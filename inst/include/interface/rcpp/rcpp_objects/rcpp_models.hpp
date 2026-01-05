@@ -74,11 +74,12 @@ class FisheryModelInterfaceBase : public FIMSRcppInterfaceBase {
 
   /**
    * @brief Convert the model to a JSON string.
-   * @param optimize A boolean indicating whether optimization was performed.
-   *   If false, sdreport calculations are skipped. Default is true.
+   * @param do_sd_report A boolean indicating whether to perform sdreport 
+   * calculations, which should be skipped when mle optimization is false. 
+   * Default is true.
    * @return A JSON string representation of the model.
    */
-  virtual std::string to_json(bool optimize = true) {
+  virtual std::string to_json(bool do_sd_report = true) {
     return "std::string to_json() not yet implemented.";
   }
 
@@ -667,11 +668,12 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
    *
    * @details Returns a list containing the report results for the CatchAtAge
    * model, including derived quantities and diagnostics.
-   * @param optimize A boolean indicating whether optimization was performed.
-   *   If false, sdreport calculations are skipped.
+   * @param do_sd_report  A boolean indicating whether to perform sdreport 
+   * calculations, which should be skipped when mle optimization is false. 
+   * Default is true.
    * @return Rcpp::List containing the report output.
    */
-  Rcpp::List get_report(bool optimize = true) {
+  Rcpp::List get_report(bool do_sd_report = true) {
     Rcpp::Environment base = Rcpp::Environment::base_env();
     Rcpp::Function summary = base["summary"];
 
@@ -714,8 +716,8 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
     Rcpp::List grouped_out = Rcpp::List::create();
     double first_est = 0.0;
     
-    // Only run sdreport if optimize is true
-    if (optimize) {
+    // Only run sdreport if do_sd_report is true
+    if (do_sd_report) {
       SEXP sdr = sdreport(obj);
       sdr_summary = summary(sdr, "report");
 
@@ -743,7 +745,7 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
         first_est = mat(0, 0);
       }
     } else {
-      // Return empty objects when optimize is false
+      // Return empty objects when do_sd_report is false
       sdr_summary = R_NilValue;
       mat = Rcpp::NumericMatrix(0, 0);
       rownames = Rcpp::CharacterVector(0);
@@ -764,11 +766,12 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
   }
   /**
    * @brief Method to convert the model to a JSON string.
-   * @param optimize A boolean indicating whether optimization was performed.
-   *   If false, sdreport calculations are skipped. Default is true.
+   * @param do_sd_report  A boolean indicating whether to perform sdreport 
+   * calculations, which should be skipped when mle optimization is false. 
+   * Default is true.
    */
-  virtual std::string to_json(bool optimize = true) {
-    Rcpp::List report = get_report(optimize);
+  virtual std::string to_json(bool do_sd_report = true) {
+    Rcpp::List report = get_report(do_sd_report);
     Rcpp::List grouped_out = report["grouped_se"];
     double max_gc = Rcpp::as<double>(report["max_gradient_component"]);
     Rcpp::NumericVector grad = report["gradient"];
