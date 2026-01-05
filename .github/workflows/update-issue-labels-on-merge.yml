@@ -56,7 +56,7 @@ jobs:
           
           # Extract issue numbers from commit messages using GitHub's closing keywords
           # Matches: close, closes, closed, fix, fixes, fixed, resolve, resolves, resolved (case-insensitive)
-          ISSUE_NUMBERS=$(echo "$COMMIT_MESSAGES" | grep -v '^null$' | grep -v '^$' | grep -i -o -E '(close|closes|closed|fix|fixes|fixed|resolve|resolves|resolved)[[:space:]]+#[0-9]+' | grep -o -E '#[0-9]+' | sed 's/#//' | tr '\n' ' ' || true)
+          ISSUE_NUMBERS=$(echo "$COMMIT_MESSAGES" | grep -v '^null$' | grep -v '^$' | grep -i -o -E '(close|closes|closed|fix|fixes|fixed|resolve|resolves|resolved)[[:space:]]*#[0-9]+' | grep -o -E '#[0-9]+' | sed 's/#//' | tr '\n' ' ' || true)
           
           echo "Found issue numbers in commit messages: $ISSUE_NUMBERS"
           echo "issue_numbers=$ISSUE_NUMBERS" >> $GITHUB_OUTPUT
