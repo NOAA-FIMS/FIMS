@@ -71,6 +71,7 @@ CalculateNumbersAA
 CalculateRecruitment
 CalculateSBPR
 CalculateSpawningBiomass
+CalculateSpawningBiomassRatio
 CalculateUnfishedBiomass
 CalculateUnfishedNumbersAA
 CalculateUnfishedNumbersAAandUnfishedSpawningBiomass
@@ -862,6 +863,7 @@ ost
 ostream
 ostringstream
 outputFile
+overfishing
 packageVersion
 pandoc
 parList

@@ -1,3 +1,10 @@
+# FIMS 0.8.0
+
+* Allow for projections based on fixed fishing mortality, catches, or in theory
+  using priors on any parameter or derived quantity that you want such as
+  the ratio of current spawning biomass to initial biomass.
+* Fixes create_default_Population() to define age and years for log_M
+
 # FIMS 0.7.1
 
 * Fixes json output when there are non numeric values, infinity values, and -999

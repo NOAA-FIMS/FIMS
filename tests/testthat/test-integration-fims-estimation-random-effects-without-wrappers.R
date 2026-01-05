@@ -62,27 +62,21 @@ test_that("deterministic run results correct number of parameters and random eff
 # No built-in errors to test.
 
 # Estimation test ----
-## Setup ----
-result_log_devs <- setup_and_run_FIMS_without_wrappers(
-  iter_id = iter_id,
-  om_input_list = om_input_list,
-  om_output_list = om_output_list,
-  em_input_list = em_input_list,
-  estimation_mode = TRUE,
-  random_effects = c(recruitment = "log_devs")
-)
-result_log_r <- setup_and_run_FIMS_without_wrappers(
-  iter_id = iter_id,
-  om_input_list = om_input_list,
-  om_output_list = om_output_list,
-  em_input_list = em_input_list,
-  estimation_mode = TRUE,
-  random_effects = c(recruitment = "log_r")
-)
+
 
 ## IO correctness ----
 # Compare FIMS results with model comparison project OM values
 test_that("estimation test with recruitment re on log devs", {
+  ## Setup ----
+  result_log_devs <- setup_and_run_FIMS_without_wrappers(
+    iter_id = iter_id,
+    om_input_list = om_input_list,
+    om_output_list = om_output_list,
+    em_input_list = em_input_list,
+    estimation_mode = TRUE,
+    random_effects = c(recruitment = "log_devs")
+  )
+
   # Compare FIMS results with model comparison project OM values
   # Tests currently don't pass when log devs are estimated
   #' @description Skip test due to current issues with log devs estimation.
@@ -97,7 +91,16 @@ test_that("estimation test with recruitment re on log devs", {
   )
 })
 
+
 test_that("estimation test with recruitment re on logr", {
+  result_log_r <- setup_and_run_FIMS_without_wrappers(
+    iter_id = iter_id,
+    om_input_list = om_input_list,
+    om_output_list = om_output_list,
+    em_input_list = em_input_list,
+    estimation_mode = TRUE,
+    random_effects = c(recruitment = "log_r")
+  )
   # Compare FIMS results with model comparison project OM values
   # Tests currently don't pass when log devs are estimated
   #' @description Skip test due to current issues with log r estimation.
