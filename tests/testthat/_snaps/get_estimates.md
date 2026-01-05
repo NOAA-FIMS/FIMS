@@ -4,7 +4,7 @@
       print(dplyr::select(get_estimates(deterministic_results), -estimated, -expected,
       -uncertainty, -gradient, -likelihood, -log_like_cv, -gradient), n = 320, width = Inf)
     Output
-      # A tibble: 13,826 x 17
+      # A tibble: 14,247 x 17
           module_name module_id module_type label                    type   type_id
           <chr>           <int> <chr>       <chr>                    <chr>    <int>
         1 Fleet               1 <NA>        log_Fmort                vector       4
@@ -971,7 +971,7 @@
       318 multinomial  data       -836.
       319 multinomial  data       -836.
       320 multinomial  data       -836.
-      # i 13,506 more rows
+      # i 13,927 more rows
 
 # `get_estimates()` works with estimation run
 
@@ -980,7 +980,7 @@
       -expected, -uncertainty, -gradient, -likelihood, -log_like_cv, -gradient), n = 320,
       width = Inf)
     Output
-      # A tibble: 13,826 x 17
+      # A tibble: 14,247 x 17
           module_name module_id module_type label                    type   type_id
           <chr>           <int> <chr>       <chr>                    <chr>    <int>
         1 Fleet               1 <NA>        log_Fmort                vector       4
@@ -1947,5 +1947,5 @@
       318 multinomial  data       -835.
       319 multinomial  data       -835.
       320 multinomial  data       -835.
-      # i 13,506 more rows
+      # i 13,927 more rows
 

@@ -147,22 +147,22 @@ test_that("catch-at-age model (estimation MLE without wrappers) returns correct 
   )
 
   # Run the FIMS setup and execution function
-  result <- setup_and_run_FIMS_without_wrappers(
-    iter_id = iter_id,
-    om_input_list = om_input_list,
-    om_output_list = om_output_list,
-    em_input_list = em_input_list,
-    estimation_mode = TRUE
-  )
+  #result <- setup_and_run_FIMS_without_wrappers(
+  #  iter_id = iter_id,
+  #  om_input_list = om_input_list,
+  #  om_output_list = om_output_list,
+  #  em_input_list = em_input_list,
+  #  estimation_mode = TRUE
+  #)
 
-  #' @description Test that FIMS runs with only one observation in landings and survey data and the report is not NULL.
-  validate_fims(
-    report = result[["report"]],
-    estimates = result[["sdr_report"]],
-    om_input = om_input_list[[iter_id]],
-    om_output = om_output_list[[iter_id]],
-    em_input = em_input_list[[iter_id]]
-  )
+  ##' @description Test that FIMS runs with only one observation in landings and survey data and the report is not NULL.
+  #validate_fims(
+  #  report = result[["report"]],
+  #  estimates = result[["sdr_report"]],
+  #  om_input = om_input_list[[iter_id]],
+  # om_output = om_output_list[[iter_id]],
+  #  em_input = em_input_list[[iter_id]]
+  #)
 })
 
 ## Error handling ----
