@@ -62,12 +62,17 @@ class CAAInitializeTestFixture : public testing::Test {
           this->catch_at_age_model->populations[p]->n_years *
           this->catch_at_age_model->populations[p]->n_ages);
 
+      derived_quantities["mortality_M"] = fims::Vector<double>(
+          this->catch_at_age_model->populations[p]->n_years *
+          this->catch_at_age_model->populations[p]->n_ages);
+
       derived_quantities["mortality_Z"] = fims::Vector<double>(
           this->catch_at_age_model->populations[p]->n_years *
           this->catch_at_age_model->populations[p]->n_ages);
 
       // TODO: numbers_at_age are resized in rcpp_population, should this be
-      // removed?
+      // removed? Removed number_at_age from rcpp_population instead because
+      // they are no longer a part of population.
       derived_quantities["numbers_at_age"] = fims::Vector<double>(
           (this->catch_at_age_model->populations[p]->n_years + 1) *
           this->catch_at_age_model->populations[p]->n_ages);
@@ -102,9 +107,15 @@ class CAAInitializeTestFixture : public testing::Test {
       this->catch_at_age_model->populations[p]->proportion_female.resize(
           this->catch_at_age_model->populations[p]->n_ages);
 
+      this->catch_at_age_model->populations[p]->spawning_biomass_ratio.resize(
+          this->catch_at_age_model->populations[p]->n_years + 1);
+
       this->catch_at_age_model->populations[p]->M.resize(
           this->catch_at_age_model->populations[p]->n_years *
           this->catch_at_age_model->populations[p]->n_ages);
+
+      this->catch_at_age_model->populations[p]->f_multiplier.resize(
+          this->catch_at_age_model->populations[p]->n_years);
     }
 
     for (fleet_iterator fit = this->catch_at_age_model->fleets.begin();
@@ -283,6 +294,7 @@ class CAAEvaluateTestFixture : public testing::Test {
     catch_at_age_model->populations[0]->ages.resize(n_ages);
     catch_at_age_model->populations[0]->log_init_naa.resize(n_ages);
     catch_at_age_model->populations[0]->log_M.resize(n_years * n_ages);
+    catch_at_age_model->populations[0]->log_f_multiplier.resize(n_years);
     for (int i = 0; i < n_ages; i++) {
       catch_at_age_model->populations[0]->ages[i] = i + 1;
     }
@@ -307,6 +319,12 @@ class CAAEvaluateTestFixture : public testing::Test {
     for (int i = 0; i < n_years * n_ages; i++) {
       catch_at_age_model->populations[0]->log_M[i] =
           log_M_distribution(generator);
+    }
+
+    catch_at_age_model->populations[0]->log_f_multiplier.resize(n_years);
+    for (int i = 0; i < n_years; i++) {
+      catch_at_age_model->populations[0]->log_f_multiplier[i] =
+          static_cast<double>(0.0);
     }
 
     // Set initialized values for derived quantities
@@ -407,6 +425,10 @@ class CAAEvaluateTestFixture : public testing::Test {
           this->catch_at_age_model->populations[p]->n_years *
           this->catch_at_age_model->populations[p]->n_ages);
 
+      derived_quantities["mortality_M"] = fims::Vector<double>(
+          this->catch_at_age_model->populations[p]->n_years *
+          this->catch_at_age_model->populations[p]->n_ages);
+
       derived_quantities["mortality_Z"] = fims::Vector<double>(
           this->catch_at_age_model->populations[p]->n_years *
           this->catch_at_age_model->populations[p]->n_ages);
@@ -447,9 +469,15 @@ class CAAEvaluateTestFixture : public testing::Test {
       this->catch_at_age_model->populations[p]->proportion_female.resize(
           this->catch_at_age_model->populations[p]->n_ages);
 
+      this->catch_at_age_model->populations[p]->spawning_biomass_ratio.resize(
+          this->catch_at_age_model->populations[p]->n_years + 1);
+
       this->catch_at_age_model->populations[p]->M.resize(
           this->catch_at_age_model->populations[p]->n_years *
           this->catch_at_age_model->populations[p]->n_ages);
+
+      this->catch_at_age_model->populations[p]->f_multiplier.resize(
+          this->catch_at_age_model->populations[p]->n_years);
     }
 
     for (fleet_iterator fit = this->catch_at_age_model->fleets.begin();
@@ -646,6 +674,12 @@ class CAAPrepareTestFixture : public testing::Test {
           log_M_distribution(generator);
     }
 
+    catch_at_age_model->populations[0]->log_f_multiplier.resize(n_years);
+    for (int i = 0; i < n_years; i++) {
+      catch_at_age_model->populations[0]->log_f_multiplier[i] =
+          static_cast<double>(0.0);
+    }
+
     // weight_at_age
     double weight_at_age_min = 0.5;
     double weight_at_age_max = 12.0;
@@ -689,6 +723,10 @@ class CAAPrepareTestFixture : public testing::Test {
           this->catch_at_age_model->populations[p]->n_years *
           this->catch_at_age_model->populations[p]->n_ages);
 
+      derived_quantities["mortality_M"] = fims::Vector<double>(
+          this->catch_at_age_model->populations[p]->n_years *
+          this->catch_at_age_model->populations[p]->n_ages);
+
       derived_quantities["mortality_Z"] = fims::Vector<double>(
           this->catch_at_age_model->populations[p]->n_years *
           this->catch_at_age_model->populations[p]->n_ages);
@@ -729,9 +767,15 @@ class CAAPrepareTestFixture : public testing::Test {
       this->catch_at_age_model->populations[p]->proportion_female.resize(
           this->catch_at_age_model->populations[p]->n_ages);
 
+      this->catch_at_age_model->populations[p]->spawning_biomass_ratio.resize(
+          this->catch_at_age_model->populations[p]->n_years + 1);
+
       this->catch_at_age_model->populations[p]->M.resize(
           this->catch_at_age_model->populations[p]->n_years *
           this->catch_at_age_model->populations[p]->n_ages);
+
+      this->catch_at_age_model->populations[p]->f_multiplier.resize(
+          this->catch_at_age_model->populations[p]->n_years);
     }
 
     for (fleet_iterator fit = this->catch_at_age_model->fleets.begin();
