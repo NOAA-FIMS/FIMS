@@ -133,7 +133,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
 
       this->populations[p]->f_multiplier.resize(this->populations[p]->n_years);
 
-      this->populations[p]->spawning_biomass_ratio.resize(this->populations[p]->(n_years + 1));
+      this->populations[p]->spawning_biomass_ratio.resize((this->populations[p]->n_years + 1));
     }
 
     for (fleet_iterator fit = this->fleets.begin(); fit != this->fleets.end();
