@@ -9,18 +9,18 @@
 #ifndef SRC_FIMS_MODULES_HPP
 #define SRC_FIMS_MODULES_HPP
 
+#include "../inst/include/interface/rcpp/rcpp_interface.hpp"
 #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_data.hpp"
+#include "../inst/include/interface/rcpp/rcpp_objects/rcpp_distribution.hpp"
 #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_fleet.hpp"
 #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_growth.hpp"
+#include "../inst/include/interface/rcpp/rcpp_objects/rcpp_interface_base.hpp"
 #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_math.hpp"
 #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_maturity.hpp"
 #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_natural_mortality.hpp"
 #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_population.hpp"
 #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_recruitment.hpp"
 #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_selectivity.hpp"
-#include "../inst/include/interface/rcpp/rcpp_objects/rcpp_distribution.hpp"
-#include "../inst/include/interface/rcpp/rcpp_objects/rcpp_interface_base.hpp"
-#include "../inst/include/interface/rcpp/rcpp_interface.hpp"
 
 RCPP_EXPOSED_CLASS(Parameter)
 RCPP_EXPOSED_CLASS(ParameterVector)
@@ -136,6 +136,48 @@ RCPP_MODULE(fims) {
       .method("at", &ParameterVector::at,
               "Returns a Parameter at the indicated position given the index "
               "argument.")
+      .method("values_from_R_vector", &ParameterVector::values_from_R_vector,
+          "Sets the initial values of the ParameterVector from a R numeric ")
+      .method(
+          "min_values_from_R_vector",
+          &ParameterVector::min_values_from_R_vector,
+          "Sets the minimum values of the ParameterVector from a R numeric ")
+      .method(
+          "max_values_from_R_vector",
+          &ParameterVector::max_values_from_R_vector,
+          "Sets the maximum values of the ParameterVector from a R numeric ")
+      .method("final_values_from_R_vector",
+              &ParameterVector::final_values_from_R_vector,
+              "Sets the final values of the ParameterVector from a R numeric ")
+      .method("uncertainty_values_from_R_vector",
+              &ParameterVector::uncertainty_values_from_R_vector,
+              "Sets the uncertainty values of the ParameterVector from a R "
+              "numeric ")
+      .method("estimation_types_from_R_vector",
+              &ParameterVector::estimation_types_from_R_vector,
+              "Sets the estimation type values of the ParameterVector from a R "
+              "numeric ")
+        .method("values_to_R_vector", &ParameterVector::values_to_R_vector,
+              "Returns the initial values of the ParameterVector as a R "
+              "numeric vector.")
+      .method("min_values_to_R_vector", &ParameterVector::min_values_to_R_vector,
+              "Returns the minimum values of the ParameterVector as a R "
+              "numeric vector.")
+      .method("max_values_to_R_vector", &ParameterVector::max_values_to_R_vector,
+              "Returns the maximum values of the ParameterVector as a R "
+              "numeric vector.")
+      .method("final_values_to_R_vector",
+              &ParameterVector::final_values_to_R_vector,
+              "Returns the final values of the ParameterVector as a R "
+              "numeric vector.")
+      .method("uncertainty_values_to_R_vector",
+              &ParameterVector::uncertainty_values_to_R_vector,
+              "Returns the uncertainty values of the ParameterVector as a R "
+              "numeric vector.")
+      .method("estimation_types_to_R_vector",
+              &ParameterVector::estimation_types_to_R_vector,
+              "Returns the estimation types of the ParameterVector as a R "
+              "character vector.")
       .method("size", &ParameterVector::size,
               "Returns the size of a ParameterVector.")
       .method("resize", &ParameterVector::resize,
@@ -160,9 +202,9 @@ RCPP_MODULE(fims) {
       .method(
           "set", &RealVector::set,
           "An internal setter for setting a position of a RealVector from R.")
-      .method("fromRVector", &RealVector::fromRVector,
+      .method("from_R_vector", &RealVector::from_R_vector,
               "Initializes the RealVector from the values of a R vector.")
-      .method("toRVector", &RealVector::toRVector,
+      .method("to_R_vector", &RealVector::to_R_vector,
               "Returns values as a R vector.")
       .method("show", &RealVector::show,
               "The printing methods for a RealVector.")

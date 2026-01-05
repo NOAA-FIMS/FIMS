@@ -308,6 +308,188 @@ class ParameterVector {
    */
   void set(size_t pos, const Parameter& p) { this->storage_m->at(pos) = p; }
 
+
+  /**
+   * @brief Sets the initial values of the ParameterVector from a R numeric
+   * vector.
+   * @param orig A numeric vector from R.
+   */
+void values_from_R_vector(const Rcpp::NumericVector& orig) {
+    if (orig.size() != this->storage_m->size()) {
+      throw std::invalid_argument(
+          "Error in call to ParameterVector::values_from_R_vector: orig.size() "
+          "!= storage_m->size().");
+    }
+    for (size_t i = 0; i < this->storage_m->size(); i++) {
+      this->storage_m->at(i).initial_value_m = orig[i];
+    }
+  }
+
+  /**
+   * @brief Sets the minimum values of the ParameterVector from a R numeric
+   * vector.
+   * @param orig A numeric vector from R.
+   */
+  void min_values_from_R_vector(const Rcpp::NumericVector& orig) {
+    if (orig.size() != this->storage_m->size()) {
+      throw std::invalid_argument(
+          "Error in call to ParameterVector::min_from_R_vector: orig.size() "
+          "!= storage_m->size().");
+    }
+    for (size_t i = 0; i < this->storage_m->size(); i++) {
+      this->storage_m->at(i).min_m = orig[i];
+    }
+  }
+
+  /**
+   * @brief Sets the maximum values of the ParameterVector from a R numeric
+   * vector.
+   * @param orig A numeric vector from R.
+   */  
+  void max_values_from_R_vector(const Rcpp::NumericVector& orig) {
+    if (orig.size() != this->storage_m->size()) {
+      throw std::invalid_argument(
+          "Error in call to ParameterVector::max_from_R_vector: orig.size() "
+          "!= storage_m->size().");
+    }
+    for (size_t i = 0; i < this->storage_m->size(); i++) {
+      this->storage_m->at(i).max_m = orig[i];
+    }
+  }
+
+  /**
+   * @brief Sets the estimation types of the ParameterVector from a R character
+   * vector.
+   * @param orig A character vector from R.
+   */
+  void estimation_types_from_R_vector(const Rcpp::CharacterVector& orig) {
+    if (orig.size() != this->storage_m->size()) {
+      throw std::invalid_argument(
+          "Error in call to ParameterVector::estimation_type_from_R_vector: "
+          "orig.size() != storage_m->size().");
+    }
+    for (size_t i = 0; i < this->storage_m->size(); i++) {
+      this->storage_m->at(i).estimation_type_m.set(Rcpp::as<std::string>(orig[i]));
+    }
+  }
+
+  /**
+   * @brief Sets the final values of the ParameterVector from a R numeric
+   * vector.
+   * @param orig A numeric vector from R.
+   */
+  void final_values_from_R_vector(const Rcpp::NumericVector& orig) {
+    if (orig.size() != this->storage_m->size()) {
+      throw std::invalid_argument(
+          "Error in call to ParameterVector::final_values_from_R_vector: "
+          "orig.size() != storage_m->size().");
+    }
+    for (size_t i = 0; i < this->storage_m->size(); i++) {
+      this->storage_m->at(i).final_value_m = orig[i];
+    }
+  } 
+
+  /**
+   * @brief Sets the uncertainty values of the ParameterVector from a R numeric
+   * vector.
+   * @param orig A numeric vector from R.
+   */
+  void uncertainty_values_from_R_vector(const Rcpp::NumericVector& orig) {
+    if (orig.size() != this->storage_m->size()) {
+      throw std::invalid_argument(
+          "Error in call to ParameterVector::uncertainty_values_from_R_vector: "
+          "orig.size() != storage_m->size().");
+    }
+    for (size_t i = 0; i < this->storage_m->size(); i++) {
+      this->storage_m->at(i).uncertainty_m = orig[i];
+    }
+  }
+
+  /**
+   * @brief Returns the initial values of the ParameterVector as a R numeric
+   * vector.
+   * @return Rcpp::NumericVector
+   */
+  Rcpp::NumericVector values_to_R_vector() {
+    Rcpp::NumericVector ret(this->storage_m->size());
+    for (size_t i = 0; i < this->size(); i++) {
+      ret[i] = this->storage_m->at(i).initial_value_m;
+    }
+
+    return ret;
+  }
+
+  /**
+   * @brief Returns the minimum values of the ParameterVector as a R numeric
+   * vector.
+   * @return Rcpp::NumericVector
+   */
+  Rcpp::NumericVector final_values_to_R_vector() {
+    Rcpp::NumericVector ret(this->storage_m->size());
+    for (size_t i = 0; i < this->size(); i++) {
+      ret[i] = this->storage_m->at(i).final_value_m;
+    }
+
+    return ret;
+  }
+
+  /**
+   * @brief Returns the minimum values of the ParameterVector as a R numeric
+   * vector.
+   * @return Rcpp::NumericVector
+   */
+  Rcpp::NumericVector min_values_to_R_vector() {
+    Rcpp::NumericVector ret(this->storage_m->size());
+    for (size_t i = 0; i < this->size(); i++) {
+      ret[i] = this->storage_m->at(i).min_m;
+    }
+
+    return ret;
+  }
+  
+
+  /**
+   * @brief Returns the maximum values of the ParameterVector as a R numeric
+   * vector.
+   * @return Rcpp::NumericVector
+   */
+  Rcpp::NumericVector max_values_to_R_vector() {
+    Rcpp::NumericVector ret(this->storage_m->size());
+    for (size_t i = 0; i < this->size(); i++) {
+      ret[i] = this->storage_m->at(i).max_m;
+    }
+
+    return ret;
+  }
+
+  /**
+   * @brief Returns the estimation types of the ParameterVector as a R
+   * character vector.
+   * @return Rcpp::CharacterVector
+   */  
+  Rcpp::CharacterVector estimation_types_to_R_vector() {
+    Rcpp::CharacterVector ret(this->storage_m->size());
+    for (size_t i = 0; i < this->size(); i++) {
+      ret[i] = this->storage_m->at(i).estimation_type_m.get();
+    }
+
+    return ret;
+  }
+
+  /**
+   * @brief Returns the uncertainty values of the ParameterVector as a R
+   * numeric vector.
+   * @return Rcpp::NumericVector
+   */
+  Rcpp::NumericVector uncertainty_values_to_R_vector() {
+    Rcpp::NumericVector ret(this->storage_m->size());
+    for (size_t i = 0; i < this->size(); i++) {
+      ret[i] = this->storage_m->at(i).uncertainty_m;
+    }
+
+    return ret;
+  }
+
   /**
    * @brief Returns the size of a ParameterVector.
    */
@@ -521,11 +703,10 @@ class RealVector {
   virtual uint32_t get_id() { return this->id_m; }
 
   /**
-   * @brief
-   *
-   * @param orig
-   */
-  void fromRVector(const Rcpp::NumericVector& orig) {
+   * @brief Sets the values of the RealVector from a R numeric vector.
+   * @param orig A numeric vector from R.
+  */
+  void from_R_vector(const Rcpp::NumericVector& orig) {
     this->storage_m->resize(orig.size());
     for (size_t i = 0; i < this->storage_m->size(); i++) {
       this->storage_m->at(i) = orig[i];
@@ -533,11 +714,11 @@ class RealVector {
   }
 
   /**
-   * @brief
+   * @brief Returns the values of the RealVector as a R numeric vector.
    *
    * @return Rcpp::NumericVector
    */
-  Rcpp::NumericVector toRVector() {
+  Rcpp::NumericVector to_R_vector() {
     Rcpp::NumericVector ret(this->storage_m->size());
     for (size_t i = 0; i < this->size(); i++) {
       ret[i] = this->storage_m->at(i);
