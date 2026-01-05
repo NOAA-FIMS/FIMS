@@ -178,6 +178,9 @@ class Information {
       if ((d->priors)[0] != NULL) {
         d->priors.clear();
       }
+      if (d->data_expected_values != NULL) {
+        d->data_expected_values->clear();
+      }
       if (d->re != NULL) {
         d->re->clear();
       }
@@ -863,14 +866,14 @@ class Information {
   void SetNages(size_t n_ages) { this->n_ages = n_ages; }
 
   /**
-   * @brief Get the Nyears object
+   * @brief Get the n_years object
    *
    * @return size_t
    */
   size_t GetNyears() const { return n_years; }
 
   /**
-   * @brief Set the Nyears object
+   * @brief Set the n_years object
    *
    * @param n_years
    */

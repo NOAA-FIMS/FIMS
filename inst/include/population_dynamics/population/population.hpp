@@ -35,10 +35,16 @@ struct Population : public fims_model_object::FIMSObject<Type> {
   fims::Vector<Type>
       log_M; /*!< estimated parameter: natural log of Natural Mortality*/
   fims::Vector<Type> proportion_female = fims::Vector<Type>(
-      1, static_cast<Type>(0.5)); /*!< proportion female by age */
+      1, static_cast<Type>(0.5));            /*!< proportion female by age */
+  fims::Vector<Type> log_f_multiplier;       /*!< estimated parameter: vector of
+    annual fishing mortality multipliers to scale total mortality of all fleets*/
+  fims::Vector<Type> spawning_biomass_ratio; /*!< estimated parameter: vector of
+annual fishing mortality multipliers to scale total mortality of all fleets*/
 
   // Transformed values
   fims::Vector<Type> M; /*!< transformed parameter: natural mortality*/
+  fims::Vector<Type> f_multiplier; /*!< transformed parameter: vector of
+annual fishing mortality multipliers to scale total mortality of all fleets*/
 
   fims::Vector<double> ages;  /*!< vector of the ages for referencing*/
   fims::Vector<double> years; /*!< vector of years for referencing*/
@@ -75,6 +81,9 @@ struct Population : public fims_model_object::FIMSObject<Type> {
       std::map<std::string, fims::Vector<fims::Vector<Type>>>& report_vectors) {
     report_vectors["log_init_naa"].emplace_back(this->log_init_naa);
     report_vectors["log_M"].emplace_back(this->log_M);
+    report_vectors["log_f_multiplier"].emplace_back(this->log_f_multiplier);
+    report_vectors["spawning_biomass_ratio"].emplace_back(
+        this->spawning_biomass_ratio);
   }
 
   /**
@@ -84,6 +93,8 @@ struct Population : public fims_model_object::FIMSObject<Type> {
       std::map<std::string, size_t>& report_vector_count) {
     report_vector_count["log_init_naa"] += 1;
     report_vector_count["log_M"] += 1;
+    report_vector_count["log_f_multiplier"] += 1;
+    report_vector_count["spawning_biomass_ratio"] += 1;
   }
 };
 template <class Type>

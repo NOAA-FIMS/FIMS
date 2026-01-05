@@ -700,9 +700,15 @@ FIMSFrame <- function(data) {
   n_fleets <- length(fleets)
 
   if ("age" %in% colnames(data)) {
-    # Forced to use annual age bins because the model is on an annual time step
-    # FUTURE: allow for different age bins rather than 1 year increment
-    ages <- min(data[["age"]], na.rm = TRUE):max(data[["age"]], na.rm = TRUE)
+    if (all(is.na(data[["age"]]))) {
+      cli::cli_abort(
+        message = "The `age` column exists in `data` but they are all `NA`."
+      )
+    } else {
+      # Forced to use annual age bins because the model has an annual time step
+      # FUTURE: allow for different age bins rather than 1 year increment
+      ages <- min(data[["age"]], na.rm = TRUE):max(data[["age"]], na.rm = TRUE)
+    }
   } else {
     ages <- numeric()
   }

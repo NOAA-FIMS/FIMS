@@ -42,6 +42,8 @@ struct LogNormalLPDF : public DensityComponentBase<Type> {
   virtual const Type evaluate() {
     // set vector size based on input type (prior, process, or data)
     size_t n_x = this->get_n_x();
+    // get expected value vector size
+    size_t n_expected = this->get_n_expected();
     // setup vector for recording the log probability density function values
     this->lpdf_vec.resize(n_x);
     this->report_lpdf_vec.resize(n_x);
@@ -52,15 +54,15 @@ struct LogNormalLPDF : public DensityComponentBase<Type> {
     this->lpdf = static_cast<Type>(0);
 
     // Dimension checks
-    /* TODO: fix dimension check as expected values no longer used for data
-    if (n_x != this->expected_values.size()) {
-      throw std::invalid_argument(
-          "LognormalLPDF::Vector index out of bounds. The size of observed "
-          "data does not equal the size of expected values. The observed data "
-          "vector is of size " +
-          fims::to_string(n_x) + " and the expected vector is of size " +
-          fims::to_string(this->expected_values.size()));
-    }*/
+    // TODO: fix dimension check as expected values no longer used for data
+    if (n_x != n_expected) {
+      if (n_expected == 1) {
+        n_expected = n_x;
+      } else if (n_x > n_expected) {
+        n_x = n_expected;
+      }
+    }
+
     if (this->log_sd.size() > 1 && n_x != this->log_sd.size()) {
       throw std::invalid_argument(
           "LognormalLPDF::Vector index out of bounds. The size of observed "

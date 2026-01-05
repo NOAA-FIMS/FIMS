@@ -36,6 +36,30 @@ class DistributionsInterfaceBase : public FIMSRcppInterfaceBase {
    */
   SharedString input_type_m;
   /**
+   * @brief Control flag indicating whether to use the expected mean in the
+   * distribution calculations.
+   *
+   * This shared string member serves as a boolean flag (i.e., "yes" or "no")
+   * that determines whether the distribution should use the `expected_mean`
+   * vector or other expected values (e.g., from data or random effects) when
+   * computing the expected value in the likelihood calculations.
+   *
+   * When set to "no" (default), the distribution uses expected values based on
+   * the `input_type` setting (data expected values for "data", random effects
+   * expected values for "random_effects", or standard expected values
+   * otherwise).
+   *
+   * When set to "yes" (typically by calling `set_distribution_mean()`), the
+   * distribution overrides the default expected value source and uses the
+   * `expected_mean` vector instead. This is useful for setting a fixed mean
+   * value for the distribution that doesn't depend on other model components.
+   *
+   * @see set_distribution_mean() for the method that sets this flag to "yes".
+   * @see DensityComponentBase::get_expected() in density_components_base.hpp
+   * for the implementation that checks this flag.
+   */
+  SharedString use_mean_m = fims::to_string("no");
+  /**
    * @brief The map associating the ID of the DistributionsInterfaceBase to the
      DistributionsInterfaceBase objects. This is a live object, which is an
      object that has been created and lives in memory.
@@ -71,6 +95,7 @@ class DistributionsInterfaceBase : public FIMSRcppInterfaceBase {
       : id_m(other.id_m),
         key_m(other.key_m),
         input_type_m(other.input_type_m),
+        use_mean_m(other.use_mean_m),
         interface_observed_data_id_m(other.interface_observed_data_id_m) {}
 
   /**
@@ -95,6 +120,31 @@ class DistributionsInterfaceBase : public FIMSRcppInterfaceBase {
                                       Rcpp::IntegerVector ids) {
     return false;
   }
+
+  /**
+   * @brief Set the expected mean value for the distribution.
+   *
+   * This virtual function provides an interface for setting a fixed mean value
+   * for distribution objects. When overridden in derived classes, this method
+   * typically stores the provided mean value as a fixed effect parameter and
+   * marks the distribution to use the mean in its calculations.
+   *
+   * The base class implementation returns false to indicate the operation is
+   * not supported. Derived classes that support mean specification should
+   * override this method to implement the actual functionality.
+   *
+   * @param input_value The numeric value to set as the distribution's expected
+   * mean. This value will be treated as a fixed effect parameter (not
+   * estimated) in derived class implementations.
+   *
+   * @return bool Returns true if the mean was successfully set, false
+   * otherwise. The base class implementation always returns false to indicate
+   * the operation is not supported by default.
+   *
+   * @see DnormDistributionsInterface::set_distribution_mean for an example
+   * implementation that sets the mean as a fixed effect parameter.
+   */
+  virtual bool set_distribution_mean(double input_value) { return false; }
 
   /**
    * @brief Set the unique ID for the observed data object.
@@ -133,6 +183,11 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
    */
   ParameterVector expected_values;
   /**
+   * @brief The expected mean, which would be the mean of x for this
+   * distribution.
+   */
+  ParameterVector expected_mean;
+  /**
    * @brief The uncertainty, which would be the standard deviation of x for the
    * normal distribution.
    */
@@ -163,6 +218,7 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
         x(other.x),
         expected_values(other.expected_values),
         log_sd(other.log_sd),
+        expected_mean(other.expected_mean),
         lpdf_vec(other.lpdf_vec) {}
 
   /**
@@ -186,12 +242,17 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
   }
 
   /**
-   * @brief Sets pointers for data observations, random effects, or priors.
-   *
-   * @param input_type String that sets whether the distribution type is for
-   * priors, random effects, or data.
-   * @param ids Vector of unique ids for each linked parameter(s), derived
-   * value(s), or observed data vector.
+   * @copydoc DistributionsInterfaceBase::set_distribution_mean
+   */
+  virtual bool set_distribution_mean(double input_value) {
+    this->expected_mean[0].initial_value_m = input_value;
+    this->expected_mean[0].estimation_type_m.set("fixed_effects");
+    this->use_mean_m.set(fims::to_string("yes"));
+    return true;
+  }
+
+  /**
+   * @copydoc DistributionsInterfaceBase::set_distribution_links
    */
   virtual bool set_distribution_links(std::string input_type,
                                       Rcpp::IntegerVector ids) {
@@ -214,6 +275,7 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
     dnorm.x.resize(this->x.size());
     dnorm.expected_values.resize(this->expected_values.size());
     dnorm.log_sd.resize(this->log_sd.size());
+    dnorm.expected_mean.resize(this->expected_mean.size());
     for (size_t i = 0; i < x.size(); i++) {
       dnorm.x[i] = this->x[i].initial_value_m;
     }
@@ -223,6 +285,10 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
     for (size_t i = 0; i < log_sd.size(); i++) {
       dnorm.log_sd[i] = this->log_sd[i].initial_value_m;
     }
+    for (size_t i = 0; i < expected_mean.size(); i++) {
+      dnorm.expected_mean[i] = this->expected_mean[i].initial_value_m;
+    }
+    dnorm.use_mean = this->use_mean_m;
     return dnorm.evaluate();
   }
 
@@ -263,6 +329,15 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
           this->log_sd[i].final_value_m = this->log_sd[i].initial_value_m;
         } else {
           this->log_sd[i].final_value_m = dnorm->log_sd[i];
+        }
+      }
+
+      for (size_t i = 0; i < this->expected_mean.size(); i++) {
+        if (this->expected_mean[i].estimation_type_m.get() == "constant") {
+          this->expected_mean[i].final_value_m =
+              this->expected_mean[i].initial_value_m;
+        } else {
+          this->expected_mean[i].final_value_m = dnorm->expected_mean[i];
         }
       }
 
@@ -385,6 +460,24 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
       }
     }
     info->variable_map[this->log_sd.id_m] = &(distribution)->log_sd;
+
+    distribution->use_mean = this->use_mean_m.get();
+    distribution->expected_mean.resize(this->expected_mean.size());
+    for (size_t i = 0; i < this->expected_mean.size(); i++) {
+      distribution->expected_mean[i] = this->expected_mean[i].initial_value_m;
+      if (this->expected_mean[i].estimation_type_m.get() == "fixed_effects") {
+        ss.str("");
+        ss << "dnorm." << this->id_m << ".expected_mean."
+           << this->expected_mean[i].id_m;
+        info->RegisterParameterName(ss.str());
+        info->RegisterParameter(distribution->expected_mean[i]);
+      }
+      if (this->expected_mean[i].estimation_type_m.get() == "random_effects") {
+        FIMS_ERROR_LOG("expected_mean cannot be set to random effects");
+      }
+    }
+    info->variable_map[this->expected_mean.id_m] =
+        &(distribution)->expected_mean;
 
     info->density_components[distribution->id] = distribution;
 
