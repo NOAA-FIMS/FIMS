@@ -57,10 +57,10 @@ jobs:
           
           echo "Final list of unique issue numbers: $ALL_ISSUE_NUMBERS"
           
-          # Check if the new label exists by viewing all labels and searching
+          # Check if the new label exists using jq for proper JSON parsing
           LABELS=$(gh label list --repo ${{ github.repository }} --json name)
           
-          if [[ ! $LABELS =~ \"$NEW_LABEL\" ]]; then
+          if ! echo "$LABELS" | jq -e --arg label "$NEW_LABEL" '.[] | select(.name == $label)' > /dev/null; then
             echo "Label '$NEW_LABEL' does not exist. Creating it now."
             gh label create "$NEW_LABEL" --repo ${{ github.repository }} --color 0E8A16 --description "This work is completed and is in the dev branch"
           else
@@ -70,14 +70,20 @@ jobs:
           # Update the labels on each unique linked issue
           for ISSUE_NUMBER in $ALL_ISSUE_NUMBERS; do
             echo "Processing issue #$ISSUE_NUMBER"
-            if gh issue view $ISSUE_NUMBER --repo ${{ github.repository }} --json labels | grep -q "$OLD_LABEL"; then
+            
+            # Fetch current labels once per issue
+            CURRENT_LABELS=$(gh issue view $ISSUE_NUMBER --repo ${{ github.repository }} --json labels)
+            
+            # Check if old label exists using jq for proper JSON parsing
+            if echo "$CURRENT_LABELS" | jq -e --arg label "$OLD_LABEL" '.labels[] | select(.name == $label)' > /dev/null; then
               gh issue edit $ISSUE_NUMBER --repo ${{ github.repository }} --remove-label "$OLD_LABEL"
               echo "Removed label '$OLD_LABEL' from issue #$ISSUE_NUMBER"
             else
               echo "Label '$OLD_LABEL' does not exist on issue #$ISSUE_NUMBER. Skipping removal."
             fi
 
-            if gh issue view $ISSUE_NUMBER --repo ${{ github.repository }} --json labels | grep -q "$NEW_LABEL"; then
+            # Check if new label already exists using jq for proper JSON parsing
+            if echo "$CURRENT_LABELS" | jq -e --arg label "$NEW_LABEL" '.labels[] | select(.name == $label)' > /dev/null; then
               echo "Label '$NEW_LABEL' already exists on issue #$ISSUE_NUMBER. Skipping addition."
             else
               echo "Adding label '$NEW_LABEL' to issue #$ISSUE_NUMBER"
