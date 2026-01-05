@@ -52,10 +52,16 @@ jobs:
           OLD_LABEL: "status: in progress"
           NEW_LABEL: "status: in dev"
         run: |
-          # Combine outputs and de-duplicate issue numbers
-          ALL_ISSUE_NUMBERS=$(echo "${{ steps.get_body_issues.outputs.issue_numbers }} ${{ steps.get_graphql_issues.outputs.issue_numbers }}" | tr ' ' '\n' | sort -u | tr '\n' ' ')
+          # Combine outputs and de-duplicate issue numbers, filtering out empty values
+          ALL_ISSUE_NUMBERS=$(echo "${{ steps.get_body_issues.outputs.issue_numbers }} ${{ steps.get_graphql_issues.outputs.issue_numbers }}" | tr ' ' '\n' | grep -E '^[0-9]+$' | sort -u | tr '\n' ' ')
           
           echo "Final list of unique issue numbers: $ALL_ISSUE_NUMBERS"
+          
+          # Check if there are any issue numbers to process
+          if [ -z "$ALL_ISSUE_NUMBERS" ] || [ "$ALL_ISSUE_NUMBERS" = " " ]; then
+            echo "No linked issues found. Exiting."
+            exit 0
+          fi
           
           # Check if the new label exists using jq for proper JSON parsing
           LABELS=$(gh label list --repo ${{ github.repository }} --json name)
