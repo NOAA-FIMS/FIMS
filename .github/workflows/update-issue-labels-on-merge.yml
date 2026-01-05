@@ -1,0 +1,115 @@
+name: Change Issue Label on PR Merge
+
+on:
+  pull_request:
+    types: [closed]
+    branches:
+      - dev
+
+jobs:
+  update-label:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: read
+    
+    steps:
+      - name: Get Issues from PR Body
+        id: get_body_issues
+        run: |
+          ISSUE_NUMBERS=$(echo "${{ github.event.pull_request.body }}" | grep -o -E '#[0-9]+' | sed 's/#//' | tr '\n' ' ' || true)
+          echo "Found issue numbers in PR body: $ISSUE_NUMBERS"
+          echo "issue_numbers=$ISSUE_NUMBERS" >> $GITHUB_OUTPUT
+        shell: bash
+
+      - name: Fetch Linked Issues via GraphQL
+        id: get_graphql_issues
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          cat <<EOF > graphql-query.json
+          {
+            "query": "query(\$owner: String!, \$repo: String!, \$pr: Int!) { repository(owner: \$owner, name: \$repo) { pullRequest(number: \$pr) { closingIssuesReferences(first: 100) { nodes { number } } } } }",
+            "variables": {
+              "owner": "${{ github.repository_owner }}",
+              "repo": "${{ github.event.repository.name }}",
+              "pr": ${{ github.event.pull_request.number }}
+            }
+          }
+          EOF
+          
+          ISSUE_NUMBERS=$(gh api graphql --input graphql-query.json --jq '.data.repository.pullRequest.closingIssuesReferences.nodes[].number' | tr '\n' ' ')
+          
+          echo "Found linked issue numbers via GraphQL: $ISSUE_NUMBERS"
+          echo "issue_numbers=$ISSUE_NUMBERS" >> $GITHUB_OUTPUT
+        shell: bash
+
+      - name: Get Issues from Commit Messages
+        id: get_commit_issues
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Get all commit messages (both headline and body) from the PR
+          COMMIT_MESSAGES=$(gh pr view ${{ github.event.pull_request.number }} --repo ${{ github.repository }} --json commits --jq '.commits[] | .messageHeadline, .messageBody' || true)
+          
+          # Extract issue numbers from commit messages using GitHub's closing keywords
+          # Matches: close, closes, closed, fix, fixes, fixed, resolve, resolves, resolved (case-insensitive)
+          ISSUE_NUMBERS=$(echo "$COMMIT_MESSAGES" | grep -v '^null$' | grep -v '^$' | grep -i -o -E '(close|closes|closed|fix|fixes|fixed|resolve|resolves|resolved)[[:space:]]*#[0-9]+' | grep -o -E '#[0-9]+' | sed 's/#//' | tr '\n' ' ' || true)
+          
+          echo "Found issue numbers in commit messages: $ISSUE_NUMBERS"
+          echo "issue_numbers=$ISSUE_NUMBERS" >> $GITHUB_OUTPUT
+        shell: bash
+
+      - name: Update Labels on Linked Issues
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OLD_LABEL: "status: in progress"
+          NEW_LABEL: "status: in dev"
+        run: |
+          # Combine outputs and de-duplicate issue numbers, filtering out empty values
+          ALL_ISSUE_NUMBERS=$(echo "${{ steps.get_body_issues.outputs.issue_numbers }} ${{ steps.get_graphql_issues.outputs.issue_numbers }} ${{ steps.get_commit_issues.outputs.issue_numbers }}" | tr ' ' '\n' | grep -E '^[0-9]+$' | sort -u | tr '\n' ' ' || true)
+          
+          echo "Final list of unique issue numbers: $ALL_ISSUE_NUMBERS"
+          
+          # Check if there are any issue numbers to process
+          if [ -z "$ALL_ISSUE_NUMBERS" ] || [ "$ALL_ISSUE_NUMBERS" = " " ]; then
+            echo "No linked issues found. Exiting."
+            exit 0
+          fi
+          
+          # Check if the new label exists using jq for proper JSON parsing
+          LABELS=$(gh label list --repo ${{ github.repository }} --json name)
+          
+          if ! echo "$LABELS" | jq -e --arg label "$NEW_LABEL" '.[] | select(.name == $label)' > /dev/null; then
+            echo "Label '$NEW_LABEL' does not exist. Creating it now."
+            gh label create "$NEW_LABEL" --repo ${{ github.repository }} --color 0E8A16 --description "This work is completed and is in the dev branch"
+          else
+            echo "Label '$NEW_LABEL' already exists. Skipping creation."
+          fi
+
+          # Update the labels on each unique linked issue
+          for ISSUE_NUMBER in $ALL_ISSUE_NUMBERS; do
+            echo "Processing issue #$ISSUE_NUMBER"
+            
+            # Fetch current labels once per issue
+            CURRENT_LABELS=$(gh issue view $ISSUE_NUMBER --repo ${{ github.repository }} --json labels)
+            
+            # Check if old label exists using jq for proper JSON parsing
+            if echo "$CURRENT_LABELS" | jq -e --arg label "$OLD_LABEL" '.labels[] | select(.name == $label)' > /dev/null; then
+              gh issue edit $ISSUE_NUMBER --repo ${{ github.repository }} --remove-label "$OLD_LABEL"
+              echo "Removed label '$OLD_LABEL' from issue #$ISSUE_NUMBER"
+            else
+              echo "Label '$OLD_LABEL' does not exist on issue #$ISSUE_NUMBER. Skipping removal."
+            fi
+
+            # Check if new label already exists using jq for proper JSON parsing
+            if echo "$CURRENT_LABELS" | jq -e --arg label "$NEW_LABEL" '.labels[] | select(.name == $label)' > /dev/null; then
+              echo "Label '$NEW_LABEL' already exists on issue #$ISSUE_NUMBER. Skipping addition."
+            else
+              echo "Adding label '$NEW_LABEL' to issue #$ISSUE_NUMBER"
+              gh issue edit $ISSUE_NUMBER --repo ${{ github.repository }} --add-label "$NEW_LABEL"
+            fi
+          done
+        shell: bash
