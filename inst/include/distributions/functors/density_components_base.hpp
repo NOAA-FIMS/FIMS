@@ -42,7 +42,7 @@ struct DistributionElementObject {
                            random effects*/
   fims::Vector<Type> expected_mean; /**< the expected mean of the
                                 distribution, overrides expected values */
-  std::string  use_mean = fims::to_string("no"); /**< should expected_mean 
+  std::string  use_mean = fims::to_string("no"); /**< should expected_mean
                                            be used over expected values */
   // std::shared_ptr<DistributionElementObject<Type>> expected; /**< expected
   // value of distribution function */
@@ -117,6 +117,23 @@ struct DistributionElementObject {
     }
     if (this->input_type == "random_effects") {
       return (*re).size();
+    }
+    if (this->input_type == "prior") {
+      return this->expected_values.size();
+    }
+    return x.size();
+  }
+
+  /**
+   * Retrieve expected value element size given data, random effect, or prior.
+   * @return The size of the element.
+   */
+  inline size_t get_n_expected() {
+    if (this->input_type == "data") {
+      return (*data_expected_values).size();
+    }
+    if (this->input_type == "random_effects") {
+      return (*re_expected_values).size();
     }
     if (this->input_type == "prior") {
       return this->expected_values.size();
