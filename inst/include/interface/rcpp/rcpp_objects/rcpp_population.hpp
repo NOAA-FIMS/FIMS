@@ -142,6 +142,10 @@ class PopulationInterface : public PopulationInterfaceBase {
    */
   ParameterVector log_init_naa;
   /**
+   * @brief random effect for recruitment.
+   */
+  ParameterVector log_r;
+  /**
    * @brief Ages that are modeled in the population, the length of this vector
    * should equal \"n_ages\".
    */
