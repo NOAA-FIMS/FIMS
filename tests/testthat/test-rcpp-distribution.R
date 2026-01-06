@@ -389,12 +389,12 @@ test_that("rcpp distribution returns correct error messages", {
   # initialize the Dnorm module
   dnorm_ <- methods::new(DnormDistribution)
   # populate class members
-  dnorm_$x$resize(length(y))
+  dnorm_$x$resize(length(y) + 1)
   purrr::walk(
     seq_along(y),
     \(x) dnorm_$x[x]$value <- y[x]
   )
-  dnorm_$expected_values$resize(length(y) + 1)
+  dnorm_$expected_values$resize(length(y))
   dnorm_$log_sd$resize(length(y))
   purrr::walk(
     seq_along(length(y)),
@@ -403,7 +403,7 @@ test_that("rcpp distribution returns correct error messages", {
   #' @description dnorm should error out when there is a dimension mismatch where it is expecting `expected_values` to have a size 10 but is provided a size 11 vector.
   expect_error(
     object = dnorm_$evaluate(),
-    regexp = "NormalLPDF::Vector .* out of bounds. .* 10 .* 11"
+    regexp = "NormalLPDF::Vector .* out of bounds. .* 11 .* 10"
   )
   clear()
 

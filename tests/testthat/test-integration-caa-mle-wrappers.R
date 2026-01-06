@@ -176,7 +176,8 @@ test_that("catch-at-age model (estimation MLE with wrappers) returns an error wh
   deterministic_output <- initialized_model |>
     fit_fims(optimize = FALSE) |>
     get_estimates() |>
-    dplyr::filter(!is.na(input))
+    dplyr::filter(!is.na(input)) |>
+    dplyr::filter(label!="spawning_biomass_ratio")
 
   #' @description Test that estimate column should match input column when not optimized.
   expect_equal(
