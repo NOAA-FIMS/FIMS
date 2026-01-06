@@ -464,6 +464,29 @@ RCPP_MODULE(fims) {
              "The natural log of the standard deviation of the distribution on "
              "the natural log scale.");
 
+  Rcpp::class_<DgammaDistributionsInterface>("DgammaDistribution")
+      .constructor()
+      .method("get_id", &DgammaDistributionsInterface::get_id,
+              "Returns a unique ID for the Dgamma distribution class.")
+      .method("evaluate", &DgammaDistributionsInterface::evaluate,
+              "Evaluates the gamma distribution given input data and "
+              "parameter values.")
+      .method("set_observed_data",
+              &DgammaDistributionsInterface::set_observed_data,
+              "Accepts a unique ID for a given Data Object class to link the "
+              "data with the distribution.")
+      .method("set_distribution_links",
+              &DgammaDistributionsInterface::set_distribution_links,
+              "Accepts a unique ID for a given parameter to link the parameter "
+              "with the distribution.")
+      .field("x", &DgammaDistributionsInterface::x,
+             "Input for distribution when not observations, e.g., prior or "
+             "random effect.")
+      .field("expected_values", &DgammaDistributionsInterface::expected_values,
+             "Mean of the distribution.")
+      .field("log_sd", &DgammaDistributionsInterface::log_sd,
+             "The natural log of the standard deviation.");
+
   Rcpp::class_<DmultinomDistributionsInterface>("DmultinomDistribution")
       .constructor()
       .method("get_id", &DmultinomDistributionsInterface::get_id,
