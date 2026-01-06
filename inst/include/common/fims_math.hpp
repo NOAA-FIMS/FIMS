@@ -386,6 +386,24 @@ Type smooth_piecemeal(const Type& x, const Type& K, const Type& bound_lower, con
     return left * s_left + right * s_right;
 }
 
+/**
+* @brief Squeezes a value u in (0,1) to avoid exact boundary values of 0 and 1.
+* This is useful for parameters that are defined on the open interval (0,1)
+* to prevent numerical issues during optimization or MCMC sampling.
+*
+* @param u The input value in the interval (0,1).
+* @return The squeezed value in the interval (eps, 1-eps), where eps is a small
+* constant.
+*/ 
+template<typename Type>
+ Type squeeze(Type u){
+   Type eps = std::numeric_limits<double>::epsilon();
+   u = (1.0 - eps) * (u - .5) + .5;
+   return u;
+ }
+
 }  // namespace fims_math
+
+
 
 #endif /* FIMS_MATH_HPP */

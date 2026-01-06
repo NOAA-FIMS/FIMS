@@ -91,7 +91,7 @@ struct DistributionElementObject {
       return (*data_expected_values)[i];
     } 
     if (this->input_type == "random_effects") {
-      return (*re_expected_values)[i];
+      return (*re_expected_values).get_force_scalar(i);
     } else {
       return this->expected_values.get_force_scalar(i);
     }

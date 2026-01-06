@@ -85,9 +85,12 @@ struct NormalLPDF : public DensityComponentBase<Type> {
         // if not data (i.e. prior or process), use x vector instead of
         // observed_values
       } else {
-        this->lpdf_vec[i] =
-            dnorm(this->get_observed(i), this->get_expected(i),
-                  fims_math::exp(log_sd.get_force_scalar(i)), true);
+        // TODO: hard coded for now but need to address NA values when observed value is derived from data
+        if(this->get_observed(i) != -999){
+          this->lpdf_vec[i] =
+              dnorm(this->get_observed(i), this->get_expected(i),
+                    fims_math::exp(log_sd.get_force_scalar(i)), true);
+        }
       }
       this->report_lpdf_vec[i] = this->lpdf_vec[i];
       lpdf += this->lpdf_vec[i];

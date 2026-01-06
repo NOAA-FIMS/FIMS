@@ -155,10 +155,6 @@ class PopulationInterface : public PopulationInterfaceBase {
    */
   ParameterVector log_r;
   /**
-   * @brief The log ratio of the index to depletion times K.
-   */
-  ParameterVector log_index_depletionK_ratio;
-  /**
    * @brief Ages that are modeled in the population, the length of this vector
    * should equal \"nages\".
    */
@@ -219,7 +215,6 @@ class PopulationInterface : public PopulationInterfaceBase {
         log_init_naa(other.log_init_naa),
         logit_init_depletion(other.logit_init_depletion),
         numbers_at_age(other.numbers_at_age),
-        log_index_depletionK_ratio(other.log_index_depletionK_ratio),
         ages(other.ages),
         derived_ssb(other.derived_ssb),
         derived_naa(other.derived_naa),

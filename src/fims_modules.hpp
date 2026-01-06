@@ -274,6 +274,8 @@ RCPP_MODULE(fims) {
       .field("age_to_length_conversion",
              &FleetInterface::age_to_length_conversion)
       .field("mean_log_q", &FleetInterface::mean_log_q)
+      .field("log_index_depletionK_ratio",
+             &FleetInterface::log_index_depletionK_ratio)
       .method("get_id", &FleetInterface::get_id)
       .method("SetObservedAgeCompDataID",
               &FleetInterface::SetObservedAgeCompDataID)
@@ -327,8 +329,6 @@ RCPP_MODULE(fims) {
              "natural log of the initial depletion level")
       .field("ages", &PopulationInterface::ages,
              "vector of ages in the population; length nages")
-      .field("log_index_depletionK_ratio", &PopulationInterface::log_index_depletionK_ratio,
-             "log of the index to depletion times K ratio")
       .method("SetMaturityID", &PopulationInterface::SetMaturityID,
               "Set the unique id for the Maturity object")
       .method("SetGrowthID", &PopulationInterface::SetGrowthID,

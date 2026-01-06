@@ -368,8 +368,8 @@ class PellaTomlinsonInterface : public DepletionInterfaceBase {
     info->variable_map[this->m.id_m] = &(depletion)->m;
 
     // set logit_depletion
-    depletion->logit_depletion.resize(this->nyears.get());
-    for (size_t i = 0; i < this->nyears.get(); i++) {
+    depletion->logit_depletion.resize(this->nyears.get()+1);
+    for (size_t i = 0; i < this->nyears.get()+1; i++) {
       depletion->logit_depletion[i] = this->logit_depletion[i].initial_value_m;
 
       if (this->logit_depletion[i].estimation_type_m.get() == "fixed_effects") {

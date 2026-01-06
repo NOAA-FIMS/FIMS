@@ -33,6 +33,10 @@ class FisheryModelInterfaceBase : public FIMSRcppInterfaceBase {
    */
   std::shared_ptr<std::set<uint32_t>> population_ids;
   /**
+   * @brief unique id that maps fleet to population interactions.
+   */
+  std::vector<uint32_t> pop_fleet_id;
+  /**
    * @brief The map associating the IDs of FleetInterfaceBase to the objects.
    * This is a live object, which is an object that has been created and lives
    * in memory.
@@ -1073,6 +1077,8 @@ class SurplusProductionInterface : public FisheryModelInterfaceBase {
       std::shared_ptr<PopulationInterface> population =
           std::dynamic_pointer_cast<PopulationInterface>(
               PopulationInterfaceBase::live_objects[(*pit)]);
+      
+      model->InitializePopulationDerivedQuantities(population->id);
 
       std::map<std::string, fims::Vector<Type>> &derived_quantities =
           model->GetPopulationDerivedQuantities(population->id);
@@ -1083,12 +1089,7 @@ class SurplusProductionInterface : public FisheryModelInterfaceBase {
       derived_quantities["observed_catch"] = fims::Vector<Type>(
           population->nyears.get());
       
-      derived_quantities["log_index_depletionK_ratio"] = fims::Vector<Type>(
-          population->nyears.get() * population->nfleets.get());
-
-      info->variable_map[population->log_index_depletionK_ratio.id_m] =
-        &(derived_quantities["log_index_depletionK_ratio"]);
-      
+      //This will not work for many populations to one fleet relationships
       for (fleet_ids_iterator fit = population->fleet_ids->begin();
            fit != population->fleet_ids->end(); ++fit) {
         fleet_ids.insert(*fit);
@@ -1102,6 +1103,8 @@ class SurplusProductionInterface : public FisheryModelInterfaceBase {
           std::dynamic_pointer_cast<FleetInterface>(
               FleetInterfaceBase::live_objects[(*fit)]);
 
+      model->InitializeFleetDerivedQuantities(fleet_interface->id);
+
       std::map<std::string, fims::Vector<Type>> &derived_quantities =
           model->GetFleetDerivedQuantities(fleet_interface->id);
 
@@ -1110,16 +1113,40 @@ class SurplusProductionInterface : public FisheryModelInterfaceBase {
 
       derived_quantities["log_index_expected"] =
           fims::Vector<Type>(fleet_interface->nyears.get());
-
-      derived_quantities["mean_log_q"] =
-          fims::Vector<Type>(1);
       
       info->variable_map[fleet_interface->log_index_expected.id_m] =
           &(derived_quantities["log_index_expected"]);
       
-      info->variable_map[fleet_interface->mean_log_q.id_m] =
-          &(derived_quantities["mean_log_q"]);
     }
+
+    //Setup derived quantities that depend on populations and fleets
+     for (pit = this->population_ids->begin(); pit != this->population_ids->end();
+         ++pit) {
+      std::shared_ptr<PopulationInterface> population =
+          std::dynamic_pointer_cast<PopulationInterface>(
+              PopulationInterfaceBase::live_objects[(*pit)]); 
+      
+      //This will not work for many populations to one fleet relationships
+      for (fleet_ids_iterator fit = population->fleet_ids->begin();
+           fit != population->fleet_ids->end(); ++fit) {
+        std::shared_ptr<FleetInterface> fleet_interface =
+          std::dynamic_pointer_cast<FleetInterface>(
+              FleetInterfaceBase::live_objects[(*fit)]);
+        std::map<std::string, fims::Vector<Type>> &derived_quantities =
+          model->GetFleetDerivedQuantities(fleet_interface->id);
+  
+        derived_quantities["log_index_depletionK_ratio"] =
+          fims::Vector<Type>(population->nyears.get());
+        derived_quantities["mean_log_q"] = fims::Vector<Type>(1);
+
+        info->variable_map[fleet_interface->log_index_depletionK_ratio.id_m] =
+          &(derived_quantities["log_index_depletionK_ratio"]);
+        info->variable_map[fleet_interface->mean_log_q.id_m] =
+          &(derived_quantities["mean_log_q"]);
+      }
+
+    }
+
 
 
 

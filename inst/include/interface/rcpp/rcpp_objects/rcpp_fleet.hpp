@@ -161,10 +161,16 @@ class FleetInterface : public FleetInterfaceBase {
    * age-to-length-conversion matrix.
    */
   ParameterVector age_to_length_conversion;
-/**
- * @brief The mean of the log of catchability of the fleet.
- */
-  ParameterVector mean_log_q;
+
+  //initialize fleet derived quantities with population specific parameters
+  /**
+  * @brief The mean of the log of catchability of the fleet.
+  */
+  ParameterVector  mean_log_q;
+  /**
+   * @brief The log ratio of the index to depletion times K.
+   */
+  ParameterVector  log_index_depletionK_ratio;
 
   // derived quantities
   /**
@@ -277,6 +283,7 @@ class FleetInterface : public FleetInterfaceBase {
         observed_landings_units(other.observed_landings_units),
         observed_index_units(other.observed_index_units),
         mean_log_q(other.mean_log_q),
+        log_index_depletionK_ratio(other.log_index_depletionK_ratio),
         derived_landings_naa(other.derived_landings_naa),
         derived_landings_nal(other.derived_landings_nal),
         derived_landings_waa(other.derived_landings_waa),
