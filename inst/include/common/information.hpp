@@ -178,6 +178,9 @@ class Information {
       if ((d->priors)[0] != NULL) {
         d->priors.clear();
       }
+      if (d->data_expected_values != NULL) {
+        d->data_expected_values->clear();
+      }
       if (d->re != NULL) {
         d->re->clear();
       }
