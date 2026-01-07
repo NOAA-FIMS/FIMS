@@ -25,6 +25,14 @@ Developers who are interested in building FIMS can clone this repository, e.g., 
 
 If you encounter a clear :bug:, please file an [Issue](https://github.com/NOAA-FIMS/FIMS/issues) with a minimal reproducible example on GitHub. If you are uncertain if you have actually encountered a :bug:, are looking for more information, or want to talk about some new ideas please use the [Discussion Board](https://github.com/orgs/NOAA-FIMS/discussions) to post your thoughts. Users, developers, lurkers, and anyone else interested in our project are welcome to join the discussions, this is a place for **all** members of the assessment and open-source software community to ask and answer questions, share updates, have open-ended conversations, and follow along on decisions affecting FIMS. Also, feel free to introduce yourself :wave: on the [FIMS Discussion Board](https://github.com/orgs/NOAA-FIMS/discussions/801).
 
+## Developer Resources
+
+For developers interested in contributing to FIMS:
+
+- [Contributing Guidelines](CONTRIBUTING.md) - General contribution workflow and standards
+- [Guide: Adding a New C++ Module](vignettes/adding-new-module.Rmd) - Comprehensive guide for adding new modules
+- [Module Addition Checklist](docs/MODULE_CHECKLIST.md) - Quick reference checklist
+
 ****************************
 
 ## Contributors
