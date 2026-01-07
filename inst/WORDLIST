@@ -816,6 +816,7 @@ libPaths
 libname
 libpath
 libs
+lifecycle
 linux
 listComments
 listCommits
