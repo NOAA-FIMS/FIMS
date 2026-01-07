@@ -1,6 +1,6 @@
 # Quick Reference: Adding a New C++ Module to FIMS
 
-This is a quick reference checklist for adding a new module to FIMS. For detailed instructions, see [the comprehensive guide](../vignettes/adding-new-module.Rmd).
+This is a quick reference checklist for adding a new module to FIMS. For detailed instructions, see the [comprehensive guide in vignettes/adding-new-module.Rmd](vignettes/adding-new-module.Rmd).
 
 ## Checklist
 
