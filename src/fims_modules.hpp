@@ -272,7 +272,8 @@ RCPP_MODULE(fims) {
               &FleetInterface::SetObservedLandingsDataID)
       .method("GetObservedLandingsDataID",
               &FleetInterface::GetObservedLandingsDataID)
-      .method("SetSelectivityID", &FleetInterface::SetSelectivityID);
+      .method("GetSelectivityAgeID", &FleetInterface::GetSelectivityAgeID)
+      .method("SetSelectivityLengthID", &FleetInterface::SetSelectivityLengthID);
 
   Rcpp::class_<AgeCompDataInterface>("AgeComp")
       .constructor<int, int>()

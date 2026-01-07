@@ -478,16 +478,16 @@ class Information {
    */
   void SetFleetSelectivityModel(bool &valid_model,
                                 std::shared_ptr<fims_popdy::Fleet<Type>> f) {
-    if (f->fleet_selectivity_id_m != static_cast<Type>(-999)) {
+    if (f->fleet_selectivity_age_id_m != static_cast<Type>(-999)) {
       uint32_t sel_id = static_cast<uint32_t>(
-          f->fleet_selectivity_id_m);  // cast as unsigned integer
+          f->fleet_selectivity_age_id_m);  // cast as unsigned integer
       selectivity_models_iterator it = this->selectivity_models.find(
           sel_id);  // if find, set it, otherwise invalid
 
       if (it != this->selectivity_models.end()) {
         f->selectivity = (*it).second;  // elements in container held in pair
         FIMS_INFO_LOG("Selectivity model " +
-                      fims::to_string(f->fleet_selectivity_id_m) +
+                      fims::to_string(f->fleet_selectivity_age_id_m) +
                       " successfully set to fleet " + fims::to_string(f->id));
       } else {
         valid_model = false;
@@ -496,11 +496,36 @@ class Information {
                        fims::to_string(sel_id));
       }
     } else {
-      FIMS_WARNING_LOG("Warning: No selectivity pattern defined for fleet " +
+      FIMS_WARNING_LOG("Warning: No age selectivity pattern defined for fleet " +
                        fims::to_string(f->id) +
                        ". FIMS requires selectivity be defined for all fleets "
                        "when running a catch at age model.");
     }
+
+ if (f->fleet_selectivity_length_id_m != static_cast<Type>(-999)) {
+      uint32_t sel_id = static_cast<uint32_t>(
+          f->fleet_selectivity_length_id_m);  // cast as unsigned integer
+      selectivity_models_iterator it = this->selectivity_models.find(
+          sel_id);  // if find, set it, otherwise invalid
+
+      if (it != this->selectivity_models.end()) {
+        f->selectivity = (*it).second;  // elements in container held in pair
+        FIMS_INFO_LOG("Selectivity model " +
+                      fims::to_string(f->fleet_selectivity_length_id_m) +
+                      " successfully set to fleet " + fims::to_string(f->id));
+      } else {
+        valid_model = false;
+        FIMS_ERROR_LOG("Expected selectivity pattern not defined for fleet " +
+                       fims::to_string(f->id) + ", selectivity pattern " +
+                       fims::to_string(sel_id));
+      }
+    } else {
+      FIMS_WARNING_LOG("Warning: No length selectivity pattern defined for fleet " +
+                       fims::to_string(f->id) +
+                       ". FIMS requires selectivity be defined for all fleets "
+                       "when running a catch at age model.");
+    }
+
   }
 
   /**
@@ -932,7 +957,8 @@ class Information {
                 // Initialize fleet object
                 std::shared_ptr<fims_popdy::Fleet<Type>> f = (*it).second;
 
-                if (f->fleet_selectivity_id_m == -999) {
+                if (f->fleet_selectivity_age_id_m == -999 && 
+                    f->fleet_selectivity_length_id_m == -999) {
                   valid_model = false;
                   FIMS_ERROR_LOG(
                       "No selectivity pattern defined for fleet " +

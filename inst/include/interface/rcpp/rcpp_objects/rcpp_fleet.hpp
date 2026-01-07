@@ -259,7 +259,8 @@ class FleetInterface : public FleetInterfaceBase {
             other.interface_observed_index_data_id_m),
         interface_observed_landings_data_id_m(
             other.interface_observed_landings_data_id_m),
-        interface_selectivity_id_m(other.interface_selectivity_id_m),
+        interface_selectivity_age_id_m(other.interface_selectivity_age_id_m),
+        interface_selectivity_length_id_m(other.interface_selectivity_length_id_m),
         name(other.name),
         n_ages(other.n_ages),
         n_lengths(other.n_lengths),

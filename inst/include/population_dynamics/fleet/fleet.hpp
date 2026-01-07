@@ -29,7 +29,9 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
   size_t n_lengths;     /*!< the number of lengths in the model*/
 
   // selectivity
-  int fleet_selectivity_id_m = -999; /*!< id of selectivity component*/
+  int fleet_selectivity_age_id_m = -999; /*!< id of selectivity component*/
+  int fleet_selectivity_length_id_m = -999; /*!< id of selectivity component*/
+
   std::shared_ptr<SelectivityBase<Type>>
       selectivity; /*!< selectivity component*/
 

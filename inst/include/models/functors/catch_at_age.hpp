@@ -604,6 +604,10 @@ public:
   void CalculateLandingsNumbersAL(
       std::shared_ptr<fims_popdy::Population<Type>> &population,
       size_t i_age_year, size_t year, size_t age) {
+        std::map<std::string, fims::Vector<Type>> &pdq_ =
+        this->GetPopulationDerivedQuantities(population->GetId());
+
+
     for (size_t fleet_ = 0; fleet_ < population->n_fleets; fleet_++) {
       if (population->fleets[fleet_]->nlengths > 0) {
         for (size_t i_length = 0;
