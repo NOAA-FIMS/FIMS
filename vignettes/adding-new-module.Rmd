@@ -1,0 +1,755 @@
+---
+title: "Guide: Adding a New C++ Module to FIMS"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Guide: Adding a New C++ Module to FIMS}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# Overview
+
+This guide provides comprehensive instructions for adding a new C++ module to the Fisheries Integrated Modeling System (FIMS). The FIMS architecture is complex, involving C++ implementation, R interface layers, and TMB integration. This guide walks through all necessary steps and files that need to be modified.
+
+## Who Should Use This Guide
+
+This guide is intended for:
+
+- Developers adding new population dynamics modules (e.g., selectivity, recruitment, maturity)
+- Contributors adding new distribution models
+- Anyone extending FIMS with new model components
+
+## Prerequisites
+
+Before starting, ensure you have:
+
+- Familiarity with C++ and template programming
+- Understanding of the R/C++ interface via Rcpp
+- Basic knowledge of TMB (Template Model Builder)
+- Development environment set up as described in the [CONTRIBUTING.md](../CONTRIBUTING.md)
+
+# FIMS Code Structure
+
+FIMS follows a modular architecture with clear separation between:
+
+1. **C++ Implementation Layer** (`inst/include/`): Core mathematical and computational logic
+2. **R Interface Layer** (`inst/include/interface/rcpp/`): Bridges C++ and R
+3. **R Wrapper Layer** (`R/`): R functions for initialization and data management
+4. **Module Registration** (`src/`): Exposes modules to R via Rcpp
+
+## Directory Structure
+
+```
+FIMS/
+├── inst/include/
+│   ├── population_dynamics/      # Core population dynamics modules
+│   │   ├── selectivity/
+│   │   │   ├── functors/         # Specific implementations
+│   │   │   │   ├── selectivity_base.hpp    # Base class
+│   │   │   │   ├── logistic.hpp            # Implementation example
+│   │   │   │   └── double_logistic.hpp     # Implementation example
+│   │   │   └── selectivity.hpp   # Module header (includes all functors)
+│   │   ├── recruitment/
+│   │   ├── maturity/
+│   │   ├── growth/
+│   │   └── fleet/
+│   └── interface/rcpp/rcpp_objects/  # R-C++ interface
+│       ├── rcpp_selectivity.hpp      # Rcpp interface for selectivity
+│       ├── rcpp_recruitment.hpp
+│       └── ...
+├── src/
+│   ├── fims_modules.hpp          # Rcpp module definitions
+│   └── init.hpp                  # Module initialization
+└── R/
+    └── initialize_modules.R      # R initialization functions
+```
+
+# Naming Conventions
+
+FIMS follows consistent naming conventions to maintain code readability and organization:
+
+## C++ Naming Conventions
+
+Following the [Google C++ Style Guide](https://google.github.io/styleguide/cppguide.html):
+
+- **Classes**: PascalCase (e.g., `LogisticSelectivity`, `BevertonHoltRecruitment`)
+- **Namespaces**: snake_case (e.g., `fims_popdy`, `fims_info`)
+- **Member variables**: snake_case with no trailing underscore for public members (e.g., `inflection_point`, `log_devs`)
+- **Methods/Functions**: PascalCase for interface methods, snake_case for internal functions
+- **Template parameters**: Use `typename Type` (not `class T`)
+- **File names**: snake_case (e.g., `logistic.hpp`, `selectivity_base.hpp`)
+
+## R Naming Conventions
+
+Following the [tidyverse style guide](https://style.tidyverse.org/):
+
+- **Functions**: snake_case (e.g., `initialize_selectivity`, `m_agecomp`)
+- **Classes**: PascalCase (e.g., `LogisticSelectivity`)
+- **Variables**: snake_case (e.g., `fleet_name`, `module_input`)
+
+## Module-Specific Conventions
+
+- **Base classes**: Suffix with `Base` (e.g., `SelectivityBase`, `RecruitmentBase`)
+- **Interface classes**: Suffix with `Interface` (e.g., `LogisticSelectivityInterface`)
+- **Header guards**: `FIMS_[PATH]_[FILENAME]_HPP` format
+  - Example: `FIMS_POPULATION_DYNAMICS_SELECTIVITY_LOGISTIC_HPP`
+- **Module headers**: Named after the module (e.g., `selectivity.hpp` includes all selectivity functors)
+
+# Step-by-Step Guide: Adding a New Module
+
+This section provides detailed instructions for adding a new module to FIMS. We'll use a hypothetical "LogisticSelectivity" module as an example throughout.
+
+## Step 1: Create the C++ Implementation
+
+### 1.1 Create Base Class (if needed)
+
+If creating a new module category, first create a base class in `inst/include/[category]/functors/[category]_base.hpp`:
+
+**File**: `inst/include/population_dynamics/selectivity/functors/selectivity_base.hpp`
+
+```cpp
+#ifndef POPULATION_DYNAMICS_SELECTIVITY_BASE_HPP
+#define POPULATION_DYNAMICS_SELECTIVITY_BASE_HPP
+
+namespace fims_popdy {
+
+template <typename Type>
+struct SelectivityBase {
+  uint32_t id;  ///< Unique identifier for the object
+
+  SelectivityBase() : id(0) {}
+  virtual ~SelectivityBase() {}
+
+  /**
+   * @brief Evaluate the selectivity function
+   * @param x The independent variable (e.g., age or size)
+   */
+  virtual const Type evaluate(const Type& x) = 0;
+};
+
+}  // namespace fims_popdy
+
+#endif
+```
+
+**Key elements**:
+- Include guard using the naming convention
+- Template parameter `typename Type` for TMB compatibility
+- Pure virtual `evaluate()` method
+- Unique `id` field for object tracking
+- Namespace `fims_popdy` for population dynamics modules
+
+### 1.2 Create Implementation Class
+
+Create your specific implementation in `inst/include/[category]/functors/[name].hpp`:
+
+**File**: `inst/include/population_dynamics/selectivity/functors/logistic.hpp`
+
+```cpp
+#ifndef POPULATION_DYNAMICS_SELECTIVITY_LOGISTIC_HPP
+#define POPULATION_DYNAMICS_SELECTIVITY_LOGISTIC_HPP
+
+#include "../../../common/fims_math.hpp"
+#include "../../../common/fims_vector.hpp"
+#include "selectivity_base.hpp"
+
+namespace fims_popdy {
+
+/**
+ * @brief LogisticSelectivity class implementing logistic selectivity
+ */
+template <typename Type>
+struct LogisticSelectivity : public SelectivityBase<Type> {
+  fims::Vector<Type> inflection_point;  ///< Parameter: 50% selectivity point
+  fims::Vector<Type> slope;              ///< Parameter: curve steepness
+
+  LogisticSelectivity() : SelectivityBase<Type>() {}
+  virtual ~LogisticSelectivity() {}
+
+  /**
+   * @brief Evaluate logistic selectivity at given value
+   * @param x Independent variable (e.g., age)
+   */
+  virtual const Type evaluate(const Type& x) {
+    return fims_math::logistic<Type>(inflection_point[0], slope[0], x);
+  }
+
+  /**
+   * @brief Time-varying evaluate method
+   * @param x Independent variable
+   * @param pos Time index
+   */
+  virtual const Type evaluate(const Type& x, size_t pos) {
+    return fims_math::logistic<Type>(
+      inflection_point.get_force_scalar(pos),
+      slope.get_force_scalar(pos),
+      x
+    );
+  }
+};
+
+}  // namespace fims_popdy
+
+#endif
+```
+
+**Key elements**:
+- Include necessary dependencies (`fims_math.hpp`, `fims_vector.hpp`)
+- Use `fims::Vector<Type>` for parameters to support time-varying values
+- Implement both constant and time-varying `evaluate()` methods
+- Add comprehensive Doxygen documentation
+
+**See also**: 
+- [inst/include/population_dynamics/selectivity/functors/logistic.hpp](../inst/include/population_dynamics/selectivity/functors/logistic.hpp)
+- [inst/include/population_dynamics/maturity/functors/logistic.hpp](../inst/include/population_dynamics/maturity/functors/logistic.hpp)
+
+### 1.3 Create Module Header
+
+Create an umbrella header that includes all functors:
+
+**File**: `inst/include/population_dynamics/selectivity/selectivity.hpp`
+
+```cpp
+#ifndef FIMS_POPULATION_DYNAMICS_SELECTIVITY_HPP
+#define FIMS_POPULATION_DYNAMICS_SELECTIVITY_HPP
+
+#include "functors/selectivity_base.hpp"
+#include "functors/logistic.hpp"
+#include "functors/double_logistic.hpp"
+
+#endif /* FIMS_POPULATION_DYNAMICS_SELECTIVITY_HPP */
+```
+
+**Purpose**: This header allows users to include all selectivity functors with a single include statement.
+
+**See also**: [inst/include/population_dynamics/selectivity/selectivity.hpp](../inst/include/population_dynamics/selectivity/selectivity.hpp)
+
+## Step 2: Create the Rcpp Interface
+
+The Rcpp interface bridges C++ and R, allowing R users to create and manipulate C++ objects.
+
+### 2.1 Create Interface File
+
+**File**: `inst/include/interface/rcpp/rcpp_objects/rcpp_selectivity.hpp`
+
+```cpp
+#ifndef FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_SELECTIVITY_HPP
+#define FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_SELECTIVITY_HPP
+
+#include "../../../population_dynamics/selectivity/selectivity.hpp"
+#include "rcpp_interface_base.hpp"
+
+/**
+ * @brief Base interface class for all selectivity types
+ */
+class SelectivityInterfaceBase : public FIMSRcppInterfaceBase {
+ public:
+  static uint32_t id_g;  ///< Global ID counter
+  uint32_t id;           ///< Instance ID
+
+  static std::map<uint32_t, std::shared_ptr<SelectivityInterfaceBase>> 
+    live_objects;
+
+  SelectivityInterfaceBase() {
+    this->id = SelectivityInterfaceBase::id_g++;
+  }
+
+  virtual ~SelectivityInterfaceBase() {}
+  virtual uint32_t get_id() = 0;
+  virtual double evaluate(double x) = 0;
+};
+
+// Initialize static members
+uint32_t SelectivityInterfaceBase::id_g = 1;
+std::map<uint32_t, std::shared_ptr<SelectivityInterfaceBase>>
+    SelectivityInterfaceBase::live_objects;
+
+/**
+ * @brief Rcpp interface for LogisticSelectivity
+ */
+class LogisticSelectivityInterface : public SelectivityInterfaceBase {
+ public:
+  ParameterVector inflection_point;
+  ParameterVector slope;
+
+  LogisticSelectivityInterface() : SelectivityInterfaceBase() {
+    SelectivityInterfaceBase::live_objects[this->id] =
+        std::make_shared<LogisticSelectivityInterface>(*this);
+    FIMSRcppInterfaceBase::fims_interface_objects.push_back(
+        SelectivityInterfaceBase::live_objects[this->id]);
+  }
+
+  virtual ~LogisticSelectivityInterface() {}
+
+  virtual uint32_t get_id() { return this->id; }
+
+  virtual double evaluate(double x) {
+    fims_popdy::LogisticSelectivity<double> LogisticSel;
+    LogisticSel.inflection_point.resize(1);
+    LogisticSel.inflection_point[0] = this->inflection_point[0].initial_value_m;
+    LogisticSel.slope.resize(1);
+    LogisticSel.slope[0] = this->slope[0].initial_value_m;
+    return LogisticSel.evaluate(x);
+  }
+
+#ifdef TMB_MODEL
+  template <typename Type>
+  bool add_to_fims_tmb_internal() {
+    std::shared_ptr<fims_info::Information<Type>> info =
+        fims_info::Information<Type>::GetInstance();
+
+    std::shared_ptr<fims_popdy::LogisticSelectivity<Type>> selectivity =
+        std::make_shared<fims_popdy::LogisticSelectivity<Type>>();
+
+    selectivity->id = this->id;
+    
+    // Register inflection_point parameter
+    selectivity->inflection_point.resize(this->inflection_point.size());
+    for (size_t i = 0; i < this->inflection_point.size(); i++) {
+      selectivity->inflection_point[i] = 
+        this->inflection_point[i].initial_value_m;
+      
+      if (this->inflection_point[i].estimation_type_m.get() == 
+          "fixed_effects") {
+        std::stringstream ss;
+        ss << "Selectivity." << this->id << ".inflection_point." 
+           << this->inflection_point[i].id_m;
+        info->RegisterParameterName(ss.str());
+        info->RegisterParameter(selectivity->inflection_point[i]);
+      }
+    }
+
+    // Register slope parameter (similar to inflection_point)
+    // ... (see full example in actual code)
+
+    // Add to Information object
+    info->selectivity_models[selectivity->id] = selectivity;
+    return true;
+  }
+
+  virtual bool add_to_fims_tmb() {
+#ifdef TMBAD_FRAMEWORK
+    this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
+    this->add_to_fims_tmb_internal<TMBAD_FIMS_TYPE>();
+#else
+    this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
+    this->add_to_fims_tmb_internal<TMB_FIMS_FIRST_ORDER>();
+    this->add_to_fims_tmb_internal<TMB_FIMS_SECOND_ORDER>();
+    this->add_to_fims_tmb_internal<TMB_FIMS_THIRD_ORDER>();
+#endif
+    return true;
+  }
+#endif
+};
+
+#endif
+```
+
+**Key components**:
+
+1. **Base Interface Class**: Manages object lifecycle and IDs
+2. **Specific Interface Class**: Bridges R and C++ for your module
+3. **evaluate() method**: Allows testing from R without full TMB setup
+4. **add_to_fims_tmb()**: Registers parameters with TMB framework
+5. **Parameter Registration**: Links parameters to the optimization framework
+
+**Important patterns**:
+- Use `ParameterVector` for parameters that can be estimated
+- Include both `double` evaluation (for R testing) and template evaluation (for TMB)
+- Register parameters as either `fixed_effects` or `random_effects`
+- Store objects in `live_objects` map for lifecycle management
+
+**See also**: 
+- [inst/include/interface/rcpp/rcpp_objects/rcpp_selectivity.hpp](../inst/include/interface/rcpp/rcpp_objects/rcpp_selectivity.hpp)
+- [inst/include/interface/rcpp/rcpp_objects/rcpp_maturity.hpp](../inst/include/interface/rcpp/rcpp_objects/rcpp_maturity.hpp)
+
+## Step 3: Register the Module in src/
+
+### 3.1 Update fims_modules.hpp
+
+Add your interface to the Rcpp module definition:
+
+**File**: `src/fims_modules.hpp`
+
+Add include at the top:
+```cpp
+#include "../inst/include/interface/rcpp/rcpp_objects/rcpp_selectivity.hpp"
+```
+
+Add to the `RCPP_MODULE(fims)` block:
+```cpp
+Rcpp::class_<LogisticSelectivityInterface>("LogisticSelectivity")
+    .constructor()
+    .field("inflection_point", 
+           &LogisticSelectivityInterface::inflection_point,
+           "50% quantile of the selectivity curve")
+    .field("slope", 
+           &LogisticSelectivityInterface::slope,
+           "Slope of the selectivity curve")
+    .method("get_id", &LogisticSelectivityInterface::get_id,
+            "Get unique ID")
+    .method("evaluate", &LogisticSelectivityInterface::evaluate,
+            "Evaluate selectivity at given value");
+```
+
+**Key points**:
+- The string in `Rcpp::class_<>()` is the R class name
+- Use `.field()` for parameters users can set
+- Use `.method()` for functions users can call
+- Include brief, helpful descriptions for each field and method
+
+**See also**: [src/fims_modules.hpp](../src/fims_modules.hpp) (lines 331-337 for LogisticSelectivity example)
+
+### 3.2 Update R/FIMS-package.R
+
+Export the new class so it's available to R users. Add to the roxygen documentation:
+
+```r
+#' @export LogisticSelectivity
+```
+
+Then run `devtools::document()` to update the NAMESPACE.
+
+## Step 4: Add R Initialization Functions
+
+Add initialization functions to help users create and configure your module.
+
+**File**: `R/initialize_modules.R`
+
+```r
+#' Initialize a selectivity module
+#'
+#' @description
+#' Initializes a selectivity module by setting up fields. This function uses
+#' the `initialize_module` function to handle specific requirements for
+#' selectivity initialization.
+#' @inheritParams initialize_module
+#' @param fleet_name A character. Name of the fleet to initialize.
+#' @return
+#' The initialized selectivity module as an object.
+#' @noRd
+initialize_selectivity <- function(parameters, data, fleet_name) {
+  module_name <- "Selectivity"
+  module <- initialize_module(
+    parameters = parameters,
+    data = data,
+    module_name = module_name,
+    fleet_name = fleet_name
+  )
+  return(module)
+}
+```
+
+**Integration**: Ensure your initialization function is called from `initialize_fims()` in the appropriate place.
+
+**See also**: [R/initialize_modules.R](../R/initialize_modules.R) (lines 349-368 for selectivity example)
+
+## Step 5: Add Tests
+
+### 5.1 C++ Google Tests
+
+Create tests for your C++ implementation:
+
+**File**: `tests/gtest/test_population_dynamics_selectivity.cpp`
+
+```cpp
+#include "gtest/gtest.h"
+#include "../../inst/include/population_dynamics/selectivity/selectivity.hpp"
+
+namespace {
+
+TEST(LogisticSelectivity, Evaluate) {
+  fims_popdy::LogisticSelectivity<double> selectivity;
+  
+  selectivity.inflection_point.resize(1);
+  selectivity.inflection_point[0] = 5.0;
+  selectivity.slope.resize(1);
+  selectivity.slope[0] = 1.0;
+  
+  // Test at inflection point (should be ~0.5)
+  double result = selectivity.evaluate(5.0);
+  EXPECT_NEAR(result, 0.5, 0.001);
+  
+  // Test well below inflection point (should be near 0)
+  result = selectivity.evaluate(0.0);
+  EXPECT_NEAR(result, 0.0, 0.01);
+  
+  // Test well above inflection point (should be near 1)
+  result = selectivity.evaluate(10.0);
+  EXPECT_NEAR(result, 1.0, 0.01);
+}
+
+}  // namespace
+```
+
+**Run tests**: Use `setup_and_run_gtest()` in R or `cmake --build build && ctest --test-dir build`
+
+### 5.2 R testthat Tests
+
+Create R tests for the interface:
+
+**File**: `tests/testthat/test-rcpp-selectivity.R`
+
+```r
+test_that("LogisticSelectivity interface works", {
+  # Create selectivity object
+  sel <- methods::new(LogisticSelectivity)
+  
+  # Set parameters
+  sel$inflection_point$resize(1)
+  sel$inflection_point[[1]]$value <- 5.0
+  sel$slope$resize(1)
+  sel$slope[[1]]$value <- 1.0
+  
+  # Test evaluation
+  result <- sel$evaluate(5.0)
+  expect_equal(result, 0.5, tolerance = 0.001)
+  
+  # Test ID generation
+  id <- sel$get_id()
+  expect_true(is.numeric(id))
+  expect_true(id > 0)
+})
+```
+
+**Run tests**: Use `devtools::test()`
+
+**See also**: 
+- [tests/gtest/](../tests/gtest/) for C++ test examples
+- [tests/testthat/](../tests/testthat/) for R test examples
+
+## Step 6: Document Your Module
+
+### 6.1 C++ Documentation (Doxygen)
+
+Add comprehensive Doxygen comments to your C++ code:
+
+```cpp
+/**
+ * @brief LogisticSelectivity class implementing logistic selectivity curve
+ * 
+ * @details Implements the logistic function for selectivity:
+ * \f[ \frac{1.0}{1.0 + \exp(-slope \times (x - inflection\_point))} \f]
+ * 
+ * @tparam Type The data type (double for testing, TMB types for estimation)
+ */
+template <typename Type>
+struct LogisticSelectivity : public SelectivityBase<Type> {
+  // ...
+};
+```
+
+Build Doxygen docs: `cmake --build build` (outputs to `build/html`)
+
+### 6.2 R Documentation (roxygen2)
+
+Add roxygen documentation to R functions:
+
+```r
+#' Initialize a selectivity module
+#'
+#' @param parameters A tibble containing parameter values
+#' @param data An S4 FIMS data object
+#' @param fleet_name Character string identifying the fleet
+#' @return An initialized selectivity module object
+#' @examples
+#' \dontrun{
+#' sel <- initialize_selectivity(parameters, data, "fleet1")
+#' }
+```
+
+Build R docs: `devtools::document()`
+
+### 6.3 Update Vignettes (if applicable)
+
+If your module represents a major new capability, consider adding or updating vignettes to demonstrate its use.
+
+**See also**: [vignettes/](../vignettes/) directory
+
+# Files to Modify: Complete Checklist
+
+When adding a new module, you will typically need to modify or create the following files:
+
+## Required Files (New Module)
+
+- [ ] `inst/include/[category]/functors/[module]_base.hpp` - Base class (if new category)
+- [ ] `inst/include/[category]/functors/[name].hpp` - Implementation class
+- [ ] `inst/include/[category]/[category].hpp` - Module umbrella header
+- [ ] `inst/include/interface/rcpp/rcpp_objects/rcpp_[category].hpp` - Rcpp interface
+- [ ] `src/fims_modules.hpp` - Add Rcpp module registration
+- [ ] `R/initialize_modules.R` - Add R initialization function
+- [ ] `R/FIMS-package.R` - Export new class
+- [ ] `tests/gtest/test_[category]_[name].cpp` - C++ unit tests
+- [ ] `tests/testthat/test-rcpp-[category].R` - R unit tests
+
+## Optional Files (As Needed)
+
+- [ ] Vignettes demonstrating usage
+- [ ] Update `README.md` if adding major functionality
+- [ ] Update `NEWS.md` to document the new feature
+
+## Don't Forget
+
+- [ ] Run `devtools::document()` to update R documentation
+- [ ] Run `styler::style_pkg()` to format R code
+- [ ] Run clang-format on C++ code
+- [ ] Run `devtools::check()` to ensure package builds
+- [ ] Update code coverage with new tests
+
+# Common Patterns and Best Practices
+
+## Parameter Handling
+
+Use `fims::Vector<Type>` for all parameters that may be time-varying:
+
+```cpp
+fims::Vector<Type> my_parameter;  // Can be scalar or time-varying
+
+// Access scalar value
+Type value = my_parameter[0];
+
+// Access time-varying value
+Type value_at_time = my_parameter.get_force_scalar(time_index);
+```
+
+## ID Management
+
+Every module needs a unique ID for tracking:
+
+```cpp
+// In base class
+uint32_t id;
+
+// In interface
+static uint32_t id_g;  // Global counter
+uint32_t id;           // Instance ID
+
+// Initialize in constructor
+this->id = MyModuleInterface::id_g++;
+```
+
+## TMB Integration
+
+Register parameters correctly for estimation:
+
+```cpp
+// Fixed effects (estimated parameters)
+if (this->param[i].estimation_type_m.get() == "fixed_effects") {
+  info->RegisterParameter(module_obj->param[i]);
+  info->RegisterParameterName(param_name);
+}
+
+// Random effects
+if (this->param[i].estimation_type_m.get() == "random_effects") {
+  info->RegisterRandomEffect(module_obj->param[i]);
+  info->RegisterRandomEffectName(param_name);
+}
+```
+
+## Namespace Organization
+
+- Use `fims_popdy` for population dynamics modules
+- Use `fims_info` for information/state management
+- Use `fims_math` for mathematical functions
+- Use `fims` for common utilities
+
+# Troubleshooting
+
+## Common Issues
+
+### "undefined symbol" errors when loading package
+
+**Cause**: Module not properly registered in `src/fims_modules.hpp`
+
+**Solution**: Ensure you've added your class to the `RCPP_MODULE(fims)` block and included the header file.
+
+### "object not found" in R
+
+**Cause**: Class not exported in `NAMESPACE`
+
+**Solution**: Add `@export ClassName` to `R/FIMS-package.R` and run `devtools::document()`
+
+### Parameters not being estimated
+
+**Cause**: Parameters not registered with TMB
+
+**Solution**: Check that `add_to_fims_tmb_internal()` correctly registers parameters with `info->RegisterParameter()`
+
+### Compilation errors with templates
+
+**Cause**: Missing or incorrect template instantiation
+
+**Solution**: Ensure `add_to_fims_tmb()` instantiates templates for all required TMB types
+
+### Test failures after adding module
+
+**Cause**: Module not properly integrated with FIMS framework
+
+**Solution**: Verify that initialization functions are called from `initialize_fims()` and that IDs are properly linked
+
+## Getting Help
+
+If you encounter issues:
+
+1. Check the [FIMS Discussion Board](https://github.com/orgs/NOAA-FIMS/discussions) for similar questions
+2. Review existing module implementations as examples
+3. File an [Issue](https://github.com/NOAA-FIMS/FIMS/issues) with a minimal reproducible example
+
+# Examples and References
+
+## Example Pull Requests
+
+When available, you can learn from these merged PRs that added modules:
+
+- Search GitHub for PRs with labels related to modules: 
+  `https://github.com/NOAA-FIMS/FIMS/pulls?q=is%3Apr+label%3Amodule`
+
+## Code Examples
+
+Study these existing modules as templates:
+
+- **Selectivity**: [inst/include/population_dynamics/selectivity/](../inst/include/population_dynamics/selectivity/)
+  - Logistic selectivity: Simple example with two parameters
+  - Double logistic: More complex example with four parameters
+
+- **Maturity**: [inst/include/population_dynamics/maturity/](../inst/include/population_dynamics/maturity/)
+  - Similar structure to selectivity, good parallel example
+
+- **Recruitment**: [inst/include/population_dynamics/recruitment/](../inst/include/population_dynamics/recruitment/)
+  - More complex with process error structures
+
+- **Growth**: [inst/include/population_dynamics/growth/](../inst/include/population_dynamics/growth/)
+  - Empirical weight-at-age example
+
+## Documentation Resources
+
+- [FIMS Architecture Overview](https://noaa-fims.github.io/)
+- [Contributing Guidelines](../CONTRIBUTING.md)
+- [Google C++ Style Guide](https://google.github.io/styleguide/cppguide.html)
+- [tidyverse R Style Guide](https://style.tidyverse.org/)
+- [Rcpp Documentation](https://cran.r-project.org/web/packages/Rcpp/index.html)
+- [TMB Documentation](https://kaskr.github.io/adcomp/Introduction.html)
+
+# Summary
+
+Adding a new module to FIMS requires coordination across multiple layers:
+
+1. **C++ Implementation**: Create base and implementation classes with proper templates
+2. **Rcpp Interface**: Bridge C++ and R with interface classes
+3. **Module Registration**: Register with Rcpp in `src/fims_modules.hpp`
+4. **R Functions**: Add initialization and helper functions
+5. **Testing**: Add both C++ and R tests
+6. **Documentation**: Document code and update user guides
+
+Following this guide and the naming conventions ensures your module integrates seamlessly with the FIMS framework and is maintainable by the development team.
+
+---
+
+**Questions or suggestions for improving this guide?** Please open an issue or discussion on the [FIMS GitHub repository](https://github.com/NOAA-FIMS/FIMS).
