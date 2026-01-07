@@ -93,6 +93,8 @@ navbar:
           href: articles/fims-demo-projections.html
         - text: -------
         - text: Developer
+        - text: Adding a New C++ Module
+          href: articles/adding-new-module.html
         - text: FIMS Path - Maturity
           href: articles/fims-path-maturity.html
         - text: -------
