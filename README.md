@@ -31,7 +31,7 @@ For developers interested in contributing to FIMS:
 
 - [Contributing Guidelines](CONTRIBUTING.md) - General contribution workflow and standards
 - [Guide: Adding a New C++ Module](vignettes/adding-new-module.Rmd) - Comprehensive guide for adding new modules
-- [Module Addition Checklist](docs/MODULE_CHECKLIST.md) - Quick reference checklist
+- [Module Addition Checklist](MODULE_CHECKLIST.md) - Quick reference checklist
 
 ****************************
 
