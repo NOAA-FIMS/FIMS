@@ -173,5 +173,257 @@ test_that("`initialize_fims()` returns correct error messages", {
   clear()
 })
 
+# test_initialize_distribution ----
+## IO correctness ----
+test_that("`initialize_distribution()` works with correct inputs", {
+  # Setup for testing initialize_distribution
+  module_input <- default_parameters |>
+    dplyr::filter(fleet_name == "fleet1" & distribution_type == "Data")
+  
+  distribution_name <- "dlnorm"
+  linked_ids <- c(data_link = 1, fleet_link = 2)
+  
+  #' @description Test that `initialize_distribution()` returns an S4 object with data distribution.
+  result <- initialize_distribution(
+    module_input = module_input,
+    distribution_name = distribution_name,
+    distribution_type = "data",
+    linked_ids = linked_ids
+  )
+  expect_type(result, "S4")
+  clear()
+})
+
+## Error handling ----
+test_that("`initialize_distribution()` returns correct error messages", {
+  module_input <- default_parameters |>
+    dplyr::filter(fleet_name == "fleet1" & distribution_type == "Data")
+  
+  #' @description Test that `initialize_distribution()` handles NULL distribution_name correctly.
+  result <- initialize_distribution(
+    module_input = module_input,
+    distribution_name = NULL,
+    distribution_type = "data",
+    linked_ids = c(data_link = 1, fleet_link = 2)
+  )
+  expect_null(result)
+  clear()
+  
+  #' @description Test that `initialize_distribution()` handles non-list module_input correctly.
+  expect_error(
+    initialize_distribution(
+      module_input = "not_a_list",
+      distribution_name = "dlnorm",
+      distribution_type = "data",
+      linked_ids = c(data_link = 1, fleet_link = 2)
+    ),
+    "`module_input` must be a list."
+  )
+  clear()
+  
+  #' @description Test that `initialize_distribution()` handles missing linked_ids correctly.
+  expect_error(
+    initialize_distribution(
+      module_input = module_input,
+      distribution_name = "dlnorm",
+      distribution_type = "data",
+      linked_ids = c(data_link = 1)
+    ),
+    "`linked_ids` must be a named vector containing 'data_link' and"
+  )
+  clear()
+})
+
+# test_initialize_recruitment ----
+## IO correctness ----
+test_that("`initialize_recruitment()` works with correct inputs", {
+  #' @description Test that `initialize_recruitment()` returns an S4 object.
+  result <- initialize_recruitment(
+    parameters = default_parameters,
+    data = data
+  )
+  expect_type(result, "S4")
+  #' @description Test that `initialize_recruitment()` creates a module with expected fields.
+  expect_true("get_id" %in% names(result))
+  clear()
+})
+
+# test_initialize_growth ----
+## IO correctness ----
+test_that("`initialize_growth()` works with correct inputs", {
+  #' @description Test that `initialize_growth()` returns an S4 object.
+  result <- initialize_growth(
+    parameters = default_parameters,
+    data = data
+  )
+  expect_type(result, "S4")
+  #' @description Test that `initialize_growth()` creates a module with expected fields.
+  expect_true("get_id" %in% names(result))
+  clear()
+})
+
+# test_initialize_maturity ----
+## IO correctness ----
+test_that("`initialize_maturity()` works with correct inputs", {
+  #' @description Test that `initialize_maturity()` returns an S4 object.
+  result <- initialize_maturity(
+    parameters = default_parameters,
+    data = data
+  )
+  expect_type(result, "S4")
+  #' @description Test that `initialize_maturity()` creates a module with expected fields.
+  expect_true("get_id" %in% names(result))
+  clear()
+})
+
+# test_initialize_population ----
+## IO correctness ----
+test_that("`initialize_population()` works with correct inputs", {
+  # Setup modules needed for population
+  recruitment <- initialize_recruitment(
+    parameters = default_parameters,
+    data = data
+  )
+  growth <- initialize_growth(
+    parameters = default_parameters,
+    data = data
+  )
+  maturity <- initialize_maturity(
+    parameters = default_parameters,
+    data = data
+  )
+  
+  linked_ids <- c(
+    recruitment = recruitment$get_id(),
+    growth = growth$get_id(),
+    maturity = maturity$get_id()
+  )
+  
+  #' @description Test that `initialize_population()` returns an S4 object.
+  result <- initialize_population(
+    parameters = default_parameters,
+    data = data,
+    linked_ids = linked_ids
+  )
+  expect_type(result, "S4")
+  #' @description Test that `initialize_population()` creates a module with expected fields.
+  expect_true("get_id" %in% names(result))
+  clear()
+})
+
+## Error handling ----
+test_that("`initialize_population()` returns correct error messages", {
+  #' @description Test that `initialize_population()` handles missing linked_ids correctly.
+  expect_error(
+    initialize_population(
+      parameters = default_parameters,
+      data = data,
+      linked_ids = c(growth = 1)
+    ),
+    "`linked_ids` for population must include `growth`, `maturity`, and"
+  )
+  clear()
+})
+
+# test_initialize_selectivity ----
+## IO correctness ----
+test_that("`initialize_selectivity()` works with correct inputs", {
+  #' @description Test that `initialize_selectivity()` returns an S4 object.
+  result <- initialize_selectivity(
+    parameters = default_parameters,
+    data = data,
+    fleet_name = "fleet1"
+  )
+  expect_type(result, "S4")
+  #' @description Test that `initialize_selectivity()` creates a module with expected fields.
+  expect_true("get_id" %in% names(result))
+  clear()
+})
+
+# test_initialize_fleet ----
+## IO correctness ----
+test_that("`initialize_fleet()` works with correct inputs", {
+  # Setup selectivity module
+  selectivity <- initialize_selectivity(
+    parameters = default_parameters,
+    data = data,
+    fleet_name = "fleet1"
+  )
+  
+  linked_ids <- c(
+    selectivity = selectivity$get_id()
+  )
+  
+  #' @description Test that `initialize_fleet()` returns an S4 object.
+  result <- initialize_fleet(
+    parameters = default_parameters,
+    data = data,
+    fleet_name = "fleet1",
+    linked_ids = linked_ids
+  )
+  expect_type(result, "S4")
+  #' @description Test that `initialize_fleet()` creates a module with expected fields.
+  expect_true("get_id" %in% names(result))
+  clear()
+})
+
+# test_initialize_landings ----
+## IO correctness ----
+test_that("`initialize_landings()` works with correct inputs", {
+  #' @description Test that `initialize_landings()` returns an S4 object for fleet with landings.
+  result <- initialize_landings(
+    data = data,
+    fleet_name = "fleet1"
+  )
+  expect_type(result, "S4")
+  #' @description Test that `initialize_landings()` creates a module with expected fields.
+  expect_true("get_id" %in% names(result))
+  #' @description Test that `initialize_landings()` module contains landings_data field.
+  expect_true("landings_data" %in% names(result))
+  clear()
+})
+
+## Error handling ----
+test_that("`initialize_landings()` returns correct error messages", {
+  #' @description Test that `initialize_landings()` handles unknown fleet_name correctly.
+  expect_error(
+    initialize_landings(
+      data = data,
+      fleet_name = "unknown_fleet"
+    ),
+    "Fleet unknown_fleet not found in the data object."
+  )
+  clear()
+})
+
+# test_initialize_index ----
+## IO correctness ----
+test_that("`initialize_index()` works with correct inputs", {
+  #' @description Test that `initialize_index()` returns an S4 object for survey with index.
+  result <- initialize_index(
+    data = data,
+    fleet_name = "survey1"
+  )
+  expect_type(result, "S4")
+  #' @description Test that `initialize_index()` creates a module with expected fields.
+  expect_true("get_id" %in% names(result))
+  #' @description Test that `initialize_index()` module contains index_data field.
+  expect_true("index_data" %in% names(result))
+  clear()
+})
+
+## Error handling ----
+test_that("`initialize_index()` returns correct error messages", {
+  #' @description Test that `initialize_index()` handles unknown fleet_name correctly.
+  expect_error(
+    initialize_index(
+      data = data,
+      fleet_name = "unknown_fleet"
+    ),
+    "Fleet unknown_fleet not found in the data object."
+  )
+  clear()
+})
+
 # TODO: most lines with no coverage are error checks that are not verified to
 # work via the tests.
