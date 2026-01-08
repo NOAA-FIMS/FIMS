@@ -375,4 +375,4 @@ test_that("Test that R doesn't crash when force vector is out of bounds", {
     ), "Exception caught during model evaluation: fims::Vector out of bounds")
 
 
-})
+ })
