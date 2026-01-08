@@ -1,0 +1,629 @@
+---
+title: "Simple projections using the Fisheries Integrated Modeling System (FIMS)"
+output: github_document
+vignette: >
+  %\VignetteIndexEntry{Simple projections using the Fisheries Integrated Modeling System (FIMS)}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+# Set local options so vignette output is clean and consistent
+# (avoids color codes and subtle formatting in rendered docs)
+withr::local_options(list(
+  cli.num_colors = 1,
+  crayon.enabled = FALSE,
+  pillar.subtle = FALSE
+))
+```
+
+## FIMS
+The NOAA Fisheries Integrated Modeling System (FIMS) is a new modeling framework for fisheries modeling. The framework is designed to support next-generation fisheries stock assessment, ecosystem, and socioeconomic modeling. It is important to note that FIMS itself is not a model but rather a framework for creating models. The framework is made up of many modules that come together to create a model that best suits the needs of the end-user. The remainder of this vignette walks through what is absolutely necessary to run a FIMS catch-at-age model using the default settings.
+
+## Memory
+
+Calling `library(FIMS)` loads the R package and Rcpp functions and modules into the R environment. The C++ code is compiled upon installation rather than loading so the call to `library()` should be pretty fast. Users should always run `clear()` prior to modeling to ensure that the C++ memory from any previous FIMS model run is cleared out.
+```{r memory, warning=FALSE, message=FALSE}
+library(FIMS)
+library(ggplot2)
+library(stockplotr)
+
+# Use the {stockplotr} theme for all figures
+# ggplot2::theme_set(stockplotr::theme_noaa())
+
+
+# clear memory
+clear()
+```
+
+## Data
+
+Data for a FIMS model must be stored in a single data frame with a long format, e.g., `data("data1", package = "FIMS")`. The design is similar to running a linear model where you pass a single data frame to `lm()`. The long format does lead to some information being duplicated. For example, the units are listed for every row rather than stored in a single location for each data type. But, the long format facilitates using tidy functions to manipulate the data. And, a single function, i.e., `FIMSFrame()`, is all that is needed to prepare the data to be used in a FIMS model.
+
+### `data1`
+
+A sample data frame for a catch-at-age model with both ages and lengths is stored in the package as `data1`. This data set is based on data that was used in [Li et al.](https://www.doi.org/10.7755/FB.119.2-3.5) for the Model Comparison Project ([github site](https://github.com/NOAA-FIMS/Age_Structured_Stock_Assessment_Model_Comparison)). The length data have since been added [data-raw/data1.R](https://github.com/NOAA-FIMS/FIMS/blob/main/data-raw/data1.R) based on an age-length conversion matrix. See [R/data1.R](https://github.com/NOAA-FIMS/FIMS/blob/main/R/data1.R) or `?data1` for details about the package data.
+
+### `FIMSFrame()`
+
+The easiest way to prepare the data for a FIMS model is to use `FIMSFrame()`. This function performs several validation checks and returns an object of the S4 class called `FIMSFrame`. There are helper functions for working with a `FIMSFrame` object, e.g., `get_data()`, `get_n_years()`, `get_*()`. Additionally, there are helper functions for pulling data out of the S4 class in the format needed for a module, i.e., a vector, but these `m_*()` functions are largely meant to be used internally within the package and are only exported to allow for their use by power users wishing to manually set up.
+
+```{r FIMSFrame}
+# Bring the package data into your environment
+data("data1")
+# Prepare the package data for being used in a FIMS model
+data_4_model <- FIMSFrame(data1)
+```
+
+The S4 object that we named `data_4_model` contains many slots (i.e., named components of the object that can be accessed) but perhaps the most interesting one is the long data frame stored in the "data" slot. The tibble stored in this slot can be accessed using `get_data()`.
+
+```{r FIMSFrame-view}
+# Use show() to see what is stored in the FIMSFrame S4 class
+methods::show(data_4_model)
+# Or, look at the structure using str()
+# Increase max.level to see more of the structure
+str(data_4_model, max.level = 1)
+# Use dplyr to subset the data for just the landings
+get_data(data_4_model) |>
+  dplyr::filter(type == "landings")
+```
+
+The data contains the following fleets:
+
+- A single fishery fleet with age- and length-composition, weight-at-age, and landings data
+- A single survey with age- and length-composition and index data
+
+## configurations
+
+### `create_default_configurations()`
+
+The `create_default_configurations()` function is designed to generate a set of default configurations for the various components of a FIMS model. This includes configurations for fleets, growth, maturity, and recruitment modules. By leveraging the structure of the input data, the function can automatically set up initial configurations for each module. By passing the data and configurations to `create_default_parameters()` the function can tailor the defaults based on how many fleets there are and what data types exist. For example, if you have three fleets, then `create_default_configurations()` will set up three logistic selectivity modules.
+
+```{r configurations, max.height='100px', attr.output='.numberLines'}
+# Create default configurations based on the data
+default_configurations <- create_default_configurations(data = data_4_model)
+
+default_configurations
+
+# The output is a nested tibble, with details in the `data` column.
+default_configurations_unnested <- default_configurations |>
+  tidyr::unnest(cols = data)
+
+default_configurations_unnested
+```
+
+### Update configurations
+
+The default_configurations are just a starting point. Functions (e.g., `rows_*()`) from `{dplyr}` can be used to modify the default configurations as needed. For example, logistic selectivity for survey1 can be changed to double logistic selectivity.
+```{r updated_configurations, max.height='100px', attr.output='.numberLines'}
+# Update the module_type for survey1's selectivity
+updated_configurations <- default_configurations_unnested |>
+  dplyr::rows_update(
+    y = tibble::tibble(
+      module_name = c("Selectivity"),
+      fleet_name = c("survey1"),
+      module_type = c("DoubleLogistic")
+    ),
+    by = c("module_name", "fleet_name")
+  )
+
+updated_configurations
+
+# Nest updated_configurations
+updated_configurations_nested <- updated_configurations |>
+  tidyr::nest(.by = c(model_family, module_name, fleet_name))
+```
+
+## Parameters
+
+The parameters that are in the model will depend on which modules are used from the FIMS framework. This combination of modules rather than the use of a control file negates the need for complicated if{} else{} statements in the code.
+
+### `create_default_parameters()`
+
+Modules that are available in FIMS are known as reference classes in the C++ code. Each reference class acts as an interface between R and the underlining C++ code that defines FIMS. Several reference classes exist and several more will be created in the future. The beauty of having modules rather than a control file really comes out when more reference classes are created because each reference class can be accessed through R by itself to build up a model rather than needing to modify a control file for future features.
+
+By just passing the configurations and the data to `create_default_parameters()`, the default values for parameters that relate to fleet(s), recruitment, growth, and maturity modules can be created. For example,
+
+- "BevertonHolt" for the recruitment module
+- "Dnorm" distribution for recruitment deviations (log_devs)
+- "EWAA" for the Growth module, and
+- "Logistic" for Maturity module.
+
+```{r parameters, max.height='100px', attr.output='.numberLines'}
+# Create default parameters based on default_configurations and data
+default_parameters <- create_default_parameters(
+  configurations = default_configurations,
+  data = data_4_model
+)
+
+default_parameters
+
+# Unnest the default_parameters to see the detailed parameters
+default_parameters_unnested <- tidyr::unnest(default_parameters, cols = data)
+
+default_parameters_unnested
+```
+
+### Update parameters
+
+Functions (e.g., `rows_*()`) from `{dplyr}` can be used to update the default parameters as needed. 
+
+In the code below, `rows_update()` is used to adjust the fishing mortality, selectivity, maturity, and population parameters from their default values.
+
+```{r parameters-update}
+parameters_4_model <- default_parameters |>
+  tidyr::unnest(cols = data) |>
+  # Update log_Fmort initial values for Fleet1
+  dplyr::rows_update(
+    tibble::tibble(
+      fleet_name = "fleet1",
+      label = "log_Fmort",
+      time = 1:30,
+      value = log(c(
+        0.009459165, 0.027288858, 0.045063639,
+        0.061017825, 0.048600752, 0.087420554,
+        0.088447204, 0.186607929, 0.109008958,
+        0.132704335, 0.150615473, 0.161242955,
+        0.116640187, 0.169346119, 0.180191913,
+        0.161240483, 0.314573212, 0.257247574,
+        0.254887252, 0.251462108, 0.349101406,
+        0.254107720, 0.418478117, 0.345721184,
+        0.343685540, 0.314171227, 0.308026829,
+        0.431745298, 0.328030899, 0.499675368
+      ))
+    ),
+    by = c("fleet_name", "label", "time")
+  ) |>
+  # Update selectivity parameters and log_q for survey1
+  dplyr::rows_update(
+    tibble::tibble(
+      fleet_name = "survey1",
+      label = c("inflection_point", "slope", "log_q"),
+      value = c(1.5, 2, log(3.315143e-07))
+    ),
+    by = c("fleet_name", "label")
+  ) |>
+  # Update log_devs in the Recruitment module (time steps 2-30)
+  dplyr::rows_update(
+    tibble::tibble(
+      label = "log_devs",
+      time = 2:30,
+      value = c(
+        0.43787763, -0.13299042, -0.43251973, 0.64861200, 0.50640852,
+        -0.06958319, 0.30246260, -0.08257384, 0.20740372, 0.15289604,
+        -0.21709207, -0.13320626, 0.11225374, -0.10650836, 0.26877132,
+        0.24094126, -0.54480751, -0.23680557, -0.58483386, 0.30122785,
+        0.21930545, -0.22281699, -0.51358369, 0.15740234, -0.53988240,
+        -0.19556523, 0.20094360, 0.37248740, -0.07163145
+      )
+    ),
+    by = c("label", "time")
+  ) |>
+  # Update log_sd for log_devs in the Recruitment module
+  dplyr::rows_update(
+    tibble::tibble(
+      module_name = "Recruitment",
+      label = "log_sd",
+      value = 0.4
+    ),
+    by = c("module_name", "label")
+  ) |>
+  # Update inflection point and slope parameters in the Maturity module
+  dplyr::rows_update(
+    tibble::tibble(
+      module_name = "Maturity",
+      label = c("inflection_point", "slope"),
+      value = c(2.25, 3)
+    ),
+    by = c("module_name", "label")
+  ) |>
+  # Update log_init_naa values in the Population module
+  dplyr::rows_update(
+    tibble::tibble(
+      label = "log_init_naa",
+      age = 1:12,
+      value = c(
+        13.80944, 13.60690, 13.40217, 13.19525, 12.98692, 12.77791,
+        12.56862, 12.35922, 12.14979, 11.94034, 11.73088, 13.18755
+      )
+    ),
+    by = c("label", "age")
+  )
+```
+
+## Fit
+
+With data and parameters in place, we can now initialize modules using `initialize_fims()` and fit the model using `fit_fims()`.
+
+### `initialize_fims()`
+
+The tibble returned by `create_default_parameters()` is just a data frame containing specifications. Nothing has been created in memory as of yet. To actually initialize the modules, `initialize_fims()` needs to be called. This function takes all of the specifications and matches them with the appropriate data to initialize a module and create the pointers to the memory.
+
+### `fit_fims()`
+
+The list returned from `initialize_fims()` can be passed to the parameter of `fit_fims()` called `input` to run a FIMS model. If `optimize = FALSE`, the model will not actually be optimized but instead just checked to ensure it is a viable model. When `optimize = TRUE`, the model will be fit using `stats::nlminb()` and an object of the class `FIMSFit` will be returned.
+
+### Example
+
+```{r fit, max.height='100px', attr.output='.numberLines', eval=TRUE}
+# Run the model without optimization to help ensure a viable model
+test_fit <- parameters_4_model |>
+  initialize_fims(data = data_4_model) |>
+  fit_fims(optimize = FALSE)
+clear()
+# Run the  model with optimization
+fit <- parameters_4_model |>
+  initialize_fims(data = data_4_model) |>
+  fit_fims(optimize = TRUE)
+clear()
+
+# Get information about the model and print a few characters to the screen
+recruitment_log <- get_log_module("information")
+substr(recruitment_log, 1, 100)
+```
+
+The results can be plotted with either base R, {ggplot2}, or {stockplotr}. Where, we recommend using {stockplotr} where possible.
+
+```{r fit-output}
+# Temporary manipulation to the returned estimates to get them
+# to work with stockplotr
+output <- get_estimates(fit) |>
+  dplyr::mutate(
+    uncertainty_label = "se",
+    year = year_i,
+    estimate = estimated
+  )
+```
+
+```{r fit-plot-spawning-biomass}
+#| fig.alt: >
+#|   Plot of spawning biomass.
+stockplotr::plot_spawning_biomass(
+  dplyr::filter(output, label == "spawning_biomass")
+) +
+  stockplotr::theme_noaa()
+```
+
+```{r fit-plot-log-fishing-mortality} 
+#| fig.alt: >
+#|   Plot of log fishing mortality.
+stockplotr::plot_timeseries(
+  stockplotr::filter_data(
+    output |> dplyr::filter(module_id == 1),
+    label_name = "log_Fmort$",
+    geom = "line"
+  ),
+  x = "year",
+  y = "estimate",
+  ylab = "natural log of Fishing Mortality"
+) +
+  stockplotr::theme_noaa()
+```
+
+```{r fit-plot-index-of-abundance}
+#| fig.alt: >
+#|   Plot of estimated index of abundance versus observed values.
+stockplotr::plot_timeseries(
+  stockplotr::filter_data(
+    output |> dplyr::filter(module_id == 2),
+    label_name = "^index_expected$",
+    geom = "line"
+  ),
+  x = "year",
+  y = "estimate",
+  ylab = "Relative Index of Abundance"
+) +
+  ggplot2::geom_point(
+    data = data.frame(
+      observed = m_index(data_4_model, "survey1"),
+      expected = get_report(fit)[["index_expected"]][[2]],
+      year = get_start_year(data_4_model):get_end_year(data_4_model)
+    ),
+    ggplot2::aes(x = year, y = observed)
+  ) +
+  stockplotr::theme_noaa()
+```
+
+```{r fit-plot-landings}
+#| fig.alt: >
+#|   Plot of estimated landings.
+stockplotr::plot_timeseries(
+  stockplotr::filter_data(
+    output |> dplyr::filter(module_id == 1),
+    label_name = "^landings_expected$",
+    geom = "line"
+  ),
+  x = "year",
+  y = "estimate",
+  ylab = "Expected Landings (mt)"
+) +
+  stockplotr::theme_noaa()
+```
+
+### Sensitivities
+
+Multiple fits, i.e., sensitivity runs, can be set up by modifying the parameter list using `dplyr::mutate()` or changing the data that is used to fit the model.
+
+#### Initial values
+
+For example, one could change the initial value used for the slope of the logistic curve for the survey to see if the terminal estimate changes due to changes to the initial value.
+
+```{r initial-values}
+parameters_high_slope <- parameters_4_model |>
+  # Update the slope value of the logistic selectivity for the survey
+  dplyr::mutate(
+    value = dplyr::if_else(
+      module_name == "Selectivity" &
+        fleet_name == "survey1" &
+        label == "slope",
+      2.5,
+      value
+    )
+  )
+
+parameters_low_slope <- parameters_4_model |>
+  dplyr::mutate(
+    value = dplyr::if_else(
+      module_name == "Selectivity" &
+        fleet_name == "survey1" &
+        label == "slope",
+      1,
+      value
+    )
+  )
+
+high_slope_fit <- parameters_high_slope |>
+  initialize_fims(data = data_4_model) |>
+  fit_fims(optimize = TRUE)
+
+clear()
+
+low_slope_fit <- parameters_low_slope |>
+  initialize_fims(data = data_4_model) |>
+  fit_fims(optimize = TRUE)
+
+clear()
+```
+
+#### Age only
+
+The same model can be fit to just the age data, removing the length-composition configurations.
+
+```{r age}
+# Create default parameters, update with modified values, initialize FIMS,
+# and fit the model
+age_only_fit <- parameters_4_model |>
+  # remove rows that have module_type == LengthComp
+  dplyr::rows_delete(
+    y = tibble::tibble(module_type = "LengthComp")
+  ) |>
+  initialize_fims(data = data_4_model) |>
+  fit_fims(optimize = TRUE)
+
+clear()
+```
+
+#### Length
+
+The same model can be fit to just the length data, removing the age-composition configurations.
+
+```{r length}
+# Create default parameters, update with modified values, initialize FIMS,
+# and fit the model
+length_only_fit <- parameters_4_model |>
+  # remove rows that have module_type == AgeComp
+  dplyr::rows_delete(
+    y = tibble::tibble(module_type = "AgeComp")
+  ) |>
+  initialize_fims(data = data_4_model) |>
+  fit_fims(optimize = TRUE)
+clear()
+```
+
+```{r fit-plot-biomass}
+#| fig.alt: >
+#|   Plot of spawning biomass for each sensitivity model.
+stockplotr::plot_biomass(
+  list(
+    "age" = get_estimates(age_only_fit) |>
+      dplyr::mutate(
+        uncertainty_label = "se",
+        year = year_i,
+        estimate = estimated
+      ),
+    "length" = get_estimates(length_only_fit) |>
+      dplyr::mutate(
+        uncertainty_label = "se",
+        year = year_i,
+        estimate = estimated
+      )
+  )
+)
+```
+
+#### Projections
+
+The same model can be used to fit projections by extending the terminal year with 
+missing data place holders.
+
+```{r projections}
+years_of_projection <- 5
+#Add 5 projection years to the base model data
+data_4_model@n_years <- as.integer(data_4_model@n_years + years_of_projection)
+data_4_model@end_year <- as.integer(data_4_model@end_year + years_of_projection)
+
+#Add 5 rows of -999 landings to data
+all_landings <- data_4_model@data[data_4_model@data$type=="landings",]
+fleets <- unique(all_landings$name)
+for(flts in seq_along(fleets)){
+  temp_landings <- all_landings[all_landings$name==fleets[flts],][1:years_of_projection,]
+  temp_landings$value <- -999
+  temp_landings$uncertainty <- 20
+  temp_landings$timing <- as.integer((data_4_model@end_year-years_of_projection+1):data_4_model@end_year)
+  last_row_landings <- max(which(data_4_model@data$type=="landings" & data_4_model@data$name==fleets[flts]))
+  data_4_model@data <- dplyr::bind_rows(data_4_model@data[1:last_row_landings,],temp_landings,data_4_model@data[(last_row_landings+1):dim(data_4_model@data)[1],])
+}
+#Add 5 rows of -999 index to data
+all_index <- data_4_model@data[data_4_model@data$type=="index",]
+fleets <- unique(all_index$name)
+for(flts in seq_along(fleets)){
+  temp_index <- all_index[all_index$name==fleets[flts],][1:years_of_projection,]
+  temp_index$value <- -999
+  temp_index$uncertainty <- 20
+  temp_index$timing <- as.integer((data_4_model@end_year-years_of_projection+1):data_4_model@end_year)
+  last_row_index <- max(which(data_4_model@data$type=="index" & data_4_model@data$name==fleets[flts]))
+  data_4_model@data <- dplyr::bind_rows(data_4_model@data[1:last_row_index,],temp_index,data_4_model@data[(last_row_index+1):dim(data_4_model@data)[1],])
+}
+#Add 120 rows of -999 value to age_comps in data 
+#this covers 12 ages for 2 fleets over 5 years
+all_age_comp <- data_4_model@data[data_4_model@data$type=="age_comp",]
+fleets <- unique(all_age_comp$name)
+for(flts in seq_along(fleets)){
+  temp_age_comps <- all_age_comp[all_age_comp$name==fleets[flts],][1:(years_of_projection*data_4_model@n_ages),]
+  temp_age_comps$value <- -999
+  temp_age_comps$uncertainty <- 0
+  temp_age_comps$timing <- as.integer(sort(rep((data_4_model@end_year-years_of_projection+1):data_4_model@end_year,data_4_model@n_ages)))
+  last_row_age_comp <- max(which(data_4_model@data$type=="age_comp" & data_4_model@data$name==fleets[flts]))
+  if(last_row_age_comp<dim(data_4_model@data)[1]){
+  data_4_model@data <- dplyr::bind_rows(data_4_model@data[1:last_row_age_comp,],temp_age_comps,data_4_model@data[(last_row_age_comp+1):dim(data_4_model@data)[1],])
+  }else{
+    data_4_model@data <- dplyr::bind_rows(data_4_model@data[1:last_row_age_comp,],temp_age_comps)
+  }
+}
+
+#Add 230 rows of -999 value to length_comps in data 
+#this covers 46 length bins for 2 fleets over 5 years
+all_length_comp <- data_4_model@data[data_4_model@data$type=="length_comp",]
+fleets <- unique(all_length_comp$name)
+for(flts in seq_along(fleets)){
+  temp_length_comps <- all_length_comp[all_length_comp$name==fleets[flts],][1:(years_of_projection*data_4_model@n_lengths),]
+  temp_length_comps$value <- -999
+  temp_length_comps$uncertainty <- 0
+  temp_length_comps$timing <- as.integer(sort(rep((data_4_model@end_year-years_of_projection+1):data_4_model@end_year,data_4_model@n_lengths)))
+  last_row_length_comp <- max(which(data_4_model@data$type=="length_comp" & data_4_model@data$name==fleets[flts]))
+  if(last_row_length_comp<dim(data_4_model@data)[1]){
+  data_4_model@data <- dplyr::bind_rows(data_4_model@data[1:last_row_length_comp,],temp_length_comps,data_4_model@data[(last_row_length_comp+1):dim(data_4_model@data)[1],])
+  }else{
+    data_4_model@data <- dplyr::bind_rows(data_4_model@data[1:last_row_length_comp,],temp_length_comps)
+  }
+}
+
+parameters_projection <- default_parameters |>
+  tidyr::unnest(cols = data) |>
+  # Update log_Fmort initial values for Fleet1
+  dplyr::rows_update(
+    tibble::tibble(
+      fleet_name = "fleet1",
+      label = "log_Fmort",
+      time = 1:data_4_model@n_years,
+      value = log(c(
+        0.009459165, 0.027288858, 0.045063639,
+        0.061017825, 0.048600752, 0.087420554,
+        0.088447204, 0.186607929, 0.109008958,
+        0.132704335, 0.150615473, 0.161242955,
+        0.116640187, 0.169346119, 0.180191913,
+        0.161240483, 0.314573212, 0.257247574,
+        0.254887252, 0.251462108, 0.349101406,
+        0.254107720, 0.418478117, 0.345721184,
+        0.343685540, 0.314171227, 0.308026829,
+        0.431745298, 0.328030899, 0.499675368,
+        rep(0.499675368,years_of_projection)
+      ))
+    ),
+    by = c("fleet_name", "label", "time")
+  ) |>
+  # Update selectivity parameters and log_q for survey1
+  dplyr::rows_update(
+    tibble::tibble(
+      fleet_name = "survey1",
+      label = c("inflection_point", "slope", "log_q"),
+      value = c(1.5, 2, log(3.315143e-07))
+    ),
+    by = c("fleet_name", "label")
+  ) |>
+  # Update log_devs in the Recruitment module (time steps 2-30)
+  dplyr::rows_update(
+    tibble::tibble(
+      label = "log_devs",
+      time = 2:30,
+      value = c(
+        0.43787763, -0.13299042, -0.43251973, 0.64861200, 0.50640852,
+        -0.06958319, 0.30246260, -0.08257384, 0.20740372, 0.15289604,
+        -0.21709207, -0.13320626, 0.11225374, -0.10650836, 0.26877132,
+        0.24094126, -0.54480751, -0.23680557, -0.58483386, 0.30122785,
+        0.21930545, -0.22281699, -0.51358369, 0.15740234, -0.53988240,
+        -0.19556523, 0.20094360, 0.37248740, -0.07163145
+      )
+    ),
+    by = c("label", "time")
+  ) |>
+  # Update log_sd for log_devs in the Recruitment module
+  dplyr::rows_update(
+    tibble::tibble(
+      module_name = "Recruitment",
+      label = "log_sd",
+      value = 0.4
+    ),
+    by = c("module_name", "label")
+  ) |>
+  # Update inflection point and slope parameters in the Maturity module
+  dplyr::rows_update(
+    tibble::tibble(
+      module_name = "Maturity",
+      label = c("inflection_point", "slope"),
+      value = c(2.25, 3)
+    ),
+    by = c("module_name", "label")
+  ) |>
+  # Update log_init_naa values in the Population module
+  dplyr::rows_update(
+    tibble::tibble(
+      label = "log_init_naa",
+      age = 1:12,
+      value = c(
+        13.80944, 13.60690, 13.40217, 13.19525, 12.98692, 12.77791,
+        12.56862, 12.35922, 12.14979, 11.94034, 11.73088, 13.18755
+      )
+    ),
+    by = c("label", "age")
+  )
+
+projection_fit <- parameters_projection |>
+  initialize_fims(data = data_4_model) |>
+  fit_fims(optimize = TRUE)
+
+clear()
+# Create default parameters, update with modified values, initialize FIMS,
+# and fit the model
+length_only_fit <- parameters_4_model |>
+  # remove rows that have module_type == AgeComp
+  dplyr::rows_delete(
+    y = tibble::tibble(module_type = "AgeComp")
+  ) |>
+  initialize_fims(data = data_4_model) |>
+  fit_fims(optimize = TRUE)
+clear()
+```
+
+```{r fit-plot-biomass}
+#| fig.alt: >
+#|   Plot of spawning biomass for each sensitivity model.
+stockplotr::plot_biomass(
+  list(
+    "age" = get_estimates(age_only_fit) |>
+      dplyr::mutate(
+        uncertainty_label = "se",
+        year = year_i,
+        estimate = estimated
+      ),
+    "length" = get_estimates(length_only_fit) |>
+      dplyr::mutate(
+        uncertainty_label = "se",
+        year = year_i,
+        estimate = estimated
+      )
+  )
+)
+```
