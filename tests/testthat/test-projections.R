@@ -328,9 +328,9 @@
   #NOTE: If this doesn't work I would guess that this is the possible source of
   # issues due to the length of x or expected recruitment needing to be the
   # same length as the random effect portion not the whole recruitment vector
-  recruitment_distribution$x$resize(om_input[["nyr"]] - 1)
-  recruitment_distribution$expected_values$resize(om_input[["nyr"]] - 1)
-  for (i in 1:(om_input[["nyr"]] - 1)) {
+  recruitment_distribution$x$resize(om_input[["nyr"]] - 1 + n_projection_years)
+  recruitment_distribution$expected_values$resize(om_input[["nyr"]] - 1 + n_projection_years)
+  for (i in 1:(om_input[["nyr"]] - 1 + n_projection_years)) {
     recruitment_distribution$x[i]$value <- (0)
     recruitment_distribution$expected_values[i]$value <- (0)
   }
@@ -748,9 +748,9 @@ if(n_projection_years>0){
   #NOTE: If this doesn't work I would guess that this is the possible source of
   # issues due to the length of x or expected recruitment needing to be the
   # same length as the random effect portion not the whole recruitment vector
-  recruitment_distribution$x$resize(om_input[["nyr"]] - 1)
-  recruitment_distribution$expected_values$resize(om_input[["nyr"]] - 1)
-  for (i in 1:(om_input[["nyr"]] - 1)) {
+  recruitment_distribution$x$resize(om_input[["nyr"]] - 1 + n_projection_years)
+  recruitment_distribution$expected_values$resize(om_input[["nyr"]] - 1 + n_projection_years)
+  for (i in 1:(om_input[["nyr"]] - 1 + n_projection_years)) {
     recruitment_distribution$x[i]$value <- (0)
     recruitment_distribution$expected_values[i]$value <- (0)
   }
@@ -1169,9 +1169,9 @@ if(n_projection_years>0){
   #NOTE: If this doesn't work I would guess that this is the possible source of
   # issues due to the length of x or expected recruitment needing to be the
   # same length as the random effect portion not the whole recruitment vector
-  recruitment_distribution$x$resize(om_input[["nyr"]] - 1)
-  recruitment_distribution$expected_values$resize(om_input[["nyr"]] - 1)
-  for (i in 1:(om_input[["nyr"]] - 1)) {
+  recruitment_distribution$x$resize(om_input[["nyr"]] - 1 + n_projection_years)
+  recruitment_distribution$expected_values$resize(om_input[["nyr"]] - 1 + n_projection_years)
+  for (i in 1:(om_input[["nyr"]] - 1 + n_projection_years)) {
     recruitment_distribution$x[i]$value <- (0)
     recruitment_distribution$expected_values[i]$value <- (0)
   }
@@ -1592,9 +1592,9 @@ if(n_projection_years>0){
   #NOTE: If this doesn't work I would guess that this is the possible source of
   # issues due to the length of x or expected recruitment needing to be the
   # same length as the random effect portion not the whole recruitment vector
-  recruitment_distribution$x$resize(om_input[["nyr"]] - 1)
-  recruitment_distribution$expected_values$resize(om_input[["nyr"]] - 1)
-  for (i in 1:(om_input[["nyr"]] - 1)) {
+  recruitment_distribution$x$resize(om_input[["nyr"]] - 1 + n_projection_years)
+  recruitment_distribution$expected_values$resize(om_input[["nyr"]] - 1 + n_projection_years)
+  for (i in 1:(om_input[["nyr"]] - 1 + n_projection_years)) {
     recruitment_distribution$x[i]$value <- (0)
     recruitment_distribution$expected_values[i]$value <- (0)
   }
@@ -2023,9 +2023,9 @@ if(n_projection_years>0){
   #NOTE: If this doesn't work I would guess that this is the possible source of
   # issues due to the length of x or expected recruitment needing to be the
   # same length as the random effect portion not the whole recruitment vector
-  recruitment_distribution$x$resize(om_input[["nyr"]] - 1)
-  recruitment_distribution$expected_values$resize(om_input[["nyr"]] - 1)
-  for (i in 1:(om_input[["nyr"]] - 1)) {
+  recruitment_distribution$x$resize(om_input[["nyr"]] - 1 + n_projection_years)
+  recruitment_distribution$expected_values$resize(om_input[["nyr"]] - 1 + n_projection_years)
+  for (i in 1:(om_input[["nyr"]] - 1 + n_projection_years)) {
     recruitment_distribution$x[i]$value <-recruitment$log_devs[i]$value
     recruitment_distribution$expected_values[i]$value <- (0)
   }
@@ -2085,18 +2085,18 @@ if(n_projection_years>0){
   SSB_prior$x$resize((om_input[["nyr"]] + n_projection_years + 1))
   SSB_prior$log_sd$resize((om_input[["nyr"]] + n_projection_years + 1))
   for(y in 1:(om_input[["nyr"]] + 1)){
-    SSB_prior$x[y]$value <- 3000
-    SSB_prior$expected_values[y]$value <- 3000
+    SSB_prior$x[y]$value <- .4
+    SSB_prior$expected_values[y]$value <- .4
     SSB_prior$log_sd[y]$value <- 20
   }
   if(n_projection_years>0){
     for(y in (om_input[["nyr"]] + 2):(om_input[["nyr"]] + 1 + n_projection_years)){
-      SSB_prior$x[y]$value <- 3000
-      SSB_prior$expected_values[y]$value <- 3000
+      SSB_prior$x[y]$value <- .4
+      SSB_prior$expected_values[y]$value <- .4
       SSB_prior$log_sd[y]$value <- -1
     }
   }
-  SSB_prior$set_distribution_links("prior", population$spawning_biomass$get_id())
+  SSB_prior$set_distribution_links("prior", population$spawning_biomass_ratio$get_id())
 
   # Set up catch at age model
   caa <- methods::new(CatchAtAge)
