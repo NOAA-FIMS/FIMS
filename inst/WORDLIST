@@ -264,6 +264,7 @@ LengthCompDataInterface
 LengthCompositionExpected
 LengthCompositionProportion
 Lifecycle
+lifecycle
 Linf
 Lmcons
 LogDevs
@@ -696,6 +697,7 @@ inheritParams
 init
 initializer
 inplace
+instantiation
 instantiations
 inv
 io
