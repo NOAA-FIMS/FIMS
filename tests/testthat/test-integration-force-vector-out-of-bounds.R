@@ -70,11 +70,9 @@ test_that("Test that R doesn't crash when force vector is out of bounds", {
     # Set number of length bins
     fishing_fleet$n_lengths$set(om_input[["nlengths"]])
 
+    #make this vector short to force out-of-bounds error
     fishing_fleet$log_Fmort$resize(om_input[["nyr"]] - 2)
-    #   for (y in 1:om_input$nyr) {
-    #     # Log-transform OM fishing mortality
-    #     fishing_fleet$log_Fmort[y]$value <- log(om_output[["f"]][y])
-    #   }
+   
     fishing_fleet$log_Fmort$set_all_estimable(TRUE)
     fishing_fleet$log_q[1]$value <- log(1.0)
     fishing_fleet$log_q[1]$estimation_type$set("constant")
