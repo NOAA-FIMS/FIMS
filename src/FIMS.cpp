@@ -44,7 +44,7 @@ Type objective_function<Type>::operator()() {
     try{
         nll= model->Evaluate();
     } catch (const std::exception& e) {
-        Rcpp::Rcout << "Exception caught during model evaluation: " << e.what() << std::endl;
+        Rcpp::Rcerr << "Exception caught during model evaluation: " << e.what() << std::endl;
         // throw; // rethrow the exception after logging
     }    
 
