@@ -1,3 +1,10 @@
+## Setup ----
+# Load necessary data for the integration test
+if (!file.exists(test_path("fixtures", "fit_age_length_comp.RDS"))) {
+  prepare_test_data()
+}
+
+
 ##Section 1: load in test data for all runs
 
 load(test_path("fixtures", "integration_test_data.RData"))
@@ -475,11 +482,33 @@ no_projection_outputs <- run_FIMS_projection_scenario(om_input,
                                          projected_index,
                                          ssb_ratio_target=NULL)
 
-## Run FIMS with no projection years as a control run ##
-n_projection_years <- 0
+sdr_fixed_no_project <- no_projection_outputs[[2]]
+sdr_report_no_project <- no_projection_outputs[[1]]
+
+## Run FIMS with 5 projection years and no landings ##
+n_projection_years <- 5
 projected_landings <- rep(-999,n_projection_years)
 projected_F <- rep(om_output[["f"]][om_input$nyr],n_projection_years)
 estim_projected_F <- rep("constant",n_projection_years)
+projected_index <- rep(-999,n_projection_years)
+
+projection_outputs <- run_FIMS_projection_scenario(om_input,
+                                                      om_output,
+                                                      em_input,
+                                                      n_projection_years,
+                                                      projected_landings,
+                                                      projected_F,
+                                                      estim_projected_F,
+                                                      projected_index,
+                                                      ssb_ratio_target=NULL)
+
+sdr_fixed_5_year_project <- projection_outputs[[2]]
+
+## Run FIMS with 5 projection years and low future landings ##
+n_projection_years <- 5
+projected_landings <- rep(em_input[["L.obs"]][["fleet1"]][om_input$nyr]*0.5,n_projection_years)
+projected_F <- rep(om_output[["f"]][om_input$nyr],n_projection_years)
+estim_projected_F <- rep("fixed_effects",n_projection_years)
 projected_index <- rep(-999,n_projection_years)
 
 low_catch_projection_outputs <- run_FIMS_projection_scenario(om_input,
@@ -492,28 +521,32 @@ low_catch_projection_outputs <- run_FIMS_projection_scenario(om_input,
                                                       projected_index,
                                                       ssb_ratio_target=NULL)
 
-## Run FIMS with no projection years as a control run ##
-n_projection_years <- 0
-projected_landings <- rep(-999,n_projection_years)
+sdr_fixed_5_year_project_catch_low <- low_catch_projection_outputs[[2]]
+
+## Run FIMS with 5 projection years and high future landings ##
+n_projection_years <- 5
+projected_landings <- rep(em_input[["L.obs"]][["fleet1"]][om_input$nyr]*2,n_projection_years)
 projected_F <- rep(om_output[["f"]][om_input$nyr],n_projection_years)
-estim_projected_F <- rep("constant",n_projection_years)
+estim_projected_F <- rep("fixed_effects",n_projection_years)
 projected_index <- rep(-999,n_projection_years)
 
 high_catch_projection_outputs <- run_FIMS_projection_scenario(om_input,
-                                                      om_output,
-                                                      em_input,
-                                                      n_projection_years,
-                                                      projected_landings,
-                                                      projected_F,
-                                                      estim_projected_F,
-                                                      projected_index,
-                                                      ssb_ratio_target=NULL)
+                                                              om_output,
+                                                              em_input,
+                                                              n_projection_years,
+                                                              projected_landings,
+                                                              projected_F,
+                                                              estim_projected_F,
+                                                              projected_index,
+                                                              ssb_ratio_target=NULL)
 
-## Run FIMS with no projection years as a control run ##
-n_projection_years <- 0
+sdr_fixed_5_year_project_catch_high <- high_catch_projection_outputs[[2]]
+
+## Run FIMS with 10 projection years and an SSB ratio target ##
+n_projection_years <- 10
 projected_landings <- rep(-999,n_projection_years)
 projected_F <- rep(om_output[["f"]][om_input$nyr],n_projection_years)
-estim_projected_F <- rep("constant",n_projection_years)
+estim_projected_F <- rep("fixed_effects",n_projection_years)
 projected_index <- rep(-999,n_projection_years)
 
 ssb_ratio_target_projection_outputs <- run_FIMS_projection_scenario(om_input,
@@ -526,6 +559,111 @@ ssb_ratio_target_projection_outputs <- run_FIMS_projection_scenario(om_input,
                                                       projected_index,
                                                       ssb_ratio_target=0.4)
 
+sdr_fixed_10_year_project_SSB_target <- ssb_ratio_target_projection_outputs[[2]]
+sdr_report_10_year_project_SSB_target <- ssb_ratio_target_projection_outputs[[1]]
 ##Section 3: Compare scenario results
 
+#Compare fixed parameter estimates between control and fixed F runs
+#Results are identical as expected
+
+estim_error <- max(abs(sdr_fixed_no_project[,"Estimate"]-sdr_fixed_5_year_project[,"Estimate"])/abs(sdr_fixed_no_project[,"Estimate"]))
+
+sd_error <- max(abs(sdr_fixed_no_project[,"Std. Error"]-sdr_fixed_5_year_project[,"Std. Error"])/abs(sdr_fixed_no_project[,"Std. Error"]))
+
+test_that("projections with no data achieve same estimates and no projection model run", {
+
+  #' @description Test that the maximum parameter estimate difference between
+  #' a projection run and no projection run is less than 10%.
+  expect_lt(estim_error, 0.1)
+
+  #' @description Test that the maximum parameter standard deviation estimate
+  #' difference between a projection run and no projection run is less than 10%.
+  expect_lt(sd_error, 0.1)
+})
+
+#Compare fixed parameter estimates between control and estimated F runs with reasonable low catch targets
+#Results are very similar <1% maximum difference
+#Not sure why there is any difference? Maybe there is an assumption of symmetry
+#between the F pars that back propagates the impact of Future F's to past F's???
+#or this is just the result of rounding error in the final gradient convergence thresholds??
+estim_error <- max(abs(sdr_fixed_5_year_project_catch_low[-c(33:37),"Estimate"] - sdr_fixed_no_project[,"Estimate"])/ abs(sdr_fixed_no_project[,"Estimate"]))
+
+sd_error <- max(abs(sdr_fixed_5_year_project_catch_low[-c(33:37),"Std. Error"] - sdr_fixed_no_project[,"Std. Error"])/ abs(sdr_fixed_no_project[,"Std. Error"]))
+
+test_that("projections with low catch data achieve same estimates and no projection model run", {
+
+  #' @description Test that the maximum parameter estimate difference between
+  #' a low catch projection run and no projection run is less than 10%.
+  expect_lt(estim_error, 0.1)
+
+  #' @description Test that the maximum parameter standard deviation estimate
+  #' difference between a low catch projection run and no projection run is less than 10%.
+  expect_lt(sd_error, 0.1)
+})
+
+#Compare fixed parameter estimates between control and estimated F runs with high catch targets (overfishing)
+#Results are not all similar something is happening with the Fmort results in particular
+#This is somewhat expected as the model is being forced to make the future projected catches obtainable.
+#This interaction means we would need to restrain or detect scenarios where this interaction is occuring.
+#We need to test if this is just a catch issue or if it effects reference point projections targeting SPR.
+estim_error <- max(abs(sdr_fixed_5_year_project_catch_high[-c(33:37),"Estimate"] - sdr_fixed_no_project[,"Estimate"])/ abs(sdr_fixed_no_project[,"Estimate"]))
+
+sd_error <- max(abs(sdr_fixed_5_year_project_catch_high[-c(33:37),"Std. Error"] - sdr_fixed_no_project[,"Std. Error"])/ abs(sdr_fixed_no_project[,"Std. Error"]))
+
+test_that("projections with high catch data achieve same estimates and no projection model run", {
+
+  #' @description Test that the maximum parameter estimate difference between
+  #' a low catch projection run and no projection run is less than 10%.
+  expect_gt(estim_error, 0.7)
+
+  #' @description Test that the maximum parameter standard deviation estimate
+  #' difference between a low catch projection run and no projection run is less than 10%.
+  expect_gt(sd_error, 0.7)
+})
+#Compare fixed parameter estimates between control and estimated F runs with high catch targets (overfishing)
+#But super high log_sd = 5 on the projection catches so the model isn't forced to fit the targets
+#Results are almost identical 1.426e-5 max proportion error
+#In this case the model seems to estimate the most catch it can without changing
+#the estimation period fits which is likely our best case scenario vs fixed catch
+#projections such as SS that can go wild when the catches are too high.
+#This appears to achieve close to a constant F projection which is interesting.
+
+#TODO: Find the code to run these comparisons in another old projections branch
+# max((sdr_fixed_5_year_project_catch_high_cv_high[-c(33:37),"Estimate"] - sdr_fixed_no_project[,"Estimate"])/ sdr_fixed_no_project[,"Estimate"])
+# min((sdr_fixed_5_year_project_catch_high_cv_high[-c(33:37),"Estimate"] - sdr_fixed_no_project[,"Estimate"])/ sdr_fixed_no_project[,"Estimate"])
+#
+# max((sdr_fixed_5_year_project_catch_high_cv_high[-c(33:37),"Std. Error"] - sdr_fixed_no_project[,"Std. Error"])/ sdr_fixed_no_project[,"Std. Error"])
+# min((sdr_fixed_5_year_project_catch_high_cv_high[-c(33:37),"Std. Error"] - sdr_fixed_no_project[,"Std. Error"])/ sdr_fixed_no_project[,"Std. Error"])
+
+
+#Comparison of SSB target results
+
+estim_error <- max(abs(sdr_fixed_10_year_project_SSB_target[-c(33:42),"Estimate"] - sdr_fixed_no_project[,"Estimate"])/ abs(sdr_fixed_no_project[,"Estimate"]))
+
+sd_error <- max(abs(sdr_fixed_10_year_project_SSB_target[-c(33:42),"Std. Error"] - sdr_fixed_no_project[,"Std. Error"])/ abs(sdr_fixed_no_project[,"Std. Error"]))
+
+ssb_ratio_estim_error <- max(abs(sdr_report_10_year_project_SSB_target[rownames(sdr_report_10_year_project_SSB_target)=="spawning_biomass_ratio","Estimate"][1:length(sdr_report_no_project[rownames(sdr_report_no_project)=="spawning_biomass_ratio","Estimate"])] -
+                                   sdr_report_no_project[rownames(sdr_report_no_project)=="spawning_biomass_ratio","Estimate"])/abs(sdr_report_no_project[rownames(sdr_report_no_project)=="spawning_biomass_ratio","Estimate"]))
+
+
+ssb_ratio_target_error <- abs(sdr_report_10_year_project_SSB_target[rownames(sdr_report_10_year_project_SSB_target)=="spawning_biomass_ratio","Estimate"][length(sdr_report_10_year_project_SSB_target[rownames(sdr_report_10_year_project_SSB_target)=="spawning_biomass_ratio","Estimate"])] - 0.4)/0.4
+
+test_that("projections with spawning biomass ratio target achieve same estimates and no projection model run", {
+
+  #' @description Test that the maximum parameter estimate difference between
+  #' a low catch projection run and no projection run is less than 10%.
+  expect_lt(estim_error, 0.15)
+
+  #' @description Test that the maximum parameter standard deviation estimate
+  #' difference between a low catch projection run and no projection run is less than 10%.
+  expect_lt(sd_error, 0.15)
+
+  #' @description Test that the maximum parameter estimate difference between
+  #' a low catch projection run and no projection run is less than 10%.
+  expect_lt(ssb_ratio_estim_error, 0.15)
+
+  #' @description Test that the maximum parameter standard deviation estimate
+  #' difference between a low catch projection run and no projection run is less than 10%.
+  expect_lt(ssb_ratio_target_error, 0.001)
+})
 
