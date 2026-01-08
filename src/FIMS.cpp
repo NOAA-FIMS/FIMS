@@ -40,7 +40,13 @@ Type objective_function<Type>::operator()() {
     model -> of = this;
 
     //evaluate the model objective function value
-    Type nll = model->Evaluate();
+    Type nll = static_cast<Type>(0.0);
+    try{
+        nll= model->Evaluate();
+    } catch (const std::exception& e) {
+        Rcpp::Rcout << "Exception caught during model evaluation: " << e.what() << std::endl;
+        // throw; // rethrow the exception after logging
+    }    
 
     return nll;
 
