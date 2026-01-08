@@ -39,14 +39,14 @@ load(test_path("fixtures", "integration_test_data.RData"))
 # Memory Management Note:
 # R crashes when attempting to run 10 models in parallel with the error
 # `cannot allocate vector of size 1.4 Gigabyte`. According to Gemini, the error indicates
-# that during the serialization or unserialization of the data between the main 
+# that during the serialization or unserialization of the data between the main
 # R process and the worker nodes, R requested more memory than the system or the
 # R environment allowed. This may be related to the size of the tibble being
 # passed around. We limit sim_num to 4 to ensure the tests pass on CI.
 sim_num <- 4
 
 # Create the initial FIMS data and default parameter structures,
-# then map through the simulation iterations to apply iteration-specific 
+# then map through the simulation iterations to apply iteration-specific
 # values from the operating model.
 data_age_length_comp <- FIMSFrame(data1)
 default_parameters <- create_default_configurations(
@@ -140,10 +140,10 @@ estimation_results_serial <- purrr::map(1:sim_num, \(iter_id) {
 test_that("Run FIMS in parallel using {snowfall}", {
   # Parallel Initialization
   core_num <- 2
-  # suppressWarnings is used to hide the 'Unknown option --file' warning 
+  # suppressWarnings is used to hide the 'Unknown option --file' warning
   # triggered by snowfall's command-line scanner during Rscript execution.
   suppressWarnings(snowfall::sfInit(parallel = TRUE, cpus = core_num))
-  
+
   # Ensure the FIMS package and required objects are available on all worker nodes.
   snowfall::sfLibrary(FIMS)
 
