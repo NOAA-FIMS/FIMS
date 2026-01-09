@@ -75,7 +75,7 @@ class FisheryModelInterfaceBase : public FIMSRcppInterfaceBase {
   /**
    * @brief Convert the model to a JSON string.
    * @param do_sd_report A boolean indicating whether to perform sdreport 
-   * calculations, which should be skipped when mle optimization is false. 
+   * calculations, which should be skipped when MLE optimization is false. 
    * Default is true.
    * @return A JSON string representation of the model.
    */
@@ -669,7 +669,7 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
    * @details Returns a list containing the report results for the CatchAtAge
    * model, including derived quantities and diagnostics.
    * @param do_sd_report  A boolean indicating whether to perform sdreport 
-   * calculations, which should be skipped when mle optimization is false. 
+   * calculations, which should be skipped when MLE optimization is false. 
    * Default is true.
    * @return Rcpp::List containing the report output.
    */
@@ -767,7 +767,7 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
   /**
    * @brief Method to convert the model to a JSON string.
    * @param do_sd_report  A boolean indicating whether to perform sdreport 
-   * calculations, which should be skipped when mle optimization is false. 
+   * calculations, which should be skipped when MLE optimization is false. 
    * Default is true.
    */
   virtual std::string to_json(bool do_sd_report = true) {
