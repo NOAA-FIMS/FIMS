@@ -260,22 +260,24 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
 
       size_t n_x = dnorm->get_n_x();
 
-      if(this->log_sd.size() != n_x){
+      if (this->log_sd.size() != n_x) {
         // If log_sd size == 1 (scalar), repeat the entry
         if (this->log_sd.size() == 1) {
-          auto tmp = this->log_sd[0]; // copy the one log_sd param
+          auto tmp = this->log_sd[0];  // copy the one log_sd param
           this->log_sd.resize(n_x);
           for (size_t i = 0; i < n_x; ++i) {
             this->log_sd[i] = tmp;  // copies all fields in Param
           }
         } else {
           // Handle error
-          FIMS_WARNING_LOG("log_sd size does not match number of observations and is not scalar.");
+          FIMS_WARNING_LOG(
+              "log_sd size does not match number of observations and is not "
+              "scalar.");
         }
       }
       for (size_t i = 0; i < n_x; i++) {
         size_t idx = 0;
-        if(dnorm->log_sd.size() > 1){
+        if (dnorm->log_sd.size() > 1) {
           idx = i;
         }
         if (this->log_sd[i].estimation_type_m.get() == "constant") {
@@ -352,7 +354,9 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
       for (R_xlen_t i = 0; i < this->log_sd.size() - 1; i++) {
         ss << this->value_to_string(this->log_sd[i].final_value_m) << ", ";
       }
-      ss << this->value_to_string(this->log_sd[this->log_sd.size() - 1].final_value_m) << "],\n";
+      ss << this->value_to_string(
+                this->log_sd[this->log_sd.size() - 1].final_value_m)
+         << "],\n";
     }
     ss << "  \"observed_values\":[";
     if (this->x.size() == 0) {
@@ -585,23 +589,25 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
 
       size_t n_x = dlnorm->get_n_x();
 
-      if(this->log_sd.size() != n_x){
+      if (this->log_sd.size() != n_x) {
         // If log_sd size == 1 (scalar), repeat the entry
         if (this->log_sd.size() == 1) {
-          auto tmp = this->log_sd[0]; // copy the one log_sd param
+          auto tmp = this->log_sd[0];  // copy the one log_sd param
           this->log_sd.resize(n_x);
           for (size_t i = 0; i < n_x; ++i) {
             this->log_sd[i] = tmp;  // copies all fields in Param
           }
         } else {
           // Handle error
-          FIMS_WARNING_LOG("log_sd size does not match number of observations and is not scalar.");
+          FIMS_WARNING_LOG(
+              "log_sd size does not match number of observations and is not "
+              "scalar.");
         }
       }
 
       for (size_t i = 0; i < n_x; i++) {
         size_t idx = 0;
-        if(dlnorm->log_sd.size() > 1){
+        if (dlnorm->log_sd.size() > 1) {
           idx = i;
         }
         if (this->log_sd[i].estimation_type_m.get() == "constant") {
@@ -677,7 +683,9 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
       for (R_xlen_t i = 0; i < this->log_sd.size() - 1; i++) {
         ss << this->value_to_string(this->log_sd[i].final_value_m) << ", ";
       }
-      ss << this->value_to_string(this->log_sd[this->log_sd.size() - 1].final_value_m) << "],\n";
+      ss << this->value_to_string(
+                this->log_sd[this->log_sd.size() - 1].final_value_m)
+         << "],\n";
     }
     ss << "  \"observed_values\":[";
     if (this->x.size() == 0) {
