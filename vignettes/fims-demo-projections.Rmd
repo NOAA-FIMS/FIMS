@@ -547,14 +547,15 @@ parameters_projection <- default_parameters |>
   dplyr::rows_update(
     tibble::tibble(
       label = "log_devs",
-      time = 2:30,
+      time = 2:data_4_model@n_years,
       value = c(
         0.43787763, -0.13299042, -0.43251973, 0.64861200, 0.50640852,
         -0.06958319, 0.30246260, -0.08257384, 0.20740372, 0.15289604,
         -0.21709207, -0.13320626, 0.11225374, -0.10650836, 0.26877132,
         0.24094126, -0.54480751, -0.23680557, -0.58483386, 0.30122785,
         0.21930545, -0.22281699, -0.51358369, 0.15740234, -0.53988240,
-        -0.19556523, 0.20094360, 0.37248740, -0.07163145
+        -0.19556523, 0.20094360, 0.37248740, -0.07163145,
+        rep(0,years_of_projection)
       )
     ),
     by = c("label", "time")
@@ -589,6 +590,11 @@ parameters_projection <- default_parameters |>
     ),
     by = c("label", "age")
   )
+ #TODO: Need to add additional updates to add extra years for
+ # survey F_mort, fishing and survey fleet log_sd, recruitment x and expected
+ # values, log_M,
+ # Also need to update fishing and survey fleet n_years, recruitement n_years,
+ # population n_years, and figure out how to add SSB_ratio prior
 
 projection_fit <- parameters_projection |>
   initialize_fims(data = data_4_model) |>
