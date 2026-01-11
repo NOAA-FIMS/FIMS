@@ -677,9 +677,9 @@ clear()
 
 ```
 
-```{r fit-plot-biomass}
+```{r fit-plot-projections}
 #| fig.alt: >
-#|   Plot of spawning biomass for each sensitivity model.
+#|   Plot of spawning biomass for projection model.
 stockplotr::plot_biomass(
   list(
     "age" = get_estimates(projection_fit) |>
