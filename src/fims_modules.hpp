@@ -304,8 +304,10 @@ RCPP_MODULE(fims) {
       .field("log_M", &PopulationInterface::log_M,
              "natural log of the natural mortality of the population")
       .field("log_f_multiplier", &PopulationInterface::log_f_multiplier,
-             "natural log of the annual fishing mortality multiplier of the population")
-      .field("spawning_biomass_ratio", &PopulationInterface::spawning_biomass_ratio,
+             "natural log of the annual fishing mortality multiplier of the "
+             "population")
+      .field("spawning_biomass_ratio",
+             &PopulationInterface::spawning_biomass_ratio,
              "population spawning biomass ratio for each year")
       .field("log_init_naa", &PopulationInterface::log_init_naa,
              "natural log of the initial numbers at age")
