@@ -106,9 +106,7 @@ class DistributionsInterfaceBase : public FIMSRcppInterfaceBase {
    *
    * @param input_value Value to use for the distribution mean.
    */
-  virtual bool set_distribution_mean(double input_value) {
-    return false;
-  }
+  virtual bool set_distribution_mean(double input_value) { return false; }
 
   /**
    * @brief Set the unique ID for the observed data object.
@@ -304,7 +302,8 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
 
       for (size_t i = 0; i < this->expected_mean.size(); i++) {
         if (this->expected_mean[i].estimation_type_m.get() == "constant") {
-          this->expected_mean[i].final_value_m = this->expected_mean[i].initial_value_m;
+          this->expected_mean[i].final_value_m =
+              this->expected_mean[i].initial_value_m;
         } else {
           this->expected_mean[i].final_value_m = dnorm->expected_mean[i];
         }
@@ -432,11 +431,12 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
 
     distribution->use_mean = this->use_mean_m.get();
     distribution->expected_mean.resize(this->expected_mean.size());
-    for (size_t i = 0; i < this->expected_mean.size(); i++){
+    for (size_t i = 0; i < this->expected_mean.size(); i++) {
       distribution->expected_mean[i] = this->expected_mean[i].initial_value_m;
       if (this->expected_mean[i].estimation_type_m.get() == "fixed_effects") {
         ss.str("");
-        ss << "dnorm." << this->id_m << ".expected_mean." << this->expected_mean[i].id_m;
+        ss << "dnorm." << this->id_m << ".expected_mean."
+           << this->expected_mean[i].id_m;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(distribution->expected_mean[i]);
       }
@@ -444,8 +444,8 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
         FIMS_ERROR_LOG("expected_mean cannot be set to random effects");
       }
     }
-    info->variable_map[this->expected_mean.id_m] = &(distribution)->expected_mean;
-    
+    info->variable_map[this->expected_mean.id_m] =
+        &(distribution)->expected_mean;
 
     info->density_components[distribution->id] = distribution;
 

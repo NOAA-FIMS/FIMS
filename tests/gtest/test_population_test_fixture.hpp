@@ -63,7 +63,7 @@ class CAAInitializeTestFixture : public testing::Test {
           this->catch_at_age_model->populations[p]->n_ages);
 
       derived_quantities["mortality_M"] = fims::Vector<double>(
-        this->catch_at_age_model->populations[p]->n_years *
+          this->catch_at_age_model->populations[p]->n_years *
           this->catch_at_age_model->populations[p]->n_ages);
 
       derived_quantities["mortality_Z"] = fims::Vector<double>(
@@ -324,7 +324,7 @@ class CAAEvaluateTestFixture : public testing::Test {
     catch_at_age_model->populations[0]->log_f_multiplier.resize(n_years);
     for (int i = 0; i < n_years; i++) {
       catch_at_age_model->populations[0]->log_f_multiplier[i] =
-        static_cast<double>(0.0);
+          static_cast<double>(0.0);
     }
 
     // Set initialized values for derived quantities
@@ -677,9 +677,9 @@ class CAAPrepareTestFixture : public testing::Test {
     catch_at_age_model->populations[0]->log_f_multiplier.resize(n_years);
     for (int i = 0; i < n_years; i++) {
       catch_at_age_model->populations[0]->log_f_multiplier[i] =
-        static_cast<double>(0.0);
+          static_cast<double>(0.0);
     }
-    
+
     // weight_at_age
     double weight_at_age_min = 0.5;
     double weight_at_age_max = 12.0;
