@@ -40,10 +40,10 @@ struct DistributionElementObject {
       priors; /**< vector of pointers where each points to a prior parameter */
   fims::Vector<Type> x; /**< input value of distribution function for priors or
                            random effects*/
-  fims::Vector<Type> expected_mean; /**< the expected mean of the
-                                distribution, overrides expected values */
-  std::string  use_mean = fims::to_string("no"); /**< should expected_mean
-                                           be used over expected values */
+  fims::Vector<Type> expected_mean;             /**< the expected mean of the
+                                            distribution, overrides expected values */
+  std::string use_mean = fims::to_string("no"); /**< should expected_mean
+                                          be used over expected values */
   // std::shared_ptr<DistributionElementObject<Type>> expected; /**< expected
   // value of distribution function */
 
@@ -60,11 +60,11 @@ struct DistributionElementObject {
       return (*re)[i];
     }
     if (this->input_type == "prior") {
-      if(priors.size() == 0) {
+      if (priors.size() == 0) {
         throw std::runtime_error("No priors defined for this distribution.");
-      } else if(priors.size() == 1) {
+      } else if (priors.size() == 1) {
         return (*(priors[0]))[i];
-      } else if(priors.size() > 1) {
+      } else if (priors.size() > 1) {
         return (*(priors[i]))[0];
       }
     }

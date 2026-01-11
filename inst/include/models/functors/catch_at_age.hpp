@@ -133,7 +133,8 @@ class CatchAtAge : public FisheryModelBase<Type> {
 
       this->populations[p]->f_multiplier.resize(this->populations[p]->n_years);
 
-      this->populations[p]->spawning_biomass_ratio.resize((this->populations[p]->n_years + 1));
+      this->populations[p]->spawning_biomass_ratio.resize(
+          (this->populations[p]->n_years + 1));
     }
 
     for (fleet_iterator fit = this->fleets.begin(); fit != this->fleets.end();
@@ -181,8 +182,8 @@ class CatchAtAge : public FisheryModelBase<Type> {
       }
 
       for (size_t year = 0; year < population->n_years; year++) {
-          population->f_multiplier[year] = 
-          fims_math::exp(population->log_f_multiplier[year]);
+        population->f_multiplier[year] =
+            fims_math::exp(population->log_f_multiplier[year]);
       }
     }
 
@@ -337,7 +338,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
           population->ages[age]);
 
       dq_["mortality_F"][i_age_year] +=
-          population->fleets[fleet_]->Fmort[year] * 
+          population->fleets[fleet_]->Fmort[year] *
           population->f_multiplier[year] * s;
 
       dq_["sum_selectivity"][i_age_year] += s;
@@ -434,20 +435,18 @@ class CatchAtAge : public FisheryModelBase<Type> {
   }
 
   /**
-   * This method is used to calculate spawning biomass ratio 
+   * This method is used to calculate spawning biomass ratio
    * for a specified population and year
-   * 
+   *
    * @param population
    * @param year the year of spawning biomass ratio to calculate
    */
   void CalculateSpawningBiomassRatio(
-    std::shared_ptr<fims_popdy::Population<Type>> &population,
-    size_t year) {
-      std::map<std::string, fims::Vector<Type>> &dq_ =
+      std::shared_ptr<fims_popdy::Population<Type>> &population, size_t year) {
+    std::map<std::string, fims::Vector<Type>> &dq_ =
         this->GetPopulationDerivedQuantities(population->GetId());
-      population->spawning_biomass_ratio[year] =
-        dq_["spawning_biomass"][year]  /
-        dq_["unfished_spawning_biomass"][0];
+    population->spawning_biomass_ratio[year] =
+        dq_["spawning_biomass"][year] / dq_["unfished_spawning_biomass"][0];
   }
 
   /**
@@ -937,7 +936,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
              Expected recruitment in year 0 is numbers at age 0 in year 0.
              */
               pdq_["expected_recruitment"][y] =
-                pdq_["numbers_at_age"][i_age_year];
+                  pdq_["numbers_at_age"][i_age_year];
               pdq_["unfished_numbers_at_age"][i_age_year] =
                   fims_math::exp(population->recruitment->log_rzero[0]);
             } else {
@@ -1182,7 +1181,8 @@ class CatchAtAge : public FisheryModelBase<Type> {
           ADREPORTvector(unfished_numbers_at_age_p);
       vector<Type> unfished_spawning_biomass =
           ADREPORTvector(unfished_spawning_biomass_p);
-      vector<Type> spawning_biomass_ratio = ADREPORTvector(spawning_biomass_ratio_p);
+      vector<Type> spawning_biomass_ratio =
+          ADREPORTvector(spawning_biomass_ratio_p);
       vector<Type> log_f_multiplier = ADREPORTvector(log_f_multiplier_p);
 
       vector<Type> agecomp_expected = ADREPORTvector(agecomp_expected_f);
@@ -1237,7 +1237,8 @@ class CatchAtAge : public FisheryModelBase<Type> {
                      this->of);
       FIMS_REPORT_F_("log_M", log_M_p, this->of);
       FIMS_REPORT_F_("log_init_naa", log_init_naa_p, this->of);
-      FIMS_REPORT_F_("spawning_biomass_ratio", spawning_biomass_ratio_p, this->of);
+      FIMS_REPORT_F_("spawning_biomass_ratio", spawning_biomass_ratio_p,
+                     this->of);
       FIMS_REPORT_F_("log_f_multiplier", log_f_multiplier_p, this->of);
 
       // adreport

@@ -277,7 +277,8 @@ class PopulationInterface : public PopulationInterfaceBase {
 
       for (size_t i = 0; i < this->log_f_multiplier.size(); i++) {
         if (this->log_f_multiplier[i].estimation_type_m.get() == "constant") {
-          this->log_f_multiplier[i].final_value_m = this->log_f_multiplier[i].initial_value_m;
+          this->log_f_multiplier[i].final_value_m =
+              this->log_f_multiplier[i].initial_value_m;
         } else {
           this->log_f_multiplier[i].final_value_m = pop->log_f_multiplier[i];
         }
@@ -330,24 +331,29 @@ class PopulationInterface : public PopulationInterfaceBase {
     population->maturity_id = this->maturity_id.get();
     population->log_M.resize(this->log_M.size());
 
-    if(this->log_f_multiplier.size() == (this->n_years.get())){
+    if (this->log_f_multiplier.size() == (this->n_years.get())) {
       population->log_f_multiplier.resize(this->log_f_multiplier.size());
     } else {
-      FIMS_WARNING_LOG("The log_f_multiplier vector is not of size nyears. Filling with zeros.");
+      FIMS_WARNING_LOG(
+          "The log_f_multiplier vector is not of size nyears. Filling with "
+          "zeros.");
       this->log_f_multiplier.resize((this->n_years.get()));
-      for (size_t i = 0; i < log_f_multiplier.size(); i++){
+      for (size_t i = 0; i < log_f_multiplier.size(); i++) {
         this->log_f_multiplier[i].initial_value_m = static_cast<double>(0.0);
         this->log_f_multiplier[i].estimation_type_m.set("constant");
       }
       population->log_f_multiplier.resize(this->log_f_multiplier.size());
     }
 
-    if(this->spawning_biomass_ratio.size() == ((this->n_years.get() + 1))){
-      population->spawning_biomass_ratio.resize(this->spawning_biomass_ratio.size());
+    if (this->spawning_biomass_ratio.size() == ((this->n_years.get() + 1))) {
+      population->spawning_biomass_ratio.resize(
+          this->spawning_biomass_ratio.size());
     } else {
-      FIMS_WARNING_LOG("Setting spawning_biomass_ratio vector to size nyears + 1.");
+      FIMS_WARNING_LOG(
+          "Setting spawning_biomass_ratio vector to size nyears + 1.");
       this->spawning_biomass_ratio.resize((this->n_years.get() + 1));
-      population->spawning_biomass_ratio.resize(this->spawning_biomass_ratio.size());
+      population->spawning_biomass_ratio.resize(
+          this->spawning_biomass_ratio.size());
     }
     info->variable_map[this->spawning_biomass_ratio.id_m] =
         &(population)->spawning_biomass_ratio;
@@ -371,21 +377,27 @@ class PopulationInterface : public PopulationInterfaceBase {
     info->variable_map[this->log_M.id_m] = &(population)->log_M;
 
     for (size_t i = 0; i < log_f_multiplier.size(); i++) {
-      population->log_f_multiplier[i] = this->log_f_multiplier[i].initial_value_m;
-      if (this->log_f_multiplier[i].estimation_type_m.get() == "fixed_effects") {
+      population->log_f_multiplier[i] =
+          this->log_f_multiplier[i].initial_value_m;
+      if (this->log_f_multiplier[i].estimation_type_m.get() ==
+          "fixed_effects") {
         ss.str("");
-        ss << "Population." << this->id << ".log_f_multiplier." << this->log_f_multiplier[i].id_m;
+        ss << "Population." << this->id << ".log_f_multiplier."
+           << this->log_f_multiplier[i].id_m;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(population->log_f_multiplier[i]);
       }
-      if (this->log_f_multiplier[i].estimation_type_m.get() == "random_effects") {
+      if (this->log_f_multiplier[i].estimation_type_m.get() ==
+          "random_effects") {
         ss.str("");
-        ss << "Population." << this->id << ".log_f_multiplier." << this->log_f_multiplier[i].id_m;
+        ss << "Population." << this->id << ".log_f_multiplier."
+           << this->log_f_multiplier[i].id_m;
         info->RegisterRandomEffectName(ss.str());
         info->RegisterRandomEffect(population->log_f_multiplier[i]);
       }
     }
-    info->variable_map[this->log_f_multiplier.id_m] = &(population)->log_f_multiplier;
+    info->variable_map[this->log_f_multiplier.id_m] =
+        &(population)->log_f_multiplier;
 
     for (size_t i = 0; i < log_init_naa.size(); i++) {
       population->log_init_naa[i] = this->log_init_naa[i].initial_value_m;
@@ -409,7 +421,6 @@ class PopulationInterface : public PopulationInterfaceBase {
     for (int i = 0; i < ages.size(); i++) {
       population->ages[i] = this->ages[i];
     }
-    
 
     // add to Information
     info->populations[population->id] = population;
