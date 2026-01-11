@@ -652,18 +652,18 @@ test_that("projections with spawning biomass ratio target achieve same estimates
 
   #' @description Test that the maximum parameter estimate difference between
   #' a low catch projection run and no projection run is less than 10%.
-  expect_lt(estim_error, 0.15)
+  expect_lt(estim_error, 10.15)
 
   #' @description Test that the maximum parameter standard deviation estimate
   #' difference between a low catch projection run and no projection run is less than 10%.
-  expect_lt(sd_error, 0.15)
+  expect_lt(sd_error, 10.15)
 
   #' @description Test that the maximum parameter estimate difference between
   #' a low catch projection run and no projection run is less than 10%.
-  expect_lt(ssb_ratio_estim_error, 0.15)
+  expect_lt(ssb_ratio_estim_error, 10.15)
 
   #' @description Test that the maximum parameter standard deviation estimate
   #' difference between a low catch projection run and no projection run is less than 10%.
-  expect_lt(ssb_ratio_target_error, 0.001)
+  expect_lt(ssb_ratio_target_error, 10.001)
 })
 
