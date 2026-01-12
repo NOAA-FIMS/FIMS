@@ -24,9 +24,9 @@ namespace fims_popdy {
 template <class Type>
 struct Fleet : public fims_model_object::FIMSObject<Type> {
   static uint32_t id_g; /*!< reference id for fleet object*/
-  size_t n_years;       /*!< the number of years in the model*/
-  size_t n_ages;        /*!< the number of ages in the model*/
-  size_t n_lengths;     /*!< the number of lengths in the model*/
+  size_t n_years= 0;       /*!< the number of years in the model*/
+  size_t n_ages= 0;        /*!< the number of ages in the model*/
+  size_t n_lengths = 0;     /*!< the number of lengths in the model*/
 
   // selectivity
   int fleet_selectivity_age_id_m = -999; /*!< id of selectivity component*/

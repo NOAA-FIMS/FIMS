@@ -608,11 +608,12 @@ public:
         this->GetPopulationDerivedQuantities(population->GetId());
 
     for (size_t fleet_ = 0; fleet_ < population->n_fleets; fleet_++) {
-      if (population->fleets[fleet_]->n_lengths > 0) {
+
+      if (population->fleets[fleet_]->n_lengths > 0 /*&&
+         population->fleets[fleet_]->fleet_selectivity_length_id_m != -999*/) {
         std::map<std::string, fims::Vector<Type>> &fdq_ =
             this->GetFleetDerivedQuantities(
                 population->fleets[fleet_]->GetId());
-
         for (size_t i_length = 0;
              i_length < population->fleets[fleet_]->n_lengths; i_length++) {
           // iterate through all lengths within an age and sum the selectivity
