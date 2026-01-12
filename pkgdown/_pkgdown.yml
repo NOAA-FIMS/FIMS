@@ -27,6 +27,7 @@ articles:
   - fims-demo
   - fims-demo-minimal
   - fims-logging
+  - fims-demo-projections
 
 - title: Developer
   contents:

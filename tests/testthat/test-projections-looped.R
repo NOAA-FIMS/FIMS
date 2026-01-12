@@ -604,7 +604,7 @@ test_that("projections with low catch data achieve same estimates and no project
 #Compare fixed parameter estimates between control and estimated F runs with high catch targets (overfishing)
 #Results are not all similar something is happening with the Fmort results in particular
 #This is somewhat expected as the model is being forced to make the future projected catches obtainable.
-#This interaction means we would need to restrain or detect scenarios where this interaction is occuring.
+#This interaction means we would need to restrain or detect scenarios where this interaction is occurring.
 #We need to test if this is just a catch issue or if it effects reference point projections targeting SPR.
 estim_error <- max(abs(sdr_fixed_5_year_project_catch_high[-c(33:37),"Estimate"] - sdr_fixed_no_project[,"Estimate"])/ abs(sdr_fixed_no_project[,"Estimate"]))
 
