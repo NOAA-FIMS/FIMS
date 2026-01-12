@@ -27,9 +27,9 @@ test_that("rcpp fleet works with correct inputs", {
   fleet1 <- methods::new(Fleet)
   fleet2 <- methods::new(Fleet)
   #' @description Test that rcpp fleet interface works with the first `LogisticSelectivity` module and no output, errors, messages, or warnings are produced when setting the SelectivityIDs for the fleets.
-  expect_silent(fleet1$SetSelectivityID(selectivity_fleet1$get_id()))
+  expect_silent(fleet1$SetSelectivityAgeID(selectivity_fleet1$get_id()))
   #' @description Test that rcpp fleet interface works with the second `LogisticSelectivity` module and no output, errors, messages, or warnings are produced when setting the SelectivityIDs for the fleets.
-  expect_silent(fleet2$SetSelectivityID(selectivity_fleet2$get_id()))
+  expect_silent(fleet2$SetSelectivityAgeID(selectivity_fleet2$get_id()))
 
   #' @description Test that setting the age-composition ID works within the fleet module.
   expect_silent(fleet1$SetObservedAgeCompDataID(1))
@@ -52,7 +52,7 @@ test_that("rcpp fleet works with correct inputs", {
 test_that("rcpp fleet returns correct error messages", {
   fleet1 <- methods::new(Fleet)
   #' @description Test that the rcpp fleet interface returns an error when given a string as a selectivity ID rather than an integer.
-  expect_error(fleet1$SetSelectivityID("id"))
+  expect_error(fleet1$SetSelectivityAgeID("id"))
   #' @description Test that the rcpp fleet interface returns an error when given a string as an age-composition ID rather than an integer.
   expect_error(fleet1$SetObservedAgeCompDataID("id"))
   #' @description Test that the rcpp fleet interface returns an error when given a string as an length-composition ID rather than an integer.
