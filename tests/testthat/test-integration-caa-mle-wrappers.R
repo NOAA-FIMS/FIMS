@@ -172,7 +172,7 @@ test_that("catch-at-age model (estimation MLE with wrappers) works with mixed es
     ) |>
     initialize_fims(data = data_age_comp) |>
     fit_fims(optimize = TRUE)
-  
+
   clear()
 
   #' @description Test that the output from FIMS matches the model comparison project OM values when Fmort estimation types are mixed.
