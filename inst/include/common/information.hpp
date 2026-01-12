@@ -485,7 +485,7 @@ class Information {
           sel_id);  // if find, set it, otherwise invalid
 
       if (it != this->selectivity_models.end()) {
-        f->selectivity = (*it).second;  // elements in container held in pair
+        f->selectivity_age = (*it).second;  // elements in container held in pair
         FIMS_INFO_LOG("Selectivity model " +
                       fims::to_string(f->fleet_selectivity_age_id_m) +
                       " successfully set to fleet " + fims::to_string(f->id));
@@ -509,7 +509,7 @@ class Information {
           sel_id);  // if find, set it, otherwise invalid
 
       if (it != this->selectivity_models.end()) {
-        f->selectivity = (*it).second;  // elements in container held in pair
+        f->selectivity_length = (*it).second;  // elements in container held in pair
         FIMS_INFO_LOG("Selectivity model " +
                       fims::to_string(f->fleet_selectivity_length_id_m) +
                       " successfully set to fleet " + fims::to_string(f->id));

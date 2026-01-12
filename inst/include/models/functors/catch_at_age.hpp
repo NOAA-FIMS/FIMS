@@ -324,7 +324,7 @@ public:
 
     for (size_t fleet_ = 0; fleet_ < population->n_fleets; fleet_++) {
       // evaluate is a member function of the selectivity class
-      Type s = population->fleets[fleet_]->selectivity->evaluate(
+      Type s = population->fleets[fleet_]->selectivity_age->evaluate(
           population->ages[age]);
 
       dq_["mortality_F"][i_age_year] +=
@@ -584,7 +584,7 @@ public:
       // Baranov Catch Equation
       fdq_["landings_numbers_at_age"][i_age_year] +=
           (population->fleets[fleet_]->Fmort[year] *
-           population->fleets[fleet_]->selectivity->evaluate(
+           population->fleets[fleet_]->selectivity_age->evaluate(
                population->ages[age])) /
           pdq_["mortality_Z"][i_age_year] * pdq_["numbers_at_age"][i_age_year] *
           (1 - fims_math::exp(-(pdq_["mortality_Z"][i_age_year])));
@@ -604,24 +604,27 @@ public:
   void CalculateLandingsNumbersAL(
       std::shared_ptr<fims_popdy::Population<Type>> &population,
       size_t i_age_year, size_t year, size_t age) {
-        std::map<std::string, fims::Vector<Type>> &pdq_ =
+    std::map<std::string, fims::Vector<Type>> &pdq_ =
         this->GetPopulationDerivedQuantities(population->GetId());
 
-
     for (size_t fleet_ = 0; fleet_ < population->n_fleets; fleet_++) {
-      if (population->fleets[fleet_]->nlengths > 0) {
+      if (population->fleets[fleet_]->n_lengths > 0) {
+        std::map<std::string, fims::Vector<Type>> &fdq_ =
+            this->GetFleetDerivedQuantities(
+                population->fleets[fleet_]->GetId());
+
         for (size_t i_length = 0;
-             i_length < population->fleets[fleet_]->nlengths; i_length++) {
+             i_length < population->fleets[fleet_]->n_lengths; i_length++) {
           // iterate through all lengths within an age and sum the selectivity
           // to get numbers at length
           size_t i_length_age =
-              age * population->fleets[fleet_]->nlengths + i_length;
+              age * population->fleets[fleet_]->n_lengths + i_length;
           size_t i_length_year =
-              year * population->fleets[fleet_]->nlengths + i_length;
-          population->fleets[fleet_]
-              ->landings_numbers_at_length[i_length_year] +=
+              year * population->fleets[fleet_]->n_lengths + i_length;
+          fdq_["landings_numbers_at_length"][i_length_year] +=
               (population->fleets[fleet_]->Fmort[year] *
-               population->fleets[fleet_]->selectivity_at_length[i_length]) /
+               population->fleets[fleet_]->selectivity_length->evaluate(
+                   population->ages[age])) /
               pdq_["mortality_Z"][i_age_year] *
               pdq_["numbers_at_age"][i_age_year] *
               (1 - fims_math::exp(-(pdq_["mortality_Z"][i_age_year]))) *
@@ -672,7 +675,7 @@ public:
 
       fdq_["index_numbers_at_age"][i_age_year] +=
           (population->fleets[fleet_]->q.get_force_scalar(year) *
-           population->fleets[fleet_]->selectivity->evaluate(
+           population->fleets[fleet_]->selectivity_age->evaluate(
                population->ages[age])) *
           pdq_["numbers_at_age"][i_age_year];
     }
@@ -718,18 +721,19 @@ public:
       std::map<std::string, fims::Vector<Type>> &fdq_ =
           this->GetFleetDerivedQuantities(population->fleets[fleet_]->GetId());
 
-      if (population->fleets[fleet_]->nlengths > 0) {
+      if (population->fleets[fleet_]->n_lengths > 0) {
         for (size_t i_length = 0;
-             i_length < population->fleets[fleet_]->nlengths; i_length++) {
+             i_length < population->fleets[fleet_]->n_lengths; i_length++) {
           // iterate through all lengths within an age and sum the selectivity
           // to get numbers at length
           size_t i_length_age =
-              age * population->fleets[fleet_]->nlengths + i_length;
+              age * population->fleets[fleet_]->n_lengths + i_length;
           size_t i_length_year =
-              year * population->fleets[fleet_]->nlengths + i_length;
+              year * population->fleets[fleet_]->n_lengths + i_length;
           fdq_["index_numbers_at_length"][i_length_year] +=
               population->fleets[fleet_]->q.get_force_scalar(year) *
-              population->fleets[fleet_]->selectivity_at_length[i_length] *
+              population->fleets[fleet_]->selectivity_length->evaluate(
+                  population->ages[age]) *
               pdq_["numbers_at_age"][i_age_year] *
               population->fleets[fleet_]
                   ->age_to_length_conversion[i_length_age];
@@ -1042,10 +1046,12 @@ public:
            */
           if (y < population->n_years) {
             CalculateLandingsNumbersAA(population, i_age_year, y, a);
+            CalculateLandingsNumbersAL(population, i_age_year, y, a);
             CalculateLandingsWeightAA(population, y, a);
             CalculateLandings(population, y, a);
 
             CalculateIndexNumbersAA(population, i_age_year, y, a);
+            CalculateIndexNumbersAL(population, i_age_year, y, a);
             CalculateIndexWeightAA(population, y, a);
             CalculateIndex(population, i_age_year, y, a);
           }
@@ -1161,7 +1167,10 @@ public:
       for (fit = this->fleets.begin(); fit != this->fleets.end(); ++fit) {
         std::shared_ptr<fims_popdy::Fleet<Type>> &fleet = (*fit).second;
         fleet->create_report_vectors(report_vectors);
-        fleet->selectivity->create_report_vectors(report_vectors);
+        fleet->selectivity_age->create_report_vectors(report_vectors);
+        if (fleet->n_lengths > 0) {
+          fleet->selectivity_length->create_report_vectors(report_vectors);
+        }
         std::map<std::string, fims::Vector<Type>> &derived_quantities =
             this->GetFleetDerivedQuantities(fleet->GetId());
 

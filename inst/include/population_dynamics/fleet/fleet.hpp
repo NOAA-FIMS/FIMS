@@ -33,7 +33,11 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
   int fleet_selectivity_length_id_m = -999; /*!< id of selectivity component*/
 
   std::shared_ptr<SelectivityBase<Type>>
-      selectivity; /*!< selectivity component*/
+      selectivity_age; /*!< age selectivity component*/
+
+
+  std::shared_ptr<SelectivityBase<Type>>
+      selectivity_length; /*!< length selectivity component*/
 
   // landings data
   int fleet_observed_landings_data_id_m = -999; /*!< id of landings data */
