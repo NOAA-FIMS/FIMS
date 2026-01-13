@@ -71,9 +71,7 @@ test_that("prior predictive check", {
   fishing_fleet$log_Fmort$set_all_estimable(TRUE)
   fishing_fleet$log_q[1]$value <- log(1.0)
   fishing_fleet$SetSelectivityAgeID(fishing_fleet_selectivity$get_id())
-  if(om_input[["nlengths"]] > 0){
-    fishing_fleet$SetSelectivityLengthID(fishing_fleet_selectivity$get_id())
-  }
+ 
   fishing_fleet$SetObservedIndexDataID(fishing_fleet_index$get_id())
   fishing_fleet$SetObservedAgeCompDataID(fishing_fleet_age_comp$get_id())
   fishing_fleet$SetObservedLengthCompDataID(fishing_fleet_length_comp$get_id())
@@ -134,9 +132,7 @@ test_that("prior predictive check", {
   survey_fleet$log_q[1]$value <- log(om_output[["survey_q"]][["survey1"]])
   survey_fleet$log_q[1]$estimation_type$set("fixed_effects")
   survey_fleet$SetSelectivityAgeID(survey_fleet_selectivity$get_id())
-  if(om_input[["nlengths"]] > 0){
-    survey_fleet$SetSelectivityLengthID(survey_fleet_selectivity$get_id())
-  }
+ 
   survey_fleet$SetObservedIndexDataID(survey_fleet_index$get_id())
   survey_fleet$SetObservedAgeCompDataID(survey_fleet_age_comp$get_id())
   survey_fleet$SetObservedLengthCompDataID(survey_fleet_length_comp$get_id())

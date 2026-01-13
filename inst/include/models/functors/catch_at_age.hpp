@@ -195,16 +195,40 @@ public:
       for (size_t year = 0; year < fleet->n_years; year++) {
         fleet->Fmort[year] = fims_math::exp(fleet->log_Fmort[year]);
       }
-      // // TODO: does this age_length_to_conversion need to be a dq and
-      // parameter
-      // // of fleet?
-      // for (size_t i_length_age = 0;
-      //      i_length_age < fleet->age_to_length_conversion.size();
-      //      i_length_age++)
-      // {
-      //   derived_quantities["age_to_length_conversion"][i_length_age] =
-      //       fleet->age_to_length_conversion[i_length_age];
-      // }
+      // fill selectivity at age and length
+      if (fleet->selectivity_units == "age") {
+        for (size_t a = 0; a < fleet->n_ages; a++) {
+          derived_quantities["selectivity_at_age"][a] = fleet->selectivity->evaluate(ages[a]);
+
+          if (fleet->n_lengths > 0) {
+            for (size_t l = 0; l < fleet->n_lengths; l++) {
+              // iterate through all lengths within an age and sum the
+              // selectivity to get a selectivity at length
+              size_t i_length_age = a * fleet->n_lengths + l;
+              derived_quantities["selectivity_at_length"][l] +=
+                  fleet->age_to_length_conversion[i_length_age] *
+                  derived_quantities["selectivity_at_age"][a];
+            }
+          }
+        }
+      } else if (fleet->selectivity_units == "length") {
+        for (size_t a = 0; a < fleet->n_ages; a++) {
+          for (size_t l = 0; l < fleet->n_lengths; l++) {
+            derived_quantities["selectivity_at_length"][l] =
+                fleet->selectivity->evaluate(fleet->lengths[l]);
+            // iterate through all lengths within an age and sum the selectivity
+            // to get a selectivity at age
+            size_t i_length_age = a * fleet->n_lengths + l;
+            derived_quantities["selectivity_at_age"][a] +=
+                fleet->age_to_length_conversion[i_length_age] *
+                derived_quantities["selectivity_at_length"][l];
+          }
+        }
+      } else {
+        FIMS_ERROR_LOG(
+            "Fleet selectivity units must be either 'age' or 'length', not " +
+            fleet->selectivity_units);
+      }
     }
   }
   /**
@@ -324,7 +348,7 @@ public:
 
     for (size_t fleet_ = 0; fleet_ < population->n_fleets; fleet_++) {
       // evaluate is a member function of the selectivity class
-      Type s = population->fleets[fleet_]->selectivity_age->evaluate(
+      Type s = population->fleets[fleet_]->selectivity->evaluate(
           population->ages[age]);
 
       dq_["mortality_F"][i_age_year] +=
@@ -584,7 +608,7 @@ public:
       // Baranov Catch Equation
       fdq_["landings_numbers_at_age"][i_age_year] +=
           (population->fleets[fleet_]->Fmort[year] *
-           population->fleets[fleet_]->selectivity_age->evaluate(
+           population->fleets[fleet_]->selectivity->evaluate(
                population->ages[age])) /
           pdq_["mortality_Z"][i_age_year] * pdq_["numbers_at_age"][i_age_year] *
           (1 - fims_math::exp(-(pdq_["mortality_Z"][i_age_year])));
@@ -609,8 +633,7 @@ public:
 
     for (size_t fleet_ = 0; fleet_ < population->n_fleets; fleet_++) {
 
-      if (population->fleets[fleet_]->n_lengths > 0 /*&&
-         population->fleets[fleet_]->fleet_selectivity_length_id_m != -999*/) {
+      if (population->fleets[fleet_]->n_lengths > 0) {
         std::map<std::string, fims::Vector<Type>> &fdq_ =
             this->GetFleetDerivedQuantities(
                 population->fleets[fleet_]->GetId());
@@ -624,7 +647,7 @@ public:
               year * population->fleets[fleet_]->n_lengths + i_length;
           fdq_["landings_numbers_at_length"][i_length_year] +=
               (population->fleets[fleet_]->Fmort[year] *
-               population->fleets[fleet_]->selectivity_length->evaluate(
+               population->fleets[fleet_]->selectivity->evaluate(
                    population->ages[age])) /
               pdq_["mortality_Z"][i_age_year] *
               pdq_["numbers_at_age"][i_age_year] *
@@ -676,7 +699,7 @@ public:
 
       fdq_["index_numbers_at_age"][i_age_year] +=
           (population->fleets[fleet_]->q.get_force_scalar(year) *
-           population->fleets[fleet_]->selectivity_age->evaluate(
+           population->fleets[fleet_]->selectivity->evaluate(
                population->ages[age])) *
           pdq_["numbers_at_age"][i_age_year];
     }
@@ -733,7 +756,7 @@ public:
               year * population->fleets[fleet_]->n_lengths + i_length;
           fdq_["index_numbers_at_length"][i_length_year] +=
               population->fleets[fleet_]->q.get_force_scalar(year) *
-              population->fleets[fleet_]->selectivity_length->evaluate(
+              population->fleets[fleet_]->selectivity->evaluate(
                   population->ages[age]) *
               pdq_["numbers_at_age"][i_age_year] *
               population->fleets[fleet_]
@@ -1168,10 +1191,8 @@ public:
       for (fit = this->fleets.begin(); fit != this->fleets.end(); ++fit) {
         std::shared_ptr<fims_popdy::Fleet<Type>> &fleet = (*fit).second;
         fleet->create_report_vectors(report_vectors);
-        fleet->selectivity_age->create_report_vectors(report_vectors);
-        if (fleet->n_lengths > 0) {
-          fleet->selectivity_length->create_report_vectors(report_vectors);
-        }
+        fleet->selectivity->create_report_vectors(report_vectors);
+
         std::map<std::string, fims::Vector<Type>> &derived_quantities =
             this->GetFleetDerivedQuantities(fleet->GetId());
 

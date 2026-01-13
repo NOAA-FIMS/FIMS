@@ -11,10 +11,10 @@
 #ifndef FIMS_COMMON_INFORMATION_HPP
 #define FIMS_COMMON_INFORMATION_HPP
 
+#include <algorithm>
 #include <map>
 #include <memory>
 #include <vector>
-#include <algorithm>
 
 #include "../distributions/distributions.hpp"
 #include "../models/functors/fishery_model_base.hpp"
@@ -33,9 +33,8 @@ namespace fims_info {
  * @brief Stores FIMS model information and creates model. Contains all objects
  * and data pre-model construction
  */
-template <typename Type>
-class Information {
- public:
+template <typename Type> class Information {
+public:
   size_t n_years = 0; /**< number of years >*/
   size_t n_ages = 0;  /**< number of ages>*/
 
@@ -478,54 +477,31 @@ class Information {
    */
   void SetFleetSelectivityModel(bool &valid_model,
                                 std::shared_ptr<fims_popdy::Fleet<Type>> f) {
-    if (f->fleet_selectivity_age_id_m != static_cast<Type>(-999)) {
+    if (f->fleet_selectivity_id_m != static_cast<Type>(-999)) {
       uint32_t sel_id = static_cast<uint32_t>(
-          f->fleet_selectivity_age_id_m);  // cast as unsigned integer
+          f->fleet_selectivity_id_m); // cast as unsigned integer
       selectivity_models_iterator it = this->selectivity_models.find(
-          sel_id);  // if find, set it, otherwise invalid
+          sel_id); // if find, set it, otherwise invalid
 
       if (it != this->selectivity_models.end()) {
-        f->selectivity_age = (*it).second;  // elements in container held in pair
+        f->selectivity = (*it).second; // elements in container held in pair
         FIMS_INFO_LOG("Selectivity model " +
-                      fims::to_string(f->fleet_selectivity_age_id_m) +
+                      fims::to_string(f->fleet_selectivity_id_m) +
                       " successfully set to fleet " + fims::to_string(f->id));
+
       } else {
         valid_model = false;
         FIMS_ERROR_LOG("Expected selectivity pattern not defined for fleet " +
                        fims::to_string(f->id) + ", selectivity pattern " +
                        fims::to_string(sel_id));
       }
+
     } else {
-      FIMS_WARNING_LOG("Warning: No age selectivity pattern defined for fleet " +
-                       fims::to_string(f->id) +
-                       ". FIMS requires selectivity be defined for all fleets "
-                       "when running a catch at age model.");
+      valid_model = false;
+      FIMS_ERROR_LOG("Error: No selectivity pattern defined for fleet " +
+                     fims::to_string(f->id) +
+                     ". FIMS requires selectivity be defined for all fleets.");
     }
-
- if (f->fleet_selectivity_length_id_m != static_cast<Type>(-999)) {
-      uint32_t sel_id = static_cast<uint32_t>(
-          f->fleet_selectivity_length_id_m);  // cast as unsigned integer
-      selectivity_models_iterator it = this->selectivity_models.find(
-          sel_id);  // if find, set it, otherwise invalid
-
-      if (it != this->selectivity_models.end()) {
-        f->selectivity_length = (*it).second;  // elements in container held in pair
-        FIMS_INFO_LOG("Selectivity model " +
-                      fims::to_string(f->fleet_selectivity_length_id_m) +
-                      " successfully set to fleet " + fims::to_string(f->id));
-      } else {
-        valid_model = false;
-        FIMS_ERROR_LOG("Expected selectivity pattern not defined for fleet " +
-                       fims::to_string(f->id) + ", selectivity pattern " +
-                       fims::to_string(sel_id));
-      }
-    } else {
-      FIMS_WARNING_LOG("Warning: No length selectivity pattern defined for fleet " +
-                       fims::to_string(f->id) +
-                       ". FIMS requires selectivity be defined for all fleets "
-                       "when running a catch at age model.");
-    }
-
   }
 
   /**
@@ -546,17 +522,16 @@ class Information {
           this->recruitment_models.find(recruitment_uint);
 
       if (it != this->recruitment_models.end()) {
-        p->recruitment = (*it).second;  // recruitment defined in population.hpp
+        p->recruitment = (*it).second; // recruitment defined in population.hpp
         FIMS_INFO_LOG("Recruitment model " + fims::to_string(recruitment_uint) +
                       " successfully set to population " +
                       fims::to_string(p->id));
       } else {
         valid_model = false;
-        FIMS_ERROR_LOG(
-            "Expected recruitment function not defined for "
-            "population " +
-            fims::to_string(p->id) + ", recruitment function " +
-            fims::to_string(recruitment_uint));
+        FIMS_ERROR_LOG("Expected recruitment function not defined for "
+                       "population " +
+                       fims::to_string(p->id) + ", recruitment function " +
+                       fims::to_string(recruitment_uint));
       }
     } else {
       FIMS_WARNING_LOG(
@@ -586,7 +561,7 @@ class Information {
             this->recruitment_process_models.find(process_uint);
 
         if (it != this->recruitment_process_models.end()) {
-          r->process = (*it).second;  // recruitment process
+          r->process = (*it).second; // recruitment process
           FIMS_INFO_LOG(
               "Recruitment Process model " + fims::to_string(process_uint) +
               " successfully set to population " + fims::to_string(p->id));
@@ -622,13 +597,13 @@ class Information {
     if (p->growth_id != static_cast<Type>(-999)) {
       uint32_t growth_uint = static_cast<uint32_t>(p->growth_id);
       growth_models_iterator it = this->growth_models.find(
-          growth_uint);  // growth_models is specified in information.hpp
+          growth_uint); // growth_models is specified in information.hpp
       // and used in rcpp
       // at the head of information.hpp; are the
       // dimensions of ages defined in rcpp or where?
       if (it != this->growth_models.end()) {
         p->growth =
-            (*it).second;  // growth defined in population.hpp (the object
+            (*it).second; // growth defined in population.hpp (the object
         // is called p, growth is within p)
         FIMS_INFO_LOG("Growth model " + fims::to_string(growth_uint) +
                       " successfully set to population " +
@@ -660,10 +635,10 @@ class Information {
     if (p->maturity_id != static_cast<Type>(-999)) {
       uint32_t maturity_uint = static_cast<uint32_t>(p->maturity_id);
       maturity_models_iterator it = this->maturity_models.find(
-          maturity_uint);  // >maturity_models is specified in
+          maturity_uint); // >maturity_models is specified in
       // information.hpp and used in rcpp
       if (it != this->maturity_models.end()) {
-        p->maturity = (*it).second;  // >maturity defined in population.hpp
+        p->maturity = (*it).second; // >maturity defined in population.hpp
         FIMS_INFO_LOG("Maturity model " + fims::to_string(maturity_uint) +
                       " successfully set to population " +
                       fims::to_string(p->id));
@@ -732,11 +707,10 @@ class Information {
                           fims::to_string(d->id));
           } else {
             valid_model = false;
-            FIMS_ERROR_LOG(
-                "Expected data observations not defined for density "
-                "component " +
-                fims::to_string(d->id) + ", observed data " +
-                fims::to_string(observed_data_id));
+            FIMS_ERROR_LOG("Expected data observations not defined for density "
+                           "component " +
+                           fims::to_string(d->id) + ", observed data " +
+                           fims::to_string(observed_data_id));
           }
         } else {
           valid_model = false;
@@ -957,8 +931,7 @@ class Information {
                 // Initialize fleet object
                 std::shared_ptr<fims_popdy::Fleet<Type>> f = (*it).second;
 
-                if (f->fleet_selectivity_age_id_m == -999 && 
-                    f->fleet_selectivity_length_id_m == -999) {
+                if (f->fleet_selectivity_id_m == -999) {
                   valid_model = false;
                   FIMS_ERROR_LOG(
                       "No selectivity pattern defined for fleet " +
@@ -1019,8 +992,8 @@ class Information {
 
 template <typename Type>
 std::shared_ptr<Information<Type>> Information<Type>::fims_information =
-    nullptr;  // singleton instance
+    nullptr; // singleton instance
 
-}  // namespace fims_info
+} // namespace fims_info
 
 #endif /* FIMS_COMMON_INFORMATION_HPP */

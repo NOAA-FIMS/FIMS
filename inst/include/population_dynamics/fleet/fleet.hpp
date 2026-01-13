@@ -24,20 +24,20 @@ namespace fims_popdy {
 template <class Type>
 struct Fleet : public fims_model_object::FIMSObject<Type> {
   static uint32_t id_g; /*!< reference id for fleet object*/
-  size_t n_years= 0;       /*!< the number of years in the model*/
-  size_t n_ages= 0;        /*!< the number of ages in the model*/
-  size_t n_lengths = 0;     /*!< the number of lengths in the model*/
+  size_t n_years = 0;   /*!< the number of years in the model*/
+  size_t n_ages = 0;    /*!< the number of ages in the model*/
+  size_t n_lengths = 0; /*!< the number of lengths in the model*/
+
+  fims::Vector<double> ages;    /*!< vector of the ages for referencing*/
+  fims::Vector<double> lengths; /*!< vector of the ages for referencing*/
 
   // selectivity
-  int fleet_selectivity_age_id_m = -999; /*!< id of selectivity component*/
-  int fleet_selectivity_length_id_m = -999; /*!< id of selectivity component*/
-
+  int fleet_selectivity_id_m = -999; /*!< id of selectivity component*/
   std::shared_ptr<SelectivityBase<Type>>
-      selectivity_age; /*!< age selectivity component*/
+      selectivity; /*!< selectivity component*/
 
-
-  std::shared_ptr<SelectivityBase<Type>>
-      selectivity_length; /*!< length selectivity component*/
+  std::string
+      selectivity_units; /*!< units for fleet selectivity (age or length)*/
 
   // landings data
   int fleet_observed_landings_data_id_m = -999; /*!< id of landings data */
@@ -109,7 +109,7 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
    * Create a map of report vectors for the object.
    */
   virtual void create_report_vectors(
-      std::map<std::string, fims::Vector<fims::Vector<Type>>>& report_vectors) {
+      std::map<std::string, fims::Vector<fims::Vector<Type>>> &report_vectors) {
     report_vectors["log_Fmort"].emplace_back(this->log_Fmort.to_tmb());
     report_vectors["log_q"].emplace_back(this->log_q.to_tmb());
     report_vectors["age_to_length_conversion"].emplace_back(
@@ -119,17 +119,16 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
   /**
    * Get the report vector count object.
    */
-  virtual void get_report_vector_count(
-      std::map<std::string, size_t>& report_vector_count) {
+  virtual void
+  get_report_vector_count(std::map<std::string, size_t> &report_vector_count) {
     report_vector_count["log_Fmort"] += 1;
     report_vector_count["log_q"] += 1;
   }
 };
 
 // default id of the singleton fleet class
-template <class Type>
-uint32_t Fleet<Type>::id_g = 0;
+template <class Type> uint32_t Fleet<Type>::id_g = 0;
 
-}  // end namespace fims_popdy
+} // end namespace fims_popdy
 
 #endif /* FIMS_POPULATION_DYNAMICS_FLEET_HPP */

@@ -149,9 +149,7 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   fishing_fleet$log_q[1]$value <- log(1.0)
   fishing_fleet$log_q[1]$estimation_type$set("constant")
   fishing_fleet$SetSelectivityAgeID(fishing_fleet_selectivity$get_id())
-  if(om_input[["nlengths"]] > 0){
-    fishing_fleet$SetSelectivityLengthID(fishing_fleet_selectivity$get_id())
-  }
+
   fishing_fleet$SetObservedLandingsDataID(fishing_fleet_landings$get_id())
   fishing_fleet$SetObservedAgeCompDataID(fishing_fleet_age_comp$get_id())
   fishing_fleet$SetObservedLengthCompDataID(fishing_fleet_length_comp$get_id())
