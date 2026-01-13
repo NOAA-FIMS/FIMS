@@ -64,7 +64,6 @@ test_that("deterministic run results correct number of parameters and random eff
 # Estimation test ----
 
 
-
 ## IO correctness ----
 # Compare FIMS results with model comparison project OM values
 test_that("estimation test with recruitment re on log devs", {

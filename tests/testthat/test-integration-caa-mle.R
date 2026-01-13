@@ -143,7 +143,7 @@ test_that("catch-at-age model (estimation MLE without wrappers) returns correct 
 })
 
 test_that("catch-at-age model (estimation MLE without wrappers) returns correct outputs for sample size of 1", {
- # Store the original values of the number of landings observations and
+  # Store the original values of the number of landings observations and
   # survey observations
   n.L_original <- om_input_list[[iter_id]][["n.L"]][["fleet1"]]
   n.survey_original <- om_input_list[[iter_id]][["n.survey"]][["survey1"]]
