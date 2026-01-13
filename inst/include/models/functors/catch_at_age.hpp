@@ -240,18 +240,18 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * This method is used to calculate the initial numbers at age for a
    * population. It takes a population object and an age as input and
    * calculates the initial numbers at age for that population.
-   * @param population
-   * @param i_age_year
-   * @param a
+   * @param population A shared pointer to the population object.
+   * @param i_age_year The index of the age in the current year.
+   * @param age Integer specifying the age of interest.
    */
   void CalculateInitialNumbersAA(
       std::shared_ptr<fims_popdy::Population<Type>> &population,
-      size_t i_age_year, size_t a) {
+      size_t i_age_year, size_t age) {
     std::map<std::string, fims::Vector<Type>> &dq_ =
         this->GetPopulationDerivedQuantities(population->GetId());
 
     dq_["numbers_at_age"][i_age_year] =
-        fims_math::exp(population->log_init_naa[a]);
+        fims_math::exp(population->log_init_naa[age]);
   }
 
   /**
@@ -260,10 +260,10 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * in the current year, the index of the age in the previous year,
    * and the age as input and calculates the numbers at age for that
    * population.
-   * @param population
-   * @param i_age_year
-   * @param i_agem1_yearm1
-   * @param age
+   * @param population A shared pointer to the population object.
+   * @param i_age_year The index of the age in the current year.
+   * @param i_agem1_yearm1 The index of the previous age in the previous year.
+   * @param age Integer specifying the age of interest.
    */
   void CalculateNumbersAA(
       std::shared_ptr<fims_popdy::Population<Type>> &population,
@@ -292,10 +292,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * in the current year, the index of the age in the previous year,
    * and the age as input and calculates the unfished numbers at age
    * for that population.
-   * @param population
-   * @param i_age_year
-   * @param i_agem1_yearm1
-   * @param age
+   * @copydoc CalculateNumbersAA()
    */
   void CalculateUnfishedNumbersAA(
       std::shared_ptr<fims_popdy::Population<Type>> &population,
@@ -321,10 +318,10 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * * This method is used to calculate the mortality for a population. It takes
    * a population object, the index of the age in the current year, the year,
    * and the age as input and calculates the mortality for that population.
-   * @param population
-   * @param i_age_year
-   * @param year
-   * @param age
+   * @param population A shared pointer to the population object.
+   * @param i_age_year The index of the age in the current year.
+   * @param year Integer specifying the year of interest.
+   * @param age Integer specifying the age of interest.
    */
   void CalculateMortality(
       std::shared_ptr<fims_popdy::Population<Type>> &population,
@@ -353,10 +350,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * * This method is used to calculate the biomass for a population. It takes a
    * population object, the index of the age in the current year, the year,
    * and the age as input and calculates the biomass for that population.
-   * @param population
-   * @param i_age_year
-   * @param year
-   * @param age
+   * @copydoc CalculateMortality()
    */
   void CalculateBiomass(
       std::shared_ptr<fims_popdy::Population<Type>> &population,
@@ -373,10 +367,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * It takes a population object, the index of the age in the current year, the
    * year, and the age as input and calculates the unfished biomass for that
    * population.
-   * @param population
-   * @param i_age_year
-   * @param year
-   * @param age
+   * @copydoc CalculateMortality()
    */
   void CalculateUnfishedBiomass(
       std::shared_ptr<fims_popdy::Population<Type>> &population,
@@ -394,10 +385,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * It takes a population object, the index of the age in the current year, the
    * year, and the age as input and calculates the spawning biomass for that
    * population.
-   * @param population
-   * @param i_age_year
-   * @param year
-   * @param age
+   * @copydoc CalculateMortality()
    */
   void CalculateSpawningBiomass(
       std::shared_ptr<fims_popdy::Population<Type>> &population,
@@ -416,10 +404,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * population. It takes a population object, the index of the age in the
    * current year, the year, and the age as input and calculates the unfished
    * spawning biomass for that population.
-   * @param population
-   * @param i_age_year
-   * @param year
-   * @param age
+   * @copydoc CalculateMortality()
    */
   void CalculateUnfishedSpawningBiomass(
       std::shared_ptr<fims_popdy::Population<Type>> &population,
@@ -456,7 +441,9 @@ class CatchAtAge : public FisheryModelBase<Type> {
 
   /**
    * This method is used to calculate the spawning biomass per recruit for a
-   * population. It takes a population object.
+   * population. It takes a population object as input.
+   * @param population A shared pointer to the population object.
+   * @return The spawning biomass per recruit.
    */
   Type CalculateSBPR0(
       std::shared_ptr<fims_popdy::Population<Type>> &population) {
@@ -468,11 +455,12 @@ class CatchAtAge : public FisheryModelBase<Type> {
     phi_0 += numbers_spr[0] * population->proportion_female[0] *
              dq_["proportion_mature_at_age"][0] *
              population->growth->evaluate(population->ages[0]);
-    for (size_t a = 1; a < (population->n_ages - 1); a++) {
-      numbers_spr[a] = numbers_spr[a - 1] * fims_math::exp(-population->M[a]);
-      phi_0 += numbers_spr[a] * population->proportion_female[a] *
-               dq_["proportion_mature_at_age"][a] *
-               population->growth->evaluate(population->ages[a]);
+    for (size_t age = 1; age < (population->n_ages - 1); age++) {
+      numbers_spr[age] =
+          numbers_spr[age - 1] * fims_math::exp(-population->M[age]);
+      phi_0 += numbers_spr[age] * population->proportion_female[age] *
+               dq_["proportion_mature_at_age"][age] *
+               population->growth->evaluate(population->ages[age]);
     }
 
     numbers_spr[population->n_ages - 1] =
@@ -490,6 +478,8 @@ class CatchAtAge : public FisheryModelBase<Type> {
 
   /**
    * This method is used to calculate the recruitment for a population.
+   * @copydoc CalculateIndex()
+   * @param i_dev The year of the last deviation.
    *
    */
   void CalculateRecruitment(
@@ -525,9 +515,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * This method is used to calculate the maturity at age for a population. It
    * takes a population object, the index of the age in the current year, the
    * age as input and calculates the maturity at age for that population.
-   * @param population
-   * @param i_age_year
-   * @param age
+   * @copydoc CalculateInitialNumbersAA()
    */
   void CalculateMaturityAA(
       std::shared_ptr<fims_popdy::Population<Type>> &population,
@@ -544,9 +532,9 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * existing expected total landings by fleet. It takes a population object,
    * the year, and the age as input and calculates the landings for that
    * population.
-   * @param population
-   * @param year
-   * @param age
+   * @param population A shared pointer to the population object.
+   * @param year Integer specifying the year of interest.
+   * @param age Integer specifying the age of interest.
    */
   void CalculateLandings(
       std::shared_ptr<fims_popdy::Population<Type>> &population, size_t year,
@@ -577,10 +565,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * This method is used to calculate the catch weight at age for a population.
    * It takes a population object, the index of the age in the current year, the
    * year, and the age as input and calculates the weight at age for that
-   * population.
-   * @param population
-   * @param year
-   * @param age
+   * @copydoc CalculateLandings()
    */
   void CalculateLandingsWeightAA(
       std::shared_ptr<fims_popdy::Population<Type>> &population, size_t year,
@@ -598,11 +583,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
 
   /**
    * @brief Calculate the numbers at age for landings in a population.
-   *
-   * @param population The population.
-   * @param i_age_year The index of the age and year.
-   * @param year The year.
-   * @param age The age.
+   * @copydoc CalculateMortality()
    */
   void CalculateLandingsNumbersAA(
       std::shared_ptr<fims_popdy::Population<Type>> &population,
@@ -627,14 +608,12 @@ class CatchAtAge : public FisheryModelBase<Type> {
 
   /**
    * @brief Calculate the index for a population.
-   *
-   * @param population The population.
-   * @param i_age_year The index of the year and age.
-   * @param year The year.
-   * @param age The age.
+   * @param population A shared pointer to the population object.
+   * @param i_age_year The index of the age in the current year.
+   * @param year Integer specifying the year of interest.
    */
   void CalculateIndex(std::shared_ptr<fims_popdy::Population<Type>> &population,
-                      size_t i_age_year, size_t year, size_t age) {
+                      size_t i_age_year, size_t year) {
     for (size_t fleet_ = 0; fleet_ < population->n_fleets; fleet_++) {
       std::map<std::string, fims::Vector<Type>> &fdq_ =
           this->GetFleetDerivedQuantities(population->fleets[fleet_]->GetId());
@@ -647,11 +626,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
 
   /**
    * @brief Calculate the numbers at age for an index in the population.
-   *
-   * @param population The population.
-   * @param i_age_year The index of the year and age.
-   * @param year The year.
-   * @param age The age.
+   * @copydoc CalculateMortality()
    */
   void CalculateIndexNumbersAA(
       std::shared_ptr<fims_popdy::Population<Type>> &population,
@@ -673,10 +648,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
 
   /**
    * @brief Calculate the weight at age for an index in a population.
-   *
-   * @param population The population.
-   * @param year The year.
-   * @param age The age.
+   * @copydoc CalculateLandings()
    */
   void CalculateIndexWeightAA(
       std::shared_ptr<fims_popdy::Population<Type>> &population, size_t year,
@@ -702,7 +674,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
           this->GetFleetDerivedQuantities((*fit).second->GetId());
 
       std::shared_ptr<fims_popdy::Fleet<Type>> &fleet = (*fit).second;
-      for (size_t y = 0; y < fleet->n_years; y++) {
+      for (size_t year = 0; year < fleet->n_years; year++) {
         Type sum = static_cast<Type>(0.0);
         Type sum_obs = static_cast<Type>(0.0);
         // robust_add is a small value to add to expected composition
@@ -713,8 +685,8 @@ class CatchAtAge : public FisheryModelBase<Type> {
         // robust additions to ensure that proportions sum to 1. Type robust_sum
         // = static_cast<Type>(1.0);
 
-        for (size_t a = 0; a < fleet->n_ages; a++) {
-          size_t i_age_year = y * fleet->n_ages + a;
+        for (size_t age = 0; age < fleet->n_ages; age++) {
+          size_t i_age_year = year * fleet->n_ages + age;
           // Here we have a check to determine if the age comp
           // should be calculated from the retained landings or
           // the total population. These values are slightly different.
@@ -745,8 +717,8 @@ class CatchAtAge : public FisheryModelBase<Type> {
             }
           }
         }
-        for (size_t a = 0; a < fleet->n_ages; a++) {
-          size_t i_age_year = y * fleet->n_ages + a;
+        for (size_t age = 0; age < fleet->n_ages; age++) {
+          size_t i_age_year = year * fleet->n_ages + age;
           fdq_["agecomp_proportion"][i_age_year] =
               fdq_["agecomp_expected"][i_age_year] / sum;
           // robust_add + robust_sum * this->agecomp_expected[i_age_year] / sum;
@@ -772,7 +744,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
       std::shared_ptr<fims_popdy::Fleet<Type>> &fleet = (*fit).second;
 
       if (fleet->n_lengths > 0) {
-        for (size_t y = 0; y < fleet->n_years; y++) {
+        for (size_t year = 0; year < fleet->n_years; year++) {
           Type sum = static_cast<Type>(0.0);
           Type sum_obs = static_cast<Type>(0.0);
           // robust_add is a small value to add to expected composition
@@ -782,11 +754,11 @@ class CatchAtAge : public FisheryModelBase<Type> {
           // before testing sum robust is used to calculate the total sum of
           // robust additions to ensure that proportions sum to 1. Type
           // robust_sum = static_cast<Type>(1.0);
-          for (size_t l = 0; l < fleet->n_lengths; l++) {
-            size_t i_length_year = y * fleet->n_lengths + l;
-            for (size_t a = 0; a < fleet->n_ages; a++) {
-              size_t i_age_year = y * fleet->n_ages + a;
-              size_t i_length_age = a * fleet->n_lengths + l;
+          for (size_t length = 0; length < fleet->n_lengths; length++) {
+            size_t i_length_year = year * fleet->n_lengths + length;
+            for (size_t age = 0; age < fleet->n_ages; age++) {
+              size_t i_age_year = year * fleet->n_ages + age;
+              size_t i_length_age = age * fleet->n_lengths + length;
               fdq_["lengthcomp_expected"][i_length_year] +=
                   fdq_["agecomp_expected"][i_age_year] *
                   fleet->age_to_length_conversion[i_length_age];
@@ -810,8 +782,8 @@ class CatchAtAge : public FisheryModelBase<Type> {
               }
             }
           }
-          for (size_t l = 0; l < fleet->n_lengths; l++) {
-            size_t i_length_year = y * fleet->n_lengths + l;
+          for (size_t length = 0; length < fleet->n_lengths; length++) {
+            size_t i_length_year = year * fleet->n_lengths + length;
             fdq_["lengthcomp_proportion"][i_length_year] =
                 fdq_["lengthcomp_expected"][i_length_year] / sum;
             // robust_add + robust_sum *
@@ -868,6 +840,9 @@ class CatchAtAge : public FisheryModelBase<Type> {
     }
   }
 
+  /**
+   * * This method is used to evaluate the population dynamics model.
+   */
   virtual void Evaluate() {
     /*
                Sets derived vectors to zero
@@ -995,7 +970,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
 
             CalculateIndexNumbersAA(population, i_age_year, y, a);
             CalculateIndexWeightAA(population, y, a);
-            CalculateIndex(population, i_age_year, y, a);
+            CalculateIndex(population, i_age_year, y);
           }
         }
         /* Calculate spawning biomass depletion ratio */
