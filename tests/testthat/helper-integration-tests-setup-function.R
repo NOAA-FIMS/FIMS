@@ -139,8 +139,12 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   fishing_fleet$n_ages$set(om_input[["nages"]])
   # Set number of length bins
   fishing_fleet$n_lengths$set(om_input[["nlengths"]])
+  fishing_fleet$ages <- om_input[["ages"]]
+  fishing_fleet$lengths <- om_input[["lengths"]]
 
   fishing_fleet$log_Fmort$resize(om_input[["nyr"]])
+
+
   for (y in 1:om_input$nyr) {
     # Log-transform OM fishing mortality
     fishing_fleet$log_Fmort[y]$value <- log(om_output[["f"]][y])
@@ -234,6 +238,8 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   survey_fleet$n_years$set(om_input[["nyr"]])
   survey_fleet$n_lengths$set(om_input[["nlengths"]])
   survey_fleet$log_Fmort$resize(om_input[["nyr"]])
+  survey_fleet$ages <- om_input[["ages"]]
+  survey_fleet$lengths <- om_input[["lengths"]]
   for (y in 1:om_input$nyr) {
     # Set very low survey fishing mortality
     survey_fleet$log_Fmort[y]$value <- -200
@@ -242,7 +248,7 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   survey_fleet$log_q[1]$value <- log(om_output[["survey_q"]][["survey1"]])
   survey_fleet$log_q[1]$estimation_type$set("fixed_effects")
   survey_fleet$SetSelectivityAgeID(survey_fleet_selectivity$get_id())
-  if(om_input[["nlengths"]] > 0){
+  if (om_input[["nlengths"]] > 0) {
     survey_fleet$SetSelectivityLengthID(survey_fleet_selectivity$get_id())
   }
   survey_fleet$SetObservedIndexDataID(survey_fleet_index$get_id())

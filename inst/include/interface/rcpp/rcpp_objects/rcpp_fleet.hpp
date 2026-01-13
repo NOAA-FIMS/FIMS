@@ -116,6 +116,15 @@ public:
   SharedInt n_years = 0;
 
   /**
+   * @brief The vector of ages for the fleet.
+   */
+  Rcpp::NumericVector ages;
+  /**
+   * @brief The vector of lengths for the fleet.
+   */
+  Rcpp::NumericVector lengths;
+
+  /**
    * @brief What units is selectivity for this fleet modeled in.
    * Options are age or length, default is age.
    */
@@ -486,6 +495,16 @@ public:
     fleet->observed_landings_units = this->observed_landings_units.get();
     fleet->observed_index_units = this->observed_index_units.get();
     fleet->selectivity_units = this->selectivity_units.get();
+
+    fleet->ages.resize(this->ages.size());
+    for (size_t i = 0; i < this->ages.size(); i++) {
+      fleet->ages[i] = this->ages[i];
+    }
+    
+    fleet->lengths.resize(this->lengths.size());
+    for (size_t i = 0; i < this->lengths.size(); i++) {
+      fleet->lengths[i] = this->lengths[i];
+    }
 
     fleet->fleet_observed_agecomp_data_id_m =
         interface_observed_agecomp_data_id_m.get();
