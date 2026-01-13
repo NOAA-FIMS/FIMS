@@ -96,6 +96,7 @@ ComputeProportions
 ConfigurePopulationModel
 Const
 ConstraintWorks
+copydoc
 CppAD
 CreateFleetObjects
 CreateModel
