@@ -5,7 +5,7 @@ if (!file.exists(test_path("fixtures", "fit_age_length_comp.RDS"))) {
 }
 
 
-##Section 1: load in test data for all runs
+## Section 1: load in test data for all runs
 
 load(test_path("fixtures", "integration_test_data.RData"))
 map <- list()
@@ -16,7 +16,7 @@ om_input <- om_input_list[[iter_id]] # Operating model input for the current ite
 om_output <- om_output_list[[iter_id]] # Operating model output for the current iteration
 em_input <- em_input_list[[iter_id]] # Estimation model input for the current iteration
 
-##Section 2: Model run code that should work for each scenario
+## Section 2: Model run code that should work for each scenario
 
 run_FIMS_projection_scenario <- function(om_input,
                                          om_output,
@@ -26,8 +26,7 @@ run_FIMS_projection_scenario <- function(om_input,
                                          projected_F,
                                          estim_projected_F,
                                          projected_index,
-                                         ssb_ratio_target=NULL){
-
+                                         ssb_ratio_target = NULL) {
   # Clear any previous FIMS settings
   clear()
 
@@ -42,10 +41,10 @@ run_FIMS_projection_scenario <- function(om_input,
     \(x) fishing_fleet_landings$landings_data$set(x - 1, landings[x])
   )
   # set projection years
-  if(n_projection_years>0){
+  if (n_projection_years > 0) {
     purrr::walk(
-      (om_input[["nyr"]]+1):(om_input[["nyr"]]+n_projection_years),
-      \(x) fishing_fleet_landings$landings_data$set(x - 1, projected_landings[x-om_input[["nyr"]]])
+      (om_input[["nyr"]] + 1):(om_input[["nyr"]] + n_projection_years),
+      \(x) fishing_fleet_landings$landings_data$set(x - 1, projected_landings[x - om_input[["nyr"]]])
     )
   }
   # set fishing fleet age comp data, need to set dimensions of age comps
@@ -55,8 +54,8 @@ run_FIMS_projection_scenario <- function(om_input,
   # Here we add projection period missing age comps for the fishing fleet
   # We take the observed age proportions and multiply them by the sample size
   # then add two years of missing data -999 for the projection period
-  projected_age_comps <- em_input[["L.age.obs"]][["fleet1"]]* em_input[["n.L"]][["fleet1"]]
-  if(n_projection_years>0){
+  projected_age_comps <- em_input[["L.age.obs"]][["fleet1"]] * em_input[["n.L"]][["fleet1"]]
+  if (n_projection_years > 0) {
     projected_age_comps <- rbind(
       projected_age_comps,
       matrix(-999, nrow = n_projection_years, ncol = om_input[["nages"]])
@@ -77,7 +76,7 @@ run_FIMS_projection_scenario <- function(om_input,
   # Here we add projection period missing length comps for the fishing fleet
   # We take the observed length proportions and multiply them by the sample size
   # then add two years of missing data -999 for the projection period
-  projected_length_comps <- em_input[["L.length.obs"]][["fleet1"]]* em_input[["n.L.lengthcomp"]][["fleet1"]]
+  projected_length_comps <- em_input[["L.length.obs"]][["fleet1"]] * em_input[["n.L.lengthcomp"]][["fleet1"]]
   projected_length_comps <- rbind(
     projected_length_comps,
     matrix(-999, nrow = n_projection_years, ncol = om_input[["nlengths"]])
@@ -105,7 +104,7 @@ run_FIMS_projection_scenario <- function(om_input,
   # Initialize the fishing fleet module
   fishing_fleet <- methods::new(Fleet)
   # Set number of years
-  fishing_fleet$n_years$set((om_input[["nyr"]]+n_projection_years))
+  fishing_fleet$n_years$set((om_input[["nyr"]] + n_projection_years))
   # Set number of age classes
   fishing_fleet$n_ages$set(om_input[["nages"]])
   # Set number of length bins
@@ -119,12 +118,12 @@ run_FIMS_projection_scenario <- function(om_input,
     fishing_fleet$log_Fmort[y]$estimation_type$set("fixed_effects")
   }
 
-  if(n_projection_years>0){
-    for (y in (om_input$nyr+1):(om_input$nyr+n_projection_years)) {
+  if (n_projection_years > 0) {
+    for (y in (om_input$nyr + 1):(om_input$nyr + n_projection_years)) {
       # Log-transform OM fishing mortality
       # NOTE: Is this index y correct? It starts at 1 but others start at 0?
-      fishing_fleet$log_Fmort[y]$value <- (log(projected_F[y-om_input$nyr]))
-      fishing_fleet$log_Fmort[y]$estimation_type$set(estim_projected_F[y-om_input$nyr])
+      fishing_fleet$log_Fmort[y]$value <- (log(projected_F[y - om_input$nyr]))
+      fishing_fleet$log_Fmort[y]$estimation_type$set(estim_projected_F[y - om_input$nyr])
     }
   }
 
@@ -176,16 +175,16 @@ run_FIMS_projection_scenario <- function(om_input,
     1:om_input[["nyr"]],
     \(x) survey_fleet_index$index_data$set(x - 1, survey_index[x])
   )
-  if(n_projection_years>0){
+  if (n_projection_years > 0) {
     purrr::walk(
-      (om_input[["nyr"]]+1):(om_input[["nyr"]]+n_projection_years),
-      \(x) survey_fleet_index$index_data$set(x - 1, projected_index[x-om_input[["nyr"]]])
+      (om_input[["nyr"]] + 1):(om_input[["nyr"]] + n_projection_years),
+      \(x) survey_fleet_index$index_data$set(x - 1, projected_index[x - om_input[["nyr"]]])
     )
   }
 
   survey_fleet_age_comp <- methods::new(AgeComp, (om_input[["nyr"]] + n_projection_years), om_input[["nages"]])
 
-  projected_survey_age_comps <- em_input[["survey.age.obs"]][["survey1"]]* em_input[["n.survey"]][["survey1"]]
+  projected_survey_age_comps <- em_input[["survey.age.obs"]][["survey1"]] * em_input[["n.survey"]][["survey1"]]
   projected_survey_age_comps <- rbind(
     projected_survey_age_comps,
     matrix(-999, nrow = n_projection_years, ncol = om_input[["nages"]])
@@ -201,7 +200,7 @@ run_FIMS_projection_scenario <- function(om_input,
 
   survey_fleet_length_comp <- methods::new(LengthComp, (om_input[["nyr"]] + n_projection_years), om_input[["nlengths"]])
 
-  projected_survey_length_comps <- em_input[["survey.length.obs"]][["survey1"]]* em_input[["n.survey.lengthcomp"]][["survey1"]]
+  projected_survey_length_comps <- em_input[["survey.length.obs"]][["survey1"]] * em_input[["n.survey.lengthcomp"]][["survey1"]]
   projected_survey_length_comps <- rbind(
     projected_survey_length_comps,
     matrix(-999, nrow = n_projection_years, ncol = om_input[["nlengths"]])
@@ -310,25 +309,22 @@ run_FIMS_projection_scenario <- function(om_input,
   # The log is taken in the likelihood calculations
   # alternative setting: recruitment$log_devs <- rep(0, length(om_input$logR.resid))
 
-  #adding two years for projections
+  # adding two years for projections
   recruitment$log_devs$resize(om_input[["nyr"]] - 1 + n_projection_years)
 
-  #set values for estimated years
+  # set values for estimated years
   for (y in 1:(om_input[["nyr"]] - 1)) {
     recruitment$log_devs[y]$value <- (om_input[["logR.resid"]][y + 1])
     recruitment$log_devs[y]$estimation_type$set("random_effects")
   }
 
-  if(n_projection_years>0){
-    #set projection years to zero
-    for(y in (om_input[["nyr"]]):(om_input[["nyr"]] - 1 + n_projection_years)){
+  if (n_projection_years > 0) {
+    # set projection years to zero
+    for (y in (om_input[["nyr"]]):(om_input[["nyr"]] - 1 + n_projection_years)) {
       recruitment$log_devs[y]$value <- (0)
       recruitment$log_devs[y]$estimation_type$set("constant")
     }
   }
-
-
-
 
 
   recruitment_distribution <- methods::new(DnormDistribution)
@@ -338,7 +334,7 @@ run_FIMS_projection_scenario <- function(om_input,
   recruitment_distribution$log_sd$resize(1)
   recruitment_distribution$log_sd[1]$value <- (log(om_input[["logR_sd"]]))
 
-  #NOTE: If this doesn't work I would guess that this is the possible source of
+  # NOTE: If this doesn't work I would guess that this is the possible source of
   # issues due to the length of x or expected recruitment needing to be the
   # same length as the random effect portion not the whole recruitment vector
   recruitment_distribution$x$resize(om_input[["nyr"]] - 1 + n_projection_years)
@@ -397,17 +393,15 @@ run_FIMS_projection_scenario <- function(om_input,
   population$AddFleet(fishing_fleet$get_id())
   population$AddFleet(survey_fleet$get_id())
 
-  if(!is.null(ssb_ratio_target)){
-
-
-    #Setup f_multiplier to allow F in the projection period to be scaled to achieve
+  if (!is.null(ssb_ratio_target)) {
+    # Setup f_multiplier to allow F in the projection period to be scaled to achieve
     population$log_f_multiplier$resize(om_input[["nyr"]] + n_projection_years)
-    for (i in 1:(om_input[["nyr"]]) ) {
+    for (i in 1:(om_input[["nyr"]])) {
       population$log_f_multiplier[i]$value <- 0.0
       population$log_f_multiplier[i]$estimation_type$set("constant")
     }
-    if(n_projection_years>0){
-      for (i in (om_input[["nyr"]]+1):(om_input[["nyr"]] + n_projection_years) ) {
+    if (n_projection_years > 0) {
+      for (i in (om_input[["nyr"]] + 1):(om_input[["nyr"]] + n_projection_years)) {
         population$log_f_multiplier[i]$value <- 0.0
         population$log_f_multiplier[i]$estimation_type$set("random_effects")
       }
@@ -415,7 +409,7 @@ run_FIMS_projection_scenario <- function(om_input,
       F_mult_distribution <- methods::new(DnormDistribution)
 
       F_mult_distribution$set_distribution_mean(1)
-      #F_mult_distribution$set_distribution_mean(-0.6931472)
+      # F_mult_distribution$set_distribution_mean(-0.6931472)
       F_mult_distribution$expected_mean[1]$estimation_type$set("fixed_effects")
 
       F_mult_distribution$x$resize(om_input[["nyr"]] + n_projection_years)
@@ -433,40 +427,39 @@ run_FIMS_projection_scenario <- function(om_input,
         F_mult_distribution$log_sd[i]$value <- -0
         F_mult_distribution$log_sd[i]$estimation_type$set("constant")
       }
-      for (i in (om_input[["nyr"]] + max(1,(n_projection_years - 30))):(om_input[["nyr"]] + n_projection_years)) {
+      for (i in (om_input[["nyr"]] + max(1, (n_projection_years - 30))):(om_input[["nyr"]] + n_projection_years)) {
         F_mult_distribution$x[i]$value <- 0
         F_mult_distribution$expected_values[i]$value <- 0
         F_mult_distribution$log_sd[i]$value <- -5
         F_mult_distribution$log_sd[i]$estimation_type$set("constant")
       }
-      for (i in (om_input[["nyr"]] + max(1,(n_projection_years - 5))):(om_input[["nyr"]] + n_projection_years)) {
+      for (i in (om_input[["nyr"]] + max(1, (n_projection_years - 5))):(om_input[["nyr"]] + n_projection_years)) {
         F_mult_distribution$x[i]$value <- 0
         F_mult_distribution$expected_values[i]$value <- 0
         F_mult_distribution$log_sd[i]$value <- -5
         F_mult_distribution$log_sd[i]$estimation_type$set("constant")
       }
       F_mult_distribution$set_distribution_links("random_effects", population$log_f_multiplier$get_id())
-
     }
 
-    #Setup projection prior target
+    # Setup projection prior target
     SSB_ratio_prior <- methods::new(DnormDistribution)
     SSB_ratio_prior$expected_values$resize((om_input[["nyr"]] + n_projection_years + 1))
     SSB_ratio_prior$x$resize((om_input[["nyr"]] + n_projection_years + 1))
     SSB_ratio_prior$log_sd$resize((om_input[["nyr"]] + n_projection_years + 1))
-    for(y in 1:(om_input[["nyr"]] + 1)){
+    for (y in 1:(om_input[["nyr"]] + 1)) {
       SSB_ratio_prior$x[y]$value <- ssb_ratio_target
       SSB_ratio_prior$expected_values[y]$value <- ssb_ratio_target
       SSB_ratio_prior$log_sd[y]$value <- 200
     }
-    if(n_projection_years>0){
-      for(y in (om_input[["nyr"]] + 2):(om_input[["nyr"]] + 1 + n_projection_years)){
+    if (n_projection_years > 0) {
+      for (y in (om_input[["nyr"]] + 2):(om_input[["nyr"]] + 1 + n_projection_years)) {
         SSB_ratio_prior$x[y]$value <- ssb_ratio_target
         SSB_ratio_prior$expected_values[y]$value <- ssb_ratio_target
         SSB_ratio_prior$log_sd[y]$value <- 200
       }
 
-      for(y in (om_input[["nyr"]] + max(2, n_projection_years-5)):(om_input[["nyr"]] + 1 + n_projection_years)){
+      for (y in (om_input[["nyr"]] + max(2, n_projection_years - 5)):(om_input[["nyr"]] + 1 + n_projection_years)) {
         SSB_ratio_prior$x[y]$value <- ssb_ratio_target
         SSB_ratio_prior$expected_values[y]$value <- ssb_ratio_target
         SSB_ratio_prior$log_sd[y]$value <- -5
@@ -493,7 +486,7 @@ run_FIMS_projection_scenario <- function(om_input,
   # Optimization with nlminb
 
   opt <- stats::nlminb(obj[["par"]], obj[["fn"]], obj[["gr"]],
-                       control = list(eval.max = 10000, iter.max = 10000, trace = 0)
+    control = list(eval.max = 10000, iter.max = 10000, trace = 0)
   )
   FIMS::set_fixed(opt$par)
   fims_finalized <- caa$get_output()
@@ -510,7 +503,7 @@ run_FIMS_projection_scenario <- function(om_input,
 
   clear()
 
-  #Output results for scenario comparison
+  # Output results for scenario comparison
   outputs <- list()
   outputs[[1]] <- sdr_report
   outputs[[2]] <- sdr_fixed
@@ -520,125 +513,130 @@ run_FIMS_projection_scenario <- function(om_input,
   return(outputs)
 }
 
-##Section 3: Setup comparison scenario runs
+## Section 3: Setup comparison scenario runs
 
 ## Run FIMS with no projection years as a control run ##
 n_projection_years <- 0
-projected_landings <- rep(-999,n_projection_years)
-projected_F <- rep(om_output[["f"]][om_input$nyr],n_projection_years)
-estim_projected_F <- rep("constant",n_projection_years)
-projected_index <- rep(-999,n_projection_years)
+projected_landings <- rep(-999, n_projection_years)
+projected_F <- rep(om_output[["f"]][om_input$nyr], n_projection_years)
+estim_projected_F <- rep("constant", n_projection_years)
+projected_index <- rep(-999, n_projection_years)
 
 no_projection_outputs <- run_FIMS_projection_scenario(om_input,
-                                         om_output,
-                                         em_input,
-                                         n_projection_years,
-                                         projected_landings,
-                                         projected_F,
-                                         estim_projected_F,
-                                         projected_index,
-                                         ssb_ratio_target=NULL)
+  om_output,
+  em_input,
+  n_projection_years,
+  projected_landings,
+  projected_F,
+  estim_projected_F,
+  projected_index,
+  ssb_ratio_target = NULL
+)
 
 sdr_fixed_no_project <- no_projection_outputs[[2]]
 sdr_report_no_project <- no_projection_outputs[[1]]
 
 ## Run FIMS with 5 projection years and no landings ##
 n_projection_years <- 5
-projected_landings <- rep(-999,n_projection_years)
-projected_F <- rep(om_output[["f"]][om_input$nyr],n_projection_years)
-estim_projected_F <- rep("constant",n_projection_years)
-projected_index <- rep(-999,n_projection_years)
+projected_landings <- rep(-999, n_projection_years)
+projected_F <- rep(om_output[["f"]][om_input$nyr], n_projection_years)
+estim_projected_F <- rep("constant", n_projection_years)
+projected_index <- rep(-999, n_projection_years)
 
 projection_outputs <- run_FIMS_projection_scenario(om_input,
-                                                      om_output,
-                                                      em_input,
-                                                      n_projection_years,
-                                                      projected_landings,
-                                                      projected_F,
-                                                      estim_projected_F,
-                                                      projected_index,
-                                                      ssb_ratio_target=NULL)
+  om_output,
+  em_input,
+  n_projection_years,
+  projected_landings,
+  projected_F,
+  estim_projected_F,
+  projected_index,
+  ssb_ratio_target = NULL
+)
 
 sdr_fixed_5_year_project <- projection_outputs[[2]]
 sdr_report_5_year_project <- projection_outputs[[1]]
 
 ## Run FIMS with 5 projection years and low future landings ##
 n_projection_years <- 5
-projected_landings <- rep(em_input[["L.obs"]][["fleet1"]][om_input$nyr]*0.5,n_projection_years)
-projected_F <- rep(om_output[["f"]][om_input$nyr],n_projection_years)
-estim_projected_F <- rep("fixed_effects",n_projection_years)
-projected_index <- rep(-999,n_projection_years)
+projected_landings <- rep(em_input[["L.obs"]][["fleet1"]][om_input$nyr] * 0.5, n_projection_years)
+projected_F <- rep(om_output[["f"]][om_input$nyr], n_projection_years)
+estim_projected_F <- rep("fixed_effects", n_projection_years)
+projected_index <- rep(-999, n_projection_years)
 
 low_catch_projection_outputs <- run_FIMS_projection_scenario(om_input,
-                                                      om_output,
-                                                      em_input,
-                                                      n_projection_years,
-                                                      projected_landings,
-                                                      projected_F,
-                                                      estim_projected_F,
-                                                      projected_index,
-                                                      ssb_ratio_target=NULL)
+  om_output,
+  em_input,
+  n_projection_years,
+  projected_landings,
+  projected_F,
+  estim_projected_F,
+  projected_index,
+  ssb_ratio_target = NULL
+)
 
 sdr_fixed_5_year_project_catch_low <- low_catch_projection_outputs[[2]]
 sdr_report_5_year_project_catch_low <- low_catch_projection_outputs[[1]]
 ## Run FIMS with 5 projection years and high future landings ##
 n_projection_years <- 5
-projected_landings <- rep(em_input[["L.obs"]][["fleet1"]][om_input$nyr]*2,n_projection_years)
-projected_F <- rep(om_output[["f"]][om_input$nyr],n_projection_years)
-estim_projected_F <- rep("fixed_effects",n_projection_years)
-projected_index <- rep(-999,n_projection_years)
+projected_landings <- rep(em_input[["L.obs"]][["fleet1"]][om_input$nyr] * 2, n_projection_years)
+projected_F <- rep(om_output[["f"]][om_input$nyr], n_projection_years)
+estim_projected_F <- rep("fixed_effects", n_projection_years)
+projected_index <- rep(-999, n_projection_years)
 
 high_catch_projection_outputs <- run_FIMS_projection_scenario(om_input,
-                                                              om_output,
-                                                              em_input,
-                                                              n_projection_years,
-                                                              projected_landings,
-                                                              projected_F,
-                                                              estim_projected_F,
-                                                              projected_index,
-                                                              ssb_ratio_target=NULL)
+  om_output,
+  em_input,
+  n_projection_years,
+  projected_landings,
+  projected_F,
+  estim_projected_F,
+  projected_index,
+  ssb_ratio_target = NULL
+)
 
 sdr_fixed_5_year_project_catch_high <- high_catch_projection_outputs[[2]]
 sdr_report_5_year_project_catch_high <- high_catch_projection_outputs[[1]]
 ## Run FIMS with 10 projection years and an SSB ratio target ##
 n_projection_years <- 30
-projected_landings <- rep(-999,n_projection_years)
-projected_F <- rep(om_output[["f"]][om_input$nyr],n_projection_years)
-estim_projected_F <- rep("constant",n_projection_years)
-projected_index <- rep(-999,n_projection_years)
+projected_landings <- rep(-999, n_projection_years)
+projected_F <- rep(om_output[["f"]][om_input$nyr], n_projection_years)
+estim_projected_F <- rep("constant", n_projection_years)
+projected_index <- rep(-999, n_projection_years)
 ssb_ratio_target <- 0.4
 
-ssb_ratio_target_projection_outputs <- run_FIMS_projection_scenario(om_input,
-                                                      om_output,
-                                                      em_input,
-                                                      n_projection_years,
-                                                      projected_landings,
-                                                      projected_F,
-                                                      estim_projected_F,
-                                                      projected_index,
-                                                      ssb_ratio_target)
+ssb_ratio_target_projection_outputs <- run_FIMS_projection_scenario(
+  om_input,
+  om_output,
+  em_input,
+  n_projection_years,
+  projected_landings,
+  projected_F,
+  estim_projected_F,
+  projected_index,
+  ssb_ratio_target
+)
 
 sdr_fixed_10_year_project_SSB_target <- ssb_ratio_target_projection_outputs[[2]]
 sdr_report_10_year_project_SSB_target <- ssb_ratio_target_projection_outputs[[1]]
-##Section 3: Compare scenario results
+## Section 3: Compare scenario results
 
-#important_row_names <- c("spawning_biomass","spawning_biomass_ratio","log_devs","log_Fmort")
+# important_row_names <- c("spawning_biomass","spawning_biomass_ratio","log_devs","log_Fmort")
 
-#sdr_report_5_year_project[which((abs(sdr_report_5_year_project[row.names(sdr_report_5_year_project)=="log_devs","Estimate"]-sdr_report_no_project[row.names(sdr_report_no_project)=="log_devs","Estimate"])/abs(sdr_report_no_project[row.names(sdr_report_no_project)=="log_devs","Estimate"]))>0.01),]
-#Compare fixed parameter estimates between control and fixed F runs
-#Results are identical as expected
+# sdr_report_5_year_project[which((abs(sdr_report_5_year_project[row.names(sdr_report_5_year_project)=="log_devs","Estimate"]-sdr_report_no_project[row.names(sdr_report_no_project)=="log_devs","Estimate"])/abs(sdr_report_no_project[row.names(sdr_report_no_project)=="log_devs","Estimate"]))>0.01),]
+# Compare fixed parameter estimates between control and fixed F runs
+# Results are identical as expected
 
-estim_error <- max(((abs(sdr_fixed_no_project[,"Estimate"]-sdr_fixed_5_year_project[,"Estimate"])/abs(sdr_fixed_no_project[,"Estimate"]))/abs(sdr_fixed_no_project[,"Std. Error"])))
+estim_error <- max(((abs(sdr_fixed_no_project[, "Estimate"] - sdr_fixed_5_year_project[, "Estimate"]) / abs(sdr_fixed_no_project[, "Estimate"])) / abs(sdr_fixed_no_project[, "Std. Error"])))
 
-sd_error <- max(abs(sdr_fixed_no_project[,"Std. Error"]-sdr_fixed_5_year_project[,"Std. Error"])/abs(sdr_fixed_no_project[,"Std. Error"]))
+sd_error <- max(abs(sdr_fixed_no_project[, "Std. Error"] - sdr_fixed_5_year_project[, "Std. Error"]) / abs(sdr_fixed_no_project[, "Std. Error"]))
 
-rec_devs <- sdr_report_5_year_project[row.names(sdr_report_5_year_project)=="log_devs",][30:34,]
+rec_devs <- sdr_report_5_year_project[row.names(sdr_report_5_year_project) == "log_devs", ][30:34, ]
 
 
 test_that("projections with no data achieve same estimates and no projection model run", {
-
   #' @description Test that rec devs were fixed at zero in projection.
-  expect_equal(sum(rec_devs[,"Estimate"]), 0)
+  expect_equal(sum(rec_devs[, "Estimate"]), 0)
 
   #' @description Test that the maximum parameter estimate difference between
   #' a projection run and no projection run is less than 1 standard error.
@@ -650,21 +648,20 @@ test_that("projections with no data achieve same estimates and no projection mod
   expect_lt(sd_error, 0.1)
 })
 
-#Compare fixed parameter estimates between control and estimated F runs with reasonable low catch targets
-#Results are very similar <1% maximum difference
-#Not sure why there is any difference? Maybe there is an assumption of symmetry
-#between the F pars that back propagates the impact of Future F's to past F's???
-#or this is just the result of rounding error in the final gradient convergence thresholds??
-estim_error <- max(abs(sdr_fixed_5_year_project_catch_low[-c(33:37),"Estimate"] - sdr_fixed_no_project[,"Estimate"])/ abs(sdr_fixed_no_project[,"Estimate"]))
+# Compare fixed parameter estimates between control and estimated F runs with reasonable low catch targets
+# Results are very similar <1% maximum difference
+# Not sure why there is any difference? Maybe there is an assumption of symmetry
+# between the F pars that back propagates the impact of Future F's to past F's???
+# or this is just the result of rounding error in the final gradient convergence thresholds??
+estim_error <- max(abs(sdr_fixed_5_year_project_catch_low[-c(33:37), "Estimate"] - sdr_fixed_no_project[, "Estimate"]) / abs(sdr_fixed_no_project[, "Estimate"]))
 
-sd_error <- max(abs(sdr_fixed_5_year_project_catch_low[-c(33:37),"Std. Error"] - sdr_fixed_no_project[,"Std. Error"])/ abs(sdr_fixed_no_project[,"Std. Error"]))
+sd_error <- max(abs(sdr_fixed_5_year_project_catch_low[-c(33:37), "Std. Error"] - sdr_fixed_no_project[, "Std. Error"]) / abs(sdr_fixed_no_project[, "Std. Error"]))
 
-rec_devs <- sdr_report_5_year_project_catch_low[row.names(sdr_report_5_year_project_catch_low)=="log_devs",][30:34,]
+rec_devs <- sdr_report_5_year_project_catch_low[row.names(sdr_report_5_year_project_catch_low) == "log_devs", ][30:34, ]
 
 test_that("projections with low catch data achieve same estimates and no projection model run", {
-
   #' @description Test that rec devs were fixed at zero in projection.
-  expect_equal(sum(rec_devs[,"Estimate"]), 0)
+  expect_equal(sum(rec_devs[, "Estimate"]), 0)
 
   #' @description Test that the maximum parameter estimate difference between
   #' a low catch projection run and no projection run is less than 10%.
@@ -675,17 +672,16 @@ test_that("projections with low catch data achieve same estimates and no project
   expect_lt(sd_error, 0.1)
 })
 
-#Compare fixed parameter estimates between control and estimated F runs with high catch targets (overfishing)
-#Results are not all similar something is happening with the Fmort results in particular
-#This is somewhat expected as the model is being forced to make the future projected catches obtainable.
-#This interaction means we would need to restrain or detect scenarios where this interaction is occurring.
-#We need to test if this is just a catch issue or if it effects reference point projections targeting SPR.
-estim_error <- max(abs(sdr_fixed_5_year_project_catch_high[-c(33:37),"Estimate"] - sdr_fixed_no_project[,"Estimate"])/ abs(sdr_fixed_no_project[,"Estimate"]))
+# Compare fixed parameter estimates between control and estimated F runs with high catch targets (overfishing)
+# Results are not all similar something is happening with the Fmort results in particular
+# This is somewhat expected as the model is being forced to make the future projected catches obtainable.
+# This interaction means we would need to restrain or detect scenarios where this interaction is occurring.
+# We need to test if this is just a catch issue or if it effects reference point projections targeting SPR.
+estim_error <- max(abs(sdr_fixed_5_year_project_catch_high[-c(33:37), "Estimate"] - sdr_fixed_no_project[, "Estimate"]) / abs(sdr_fixed_no_project[, "Estimate"]))
 
-sd_error <- max(abs(sdr_fixed_5_year_project_catch_high[-c(33:37),"Std. Error"] - sdr_fixed_no_project[,"Std. Error"])/ abs(sdr_fixed_no_project[,"Std. Error"]))
+sd_error <- max(abs(sdr_fixed_5_year_project_catch_high[-c(33:37), "Std. Error"] - sdr_fixed_no_project[, "Std. Error"]) / abs(sdr_fixed_no_project[, "Std. Error"]))
 
 test_that("projections with high catch data achieve same estimates and no projection model run", {
-
   #' @description Test that the maximum parameter estimate difference between
   #' a low catch projection run and no projection run is less than 10%.
   expect_gt(estim_error, 0.7)
@@ -694,15 +690,15 @@ test_that("projections with high catch data achieve same estimates and no projec
   #' difference between a low catch projection run and no projection run is less than 10%.
   expect_gt(sd_error, 0.7)
 })
-#Compare fixed parameter estimates between control and estimated F runs with high catch targets (overfishing)
-#But super high log_sd = 5 on the projection catches so the model isn't forced to fit the targets
-#Results are almost identical 1.426e-5 max proportion error
-#In this case the model seems to estimate the most catch it can without changing
-#the estimation period fits which is likely our best case scenario vs fixed catch
-#projections such as SS that can go wild when the catches are too high.
-#This appears to achieve close to a constant F projection which is interesting.
+# Compare fixed parameter estimates between control and estimated F runs with high catch targets (overfishing)
+# But super high log_sd = 5 on the projection catches so the model isn't forced to fit the targets
+# Results are almost identical 1.426e-5 max proportion error
+# In this case the model seems to estimate the most catch it can without changing
+# the estimation period fits which is likely our best case scenario vs fixed catch
+# projections such as SS that can go wild when the catches are too high.
+# This appears to achieve close to a constant F projection which is interesting.
 
-#TODO: Find the code to run these comparisons in another old projections branch
+# TODO: Find the code to run these comparisons in another old projections branch
 # max((sdr_fixed_5_year_project_catch_high_cv_high[-c(33:37),"Estimate"] - sdr_fixed_no_project[,"Estimate"])/ sdr_fixed_no_project[,"Estimate"])
 # min((sdr_fixed_5_year_project_catch_high_cv_high[-c(33:37),"Estimate"] - sdr_fixed_no_project[,"Estimate"])/ sdr_fixed_no_project[,"Estimate"])
 #
@@ -710,20 +706,19 @@ test_that("projections with high catch data achieve same estimates and no projec
 # min((sdr_fixed_5_year_project_catch_high_cv_high[-c(33:37),"Std. Error"] - sdr_fixed_no_project[,"Std. Error"])/ sdr_fixed_no_project[,"Std. Error"])
 
 
-#Comparison of SSB target results
+# Comparison of SSB target results
 
-estim_error <- max(abs(sdr_fixed_10_year_project_SSB_target[-c(50),"Estimate"] - sdr_fixed_no_project[,"Estimate"])/ abs(sdr_fixed_no_project[,"Estimate"]))
+estim_error <- max(abs(sdr_fixed_10_year_project_SSB_target[-c(50), "Estimate"] - sdr_fixed_no_project[, "Estimate"]) / abs(sdr_fixed_no_project[, "Estimate"]))
 
-sd_error <- max(abs(sdr_fixed_10_year_project_SSB_target[-c(50),"Std. Error"] - sdr_fixed_no_project[,"Std. Error"])/ abs(sdr_fixed_no_project[,"Std. Error"]))
+sd_error <- max(abs(sdr_fixed_10_year_project_SSB_target[-c(50), "Std. Error"] - sdr_fixed_no_project[, "Std. Error"]) / abs(sdr_fixed_no_project[, "Std. Error"]))
 
-ssb_ratio_estim_error <- max(abs(sdr_report_10_year_project_SSB_target[rownames(sdr_report_10_year_project_SSB_target)=="spawning_biomass_ratio","Estimate"][1:31] -
-                                   sdr_report_no_project[rownames(sdr_report_no_project)=="spawning_biomass_ratio","Estimate"][1:31])/abs(sdr_report_no_project[rownames(sdr_report_no_project)=="spawning_biomass_ratio","Estimate"][1:31]))
+ssb_ratio_estim_error <- max(abs(sdr_report_10_year_project_SSB_target[rownames(sdr_report_10_year_project_SSB_target) == "spawning_biomass_ratio", "Estimate"][1:31] -
+  sdr_report_no_project[rownames(sdr_report_no_project) == "spawning_biomass_ratio", "Estimate"][1:31]) / abs(sdr_report_no_project[rownames(sdr_report_no_project) == "spawning_biomass_ratio", "Estimate"][1:31]))
 
 
-ssb_ratio_target_error <- abs(sdr_report_10_year_project_SSB_target[rownames(sdr_report_10_year_project_SSB_target)=="spawning_biomass_ratio","Estimate"][length(sdr_report_10_year_project_SSB_target[rownames(sdr_report_10_year_project_SSB_target)=="spawning_biomass_ratio","Estimate"])] - ssb_ratio_target)/ssb_ratio_target
+ssb_ratio_target_error <- abs(sdr_report_10_year_project_SSB_target[rownames(sdr_report_10_year_project_SSB_target) == "spawning_biomass_ratio", "Estimate"][length(sdr_report_10_year_project_SSB_target[rownames(sdr_report_10_year_project_SSB_target) == "spawning_biomass_ratio", "Estimate"])] - ssb_ratio_target) / ssb_ratio_target
 
 test_that("projections with spawning biomass ratio target achieve same estimates and no projection model run", {
-
   #' @description Test that the maximum parameter estimate difference between
   #' a low catch projection run and no projection run is less than 10%.
   expect_lt(estim_error, 0.5)
@@ -740,4 +735,3 @@ test_that("projections with spawning biomass ratio target achieve same estimates
   #' difference between a low catch projection run and no projection run is less than 10%.
   expect_lt(ssb_ratio_target_error, 0.01)
 })
-
