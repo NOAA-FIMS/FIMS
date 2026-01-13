@@ -139,8 +139,16 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   fishing_fleet$n_ages$set(om_input[["nages"]])
   # Set number of length bins
   fishing_fleet$n_lengths$set(om_input[["nlengths"]])
-  fishing_fleet$ages <- om_input[["ages"]]
-  fishing_fleet$lengths <- om_input[["lengths"]]
+  fishing_fleet$ages$resize(om_input[["nages"]])
+    purrr::walk(
+    seq_along(om_input[["ages"]]),
+    \(x) fishing_fleet$ages$set(x - 1, om_input[["ages"]][x])
+  )
+  fishing_fleet$lengths$resize(om_input[["nlengths"]])
+    purrr::walk(
+    seq_along(om_input[["lengths"]]),
+    \(x) fishing_fleet$lengths$set(x - 1, om_input[["lengths"]][x])
+  )
 
   fishing_fleet$log_Fmort$resize(om_input[["nyr"]])
 
@@ -238,8 +246,16 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   survey_fleet$n_years$set(om_input[["nyr"]])
   survey_fleet$n_lengths$set(om_input[["nlengths"]])
   survey_fleet$log_Fmort$resize(om_input[["nyr"]])
-  survey_fleet$ages <- om_input[["ages"]]
-  survey_fleet$lengths <- om_input[["lengths"]]
+  survey_fleet$ages$resize(om_input[["nages"]])
+    purrr::walk(
+    seq_along(om_input[["ages"]]),
+    \(x) survey_fleet$ages$set(x - 1, om_input[["ages"]][x])
+  )
+  survey_fleet$lengths$resize(om_input[["nlengths"]])
+    purrr::walk(
+    seq_along(om_input[["lengths"]]),
+    \(x) survey_fleet$lengths$set(x - 1, om_input[["lengths"]][x])
+  )
   for (y in 1:om_input$nyr) {
     # Set very low survey fishing mortality
     survey_fleet$log_Fmort[y]$value <- -200

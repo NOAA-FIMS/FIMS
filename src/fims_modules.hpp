@@ -9,18 +9,18 @@
 #ifndef SRC_FIMS_MODULES_HPP
 #define SRC_FIMS_MODULES_HPP
 
+#include "../inst/include/interface/rcpp/rcpp_interface.hpp"
 #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_data.hpp"
+#include "../inst/include/interface/rcpp/rcpp_objects/rcpp_distribution.hpp"
 #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_fleet.hpp"
 #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_growth.hpp"
+#include "../inst/include/interface/rcpp/rcpp_objects/rcpp_interface_base.hpp"
 #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_math.hpp"
 #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_maturity.hpp"
 #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_natural_mortality.hpp"
 #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_population.hpp"
 #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_recruitment.hpp"
 #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_selectivity.hpp"
-#include "../inst/include/interface/rcpp/rcpp_objects/rcpp_distribution.hpp"
-#include "../inst/include/interface/rcpp/rcpp_objects/rcpp_interface_base.hpp"
-#include "../inst/include/interface/rcpp/rcpp_interface.hpp"
 
 RCPP_EXPOSED_CLASS(Parameter)
 RCPP_EXPOSED_CLASS(ParameterVector)
@@ -242,9 +242,9 @@ RCPP_MODULE(fims) {
       .field("n_ages", &FleetInterface::n_ages)
       .field("n_years", &FleetInterface::n_years)
       .field("n_lengths", &FleetInterface::n_lengths)
-      .field("selectivity_units", &FleetInterface::selectivity_units)
       .field("ages", &FleetInterface::ages)
       .field("lengths", &FleetInterface::lengths)
+      .field("selectivity_units", &FleetInterface::selectivity_units)
       .field("observed_landings_units",
              &FleetInterface::observed_landings_units)
       .field("observed_index_units", &FleetInterface::observed_index_units)
@@ -275,10 +275,10 @@ RCPP_MODULE(fims) {
               &FleetInterface::SetObservedLandingsDataID)
       .method("GetObservedLandingsDataID",
               &FleetInterface::GetObservedLandingsDataID)
-              .method("SetSelectivityAgeID", &FleetInterface::SetSelectivityAgeID)
-      .method("GetSelectivityAgeID", &FleetInterface::GetSelectivityAgeID)
-      .method("SetSelectivityLengthID", &FleetInterface::SetSelectivityLengthID)
+      .method("SetSelectivityAgeID", &FleetInterface::SetSelectivityAgeID)
+      .method("GetSelectivityID", &FleetInterface::GetSelectivityID)
       .method("SetSelectivityLengthID", &FleetInterface::SetSelectivityLengthID);
+    
 
   Rcpp::class_<AgeCompDataInterface>("AgeComp")
       .constructor<int, int>()

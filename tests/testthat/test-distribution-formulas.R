@@ -68,6 +68,17 @@ purrr::walk(
 fishing_fleet <- methods::new(Fleet)
 fishing_fleet$n_ages$set(om_input$nages)
 fishing_fleet$n_years$set(om_input$nyr)
+fishing_fleet$n_lengths$set(om_input$nlengths)
+ fishing_fleet$ages$resize(om_input[["nages"]])
+    purrr::walk(
+    seq_along(om_input[["ages"]]),
+    \(x) fishing_fleet$ages$set(x - 1, om_input[["ages"]][x])
+  )
+  fishing_fleet$lengths$resize(om_input[["nlengths"]])
+    purrr::walk(
+    seq_along(om_input[["lengths"]]),
+    \(x) fishing_fleet$lengths$set(x - 1, om_input[["lengths"]][x])
+  )
 fishing_fleet$log_Fmort$resize(om_input$nyr)
 purrr::walk(
   seq_along(log(om_output$f)),

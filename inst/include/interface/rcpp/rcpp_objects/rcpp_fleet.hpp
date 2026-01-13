@@ -91,11 +91,11 @@ class FleetInterface : public FleetInterfaceBase {
   /**
    * @brief The ID of the selectivity at age object.
    */
-  SharedInt interface_selectivity_age_id_m = -999;
   /**
-   * @brief The ID of the selectivity at length object.
+   * @brief The ID of the selectivity object.
    */
-  SharedInt interface_selectivity_length_id_m = -999;
+  SharedInt interface_selectivity_id_m = -999;
+ 
 
 public:
   /**
@@ -118,11 +118,11 @@ public:
   /**
    * @brief The vector of ages for the fleet.
    */
-  Rcpp::NumericVector ages;
+  RealVector ages;
   /**
    * @brief The vector of lengths for the fleet.
    */
-  Rcpp::NumericVector lengths;
+  RealVector lengths;
 
   /**
    * @brief What units is selectivity for this fleet modeled in.
@@ -275,11 +275,11 @@ public:
             other.interface_observed_index_data_id_m),
         interface_observed_landings_data_id_m(
             other.interface_observed_landings_data_id_m),
-        interface_selectivity_age_id_m(other.interface_selectivity_age_id_m),
-        interface_selectivity_length_id_m(
-            other.interface_selectivity_length_id_m),
+        interface_selectivity_id_m(other.interface_selectivity_id_m),
         name(other.name), n_ages(other.n_ages), n_lengths(other.n_lengths),
-        n_years(other.n_years), log_q(other.log_q), log_Fmort(other.log_Fmort),
+        ages(other.ages), lengths(other.lengths),
+        selectivity_units(other.selectivity_units), n_years(other.n_years),
+        log_q(other.log_q), log_Fmort(other.log_Fmort),
         log_index_expected(other.log_index_expected),
         log_landings_expected(other.log_landings_expected),
         agecomp_proportion(other.agecomp_proportion),
@@ -362,7 +362,7 @@ public:
    * @param selectivity_id Unique ID for the observed object.
    */
   void SetSelectivityAgeID(int selectivity_id) {
-    interface_selectivity_age_id_m.set(selectivity_id);
+    interface_selectivity_id_m.set(selectivity_id);
     selectivity_units.set(fims::to_string("age"));
     // TODO: We should, as a warning/notification, inform users that the
     // selectivity units are set to age.
@@ -373,24 +373,21 @@ public:
    * @param selectivity_id Unique ID for the observed object.
    */
   void SetSelectivityLengthID(int selectivity_id) {
-    interface_selectivity_length_id_m.set(selectivity_id);
+    interface_selectivity_id_m.set(selectivity_id);
     selectivity_units.set(fims::to_string("length"));
     // TODO: We should, as a warning/notification, inform users that the
     // selectivity units are set to length.
   }
 
   /**
-   * @brief Get the unique ID for the selectivity at age object.
+   * @brief Get the unique ID for the selectivity object.
    */
-  int GetSelectivityAgeID() { return interface_selectivity_age_id_m.get(); }
+  int GetSelectivityID() { return interface_selectivity_id_m.get(); }
 
-  /**
-   * @brief Get the unique ID for the selectivity at length object.
-   */
-  int GetSelectivityLengthID() {
-    return interface_selectivity_length_id_m.get();
+  std::string GetSelectivityUnits() {
+    return selectivity_units.get();
   }
-
+ 
   /**
    * @brief Get the unique ID for the observed age-composition data object.
    */
@@ -495,13 +492,31 @@ public:
     fleet->observed_landings_units = this->observed_landings_units.get();
     fleet->observed_index_units = this->observed_index_units.get();
     fleet->selectivity_units = this->selectivity_units.get();
-
-    fleet->ages.resize(this->ages.size());
+    std::cout << "Rcpp_fleet" << std::endl;
+    std::cout << "Setting fleet ages and lengths vectors" << std::endl;
+    std::cout << "this->ages.size(): " << this->ages.size() << std::endl;
+    if (this->n_ages.get() > 0) {
+      fleet->n_ages = this->n_ages.get();
+      if (this->n_ages.get() == this->ages.size()) {
+        fleet->ages.resize(this->n_ages.get());
+      } else {
+        warning("The ages vector is not of size n_ages for fleet.");
+      }
+    }
     for (size_t i = 0; i < this->ages.size(); i++) {
       fleet->ages[i] = this->ages[i];
     }
-    
-    fleet->lengths.resize(this->lengths.size());
+
+    std::cout << "this->lengths.size(): " << this->lengths.size() << std::endl;
+
+    if (this->n_lengths.get() > 0) {
+      fleet->n_lengths = this->n_lengths.get();
+      if (this->n_lengths.get() == this->lengths.size()) {
+        fleet->lengths.resize(this->n_lengths.get());
+      } else {
+        warning("The lengths vector is not of size n_lengths for fleet.");
+      }
+    }
     for (size_t i = 0; i < this->lengths.size(); i++) {
       fleet->lengths[i] = this->lengths[i];
     }
@@ -517,7 +532,7 @@ public:
     fleet->fleet_observed_landings_data_id_m =
         interface_observed_landings_data_id_m.get();
 
-    fleet->fleet_selectivity_id_m = interface_selectivity_age_id_m.get();
+    fleet->fleet_selectivity_id_m = interface_selectivity_id_m.get();
 
     fleet->log_q.resize(this->log_q.size());
     for (size_t i = 0; i < this->log_q.size(); i++) {

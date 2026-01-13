@@ -796,11 +796,8 @@ public:
           std::dynamic_pointer_cast<FleetInterface>(
               FleetInterfaceBase::live_objects[*fids]);
       if (fleet_interface) {
-        if (fleet_interface->GetSelectivityAgeID() != -999) {
-          selectivity_ids.insert(fleet_interface->GetSelectivityAgeID());
-        }
-        if (fleet_interface->GetSelectivityLengthID() != -999) {
-          selectivity_ids.insert(fleet_interface->GetSelectivityLengthID());
+        if (fleet_interface->GetSelectivityID() != -999) {
+          selectivity_ids.insert(fleet_interface->GetSelectivityID());
         }
       }
     }
@@ -1458,7 +1455,7 @@ public:
               "selectivity_at_length",
               fims::Vector<int>{fleet_interface->n_lengths.get()},
               fims::Vector<std::string>{"n_lengths"});
-              
+
       // replace elements in the variable map
       info->variable_map[fleet_interface->log_landings_expected.id_m] =
           &(derived_quantities["log_landings_expected"]);

@@ -81,6 +81,35 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
    */
   Fleet() { this->id = Fleet::id_g++; }
 
+  Fleet(const Fleet<Type> &other)
+      : fims_model_object::FIMSObject<Type>(other),
+        n_years(other.n_years),
+        n_ages(other.n_ages),
+        n_lengths(other.n_lengths),
+        ages(other.ages),
+        lengths(other.lengths),
+        fleet_selectivity_id_m(other.fleet_selectivity_id_m),
+        selectivity(other.selectivity),
+        selectivity_units(other.selectivity_units),
+        fleet_observed_landings_data_id_m(
+            other.fleet_observed_landings_data_id_m),
+        observed_landings_data(other.observed_landings_data),
+        observed_landings_units(other.observed_landings_units),
+        fleet_observed_index_data_id_m(other.fleet_observed_index_data_id_m),
+        observed_index_data(other.observed_index_data),
+        observed_index_units(other.observed_index_units),
+        fleet_observed_agecomp_data_id_m(
+            other.fleet_observed_agecomp_data_id_m),
+        observed_agecomp_data(other.observed_agecomp_data),
+        fleet_observed_lengthcomp_data_id_m(
+            other.fleet_observed_lengthcomp_data_id_m),
+        observed_lengthcomp_data(other.observed_lengthcomp_data),
+        log_Fmort(other.log_Fmort),
+        log_q(other.log_q),
+        Fmort(other.Fmort),
+        q(other.q),
+        age_to_length_conversion(other.age_to_length_conversion) {}
+
   /**
    * @brief Destructor.
    */

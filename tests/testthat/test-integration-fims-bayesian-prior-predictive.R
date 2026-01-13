@@ -62,8 +62,8 @@ test_that("prior predictive check", {
   fishing_fleet$n_ages$set(om_input[["nages"]])
   # Set number of length bins
   fishing_fleet$n_lengths$set(om_input[["nlengths"]])
-  fishing_fleet$ages <- om_input[["ages"]]
-  fishing_fleet$lengths <- om_input[["lengths"]]
+  fishing_fleet$ages$fromRVector(om_input[["ages"]])
+  fishing_fleet$lengths$fromRVector(om_input[["lengths"]])
 
   fishing_fleet$log_Fmort$resize(om_input[["nyr"]])
   for (y in 1:om_input$nyr) {
@@ -130,9 +130,9 @@ test_that("prior predictive check", {
   survey_fleet <- methods::new(Fleet)
   survey_fleet$n_ages$set(om_input[["nages"]])
   survey_fleet$n_years$set(om_input[["nyr"]])
-  survey_fleet$n_lengths$set(om_input[["nlengths"]])
-  survey_fleet$ages <- om_input[["ages"]]
-  survey_fleet$lengths <- om_input[["lengths"]]
+  survey_fleet$ages$fromRVector(om_input[["ages"]])
+  survey_fleet$lengths$fromRVector(om_input[["lengths"]])
+  
   survey_fleet$log_q[1]$value <- log(om_output[["survey_q"]][["survey1"]])
   survey_fleet$log_q[1]$estimation_type$set("fixed_effects")
   survey_fleet$SetSelectivityAgeID(survey_fleet_selectivity$get_id())
