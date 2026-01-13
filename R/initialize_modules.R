@@ -48,7 +48,7 @@ initialize_module <- function(parameters, data, module_name, fleet_name = NA_cha
   module_fields <- names(module_class@fields)
   module <- methods::new(module_class)
 
-  if(module_class_name == "Population") {
+  if (module_class_name == "Population") {
     module_fields <- setdiff(module_fields, c(
       "log_f_multiplier",
       "spawning_biomass_ratio"

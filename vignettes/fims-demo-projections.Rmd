@@ -449,232 +449,230 @@ The same model can be used to fit projections by extending the terminal year wit
 missing data place holders.
 
 ```{r projections}
-#Setup example to add 10 projection years with no data and an SSB_ratio target
-#of 0.4
+# Setup example to add 10 projection years with no data and an SSB_ratio target
+# of 0.4
 years_of_projection <- 10
-#Setup null case missing data vectors
-projected_landings <- rep(-999,years_of_projection)
-projected_landings_uncertainty <- rep(20,years_of_projection)
-projected_index <- rep(-999,years_of_projection)
-projected_index_uncertainty <- rep(20,years_of_projection)
-projected_age_comp <- rep(-999,years_of_projection*data_4_model@n_ages)
-projected_age_comp_uncertainty <- rep(0,years_of_projection*data_4_model@n_ages)
-projected_length_comp <- rep(-999,years_of_projection*data_4_model@n_lengths)
-projected_length_comp_uncertainty <- rep(0,years_of_projection*data_4_model@n_lengths)
+# Setup null case missing data vectors
+projected_landings <- rep(-999, years_of_projection)
+projected_landings_uncertainty <- rep(20, years_of_projection)
+projected_index <- rep(-999, years_of_projection)
+projected_index_uncertainty <- rep(20, years_of_projection)
+projected_age_comp <- rep(-999, years_of_projection * data_4_model@n_ages)
+projected_age_comp_uncertainty <- rep(0, years_of_projection * data_4_model@n_ages)
+projected_length_comp <- rep(-999, years_of_projection * data_4_model@n_lengths)
+projected_length_comp_uncertainty <- rep(0, years_of_projection * data_4_model@n_lengths)
 
-#Add 10 projection years to the base model data
+# Add 10 projection years to the base model data
 data_4_model@n_years <- as.integer(data_4_model@n_years + years_of_projection)
 data_4_model@end_year <- as.integer(data_4_model@end_year + years_of_projection)
 
-#Add 10 rows of -999 landings to data
-all_landings <- data_4_model@data[data_4_model@data$type=="landings",]
+# Add 10 rows of -999 landings to data
+all_landings <- data_4_model@data[data_4_model@data$type == "landings", ]
 fleets <- unique(all_landings$name)
-for(flts in seq_along(fleets)){
-  temp_landings <- all_landings[all_landings$name==fleets[flts],][1:years_of_projection,]
+for (flts in seq_along(fleets)) {
+  temp_landings <- all_landings[all_landings$name == fleets[flts], ][1:years_of_projection, ]
   temp_landings$value <- projected_landings
   temp_landings$uncertainty <- projected_landings_uncertainty
-  temp_landings$timing <- as.integer((data_4_model@end_year-years_of_projection+1):data_4_model@end_year)
-  last_row_landings <- max(which(data_4_model@data$type=="landings" & data_4_model@data$name==fleets[flts]))
-  data_4_model@data <- dplyr::bind_rows(data_4_model@data[1:last_row_landings,],temp_landings,data_4_model@data[(last_row_landings+1):dim(data_4_model@data)[1],])
+  temp_landings$timing <- as.integer((data_4_model@end_year - years_of_projection + 1):data_4_model@end_year)
+  last_row_landings <- max(which(data_4_model@data$type == "landings" & data_4_model@data$name == fleets[flts]))
+  data_4_model@data <- dplyr::bind_rows(data_4_model@data[1:last_row_landings, ], temp_landings, data_4_model@data[(last_row_landings + 1):dim(data_4_model@data)[1], ])
 }
 
-#Add 10 rows of -999 index to data
-all_index <- data_4_model@data[data_4_model@data$type=="index",]
+# Add 10 rows of -999 index to data
+all_index <- data_4_model@data[data_4_model@data$type == "index", ]
 fleets <- unique(all_index$name)
-for(flts in seq_along(fleets)){
-  temp_index <- all_index[all_index$name==fleets[flts],][1:years_of_projection,]
+for (flts in seq_along(fleets)) {
+  temp_index <- all_index[all_index$name == fleets[flts], ][1:years_of_projection, ]
   temp_index$value <- projected_index
   temp_index$uncertainty <- projected_index_uncertainty
-  temp_index$timing <- as.integer((data_4_model@end_year-years_of_projection+1):data_4_model@end_year)
-  last_row_index <- max(which(data_4_model@data$type=="index" & data_4_model@data$name==fleets[flts]))
-  data_4_model@data <- dplyr::bind_rows(data_4_model@data[1:last_row_index,],temp_index,data_4_model@data[(last_row_index+1):dim(data_4_model@data)[1],])
+  temp_index$timing <- as.integer((data_4_model@end_year - years_of_projection + 1):data_4_model@end_year)
+  last_row_index <- max(which(data_4_model@data$type == "index" & data_4_model@data$name == fleets[flts]))
+  data_4_model@data <- dplyr::bind_rows(data_4_model@data[1:last_row_index, ], temp_index, data_4_model@data[(last_row_index + 1):dim(data_4_model@data)[1], ])
 }
 
-#Add 240 rows of -999 value to age_comps in data 
-#this covers 12 ages for 2 fleets over 10 years
-all_age_comp <- data_4_model@data[data_4_model@data$type=="age_comp",]
+# Add 240 rows of -999 value to age_comps in data
+# this covers 12 ages for 2 fleets over 10 years
+all_age_comp <- data_4_model@data[data_4_model@data$type == "age_comp", ]
 fleets <- unique(all_age_comp$name)
-for(flts in seq_along(fleets)){
-  temp_age_comps <- all_age_comp[all_age_comp$name==fleets[flts],][1:(years_of_projection*data_4_model@n_ages),]
+for (flts in seq_along(fleets)) {
+  temp_age_comps <- all_age_comp[all_age_comp$name == fleets[flts], ][1:(years_of_projection * data_4_model@n_ages), ]
   temp_age_comps$value <- projected_age_comp
   temp_age_comps$uncertainty <- projected_age_comp_uncertainty
-  temp_age_comps$timing <- as.integer(sort(rep((data_4_model@end_year-years_of_projection+1):data_4_model@end_year,data_4_model@n_ages)))
-  last_row_age_comp <- max(which(data_4_model@data$type=="age_comp" & data_4_model@data$name==fleets[flts]))
-  if(last_row_age_comp<dim(data_4_model@data)[1]){
-  data_4_model@data <- dplyr::bind_rows(data_4_model@data[1:last_row_age_comp,],temp_age_comps,data_4_model@data[(last_row_age_comp+1):dim(data_4_model@data)[1],])
-  }else{
-    data_4_model@data <- dplyr::bind_rows(data_4_model@data[1:last_row_age_comp,],temp_age_comps)
+  temp_age_comps$timing <- as.integer(sort(rep((data_4_model@end_year - years_of_projection + 1):data_4_model@end_year, data_4_model@n_ages)))
+  last_row_age_comp <- max(which(data_4_model@data$type == "age_comp" & data_4_model@data$name == fleets[flts]))
+  if (last_row_age_comp < dim(data_4_model@data)[1]) {
+    data_4_model@data <- dplyr::bind_rows(data_4_model@data[1:last_row_age_comp, ], temp_age_comps, data_4_model@data[(last_row_age_comp + 1):dim(data_4_model@data)[1], ])
+  } else {
+    data_4_model@data <- dplyr::bind_rows(data_4_model@data[1:last_row_age_comp, ], temp_age_comps)
   }
 }
 
-#Add 460 rows of -999 value to length_comps in data 
-#this covers 46 length bins for 2 fleets over 10 years
-all_length_comp <- data_4_model@data[data_4_model@data$type=="length_comp",]
+# Add 460 rows of -999 value to length_comps in data
+# this covers 46 length bins for 2 fleets over 10 years
+all_length_comp <- data_4_model@data[data_4_model@data$type == "length_comp", ]
 fleets <- unique(all_length_comp$name)
-for(flts in seq_along(fleets)){
-  temp_length_comps <- all_length_comp[all_length_comp$name==fleets[flts],][1:(years_of_projection*data_4_model@n_lengths),]
+for (flts in seq_along(fleets)) {
+  temp_length_comps <- all_length_comp[all_length_comp$name == fleets[flts], ][1:(years_of_projection * data_4_model@n_lengths), ]
   temp_length_comps$value <- projected_length_comp
   temp_length_comps$uncertainty <- projected_length_comp_uncertainty
-  temp_length_comps$timing <- as.integer(sort(rep((data_4_model@end_year-years_of_projection+1):data_4_model@end_year,data_4_model@n_lengths)))
-  last_row_length_comp <- max(which(data_4_model@data$type=="length_comp" & data_4_model@data$name==fleets[flts]))
-  if(last_row_length_comp<dim(data_4_model@data)[1]){
-  data_4_model@data <- dplyr::bind_rows(data_4_model@data[1:last_row_length_comp,],temp_length_comps,data_4_model@data[(last_row_length_comp+1):dim(data_4_model@data)[1],])
-  }else{
-    data_4_model@data <- dplyr::bind_rows(data_4_model@data[1:last_row_length_comp,],temp_length_comps)
+  temp_length_comps$timing <- as.integer(sort(rep((data_4_model@end_year - years_of_projection + 1):data_4_model@end_year, data_4_model@n_lengths)))
+  last_row_length_comp <- max(which(data_4_model@data$type == "length_comp" & data_4_model@data$name == fleets[flts]))
+  if (last_row_length_comp < dim(data_4_model@data)[1]) {
+    data_4_model@data <- dplyr::bind_rows(data_4_model@data[1:last_row_length_comp, ], temp_length_comps, data_4_model@data[(last_row_length_comp + 1):dim(data_4_model@data)[1], ])
+  } else {
+    data_4_model@data <- dplyr::bind_rows(data_4_model@data[1:last_row_length_comp, ], temp_length_comps)
   }
 }
 
 parameters_projection <- parameters_4_model
 
 
-#log_Fmort fleet1 and survey1
-#Add 10 rows of replicated final year F_mort for both fleets. Set as fixed
-#effect for fishery and constant for survey.
-all_F <- parameters_projection[parameters_projection$label=="log_Fmort",]
-all_F <- all_F[!is.na(all_F$label),]
+# log_Fmort fleet1 and survey1
+# Add 10 rows of replicated final year F_mort for both fleets. Set as fixed
+# effect for fishery and constant for survey.
+all_F <- parameters_projection[parameters_projection$label == "log_Fmort", ]
+all_F <- all_F[!is.na(all_F$label), ]
 fleets <- unique(all_F$fleet_name)
-for(flts in seq_along(fleets)){
-  fleet_F <- all_F[all_F$fleet_name==fleets[flts],]
-  temp_F <- fleet_F[rep(dim(fleet_F[,1])[1],years_of_projection),]
+for (flts in seq_along(fleets)) {
+  fleet_F <- all_F[all_F$fleet_name == fleets[flts], ]
+  temp_F <- fleet_F[rep(dim(fleet_F[, 1])[1], years_of_projection), ]
   temp_F$value <- temp_F$value[years_of_projection]
-  if(flts == 1 ){
+  if (flts == 1) {
     temp_F$estimation_type <- "fixed_effects"
-  }else{
+  } else {
     temp_F$estimation_type <- "constant"
   }
-  temp_F$time <- as.integer((data_4_model@end_year-years_of_projection+1):data_4_model@end_year)
-  last_row_F <- max(which(parameters_projection$label=="log_Fmort" & parameters_projection$fleet_name==fleets[flts]))
-  if(last_row_F!=dim(parameters_projection)[1]){
-    parameters_projection <- dplyr::bind_rows(parameters_projection[1:last_row_F,],temp_F,parameters_projection[(last_row_F+1):dim(parameters_projection)[1],])
-  }else{
-    parameters_projection <- dplyr::bind_rows(parameters_projection[1:last_row_F,],temp_F)
+  temp_F$time <- as.integer((data_4_model@end_year - years_of_projection + 1):data_4_model@end_year)
+  last_row_F <- max(which(parameters_projection$label == "log_Fmort" & parameters_projection$fleet_name == fleets[flts]))
+  if (last_row_F != dim(parameters_projection)[1]) {
+    parameters_projection <- dplyr::bind_rows(parameters_projection[1:last_row_F, ], temp_F, parameters_projection[(last_row_F + 1):dim(parameters_projection)[1], ])
+  } else {
+    parameters_projection <- dplyr::bind_rows(parameters_projection[1:last_row_F, ], temp_F)
   }
 }
 
-#log_sd for landings fleet1
-#Add 10 rows of replicated final year F_mort for both fleets. Set as fixed
-#effect for fishery and constant for survey.
-all_sd <- parameters_projection[parameters_projection$label=="log_sd",]
-all_sd <- all_sd[!is.na(all_sd$label),]
-all_sd <- all_sd[!is.na(all_sd$fleet_name),]
+# log_sd for landings fleet1
+# Add 10 rows of replicated final year F_mort for both fleets. Set as fixed
+# effect for fishery and constant for survey.
+all_sd <- parameters_projection[parameters_projection$label == "log_sd", ]
+all_sd <- all_sd[!is.na(all_sd$label), ]
+all_sd <- all_sd[!is.na(all_sd$fleet_name), ]
 fleets <- unique(all_sd$fleet_name)
-for(flts in seq_along(fleets)){
-  fleet_sd <- all_sd[all_sd$fleet_name==fleets[flts],]
-  temp_sd <- fleet_sd[rep(dim(fleet_sd[,1])[1],years_of_projection),]
+for (flts in seq_along(fleets)) {
+  fleet_sd <- all_sd[all_sd$fleet_name == fleets[flts], ]
+  temp_sd <- fleet_sd[rep(dim(fleet_sd[, 1])[1], years_of_projection), ]
   temp_sd$value <- temp_sd$value[years_of_projection]
   temp_sd$estimation_type <- "constant"
-  
-  temp_sd$time <- as.integer((data_4_model@end_year-years_of_projection+1):data_4_model@end_year)
-  last_row_sd <- max(which(parameters_projection$label=="log_sd" & parameters_projection$fleet_name==fleets[flts]))
-  if(last_row_sd!=dim(parameters_projection)[1]){
-    parameters_projection <- dplyr::bind_rows(parameters_projection[1:last_row_sd,],temp_sd,parameters_projection[(last_row_sd+1):dim(parameters_projection)[1],])
-  }else{
-    parameters_projection <- dplyr::bind_rows(parameters_projection[1:last_row_sd,],temp_sd)
+
+  temp_sd$time <- as.integer((data_4_model@end_year - years_of_projection + 1):data_4_model@end_year)
+  last_row_sd <- max(which(parameters_projection$label == "log_sd" & parameters_projection$fleet_name == fleets[flts]))
+  if (last_row_sd != dim(parameters_projection)[1]) {
+    parameters_projection <- dplyr::bind_rows(parameters_projection[1:last_row_sd, ], temp_sd, parameters_projection[(last_row_sd + 1):dim(parameters_projection)[1], ])
+  } else {
+    parameters_projection <- dplyr::bind_rows(parameters_projection[1:last_row_sd, ], temp_sd)
   }
 }
 
-#log_devs recruitement
-#Add 10 rows of replicated final year F_mort for both fleets. Set as fixed
-#effect for fishery and constant for survey.
-all_devs <- parameters_projection[parameters_projection$label=="log_devs",]
-all_devs <- all_devs[!is.na(all_devs$label),]
-all_devs <- all_devs[!is.na(all_devs$module_name),]
-temp_devs <- all_devs[rep(dim(all_devs[,1])[1],years_of_projection),]
+# log_devs recruitement
+# Add 10 rows of replicated final year F_mort for both fleets. Set as fixed
+# effect for fishery and constant for survey.
+all_devs <- parameters_projection[parameters_projection$label == "log_devs", ]
+all_devs <- all_devs[!is.na(all_devs$label), ]
+all_devs <- all_devs[!is.na(all_devs$module_name), ]
+temp_devs <- all_devs[rep(dim(all_devs[, 1])[1], years_of_projection), ]
 temp_devs$value <- 0
 temp_devs$estimation_type <- "constant"
-temp_devs$time <- as.integer((data_4_model@end_year-years_of_projection+1):data_4_model@end_year)
-last_row_devs <- max(which(parameters_projection$label=="log_devs" & parameters_projection$module_name=="Recruitment"))
-if(last_row_devs!=dim(parameters_projection)[1]){
-    parameters_projection <- dplyr::bind_rows(parameters_projection[1:last_row_devs,],temp_devs,parameters_projection[(last_row_devs+1):dim(parameters_projection)[1],])
-}else{
-    parameters_projection <- dplyr::bind_rows(parameters_projection[1:last_row_devs,],temp_devs)
+temp_devs$time <- as.integer((data_4_model@end_year - years_of_projection + 1):data_4_model@end_year)
+last_row_devs <- max(which(parameters_projection$label == "log_devs" & parameters_projection$module_name == "Recruitment"))
+if (last_row_devs != dim(parameters_projection)[1]) {
+  parameters_projection <- dplyr::bind_rows(parameters_projection[1:last_row_devs, ], temp_devs, parameters_projection[(last_row_devs + 1):dim(parameters_projection)[1], ])
+} else {
+  parameters_projection <- dplyr::bind_rows(parameters_projection[1:last_row_devs, ], temp_devs)
 }
 
 
-#log_r recruitement
-all_logr <- parameters_projection[parameters_projection$label=="log_r",]
-all_logr <- all_logr[!is.na(all_logr$label),]
-all_logr <- all_logr[!is.na(all_logr$module_name),]
-temp_logr <- all_logr[rep(dim(all_logr[,1])[1],years_of_projection),]
+# log_r recruitement
+all_logr <- parameters_projection[parameters_projection$label == "log_r", ]
+all_logr <- all_logr[!is.na(all_logr$label), ]
+all_logr <- all_logr[!is.na(all_logr$module_name), ]
+temp_logr <- all_logr[rep(dim(all_logr[, 1])[1], years_of_projection), ]
 temp_logr$value <- 0
 temp_logr$estimation_type <- "constant"
-temp_logr$time <- as.integer((data_4_model@end_year-years_of_projection+1):data_4_model@end_year)
-last_row_logr <- max(which(parameters_projection$label=="log_r" & parameters_projection$module_name=="Recruitment"))
-if(last_row_logr!=dim(parameters_projection)[1]){
-    parameters_projection <- dplyr::bind_rows(parameters_projection[1:last_row_logr,],temp_logr,parameters_projection[(last_row_logr+1):dim(parameters_projection)[1],])
-}else{
-    parameters_projection <- dplyr::bind_rows(parameters_projection[1:last_row_logr,],temp_logr)
+temp_logr$time <- as.integer((data_4_model@end_year - years_of_projection + 1):data_4_model@end_year)
+last_row_logr <- max(which(parameters_projection$label == "log_r" & parameters_projection$module_name == "Recruitment"))
+if (last_row_logr != dim(parameters_projection)[1]) {
+  parameters_projection <- dplyr::bind_rows(parameters_projection[1:last_row_logr, ], temp_logr, parameters_projection[(last_row_logr + 1):dim(parameters_projection)[1], ])
+} else {
+  parameters_projection <- dplyr::bind_rows(parameters_projection[1:last_row_logr, ], temp_logr)
 }
 
-#log_expected_recruitment recruitment
-all_exp_rec <- parameters_projection[parameters_projection$label=="log_expected_recruitment",]
-all_exp_rec <- all_exp_rec[!is.na(all_exp_rec$label),]
-all_exp_rec <- all_exp_rec[!is.na(all_exp_rec$module_name),]
-temp_exp_rec <- all_exp_rec[rep(dim(all_exp_rec[,1])[1],years_of_projection),]
+# log_expected_recruitment recruitment
+all_exp_rec <- parameters_projection[parameters_projection$label == "log_expected_recruitment", ]
+all_exp_rec <- all_exp_rec[!is.na(all_exp_rec$label), ]
+all_exp_rec <- all_exp_rec[!is.na(all_exp_rec$module_name), ]
+temp_exp_rec <- all_exp_rec[rep(dim(all_exp_rec[, 1])[1], years_of_projection), ]
 temp_exp_rec$value <- 0
 temp_exp_rec$estimation_type <- "constant"
-#temp_logr$time <- as.integer((data_4_model@end_year-years_of_projection+1):data_4_model@end_year)
-last_row_exp_rec <- max(which(parameters_projection$label=="log_expected_recruitment" & parameters_projection$module_name=="Recruitment"))
-if(last_row_exp_rec!=dim(parameters_projection)[1]){
-    parameters_projection <- dplyr::bind_rows(parameters_projection[1:last_row_exp_rec,],temp_exp_rec,parameters_projection[(last_row_exp_rec+1):dim(parameters_projection)[1],])
-}else{
-    parameters_projection <- dplyr::bind_rows(parameters_projection[1:last_row_exp_rec,],temp_exp_rec)
+# temp_logr$time <- as.integer((data_4_model@end_year-years_of_projection+1):data_4_model@end_year)
+last_row_exp_rec <- max(which(parameters_projection$label == "log_expected_recruitment" & parameters_projection$module_name == "Recruitment"))
+if (last_row_exp_rec != dim(parameters_projection)[1]) {
+  parameters_projection <- dplyr::bind_rows(parameters_projection[1:last_row_exp_rec, ], temp_exp_rec, parameters_projection[(last_row_exp_rec + 1):dim(parameters_projection)[1], ])
+} else {
+  parameters_projection <- dplyr::bind_rows(parameters_projection[1:last_row_exp_rec, ], temp_exp_rec)
 }
 
-#x recruitment
-all_x <- parameters_projection[parameters_projection$label=="x",]
-all_x <- all_x[!is.na(all_x$label),]
-all_x <- all_x[!is.na(all_x$module_name),]
-temp_x <- all_x[rep(dim(all_x[,1])[1],years_of_projection),]
+# x recruitment
+all_x <- parameters_projection[parameters_projection$label == "x", ]
+all_x <- all_x[!is.na(all_x$label), ]
+all_x <- all_x[!is.na(all_x$module_name), ]
+temp_x <- all_x[rep(dim(all_x[, 1])[1], years_of_projection), ]
 temp_x$value <- 0
 temp_x$estimation_type <- "constant"
-temp_x$time <- as.integer((data_4_model@end_year-years_of_projection+1):data_4_model@end_year)
-last_row_x <- max(which(parameters_projection$label=="x" & parameters_projection$module_name=="Recruitment"))
-if(last_row_x!=dim(parameters_projection)[1]){
-    parameters_projection <- dplyr::bind_rows(parameters_projection[1:last_row_x,],temp_x,parameters_projection[(last_row_x+1):dim(parameters_projection)[1],])
-}else{
-    parameters_projection <- dplyr::bind_rows(parameters_projection[1:last_row_x,],temp_x)
+temp_x$time <- as.integer((data_4_model@end_year - years_of_projection + 1):data_4_model@end_year)
+last_row_x <- max(which(parameters_projection$label == "x" & parameters_projection$module_name == "Recruitment"))
+if (last_row_x != dim(parameters_projection)[1]) {
+  parameters_projection <- dplyr::bind_rows(parameters_projection[1:last_row_x, ], temp_x, parameters_projection[(last_row_x + 1):dim(parameters_projection)[1], ])
+} else {
+  parameters_projection <- dplyr::bind_rows(parameters_projection[1:last_row_x, ], temp_x)
 }
 
-#expected values recruitment
-all_expected <- parameters_projection[parameters_projection$label=="expected_values",]
-all_expected <- all_expected[!is.na(all_expected$label),]
-all_expected <- all_expected[!is.na(all_expected$module_name),]
-temp_expected <- all_expected[rep(dim(all_expected[,1])[1],years_of_projection),]
+# expected values recruitment
+all_expected <- parameters_projection[parameters_projection$label == "expected_values", ]
+all_expected <- all_expected[!is.na(all_expected$label), ]
+all_expected <- all_expected[!is.na(all_expected$module_name), ]
+temp_expected <- all_expected[rep(dim(all_expected[, 1])[1], years_of_projection), ]
 temp_expected$value <- 0
 temp_expected$estimation_type <- "constant"
-temp_expected$time <- as.integer((data_4_model@end_year-years_of_projection+1):data_4_model@end_year)
-last_row_expected <- max(which(parameters_projection$label=="expected_values" & parameters_projection$module_name=="Recruitment"))
-if(last_row_expected!=dim(parameters_projection)[1]){
-    parameters_projection <- dplyr::bind_rows(parameters_projection[1:last_row_expected,],temp_expected,parameters_projection[(last_row_expected+1):dim(parameters_projection)[1],])
-}else{
-    parameters_projection <- dplyr::bind_rows(parameters_projection[1:last_row_expected,],temp_expected)
+temp_expected$time <- as.integer((data_4_model@end_year - years_of_projection + 1):data_4_model@end_year)
+last_row_expected <- max(which(parameters_projection$label == "expected_values" & parameters_projection$module_name == "Recruitment"))
+if (last_row_expected != dim(parameters_projection)[1]) {
+  parameters_projection <- dplyr::bind_rows(parameters_projection[1:last_row_expected, ], temp_expected, parameters_projection[(last_row_expected + 1):dim(parameters_projection)[1], ])
+} else {
+  parameters_projection <- dplyr::bind_rows(parameters_projection[1:last_row_expected, ], temp_expected)
 }
 
-#log_M population
-all_M <- parameters_projection[parameters_projection$label=="log_M",]
-all_M <- all_M[!is.na(all_M$label),]
-all_M <- all_M[!is.na(all_M$module_name),]
-temp_M <- all_M[rep((dim(all_M[,1])[1]-data_4_model@n_ages+1):dim(all_M[,1])[1],(years_of_projection)),]
+# log_M population
+all_M <- parameters_projection[parameters_projection$label == "log_M", ]
+all_M <- all_M[!is.na(all_M$label), ]
+all_M <- all_M[!is.na(all_M$module_name), ]
+temp_M <- all_M[rep((dim(all_M[, 1])[1] - data_4_model@n_ages + 1):dim(all_M[, 1])[1], (years_of_projection)), ]
 temp_M$estimation_type <- "constant"
-temp_M$time <- as.integer(sort(rep((data_4_model@end_year-years_of_projection+1):data_4_model@end_year,data_4_model@n_ages)))
-last_row_M <- max(which(parameters_projection$label=="log_M" & parameters_projection$module_name=="Population"))
-if(last_row_M!=dim(parameters_projection)[1]){
-    parameters_projection <- dplyr::bind_rows(parameters_projection[1:last_row_M,],temp_M,parameters_projection[(last_row_M+1):dim(parameters_projection)[1],])
-}else{
-    parameters_projection <- dplyr::bind_rows(parameters_projection[1:last_row_M,],temp_M)
+temp_M$time <- as.integer(sort(rep((data_4_model@end_year - years_of_projection + 1):data_4_model@end_year, data_4_model@n_ages)))
+last_row_M <- max(which(parameters_projection$label == "log_M" & parameters_projection$module_name == "Population"))
+if (last_row_M != dim(parameters_projection)[1]) {
+  parameters_projection <- dplyr::bind_rows(parameters_projection[1:last_row_M, ], temp_M, parameters_projection[(last_row_M + 1):dim(parameters_projection)[1], ])
+} else {
+  parameters_projection <- dplyr::bind_rows(parameters_projection[1:last_row_M, ], temp_M)
 }
 
 
-
- #TODO: Figure out how to add SSB_ratio prior
+# TODO: Figure out how to add SSB_ratio prior
 
 projection_fit <- parameters_projection |>
   initialize_fims(data = data_4_model) |>
   fit_fims(optimize = TRUE)
 
 clear()
-
 ```
 
 ```{r fit-plot-projections}
