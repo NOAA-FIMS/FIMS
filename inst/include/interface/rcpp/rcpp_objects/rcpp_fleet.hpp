@@ -492,9 +492,7 @@ public:
     fleet->observed_landings_units = this->observed_landings_units.get();
     fleet->observed_index_units = this->observed_index_units.get();
     fleet->selectivity_units = this->selectivity_units.get();
-    std::cout << "Rcpp_fleet" << std::endl;
-    std::cout << "Setting fleet ages and lengths vectors" << std::endl;
-    std::cout << "this->ages.size(): " << this->ages.size() << std::endl;
+   
     if (this->n_ages.get() > 0) {
       fleet->n_ages = this->n_ages.get();
       if (this->n_ages.get() == this->ages.size()) {
@@ -507,7 +505,6 @@ public:
       fleet->ages[i] = this->ages[i];
     }
 
-    std::cout << "this->lengths.size(): " << this->lengths.size() << std::endl;
 
     if (this->n_lengths.get() > 0) {
       fleet->n_lengths = this->n_lengths.get();

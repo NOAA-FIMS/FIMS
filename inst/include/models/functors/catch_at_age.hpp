@@ -182,8 +182,7 @@ public:
       std::shared_ptr<fims_popdy::Fleet<Type>> &fleet = (*fit).second;
       auto &derived_quantities =
           this->GetFleetDerivedQuantities(fleet->GetId());
-std::cout << "Preparing fleet derived quantities for fleet id "
-                << fleet->GetId() << std::endl;
+
       for (auto &kv : derived_quantities) {
         this->ResetVector(kv.second);
       }
@@ -199,27 +198,18 @@ std::cout << "Preparing fleet derived quantities for fleet id "
       // fill selectivity at age and length
       if (fleet->selectivity_units == "age") {
         for (size_t a = 0; a < fleet->n_ages; a++) {
-          std::cout << "Evaluating selectivity at age for age " << a
-                    << std::endl;
-
-          std::cout << "fleet->ages.size(): " << fleet->ages.size() << std::endl;
-          std::cout << "derived_quantities[selectivity_at_age].size(): "
-                   << derived_quantities["selectivity_at_age"].size()
-                   << std::endl;
+     
           derived_quantities["selectivity_at_age"][a] =
               fleet->selectivity->evaluate(fleet->ages[a]);
 
           if (fleet->n_lengths > 0) {
-            std::cout << "Calculating selectivity at length for age " << a
-                      << std::endl;
+           
                 
             for (size_t l = 0; l < fleet->n_lengths; l++) {
               // iterate through all lengths within an age and sum the
               // selectivity to get a selectivity at length
               size_t i_length_age = a * fleet->n_lengths + l;
-              std::cout << "  length " << l << " age_to_length_conversion: "
-                        << fleet->age_to_length_conversion[i_length_age]
-                        << std::endl;
+          
               derived_quantities["selectivity_at_length"][l] +=
                   fleet->age_to_length_conversion[i_length_age] *
                   derived_quantities["selectivity_at_age"][a];
@@ -227,20 +217,16 @@ std::cout << "Preparing fleet derived quantities for fleet id "
           }
         }
       } else if (fleet->selectivity_units == "length") {
-        std::cout << "Calculating selectivity at length" << std::endl;
         for (size_t a = 0; a < fleet->n_ages; a++) {
           for (size_t l = 0; l < fleet->n_lengths; l++) {
-            std::cout << "  Evaluating selectivity at length for length " << l
-                      << std::endl;
+            
             derived_quantities["selectivity_at_length"][l] =
                 fleet->selectivity->evaluate(fleet->lengths[l]);
             // iterate through all lengths within an age and sum the selectivity
             // to get a selectivity at age
 
             size_t i_length_age = a * fleet->n_lengths + l;
-            std::cout << "    age_to_length_conversion: "
-                      << fleet->age_to_length_conversion[i_length_age]
-                      << std::endl;
+            
             derived_quantities["selectivity_at_age"][a] +=
                 fleet->age_to_length_conversion[i_length_age] *
                 derived_quantities["selectivity_at_length"][l];
