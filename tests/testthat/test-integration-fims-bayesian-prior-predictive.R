@@ -62,8 +62,18 @@ test_that("prior predictive check", {
   fishing_fleet$n_ages$set(om_input[["nages"]])
   # Set number of length bins
   fishing_fleet$n_lengths$set(om_input[["nlengths"]])
-  fishing_fleet$ages$fromRVector(om_input[["ages"]])
-  fishing_fleet$lengths$fromRVector(om_input[["lengths"]])
+
+  fishing_fleet$ages$resize(om_input[["nages"]])
+  purrr::walk(
+    seq_along(om_input[["ages"]]),
+    \(x) fishing_fleet$ages$set(x - 1, om_input[["ages"]][x])
+  )
+  fishing_fleet$lengths$resize(om_input[["nlengths"]])
+  purrr::walk(
+    seq_along(om_input[["lengths"]]),
+    \(x) fishing_fleet$lengths$set(x - 1, om_input[["lengths"]][x])
+  )
+
 
   fishing_fleet$log_Fmort$resize(om_input[["nyr"]])
   for (y in 1:om_input$nyr) {
@@ -73,7 +83,6 @@ test_that("prior predictive check", {
   fishing_fleet$log_Fmort$set_all_estimable(TRUE)
   fishing_fleet$log_q[1]$value <- log(1.0)
   fishing_fleet$SetSelectivityAgeID(fishing_fleet_selectivity$get_id())
- 
   fishing_fleet$SetObservedIndexDataID(fishing_fleet_index$get_id())
   fishing_fleet$SetObservedAgeCompDataID(fishing_fleet_age_comp$get_id())
   fishing_fleet$SetObservedLengthCompDataID(fishing_fleet_length_comp$get_id())
@@ -130,13 +139,24 @@ test_that("prior predictive check", {
   survey_fleet <- methods::new(Fleet)
   survey_fleet$n_ages$set(om_input[["nages"]])
   survey_fleet$n_years$set(om_input[["nyr"]])
-  survey_fleet$ages$fromRVector(om_input[["ages"]])
-  survey_fleet$lengths$fromRVector(om_input[["lengths"]])
-  
+  survey_fleet$n_lengths$set(om_input[["nlengths"]])
+
+
+  survey_fleet$ages$resize(om_input[["nages"]])
+    purrr::walk(
+    seq_along(om_input[["ages"]]),
+    \(x) survey_fleet$ages$set(x - 1, om_input[["ages"]][x])
+  )
+  survey_fleet$lengths$resize(om_input[["nlengths"]])
+    purrr::walk(
+    seq_along(om_input[["lengths"]]),
+    \(x) survey_fleet$lengths$set(x - 1, om_input[["lengths"]][x])
+  )
+
+
   survey_fleet$log_q[1]$value <- log(om_output[["survey_q"]][["survey1"]])
   survey_fleet$log_q[1]$estimation_type$set("fixed_effects")
   survey_fleet$SetSelectivityAgeID(survey_fleet_selectivity$get_id())
- 
   survey_fleet$SetObservedIndexDataID(survey_fleet_index$get_id())
   survey_fleet$SetObservedAgeCompDataID(survey_fleet_age_comp$get_id())
   survey_fleet$SetObservedLengthCompDataID(survey_fleet_length_comp$get_id())
