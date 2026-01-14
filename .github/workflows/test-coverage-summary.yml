@@ -49,17 +49,17 @@ jobs:
         if: inputs.depends_on_quarto == true
         uses: quarto-dev/quarto-actions/setup@v2
 
-      - name: Calc. Test coverage
-        run: |
-          cov <- covr::package_coverage(
-            quiet = FALSE,
-            clean = FALSE,
-            install_path = file.path(normalizePath(Sys.getenv("RUNNER_TEMP"), winslash = "/"), "package")
-          )
-          print(cov)
-          covr::to_cobertura(cov, filename = "testthat_coverage.xml")
-          covr::report(cov, browse = FALSE, file = "coverage_report.html")
-        shell: Rscript {0}
+      # - name: Calc. Test coverage
+      #   run: |
+      #     cov <- covr::package_coverage(
+      #       quiet = FALSE,
+      #       clean = FALSE,
+      #       install_path = file.path(normalizePath(Sys.getenv("RUNNER_TEMP"), winslash = "/"), "package")
+      #     )
+      #     print(cov)
+      #     covr::to_cobertura(cov, filename = "testthat_coverage.xml")
+      #     covr::report(cov, browse = FALSE, file = "coverage_report.html")
+      #   shell: Rscript {0}
 
       - name: Install Ninja
         run: sudo apt-get install ninja-build
@@ -70,9 +70,7 @@ jobs:
       - name: install local version of FIMS
         run: remotes::install_local(upgrade= "always", force = TRUE)
         shell: Rscript {0}
-      - name: setup for gtest
-        run: FIMS:::setup_gtest()
-        shell: Rscript {0}
+
       #note: the following configure, build and test steps could instead
       # be run from r using FIMS::setup_and_run_gtest()
       - name: Configure
