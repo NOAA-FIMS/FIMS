@@ -96,11 +96,82 @@ test_that("catch-at-age model (estimation MLE without wrappers) works with corre
   expect_equal(out_of_tolerance_parameters, 0)
 })
 
+#' ## Edge handling ----
+#' test_that("catch-at-age model (estimation MLE without wrappers) returns correct outputs for edge cases", {
+#'   # Introduce a missing value in survey observations for the EM input
+#'   na_value <- -999
+#'   na_index <- 2
+#'   em_input_list[[iter_id]][["surveyB.obs"]][["survey1"]][na_index] <- na_value
+#'
+#'   # Run the FIMS setup and execution function
+#'   result <- setup_and_run_FIMS_without_wrappers(
+#'     iter_id = iter_id,
+#'     om_input_list = om_input_list,
+#'     om_output_list = om_output_list,
+#'     em_input_list = em_input_list,
+#'     estimation_mode = TRUE
+#'   )
+#'
+#'   #' @description Test that FIMS runs with missing values in survey index observations using NA (missing value) placeholder in the second value and the report is not NULL.
+#'   expect_false(is.null(result[["report"]]))
+#'
+#'   # Obtain the gradient and Hessian matrix
+#'   g <- as.numeric(result[["obj"]][["gr"]](result[["opt"]][["par"]]))
+#'   h <- optimHess(
+#'     result[["opt"]][["par"]],
+#'     fn = result[["obj"]][["fn"]],
+#'     gr = result[["obj"]][["gr"]]
+#'   )
+#'   result[["opt"]][["par"]] <- result[["opt"]][["par"]] - solve(h, g)
+#'   # Obtain the maximum absolute gradient to check convergence
+#'   max_gradient <- max(abs(result[["obj"]][["gr"]](result[["opt"]][["par"]])))
+#'
+#'   #' @description Test that the maximum gradient is less than or equal to 0.0001 after running FIMS with missing values in survey index observations.
+#'   expect_lte(max_gradient, 0.0001)
+#'
+#'   # Store the original values of the number of landings observations and
+#'   # survey observations
+#'   n.L_original <- om_input_list[[iter_id]][["n.L"]][["fleet1"]]
+#'   n.survey_original <- om_input_list[[iter_id]][["n.survey"]][["survey1"]]
+#'
+#'   # Set the number of landings observations and survey observations to 1
+#'   om_input_list[[iter_id]][["n.L"]][["fleet1"]] <- 1
+#'   om_input_list[[iter_id]][["n.survey"]][["survey1"]] <- 1
+#'   on.exit(
+#'     om_input_list[[iter_id]][["n.L"]][["fleet1"]] <- n.L_original,
+#'     add = TRUE
+#'   )
+#'   on.exit(
+#'     om_input_list[[iter_id]][["n.survey"]][["survey1"]] <- n.survey_original,
+#'     add = TRUE
+#'   )
+#'
+#'   # Run the FIMS setup and execution function
+#'   result <- setup_and_run_FIMS_without_wrappers(
+#'     iter_id = iter_id,
+#'     om_input_list = om_input_list,
+#'     om_output_list = om_output_list,
+#'     em_input_list = em_input_list,
+#'     estimation_mode = TRUE
+#'   )
+#'
+#'   #' @description Test that FIMS runs with only one observation in landings and survey data and the report is not NULL.
+#'   validate_fims(
+#'     report = result[["report"]],
+#'     estimates = result[["sdr_report"]],
+#'     om_input = om_input_list[[iter_id]],
+#'     om_output = om_output_list[[iter_id]],
+#'     em_input = em_input_list[[iter_id]]
+#'   )
+#' })
+
+
 ## Edge handling ----
-test_that("catch-at-age model (estimation MLE without wrappers) returns correct outputs for edge cases", {
+test_that("catch-at-age model (estimation MLE without wrappers) returns correct outputs for missing values", {
   # Introduce a missing value in survey observations for the EM input
   na_value <- -999
   na_index <- 2
+  orig_val <- em_input_list[[iter_id]][["surveyB.obs"]][["survey1"]][na_index]
   em_input_list[[iter_id]][["surveyB.obs"]][["survey1"]][na_index] <- na_value
 
   # Run the FIMS setup and execution function
@@ -129,6 +200,19 @@ test_that("catch-at-age model (estimation MLE without wrappers) returns correct 
   #' @description Test that the maximum gradient is less than or equal to 0.0001 after running FIMS with missing values in survey index observations.
   expect_lte(max_gradient, 0.0001)
 
+  #' @description Test that FIMS runs with only one observation in landings and survey data and the report is not NULL.
+  validate_fims(
+    report = result[["report"]],
+    estimates = result[["sdr_report"]],
+    om_input = om_input_list[[iter_id]],
+    om_output = om_output_list[[iter_id]],
+    em_input = em_input_list[[iter_id]]
+  )
+
+  em_input_list[[iter_id]][["surveyB.obs"]][["survey1"]][na_index] <- orig_val
+})
+
+test_that("catch-at-age model (estimation MLE without wrappers) returns correct outputs for sample size of 1", {
   # Store the original values of the number of landings observations and
   # survey observations
   n.L_original <- om_input_list[[iter_id]][["n.L"]][["fleet1"]]
@@ -137,14 +221,6 @@ test_that("catch-at-age model (estimation MLE without wrappers) returns correct 
   # Set the number of landings observations and survey observations to 1
   om_input_list[[iter_id]][["n.L"]][["fleet1"]] <- 1
   om_input_list[[iter_id]][["n.survey"]][["survey1"]] <- 1
-  on.exit(
-    om_input_list[[iter_id]][["n.L"]][["fleet1"]] <- n.L_original,
-    add = TRUE
-  )
-  on.exit(
-    om_input_list[[iter_id]][["n.survey"]][["survey1"]] <- n.survey_original,
-    add = TRUE
-  )
 
   # Run the FIMS setup and execution function
   result <- setup_and_run_FIMS_without_wrappers(
@@ -163,6 +239,48 @@ test_that("catch-at-age model (estimation MLE without wrappers) returns correct 
     om_output = om_output_list[[iter_id]],
     em_input = em_input_list[[iter_id]]
   )
+
+  om_input_list[[iter_id]][["n.L"]][["fleet1"]] <- n.L_original
+  om_input_list[[iter_id]][["n.survey"]][["survey1"]] <- n.survey_original
+})
+
+test_that("catch-at-age model (estimation MLE without wrappers) returns correct outputs with NA values and sample size of 1", {
+  # Introduce a missing value in survey observations for the EM input
+  na_value <- -999
+  na_index <- 2
+  orig_val <- em_input_list[[iter_id]][["surveyB.obs"]][["survey1"]][na_index]
+  em_input_list[[iter_id]][["surveyB.obs"]][["survey1"]][na_index] <- na_value
+
+  # Store the original values of the number of landings observations and
+  # survey observations
+  n.L_original <- om_input_list[[iter_id]][["n.L"]][["fleet1"]]
+  n.survey_original <- om_input_list[[iter_id]][["n.survey"]][["survey1"]]
+
+  # Set the number of landings observations and survey observations to 1
+  om_input_list[[iter_id]][["n.L"]][["fleet1"]] <- 1
+  om_input_list[[iter_id]][["n.survey"]][["survey1"]] <- 1
+
+  # Run the FIMS setup and execution function
+  result <- setup_and_run_FIMS_without_wrappers(
+    iter_id = iter_id,
+    om_input_list = om_input_list,
+    om_output_list = om_output_list,
+    em_input_list = em_input_list,
+    estimation_mode = TRUE
+  )
+
+  #' @description Test that FIMS runs with only one observation in landings and survey data and the report is not NULL.
+  validate_fims(
+    report = result[["report"]],
+    estimates = result[["sdr_report"]],
+    om_input = om_input_list[[iter_id]],
+    om_output = om_output_list[[iter_id]],
+    em_input = em_input_list[[iter_id]]
+  )
+
+  om_input_list[[iter_id]][["n.L"]][["fleet1"]] <- n.L_original
+  om_input_list[[iter_id]][["n.survey"]][["survey1"]] <- n.survey_original
+  em_input_list[[iter_id]][["surveyB.obs"]][["survey1"]][na_index] <- orig_val
 })
 
 ## Error handling ----

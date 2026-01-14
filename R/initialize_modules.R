@@ -87,7 +87,7 @@ initialize_module <- function(parameters, data, module_name, fleet_name = NA_cha
     } else {
       module_fields <- setdiff(module_fields, c(
         # Right now we can also remove n_lengths because the default is 0
-        "n_lengths"
+        "n_lengths", "lengths"
       ))
     }
 
