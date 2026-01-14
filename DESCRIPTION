@@ -80,6 +80,7 @@ Suggests:
     knitr,
     lozen,
     markdown,
+    microbenchmark,
     parallel,
     pkgdown,
     remotes,
