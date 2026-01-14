@@ -546,8 +546,7 @@ int pointer(){
   Rcpp::Rcout <<  "The address of y is: " << &y << std::endl;
   Rcpp::Rcout << "*x returns the value of y: " << *x <<  std::endl;
   return 0;
-}'
-)
+}')
 
 pointer()
 ```
@@ -573,8 +572,7 @@ Rcpp::cppFunction('
     Rcpp::Rcout << "The memory address of y is: " << &y << std::endl;
 
     return 0;
-  }'
-)
+  }')
 
 reference()
 ```
@@ -604,8 +602,7 @@ int update_pointer(){
   Rcpp::Rcout << "a = " << a << "; *c = " << *c << std::endl;
   Rcpp::Rcout << "b = " << b << std::endl;
   return 0;
-}'
-)
+}')
 
 update_pointer()
 ```
@@ -639,8 +636,7 @@ int reassign_pointer(){
   Rcpp::Rcout << "b = " << b << std::endl;
   Rcpp::Rcout << "*c = " << *c <<std::endl;
   return 0;
-}'
-)
+}')
 
 reassign_pointer()
 ```
@@ -667,8 +663,7 @@ int manage_memory(){
   //delete memory
   delete ptr;
   return 0;
-}'
-)
+}')
 
 manage_memory()
 ```
@@ -725,8 +720,7 @@ Rcpp::cppFunction('
     Rcpp::Rcout << "ptr3 = " << ptr3 << std::endl;
 
     return 0;
-}'
-)
+}')
 
 shared_pointer()
 ```
