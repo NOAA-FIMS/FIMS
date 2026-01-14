@@ -27,12 +27,14 @@ BH
 BOOL
 Baranov
 BasedOnStyle
+Benchmarking 
 Bertalanffy
 BevHolt
 Beverton
 BevertonHolt
 BevertonHoltRecruitment
 BevertonHoltRecruitmentInterface
+Bjarne
 Bool
 CAA
 CAAEvaluateTestFixture
@@ -76,6 +78,7 @@ CalculateUnfishedNumbersAAandUnfishedSpawningBiomass
 CalculateUnfishedSpawningBiomass
 CallEntries
 CallMethodDef
+callout
 CamelCase
 CaptureError
 CatchAtAge
@@ -539,6 +542,7 @@ cout
 cov
 covr
 cp
+cplusplus
 cpp
 cpus
 cran
@@ -564,6 +568,7 @@ dat
 dbcceb
 de
 deallocated
+deallocates
 defineVar
 deliverables
 dellog
@@ -598,6 +603,7 @@ dplyr
 dq
 dum
 dynam
+Eddelbuttel
 elif
 emph
 emplace
@@ -647,6 +653,7 @@ gc
 gcc
 gcovr
 gdb
+geeksforgeeks
 getAbsolutePathWithoutDotDot
 getOption
 getenv
@@ -697,6 +704,7 @@ inheritParams
 init
 initializer
 inplace
+instantiation
 instantiations
 inv
 io
@@ -764,12 +772,14 @@ meanlog
 messageBody
 messageHeadline
 mget
+microbenchmark
 minimizR
 minimizer
 mkString
 mkdir
 MLE
 modelTest
+modularity
 mort
 mpi
 msupernaw
@@ -777,6 +787,7 @@ msy
 mult
 mutex
 mv
+MyClass
 mymap
 nCAA
 nF
@@ -860,6 +871,8 @@ pmap
 pmf
 png
 pnorm
+Polymorphism
+polymorphism
 popdy
 pos
 postfix
@@ -897,6 +910,7 @@ rebasing
 reccommend
 recr
 recruitments
+rect
 refClass
 registerRoutines
 relativePath
@@ -911,6 +925,7 @@ rescaled
 resid
 ret
 retape
+reusability
 rf
 rlang
 rlib
@@ -924,6 +939,7 @@ roxygenize
 rspm
 rstan
 rstream
+rtools
 ru
 rvit
 rzero
@@ -983,6 +999,7 @@ srcref
 ss
 ssb
 ssbzero
+ssqng
 sstream
 stackoverflow
 stan
@@ -996,6 +1013,7 @@ stockplotr
 str
 streambuf
 stringstream
+Stroustrup
 strs
 strsplit
 strtok
@@ -1017,6 +1035,7 @@ tanh
 tbl
 tempdir
 tempfile
+templating
 templated
 testdown
 testthat
@@ -1043,6 +1062,7 @@ trigamma
 trunc
 tryCatch
 tryFormats
+Tsuda
 typedef
 typename
 typeof

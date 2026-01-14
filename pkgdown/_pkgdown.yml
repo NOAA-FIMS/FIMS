@@ -32,6 +32,11 @@ articles:
   contents:
   - fims-path-maturity
 
+- title: C++ Training
+  contents:
+  - training-intro-cpp
+  - training-intro-rcpp
+
 reference:
 - title: Data
   desc: >
