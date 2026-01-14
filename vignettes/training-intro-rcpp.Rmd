@@ -137,7 +137,7 @@ double meanC(NumericVector x) {
 
 # The same code that is stored in mean.cpp can be sourced directly
 src <-
-"#include <Rcpp.h>
+  "#include <Rcpp.h>
 using namespace Rcpp;
 
 // [[Rcpp::export]]
