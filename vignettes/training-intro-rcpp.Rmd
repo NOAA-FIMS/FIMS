@@ -1,0 +1,278 @@
+---
+title: "Intro to Rcpp"
+author: "Christine Stawitz"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Intro to Rcpp}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+<!-- The section below creates a collpase/expand all button -->
+<div id="expand-collapse-buttons" style="margin-bottom: 20px;">
+  <button onclick="expandAll()" class="btn btn-primary">Expand All</button>
+  <button onclick="collapseAll()" class="btn btn-secondary">Collapse All</button>
+</div>
+
+<script>
+function expandAll() {
+  const details = document.querySelectorAll('details');
+  details.forEach((detail) => {
+    detail.setAttribute('open', 'true');
+  });
+}
+
+function collapseAll() {
+  const details = document.querySelectorAll('details');
+  details.forEach((detail) => {
+    detail.removeAttribute('open');
+  });
+}
+</script>
+
+# What is Rcpp
+
+## Definition
+
+[Rcpp](https://cran.r-project.org/package=Rcpp) is an [R](https://www.r-project.org/) package that facilitates seamless integration of R and [C++](https://cplusplus.com/) code. By providing tools and classes within this R package, users can easily write high-performance C++ functions and use them directly in R, which allows users to combine R's statistical capabilities with the speed and flexibility of C++.
+
+Rcpp acts as an Application Programming Interface (API) between R and C++. As an API, Rcpp defines a set of tools and conventions that enable R and C++ code to communicate and work together seamlessly, making it easy to call C++ functions from R and exchange data between the two languages.
+
+## Why use Rcpp
+
+There are other options out there besides Rcpp, e.g., [cpp11](https://cran.r-project.org/package=cpp11) and [cpp4r](https://cran.r-project.org/package=cpp4r). We choose to use Rcpp because
+
+* Rcpp is one of the most widely used R extensions (i.e., over 1000 packages),
+* With very minimal knowledge of C++, Rcpp facilitates increasing the speed of functions, and
+* The most efficient R functions are written in C++ and called from R.
+
+# Writing C++ functions {#writing-cpp-functions}
+
+## Inline C++ code in R
+
+Using {Rcpp} you can compile C++ code using R and never have to interact with an external file or compiler using one of the two following functions:
+
+* You can write C++ functions inline in your R code by wrapping the C++ code in `Rcpp::cppFunction()`.
+* You can compile and execute single lines of code directly using `Rcpp::evalCpp()`.
+
+<details>
+<summary><strong>Example: Inline C++ within R</strong></summary>
+
+```{r inline}
+library(Rcpp)
+
+# Compile inline C++ using R
+Rcpp::cppFunction("int add(int x, int y, int z) {
+  int sum = x + y + z;
+  return sum;
+}")
+
+# after compiling, add works like a regular R function
+add
+add(1, 2, 3)
+
+# Compile and execute C++ code
+# Find the square root of 16
+Rcpp::evalCpp("std::sqrt(16.0)")
+# Return the largest representable double value
+Rcpp::evalCpp("std::numeric_limits<double>::max()")
+```
+</details>
+
+## Calling .cpp files from R
+
+You can save your C++ code in a separate file with the .cpp extension and call this file from R using `Rcpp::sourceCpp()`. For example, the code below stores `meanC`, a C++ function that calculates the mean of a numeric vector. This code can be saved in a .cpp file, e.g., `mean.cpp` and compiled within your R session with `Rcpp::sourceCpp("mean.cpp")`. Again, if you do not want to use external cpp files, you can wrap the C++ code in quotes and store it as an R object like the example above. Either way, the C++ is then made available within the R session using `Rcpp::sourceCpp()`. Both methods are illustrated below.
+
+<details>
+<summary><strong>Example: mean.cpp</strong></summary>
+
+```{Rcpp meanC}
+/*
+ The include statement allows you to use the Rcpp library in Rcpp.h, which
+ includes NumericVector.
+*/
+#include <Rcpp.h>
+/*
+ You can use Rcpp functions like NumericVector without specifying their
+ namespace on each instance if you include the  entire Rcpp namespace using the
+ line below, e.g., you can use `NumericVector` rather than
+ `Rcpp::NumericVector`.
+*/
+using namespace Rcpp;
+
+/*
+ Use Rcpp::export to export the following function to R
+*/
+// [[Rcpp::export]]
+double meanC(NumericVector x) {
+  /*
+   .size() is a member function of Rcpp::NumericVector class and can be accessed
+   with the dot operator from any Rcpp::NumericVector object
+  */
+  int n = x.size();
+  double total = 0;
+
+  for (int i = 0; i < n; ++i) {
+    /*
+     += is the same as x = x + y, and is known as an overload operator
+    */
+    total += x[i];
+  }
+  return total / n;
+}
+```
+</details>
+
+<details>
+<summary><strong>Example: Sourcing C++ Code in R</strong></summary>
+
+```{r sourceCpp}
+# code can be saved in .cpp file and compiled
+# Rcpp::sourceCpp("mean.cpp")
+# meanC(1:10)
+
+# The same code that is stored in mean.cpp can be sourced directly
+src <-
+  "#include <Rcpp.h>
+using namespace Rcpp;
+
+// [[Rcpp::export]]
+double meanC(NumericVector x) {
+  int n = x.size();
+  double total = 0;
+
+  for (int i = 0; i < n; ++i) {
+    total += x[i];
+  }
+  return total / n;
+}
+"
+# compile the text
+Rcpp::sourceCpp(code = src)
+meanC(1:10)
+```
+</details>
+
+## Benchmarking against R
+
+Compiled C++ is often much faster than R. Below we compare our compiled `meanC` function against the R function `mean` using [{microbenchmark}](https://cran.r-project.org/package=microbenchmark).
+
+<details>
+<summary><strong>Example: Benchmarking R vs C++</strong></summary>
+
+```{r microbench}
+library(microbenchmark)
+x <- runif(1e5)
+microbenchmark(
+  mean(x),
+  meanC(x)
+)
+```
+</details>
+
+## C++ in FIMS
+
+In FIMS, most of the C++ code is organized into several header files that are stored in the [`inst/include/`](https://github.com/NOAA-FIMS/FIMS/tree/main/inst/include) directory. These files include the definitions of Rcpp modules and interfaces (in inst/include/interface/rcpp/*) that make C++ classes and functions accessible from R.
+
+A single C++ source file (i.e., [src/FIMS.cpp](https://github.com/NOAA-FIMS/FIMS/blob/main/src/FIMS.cpp)) lists all of the header files and serves as their main entry point for compilation. The build process is managed by the [`src/Makevars` file](https://github.com/NOAA-FIMS/FIMS/blob/main/src/Makevars) (and [`src/Makevars.win`](https://github.com/NOAA-FIMS/FIMS/blob/main/src/Makevars.win) for Windows machines), which sets the necessary compiler and linker flags for R to compile the C++ code into a shared library (DLL or SO). This shared library is automatically loaded by R when users call `library(FIMS)`, allowing R users to call high-performance C++ code without needing to use `Rcpp::sourceCpp()` manually.
+
+# Rcpp Types
+
+Rcpp types map standard C++ data types to R objects enabling seamless data exchange and operations between R and C++ for efficiency. Example Rcpp types include classes like `NumericVector` and `IntegerVector`. Rcpp types handle everything from basic data to complex structures like matrices, lists, and functions. Additionally, each type handles memory management for you automatically.
+
+## Rcpp scalar classes
+
+* Integer: `int`
+* Double: `double`
+* Boolean: `bool`
+* String: `String`
+
+## Rcpp vector classes
+
+* Vector of integers: `IntegerVector`
+* Vector of doubles: `NumericVector`
+* Vector of booleans: `LogicalVector`
+* Vector of strings: `CharacterVector`
+
+## Rcpp methods {#rcpp-methods}
+
+Rcpp methods are functions that belong to Rcpp classes and allow you to interact with C++ objects from R in an object-oriented way.
+
+* Static methods are called using `::` on a class. For example, `NumericVector::create()` creates a numeric vector without needing an existing object.
+* Member methods (or member functions) are called on specific objects using the `$` operator in R and the dot operator in C++. For example, the `.size()` member function of the `NumericVector` class returns the number of elements in the `Rcpp::NumericVector` class. If you have any experience with Python, it's somewhat similar to the way you use dot notation there.
+
+<details>
+<summary><strong>Example: Rcpp Vectors and Methods</strong></summary>
+
+```{r methods}
+src <-
+  "#include <Rcpp.h>
+  using namespace Rcpp;
+
+  // [[Rcpp::export]]
+  NumericVector fun() {
+    //Call static methods on NumericVector
+    //Create new vector of size 3 using numbers 1, 2, and 3
+    NumericVector v = NumericVector::create(1, 2, 3);
+    Rcout << NumericVector::get_na() << std::endl;
+
+    //Call member methods on object v of class NumericVector
+    //Print the length of v
+    Rcout << v.size() << std::endl;
+    //append the number 4 to the vector using push_back()
+    v.push_back(4);
+
+    return v;
+  }
+"
+
+# Compile the code and call it
+sourceCpp(code = src)
+fun()
+```
+</details>
+
+# Rcpp modules
+
+[Rcpp modules](https://cran.r-project.org/web/packages/Rcpp/vignettes/Rcpp-modules.pdf) are a feature of the Rcpp package that allow you to expose C++ classes, methods, and functions to R in a structured and object-oriented way. This makes it possible to work with C++ objects directly from R, enabling more advanced and efficient workflows that combine the strengths of both languages. A module is defined in C++ using the `RCPP_MODULE` macro.
+
+By using modules, you avoid the need to write low-level interface code for each function or class you want to expose. Instead, you describe the interface in a concise and readable way, and Rcpp handles the details of data conversion and method dispatch.
+
+## RCPP_MODULE
+
+Rcpp modules can be used to expose C++ functions and classes using the Rcpp macro `RCPP_MODULE`. Without `RCPP_MODULE` the C++ that you want to call within R would have to be extremely complex to work within the R environment. Much of the complexity of changing R input (SEXP) into C++ types is handled by including `#include <Rcpp.h>` but `RCPP_MODULE` handles some additional complexity.
+
+Within a module, you can register the following components:
+
+* Constructors: These specify how to create new instances of a C++ class from R, mapping R arguments to C++ constructors.
+* Fields: These are member variables of a class that you want to make accessible from R. You can expose them as read/write or read-only.
+* Methods: These are member functions of a class that can be called from R, allowing you to invoke C++ logic on your objects.
+* Properties: These are similar to fields but can have custom getter and setter functions, providing more control over how R interacts with the underlying C++ data.
+
+Thus, `RCPP_MODULE`s can include `.field`, `.constructor`, `.method`, and `.property` arguments, where `.field` can be used with two or three arguments. For example, the class that we create below called `Uniform` is complex with a constructor; two inputs, `min` and `max`; and one method, `draw`. Additionally, classes can include `.field_readonly`, which prevents it from being modified within R.
+
+<details>
+<summary><strong>Example: Rcpp Module Skeleton</strong></summary>
+
+```{Rcpp modules, eval=FALSE}
+RCPP_MODULE(unif_module) {
+  class_<Uniform>("Uniform")
+  .constructor<double,double>()
+  .field("min", &Uniform::min, "minimum value")
+  .field("max", &Uniform::max, "maximum value")
+  .method("draw", &Uniform::draw);
+}
+```
+</details>
+
+## RCPP_EXPOSED_CLASS
+
+Rcpp provides several built-in types, such as `Rcpp::NumericVector`, but when you define your own C++ class, you need to make Rcpp aware of it. This is done using the [`RCPP_EXPOSED_CLASS`](https://cran.r-project.org/web/packages/Rcpp/vignettes/Rcpp-extending.pdf) macro. For example, if you create a new class called `FancyVector`, you need add `RCPP_EXPOSED_CLASS(FancyVector)` to your code. This macro instructs Rcpp to generate the necessary type information, allowing your new class to be used within Rcpp modules. As a result, you can pass objects of your class between R and C++, store them in Rcpp containers, and use them as arguments or return values in Rcpp-exposed functions.
+
+## Modules in FIMS
+
+Within FIMS, we first use `RCPP_EXPOSED_CLASS()` to expose all of our new type classes, e.g., `RCPP_EXPOSED_CLASS(Parameter)` in [`src/fims_modules.hpp`](https://github.com/NOAA-FIMS/FIMS/blob/main/src/fims_modules.hpp). Once all of the type classes are exposed, we then use a single instance of `RCPP_MODULE` to expose the C++ to R in that same file.
