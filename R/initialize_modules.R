@@ -58,7 +58,8 @@ initialize_module <- function(parameters, data, module_name, fleet_name = NA_cha
       "agecomp_expected",
       "agecomp_proportion",
       "observed_index_units",
-      "observed_landings_units"
+      "observed_landings_units",
+      "selectivity_units"
     ))
 
     fleet_types <- get_data(data) |>
@@ -120,7 +121,7 @@ initialize_module <- function(parameters, data, module_name, fleet_name = NA_cha
   )
 
   real_vector_fields <- c(
-    "ages", "weights"
+    "ages", "weights", "lengths"
   )
 
   for (field in module_fields) {
@@ -138,15 +139,23 @@ initialize_module <- function(parameters, data, module_name, fleet_name = NA_cha
           "n_years" = get_n_years(data)
         )
       )
-    } else if (field %in% c("ages", "weights")) {
+    } else if (field %in% real_vector_fields) {
       get_value_function <- switch(field,
         "ages" = get_ages,
+        "lengths" = get_lengths,
         "weights" = m_weight_at_age
       )
-      module[[field]]$resize(get_n_ages(data))
-      purrr::walk(seq_len(get_n_ages(data)), function(x) {
-        module[[field]]$set(x - 1, get_value_function(data)[x])
-      })
+      if(field=="lengths"){
+        module[[field]]$resize(get_n_lengths(data))
+        purrr::walk(seq_len(get_n_lengths(data)), function(x) {
+          module[[field]]$set(x - 1, get_value_function(data)[x])
+        })
+      }else{
+        module[[field]]$resize(get_n_ages(data))
+        purrr::walk(seq_len(get_n_ages(data)), function(x) {
+          module[[field]]$set(x - 1, get_value_function(data)[x])
+        })
+      }
     } else {
       set_param_vector(
         field = field,
