@@ -678,8 +678,8 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
    *
    * @details Returns a list containing the report results for the CatchAtAge
    * model, including derived quantities and diagnostics.
-   * @param do_sd_report  A boolean indicating whether to perform sdreport 
-   * calculations, which should be skipped when MLE optimization is false. 
+   * @param do_sd_report  A boolean indicating whether to perform sdreport
+   * calculations, which should be skipped when MLE optimization is false.
    * Default is true.
    * @return Rcpp::List containing the report output.
    */
@@ -717,7 +717,7 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
     double of_value =
         Rcpp::as<double>(func(this->get_fixed_parameters_vector()));
     Rcpp::List rep = report();
-    
+
     // Initialize variables for sdreport results
     Rcpp::RObject sdr_summary;
     Rcpp::NumericMatrix mat;
@@ -725,7 +725,7 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
     Rcpp::CharacterVector colnames;
     Rcpp::List grouped_out = Rcpp::List::create();
     double first_est = 0.0;
-    
+
     // Only run sdreport if do_sd_report is true
     if (do_sd_report) {
       SEXP sdr = sdreport(obj);
