@@ -95,7 +95,6 @@ class FleetInterface : public FleetInterfaceBase {
    * @brief The ID of the selectivity object.
    */
   SharedInt interface_selectivity_id_m = -999;
- 
 
 public:
   /**
@@ -384,10 +383,8 @@ public:
    */
   int GetSelectivityID() { return interface_selectivity_id_m.get(); }
 
-  std::string GetSelectivityUnits() {
-    return selectivity_units.get();
-  }
- 
+  std::string GetSelectivityUnits() { return selectivity_units.get(); }
+
   /**
    * @brief Get the unique ID for the observed age-composition data object.
    */
@@ -492,7 +489,7 @@ public:
     fleet->observed_landings_units = this->observed_landings_units.get();
     fleet->observed_index_units = this->observed_index_units.get();
     fleet->selectivity_units = this->selectivity_units.get();
-   
+
     if (this->n_ages.get() > 0) {
       fleet->n_ages = this->n_ages.get();
       if (this->n_ages.get() == this->ages.size()) {
@@ -505,17 +502,15 @@ public:
       fleet->ages[i] = this->ages[i];
     }
 
-
     if (this->n_lengths.get() > 0) {
       fleet->n_lengths = this->n_lengths.get();
-      if (this->n_lengths.get() == this->lengths.size()) {
-        fleet->lengths.resize(this->n_lengths.get());
-      } else {
-        warning("The lengths vector is not of size n_lengths for fleet.");
+      fleet->lengths.resize(this->n_lengths.get());
+        for (size_t i = 0; i < this->lengths.size(); i++) {
+          fleet->lengths[i] = this->lengths[i];
+        }
+      if (this->n_lengths.get() != this->lengths.size()) {
+        Rf_error("The lengths vector is not of size n_lengths for fleet.");
       }
-    }
-    for (size_t i = 0; i < this->lengths.size(); i++) {
-      fleet->lengths[i] = this->lengths[i];
     }
 
     fleet->fleet_observed_agecomp_data_id_m =
