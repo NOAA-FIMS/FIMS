@@ -183,7 +183,7 @@ test_that("catch-at-age model (estimation MLE with wrappers) returns an error wh
     deterministic_output[["estimated"]],
     deterministic_output[["input"]]
   )
-  
+
   #' @description Test that no warnings are produced when optimize = FALSE.
   expect_no_warning(
     initialized_model |>
