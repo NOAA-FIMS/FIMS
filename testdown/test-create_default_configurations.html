@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2025-12-30" />
+<meta name="date" content="2026-01-15" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -183,7 +183,7 @@
 <td align="left">expect_equal( object = colnames(default_configurations), expected = expected_names )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-create_default_configurations.R#22</td>
-<td align="left">2025-12-30 17:42:18.151491</td>
+<td align="left">2026-01-15 22:17:34.885129</td>
 </tr>
 <tr class="even">
 <td align="left"><code>create_default_configurations()</code> works with correct inputs</td>
@@ -191,7 +191,7 @@
 <td align="left">expect_equal( object = colnames(default_configurations_unnested), expected = expected_names_unnested )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-create_default_configurations.R#35</td>
-<td align="left">2025-12-30 17:42:18.16857</td>
+<td align="left">2026-01-15 22:17:34.900348</td>
 </tr>
 <tr class="odd">
 <td align="left"><code>create_default_configurations()</code> works with correct inputs</td>
@@ -199,7 +199,7 @@
 <td align="left">expect_equal( object = unique(default_configurations_unnested[[“model_family”]]), expected = “catch_at_age” )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-create_default_configurations.R#41</td>
-<td align="left">2025-12-30 17:42:18.187408</td>
+<td align="left">2026-01-15 22:17:34.917151</td>
 </tr>
 <tr class="even">
 <td align="left"><code>create_default_configurations()</code> works with correct inputs</td>
@@ -214,7 +214,7 @@
 <td align="left">expect_snapshot_file( save_csv(default_configurations_unnested), “default_configurations.csv”, compare = compare_file_text )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-create_default_configurations.R#48</td>
-<td align="left">2025-12-30 17:42:18.200728</td>
+<td align="left">2026-01-15 22:17:34.928509</td>
 <td align="left"></td>
 </tr>
 <tr class="even">
@@ -223,7 +223,7 @@
 <td align="left">expect_equal( object = colnames(configurations), expected = expected_names )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-create_default_configurations.R#77</td>
-<td align="left">2025-12-30 17:51:07.941305</td>
+<td align="left">2026-01-15 22:26:04.763232</td>
 </tr>
 <tr class="odd">
 <td align="left"><code>create_default_configurations()</code> returns correct outputs for edge cases</td>
@@ -231,7 +231,7 @@
 <td align="left">expect_true(“AgeComp” %in% module_types)</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-create_default_configurations.R#87</td>
-<td align="left">2025-12-30 17:51:07.98355</td>
+<td align="left">2026-01-15 22:26:04.804195</td>
 </tr>
 <tr class="even">
 <td align="left"><code>create_default_configurations()</code> returns correct outputs for edge cases</td>
@@ -239,7 +239,7 @@
 <td align="left">expect_true(!(“LengthComp” %in% module_types))</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-create_default_configurations.R#90</td>
-<td align="left">2025-12-30 17:51:07.994972</td>
+<td align="left">2026-01-15 22:26:04.815054</td>
 </tr>
 <tr class="odd">
 <td align="left"><code>create_default_configurations()</code> returns correct outputs for edge cases</td>
@@ -247,7 +247,7 @@
 <td align="left">expect_true(“LengthComp” %in% module_types)</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-create_default_configurations.R#98</td>
-<td align="left">2025-12-30 17:51:08.082195</td>
+<td align="left">2026-01-15 22:26:04.900967</td>
 </tr>
 <tr class="even">
 <td align="left"><code>create_default_configurations()</code> returns correct outputs for edge cases</td>
@@ -255,7 +255,7 @@
 <td align="left">expect_true(!(“AgeComp” %in% module_types))</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-create_default_configurations.R#101</td>
-<td align="left">2025-12-30 17:51:08.093619</td>
+<td align="left">2026-01-15 22:26:04.911916</td>
 </tr>
 <tr class="odd">
 <td align="left"><code>create_default_configurations()</code> returns correct error messages</td>
@@ -263,7 +263,7 @@
 <td align="left">expect_error( create_default_configurations(data = data.frame(a = 1)), regexp = “<code>data</code> must be a” )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-create_default_configurations.R#113</td>
-<td align="left">2025-12-30 17:51:08.136298</td>
+<td align="left">2026-01-15 22:26:04.954645</td>
 </tr>
 <tr class="even">
 <td align="left"><code>create_default_configurations()</code> returns correct error messages</td>
@@ -271,7 +271,7 @@
 <td align="left">expect_error( create_default_configurations( data = data_age_length, model_family = “invalid_family” ) )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-create_default_configurations.R#119</td>
-<td align="left">2025-12-30 17:51:08.149364</td>
+<td align="left">2026-01-15 22:26:04.9673</td>
 </tr>
 </tbody>
 </table>
