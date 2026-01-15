@@ -19,11 +19,11 @@ Prepare the test data in the new file or in a separate file if you plan on reusi
 - If you used a test fixture from GoogleTest to use the same data configuration for multiple tests, `TearDown() override{}` can be used to clean up the test and then the test fixture will be deleted. See [GoogleTest user's guide](https://google.github.io/googletest/primer.html#same-data-multiple-tests) for more details.
 - R reusable test data: add code to the `prepare_test_data()` function in [`tests/testthat/helper-integration-tests-setup-run.R`](https://github.com/NOAA-FIMS/FIMS/blob/main/tests/testthat/helper-integration-tests-setup-run.R), including code to save the new data object, e.g., `base::saveRDS(object, file = testthat::test_path("fixtures", "data_name.RDS"))`, and call `prepare_test_data()` in the `setup` section of the new test file to load the data using
   ```r
-  if (!file.exists(test_path("fixtures", "data_name.RDS"))) {
+  if (!file.exists(testthat::test_path("fixtures", "data_name.RDS"))) {
     prepare_test_data()
   }
   ```
-- Use pre-existing integration data, e.g., `tests/testthat/fixtures/integration_test_data_components.RData` and `tests/testthat/fixtures/integration_test_data.RData`, by loading them within the `setup` section, e.g., `load(test_path("fixtures", "integration_test_data.RData"))` or within `prepare_test_data()`, where these data objects can be updated by running `R/data1.R`.
+- Use pre-existing integration data, e.g., `tests/testthat/fixtures/integration_test_data_components.RData` and `tests/testthat/fixtures/integration_test_data.RData`, by loading them within the `setup` section, e.g., `load(testthat::test_path("fixtures", "integration_test_data.RData"))` or within `prepare_test_data()`, where these data objects can be updated by running `R/data1.R`.
 
 ### :pencil: Edit the code in the new test file
 
