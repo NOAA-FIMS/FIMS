@@ -10,7 +10,7 @@
 # reshape_json_estimates ----
 ## Setup ----
 # Load or prepare any necessary data for testing
-if (!file.exists(test_path("fixtures", "fit_age_length_comp.RDS"))) {
+if (!file.exists(testthat::test_path("fixtures", "fit_age_length_comp.RDS"))) {
   prepare_test_data()
 }
 
@@ -155,7 +155,7 @@ compare_tmb_and_json_outputs <- function(model_fit_path) {
 ## IO correctness ----
 test_that("`reshape_json_estimates()` output matches TMB for a deterministic run", {
   # Define the path to the deterministic model run fixture.
-  deterministic_path <- test_path(
+  deterministic_path <- testthat::test_path(
     "fixtures",
     "deterministic_age_length_comp.RDS"
   )
@@ -168,7 +168,7 @@ test_that("`reshape_json_estimates()` output matches TMB for an estimation run",
   # Load the test data from an RDS file containing model fits.
   # List all RDS files in the fixtures directory that match the pattern "fit_*.RDS"
   fit_files <- list.files(
-    path = test_path("fixtures"),
+    path = testthat::test_path("fixtures"),
     pattern = "^fit.*\\.RDS$",
     full.names = TRUE
   )
