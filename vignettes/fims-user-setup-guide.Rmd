@@ -37,37 +37,37 @@ knitr::opts_chunk$set(echo = TRUE)
 extract_remote_markdown <- function(url, header_pattern) {
   lines <- try(readLines(url, warn = FALSE), silent = TRUE)
   tmp <- tempfile(fileext = ".md")
-  
+
   if (inherits(lines, "try-error")) {
     writeLines("_Documentation temporarily unreachable._", tmp)
     return(tmp)
   }
-  
+
   # Find the starting line (e.g., the line containing "## WSL2")
   start_idx <- grep(header_pattern, lines, ignore.case = TRUE)
-  
+
   if (length(start_idx) > 0) {
     # Determine the level of the header found (count the # symbols)
     header_line <- lines[start_idx]
     header_level <- nchar(gsub("(^#+).*", "\\1", header_line))
-    
+
     # Find headers that are at the SAME level or HIGHER (fewer or equal #)
     # We want to ignore ### if we are looking for a ## section
     stop_pattern <- paste0("^#{1,", header_level, "} ")
     all_potential_stops <- grep(stop_pattern, lines)
-    
+
     # The end index is the next header that isn't the current one
     end_idx <- all_potential_stops[all_potential_stops > start_idx][1]
-    
+
     if (is.na(end_idx)) end_idx <- length(lines) else end_idx <- end_idx - 1
-    
+
     # Extract and add blank lines for proper RMarkdown list rendering
-    content <- c("", lines[(start_idx + 1):end_idx], "") 
+    content <- c("", lines[(start_idx + 1):end_idx], "")
     writeLines(content, tmp)
   } else {
     writeLines("_Section not found in remote documentation._", tmp)
   }
-  
+
   return(tmp)
 }
 ```
@@ -92,8 +92,8 @@ common_script <- "bash <(curl -sL https://raw.githubusercontent.com/NOAA-FIMS/FI
 # The R script to verify FIMS is ready to be used
 fims_demo_rscript <- "
 knitr::purl(
-  input = 'https://raw.githubusercontent.com/NOAA-FIMS/FIMS/refs/heads/main/vignettes/fims-demo.Rmd', 
-  output = 'fims_demo.R', 
+  input = 'https://raw.githubusercontent.com/NOAA-FIMS/FIMS/refs/heads/main/vignettes/fims-demo.Rmd',
+  output = 'fims_demo.R',
   documentation = 0
 )
 
