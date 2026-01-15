@@ -10,7 +10,7 @@
 # get_model_output ----
 ## Setup ----
 # Load or prepare any necessary data for testing
-if (!file.exists(test_path("fixtures", "fit_age_length_comp.RDS"))) {
+if (!file.exists(testthat::test_path("fixtures", "fit_age_length_comp.RDS"))) {
   prepare_test_data()
 }
 
@@ -20,7 +20,7 @@ test_that("`get_model_output()` works with correct inputs", {
   # List all RDS files in the fixtures directory that match the pattern "fit*_.RDS"
   # or "deterministic*.RDS"
   fit_files <- list.files(
-    path = test_path("fixtures"),
+    path = testthat::test_path("fixtures"),
     pattern = "^(fit.*|deterministic.*)\\.RDS$",
     full.names = TRUE
   )

@@ -21,7 +21,7 @@ prepare_test_data <- function() {
   # The integration_test_data_components.RData is generated after running the
   # script R/data1.R.
   # Load required integration test data components
-  load(test_path("fixtures", "integration_test_data_components.RData"))
+  load(testthat::test_path("fixtures", "integration_test_data_components.RData"))
 
   # Generate dataset with only age composition data
   data_age_comp_raw <- rbind(
@@ -112,7 +112,7 @@ prepare_test_data <- function() {
   # composition, only length composition data, or data with missing values.
 
   # Load necessary data for the integration test
-  load(test_path("fixtures", "integration_test_data.RData"))
+  load(testthat::test_path("fixtures", "integration_test_data.RData"))
 
   # Set the iteration ID to 1 for accessing specific input/output list
   iter_id <- 1
@@ -256,7 +256,7 @@ prepare_test_data <- function() {
 
   ## Estimation run with age comp only using wrappers ----
   # Load test data for age composition from an RDS file
-  data_age_comp <- readRDS(test_path("fixtures", "data_age_comp.RDS"))
+  data_age_comp <- readRDS(testthat::test_path("fixtures", "data_age_comp.RDS"))
 
   # Run FIMS model
   fit_agecomp <- modified_parameters |>
@@ -277,7 +277,7 @@ prepare_test_data <- function() {
   )
 
   # Load a second dataset that contains missing age composition data
-  data_age_comp_na <- readRDS(test_path("fixtures", "data_age_comp_na.RDS"))
+  data_age_comp_na <- readRDS(testthat::test_path("fixtures", "data_age_comp_na.RDS"))
   # Fit the FIMS model using the second dataset (with missing values)
   fit_agecomp_na <- modified_parameters |>
     # remove rows that have module_type == LengthComp
@@ -298,7 +298,7 @@ prepare_test_data <- function() {
 
   ## Estimation run with length comp only using wrappers ----
   # Load test data for length composition from an RDS file
-  data_length_comp <- readRDS(test_path("fixtures", "data_length_comp.RDS"))
+  data_length_comp <- readRDS(testthat::test_path("fixtures", "data_length_comp.RDS"))
 
   # Run FIMS model
   fit_lengthcomp <- modified_parameters |>
@@ -319,7 +319,7 @@ prepare_test_data <- function() {
   )
 
   # Load a second dataset that contains missing length composition data
-  data_length_comp_na <- readRDS(test_path("fixtures", "data_length_comp_na.RDS"))
+  data_length_comp_na <- readRDS(testthat::test_path("fixtures", "data_length_comp_na.RDS"))
   # Fit the FIMS model using the second dataset (with missing values)
   fit_lengthcomp_na <- modified_parameters |>
     # remove rows that have module_type == LengthComp
@@ -340,7 +340,7 @@ prepare_test_data <- function() {
 
   ## Estimation run with age and length comp with NAs ----
   # Load test data with both age and length composition data, which contains missing values
-  data_age_length_comp_na <- readRDS(test_path("fixtures", "data_age_length_comp_na.RDS"))
+  data_age_length_comp_na <- readRDS(testthat::test_path("fixtures", "data_age_length_comp_na.RDS"))
   # Define fleet1 and survey1 specifications
 
   # Run FIMS model with the following steps:
