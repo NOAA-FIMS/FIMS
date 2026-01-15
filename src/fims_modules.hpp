@@ -336,6 +336,23 @@ RCPP_MODULE(fims) {
       .method("get_id", &LogisticSelectivityInterface::get_id)
       .method("evaluate", &LogisticSelectivityInterface::evaluate);
 
+  Rcpp::class_<DescendingLogisticSelectivityInterface>("DescendingLogisticSelectivity")
+      .constructor()
+      .field("inflection_point_desc",
+             &DescendingLogisticSelectivityInterface::inflection_point_desc,
+             "50 percent quantile of the value of the quantity of interest (x) "
+             "on the descending limb of the descending logistic curve; e.g. age at "
+             "which 50 percent of the fish are selected.")
+      .field("slope_desc", &DescendingLogisticSelectivityInterface::slope_desc,
+             "Scalar multiplier of difference between quantity of interest  "
+             "value (x) and inflection_point on the descending limb of the "
+             "descending  logistic  curve.")
+      .method("get_id", &DescendingLogisticSelectivityInterface::get_id,
+             "Returns a unique ID for the selectivity class.")
+      .method("evaluate", &DescendingLogisticSelectivityInterface::evaluate,
+             "Evaluates the descending logistic selectivity given input value "
+             "(e.g., age or size in selectivity).");
+
   Rcpp::class_<DoubleLogisticSelectivityInterface>("DoubleLogisticSelectivity")
       .constructor()
       .field("inflection_point_asc",

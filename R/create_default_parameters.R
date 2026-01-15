@@ -329,6 +329,31 @@ create_default_DoubleLogistic <- function(module_name = NA_character_) {
     )
 }
 
+#' Create default descending logistic parameters
+#'
+#' @description
+#' This function sets up default parameters for a descending logistic function.
+#' There two specified parameters for the
+#' descending inflection points and slopes.
+#' @return
+#' A tibble containing the default descending logistic parameters,
+#' inflection_point, slope
+#' values and their estimation status.
+#' @noRd
+create_default_DescendingLogistic <- function(module_name = NA_character_) {
+  default <- create_default_parameters_template(n_parameters = 2) |>
+    dplyr::mutate(
+      module_name = !!module_name,
+      module_type = "DescendingLogistic",
+      label = c("inflection_point_desc", "slope_desc"),
+      value = c(6, 1),
+      estimation_type = "fixed_effects"
+    )
+}
+
+
+
+
 #' Create default selectivity parameters
 #'
 #' @description
@@ -342,7 +367,7 @@ create_default_DoubleLogistic <- function(module_name = NA_character_) {
 #' of selectivity.
 #' @noRd
 create_default_selectivity <- function(
-  form = c("Logistic", "DoubleLogistic")
+  form = c("Logistic", "DoubleLogistic", "DescendingLogistic")
 ) {
   # Input checks
   form <- rlang::arg_match(form)
@@ -351,7 +376,8 @@ create_default_selectivity <- function(
   # `switch`
   default <- switch(form,
     "Logistic" = create_default_Logistic(),
-    "DoubleLogistic" = create_default_DoubleLogistic()
+    "DoubleLogistic" = create_default_DoubleLogistic(),
+    "DescendingLogistic" = create_default_DescendingLogistic()
   ) |>
     dplyr::mutate(
       module_name = "Selectivity"

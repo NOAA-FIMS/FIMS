@@ -142,6 +142,10 @@ DoubleLogistic
 DoubleLogisticSel
 DoubleLogisticSelectivity
 DoubleLogisticSelectivityInterface
+DescendingLogistic
+DescendingLogisticSel
+DescendingLogisticSelectivity
+DescendingLogisticSelectivityInterface
 DoxygenLayout
 DragonFly
 ELT
