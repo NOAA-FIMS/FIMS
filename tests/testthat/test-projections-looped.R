@@ -598,7 +598,7 @@ high_catch_projection_outputs <- run_FIMS_projection_scenario(om_input,
 sdr_fixed_5_year_project_catch_high <- high_catch_projection_outputs[[2]]
 sdr_report_5_year_project_catch_high <- high_catch_projection_outputs[[1]]
 ## Run FIMS with 10 projection years and an SSB ratio target ##
-n_projection_years <- 30
+n_projection_years <- 10
 projected_landings <- rep(-999, n_projection_years)
 projected_F <- rep(om_output[["f"]][om_input$nyr], n_projection_years)
 estim_projected_F <- rep("constant", n_projection_years)
@@ -729,9 +729,9 @@ test_that("projections with spawning biomass ratio target achieve same estimates
 
   #' @description Test that the maximum parameter estimate difference between
   #' a low catch projection run and no projection run is less than 10%.
-  expect_lt(ssb_ratio_estim_error, 0.01)
+  expect_lt(ssb_ratio_estim_error, 0.1)
 
   #' @description Test that the maximum parameter standard deviation estimate
   #' difference between a low catch projection run and no projection run is less than 10%.
-  expect_lt(ssb_ratio_target_error, 0.01)
+  expect_lt(ssb_ratio_target_error, 0.1)
 })
