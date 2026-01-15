@@ -10,11 +10,11 @@
 # Deterministic test ----
 ## Setup ----
 # Load necessary data for the integration test
-if (!file.exists(test_path("fixtures", "fit_age_length_comp.RDS"))) {
+if (!file.exists(testthat::test_path("fixtures", "fit_age_length_comp.RDS"))) {
   prepare_test_data()
 }
 
-load(test_path("fixtures", "integration_test_data.RData"))
+load(testthat::test_path("fixtures", "integration_test_data.RData"))
 
 # Set the iteration ID to 1 for accessing specific input/output list
 iter_id <- 1

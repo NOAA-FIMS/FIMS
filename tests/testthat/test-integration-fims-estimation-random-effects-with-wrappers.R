@@ -1,4 +1,4 @@
-load(test_path("fixtures", "integration_test_data.RData"))
+load(testthat::test_path("fixtures", "integration_test_data.RData"))
 
 # Set the iteration ID to 1 for accessing specific input/output list
 iter_id <- 1

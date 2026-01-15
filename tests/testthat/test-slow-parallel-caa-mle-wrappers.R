@@ -25,7 +25,7 @@ testthat::skip_if_not(
 )
 
 # Load the model comparison operating model data from the fixtures folder
-load(test_path("fixtures", "integration_test_data.RData"))
+load(testthat::test_path("fixtures", "integration_test_data.RData"))
 
 # Simulation configuration
 # We run a subset of simulations to verify that the FIMS estimation wrapper
