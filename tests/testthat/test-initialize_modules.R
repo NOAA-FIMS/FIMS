@@ -179,10 +179,10 @@ test_that("`initialize_distribution()` works with correct inputs", {
   # Setup for testing initialize_distribution
   module_input <- default_parameters |>
     dplyr::filter(fleet_name == "fleet1" & distribution_type == "Data")
-  
+
   distribution_name <- "dlnorm"
   linked_ids <- c(data_link = 1, fleet_link = 2)
-  
+
   #' @description Test that `initialize_distribution()` returns an S4 object with data distribution.
   result <- initialize_distribution(
     module_input = module_input,
@@ -198,7 +198,7 @@ test_that("`initialize_distribution()` works with correct inputs", {
 test_that("`initialize_distribution()` returns correct error messages", {
   module_input <- default_parameters |>
     dplyr::filter(fleet_name == "fleet1" & distribution_type == "Data")
-  
+
   #' @description Test that `initialize_distribution()` handles NULL distribution_name correctly.
   result <- initialize_distribution(
     module_input = module_input,
@@ -208,7 +208,7 @@ test_that("`initialize_distribution()` returns correct error messages", {
   )
   expect_null(result)
   clear()
-  
+
   #' @description Test that `initialize_distribution()` handles non-list module_input correctly.
   expect_error(
     initialize_distribution(
@@ -220,7 +220,7 @@ test_that("`initialize_distribution()` returns correct error messages", {
     "`module_input` must be a list."
   )
   clear()
-  
+
   #' @description Test that `initialize_distribution()` handles missing linked_ids correctly.
   expect_error(
     initialize_distribution(
@@ -292,13 +292,13 @@ test_that("`initialize_population()` works with correct inputs", {
     parameters = default_parameters,
     data = data
   )
-  
+
   linked_ids <- c(
     recruitment = recruitment$get_id(),
     growth = growth$get_id(),
     maturity = maturity$get_id()
   )
-  
+
   #' @description Test that `initialize_population()` returns an S4 object.
   result <- initialize_population(
     parameters = default_parameters,
@@ -349,11 +349,11 @@ test_that("`initialize_fleet()` works with correct inputs", {
     data = data,
     fleet_name = "fleet1"
   )
-  
+
   linked_ids <- c(
     selectivity = selectivity$get_id()
   )
-  
+
   #' @description Test that `initialize_fleet()` returns an S4 object.
   result <- initialize_fleet(
     parameters = default_parameters,
