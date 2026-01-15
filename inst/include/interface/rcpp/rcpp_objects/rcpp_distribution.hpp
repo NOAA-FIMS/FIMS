@@ -102,9 +102,27 @@ class DistributionsInterfaceBase : public FIMSRcppInterfaceBase {
   }
 
   /**
-   * @brief Set mean expected value for distribution.
+   * @brief Set the expected mean value for the distribution.
    *
-   * @param input_value Value to use for the distribution mean.
+   * This virtual function provides an interface for setting a fixed mean value
+   * for distribution objects. When overridden in derived classes, this method
+   * typically stores the provided mean value as a fixed effect parameter and
+   * marks the distribution to use the mean in its calculations.
+   *
+   * The base class implementation returns false to indicate the operation is
+   * not supported. Derived classes that support mean specification should
+   * override this method to implement the actual functionality.
+   *
+   * @param input_value The numeric value to set as the distribution's expected
+   * mean. This value will be treated as a fixed effect parameter (not
+   * estimated) in derived class implementations.
+   *
+   * @return bool Returns true if the mean was successfully set, false
+   * otherwise. The base class implementation always returns false to indicate
+   * the operation is not supported by default.
+   *
+   * @see DnormDistributionsInterface::set_distribution_mean for an example
+   * implementation that sets the mean as a fixed effect parameter.
    */
   virtual bool set_distribution_mean(double input_value) { return false; }
 
