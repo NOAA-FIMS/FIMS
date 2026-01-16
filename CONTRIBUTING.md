@@ -12,6 +12,17 @@ Please use [GitHub Issues](https://github.com/NOAA-FIMS/FIMS/issues/new?template
 
 ## Contributing code
 
+### Adding a new module
+
+If you are adding a new C++ module to FIMS (e.g., a new selectivity function, recruitment model, or other population dynamics component), please see the comprehensive [Guide: Adding a New C++ Module to FIMS](vignettes/adding-new-module.Rmd) vignette. This guide provides:
+
+- Detailed explanation of the FIMS code structure
+- Step-by-step instructions for creating new modules
+- Complete list of files that need to be modified
+- Naming conventions and best practices
+- Links to example code
+- Troubleshooting tips
+
 ### Feature branches
 
 Once an issue is approved and prioritized for work, a feature branch off of the dev branch, e.g., `dev-discards`, can be created to address the issue. Feature branches can be made within the repository or on a fork of the repository. When making a fork, be sure to fork all branches not just the default branch because feature branches should only be created off of main if they are a hotfix for the current release, e.g., `fix-pointer`. There are no hard and fast rules for branch names but we tend to use dashes to separate words. Often while working on this new feature branch, there will be updates to the dev branch. These updates must be brought in using `git rebase`. Branches that have merge commits will not be accepted into the code base. Please see the [GitHub documentation for rebasing](https://docs.github.com/en/get-started/using-git/about-git-rebase) for more information.
