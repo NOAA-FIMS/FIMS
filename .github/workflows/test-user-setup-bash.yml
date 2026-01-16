@@ -3,6 +3,9 @@ name: Test FIMS User Setup Bash Script
 on:
   pull_request:
     branches: [ main ]
+  # Runs the bash script from the main branch every day at midnight UTC
+  schedule:
+    - cron: '0 0 * * *'  
   workflow_dispatch: 
 
 jobs:
@@ -28,7 +31,14 @@ jobs:
       - name: Run FIMS User Setup Script
         shell: bash
         run: |
-          time bash <(curl -sL https://raw.githubusercontent.com/NOAA-FIMS/FIMS/main/setup_fims.sh)
+          # Change the access permissions of the file and ensure the script is executable
+          # chmod: short for Change Mode
+          # +: add a permission
+          # x: stands for execute
+          chmod +x ./setup_fims.sh
+          # If we are in a PR, use the local script from the feature branch.
+          # Otherwise (scheduled), use the main branch script.
+          time ./setup_fims.sh
 
       - name: Verify FIMS Installation
         shell: Rscript {0}
