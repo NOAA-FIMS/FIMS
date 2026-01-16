@@ -36,7 +36,27 @@ class DistributionsInterfaceBase : public FIMSRcppInterfaceBase {
    */
   SharedString input_type_m;
   /**
-   * @brief Shared string indicating whether to use the mean.
+   * @brief Control flag indicating whether to use the expected mean in
+   * distribution calculations.
+   *
+   * This shared string member serves as a boolean flag (stored as "yes" or "no")
+   * that determines whether the distribution should use the `expected_mean`
+   * vector or other expected values (e.g., from data or random effects) when
+   * computing the expected value in likelihood calculations.
+   *
+   * When set to "no" (default), the distribution uses expected values based on
+   * the `input_type` setting (data expected values for "data", random effects
+   * expected values for "random_effects", or standard expected values
+   * otherwise).
+   *
+   * When set to "yes" (typically by calling `set_distribution_mean()`), the
+   * distribution overrides the default expected value source and uses the
+   * `expected_mean` vector instead. This is useful for setting a fixed mean
+   * value for the distribution that doesn't depend on other model components.
+   *
+   * @see set_distribution_mean() for the method that sets this flag to "yes"
+   * @see DensityComponentsBase::get_expected() in density_components_base.hpp
+   * for the implementation that checks this flag
    */
   SharedString use_mean_m = fims::to_string("no");
   /**
