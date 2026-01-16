@@ -331,7 +331,7 @@ class PopulationInterface : public PopulationInterfaceBase {
       population->log_f_multiplier.resize(this->log_f_multiplier.size());
     } else {
       FIMS_WARNING_LOG(
-          "The log_f_multiplier vector is not of size nyears. Filling with "
+          "The log_f_multiplier vector is not of size n_years. Filling with "
           "zeros.");
       this->log_f_multiplier.resize((this->n_years.get()));
       for (size_t i = 0; i < log_f_multiplier.size(); i++) {
@@ -346,7 +346,7 @@ class PopulationInterface : public PopulationInterfaceBase {
           this->spawning_biomass_ratio.size());
     } else {
       FIMS_WARNING_LOG(
-          "Setting spawning_biomass_ratio vector to size nyears + 1.");
+          "Setting spawning_biomass_ratio vector to size n_years + 1.");
       this->spawning_biomass_ratio.resize((this->n_years.get() + 1));
       population->spawning_biomass_ratio.resize(
           this->spawning_biomass_ratio.size());
