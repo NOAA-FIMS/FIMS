@@ -36,7 +36,27 @@ class DistributionsInterfaceBase : public FIMSRcppInterfaceBase {
    */
   SharedString input_type_m;
   /**
-   * @brief Shared string indicating whether to use the mean.
+* @brief Control flag indicating whether to use the expected mean in the
+   * distribution calculations.
+   *
+   * This shared string member serves as a boolean flag (i.e., "yes" or "no")
+   * that determines whether the distribution should use the `expected_mean`
+   * vector or other expected values (e.g., from data or random effects) when
+   * computing the expected value in the likelihood calculations.
+   *
+   * When set to "no" (default), the distribution uses expected values based on
+   * the `input_type` setting (data expected values for "data", random effects
+   * expected values for "random_effects", or standard expected values
+   * otherwise).
+   *
+   * When set to "yes" (typically by calling `set_distribution_mean()`), the
+   * distribution overrides the default expected value source and uses the
+   * `expected_mean` vector instead. This is useful for setting a fixed mean
+   * value for the distribution that doesn't depend on other model components.
+   *
+   * @see set_distribution_mean() for the method that sets this flag to "yes".
+   * @see DensityComponentsBase::get_expected() in density_components_base.hpp
+   * for the implementation that checks this flag.
    */
   SharedString use_mean_m = fims::to_string("no");
   /**
@@ -102,9 +122,27 @@ class DistributionsInterfaceBase : public FIMSRcppInterfaceBase {
   }
 
   /**
-   * @brief Set mean expected value for distribution.
+   * @brief Set the expected mean value for the distribution.
    *
-   * @param input_value Value to use for the distribution mean.
+   * This virtual function provides an interface for setting a fixed mean value
+   * for distribution objects. When overridden in derived classes, this method
+   * typically stores the provided mean value as a fixed effect parameter and
+   * marks the distribution to use the mean in its calculations.
+   *
+   * The base class implementation returns false to indicate the operation is
+   * not supported. Derived classes that support mean specification should
+   * override this method to implement the actual functionality.
+   *
+   * @param input_value The numeric value to set as the distribution's expected
+   * mean. This value will be treated as a fixed effect parameter (not
+   * estimated) in derived class implementations.
+   *
+   * @return bool Returns true if the mean was successfully set, false
+   * otherwise. The base class implementation always returns false to indicate
+   * the operation is not supported by default.
+   *
+   * @see DnormDistributionsInterface::set_distribution_mean for an example
+   * implementation that sets the mean as a fixed effect parameter.
    */
   virtual bool set_distribution_mean(double input_value) { return false; }
 
@@ -204,8 +242,7 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
   }
 
   /**
-   * @brief Set expected mean for distribution.
-   * @param input_value Distribution mean.
+   * @copydoc DistributionsInterfaceBase::set_distribution_mean
    */
   virtual bool set_distribution_mean(double input_value) {
     this->expected_mean[0].initial_value_m = input_value;
@@ -215,12 +252,7 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
   }
 
   /**
-   * @brief Sets pointers for data observations, random effects, or priors.
-   *
-   * @param input_type String that sets whether the distribution type is for
-   * priors, random effects, or data.
-   * @param ids Vector of unique ids for each linked parameter(s), derived
-   * value(s), or observed data vector.
+   * @copydoc DistributionsInterfaceBase::set_distribution_links
    */
   virtual bool set_distribution_links(std::string input_type,
                                       Rcpp::IntegerVector ids) {
