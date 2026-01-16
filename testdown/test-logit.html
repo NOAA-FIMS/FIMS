@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2026-01-15" />
+<meta name="date" content="2026-01-16" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -183,7 +183,7 @@
 <td align="left">expect_equal( object = logit(0, 1, 0.5), expected = 0 )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-logit.R#17</td>
-<td align="left">2026-01-15 22:59:19.535681</td>
+<td align="left">2026-01-16 23:34:23.335677</td>
 </tr>
 <tr class="even">
 <td align="left"><code>logit()</code> works with correct inputs</td>
@@ -191,7 +191,7 @@
 <td align="left">expect_equal( object = logit(0.2, 1.0, 0.3), expected = -1.94591015 )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-logit.R#22</td>
-<td align="left">2026-01-15 22:59:19.549517</td>
+<td align="left">2026-01-16 23:34:23.348869</td>
 </tr>
 <tr class="odd">
 <td align="left"><code>logit()</code> works with correct inputs</td>
@@ -199,7 +199,7 @@
 <td align="left">expect_equal( object = inv_logit(0.0, 1.0, logit(0.0, 1.0, 0.5)), expected = 0.5 )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-logit.R#27</td>
-<td align="left">2026-01-15 22:59:19.562189</td>
+<td align="left">2026-01-16 23:34:23.361304</td>
 </tr>
 <tr class="even">
 <td align="left"><code>logit()</code> returns correct outputs for edge cases</td>
@@ -207,7 +207,7 @@
 <td align="left">expect_equal( object = logit(0, 1L, 0.5), expected = 0 )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-logit.R#36</td>
-<td align="left">2026-01-15 22:59:19.577522</td>
+<td align="left">2026-01-16 23:34:23.376776</td>
 </tr>
 <tr class="odd">
 <td align="left"><code>logit()</code> returns correct outputs for edge cases</td>
@@ -215,7 +215,7 @@
 <td align="left">expect_equal( object = logit(-Inf, Inf, 1), expected = NaN )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-logit.R#41</td>
-<td align="left">2026-01-15 22:59:19.590092</td>
+<td align="left">2026-01-16 23:34:23.38933</td>
 </tr>
 <tr class="even">
 <td align="left"><code>logit()</code> returns correct error messages</td>
@@ -223,7 +223,7 @@
 <td align="left">expect_error( object = logit(0, 1, c(0.5, 0.5)), regexp = “Expecting a single value” )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-logit.R#50</td>
-<td align="left">2026-01-15 22:59:19.609504</td>
+<td align="left">2026-01-16 23:34:23.409624</td>
 </tr>
 <tr class="odd">
 <td align="left"><code>logit()</code> returns correct error messages</td>
@@ -231,7 +231,7 @@
 <td align="left">expect_error( object = logit(-2:-1, 1, 0.5), regexp = “Expecting a single value” )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-logit.R#55</td>
-<td align="left">2026-01-15 22:59:19.623945</td>
+<td align="left">2026-01-16 23:34:23.424332</td>
 </tr>
 <tr class="even">
 <td align="left"><code>logit()</code> returns correct error messages</td>
@@ -239,7 +239,7 @@
 <td align="left">expect_error( object = logit(0, 1:2, 0.5), regexp = “Expecting a single value” )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-logit.R#60</td>
-<td align="left">2026-01-15 22:59:19.63836</td>
+<td align="left">2026-01-16 23:34:23.439118</td>
 </tr>
 <tr class="odd">
 <td align="left"><code>inv_logit()</code> works with correct inputs</td>
@@ -247,7 +247,7 @@
 <td align="left">expect_equal( object = inv_logit(0, 1, 0.0), expected = 0.5 )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-logit.R#73</td>
-<td align="left">2026-01-15 22:59:19.653771</td>
+<td align="left">2026-01-16 23:34:23.454806</td>
 </tr>
 <tr class="even">
 <td align="left"><code>inv_logit()</code> works with correct inputs</td>
@@ -255,7 +255,7 @@
 <td align="left">expect_equal( object = inv_logit(0.2, 1.0, -1.94591015), expected = 0.3 )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-logit.R#78</td>
-<td align="left">2026-01-15 22:59:19.667009</td>
+<td align="left">2026-01-16 23:34:23.468432</td>
 </tr>
 <tr class="odd">
 <td align="left"><code>inv_logit()</code> returns correct outputs for edge cases</td>
@@ -263,7 +263,7 @@
 <td align="left">expect_equal( object = inv_logit(0, 1L, 0.0), expected = 0.5 )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-logit.R#87</td>
-<td align="left">2026-01-15 22:59:19.682796</td>
+<td align="left">2026-01-16 23:34:23.484131</td>
 </tr>
 <tr class="even">
 <td align="left"><code>inv_logit()</code> returns correct outputs for edge cases</td>
@@ -271,7 +271,7 @@
 <td align="left">expect_equal( object = inv_logit(-Inf, Inf, 1), expected = NaN )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-logit.R#92</td>
-<td align="left">2026-01-15 22:59:19.6957</td>
+<td align="left">2026-01-16 23:34:23.496676</td>
 </tr>
 <tr class="odd">
 <td align="left"><code>inv_logit()</code> returns correct error messages</td>
@@ -279,7 +279,7 @@
 <td align="left">expect_error( object = inv_logit(0, 1, c(0.5, 0.5)), regexp = “Expecting a single value” )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-logit.R#101</td>
-<td align="left">2026-01-15 22:59:19.713526</td>
+<td align="left">2026-01-16 23:34:23.514257</td>
 </tr>
 <tr class="even">
 <td align="left"><code>inv_logit()</code> returns correct error messages</td>
@@ -287,7 +287,7 @@
 <td align="left">expect_error( object = inv_logit(-2:-1, 1, 0.5), regexp = “Expecting a single value” )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-logit.R#106</td>
-<td align="left">2026-01-15 22:59:19.728577</td>
+<td align="left">2026-01-16 23:34:23.528646</td>
 </tr>
 <tr class="odd">
 <td align="left"><code>inv_logit()</code> returns correct error messages</td>
@@ -295,7 +295,7 @@
 <td align="left">expect_error( object = inv_logit(0, 1:2, 0.5), regexp = “Expecting a single value” )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-logit.R#111</td>
-<td align="left">2026-01-15 22:59:19.743399</td>
+<td align="left">2026-01-16 23:34:23.543013</td>
 </tr>
 </tbody>
 </table>

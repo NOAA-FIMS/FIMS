@@ -2,8 +2,7 @@
 
 ## Data
 
-FIMS comes with a selection of built-in datasets that are used in
-examples to illustrate various visualization challenges.
+Example dataset used in FIMS demonstrations and examples.
 
 - [`data1`](https://NOAA-FIMS.github.io/FIMS/reference/data1.md) : FIMS
   input data frame
@@ -88,50 +87,22 @@ Primary functions used when developing FIMS package.
 
 - [`remove_test_data()`](https://NOAA-FIMS.github.io/FIMS/reference/remove_test_data.md)
   : Remove test data
-
 - [`run_gtest()`](https://NOAA-FIMS.github.io/FIMS/reference/run_gtest.md)
   : Run the google test suite
-
 - [`run_r_integration_tests()`](https://NOAA-FIMS.github.io/FIMS/reference/run_r_integration_tests.md)
   : Run R integration tests
-
 - [`run_r_unit_tests()`](https://NOAA-FIMS.github.io/FIMS/reference/run_r_unit_tests.md)
   : Run R unit tests
-
 - [`setup_and_run_gtest()`](https://NOAA-FIMS.github.io/FIMS/reference/setup_and_run_gtest.md)
   : Setup and run the google test suite
-
 - [`setup_gtest()`](https://NOAA-FIMS.github.io/FIMS/reference/setup_gtest.md)
   : Set up your local environment to run the google tests locally
-
 - [`use_gtest_template()`](https://NOAA-FIMS.github.io/FIMS/reference/use_gtest_template.md)
   : Create tests/gtest/test\_\*.cpp test file and register it in
   CMakeLists.txt
-
 - [`use_testthat_template()`](https://NOAA-FIMS.github.io/FIMS/reference/use_testthat_template.md)
   : Create tests/testthat/test-\*.R test file
-
-- [`Ops(`*`<Rcpp_Parameter>`*`,`*`<Rcpp_Parameter>`*`)`](https://NOAA-FIMS.github.io/FIMS/reference/Rcpp_Math.md)
-  [`Ops(`*`<Rcpp_Parameter>`*`,`*`<numeric>`*`)`](https://NOAA-FIMS.github.io/FIMS/reference/Rcpp_Math.md)
-  [`Ops(`*`<numeric>`*`,`*`<Rcpp_Parameter>`*`)`](https://NOAA-FIMS.github.io/FIMS/reference/Rcpp_Math.md)
-  [`Ops(`*`<Rcpp_ParameterVector>`*`,`*`<Rcpp_ParameterVector>`*`)`](https://NOAA-FIMS.github.io/FIMS/reference/Rcpp_Math.md)
-  [`Ops(`*`<Rcpp_ParameterVector>`*`,`*`<numeric>`*`)`](https://NOAA-FIMS.github.io/FIMS/reference/Rcpp_Math.md)
-  [`Ops(`*`<numeric>`*`,`*`<Rcpp_ParameterVector>`*`)`](https://NOAA-FIMS.github.io/FIMS/reference/Rcpp_Math.md)
-  [`Math(`*`<Rcpp_ParameterVector>`*`)`](https://NOAA-FIMS.github.io/FIMS/reference/Rcpp_Math.md)
-  : Sets methods for operators under the S4 Generic Group, Ops
-
-- [`` `[<-`( ``*`<Rcpp_ParameterVector>`*`,`*`<ANY>`*`,`*`<ANY>`*`,`*`<ANY>`*`)`](https://NOAA-FIMS.github.io/FIMS/reference/Rcpp_ParameterVector.md)
-  [`` `[`( ``*`<Rcpp_ParameterVector>`*`,`*`<numeric>`*`,`*`<ANY>`*`,`*`<ANY>`*`)`](https://NOAA-FIMS.github.io/FIMS/reference/Rcpp_ParameterVector.md)
-  [`length(`*`<Rcpp_ParameterVector>`*`)`](https://NOAA-FIMS.github.io/FIMS/reference/Rcpp_ParameterVector.md)
-  [`sum(`*`<Rcpp_ParameterVector>`*`)`](https://NOAA-FIMS.github.io/FIMS/reference/Rcpp_ParameterVector.md)
-  [`dim(`*`<Rcpp_ParameterVector>`*`)`](https://NOAA-FIMS.github.io/FIMS/reference/Rcpp_ParameterVector.md)
-  [`Summary(`*`<Rcpp_ParameterVector>`*`)`](https://NOAA-FIMS.github.io/FIMS/reference/Rcpp_ParameterVector.md)
-  :
-
-  Setter for `Rcpp_ParameterVector`
-
 - [`reshape_json_estimates()`](https://NOAA-FIMS.github.io/FIMS/reference/reshape_json_estimates.md)
   : Reshape JSON estimates
-
 - [`reshape_tmb_estimates()`](https://NOAA-FIMS.github.io/FIMS/reference/reshape_tmb_estimates.md)
   : Reshape TMB estimates

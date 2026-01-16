@@ -267,7 +267,7 @@ that depends on platforms outside of base C++ (e.g.,
 
 ``` cpp
 namespace fims{
-  
+
 }
 ```
 
