@@ -59,18 +59,7 @@ struct NormalLPDF : public DensityComponentBase<Type> {
         n_x = n_expected;
       }
     }
-    // if(n_x != n_expected){
-    //   throw std::invalid_argument(
-    //       "LognormalLPDF::Vector index out of bounds. The size of observed "
-    //       "data does not equal the size of expected values. The observed data
-    //       " "vector is of size " +
-    //         fims::to_string(n_x) + " and the expected vector is of size " +
-    //         fims::to_string(n_expected) + ". with input type " +
-    //         fims::to_string(this->input_type) + ". Final data value = " +
-    //         fims::to_string(this->get_observed(n_x - 1)) +
-    //         " and the final expected value = " +
-    //         fims::to_string(this->get_expected(n_expected - 1)));
-    // }
+
     if (this->log_sd.size() > 1 && n_x != this->log_sd.size()) {
       throw std::invalid_argument(
           "NormalLPDF::Vector index out of bounds. The size of observed data "
