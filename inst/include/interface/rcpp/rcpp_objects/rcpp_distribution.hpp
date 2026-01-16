@@ -55,7 +55,7 @@ class DistributionsInterfaceBase : public FIMSRcppInterfaceBase {
    * value for the distribution that doesn't depend on other model components.
    *
    * @see set_distribution_mean() for the method that sets this flag to "yes".
-   * @see DensityComponentsBase::get_expected() in density_components_base.hpp
+   * @see DensityComponentBase::get_expected() in density_components_base.hpp
    * for the implementation that checks this flag.
    */
   SharedString use_mean_m = fims::to_string("no");
