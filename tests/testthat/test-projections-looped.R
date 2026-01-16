@@ -489,7 +489,7 @@ run_FIMS_projection_scenario <- function(om_input,
     control = list(eval.max = 10000, iter.max = 10000, trace = 0)
   )
   FIMS::set_fixed(opt$par)
-  fims_finalized <- caa$get_output()
+  fims_finalized <- caa$get_output(do_sd_report = TRUE)
 
   # Call report using MLE parameter values, or
   # the initial values if optimization is skipped
