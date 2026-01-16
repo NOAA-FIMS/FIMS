@@ -435,11 +435,16 @@ class CatchAtAge : public FisheryModelBase<Type> {
   }
 
   /**
-   * This method is used to calculate spawning biomass ratio
-   * for a specified population and year
+   * @brief Calculate the spawning biomass ratio for a population and year.
    *
-   * @param population
-   * @param year the year of spawning biomass ratio to calculate
+   * This method computes the ratio of spawning biomass in a given year to the
+   * spawning biomass at year zero, which is typically unfished spawning biomass
+   * but there is nothing specifying it to be unfished, for the specified
+   * population. The result is stored in the population's spawning_biomass_ratio
+   * vector for each given year in the time series.
+   *
+   * @param population Shared pointer to the population object.
+   * @param year Index of the year for which to calculate the ratio.
    */
   void CalculateSpawningBiomassRatio(
       std::shared_ptr<fims_popdy::Population<Type>> &population, size_t year) {
