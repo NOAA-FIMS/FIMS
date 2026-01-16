@@ -36,7 +36,7 @@ class DistributionsInterfaceBase : public FIMSRcppInterfaceBase {
    */
   SharedString input_type_m;
   /**
-* @brief Control flag indicating whether to use the expected mean in the
+   * @brief Control flag indicating whether to use the expected mean in the
    * distribution calculations.
    *
    * This shared string member serves as a boolean flag (i.e., "yes" or "no")
