@@ -196,7 +196,7 @@ parameters_projection <- create_default_parameters(
       fleet_name = "fleet1",
       label = "log_Fmort",
       time = get_start_year(data_4_projections):
-        get_end_year(data_4_projections),
+      get_end_year(data_4_projections),
       value = log(c(
         0.009459165, 0.027288858, 0.045063639,
         0.061017825, 0.048600752, 0.087420554,
@@ -227,7 +227,7 @@ parameters_projection <- create_default_parameters(
     tibble::tibble(
       label = "log_devs",
       time = (get_start_year(data_4_projections) + 1):
-        get_end_year(data_4_projections),
+      get_end_year(data_4_projections),
       value = c(
         0.43787763, -0.13299042, -0.43251973, 0.64861200, 0.50640852,
         -0.06958319, 0.30246260, -0.08257384, 0.20740372, 0.15289604,
@@ -244,7 +244,7 @@ parameters_projection <- create_default_parameters(
     tibble::tibble(
       label = "log_devs",
       time = (get_end_year(data_4_projections) - years_of_projection + 1):
-        get_end_year(data_4_projections),
+      get_end_year(data_4_projections),
       estimation_type = rep("constant", years_of_projection)
     ),
     by = c("label", "time")
