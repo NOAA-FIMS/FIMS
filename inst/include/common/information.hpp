@@ -866,14 +866,14 @@ class Information {
   void SetNages(size_t n_ages) { this->n_ages = n_ages; }
 
   /**
-   * @brief Get the Nyears object
+   * @brief Get the n_years object
    *
    * @return size_t
    */
   size_t GetNyears() const { return n_years; }
 
   /**
-   * @brief Set the Nyears object
+   * @brief Set the n_years object
    *
    * @param n_years
    */

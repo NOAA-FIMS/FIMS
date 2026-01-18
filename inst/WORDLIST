@@ -625,7 +625,6 @@ enum
 env
 eq
 escapeQuotes
-estim
 et
 eval
 evans
@@ -845,8 +844,6 @@ nsurveys
 nullptr
 num
 nx
-Nyears
-nyears
 nyr
 oE
 objs
