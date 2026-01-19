@@ -59,14 +59,14 @@ IF(BUILD_DOC)
   set(DOXYGEN_FULL_SIDEBAR "NO")
   set(DOXYGEN_PROJECT_NUMBER ${VERSION})
   set(DOXYGEN_PROJECT_NAME "FIMS")
-  set(DOXYGEN_PROJECT_LOGO "FIMS_logo3.png")
+  set(DOXYGEN_PROJECT_LOGO "assets/FIMS_logo3.png")
   set(DOXYGEN_GENERATE_HTML "YES")
   set(DOXYGEN_HTML_DYNAMIC_SECTIONS "NO")
-  set(DOXYGEN_HTML_EXTRA_STYLESHEET "doxygen-awesome.css" "custom.css")
+  set(DOXYGEN_HTML_EXTRA_STYLESHEET "assets/doxygen-awesome.css" "assets/custom.css")
   set(DOXYGEN_HTML_COLORSTYLE "LIGHT")
   set(DOXYGEN_USE_MDFILE_AS_MAINPAGE "inst/include/common/MAIN.md")
-  set(DOXYGEN_HTML_HEADER "header.html")
-  set(DOXYGEN_LAYOUT_FILE "DoxygenLayout.xml")
+  set(DOXYGEN_HTML_HEADER "assets/header.html")
+  set(DOXYGEN_LAYOUT_FILE "assets/DoxygenLayout.xml")
   set(DOXYGEN_MARKDOWN_SUPPORT YES)
   set(DOXYGEN_AUTOLINK_SUPPORT YES)
 
@@ -102,7 +102,7 @@ EXECUTE_PROCESS(
 MESSAGE(STATUS "R_HOME is ${R_HOME}")
 
 EXECUTE_PROCESS(
-		COMMAND R "--slave" "--no-save" "-e" "remotes::install_local(upgrade = 'always')")
+		COMMAND R "--slave" "--no-save" "-e" "remotes::install_local(dependencies = FALSE)")
 EXECUTE_PROCESS(
 		COMMAND R "--slave" "--no-save" "-e" "FIMS:::setup_gtest()")
 
