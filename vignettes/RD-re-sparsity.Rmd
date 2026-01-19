@@ -201,7 +201,7 @@ The process approach resulted in a sparse Hessian while the deviations approach 
 
 **Table 1.** Results from speed test (in seconds) from running models 25 times. Note that absolute results are machine dependent but relative results will be consistent across operating systems and machine specifications.
 
-|Intercept|Model      |Average time (sec) | SD   | Min  | Max |
+|Intercept|Model      |Mean time (sec) | SD   | Min  | Max |
 |---------|-----------|-------------------|------|------|-----|
 |Y        |process    |1.381              |0.642 |0.957 |3.635|
 |N        |process    |1.561              |0.620 |1.163 |4.473|
