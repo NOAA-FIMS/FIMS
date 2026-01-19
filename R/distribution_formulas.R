@@ -139,13 +139,13 @@ check_distribution_validity <- function(args) {
     }
   }
 
-  # Check dimensions for data distributions: sd must be either length 1 (scalar) 
+  # Check dimensions for data distributions: sd must be either length 1 (scalar)
   # or match data length when data_type is landings or index
   if (!is.null(data_type) && !is.null(args[["module"]])) {
     module <- args[["module"]]
-    if(data_type == "landings" | data_type == "index"){
+    if (data_type == "landings" | data_type == "index") {
       n_obs <- module$n_years$get()
-      
+
       if (length(sd[["value"]]) > 1 && length(sd[["value"]]) != n_obs) {
         abort_bullets <- c(
           abort_bullets,

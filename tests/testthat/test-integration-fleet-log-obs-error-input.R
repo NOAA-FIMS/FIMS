@@ -40,61 +40,62 @@ default_parameters <- data_4_model |>
   create_default_parameters(data = data_4_model)
 
 test_that("`log_obs_error scalar` works with correct inputs", {
+  #' @description Test that `log_obs_error` works when it is a fixed scalar.
 
-      #' @description Test that `log_obs_error` works when it is a fixed scalar.
+  parameters_4_model <- default_parameters |>
+    tidyr::unnest(cols = data) |>
+    # remove all but one log_obs_sd initial values for Fleet1
+    dplyr::filter(
+      !(fleet_name == "fleet1" & label == "log_sd" & time > 1) |
+        is.na(fleet_name == "fleet1" & label == "log_sd" & time > 1)
+    )
 
-      parameters_4_model <- default_parameters |>
-        tidyr::unnest(cols = data) |>
-        # remove all but one log_obs_sd initial values for Fleet1
-        dplyr::filter(
-          !(fleet_name == "fleet1" & label == "log_sd" & time > 1) |
-          is.na(fleet_name == "fleet1" & label == "log_sd" & time > 1)
-        )
+  test_fit <- parameters_4_model |>
+    initialize_fims(data = data_4_model) |>
+    fit_fims(optimize = FALSE)
 
-      test_fit <- parameters_4_model |>
-        initialize_fims(data = data_4_model) |>
-        fit_fims(optimize = FALSE)
+  json_estimates <- reshape_json_estimates(test_fit@model_output)
 
-      json_estimates <- reshape_json_estimates(test_fit@model_output)
+  log_sd_input <- parameters_4_model |>
+    dplyr::filter(fleet_name == "fleet1" & label == "log_sd") |>
+    dplyr::select(value)
 
-      log_sd_input <- parameters_4_model |>
-        dplyr::filter(fleet_name == "fleet1" & label == "log_sd") |>
-        dplyr::select(value)
+  log_sd_output <- json_estimates |>
+    dplyr::filter(module_id == 1 & !is.na(log_sd_values)) |>
+    dplyr::select(log_sd_values) |>
+    as.vector()
 
-      log_sd_output <- json_estimates |>
-        dplyr::filter(module_id == 1 & !is.na(log_sd_values)) |>
-        dplyr::select(log_sd_values) |> as.vector()
+  for (i in seq_along(log_sd_output$log_sd_values)) {
+    expect_equal(log_sd_input$value, log_sd_output$log_sd_values[i])
+  }
 
-      for(i in seq_along(log_sd_output$log_sd_values)){
-        expect_equal(log_sd_input$value, log_sd_output$log_sd_values[i])
-      }
+  #' @description Test that `log_obs_error` works when it is an estimated scalar.
 
-      #' @description Test that `log_obs_error` works when it is an estimated scalar.
+  # turn on estimation for log_sd
+  parameters_4_model <- parameters_4_model |>
+    dplyr::mutate(estimation_type = ifelse(fleet_name == "fleet1" &
+      label == "log_sd",
+    "fixed_effects", estimation_type
+    ))
 
-      #turn on estimation for log_sd
-      parameters_4_model <- parameters_4_model |>
-        dplyr::mutate(estimation_type = ifelse(fleet_name == "fleet1" &
-                                                 label == "log_sd",
-                      "fixed_effects", estimation_type))
+  test_fit <- parameters_4_model |>
+    initialize_fims(data = data_4_model) |>
+    fit_fims(optimize = FALSE)
 
-      test_fit <- parameters_4_model |>
-        initialize_fims(data = data_4_model) |>
-        fit_fims(optimize = FALSE)
+  json_estimates <- reshape_json_estimates(test_fit@model_output)
 
-      json_estimates <- reshape_json_estimates(test_fit@model_output)
+  log_sd_input <- parameters_4_model |>
+    dplyr::filter(fleet_name == "fleet1" & label == "log_sd") |>
+    dplyr::select(value)
 
-      log_sd_input <- parameters_4_model |>
-        dplyr::filter(fleet_name == "fleet1" & label == "log_sd") |>
-        dplyr::select(value)
+  log_sd_output <- json_estimates |>
+    dplyr::filter(module_id == 1 & !is.na(log_sd_values)) |>
+    dplyr::select(log_sd_values) |>
+    as.vector()
 
-      log_sd_output <- json_estimates |>
-        dplyr::filter(module_id == 1 & !is.na(log_sd_values)) |>
-        dplyr::select(log_sd_values) |> as.vector()
-
-      for(i in seq_along(log_sd_output$log_sd_values)){
-        expect_equal(log_sd_input$value, log_sd_output$log_sd_values[i])
-      }
-
+  for (i in seq_along(log_sd_output$log_sd_values)) {
+    expect_equal(log_sd_input$value, log_sd_output$log_sd_values[i])
+  }
 })
 
 
@@ -124,11 +125,11 @@ test_that("`log_sd` returns correct error messages when wrong dimensions", {
   parameters_4_model <- default_parameters |>
     tidyr::unnest(cols = data) |>
     # add an extra log_sd observation
-       dplyr::add_row(
-        fleet_name = "fleet1",
-        label = "log_sd",
-        value = -4.61
-      )
+    dplyr::add_row(
+      fleet_name = "fleet1",
+      label = "log_sd",
+      value = -4.61
+    )
 
   expect_error(
     {
@@ -167,12 +168,12 @@ test_that("`log_Fmort` returns correct error messages when wrong dimensions", {
   parameters_4_model <- default_parameters |>
     tidyr::unnest(cols = data) |>
     # add an extra log_Fmort observation
-       dplyr::add_row(
-        fleet_name = "fleet1",
-        label = "log_Fmort",
-        value = -3, 
-        module_name = "Fleet"
-      )
+    dplyr::add_row(
+      fleet_name = "fleet1",
+      label = "log_Fmort",
+      value = -3,
+      module_name = "Fleet"
+    )
 
   expect_error(
     {
