@@ -14,46 +14,13 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Introduction
 
-Many stock assessment models in the U.S. have historically used a hierarchical 
-approach when estimating time-varying process variability in 
-model parameters such as recruitment. In this approach a mean parameter value 
-$\tilde{P}$, and annual deviation values, $Pdev_{y}$, are estimated and combined 
-to produce annual parameter estimates $P_{y}$ with deviations often being 
-additive or multiplicative of the mean. Models utilizing this approach have 
-predominantly implemented deviations as estimated fixed effects. In several 
-tools, such as Stock Synthesis, sum to zero constraints have been applied to 
-ensure that Hessian matrices are positive definite. A fixed-effect vector of 
-deviation parameters does not require second order partial derivatives to be 
-estimated until model optimization is complete and variance is estimated. 
+Many stock assessment models in the U.S. have historically used a hierarchical approach when estimating time-varying process variability in model parameters such as recruitment. In this approach a mean parameter value $\tilde{P}$, and annual deviation values, $Pdev_{y}$, are estimated and combined to produce annual parameter estimates $P_{y}$ with deviations often being additive or multiplicative of the mean. Models utilizing this approach have predominantly implemented deviations as estimated fixed effects. In several tools, such as Stock Synthesis, sum to zero constraints have been applied to ensure that Hessian matrices are positive definite. A fixed-effect vector of deviation parameters does not require second order partial derivatives to be estimated until model optimization is complete and variance is estimated.
 
-Following statistical best practices, FIMS incorporates the use of random 
-effects to model process variability in time-varying parameters. Uncertainty in the random effects
-is integrated out during parameter optimization in TMB using the 
-Laplace approximation. This integration requires the calculation of second-order 
-partial derivatives and inversion of the Hessian at each optimization step. While 
-simple to interpret and implement, the deviations approach results in a dense 
-covariance matrix of correlations between the mean $\tilde{P}$ and each annual 
-deviation $Pdev_{y}$ estimate. Due to this difference, using the deviations 
-approach in a random effects model has a much larger computational penalty than 
-when only fixed effects were considered in historic modeling platforms.
+Following statistical best practices, FIMS incorporates the use of random effects to model process variability in time-varying parameters. Uncertainty in the random effects is integrated out during parameter optimization in TMB using the Laplace approximation. This integration requires the calculation of second-order partial derivatives and inversion of the Hessian at each optimization step. While simple to interpret and implement, the deviations approach results in a dense covariance matrix of correlations between the mean $\tilde{P}$ and each annual deviation $Pdev_{y}$ estimate. Due to this difference, using the deviations approach in a random effects model has a much larger computational penalty than when only fixed effects were considered in historic modeling platforms.
 
-To quantify the magnitude of this penalty we investigate the performance and
-optimization time of a simple random effects model under equivalent sparse vs
-dense parameterizations. For this example we utilize two simple proxy models;
-an auto regressive AR1 function and a simple stock assessment model based on 
-[babySAM](https://github.com/fishfollower/SAM/tree/master/stockassessment). These proxies should reflect the relative performance gains expected 
-in the real-world correlated time-varying processes modeled in stock 
-assessments such as recruitment. Each of these time-series models can be 
-parameterized as a dense matrix, representing the traditional parameter 
-deviations as a random-effects approach, or as a sparse matrix, as would be 
-achieved by directly estimating annual parameter values as random effects.
+To quantify the magnitude of this penalty we investigate the performance and optimization time of a simple random effects model under equivalent sparse vs dense parameterizations. For this example we utilize two simple proxy models; an auto regressive AR1 function and a simple stock assessment model based on [babySAM](https://github.com/fishfollower/SAM/tree/master/stockassessment). These proxies should reflect the relative performance gains expected in the real-world correlated time-varying processes modeled in stock assessments such as recruitment. Each of these time-series models can be parameterized as a dense matrix, representing the traditional parameter deviations as a random-effects approach, or as a sparse matrix, as would be achieved by directly estimating annual parameter values as random effects.
 
-These two approaches are anticipated to produce mathematically equivalent 
-results while differing in their computational overhead. Confirming this
-equivalency and quantifying the runtime improvement will provide support for 
-the change in approach relative to previous assessment models.
-
-
+These two approaches are anticipated to produce mathematically equivalent results while differing in their computational overhead. Confirming this equivalency and quantifying the runtime improvement will provide support for the change in approach relative to previous assessment models.
 
 ## Methods
 
@@ -79,14 +46,7 @@ $\lambda_{t} = \phi * \lambda_{t-1} + \epsilon_{t}$, using two parameterizations
     \text{Var}(\gamma)=\frac{\sigma^2}{(1-\phi^2)}
     $$
 
-Under a random-effects model, the process approach puts the random effect on $\lambda_{t}$, while in
-the deviations approach, the random effect is applied to $z_{t}$. Though we use
-the process and deviations terminology to contrast these approaches, the statistical 
-literature often refers to these as centered and non-centered parameterizations, 
-respectively (Stan User's Guide 2025; Reparameterization and Change of Variables). 
-The joint negative log likelihood for this process is computed in state-space 
-form where the process of the current time step is dependent on the previous 
-one and observations, $y$ are *iid* Normal:
+Under a random-effects model, the process approach puts the random effect on $\lambda_{t}$, while in the deviations approach, the random effect is applied to $z_{t}$. Though we use the process and deviations terminology to contrast these approaches, the statistical literature often refers to these as centered and non-centered parameterizations, respectively (Stan User's Guide 2025; Reparameterization and Change of Variables). The joint negative log likelihood for this process is computed in state-space form where the process of the current time step is dependent on the previous one and observations, $y$ are *iid* Normal:
 ```{r pseudo-code, eval = FALSE}
 # deviations approach
 nll <- nll - dnorm(z[1], 0, sqrt(sd * sd / (1 - phi * phi)), log = TRUE)
@@ -105,20 +65,7 @@ nll <- nll - sum(dnorm(lambda[-1], phi * lambda[-length(lambda)], sd, log = TRUE
 nll <- nll - sum(dnorm(y, lambda, sdo, TRUE))
 ```
 
-Under this formulation, the process approach results in a sparse Hessian which is 
-a function of the inverted covariance matrix, while the deviations approach 
-results in a dense Hessian (Fig 1). Models were evaluated with 
-RTMB (Kristensen, 2019) using the TMB package (Kristensen et al., 2016) in R (R Core Team, 2024).
-TMB relies on the Laplace approximation to integrate out random effects during an inner 
-optimization step, and afterwards, the joint negative log likelihood is minimized with respect to
-the fixed effects. The Laplace approximation requires up to the second-order partial 
-derivatives of the joint negative log likelihood with respect to the random effects 
-to be evaluated at each inner optimization step. The computation cost of the Laplace 
-approximation is primarily determined by the cost of inverting the Hessian, which is $O(N^3)$ 
-for N-dimensional parameter space. As the number of random effects increases, 
-the computational cost of inverting the dense Hessian from the deviations approach
-increases rapidly, while the cost of inverting the sparse Hessian from the process
-approach increases much more slowly.
+Under this formulation, the process approach results in a sparse Hessian which is a function of the inverted covariance matrix, while the deviations approach results in a dense Hessian (Fig 1). Models were evaluated with RTMB (Kristensen, 2019) using the TMB package (Kristensen et al., 2016) in R (R Core Team, 2024). TMB relies on the Laplace approximation to integrate out random effects during an inner optimization step, and afterwards, the joint negative log likelihood is minimized with respect to the fixed effects. The Laplace approximation requires up to the second-order partial derivatives of the joint negative log likelihood with respect to the random effects to be evaluated at each inner optimization step. The computation cost of the Laplace approximation is primarily determined by the cost of inverting the Hessian, which is $O(N^3)$ for N-dimensional parameter space. As the number of random effects increases, the computational cost of inverting the dense Hessian from the deviations approach increases rapidly, while the cost of inverting the sparse Hessian from the process approach increases much more slowly.
 
 ![](figures/ar1hess_deviations.jpg) ![](figures/ar1hess_process.jpg)
 **Figure 1.** Hessian matrix for a first-order autoregressive (AR1) process using deviations approach (top)
@@ -175,9 +122,7 @@ dat$noParUS <- sapply(
 
 #### Parameters
 
-We modified the model to structure recruitment under both the deviation and process approaches. The main structure 
-for recruitment for years 2 and greater was applied to the numbers-at-age parameter, $N_{y, a=1}$ 
-for year $y$ and for age 1 with mean recruitment $\hat{r}$, written as the following:
+We modified the model to structure recruitment under both the deviation and process approaches. The main structure for recruitment for years 2 and greater was applied to the numbers-at-age parameter, $N_{y, a=1}$ for year $y$ and for age 1 with mean recruitment $\hat{r}$, written as the following:
 
 1. deviations approach: $log(N_{y,1}) = \hat{r} + z_{y}, \quad where \quad z_{y} \sim N(z_{y-1},\sigma^{2}_{r})$
 2. process approach: log($\widehat{N{y,1}}) = log(N_{y-1, 1}), \quad where \quad log(N_{y, 1}) \sim N(\hat{r} + \phi*(log(\widehat{N_{y-1,1}}) - \hat{r}))$
@@ -219,8 +164,7 @@ par$mean_recruitment <- 0 # mapped off if not estimated
 
 #### Code
 
-The joint negative log likelihood for recruitment under each approach was computed using the
-state space form as:
+The joint negative log likelihood for recruitment under each approach was computed using the state space form as:
 
 ```{r approaches, eval = FALSE}
 # deviations approach
@@ -245,13 +189,9 @@ jnll <- jnll - dnorm(logN[1, 1], mean_recruitment, sdR / sqrt(1 - phi^2), log = 
 jnll <- jnll - sum(dnorm(logN[-1, 1], mean_recruitment + phi * (logN[-nrow, 1] - mean_recruitment), sdR, TRUE))
 ```
 
-Catch-at-age models compared recruitment with the mean recruitment estimated versus fixed at zero
-to compare model parameterizations common in Europe (fixed) and
-the US (estimated) to ensure the inclusion of the mean recruitment parameter did not influence the sparsity of the 
-Hessian. In the context of European models, mean recruitment is not zero neither is it estimated. Rather, the initial recruitment is estimated using a large variance term and subsequent recruitment values are  a function of the previous time step. Mean recruitment can then be derived as the mean of the recruitment time series.
+Catch-at-age models compared recruitment with the mean recruitment estimated versus fixed at zero to compare model parameterizations common in Europe (fixed) and the U.S.A. (estimated) to ensure the inclusion of the mean recruitment parameter did not influence the sparsity of the Hessian. In the context of European models, mean recruitment is not zero neither is it estimated. Rather, the initial recruitment is estimated using a large variance term and subsequent recruitment values are  a function of the previous time step. Mean recruitment can then be derived as the mean of the recruitment time series.
 
-We ran a speed test by repeating model runs on the catch-at-age model 25 times, each time modifying the observation variance parameter using random noise from a normal distribution with 
-standard deviation of 0.03. We compared computational times from the speed test and compared parameter estimates, including recruitment from the first model run.
+We ran a speed test by repeating model runs on the catch-at-age model 25 times, each time modifying the observation variance parameter using random noise from a normal distribution with standard deviation of 0.03. We compared computational times from the speed test and compared parameter estimates, including recruitment from the first model run.
 
 ## Results
 
@@ -259,7 +199,7 @@ For each group of models (AR1 and catch-at-age with and without the fixed effect
 
 The process approach resulted in a sparse Hessian while the deviations approach resulted in a Hessian that was dense in recruitment (Fig. 2). Results from the speed test indicated the process approach was approximately 2x times faster than the deviations approach both with and without an estimated intercept (Table 1). While speed up for a single AR1 process is minimal, more complex stock assessments currently include AR1 random effects in multiple processes (e.g., numbers at age, maturity, mortality, etc.). The computational cost of fitting the deviations approach scales significantly, warranting the need to adopt the more computationally efficient process parameterization when estimating AR1 processes as random effects.
 
-Table 1. Results from speed test (in seconds) from running models 25 times. Note that absolute results are machine dependent but relative results will be consistent across operating systems and machine specifications.
+**Table 1.** Results from speed test (in seconds) from running models 25 times. Note that absolute results are machine dependent but relative results will be consistent across operating systems and machine specifications.
 
 |Intercept|Model      |Average time (sec) | SD   | Min  | Max |
 |---------|-----------|-------------------|------|------|-----|
