@@ -199,7 +199,7 @@ For each group of models (AR1 and catch-at-age with and without the fixed effect
 
 The process approach resulted in a sparse Hessian while the deviations approach resulted in a Hessian that was dense in recruitment (Fig. 2). Results from the speed test indicated the process approach was approximately 2x times faster than the deviations approach both with and without an estimated intercept (Table 1). While speed up for a single AR1 process is minimal, more complex stock assessments currently include AR1 random effects in multiple processes (e.g., numbers at age, maturity, mortality, etc.). The computational cost of fitting the deviations approach scales significantly, warranting the need to adopt the more computationally efficient process parameterization when estimating AR1 processes as random effects.
 
-**Table 1.** Results from speed test (in seconds) from running models 25 times. Note that absolute results are machine dependent but relative results will be consistent across operating systems and machine specifications.
+**Table 1.** Results from speed test (in seconds) from running models 25 times. The standard deviation (SD), minimum (Min), and maximum (Max) of the run times are also shown. Note that absolute results are machine dependent but relative results will be consistent across operating systems and machine specifications.
 
 |Intercept|Model      |Mean time (sec) | SD   | Min  | Max |
 |---------|-----------|-------------------|------|------|-----|
@@ -207,8 +207,7 @@ The process approach resulted in a sparse Hessian while the deviations approach 
 |N        |process    |1.561              |0.620 |1.163 |4.473|
 |Y        |deviations |2.976              |1.695 |2.070 |9.903|
 |N        |deviations |3.372              |1.324 |2.614 |9.613|
- 
 
 ![](figures/devs_intercept.png) ![](figures/process_intercept.png)
 
-**Figure 2.** Hessian matrix for random effects model with an AR1 process on recruitment in a catch-at-age model using deviations approach (top) and process approach (bottom).
+**Figure 2.** Hessian matrix for random effects model with a first-order autoregressive (AR1) process on recruitment in a catch-at-age model using deviations approach (top) and process approach (bottom).
