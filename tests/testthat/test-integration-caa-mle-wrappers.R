@@ -152,6 +152,19 @@ test_that("catch-at-age model (estimation MLE with wrappers) works with age and 
   )
 })
 
+test_that("catch-at-age model (estimation MLE with wrappers) deterministic run returns correct nlls", {
+  # Load the test data from an RDS file containing the model fit
+  deterministic_age_length_comp <- readRDS(test_path("fixtures", "deterministic_age_length_comp.RDS"))
+
+  #' Compare FIMS NLLs with model comparison project "true" NLLs
+  verify_fims_nll(
+    report = get_report(deterministic_age_length_comp),
+    om_input = om_input_list[[iter_id]],
+    om_output = om_output_list[[iter_id]],
+    em_input = em_input_list[[iter_id]]
+  )
+})
+
 ## Error handling ----
 test_that("catch-at-age model (estimation MLE with wrappers) returns an error when there are no estimated parameters for optimization", {
   # Load data
