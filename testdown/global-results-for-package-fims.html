@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2026-01-16" />
+<meta name="date" content="2026-01-20" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -103,7 +103,7 @@
 <li class="chapter" data-level="23" data-path="test-integration-fims-estimation-random-effects-without-wrappers.html"><a href="test-integration-fims-estimation-random-effects-without-wrappers.html"><i class="fa fa-check"></i><b>23</b> test-integration-fims-estimation-random-effects-without-wrappers.R</a></li>
 <li class="chapter" data-level="24" data-path="test-is_fims_verbose.html"><a href="test-is_fims_verbose.html"><i class="fa fa-check"></i><b>24</b> test-is_fims_verbose.R</a></li>
 <li class="chapter" data-level="25" data-path="test-logit.html"><a href="test-logit.html"><i class="fa fa-check"></i><b>25</b> test-logit.R</a></li>
-<li class="chapter" data-level="26" data-path="test-parallel-caa-mle-wrappers.html"><a href="test-parallel-caa-mle-wrappers.html"><i class="fa fa-check"></i><b>26</b> test-parallel-caa-mle-wrappers.R</a></li>
+<li class="chapter" data-level="26" data-path="test-projections-looped.html"><a href="test-projections-looped.html"><i class="fa fa-check"></i><b>26</b> test-projections-looped.R</a></li>
 <li class="chapter" data-level="27" data-path="test-rcpp-data.html"><a href="test-rcpp-data.html"><i class="fa fa-check"></i><b>27</b> test-rcpp-data.R</a></li>
 <li class="chapter" data-level="28" data-path="test-rcpp-distribution.html"><a href="test-rcpp-distribution.html"><i class="fa fa-check"></i><b>28</b> test-rcpp-distribution.R</a></li>
 <li class="chapter" data-level="29" data-path="test-rcpp-ewaa.html"><a href="test-rcpp-ewaa.html"><i class="fa fa-check"></i><b>29</b> test-rcpp-ewaa.R</a></li>
@@ -115,7 +115,8 @@
 <li class="chapter" data-level="35" data-path="test-rcpp-recruitment-interface.html"><a href="test-rcpp-recruitment-interface.html"><i class="fa fa-check"></i><b>35</b> test-rcpp-recruitment-interface.R</a></li>
 <li class="chapter" data-level="36" data-path="test-rcpp-selectivity.html"><a href="test-rcpp-selectivity.html"><i class="fa fa-check"></i><b>36</b> test-rcpp-selectivity.R</a></li>
 <li class="chapter" data-level="37" data-path="test-reshape_json_estimates.html"><a href="test-reshape_json_estimates.html"><i class="fa fa-check"></i><b>37</b> test-reshape_json_estimates.R</a></li>
-<li class="chapter" data-level="38" data-path="test-use-test-template.html"><a href="test-use-test-template.html"><i class="fa fa-check"></i><b>38</b> test-use-test-template.R</a></li>
+<li class="chapter" data-level="38" data-path="test-slow-parallel-caa-mle-wrappers.html"><a href="test-slow-parallel-caa-mle-wrappers.html"><i class="fa fa-check"></i><b>38</b> test-slow-parallel-caa-mle-wrappers.R</a></li>
+<li class="chapter" data-level="39" data-path="test-use-test-template.html"><a href="test-use-test-template.html"><i class="fa fa-check"></i><b>39</b> test-use-test-template.R</a></li>
 <li class="chapter" data-level="" data-path="aggregated-failures-and-errors.html"><a href="aggregated-failures-and-errors.html"><i class="fa fa-check"></i>Aggregated failures and errors</a></li>
 <li class="chapter" data-level="" data-path="aggregated-warnings.html"><a href="aggregated-warnings.html"><i class="fa fa-check"></i>Aggregated warnings</a></li>
 <li class="chapter" data-level="" data-path="aggregated-skipped.html"><a href="aggregated-skipped.html"><i class="fa fa-check"></i>Aggregated skipped</a></li>
@@ -143,7 +144,7 @@
 <div id="global-results-for-package-fims" class="section level1 unnumbered hasAnchor">
 <h1>Global results for package FIMS<a href="global-results-for-package-fims.html#global-results-for-package-fims" class="anchor-section" aria-label="Anchor link to header"></a></h1>
 <blockquote>
-<p>Performed on the: 2026-01-16 23:34:44.489278</p>
+<p>Performed on the: 2026-01-20 20:35:38.720303</p>
 </blockquote>
 <table style="width:100%;">
 <colgroup>
@@ -168,63 +169,63 @@
 <td align="left"><code>create_default_configurations()</code> works with correct inputs</td>
 <td align="right">4</td>
 <td align="left"><span title="No error, failed expectation, or warning.">✅</span></td>
-<td align="right">0.117</td>
+<td align="right">0.206</td>
 </tr>
 <tr class="even">
 <td align="left"><a href='test-create_default_configurations-r.html'>test-create_default_configurations.R</a></td>
 <td align="left"><code>create_default_configurations()</code> returns correct outputs for edge cases</td>
 <td align="right">5</td>
 <td align="left"><span title="No error, failed expectation, or warning.">✅</span></td>
-<td align="right">530.242</td>
+<td align="right">496.205</td>
 </tr>
 <tr class="odd">
 <td align="left"><a href='test-create_default_configurations-r.html'>test-create_default_configurations.R</a></td>
 <td align="left"><code>create_default_configurations()</code> returns correct error messages</td>
 <td align="right">2</td>
 <td align="left"><span title="No error, failed expectation, or warning.">✅</span></td>
-<td align="right">0.049</td>
+<td align="right">0.050</td>
 </tr>
 <tr class="even">
 <td align="left"><a href='test-create_default_parameters-r.html'>test-create_default_parameters.R</a></td>
 <td align="left"><code>create_default_parameters()</code> works with correct inputs</td>
 <td align="right">6</td>
 <td align="left"><span title="No error, failed expectation, or warning.">✅</span></td>
-<td align="right">0.235</td>
+<td align="right">0.237</td>
 </tr>
 <tr class="odd">
 <td align="left"><a href='test-distribution-formulas-r.html'>test-distribution-formulas.R</a></td>
 <td align="left"><code>initialize_process_distribution()</code> works with correct inputs</td>
 <td align="right">3</td>
 <td align="left"><span title="No error, failed expectation, or warning.">✅</span></td>
-<td align="right">0.057</td>
+<td align="right">0.056</td>
 </tr>
 <tr class="even">
 <td align="left"><a href='test-distribution-formulas-r.html'>test-distribution-formulas.R</a></td>
 <td align="left"><code>initialize_data_distribution()</code> works with correct inputs</td>
 <td align="right">3</td>
 <td align="left"><span title="No error, failed expectation, or warning.">✅</span></td>
-<td align="right">0.058</td>
+<td align="right">0.057</td>
 </tr>
 <tr class="odd">
 <td align="left"><a href='test-distribution-formulas-r.html'>test-distribution-formulas.R</a></td>
 <td align="left"><code>sd</code> value from <code>initialize_process_distribution()</code> must be greater than 0</td>
 <td align="right">1</td>
 <td align="left"><span title="No error, failed expectation, or warning.">✅</span></td>
-<td align="right">0.051</td>
+<td align="right">0.052</td>
 </tr>
 <tr class="even">
 <td align="left"><a href='test-distribution-formulas-r.html'>test-distribution-formulas.R</a></td>
 <td align="left"><code>initialize_process_distribution()</code> returns correct error messages</td>
 <td align="right">5</td>
 <td align="left"><span title="No error, failed expectation, or warning.">✅</span></td>
-<td align="right">0.251</td>
+<td align="right">0.253</td>
 </tr>
 <tr class="odd">
 <td align="left"><a href='test-distribution-formulas-r.html'>test-distribution-formulas.R</a></td>
 <td align="left"><code>initialize_data_distribution()</code> returns correct error messages</td>
 <td align="right">8</td>
 <td align="left"><span title="No error, failed expectation, or warning.">✅</span></td>
-<td align="right">0.354</td>
+<td align="right">0.355</td>
 </tr>
 <tr class="even">
 <td align="left"><a href='test-fimsfit-r.html'>test-fimsfit.R</a></td>
@@ -245,14 +246,14 @@
 <td align="left"><code>fims_frame()</code> works with the correct inputs</td>
 <td align="right">22</td>
 <td align="left"><span title="No error, failed expectation, or warning.">✅</span></td>
-<td align="right">0.865</td>
+<td align="right">0.939</td>
 </tr>
 <tr class="odd">
 <td align="left"><a href='test-fimsframe-r.html'>test-fimsframe.R</a></td>
 <td align="left"><code>FIMSFrame()</code> returns correct error messages</td>
 <td align="right">7</td>
 <td align="left"><span title="No error, failed expectation, or warning.">✅</span></td>
-<td align="right">0.238</td>
+<td align="right">0.244</td>
 </tr>
 <tr class="even">
 <td align="left"><a href='test-fimsframe-r.html'>test-fimsframe.R</a></td>
@@ -266,63 +267,63 @@
 <td align="left"><code>m_agecomp()</code> works with correct inputs</td>
 <td align="right">1</td>
 <td align="left"><span title="No error, failed expectation, or warning.">✅</span></td>
-<td align="right">1.441</td>
+<td align="right">1.444</td>
 </tr>
 <tr class="even">
 <td align="left"><a href='test-fimsframe-r.html'>test-fimsframe.R</a></td>
 <td align="left"><code>get_n_fleets()</code> works with correct inputs</td>
 <td align="right">1</td>
 <td align="left"><span title="No error, failed expectation, or warning.">✅</span></td>
-<td align="right">0.056</td>
+<td align="right">0.062</td>
 </tr>
 <tr class="odd">
 <td align="left"><a href='test-fimsframe-r.html'>test-fimsframe.R</a></td>
 <td align="left">FIMSFrame() warns on unexpected data types</td>
 <td align="right">2</td>
 <td align="left"><span title="No error, failed expectation, or warning.">✅</span></td>
-<td align="right">0.139</td>
+<td align="right">0.142</td>
 </tr>
 <tr class="even">
 <td align="left"><a href='test-get_estimates-r.html'>test-get_estimates.R</a></td>
 <td align="left"><code>get_estimates()</code> works with deterministic run</td>
 <td align="right">2</td>
 <td align="left"><span title="No error, failed expectation, or warning.">✅</span></td>
-<td align="right">1.479</td>
+<td align="right">1.551</td>
 </tr>
 <tr class="odd">
 <td align="left"><a href='test-get_estimates-r.html'>test-get_estimates.R</a></td>
 <td align="left"><code>get_estimates()</code> works with estimation run</td>
 <td align="right">2</td>
 <td align="left"><span title="No error, failed expectation, or warning.">✅</span></td>
-<td align="right">14.648</td>
+<td align="right">18.142</td>
 </tr>
 <tr class="even">
 <td align="left"><a href='test-get_estimates-r.html'>test-get_estimates.R</a></td>
 <td align="left"><code>get_estimates()</code> returns correct outputs for edge cases</td>
 <td align="right">1</td>
 <td align="left"><span title="No error, failed expectation, or warning.">✅</span></td>
-<td align="right">0.015</td>
+<td align="right">0.016</td>
 </tr>
 <tr class="odd">
 <td align="left"><a href='test-get_fixed-r.html'>test-get_fixed.R</a></td>
 <td align="left"><code>get_fixed()</code> works with correct inputs</td>
 <td align="right">4</td>
 <td align="left"><span title="No error, failed expectation, or warning.">✅</span></td>
-<td align="right">0.079</td>
+<td align="right">0.074</td>
 </tr>
 <tr class="even">
 <td align="left"><a href='test-get_fixed-r.html'>test-get_fixed.R</a></td>
 <td align="left"><code>get_fixed()</code> returns correct outputs for edge cases</td>
 <td align="right">2</td>
 <td align="left"><span title="No error, failed expectation, or warning.">✅</span></td>
-<td align="right">0.018</td>
+<td align="right">0.020</td>
 </tr>
 <tr class="odd">
 <td align="left"><a href='test-get_input-r.html'>test-get_input.R</a></td>
 <td align="left"><code>get_input()</code> works with correct inputs</td>
 <td align="right">2</td>
 <td align="left"><span title="No error, failed expectation, or warning.">✅</span></td>
-<td align="right">7.109</td>
+<td align="right">7.674</td>
 </tr>
 <tr class="even">
 <td align="left"><a href='test-get_input-r.html'>test-get_input.R</a></td>
@@ -336,63 +337,63 @@
 <td align="left"><code>get_max_gradient()</code> works with correct inputs</td>
 <td align="right">2</td>
 <td align="left"><span title="No error, failed expectation, or warning.">✅</span></td>
-<td align="right">7.015</td>
+<td align="right">7.517</td>
 </tr>
 <tr class="even">
 <td align="left"><a href='test-get_max_gradient-r.html'>test-get_max_gradient.R</a></td>
 <td align="left"><code>get_max_gradient()</code> returns correct outputs for edge cases</td>
 <td align="right">1</td>
 <td align="left"><span title="No error, failed expectation, or warning.">✅</span></td>
-<td align="right">0.015</td>
+<td align="right">0.013</td>
 </tr>
 <tr class="odd">
 <td align="left"><a href='test-get_model_output-r.html'>test-get_model_output.R</a></td>
 <td align="left"><code>get_model_output()</code> works with correct inputs</td>
 <td align="right">1</td>
 <td align="left"><span title="No error, failed expectation, or warning.">✅</span></td>
-<td align="right">7.288</td>
+<td align="right">7.931</td>
 </tr>
 <tr class="even">
 <td align="left"><a href='test-get_number_parameters-r.html'>test-get_number_parameters.R</a></td>
 <td align="left"><code>get_number_of_parameters()</code> works with correct inputs</td>
 <td align="right">2</td>
 <td align="left"><span title="No error, failed expectation, or warning.">✅</span></td>
-<td align="right">7.120</td>
+<td align="right">7.616</td>
 </tr>
 <tr class="odd">
 <td align="left"><a href='test-get_number_parameters-r.html'>test-get_number_parameters.R</a></td>
 <td align="left"><code>get_number_of_parameters()</code> returns correct outputs for edge cases</td>
 <td align="right">1</td>
 <td align="left"><span title="No error, failed expectation, or warning.">✅</span></td>
-<td align="right">0.014</td>
+<td align="right">0.016</td>
 </tr>
 <tr class="even">
 <td align="left"><a href='test-get_obj-r.html'>test-get_obj.R</a></td>
 <td align="left"><code>get_obj()</code> works with correct inputs</td>
 <td align="right">2</td>
 <td align="left"><span title="No error, failed expectation, or warning.">✅</span></td>
-<td align="right">7.030</td>
+<td align="right">8.155</td>
 </tr>
 <tr class="odd">
 <td align="left"><a href='test-get_obj-r.html'>test-get_obj.R</a></td>
 <td align="left"><code>get_obj()</code> returns correct outputs for edge cases</td>
 <td align="right">1</td>
 <td align="left"><span title="No error, failed expectation, or warning.">✅</span></td>
-<td align="right">0.015</td>
+<td align="right">0.013</td>
 </tr>
 <tr class="even">
 <td align="left"><a href='test-get_opt-r.html'>test-get_opt.R</a></td>
 <td align="left"><code>get_opt()</code> works with correct inputs</td>
 <td align="right">2</td>
 <td align="left"><span title="No error, failed expectation, or warning.">✅</span></td>
-<td align="right">7.167</td>
+<td align="right">7.591</td>
 </tr>
 <tr class="odd">
 <td align="left"><a href='test-get_opt-r.html'>test-get_opt.R</a></td>
 <td align="left"><code>get_opt()</code> returns correct outputs for edge cases</td>
 <td align="right">1</td>
 <td align="left"><span title="No error, failed expectation, or warning.">✅</span></td>
-<td align="right">0.015</td>
+<td align="right">0.016</td>
 </tr>
 <tr class="even">
 <td align="left"><a href='test-get_random-r.html'>test-get_random.R</a></td>
@@ -406,154 +407,168 @@
 <td align="left"><code>get_random()</code> returns correct outputs for edge cases</td>
 <td align="right">2</td>
 <td align="left"><span title="No error, failed expectation, or warning.">✅</span></td>
-<td align="right">0.021</td>
+<td align="right">0.019</td>
 </tr>
 <tr class="even">
 <td align="left"><a href='test-get_sdreport-r.html'>test-get_sdreport.R</a></td>
 <td align="left"><code>get_sdreport()</code> works with correct inputs</td>
 <td align="right">2</td>
 <td align="left"><span title="No error, failed expectation, or warning.">✅</span></td>
-<td align="right">6.997</td>
+<td align="right">7.552</td>
 </tr>
 <tr class="odd">
 <td align="left"><a href='test-get_sdreport-r.html'>test-get_sdreport.R</a></td>
 <td align="left"><code>get_sdreport()</code> returns correct outputs for edge cases</td>
 <td align="right">1</td>
 <td align="left"><span title="No error, failed expectation, or warning.">✅</span></td>
-<td align="right">0.015</td>
+<td align="right">0.014</td>
 </tr>
 <tr class="even">
 <td align="left"><a href='test-get_timing-r.html'>test-get_timing.R</a></td>
 <td align="left"><code>get_timing()</code> works with correct inputs</td>
 <td align="right">3</td>
 <td align="left"><span title="No error, failed expectation, or warning.">✅</span></td>
-<td align="right">7.157</td>
+<td align="right">7.639</td>
 </tr>
 <tr class="odd">
 <td align="left"><a href='test-get_timing-r.html'>test-get_timing.R</a></td>
 <td align="left"><code>get_timing()</code> returns correct outputs for edge cases</td>
 <td align="right">1</td>
 <td align="left"><span title="No error, failed expectation, or warning.">✅</span></td>
-<td align="right">0.016</td>
+<td align="right">0.018</td>
 </tr>
 <tr class="even">
 <td align="left"><a href='test-get_version-r.html'>test-get_version.R</a></td>
 <td align="left"><code>get_version()</code> works with correct inputs</td>
 <td align="right">2</td>
 <td align="left"><span title="No error, failed expectation, or warning.">✅</span></td>
-<td align="right">7.116</td>
+<td align="right">7.737</td>
 </tr>
 <tr class="odd">
 <td align="left"><a href='test-get_version-r.html'>test-get_version.R</a></td>
 <td align="left"><code>get_version()</code> returns correct outputs for edge cases</td>
 <td align="right">1</td>
 <td align="left"><span title="No error, failed expectation, or warning.">✅</span></td>
-<td align="right">0.015</td>
+<td align="right">0.016</td>
 </tr>
 <tr class="even">
 <td align="left"><a href='test-initialize_modules-r.html'>test-initialize_modules.R</a></td>
 <td align="left"><code>initialize_fims()</code> works with correct inputs</td>
 <td align="right">13</td>
 <td align="left"><span title="No error, failed expectation, or warning.">✅</span></td>
-<td align="right">3.669</td>
+<td align="right">3.666</td>
 </tr>
 <tr class="odd">
 <td align="left"><a href='test-initialize_modules-r.html'>test-initialize_modules.R</a></td>
 <td align="left"><code>initialize_fims()</code> works with edge cases</td>
 <td align="right">1</td>
 <td align="left"><span title="No error, failed expectation, or warning.">✅</span></td>
-<td align="right">6.398</td>
+<td align="right">6.428</td>
 </tr>
 <tr class="even">
 <td align="left"><a href='test-initialize_modules-r.html'>test-initialize_modules.R</a></td>
 <td align="left"><code>initialize_fims()</code> returns correct error messages</td>
 <td align="right">6</td>
 <td align="left"><span title="No error, failed expectation, or warning.">✅</span></td>
-<td align="right">0.239</td>
+<td align="right">0.187</td>
 </tr>
 <tr class="odd">
 <td align="left"><a href='test-integration-caa-mle-wrappers-r.html'>test-integration-caa-mle-wrappers.R</a></td>
 <td align="left">catch-at-age model (deterministic MLE with wrappers) works with correct inputs</td>
 <td align="right">1</td>
 <td align="left"><span title="No error, failed expectation, or warning.">✅</span></td>
-<td align="right">0.798</td>
+<td align="right">0.922</td>
 </tr>
 <tr class="even">
 <td align="left"><a href='test-integration-caa-mle-wrappers-r.html'>test-integration-caa-mle-wrappers.R</a></td>
 <td align="left">catch-at-age model (deterministic MLE with wrappers) returns correct NLLs / catch-at-age model (deterministic MLE with wrappers) returns correct number of parameters and random effects</td>
 <td align="right">2</td>
 <td align="left"><span title="No error, failed expectation, or warning.">✅</span></td>
-<td align="right">0.040</td>
+<td align="right">0.052</td>
 </tr>
 <tr class="odd">
 <td align="left"><a href='test-integration-caa-mle-wrappers-r.html'>test-integration-caa-mle-wrappers.R</a></td>
 <td align="left">catch-at-age model (deterministic MLE with wrappers) returns correct NLLs</td>
 <td align="right">1</td>
 <td align="left"><span title="No error, failed expectation, or warning.">✅</span></td>
-<td align="right">0.042</td>
+<td align="right">0.054</td>
 </tr>
 <tr class="even">
 <td align="left"><a href='test-integration-caa-mle-wrappers-r.html'>test-integration-caa-mle-wrappers.R</a></td>
 <td align="left">catch-at-age model (estimation MLE with wrappers) works with age and length comp</td>
 <td align="right">1</td>
 <td align="left"><span title="No error, failed expectation, or warning.">✅</span></td>
-<td align="right">2.790</td>
+<td align="right">3.104</td>
 </tr>
 <tr class="odd">
 <td align="left"><a href='test-integration-caa-mle-wrappers-r.html'>test-integration-caa-mle-wrappers.R</a></td>
 <td align="left">catch-at-age model (estimation MLE with wrappers) works with age comp only using wrappers</td>
 <td align="right">2</td>
 <td align="left"><span title="No error, failed expectation, or warning.">✅</span></td>
-<td align="right">2.886</td>
+<td align="right">3.401</td>
 </tr>
 <tr class="even">
 <td align="left"><a href='test-integration-caa-mle-wrappers-r.html'>test-integration-caa-mle-wrappers.R</a></td>
 <td align="left">catch-at-age model (estimation MLE with wrappers) works with length comp only using wrappers</td>
 <td align="right">2</td>
 <td align="left"><span title="No error, failed expectation, or warning.">✅</span></td>
-<td align="right">5.913</td>
+<td align="right">6.207</td>
 </tr>
 <tr class="odd">
 <td align="left"><a href='test-integration-caa-mle-wrappers-r.html'>test-integration-caa-mle-wrappers.R</a></td>
 <td align="left">catch-at-age model (estimation MLE with wrappers) works with age and length comp with NAs</td>
 <td align="right">1</td>
 <td align="left"><span title="No error, failed expectation, or warning.">✅</span></td>
-<td align="right">1.305</td>
+<td align="right">1.891</td>
 </tr>
 <tr class="even">
 <td align="left"><a href='test-integration-caa-mle-wrappers-r.html'>test-integration-caa-mle-wrappers.R</a></td>
 <td align="left">catch-at-age model (estimation MLE with wrappers) returns an error when there are no estimated parameters for optimization</td>
 <td align="right">3</td>
 <td align="left"><span title="No error, failed expectation, or warning.">✅</span></td>
-<td align="right">5.635</td>
+<td align="right">5.924</td>
 </tr>
 <tr class="odd">
 <td align="left"><a href='test-integration-caa-mle-r.html'>test-integration-caa-mle.R</a></td>
 <td align="left">catch-at-age model (deterministic MLE without wrappers) works with correct inputs</td>
 <td align="right">3</td>
 <td align="left"><span title="No error, failed expectation, or warning.">✅</span></td>
-<td align="right">0.226</td>
+<td align="right">0.233</td>
 </tr>
 <tr class="even">
 <td align="left"><a href='test-integration-caa-mle-r.html'>test-integration-caa-mle.R</a></td>
 <td align="left">catch-at-age model (estimation MLE without wrappers) works with correct inputs</td>
 <td align="right">2</td>
 <td align="left"><span title="No error, failed expectation, or warning.">✅</span></td>
-<td align="right">0.060</td>
+<td align="right">0.069</td>
 </tr>
 <tr class="odd">
 <td align="left"><a href='test-integration-caa-mle-r.html'>test-integration-caa-mle.R</a></td>
-<td align="left">catch-at-age model (estimation MLE without wrappers) returns correct outputs for edge cases</td>
+<td align="left">catch-at-age model (estimation MLE without wrappers) returns correct outputs for missing values</td>
 <td align="right">3</td>
 <td align="left"><span title="No error, failed expectation, or warning.">✅</span></td>
-<td align="right">360.930</td>
+<td align="right">158.862</td>
+</tr>
+<tr class="even">
+<td align="left"><a href='test-integration-caa-mle-r.html'>test-integration-caa-mle.R</a></td>
+<td align="left">catch-at-age model (estimation MLE without wrappers) returns correct outputs for sample size of 1</td>
+<td align="right">1</td>
+<td align="left"><span title="No error, failed expectation, or warning.">✅</span></td>
+<td align="right">157.771</td>
+</tr>
+<tr class="odd">
+<td align="left"><a href='test-integration-caa-mle-r.html'>test-integration-caa-mle.R</a></td>
+<td align="left">catch-at-age model (estimation MLE without wrappers) returns correct outputs with NA values and sample size of 1</td>
+<td align="right">1</td>
+<td align="left"><span title="No error, failed expectation, or warning.">✅</span></td>
+<td align="right">157.523</td>
 </tr>
 <tr class="even">
 <td align="left"><a href='test-integration-fims-bayesian-prior-predictive-r.html'>test-integration-fims-bayesian-prior-predictive.R</a></td>
 <td align="left">prior predictive check</td>
 <td align="right">6</td>
 <td align="left"><span title="No error, failed expectation, or warning.">✅</span></td>
-<td align="right">1.803</td>
+<td align="right">2.229</td>
 </tr>
 <tr class="odd">
 <td align="left"><a href='test-integration-fims-estimation-random-effects-with-wrappers-r.html'>test-integration-fims-estimation-random-effects-with-wrappers.R</a></td>
@@ -581,56 +596,56 @@
 <td align="left">estimation test with recruitment re on logr</td>
 <td align="right">9</td>
 <td align="left"><span title="No error, failed expectation, or warning.">✅</span></td>
-<td align="right">0.023</td>
+<td align="right">0.024</td>
 </tr>
 <tr class="odd">
 <td align="left"><a href='test-integration-fims-estimation-random-effects-without-wrappers-r.html'>test-integration-fims-estimation-random-effects-without-wrappers.R</a></td>
 <td align="left">deterministic run works with correct inputs</td>
 <td align="right">1</td>
 <td align="left"><span title="No error, failed expectation, or warning.">✅</span></td>
-<td align="right">0.043</td>
+<td align="right">0.045</td>
 </tr>
 <tr class="even">
 <td align="left"><a href='test-integration-fims-estimation-random-effects-without-wrappers-r.html'>test-integration-fims-estimation-random-effects-without-wrappers.R</a></td>
 <td align="left">deterministic run returns correct nlls</td>
 <td align="right">1</td>
 <td align="left"><span title="No error, failed expectation, or warning.">✅</span></td>
-<td align="right">0.035</td>
+<td align="right">0.037</td>
 </tr>
 <tr class="odd">
 <td align="left"><a href='test-integration-fims-estimation-random-effects-without-wrappers-r.html'>test-integration-fims-estimation-random-effects-without-wrappers.R</a></td>
 <td align="left">deterministic run results correct number of parameters and random effects</td>
 <td align="right">2</td>
 <td align="left"><span title="No error, failed expectation, or warning.">✅</span></td>
-<td align="right">0.026</td>
+<td align="right">0.027</td>
 </tr>
 <tr class="even">
 <td align="left"><a href='test-integration-fims-estimation-random-effects-without-wrappers-r.html'>test-integration-fims-estimation-random-effects-without-wrappers.R</a></td>
 <td align="left">estimation test with recruitment re on log devs</td>
 <td align="right">1</td>
 <td align="left"><span title="No error, failed expectation, or warning.">✅</span></td>
-<td align="right">0.012</td>
+<td align="right">508.386</td>
 </tr>
 <tr class="odd">
 <td align="left"><a href='test-integration-fims-estimation-random-effects-without-wrappers-r.html'>test-integration-fims-estimation-random-effects-without-wrappers.R</a></td>
 <td align="left">estimation test with recruitment re on logr</td>
 <td align="right">9</td>
 <td align="left"><span title="No error, failed expectation, or warning.">✅</span></td>
-<td align="right">0.010</td>
+<td align="right">501.050</td>
 </tr>
 <tr class="even">
 <td align="left"><a href='test-is_fims_verbose-r.html'>test-is_fims_verbose.R</a></td>
 <td align="left"><code>is_fims_verbose()</code> works with correct inputs</td>
 <td align="right">2</td>
 <td align="left"><span title="No error, failed expectation, or warning.">✅</span></td>
-<td align="right">0.015</td>
+<td align="right">0.016</td>
 </tr>
 <tr class="odd">
 <td align="left"><a href='test-is_fims_verbose-r.html'>test-is_fims_verbose.R</a></td>
 <td align="left"><code>is_fims_verbose()</code> returns correct outputs for edge cases</td>
 <td align="right">1</td>
 <td align="left"><span title="No error, failed expectation, or warning.">✅</span></td>
-<td align="right">0.009</td>
+<td align="right">0.010</td>
 </tr>
 <tr class="even">
 <td align="left"><a href='test-is_fims_verbose-r.html'>test-is_fims_verbose.R</a></td>
@@ -644,14 +659,14 @@
 <td align="left"><code>logit()</code> works with correct inputs</td>
 <td align="right">3</td>
 <td align="left"><span title="No error, failed expectation, or warning.">✅</span></td>
-<td align="right">0.040</td>
+<td align="right">0.043</td>
 </tr>
 <tr class="even">
 <td align="left"><a href='test-logit-r.html'>test-logit.R</a></td>
 <td align="left"><code>logit()</code> returns correct outputs for edge cases</td>
 <td align="right">2</td>
 <td align="left"><span title="No error, failed expectation, or warning.">✅</span></td>
-<td align="right">0.027</td>
+<td align="right">0.029</td>
 </tr>
 <tr class="odd">
 <td align="left"><a href='test-logit-r.html'>test-logit.R</a></td>
@@ -665,182 +680,210 @@
 <td align="left"><code>inv_logit()</code> works with correct inputs</td>
 <td align="right">2</td>
 <td align="left"><span title="No error, failed expectation, or warning.">✅</span></td>
-<td align="right">0.028</td>
+<td align="right">0.029</td>
 </tr>
 <tr class="odd">
 <td align="left"><a href='test-logit-r.html'>test-logit.R</a></td>
 <td align="left"><code>inv_logit()</code> returns correct outputs for edge cases</td>
 <td align="right">2</td>
 <td align="left"><span title="No error, failed expectation, or warning.">✅</span></td>
-<td align="right">0.027</td>
+<td align="right">0.028</td>
 </tr>
 <tr class="even">
 <td align="left"><a href='test-logit-r.html'>test-logit.R</a></td>
 <td align="left"><code>inv_logit()</code> returns correct error messages</td>
 <td align="right">3</td>
 <td align="left"><span title="No error, failed expectation, or warning.">✅</span></td>
-<td align="right">0.045</td>
+<td align="right">0.048</td>
+</tr>
+<tr class="odd">
+<td align="left"><a href='test-projections-looped-r.html'>test-projections-looped.R</a></td>
+<td align="left">projections with no data achieve same estimates and no projection model run</td>
+<td align="right">3</td>
+<td align="left"><span title="No error, failed expectation, or warning.">✅</span></td>
+<td align="right">0.052</td>
+</tr>
+<tr class="even">
+<td align="left"><a href='test-projections-looped-r.html'>test-projections-looped.R</a></td>
+<td align="left">projections with low catch data achieve same estimates and no projection model run</td>
+<td align="right">3</td>
+<td align="left"><span title="No error, failed expectation, or warning.">✅</span></td>
+<td align="right">0.051</td>
+</tr>
+<tr class="odd">
+<td align="left"><a href='test-projections-looped-r.html'>test-projections-looped.R</a></td>
+<td align="left">projections with high catch data achieve same estimates and no projection model run</td>
+<td align="right">2</td>
+<td align="left"><span title="No error, failed expectation, or warning.">✅</span></td>
+<td align="right">0.033</td>
+</tr>
+<tr class="even">
+<td align="left"><a href='test-projections-looped-r.html'>test-projections-looped.R</a></td>
+<td align="left">projections with spawning biomass ratio target achieve same estimates and no projection model run</td>
+<td align="right">4</td>
+<td align="left"><span title="No error, failed expectation, or warning.">✅</span></td>
+<td align="right">0.066</td>
 </tr>
 <tr class="odd">
 <td align="left"><a href='test-rcpp-data-r.html'>test-rcpp-data.R</a></td>
 <td align="left">rcpp data works with correct inputs</td>
 <td align="right">2</td>
 <td align="left"><span title="No error, failed expectation, or warning.">✅</span></td>
-<td align="right">1.271</td>
+<td align="right">1.356</td>
 </tr>
 <tr class="even">
 <td align="left"><a href='test-rcpp-distribution-r.html'>test-rcpp-distribution.R</a></td>
 <td align="left">rcpp distribution works with correct inputs</td>
 <td align="right">7</td>
 <td align="left"><span title="No error, failed expectation, or warning.">✅</span></td>
-<td align="right">0.272</td>
+<td align="right">0.295</td>
 </tr>
 <tr class="odd">
 <td align="left"><a href='test-rcpp-distribution-r.html'>test-rcpp-distribution.R</a></td>
 <td align="left">rcpp_distribution returns correct outputs for edge cases</td>
 <td align="right">15</td>
 <td align="left"><span title="No error, failed expectation, or warning.">✅</span></td>
-<td align="right">0.361</td>
+<td align="right">0.392</td>
 </tr>
 <tr class="even">
 <td align="left"><a href='test-rcpp-distribution-r.html'>test-rcpp-distribution.R</a></td>
 <td align="left">rcpp distribution returns correct error messages</td>
 <td align="right">6</td>
 <td align="left"><span title="No error, failed expectation, or warning.">✅</span></td>
-<td align="right">0.217</td>
+<td align="right">0.234</td>
 </tr>
 <tr class="odd">
 <td align="left"><a href='test-rcpp-ewaa-r.html'>test-rcpp-ewaa.R</a></td>
 <td align="left">EWAAGrowth evaluate() works with correct input data</td>
 <td align="right">1</td>
 <td align="left"><span title="No error, failed expectation, or warning.">✅</span></td>
-<td align="right">0.011</td>
+<td align="right">0.013</td>
 </tr>
 <tr class="even">
 <td align="left"><a href='test-rcpp-ewaa-r.html'>test-rcpp-ewaa.R</a></td>
 <td align="left">EWAAGrowth get_id() works with correct input data</td>
 <td align="right">2</td>
 <td align="left"><span title="No error, failed expectation, or warning.">✅</span></td>
-<td align="right">0.019</td>
+<td align="right">0.024</td>
 </tr>
 <tr class="odd">
 <td align="left"><a href='test-rcpp-ewaa-r.html'>test-rcpp-ewaa.R</a></td>
 <td align="left">EWAAGrowth evaluate() doesn’t work when missing weights</td>
 <td align="right">1</td>
 <td align="left"><span title="No error, failed expectation, or warning.">✅</span></td>
-<td align="right">0.024</td>
+<td align="right">0.027</td>
 </tr>
 <tr class="even">
 <td align="left"><a href='test-rcpp-ewaa-r.html'>test-rcpp-ewaa.R</a></td>
 <td align="left">EWAAGrowth evaluate() returns expected error for mismatched input lengths</td>
 <td align="right">1</td>
 <td align="left"><span title="No error, failed expectation, or warning.">✅</span></td>
-<td align="right">0.028</td>
+<td align="right">0.030</td>
 </tr>
 <tr class="odd">
 <td align="left"><a href='test-rcpp-fims-r.html'>test-rcpp-fims.R</a></td>
 <td align="left">Rcpp interface works for modules</td>
 <td align="right">11</td>
 <td align="left"><span title="No error, failed expectation, or warning.">✅</span></td>
-<td align="right">0.139</td>
+<td align="right">0.160</td>
 </tr>
 <tr class="even">
 <td align="left"><a href='test-rcpp-fims-r.html'>test-rcpp-fims.R</a></td>
 <td align="left">Rcpp interface returns correct error messages</td>
 <td align="right">4</td>
 <td align="left"><span title="No error, failed expectation, or warning.">✅</span></td>
-<td align="right">0.061</td>
+<td align="right">0.069</td>
 </tr>
 <tr class="odd">
 <td align="left"><a href='test-rcpp-fleet-interface-r.html'>test-rcpp-fleet-interface.R</a></td>
 <td align="left">rcpp fleet works with correct inputs</td>
 <td align="right">8</td>
 <td align="left"><span title="No error, failed expectation, or warning.">✅</span></td>
-<td align="right">0.083</td>
+<td align="right">0.096</td>
 </tr>
 <tr class="even">
 <td align="left"><a href='test-rcpp-fleet-interface-r.html'>test-rcpp-fleet-interface.R</a></td>
 <td align="left">rcpp fleet returns correct error messages</td>
 <td align="right">4</td>
 <td align="left"><span title="No error, failed expectation, or warning.">✅</span></td>
-<td align="right">0.052</td>
+<td align="right">0.060</td>
 </tr>
 <tr class="odd">
 <td align="left"><a href='test-rcpp-maturity-r.html'>test-rcpp-maturity.R</a></td>
 <td align="left">rcpp maturity works with correct inputs</td>
 <td align="right">8</td>
 <td align="left"><span title="No error, failed expectation, or warning.">✅</span></td>
-<td align="right">0.096</td>
+<td align="right">0.092</td>
 </tr>
 <tr class="even">
 <td align="left"><a href='test-rcpp-parameter-vector-r.html'>test-rcpp-parameter-vector.R</a></td>
 <td align="left">rcpp ParameterVector works as expected</td>
 <td align="right">29</td>
 <td align="left"><span title="No error, failed expectation, or warning.">✅</span></td>
-<td align="right">1.623</td>
+<td align="right">1.762</td>
 </tr>
 <tr class="odd">
 <td align="left"><a href='test-rcpp-parameter-vector-r.html'>test-rcpp-parameter-vector.R</a></td>
 <td align="left">ParameterVector returns correct error messages</td>
 <td align="right">3</td>
 <td align="left"><span title="No error, failed expectation, or warning.">✅</span></td>
-<td align="right">0.063</td>
+<td align="right">0.069</td>
 </tr>
 <tr class="even">
 <td align="left"><a href='test-rcpp-population-interface-r.html'>test-rcpp-population-interface.R</a></td>
 <td align="left">rcpp population interface works with correct inputs</td>
 <td align="right">9</td>
 <td align="left"><span title="No error, failed expectation, or warning.">✅</span></td>
-<td align="right">1.729</td>
+<td align="right">1.743</td>
 </tr>
 <tr class="odd">
 <td align="left"><a href='test-rcpp-recruitment-interface-r.html'>test-rcpp-recruitment-interface.R</a></td>
 <td align="left">rcpp recruitment interface works with correct inputs</td>
 <td align="right">8</td>
 <td align="left"><span title="No error, failed expectation, or warning.">✅</span></td>
-<td align="right">0.096</td>
+<td align="right">0.107</td>
 </tr>
 <tr class="even">
 <td align="left"><a href='test-rcpp-recruitment-interface-r.html'>test-rcpp-recruitment-interface.R</a></td>
 <td align="left">test rcpp recruitment interface returns correct error messages</td>
 <td align="right">1</td>
 <td align="left"><span title="No error, failed expectation, or warning.">✅</span></td>
-<td align="right">0.018</td>
+<td align="right">0.020</td>
 </tr>
 <tr class="odd">
 <td align="left"><a href='test-rcpp-selectivity-r.html'>test-rcpp-selectivity.R</a></td>
 <td align="left">rcpp logistic selectivity works with correct inputs</td>
 <td align="right">8</td>
 <td align="left"><span title="No error, failed expectation, or warning.">✅</span></td>
-<td align="right">0.152</td>
+<td align="right">0.154</td>
 </tr>
 <tr class="even">
 <td align="left"><a href='test-rcpp-selectivity-r.html'>test-rcpp-selectivity.R</a></td>
 <td align="left">rcpp double logistic selectivity works with correct inputs</td>
 <td align="right">12</td>
 <td align="left"><span title="No error, failed expectation, or warning.">✅</span></td>
-<td align="right">0.201</td>
+<td align="right">0.259</td>
 </tr>
 <tr class="odd">
 <td align="left"><a href='test-rcpp-selectivity-r.html'>test-rcpp-selectivity.R</a></td>
 <td align="left">rcpp selectivity returns correct outputs for edge cases</td>
 <td align="right">6</td>
 <td align="left"><span title="No error, failed expectation, or warning.">✅</span></td>
-<td align="right">0.032</td>
+<td align="right">0.038</td>
 </tr>
 <tr class="even">
 <td align="left"><a href='test-reshape_json_estimates-r.html'>test-reshape_json_estimates.R</a></td>
 <td align="left"><code>reshape_json_estimates()</code> output matches TMB for a deterministic run</td>
 <td align="right">1</td>
 <td align="left"><span title="No error, failed expectation, or warning.">✅</span></td>
-<td align="right">0.710</td>
+<td align="right">0.821</td>
 </tr>
 <tr class="odd">
 <td align="left"><a href='test-reshape_json_estimates-r.html'>test-reshape_json_estimates.R</a></td>
 <td align="left"><code>reshape_json_estimates()</code> output matches TMB for an estimation run</td>
 <td align="right">1</td>
 <td align="left"><span title="No error, failed expectation, or warning.">✅</span></td>
-<td align="right">13.262</td>
+<td align="right">16.726</td>
 </tr>
 </tbody>
 </table>

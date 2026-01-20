@@ -10,6 +10,8 @@
   System](https://NOAA-FIMS.github.io/FIMS/articles/fims-logging.md):
 - [FIMS User Setup
   Guide](https://NOAA-FIMS.github.io/FIMS/articles/fims-user-setup-guide.md):
+- [Simple projections using
+  FIMS](https://NOAA-FIMS.github.io/FIMS/articles/fims-demo-projections.md):
 
 ### Developer
 
@@ -22,3 +24,8 @@
   C++](https://NOAA-FIMS.github.io/FIMS/articles/training-intro-cpp.md):
 - [Intro to
   Rcpp](https://NOAA-FIMS.github.io/FIMS/articles/training-intro-rcpp.md):
+
+### Research and development
+
+- [RE
+  Sparsity](https://NOAA-FIMS.github.io/FIMS/articles/RD-re-sparsity.md):

@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2026-01-16" />
+<meta name="date" content="2026-01-20" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -30,7 +30,7 @@
   
   
 <link rel="prev" href="test-is_fims_verbose.html"/>
-<link rel="next" href="test-parallel-caa-mle-wrappers.html"/>
+<link rel="next" href="test-projections-looped.html"/>
 <script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
@@ -103,7 +103,7 @@
 <li class="chapter" data-level="23" data-path="test-integration-fims-estimation-random-effects-without-wrappers.html"><a href="test-integration-fims-estimation-random-effects-without-wrappers.html"><i class="fa fa-check"></i><b>23</b> test-integration-fims-estimation-random-effects-without-wrappers.R</a></li>
 <li class="chapter" data-level="24" data-path="test-is_fims_verbose.html"><a href="test-is_fims_verbose.html"><i class="fa fa-check"></i><b>24</b> test-is_fims_verbose.R</a></li>
 <li class="chapter" data-level="25" data-path="test-logit.html"><a href="test-logit.html"><i class="fa fa-check"></i><b>25</b> test-logit.R</a></li>
-<li class="chapter" data-level="26" data-path="test-parallel-caa-mle-wrappers.html"><a href="test-parallel-caa-mle-wrappers.html"><i class="fa fa-check"></i><b>26</b> test-parallel-caa-mle-wrappers.R</a></li>
+<li class="chapter" data-level="26" data-path="test-projections-looped.html"><a href="test-projections-looped.html"><i class="fa fa-check"></i><b>26</b> test-projections-looped.R</a></li>
 <li class="chapter" data-level="27" data-path="test-rcpp-data.html"><a href="test-rcpp-data.html"><i class="fa fa-check"></i><b>27</b> test-rcpp-data.R</a></li>
 <li class="chapter" data-level="28" data-path="test-rcpp-distribution.html"><a href="test-rcpp-distribution.html"><i class="fa fa-check"></i><b>28</b> test-rcpp-distribution.R</a></li>
 <li class="chapter" data-level="29" data-path="test-rcpp-ewaa.html"><a href="test-rcpp-ewaa.html"><i class="fa fa-check"></i><b>29</b> test-rcpp-ewaa.R</a></li>
@@ -115,7 +115,8 @@
 <li class="chapter" data-level="35" data-path="test-rcpp-recruitment-interface.html"><a href="test-rcpp-recruitment-interface.html"><i class="fa fa-check"></i><b>35</b> test-rcpp-recruitment-interface.R</a></li>
 <li class="chapter" data-level="36" data-path="test-rcpp-selectivity.html"><a href="test-rcpp-selectivity.html"><i class="fa fa-check"></i><b>36</b> test-rcpp-selectivity.R</a></li>
 <li class="chapter" data-level="37" data-path="test-reshape_json_estimates.html"><a href="test-reshape_json_estimates.html"><i class="fa fa-check"></i><b>37</b> test-reshape_json_estimates.R</a></li>
-<li class="chapter" data-level="38" data-path="test-use-test-template.html"><a href="test-use-test-template.html"><i class="fa fa-check"></i><b>38</b> test-use-test-template.R</a></li>
+<li class="chapter" data-level="38" data-path="test-slow-parallel-caa-mle-wrappers.html"><a href="test-slow-parallel-caa-mle-wrappers.html"><i class="fa fa-check"></i><b>38</b> test-slow-parallel-caa-mle-wrappers.R</a></li>
+<li class="chapter" data-level="39" data-path="test-use-test-template.html"><a href="test-use-test-template.html"><i class="fa fa-check"></i><b>39</b> test-use-test-template.R</a></li>
 <li class="chapter" data-level="" data-path="aggregated-failures-and-errors.html"><a href="aggregated-failures-and-errors.html"><i class="fa fa-check"></i>Aggregated failures and errors</a></li>
 <li class="chapter" data-level="" data-path="aggregated-warnings.html"><a href="aggregated-warnings.html"><i class="fa fa-check"></i>Aggregated warnings</a></li>
 <li class="chapter" data-level="" data-path="aggregated-skipped.html"><a href="aggregated-skipped.html"><i class="fa fa-check"></i>Aggregated skipped</a></li>
@@ -183,7 +184,7 @@
 <td align="left">expect_equal( object = logit(0, 1, 0.5), expected = 0 )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-logit.R#17</td>
-<td align="left">2026-01-16 23:34:23.335677</td>
+<td align="left">2026-01-20 19:44:02.28465</td>
 </tr>
 <tr class="even">
 <td align="left"><code>logit()</code> works with correct inputs</td>
@@ -191,7 +192,7 @@
 <td align="left">expect_equal( object = logit(0.2, 1.0, 0.3), expected = -1.94591015 )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-logit.R#22</td>
-<td align="left">2026-01-16 23:34:23.348869</td>
+<td align="left">2026-01-20 19:44:02.298968</td>
 </tr>
 <tr class="odd">
 <td align="left"><code>logit()</code> works with correct inputs</td>
@@ -199,7 +200,7 @@
 <td align="left">expect_equal( object = inv_logit(0.0, 1.0, logit(0.0, 1.0, 0.5)), expected = 0.5 )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-logit.R#27</td>
-<td align="left">2026-01-16 23:34:23.361304</td>
+<td align="left">2026-01-20 19:44:02.312384</td>
 </tr>
 <tr class="even">
 <td align="left"><code>logit()</code> returns correct outputs for edge cases</td>
@@ -207,7 +208,7 @@
 <td align="left">expect_equal( object = logit(0, 1L, 0.5), expected = 0 )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-logit.R#36</td>
-<td align="left">2026-01-16 23:34:23.376776</td>
+<td align="left">2026-01-20 19:44:02.328754</td>
 </tr>
 <tr class="odd">
 <td align="left"><code>logit()</code> returns correct outputs for edge cases</td>
@@ -215,7 +216,7 @@
 <td align="left">expect_equal( object = logit(-Inf, Inf, 1), expected = NaN )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-logit.R#41</td>
-<td align="left">2026-01-16 23:34:23.38933</td>
+<td align="left">2026-01-20 19:44:02.342813</td>
 </tr>
 <tr class="even">
 <td align="left"><code>logit()</code> returns correct error messages</td>
@@ -223,7 +224,7 @@
 <td align="left">expect_error( object = logit(0, 1, c(0.5, 0.5)), regexp = “Expecting a single value” )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-logit.R#50</td>
-<td align="left">2026-01-16 23:34:23.409624</td>
+<td align="left">2026-01-20 19:44:02.363841</td>
 </tr>
 <tr class="odd">
 <td align="left"><code>logit()</code> returns correct error messages</td>
@@ -231,7 +232,7 @@
 <td align="left">expect_error( object = logit(-2:-1, 1, 0.5), regexp = “Expecting a single value” )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-logit.R#55</td>
-<td align="left">2026-01-16 23:34:23.424332</td>
+<td align="left">2026-01-20 19:44:02.37857</td>
 </tr>
 <tr class="even">
 <td align="left"><code>logit()</code> returns correct error messages</td>
@@ -239,7 +240,7 @@
 <td align="left">expect_error( object = logit(0, 1:2, 0.5), regexp = “Expecting a single value” )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-logit.R#60</td>
-<td align="left">2026-01-16 23:34:23.439118</td>
+<td align="left">2026-01-20 19:44:02.393602</td>
 </tr>
 <tr class="odd">
 <td align="left"><code>inv_logit()</code> works with correct inputs</td>
@@ -247,7 +248,7 @@
 <td align="left">expect_equal( object = inv_logit(0, 1, 0.0), expected = 0.5 )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-logit.R#73</td>
-<td align="left">2026-01-16 23:34:23.454806</td>
+<td align="left">2026-01-20 19:44:02.410275</td>
 </tr>
 <tr class="even">
 <td align="left"><code>inv_logit()</code> works with correct inputs</td>
@@ -255,7 +256,7 @@
 <td align="left">expect_equal( object = inv_logit(0.2, 1.0, -1.94591015), expected = 0.3 )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-logit.R#78</td>
-<td align="left">2026-01-16 23:34:23.468432</td>
+<td align="left">2026-01-20 19:44:02.424237</td>
 </tr>
 <tr class="odd">
 <td align="left"><code>inv_logit()</code> returns correct outputs for edge cases</td>
@@ -263,7 +264,7 @@
 <td align="left">expect_equal( object = inv_logit(0, 1L, 0.0), expected = 0.5 )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-logit.R#87</td>
-<td align="left">2026-01-16 23:34:23.484131</td>
+<td align="left">2026-01-20 19:44:02.440356</td>
 </tr>
 <tr class="even">
 <td align="left"><code>inv_logit()</code> returns correct outputs for edge cases</td>
@@ -271,7 +272,7 @@
 <td align="left">expect_equal( object = inv_logit(-Inf, Inf, 1), expected = NaN )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-logit.R#92</td>
-<td align="left">2026-01-16 23:34:23.496676</td>
+<td align="left">2026-01-20 19:44:02.453517</td>
 </tr>
 <tr class="odd">
 <td align="left"><code>inv_logit()</code> returns correct error messages</td>
@@ -279,7 +280,7 @@
 <td align="left">expect_error( object = inv_logit(0, 1, c(0.5, 0.5)), regexp = “Expecting a single value” )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-logit.R#101</td>
-<td align="left">2026-01-16 23:34:23.514257</td>
+<td align="left">2026-01-20 19:44:02.471757</td>
 </tr>
 <tr class="even">
 <td align="left"><code>inv_logit()</code> returns correct error messages</td>
@@ -287,7 +288,7 @@
 <td align="left">expect_error( object = inv_logit(-2:-1, 1, 0.5), regexp = “Expecting a single value” )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-logit.R#106</td>
-<td align="left">2026-01-16 23:34:23.528646</td>
+<td align="left">2026-01-20 19:44:02.486964</td>
 </tr>
 <tr class="odd">
 <td align="left"><code>inv_logit()</code> returns correct error messages</td>
@@ -295,7 +296,7 @@
 <td align="left">expect_error( object = inv_logit(0, 1:2, 0.5), regexp = “Expecting a single value” )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-logit.R#111</td>
-<td align="left">2026-01-16 23:34:23.543013</td>
+<td align="left">2026-01-20 19:44:02.502305</td>
 </tr>
 </tbody>
 </table>
@@ -307,7 +308,7 @@
         </div>
       </div>
 <a href="test-is_fims_verbose.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="test-parallel-caa-mle-wrappers.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="test-projections-looped.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>

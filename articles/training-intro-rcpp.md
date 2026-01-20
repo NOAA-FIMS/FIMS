@@ -63,7 +63,7 @@ add
 ```
 
     ## function (x, y, z) 
-    ## .Call(<pointer: 0x7fcedf3d4530>, x, y, z)
+    ## .Call(<pointer: 0x7fe8523d2530>, x, y, z)
 
 ``` r
 add(1, 2, 3)
@@ -187,9 +187,9 @@ microbenchmark(
 ```
 
     ## Unit: microseconds
-    ##      expr     min      lq     mean   median      uq      max neval
-    ##   mean(x) 421.898 430.514 436.4777 434.7120 440.793   508.65   100
-    ##  meanC(x) 371.364 371.624 480.4295 372.4905 380.771 10795.99   100
+    ##      expr     min       lq     mean  median      uq       max neval
+    ##   mean(x) 420.386 432.7745 438.7090 437.804 443.109   521.556   100
+    ##  meanC(x) 371.264 372.0915 496.0677 373.634 382.636 12232.342   100
 
 ### C++ in FIMS
 

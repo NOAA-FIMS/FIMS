@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2026-01-16" />
+<meta name="date" content="2026-01-20" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -103,7 +103,7 @@
 <li class="chapter" data-level="23" data-path="test-integration-fims-estimation-random-effects-without-wrappers.html"><a href="test-integration-fims-estimation-random-effects-without-wrappers.html"><i class="fa fa-check"></i><b>23</b> test-integration-fims-estimation-random-effects-without-wrappers.R</a></li>
 <li class="chapter" data-level="24" data-path="test-is_fims_verbose.html"><a href="test-is_fims_verbose.html"><i class="fa fa-check"></i><b>24</b> test-is_fims_verbose.R</a></li>
 <li class="chapter" data-level="25" data-path="test-logit.html"><a href="test-logit.html"><i class="fa fa-check"></i><b>25</b> test-logit.R</a></li>
-<li class="chapter" data-level="26" data-path="test-parallel-caa-mle-wrappers.html"><a href="test-parallel-caa-mle-wrappers.html"><i class="fa fa-check"></i><b>26</b> test-parallel-caa-mle-wrappers.R</a></li>
+<li class="chapter" data-level="26" data-path="test-projections-looped.html"><a href="test-projections-looped.html"><i class="fa fa-check"></i><b>26</b> test-projections-looped.R</a></li>
 <li class="chapter" data-level="27" data-path="test-rcpp-data.html"><a href="test-rcpp-data.html"><i class="fa fa-check"></i><b>27</b> test-rcpp-data.R</a></li>
 <li class="chapter" data-level="28" data-path="test-rcpp-distribution.html"><a href="test-rcpp-distribution.html"><i class="fa fa-check"></i><b>28</b> test-rcpp-distribution.R</a></li>
 <li class="chapter" data-level="29" data-path="test-rcpp-ewaa.html"><a href="test-rcpp-ewaa.html"><i class="fa fa-check"></i><b>29</b> test-rcpp-ewaa.R</a></li>
@@ -115,7 +115,8 @@
 <li class="chapter" data-level="35" data-path="test-rcpp-recruitment-interface.html"><a href="test-rcpp-recruitment-interface.html"><i class="fa fa-check"></i><b>35</b> test-rcpp-recruitment-interface.R</a></li>
 <li class="chapter" data-level="36" data-path="test-rcpp-selectivity.html"><a href="test-rcpp-selectivity.html"><i class="fa fa-check"></i><b>36</b> test-rcpp-selectivity.R</a></li>
 <li class="chapter" data-level="37" data-path="test-reshape_json_estimates.html"><a href="test-reshape_json_estimates.html"><i class="fa fa-check"></i><b>37</b> test-reshape_json_estimates.R</a></li>
-<li class="chapter" data-level="38" data-path="test-use-test-template.html"><a href="test-use-test-template.html"><i class="fa fa-check"></i><b>38</b> test-use-test-template.R</a></li>
+<li class="chapter" data-level="38" data-path="test-slow-parallel-caa-mle-wrappers.html"><a href="test-slow-parallel-caa-mle-wrappers.html"><i class="fa fa-check"></i><b>38</b> test-slow-parallel-caa-mle-wrappers.R</a></li>
+<li class="chapter" data-level="39" data-path="test-use-test-template.html"><a href="test-use-test-template.html"><i class="fa fa-check"></i><b>39</b> test-use-test-template.R</a></li>
 <li class="chapter" data-level="" data-path="aggregated-failures-and-errors.html"><a href="aggregated-failures-and-errors.html"><i class="fa fa-check"></i>Aggregated failures and errors</a></li>
 <li class="chapter" data-level="" data-path="aggregated-warnings.html"><a href="aggregated-warnings.html"><i class="fa fa-check"></i>Aggregated warnings</a></li>
 <li class="chapter" data-level="" data-path="aggregated-skipped.html"><a href="aggregated-skipped.html"><i class="fa fa-check"></i>Aggregated skipped</a></li>
@@ -145,9 +146,9 @@
 <div id="summary-19" class="section level2 unnumbered hasAnchor">
 <h2>Summary<a href="test-integration-caa-mle.html#summary-19" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <ul>
-<li><p><strong>Number of test(s)</strong> : 3</p></li>
-<li><p><strong>Number of expectation(s)</strong> : 8</p></li>
-<li><p><strong>Number of successful expectation(s)</strong> : 8</p></li>
+<li><p><strong>Number of test(s)</strong> : 5</p></li>
+<li><p><strong>Number of expectation(s)</strong> : 10</p></li>
+<li><p><strong>Number of successful expectation(s)</strong> : 10</p></li>
 <li><p><strong>Number of failed expectation(s)</strong> : 0</p></li>
 <li><p><strong>Number of errored expectation(s)</strong> : 0</p></li>
 <li><p><strong>Number of expectations with warning(s)</strong> : 0</p></li>
@@ -157,12 +158,12 @@
 </div>
 <div id="details-19" class="section level2 unnumbered hasAnchor">
 <h2>Details<a href="test-integration-caa-mle.html#details-19" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<table>
+<table style="width:100%;">
 <colgroup>
+<col width="17%" />
+<col width="23%" />
+<col width="34%" />
 <col width="14%" />
-<col width="24%" />
-<col width="36%" />
-<col width="15%" />
 <col width="4%" />
 <col width="4%" />
 </colgroup>
@@ -183,7 +184,7 @@
 <td align="left">verify_fims_deterministic( report = result[[“report”]], estimates = result[[“sdr_fixed”]], om_input = om_input_list[[iter_id]], om_output = om_output_list[[iter_id]], em_input = em_input_list[[iter_id]], use_fimsfit = FALSE )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-integration-caa-mle.R#34</td>
-<td align="left">2026-01-16 23:03:53.667138</td>
+<td align="left">2026-01-20 19:13:11.36056</td>
 </tr>
 <tr class="even">
 <td align="left">catch-at-age model (deterministic MLE without wrappers) works with correct inputs</td>
@@ -191,7 +192,7 @@
 <td align="left">verify_fims_nll( report = result[[“report”]], om_input = om_input_list[[iter_id]], om_output = om_output_list[[iter_id]], em_input = em_input_list[[iter_id]] )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-integration-caa-mle.R#44</td>
-<td align="left">2026-01-16 23:03:53.760635</td>
+<td align="left">2026-01-20 19:13:11.455073</td>
 </tr>
 <tr class="odd">
 <td align="left">catch-at-age model (deterministic MLE without wrappers) works with correct inputs</td>
@@ -199,7 +200,7 @@
 <td align="left">expect_equal(length(result[[“obj”]][[“par”]]), 48)</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-integration-caa-mle.R#53</td>
-<td align="left">2026-01-16 23:03:53.793229</td>
+<td align="left">2026-01-20 19:13:11.489971</td>
 </tr>
 <tr class="even">
 <td align="left">catch-at-age model (estimation MLE without wrappers) works with correct inputs</td>
@@ -207,7 +208,7 @@
 <td align="left">validate_fims( report = result[[“report”]], estimates = result[[“sdr_report”]], om_input = om_input_list[[iter_id]], om_output = om_output_list[[iter_id]], em_input = em_input_list[[iter_id]] )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-integration-caa-mle.R#76</td>
-<td align="left">2026-01-16 23:06:39.69093</td>
+<td align="left">2026-01-20 19:15:48.373819</td>
 </tr>
 <tr class="odd">
 <td align="left">catch-at-age model (estimation MLE without wrappers) works with correct inputs</td>
@@ -215,31 +216,47 @@
 <td align="left">expect_equal(out_of_tolerance_parameters, 0)</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-integration-caa-mle.R#96</td>
-<td align="left">2026-01-16 23:06:39.729914</td>
+<td align="left">2026-01-20 19:15:48.417021</td>
 </tr>
 <tr class="even">
-<td align="left">catch-at-age model (estimation MLE without wrappers) returns correct outputs for edge cases</td>
+<td align="left">catch-at-age model (estimation MLE without wrappers) returns correct outputs for missing values</td>
 <td align="left">Test that FIMS runs with missing values in survey index observations using NA (missing value) placeholder in the second value and the report is not NULL.</td>
 <td align="left">expect_false(is.null(result[[“report”]]))</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
-<td align="left">test-integration-caa-mle.R#116</td>
-<td align="left">2026-01-16 23:09:40.833181</td>
+<td align="left">test-integration-caa-mle.R#117</td>
+<td align="left">2026-01-20 19:18:26.751848</td>
 </tr>
 <tr class="odd">
-<td align="left">catch-at-age model (estimation MLE without wrappers) returns correct outputs for edge cases</td>
+<td align="left">catch-at-age model (estimation MLE without wrappers) returns correct outputs for missing values</td>
 <td align="left">Test that the maximum gradient is less than or equal to 0.0001 after running FIMS with missing values in survey index observations.</td>
 <td align="left">expect_lte(max_gradient, 0.0001)</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
-<td align="left">test-integration-caa-mle.R#130</td>
-<td align="left">2026-01-16 23:09:41.35958</td>
+<td align="left">test-integration-caa-mle.R#131</td>
+<td align="left">2026-01-20 19:18:27.254739</td>
 </tr>
 <tr class="even">
-<td align="left">catch-at-age model (estimation MLE without wrappers) returns correct outputs for edge cases</td>
+<td align="left">catch-at-age model (estimation MLE without wrappers) returns correct outputs for missing values</td>
 <td align="left">Test that FIMS runs with only one observation in landings and survey data and the report is not NULL.</td>
 <td align="left">validate_fims( report = result[[“report”]], estimates = result[[“sdr_report”]], om_input = om_input_list[[iter_id]], om_output = om_output_list[[iter_id]], em_input = em_input_list[[iter_id]] )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
-<td align="left">test-integration-caa-mle.R#159</td>
-<td align="left">2026-01-16 23:12:40.651261</td>
+<td align="left">test-integration-caa-mle.R#134</td>
+<td align="left">2026-01-20 19:18:27.271426</td>
+</tr>
+<tr class="odd">
+<td align="left">catch-at-age model (estimation MLE without wrappers) returns correct outputs for sample size of 1</td>
+<td align="left">Test that FIMS runs with only one observation in landings and survey data and the report is not NULL.</td>
+<td align="left">validate_fims( report = result[[“report”]], estimates = result[[“sdr_report”]], om_input = om_input_list[[iter_id]], om_output = om_output_list[[iter_id]], em_input = em_input_list[[iter_id]] )</td>
+<td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
+<td align="left">test-integration-caa-mle.R#165</td>
+<td align="left">2026-01-20 19:21:05.043515</td>
+</tr>
+<tr class="even">
+<td align="left">catch-at-age model (estimation MLE without wrappers) returns correct outputs with NA values and sample size of 1</td>
+<td align="left">Test that FIMS runs with only one observation in landings and survey data and the report is not NULL.</td>
+<td align="left">validate_fims( report = result[[“report”]], estimates = result[[“sdr_report”]], om_input = om_input_list[[iter_id]], om_output = om_output_list[[iter_id]], em_input = em_input_list[[iter_id]] )</td>
+<td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
+<td align="left">test-integration-caa-mle.R#203</td>
+<td align="left">2026-01-20 19:23:42.568373</td>
 </tr>
 </tbody>
 </table>

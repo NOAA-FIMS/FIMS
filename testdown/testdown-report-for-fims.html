@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2026-01-16" />
+<meta name="date" content="2026-01-20" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -103,7 +103,7 @@
 <li class="chapter" data-level="23" data-path="test-integration-fims-estimation-random-effects-without-wrappers.html"><a href="test-integration-fims-estimation-random-effects-without-wrappers.html"><i class="fa fa-check"></i><b>23</b> test-integration-fims-estimation-random-effects-without-wrappers.R</a></li>
 <li class="chapter" data-level="24" data-path="test-is_fims_verbose.html"><a href="test-is_fims_verbose.html"><i class="fa fa-check"></i><b>24</b> test-is_fims_verbose.R</a></li>
 <li class="chapter" data-level="25" data-path="test-logit.html"><a href="test-logit.html"><i class="fa fa-check"></i><b>25</b> test-logit.R</a></li>
-<li class="chapter" data-level="26" data-path="test-parallel-caa-mle-wrappers.html"><a href="test-parallel-caa-mle-wrappers.html"><i class="fa fa-check"></i><b>26</b> test-parallel-caa-mle-wrappers.R</a></li>
+<li class="chapter" data-level="26" data-path="test-projections-looped.html"><a href="test-projections-looped.html"><i class="fa fa-check"></i><b>26</b> test-projections-looped.R</a></li>
 <li class="chapter" data-level="27" data-path="test-rcpp-data.html"><a href="test-rcpp-data.html"><i class="fa fa-check"></i><b>27</b> test-rcpp-data.R</a></li>
 <li class="chapter" data-level="28" data-path="test-rcpp-distribution.html"><a href="test-rcpp-distribution.html"><i class="fa fa-check"></i><b>28</b> test-rcpp-distribution.R</a></li>
 <li class="chapter" data-level="29" data-path="test-rcpp-ewaa.html"><a href="test-rcpp-ewaa.html"><i class="fa fa-check"></i><b>29</b> test-rcpp-ewaa.R</a></li>
@@ -115,7 +115,8 @@
 <li class="chapter" data-level="35" data-path="test-rcpp-recruitment-interface.html"><a href="test-rcpp-recruitment-interface.html"><i class="fa fa-check"></i><b>35</b> test-rcpp-recruitment-interface.R</a></li>
 <li class="chapter" data-level="36" data-path="test-rcpp-selectivity.html"><a href="test-rcpp-selectivity.html"><i class="fa fa-check"></i><b>36</b> test-rcpp-selectivity.R</a></li>
 <li class="chapter" data-level="37" data-path="test-reshape_json_estimates.html"><a href="test-reshape_json_estimates.html"><i class="fa fa-check"></i><b>37</b> test-reshape_json_estimates.R</a></li>
-<li class="chapter" data-level="38" data-path="test-use-test-template.html"><a href="test-use-test-template.html"><i class="fa fa-check"></i><b>38</b> test-use-test-template.R</a></li>
+<li class="chapter" data-level="38" data-path="test-slow-parallel-caa-mle-wrappers.html"><a href="test-slow-parallel-caa-mle-wrappers.html"><i class="fa fa-check"></i><b>38</b> test-slow-parallel-caa-mle-wrappers.R</a></li>
+<li class="chapter" data-level="39" data-path="test-use-test-template.html"><a href="test-use-test-template.html"><i class="fa fa-check"></i><b>39</b> test-use-test-template.R</a></li>
 <li class="chapter" data-level="" data-path="aggregated-failures-and-errors.html"><a href="aggregated-failures-and-errors.html"><i class="fa fa-check"></i>Aggregated failures and errors</a></li>
 <li class="chapter" data-level="" data-path="aggregated-warnings.html"><a href="aggregated-warnings.html"><i class="fa fa-check"></i>Aggregated warnings</a></li>
 <li class="chapter" data-level="" data-path="aggregated-skipped.html"><a href="aggregated-skipped.html"><i class="fa fa-check"></i>Aggregated skipped</a></li>
@@ -142,18 +143,18 @@
             <section class="normal" id="section-">
 <div id="header">
 <h1 class="title">{testdown} report</h1>
-<p class="date"><em>2026-01-16</em></p>
+<p class="date"><em>2026-01-20</em></p>
 </div>
 <div id="testdown-report-for-fims" class="section level1 unnumbered hasAnchor">
 <h1><code>{testdown}</code> report for <code>{FIMS}</code><a href="testdown-report-for-fims.html#testdown-report-for-fims" class="anchor-section" aria-label="Anchor link to header"></a></h1>
 <blockquote>
-<p>Performed on the: 2026-01-16 23:34:44.485758 , using {testdown} version 0.1.2.9000</p>
+<p>Performed on the: 2026-01-20 20:35:38.717377 , using {testdown} version 0.1.2.9000</p>
 </blockquote>
 <hr />
 <p><strong>Tested Package Information:</strong></p>
 <ul>
 <li><strong>Title</strong> : The Fisheries Integrated Modeling System</li>
-<li><strong>Version</strong> : 0.7.1</li>
+<li><strong>Version</strong> : 0.8.0</li>
 <li><strong>Description</strong> : The Fisheries Integrated Modeling System is a next-generation
 framework of stock assessment models, assisting fishery managers with
 the goal of achieving sustainable fisheries. This system, when
@@ -169,14 +170,14 @@ stock assessment models.</li>
 <ul>
 <li><p><strong>Project Name</strong> : FIMS</p></li>
 <li><p><strong>Environment</strong> : /home/runner/work/FIMS/FIMS</p></li>
-<li><p><strong>Number of test file(s)</strong> : 38</p></li>
+<li><p><strong>Number of test file(s)</strong> : 39</p></li>
 </ul>
 <hr />
 <p><strong>Result Overview:</strong></p>
 <ul>
-<li><p><strong>Number of test(s)</strong> : 97</p></li>
-<li><p><strong>Number of expectation(s)</strong> : 402</p></li>
-<li><p><strong>Number of successful expectation(s)</strong> : 330</p></li>
+<li><p><strong>Number of test(s)</strong> : 103</p></li>
+<li><p><strong>Number of expectation(s)</strong> : 416</p></li>
+<li><p><strong>Number of successful expectation(s)</strong> : 344</p></li>
 <li><p><strong>Number of failed expectation(s)</strong> : 0</p></li>
 <li><p><strong>Number of errored expectation(s)</strong> : 0</p></li>
 <li><p><strong>Number of expectation(s) with warning(s)</strong> : 0</p></li>
@@ -210,17 +211,17 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
-[1] FIMS_0.7.1     testthat_3.3.2
+[1] FIMS_0.8.0     testthat_3.3.2
 
 loaded via a namespace (and not attached):
   [1] attempt_0.3.1       remotes_2.5.0       rlang_1.1.7        
   [4] magrittr_2.0.4      otel_0.2.0          compiler_4.5.2     
-  [7] roxygen2_7.3.3      callr_3.7.6         vctrs_0.6.5        
+  [7] roxygen2_7.3.3      callr_3.7.6         vctrs_0.7.0        
  [10] stringr_1.6.0       pkgconfig_2.0.3     fastmap_1.2.0      
  [13] ellipsis_0.3.2      utf8_1.2.6          promises_1.5.0     
  [16] rmarkdown_2.30      markdown_2.0        sessioninfo_1.2.3  
  [19] ps_1.9.1            purrr_1.2.1         waldo_0.6.2        
- [22] xfun_0.55           gert_2.3.1          cachem_1.1.0       
+ [22] xfun_0.56           gert_2.3.1          cachem_1.1.0       
  [25] yesno_0.1.3         litedown_0.9        covr_3.6.5         
  [28] jsonlite_2.0.0      later_1.4.5         R6_2.6.1           
  [31] golem_0.5.1         bslib_0.9.0         stringi_1.8.7      
@@ -228,12 +229,12 @@ loaded via a namespace (and not attached):
  [37] lubridate_1.9.4     jquerylib_0.1.4     Rcpp_1.1.1         
  [40] bookdown_0.46       knitr_1.51          usethis_3.2.1      
  [43] base64enc_0.1-3     httpuv_1.6.16       Matrix_1.7-4       
- [46] timechange_0.3.0    tidyselect_1.2.1    rstudioapi_0.17.1  
+ [46] timechange_0.3.0    tidyselect_1.2.1    rstudioapi_0.18.0  
  [49] yaml_2.3.12         TMB_1.9.19          codetools_0.2-20   
  [52] processx_3.8.6      pkgbuild_1.4.8      lattice_0.22-7     
  [55] tibble_3.3.1        shiny_1.12.1        withr_3.0.2        
  [58] S7_0.2.1            askpass_1.2.1       evaluate_1.0.5     
- [61] arpr_0.1.2          desc_1.4.3          xml2_1.5.1         
+ [61] arpr_0.1.2          desc_1.4.3          xml2_1.5.2         
  [64] RcppEigen_0.3.4.0.2 pillar_1.11.1       DT_0.34.0          
  [67] rex_1.2.1           generics_0.1.4      rprojroot_2.1.1    
  [70] credentials_2.0.3   ggplot2_4.0.1       commonmark_2.0.0   

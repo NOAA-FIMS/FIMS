@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2026-01-16" />
+<meta name="date" content="2026-01-20" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -103,7 +103,7 @@
 <li class="chapter" data-level="23" data-path="test-integration-fims-estimation-random-effects-without-wrappers.html"><a href="test-integration-fims-estimation-random-effects-without-wrappers.html"><i class="fa fa-check"></i><b>23</b> test-integration-fims-estimation-random-effects-without-wrappers.R</a></li>
 <li class="chapter" data-level="24" data-path="test-is_fims_verbose.html"><a href="test-is_fims_verbose.html"><i class="fa fa-check"></i><b>24</b> test-is_fims_verbose.R</a></li>
 <li class="chapter" data-level="25" data-path="test-logit.html"><a href="test-logit.html"><i class="fa fa-check"></i><b>25</b> test-logit.R</a></li>
-<li class="chapter" data-level="26" data-path="test-parallel-caa-mle-wrappers.html"><a href="test-parallel-caa-mle-wrappers.html"><i class="fa fa-check"></i><b>26</b> test-parallel-caa-mle-wrappers.R</a></li>
+<li class="chapter" data-level="26" data-path="test-projections-looped.html"><a href="test-projections-looped.html"><i class="fa fa-check"></i><b>26</b> test-projections-looped.R</a></li>
 <li class="chapter" data-level="27" data-path="test-rcpp-data.html"><a href="test-rcpp-data.html"><i class="fa fa-check"></i><b>27</b> test-rcpp-data.R</a></li>
 <li class="chapter" data-level="28" data-path="test-rcpp-distribution.html"><a href="test-rcpp-distribution.html"><i class="fa fa-check"></i><b>28</b> test-rcpp-distribution.R</a></li>
 <li class="chapter" data-level="29" data-path="test-rcpp-ewaa.html"><a href="test-rcpp-ewaa.html"><i class="fa fa-check"></i><b>29</b> test-rcpp-ewaa.R</a></li>
@@ -115,7 +115,8 @@
 <li class="chapter" data-level="35" data-path="test-rcpp-recruitment-interface.html"><a href="test-rcpp-recruitment-interface.html"><i class="fa fa-check"></i><b>35</b> test-rcpp-recruitment-interface.R</a></li>
 <li class="chapter" data-level="36" data-path="test-rcpp-selectivity.html"><a href="test-rcpp-selectivity.html"><i class="fa fa-check"></i><b>36</b> test-rcpp-selectivity.R</a></li>
 <li class="chapter" data-level="37" data-path="test-reshape_json_estimates.html"><a href="test-reshape_json_estimates.html"><i class="fa fa-check"></i><b>37</b> test-reshape_json_estimates.R</a></li>
-<li class="chapter" data-level="38" data-path="test-use-test-template.html"><a href="test-use-test-template.html"><i class="fa fa-check"></i><b>38</b> test-use-test-template.R</a></li>
+<li class="chapter" data-level="38" data-path="test-slow-parallel-caa-mle-wrappers.html"><a href="test-slow-parallel-caa-mle-wrappers.html"><i class="fa fa-check"></i><b>38</b> test-slow-parallel-caa-mle-wrappers.R</a></li>
+<li class="chapter" data-level="39" data-path="test-use-test-template.html"><a href="test-use-test-template.html"><i class="fa fa-check"></i><b>39</b> test-use-test-template.R</a></li>
 <li class="chapter" data-level="" data-path="aggregated-failures-and-errors.html"><a href="aggregated-failures-and-errors.html"><i class="fa fa-check"></i>Aggregated failures and errors</a></li>
 <li class="chapter" data-level="" data-path="aggregated-warnings.html"><a href="aggregated-warnings.html"><i class="fa fa-check"></i>Aggregated warnings</a></li>
 <li class="chapter" data-level="" data-path="aggregated-skipped.html"><a href="aggregated-skipped.html"><i class="fa fa-check"></i>Aggregated skipped</a></li>
@@ -183,7 +184,7 @@
 <td align="left">expect_equal(length(v0), 1)</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-rcpp-parameter-vector.R#23</td>
-<td align="left">2026-01-16 23:34:26.431036</td>
+<td align="left">2026-01-20 20:35:16.828347</td>
 </tr>
 <tr class="even">
 <td align="left">rcpp ParameterVector works as expected</td>
@@ -191,7 +192,7 @@
 <td align="left">expect_equal(v0$at(1)$value, 0)</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-rcpp-parameter-vector.R#25</td>
-<td align="left">2026-01-16 23:34:26.450502</td>
+<td align="left">2026-01-20 20:35:16.849372</td>
 </tr>
 <tr class="odd">
 <td align="left">rcpp ParameterVector works as expected</td>
@@ -199,7 +200,7 @@
 <td align="left">expect_equal(v1$get(i - 1)$value, v1_value)</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-rcpp-parameter-vector.R#31</td>
-<td align="left">2026-01-16 23:34:26.470318</td>
+<td align="left">2026-01-20 20:35:16.871315</td>
 </tr>
 <tr class="even">
 <td align="left">rcpp ParameterVector works as expected</td>
@@ -207,7 +208,7 @@
 <td align="left">expect_equal(v2$get(i - 1)$value, v2_value)</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-rcpp-parameter-vector.R#37</td>
-<td align="left">2026-01-16 23:34:26.516015</td>
+<td align="left">2026-01-20 20:35:16.944037</td>
 </tr>
 <tr class="odd">
 <td align="left">rcpp ParameterVector works as expected</td>
@@ -215,7 +216,7 @@
 <td align="left">expect_equal(v_plus_test$get(i - 1)$value, (v1[i]$value + v2[i]$value))</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-rcpp-parameter-vector.R#43</td>
-<td align="left">2026-01-16 23:34:26.575133</td>
+<td align="left">2026-01-20 20:35:17.011837</td>
 </tr>
 <tr class="even">
 <td align="left">rcpp ParameterVector works as expected</td>
@@ -223,7 +224,7 @@
 <td align="left">expect_equal(v_minus_test$get(i - 1)$value, (v1[i]$value - v2[i]$value))</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-rcpp-parameter-vector.R#49</td>
-<td align="left">2026-01-16 23:34:26.647298</td>
+<td align="left">2026-01-20 20:35:17.091953</td>
 </tr>
 <tr class="odd">
 <td align="left">rcpp ParameterVector works as expected</td>
@@ -231,7 +232,7 @@
 <td align="left">expect_equal(v_mult_test$get(i - 1)$value, (v1[i]$value * v2[i]$value))</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-rcpp-parameter-vector.R#55</td>
-<td align="left">2026-01-16 23:34:26.713203</td>
+<td align="left">2026-01-20 20:35:17.164764</td>
 </tr>
 <tr class="even">
 <td align="left">rcpp ParameterVector works as expected</td>
@@ -239,7 +240,7 @@
 <td align="left">expect_equal(v_div_test$get(i - 1)$value, (v1[i]$value / v2[i]$value))</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-rcpp-parameter-vector.R#61</td>
-<td align="left">2026-01-16 23:34:26.779591</td>
+<td align="left">2026-01-20 20:35:17.236773</td>
 </tr>
 <tr class="odd">
 <td align="left">rcpp ParameterVector works as expected</td>
@@ -247,7 +248,7 @@
 <td align="left">expect_equal(v_plus_test_scalar$get(i - 1)$value, (v2_value + v1[i]$value))</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-rcpp-parameter-vector.R#67</td>
-<td align="left">2026-01-16 23:34:26.841464</td>
+<td align="left">2026-01-20 20:35:17.306499</td>
 </tr>
 <tr class="even">
 <td align="left">rcpp ParameterVector works as expected</td>
@@ -255,7 +256,7 @@
 <td align="left">expect_equal(v_minus_test_scalar$get(i - 1)$value, (v2_value - v1[i]$value))</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-rcpp-parameter-vector.R#73</td>
-<td align="left">2026-01-16 23:34:26.908301</td>
+<td align="left">2026-01-20 20:35:17.37681</td>
 </tr>
 <tr class="odd">
 <td align="left">rcpp ParameterVector works as expected</td>
@@ -263,7 +264,7 @@
 <td align="left">expect_equal(v_mult_test_scalar$get(i - 1)$value, (v2_value * v1[i]$value))</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-rcpp-parameter-vector.R#79</td>
-<td align="left">2026-01-16 23:34:26.966486</td>
+<td align="left">2026-01-20 20:35:17.437889</td>
 </tr>
 <tr class="even">
 <td align="left">rcpp ParameterVector works as expected</td>
@@ -271,7 +272,7 @@
 <td align="left">expect_equal(v_div_test_scalar$get(i - 1)$value, (v2_value / v1[i]$value))</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-rcpp-parameter-vector.R#85</td>
-<td align="left">2026-01-16 23:34:27.025414</td>
+<td align="left">2026-01-20 20:35:17.499812</td>
 </tr>
 <tr class="odd">
 <td align="left">rcpp ParameterVector works as expected</td>
@@ -279,7 +280,7 @@
 <td align="left">expect_equal(v_plus_test_scalar$get(i - 1)$value, (v1[i]$value + v2_value))</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-rcpp-parameter-vector.R#91</td>
-<td align="left">2026-01-16 23:34:27.083302</td>
+<td align="left">2026-01-20 20:35:17.560561</td>
 </tr>
 <tr class="even">
 <td align="left">rcpp ParameterVector works as expected</td>
@@ -287,7 +288,7 @@
 <td align="left">expect_equal(v_minus_test_scalar$get(i - 1)$value, (v1[i]$value - v2_value))</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-rcpp-parameter-vector.R#97</td>
-<td align="left">2026-01-16 23:34:27.170427</td>
+<td align="left">2026-01-20 20:35:17.632556</td>
 </tr>
 <tr class="odd">
 <td align="left">rcpp ParameterVector works as expected</td>
@@ -295,7 +296,7 @@
 <td align="left">expect_equal(v_mult_test_scalar$get(i - 1)$value, (v1[i]$value * v2_value))</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-rcpp-parameter-vector.R#103</td>
-<td align="left">2026-01-16 23:34:27.22805</td>
+<td align="left">2026-01-20 20:35:17.713621</td>
 </tr>
 <tr class="even">
 <td align="left">rcpp ParameterVector works as expected</td>
@@ -303,7 +304,7 @@
 <td align="left">expect_equal(v_div_test_scalar$get(i - 1)$value, (v1[i]$value / v2_value))</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-rcpp-parameter-vector.R#109</td>
-<td align="left">2026-01-16 23:34:27.286106</td>
+<td align="left">2026-01-20 20:35:17.774301</td>
 </tr>
 <tr class="odd">
 <td align="left">rcpp ParameterVector works as expected</td>
@@ -311,7 +312,7 @@
 <td align="left">expect_equal(v_acos_test$get(i - 1)$value, acos(v1_value))</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-rcpp-parameter-vector.R#115</td>
-<td align="left">2026-01-16 23:34:27.342935</td>
+<td align="left">2026-01-20 20:35:17.833965</td>
 </tr>
 <tr class="even">
 <td align="left">rcpp ParameterVector works as expected</td>
@@ -319,7 +320,7 @@
 <td align="left">expect_equal(v_asin_test$get(i - 1)$value, asin(v1_value))</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-rcpp-parameter-vector.R#121</td>
-<td align="left">2026-01-16 23:34:27.399462</td>
+<td align="left">2026-01-20 20:35:17.894953</td>
 </tr>
 <tr class="odd">
 <td align="left">rcpp ParameterVector works as expected</td>
@@ -327,7 +328,7 @@
 <td align="left">expect_equal(v_atan_test$get(i - 1)$value, atan(v1_value))</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-rcpp-parameter-vector.R#127</td>
-<td align="left">2026-01-16 23:34:27.452325</td>
+<td align="left">2026-01-20 20:35:17.952222</td>
 </tr>
 <tr class="even">
 <td align="left">rcpp ParameterVector works as expected</td>
@@ -335,7 +336,7 @@
 <td align="left">expect_equal(v_cos_test$get(i - 1)$value, cos(v1_value))</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-rcpp-parameter-vector.R#133</td>
-<td align="left">2026-01-16 23:34:27.506296</td>
+<td align="left">2026-01-20 20:35:18.008099</td>
 </tr>
 <tr class="odd">
 <td align="left">rcpp ParameterVector works as expected</td>
@@ -343,7 +344,7 @@
 <td align="left">expect_equal(v_cosh_test$get(i - 1)$value, cosh(v1_value))</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-rcpp-parameter-vector.R#139</td>
-<td align="left">2026-01-16 23:34:27.563168</td>
+<td align="left">2026-01-20 20:35:18.063674</td>
 </tr>
 <tr class="even">
 <td align="left">rcpp ParameterVector works as expected</td>
@@ -351,7 +352,7 @@
 <td align="left">expect_equal(v_sin_test$get(i - 1)$value, sin(v1_value))</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-rcpp-parameter-vector.R#145</td>
-<td align="left">2026-01-16 23:34:27.616287</td>
+<td align="left">2026-01-20 20:35:18.120795</td>
 </tr>
 <tr class="odd">
 <td align="left">rcpp ParameterVector works as expected</td>
@@ -359,7 +360,7 @@
 <td align="left">expect_equal(v_sinh_test$get(i - 1)$value, sinh(v1_value))</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-rcpp-parameter-vector.R#151</td>
-<td align="left">2026-01-16 23:34:27.669481</td>
+<td align="left">2026-01-20 20:35:18.177375</td>
 </tr>
 <tr class="even">
 <td align="left">rcpp ParameterVector works as expected</td>
@@ -367,7 +368,7 @@
 <td align="left">expect_equal(v_tan_test$get(i - 1)$value, tan(v1_value))</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-rcpp-parameter-vector.R#157</td>
-<td align="left">2026-01-16 23:34:27.723134</td>
+<td align="left">2026-01-20 20:35:18.233628</td>
 </tr>
 <tr class="odd">
 <td align="left">rcpp ParameterVector works as expected</td>
@@ -375,7 +376,7 @@
 <td align="left">expect_equal(v_tanh_test$get(i - 1)$value, tanh(v1_value))</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-rcpp-parameter-vector.R#163</td>
-<td align="left">2026-01-16 23:34:27.776361</td>
+<td align="left">2026-01-20 20:35:18.291247</td>
 </tr>
 <tr class="even">
 <td align="left">rcpp ParameterVector works as expected</td>
@@ -383,7 +384,7 @@
 <td align="left">expect_equal(v_exp_test$get(i - 1)$value, exp(v1_value))</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-rcpp-parameter-vector.R#169</td>
-<td align="left">2026-01-16 23:34:27.847141</td>
+<td align="left">2026-01-20 20:35:18.349422</td>
 </tr>
 <tr class="odd">
 <td align="left">rcpp ParameterVector works as expected</td>
@@ -391,7 +392,7 @@
 <td align="left">expect_equal(v_log10_test$get(i - 1)$value, log10(v1_value))</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-rcpp-parameter-vector.R#175</td>
-<td align="left">2026-01-16 23:34:27.900683</td>
+<td align="left">2026-01-20 20:35:18.405823</td>
 </tr>
 <tr class="even">
 <td align="left">rcpp ParameterVector works as expected</td>
@@ -399,7 +400,7 @@
 <td align="left">expect_equal(v_sqrt_test$get(i - 1)$value, sqrt(v1_value))</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-rcpp-parameter-vector.R#181</td>
-<td align="left">2026-01-16 23:34:27.954105</td>
+<td align="left">2026-01-20 20:35:18.484032</td>
 </tr>
 <tr class="odd">
 <td align="left">rcpp ParameterVector works as expected</td>
@@ -407,7 +408,7 @@
 <td align="left">expect_equal(v_log_test$get(i - 1)$value, log(v1_value))</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-rcpp-parameter-vector.R#187</td>
-<td align="left">2026-01-16 23:34:28.007502</td>
+<td align="left">2026-01-20 20:35:18.540863</td>
 </tr>
 <tr class="even">
 <td align="left">ParameterVector returns correct error messages</td>
@@ -415,7 +416,7 @@
 <td align="left">expect_error(v0$at(10)$value, regexp = “ParameterVector: Index out of range”)</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-rcpp-parameter-vector.R#200</td>
-<td align="left">2026-01-16 23:34:28.056633</td>
+<td align="left">2026-01-20 20:35:18.59326</td>
 </tr>
 <tr class="odd">
 <td align="left">ParameterVector returns correct error messages</td>
@@ -423,7 +424,7 @@
 <td align="left">expect_error(v0$get(10)$value, regexp = “ParameterVector: Index out of range”)</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-rcpp-parameter-vector.R#203</td>
-<td align="left">2026-01-16 23:34:28.076998</td>
+<td align="left">2026-01-20 20:35:18.615667</td>
 </tr>
 <tr class="even">
 <td align="left">ParameterVector returns correct error messages</td>
@@ -431,7 +432,7 @@
 <td align="left">expect_error( methods::new(ParameterVector, 1:3, 5), “Error in call to ParameterVector” )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-rcpp-parameter-vector.R#206</td>
-<td align="left">2026-01-16 23:34:28.09781</td>
+<td align="left">2026-01-20 20:35:18.638422</td>
 </tr>
 </tbody>
 </table>

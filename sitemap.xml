@@ -2,7 +2,9 @@
 <url><loc>https://NOAA-FIMS.github.io/FIMS/404.html</loc></url>
 <url><loc>https://NOAA-FIMS.github.io/FIMS/CONTRIBUTING.html</loc></url>
 <url><loc>https://NOAA-FIMS.github.io/FIMS/LICENSE-text.html</loc></url>
+<url><loc>https://NOAA-FIMS.github.io/FIMS/articles/RD-re-sparsity.html</loc></url>
 <url><loc>https://NOAA-FIMS.github.io/FIMS/articles/fims-demo-minimal.html</loc></url>
+<url><loc>https://NOAA-FIMS.github.io/FIMS/articles/fims-demo-projections.html</loc></url>
 <url><loc>https://NOAA-FIMS.github.io/FIMS/articles/fims-demo.html</loc></url>
 <url><loc>https://NOAA-FIMS.github.io/FIMS/articles/fims-logging.html</loc></url>
 <url><loc>https://NOAA-FIMS.github.io/FIMS/articles/fims-path-maturity.html</loc></url>
@@ -74,7 +76,7 @@
 <url><loc>https://NOAA-FIMS.github.io/FIMS/testdown/test-integration-fims-estimation-random-effects-without-wrappers.html</loc></url>
 <url><loc>https://NOAA-FIMS.github.io/FIMS/testdown/test-is_fims_verbose.html</loc></url>
 <url><loc>https://NOAA-FIMS.github.io/FIMS/testdown/test-logit.html</loc></url>
-<url><loc>https://NOAA-FIMS.github.io/FIMS/testdown/test-parallel-caa-mle-wrappers.html</loc></url>
+<url><loc>https://NOAA-FIMS.github.io/FIMS/testdown/test-projections-looped.html</loc></url>
 <url><loc>https://NOAA-FIMS.github.io/FIMS/testdown/test-rcpp-data.html</loc></url>
 <url><loc>https://NOAA-FIMS.github.io/FIMS/testdown/test-rcpp-distribution.html</loc></url>
 <url><loc>https://NOAA-FIMS.github.io/FIMS/testdown/test-rcpp-ewaa.html</loc></url>
@@ -86,6 +88,7 @@
 <url><loc>https://NOAA-FIMS.github.io/FIMS/testdown/test-rcpp-recruitment-interface.html</loc></url>
 <url><loc>https://NOAA-FIMS.github.io/FIMS/testdown/test-rcpp-selectivity.html</loc></url>
 <url><loc>https://NOAA-FIMS.github.io/FIMS/testdown/test-reshape_json_estimates.html</loc></url>
+<url><loc>https://NOAA-FIMS.github.io/FIMS/testdown/test-slow-parallel-caa-mle-wrappers.html</loc></url>
 <url><loc>https://NOAA-FIMS.github.io/FIMS/testdown/test-use-test-template.html</loc></url>
 <url><loc>https://NOAA-FIMS.github.io/FIMS/testdown/testdown-report-for-fims.html</loc></url>
 </urlset>

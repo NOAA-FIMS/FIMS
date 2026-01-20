@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2026-01-16" />
+<meta name="date" content="2026-01-20" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -103,7 +103,7 @@
 <li class="chapter" data-level="23" data-path="test-integration-fims-estimation-random-effects-without-wrappers.html"><a href="test-integration-fims-estimation-random-effects-without-wrappers.html"><i class="fa fa-check"></i><b>23</b> test-integration-fims-estimation-random-effects-without-wrappers.R</a></li>
 <li class="chapter" data-level="24" data-path="test-is_fims_verbose.html"><a href="test-is_fims_verbose.html"><i class="fa fa-check"></i><b>24</b> test-is_fims_verbose.R</a></li>
 <li class="chapter" data-level="25" data-path="test-logit.html"><a href="test-logit.html"><i class="fa fa-check"></i><b>25</b> test-logit.R</a></li>
-<li class="chapter" data-level="26" data-path="test-parallel-caa-mle-wrappers.html"><a href="test-parallel-caa-mle-wrappers.html"><i class="fa fa-check"></i><b>26</b> test-parallel-caa-mle-wrappers.R</a></li>
+<li class="chapter" data-level="26" data-path="test-projections-looped.html"><a href="test-projections-looped.html"><i class="fa fa-check"></i><b>26</b> test-projections-looped.R</a></li>
 <li class="chapter" data-level="27" data-path="test-rcpp-data.html"><a href="test-rcpp-data.html"><i class="fa fa-check"></i><b>27</b> test-rcpp-data.R</a></li>
 <li class="chapter" data-level="28" data-path="test-rcpp-distribution.html"><a href="test-rcpp-distribution.html"><i class="fa fa-check"></i><b>28</b> test-rcpp-distribution.R</a></li>
 <li class="chapter" data-level="29" data-path="test-rcpp-ewaa.html"><a href="test-rcpp-ewaa.html"><i class="fa fa-check"></i><b>29</b> test-rcpp-ewaa.R</a></li>
@@ -115,7 +115,8 @@
 <li class="chapter" data-level="35" data-path="test-rcpp-recruitment-interface.html"><a href="test-rcpp-recruitment-interface.html"><i class="fa fa-check"></i><b>35</b> test-rcpp-recruitment-interface.R</a></li>
 <li class="chapter" data-level="36" data-path="test-rcpp-selectivity.html"><a href="test-rcpp-selectivity.html"><i class="fa fa-check"></i><b>36</b> test-rcpp-selectivity.R</a></li>
 <li class="chapter" data-level="37" data-path="test-reshape_json_estimates.html"><a href="test-reshape_json_estimates.html"><i class="fa fa-check"></i><b>37</b> test-reshape_json_estimates.R</a></li>
-<li class="chapter" data-level="38" data-path="test-use-test-template.html"><a href="test-use-test-template.html"><i class="fa fa-check"></i><b>38</b> test-use-test-template.R</a></li>
+<li class="chapter" data-level="38" data-path="test-slow-parallel-caa-mle-wrappers.html"><a href="test-slow-parallel-caa-mle-wrappers.html"><i class="fa fa-check"></i><b>38</b> test-slow-parallel-caa-mle-wrappers.R</a></li>
+<li class="chapter" data-level="39" data-path="test-use-test-template.html"><a href="test-use-test-template.html"><i class="fa fa-check"></i><b>39</b> test-use-test-template.R</a></li>
 <li class="chapter" data-level="" data-path="aggregated-failures-and-errors.html"><a href="aggregated-failures-and-errors.html"><i class="fa fa-check"></i>Aggregated failures and errors</a></li>
 <li class="chapter" data-level="" data-path="aggregated-warnings.html"><a href="aggregated-warnings.html"><i class="fa fa-check"></i>Aggregated warnings</a></li>
 <li class="chapter" data-level="" data-path="aggregated-skipped.html"><a href="aggregated-skipped.html"><i class="fa fa-check"></i>Aggregated skipped</a></li>
@@ -183,7 +184,7 @@
 <td align="left">expect_type(result, “list”)</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-initialize_modules.R#23</td>
-<td align="left">2026-01-16 23:02:03.582396</td>
+<td align="left">2026-01-20 19:11:21.272803</td>
 </tr>
 <tr class="even">
 <td align="left"><code>initialize_fims()</code> works with correct inputs</td>
@@ -191,7 +192,7 @@
 <td align="left">expect_named(result, c(“parameters”, “model”))</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-initialize_modules.R#25</td>
-<td align="left">2026-01-16 23:02:03.600262</td>
+<td align="left">2026-01-20 19:11:21.288892</td>
 </tr>
 <tr class="odd">
 <td align="left"><code>initialize_fims()</code> works with correct inputs</td>
@@ -199,7 +200,7 @@
 <td align="left">expect_equal(length(result), 2)</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-initialize_modules.R#27</td>
-<td align="left">2026-01-16 23:02:03.618466</td>
+<td align="left">2026-01-20 19:11:21.305503</td>
 </tr>
 <tr class="even">
 <td align="left"><code>initialize_fims()</code> works with correct inputs</td>
@@ -207,7 +208,7 @@
 <td align="left">expect_type(result, “S4”)</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-initialize_modules.R#37</td>
-<td align="left">2026-01-16 23:02:03.785264</td>
+<td align="left">2026-01-20 19:11:21.450067</td>
 </tr>
 <tr class="odd">
 <td align="left"><code>initialize_fims()</code> works with correct inputs</td>
@@ -215,7 +216,7 @@
 <td align="left">expect_no_error(result[[“age_comp_data”]])</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-initialize_modules.R#39</td>
-<td align="left">2026-01-16 23:02:03.800601</td>
+<td align="left">2026-01-20 19:11:21.464337</td>
 </tr>
 <tr class="even">
 <td align="left"><code>initialize_fims()</code> works with correct inputs</td>
@@ -223,7 +224,7 @@
 <td align="left">expect_null(result[[“length_comp_data”]])</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-initialize_modules.R#41</td>
-<td align="left">2026-01-16 23:02:03.817425</td>
+<td align="left">2026-01-20 19:11:21.479823</td>
 </tr>
 <tr class="odd">
 <td align="left"><code>initialize_fims()</code> works with correct inputs</td>
@@ -231,7 +232,7 @@
 <td align="left">expect_true( all(c(“age_comp_data”, “initialize”, “finalize”, “.pointer”) %in% names(result)) )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-initialize_modules.R#43</td>
-<td align="left">2026-01-16 23:02:03.833921</td>
+<td align="left">2026-01-20 19:11:21.495347</td>
 </tr>
 <tr class="even">
 <td align="left"><code>initialize_fims()</code> works with correct inputs</td>
@@ -239,7 +240,7 @@
 <td align="left">expect_equal( result$age_comp_data$toRVector(), data |&gt; get_data() |&gt; dplyr::filter(type == “age_comp”, name == “fleet1”) |&gt; dplyr::mutate(out = value * uncertainty) |&gt; dplyr::pull(out) )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-initialize_modules.R#48</td>
-<td align="left">2026-01-16 23:02:03.854138</td>
+<td align="left">2026-01-20 19:11:21.514219</td>
 </tr>
 <tr class="odd">
 <td align="left"><code>initialize_fims()</code> works with correct inputs</td>
@@ -247,7 +248,7 @@
 <td align="left">expect_type(result, “S4”)</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-initialize_modules.R#64</td>
-<td align="left">2026-01-16 23:02:04.139314</td>
+<td align="left">2026-01-20 19:11:21.830149</td>
 </tr>
 <tr class="even">
 <td align="left"><code>initialize_fims()</code> works with correct inputs</td>
@@ -255,7 +256,7 @@
 <td align="left">expect_no_error(result[[“length_comp_data”]])</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-initialize_modules.R#66</td>
-<td align="left">2026-01-16 23:02:04.15535</td>
+<td align="left">2026-01-20 19:11:21.847438</td>
 </tr>
 <tr class="odd">
 <td align="left"><code>initialize_fims()</code> works with correct inputs</td>
@@ -263,7 +264,7 @@
 <td align="left">expect_null(result[[“age_comp_data”]])</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-initialize_modules.R#68</td>
-<td align="left">2026-01-16 23:02:04.172409</td>
+<td align="left">2026-01-20 19:11:21.864512</td>
 </tr>
 <tr class="even">
 <td align="left"><code>initialize_fims()</code> works with correct inputs</td>
@@ -271,7 +272,7 @@
 <td align="left">expect_true( all(c(“length_comp_data”, “initialize”, “finalize”, “.pointer”) %in% names(result)) )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-initialize_modules.R#70</td>
-<td align="left">2026-01-16 23:02:04.189285</td>
+<td align="left">2026-01-20 19:11:21.880414</td>
 </tr>
 <tr class="odd">
 <td align="left"><code>initialize_fims()</code> works with correct inputs</td>
@@ -279,7 +280,7 @@
 <td align="left">expect_equal( result$length_comp_data$toRVector(), data |&gt; get_data() |&gt; dplyr::filter(type == “length_comp”, name == “fleet1”) |&gt; dplyr::mutate(out = value * uncertainty) |&gt; dplyr::pull(out) )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-initialize_modules.R#75</td>
-<td align="left">2026-01-16 23:02:04.21019</td>
+<td align="left">2026-01-20 19:11:21.899667</td>
 </tr>
 <tr class="even">
 <td align="left"><code>initialize_fims()</code> works with edge cases</td>
@@ -287,7 +288,7 @@
 <td align="left">expect_equal(length(init_parm_multiple_types$parameters$p), length(init_parm_default$parameters$p) - 10)</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-initialize_modules.R#107</td>
-<td align="left">2026-01-16 23:02:10.609601</td>
+<td align="left">2026-01-20 19:11:28.32918</td>
 </tr>
 <tr class="odd">
 <td align="left"><code>initialize_fims()</code> returns correct error messages</td>
@@ -295,7 +296,7 @@
 <td align="left">expect_error( initialize_fims(data = data), “The <code>parameters</code> argument must be a tibble.” )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-initialize_modules.R#114</td>
-<td align="left">2026-01-16 23:02:10.661968</td>
+<td align="left">2026-01-20 19:11:28.363871</td>
 </tr>
 <tr class="even">
 <td align="left"><code>initialize_fims()</code> returns correct error messages</td>
@@ -303,7 +304,7 @@
 <td align="left">expect_error( initialize_fims(parameters = “not_a_list”, data = data), “The <code>parameters</code> argument must be a tibble.” )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-initialize_modules.R#121</td>
-<td align="left">2026-01-16 23:02:10.710415</td>
+<td align="left">2026-01-20 19:11:28.397014</td>
 </tr>
 <tr class="odd">
 <td align="left"><code>initialize_fims()</code> returns correct error messages</td>
@@ -311,7 +312,7 @@
 <td align="left">expect_error( initialize_fims(parameters = parameters_no_fleets, data = data), “No fleets found in the provided <code>parameters</code>.” )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-initialize_modules.R#130</td>
-<td align="left">2026-01-16 23:02:10.752421</td>
+<td align="left">2026-01-20 19:11:28.430899</td>
 </tr>
 <tr class="even">
 <td align="left"><code>initialize_fims()</code> returns correct error messages</td>
@@ -319,7 +320,7 @@
 <td align="left">expect_error( initialize_comp( data = data, fleet_name = “unknown_fleet”, type = “AgeComp” ), “Fleet <code>unknown_fleet</code> not found in the data object.” )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-initialize_modules.R#137</td>
-<td align="left">2026-01-16 23:02:10.787104</td>
+<td align="left">2026-01-20 19:11:28.462008</td>
 </tr>
 <tr class="odd">
 <td align="left"><code>initialize_fims()</code> returns correct error messages</td>
@@ -327,7 +328,7 @@
 <td align="left">expect_error( initialize_comp( data = data, fleet_name = “fleet1”, type = “unknown” ), “should be one of” )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-initialize_modules.R#148</td>
-<td align="left">2026-01-16 23:02:10.807508</td>
+<td align="left">2026-01-20 19:11:28.480179</td>
 </tr>
 <tr class="even">
 <td align="left"><code>initialize_fims()</code> returns correct error messages</td>
@@ -335,7 +336,7 @@
 <td align="left">expect_error( initialize_fims(parameters = parameters_wrong_type, data = data), “The <code>estimation_type</code> must be one of: constant, fixed_effects, and random_effects.” )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-initialize_modules.R#169</td>
-<td align="left">2026-01-16 23:02:10.85204</td>
+<td align="left">2026-01-20 19:11:28.518392</td>
 </tr>
 </tbody>
 </table>

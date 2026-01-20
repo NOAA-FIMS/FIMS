@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2026-01-16" />
+<meta name="date" content="2026-01-20" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -103,7 +103,7 @@
 <li class="chapter" data-level="23" data-path="test-integration-fims-estimation-random-effects-without-wrappers.html"><a href="test-integration-fims-estimation-random-effects-without-wrappers.html"><i class="fa fa-check"></i><b>23</b> test-integration-fims-estimation-random-effects-without-wrappers.R</a></li>
 <li class="chapter" data-level="24" data-path="test-is_fims_verbose.html"><a href="test-is_fims_verbose.html"><i class="fa fa-check"></i><b>24</b> test-is_fims_verbose.R</a></li>
 <li class="chapter" data-level="25" data-path="test-logit.html"><a href="test-logit.html"><i class="fa fa-check"></i><b>25</b> test-logit.R</a></li>
-<li class="chapter" data-level="26" data-path="test-parallel-caa-mle-wrappers.html"><a href="test-parallel-caa-mle-wrappers.html"><i class="fa fa-check"></i><b>26</b> test-parallel-caa-mle-wrappers.R</a></li>
+<li class="chapter" data-level="26" data-path="test-projections-looped.html"><a href="test-projections-looped.html"><i class="fa fa-check"></i><b>26</b> test-projections-looped.R</a></li>
 <li class="chapter" data-level="27" data-path="test-rcpp-data.html"><a href="test-rcpp-data.html"><i class="fa fa-check"></i><b>27</b> test-rcpp-data.R</a></li>
 <li class="chapter" data-level="28" data-path="test-rcpp-distribution.html"><a href="test-rcpp-distribution.html"><i class="fa fa-check"></i><b>28</b> test-rcpp-distribution.R</a></li>
 <li class="chapter" data-level="29" data-path="test-rcpp-ewaa.html"><a href="test-rcpp-ewaa.html"><i class="fa fa-check"></i><b>29</b> test-rcpp-ewaa.R</a></li>
@@ -115,7 +115,8 @@
 <li class="chapter" data-level="35" data-path="test-rcpp-recruitment-interface.html"><a href="test-rcpp-recruitment-interface.html"><i class="fa fa-check"></i><b>35</b> test-rcpp-recruitment-interface.R</a></li>
 <li class="chapter" data-level="36" data-path="test-rcpp-selectivity.html"><a href="test-rcpp-selectivity.html"><i class="fa fa-check"></i><b>36</b> test-rcpp-selectivity.R</a></li>
 <li class="chapter" data-level="37" data-path="test-reshape_json_estimates.html"><a href="test-reshape_json_estimates.html"><i class="fa fa-check"></i><b>37</b> test-reshape_json_estimates.R</a></li>
-<li class="chapter" data-level="38" data-path="test-use-test-template.html"><a href="test-use-test-template.html"><i class="fa fa-check"></i><b>38</b> test-use-test-template.R</a></li>
+<li class="chapter" data-level="38" data-path="test-slow-parallel-caa-mle-wrappers.html"><a href="test-slow-parallel-caa-mle-wrappers.html"><i class="fa fa-check"></i><b>38</b> test-slow-parallel-caa-mle-wrappers.R</a></li>
+<li class="chapter" data-level="39" data-path="test-use-test-template.html"><a href="test-use-test-template.html"><i class="fa fa-check"></i><b>39</b> test-use-test-template.R</a></li>
 <li class="chapter" data-level="" data-path="aggregated-failures-and-errors.html"><a href="aggregated-failures-and-errors.html"><i class="fa fa-check"></i>Aggregated failures and errors</a></li>
 <li class="chapter" data-level="" data-path="aggregated-warnings.html"><a href="aggregated-warnings.html"><i class="fa fa-check"></i>Aggregated warnings</a></li>
 <li class="chapter" data-level="" data-path="aggregated-skipped.html"><a href="aggregated-skipped.html"><i class="fa fa-check"></i>Aggregated skipped</a></li>
@@ -183,7 +184,7 @@
 <td align="left">expect_equal( object = recruitment$get_id(), expected = 1 )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-rcpp-recruitment-interface.R#31</td>
-<td align="left">2026-01-16 23:34:29.852741</td>
+<td align="left">2026-01-20 20:35:20.409516</td>
 </tr>
 <tr class="even">
 <td align="left">rcpp recruitment interface works with correct inputs</td>
@@ -191,7 +192,7 @@
 <td align="left">expect_equal( object = recruitment$logit_steep[1]$value, expected = 0.78845736 )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-rcpp-recruitment-interface.R#36</td>
-<td align="left">2026-01-16 23:34:29.863626</td>
+<td align="left">2026-01-20 20:35:20.421045</td>
 </tr>
 <tr class="odd">
 <td align="left">rcpp recruitment interface works with correct inputs</td>
@@ -199,7 +200,7 @@
 <td align="left">expect_equal( object = recruitment$logit_steep[1]$min, expected = 0.21 )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-rcpp-recruitment-interface.R#41</td>
-<td align="left">2026-01-16 23:34:29.873403</td>
+<td align="left">2026-01-20 20:35:20.4321</td>
 </tr>
 <tr class="even">
 <td align="left">rcpp recruitment interface works with correct inputs</td>
@@ -207,7 +208,7 @@
 <td align="left">expect_equal( object = recruitment$logit_steep[1]$max, expected = 1.0 )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-rcpp-recruitment-interface.R#46</td>
-<td align="left">2026-01-16 23:34:29.883201</td>
+<td align="left">2026-01-20 20:35:20.443243</td>
 </tr>
 <tr class="odd">
 <td align="left">rcpp recruitment interface works with correct inputs</td>
@@ -215,7 +216,7 @@
 <td align="left">expect_equal( object = recruitment$logit_steep[1]$estimation_type$get(), “random_effects” )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-rcpp-recruitment-interface.R#51</td>
-<td align="left">2026-01-16 23:34:29.893382</td>
+<td align="left">2026-01-20 20:35:20.454544</td>
 </tr>
 <tr class="even">
 <td align="left">rcpp recruitment interface works with correct inputs</td>
@@ -223,7 +224,7 @@
 <td align="left">expect_equal( object = recruitment$log_rzero[1]$value, expected = log(1000000.0) )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-rcpp-recruitment-interface.R#55</td>
-<td align="left">2026-01-16 23:34:29.903147</td>
+<td align="left">2026-01-20 20:35:20.465889</td>
 </tr>
 <tr class="odd">
 <td align="left">rcpp recruitment interface works with correct inputs</td>
@@ -231,7 +232,7 @@
 <td align="left">expect_equal( object = recruitment$evaluate_mean(spawns, ssb0), expected = 1090802.68 )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-rcpp-recruitment-interface.R#60</td>
-<td align="left">2026-01-16 23:34:29.913103</td>
+<td align="left">2026-01-20 20:35:20.477088</td>
 </tr>
 <tr class="even">
 <td align="left">rcpp recruitment interface works with correct inputs</td>
@@ -239,7 +240,7 @@
 <td align="left">expect_equal( object = recruitment$log_devs[i]$value, expected = log_devs[i] )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-rcpp-recruitment-interface.R#72</td>
-<td align="left">2026-01-16 23:34:29.926183</td>
+<td align="left">2026-01-20 20:35:20.491716</td>
 </tr>
 <tr class="odd">
 <td align="left">test rcpp recruitment interface returns correct error messages</td>
@@ -247,7 +248,7 @@
 <td align="left">expect_warning( object = recruitment$evaluate_mean(spawns, ssb0), regexp = “Steepness is subject to a logit transformation. Fixing it at 1.0 is not currently possible.” )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-rcpp-recruitment-interface.R#102</td>
-<td align="left">2026-01-16 23:34:29.952103</td>
+<td align="left">2026-01-20 20:35:20.519635</td>
 </tr>
 </tbody>
 </table>

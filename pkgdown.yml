@@ -3,13 +3,15 @@ pkgdown: 2.2.0
 pkgdown_sha: ~
 articles:
   fims-demo-minimal: fims-demo-minimal.html
+  fims-demo-projections: fims-demo-projections.html
   fims-demo: fims-demo.html
   fims-logging: fims-logging.html
   fims-path-maturity: fims-path-maturity.html
   fims-user-setup-guide: fims-user-setup-guide.html
+  RD-re-sparsity: RD-re-sparsity.html
   training-intro-cpp: training-intro-cpp.html
   training-intro-rcpp: training-intro-rcpp.html
-last_built: 2026-01-16T23:35Z
+last_built: 2026-01-20T20:35Z
 urls:
   reference: https://NOAA-FIMS.github.io/FIMS/reference
   article: https://NOAA-FIMS.github.io/FIMS/articles

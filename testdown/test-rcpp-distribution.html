@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2026-01-16" />
+<meta name="date" content="2026-01-20" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -103,7 +103,7 @@
 <li class="chapter" data-level="23" data-path="test-integration-fims-estimation-random-effects-without-wrappers.html"><a href="test-integration-fims-estimation-random-effects-without-wrappers.html"><i class="fa fa-check"></i><b>23</b> test-integration-fims-estimation-random-effects-without-wrappers.R</a></li>
 <li class="chapter" data-level="24" data-path="test-is_fims_verbose.html"><a href="test-is_fims_verbose.html"><i class="fa fa-check"></i><b>24</b> test-is_fims_verbose.R</a></li>
 <li class="chapter" data-level="25" data-path="test-logit.html"><a href="test-logit.html"><i class="fa fa-check"></i><b>25</b> test-logit.R</a></li>
-<li class="chapter" data-level="26" data-path="test-parallel-caa-mle-wrappers.html"><a href="test-parallel-caa-mle-wrappers.html"><i class="fa fa-check"></i><b>26</b> test-parallel-caa-mle-wrappers.R</a></li>
+<li class="chapter" data-level="26" data-path="test-projections-looped.html"><a href="test-projections-looped.html"><i class="fa fa-check"></i><b>26</b> test-projections-looped.R</a></li>
 <li class="chapter" data-level="27" data-path="test-rcpp-data.html"><a href="test-rcpp-data.html"><i class="fa fa-check"></i><b>27</b> test-rcpp-data.R</a></li>
 <li class="chapter" data-level="28" data-path="test-rcpp-distribution.html"><a href="test-rcpp-distribution.html"><i class="fa fa-check"></i><b>28</b> test-rcpp-distribution.R</a></li>
 <li class="chapter" data-level="29" data-path="test-rcpp-ewaa.html"><a href="test-rcpp-ewaa.html"><i class="fa fa-check"></i><b>29</b> test-rcpp-ewaa.R</a></li>
@@ -115,7 +115,8 @@
 <li class="chapter" data-level="35" data-path="test-rcpp-recruitment-interface.html"><a href="test-rcpp-recruitment-interface.html"><i class="fa fa-check"></i><b>35</b> test-rcpp-recruitment-interface.R</a></li>
 <li class="chapter" data-level="36" data-path="test-rcpp-selectivity.html"><a href="test-rcpp-selectivity.html"><i class="fa fa-check"></i><b>36</b> test-rcpp-selectivity.R</a></li>
 <li class="chapter" data-level="37" data-path="test-reshape_json_estimates.html"><a href="test-reshape_json_estimates.html"><i class="fa fa-check"></i><b>37</b> test-reshape_json_estimates.R</a></li>
-<li class="chapter" data-level="38" data-path="test-use-test-template.html"><a href="test-use-test-template.html"><i class="fa fa-check"></i><b>38</b> test-use-test-template.R</a></li>
+<li class="chapter" data-level="38" data-path="test-slow-parallel-caa-mle-wrappers.html"><a href="test-slow-parallel-caa-mle-wrappers.html"><i class="fa fa-check"></i><b>38</b> test-slow-parallel-caa-mle-wrappers.R</a></li>
+<li class="chapter" data-level="39" data-path="test-use-test-template.html"><a href="test-use-test-template.html"><i class="fa fa-check"></i><b>39</b> test-use-test-template.R</a></li>
 <li class="chapter" data-level="" data-path="aggregated-failures-and-errors.html"><a href="aggregated-failures-and-errors.html"><i class="fa fa-check"></i>Aggregated failures and errors</a></li>
 <li class="chapter" data-level="" data-path="aggregated-warnings.html"><a href="aggregated-warnings.html"><i class="fa fa-check"></i>Aggregated warnings</a></li>
 <li class="chapter" data-level="" data-path="aggregated-skipped.html"><a href="aggregated-skipped.html"><i class="fa fa-check"></i>Aggregated skipped</a></li>
@@ -183,7 +184,7 @@
 <td align="left">expect_equal(dnorm_$evaluate(), stats::dnorm(y, 0, 1, TRUE))</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-rcpp-distribution.R#30</td>
-<td align="left">2026-01-16 23:34:24.940045</td>
+<td align="left">2026-01-20 20:35:15.186335</td>
 </tr>
 <tr class="even">
 <td align="left">rcpp distribution works with correct inputs</td>
@@ -191,7 +192,7 @@
 <td align="left">expect_equal(dnorm_$evaluate(), sum(stats::dnorm(y, 0, 1, TRUE)))</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-rcpp-distribution.R#52</td>
-<td align="left">2026-01-16 23:34:24.993638</td>
+<td align="left">2026-01-20 20:35:15.22722</td>
 </tr>
 <tr class="odd">
 <td align="left">rcpp distribution works with correct inputs</td>
@@ -199,7 +200,7 @@
 <td align="left">expect_equal(dnorm_$evaluate(), sum(stats::dnorm(y, 0, 1, TRUE)))</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-rcpp-distribution.R#78</td>
-<td align="left">2026-01-16 23:34:25.040494</td>
+<td align="left">2026-01-20 20:35:15.276375</td>
 </tr>
 <tr class="even">
 <td align="left">rcpp distribution works with correct inputs</td>
@@ -207,7 +208,7 @@
 <td align="left">expect_equal(dlnorm_$evaluate(), stats::dlnorm(y, 0, 1, TRUE))</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-rcpp-distribution.R#95</td>
-<td align="left">2026-01-16 23:34:25.063052</td>
+<td align="left">2026-01-20 20:35:15.30121</td>
 </tr>
 <tr class="odd">
 <td align="left">rcpp distribution works with correct inputs</td>
@@ -215,7 +216,7 @@
 <td align="left">expect_equal(dlnorm_$evaluate(), sum(stats::dlnorm(y, 0, 1, TRUE)))</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-rcpp-distribution.R#117</td>
-<td align="left">2026-01-16 23:34:25.102286</td>
+<td align="left">2026-01-20 20:35:15.362003</td>
 </tr>
 <tr class="even">
 <td align="left">rcpp distribution works with correct inputs</td>
@@ -223,7 +224,7 @@
 <td align="left">expect_equal(dlnorm_$evaluate(), sum(stats::dlnorm(y, 0, 1, TRUE)))</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-rcpp-distribution.R#143</td>
-<td align="left">2026-01-16 23:34:25.14937</td>
+<td align="left">2026-01-20 20:35:15.411594</td>
 </tr>
 <tr class="odd">
 <td align="left">rcpp distribution works with correct inputs</td>
@@ -231,7 +232,7 @@
 <td align="left">expect_equal( dmultinom_$evaluate(), stats::dmultinom(x = x_values, prob = p, log = TRUE) )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-rcpp-distribution.R#171</td>
-<td align="left">2026-01-16 23:34:25.188574</td>
+<td align="left">2026-01-20 20:35:15.453737</td>
 </tr>
 <tr class="even">
 <td align="left">rcpp_distribution returns correct outputs for edge cases</td>
@@ -239,7 +240,7 @@
 <td align="left">expect_equal(dnorm_$evaluate(), stats::dnorm(y, 0, 1, TRUE))</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-rcpp-distribution.R#193</td>
-<td align="left">2026-01-16 23:34:25.213671</td>
+<td align="left">2026-01-20 20:35:15.480675</td>
 </tr>
 <tr class="odd">
 <td align="left">rcpp_distribution returns correct outputs for edge cases</td>
@@ -247,7 +248,7 @@
 <td align="left">expect_equal(dnorm_$evaluate(), stats::dnorm(y, 0, 1, TRUE))</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-rcpp-distribution.R#205</td>
-<td align="left">2026-01-16 23:34:25.235137</td>
+<td align="left">2026-01-20 20:35:15.504246</td>
 </tr>
 <tr class="even">
 <td align="left">rcpp_distribution returns correct outputs for edge cases</td>
@@ -255,7 +256,7 @@
 <td align="left">expect_equal(dnorm_$evaluate(), stats::dnorm(y, -1000, 1, TRUE))</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-rcpp-distribution.R#218</td>
-<td align="left">2026-01-16 23:34:25.256587</td>
+<td align="left">2026-01-20 20:35:15.52759</td>
 </tr>
 <tr class="odd">
 <td align="left">rcpp_distribution returns correct outputs for edge cases</td>
@@ -263,7 +264,7 @@
 <td align="left">expect_equal(dnorm_$evaluate(), stats::dnorm(y, 1000, 1, TRUE))</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-rcpp-distribution.R#230</td>
-<td align="left">2026-01-16 23:34:25.278061</td>
+<td align="left">2026-01-20 20:35:15.551278</td>
 </tr>
 <tr class="even">
 <td align="left">rcpp_distribution returns correct outputs for edge cases</td>
@@ -271,7 +272,7 @@
 <td align="left">expect_equal(dnorm_$evaluate(), stats::dnorm(y, 0, exp(10), TRUE))</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-rcpp-distribution.R#243</td>
-<td align="left">2026-01-16 23:34:25.299822</td>
+<td align="left">2026-01-20 20:35:15.575005</td>
 </tr>
 <tr class="odd">
 <td align="left">rcpp_distribution returns correct outputs for edge cases</td>
@@ -279,7 +280,7 @@
 <td align="left">expect_equal(dnorm_$evaluate(), stats::dnorm(y, 0, exp(-10), TRUE))</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-rcpp-distribution.R#255</td>
-<td align="left">2026-01-16 23:34:25.321464</td>
+<td align="left">2026-01-20 20:35:15.5987</td>
 </tr>
 <tr class="even">
 <td align="left">rcpp_distribution returns correct outputs for edge cases</td>
@@ -287,7 +288,7 @@
 <td align="left">expect_equal(dlnorm_$evaluate(), NaN)</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-rcpp-distribution.R#266</td>
-<td align="left">2026-01-16 23:34:25.342861</td>
+<td align="left">2026-01-20 20:35:15.622194</td>
 </tr>
 <tr class="odd">
 <td align="left">rcpp_distribution returns correct outputs for edge cases</td>
@@ -295,7 +296,7 @@
 <td align="left">expect_equal(dlnorm_$evaluate(), NaN)</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-rcpp-distribution.R#276</td>
-<td align="left">2026-01-16 23:34:25.364355</td>
+<td align="left">2026-01-20 20:35:15.645811</td>
 </tr>
 <tr class="even">
 <td align="left">rcpp_distribution returns correct outputs for edge cases</td>
@@ -303,7 +304,7 @@
 <td align="left">expect_equal(dlnorm_$evaluate(), stats::dlnorm(y, 0, 1, TRUE))</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-rcpp-distribution.R#286</td>
-<td align="left">2026-01-16 23:34:25.385919</td>
+<td align="left">2026-01-20 20:35:15.669042</td>
 </tr>
 <tr class="odd">
 <td align="left">rcpp_distribution returns correct outputs for edge cases</td>
@@ -311,7 +312,7 @@
 <td align="left">expect_equal(dlnorm_$evaluate(), stats::dlnorm(y, -1000, 1, TRUE))</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-rcpp-distribution.R#296</td>
-<td align="left">2026-01-16 23:34:25.407945</td>
+<td align="left">2026-01-20 20:35:15.692757</td>
 </tr>
 <tr class="even">
 <td align="left">rcpp_distribution returns correct outputs for edge cases</td>
@@ -319,7 +320,7 @@
 <td align="left">expect_equal(dlnorm_$evaluate(), -500000.92)</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-rcpp-distribution.R#305</td>
-<td align="left">2026-01-16 23:34:25.430307</td>
+<td align="left">2026-01-20 20:35:15.717225</td>
 </tr>
 <tr class="odd">
 <td align="left">rcpp_distribution returns correct outputs for edge cases</td>
@@ -327,7 +328,7 @@
 <td align="left">expect_equal(dlnorm_$evaluate(), stats::dlnorm(y, 0, exp(10), TRUE))</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-rcpp-distribution.R#315</td>
-<td align="left">2026-01-16 23:34:25.452073</td>
+<td align="left">2026-01-20 20:35:15.740968</td>
 </tr>
 <tr class="even">
 <td align="left">rcpp_distribution returns correct outputs for edge cases</td>
@@ -335,7 +336,7 @@
 <td align="left">expect_equal(dlnorm_$evaluate(), 9.0810615)</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-rcpp-distribution.R#324</td>
-<td align="left">2026-01-16 23:34:25.474524</td>
+<td align="left">2026-01-20 20:35:15.765141</td>
 </tr>
 <tr class="odd">
 <td align="left">rcpp_distribution returns correct outputs for edge cases</td>
@@ -343,7 +344,7 @@
 <td align="left">expect_equal( dmultinom_$evaluate(), NaN )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-rcpp-distribution.R#351</td>
-<td align="left">2026-01-16 23:34:25.513343</td>
+<td align="left">2026-01-20 20:35:15.806708</td>
 </tr>
 <tr class="even">
 <td align="left">rcpp_distribution returns correct outputs for edge cases</td>
@@ -351,15 +352,15 @@
 <td align="left">expect_equal( dmultinom_$evaluate(), NaN )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-rcpp-distribution.R#379</td>
-<td align="left">2026-01-16 23:34:25.551628</td>
+<td align="left">2026-01-20 20:35:15.847503</td>
 </tr>
 <tr class="odd">
 <td align="left">rcpp distribution returns correct error messages</td>
 <td align="left">dnorm should error out when there is a dimension mismatch where it is expecting <code>expected_values</code> to have a size 10 but is provided a size 11 vector.</td>
-<td align="left">expect_error( object = dnorm_$evaluate(), regexp = “NormalLPDF::Vector .* out of bounds. .* 10 .* 11” )</td>
+<td align="left">expect_error( object = dnorm_$evaluate(), regexp = “NormalLPDF::Vector .* out of bounds. .* 11 .* 10” )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-rcpp-distribution.R#404</td>
-<td align="left">2026-01-16 23:34:25.588156</td>
+<td align="left">2026-01-20 20:35:15.885182</td>
 </tr>
 <tr class="even">
 <td align="left">rcpp distribution returns correct error messages</td>
@@ -367,7 +368,7 @@
 <td align="left">expect_error( object = dnorm_$evaluate(), regexp = “NormalLPDF::Vector .* out of bounds. .* 10 .* 3” )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-rcpp-distribution.R#424</td>
-<td align="left">2026-01-16 23:34:25.61413</td>
+<td align="left">2026-01-20 20:35:15.914325</td>
 </tr>
 <tr class="odd">
 <td align="left">rcpp distribution returns correct error messages</td>
@@ -383,7 +384,7 @@
 <td align="left">expect_error( object = dlnorm_$evaluate(), regexp = “LognormalLPDF::Vector .* out of bounds. .* 10 .* 3” )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-rcpp-distribution.R#468</td>
-<td align="left">2026-01-16 23:34:25.686483</td>
+<td align="left">2026-01-20 20:35:15.970793</td>
 </tr>
 <tr class="odd">
 <td align="left">rcpp distribution returns correct error messages</td>
@@ -391,7 +392,7 @@
 <td align="left">expect_error( object = dmultinom_$evaluate(), regexp = “MultinomialLPDF: Vector index out of bounds. The dimension of the number of rows times the number of columns is of size 10 and the observed vector is of size 12” )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-rcpp-distribution.R#495</td>
-<td align="left">2026-01-16 23:34:25.73027</td>
+<td align="left">2026-01-20 20:35:16.016581</td>
 </tr>
 <tr class="even">
 <td align="left">rcpp distribution returns correct error messages</td>
@@ -399,7 +400,7 @@
 <td align="left">expect_error( object = dmultinom_$evaluate(), regexp = “MultinomialLPDF: Vector index out of bounds. The dimension of the observed vector of size 9 and the expected vector is of size 10” )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-rcpp-distribution.R#522</td>
-<td align="left">2026-01-16 23:34:25.769928</td>
+<td align="left">2026-01-20 20:35:16.083103</td>
 </tr>
 </tbody>
 </table>

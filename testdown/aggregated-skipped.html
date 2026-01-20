@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2026-01-16" />
+<meta name="date" content="2026-01-20" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -103,7 +103,7 @@
 <li class="chapter" data-level="23" data-path="test-integration-fims-estimation-random-effects-without-wrappers.html"><a href="test-integration-fims-estimation-random-effects-without-wrappers.html"><i class="fa fa-check"></i><b>23</b> test-integration-fims-estimation-random-effects-without-wrappers.R</a></li>
 <li class="chapter" data-level="24" data-path="test-is_fims_verbose.html"><a href="test-is_fims_verbose.html"><i class="fa fa-check"></i><b>24</b> test-is_fims_verbose.R</a></li>
 <li class="chapter" data-level="25" data-path="test-logit.html"><a href="test-logit.html"><i class="fa fa-check"></i><b>25</b> test-logit.R</a></li>
-<li class="chapter" data-level="26" data-path="test-parallel-caa-mle-wrappers.html"><a href="test-parallel-caa-mle-wrappers.html"><i class="fa fa-check"></i><b>26</b> test-parallel-caa-mle-wrappers.R</a></li>
+<li class="chapter" data-level="26" data-path="test-projections-looped.html"><a href="test-projections-looped.html"><i class="fa fa-check"></i><b>26</b> test-projections-looped.R</a></li>
 <li class="chapter" data-level="27" data-path="test-rcpp-data.html"><a href="test-rcpp-data.html"><i class="fa fa-check"></i><b>27</b> test-rcpp-data.R</a></li>
 <li class="chapter" data-level="28" data-path="test-rcpp-distribution.html"><a href="test-rcpp-distribution.html"><i class="fa fa-check"></i><b>28</b> test-rcpp-distribution.R</a></li>
 <li class="chapter" data-level="29" data-path="test-rcpp-ewaa.html"><a href="test-rcpp-ewaa.html"><i class="fa fa-check"></i><b>29</b> test-rcpp-ewaa.R</a></li>
@@ -115,7 +115,8 @@
 <li class="chapter" data-level="35" data-path="test-rcpp-recruitment-interface.html"><a href="test-rcpp-recruitment-interface.html"><i class="fa fa-check"></i><b>35</b> test-rcpp-recruitment-interface.R</a></li>
 <li class="chapter" data-level="36" data-path="test-rcpp-selectivity.html"><a href="test-rcpp-selectivity.html"><i class="fa fa-check"></i><b>36</b> test-rcpp-selectivity.R</a></li>
 <li class="chapter" data-level="37" data-path="test-reshape_json_estimates.html"><a href="test-reshape_json_estimates.html"><i class="fa fa-check"></i><b>37</b> test-reshape_json_estimates.R</a></li>
-<li class="chapter" data-level="38" data-path="test-use-test-template.html"><a href="test-use-test-template.html"><i class="fa fa-check"></i><b>38</b> test-use-test-template.R</a></li>
+<li class="chapter" data-level="38" data-path="test-slow-parallel-caa-mle-wrappers.html"><a href="test-slow-parallel-caa-mle-wrappers.html"><i class="fa fa-check"></i><b>38</b> test-slow-parallel-caa-mle-wrappers.R</a></li>
+<li class="chapter" data-level="39" data-path="test-use-test-template.html"><a href="test-use-test-template.html"><i class="fa fa-check"></i><b>39</b> test-use-test-template.R</a></li>
 <li class="chapter" data-level="" data-path="aggregated-failures-and-errors.html"><a href="aggregated-failures-and-errors.html"><i class="fa fa-check"></i>Aggregated failures and errors</a></li>
 <li class="chapter" data-level="" data-path="aggregated-warnings.html"><a href="aggregated-warnings.html"><i class="fa fa-check"></i>Aggregated warnings</a></li>
 <li class="chapter" data-level="" data-path="aggregated-skipped.html"><a href="aggregated-skipped.html"><i class="fa fa-check"></i>Aggregated skipped</a></li>
@@ -486,59 +487,31 @@
 <td align="left">NA (was skipped)</td>
 </tr>
 <tr class="odd">
-<td align="left">test-integration-fims-estimation-random-effects-without-wrappers.R#89</td>
+<td align="left">test-integration-fims-estimation-random-effects-without-wrappers.R#83</td>
 <td align="left">estimation test with recruitment re on log devs</td>
 <td align="left">Skip test due to current issues with log devs estimation.</td>
 <td align="left">testthat::skip(“Skipping test for log devs estimation until issues are resolved.”)</td>
 <td align="left">Reason: Skipping test for log devs estimation until issues are resolved.</td>
 </tr>
 <tr class="even">
-<td align="left">test-integration-fims-estimation-random-effects-without-wrappers.R#104</td>
+<td align="left">test-integration-fims-estimation-random-effects-without-wrappers.R#107</td>
 <td align="left">estimation test with recruitment re on logr</td>
 <td align="left">Skip test due to current issues with log r estimation.</td>
 <td align="left">testthat::skip(“Skipping test for log r estimation until issues are resolved.”)</td>
 <td align="left">Reason: Skipping test for log r estimation until issues are resolved.</td>
 </tr>
 <tr class="odd">
-<td align="left">test-integration-fims-estimation-random-effects-without-wrappers.R#115</td>
+<td align="left">test-integration-fims-estimation-random-effects-without-wrappers.R#118</td>
 <td align="left">estimation test with recruitment re on logr</td>
 <td align="left">NA (was skipped)</td>
 <td align="left">expect_equal(result_log_r<span class="math inline">\(report[[&quot;nll_components&quot;]], result_log_devs\)</span>report[[“nll_components”]], tolerance = 1e-4)</td>
 <td align="left">NA (was skipped)</td>
 </tr>
 <tr class="even">
-<td align="left">test-integration-fims-estimation-random-effects-without-wrappers.R#117</td>
+<td align="left">test-integration-fims-estimation-random-effects-without-wrappers.R#120</td>
 <td align="left">estimation test with recruitment re on logr</td>
 <td align="left">NA (was skipped)</td>
 <td align="left">expect_equal(result_log_r<span class="math inline">\(report[[&quot;recruitment&quot;]], result_log_devs\)</span>report[[“recruitment”]], tolerance = 1e-4)</td>
-<td align="left">NA (was skipped)</td>
-</tr>
-<tr class="odd">
-<td align="left">test-parallel-caa-mle-wrappers.R#26</td>
-<td align="left">(code run outside of <code>test_that()</code>)</td>
-<td align="left"></td>
-<td align="left">testthat::skip_on_ci()</td>
-<td align="left">Reason: On CI</td>
-</tr>
-<tr class="even">
-<td align="left">test-parallel-caa-mle-wrappers.R#112</td>
-<td align="left">(code run outside of <code>test_that()</code>)</td>
-<td align="left">NA (was skipped)</td>
-<td align="left">expect_setequal(ssb_parallel, ssb_serial)</td>
-<td align="left">NA (was skipped)</td>
-</tr>
-<tr class="odd">
-<td align="left">test-parallel-caa-mle-wrappers.R#123</td>
-<td align="left">(code run outside of <code>test_that()</code>)</td>
-<td align="left">NA (was skipped)</td>
-<td align="left">expect_setequal(parameters_parallel, parameters_serial)</td>
-<td align="left">NA (was skipped)</td>
-</tr>
-<tr class="even">
-<td align="left">test-parallel-caa-mle-wrappers.R#134</td>
-<td align="left">(code run outside of <code>test_that()</code>)</td>
-<td align="left">NA (was skipped)</td>
-<td align="left">expect_equal(jnll_parallel, jnll_serial)</td>
 <td align="left">NA (was skipped)</td>
 </tr>
 <tr class="odd">
@@ -574,6 +547,34 @@
 <td align="left">rcpp selectivity returns correct outputs for edge cases</td>
 <td align="left">NA (was skipped)</td>
 <td align="left">expect_equal(nrow(missing_label_in_json), 0)</td>
+<td align="left">NA (was skipped)</td>
+</tr>
+<tr class="even">
+<td align="left">test-slow-parallel-caa-mle-wrappers.R#22</td>
+<td align="left">(code run outside of <code>test_that()</code>)</td>
+<td align="left">Skip the test unless explicitly enabled for heavy integration testing</td>
+<td align="left">testthat::skip_if_not( testthat:::env_var_is_true(“RUN_SLOW_TESTS”), message = “Skipping: RUN_SLOW_TESTS is not set to true.”)</td>
+<td align="left">Reason: Skipping: RUN_SLOW_TESTS is not set to true.</td>
+</tr>
+<tr class="odd">
+<td align="left">test-slow-parallel-caa-mle-wrappers.R#175</td>
+<td align="left">(code run outside of <code>test_that()</code>)</td>
+<td align="left">NA (was skipped)</td>
+<td align="left">expect_equal(sb_parallel, sb_serial, tolerance = 1e-5)</td>
+<td align="left">NA (was skipped)</td>
+</tr>
+<tr class="even">
+<td align="left">test-slow-parallel-caa-mle-wrappers.R#190</td>
+<td align="left">(code run outside of <code>test_that()</code>)</td>
+<td align="left">NA (was skipped)</td>
+<td align="left">expect_equal(parameters_parallel, parameters_serial, tolerance = 1e-5)</td>
+<td align="left">NA (was skipped)</td>
+</tr>
+<tr class="odd">
+<td align="left">test-slow-parallel-caa-mle-wrappers.R#201</td>
+<td align="left">(code run outside of <code>test_that()</code>)</td>
+<td align="left">NA (was skipped)</td>
+<td align="left">expect_equal(jnll_parallel, jnll_serial)</td>
 <td align="left">NA (was skipped)</td>
 </tr>
 <tr class="even">
