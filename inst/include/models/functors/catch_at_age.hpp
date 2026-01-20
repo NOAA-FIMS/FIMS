@@ -90,6 +90,63 @@ class CatchAtAge : public FisheryModelBase<Type> {
    */
   std::map<std::string, fims::Vector<fims::Vector<Type>>> report_vectors;
 
+ private:
+  /**
+   * @name Documentation Reference Functions
+   * @brief These functions exist only for documentation purposes and should not be called.
+   * They serve as targets for @copydoc directives to reuse parameter documentation.
+   * @{
+   */
+
+  /**
+   * @param population A shared pointer to the population object.
+   * @param i_age_year The index of the age in the current year.
+   * @param year Integer specifying the year of interest.
+   * @param age Integer specifying the age of interest.
+   */
+  void PopI_ayYearAgeParams(
+      std::shared_ptr<fims_popdy::Population<Type>> &population,
+      size_t i_age_year, size_t year, size_t age);
+
+  /**
+   * @param population A shared pointer to the population object.
+   * @param i_age_year The index of the age in the current year.
+   * @param age Integer specifying the age of interest.
+   */
+  void PopI_ayAgeParams(
+      std::shared_ptr<fims_popdy::Population<Type>> &population,
+      size_t i_age_year, size_t age);
+
+  /**
+   * @param population A shared pointer to the population object.
+   * @param i_age_year The index of the age in the current year.
+   * @param year Integer specifying the year of interest.
+   */
+  void PopI_ayYearParams(
+      std::shared_ptr<fims_popdy::Population<Type>> &population,
+      size_t i_age_year, size_t year);
+
+  /**
+   * @param population A shared pointer to the population object.
+   * @param year Integer specifying the year of interest.
+   * @param age Integer specifying the age of interest.
+   */
+  void PopYearAgeParams(
+      std::shared_ptr<fims_popdy::Population<Type>> &population,
+      size_t year, size_t age);
+
+  /**
+   * @param population A shared pointer to the population object.
+   * @param i_age_year The index of the age in the current year.
+   * @param i_agem1_yearm1 The index of the previous age in the previous year.
+   * @param age Integer specifying the age of interest.
+   */
+  void PopI_ayI_am1ym1Age(
+      std::shared_ptr<fims_popdy::Population<Type>> &population,
+      size_t i_age_year, size_t i_agem1_yearm1, size_t age);
+
+  /** @} */
+
  public:
   std::vector<Type> ages; /*!< vector of the ages for referencing*/
   /**
@@ -240,9 +297,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * This method is used to calculate the initial numbers at age for a
    * population. It takes a population object and an age as input and
    * calculates the initial numbers at age for that population.
-   * @param population A shared pointer to the population object.
-   * @param i_age_year The index of the age in the current year.
-   * @param age Integer specifying the age of interest.
+   * @copydoc PopI_ayAgeParams()
    */
   void CalculateInitialNumbersAA(
       std::shared_ptr<fims_popdy::Population<Type>> &population,
@@ -260,10 +315,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * in the current year, the index of the age in the previous year,
    * and the age as input and calculates the numbers at age for that
    * population.
-   * @param population A shared pointer to the population object.
-   * @param i_age_year The index of the age in the current year.
-   * @param i_agem1_yearm1 The index of the previous age in the previous year.
-   * @param age Integer specifying the age of interest.
+   * @copydoc PopI_ayI_am1ym1Age()
    */
   void CalculateNumbersAA(
       std::shared_ptr<fims_popdy::Population<Type>> &population,
@@ -292,7 +344,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * in the current year, the index of the age in the previous year,
    * and the age as input and calculates the unfished numbers at age
    * for that population.
-   * @copydoc CalculateNumbersAA()
+   * @copydoc PopI_ayI_am1ym1Age()
    */
   void CalculateUnfishedNumbersAA(
       std::shared_ptr<fims_popdy::Population<Type>> &population,
@@ -318,10 +370,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * * This method is used to calculate the mortality for a population. It takes
    * a population object, the index of the age in the current year, the year,
    * and the age as input and calculates the mortality for that population.
-   * @param population A shared pointer to the population object.
-   * @param i_age_year The index of the age in the current year.
-   * @param year Integer specifying the year of interest.
-   * @param age Integer specifying the age of interest.
+   * @copydoc PopI_ayYearAgeParams()
    */
   void CalculateMortality(
       std::shared_ptr<fims_popdy::Population<Type>> &population,
@@ -350,7 +399,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * * This method is used to calculate the biomass for a population. It takes a
    * population object, the index of the age in the current year, the year,
    * and the age as input and calculates the biomass for that population.
-   * @copydoc CalculateMortality()
+   * @copydoc PopI_ayYearAgeParams()
    */
   void CalculateBiomass(
       std::shared_ptr<fims_popdy::Population<Type>> &population,
@@ -367,7 +416,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * It takes a population object, the index of the age in the current year, the
    * year, and the age as input and calculates the unfished biomass for that
    * population.
-   * @copydoc CalculateMortality()
+   * @copydoc PopI_ayYearAgeParams()
    */
   void CalculateUnfishedBiomass(
       std::shared_ptr<fims_popdy::Population<Type>> &population,
@@ -385,7 +434,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * It takes a population object, the index of the age in the current year, the
    * year, and the age as input and calculates the spawning biomass for that
    * population.
-   * @copydoc CalculateMortality()
+   * @copydoc PopI_ayYearAgeParams()
    */
   void CalculateSpawningBiomass(
       std::shared_ptr<fims_popdy::Population<Type>> &population,
@@ -404,7 +453,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * population. It takes a population object, the index of the age in the
    * current year, the year, and the age as input and calculates the unfished
    * spawning biomass for that population.
-   * @copydoc CalculateMortality()
+   * @copydoc PopI_ayYearAgeParams()
    */
   void CalculateUnfishedSpawningBiomass(
       std::shared_ptr<fims_popdy::Population<Type>> &population,
@@ -478,7 +527,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
 
   /**
    * This method is used to calculate the recruitment for a population.
-   * @copydoc CalculateIndex()
+   * @copydoc PopI_ayYearParams()
    * @param i_dev The year of the last deviation.
    *
    */
@@ -515,7 +564,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * This method is used to calculate the maturity at age for a population. It
    * takes a population object, the index of the age in the current year, the
    * age as input and calculates the maturity at age for that population.
-   * @copydoc CalculateInitialNumbersAA()
+   * @copydoc PopI_ayAgeParams()
    */
   void CalculateMaturityAA(
       std::shared_ptr<fims_popdy::Population<Type>> &population,
@@ -532,9 +581,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * existing expected total landings by fleet. It takes a population object,
    * the year, and the age as input and calculates the landings for that
    * population.
-   * @param population A shared pointer to the population object.
-   * @param year Integer specifying the year of interest.
-   * @param age Integer specifying the age of interest.
+   * @copydoc PopYearAgeParams()
    */
   void CalculateLandings(
       std::shared_ptr<fims_popdy::Population<Type>> &population, size_t year,
@@ -565,7 +612,8 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * This method is used to calculate the catch weight at age for a population.
    * It takes a population object, the index of the age in the current year, the
    * year, and the age as input and calculates the weight at age for that
-   * @copydoc CalculateLandings()
+   * population.
+   * @copydoc PopYearAgeParams()
    */
   void CalculateLandingsWeightAA(
       std::shared_ptr<fims_popdy::Population<Type>> &population, size_t year,
@@ -583,7 +631,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
 
   /**
    * @brief Calculate the numbers at age for landings in a population.
-   * @copydoc CalculateMortality()
+   * @copydoc PopI_ayYearAgeParams()
    */
   void CalculateLandingsNumbersAA(
       std::shared_ptr<fims_popdy::Population<Type>> &population,
@@ -608,9 +656,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
 
   /**
    * @brief Calculate the index for a population.
-   * @param population A shared pointer to the population object.
-   * @param i_age_year The index of the age in the current year.
-   * @param year Integer specifying the year of interest.
+   * @copydoc PopI_ayYearParams()
    */
   void CalculateIndex(std::shared_ptr<fims_popdy::Population<Type>> &population,
                       size_t i_age_year, size_t year) {
@@ -626,7 +672,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
 
   /**
    * @brief Calculate the numbers at age for an index in the population.
-   * @copydoc CalculateMortality()
+   * @copydoc PopI_ayYearAgeParams()
    */
   void CalculateIndexNumbersAA(
       std::shared_ptr<fims_popdy::Population<Type>> &population,
@@ -648,7 +694,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
 
   /**
    * @brief Calculate the weight at age for an index in a population.
-   * @copydoc CalculateLandings()
+   * @copydoc PopYearAgeParams()
    */
   void CalculateIndexWeightAA(
       std::shared_ptr<fims_popdy::Population<Type>> &population, size_t year,
