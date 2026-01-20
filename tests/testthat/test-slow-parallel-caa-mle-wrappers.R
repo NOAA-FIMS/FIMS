@@ -135,26 +135,41 @@ estimation_results_serial <- purrr::map(1:sim_num, \(iter_id) {
 test_that("Run FIMS in parallel using {snowfall}", {
   # Parallel Initialization
   core_num <- 2
-  # suppressWarnings is used to hide the 'Unknown option --file' warning
-  # triggered by snowfall's command-line scanner during Rscript execution.
-  suppressWarnings(snowfall::sfInit(parallel = TRUE, cpus = core_num))
+  # Forces a socket cluster even on Linux
+  cl <- parallel::makePSOCKcluster(core_num)
+  # Ensure the cluster is closed even if the test fails
+  on.exit(parallel::stopCluster(cl))
 
-  # Ensure the FIMS package and required objects are available on all worker nodes.
-  snowfall::sfLibrary(FIMS)
+  parallel::clusterEvalQ(cl, library(FIMS))
 
-  # Parallel Execution
-  results_parallel <- snowfall::sfLapply(
+  # Export the objects needed by 'setup_and_run_FIMS_with_wrappers'
+  parallel::clusterExport(cl, varlist = c(
+    "om_input_list", 
+    "om_output_list", 
+    "em_input_list", 
+    "modified_parameters",
+    "setup_and_run_FIMS_with_wrappers"
+  ), envir = environment())
+
+  # 3. Parallel Execution using parLapply (Socket version of sfLapply)
+  results_parallel <- parallel::parLapply(
+    cl,
     1:sim_num,
-    setup_and_run_FIMS_with_wrappers,
-    om_input_list,
-    om_output_list,
-    em_input_list,
-    TRUE,
-    FALSE,
-    modified_parameters
+    function(iter_id) {
+      # Explicit garbage collection inside the worker after the run
+      res <- setup_and_run_FIMS_with_wrappers(
+        iter_id = iter_id,
+        om_input_list = om_input_list,
+        om_output_list = om_output_list,
+        em_input_list = em_input_list,
+        estimation_mode = TRUE,
+        is_parallel = FALSE, # Inside the worker, don't nest more parallelization
+        modified_parameters = modified_parameters
+      )
+      
+      return(res)
+    }
   )
-
-  snowfall::sfStop()
 
   # Comparison of results:
   # Verify that spawning biomass values from both runs are equivalent.
