@@ -571,6 +571,7 @@ setup_and_run_FIMS_with_wrappers <- function(iter_id,
   fit <- fit_fims(input = parameter_list, optimize = estimation_mode)
 
   clear()
+  gc()
   # Return the results as a list
   return(fit)
 }
