@@ -93,8 +93,9 @@ class CatchAtAge : public FisheryModelBase<Type> {
  private:
   /**
    * @name Documentation Reference Functions
-   * @brief These functions exist only for documentation purposes and should not be called.
-   * They serve as targets for @copydoc directives to reuse parameter documentation.
+   * @brief These functions exist only for documentation purposes and should not
+   * be called. They serve as targets for @copydoc directives to reuse parameter
+   * documentation.
    * @{
    */
 
@@ -132,8 +133,8 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * @param age Integer specifying the age of interest.
    */
   void PopYearAgeParams(
-      std::shared_ptr<fims_popdy::Population<Type>> &population,
-      size_t year, size_t age);
+      std::shared_ptr<fims_popdy::Population<Type>> &population, size_t year,
+      size_t age);
 
   /**
    * @param population A shared pointer to the population object.
