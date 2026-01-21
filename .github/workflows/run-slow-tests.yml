@@ -35,20 +35,36 @@ jobs:
 
     steps:
       - uses: actions/checkout@v6
+      
+      - name: Locate Package Root
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          echo "Current Working Directory: $(pwd)"
+          echo "Looking for DESCRIPTION file..."
+          find / -name "DESCRIPTION" -path "*/work/*" 2>/dev/null | head -n 1
 
       - name: Maximize Build Space
         if: matrix.os == 'ubuntu-latest'
         uses: easimon/maximize-build-space@master
         with:
           swap-size-mb: 16384 # 16GB of Swap
+          # Leave 2GB for the OS and 1GB for temp files
+          root-reserve-mb: 2048
+          temp-reserve-mb: 1024
           remove-dotnet: 'true'
           remove-android: 'true'
           remove-haskell: 'true'
-          overprovision-lvm: 'true'
+          build-mount-path: ${{ github.workspace }}
 
       - uses: r-lib/actions/setup-r@v2
         with:
           use-public-rspm: true
+      
+      - name: Verify Workspace
+        shell: bash
+        run: |
+          echo "Workspace: ${{ github.workspace }}"
+          ls -F ${{ github.workspace }}
       
       - name: Check RAM before dependency install
         run: |
@@ -84,13 +100,19 @@ jobs:
       - name: Run Slow Tests Only
         shell: Rscript {0}
         run: |
+          # Define the package root explicitly
+          pkg_root <- getwd()
+          
+          # Debug: print files in the current directory to verify
+          print(list.files(pkg_root))
+
           # Windows-specific fix for the "files too big" error
           if (Sys.info()[["sysname"]] == "Windows") {
             withr::local_options(pkg.build_extra_flags = FALSE)
           }
 
           # The filter looks for files with 'slow' in the name
-          devtools::test(filter = "slow")
+          devtools::test(pkg = pkg_root, filter = "slow")
 
       - name: Check for Out of Memory (OOM) Error
         if: failure() 
