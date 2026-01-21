@@ -217,7 +217,7 @@ using namespace Rcpp;
 template <typename T>
 T meanC(std::vector<T> x) {
   int n = x.size();
-  float total = 0;
+  T total = 0;
   
   for(int i = 0; i < n; ++i) {
     total += x[i];
@@ -231,7 +231,7 @@ SEXP mean_wrap(SEXP input){
   std::vector<double> x = as<std::vector<double>>(input);
   
   // Perform calculation
-  float mean = meanC(x);
+  double mean = meanC(x);
   
   // Convert C++ result back to R object
   return wrap(mean);
@@ -351,7 +351,7 @@ u <- new(Uniform, 0, 10)
 # Call methods and access fields
 u$draw(10L)
 u$max
-u$max <- 1
+u$max <- 5
 u$draw(10)
 ```
 </details>
