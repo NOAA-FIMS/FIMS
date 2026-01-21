@@ -31,9 +31,27 @@ jobs:
     
     env:
       RUN_SLOW_TESTS: "true"
+      GITHUB_PAT: ${{ secrets.PAT }}
 
     steps:
       - uses: actions/checkout@v6
+      
+      # Current Ubuntu runners lack enough RAM for parallel tests.
+      # The step below creates a 16 GB swap file to prevent R processes
+      # from being terminated due to out-of-memory errors.
+      - name: Create Manual Swap (Linux)
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          # Pre-allocate 16GB of disk space for the swap file.
+          sudo fallocate -l 16G /swapfile
+          # Restricted permissions are required; swap files must be 
+          # readable only by the root user for security.
+          sudo chmod 600 /swapfile
+          # Format the allocated file into a Linux swap area.
+          sudo mkswap /swapfile
+          # Activate the swap file, adding 16GB of virtual memory to the 
+          # physical RAM.
+          sudo swapon /swapfile
 
       - uses: r-lib/actions/setup-r@v2
         with:
