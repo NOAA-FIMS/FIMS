@@ -210,7 +210,7 @@ These functions are particularly useful when you want to use standard C++ types 
 <details>
 <summary><strong>Example: Using wrap and as</strong></summary>
 
-```{Rcpp wrap_as}
+```{Rcpp wrap-as}
 #include <Rcpp.h>
 using namespace Rcpp;
 
@@ -238,7 +238,7 @@ SEXP mean_wrap(SEXP input){
 }
 ```
 
-```{r wrap_as_example, eval=FALSE}
+```{r wrap-as-example, eval=FALSE}
 # After compilation with sourceCpp
 mean_wrap(c(42, 34))
 ```
@@ -312,7 +312,7 @@ Thus, `RCPP_MODULE`s can include `.field`, `.constructor`, `.method`, and `.prop
 
 First, we define a C++ class for generating uniform random numbers:
 
-```{Rcpp uniform_class, eval=FALSE}
+```{Rcpp uniform-class, eval=FALSE}
 #include <Rcpp.h>
 using namespace Rcpp;
 
@@ -344,7 +344,7 @@ RCPP_MODULE(unif_module) {
 
 After compiling with `sourceCpp()`, you can use this class from R:
 
-```{r uniform_usage, eval=FALSE}
+```{r uniform-usage, eval=FALSE}
 # Create a new Uniform object
 u <- new(Uniform, 0, 10)
 
@@ -383,7 +383,7 @@ Rcpp Sugar provides many useful functions similar to those in R:
 <details>
 <summary><strong>Example: Rcpp Sugar</strong></summary>
 
-```{Rcpp sugar_example, eval=FALSE}
+```{Rcpp sugar-example, eval=FALSE}
 #include <Rcpp.h>
 using namespace Rcpp;
 
@@ -406,7 +406,7 @@ void sugar_demo() {
 
 You can also use sugar with statistical distributions:
 
-```{Rcpp sugar_dist, eval=FALSE}
+```{Rcpp sugar-dist, eval=FALSE}
 #include <Rcpp.h>
 using namespace Rcpp;
 
@@ -426,7 +426,7 @@ void distribution_demo() {
 
 Sugar also supports `sapply` for applying functions:
 
-```{Rcpp sugar_sapply, eval=FALSE}
+```{Rcpp sugar-sapply, eval=FALSE}
 #include <Rcpp.h>
 using namespace Rcpp;
 
