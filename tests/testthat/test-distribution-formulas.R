@@ -9,7 +9,7 @@
 
 # distribution_formulas ----
 ## Setup ----
-load(test_path("fixtures", "integration_test_data.RData"))
+load(testthat::test_path("fixtures", "integration_test_data.RData"))
 iter_id <- 1
 # Load operating model data
 om_input <- om_input_list[[iter_id]]

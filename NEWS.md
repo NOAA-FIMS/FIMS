@@ -1,9 +1,17 @@
+# FIMS 0.8.0
+
+* Allow for projections based on fixed fishing mortality, catches, or in theory
+  using priors on any parameter or derived quantity that you want such as
+  the ratio of current spawning biomass to initial biomass.
+* Fixes create_default_Population() to define age and years for log_M
+
 # FIMS 0.7.1
 
 * Fixes json output when there are non numeric values, infinity values, and -999
 * Allows the output columns to be merged with reshape and dplyr when character
   values are combined with strings
 * Fixes spawning biomass output in print method to report value
+* Fixes get_output() when there is no sdreport with added argument do_sd_report
 
 # FIMS 0.7.0
 

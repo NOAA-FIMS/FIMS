@@ -10,12 +10,12 @@
 # FIMSFit ----
 ## Setup ----
 # Load the test data from an RDS file containing the fitted model estimates
-if (!file.exists(test_path("fixtures", "fit_age_length_comp.RDS"))) {
+if (!file.exists(testthat::test_path("fixtures", "fit_age_length_comp.RDS"))) {
   prepare_test_data()
 }
 
-fit_age_length_comp <- readRDS(test_path("fixtures", "fit_age_length_comp.RDS"))
-fit_agecomp <- readRDS(test_path("fixtures", "fit_agecomp.RDS"))
+fit_age_length_comp <- readRDS(testthat::test_path("fixtures", "fit_age_length_comp.RDS"))
+fit_agecomp <- readRDS(testthat::test_path("fixtures", "fit_agecomp.RDS"))
 fit_list <- list(fit_age_length_comp, fit_agecomp)
 on.exit(rm(fit_list), add = TRUE)
 

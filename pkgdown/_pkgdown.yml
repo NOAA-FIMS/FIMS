@@ -27,10 +27,21 @@ articles:
   - fims-demo
   - fims-demo-minimal
   - fims-logging
+  - fims-user-setup-guide
+  - fims-demo-projections
 
 - title: Developer
   contents:
   - fims-path-maturity
+
+- title: C++ Training
+  contents:
+  - training-intro-cpp
+  - training-intro-rcpp
+
+- title: Research and development
+  contents:
+  - RD-re-sparsity
 
 reference:
 - title: Data

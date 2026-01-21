@@ -454,7 +454,7 @@ FIMSFit <- function(
   )
 
   # Create JSON output for FIMS run
-  model_output <- input[["model"]]$get_output()
+  model_output <- input[["model"]]$get_output(do_sd_report = length(opt) > 0)
   # Reshape the JSON estimates
   json_estimates <- reshape_json_estimates(model_output)
   # Merge json_estimates into tmb_estimates based on parameter id

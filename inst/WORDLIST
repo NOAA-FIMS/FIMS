@@ -1,4 +1,3 @@
-
 ADMB
 ADREPORT
 ADREPORTvector
@@ -18,6 +17,7 @@ AgeCompositionExpected
 AgeCompositionProportion
 Allocator
 AloadModule
+Anders
 Args
 Arith
 AtoL
@@ -25,14 +25,17 @@ AtoLSchnute
 BEOS
 BH
 BOOL
+babySAM
 Baranov
 BasedOnStyle
+Benchmarking
 Bertalanffy
 BevHolt
 Beverton
 BevertonHolt
 BevertonHoltRecruitment
 BevertonHoltRecruitmentInterface
+Bjarne
 Bool
 CAA
 CAAEvaluateTestFixture
@@ -70,6 +73,7 @@ CalculateNumbersAA
 CalculateRecruitment
 CalculateSBPR
 CalculateSpawningBiomass
+CalculateSpawningBiomassRatio
 CalculateUnfishedBiomass
 CalculateUnfishedNumbersAA
 CalculateUnfishedNumbersAAandUnfishedSpawningBiomass
@@ -88,6 +92,8 @@ CheckModelOutput
 ClangFormat
 ClassName
 Codecov
+Codespace
+Codespaces
 ComputeProportions
 ConfigurePopulationModel
 Const
@@ -256,6 +262,7 @@ JsonObject
 JsonParser
 JsonValue
 JsonValueType
+Kristensen
 LIBPFM
 LPMF
 LandingsDataInterface
@@ -303,6 +310,7 @@ MaturityInterfaceBase
 ModularTMBExample
 MultinomialLPDF
 MultinomialLPMF
+MyClass
 NCOL
 NLL
 NLLs
@@ -319,6 +327,7 @@ NumbersAtAge
 NumericMatrix
 NumericVector
 Nyears
+OSS
 ObservedCatch
 OpenBSD
 ParameterVector
@@ -333,7 +342,11 @@ ParseString
 ParseValue
 ParseVector
 PascalCase
+Pdev
+phiTrans
+plogis
 PlusGroup
+Polymorphism
 PopulationEvaluateTestFixture
 PopulationInitializeTestFixture
 PopulationInterface
@@ -367,6 +380,7 @@ RegisterParameter
 RegisterParameterName
 RegisterRandomEffect
 RegisterRandomEffectName
+Reparameterization
 ResetVector
 Ricker
 Rmd
@@ -374,6 +388,7 @@ Rmpi
 Robj
 Rscript
 Rslaves
+RTMB
 RunModelLoop
 SBPR
 SDreports
@@ -434,6 +449,7 @@ ShowPopulation
 SkipWhitespace
 SortIncludes
 SrBevertonHoltEvaluate
+Stroustrup
 Subpopulation
 Sys
 TESTDOWN
@@ -449,6 +465,7 @@ TearDown
 ToDo
 ToJSON
 Tomlinson
+Tsuda
 ULPs
 UNLEN
 UNPROTECT
@@ -467,6 +484,7 @@ WORDLIST
 WSL
 Wa
 Wb
+widehat
 WriteAtExit
 WriteJsonValue
 WriteToFile
@@ -507,6 +525,7 @@ byrow
 caa
 calc
 callGeneric
+callout
 catchability
 cbind
 cctype
@@ -514,6 +533,7 @@ cdf
 cdot
 cerr
 checkmarks
+chmod
 choco
 chr
 chrono
@@ -538,10 +558,12 @@ const
 containsNA
 conventionalcommits
 conversiondouble
+copydoc
 cout
 cov
 covr
 cp
+cplusplus
 cpp
 cpus
 cran
@@ -567,6 +589,7 @@ dat
 dbcceb
 de
 deallocated
+deallocates
 defineVar
 deliverables
 dellog
@@ -599,6 +622,7 @@ dox
 doxygen
 dplyr
 dq
+dropdown
 dum
 dynam
 elif
@@ -635,6 +659,7 @@ filesystem
 fims
 fimsfit
 fimsframe
+firstname
 fishres
 fmort
 fn
@@ -650,6 +675,7 @@ gc
 gcc
 gcovr
 gdb
+geeksforgeeks
 getAbsolutePathWithoutDotDot
 getOption
 getenv
@@ -663,6 +689,7 @@ gh
 gha
 ghactions
 github
+githubusercontent
 gitignore
 glm
 globalVariables
@@ -700,6 +727,7 @@ inheritParams
 init
 initializer
 inplace
+instantiation
 instantiations
 inv
 io
@@ -728,11 +756,13 @@ kmax
 knitr
 knum
 kv
+lastname
 lcomp
 ldots
 len
 lengthcomp
 lgamma
+libPaths
 libname
 libpath
 libs
@@ -767,11 +797,14 @@ meanlog
 messageBody
 messageHeadline
 mget
+microbenchmark
 minimizR
 minimizer
 mkString
 mkdir
+MLE
 modelTest
+modularity
 mort
 mpi
 msupernaw
@@ -818,6 +851,7 @@ npos
 nrecruits
 nrow
 ns
+nsaw
 nsims
 nslaves
 nsurveys
@@ -842,6 +876,7 @@ ost
 ostream
 ostringstream
 outputFile
+overfishing
 packageVersion
 pandoc
 parList
@@ -862,6 +897,7 @@ pmap
 pmf
 png
 pnorm
+polymorphism
 popdy
 pos
 postfix
@@ -899,6 +935,7 @@ rebasing
 reccommend
 recr
 recruitments
+rect
 refClass
 registerRoutines
 relativePath
@@ -909,10 +946,12 @@ repo
 reportable
 reportvector
 reprod
+requireNamespace
 rescaled
 resid
 ret
 retape
+reusability
 rf
 rlang
 rlib
@@ -926,13 +965,16 @@ roxygenize
 rspm
 rstan
 rstream
+rtools
 ru
 rvit
 rzero
+sL
 sapply
 saveRDS
 sb
 sbzero
+scrollable
 sd
 sdlog
 sdmTMB
@@ -985,6 +1027,7 @@ srcref
 ss
 ssb
 ssbzero
+ssqng
 sstream
 stackoverflow
 stan
@@ -1012,14 +1055,17 @@ substr
 sudo
 superClass
 suppressMessages
+suppressWarnings
 surveyB
 syms
+sysname
 tabset
 tanh
 tbl
 tempdir
 tempfile
 templated
+templating
 testdown
 testthat
 th
@@ -1062,6 +1108,7 @@ unlist
 unname
 unnest
 unnested
+unserialization
 useDynLib
 useDynamicSymbols
 usethis
@@ -1095,3 +1142,4 @@ ymax
 yml
 yyyy
 zzz
+️

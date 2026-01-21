@@ -1,0 +1,728 @@
+---
+title: "Intro to C++"
+author: "Andrea Havron"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Intro to C++}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+<!--
+EP - in general it would be really helpful to have side by side examples of similar things happening in FIMS to whatever basic "hello world" simple type of examples that are in this vignette so that people can immediately see the parallels to the FIMS code and make that connection quickly.
+-->
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+<!-- The section below creates a collpase/expand all button -->
+<div id="expand-collapse-buttons" style="margin-bottom: 20px;">
+  <button onclick="expandAll()" class="btn btn-primary">Expand All</button>
+  <button onclick="collapseAll()" class="btn btn-secondary">Collapse All</button>
+</div>
+
+<script>
+function expandAll() {
+  const details = document.querySelectorAll('details');
+  details.forEach((detail) => {
+    detail.setAttribute('open', 'true');
+  });
+}
+
+function collapseAll() {
+  const details = document.querySelectorAll('details');
+  details.forEach((detail) => {
+    detail.removeAttribute('open');
+  });
+}
+</script>
+
+# What is C++
+
+## Definition
+
+C++ is currently one of the world's most popular programming languages. It was created by [Bjarne Stroustrup](https://en.wikipedia.org/wiki/Bjarne_Stroustrup) as an extension of the C language. The language is ideal for building and maintaining large-scale software infrastructures. Its [object-oriented nature](https://adv-r.hadley.nz/oo.html) allows for clear structure, modularity, and code reusability, which helps manage complexity in large projects such as web browsers, operating systems, and database engines. C++ is also a strongly typed language, meaning that variable types must be explicitly defined, which can help catch errors at compile time and improve code reliability (see the section below on [`C++ types`](#types) for more information on types).
+
+## Why use C++
+
+There are thousands of online resources available for learning and troubleshooting C++, making it accessible for both beginners and experienced developers. C++ supports object-oriented programming, which enables you to design software using classes and objects, promoting encapsulation, inheritance, and polymorphism. Additionally, C++ offers fine-grained control over system resources and memory management, making it a preferred choice for high-performance applications and systems programming.
+
+# Writing C++
+
+## Basics
+
+* Lines end in semicolons
+* Everything must be declared first, even functions
+* Indexing starts at 0, where indexing in R starts at 1
+* Basic math operators (=,+,-,/,*) operate the same as they do in R
+* Code must first be compiled before it is run
+
+## Types {#types}
+
+<!-- This section still needs some ties back to the FIMS code -->
+Every variable, function, and expression in C++ must have a type, which determines the amount of memory allocated and the operations that can be performed. This explicit nature is why C++ is defined a **[strongly typed language](https://www.fluentcpp.com/2017/03/31/how-typed-cpp-is-and-why-it-matters/)**. C++ types are categorized into the following three main groups: Primitive (built-in), Derived, and User-Defined.
+
+Primitive types are the basic building blocks in C++, similar to atomic types in R. They represent single values, are are used directly, and are the building blocks for more complex types.
+
+* `bool`: Boolean (`true` or `false`), like logical in R but lowercase
+* `char`: A single character or small integer
+* `int`: Integer
+* `float`: Single precision floating-point number, less precise than numeric in R
+* `double`: Double precision floating-point number, like numeric in R
+* `void`: No return value from a function
+
+Derived types in C++ are built from primitive types.
+
+* Arrays: Like R vectors but fixed size and type
+* Pointers: Variables that store memory addresses, similar to environments or references in R
+* References: Aliases for existing variables, somewhat like [assignment by reference in R](https://rdatatable.gitlab.io/data.table/articles/datatable-reference-semantics.html)
+
+User-defined types in C++ are custom types created by the programmer.
+
+* Structs and Classes: These are similar to lists, data frames, or S3/S4 objects in R, allowing you to group different types of data and define custom behaviors and methods.
+
+### Hello World example
+
+In almost all tutorials, the hello world program will be the first introduction to writing a C++ program. Here we give two examples, one where `main`, i.e., the program name, returns an integer and a duplicate example (without comments in the code) that does not return a value. Regardless of what is being returned in either option, they both print "Hello World!" to the terminal.
+
+<details>
+<summary><strong>Example: Hello World</strong></summary>
+
+```cpp
+/*
+ The include statement allows you to use the iostream library, which includes
+ the standard library (std) functions.
+*/
+#include <iostream>
+/*
+ `using namespace` allows you to use functions in the library that you specify,
+ e.g., std, without specifying their namespace on each instance, e.g., you can
+ use `cout` rather than `std::cout`.
+*/
+using namespace std;
+
+/*
+ main is the entry point to the program and the function name the int
+ declaration before the function name declares the function will return an
+ integer.
+*/
+int main() {
+  /*
+   cout allows you to print a message directly to the screen when the function
+   is called
+  */
+  cout << "Hello World!";
+  return 0;
+}
+```
+
+</details>
+
+If a function should not return anything, then the type declaration before the
+function name should be `void`. The above Hello World program is re-written
+below (without comments) to use `void` instead of `int`.
+
+<details>
+<summary><strong>Example: Hello World using `void`</strong></summary>
+
+```cpp
+#include <iostream>
+using namespace std;
+
+void main() {
+  cout << "Hello World!";
+}
+```
+
+</details>
+
+### add example {#add-example}
+
+The following program does a mathematical computation, taking two integers as inputs and returning an integer.
+```cpp
+int add(int x, int y) {
+  return x + y;
+}
+```
+
+The program coded above will fail if the inputs are not integers, which is just one example of why C++ is considered a strongly-typed language. An additional program is needed to handle doubles as inputs. Using this version of `add` will return a floating-point number. See the [section below on templated code](#templates) for how to avoid having to a function for each type.
+```cpp
+double add(double x, double y) {
+  return x + y;
+}
+```
+
+### Vectors
+
+Vectors are a compound type and are available in the standard library, i.e., [`std::vector`](https://cplusplus.com/reference/vector/vector/). Compound types are built from primitive types like `int`. A vector will be compound integer if the vector is composed of integers, compound double if the vector is composed of doubles, and so on. The type of all elements in the vector must be the same and must be declared when the vector is created, e.g., `std::vector<int>`. For example, in FIMS we have a vector of parameter names that we declare as a vector of strings, e.g., `std::vector<std::string> parameter_names` in [`information.hpp`](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/common/information.hpp).
+
+`std::vector` has a number of member functions (see the [rcpp methods section in the Rcpp vignette](training-intro-rcpp.html#rcpp-methods)) that can be used to operate on a vector. Below are a few member functions of `std::vector` that are commonly used or used within the FIMS code, e.g., we use `resize` quite often. See the [documentation for `std::vector`](https://en.cppreference.com/w/cpp/container/vector) for the full list of member functions.
+
+* `begin`: return iterator to beginning
+* `end`: return iterator to end
+* `size`: returns vector size
+* `resize`: changes the vector size
+* `[]`: access element
+* `front`: access first element
+* `back`: access last element
+* `push_back`: append element to end
+* `pop_back`: delete last element
+* `clear`: clear content
+
+The code below illustrates how to create a vector and utilize some of the member functions. Specifically, it initializes a vector, resizes it to have a length of three, adds elements using a `for` loop, uses the member function `push.back()` to add one additional element to the end of the vector, and returns a vector of doubles with the following four elements: `1.3 2.6 3.9 8.1`.
+
+<details>
+<summary><strong>Example: `std::vector`</strong></summary>
+
+```cpp
+#include <iostream>
+
+std::vector<double> create_vector() {
+  std::vector<double> x;
+  x.resize(3);
+  x[0] = 1.3;
+  for(int i=1; i<3; i++){
+    x[i] = x[i-1] + 1.3;
+  }
+  x.push_back(8.1);
+
+  return x;
+}
+```
+
+</details>
+
+### Constants
+
+If you do not want a value to change throughout the program, you can assign it to be a constant. For all constant values, you must first declare it is going to be a constant and then declare the type.
+
+```cpp
+const int MinutesPerHour = 60;
+const double pi = 3.14159;
+```
+
+## Templates
+
+Because C++ is a strongly typed language (see the section on [C++ types](#types)), every function must be declared to return a single type, e.g., `int`, `float`, `double`, etc. For example, in the [simple addition function](#add-example) that we wrote above, we had to specify two separate functions with the same name, i.e., `add`, one for adding integers and one for adding doubles.
+
+It can be tedious and repetitive to write out functions for each type, and it can lead to more code to maintain and more potential for bugs. To simplify matters, C++ allows for templated code, which allows functions to take a generic type, e.g., `Type`, rather than a specific type, e.g., `int`. This is helpful for instances when the guts of a function are repeated multiple times but the input and output types differ on each instance.
+
+For example, the code below is a single replacement for the two `add` functions in the [simple addition function](#add-example). In fact, this templated function would also work for additional types beyond integers and doubles not accounted for in the [simple addition function](#add-example), such as booleans because true and false values translate into 1s and 0s.
+
+```cpp
+template <class Type>
+Type my_add(Type x, Type y){
+  return x + y
+}
+```
+
+### Syntax in FIMS
+
+In templated code, `class` is interchangeable with `typename`, where `typename` is seen as a more modern way the templated code. Additionally, you do not have to use `Type` for the name of the `typename`. You could use a capital T, or many examples use a capital A, e.g., `template <typename A>` instead of `template <class Type>`. Within the FIMS codebase, we exclusively use `class` instead of `typename` and `Type` to declare the type parameter name. You can see several examples of templated code in [`fims_math.hpp`](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/common/fims_math.hpp).
+
+{Rcpp} does not support C++ templating so you cannot create templated code if you plan on compiling it with `Rcpp::cppFunction()` (see the [vignette on {Rcpp}](training-intro-rcpp.html#writing-cpp-functions) for where it does work). Instead, you have to compile the C++ code using the terminal.
+
+### Compiling directions
+
+The example code for `my_add` given [above](#templates) only provides the function and does not actually run it. Below, we expand it to include the necessary header file so the output can be printed the screen within an additional `main` program that runs `my_add` multiple times. In the example below, main returns the integer zero to signal the end of the program.
+
+To compile and run the code that we give below you must save it to a .cpp file, e.g., `my_templated_add.cpp`, and navigate your terminal to the directory where the file is saved. Next you will need to compile the program (see the second code chunk), which will create an executable that you can then run to see the results of `main`. If you are on a Windows computer, `g++` will be installed in your rtools directory but it might not be available in your path, which means you will have to specify the full path to the executable rather than just the executable name as we do in the example.
+
+```cpp
+#include <iostream>
+
+template <typename Type>
+  Type my_add(Type x, Type y) {
+    return x + y;
+  }
+
+int main(){
+  //works with integers
+  std::cout << "Type is int: " << my_add(1, 2) << std::endl;
+
+  //works with floats
+  std::cout << "Type is float: " << my_add(1.2, 3.2) << std::endl;
+
+  //works with doubles
+  std::cout << "Type is double: " << my_add(1.52757396774, 6.83480375227) << std::endl;
+
+  return 0;
+
+}
+```
+
+Ensure that you navigate your terminal to where you saved `my_templated_add.cpp`, using `cd`, i.e., change directory, before you run the following code.
+
+```bash
+g++ my_templated_add.cpp -o a.exe
+a.exe
+```
+
+Running the executable results in the following being printed to the screen.
+```bash
+Type is int: 3
+Type in float: 4.4
+Type is double: 8.36238
+```
+
+## Classes
+
+In C++, [a class](https://www.geeksforgeeks.org/c-classes-and-objects/) is a user-defined type that serves as a blueprint for creating objects. For example, `Rcpp::NumericVector` is a class within Rcpp that we talk about a lot in the [Rcpp introduction vignette](training-intro-rcpp.html). Classes allow for the grouping of related data (called member variables or attributes) and functions (called member functions or methods) into a single, cohesive unit. This encapsulation makes it easier to model real-world entities and manage complexity in large programs (see [cplusplus.com](https://cplusplus.com/doc/tutorial/classes/) for more details). By defining classes, you can create multiple objects with the same structure and behavior, enabling code reuse, modularity, and the use of object-oriented programming principles such as inheritance and polymorphism.
+
+Within your code, a class must first be defined before it can be used. Though, memory is only allocated when an instance (object) of the class is created, this is called instantiation. There are several ways to create class instances in C++. You can declare an object directly (e.g., `MyClass m;` that creates the object `m` defined by `MyClass`) or you can use the `new` function to allocate memory dynamically and create a pointer to the object (e.g., `MyClass* m = new MyClass();`). In modern C++ and in FIMS, it is common to use shared pointers (`std::shared_ptr`) to manage memory automatically and safely share ownership of objects across different parts of the program. If you are not yet familiar with pointers or dynamic memory allocation, do not worry—these concepts are explained in detail in the [Pointers and References section](#pointers-and-references) below.
+
+Once a class instance is instantiated, you can access its members (variables and functions) using either the dot operator (.) if you have a regular object that was created directly or the arrow operator (->) if you are working with a pointer or a shared pointer. This distinction is important for interacting with class members and is a fundamental part of working with objects in C++.
+
+### MyClass example
+
+```c++
+class MyClass{ //start of class called MyClass
+  //Access specifier: can be private, public, or protected
+  public:
+  //Data members: variables to be used
+  float a;
+  float b;
+
+  MyClass(){} //Constructor - automatically called when new object created
+
+  //Member functions: Methods to access data members
+  float my_add(){
+    return a + b;
+  }
+
+}; //class ends with semicolon
+```
+
+### Instantiate and initialize
+
+<details>
+<summary><strong>Example: Use `MyClass`</strong></summary>
+
+```c++
+// [[Rcpp::export]]
+void my_class_add(){ //Use void because the main function has no return
+
+  //Create instance of class using a declaration
+  MyClass m1;
+
+  //Members can be accessed and initialized using the . command
+  m1.a = 1.2;
+  m1.b = 2.4;
+
+  Rcpp::Rcout << "m1.my_add() = " << m1.my_add() << std::endl;
+
+  //Create instance of class using a pointer
+  MyClass* m2 = new MyClass();
+  //Note that the above is equivalent to the following, where the space is
+  //located is irrelevant
+  //MyClass *m2 = new MyClass();
+
+  //Members can be access using the -> command
+  m2->a = 3.3;
+  m2->b = 4.4;
+
+  Rcpp::Rcout << "m2->my_add() = " << m2->my_add() << std::endl;
+
+  //Need to delete memory after use when instantiating with new
+  delete m2;
+
+  //Create instance of class with shared pointer
+  //Note the type of the shared pointer is MyClass
+  std::shared_ptr<MyClass> m3 = std::make_shared<MyClass>();
+
+  //Members can be access using the -> command
+  m3->a = 4.2;
+  m3->b = 1.7;
+
+  Rcpp::Rcout << "m3->my_add() = " << m3->my_add() << std::endl;
+}
+```
+
+</details>
+
+The previous two code chunks are saved in [`cpp/my_class.cpp`](https://github.com/NOAA-FIMS/FIMS/blob/main/vignettes/cpp/my_class.cpp) along with the necessary `include` statements. You can compile the file in an R session using {Rcpp} and call the program `my_class_add()`, see the following code:
+```{r run-my-class-add}
+Rcpp::sourceCpp("cpp/my_class.cpp")
+my_class_add()
+```
+
+### Inheritance
+
+A new class (child, derived) can inherit members and functions from an existing class (parent, base), and this is termed inheritance. There are three types of inheritance,
+
+    - **public**: everything that can access the base class can access its public members and functions;
+    - **protected**: only the derived classes can access the protected members and functions of a base class; and
+    - **private**: only the base class can access private members and functions of the base class.
+
+The `MyClass` example uses public inheritance, which is what is largely used in FIMS. Though, some things in FIMS are declared as private (see `SharedInt` in [`rcpp_shared_primitive.hpp`](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/interface/rcpp/rcpp_objects/rcpp_shared_primitive.hpp)).
+
+When setting up inheritance, it's best to establish a base class with behavior shared with all the derived classes. This means that the base class should contain the data members and functions that are common to all derived classes so code is not duplicated and can be reused easily. By centralizing shared functionality in the base class, you make your code more organized, maintainable, and flexible — any changes to shared behavior only need to be made in one place, and all derived classes will automatically inherit those updates. This approach also makes it easier to extend your code in the future by adding new derived classes that benefit from the existing shared features.
+
+<!-- need example of inheritence in FIMS -->
+
+To refer to members (variables or functions) of the current object, `this->` is used inside of a class. It is especially useful in derived classes to clarify that you are accessing a member inherited from the base class, or to resolve naming conflicts. For example, if a derived class has a function or variable with the same name as one in the base class, using `this->` makes it clear you mean the member of the current object. In most cases, you can access members without `this->`, but it can help with code clarity and is sometimes required for templates or to avoid ambiguity.
+
+In the code below, we create a base class `Shape` with two public members, `length` and `height`. Then, we add derived classes that can inherit from the `Shape` base class. Finally, we create a function called `calculate_areas()` that determines the area of the appropriate child class.
+
+<details>
+<summary><strong>Example: Inheritance</strong></summary>
+
+```cpp
+class Shape{
+
+public:
+double length;
+double height;
+
+Shape(){}
+
+};
+
+//Rectangle is a derived class of Shape
+class Rectangle : public Shape{
+public:
+  Rectangle() : Shape() {}
+
+  public:
+  //this->length: points to length within base class, etc.
+  double area(){
+    return this->length * this->height;
+  }
+};
+
+//Square is also a derived class of Shape
+class Square : public Shape{
+public:
+  Square() : Shape() {}
+
+  public:
+  double area(){
+    return this->length * this->length;
+  }
+};
+
+// [[Rcpp::export]]
+double calculate_areas(std::string shape, double length, double width = 0){
+
+  double out = 0;
+
+  if (shape == "rectangle"){
+      Rectangle rect;
+      rect.length = length;
+      rect.width = width;
+      out = rect.area();
+  } else if (shape == "square") {
+      Square sq;
+      sq.length = length;
+      out = sq.area();
+  } else {
+      Rcpp::Rcout << "Invalid shape" << std::endl;
+  }
+  return out;
+}
+```
+
+</details>
+
+The previous code and the appropriate include statements are combined into [`cpp/my_inheritance.cpp`](https://github.com/NOAA-FIMS/FIMS/blob/main/vignettes/cpp/my_inheritance.cpp) and can be run from R using `Rcpp::sourceCpp()`, see below.
+
+<details>
+<summary><strong>Example: Run inheritance example from R</strong></summary>
+
+```{r run-inheritance}
+Rcpp::sourceCpp("cpp/my_inheritance.cpp")
+
+calculate_areas("rectangle", 6, 4)
+calculate_areas("square", 2)
+calculate_areas("triangle", 3, 4)
+```
+
+</details>
+
+### Polymorphism
+
+We saw how derived classes can inherit from base classes. This example resulted in code that required `if ()` statements to calculate a function for the different classes. Polymorphism can be used instead to specify different behaviors for each child class to avoid conditional statements in the code, which are hard to maintain and extend. Polymorphism is used when a function or operator works differently when used in different context and works when classes inherit from each other resulting in a single action or function that produces different results based on the derived class.
+
+To set up polymorphism in your code you will need to use a `virtual` function that is overridden at run time. Thus, we will set up the base class as before but this time the shared object is a function called  `area()`. Note that the area function is proceeded by `virtual` and set to equal 0. This is done to specify that `area` is a function being overwritten by functions from the child classes. Then, we specify `virtual` functions in each child class with the same name, e.g., `area`, to overwrite the `area` function in the base class. Finally, the classes have to be exposed to R using `Rcpp::RCPP_MODULE()`. See the [vignette on Rcpp](training-intro-rcpp.html) for a refresher on Rcpp modules.
+
+<details>
+<summary><strong>Example: Polymorphism</strong></summary>
+
+```cpp
+class Shape {
+  public:
+    //constructor
+    Shape() {}
+
+    virtual ~Shape() {}
+
+    // Virtual function to calculate area
+    virtual double area() = 0;
+
+  };
+
+class Circle : public Shape {
+  double radius;
+
+  public:
+    Circle(double r) : Shape(){
+      radius = r;
+    }
+
+  // Override area() for Circle
+  virtual double area() {
+    return M_PI * radius * radius;
+  }
+};
+
+class Rectangle : public Shape {
+  private:
+    double length, height;
+
+  public:
+    Rectangle(double l, double h) : Shape(){
+      length = l;
+      height = h;
+    }
+
+  // Override area() for Rectangle
+  virtual double area()  {
+    return length * height;
+  }
+};
+
+RCPP_MODULE(shape) {
+  Rcpp::class_<Shape>("Shape")
+  .method("area", &Shape::area);
+
+  Rcpp::class_<Circle>("Circle")
+    .derives<Shape>("Shape")
+    .constructor<double>();
+
+  Rcpp::class_<Rectangle>("Rectangle")
+    .derives<Shape>("Shape")
+    .constructor<double, double>();
+}
+```
+
+</details>
+
+We can load this code, which is stored in [`cpp/my_polymorphism.cpp`]((https://github.com/NOAA-FIMS/FIMS/blob/main/vignettes/cpp/my_polymorphism.cpp)) using `Rcpp::sourceCpp()` and `Rcpp::loadModule()` where the second argument is `TRUE` so that all objects are loaded into the R environment. `methods::new()` is used to create new instances of the desired class.
+
+<details>
+<summary><strong>Example: Load module</strong></summary>
+
+```{r run-polymorphism}
+Rcpp::sourceCpp("cpp/my_polymorphism.cpp")
+# Note that "shape" matches the name passed to RCPP_MODULE
+Rcpp::loadModule("shape", TRUE)
+c <- methods::new(Circle, 2)
+r <- methods::new(Rectangle, 3, 4)
+
+c$area()
+r$area()
+```
+
+</details>
+
+## Pointers and References
+
+### Pointers
+
+A [pointer](https://www.w3schools.com/cpp/cpp_pointers.asp) is a variable that stores the memory address of another variable as its value. Instead of holding a direct value (like an int or double), a pointer "points to" the location in memory where a value is stored. Pointers are declared using the `*` operator, for example, `int* p;` creates a pointer named `p` to an integer. More specifically, to point to where `y` is stored we can declare  `int y = 3; int* x = &y;`. The `*` operator can also be used to access the value the pointer points to, e.g., `*x`. Pointers are powerful for dynamic memory management, working with arrays, and enabling efficient function arguments. In FIMS, we use [shared pointer](#shared-pointers), i.e., `std::shared_ptr<int> y`, which we will explore later.
+
+<details>
+<summary><strong>Example: Pointers</strong></summary>
+
+```{r pointer}
+Rcpp::cppFunction('
+#include <Rcpp.h>
+int pointer(){
+  float y = 3.1459;
+  //initiate a variable x that points to the same address as y
+  float* x = &y;
+  Rcpp::Rcout << "x is equal to the address of y" << std::endl;
+  Rcpp::Rcout << "x is: " << x << std::endl;
+  Rcpp::Rcout <<  "The address of y is: " << &y << std::endl;
+  Rcpp::Rcout << "*x returns the value of y: " << *x <<  std::endl;
+  return 0;
+}')
+
+pointer()
+```
+
+</details>
+
+### References
+
+A [reference variable](https://www.w3schools.com/cpp/cpp_references.asp) is an alias for an existing variable. Once a reference is initialized to a variable, it acts as another name for that variable — any changes made through the reference affect the original variable. References are declared using the `&` operator, for example: `int y = 3; int &ref = y;` creates a reference named `ref` that refers to the variable `y`. Unlike pointers, references must be initialized when declared and cannot be changed to refer to another variable later. References are commonly used to pass variables to functions without making copies, enabling efficient and direct access to the original data. The `&` operator can also be used to return the memory address of a variable, e.g., `&y`.
+
+<details>
+<summary><strong>Example: References</strong></summary>
+
+```{r reference}
+Rcpp::cppFunction('
+  #include <Rcpp.h>
+  int reference() {
+    int y = 3;
+    int &x = y;
+    Rcpp::Rcout << "x is: " << x << std::endl;
+    Rcpp::Rcout << "y is: " << y << std::endl;
+    Rcpp::Rcout << "The memory address of x is: " << &x << std::endl;
+    Rcpp::Rcout << "The memory address of y is: " << &y << std::endl;
+
+    return 0;
+  }')
+
+reference()
+```
+
+</details>
+
+### Modifying Pointers
+
+We can use pointers to update values. In the following example, `b` is a copy while `c` is a pointer, which is why `b` does not get updated when `*c` is updated. We avoid copies in FIMS because when a variable gets updated in the model, we want it updated everywhere in the model.
+
+<details>
+
+<summary><strong>Example: Updating pointers</strong></summary>
+
+```{r pointer-update}
+Rcpp::cppFunction('
+#include <Rcpp.h>
+int update_pointer(){
+ //initiate a variable
+  float a = 3.1459;
+  //initiate a new variable with the same value as a
+  float b = a;
+  //initiate a variable c that points to the same address as a
+  float* c = &a;
+  *c = 100;
+  Rcpp::Rcout << "a and *c have been updated; b has not"  << std::endl;
+  Rcpp::Rcout << "a = " << a << "; *c = " << *c << std::endl;
+  Rcpp::Rcout << "b = " << b << std::endl;
+  return 0;
+}')
+
+update_pointer()
+```
+
+</details>
+
+We can reassign pointers using the `&` operator. What do you expect `a` and `*c` to return in the following example?
+
+<details>
+
+<summary><strong>Example: Reassigning pointers</strong></summary>
+
+```{r reassign-pointer}
+Rcpp::cppFunction('
+#include <Rcpp.h>
+int reassign_pointer(){
+//initiate a variable
+  float a = 3.1459;
+  //initiate a new variable with the same value as a
+  float b = a;
+  //initiate a variable c that points to the same address as a
+  float* c = &a;
+  *c = 100;
+  c = &b;
+  b = 10;
+  Rcpp::Rcout << "c now equals the address of b" << std::endl;
+  Rcpp::Rcout << "&a = " << &a << std::endl;
+  Rcpp::Rcout << "&b = " << &b << std::endl;
+  Rcpp::Rcout << "c = " << c << std::endl;
+  Rcpp::Rcout << "a = " << a << std::endl;
+  Rcpp::Rcout << "b = " << b << std::endl;
+  Rcpp::Rcout << "*c = " << *c <<std::endl;
+  return 0;
+}')
+
+reassign_pointer()
+```
+
+</details>
+
+### Memory Management
+
+When pointers are initialized inline, e.g., `int x = 3; int* y = x`, the compiler automatically creates and manages memory for you. Care must be taken to manage memory properly. The user can also create and manage memory themselves using the `new` and `delete` commands. If you create a variable using `new` and do not clean up after using `delete`, the program can result in **memory leaks** where the memory in the program accumulates over its run time, which can slow down or even crash your program. In FIMS, we use `clear()`, which removes all pointers, references, and objects created during previous model runs, ensuring that no leftover data or memory remains in the C++ backend. This is important for avoiding memory leaks and for making sure that each new model run starts with a clean slate. In practice, you should run clear() before starting a new model or after finishing one, especially when working interactively in R, to prevent old objects from interfering with new analyses.
+
+<details>
+
+<summary><strong>Example: Manual memory management</strong></summary>
+
+```{r manage-memory}
+Rcpp::cppFunction('
+#include <Rcpp.h>
+int manage_memory(){
+  //initiate an integer type pointer
+  int* ptr= new int;
+  *ptr = 35;
+  Rcpp::Rcout << "*ptr = " << *ptr <<std::endl;
+
+  //delete memory
+  delete ptr;
+  return 0;
+}')
+
+manage_memory()
+```
+
+</details>
+
+## Shared pointers
+
+A [shared pointers](https://www.geeksforgeeks.org/cpp/shared_ptr-in-cpp/), also called a smart pointer, in C++ is a type of smart pointer provided by the standard library (`std::shared_ptr`) that manages the lifetime of a dynamically allocated object. Unlike a regular pointer, a shared pointer keeps track of how many shared pointers point to the same object using a reference count. When the last shared pointer referencing an object is destroyed or reset, the object's memory is automatically deallocated. Shared pointers are especially useful when multiple parts of a program need to share ownership of an object, as they help prevent memory leaks and make memory management safer and easier. In FIMS, shared pointers are used to ensure that important model components are accessible from different modules while avoiding manual memory management.
+
+FIMS uses shared pointers to help with memory management. It is recommended to use a shared pointer when the ownership of an object is shared across the program. For example in FIMS, the recruitment module needs to be accessed by information.hpp and population.hpp. The pointer to the recruitment module, is therefore shared across the program. C++ automatically deallocates memory for a shared pointer when the object goes out of scope, thus preventing memory leaks in the program.
+
+Specifically, each shared pointer has a reference count that tracks the number of instances in which the shared pointer points to the same object. In the example above, information and population both reference the recruitment module using a shared pointer, so the recruitment module pointer would have a reference count of two. When the reference count drops to zero, the memory where the recruitment module is saved would be automatically deleted.
+
+Declare a shared pointer:
+```c++
+std::shared_ptr<Type> ptr;
+```
+
+Initialize using a new pointer:
+```c++
+std::shared_ptr<Type>* ptr;
+std::shared_ptr<Type> ptr = std::make_shared<Type>();
+```
+
+Initialize using existing pointer:
+```c++
+double* x = 3.2;
+shared_ptr<double> ptr(x);
+shared_ptr<double> ptr = make_shared(x);
+```
+
+<details>
+
+<summary><strong>Example: Shared pointers</strong></summary>
+
+```{r shared-pointer}
+Rcpp::cppFunction('
+  #include <Rcpp.h>
+  //std::shared_ptr is defined in <memory>
+  #include <memory>
+  int shared_pointer(){
+   // Creating shared pointers using std::make_shared
+    std::shared_ptr<int> ptr1 = std::make_shared<int>(42);
+    std::shared_ptr<int> ptr2 = std::make_shared<int>(24);
+    // Accessing the values using the (*) operator
+    Rcpp::Rcout << "ptr1: " << *ptr1 << std::endl;
+    Rcpp::Rcout << "ptr2: " << *ptr2 << std::endl;
+    // Set up a new pointer that shares ownership with the ptr1
+    std::shared_ptr<int> ptr3 = ptr1;
+    // Checking if shared pointer 1 and shared pointer 3
+    Rcpp::Rcout << "ptr1 = " << ptr1 << std::endl;
+    Rcpp::Rcout << "ptr2 = " << ptr2 << std::endl;
+    Rcpp::Rcout << "ptr3 = " << ptr3 << std::endl;
+
+    return 0;
+}')
+
+shared_pointer()
+```
+
+</details>
