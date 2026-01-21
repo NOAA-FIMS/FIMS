@@ -154,10 +154,10 @@ test_that("catch-at-age model (estimation MLE with wrappers) works with age and 
 
 test_that("catch-at-age model (estimation MLE with wrappers) works with mixed estimation types", {
   # Load setup data
-  data_age_comp <- readRDS(test_path("fixtures", "data_age_comp.RDS"))
+  data_age_comp <- readRDS(testthat::test_path("fixtures", "data_age_comp.RDS"))
 
   modified_parameters <- readRDS(
-    test_path("fixtures", "parameters_model_comparison_project.RDS")
+    testthat::test_path("fixtures", "parameters_model_comparison_project.RDS")
   )
 
   # Force fleet1's Fmort to be constant for the first 10 years.
@@ -172,8 +172,20 @@ test_that("catch-at-age model (estimation MLE with wrappers) works with mixed es
     ) |>
     initialize_fims(data = data_age_comp) |>
     fit_fims(optimize = TRUE)
-
   clear()
+
+  mixed_output <- get_estimates(fit_mixed_estimation_types) |>
+    dplyr::filter(label == "log_Fmort", module_id == 1)
+  #' @description Test that there are 10 years of constant fishing mortality values and 20 years of fixed effects for the fishing fleet.
+  expect_equal(
+    dplyr::pull(dplyr::count(mixed_output, estimation_type)),
+    c(10, 20)
+  )
+  #' @description Test that there are 20 years of estimates with standard errors because they are estimated as fixed effects.
+  expect_equal(
+    sum(mixed_output[["uncertainty"]] == 0),
+    10
+  )
 
   #' @description Test that the output from FIMS matches the model comparison project OM values when Fmort estimation types are mixed.
   validate_fims(
