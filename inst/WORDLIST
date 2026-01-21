@@ -645,6 +645,7 @@ exponentiate
 exprs
 extern
 fabs
+fallocate
 fcn
 fdq
 fdqit
@@ -798,6 +799,7 @@ minimizR
 minimizer
 mkString
 mkdir
+mkswap
 MLE
 modelTest
 modularity
@@ -1053,6 +1055,8 @@ superClass
 suppressMessages
 suppressWarnings
 surveyB
+swapfile
+swapon
 syms
 sysname
 tabset
