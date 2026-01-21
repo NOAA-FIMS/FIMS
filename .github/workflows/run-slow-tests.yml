@@ -34,44 +34,19 @@ jobs:
       GITHUB_PAT: ${{ secrets.PAT }}
 
     steps:
-      - name: Maximize Build Space
-        if: matrix.os == 'ubuntu-latest'
-        uses: easimon/maximize-build-space@master
-        with:
-          swap-size-mb: 16384 # 16GB of Swap
-          # Leave 2GB for the OS and 1GB for temp files
-          root-reserve-mb: 2048
-          temp-reserve-mb: 1024
-          remove-dotnet: 'true'
-          remove-android: 'true'
-          remove-haskell: 'true'
-          # mount path: /home/runner/work/FIMS/FIMS
-          build-mount-path: ${{ github.workspace }}
-      
       - uses: actions/checkout@v6
+
+      - name: Create Manual Swap (Linux)
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo fallocate -l 16G /swapfile
+          sudo chmod 600 /swapfile
+          sudo mkswap /swapfile
+          sudo swapon /swapfile
 
       - uses: r-lib/actions/setup-r@v2
         with:
           use-public-rspm: true
-      
-      - name: Verify Workspace
-        if: matrix.os == 'ubuntu-latest'
-        shell: bash
-        run: |
-          echo "Workspace: ${{ github.workspace }}"
-          ls -F ${{ github.workspace }}
-      
-      - name: Check RAM before dependency install
-        run: |
-          echo "=== Memory Usage Before Setup ==="
-          if [ "$RUNNER_OS" == "Linux" ]; then
-            free -h
-          elif [ "$RUNNER_OS" == "Windows" ]; then
-            systeminfo | findstr /C:"Available Physical Memory"
-          elif [ "$RUNNER_OS" == "macOS" ]; then
-            vm_stat
-          fi
-        shell: bash
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
@@ -80,53 +55,14 @@ jobs:
             any::snowfall
           needs: check
 
-      - name: Check RAM before tests
-        run: |
-          echo "=== Memory Usage Before Tests ==="
-          if [ "$RUNNER_OS" == "Linux" ]; then
-            free -h
-          elif [ "$RUNNER_OS" == "Windows" ]; then
-            systeminfo | findstr /C:"Available Physical Memory"
-          elif [ "$RUNNER_OS" == "macOS" ]; then
-            vm_stat
-          fi
-        shell: bash
-
       - name: Run Slow Tests Only
         shell: Rscript {0}
         run: |
-          # Define the package root explicitly
-          pkg_root <- getwd()
-          
-          # Debug: print files in the current directory to verify
-          print(list.files(pkg_root))
-
           # Windows-specific fix for the "files too big" error
           if (Sys.info()[["sysname"]] == "Windows") {
             withr::local_options(pkg.build_extra_flags = FALSE)
           }
 
           # The filter looks for files with 'slow' in the name
-          devtools::test(pkg = pkg_root, filter = "slow")
-
-      - name: Check for Out of Memory (OOM) Error
-        if: failure() 
-        run: |
-          echo "=== Checking Kernel Logs for OOM Killer ==="
-          echo "=== OS-Specific Diagnostic ==="
-          if [ "$RUNNER_OS" == "Linux" ]; then
-            sudo dmesg | grep -iE "out of memory|killed process" || echo "No Linux OOM logs found."
-          
-          elif [ "$RUNNER_OS" == "Windows" ]; then
-            echo "Checking Windows Event Log for Application Errors..."
-            powershell "Get-EventLog -LogName System -Newest 10 | Where-Object { \$_.EventID -eq 2013 -or \$_.Level -eq 'Error' }"
-          
-          elif [ "$RUNNER_OS" == "macOS" ]; then
-            echo "Checking macOS system logs for kills..."
-            log show --predicate 'eventMessage CONTAINS "killed"' --last 5m || echo "No macOS kill logs found."
-          fi
-          
-          echo "=== Final Memory State ==="
-          if [ "$RUNNER_OS" == "Linux" ]; then free -h; fi
-        shell: bash
+          devtools::test(filter = "slow")
           
