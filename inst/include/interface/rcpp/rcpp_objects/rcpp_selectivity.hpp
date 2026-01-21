@@ -75,15 +75,13 @@ uint32_t SelectivityInterfaceBase::id_g = 1;
 std::map<uint32_t, std::shared_ptr<SelectivityInterfaceBase>>
     SelectivityInterfaceBase::live_objects;
 
-
-
 /**
- * @brief Rcpp interface for descending logistic selectivity to instantiate the object
- * from R:
- * descending_logistic_selectivity <- methods::new(descending_logistic_selectivity).
+ * @brief Rcpp interface for descending logistic selectivity to instantiate the
+ * object from R: descending_logistic_selectivity <-
+ * methods::new(descending_logistic_selectivity).
  */
 class DescendingLogisticSelectivityInterface : public SelectivityInterfaceBase {
-public:
+ public:
   /**
    * @brief The index value at which the response reaches 0.5.
    */
@@ -98,9 +96,9 @@ public:
    */
   DescendingLogisticSelectivityInterface() : SelectivityInterfaceBase() {
     SelectivityInterfaceBase::live_objects[this->id] =
-      std::make_shared<DescendingLogisticSelectivityInterface>(*this);
+        std::make_shared<DescendingLogisticSelectivityInterface>(*this);
     FIMSRcppInterfaceBase::fims_interface_objects.push_back(
-      SelectivityInterfaceBase::live_objects[this->id]);
+        SelectivityInterfaceBase::live_objects[this->id]);
   }
 
   /**
@@ -108,10 +106,11 @@ public:
    *
    * @param other
    */
-  DescendingLogisticSelectivityInterface(const DescendingLogisticSelectivityInterface &other)
-    : SelectivityInterfaceBase(other),
-      inflection_point_desc(other.inflection_point_desc),
-      slope_desc(other.slope_desc) {}
+  DescendingLogisticSelectivityInterface(
+      const DescendingLogisticSelectivityInterface &other)
+      : SelectivityInterfaceBase(other),
+        inflection_point_desc(other.inflection_point_desc),
+        slope_desc(other.slope_desc) {}
 
   /**
    * @brief The destructor.
@@ -126,13 +125,14 @@ public:
 
   /**
    * @brief Evaluate selectivity using the descending logistic function.
-   * @param x The independent variable in the descending logistic function (e.g., age or
-   * size in selectivity).
+   * @param x The independent variable in the descending logistic function
+   * (e.g., age or size in selectivity).
    */
   virtual double evaluate(double x) {
     fims_popdy::DescendingLogisticSelectivity<double> DescendingLogisticSel;
     DescendingLogisticSel.inflection_point_desc.resize(1);
-    DescendingLogisticSel.inflection_point_desc[0] = this->inflection_point_desc[0].initial_value_m;
+    DescendingLogisticSel.inflection_point_desc[0] =
+        this->inflection_point_desc[0].initial_value_m;
     DescendingLogisticSel.slope_desc.resize(1);
     DescendingLogisticSel.slope_desc[0] = this->slope_desc[0].initial_value_m;
     return DescendingLogisticSel.evaluate(x);
@@ -145,14 +145,15 @@ public:
   virtual void finalize() {
     if (this->finalized) {
       // log warning that finalize has been called more than once.
-      FIMS_WARNING_LOG("Descending Logistic Selectivity  " + fims::to_string(this->id) +
-        " has been finalized already.");
+      FIMS_WARNING_LOG("Descending Logistic Selectivity  " +
+                       fims::to_string(this->id) +
+                       " has been finalized already.");
     }
 
     this->finalized = true;  // indicate this has been called already
 
     std::shared_ptr<fims_info::Information<double>> info =
-      fims_info::Information<double>::GetInstance();
+        fims_info::Information<double>::GetInstance();
 
     fims_info::Information<double>::selectivity_models_iterator it;
 
@@ -160,26 +161,30 @@ public:
     it = info->selectivity_models.find(this->id);
     // if not found, just return
     if (it == info->selectivity_models.end()) {
-      FIMS_WARNING_LOG("Descending Logistic Selectivity " + fims::to_string(this->id) +
-        " not found in Information.");
+      FIMS_WARNING_LOG("Descending Logistic Selectivity " +
+                       fims::to_string(this->id) +
+                       " not found in Information.");
       return;
     } else {
       std::shared_ptr<fims_popdy::DescendingLogisticSelectivity<double>> sel =
-        std::dynamic_pointer_cast<fims_popdy::DescendingLogisticSelectivity<double>>(
-          it->second);
+          std::dynamic_pointer_cast<
+              fims_popdy::DescendingLogisticSelectivity<double>>(it->second);
 
       for (size_t i = 0; i < inflection_point_desc.size(); i++) {
-        if (this->inflection_point_desc[i].estimation_type_m.get() == "constant") {
+        if (this->inflection_point_desc[i].estimation_type_m.get() ==
+            "constant") {
           this->inflection_point_desc[i].final_value_m =
-            this->inflection_point_desc[i].initial_value_m;
+              this->inflection_point_desc[i].initial_value_m;
         } else {
-          this->inflection_point_desc[i].final_value_m = sel->inflection_point_desc[i];
+          this->inflection_point_desc[i].final_value_m =
+              sel->inflection_point_desc[i];
         }
       }
 
       for (size_t i = 0; i < slope_desc.size(); i++) {
         if (this->slope_desc[i].estimation_type_m.get() == "constant") {
-          this->slope_desc[i].final_value_m = this->slope_desc[i].initial_value_m;
+          this->slope_desc[i].final_value_m =
+              this->slope_desc[i].initial_value_m;
         } else {
           this->slope_desc[i].final_value_m = sel->slope_desc[i];
         }
@@ -189,8 +194,8 @@ public:
   /**
    * @brief Set uncertainty values for selectivity parameters.
    *
-   * @details Sets the standard error values for the inflection point and slope_desc
-   * parameters using the provided map.
+   * @details Sets the standard error values for the inflection point and
+   * slope_desc parameters using the provided map.
    * @param se_values A map from parameter names to vectors of standard error
    * values.
    */
@@ -203,7 +208,8 @@ public:
     fims::Vector<double> slope_uncertainty(this->slope_desc.size(), -999);
     this->get_se_values("slope_desc", se_values, slope_uncertainty);
     for (size_t i = 0; i < this->inflection_point_desc.size(); i++) {
-      this->inflection_point_desc[i].uncertainty_m = inflection_point_desc_uncertainty[i];
+      this->inflection_point_desc[i].uncertainty_m =
+          inflection_point_desc_uncertainty[i];
     }
     for (size_t i = 0; i < this->slope_desc.size(); i++) {
       this->slope_desc[i].uncertainty_m = slope_uncertainty[i];
@@ -213,8 +219,8 @@ public:
   /**
    * @brief Converts the data to json representation for the output.
    * @return A string is returned specifying that the module relates to the
-   * selectivity interface with descending logistic selectivity. It also returns the ID
-   * and the parameters. This string is formatted for a json file.
+   * selectivity interface with descending logistic selectivity. It also returns
+   * the ID and the parameters. This string is formatted for a json file.
    */
   virtual std::string to_json() {
     std::stringstream ss;
@@ -252,17 +258,19 @@ public:
   template <typename Type>
   bool add_to_fims_tmb_internal() {
     std::shared_ptr<fims_info::Information<Type>> info =
-      fims_info::Information<Type>::GetInstance();
+        fims_info::Information<Type>::GetInstance();
 
-    std::shared_ptr<fims_popdy::DescendingLogisticSelectivity<Type>> selectivity =
-      std::make_shared<fims_popdy::DescendingLogisticSelectivity<Type>>();
+    std::shared_ptr<fims_popdy::DescendingLogisticSelectivity<Type>>
+        selectivity =
+            std::make_shared<fims_popdy::DescendingLogisticSelectivity<Type>>();
     std::stringstream ss;
     // set relative info
     selectivity->id = this->id;
-    selectivity->inflection_point_desc.resize(this->inflection_point_desc.size());
+    selectivity->inflection_point_desc.resize(
+        this->inflection_point_desc.size());
     for (size_t i = 0; i < this->inflection_point_desc.size(); i++) {
       selectivity->inflection_point_desc[i] =
-        this->inflection_point_desc[i].initial_value_m;
+          this->inflection_point_desc[i].initial_value_m;
       if (this->inflection_point_desc[i].estimation_type_m.get() ==
           "fixed_effects") {
         ss.str("");
@@ -281,30 +289,32 @@ public:
       }
     }
     info->variable_map[this->inflection_point_desc.id_m] =
-      &(selectivity)->inflection_point_desc;
+        &(selectivity)->inflection_point_desc;
 
-      selectivity->slope_desc.resize(this->slope_desc.size());
-      for (size_t i = 0; i < this->slope_desc.size(); i++) {
-        selectivity->slope_desc[i] = this->slope_desc[i].initial_value_m;
-        if (this->slope_desc[i].estimation_type_m.get() == "fixed_effects") {
-          ss.str("");
-          ss << "Selectivity." << this->id << ".slope_desc." << this->slope_desc[i].id_m;
-          info->RegisterParameterName(ss.str());
-          info->RegisterParameter(selectivity->slope_desc[i]);
-        }
-        if (this->slope_desc[i].estimation_type_m.get() == "random_effects") {
-          ss.str("");
-          ss << "Selectivity." << this->id << ".slope_desc." << this->slope_desc[i].id_m;
-          info->RegisterRandomEffectName(ss.str());
-          info->RegisterRandomEffect(selectivity->slope_desc[i]);
-        }
+    selectivity->slope_desc.resize(this->slope_desc.size());
+    for (size_t i = 0; i < this->slope_desc.size(); i++) {
+      selectivity->slope_desc[i] = this->slope_desc[i].initial_value_m;
+      if (this->slope_desc[i].estimation_type_m.get() == "fixed_effects") {
+        ss.str("");
+        ss << "Selectivity." << this->id << ".slope_desc."
+           << this->slope_desc[i].id_m;
+        info->RegisterParameterName(ss.str());
+        info->RegisterParameter(selectivity->slope_desc[i]);
       }
-      info->variable_map[this->slope_desc.id_m] = &(selectivity)->slope_desc;
+      if (this->slope_desc[i].estimation_type_m.get() == "random_effects") {
+        ss.str("");
+        ss << "Selectivity." << this->id << ".slope_desc."
+           << this->slope_desc[i].id_m;
+        info->RegisterRandomEffectName(ss.str());
+        info->RegisterRandomEffect(selectivity->slope_desc[i]);
+      }
+    }
+    info->variable_map[this->slope_desc.id_m] = &(selectivity)->slope_desc;
 
-      // add to Information
-      info->selectivity_models[selectivity->id] = selectivity;
+    // add to Information
+    info->selectivity_models[selectivity->id] = selectivity;
 
-      return true;
+    return true;
   }
 
   /**
