@@ -352,8 +352,6 @@ create_default_DescendingLogistic <- function(module_name = NA_character_) {
 }
 
 
-
-
 #' Create default selectivity parameters
 #'
 #' @description
