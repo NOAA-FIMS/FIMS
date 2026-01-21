@@ -198,6 +198,58 @@ Rcpp types map standard C++ data types to R objects enabling seamless data excha
 * Vector of booleans: `LogicalVector`
 * Vector of strings: `CharacterVector`
 
+## Type conversion with wrap and as
+
+When working with C++ code that doesn't use Rcpp types directly, you can use `wrap()` and `as<>()` to convert between R objects (SEXP) and C++ types.
+
+* `as<>()`: Converts R objects (SEXP) to C++ types
+* `wrap()`: Converts C++ types to R objects (SEXP)
+
+These functions are particularly useful when you want to use standard C++ types (like `std::vector<double>`) in your C++ code while still maintaining compatibility with R.
+
+<details>
+<summary><strong>Example: Using wrap and as</strong></summary>
+
+```{Rcpp wrap_as}
+#include <Rcpp.h>
+using namespace Rcpp;
+
+template <typename T>
+T meanC(std::vector<T> x) {
+  int n = x.size();
+  float total = 0;
+  
+  for(int i = 0; i < n; ++i) {
+    total += x[i];
+  }
+  return total / n;
+}
+
+// [[Rcpp::export]]
+SEXP mean_wrap(SEXP input){
+  // Convert R object to C++ std::vector
+  std::vector<double> x = as<std::vector<double>>(input);
+  
+  // Perform calculation
+  float mean = meanC(x);
+  
+  // Convert C++ result back to R object
+  return wrap(mean);
+}
+```
+
+```{r wrap_as_example, eval=FALSE}
+# After compilation with sourceCpp
+mean_wrap(c(42, 34))
+```
+</details>
+
+## SEXP and R objects
+
+Under the hood, all R objects are stored in a common datatype called `SEXP` (S-expression). Technically, a `SEXP` is a pointer to a structure of type `SEXPREC`. This is a variant type with subvariants corresponding to the R types you're familiar with (e.g., real, integer, logical, character).
+
+When you use Rcpp types like `NumericVector`, Rcpp handles the conversion between `SEXP` and C++ types automatically. However, when writing more advanced C++ code or working with the R API directly, you may encounter `SEXP` types explicitly.
+
 ## Rcpp methods {#rcpp-methods}
 
 Rcpp methods are functions that belong to Rcpp classes and allow you to interact with C++ objects from R in an object-oriented way.
@@ -256,7 +308,29 @@ Within a module, you can register the following components:
 Thus, `RCPP_MODULE`s can include `.field`, `.constructor`, `.method`, and `.property` arguments, where `.field` can be used with two or three arguments. For example, the class that we create below called `Uniform` is complex with a constructor; two inputs, `min` and `max`; and one method, `draw`. Additionally, classes can include `.field_readonly`, which prevents it from being modified within R.
 
 <details>
-<summary><strong>Example: Rcpp Module Skeleton</strong></summary>
+<summary><strong>Example: Complete Uniform Class with Module</strong></summary>
+
+First, we define a C++ class for generating uniform random numbers:
+
+```{Rcpp uniform_class, eval=FALSE}
+#include <Rcpp.h>
+using namespace Rcpp;
+
+class Uniform {
+public:
+  Uniform(double min_, double max_) :
+  min(min_), max(max_) {}
+  
+  NumericVector draw(int n) {
+    RNGScope scope;
+    return runif(n, min, max);
+  }
+
+  double min, max;
+};
+```
+
+Then we expose this class to R using `RCPP_MODULE`:
 
 ```{Rcpp modules, eval=FALSE}
 RCPP_MODULE(unif_module) {
@@ -267,6 +341,19 @@ RCPP_MODULE(unif_module) {
   .method("draw", &Uniform::draw);
 }
 ```
+
+After compiling with `sourceCpp()`, you can use this class from R:
+
+```{r uniform_usage, eval=FALSE}
+# Create a new Uniform object
+u <- new(Uniform, 0, 10)
+
+# Call methods and access fields
+u$draw(10L)
+u$max
+u$max <- 1
+u$draw(10)
+```
 </details>
 
 ## RCPP_EXPOSED_CLASS
@@ -276,3 +363,92 @@ Rcpp provides several built-in types, such as `Rcpp::NumericVector`, but when yo
 ## Modules in FIMS
 
 Within FIMS, we first use `RCPP_EXPOSED_CLASS()` to expose all of our new type classes, e.g., `RCPP_EXPOSED_CLASS(Parameter)` in [`src/fims_modules.hpp`](https://github.com/NOAA-FIMS/FIMS/blob/main/src/fims_modules.hpp). Once all of the type classes are exposed, we then use a single instance of `RCPP_MODULE` to expose the C++ to R in that same file.
+
+# Rcpp Sugar
+
+## What is Rcpp Sugar
+
+[Rcpp Sugar](https://dirk.eddelbuettel.com/code/rcpp/Rcpp-sugar.pdf) uses expression templates to allow you to write C++ code at a higher level of abstraction, making it more similar to R syntax. This syntactic sugar makes your C++ code more readable and often more efficient through vectorization.
+
+## Sugar Functions
+
+Rcpp Sugar provides many useful functions similar to those in R:
+
+* Logical functions: `all()`, `any()`
+* Sequence generation: `seq_len()`, `seq_along()`
+* Statistical functions: `mean()`, `var()`, `sd()`
+* Mathematical functions: `abs()`, `exp()`, `log()`, `sqrt()`
+* Statistical distributions: `dnorm()`, `pnorm()`, `qnorm()`, `rnorm()` (and similar for other distributions)
+
+<details>
+<summary><strong>Example: Rcpp Sugar</strong></summary>
+
+```{Rcpp sugar_example, eval=FALSE}
+#include <Rcpp.h>
+using namespace Rcpp;
+
+// [[Rcpp::export]]
+void sugar_demo() {
+  // Sequence generation
+  IntegerVector x = seq_len(1000);
+  
+  // Vectorized operations
+  LogicalVector check1 = x * x < 3;
+  
+  // Logical functions
+  bool all_check = all(check1);
+  bool any_check = any(check1);
+  
+  Rcout << "All values less than 3: " << all_check << std::endl;
+  Rcout << "Any values less than 3: " << any_check << std::endl;
+}
+```
+
+You can also use sugar with statistical distributions:
+
+```{Rcpp sugar_dist, eval=FALSE}
+#include <Rcpp.h>
+using namespace Rcpp;
+
+// [[Rcpp::export]]
+void distribution_demo() {
+  NumericVector y1 = NumericVector::create(0.0, 1.0, 2.0);
+  NumericVector y2 = NumericVector::create(0.25, 0.5, 0.75);
+  NumericVector y3 = NumericVector::create(-1.0, 0.0, 1.0);
+  
+  // Statistical functions (all assume standard normal)
+  NumericVector x1 = dnorm(y1, 0, 1); // density of y1 at m=0, sd=1
+  NumericVector x2 = qnorm(y2, 0, 1); // quantiles of y2
+  NumericVector x3 = pnorm(y3, 0, 1); // distribution function of y3
+  NumericVector x4 = rnorm(10, 0, 1); // 10 RNG draws of N(0, 1)
+}
+```
+
+Sugar also supports `sapply` for applying functions:
+
+```{Rcpp sugar_sapply, eval=FALSE}
+#include <Rcpp.h>
+using namespace Rcpp;
+
+template <typename T>
+T square(const T& x){
+  return x * x;
+}
+
+// [[Rcpp::export]]
+IntegerVector squared_values() {
+  return sapply(seq_len(10), square<int>);
+}
+```
+</details>
+
+# Additional Resources
+
+To learn more about Rcpp, we recommend the following resources:
+
+* ["Advanced R"](http://adv-r.had.co.nz/Rcpp.html) by Hadley Wickham - Chapter on Rcpp
+* ["Rcpp: Seamless R and C++ integration"](https://www.jstatsoft.org/article/view/v040i08) by Dirk Eddelbuettel and Romain Francois - Journal of Statistical Software article
+* ["Rcpp for everyone"](https://teuder.github.io/rcpp4everyone_en/) by Masaki E. Tsuda - Comprehensive online book
+* [Rcpp Modules vignette](https://cran.rstudio.com/web/packages/Rcpp/vignettes/Rcpp-modules.pdf) by Eddelbuettel and Francois
+* [Rcpp Sugar vignette](https://dirk.eddelbuettel.com/code/rcpp/Rcpp-sugar.pdf)
+* [Rcpp Quick Reference](https://dirk.eddelbuettel.com/code/rcpp/Rcpp-quickref.pdf)
