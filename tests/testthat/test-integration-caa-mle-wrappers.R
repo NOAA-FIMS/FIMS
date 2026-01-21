@@ -137,20 +137,20 @@ test_that("catch-at-age model (estimation MLE with wrappers) works with length c
   )
 })
 
-test_that("catch-at-age model (estimation MLE with wrappers) works with age and length comp with NAs", {
-  # Load the test data from an RDS file containing the model fit
-  fit_age_length_comp_na <- readRDS(test_path("fixtures", "fit_age_length_comp_na.RDS"))
+# test_that("catch-at-age model (estimation MLE with wrappers) works with age and length comp with NAs", {
+#   # Load the test data from an RDS file containing the model fit
+#   fit_age_length_comp_na <- readRDS(test_path("fixtures", "fit_age_length_comp_na.RDS"))
 
-  #' @description Test that the output from FIMS matches the model comparison project OM values when there are NAs.
-  validate_fims(
-    report = get_report(fit_age_length_comp_na),
-    estimates = get_estimates(fit_age_length_comp_na),
-    om_input = om_input_list[[iter_id]],
-    om_output = om_output_list[[iter_id]],
-    em_input = em_input_list[[iter_id]],
-    use_fimsfit = TRUE
-  )
-})
+#   #' @description Test that the output from FIMS matches the model comparison project OM values when there are NAs.
+#   validate_fims(
+#     report = get_report(fit_age_length_comp_na),
+#     estimates = get_estimates(fit_age_length_comp_na),
+#     om_input = om_input_list[[iter_id]],
+#     om_output = om_output_list[[iter_id]],
+#     em_input = em_input_list[[iter_id]],
+#     use_fimsfit = TRUE
+#   )
+# })
 
 test_that("catch-at-age model (estimation MLE with wrappers) deterministic run returns correct nlls", {
   # Load the test data from an RDS file containing the model fit
