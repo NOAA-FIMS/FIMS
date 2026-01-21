@@ -120,7 +120,7 @@ public:
   virtual ~CatchAtAge() {}
 
   /**
-   * This function is called once at the beginning of the model run. It
+   * @brief This function is called once at the beginning of the model run. It
    * initializes the derived quantities for the populations and fleets.
    */
   virtual void Initialize() {
@@ -146,7 +146,7 @@ public:
   }
 
   /**
-   * This function is used to reset the derived quantities of a population or
+   * @brief This function is used to reset the derived quantities of a population or
    * fleet to a given value.
    */
   virtual void Prepare() {
@@ -198,18 +198,17 @@ public:
       // fill selectivity at age and length
       if (fleet->selectivity_units == "age") {
         for (size_t a = 0; a < fleet->n_ages; a++) {
-     
+
           derived_quantities["selectivity_at_age"][a] =
               fleet->selectivity->evaluate(fleet->ages[a]);
 
           if (fleet->n_lengths > 0) {
-           
-                
+
             for (size_t l = 0; l < fleet->n_lengths; l++) {
               // iterate through all lengths within an age and sum the
               // selectivity to get a selectivity at length
               size_t i_length_age = a * fleet->n_lengths + l;
-          
+
               derived_quantities["selectivity_at_length"][l] +=
                   fleet->age_to_length_conversion[i_length_age] *
                   derived_quantities["selectivity_at_age"][a];
@@ -219,14 +218,14 @@ public:
       } else if (fleet->selectivity_units == "length") {
         for (size_t a = 0; a < fleet->n_ages; a++) {
           for (size_t l = 0; l < fleet->n_lengths; l++) {
-            
+
             derived_quantities["selectivity_at_length"][l] =
                 fleet->selectivity->evaluate(fleet->lengths[l]);
             // iterate through all lengths within an age and sum the selectivity
             // to get a selectivity at age
 
             size_t i_length_age = a * fleet->n_lengths + l;
-            
+
             derived_quantities["selectivity_at_age"][a] +=
                 fleet->age_to_length_conversion[i_length_age] *
                 derived_quantities["selectivity_at_length"][l];
@@ -240,7 +239,7 @@ public:
     }
   }
   /**
-   * This function is used to add a population id to the set of population ids.
+   * @brief This function is used to add a population id to the set of population ids.
    */
   void AddPopulation(uint32_t id) { this->population_ids.insert(id); }
 
@@ -259,7 +258,7 @@ public:
   }
 
   /**
-   * This method is used to calculate the initial numbers at age for a
+   * @brief This method is used to calculate the initial numbers at age for a
    * population. It takes a population object and an age as input and
    * calculates the initial numbers at age for that population.
    * @param population
@@ -277,7 +276,7 @@ public:
   }
 
   /**
-   * * This method is used to calculate the numbers at age for a
+   * This method is used to calculate the numbers at age for a
    * population. It takes a population object, the index of the age
    * in the current year, the index of the age in the previous year,
    * and the age as input and calculates the numbers at age for that
@@ -309,7 +308,7 @@ public:
   }
 
   /**
-   * This method is used to calculate the unfished numbers at age for a
+   * @brief This method is used to calculate the unfished numbers at age for a
    * population. It takes a population object, the index of the age
    * in the current year, the index of the age in the previous year,
    * and the age as input and calculates the unfished numbers at age
@@ -340,7 +339,7 @@ public:
   }
 
   /**
-   * * This method is used to calculate the mortality for a population. It takes
+   * @brief This method is used to calculate the mortality for a population. It takes
    * a population object, the index of the age in the current year, the year,
    * and the age as input and calculates the mortality for that population.
    * @param population
@@ -369,7 +368,7 @@ public:
   }
 
   /**
-   * * This method is used to calculate the biomass for a population. It takes a
+   * @brief This method is used to calculate the biomass for a population. It takes a
    * population object, the index of the age in the current year, the year,
    * and the age as input and calculates the biomass for that population.
    * @param population
@@ -388,7 +387,7 @@ public:
   }
 
   /**
-   * * This method is used to calculate the unfished biomass for a population.
+   * @brief This method is used to calculate the unfished biomass for a population.
    * It takes a population object, the index of the age in the current year, the
    * year, and the age as input and calculates the unfished biomass for that
    * population.
@@ -409,7 +408,7 @@ public:
   }
 
   /**
-   * * This method is used to calculate the spawning biomass for a population.
+   * @brief This method is used to calculate the spawning biomass for a population.
    * It takes a population object, the index of the age in the current year, the
    * year, and the age as input and calculates the spawning biomass for that
    * population.
@@ -431,7 +430,7 @@ public:
   }
 
   /**
-   * This method is used to calculate the unfished spawning biomass for a
+   * @brief This method is used to calculate the unfished spawning biomass for a
    * population. It takes a population object, the index of the age in the
    * current year, the year, and the age as input and calculates the unfished
    * spawning biomass for that population.
@@ -454,7 +453,7 @@ public:
   }
 
   /**
-   * This method is used to calculate the spawning biomass per recruit for a
+   * @brief This method is used to calculate the spawning biomass per recruit for a
    * population. It takes a population object.
    */
   Type
@@ -488,7 +487,7 @@ public:
   }
 
   /**
-   * This method is used to calculate the recruitment for a population.
+   * @brief This method is used to calculate the recruitment for a population.
    *
    */
   void CalculateRecruitment(
@@ -521,7 +520,7 @@ public:
   }
 
   /**
-   * This method is used to calculate the maturity at age for a population. It
+   * @brief This method is used to calculate the maturity at age for a population. It
    * takes a population object, the index of the age in the current year, the
    * age as input and calculates the maturity at age for that population.
    * @param population
@@ -539,7 +538,7 @@ public:
   }
 
   /**
-   * This method is used to calculate the landings for a population and adds to
+   * @brief This method is used to calculate the landings for a population and adds to
    * existing expected total landings by fleet. It takes a population object,
    * the year, and the age as input and calculates the landings for that
    * population.
@@ -573,7 +572,7 @@ public:
   }
 
   /**
-   * This method is used to calculate the catch weight at age for a population.
+   * @brief This method is used to calculate the catch weight at age for a population.
    * It takes a population object, the index of the age in the current year, the
    * year, and the age as input and calculates the weight at age for that
    * population.
@@ -775,7 +774,7 @@ public:
   }
 
   /**
-   * Evaluate the proportion of landings numbers at age.
+   * @brief Evaluate the proportion of landings numbers at age.
    */
   void evaluate_age_comp() {
     fleet_iterator fit;
@@ -843,7 +842,7 @@ public:
   }
 
   /**
-   * Evaluate the proportion of landings numbers at length.
+   * @brief Evaluate the proportion of landings numbers at length.
    */
   void evaluate_length_comp() {
     fleet_iterator fit;
@@ -909,7 +908,7 @@ public:
   }
 
   /**
-   * Evaluate the natural log of the expected index.
+   * @brief Evaluate the natural log of the expected index.
    */
   void evaluate_index() {
     fleet_iterator fit;
@@ -950,6 +949,9 @@ public:
     }
   }
 
+  /**
+   * @brief This method evaluates the Catch-at-age population dynamics model.
+   */
   virtual void Evaluate() {
     /*
                Sets derived vectors to zero
