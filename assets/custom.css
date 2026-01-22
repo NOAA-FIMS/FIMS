@@ -19,9 +19,61 @@ html {
     letter-spacing: 1px;
 }
 
-#side-nav {
+/*#side-nav {
     background: #ffffff;
+}*/
+
+
+/*@media (prefers-color-scheme: dark) {
+    html:not(.light-mode) {
+        color-scheme: dark;
+        --primary-color: #1982d2;
+        --primary-dark-color: #86a9c4;
+        --primary-light-color: #4779ac;
+        --box-shadow: 0 2px 8px 0 rgba(0, 0, 0, .35);
+        --odd-color: rgba(100, 100, 100, .06);
+        --menu-selected-background: rgba(0, 0, 0, .4);
+        --page-background-color: #1C1D1F;
+        --page-foreground-color: #d2dbde;
+        --page-secondary-foreground-color: #859399;
+        --separator-color: #38393b;
+        --code-background: #2a2c2f;
+        --tablehead-background: #2a2c2f;
+        --blockquote-background: #222325;
+        --blockquote-foreground: #7e8c92;
+        --warning-color: #3b2e04;
+        --warning-color-dark: #f1b602;
+        --warning-color-darker: #ceb670;
+        --note-color: #163750;
+        --note-color-dark: #1982D2;
+        --note-color-darker: #dcf0fa;
+        --todo-color: #2a2536;
+        --todo-color-dark: #7661b3;
+        --todo-color-darker: #ae9ed6;
+        --deprecated-color: #2e323b;
+        --deprecated-color-dark: #738396;
+        --deprecated-color-darker: #abb0bd;
+        --bug-color: #2e1917;
+        --bug-color-dark: #ad2617;
+        --bug-color-darker: #f5b1aa;
+        --invariant-color: #303a35;
+        --invariant-color-dark: #76ce96;
+        --invariant-color-darker: #cceed5;
+        --fragment-background: #282c34;
+        --fragment-foreground: #dbe4eb;
+        --fragment-keyword: #cc99cd;
+        --fragment-keywordtype: #ab99cd;
+        --fragment-keywordflow: #e08000;
+        --fragment-token: #7ec699;
+        --fragment-comment: #999999;
+        --fragment-link: #98c0e3;
+        --fragment-preprocessor: #65cabe;
+        --fragment-linenumber-color: #cccccc;
+        --fragment-linenumber-background: #35393c;
+        --fragment-linenumber-border: #1f1f1f;
+    }
 }
+*/
 
 .navbar {
     --bs-navbar-color: #51595d;
@@ -89,12 +141,20 @@ html {
     width: 100%;
 }
 
-#nav-tree {
+/*#nav-tree {
     background: #ffffff;
-}
+}*/
 
 #nav-tree .label {
     font-family: Outfit, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif !important;
+}
+
+#nav-tree .label a {
+    font-weight: bold
+}
+
+#nav-tree .selected a {
+    font-weight: normal;
 }
 
 div.toc li, div.toc h3 {
@@ -112,7 +172,7 @@ div.toc li a {
     min-height: 1.5em; /* Ensures a good touch target size */
     border-radius: var(--border-radius-small);
     text-decoration: none; /* Ensure no underline */
-    
+
     /* Default link color */
     color: var(--primary-color) !important;
 }
@@ -121,7 +181,7 @@ div.toc li a {
 div.toc li a:hover,
 div.toc li a:focus {
     /* Use a slightly transparent version of the active color as the hover background */
-    background-color: rgba(14, 104, 118, 0.1) !important; 
+    background-color: rgba(14, 104, 118, 0.1) !important;
     color: #0e6270cc !important; /* Slightly dimmed primary color */
 }
 
@@ -151,4 +211,56 @@ div.contents .toc {
 
 a.anchor {
   scroll-margin-top: 120px; /* increase if header is tall */
+}
+
+/* Light mode default */
+html {
+  --side-nav-background: #ffffff;
+}
+
+/* Force nav panes to use the variable (wins over theme) */
+#side-nav,
+#nav-tree {
+  background: var(--side-nav-background) !important;
+}
+
+/* Dark mode override */
+@media (prefers-color-scheme: dark) {
+  html:not(.light-mode) {
+    color-scheme: dark;
+    --primary-color: #4896a1;
+    --side-nav-background: #0e181e;
+    --side-nav-foreground: #bed9de;
+    --page-background-color: #0e181e;
+    --odd-color: rgba(14, 24, 30, .10);
+    --directory-levels-background: #4896a1;
+    --separator-color: #213f4b;
+  }
+
+  html:not(.light-mode) div.header .title {
+    color: #bed9de; 
+  }
+
+  html:not(.light-mode) div.header {
+    border-bottom-color: #213f4b; 
+  }
+
+  html:not(.light-mode) .navbar {
+    --bs-navbar-color: #a0a4a6;
+  }
+
+
+  html:not(.light-mode) .navbar .nav-link .menu-text {
+    color: var(--bs-navbar-color) !important;
+  }
+
+   html:not(.light-mode) #projectname {
+    color: #a0a4a6; 
+  }
+
+  html:not(.light-mode) .navbar a:link,
+  html:not(.light-mode) .navbar a:visited,
+  html:not(.light-mode) .navbar a:active {
+    color: #bed9de !important;
+  }
 }

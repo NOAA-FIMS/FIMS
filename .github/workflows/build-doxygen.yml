@@ -7,16 +7,14 @@ name: run-doxygen
 on:
   pull_request:
   push:
-    branches: 
+    branches:
       - dev
       - main
-  # schedule: 
-  #   - cron: '0 16 * * *' 
   workflow_dispatch:
   # below is a trigger for when there are changes to the fims website, it pulls
   # the bootstrap file name from there which occasionally changes
   # file in that repo, which change whenever a significant change is made to
-  # the website for some reason 
+  # the website for some reason
   repository_dispatch:
     types: [file-updated]
 
@@ -36,70 +34,69 @@ jobs:
     - name: Checkout External Docs Repository (Source of bootstrap CSS)
       uses: actions/checkout@v6
       with:
-        repository: NOAA-FIMS/noaa-fims.github.io
+        repository: noaa-fims/noaa-fims.github.io
+        ref: gh-pages
         path: external-docs
 
     - name: Installing build dependencies
       run: |
-        sudo apt update
+        sudo apt-get update && sudo apt-get install -y coreutils grep findutils
         sudo apt install cmake doxygen gcc git ninja-build
 
-    - name: Update Bootstrap CSS Link in header.html
+    - name: Update Bootstrap CSS Links in header.html
       run: |
-        DOCS_PATH="external-docs/docs/site_libs/bootstrap"
+        DOCS_PATH="external-docs/site_libs/bootstrap"
 
-        # 1. Find the name of the new bootstrap CSS file (not the dark one).
-        # We use a negative lookahead regex (.*) to explicitly exclude filenames
-        # containing '-dark-'.
-        BOOTSTRAP_FILE=$(ls $DOCS_PATH | grep '^bootstrap-[0-9a-f]\+\.min\.css$' | grep -v 'dark' | head -n 1)
-        
-        # Check if the file name was found
-        if [ -z "$BOOTSTRAP_FILE" ]; then
-          echo "ERROR: Could not find bootstrap CSS file in external repository: $DOCS_PATH"
+        # 1) Find latest light + dark bootstrap css filenames in the external repo
+        BOOTSTRAP_LIGHT=$(ls "$DOCS_PATH" | grep -E '^bootstrap-[0-9a-f]+\.min\.css$' | grep -v 'dark' | head -n 1)
+        BOOTSTRAP_DARK=$(ls "$DOCS_PATH" | grep -E '^bootstrap-dark-[0-9a-f]+\.min\.css$' | head -n 1)
+
+        if [ -z "$BOOTSTRAP_LIGHT" ] || [ -z "$BOOTSTRAP_DARK" ]; then
+          echo "ERROR: Could not find both light and dark bootstrap CSS files in: $DOCS_PATH"
+          echo "Found light: '$BOOTSTRAP_LIGHT'"
+          echo "Found dark:  '$BOOTSTRAP_DARK'"
           exit 1
         fi
-        
-        echo "Found new bootstrap CSS file: $BOOTSTRAP_FILE"
 
         # Copy header.html from assets to root so it can be modified before Doxygen runs
         cp assets/header.html ./
+        HEADER_PATH="header.html"
 
-        # 2. Use sed to replace the old hard-coded path with the dynamic file name
-        HEADER_PATH="header.html" 
-        
-        # Get the old filename from the existing header.html content to use in sed
-        # We need to find the filename currently embedded in the header.html
-        OLD_FILENAME=$(grep -oE 'bootstrap-[0-9a-f]+\.min\.css' $HEADER_PATH | head -n 1)
+        # 2) Extract OLD filenames currently present in header.html
+        OLD_LIGHT=$(grep -oE 'bootstrap-[0-9a-f]+\.min\.css' "$HEADER_PATH" | grep -v 'dark' | head -n 1)
+        OLD_DARK=$(grep -oE 'bootstrap-dark-[0-9a-f]+\.min\.css' "$HEADER_PATH" | head -n 1)
 
-        # Safety check: if we can't find the old filename, something is wrong
-        if [ -z "$OLD_FILENAME" ]; then
-          echo "ERROR: Could not find old hard-coded bootstrap filename in $HEADER_PATH."
+        if [ -z "$OLD_LIGHT" ] || [ -z "$OLD_DARK" ]; then
+          echo "ERROR: Could not find old hard-coded bootstrap filenames in $HEADER_PATH"
+          echo "Old light: '$OLD_LIGHT'"
+          echo "Old dark:  '$OLD_DARK'"
           exit 1
         fi
 
-        # Perform the substitution in-place on header.html
-        # We need to escape the '/' characters in the URL for sed.
-        sed -i "s/${OLD_FILENAME}/${BOOTSTRAP_FILE}/g" $HEADER_PATH
-        
-        echo "$HEADER_PATH updated successfully from $OLD_FILENAME to $BOOTSTRAP_FILE."
+        # 3) Replace both (do them separately to avoid accidental cross-matching)
+        sed -i "s/${OLD_LIGHT}/${BOOTSTRAP_LIGHT}/g" "$HEADER_PATH"
+        sed -i "s/${OLD_DARK}/${BOOTSTRAP_DARK}/g" "$HEADER_PATH"
 
-        if [ "$OLD_FILENAME" != "$BOOTSTRAP_FILE" ]; then
-          echo "Detected change in bootstrap file hash. Updating assets/header.html."
+        echo "$HEADER_PATH updated successfully:"
+
+        # 4) Copy back only if something changed (optional, but keeps commits clean)
+        if [ "$OLD_LIGHT" != "$BOOTSTRAP_LIGHT" ] || [ "$OLD_DARK" != "$BOOTSTRAP_DARK" ]; then
+          echo "Detected change in bootstrap file hash(es). Updating assets/header.html."
           cp "$HEADER_PATH" assets/header.html
         else
-          echo "Bootstrap file hash did not change. assets/header.html remains current."
+          echo "Bootstrap file hashes did not change. assets/header.html remains current."
         fi
 
     - name: Building HTML documentation with Doxygen
-    # Do not run -DDOXYGEN_WARN_AS_ERROR=YES locally
-    # FIX? run cmake --build build --parallel 16
+      # Do not run -DDOXYGEN_WARN_AS_ERROR=YES locally
+      # FIX? run cmake --build build --parallel 16
       run: |
         cp -r assets/* ./
         cmake -S . -B build -G Ninja -DDOXYGEN_WARN_AS_ERROR=FAIL_ON_WARNINGS
         cmake --build build
-    
+
     - name: Deploy html documentation with Doxygen
-    # Do not run mkdir doxygen and mv build/html doxygen locally
+      # Do not run mkdir doxygen and mv build/html doxygen locally
       if: ${{ github.ref == 'refs/heads/main' }}
       run: |
         mv build/html ./
@@ -120,7 +117,7 @@ jobs:
         API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
       with:
         source_file: 'doxygen'
-        destination_repo: 'NOAA-FIMS/noaa-fims.github.io'
+        destination_repo: 'noaa-fims/noaa-fims.github.io'
         destination_folder: './'
         destination_branch: 'main'
         user_email: 'kelli.johnson@noaa.gov' # your email
