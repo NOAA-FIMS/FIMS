@@ -40,7 +40,9 @@ test_that("`log_obs_error scalar` works with correct inputs", {
     initialize_fims(data = data_4_model) |>
     fit_fims(optimize = FALSE)
 
-  json_estimates <- test_fit |> get_estimates() |> reshape_json_estimates()
+  json_estimates <- test_fit |>
+    get_estimates() |>
+    reshape_json_estimates()
 
   log_sd_input <- parameters_4_model |>
     dplyr::filter(fleet_name == "fleet1" & label == "log_sd") |>
@@ -75,7 +77,7 @@ test_that("`log_obs_error scalar` works with correct inputs", {
 
   log_sd_output <- json_estimates |>
     dplyr::filter(module_id == 1 & !is.na(log_sd_values)) |>
-    dplyr::pull(log_sd_values) 
+    dplyr::pull(log_sd_values)
 
   for (i in seq_along(log_sd_output$log_sd_values)) {
     expect_equal(log_sd_input$value, log_sd_output$log_sd_values[i])
