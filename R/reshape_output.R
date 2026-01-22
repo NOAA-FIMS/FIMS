@@ -401,8 +401,19 @@ dimensions_to_tibble <- function(data) {
 #' density_to_tibble(dummy_density)
 #' @noRd
 density_to_tibble <- function(data) {
-  data |>
-    tibble::as_tibble() |>
-    tidyr::unnest(c(value, expected_values, observed_values)) |>
-    dplyr::rename(likelihood = value)
+  df <- tibble::as_tibble(data)
+
+  # Guarantee log_sd_values exists and is a list-column
+  if (!"log_sd_values" %in% names(df)) {
+    df$log_sd_values <- NA
+  }
+  df <- tidyr::unnest(df, c(value, expected_values, observed_values))
+
+  # Only unnest log_sd_values if it is not all NULL
+  if (!all(sapply(df$log_sd_values, is.null))) {
+    df <- tidyr::unnest(df, log_sd_values, keep_empty = TRUE)
+  }
+
+  dplyr::rename(df, likelihood = value)
+  df
 }
