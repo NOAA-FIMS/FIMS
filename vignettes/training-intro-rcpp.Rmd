@@ -328,7 +328,7 @@ public:
 
 Then we expose this class to R using `RCPP_MODULE`:
 
-```{r uniform-modules, eval=FALSE}
+```cpp
 RCPP_MODULE(unif_module) {
   class_<Uniform>("Uniform")
   .constructor<double,double>()
