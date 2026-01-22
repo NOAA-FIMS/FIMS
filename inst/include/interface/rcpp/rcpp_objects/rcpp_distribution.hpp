@@ -326,7 +326,8 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
 
       size_t n_x = dnorm->get_n_x();
 
-      //If input log_sd is a scalar, resize to n_x and fill with the scalar value
+      // If input log_sd is a scalar, resize to n_x and fill with the scalar
+      // value
       if (this->log_sd.size() != n_x) {
         // If log_sd size == 1 (scalar), repeat the entry
         if (this->log_sd.size() == 1) {
