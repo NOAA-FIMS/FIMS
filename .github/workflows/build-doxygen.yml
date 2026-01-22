@@ -36,7 +36,7 @@ jobs:
     - name: Checkout External Docs Repository (Source of bootstrap CSS)
       uses: actions/checkout@v6
       with:
-        repository: NOAA-FIMS/noaa-fims.github.io
+        repository: e-perl-NOAA/noaa-fims.github.io
         path: external-docs
 
     - name: Installing build dependencies
@@ -122,7 +122,7 @@ jobs:
         source_file: 'doxygen'
         destination_repo: 'NOAA-FIMS/noaa-fims.github.io'
         destination_folder: './'
-        destination_branch: 'main'
-        user_email: 'kelli.johnson@noaa.gov' # your email
-        user_name: 'Kelli Johnson'           # your login
+        destination_branch: 'gh-pages'
+        user_email: 'elizabeth.gugliotti@noaa.gov' # your email
+        user_name: 'Elizabeth Perl'           # your login
         commit_message: 'Docs: run Doxygen'
