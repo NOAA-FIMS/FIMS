@@ -152,6 +152,52 @@ test_that("catch-at-age model (estimation MLE with wrappers) works with age and 
   )
 })
 
+test_that("catch-at-age model (estimation MLE with wrappers) works with mixed estimation types", {
+  # Load setup data
+  data_age_comp <- readRDS(testthat::test_path("fixtures", "data_age_comp.RDS"))
+
+  modified_parameters <- readRDS(
+    testthat::test_path("fixtures", "parameters_model_comparison_project.RDS")
+  )
+
+  # Force fleet1's Fmort to be constant for the first 10 years.
+  # From years 11–30, the Fmort estimation type is fixed_effects.
+  fit_mixed_estimation_types <- modified_parameters |>
+    dplyr::mutate(
+      estimation_type = dplyr::if_else(
+        fleet_name == "fleet1" & label == "log_Fmort" & time %in% 1:10,
+        "constant",
+        estimation_type
+      )
+    ) |>
+    initialize_fims(data = data_age_comp) |>
+    fit_fims(optimize = TRUE)
+  clear()
+
+  mixed_output <- get_estimates(fit_mixed_estimation_types) |>
+    dplyr::filter(label == "log_Fmort", module_id == 1)
+  #' @description Test that there are 10 years of constant fishing mortality values and 20 years of fixed effects for the fishing fleet.
+  expect_equal(
+    dplyr::pull(dplyr::count(mixed_output, estimation_type)),
+    c(10, 20)
+  )
+  #' @description Test that there are 20 years of estimates with standard errors because they are estimated as fixed effects.
+  expect_equal(
+    sum(mixed_output[["uncertainty"]] == 0),
+    10
+  )
+
+  #' @description Test that the output from FIMS matches the model comparison project OM values when Fmort estimation types are mixed.
+  validate_fims(
+    report = get_report(fit_mixed_estimation_types),
+    estimates = get_estimates(fit_mixed_estimation_types),
+    om_input = om_input_list[[iter_id]],
+    om_output = om_output_list[[iter_id]],
+    em_input = em_input_list[[iter_id]],
+    use_fimsfit = TRUE
+  )
+})
+
 ## Error handling ----
 test_that("catch-at-age model (estimation MLE with wrappers) returns an error when there are no estimated parameters for optimization", {
   # Load data
