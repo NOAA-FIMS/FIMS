@@ -1,7 +1,7 @@
 
 #include <cmath>
 
-#include "../inst/include/interface/rcpp/rcpp_interface.hpp"
+//#include "../inst/include/interface/rcpp/rcpp_interface.hpp"
 #include "../inst/include/interface/interface.hpp"
 #include "init.hpp"
 #include "fims_modules.hpp"
@@ -45,4 +45,8 @@ Type objective_function<Type>::operator()() {
     return nll;
 
 }
-/// @endcond
+
+
+template struct fims_popdy::LogisticSelectivity<TMBad::ad_aug>;
+template struct fims_popdy::LogisticSelectivity<double>;
+

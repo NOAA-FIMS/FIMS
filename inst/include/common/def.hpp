@@ -571,7 +571,7 @@ class FIMSLog {
   }
 };
 
-std::shared_ptr<FIMSLog> FIMSLog::fims_log = std::make_shared<FIMSLog>();
+inline std::shared_ptr<FIMSLog> FIMSLog::fims_log = std::make_shared<FIMSLog>();
 
 }  // namespace fims
 
@@ -611,8 +611,8 @@ namespace fims {
  * a crash occurs.
  *
  * @param sig
- */
-void WriteAtExit(int sig) {
+*/
+inline void WriteAtExit(int sig) {
   std::string signal_error = "NA";
   switch (sig) {
     case SIGSEGV:

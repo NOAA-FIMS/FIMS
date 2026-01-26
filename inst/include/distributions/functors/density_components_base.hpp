@@ -42,7 +42,7 @@ struct DistributionElementObject {
                            random effects*/
   fims::Vector<Type> expected_mean;             /**< the expected mean of the
                                             distribution, overrides expected values */
-  std::string use_mean = fims::to_string("no"); /**< should expected_mean
+  std::string use_mean = std::string("no"); /**< should expected_mean
                                           be used over expected values */
   // std::shared_ptr<DistributionElementObject<Type>> expected; /**< expected
   // value of distribution function */

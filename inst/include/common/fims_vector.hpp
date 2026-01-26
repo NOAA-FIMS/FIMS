@@ -8,7 +8,14 @@
 #ifndef FIMS_VECTOR_HPP
 #define FIMS_VECTOR_HPP
 
-#include "../interface/interface.hpp"
+
+#ifdef TMB_MODEL
+namespace tmbutils {
+template <typename Type>
+class vector;
+}  // namespace tmbutils
+#endif
+
 #include <ostream>
 #include <iomanip>
 
