@@ -12,6 +12,7 @@
 #define POPULATION_DYNAMICS_SELECTIVITY_BASE_HPP
 
 #include "../../../common/model_object.hpp"
+#include <map>
 
 namespace fims_popdy {
 

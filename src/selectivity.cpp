@@ -1,6 +1,7 @@
 
 
 #include "../inst/include/population_dynamics/selectivity/selectivity.hpp"
+#include "TMBTypes.hpp"
 
 namespace fims_popdy {
 
@@ -35,4 +36,13 @@ void LogisticSelectivity<Type>::get_report_vector_count(
 
 } // end namespace fims_popdy
 
-
+// Explicit instantiations for LogisticSelectivity to ensure a single
+// translation-unit emits the AD math symbols used by TMB.
+#ifdef TMB_MODEL
+#ifdef TMBAD_FRAMEWORK
+template struct fims_popdy::LogisticSelectivity<TMBad::ad_aug>;
+#else
+template struct fims_popdy::LogisticSelectivity<TMBad::ad_aug>;
+#endif
+#endif
+template struct fims_popdy::LogisticSelectivity<double>;
