@@ -317,6 +317,9 @@ void clear() {
   DoubleLogisticSelectivityInterface::id_g = 1;
   DoubleLogisticSelectivityInterface::live_objects.clear();
 
+  DescendingLogisticSelectivityInterface::id_g = 1;
+  DescendingLogisticSelectivityInterface::live_objects.clear();
+
   // rcpp_distribution.hpp
   DistributionsInterfaceBase::id_g = 1;
   DistributionsInterfaceBase::live_objects.clear();

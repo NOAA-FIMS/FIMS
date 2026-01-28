@@ -105,6 +105,57 @@ test_that("rcpp double logistic selectivity works with correct inputs", {
   clear()
 })
 
+
+test_that("rcpp descending logistic selectivity works with correct inputs", {
+  # Create selectivity1
+  selectivity1 <- methods::new(DescendingLogisticSelectivity)
+  selectivity1$inflection_point_desc[1]$value <- 15.0
+  selectivity1$inflection_point_desc[1]$estimation_type$set("fixed_effects")
+  selectivity1$slope_desc[1]$value <- 0.05
+  selectivity1$slope_desc[1]$estimation_type$set("fixed_effects")
+
+  #' @description Test that `get_id()` for `DescendingLogisticSelectivity` works.
+  expect_equal(selectivity1$get_id(), 1)
+  #' @description Test that the `inflection_point_desc` value is set to 15.
+  expect_equal(selectivity1$inflection_point_desc[1]$value, 15.0)
+  #' @description Test that the `slope_desc` value is set to 0.05.
+  expect_equal(selectivity1$slope_desc[1]$value, 0.05)
+  #' @description Test that `evaluate()` works for `DescendingLogisticSelectivity`.
+  expect_equal(
+    selectivity1$evaluate(34.5),
+    # Line below equals 0.2716494
+    (1.0 - 1.0 / (1.0 + exp(-(34.5 - 15) * 0.05))),
+    tolerance = 0.0000001
+  )
+
+  # Create selectivity2
+  selectivity2 <- methods::new(DescendingLogisticSelectivity)
+  selectivity2$inflection_point_desc[1]$value <- 12.0
+  selectivity2$slope_desc[1]$value <- 0.1
+
+  selectivity2$inflection_point_desc[1]$estimation_type$set("random_effects")
+  selectivity2$slope_desc[1]$estimation_type$set("random_effects")
+
+  #' @description Test that `get_id()` for `DescendingLogisticSelectivity` works when a second object is created.
+  expect_equal(selectivity2$get_id(), 2)
+  #' @description Test that the `inflection_point_desc` value is set to 10.5.
+  expect_equal(selectivity2$inflection_point_desc[1]$value, 12)
+  #' @description Test that the `slope_desc` value is set to 0.2.
+  expect_equal(selectivity2$slope_desc[1]$value, 0.1)
+  #' @description Test that the `inflection_point_desc` estimation type is set to "random_effects".
+  expect_equal(selectivity2$inflection_point_desc[1]$estimation_type$get(), "random_effects")
+  #' @description Test that the `slope_desc` estimation type is set to "random_effects".
+  expect_equal(selectivity2$slope_desc[1]$estimation_type$get(), "random_effects")
+  #' @description Test that `evaluate()` works for `DoubleLogisticSelectivity` when all parameters are set to "random_effects".
+  expect_equal(
+    selectivity2$evaluate(34.5),
+    # Line below equals 0.2716494
+    (1.0 - 1.0 / (1.0 + exp(-(34.5 - 12) * 0.1))),
+    tolerance = 0.0000001
+  )
+  clear()
+})
+
 ## Edge handling ----
 test_that("rcpp selectivity returns correct outputs for edge cases", {
   # emptyLogistic
