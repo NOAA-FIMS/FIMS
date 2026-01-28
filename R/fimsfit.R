@@ -411,7 +411,7 @@ FIMSFit <- function(
   # Determine the number of parameters
   n_total <- length(obj[["env"]][["last.par.best"]])
   n_fixed_effects <- length(obj[["par"]])
-  n_random_effects <- length(obj[["env"]][["parList()"]][["re"]])
+  n_random_effects <- length(obj[["env"]]$parList()[["re"]])
   number_of_parameters <- c(
     fixed_effects = n_fixed_effects,
     random_effects = n_random_effects
@@ -428,7 +428,7 @@ FIMSFit <- function(
   # Rename parameters instead of "p"
   parameter_names <- names(get_parameter_names(obj[["par"]]))
   names(obj[["par"]]) <- parameter_names
-  random_effects_names <- names(get_random_names(obj[["env"]][["parList()"]][["re"]]))
+  random_effects_names <- names(get_random_names(obj[["env"]]$parList()[["re"]]))
 
   # Get the report
   report <- if (length(opt) == 0) {
@@ -454,7 +454,7 @@ FIMSFit <- function(
   )
 
   # Create JSON output for FIMS run
-  model_output <- input[["model"]]$get_output(do_sd_report = length(opt) > 0)
+  model_output <- input[["model"]]$get_output(do_sd_report = FALSE)
   # Reshape the JSON estimates
   json_estimates <- reshape_json_estimates(model_output)
   # Merge json_estimates into tmb_estimates based on parameter id
@@ -533,6 +533,7 @@ fit_fims <- function(input,
                        trace = 0
                      ),
                      filename = NULL) {
+
   # See issue 455 of sdmTMB to see what should be used.
   # https://github.com/pbs-assess/sdmTMB/issues/455
   # NOTE: When we add implementation for newton step we need to
@@ -583,7 +584,7 @@ fit_fims <- function(input,
       control = control
     )
   )
-  maxgrad0 <- maxgrad <- max(abs(obj$gr(opt$par)))
+  maxgrad0 <- maxgrad <- max(abs(obj$gr(opt[["par"]])))
   if (number_of_loops > 0) {
     cli::cli_inform(c(
       "i" = "Restarting optimizer {number_of_loops} times to improve gradient."
@@ -613,7 +614,10 @@ fit_fims <- function(input,
   }
   time_optimization <- Sys.time() - t0
   cli::cli_inform(c("v" = "Finished optimization"))
-  FIMS::set_fixed(opt$par)
+
+  check_mle_convergence(input, obj, opt, maxgrad, filename)
+
+  FIMS::set_fixed(opt[["par"]])
 
   time_sdreport <- NA
   if (get_sd) {
@@ -621,6 +625,7 @@ fit_fims <- function(input,
     sdreport <- TMB::sdreport(obj)
     cli::cli_inform(c("v" = "Finished sdreport"))
     time_sdreport <- Sys.time() - t2
+    check_sdreport_convergence(input, obj, opt, sdreport, filename)
   } else {
     sdreport <- list()
     time_sdreport <- as.difftime(0, units = "secs")
