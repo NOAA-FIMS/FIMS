@@ -613,6 +613,22 @@ fit_fims <- function(input,
   }
   time_optimization <- Sys.time() - t0
   cli::cli_inform(c("v" = "Finished optimization"))
+  
+  # Check convergence status
+  if (opt$convergence != 0) {
+    convergence_message <- if (!is.null(opt$message)) {
+      paste0("Convergence code = ", opt$convergence, "; message = ", opt$message)
+    } else {
+      paste0("Convergence code = ", opt$convergence)
+    }
+    cli::cli_abort(c(
+      "x" = "Optimization failed to converge.",
+      "i" = convergence_message,
+      "i" = "Maximum gradient: {.val {maxgrad}}",
+      "i" = "Consider adjusting control parameters (eval.max, iter.max) or model structure."
+    ))
+  }
+  
   FIMS::set_fixed(opt$par)
 
   time_sdreport <- NA
