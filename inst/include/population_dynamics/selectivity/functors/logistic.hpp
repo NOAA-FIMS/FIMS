@@ -8,13 +8,18 @@
  */
 #ifndef POPULATION_DYNAMICS_SELECTIVITY_LOGISTIC_HPP
 #define POPULATION_DYNAMICS_SELECTIVITY_LOGISTIC_HPP
-
-// #include "../../../interface/interface.hpp"
-#include "../../../common/fims_math.hpp"
-#include "../../../common/fims_vector.hpp"
+#pragma once
+#include <map>
 #include "selectivity_base.hpp"
 
+// forward declaration to avoid circular includes
+namespace fims {
+template <typename Type> class Vector;
+} // namespace fims
+
 namespace fims_popdy {
+// forward declaration to avoid circular includes
+// template <typename Type> class SelectivityBase;
 
 /**
  *  @brief LogisticSelectivity class that returns the logistic function value
@@ -28,9 +33,8 @@ struct LogisticSelectivity : public SelectivityBase<Type> {
   fims::Vector<Type> slope; /**<scalar multiplier of difference between quantity
             of interest value (x) and inflection_point */
 
-  LogisticSelectivity() : SelectivityBase<Type>() {}
-
-  virtual ~LogisticSelectivity() {}
+  LogisticSelectivity();
+  virtual ~LogisticSelectivity();
 
   /**
    * @brief Method of the logistic selectivity class that implements the
@@ -41,10 +45,7 @@ struct LogisticSelectivity : public SelectivityBase<Type> {
    * @param x  The independent variable in the logistic function (e.g., age or
    * size in selectivity).
    */
-  virtual const Type evaluate(const Type &x) {
-    return fims_math::logistic<Type>(inflection_point[0], slope[0], x);
-  }
-
+  virtual const Type evaluate(const Type &x);
   /**
    * @brief Method of the logistic selectivity class that implements the
    * logistic function from FIMS math.
@@ -55,24 +56,15 @@ struct LogisticSelectivity : public SelectivityBase<Type> {
    * size in selectivity).
    * @param pos Position index, e.g., which year.
    */
-  virtual const Type evaluate(const Type &x, size_t pos) {
-    return fims_math::logistic<Type>(inflection_point.get_force_scalar(pos),
-                                     slope.get_force_scalar(pos), x);
-  }
-
+  virtual const Type evaluate(const Type &x, size_t pos);
+  /**<brief Create report vectors for the logistic selectivity */
   virtual void create_report_vectors(
-      std::map<std::string, fims::Vector<fims::Vector<Type>>> &report_vectors) {
-    report_vectors["inflection_point"].emplace_back(inflection_point);
-    report_vectors["slope"].emplace_back(slope);
-  }
-
-  virtual void get_report_vector_count(
-      std::map<std::string, size_t> &report_vector_count) {
-    report_vector_count["inflection_point"] += 1;
-    report_vector_count["slope"] += 1;
-  }
+      std::map<std::string, fims::Vector<fims::Vector<Type>>> &report_vectors);
+  /**<brief Get the number of report vectors for the logistic selectivity */
+  virtual void
+  get_report_vector_count(std::map<std::string, size_t> &report_vector_count);
 };
 
-}  // namespace fims_popdy
+} // namespace fims_popdy
 
 #endif /* POPULATION_DYNAMICS_SELECTIVITY_LOGISTIC_HPP */

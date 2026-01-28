@@ -29,14 +29,13 @@ struct SelectivityBase : public fims_model_object::FIMSObject<Type> {
   static uint32_t
       id_g; /**< The ID of the instance of the SelectivityBase class */
 
-  /** @brief Constructor.
+  /** @brief Constructor (defined in impl file).
    */
-  SelectivityBase() {
-    // increment id of the singleton selectivity class
-    this->id = SelectivityBase::id_g++;
-  }
+  SelectivityBase();
 
-  virtual ~SelectivityBase() {}
+  /** @brief Destructor (defined in impl file).
+   */
+  virtual ~SelectivityBase();
 
   /**
    * @brief Calculates the selectivity.
@@ -54,9 +53,12 @@ struct SelectivityBase : public fims_model_object::FIMSObject<Type> {
   virtual const Type evaluate(const Type& x, size_t pos) = 0;
 };
 
-// default id of the singleton selectivity class
-template <typename Type>
-uint32_t SelectivityBase<Type>::id_g = 0;
+// The definition of the static member and the out-of-line
+// constructor/destructor implementations are provided in
+// `selectivity_base_impl.hpp` which is included below so that
+// template definitions remain visible to translation units.
+
+// #include "selectivity_base_impl.hpp"
 
 }  // namespace fims_popdy
 
