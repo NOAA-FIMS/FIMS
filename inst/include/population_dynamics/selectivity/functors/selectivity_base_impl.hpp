@@ -18,7 +18,7 @@ SelectivityBase<Type>::~SelectivityBase() = default;
 
 // default id of the singleton selectivity class
 template <typename Type>
-uint32_t SelectivityBase<Type>::id_g = 0;
+inline uint32_t SelectivityBase<Type>::id_g = 0;
 
 }  // namespace fims_popdy
 

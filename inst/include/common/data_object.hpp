@@ -207,7 +207,7 @@ struct DataObject : public fims_model_object::FIMSObject<Type> {
 };
 
 template <typename Type>
-uint32_t DataObject<Type>::id_g = 0;
+inline uint32_t DataObject<Type>::id_g = 0;
 
 }  // namespace fims_data_object
 

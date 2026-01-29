@@ -192,7 +192,7 @@ struct DensityComponentBase : public fims_model_object::FIMSObject<Type>,
 /** @brief Default id of the singleton distribution class
  */
 template <typename Type>
-uint32_t DensityComponentBase<Type>::id_g = 0;
+inline uint32_t DensityComponentBase<Type>::id_g = 0;
 
 }  // namespace fims_distributions
 

@@ -4,8 +4,8 @@
 #pragma once
 
 #include "../logistic.hpp"
-#include "../../../../common/fims_math.hpp"
-#include "../../../../common/fims_vector.hpp"
+// #include "../../../../common/fims_math.hpp"
+// #include "../../../../common/fims_vector.hpp"
 
 namespace fims_popdy {
 template<typename Type>

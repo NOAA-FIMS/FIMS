@@ -8,7 +8,7 @@
 #ifndef FIMS_VECTOR_HPP
 #define FIMS_VECTOR_HPP
 
-#include "../interface/interface.hpp"
+ #include "../interface/interface.hpp"
 #include <ostream>
 #include <iomanip>
 
@@ -485,12 +485,10 @@ class Vector {
 };  // end fims::Vector class
 
 /**
- * @brief Comparison operator.
+/** @brief Comparison operator (defined in impl header).
  */
 template <class T>
-bool operator==(const fims::Vector<T> &lhs, const fims::Vector<T> &rhs) {
-  return lhs.vec_m == rhs.vec_m;
-}
+bool operator==(const fims::Vector<T> &lhs, const fims::Vector<T> &rhs);
 
 }  // namespace fims
 
@@ -501,28 +499,10 @@ bool operator==(const fims::Vector<T> &lhs, const fims::Vector<T> &rhs) {
  * @param v A vector.
  * @return std::ostream&
  */
-template <typename Type>
-std::ostream &operator<<(std::ostream &out, const fims::Vector<Type> &v) {
-  out << std::fixed << std::setprecision(10);
-  out << "[";
 
-  if (v.size() == 0) {
-    out << "]";
-    return out;
-  }
-  for (size_t i = 0; i < v.size() - 1; i++) {
-    if (v[i] != v[i]) {
-      out << "-999" << ",";
-    } else {
-      out << v[i] << ",";
-    }
-  }
-  if (v[v.size() - 1] != v[v.size() - 1]) {
-    out << "-999]";
-  } else {
-    out << v[v.size() - 1] << "]";
-  }
-  return out;
-}
+template <typename Type>
+std::ostream &operator<<(std::ostream &out, const fims::Vector<Type> &v);
+
+//#include "fims_vector_impl.hpp"
 
 #endif

@@ -283,7 +283,7 @@ inline const Type double_logistic(const Type &inflection_point_asc,
  * @return
  */
 template <class Type>
-const Type ad_fabs(const Type &x, Type C = 1e-5) {
+inline const Type ad_fabs(const Type &x, Type C = 1e-5) {
   return sqrt((x * x) + C);
 }
 
@@ -333,7 +333,7 @@ inline const Type ad_max(const Type &a, const Type &b, Type C = 1e-5) {
  * @return A single numeric value.
  */
 template <class T>
-T sum(const std::vector<T> &v) {
+inline T sum(const std::vector<T> &v) {
   T ret = 0.0;
   for (int i = 0; i < v.size(); i++) {
     ret += v[i];
@@ -350,7 +350,7 @@ T sum(const std::vector<T> &v) {
  * @return A single numeric value.
  */
 template <class T>
-T sum(const fims::Vector<T> &v) {
+inline T sum(const fims::Vector<T> &v) {
   T ret = 0.0;
   for (int i = 0; i < v.size(); i++) {
     ret += v[i];
