@@ -8,9 +8,13 @@
 #ifndef FIMS_VECTOR_HPP
 #define FIMS_VECTOR_HPP
 
- #include "../interface/interface.hpp"
+ //#include "../interface/interface.hpp"
 #include <ostream>
 #include <iomanip>
+
+namespace tmbutils{
+  template <typename Type> struct vector;
+}
 
 namespace fims {
 
@@ -484,8 +488,9 @@ class Vector {
   std::string tag_m; /*!< The tag for the vector. */
 };  // end fims::Vector class
 
-/**
-/** @brief Comparison operator (defined in impl header).
+
+/** 
+ * @brief Comparison operator (defined in impl header).
  */
 template <class T>
 bool operator==(const fims::Vector<T> &lhs, const fims::Vector<T> &rhs);

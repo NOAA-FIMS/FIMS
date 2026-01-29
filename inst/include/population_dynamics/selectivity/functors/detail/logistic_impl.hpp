@@ -26,6 +26,20 @@ const Type LogisticSelectivity<Type>::evaluate(const Type &x, size_t pos) {
            (Type(1.0) + exp(-this->slope[pos] * (x - this->inflection_point[pos])));
 }
 
+template<typename Type>
+void LogisticSelectivity<Type>::create_report_vectors(
+        std::map<std::string, fims::Vector<fims::Vector<Type>>> &report_vectors) {
+    report_vectors["inflection_point"].emplace_back(inflection_point.to_tmb());
+    report_vectors["slope"].emplace_back(slope.to_tmb());
+}
+
+template<typename Type>
+void LogisticSelectivity<Type>::get_report_vector_count(
+        std::map<std::string, size_t> &report_vector_count) {
+    report_vector_count["inflection_point"] += 1;
+    report_vector_count["slope"] += 1;
+}
+
 }  // namespace fims_popdy
 
 
