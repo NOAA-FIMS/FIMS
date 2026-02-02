@@ -7,16 +7,16 @@ name: run-doxygen
 on:
   pull_request:
   push:
-    branches: 
+    branches:
       - dev
       - main
-  # schedule: 
-  #   - cron: '0 16 * * *' 
+  # schedule:
+  #   - cron: '0 16 * * *'
   workflow_dispatch:
   # below is a trigger for when there are changes to the fims website, it pulls
   # the bootstrap file name from there which occasionally changes
   # file in that repo, which change whenever a significant change is made to
-  # the website for some reason 
+  # the website for some reason
   repository_dispatch:
     types: [file-updated]
 
@@ -52,21 +52,21 @@ jobs:
         # We use a negative lookahead regex (.*) to explicitly exclude filenames
         # containing '-dark-'.
         BOOTSTRAP_FILE=$(ls $DOCS_PATH | grep '^bootstrap-[0-9a-f]\+\.min\.css$' | grep -v 'dark' | head -n 1)
-        
+
         # Check if the file name was found
         if [ -z "$BOOTSTRAP_FILE" ]; then
           echo "ERROR: Could not find bootstrap CSS file in external repository: $DOCS_PATH"
           exit 1
         fi
-        
+
         echo "Found new bootstrap CSS file: $BOOTSTRAP_FILE"
 
         # Copy header.html from assets to root so it can be modified before Doxygen runs
         cp assets/header.html ./
 
         # 2. Use sed to replace the old hard-coded path with the dynamic file name
-        HEADER_PATH="header.html" 
-        
+        HEADER_PATH="header.html"
+
         # Get the old filename from the existing header.html content to use in sed
         # We need to find the filename currently embedded in the header.html
         OLD_FILENAME=$(grep -oE 'bootstrap-[0-9a-f]+\.min\.css' $HEADER_PATH | head -n 1)
@@ -80,7 +80,7 @@ jobs:
         # Perform the substitution in-place on header.html
         # We need to escape the '/' characters in the URL for sed.
         sed -i "s/${OLD_FILENAME}/${BOOTSTRAP_FILE}/g" $HEADER_PATH
-        
+
         echo "$HEADER_PATH updated successfully from $OLD_FILENAME to $BOOTSTRAP_FILE."
 
         if [ "$OLD_FILENAME" != "$BOOTSTRAP_FILE" ]; then
@@ -97,10 +97,10 @@ jobs:
         cp -r assets/* ./
         cmake -S . -B build -G Ninja -DDOXYGEN_WARN_AS_ERROR=FAIL_ON_WARNINGS
         cmake --build build
-    
+
     - name: Deploy html documentation with Doxygen
     # Do not run mkdir doxygen and mv build/html doxygen locally
-      if: ${{ github.ref == 'refs/heads/main' }}
+      # if: ${{ github.ref == 'refs/heads/main' }}
       run: |
         mv build/html ./
         mkdir -p ./doxygen
