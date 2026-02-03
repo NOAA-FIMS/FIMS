@@ -424,16 +424,59 @@ methods::setMethod(
   "m_weight_at_age",
   "FIMSFrame",
   function(x) {
-    dplyr::filter(
+    model_data <- dplyr::filter(
       .data = as.data.frame(x@data),
       .data[["type"]] == "weight_at_age"
-    ) |>
-      dplyr::group_by(.data[["age"]]) |>
-      dplyr::mutate(
-        value = ifelse(value == -999, NA, value)
+    )
+    if (NROW(model_data) == 0) {
+      cli::cli_abort(
+        message = "No weight_at_age data found in FIMSFrame object."
+      )
+    }
+    fleet_names <- unique(model_data[["name"]])
+    if (length(fleet_names) > 1) {
+      cli::cli_warn(c(
+       "x" = "Multiple fleets found in weight_at_age data.",
+       "i" = "{.fn m_weight_at_age} will average values across fleets."
+      ))
+      model_data <- dplyr::group_by(
+        .data = model_data,
+        .data[["timing"]],
+        .data[["age"]]
       ) |>
-      dplyr::summarize(mean_value = mean(.data[["value"]], na.rm = TRUE)) |>
-      dplyr::pull(.data[["mean_value"]])
+      dplyr::mutate(
+        value = ifelse(.data[["value"]] == -999, NA, .data[["value"]])
+      ) |>
+      dplyr::summarise(
+        value = mean(.data[["value"]], na.rm = TRUE)
+      ) |>
+      dplyr::mutate(
+        value = ifelse(is.nan(.data[["value"]]), -999, .data[["value"]])
+      )
+    }
+    # Create time-series vector if only available by age
+    n_rows <- NROW(dplyr::filter(model_data, value != -999))
+    n_rows_needed <- get_n_ages(x) * (get_n_years(x) + 1)
+    if (n_rows < n_rows_needed) {
+      if (n_rows == get_n_ages(x)) {
+        model_data <- dplyr::bind_rows(
+          replicate(
+            # Adds a year for terminal year + 1 because to calculate
+            # spawning biomass after fishing in terminal year
+            get_n_years(x) + 1,
+            dplyr::filter(model_data, value != -999),
+            simplify = FALSE
+          )
+        )
+      } else {
+        cli::cli_abort(
+          "Too few rows of weight_at_age data found, you need at least
+          {n_rows_needed}, one for every year and age combination."
+        )
+      }
+    }
+    model_data |>
+      dplyr::pull(.data[["value"]])
   }
 )
 #' @rdname m_
@@ -772,8 +815,13 @@ FIMSFrame <- function(data) {
   }
 
   # Get the earliest and latest year formatted as integers
-  start_year <- as.integer(floor(min(data[["timing"]], na.rm = TRUE)))
-  end_year <- as.integer(floor(max(data[["timing"]], na.rm = TRUE)))
+  data_to_use_4_timing <- dplyr::filter(
+    data,
+    type != "weight_at_age"
+  ) |>
+    dplyr::pull(timing)
+  start_year <- as.integer(floor(min(data_to_use_4_timing, na.rm = TRUE)))
+  end_year <- as.integer(floor(max(data_to_use_4_timing, na.rm = TRUE)))
   n_years <- as.integer(end_year - start_year + 1)
   years <- start_year:end_year
 

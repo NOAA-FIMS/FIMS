@@ -75,6 +75,19 @@ data_big_with_extra_year <- dplyr::add_row(
   unit = "mt"
 )
 data_4_projections <- data_big_with_extra_year |>
+  # Add on weight_at_age data for 10 more years because you don't want these
+  # filled with -999
+  dplyr::bind_rows(
+    dplyr::filter(
+      data_big,
+      type == "weight_at_age",
+      timing == 1
+    ) |>
+    dplyr::select(-timing) |>
+    merge(
+      data.frame(timing = max(data_big[["timing"]]):(max(data_big[["timing"]]) + 10))
+    )
+  ) |>
   # Make a FIMSFrame object out of this data frame with the extra row to add all
   # of the other missing years for each data type
   FIMSFrame() |>

@@ -311,7 +311,7 @@ age_data <- rbind(
 ###############################################################################
 # weight_at_age data
 ###############################################################################
-timingfishery <- data.frame(
+timing_fishery <- data.frame(
   timing = returned_om[["om_input"]][["year"]]
 )
 weights_fishery <- data.frame(
@@ -322,7 +322,16 @@ weights_fishery <- data.frame(
   uncertainty = NA,
   unit = "mt"
 )
-weight_at_age_data <- merge(timingfishery, weights_fishery)
+weight_at_age_data <- merge(
+  # Add on one more year for weight_at_age data because the model needs to
+  # compute spawning biomass for the beginning of the year following the
+  # terminal year
+  dplyr::bind_rows(
+    timing_fishery,
+    data.frame(timing = max(timing_fishery[["timing"]]) + 1)
+  ),
+  weights_fishery
+)
 
 ###############################################################################
 # {FIMS} data
@@ -344,23 +353,23 @@ length_age_data <- data.frame(
   type = "age_to_length_conversion",
   name = rep(
     sort(rep(observers, length(len_bins) * length(ages))),
-    length(timingfishery[["timing"]])
+    length(timing_fishery[["timing"]])
   ),
   age = rep(
     sort(rep(ages, length(len_bins))),
-    length(observers) * length(timingfishery[["timing"]])
+    length(observers) * length(timing_fishery[["timing"]])
   ),
   length = rep(
     len_bins,
-    length(ages) * length(observers) * length(timingfishery[["timing"]])
+    length(ages) * length(observers) * length(timing_fishery[["timing"]])
   ),
   timing = rep(
-    timingfishery[["timing"]],
+    timing_fishery[["timing"]],
     each = length(len_bins) * length(ages) * length(observers)
   ),
   value = rep(
     c(t(returned_om[["em_input"]][["age_to_length_conversion"]])),
-    length(observers) * length(timingfishery[["timing"]])
+    length(observers) * length(timing_fishery[["timing"]])
   ),
   unit = "proportion",
   uncertainty = rep(
@@ -368,7 +377,7 @@ length_age_data <- data.frame(
       em_input[["n.L.lengthcomp"]][["fleet1"]],
       em_input[["n.survey.lengthcomp"]][["survey1"]]
     ),
-    length(len_bins) * length(ages) * length(timingfishery[["timing"]])
+    length(len_bins) * length(ages) * length(timing_fishery[["timing"]])
   )
 )
 
@@ -376,10 +385,10 @@ length_age_data <- data.frame(
 # the age composition data
 length_comp_data <- data.frame(
   type = "length_comp",
-  name = sort(rep(observers, length(len_bins) * length(timingfishery[["timing"]]))),
+  name = sort(rep(observers, length(len_bins) * length(timing_fishery[["timing"]]))),
   age = NA,
-  length = rep(len_bins, length(timingfishery[["timing"]]) * length(observers)),
-  timing = rep(rep(timingfishery[["timing"]], each = length(len_bins)), length(observers)),
+  length = rep(len_bins, length(timing_fishery[["timing"]]) * length(observers)),
+  timing = rep(rep(timing_fishery[["timing"]], each = length(len_bins)), length(observers)),
   value = c(
     c(t(returned_om[["em_input"]][["L.length.obs"]][["fleet1"]])),
     c(t(returned_om[["em_input"]][["survey.length.obs"]][["survey1"]]))
@@ -390,7 +399,7 @@ length_comp_data <- data.frame(
       em_input[["n.L.lengthcomp"]][["fleet1"]],
       em_input[["n.survey.lengthcomp"]][["survey1"]]
     ),
-    length(len_bins) * length(timingfishery[["timing"]])
+    length(len_bins) * length(timing_fishery[["timing"]])
   )
 )
 
