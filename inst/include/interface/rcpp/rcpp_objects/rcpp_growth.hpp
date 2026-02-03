@@ -205,7 +205,7 @@ public:
       // TODO: change the dimensionality
       ss << " \"dimensionality\": {\n";
       ss << "  \"header\": [\"n_years\",\"n_ages\"],\n";
-      ss << "  \"dimensions\": [" << this->n_years << "," << this->ages.size() << "]\n},\n";
+      ss << "  \"dimensions\": [" << this->n_years.get() << "," << this->ages.size() << "]\n},\n";
 
       ss << " \"values\": [\n";
       for (size_t i = 0; i < weights.size() - 1; i++) {
