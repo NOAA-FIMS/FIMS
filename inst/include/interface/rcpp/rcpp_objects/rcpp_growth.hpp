@@ -164,6 +164,7 @@ public:
         }
       }
     }
+    return mymap;
 
     /**
      * @brief Evaluate the growth using empirical weight at age.
