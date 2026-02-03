@@ -5,7 +5,7 @@
 \alias{data_big}
 \title{FIMS input data frame}
 \format{
-A data frame with 19080 observations of 8
+A data frame with 19092 observations of 8
 variables:
 \describe{
 \item{type}{The type of input the row contains. Allowed types include
