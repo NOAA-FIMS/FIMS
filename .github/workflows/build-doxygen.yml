@@ -10,8 +10,6 @@ on:
     branches:
       - dev
       - main
-  # schedule:
-  #   - cron: '0 16 * * *'
   workflow_dispatch:
   # below is a trigger for when there are changes to the fims website, it pulls
   # the bootstrap file name from there which occasionally changes
@@ -100,7 +98,7 @@ jobs:
 
     - name: Deploy html documentation with Doxygen
     # Do not run mkdir doxygen and mv build/html doxygen locally
-      # if: ${{ github.ref == 'refs/heads/main' }}
+      if: ${{ github.ref == 'refs/heads/main' }} # remove this if developing on branch and need to view
       run: |
         mv build/html ./
         mkdir -p ./doxygen
