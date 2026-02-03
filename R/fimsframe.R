@@ -418,16 +418,44 @@ methods::setMethod(
   "m_weight_at_age",
   "FIMSFrame",
   function(x) {
-    dplyr::filter(
+    model_data <- dplyr::filter(
       .data = as.data.frame(x@data),
       .data[["type"]] == "weight-at-age"
-    ) |>
-      dplyr::group_by(.data[["age"]]) |>
-      dplyr::mutate(
-        value = ifelse(value == -999, NA, value)
+    )
+    if (NROW(model_data) == 0) {
+      cli::cli_abort(
+        message = "No weight-at-age data found in FIMSFrame object."
+      )
+    }
+    fleet_names <- unique(model_data[["name"]])
+    if (length(fleet_names) > 1) {
+      cli::cli_warn(c(
+       "x" = "Multiple fleets found in weight-at-age data.",
+       "i" = "{.fn m_weight_at_age} will average values across fleets."
+      ))
+      model_data <- dplyr::group_by(
+        .data = model_data,
+        .data[["timing"]],
+        .data[["age"]]
       ) |>
-      dplyr::summarize(mean_value = mean(.data[["value"]], na.rm = TRUE)) |>
-      dplyr::pull(.data[["mean_value"]])
+      dplyr::mutate(
+        value = ifelse(.data[["value"]] == -999, NA, .data[["value"]])
+      ) |>
+      dplyr::summarise(
+        value = mean(.data[["value"]], na.rm = TRUE)
+      ) |>
+      dplyr::mutate(
+        value = ifelse(is.nan(.data[["value"]]), -999, .data[["value"]])
+      )
+    }
+    # Create time-series vector if only available by age
+    if (NROW(model_data) == get_n_ages(x)) {
+      model_data <- dplyr::bind_rows(
+          replicate(get_n_ages(x), model_data, simplify = FALSE)
+        )
+    }
+    model_data |>
+      dplyr::pull(.data[["value"]])
   }
 )
 #' @rdname m_
