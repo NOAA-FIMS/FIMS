@@ -211,6 +211,7 @@ test_that("prior predictive check", {
 
   # Growth
   ewaa_growth <- methods::new(EWAAGrowth)
+  ewaa_growth$n_years$set(om_input[["nyr"]])
   ewaa_growth$ages$resize(om_input[["nages"]])
   purrr::walk(
     seq_along(om_input[["ages"]]),
@@ -218,7 +219,9 @@ test_that("prior predictive check", {
   )
   ewaa_growth$weights$resize(om_input[["nages"]])
   purrr::walk(
-    seq_along(om_input[["W.mt"]]),
+    seq(ewaa_growth$weights$size()),
+    # Weights are only by age in the OM not by age and year. The modular math
+    # will repeat 1:n_ages over and over again for each year.
     \(x) ewaa_growth$weights$set(x - 1, om_input[["W.mt"]][x])
   )
 
