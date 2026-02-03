@@ -145,6 +145,14 @@ public:
   inline std::map<int, std::map<double, double>> make_map(RealVector ages, RealVector weights,
                                            SharedInt n_years) {
     std::map<int, std::map<double, double>> mymap;
+    
+ if (n_years.get() < 1) {   
+      Rcpp::stop("EWAA Error:: n_years must be at least 1");
+    }
+
+    if(weights.size() == 0 || ages.size() == 0){
+      Rcpp::stop("EWAA Error:: ages and weights must have at least one value");
+    }
 
     if((weights.size() != ages.size() * n_years.get()) &&
        (weights.size() != ages.size())) {
