@@ -53,7 +53,9 @@ struct LogisticSelectivity : public SelectivityBase<Type> {
    *
    * @param x  The independent variable in the logistic function (e.g., age or
    * size in selectivity).
-   * @param pos Position index, e.g., which year.
+   * @param pos Position index, e.g., which year. If the index is out of bounds
+   * then it returns the first element, which would be the case when you do not
+   * have time-varying selectivity.
    */
   virtual const Type evaluate(const Type &x, size_t pos) {
     return fims_math::logistic<Type>(inflection_point.get_force_scalar(pos),

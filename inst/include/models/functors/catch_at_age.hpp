@@ -335,7 +335,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
     for (size_t fleet_ = 0; fleet_ < population->n_fleets; fleet_++) {
       // evaluate is a member function of the selectivity class
       Type s = population->fleets[fleet_]->selectivity->evaluate(
-          population->ages[age]);
+          population->ages[age], year);
 
       dq_["mortality_F"][i_age_year] +=
           population->fleets[fleet_]->Fmort[year] *
