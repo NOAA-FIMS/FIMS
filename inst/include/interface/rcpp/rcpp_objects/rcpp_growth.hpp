@@ -142,7 +142,8 @@ public:
    * @param n_years An integer specifying the number of years.
    * @return std::map<T, T>.
    */
-  inline std::map<double, double> make_map(RealVector ages, RealVector weights,
+  inline std::map<int, std::map<double, double> > make_map(RealVector ages,
+                                           RealVector weights,
                                            SharedInt n_years) {
     std::map<int, std::map<double, double>> mymap;
 

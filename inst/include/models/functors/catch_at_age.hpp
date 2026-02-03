@@ -365,7 +365,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
         this->GetPopulationDerivedQuantities(population->GetId());
 
     dq_["biomass"][year] += dq_["numbers_at_age"][i_age_year] *
-                            population->growth->evaluate(population->ages[age]);
+                            population->growth->evaluate(year, population->ages[age]);
   }
 
   /**
@@ -386,7 +386,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
 
     dq_["unfished_biomass"][year] +=
         dq_["unfished_numbers_at_age"][i_age_year] *
-        population->growth->evaluate(population->ages[age]);
+        population->growth->evaluate(year,population->ages[age]);
   }
 
   /**
@@ -408,7 +408,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
     dq_["spawning_biomass"][year] +=
         population->proportion_female[age] * dq_["numbers_at_age"][i_age_year] *
         dq_["proportion_mature_at_age"][i_age_year] *
-        population->growth->evaluate(population->ages[age]);
+        population->growth->evaluate(year,population->ages[age]);
   }
 
   /**
@@ -431,7 +431,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
         population->proportion_female[age] *
         dq_["unfished_numbers_at_age"][i_age_year] *
         dq_["proportion_mature_at_age"][i_age_year] *
-        population->growth->evaluate(population->ages[age]);
+        population->growth->evaluate(year,population->ages[age]);
   }
 
   /**
@@ -467,12 +467,12 @@ class CatchAtAge : public FisheryModelBase<Type> {
     Type phi_0 = 0.0;
     phi_0 += numbers_spr[0] * population->proportion_female[0] *
              dq_["proportion_mature_at_age"][0] *
-             population->growth->evaluate(population->ages[0]);
+             population->growth->evaluate(0,population->ages[0]);
     for (size_t a = 1; a < (population->n_ages - 1); a++) {
       numbers_spr[a] = numbers_spr[a - 1] * fims_math::exp(-population->M[a]);
       phi_0 += numbers_spr[a] * population->proportion_female[a] *
                dq_["proportion_mature_at_age"][a] *
-               population->growth->evaluate(population->ages[a]);
+               population->growth->evaluate(0,population->ages[a]);
     }
 
     numbers_spr[population->n_ages - 1] =
@@ -483,7 +483,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
         numbers_spr[population->n_ages - 1] *
         population->proportion_female[population->n_ages - 1] *
         dq_["proportion_mature_at_age"][population->n_ages - 1] *
-        population->growth->evaluate(population->ages[population->n_ages - 1]);
+        population->growth->evaluate(0,population->ages[population->n_ages - 1]);
 
     return phi_0;
   }
@@ -592,7 +592,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
 
       fdq_["landings_weight_at_age"][i_age_year] =
           fdq_["landings_numbers_at_age"][i_age_year] *
-          population->growth->evaluate(population->ages[age]);
+          population->growth->evaluate(year,population->ages[age]);
     }
   }
 
@@ -688,7 +688,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
 
       fdq_["index_weight_at_age"][i_age_year] =
           fdq_["index_numbers_at_age"][i_age_year] *
-          population->growth->evaluate(population->ages[age]);
+          population->growth->evaluate(year,population->ages[age]);
     }
   }
 
