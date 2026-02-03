@@ -2,6 +2,8 @@
 
 #include "../inst/include/population_dynamics/selectivity/functors/logistic.hpp"
 #include "../inst/include/population_dynamics/selectivity/functors/detail/logistic_impl.hpp"
+#include "../inst/include/population_dynamics/selectivity/functors/double_logistic.hpp"
+#include "../inst/include/population_dynamics/selectivity/functors/detail/double_logistic_impl.hpp"
 
 #include <RcppCommon.h>
 
@@ -17,4 +19,6 @@ using namespace Rcpp;
 
 
 template struct fims_popdy::LogisticSelectivity<double>;
-template struct fims_popdy::LogisticSelectivity<TMBad::ad_aug>; 
+template struct fims_popdy::LogisticSelectivity<TMBad::ad_aug>;
+template struct fims_popdy::DoubleLogisticSelectivity<double>;
+template struct fims_popdy::DoubleLogisticSelectivity<TMBad::ad_aug>;

@@ -6,6 +6,7 @@
 #define FIMS_VECTOR_IMPL_HPP
 
 #include <ostream>
+#include "../fims_vector.hpp"
 
 namespace fims {
 

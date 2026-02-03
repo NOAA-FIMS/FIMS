@@ -122,7 +122,7 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
 
 // default id of the singleton fleet class
 template <class Type>
-uint32_t Fleet<Type>::id_g = 0;
+inline uint32_t Fleet<Type>::id_g = 0;
 
 }  // end namespace fims_popdy
 

@@ -8,8 +8,8 @@
  * folder for reuse information.
  */
 
-#ifndef NORMAL_LPDF
-#define NORMAL_LPDF
+#ifndef FIMS_DISTRIBUTIONS_FUNCTORS_NORMAL_LPDF_HPP
+#define FIMS_DISTRIBUTIONS_FUNCTORS_NORMAL_LPDF_HPP
 
 #include "density_components_base.hpp"
 #include "../../common/fims_vector.hpp"
@@ -108,7 +108,7 @@ struct NormalLPDF : public DensityComponentBase<Type> {
           }
         }
       }
-#endif
+#endif /* FIMS_DISTRIBUTIONS_FUNCTORS_NORMAL_LPDF_HPP */
       /* osa not working yet
         if(osa_flag){//data observation type implements osa residuals
             //code for osa cdf method

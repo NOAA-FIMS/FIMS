@@ -490,7 +490,7 @@ class FisheryModelBase : public fims_model_object::FIMSObject<Type> {
 };
 
 template <typename Type>
-uint32_t FisheryModelBase<Type>::id_g = 0;
+inline uint32_t FisheryModelBase<Type>::id_g = 0;
 
 }  // namespace fims_popdy
 #endif

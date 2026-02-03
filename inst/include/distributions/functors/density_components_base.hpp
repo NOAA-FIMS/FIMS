@@ -9,8 +9,8 @@
  * Fisheries Integrated Modeling System project. See LICENSE in the source
  * folder for reuse information.
  */
-#ifndef DENSITY_COMPONENT_BASE_HPP
-#define DENSITY_COMPONENT_BASE_HPP
+#ifndef FIMS_DISTRIBUTIONS_FUNCTORS_DENSITY_COMPONENT_BASE_HPP
+#define FIMS_DISTRIBUTIONS_FUNCTORS_DENSITY_COMPONENT_BASE_HPP
 
 #include "../../common/data_object.hpp"
 #include "../../common/model_object.hpp"

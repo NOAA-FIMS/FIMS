@@ -8,14 +8,17 @@
 #ifndef FIMS_VECTOR_HPP
 #define FIMS_VECTOR_HPP
 
- //#include "../interface/interface.hpp"
-#include <ostream>
+// #include "../interface/interface.hpp"
 #include <iomanip>
+#include <ostream>
 
-namespace tmbutils{
-  template <typename Type> struct vector;
-}
+#ifdef TMB_MODEL
 
+namespace tmbutils {
+#include <tmbutils/vector.hpp>
+} // namespace tmbutils
+
+#endif
 namespace fims {
 
 /**
@@ -27,8 +30,7 @@ namespace fims {
  * std library functions.
  *
  */
-template <typename Type>
-class Vector {
+template <typename Type> class Vector {
   std::vector<Type> vec_m;
   /**
    * @brief friend comparison operator. Allows the operator to see private
@@ -38,7 +40,7 @@ class Vector {
   friend bool operator==(const fims::Vector<T> &lhs,
                          const fims::Vector<T> &rhs);
 
- public:
+public:
   // Member Types
 
   typedef
@@ -363,8 +365,7 @@ class Vector {
   /**
    * @brief Constructs an element in-place at the end.
    */
-  template <class... Args>
-  void emplace_back(Args &&...args) {
+  template <class... Args> void emplace_back(Args &&...args) {
     this->vec_m.emplace_back(std::forward<Args>(args)...);
   }
 
@@ -484,18 +485,17 @@ class Vector {
    */
   void set_tag(const std::string &tag) { this->tag_m = tag; }
 
- private:
+private:
   std::string tag_m; /*!< The tag for the vector. */
-};  // end fims::Vector class
+}; // end fims::Vector class
 
-
-/** 
+/**
  * @brief Comparison operator (defined in impl header).
  */
 template <class T>
 bool operator==(const fims::Vector<T> &lhs, const fims::Vector<T> &rhs);
 
-}  // namespace fims
+} // namespace fims
 
 /**
  * @brief Output for std::ostream& for a vector.
@@ -508,6 +508,6 @@ bool operator==(const fims::Vector<T> &lhs, const fims::Vector<T> &rhs);
 template <typename Type>
 std::ostream &operator<<(std::ostream &out, const fims::Vector<Type> &v);
 
-//#include "fims_vector_impl.hpp"
+// #include "fims_vector_impl.hpp"
 
 #endif

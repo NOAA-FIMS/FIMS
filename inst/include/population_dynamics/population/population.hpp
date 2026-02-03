@@ -98,7 +98,8 @@ annual fishing mortality multipliers to scale total mortality of all fleets*/
   }
 };
 template <class Type>
-uint32_t Population<Type>::id_g = 0;
+inline uint32_t Population<Type>::id_g = 0;
+
 
 }  // namespace fims_popdy
 

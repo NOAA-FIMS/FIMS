@@ -7,8 +7,8 @@
  * Fisheries Integrated Modeling System project. See LICENSE in the source
  * folder for reuse information.
  */
-#ifndef MULTINOMIAL_LPMF
-#define MULTINOMIAL_LPMF
+#ifndef FIMS_DISTRIBUTIONS_FUNCTORS_MULTINOMIAL_LPMF
+#define FIMS_DISTRIBUTIONS_FUNCTORS_MULTINOMIAL_LPMF
 
 #include "density_components_base.hpp"
 #include "../../common/fims_vector.hpp"

@@ -10,7 +10,7 @@
 #define FIMS_COMMON_MODEL_OBJECT_HPP
 
 #include <stdint.h>
-
+#include <map>
 #include <vector>
 
 //#include "def.hpp"

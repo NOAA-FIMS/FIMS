@@ -7,8 +7,8 @@
  * Fisheries Integrated Modeling System project. See LICENSE in the source
  * folder for reuse information.
  */
-#ifndef LOGNORMAL_LPDF
-#define LOGNORMAL_LPDF
+#ifndef FIMS_DISTRIBUTIONS_FUNCTORS_LOGNORMAL_LPDF
+#define FIMS_DISTRIBUTIONS_FUNCTORS_LOGNORMAL_LPDF
 
 #include "density_components_base.hpp"
 #include "../../common/fims_vector.hpp"

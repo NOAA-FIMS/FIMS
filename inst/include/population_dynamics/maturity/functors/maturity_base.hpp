@@ -52,7 +52,7 @@ struct MaturityBase : public fims_model_object::FIMSObject<Type> {
 
 // default id of the singleton maturity class
 template <typename Type>
-uint32_t MaturityBase<Type>::id_g = 0;
+inline uint32_t MaturityBase<Type>::id_g = 0;
 
 }  // namespace fims_popdy
 

@@ -124,7 +124,7 @@ class Parameter {
 /**
  * @brief The unique ID for the variable map that points to a fims::Vector.
  */
-uint32_t Parameter::id_g = 0;
+inline uint32_t Parameter::id_g = 0;
 
 /**
  * @brief Sanitize a double value by replacing NaN or Inf with -999.0.
@@ -403,7 +403,7 @@ class ParameterVector {
     }
   }
 };
-uint32_t ParameterVector::id_g = 0;
+inline uint32_t ParameterVector::id_g = 0;
 
 /**
  * @brief Output for std::ostream& for a ParameterVector.
@@ -630,7 +630,7 @@ class RealVector {
     }
   }
 };
-uint32_t RealVector::id_g = 0;
+inline uint32_t RealVector::id_g = 0;
 
 /**
  *@brief Base class for all interface objects.
