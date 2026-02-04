@@ -5,9 +5,26 @@
   [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
   <!-- badges: end -->
 
+TODO: use more section headers, with multiple levels
+TODO: Shorten complex sentences
+
+
 # Overview
 
-The NOAA Fisheries Integrated Modeling System (FIMS) is a software system designed to support next-generation fisheries stock assessment, ecosystem, and socioeconomic modeling. A [team of experts](https://noaa-fims.github.io/about/contributors.html) within NOAA Fisheries is designing and developing the system, and we are advised by the [FIMS Council](https://noaa-fims.github.io/about/contributors.html#fims-council), which includes academic, industry, and international partners. Our software is currently operational for estimation purposes and we plan for it to be operational for management in late 2025.
+The mission of the NOAA Fisheries Integrated Modeling System (FIMS) is to enhance the connection of models used to assess the status of managed fish stocks to ecosystem, climate, and socioeconomic factors while meeting current management needs. The system includes the R package stored in this repository, i.e., {FIMS}, and several other packages that you can find within the <a href="https://github.com/NOAA-FIMS" target="_blank">NOAA-FIMS GitHub organization</a>. More information about the mission can be found on our <a href="https://noaa-fims.github.io/" target="_blank">FIMS website</a>.
+
+## Learning FIMS
+
+TODO: Change to Quick Start section based on copilot feedback
+
+The best place to learn how to use {FIMS} is on the <a href="https://noaa-fims.github.io/FIMS" target="_blank">package website</a>. For new users, the <a href="https://noaa-fims.github.io/FIMS/articles/fims-demo.html" target="_blank">"Introducing the Fisheries Integrated Modeling System (FIMS)"</a> vignette is the best place to start. This vignette is just one of several vignettes that are available within the <a href="https://noaa-fims.github.io/FIMS/articles/index.html" target="_blank">articles</a> section of the package website.
+
+TODO: move this text to the vignette.
+FIMS is currently run entirely within the software R. The help documentation for all of the R functions is available within R via commands like
+```r
+methods::show(FIMS::CreateTMBModel)
+```
+Note that the use of `methods::show()` is needed here to access documentation for internal C++ code (and not just R functions).
 
 ## Installing FIMS
 
@@ -19,11 +36,14 @@ install.packages("FIMS", repos = c("https://noaa-fisheries-integrated-toolbox.r-
 
 Users can also compile it themselves, like any other TMB package by running `devtools::install_github("NOAA-FIMS/FIMS")`. This workflow allows for the specification of a particular branch or tag using the `ref` argument.
 
+TODO: Maybe have a prequestites section
+TODO: Move this to an installation vignette or somewhere else or make it collapsible.
 Developers who are interested in building FIMS can clone this repository, e.g., `git clone https://github.com/NOAA-FIMS/FIMS.git` and build it with `devtools::install()`, which builds the package from the cloned files and installs the R library. Installing with `devtools::load_all()` is not recommended because it uses shim files for things like `system.file()`, which can cause FIMS to not function as expected. For example, if you try to optimize the same model twice, you will more than likely not get estimates of uncertainty from the second model run. Additionally, `devtools::load_all()` adds the debugger flag `-O0 -g` which leads to Windows users seeing `Fatal error: can't write <xxx> bytes to section .text of FIMS.o: 'file too big`. Thus, Windows users need to run `withr::local_options(pkg.build_extra_flags = FALSE)` at the beginning of every R session before calling `devtools::load_all()`. If you want to compile FIMS with the debugger turned on you will need to run the {withr} function in addition to manually modifying the call to PKG_CXXFLAGS in the [Makevars.win](https://github.com/NOAA-FIMS/FIMS/blob/doc-install/src/Makevars.win) file in `src` to `PKG_CXXFLAGS =  -DTMB_MODEL  -DTMB_EIGEN_DISABLE_WARNINGS -O1 -g`. For a [list of development tools needed to build, test, and document FIMS](https://github.com/nmfs-ost/on-off-boarding/blob/211d3895afb892ac2fba919935eb27d933e4d048/.github/workflows/onboard-fims.yml#L22) see the [on- and off-boarding repository for NOAA Fisheries Office of Science & Technology](https://github.com/nmfs-ost/on-off-boarding).
 
 ## Getting Help
 
-If you encounter a clear :bug:, please file an [Issue](https://github.com/NOAA-FIMS/FIMS/issues) with a minimal reproducible example on GitHub. If you are uncertain if you have actually encountered a :bug:, are looking for more information, or want to talk about some new ideas please use the [Discussion Board](https://github.com/orgs/NOAA-FIMS/discussions) to post your thoughts. Users, developers, lurkers, and anyone else interested in our project are welcome to join the discussions, this is a place for **all** members of the assessment and open-source software community to ask and answer questions, share updates, have open-ended conversations, and follow along on decisions affecting FIMS. Also, feel free to introduce yourself :wave: on the [FIMS Discussion Board](https://github.com/orgs/NOAA-FIMS/discussions/801).
+TODO: Potentially change this Troubleshooting
+If you encounter a clear :bug:, please file an [Issue](https://github.com/NOAA-FIMS/FIMS/issues) with a minimal reproducible example on GitHub. If you are uncertain that you have actually encountered a :bug:, are looking for more information, or want to talk about some new ideas please use the [Discussion Board](https://github.com/orgs/NOAA-FIMS/discussions) to post your thoughts. Users, developers, lurkers, and anyone else interested in our project are welcome to join the discussions, this is a place for **all** members of the assessment and open-source software community to ask and answer questions, share updates, have open-ended conversations, and follow along on decisions affecting FIMS. Also, feel free to introduce yourself :wave: on the [FIMS Discussion Board](https://github.com/orgs/NOAA-FIMS/discussions/801).
 
 ****************************
 
@@ -373,4 +393,4 @@ Software code created by U.S. Government employees is not subject to copyright i
 
 <img src="https://raw.githubusercontent.com/nmfs-general-modeling-tools/nmfspalette/main/man/figures/noaa-fisheries-rgb-2line-horizontal-small.png" height="75" alt="NOAA Fisheries">
 
-[U.S. Department of Commerce](https://www.commerce.gov/) | [National Oceanographic and Atmospheric Administration](https://www.noaa.gov) | [NOAA Fisheries](https://www.fisheries.noaa.gov/)
+[U.S. Department of Commerce](https://www.commerce.gov/) | [National Oceanic and Atmospheric Administration](https://www.noaa.gov) | [NOAA Fisheries](https://www.fisheries.noaa.gov/)

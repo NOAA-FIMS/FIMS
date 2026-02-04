@@ -48,7 +48,7 @@ A sample data frame for a catch-at-age model with both ages and lengths is store
 
 ### `FIMSFrame()`
 
-The easiest way to prepare the data for a FIMS model is to use `FIMSFrame()`. This function performs several validation checks and returns an object of the S4 class called `FIMSFrame`. There are helper functions for working with a `FIMSFrame` object, e.g., `get_data()`, `get_n_years()`, `get_*()`. Additionally, there are helper functions for pulling data out of the S4 class in the format needed for a module, i.e., a vector, but these `m_*()` functions are largely meant to be used internally within the package and are only exported to allow for their use by power users wishing to manually set up.
+The easiest way to prepare the data for a FIMS model is to use `FIMSFrame()`. This function performs several validation checks and returns an object of the S4 class (more information on the S4 class can be found [here](https://adv-r.hadley.nz/s4.html)) called `FIMSFrame`. There are helper functions for working with a `FIMSFrame` object, e.g., `get_data()`, `get_n_years()`, `get_*()`. Additionally, there are helper functions for pulling data out of the S4 class in the format needed for a module, i.e., a vector, but these `m_*()` functions are largely meant to be used internally within the package and are only exported to allow for their use by power users wishing to manually set up.
 
 ```{r FIMSFrame}
 # Bring the package data into your environment

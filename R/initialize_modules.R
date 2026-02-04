@@ -628,7 +628,8 @@ initialize_comp <- function(data,
 #' modules. This function iterates over the provided fleets, setting up
 #' necessary sub-modules such as selectivity, index, and age composition. It
 #' also sets up distribution models for fishery index and age-composition data.
-#' @param parameters A tibble. Contains parameters and modules required for
+#' @param parameters A ne
+ tibbleeA . Usually the output of [create_default_parameters]tibble. Contains parameters and modules required for
 #'   initialization.
 #' @param data An S4 object. FIMS input data.
 #' @return
@@ -648,6 +649,8 @@ initialize_fims <- function(parameters, data) {
   }
 
   # Check if estimation_type is within "constant", "fixed_effect", "random_effect"
+  #Validates supported estimation typee s tov avoid errors later when
+  #
   valid_estimation_types <- c("constant", "fixed_effects", "random_effects")
   invalid_estimation_types <- parameters |>
     dplyr::filter(!estimation_type %in% valid_estimation_types) |>
