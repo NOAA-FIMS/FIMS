@@ -119,7 +119,7 @@ jobs:
         API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
       with:
         source_file: 'doxygen'
-        destination_repo: 'NOAA-FIMS/noaa-fims.github.io'
+        destination_repo: 'e-perl-NOAA/noaa-fims.github.io'
         destination_folder: './'
         destination_branch: 'gh-pages'
         user_email: 'elizabeth.gugliotti@noaa.gov' # your email
