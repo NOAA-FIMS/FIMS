@@ -4,6 +4,8 @@
 #' assessment model in FIMS. This data was generated using
 #' the `ASSAMC` package written for the [model comparison project](
 #' www.github.com/NOAA-FIMS/Age_Structured_Stock_Assessment_Model_Comparison).
+#' The source code to make this dataset is in `data-raw/data1.R` which is on
+#' Github, but won't be local because it's in the .Rbuildignore file.
 #'
 #' @format
 #' A data frame with `r NROW(data1)` observations of `r NCOL(data1)`
