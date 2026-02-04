@@ -36,8 +36,9 @@ install.packages("FIMS", repos = c("https://noaa-fisheries-integrated-toolbox.r-
 
 Users can also compile it themselves, like any other TMB package by running `devtools::install_github("NOAA-FIMS/FIMS")`. This workflow allows for the specification of a particular branch or tag using the `ref` argument.
 
-TODO: Maybe have a prequestites section
+TODO: Maybe have a prequesites section
 TODO: Move this to an installation vignette or somewhere else or make it collapsible.
+
 Developers who are interested in building FIMS can clone this repository, e.g., `git clone https://github.com/NOAA-FIMS/FIMS.git` and build it with `devtools::install()`, which builds the package from the cloned files and installs the R library. Installing with `devtools::load_all()` is not recommended because it uses shim files for things like `system.file()`, which can cause FIMS to not function as expected. For example, if you try to optimize the same model twice, you will more than likely not get estimates of uncertainty from the second model run. Additionally, `devtools::load_all()` adds the debugger flag `-O0 -g` which leads to Windows users seeing `Fatal error: can't write <xxx> bytes to section .text of FIMS.o: 'file too big`. Thus, Windows users need to run `withr::local_options(pkg.build_extra_flags = FALSE)` at the beginning of every R session before calling `devtools::load_all()`. If you want to compile FIMS with the debugger turned on you will need to run the {withr} function in addition to manually modifying the call to PKG_CXXFLAGS in the [Makevars.win](https://github.com/NOAA-FIMS/FIMS/blob/doc-install/src/Makevars.win) file in `src` to `PKG_CXXFLAGS =  -DTMB_MODEL  -DTMB_EIGEN_DISABLE_WARNINGS -O1 -g`. For a [list of development tools needed to build, test, and document FIMS](https://github.com/nmfs-ost/on-off-boarding/blob/211d3895afb892ac2fba919935eb27d933e4d048/.github/workflows/onboard-fims.yml#L22) see the [on- and off-boarding repository for NOAA Fisheries Office of Science & Technology](https://github.com/nmfs-ost/on-off-boarding).
 
 ## Getting Help
