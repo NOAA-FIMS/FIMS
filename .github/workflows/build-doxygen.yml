@@ -50,7 +50,7 @@ jobs:
         # 1. Find the name of the new bootstrap CSS file (not the dark one).
         # We use a negative lookahead regex (.*) to explicitly exclude filenames
         # containing '-dark-'.
-        BOOTSTRAP_FILE=$(ls DOCS_PATH | grep '^bootstrap-[0-9a-f]\+\.min\.css$' | grep -v 'dark' | head -n 1)
+        BOOTSTRAP_FILE=$(ls $DOCS_PATH | grep '^bootstrap-[0-9a-f]\+\.min\.css$' | grep -v 'dark' | head -n 1)
 
         # Check if the file name was found
         if [ -z "$BOOTSTRAP_FILE" ]; then
