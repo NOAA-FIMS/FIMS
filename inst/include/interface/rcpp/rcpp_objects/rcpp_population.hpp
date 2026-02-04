@@ -169,14 +169,15 @@ class PopulationInterface : public PopulationInterfaceBase {
    */
   PopulationInterface(const PopulationInterface &other)
       : PopulationInterfaceBase(other),
-        fleet_ids(other.fleet_ids),
         n_ages(other.n_ages),
         n_fleets(other.n_fleets),
+        fleet_ids(other.fleet_ids),
         n_years(other.n_years),
         n_lengths(other.n_lengths),
         maturity_id(other.maturity_id),
         growth_id(other.growth_id),
         recruitment_id(other.recruitment_id),
+        recruitment_err_id(other.recruitment_id),
         log_M(other.log_M),
         spawning_biomass_ratio(other.spawning_biomass_ratio),
         log_f_multiplier(other.log_f_multiplier),

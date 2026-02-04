@@ -1,8 +1,19 @@
 # This file contains many functions to reshape output from get_output()
 # To remove the NOTE `no visible binding for global variable`
 utils::globalVariables(c(
+  "data", "data_id", "data_ids", "data_type",
+  "delete_me",
+  "density_component",
+  "derived_quantities", "dimensionality",
+  "fleet",
+  "join_by", "json",
+  "input_type",
+  "label", "label_splits", "likelihood", "log_sd_values",
   "module_name", "module_id", "module_type",
-  "parameter_min", "parameter_max", "label", "label_splits"
+  "observed_data_id", "observed_values",
+  "parameter_min", "parameter_max",
+  "parameters",
+  "population"
 ))
 
 #' Reshape JSON estimates

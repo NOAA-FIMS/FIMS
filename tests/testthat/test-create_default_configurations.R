@@ -3,9 +3,9 @@
 #' Necessary tests include input and output (IO) correctness [IO
 #' correctness], edge-case handling [Edge handling], and built-in errors and
 #' warnings [Error handling]. See `?FIMS:::use_testthat_template` for more
-#' information. Every test should have a @description tag, which can span
-#' multiple lines, that will be used in the bookdown report of the results from
-#' {testthat}.
+#' information. Every test should have a @description tag, which can only span
+#' one lines, that will be used in the bookdown report of the results from
+#' {testthat}. This line can be more than 80 characters.
 
 # create_default_configurations ----
 ## Setup ----
@@ -43,8 +43,7 @@ test_that("`create_default_configurations()` works with correct inputs", {
     expected = "catch_at_age"
   )
 
-  #' @description Test that the function produces a consistent output
-  #' by comparing to a stored snapshot.
+  #' @description Test that the function produces a consistent output by comparing to a stored snapshot.
   expect_snapshot_file(
     save_csv(default_configurations_unnested),
     "default_configurations.csv",

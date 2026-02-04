@@ -97,7 +97,9 @@ struct MultinomialLPMF : public DensityComponentBase<Type> {
         if (this->input_type == "data") {
           // if data, check if there are any NA values and skip lpdf calculation
           // for entire row if there are
-          if (this->get_observed(i, j) == this->observed_values->na_value) {
+          if (this->get_observed(static_cast<size_t>(i),
+                                 static_cast<size_t>(j)) ==
+              this->observed_values->na_value) {
             containsNA = true;
             break;
           }

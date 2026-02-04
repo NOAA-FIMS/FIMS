@@ -260,26 +260,29 @@ class FleetInterface : public FleetInterfaceBase {
         n_ages(other.n_ages),
         n_lengths(other.n_lengths),
         n_years(other.n_years),
-        log_q(other.log_q),
-        log_Fmort(other.log_Fmort),
-        log_index_expected(other.log_index_expected),
-        log_landings_expected(other.log_landings_expected),
-        agecomp_proportion(other.agecomp_proportion),
-        lengthcomp_proportion(other.lengthcomp_proportion),
-        agecomp_expected(other.agecomp_expected),
-        lengthcomp_expected(other.lengthcomp_expected),
-        age_to_length_conversion(other.age_to_length_conversion),
         observed_landings_units(other.observed_landings_units),
         observed_index_units(other.observed_index_units),
+        log_q(other.log_q),
+        log_Fmort(other.log_Fmort),
+        log_landings_expected(other.log_landings_expected),
+        log_index_expected(other.log_index_expected),
+        agecomp_expected(other.agecomp_expected),
+        lengthcomp_expected(other.lengthcomp_expected),
+        agecomp_proportion(other.agecomp_proportion),
+        lengthcomp_proportion(other.lengthcomp_proportion),
+        age_to_length_conversion(other.age_to_length_conversion),
         derived_landings_naa(other.derived_landings_naa),
         derived_landings_nal(other.derived_landings_nal),
         derived_landings_waa(other.derived_landings_waa),
-        derived_index_expected(other.derived_index_expected),
-        derived_index_w(other.derived_index_w),
-        derived_index_n(other.derived_index_n),
         derived_landings_expected(other.derived_landings_expected),
         derived_landings_w(other.derived_landings_w),
         derived_landings_n(other.derived_landings_n),
+        derived_index_naa(other.derived_index_naa),
+        derived_index_nal(other.derived_index_nal),
+        derived_index_waa(other.derived_index_waa),
+        derived_index_expected(other.derived_index_expected),
+        derived_index_w(other.derived_index_w),
+        derived_index_n(other.derived_index_n),
         derived_agecomp_proportion(other.derived_agecomp_proportion),
         derived_lengthcomp_proportion(other.derived_lengthcomp_proportion),
         derived_agecomp_expected(other.derived_agecomp_expected),
@@ -491,7 +494,7 @@ class FleetInterface : public FleetInterfaceBase {
     }
 
     FIMS_INFO_LOG("adding Fleet fmort object to TMB");
-    if (this->log_Fmort.size() != this->n_years.get()) {
+    if (this->log_Fmort.size() != static_cast<size_t>(this->n_years.get())) {
       FIMS_ERROR_LOG("The size of `log_Fmort` does not match `n_years`: " +
                      fims::to_string(this->log_Fmort.size()) +
                      " != " + fims::to_string(this->n_years.get()));
@@ -502,7 +505,7 @@ class FleetInterface : public FleetInterfaceBase {
           " and the number of years is " +
           fims::to_string(this->n_years.get()));
     }
-    fleet->log_Fmort.resize(this->log_Fmort.size());
+    fleet->log_Fmort.resize(static_cast<size_t>(this->log_Fmort.size()));
     for (size_t i = 0; i < log_Fmort.size(); i++) {
       fleet->log_Fmort[i] = this->log_Fmort[i].initial_value_m;
 

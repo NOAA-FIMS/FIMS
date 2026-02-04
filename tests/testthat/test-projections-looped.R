@@ -638,13 +638,10 @@ test_that("projections with no data achieve same estimates and no projection mod
   #' @description Test that rec devs were fixed at zero in projection.
   expect_equal(sum(rec_devs[, "Estimate"]), 0)
 
-  #' @description Test that the maximum parameter estimate difference between
-  #' a projection run and no projection run is less than 1 standard error.
+  #' @description Test that the maximum parameter estimate difference between a projection run and no projection run is less than 1 standard error.
   expect_lt(estimation_error, 1)
 
-  #' @description Test that the maximum parameter standard deviation estimate
-  #' difference between a projection run and no projection run is less than 10%
-  #' of base estimate.
+  #' @description Test that the maximum parameter standard deviation estimate difference between a projection run and no projection run is less than 10% of base estimate.
   expect_lt(sd_error, 0.1)
 })
 
@@ -663,12 +660,10 @@ test_that("projections with low catch data achieve same estimates and no project
   #' @description Test that rec devs were fixed at zero in projection.
   expect_equal(sum(rec_devs[, "Estimate"]), 0)
 
-  #' @description Test that the maximum parameter estimate difference between
-  #' a low catch projection run and no projection run is less than 10%.
+  #' @description Test that the maximum parameter estimate difference between a low catch projection run and no projection run is less than 10%.
   expect_lt(estimation_error, 0.1)
 
-  #' @description Test that the maximum parameter standard deviation estimate
-  #' difference between a low catch projection run and no projection run is less than 10%.
+  #' @description Test that the maximum parameter standard deviation estimate difference between a low catch projection run and no projection run is less than 10%.
   expect_lt(sd_error, 0.1)
 })
 
@@ -682,12 +677,10 @@ estimation_error <- max(abs(sdr_fixed_5_year_project_catch_high[-c(33:37), "Esti
 sd_error <- max(abs(sdr_fixed_5_year_project_catch_high[-c(33:37), "Std. Error"] - sdr_fixed_no_project[, "Std. Error"]) / abs(sdr_fixed_no_project[, "Std. Error"]))
 
 test_that("projections with high catch data achieve same estimates and no projection model run", {
-  #' @description Test that the maximum parameter estimate difference between
-  #' a low catch projection run and no projection run is less than 10%.
+  #' @description Test that the maximum parameter estimate difference between a low catch projection run and no projection run is less than 10%.
   expect_gt(estimation_error, 0.7)
 
-  #' @description Test that the maximum parameter standard deviation estimate
-  #' difference between a low catch projection run and no projection run is less than 10%.
+  #' @description Test that the maximum parameter standard deviation estimate difference between a low catch projection run and no projection run is less than 10%.
   expect_gt(sd_error, 0.7)
 })
 # Compare fixed parameter estimates between control and estimated F runs with high catch targets (overfishing)
@@ -719,19 +712,15 @@ ssb_ratio_estimation_error <- max(abs(sdr_report_10_year_project_SSB_target[rown
 ssb_ratio_target_error <- abs(sdr_report_10_year_project_SSB_target[rownames(sdr_report_10_year_project_SSB_target) == "spawning_biomass_ratio", "Estimate"][length(sdr_report_10_year_project_SSB_target[rownames(sdr_report_10_year_project_SSB_target) == "spawning_biomass_ratio", "Estimate"])] - ssb_ratio_target) / ssb_ratio_target
 
 test_that("projections with spawning biomass ratio target achieve same estimates and no projection model run", {
-  #' @description Test that the maximum parameter estimate difference between
-  #' a low catch projection run and no projection run is less than 10%.
+  #' @description Test that the maximum parameter estimate difference between a low catch projection run and no projection run is less than 10%.
   expect_lt(estimation_error, 0.5)
 
-  #' @description Test that the maximum parameter standard deviation estimate
-  #' difference between a low catch projection run and no projection run is less than 10%.
+  #' @description Test that the maximum parameter standard deviation estimate difference between a low catch projection run and no projection run is less than 10%.
   expect_lt(sd_error, 0.5)
 
-  #' @description Test that the maximum parameter estimate difference between
-  #' a low catch projection run and no projection run is less than 10%.
+  #' @description Test that the maximum parameter estimate difference between a low catch projection run and no projection run is less than 10%.
   expect_lt(ssb_ratio_estimation_error, 1.1)
 
-  #' @description Test that the maximum parameter standard deviation estimate
-  #' difference between a low catch projection run and no projection run is less than 10%.
+  #' @description Test that the maximum parameter standard deviation estimate difference between a low catch projection run and no projection run is less than 10%.
   expect_lt(ssb_ratio_target_error, 0.1)
 })
