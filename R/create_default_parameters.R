@@ -1,4 +1,15 @@
 # TODO: Document the names/items in each list that are returned
+
+# To remove the WARNING
+# no visible binding for global variable
+utils::globalVariables(c(
+  "distribution.x", "distribution.y",
+  "distribution_link",
+  "distribution_type.x", "distribution_type.y",
+  "fleet_name",
+  "model_family", "model_family.x", "model_family.y"
+))
+
 #' Create default parameters for a FIMS model
 #'
 #' @description
