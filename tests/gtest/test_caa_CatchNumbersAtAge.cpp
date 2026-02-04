@@ -1,6 +1,6 @@
 #include "gtest/gtest.h"
-#include "population_dynamics/population/population.hpp"
-#include "../../tests/gtest/test_population_test_fixture.hpp"
+#include "../../tests/gtest/test_caa_test_fixture.hpp"
+
 
 namespace
 {

@@ -68,12 +68,13 @@ struct NormalLPDF : public DensityComponentBase<Type> {
     this->lpdf = static_cast<Type>(0);
 
     // Dimension checks
-    if (n_x != n_expected) {
-      if (n_expected == 1) {
-        n_expected = n_x;
-      } else if (n_x > n_expected) {
-        n_x = n_expected;
-      }
+    if (n_expected > 1 && n_expected != n_x) {
+      throw std::invalid_argument(
+        "NormalLPDF::Vector index out of bounds. The size of observed "
+            "data does not equal the expected size. The observed data vector "
+            "is of size " +
+            fims::to_string(n_x) +
+            " and the expected size is " + fims::to_string(n_expected));
     }
 
     if (this->log_sd.size() > 1 && n_x != this->log_sd.size()) {
@@ -100,9 +101,11 @@ struct NormalLPDF : public DensityComponentBase<Type> {
         // if not data (i.e. prior or process), use x vector instead of
         // observed_values
       } else {
-        this->lpdf_vec[i] =
-            dnorm(this->get_observed(i), this->get_expected(i),
-                  fims_math::exp(log_sd.get_force_scalar(i)), true);
+        if(this->get_observed(i) != -999){
+          this->lpdf_vec[i] =
+              dnorm(this->get_observed(i), this->get_expected(i),
+                    fims_math::exp(log_sd.get_force_scalar(i)), true);
+        }
       }
       this->lpdf += this->lpdf_vec[i];
       if (this->simulate_flag) {

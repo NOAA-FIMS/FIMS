@@ -11,6 +11,7 @@
 #include "../interface/interface.hpp"
 #include <ostream>
 #include <iomanip>
+#include <initializer_list>
 
 namespace fims {
 

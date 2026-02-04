@@ -125,7 +125,7 @@ struct DensityComponentBase : public fims_model_object::FIMSObject<Type> {
     } else if (this->use_mean == "yes") {
       return this->expected_mean.get_force_scalar(i);
     } else if (this->input_type == "random_effects") {
-      return (*re_expected_values)[i];
+      return (*re_expected_values).get_force_scalar(i);
     } else {
       return this->expected_values.get_force_scalar(i);
     }
@@ -142,8 +142,10 @@ struct DensityComponentBase : public fims_model_object::FIMSObject<Type> {
     if (this->input_type == "random_effects") {
       return (*re).size();
     }
+    // TODO: this handles a scalar prior that is shared across multiple modules
+    // Need to develop this further for time-varying priors. 
     if (this->input_type == "prior") {
-      return this->expected_values.size();
+      return priors.size();
     }
     return observed_values.size();
   }
