@@ -25,7 +25,6 @@ articles:
 - title: FIMS
   contents:
   - fims-demo
-  - fims-demo-minimal
   - fims-logging
   - fims-user-setup-guide
   - fims-demo-projections

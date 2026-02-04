@@ -34,11 +34,39 @@ void init_logging() {
 }
 
 /**
- * @brief Creates the TMB model object and adds interface objects to it.
+ * @brief Initialize and construct the FIMS model using TMB.
  *
  * @details
- * This function is called within `initialize_fims()` from R and is not
- * typically called by the user directly.
+ * This function sets up the core C++ objects required for building the
+ * objective function with TMB before optimizing a FIMS model. The main steps
+ * of the function are as follows:
+ * - The logging system is initialized and any existing model structures are
+ *   cleared, ensuring a clean slate for a new model.
+ * - It resets and prepares the main model information objects
+ *   (fims_info::Information singletons), ensuring all internal data and
+ *   settings are cleared and ready for a new model run. This step is essential
+ *   for both initializing the model structure and avoiding conflicts from
+ *   previous runs.
+ * - It iterates over all registered FIMS interface objects and adds them to
+ *   the TMB model context.
+ * - After all of the objects are registered, it calls
+ *   fims_info::Information::CreateModel() and
+ *   fims_info::Information::CheckModel() on the base fims_info::Information
+ *   object.
+ * - It instantiates the singleton fims_model::Model object which represents
+ *   the constructed TMB model.
+ * 
+ * Typically the average user does not interact with this function because it
+ * is called within <a href = "https://noaa-fims.github.io/FIMS/reference/initialize_fims.html">`initialize_fims`</a>.
+ * 
+ * @see init_logging()
+ * @see fims_info::Information::Clear()
+ * @see fims_info::Information::CreateModel()
+ * @see fims_info::Information::CheckModel()
+ * @see fims_info::Information::GetInstance()
+ * @see <a href = "https://noaa-fims.github.io/FIMS/reference/initialize_fims.html" target="_blank">`initialize_fims()`</a>
+ * @return A boolean is returned, where true indicates that the model was
+ * successfully created.
  */
 bool CreateTMBModel() {
   init_logging();
@@ -115,19 +143,31 @@ bool CreateTMBModel() {
   return true;
 }
 
+/* Dictionary block for shared documentation.
+  [details_set_x_parameters]
+  @details
+    Updates the internal parameter values for the model base of type
+    TMB_FIMS_REAL_TYPE. It is typically called before finalize() or
+    @ref CatchAtAgeInterface::to_json "`get_output()`" to ensure the correct
+    values are used because TMB doesn't always keep the updated parameters in
+    the "double" version of the tape. So we need to update those first.
+    Usage example in R:
+    \code{.R}
+    set_fixed_parameters(c(1, 2, 3))
+    set_random_parameters(c(1, 2, 3))
+    catch_at_age$get_output(do_sd_report = FALSE)
+    \endcode
+  [details_set_x_parameters]
+  [param_par]
+  @param par A vector of parameter values.
+  [param_par]
+*/
+
 /**
- * @brief Sets the fixed parameters vector object.
- * Updates the internal parameter values for the model base
- * of type TMB_FIMS_REAL_TYPE. Typically called before
- * finalize or get_output to ensure the correct values are used.
- *
- * Usage example:
- * \code{.R}
- * set_fixed_parameters(c(1, 2, 3))
- * catch_at_age$get_output(do_sd_report = FALSE)
- * \endcode
- *
- * @param par A vector of parameter values.
+ * @brief Update fixed parameters in the tape, so the output is correct.
+ * @snippet{doc} this details_set_x_parameters
+ * @snippet{doc} this param_par
+ * @see set_random_parameters()
  */
 void set_fixed_parameters(Rcpp::NumericVector par) {
   // base model
@@ -159,18 +199,10 @@ Rcpp::NumericVector get_fixed_parameters_vector() {
 }
 
 /**
- * @brief Sets the random parameters vector object.
- * Updates the internal random effects parameter values for
- * the model base of TMB_FIMS_REAL_TYPE. Typically called before
- * finalize or get_output to ensure the correct values are used.
- *
- * Usage example:
- * \code{.R}
- * set_random_parameters(c(1, 2, 3))
- * catch_at_age$get_output(do_sd_report = FALSE)
- * \endcode
- *
- * @param par A vector of parameter values.
+ * @brief Update random effect parameters in the tape, so the output is correct.
+ * @snippet{doc} this details_set_x_parameters
+ * @snippet{doc} this param_par
+ * @see set_fixed_parameters()
  */
 void set_random_parameters(Rcpp::NumericVector par) {
   // base model
