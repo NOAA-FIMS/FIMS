@@ -32,7 +32,7 @@ namespace
             index_expected[index_yf] += dq_pop["numbers_at_age"][i_age_year]*
                                         pop->fleets[fleet_]->q[0]*
                                         pop->fleets[fleet_]->selectivity->evaluate(pop->ages[age])*
-                                        pop->growth->evaluate(pop->ages[age]);
+                                        pop->growth->evaluate(year, pop->ages[age]);
             uint32_t fleet_id = pop->fleets[fleet_]->GetId();
             auto& dq_fleet = catch_at_age_model->GetFleetDerivedQuantities(fleet_id);
             EXPECT_GT(dq_fleet["index_weight"][year], 0);

@@ -20,9 +20,9 @@ namespace
         test_SB[year] += dq["numbers_at_age"][i_age_year] *
             catch_at_age_model->populations[0]->proportion_female[age] *
             dq["proportion_mature_at_age"][i_age_year] *
-            catch_at_age_model->populations[0]->growth->evaluate(population->ages[age]);
+            catch_at_age_model->populations[0]->growth->evaluate(year, population->ages[age]);
         test_B[year] += dq["numbers_at_age"][i_age_year] *
-                         catch_at_age_model->populations[0]->growth->evaluate(population->ages[age]);
+                         catch_at_age_model->populations[0]->growth->evaluate(year, population->ages[age]);
 
         EXPECT_EQ(dq["spawning_biomass"][year], test_SB[year]);
         EXPECT_GT(dq["spawning_biomass"][year], 0);
@@ -50,7 +50,7 @@ namespace
         test_SSB[n_years] += dq["numbers_at_age"][i_age_year] *
             catch_at_age_model->populations[0]->proportion_female[age] *
             dq["proportion_mature_at_age"][i_age_year] *
-            catch_at_age_model->populations[0]->growth->evaluate(population->ages[age]);
+            catch_at_age_model->populations[0]->growth->evaluate(year, population->ages[age]);
 
         EXPECT_EQ(dq["spawning_biomass"][year], test_SSB[year]);
         EXPECT_GT(dq["spawning_biomass"][year], 0);

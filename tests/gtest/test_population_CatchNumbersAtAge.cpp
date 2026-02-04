@@ -49,7 +49,7 @@ namespace
               test_naa[i_age_year] *
               (1 - exp(-(dq_pop["mortality_Z"][i_age_year])));
             test_landings_naa[i_age_yearf] += landings_temp;
-            test_landings_waa[i_age_yearf] += landings_temp * population->growth->evaluate(population->ages[age]);
+            test_landings_waa[i_age_yearf] += landings_temp * population->growth->evaluate(year, population->ages[age]);
 
             // test value
           EXPECT_EQ(dq_fleet["landings_numbers_at_age"][i_age_year], test_landings_naa[i_age_yearf]);
