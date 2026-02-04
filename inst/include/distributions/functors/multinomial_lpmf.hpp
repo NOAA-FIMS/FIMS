@@ -86,6 +86,10 @@ struct MultinomialLPMF : public DensityComponentBase<Type> {
               " and the expected vector is of size " +
               fims::to_string(this->data_expected_values->size()));
         }
+      } else {
+        throw std::invalid_argument(
+            "MultinomialLPDF: Expected values pointer is null for data input "
+            "type.");
       }
     } else {
       if (dims[0] * dims[1] != this->observed_values.size()) {
