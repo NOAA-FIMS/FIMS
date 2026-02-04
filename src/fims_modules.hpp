@@ -373,6 +373,7 @@ RCPP_MODULE(fims) {
       .field("ages", &EWAAGrowthInterface::ages, "Ages for each age class.")
       .field("weights", &EWAAGrowthInterface::weights,
              "Weights for each age class.")
+      .field("n_years", &EWAAGrowthInterface::n_years, "Number of years.")
       .method("get_id", &EWAAGrowthInterface::get_id)
       .method("evaluate", &EWAAGrowthInterface::evaluate);
 

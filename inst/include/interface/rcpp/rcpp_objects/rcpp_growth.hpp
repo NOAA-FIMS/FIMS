@@ -122,7 +122,8 @@ public:
    */
   EWAAGrowthInterface(const EWAAGrowthInterface &other)
       : GrowthInterfaceBase(other), weights(other.weights), ages(other.ages),
-        ewaa(other.ewaa), initialized(other.initialized) {}
+        n_years(other.n_years), ewaa(other.ewaa),
+        initialized(other.initialized) {}
 
   /**
    * @brief The destructor.

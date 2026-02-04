@@ -150,8 +150,14 @@ initialize_module <- function(parameters, data, module_name, fleet_name = NA_cha
         "ages" = get_ages,
         "weights" = m_weight_at_age
       )
-      module[[field]]$resize(get_n_ages(data))
-      purrr::walk(seq_len(get_n_ages(data)), function(x) {
+      module_length <- switch(field,
+        "ages" = get_n_ages(data),
+        "weights" = get_n_ages(data) * get_n_years(data)
+      )
+      module[[field]]$resize(module_length)
+      purrr::walk(
+        seq(module_length),
+        function(x) {
         module[[field]]$set(x - 1, get_value_function(data)[x])
       })
     } else {
