@@ -306,7 +306,7 @@ verify_fims_deterministic <- function(
   }
 
   fims_landings <- report[["landings_expected"]]
-  #' @description Test that the expected landings values from report are equal to the true values
+  #' @description Test that the expected landings values from report are equal to the true values.
   expect_equal(
     fims_landings[[1]],
     om_output[["L.mt"]][["fleet1"]]
@@ -348,7 +348,7 @@ verify_fims_deterministic <- function(
   # landings_waa <- matrix(report[["landings_waa"]][[2]][1:(om_input[["nyr"]] * om_input[["nages"]])],
   #   nrow = om_input[["nyr"]], byrow = TRUE
   # )
-  # #' @description Test that the expected survey index values from report are equal to the true values
+  # #' @description Test that the expected survey index values from report are equal to the true values.
   # # Using [[2]] because the survey is the 2nd fleet.
   # expect_setequal(
   #   fims_landings[[2]],

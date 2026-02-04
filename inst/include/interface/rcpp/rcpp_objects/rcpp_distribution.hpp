@@ -217,8 +217,8 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
       : DistributionsInterfaceBase(other),
         x(other.x),
         expected_values(other.expected_values),
-        log_sd(other.log_sd),
         expected_mean(other.expected_mean),
+        log_sd(other.log_sd),
         lpdf_vec(other.lpdf_vec) {}
 
   /**
@@ -424,7 +424,8 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
     if (this->log_sd.size() == 0) {
       ss << "],\n";
     } else {
-      for (R_xlen_t i = 0; i < this->log_sd.size() - 1; i++) {
+      for (R_xlen_t i = 0; i < static_cast<R_xlen_t>(this->log_sd.size()) - 1;
+           i++) {
         ss << this->value_to_string(this->log_sd[i].final_value_m) << ", ";
       }
       ss << this->value_to_string(
@@ -767,7 +768,8 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
     if (this->log_sd.size() == 0) {
       ss << "],\n";
     } else {
-      for (R_xlen_t i = 0; i < this->log_sd.size() - 1; i++) {
+      for (R_xlen_t i = 0; i < static_cast<R_xlen_t>(this->log_sd.size()) - 1;
+           i++) {
         ss << this->value_to_string(this->log_sd[i].final_value_m) << ", ";
       }
       ss << this->value_to_string(
@@ -1030,7 +1032,8 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
         for (size_t i = 0; i < dims[0]; i++) {
           for (size_t j = 0; j < dims[1]; j++) {
             size_t idx = (i * dims[1]) + j;
-            this->x[idx].final_value_m = dmultinom->get_observed(i, j);
+            this->x[idx].final_value_m = dmultinom->get_observed(
+                static_cast<size_t>(i), static_cast<size_t>(j));
           }
         }
       }

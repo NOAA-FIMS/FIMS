@@ -14,8 +14,10 @@ build
 CONTRIBUTING.md
 fims.log
 ^doc$
+^doxygen$
 ^Meta$
 ^_pkgdown\.yml$
 ^docs$
 ^pkgdown$
 ^assets$
+setup_fims.sh

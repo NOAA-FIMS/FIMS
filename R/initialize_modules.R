@@ -1,9 +1,11 @@
 # To remove the WARNING
 # no visible binding for global variable
 utils::globalVariables(c(
+  "distribution_link", "distribution_type",
+  "fleet_name",
   "type", "name", "value", "unit", "uncertainty",
   "timing", "age", "length", "year",
-  # Used in initialize_comp dplyr code
+  "temp_name",
   "valid_n"
 ))
 
@@ -628,21 +630,59 @@ initialize_comp <- function(data,
   return(module)
 }
 
-#' Initialize FIMS modules
+#' Initialize C++ modules via Rcpp for a FIMS model
 #'
 #' @description
-#' Initializes multiple modules within the Fisheries Integrated Modeling System
-#' (FIMS), including fleet, recruitment, growth, maturity, and population
-#' modules. This function iterates over the provided fleets, setting up
-#' necessary sub-modules such as selectivity, index, and age composition. It
-#' also sets up distribution models for fishery index and age-composition data.
-#' @param parameters A tibble. Contains parameters and modules required for
-#'   initialization.
-#' @param data An S4 object. FIMS input data.
+#' This function uses information from a parameter data frame that stores the
+#' model specifications and a`FIMSFrame` object that stores the data to
+#' instantiate, i.e., create an instance of a class, the required C++ modules.
+#' Several C++ modules are needed to run a FIMS model and the required modules
+#' will be different for each model type. For example, for a catch-at-age
+#' model one needs to instantiate recruitment, growth, and maturity modules and
+#' at least one fleet and population module.
+#'
+#' @param parameters A tibble returned from [create_default_parameters()]. The
+#'   tibble can be nested, i.e., contain a data column, or unnested, i.e.,
+#'   `tidyr::unnest(create_default_parameters(), cols = "data")`. Regardless, it
+#'   is the primary source of information for what is initialized. That is, if a
+#'   fleet exists in the data but parameter information for how to specify
+#'   selectivity for that fleet is not provided, then selectivity will not be
+#'   initialized for that fleet.
+#' @param data An S4 object with the `FIMSFrame` class, which is returned from
+#'   [FIMSFrame()]. Passing the data is required because initialization of the
+#'   modules requires passing the data and information regarding the uncertainty
+#'   of that data, i.e., input sample sizes for the multinomial distribution.
 #' @return
-#' A list containing parameters for the initialized FIMS modules, ready for use
-#' in TMB modeling.
+#' A list is returned with two elements, `parameters` and `model`. The list can
+#' be passed to the `input` argument of [fit_fims()] to fit the model. The first
+#' element of the list can also be passed to the `parameters` argument of
+#' [TMB::MakeADFun()] if you wish to have more control over the model-fitting
+#' process.
+#' The model element of the returned list stores the instantiated C++ model
+#' module, e.g., the results of `methods::new(CatchAtAge)` for a catch-at-age
+#' model.
+#' It is important that you only have one FIMS model initialized in your R
+#' workspace at a time. Thus, after you initialize and fit the model, you should
+#' run [clear()].
 #' @export
+#' @seealso
+#' * [create_default_configurations()]
+#' * [create_default_parameters()]
+#' * [FIMSFrame()]
+#' * [fit_fims()]
+#' * [clear()]
+#' @examples
+#' \dontrun{
+#' # Prepare data for FIMS model
+#' data("data1", package = "FIMS")
+#' data_4_model <- FIMSFrame(data1)
+#' # Instantiate modules
+#' parameters_list <- data_4_model |>
+#'   create_default_configurations() |>
+#'   create_default_parameters(data = data_4_model) |>
+#'   initialize_fims(data = data_4_model)
+#' clear()
+#' }
 initialize_fims <- function(parameters, data) {
   # Validate parameters input
   if (missing(parameters) || !tibble::is_tibble(parameters)) {
@@ -656,6 +696,8 @@ initialize_fims <- function(parameters, data) {
   }
 
   # Check if estimation_type is within "constant", "fixed_effect", "random_effect"
+  # Validates supported estimation types to avoid errors later when
+  #
   valid_estimation_types <- c("constant", "fixed_effects", "random_effects")
   invalid_estimation_types <- parameters |>
     dplyr::filter(!estimation_type %in% valid_estimation_types) |>

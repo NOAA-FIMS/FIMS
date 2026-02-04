@@ -1,8 +1,10 @@
 # To remove the NOTE
 # no visible binding for global variable
 utils::globalVariables(c(
-  "parameter_id", "module_name", "module_id", "label", "initial.x", "initial.y",
-  "estimate.x", "estimate.y",
+  "parameter_id", "module_name", "module_id", "label",
+  "estimate", "estimate.x", "estimate.y",
+  "initial", "initial.x", "initial.y",
+  "uncertainty.x", "uncertainty.y",
   "derived_quantity_id",
   "distribution", "module_type", "n", "type_id", "values",
   "module_name.x", "module_name.y",
@@ -220,7 +222,7 @@ methods::setMethod(
 
     # Reshape the TMB output into a standardized data frame.
     # This serves as the "expected" result to compare against.
-    tmb_output <- FIMS:::reshape_tmb_estimates(
+    tmb_output <- reshape_tmb_estimates(
       obj = obj,
       sdreport = sdreport,
       opt = opt,

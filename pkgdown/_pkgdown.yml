@@ -25,7 +25,6 @@ articles:
 - title: FIMS
   contents:
   - fims-demo
-  - fims-demo-minimal
   - fims-logging
   - fims-user-setup-guide
   - fims-demo-projections
@@ -68,6 +67,12 @@ reference:
   - has_keyword("developer")
   - use_testthat_template
   - starts_with("reshape_")
+
+- title: Exported C++ functions and classes
+  desc: Links to the relevant doxygen documentation for the C++ code.
+  contents:
+  - Cpp_classes
+  - Cpp_functions
 
 news:
   releases:
