@@ -16,6 +16,7 @@ on.exit(rm(fims_frame), add = TRUE)
 
 # Initialize an EWAAGrowth object
 ewaa_growth <- methods::new(EWAAGrowth)
+ewaa_growth$n_years$set(get_n_years(fims_frame))
 # Assign age data to the EWAAGrowth object
 ages <- get_ages(fims_frame)
 ewaa_growth$ages$resize(length(ages))
@@ -56,6 +57,7 @@ clear()
 test_that("EWAAGrowth evaluate() doesn't work when missing weights", {
   # Initialize an EWAAGrowth object
   ewaa_growth <- methods::new(EWAAGrowth)
+  ewaa_growth$n_years$set(get_n_years(fims_frame))
   # Assign age data to the EWAAGrowth object
   ewaa_growth$ages$resize(length(ages))
   purrr::walk(
@@ -72,6 +74,7 @@ test_that("EWAAGrowth evaluate() doesn't work when missing weights", {
 test_that("EWAAGrowth evaluate() returns expected error for mismatched input lengths", {
   # Initialize an EWAAGrowth object
   ewaa_growth <- methods::new(EWAAGrowth)
+  ewaa_growth$n_years$set(get_n_years(fims_frame))
   # Assign age data and intentionally mismatch the length of ages and weights
   age_vector_long <- c(get_ages(fims_frame), 13)
   ewaa_growth$ages$resize(length(age_vector_long))
@@ -88,7 +91,7 @@ test_that("EWAAGrowth evaluate() returns expected error for mismatched input len
   #' @description Test that EWAAGrowth evaluate() throws an error when the lengths of ages and weights don't match.
   expect_error(
     ewaa_growth$evaluate(1),
-    regexp = "ages and weights must be the same length",
+    regexp = "does not match ages size or ages size times n_years",
     ignore.case = FALSE
   )
   # Clear any previous FIMS settings
