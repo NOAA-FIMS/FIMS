@@ -31,152 +31,176 @@ RCPP_EXPOSED_CLASS(SharedReal)
 RCPP_EXPOSED_CLASS(SharedBoolean)
 
 /**
- * @brief The `fims` Rcpp module construct, providing declarative code of what
- * the module exposes to R.
+ * @brief Define fims C++ functions and classes exposed in R
+ * 
+ * @details
+ * The use of `RCPP_MODULE()` allows for exporting of specific C++ code to the
+ * R environment, making it callable from R, i.e., providing declarative code
+ * of what the module exposes to R.
  *
- * @details Each element included in the module should have a name, a pointer,
- * and a description separated by commas in that order. Both the name and the
- * description should be wrapped in quotes. The description is printed to the
- * screen when the R function `methods::show()` is used on the object. The
- * available description should exactly match the information found in the
- * brief tag where the function, class, etc. is documented. See the Rcpp
- * vignette for more information on documenting modules, particularly how to
- * include lists for parameters to a function. Each of the functions included
- * in this module should be exported by manually exporting them in
- * R/FIMS-package.R.
+ * Each element included in the module should have a name, a pointer, and a
+ * description separated by commas in that order. Elements can be functions or
+ * classes. Within an element, both the name and the description should be
+ * wrapped in quotes.
+ *
+ * The description is printed to the in R when users run `methods::show()` on
+ * a function or class within the RCPP_MODULE, e.g., `methods::show(Parameter)`.
+ * Thus, information in the description should either link to the relevant
+ * doxygen documentation for the C++ class or function or exactly duplicate
+ * what is written in the doxygen.
+ *
+ * Each of the functions included in this module should be exported by manually
+ * exporting them in R/FIMS-package.R. Typically, R packages that use C++ would
+ * take care a lot of this stuff automatically using `Rcpp::export` calls in the
+ * C++ documentation but we cannot do that within FIMS because of how the
+ * package is compiled.
  *
  */
 RCPP_MODULE(fims) {
   Rcpp::function(
-      "CreateTMBModel", &CreateTMBModel,
-      "Creates the TMB model object and adds interface objects to it.");
-  Rcpp::function("set_fixed", &set_fixed_parameters,
-                 "Sets the fixed parameters vector object.");
-  Rcpp::function("get_fixed", &get_fixed_parameters_vector,
-                 "Gets the fixed parameters vector object.");
-  Rcpp::function("set_random", &set_random_parameters,
-                 "Sets the random parameters vector object.");
-  Rcpp::function("get_random", &get_random_parameters_vector,
-                 "Gets the random parameters vector object.");
-  Rcpp::function("get_parameter_names", &get_parameter_names,
-                 "Gets the parameter names object.");
-  Rcpp::function("get_random_names", &get_random_names,
-                 "Gets the random effects names object.");
-  Rcpp::function("clear", clear,
-                 "Clears all pointers/references of a FIMS model.");
-  Rcpp::function("get_log", get_log,
-                 "Gets the log entries as a string in JSON format.");
+      "CreateTMBModel",
+      &CreateTMBModel,
+      "See https://noaa-fims.github.io/doxygen/rcpp__interface_8hpp.html.");
   Rcpp::function(
-      "get_log_errors", get_log_errors,
-      "Gets the error entries from the log as a string in JSON format.");
+      // TODO: fix the naming mismatch
+      "set_fixed",
+      &set_fixed_parameters,
+      "See https://noaa-fims.github.io/doxygen/rcpp__interface_8hpp.html.");
   Rcpp::function(
-      "get_log_warnings", get_log_warnings,
-      "Gets the warning entries from the log as a string in JSON format.");
+      // TODO: fix the naming mismatch
+      "get_fixed",
+      &get_fixed_parameters_vector,
+      "See https://noaa-fims.github.io/doxygen/rcpp__interface_8hpp.html.");
   Rcpp::function(
-      "get_log_info", get_log_info,
-      "Gets the info entries from the log as a string in JSON format.");
-  Rcpp::function("get_log_module", get_log_module,
-                 "Gets log entries by module as a string in JSON format.");
-  Rcpp::function("write_log", write_log, "If true, writes the log on exit.");
-  Rcpp::function("set_log_path", set_log_path,
-                 "Sets the path for the log file to be written to.");
+      // TODO: fix the naming mismatch
+      "set_random",
+      &set_random_parameters,
+      "See https://noaa-fims.github.io/doxygen/rcpp__interface_8hpp.html.");
   Rcpp::function(
-      "init_logging", init_logging,
-      "Initializes the logging system, setting all signal handling.");
+      // TODO: fix the naming mismatch
+      "get_random",
+      &get_random_parameters_vector,
+      "See https://noaa-fims.github.io/doxygen/rcpp__interface_8hpp.html.");
   Rcpp::function(
-      "set_log_throw_on_error", set_log_throw_on_error,
-      "If true, throws a runtime exception when an error is logged.");
-  Rcpp::function("log_info", log_info,
-                 "Adds an info entry to the log from the R environment.");
-  Rcpp::function("log_warning", log_warning,
-                 "Adds a warning entry to the log from the R environment.");
-  Rcpp::function("log_error", log_error,
-                 "Adds a error entry to the log from the R environment.");
-  Rcpp::function("logit", logit_rcpp,
-                 "Applies the logit transformation: -log(b - x) + log(x - a).");
+      "get_parameter_names",
+      &get_parameter_names,
+      "See https://noaa-fims.github.io/doxygen/rcpp__interface_8hpp.html.");
   Rcpp::function(
-      "inv_logit", inv_logit_rcpp,
-      "Applies the inverse of the logit transformation to a bounded space.");
+      "get_random_names",
+      &get_random_names,
+      "See https://noaa-fims.github.io/doxygen/rcpp__interface_8hpp.html.");
+  Rcpp::function(
+      "clear",
+      clear,
+      "See https://noaa-fims.github.io/doxygen/rcpp__interface_8hpp.html.");
+  Rcpp::function(
+      "get_log",
+      get_log,
+      "See https://noaa-fims.github.io/doxygen/rcpp__interface_8hpp.html.");
+  Rcpp::function(
+      "get_log_errors",
+      get_log_errors,
+      "See https://noaa-fims.github.io/doxygen/rcpp__interface_8hpp.html.");
+  Rcpp::function(
+      "get_log_warnings",
+      get_log_warnings,
+      "See https://noaa-fims.github.io/doxygen/rcpp__interface_8hpp.html.");
+  Rcpp::function(
+      "get_log_info",
+      get_log_info,
+      "See https://noaa-fims.github.io/doxygen/rcpp__interface_8hpp.html.");
+  Rcpp::function(
+      "get_log_module",
+      get_log_module,
+      "See https://noaa-fims.github.io/doxygen/rcpp__interface_8hpp.html.");
+  Rcpp::function(
+      "write_log",
+      write_log,
+      "See https://noaa-fims.github.io/doxygen/rcpp__interface_8hpp.html.");
+  Rcpp::function(
+      "set_log_path",
+      set_log_path,
+      "See https://noaa-fims.github.io/doxygen/rcpp__interface_8hpp.html.");
+  Rcpp::function(
+      "init_logging",
+      init_logging,
+      "See https://noaa-fims.github.io/doxygen/rcpp__interface_8hpp.html.");
+  Rcpp::function(
+      "set_log_throw_on_error",
+      set_log_throw_on_error,
+      "See https://noaa-fims.github.io/doxygen/rcpp__interface_8hpp.html.");
+  Rcpp::function(
+      "log_info",
+      log_info,
+      "See https://noaa-fims.github.io/doxygen/rcpp__interface_8hpp.html.");
+  Rcpp::function(
+      "log_warning",
+      log_warning,
+      "See https://noaa-fims.github.io/doxygen/rcpp__interface_8hpp.html.");
+  Rcpp::function(
+      "log_error",
+      log_error,
+      "See https://noaa-fims.github.io/doxygen/rcpp__interface_8hpp.html.");
+  Rcpp::function(
+      // TODO: fix the naming mismatch
+      "logit",
+      logit_rcpp,
+      "See https://noaa-fims.github.io/doxygen/rcpp__interface_8hpp.html.");
+  Rcpp::function(
+      // TODO: fix the naming mismatch
+      "inv_logit",
+      inv_logit_rcpp,
+      "See https://noaa-fims.github.io/doxygen/rcpp__interface_8hpp.html.");
+      
   Rcpp::class_<Parameter>(
-      "Parameter", "An RcppInterface class that defines the Parameter class.")
+      "Parameter",
+      "See https://noaa-fims.github.io/doxygen/classParameter.html.")
       .constructor()
       .constructor<double>()
       .constructor<Parameter>()
-      .field("value", &Parameter::initial_value_m,
-             "A numeric value specifying the initial value of the parameter.")
-      .field("value", &Parameter::final_value_m,
-             "A numeric value specifying the final value of the parameter.")
-      .field("min", &Parameter::min_m,
-             "A numeric value specifying the minimum possible parameter value, "
-             "where the default is negative infinity.")
-      .field("max", &Parameter::max_m,
-             "A numeric value specifying the maximum possible parameter value, "
-             "where the default is positive infinity.")
-      .field("id", &Parameter::id_m, "unique id for parameter class")
-      .field("estimation_type", &Parameter::estimation_type_m,
-             "A string that takes three arguments: constant, indicating a "
-             "parameter is not estimated; fixed_effects, indicating a "
-             "parameter is estimated; and random_effects, indicating a "
-             "parameter is estimated; the default is constant.");
+      .field("value", &Parameter::initial_value_m)
+      .field("value", &Parameter::final_value_m)
+      .field("min", &Parameter::min_m)
+      .field("max", &Parameter::max_m)
+      .field("id", &Parameter::id_m)
+      .field("estimation_type", &Parameter::estimation_type_m);
 
   Rcpp::class_<ParameterVector>(
       "ParameterVector",
-      "An RcppInterface class that defines the ParameterVector class.")
+      "See https://noaa-fims.github.io/doxygen/classParameterVector.html.")
       .constructor()
       .constructor<size_t>()
       .constructor<Rcpp::NumericVector, size_t>()
-      .method("get", &ParameterVector::get,
-              "An internal accessor for calling a position of a "
-              "ParameterVector from R.")
-      .method("set", &ParameterVector::set,
-              "An internal setter for setting a position of a ParameterVector "
-              "from R.")
-      .method("show", &ParameterVector::show,
-              "The printing methods for a ParameterVector.")
-      .method("at", &ParameterVector::at,
-              "Returns a Parameter at the indicated position given the index "
-              "argument.")
-      .method("size", &ParameterVector::size,
-              "Returns the size of a ParameterVector.")
-      .method("resize", &ParameterVector::resize,
-              "Resizes a ParameterVector to the desired length.")
-      .method("set_all_estimable", &ParameterVector::set_all_estimable,
-              "Sets all Parameters within a ParameterVector as estimable.")
-      .method("set_all_random", &ParameterVector::set_all_random,
-              "Sets all Parameters within a ParameterVector as random effects.")
-      .method("fill", &ParameterVector::fill,
-              "Sets the value of all Parameters in the ParameterVector to the "
-              "provided value.")
-      .method("get_id", &ParameterVector::get_id,
-              "Gets the ID of the ParameterVector object.");
+      .method("get", &ParameterVector::get)
+      .method("set", &ParameterVector::set)
+      .method("show", &ParameterVector::show)
+      .method("at", &ParameterVector::at)
+      .method("size", &ParameterVector::size)
+      .method("resize", &ParameterVector::resize)
+      .method("set_all_estimable", &ParameterVector::set_all_estimable)
+      .method("set_all_random", &ParameterVector::set_all_random)
+      .method("fill", &ParameterVector::fill)
+      .method("get_id", &ParameterVector::get_id);
+
   Rcpp::class_<RealVector>(
-      "RealVector", "An RcppInterface class that defines the RealVector class.")
+      "RealVector",
+      "See https://noaa-fims.github.io/doxygen/classRealVector.html.")
       .constructor()
       .constructor<size_t>()
       .constructor<Rcpp::NumericVector, size_t>()
-      .method(
-          "get", &RealVector::get,
-          "An internal accessor for calling a position of a RealVector from R.")
-      .method(
-          "set", &RealVector::set,
-          "An internal setter for setting a position of a RealVector from R.")
-      .method("fromRVector", &RealVector::fromRVector,
-              "Initializes the RealVector from the values of a R vector.")
-      .method("toRVector", &RealVector::toRVector,
-              "Returns values as a R vector.")
-      .method("show", &RealVector::show,
-              "The printing methods for a RealVector.")
-      .method("at", &RealVector::at,
-              "Returns a double at the indicated position given the index "
-              "argument.")
-      .method("size", &RealVector::size, "Returns the size of a RealVector.")
-      .method("resize", &RealVector::resize,
-              "Resizes a RealVector to the desired length.")
-      .method("get_id", &RealVector::get_id,
-              "Gets the ID of the RealVector object.");
+      .method("get", &RealVector::get)
+      .method("set", &RealVector::set)
+      .method("fromRVector", &RealVector::fromRVector)
+      .method("toRVector", &RealVector::toRVector)
+      .method("show", &RealVector::show)
+      .method("at", &RealVector::at)
+      .method("size", &RealVector::size)
+      .method("resize", &RealVector::resize)
+      .method("get_id", &RealVector::get_id);
 
   Rcpp::class_<SharedInt>(
-      "SharedInt", "An RcppInterface class that defines the SharedInt class.")
+      "SharedInt",
+      "See https://noaa-fims.github.io/doxygen/classSharedInt.html.")
       .constructor()
       .constructor<int>()
       .method("get", &SharedInt::get)
@@ -184,7 +208,7 @@ RCPP_MODULE(fims) {
 
   Rcpp::class_<SharedString>(
       "SharedString",
-      "An RcppInterface class that defines the SharedString class.")
+      "See https://noaa-fims.github.io/doxygen/classSharedString.html.")
       .constructor()
       .constructor<std::string>()
       .method("get", &SharedString::get)
@@ -192,50 +216,55 @@ RCPP_MODULE(fims) {
 
   Rcpp::class_<SharedBoolean>(
       "SharedBoolean",
-      "An RcppInterface class that defines the SharedBoolean class.")
+      "See https://noaa-fims.github.io/doxygen/classSharedBoolean.html.")
       .constructor()
       .constructor<bool>()
       .method("get", &SharedBoolean::get)
       .method("set", &SharedBoolean::set);
 
   Rcpp::class_<SharedReal>(
-      "SharedReal", "An RcppInterface class that defines the SharedReal class.")
+      "SharedReal",
+      "See https://noaa-fims.github.io/doxygen/classSharedReal.html.")
       .constructor()
       .constructor<double>()
       .method("get", &SharedReal::get)
       .method("set", &SharedReal::set);
 
-  Rcpp::class_<BevertonHoltRecruitmentInterface>("BevertonHoltRecruitment")
+  Rcpp::class_<BevertonHoltRecruitmentInterface>(
+      "BevertonHoltRecruitment",
+      "See https://noaa-fims.github.io/doxygen/classBevertonHoltRecruitmentInterface.html.")
       .constructor()
       .field("logit_steep", &BevertonHoltRecruitmentInterface::logit_steep)
       .field("log_rzero", &BevertonHoltRecruitmentInterface::log_rzero)
       .field("log_devs", &BevertonHoltRecruitmentInterface::log_devs)
-      .field("log_r", &BevertonHoltRecruitmentInterface::log_r,
-             "recruitment as a random effect on the natural log scale")
+      .field("log_r", &BevertonHoltRecruitmentInterface::log_r)
       .field("log_expected_recruitment",
-             &BevertonHoltRecruitmentInterface::log_expected_recruitment,
-             "expected recruitment as a random effect on the natural log scale")
-      .field("n_years", &BevertonHoltRecruitmentInterface::n_years,
-             "Number of years")
+             &BevertonHoltRecruitmentInterface::log_expected_recruitment)
+      .field("n_years", &BevertonHoltRecruitmentInterface::n_years)
       .method("get_id", &BevertonHoltRecruitmentInterface::get_id)
       .method("SetRecruitmentProcessID",
-              &BevertonHoltRecruitmentInterface::SetRecruitmentProcessID,
-              "Set unique ID for recruitment process")
+              &BevertonHoltRecruitmentInterface::SetRecruitmentProcessID)
       .method("evaluate_mean",
               &BevertonHoltRecruitmentInterface::evaluate_mean);
 
-  Rcpp::class_<LogDevsRecruitmentInterface>("LogDevsRecruitmentProcess")
+  Rcpp::class_<LogDevsRecruitmentInterface>(
+    "LogDevsRecruitmentProcess",
+      "See https://noaa-fims.github.io/doxygen/classLogDevsRecruitmentInterface.html.")
       .constructor()
       .method("get_id", &LogDevsRecruitmentInterface::get_id)
       .method("evaluate_process",
               &LogDevsRecruitmentInterface::evaluate_process);
 
-  Rcpp::class_<LogRRecruitmentInterface>("LogRRecruitmentProcess")
+  Rcpp::class_<LogRRecruitmentInterface>(
+    "LogRRecruitmentProcess",
+      "See https://noaa-fims.github.io/doxygen/classLogRRecruitmentInterface.html.")
       .constructor()
       .method("get_id", &LogRRecruitmentInterface::get_id)
       .method("evaluate_process", &LogRRecruitmentInterface::evaluate_process);
 
-  Rcpp::class_<FleetInterface>("Fleet")
+  Rcpp::class_<FleetInterface>(
+      "Fleet",
+      "See https://noaa-fims.github.io/doxygen/classFleetInterface.html.")
       .constructor()
       .field("log_q", &FleetInterface::log_q)
       .field("log_Fmort", &FleetInterface::log_Fmort)
@@ -274,67 +303,68 @@ RCPP_MODULE(fims) {
               &FleetInterface::GetObservedLandingsDataID)
       .method("SetSelectivityID", &FleetInterface::SetSelectivityID);
 
-  Rcpp::class_<AgeCompDataInterface>("AgeComp")
+  Rcpp::class_<AgeCompDataInterface>(
+      "AgeComp",
+      "See https://noaa-fims.github.io/doxygen/classAgeCompDataInterface.html.")
       .constructor<int, int>()
       .field("age_comp_data", &AgeCompDataInterface::age_comp_data)
       .method("get_id", &AgeCompDataInterface::get_id);
 
-  Rcpp::class_<LengthCompDataInterface>("LengthComp")
+  Rcpp::class_<LengthCompDataInterface>(
+      "LengthComp",
+      "See https://noaa-fims.github.io/doxygen/classLengthCompDataInterface.html.")
       .constructor<int, int>()
       .field("length_comp_data", &LengthCompDataInterface::length_comp_data)
       .method("get_id", &LengthCompDataInterface::get_id);
 
-  Rcpp::class_<LandingsDataInterface>("Landings")
+  Rcpp::class_<LandingsDataInterface>(
+      "Landings",
+      "See https://noaa-fims.github.io/doxygen/classLandingsDataInterface.html.")
       .constructor<int>()
       .field("landings_data", &LandingsDataInterface::landings_data)
       .method("get_id", &LandingsDataInterface::get_id);
 
-  Rcpp::class_<IndexDataInterface>("Index")
+  Rcpp::class_<IndexDataInterface>(
+      "Index",
+      "See https://noaa-fims.github.io/doxygen/classIndexDataInterface.html.")
       .constructor<int>()
       .field("index_data", &IndexDataInterface::index_data)
       .method("get_id", &IndexDataInterface::get_id);
 
-  Rcpp::class_<PopulationInterface>("Population")
+  Rcpp::class_<PopulationInterface>(
+      "Population",
+      "See https://noaa-fims.github.io/doxygen/classPopulationInterface.html.")
       .constructor()
-      .method("get_id", &PopulationInterface::get_id, "get population ID")
-      .field("n_ages", &PopulationInterface::n_ages, "number of ages")
-      .field("n_fleets", &PopulationInterface::n_fleets, "number of fleets")
-      .field("n_years", &PopulationInterface::n_years, "number of years")
-      .field("n_lengths", &PopulationInterface::n_lengths, "number of lengths")
-      .field("log_M", &PopulationInterface::log_M,
-             "natural log of the natural mortality of the population")
-      .field("log_f_multiplier", &PopulationInterface::log_f_multiplier,
-             "natural log of the annual fishing mortality multiplier of the "
-             "population")
+      .method("get_id", &PopulationInterface::get_id)
+      .field("n_ages", &PopulationInterface::n_ages)
+      .field("n_fleets", &PopulationInterface::n_fleets)
+      .field("n_years", &PopulationInterface::n_years)
+      .field("n_lengths", &PopulationInterface::n_lengths)
+      .field("log_M", &PopulationInterface::log_M)
+      .field("log_f_multiplier", &PopulationInterface::log_f_multiplier)
       .field("spawning_biomass_ratio",
-             &PopulationInterface::spawning_biomass_ratio,
-             "population spawning biomass ratio for each year")
-      .field("log_init_naa", &PopulationInterface::log_init_naa,
-             "natural log of the initial numbers at age")
-      .field("ages", &PopulationInterface::ages,
-             "vector of ages in the population; length n_ages")
-      .method("SetMaturityID", &PopulationInterface::SetMaturityID,
-              "Set the unique id for the Maturity object")
-      .method("SetGrowthID", &PopulationInterface::SetGrowthID,
-              "Set the unique id for the growth object")
-      .method("SetRecruitmentID", &PopulationInterface::SetRecruitmentID,
-              "Set the unique id for the Recruitment object")
-      .method("AddFleet", &PopulationInterface::AddFleet,
-              "Set a unique fleet id to the list of fleets operating on this "
-              "population")
-      .method("SetName", &PopulationInterface::SetName,
-              "Set the name of the population")
-      .method("GetName", &PopulationInterface::GetName,
-              "Get the name of the population");
+             &PopulationInterface::spawning_biomass_ratio)
+      .field("log_init_naa", &PopulationInterface::log_init_naa)
+      .field("ages", &PopulationInterface::ages)
+      .method("SetMaturityID", &PopulationInterface::SetMaturityID)
+      .method("SetGrowthID", &PopulationInterface::SetGrowthID)
+      .method("SetRecruitmentID", &PopulationInterface::SetRecruitmentID)
+      .method("AddFleet", &PopulationInterface::AddFleet)
+      .method("SetName", &PopulationInterface::SetName)
+      .method("GetName", &PopulationInterface::GetName);
 
-  Rcpp::class_<LogisticMaturityInterface>("LogisticMaturity")
+  Rcpp::class_<LogisticMaturityInterface>(
+      "LogisticMaturity",
+      "See https://noaa-fims.github.io/doxygen/classLogisticMaturityInterface.html.")
       .constructor()
       .field("inflection_point", &LogisticMaturityInterface::inflection_point)
       .field("slope", &LogisticMaturityInterface::slope)
       .method("get_id", &LogisticMaturityInterface::get_id)
       .method("evaluate", &LogisticMaturityInterface::evaluate);
 
-  Rcpp::class_<LogisticSelectivityInterface>("LogisticSelectivity")
+  Rcpp::class_<LogisticSelectivityInterface>(
+      "LogisticSelectivity",
+      "See https://noaa-fims.github.io/doxygen/classLogisticSelectivityInterface.html.")
       .constructor()
       .field("inflection_point",
              &LogisticSelectivityInterface::inflection_point)
@@ -342,33 +372,22 @@ RCPP_MODULE(fims) {
       .method("get_id", &LogisticSelectivityInterface::get_id)
       .method("evaluate", &LogisticSelectivityInterface::evaluate);
 
-  Rcpp::class_<DoubleLogisticSelectivityInterface>("DoubleLogisticSelectivity")
+  Rcpp::class_<DoubleLogisticSelectivityInterface>(
+      "DoubleLogisticSelectivity",
+      "See https://noaa-fims.github.io/doxygen/classDoubleLogisticSelectivityInterface.html.")
       .constructor()
       .field("inflection_point_asc",
-             &DoubleLogisticSelectivityInterface::inflection_point_asc,
-             "50 percent quantile of the value of the quantity of interest (x) "
-             " on the ascending limb of the double logistic curve; e.g., age "
-             "at  which 50 percent of the fish are selected.")
-      .field("slope_asc", &DoubleLogisticSelectivityInterface::slope_asc,
-             "Scalar multiplier of difference between quantity of interest "
-             "value (x) and inflection_point on the ascending limb of the "
-             "double logistic curve.")
+             &DoubleLogisticSelectivityInterface::inflection_point_asc)
+      .field("slope_asc", &DoubleLogisticSelectivityInterface::slope_asc)
       .field("inflection_point_desc",
-             &DoubleLogisticSelectivityInterface::inflection_point_desc,
-             "50 percent quantile of the value of the quantity of interest (x) "
-             "on the descending limb of the double logistic curve; e.g. age at "
-             "which 50 percent of the fish are selected.")
-      .field("slope_desc", &DoubleLogisticSelectivityInterface::slope_desc,
-             "Scalar multiplier of difference between quantity of interest  "
-             "value (x) and inflection_point on the descending limb of the "
-             "double  logistic  curve.")
-      .method("get_id", &DoubleLogisticSelectivityInterface::get_id,
-              "Returns a unique ID for the selectivity class.")
-      .method("evaluate", &DoubleLogisticSelectivityInterface::evaluate,
-              "Evaluates the double logistic selectivity given input value "
-              "(e.g., age or size in selectivity).");
+             &DoubleLogisticSelectivityInterface::inflection_point_desc)
+      .field("slope_desc", &DoubleLogisticSelectivityInterface::slope_desc)
+      .method("get_id", &DoubleLogisticSelectivityInterface::get_id)
+      .method("evaluate", &DoubleLogisticSelectivityInterface::evaluate);
 
-  Rcpp::class_<EWAAGrowthInterface>("EWAAGrowth")
+  Rcpp::class_<EWAAGrowthInterface>(
+      "EWAAGrowth",
+      "See https://noaa-fims.github.io/doxygen/classEWAAGrowthInterface.html.")
       .constructor()
       .field("ages", &EWAAGrowthInterface::ages, "Ages for each age class.")
       .field("weights", &EWAAGrowthInterface::weights,
@@ -376,87 +395,56 @@ RCPP_MODULE(fims) {
       .method("get_id", &EWAAGrowthInterface::get_id)
       .method("evaluate", &EWAAGrowthInterface::evaluate);
 
-  Rcpp::class_<DnormDistributionsInterface>("DnormDistribution")
+  Rcpp::class_<DnormDistributionsInterface>(
+      "DnormDistribution",
+      "See https://noaa-fims.github.io/doxygen/classDnormDistributionsInterface.html.")
       .constructor()
-      .method("get_id", &DnormDistributionsInterface::get_id,
-              "Returns a unique ID for the Dnorm distribution class.")
-      .method("evaluate", &DnormDistributionsInterface::evaluate,
-              "Evaluates the normal distribution given input data and "
-              "parameter values.")
+      .method("get_id", &DnormDistributionsInterface::get_id)
+      .method("evaluate", &DnormDistributionsInterface::evaluate)
       .method("set_observed_data",
-              &DnormDistributionsInterface::set_observed_data,
-              "Accepts a unique ID for a given Data Object class to link the "
-              "data with the distribution.")
+              &DnormDistributionsInterface::set_observed_data)
       .method("set_distribution_mean",
-              &DnormDistributionsInterface::set_distribution_mean,
-              "Accepts a value for the expected distribution mean "
-              "creates a fixed effect estimated mean.")
+              &DnormDistributionsInterface::set_distribution_mean)
       .method("set_distribution_links",
-              &DnormDistributionsInterface::set_distribution_links,
-              "Accepts a unique ID for a given parameter to link the parameter "
-              "with the distribution.")
-      .field("x", &DnormDistributionsInterface::x,
-             "Input for distribution when not observations, e.g., prior or "
-             "random effect.")
-      .field("expected_values", &DnormDistributionsInterface::expected_values,
-             "Mean of the distribution.")
-      .field("expected_mean", &DnormDistributionsInterface::expected_mean,
-             "The expected mean of the distribution.")
-      .field("log_sd", &DnormDistributionsInterface::log_sd,
-             "The natural log of the standard deviation.");
+              &DnormDistributionsInterface::set_distribution_links)
+      .field("x", &DnormDistributionsInterface::x)
+      .field("expected_values", &DnormDistributionsInterface::expected_values)
+      .field("expected_mean", &DnormDistributionsInterface::expected_mean)
+      .field("log_sd", &DnormDistributionsInterface::log_sd);
 
-  Rcpp::class_<DlnormDistributionsInterface>("DlnormDistribution")
+  Rcpp::class_<DlnormDistributionsInterface>(
+      "DlnormDistribution",
+      "See https://noaa-fims.github.io/doxygen/classDlnormDistributionsInterface.html.")
       .constructor()
-      .method("get_id", &DlnormDistributionsInterface::get_id,
-              "Returns a unique ID for the Dnorm distribution class.")
-      .method("evaluate", &DlnormDistributionsInterface::evaluate,
-              "Evaluates the normal distribution given input data and "
-              "parameter values.")
+      .method("get_id", &DlnormDistributionsInterface::get_id)
+      .method("evaluate", &DlnormDistributionsInterface::evaluate)
       .method("set_observed_data",
-              &DlnormDistributionsInterface::set_observed_data,
-              "Accepts a unique ID for a given Data Object class to link the "
-              "data with the distribution.")
+              &DlnormDistributionsInterface::set_observed_data)
       .method("set_distribution_links",
-              &DlnormDistributionsInterface::set_distribution_links,
-              "Accepts a unique ID for a given parameter to link the parameter "
-              "with the distribution.")
-      .field("x", &DlnormDistributionsInterface::x,
-             "Input for distribution when not observations, e.g., prior or "
-             "random effect.")
-      .field("expected_values", &DlnormDistributionsInterface::expected_values,
-             "Mean of the distribution on the natural log scale.")
-      .field("log_sd", &DlnormDistributionsInterface::log_sd,
-             "The natural log of the standard deviation of the distribution on "
-             "the natural log scale.");
+              &DlnormDistributionsInterface::set_distribution_links)
+      .field("x", &DlnormDistributionsInterface::x)
+      .field("expected_values", &DlnormDistributionsInterface::expected_values)
+      .field("log_sd", &DlnormDistributionsInterface::log_sd);
 
-  Rcpp::class_<DmultinomDistributionsInterface>("DmultinomDistribution")
+  Rcpp::class_<DmultinomDistributionsInterface>(
+      "DmultinomDistribution",
+      "See https://noaa-fims.github.io/doxygen/classDmultinomDistributionsInterface.html.")
       .constructor()
-      .method("get_id", &DmultinomDistributionsInterface::get_id,
-              "Returns a unique ID for the Dnorm distribution class.")
-      .method("evaluate", &DmultinomDistributionsInterface::evaluate,
-              "Evaluates the normal distribution given input data and "
-              "parameter values.")
+      .method("get_id", &DmultinomDistributionsInterface::get_id)
+      .method("evaluate", &DmultinomDistributionsInterface::evaluate)
       .method("set_observed_data",
-              &DmultinomDistributionsInterface::set_observed_data,
-              "Accepts a unique ID for a given Data Object class to link the "
-              "data with the distribution.")
+              &DmultinomDistributionsInterface::set_observed_data)
       .method("set_distribution_links",
-              &DmultinomDistributionsInterface::set_distribution_links,
-              "Accepts a unique ID for a given parameter to link the parameter "
-              "with the distribution.")
+              &DmultinomDistributionsInterface::set_distribution_links)
       .method("set_note", &DmultinomDistributionsInterface::set_note)
-      .field("x", &DmultinomDistributionsInterface::x,
-             "Input for distribution when not observations, e.g., prior or "
-             "random effect.")
+      .field("x", &DmultinomDistributionsInterface::x)
       .field("expected_values",
-             &DmultinomDistributionsInterface::expected_values,
-             "numeric non-negative vector of length K, specifying the "
-             "probability for the K classes.")
-      .field(
-          "dims", &DmultinomDistributionsInterface::dims,
-          "dimension of the multivariate input, e.g., c(num rows, num cols).");
+             &DmultinomDistributionsInterface::expected_values)
+      .field("dims", &DmultinomDistributionsInterface::dims);
 
-  Rcpp::class_<CatchAtAgeInterface>("CatchAtAge")
+  Rcpp::class_<CatchAtAgeInterface>(
+      "CatchAtAge",
+      "See https://noaa-fims.github.io/doxygen/classCatchAtAgeInterface.html.")
       .constructor()
       .method("AddPopulation", &CatchAtAgeInterface::AddPopulation)
       .method("get_output", &CatchAtAgeInterface::to_json)
