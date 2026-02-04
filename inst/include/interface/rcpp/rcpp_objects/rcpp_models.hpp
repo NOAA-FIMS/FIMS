@@ -16,6 +16,7 @@
 #include "rcpp_population.hpp"
 
 #include "rcpp_interface_base.hpp"
+#include "rcpp_depletion.hpp"
 #include "rcpp_population.hpp"
 #include "rcpp_fleet.hpp"
 #include "rcpp_maturity.hpp"
@@ -42,7 +43,17 @@ class FisheryModelInterfaceBase : public FIMSRcppInterfaceBase {
    */
   uint32_t id;
   /**
-   * @brief The map associating the IDs of FleetInterfaceBase to the objects.
+   * @brief The set of population ids that this catch at age model operates on.
+   */
+  std::shared_ptr<std::set<uint32_t>> population_ids;
+  /**
+   * @brief A private working map of standard error values for all
+   * concatenated derived quantities. Elements are extracted in the
+   * to_json method.
+   */
+  std::map<std::string, std::vector<double>> se_values;
+  /**
+   * @brief The map associating the IDs of FisheryModelInterfaceBase to the objects.
    * This is a live object, which is an object that has been created and lives
    * in memory.
    */
@@ -65,7 +76,9 @@ class FisheryModelInterfaceBase : public FIMSRcppInterfaceBase {
    * @param other
    */
   FisheryModelInterfaceBase(const FisheryModelInterfaceBase &other)
-      : id(other.id) {}
+      : id(other.id),
+      population_ids(other.population_ids),
+      se_values(other.se_values) {}
 
   /**
    * @brief The destructor.
@@ -103,21 +116,12 @@ std::map<uint32_t, std::shared_ptr<FisheryModelInterfaceBase>>
  * CatchAtAge model. It inherits from the FisheryModelInterfaceBase class.
  */
 class CatchAtAgeInterface : public FisheryModelInterfaceBase {
-  /**
-   * @brief The set of population ids that this catch at age model operates on.
-   */
-  std::shared_ptr<std::set<uint32_t>> population_ids;
-  /**
+
+   /**
    * @brief Iterator for population ids.
    */
   typedef typename std::set<uint32_t>::iterator population_id_iterator;
 
-  /**
-   * @brief A private working map of standard error values for all
-   * concatenated derived quantities. Elements are extracted in the
-   * to_json method.
-   */
-  std::map<std::string, std::vector<double>> se_values;
 
  public:
   /**
@@ -137,8 +141,7 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
    * @param other
    */
   CatchAtAgeInterface(const CatchAtAgeInterface &other)
-      : FisheryModelInterfaceBase(other),
-        population_ids(other.population_ids) {}
+      : FisheryModelInterfaceBase(other) {}
 
   /**
    * Method to add a population id to the set of population ids.
@@ -1477,5 +1480,284 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
 
 #endif
 };
+
+/**
+ * @brief The SurplusProduction class is used to interface with the
+ * SurplusProduction model. It inherits from the FisheryModelInterfaceBase
+ * class.
+ */
+class SurplusProductionInterface : public FisheryModelInterfaceBase {
+  typedef typename std::set<uint32_t>::iterator population_id_iterator;
+
+ public:
+  /**
+   * @brief The constructor.
+   */
+  SurplusProductionInterface() : FisheryModelInterfaceBase() {
+    this->population_ids = std::make_shared<std::set<uint32_t>>();
+    std::shared_ptr<SurplusProductionInterface> surplus_production =
+        std::make_shared<SurplusProductionInterface>(*this);
+    FIMSRcppInterfaceBase::fims_interface_objects.push_back(surplus_production);
+    FisheryModelInterfaceBase::live_objects[this->id] = surplus_production;
+  }
+
+  /**
+   * @brief Construct a new Surplus Production Interface object
+   *
+   * @param other
+   */
+  SurplusProductionInterface(const SurplusProductionInterface &other)
+      : FisheryModelInterfaceBase(other) {}
+
+  /**
+   * Method to add a population id to the set of population ids.
+   */
+  void AddPopulation(uint32_t id) {
+    this->population_ids->insert(id);
+    std::map<uint32_t, std::shared_ptr<PopulationInterfaceBase>>::iterator pit;
+    pit = PopulationInterfaceBase::live_objects.find(id);
+    if (pit != PopulationInterfaceBase::live_objects.end()) {
+      std::shared_ptr<PopulationInterfaceBase> &pop = (*pit).second;
+      pop->initialize_surplus_production.set(true);
+    } else {
+      FIMS_ERROR_LOG("Population with id " + fims::to_string(id) +
+                     " not found.");
+    }
+  }
+
+   /**
+   * @brief Enable or disable reporting for the SurplusProduction model.
+   *
+   * @details This method is used to control whether reporting is performed for
+   * the SurplusProduction model. The implementation may depend on TMB_MODEL.
+   * @param report Boolean flag to enable (true) or disable (false) reporting.
+   */
+  void DoReporting(bool report) {
+#ifdef TMB_MODEL
+    std::shared_ptr<fims_info::Information<double>> info =
+        fims_info::Information<double>::GetInstance();
+    typename fims_info::Information<double>::model_map_iterator model_it;
+    model_it = info->models_map.find(this->get_id());
+    if (model_it != info->models_map.end()) {
+      std::shared_ptr<fims_popdy::SurplusProduction<double>> model_ptr =
+          std::dynamic_pointer_cast<fims_popdy::SurplusProduction<double>>(
+              (*model_it).second);
+      model_ptr->do_reporting = report;
+    }
+#endif
+  }
+
+  /**
+   * @brief Check if reporting is enabled for the SurplusProduction model.
+   *
+   * @details Returns true if reporting is enabled, false otherwise. The
+   * implementation may depend on TMB_MODEL.
+   * @return Boolean indicating reporting status.
+   */
+  bool IsReporting() {
+#ifdef TMB_MODEL
+    std::shared_ptr<fims_info::Information<double>> info =
+        fims_info::Information<double>::GetInstance();
+    typename fims_info::Information<double>::model_map_iterator model_it;
+    model_it = info->models_map.find(this->get_id());
+    if (model_it != info->models_map.end()) {
+      std::shared_ptr<fims_popdy::SurplusProduction<double>> model_ptr =
+          std::dynamic_pointer_cast<fims_popdy::SurplusProduction<double>>(
+              (*model_it).second);
+      return model_ptr->do_reporting;
+    }
+    return false;
+#else
+    return false;
+#endif
+  }
+
+  /**
+   * @brief Method to get the population id.
+   */
+  virtual uint32_t get_id() {
+    typename std::map<uint32_t,
+                      std::shared_ptr<PopulationInterfaceBase>>::iterator pit;
+    return this->id;
+  }
+
+  /**
+   *
+   */
+  virtual void finalize() {}
+
+  // TODO: implement population_to_json(), derived_quantity_to_json, derived_quantities_component_to_json, fleet_to_json()
+// get_fixed_parameter_vector, get_random_parameter_vector, get_report, to_json,
+//sum, sum, min, valarray
+
+#ifdef TMB_MODEL
+  template <typename Type>
+  bool add_to_fims_tmb_internal() {
+    std::shared_ptr<fims_info::Information<Type>> info =
+        fims_info::Information<Type>::GetInstance();
+
+    std::shared_ptr<fims_popdy::SurplusProduction<Type>> model =
+        std::make_shared<fims_popdy::SurplusProduction<Type>>();
+    population_id_iterator pit;
+    for (pit = this->population_ids->begin(); pit != this->population_ids->end();
+         ++pit) {
+      model->AddPopulation((*pit));
+    }
+
+    std::set<uint32_t> fleet_ids;  // all fleets in the model
+    typedef typename std::set<uint32_t>::iterator fleet_ids_iterator;
+    fleet_ids_iterator fit;
+
+    // add to Information
+    info->models_map[this->get_id()] = model;
+
+    for (pit = this->population_ids->begin(); pit != this->population_ids->end();
+         ++pit) {
+      auto it2 = PopulationInterfaceBase::live_objects.find(*pit);
+      if (it2 == PopulationInterfaceBase::live_objects.end()) {
+        throw std::runtime_error("Population ID " + std::to_string(*pit) +
+                                 " not found in live_objects");
+      }
+      auto population =
+          std::dynamic_pointer_cast<PopulationInterface>(it2->second);
+      
+      model->InitializePopulationDerivedQuantities(population->id);
+
+      std::map<std::string, fims::Vector<Type>> &derived_quantities =
+          model->GetPopulationDerivedQuantities(population->id);
+      
+      std::map<std::string, fims_popdy::DimensionInfo>
+        &derived_quantities_dim_info =
+            model->GetPopulationDimensionInfo(population->id);
+
+      std::stringstream ss;
+
+      derived_quantities["biomass"] =
+          fims::Vector<Type>(population->n_years.get() + 1);
+      derived_quantities_dim_info["biomass"] =
+          fims_popdy::DimensionInfo(
+              "biomass",
+              fims::Vector<int>{(int)population->n_years.get() + 1},
+              fims::Vector<std::string>{"n_years+1"});
+
+      derived_quantities["observed_catch"] = fims::Vector<Type>(
+          population->n_years.get());
+      derived_quantities_dim_info["observed_catch"] =
+          fims_popdy::DimensionInfo(
+              "observed_catch",
+              fims::Vector<int>{(int)population->n_years.get()},
+              fims::Vector<std::string>{"n_years"});
+
+      derived_quantities["harvest_rate"] = fims::Vector<Type>(
+          population->n_years.get());
+      derived_quantities_dim_info["harvest_rate"] =
+          fims_popdy::DimensionInfo(
+              "harvest_rate",
+              fims::Vector<int>{(int)population->n_years.get()},
+              fims::Vector<std::string>{"n_years"});
+      
+      derived_quantities["fmsy"] = fims::Vector<Type>(1);
+      derived_quantities_dim_info["fmsy"] =
+          fims_popdy::DimensionInfo(
+              "fmsy",
+          fims::Vector<int>{1},
+          fims::Vector<std::string>{"scalar"});
+
+      derived_quantities["bmsy"] = fims::Vector<Type>(1);
+      derived_quantities_dim_info["bmsy"] =
+          fims_popdy::DimensionInfo(
+              "bmsy",
+          fims::Vector<int>{1},
+          fims::Vector<std::string>{"scalar"});
+
+      derived_quantities["msy"] = fims::Vector<Type>(1);
+      derived_quantities_dim_info["msy"] =
+          fims_popdy::DimensionInfo(
+              "msy",
+          fims::Vector<int>{1},
+          fims::Vector<std::string>{"scalar"});
+      
+      //This will not work for many populations to one fleet relationships
+      for (fleet_ids_iterator fit = population->fleet_ids->begin();
+           fit != population->fleet_ids->end(); ++fit) {
+        fleet_ids.insert(*fit);
+      }
+    }
+
+
+     for (fleet_ids_iterator it = fleet_ids.begin(); it != fleet_ids.end();
+         ++it) {
+      std::shared_ptr<FleetInterface> fleet_interface =
+          std::dynamic_pointer_cast<FleetInterface>(
+              FleetInterfaceBase::live_objects[(*it)]);
+
+      model->InitializeFleetDerivedQuantities(fleet_interface->id);
+
+      std::map<std::string, fims::Vector<Type>> &derived_quantities =
+          model->GetFleetDerivedQuantities(fleet_interface->id);
+
+      std::map<std::string, fims_popdy::DimensionInfo>
+          &derived_quantities_dim_info =
+              model->GetFleetDimensionInfo(fleet_interface->id);
+
+      derived_quantities["index_expected"] =
+          fims::Vector<Type>(fleet_interface->n_years.get());
+      derived_quantities_dim_info["index_expected"] =
+          fims_popdy::DimensionInfo(
+              "index_expected",
+              fims::Vector<int>{fleet_interface->n_years.get()},
+              fims::Vector<std::string>{"n_years"});
+
+      derived_quantities["log_index_expected"] =
+          fims::Vector<Type>(fleet_interface->n_years.get());
+      derived_quantities_dim_info["log_index_expected"] =
+          fims_popdy::DimensionInfo(
+              "log_index_expected",
+              fims::Vector<int>{fleet_interface->n_years.get()},
+              fims::Vector<std::string>{"n_years"});
+      
+      info->variable_map[fleet_interface->log_index_expected.id_m] =
+          &(derived_quantities["log_index_expected"]);
+
+      //This will not work for many populations to one fleet relationships
+      derived_quantities["log_index_depletionK_ratio"] =
+        fims::Vector<Type>(fleet_interface->n_years.get());
+      derived_quantities_dim_info["log_index_depletionK_ratio"] =
+      fims_popdy::DimensionInfo(
+          "log_index_depletionK_ratio",
+          fims::Vector<int>{fleet_interface->n_years.get()},
+          fims::Vector<std::string>{"n_years"});
+      derived_quantities["mean_log_q"] = fims::Vector<Type>(1);
+      derived_quantities_dim_info["mean_log_q"] =
+      fims_popdy::DimensionInfo(
+          "mean_log_q",
+          fims::Vector<int>{1},
+          fims::Vector<std::string>{"scalar"});
+
+      info->variable_map[fleet_interface->log_index_depletionK_ratio.id_m] =
+        &(derived_quantities["log_index_depletionK_ratio"]);
+      info->variable_map[fleet_interface->mean_log_q.id_m] =
+        &(derived_quantities["mean_log_q"]);
+      
+    }
+    return true;
+  }
+
+  virtual bool add_to_fims_tmb() {
+    this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
+#ifdef TMBAD_FRAMEWORK
+    this->add_to_fims_tmb_internal<TMBAD_FIMS_TYPE>();
+#else
+    this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
+    this->add_to_fims_tmb_internal<TMB_FIMS_FIRST_ORDER>();
+    this->add_to_fims_tmb_internal<TMB_FIMS_SECOND_ORDER>();
+    this->add_to_fims_tmb_internal<TMB_FIMS_THIRD_ORDER>();
+#endif
+    return true;
+  }
+
+#endif
+};
+
 
 #endif

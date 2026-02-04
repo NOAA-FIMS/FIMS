@@ -234,6 +234,74 @@ Rcpp::List get_random_names(Rcpp::List pars) {
 }
 
 /**
+* @brief Gets a vector of parameter minimum values.
+* @return Rcpp::NumericVector
+*/
+Rcpp::NumericVector get_parameter_min_vector() {
+  //loop over all parameters and get their minimum values
+  std::shared_ptr<fims_info::Information<TMB_FIMS_REAL_TYPE>> d0 =
+      fims_info::Information<TMB_FIMS_REAL_TYPE>::GetInstance();  
+  Rcpp::NumericVector min_vector;
+
+  for (size_t i = 0; i < d0->fixed_effects_parameters_min.size(); i++) {
+    min_vector.push_back(d0->fixed_effects_parameters_min[i]);
+  }
+
+  return min_vector;
+}
+
+/**
+* @brief Gets a vector of parameter maximum values.
+* @return Rcpp::NumericVector
+*/
+Rcpp::NumericVector get_parameter_max_vector() {
+  //loop over all parameters and get their maximum values
+  std::shared_ptr<fims_info::Information<TMB_FIMS_REAL_TYPE>> d0 =
+      fims_info::Information<TMB_FIMS_REAL_TYPE>::GetInstance();  
+  Rcpp::NumericVector max_vector;
+
+  for (size_t i = 0; i < d0->fixed_effects_parameters_max.size(); i++) {
+    max_vector.push_back(d0->fixed_effects_parameters_max[i]);
+  }
+
+  return max_vector;
+}
+
+/**
+* @brief Gets a vector of random effects minimum values.
+* @return Rcpp::NumericVector
+*/
+Rcpp::NumericVector get_random_effects_min_vector() {
+  //loop over all random effects and get their minimum values
+  std::shared_ptr<fims_info::Information<TMB_FIMS_REAL_TYPE>> d0 =
+      fims_info::Information<TMB_FIMS_REAL_TYPE>::GetInstance();  
+  Rcpp::NumericVector min_vector;
+
+  for (size_t i = 0; i < d0->random_effects_parameters_min.size(); i++) {
+    min_vector.push_back(d0->random_effects_parameters_min[i]);
+  }
+
+  return min_vector;
+}
+
+/**
+* @brief Gets a vector of random effects maximum values.
+* @return Rcpp::NumericVector
+*/
+Rcpp::NumericVector get_random_effects_max_vector() {
+  //loop over all random effects and get their maximum values
+  std::shared_ptr<fims_info::Information<TMB_FIMS_REAL_TYPE>> d0 =
+      fims_info::Information<TMB_FIMS_REAL_TYPE>::GetInstance();  
+  Rcpp::NumericVector max_vector;
+
+  for (size_t i = 0; i < d0->random_effects_parameters_max.size(); i++) {
+    max_vector.push_back(d0->random_effects_parameters_max[i]);
+  }
+
+  return max_vector;
+}
+
+/**
  * @brief Clears the internal objects.
  *
  * @tparam Type

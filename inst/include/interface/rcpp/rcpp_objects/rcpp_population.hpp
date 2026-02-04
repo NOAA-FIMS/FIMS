@@ -126,6 +126,10 @@ class PopulationInterface : public PopulationInterfaceBase {
    */
   SharedInt recruitment_err_id;
   /**
+   * @brief The ID of the depletion module.
+   */
+  SharedInt depletion_id;
+  /**
    * @brief The natural log of the natural mortality for each year.
    */
   ParameterVector log_M;
@@ -186,17 +190,20 @@ class PopulationInterface : public PopulationInterfaceBase {
    */
   PopulationInterface(const PopulationInterface &other)
       : PopulationInterfaceBase(other),
-        fleet_ids(other.fleet_ids),
         n_ages(other.n_ages),
         n_fleets(other.n_fleets),
+        fleet_ids(other.fleet_ids),
         n_years(other.n_years),
         n_lengths(other.n_lengths),
         maturity_id(other.maturity_id),
         growth_id(other.growth_id),
         recruitment_id(other.recruitment_id),
+        recruitment_err_id(other.recruitment_err_id),
+        depletion_id(other.depletion_id),
         log_M(other.log_M),
         log_init_naa(other.log_init_naa),
         numbers_at_age(other.numbers_at_age),
+        log_r(other.log_r),
         ages(other.ages),
         derived_ssb(other.derived_ssb),
         derived_naa(other.derived_naa),
@@ -247,6 +254,14 @@ class PopulationInterface : public PopulationInterfaceBase {
    */
   void SetRecruitmentID(uint32_t recruitment_id) {
     this->recruitment_id.set(recruitment_id);
+  }
+
+  /**
+   * @brief Set the unique ID for the depletion object.
+   * @param depletion_id Unique ID for the depletion object.
+   */
+  void SetDepletionID(uint32_t depletion_id) {
+    this->depletion_id.set(depletion_id);
   }
 
   /**
@@ -336,6 +351,7 @@ class PopulationInterface : public PopulationInterfaceBase {
     population->growth_id = this->growth_id.get();
     population->recruitment_id = this->recruitment_id.get();
     population->maturity_id = this->maturity_id.get();
+    population->depletion_id = this->depletion_id.get();
     population->log_M.resize(this->log_M.size());
     population->log_init_naa.resize(this->log_init_naa.size());
     for (size_t i = 0; i < log_M.size(); i++) {
@@ -345,12 +361,16 @@ class PopulationInterface : public PopulationInterfaceBase {
         ss << "Population." << this->id << ".log_M." << this->log_M[i].id_m;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(population->log_M[i]);
+        info->RegisterParameterBounds(this->log_M[i].min_m,
+            this->log_M[i].max_m);
       }
       if (this->log_M[i].estimation_type_m.get() == "random_effects") {
         ss.str("");
         ss << "Population." << this->id << ".log_M." << this->log_M[i].id_m;
         info->RegisterRandomEffectName(ss.str());
         info->RegisterRandomEffect(population->log_M[i]);
+        info->RegisterRandomEffectBounds(this->log_M[i].min_m,
+            this->log_M[i].max_m);
       }
     }
     info->variable_map[this->log_M.id_m] = &(population)->log_M;
@@ -363,6 +383,8 @@ class PopulationInterface : public PopulationInterfaceBase {
            << this->log_init_naa[i].id_m;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(population->log_init_naa[i]);
+        info->RegisterParameterBounds(this->log_init_naa[i].min_m,
+            this->log_init_naa[i].max_m);
       }
       if (this->log_init_naa[i].estimation_type_m.get() == "random_effects") {
         ss.str("");
@@ -370,6 +392,8 @@ class PopulationInterface : public PopulationInterfaceBase {
            << this->log_init_naa[i].id_m;
         info->RegisterRandomEffectName(ss.str());
         info->RegisterRandomEffect(population->log_init_naa[i]);
+        info->RegisterRandomEffectBounds(this->log_init_naa[i].min_m,
+            this->log_init_naa[i].max_m);
       }
     }
     info->variable_map[this->log_init_naa.id_m] = &(population)->log_init_naa;

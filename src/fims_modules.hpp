@@ -10,6 +10,7 @@
 #define SRC_FIMS_MODULES_HPP
 
 #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_data.hpp"
+#include "../inst/include/interface/rcpp/rcpp_objects/rcpp_depletion.hpp"
 #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_fleet.hpp"
 #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_growth.hpp"
 #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_math.hpp"
@@ -62,6 +63,14 @@ RCPP_MODULE(fims) {
                  "Gets the parameter names object.");
   Rcpp::function("get_random_names", &get_random_names,
                  "Gets the random effects names object.");
+  Rcpp::function("get_parameter_min_vector", &get_parameter_min_vector,
+                 "Gets a vector of parameter minimum values.");
+  Rcpp::function("get_parameter_max_vector", &get_parameter_max_vector,
+                 "Gets a vector of parameter maximum values.");
+  Rcpp::function("get_random_effects_min_vector", &get_random_effects_min_vector,
+                 "Gets a vector of random effects minimum values.");
+  Rcpp::function("get_random_effects_max_vector", &get_random_effects_max_vector,
+                 "Gets a vector of random effects maximum values.");
   Rcpp::function("clear", clear,
                  "Clears all pointers/references of a FIMS model.");
   Rcpp::function("get_log", get_log,
@@ -215,8 +224,6 @@ RCPP_MODULE(fims) {
       .field("log_expected_recruitment",
              &BevertonHoltRecruitmentInterface::log_expected_recruitment,
              "expected recruitment as a random effect on the natural log scale")
-      .field("n_years", &BevertonHoltRecruitmentInterface::n_years,
-             "Number of years")
       .method("get_id", &BevertonHoltRecruitmentInterface::get_id)
       .method("SetRecruitmentProcessID",
               &BevertonHoltRecruitmentInterface::SetRecruitmentProcessID,
@@ -255,6 +262,9 @@ RCPP_MODULE(fims) {
       .field("lengthcomp_proportion", &FleetInterface::lengthcomp_proportion)
       .field("age_to_length_conversion",
              &FleetInterface::age_to_length_conversion)
+      .field("mean_log_q", &FleetInterface::mean_log_q)
+      .field("log_index_depletionK_ratio",
+             &FleetInterface::log_index_depletionK_ratio)
       .method("get_id", &FleetInterface::get_id)
       .method("SetName", &FleetInterface::SetName)
       .method("GetName", &FleetInterface::GetName)
@@ -313,6 +323,8 @@ RCPP_MODULE(fims) {
               "Set the unique id for the growth object")
       .method("SetRecruitmentID", &PopulationInterface::SetRecruitmentID,
               "Set the unique id for the Recruitment object")
+      .method("SetDepletionID", &PopulationInterface::SetDepletionID,
+              "Set the unique id for the Depletion object")
       .method("AddFleet", &PopulationInterface::AddFleet,
               "Set a unique fleet id to the list of fleets operating on this "
               "population")
@@ -370,6 +382,27 @@ RCPP_MODULE(fims) {
       .method("get_id", &EWAAGrowthInterface::get_id)
       .method("evaluate", &EWAAGrowthInterface::evaluate);
 
+  Rcpp::class_<PellaTomlinsonInterface>("PTDepletion")
+      .constructor()
+      .field("log_r", &PellaTomlinsonInterface::log_r)
+      .field("log_K", &PellaTomlinsonInterface::log_K)
+      .field("log_m", &PellaTomlinsonInterface::log_m)
+      .field("r", &PellaTomlinsonInterface::r)
+      .field("K", &PellaTomlinsonInterface::K)
+      .field("m", &PellaTomlinsonInterface::m)
+      .field("depletion", &PellaTomlinsonInterface::depletion,
+             "The depletion process")
+      .field("log_depletion", &PellaTomlinsonInterface::log_depletion,
+             "The log-transformed depletion process")
+      .field("log_init_depletion", &PellaTomlinsonInterface::log_init_depletion,
+             "natural log of the initial depletion level")
+      .field("log_expected_depletion",
+             &PellaTomlinsonInterface::log_expected_depletion,
+             "expected depletion as a random effect on the natural log scale")
+      .field("n_years", &PellaTomlinsonInterface::n_years, "number of years")
+      .method("get_id", &PellaTomlinsonInterface::get_id)
+      .method("evaluate_mean", &PellaTomlinsonInterface::evaluate_mean);
+
   Rcpp::class_<DnormDistributionsInterface>("DnormDistribution")
       .constructor()
       .method("get_id", &DnormDistributionsInterface::get_id,
@@ -417,6 +450,29 @@ RCPP_MODULE(fims) {
              "The natural log of the standard deviation of the distribution on "
              "the natural log scale.");
 
+  Rcpp::class_<DgammaDistributionsInterface>("DgammaDistribution")
+      .constructor()
+      .method("get_id", &DgammaDistributionsInterface::get_id,
+              "Returns a unique ID for the Dgamma distribution class.")
+      .method("evaluate", &DgammaDistributionsInterface::evaluate,
+              "Evaluates the gamma distribution given input data and "
+              "parameter values.")
+      .method("set_observed_data",
+              &DgammaDistributionsInterface::set_observed_data,
+              "Accepts a unique ID for a given Data Object class to link the "
+              "data with the distribution.")
+      .method("set_distribution_links",
+              &DgammaDistributionsInterface::set_distribution_links,
+              "Accepts a unique ID for a given parameter to link the parameter "
+              "with the distribution.")
+      .field("x", &DgammaDistributionsInterface::x,
+             "Input for distribution when not observations, e.g., prior or "
+             "random effect.")
+      .field("expected_values", &DgammaDistributionsInterface::expected_values,
+             "Mean of the distribution.")
+      .field("log_sd", &DgammaDistributionsInterface::log_sd,
+             "The natural log of the standard deviation.");
+
   Rcpp::class_<DmultinomDistributionsInterface>("DmultinomDistribution")
       .constructor()
       .method("get_id", &DmultinomDistributionsInterface::get_id,
@@ -452,6 +508,10 @@ RCPP_MODULE(fims) {
       .method("GetId", &CatchAtAgeInterface::get_id)
       .method("DoReporting", &CatchAtAgeInterface::DoReporting)
       .method("IsReporting", &CatchAtAgeInterface::IsReporting);
+
+  Rcpp::class_<SurplusProductionInterface>("SurplusProduction")
+      .constructor()
+      .method("AddPopulation", &SurplusProductionInterface::AddPopulation);
 }
 
 #endif /* SRC_FIMS_MODULES_HPP */

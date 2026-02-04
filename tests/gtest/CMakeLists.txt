@@ -87,17 +87,17 @@ target_link_libraries(fims_math_fabs_min_max
 
 gtest_discover_tests(fims_math_fabs_min_max)
 
-# test_growth.cpp
-add_executable(growth_evaluate
-  test_growth.cpp
+# test_population_dynamics_growth.cpp
+add_executable(population_dynamics_growth
+  test_population_dynamics_growth.cpp
 )
 
-target_link_libraries(growth_evaluate
+target_link_libraries(population_dynamics_growth
   gtest_main
   fims_test
 )
 
-gtest_discover_tests(growth_evaluate)
+gtest_discover_tests(population_dynamics_growth)
 
 # test_info_setup_random_effects.cpp
 add_executable(info_setup_random_effects
@@ -143,137 +143,137 @@ target_link_libraries(population_dynamics_recruitment_process
 
 gtest_discover_tests(population_dynamics_recruitment_process)
 
-# test_sr_beverton_holt.cpp
-add_executable(sr_beverton_holt
-test_sr_beverton_holt.cpp
+# test_population_dynamics_recruitment_sr_beverton_holt.cpp
+add_executable(population_dynamics_recruitment_sr_beverton_holt
+test_population_dynamics_recruitment_sr_beverton_holt.cpp
 )
 
-target_link_libraries(sr_beverton_holt
+target_link_libraries(population_dynamics_recruitment_sr_beverton_holt
   gtest_main
   fims_test
 )
 
-gtest_discover_tests(sr_beverton_holt)
+gtest_discover_tests(population_dynamics_recruitment_sr_beverton_holt)
 
-# test_population_dynamics_fleet.cpp
-add_executable(population_dynamics_fleet_initialize_prepare
-  test_population_dynamics_fleet_initialize_prepare.cpp
+# test_caa_fleet.cpp
+add_executable(caa_fleet_initialize_prepare
+  test_caa_fleet_initialize_prepare.cpp
 )
 
-target_link_libraries(population_dynamics_fleet_initialize_prepare
+target_link_libraries(caa_fleet_initialize_prepare
   gtest_main
   fims_test
 )
 
-gtest_discover_tests(population_dynamics_fleet_initialize_prepare)
+gtest_discover_tests(caa_fleet_initialize_prepare)
 
-# test_population_dynamics_population.cpp
-add_executable(population_dynamics_population_initialize_prepare
-  test_population_dynamics_population_initialize_prepare.cpp
+# test_caa_population.cpp
+add_executable(caa_population_initialize_prepare
+  test_caa_population_initialize_prepare.cpp
 )
 
-target_link_libraries(population_dynamics_population_initialize_prepare
+target_link_libraries(caa_population_initialize_prepare
   gtest_main
   fims_test
 )
 
-gtest_discover_tests(population_dynamics_population_initialize_prepare)
+gtest_discover_tests(caa_population_initialize_prepare)
 
-# test_population_Li.cpp
-add_executable(population_unfished
-  test_population_Unfished_Initial.cpp
+# test_caa_Unfished_Initial.cpp
+add_executable(caa_unfished
+  test_caa_Unfished_Initial.cpp
 )
 
-target_link_libraries(population_unfished
+target_link_libraries(caa_unfished
   gtest_main
   fims_test
 )
 
-gtest_discover_tests(population_unfished)
+gtest_discover_tests(caa_unfished)
 
-#test_population_stawitz.cpp
-add_executable(population_NumbersAtAge
-  test_population_NumbersAtAge.cpp
+#test_caa_NumbersAtAge.cpp
+add_executable(caa_NumbersAtAge
+  test_caa_NumbersAtAge.cpp
 )
 
-target_link_libraries(population_NumbersAtAge
+target_link_libraries(caa_NumbersAtAge
   gtest_main
   fims_test
 )
 
-gtest_discover_tests(population_NumbersAtAge)
+gtest_discover_tests(caa_NumbersAtAge)
 
 #test_maturityAA.cpp
-add_executable(population_MaturityAtAge
-  test_population_MaturityAtAge.cpp
+add_executable(caa_MaturityAtAge
+  test_caa_MaturityAtAge.cpp
 )
 
-target_link_libraries(population_MaturityAtAge
+target_link_libraries(caa_MaturityAtAge
   gtest_main
   fims_test
 )
 
-gtest_discover_tests(population_MaturityAtAge)
+gtest_discover_tests(caa_MaturityAtAge)
 
-#test_population_CatchNumbersAtAge.cpp
-add_executable(population_CatchNumbersAtAge
-  test_population_CatchNumbersAtAge.cpp
+#test_caa_CatchNumbersAtAge.cpp
+add_executable(caa_CatchNumbersAtAge
+  test_caa_CatchNumbersAtAge.cpp
 )
 
-target_link_libraries(population_CatchNumbersAtAge
+target_link_libraries(caa_CatchNumbersAtAge
   gtest_main
   fims_test
 )
 
-gtest_discover_tests(population_CatchNumbersAtAge)
+gtest_discover_tests(caa_CatchNumbersAtAge)
 
 #test_CalculateCatch.cpp
-add_executable(population_Catch
-  test_population_Catch.cpp
+add_executable(caa_Catch
+  test_caa_Catch.cpp
 )
 
-target_link_libraries(population_Catch
+target_link_libraries(caa_Catch
   gtest_main
   fims_test
 )
 
-gtest_discover_tests(population_Catch)
+gtest_discover_tests(caa_Catch)
 
 #test_B_and_SB.cpp
-add_executable(population_B_and_SB
-  test_population_B_and_SB.cpp
+add_executable(caa_B_and_SB
+  test_caa_B_and_SB.cpp
 )
 
-target_link_libraries(population_B_and_SB
+target_link_libraries(caa_B_and_SB
   gtest_main
   fims_test
 )
 
-gtest_discover_tests(population_B_and_SB)
+gtest_discover_tests(caa_B_and_SB)
 
 #test_CalculateIndex_works.cpp
-add_executable(population_Index
-  test_population_Index.cpp
+add_executable(caa_Index
+  test_caa_Index.cpp
 )
 
-target_link_libraries(population_Index
+target_link_libraries(caa_Index
   gtest_main
   fims_test
 )
 
-gtest_discover_tests(population_Index)
+gtest_discover_tests(caa_Index)
 
-# test_population_Recruitment.cpp
-add_executable(population_Recruitment
-  test_population_Recruitment.cpp
+# test_caa_Recruitment.cpp
+add_executable(caa_Recruitment
+  test_caa_Recruitment.cpp
 )
 
-target_link_libraries(population_Recruitment
+target_link_libraries(caa_Recruitment
   gtest_main
   fims_test
 )
 
-gtest_discover_tests(population_Recruitment)
+gtest_discover_tests(caa_Recruitment)
 
 gtest_discover_tests(fims_math_fabs_min_max)
 
@@ -302,17 +302,17 @@ gtest_discover_tests(fims_math_logit)
 
 #  gtest_discover_tests(population_integration)
 
-# test_Logistic_LogisticSelectivity_Evaluate.cpp
-add_executable(Logistic_LogisticSelectivity_Evaluate
-  test_Logistic_LogisticSelectivity_Evaluate.cpp
+# test_population_dynamics_selectivity_logistic.cpp
+add_executable(population_dynamics_selectivity_logistic
+  test_population_dynamics_selectivity_logistic.cpp
 )
 
-target_link_libraries(Logistic_LogisticSelectivity_Evaluate
+target_link_libraries(population_dynamics_selectivity_logistic
   gtest_main
   fims_test
 )
 
-gtest_discover_tests(Logistic_LogisticSelectivity_Evaluate)
+gtest_discover_tests(population_dynamics_selectivity_logistic)
 
 
 # test_FIMSJson_JsonParser_WriteToFile.cpp
@@ -326,3 +326,101 @@ target_link_libraries(FIMSJson_JsonParser_WriteToFile
 )
 
 gtest_discover_tests(FIMSJson_JsonParser_WriteToFile)
+
+
+# test_surplus_production_population.cpp
+add_executable(surplus_production_population_initialize_prepare
+  test_surplus_production_population_initialize_prepare.cpp
+)
+
+target_link_libraries(surplus_production_population_initialize_prepare
+  gtest_main
+  fims_test
+)
+
+gtest_discover_tests(surplus_production_population_initialize_prepare)
+
+# test_surplus_production_fleet.cpp
+add_executable(surplus_production_fleet_initialize_prepare
+  test_surplus_production_fleet_initialize_prepare.cpp
+)
+
+target_link_libraries(surplus_production_fleet_initialize_prepare
+  gtest_main
+  fims_test
+)
+
+gtest_discover_tests(surplus_production_fleet_initialize_prepare)
+
+# test_population_dynamics_depletion_pella_tomlinson.cpp
+add_executable(population_dynamics_depletion_pella_tomlinson
+  test_population_dynamics_depletion_pella_tomlinson.cpp
+)
+
+target_link_libraries(population_dynamics_depletion_pella_tomlinson
+  gtest_main
+  fims_test
+)
+
+gtest_discover_tests(population_dynamics_depletion_pella_tomlinson)
+
+# test_surplus_production_Catch.cpp
+add_executable(surplus_production_Catch
+  test_surplus_production_Catch.cpp
+)
+
+target_link_libraries(surplus_production_Catch
+  gtest_main
+  fims_test
+)
+
+gtest_discover_tests(surplus_production_Catch)
+
+# test_surplus_production_CalculateDepletion.cpp
+add_executable(surplus_production_CalculateDepletion
+  test_surplus_production_CalculateDepletion.cpp
+)
+
+target_link_libraries(surplus_production_CalculateDepletion
+  gtest_main
+  fims_test
+)
+
+gtest_discover_tests(surplus_production_CalculateDepletion)
+
+# test_surplus_production_CalculateIndex.cpp
+add_executable(surplus_production_CalculateIndex
+  test_surplus_production_CalculateIndex.cpp
+)
+
+target_link_libraries(surplus_production_CalculateIndex
+  gtest_main
+  fims_test
+)
+
+gtest_discover_tests(surplus_production_CalculateIndex)
+
+# test_surplus_production_CalculateBiomass.cpp
+add_executable(surplus_production_CalculateBiomass
+  test_surplus_production_CalculateBiomass.cpp
+)
+
+target_link_libraries(surplus_production_CalculateBiomass
+  gtest_main
+  fims_test
+)
+
+gtest_discover_tests(surplus_production_CalculateBiomass)
+
+# test_surplus_production_CalculateRPs.cpp
+add_executable(surplus_production_CalculateRPs
+  test_surplus_production_CalculateRPs.cpp
+)
+
+target_link_libraries(surplus_production_CalculateRPs
+  gtest_main
+  fims_test
+)
+
+gtest_discover_tests(surplus_production_CalculateRPs)
+

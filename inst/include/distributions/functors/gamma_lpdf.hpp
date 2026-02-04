@@ -1,15 +1,15 @@
 /**
- * @file normal_lpdf.hpp
- * @brief Normal Log Probability Density Function (LPDF) module file defines
- * the Normal LPDF class and its fields and returns the log probability density
+ * @file gamma_lpdf.hpp
+ * @brief Gamma Log Probability Density Function (LPDF) module file defines
+ * the Gamma LPDF class and its fields and returns the log probability density
  * function.
  * @copyright This file is part of the NOAA, National Marine Fisheries Service
  * Fisheries Integrated Modeling System project. See LICENSE in the source
  * folder for reuse information.
  */
 
-#ifndef NORMAL_LPDF
-#define NORMAL_LPDF
+#ifndef GAMMA_LPDF
+#define GAMMA_LPDF
 
 #include "density_components_base.hpp"
 #include "../../common/fims_vector.hpp"
@@ -17,10 +17,10 @@
 
 namespace fims_distributions {
 /**
- * Normal Log Probability Density Function
+ * Gamma Log Probability Density Function
  */
 template <typename Type>
-struct NormalLPDF : public DensityComponentBase<Type> {
+struct GammaLPDF : public DensityComponentBase<Type> {
   fims::Vector<Type> log_sd; /**< the natural log of the standard deviation of
                                 the distribution; can be a vector or scalar */
   Type lpdf = static_cast<Type>(0.0); /**< total log probability density
@@ -28,14 +28,14 @@ struct NormalLPDF : public DensityComponentBase<Type> {
 
   /** @brief Constructor.
    */
-  NormalLPDF() : DensityComponentBase<Type>() {}
+  GammaLPDF() : DensityComponentBase<Type>() {}
 
   /** @brief Destructor.
    */
-  virtual ~NormalLPDF() {}
+  virtual ~GammaLPDF() {}
 
   /**
-   * @brief Evaluates the normal probability density function
+   * @brief Evaluates the gamma probability density function
    */
   virtual const Type evaluate() {
     // set vector size based on input type (prior, process, or data)
@@ -50,27 +50,9 @@ struct NormalLPDF : public DensityComponentBase<Type> {
     lpdf = static_cast<Type>(0);
 
     // Dimension checks
-    size_t n_expected_values = 0;
-    if (this->input_type == "data"){  
-      n_expected_values = this->data_expected_values->size();
-    }
-    if (this->input_type == "random_effects"){
-      n_expected_values = this->re_expected_values->size();
-    }
-    if (this->input_type == "prior"){
-      n_expected_values = this->expected_values.size();
-    }
-    if (n_expected_values > 1 && n_expected_values != n_x) {
-      throw std::invalid_argument(
-        "NormalLPDF::Vector index out of bounds. The size of observed "
-            "data does not equal the expected size. The observed data vector "
-            "is of size " +
-            fims::to_string(n_x) +
-            " and the expected size is " + fims::to_string(n_expected_values));
-    }
     if (this->log_sd.size() > 1 && n_x != this->log_sd.size()) {
       throw std::invalid_argument(
-          "NormalLPDF::Vector index out of bounds. The size of observed data "
+          "GammaLPDF::Vector index out of bounds. The size of observed data "
           "does not equal the size of the log_sd vector. The observed data "
           "vector is of size " +
           fims::to_string(n_x) + " and the log_sd vector is of size " +
@@ -79,23 +61,30 @@ struct NormalLPDF : public DensityComponentBase<Type> {
 
     for (size_t i = 0; i < n_x; i++) {
 #ifdef TMB_MODEL
+      // Calculate shape and scale parameters from mean (expected value) and standard deviation
+      // shape = (mean/sd)^2
+      // scale = sd^2/mean
+      Type mean_val = this->get_expected(i);
+      Type sd_val = fims_math::exp(log_sd.get_force_scalar(i));
+      Type shape = (mean_val / sd_val) * (mean_val / sd_val);
+      Type scale = (sd_val * sd_val) / mean_val;
+
       if (this->input_type == "data") {
         // if data, check if there are any NA values and skip lpdf calculation
         // if there are
         if (this->get_observed(i) != this->observed_values->na_value) {
           this->lpdf_vec[i] =
-              dnorm(this->get_observed(i), this->get_expected(i),
-                    fims_math::exp(log_sd.get_force_scalar(i)), true);
+              dgamma(this->get_observed(i), shape, scale, true);
         } else {
           this->lpdf_vec[i] = 0;
         }
         // if not data (i.e. prior or process), use x vector instead of
         // observed_values
       } else {
+        // TODO: hard coded for now but need to address NA values when observed value is derived from data
         if(this->get_observed(i) != -999){
           this->lpdf_vec[i] =
-              dnorm(this->get_observed(i), this->get_expected(i),
-                    fims_math::exp(log_sd.get_force_scalar(i)), true);
+              dgamma(this->get_observed(i), shape, scale, true);
         }
       }
       this->report_lpdf_vec[i] = this->lpdf_vec[i];
@@ -104,32 +93,21 @@ struct NormalLPDF : public DensityComponentBase<Type> {
         FIMS_SIMULATE_F(this->of) {
           if (this->input_type == "data") {
             this->observed_values->at(i) =
-                rnorm(this->get_expected(i),
-                      fims_math::exp(log_sd.get_force_scalar(i)));
+                rgamma(shape, scale);
           }
           if (this->input_type == "random_effects") {
-            (*this->re)[i] = rnorm(this->get_expected(i),
-                                   fims_math::exp(log_sd.get_force_scalar(i)));
+            (*this->re)[i] = rgamma(shape, scale);
           }
           if (this->input_type == "prior") {
             (*(this->priors[i]))[0] =
-                rnorm(this->get_expected(i),
-                      fims_math::exp(log_sd.get_force_scalar(i)));
+                rgamma(shape, scale);
           }
         }
       }
 #endif
-      /* osa not working yet
-        if(osa_flag){//data observation type implements osa residuals
-            //code for osa cdf method
-            this->lpdf_vec[i] = this->keep.cdf_lower[i] * log( pnorm(this->x[i],
-        this->get_expected(i), sd[i]) ); this->lpdf_vec[i] =
-        this->keep.cdf_upper[i] * log( 1.0 - pnorm(this->x[i],
-        this->get_expected(i), sd[i]) );
-        } */
     }
 #ifdef TMB_MODEL
-    vector<Type> normal_x = this->x.to_tmb();
+    vector<Type> gamma_x = this->x.to_tmb();
 #endif
     return (lpdf);
   }

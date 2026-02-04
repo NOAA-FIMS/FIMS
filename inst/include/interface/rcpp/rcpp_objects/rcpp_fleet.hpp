@@ -161,6 +161,14 @@ class FleetInterface : public FleetInterfaceBase {
    * age-to-length-conversion matrix.
    */
   ParameterVector age_to_length_conversion;
+  /**
+   * @brief Mean of the log catchability of the fleet.
+   */
+  ParameterVector mean_log_q;
+  /**
+   * @brief log of the ratio of the index to the product of depletion and K.
+   */
+  ParameterVector log_index_depletionK_ratio;
 
   // derived quantities
   /**
@@ -197,7 +205,7 @@ class FleetInterface : public FleetInterfaceBase {
   Rcpp::NumericVector derived_index_nal;
   /**
    * @brief Derived landings-at-age in weight (mt).
-   */
+  */
   Rcpp::NumericVector derived_index_waa;
   /**
    * @brief Derived index in observed units.
@@ -260,17 +268,19 @@ class FleetInterface : public FleetInterfaceBase {
         n_ages(other.n_ages),
         n_lengths(other.n_lengths),
         n_years(other.n_years),
-        log_q(other.log_q),
-        log_Fmort(other.log_Fmort),
-        log_index_expected(other.log_index_expected),
-        log_landings_expected(other.log_landings_expected),
-        agecomp_proportion(other.agecomp_proportion),
-        lengthcomp_proportion(other.lengthcomp_proportion),
-        agecomp_expected(other.agecomp_expected),
-        lengthcomp_expected(other.lengthcomp_expected),
-        age_to_length_conversion(other.age_to_length_conversion),
         observed_landings_units(other.observed_landings_units),
         observed_index_units(other.observed_index_units),
+        log_q(other.log_q),
+        log_Fmort(other.log_Fmort),
+        log_landings_expected(other.log_landings_expected),
+        log_index_expected(other.log_index_expected),
+        agecomp_expected(other.agecomp_expected),
+        lengthcomp_expected(other.lengthcomp_expected),
+        agecomp_proportion(other.agecomp_proportion),
+        lengthcomp_proportion(other.lengthcomp_proportion),
+        age_to_length_conversion(other.age_to_length_conversion),
+        mean_log_q(other.mean_log_q),
+        log_index_depletionK_ratio(other.log_index_depletionK_ratio),
         derived_landings_naa(other.derived_landings_naa),
         derived_landings_nal(other.derived_landings_nal),
         derived_landings_waa(other.derived_landings_waa),
@@ -481,12 +491,16 @@ class FleetInterface : public FleetInterfaceBase {
         ss << "Fleet." << this->id << ".log_q." << this->log_q[i].id_m;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(fleet->log_q[i]);
+        info->RegisterParameterBounds(this->log_q[i].min_m,
+                                     this->log_q[i].max_m);
       }
       if (this->log_q[i].estimation_type_m.get() == "random_effects") {
         ss.str("");
         ss << "Fleet." << this->id << ".log_q." << this->log_q[i].id_m;
         info->RegisterRandomEffectName(ss.str());
         info->RegisterRandomEffect(fleet->log_q[i]);
+        info->RegisterRandomEffectBounds(this->log_q[i].min_m,
+                                        this->log_q[i].max_m);
       }
     }
 
@@ -500,12 +514,16 @@ class FleetInterface : public FleetInterfaceBase {
         ss << "Fleet." << this->id << ".log_Fmort." << this->log_Fmort[i].id_m;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(fleet->log_Fmort[i]);
+        info->RegisterParameterBounds(this->log_Fmort[i].min_m,
+                                     this->log_Fmort[i].max_m);
       }
       if (this->log_Fmort[i].estimation_type_m.get() == "random_effects") {
         ss.str("");
         ss << "Fleet." << this->id << ".log_Fmort." << this->log_Fmort[i].id_m;
         info->RegisterRandomEffectName(ss.str());
         info->RegisterRandomEffect(fleet->log_Fmort[i]);
+        info->RegisterRandomEffectBounds(this->log_Fmort[i].min_m,
+                                        this->log_Fmort[i].max_m);
       }
     }
     // add to variable_map
@@ -537,6 +555,9 @@ class FleetInterface : public FleetInterfaceBase {
              << this->age_to_length_conversion[i].id_m;
           info->RegisterParameterName(ss.str());
           info->RegisterParameter(fleet->age_to_length_conversion[i]);
+          info->RegisterParameterBounds(
+              this->age_to_length_conversion[i].min_m,
+              this->age_to_length_conversion[i].max_m);
         }
         if (this->age_to_length_conversion[i].estimation_type_m.get() ==
             "random_effects") {

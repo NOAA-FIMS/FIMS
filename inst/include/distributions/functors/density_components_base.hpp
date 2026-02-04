@@ -75,6 +75,7 @@ struct DistributionElementObject {
       return (*re)[i, j];
     }
     if (this->input_type == "prior") {
+      //TODO:: this is not set up correctly for 2d priors
       return (*(priors[i, j]))[0];
     }
     return x[i];
@@ -90,7 +91,7 @@ struct DistributionElementObject {
       return (*data_expected_values)[i];
     }
     if (this->input_type == "random_effects") {
-      return (*re_expected_values)[i];
+      return (*re_expected_values).get_force_scalar(i);
     } else {
       return this->expected_values.get_force_scalar(i);
     }
@@ -107,8 +108,10 @@ struct DistributionElementObject {
     if (this->input_type == "random_effects") {
       return (*re).size();
     }
+    // TODO: this handles a scalar prior that is shared across multiple modules
+    // Need to develop this further for time-varying priors. 
     if (this->input_type == "prior") {
-      return this->expected_values.size();
+      return priors.size();
     }
     return x.size();
   }

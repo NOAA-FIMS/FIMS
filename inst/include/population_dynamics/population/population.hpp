@@ -9,6 +9,7 @@
 #define FIMS_POPULATION_DYNAMICS_POPULATION_HPP
 
 #include "../../common/model_object.hpp"
+#include "../depletion/depletion.hpp"
 #include "../fleet/fleet.hpp"
 #include "../growth/growth.hpp"
 #include "../recruitment/recruitment.hpp"
@@ -57,6 +58,11 @@ struct Population : public fims_model_object::FIMSObject<Type> {
   int maturity_id = -999; /*!< id of maturity model object*/
   std::shared_ptr<fims_popdy::MaturityBase<Type>>
       maturity; /*!< shared pointer to maturity module */
+
+  // depletion
+  int depletion_id = -999; /*!< id of depletion model object*/
+  std::shared_ptr<fims_popdy::DepletionBase<Type>>
+      depletion; /*!< shared pointer to depletion module */
 
   // fleet
   std::set<uint32_t> fleet_ids; /*!< id of fleet model object*/

@@ -371,6 +371,8 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
            << this->logit_steep[i].id_m;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(recruitment->logit_steep[i]);
+        info->RegisterParameterBounds(this->logit_steep[i].min_m,
+            this->logit_steep[i].max_m);
       }
       if (this->logit_steep[i].estimation_type_m.get() == "random_effects") {
         ss.str("");
@@ -378,6 +380,8 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
            << this->logit_steep[i].id_m;
         info->RegisterRandomEffectName(ss.str());
         info->RegisterRandomEffect(recruitment->logit_steep[i]);
+        info->RegisterRandomEffectBounds(this->logit_steep[i].min_m,
+            this->logit_steep[i].max_m);
       }
     }
     info->variable_map[this->logit_steep.id_m] = &(recruitment)->logit_steep;
@@ -393,6 +397,8 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
            << this->log_rzero[i].id_m;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(recruitment->log_rzero[i]);
+        info->RegisterParameterBounds(this->log_rzero[i].min_m,
+            this->log_rzero[i].max_m);
       }
       if (this->log_rzero[i].estimation_type_m.get() == "random_effects") {
         ss.str("");
@@ -400,6 +406,8 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
            << this->log_rzero[i].id_m;
         info->RegisterRandomEffectName(ss.str());
         info->RegisterRandomEffect(recruitment->log_rzero[i]);
+        info->RegisterRandomEffectBounds(this->log_rzero[i].min_m,
+            this->log_rzero[i].max_m);
       }
     }
     info->variable_map[this->log_rzero.id_m] = &(recruitment)->log_rzero;
@@ -414,6 +422,8 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
            << this->log_devs[i].id_m;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(recruitment->log_recruit_devs[i]);
+        info->RegisterParameterBounds(this->log_devs[i].min_m,
+            this->log_devs[i].max_m);
       }
       if (this->log_devs[i].estimation_type_m.get() == "random_effects") {
         ss.str("");
@@ -421,6 +431,8 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
            << this->log_devs[i].id_m;
         info->RegisterRandomEffectName(ss.str());
         info->RegisterRandomEffect(recruitment->log_recruit_devs[i]);
+        info->RegisterRandomEffectBounds(this->log_devs[i].min_m,
+            this->log_devs[i].max_m);
       }
     }
 
@@ -436,12 +448,16 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
         ss << "Recruitment." << this->id << ".log_r." << this->log_r[i].id_m;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(recruitment->log_r[i]);
+        info->RegisterParameterBounds(this->log_r[i].min_m,
+            this->log_r[i].max_m);
       }
       if (this->log_r[i].estimation_type_m.get() == "random_effects") {
         ss.str("");
         ss << "Recruitment." << this->id << ".log_r." << this->log_r[i].id_m;
         info->RegisterRandomEffectName(ss.str());
         info->RegisterRandomEffect(recruitment->log_r[i]);
+        info->RegisterRandomEffectBounds(this->log_r[i].min_m,
+            this->log_r[i].max_m);
       }
     }
 

@@ -1,0 +1,67 @@
+/**
+ * @file pella_tomlinson.hpp
+ * @brief Declares the PellaTomlinsonDepletion class which implements the
+ * Pella--Tomlinson function.
+ * @copyright This file is part of the NOAA, National Marine Fisheries Service
+ * Fisheries Integrated Modeling System project. See LICENSE in the source
+ * folder for reuse information.
+ */
+#ifndef POPULATION_DYNAMICS_DEPLETION_PELLA_TOMLINSON_HPP
+#define POPULATION_DYNAMICS_DEPLETION_PELLA_TOMLINSON_HPP
+
+#include "../../../common/fims_vector.hpp"
+#include "../../../common/fims_math.hpp"
+#include "depletion_base.hpp"
+
+namespace fims_popdy {
+
+/**
+ *  @brief PellaTomlinsonDepletion class that returns the Pella--Tomlinson
+ * function.
+ */
+template <typename Type>
+struct PellaTomlinsonDepletion : public DepletionBase<Type> {
+
+  PellaTomlinsonDepletion() : DepletionBase<Type>() {}
+
+  virtual ~PellaTomlinsonDepletion() {}
+
+  /**
+   * @brief Method of the depletion class that implements the
+   * Pella--Tomlinson production function for depletion, d at time, t.
+   *
+   * \f[ \frac{r}{m - 1.0} * d_{t-1} *  (1.0 - d_{t-1}^{m - 1.0} - Catch_{t-1} /
+   * K \f]
+   *
+   * @param depletion_ym1 Expected depletion from previous time step.
+   * @param catch_ym1 Catch from previous time step.
+   */
+  virtual const Type evaluate_mean(const Type& depletion_ym1,
+                                   const Type& catch_ym1) {
+
+    return depletion_ym1 +
+           (this->r[0] / (this->m[0] - 1.0)) * depletion_ym1 *
+               (1.0 - fims_math::pow(depletion_ym1, this->m[0] - 1.0)) -
+           catch_ym1 / this->K[0];
+  }
+
+  /**
+   * @brief Create a map of report vectors for the maturity object.
+   */
+  virtual void create_report_vectors(
+      std::map<std::string, fims::Vector<fims::Vector<Type>>>& report_vectors) {
+    report_vectors["r"].emplace_back(this->r);
+    report_vectors["K"].emplace_back(this->K);
+    report_vectors["m"].emplace_back(this->m);
+  }
+  virtual void get_report_vector_count(
+      std::map<std::string, size_t>& report_vector_count) {
+    report_vector_count["r"] += 1;
+    report_vector_count["K"] += 1;
+    report_vector_count["m"] += 1;
+  }
+
+};
+}  // namespace fims_popdy
+
+#endif /* POPULATION_DYNAMICS_DEPLETION_PELLA_TOMLINSON_HPP */

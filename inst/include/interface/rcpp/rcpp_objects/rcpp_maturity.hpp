@@ -267,6 +267,9 @@ class LogisticMaturityInterface : public MaturityInterfaceBase {
            << this->inflection_point[i].id_m;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(maturity->inflection_point[i]);
+        info->RegisterParameterBounds(
+            this->inflection_point[i].min_m,
+            this->inflection_point[i].max_m);
       }
       if (this->inflection_point[i].estimation_type_m.get() ==
           "random_effects") {
@@ -275,6 +278,9 @@ class LogisticMaturityInterface : public MaturityInterfaceBase {
            << this->inflection_point[i].id_m;
         info->RegisterRandomEffectName(ss.str());
         info->RegisterRandomEffect(maturity->inflection_point[i]);
+        info->RegisterRandomEffectBounds(
+            this->inflection_point[i].min_m,
+            this->inflection_point[i].max_m);
       }
     }
 
@@ -286,11 +292,15 @@ class LogisticMaturityInterface : public MaturityInterfaceBase {
         ss << "Maturity." << this->id << ".slope." << this->slope[i].id_m;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(maturity->slope[i]);
+        info->RegisterParameterBounds(this->slope[i].min_m,
+            this->slope[i].max_m);
       }
       if (this->slope[i].estimation_type_m.get() == "random_effects") {
         ss.str("");
         ss << "Maturity." << this->id << ".slope." << this->slope[i].id_m;
         info->RegisterRandomEffect(maturity->slope[i]);
+        info->RegisterRandomEffectBounds(this->slope[i].min_m,
+            this->slope[i].max_m);
         info->RegisterRandomEffectName(ss.str());
       }
     }

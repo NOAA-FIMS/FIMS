@@ -46,6 +46,18 @@ class Information {
       random_effects_parameters; /**< list of all random effects parameters >*/
   std::vector<Type *>
       fixed_effects_parameters; /**< list of all fixed effects parameters >*/
+  std::vector<double>
+      fixed_effects_parameters_min; /**< list of all fixed effects 
+                                        parameters minimum values >*/
+  std::vector<double>
+      fixed_effects_parameters_max; /**< list of all fixed effects 
+                                          parameters maximum values >*/
+  std::vector<double>
+      random_effects_parameters_min; /**< list of all random effects 
+                                        parameters minimum values >*/
+  std::vector<double>
+      random_effects_parameters_max; /**< list of all random effects 
+                                          parameters maximum values >*/
   std::vector<std::string> parameter_names; /**< list of all parameter names
                                                estimated in the model */
   std::vector<std::string>
@@ -100,6 +112,14 @@ class Information {
       uint32_t, std::shared_ptr<fims_popdy::MaturityBase<Type>>>::iterator
       maturity_models_iterator;
   /**< iterator for maturity objects>*/
+
+  std::map<uint32_t, std::shared_ptr<fims_popdy::DepletionBase<Type>>>
+      depletion_models; /**<hash map to link each object to its shared location
+                        in memory*/
+  typedef typename std::map<
+      uint32_t, std::shared_ptr<fims_popdy::DepletionBase<Type>>>::iterator
+      depletion_models_iterator;
+  /**< iterator for depletion objects>*/
 
   // fleet modules
   std::map<uint32_t, std::shared_ptr<fims_popdy::Fleet<Type>>>
@@ -157,6 +177,10 @@ class Information {
     this->data_objects.clear();
     this->populations.clear();
     this->fixed_effects_parameters.clear();
+    this->fixed_effects_parameters_min.clear();
+    this->fixed_effects_parameters_max.clear();
+    this->random_effects_parameters_min.clear();
+    this->random_effects_parameters_max.clear();
     this->fleets.clear();
     this->growth_models.clear();
     this->maturity_models.clear();
@@ -256,6 +280,26 @@ class Information {
    */
   void RegisterRandomEffect(Type &re) {
     this->random_effects_parameters.push_back(&re);
+  }
+
+  /**
+   * @brief Register min and max parameter bounds.
+   *
+   * @param p parameter
+   */
+  void RegisterParameterBounds(double min_value, double max_value) {
+    this->fixed_effects_parameters_min.push_back(min_value);
+    this->fixed_effects_parameters_max.push_back(max_value);
+  }
+
+  /**
+   * @brief Register min and max random effects bounds.
+   *
+   * @param p parameter
+   */
+  void RegisterRandomEffectBounds(double min_value, double max_value) {
+    this->random_effects_parameters_min.push_back(min_value);
+    this->random_effects_parameters_max.push_back(max_value);
   }
 
   /**
@@ -585,6 +629,44 @@ class Information {
   }
 
   /**
+   * @brief Set pointers to the recruitment module referenced in the population
+   * module.
+   *
+   * @param &valid_model reference to true/false boolean indicating whether
+   * model is valid.
+   * @param p shared pointer to population module
+   */
+  void SetDepletion(bool &valid_model,
+                    std::shared_ptr<fims_popdy::Population<Type>> p) {
+    if (p->depletion_id != -999) {
+      uint32_t depletion_uint = static_cast<uint32_t>(p->depletion_id);
+      FIMS_INFO_LOG("searching for depletion model " +
+                    fims::to_string(depletion_uint));
+      depletion_models_iterator it =
+          this->depletion_models.find(depletion_uint);
+
+      if (it != this->depletion_models.end()) {
+        p->depletion = (*it).second;  // depletion defined in population.hpp
+        FIMS_INFO_LOG("Depletion model " + fims::to_string(depletion_uint) +
+                      " successfully set to population " +
+                      fims::to_string(p->id));
+      } else {
+        valid_model = false;
+        FIMS_ERROR_LOG(
+            "Expected depletion function not defined for "
+            "population " +
+            fims::to_string(p->id) + ", depletion function " +
+            fims::to_string(depletion_uint));
+      }
+    } else {
+      FIMS_WARNING_LOG("No depletion function defined for population " +
+                       fims::to_string(p->id) +
+                       ". FIMS requires depletion functions be defined for all "
+                       "populations when running a surplus production model.");
+    }
+  }
+
+  /**
    * @brief Set pointers to the growth module referenced in the population
    * module.
    *
@@ -783,6 +865,8 @@ class Information {
       SetRecruitment(valid_model, p);
 
       SetRecruitmentProcess(valid_model, p);
+
+      SetDepletion(valid_model, p);
 
       SetGrowth(valid_model, p);
 

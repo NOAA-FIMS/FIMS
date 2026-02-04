@@ -129,7 +129,7 @@ template <typename Type>
 class FisheryModelBase : public fims_model_object::FIMSObject<Type> {
   static uint32_t id_g; /*!< global id where unique id is drawn from for fishery
                            model object*/
-  uint32_t id; /*!< unique identifier assigned for fishery model object */
+  uint32_t id; /*!< unique identifier assigned for all fishery model objects */
 
  public:
 #ifdef TMB_MODEL
@@ -241,7 +241,7 @@ class FisheryModelBase : public fims_model_object::FIMSObject<Type> {
    * @param other
    */
   FisheryModelBase(const FisheryModelBase &other)
-      : id(other.id),
+        : id(other.id),      
         population_ids(other.population_ids),
         populations(other.populations),
         fleet_derived_quantities(other.fleet_derived_quantities),

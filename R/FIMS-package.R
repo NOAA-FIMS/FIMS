@@ -18,6 +18,10 @@
 #' @export get_random
 #' @export get_parameter_names
 #' @export get_random_names
+#' @export get_parameter_min_vector
+#' @export get_parameter_max_vector
+#' @export get_random_effects_min_vector
+#' @export get_random_effects_max_vector
 #' @export get_log
 #' @export get_log_errors
 #' @export get_log_module
@@ -36,11 +40,13 @@
 #' @export Parameter
 #' @export ParameterVector
 #' @export Population
+#' @export PTDepletion
 #' @export RealVector
 #' @export set_log_throw_on_error
 #' @export SharedInt
 #' @export SharedReal
 #' @export SharedString
+#' @export SurplusProduction
 #' @import methods
 #' @import stats
 #' @importFrom ggplot2 .data
