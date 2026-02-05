@@ -19,26 +19,16 @@ html {
     letter-spacing: 1px;
 }
 
-/* Make doxygen-awesome variables follow Bootstrap variables */
-:root {
-  --page-background-color: var(--bs-body-bg);
-  --page-foreground-color: var(--bs-body-color);
-
-  --side-nav-background: var(--bs-body-bg);
-  --side-nav-foreground: var(--bs-body-color);
-
-  --separator-color: var(--bs-border-color, rgba(0,0,0,.1));
+#side-nav {
+    background: #ffffff;
 }
 
-/* Ensure the actual sidebar elements use the variables (in case other CSS overrides) */
-#side-nav,
-#nav-tree {
-  background: var(--side-nav-background) !important;
-  color: var(--side-nav-foreground) !important;
+[data-bs-theme="dark"] #side-nav {
+  background: #0e181e;
 }
 
 .navbar {
-    --bs-navbar-color: var(--bs-body-color);
+    --bs-navbar-color: #51595d;
     --bs-navbar-hover-color: #0e6876cc;
     --bs-navbar-active-color: #0e6876;
 }
@@ -101,6 +91,10 @@ html {
 
 .navbar .nav-link.active .menu-text::after {
     width: 100%;
+}
+
+#nav-tree {
+    background: #ffffff;
 }
 
 #nav-tree .label {
