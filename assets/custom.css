@@ -225,6 +225,13 @@ html {
     --side-nav-foreground: #bed9de;
     --page-background-color: #0e181e;
     --odd-color: rgba(14, 24, 30, .10);
+    --directory-levels-background: #4896a1;
+    --projectname-color: #a0a4a6 !important;
+
+  }
+
+  html:not(.light-mode) .navbar .nav-link .menu-text {
+    color: #a0a4a6 !important;
   }
 
   html:not(.light-mode) .navbar a:link,
