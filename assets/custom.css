@@ -38,7 +38,7 @@ html {
 }
 
 .navbar {
-    --bs-navbar-color: #51595d;
+    --bs-navbar-color: var(--bs-body-color);
     --bs-navbar-hover-color: #0e6876cc;
     --bs-navbar-active-color: #0e6876;
 }
