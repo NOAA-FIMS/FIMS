@@ -24,7 +24,7 @@ html {
 }
 
 [data-bs-theme="dark"] #side-nav {
-  background: #0e181e;
+  background: #0e181e !important;
 }
 
 .navbar {
