@@ -27,20 +27,23 @@ html {
 @media (prefers-color-scheme: dark) {
   html:not(.light-mode) {
     color-scheme: dark;
+    --primary-color: #4896a1 !important;
     --side-nav-background: #0e181e !important; /* your chosen dark color */
-    --side-nav-foreground: #cfd5d8 !important;
+    --side-nav-foreground: #bed9de !important;
     --page-background-color: #0e181e !important;
+    --nav-tree-background: #0e181e !important;
+
   }
 
   html:not(.light-mode) .navbar a:link,
   html:not(.light-mode) .navbar a:visited,
   html:not(.light-mode) .navbar a:active {
-    color: #ffffff !important; /* your navbar link color */
+    color: #bed9de !important; /* your navbar link color */
   }
 }
 
 
-@media (prefers-color-scheme: dark) {
+/*@media (prefers-color-scheme: dark) {
     html:not(.light-mode) {
         color-scheme: dark;
         --primary-color: #1982d2;
@@ -89,6 +92,7 @@ html {
         --fragment-linenumber-border: #1f1f1f;
     }
 }
+*/
 
 .navbar {
     --bs-navbar-color: #51595d;
