@@ -205,17 +205,26 @@ a.anchor {
   scroll-margin-top: 120px; /* increase if header is tall */
 }
 
-html { --side-nav-background: #ffffff; }
+/* Light mode default */
+html {
+  --side-nav-background: #ffffff;
+}
 
+/* Force nav panes to use the variable (wins over theme) */
+#side-nav,
+#nav-tree {
+  background: var(--side-nav-background) !important;
+}
+
+/* Dark mode override */
 @media (prefers-color-scheme: dark) {
   html:not(.light-mode) {
     color-scheme: dark;
-    --primary-color: #4896a1 !important;
-    --side-nav-background: #0e181e !important; /* your chosen dark color */
-    --side-nav-foreground: #bed9de !important;
-    --page-background-color: #0e181e !important;
-    --nav-tree-background: #0e181e !important;
-
+    --primary-color: #4896a1;
+    --side-nav-background: #0e181e;
+    --side-nav-foreground: #bed9de;
+    --page-background-color: #0e181e;
+    --odd-color: rgba(14, 24, 30, .10);
   }
 
   html:not(.light-mode) .navbar a:link,
