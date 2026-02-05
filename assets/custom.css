@@ -19,28 +19,9 @@ html {
     letter-spacing: 1px;
 }
 
-#side-nav {
+/*#side-nav {
     background: #ffffff;
-}
-
-
-@media (prefers-color-scheme: dark) {
-  html:not(.light-mode) {
-    color-scheme: dark;
-    --primary-color: #4896a1 !important;
-    --side-nav-background: #0e181e !important; /* your chosen dark color */
-    --side-nav-foreground: #bed9de !important;
-    --page-background-color: #0e181e !important;
-    --nav-tree-background: #0e181e !important;
-
-  }
-
-  html:not(.light-mode) .navbar a:link,
-  html:not(.light-mode) .navbar a:visited,
-  html:not(.light-mode) .navbar a:active {
-    color: #bed9de !important; /* your navbar link color */
-  }
-}
+}*/
 
 
 /*@media (prefers-color-scheme: dark) {
@@ -160,9 +141,9 @@ html {
     width: 100%;
 }
 
-#nav-tree {
+/*#nav-tree {
     background: #ffffff;
-}
+}*/
 
 #nav-tree .label {
     font-family: Outfit, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif !important;
@@ -222,4 +203,24 @@ div.contents .toc {
 
 a.anchor {
   scroll-margin-top: 120px; /* increase if header is tall */
+}
+
+html { --side-nav-background: #ffffff; }
+
+@media (prefers-color-scheme: dark) {
+  html:not(.light-mode) {
+    color-scheme: dark;
+    --primary-color: #4896a1 !important;
+    --side-nav-background: #0e181e !important; /* your chosen dark color */
+    --side-nav-foreground: #bed9de !important;
+    --page-background-color: #0e181e !important;
+    --nav-tree-background: #0e181e !important;
+
+  }
+
+  html:not(.light-mode) .navbar a:link,
+  html:not(.light-mode) .navbar a:visited,
+  html:not(.light-mode) .navbar a:active {
+    color: #bed9de !important; /* your navbar link color */
+  }
 }
