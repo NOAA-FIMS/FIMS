@@ -6,12 +6,12 @@ namespace
 {
   TEST(DepletionEvaluate, DoubleInput){
     fims_popdy::PellaTomlinsonDepletion<double> pella_tomlinson1;
-    pella_tomlinson1.log_r.resize(1);
-    pella_tomlinson1.log_K.resize(1);
-    pella_tomlinson1.log_m.resize(1);
-    pella_tomlinson1.log_r[0] = fims_math::log(0.2);
-    pella_tomlinson1.log_K[0] = fims_math::log(645.0);
-    pella_tomlinson1.log_m[0] = fims_math::log(2.0);
+    pella_tomlinson1.r.resize(1);
+    pella_tomlinson1.K.resize(1);
+    pella_tomlinson1.m.resize(1);
+    pella_tomlinson1.r[0] = 0.2;
+    pella_tomlinson1.K[0] = 645.0;
+    pella_tomlinson1.m[0] = 2.0;
 
     // Test values from the jabba comparison
     // (via the Rdata object being used by the data group)

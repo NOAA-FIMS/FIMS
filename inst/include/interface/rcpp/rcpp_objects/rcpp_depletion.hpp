@@ -512,7 +512,7 @@ class PellaTomlinsonInterface : public DepletionInterfaceBase {
       this->log_depletion[0].initial_value_m == -999.0);
 
     // Resize vectors
-    size_t depletion_size = this->n_years.get() + 1;
+    size_t depletion_size = this->n_years.get();
     depletion_module->depletion.resize(depletion_size);
     depletion_module->log_depletion.resize(depletion_size);
 

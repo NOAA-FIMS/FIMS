@@ -19,7 +19,7 @@ namespace
         surplus_production_model->CalculateIndex(population, year);
         surplus_production_model->CalculateBiomass(population, year);
         surplus_production_model->CalculateReferencePoints(population);
-        auto& dq_pop = surplus_production_model->population_derived_quantities[population->GetId()];
+        auto& dq_pop = surplus_production_model->GetPopulationDerivedQuantities(population->GetId());
 
         fmsy[0] = exp(population->depletion->log_r[0]) *
             pow(exp(population->depletion->log_m[0])-1,-1) *
@@ -47,7 +47,7 @@ namespace
         surplus_production_model->CalculateIndex(population, year);
         surplus_production_model->CalculateBiomass(population, year);
         surplus_production_model->CalculateHarvestRate(population, year);
-        auto& dq_pop = surplus_production_model->population_derived_quantities[population->GetId()];
+        auto& dq_pop = surplus_production_model->GetPopulationDerivedQuantities(population->GetId());
 
         harvest_rate[year] = dq_pop["observed_catch"][year] / dq_pop["biomass"][year];
         EXPECT_EQ( harvest_rate[year], dq_pop["harvest_rate"][year]);

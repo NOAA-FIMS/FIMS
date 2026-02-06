@@ -14,9 +14,9 @@ namespace
         }
 
         surplus_production_model->CalculateIndex(surplus_production_model->populations[0], year);
-        for (int fleet_ = 0; fleet_ < population->nfleets; fleet_++) {
+        for (int fleet_ = 0; fleet_ < population->n_fleets; fleet_++) {
             auto& fleet = population->fleets[fleet_];
-            auto& fleet_dq = surplus_production_model->fleet_derived_quantities[fleet->GetId()];
+            auto& fleet_dq = surplus_production_model->GetFleetDerivedQuantities(fleet->GetId());
             index[year] = population->depletion->depletion[year] * fleet->q[0] * 
                 exp(population->depletion->log_K[0]);
             log_index[year] = fims_math::log(index[year]);

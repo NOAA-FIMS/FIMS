@@ -81,6 +81,34 @@ class SurplusProduction : public FisheryModelBase<Type> {
    */
   std::map<std::string, fims::Vector<fims::Vector<Type>>> report_vectors;
 
+  /**
+   * @name Documentation Reference Functions
+   * @brief These functions exist only for documentation purposes and should not
+   * be called. They serve as targets for `@copydoc` directives to reuse parameter
+   * documentation.
+   */
+
+  /**
+   * @param population A shared pointer to the population object.
+   */
+  void doc_population(
+      std::shared_ptr<fims_popdy::Population<Type>> &population
+  );
+  /**
+   * @copydoc doc_population
+   * @param year The index of the current year.
+   */
+  void doc_population_year(
+      std::shared_ptr<fims_popdy::Population<Type>> &population,
+      size_t year
+  );
+
+
+  public:
+  /**
+   * Constructor for the SurplusProduction class. This constructor initializes the
+   * name of the model and sets the id of the model.
+   */
   SurplusProduction() : fims_popdy::FisheryModelBase<Type>() {
     std::stringstream ss;
     ss << "sp_" << this->GetId() << "_";
@@ -89,9 +117,9 @@ class SurplusProduction : public FisheryModelBase<Type> {
   }
 
   /**
-   * @brief Copy constructor for the CatchAtAge class.
+   * @brief Copy constructor for the SurplusProduction class.
    *
-   * @param other The other CatchAtAge object to copy from.
+   * @param other The other SurplusProduction object to copy from.
    */
   SurplusProduction(const SurplusProduction &other)
       : FisheryModelBase<Type>(other), name_m(other.name_m) {
@@ -104,6 +132,12 @@ class SurplusProduction : public FisheryModelBase<Type> {
    */
   virtual ~SurplusProduction() {}
 
+
+
+   /**
+   * This function is called once at the beginning of the model run. It
+   * initializes the derived quantities for the populations and fleets.
+   */
   virtual void Initialize() {
     for (size_t p = 0; p < this->populations.size(); p++) {
         std::shared_ptr<fims_popdy::Population<Type>> &population =
@@ -126,6 +160,10 @@ class SurplusProduction : public FisheryModelBase<Type> {
     }
   }
 
+  /**
+   * This function is used to reset the derived quantities of a population or
+   * fleet to a given value at the start of each model iteration.
+   */
   void Prepare() {
     for (size_t p = 0; p < this->populations.size(); p++) {
      std::shared_ptr<fims_popdy::Population<Type>> &population =
@@ -181,8 +219,7 @@ class SurplusProduction : public FisheryModelBase<Type> {
 
 /**
  * @brief Sum over the observed catch for a given population and year.
- * @param population A shared pointer to the population object.
- * @param year The year for which to calculate the catch.
+ * @copydoc doc_population_year()
  */
   void CalculateCatch(std::shared_ptr<fims_popdy::Population<Type>> &population,
                       size_t year) {
@@ -204,7 +241,7 @@ class SurplusProduction : public FisheryModelBase<Type> {
 
   /**
    * @brief Evaluate the log expected depletion for a given population and year.
-   * @copydoc CalculateCatch()
+   * @copydoc doc_population_year()
    */
   void CalculateDepletion(
     //depletion ~ LN(log_expected_depletion, sigma)
@@ -234,18 +271,12 @@ class SurplusProduction : public FisheryModelBase<Type> {
           );
         
     }
-    //first year depletion is initialized in rcpp interface at 0.5
-    //subsequent years are calculated based on inverse log of log_depletion
-    //log_depletion is n_years-1 as first year depletion is informed by init_log_depletion
-    population->depletion->depletion[year] = fims_math::exp(population->depletion->log_depletion[year]);
-      
-  
     
   }
 
   /**
    * @brief Evaluate the population index for a given population and year.
-   * @copydoc CalculateCatch()
+   * @copydoc doc_population_year()
    */
   void CalculateIndex(std::shared_ptr<fims_popdy::Population<Type>> &population,
                       size_t year) {
@@ -270,7 +301,7 @@ class SurplusProduction : public FisheryModelBase<Type> {
 
   /**
    * @brief Evaluate the population biomass for a given population and year.
-   * @copydoc CalculateCatch()
+   * @copydoc doc_population_year()
    */
   void CalculateBiomass(
       std::shared_ptr<fims_popdy::Population<Type>> &population,
@@ -282,6 +313,10 @@ class SurplusProduction : public FisheryModelBase<Type> {
         fims_math::exp(population->depletion->log_K[0]);
   }
 
+  /**
+   * @brief Evaluate the ratio of index to the product of depletion and K for a given population and year.
+   * @copydoc doc_population_year()
+   */
   void CalculateIndexToDepletionKRatio(std::shared_ptr<fims_popdy::Population<Type>> &population,
                       size_t year) {
     //This does not work for many populations to one fleet relationships
@@ -305,6 +340,10 @@ class SurplusProduction : public FisheryModelBase<Type> {
     }
   } 
 
+  /**
+   * @brief Approximate the mean of log catchability (q).
+   * @copydoc doc_population()
+   */
   void CalculateMeanLogQ(std::shared_ptr<fims_popdy::Population<Type>> &population) {
     for (size_t fleet_ = 0; fleet_ < population->n_fleets; fleet_++) {
       std::map<std::string, fims::Vector<Type>> &fdq_ =
@@ -323,6 +362,10 @@ class SurplusProduction : public FisheryModelBase<Type> {
 
   } 
 
+  /**
+   * @brief Evaluate reference points for a given population.
+   * @copydoc doc_population()
+   */
   void CalculateReferencePoints(std::shared_ptr<fims_popdy::Population<Type>> &population) {
     std::map<std::string, fims::Vector<Type>> &pdq_ =
         this->GetPopulationDerivedQuantities(population->GetId());
@@ -338,6 +381,10 @@ class SurplusProduction : public FisheryModelBase<Type> {
     pdq_["msy"][0] = pdq_["fmsy"][0] * pdq_["bmsy"][0];
   }
 
+  /**
+   * @brief Evaluate harvest rates for a given population and year.
+   * @copydoc doc_population_year()
+   */
   void CalculateHarvestRate(std::shared_ptr<fims_popdy::Population<Type>> &population,
                       size_t year) {
     std::map<std::string, fims::Vector<Type>> &pdq_ =

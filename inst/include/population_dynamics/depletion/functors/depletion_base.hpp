@@ -47,13 +47,13 @@ struct DepletionBase : public fims_model_object::FIMSObject<Type> {
   
   // Transformation modules
   std::shared_ptr<fims_transformations::ParameterTransformationBase<Type>> 
-      r_transformation;
+      r_transformation; /**< Pointer to the transformation function for the intrinsic growth rate */
   std::shared_ptr<fims_transformations::ParameterTransformationBase<Type>> 
-      K_transformation;
+      K_transformation; /**< Pointer to the transformation function for the carrying capacity */
   std::shared_ptr<fims_transformations::ParameterTransformationBase<Type>> 
-      m_transformation;
+      m_transformation; /**< Pointer to the transformation function for the shape parameter */
   std::shared_ptr<fims_transformations::ParameterTransformationBase<Type>> 
-      depletion_transformation;
+      depletion_transformation; /**< Pointer to the transformation function for depletion */
 
   /** @brief Constructor.
    */

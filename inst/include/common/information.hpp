@@ -285,7 +285,8 @@ class Information {
   /**
    * @brief Register min and max parameter bounds.
    *
-   * @param p parameter
+   * @param min_value parameter minimum value
+   * @param max_value parameter maximum value
    */
   void RegisterParameterBounds(double min_value, double max_value) {
     this->fixed_effects_parameters_min.push_back(min_value);
@@ -295,7 +296,8 @@ class Information {
   /**
    * @brief Register min and max random effects bounds.
    *
-   * @param p parameter
+   * @param min_value random effects minimum value
+   * @param max_value random effects maximum value
    */
   void RegisterRandomEffectBounds(double min_value, double max_value) {
     this->random_effects_parameters_min.push_back(min_value);

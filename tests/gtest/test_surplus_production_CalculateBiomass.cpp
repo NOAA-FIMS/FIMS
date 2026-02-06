@@ -16,7 +16,7 @@ namespace
         surplus_production_model->CalculateIndex(population, year);
         surplus_production_model->CalculateBiomass(population, year);
 
-        auto& dq_pop = surplus_production_model->population_derived_quantities[population->GetId()];
+        auto& dq_pop = surplus_production_model->GetPopulationDerivedQuantities(population->GetId());
 
         biomass[year] = population->depletion->depletion[year] * 
                 exp(population->depletion->log_K[0]);

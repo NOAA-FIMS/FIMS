@@ -87,6 +87,18 @@ target_link_libraries(fims_math_fabs_min_max
 
 gtest_discover_tests(fims_math_fabs_min_max)
 
+# test_parameter_transformations_log.cpp
+add_executable(parameter_transformations_log
+  test_parameter_transformations_log.cpp
+)
+
+target_link_libraries(parameter_transformations_log
+  gtest_main
+  fims_test
+)
+
+gtest_discover_tests(parameter_transformations_log)
+
 # test_population_dynamics_growth.cpp
 add_executable(population_dynamics_growth
   test_population_dynamics_growth.cpp

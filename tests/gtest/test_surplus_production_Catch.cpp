@@ -9,9 +9,9 @@ namespace
         std::vector<double> observed_catch(nyears, 0);
         // calculate landings in in suplus production module
         surplus_production_model->CalculateCatch(population, year);
-        auto& dq_pop = surplus_production_model->population_derived_quantities[population->GetId()];
+        auto& dq_pop = surplus_production_model->GetPopulationDerivedQuantities(population->GetId());
 
-        for (int fleet_ = 0; fleet_ < population->nfleets; fleet_++) {
+        for (int fleet_ = 0; fleet_ < population->n_fleets; fleet_++) {
             observed_catch[year] += population->fleets[fleet_]->observed_landings_data->at(year);
         }
 
