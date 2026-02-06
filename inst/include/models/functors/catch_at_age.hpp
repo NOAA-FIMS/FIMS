@@ -259,7 +259,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
   }
 
   /**
-   * @brief Calculates numbers at age at year and age specific indices.
+   * @brief Calculates numbers at age for a population.
    *
    * This function calculates numbers at age by applying total mortality
    * \f$Z\f$ to individuals from the previous time step. It also handles
@@ -344,14 +344,14 @@ class CatchAtAge : public FisheryModelBase<Type> {
   }
 
   /**
-   * @brief Calculates total mortality at an index, year, and age.
+   * @brief Calculates total mortality for a population.
    *
    * This function calculates total mortality \f$Z\f$ for a specific age and
    * year, combining natural mortality \f$M\f$ and fishing mortality \f$F\f$
    * from all fleets.
    *
    * The fishing mortality \f$F_{f,a,y}\f$ for each fleet \f$f\f$ is computed
-   * using age-specific selectivity \f$S_f(a)\f$ and fleet-specific annual
+   * using age-specific selectivity \f$S_f(a)\f$, fleet-specific annual
    * fishing mortality \f$F_{f,y}\f$, and year-specific F multiplier
    * \f$f_y\f$:
    * \f[
@@ -359,10 +359,15 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * \f]
    *
    * Total fishing mortality at age \f$a\f$ and year \f$y\f$ is the sum over
-   * fleets: \f[ F_{a,y} = \sum_{f=1}^{N_{fleets}} F_{f,a,y} \f]
+   * fleets:
+   * \f[
+   * F_{a,y} = \sum_{f=1}^{N_{fleets}} F_{f,a,y}
+   * \f]
    *
    * Total mortality \f$Z_{a,y}\f$ is the sum of natural and fishing mortality:
-   * \f[ Z_{a,y} = M_{a,y} + F_{a,y} \f]
+   * \f[
+   * Z_{a,y} = M_{a,y} + F_{a,y}
+   * \f]
    *
    * @param population Shared pointer to the population object.
    * @param i_age_year Dimension folded index for age and year.
@@ -393,7 +398,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
   }
 
   /**
-   * @brief Calculates biomass.
+   * @brief Calculates biomass for a population.
    *
    * Adds the biomass at age to the total biomass for a given year \f$y\f$ by
    * multiplying numbers at age \f$a\f$ by weight at age \f$w_a\f$:
@@ -442,7 +447,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
   }
 
   /**
-   * @brief Calculates spawning biomass.
+   * @brief Calculates spawning biomass for a population.
    *
    * This function computes yearly \f$y\f$ spawning biomass \f$SB_y\f$ by
    * summing the contributions from each age \f$a\f$, accounting for proportion
@@ -471,8 +476,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
   }
 
   /**
-   * @brief Adds to existing yearly unfished spawning biomass the biomass for a
-   * given year and age.
+   * @brief Calculated unfished spawning biomass for a population
    *
    * Updates unfished spawning biomass \f$SB^U_y\f$ by adding the biomass of age
    * \f$a\f$ in year \f$y\f$:
@@ -576,7 +580,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
   }
 
   /**
-   * @brief Calculates expected recruitment for a given year.
+   * @brief Calculates expected recruitment for a population.
    *
    * Calculates expected recruitment as a function of spawning biomass and
    * equilibrium spawning biomass per recruit \f$\phi_0\f$.
@@ -596,7 +600,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * @param population Shared pointer to the population object.
    * @param i_age_year Dimension folded index for age and year.
    * @param year The year recruitment is being calculated for.
-   * @param i_dev Index to log_recruit_dev of vector length nyears-1.
+   * @param i_dev Index to log_recruit_dev of vector length n_years-1.
    */
   void CalculateRecruitment(
       std::shared_ptr<fims_popdy::Population<Type>> &population,
@@ -628,8 +632,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
   }
 
   /**
-   * @brief Calculates expected proportion of individuals mature at a selected
-   * age.
+   * @brief Calculates maturity at age, in proportion, for a population.
    *
    * This function evaluates the maturity ogive at the specified age to estimate
    * the proportion of individuals that are mature:
@@ -652,7 +655,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
   }
 
   /**
-   * @brief Adds to existing expected total landings by fleet.
+   * @brief Calculated landings for a population by a given fleet.
    *
    * This function updates fleet-specific and total expected landings for a
    * given year and age by using age-specific landings from each fleet and
@@ -688,7 +691,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
   }
 
   /**
-   * @brief Calculates expected landings weight at age for each fleet
+   * @brief Calculates weight at age of the landings for a given fleet from a population.
    *
    * This function computes the expected landings at age in weight by
    * multiplying the expected landings numbers at age by the corresponding
@@ -719,7 +722,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
   }
 
   /**
-   * @brief Calculates landings in numbers at age for each fleet for a given
+   * @brief Calculates numbers of fish for the landings for a given fleet from a population.
    * year and age.
    *
    * This function uses the Baranov Catch Equation to calculate expected
@@ -766,7 +769,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
   }
 
   /**
-   * @brief Adds to the expected population indices by fleet.
+   * @brief Calculates the index for a fleet from a population.
    *
    * This function updates the population indices for each fleet by adding the
    * age- and year-specific index weights and numbers to the corresponding
@@ -803,7 +806,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
   }
 
   /**
-   * @brief Calculates index sample in numbers at age for each fleet
+   * @brief Calculates the numbers for the index for a fleet from a population.
    *
    * This function calculates the expected index in numbers at age for each
    * fleet, using catchability, selectivity, and population numbers at age:
@@ -848,7 +851,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
   }
 
   /**
-   * @brief Calculates expected index weight at age for each fleet.
+   * @brief Calculates biomass of fish for the index for a given fleet from a population.
    *
    * This function computes the expected index weight at age by multiplying the
    * expected index numbers at age by the corresponding weight at age:
