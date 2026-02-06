@@ -302,7 +302,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
   }
 
   /**
-   * @brief Calculates unfished numbers at age at year and age specific indices
+   * @brief Calculates unfished numbers at age at year and age specific indices.
    *
    * This function computes unfished numbers at age by applying survival
    * through time using only natural mortality, without any fishing pressure.
@@ -448,7 +448,8 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * summing the contributions from each age \f$a\f$, accounting for proportion
    * female, proportion mature, and weight at age \f$w_a\f$:
    * \f[
-   * SB_y \mathrel{+}= N_{a,y} \times w_a \times p_{female,a} \times p_{mature,a}
+   * SB_y \mathrel{+}= N_{a,y} \times w_a \times p_{female,a} \times
+   * p_{mature,a}
    * \f]
    *
    * @param population Shared pointer to the population object.
@@ -476,7 +477,8 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * Updates unfished spawning biomass \f$SB^U_y\f$ by adding the biomass of age
    * \f$a\f$ in year \f$y\f$:
    * \f[
-   * SB^U_y \mathrel{+}= N^U_{a,y} \times w_a \times p_{female,a} \times p_{mature,a}
+   * SB^U_y \mathrel{+}= N^U_{a,y} \times w_a \times p_{female,a} \times
+   * p_{mature,a}
    * \f]
    *
    * @param population Shared pointer to the population object.
@@ -527,12 +529,13 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * equilibrium, assuming an unfished stock. The biomass is calculated as the
    * sum of the biomass contributions from each age \f$a\f$:
    * \f[
-   * \phi_0 = \sum_{a=0}^{A} N_a \times p_{female,a} \times p_{mature,a} \times w_a
+   * \phi_0 = \sum_{a=0}^{A} N_a \times p_{female,a} \times p_{mature,a} \times
+   * w_a
    * \f]
    *
    * The numbers at age \f$N_a\f$ are calculated recursively with natural
-   * mortality: \f[ N_a = N_{a-1} \times \exp(-M_a) \quad \text{for } a = 1, \ldots,
-   * A-1 \f]
+   * mortality: \f[ N_a = N_{a-1} \times \exp(-M_a) \quad \text{for } a = 1,
+   * \ldots, A-1 \f]
    *
    * Plus group update:
    * \f[
@@ -722,7 +725,8 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * This function uses the Baranov Catch Equation to calculate expected
    * landings in numbers at age for each fleet. With F multiplier \f$f_y\f$:
    * \f[
-   * C_{f,a,y} = \frac{F_{f,y} \times f_y \times S_f(a)}{Z_{a,y}} \times N_{a,y} \times
+   * C_{f,a,y} = \frac{F_{f,y} \times f_y \times S_f(a)}{Z_{a,y}} \times N_{a,y}
+   * \times
    * \left( 1 - \exp(-Z_{a,y}) \right)
    * \f]
    *
@@ -732,7 +736,8 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * - \f$F_{f,y}\f$ is fleet-specific fishing mortality in year \f$y\f$
    * - \f$S_f(a)\f$ is selectivity at age \f$a\f$ for fleet \f$f\f$
    * - \f$Z_{a,y}\f$ is total mortality at age \f$a\f$ and year \f$y\f$
-   * - \f$N_{a,y}\f$ is the number of individuals at age \f$a\f$ and year \f$y\f$
+   * - \f$N_{a,y}\f$ is the number of individuals at age \f$a\f$ and year
+   * \f$y\f$
    *
    * @param population Shared pointer to the population object.
    * @param i_age_year Dimension folded index for age and year.
@@ -779,7 +784,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * \f$y\f$
    * - \f$IWAA_{a,y}\f$ is the index weight at age \f$a\f$ in year \f$y\f$
    * - \f$INAA_{a,y}\f$ is the index numbers at age \f$a\f$ in year \f$y\f$
-   * 
+   *
    * @param population Shared pointer to the population object.
    * @param i_age_year Dimension-folded index for age and year.
    * @param year The year of the population index.
@@ -813,10 +818,11 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * \f$y\f$
    * - \f$S_f(a)\f$ is the selectivity at age \f$a\f$ for fleet \f$f\f$
    * - \f$N_{a,y}\f$ is the population numbers at age \f$a\f$ and year \f$y\f$
-   * 
+   *
    * When timing is accounted for within FIMS the equation will include the
    * fraction of the year when the survey was conducted \f$t_y\f$:
-   * \f[ I_{f,a,y} \mathrel{+}= S_{f,y}(a) \times N_{a,y} \times e^{(-t_{y}Z_{a,y})}\f]
+   * \f[ I_{f,a,y} \mathrel{+}= S_{f,y}(a) \times N_{a,y} \times
+   * e^{(-t_{y}Z_{a,y})}\f]
    *
    * @param population Shared pointer to the population object.
    * @param i_age_year Dimension folded index for age and year.
