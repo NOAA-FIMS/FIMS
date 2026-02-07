@@ -655,11 +655,23 @@ class CatchAtAge : public FisheryModelBase<Type> {
   }
 
   /**
-   * @brief Calculated landings for a population by a given fleet.
+   * @brief Calculates total catch (landings) by fleet and population for a
+   * given year by aggregating age-specific catch over ages.
    *
    * This function updates fleet-specific and total expected landings for a
-   * given year and age by using age-specific landings from each fleet and
-   * summing over ages.
+   * given year and age by accumulating age-specific catch from each fleet:
+   * \f[
+   * CW_{f,y} \mathrel{+}= CW_{f,a,y}, \quad
+   * C_{f,y} \mathrel{+}= C_{f,a,y}
+   * \f]
+   *
+   * where
+   * - \f$CW_{f,y}\f$ is total catch weight for fleet \f$f\f$ in year
+   * \f$y\f$
+   * - \f$C_{f,y}\f$ is total catch numbers for fleet \f$f\f$ in year
+   * \f$y\f$
+   * - \f$CW_{f,a,y}\f$, \f$C_{f,a,y}\f$ are catch weight and numbers for fleet
+   * \f$f\f$ at age \f$a\f$ in year \f$y\f$.
    *
    * @param population Shared pointer to the population object.
    * @param year The year of expected total landings.
@@ -691,7 +703,8 @@ class CatchAtAge : public FisheryModelBase<Type> {
   }
 
   /**
-   * @brief Calculates weight at age of the landings for a given fleet from a population.
+   * @brief Calculates weight at age of the landings for a given fleet from a
+   * population.
    *
    * This function computes the expected landings at age in weight by
    * multiplying the expected landings numbers at age by the corresponding
@@ -722,8 +735,8 @@ class CatchAtAge : public FisheryModelBase<Type> {
   }
 
   /**
-   * @brief Calculates numbers of fish for the landings for a given fleet from a population.
-   * year and age.
+   * @brief Calculates numbers of fish for the landings for a given fleet from a
+   * population, year and age.
    *
    * This function uses the Baranov Catch Equation to calculate expected
    * landings in numbers at age for each fleet. With F multiplier \f$f_y\f$:
@@ -851,7 +864,8 @@ class CatchAtAge : public FisheryModelBase<Type> {
   }
 
   /**
-   * @brief Calculates biomass of fish for the index for a given fleet from a population.
+   * @brief Calculates biomass of fish for the index for a given fleet from a
+   * population.
    *
    * This function computes the expected index weight at age by multiplying the
    * expected index numbers at age by the corresponding weight at age:
