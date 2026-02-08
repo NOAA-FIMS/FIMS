@@ -1,3 +1,8 @@
+# FIMS 0.8.1
+
+* Implement time-varying selectivity
+* Implement time-varying weight-at-age data
+
 # FIMS 0.8.0
 
 * Allow for projections based on fixed fishing mortality, catches, or in theory
