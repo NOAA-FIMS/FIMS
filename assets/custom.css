@@ -234,8 +234,7 @@ html {
     --page-background-color: #0e181e;
     --odd-color: rgba(14, 24, 30, .10);
     --directory-levels-background: #4896a1;
-    --projectname-color: #a0a4a6 !important;
-
+    --separator-color: #213f4b;
   }
 
   html:not(.light-mode) div.header .title {
@@ -250,13 +249,18 @@ html {
     --bs-navbar-color: #a0a4a6;
   }
 
+
   html:not(.light-mode) .navbar .nav-link .menu-text {
     color: var(--bs-navbar-color) !important;
+  }
+
+   html:not(.light-mode) #projectname {
+    color: #a0a4a6; 
   }
 
   html:not(.light-mode) .navbar a:link,
   html:not(.light-mode) .navbar a:visited,
   html:not(.light-mode) .navbar a:active {
-    color: #bed9de !important; /* your navbar link color */
+    color: #bed9de !important;
   }
 }
