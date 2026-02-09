@@ -149,6 +149,14 @@ html {
     font-family: Outfit, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif !important;
 }
 
+#nav-tree .label a {
+    font-weight: bold
+}
+
+#nav-tree .selected a {
+    font-weight: normal;
+}
+
 div.toc li, div.toc h3 {
     font-family: Outfit, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif !important;
 }
@@ -230,8 +238,20 @@ html {
 
   }
 
+  html:not(.light-mode) div.header .title {
+    color: #bed9de; 
+  }
+
+  html:not(.light-mode) div.header {
+    border-bottom-color: #213f4b; 
+  }
+
+  html:not(.light-mode) .navbar {
+    --bs-navbar-color: #a0a4a6;
+  }
+
   html:not(.light-mode) .navbar .nav-link .menu-text {
-    color: #a0a4a6 !important;
+    color: var(--bs-navbar-color) !important;
   }
 
   html:not(.light-mode) .navbar a:link,
