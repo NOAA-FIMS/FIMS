@@ -376,6 +376,25 @@ RCPP_MODULE(fims) {
       .method("get_id", &EWAAGrowthInterface::get_id)
       .method("evaluate", &EWAAGrowthInterface::evaluate);
 
+  Rcpp::class_<VonBertalanffyGrowthInterface>("VonBertalanffyGrowth")
+  .constructor()
+  .field("L1", &VonBertalanffyGrowthInterface::L1)
+  .field("L2", &VonBertalanffyGrowthInterface::L2)
+  .field("K",  &VonBertalanffyGrowthInterface::K)
+  .field("age_L1", &VonBertalanffyGrowthInterface::age_L1)
+  .field("age_L2", &VonBertalanffyGrowthInterface::age_L2)
+  .field("a_wl", &VonBertalanffyGrowthInterface::a_wl)
+  .field("b_wl", &VonBertalanffyGrowthInterface::b_wl)
+  .field("SDgrowth", &VonBertalanffyGrowthInterface::SDgrowth)
+  .field("n_ages", &VonBertalanffyGrowthInterface::n_ages)
+  .method("get_id", &VonBertalanffyGrowthInterface::get_id)
+  .method("evaluate", &VonBertalanffyGrowthInterface::evaluate)
+  .method("to_json",  &VonBertalanffyGrowthInterface::to_json)
+#ifdef TMB_MODEL
+  .method("add_to_fims_tmb", &VonBertalanffyGrowthInterface::add_to_fims_tmb)
+#endif
+;
+
   Rcpp::class_<DnormDistributionsInterface>("DnormDistribution")
       .constructor()
       .method("get_id", &DnormDistributionsInterface::get_id,

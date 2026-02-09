@@ -289,6 +289,36 @@ initialize_recruitment <- function(parameters, data) {
 #' The initialized growth module as an object.
 #' @noRd
 initialize_growth <- function(parameters, data) {
+  growth_input <- parameters |>
+    dplyr::filter(module_name == "Growth")
+
+  growth_type <- growth_input |>
+    dplyr::pull(module_type) |>
+    unique() |>
+    na.omit()
+
+  if (length(growth_type) == 1 && growth_type == "VonBertalanffy") {
+    sd_rows <- parameters |>
+      dplyr::filter(module_name == "Growth", label == "SDgrowth")
+
+    if (nrow(sd_rows) > 1 && all(!is.na(sd_rows$age))) {
+      sd_rows <- sd_rows |>
+        dplyr::arrange(age)
+
+      parameters <- parameters |>
+        dplyr::filter(!(module_name == "Growth" & label == "SDgrowth")) |>
+        dplyr::bind_rows(sd_rows)
+    }
+
+    missing_labels <- setdiff(c("age_L1", "age_L2"), growth_input$label)
+    if (length(missing_labels) > 0) {
+      stop(
+        "VonBertalanffy Growth requires age_L1 and age_L2. ",
+        "Use create_default_parameters() or supply them explicitly."
+      )
+    }
+  }
+
   module <- initialize_module(
     parameters = parameters,
     data = data,

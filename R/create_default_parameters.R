@@ -143,6 +143,11 @@ create_default_parameters <- function(
     unnested_configurations = unnested_configurations,
     data = data
   )
+  #Create growth parameters
+  growth_temp <- create_default_growth(
+    unnested_configurations = unnested_configurations,
+    data = data
+  )
 
   # Create population parameters
   # Handle population parameters based on recruitment form
@@ -161,6 +166,7 @@ create_default_parameters <- function(
     fleet_temp,
     recruitment_temp,
     maturity_temp,
+    growth_temp,
     population_temp
   )
   # Merge with configuration_unnest
@@ -180,6 +186,50 @@ create_default_parameters <- function(
       model_family, module_name, module_type, label, distribution_link, dplyr::everything()
     ) |>
     tidyr::nest(.by = c(model_family, module_name, fleet_name))
+}
+
+#' Create default growth parameters (VonB only)
+#' @noRd
+create_default_growth <- function(unnested_configurations, data) {
+
+  form <- unnested_configurations |>
+    dplyr::filter(module_name == "Growth") |>
+    dplyr::pull(module_type) |>
+    unique() |>
+    na.omit()
+
+  # Only act if VonB is requested
+  if (length(form) == 1 && form == "VonBertalanffy") {
+
+    ages <- get_ages(data)
+    if (length(ages) == 0 || all(is.na(ages))) {
+      age_L1 <- 0
+      n_ages <- get_n_ages(data)
+      age_L2 <- if (n_ages > 0) n_ages - 1 else 0
+    } else {
+      age_L1 <- min(ages, na.rm = TRUE)
+      age_L2 <- max(ages, na.rm = TRUE)
+    }
+
+    default <- create_default_parameters_template(n_parameters = 9) |>
+      dplyr::mutate(
+        module_name = "Growth",
+        module_type = "VonBertalanffy",
+        label = c("L1", "L2", "K", "age_L1", "age_L2",
+                  "a_wl", "b_wl", "SDgrowth", "SDgrowth"),
+        age = c(NA_real_, NA_real_, NA_real_, NA_real_, NA_real_,
+                NA_real_, NA_real_, age_L1, age_L2),
+        value = c(8, 60, 0.2, age_L1, age_L2,
+                  1e-5, 3,
+                  3, 7),
+        estimation_type = "constant"
+      )
+
+    return(default)
+  }
+
+  # Otherwise: no growth parameters added
+  create_default_parameters_template(n_parameters = 0)
 }
 
 #' Create default parameters for a FIMS model

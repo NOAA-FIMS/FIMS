@@ -608,6 +608,21 @@ class Information {
         p->growth =
             (*it).second;  // growth defined in population.hpp (the object
         // is called p, growth is within p)
+        if (std::shared_ptr<fims_popdy::VonBertalanffyGrowthModelAdapter<Type>>
+                adapter = std::dynamic_pointer_cast<
+                    fims_popdy::VonBertalanffyGrowthModelAdapter<Type>>(
+                    p->growth)) {
+          adapter->Initialize(p->n_years, p->n_ages, 1);
+          if (p->ages.size() > 0) {
+            double min_age = p->ages[0];
+            for (size_t i = 1; i < p->ages.size(); ++i) {
+              if (p->ages[i] < min_age) {
+                min_age = p->ages[i];
+              }
+            }
+            adapter->SetAgeOffset(static_cast<double>(min_age));
+          }
+        }
         FIMS_INFO_LOG("Growth model " + fims::to_string(growth_uint) +
                       " successfully set to population " +
                       fims::to_string(p->id));

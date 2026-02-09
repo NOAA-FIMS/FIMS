@@ -9,6 +9,8 @@
 #ifndef FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_GROWTH_HPP
 #define FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_GROWTH_HPP
 
+#include <cmath>
+
 #include "../../../population_dynamics/growth/growth.hpp"
 #include "rcpp_interface_base.hpp"
 
@@ -255,4 +257,244 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
 #endif
 };
 
+/**
+ * @brief Rcpp interface for VonBertalanffyGrowth to instantiate from R:
+ * vb <- methods::new(VonBertalanffyGrowth)
+ */
+class VonBertalanffyGrowthInterface : public GrowthInterfaceBase {
+ public:
+  // Required parameters
+  ParameterVector L1;
+  ParameterVector L2;
+  ParameterVector K;
+  ParameterVector age_L1;
+  ParameterVector age_L2;
+
+  // Length-weight conversion params
+  ParameterVector a_wl;
+  ParameterVector b_wl;
+  // Length-at-age SD params
+  ParameterVector SDgrowth;
+  // Age dimension (for bounds checking)
+  SharedInt n_ages = 0;
+
+  VonBertalanffyGrowthInterface() : GrowthInterfaceBase() {
+    GrowthInterfaceBase::live_objects[this->id] =
+        std::make_shared<VonBertalanffyGrowthInterface>(*this);
+    FIMSRcppInterfaceBase::fims_interface_objects.push_back(
+        std::make_shared<VonBertalanffyGrowthInterface>(*this));
+  }
+
+  VonBertalanffyGrowthInterface(const VonBertalanffyGrowthInterface& other)
+      : GrowthInterfaceBase(other),
+        L1(other.L1),
+        L2(other.L2),
+        K(other.K),
+        age_L1(other.age_L1),
+        age_L2(other.age_L2),
+        a_wl(other.a_wl),
+        b_wl(other.b_wl),
+        SDgrowth(other.SDgrowth),
+        n_ages(other.n_ages) {}
+
+  virtual ~VonBertalanffyGrowthInterface() {}
+
+  virtual uint32_t get_id() { return this->id; }
+
+  virtual double evaluate(double age) {
+    if (age < 0.0) {
+      Rcpp::stop("Negative age not supported");
+    }
+    if (this->n_ages.get() <= 0) {
+      Rcpp::stop("n_ages not set");
+    }
+    const double age_round = std::round(age);
+    const double tol = 1e-8;
+    if (std::fabs(age - age_round) > tol) {
+      Rcpp::stop("Non-integer age not supported yet");
+    }
+    if (age_round >= this->n_ages.get()) {
+      Rcpp::stop("Age out of range for growth model");
+    }
+    fims_popdy::VonBertalanffyGrowth<double> vb;
+    if (this->L1.size() < 1 || this->L2.size() < 1 || this->K.size() < 1 ||
+        this->age_L1.size() < 1 || this->age_L2.size() < 1 ||
+        this->a_wl.size() < 1 || this->b_wl.size() < 1) {
+      Rcpp::stop("VonBertalanffyGrowth parameters not set");
+    }
+
+    vb.L1 = this->L1[0].initial_value_m;
+    vb.L2 = this->L2[0].initial_value_m;
+    vb.K  = this->K[0].initial_value_m;
+    vb.age_L1 = this->age_L1[0].initial_value_m;
+    vb.age_L2 = this->age_L2[0].initial_value_m;
+
+    vb.a_wl = this->a_wl[0].initial_value_m;
+    vb.b_wl = this->b_wl[0].initial_value_m;
+
+    return vb.evaluate(age);
+  }
+
+virtual std::string to_json() {
+  std::stringstream ss;
+
+  ss << "{\n";
+  ss << " \"module_name\":\"Growth\",\n";
+  ss << " \"module_type\": \"VonBertalanffy\",\n";
+  ss << " \"module_id\": " << this->id << ",\n";
+
+  ss << " \"parameters\": [\n";
+
+  // L1
+  ss << "{\n";
+  ss << "   \"name\": \"L1\",\n";
+  ss << "   \"id\":" << this->L1.id_m << ",\n";
+  ss << "   \"type\": \"vector\",\n";
+  ss << "   \"dimensionality\": {\n";
+  ss << "    \"header\": [null],\n";
+  ss << "    \"dimensions\": [" << this->L1.size() << "]\n";
+  ss << "   },\n";
+  ss << "   \"values\":" << this->L1 << "\n";
+  ss << "},\n";
+
+  // K
+  ss << "{\n";
+  ss << "   \"name\": \"K\",\n";
+  ss << "   \"id\":" << this->K.id_m << ",\n";
+  ss << "   \"type\": \"vector\",\n";
+  ss << "   \"dimensionality\": {\n";
+  ss << "    \"header\": [null],\n";
+  ss << "    \"dimensions\": [" << this->K.size() << "]\n";
+  ss << "   },\n";
+  ss << "   \"values\":" << this->K << "\n";
+  ss << "},\n";
+
+  // L2
+  ss << "{\n";
+  ss << "   \"name\": \"L2\",\n";
+  ss << "   \"id\":" << this->L2.id_m << ",\n";
+  ss << "   \"type\": \"vector\",\n";
+  ss << "   \"dimensionality\": {\n";
+  ss << "    \"header\": [null],\n";
+  ss << "    \"dimensions\": [" << this->L2.size() << "]\n";
+  ss << "   },\n";
+  ss << "   \"values\":" << this->L2 << "\n";
+  ss << "},\n";
+
+  // age_L1
+  ss << "{\n";
+  ss << "   \"name\": \"age_L1\",\n";
+  ss << "   \"id\":" << this->age_L1.id_m << ",\n";
+  ss << "   \"type\": \"vector\",\n";
+  ss << "   \"dimensionality\": {\n";
+  ss << "    \"header\": [null],\n";
+  ss << "    \"dimensions\": [" << this->age_L1.size() << "]\n";
+  ss << "   },\n";
+  ss << "   \"values\":" << this->age_L1 << "\n";
+  ss << "},\n";
+
+  // age_L2
+  ss << "{\n";
+  ss << "   \"name\": \"age_L2\",\n";
+  ss << "   \"id\":" << this->age_L2.id_m << ",\n";
+  ss << "   \"type\": \"vector\",\n";
+  ss << "   \"dimensionality\": {\n";
+  ss << "    \"header\": [null],\n";
+  ss << "    \"dimensions\": [" << this->age_L2.size() << "]\n";
+  ss << "   },\n";
+  ss << "   \"values\":" << this->age_L2 << "\n";
+  ss << "},\n";
+
+  // a_wl
+  ss << "{\n";
+  ss << "   \"name\": \"a_wl\",\n";
+  ss << "   \"id\":" << this->a_wl.id_m << ",\n";
+  ss << "   \"type\": \"vector\",\n";
+  ss << "   \"dimensionality\": {\n";
+  ss << "    \"header\": [null],\n";
+  ss << "    \"dimensions\": [" << this->a_wl.size() << "]\n";
+  ss << "   },\n";
+  ss << "   \"values\":" << this->a_wl << "\n";
+  ss << "},\n";
+
+  // b_wl (last)
+  ss << "{\n";
+  ss << "   \"name\": \"b_wl\",\n";
+  ss << "   \"id\":" << this->b_wl.id_m << ",\n";
+  ss << "   \"type\": \"vector\",\n";
+  ss << "   \"dimensionality\": {\n";
+  ss << "    \"header\": [null],\n";
+  ss << "    \"dimensions\": [" << this->b_wl.size() << "]\n";
+  ss << "   },\n";
+  ss << "   \"values\":" << this->b_wl << "\n";
+  ss << "},\n";
+
+  // SDgrowth (SD1, SDA)
+  ss << "{\n";
+  ss << "   \"name\": \"SDgrowth\",\n";
+  ss << "   \"id\":" << this->SDgrowth.id_m << ",\n";
+  ss << "   \"type\": \"vector\",\n";
+  ss << "   \"dimensionality\": {\n";
+  ss << "    \"header\": [null],\n";
+  ss << "    \"dimensions\": [" << this->SDgrowth.size() << "]\n";
+  ss << "   },\n";
+  ss << "   \"values\":" << this->SDgrowth << "\n";
+  ss << "}]\n";
+
+  ss << "}";
+
+  return ss.str();
+}
+#ifdef TMB_MODEL
+template <typename Type>
+bool add_to_fims_tmb_internal() {
+  std::shared_ptr<fims_info::Information<Type>> info =
+      fims_info::Information<Type>::GetInstance();
+
+  std::shared_ptr<fims_popdy::VonBertalanffyGrowthModelAdapter<Type>> vb =
+      std::make_shared<fims_popdy::VonBertalanffyGrowthModelAdapter<Type>>();
+
+  vb->id = this->id;
+
+  // For now, use initial values
+  if (this->L1.size() < 1 || this->L2.size() < 1 || this->K.size() < 1 ||
+      this->age_L1.size() < 1 || this->age_L2.size() < 1 ||
+      this->a_wl.size() < 1 || this->b_wl.size() < 1) {
+    Rcpp::stop("VonBertalanffyGrowth parameters not set");
+  }
+  if (this->SDgrowth.size() < 2) {
+    Rcpp::stop("SDgrowth must have two values (SD1, SDA)");
+  }
+  vb->SetVonBertalanffyParameters(
+      this->L1[0].initial_value_m,
+      this->L2[0].initial_value_m,
+      this->K[0].initial_value_m,
+      this->age_L1[0].initial_value_m,
+      this->age_L2[0].initial_value_m);
+  vb->SetLengthWeightParameters(
+      this->a_wl[0].initial_value_m,
+      this->b_wl[0].initial_value_m);
+  vb->SetLengthSdParams(this->SDgrowth[0].initial_value_m,
+                        this->SDgrowth[1].initial_value_m);
+
+  info->growth_models[vb->id] = vb;
+  return true;
+}
+
+virtual bool add_to_fims_tmb() {
+  this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
+#ifdef TMBAD_FRAMEWORK
+  this->add_to_fims_tmb_internal<TMBAD_FIMS_TYPE>();
+#else
+  this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
+  this->add_to_fims_tmb_internal<TMB_FIMS_FIRST_ORDER>();
+  this->add_to_fims_tmb_internal<TMB_FIMS_SECOND_ORDER>();
+  this->add_to_fims_tmb_internal<TMB_FIMS_THIRD_ORDER>();
 #endif
+  return true;
+}
+#endif
+
+};  // end class
+
+#endif  // FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_GROWTH_HPP
