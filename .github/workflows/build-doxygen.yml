@@ -119,7 +119,7 @@ jobs:
         source_file: 'doxygen'
         destination_repo: 'e-perl-NOAA/noaa-fims.github.io' #need to change back
         destination_folder: './'
-        destination_branch: 'gh-pages'
+        destination_branch: 'main'
         user_email: 'elizabeth.gugliotti@noaa.gov' # your email
         user_name: 'Elizabeth Perl'           # your login
         commit_message: 'Docs: run Doxygen'
