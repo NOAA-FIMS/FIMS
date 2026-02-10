@@ -411,7 +411,7 @@ FIMSFit <- function(
   # Determine the number of parameters
   n_total <- length(obj[["env"]][["last.par.best"]])
   n_fixed_effects <- length(obj[["par"]])
-  n_random_effects <- length(obj[["env"]][["parList()"]][["re"]])
+  n_random_effects <- length(obj[["env"]]$parList()[["re"]])
   number_of_parameters <- c(
     fixed_effects = n_fixed_effects,
     random_effects = n_random_effects
@@ -428,7 +428,7 @@ FIMSFit <- function(
   # Rename parameters instead of "p"
   parameter_names <- names(get_parameter_names(obj[["par"]]))
   names(obj[["par"]]) <- parameter_names
-  random_effects_names <- names(get_random_names(obj[["env"]][["parList()"]][["re"]]))
+  random_effects_names <- names(get_random_names(obj[["env"]]$parList()[["re"]]))
 
   # Get the report
   report <- if (length(opt) == 0) {
@@ -454,7 +454,9 @@ FIMSFit <- function(
   )
 
   # Create JSON output for FIMS run
-  model_output <- input[["model"]]$get_output(do_sd_report = length(opt) > 0)
+  model_output <- input[["model"]]$get_output(
+    do_sd_report = length(sdreport) > 0
+  )
   # Reshape the JSON estimates
   json_estimates <- reshape_json_estimates(model_output)
   # Merge json_estimates into tmb_estimates based on parameter id
