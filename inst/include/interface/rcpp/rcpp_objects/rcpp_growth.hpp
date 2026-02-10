@@ -9,6 +9,7 @@
 #ifndef FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_GROWTH_HPP
 #define FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_GROWTH_HPP
 
+#include <algorithm>
 #include <cmath>
 
 #include "../../../population_dynamics/growth/growth.hpp"
@@ -313,8 +314,20 @@ class VonBertalanffyGrowthInterface : public GrowthInterfaceBase {
     if (std::fabs(age - age_round) > tol) {
       Rcpp::stop("Non-integer age not supported yet");
     }
-    if (age_round >= this->n_ages.get()) {
-      Rcpp::stop("Age out of range for growth model");
+    double min_age = 0.0;
+    double max_age = static_cast<double>(this->n_ages.get() - 1);
+    if (this->age_L1.size() > 0 && this->age_L2.size() > 0) {
+      const double a1 = this->age_L1[0].initial_value_m;
+      const double a2 = this->age_L2[0].initial_value_m;
+      if (a2 < a1 || (a2 == a1 && this->n_ages.get() > 1)) {
+        Rcpp::stop("VonBertalanffyGrowth age_L2 must be >= age_L1");
+      }
+      min_age = std::min(a1, a2);
+      max_age = std::max(a1, a2);
+    }
+    if (age_round < min_age - tol || age_round > max_age + tol) {
+      Rcpp::warning(
+          "Age outside [age_L1, age_L2]; extrapolating growth curve.");
     }
     fims_popdy::VonBertalanffyGrowth<double> vb;
     if (this->L1.size() < 1 || this->L2.size() < 1 || this->K.size() < 1 ||

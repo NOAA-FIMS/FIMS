@@ -58,6 +58,9 @@ class VonBertalanffyGrowthModelAdapter : public GrowthBase<Type> {
                   std::size_t n_ages,
                   std::size_t n_sexes = 1) {
     EnsureParamsSet();
+    n_years_ = n_years;
+    n_ages_ = n_ages;
+    n_sexes_ = n_sexes;
     model_ = std::make_shared<GrowthModel<Type>>(n_years, n_ages, n_sexes);
     model_->SetVonBertalanffyParameters(L1_, L2_, K_, age_L1_, age_L2_);
     model_->SetLengthWeightParameters(a_wl_, b_wl_);
@@ -104,6 +107,22 @@ class VonBertalanffyGrowthModelAdapter : public GrowthBase<Type> {
     return p.MeanWAA(0, age_index, 0);
   }
 
+  /**
+   * @brief Prepare and return growth products for reporting.
+   */
+  const GrowthProducts<Type>& GetProductsForReporting() {
+    if (!model_) {
+      if (n_ages_ == 0) {
+        throw std::runtime_error(
+            "Growth model not initialized; n_ages is 0");
+      }
+      Initialize(n_years_ == 0 ? 1 : n_years_, n_ages_,
+                 n_sexes_ == 0 ? 1 : n_sexes_);
+    }
+    model_->Prepare();
+    return model_->GetProducts();
+  }
+
  private:
   Type L1_ = Type(0.0);
   Type L2_ = Type(0.0);
@@ -114,6 +133,9 @@ class VonBertalanffyGrowthModelAdapter : public GrowthBase<Type> {
   Type sd_LA_ = Type(7.0);
   Type age_L1_ = Type(0.0);
   Type age_L2_ = Type(0.0);
+  std::size_t n_years_ = 0;
+  std::size_t n_ages_ = 0;
+  std::size_t n_sexes_ = 1;
   double age_offset_ = 0.0;
   bool age_offset_set_ = false;
   bool vb_params_set_ = false;

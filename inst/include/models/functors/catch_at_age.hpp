@@ -1044,10 +1044,14 @@ class CatchAtAge : public FisheryModelBase<Type> {
       vector<vector<Type>> log_init_naa_p(n_pops);
       vector<vector<Type>> spawning_biomass_ratio_p(n_pops);
       vector<vector<Type>> log_f_multiplier_p(n_pops);
+      vector<vector<Type>> growth_mean_LAA_p(n_pops);
+      vector<vector<Type>> growth_sd_LAA_p(n_pops);
+      vector<vector<Type>> growth_mean_WAA_p(n_pops);
 
       // initialize fleet vectors
       vector<vector<Type>> agecomp_expected_f(n_fleets);
       vector<vector<Type>> agecomp_proportion_f(n_fleets);
+      vector<vector<Type>> age_to_length_conversion_f(n_fleets);
       vector<vector<Type>> catch_index_f(n_fleets);
       vector<vector<Type>> index_expected_f(n_fleets);
       vector<vector<Type>> index_numbers_f(n_fleets);
@@ -1075,7 +1079,6 @@ class CatchAtAge : public FisheryModelBase<Type> {
         std::map<std::string, fims::Vector<Type>> &derived_quantities =
             this->GetPopulationDerivedQuantities(this->populations[p]->GetId());
         this->populations[p]->maturity->create_report_vectors(report_vectors);
-        this->populations[p]->growth->create_report_vectors(report_vectors);
         this->populations[p]->recruitment->create_report_vectors(
             report_vectors);
         biomass_p(pop_idx) = derived_quantities["biomass"].to_tmb();
@@ -1110,6 +1113,25 @@ class CatchAtAge : public FisheryModelBase<Type> {
         log_f_multiplier_p(pop_idx) =
             this->populations[pop_idx]->log_f_multiplier.to_tmb();
 
+        if (std::shared_ptr<fims_popdy::VonBertalanffyGrowthModelAdapter<Type>>
+                adapter = std::dynamic_pointer_cast<
+                    fims_popdy::VonBertalanffyGrowthModelAdapter<Type>>(
+                    this->populations[p]->growth)) {
+          const auto& gp = adapter->GetProductsForReporting();
+          const std::size_t n = gp.Size();
+          vector<Type> mean_laa(n);
+          vector<Type> sd_laa(n);
+          vector<Type> mean_waa(n);
+          for (std::size_t i = 0; i < n; ++i) {
+            mean_laa(i) = gp.mean_LAA[i];
+            sd_laa(i) = gp.sd_LAA[i];
+            mean_waa(i) = gp.mean_WAA[i];
+          }
+          growth_mean_LAA_p(pop_idx) = mean_laa;
+          growth_sd_LAA_p(pop_idx) = sd_laa;
+          growth_mean_WAA_p(pop_idx) = mean_waa;
+        }
+
         pop_idx += 1;
       }
 
@@ -1127,6 +1149,8 @@ class CatchAtAge : public FisheryModelBase<Type> {
             derived_quantities["agecomp_expected"].to_tmb();
         agecomp_proportion_f(fleet_idx) =
             derived_quantities["agecomp_proportion"].to_tmb();
+        age_to_length_conversion_f(fleet_idx) =
+            fleet->age_to_length_conversion.to_tmb();
         catch_index_f(fleet_idx) = derived_quantities["catch_index"].to_tmb();
         index_expected_f(fleet_idx) =
             derived_quantities["index_expected"].to_tmb();
@@ -1245,6 +1269,9 @@ class CatchAtAge : public FisheryModelBase<Type> {
       FIMS_REPORT_F_("spawning_biomass_ratio", spawning_biomass_ratio_p,
                      this->of);
       FIMS_REPORT_F_("log_f_multiplier", log_f_multiplier_p, this->of);
+      FIMS_REPORT_F_("growth_mean_LAA", growth_mean_LAA_p, this->of);
+      FIMS_REPORT_F_("growth_sd_LAA", growth_sd_LAA_p, this->of);
+      FIMS_REPORT_F_("growth_mean_WAA", growth_mean_WAA_p, this->of);
 
       // adreport
       ADREPORT_F(biomass, this->of);
@@ -1268,6 +1295,8 @@ class CatchAtAge : public FisheryModelBase<Type> {
       // report
       FIMS_REPORT_F_("agecomp_expected", agecomp_expected_f, this->of);
       FIMS_REPORT_F_("agecomp_proportion", agecomp_proportion_f, this->of);
+      FIMS_REPORT_F_("age_to_length_conversion", age_to_length_conversion_f,
+                     this->of);
       FIMS_REPORT_F_("catch_index", catch_index_f, this->of);
       FIMS_REPORT_F_("index_expected", index_expected_f, this->of);
       FIMS_REPORT_F_("index_numbers", index_numbers_f, this->of);
