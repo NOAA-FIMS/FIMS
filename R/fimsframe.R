@@ -718,8 +718,13 @@ FIMSFrame <- function(data) {
   }
 
   # Get the earliest and latest year formatted as integers
-  start_year <- as.integer(floor(min(data[["timing"]], na.rm = TRUE)))
-  end_year <- as.integer(floor(max(data[["timing"]], na.rm = TRUE)))
+  data_to_use_4_timing <- dplyr::filter(
+    data,
+    type != "weight-at-age"
+  ) |>
+    dplyr::pull(timing)
+  start_year <- as.integer(floor(min(data_to_use_4_timing, na.rm = TRUE)))
+  end_year <- as.integer(floor(max(data_to_use_4_timing, na.rm = TRUE)))
   n_years <- as.integer(end_year - start_year + 1)
   years <- start_year:end_year
 
