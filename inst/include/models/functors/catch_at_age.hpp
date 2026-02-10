@@ -250,8 +250,35 @@ class CatchAtAge : public FisheryModelBase<Type> {
     std::map<std::string, fims::Vector<Type>> &dq_ =
         this->GetPopulationDerivedQuantities(population->GetId());
 
-    dq_["numbers_at_age"][i_age_year] =
-        fims_math::exp(population->log_init_naa[a]);
+    // dq_["numbers_at_age"][i_age_year] =
+    //     fims_math::exp(population->log_init_naa[a]);
+    // Temporary test: calculate initial numbers at age using equilibrium initalization logic
+    Type R1 = fims_math::exp(population->log_init_naa[0]);
+    Type F_init_scalar = fims_math::exp(population->log_f_multiplier[0]);
+
+    if (a == 0) {
+        // Initial Age 0 fish
+        dq_["numbers_at_age"][i_age_year] = R1;
+    } else {
+        // We need to recursively calculate based on the previous age
+        size_t i_agem1_year1 = i_age_year - 1;
+        
+        // Calculate Z_init for the PREVIOUS age to survive them to the current age
+        // Use Fleet 0 selectivity to match BAM's single-fleet assumption
+        Type sel_prev = population->fleets[0]->selectivity->evaluate(population->ages[a-1]);
+        Type Z_init_prev = population->M[a-1] + (F_init_scalar * sel_prev);
+        
+        dq_["numbers_at_age"][i_age_year] = dq_["numbers_at_age"][i_agem1_year1] * fims_math::exp(-Z_init_prev);
+
+        // Plus Group Calculation (BAM analytical solution)
+        if (a == (population->n_ages - 1)) {
+            Type sel_plus = population->fleets[0]->selectivity->evaluate(population->ages[a]);
+            Type Z_init_plus = population->M[a] + (F_init_scalar * sel_plus);
+            
+            // This transforms the last age into the sum of all older ages
+            dq_["numbers_at_age"][i_age_year] /= (static_cast<Type>(1.0) - fims_math::exp(-Z_init_plus));
+        }
+    }
   }
 
   /**
