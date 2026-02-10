@@ -28,7 +28,7 @@ test_that("`get_number_of_parameters()` works with correct inputs", {
     fit_data <- readRDS(fit_file)
     expected_n_total <- length(fit_data@obj[["env"]][["last.par.best"]])
     expected_n_fixed_effects <- length(fit_data@obj[["par"]])
-    expected_n_random_effects <- length(fit_data@obj[["env"]][["parList()"]][["re"]])
+    expected_n_random_effects <- length(fit_data@obj[["env"]]$parList()[["re"]])
     number_of_parameters <- get_number_of_parameters(fit_data)
     expected_vector <- c(
       fixed_effects = expected_n_fixed_effects,
