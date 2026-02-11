@@ -1,5 +1,5 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html xmlns="http://www.w3.org/1999/xhtml" data-bs-theme="auto">
 <head>
     <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
     <meta http-equiv="X-UA-Compatible" content="IE=9"/>
@@ -8,9 +8,10 @@
 
     <title>$projectname</title><link href="$relpath^tabs.css" rel="stylesheet" type="text/css"/>
     <link rel="icon" type="image/png" href="https://noaa-fims.github.io/images/FIMS_hexlogo.png">
-    
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-    <link href="https://noaa-fims.github.io/site_libs/bootstrap/bootstrap-0d7642d9f0085e55ff1babbc913e88da.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+    <link href="https://noaa-fims.github.io/site_libs/bootstrap/bootstrap-0d7642d9f0085e55ff1babbc913e88da.min.css" rel="stylesheet">
+    <link href="https://noaa-fims.github.io/site_libs/bootstrap/bootstrap-dark-14bdf6b38375578f483856591ab05b48.min.css" rel="stylesheet" media="(prefers-color-scheme: dark)">
     <script type="text/javascript" src="$relpath^jquery.js"></script>
     <script type="text/javascript" src="$relpath^dynsections.js"></script>
     $treeview
@@ -21,11 +22,11 @@
 
     <script src="https://noaa-fims.github.io/site_libs/quarto-nav/quarto-nav.js"></script>
     <script src="https://noaa-fims.github.io/site_libs/bootstrap/bootstrap.min.js"></script>
-    <script src="https://noaa-fims.github.io/site_libs/quarto-html/quarto.js" type="module"></script>  
+    <script src="https://noaa-fims.github.io/site_libs/quarto-html/quarto.js" type="module"></script>
 </head>
 <body>
 
-<div id="top"> 
+<div id="top">
     <div id="titlearea">
         <table cellspacing="0" cellpadding="0">
             <tbody>
@@ -42,7 +43,7 @@
             </tbody>
         </table>
     </div>
-    <nav class="navbar navbar-expand-lg " data-bs-theme="light">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="auto">
       <div class="navbar-container container-fluid">
         <div class="navbar-brand-container mx-auto">
           <a href="https://noaa-fims.github.io/" class="navbar-brand navbar-brand-logo"></a>
@@ -63,25 +64,24 @@
                 <li><a class="dropdown-item" href="https://noaa-fims.github.io/about/index.html"><span class="dropdown-text">overview</span></a></li>
                 <li><a class="dropdown-item" href="https://noaa-fims.github.io/about/faq.html"><span class="dropdown-text">faq</span></a></li>
                 <li><a class="dropdown-item" href="https://noaa-fims.github.io/about/calendar.html"><span class="dropdown-text">calendar</span></a></li>
-                <li><a class="dropdown-item" href="https://noaa-fims.github.io/changelog/FIMS_CHANGELOG.html"><span class="dropdown-text">changelog</span></a></li>
+                <li><a class="dropdown-item" href="https://noaa-fims.github.io/about/FIMS_CHANGELOG.html"><span class="dropdown-text">changelog</span></a></li>
                 <li><a class="dropdown-item" href="https://noaa-fims.github.io/about/acknowledgements.html"><span class="dropdown-text">acknowledgements</span></a></li>
               </ul>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="https://noaa-fims.github.io/fims-weekly/index.html"><span class="menu-text">fims weekly</span></a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="https://noaa-fims.github.io/projects/index.html"><span class="menu-text">projects</span></a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="https://noaa-fims.github.io/packages/index.html"><span class="menu-text">packages</span></a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="https://noaa-fims.github.io/sites/sites_index.html"><span class="menu-text">resources</span></a>
+              <a class="nav-link" href="https://noaa-fims.github.io/blog/index.html"><span class="menu-text">blog</span></a>
             </li>
             <li class="nav-item dropdown ">
-              <a class="nav-link dropdown-toggle" href="https://noaa-fims.github.io/contact/index.html" id="nav-menu-about" role="link" data-bs-toggle="dropdown" aria-expanded="false"><span class="menu-text">contact</span></a>
-              <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="nav-menu-about">
+              <a class="nav-link dropdown-toggle" href="https://noaa-fims.github.io/resources/resources.html" id="nav-menu-resources" role="link" data-bs-toggle="dropdown" aria-expanded="false"><span class="menu-text">resources</span></a>
+              <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="nav-menu-resources">
+                <li><a class="dropdown-item" href="https://noaa-fims.github.io/resources/resources.html"><span class="dropdown-text">resources</span></a></li>
+                <li><a class="dropdown-item" href="https://noaa-fims.github.io/resources/packages.html"><span class="dropdown-text">R packages</span></a></li>
+                <li><a class="dropdown-item" href="https://noaa-fims.github.io/resources/projects.html"><span class="dropdown-text">projects</span></a></li>
+              </ul>
+            </li>
+            <li class="nav-item dropdown ">
+              <a class="nav-link dropdown-toggle" href="https://noaa-fims.github.io/contact/index.html" id="nav-menu-contact" role="link" data-bs-toggle="dropdown" aria-expanded="false"><span class="menu-text">contact</span></a>
+              <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="nav-menu-contact">
                 <li><a class="dropdown-item" href="https://noaa-fims.github.io/contact/index.html"><span class="dropdown-text">contact FIMS lead</span></a></li>
                 <li><a class="dropdown-item" href="https://noaa-fims.github.io/contact/contributors.html"><span class="dropdown-text">FIMS team</span></a></li>
               </ul>
