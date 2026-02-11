@@ -449,10 +449,25 @@ methods::setMethod(
       )
     }
     # Create time-series vector if only available by age
-    if (NROW(model_data) == get_n_ages(x)) {
-      model_data <- dplyr::bind_rows(
-          replicate(get_n_ages(x), model_data, simplify = FALSE)
+    n_rows <- NROW(dplyr::filter(model_data, value != -999))
+    n_rows_needed <- get_n_ages(x) * get_n_years(x)
+    if (n_rows < n_rows_needed) {
+      if (n_rows == get_n_ages(x)) {
+        model_data <- dplyr::bind_rows(
+          replicate(
+            # Adds a year for terminal year + 1 because to calculate
+            # spawning biomass after fishing in terminal year
+            get_n_years(x) + 1,
+            dplyr::filter(model_data, value != -999),
+            simplify = FALSE
+          )
         )
+      } else {
+        cli::cli_abort(
+          "Too few rows of weight-at-age data found, you need at least
+          {n_rows_needed}, one for every year and age combination."
+        )
+      }
     }
     model_data |>
       dplyr::pull(.data[["value"]])
