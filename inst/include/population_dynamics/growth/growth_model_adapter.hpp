@@ -25,44 +25,44 @@ class VonBertalanffyGrowthModelAdapter : public GrowthBase<Type> {
  public:
   VonBertalanffyGrowthModelAdapter() : GrowthBase<Type>() {}
 
-  fims::Vector<Type>& L1Vector() {
+  fims::Vector<Type>& LengthAtRefAge1Vector() {
     use_param_vectors_ = true;
     vb_params_set_ = true;
-    return L1_v_;
+    return length_at_ref_age_1_vector_;
   }
-  fims::Vector<Type>& L2Vector() {
+  fims::Vector<Type>& LengthAtRefAge2Vector() {
     use_param_vectors_ = true;
     vb_params_set_ = true;
-    return L2_v_;
+    return length_at_ref_age_2_vector_;
   }
-  fims::Vector<Type>& KVector() {
+  fims::Vector<Type>& GrowthCoefficientKVector() {
     use_param_vectors_ = true;
     vb_params_set_ = true;
-    return K_v_;
+    return growth_coefficient_K_vector_;
   }
-  fims::Vector<Type>& AgeL1Vector() {
+  fims::Vector<Type>& ReferenceAgeForLength1Vector() {
     use_param_vectors_ = true;
     vb_params_set_ = true;
-    return age_L1_v_;
+    return reference_age_for_length_1_vector_;
   }
-  fims::Vector<Type>& AgeL2Vector() {
+  fims::Vector<Type>& ReferenceAgeForLength2Vector() {
     use_param_vectors_ = true;
     vb_params_set_ = true;
-    return age_L2_v_;
+    return reference_age_for_length_2_vector_;
   }
-  fims::Vector<Type>& AwlVector() {
+  fims::Vector<Type>& LengthWeightAVector() {
     use_param_vectors_ = true;
     lw_params_set_ = true;
-    return a_wl_v_;
+    return length_weight_a_vector_;
   }
-  fims::Vector<Type>& BwlVector() {
+  fims::Vector<Type>& LengthWeightBVector() {
     use_param_vectors_ = true;
     lw_params_set_ = true;
-    return b_wl_v_;
+    return length_weight_b_vector_;
   }
-  fims::Vector<Type>& SDgrowthVector() {
+  fims::Vector<Type>& LengthAtAgeSdAtRefAgesVector() {
     use_param_vectors_ = true;
-    return SDgrowth_v_;
+    return length_at_age_sd_at_ref_ages_vector_;
   }
 
   // If ages do not start at zero, set the minimum age here so we can
@@ -146,14 +146,14 @@ class VonBertalanffyGrowthModelAdapter : public GrowthBase<Type> {
 
  private:
   // Stored in log-scale for positive parameters.
-  fims::Vector<Type> L1_v_;
-  fims::Vector<Type> L2_v_;
-  fims::Vector<Type> K_v_;
-  fims::Vector<Type> age_L1_v_;
-  fims::Vector<Type> age_L2_v_;
-  fims::Vector<Type> a_wl_v_;
-  fims::Vector<Type> b_wl_v_;
-  fims::Vector<Type> SDgrowth_v_;
+  fims::Vector<Type> length_at_ref_age_1_vector_;
+  fims::Vector<Type> length_at_ref_age_2_vector_;
+  fims::Vector<Type> growth_coefficient_K_vector_;
+  fims::Vector<Type> reference_age_for_length_1_vector_;
+  fims::Vector<Type> reference_age_for_length_2_vector_;
+  fims::Vector<Type> length_weight_a_vector_;
+  fims::Vector<Type> length_weight_b_vector_;
+  fims::Vector<Type> length_at_age_sd_at_ref_ages_vector_;
   bool use_param_vectors_ = false;
   std::size_t n_years_ = 0;
   std::size_t n_ages_ = 0;
@@ -168,39 +168,45 @@ class VonBertalanffyGrowthModelAdapter : public GrowthBase<Type> {
   Type EvaluateWithFunctor(const double& a) const {
     EnsureParamsSet();
     fims_popdy::VonBertalanffyGrowth<Type> vb;
-    vb.L1 = CurrentL1();
-    vb.L2 = CurrentL2();
-    vb.K = CurrentK();
-    vb.age_L1 = CurrentAgeL1();
-    vb.age_L2 = CurrentAgeL2();
-    vb.a_wl = CurrentAwl();
-    vb.b_wl = CurrentBwl();
+    vb.length_at_ref_age_1 = CurrentLengthAtRefAge1();
+    vb.length_at_ref_age_2 = CurrentLengthAtRefAge2();
+    vb.growth_coefficient_K = CurrentGrowthCoefficientK();
+    vb.reference_age_for_length_1 = CurrentReferenceAgeForLength1();
+    vb.reference_age_for_length_2 = CurrentReferenceAgeForLength2();
+    vb.length_weight_a = CurrentLengthWeightA();
+    vb.length_weight_b = CurrentLengthWeightB();
     return vb.evaluate(a);
   }
 
   void SyncParamsToModel() const {
     if (!model_) return;
     EnsureParamsSet();
-    model_->SetVonBertalanffyParameters(CurrentL1(), CurrentL2(), CurrentK(),
-                                        CurrentAgeL1(), CurrentAgeL2());
-    model_->SetLengthWeightParameters(CurrentAwl(), CurrentBwl());
-    model_->SetLengthSdParams(CurrentSD1(), CurrentSDA());
+    model_->SetVonBertalanffyParameters(CurrentLengthAtRefAge1(), CurrentLengthAtRefAge2(), CurrentGrowthCoefficientK(),
+                                        CurrentReferenceAgeForLength1(), CurrentReferenceAgeForLength2());
+    model_->SetLengthWeightParameters(CurrentLengthWeightA(), CurrentLengthWeightB());
+    model_->SetLengthSdParams(CurrentLengthAtAgeSdAtReferenceAge1(), CurrentLengthAtAgeSdAtReferenceAge2());
   }
 
-  Type CurrentL1() const { return fims_math::exp(L1_v_[0]); }
-  Type CurrentL2() const { return fims_math::exp(L2_v_[0]); }
-  Type CurrentK() const { return fims_math::exp(K_v_[0]); }
-  Type CurrentAgeL1() const { return age_L1_v_[0]; }
-  Type CurrentAgeL2() const { return age_L2_v_[0]; }
-  Type CurrentAwl() const { return fims_math::exp(a_wl_v_[0]); }
-  Type CurrentBwl() const { return fims_math::exp(b_wl_v_[0]); }
-  Type CurrentSD1() const { return fims_math::exp(SDgrowth_v_[0]); }
-  Type CurrentSDA() const { return fims_math::exp(SDgrowth_v_[1]); }
+  Type CurrentLengthAtRefAge1() const { return fims_math::exp(length_at_ref_age_1_vector_[0]); }
+  Type CurrentLengthAtRefAge2() const { return fims_math::exp(length_at_ref_age_2_vector_[0]); }
+  Type CurrentGrowthCoefficientK() const { return fims_math::exp(growth_coefficient_K_vector_[0]); }
+  Type CurrentReferenceAgeForLength1() const {
+    return reference_age_for_length_1_vector_[0];
+  }
+  Type CurrentReferenceAgeForLength2() const {
+    return reference_age_for_length_2_vector_[0];
+  }
+  Type CurrentLengthWeightA() const { return fims_math::exp(length_weight_a_vector_[0]); }
+  Type CurrentLengthWeightB() const { return fims_math::exp(length_weight_b_vector_[0]); }
+  Type CurrentLengthAtAgeSdAtReferenceAge1() const { return fims_math::exp(length_at_age_sd_at_ref_ages_vector_[0]); }
+  Type CurrentLengthAtAgeSdAtReferenceAge2() const { return fims_math::exp(length_at_age_sd_at_ref_ages_vector_[1]); }
 
   void EnsureParamsSet() const {
-    if (!use_param_vectors_ || L1_v_.size() < 1 || L2_v_.size() < 1 ||
-        K_v_.size() < 1 || age_L1_v_.size() < 1 || age_L2_v_.size() < 1 ||
-        a_wl_v_.size() < 1 || b_wl_v_.size() < 1 || SDgrowth_v_.size() < 2) {
+    if (!use_param_vectors_ || length_at_ref_age_1_vector_.size() < 1 || length_at_ref_age_2_vector_.size() < 1 ||
+        growth_coefficient_K_vector_.size() < 1 ||
+        reference_age_for_length_1_vector_.size() < 1 ||
+        reference_age_for_length_2_vector_.size() < 1 ||
+        length_weight_a_vector_.size() < 1 || length_weight_b_vector_.size() < 1 || length_at_age_sd_at_ref_ages_vector_.size() < 2) {
       throw std::runtime_error(
           "VonBertalanffyGrowth parameters not set");
     }

@@ -6,27 +6,31 @@
 namespace {
 
 void ConfigureAdapter(fims_popdy::VonBertalanffyGrowthModelAdapter<double>& adapter,
-                      double L1, double L2, double K, double A1, double A2,
-                      double a_wl, double b_wl, double sd1, double sdA) {
-  adapter.L1Vector().resize(1);
-  adapter.L2Vector().resize(1);
-  adapter.KVector().resize(1);
-  adapter.AgeL1Vector().resize(1);
-  adapter.AgeL2Vector().resize(1);
-  adapter.AwlVector().resize(1);
-  adapter.BwlVector().resize(1);
-  adapter.SDgrowthVector().resize(2);
+                      double length_at_ref_age_1, double length_at_ref_age_2, double growth_coefficient_K, double reference_age_for_length_1, double reference_age_for_length_2,
+                      double length_weight_a, double length_weight_b,
+                      double length_at_age_sd_at_reference_age_1,
+                      double length_at_age_sd_at_reference_age_2) {
+  adapter.LengthAtRefAge1Vector().resize(1);
+  adapter.LengthAtRefAge2Vector().resize(1);
+  adapter.GrowthCoefficientKVector().resize(1);
+  adapter.ReferenceAgeForLength1Vector().resize(1);
+  adapter.ReferenceAgeForLength2Vector().resize(1);
+  adapter.LengthWeightAVector().resize(1);
+  adapter.LengthWeightBVector().resize(1);
+  adapter.LengthAtAgeSdAtRefAgesVector().resize(2);
 
   // Adapter stores positive growth params on log scale.
-  adapter.L1Vector()[0] = fims_math::log(L1);
-  adapter.L2Vector()[0] = fims_math::log(L2);
-  adapter.KVector()[0] = fims_math::log(K);
-  adapter.AgeL1Vector()[0] = A1;
-  adapter.AgeL2Vector()[0] = A2;
-  adapter.AwlVector()[0] = fims_math::log(a_wl);
-  adapter.BwlVector()[0] = fims_math::log(b_wl);
-  adapter.SDgrowthVector()[0] = fims_math::log(sd1);
-  adapter.SDgrowthVector()[1] = fims_math::log(sdA);
+  adapter.LengthAtRefAge1Vector()[0] = fims_math::log(length_at_ref_age_1);
+  adapter.LengthAtRefAge2Vector()[0] = fims_math::log(length_at_ref_age_2);
+  adapter.GrowthCoefficientKVector()[0] = fims_math::log(growth_coefficient_K);
+  adapter.ReferenceAgeForLength1Vector()[0] = reference_age_for_length_1;
+  adapter.ReferenceAgeForLength2Vector()[0] = reference_age_for_length_2;
+  adapter.LengthWeightAVector()[0] = fims_math::log(length_weight_a);
+  adapter.LengthWeightBVector()[0] = fims_math::log(length_weight_b);
+  adapter.LengthAtAgeSdAtRefAgesVector()[0] =
+      fims_math::log(length_at_age_sd_at_reference_age_1);
+  adapter.LengthAtAgeSdAtRefAgesVector()[1] =
+      fims_math::log(length_at_age_sd_at_reference_age_2);
 }
 
 TEST(VonBertalanffyGrowthModelAdapter, UsesWaaFromLaa) {
@@ -35,14 +39,14 @@ TEST(VonBertalanffyGrowthModelAdapter, UsesWaaFromLaa) {
   adapter.Initialize(1, 51, 1);
 
   const double age = 5.0;
-  const double L1 = 10.0;
-  const double L2 = 100.0;
-  const double K = 0.2;
-  const double A1 = 0.0;
-  const double A2 = 50.0;
-  const double denom_raw = 1.0 - std::exp(-K * (A2 - A1));
+  const double length_at_ref_age_1 = 10.0;
+  const double length_at_ref_age_2 = 100.0;
+  const double growth_coefficient_K = 0.2;
+  const double reference_age_for_length_1 = 0.0;
+  const double reference_age_for_length_2 = 50.0;
+  const double denom_raw = 1.0 - std::exp(-growth_coefficient_K * (reference_age_for_length_2 - reference_age_for_length_1));
   const double denom = fims_math::ad_max(fims_math::ad_fabs(denom_raw), 1e-8);
-  const double L = L1 + (L2 - L1) * (1.0 - std::exp(-K * (age - A1))) / denom;
+  const double L = length_at_ref_age_1 + (length_at_ref_age_2 - length_at_ref_age_1) * (1.0 - std::exp(-growth_coefficient_K * (age - reference_age_for_length_1))) / denom;
   const double expected = 1e-5 * std::pow(L, 3.0);
   const double W = adapter.evaluate(age);
 
@@ -57,14 +61,14 @@ TEST(VonBertalanffyGrowthModelAdapter, HonorsAgeOffset) {
   adapter.Initialize(1, 51, 1);
 
   const double age = 1.0;
-  const double L1 = 10.0;
-  const double L2 = 100.0;
-  const double K = 0.2;
-  const double A1 = 1.0;
-  const double A2 = 51.0;
-  const double denom_raw = 1.0 - std::exp(-K * (A2 - A1));
+  const double length_at_ref_age_1 = 10.0;
+  const double length_at_ref_age_2 = 100.0;
+  const double growth_coefficient_K = 0.2;
+  const double reference_age_for_length_1 = 1.0;
+  const double reference_age_for_length_2 = 51.0;
+  const double denom_raw = 1.0 - std::exp(-growth_coefficient_K * (reference_age_for_length_2 - reference_age_for_length_1));
   const double denom = fims_math::ad_max(fims_math::ad_fabs(denom_raw), 1e-8);
-  const double L = L1 + (L2 - L1) * (1.0 - std::exp(-K * (age - A1))) / denom;
+  const double L = length_at_ref_age_1 + (length_at_ref_age_2 - length_at_ref_age_1) * (1.0 - std::exp(-growth_coefficient_K * (age - reference_age_for_length_1))) / denom;
   const double expected = 1e-5 * std::pow(L, 3.0);
   const double W = adapter.evaluate(age);
 

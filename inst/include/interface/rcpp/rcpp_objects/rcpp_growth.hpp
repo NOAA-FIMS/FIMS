@@ -351,14 +351,16 @@ class VonBertalanffyGrowthInterface : public GrowthInterfaceBase {
       }
     };
 
-    set_final(this->length_at_ref_age_1, vb->L1Vector(), true);
-    set_final(this->length_at_ref_age_2, vb->L2Vector(), true);
-    set_final(this->growth_coefficient_K, vb->KVector(), true);
-    set_final(this->reference_age_for_length_1, vb->AgeL1Vector(), false);
-    set_final(this->reference_age_for_length_2, vb->AgeL2Vector(), false);
-    set_final(this->length_weight_a, vb->AwlVector(), true);
-    set_final(this->length_weight_b, vb->BwlVector(), true);
-    set_final(this->length_at_age_sd_at_ref_ages, vb->SDgrowthVector(), true);
+    set_final(this->length_at_ref_age_1, vb->LengthAtRefAge1Vector(), true);
+    set_final(this->length_at_ref_age_2, vb->LengthAtRefAge2Vector(), true);
+    set_final(this->growth_coefficient_K, vb->GrowthCoefficientKVector(), true);
+    set_final(this->reference_age_for_length_1,
+              vb->ReferenceAgeForLength1Vector(), false);
+    set_final(this->reference_age_for_length_2,
+              vb->ReferenceAgeForLength2Vector(), false);
+    set_final(this->length_weight_a, vb->LengthWeightAVector(), true);
+    set_final(this->length_weight_b, vb->LengthWeightBVector(), true);
+    set_final(this->length_at_age_sd_at_ref_ages, vb->LengthAtAgeSdAtRefAgesVector(), true);
   }
 
   virtual double evaluate(double age) {
@@ -405,14 +407,14 @@ class VonBertalanffyGrowthInterface : public GrowthInterfaceBase {
       Rcpp::stop("VonBertalanffyGrowth parameters not set");
     }
 
-    vb.L1 = this->length_at_ref_age_1[0].initial_value_m;
-    vb.L2 = this->length_at_ref_age_2[0].initial_value_m;
-    vb.K  = this->growth_coefficient_K[0].initial_value_m;
-    vb.age_L1 = this->reference_age_for_length_1[0].initial_value_m;
-    vb.age_L2 = this->reference_age_for_length_2[0].initial_value_m;
+    vb.length_at_ref_age_1 = this->length_at_ref_age_1[0].initial_value_m;
+    vb.length_at_ref_age_2 = this->length_at_ref_age_2[0].initial_value_m;
+    vb.growth_coefficient_K  = this->growth_coefficient_K[0].initial_value_m;
+    vb.reference_age_for_length_1 = this->reference_age_for_length_1[0].initial_value_m;
+    vb.reference_age_for_length_2 = this->reference_age_for_length_2[0].initial_value_m;
 
-    vb.a_wl = this->length_weight_a[0].initial_value_m;
-    vb.b_wl = this->length_weight_b[0].initial_value_m;
+    vb.length_weight_a = this->length_weight_a[0].initial_value_m;
+    vb.length_weight_b = this->length_weight_b[0].initial_value_m;
 
     return vb.evaluate(age);
   }
@@ -588,21 +590,23 @@ bool add_to_fims_tmb_internal() {
     info->variable_map[pv.id_m] = &target;
   };
 
-  load_and_register(this->length_at_ref_age_1, vb->L1Vector(),
+  load_and_register(this->length_at_ref_age_1, vb->LengthAtRefAge1Vector(),
                     "length_at_ref_age_1", true);
-  load_and_register(this->length_at_ref_age_2, vb->L2Vector(),
+  load_and_register(this->length_at_ref_age_2, vb->LengthAtRefAge2Vector(),
                     "length_at_ref_age_2", true);
-  load_and_register(this->growth_coefficient_K, vb->KVector(),
+  load_and_register(this->growth_coefficient_K, vb->GrowthCoefficientKVector(),
                     "growth_coefficient_K", true);
-  load_and_register(this->reference_age_for_length_1, vb->AgeL1Vector(),
+  load_and_register(this->reference_age_for_length_1,
+                    vb->ReferenceAgeForLength1Vector(),
                     "reference_age_for_length_1", false);
-  load_and_register(this->reference_age_for_length_2, vb->AgeL2Vector(),
+  load_and_register(this->reference_age_for_length_2,
+                    vb->ReferenceAgeForLength2Vector(),
                     "reference_age_for_length_2", false);
-  load_and_register(this->length_weight_a, vb->AwlVector(),
+  load_and_register(this->length_weight_a, vb->LengthWeightAVector(),
                     "length_weight_a", true);
-  load_and_register(this->length_weight_b, vb->BwlVector(),
+  load_and_register(this->length_weight_b, vb->LengthWeightBVector(),
                     "length_weight_b", true);
-  load_and_register(this->length_at_age_sd_at_ref_ages, vb->SDgrowthVector(),
+  load_and_register(this->length_at_age_sd_at_ref_ages, vb->LengthAtAgeSdAtRefAgesVector(),
                     "length_at_age_sd_at_ref_ages", true);
 
   info->growth_models[vb->id] = vb;
