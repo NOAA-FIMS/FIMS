@@ -16,4 +16,11 @@
 #include "functors/logistic.hpp"
 #include "functors/selectivity_base.hpp"
 
+enum class SelectivityType {
+  LOGISTIC = 0,
+  DOUBLE_LOGISTIC = 1,
+  RANDOM_WALK = 2
+};
+
+
 #endif /* FIMS_POPULATION_DYNAMICS_SELECTIVITY_HPP */
