@@ -633,14 +633,10 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
         ss << " ,{\n";
         fims::Vector<double> age_to_length_conversion_uncertainty(
             fleet->age_to_length_conversion.size(), -999);
-        this->get_se_values("age_to_length_conversion", this->se_values,
-                            age_to_length_conversion_uncertainty);
         for (size_t i = 0; i < fleet_interface->age_to_length_conversion.size();
              i++) {
           fleet_interface->age_to_length_conversion[i].final_value_m =
               fleet->age_to_length_conversion[i];
-          fleet_interface->age_to_length_conversion[i].uncertainty_m =
-              age_to_length_conversion_uncertainty[i];
         }
         ss << " \"name\": \"age_to_length_conversion\",\n";
         ss << " \"id\":" << fleet_interface->age_to_length_conversion.id_m
