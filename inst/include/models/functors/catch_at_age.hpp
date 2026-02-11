@@ -205,16 +205,6 @@ class CatchAtAge : public FisheryModelBase<Type> {
       for (size_t year = 0; year < fleet->n_years; year++) {
         fleet->Fmort[year] = fims_math::exp(fleet->log_Fmort[year]);
       }
-      // // TODO: does this age_length_to_conversion need to be a dq and
-      // parameter
-      // // of fleet?
-      // for (size_t i_length_age = 0;
-      //      i_length_age < fleet->age_to_length_conversion.size();
-      //      i_length_age++)
-      // {
-      //   derived_quantities["age_to_length_conversion"][i_length_age] =
-      //       fleet->age_to_length_conversion[i_length_age];
-      // }
     }
   }
   /**

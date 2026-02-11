@@ -191,11 +191,6 @@ class CAAInitializeTestFixture : public testing::Test {
       derived_quantities["lengthcomp_expected"] =
           fims::Vector<double>(fleet->n_years * fleet->n_lengths);
 
-      if (fleet->n_lengths > 0) {
-        derived_quantities["age_to_length_conversion"] =
-            fims::Vector<double>(fleet->n_ages * fleet->n_lengths);
-      }
-
       if (fleet->log_q.size() == 0) {
         fleet->log_q.resize(1);
         fleet->log_q[0] = static_cast<double>(0.0);
@@ -553,11 +548,6 @@ class CAAEvaluateTestFixture : public testing::Test {
       derived_quantities["lengthcomp_expected"] =
           fims::Vector<double>(fleet->n_years * fleet->n_lengths);
 
-      if (fleet->n_lengths > 0) {
-        derived_quantities["age_to_length_conversion"] =
-            fims::Vector<double>(fleet->n_ages * fleet->n_lengths);
-      }
-
       if (fleet->log_q.size() == 0) {
         fleet->log_q.resize(1);
         fleet->log_q[0] = static_cast<double>(0.0);
@@ -608,10 +598,10 @@ class CAAPrepareTestFixture : public testing::Test {
         log_Fmort_min, log_Fmort_max);
 
     // age_to_length_conversiondouble log_Fmort_min = fims_math::log(0.1);
-    double age_2_length_conversion_min = 0.0;
-    double age_2_length_conversion_max = 1.0;
+    double age_to_length_conversion_min = 0.0;
+    double age_to_length_conversion_max = 1.0;
     std::uniform_real_distribution<double> alc_distribution(
-        age_2_length_conversion_min, age_2_length_conversion_max);
+        age_to_length_conversion_min, age_to_length_conversion_max);
 
     // log_q
     double log_q_min = fims_math::log(0.1);
@@ -850,11 +840,6 @@ class CAAPrepareTestFixture : public testing::Test {
 
       derived_quantities["lengthcomp_expected"] =
           fims::Vector<double>(fleet->n_years * fleet->n_lengths);
-
-      if (fleet->n_lengths > 0) {
-        derived_quantities["age_to_length_conversion"] =
-            fims::Vector<double>(fleet->n_ages * fleet->n_lengths);
-      }
 
       if (fleet->log_q.size() == 0) {
         fleet->log_q.resize(1);
