@@ -42,21 +42,21 @@ Type objective_function<Type>::operator()() {
     //evaluate the model objective function value
     Type nll = model->Evaluate();
 
-    // Temporary test: add sum-to-zero constraint
-    Type sum_devs = 0.0;
-    int start_index = 36; // R index 37
-    int end_index = 64;   // R index 65
+    // // Temporary test: add sum-to-zero constraint
+    // Type sum_devs = 0.0;
+    // int start_index = 36; // R index 37
+    // int end_index = 64;   // R index 65
 
-    // Safety check to ensure we don't crash if vector size changes
-    if (p.size() > end_index) {
-        for (int i = start_index; i <= end_index; ++i) {
-            sum_devs += p[i];
-        }
+    // // Safety check to ensure we don't crash if vector size changes
+    // if (p.size() > end_index) {
+    //     for (int i = start_index; i <= end_index; ++i) {
+    //         sum_devs += p[i];
+    //     }
 
-        // Apply strong penalty (Weight = 10,000)
-        Type penalty = 10000.0 * sum_devs * sum_devs;
-        nll += penalty;
-    }
+    //     // Apply strong penalty (Weight = 10,000)
+    //     Type penalty = 10000.0 * sum_devs * sum_devs;
+    //     nll += penalty;
+    // }
 
     return nll;
 

@@ -114,6 +114,7 @@ model_comparison <- function(){
     sum()
   sum_numbers_at_age_om <- (om_output[["abundance"]]/1000) |>
     sum()
+  om_output[["N.age"]]
   r0_om <- om_input[["median_R0"]]/1000
   rec_dev_om <- om_input[["logR.resid"]]
 
@@ -195,28 +196,43 @@ model_comparison <- function(){
   (spr0_wham_random_effects - spr0_om) / spr0_om * 100
 
   # FIMS
-  fims_output <- readRDS(file.path(case_dir, "output", "FIMS", "s1", "fit_fims.RDS"))
-  fims_estimates <- FIMS::get_estimates(fims_output)
-  fims_max_gradient <- FIMS::get_max_gradient(fims_output)
+  fims_output_fixed_effects <- readRDS(file.path(case_dir, "output", "FIMS", "s1", "fit_fims_fixed_effects.RDS"))
+  fims_estimates_fixed_effects <- FIMS::get_estimates(fims_output_fixed_effects)
+  fims_max_gradient_fixed_effects <- FIMS::get_max_gradient(fims_output_fixed_effects)
 
-  sum_spawning_biomass_fims <- fims_estimates |>
+  sum_spawning_biomass_fims_fixed_effects <- fims_estimates_fixed_effects |>
     dplyr::filter(label == "spawning_biomass" & year_i %in% 1:30) |>
     dplyr::select(estimated) |>
     sum()
-  sum_numbers_at_age_fims <- fims_estimates |>
+  sum_numbers_at_age_fims_fixed_effects <- fims_estimates_fixed_effects |>
     dplyr::filter(label == "numbers_at_age" & year_i %in% 1:30) |>
     dplyr::select(estimated) |>
     sum() |>
     (\(x) x / 1000)()
-  r0_fims <- fims_estimates |>
+  r0_fims_fixed_effects <- fims_estimates_fixed_effects |>
     dplyr::filter(label == "log_rzero") |>
     dplyr::select(estimated) |>
     exp() |>
     (\(x) x / 1000)()
-  rec_dev_fims <- fims_estimates |>
+  rec_dev_fims_fixed_effects <- fims_estimates_fixed_effects |>
     dplyr::filter(label == "log_devs" & year_i %in% 1:30) |>
     dplyr::pull(estimated) |>
     sum()
+
+  fims_output_random_effects <- readRDS(file.path(case_dir, "output", "FIMS", "s1", "fit_fims_random_effects.RDS"))
+  fims_report_random_effects <- fims_output_random_effects[["report"]]
+  fims_estimates_random_effects <- fims_output_random_effects[["sdr_report"]]
+  sum_spawning_biomass_fims_random_effects <- fims_estimates_random_effects[(rownames(fims_estimates_random_effects) == "spawning_biomass"), "Estimate"] |>
+    head(-1) |>
+    sum()
+  sum_numbers_at_age_fims_random_effects <- fims_estimates_random_effects[(rownames(fims_estimates_random_effects) == "numbers_at_age"), "Estimate"] |>
+    head(-12) |>
+    sum() |>
+    (\(x) x / 1000)()
+  r0_fims_random_effects <- fims_estimates_random_effects[(rownames(fims_estimates_random_effects) == "log_rzero"), "Estimate"] |>
+    exp() |>
+    (\(x) x / 1000)()
+  rec_dev_fims_random_effects <- fims_estimates_random_effects[(rownames(fims_estimates_random_effects) == "log_devs"), "Estimate"]
 
   # Relative error
   # Spawning Biomass (SB) errors
@@ -226,7 +242,8 @@ model_comparison <- function(){
     sum_spawning_biomass_ss3 - sum_spawning_biomass_om,
     sum_spawning_biomass_wham_fixed_effects - sum_spawning_biomass_om,
     sum_spawning_biomass_wham_random_effects - sum_spawning_biomass_om,
-    sum_spawning_biomass_fims - sum_spawning_biomass_om
+    sum_spawning_biomass_fims_fixed_effects - sum_spawning_biomass_om,
+    sum_spawning_biomass_fims_random_effects - sum_spawning_biomass_om
   )
   sb_rel_error <- sb_abs_error / sum_spawning_biomass_om * 100
 
@@ -237,7 +254,8 @@ model_comparison <- function(){
     sum_numbers_at_age_ss3 - sum_numbers_at_age_om,
     sum_numbers_at_age_wham_fixed_effects - sum_numbers_at_age_om,
     sum_numbers_at_age_wham_random_effects - sum_numbers_at_age_om,
-    sum_numbers_at_age_fims - sum_numbers_at_age_om
+    sum_numbers_at_age_fims_fixed_effects - sum_numbers_at_age_om,
+    sum_numbers_at_age_fims_random_effects - sum_numbers_at_age_om
   )
   naa_rel_error <- naa_abs_error / sum_numbers_at_age_om * 100
   
@@ -248,13 +266,14 @@ model_comparison <- function(){
     r0_ss3[["Recruit_0"]] - r0_om,
     r0_wham_fixed_effects - r0_om,
     r0_wham_random_effects - r0_om,
-    r0_fims[["estimated"]] - r0_om
+    r0_fims_fixed_effects[["estimated"]] - r0_om,
+    r0_fims_random_effects - r0_om
   )
 
   r0_rel_error <- r0_abs_error / r0_om * 100
 
   error_df <- data.frame(
-    Model = c("ASAP", "BAM", "SS3", "WHAM_fixed_effects", "WHAM_random_effects", "FIMS"),
+    Model = c("ASAP", "BAM", "SS3", "WHAM_fixed_effects", "WHAM_random_effects", "FIMS_fixed_effects", "FIMS_random_effects"),
     #SB_Absolute_Error = round(sb_abs_error, digit = 2),
     SB_Relative_Error_Pct = round(sb_rel_error, digit = 2),
     #NAA_Absolute_Error = round(naa_abs_error, digit = 2),
@@ -275,11 +294,117 @@ model_comparison <- function(){
       dplyr::pull(dev),
     WHAM_fixed_effects = c(NA, fit_wham_fixed_effects$rep$NAA_devs[1,1,-1,1]),
     WHAM_random_effects = c(NA, fit_wham_random_effects$rep$NAA_devs[1,1,-1,1]),
-    FIMS = c(NA, fims_estimates |>
+    FIMS_fixed_effects = c(NA, fims_estimates_fixed_effects |>
       dplyr::filter(label == "log_devs" & year_i %in% 1:30) |>
-      dplyr::pull(estimated))
+      dplyr::pull(estimated)), 
+    FIMS_random_effects = c(NA, rec_dev_fims_random_effects)
   ) |>
     knitr::kable(digits = 2)
+
+    # After loading all model outputs, add:
+fims_f_init <- fims_estimates |> 
+  filter(label == 'log_Fmort', year_i == 1, module_id == 1) |> 
+  pull(estimated) |> 
+  exp()
+
+cat('FIMS F_init (year 1):', fims_f_init, '\n')
+
+# Check BAM F_init  
+bam_f_init <- bam_output$t.series$F.fleet1[1]
+cat('BAM F_init (year 1):', bam_f_init, '\n')
+
+# Check FIMS selectivity at age 12 (plus group, age index 11 in C++)
+cat('\nFIMS selectivity at each age:\n')
+inflection <- 1.93
+slope <- 0.996
+ages <- 1:12
+
+# Logistic equation
+selectivity <- 
+fims_sel <- 1 / (1 + exp(-slope * (ages - inflection)))
+print(fims_sel)
+
+cat('\nBAM selectivity at each age:\n')
+bam_sel <- bam_output$sel.age$sel.m.fleet1[1,]
+print(bam_sel)
+
+# Calculate F*selectivity for age 12
+cat('\nF × selectivity at age 12:\n')
+cat('FIMS:', fims_f_init * fims_sel[12], '\n')
+cat('BAM:', bam_f_init * bam_sel[12], '\n')
+
+# Calculate Z at age 12
+M <- 0.2
+cat('\nZ at age 12 (M + F×sel):\n')
+cat('FIMS:', M + fims_f_init * fims_sel[12], '\n')
+cat('BAM:', M + bam_f_init * bam_sel[12], '\n')
+
+fims_naa <- fims_estimates |>
+  dplyr::filter(label == "numbers_at_age" & year_i %in% 1:30) |>
+  pull(estimated)
+
+om_naa <- c(t(om_output[["N.age"]]))
+
+bam_naa <- c(t(head(bam_output[["N.age"]], -1)))
+
+(fims_naa - om_naa)/om_naa * 100
+(bam_naa - om_naa)/om_naa * 100
+# Compare NAA by year and age
+fims_naa <- fims_estimates |>
+  dplyr::filter(label == "numbers_at_age" & year_i %in% 1:30) |>
+  tidyr::pivot_wider(names_from = age_i, values_from = estimated, id_cols = year_i) |>
+  print(n = 30)
+
+bam_naa_df <- bam_output[["N.age"]][1:30,]  # Convert to same units
+
+fims_naa - om_output[["N.age"]]
+# Year-by-year comparison
+year_errors <- sapply(1:30, function(y) {
+  fims_year <- sum(fims_naa[fims_naa$year_i == y, -1])
+  bam_year <- sum(bam_naa_df[y,])
+  (fims_year - bam_year) / bam_year * 100
+})
+
+plot(1:30, year_errors, type = "l", 
+     main = "NAA Relative Error by Year",
+     xlab = "Year", ylab = "Relative Error %")
+abline(h = 0, col = "red", lty = 2)
+
+# Year 1 comparison
+fims_year1 <- fims_naa |> dplyr::filter(year_i == 1) |> dplyr::select(-year_i) |> as.numeric()
+bam_year1 <- bam_naa_df[1,]
+
+data.frame(
+  Age = 1:12,
+  FIMS = fims_year1,
+  BAM = bam_year1,
+  OM = om_naa[1:12],
+  Diff = fims_year1 - bam_year1,
+  RelError_Pct = (fims_year1 - bam_year1) / bam_year1 * 100
+) |> knitr::kable(digits = 4)
+
+
+# Check if F, M, Z are the same
+fims_mortality_z <- fims_estimates |>
+  dplyr::filter(label == "mortality_Z" & year_i %in% 1:30)
+
+fims_mortality_f <- fims_estimates |>
+  dplyr::filter(label == "mortality_F" & year_i %in% 1:30)
+
+# Compare selectivity values
+fims_selectivity <- fims_estimates |>
+  dplyr::filter(grepl("selectivity", label))
+
+# Compare last age (plus group) across years
+fims_plus <- fims_naa$`12` # Age 12 is plus group
+bam_plus <- bam_naa_df[,12]
+
+data.frame(
+  Year = 1:30,
+  FIMS_plus = fims_plus,
+  BAM_plus = bam_plus,
+  RelError_Pct = (fims_plus - bam_plus) / bam_plus * 100
+) |> knitr::kable(digits = 4)
 }
 
 install_wine_on_linux <- function() {

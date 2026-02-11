@@ -250,35 +250,40 @@ class CatchAtAge : public FisheryModelBase<Type> {
     std::map<std::string, fims::Vector<Type>> &dq_ =
         this->GetPopulationDerivedQuantities(population->GetId());
 
-    // dq_["numbers_at_age"][i_age_year] =
-    //     fims_math::exp(population->log_init_naa[a]);
-    // Temporary test: calculate initial numbers at age using equilibrium initalization logic
-    Type R1 = fims_math::exp(population->log_init_naa[0]);
-    Type F_init_scalar = fims_math::exp(population->log_f_multiplier[0]);
+    dq_["numbers_at_age"][i_age_year] =
+        fims_math::exp(population->log_init_naa[a]);
+    // // Temporary test: calculate initial numbers at age using equilibrium initalization logic
+    // Type R1 = fims_math::exp(population->log_init_naa[0]);
+    // Type F_init_scalar = population->fleets[0]->Fmort[0];
 
-    if (a == 0) {
-        // Initial Age 0 fish
-        dq_["numbers_at_age"][i_age_year] = R1;
-    } else {
-        // We need to recursively calculate based on the previous age
-        size_t i_agem1_year1 = i_age_year - 1;
+    // if (a == 0) {
+    //     // Initial Age 0 fish
+    //     dq_["numbers_at_age"][i_age_year] = R1;
+    // } else {
+    //     // We need to recursively calculate based on the previous age
+    //     size_t i_agem1_year0 = (a - 1) * population->n_years;  // Previous age at year 0
+    //     size_t i_a_year0 = a * population->n_years;  // Current age at year 0
         
-        // Calculate Z_init for the PREVIOUS age to survive them to the current age
-        // Use Fleet 0 selectivity to match BAM's single-fleet assumption
-        Type sel_prev = population->fleets[0]->selectivity->evaluate(population->ages[a-1]);
-        Type Z_init_prev = population->M[a-1] + (F_init_scalar * sel_prev);
+    //     // Calculate Z_init for the PREVIOUS age to survive them to the current age
+    //     // Use Fleet 0 selectivity to match BAM's single-fleet assumption
+    //     Type sel_prev = population->fleets[0]->selectivity->evaluate(population->ages[a-1]);
+    //     Type sel_current = population->fleets[0]->selectivity->evaluate(population->ages[a]);
+    //     Type Z_init_prev = population->M[i_agem1_year0] + (F_init_scalar * sel_prev);
+    //     Type Z_init_current = population->M[i_a_year0] + (F_init_scalar * sel_current);
         
-        dq_["numbers_at_age"][i_age_year] = dq_["numbers_at_age"][i_agem1_year1] * fims_math::exp(-Z_init_prev);
-
-        // Plus Group Calculation (BAM analytical solution)
-        if (a == (population->n_ages - 1)) {
-            Type sel_plus = population->fleets[0]->selectivity->evaluate(population->ages[a]);
-            Type Z_init_plus = population->M[a] + (F_init_scalar * sel_plus);
-            
-            // This transforms the last age into the sum of all older ages
-            dq_["numbers_at_age"][i_age_year] /= (static_cast<Type>(1.0) - fims_math::exp(-Z_init_plus));
-        }
-    }
+    //     size_t i_agem1_year1 = i_age_year - 1;  // Index in numbers_at_age vector
+        
+    //     // For non-plus group ages, use standard survival
+    //     if (a < (population->n_ages - 1)) {
+    //         dq_["numbers_at_age"][i_age_year] = dq_["numbers_at_age"][i_agem1_year1] * fims_math::exp(-Z_init_prev);
+    //     } else {
+    //         // Plus Group: survivors from age n-1 divided by (1 - survival rate)
+    //         // This is the analytical solution for geometric series (sum of all ages >= nages)
+    //         dq_["numbers_at_age"][i_age_year] = 
+    //             (dq_["numbers_at_age"][i_agem1_year1] * fims_math::exp(-Z_init_prev)) / 
+    //             (static_cast<Type>(1.0) - fims_math::exp(-Z_init_current));
+    //     }
+    // }
   }
 
   /**
@@ -310,6 +315,13 @@ class CatchAtAge : public FisheryModelBase<Type> {
           dq_["numbers_at_age"][i_age_year] +
           dq_["numbers_at_age"][i_agem1_yearm1 + 1] *
               (fims_math::exp(-dq_["mortality_Z"][i_agem1_yearm1 + 1]));
+      // Add the survivors of the previous year's plus group
+        // i_age_year - 1 is the previous year's plus group (same age)
+        // size_t i_age_yearm1 = i_age_year - population->n_ages; 
+        
+        // dq_["numbers_at_age"][i_age_year] +=
+        //     dq_["numbers_at_age"][i_age_yearm1] *
+        //     (fims_math::exp(-dq_["mortality_Z"][i_age_yearm1]));
     }
   }
 
@@ -1369,3 +1381,4 @@ class CatchAtAge : public FisheryModelBase<Type> {
 }  // namespace fims_popdy
 
 #endif
+
