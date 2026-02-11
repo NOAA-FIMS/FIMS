@@ -1,5 +1,6 @@
 #include <cmath>
 #include "gtest/gtest.h"
+#include "common/fims_math.hpp"
 #include "population_dynamics/growth/growth_model.hpp"
 
 namespace {
@@ -27,7 +28,8 @@ TEST(GrowthModel, CanConstructAndPrepare) {
   const double K = 0.2;
   const double A1 = 0.0;
   const double A2 = 50.0;
-  const double denom = 1.0 - std::exp(-K * (A2 - A1));
+  const double denom_raw = 1.0 - std::exp(-K * (A2 - A1));
+  const double denom = fims_math::ad_max(fims_math::ad_fabs(denom_raw), 1e-8);
   const double L0 = L1 + (L2 - L1) * (1.0 - std::exp(-K * (0.0 - A1))) / denom;
   const double L5 = L1 + (L2 - L1) * (1.0 - std::exp(-K * (age - A1))) / denom;
   const double L25 =
