@@ -117,8 +117,8 @@ The functor defines the core formula:
 
 ```{Rcpp, class.source = "fimschunk", eval = FALSE}
 // file: inst/include/population_dynamics/growth/functors/von_bertalanffy.hpp
-// L(a) = L1 + (L2 - L1) * (1 - exp(-K * (a - A1))) /
-//        (1 - exp(-K * (A2 - A1)))
+// L(a) = length_at_ref_age_1 + (length_at_ref_age_2 - length_at_ref_age_1) * (1 - exp(-growth_coefficient_K * (a - reference_age_for_length_1))) /
+//        (1 - exp(-growth_coefficient_K * (reference_age_for_length_2 - reference_age_for_length_1)))
 ```
 
 The model wraps the functor and computes cached products (mean LAA, SD LAA, mean WAA) across years, ages, and sexes. The data structures are already dimensioned as `(year, age, sex)` even though v1 uses a single year and a single sex:

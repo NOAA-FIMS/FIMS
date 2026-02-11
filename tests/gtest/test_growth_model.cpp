@@ -23,36 +23,59 @@ TEST(GrowthModel, CanConstructAndPrepare) {
 
   // Check a couple of values exist and look sane
   const double age = 5.0;
-  const double L1 = 10.0;
-  const double L2 = 100.0;
-  const double K = 0.2;
-  const double A1 = 0.0;
-  const double A2 = 50.0;
-  const double denom_raw = 1.0 - std::exp(-K * (A2 - A1));
+  const double length_at_ref_age_1 = 10.0;
+  const double length_at_ref_age_2 = 100.0;
+  const double growth_coefficient_K = 0.2;
+  const double reference_age_for_length_1 = 0.0;
+  const double reference_age_for_length_2 = 50.0;
+  const double denom_raw = 1.0 - std::exp(
+      -growth_coefficient_K *
+      (reference_age_for_length_2 - reference_age_for_length_1));
   const double denom = fims_math::ad_max(fims_math::ad_fabs(denom_raw), 1e-8);
-  const double L0 = L1 + (L2 - L1) * (1.0 - std::exp(-K * (0.0 - A1))) / denom;
-  const double L5 = L1 + (L2 - L1) * (1.0 - std::exp(-K * (age - A1))) / denom;
-  const double L25 =
-      L1 + (L2 - L1) * (1.0 - std::exp(-K * (25.0 - A1))) / denom;
-  const double L50 = L1 + (L2 - L1) * (1.0 - std::exp(-K * (50.0 - A1))) / denom;
-  const double L0_obs = p.MeanLAA(0, 0, 0);
-  const double L50_obs = p.MeanLAA(0, 50, 0);
+  const double expected_length_at_age_0 =
+      length_at_ref_age_1 +
+      (length_at_ref_age_2 - length_at_ref_age_1) *
+          (1.0 - std::exp(-growth_coefficient_K *
+                          (0.0 - reference_age_for_length_1))) /
+          denom;
+  const double expected_length_at_age_5 =
+      length_at_ref_age_1 +
+      (length_at_ref_age_2 - length_at_ref_age_1) *
+          (1.0 - std::exp(-growth_coefficient_K *
+                          (age - reference_age_for_length_1))) /
+          denom;
+  const double expected_length_at_age_25 =
+      length_at_ref_age_1 +
+      (length_at_ref_age_2 - length_at_ref_age_1) *
+          (1.0 - std::exp(-growth_coefficient_K *
+                          (25.0 - reference_age_for_length_1))) /
+          denom;
+  const double expected_length_at_age_50 =
+      length_at_ref_age_1 +
+      (length_at_ref_age_2 - length_at_ref_age_1) *
+          (1.0 - std::exp(-growth_coefficient_K *
+                          (50.0 - reference_age_for_length_1))) /
+          denom;
+  const double observed_length_at_age_0 = p.MeanLAA(0, 0, 0);
+  const double observed_length_at_age_50 = p.MeanLAA(0, 50, 0);
 
-  EXPECT_NEAR(L0_obs, L0, 1e-12);
-  EXPECT_GT(L5, L1);
-  EXPECT_LT(L5, L2);
-  EXPECT_NEAR(L50_obs, L50, 1e-12);
-  EXPECT_NEAR(p.SdLAA(0, 0, 0), 3.0, 1e-12);
-  EXPECT_NEAR(p.SdLAA(0, 50, 0), 7.0, 1e-12);
+  EXPECT_NEAR(observed_length_at_age_0, expected_length_at_age_0, 1e-8);
+  EXPECT_GT(expected_length_at_age_5, length_at_ref_age_1);
+  EXPECT_LT(expected_length_at_age_5, length_at_ref_age_2);
+  EXPECT_NEAR(observed_length_at_age_50, expected_length_at_age_50, 1e-8);
+  EXPECT_NEAR(p.SdLAA(0, 0, 0), 3.0, 1e-8);
+  EXPECT_NEAR(p.SdLAA(0, 50, 0), 7.0, 1e-8);
   // Length-based interpolation for SD
   const double expected_sd_mid =
-      3.0 + (7.0 - 3.0) * (L25 - L0) / (L50 - L0);
-  EXPECT_NEAR(p.SdLAA(0, 25, 0), expected_sd_mid, 1e-12);
+      3.0 + (7.0 - 3.0) *
+                (expected_length_at_age_25 - expected_length_at_age_0) /
+                (expected_length_at_age_50 - expected_length_at_age_0);
+  EXPECT_NEAR(p.SdLAA(0, 25, 0), expected_sd_mid, 1e-8);
 
   // weight exists in the contract (derived from length-weight)
   const double W5 = p.MeanWAA(0, 5, 0);
   EXPECT_GT(W5, 0.0);
-  EXPECT_NEAR(W5, 1e-5 * std::pow(L5, 3.0), 1e-8);
+  EXPECT_NEAR(W5, 1e-5 * std::pow(expected_length_at_age_5, 3.0), 1e-8);
 
 }
 

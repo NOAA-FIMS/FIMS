@@ -39,27 +39,33 @@ class GrowthModel : public GrowthModelBase<Type> {
         products_(n_years, n_ages, n_sexes) {}
 
   /// Set fixed von Bertalanffy parameters (explicit reference ages).
-  void SetVonBertalanffyParameters(Type L1, Type L2, Type K,
-                                   Type age_L1, Type age_L2) {
-    vb_.L1 = L1;
-    vb_.L2 = L2;
-    vb_.K = K;
-    vb_.age_L1 = age_L1;
-    vb_.age_L2 = age_L2;
+  void SetVonBertalanffyParameters(Type length_at_ref_age_1,
+                                   Type length_at_ref_age_2,
+                                   Type growth_coefficient_K,
+                                   Type reference_age_for_length_1,
+                                   Type reference_age_for_length_2) {
+    vb_.length_at_ref_age_1 = length_at_ref_age_1;
+    vb_.length_at_ref_age_2 = length_at_ref_age_2;
+    vb_.growth_coefficient_K = growth_coefficient_K;
+    vb_.reference_age_for_length_1 = reference_age_for_length_1;
+    vb_.reference_age_for_length_2 = reference_age_for_length_2;
     needs_update_ = true;
   }
 
   /// fixed length-weight params (phase 1)
-  void SetLengthWeightParameters(Type a_wl, Type b_wl) {
-    vb_.a_wl = a_wl;
-    vb_.b_wl = b_wl;
+  void SetLengthWeightParameters(Type length_weight_a, Type length_weight_b) {
+    vb_.length_weight_a = length_weight_a;
+    vb_.length_weight_b = length_weight_b;
     needs_update_ = true;
   }
 
   /// Set SD at youngest and oldest ages
-  void SetLengthSdParams(Type sd1, Type sdA) {
-    sd_L1_ = sd1;
-    sd_LA_ = sdA;
+  void SetLengthSdParams(Type length_at_age_sd_at_reference_age_1,
+                         Type length_at_age_sd_at_reference_age_2) {
+    length_at_age_sd_at_reference_age_1_ =
+        length_at_age_sd_at_reference_age_1;
+    length_at_age_sd_at_reference_age_2_ =
+        length_at_age_sd_at_reference_age_2;
     needs_update_ = true;
   }
 
@@ -73,16 +79,13 @@ class GrowthModel : public GrowthModelBase<Type> {
     }
 
     // Fill mean length-at-age and sd
-    const Type min_model_age = age_offset_;
-    const Type max_model_age =
-        age_offset_ + static_cast<Type>(n_ages_ - 1);
-    const Type laa_min = vb_.length_at_age(vb_.age_L1);
-    const Type laa_max = vb_.length_at_age(vb_.age_L2);
+    const Type laa_min = vb_.length_at_age(vb_.reference_age_for_length_1);
+    const Type laa_max = vb_.length_at_age(vb_.reference_age_for_length_2);
     const Type laa_delta_safe = fims_math::ad_max(
         fims_math::ad_fabs(laa_max - laa_min), static_cast<Type>(1e-8));
     const Type slope =
         (n_ages_ > 1)
-            ? (sd_LA_ - sd_L1_) / laa_delta_safe
+            ? (length_at_age_sd_at_reference_age_2_ - length_at_age_sd_at_reference_age_1_) / laa_delta_safe
             : Type(0.0);
     for (std::size_t y = 0; y < n_years_; ++y) {
       for (std::size_t a = 0; a < n_ages_; ++a) {
@@ -95,8 +98,8 @@ class GrowthModel : public GrowthModelBase<Type> {
           products_.MeanLAA(y, a, s) = laa;
           products_.SdLAA(y, a, s) =
               (n_ages_ > 1)
-                  ? sd_L1_ + slope * (laa - laa_min)
-                  : sd_L1_;
+                  ? length_at_age_sd_at_reference_age_1_ + slope * (laa - laa_min)
+                  : length_at_age_sd_at_reference_age_1_;
           products_.MeanWAA(y, a, s) = vb_.weight_at_age(age);
         }
       }
@@ -122,8 +125,8 @@ class GrowthModel : public GrowthModelBase<Type> {
 
   // Caching state
   bool needs_update_ = true;
-  Type sd_L1_ = static_cast<Type>(3.0);
-  Type sd_LA_ = static_cast<Type>(7.0);
+  Type length_at_age_sd_at_reference_age_1_ = static_cast<Type>(3.0);
+  Type length_at_age_sd_at_reference_age_2_ = static_cast<Type>(7.0);
   Type age_offset_ = static_cast<Type>(0.0);
 
  public:

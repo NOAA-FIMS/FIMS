@@ -18,38 +18,44 @@ namespace fims_popdy {
  * @brief Von Bertalanffy growth functor for length-at-age and weight-at-age.
  *
  * Parameterization using length at two reference ages:
- * L(a) = L1 + (L2 - L1) * (1 - exp(-K * (a - A1))) /
- *        (1 - exp(-K * (A2 - A1)))
+ * L(a) = length_at_ref_age_1 +
+ *        (length_at_ref_age_2 - length_at_ref_age_1) *
+ *        (1 - exp(-growth_coefficient_K * (a - reference_age_for_length_1))) /
+ *        (1 - exp(-growth_coefficient_K *
+ *                 (reference_age_for_length_2 - reference_age_for_length_1)))
  */
 template <typename Type>
 struct VonBertalanffyGrowth : public GrowthBase<Type> {
-  Type L1 = Type(0.0);
-  Type L2 = Type(0.0);
-  Type K = Type(0.0);
-  Type age_L1 = Type(0.0);
-  Type age_L2 = Type(0.0);
+  Type length_at_ref_age_1 = Type(0.0);
+  Type length_at_ref_age_2 = Type(0.0);
+  Type growth_coefficient_K = Type(0.0);
+  Type reference_age_for_length_1 = Type(0.0);
+  Type reference_age_for_length_2 = Type(0.0);
 
   // length-weight conversion
-  Type a_wl = Type(0.0);
-  Type b_wl = Type(3.0);
+  Type length_weight_a = Type(0.0);
+  Type length_weight_b = Type(3.0);
 
   VonBertalanffyGrowth() : GrowthBase<Type>() {}
   virtual ~VonBertalanffyGrowth() {}
 
   Type length_at_age(const Type& age) const {
     const Type denom = Type(1.0) -
-        fims_math::exp(-K * (age_L2 - age_L1));
+        fims_math::exp(-growth_coefficient_K * (reference_age_for_length_2 -
+                                              reference_age_for_length_1));
     // AD-safe floor to avoid divide-by-zero/NaN when denominator is tiny.
     const Type denom_safe = fims_math::ad_max(
         fims_math::ad_fabs(denom), static_cast<Type>(1e-8));
     const Type numer = Type(1.0) -
-        fims_math::exp(-K * (age - age_L1));
-    return L1 + (L2 - L1) * numer / denom_safe;
+        fims_math::exp(-growth_coefficient_K *
+                       (age - reference_age_for_length_1));
+    return length_at_ref_age_1 +
+           (length_at_ref_age_2 - length_at_ref_age_1) * numer / denom_safe;
   }
 
   Type weight_at_age(const Type& age) const {
-    Type L = length_at_age(age);
-    return a_wl * fims_math::pow(L, b_wl);
+    Type length = length_at_age(age);
+    return length_weight_a * fims_math::pow(length, length_weight_b);
   }
 
   virtual const Type evaluate(const double& a) const override {
