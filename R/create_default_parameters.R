@@ -193,6 +193,55 @@ create_default_parameters <- function(
     tidyr::nest(.by = c(model_family, module_name, fleet_name))
 }
 
+#' Create default growth parameters (VonB only)
+#' @noRd
+create_default_growth <- function(unnested_configurations, data) {
+
+  form <- unnested_configurations |>
+    dplyr::filter(module_name == "Growth") |>
+    dplyr::pull(module_type) |>
+    unique() |>
+    na.omit()
+
+  # Only act if VonB is requested
+  if (length(form) == 1 && form == "VonBertalanffy") {
+
+    ages <- get_ages(data)
+    if (length(ages) == 0 || all(is.na(ages))) {
+      reference_age_for_length_1 <- 0
+      n_ages <- get_n_ages(data)
+      reference_age_for_length_2 <- if (n_ages > 0) n_ages - 1 else 0
+    } else {
+      reference_age_for_length_1 <- min(ages, na.rm = TRUE)
+      reference_age_for_length_2 <- max(ages, na.rm = TRUE)
+    }
+
+    default <- create_default_parameters_template(n_parameters = 9) |>
+      dplyr::mutate(
+        module_name = "Growth",
+        module_type = "VonBertalanffy",
+        label = c("length_at_ref_age_1", "length_at_ref_age_2",
+                  "growth_coefficient_K", "reference_age_for_length_1",
+                  "reference_age_for_length_2", "length_weight_a",
+                  "length_weight_b", "length_at_age_sd_at_ref_ages",
+                  "length_at_age_sd_at_ref_ages"),
+        age = c(NA_real_, NA_real_, NA_real_, NA_real_, NA_real_,
+                NA_real_, NA_real_,
+                reference_age_for_length_1, reference_age_for_length_2),
+        value = c(8, 60, 0.2,
+                  reference_age_for_length_1, reference_age_for_length_2,
+                  1e-5, 3,
+                  3, 7),
+        estimation_type = "constant"
+      )
+
+    return(default)
+  }
+
+  # Otherwise: no growth parameters added
+  create_default_parameters_template(n_parameters = 0)
+}
+
 #' Create default parameters for a FIMS model
 #' @description
 #' This function creates a template for default parameters used in a Fisheries
