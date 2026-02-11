@@ -629,34 +629,6 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
 
       ss << " \"values\": " << fleet_interface->log_q << "}\n";
 
-      if (fleet_interface->n_lengths > 0) {
-        ss << " ,{\n";
-        fims::Vector<double> age_to_length_conversion_uncertainty(
-            fleet->age_to_length_conversion.size(), -999);
-        this->get_se_values("age_to_length_conversion", this->se_values,
-                            age_to_length_conversion_uncertainty);
-        for (size_t i = 0; i < fleet_interface->age_to_length_conversion.size();
-             i++) {
-          fleet_interface->age_to_length_conversion[i].final_value_m =
-              fleet->age_to_length_conversion[i];
-          fleet_interface->age_to_length_conversion[i].uncertainty_m =
-              age_to_length_conversion_uncertainty[i];
-        }
-        ss << " \"name\": \"age_to_length_conversion\",\n";
-        ss << " \"id\":" << fleet_interface->age_to_length_conversion.id_m
-           << ",\n";
-        ss << " \"type\": \"vector\",\n";
-        ss << " \"dimensionality\": {\n";
-        ss << "  \"header\": [" << "\"n_ages\", \"n_lengths\"" << "],\n";
-        ss << "  \"dimensions\": [" << fleet_interface->n_ages.get() << ", "
-           << fleet_interface->n_lengths.get() << "]\n},\n";
-
-        ss << " \"values\": " << fleet_interface->age_to_length_conversion
-           << "\n";
-
-        ss << "\n}\n";
-      }
-
       ss << "], \"derived_quantities\": [";
 
       std::map<std::string, fims::Vector<double>> dqs =
@@ -1541,13 +1513,6 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
           &(derived_quantities["agecomp_proportion"]);
       info->variable_map[fleet_interface->lengthcomp_expected.id_m] =
           &(derived_quantities["lengthcomp_expected"]);
-      // if (fleet_interface->n_lengths.get() > 0)
-      // {
-      //   info->variable_map[fleet_interface->age_to_length_conversion.id_m] =
-      //       &(derived_quantities["age_to_length_conversion"]);
-      // }
-      // info->variable_map[fleet_interface->lengthcomp_expected.id_m] =
-      //     &(derived_quantities["length_comp_expected"]);
       info->variable_map[fleet_interface->lengthcomp_proportion.id_m] =
           &(derived_quantities["lengthcomp_proportion"]);
     }
