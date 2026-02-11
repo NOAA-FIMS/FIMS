@@ -34,7 +34,7 @@ jobs:
     - name: Checkout External Docs Repository (Source of bootstrap CSS)
       uses: actions/checkout@v6
       with:
-        repository: e-perl-NOAA/noaa-fims.github.io #need to change back
+        repository: noaa-fims/noaa-fims.github.io
         ref: gh-pages
         path: external-docs
 
@@ -88,16 +88,16 @@ jobs:
         fi
 
     - name: Building HTML documentation with Doxygen
-    # Do not run -DDOXYGEN_WARN_AS_ERROR=YES locally
-    # FIX? run cmake --build build --parallel 16
+      # Do not run -DDOXYGEN_WARN_AS_ERROR=YES locally
+      # FIX? run cmake --build build --parallel 16
       run: |
         cp -r assets/* ./
         cmake -S . -B build -G Ninja -DDOXYGEN_WARN_AS_ERROR=FAIL_ON_WARNINGS
         cmake --build build
 
     - name: Deploy html documentation with Doxygen
-    # Do not run mkdir doxygen and mv build/html doxygen locally
-      # if: ${{ github.ref == 'refs/heads/main' }} #need to uncomment
+      # Do not run mkdir doxygen and mv build/html doxygen locally
+      if: ${{ github.ref == 'refs/heads/main' }}
       run: |
         mv build/html ./
         mkdir -p ./doxygen
@@ -111,15 +111,15 @@ jobs:
         rm DoxygenLayout.xml
 
     - name: Push doxygen html files to FIMS website repo
-      # if: ${{ github.ref == 'refs/heads/main' }} #need to uncomment
+      if: ${{ github.ref == 'refs/heads/main' }}
       uses: dmnemec/copy_file_to_another_repo_action@main
       env:
         API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
       with:
         source_file: 'doxygen'
-        destination_repo: 'e-perl-NOAA/noaa-fims.github.io' #need to change back
+        destination_repo: 'noaa-fims/noaa-fims.github.io'
         destination_folder: './'
         destination_branch: 'main'
-        user_email: 'elizabeth.gugliotti@noaa.gov' # your email
-        user_name: 'Elizabeth Perl'           # your login
+        user_email: 'kelli.johnson@noaa.gov' # your email
+        user_name: 'Kelli Johnson'           # your login
         commit_message: 'Docs: run Doxygen'
