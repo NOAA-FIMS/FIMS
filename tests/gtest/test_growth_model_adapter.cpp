@@ -40,7 +40,8 @@ TEST(VonBertalanffyGrowthModelAdapter, UsesWaaFromLaa) {
   const double K = 0.2;
   const double A1 = 0.0;
   const double A2 = 50.0;
-  const double denom = 1.0 - std::exp(-K * (A2 - A1));
+  const double denom_raw = 1.0 - std::exp(-K * (A2 - A1));
+  const double denom = fims_math::ad_max(fims_math::ad_fabs(denom_raw), 1e-8);
   const double L = L1 + (L2 - L1) * (1.0 - std::exp(-K * (age - A1))) / denom;
   const double expected = 1e-5 * std::pow(L, 3.0);
   const double W = adapter.evaluate(age);
@@ -61,7 +62,8 @@ TEST(VonBertalanffyGrowthModelAdapter, HonorsAgeOffset) {
   const double K = 0.2;
   const double A1 = 1.0;
   const double A2 = 51.0;
-  const double denom = 1.0 - std::exp(-K * (A2 - A1));
+  const double denom_raw = 1.0 - std::exp(-K * (A2 - A1));
+  const double denom = fims_math::ad_max(fims_math::ad_fabs(denom_raw), 1e-8);
   const double L = L1 + (L2 - L1) * (1.0 - std::exp(-K * (age - A1))) / denom;
   const double expected = 1e-5 * std::pow(L, 3.0);
   const double W = adapter.evaluate(age);

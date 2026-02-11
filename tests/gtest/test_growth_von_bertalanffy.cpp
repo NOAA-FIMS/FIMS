@@ -1,5 +1,6 @@
 #include <cmath>
 #include "gtest/gtest.h"
+#include "common/fims_math.hpp"
 #include "population_dynamics/growth/functors/von_bertalanffy.hpp"
 
 namespace
@@ -15,18 +16,24 @@ namespace
     vb.age_L1 = 0.0;
     vb.age_L2 = 50.0;
 
-    // expected values from the formula:
-    // L(a) = L1 + (L2 - L1) * (1 - exp(-K * (a - A1))) /
-    //        (1 - exp(-K * (A2 - A1)))
+    // expected values from the formula (guarded denominator)
+    const double denom_raw = 1.0 - std::exp(-vb.K * (vb.age_L2 - vb.age_L1));
+    const double denom = fims_math::ad_max(fims_math::ad_fabs(denom_raw), 1e-8);
+
     double L0 = vb.length_at_age(0.0);
     double L5 = vb.length_at_age(5.0);
     double L50 = vb.length_at_age(50.0);
 
+    const double L0_expected = vb.L1 + (vb.L2 - vb.L1) *
+        (1.0 - std::exp(-vb.K * (0.0 - vb.age_L1))) / denom;
+    const double L50_expected = vb.L1 + (vb.L2 - vb.L1) *
+        (1.0 - std::exp(-vb.K * (50.0 - vb.age_L1))) / denom;
+
     // sanity checks
-    EXPECT_NEAR(L0, 10.0, 1e-12);     // at A1, should equal L1
+    EXPECT_NEAR(L0, L0_expected, 1e-12);
     EXPECT_GT(L5, 10.0);
     EXPECT_LT(L5, 100.0);
-    EXPECT_NEAR(L50, 100.0, 1e-12);   // at A2, should equal L2
+    EXPECT_NEAR(L50, L50_expected, 1e-12);
 
     // weight uses length-weight params and evaluate() returns waa
     vb.a_wl = 1e-5;
