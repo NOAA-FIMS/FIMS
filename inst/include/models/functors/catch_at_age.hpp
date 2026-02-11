@@ -619,7 +619,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
           (population->fleets[fleet_]->Fmort[year] *
            population->f_multiplier[year] *
            population->fleets[fleet_]->selectivity->evaluate(
-               population->ages[age])) /
+               population->ages[age],year)) /
           pdq_["mortality_Z"][i_age_year] * pdq_["numbers_at_age"][i_age_year] *
           (1 - fims_math::exp(-(pdq_["mortality_Z"][i_age_year])));
     }
@@ -666,7 +666,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
       fdq_["index_numbers_at_age"][i_age_year] +=
           (population->fleets[fleet_]->q.get_force_scalar(year) *
            population->fleets[fleet_]->selectivity->evaluate(
-               population->ages[age])) *
+               population->ages[age],year)) *
           pdq_["numbers_at_age"][i_age_year];
     }
   }
