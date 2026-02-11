@@ -9,7 +9,7 @@
 #ifndef POPULATION_DYNAMICS_GROWTH_VON_BERTALANFFY_HPP
 #define POPULATION_DYNAMICS_GROWTH_VON_BERTALANFFY_HPP
 
-#include <cmath>
+#include "../../../common/fims_math.hpp"
 #include "growth_base.hpp"
 
 namespace fims_popdy {
@@ -37,19 +37,19 @@ struct VonBertalanffyGrowth : public GrowthBase<Type> {
   virtual ~VonBertalanffyGrowth() {}
 
   Type length_at_age(const Type& age) const {
-    using std::exp;
-    const Type denom = Type(1.0) - exp(-K * (age_L2 - age_L1));
-    if (denom == Type(0.0)) {
-      return L1;
-    }
-    const Type numer = Type(1.0) - exp(-K * (age - age_L1));
-    return L1 + (L2 - L1) * numer / denom;
+    const Type denom = Type(1.0) -
+        fims_math::exp(-K * (age_L2 - age_L1));
+    // AD-safe floor to avoid divide-by-zero/NaN when denominator is tiny.
+    const Type denom_safe = fims_math::ad_max(
+        fims_math::ad_fabs(denom), static_cast<Type>(1e-8));
+    const Type numer = Type(1.0) -
+        fims_math::exp(-K * (age - age_L1));
+    return L1 + (L2 - L1) * numer / denom_safe;
   }
 
   Type weight_at_age(const Type& age) const {
-    using std::pow;
     Type L = length_at_age(age);
-    return a_wl * pow(L, b_wl);
+    return a_wl * fims_math::pow(L, b_wl);
   }
 
   virtual const Type evaluate(const double& a) const override {

@@ -203,23 +203,28 @@ create_default_growth <- function(unnested_configurations, data) {
 
     ages <- get_ages(data)
     if (length(ages) == 0 || all(is.na(ages))) {
-      age_L1 <- 0
+      reference_age_for_length_1 <- 0
       n_ages <- get_n_ages(data)
-      age_L2 <- if (n_ages > 0) n_ages - 1 else 0
+      reference_age_for_length_2 <- if (n_ages > 0) n_ages - 1 else 0
     } else {
-      age_L1 <- min(ages, na.rm = TRUE)
-      age_L2 <- max(ages, na.rm = TRUE)
+      reference_age_for_length_1 <- min(ages, na.rm = TRUE)
+      reference_age_for_length_2 <- max(ages, na.rm = TRUE)
     }
 
     default <- create_default_parameters_template(n_parameters = 9) |>
       dplyr::mutate(
         module_name = "Growth",
         module_type = "VonBertalanffy",
-        label = c("L1", "L2", "K", "age_L1", "age_L2",
-                  "a_wl", "b_wl", "SDgrowth", "SDgrowth"),
+        label = c("length_at_ref_age_1", "length_at_ref_age_2",
+                  "growth_coefficient_K", "reference_age_for_length_1",
+                  "reference_age_for_length_2", "length_weight_a",
+                  "length_weight_b", "length_at_age_sd_at_ref_ages",
+                  "length_at_age_sd_at_ref_ages"),
         age = c(NA_real_, NA_real_, NA_real_, NA_real_, NA_real_,
-                NA_real_, NA_real_, age_L1, age_L2),
-        value = c(8, 60, 0.2, age_L1, age_L2,
+                NA_real_, NA_real_,
+                reference_age_for_length_1, reference_age_for_length_2),
+        value = c(8, 60, 0.2,
+                  reference_age_for_length_1, reference_age_for_length_2,
                   1e-5, 3,
                   3, 7),
         estimation_type = "constant"

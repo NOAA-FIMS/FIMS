@@ -14,28 +14,37 @@ on.exit(rm(fims_frame), add = TRUE)
 
 ages <- get_ages(fims_frame)
 if (length(ages) == 0 || all(is.na(ages))) {
-  age_L1 <- 0
-  age_L2 <- get_n_ages(fims_frame) - 1
+  reference_age_for_length_1 <- 0
+  reference_age_for_length_2 <- get_n_ages(fims_frame) - 1
 } else {
-  age_L1 <- min(ages, na.rm = TRUE)
-  age_L2 <- max(ages, na.rm = TRUE)
+  reference_age_for_length_1 <- min(ages, na.rm = TRUE)
+  reference_age_for_length_2 <- max(ages, na.rm = TRUE)
 }
 
-L1 <- 8
-L2 <- 60
-K <- 0.2
-a_wl <- 1e-5
-b_wl <- 3
+length_at_ref_age_1 <- 8
+length_at_ref_age_2 <- 60
+growth_coefficient_K <- 0.2
+length_weight_a <- 1e-5
+length_weight_b <- 3
 
 vb <- methods::new(VonBertalanffyGrowth)
-vb$L1$resize(1); vb$L1[1]$value <- L1
-vb$L2$resize(1); vb$L2[1]$value <- L2
-vb$K$resize(1);  vb$K[1]$value  <- K
-vb$age_L1$resize(1); vb$age_L1[1]$value <- age_L1
-vb$age_L2$resize(1); vb$age_L2[1]$value <- age_L2
-vb$a_wl$resize(1); vb$a_wl[1]$value <- a_wl
-vb$b_wl$resize(1); vb$b_wl[1]$value <- b_wl
-vb$SDgrowth$resize(2); vb$SDgrowth[1]$value <- 3; vb$SDgrowth[2]$value <- 7
+vb$length_at_ref_age_1$resize(1)
+vb$length_at_ref_age_1[1]$value <- length_at_ref_age_1
+vb$length_at_ref_age_2$resize(1)
+vb$length_at_ref_age_2[1]$value <- length_at_ref_age_2
+vb$growth_coefficient_K$resize(1)
+vb$growth_coefficient_K[1]$value <- growth_coefficient_K
+vb$reference_age_for_length_1$resize(1)
+vb$reference_age_for_length_1[1]$value <- reference_age_for_length_1
+vb$reference_age_for_length_2$resize(1)
+vb$reference_age_for_length_2[1]$value <- reference_age_for_length_2
+vb$length_weight_a$resize(1)
+vb$length_weight_a[1]$value <- length_weight_a
+vb$length_weight_b$resize(1)
+vb$length_weight_b[1]$value <- length_weight_b
+vb$length_at_age_sd_at_ref_ages$resize(2)
+vb$length_at_age_sd_at_ref_ages[1]$value <- 3
+vb$length_at_age_sd_at_ref_ages[2]$value <- 7
 vb$n_ages$set(get_n_ages(fims_frame))
 on.exit(vb, add = TRUE)
 
@@ -43,10 +52,15 @@ on.exit(vb, add = TRUE)
 test_that("VonBertalanffyGrowth evaluate() works at max age when min age > 0", {
   #' @description Test that VonBertalanffyGrowth evaluate() accepts the
   #' maximum age when ages do not start at zero.
-  age <- age_L2
-  denom <- 1 - exp(-K * (age_L2 - age_L1))
-  L <- L1 + (L2 - L1) * (1 - exp(-K * (age - age_L1))) / denom
-  expected_W <- a_wl * L^b_wl
+  age <- reference_age_for_length_2
+  denom <- 1 - exp(-growth_coefficient_K *
+                   (reference_age_for_length_2 -
+                      reference_age_for_length_1))
+  L <- length_at_ref_age_1 +
+    (length_at_ref_age_2 - length_at_ref_age_1) *
+    (1 - exp(-growth_coefficient_K *
+               (age - reference_age_for_length_1))) / denom
+  expected_W <- length_weight_a * L^length_weight_b
   expect_equal(vb$evaluate(age), expected_W)
 })
 
@@ -54,23 +68,27 @@ test_that("VonBertalanffyGrowth evaluate() works at max age when min age > 0", {
 test_that("VonBertalanffyGrowth evaluate() rejects fractional age", {
   #' @description Test that VonBertalanffyGrowth evaluate() rejects
   #' non-integer ages.
-  expect_error(vb$evaluate(age_L1 + 0.5), "Non-integer age")
+  expect_error(vb$evaluate(reference_age_for_length_1 + 0.5),
+               "Non-integer age")
 })
 
 test_that("VonBertalanffyGrowth evaluate() handles ages below reference range", {
   #' @description Test that VonBertalanffyGrowth evaluate() errors for
   #' negative ages and warns for extrapolation below the reference range.
-  if (age_L1 <= 0) {
-    expect_error(vb$evaluate(age_L1 - 1), "Negative age")
+  if (reference_age_for_length_1 <= 0) {
+    expect_error(vb$evaluate(reference_age_for_length_1 - 1),
+                 "Negative age")
   } else {
-    expect_warning(vb$evaluate(age_L1 - 1), "extrapolating growth curve")
+    expect_warning(vb$evaluate(reference_age_for_length_1 - 1),
+                   "extrapolating growth curve")
   }
 })
 
 test_that("VonBertalanffyGrowth evaluate() warns for ages above reference range", {
   #' @description Test that VonBertalanffyGrowth evaluate() warns for
   #' extrapolation above the reference age range.
-  expect_warning(vb$evaluate(age_L2 + 1), "extrapolating growth curve")
+  expect_warning(vb$evaluate(reference_age_for_length_2 + 1),
+                 "extrapolating growth curve")
 })
 
 ## Error handling ----
@@ -78,15 +96,25 @@ test_that("VonBertalanffyGrowth evaluate() rejects reversed reference ages", {
   #' @description Test that VonBertalanffyGrowth evaluate() rejects
   #' reversed reference ages when more than one age is modeled.
   vb_bad <- methods::new(VonBertalanffyGrowth)
-  vb_bad$L1$resize(1); vb_bad$L1[1]$value <- L1
-  vb_bad$L2$resize(1); vb_bad$L2[1]$value <- L2
-  vb_bad$K$resize(1);  vb_bad$K[1]$value  <- K
-  vb_bad$age_L1$resize(1); vb_bad$age_L1[1]$value <- age_L2
-  vb_bad$age_L2$resize(1); vb_bad$age_L2[1]$value <- age_L1
-  vb_bad$a_wl$resize(1); vb_bad$a_wl[1]$value <- a_wl
-  vb_bad$b_wl$resize(1); vb_bad$b_wl[1]$value <- b_wl
+  vb_bad$length_at_ref_age_1$resize(1)
+  vb_bad$length_at_ref_age_1[1]$value <- length_at_ref_age_1
+  vb_bad$length_at_ref_age_2$resize(1)
+  vb_bad$length_at_ref_age_2[1]$value <- length_at_ref_age_2
+  vb_bad$growth_coefficient_K$resize(1)
+  vb_bad$growth_coefficient_K[1]$value <- growth_coefficient_K
+  vb_bad$reference_age_for_length_1$resize(1)
+  vb_bad$reference_age_for_length_1[1]$value <-
+    reference_age_for_length_2
+  vb_bad$reference_age_for_length_2$resize(1)
+  vb_bad$reference_age_for_length_2[1]$value <-
+    reference_age_for_length_1
+  vb_bad$length_weight_a$resize(1)
+  vb_bad$length_weight_a[1]$value <- length_weight_a
+  vb_bad$length_weight_b$resize(1)
+  vb_bad$length_weight_b[1]$value <- length_weight_b
   vb_bad$n_ages$set(get_n_ages(fims_frame))
-  expect_error(vb_bad$evaluate(age_L1), "age_L2 must be >= age_L1")
+  expect_error(vb_bad$evaluate(reference_age_for_length_1),
+               "reference_age_for_length_2 must be > reference_age_for_length_1")
   clear()
 })
 
@@ -95,6 +123,7 @@ test_that("VonBertalanffyGrowth evaluate() errors when parameters are missing", 
   #' required parameters are missing.
   vb2 <- methods::new(VonBertalanffyGrowth)
   vb2$n_ages$set(get_n_ages(fims_frame))
-  expect_error(vb2$evaluate(age_L1), "parameters not set")
+  expect_error(vb2$evaluate(reference_age_for_length_1),
+               "parameters not set")
   clear()
 })

@@ -13,6 +13,8 @@
 #include <cmath>
 
 #include "../../../population_dynamics/growth/growth.hpp"
+#include "../../../common/fims_math.hpp"
+#include "../../../common/fims_vector.hpp"
 #include "rcpp_interface_base.hpp"
 
 /**
@@ -265,17 +267,17 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
 class VonBertalanffyGrowthInterface : public GrowthInterfaceBase {
  public:
   // Required parameters
-  ParameterVector L1;
-  ParameterVector L2;
-  ParameterVector K;
-  ParameterVector age_L1;
-  ParameterVector age_L2;
+  ParameterVector length_at_ref_age_1;
+  ParameterVector length_at_ref_age_2;
+  ParameterVector growth_coefficient_K;
+  ParameterVector reference_age_for_length_1;
+  ParameterVector reference_age_for_length_2;
 
   // Length-weight conversion params
-  ParameterVector a_wl;
-  ParameterVector b_wl;
+  ParameterVector length_weight_a;
+  ParameterVector length_weight_b;
   // Length-at-age SD params
-  ParameterVector SDgrowth;
+  ParameterVector length_at_age_sd_at_ref_ages;
   // Age dimension (for bounds checking)
   SharedInt n_ages = 0;
 
@@ -288,19 +290,76 @@ class VonBertalanffyGrowthInterface : public GrowthInterfaceBase {
 
   VonBertalanffyGrowthInterface(const VonBertalanffyGrowthInterface& other)
       : GrowthInterfaceBase(other),
-        L1(other.L1),
-        L2(other.L2),
-        K(other.K),
-        age_L1(other.age_L1),
-        age_L2(other.age_L2),
-        a_wl(other.a_wl),
-        b_wl(other.b_wl),
-        SDgrowth(other.SDgrowth),
+        length_at_ref_age_1(other.length_at_ref_age_1),
+        length_at_ref_age_2(other.length_at_ref_age_2),
+        growth_coefficient_K(other.growth_coefficient_K),
+        reference_age_for_length_1(other.reference_age_for_length_1),
+        reference_age_for_length_2(other.reference_age_for_length_2),
+        length_weight_a(other.length_weight_a),
+        length_weight_b(other.length_weight_b),
+        length_at_age_sd_at_ref_ages(other.length_at_age_sd_at_ref_ages),
         n_ages(other.n_ages) {}
 
   virtual ~VonBertalanffyGrowthInterface() {}
 
   virtual uint32_t get_id() { return this->id; }
+
+  /**
+   * @brief Extracts derived quantities back to the Rcpp interface object from
+   * the Information object.
+   */
+  virtual void finalize() {
+    if (this->finalized) {
+      FIMS_WARNING_LOG("VonBertalanffy Growth " + fims::to_string(this->id) +
+                       " has been finalized already.");
+    }
+
+    this->finalized = true;
+
+    std::shared_ptr<fims_info::Information<double>> info =
+        fims_info::Information<double>::GetInstance();
+
+    fims_info::Information<double>::growth_models_iterator it;
+    it = info->growth_models.find(this->id);
+    if (it == info->growth_models.end()) {
+      FIMS_WARNING_LOG("VonBertalanffy Growth " + fims::to_string(this->id) +
+                       " not found in Information.");
+      return;
+    }
+
+    std::shared_ptr<fims_popdy::VonBertalanffyGrowthModelAdapter<double>> vb =
+        std::dynamic_pointer_cast<
+            fims_popdy::VonBertalanffyGrowthModelAdapter<double>>(it->second);
+    if (!vb) {
+      FIMS_WARNING_LOG("Growth model type mismatch for id " +
+                       fims::to_string(this->id));
+      return;
+    }
+
+    auto set_final = [](ParameterVector& pv, const fims::Vector<double>& src,
+                        bool log_scale) {
+      for (size_t i = 0; i < pv.size(); i++) {
+        if (pv[i].estimation_type_m.get() == "constant") {
+          pv[i].final_value_m = pv[i].initial_value_m;
+        } else {
+          double v = src[i];
+          if (log_scale) {
+            v = fims_math::exp(v);
+          }
+          pv[i].final_value_m = v;
+        }
+      }
+    };
+
+    set_final(this->length_at_ref_age_1, vb->L1Vector(), true);
+    set_final(this->length_at_ref_age_2, vb->L2Vector(), true);
+    set_final(this->growth_coefficient_K, vb->KVector(), true);
+    set_final(this->reference_age_for_length_1, vb->AgeL1Vector(), false);
+    set_final(this->reference_age_for_length_2, vb->AgeL2Vector(), false);
+    set_final(this->length_weight_a, vb->AwlVector(), true);
+    set_final(this->length_weight_b, vb->BwlVector(), true);
+    set_final(this->length_at_age_sd_at_ref_ages, vb->SDgrowthVector(), true);
+  }
 
   virtual double evaluate(double age) {
     if (age < 0.0) {
@@ -316,34 +375,44 @@ class VonBertalanffyGrowthInterface : public GrowthInterfaceBase {
     }
     double min_age = 0.0;
     double max_age = static_cast<double>(this->n_ages.get() - 1);
-    if (this->age_L1.size() > 0 && this->age_L2.size() > 0) {
-      const double a1 = this->age_L1[0].initial_value_m;
-      const double a2 = this->age_L2[0].initial_value_m;
-      if (a2 < a1 || (a2 == a1 && this->n_ages.get() > 1)) {
-        Rcpp::stop("VonBertalanffyGrowth age_L2 must be >= age_L1");
+    if (this->reference_age_for_length_1.size() > 0 &&
+        this->reference_age_for_length_2.size() > 0) {
+      const double a1 =
+          this->reference_age_for_length_1[0].initial_value_m;
+      const double a2 =
+          this->reference_age_for_length_2[0].initial_value_m;
+      if (a2 <= a1) {
+        Rcpp::stop(
+            "VonBertalanffyGrowth reference_age_for_length_2 must be > "
+            "reference_age_for_length_1");
       }
       min_age = std::min(a1, a2);
       max_age = std::max(a1, a2);
     }
     if (age_round < min_age - tol || age_round > max_age + tol) {
       Rcpp::warning(
-          "Age outside [age_L1, age_L2]; extrapolating growth curve.");
+          "Age outside [reference_age_for_length_1, reference_age_for_length_2]; "
+          "extrapolating growth curve.");
     }
     fims_popdy::VonBertalanffyGrowth<double> vb;
-    if (this->L1.size() < 1 || this->L2.size() < 1 || this->K.size() < 1 ||
-        this->age_L1.size() < 1 || this->age_L2.size() < 1 ||
-        this->a_wl.size() < 1 || this->b_wl.size() < 1) {
+    if (this->length_at_ref_age_1.size() < 1 ||
+        this->length_at_ref_age_2.size() < 1 ||
+        this->growth_coefficient_K.size() < 1 ||
+        this->reference_age_for_length_1.size() < 1 ||
+        this->reference_age_for_length_2.size() < 1 ||
+        this->length_weight_a.size() < 1 ||
+        this->length_weight_b.size() < 1) {
       Rcpp::stop("VonBertalanffyGrowth parameters not set");
     }
 
-    vb.L1 = this->L1[0].initial_value_m;
-    vb.L2 = this->L2[0].initial_value_m;
-    vb.K  = this->K[0].initial_value_m;
-    vb.age_L1 = this->age_L1[0].initial_value_m;
-    vb.age_L2 = this->age_L2[0].initial_value_m;
+    vb.L1 = this->length_at_ref_age_1[0].initial_value_m;
+    vb.L2 = this->length_at_ref_age_2[0].initial_value_m;
+    vb.K  = this->growth_coefficient_K[0].initial_value_m;
+    vb.age_L1 = this->reference_age_for_length_1[0].initial_value_m;
+    vb.age_L2 = this->reference_age_for_length_2[0].initial_value_m;
 
-    vb.a_wl = this->a_wl[0].initial_value_m;
-    vb.b_wl = this->b_wl[0].initial_value_m;
+    vb.a_wl = this->length_weight_a[0].initial_value_m;
+    vb.b_wl = this->length_weight_b[0].initial_value_m;
 
     return vb.evaluate(age);
   }
@@ -358,100 +427,103 @@ virtual std::string to_json() {
 
   ss << " \"parameters\": [\n";
 
-  // L1
+  // length_at_ref_age_1
   ss << "{\n";
-  ss << "   \"name\": \"L1\",\n";
-  ss << "   \"id\":" << this->L1.id_m << ",\n";
+  ss << "   \"name\": \"length_at_ref_age_1\",\n";
+  ss << "   \"id\":" << this->length_at_ref_age_1.id_m << ",\n";
   ss << "   \"type\": \"vector\",\n";
   ss << "   \"dimensionality\": {\n";
   ss << "    \"header\": [null],\n";
-  ss << "    \"dimensions\": [" << this->L1.size() << "]\n";
+  ss << "    \"dimensions\": [" << this->length_at_ref_age_1.size() << "]\n";
   ss << "   },\n";
-  ss << "   \"values\":" << this->L1 << "\n";
+  ss << "   \"values\":" << this->length_at_ref_age_1 << "\n";
   ss << "},\n";
 
-  // K
+  // growth_coefficient_K
   ss << "{\n";
-  ss << "   \"name\": \"K\",\n";
-  ss << "   \"id\":" << this->K.id_m << ",\n";
+  ss << "   \"name\": \"growth_coefficient_K\",\n";
+  ss << "   \"id\":" << this->growth_coefficient_K.id_m << ",\n";
   ss << "   \"type\": \"vector\",\n";
   ss << "   \"dimensionality\": {\n";
   ss << "    \"header\": [null],\n";
-  ss << "    \"dimensions\": [" << this->K.size() << "]\n";
+  ss << "    \"dimensions\": [" << this->growth_coefficient_K.size() << "]\n";
   ss << "   },\n";
-  ss << "   \"values\":" << this->K << "\n";
+  ss << "   \"values\":" << this->growth_coefficient_K << "\n";
   ss << "},\n";
 
-  // L2
+  // length_at_ref_age_2
   ss << "{\n";
-  ss << "   \"name\": \"L2\",\n";
-  ss << "   \"id\":" << this->L2.id_m << ",\n";
+  ss << "   \"name\": \"length_at_ref_age_2\",\n";
+  ss << "   \"id\":" << this->length_at_ref_age_2.id_m << ",\n";
   ss << "   \"type\": \"vector\",\n";
   ss << "   \"dimensionality\": {\n";
   ss << "    \"header\": [null],\n";
-  ss << "    \"dimensions\": [" << this->L2.size() << "]\n";
+  ss << "    \"dimensions\": [" << this->length_at_ref_age_2.size() << "]\n";
   ss << "   },\n";
-  ss << "   \"values\":" << this->L2 << "\n";
+  ss << "   \"values\":" << this->length_at_ref_age_2 << "\n";
   ss << "},\n";
 
-  // age_L1
+  // reference_age_for_length_1
   ss << "{\n";
-  ss << "   \"name\": \"age_L1\",\n";
-  ss << "   \"id\":" << this->age_L1.id_m << ",\n";
+  ss << "   \"name\": \"reference_age_for_length_1\",\n";
+  ss << "   \"id\":" << this->reference_age_for_length_1.id_m << ",\n";
   ss << "   \"type\": \"vector\",\n";
   ss << "   \"dimensionality\": {\n";
   ss << "    \"header\": [null],\n";
-  ss << "    \"dimensions\": [" << this->age_L1.size() << "]\n";
+  ss << "    \"dimensions\": [" << this->reference_age_for_length_1.size()
+     << "]\n";
   ss << "   },\n";
-  ss << "   \"values\":" << this->age_L1 << "\n";
+  ss << "   \"values\":" << this->reference_age_for_length_1 << "\n";
   ss << "},\n";
 
-  // age_L2
+  // reference_age_for_length_2
   ss << "{\n";
-  ss << "   \"name\": \"age_L2\",\n";
-  ss << "   \"id\":" << this->age_L2.id_m << ",\n";
+  ss << "   \"name\": \"reference_age_for_length_2\",\n";
+  ss << "   \"id\":" << this->reference_age_for_length_2.id_m << ",\n";
   ss << "   \"type\": \"vector\",\n";
   ss << "   \"dimensionality\": {\n";
   ss << "    \"header\": [null],\n";
-  ss << "    \"dimensions\": [" << this->age_L2.size() << "]\n";
+  ss << "    \"dimensions\": [" << this->reference_age_for_length_2.size()
+     << "]\n";
   ss << "   },\n";
-  ss << "   \"values\":" << this->age_L2 << "\n";
+  ss << "   \"values\":" << this->reference_age_for_length_2 << "\n";
   ss << "},\n";
 
-  // a_wl
+  // length_weight_a
   ss << "{\n";
-  ss << "   \"name\": \"a_wl\",\n";
-  ss << "   \"id\":" << this->a_wl.id_m << ",\n";
+  ss << "   \"name\": \"length_weight_a\",\n";
+  ss << "   \"id\":" << this->length_weight_a.id_m << ",\n";
   ss << "   \"type\": \"vector\",\n";
   ss << "   \"dimensionality\": {\n";
   ss << "    \"header\": [null],\n";
-  ss << "    \"dimensions\": [" << this->a_wl.size() << "]\n";
+  ss << "    \"dimensions\": [" << this->length_weight_a.size() << "]\n";
   ss << "   },\n";
-  ss << "   \"values\":" << this->a_wl << "\n";
+  ss << "   \"values\":" << this->length_weight_a << "\n";
   ss << "},\n";
 
-  // b_wl (last)
+  // length_weight_b (last)
   ss << "{\n";
-  ss << "   \"name\": \"b_wl\",\n";
-  ss << "   \"id\":" << this->b_wl.id_m << ",\n";
+  ss << "   \"name\": \"length_weight_b\",\n";
+  ss << "   \"id\":" << this->length_weight_b.id_m << ",\n";
   ss << "   \"type\": \"vector\",\n";
   ss << "   \"dimensionality\": {\n";
   ss << "    \"header\": [null],\n";
-  ss << "    \"dimensions\": [" << this->b_wl.size() << "]\n";
+  ss << "    \"dimensions\": [" << this->length_weight_b.size() << "]\n";
   ss << "   },\n";
-  ss << "   \"values\":" << this->b_wl << "\n";
+  ss << "   \"values\":" << this->length_weight_b << "\n";
   ss << "},\n";
 
-  // SDgrowth (SD1, SDA)
+  // length_at_age_sd_at_ref_ages (SD1, SDA)
   ss << "{\n";
-  ss << "   \"name\": \"SDgrowth\",\n";
-  ss << "   \"id\":" << this->SDgrowth.id_m << ",\n";
+  ss << "   \"name\": \"length_at_age_sd_at_ref_ages\",\n";
+  ss << "   \"id\":" << this->length_at_age_sd_at_ref_ages.id_m << ",\n";
   ss << "   \"type\": \"vector\",\n";
   ss << "   \"dimensionality\": {\n";
   ss << "    \"header\": [null],\n";
-  ss << "    \"dimensions\": [" << this->SDgrowth.size() << "]\n";
+  ss << "    \"dimensions\": [" << this->length_at_age_sd_at_ref_ages.size()
+     << "]\n";
   ss << "   },\n";
-  ss << "   \"values\":" << this->SDgrowth << "\n";
+  ss << "   \"values\":" << this->length_at_age_sd_at_ref_ages << "\n";
   ss << "}]\n";
 
   ss << "}";
@@ -469,26 +541,69 @@ bool add_to_fims_tmb_internal() {
 
   vb->id = this->id;
 
-  // For now, use initial values
-  if (this->L1.size() < 1 || this->L2.size() < 1 || this->K.size() < 1 ||
-      this->age_L1.size() < 1 || this->age_L2.size() < 1 ||
-      this->a_wl.size() < 1 || this->b_wl.size() < 1) {
+  // Build parameter vectors and register if estimable
+  if (this->length_at_ref_age_1.size() < 1 ||
+      this->length_at_ref_age_2.size() < 1 ||
+      this->growth_coefficient_K.size() < 1 ||
+      this->reference_age_for_length_1.size() < 1 ||
+      this->reference_age_for_length_2.size() < 1 ||
+      this->length_weight_a.size() < 1 ||
+      this->length_weight_b.size() < 1) {
     Rcpp::stop("VonBertalanffyGrowth parameters not set");
   }
-  if (this->SDgrowth.size() < 2) {
-    Rcpp::stop("SDgrowth must have two values (SD1, SDA)");
+  if (this->length_at_age_sd_at_ref_ages.size() < 2) {
+    Rcpp::stop("length_at_age_sd_at_ref_ages must have two values");
   }
-  vb->SetVonBertalanffyParameters(
-      this->L1[0].initial_value_m,
-      this->L2[0].initial_value_m,
-      this->K[0].initial_value_m,
-      this->age_L1[0].initial_value_m,
-      this->age_L2[0].initial_value_m);
-  vb->SetLengthWeightParameters(
-      this->a_wl[0].initial_value_m,
-      this->b_wl[0].initial_value_m);
-  vb->SetLengthSdParams(this->SDgrowth[0].initial_value_m,
-                        this->SDgrowth[1].initial_value_m);
+
+  std::stringstream ss;
+  auto load_and_register = [&](ParameterVector& pv,
+                               fims::Vector<Type>& target,
+                               const std::string& base_name,
+                               bool log_scale) {
+    target.resize(pv.size());
+    for (size_t i = 0; i < pv.size(); i++) {
+      double v = pv[i].initial_value_m;
+      if (log_scale) {
+        if (v <= 0.0) {
+          Rcpp::stop((base_name + " must be > 0").c_str());
+        }
+        v = fims_math::log(v);
+      }
+      target[i] = static_cast<Type>(v);
+      if (pv[i].estimation_type_m.get() == "fixed_effects") {
+        ss.str("");
+        ss << "Growth." << this->id << "." << base_name << "."
+           << pv[i].id_m;
+        info->RegisterParameterName(ss.str());
+        info->RegisterParameter(target[i]);
+      }
+      if (pv[i].estimation_type_m.get() == "random_effects") {
+        ss.str("");
+        ss << "Growth." << this->id << "." << base_name << "."
+           << pv[i].id_m;
+        info->RegisterRandomEffectName(ss.str());
+        info->RegisterRandomEffect(target[i]);
+      }
+    }
+    info->variable_map[pv.id_m] = &target;
+  };
+
+  load_and_register(this->length_at_ref_age_1, vb->L1Vector(),
+                    "length_at_ref_age_1", true);
+  load_and_register(this->length_at_ref_age_2, vb->L2Vector(),
+                    "length_at_ref_age_2", true);
+  load_and_register(this->growth_coefficient_K, vb->KVector(),
+                    "growth_coefficient_K", true);
+  load_and_register(this->reference_age_for_length_1, vb->AgeL1Vector(),
+                    "reference_age_for_length_1", false);
+  load_and_register(this->reference_age_for_length_2, vb->AgeL2Vector(),
+                    "reference_age_for_length_2", false);
+  load_and_register(this->length_weight_a, vb->AwlVector(),
+                    "length_weight_a", true);
+  load_and_register(this->length_weight_b, vb->BwlVector(),
+                    "length_weight_b", true);
+  load_and_register(this->length_at_age_sd_at_ref_ages, vb->SDgrowthVector(),
+                    "length_at_age_sd_at_ref_ages", true);
 
   info->growth_models[vb->id] = vb;
   return true;

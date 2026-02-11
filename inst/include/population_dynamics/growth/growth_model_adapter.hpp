@@ -9,6 +9,8 @@
 #include <cmath>
 #include <memory>
 
+#include "../../common/fims_vector.hpp"
+#include "../../common/fims_math.hpp"
 #include "growth_model.hpp"
 #include "functors/growth_base.hpp"
 #include "functors/von_bertalanffy.hpp"
@@ -23,25 +25,44 @@ class VonBertalanffyGrowthModelAdapter : public GrowthBase<Type> {
  public:
   VonBertalanffyGrowthModelAdapter() : GrowthBase<Type>() {}
 
-  void SetVonBertalanffyParameters(Type L1, Type L2, Type K,
-                                   Type age_L1, Type age_L2) {
-    L1_ = L1;
-    L2_ = L2;
-    K_ = K;
-    age_L1_ = age_L1;
-    age_L2_ = age_L2;
+  fims::Vector<Type>& L1Vector() {
+    use_param_vectors_ = true;
     vb_params_set_ = true;
+    return L1_v_;
   }
-
-  void SetLengthWeightParameters(Type a_wl, Type b_wl) {
-    a_wl_ = a_wl;
-    b_wl_ = b_wl;
+  fims::Vector<Type>& L2Vector() {
+    use_param_vectors_ = true;
+    vb_params_set_ = true;
+    return L2_v_;
+  }
+  fims::Vector<Type>& KVector() {
+    use_param_vectors_ = true;
+    vb_params_set_ = true;
+    return K_v_;
+  }
+  fims::Vector<Type>& AgeL1Vector() {
+    use_param_vectors_ = true;
+    vb_params_set_ = true;
+    return age_L1_v_;
+  }
+  fims::Vector<Type>& AgeL2Vector() {
+    use_param_vectors_ = true;
+    vb_params_set_ = true;
+    return age_L2_v_;
+  }
+  fims::Vector<Type>& AwlVector() {
+    use_param_vectors_ = true;
     lw_params_set_ = true;
+    return a_wl_v_;
   }
-
-  void SetLengthSdParams(Type sd1, Type sdA) {
-    sd_L1_ = sd1;
-    sd_LA_ = sdA;
+  fims::Vector<Type>& BwlVector() {
+    use_param_vectors_ = true;
+    lw_params_set_ = true;
+    return b_wl_v_;
+  }
+  fims::Vector<Type>& SDgrowthVector() {
+    use_param_vectors_ = true;
+    return SDgrowth_v_;
   }
 
   // If ages do not start at zero, set the minimum age here so we can
@@ -62,9 +83,7 @@ class VonBertalanffyGrowthModelAdapter : public GrowthBase<Type> {
     n_ages_ = n_ages;
     n_sexes_ = n_sexes;
     model_ = std::make_shared<GrowthModel<Type>>(n_years, n_ages, n_sexes);
-    model_->SetVonBertalanffyParameters(L1_, L2_, K_, age_L1_, age_L2_);
-    model_->SetLengthWeightParameters(a_wl_, b_wl_);
-    model_->SetLengthSdParams(sd_L1_, sd_LA_);
+    SyncParamsToModel();
     if (age_offset_set_) {
       model_->SetAgeOffset(static_cast<Type>(age_offset_));
     }
@@ -85,6 +104,7 @@ class VonBertalanffyGrowthModelAdapter : public GrowthBase<Type> {
       return EvaluateWithFunctor(a);
     }
 
+    SyncParamsToModel();
     model_->Prepare();
     const auto& p = model_->GetProducts();
     const double offset = age_offset_set_ ? age_offset_ : 0.0;
@@ -119,20 +139,22 @@ class VonBertalanffyGrowthModelAdapter : public GrowthBase<Type> {
       Initialize(n_years_ == 0 ? 1 : n_years_, n_ages_,
                  n_sexes_ == 0 ? 1 : n_sexes_);
     }
+    SyncParamsToModel();
     model_->Prepare();
     return model_->GetProducts();
   }
 
  private:
-  Type L1_ = Type(0.0);
-  Type L2_ = Type(0.0);
-  Type K_ = Type(0.0);
-  Type a_wl_ = Type(0.0);
-  Type b_wl_ = Type(3.0);
-  Type sd_L1_ = Type(3.0);
-  Type sd_LA_ = Type(7.0);
-  Type age_L1_ = Type(0.0);
-  Type age_L2_ = Type(0.0);
+  // Stored in log-scale for positive parameters.
+  fims::Vector<Type> L1_v_;
+  fims::Vector<Type> L2_v_;
+  fims::Vector<Type> K_v_;
+  fims::Vector<Type> age_L1_v_;
+  fims::Vector<Type> age_L2_v_;
+  fims::Vector<Type> a_wl_v_;
+  fims::Vector<Type> b_wl_v_;
+  fims::Vector<Type> SDgrowth_v_;
+  bool use_param_vectors_ = false;
   std::size_t n_years_ = 0;
   std::size_t n_ages_ = 0;
   std::size_t n_sexes_ = 1;
@@ -146,18 +168,39 @@ class VonBertalanffyGrowthModelAdapter : public GrowthBase<Type> {
   Type EvaluateWithFunctor(const double& a) const {
     EnsureParamsSet();
     fims_popdy::VonBertalanffyGrowth<Type> vb;
-    vb.L1 = L1_;
-    vb.L2 = L2_;
-    vb.K = K_;
-    vb.age_L1 = age_L1_;
-    vb.age_L2 = age_L2_;
-    vb.a_wl = a_wl_;
-    vb.b_wl = b_wl_;
+    vb.L1 = CurrentL1();
+    vb.L2 = CurrentL2();
+    vb.K = CurrentK();
+    vb.age_L1 = CurrentAgeL1();
+    vb.age_L2 = CurrentAgeL2();
+    vb.a_wl = CurrentAwl();
+    vb.b_wl = CurrentBwl();
     return vb.evaluate(a);
   }
 
+  void SyncParamsToModel() const {
+    if (!model_) return;
+    EnsureParamsSet();
+    model_->SetVonBertalanffyParameters(CurrentL1(), CurrentL2(), CurrentK(),
+                                        CurrentAgeL1(), CurrentAgeL2());
+    model_->SetLengthWeightParameters(CurrentAwl(), CurrentBwl());
+    model_->SetLengthSdParams(CurrentSD1(), CurrentSDA());
+  }
+
+  Type CurrentL1() const { return fims_math::exp(L1_v_[0]); }
+  Type CurrentL2() const { return fims_math::exp(L2_v_[0]); }
+  Type CurrentK() const { return fims_math::exp(K_v_[0]); }
+  Type CurrentAgeL1() const { return age_L1_v_[0]; }
+  Type CurrentAgeL2() const { return age_L2_v_[0]; }
+  Type CurrentAwl() const { return fims_math::exp(a_wl_v_[0]); }
+  Type CurrentBwl() const { return fims_math::exp(b_wl_v_[0]); }
+  Type CurrentSD1() const { return fims_math::exp(SDgrowth_v_[0]); }
+  Type CurrentSDA() const { return fims_math::exp(SDgrowth_v_[1]); }
+
   void EnsureParamsSet() const {
-    if (!vb_params_set_ || !lw_params_set_) {
+    if (!use_param_vectors_ || L1_v_.size() < 1 || L2_v_.size() < 1 ||
+        K_v_.size() < 1 || age_L1_v_.size() < 1 || age_L2_v_.size() < 1 ||
+        a_wl_v_.size() < 1 || b_wl_v_.size() < 1 || SDgrowth_v_.size() < 2) {
       throw std::runtime_error(
           "VonBertalanffyGrowth parameters not set");
     }

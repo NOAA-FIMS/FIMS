@@ -54,49 +54,60 @@ TEST(GrowthModel, CanConstructAndPrepare) {
 
 }
 
-TEST(GrowthModel, NegativeLaaError) {
-  fims_popdy::GrowthModel<double> gm(1, 2, 1);
-  gm.SetVonBertalanffyParameters(-10.0, 50.0, 0.2, 0.0, 1.0);
+TEST(GrowthModel, ZeroAgesThrows) {
+  fims_popdy::GrowthModel<double> gm(1, 0, 1);
+  gm.SetVonBertalanffyParameters(10.0, 50.0, 0.2, 0.0, 1.0);
   gm.SetLengthWeightParameters(1e-5, 3.0);
   gm.SetLengthSdParams(3.0, 7.0);
 
   EXPECT_THROW(gm.Prepare(), std::runtime_error);
 }
 
-TEST(GrowthModel, LaaRangeError) {
+TEST(GrowthModel, HandlesDegenerateLaaRangeWithoutThrow) {
+  fims_popdy::GrowthModel<double> gm(1, 2, 1);
+  gm.SetVonBertalanffyParameters(10.0, 10.0, 0.2, 0.0, 1.0);
+  gm.SetLengthWeightParameters(1e-5, 3.0);
+  gm.SetLengthSdParams(3.0, 7.0);
+
+  EXPECT_NO_THROW(gm.Prepare());
+  const auto& p = gm.GetProducts();
+  EXPECT_TRUE(std::isfinite(p.MeanLAA(0, 0, 0)));
+  EXPECT_TRUE(std::isfinite(p.SdLAA(0, 0, 0)));
+  EXPECT_TRUE(std::isfinite(p.MeanWAA(0, 0, 0)));
+}
+
+TEST(GrowthModel, HandlesCoincidentReferenceAgesWithoutThrow) {
   fims_popdy::GrowthModel<double> gm(1, 3, 1);
-  gm.SetVonBertalanffyParameters(10.0, 10.0, 0.0, 0.0, 2.0);  // flat LAA
-  gm.SetLengthWeightParameters(1e-5, 3.0);
-  gm.SetLengthSdParams(3.0, 7.0);
-
-  EXPECT_THROW(gm.Prepare(), std::runtime_error);
-}
-
-TEST(GrowthModel, InvalidAgeOrder) {
-  fims_popdy::GrowthModel<double> gm(1, 2, 1);
   gm.SetVonBertalanffyParameters(10.0, 100.0, 0.2, 5.0, 5.0);
   gm.SetLengthWeightParameters(1e-5, 3.0);
   gm.SetLengthSdParams(3.0, 7.0);
 
-  EXPECT_THROW(gm.Prepare(), std::runtime_error);
+  EXPECT_NO_THROW(gm.Prepare());
+  const auto& p = gm.GetProducts();
+  EXPECT_TRUE(std::isfinite(p.MeanLAA(0, 0, 0)));
+  EXPECT_TRUE(std::isfinite(p.MeanWAA(0, 0, 0)));
 }
 
-TEST(GrowthModel, InvalidLengthWeightParams) {
+TEST(GrowthModel, HandlesZeroLengthWeightAWithoutThrow) {
   fims_popdy::GrowthModel<double> gm(1, 2, 1);
   gm.SetVonBertalanffyParameters(10.0, 100.0, 0.2, 0.0, 1.0);
   gm.SetLengthWeightParameters(0.0, 3.0);
   gm.SetLengthSdParams(3.0, 7.0);
 
-  EXPECT_THROW(gm.Prepare(), std::runtime_error);
+  EXPECT_NO_THROW(gm.Prepare());
+  const auto& p = gm.GetProducts();
+  EXPECT_NEAR(p.MeanWAA(0, 0, 0), 0.0, 1e-12);
 }
 
-TEST(GrowthModel, InvalidSdParams) {
+TEST(GrowthModel, HandlesNegativeSdInputsWithoutThrow) {
   fims_popdy::GrowthModel<double> gm(1, 2, 1);
   gm.SetVonBertalanffyParameters(10.0, 100.0, 0.2, 0.0, 1.0);
   gm.SetLengthWeightParameters(1e-5, 3.0);
   gm.SetLengthSdParams(-1.0, 7.0);
 
-  EXPECT_THROW(gm.Prepare(), std::runtime_error);
+  EXPECT_NO_THROW(gm.Prepare());
+  const auto& p = gm.GetProducts();
+  EXPECT_TRUE(std::isfinite(p.SdLAA(0, 0, 0)));
 }
 
 TEST(GrowthModel, SingleAgeAllowed) {

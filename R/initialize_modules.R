@@ -299,21 +299,26 @@ initialize_growth <- function(parameters, data) {
 
   if (length(growth_type) == 1 && growth_type == "VonBertalanffy") {
     sd_rows <- parameters |>
-      dplyr::filter(module_name == "Growth", label == "SDgrowth")
+      dplyr::filter(module_name == "Growth",
+                    label == "length_at_age_sd_at_ref_ages")
 
     if (nrow(sd_rows) > 1 && all(!is.na(sd_rows$age))) {
       sd_rows <- sd_rows |>
         dplyr::arrange(age)
 
       parameters <- parameters |>
-        dplyr::filter(!(module_name == "Growth" & label == "SDgrowth")) |>
+        dplyr::filter(!(module_name == "Growth" &
+                          label == "length_at_age_sd_at_ref_ages")) |>
         dplyr::bind_rows(sd_rows)
     }
 
-    missing_labels <- setdiff(c("age_L1", "age_L2"), growth_input$label)
+    missing_labels <- setdiff(c("reference_age_for_length_1",
+                                "reference_age_for_length_2"),
+                              growth_input$label)
     if (length(missing_labels) > 0) {
       stop(
-        "VonBertalanffy Growth requires age_L1 and age_L2. ",
+        "VonBertalanffy Growth requires reference_age_for_length_1 and ",
+        "reference_age_for_length_2. ",
         "Use create_default_parameters() or supply them explicitly."
       )
     }

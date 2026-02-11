@@ -378,14 +378,22 @@ RCPP_MODULE(fims) {
 
   Rcpp::class_<VonBertalanffyGrowthInterface>("VonBertalanffyGrowth")
   .constructor()
-  .field("L1", &VonBertalanffyGrowthInterface::L1)
-  .field("L2", &VonBertalanffyGrowthInterface::L2)
-  .field("K",  &VonBertalanffyGrowthInterface::K)
-  .field("age_L1", &VonBertalanffyGrowthInterface::age_L1)
-  .field("age_L2", &VonBertalanffyGrowthInterface::age_L2)
-  .field("a_wl", &VonBertalanffyGrowthInterface::a_wl)
-  .field("b_wl", &VonBertalanffyGrowthInterface::b_wl)
-  .field("SDgrowth", &VonBertalanffyGrowthInterface::SDgrowth)
+  .field("length_at_ref_age_1",
+         &VonBertalanffyGrowthInterface::length_at_ref_age_1)
+  .field("length_at_ref_age_2",
+         &VonBertalanffyGrowthInterface::length_at_ref_age_2)
+  .field("growth_coefficient_K",
+         &VonBertalanffyGrowthInterface::growth_coefficient_K)
+  .field("reference_age_for_length_1",
+         &VonBertalanffyGrowthInterface::reference_age_for_length_1)
+  .field("reference_age_for_length_2",
+         &VonBertalanffyGrowthInterface::reference_age_for_length_2)
+  .field("length_weight_a",
+         &VonBertalanffyGrowthInterface::length_weight_a)
+  .field("length_weight_b",
+         &VonBertalanffyGrowthInterface::length_weight_b)
+  .field("length_at_age_sd_at_ref_ages",
+         &VonBertalanffyGrowthInterface::length_at_age_sd_at_ref_ages)
   .field("n_ages", &VonBertalanffyGrowthInterface::n_ages)
   .method("get_id", &VonBertalanffyGrowthInterface::get_id)
   .method("evaluate", &VonBertalanffyGrowthInterface::evaluate)

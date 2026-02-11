@@ -47,7 +47,6 @@ class GrowthModel : public GrowthModelBase<Type> {
     vb_.age_L1 = age_L1;
     vb_.age_L2 = age_L2;
     needs_update_ = true;
-    warned_extrapolation_ = false;
   }
 
   /// fixed length-weight params (phase 1)
@@ -55,7 +54,6 @@ class GrowthModel : public GrowthModelBase<Type> {
     vb_.a_wl = a_wl;
     vb_.b_wl = b_wl;
     needs_update_ = true;
-    warned_extrapolation_ = false;
   }
 
   /// Set SD at youngest and oldest ages
@@ -69,28 +67,6 @@ class GrowthModel : public GrowthModelBase<Type> {
   void Prepare() override {
     if (!needs_update_) return;
 
-    if (vb_.age_L2 < vb_.age_L1 ||
-        (n_ages_ > 1 && vb_.age_L2 == vb_.age_L1)) {
-      throw std::runtime_error(
-          "VonBertalanffyGrowth age_L2 must be >= age_L1");
-    }
-    if (vb_.K < Type(0.0)) {
-      throw std::runtime_error(
-          "VonBertalanffyGrowth K must be >= 0");
-    }
-    if (vb_.a_wl <= Type(0.0)) {
-      throw std::runtime_error(
-          "VonBertalanffyGrowth a_wl must be > 0");
-    }
-    if (vb_.b_wl <= Type(0.0)) {
-      throw std::runtime_error(
-          "VonBertalanffyGrowth b_wl must be > 0");
-    }
-    if (sd_L1_ < Type(0.0) || sd_LA_ < Type(0.0)) {
-      throw std::runtime_error(
-          "VonBertalanffyGrowth SDgrowth must be >= 0");
-    }
-
     if (n_ages_ == 0) {
       throw std::runtime_error(
           "VonBertalanffyGrowth requires n_ages > 0");
@@ -100,24 +76,13 @@ class GrowthModel : public GrowthModelBase<Type> {
     const Type min_model_age = age_offset_;
     const Type max_model_age =
         age_offset_ + static_cast<Type>(n_ages_ - 1);
-    if (min_model_age < vb_.age_L1 || max_model_age > vb_.age_L2) {
-      if (!warned_extrapolation_) {
-        FIMS_WARNING_LOG(
-            "VonBertalanffyGrowth ages fall outside [age_L1, age_L2]; "
-            "extrapolating growth curve.");
-        warned_extrapolation_ = true;
-      }
-    }
-
     const Type laa_min = vb_.length_at_age(vb_.age_L1);
     const Type laa_max = vb_.length_at_age(vb_.age_L2);
-    if (n_ages_ > 1 && laa_max <= laa_min) {
-      throw std::runtime_error(
-          "VonBertalanffyGrowth LAA range invalid; check growth params");
-    }
+    const Type laa_delta_safe = fims_math::ad_max(
+        fims_math::ad_fabs(laa_max - laa_min), static_cast<Type>(1e-8));
     const Type slope =
         (n_ages_ > 1)
-            ? (sd_LA_ - sd_L1_) / (laa_max - laa_min)
+            ? (sd_LA_ - sd_L1_) / laa_delta_safe
             : Type(0.0);
     for (std::size_t y = 0; y < n_years_; ++y) {
       for (std::size_t a = 0; a < n_ages_; ++a) {
@@ -127,10 +92,6 @@ class GrowthModel : public GrowthModelBase<Type> {
 
           // log-scale params live upstream; laa here is natural scale
           const Type laa = vb_.length_at_age(age);
-          if (laa < Type(0.0)) {
-            throw std::runtime_error(
-                "VonBertalanffyGrowth length_at_age < 0; check growth params");
-          }
           products_.MeanLAA(y, a, s) = laa;
           products_.SdLAA(y, a, s) =
               (n_ages_ > 1)
@@ -161,7 +122,6 @@ class GrowthModel : public GrowthModelBase<Type> {
 
   // Caching state
   bool needs_update_ = true;
-  bool warned_extrapolation_ = false;
   Type sd_L1_ = static_cast<Type>(3.0);
   Type sd_LA_ = static_cast<Type>(7.0);
   Type age_offset_ = static_cast<Type>(0.0);
@@ -171,7 +131,6 @@ class GrowthModel : public GrowthModelBase<Type> {
   void SetAgeOffset(Type offset) {
     age_offset_ = offset;
     needs_update_ = true;
-    warned_extrapolation_ = false;
   }
 };
 
