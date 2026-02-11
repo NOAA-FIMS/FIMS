@@ -466,4 +466,13 @@ void log_error(std::string log_entry) {
 
   fims::FIMSLog::fims_log->error_message(log_entry, -1, "R_env", ret.c_str());
 }
+
+Rcpp::IntegerVector get_selectivity_enum() {
+return Rcpp::IntegerVector::create(
+Rcpp::Named("Logistic") = static_cast<int>(SelectivityType::LOGISTIC),
+Rcpp::Named("DoubleLogistic") = static_cast<int>(SelectivityType::DOUBLE_LOGISTIC),
+Rcpp::Named("RandomWalk") = static_cast<int>(SelectivityType::RANDOM_WALK)
+);
+}
+
 #endif  // FIMS_INTERFACE_RCPP_INTERFACE_HPP
