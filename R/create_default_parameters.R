@@ -223,10 +223,10 @@ create_default_growth <- function(unnested_configurations, data) {
         age = c(NA_real_, NA_real_, NA_real_, NA_real_, NA_real_,
                 NA_real_, NA_real_,
                 reference_age_for_length_1, reference_age_for_length_2),
-        value = c(8, 60, 0.2,
+        value = c(275, 725, 0.18,
                   reference_age_for_length_1, reference_age_for_length_2,
-                  1e-5, 3,
-                  3, 7),
+                  2.5e-11, 3,
+                  28, 73),
         estimation_type = "constant"
       )
 

@@ -100,6 +100,15 @@ class VonBertalanffyGrowthModelAdapter : public GrowthBase<Type> {
       throw std::runtime_error(
           "Non-integer age not supported yet");
     }
+    EnsureParamsSet();
+    const Type ref_age_1 = CurrentReferenceAgeForLength1();
+    const Type ref_age_2 = CurrentReferenceAgeForLength2();
+    if (ref_age_2 <= ref_age_1) {
+      throw std::runtime_error(
+          "VonBertalanffyGrowth reference_age_for_length_2 must be > "
+          "reference_age_for_length_1");
+    }
+
     if (!model_) {
       return EvaluateWithFunctor(a);
     }
@@ -109,22 +118,18 @@ class VonBertalanffyGrowthModelAdapter : public GrowthBase<Type> {
     const auto& p = model_->GetProducts();
     const double offset = age_offset_set_ ? age_offset_ : 0.0;
     const double age_index_raw = a_round - offset;
-    if (age_index_raw < 0.0) {
-      throw std::runtime_error(
-          "Age below model minimum");
-    }
     const double age_index_round = std::round(age_index_raw);
-    if (std::fabs(age_index_raw - age_index_round) > tol) {
-      throw std::runtime_error(
-          "Age not aligned with model age bins");
+    if (std::fabs(age_index_raw - age_index_round) <= tol &&
+        age_index_round >= 0.0) {
+      const std::size_t age_index =
+          static_cast<std::size_t>(age_index_round);
+      if (age_index < p.n_ages) {
+        return p.MeanWAA(0, age_index, 0);
+      }
     }
-    const std::size_t age_index =
-        static_cast<std::size_t>(age_index_round);
-    if (age_index >= p.n_ages) {
-      throw std::runtime_error(
-          "Age out of range for growth products");
-    }
-    return p.MeanWAA(0, age_index, 0);
+
+    // Outside cached model age bins: fall back to direct functor evaluation.
+    return EvaluateWithFunctor(a);
   }
 
   /**

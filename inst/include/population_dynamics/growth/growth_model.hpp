@@ -77,6 +77,11 @@ class GrowthModel : public GrowthModelBase<Type> {
       throw std::runtime_error(
           "VonBertalanffyGrowth requires n_ages > 0");
     }
+    if (vb_.reference_age_for_length_2 <= vb_.reference_age_for_length_1) {
+      throw std::runtime_error(
+          "VonBertalanffyGrowth reference_age_for_length_2 must be > "
+          "reference_age_for_length_1");
+    }
 
     // Fill mean length-at-age and sd
     const Type laa_min = vb_.length_at_age(vb_.reference_age_for_length_1);

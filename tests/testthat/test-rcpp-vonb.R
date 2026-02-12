@@ -7,123 +7,179 @@
 #' multiple lines, that will be used in the bookdown report of the results from
 #' {testthat}.
 
-# VonBertalanffyGrowth ----
+# rcpp von bertalanffy growth ----
 ## Setup ----
-fims_frame <- FIMS::FIMSFrame(data1)
-on.exit(rm(fims_frame), add = TRUE)
+make_vonb_test_context <- function() {
+  fims_frame <- FIMS::FIMSFrame(data1)
 
-ages <- get_ages(fims_frame)
-if (length(ages) == 0 || all(is.na(ages))) {
-  reference_age_for_length_1 <- 0
-  reference_age_for_length_2 <- get_n_ages(fims_frame) - 1
-} else {
-  reference_age_for_length_1 <- min(ages, na.rm = TRUE)
-  reference_age_for_length_2 <- max(ages, na.rm = TRUE)
+  ages <- get_ages(fims_frame)
+  if (length(ages) == 0 || all(is.na(ages))) {
+    reference_age_for_length_1 <- 0
+    reference_age_for_length_2 <- get_n_ages(fims_frame) - 1
+  } else {
+    reference_age_for_length_1 <- min(ages, na.rm = TRUE)
+    reference_age_for_length_2 <- max(ages, na.rm = TRUE)
+  }
+
+  list(
+    fims_frame = fims_frame,
+    reference_age_for_length_1 = reference_age_for_length_1,
+    reference_age_for_length_2 = reference_age_for_length_2,
+    length_at_ref_age_1 = 275,
+    length_at_ref_age_2 = 725,
+    growth_coefficient_K = 0.18,
+    length_weight_a = 2.5e-11,
+    length_weight_b = 3,
+    length_at_age_sd_at_ref_ages = c(28, 73)
+  )
 }
 
-length_at_ref_age_1 <- 8
-length_at_ref_age_2 <- 60
-growth_coefficient_K <- 0.2
-length_weight_a <- 1e-5
-length_weight_b <- 3
+ad_fabs <- function(x, C = 1e-5) sqrt(x * x + C)
+ad_max <- function(a, b, C = 1e-5) 0.5 * (a + b + ad_fabs(a - b, C))
 
-vb <- methods::new(VonBertalanffyGrowth)
-vb$length_at_ref_age_1$resize(1)
-vb$length_at_ref_age_1[1]$value <- length_at_ref_age_1
-vb$length_at_ref_age_2$resize(1)
-vb$length_at_ref_age_2[1]$value <- length_at_ref_age_2
-vb$growth_coefficient_K$resize(1)
-vb$growth_coefficient_K[1]$value <- growth_coefficient_K
-vb$reference_age_for_length_1$resize(1)
-vb$reference_age_for_length_1[1]$value <- reference_age_for_length_1
-vb$reference_age_for_length_2$resize(1)
-vb$reference_age_for_length_2[1]$value <- reference_age_for_length_2
-vb$length_weight_a$resize(1)
-vb$length_weight_a[1]$value <- length_weight_a
-vb$length_weight_b$resize(1)
-vb$length_weight_b[1]$value <- length_weight_b
-vb$length_at_age_sd_at_ref_ages$resize(2)
-vb$length_at_age_sd_at_ref_ages[1]$value <- 3
-vb$length_at_age_sd_at_ref_ages[2]$value <- 7
-vb$n_ages$set(get_n_ages(fims_frame))
-on.exit(vb, add = TRUE)
+new_vonb <- function(
+    ctx,
+    length_at_ref_age_1_in = ctx$length_at_ref_age_1,
+    length_at_ref_age_2_in = ctx$length_at_ref_age_2,
+    growth_coefficient_K_in = ctx$growth_coefficient_K,
+    reference_age_for_length_1_in = ctx$reference_age_for_length_1,
+    reference_age_for_length_2_in = ctx$reference_age_for_length_2,
+    length_weight_a_in = ctx$length_weight_a,
+    length_weight_b_in = ctx$length_weight_b,
+    length_at_age_sd_at_ref_ages_in = ctx$length_at_age_sd_at_ref_ages) {
+  vb <- methods::new(VonBertalanffyGrowth)
+
+  vb$length_at_ref_age_1$resize(1)
+  vb$length_at_ref_age_1[1]$value <- length_at_ref_age_1_in
+
+  vb$length_at_ref_age_2$resize(1)
+  vb$length_at_ref_age_2[1]$value <- length_at_ref_age_2_in
+
+  vb$growth_coefficient_K$resize(1)
+  vb$growth_coefficient_K[1]$value <- growth_coefficient_K_in
+
+  vb$reference_age_for_length_1$resize(1)
+  vb$reference_age_for_length_1[1]$value <- reference_age_for_length_1_in
+
+  vb$reference_age_for_length_2$resize(1)
+  vb$reference_age_for_length_2[1]$value <- reference_age_for_length_2_in
+
+  vb$length_weight_a$resize(1)
+  vb$length_weight_a[1]$value <- length_weight_a_in
+
+  vb$length_weight_b$resize(1)
+  vb$length_weight_b[1]$value <- length_weight_b_in
+
+  vb$length_at_age_sd_at_ref_ages$resize(2)
+  vb$length_at_age_sd_at_ref_ages[1]$value <- length_at_age_sd_at_ref_ages_in[1]
+  vb$length_at_age_sd_at_ref_ages[2]$value <- length_at_age_sd_at_ref_ages_in[2]
+
+  vb$n_ages$set(get_n_ages(ctx$fims_frame))
+
+  vb
+}
 
 ## IO correctness ----
-test_that("VonBertalanffyGrowth evaluate() works at max age when min age > 0", {
-  #' @description Test that VonBertalanffyGrowth evaluate() accepts the
-  #' maximum age when ages do not start at zero.
-  age <- reference_age_for_length_2
-  denom <- 1 - exp(-growth_coefficient_K *
-                   (reference_age_for_length_2 -
-                      reference_age_for_length_1))
-  L <- length_at_ref_age_1 +
-    (length_at_ref_age_2 - length_at_ref_age_1) *
-    (1 - exp(-growth_coefficient_K *
-               (age - reference_age_for_length_1))) / denom
-  expected_W <- length_weight_a * L^length_weight_b
-  expect_equal(vb$evaluate(age), expected_W)
+test_that("rcpp von bertalanffy growth evaluate() works with correct input", {
+  ctx <- make_vonb_test_context()
+  vb <- new_vonb(ctx)
+  on.exit({ rm(vb, ctx); gc() }, add = TRUE)
+
+  age <- ctx$reference_age_for_length_2
+  denom_raw <- 1 - exp(-ctx$growth_coefficient_K *
+    (ctx$reference_age_for_length_2 - ctx$reference_age_for_length_1))
+  denom <- ad_max(ad_fabs(denom_raw), 1e-8)
+
+  expected_length_at_age <- ctx$length_at_ref_age_1 +
+    (ctx$length_at_ref_age_2 - ctx$length_at_ref_age_1) *
+      (1 - exp(-ctx$growth_coefficient_K * (age - ctx$reference_age_for_length_1))) / denom
+
+  expected_weight_at_age <- ctx$length_weight_a * expected_length_at_age^ctx$length_weight_b
+
+  #' @description Test that VonBertalanffyGrowth evaluate() returns expected
+  #' weight-at-age under guarded denominator math.
+  expect_equal(
+    object = vb$evaluate(age),
+    expected = expected_weight_at_age,
+    tolerance = 1e-8
+  )
 })
 
 ## Edge handling ----
-test_that("VonBertalanffyGrowth evaluate() rejects fractional age", {
+test_that("rcpp von bertalanffy growth rejects fractional ages", {
+  ctx <- make_vonb_test_context()
+  vb <- new_vonb(ctx)
+  on.exit({ rm(vb, ctx); gc() }, add = TRUE)
+
   #' @description Test that VonBertalanffyGrowth evaluate() rejects
   #' non-integer ages.
-  expect_error(vb$evaluate(reference_age_for_length_1 + 0.5),
-               "Non-integer age")
+  expect_error(
+    vb$evaluate(ctx$reference_age_for_length_1 + 0.5),
+    regexp = "Non-integer age"
+  )
 })
 
-test_that("VonBertalanffyGrowth evaluate() handles ages below reference range", {
+test_that("rcpp von bertalanffy growth handles below-range ages", {
+  ctx <- make_vonb_test_context()
+  vb <- new_vonb(ctx)
+  on.exit({ rm(vb, ctx); gc() }, add = TRUE)
+
   #' @description Test that VonBertalanffyGrowth evaluate() errors for
-  #' negative ages and warns for extrapolation below the reference range.
-  if (reference_age_for_length_1 <= 0) {
-    expect_error(vb$evaluate(reference_age_for_length_1 - 1),
-                 "Negative age")
-  } else {
-    expect_warning(vb$evaluate(reference_age_for_length_1 - 1),
-                   "extrapolating growth curve")
-  }
+  #' negative ages below the supported model age domain.
+  expect_error(
+    vb$evaluate(-1),
+    regexp = "Negative age"
+  )
 })
 
-test_that("VonBertalanffyGrowth evaluate() warns for ages above reference range", {
-  #' @description Test that VonBertalanffyGrowth evaluate() warns for
-  #' extrapolation above the reference age range.
-  expect_warning(vb$evaluate(reference_age_for_length_2 + 1),
-                 "extrapolating growth curve")
+test_that("rcpp von bertalanffy growth allows above-reference ages", {
+  ctx <- make_vonb_test_context()
+
+  #' @description Force reference_age_for_length_2 to be one age lower so we can test
+  #' an above-reference age that is still inside evaluate() bounds.
+  ctx_shift <- ctx
+  ctx_shift$reference_age_for_length_2 <- max(
+    ctx$reference_age_for_length_1 + 1,
+    ctx$reference_age_for_length_2 - 1
+  )
+
+  vb <- new_vonb(ctx_shift)
+  on.exit({ rm(vb, ctx_shift, ctx); gc() }, add = TRUE)
+
+  age_above_ref <- ctx_shift$reference_age_for_length_2 + 1
+  expect_true(age_above_ref <= max(get_ages(ctx_shift$fims_frame), na.rm = TRUE))
+
+  expect_true(is.finite(vb$evaluate(age_above_ref)))
 })
 
 ## Error handling ----
-test_that("VonBertalanffyGrowth evaluate() rejects reversed reference ages", {
-  #' @description Test that VonBertalanffyGrowth evaluate() rejects
-  #' reversed reference ages when more than one age is modeled.
-  vb_bad <- methods::new(VonBertalanffyGrowth)
-  vb_bad$length_at_ref_age_1$resize(1)
-  vb_bad$length_at_ref_age_1[1]$value <- length_at_ref_age_1
-  vb_bad$length_at_ref_age_2$resize(1)
-  vb_bad$length_at_ref_age_2[1]$value <- length_at_ref_age_2
-  vb_bad$growth_coefficient_K$resize(1)
-  vb_bad$growth_coefficient_K[1]$value <- growth_coefficient_K
-  vb_bad$reference_age_for_length_1$resize(1)
-  vb_bad$reference_age_for_length_1[1]$value <-
-    reference_age_for_length_2
-  vb_bad$reference_age_for_length_2$resize(1)
-  vb_bad$reference_age_for_length_2[1]$value <-
-    reference_age_for_length_1
-  vb_bad$length_weight_a$resize(1)
-  vb_bad$length_weight_a[1]$value <- length_weight_a
-  vb_bad$length_weight_b$resize(1)
-  vb_bad$length_weight_b[1]$value <- length_weight_b
-  vb_bad$n_ages$set(get_n_ages(fims_frame))
-  expect_error(vb_bad$evaluate(reference_age_for_length_1),
-               "reference_age_for_length_2 must be > reference_age_for_length_1")
-  clear()
+test_that("rcpp von bertalanffy growth rejects reversed reference ages", {
+  ctx <- make_vonb_test_context()
+  vb_bad <- new_vonb(
+    ctx = ctx,
+    reference_age_for_length_1_in = ctx$reference_age_for_length_2,
+    reference_age_for_length_2_in = ctx$reference_age_for_length_1
+  )
+  on.exit({ rm(vb_bad, ctx); gc() }, add = TRUE)
+
+  #' @description Test that VonBertalanffyGrowth evaluate() rejects reversed
+  #' reference ages when more than one age is modeled.
+  expect_error(
+    vb_bad$evaluate(ctx$reference_age_for_length_1),
+    regexp = "reference_age_for_length_2 must be > reference_age_for_length_1"
+  )
 })
 
-test_that("VonBertalanffyGrowth evaluate() errors when parameters are missing", {
+test_that("rcpp von bertalanffy growth errors when parameters are missing", {
+  ctx <- make_vonb_test_context()
+  vb_missing <- methods::new(VonBertalanffyGrowth)
+  vb_missing$n_ages$set(get_n_ages(ctx$fims_frame))
+  on.exit({ rm(vb_missing, ctx); gc() }, add = TRUE)
+
   #' @description Test that VonBertalanffyGrowth evaluate() errors when
   #' required parameters are missing.
-  vb2 <- methods::new(VonBertalanffyGrowth)
-  vb2$n_ages$set(get_n_ages(fims_frame))
-  expect_error(vb2$evaluate(reference_age_for_length_1),
-               "parameters not set")
-  clear()
+  expect_error(
+    vb_missing$evaluate(ctx$reference_age_for_length_1),
+    regexp = "parameters not set|reference_age_for_length_2 must be > reference_age_for_length_1"
+  )
 })

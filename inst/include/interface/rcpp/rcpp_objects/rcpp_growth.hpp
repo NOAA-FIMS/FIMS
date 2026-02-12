@@ -375,37 +375,9 @@ class VonBertalanffyGrowthInterface : public GrowthInterfaceBase {
     if (std::fabs(age - age_round) > tol) {
       Rcpp::stop("Non-integer age not supported yet");
     }
-    double min_age = 0.0;
-    double max_age = static_cast<double>(this->n_ages.get() - 1);
-    if (this->reference_age_for_length_1.size() > 0 &&
-        this->reference_age_for_length_2.size() > 0) {
-      const double a1 =
-          this->reference_age_for_length_1[0].initial_value_m;
-      const double a2 =
-          this->reference_age_for_length_2[0].initial_value_m;
-      if (a2 <= a1) {
-        Rcpp::stop(
-            "VonBertalanffyGrowth reference_age_for_length_2 must be > "
-            "reference_age_for_length_1");
-      }
-      min_age = std::min(a1, a2);
-      max_age = std::max(a1, a2);
-    }
-    if (age_round < min_age - tol || age_round > max_age + tol) {
-      Rcpp::warning(
-          "Age outside [reference_age_for_length_1, reference_age_for_length_2]; "
-          "extrapolating growth curve.");
-    }
+    ValidateVonBInputs(false);
+
     fims_popdy::VonBertalanffyGrowth<double> vb;
-    if (this->length_at_ref_age_1.size() < 1 ||
-        this->length_at_ref_age_2.size() < 1 ||
-        this->growth_coefficient_K.size() < 1 ||
-        this->reference_age_for_length_1.size() < 1 ||
-        this->reference_age_for_length_2.size() < 1 ||
-        this->length_weight_a.size() < 1 ||
-        this->length_weight_b.size() < 1) {
-      Rcpp::stop("VonBertalanffyGrowth parameters not set");
-    }
 
     vb.length_at_ref_age_1 = this->length_at_ref_age_1[0].initial_value_m;
     vb.length_at_ref_age_2 = this->length_at_ref_age_2[0].initial_value_m;
@@ -418,6 +390,51 @@ class VonBertalanffyGrowthInterface : public GrowthInterfaceBase {
 
     return vb.evaluate(age);
   }
+
+ private:
+  void ValidateVonBInputs(bool require_sd) {
+    if (this->length_at_ref_age_1.size() < 1 ||
+        this->length_at_ref_age_2.size() < 1 ||
+        this->growth_coefficient_K.size() < 1 ||
+        this->reference_age_for_length_1.size() < 1 ||
+        this->reference_age_for_length_2.size() < 1 ||
+        this->length_weight_a.size() < 1 ||
+        this->length_weight_b.size() < 1) {
+      Rcpp::stop("VonBertalanffyGrowth parameters not set");
+    }
+    if (require_sd && this->length_at_age_sd_at_ref_ages.size() < 2) {
+      Rcpp::stop("length_at_age_sd_at_ref_ages must have two values");
+    }
+
+    const double a1 = this->reference_age_for_length_1[0].initial_value_m;
+    const double a2 = this->reference_age_for_length_2[0].initial_value_m;
+    if (a2 <= a1) {
+      Rcpp::stop(
+          "VonBertalanffyGrowth reference_age_for_length_2 must be > "
+          "reference_age_for_length_1");
+    }
+
+    auto check_positive = [](ParameterVector& pv,
+                             const std::string& base_name) {
+      for (size_t i = 0; i < pv.size(); i++) {
+        if (pv[i].initial_value_m <= 0.0) {
+          Rcpp::stop((base_name + " must be > 0").c_str());
+        }
+      }
+    };
+
+    check_positive(this->length_at_ref_age_1, "length_at_ref_age_1");
+    check_positive(this->length_at_ref_age_2, "length_at_ref_age_2");
+    check_positive(this->growth_coefficient_K, "growth_coefficient_K");
+    check_positive(this->length_weight_a, "length_weight_a");
+    check_positive(this->length_weight_b, "length_weight_b");
+    if (require_sd) {
+      check_positive(this->length_at_age_sd_at_ref_ages,
+                     "length_at_age_sd_at_ref_ages");
+    }
+  }
+
+ public:
 
 virtual std::string to_json() {
   std::stringstream ss;
@@ -544,18 +561,7 @@ bool add_to_fims_tmb_internal() {
   vb->id = this->id;
 
   // Build parameter vectors and register if estimable
-  if (this->length_at_ref_age_1.size() < 1 ||
-      this->length_at_ref_age_2.size() < 1 ||
-      this->growth_coefficient_K.size() < 1 ||
-      this->reference_age_for_length_1.size() < 1 ||
-      this->reference_age_for_length_2.size() < 1 ||
-      this->length_weight_a.size() < 1 ||
-      this->length_weight_b.size() < 1) {
-    Rcpp::stop("VonBertalanffyGrowth parameters not set");
-  }
-  if (this->length_at_age_sd_at_ref_ages.size() < 2) {
-    Rcpp::stop("length_at_age_sd_at_ref_ages must have two values");
-  }
+  ValidateVonBInputs(true);
 
   std::stringstream ss;
   auto load_and_register = [&](ParameterVector& pv,

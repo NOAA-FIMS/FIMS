@@ -37,7 +37,7 @@ struct GrowthBase : public fims_model_object::FIMSObject<Type> {
 
   /**
    * @brief Calculates the  growth at the independent variable value.
-   * @param a The age at which to return weight of the fish (in kg).
+   * @param a The age at which to return weight of the fish.
    */
   virtual const Type evaluate(const double& a) const = 0;
 };
