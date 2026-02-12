@@ -79,7 +79,7 @@ struct LogNormalLPDF : public DensityComponentBase<Type> {
         // if there are See Deroba and Miller, 2016
         // (https://doi.org/10.1016/j.fishres.2015.12.002) for the use of
         // lognormal constant
-        if (this->get_observed(i) != this->observed_values->na_value) {
+        if (this->get_observed(i) != this->data_observed_values->na_value) {
           this->lpdf_vec[i] =
               dnorm(log(this->get_observed(i)), this->get_expected(i),
                     fims_math::exp(log_sd.get_force_scalar(i)), true) -
@@ -107,7 +107,7 @@ struct LogNormalLPDF : public DensityComponentBase<Type> {
         FIMS_SIMULATE_F(this->of) {  // preprocessor definition in interface.hpp
                                      // this simulates data that is mean biased
           if (this->input_type == "data") {
-            this->observed_values->at(i) = fims_math::exp(
+            this->data_observed_values->at(i) = fims_math::exp(
                 rnorm(this->get_expected(i),
                       fims_math::exp(log_sd.get_force_scalar(i))));
           }

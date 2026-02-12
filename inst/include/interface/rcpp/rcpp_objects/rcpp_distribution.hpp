@@ -155,6 +155,45 @@ class DistributionsInterfaceBase : public FIMSRcppInterfaceBase {
   virtual bool set_observed_data(int observed_data_id) { return false; }
 
   /**
+   * @brief Set the observed, expected, and sd values for a distribution
+   * process to incorporate into the likelihood calculation.
+   *
+   * @param input_type String that sets whether the distribution type is for
+   * priors, random effects, or data.
+   * @param observed_id Unique id for linked parameter, derived
+   * value, or observed value vector.
+   * @param observed_values Vector of values to use directly as observed input
+   * (i.e. the value for which the likelihood of being drawn from a the
+   * distribution is being evaluated).
+   * @param observed_index Vector of integers for which subset of values 
+   * to use from the observed vector (directly input or linked id vector).
+   * @param expected_id Unique id for linked parameter, derived
+   * value, or expected value vector.
+   * @param expected_values Vector of values to use directly as expected input
+   * (i.e. the mean of the distribution the likelihood is being evaluated from).
+   * @param expected_index Vector of integers for which subset of values 
+   * to use from the expected vector (directly input or linked id vector).
+   * @param uncertainty_id Unique id for linked parameter, derived
+   * value, or sd vector (i.e. the standard deviation of the distribution the
+   * likelihood is being evaluated from).
+   * @param uncertainty_values Vector of values to use directly as sd input.
+   * @param uncertainty_index Vector of integers for which subset of values 
+   * to use from the sd vector (directly input or linked id vector).
+   */
+  virtual bool set_process_values(std::string input_type,
+                                  Rcpp::IntegerVector observed_id,
+                                  Rcpp::NumericVector observed_values,
+                                  Rcpp::IntegerVector observed_index,
+                                  Rcpp::IntegerVector expected_id,
+                                  Rcpp::NumericVector expected_values,
+                                  Rcpp::IntegerVector expected_index,
+                                  Rcpp::IntegerVector uncertainty_id,
+                                  Rcpp::NumericVector uncertainty_values,
+                                  Rcpp::IntegerVector uncertainty_index) { 
+    return false; 
+  }
+
+  /**
    * @brief A method for each child distribution interface object to inherit so
    * each distribution can have an evaluate() function.
    */
@@ -176,7 +215,7 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
   /**
    * @brief Observed data.
    */
-  ParameterVector x;
+  ParameterVector observed_values;
   /**
    * @brief The expected values, which would be the mean of x for this
    * distribution.
@@ -215,7 +254,7 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
    */
   DnormDistributionsInterface(const DnormDistributionsInterface &other)
       : DistributionsInterfaceBase(other),
-        x(other.x),
+        observed_values(other.observed_values),
         expected_values(other.expected_values),
         log_sd(other.log_sd),
         expected_mean(other.expected_mean),
@@ -265,6 +304,36 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
   }
 
   /**
+   * @copydoc DistributionsInterfaceBase::set_distribution_links
+   */
+  virtual bool set_process_values(std::string input_type,
+                                  Rcpp::IntegerVector observed_id,
+                                  Rcpp::NumericVector observed_values,
+                                  Rcpp::IntegerVector observed_index,
+                                  Rcpp::IntegerVector expected_id,
+                                  Rcpp::NumericVector expected_values,
+                                  Rcpp::IntegerVector expected_index,
+                                  Rcpp::IntegerVector uncertainty_id,
+                                  Rcpp::NumericVector uncertainty_values,
+                                  Rcpp::IntegerVector uncertainty_index)  {
+    this->input_type_m.set(input_type);
+    this->observed_key_m->resize(observed_id.size());
+    for (int i = 0; i < observed_id.size(); i++) {
+      this->observed_key_m->at(i) = observed_id[i];
+    }
+    this->expected_key_m->resize(expected_id.size());
+    for (int i = 0; i < expected_id.size(); i++) {
+      this->expected_key_m->at(i) = expected_id[i];
+    }
+    this->uncertainty_key_m->resize(uncertainty_id.size());
+    for (int i = 0; i < uncertainty_id.size(); i++) {
+      this->uncertainty_key_m->at(i) = uncertainty_id[i];
+    }
+    return true;
+  }
+
+
+  /**
    * @brief Evaluate normal probability density function (pdf). The natural log
    * of the pdf is returned.
    * @return The natural log of the probability density function (pdf) is
@@ -272,12 +341,12 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
    */
   virtual double evaluate() {
     fims_distributions::NormalLPDF<double> dnorm;
-    dnorm.x.resize(this->x.size());
+    dnorm.observed_values.resize(this->observed_values.size());
     dnorm.expected_values.resize(this->expected_values.size());
     dnorm.log_sd.resize(this->log_sd.size());
     dnorm.expected_mean.resize(this->expected_mean.size());
-    for (size_t i = 0; i < x.size(); i++) {
-      dnorm.x[i] = this->x[i].initial_value_m;
+    for (size_t i = 0; i < observed_values.size(); i++) {
+      dnorm.observed_values[i] = this->observed_values[i].initial_value_m;
     }
     for (size_t i = 0; i < expected_values.size(); i++) {
       dnorm.expected_values[i] = this->expected_values[i].initial_value_m;
@@ -345,15 +414,15 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
       if (this->expected_values.size() == 1) {
         this->expected_values.resize(dnorm->expected_values.size());
       }
-      if (this->x.size() == 1) {
+      if (this->observed_values.size() == 1) {
         size_t nx = dnorm->get_n_x();
-        this->x.resize(nx);
+        this->observed_values.resize(nx);
       }
 
       for (R_xlen_t i = 0; i < this->lpdf_vec.size(); i++) {
         this->lpdf_vec[i] = dnorm->report_lpdf_vec[i];
         this->expected_values[i].final_value_m = dnorm->get_expected(i);
-        this->x[i].final_value_m = dnorm->get_observed(i);
+        this->observed_values[i].final_value_m = dnorm->get_observed(i);
       }
     }
   }
@@ -403,13 +472,13 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
       ss << "],\n";
     }
     ss << "  \"observed_values\":[";
-    if (this->x.size() == 0) {
+    if (this->observed_values.size() == 0) {
       ss << "]\n";
     } else {
-      for (R_xlen_t i = 0; i < this->x.size() - 1; i++) {
-        ss << this->x[i].final_value_m << ", ";
+      for (R_xlen_t i = 0; i < this->observed_values.size() - 1; i++) {
+        ss << this->observed_values[i].final_value_m << ", ";
       }
-      ss << this->x[this->x.size() - 1].final_value_m << "]\n";
+      ss << this->observed_values[this->observed_values.size() - 1].final_value_m << "]\n";
     }
     ss << " }}\n";
 
@@ -436,9 +505,9 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
       distribution->key[i] = this->key_m->at(i);
     }
     distribution->id = this->id_m;
-    distribution->x.resize(this->x.size());
-    for (size_t i = 0; i < this->x.size(); i++) {
-      distribution->x[i] = this->x[i].initial_value_m;
+    distribution->observed_values.resize(this->observed_values.size());
+    for (size_t i = 0; i < this->observed_values.size(); i++) {
+      distribution->observed_values[i] = this->observed_values[i].initial_value_m;
     }
     // set relative info
     distribution->expected_values.resize(this->expected_values.size());
@@ -514,7 +583,7 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
   /**
    * @brief Observed data.
    */
-  ParameterVector x;
+  ParameterVector observed_values;
   /**
    * @brief The expected values, which would be the mean of log(x) for this
    * distribution.
@@ -551,7 +620,7 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
    */
   DlnormDistributionsInterface(const DlnormDistributionsInterface &other)
       : DistributionsInterfaceBase(other),
-        x(other.x),
+        observed_values(other.observed_values),
         expected_values(other.expected_values),
         log_sd(other.log_sd),
         lpdf_vec(other.lpdf_vec) {}
@@ -602,12 +671,12 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
    */
   virtual double evaluate() {
     fims_distributions::LogNormalLPDF<double> dlnorm;
-    dlnorm.x.resize(this->x.size());
+    dlnorm.observed_values.resize(this->observed_values.size());
     dlnorm.expected_values.resize(this->expected_values.size());
     dlnorm.log_sd.resize(this->log_sd.size());
     // dlnorm.input_type = "prior";
-    for (size_t i = 0; i < x.size(); i++) {
-      dlnorm.x[i] = this->x[i].initial_value_m;
+    for (size_t i = 0; i < observed_values.size(); i++) {
+      dlnorm.observed_values[i] = this->observed_values[i].initial_value_m;
     }
     for (size_t i = 0; i < expected_values.size(); i++) {
       dlnorm.expected_values[i] = this->expected_values[i].initial_value_m;
@@ -663,14 +732,14 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
         this->expected_values.resize(
             this->lpdf_vec.size());  // dlnorm->expected_values.size());
       }
-      if (this->x.size() == 1) {
+      if (this->observed_values.size() == 1) {
         size_t nx = dlnorm->get_n_x();
-        this->x.resize(nx);
+        this->observed_values.resize(nx);
       }
       for (R_xlen_t i = 0; i < this->lpdf_vec.size(); i++) {
         this->lpdf_vec[i] = dlnorm->report_lpdf_vec[i];
         this->expected_values[i].final_value_m = dlnorm->get_expected(i);
-        this->x[i].final_value_m = dlnorm->get_observed(i);
+        this->observed_values[i].final_value_m = dlnorm->get_observed(i);
       }
     }
   }
@@ -720,13 +789,13 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
       ss << "],\n";
     }
     ss << "  \"observed_values\":[";
-    if (this->x.size() == 0) {
+    if (this->observed_values.size() == 0) {
       ss << "]\n";
     } else {
-      for (R_xlen_t i = 0; i < this->x.size() - 1; i++) {
-        ss << this->x[i].final_value_m << ", ";
+      for (R_xlen_t i = 0; i < this->observed_values.size() - 1; i++) {
+        ss << this->observed_values[i].final_value_m << ", ";
       }
-      ss << this->x[this->x.size() - 1].final_value_m << "]\n";
+      ss << this->observed_values[this->observed_values.size() - 1].final_value_m << "]\n";
     }
     ss << " }}\n";
     return ss.str();
@@ -751,9 +820,9 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
     for (size_t i = 0; i < this->key_m->size(); i++) {
       distribution->key[i] = this->key_m->at(i);
     }
-    distribution->x.resize(this->x.size());
-    for (size_t i = 0; i < this->x.size(); i++) {
-      distribution->x[i] = this->x[i].initial_value_m;
+    distribution->observed_values.resize(this->observed_values.size());
+    for (size_t i = 0; i < this->observed_values.size(); i++) {
+      distribution->observed_values[i] = this->observed_values[i].initial_value_m;
     }
     // set relative info
     distribution->expected_values.resize(this->expected_values.size());
@@ -811,7 +880,7 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
   /**
    * @brief Observed data, which should be a vector of length K of integers.
    */
-  ParameterVector x;
+  ParameterVector observed_values;
   /**
    * @brief The expected values, which should be a vector of length K where
    * each value specifies the probability of class k. Note that, unlike in R,
@@ -852,7 +921,7 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
    */
   DmultinomDistributionsInterface(const DmultinomDistributionsInterface &other)
       : DistributionsInterfaceBase(other),
-        x(other.x),
+        observed_values(other.observed_values),
         expected_values(other.expected_values),
         dims(other.dims),
         lpdf_vec(other.lpdf_vec),
@@ -910,10 +979,10 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
   virtual double evaluate() {
     fims_distributions::MultinomialLPMF<double> dmultinom;
     // Declare TMBVector in this scope
-    dmultinom.x.resize(this->x.size());
+    dmultinom.observed_values.resize(this->observed_values.size());
     dmultinom.expected_values.resize(this->expected_values.size());
-    for (size_t i = 0; i < x.size(); i++) {
-      dmultinom.x[i] = this->x[i].initial_value_m;
+    for (size_t i = 0; i < observed_values.size(); i++) {
+      dmultinom.observed_values[i] = this->observed_values[i].initial_value_m;
     }
     for (size_t i = 0; i < expected_values.size(); i++) {
       dmultinom.expected_values[i] = this->expected_values[i].initial_value_m;
@@ -958,24 +1027,24 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
       if (this->expected_values.size() != nx) {
         this->expected_values.resize(nx);
       }
-      if (this->x.size() != nx) {
-        this->x.resize(nx);
+      if (this->observed_values.size() != nx) {
+        this->observed_values.resize(nx);
       }
       for (R_xlen_t i = 0; i < this->lpdf_vec.size(); i++) {
         this->lpdf_vec[i] = dmultinom->report_lpdf_vec[i];
         this->expected_values[i].final_value_m = dmultinom->get_expected(i);
         if (dmultinom->input_type != "data") {
-          this->x[i].final_value_m = dmultinom->get_observed(i);
+          this->observed_values[i].final_value_m = dmultinom->get_observed(i);
         }
       }
       if (dmultinom->input_type == "data") {
         dims.resize(2);
-        dims[0] = dmultinom->observed_values->get_imax();
-        dims[1] = dmultinom->observed_values->get_jmax();
+        dims[0] = dmultinom->data_observed_values->get_imax();
+        dims[1] = dmultinom->data_observed_values->get_jmax();
         for (size_t i = 0; i < dims[0]; i++) {
           for (size_t j = 0; j < dims[1]; j++) {
             size_t idx = (i * dims[1]) + j;
-            this->x[idx].final_value_m = dmultinom->get_observed(i, j);
+            this->observed_values[idx].final_value_m = dmultinom->get_observed(i, j);
           }
         }
       }
@@ -1028,13 +1097,13 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
       ss << "],\n";
     }
     ss << "  \"observed_values\":[";
-    if (this->x.size() == 0) {
+    if (this->observed_values.size() == 0) {
       ss << "]\n";
     } else {
-      for (R_xlen_t i = 0; i < this->x.size() - 1; i++) {
-        ss << this->x[i].final_value_m << ", ";
+      for (R_xlen_t i = 0; i < this->observed_values.size() - 1; i++) {
+        ss << this->observed_values[i].final_value_m << ", ";
       }
-      ss << this->x[this->x.size() - 1].final_value_m << "]\n";
+      ss << this->observed_values[this->observed_values.size() - 1].final_value_m << "]\n";
     }
     ss << " }}\n";
     return ss.str();
@@ -1058,9 +1127,9 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
     for (size_t i = 0; i < this->key_m->size(); i++) {
       distribution->key[i] = this->key_m->at(i);
     }
-    distribution->x.resize(this->x.size());
-    for (size_t i = 0; i < this->x.size(); i++) {
-      distribution->x[i] = this->x[i].initial_value_m;
+    distribution->observed_values.resize(this->observed_values.size());
+    for (size_t i = 0; i < this->observed_values.size(); i++) {
+      distribution->observed_values[i] = this->observed_values[i].initial_value_m;
     }
     // set relative info
     distribution->expected_values.resize(this->expected_values.size());

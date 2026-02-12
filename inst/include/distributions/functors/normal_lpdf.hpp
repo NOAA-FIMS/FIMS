@@ -74,7 +74,7 @@ struct NormalLPDF : public DensityComponentBase<Type> {
       if (this->input_type == "data") {
         // if data, check if there are any NA values and skip lpdf calculation
         // if there are
-        if (this->get_observed(i) != this->observed_values->na_value) {
+        if (this->get_observed(i) != this->data_observed_values->na_value) {
           this->lpdf_vec[i] =
               dnorm(this->get_observed(i), this->get_expected(i),
                     fims_math::exp(log_sd.get_force_scalar(i)), true);
@@ -82,7 +82,7 @@ struct NormalLPDF : public DensityComponentBase<Type> {
           this->lpdf_vec[i] = 0;
         }
         // if not data (i.e. prior or process), use x vector instead of
-        // observed_values
+        // data_observed_values
       } else {
         this->lpdf_vec[i] =
             dnorm(this->get_observed(i), this->get_expected(i),
@@ -93,7 +93,7 @@ struct NormalLPDF : public DensityComponentBase<Type> {
       if (this->simulate_flag) {
         FIMS_SIMULATE_F(this->of) {
           if (this->input_type == "data") {
-            this->observed_values->at(i) =
+            this->data_observed_values->at(i) =
                 rnorm(this->get_expected(i),
                       fims_math::exp(log_sd.get_force_scalar(i)));
           }

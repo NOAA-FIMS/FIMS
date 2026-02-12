@@ -29,7 +29,7 @@ struct DistributionElementObject {
                              log-likelihood; options are: "priors",
                              "random_effects", and "data" */
   std::shared_ptr<fims_data_object::DataObject<Type>>
-      observed_values; /**< observed data*/
+      data_observed_values; /**< observed data*/
   fims::Vector<Type>
       expected_values;           /**< expected value of distribution function*/
   fims::Vector<Type>* re = NULL; /**< pointer to random effects vector*/
@@ -38,8 +38,8 @@ struct DistributionElementObject {
   fims::Vector<Type>* data_expected_values = NULL; /**< expected value of data*/
   std::vector<fims::Vector<Type>*>
       priors; /**< vector of pointers where each points to a prior parameter */
-  fims::Vector<Type> x; /**< input value of distribution function for priors or
-                           random effects*/
+  fims::Vector<Type> observed_values; /**< input value of distribution function 
+  for priors, random effects, or processes*/
   fims::Vector<Type> expected_mean;             /**< the expected mean of the
                                             distribution, overrides expected values */
   std::string use_mean = fims::to_string("no"); /**< should expected_mean
@@ -54,7 +54,7 @@ struct DistributionElementObject {
    */
   inline Type& get_observed(size_t i) {
     if (this->input_type == "data") {
-      return observed_values->at(i);
+      return data_observed_values->at(i);
     }
     if (this->input_type == "random_effects") {
       return (*re)[i];
@@ -68,7 +68,7 @@ struct DistributionElementObject {
         return (*(priors[i]))[0];
       }
     }
-    return x[i];
+    return observed_values[i];
   }
 
   /**
@@ -79,7 +79,7 @@ struct DistributionElementObject {
    */
   inline Type& get_observed(size_t i, size_t j) {
     if (this->input_type == "data") {
-      return observed_values->at(i, j);
+      return data_observed_values->at(i, j);
     }
     if (this->input_type == "random_effects") {
       return (*re)[i, j];
@@ -87,7 +87,7 @@ struct DistributionElementObject {
     if (this->input_type == "prior") {
       return (*(priors[i, j]))[0];
     }
-    return x[i];
+    return observed_values[i];
   }
 
   /**
@@ -113,7 +113,7 @@ struct DistributionElementObject {
    */
   inline size_t get_n_x() {
     if (this->input_type == "data") {
-      return this->observed_values->data.size();
+      return this->data_observed_values->data.size();
     }
     if (this->input_type == "random_effects") {
       return (*re).size();
@@ -121,7 +121,7 @@ struct DistributionElementObject {
     if (this->input_type == "prior") {
       return this->expected_values.size();
     }
-    return x.size();
+    return observed_values.size();
   }
 
   /**
@@ -138,7 +138,7 @@ struct DistributionElementObject {
     if (this->input_type == "prior") {
       return this->expected_values.size();
     }
-    return x.size();
+    return observed_values.size();
   }
 };
 

@@ -181,6 +181,9 @@ class Information {
       if (d->data_expected_values != NULL) {
         d->data_expected_values->clear();
       }
+      if (d->observed_values != NULL) {
+        d->observed_values->clear();
+      }
       if (d->re != NULL) {
         d->re->clear();
       }
@@ -302,7 +305,7 @@ class Information {
           d->priors[i] = (*vmit).second;
         }
         FIMS_INFO_LOG("Prior size for distribution " + fims::to_string(d->id) +
-                      "is: " + fims::to_string(d->x.size()));
+                      "is: " + fims::to_string(d->observed_values.size()));
       }
     }
   }
@@ -333,7 +336,52 @@ class Information {
         }
         FIMS_INFO_LOG("Random effect size for distribution " +
                       fims::to_string(d->id) +
-                      " is: " + fims::to_string(d->x.size()));
+                      " is: " + fims::to_string(d->observed_values.size()));
+      }
+    }
+  }
+
+  /**
+   * @brief Loop over distributions and set links to distribution x value if
+   * distribution is a process type.
+   */
+  void SetupProcess() {
+    for (density_components_iterator it = this->density_components.begin();
+         it != this->density_components.end(); ++it) {
+      std::shared_ptr<fims_distributions::DensityComponentBase<Type>> d =
+          (*it).second;
+      if (d->input_type == "process") {
+        FIMS_INFO_LOG("Setup process for distribution " +
+                      fims::to_string(d->id));
+        
+        if (d->observed_key.size() > 0) {
+          variable_map_iterator vmit_observed;
+          if(d->observed_key.size() > 1) {
+            for(size_t i = 0; i < d->observed_key.size(); i++) {
+              vmit_observed = this->variable_map.find(d->observed_key[i]);
+              d->lpdf_vec.push_back((*vmit_observed).second);
+            }
+          }else{
+            
+          }
+          vmit_observed = this->variable_map.find(d->key[1]);
+          d->pointer_expected_values = (*vmit).second;
+        } else {
+          d->pointer_expected_values = &d->expected_values;
+        }
+        
+        variable_map_iterator vmit_expected;
+        FIMS_INFO_LOG("Link process from distribution " +
+                      fims::to_string(d->id) + " to observed value " +
+                      fims::to_string(d->observed_key[0])) + " and expected value " +
+                      fims::to_string(d->expected_key[0]));
+        vmit_observed = this->variable_map.find(d->observed_key[0]);
+        vmit_expected = this->variable_map.find(d->expected_key[0]);
+        d->process = (*vmit_observed).second;
+        
+        FIMS_INFO_LOG("Process size for distribution " +
+                      fims::to_string(d->id) +
+                      " is: " + fims::to_string(d->observed_values.size()));
       }
     }
   }
@@ -704,7 +752,7 @@ class Information {
           data_iterator it = this->data_objects.find(observed_data_id);
 
           if (it != this->data_objects.end()) {
-            d->observed_values = (*it).second;
+            d->data_observed_values = (*it).second;
             FIMS_INFO_LOG("Observed data " + fims::to_string(observed_data_id) +
                           " successfully set to density component " +
                           fims::to_string(d->id));

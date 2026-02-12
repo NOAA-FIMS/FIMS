@@ -37,11 +37,11 @@ struct MultinomialLPMF : public DensityComponentBase<Type> {
    * @brief Evaluates the multinomial probability mass function
    */
   virtual const Type evaluate() {
-    // set dims using observed_values if no user input
+    // set dims using data_observed_values if no user input
     if (dims.size() != 2) {
       dims.resize(2);
-      dims[0] = this->observed_values->get_imax();
-      dims[1] = this->observed_values->get_jmax();
+      dims[0] = this->data_observed_values->get_imax();
+      dims[1] = this->data_observed_values->get_jmax();
     }
 
     // setup vector for recording the log probability density function values
@@ -97,7 +97,7 @@ struct MultinomialLPMF : public DensityComponentBase<Type> {
         if (this->input_type == "data") {
           // if data, check if there are any NA values and skip lpdf calculation
           // for entire row if there are
-          if (this->get_observed(i, j) == this->observed_values->na_value) {
+          if (this->get_observed(i, j) == this->data_observed_values->na_value) {
             containsNA = true;
             break;
           }
@@ -108,7 +108,7 @@ struct MultinomialLPMF : public DensityComponentBase<Type> {
           }
         } else {
           // if not data (i.e. prior or process), use x vector instead of
-          // observed_values
+          // data_observed_values
           size_t idx = (i * dims[1]) + j;
           x_vector[j] = this->get_observed(idx);
           prob_vector[j] = this->get_expected(idx);
