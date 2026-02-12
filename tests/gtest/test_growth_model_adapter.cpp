@@ -35,19 +35,20 @@ void ConfigureAdapter(fims_popdy::VonBertalanffyGrowthModelAdapter<double>& adap
 
 TEST(VonBertalanffyGrowthModelAdapter, UsesWaaFromLaa) {
   fims_popdy::VonBertalanffyGrowthModelAdapter<double> adapter;
-  ConfigureAdapter(adapter, 10.0, 100.0, 0.2, 0.0, 50.0, 1e-5, 3.0, 3.0, 7.0);
-  adapter.Initialize(1, 51, 1);
+  ConfigureAdapter(adapter, 275.0, 725.0, 0.18, 1.0, 12.0, 2.5e-11, 3.0, 28.0, 73.0);
+  adapter.SetAgeOffset(1.0);
+  adapter.Initialize(1, 12, 1);
 
   const double age = 5.0;
-  const double length_at_ref_age_1 = 10.0;
-  const double length_at_ref_age_2 = 100.0;
-  const double growth_coefficient_K = 0.2;
-  const double reference_age_for_length_1 = 0.0;
-  const double reference_age_for_length_2 = 50.0;
+  const double length_at_ref_age_1 = 275.0;
+  const double length_at_ref_age_2 = 725.0;
+  const double growth_coefficient_K = 0.18;
+  const double reference_age_for_length_1 = 1.0;
+  const double reference_age_for_length_2 = 12.0;
   const double denom_raw = 1.0 - std::exp(-growth_coefficient_K * (reference_age_for_length_2 - reference_age_for_length_1));
   const double denom = fims_math::ad_max(fims_math::ad_fabs(denom_raw), 1e-8);
   const double L = length_at_ref_age_1 + (length_at_ref_age_2 - length_at_ref_age_1) * (1.0 - std::exp(-growth_coefficient_K * (age - reference_age_for_length_1))) / denom;
-  const double expected = 1e-5 * std::pow(L, 3.0);
+  const double expected = 2.5e-11 * std::pow(L, 3.0);
   const double W = adapter.evaluate(age);
 
   EXPECT_NEAR(W, expected, 1e-8);
@@ -55,21 +56,21 @@ TEST(VonBertalanffyGrowthModelAdapter, UsesWaaFromLaa) {
 
 TEST(VonBertalanffyGrowthModelAdapter, HonorsAgeOffset) {
   fims_popdy::VonBertalanffyGrowthModelAdapter<double> adapter;
-  // ages 1..51 (n_ages = 51), set reference ages to match
-  ConfigureAdapter(adapter, 10.0, 100.0, 0.2, 1.0, 51.0, 1e-5, 3.0, 3.0, 7.0);
+  // ages 1..12 (n_ages = 12), set reference ages to match
+  ConfigureAdapter(adapter, 275.0, 725.0, 0.18, 1.0, 12.0, 2.5e-11, 3.0, 28.0, 73.0);
   adapter.SetAgeOffset(1.0);
-  adapter.Initialize(1, 51, 1);
+  adapter.Initialize(1, 12, 1);
 
   const double age = 1.0;
-  const double length_at_ref_age_1 = 10.0;
-  const double length_at_ref_age_2 = 100.0;
-  const double growth_coefficient_K = 0.2;
+  const double length_at_ref_age_1 = 275.0;
+  const double length_at_ref_age_2 = 725.0;
+  const double growth_coefficient_K = 0.18;
   const double reference_age_for_length_1 = 1.0;
-  const double reference_age_for_length_2 = 51.0;
+  const double reference_age_for_length_2 = 12.0;
   const double denom_raw = 1.0 - std::exp(-growth_coefficient_K * (reference_age_for_length_2 - reference_age_for_length_1));
   const double denom = fims_math::ad_max(fims_math::ad_fabs(denom_raw), 1e-8);
   const double L = length_at_ref_age_1 + (length_at_ref_age_2 - length_at_ref_age_1) * (1.0 - std::exp(-growth_coefficient_K * (age - reference_age_for_length_1))) / denom;
-  const double expected = 1e-5 * std::pow(L, 3.0);
+  const double expected = 2.5e-11 * std::pow(L, 3.0);
   const double W = adapter.evaluate(age);
 
   EXPECT_NEAR(W, expected, 1e-8);
@@ -77,26 +78,41 @@ TEST(VonBertalanffyGrowthModelAdapter, HonorsAgeOffset) {
 
 TEST(VonBertalanffyGrowthModelAdapter, RejectsFractionalAge) {
   fims_popdy::VonBertalanffyGrowthModelAdapter<double> adapter;
-  ConfigureAdapter(adapter, 10.0, 100.0, 0.2, 0.0, 50.0, 1e-5, 3.0, 3.0, 7.0);
-  adapter.Initialize(1, 51, 1);
+  ConfigureAdapter(adapter, 275.0, 725.0, 0.18, 1.0, 12.0, 2.5e-11, 3.0, 28.0, 73.0);
+  adapter.SetAgeOffset(1.0);
+  adapter.Initialize(1, 12, 1);
 
   EXPECT_THROW(adapter.evaluate(5.5), std::runtime_error);
 }
 
 TEST(VonBertalanffyGrowthModelAdapter, RejectsNegativeAge) {
   fims_popdy::VonBertalanffyGrowthModelAdapter<double> adapter;
-  ConfigureAdapter(adapter, 10.0, 100.0, 0.2, 0.0, 50.0, 1e-5, 3.0, 3.0, 7.0);
-  adapter.Initialize(1, 51, 1);
+  ConfigureAdapter(adapter, 275.0, 725.0, 0.18, 1.0, 12.0, 2.5e-11, 3.0, 28.0, 73.0);
+  adapter.SetAgeOffset(1.0);
+  adapter.Initialize(1, 12, 1);
 
   EXPECT_THROW(adapter.evaluate(-1.0), std::runtime_error);
 }
 
-TEST(VonBertalanffyGrowthModelAdapter, RejectsOutOfRangeAge) {
+TEST(VonBertalanffyGrowthModelAdapter, ExtrapolatesAboveCachedAgeRange) {
   fims_popdy::VonBertalanffyGrowthModelAdapter<double> adapter;
-  ConfigureAdapter(adapter, 10.0, 100.0, 0.2, 0.0, 50.0, 1e-5, 3.0, 3.0, 7.0);
-  adapter.Initialize(1, 51, 1);
+  ConfigureAdapter(adapter, 275.0, 725.0, 0.18, 1.0, 12.0, 2.5e-11, 3.0, 28.0, 73.0);
+  adapter.SetAgeOffset(1.0);
+  adapter.Initialize(1, 12, 1);
 
-  EXPECT_THROW(adapter.evaluate(51.0), std::runtime_error);
+  const double age = 13.0;
+  const double length_at_ref_age_1 = 275.0;
+  const double length_at_ref_age_2 = 725.0;
+  const double growth_coefficient_K = 0.18;
+  const double reference_age_for_length_1 = 1.0;
+  const double reference_age_for_length_2 = 12.0;
+  const double denom_raw = 1.0 - std::exp(-growth_coefficient_K * (reference_age_for_length_2 - reference_age_for_length_1));
+  const double denom = fims_math::ad_max(fims_math::ad_fabs(denom_raw), 1e-8);
+  const double L = length_at_ref_age_1 + (length_at_ref_age_2 - length_at_ref_age_1) * (1.0 - std::exp(-growth_coefficient_K * (age - reference_age_for_length_1))) / denom;
+  const double expected = 2.5e-11 * std::pow(L, 3.0);
+
+  const double W = adapter.evaluate(age);
+  EXPECT_NEAR(W, expected, 1e-8);
 }
 
 }  // namespace
