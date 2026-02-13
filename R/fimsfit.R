@@ -661,30 +661,33 @@ fit_fims <- function(input,
     
     # Checks 3 & 4: Validate fixed effects standard errors
     # Safely extract fixed effects summary and check for issues
-    tryCatch({
+    se_check_result <- tryCatch({
       fixed_summary <- summary(sdreport, "fixed")
+      issues <- c()
       if (!is.null(fixed_summary) && nrow(fixed_summary) > 0) {
         std_errors <- fixed_summary[, "Std. Error"]
         
         # Check 3: Non-NA standard errors
         na_se <- sum(is.na(std_errors))
         if (na_se > 0) {
-          sdreport_issues <- c(sdreport_issues,
+          issues <- c(issues,
             paste0(na_se, " fixed effect(s) have NA standard errors"))
         }
         
         # Check 4: Standard errors below threshold
         large_se <- sum(std_errors >= MAX_SE_THRESHOLD, na.rm = TRUE)
         if (large_se > 0) {
-          sdreport_issues <- c(sdreport_issues,
+          issues <- c(issues,
             paste0(large_se, " fixed effect(s) have standard errors >= ", MAX_SE_THRESHOLD))
         }
       }
+      issues
     }, error = function(e) {
       # If we can't extract fixed effects summary, note it as an issue
-      sdreport_issues <<- c(sdreport_issues,
-        "Unable to extract fixed effects summary from sdreport")
+      c("Unable to extract fixed effects summary from sdreport")
     })
+    
+    sdreport_issues <- c(sdreport_issues, se_check_result)
     
     # Warn if sdreport issues found
     if (length(sdreport_issues) > 0) {
