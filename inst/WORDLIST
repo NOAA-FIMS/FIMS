@@ -228,6 +228,7 @@ HPP
 HPUX
 HandlesCorrectInput
 HandlesEdgeCase
+HandlesNegativeSlope
 HardwareConcurrency
 IBMCPP
 INAA
