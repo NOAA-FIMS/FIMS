@@ -39,6 +39,24 @@ namespace
   
   }
 
+  // IO correctness - negative slope for descending logistic
+  TEST(LogisticSelectivity_Evaluate, HandlesNegativeSlope) {
+    // Setup
+    // Test that negative slope creates a descending logistic curve
+    fims_popdy::LogisticSelectivity<double> fishery_selectivity;
+    fishery_selectivity.inflection_point.resize(1);
+    fishery_selectivity.slope.resize(1);
+    fishery_selectivity.inflection_point[0] = 20.5;
+    fishery_selectivity.slope[0] = -0.2;  // Negative slope
+    double fishery_x = 40.5;
+    // 1.0/(1.0+exp(-(-0.2)*(40.5-20.5))) = 1.0/(1.0+exp(4.0)) = 0.01798621
+    double expect_fishery = 0.01798621;
+    
+    // Test that Evaluate(x) with negative slope returns descending value
+    EXPECT_NEAR(fishery_selectivity.evaluate(fishery_x), expect_fishery, 0.0001);
+  
+  }
+
   // Edge handling 
   // No edge cases.
 
