@@ -659,23 +659,32 @@ fit_fims <- function(input,
     # Check sdreport convergence criteria
     sdreport_issues <- c()
     
-    # Check 3: Non-NA standard errors for fixed effects
-    if ("par.fixed" %in% names(sdreport)) {
-      na_se <- sum(is.na(summary(sdreport, "fixed")[, "Std. Error"]))
-      if (na_se > 0) {
-        sdreport_issues <- c(sdreport_issues,
-          paste0(na_se, " fixed effect(s) have NA standard errors"))
+    # Checks 3 & 4: Validate fixed effects standard errors
+    # Safely extract fixed effects summary and check for issues
+    tryCatch({
+      fixed_summary <- summary(sdreport, "fixed")
+      if (!is.null(fixed_summary) && nrow(fixed_summary) > 0) {
+        std_errors <- fixed_summary[, "Std. Error"]
+        
+        # Check 3: Non-NA standard errors
+        na_se <- sum(is.na(std_errors))
+        if (na_se > 0) {
+          sdreport_issues <- c(sdreport_issues,
+            paste0(na_se, " fixed effect(s) have NA standard errors"))
+        }
+        
+        # Check 4: Standard errors below threshold
+        large_se <- sum(std_errors >= MAX_SE_THRESHOLD, na.rm = TRUE)
+        if (large_se > 0) {
+          sdreport_issues <- c(sdreport_issues,
+            paste0(large_se, " fixed effect(s) have standard errors >= ", MAX_SE_THRESHOLD))
+        }
       }
-    }
-    
-    # Check 4: All standard errors below threshold
-    if ("par.fixed" %in% names(sdreport)) {
-      large_se <- sum(summary(sdreport, "fixed")[, "Std. Error"] >= MAX_SE_THRESHOLD, na.rm = TRUE)
-      if (large_se > 0) {
-        sdreport_issues <- c(sdreport_issues,
-          paste0(large_se, " fixed effect(s) have standard errors >= ", MAX_SE_THRESHOLD))
-      }
-    }
+    }, error = function(e) {
+      # If we can't extract fixed effects summary, note it as an issue
+      sdreport_issues <<- c(sdreport_issues,
+        "Unable to extract fixed effects summary from sdreport")
+    })
     
     # Warn if sdreport issues found
     if (length(sdreport_issues) > 0) {
