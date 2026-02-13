@@ -223,7 +223,7 @@ class ParameterVector {
    * @param size The number of elements to copy over.
    */
   ParameterVector(Rcpp::NumericVector x, size_t size) {
-    if (x.size() < size) {
+    if (static_cast<size_t>(x.size()) < size) {
       throw std::invalid_argument(
           "Error in call to ParameterVector(Rcpp::NumericVector x, size_t "
           "size): x.size() < size argument.");
