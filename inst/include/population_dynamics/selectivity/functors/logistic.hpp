@@ -59,18 +59,7 @@ struct LogisticSelectivity : public SelectivityBase<Type> {
   }
 
   /**
-   * @brief Method of the logistic selectivity class that implements the
-   * logistic function from FIMS math.
-   *
-   * \f[ \frac{1.0}{ 1.0 + exp(-1.0 * slope_t (x - {inflection\_point}_t))} \f]
-   *
-   * The selectivity curve can be either ascending or descending depending on
-   * the sign of the slope parameter:
-   * - Positive slope: ascending curve (selectivity increases from 0 to 1)
-   * - Negative slope: descending curve (selectivity decreases from 1 to 0)
-   *
-   * @param x  The independent variable in the logistic function (e.g., age or
-   * size in selectivity).
+   * @copydoc LogisticSelectivity::evaluate(const Type &x)
    * @param pos Position index, e.g., which year.
    */
   virtual const Type evaluate(const Type &x, size_t pos) {
