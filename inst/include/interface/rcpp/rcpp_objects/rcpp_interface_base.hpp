@@ -223,10 +223,10 @@ class ParameterVector {
    * @param size The number of elements to copy over.
    */
   ParameterVector(Rcpp::NumericVector x, size_t size) {
-    if (x.size() < size) {
+    if (x.size() != size) {
       throw std::invalid_argument(
           "Error in call to ParameterVector(Rcpp::NumericVector x, size_t "
-          "size): x.size() < size argument.");
+          "size): x.size() != size argument.");
     } else {
       this->id_m = ParameterVector::id_g++;
       this->storage_m = std::make_shared<std::vector<Parameter>>();
@@ -722,7 +722,8 @@ class FIMSRcppInterfaceBase {
     } else if (value != value) {
       ss << "-999";
     } else {
-      ss << value;
+      // Set precision (R default is 16)
+      ss << std::fixed << std::setprecision(16) << value;
     }
     return ss.str();
   }
