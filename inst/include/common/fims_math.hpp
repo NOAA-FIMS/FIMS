@@ -190,10 +190,17 @@ inline const Type lgamma(const Type &x) {
 /**
  * @brief The general logistic function
  *
+ * @details
+ * The logistic function can range from zero to one or one to zero, depending on
+ * the slope parameter, but it is not normalized to force values to reach those
+ * ranges.
+ *
  * \f$ \frac{1.0}{ 1.0 + exp(-1.0 * slope (x - inflection_point))} \f$
  *
  * @param inflection_point the inflection point of the logistic function
- * @param slope the slope of the logistic function
+ * @param slope the slope of the logistic function. A positive slope results in
+ * an ascending logistic curve (0 to 1), while a negative slope results in a
+ * descending logistic curve (1 to 0).
  * @param x the index the logistic function should be evaluated at
  * @return
  */
