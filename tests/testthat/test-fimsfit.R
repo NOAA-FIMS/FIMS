@@ -68,21 +68,21 @@ test_that("`is.FIMSFit()` returns correct outputs for edge cases", {
 test_that("fit_fims() errors when optimization fails to converge", {
   # Create a simple test case that will fail to converge by setting
   # extremely restrictive iteration limits
-  
+
   # Skip if test fixtures don't exist
   skip_if_not(file.exists(testthat::test_path("fixtures", "integration_test_data.RData")))
-  
+
   load(testthat::test_path("fixtures", "integration_test_data.RData"))
-  
+
   # Set up the model with data
   data_age_comp <- FIMSFrame(data1)
   parameters <- readRDS(
     testthat::test_path("fixtures", "parameters_model_comparison_project.RDS")
   )
-  
+
   initialized_model <- parameters |>
     initialize_fims(data = data_age_comp)
-  
+
   # Set control parameters that will cause convergence failure
   # by making iteration limits extremely low
   bad_control <- list(
@@ -90,13 +90,13 @@ test_that("fit_fims() errors when optimization fails to converge", {
     iter.max = 1,
     trace = 0
   )
-  
+
   #' @description Test that fit_fims() aborts with an informative error when convergence fails.
   expect_error(
     object = initialized_model |>
       fit_fims(optimize = TRUE, control = bad_control),
     regexp = "Optimization failed convergence checks"
   )
-  
+
   clear()
 })
