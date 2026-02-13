@@ -258,7 +258,7 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
                                       Rcpp::IntegerVector ids) {
     this->input_type_m.set(input_type);
     this->key_m->resize(ids.size());
-    for (int i = 0; i < ids.size(); i++) {
+    for (size_t i = 0; i < ids.size(); i++) {
       this->key_m->at(i) = ids[i];
     }
     return true;
@@ -588,7 +588,7 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
                                       Rcpp::IntegerVector ids) {
     this->input_type_m.set(input_type);
     this->key_m->resize(ids.size());
-    for (int i = 0; i < ids.size(); i++) {
+    for (size_t i = 0; i < ids.size(); i++) {
       this->key_m->at(i) = ids[i];
     }
     return true;
@@ -889,7 +889,7 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
                                       Rcpp::IntegerVector ids) {
     this->input_type_m.set(input_type);
     this->key_m->resize(ids.size());
-    for (int i = 0; i < ids.size(); i++) {
+    for (size_t i = 0; i < ids.size(); i++) {
       this->key_m->at(i) = ids[i];
     }
     return true;

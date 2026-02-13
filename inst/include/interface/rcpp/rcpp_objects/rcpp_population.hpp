@@ -414,7 +414,7 @@ class PopulationInterface : public PopulationInterfaceBase {
     }
     info->variable_map[this->log_init_naa.id_m] = &(population)->log_init_naa;
 
-    for (int i = 0; i < ages.size(); i++) {
+    for (size_t i = 0; i < ages.size(); i++) {
       population->ages[i] = this->ages[i];
     }
 

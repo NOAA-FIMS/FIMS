@@ -448,7 +448,7 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
     info->variable_map[this->log_r.id_m] = &(recruitment)->log_r;
     // set log_expected_recruitment
     recruitment->log_expected_recruitment.resize(this->n_years.get() + 1);
-    for (size_t i = 0; i < this->n_years.get() + 1; i++) {
+    for (size_t i = 0; i < static_cast<size_t>(this->n_years.get() + 1); i++) {
       recruitment->log_expected_recruitment[i] = 0;
     }
     info->variable_map[this->log_expected_recruitment.id_m] =

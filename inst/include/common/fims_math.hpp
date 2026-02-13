@@ -335,7 +335,7 @@ inline const Type ad_max(const Type &a, const Type &b, Type C = 1e-5) {
 template <class T>
 T sum(const std::vector<T> &v) {
   T ret = 0.0;
-  for (int i = 0; i < v.size(); i++) {
+  for (size_t i = 0; i < v.size(); i++) {
     ret += v[i];
   }
   return ret;
@@ -352,7 +352,7 @@ T sum(const std::vector<T> &v) {
 template <class T>
 T sum(const fims::Vector<T> &v) {
   T ret = 0.0;
-  for (int i = 0; i < v.size(); i++) {
+  for (size_t i = 0; i < v.size(); i++) {
     ret += v[i];
   }
   return ret;
