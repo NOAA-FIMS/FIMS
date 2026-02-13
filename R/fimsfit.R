@@ -615,16 +615,30 @@ fit_fims <- function(input,
   cli::cli_inform(c("v" = "Finished optimization"))
   
   # Check convergence status
+  convergence_issues <- c()
+  
+  # Check 1: nlminb convergence flag
   if (opt$convergence != 0) {
     convergence_message <- if (!is.null(opt$message)) {
       paste0("Convergence code = ", opt$convergence, "; message = ", opt$message)
     } else {
       paste0("Convergence code = ", opt$convergence)
     }
+    convergence_issues <- c(convergence_issues, convergence_message)
+  }
+  
+  # Check 2: Maximum gradient threshold (1e-6 from WHAM)
+  if (maxgrad > 1e-6) {
+    convergence_issues <- c(convergence_issues, 
+      paste0("Maximum gradient (", format(maxgrad, scientific = TRUE), 
+             ") exceeds threshold of 1e-6"))
+  }
+  
+  # Abort if convergence issues found before sdreport
+  if (length(convergence_issues) > 0) {
     cli::cli_abort(c(
-      "x" = "Optimization failed to converge.",
-      "i" = convergence_message,
-      "i" = "Maximum gradient: {.val {maxgrad}}",
+      "x" = "Optimization failed convergence checks.",
+      setNames(convergence_issues, rep("i", length(convergence_issues))),
       "i" = "Consider adjusting control parameters (eval.max, iter.max) or model structure."
     ))
   }
@@ -637,6 +651,35 @@ fit_fims <- function(input,
     sdreport <- TMB::sdreport(obj)
     cli::cli_inform(c("v" = "Finished sdreport"))
     time_sdreport <- Sys.time() - t2
+    
+    # Check sdreport convergence criteria
+    sdreport_issues <- c()
+    
+    # Check 3: Non-NA standard errors for fixed effects
+    if ("par.fixed" %in% names(sdreport)) {
+      na_se <- sum(is.na(summary(sdreport, "fixed")[, "Std. Error"]))
+      if (na_se > 0) {
+        sdreport_issues <- c(sdreport_issues,
+          paste0(na_se, " fixed effect(s) have NA standard errors"))
+      }
+    }
+    
+    # Check 4: All standard errors < 100
+    if ("par.fixed" %in% names(sdreport)) {
+      large_se <- sum(summary(sdreport, "fixed")[, "Std. Error"] >= 100, na.rm = TRUE)
+      if (large_se > 0) {
+        sdreport_issues <- c(sdreport_issues,
+          paste0(large_se, " fixed effect(s) have standard errors >= 100"))
+      }
+    }
+    
+    # Warn if sdreport issues found
+    if (length(sdreport_issues) > 0) {
+      cli::cli_warn(c(
+        "!" = "sdreport convergence issues detected:",
+        setNames(sdreport_issues, rep("i", length(sdreport_issues)))
+      ))
+    }
   } else {
     sdreport <- list()
     time_sdreport <- as.difftime(0, units = "secs")

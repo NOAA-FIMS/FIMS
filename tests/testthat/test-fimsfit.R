@@ -95,7 +95,7 @@ test_that("fit_fims() errors when optimization fails to converge", {
   expect_error(
     object = initialized_model |>
       fit_fims(optimize = TRUE, control = bad_control),
-    regexp = "Optimization failed to converge"
+    regexp = "Optimization failed convergence checks"
   )
   
   clear()
