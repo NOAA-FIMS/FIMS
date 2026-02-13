@@ -533,6 +533,10 @@ fit_fims <- function(input,
                        trace = 0
                      ),
                      filename = NULL) {
+  # Convergence thresholds following WHAM criteria
+  MAX_GRADIENT_THRESHOLD <- 1e-6
+  MAX_SE_THRESHOLD <- 100
+  
   # See issue 455 of sdmTMB to see what should be used.
   # https://github.com/pbs-assess/sdmTMB/issues/455
   # NOTE: When we add implementation for newton step we need to
@@ -627,11 +631,11 @@ fit_fims <- function(input,
     convergence_issues <- c(convergence_issues, convergence_message)
   }
   
-  # Check 2: Maximum gradient threshold (1e-6 from WHAM)
-  if (maxgrad > 1e-6) {
+  # Check 2: Maximum gradient threshold
+  if (maxgrad > MAX_GRADIENT_THRESHOLD) {
     convergence_issues <- c(convergence_issues, 
       paste0("Maximum gradient (", format(maxgrad, scientific = TRUE), 
-             ") exceeds threshold of 1e-6"))
+             ") exceeds threshold of ", MAX_GRADIENT_THRESHOLD))
   }
   
   # Abort if convergence issues found before sdreport
@@ -664,12 +668,12 @@ fit_fims <- function(input,
       }
     }
     
-    # Check 4: All standard errors < 100
+    # Check 4: All standard errors below threshold
     if ("par.fixed" %in% names(sdreport)) {
-      large_se <- sum(summary(sdreport, "fixed")[, "Std. Error"] >= 100, na.rm = TRUE)
+      large_se <- sum(summary(sdreport, "fixed")[, "Std. Error"] >= MAX_SE_THRESHOLD, na.rm = TRUE)
       if (large_se > 0) {
         sdreport_issues <- c(sdreport_issues,
-          paste0(large_se, " fixed effect(s) have standard errors >= 100"))
+          paste0(large_se, " fixed effect(s) have standard errors >= ", MAX_SE_THRESHOLD))
       }
     }
     
