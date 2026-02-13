@@ -535,6 +535,10 @@ fit_fims <- function(input,
                        trace = 0
                      ),
                      filename = NULL) {
+  # Convergence thresholds following WHAM criteria
+  MAX_GRADIENT_THRESHOLD <- 1e-6
+  MAX_SE_THRESHOLD <- 100
+
   # See issue 455 of sdmTMB to see what should be used.
   # https://github.com/pbs-assess/sdmTMB/issues/455
   # NOTE: When we add implementation for newton step we need to
@@ -615,6 +619,40 @@ fit_fims <- function(input,
   }
   time_optimization <- Sys.time() - t0
   cli::cli_inform(c("v" = "Finished optimization"))
+
+  # Check convergence status
+  convergence_issues <- c()
+
+  # Check 1: nlminb convergence flag
+  if (opt$convergence != 0) {
+    convergence_message <- if (!is.null(opt$message)) {
+      paste0("Convergence code = ", opt$convergence, "; message = ", opt$message)
+    } else {
+      paste0("Convergence code = ", opt$convergence)
+    }
+    convergence_issues <- c(convergence_issues, convergence_message)
+  }
+
+  # Check 2: Maximum gradient threshold
+  if (maxgrad > MAX_GRADIENT_THRESHOLD) {
+    convergence_issues <- c(
+      convergence_issues,
+      paste0(
+        "Maximum gradient (", format(maxgrad, scientific = TRUE),
+        ") exceeds threshold of ", MAX_GRADIENT_THRESHOLD
+      )
+    )
+  }
+
+  # Abort if convergence issues found before sdreport
+  if (length(convergence_issues) > 0) {
+    cli::cli_abort(c(
+      "x" = "Optimization failed convergence checks.",
+      setNames(convergence_issues, rep("i", length(convergence_issues))),
+      "i" = "Consider adjusting control parameters (eval.max, iter.max) or model structure."
+    ))
+  }
+
   FIMS::set_fixed(opt$par)
 
   time_sdreport <- NA
@@ -623,6 +661,54 @@ fit_fims <- function(input,
     sdreport <- TMB::sdreport(obj)
     cli::cli_inform(c("v" = "Finished sdreport"))
     time_sdreport <- Sys.time() - t2
+
+    # Check sdreport convergence criteria
+    sdreport_issues <- c()
+
+    # Checks 3 & 4: Validate fixed effects standard errors
+    # Safely extract fixed effects summary and check for issues
+    se_check_result <- tryCatch(
+      {
+        fixed_summary <- summary(sdreport, "fixed")
+        issues <- c()
+        if (!is.null(fixed_summary) && nrow(fixed_summary) > 0) {
+          std_errors <- fixed_summary[, "Std. Error"]
+
+          # Check 3: Non-NA standard errors
+          na_se <- sum(is.na(std_errors))
+          if (na_se > 0) {
+            issues <- c(
+              issues,
+              paste0(na_se, " fixed effect(s) have NA standard errors")
+            )
+          }
+
+          # Check 4: Standard errors below threshold
+          large_se <- sum(std_errors >= MAX_SE_THRESHOLD, na.rm = TRUE)
+          if (large_se > 0) {
+            issues <- c(
+              issues,
+              paste0(large_se, " fixed effect(s) have standard errors >= ", MAX_SE_THRESHOLD)
+            )
+          }
+        }
+        issues
+      },
+      error = function(e) {
+        # If we can't extract fixed effects summary, note it as an issue
+        c("Unable to extract fixed effects summary from sdreport")
+      }
+    )
+
+    sdreport_issues <- c(sdreport_issues, se_check_result)
+
+    # Warn if sdreport issues found
+    if (length(sdreport_issues) > 0) {
+      cli::cli_warn(c(
+        "!" = "sdreport convergence issues detected:",
+        setNames(sdreport_issues, rep("i", length(sdreport_issues)))
+      ))
+    }
   } else {
     sdreport <- list()
     time_sdreport <- as.difftime(0, units = "secs")
