@@ -142,7 +142,7 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
   inline std::map<double, double> make_map(RealVector ages,
                                            RealVector weights) {
     std::map<double, double> mymap;
-    for (uint32_t i = 0; i < ages.size(); i++) {
+    for (size_t i = 0; i < ages.size(); i++) {
       mymap.insert(std::pair<double, double>(ages[i], weights[i]));
     }
     return mymap;
