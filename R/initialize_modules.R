@@ -359,6 +359,14 @@ initialize_population <- function(parameters, data, linked_ids) {
 #' Initializes a selectivity module by setting up fields. This function uses
 #' the `initialize_module` function to handle specific requirements for
 #' population initialization.
+#'
+#' For logistic selectivity, the curve can be either ascending or descending
+#' based on the sign of the slope parameter. A positive slope creates an
+#' ascending logistic curve where selectivity increases from 0 to 1 with
+#' increasing values of the independent variable (e.g., age or size). A
+#' negative slope creates a descending logistic curve where selectivity
+#' decreases from 1 to 0.
+#'
 #' @inheritParams initialize_module
 #' @param fleet_name A character. Name of the fleet to initialize.
 #' @return

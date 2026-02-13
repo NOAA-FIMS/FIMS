@@ -19,6 +19,12 @@ namespace fims_popdy {
 /**
  *  @brief LogisticSelectivity class that returns the logistic function value
  * from fims_math.
+ *
+ * The logistic selectivity function can produce either an ascending or
+ * descending curve based on the sign of the slope parameter. A positive slope
+ * creates an ascending logistic curve (selectivity increases from 0 to 1 with
+ * increasing x), while a negative slope creates a descending logistic curve
+ * (selectivity decreases from 1 to 0 with increasing x).
  */
 template <typename Type>
 struct LogisticSelectivity : public SelectivityBase<Type> {
@@ -26,7 +32,9 @@ struct LogisticSelectivity : public SelectivityBase<Type> {
       inflection_point;     /**< 50% quantile of the value of the quantity of
   interest (x); e.g. age at which 50% of the fish are selected */
   fims::Vector<Type> slope; /**<scalar multiplier of difference between quantity
-            of interest value (x) and inflection_point */
+            of interest value (x) and inflection_point. Positive values create
+            an ascending curve (0 to 1), negative values create a descending
+            curve (1 to 0). */
 
   LogisticSelectivity() : SelectivityBase<Type>() {}
 
@@ -38,6 +46,11 @@ struct LogisticSelectivity : public SelectivityBase<Type> {
    *
    * \f[ \frac{1.0}{ 1.0 + exp(-1.0 * slope (x - inflection\_point))} \f]
    *
+   * The selectivity curve can be either ascending or descending depending on
+   * the sign of the slope parameter:
+   * - Positive slope: ascending curve (selectivity increases from 0 to 1)
+   * - Negative slope: descending curve (selectivity decreases from 1 to 0)
+   *
    * @param x  The independent variable in the logistic function (e.g., age or
    * size in selectivity).
    */
@@ -46,13 +59,7 @@ struct LogisticSelectivity : public SelectivityBase<Type> {
   }
 
   /**
-   * @brief Method of the logistic selectivity class that implements the
-   * logistic function from FIMS math.
-   *
-   * \f[ \frac{1.0}{ 1.0 + exp(-1.0 * slope_t (x - {inflection\_point}_t))} \f]
-   *
-   * @param x  The independent variable in the logistic function (e.g., age or
-   * size in selectivity).
+   * @copydoc LogisticSelectivity::evaluate(const Type &x)
    * @param pos Position index, e.g., which year.
    */
   virtual const Type evaluate(const Type &x, size_t pos) {
