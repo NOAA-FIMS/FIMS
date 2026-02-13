@@ -477,7 +477,7 @@ class RealVector {
     this->id_m = RealVector::id_g++;
     this->storage_m = std::make_shared<std::vector<double>>();
     this->resize(x.size());
-    for (size_t i = 0; i < x.size(); i++) {
+    for (R_xlen_t i = 0; i < x.size(); i++) {
       storage_m->at(i) = x[i];
     }
   }
@@ -509,7 +509,7 @@ class RealVector {
    */
   RealVector& operator=(const Rcpp::NumericVector& v) {
     this->storage_m->resize(v.size());
-    for (size_t i = 0; i < v.size(); i++) {
+    for (R_xlen_t i = 0; i < v.size(); i++) {
       storage_m->at(i) = v[i];
     }
     return *this;

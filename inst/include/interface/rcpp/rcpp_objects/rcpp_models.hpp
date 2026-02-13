@@ -829,19 +829,19 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
     double of_value = Rcpp::as<double>(report["objective_function_value"]);
 
     fims::Vector<double> gradient(grad.size());
-    for (size_t i = 0; i < grad.size(); i++) {
+    for (R_xlen_t i = 0; i < grad.size(); i++) {
       gradient[i] = grad[i];
     }
     // Assume grouped_out is an Rcpp::List
     std::map<std::string, std::vector<double>> grouped_cpp;
     if (grouped_out.size() > 0) {
       Rcpp::CharacterVector names = grouped_out.names();
-      for (size_t i = 0; i < grouped_out.size(); i++) {
+      for (R_xlen_t i = 0; i < grouped_out.size(); i++) {
         std::string key = Rcpp::as<std::string>(names[i]);
         Rcpp::NumericVector vec =
             grouped_out[i];  // each element is a numeric vector
         std::vector<double> vec_std(vec.size());
-        for (size_t j = 0; j < vec.size(); j++) {
+        for (R_xlen_t j = 0; j < vec.size(); j++) {
           vec_std[j] = vec[j];
         }
         grouped_cpp[key] = vec_std;
