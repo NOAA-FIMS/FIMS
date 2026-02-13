@@ -548,7 +548,6 @@ class CAAEvaluateTestFixture : public testing::Test {
       derived_quantities["lengthcomp_expected"] =
           fims::Vector<double>(fleet->n_years * fleet->n_lengths);
 
-
       if (fleet->log_q.size() == 0) {
         fleet->log_q.resize(1);
         fleet->log_q[0] = static_cast<double>(0.0);
