@@ -310,7 +310,7 @@ class PopulationInterface : public PopulationInterfaceBase {
     // only define ages if n_ages greater than 0
     if (this->n_ages.get() > 0) {
       population->n_ages = this->n_ages.get();
-      if (this->n_ages.get() == this->ages.size()) {
+      if (static_cast<size_t>(this->n_ages.get()) == this->ages.size()) {
         population->ages.resize(this->n_ages.get());
       } else {
         warning("The ages vector is not of size n_ages.");
@@ -327,7 +327,7 @@ class PopulationInterface : public PopulationInterfaceBase {
     population->maturity_id = this->maturity_id.get();
     population->log_M.resize(this->log_M.size());
 
-    if (this->log_f_multiplier.size() == (this->n_years.get())) {
+    if (this->log_f_multiplier.size() == static_cast<size_t>(this->n_years.get())) {
       population->log_f_multiplier.resize(this->log_f_multiplier.size());
     } else {
       FIMS_WARNING_LOG(
@@ -341,7 +341,7 @@ class PopulationInterface : public PopulationInterfaceBase {
       population->log_f_multiplier.resize(this->log_f_multiplier.size());
     }
 
-    if (this->spawning_biomass_ratio.size() == ((this->n_years.get() + 1))) {
+    if (this->spawning_biomass_ratio.size() == static_cast<size_t>(this->n_years.get() + 1)) {
       population->spawning_biomass_ratio.resize(
           this->spawning_biomass_ratio.size());
     } else {
@@ -414,7 +414,7 @@ class PopulationInterface : public PopulationInterfaceBase {
     }
     info->variable_map[this->log_init_naa.id_m] = &(population)->log_init_naa;
 
-    for (int i = 0; i < ages.size(); i++) {
+    for (size_t i = 0; i < ages.size(); i++) {
       population->ages[i] = this->ages[i];
     }
 
