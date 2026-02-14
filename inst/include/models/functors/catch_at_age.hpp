@@ -13,6 +13,21 @@
 
 #include "fishery_model_base.hpp"
 
+// Dictionary block for shared parameter snippet documentations.
+// Referenced in function docs via @snippet{doc} this snippet_id.
+// [param_population]
+@param population Shared pointer to the population object.
+// [param_population]
+// [param_i_age_year]
+@param i_age_year Dimension folded index for age and year.
+// [param_i_age_year]
+// [param_year]
+@param year Year index.
+// [param_year]
+// [param_age]
+@param age Age index.
+// [param_age]
+
 namespace fims_popdy {
 
 template <typename Type>
@@ -369,10 +384,10 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * Z_{a,y} = M_{a,y} + F_{a,y}
    * \f]
    *
-   * @param population Shared pointer to the population object.
-   * @param i_age_year Dimension folded index for age and year.
-   * @param year Year index.
-   * @param age Age index.
+   * @snippet{doc} this param_population
+   * @snippet{doc} this param_i_age_year
+   * @snippet{doc} this param_year
+   * @snippet{doc} this param_age
    */
   void CalculateMortality(
       std::shared_ptr<fims_popdy::Population<Type>> &population,
