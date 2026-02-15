@@ -327,7 +327,8 @@ class PopulationInterface : public PopulationInterfaceBase {
     population->maturity_id = this->maturity_id.get();
     population->log_M.resize(this->log_M.size());
 
-    if (this->log_f_multiplier.size() == static_cast<size_t>(this->n_years.get())) {
+    if (this->log_f_multiplier.size() ==
+        static_cast<size_t>(this->n_years.get())) {
       population->log_f_multiplier.resize(this->log_f_multiplier.size());
     } else {
       FIMS_WARNING_LOG(
@@ -341,7 +342,8 @@ class PopulationInterface : public PopulationInterfaceBase {
       population->log_f_multiplier.resize(this->log_f_multiplier.size());
     }
 
-    if (this->spawning_biomass_ratio.size() == static_cast<size_t>(this->n_years.get() + 1)) {
+    if (this->spawning_biomass_ratio.size() ==
+        static_cast<size_t>(this->n_years.get() + 1)) {
       population->spawning_biomass_ratio.resize(
           this->spawning_biomass_ratio.size());
     } else {
