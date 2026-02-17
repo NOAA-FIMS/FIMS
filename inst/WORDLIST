@@ -98,6 +98,7 @@ ComputeProportions
 ConfigurePopulationModel
 Const
 ConstraintWorks
+coreutils
 CppAD
 CreateFleetObjects
 CreateModel
@@ -168,6 +169,7 @@ FIMSLog
 FIMSMath
 FIMSObject
 FIMSRcppInterfaceBase
+findutils
 FIXME
 FMort
 FUNC
