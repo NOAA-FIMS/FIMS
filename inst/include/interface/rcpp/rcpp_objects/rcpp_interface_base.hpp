@@ -225,7 +225,7 @@ class ParameterVector {
   ParameterVector(Rcpp::NumericVector x, size_t size) {
     this->id_m = ParameterVector::id_g++;
     this->storage_m = std::make_shared<std::vector<Parameter>>();
-    // Use std::min to avoid signedness comparison warning
+    // Use std::min to avoid comparing signed and unsigned types
     size_t n = std::min(static_cast<size_t>(x.size()), size);
     this->storage_m->resize(n);
     for (size_t i = 0; i < n; i++) {
