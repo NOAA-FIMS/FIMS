@@ -250,8 +250,8 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * N_{a,0} = \exp(\log N_{a,0})
    * \f]
    *
-   * @param population Shared pointer to the population object.
-   * @param i_age_year Dimension folded index for age and year.
+   * @snippet{doc} this param_population
+   * @snippet{doc} this param_i_age_year
    * @param a Age index.
    */
   void CalculateInitialNumbersAA(
@@ -281,10 +281,10 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * N_{A,y} = N_{A,y} + N_{A,y-1} \exp(-Z_{A,y-1})
    * \f]
    *
-   * @param population Shared pointer to the population object.
-   * @param i_age_year Dimension folded index for age and year.
+   * @snippet{doc} this param_population
+   * @snippet{doc} this param_i_age_year
    * @param i_agem1_yearm1 Dimension folded index for age-1 and year-1.
-   * @param age Age index.
+   * @snippet{doc} this param_age
    */
   void CalculateNumbersAA(
       std::shared_ptr<fims_popdy::Population<Type>> &population,
@@ -324,10 +324,10 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * N^U_{A,y} = N^U_{A,y} + N^U_{A,y-1} \exp(-M_{A,y-1})
    * \f]
    *
-   * @param population Shared pointer to the population object.
-   * @param i_age_year Dimension folded index for age and year.
+   * @snippet{doc} this param_population
+   * @snippet{doc} this param_i_age_year
    * @param i_agem1_yearm1 Dimension folded index for age-1 and year-1.
-   * @param age Age index.
+   * @snippet{doc} this param_age
    */
   void CalculateUnfishedNumbersAA(
       std::shared_ptr<fims_popdy::Population<Type>> &population,
@@ -412,10 +412,10 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * B_y \mathrel{+}= N_{a,y} \times w_a
    * \f]
    *
-   * @param population Shared pointer to the population object.
-   * @param i_age_year Dimension folded index for age and year.
-   * @param year The year biomass is being aggregated for.
-   * @param age The age whose biomass is being added into total biomass.
+   * @snippet{doc} this param_population
+   * @snippet{doc} this param_i_age_year
+   * @snippet{doc} this param_year
+   * @snippet{doc} this param_age
    */
   void CalculateBiomass(
       std::shared_ptr<fims_popdy::Population<Type>> &population,
@@ -436,10 +436,10 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * B^U_y \mathrel{+}= N^U_{a,y} \times w_a
    * \f]
    *
-   * @param population Shared pointer to the population object.
-   * @param i_age_year Dimension folded index for age and year.
-   * @param year The year of unfished biomass to add.
-   * @param age The age of unfished biomass to add.
+   * @snippet{doc} this param_population
+   * @snippet{doc} this param_i_age_year
+   * @snippet{doc} this param_year
+   * @snippet{doc} this param_age
    */
   void CalculateUnfishedBiomass(
       std::shared_ptr<fims_popdy::Population<Type>> &population,
@@ -463,11 +463,10 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * p_{mature,a}
    * \f]
    *
-   * @param population Shared pointer to the population object.
-   * @param i_age_year Dimension folded index for age and year.
-   * @param year The year spawning biomass is being aggregated for.
-   * @param age The age whose biomass is being added into total spawning
-   * biomass.
+   * @snippet{doc} this param_population
+   * @snippet{doc} this param_i_age_year
+   * @snippet{doc} this param_year
+   * @snippet{doc} this param_age
    */
   void CalculateSpawningBiomass(
       std::shared_ptr<fims_popdy::Population<Type>> &population,
@@ -491,10 +490,10 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * p_{mature,a}
    * \f]
    *
-   * @param population Shared pointer to the population object.
-   * @param i_age_year Dimension folded index for age and year.
-   * @param year The year of unfished spawning biomass to add.
-   * @param age The age of unfished spawning biomass to add.
+   * @snippet{doc} this param_population
+   * @snippet{doc} this param_i_age_year
+   * @snippet{doc} this param_year
+   * @snippet{doc} this param_age
    */
   void CalculateUnfishedSpawningBiomass(
       std::shared_ptr<fims_popdy::Population<Type>> &population,
@@ -521,8 +520,8 @@ class CatchAtAge : public FisheryModelBase<Type> {
    *
    * The result is stored in the population's spawning_biomass_ratio vector.
    *
-   * @param population Shared pointer to the population object.
-   * @param year Index of the year for which to calculate the ratio.
+   * @snippet{doc} this param_population
+   * @snippet{doc} this param_year
    */
   void CalculateSpawningBiomassRatio(
       std::shared_ptr<fims_popdy::Population<Type>> &population, size_t year) {
@@ -552,7 +551,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * N_A = \frac{N_{A-1} \times \exp(-M_{A-1})}{1 - \exp(-M_A)}
    * \f]
    *
-   * @param population Shared pointer to the population object.
+   * @snippet{doc} this param_population
    * @return Type
    */
   Type CalculateSBPR0(
@@ -603,9 +602,9 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * Where \f$f()\f$ evaluates mean recruitment based on spawning biomass and
    * \f$\phi_0\f$, and \f$g(y-1)\f$ evaluates recruitment deviations.
    *
-   * @param population Shared pointer to the population object.
-   * @param i_age_year Dimension folded index for age and year.
-   * @param year The year recruitment is being calculated for.
+   * @snippet{doc} this param_population
+   * @snippet{doc} this param_i_age_year
+   * @snippet{doc} this param_year
    * @param i_dev Index to log_recruit_dev of vector length n_years-1.
    */
   void CalculateRecruitment(
@@ -646,9 +645,9 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * p_{mature,a} = \text{maturity}(a)
    * \f]
    *
-   * @param population Shared pointer to the population object.
-   * @param i_age_year Dimension folded index for age and year.
-   * @param age The age of maturity.
+   * @snippet{doc} this param_population
+   * @snippet{doc} this param_i_age_year
+   * @snippet{doc} this param_age
    */
   void CalculateMaturityAA(
       std::shared_ptr<fims_popdy::Population<Type>> &population,
@@ -679,9 +678,9 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * - \f$CW_{f,a,y}\f$, \f$C_{f,a,y}\f$ are catch weight and numbers for fleet
    * \f$f\f$ at age \f$a\f$ in year \f$y\f$.
    *
-   * @param population Shared pointer to the population object.
-   * @param year The year of expected total landings.
-   * @param age The age of landings that is being added into total landings.
+   * @snippet{doc} this param_population
+   * @snippet{doc} this param_year
+   * @snippet{doc} this param_age
    */
   void CalculateLandings(
       std::shared_ptr<fims_popdy::Population<Type>> &population, size_t year,
@@ -722,9 +721,9 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * where \f$CW_{f,a,y}\f$ is the catch weight for fleet \f$f\f$ at age
    * \f$a\f$ in year \f$y\f$.
    *
-   * @param population Shared pointer to the population object.
-   * @param year The year of expected landings weight at age.
-   * @param age The age of expected landings weight at age.
+   * @snippet{doc} this param_population
+   * @snippet{doc} this param_year
+   * @snippet{doc} this param_age
    */
   void CalculateLandingsWeightAA(
       std::shared_ptr<fims_popdy::Population<Type>> &population, size_t year,
@@ -761,10 +760,10 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * - \f$N_{a,y}\f$ is the number of individuals at age \f$a\f$ and year
    * \f$y\f$
    *
-   * @param population Shared pointer to the population object.
-   * @param i_age_year Dimension folded index for age and year.
-   * @param year The year expected landings composition is being calculated for.
-   * @param age The age composition is being calculated for.
+   * @snippet{doc} this param_population
+   * @snippet{doc} this param_i_age_year
+   * @snippet{doc} this param_year
+   * @snippet{doc} this param_age
    */
   void CalculateLandingsNumbersAA(
       std::shared_ptr<fims_popdy::Population<Type>> &population,
@@ -807,10 +806,10 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * - \f$IWAA_{a,y}\f$ is the index weight at age \f$a\f$ in year \f$y\f$
    * - \f$INAA_{a,y}\f$ is the index numbers at age \f$a\f$ in year \f$y\f$
    *
-   * @param population Shared pointer to the population object.
-   * @param i_age_year Dimension-folded index for age and year.
-   * @param year The year of the population index.
-   * @param age The age of the index being added to the population index.
+   * @snippet{doc} this param_population
+   * @snippet{doc} this param_i_age_year
+   * @snippet{doc} this param_year
+   * @snippet{doc} this param_age
    */
   void CalculateIndex(std::shared_ptr<fims_popdy::Population<Type>> &population,
                       size_t i_age_year, size_t year, size_t age) {
@@ -846,10 +845,10 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * \f[ I_{f,a,y} \mathrel{+}= S_{f,y}(a) \times N_{a,y} \times
    * e^{(-t_{y}Z_{a,y})}\f]
    *
-   * @param population Shared pointer to the population object.
-   * @param i_age_year Dimension folded index for age and year.
-   * @param year The year the expected index is being calculated for.
-   * @param age The age index is being calculated for.
+   * @snippet{doc} this param_population
+   * @snippet{doc} this param_i_age_year
+   * @snippet{doc} this param_year
+   * @snippet{doc} this param_age
    */
   void CalculateIndexNumbersAA(
       std::shared_ptr<fims_popdy::Population<Type>> &population,
@@ -882,9 +881,9 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * where \f$IWAA_{f,a,y}\f$ is the index weight for fleet \f$f\f$ at age
    * \f$a\f$ in year \f$y\f$.
    *
-   * @param population Shared pointer to the population object.
-   * @param year The year of expected index weight at age.
-   * @param age The age of expected index weight at age.
+   * @snippet{doc} this param_population
+   * @snippet{doc} this param_year
+   * @snippet{doc} this param_age
    */
   void CalculateIndexWeightAA(
       std::shared_ptr<fims_popdy::Population<Type>> &population, size_t year,
