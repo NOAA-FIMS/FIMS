@@ -98,7 +98,6 @@ ComputeProportions
 ConfigurePopulationModel
 Const
 ConstraintWorks
-coreutils
 CppAD
 CreateFleetObjects
 CreateModel
@@ -169,7 +168,6 @@ FIMSLog
 FIMSMath
 FIMSObject
 FIMSRcppInterfaceBase
-findutils
 FIXME
 FMort
 FUNC
@@ -557,6 +555,7 @@ containsNA
 conventionalcommits
 conversiondouble
 copydoc
+coreutils
 cout
 cov
 covr
@@ -658,6 +657,7 @@ filesystem
 fims
 fimsfit
 fimsframe
+findutils
 firstname
 fishres
 fmort
