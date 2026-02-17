@@ -13,20 +13,21 @@
 
 #include "fishery_model_base.hpp"
 
-// Dictionary block for shared parameter snippet documentations.
-// Referenced in function docs via @snippet{doc} this snippet_id.
-// [param_population]
-@param population Shared pointer to the population object.
-// [param_population]
-// [param_i_age_year]
-@param i_age_year Dimension folded index for age and year.
-// [param_i_age_year]
-// [param_year]
-@param year Year index.
-// [param_year]
-// [param_age]
-@param age Age index.
-// [param_age]
+/* Dictionary block for shared parameter snippet documentations.
+ * Referenced in function docs via @snippet{doc} this snippet_id.
+ * [param_population]
+ * @param population Shared pointer to the population object.
+ * [param_population]
+ * [param_i_age_year]
+ * @param i_age_year Dimension folded index for age and year.
+ * [param_i_age_year]
+ * [param_year]
+ * @param year Year index.
+ * [param_year]
+ * [param_age]
+ * @param age Age index.
+ * [param_age]
+ */
 
 namespace fims_popdy {
 
