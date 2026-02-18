@@ -255,7 +255,7 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
         }
       }
 
-      for (R_xlen_t i = 0; i < this->log_devs.size(); i++) {
+      for (size_t i = 0; i < this->log_devs.size(); i++) {
         if (this->log_devs[i].estimation_type_m.get() == "constant") {
           this->log_devs[i].final_value_m = this->log_devs[i].initial_value_m;
         } else {
@@ -263,7 +263,7 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
         }
       }
 
-      for (R_xlen_t i = 0; i < this->log_r.size(); i++) {
+      for (size_t i = 0; i < this->log_r.size(); i++) {
         if (this->log_r[i].estimation_type_m.get() == "constant") {
           this->log_r[i].final_value_m = this->log_r[i].initial_value_m;
         } else {
@@ -448,7 +448,7 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
     info->variable_map[this->log_r.id_m] = &(recruitment)->log_r;
     // set log_expected_recruitment
     recruitment->log_expected_recruitment.resize(this->n_years.get() + 1);
-    for (size_t i = 0; i < this->n_years.get() + 1; i++) {
+    for (size_t i = 0; i < static_cast<size_t>(this->n_years.get() + 1); i++) {
       recruitment->log_expected_recruitment[i] = 0;
     }
     info->variable_map[this->log_expected_recruitment.id_m] =

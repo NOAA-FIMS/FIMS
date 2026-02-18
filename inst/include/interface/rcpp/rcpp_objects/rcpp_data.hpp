@@ -165,12 +165,12 @@ class AgeCompDataInterface : public DataInterfaceBase {
     ss << "  \"header\": [" << "\"n_ages\", \"n_years\"" << "],\n";
     ss << "  \"dimensions\": [" << amax << ", " << ymax << "]\n},\n";
     ss << " \"value\": [";
-    for (R_xlen_t i = 0; i < age_comp_data.size() - 1; i++) {
+    for (size_t i = 0; i < age_comp_data.size() - 1; i++) {
       ss << age_comp_data[i] << ", ";
     }
     ss << age_comp_data[age_comp_data.size() - 1] << "],\n";
     ss << "\"uncertainty\":[ ";
-    for (R_xlen_t i = 0; i < uncertainty.size() - 1; i++) {
+    for (size_t i = 0; i < uncertainty.size() - 1; i++) {
       ss << uncertainty[i] << ", ";
     }
     ss << uncertainty[uncertainty.size() - 1] << "]\n";
@@ -305,12 +305,12 @@ class LengthCompDataInterface : public DataInterfaceBase {
     ss << "  \"header\": [" << "\"n_lengths\", \"n_years\"" << "],\n";
     ss << "  \"dimensions\": [" << lmax << ", " << ymax << "]\n},\n";
     ss << " \"value\": [";
-    for (R_xlen_t i = 0; i < length_comp_data.size() - 1; i++) {
+    for (size_t i = 0; i < length_comp_data.size() - 1; i++) {
       ss << length_comp_data[i] << ", ";
     }
     ss << length_comp_data[length_comp_data.size() - 1] << "],\n";
     ss << "\"uncertainty\": [ ";
-    for (R_xlen_t i = 0; i < uncertainty.size() - 1; i++) {
+    for (size_t i = 0; i < uncertainty.size() - 1; i++) {
       ss << uncertainty[i] << ", ";
     }
     ss << uncertainty[uncertainty.size() - 1] << "]\n";
@@ -432,12 +432,12 @@ class IndexDataInterface : public DataInterfaceBase {
     ss << "  \"header\": [" << "\"n_years\"" << "],\n";
     ss << "  \"dimensions\": [" << ymax << "]\n},\n";
     ss << " \"value\": [";
-    for (R_xlen_t i = 0; i < index_data.size() - 1; i++) {
+    for (size_t i = 0; i < index_data.size() - 1; i++) {
       ss << index_data[i] << ", ";
     }
     ss << index_data[index_data.size() - 1] << "],\n";
     ss << "\"uncertainty\": [ ";
-    for (R_xlen_t i = 0; i < uncertainty.size() - 1; i++) {
+    for (size_t i = 0; i < uncertainty.size() - 1; i++) {
       ss << uncertainty[i] << ", ";
     }
     ss << uncertainty[uncertainty.size() - 1] << "]\n";
@@ -560,12 +560,12 @@ class LandingsDataInterface : public DataInterfaceBase {
     ss << "  \"header\": [" << "\"n_years\"" << "],\n";
     ss << "  \"dimensions\": [" << ymax << "]\n},\n";
     ss << " \"value\": [";
-    for (R_xlen_t i = 0; i < landings_data.size() - 1; i++) {
+    for (size_t i = 0; i < landings_data.size() - 1; i++) {
       ss << landings_data[i] << ", ";
     }
     ss << landings_data[landings_data.size() - 1] << "],\n";
     ss << "\"uncertainty\": [ ";
-    for (R_xlen_t i = 0; i < uncertainty.size() - 1; i++) {
+    for (size_t i = 0; i < uncertainty.size() - 1; i++) {
       ss << uncertainty[i] << ", ";
     }
     ss << uncertainty[uncertainty.size() - 1] << "]\n";

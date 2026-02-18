@@ -516,7 +516,7 @@ class FleetInterface : public FleetInterfaceBase {
           this->age_to_length_conversion.size());
 
       if (this->age_to_length_conversion.size() !=
-          (this->n_ages.get() * this->n_lengths.get())) {
+          static_cast<size_t>(this->n_ages.get() * this->n_lengths.get())) {
         FIMS_ERROR_LOG(
             "age_to_length_conversion don't match, " +
             fims::to_string(this->age_to_length_conversion.size()) + " != " +

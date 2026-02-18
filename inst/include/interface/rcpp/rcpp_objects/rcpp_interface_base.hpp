@@ -223,17 +223,18 @@ class ParameterVector {
    * @param size The number of elements to copy over.
    */
   ParameterVector(Rcpp::NumericVector x, size_t size) {
-    if (x.size() < size) {
+    this->id_m = ParameterVector::id_g++;
+    this->storage_m = std::make_shared<std::vector<Parameter>>();
+    // Use std::min to avoid comparing signed and unsigned types
+    size_t n = std::min(static_cast<size_t>(x.size()), size);
+    this->storage_m->resize(n);
+    for (size_t i = 0; i < n; i++) {
+      storage_m->at(i).initial_value_m = x[i];
+    }
+    if (static_cast<size_t>(x.size()) < size) {
       throw std::invalid_argument(
           "Error in call to ParameterVector(Rcpp::NumericVector x, size_t "
           "size): x.size() < size argument.");
-    } else {
-      this->id_m = ParameterVector::id_g++;
-      this->storage_m = std::make_shared<std::vector<Parameter>>();
-      this->storage_m->resize(size);
-      for (size_t i = 0; i < size; i++) {
-        storage_m->at(i).initial_value_m = x[i];
-      }
     }
   }
 
@@ -476,10 +477,7 @@ class RealVector {
   RealVector(Rcpp::NumericVector x, size_t size) {
     this->id_m = RealVector::id_g++;
     this->storage_m = std::make_shared<std::vector<double>>();
-    this->resize(x.size());
-    for (size_t i = 0; i < x.size(); i++) {
-      storage_m->at(i) = x[i];
-    }
+    this->storage_m->assign(x.begin(), x.end());
   }
 
   /**
@@ -508,10 +506,7 @@ class RealVector {
    * @return RealVector&
    */
   RealVector& operator=(const Rcpp::NumericVector& v) {
-    this->storage_m->resize(v.size());
-    for (size_t i = 0; i < v.size(); i++) {
-      storage_m->at(i) = v[i];
-    }
+    this->storage_m->assign(v.begin(), v.end());
     return *this;
   }
 
