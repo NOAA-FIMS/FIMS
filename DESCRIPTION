@@ -102,8 +102,8 @@ VignetteBuilder:
     knitr
 Remotes: 
     github::ThinkR-open/lozen,
-    github::ThinkR-open/testdown,
-    url::https://noaa-fisheries-integrated-toolbox.r-universe.dev/src/contrib/stockplotr_0.7.0.tar.gz
+    github::ThinkR-open/testdown
+Additional_repositories: https://noaa-fisheries-integrated-toolbox.r-universe.dev
 Config/testthat/edition: 3
 Config/testthat/parallel: false
 Encoding: UTF-8
