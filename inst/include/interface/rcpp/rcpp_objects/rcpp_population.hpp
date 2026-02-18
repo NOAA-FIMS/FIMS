@@ -313,7 +313,7 @@ class PopulationInterface : public PopulationInterfaceBase {
       if (static_cast<size_t>(this->n_ages.get()) == this->ages.size()) {
         population->ages.resize(this->n_ages.get());
       } else {
-        Rcpp::warning("The ages vector is not of size n_ages.");
+        warning("The ages vector is not of size n_ages.");
       }
     }
 
