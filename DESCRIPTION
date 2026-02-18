@@ -101,6 +101,7 @@ LinkingTo:
 VignetteBuilder:
     knitr
 Remotes: 
+    github::nmfs-ost/stockplotr,
     github::ThinkR-open/lozen,
     github::ThinkR-open/testdown
 Additional_repositories: https://noaa-fisheries-integrated-toolbox.r-universe.dev
