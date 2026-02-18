@@ -258,7 +258,7 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
                                       Rcpp::IntegerVector ids) {
     this->input_type_m.set(input_type);
     this->key_m->resize(ids.size());
-    for (int i = 0; i < ids.size(); i++) {
+    for (R_xlen_t i = 0; i < ids.size(); i++) {
       this->key_m->at(i) = ids[i];
     }
     return true;
@@ -350,7 +350,7 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
         this->x.resize(nx);
       }
 
-      for (R_xlen_t i = 0; i < this->lpdf_vec.size(); i++) {
+      for (size_t i = 0; i < this->lpdf_vec.size(); i++) {
         this->lpdf_vec[i] = dnorm->report_lpdf_vec[i];
         this->expected_values[i].final_value_m = dnorm->get_expected(i);
         this->x[i].final_value_m = dnorm->get_observed(i);
@@ -381,7 +381,7 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
     if (this->lpdf_vec.size() == 0) {
       ss << "],\n";
     } else {
-      for (R_xlen_t i = 0; i < this->lpdf_vec.size() - 1; i++) {
+      for (size_t i = 0; i < this->lpdf_vec.size() - 1; i++) {
         ss << this->value_to_string(this->lpdf_vec[i]);
         ss << ", ";
       }
@@ -393,7 +393,7 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
     if (this->expected_values.size() == 0) {
       ss << "],\n";
     } else {
-      for (R_xlen_t i = 0; i < this->expected_values.size() - 1; i++) {
+      for (size_t i = 0; i < this->expected_values.size() - 1; i++) {
         ss << this->value_to_string(this->expected_values[i].final_value_m)
            << ", ";
       }
@@ -406,7 +406,7 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
     if (this->x.size() == 0) {
       ss << "]\n";
     } else {
-      for (R_xlen_t i = 0; i < this->x.size() - 1; i++) {
+      for (size_t i = 0; i < this->x.size() - 1; i++) {
         ss << this->x[i].final_value_m << ", ";
       }
       ss << this->x[this->x.size() - 1].final_value_m << "]\n";
@@ -588,7 +588,7 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
                                       Rcpp::IntegerVector ids) {
     this->input_type_m.set(input_type);
     this->key_m->resize(ids.size());
-    for (int i = 0; i < ids.size(); i++) {
+    for (R_xlen_t i = 0; i < ids.size(); i++) {
       this->key_m->at(i) = ids[i];
     }
     return true;
@@ -667,7 +667,7 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
         size_t nx = dlnorm->get_n_x();
         this->x.resize(nx);
       }
-      for (R_xlen_t i = 0; i < this->lpdf_vec.size(); i++) {
+      for (size_t i = 0; i < this->lpdf_vec.size(); i++) {
         this->lpdf_vec[i] = dlnorm->report_lpdf_vec[i];
         this->expected_values[i].final_value_m = dlnorm->get_expected(i);
         this->x[i].final_value_m = dlnorm->get_observed(i);
@@ -698,7 +698,7 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
     if (this->lpdf_vec.size() == 0) {
       ss << "]\n";
     } else {
-      for (R_xlen_t i = 0; i < this->lpdf_vec.size() - 1; i++) {
+      for (size_t i = 0; i < this->lpdf_vec.size() - 1; i++) {
         ss << this->value_to_string(this->lpdf_vec[i]) << ", ";
       }
       ss << this->value_to_string(this->lpdf_vec[this->lpdf_vec.size() - 1]);
@@ -709,7 +709,7 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
     if (this->expected_values.size() == 0) {
       ss << "],\n";
     } else {
-      for (R_xlen_t i = 0; i < this->expected_values.size() - 1; i++) {
+      for (size_t i = 0; i < this->expected_values.size() - 1; i++) {
         ss << this->value_to_string(this->expected_values[i].final_value_m)
            << ", ";
       }
@@ -723,7 +723,7 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
     if (this->x.size() == 0) {
       ss << "]\n";
     } else {
-      for (R_xlen_t i = 0; i < this->x.size() - 1; i++) {
+      for (size_t i = 0; i < this->x.size() - 1; i++) {
         ss << this->x[i].final_value_m << ", ";
       }
       ss << this->x[this->x.size() - 1].final_value_m << "]\n";
@@ -889,7 +889,7 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
                                       Rcpp::IntegerVector ids) {
     this->input_type_m.set(input_type);
     this->key_m->resize(ids.size());
-    for (int i = 0; i < ids.size(); i++) {
+    for (R_xlen_t i = 0; i < ids.size(); i++) {
       this->key_m->at(i) = ids[i];
     }
     return true;
@@ -961,7 +961,7 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
       if (this->x.size() != nx) {
         this->x.resize(nx);
       }
-      for (R_xlen_t i = 0; i < this->lpdf_vec.size(); i++) {
+      for (size_t i = 0; i < this->lpdf_vec.size(); i++) {
         this->lpdf_vec[i] = dmultinom->report_lpdf_vec[i];
         this->expected_values[i].final_value_m = dmultinom->get_expected(i);
         if (dmultinom->input_type != "data") {
@@ -1005,7 +1005,7 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
     if (this->lpdf_vec.size() == 0) {
       ss << "],\n";
     } else {
-      for (R_xlen_t i = 0; i < this->lpdf_vec.size() - 1; i++) {
+      for (size_t i = 0; i < this->lpdf_vec.size() - 1; i++) {
         ss << this->value_to_string(this->lpdf_vec[i]);
         ss << ", ";
       }
@@ -1017,7 +1017,7 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
     if (this->expected_values.size() == 0) {
       ss << "],\n";
     } else {
-      for (R_xlen_t i = 0; i < this->expected_values.size() - 1; i++) {
+      for (size_t i = 0; i < this->expected_values.size() - 1; i++) {
         ss << this->value_to_string(this->expected_values[i].final_value_m)
            << ", ";
       }
@@ -1031,7 +1031,7 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
     if (this->x.size() == 0) {
       ss << "]\n";
     } else {
-      for (R_xlen_t i = 0; i < this->x.size() - 1; i++) {
+      for (size_t i = 0; i < this->x.size() - 1; i++) {
         ss << this->x[i].final_value_m << ", ";
       }
       ss << this->x[this->x.size() - 1].final_value_m << "]\n";
