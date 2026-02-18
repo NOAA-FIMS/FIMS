@@ -101,9 +101,10 @@ LinkingTo:
 VignetteBuilder:
     knitr
 Remotes: 
-    github::nmfs-ost/stockplotr,
     github::ThinkR-open/lozen,
     github::ThinkR-open/testdown
+AdditionalRepositories:
+    Runiverse = "https://noaa-fisheries-integrated-toolbox.r-universe.dev"
 Config/testthat/edition: 3
 Config/testthat/parallel: false
 Encoding: UTF-8
