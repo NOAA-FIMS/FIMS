@@ -18,7 +18,7 @@ jobs:
   call-workflow:
     uses: NOAA-FIMS/FIMS/.github/workflows/build-pkgdown.yml@main
     with:
-      build_testdown: true
-      build_code_coverage: true
-      # This expression is TRUE only on a push to main
+      # These expressions are TRUE only on a push to main
+      build_testdown: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+      build_code_coverage: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
       is_main_push: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
