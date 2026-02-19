@@ -534,8 +534,8 @@ fit_fims <- function(input,
                      ),
                      filename = NULL) {
   # Convergence thresholds following WHAM criteria
-  MAX_GRADIENT_THRESHOLD <- 1e-6
-  MAX_SE_THRESHOLD <- 100
+  MAX_GRADIENT_THRESHOLD <- 1e-4
+  CONDITION_NUMBER_THRESHOLD <- 1e5
 
   # See issue 455 of sdmTMB to see what should be used.
   # https://github.com/pbs-assess/sdmTMB/issues/455
@@ -587,7 +587,7 @@ fit_fims <- function(input,
       control = control
     )
   )
-  maxgrad0 <- maxgrad <- max(abs(obj$gr(opt$par)))
+  maxgrad0 <- maxgrad <- max(abs(obj$gr(opt[["par"]])))
   if (number_of_loops > 0) {
     cli::cli_inform(c(
       "i" = "Restarting optimizer {number_of_loops} times to improve gradient."
@@ -620,38 +620,67 @@ fit_fims <- function(input,
 
   # Check convergence status
   convergence_issues <- c()
+  convergence_warnings <- c()
 
   # Check 1: nlminb convergence flag
-  if (opt$convergence != 0) {
-    convergence_message <- if (!is.null(opt$message)) {
-      paste0("Convergence code = ", opt$convergence, "; message = ", opt$message)
+  if (opt[["convergence"]] != 0) {
+    convergence_message <- if (!is.null(opt[["message"]])) {
+      paste0("Convergence code = ", opt[["convergence"]], "; message = ", opt[["message"]])
     } else {
-      paste0("Convergence code = ", opt$convergence)
+      paste0("Convergence code = ", opt[["convergence"]])
     }
     convergence_issues <- c(convergence_issues, convergence_message)
-  }
-
-  # Check 2: Maximum gradient threshold
-  if (maxgrad > MAX_GRADIENT_THRESHOLD) {
-    convergence_issues <- c(
-      convergence_issues,
-      paste0(
-        "Maximum gradient (", format(maxgrad, scientific = TRUE),
-        ") exceeds threshold of ", MAX_GRADIENT_THRESHOLD
+  } else {
+    # if optimizer converged, check the gradient to see if it is close enough to zero
+    # Check 2: Maximum gradient threshold (warning only)
+    if (maxgrad > MAX_GRADIENT_THRESHOLD) {
+      convergence_warnings <- c(
+        convergence_warnings,
+        paste0(
+          "Maximum gradient (", format(maxgrad, scientific = TRUE),
+          ") is higher than ", MAX_GRADIENT_THRESHOLD,
+          ". Model may not have fully converged."
+        )
       )
-    )
+      cli::cli_warn(c(
+        "!" = "Maximum gradient check did not pass.",
+        setNames(convergence_warnings, rep("i", length(convergence_warnings))),
+        "i" = "Model fit returned; results may be less reliable if the gradient is too far from zero."
+      ))
+    }
   }
 
-  # Abort if convergence issues found before sdreport
+  # If optimizer did not converge, skip sdreport, warn, and return fit for diagnostics
   if (length(convergence_issues) > 0) {
-    cli::cli_abort(c(
-      "x" = "Optimization failed convergence checks.",
+    cli::cli_warn(c(
+      "x" = "Optimization failed convergence checks (optimizer did not converge).",
       setNames(convergence_issues, rep("i", length(convergence_issues))),
-      "i" = "Consider adjusting control parameters (eval.max, iter.max) or model structure."
+      "i" = "Skipping sdreport. Consider adjusting control parameters (eval.max, iter.max) or model structure.",
+      "i" = "Model fit returned for diagnostic purposes only. Results are not reliable."
     ))
+    timing <- c(
+      time_optimization = time_optimization,
+      time_sdreport = as.difftime(0, units = "secs"),
+      time_total = Sys.time() - t0
+    )
+    fit <- FIMSFit(
+      input = input,
+      obj = obj,
+      opt = opt,
+      sdreport = list(),
+      timing = timing
+    )
+    print(fit)
+    if (!is.null(filename)) {
+      cli::cli_warn(c(
+        "i" = "Saving output to file is not yet implemented."
+      ))
+      # saveRDS(fit, file=file.path(input[["path"]], filename))
+    }
+    return(fit)
   }
 
-  FIMS::set_fixed(opt$par)
+  FIMS::set_fixed(opt[["par"]])
 
   time_sdreport <- NA
   if (get_sd) {
@@ -660,51 +689,135 @@ fit_fims <- function(input,
     cli::cli_inform(c("v" = "Finished sdreport"))
     time_sdreport <- Sys.time() - t2
 
-    # Check sdreport convergence criteria
-    sdreport_issues <- c()
+    issues <- c()
+    warnings <- c()
 
-    # Checks 3 & 4: Validate fixed effects standard errors
+    # Check 3: Hessian is invertible (positive definite) 
+    if(!sdreport[["pdHess"]]){
+      issues <- c(
+        issues,
+        "Hessian is not positive definite."
+      )
+      # Skip further checks if Hessian is not positive definite
+      se_check_result <- list(issues = issues)
+      # Warn and return output early
+      if (length(se_check_result$issues) > 0) {
+        cli::cli_warn(c(
+          "!" = "sdreport convergence issues detected:",
+          setNames(se_check_result$issues, rep("i", length(se_check_result$issues)))
+        ))
+      }
+      # Skip the rest of the sdreport checks
+      timing <- c(
+        time_optimization = time_optimization,
+        time_sdreport = time_sdreport,
+        time_total = Sys.time() - t0
+      )
+      fit <- FIMSFit(
+        input = input,
+        obj = obj,
+        opt = opt,
+        sdreport = sdreport,
+        timing = timing
+      )
+      print(fit)
+      if (!is.null(filename)) {
+        cli::cli_warn(c(
+          "i" = "Saving output to file is not yet implemented."
+        ))
+        # saveRDS(fit, file=file.path(input[["path"]], filename))
+      }
+      return(fit)
+    }
+
+    # Checks 4: Validate standard errors
     # Safely extract fixed effects summary and check for issues
     se_check_result <- tryCatch(
       {
+        se_issues <- c()
+        
         fixed_summary <- summary(sdreport, "fixed")
-        issues <- c()
+       
         if (!is.null(fixed_summary) && nrow(fixed_summary) > 0) {
           std_errors <- fixed_summary[, "Std. Error"]
 
-          # Check 3: Non-NA standard errors
           na_se <- sum(is.na(std_errors))
           if (na_se > 0) {
-            issues <- c(
-              issues,
+            se_issues <- c(
+              se_issues,
               paste0(na_se, " fixed effect(s) have NA standard errors")
             )
           }
+        }
 
-          # Check 4: Standard errors below threshold
-          large_se <- sum(std_errors >= MAX_SE_THRESHOLD, na.rm = TRUE)
-          if (large_se > 0) {
-            issues <- c(
-              issues,
-              paste0(large_se, " fixed effect(s) have standard errors >= ", MAX_SE_THRESHOLD)
+        if(length(obj[["env"]][["random"]]) > 0){
+          random_summary <- summary(sdreport, "random")
+          if (!is.null(random_summary) && nrow(random_summary) > 0) {
+            std_errors <- random_summary[, "Std. Error"]
+
+            na_se <- sum(is.na(std_errors))
+            if (na_se > 0) {
+              se_issues <- c(
+                se_issues,
+                paste0(na_se, " random effect(s) have NA standard errors")
+              )
+            }
+          }
+        }
+
+
+        derived_summary <- summary(sdreport, "report")
+        if (!is.null(derived_summary) && nrow(derived_summary) > 0) {
+          std_errors <- derived_summary[, "Std. Error"]
+
+          na_se <- sum(is.na(std_errors))
+          if (na_se > 0) {
+            se_issues <- c(
+              se_issues,
+              paste0(na_se, " derived value(s) have NA standard errors")
             )
           }
         }
-        issues
+        list(issues = se_issues)
       },
       error = function(e) {
-        # If we can't extract fixed effects summary, note it as an issue
-        c("Unable to extract fixed effects summary from sdreport")
+        list(issues = c("Unable to extract fixed effects summary from sdreport"))
       }
     )
 
-    sdreport_issues <- c(sdreport_issues, se_check_result)
-
-    # Warn if sdreport issues found
-    if (length(sdreport_issues) > 0) {
+    # Check 5: Condition number of covariance matrix (warning)
+    # Safely extract hessian and check condition number
+    hessian_check_result <- tryCatch(
+      {
+        hessian <- as.matrix(obj$he(opt[["par"]]))
+        #Compare condition number to threshold
+        condition_number <- kappa(hessian)
+        if (condition_number > CONDITION_NUMBER_THRESHOLD) {
+          list(warnings = c(
+            paste0("Condition number of Hessian (", format(condition_number, scientific = TRUE),
+            ") exceeds threshold of ", CONDITION_NUMBER_THRESHOLD, 
+            ". Standard errors and MLEs may be unreliable.")
+          ))
+        } else {
+          list(warnings = c())
+        }
+      },
+      error = function(e) {
+        list(warnings = c("Unable to extract Hessian for condition number check"))
+      }
+    ) 
+    
+    # Separate issues and warnings
+    if (length(se_check_result$issues) > 0) {
       cli::cli_warn(c(
         "!" = "sdreport convergence issues detected:",
-        setNames(sdreport_issues, rep("i", length(sdreport_issues)))
+        setNames(se_check_result$issues, rep("i", length(se_check_result$issues)))
+      ))
+    }
+    if (length(hessian_check_result$warnings) > 0) {
+      cli::cli_warn(c(
+        "!" = "Hessian near singularity:",
+        setNames(hessian_check_result$warnings, rep("i", length(hessian_check_result$warnings)))
       ))
     }
   } else {
