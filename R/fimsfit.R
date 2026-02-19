@@ -692,8 +692,8 @@ fit_fims <- function(input,
     issues <- c()
     warnings <- c()
 
-    # Check 3: Hessian is invertible (positive definite) 
-    if(!sdreport[["pdHess"]]){
+    # Check 3: Hessian is invertible (positive definite)
+    if (!sdreport[["pdHess"]]) {
       issues <- c(
         issues,
         "Hessian is not positive definite."
@@ -735,9 +735,9 @@ fit_fims <- function(input,
     se_check_result <- tryCatch(
       {
         se_issues <- c()
-        
+
         fixed_summary <- summary(sdreport, "fixed")
-       
+
         if (!is.null(fixed_summary) && nrow(fixed_summary) > 0) {
           std_errors <- fixed_summary[, "Std. Error"]
 
@@ -750,7 +750,7 @@ fit_fims <- function(input,
           }
         }
 
-        if(length(obj[["env"]][["random"]]) > 0){
+        if (length(obj[["env"]][["random"]]) > 0) {
           random_summary <- summary(sdreport, "random")
           if (!is.null(random_summary) && nrow(random_summary) > 0) {
             std_errors <- random_summary[, "Std. Error"]
@@ -790,13 +790,15 @@ fit_fims <- function(input,
     hessian_check_result <- tryCatch(
       {
         hessian <- as.matrix(obj$he(opt[["par"]]))
-        #Compare condition number to threshold
+        # Compare condition number to threshold
         condition_number <- kappa(hessian)
         if (condition_number > CONDITION_NUMBER_THRESHOLD) {
           list(warnings = c(
-            paste0("Condition number of Hessian (", format(condition_number, scientific = TRUE),
-            ") exceeds threshold of ", CONDITION_NUMBER_THRESHOLD, 
-            ". Standard errors and MLEs may be unreliable.")
+            paste0(
+              "Condition number of Hessian (", format(condition_number, scientific = TRUE),
+              ") exceeds threshold of ", CONDITION_NUMBER_THRESHOLD,
+              ". Standard errors and MLEs may be unreliable."
+            )
           ))
         } else {
           list(warnings = c())
@@ -805,8 +807,8 @@ fit_fims <- function(input,
       error = function(e) {
         list(warnings = c("Unable to extract Hessian for condition number check"))
       }
-    ) 
-    
+    )
+
     # Separate issues and warnings
     if (length(se_check_result$issues) > 0) {
       cli::cli_warn(c(
