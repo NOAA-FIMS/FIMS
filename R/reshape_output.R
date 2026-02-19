@@ -384,7 +384,7 @@ dimensions_to_tibble <- function(data) {
 #' the json that pertains to a distribution, which is often associated with a
 #' data stream. For example, the lognormal distribution can be associated with
 #' landings for a given fleet because those landings might be uncertain.
-#' 
+#'
 #' @details
 #' The raw information, i.e., `data` is a list of unknown dimensions, where the
 #' first element of the list, i.e., `lpdf_value`, is a single numeric value and
@@ -394,7 +394,7 @@ dimensions_to_tibble <- function(data) {
 #' regular expression matching. Thus, when `data` does not have an entry for
 #' `log_sd_values` the function does not fail but will return a smaller tibble
 #' than normal.
-#' 
+#'
 #' It is imperative that each list element of `data` be of length one or the
 #' exact same length as the other elements. There is an internal check in the
 #' function for this consistency.
