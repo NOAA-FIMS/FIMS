@@ -649,7 +649,7 @@
       318           NA NA         1    11       NA NA               7 derived_quantity
       319           NA NA         1    12       NA NA              25 derived_quantity
       320           NA NA         2     1       NA NA              21 derived_quantity
-          distribution input_type  lpdf log_sd_values
+          distribution input_type  lpdf lod_sd
           <chr>        <chr>      <dbl>         <dbl>
         1 <NA>         <NA>         NA             NA
         2 <NA>         <NA>         NA             NA
@@ -1625,7 +1625,7 @@
       318           NA NA         1    11       NA NA               7 derived_quantity
       319           NA NA         1    12       NA NA              25 derived_quantity
       320           NA NA         2     1       NA NA              21 derived_quantity
-          distribution input_type  lpdf log_sd_values
+          distribution input_type  lpdf lod_sd
           <chr>        <chr>      <dbl>         <dbl>
         1 <NA>         <NA>         NA             NA
         2 <NA>         <NA>         NA             NA

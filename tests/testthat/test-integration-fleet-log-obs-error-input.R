@@ -48,8 +48,8 @@ test_that("`log_obs_error scalar` works with correct inputs", {
     dplyr::select(value)
 
   log_sd_output <- json_estimates |>
-    dplyr::filter(module_id == 1 & !is.na(log_sd_values)) |>
-    dplyr::pull(log_sd_values)
+    dplyr::filter(module_id == 1 & !is.na(lod_sd)) |>
+    dplyr::pull(lod_sd)
 
   for (i in seq_along(log_sd_output)) {
     expect_equal(
@@ -78,8 +78,8 @@ test_that("`log_obs_error scalar` works with correct inputs", {
     dplyr::select(value)
 
   log_sd_output <- json_estimates |>
-    dplyr::filter(module_id == 1 & !is.na(log_sd_values)) |>
-    dplyr::pull(log_sd_values)
+    dplyr::filter(module_id == 1 & !is.na(lod_sd)) |>
+    dplyr::pull(lod_sd)
 
   for (i in seq_along(log_sd_output)) {
     expect_equal(log_sd_input$value, log_sd_output[i])
