@@ -555,7 +555,7 @@ class RealVector {
   /**
    * @brief The accessor where the first index starts at one. This function is
    * for calling accessing from R.
-   * @param pos The position of the ParameterVector that you want returned.
+   * @param pos The position of the RealVector that you want returned.
    */
   SEXP at(R_xlen_t pos) {
     if (static_cast<size_t>(pos) == 0 ||
@@ -631,6 +631,216 @@ class RealVector {
   }
 };
 uint32_t RealVector::id_g = 0;
+
+/**
+ * @brief An Rcpp interface class that defines the IntVector class.
+ *
+ * @details An Rcpp interface class that defines the interface between R and
+ * C++ for an integer vector type. Underlying values are held in a shared pointer
+ * and are carried over to any copies of this vector.
+ */
+class IntVector {
+ public:
+  /**
+   * @brief The static ID of the IntVector object.
+   */
+  static uint32_t id_g;
+  /**
+   * @brief integer storage.
+   */
+  std::shared_ptr<std::vector<int>> storage_m;
+  /**
+   * @brief The local ID of the IntVector object.
+   */
+  uint32_t id_m;
+
+  /**
+   * @brief The constructor.
+   */
+  IntVector() {
+    this->id_m = IntVector::id_g++;
+    this->storage_m = std::make_shared<std::vector<int>>();
+    this->storage_m->resize(1);
+  }
+
+  /**
+   * @brief The constructor.
+   */
+  IntVector(const IntVector& other)
+      : storage_m(other.storage_m), id_m(other.id_m) {}
+
+  /**
+   * @brief The constructor.
+   */
+  IntVector(size_t size) {
+    this->id_m = IntVector::id_g++;
+    this->storage_m = std::make_shared<std::vector<int>>();
+    this->storage_m->resize(size);
+  }
+
+  /**
+   * @brief The constructor for initializing an integer vector.
+   * @param x A numeric vector.
+   * @param size The number of elements to copy over.
+   */
+  IntVector(Rcpp::IntegerVector x, size_t size) {
+    this->id_m = IntVector::id_g++;
+    this->storage_m = std::make_shared<std::vector<int>>();
+    this->resize(x.size());
+    for (size_t i = 0; i < x.size(); i++) {
+      storage_m->at(i) = x[i];
+    }
+  }
+
+  /**
+   * @brief The constructor for initializing an integer vector.
+   * @param v A vector of integers.
+   */
+  IntVector(const fims::Vector<int>& v) {
+    this->id_m = IntVector::id_g++;
+    this->storage_m = std::make_shared<std::vector<int>>();
+    this->storage_m->resize(v.size());
+    for (size_t i = 0; i < v.size(); i++) {
+      storage_m->at(i) = v[i];
+    }
+  }
+
+  /**
+   * @brief Destroy the integer Vector object.
+   *
+   */
+  virtual ~IntVector() {}
+
+  /**
+   * @brief
+   *
+   * @param v
+   * @return IntVector&
+   */
+  IntVector& operator=(const Rcpp::IntegerVector& v) {
+    this->storage_m->resize(v.size());
+    for (size_t i = 0; i < v.size(); i++) {
+      storage_m->at(i) = v[i];
+    }
+    return *this;
+  }
+
+  /**
+   * @brief Gets the ID of the IntVector object.
+   */
+  virtual uint32_t get_id() { return this->id_m; }
+
+  /**
+   * @brief
+   *
+   * @param orig
+   */
+  void fromRVector(const Rcpp::IntegerVector& orig) {
+    this->storage_m->resize(orig.size());
+    for (size_t i = 0; i < this->storage_m->size(); i++) {
+      this->storage_m->at(i) = orig[i];
+    }
+  }
+
+  /**
+   * @brief
+   *
+   * @return Rcpp::IntegerVector
+   */
+  Rcpp::IntegerVector toRVector() {
+    Rcpp::IntegerVector ret(this->storage_m->size());
+    for (size_t i = 0; i < this->size(); i++) {
+      ret[i] = this->storage_m->at(i);
+    }
+
+    return ret;
+  }
+
+  /**
+   * @brief The accessor where the first index starts is zero.
+   * @param pos The position of the IntVector that you want returned.
+   */
+  inline int& operator[](size_t pos) { return this->storage_m->at(pos); }
+
+  /**
+   * @brief The accessor where the first index starts at one. This function is
+   * for calling accessing from R.
+   * @param pos The position of the IntVector that you want returned.
+   */
+  SEXP at(R_xlen_t pos) {
+    if (static_cast<size_t>(pos) == 0 ||
+        static_cast<size_t>(pos) > this->storage_m->size()) {
+      throw std::invalid_argument("IntVector: Index out of range");
+      FIMS_ERROR_LOG(fims::to_string(pos) + "!<" +
+                     fims::to_string(this->size()));
+      return NULL;
+    }
+    return Rcpp::wrap(this->storage_m->at(pos - 1));
+  }
+
+  /**
+   * @brief An internal accessor for calling a position of a IntVector
+   * from R.
+   * @param pos An integer specifying the position of the IntVector
+   * you want returned. The first position is one and the last position is
+   * the same as the size of the IntVector.
+   */
+  int& get(size_t pos) {
+    if (pos >= this->storage_m->size()) {
+      throw std::invalid_argument("IntVector: Index out of range");
+    }
+    return (this->storage_m->at(pos));
+  }
+
+  /**
+   * @brief An internal setter for setting a position of a IntVector
+   * from R.
+   * @param pos An integer specifying the position of the IntVector
+   * you want to set. The first position is one and the last position is the
+   * same as the size of the IntVector.
+   * @param p An integer value specifying the value to set position `pos` to
+   * in the IntVector.
+   */
+  void set(size_t pos, const int& p) { this->storage_m->at(pos) = p; }
+
+  /**
+   * @brief Returns the size of an IntVector.
+   */
+  size_t size() { return this->storage_m->size(); }
+
+  /**
+   * @brief Resizes an IntVector to the desired length.
+   * @param size An integer specifying the desired length for the
+   * IntVector to be resized to.
+   */
+  void resize(size_t size) { this->storage_m->resize(size); }
+
+  /**
+   * @brief Sets the value of all elements in the IntVector to the
+   * provided value.
+   *
+   * @param value An integer specifying the value to set all elements to
+   * within the IntVector.
+   */
+  void fill(int value) {
+    for (size_t i = 0; i < this->storage_m->size(); i++) {
+      storage_m->at(i) = value;
+    }
+  }
+
+  /**
+   * @brief The printing methods for an IntVector.
+   *
+   */
+  void show() {
+    Rcpp::Rcout << this->storage_m->data() << "\n";
+
+    for (size_t i = 0; i < this->storage_m->size(); i++) {
+      Rcpp::Rcout << storage_m->at(i) << "  ";
+    }
+  }
+};
+uint32_t IntVector::id_g = 0;
 
 /**
  *@brief Base class for all interface objects.

@@ -247,6 +247,7 @@ InputIt
 IntInput
 IntegerAgeInput
 IntegerVector
+IntVector
 IntegrationTest
 InvLogit
 InvLogitLogit

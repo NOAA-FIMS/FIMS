@@ -23,6 +23,7 @@
 #' @export get_log_module
 #' @export get_log_warnings
 #' @export get_random
+#' @export IntVector
 #' @export inv_logit
 #' @export logit
 #' @export Landings

@@ -25,6 +25,7 @@
 RCPP_EXPOSED_CLASS(Parameter)
 RCPP_EXPOSED_CLASS(ParameterVector)
 RCPP_EXPOSED_CLASS(RealVector)
+RCPP_EXPOSED_CLASS(IntVector)
 RCPP_EXPOSED_CLASS(SharedInt)
 RCPP_EXPOSED_CLASS(SharedString)
 RCPP_EXPOSED_CLASS(SharedReal)
@@ -97,6 +98,7 @@ RCPP_MODULE(fims) {
   Rcpp::function(
       "inv_logit", inv_logit_rcpp,
       "Applies the inverse of the logit transformation to a bounded space.");
+      
   Rcpp::class_<Parameter>(
       "Parameter", "An RcppInterface class that defines the Parameter class.")
       .constructor()
@@ -149,6 +151,7 @@ RCPP_MODULE(fims) {
               "provided value.")
       .method("get_id", &ParameterVector::get_id,
               "Gets the ID of the ParameterVector object.");
+
   Rcpp::class_<RealVector>(
       "RealVector", "An RcppInterface class that defines the RealVector class.")
       .constructor()
@@ -174,6 +177,32 @@ RCPP_MODULE(fims) {
               "Resizes a RealVector to the desired length.")
       .method("get_id", &RealVector::get_id,
               "Gets the ID of the RealVector object.");
+
+  Rcpp::class_<IntVector>(
+      "IntVector", "An RcppInterface class that defines the IntVector class.")
+      .constructor()
+      .constructor<size_t>()
+      .constructor<Rcpp::IntegerVector, size_t>()
+      .method(
+          "get", &IntVector::get,
+          "An internal accessor for calling a position of a IntVector from R.")
+      .method(
+          "set", &IntVector::set,
+          "An internal setter for setting a position of a IntVector from R.")
+      .method("fromRVector", &IntVector::fromRVector,
+              "Initializes the IntVector from the values of a R vector.")
+      .method("toRVector", &IntVector::toRVector,
+              "Returns values as a R vector.")
+      .method("show", &IntVector::show,
+              "The printing methods for a IntVector.")
+      .method("at", &IntVector::at,
+              "Returns a int at the indicated position given the index "
+              "argument.")
+      .method("size", &IntVector::size, "Returns the size of a IntVector.")
+      .method("resize", &IntVector::resize,
+              "Resizes a IntVector to the desired length.")
+      .method("get_id", &IntVector::get_id,
+              "Gets the ID of the IntVector object.");
 
   Rcpp::class_<SharedInt>(
       "SharedInt", "An RcppInterface class that defines the SharedInt class.")

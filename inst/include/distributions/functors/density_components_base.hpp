@@ -166,6 +166,12 @@ struct DensityComponentBase : public fims_model_object::FIMSObject<Type>,
       false; /**< Boolean; if true, data are simulated from the distribution */
   std::vector<uint32_t>
       key; /**< unique id for variable map that points to a fims::Vector */
+  std::vector<uint32_t>
+      observed_key; /**< unique id for variable map that points to a fims::Vector */
+  std::vector<uint32_t>
+      expected_key; /**< unique id for variable map that points to a fims::Vector */
+  std::vector<uint32_t>
+      uncertainty_key; /**< unique id for variable map that points to a fims::Vector */
 
 #ifdef TMB_MODEL
   ::objective_function<Type>* of; /**< Pointer to the TMB objective function */

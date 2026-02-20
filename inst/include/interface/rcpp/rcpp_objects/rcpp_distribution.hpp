@@ -32,6 +32,55 @@ class DistributionsInterfaceBase : public FIMSRcppInterfaceBase {
    */
   std::shared_ptr<std::vector<uint32_t>> key_m;
   /**
+   * @brief The unique ID for the variable map that points to a fims::Vector.
+   */
+  std::shared_ptr<std::vector<uint32_t>> observed_key_m;
+  /**
+   * @brief The unique ID for the variable map that points to a fims::Vector.
+   */
+  std::shared_ptr<std::vector<uint32_t>> expected_key_m;
+  /**
+   * @brief The unique ID for the variable map that points to a fims::Vector.
+   */
+  std::shared_ptr<std::vector<uint32_t>> uncertainty_key_m;
+  /**
+   * @brief Direct input observed values for the distribution.
+   */
+  RealVector observed_values_m;
+  /**
+   * @brief Direct input expected values for the distribution.
+   */
+  RealVector expected_values_m;
+  /**
+   * @brief Direct input uncertainty values for the distribution.
+   */
+  RealVector uncertainty_values_m;
+  /**
+   * @brief An index vector for the observed values used to subset which 
+   * values are considered in the distribution likelihood calculations.
+   */
+  IntVector observed_index_m;
+  /**
+   * @brief An index vector for the expected values used to subset which 
+   * values are considered in the distribution likelihood calculations.
+   */
+  IntVector expected_index_m;
+  /**
+   * @brief An index vector for the uncertainty values used to subset which 
+   * values are considered in the distribution likelihood calculations.
+   */
+  IntVector uncertainty_index_m;
+  /**
+   * @brief Lambda values for weighting the likelihood contributions of each
+   * observation in the distribution calculations.
+   */
+  RealVector lambda_m = double(1);
+  /**
+   * @brief Vector that records the individual log probability function for each
+   * observation.
+   */
+  RealVector lpdf_vec_m; /**< The vector of log probability values */
+  /**
    * @brief The type of density input. The options are prior, re, or data.
    */
   SharedString input_type_m;
@@ -75,11 +124,15 @@ class DistributionsInterfaceBase : public FIMSRcppInterfaceBase {
    * @brief The log probability density function value.
    */
   double lpdf_value = 0;
+
   /**
    * @brief The constructor.
    */
   DistributionsInterfaceBase() {
     this->key_m = std::make_shared<std::vector<uint32_t>>();
+    this->observed_key_m = std::make_shared<std::vector<uint32_t>>();
+    this->expected_key_m = std::make_shared<std::vector<uint32_t>>();
+    this->uncertainty_key_m = std::make_shared<std::vector<uint32_t>>();
     this->id_m = DistributionsInterfaceBase::id_g++;
     /* Create instance of map: key is id and value is pointer to
     DistributionsInterfaceBase */
@@ -94,6 +147,17 @@ class DistributionsInterfaceBase : public FIMSRcppInterfaceBase {
   DistributionsInterfaceBase(const DistributionsInterfaceBase &other)
       : id_m(other.id_m),
         key_m(other.key_m),
+        observed_key_m(other.observed_key_m),
+        expected_key_m(other.expected_key_m),
+        uncertainty_key_m(other.uncertainty_key_m),
+        observed_values_m(other.observed_values_m),
+        expected_values_m(other.expected_values_m),
+        uncertainty_values_m(other.uncertainty_values_m),
+        observed_index_m(other.observed_index_m),
+        expected_index_m(other.expected_index_m),
+        uncertainty_index_m(other.uncertainty_index_m),
+        lambda_m(other.lambda_m),
+        lpdf_vec_m(other.lpdf_vec_m),
         input_type_m(other.input_type_m),
         use_mean_m(other.use_mean_m),
         interface_observed_data_id_m(other.interface_observed_data_id_m) {}
@@ -155,41 +219,66 @@ class DistributionsInterfaceBase : public FIMSRcppInterfaceBase {
   virtual bool set_observed_data(int observed_data_id) { return false; }
 
   /**
-   * @brief Set the observed, expected, and sd values for a distribution
-   * process to incorporate into the likelihood calculation.
+   * @brief Set the type (data, prior, random_effect, or process) for a
+   * distribution to incorporate into the likelihood calculation.
    *
    * @param input_type String that sets whether the distribution type is for
-   * priors, random effects, or data.
-   * @param observed_id Unique id for linked parameter, derived
-   * value, or observed value vector.
-   * @param observed_values Vector of values to use directly as observed input
-   * (i.e. the value for which the likelihood of being drawn from a the
-   * distribution is being evaluated).
-   * @param observed_index Vector of integers for which subset of values 
-   * to use from the observed vector (directly input or linked id vector).
-   * @param expected_id Unique id for linked parameter, derived
-   * value, or expected value vector.
-   * @param expected_values Vector of values to use directly as expected input
-   * (i.e. the mean of the distribution the likelihood is being evaluated from).
-   * @param expected_index Vector of integers for which subset of values 
-   * to use from the expected vector (directly input or linked id vector).
-   * @param uncertainty_id Unique id for linked parameter, derived
-   * value, or sd vector (i.e. the standard deviation of the distribution the
-   * likelihood is being evaluated from).
-   * @param uncertainty_values Vector of values to use directly as sd input.
-   * @param uncertainty_index Vector of integers for which subset of values 
-   * to use from the sd vector (directly input or linked id vector).
+   * priors, random_effects, data, or process.
+   */
+  virtual bool set_process_type(std::string input_type) { 
+    return false; 
+  }
+
+  /**
+   * @brief Link the observed, expected, or uncertainty values to a model
+   * parameter, derived value, or data pointerfor a distribution
+   * process to incorporate into the likelihood calculation.
+   *
+   * @param input_type String that sets the value to be updated (observed,
+   * expected, or uncertainty).
+   * @param input_id Unique id for linked parameter, derived
+   * value, or data pointer.
+   */
+  virtual bool set_process_id(std::string input_type,
+                                  Rcpp::IntegerVector input_id) { 
+    return false; 
+  }
+
+  /**
+   * @brief Directly set the observed, expected, or uncertainty values for a 
+   * distribution process to incorporate into the likelihood calculation.
+   *
+   * @param input_type String that sets the value to be updated (observed,
+   * expected, or uncertainty).
+   * @param input_values Vector of values to use directly as input.
    */
   virtual bool set_process_values(std::string input_type,
-                                  Rcpp::IntegerVector observed_id,
-                                  Rcpp::NumericVector observed_values,
-                                  Rcpp::IntegerVector observed_index,
-                                  Rcpp::IntegerVector expected_id,
-                                  Rcpp::NumericVector expected_values,
-                                  Rcpp::IntegerVector expected_index,
-                                  Rcpp::IntegerVector uncertainty_id,
-                                  Rcpp::NumericVector uncertainty_values,
-                                  Rcpp::IntegerVector uncertainty_index) { 
+                                  Rcpp::NumericVector input_values) { 
+    return false; 
+  }
+
+  /**
+   * @brief Set the index to specify a subset of the linked ids/values to be
+   * included in the distributions likelihood calculation.
+   *
+   * @param input_type String that sets the value to be updated (observed,
+   * expected, or uncertainty).
+   * @param input_index Index of the subset of values to be included (i.e. which 
+   * elements of the vector to use).
+   */
+  virtual bool set_process_index(std::string input_type,
+                                  Rcpp::IntegerVector input_index) { 
+    return false; 
+  }
+
+  /**
+   * @brief Set the lambda values for weighting the likelihood contributions of 
+   * each observation in the distribution calculations.
+   *
+   * @param lambda_value Vector of lambda values for weighting the likelihood 
+   * contributions.
+   */
+  virtual bool set_lambda_values(Rcpp::NumericVector lambda_value) { 
     return false; 
   }
 
@@ -213,29 +302,15 @@ std::map<uint32_t, std::shared_ptr<DistributionsInterfaceBase>>
 class DnormDistributionsInterface : public DistributionsInterfaceBase {
  public:
   /**
-   * @brief Observed data.
-   */
-  ParameterVector observed_values;
-  /**
-   * @brief The expected values, which would be the mean of x for this
-   * distribution.
-   */
-  ParameterVector expected_values;
-  /**
-   * @brief The expected mean, which would be the mean of x for this
-   * distribution.
+   * @brief The expected mean, which would be the mean of observed values for 
+   * this distribution.
    */
   ParameterVector expected_mean;
   /**
-   * @brief The uncertainty, which would be the standard deviation of x for the
-   * normal distribution.
+   * @brief The uncertainty, which would be the standard deviation of observed 
+   * values for the normal distribution.
    */
   ParameterVector log_sd;
-  /**
-   * @brief Vector that records the individual log probability function for each
-   * observation.
-   */
-  RealVector lpdf_vec; /**< The vector*/
 
   /**
    * @brief The constructor.
@@ -256,6 +331,7 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
       : DistributionsInterfaceBase(other),
         observed_values(other.observed_values),
         expected_values(other.expected_values),
+        uncertainty_values(other.uncertainty_values),
         log_sd(other.log_sd),
         expected_mean(other.expected_mean),
         lpdf_vec(other.lpdf_vec) {}
@@ -304,32 +380,101 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
   }
 
   /**
-   * @copydoc DistributionsInterfaceBase::set_distribution_links
+   * @copydoc DistributionsInterfaceBase::set_process_type
+   */
+  virtual bool set_process_type(std::string input_type) { 
+    this->input_type_m.set(input_type);
+    return true; 
+  }
+
+  /**
+   * @copydoc DistributionsInterfaceBase::set_process_id
+   */
+  virtual bool set_process_id(std::string input_type,
+                                  Rcpp::IntegerVector input_id) {
+    if (input_type == "observed") {
+      this->observed_key_m->resize(input_id.size());
+      for (int i = 0; i < input_id.size(); i++) {
+        this->observed_key_m->at(i) = input_id[i];
+      }
+    } else if (input_type == "expected") {
+      this->expected_key_m->resize(input_id.size());
+      for (int i = 0; i < input_id.size(); i++) {
+        this->expected_key_m->at(i) = input_id[i];
+      }
+    } else if (input_type == "uncertainty") {
+      this->uncertainty_key_m->resize(input_id.size());
+      for (int i = 0; i < input_id.size(); i++) {
+        this->uncertainty_key_m->at(i) = input_id[i];
+      }
+    } else {
+      // log error that input_type is not recognized
+      FIMS_ERROR_LOG("DnormDistribution " + fims::to_string(this->id_m) +
+                     " set_process_id: input_type " + input_type +
+                     " not recognized. Must be 'observed', 'expected', or 'uncertainty'.");
+      return false;
+    }
+    return true; 
+  }
+
+  /**
+   * @copydoc DistributionsInterfaceBase::set_process_values
    */
   virtual bool set_process_values(std::string input_type,
-                                  Rcpp::IntegerVector observed_id,
-                                  Rcpp::NumericVector observed_values,
-                                  Rcpp::IntegerVector observed_index,
-                                  Rcpp::IntegerVector expected_id,
-                                  Rcpp::NumericVector expected_values,
-                                  Rcpp::IntegerVector expected_index,
-                                  Rcpp::IntegerVector uncertainty_id,
-                                  Rcpp::NumericVector uncertainty_values,
-                                  Rcpp::IntegerVector uncertainty_index)  {
-    this->input_type_m.set(input_type);
-    this->observed_key_m->resize(observed_id.size());
-    for (int i = 0; i < observed_id.size(); i++) {
-      this->observed_key_m->at(i) = observed_id[i];
+                                  Rcpp::NumericVector input_values) {
+    if (input_type == "observed") {
+      this->observed_values.resize(input_values.size());
+      for (int i = 0; i < input_values.size(); i++) {
+        this->observed_values[i].initial_value_m = input_values[i];
+      }
+    } else if (input_type == "expected") {
+      this->expected_values.resize(input_values.size());
+      for (int i = 0; i < input_values.size(); i++) {
+        this->expected_values[i].initial_value_m = input_values[i];
+      }
+    } else if (input_type == "uncertainty") {
+      this->uncertainty_values.resize(input_values.size());
+      for (int i = 0; i < input_values.size(); i++) {
+        this->uncertainty_values[i].initial_value_m = input_values[i];
+      }
+    } else {
+      // log error that input_type is not recognized
+      FIMS_ERROR_LOG("DnormDistribution " + fims::to_string(this->id_m) +
+                     " set_process_values: input_type " + input_type +
+                     " not recognized. Must be 'observed', 'expected', or 'uncertainty'.");
+      return false;
     }
-    this->expected_key_m->resize(expected_id.size());
-    for (int i = 0; i < expected_id.size(); i++) {
-      this->expected_key_m->at(i) = expected_id[i];
+    return true; 
+  }
+
+  /**
+   * @copydoc DistributionsInterfaceBase::set_process_index
+   */
+  virtual bool set_process_index(std::string input_type,
+                                  Rcpp::IntegerVector input_index) {
+    if (input_type == "observed") {
+      this->observed_index_m->resize(input_index.size());
+      for (int i = 0; i < input_index.size(); i++) {
+        this->observed_index_m->at(i) = input_index[i];
+      }
+    } else if (input_type == "expected") {
+      this->expected_index_m->resize(input_index.size());
+      for (int i = 0; i < input_index.size(); i++) {
+        this->expected_index_m->at(i) = input_index[i];
+      }
+    } else if (input_type == "uncertainty") {
+      this->uncertainty_index_m->resize(input_index.size());
+      for (int i = 0; i < input_index.size(); i++) {
+        this->uncertainty_index_m->at(i) = input_index[i];
+      }
+    } else {
+      // log error that input_type is not recognized
+      FIMS_ERROR_LOG("DnormDistribution " + fims::to_string(this->id_m) +
+                     " set_process_index: input_type " + input_type +
+                     " not recognized. Must be 'observed', 'expected', or 'uncertainty'.");
+      return false;
     }
-    this->uncertainty_key_m->resize(uncertainty_id.size());
-    for (int i = 0; i < uncertainty_id.size(); i++) {
-      this->uncertainty_key_m->at(i) = uncertainty_id[i];
-    }
-    return true;
+    return true; 
   }
 
 
