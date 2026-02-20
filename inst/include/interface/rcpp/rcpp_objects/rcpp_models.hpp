@@ -32,7 +32,7 @@
  *
  */
 class FisheryModelInterfaceBase : public FIMSRcppInterfaceBase {
-public:
+ public:
   /**
    * @brief The static id of the FleetInterfaceBase object.
    */
@@ -136,7 +136,7 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
    */
   std::map<std::string, std::vector<double>> se_values;
 
-public:
+ public:
   /**
    * @brief The constructor.
    */
@@ -154,8 +154,8 @@ public:
    * @param other
    */
   CatchAtAgeInterface(const CatchAtAgeInterface &other)
-      : FisheryModelInterfaceBase(other), population_ids(other.population_ids) {
-  }
+      : FisheryModelInterfaceBase(other),
+        population_ids(other.population_ids) {}
 
   /**
    * Method to add a population id to the set of population ids.
@@ -239,14 +239,14 @@ public:
 
     typename std::map<uint32_t,
                       std::shared_ptr<PopulationInterfaceBase>>::iterator
-        pi_it; // population interface iterator
+        pi_it;  // population interface iterator
     pi_it = PopulationInterfaceBase::live_objects.find(
         population_interface->get_id());
     if (pi_it == PopulationInterfaceBase::live_objects.end()) {
       FIMS_ERROR_LOG("Population with id " +
                      fims::to_string(population_interface->get_id()) +
                      " not found in live objects.");
-      return "{}"; // Return empty JSON
+      return "{}";  // Return empty JSON
     }
 
     std::shared_ptr<PopulationInterface> population_interface_ptr =
@@ -409,51 +409,48 @@ public:
     }
     // gather dimension information
     switch (dim_info.ndims) {
-    case 1:
-      dim_entry << "\"dimensionality\": {\n";
-      dim_entry << "  \"header\": [\"" << dim_info.dim_names[0] << "\"],\n";
-      dim_entry << "  \"dimensions\": [";
-      for (size_t i = 0; i < dim_info.dims.size(); ++i) {
-        if (i > 0)
-          dim_entry << ", ";
-        dim_entry << dim_info.dims[i];
-      }
-      dim_entry << "]\n";
-      dim_entry << "}";
-      break;
-    case 2:
-      dim_entry << "\"dimensionality\": {\n";
-      dim_entry << "  \"header\": [\"" << dim_info.dim_names[0] << "\", \""
-                << dim_info.dim_names[1] << "\"],\n";
-      dim_entry << "  \"dimensions\": [";
-      for (size_t i = 0; i < dim_info.dims.size(); ++i) {
-        if (i > 0)
-          dim_entry << ", ";
-        dim_entry << dim_info.dims[i];
-      }
-      dim_entry << "]\n";
-      dim_entry << "}";
-      break;
-    case 3:
-      dim_entry << "\"dimensionality\": {\n";
-      dim_entry << "  \"header\": [\"" << dim_info.dim_names[0] << "\", \""
-                << dim_info.dim_names[1] << "\", \"" << dim_info.dim_names[2]
-                << "\"],\n";
-      dim_entry << "  \"dimensions\": [";
-      for (size_t i = 0; i < dim_info.dims.size(); ++i) {
-        if (i > 0)
-          dim_entry << ", ";
-        dim_entry << dim_info.dims[i];
-      }
-      dim_entry << "]\n";
-      dim_entry << "}";
-      break;
-    default:
-      dim_entry << "\"dimensionality\": {\n";
-      dim_entry << "  \"header\": [],\n";
-      dim_entry << "  \"dimensions\": []\n";
-      dim_entry << "}";
-      break;
+      case 1:
+        dim_entry << "\"dimensionality\": {\n";
+        dim_entry << "  \"header\": [\"" << dim_info.dim_names[0] << "\"],\n";
+        dim_entry << "  \"dimensions\": [";
+        for (size_t i = 0; i < dim_info.dims.size(); ++i) {
+          if (i > 0) dim_entry << ", ";
+          dim_entry << dim_info.dims[i];
+        }
+        dim_entry << "]\n";
+        dim_entry << "}";
+        break;
+      case 2:
+        dim_entry << "\"dimensionality\": {\n";
+        dim_entry << "  \"header\": [\"" << dim_info.dim_names[0] << "\", \""
+                  << dim_info.dim_names[1] << "\"],\n";
+        dim_entry << "  \"dimensions\": [";
+        for (size_t i = 0; i < dim_info.dims.size(); ++i) {
+          if (i > 0) dim_entry << ", ";
+          dim_entry << dim_info.dims[i];
+        }
+        dim_entry << "]\n";
+        dim_entry << "}";
+        break;
+      case 3:
+        dim_entry << "\"dimensionality\": {\n";
+        dim_entry << "  \"header\": [\"" << dim_info.dim_names[0] << "\", \""
+                  << dim_info.dim_names[1] << "\", \"" << dim_info.dim_names[2]
+                  << "\"],\n";
+        dim_entry << "  \"dimensions\": [";
+        for (size_t i = 0; i < dim_info.dims.size(); ++i) {
+          if (i > 0) dim_entry << ", ";
+          dim_entry << dim_info.dims[i];
+        }
+        dim_entry << "]\n";
+        dim_entry << "}";
+        break;
+      default:
+        dim_entry << "\"dimensionality\": {\n";
+        dim_entry << "  \"header\": [],\n";
+        dim_entry << "  \"dimensions\": []\n";
+        dim_entry << "}";
+        break;
     }
 
     // build JSON string
@@ -464,14 +461,14 @@ public:
     ss << std::fixed << std::setprecision(10);
     if (dq.size() > 0) {
       for (size_t i = 0; i < dq.size() - 1; i++) {
-        if (dq[i] != dq[i]) // check for NaN
+        if (dq[i] != dq[i])  // check for NaN
         {
           ss << "-999" << ", ";
         } else {
           ss << dq[i] << ", ";
         }
       }
-      if (dq[dq.size() - 1] != dq[dq.size() - 1]) // check for NaN
+      if (dq[dq.size() - 1] != dq[dq.size() - 1])  // check for NaN
       {
         ss << "-999]" << ",\n";
       } else {
@@ -504,7 +501,7 @@ public:
     } else {
       ss << "\"uncertainty\": [";
       for (size_t i = 0; i < dq.size(); ++i) {
-        ss << "-999.0"; // Placeholder for uncertainty values
+        ss << "-999.0";  // Placeholder for uncertainty values
         if (i < dq.size() - 1) {
           ss << ", ";
         }
@@ -562,7 +559,7 @@ public:
       FIMS_ERROR_LOG("Fleet with id " +
                      fims::to_string(fleet_interface->get_id()) +
                      " not found in live objects.");
-      return "{}"; // Return empty JSON
+      return "{}";  // Return empty JSON
     }
 
     std::shared_ptr<fims_info::Information<double>> info =
@@ -789,7 +786,7 @@ public:
       int nrow = mat.nrow();
       for (int i = 0; i < nrow; i++) {
         std::string key = Rcpp::as<std::string>(rownames[i]);
-        double val = mat(i, 1); // col 1 = "Std. Error"
+        double val = mat(i, 1);  // col 1 = "Std. Error"
         grouped[key].push_back(val);
       }
 
@@ -843,7 +840,7 @@ public:
       for (R_xlen_t i = 0; i < grouped_out.size(); i++) {
         std::string key = Rcpp::as<std::string>(names[i]);
         Rcpp::NumericVector vec =
-            grouped_out[i]; // each element is a numeric vector
+            grouped_out[i];  // each element is a numeric vector
         std::vector<double> vec_std(vec.size());
         for (R_xlen_t j = 0; j < vec.size(); j++) {
           vec_std[j] = vec[j];
@@ -859,7 +856,7 @@ public:
     std::set<uint32_t> selectivity_ids;
     std::set<uint32_t> fleet_ids;
     // gather sub-module info from population and fleets
-    typename std::set<uint32_t>::iterator module_id_it; // generic
+    typename std::set<uint32_t>::iterator module_id_it;  // generic
     typename std::set<uint32_t>::iterator pit;
     typename std::set<uint32_t>::iterator fids;
     for (pit = this->population_ids->begin();
@@ -1029,7 +1026,7 @@ public:
       } else {
         FIMS_ERROR_LOG("Population with id " + fims::to_string(*pop_it) +
                        " not found in live objects.");
-        ss << "{}"; // Return empty JSON for this population
+        ss << "{}";  // Return empty JSON for this population
       }
     }
 
@@ -1046,7 +1043,7 @@ public:
     } else {
       FIMS_ERROR_LOG("Population with id " + fims::to_string(*pop_it) +
                      " not found in live objects.");
-      ss << "{}"; // Return empty JSON for this population
+      ss << "{}";  // Return empty JSON for this population
     }
 
     ss << "]";
@@ -1072,7 +1069,7 @@ public:
       } else {
         FIMS_ERROR_LOG("Fleet with id " + fims::to_string(*fleet_it) +
                        " not found in live objects.");
-        ss << "{}"; // Return empty JSON for this fleet
+        ss << "{}";  // Return empty JSON for this fleet
       }
     }
     std::shared_ptr<FleetInterface> fleet_interface =
@@ -1083,7 +1080,7 @@ public:
     } else {
       FIMS_ERROR_LOG("Fleet with id " + fims::to_string(*fleet_it) +
                      " not found in live objects.");
-      ss << "{}"; // Return empty JSON for this fleet
+      ss << "{}";  // Return empty JSON for this fleet
     }
 
     ss << "],\n";
@@ -1193,7 +1190,8 @@ public:
 
 #ifdef TMB_MODEL
 
-  template <typename Type> bool add_to_fims_tmb_internal() {
+  template <typename Type>
+  bool add_to_fims_tmb_internal() {
     std::shared_ptr<fims_info::Information<Type>> info =
         fims_info::Information<Type>::GetInstance();
 
@@ -1207,7 +1205,7 @@ public:
       model->AddPopulation((*it));
     }
 
-    std::set<uint32_t> fleet_ids; // all fleets in the model
+    std::set<uint32_t> fleet_ids;  // all fleets in the model
     typedef typename std::set<uint32_t>::iterator fleet_ids_iterator;
 
     // add to Information
