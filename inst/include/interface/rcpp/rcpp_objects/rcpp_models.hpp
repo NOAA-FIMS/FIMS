@@ -811,7 +811,7 @@ public:
       grouped_out = Rcpp::List::create();
       // first_est is already initialized to 0.0
     }
-    // freeADFun(obj);
+    freeADFun(obj);
     return Rcpp::List::create(
         Rcpp::Named("objective_function_value") = of_value,
         Rcpp::Named("gradient") = grad,
