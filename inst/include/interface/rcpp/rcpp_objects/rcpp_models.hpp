@@ -735,7 +735,7 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
     Rcpp::Environment TMB = Rcpp::Environment::namespace_env("TMB");
     Rcpp::Function MakeADFun = TMB["MakeADFun"];
     Rcpp::Function sdreport = TMB["sdreport"];
-    Rcpp::Function freeADFun = TMB["FreeADFun"];
+    Rcpp::Function FreeADFun = TMB["FreeADFun"];
     // Grab your helpers from R global environment
     Rcpp::Environment global = Rcpp::Environment::global_env();
     // Build parameters list
@@ -808,7 +808,7 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
       grouped_out = Rcpp::List::create();
       // first_est is already initialized to 0.0
     }
-    freeADFun(obj);
+    FreeADFun(obj);
     return Rcpp::List::create(
         Rcpp::Named("objective_function_value") = of_value,
         Rcpp::Named("gradient") = grad,
