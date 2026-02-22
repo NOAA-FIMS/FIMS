@@ -19,8 +19,8 @@ jobs:
           ASSIGNEES: ${{ toJSON(github.event.issue.assignees) }}
         run: |
           echo "Assignees: $ASSIGNEES"
-          # Check if copilot is in the assignees list
-          if echo "$ASSIGNEES" | jq -e '.[] | select(.login == "copilot")' > /dev/null; then
+          # Check if copilot or github-copilot[bot] is in the assignees list
+          if echo "$ASSIGNEES" | jq -e '.[] | select(.login == "copilot" or .login == "github-copilot[bot]" or .login | startswith("copilot"))' > /dev/null; then
             echo "is_copilot=true" >> $GITHUB_OUTPUT
             echo "Issue assigned to copilot"
           else
