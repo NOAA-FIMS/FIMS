@@ -146,7 +146,6 @@ bool CreateTMBModel() {
   return true;
 }
 
-
 /** @page shared_details Shared docs: set_*_parameters
  *
  * @details
