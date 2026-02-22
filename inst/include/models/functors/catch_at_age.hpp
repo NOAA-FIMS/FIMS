@@ -278,7 +278,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
    *
    * Plus group update (if \f$a = A\f$):
    * \f[
-   * N_{A,y} = N_{A,y} + N_{A,y-1} \exp(-Z_{A,y-1})
+   * N_{A,y} = N_{A-1,y-1} \exp(-Z_{A-1,y-1}) + N_{A,y-1} \exp(-Z_{A,y-1})
    * \f]
    *
    * @snippet{doc} this param_population
@@ -321,7 +321,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
    *
    * Plus group update (if \f$a = A\f$):
    * \f[
-   * N^U_{A,y} = N^U_{A,y} + N^U_{A,y-1} \exp(-M_{A,y-1})
+   * N^U_{A,y} = N^U_{A-1,y-1} \exp(-M_{A-1,y-1}) + N^U_{A,y-1} \exp(-M_{A,y-1})
    * \f]
    *
    * @snippet{doc} this param_population
