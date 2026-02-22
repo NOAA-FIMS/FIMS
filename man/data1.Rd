@@ -42,5 +42,7 @@ data1
 A dataset containing information necessary to run an age-structured stock
 assessment model in FIMS. This data was generated using
 the \code{ASSAMC} package written for the \href{www.github.com/NOAA-FIMS/Age_Structured_Stock_Assessment_Model_Comparison}{model comparison project}.
+The source code to make this dataset is in \code{data-raw/data1.R} which is on
+Github, but won't be local because it's in the .Rbuildignore file.
 }
 \keyword{datasets}

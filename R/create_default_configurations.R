@@ -1,3 +1,9 @@
+# To remove the WARNING
+# no visible binding for global variable
+utils::globalVariables(c(
+  "everything", "fleet_name"
+))
+
 #' Create a default FIMS configuration tibble
 #'
 #' @description

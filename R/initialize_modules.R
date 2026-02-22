@@ -1,9 +1,11 @@
 # To remove the WARNING
 # no visible binding for global variable
 utils::globalVariables(c(
+  "distribution_link", "distribution_type",
+  "fleet_name",
   "type", "name", "value", "unit", "uncertainty",
   "timing", "age", "length", "year",
-  # Used in initialize_comp dplyr code
+  "temp_name",
   "valid_n"
 ))
 
@@ -659,7 +661,7 @@ initialize_comp <- function(data,
 #' The model element of the returned list stores the instantiated C++ model
 #' module, e.g., the results of `methods::new(CatchAtAge)` for a catch-at-age
 #' model.
-#' It is important that you only have one FIMS model initiatlized in your R
+#' It is important that you only have one FIMS model initialized in your R
 #' workspace at a time. Thus, after you initialize and fit the model, you should
 #' run [clear()].
 #' @export

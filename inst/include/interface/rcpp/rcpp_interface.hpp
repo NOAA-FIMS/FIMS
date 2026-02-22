@@ -55,16 +55,18 @@ void init_logging() {
  *   object.
  * - It instantiates the singleton fims_model::Model object which represents
  *   the constructed TMB model.
- * 
+ *
  * Typically the average user does not interact with this function because it
- * is called within <a href = "https://noaa-fims.github.io/FIMS/reference/initialize_fims.html">`initialize_fims`</a>.
+ * is called within <a href =
+ * "https://noaa-fims.github.io/FIMS/reference/initialize_fims.html">`initialize_fims`</a>.
  * 
  * @see init_logging()
  * @see fims_info::Information::Clear()
  * @see fims_info::Information::CreateModel()
  * @see fims_info::Information::CheckModel()
  * @see fims_info::Information::GetInstance()
- * @see <a href = "https://noaa-fims.github.io/FIMS/reference/initialize_fims.html" target="_blank">`initialize_fims()`</a>
+ * @see <a href =
+ * "https://noaa-fims.github.io/FIMS/reference/initialize_fims.html" target="_blank">`initialize_fims()`</a>
  * @return A boolean is returned, where true indicates that the model was
  * successfully created.
  */

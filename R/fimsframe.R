@@ -731,13 +731,13 @@ FIMSFrame <- function(data) {
   formatted_data <- tibble::as_tibble(data)
   missing_time_series <- create_missing_data(
     data = formatted_data,
-    timing = years
+    timings = years
   )
   if ("age" %in% colnames(formatted_data)) {
     missing_ages <- create_missing_data(
       data = formatted_data,
       bins = ages,
-      timing = years,
+      timings = years,
       column = age,
       types = c("weight-at-age", "age_comp")
     )
@@ -748,7 +748,7 @@ FIMSFrame <- function(data) {
     missing_lengths <- create_missing_data(
       data = formatted_data,
       bins = lengths,
-      timing = years,
+      timings = years,
       column = length,
       types = "length_comp"
     )
