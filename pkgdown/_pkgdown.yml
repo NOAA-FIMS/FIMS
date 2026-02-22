@@ -68,6 +68,12 @@ reference:
   - use_testthat_template
   - starts_with("reshape_")
 
+- title: Exported C++ functions and classes
+  desc: Links to the relevant doxygen documentation for the C++ code.
+  contents:
+  - Cpp_classes
+  - Cpp_functions
+
 news:
   releases:
   - text: "Latest release"
