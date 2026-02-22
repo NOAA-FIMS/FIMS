@@ -59,14 +59,15 @@ void init_logging() {
  * Typically the average user does not interact with this function because it
  * is called within <a href =
  * "https://noaa-fims.github.io/FIMS/reference/initialize_fims.html">`initialize_fims`</a>.
- * 
+ *
  * @see init_logging()
  * @see fims_info::Information::Clear()
  * @see fims_info::Information::CreateModel()
  * @see fims_info::Information::CheckModel()
  * @see fims_info::Information::GetInstance()
  * @see <a href =
- * "https://noaa-fims.github.io/FIMS/reference/initialize_fims.html" target="_blank">`initialize_fims()`</a>
+ * "https://noaa-fims.github.io/FIMS/reference/initialize_fims.html"
+ * target="_blank">`initialize_fims()`</a>
  * @return A boolean is returned, where true indicates that the model was
  * successfully created.
  */

@@ -32,7 +32,7 @@ RCPP_EXPOSED_CLASS(SharedBoolean)
 
 /**
  * @brief Define fims C++ functions and classes exposed in R
- * 
+ *
  * @details
  * The use of `RCPP_MODULE()` allows for exporting of specific C++ code to the
  * R environment, making it callable from R, i.e., providing declarative code
@@ -129,7 +129,7 @@ RCPP_MODULE(fims) {
       // TODO: fix the naming mismatch
       "inv_logit", inv_logit_rcpp,
       "See https://noaa-fims.github.io/doxygen/rcpp__interface_8hpp.html.");
-      
+
   Rcpp::class_<Parameter>(
       "Parameter",
       "See https://noaa-fims.github.io/doxygen/classParameter.html.")
@@ -228,7 +228,7 @@ RCPP_MODULE(fims) {
               &BevertonHoltRecruitmentInterface::evaluate_mean);
 
   Rcpp::class_<LogDevsRecruitmentInterface>(
-    "LogDevsRecruitmentProcess",
+      "LogDevsRecruitmentProcess",
       "See "
       "https://noaa-fims.github.io/doxygen/"
       "classLogDevsRecruitmentInterface.html.")
@@ -238,7 +238,7 @@ RCPP_MODULE(fims) {
               &LogDevsRecruitmentInterface::evaluate_process);
 
   Rcpp::class_<LogRRecruitmentInterface>(
-    "LogRRecruitmentProcess",
+      "LogRRecruitmentProcess",
       "See "
       "https://noaa-fims.github.io/doxygen/classLogRRecruitmentInterface.html.")
       .constructor()
