@@ -146,30 +146,33 @@ bool CreateTMBModel() {
   return true;
 }
 
-/* Dictionary block for shared documentation.
-  [details_set_x_parameters]
-  @details
-    Updates the internal parameter values for the model base of type
-    TMB_FIMS_REAL_TYPE. It is typically called before finalize() or
-    @ref CatchAtAgeInterface::to_json "`get_output()`" to ensure the correct
-    values are used because TMB doesn't always keep the updated parameters in
-    the "double" version of the tape. So we need to update those first.
-    Usage example in R:
-    \code{.R}
-    set_fixed_parameters(c(1, 2, 3))
-    set_random_parameters(c(1, 2, 3))
-    catch_at_age$get_output(do_sd_report = FALSE)
-    \endcode
-  [details_set_x_parameters]
-  [param_par]
-  @param par A vector of parameter values.
-  [param_par]
-*/
+
+/** @page shared_details Shared docs: set_*_parameters
+ *
+ * @details
+ * Updates the internal parameter values for the model base of type
+ * TMB_FIMS_REAL_TYPE. It is typically called before finalize() or
+ * \ref CatchAtAgeInterface::to_json "`get_output()`" to ensure the correct
+ * values are used because TMB doesn't always keep the updated parameters in
+ * the "double" version of the tape. So we need to update those first.
+ *
+ * Usage example in R:
+ * \code{.R}
+ * set_fixed_parameters(c(1, 2, 3))
+ * set_random_parameters(c(1, 2, 3))
+ * catch_at_age$get_output(do_sd_report = FALSE)
+ * \endcode
+ *
+ */
+/** @page shared_param_par Shared docs: set_par
+ *
+ * @param par A vector of parameter values.
+ */
 
 /**
  * @brief Update fixed parameters in the tape, so the output is correct.
- * @snippet{doc} this details_set_x_parameters
- * @snippet{doc} this param_par
+ * @copydoc shared_details
+ * @copydoc shared_param_par
  * @see set_random_parameters()
  */
 void set_fixed_parameters(Rcpp::NumericVector par) {
@@ -203,8 +206,8 @@ Rcpp::NumericVector get_fixed_parameters_vector() {
 
 /**
  * @brief Update random effect parameters in the tape, so the output is correct.
- * @snippet{doc} this details_set_x_parameters
- * @snippet{doc} this param_par
+ * @copydoc shared_details
+ * @copydoc shared_param_par
  * @see set_fixed_parameters()
  */
 void set_random_parameters(Rcpp::NumericVector par) {
