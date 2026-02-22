@@ -27,6 +27,15 @@
  * [param_age]
  * @param age Age index.
  * [param_age]
+ * [param_i_agem1_yearm1]
+ * @param i_agem1_yearm1 Dimension folded index for age-1 and year-1.
+ * [param_i_agem1_yearm1]
+ * [param_i_dev]
+ * @param i_dev Index to log_recruit_dev of vector length n_years-1.
+ * [param_i_dev]
+ * [param_other]
+ * @param other The other CatchAtAge object to copy from.
+ * [param_other]
  */
 
 namespace fims_popdy {
@@ -122,7 +131,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
   /**
    * @brief Copy constructor for the CatchAtAge class.
    *
-   * @param other The other CatchAtAge object to copy from.
+   * @snippet{doc} this param_other
    */
   CatchAtAge(const CatchAtAge &other)
       : FisheryModelBase<Type>(other), name_m(other.name_m), ages(other.ages) {
@@ -252,16 +261,16 @@ class CatchAtAge : public FisheryModelBase<Type> {
    *
    * @snippet{doc} this param_population
    * @snippet{doc} this param_i_age_year
-   * @param a Age index.
+   * @snippet{doc} this param_age
    */
   void CalculateInitialNumbersAA(
       std::shared_ptr<fims_popdy::Population<Type>> &population,
-      size_t i_age_year, size_t a) {
+      size_t i_age_year, size_t age) {
     std::map<std::string, fims::Vector<Type>> &dq_ =
         this->GetPopulationDerivedQuantities(population->GetId());
 
     dq_["numbers_at_age"][i_age_year] =
-        fims_math::exp(population->log_init_naa[a]);
+        fims_math::exp(population->log_init_naa[age]);
   }
 
   /**
@@ -283,7 +292,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
    *
    * @snippet{doc} this param_population
    * @snippet{doc} this param_i_age_year
-   * @param i_agem1_yearm1 Dimension folded index for age-1 and year-1.
+   * @snippet{doc} this param_i_agem1_yearm1
    * @snippet{doc} this param_age
    */
   void CalculateNumbersAA(
@@ -326,7 +335,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
    *
    * @snippet{doc} this param_population
    * @snippet{doc} this param_i_age_year
-   * @param i_agem1_yearm1 Dimension folded index for age-1 and year-1.
+   * @snippet{doc} this param_i_agem1_yearm1
    * @snippet{doc} this param_age
    */
   void CalculateUnfishedNumbersAA(
@@ -605,7 +614,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * @snippet{doc} this param_population
    * @snippet{doc} this param_i_age_year
    * @snippet{doc} this param_year
-   * @param i_dev Index to log_recruit_dev of vector length n_years-1.
+   * @snippet{doc} this param_i_dev
    */
   void CalculateRecruitment(
       std::shared_ptr<fims_popdy::Population<Type>> &population,
