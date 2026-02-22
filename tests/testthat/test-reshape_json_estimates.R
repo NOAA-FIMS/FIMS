@@ -3,9 +3,9 @@
 #' Necessary tests include input and output (IO) correctness [IO
 #' correctness], edge-case handling [Edge handling], and built-in errors and
 #' warnings [Error handling]. See `?FIMS:::use_testthat_template` for more
-#' information. Every test should have a @description tag, which can span
-#' multiple lines, that will be used in the bookdown report of the results from
-#' {testthat}.
+#' information. Every test should have a @description tag, which can only span
+#' one lines, that will be used in the bookdown report of the results from
+#' {testthat}. This line can be more than 80 characters.
 
 # reshape_json_estimates ----
 ## Setup ----
@@ -16,10 +16,7 @@ if (!file.exists(testthat::test_path("fixtures", "fit_age_length_comp.RDS"))) {
 
 #' Helper function to compare parameter summaries from TMB and JSON sources.
 #'
-#' @description This function reads a saved FIMS model fit object, processes its
-#' TMB and JSON components to extract parameter names and labels, and then
-#' compares them for consistency. It also checks for duplicate parameter IDs in
-#' the JSON output.
+#' @description This function reads a saved FIMS model fit object, processes its TMB and JSON components to extract parameter names and labels, and then compares them for consistency. It also checks for duplicate parameter IDs in the JSON output.
 #' @param model_fit_path A character string specifying the path to the .RDS file
 #'   containing the model fit object.
 #' @return Invisible `NULL` if tests pass. Throws an error via `cli::cli_abort`
