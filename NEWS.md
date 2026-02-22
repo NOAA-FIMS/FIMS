@@ -1,3 +1,11 @@
+# FIMS 0.8.1
+
+* Fixes two bugs in `fit_fims` when getting random effect names and not wanting
+  measurements of uncertainty
+* Enhance the documentation by adding a Cheatsheet, updating the README,
+  increasing information for some functions, added Rcpp training vignette,
+  adding additional equations to doxygen
+
 # FIMS 0.8.0
 
 * Allow for projections based on fixed fishing mortality, catches, or in theory
