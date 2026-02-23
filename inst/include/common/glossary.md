@@ -6,21 +6,21 @@ Definitions of mathematical symbols used in FIMS equations.
 
 - \f$N_{a,y}\f$ — Numbers at age \f$a\f$ in year \f$y\f$ (fished)
 - \f$N^U_{a,y}\f$ — Unfished numbers at age \f$a\f$ in year \f$y\f$
-- \f$N_{a,0}\f$ — Initial numbers at age \f$a\f$ in the initial year 0
-- \f$N^U_{a,0}\f$ — Unfished initial numbers at age \f$a\f$ in the initial year 0
+- \f$N_{a,0}\f$ — Numbers at age \f$a\f$ in the initial year 0
+- \f$N^U_{a,0}\f$ — Unfished numbers at age \f$a\f$ in the initial year 0
 - \f$R_0\f$ — Unfished equilibrium recruitment
 - \f$R_y\f$ — Recruitment in year \f$y\f$
 - \f$\log R_0\f$ — Natural log of unfished equilibrium recruitment
-- \f$\log\_devs\f$ — Natural log recruitment deviations
+- \f$\log devs\f$ — Natural log recruitment deviations (see log_devs.hpp)
 
 ## Mortality
 
 - \f$M\f$ — Natural mortality rate (yr\f$^{-1}\f$)
-- \f$F_{f,y}\f$ — Fleet-specific fishing mortality for fleet \f$f\f$ in year \f$y\f$ (yr\f$^{-1}\f$)
+- \f$F_{f,y}\f$ — Fishing mortality for fleet \f$f\f$ in year \f$y\f$ (yr\f$^{-1}\f$)
 - \f$F_{f,a,y}\f$ — Fishing mortality for fleet \f$f\f$ at age \f$a\f$ in year \f$y\f$ (yr\f$^{-1}\f$)
 - \f$Z_{a,y}\f$ — Total mortality at age \f$a\f$ in year \f$y\f$, \f$Z = M + F\f$ (yr\f$^{-1}\f$)
 - \f$S_{f,a}\f$ — Selectivity for fleet \f$f\f$ at age \f$a\f$
-- \f$f_y\f$ — Year-specific F multiplier in year \f$y\f$
+- \f$f_y\f$ — F multiplier in year \f$y\f$
 
 ## Biomass
 
@@ -34,25 +34,8 @@ Definitions of mathematical symbols used in FIMS equations.
 ## Stock--Recruitment (Beverton--Holt)
 
 - \f$h\f$ — Steepness, recruitment relative to \f$R_0\f$ at 20% of \f$SB^U_0\f$; range (0.2, 1.0]
-- \f$\phi_0\f$ — Spawning biomass per recruit (unfished)
-- \f$SB_{y-1}\f$ — Spawning output in the previous year
-
-\f[
-R_y = \frac{0.8\, R_0\, h\, SB_{y-1}}{0.2\, R_0\, \phi_0\, (1 - h) + SB_{y-1}\, (h - 0.2)}
-\f]
-
-## Selectivity and Maturity
-
-- \f$x\f$ — Age or size
-- \f$\text{slope}\f$ — Logistic curve slope
-- \f$\text{inflection\_point}\f$ — Age or size at 50% selectivity/maturity
-- \f$\text{slope\_asc}\f$, \f$\text{slope\_desc}\f$ — Ascending and descending slopes (double logistic)
-- \f$\text{inflection\_point\_asc}\f$, \f$\text{inflection\_point\_desc}\f$ — Ascending and descending inflection points
-
-Logistic:
-\f[
-\frac{1}{1 + \exp(-\text{slope} \cdot (x - \text{inflection\_point}))}
-\f]
+- \f$\phi_0\f$ — Spawning biomass per recruit in the initial year 0
+- \f$SB_{y-1}\f$ — Spawning biomass in the previous year
 
 ## Growth
 
@@ -61,29 +44,17 @@ Logistic:
 ## Catch and Landings
 
 - \f$C_{f,a,y}\f$ — Catch in numbers for fleet \f$f\f$ at age \f$a\f$ in year \f$y\f$
-- \f$CW_{f,a,y}\f$ — Catch weight for fleet \f$f\f$ at age \f$a\f$ in year \f$y\f$
-- \f$CW_{f,y}\f$ — Total catch weight for fleet \f$f\f$ in year \f$y\f$
+- \f$CW_{f,y}\f$ — Catch weight for fleet \f$f\f$ in year \f$y\f$ (mt)
+- \f$CW_{f,a,y}\f$ — Catch weight for fleet \f$f\f$ at age \f$a\f$ in year \f$y\f$ (mt)
 - \f$q_{f,y}\f$ — Catchability coefficient for fleet \f$f\f$ in year \f$y\f$
 
-Baranov catch equation:
-\f[
-C_{f,a,y} = \frac{F_{f,y} \times f_y \times S_{f,a}}{Z_{a,y}} \times N_{a,y} \times (1 - e^{-Z_{a,y}})
-\f]
+## Index of Abundance
 
-## Index (Survey)
-
+- \f$IN_{f,y}\f$ — Index numbers for fleet \f$f\f$ in year \f$y\f$
 - \f$I_{f,a,y}\f$ — Index numbers for fleet \f$f\f$ at age \f$a\f$ in year \f$y\f$
-- \f$IW_{f,y}\f$ — Total index weight for fleet \f$f\f$ in year \f$y\f$
-- \f$IN_{f,y}\f$ — Total index numbers for fleet \f$f\f$ in year \f$y\f$
+- \f$IW_{f,y}\f$ — Index weight for fleet \f$f\f$ in year \f$y\f$ (mt)
 - \f$IWAA_{a,y}\f$ — Index weight at age \f$a\f$ in year \f$y\f$
 - \f$INAA_{a,y}\f$ — Index numbers at age \f$a\f$ in year \f$y\f$
-
-## Transformations
-
-- \f$\exp(x)\f$ — Exponential function
-- \f$\log(x)\f$ — Natural logarithm
-- \f$\text{logit}(x; a, b) = -\log(b-x) + \log(x-a)\f$
-- \f$\text{logit}^{-1}(x; a, b) = a + \frac{b-a}{1+\exp(-x)}\f$
 
 ## Index Variables
 
@@ -94,8 +65,7 @@ C_{f,a,y} = \frac{F_{f,y} \times f_y \times S_{f,a}}{Z_{a,y}} \times N_{a,y} \ti
 
 ## Statistical
 
-- \f$\sigma\f$ — Standard deviation
-- \f$\log\_sd\f$ — Log of standard deviation (used in likelihoods)
+- \f$\sigma\f$ — Standard deviation; sd
 
 ## Common Abbreviations
 
