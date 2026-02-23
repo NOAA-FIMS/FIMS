@@ -25,7 +25,7 @@ jobs:
               pull_number: context.issue.number
             });
             
-            const checklistMarker = '# Instructions for code reviewer';
+            const checklist_marker = '# Instructions for code reviewer';
             const checklist = '\n\n___\n\n' +
             '# Instructions for code reviewer\n\n' +
             'Hello reviewer, thanks for taking the time to review this PR!\n\n' +
@@ -42,17 +42,17 @@ jobs:
             '- [ ] The code is commented and the comments are clear, useful, and mostly explain why instead of what.\n' +
             '- [ ] Code is appropriately documented (doxygen and roxygen).\n';
             
-            const currentBody = pullRequest.body || '';
+            const current_body = pullRequest.body || '';
             
             // Only append checklist if it doesn't already exist
-            if (!currentBody.includes(checklistMarker)) {
-              const newBody = currentBody + checklist;
+            if (!current_body.includes(checklist_marker)) {
+              const new_body = current_body + checklist;
               
               await github.rest.pulls.update({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 pull_number: context.issue.number,
-                body: newBody
+                body: new_body
               });
             } else {
               console.log('Checklist already exists in PR description, skipping update');
