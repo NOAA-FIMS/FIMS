@@ -735,7 +735,7 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
     Rcpp::Environment TMB = Rcpp::Environment::namespace_env("TMB");
     Rcpp::Function MakeADFun = TMB["MakeADFun"];
     Rcpp::Function sdreport = TMB["sdreport"];
-    // Rcpp::Function FreeADFun = TMB["FreeADFun"];
+    Rcpp::Function FreeADFun = TMB["FreeADFun"];
     // Grab your helpers from R global environment
     Rcpp::Environment global = Rcpp::Environment::global_env();
     // Build parameters list
