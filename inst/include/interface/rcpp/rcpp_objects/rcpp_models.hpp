@@ -92,7 +92,9 @@ class FisheryModelInterfaceBase : public FIMSRcppInterfaceBase {
   virtual std::string to_json(bool do_sd_report = true) {
     return "std::string to_json() not yet implemented.";
   }
-
+  virtual std::string to_json() {
+    return this->to_json(false);
+  }
   /**
    * @brief A function to calculate reference points for the fishery model.
    *
@@ -556,9 +558,7 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
     std::stringstream ss;
 
     if (!fleet_interface) {
-      FIMS_ERROR_LOG("Fleet with id " +
-                     fims::to_string(fleet_interface->get_id()) +
-                     " not found in live objects.");
+      FIMS_ERROR_LOG("Fleet pointer is null; cannot get id. Not found in live objects.");
       return "{}";  // Return empty JSON
     }
 
