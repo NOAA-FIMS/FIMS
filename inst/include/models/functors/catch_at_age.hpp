@@ -15,27 +15,27 @@
 
 /* Dictionary block for shared parameter snippet documentations.
  * Referenced in function docs via @snippet{doc} this snippet_id.
- * [param_population]
- * @param population Shared pointer to the population object.
- * [param_population]
- * [param_i_age_year]
- * @param i_age_year Dimension folded index for age and year.
- * [param_i_age_year]
- * [param_year]
- * @param year Year index.
- * [param_year]
- * [param_age]
- * @param age Age index.
- * [param_age]
- * [param_i_agem1_yearm1]
- * @param i_agem1_yearm1 Dimension folded index for age-1 and year-1.
- * [param_i_agem1_yearm1]
- * [param_i_dev]
- * @param i_dev Index to log_recruit_dev of vector length n_years-1.
- * [param_i_dev]
- * [param_other]
- * @param other The other CatchAtAge object to copy from.
- * [param_other]
+  [param_population]
+  @param population Shared pointer to the population object.
+  [param_population]
+  [param_i_age_year]
+  @param i_age_year Dimension folded index for age and year.
+  [param_i_age_year]
+  [param_year]
+  @param year Year index.
+  [param_year]
+  [param_age]
+  @param age Age index.
+  [param_age]
+  [param_i_agem1_yearm1]
+  @param i_agem1_yearm1 Dimension folded index for age-1 and year-1.
+  [param_i_agem1_yearm1]
+  [param_i_dev]
+  @param i_dev Index to log_recruit_dev of vector length n_years-1.
+  [param_i_dev]
+  [param_other]
+  @param other The other CatchAtAge object to copy from.
+  [param_other]
  */
 
 namespace fims_popdy {
