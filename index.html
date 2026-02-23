@@ -31,7 +31,7 @@
     <nav class="navbar navbar-expand-lg fixed-top bg-light" data-bs-theme="light" aria-label="Site navigation"><div class="container">
     <img class="navlogo" src="https://noaa-fims.github.io/images/FIMS_logo3.png" width="60" align="left"><a class="navbar-brand me-2" href="index.html">FIMS</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -79,20 +79,62 @@
 <img src="logo.png" class="logo" alt=""><h1 id="overview">Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
 </h1>
 </div>
-<p>The NOAA Fisheries Integrated Modeling System (FIMS) is a software system designed to support next-generation fisheries stock assessment, ecosystem, and socioeconomic modeling. A <a href="https://noaa-fims.github.io/about/contributors.html" class="external-link">team of experts</a> within NOAA Fisheries is designing and developing the system, and we are advised by the <a href="https://noaa-fims.github.io/about/contributors.html#fims-council" class="external-link">FIMS Council</a>, which includes academic, industry, and international partners. Our software is currently operational for estimation purposes and we plan for it to be operational for management in late 2025.</p>
+<p>FIMS is an R package for fitting integrated statistical population-dynamics models to fishery data. The back end is written in C++, and the use of Rcpp allows users to easily interact with the models using R. The package is unique because it includes multiple model types, e.g., surplus production and catch-at-age models. This reduces the burden of learning a new framework when exploring major changes in model structure. Stay tuned for the addition of even more model types.</p>
+<p>If you are new to FIMS, the best place to start is the <a href="https://noaa-fims.github.io/FIMS/articles/fims-demo.html" target="_blank" class="external-link">“Introducing FIMS”</a> vignette.</p>
 <div class="section level2">
-<h2 id="installing-fims">Installing FIMS<a class="anchor" aria-label="anchor" href="#installing-fims"></a>
+<h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
-<p>A <a href="https://noaa-fisheries-integrated-toolbox.r-universe.dev/FIMS" class="external-link">precompiled version of the latest release of FIMS</a> is available from <a href="https://noaa-fisheries-integrated-toolbox.r-universe.dev" class="external-link">R universe</a> by running the following code within R:</p>
+<p>A <a href="https://noaa-fisheries-integrated-toolbox.r-universe.dev/FIMS" class="external-link">precompiled version of the latest release</a> is available from the instance of <a href="https://noaa-fisheries-integrated-toolbox.r-universe.dev" class="external-link">R universe</a> hosted by NOAA Fisheries Integrated Toolbox. You can install the latest version from GitHub.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"FIMS"</span>, repos <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"https://noaa-fisheries-integrated-toolbox.r-universe.dev"</span>, <span class="st">"https://cloud.r-project.org"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p>Users can also compile it themselves, like any other TMB package by running <code>devtools::install_github("NOAA-FIMS/FIMS")</code>. This workflow allows for the specification of a particular branch or tag using the <code>ref</code> argument.</p>
-<p>Developers who are interested in building FIMS can clone this repository, e.g., <code>git clone https://github.com/NOAA-FIMS/FIMS.git</code> and build it with <code><a href="https://devtools.r-lib.org/reference/install.html" class="external-link">devtools::install()</a></code>, which builds the package from the cloned files and installs the R library. Installing with <code><a href="https://devtools.r-lib.org/reference/load_all.html" class="external-link">devtools::load_all()</a></code> is not recommended because it uses shim files for things like <code><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file()</a></code>, which can cause FIMS to not function as expected. For example, if you try to optimize the same model twice, you will more than likely not get estimates of uncertainty from the second model run. Additionally, <code><a href="https://devtools.r-lib.org/reference/load_all.html" class="external-link">devtools::load_all()</a></code> adds the debugger flag <code>-O0 -g</code> which leads to Windows users seeing <code>Fatal error: can't write &lt;xxx&gt; bytes to section .text of FIMS.o: 'file too big</code>. Thus, Windows users need to run <code>withr::local_options(pkg.build_extra_flags = FALSE)</code> at the beginning of every R session before calling <code><a href="https://devtools.r-lib.org/reference/load_all.html" class="external-link">devtools::load_all()</a></code>. If you want to compile FIMS with the debugger turned on you will need to run the {withr} function in addition to manually modifying the call to PKG_CXXFLAGS in the <a href="https://github.com/NOAA-FIMS/FIMS/blob/doc-install/src/Makevars.win" class="external-link">Makevars.win</a> file in <code>src</code> to <code>PKG_CXXFLAGS =  -DTMB_MODEL  -DTMB_EIGEN_DISABLE_WARNINGS -O1 -g</code>. For a <a href="https://github.com/nmfs-ost/on-off-boarding/blob/211d3895afb892ac2fba919935eb27d933e4d048/.github/workflows/onboard-fims.yml#L22" class="external-link">list of development tools needed to build, test, and document FIMS</a> see the <a href="https://github.com/nmfs-ost/on-off-boarding" class="external-link">on- and off-boarding repository for NOAA Fisheries Office of Science &amp; Technology</a>.</p>
+<code class="sourceCode R"><span><span class="co"># Install the pre-compiled version of the latest release</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span></span>
+<span>  <span class="st">"FIMS"</span>,</span>
+<span>  repos <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>    <span class="st">"https://noaa-fisheries-integrated-toolbox.r-universe.dev"</span>,</span>
+<span>    <span class="st">"https://cloud.r-project.org"</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Compile and install it yourself, where you can specify the branch</span></span>
+<span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pak.html" class="external-link">pak</a></span><span class="op">(</span><span class="st">"NOAA-FIMS/FIMS@main"</span><span class="op">)</span></span></code></pre></div>
+<details><summary><strong>Expand this section if you want to use <code>load_all()</code></strong>
+</summary><p>Developers who are interested in building FIMS can clone this repository, e.g., <code>git clone https://github.com/NOAA-FIMS/FIMS.git</code> and build it with <code><a href="https://devtools.r-lib.org/reference/install.html" class="external-link">devtools::install()</a></code>, which builds the package from the cloned files and installs the R library. Installing with <code><a href="https://devtools.r-lib.org/reference/load_all.html" class="external-link">devtools::load_all()</a></code> is not recommended because it uses shim files for things like <code><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file()</a></code>, which can cause FIMS to not function as expected. For example, if you try to optimize the same model twice, you will more than likely not get estimates of uncertainty from the second model run. Additionally, <code><a href="https://devtools.r-lib.org/reference/load_all.html" class="external-link">devtools::load_all()</a></code> adds the debugger flag <code>-O0 -g</code> which leads to Windows users seeing <code>Fatal error: can't write &lt;xxx&gt; bytes to section .text of FIMS.o: 'file too big</code>. Thus, Windows users need to run <code>withr::local_options(pkg.build_extra_flags = FALSE)</code> at the beginning of every R session before calling <code><a href="https://devtools.r-lib.org/reference/load_all.html" class="external-link">devtools::load_all()</a></code>. If you want to compile FIMS with the debugger turned on you will need to run the {withr} function in addition to manually modifying the call to PKG_CXXFLAGS in the <a href="https://github.com/NOAA-FIMS/FIMS/blob/main/src/Makevars.win" class="external-link">src/Makevars.win</a> file to include <code>-O1 -g</code>.</p>
+A comprehensive list of all the tools needed to build, test, and document FIMS can be found <a href="https://github.com/nmfs-ost/on-off-boarding/blob/211d3895afb892ac2fba919935eb27d933e4d048/.github/workflows/onboard-fims.yml#L22" class="external-link">here</a>. Additionally, information on best practices regarding how to install each requirement can be found on the <a href="https://nmfs-ost.github.io/on-off-boarding/" class="external-link">NOAA Fisheries Office of Science and Technology on- and off-boarding repository</a>.
+</details>
 </div>
 <div class="section level2">
-<h2 id="getting-help">Getting Help<a class="anchor" aria-label="anchor" href="#getting-help"></a>
+<h2 id="cheatsheet">Cheatsheet<a class="anchor" aria-label="anchor" href="#cheatsheet"></a>
 </h2>
-<p>If you encounter a clear <span class="emoji" data-emoji="bug">🐛</span>, please file an <a href="https://github.com/NOAA-FIMS/FIMS/issues" class="external-link">Issue</a> with a minimal reproducible example on GitHub. If you are uncertain if you have actually encountered a <span class="emoji" data-emoji="bug">🐛</span>, are looking for more information, or want to talk about some new ideas please use the <a href="https://github.com/orgs/NOAA-FIMS/discussions" class="external-link">Discussion Board</a> to post your thoughts. Users, developers, lurkers, and anyone else interested in our project are welcome to join the discussions, this is a place for <strong>all</strong> members of the assessment and open-source software community to ask and answer questions, share updates, have open-ended conversations, and follow along on decisions affecting FIMS. Also, feel free to introduce yourself <span class="emoji" data-emoji="wave">👋</span> on the <a href="https://github.com/orgs/NOAA-FIMS/discussions/801" class="external-link">FIMS Discussion Board</a>.</p>
+<p><a href="https://github.com/noaa-fims/fims/blob/main/pkgdown/assets/fims.pdf" class="external-link"><img src="https://raw.githubusercontent.com/noaa-fims/fims/main/pkgdown/assets/fims-cheatsheet-thumbs.png" width="315" height="252"></a></p>
+</div>
+<div class="section level2">
+<h2 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a>
+</h2>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/noaa-fims/fims" class="external-link">FIMS</a></span><span class="op">)</span></span>
+<span><span class="co"># Load sample data</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"data1"</span><span class="op">)</span></span>
+<span><span class="co"># Prepare data for FIMS model</span></span>
+<span><span class="va">data_4_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/FIMSFrame.html">FIMSFrame</a></span><span class="op">(</span><span class="va">data1</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Create parameters</span></span>
+<span><span class="va">parameters</span> <span class="op">&lt;-</span> <span class="va">data_4_model</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="reference/create_default_configurations.html">create_default_configurations</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="reference/create_default_parameters.html">create_default_parameters</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">data_4_model</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Run the  model with optimization</span></span>
+<span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="va">parameters</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="reference/initialize_fims.html">initialize_fims</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">data_4_model</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="reference/fit_fims.html">fit_fims</a></span><span class="op">(</span>optimize <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="co"># Clear memory post-run</span></span>
+<span><span class="fu"><a href="reference/Cpp_functions.html">clear</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="troubleshooting">Troubleshooting<a class="anchor" aria-label="anchor" href="#troubleshooting"></a>
+</h2>
+<p>If you encounter a <span class="emoji" data-emoji="bug">🐛</span>, please file an <a href="https://github.com/NOAA-FIMS/FIMS/issues" class="external-link">Issue</a> with a minimal reproducible example on GitHub.</p>
+<p>If you are uncertain that you have actually encountered a <span class="emoji" data-emoji="bug">🐛</span>, are looking for more information, or want to talk about some new ideas please use the <a href="https://github.com/orgs/NOAA-FIMS/discussions" class="external-link">Discussion Board</a> to post your thoughts. Anyone interested in our project is welcome to join the discussions, this is a place for <strong>all</strong> members of the assessment and open-source software community to ask and answer questions, share updates, have open-ended conversations, and follow along. Please introduce yourself <span class="emoji" data-emoji="wave">👋</span> on the <a href="https://github.com/orgs/NOAA-FIMS/discussions/801" class="external-link">Introduction Discussion</a>.</p>
+<p>More information can be found on the <a href="https://noaa-fims.github.io" target="_blank" class="external-link">NOAA-FIMS website</a>, particularly on <a href="https://noaa-fims.github.io/blog/" target="_blank" class="external-link">our blog</a>.</p>
 <hr>
 </div>
 <div class="section level2">
@@ -134,13 +176,13 @@
 <a href="https://github.com/JaneSullivan-NOAA" class="external-link"> <img src="https://avatars.githubusercontent.com/u/68303089?v=4" width="100px;" alt=""></a><br><a href="https://github.com/NOAA-FIMS/FIMS/commits?author=JaneSullivan-NOAA" class="external-link">JaneSullivan-NOAA</a>
 </td>
 <td align="center">
+<a href="https://github.com/awilnoaa" class="external-link"> <img src="https://avatars.githubusercontent.com/u/167116769?v=4" width="100px;" alt=""></a><br><a href="https://github.com/NOAA-FIMS/FIMS/commits?author=awilnoaa" class="external-link">awilnoaa</a>
+</td>
+<td align="center">
 <a href="https://github.com/JonBrodziak" class="external-link"> <img src="https://avatars.githubusercontent.com/u/11236454?v=4" width="100px;" alt=""></a><br><a href="https://github.com/NOAA-FIMS/FIMS/commits?author=JonBrodziak" class="external-link">JonBrodziak</a>
 </td>
 <td align="center">
 <a href="https://github.com/MOshima-PIFSC" class="external-link"> <img src="https://avatars.githubusercontent.com/u/78562167?v=4" width="100px;" alt=""></a><br><a href="https://github.com/NOAA-FIMS/FIMS/commits?author=MOshima-PIFSC" class="external-link">MOshima-PIFSC</a>
-</td>
-<td align="center">
-<a href="https://github.com/awilnoaa" class="external-link"> <img src="https://avatars.githubusercontent.com/u/167116769?v=4" width="100px;" alt=""></a><br><a href="https://github.com/NOAA-FIMS/FIMS/commits?author=awilnoaa" class="external-link">awilnoaa</a>
 </td>
 <td align="center">
 <a href="https://github.com/iantaylor-NOAA" class="external-link"> <img src="https://avatars.githubusercontent.com/u/4992918?v=4" width="100px;" alt=""></a><br><a href="https://github.com/NOAA-FIMS/FIMS/commits?author=iantaylor-NOAA" class="external-link">iantaylor-NOAA</a>
@@ -253,15 +295,21 @@
 <a href="https://github.com/cgrandin" class="external-link"> <img src="https://avatars.githubusercontent.com/u/4551051?u=7d289d4508c6ba2f6d2691b71be5bd2dc5456115&amp;v=4" width="100px;" alt=""></a><br><a href="https://github.com/NOAA-FIMS/FIMS/issues?q=is%3Aissue+commenter%3Acgrandin" class="external-link">cgrandin</a>
 </td>
 <td align="center">
-<a href="https://github.com/grantdadams" class="external-link"> <img src="https://avatars.githubusercontent.com/u/25754306?u=8905d14240f12344b16974444ae34f26bb20be18&amp;v=4" width="100px;" alt=""></a><br><a href="https://github.com/NOAA-FIMS/FIMS/issues?q=is%3Aissue+commenter%3Agrantdadams" class="external-link">grantdadams</a>
+<a href="https://github.com/szu-yun-ko" class="external-link"> <img src="https://avatars.githubusercontent.com/u/210009874?u=5c9a6c92ce5c9f980d1c63978aa3dd1273a7135c&amp;v=4" width="100px;" alt=""></a><br><a href="https://github.com/NOAA-FIMS/FIMS/issues?q=is%3Aissue+commenter%3Aszu-yun-ko" class="external-link">szu-yun-ko</a>
 </td>
 <td align="center">
-<a href="https://github.com/mtvincent-NOAA" class="external-link"> <img src="https://avatars.githubusercontent.com/u/37819533?u=bf0d6c72d33785c62ff89b70963f4a76c37ce9d7&amp;v=4" width="100px;" alt=""></a><br><a href="https://github.com/NOAA-FIMS/FIMS/issues?q=is%3Aissue+commenter%3Amtvincent-NOAA" class="external-link">mtvincent-NOAA</a>
+<a href="https://github.com/grantdadams" class="external-link"> <img src="https://avatars.githubusercontent.com/u/25754306?u=8905d14240f12344b16974444ae34f26bb20be18&amp;v=4" width="100px;" alt=""></a><br><a href="https://github.com/NOAA-FIMS/FIMS/issues?q=is%3Aissue+commenter%3Agrantdadams" class="external-link">grantdadams</a>
 </td>
 </tr>
 <tr>
 <td align="center">
+<a href="https://github.com/mtvincent-NOAA" class="external-link"> <img src="https://avatars.githubusercontent.com/u/37819533?u=bf0d6c72d33785c62ff89b70963f4a76c37ce9d7&amp;v=4" width="100px;" alt=""></a><br><a href="https://github.com/NOAA-FIMS/FIMS/issues?q=is%3Aissue+commenter%3Amtvincent-NOAA" class="external-link">mtvincent-NOAA</a>
+</td>
+<td align="center">
 <a href="https://github.com/averma2988225-droid" class="external-link"> <img src="https://avatars.githubusercontent.com/u/228820491?u=65b366d015576fba0e42513d2443a57aa6f2d4fa&amp;v=4" width="100px;" alt=""></a><br><a href="https://github.com/NOAA-FIMS/FIMS/issues?q=is%3Aissue+commenter%3Aaverma2988225-droid" class="external-link">averma2988225-droid</a>
+</td>
+<td align="center">
+<a href="https://github.com/mollystevens-noaa" class="external-link"> <img src="https://avatars.githubusercontent.com/u/53794202?u=349e71933142169e93c418f94414fd6020a067f3&amp;v=4" width="100px;" alt=""></a><br><a href="https://github.com/NOAA-FIMS/FIMS/issues?q=is%3Aissue+commenter%3Amollystevens-noaa" class="external-link">mollystevens-noaa</a>
 </td>
 </tr>
 </table>
@@ -275,7 +323,7 @@
 <p>Software code created by U.S. Government employees is not subject to copyright in the United States (17 U.S.C. section 105). The United States/Department of Commerce reserve all rights to seek and obtain copyright protection in countries other than the United States for Software authored in its entirety by the Department of Commerce. To this end, the Department of Commerce hereby grants to Recipient a royalty-free, nonexclusive license to use, copy, and create derivative works of the Software outside of the United States.</p>
 <hr>
 <p><img src="https://raw.githubusercontent.com/nmfs-general-modeling-tools/nmfspalette/main/man/figures/noaa-fisheries-rgb-2line-horizontal-small.png" height="75" alt="NOAA Fisheries"></p>
-<p><a href="https://www.commerce.gov/" class="external-link">U.S. Department of Commerce</a> | <a href="https://www.noaa.gov" class="external-link">National Oceanographic and Atmospheric Administration</a> | <a href="https://www.fisheries.noaa.gov/" class="external-link">NOAA Fisheries</a></p>
+<p><a href="https://www.commerce.gov/" class="external-link">U.S. Department of Commerce</a> | <a href="https://www.noaa.gov" class="external-link">National Oceanic and Atmospheric Administration</a> | <a href="https://www.fisheries.noaa.gov/" class="external-link">NOAA Fisheries</a></p>
 </div>
 </div>
 
@@ -314,11 +362,14 @@
 <h2 data-toc-skip>Developers</h2>
 <ul class="list-unstyled">
 <li>Kelli F. Johnson <br><small class="roles"> Author, maintainer </small> <a href="https://orcid.org/0000-0002-5149-451X" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
+<li>Grant D. Adams <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0003-0297-8347" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
 <li>Jon K. T. Brodziak <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0001-8690-5588" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
 <li>Kathryn L. Doering <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0002-0396-7044" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
+<li>Daniel R. Goethel <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0003-0066-431X" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
 <li>Andrea M. Havron <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0002-4080-448X" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
 <li>Ronald Klasky <br><small class="roles"> Author </small> <a href="https://orcid.org/0009-0004-7563-7716" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
 <li>Peter T. Kuriyama <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0002-6971-4015" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
+<li>Emily M. Liljestrand <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0002-1118-3872" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
 <li>Christopher M. Legault <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0002-0328-1376" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
 <li>Bai Li <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0002-8249-1442" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
 <li>Timothy J. Miller <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0003-1411-1206" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
@@ -330,6 +381,7 @@
 <li>Matthew Supernaw <br><small class="roles"> Author </small> <a href="https://orcid.org/0009-0007-3681-7433" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
 <li>Ian G. Taylor <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0002-4232-5669" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
 <li>Nathan R. Vaughan <br><small class="roles"> Author </small> <a href="https://orcid.org/0009-0000-3054-6950" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
+<li>Erik H. Williams <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0001-6623-4254" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
 <li><a href="authors.html">More about authors...</a></li>
 </ul>
 </div>
@@ -341,7 +393,7 @@
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Kelli F. Johnson, Jon K. T. Brodziak, Kathryn L. Doering, Andrea M. Havron, Ronald Klasky, Peter T. Kuriyama, Christopher M. Legault, Bai Li, Timothy J. Miller, Cole C. Monnahan, Megumi C. Oshima, Kyle W. Shertzer, Christine C. Stawitz, Jane Y. Sullivan, Matthew Supernaw, Ian G. Taylor, Nathan R. Vaughan.</p>
+  <p>Developed by Kelli F. Johnson, Grant D. Adams, Jon K. T. Brodziak, Kathryn L. Doering, Daniel R. Goethel, Andrea M. Havron, Ronald Klasky, Peter T. Kuriyama, Emily M. Liljestrand, Christopher M. Legault, Bai Li, Timothy J. Miller, Cole C. Monnahan, Megumi C. Oshima, Kyle W. Shertzer, Christine C. Stawitz, Jane Y. Sullivan, Matthew Supernaw, Ian G. Taylor, Nathan R. Vaughan, Erik H. Williams.</p>
 </div>
 
 <div class="pkgdown-footer-right">

@@ -140,9 +140,11 @@ population$SetRecruitmentID(3)
 
 Because FIMS sets up objects that are stored in memory simply running
 `rm(population)` will not free this memory back up. Instead, users need
-to use `clear()`, which is a function written in the Rcpp interface but
-callable from R. Restarting or closing your R session will also work to
-free up the memory.
+to use
+[`clear()`](https://NOAA-FIMS.github.io/FIMS/reference/Cpp_functions.md),
+which is a function written in the Rcpp interface but callable from R.
+Restarting or closing your R session will also work to free up the
+memory.
 
 ``` r
 # Clear C++ memory
@@ -161,7 +163,8 @@ each module in .hpp files found in the
 [inst/include/interface/rcpp](https://github.com/NOAA-FIMS/FIMS/tree/main/inst/include/interface/rcpp)
 directory. Only the fields and methods that are listed in the module
 interface, see below, are exposed to the R user. Additionally, this
-directory stores the code for Rcpp functions like `clear()`.
+directory stores the code for Rcpp functions like
+[`clear()`](https://NOAA-FIMS.github.io/FIMS/reference/Cpp_functions.md).
 
 ``` cpp
 Rcpp::class_<LogisticMaturityInterface>("LogisticMaturity")

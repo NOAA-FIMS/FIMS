@@ -53,7 +53,7 @@ Primary functions used when setting up or running a FIMS model.
   : Distributions not available in the stats package
 
 - [`initialize_fims()`](https://NOAA-FIMS.github.io/FIMS/reference/initialize_fims.md)
-  : Initialize FIMS modules
+  : Initialize C++ modules via Rcpp for a FIMS model
 
 - [`FIMSFit()`](https://NOAA-FIMS.github.io/FIMS/reference/FIMSFit.md) :
 
@@ -106,3 +106,53 @@ Primary functions used when developing FIMS package.
   : Reshape JSON estimates
 - [`reshape_tmb_estimates()`](https://NOAA-FIMS.github.io/FIMS/reference/reshape_tmb_estimates.md)
   : Reshape TMB estimates
+
+## Exported C++ functions and classes
+
+Links to the relevant doxygen documentation for the C++ code.
+
+- [`Cpp_classes`](https://NOAA-FIMS.github.io/FIMS/reference/Cpp_classes.md)
+  [`AgeComp`](https://NOAA-FIMS.github.io/FIMS/reference/Cpp_classes.md)
+  [`BevertonHoltRecruitment`](https://NOAA-FIMS.github.io/FIMS/reference/Cpp_classes.md)
+  [`CatchAtAge`](https://NOAA-FIMS.github.io/FIMS/reference/Cpp_classes.md)
+  [`DlnormDistribution`](https://NOAA-FIMS.github.io/FIMS/reference/Cpp_classes.md)
+  [`DmultinomDistribution`](https://NOAA-FIMS.github.io/FIMS/reference/Cpp_classes.md)
+  [`DnormDistribution`](https://NOAA-FIMS.github.io/FIMS/reference/Cpp_classes.md)
+  [`DoubleLogisticSelectivity`](https://NOAA-FIMS.github.io/FIMS/reference/Cpp_classes.md)
+  [`EWAAGrowth`](https://NOAA-FIMS.github.io/FIMS/reference/Cpp_classes.md)
+  [`Fleet`](https://NOAA-FIMS.github.io/FIMS/reference/Cpp_classes.md)
+  [`Index`](https://NOAA-FIMS.github.io/FIMS/reference/Cpp_classes.md)
+  [`Landings`](https://NOAA-FIMS.github.io/FIMS/reference/Cpp_classes.md)
+  [`LengthComp`](https://NOAA-FIMS.github.io/FIMS/reference/Cpp_classes.md)
+  [`LogDevsRecruitmentProcess`](https://NOAA-FIMS.github.io/FIMS/reference/Cpp_classes.md)
+  [`LogRRecruitmentProcess`](https://NOAA-FIMS.github.io/FIMS/reference/Cpp_classes.md)
+  [`LogisticMaturity`](https://NOAA-FIMS.github.io/FIMS/reference/Cpp_classes.md)
+  [`LogisticSelectivity`](https://NOAA-FIMS.github.io/FIMS/reference/Cpp_classes.md)
+  [`Parameter`](https://NOAA-FIMS.github.io/FIMS/reference/Cpp_classes.md)
+  [`ParameterVector`](https://NOAA-FIMS.github.io/FIMS/reference/Cpp_classes.md)
+  [`Population`](https://NOAA-FIMS.github.io/FIMS/reference/Cpp_classes.md)
+  [`RealVector`](https://NOAA-FIMS.github.io/FIMS/reference/Cpp_classes.md)
+  [`SharedInt`](https://NOAA-FIMS.github.io/FIMS/reference/Cpp_classes.md)
+  [`SharedReal`](https://NOAA-FIMS.github.io/FIMS/reference/Cpp_classes.md)
+  [`SharedString`](https://NOAA-FIMS.github.io/FIMS/reference/Cpp_classes.md)
+  : C++ Classes Exported via Rcpp
+- [`Cpp_functions`](https://NOAA-FIMS.github.io/FIMS/reference/Cpp_functions.md)
+  [`clear`](https://NOAA-FIMS.github.io/FIMS/reference/Cpp_functions.md)
+  [`get_fixed`](https://NOAA-FIMS.github.io/FIMS/reference/Cpp_functions.md)
+  [`get_log`](https://NOAA-FIMS.github.io/FIMS/reference/Cpp_functions.md)
+  [`get_log_errors`](https://NOAA-FIMS.github.io/FIMS/reference/Cpp_functions.md)
+  [`get_log_module`](https://NOAA-FIMS.github.io/FIMS/reference/Cpp_functions.md)
+  [`get_log_warnings`](https://NOAA-FIMS.github.io/FIMS/reference/Cpp_functions.md)
+  [`get_parameter_names`](https://NOAA-FIMS.github.io/FIMS/reference/Cpp_functions.md)
+  [`get_random`](https://NOAA-FIMS.github.io/FIMS/reference/Cpp_functions.md)
+  [`get_random_names`](https://NOAA-FIMS.github.io/FIMS/reference/Cpp_functions.md)
+  [`inv_logit`](https://NOAA-FIMS.github.io/FIMS/reference/Cpp_functions.md)
+  [`log_error`](https://NOAA-FIMS.github.io/FIMS/reference/Cpp_functions.md)
+  [`log_info`](https://NOAA-FIMS.github.io/FIMS/reference/Cpp_functions.md)
+  [`log_warning`](https://NOAA-FIMS.github.io/FIMS/reference/Cpp_functions.md)
+  [`logit`](https://NOAA-FIMS.github.io/FIMS/reference/Cpp_functions.md)
+  [`set_fixed`](https://NOAA-FIMS.github.io/FIMS/reference/Cpp_functions.md)
+  [`set_log_throw_on_error`](https://NOAA-FIMS.github.io/FIMS/reference/Cpp_functions.md)
+  [`set_random`](https://NOAA-FIMS.github.io/FIMS/reference/Cpp_functions.md)
+  [`CreateTMBModel`](https://NOAA-FIMS.github.io/FIMS/reference/Cpp_functions.md)
+  : C++ Functions Exported via Rcpp

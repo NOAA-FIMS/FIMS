@@ -248,8 +248,8 @@ projection_fit <- parameters_projection |>
     ## ℹ Maximum gradient went from 0.01568 to 0.00186 after 3 steps.
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
-    ## ℹ FIMS model version: 0.8.0
-    ## ℹ Total run time was 2.63222 minutes
+    ## ℹ FIMS model version: 0.8.1
+    ## ℹ Total run time was 2.4133 minutes
     ## ℹ Number of parameters: fixed_effects=87, random_effects=0, and total=87
     ## ℹ Maximum gradient= 0.00186
     ## ℹ Negative log likelihood (NLL):

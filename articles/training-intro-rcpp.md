@@ -63,7 +63,7 @@ add
 ```
 
     ## function (x, y, z) 
-    ## .Call(<pointer: 0x7f61c61d0530>, x, y, z)
+    ## .Call(<pointer: 0x7f510d7d5530>, x, y, z)
 
 ``` r
 add(1, 2, 3)
@@ -187,9 +187,9 @@ microbenchmark(
 ```
 
     ## Unit: microseconds
-    ##      expr     min       lq     mean  median       uq       max neval
-    ##   mean(x) 422.399 431.2055 437.1976 435.403 440.3080   497.289   100
-    ##  meanC(x) 371.264 371.6140 481.2538 372.506 381.5425 10869.401   100
+    ##      expr     min       lq     mean   median      uq       max neval
+    ##   mean(x) 421.977 431.5345 438.8228 436.0435 443.242   522.274   100
+    ##  meanC(x) 371.943 372.6955 491.9060 375.0845 381.451 11743.380   100
 
 ### C++ in FIMS
 
@@ -236,6 +236,71 @@ management for you automatically.
 - Vector of doubles: `NumericVector`
 - Vector of booleans: `LogicalVector`
 - Vector of strings: `CharacterVector`
+
+### SEXP in R
+
+Under the hood, every R object—whether it’s a number, vector, list, or
+function—is represented in C code as a `SEXP` (S-expression). A `SEXP`
+is essentially a pointer ([see the section on pointers in the C++
+vignette](https://NOAA-FIMS.github.io/FIMS/articles/training-intro-rcpp.html#pointers-and-references))
+to a data structure called a `SEXPREC`. The `SEXPREC` structure contains
+information about the type of the object (such as numeric, integer,
+logical, or character), as well as the actual data and other metadata.
+This design allows R to handle all its objects in a uniform way,
+regardless of their specific type. See the [SEXP Structures in
+C](https://collinn.github.io/pages/rcpp_guide.html) for more
+information.
+
+When you use Rcpp types like `NumericVector`, Rcpp automatically manages
+the conversion between these internal R representations and C++ types,
+so you usually don’t need to interact with `SEXP` directly. However,
+when writing more advanced C++ code or working with the R API at a low
+level, you may encounter `SEXP` types explicitly.
+
+#### Type conversion
+
+When working with C++ code that doesn’t use Rcpp types directly, you can
+use `wrap()` and `as<>()` to convert between R objects (SEXP) and C++
+types.
+
+- `as<>()`: Converts R objects (SEXP) to C++ types
+- `wrap()`: Converts C++ types to R objects (SEXP)
+
+These functions are particularly useful when you want to use standard
+C++ types (like `std::vector<double>`) in your C++ code while still
+maintaining compatibility with R. See [`get_report()` in
+rcpp_models.hpp](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/interface/rcpp/rcpp_objects/rcpp_models.hpp)
+for an example of `as<>()`.
+
+**Example: Using wrap and as**
+
+``` cpp
+#include <Rcpp.h>
+using namespace Rcpp;
+
+template <typename T>
+T meanC(std::vector<T> x) {
+  int n = x.size();
+  T total = 0;
+  
+  for(int i = 0; i < n; ++i) {
+    total += x[i];
+  }
+  return total / n;
+}
+
+// [[Rcpp::export]]
+SEXP mean_wrap(SEXP input){
+  // Convert R object to C++ std::vector
+  std::vector<double> x = as<std::vector<double>>(input);
+  
+  // Perform calculation
+  double mean = meanC(x);
+  
+  // Convert C++ result back to R object
+  return wrap(mean);
+}
+```
 
 ### Rcpp methods
 
@@ -330,7 +395,29 @@ is complex with a constructor; two inputs, `min` and `max`; and one
 method, `draw`. Additionally, classes can include `.field_readonly`,
 which prevents it from being modified within R.
 
-**Example: Rcpp Module Skeleton**
+**Example: Complete Uniform Class with Module**
+
+First, we define a C++ class for generating uniform random numbers:
+
+``` cpp
+#include <Rcpp.h>
+using namespace Rcpp;
+
+class Uniform {
+public:
+  Uniform(double min_, double max_) :
+  min(min_), max(max_) {}
+  
+  NumericVector draw(int n) {
+    RNGScope scope;
+    return runif(n, min, max);
+  }
+
+  double min, max;
+};
+```
+
+Then we expose this class to R using `RCPP_MODULE`:
 
 ``` cpp
 RCPP_MODULE(unif_module) {
@@ -340,6 +427,21 @@ RCPP_MODULE(unif_module) {
   .field("max", &Uniform::max, "maximum value")
   .method("draw", &Uniform::draw);
 }
+```
+
+After compiling with
+[`Rcpp::sourceCpp()`](https://rdrr.io/pkg/Rcpp/man/sourceCpp.html), you
+can use this class from R:
+
+``` r
+# Create a new Uniform object
+u <- new(Uniform, 0, 10)
+
+# Call methods and access fields
+u$draw(10L)
+u$max
+u$max <- 5
+u$draw(10)
 ```
 
 ### RCPP_EXPOSED_CLASS

@@ -4,6 +4,8 @@ A dataset containing information necessary to run an age-structured
 stock assessment model in FIMS. This data was generated using the
 `ASSAMC` package written for the [model comparison
 project](https://NOAA-FIMS.github.io/FIMS/reference/www.github.com/NOAA-FIMS/Age_Structured_Stock_Assessment_Model_Comparison).
+The source code to make this dataset is in `data-raw/data1.R` which is
+on Github, but won't be local because it's in the .Rbuildignore file.
 
 ## Usage
 

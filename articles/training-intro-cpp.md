@@ -732,8 +732,8 @@ pointer()
 ```
 
     ## x is equal to the address of y
-    ## x is: 0x7fff1a626624
-    ## The address of y is: 0x7fff1a626624
+    ## x is: 0x7ffcc5f440c4
+    ## The address of y is: 0x7ffcc5f440c4
     ## *x returns the value of y: 3.1459
 
     ## [1] 0
@@ -773,8 +773,8 @@ reference()
 
     ## x is: 3
     ## y is: 3
-    ## The memory address of x is: 0x7fff1a626624
-    ## The memory address of y is: 0x7fff1a626624
+    ## The memory address of x is: 0x7ffcc5f440c4
+    ## The memory address of y is: 0x7ffcc5f440c4
 
     ## [1] 0
 
@@ -845,9 +845,9 @@ reassign_pointer()
 ```
 
     ## c now equals the address of b
-    ## &a = 0x7fff1a626620
-    ## &b = 0x7fff1a626624
-    ## c = 0x7fff1a626624
+    ## &a = 0x7ffcc5f440c0
+    ## &b = 0x7ffcc5f440c4
+    ## c = 0x7ffcc5f440c4
     ## a = 100
     ## b = 10
     ## *c = 10
@@ -863,14 +863,15 @@ memory themselves using the `new` and `delete` commands. If you create a
 variable using `new` and do not clean up after using `delete`, the
 program can result in **memory leaks** where the memory in the program
 accumulates over its run time, which can slow down or even crash your
-program. In FIMS, we use `clear()`, which removes all pointers,
-references, and objects created during previous model runs, ensuring
-that no leftover data or memory remains in the C++ backend. This is
-important for avoiding memory leaks and for making sure that each new
-model run starts with a clean slate. In practice, you should run clear()
-before starting a new model or after finishing one, especially when
-working interactively in R, to prevent old objects from interfering with
-new analyses.
+program. In FIMS, we use
+[`clear()`](https://NOAA-FIMS.github.io/FIMS/reference/Cpp_functions.md),
+which removes all pointers, references, and objects created during
+previous model runs, ensuring that no leftover data or memory remains in
+the C++ backend. This is important for avoiding memory leaks and for
+making sure that each new model run starts with a clean slate. In
+practice, you should run clear() before starting a new model or after
+finishing one, especially when working interactively in R, to prevent
+old objects from interfering with new analyses.
 
 **Example: Manual memory management**
 
@@ -977,8 +978,8 @@ shared_pointer()
 
     ## ptr1: 42
     ## ptr2: 24
-    ## ptr1 = 0x555ba487eca0
-    ## ptr2 = 0x555ba7674b90
-    ## ptr3 = 0x555ba487eca0
+    ## ptr1 = 0x556ab7a04510
+    ## ptr2 = 0x556ab8a79f50
+    ## ptr3 = 0x556ab7a04510
 
     ## [1] 0

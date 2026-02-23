@@ -28,7 +28,7 @@
     <nav class="navbar navbar-expand-lg fixed-top bg-light" data-bs-theme="light" aria-label="Site navigation"><div class="container">
     <img class="navlogo" src="https://noaa-fims.github.io/images/FIMS_logo3.png" width="60" align="left"><a class="navbar-brand me-2" href="../index.html">FIMS</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -229,12 +229,12 @@ wrapper functions.</p>
 <span><span class="va">population</span><span class="op">$</span><span class="fu">SetRecruitmentID</span><span class="op">(</span><span class="fl">3</span><span class="op">)</span></span></code></pre></div>
 <p>Because FIMS sets up objects that are stored in memory simply running
 <code>rm(population)</code> will not free this memory back up. Instead,
-users need to use <code>clear()</code>, which is a function written in
+users need to use <code><a href="../reference/Cpp_functions.html">clear()</a></code>, which is a function written in
 the Rcpp interface but callable from R. Restarting or closing your R
 session will also work to free up the memory.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Clear C++ memory</span></span>
-<span><span class="fu">clear</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/Cpp_functions.html">clear</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co"># Clear R memory</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/rm.html" class="external-link">rm</a></span><span class="op">(</span>list <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ls.html" class="external-link">ls</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 </div>
@@ -248,7 +248,7 @@ defined for each module in .hpp files found in the <a href="https://github.com/N
 directory. Only the fields and methods that are listed in the module
 interface, see below, are exposed to the R user. Additionally, this
 directory stores the code for Rcpp functions like
-<code>clear()</code>.</p>
+<code><a href="../reference/Cpp_functions.html">clear()</a></code>.</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode cpp rcppchunk"><code class="sourceCode cpp"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a>Rcpp<span class="op">::</span><span class="va">class_</span><span class="op">&lt;</span>LogisticMaturityInterface<span class="op">&gt;(</span><span class="st">"LogisticMaturity"</span><span class="op">)</span></span>
 <span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>  <span class="op">.</span>constructor<span class="op">()</span></span>
 <span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>  <span class="op">.</span>field<span class="op">(</span><span class="st">"inflection_point"</span><span class="op">,</span> <span class="op">&amp;</span>LogisticMaturityInterface<span class="op">::</span>inflection_point<span class="op">)</span></span>
@@ -851,7 +851,7 @@ calculations.</p>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Kelli F. Johnson, Jon K. T. Brodziak, Kathryn L. Doering, Andrea M. Havron, Ronald Klasky, Peter T. Kuriyama, Christopher M. Legault, Bai Li, Timothy J. Miller, Cole C. Monnahan, Megumi C. Oshima, Kyle W. Shertzer, Christine C. Stawitz, Jane Y. Sullivan, Matthew Supernaw, Ian G. Taylor, Nathan R. Vaughan.</p>
+  <p>Developed by Kelli F. Johnson, Grant D. Adams, Jon K. T. Brodziak, Kathryn L. Doering, Daniel R. Goethel, Andrea M. Havron, Ronald Klasky, Peter T. Kuriyama, Emily M. Liljestrand, Christopher M. Legault, Bai Li, Timothy J. Miller, Cole C. Monnahan, Megumi C. Oshima, Kyle W. Shertzer, Christine C. Stawitz, Jane Y. Sullivan, Matthew Supernaw, Ian G. Taylor, Nathan R. Vaughan, Erik H. Williams.</p>
 </div>
 
 <div class="pkgdown-footer-right">

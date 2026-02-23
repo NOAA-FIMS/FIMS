@@ -28,7 +28,7 @@
     <nav class="navbar navbar-expand-lg fixed-top bg-light" data-bs-theme="light" aria-label="Site navigation"><div class="container">
     <img class="navlogo" src="https://noaa-fims.github.io/images/FIMS_logo3.png" width="60" align="left"><a class="navbar-brand me-2" href="../index.html">FIMS</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -168,7 +168,7 @@ C++ code in <code><a href="https://rdrr.io/pkg/Rcpp/man/cppFunction.html" class=
 <span><span class="co"># after compiling, add works like a regular R function</span></span>
 <span><span class="va">add</span></span></code></pre></div>
 <pre><code><span><span class="co">## function (x, y, z) </span></span>
-<span><span class="co">## .Call(&lt;pointer: 0x7f61c61d0530&gt;, x, y, z)</span></span></code></pre>
+<span><span class="co">## .Call(&lt;pointer: 0x7f510d7d5530&gt;, x, y, z)</span></span></code></pre>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">add</span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">3</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] 6</span></span></code></pre>
@@ -273,9 +273,9 @@ compiled <code>meanC</code> function against the R function
 <span>  <span class="fu">meanC</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Unit: microseconds</span></span>
-<span><span class="co">##      expr     min       lq     mean  median       uq       max neval</span></span>
-<span><span class="co">##   mean(x) 422.399 431.2055 437.1976 435.403 440.3080   497.289   100</span></span>
-<span><span class="co">##  meanC(x) 371.264 371.6140 481.2538 372.506 381.5425 10869.401   100</span></span></code></pre>
+<span><span class="co">##      expr     min       lq     mean   median      uq       max neval</span></span>
+<span><span class="co">##   mean(x) 421.977 431.5345 438.8228 436.0435 443.242   522.274   100</span></span>
+<span><span class="co">##  meanC(x) 371.943 372.6955 491.9060 375.0845 381.451 11743.380   100</span></span></code></pre>
 </details>
 </div>
 <div class="section level3">
@@ -336,6 +336,71 @@ each type handles memory management for you automatically.</p>
 </ul>
 </div>
 <div class="section level3">
+<h3 id="sexp-in-r">SEXP in R<a class="anchor" aria-label="anchor" href="#sexp-in-r"></a>
+</h3>
+<p>Under the hood, every R object—whether it’s a number, vector, list,
+or function—is represented in C code as a <code>SEXP</code>
+(S-expression). A <code>SEXP</code> is essentially a pointer (<a href="training-intro-rcpp.html#pointers-and-references">see the section
+on pointers in the C++ vignette</a>) to a data structure called a
+<code>SEXPREC</code>. The <code>SEXPREC</code> structure contains
+information about the type of the object (such as numeric, integer,
+logical, or character), as well as the actual data and other metadata.
+This design allows R to handle all its objects in a uniform way,
+regardless of their specific type. See the <a href="https://collinn.github.io/pages/rcpp_guide.html" class="external-link">SEXP Structures
+in C</a> for more information.</p>
+<p>When you use Rcpp types like <code>NumericVector</code>, Rcpp
+automatically manages the conversion between these internal R
+representations and C++ types, so you usually don’t need to interact
+with <code>SEXP</code> directly. However, when writing more advanced C++
+code or working with the R API at a low level, you may encounter
+<code>SEXP</code> types explicitly.</p>
+<div class="section level4">
+<h4 id="type-conversion">Type conversion<a class="anchor" aria-label="anchor" href="#type-conversion"></a>
+</h4>
+<p>When working with C++ code that doesn’t use Rcpp types directly, you
+can use <code>wrap()</code> and <code>as&lt;&gt;()</code> to convert
+between R objects (SEXP) and C++ types.</p>
+<ul>
+<li>
+<code>as&lt;&gt;()</code>: Converts R objects (SEXP) to C++
+types</li>
+<li>
+<code>wrap()</code>: Converts C++ types to R objects (SEXP)</li>
+</ul>
+<p>These functions are particularly useful when you want to use standard
+C++ types (like <code>std::vector&lt;double&gt;</code>) in your C++ code
+while still maintaining compatibility with R. See <a href="https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/interface/rcpp/rcpp_objects/rcpp_models.hpp" class="external-link"><code>get_report()</code>
+in rcpp_models.hpp</a> for an example of <code>as&lt;&gt;()</code>.</p>
+<details><summary><strong>Example: Using wrap and as</strong>
+</summary><div class="sourceCode" id="cb14"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;Rcpp.h&gt;</span></span>
+<span id="cb14-2"><a href="#cb14-2" tabindex="-1"></a><span class="kw">using</span> <span class="kw">namespace</span> Rcpp<span class="op">;</span></span>
+<span id="cb14-3"><a href="#cb14-3" tabindex="-1"></a></span>
+<span id="cb14-4"><a href="#cb14-4" tabindex="-1"></a><span class="kw">template</span> <span class="op">&lt;</span><span class="kw">typename</span> T<span class="op">&gt;</span></span>
+<span id="cb14-5"><a href="#cb14-5" tabindex="-1"></a>T meanC<span class="op">(</span><span class="bu">std::</span>vector<span class="op">&lt;</span>T<span class="op">&gt;</span> x<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb14-6"><a href="#cb14-6" tabindex="-1"></a>  <span class="dt">int</span> n <span class="op">=</span> x<span class="op">.</span>size<span class="op">();</span></span>
+<span id="cb14-7"><a href="#cb14-7" tabindex="-1"></a>  T total <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb14-8"><a href="#cb14-8" tabindex="-1"></a>  </span>
+<span id="cb14-9"><a href="#cb14-9" tabindex="-1"></a>  <span class="cf">for</span><span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> n<span class="op">;</span> <span class="op">++</span>i<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb14-10"><a href="#cb14-10" tabindex="-1"></a>    total <span class="op">+=</span> x<span class="op">[</span>i<span class="op">];</span></span>
+<span id="cb14-11"><a href="#cb14-11" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb14-12"><a href="#cb14-12" tabindex="-1"></a>  <span class="cf">return</span> total <span class="op">/</span> n<span class="op">;</span></span>
+<span id="cb14-13"><a href="#cb14-13" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb14-14"><a href="#cb14-14" tabindex="-1"></a></span>
+<span id="cb14-15"><a href="#cb14-15" tabindex="-1"></a><span class="co">// [[Rcpp::export]]</span></span>
+<span id="cb14-16"><a href="#cb14-16" tabindex="-1"></a>SEXP mean_wrap<span class="op">(</span>SEXP input<span class="op">){</span></span>
+<span id="cb14-17"><a href="#cb14-17" tabindex="-1"></a>  <span class="co">// Convert R object to C++ std::vector</span></span>
+<span id="cb14-18"><a href="#cb14-18" tabindex="-1"></a>  <span class="bu">std::</span>vector<span class="op">&lt;</span><span class="dt">double</span><span class="op">&gt;</span> x <span class="op">=</span> as<span class="op">&lt;</span><span class="bu">std::</span>vector<span class="op">&lt;</span><span class="dt">double</span><span class="op">&gt;&gt;(</span>input<span class="op">);</span></span>
+<span id="cb14-19"><a href="#cb14-19" tabindex="-1"></a>  </span>
+<span id="cb14-20"><a href="#cb14-20" tabindex="-1"></a>  <span class="co">// Perform calculation</span></span>
+<span id="cb14-21"><a href="#cb14-21" tabindex="-1"></a>  <span class="dt">double</span> mean <span class="op">=</span> meanC<span class="op">(</span>x<span class="op">);</span></span>
+<span id="cb14-22"><a href="#cb14-22" tabindex="-1"></a>  </span>
+<span id="cb14-23"><a href="#cb14-23" tabindex="-1"></a>  <span class="co">// Convert C++ result back to R object</span></span>
+<span id="cb14-24"><a href="#cb14-24" tabindex="-1"></a>  <span class="cf">return</span> wrap<span class="op">(</span>mean<span class="op">);</span></span>
+<span id="cb14-25"><a href="#cb14-25" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+</details>
+</div>
+</div>
+<div class="section level3">
 <h3 id="rcpp-methods">Rcpp methods<a class="anchor" aria-label="anchor" href="#rcpp-methods"></a>
 </h3>
 <p>Rcpp methods are functions that belong to Rcpp classes and allow you
@@ -353,7 +418,7 @@ Python, it’s somewhat similar to the way you use dot notation
 there.</li>
 </ul>
 <details><summary><strong>Example: Rcpp Vectors and Methods</strong>
-</summary><div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+</summary><div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">src</span> <span class="op">&lt;-</span></span>
 <span>  <span class="st">"#include &lt;Rcpp.h&gt;</span></span>
 <span><span class="st">  using namespace Rcpp;</span></span>
@@ -429,14 +494,43 @@ called <code>Uniform</code> is complex with a constructor; two inputs,
 <code>draw</code>. Additionally, classes can include
 <code>.field_readonly</code>, which prevents it from being modified
 within R.</p>
-<details><summary><strong>Example: Rcpp Module Skeleton</strong>
-</summary><div class="sourceCode" id="cb17"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb17-1"><a href="#cb17-1" tabindex="-1"></a>RCPP_MODULE<span class="op">(</span>unif_module<span class="op">)</span> <span class="op">{</span></span>
-<span id="cb17-2"><a href="#cb17-2" tabindex="-1"></a>  <span class="va">class_</span><span class="op">&lt;</span>Uniform<span class="op">&gt;(</span><span class="st">"Uniform"</span><span class="op">)</span></span>
-<span id="cb17-3"><a href="#cb17-3" tabindex="-1"></a>  <span class="op">.</span>constructor<span class="op">&lt;</span><span class="dt">double</span><span class="op">,</span><span class="dt">double</span><span class="op">&gt;()</span></span>
-<span id="cb17-4"><a href="#cb17-4" tabindex="-1"></a>  <span class="op">.</span>field<span class="op">(</span><span class="st">"min"</span><span class="op">,</span> <span class="op">&amp;</span>Uniform<span class="op">::</span>min<span class="op">,</span> <span class="st">"minimum value"</span><span class="op">)</span></span>
-<span id="cb17-5"><a href="#cb17-5" tabindex="-1"></a>  <span class="op">.</span>field<span class="op">(</span><span class="st">"max"</span><span class="op">,</span> <span class="op">&amp;</span>Uniform<span class="op">::</span>max<span class="op">,</span> <span class="st">"maximum value"</span><span class="op">)</span></span>
-<span id="cb17-6"><a href="#cb17-6" tabindex="-1"></a>  <span class="op">.</span>method<span class="op">(</span><span class="st">"draw"</span><span class="op">,</span> <span class="op">&amp;</span>Uniform<span class="op">::</span>draw<span class="op">);</span></span>
-<span id="cb17-7"><a href="#cb17-7" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<details><summary><strong>Example: Complete Uniform Class with Module</strong>
+</summary><p>First, we define a C++ class for generating uniform random
+numbers:</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb18-1"><a href="#cb18-1" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;Rcpp.h&gt;</span></span>
+<span id="cb18-2"><a href="#cb18-2" tabindex="-1"></a><span class="kw">using</span> <span class="kw">namespace</span> Rcpp<span class="op">;</span></span>
+<span id="cb18-3"><a href="#cb18-3" tabindex="-1"></a></span>
+<span id="cb18-4"><a href="#cb18-4" tabindex="-1"></a><span class="kw">class</span> Uniform <span class="op">{</span></span>
+<span id="cb18-5"><a href="#cb18-5" tabindex="-1"></a><span class="kw">public</span><span class="op">:</span></span>
+<span id="cb18-6"><a href="#cb18-6" tabindex="-1"></a>  Uniform<span class="op">(</span><span class="dt">double</span> <span class="va">min_</span><span class="op">,</span> <span class="dt">double</span> <span class="va">max_</span><span class="op">)</span> <span class="op">:</span></span>
+<span id="cb18-7"><a href="#cb18-7" tabindex="-1"></a>  min<span class="op">(</span><span class="va">min_</span><span class="op">),</span> max<span class="op">(</span><span class="va">max_</span><span class="op">)</span> <span class="op">{}</span></span>
+<span id="cb18-8"><a href="#cb18-8" tabindex="-1"></a>  </span>
+<span id="cb18-9"><a href="#cb18-9" tabindex="-1"></a>  NumericVector draw<span class="op">(</span><span class="dt">int</span> n<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb18-10"><a href="#cb18-10" tabindex="-1"></a>    RNGScope scope<span class="op">;</span></span>
+<span id="cb18-11"><a href="#cb18-11" tabindex="-1"></a>    <span class="cf">return</span> runif<span class="op">(</span>n<span class="op">,</span> min<span class="op">,</span> max<span class="op">);</span></span>
+<span id="cb18-12"><a href="#cb18-12" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb18-13"><a href="#cb18-13" tabindex="-1"></a></span>
+<span id="cb18-14"><a href="#cb18-14" tabindex="-1"></a>  <span class="dt">double</span> min<span class="op">,</span> max<span class="op">;</span></span>
+<span id="cb18-15"><a href="#cb18-15" tabindex="-1"></a><span class="op">};</span></span></code></pre></div>
+<p>Then we expose this class to R using <code>RCPP_MODULE</code>:</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb19-1"><a href="#cb19-1" tabindex="-1"></a>RCPP_MODULE<span class="op">(</span>unif_module<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb19-2"><a href="#cb19-2" tabindex="-1"></a>  <span class="va">class_</span><span class="op">&lt;</span>Uniform<span class="op">&gt;(</span><span class="st">"Uniform"</span><span class="op">)</span></span>
+<span id="cb19-3"><a href="#cb19-3" tabindex="-1"></a>  <span class="op">.</span>constructor<span class="op">&lt;</span><span class="dt">double</span><span class="op">,</span><span class="dt">double</span><span class="op">&gt;()</span></span>
+<span id="cb19-4"><a href="#cb19-4" tabindex="-1"></a>  <span class="op">.</span>field<span class="op">(</span><span class="st">"min"</span><span class="op">,</span> <span class="op">&amp;</span>Uniform<span class="op">::</span>min<span class="op">,</span> <span class="st">"minimum value"</span><span class="op">)</span></span>
+<span id="cb19-5"><a href="#cb19-5" tabindex="-1"></a>  <span class="op">.</span>field<span class="op">(</span><span class="st">"max"</span><span class="op">,</span> <span class="op">&amp;</span>Uniform<span class="op">::</span>max<span class="op">,</span> <span class="st">"maximum value"</span><span class="op">)</span></span>
+<span id="cb19-6"><a href="#cb19-6" tabindex="-1"></a>  <span class="op">.</span>method<span class="op">(</span><span class="st">"draw"</span><span class="op">,</span> <span class="op">&amp;</span>Uniform<span class="op">::</span>draw<span class="op">);</span></span>
+<span id="cb19-7"><a href="#cb19-7" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>After compiling with <code><a href="https://rdrr.io/pkg/Rcpp/man/sourceCpp.html" class="external-link">Rcpp::sourceCpp()</a></code>, you can use this
+class from R:</p>
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Create a new Uniform object</span></span>
+<span><span class="va">u</span> <span class="op">&lt;-</span> <span class="fu">new</span><span class="op">(</span><span class="va">Uniform</span>, <span class="fl">0</span>, <span class="fl">10</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Call methods and access fields</span></span>
+<span><span class="va">u</span><span class="op">$</span><span class="fu">draw</span><span class="op">(</span><span class="fl">10L</span><span class="op">)</span></span>
+<span><span class="va">u</span><span class="op">$</span><span class="va">max</span></span>
+<span><span class="va">u</span><span class="op">$</span><span class="va">max</span> <span class="op">&lt;-</span> <span class="fl">5</span></span>
+<span><span class="va">u</span><span class="op">$</span><span class="fu">draw</span><span class="op">(</span><span class="fl">10</span><span class="op">)</span></span></code></pre></div>
 </details>
 </div>
 <div class="section level3">
@@ -472,7 +566,7 @@ file.</p>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Kelli F. Johnson, Jon K. T. Brodziak, Kathryn L. Doering, Andrea M. Havron, Ronald Klasky, Peter T. Kuriyama, Christopher M. Legault, Bai Li, Timothy J. Miller, Cole C. Monnahan, Megumi C. Oshima, Kyle W. Shertzer, Christine C. Stawitz, Jane Y. Sullivan, Matthew Supernaw, Ian G. Taylor, Nathan R. Vaughan.</p>
+  <p>Developed by Kelli F. Johnson, Grant D. Adams, Jon K. T. Brodziak, Kathryn L. Doering, Daniel R. Goethel, Andrea M. Havron, Ronald Klasky, Peter T. Kuriyama, Emily M. Liljestrand, Christopher M. Legault, Bai Li, Timothy J. Miller, Cole C. Monnahan, Megumi C. Oshima, Kyle W. Shertzer, Christine C. Stawitz, Jane Y. Sullivan, Matthew Supernaw, Ian G. Taylor, Nathan R. Vaughan, Erik H. Williams.</p>
 </div>
 
 <div class="pkgdown-footer-right">

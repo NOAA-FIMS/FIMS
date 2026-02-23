@@ -12,38 +12,63 @@ of the end-user. The remainder of this vignette walks through what is
 absolutely necessary to run a FIMS catch-at-age model using the default
 settings.
 
-## Memory
+### Loading the package
 
 Calling [`library(FIMS)`](https://github.com/noaa-fims/fims) loads the R
-package and Rcpp functions and modules into the R environment. The C++
-code is compiled upon installation rather than loading so the call to
-[`library()`](https://rdrr.io/r/base/library.html) should be pretty
-fast. Users should always run `clear()` prior to modeling to ensure that
-the C++ memory from any previous FIMS model run is cleared out.
+package, Rcpp functions, and Rcpp modules into the R environment.
 
 ``` r
 library(FIMS)
 library(ggplot2)
 library(stockplotr)
+```
 
-# Use the {stockplotr} theme for all figures
-# ggplot2::theme_set(stockplotr::theme_noaa())
+### Getting help
 
+In addition to using the traditional method of getting help within R for
+functions, i.e.,
+[`?FIMS::fit_fims`](https://NOAA-FIMS.github.io/FIMS/reference/fit_fims.md),
+you can use [`methods::show()`](https://rdrr.io/r/methods/show.html) to
+access help information for the C++ functions that are exported via
+{Rcpp}. You will either be provided with a short description of the
+function or a link to the doxygen documentation for the C++ code that
+will provide information about the function.
 
+For example, `CreateTMBModel` is a C++ function that returns a boolean.
+
+``` r
+methods::show(FIMS::CreateTMBModel)
+internal C++ function <0000014f7bd8ff00>
+    docstring : See the documentation for the Rcpp interface, https://noaa-fims.github.io/doxygen/rcpp__interface_8hpp.html.
+    signature : bool CreateTMBModel()
+```
+
+### Memory
+
+The C++ code is compiled upon installation, rather than loading, so the
+call to [`library()`](https://rdrr.io/r/base/library.html) should be
+pretty fast. Users should always run
+[`clear()`](https://NOAA-FIMS.github.io/FIMS/reference/Cpp_functions.md)
+prior to modeling to ensure that the C++ memory from any previous FIMS
+model run is cleared out.
+
+``` r
 # clear memory
 clear()
 ```
 
 ## Data
 
-Data for a FIMS model must be stored in a single data frame with a long
+Data for a FIMS model must be stored in a single data frame using a long
 format, e.g., `data("data1", package = "FIMS")`. The design is similar
 to running a linear model where you pass a single data frame to
-[`lm()`](https://rdrr.io/r/stats/lm.html). The long format does lead to
-some information being duplicated. For example, the units are listed for
-every row rather than stored in a single location for each data type.
-But, the long format facilitates using tidy functions to manipulate the
-data. And, a single function, i.e.,
+[`lm()`](https://rdrr.io/r/stats/lm.html).
+
+The long format does lead to some information being duplicated. For
+example, the units are listed for every row rather than stored in a
+single location for each data type. But, the long format facilitates
+using tidy functions to manipulate the data. And, a single function,
+i.e.,
 [`FIMSFrame()`](https://NOAA-FIMS.github.io/FIMS/reference/FIMSFrame.md),
 is all that is needed to prepare the data to be used in a FIMS model.
 
@@ -56,25 +81,21 @@ the Model Comparison Project ([github
 site](https://github.com/NOAA-FIMS/Age_Structured_Stock_Assessment_Model_Comparison)).
 The length data have since been added
 [data-raw/data1.R](https://github.com/NOAA-FIMS/FIMS/blob/main/data-raw/data1.R)
-based on an age-length conversion matrix. See
-[R/data1.R](https://github.com/NOAA-FIMS/FIMS/blob/main/R/data1.R) or
-[`?data1`](https://NOAA-FIMS.github.io/FIMS/reference/data1.md) for
-details about the package data.
+based on an age-length conversion matrix.
+
+To see how this example data frame was created, see the R script here
+[R/data1.R](https://github.com/NOAA-FIMS/FIMS/blob/main/R/data1.R). To
+find out more about the columns that are present use
+[`?data1`](https://NOAA-FIMS.github.io/FIMS/reference/data1.md).
 
 ### `FIMSFrame()`
 
-The easiest way to prepare the data for a FIMS model is to use
-[`FIMSFrame()`](https://NOAA-FIMS.github.io/FIMS/reference/FIMSFrame.md).
-This function performs several validation checks and returns an object
-of the S4 class called `FIMSFrame`. There are helper functions for
-working with a `FIMSFrame` object, e.g.,
-[`get_data()`](https://NOAA-FIMS.github.io/FIMS/reference/get_FIMSFrame.md),
-[`get_n_years()`](https://NOAA-FIMS.github.io/FIMS/reference/get_FIMSFrame.md),
-`get_*()`. Additionally, there are helper functions for pulling data out
-of the S4 class in the format needed for a module, i.e., a vector, but
-these `m_*()` functions are largely meant to be used internally within
-the package and are only exported to allow for their use by power users
-wishing to manually set up.
+Once you have a long data frame, you can pass it to
+[`FIMSFrame()`](https://NOAA-FIMS.github.io/FIMS/reference/FIMSFrame.md)
+to prepare your data for a FIMS model. This function performs several
+validation checks and returns an object with the `FIMSFrame` class. The
+`FIMSFrame` class is set up using the S4 structure (more information on
+S4 can be found [here](https://adv-r.hadley.nz/s4.html)).
 
 ``` r
 # Bring the package data into your environment
@@ -83,10 +104,20 @@ data("data1")
 data_4_model <- FIMSFrame(data1)
 ```
 
-The S4 object that we named `data_4_model` contains many slots (i.e.,
-named components of the object that can be accessed) but perhaps the
-most interesting one is the long data frame stored in the “data” slot.
-The tibble stored in this slot can be accessed using
+There are helper functions for working with objects that have the
+`FIMSFrame` class, e.g.,
+[`get_data()`](https://NOAA-FIMS.github.io/FIMS/reference/get_FIMSFrame.md),
+[`get_n_years()`](https://NOAA-FIMS.github.io/FIMS/reference/get_FIMSFrame.md),
+`get_*()`. Additionally, there are helper functions for pulling data out
+of the class in the format needed for a module, i.e., a vector, but
+these `m_*()` functions. These `m_*()` functions will not be explored in
+this vignette because they are largely meant to be used by power users
+to manually set up FIMS modules.
+
+The `data_4_model` object contains many slots (i.e., named components of
+the object that can be accessed) but perhaps the most interesting one is
+the long data frame stored in the “data” slot. This tibble can be
+accessed using
 [`get_data()`](https://NOAA-FIMS.github.io/FIMS/reference/get_FIMSFrame.md).
 
 ``` r
@@ -160,7 +191,7 @@ The data contains the following fleets:
   weight-at-age, and landings data
 - A single survey with age- and length-composition and index data
 
-## configurations
+## Configurations
 
 ### `create_default_configurations()`
 
@@ -489,8 +520,8 @@ fit <- parameters_4_model |>
     ## ℹ Maximum gradient went from 0.04938 to 0.00218 after 3 steps.
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
-    ## ℹ FIMS model version: 0.8.0
-    ## ℹ Total run time was 1.28361 minutes
+    ## ℹ FIMS model version: 0.8.1
+    ## ℹ Total run time was 1.23077 minutes
     ## ℹ Number of parameters: fixed_effects=77, random_effects=0, and total=77
     ## ℹ Maximum gradient= 0.00218
     ## ℹ Negative log likelihood (NLL):
@@ -656,8 +687,8 @@ high_slope_fit <- parameters_high_slope |>
     ## ℹ Maximum gradient went from 0.01423 to 0.00253 after 3 steps.
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
-    ## ℹ FIMS model version: 0.8.0
-    ## ℹ Total run time was 1.29102 minutes
+    ## ℹ FIMS model version: 0.8.1
+    ## ℹ Total run time was 1.22333 minutes
     ## ℹ Number of parameters: fixed_effects=77, random_effects=0, and total=77
     ## ℹ Maximum gradient= 0.00253
     ## ℹ Negative log likelihood (NLL):
@@ -678,8 +709,8 @@ low_slope_fit <- parameters_low_slope |>
     ## ℹ Maximum gradient went from 0.01142 to 0.00318 after 3 steps.
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
-    ## ℹ FIMS model version: 0.8.0
-    ## ℹ Total run time was 1.28215 minutes
+    ## ℹ FIMS model version: 0.8.1
+    ## ℹ Total run time was 1.22494 minutes
     ## ℹ Number of parameters: fixed_effects=77, random_effects=0, and total=77
     ## ℹ Maximum gradient= 0.00318
     ## ℹ Negative log likelihood (NLL):
@@ -714,7 +745,7 @@ age_only_fit <- parameters_4_model |>
     ## ℹ Maximum gradient went from 0.01253 to 8e-04 after 3 steps.
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
-    ## ℹ FIMS model version: 0.8.0 ℹ Total run time was 10.64112 seconds ℹ Number of
+    ## ℹ FIMS model version: 0.8.1 ℹ Total run time was 9.74425 seconds ℹ Number of
     ## parameters: fixed_effects=77, random_effects=0, and total=77 ℹ Maximum
     ## gradient= 8e-04 ℹ Negative log likelihood (NLL): • Marginal NLL= 1565.4676 •
     ## Total NLL= 1565.4676 ℹ Terminal SB= 1724.28921
@@ -746,7 +777,7 @@ length_only_fit <- parameters_4_model |>
     ## ℹ Maximum gradient went from 0.00422 to 0.03063 after 3 steps.
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
-    ## ℹ FIMS model version: 0.8.0 ℹ Total run time was 1.02878 minutes ℹ Number of
+    ## ℹ FIMS model version: 0.8.1 ℹ Total run time was 59.44192 seconds ℹ Number of
     ## parameters: fixed_effects=77, random_effects=0, and total=77 ℹ Maximum
     ## gradient= 0.03063 ℹ Negative log likelihood (NLL): • Marginal NLL= 1520.03752 •
     ## Total NLL= 1520.03752 ℹ Terminal SB= 1706.89135
