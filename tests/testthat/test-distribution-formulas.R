@@ -51,8 +51,7 @@ recruitment_distribution <- initialize_process_distribution(
   module = recruitment,
   par = "log_devs",
   family = gaussian(),
-  sd = list(value = om_input$logR_sd, estimation_type = "constant"),
-  is_random_effect = FALSE
+  sd = list(value = om_input$logR_sd, estimation_type = "constant")
 )
 
 # Set up fishing fleet modules to test initialize_data_distribution
@@ -135,8 +134,7 @@ test_that("`sd` value from `initialize_process_distribution()` must be greater t
       module = recruitment,
       par = "log_devs",
       family = gaussian(),
-      sd = list(value = -1, estimation_type = "constant"),
-      is_random_effect = FALSE
+      sd = list(value = -1, estimation_type = "constant")
     ),
     "are out of bounds"
   )
@@ -151,8 +149,7 @@ test_that("`initialize_process_distribution()` returns correct error messages", 
       module = recruitment,
       par = "log_devs",
       family = multinomial(),
-      sd = list(value = om_input$logR_sd, estimation_type = "constant"),
-      is_random_effect = FALSE
+      sd = list(value = om_input$logR_sd, estimation_type = "constant")
     ),
     "FIMS currently does not allow the family"
   )
@@ -163,8 +160,7 @@ test_that("`initialize_process_distribution()` returns correct error messages", 
       module = recruitment,
       par = "log_devs",
       family = binomial(),
-      sd = list(value = om_input$logR_sd, estimation_type = "constant"),
-      is_random_effect = FALSE
+      sd = list(value = om_input$logR_sd, estimation_type = "constant")
     ),
     "FIMS currently does not allow the family"
   )
@@ -178,8 +174,7 @@ test_that("`initialize_process_distribution()` returns correct error messages", 
       sd = list(
         value = rep(om_input$logR_sd, 3),
         estimation_type = rep("constant", 2)
-      ),
-      is_random_effect = FALSE
+      )
     ),
     "must match"
   )
@@ -193,8 +188,7 @@ test_that("`initialize_process_distribution()` returns correct error messages", 
       sd = list(
         value = rep(om_input$logR_sd, 3),
         estimation_type = "constant"
-      ),
-      is_random_effect = FALSE
+      )
     ),
     "should be an object of class"
   )
@@ -205,8 +199,7 @@ test_that("`initialize_process_distribution()` returns correct error messages", 
       module = recruitment,
       par = "log_devs",
       family = gaussian(),
-      sd = list(value = 1),
-      is_random_effect = FALSE
+      sd = list(value = 1)
     ),
     "need to be present"
   )

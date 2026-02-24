@@ -659,6 +659,7 @@ dmultinorm
 dnorm
 doi
 dontrun
+downup
 dox
 doxygen
 dplyr
@@ -748,6 +749,7 @@ grey
 growthBase
 gstatic
 gsub
+gte
 gtest
 hexlogo
 holt
@@ -1187,6 +1189,7 @@ validator
 validators
 vals
 vec
+vectorized
 visualstudio
 vmit
 von
