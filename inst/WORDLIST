@@ -169,6 +169,7 @@ FIMSLog
 FIMSMath
 FIMSObject
 FIMSRcppInterfaceBase
+FBCA
 FIXME
 FMort
 FUNC
@@ -1060,6 +1061,7 @@ stackoverflow
 stan
 standardGeneric
 startsWith
+startswith
 stawitz
 stdexcept
 stdint
@@ -1110,6 +1112,7 @@ tmbstan
 tmbutils
 tmp
 toRVector
+toJSON
 toString
 tomlinson
 toupper
