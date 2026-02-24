@@ -172,11 +172,6 @@ test_that("prior predictive check", {
 
   recruitment <- methods::new(BevertonHoltRecruitment)
   recruitment_process <- new(LogDevsRecruitmentProcess)
-  # NOTE: in first set of parameters below (for recruitment),
-  # $is_random_effect (default is FALSE) and $estimated (default is FALSE)
-  # are defined even if they match the defaults in order to provide an example
-  # of how that is done. Other sections of the code below leave defaults in
-  # place as appropriate.
 
   # set up log_rzero (equilibrium recruitment)
   recruitment$log_rzero[1]$value <- log(om_input[["R0"]])

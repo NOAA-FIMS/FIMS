@@ -4,7 +4,6 @@
 # no visible binding for global variable
 utils::globalVariables(c(
   "distribution.x", "distribution.y",
-  "distribution_link",
   "distribution_type.x", "distribution_type.y",
   "fleet_name",
   "model_family", "model_family.x", "model_family.y"
@@ -46,8 +45,6 @@ utils::globalVariables(c(
 #'       \item{\code{module_type}:}{The specific type of the module (e.g.,
 #'         "Logistic" for a "Selectivity" module).}
 #'       \item{\code{label}:}{The name of the parameter (e.g., "inflection_point").}
-#'       \item{\code{distribution_link}:}{The component the distribution module
-#'         links to.}
 #'       \item{\code{age}:}{The age the parameter applies to.}
 #'       \item{\code{length}:}{The length bin the parameter applies to.}
 #'       \item{\code{time}:}{The time step (i.e., year) the parameter applies to.}
@@ -174,21 +171,35 @@ create_default_parameters <- function(
     maturity_temp,
     population_temp
   )
+ 
   # Merge with configuration_unnest
   expanded_configurations <- dplyr::full_join(
     temp,
     unnested_configurations,
-    by = c("module_name", "fleet_name", "module_type", "distribution_link")
+    by = c("module_name", "fleet_name", "module_type")
   ) |>
     dplyr::mutate(
-      model_family = dplyr::coalesce(model_family.y, model_family.x),
-      distribution_type = dplyr::coalesce(distribution_type.y, distribution_type.x),
-      distribution = dplyr::coalesce(distribution.y, distribution.x)
-    ) |>
+    model_family = dplyr::coalesce(model_family.y, model_family.x),
+    distribution_type = dplyr::coalesce(distribution_type.y, distribution_type.x),
+    distribution = dplyr::coalesce(distribution.y, distribution.x),
+    distribution_type = dplyr::if_else(
+    module_name == "Recruitment" & !label %in% c("log_devs", "log_r", "log_sd"),
+    NA_character_,
+    distribution_type
+  ),
+  distribution = dplyr::if_else(
+    module_name == "Recruitment" & !label %in% c("log_devs", "log_r", "log_sd"),
+    NA_character_,
+    distribution
+  )
+) |>
     dplyr::select(-dplyr::ends_with(c(".x", ".y"))) |>
-    tidyr::fill(model_family) |>
+    tidyr::fill(model_family, .direction = "downup") |>
     dplyr::select(
-      model_family, module_name, module_type, label, distribution_link, dplyr::everything()
+      model_family, module_name, module_type, dplyr::everything()
+    ) |>
+    dplyr::filter(
+      !(is.na(label) & is.na(distribution_type) & is.na(distribution) & module_name != "Growth")
     ) |>
     tidyr::nest(.by = c(model_family, module_name, fleet_name))
 }
@@ -211,7 +222,6 @@ create_default_parameters_template <- function(n_parameters = 1) {
     module_name = NA_character_,
     module_type = NA_character_,
     label = NA_character_,
-    distribution_link = NA_character_,
     fleet_name = NA_character_,
     age = NA_real_,
     length = NA_real_,
@@ -466,7 +476,6 @@ create_default_fleet <- function(unnested_configurations,
       dplyr::mutate(
         module_name = "Data",
         module_type = "Index",
-        distribution_link = "Index",
         fleet_name = current_fleet_name,
         time = fleet_index[["time"]]
       )
@@ -524,7 +533,6 @@ create_default_fleet <- function(unnested_configurations,
       dplyr::mutate(
         module_name = "Data",
         module_type = "Landings",
-        distribution_link = "Landings",
         fleet_name = current_fleet_name,
         time = fleet_landings[["time"]]
       )
@@ -628,45 +636,21 @@ create_default_BevertonHoltRecruitment <- function(data) {
       estimation_type = "constant"
     )
 
-  # TODO: Revisit the settings for log_r. Do we must set up log_r when
-  # it is not random effect parameters?
-  log_r <- create_default_parameters_template(
-    n_parameters = get_n_years(data) - 1
-  ) |>
-    dplyr::mutate(
-      # TODO: should this be LogRecDev to match output?
-      label = "log_r",
-      value = 0.0,
-      time = (get_start_year(data) + 1):get_end_year(data),
-      estimation_type = "constant"
-    )
-
   log_devs <- create_default_parameters_template(
     n_parameters = get_n_years(data) - 1
   ) |>
     dplyr::mutate(
-      # TODO: should this be LogRecDev to match output?
+      # TODO: should this be log_recruit_dev to match output?
       label = "log_devs",
       value = 0.0,
       time = (get_start_year(data) + 1):get_end_year(data),
       estimation_type = "random_effects"
     )
 
-  expected_recruitment <- create_default_parameters_template(
-    n_parameters = get_n_years(data) + 1
-  ) |>
-    dplyr::mutate(
-      label = "log_expected_recruitment",
-      value = 0.0,
-      estimation_type = "constant"
-    )
-
   default <- dplyr::bind_rows(
     log_rzero,
     logit_steep,
-    log_r,
-    log_devs,
-    expected_recruitment
+    log_devs
   ) |>
     dplyr::mutate(
       module_name = "Recruitment",
@@ -710,28 +694,6 @@ create_default_DnormDistribution <- function(
       distribution_type = input_type,
       distribution = "Dnorm"
     )
-
-  # If input_type is 'process', add additional parameters
-  if (input_type == "process" | input_type == "prior") {
-    new_params <- create_default_parameters_template(
-      n_parameters = length(value)
-    ) |>
-      dplyr::mutate(label = "observed_values", value = 0) |>
-      dplyr::add_row(
-        label = "expected_values",
-        value = rep(0, length(value))
-      ) |>
-      dplyr::mutate(
-        estimation_type = "constant",
-        distribution_type = input_type,
-        distribution = "Dnorm"
-      )
-
-    default <- dplyr::bind_rows(
-      default,
-      new_params
-    )
-  }
 }
 
 #' Create default DlnormDistribution parameters
@@ -752,7 +714,7 @@ create_default_DnormDistribution <- function(
 create_default_DlnormDistribution <- function(
   value = 0.1,
   data,
-  input_type = c("data", "process")
+  input_type = c("data", "process", "prior")
 ) {
   # Input checks
   # TODO: Determine if value can be a vector?
@@ -774,15 +736,6 @@ create_default_DlnormDistribution <- function(
       label = "log_sd",
       value = log_value
     )
-
-  # Add additional parameters if input_type is "process"
-  if (input_type == "process") {
-    default <- default |>
-      dplyr::add_row(
-        label = "observed_values",
-        value = rep(0, get_n_years(data))
-      )
-  }
 
   default <- default |>
     dplyr::mutate(
@@ -837,29 +790,9 @@ create_default_recruitment <- function(
         input_type = "process"
       )
     )
-
-    distribution_link <- distribution_input[["distribution_link"]]
-    if (distribution_link == "log_devs") {
-      distribution_default <- distribution_default |>
-        dplyr::mutate(
-          distribution_link = !!distribution_link
-        )
-
-      expanded_rows <- distribution_default |>
-        dplyr::filter(label %in% c("observed_values", "expected_values")) |>
-        # Create all combinations of the original rows and years
-        tidyr::expand_grid(year = (get_start_year(data) + 1):get_end_year(data)) |>
-        dplyr::mutate(
-          time = year
-        ) |>
-        dplyr::select(-year)
-
-      distribution_default <- distribution_default |>
-        dplyr::filter(label == "log_sd") |>
-        dplyr::bind_rows(expanded_rows)
-    }
   }
 
   default <- dplyr::bind_rows(form_default, distribution_default) |>
     tidyr::fill(module_name, module_type)
+  
 }

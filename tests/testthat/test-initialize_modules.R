@@ -455,6 +455,31 @@ test_that("`initialize_comp()` works with correct inputs", {
   clear()
 })
 
+## Edge handling ----
+test_that("`initialize_fims()` works with edge cases", {
+  modified_log_devs <- default_parameters |>
+    dplyr::filter(label == "log_devs") |>
+    # change first 10 estimation_type for label of log_devs from random_effects
+    # to constant
+    dplyr::mutate(
+      estimation_type = dplyr::if_else(
+        time <= 11,
+        "constant",
+        estimation_type
+      )
+    )
+
+  parameters_multiple_types <- default_parameters |>
+    # Remove rows where label is "log_devs" but keep the rows where label is NA
+    dplyr::filter(label != "log_devs" | is.na(label)) |>
+    dplyr::bind_rows(modified_log_devs)
+  init_parm_default <- initialize_fims(parameters = default_parameters, data = data)
+  init_parm_multiple_types <- initialize_fims(parameters = parameters_multiple_types, data = data)
+  #' @description Test that `initialize_fims()` works with multiple estimation types.
+  expect_equal(length(unlist(init_parm_multiple_types$parameters)), length(unlist(init_parm_default$parameters)) - 10)
+})
+
+
 ## Error handling ----
 
 test_that("`initialize_comp()` returns correct error messages", {

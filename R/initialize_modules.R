@@ -1,7 +1,7 @@
 # To remove the WARNING
 # no visible binding for global variable
 utils::globalVariables(c(
-  "distribution_link", "distribution_type",
+  "distribution_type",
   "fleet_name",
   "type", "name", "value", "unit", "uncertainty",
   "timing", "age", "length", "year",
@@ -45,7 +45,7 @@ initialize_module <- function(parameters, data, module_name, fleet_name = NA_cha
     ) |>
     dplyr::pull(temp_name) |>
     unique()
-
+  # browser()
   module_class <- get(module_class_name)
   module_fields <- names(module_class@fields)
   module <- methods::new(module_class)
@@ -54,6 +54,14 @@ initialize_module <- function(parameters, data, module_name, fleet_name = NA_cha
     module_fields <- setdiff(module_fields, c(
       "log_f_multiplier",
       "spawning_biomass_ratio"
+    ))
+  }
+  
+  if(module_class_name == "BevertonHoltRecruitment"){
+    module_fields <- setdiff(module_fields, c(
+      "x",
+      "log_r",
+      "log_expected_recruitment"
     ))
   }
 
@@ -167,107 +175,14 @@ initialize_module <- function(parameters, data, module_name, fleet_name = NA_cha
       set_param_vector(
         field = field,
         module = module,
-        module_input = module_input
+        module_input = module_input,
+        module_class_name = module_class_name
       )
     }
   }
   return(module)
 }
 
-# TODO: Determine the relationship between distributions and the
-# recruitment module, and implement the appropriate logic to retrieve
-# distribution information.
-
-#' Initialize a distribution module
-#'
-#' @description
-#' Initializes a distribution module by setting up its fields based on the
-#' distribution name and type. Supports both "data" and "process" types.
-#' @param module_input A list. Contains parameters for initializing the
-#'   distribution.
-#' @param distribution_name A character. Name of the distribution to initialize.
-#' @param distribution_type A character. Type of distribution, either "data" or
-#'   "process".
-#' @param linked_ids A vector. Named vector of linked IDs required for the
-#'   distribution, such as data_link and fleet_link for setting up index
-#'   distribution.
-#' @rdname initialize_module
-#' @return
-#' The initialized distribution module as an object.
-#' @noRd
-initialize_distribution <- function(
-  module_input,
-  distribution_name,
-  distribution_type = c("data", "process"),
-  linked_ids
-) {
-  # Input checks
-  # Check if distribution_name is provided
-  if (is.null(distribution_name)) {
-    return(NULL)
-  }
-  # Validate module_input
-  if (!is.list(module_input)) {
-    cli::cli_abort("{.var module_input} must be a list.")
-  }
-  # Validate distribution_type as "data" or "process"
-  distribution_type <- rlang::arg_match(distribution_type)
-  # Validate linked_ids as a named vector with required elements for "data" type
-  if (!is.vector(linked_ids) ||
-    !all(c("data_link", "fleet_link") %in% names(linked_ids))
-  ) {
-    cli::cli_abort(
-      "{.var linked_ids} must be a named vector containing 'data_link' and
-      'fleet_link' for 'data' distribution types."
-    )
-  }
-
-  # Get distribution value and initialize the module
-  distribution_value <- get(distribution_name)
-  distribution_module <- methods::new(distribution_value)
-  distribution_fields <- names(distribution_value@fields)
-  if (distribution_type == "data") {
-    distribution_fields <- setdiff(
-      distribution_fields,
-      c("expected_values", "observed_values", "dims")
-    )
-  }
-
-  distribution_input_names <- grep(
-    distribution_name,
-    names(module_input),
-    value = TRUE
-  )
-  for (field in distribution_fields) {
-    set_param_vector(
-      field = field, module = distribution_module,
-      module_input = module_input[distribution_input_names]
-    )
-  }
-
-  switch(distribution_type,
-    "data" = {
-      # Data distribution initialization
-      distribution_module$set_observed_data(linked_ids["data_link"])
-      distribution_module$set_distribution_links(
-        distribution_type,
-        linked_ids["fleet_link"]
-      )
-    },
-    "process" = {
-      # Process distribution initialization
-      distribution_module$set_distribution_links("random_effects", linked_ids)
-    }
-  )
-
-  # Final message to confirm success
-  cli::cli_inform(c(
-    "i" = "{distribution_name} initialized successfully for
-          {names(distribution_name)}."
-  ))
-
-  return(distribution_module)
-}
 
 #' Initialize a recruitment module
 #'
@@ -916,7 +831,7 @@ initialize_fims <- function(parameters, data) {
 
   recruitment_process_input <- parameters |>
     dplyr::filter(module_name == "Recruitment" & distribution_type == "process")
-
+  
   if (length(recruitment_process_input) == 0) {
     # TODO: need to revisit initialize_process_structure and add R tests
     recruitment_process <- initialize_process_structure(
@@ -924,32 +839,27 @@ initialize_fims <- function(parameters, data) {
       par = "log_devs"
     )
   } else {
-    pars <- recruitment_process_input |>
-      dplyr::pull(distribution_link) |>
+    par <- recruitment_process_input |> dplyr::filter(label != "log_sd") |>
+      dplyr::pull(label) |>
       unique()
 
-    # Initialize_process_distribution for each par
-    recruitment_distribution <- purrr::map(pars, function(par) {
-      sd_input <- recruitment_process_input |>
-        dplyr::filter(distribution_link == par & label == "log_sd")
-      initialize_process_distribution(
+    # Initialize_process_distribution
+    sd_input <-  recruitment_process_input |> dplyr::filter(label == "log_sd")
+    recruitment_distribution <- initialize_process_distribution(
         module = recruitment,
         par = par,
         # TODO: need to update family and match options from the distribution
         # column from the parameters tibble
         family = gaussian(),
-        sd = sd_input,
-        # TODO: need to remove is_random_effect and match options from the
-        # estimation_type from the parameters tibble
-        is_random_effect = FALSE
-      )
+        sd = sd_input
+    )
 
-      recruitment_process <- initialize_process_structure(
-        module = recruitment,
-        par = par
-      )
-    })
+    recruitment_process <- initialize_process_structure(
+      module = recruitment,
+      par = par
+    )
   }
+  
 
   # Growth
   growth <- initialize_growth(
@@ -1008,10 +918,12 @@ initialize_fims <- function(parameters, data) {
 #' @param module A module object in which the parameter vector is to be set.
 #' @param module_input A list containing input parameters for the module,
 #'   including value and estimation information for the parameter vector.
+#' @param module_class_name A character string specifying the class name of the
+#'   module, used for error messages.
 #' @return
 #' Modified module object.
 #' @noRd
-set_param_vector <- function(field, module, module_input) {
+set_param_vector <- function(field, module, module_input, module_class_name) {
   # Check if field_name is a non-empty character string
   if (missing(field) || !is.character(field) || nchar(field) == 0) {
     cli::cli_abort(c(
@@ -1044,7 +956,7 @@ set_param_vector <- function(field, module, module_input) {
   # Check if both value and estimation information are present
   if (length(field_value) == 0 || length(field_estimation_type) == 0) {
     cli::cli_abort(c(
-      "Missing value or estimation_type information for {.var field}."
+      "Missing value or estimation_type information for field {.var {field}} in module {.var {module_class_name}}."
     ))
   }
   # Resize the field in the module

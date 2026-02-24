@@ -1,4 +1,4 @@
-"","model_family","module_name","fleet_name","module_type","distribution_link","distribution_type","distribution"
+"","model_family","module_name","fleet_name","module_type","label","distribution_type","distribution"
 "1","catch_at_age","Data","fleet1","AgeComp","AgeComp","Data","Dmultinom"
 "2","catch_at_age","Data","fleet1","Landings","Landings","Data","Dlnorm"
 "3","catch_at_age","Data","fleet1","LengthComp","LengthComp","Data","Dmultinom"
