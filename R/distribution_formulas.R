@@ -242,8 +242,6 @@ get_expected_name <- function(family, data_type) {
 #' @param par A string specifying the parameter name the distribution applies
 #'   to. Parameters must be members of the specified module. Use
 #'   `methods::show(module)` to obtain names of parameters within the module.
-#' @param is_random_effect A boolean indicating whether or not the process is
-#'   estimated as a random effect.
 #' @return
 #' A reference class. is returned. Use [methods::show()] to view the various
 #' Rcpp class fields, methods, and documentation.
@@ -276,8 +274,7 @@ get_expected_name <- function(family, data_type) {
 #'   module = recruitment,
 #'   par = "log_devs",
 #'   family = gaussian(),
-#'   sd = list(value = 0.4, estimation_type = "constant"),
-#'   is_random_effect = FALSE
+#'   sd = list(value = 0.4, estimation_type = "constant")
 #' )
 #' }
 initialize_data_distribution <- function(
@@ -384,13 +381,15 @@ initialize_process_distribution <- function(
   sd = tibble::tibble(
     value = 1,
     estimation_type = "constant"
-  ),
-  is_random_effect = FALSE
+  )
 ) {
   # validity check on user input
   args <- list(family = family, sd = sd)
   check_distribution_validity(args)
-
+  
+  if(!is.element(par,c("log_devs", "log_r"))) {
+    return()
+  }
   expected <- switch(paste0(par, "_", class(module)),
     "log_devs_Rcpp_BevertonHoltRecruitment" = NULL,
     "log_r_Rcpp_BevertonHoltRecruitment" = "log_expected_recruitment"
@@ -483,6 +482,9 @@ initialize_process_distribution <- function(
 #' @keywords distribution
 #' @export
 initialize_process_structure <- function(module, par) {
+  if(!is.element(par,c("log_devs", "log_r"))) {
+    return()
+  }
   new_process_module <- switch(paste0(par, "_", class(module)),
     "log_devs_Rcpp_BevertonHoltRecruitment" = new(LogDevsRecruitmentProcess),
     "log_r_Rcpp_BevertonHoltRecruitment" = new(LogRRecruitmentProcess)

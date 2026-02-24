@@ -87,7 +87,7 @@ test_that("`initialize_fims()` works with correct inputs", {
 test_that("`initialize_fims()` works with edge cases", {
   modified_log_devs <- default_parameters |>
     dplyr::filter(label == "log_devs") |>
-    # change first 10 estimation_type for label of log_devs from fixed_effects
+    # change first 10 estimation_type for label of log_devs from random_effects
     # to constant
     dplyr::mutate(
       estimation_type = dplyr::if_else(
@@ -104,7 +104,7 @@ test_that("`initialize_fims()` works with edge cases", {
   init_parm_default <- initialize_fims(parameters = default_parameters, data = data)
   init_parm_multiple_types <- initialize_fims(parameters = parameters_multiple_types, data = data)
   #' @description Test that `initialize_fims()` works with multiple estimation types.
-  expect_equal(length(init_parm_multiple_types$parameters$p), length(init_parm_default$parameters$p) - 10)
+  expect_equal(length(unlist(init_parm_multiple_types$parameters)), length(unlist(init_parm_default$parameters)) - 10)
 })
 
 ## Error handling ----
