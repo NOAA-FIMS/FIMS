@@ -277,10 +277,6 @@ fit <- parameters_4_model |>
   initialize_fims(data = data_4_model) |>
   fit_fims(optimize = TRUE)
 clear()
-
-# Get information about the model and print a few characters to the screen
-recruitment_log <- get_log_module("information")
-substr(recruitment_log, 1, 100)
 ```
 
 The results can be plotted with either base R, {ggplot2}, or {stockplotr}. Where, we recommend using {stockplotr} where possible.
@@ -297,6 +293,8 @@ output <- get_estimates(fit) |>
 ```
 
 ```{r fit-plot-spawning-biomass}
+#| warning: false
+#| message: false
 #| fig.alt: >
 #|   Plot of spawning biomass.
 stockplotr::plot_spawning_biomass(
@@ -442,6 +440,8 @@ clear()
 ```
 
 ```{r fit-plot-biomass}
+#| warning: false
+#| message: false
 #| fig.alt: >
 #|   Plot of spawning biomass for each sensitivity model.
 stockplotr::plot_biomass(
