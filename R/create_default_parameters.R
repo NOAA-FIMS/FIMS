@@ -357,13 +357,8 @@ create_default_selectivity <- function(
 ) {
   # Input checks
   form <- rlang::arg_match(form)
-  # NOTE: All new forms of selectivity must be placed in the vector of default
-  # arguments for `form` and their methods but be placed below in the call to
-  # `switch`
-  default <- switch(form,
-    "Logistic" = create_default_Logistic(),
-    "DoubleLogistic" = create_default_DoubleLogistic()
-  ) |>
+  # Dynamically call the appropriate create_default_* function
+  default <- eval(call(paste("create", "default", form, sep = "_"))) |>
     dplyr::mutate(
       module_name = "Selectivity"
     )
@@ -451,18 +446,12 @@ create_default_fleet <- function(unnested_configurations,
       dplyr::arrange(dplyr::desc(type)) |>
       dplyr::pull(uncertainty)
 
-    index_distribution_default <- switch(index_distribution,
-      "Dnorm" = create_default_DnormDistribution(
-        value = index_uncertainty,
-        input_type = "data",
-        data = data
-      ),
-      "Dlnorm" = create_default_DlnormDistribution(
-        value = index_uncertainty,
-        input_type = "data",
-        data = data
-      )
-    ) |>
+    index_distribution_default <- eval(call(
+      paste0("create_default_", index_distribution, "Distribution"),
+      value = index_uncertainty,
+      input_type = "data",
+      data = data
+    )) |>
       dplyr::mutate(
         module_name = "Data",
         module_type = "Index",
@@ -509,18 +498,12 @@ create_default_fleet <- function(unnested_configurations,
       dplyr::arrange(dplyr::desc(type)) |>
       dplyr::pull(uncertainty)
 
-    landings_distribution_default <- switch(landings_distribution,
-      "Dnorm" = create_default_DnormDistribution(
-        value = landings_uncertainty,
-        input_type = "data",
-        data = data
-      ),
-      "Dlnorm" = create_default_DlnormDistribution(
-        value = landings_uncertainty,
-        input_type = "data",
-        data = data
-      )
-    ) |>
+    landings_distribution_default <- eval(call(
+      paste0("create_default_", landings_distribution, "Distribution"),
+      value = landings_uncertainty,
+      input_type = "data",
+      data = data
+    )) |>
       dplyr::mutate(
         module_name = "Data",
         module_type = "Landings",
@@ -582,12 +565,8 @@ create_default_maturity <- function(
     ))
   }
 
-  # NOTE: All new forms of maturity must be placed in the vector of default
-  # arguments for `form` and their methods but be placed below in the call to
-  # `switch`
-  default <- switch(form,
-    "Logistic" = create_default_Logistic()
-  ) |>
+  # Dynamically call the appropriate create_default_* function
+  default <- eval(call(paste("create", "default", form, sep = "_"))) |>
     # We don't have an option to input maturity data into FIMS, so the maturity
     # parameters aren't really estimable. The parameters should be constant for now.
     # See more details from https://github.com/orgs/NOAA-FIMS/discussions/944.
@@ -820,23 +799,18 @@ create_default_recruitment <- function(
     ))
   }
   # Create default parameters based on the recruitment form
-  # NOTE: All new forms of recruitment must be placed in the vector of default
-  # arguments for `form` and their methods but be placed below in the call to
-  # `switch`
-  form_default <- switch(form,
-    "BevertonHolt" = create_default_BevertonHoltRecruitment(data)
-  )
+  # Dynamically call the appropriate create_default_* function
+  form_default <- eval(call(paste0("create_default_", form, "Recruitment"), data = data))
 
   distribution_input <- unnested_configurations |>
     dplyr::filter(module_name == "Recruitment")
 
   if (!is.null(distribution_input[["distribution"]])) {
-    distribution_default <- switch(distribution_input[["distribution"]],
-      "Dnorm" = create_default_DnormDistribution(
-        data = data,
-        input_type = "process"
-      )
-    )
+    distribution_default <- eval(call(
+      paste0("create_default_", distribution_input[["distribution"]], "Distribution"),
+      data = data,
+      input_type = "process"
+    ))
 
     distribution_link <- distribution_input[["distribution_link"]]
     if (distribution_link == "log_devs") {
