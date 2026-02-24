@@ -358,7 +358,7 @@ create_default_selectivity <- function(
   # Input checks
   form <- rlang::arg_match(form)
   # Dynamically call the appropriate create_default_* function
-  default <- eval(call(paste("create", "default", form, sep = "_"))) |>
+  default <- do.call(get(paste("create", "default", form, sep = "_")), list()) |>
     dplyr::mutate(
       module_name = "Selectivity"
     )
@@ -446,12 +446,14 @@ create_default_fleet <- function(unnested_configurations,
       dplyr::arrange(dplyr::desc(type)) |>
       dplyr::pull(uncertainty)
 
-    index_distribution_default <- eval(call(
-      paste0("create_default_", index_distribution, "Distribution"),
-      value = index_uncertainty,
-      input_type = "data",
-      data = data
-    )) |>
+    index_distribution_default <- do.call(
+      get(paste0("create_default_", index_distribution, "Distribution")),
+      list(
+        value = index_uncertainty,
+        input_type = "data",
+        data = data
+      )
+    ) |>
       dplyr::mutate(
         module_name = "Data",
         module_type = "Index",
@@ -498,12 +500,14 @@ create_default_fleet <- function(unnested_configurations,
       dplyr::arrange(dplyr::desc(type)) |>
       dplyr::pull(uncertainty)
 
-    landings_distribution_default <- eval(call(
-      paste0("create_default_", landings_distribution, "Distribution"),
-      value = landings_uncertainty,
-      input_type = "data",
-      data = data
-    )) |>
+    landings_distribution_default <- do.call(
+      get(paste0("create_default_", landings_distribution, "Distribution")),
+      list(
+        value = landings_uncertainty,
+        input_type = "data",
+        data = data
+      )
+    ) |>
       dplyr::mutate(
         module_name = "Data",
         module_type = "Landings",
@@ -566,7 +570,7 @@ create_default_maturity <- function(
   }
 
   # Dynamically call the appropriate create_default_* function
-  default <- eval(call(paste("create", "default", form, sep = "_"))) |>
+  default <- do.call(get(paste("create", "default", form, sep = "_")), list()) |>
     # We don't have an option to input maturity data into FIMS, so the maturity
     # parameters aren't really estimable. The parameters should be constant for now.
     # See more details from https://github.com/orgs/NOAA-FIMS/discussions/944.
@@ -800,17 +804,19 @@ create_default_recruitment <- function(
   }
   # Create default parameters based on the recruitment form
   # Dynamically call the appropriate create_default_* function
-  form_default <- eval(call(paste0("create_default_", form, "Recruitment"), data = data))
+  form_default <- do.call(get(paste0("create_default_", form, "Recruitment")), list(data = data))
 
   distribution_input <- unnested_configurations |>
     dplyr::filter(module_name == "Recruitment")
 
   if (!is.null(distribution_input[["distribution"]])) {
-    distribution_default <- eval(call(
-      paste0("create_default_", distribution_input[["distribution"]], "Distribution"),
-      data = data,
-      input_type = "process"
-    ))
+    distribution_default <- do.call(
+      get(paste0("create_default_", distribution_input[["distribution"]], "Distribution")),
+      list(
+        data = data,
+        input_type = "process"
+      )
+    )
 
     distribution_link <- distribution_input[["distribution_link"]]
     if (distribution_link == "log_devs") {
