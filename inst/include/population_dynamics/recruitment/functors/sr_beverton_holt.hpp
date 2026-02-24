@@ -18,6 +18,8 @@ namespace fims_popdy {
 /** @brief BevertonHolt class that returns the Beverton--Holt
  * stock--recruitment from fims_math.
  *
+ * See the @ref glossary for definitions of mathematical symbols used below.
+ *
  * @param logit_steep Recruitment relative to unfished recruitment at 20
  * percent of unfished spawning biomass. Steepness is subject to a logit
  * transformation to keep it between 0.2 and 1.0.
