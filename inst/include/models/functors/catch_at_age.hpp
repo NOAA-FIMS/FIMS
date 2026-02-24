@@ -681,14 +681,6 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * C_{f,y} \mathrel{+}= C_{f,a,y}
    * \f]
    *
-   * where
-   * - \f$CW_{f,y}\f$ is total catch weight for fleet \f$f\f$ in year
-   * \f$y\f$
-   * - \f$C_{f,y}\f$ is total catch numbers for fleet \f$f\f$ in year
-   * \f$y\f$
-   * - \f$CW_{f,a,y}\f$, \f$C_{f,a,y}\f$ are catch weight and numbers for fleet
-   * \f$f\f$ at age \f$a\f$ in year \f$y\f$.
-   *
    * @snippet{doc} this param_population
    * @snippet{doc} this param_year
    * @snippet{doc} this param_age
@@ -729,9 +721,6 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * CW_{f,a,y} = C_{f,a,y} \times w_a
    * \f]
    *
-   * where \f$CW_{f,a,y}\f$ is the catch weight for fleet \f$f\f$ at age
-   * \f$a\f$ in year \f$y\f$.
-   *
    * @snippet{doc} this param_population
    * @snippet{doc} this param_year
    * @snippet{doc} this param_age
@@ -761,15 +750,6 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * \times
    * \left( 1 - \exp(-Z_{a,y}) \right)
    * \f]
-   *
-   * where
-   * - \f$C_{f,a,y}\f$ is the catch (landings) for fleet \f$f\f$ at age
-   * \f$a\f$ in year \f$y\f$
-   * - \f$F_{f,y}\f$ is fleet-specific fishing mortality in year \f$y\f$
-   * - \f$S_f(a)\f$ is selectivity at age \f$a\f$ for fleet \f$f\f$
-   * - \f$Z_{a,y}\f$ is total mortality at age \f$a\f$ and year \f$y\f$
-   * - \f$N_{a,y}\f$ is the number of individuals at age \f$a\f$ and year
-   * \f$y\f$
    *
    * @snippet{doc} this param_population
    * @snippet{doc} this param_i_age_year
@@ -809,14 +789,6 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * IN_{f,y} \mathrel{+}= INAA_{a,y}
    * \f]
    *
-   * where:
-   * - \f$IW_{f,y}\f$ is the total index weight for fleet \f$f\f$ in year
-   * \f$y\f$
-   * - \f$IN_{f,y}\f$ is the total index numbers for fleet \f$f\f$ in year
-   * \f$y\f$
-   * - \f$IWAA_{a,y}\f$ is the index weight at age \f$a\f$ in year \f$y\f$
-   * - \f$INAA_{a,y}\f$ is the index numbers at age \f$a\f$ in year \f$y\f$
-   *
    * @snippet{doc} this param_population
    * @snippet{doc} this param_i_age_year
    * @snippet{doc} this param_year
@@ -840,20 +812,12 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * This function calculates the expected index in numbers at age for each
    * fleet, using catchability, selectivity, and population numbers at age:
    * \f[
-   * I_{f,a,y} \mathrel{+}= q_{f,y} \times S_f(a) \times N_{a,y}
+   * IN_{f,a,y} \mathrel{+}= q_{f,y} \times S_f(a) \times N_{a,y}
    * \f]
-   *
-   * where:
-   * - \f$I_{f,a,y}\f$ is the index numbers for fleet \f$f\f$ at age \f$a\f$ in
-   * year \f$y\f$
-   * - \f$q_{f,y}\f$ is the catchability coefficient for fleet \f$f\f$ at year
-   * \f$y\f$
-   * - \f$S_f(a)\f$ is the selectivity at age \f$a\f$ for fleet \f$f\f$
-   * - \f$N_{a,y}\f$ is the population numbers at age \f$a\f$ and year \f$y\f$
    *
    * When timing is accounted for within FIMS the equation will include the
    * fraction of the year when the survey was conducted \f$t_y\f$:
-   * \f[ I_{f,a,y} \mathrel{+}= S_{f,y}(a) \times N_{a,y} \times
+   * \f[ IN_{f,a,y} \mathrel{+}= S_{f,y}(a) \times N_{a,y} \times
    * e^{(-t_{y}Z_{a,y})}\f]
    *
    * @snippet{doc} this param_population
@@ -886,11 +850,8 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * This function computes the expected index weight at age by multiplying the
    * expected index numbers at age by the corresponding weight at age:
    * \f[
-   * IWAA_{f,a,y} = I_{f,a,y} \times w_a
+   * IWAA_{f,a,y} = IN_{f,a,y} \times w_a
    * \f]
-   *
-   * where \f$IWAA_{f,a,y}\f$ is the index weight for fleet \f$f\f$ at age
-   * \f$a\f$ in year \f$y\f$.
    *
    * @snippet{doc} this param_population
    * @snippet{doc} this param_year

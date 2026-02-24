@@ -19,7 +19,7 @@ Definitions of mathematical symbols used in FIMS equations.
 - \f$F_{f,y}\f$ — Fishing mortality for fleet \f$f\f$ in year \f$y\f$ (yr\f$^{-1}\f$)
 - \f$F_{f,a,y}\f$ — Fishing mortality for fleet \f$f\f$ at age \f$a\f$ in year \f$y\f$ (yr\f$^{-1}\f$)
 - \f$Z_{a,y}\f$ — Total mortality at age \f$a\f$ in year \f$y\f$, \f$Z = M + F\f$ (yr\f$^{-1}\f$)
-- \f$S_{f,a}\f$ — Selectivity for fleet \f$f\f$ at age \f$a\f$
+- \f$S_f(a)\f$ — Selectivity for fleet \f$f\f$ at age \f$a\f$
 - \f$f_y\f$ — F multiplier in year \f$y\f$
 
 ## Biomass
@@ -51,7 +51,7 @@ Definitions of mathematical symbols used in FIMS equations.
 ## Index of Abundance
 
 - \f$IN_{f,y}\f$ — Index numbers for fleet \f$f\f$ in year \f$y\f$
-- \f$I_{f,a,y}\f$ — Index numbers for fleet \f$f\f$ at age \f$a\f$ in year \f$y\f$
+- \f$IN_{f,a,y}\f$ — Index numbers for fleet \f$f\f$ at age \f$a\f$ in year \f$y\f$
 - \f$IW_{f,y}\f$ — Index weight for fleet \f$f\f$ in year \f$y\f$ (mt)
 - \f$IWAA_{a,y}\f$ — Index weight at age \f$a\f$ in year \f$y\f$
 - \f$INAA_{a,y}\f$ — Index numbers at age \f$a\f$ in year \f$y\f$
