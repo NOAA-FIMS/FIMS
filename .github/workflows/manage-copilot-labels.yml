@@ -1,0 +1,70 @@
+name: Manage Copilot Issue Labels
+
+on:
+  issues:
+    types: [assigned]
+
+permissions:
+  issues: write
+
+jobs:
+  update-copilot-labels:
+    runs-on: ubuntu-latest
+    name: Update labels for copilot-assigned issues
+    
+    steps:
+      - name: Check if assigned to copilot
+        id: check_assignee
+        env:
+          ASSIGNEES: ${{ toJSON(github.event.issue.assignees) }}
+        run: |
+          echo "Assignees: $ASSIGNEES"
+          # Check if copilot or github-copilot[bot] is in the assignees list
+          if echo "$ASSIGNEES" | jq -e '.[] | select(.login == "copilot" or .login == "github-copilot[bot]" or .login | startswith("copilot"))' > /dev/null; then
+            echo "is_copilot=true" >> $GITHUB_OUTPUT
+            echo "Issue assigned to copilot"
+          else
+            echo "is_copilot=false" >> $GITHUB_OUTPUT
+            echo "Issue not assigned to copilot"
+          fi
+        shell: bash
+
+      - name: Update labels
+        if: steps.check_assignee.outputs.is_copilot == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          ADD_LABEL: "status: in progress"
+          REMOVE_LABEL: "status: triage_needed"
+        run: |
+          echo "Updating labels for issue #$ISSUE_NUMBER"
+          
+          # Get current labels
+          CURRENT_LABELS=$(gh issue view $ISSUE_NUMBER --repo ${{ github.repository }} --json labels)
+          echo "Current labels: $CURRENT_LABELS"
+          
+          # Check if "status: in progress" label exists in the repo
+          LABELS=$(gh label list --repo ${{ github.repository }} --json name)
+          if ! echo "$LABELS" | jq -e --arg label "$ADD_LABEL" '.[] | select(.name == $label)' > /dev/null; then
+            echo "Label '$ADD_LABEL' does not exist. Creating it now."
+            gh label create "$ADD_LABEL" --repo ${{ github.repository }} --color FBCA04 --description "Work is in progress on this issue"
+          fi
+          
+          # Add "status: in progress" label if not already present
+          if echo "$CURRENT_LABELS" | jq -e --arg label "$ADD_LABEL" '.labels[] | select(.name == $label)' > /dev/null; then
+            echo "Label '$ADD_LABEL' already exists on issue #$ISSUE_NUMBER. Skipping addition."
+          else
+            echo "Adding label '$ADD_LABEL' to issue #$ISSUE_NUMBER"
+            gh issue edit $ISSUE_NUMBER --repo ${{ github.repository }} --add-label "$ADD_LABEL"
+          fi
+          
+          # Remove "status: triage_needed" label if it exists
+          if echo "$CURRENT_LABELS" | jq -e --arg label "$REMOVE_LABEL" '.labels[] | select(.name == $label)' > /dev/null; then
+            echo "Removing label '$REMOVE_LABEL' from issue #$ISSUE_NUMBER"
+            gh issue edit $ISSUE_NUMBER --repo ${{ github.repository }} --remove-label "$REMOVE_LABEL"
+          else
+            echo "Label '$REMOVE_LABEL' does not exist on issue #$ISSUE_NUMBER. Skipping removal."
+          fi
+          
+          echo "Label update complete for issue #$ISSUE_NUMBER"
+        shell: bash
