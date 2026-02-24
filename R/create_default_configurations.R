@@ -46,8 +46,6 @@ utils::globalVariables(c(
 #'     \describe{
 #'       \item{\code{module_type}:}{The specific type of the module (e.g.,
 #'         "Logistic" for a "Selectivity" module).}
-#'       \item{\code{distribution_link}:}{The component the distribution module
-#'         links to.}
 #'       \item{\code{distribution_type}:}{The type of distribution (e.g., "Data",
 #'         "process").}
 #'       \item{\code{distribution}:}{The name of distribution (e.g.,
@@ -118,11 +116,11 @@ create_default_configurations <- function(data, model_family = c("catch_at_age")
   # Define a template for data modules (comps, landings, index).
   # This specifies the default distribution for each type of data.
   data_config_template <- dplyr::tribble(
-    ~module_name, ~module_type, ~distribution_link, ~distribution_type, ~distribution,
-    "Data", "Landings", "Landings", "Data", "Dlnorm",
-    "Data", "Index", "Index", "Data", "Dlnorm",
-    "Data", "AgeComp", "AgeComp", "Data", "Dmultinom",
-    "Data", "LengthComp", "LengthComp", "Data", "Dmultinom"
+    ~module_name, ~module_type, ~distribution_type, ~distribution,
+    "Data", "Landings", "Data", "Dlnorm",
+    "Data", "Index", "Data", "Dlnorm",
+    "Data", "AgeComp", "Data", "Dmultinom",
+    "Data", "LengthComp", "Data", "Dmultinom"
   )
 
   # Create data module configurations by joining the unique fleet types
@@ -148,10 +146,10 @@ create_default_configurations <- function(data, model_family = c("catch_at_age")
 
     # Define a template for standard, non-fleet-specific modules.
     other_config <- dplyr::tribble(
-      ~module_name, ~module_type, ~distribution_link, ~distribution_type, ~distribution,
-      "Recruitment", "BevertonHolt", "log_devs", "process", "Dnorm",
-      "Growth", "EWAA", NA_character_, NA_character_, NA_character_,
-      "Maturity", "Logistic", NA_character_, NA_character_, NA_character_
+      ~module_name, ~module_type, ~distribution_type, ~distribution,
+      "Recruitment", "BevertonHolt", "process", "Dnorm",
+      "Growth", "EWAA", NA_character_, NA_character_,
+      "Maturity", "Logistic", NA_character_, NA_character_
     )
   }
 
