@@ -14,7 +14,7 @@ namespace
         int sb_i_agem1_yearm1 = (sb_year - 1) * population->n_ages + sb_age - 1;
 
         size_t pop_id = population->GetId();
-        auto& dq = catch_at_age_model->GetPopulationDerivedQuantities(pop_id);
+        auto& population_derived_quantities = catch_at_age_model->GetPopulationDerivedQuantities(pop_id);
 
         catch_at_age_model->CalculateMortality(population, sb_i_age_year, sb_year, sb_age);
         catch_at_age_model->CalculateNumbersAA(population, sb_i_age_year, sb_i_agem1_yearm1, sb_age);
@@ -45,16 +45,16 @@ namespace
         and is of length n_years - 1 where the first position of the vector
         corresponds to the second year of the time series.*/
         expect_recruitment[r_i_age_year] = 
-        (0.8 * rzero * steep * dq["spawning_biomass"][sb_year]) /
-        (0.2 * phi0 * rzero * (1.0 - steep) + dq["spawning_biomass"][sb_year] * (steep - 0.2)) * fims_math::exp(population->recruitment->log_recruit_devs[r_year-1]); 
+        (0.8 * rzero * steep * population_derived_quantities["spawning_biomass"][sb_year]) /
+        (0.2 * phi0 * rzero * (1.0 - steep) + population_derived_quantities["spawning_biomass"][sb_year] * (steep - 0.2)) * fims_math::exp(population->recruitment->log_recruit_devs[r_year-1]); 
 
         // calculate recruitment in population module
         catch_at_age_model->CalculateRecruitment(population, r_i_age_year, r_year, r_year);
         
         // testing that expected recruitment and population numbers_at_age match
         // EXPECT_DOUBLE_EQ() verifies that the two double values are approximately equal, to within 4 ULPs from each other.
-        EXPECT_DOUBLE_EQ(dq["numbers_at_age"][r_i_age_year], expect_recruitment[r_i_age_year]);
+        EXPECT_DOUBLE_EQ(population_derived_quantities["numbers_at_age"][r_i_age_year], expect_recruitment[r_i_age_year]);
         // testing that population numbers_at_age > 0.0
-        EXPECT_GT(dq["numbers_at_age"][r_i_age_year], 0.0);
+        EXPECT_GT(population_derived_quantities["numbers_at_age"][r_i_age_year], 0.0);
     }
 }

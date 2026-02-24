@@ -48,15 +48,15 @@ class SPBaseTestFixture : public testing::Test {
 
     //depletion
     auto depletion = std::make_shared<fims_popdy::PellaTomlinsonDepletion<double>>();
-    depletion->log_r.resize(1);
-    depletion->log_K.resize(1);
-    depletion->log_m.resize(1);
-    depletion->r.resize(1);
-    depletion->K.resize(1);
-    depletion->m.resize(1);
-    depletion->log_r[0] = fims_math::log(0.2);
-    depletion->log_K[0] = fims_math::log(645.0);
-    depletion->log_m[0] = fims_math::log(2.0);
+    depletion->log_growth_rate.resize(1);
+    depletion->log_carrying_capacity.resize(1);
+    depletion->log_shape.resize(1);
+    depletion->growth_rate.resize(1);
+    depletion->carrying_capacity.resize(1);
+    depletion->shape.resize(1);
+    depletion->log_growth_rate[0] = fims_math::log(0.2);
+    depletion->log_carrying_capacity[0] = fims_math::log(645.0);
+    depletion->log_shape[0] = fims_math::log(2.0);
     depletion->log_depletion.resize(nyears);
     for(int i=0; i<depletion->log_depletion.size(); i++){
       double input_depletion = depletion_distribution(generator);
@@ -64,15 +64,15 @@ class SPBaseTestFixture : public testing::Test {
       depletion->log_depletion[i] = log(input_depletion);
     }
     //set up transformation modules
-    depletion->r_transformation = 
+    depletion->growth_rate_transformation = 
       fims_transformations::CreateLogTransformation<double>(
-          depletion->log_r[0], -999.00);
-    depletion->K_transformation = 
+          depletion->log_growth_rate[0], -999.00);
+    depletion->carrying_capacity_transformation = 
       fims_transformations::CreateLogTransformation<double>(
-          depletion->log_K[0], -999.00);
-    depletion->m_transformation = 
+          depletion->log_carrying_capacity[0], -999.00);
+    depletion->shape_transformation = 
       fims_transformations::CreateLogTransformation<double>(
-          depletion->log_m[0], -999.00);
+          depletion->log_shape[0], -999.00);
     depletion->depletion_transformation = 
       fims_transformations::CreateLogTransformation<double>(
           depletion->log_depletion[0], -999.00); 
@@ -192,7 +192,7 @@ class SPEvaluateTestFixture : public SPBaseTestFixture {
   void SetUp() override {
     SetupBasicModel();
     SetupDerivedQuantities();
-    // C++ code to set up true values for log_naa, log_M,
+    // C++ code to set up true values for log_naa, log_shape,
     // log_Fmort, and log_q:
 
     // Setup fleet parameters needed for surplus_production model->Prepare()

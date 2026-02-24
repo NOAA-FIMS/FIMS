@@ -180,12 +180,12 @@ class FisheryModelBase : public fims_model_object::FIMSObject<Type> {
   /**
    * @brief Shared pointer for the fleet derived quantities map.
    */
-  std::shared_ptr<DerivedQuantitiesMap> fleet_derived_quantities;
+  std::shared_ptr<DerivedQuantitiesMap> fleet_derived_quantities_ptr;
 
   /**
    * @brief Shared pointer for the population derived quantities map.
    */
-  std::shared_ptr<DerivedQuantitiesMap> population_derived_quantities;
+  std::shared_ptr<DerivedQuantitiesMap> population_derived_quantities_ptr;
 
   /**
    * @brief Type definitions for dimension information maps.
@@ -229,8 +229,8 @@ class FisheryModelBase : public fims_model_object::FIMSObject<Type> {
    *
    */
   FisheryModelBase() : id(FisheryModelBase::id_g++) {
-    fleet_derived_quantities = std::make_shared<DerivedQuantitiesMap>();
-    population_derived_quantities = std::make_shared<DerivedQuantitiesMap>();
+    fleet_derived_quantities_ptr = std::make_shared<DerivedQuantitiesMap>();
+    population_derived_quantities_ptr = std::make_shared<DerivedQuantitiesMap>();
     fleet_dimension_info = std::make_shared<DimensionInfoMap>();
     population_dimension_info = std::make_shared<DimensionInfoMap>();
   }
@@ -244,8 +244,8 @@ class FisheryModelBase : public fims_model_object::FIMSObject<Type> {
         : id(other.id),      
         population_ids(other.population_ids),
         populations(other.populations),
-        fleet_derived_quantities(other.fleet_derived_quantities),
-        population_derived_quantities(other.population_derived_quantities),
+        fleet_derived_quantities_ptr(other.fleet_derived_quantities_ptr),
+        population_derived_quantities_ptr(other.population_derived_quantities_ptr),
         fleet_dimension_info(other.fleet_dimension_info),
         population_dimension_info(other.population_dimension_info) {}
 
@@ -281,7 +281,7 @@ class FisheryModelBase : public fims_model_object::FIMSObject<Type> {
    * @return DerivedQuantitiesMap
    */
   DerivedQuantitiesMap &GetFleetDerivedQuantities() {
-    return *fleet_derived_quantities;
+    return *fleet_derived_quantities_ptr;
   }
 
   /**
@@ -290,7 +290,7 @@ class FisheryModelBase : public fims_model_object::FIMSObject<Type> {
    * @return DerivedQuantitiesMap
    */
   DerivedQuantitiesMap &GetPopulationDerivedQuantities() {
-    return *population_derived_quantities;
+    return *population_derived_quantities_ptr;
   }
 
   /**
@@ -301,17 +301,17 @@ class FisheryModelBase : public fims_model_object::FIMSObject<Type> {
    */
   std::map<std::string, fims::Vector<Type>> &GetFleetDerivedQuantities(
       uint32_t fleet_id) {
-    if (!fleet_derived_quantities) {
+    if (!fleet_derived_quantities_ptr) {
       throw std::runtime_error(
-          "GetFleetDerivedQuantities: fleet_derived_quantities is null");
+          "GetFleetDerivedQuantities: fleet_derived_quantities_ptr is null");
     }
-    auto &outer = *fleet_derived_quantities;
+    auto &outer = *fleet_derived_quantities_ptr;
     auto it = outer.find(fleet_id);
     if (it == outer.end()) {
       std::stringstream ss;
 
       ss << "GetFleetDerivedQuantities: fleet_id " << fleet_id
-         << " not found in fleet_derived_quantities";
+         << " not found in fleet_derived_quantities_ptr";
       throw std::out_of_range(ss.str());
     }
     return it->second;
@@ -327,12 +327,12 @@ class FisheryModelBase : public fims_model_object::FIMSObject<Type> {
    */
   void InitializeFleetDerivedQuantities(uint32_t fleet_id) {
     // Ensure the shared_ptr exists
-    if (!fleet_derived_quantities) {
-      fleet_derived_quantities = std::make_shared<
+    if (!fleet_derived_quantities_ptr) {
+      fleet_derived_quantities_ptr = std::make_shared<
           std::map<uint32_t, std::map<std::string, fims::Vector<Type>>>>();
     }
 
-    auto &outer = *fleet_derived_quantities;
+    auto &outer = *fleet_derived_quantities_ptr;
 
     // Insert only if not already present
     if (outer.find(fleet_id) == outer.end()) {
@@ -350,12 +350,12 @@ class FisheryModelBase : public fims_model_object::FIMSObject<Type> {
    */
   void InitializePopulationDerivedQuantities(uint32_t population_id) {
     // Ensure the shared_ptr exists
-    if (!population_derived_quantities) {
-      population_derived_quantities = std::make_shared<
+    if (!population_derived_quantities_ptr) {
+      population_derived_quantities_ptr = std::make_shared<
           std::map<uint32_t, std::map<std::string, fims::Vector<Type>>>>();
     }
 
-    auto &outer = *population_derived_quantities;
+    auto &outer = *population_derived_quantities_ptr;
 
     // Insert only if not already present
     if (outer.find(population_id) == outer.end()) {
@@ -371,17 +371,17 @@ class FisheryModelBase : public fims_model_object::FIMSObject<Type> {
    */
   std::map<std::string, fims::Vector<Type>> &GetPopulationDerivedQuantities(
       uint32_t population_id) {
-    if (!population_derived_quantities) {
+    if (!population_derived_quantities_ptr) {
       throw std::runtime_error(
-          "GetPopulationDerivedQuantities: population_derived_quantities is "
+          "GetPopulationDerivedQuantities: population_derived_quantities_ptr is "
           "null");
     }
-    auto &outer = *population_derived_quantities;
+    auto &outer = *population_derived_quantities_ptr;
     auto it = outer.find(population_id);
     if (it == outer.end()) {
       std::ostringstream ss;
       ss << "GetPopulationDerivedQuantities: population_id " << population_id
-         << " not found in population_derived_quantities";
+         << " not found in population_derived_quantities_ptr";
       throw std::out_of_range(ss.str());
     }
     return it->second;

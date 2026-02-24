@@ -40,9 +40,9 @@ struct PellaTomlinsonDepletion : public DepletionBase<Type> {
                                    const Type& catch_ym1) {
 
     return depletion_ym1 +
-           (this->r[0] / (this->m[0] - 1.0)) * depletion_ym1 *
-               (1.0 - fims_math::pow(depletion_ym1, this->m[0] - 1.0)) -
-           catch_ym1 / this->K[0];
+           (this->growth_rate[0] / (this->shape[0] - 1.0)) * depletion_ym1 *
+               (1.0 - fims_math::pow(depletion_ym1, this->shape[0] - 1.0)) -
+           catch_ym1 / this->carrying_capacity[0];
   }
 
   /**
@@ -50,15 +50,15 @@ struct PellaTomlinsonDepletion : public DepletionBase<Type> {
    */
   virtual void create_report_vectors(
       std::map<std::string, fims::Vector<fims::Vector<Type>>>& report_vectors) {
-    report_vectors["r"].emplace_back(this->r);
-    report_vectors["K"].emplace_back(this->K);
-    report_vectors["m"].emplace_back(this->m);
+    report_vectors["growth_rate"].emplace_back(this->growth_rate);
+    report_vectors["carrying_capacity"].emplace_back(this->carrying_capacity);
+    report_vectors["shape"].emplace_back(this->shape);
   }
   virtual void get_report_vector_count(
       std::map<std::string, size_t>& report_vector_count) {
-    report_vector_count["r"] += 1;
-    report_vector_count["K"] += 1;
-    report_vector_count["m"] += 1;
+    report_vector_count["growth_rate"] += 1;
+    report_vector_count["carrying_capacity"] += 1;
+    report_vector_count["shape"] += 1;
   }
 
 };

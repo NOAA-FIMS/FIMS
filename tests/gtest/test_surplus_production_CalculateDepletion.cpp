@@ -21,13 +21,13 @@ namespace
 
         log_expected_depletion[year] =  
           fims_math::log( fims_math::ad_max(depletion_ym1 + 
-            (surplus_production_model->populations[0]->depletion->r[0] / 
-                (surplus_production_model->populations[0]->depletion->m[0] - 1.0)) * 
+            (surplus_production_model->populations[0]->depletion->growth_rate[0] / 
+                (surplus_production_model->populations[0]->depletion->shape[0] - 1.0)) * 
             depletion_ym1 *
             (1.0 - fims_math::pow(depletion_ym1, 
-                surplus_production_model->populations[0]->depletion->m[0] - 
+                surplus_production_model->populations[0]->depletion->shape[0] - 
                 1.0)) -
-           catch_ym1 / surplus_production_model->populations[0]->depletion->K[0],
+           catch_ym1 / surplus_production_model->populations[0]->depletion->carrying_capacity[0],
            0.001)
           );
 

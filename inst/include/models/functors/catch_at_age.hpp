@@ -82,7 +82,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
    *
    */
   typedef
-      typename std::map<std::string, fims::Vector<Type>>::iterator dq_iterator;
+      typename std::map<std::string, fims::Vector<Type>>::iterator derived_quantities_map_iterator;
   /**
    * @brief A map of report vectors for the object.
    * used to populate the report_vectors map in for submodule
@@ -237,10 +237,10 @@ class CatchAtAge : public FisheryModelBase<Type> {
   void CalculateInitialNumbersAA(
       std::shared_ptr<fims_popdy::Population<Type>> &population,
       size_t i_age_year, size_t a) {
-    std::map<std::string, fims::Vector<Type>> &dq_ =
+    std::map<std::string, fims::Vector<Type>> &derived_quantities_map_ =
         this->GetPopulationDerivedQuantities(population->GetId());
 
-    dq_["numbers_at_age"][i_age_year] =
+    derived_quantities_map_["numbers_at_age"][i_age_year] =
         fims_math::exp(population->log_init_naa[a]);
   }
 
@@ -260,19 +260,19 @@ class CatchAtAge : public FisheryModelBase<Type> {
       size_t i_age_year, size_t i_agem1_yearm1, size_t age) {
     // using Z from previous age/year
 
-    std::map<std::string, fims::Vector<Type>> &dq_ =
+    std::map<std::string, fims::Vector<Type>> &derived_quantities_map_ =
         this->GetPopulationDerivedQuantities(population->GetId());
 
-    dq_["numbers_at_age"][i_age_year] =
-        dq_["numbers_at_age"][i_agem1_yearm1] *
-        (fims_math::exp(-dq_["mortality_Z"][i_agem1_yearm1]));
+    derived_quantities_map_["numbers_at_age"][i_age_year] =
+        derived_quantities_map_["numbers_at_age"][i_agem1_yearm1] *
+        (fims_math::exp(-derived_quantities_map_["mortality_Z"][i_agem1_yearm1]));
 
     // Plus group calculation
     if (age == (population->n_ages - 1)) {
-      dq_["numbers_at_age"][i_age_year] =
-          dq_["numbers_at_age"][i_age_year] +
-          dq_["numbers_at_age"][i_agem1_yearm1 + 1] *
-              (fims_math::exp(-dq_["mortality_Z"][i_agem1_yearm1 + 1]));
+      derived_quantities_map_["numbers_at_age"][i_age_year] =
+          derived_quantities_map_["numbers_at_age"][i_age_year] +
+          derived_quantities_map_["numbers_at_age"][i_agem1_yearm1 + 1] *
+              (fims_math::exp(-derived_quantities_map_["mortality_Z"][i_agem1_yearm1 + 1]));
     }
   }
 
@@ -290,19 +290,19 @@ class CatchAtAge : public FisheryModelBase<Type> {
   void CalculateUnfishedNumbersAA(
       std::shared_ptr<fims_popdy::Population<Type>> &population,
       size_t i_age_year, size_t i_agem1_yearm1, size_t age) {
-    std::map<std::string, fims::Vector<Type>> &dq_ =
+    std::map<std::string, fims::Vector<Type>> &derived_quantities_map_ =
         this->GetPopulationDerivedQuantities(population->GetId());
 
     // using M from previous age/year
-    dq_["unfished_numbers_at_age"][i_age_year] =
-        dq_["unfished_numbers_at_age"][i_agem1_yearm1] *
+    derived_quantities_map_["unfished_numbers_at_age"][i_age_year] =
+        derived_quantities_map_["unfished_numbers_at_age"][i_agem1_yearm1] *
         (fims_math::exp(-population->M[i_agem1_yearm1]));
 
     // Plus group calculation
     if (age == (population->n_ages - 1)) {
-      dq_["unfished_numbers_at_age"][i_age_year] =
-          dq_["unfished_numbers_at_age"][i_age_year] +
-          dq_["unfished_numbers_at_age"][i_agem1_yearm1 + 1] *
+      derived_quantities_map_["unfished_numbers_at_age"][i_age_year] =
+          derived_quantities_map_["unfished_numbers_at_age"][i_age_year] +
+          derived_quantities_map_["unfished_numbers_at_age"][i_agem1_yearm1 + 1] *
               (fims_math::exp(-population->M[i_agem1_yearm1 + 1]));
     }
   }
@@ -319,7 +319,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
   void CalculateMortality(
       std::shared_ptr<fims_popdy::Population<Type>> &population,
       size_t i_age_year, size_t year, size_t age) {
-    std::map<std::string, fims::Vector<Type>> &dq_ =
+    std::map<std::string, fims::Vector<Type>> &derived_quantities_map_ =
         this->GetPopulationDerivedQuantities(population->GetId());
 
     for (size_t fleet_ = 0; fleet_ < population->n_fleets; fleet_++) {
@@ -327,13 +327,13 @@ class CatchAtAge : public FisheryModelBase<Type> {
       Type s = population->fleets[fleet_]->selectivity->evaluate(
           population->ages[age]);
 
-      dq_["mortality_F"][i_age_year] +=
+      derived_quantities_map_["mortality_F"][i_age_year] +=
           population->fleets[fleet_]->Fmort[year] * s;
 
-      dq_["sum_selectivity"][i_age_year] += s;
+      derived_quantities_map_["sum_selectivity"][i_age_year] += s;
     }
-    dq_["mortality_Z"][i_age_year] =
-        population->M[i_age_year] + dq_["mortality_F"][i_age_year];
+    derived_quantities_map_["mortality_Z"][i_age_year] =
+        population->M[i_age_year] + derived_quantities_map_["mortality_F"][i_age_year];
   }
 
   /**
@@ -348,10 +348,10 @@ class CatchAtAge : public FisheryModelBase<Type> {
   void CalculateBiomass(
       std::shared_ptr<fims_popdy::Population<Type>> &population,
       size_t i_age_year, size_t year, size_t age) {
-    std::map<std::string, fims::Vector<Type>> &dq_ =
+    std::map<std::string, fims::Vector<Type>> &derived_quantities_map_ =
         this->GetPopulationDerivedQuantities(population->GetId());
 
-    dq_["biomass"][year] += dq_["numbers_at_age"][i_age_year] *
+    derived_quantities_map_["biomass"][year] += derived_quantities_map_["numbers_at_age"][i_age_year] *
                             population->growth->evaluate(population->ages[age]);
   }
 
@@ -368,11 +368,11 @@ class CatchAtAge : public FisheryModelBase<Type> {
   void CalculateUnfishedBiomass(
       std::shared_ptr<fims_popdy::Population<Type>> &population,
       size_t i_age_year, size_t year, size_t age) {
-    std::map<std::string, fims::Vector<Type>> &dq_ =
+    std::map<std::string, fims::Vector<Type>> &derived_quantities_map_ =
         this->GetPopulationDerivedQuantities(population->GetId());
 
-    dq_["unfished_biomass"][year] +=
-        dq_["unfished_numbers_at_age"][i_age_year] *
+    derived_quantities_map_["unfished_biomass"][year] +=
+        derived_quantities_map_["unfished_numbers_at_age"][i_age_year] *
         population->growth->evaluate(population->ages[age]);
   }
 
@@ -389,12 +389,12 @@ class CatchAtAge : public FisheryModelBase<Type> {
   void CalculateSpawningBiomass(
       std::shared_ptr<fims_popdy::Population<Type>> &population,
       size_t i_age_year, size_t year, size_t age) {
-    std::map<std::string, fims::Vector<Type>> &dq_ =
+    std::map<std::string, fims::Vector<Type>> &derived_quantities_map_ =
         this->GetPopulationDerivedQuantities(population->GetId());
 
-    dq_["spawning_biomass"][year] +=
-        population->proportion_female[age] * dq_["numbers_at_age"][i_age_year] *
-        dq_["proportion_mature_at_age"][i_age_year] *
+    derived_quantities_map_["spawning_biomass"][year] +=
+        population->proportion_female[age] * derived_quantities_map_["numbers_at_age"][i_age_year] *
+        derived_quantities_map_["proportion_mature_at_age"][i_age_year] *
         population->growth->evaluate(population->ages[age]);
   }
 
@@ -411,13 +411,13 @@ class CatchAtAge : public FisheryModelBase<Type> {
   void CalculateUnfishedSpawningBiomass(
       std::shared_ptr<fims_popdy::Population<Type>> &population,
       size_t i_age_year, size_t year, size_t age) {
-    std::map<std::string, fims::Vector<Type>> &dq_ =
+    std::map<std::string, fims::Vector<Type>> &derived_quantities_map_ =
         this->GetPopulationDerivedQuantities(population->GetId());
 
-    dq_["unfished_spawning_biomass"][year] +=
+    derived_quantities_map_["unfished_spawning_biomass"][year] +=
         population->proportion_female[age] *
-        dq_["unfished_numbers_at_age"][i_age_year] *
-        dq_["proportion_mature_at_age"][i_age_year] *
+        derived_quantities_map_["unfished_numbers_at_age"][i_age_year] *
+        derived_quantities_map_["proportion_mature_at_age"][i_age_year] *
         population->growth->evaluate(population->ages[age]);
   }
 
@@ -427,18 +427,18 @@ class CatchAtAge : public FisheryModelBase<Type> {
    */
   Type CalculateSBPR0(
       std::shared_ptr<fims_popdy::Population<Type>> &population) {
-    std::map<std::string, fims::Vector<Type>> &dq_ =
+    std::map<std::string, fims::Vector<Type>> &derived_quantities_map_ =
         this->GetPopulationDerivedQuantities(population->GetId());
 
     std::vector<Type> numbers_spr(population->n_ages, 1.0);
     Type phi_0 = 0.0;
     phi_0 += numbers_spr[0] * population->proportion_female[0] *
-             dq_["proportion_mature_at_age"][0] *
+             derived_quantities_map_["proportion_mature_at_age"][0] *
              population->growth->evaluate(population->ages[0]);
     for (size_t a = 1; a < (population->n_ages - 1); a++) {
       numbers_spr[a] = numbers_spr[a - 1] * fims_math::exp(-population->M[a]);
       phi_0 += numbers_spr[a] * population->proportion_female[a] *
-               dq_["proportion_mature_at_age"][a] *
+               derived_quantities_map_["proportion_mature_at_age"][a] *
                population->growth->evaluate(population->ages[a]);
     }
 
@@ -449,7 +449,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
     phi_0 +=
         numbers_spr[population->n_ages - 1] *
         population->proportion_female[population->n_ages - 1] *
-        dq_["proportion_mature_at_age"][population->n_ages - 1] *
+        derived_quantities_map_["proportion_mature_at_age"][population->n_ages - 1] *
         population->growth->evaluate(population->ages[population->n_ages - 1]);
 
     return phi_0;
@@ -462,15 +462,15 @@ class CatchAtAge : public FisheryModelBase<Type> {
   void CalculateRecruitment(
       std::shared_ptr<fims_popdy::Population<Type>> &population,
       size_t i_age_year, size_t year, size_t i_dev) {
-    std::map<std::string, fims::Vector<Type>> &dq_ =
+    std::map<std::string, fims::Vector<Type>> &derived_quantities_map_ =
         this->GetPopulationDerivedQuantities(population->GetId());
 
     Type phi0 = CalculateSBPR0(population);
 
     if (i_dev == population->n_years) {
-      dq_["numbers_at_age"][i_age_year] =
+      derived_quantities_map_["numbers_at_age"][i_age_year] =
           population->recruitment->evaluate_mean(
-              dq_["spawning_biomass"][year - 1], phi0);
+              derived_quantities_map_["spawning_biomass"][year - 1], phi0);
       /*the final year of the time series has no data to inform recruitment
       devs, so this value is set to the mean recruitment.*/
     } else {
@@ -479,13 +479,13 @@ class CatchAtAge : public FisheryModelBase<Type> {
       // evaluate_process (see below)
       population->recruitment->log_expected_recruitment[year - 1] =
           fims_math::log(population->recruitment->evaluate_mean(
-              dq_["spawning_biomass"][year - 1], phi0));
+              derived_quantities_map_["spawning_biomass"][year - 1], phi0));
 
-      dq_["numbers_at_age"][i_age_year] = fims_math::exp(
+      derived_quantities_map_["numbers_at_age"][i_age_year] = fims_math::exp(
           population->recruitment->process->evaluate_process(year - 1));
     }
 
-    dq_["expected_recruitment"][year] = dq_["numbers_at_age"][i_age_year];
+    derived_quantities_map_["expected_recruitment"][year] = derived_quantities_map_["numbers_at_age"][i_age_year];
   }
 
   /**
@@ -499,10 +499,10 @@ class CatchAtAge : public FisheryModelBase<Type> {
   void CalculateMaturityAA(
       std::shared_ptr<fims_popdy::Population<Type>> &population,
       size_t i_age_year, size_t age) {
-    std::map<std::string, fims::Vector<Type>> &dq_ =
+    std::map<std::string, fims::Vector<Type>> &derived_quantities_map_ =
         this->GetPopulationDerivedQuantities(population->GetId());
 
-    dq_["proportion_mature_at_age"][i_age_year] =
+    derived_quantities_map_["proportion_mature_at_age"][i_age_year] =
         population->maturity->evaluate(population->ages[age]);
   }
 
@@ -518,25 +518,25 @@ class CatchAtAge : public FisheryModelBase<Type> {
   void CalculateLandings(
       std::shared_ptr<fims_popdy::Population<Type>> &population, size_t year,
       size_t age) {
-    std::map<std::string, fims::Vector<Type>> &pdq_ =
+    std::map<std::string, fims::Vector<Type>> &population_derived_quantities_map_ =
         this->GetPopulationDerivedQuantities(population->GetId());
 
     for (size_t fleet_ = 0; fleet_ < population->n_fleets; fleet_++) {
-      std::map<std::string, fims::Vector<Type>> &fdq_ =
+      std::map<std::string, fims::Vector<Type>> &fleet_derived_quantities_map_ =
           this->GetFleetDerivedQuantities(population->fleets[fleet_]->GetId());
       size_t i_age_year = year * population->n_ages + age;
 
-      pdq_["total_landings_weight"][year] +=
-          fdq_["landings_weight_at_age"][i_age_year];
+      population_derived_quantities_map_["total_landings_weight"][year] +=
+          fleet_derived_quantities_map_["landings_weight_at_age"][i_age_year];
 
-      fdq_["landings_weight"][year] +=
-          fdq_["landings_weight_at_age"][i_age_year];
+      fleet_derived_quantities_map_["landings_weight"][year] +=
+          fleet_derived_quantities_map_["landings_weight_at_age"][i_age_year];
 
-      pdq_["total_landings_numbers"][year] +=
-          fdq_["landings_numbers_at_age"][i_age_year];
+      population_derived_quantities_map_["total_landings_numbers"][year] +=
+          fleet_derived_quantities_map_["landings_numbers_at_age"][i_age_year];
 
-      fdq_["landings_numbers"][year] +=
-          fdq_["landings_numbers_at_age"][i_age_year];
+      fleet_derived_quantities_map_["landings_numbers"][year] +=
+          fleet_derived_quantities_map_["landings_numbers_at_age"][i_age_year];
     }
   }
 
@@ -554,11 +554,11 @@ class CatchAtAge : public FisheryModelBase<Type> {
       size_t age) {
     int i_age_year = year * population->n_ages + age;
     for (size_t fleet_ = 0; fleet_ < population->n_fleets; fleet_++) {
-      std::map<std::string, fims::Vector<Type>> &fdq_ =
+      std::map<std::string, fims::Vector<Type>> &fleet_derived_quantities_map_ =
           this->GetFleetDerivedQuantities(population->fleets[fleet_]->GetId());
 
-      fdq_["landings_weight_at_age"][i_age_year] =
-          fdq_["landings_numbers_at_age"][i_age_year] *
+      fleet_derived_quantities_map_["landings_weight_at_age"][i_age_year] =
+          fleet_derived_quantities_map_["landings_numbers_at_age"][i_age_year] *
           population->growth->evaluate(population->ages[age]);
     }
   }
@@ -574,20 +574,20 @@ class CatchAtAge : public FisheryModelBase<Type> {
   void CalculateLandingsNumbersAA(
       std::shared_ptr<fims_popdy::Population<Type>> &population,
       size_t i_age_year, size_t year, size_t age) {
-    std::map<std::string, fims::Vector<Type>> &pdq_ =
+    std::map<std::string, fims::Vector<Type>> &population_derived_quantities_map_ =
         this->GetPopulationDerivedQuantities(population->GetId());
 
     for (size_t fleet_ = 0; fleet_ < population->n_fleets; fleet_++) {
-      std::map<std::string, fims::Vector<Type>> &fdq_ =
+      std::map<std::string, fims::Vector<Type>> &fleet_derived_quantities_map_ =
           this->GetFleetDerivedQuantities(population->fleets[fleet_]->GetId());
 
       // Baranov Catch Equation
-      fdq_["landings_numbers_at_age"][i_age_year] +=
+      fleet_derived_quantities_map_["landings_numbers_at_age"][i_age_year] +=
           (population->fleets[fleet_]->Fmort[year] *
            population->fleets[fleet_]->selectivity->evaluate(
                population->ages[age])) /
-          pdq_["mortality_Z"][i_age_year] * pdq_["numbers_at_age"][i_age_year] *
-          (1 - fims_math::exp(-(pdq_["mortality_Z"][i_age_year])));
+          population_derived_quantities_map_["mortality_Z"][i_age_year] * population_derived_quantities_map_["numbers_at_age"][i_age_year] *
+          (1 - fims_math::exp(-(population_derived_quantities_map_["mortality_Z"][i_age_year])));
     }
   }
 
@@ -602,12 +602,12 @@ class CatchAtAge : public FisheryModelBase<Type> {
   void CalculateIndex(std::shared_ptr<fims_popdy::Population<Type>> &population,
                       size_t i_age_year, size_t year, size_t age) {
     for (size_t fleet_ = 0; fleet_ < population->n_fleets; fleet_++) {
-      std::map<std::string, fims::Vector<Type>> &fdq_ =
+      std::map<std::string, fims::Vector<Type>> &fleet_derived_quantities_map_ =
           this->GetFleetDerivedQuantities(population->fleets[fleet_]->GetId());
 
-      fdq_["index_weight"][year] += fdq_["index_weight_at_age"][i_age_year];
+      fleet_derived_quantities_map_["index_weight"][year] += fleet_derived_quantities_map_["index_weight_at_age"][i_age_year];
 
-      fdq_["index_numbers"][year] += fdq_["index_numbers_at_age"][i_age_year];
+      fleet_derived_quantities_map_["index_numbers"][year] += fleet_derived_quantities_map_["index_numbers_at_age"][i_age_year];
     }
   }
 
@@ -622,18 +622,18 @@ class CatchAtAge : public FisheryModelBase<Type> {
   void CalculateIndexNumbersAA(
       std::shared_ptr<fims_popdy::Population<Type>> &population,
       size_t i_age_year, size_t year, size_t age) {
-    std::map<std::string, fims::Vector<Type>> &pdq_ =
+    std::map<std::string, fims::Vector<Type>> &population_derived_quantities_map_ =
         this->GetPopulationDerivedQuantities(population->GetId());
 
     for (size_t fleet_ = 0; fleet_ < population->n_fleets; fleet_++) {
-      std::map<std::string, fims::Vector<Type>> &fdq_ =
+      std::map<std::string, fims::Vector<Type>> &fleet_derived_quantities_map_ =
           this->GetFleetDerivedQuantities(population->fleets[fleet_]->GetId());
 
-      fdq_["index_numbers_at_age"][i_age_year] +=
+      fleet_derived_quantities_map_["index_numbers_at_age"][i_age_year] +=
           (population->fleets[fleet_]->q.get_force_scalar(year) *
            population->fleets[fleet_]->selectivity->evaluate(
                population->ages[age])) *
-          pdq_["numbers_at_age"][i_age_year];
+          population_derived_quantities_map_["numbers_at_age"][i_age_year];
     }
   }
 
@@ -649,11 +649,11 @@ class CatchAtAge : public FisheryModelBase<Type> {
       size_t age) {
     int i_age_year = year * population->n_ages + age;
     for (size_t fleet_ = 0; fleet_ < population->n_fleets; fleet_++) {
-      std::map<std::string, fims::Vector<Type>> &fdq_ =
+      std::map<std::string, fims::Vector<Type>> &fleet_derived_quantities_map_ =
           this->GetFleetDerivedQuantities(population->fleets[fleet_]->GetId());
 
-      fdq_["index_weight_at_age"][i_age_year] =
-          fdq_["index_numbers_at_age"][i_age_year] *
+      fleet_derived_quantities_map_["index_weight_at_age"][i_age_year] =
+          fleet_derived_quantities_map_["index_numbers_at_age"][i_age_year] *
           population->growth->evaluate(population->ages[age]);
     }
   }
@@ -664,7 +664,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
   void evaluate_age_comp() {
     fleet_iterator fit;
     for (fit = this->fleets.begin(); fit != this->fleets.end(); ++fit) {
-      std::map<std::string, fims::Vector<Type>> &fdq_ =
+      std::map<std::string, fims::Vector<Type>> &fleet_derived_quantities_map_ =
           this->GetFleetDerivedQuantities((*fit).second->GetId());
 
       std::shared_ptr<fims_popdy::Fleet<Type>> &fleet = (*fit).second;
@@ -688,13 +688,13 @@ class CatchAtAge : public FisheryModelBase<Type> {
           // timing rather than everything occurring at the start of
           // the year.
           if (fleet->fleet_observed_landings_data_id_m == -999) {
-            fdq_["agecomp_expected"][i_age_year] =
-                fdq_["index_numbers_at_age"][i_age_year];
+            fleet_derived_quantities_map_["agecomp_expected"][i_age_year] =
+                fleet_derived_quantities_map_["index_numbers_at_age"][i_age_year];
           } else {
-            fdq_["agecomp_expected"][i_age_year] =
-                fdq_["landings_numbers_at_age"][i_age_year];
+            fleet_derived_quantities_map_["agecomp_expected"][i_age_year] =
+                fleet_derived_quantities_map_["landings_numbers_at_age"][i_age_year];
           }
-          sum += fdq_["agecomp_expected"][i_age_year];
+          sum += fleet_derived_quantities_map_["agecomp_expected"][i_age_year];
           // robust_sum -= robust_add;
 
           // This sums over the observed age composition data so that
@@ -713,13 +713,13 @@ class CatchAtAge : public FisheryModelBase<Type> {
         }
         for (size_t a = 0; a < fleet->n_ages; a++) {
           size_t i_age_year = y * fleet->n_ages + a;
-          fdq_["agecomp_proportion"][i_age_year] =
-              fdq_["agecomp_expected"][i_age_year] / sum;
+          fleet_derived_quantities_map_["agecomp_proportion"][i_age_year] =
+              fleet_derived_quantities_map_["agecomp_expected"][i_age_year] / sum;
           // robust_add + robust_sum * this->agecomp_expected[i_age_year] / sum;
 
           if (fleet->fleet_observed_agecomp_data_id_m != -999) {
-            fdq_["agecomp_expected"][i_age_year] =
-                fdq_["agecomp_proportion"][i_age_year] * sum_obs;
+            fleet_derived_quantities_map_["agecomp_expected"][i_age_year] =
+                fleet_derived_quantities_map_["agecomp_proportion"][i_age_year] * sum_obs;
           }
         }
       }
@@ -732,7 +732,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
   void evaluate_length_comp() {
     fleet_iterator fit;
     for (fit = this->fleets.begin(); fit != this->fleets.end(); ++fit) {
-      std::map<std::string, fims::Vector<Type>> &fdq_ =
+      std::map<std::string, fims::Vector<Type>> &fleet_derived_quantities_map_ =
           this->GetFleetDerivedQuantities((*fit).second->GetId());
 
       std::shared_ptr<fims_popdy::Fleet<Type>> &fleet = (*fit).second;
@@ -753,20 +753,20 @@ class CatchAtAge : public FisheryModelBase<Type> {
             for (size_t a = 0; a < fleet->n_ages; a++) {
               size_t i_age_year = y * fleet->n_ages + a;
               size_t i_length_age = a * fleet->n_lengths + l;
-              fdq_["lengthcomp_expected"][i_length_year] +=
-                  fdq_["agecomp_expected"][i_age_year] *
+              fleet_derived_quantities_map_["lengthcomp_expected"][i_length_year] +=
+                  fleet_derived_quantities_map_["agecomp_expected"][i_age_year] *
                   fleet->age_to_length_conversion[i_length_age];
 
-              fdq_["landings_numbers_at_length"][i_length_year] +=
-                  fdq_["landings_numbers_at_age"][i_age_year] *
+              fleet_derived_quantities_map_["landings_numbers_at_length"][i_length_year] +=
+                  fleet_derived_quantities_map_["landings_numbers_at_age"][i_age_year] *
                   fleet->age_to_length_conversion[i_length_age];
 
-              fdq_["index_numbers_at_length"][i_length_year] +=
-                  fdq_["index_numbers_at_age"][i_age_year] *
+              fleet_derived_quantities_map_["index_numbers_at_length"][i_length_year] +=
+                  fleet_derived_quantities_map_["index_numbers_at_age"][i_age_year] *
                   fleet->age_to_length_conversion[i_length_age];
             }
 
-            sum += fdq_["lengthcomp_expected"][i_length_year];
+            sum += fleet_derived_quantities_map_["lengthcomp_expected"][i_length_year];
             // robust_sum -= robust_add;
 
             if (fleet->fleet_observed_lengthcomp_data_id_m != -999) {
@@ -778,13 +778,13 @@ class CatchAtAge : public FisheryModelBase<Type> {
           }
           for (size_t l = 0; l < fleet->n_lengths; l++) {
             size_t i_length_year = y * fleet->n_lengths + l;
-            fdq_["lengthcomp_proportion"][i_length_year] =
-                fdq_["lengthcomp_expected"][i_length_year] / sum;
+            fleet_derived_quantities_map_["lengthcomp_proportion"][i_length_year] =
+                fleet_derived_quantities_map_["lengthcomp_expected"][i_length_year] / sum;
             // robust_add + robust_sum *
             // this->lengthcomp_expected[i_length_year] / sum;
             if (fleet->fleet_observed_lengthcomp_data_id_m != -999) {
-              fdq_["lengthcomp_expected"][i_length_year] =
-                  fdq_["lengthcomp_proportion"][i_length_year] * sum_obs;
+              fleet_derived_quantities_map_["lengthcomp_expected"][i_length_year] =
+                  fleet_derived_quantities_map_["lengthcomp_proportion"][i_length_year] * sum_obs;
             }
           }
         }
@@ -798,17 +798,17 @@ class CatchAtAge : public FisheryModelBase<Type> {
   void evaluate_index() {
     fleet_iterator fit;
     for (fit = this->fleets.begin(); fit != this->fleets.end(); ++fit) {
-      std::map<std::string, fims::Vector<Type>> &fdq_ =
+      std::map<std::string, fims::Vector<Type>> &fleet_derived_quantities_map_ =
           this->GetFleetDerivedQuantities((*fit).second->GetId());
       std::shared_ptr<fims_popdy::Fleet<Type>> &fleet = (*fit).second;
 
-      for (size_t i = 0; i < fdq_["index_numbers"].size(); i++) {
+      for (size_t i = 0; i < fleet_derived_quantities_map_["index_numbers"].size(); i++) {
         if (fleet->observed_index_units == "number") {
-          fdq_["index_expected"][i] = fdq_["index_numbers"][i];
+          fleet_derived_quantities_map_["index_expected"][i] = fleet_derived_quantities_map_["index_numbers"][i];
         } else {
-          fdq_["index_expected"][i] = fdq_["index_weight"][i];
+          fleet_derived_quantities_map_["index_expected"][i] = fleet_derived_quantities_map_["index_weight"][i];
         }
-        fdq_["log_index_expected"][i] = log(fdq_["index_expected"][i]);
+        fleet_derived_quantities_map_["log_index_expected"][i] = log(fleet_derived_quantities_map_["index_expected"][i]);
       }
     }
   }
@@ -819,17 +819,17 @@ class CatchAtAge : public FisheryModelBase<Type> {
   void evaluate_landings() {
     fleet_iterator fit;
     for (fit = this->fleets.begin(); fit != this->fleets.end(); ++fit) {
-      std::map<std::string, fims::Vector<Type>> &fdq_ =
+      std::map<std::string, fims::Vector<Type>> &fleet_derived_quantities_map_ =
           this->GetFleetDerivedQuantities((*fit).second->GetId());
       std::shared_ptr<fims_popdy::Fleet<Type>> &fleet = (*fit).second;
 
-      for (size_t i = 0; i < fdq_["landings_weight"].size(); i++) {
+      for (size_t i = 0; i < fleet_derived_quantities_map_["landings_weight"].size(); i++) {
         if (fleet->observed_landings_units == "number") {
-          fdq_["landings_expected"][i] = fdq_["landings_numbers"][i];
+          fleet_derived_quantities_map_["landings_expected"][i] = fleet_derived_quantities_map_["landings_numbers"][i];
         } else {
-          fdq_["landings_expected"][i] = fdq_["landings_weight"][i];
+          fleet_derived_quantities_map_["landings_expected"][i] = fleet_derived_quantities_map_["landings_weight"][i];
         }
-        fdq_["log_landings_expected"][i] = log(fdq_["landings_expected"][i]);
+        fleet_derived_quantities_map_["log_landings_expected"][i] = log(fleet_derived_quantities_map_["landings_expected"][i]);
       }
     }
   }
@@ -861,7 +861,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
     for (size_t p = 0; p < this->populations.size(); p++) {
       std::shared_ptr<fims_popdy::Population<Type>> &population =
           this->populations[p];
-      std::map<std::string, fims::Vector<Type>> &pdq_ =
+      std::map<std::string, fims::Vector<Type>> &population_derived_quantities_map_ =
           this->GetPopulationDerivedQuantities(population->GetId());
       // CAAPopulationProxy<Type>& population = this->populations_proxies[p];
 
@@ -903,7 +903,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
             CalculateInitialNumbersAA(population, i_age_year, a);
 
             if (a == 0) {
-              pdq_["unfished_numbers_at_age"][i_age_year] =
+              population_derived_quantities_map_["unfished_numbers_at_age"][i_age_year] =
                   fims_math::exp(population->recruitment->log_rzero[0]);
             } else {
               CalculateUnfishedNumbersAA(population, i_age_year, a - 1, a);
@@ -932,14 +932,14 @@ class CatchAtAge : public FisheryModelBase<Type> {
              Expected recruitment in year 0 is numbers at age 0 in year 0.
              */
 
-            pdq_["expected_recruitment"][i_age_year] =
-                pdq_["numbers_at_age"][i_age_year];
+            population_derived_quantities_map_["expected_recruitment"][i_age_year] =
+                population_derived_quantities_map_["numbers_at_age"][i_age_year];
           } else {
             if (a == 0) {
               // Set the nrecruits for age a=0 year y (use pointers instead of
               // functional returns) assuming fecundity = 1 and 50:50 sex ratio
               CalculateRecruitment(population, i_age_year, y, y);
-              pdq_["unfished_numbers_at_age"][i_age_year] =
+              population_derived_quantities_map_["unfished_numbers_at_age"][i_age_year] =
                   fims_math::exp(population->recruitment->log_rzero[0]);
             } else {
               size_t i_agem1_yearm1 = (y - 1) * population->n_ages + (a - 1);

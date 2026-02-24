@@ -21,12 +21,12 @@ namespace
         surplus_production_model->CalculateReferencePoints(population);
         auto& dq_pop = surplus_production_model->GetPopulationDerivedQuantities(population->GetId());
 
-        fmsy[0] = exp(population->depletion->log_r[0]) *
-            pow(exp(population->depletion->log_m[0])-1,-1) *
-            (1-1/exp(population->depletion->log_m[0]));
-        bmsy[0] = exp(population->depletion->log_K[0]) *
-            pow(exp(population->depletion->log_m[0]),
-                -1/(exp(population->depletion->log_m[0])-1));
+        fmsy[0] = exp(population->depletion->log_growth_rate[0]) *
+            pow(exp(population->depletion->log_shape[0])-1,-1) *
+            (1-1/exp(population->depletion->log_shape[0]));
+        bmsy[0] = exp(population->depletion->log_carrying_capacity[0]) *
+            pow(exp(population->depletion->log_shape[0]),
+                -1/(exp(population->depletion->log_shape[0])-1));
         msy[0] = fmsy[0]*bmsy[0];
 
         EXPECT_DOUBLE_EQ( fmsy[0], dq_pop["fmsy"][0]);

@@ -6,20 +6,20 @@ namespace
 {
   TEST(DepletionEvaluate, DoubleInput){
     fims_popdy::PellaTomlinsonDepletion<double> pella_tomlinson1;
-    pella_tomlinson1.r.resize(1);
-    pella_tomlinson1.K.resize(1);
-    pella_tomlinson1.m.resize(1);
-    pella_tomlinson1.r[0] = 0.2;
-    pella_tomlinson1.K[0] = 645.0;
-    pella_tomlinson1.m[0] = 2.0;
+    pella_tomlinson1.growth_rate.resize(1);
+    pella_tomlinson1.carrying_capacity.resize(1);
+    pella_tomlinson1.shape.resize(1);
+    pella_tomlinson1.growth_rate[0] = 0.2;
+    pella_tomlinson1.carrying_capacity[0] = 645.0;
+    pella_tomlinson1.shape[0] = 2.0;
 
     // Test values from the jabba comparison
     // (via the Rdata object being used by the data group)
     // depletion(t-1) = 0.88
     // catch(t-1) = 10
-    // r = 0.2
-    // K = 645
-    // m = 2.0
+    // growth_rate (r) = 0.2
+    // carrying_capacity (K) = 645
+    // shape (m) = 2.0
     // expected depletion(t) = \f[ d_{t-1} + \frac{r}{m - 1.0} * d_{t-1} *  (1.0 - d_{t-1}^{m - 1.0} - Catch_{t-1} /
     // K \f]
     // = 0.88 + (0.2 / (2.0 - 1.0)) * 0.88 * (1.0 - 0.88^(2.0 - 1.0)) - 10 / 645

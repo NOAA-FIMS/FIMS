@@ -37,21 +37,21 @@ struct DepletionBase : public fims_model_object::FIMSObject<Type> {
   fims::Vector<Type> depletion; /**< The depletion process. */
   fims::Vector<Type>
       log_init_depletion; /*!< estimated parameter: natural log of initial depletion*/
-  fims::Vector<Type> log_K;   /**< Carrying capacity of the population. */
-  fims::Vector<Type> log_r; /**< Intrinsic growth rate. */
-  fims::Vector<Type> log_m; /**< Shape parameter that adjusts the curvature of
-                               the growth function */
-  fims::Vector<Type> K; /**< Carrying capacity of the population. */
-  fims::Vector<Type> r; /**< Intrinsic growth rate. */
-  fims::Vector<Type> m; /**< Shape parameter that adjusts the curvature of the growth function */
+  fims::Vector<Type> log_carrying_capacity; /**< Carrying capacity of the population. */
+  fims::Vector<Type> log_growth_rate; /**< Intrinsic growth rate. */
+  fims::Vector<Type> log_shape; /**< Shape parameter that adjusts the curvature of
+                                   the growth function */
+  fims::Vector<Type> carrying_capacity; /**< Carrying capacity of the population. */
+  fims::Vector<Type> growth_rate; /**< Intrinsic growth rate. */
+  fims::Vector<Type> shape; /**< Shape parameter that adjusts the curvature of the growth function */
   
   // Transformation modules
   std::shared_ptr<fims_transformations::ParameterTransformationBase<Type>> 
-      r_transformation; /**< Pointer to the transformation function for the intrinsic growth rate */
+      growth_rate_transformation; /**< Pointer to the transformation function for the intrinsic growth rate */
   std::shared_ptr<fims_transformations::ParameterTransformationBase<Type>> 
-      K_transformation; /**< Pointer to the transformation function for the carrying capacity */
+      carrying_capacity_transformation; /**< Pointer to the transformation function for the carrying capacity */
   std::shared_ptr<fims_transformations::ParameterTransformationBase<Type>> 
-      m_transformation; /**< Pointer to the transformation function for the shape parameter */
+      shape_transformation; /**< Pointer to the transformation function for the shape parameter */
   std::shared_ptr<fims_transformations::ParameterTransformationBase<Type>> 
       depletion_transformation; /**< Pointer to the transformation function for depletion */
 
@@ -71,9 +71,9 @@ struct DepletionBase : public fims_model_object::FIMSObject<Type> {
    */
   virtual void ApplyLogTransformations() {
     // Always call transform - polymorphism handles the right direction
-    r_transformation->Transform(this->log_r[0], this->r[0]);
-    K_transformation->Transform(this->log_K[0], this->K[0]);
-    m_transformation->Transform(this->log_m[0], this->m[0]);
+    growth_rate_transformation->Transform(this->log_growth_rate[0], this->growth_rate[0]);
+    carrying_capacity_transformation->Transform(this->log_carrying_capacity[0], this->carrying_capacity[0]);
+    shape_transformation->Transform(this->log_shape[0], this->shape[0]);
     for(int i=0; i < this->depletion.size(); i++){
         depletion_transformation->Transform(this->log_depletion[i], this->depletion[i]);
     }
