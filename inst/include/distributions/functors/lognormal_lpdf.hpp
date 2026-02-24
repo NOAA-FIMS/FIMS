@@ -25,9 +25,6 @@ struct LogNormalLPDF : public DensityComponentBase<Type> {
                  the log scale; can be a vector or scalar */
   Type lpdf = static_cast<Type>(0.0); /**< total log probability density
                                          contribution of the distribution */
-  // data_indicator<tmbutils::vector<Type> , Type> keep; /**< Indicator used in
-  // TMB one-step-ahead residual calculations */
-
   /** @brief Constructor.
    */
   LogNormalLPDF() : DensityComponentBase<Type>() {}
