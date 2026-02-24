@@ -34,42 +34,42 @@ class DistributionsInterfaceBase : public FIMSRcppInterfaceBase {
   /**
    * @brief The unique ID for the variable map that points to a fims::Vector.
    */
-  std::shared_ptr<std::vector<uint32_t>> observed_key_m;
+  std::shared_ptr<std::vector<uint32_t>> observed_key_m = NULL;
   /**
    * @brief The unique ID for the variable map that points to a fims::Vector.
    */
-  std::shared_ptr<std::vector<uint32_t>> expected_key_m;
+  std::shared_ptr<std::vector<uint32_t>> expected_key_m = NULL;
   /**
    * @brief The unique ID for the variable map that points to a fims::Vector.
    */
-  std::shared_ptr<std::vector<uint32_t>> uncertainty_key_m;
+  std::shared_ptr<std::vector<uint32_t>> uncertainty_key_m = NULL;
   /**
    * @brief Direct input observed values for the distribution.
    */
-  RealVector observed_values_m;
+  RealVector observed_values_m = NULL;
   /**
    * @brief Direct input expected values for the distribution.
    */
-  RealVector expected_values_m;
+  RealVector expected_values_m = NULL;
   /**
    * @brief Direct input uncertainty values for the distribution.
    */
-  RealVector uncertainty_values_m;
+  RealVector uncertainty_values_m = NULL;
   /**
    * @brief An index vector for the observed values used to subset which 
    * values are considered in the distribution likelihood calculations.
    */
-  IntVector observed_index_m;
+  IntVector observed_index_m = NULL;
   /**
    * @brief An index vector for the expected values used to subset which 
    * values are considered in the distribution likelihood calculations.
    */
-  IntVector expected_index_m;
+  IntVector expected_index_m = NULL;
   /**
    * @brief An index vector for the uncertainty values used to subset which 
    * values are considered in the distribution likelihood calculations.
    */
-  IntVector uncertainty_index_m;
+  IntVector uncertainty_index_m = NULL;
   /**
    * @brief Lambda values for weighting the likelihood contributions of each
    * observation in the distribution calculations.
@@ -275,10 +275,10 @@ class DistributionsInterfaceBase : public FIMSRcppInterfaceBase {
    * @brief Set the lambda values for weighting the likelihood contributions of 
    * each observation in the distribution calculations.
    *
-   * @param lambda_value Vector of lambda values for weighting the likelihood 
+   * @param input_lambda Vector of lambda values for weighting the likelihood 
    * contributions.
    */
-  virtual bool set_lambda_values(Rcpp::NumericVector lambda_value) { 
+  virtual bool set_lambda_values(Rcpp::NumericVector input_lambda) { 
     return false; 
   }
 
@@ -388,6 +388,17 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
   }
 
   /**
+   * @copydoc DistributionsInterfaceBase::set_process_type
+   */
+  virtual bool set_lambda_values(Rcpp::NumericVector input_lambda) { 
+    this->lambda_m->resize(input_lambda.size());
+    for (int i = 0; i < input_lambda.size(); i++) {
+      this->lambda_m.set(i) = input_lambda[i];
+    }
+    return true;
+  }
+
+  /**
    * @copydoc DistributionsInterfaceBase::set_process_id
    */
   virtual bool set_process_id(std::string input_type,
@@ -423,19 +434,19 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
   virtual bool set_process_values(std::string input_type,
                                   Rcpp::NumericVector input_values) {
     if (input_type == "observed") {
-      this->observed_values.resize(input_values.size());
+      this->observed_values_m.resize(input_values.size());
       for (int i = 0; i < input_values.size(); i++) {
-        this->observed_values[i].initial_value_m = input_values[i];
+        this->observed_values_m.set(i) = input_values[i];
       }
     } else if (input_type == "expected") {
-      this->expected_values.resize(input_values.size());
+      this->expected_values_m.resize(input_values.size());
       for (int i = 0; i < input_values.size(); i++) {
-        this->expected_values[i].initial_value_m = input_values[i];
+        this->expected_values_m.set(i) = input_values[i];
       }
     } else if (input_type == "uncertainty") {
-      this->uncertainty_values.resize(input_values.size());
+      this->uncertainty_values_m.resize(input_values.size());
       for (int i = 0; i < input_values.size(); i++) {
-        this->uncertainty_values[i].initial_value_m = input_values[i];
+        this->uncertainty_values_m.set(i) = input_values[i];
       }
     } else {
       // log error that input_type is not recognized
@@ -455,17 +466,17 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
     if (input_type == "observed") {
       this->observed_index_m->resize(input_index.size());
       for (int i = 0; i < input_index.size(); i++) {
-        this->observed_index_m->at(i) = input_index[i];
+        this->observed_index_m.set(i) = input_index[i];
       }
     } else if (input_type == "expected") {
       this->expected_index_m->resize(input_index.size());
       for (int i = 0; i < input_index.size(); i++) {
-        this->expected_index_m->at(i) = input_index[i];
+        this->expected_index_m.set(i) = input_index[i];
       }
     } else if (input_type == "uncertainty") {
       this->uncertainty_index_m->resize(input_index.size());
       for (int i = 0; i < input_index.size(); i++) {
-        this->uncertainty_index_m->at(i) = input_index[i];
+        this->uncertainty_index_m.set(i) = input_index[i];
       }
     } else {
       // log error that input_type is not recognized

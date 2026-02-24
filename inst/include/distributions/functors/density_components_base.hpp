@@ -30,18 +30,33 @@ struct DistributionElementObject {
                              "random_effects", and "data" */
   std::shared_ptr<fims_data_object::DataObject<Type>>
       data_observed_values; /**< observed data*/
-  fims::Vector<Type>
-      expected_values;           /**< expected value of distribution function*/
   fims::Vector<Type>* re = NULL; /**< pointer to random effects vector*/
   fims::Vector<Type>* re_expected_values =
       NULL; /**< expected value of random effects*/
   fims::Vector<Type>* data_expected_values = NULL; /**< expected value of data*/
   std::vector<fims::Vector<Type>*>
       priors; /**< vector of pointers where each points to a prior parameter */
-  fims::Vector<Type> observed_values; /**< input value of distribution function 
-  for priors, random effects, or processes*/
-  fims::Vector<Type> expected_mean;             /**< the expected mean of the
-                                            distribution, overrides expected values */
+  fims::Vector<Type> observed_values; /**< Observed values of distribution 
+  function*/
+  fims::Vector<Type> expected_values; /**< expected values of distribution 
+  function*/
+  fims::Vector<Type> uncertainty_values; /**< Uncertainty values of distribution 
+  function*/
+  fims::Vector<Type>* observed_pointer = NULL; /**< pointer to process observed 
+  values*/
+  fims::Vector<Type>* expected_pointer = NULL; /**< pointer to process expected 
+  values*/
+  fims::Vector<Type>* uncertainty_pointer = NULL; /**< pointer to process 
+  uncertainty values*/
+  fims::Vector<Type> observed_index; /**< Index of which observed values to 
+  include in density likelihood calculations*/
+  fims::Vector<Type> expected_index; /**< Index of which expected values to 
+  include in density likelihood calculations*/
+  fims::Vector<Type> uncertainty_index; /**< Index of which uncertainty values 
+  to include in density likelihood calculations*/
+  fims::Vector<Type> lambda = NULL; /**< process lambda likelihood weights*/
+  fims::Vector<Type> expected_mean; /**< the expected mean of the distribution, 
+  overrides expected values */
   std::string use_mean = fims::to_string("no"); /**< should expected_mean
                                           be used over expected values */
   // std::shared_ptr<DistributionElementObject<Type>> expected; /**< expected

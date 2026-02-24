@@ -356,32 +356,107 @@ class Information {
         
         if (d->observed_key.size() > 0) {
           variable_map_iterator vmit_observed;
-          if(d->observed_key.size() > 1) {
-            for(size_t i = 0; i < d->observed_key.size(); i++) {
-              vmit_observed = this->variable_map.find(d->observed_key[i]);
-              d->lpdf_vec.push_back((*vmit_observed).second);
-            }
+          vmit_observed = this->variable_map.find(d->observed_key[0]);
+          d->observed_pointer = (*vmit_observed).second;
+        } else if (d->observed_values.size() > 0) {
+          d->observed_pointer = &d->expected_values;
+        } else{
+          FIMS_ERROR_LOG("No observed values or observed key defined for process distribution " +
+                         fims::to_string(d->id));
+        }
+
+        if(d->observed_index.size() > 0){
+          if(max(d->observed_index) > d->(*observed_pointer).size()){
+            FIMS_ERROR_LOG("Observed index for distribution " +
+                           fims::to_string(d->id) + " exceeds size of observed values");
           }else{
-            
+            FIMS_INFO_LOG("Observed value vector length for distribution " +
+                        fims::to_string(d->id) + " is: " +
+                        fims::to_string(d->observed_index.size()));
           }
-          vmit_observed = this->variable_map.find(d->key[1]);
-          d->pointer_expected_values = (*vmit).second;
-        } else {
-          d->pointer_expected_values = &d->expected_values;
+        }else{
+          d->observed_index.resize(d->(*observed_pointer).size());
+          std::iota(d->observed_index.begin(), d->observed_index.end(), 0);
         }
         
-        variable_map_iterator vmit_expected;
-        FIMS_INFO_LOG("Link process from distribution " +
-                      fims::to_string(d->id) + " to observed value " +
-                      fims::to_string(d->observed_key[0])) + " and expected value " +
-                      fims::to_string(d->expected_key[0]));
-        vmit_observed = this->variable_map.find(d->observed_key[0]);
-        vmit_expected = this->variable_map.find(d->expected_key[0]);
-        d->process = (*vmit_observed).second;
+        FIMS_INFO_LOG("Observed value vector length for distribution " +
+                      fims::to_string(d->id) + " is: " +
+                      fims::to_string(d->observed_index.size()));
+
+        if (d->expected_key.size() > 0) {
+          variable_map_iterator vmit_expected;
+          vmit_expected = this->variable_map.find(d->expected_key[0]);
+          d->expected_pointer = (*vmit_expected).second;
+        } else if (d->expected_values.size() > 0) {
+          d->expected_pointer = &d->expected_values;
+        } else{
+          FIMS_ERROR_LOG("No expected values or expected key defined for process distribution " +
+                         fims::to_string(d->id));
+        }
         
-        FIMS_INFO_LOG("Process size for distribution " +
-                      fims::to_string(d->id) +
-                      " is: " + fims::to_string(d->observed_values.size()));
+        if(d->expected_index.size() > 0){
+          if(max(d->expected_index) > d->(*expected_pointer).size()){
+            FIMS_ERROR_LOG("Expected index for distribution " +
+                           fims::to_string(d->id) + " exceeds size of expected values");
+          }else{
+            FIMS_INFO_LOG("Expected value vector length for distribution " +
+                        fims::to_string(d->id) + " is: " +
+                        fims::to_string(d->expected_index.size()));
+          }
+        }else{
+          d->expected_index.resize(d->(*expected_pointer).size());
+          std::iota(d->expected_index.begin(), d->expected_index.end(), 0);
+        }
+        
+        FIMS_INFO_LOG("Expected value vector length for distribution " +
+                      fims::to_string(d->id) + " is: " +
+                      fims::to_string(d->expected_index.size()));
+        
+        if (d->uncertainty_key.size() > 0) {
+          variable_map_iterator vmit_uncertainty;
+          vmit_uncertainty = this->variable_map.find(d->uncertainty_key[0]);
+          d->uncertainty_pointer = (*vmit_uncertainty).second;
+        } else if (d->uncertainty_values.size() > 0) {
+          d->uncertainty_pointer = &d->uncertainty_values;
+        } else{
+          FIMS_ERROR_LOG("No uncertainty values or uncertainty key defined for process distribution " +
+                         fims::to_string(d->id));
+        }
+        
+        if(d->uncertainty_index.size() > 0){
+          if(max(d->uncertainty_index) > d->(*uncertainty_pointer).size()){
+            FIMS_ERROR_LOG("Uncertainty index for distribution " +
+                           fims::to_string(d->id) + " exceeds size of uncertainty values");
+          }
+        }else{
+          d->uncertainty_index.resize(d->(*uncertainty_pointer).size());
+          std::iota(d->uncertainty_index.begin(), d->uncertainty_index.end(), 0);
+        }
+        
+        FIMS_INFO_LOG("Uncertainty value vector length for distribution " +
+                      fims::to_string(d->id) + " is: " +
+                      fims::to_string(d->uncertainty_index.size()));
+
+        if(d->observed_index.size() > 1){
+          if(d->expected_index.size() > 1){
+            if(d->observed_index.size() != d->expected_index.size()){
+              FIMS_ERROR_LOG("Observed index and expected index for distribution " +
+                            fims::to_string(d->id) + " are different lengths");
+            }
+            if(d->uncertainty_index.size() > 1){
+              if(d->expected_index.size() != d->uncertainty_index.size()){
+                FIMS_ERROR_LOG("Expected index and uncertainty index for distribution " +
+                               fims::to_string(d->id) + " are different lengths");
+              }
+            }
+          }
+          if(d->uncertainty_index.size() > 1){
+            if(d->observed_index.size() != d->uncertainty_index.size()){
+              FIMS_ERROR_LOG("Observed index and uncertainty index for distribution " +
+                              fims::to_string(d->id) + " are different lengths");
+            }
+          }
+        }
       }
     }
   }
