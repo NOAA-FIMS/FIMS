@@ -47,6 +47,8 @@ template <typename Type>
  * CatchAtAge class inherits from the FisheryModelBase class and can be used
  * to fit both age and length data even though it is called CatchAtAge.
  *
+ * See the @ref glossary for definitions of mathematical symbols used below.
+ *
  */
 class CatchAtAge : public FisheryModelBase<Type> {
  public:
