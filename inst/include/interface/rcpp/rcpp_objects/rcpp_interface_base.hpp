@@ -310,13 +310,12 @@ class ParameterVector {
    */
   void set(size_t pos, const Parameter& p) { this->storage_m->at(pos) = p; }
 
-
   /**
    * @brief Sets the initial values of the ParameterVector from a R numeric
    * vector.
    * @param orig A numeric vector from R.
    */
-void values_from_R_vector(const Rcpp::NumericVector& orig) {
+  void values_from_R_vector(const Rcpp::NumericVector& orig) {
     if (orig.size() != this->storage_m->size()) {
       throw std::invalid_argument(
           "Error in call to ParameterVector::values_from_R_vector: orig.size() "
@@ -347,7 +346,7 @@ void values_from_R_vector(const Rcpp::NumericVector& orig) {
    * @brief Sets the maximum values of the ParameterVector from a R numeric
    * vector.
    * @param orig A numeric vector from R.
-   */  
+   */
   void max_values_from_R_vector(const Rcpp::NumericVector& orig) {
     if (orig.size() != this->storage_m->size()) {
       throw std::invalid_argument(
@@ -371,7 +370,8 @@ void values_from_R_vector(const Rcpp::NumericVector& orig) {
           "orig.size() != storage_m->size().");
     }
     for (size_t i = 0; i < this->storage_m->size(); i++) {
-      this->storage_m->at(i).estimation_type_m.set(Rcpp::as<std::string>(orig[i]));
+      this->storage_m->at(i).estimation_type_m.set(
+          Rcpp::as<std::string>(orig[i]));
     }
   }
 
@@ -389,7 +389,7 @@ void values_from_R_vector(const Rcpp::NumericVector& orig) {
     for (size_t i = 0; i < this->storage_m->size(); i++) {
       this->storage_m->at(i).final_value_m = orig[i];
     }
-  } 
+  }
 
   /**
    * @brief Sets the uncertainty values of the ParameterVector from a R numeric
@@ -448,7 +448,6 @@ void values_from_R_vector(const Rcpp::NumericVector& orig) {
 
     return ret;
   }
-  
 
   /**
    * @brief Returns the maximum values of the ParameterVector as a R numeric
@@ -468,7 +467,7 @@ void values_from_R_vector(const Rcpp::NumericVector& orig) {
    * @brief Returns the estimation types of the ParameterVector as a R
    * character vector.
    * @return Rcpp::CharacterVector
-   */  
+   */
   Rcpp::CharacterVector estimation_types_to_R_vector() {
     Rcpp::CharacterVector ret(this->storage_m->size());
     for (size_t i = 0; i < this->size(); i++) {
@@ -701,7 +700,7 @@ class RealVector {
   /**
    * @brief Sets the values of the RealVector from a R numeric vector.
    * @param orig A numeric vector from R.
-  */
+   */
   void from_R_vector(const Rcpp::NumericVector& orig) {
     this->storage_m->resize(orig.size());
     for (size_t i = 0; i < this->storage_m->size(); i++) {
