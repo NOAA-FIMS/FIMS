@@ -6,6 +6,10 @@ Copilot should treat the existing codebase, especially the `tests/` directory, a
 ## General Development Guidelines
 
 - Always follow the existing C++ and R coding style used in the repo.
+  - For R: follow the [tidyverse style guide](https://style.tidyverse.org). Use tidyverse-style syntax instead of base R, and use the pipe operator (`|>`) to connect code.
+  - For C++: follow conventions consistent with the [Google C++ Style Guide](https://google.github.io/styleguide/cppguide.html).
+  - For variables: Use full, descriptive names whenever possible.
+  - For R object fields: Use `[[ ]]` instead of `$` when extracting fields from an object.
 - Do not introduce new structural patterns or large stylistic rewrites unless the issue specifically asks for them.
 - Avoid adding new dependencies without discussion.
 - Prefer clear and maintainable code over overly clever or complicated ones.
@@ -13,13 +17,13 @@ Copilot should treat the existing codebase, especially the `tests/` directory, a
 
 ## Scope and Change Discipline
 
-- Keep AI generated changes small and focused on the issue requirements.
-- Do not mix formatting only edits with functional changes.
+- Keep AI-generated changes small and focused on the issue requirements.
+- Do not mix formatting-only edits with functional changes.
 - Avoid refactors that are not directly related to the given issue.
 
 ## C++ Code and Model Structure
 
-- Follow the existing initialization and configuration patterns used in model classes, for example : `Population`, `Fleet`, integration helpers, etc.
+- Follow the existing initialization and configuration patterns used in model classes, for example: `Population`, `Fleet`, integration helpers, etc.
 - Do not restructure model setup logic unless explicitly required.
 - Maintain consistency between C++ logic and the Rcpp interface.
 - Do not modify public interfaces without updating related tests and documentation.
@@ -29,11 +33,11 @@ Copilot should treat the existing codebase, especially the `tests/` directory, a
 Before generating or modifying C++ tests, review the `tests/gtest/` directory.
 
 - New test files should follow the pattern:  
-  `tests/gtest/test_FileName_ClassName_FunctionName.cpp`
+  `tests/gtest/test_FileName_ClassName_FunctionName.cpp`.
 - When creating new C++ tests, first suggest using  
   `FIMS:::use_gtest_template(name = "FileName_ClassName_FunctionName")`  
-  which generates the test file and registers it in `CMakeLists.txt`.
-- Do not prioritize manual creation of test files or manual editing of `CMakeLists.txt` unless necessary.
+  which generates the test file and registers it in `tests/gtest/CMakeLists.txt`.
+- Do not prioritize manual creation of test files or manual editing of `tests/gtest/CMakeLists.txt` unless necessary.
 - If registering tests manually, ensure they are linked to both `gtest_main` and `fims_test`, and use `gtest_discover_tests()`.
 - Reuse existing fixture patterns and helper structures.
 - Treat existing files in `tests/gtest/` as the reference instead of introducing new test styles.
@@ -43,7 +47,7 @@ Before generating or modifying C++ tests, review the `tests/gtest/` directory.
 Before generating or modifying R tests, review the `tests/testthat/` directory.
 
 - New test files should follow the pattern:  
-  `tests/testthat/test-function_name.R`
+  `tests/testthat/test-function_name.R`.
 - When creating new R tests, first suggest using  
   `FIMS:::use_testthat_template("function_name")`.
 - Reuse existing helper functions and integration helpers where possible.
