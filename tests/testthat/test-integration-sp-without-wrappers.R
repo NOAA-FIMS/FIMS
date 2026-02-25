@@ -217,23 +217,23 @@ survey_fleet_index_distribution$set_distribution_links("random_effects",
 # create depletion module
 production <- new(PTDepletion)
 
-# estimate log r and K
+# estimate log growth rate and log carrying capacity
 if(bayesian == FALSE){
-  production$log_r[1]$value <- log(inits$r)
-  production$log_r[1]$estimation_type$set("fixed_effects")
-  production$log_K[1]$value <- log(inits$K)
-  production$log_K[1]$estimation_type$set("fixed_effects")
+  production$log_growth_rate[1]$value <- log(inits$r)
+  production$log_growth_rate[1]$estimation_type$set("fixed_effects")
+  production$log_carrying_capacity[1]$value <- log(inits$K)
+  production$log_carrying_capacity[1]$estimation_type$set("fixed_effects")
 } else {
-  production$r[1]$value <- inits$r
-  production$r[1]$min <- 0
-  production$r[1]$estimation_type$set("fixed_effects")
-  production$K[1]$value <- inits$K
-  production$K[1]$min <- 0
-  production$K[1]$estimation_type$set("fixed_effects")
+  production$growth_rate[1]$value <- inits$r
+  production$growth_rate[1]$min <- 0
+  production$growth_rate[1]$estimation_type$set("fixed_effects")
+  production$carrying_capacity[1]$value <- inits$K
+  production$carrying_capacity[1]$min <- 0
+  production$carrying_capacity[1]$estimation_type$set("fixed_effects")
 } 
 
 # Fix to get Schaefer model
-production$log_m[1]$value <- log(2)
+production$log_shape[1]$value <- log(2)
 
 
 production$log_init_depletion[1]$value <- 0 # inital depletion ~ 1
@@ -268,15 +268,15 @@ production_distribution$set_distribution_links(
 )
 
 if(bayesian == TRUE){
-  r_Prior <- new(DlnormDistribution)
-  r_Prior$expected_values[1]$value <- r_prior[1]
-  r_Prior$log_sd[1]$value <- log(r_prior[2])
-  r_Prior$set_distribution_links("prior", production$r$get_id())
+  growth_rate_Prior <- new(DlnormDistribution)
+  growth_rate_Prior$expected_values[1]$value <- r_prior[1]
+  growth_rate_Prior$log_sd[1]$value <- log(r_prior[2])
+  growth_rate_Prior$set_distribution_links("prior", production$growth_rate$get_id())
 
-  K_Prior <- new(DlnormDistribution)
-  K_Prior$expected_values[1]$value <- K_prior[1]
-  K_Prior$log_sd[1]$value <- log(K_prior[2])
-  K_Prior$set_distribution_links("prior", production$K$get_id())
+  carrying_capacity_Prior <- new(DlnormDistribution)
+  carrying_capacity_Prior$expected_values[1]$value <- K_prior[1]
+  carrying_capacity_Prior$log_sd[1]$value <- log(K_prior[2])
+  carrying_capacity_Prior$set_distribution_links("prior", production$carrying_capacity$get_id())
 }
 
 

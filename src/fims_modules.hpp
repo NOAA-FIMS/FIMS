@@ -384,12 +384,12 @@ RCPP_MODULE(fims) {
 
   Rcpp::class_<PellaTomlinsonInterface>("PTDepletion")
       .constructor()
-      .field("log_r", &PellaTomlinsonInterface::log_r)
-      .field("log_K", &PellaTomlinsonInterface::log_K)
-      .field("log_m", &PellaTomlinsonInterface::log_m)
-      .field("r", &PellaTomlinsonInterface::r)
-      .field("K", &PellaTomlinsonInterface::K)
-      .field("m", &PellaTomlinsonInterface::m)
+      .field("log_growth_rate", &PellaTomlinsonInterface::log_growth_rate)
+      .field("log_carrying_capacity", &PellaTomlinsonInterface::log_carrying_capacity)
+      .field("log_shape", &PellaTomlinsonInterface::log_shape)
+      .field("growth_rate", &PellaTomlinsonInterface::growth_rate)
+      .field("carrying_capacity", &PellaTomlinsonInterface::carrying_capacity)
+      .field("shape", &PellaTomlinsonInterface::shape)
       .field("depletion", &PellaTomlinsonInterface::depletion,
              "The depletion process")
       .field("log_depletion", &PellaTomlinsonInterface::log_depletion,

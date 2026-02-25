@@ -30,8 +30,8 @@ struct PellaTomlinsonDepletion : public DepletionBase<Type> {
    * @brief Method of the depletion class that implements the
    * Pella--Tomlinson production function for depletion, d at time, t.
    *
-   * \f[ \frac{r}{m - 1.0} * d_{t-1} *  (1.0 - d_{t-1}^{m - 1.0} - Catch_{t-1} /
-   * K \f]
+   * \f[ \frac{growth_rate}{shape - 1.0} * d_{t-1} *  (1.0 - d_{t-1}^{shape - 1.0} - Catch_{t-1} /
+   * carrying_capacity) \f]
    *
    * @param depletion_ym1 Expected depletion from previous time step.
    * @param catch_ym1 Catch from previous time step.

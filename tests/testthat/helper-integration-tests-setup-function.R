@@ -650,28 +650,28 @@ setup_and_run_sp <- function(bayesian_mode = FALSE,
 
   # create depletion module
   production <- new(PTDepletion)
-  # estimate log r and K
+  # estimate log growth_rate and log carrying_capacity
   if(estimation_mode == FALSE) {
-    production$log_r[1]$value <- 
+    production$log_growth_rate[1]$value <- 
       jabba_pars |> dplyr::filter(rownames(jabba_pars) == "r") |> 
         dplyr::select(Median) |> log() |> unlist()
-    production$log_r[1]$estimation_type$set("fixed_effects")
-    production$log_K[1]$value <- 
+    production$log_growth_rate[1]$estimation_type$set("fixed_effects")
+    production$log_carrying_capacity[1]$value <- 
       jabba_pars |> dplyr::filter(rownames(jabba_pars) == "K") |> 
         dplyr::select(Median) |> log() |> unlist()
-    production$log_K[1]$estimation_type$set("fixed_effects")
+    production$log_carrying_capacity[1]$estimation_type$set("fixed_effects")
   } else {
     r.init <- rlnorm(1, log(0.2), 0.5) # random draw from prior
-    production$r[1]$value <- r.init
-    #production$log_r[1]$estimation_type$set("fixed_effects")
+    production$growth_rate[1]$value <- r.init
+    #production$log_growth_rate[1]$estimation_type$set("fixed_effects")
     K.init <- rlnorm(1, log(8 * max(landings$value)), 
       (log(1^2+1))) # random draw from prior
-    production$K[1]$value <- K.init
-    #production$log_K[1]$estimation_type$set("fixed_effects")
+    production$carrying_capacity[1]$value <- K.init
+    #production$log_carrying_capacity[1]$estimation_type$set("fixed_effects")
   }
  
   # Fix to get Schaefer model
-  production$log_m[1]$value <- log(2)
+  production$log_shape[1]$value <- log(2)
   production$log_depletion$resize(nyears+1)
   input_depletion <- jabba_expect_depletion
   for (i in 1:(nyears+1)) {
@@ -699,15 +699,15 @@ setup_and_run_sp <- function(bayesian_mode = FALSE,
 
   if(bayesian_mode == TRUE) {
     # Setup Priors USING jabba DEFAULTS
-    r_Prior <- new(DlnormDistribution)
-    r_Prior$expected_values[1]$value <- log(0.2)
-    r_Prior$log_sd[1]$value <- log(0.5)
-    r_Prior$set_distribution_links("prior", production$r$get_id())
+    growth_rate_Prior <- new(DlnormDistribution)
+    growth_rate_Prior$expected_values[1]$value <- log(0.2)
+    growth_rate_Prior$log_sd[1]$value <- log(0.5)
+    growth_rate_Prior$set_distribution_links("prior", production$growth_rate$get_id())
 
-    K_Prior <- new(DlnormDistribution)
-    K_Prior$expected_values[1]$value <- log(8 * max(landings$value))
-    K_Prior$log_sd[1]$value <- log(sqrt(log(1^2+1))) # CV prior = 1
-    K_Prior$set_distribution_links("prior", production$K$get_id())
+    carrying_capacity_Prior <- new(DlnormDistribution)
+    carrying_capacity_Prior$expected_values[1]$value <- log(8 * max(landings$value))
+    carrying_capacity_Prior$log_sd[1]$value <- log(sqrt(log(1^2+1))) # CV prior = 1
+    carrying_capacity_Prior$set_distribution_links("prior", production$carrying_capacity$get_id())
   }
   # create population module
   population <- new(Population)

@@ -437,16 +437,16 @@ class SurplusProduction : public FisheryModelBase<Type> {
     // vector< vector<Type> > creates a nested vector structure where
     // each vector can be a different dimension. Does not work with ADREPORT
 
-    vector<vector<Type>> log_index_expected(n_fleets);
-    vector<vector<Type>> biomass(n_pops);
-    vector<vector<Type>> observed_catch(n_pops);
-    vector<vector<Type>> pop_depletion(n_pops);
-    vector<vector<Type>> log_depletion_expected(n_pops);
-    vector<vector<Type>> fmsy(n_pops);
-    vector<vector<Type>> bmsy(n_pops);
-    vector<vector<Type>> msy(n_pops);
-    vector<vector<Type>> harvest_rate(n_pops);
-    vector<vector<Type>> mean_q(n_fleets);
+    vector<vector<Type>> log_index_expected_(n_fleets);
+    vector<vector<Type>> biomass_(n_pops);
+    vector<vector<Type>> observed_catch_(n_pops);
+    vector<vector<Type>> depletion_(n_pops);
+    vector<vector<Type>> log_depletion_expected_(n_pops);
+    vector<vector<Type>> fmsy_(n_pops);
+    vector<vector<Type>> bmsy_(n_pops);
+    vector<vector<Type>> msy_(n_pops);
+    vector<vector<Type>> harvest_rate_(n_pops);
+    vector<vector<Type>> mean_q_(n_fleets);
     // initiate population index for structuring report out objects
     int pop_idx = 0;
     for (size_t p = 0; p < this->populations.size(); p++) {
@@ -456,18 +456,18 @@ class SurplusProduction : public FisheryModelBase<Type> {
       std::map<std::string, fims::Vector<Type>> &derived_quantities =
           this->GetPopulationDerivedQuantities(this->populations[p]->GetId());
       this->populations[p]->depletion->create_report_vectors(report_vectors);
-      biomass(pop_idx) = derived_quantities["biomass"].to_tmb();
-      pop_depletion(pop_idx) = 
+      biomass_(pop_idx) = derived_quantities["biomass"].to_tmb();
+      depletion_(pop_idx) = 
           (this->populations[p]->depletion->depletion).to_tmb();
-      log_depletion_expected(pop_idx) =
+      log_depletion_expected_(pop_idx) =
           (this->populations[p]->depletion->log_expected_depletion).to_tmb();
-      observed_catch(pop_idx) =
+      observed_catch_(pop_idx) =
           derived_quantities["observed_catch"].to_tmb();
-      harvest_rate(pop_idx) =
+      harvest_rate_(pop_idx) =
           derived_quantities["harvest_rate"].to_tmb();
-      fmsy(pop_idx) = derived_quantities["fmsy"].to_tmb();
-      bmsy(pop_idx) = derived_quantities["bmsy"].to_tmb();
-      msy(pop_idx) = derived_quantities["msy"].to_tmb();
+      fmsy_(pop_idx) = derived_quantities["fmsy"].to_tmb();
+      bmsy_(pop_idx) = derived_quantities["bmsy"].to_tmb();
+      msy_(pop_idx) = derived_quantities["msy"].to_tmb();
 
       pop_idx += 1;
     }
@@ -479,35 +479,35 @@ class SurplusProduction : public FisheryModelBase<Type> {
       std::map<std::string, fims::Vector<Type>> &derived_quantities =
           this->GetFleetDerivedQuantities(fleet->GetId());
 
-      log_index_expected(fleet_idx) =
+      log_index_expected_(fleet_idx) =
           derived_quantities["log_index_expected"].to_tmb();
-      mean_q(fleet_idx) =
+      mean_q_(fleet_idx) =
           fims_math::exp(derived_quantities["mean_log_q"].to_tmb());
       fleet_idx += 1;
     }
-    FIMS_REPORT_F_("biomass", biomass, this->of);
-    FIMS_REPORT_F_("depletion", pop_depletion, this->of);
-    FIMS_REPORT_F_("log_depletion_expected", log_depletion_expected, this->of);
-    FIMS_REPORT_F_("observed_catch", observed_catch, this->of);
-    FIMS_REPORT_F_("harvest_rate", harvest_rate, this->of);
-    FIMS_REPORT_F_("fmsy", fmsy, this->of);
-    FIMS_REPORT_F_("bmsy", bmsy, this->of);
-    FIMS_REPORT_F_("msy", msy, this->of);
-    FIMS_REPORT_F_("log_index_expected", log_index_expected, this->of);
-    FIMS_REPORT_F_("mean_q", mean_q, this->of);
+    FIMS_REPORT_F_("biomass", biomass_, this->of);
+    FIMS_REPORT_F_("depletion", depletion_, this->of);
+    FIMS_REPORT_F_("log_depletion_expected", log_depletion_expected_, this->of);
+    FIMS_REPORT_F_("observed_catch", observed_catch_, this->of);
+    FIMS_REPORT_F_("harvest_rate", harvest_rate_, this->of);
+    FIMS_REPORT_F_("fmsy", fmsy_, this->of);
+    FIMS_REPORT_F_("bmsy", bmsy_, this->of);
+    FIMS_REPORT_F_("msy", msy_, this->of);
+    FIMS_REPORT_F_("log_index_expected", log_index_expected_, this->of);
+    FIMS_REPORT_F_("mean_q", mean_q_, this->of);
     /*ADREPORT using ADREPORTvector defined in
      * inst/include/interface/interface.hpp:
      * function collapses the nested vector into a single vector
      */
-    vector<Type> biomass = ADREPORTvector(biomass);
-    vector<Type> depletion = ADREPORTvector(pop_depletion);
-    vector<Type> observed_catch = ADREPORTvector(observed_catch);
-    vector<Type> harvest_rate = ADREPORTvector(harvest_rate);
-    vector<Type> fmsy = ADREPORTvector(fmsy);
-    vector<Type> bmsy = ADREPORTvector(bmsy);
-    vector<Type> msy = ADREPORTvector(msy);
-    vector<Type> log_index_expected = ADREPORTvector(log_index_expected);
-    vector<Type> mean_q = ADREPORTvector(mean_q);
+    vector<Type> biomass = ADREPORTvector(biomass_);
+    vector<Type> depletion = ADREPORTvector(depletion_);
+    vector<Type> observed_catch = ADREPORTvector(observed_catch_);
+    vector<Type> harvest_rate = ADREPORTvector(harvest_rate_);
+    vector<Type> fmsy = ADREPORTvector(fmsy_);
+    vector<Type> bmsy = ADREPORTvector(bmsy_);
+    vector<Type> msy = ADREPORTvector(msy_);
+    vector<Type> log_index_expected = ADREPORTvector(log_index_expected_);
+    vector<Type> mean_q = ADREPORTvector(mean_q_);
 
     ADREPORT_F(biomass, this->of);
     ADREPORT_F(depletion, this->of);
