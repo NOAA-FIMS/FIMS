@@ -78,9 +78,14 @@ initialize_module <- function(parameters, data, module_name, fleet_name = NA_cha
     data_distribution_names_for_fleet_i <- parameters |>
       dplyr::filter(fleet_name == !!fleet_name & distribution_type == "Data") |>
       dplyr::pull(module_type)
-    if ("age-to-length-conversion" %in% fleet_types &&
+    age_to_length_conversion_value <- dplyr::filter(
+        parameters,
+        .data[["fleet_name"]] == fleet_name,
+        .data[["label"]] == "age_to_length_conversion"
+      ) |>
+        dplyr::pull(value)
+    if (length(age_to_length_conversion_value) > 0 &&
       "LengthComp" %in% data_distribution_names_for_fleet_i) {
-      age_to_length_conversion_value <- FIMS::m_age_to_length_conversion(data, fleet_name)
       module[["age_to_length_conversion"]]$resize(length(age_to_length_conversion_value))
       # Assign each value to the corresponding position in the parameter vector
       purrr::walk(
@@ -480,8 +485,8 @@ initialize_landings <- function(data, fleet_name) {
   if ("landings" %in% fleet_type) {
     module <- methods::new(Landings, get_n_years(data))
     purrr::walk(
-      seq_along(m_landings(data, fleet_name)),
-      \(x) module$landings_data$set(x - 1, m_landings(data, fleet_name)[x])
+      seq_along(get_data_vector(data, type_name = "landings", fleet_name)),
+      \(x) module$landings_data$set(x - 1, get_data_vector(data, type_name = "landings", fleet_name)[x])
     )
     return(module)
   } else {
@@ -516,8 +521,8 @@ initialize_index <- function(data, fleet_name) {
   if ("index" %in% fleet_type) {
     module <- methods::new(Index, get_n_years(data))
     purrr::walk(
-      seq_along(m_index(data, fleet_name)),
-      \(x) module$index_data$set(x - 1, m_index(data, fleet_name)[x])
+      seq_along(get_data_vector(data, type_name = "index", fleet_name)),
+      \(x) module$index_data$set(x - 1, get_data_vector(data, type_name = "index", fleet_name)[x])
     )
     return(module)
   } else {
@@ -551,15 +556,13 @@ initialize_comp <- function(data,
       "name" = "age_comp",
       "comp_data_field" = "age_comp_data",
       "get_n_function" = get_n_ages,
-      "comp_object" = AgeComp,
-      "m_comp" = m_agecomp
+      "comp_object" = AgeComp
     ),
     "LengthComp" = list(
       "name" = "length_comp",
       "comp_data_field" = "length_comp_data",
       "get_n_function" = get_n_lengths,
-      "comp_object" = LengthComp,
-      "m_comp" = m_lengthcomp
+      "comp_object" = LengthComp
     )
   )
 
@@ -583,7 +586,7 @@ initialize_comp <- function(data,
   )
 
   # Validate that the fleet's composition data is available
-  comp_data <- comp[["m_comp"]](data, fleet_name)
+  comp_data <- get_data_vector(data, type_name = comp[["name"]], fleet_name)
   if (is.null(comp_data) || length(comp_data) == 0) {
     cli::cli_abort(c(
       "`{comp[['name']]}`-composition data for fleet `{fleet_name}` is
@@ -591,6 +594,7 @@ initialize_comp <- function(data,
     ))
   }
 
+  # TODO: move this to FIMSFrame
   model_data <- comp_data *
     get_data(data) |>
       dplyr::filter(

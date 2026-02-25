@@ -42,7 +42,6 @@
 # TODO: make date_formats a local variable
 # TODO: document sorting of information in terms of alphabetized fleet order
 # TODO: test implement addition of -999
-# TODO: validate that all length-age combinations exist in the conversion matrix
 
 # methods::setClass: ----
 
@@ -267,6 +266,7 @@ methods::setMethod(
   function(x) FIMSFrame(x)@n_lengths
 )
 
+# TODO: change this documentation
 #' Get a vector of data to be passed to a FIMS module from a FIMSFrame object
 #'
 #' There is an accessor function for each data type needed to run a FIMS model.
@@ -274,11 +274,6 @@ methods::setMethod(
 #' where the star can be replaced with the data type separated by underscores,
 #' e.g., weight_at_age. These accessor functions are the preferred way to pass
 #' data to a FIMS module because the data will have the appropriate indexing.
-#'
-#' @details
-#' Age-to-length-conversion data, i.e., the proportion of age "a" that are
-#' length "l", are used to convert lengths (input data) to ages (modeled) as
-#' a way to fit length data without estimating growth.
 #'
 #' @inheritParams get_data
 #' @param fleet_name A string, or vector of strings, specifying the name of the
@@ -296,115 +291,44 @@ NULL
 #' @rdname m_
 #' @keywords FIMSFrame
 methods::setGeneric(
-  "m_landings",
-  function(x, fleet_name) standardGeneric("m_landings")
+  "get_data_vector",
+  function(x, type_name, fleet_name) standardGeneric("get_data_vector")
 )
-#' @rdname m_
+#' @rdname get_data_vector
 #' @keywords FIMSFrame
 methods::setMethod(
-  "m_landings", "FIMSFrame",
-  function(x, fleet_name) {
+  "get_data_vector", "FIMSFrame",
+  function(x, type_name, fleet_name) {
+    summary_data <- dplyr::count(x@data, type, name) |>
+      dplyr::filter(
+        .data[["type"]] %in% type_name,
+        .data[["name"]] %in% fleet_name
+      )
+    if (NROW(summary_data) == 0) {
+      cli::cli_abort(
+        "No data found for {.var name} {fleet_name} of {.var type} {type_name}."
+      )
+    }
+    # TODO: ordering needs to be correct
     dplyr::filter(
       .data = x@data,
-      .data[["type"]] == "landings",
+      .data[["type"]] == type_name,
       .data[["name"]] %in% fleet_name
     ) |>
       dplyr::pull(.data[["value"]])
   }
 )
-#' @rdname m_
+#' @rdname get_data_vector
 #' @keywords FIMSFrame
 methods::setMethod(
-  "m_landings",
+  "get_data_vector",
   "data.frame",
-  function(x, fleet_name) m_landings(FIMSFrame(x), fleet_name)
-)
-
-#' @export
-#' @rdname m_
-#' @keywords FIMSFrame
-methods::setGeneric(
-  "m_index",
-  function(x, fleet_name) standardGeneric("m_index")
-)
-#' @rdname m_
-#' @keywords FIMSFrame
-methods::setMethod(
-  "m_index", "FIMSFrame",
-  function(x, fleet_name) {
-    dplyr::filter(
-      .data = x@data,
-      .data[["type"]] == "index",
-      .data[["name"]] %in% fleet_name
-    ) |>
-      dplyr::pull(.data[["value"]])
+  function(x, type_name, fleet_name) {
+    get_data_vector(FIMSFrame(x), type_name, fleet_name)
   }
 )
-#' @rdname m_
-#' @keywords FIMSFrame
-methods::setMethod(
-  "m_index",
-  "data.frame",
-  function(x, fleet_name) m_index(FIMSFrame(x), fleet_name)
-)
 
-#' @export
-#' @rdname m_
-#' @keywords FIMSFrame
-methods::setGeneric(
-  "m_agecomp",
-  function(x, fleet_name) standardGeneric("m_agecomp")
-)
-#' @rdname m_
-#' @keywords FIMSFrame
-methods::setMethod(
-  "m_agecomp", "FIMSFrame",
-  function(x, fleet_name) {
-    dplyr::filter(
-      .data = x@data,
-      .data[["type"]] == "age_comp",
-      .data[["name"]] %in% fleet_name
-    ) |>
-      dplyr::pull(.data[["value"]])
-  }
-)
-#' @rdname m_
-#' @keywords FIMSFrame
-methods::setMethod(
-  "m_agecomp",
-  "data.frame",
-  function(x, fleet_name) m_agecomp(FIMSFrame(x), fleet_name)
-)
-
-#' @export
-#' @rdname m_
-#' @keywords FIMSFrame
-methods::setGeneric(
-  "m_lengthcomp",
-  function(x, fleet_name) standardGeneric("m_lengthcomp")
-)
-#' @rdname m_
-#' @keywords FIMSFrame
-methods::setMethod(
-  "m_lengthcomp",
-  "FIMSFrame",
-  function(x, fleet_name) {
-    dplyr::filter(
-      .data = x@data,
-      .data[["type"]] == "length_comp",
-      .data[["name"]] %in% fleet_name
-    ) |>
-      dplyr::pull(.data[["value"]])
-  }
-)
-#' @rdname m_
-#' @keywords FIMSFrame
-methods::setMethod(
-  "m_lengthcomp",
-  "data.frame",
-  function(x, fleet_name) m_lengthcomp(FIMSFrame(x), fleet_name)
-)
-
+# TODO: Move this to the creation of FIMSFrame
 #' @export
 #' @rdname m_
 #' @keywords FIMSFrame
@@ -420,7 +344,7 @@ methods::setMethod(
   function(x) {
     dplyr::filter(
       .data = as.data.frame(x@data),
-      .data[["type"]] == "weight-at-age"
+      .data[["type"]] == "weight_at_age"
     ) |>
       dplyr::group_by(.data[["age"]]) |>
       dplyr::mutate(
@@ -429,50 +353,6 @@ methods::setMethod(
       dplyr::summarize(mean_value = mean(.data[["value"]], na.rm = TRUE)) |>
       dplyr::pull(.data[["mean_value"]])
   }
-)
-#' @rdname m_
-#' @keywords FIMSFrame
-methods::setMethod(
-  "m_weight_at_age",
-  "data.frame",
-  function(x) {
-    m_weight_at_age(FIMSFrame(x))
-  }
-)
-
-#' @export
-#' @rdname m_
-#' @keywords FIMSFrame
-methods::setGeneric(
-  "m_age_to_length_conversion",
-  function(x, fleet_name) standardGeneric("m_age_to_length_conversion")
-)
-#' @rdname m_
-#' @keywords FIMSFrame
-methods::setMethod(
-  "m_age_to_length_conversion",
-  "FIMSFrame",
-  function(x, fleet_name) {
-    if ("length" %in% colnames(x@data)) {
-      dplyr::filter(
-        .data = as.data.frame(x@data),
-        .data[["type"]] == "age-to-length-conversion",
-        .data[["name"]] %in% fleet_name
-      ) |>
-        dplyr::group_by(.data[["age"]], .data[["length"]]) |>
-        dplyr::summarize(
-          mean_value = mean(as.numeric(.data[["value"]]), na.rm = TRUE)
-        ) |>
-        dplyr::pull(as.numeric(.data[["mean_value"]]))
-    }
-  }
-)
-#' @rdname m_
-#' @keywords FIMSFrame
-methods::setMethod(
-  "m_age_to_length_conversion",
-  "data.frame",
-  function(x, fleet_name) m_age_to_length_conversion(FIMSFrame(x), fleet_name)
 )
 
 # methods::setMethod: initialize ----
@@ -551,10 +431,10 @@ methods::setValidity(
       errors <- c(errors, "data must have at least one row")
     }
 
-    # FIMS models currently cannot run without weight-at-age data
-    weight_at_age_data <- dplyr::filter(object@data, type == "weight-at-age")
+    # FIMS models currently cannot run without weight_at_age data
+    weight_at_age_data <- dplyr::filter(object@data, type == "weight_at_age")
     if (NROW(weight_at_age_data) == 0) {
-      errors <- c(errors, "data must contain data of the type weight-at-age")
+      errors <- c(errors, "data must contain data of the type weight_at_age")
     }
 
     errors <- c(errors, validate_data_colnames(object@data))
@@ -570,18 +450,14 @@ methods::setValidity(
 
     # TODO: Add checks for other slots
     # Add validity check for types
-    allowed_types <- c(
-      "landings", "index", "age_comp", "length_comp",
-      "weight-at-age", "age-to-length-conversion"
-    )
     present_types <- unique(object@data[["type"]])
 
     # Issues warning if there are any unrecognized types
-    unknown_types <- setdiff(present_types, allowed_types)
+    unknown_types <- setdiff(present_types, fims_data_types)
     if (length(unknown_types) > 0) {
       cli::cli_warn(c(
         "!" = "Data contains unexpected type(s): {paste(sort(unknown_types), collapse = ', ')}",
-        "i" = "Allowed types are: {paste(allowed_types, collapse = ', ')}",
+        "i" = "Allowed types are: {paste(fims_data_types, collapse = ', ')}",
         "i" = paste(
           "Model will continue to run,",
           "but check that data types are correct."
@@ -640,8 +516,8 @@ validate_data_colnames <- function(data) {
 #' It is important that the order of the rows in the data are correct but it is
 #' not expected that the user will do this. Instead, the returned data are
 #' sorted using [dplyr::arrange()] before placing them in the data slot. Data
-#' are first sorted by data type, placing all weight-at-age data next to other
-#' weight-at-age data and all landings data next to landings data. Thus,
+#' are first sorted by data type, placing all weight_at_age data next to other
+#' weight_at_age data and all landings data next to landings data. Thus,
 #' age-composition data will come first because their type is "age" and "a" is
 #' first in the alphabet. All other types will follow according to their order
 #' in the alphabet.
@@ -659,12 +535,7 @@ validate_data_colnames <- function(data) {
 #' | age  | fleet1   | 2023    | 1    | 0.5    |
 #'
 #' Length composition-data are sorted the same way but by length bin instead of
-#' by age bin. It becomes more complicated for the age-to-length-conversion
-#' data, which are sorted by type, name, timing, age, and then length. So, a
-#' full set of length, e.g., length 10, length 20, length 30, etc., is placed
-#' together for a given age. After that age, another entire set of length
-#' information will be provided for that next age. Once the year is complete
-#' for a given fleet then the next year will begin.
+#' by age bin.
 #'
 #' @rdname FIMSFrame
 #'
@@ -739,7 +610,7 @@ FIMSFrame <- function(data) {
       bins = ages,
       timings = years,
       column = age,
-      types = c("weight-at-age", "age_comp")
+      types = c("weight_at_age", "age_comp")
     )
   } else {
     missing_ages <- missing_time_series[0, ]
@@ -755,33 +626,10 @@ FIMSFrame <- function(data) {
   } else {
     missing_lengths <- missing_time_series[0, ]
   }
-  if ("age-to-length-conversion" %in% formatted_data[["type"]]) {
-    # Must do this by hand because it is across two dimensions
-    temp_age_to_length_data <- formatted_data |>
-      dplyr::group_by(type, name)
-    missing_age_to_length <- temp_age_to_length_data |>
-      dplyr::group_by(type, name) |>
-      dplyr::filter(type %in% "age-to-length-conversion") |>
-      tidyr::expand(unit, timing = years, age = ages, length = lengths) |>
-      dplyr::anti_join(
-        y = dplyr::select(
-          temp_age_to_length_data,
-          type, name, unit, timing, age, length
-        ),
-        by = dplyr::join_by(type, name, unit, timing, age, length)
-      ) |>
-      dplyr::mutate(
-        value = 0
-      ) |>
-      dplyr::ungroup()
-  } else {
-    missing_age_to_length <- missing_time_series[0, ]
-  }
   missing_data <- dplyr::bind_rows(
     missing_time_series,
     missing_ages,
-    missing_lengths,
-    missing_age_to_length
+    missing_lengths
   )
   sort_order <- intersect(
     c("name", "type", "timing", "age", "length"),
