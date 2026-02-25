@@ -367,6 +367,7 @@ PrettyFormatJSON
 PrintJsonValue
 QNXNTO
 RData
+Rds
 README
 RObject
 RStudio
@@ -384,6 +385,7 @@ RealVector
 RecruitmentBase
 RecruitmentDeviations
 RecruitmentInterfaceBase
+RegExp
 RegisterParameter
 RegisterParameterName
 RegisterRandomEffect
@@ -528,6 +530,7 @@ bindenv
 bookdown
 bool
 boolean's
+botComment
 byrow
 caa
 calc
@@ -536,6 +539,7 @@ callout
 catchability
 cbind
 cctype
+cd
 cdf
 cdot
 cerr
@@ -573,6 +577,7 @@ classSharedString
 clearup
 cli
 closingIssuesReferences
+closingKeywords
 cls
 cmake
 cmakelist
@@ -726,6 +731,7 @@ ggplot
 gh
 gha
 ghactions
+gi
 github
 githubusercontent
 gitignore
@@ -776,6 +782,7 @@ isdigit
 isinf
 isnan
 isspace
+issueNumbers
 istringstream
 iter
 itewaa
@@ -801,11 +808,15 @@ ldots
 len
 lengthcomp
 lgamma
+libcurl
 libPaths
 libname
 libpath
 libs
 linux
+listComments
+listCommits
+listEventsForTimeline
 llvm
 lmax
 ln
@@ -875,6 +886,7 @@ nchar
 ncol
 nd
 ndims
+newLabels
 newpage
 ninput
 nlengths
@@ -909,6 +921,7 @@ ofstream
 ogive
 onLoad
 onUnload
+openssl
 oppy
 optim
 optimHess
@@ -946,6 +959,7 @@ popdy
 pos
 postfix
 postmle
+prBody
 pre
 precompiled
 preconnect
@@ -973,6 +987,7 @@ rdbuf
 rdev
 rdname
 rdrr
+rds
 readLines
 readRDS
 rebasing
@@ -1005,7 +1020,7 @@ rnorm
 rowSums
 rowwise
 roxygen
-roxygenize
+roxygenise
 rspm
 rstan
 rstream
@@ -1097,6 +1112,7 @@ subfolders
 submodule
 subpopulation
 substr
+successMessage
 sudo
 superClass
 suppressMessages
@@ -1158,6 +1174,7 @@ unname
 unnest
 unnested
 unserialization
+updateComment
 useDynLib
 useDynamicSymbols
 usethis
