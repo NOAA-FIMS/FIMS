@@ -329,12 +329,8 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
    */
   DnormDistributionsInterface(const DnormDistributionsInterface &other)
       : DistributionsInterfaceBase(other),
-        observed_values(other.observed_values),
-        expected_values(other.expected_values),
-        uncertainty_values(other.uncertainty_values),
         log_sd(other.log_sd),
-        expected_mean(other.expected_mean),
-        lpdf_vec(other.lpdf_vec) {}
+        expected_mean(other.expected_mean) {}
 
   /**
    * @brief The destructor.
@@ -391,9 +387,9 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
    * @copydoc DistributionsInterfaceBase::set_process_type
    */
   virtual bool set_lambda_values(Rcpp::NumericVector input_lambda) { 
-    this->lambda_m->resize(input_lambda.size());
+    this->lambda_m.resize(input_lambda.size());
     for (int i = 0; i < input_lambda.size(); i++) {
-      this->lambda_m.set(i) = input_lambda[i];
+      this->lambda_m.set(i,input_lambda[i]);
     }
     return true;
   }
@@ -436,17 +432,17 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
     if (input_type == "observed") {
       this->observed_values_m.resize(input_values.size());
       for (int i = 0; i < input_values.size(); i++) {
-        this->observed_values_m.set(i) = input_values[i];
+        this->observed_values_m.set(i,input_values[i]);
       }
     } else if (input_type == "expected") {
       this->expected_values_m.resize(input_values.size());
       for (int i = 0; i < input_values.size(); i++) {
-        this->expected_values_m.set(i) = input_values[i];
+        this->expected_values_m.set(i,input_values[i]);
       }
     } else if (input_type == "uncertainty") {
       this->uncertainty_values_m.resize(input_values.size());
       for (int i = 0; i < input_values.size(); i++) {
-        this->uncertainty_values_m.set(i) = input_values[i];
+        this->uncertainty_values_m.set(i,input_values[i]);
       }
     } else {
       // log error that input_type is not recognized
@@ -466,17 +462,17 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
     if (input_type == "observed") {
       this->observed_index_m->resize(input_index.size());
       for (int i = 0; i < input_index.size(); i++) {
-        this->observed_index_m.set(i) = input_index[i];
+        this->observed_index_m->set(i,input_index[i]);
       }
     } else if (input_type == "expected") {
       this->expected_index_m->resize(input_index.size());
       for (int i = 0; i < input_index.size(); i++) {
-        this->expected_index_m.set(i) = input_index[i];
+        this->expected_index_m->set(i,input_index[i]);
       }
     } else if (input_type == "uncertainty") {
       this->uncertainty_index_m->resize(input_index.size());
       for (int i = 0; i < input_index.size(); i++) {
-        this->uncertainty_index_m.set(i) = input_index[i];
+        this->uncertainty_index_m->set(i,input_index[i]);
       }
     } else {
       // log error that input_type is not recognized
@@ -497,15 +493,23 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
    */
   virtual double evaluate() {
     fims_distributions::NormalLPDF<double> dnorm;
-    dnorm.observed_values.resize(this->observed_values.size());
-    dnorm.expected_values.resize(this->expected_values.size());
+    dnorm.observed_values.resize(this->observed_values_m.size());
+    dnorm.expected_values.resize(this->expected_values_m.size());
+    dnorm.uncertainty_values.resize(this->uncertainty_values_m.size());
+    dnorm.lambda.resize(this->lambda_m.size());
     dnorm.log_sd.resize(this->log_sd.size());
     dnorm.expected_mean.resize(this->expected_mean.size());
-    for (size_t i = 0; i < observed_values.size(); i++) {
-      dnorm.observed_values[i] = this->observed_values[i].initial_value_m;
+    for (size_t i = 0; i < observed_values_m.size(); i++) {
+      dnorm.observed_values[i] = this->observed_values_m[i];
     }
-    for (size_t i = 0; i < expected_values.size(); i++) {
-      dnorm.expected_values[i] = this->expected_values[i].initial_value_m;
+    for (size_t i = 0; i < expected_values_m.size(); i++) {
+      dnorm.expected_values[i] = this->expected_values_m[i];
+    }
+    for (size_t i = 0; i < uncertainty_values_m.size(); i++) {
+      dnorm.uncertainty_values[i] = this->uncertainty_values_m[i];
+    }
+    for (size_t i = 0; i < lambda_m.size(); i++) {
+      dnorm.lambda[i] = this->lambda_m[i];
     }
     for (size_t i = 0; i < log_sd.size(); i++) {
       dnorm.log_sd[i] = this->log_sd[i].initial_value_m;

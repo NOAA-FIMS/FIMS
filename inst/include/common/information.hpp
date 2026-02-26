@@ -359,14 +359,14 @@ class Information {
           vmit_observed = this->variable_map.find(d->observed_key[0]);
           d->observed_pointer = (*vmit_observed).second;
         } else if (d->observed_values.size() > 0) {
-          d->observed_pointer = &d->expected_values;
+          d->observed_pointer = &d->observed_values;
         } else{
           FIMS_ERROR_LOG("No observed values or observed key defined for process distribution " +
                          fims::to_string(d->id));
         }
 
         if(d->observed_index.size() > 0){
-          if(max(d->observed_index) > d->(*observed_pointer).size()){
+          if(max(d->observed_index) > (d->*observed_pointer).size()){
             FIMS_ERROR_LOG("Observed index for distribution " +
                            fims::to_string(d->id) + " exceeds size of observed values");
           }else{
@@ -375,7 +375,7 @@ class Information {
                         fims::to_string(d->observed_index.size()));
           }
         }else{
-          d->observed_index.resize(d->(*observed_pointer).size());
+          d->observed_index.resize((d->*observed_pointer).size());
           std::iota(d->observed_index.begin(), d->observed_index.end(), 0);
         }
         
@@ -395,7 +395,7 @@ class Information {
         }
         
         if(d->expected_index.size() > 0){
-          if(max(d->expected_index) > d->(*expected_pointer).size()){
+          if(max(d->expected_index) > (d->*expected_pointer).size()){
             FIMS_ERROR_LOG("Expected index for distribution " +
                            fims::to_string(d->id) + " exceeds size of expected values");
           }else{
@@ -404,7 +404,7 @@ class Information {
                         fims::to_string(d->expected_index.size()));
           }
         }else{
-          d->expected_index.resize(d->(*expected_pointer).size());
+          d->expected_index.resize((d->*expected_pointer).size());
           std::iota(d->expected_index.begin(), d->expected_index.end(), 0);
         }
         
@@ -424,12 +424,12 @@ class Information {
         }
         
         if(d->uncertainty_index.size() > 0){
-          if(max(d->uncertainty_index) > d->(*uncertainty_pointer).size()){
+          if(max(d->uncertainty_index) > (d->*uncertainty_pointer).size()){
             FIMS_ERROR_LOG("Uncertainty index for distribution " +
                            fims::to_string(d->id) + " exceeds size of uncertainty values");
           }
         }else{
-          d->uncertainty_index.resize(d->(*uncertainty_pointer).size());
+          d->uncertainty_index.resize((d->*uncertainty_pointer).size());
           std::iota(d->uncertainty_index.begin(), d->uncertainty_index.end(), 0);
         }
         
