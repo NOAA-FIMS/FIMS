@@ -9,11 +9,15 @@
 #ifndef FIMS_POPULATION_DYNAMICS_FLEET_HPP
 #define FIMS_POPULATION_DYNAMICS_FLEET_HPP
 
-#include "../../common/data_object.hpp"
-#include "../../common/fims_vector.hpp"
-#include "../../common/model_object.hpp"
-#include "../../distributions/distributions.hpp"
+// #include "../../common/data_object.hpp"
+// #include "../../common/fims_vector.hpp"
+// #include "../../common/model_object.hpp"
+// #include "../../distributions/distributions.hpp"
 // #include "../selectivity/selectivity.hpp"
+FIMS_DEPENDS(data_object.hpp);
+FIMS_DEPENDS(fims_vector.hpp);
+FIMS_DEPENDS(model_object.hpp);
+FIMS_DEPENDS(distributions.hpp);
 FIMS_DEPENDS(selectivity.hpp);
 
 namespace fims_popdy {

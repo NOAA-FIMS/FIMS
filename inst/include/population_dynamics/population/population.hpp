@@ -8,12 +8,18 @@
 #ifndef FIMS_POPULATION_DYNAMICS_POPULATION_HPP
 #define FIMS_POPULATION_DYNAMICS_POPULATION_HPP
 
-#include "../../common/model_object.hpp"
-#include "../fleet/fleet.hpp"
-#include "../growth/growth.hpp"
-#include "../recruitment/recruitment.hpp"
-#include "../../interface/interface.hpp"
-#include "../maturity/maturity.hpp"
+// #include "../../common/model_object.hpp"
+// #include "../fleet/fleet.hpp"
+// #include "../growth/growth.hpp"
+// #include "../recruitment/recruitment.hpp"
+// #include "../../interface/interface.hpp"
+// #include "../maturity/maturity.hpp"
+FIMS_DEPENDS(model_object.hpp);
+FIMS_DEPENDS(fleet.hpp);
+FIMS_DEPENDS(growth.hpp);
+FIMS_DEPENDS(recruitment.hpp);
+FIMS_DEPENDS(interface.hpp);
+FIMS_DEPENDS(maturity.hpp);
 
 namespace fims_popdy {
 
