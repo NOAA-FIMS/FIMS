@@ -13,7 +13,8 @@
 #include "../../common/fims_vector.hpp"
 #include "../../common/model_object.hpp"
 #include "../../distributions/distributions.hpp"
-#include "../selectivity/selectivity.hpp"
+// #include "../selectivity/selectivity.hpp"
+FIMS_DEPENDS(selectivity.hpp);
 
 namespace fims_popdy {
 

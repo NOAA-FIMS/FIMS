@@ -13,9 +13,9 @@
 // #include "../../../common/fims_math.hpp"
 // #include "../../../common/fims_vector.hpp"
 // #include "selectivity_base.hpp"
-FIMS_DEPENDS(fims_math);
-FIMS_DEPENDS(fims_vector);
-FIMS_DEPENDS(selectivity_base);
+FIMS_DEPENDS(fims_math.hpp);
+FIMS_DEPENDS(fims_vector.hpp);
+FIMS_DEPENDS(selectivity_base.hpp);
 
 namespace fims_popdy {
 
