@@ -16,16 +16,27 @@
 #include <vector>
 #include <algorithm>
 
-#include "../distributions/distributions.hpp"
-#include "../models/functors/fishery_model_base.hpp"
-#include "../population_dynamics/fleet/fleet.hpp"
-#include "../population_dynamics/growth/growth.hpp"
-#include "../population_dynamics/population/population.hpp"
-#include "../population_dynamics/recruitment/recruitment.hpp"
-#include "../population_dynamics/selectivity/selectivity.hpp"
-#include "def.hpp"
-#include "fims_vector.hpp"
-#include "model_object.hpp"
+// #include "../distributions/distributions.hpp"
+// #include "../models/functors/fishery_model_base.hpp"
+// #include "../population_dynamics/fleet/fleet.hpp"
+// #include "../population_dynamics/growth/growth.hpp"
+// #include "../population_dynamics/population/population.hpp"
+// #include "../population_dynamics/recruitment/recruitment.hpp"
+// #include "../population_dynamics/selectivity/selectivity.hpp"
+// #include "def.hpp"
+// #include "fims_vector.hpp"
+// #include "model_object.hpp"
+
+FIMS_DEPENDS(distributions.hpp);
+FIMS_DEPENDS(fishery_model_base.hpp);
+FIMS_DEPENDS(fleet.hpp);
+FIMS_DEPENDS(growth.hpp);
+FIMS_DEPENDS(population.hpp);
+FIMS_DEPENDS(recruitment.hpp);
+FIMS_DEPENDS(selectivity.hpp);
+FIMS_DEPENDS(def.hpp);
+FIMS_DEPENDS(fims_vector.hpp);
+FIMS_DEPENDS(model_object.hpp);
 
 namespace fims_info {
 

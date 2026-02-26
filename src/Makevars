@@ -8,13 +8,16 @@
 
 PKG_CPPFLAGS = -I../inst/include \
                -I../inst/include/FIMS \
-               -I../inst/include/common \
 			   -I../inst/include/population_dynamics \
 			   -I../inst/include/population_dynamics/selectivity \
 			   -I../inst/include/population_dynamics/population \
 			   -I../inst/include/population_dynamics/fleet \
 			   -I../inst/include/models \
 			   -I../inst/include/models/functors \
+			   -I../inst/include/interface \
+			   -I../inst/include/distributions \
+			   -I../inst/include/distributions/functors \
+               -I../inst/include/common \
                -DTMB_SAFEBOUNDS \
                -DTMB_MODEL \
                -DTMBAD_FRAMEWORK  
