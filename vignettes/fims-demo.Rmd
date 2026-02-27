@@ -163,13 +163,6 @@ default_parameters
 default_parameters_unnested <- tidyr::unnest(default_parameters, cols = data)
 
 default_parameters_unnested
-
-# Add age_to_length_conversion
-good_parameters <- dplyr::bind_rows(
-  default_parameters_unnested,
-  data1_length_to_age_conversion
-) |>
-  tidyr::nest(cols = data)
 ```
 
 ### Update parameters
@@ -179,7 +172,8 @@ Functions (e.g., `rows_*()`) from `{dplyr}` can be used to update the default pa
 In the code below, `rows_update()` is used to adjust the fishing mortality, selectivity, maturity, and population parameters from their default values.
 
 ```{r parameters-update}
-parameters_4_model <- good_parameters |>
+parameters_4_model <- default_parameters |>
+  tidyr::unnest(cols = data) |>
   # Update log_Fmort initial values for Fleet1
   dplyr::rows_update(
     tibble::tibble(
@@ -276,7 +270,7 @@ The list returned from `initialize_fims()` can be passed to the parameter of `fi
 # Run the model without optimization to help ensure a viable model
 test_fit <- parameters_4_model |>
   initialize_fims(data = data_4_model) |>
-    fit_fims(optimize = FALSE)
+  fit_fims(optimize = FALSE)
 clear()
 # Run the  model with optimization
 fit <- parameters_4_model |>

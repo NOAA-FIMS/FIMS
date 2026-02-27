@@ -315,7 +315,7 @@ timingfishery <- data.frame(
   timing = returned_om[["om_input"]][["year"]]
 )
 weights_fishery <- data.frame(
-  type = "weight_at_age",
+  type = "weight-at-age",
   name = names(returned_om[["em_input"]][["n.L"]]),
   age = seq_along(returned_om[["om_input"]][["W.kg"]]),
   value = returned_om[["om_input"]][["W.mt"]],
@@ -336,6 +336,41 @@ data1 <- rbind(landings_data, index_data, age_data, weight_at_age_data) |>
 
 # Extract timing and fleets from milestone 1 data
 observers <- c("fleet1", "survey1")
+
+# Create data frame for new fleet and year-specific length at age conversion
+# proportions. These are identical across timing and fleets in this default
+# example.
+length_age_data <- data.frame(
+  type = "age-to-length-conversion",
+  name = rep(
+    sort(rep(observers, length(len_bins) * length(ages))),
+    length(timingfishery[["timing"]])
+  ),
+  age = rep(
+    sort(rep(ages, length(len_bins))),
+    length(observers) * length(timingfishery[["timing"]])
+  ),
+  length = rep(
+    len_bins,
+    length(ages) * length(observers) * length(timingfishery[["timing"]])
+  ),
+  timing = rep(
+    timingfishery[["timing"]],
+    each = length(len_bins) * length(ages) * length(observers)
+  ),
+  value = rep(
+    c(t(returned_om[["em_input"]][["age_to_length_conversion"]])),
+    length(observers) * length(timingfishery[["timing"]])
+  ),
+  unit = "proportion",
+  uncertainty = rep(
+    c(
+      em_input[["n.L.lengthcomp"]][["fleet1"]],
+      em_input[["n.survey.lengthcomp"]][["survey1"]]
+    ),
+    length(len_bins) * length(ages) * length(timingfishery[["timing"]])
+  )
+)
 
 # Create a length-composition data frame that will be filled by transforming
 # the age composition data
@@ -366,7 +401,6 @@ save(
   age_data,
   weight_at_age_data,
   length_comp_data,
-  # TODO: Fix text data later
   length_age_data,
   file = testthat::test_path(
     "fixtures",
@@ -374,61 +408,10 @@ save(
   )
 )
 
-# Add the length composition data to dataframe
-data1 <- rbind(data1, length_comp_data)
+# Add the conversion matrix and length composition data to dataframe
+data1 <- rbind(data1, length_comp_data, length_age_data)
 
 usethis::use_data(data1, overwrite = TRUE)
-
-# Create data frame for new fleet and year-specific length at age conversion
-# proportions. These are identical across timing and fleets in this default
-# example.
-# TODO: document this
-# TODO: use it
-data1_length_to_age_conversion <- data.frame(
-  model_family = "catch_at_age",
-  fleet = "Fleet",
-  label = "age_to_length_conversion",
-  fleet_name = rep(
-    sort(rep(observers, length(len_bins) * length(ages))),
-    length(timingfishery[["timing"]])
-  ),
-  age = rep(
-    sort(rep(ages, length(len_bins))),
-    length(observers) * length(timingfishery[["timing"]])
-  ),
-  length = rep(
-    len_bins,
-    length(ages) * length(observers) * length(timingfishery[["timing"]])
-  ),
-  # TODO: make issue about time versus timing mismatch in naming
-  time = rep(
-    timingfishery[["timing"]],
-    each = length(len_bins) * length(ages) * length(observers)
-  ),
-  value = rep(
-    c(t(returned_om[["em_input"]][["age_to_length_conversion"]])),
-    length(observers) * length(timingfishery[["timing"]])
-  ),
-  unit = "proportion",
-  uncertainty = rep(
-    c(
-      em_input[["n.L.lengthcomp"]][["fleet1"]],
-      em_input[["n.survey.lengthcomp"]][["survey1"]]
-    ),
-    length(len_bins) * length(ages) * length(timingfishery[["timing"]])
-  )
-)
-usethis::use_data(data1_length_to_age_conversion, overwrite = TRUE)
-
-
-
-
-
-
-
-
-
-
 on.exit(unlink(main_dir, recursive = TRUE), add = TRUE)
 on.exit(setwd(working_dir), add = TRUE)
 rm(list = ls())
