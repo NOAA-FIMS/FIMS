@@ -19,6 +19,7 @@
 #include "rcpp_population.hpp"
 #include "rcpp_fleet.hpp"
 #include "rcpp_maturity.hpp"
+#include "rcpp_growth.hpp"
 #include "rcpp_recruitment.hpp"
 #include "rcpp_selectivity.hpp"
 #include <valarray>

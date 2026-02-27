@@ -23,6 +23,9 @@ namespace fims_popdy {
  *        (1 - exp(-growth_coefficient_K * (a - reference_age_for_length_1))) /
  *        (1 - exp(-growth_coefficient_K *
  *                 (reference_age_for_length_2 - reference_age_for_length_1)))
+ * @note Users can anchor at t0 by setting reference_age_for_length_1 = 0
+ * and length_at_ref_age_1 = L(0). This is valid as long as
+ * reference_age_for_length_2 > reference_age_for_length_1.
  */
 template <typename Type>
 struct VonBertalanffyGrowth : public GrowthBase<Type> {

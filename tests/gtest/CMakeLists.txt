@@ -99,6 +99,42 @@ target_link_libraries(growth_evaluate
 
 gtest_discover_tests(growth_evaluate)
 
+# test_growth_von_bertalanffy.cpp
+add_executable(growth_von_bertalanffy
+  test_growth_von_bertalanffy.cpp
+)
+
+target_link_libraries(growth_von_bertalanffy
+  gtest_main
+  fims_test
+)
+
+gtest_discover_tests(growth_von_bertalanffy)
+
+# test_growth_model.cpp
+add_executable(growth_model
+  test_growth_model.cpp
+)
+
+target_link_libraries(growth_model
+  gtest_main
+  fims_test
+)
+
+gtest_discover_tests(growth_model)
+
+# test_growth_model_adapter.cpp
+add_executable(growth_model_adapter
+  test_growth_model_adapter.cpp
+)
+
+target_link_libraries(growth_model_adapter
+  gtest_main
+  fims_test
+)
+
+gtest_discover_tests(growth_model_adapter)
+
 # test_info_setup_random_effects.cpp
 add_executable(info_setup_random_effects
   test_info_setup_random_effects.cpp

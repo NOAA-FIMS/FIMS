@@ -154,6 +154,11 @@ create_default_parameters <- function(
     unnested_configurations = unnested_configurations,
     data = data
   )
+  #Create growth parameters
+  growth_temp <- create_default_growth(
+    unnested_configurations = unnested_configurations,
+    data = data
+  )
 
   # Create population parameters
   # Handle population parameters based on recruitment form
@@ -172,6 +177,7 @@ create_default_parameters <- function(
     fleet_temp,
     recruitment_temp,
     maturity_temp,
+    growth_temp,
     population_temp
   )
   # Merge with configuration_unnest

@@ -9,12 +9,9 @@
 #ifndef FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_GROWTH_HPP
 #define FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_GROWTH_HPP
 
-<<<<<<< HEAD
-=======
 #include <algorithm>
 #include <cmath>
 
->>>>>>> ea34e024 (feat(reporting): expose growth and ALK outputs for VonB pipeline)
 #include "../../../population_dynamics/growth/growth.hpp"
 #include "../../../common/fims_math.hpp"
 #include "../../../common/fims_vector.hpp"
@@ -150,7 +147,7 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
   inline std::map<double, double> make_map(RealVector ages,
                                            RealVector weights) {
     std::map<double, double> mymap;
-    for (size_t i = 0; i < ages.size(); i++) {
+    for (uint32_t i = 0; i < ages.size(); i++) {
       mymap.insert(std::pair<double, double>(ages[i], weights[i]));
     }
     return mymap;
@@ -263,8 +260,6 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
 #endif
 };
 
-<<<<<<< HEAD
-=======
 /**
  * @brief Rcpp interface for VonBertalanffyGrowth to instantiate from R:
  * vb <- methods::new(VonBertalanffyGrowth)
@@ -633,5 +628,11 @@ virtual bool add_to_fims_tmb() {
   this->add_to_fims_tmb_internal<TMB_FIMS_FIRST_ORDER>();
   this->add_to_fims_tmb_internal<TMB_FIMS_SECOND_ORDER>();
   this->add_to_fims_tmb_internal<TMB_FIMS_THIRD_ORDER>();
->>>>>>> ea34e024 (feat(reporting): expose growth and ALK outputs for VonB pipeline)
 #endif
+  return true;
+}
+#endif
+
+};  // end class
+
+#endif  // FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_GROWTH_HPP
