@@ -55,7 +55,6 @@ use_gtest_template <- function(name = "FileName_ClassName_FunctionName") {
   # TODO: add the ability to also pass the arguments for the function or find
   #       them within the code base and ensure that the template includes the
   #       necessary structure for each input argument
-  # TODO: Change the paste calls to use glue::glue() to increase readability
 
   # Validate the name format
   name_parts_list <- strsplit(x = name, split = "_")[[1]]
@@ -92,20 +91,19 @@ use_gtest_template <- function(name = "FileName_ClassName_FunctionName") {
   # Open in append mode
   CON <- file(cmakelist_path, "a")
   on.exit(close(CON), add = TRUE)
-  writeLines(
-    c(
-      paste0("\n\n# test_", name, ".cpp"),
-      paste0("add_executable(", name),
-      paste0("  test_", name, ".cpp"),
-      paste0(")\n"),
-      paste0("target_link_libraries(", name),
-      paste0("  gtest_main"),
-      paste0("  fims_test"),
-      paste0(")\n"),
-      paste0("gtest_discover_tests(", name, ")")
-    ),
-    CON
-  )
+  cmake_block <- glue::glue("
+    # test_{name}.cpp
+    add_executable({name}
+      test_{name}.cpp
+    )
+
+    target_link_libraries({name}
+      gtest_main
+      fims_test
+    )
+
+    gtest_discover_tests({name})")
+  writeLines(c("\n", cmake_block), CON)
   cli::cli_alert_success(
     "Registering test {.val {name}} in {.file {cmakelist_path}}."
   )
