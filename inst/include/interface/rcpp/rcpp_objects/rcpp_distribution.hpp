@@ -741,7 +741,7 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
     ss << "  \"lpdf_value\": " << this->lpdf_value << ",\n";
     ss << "  \"value\":[";
     if (this->lpdf_vec.size() == 0) {
-      ss << "]\n";
+      ss << "],\n";
     } else {
       for (size_t i = 0; i < this->lpdf_vec.size() - 1; i++) {
         ss << this->value_to_string(this->lpdf_vec[i]) << ", ";
