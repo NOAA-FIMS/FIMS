@@ -1,5 +1,5 @@
-\name{cpp-doxygen}
-\alias{cpp-doxygen}
+\name{cpp_doxygen}
+\alias{cpp_doxygen}
 \title{C++ documentation (Doxygen)}
 \description{
 The C++ generated with Doxygen.
