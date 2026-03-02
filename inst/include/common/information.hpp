@@ -342,8 +342,9 @@ class Information {
   }
 
   /**
-   * @brief Loop over distributions and set links to distribution x value if
-   * distribution is a process type.
+   * @brief Loop over distributions and set links to distribution observed, 
+   * expected, and uncertainty values/pointers/indexing/lambdas if distribution 
+   * is a process type.
    */
   void SetupProcess() {
     for (density_components_iterator it = this->density_components.begin();
@@ -354,6 +355,9 @@ class Information {
         FIMS_INFO_LOG("Setup process for distribution " +
                       fims::to_string(d->id));
         
+        // Check for observed values pointer key and set pointer if it exists, 
+        // otherwise check for observed values and set pointer to reference 
+        // observed values, otherwise set pointer to null and log error.
         if (d->observed_key.size() > 0) {
           variable_map_iterator vmit_observed;
           vmit_observed = this->variable_map.find(d->observed_key[0]);
@@ -361,10 +365,15 @@ class Information {
         } else if (d->observed_values.size() > 0) {
           d->observed_pointer = &d->observed_values;
         } else{
+          d->observed_pointer = nullptr;
           FIMS_ERROR_LOG("No observed values or observed key defined for process distribution " +
                          fims::to_string(d->id));
         }
 
+        // Check for observed values sub-vector indexing input and if it exists, 
+        // check that the max index does not exceed the length of the observed 
+        // values vector, otherwise set index to sequence from 0 to length of 
+        // observed values vector and log info. 
         if(d->observed_index.size() > 0){
           if(max(d->observed_index) > (d->*observed_pointer).size()){
             FIMS_ERROR_LOG("Observed index for distribution " +
@@ -383,6 +392,7 @@ class Information {
                       fims::to_string(d->id) + " is: " +
                       fims::to_string(d->observed_index.size()));
 
+        // Repeat above steps for expected values and uncertainty values.
         if (d->expected_key.size() > 0) {
           variable_map_iterator vmit_expected;
           vmit_expected = this->variable_map.find(d->expected_key[0]);
@@ -390,6 +400,7 @@ class Information {
         } else if (d->expected_values.size() > 0) {
           d->expected_pointer = &d->expected_values;
         } else{
+          d->expected_pointer = nullptr;
           FIMS_ERROR_LOG("No expected values or expected key defined for process distribution " +
                          fims::to_string(d->id));
         }
@@ -437,25 +448,66 @@ class Information {
                       fims::to_string(d->id) + " is: " +
                       fims::to_string(d->uncertainty_index.size()));
 
+        // Check observed, expected, and uncertainty index lengths and log error 
+        // if lengths are not all the same. If one of the index vectors has 
+        // length 1, fill with 0s to match the length of the other vectors.
         if(d->observed_index.size() > 1){
           if(d->expected_index.size() > 1){
             if(d->observed_index.size() != d->expected_index.size()){
               FIMS_ERROR_LOG("Observed index and expected index for distribution " +
                             fims::to_string(d->id) + " are different lengths");
             }
-            if(d->uncertainty_index.size() > 1){
-              if(d->expected_index.size() != d->uncertainty_index.size()){
-                FIMS_ERROR_LOG("Expected index and uncertainty index for distribution " +
-                               fims::to_string(d->id) + " are different lengths");
-              }
-            }
+          }else{
+            d->expected_index.resize(d->observed_index.size());
+            std::fill(d->expected_index.begin(), d->expected_index.end(), 0);
           }
+
           if(d->uncertainty_index.size() > 1){
             if(d->observed_index.size() != d->uncertainty_index.size()){
               FIMS_ERROR_LOG("Observed index and uncertainty index for distribution " +
                               fims::to_string(d->id) + " are different lengths");
             }
+          }else{
+            d->uncertainty_index.resize(d->observed_index.size());
+            std::fill(d->uncertainty_index.begin(), d->uncertainty_index.end(), 0);
           }
+        }else{
+          if(d->expected_index.size() > 1){
+
+            d->observed_index.resize(d->expected_index.size());
+            std::fill(d->observed_index.begin(), d->observed_index.end(), 0);
+
+            if(d->uncertainty_index.size() > 1){
+              if(d->expected_index.size() != d->uncertainty_index.size()){
+                FIMS_ERROR_LOG("Expected index and uncertainty index for distribution " +
+                                fims::to_string(d->id) + " are different lengths");
+              }
+            }else{
+              d->uncertainty_index.resize(d->expected_index.size());
+              std::fill(d->uncertainty_index.begin(), d->uncertainty_index.end(), 0);
+            }
+          }else{
+            if(d->uncertainty_index.size() > 1){
+              d->observed_index.resize(d->uncertainty_index.size());
+              std::fill(d->observed_index.begin(), d->observed_index.end(), 0);
+              d->expected_index.resize(d->uncertainty_index.size());
+              std::fill(d->expected_index.begin(), d->expected_index.end(), 0);
+            }
+          }
+        }
+        
+        d->lpdf_vec.resize(d->observed_index.size());
+        std::fill(d->lpdf_vec.begin(), d->lpdf_vec.end(), 0);
+
+        if(d->lambda == NULL){
+          d->lambda.resize(d->observed_index.size());
+          std::fill(d->lambda.begin(), d->lambda.end(), 1);
+        }else if(d->lambda.size() == 1){
+          d->lambda.resize(d->observed_index.size());
+          std::fill(d->lambda.begin(), d->lambda.end(), d->lambda[0]);
+        }else if(d->lambda.size() != d->observed_index.size()){
+          FIMS_ERROR_LOG("Lambda vector length for distribution " +
+                         fims::to_string(d->id) + " does not match observed index length");
         }
       }
     }

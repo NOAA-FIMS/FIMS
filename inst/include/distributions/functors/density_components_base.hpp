@@ -20,14 +20,94 @@
 
 namespace fims_distributions {
 
-/**
- * Container to hold density components including pointers to density inputs.
+/** @brief Base class for all module_name functors.
+ *
+ * @tparam Type The type of the module_name functor.
+ *
  */
 template <typename Type>
-struct DistributionElementObject {
+struct DensityComponentBase : public fims_model_object::FIMSObject<Type> {
+  // id_g is the ID of the instance of the DensityComponentBase class.
+  // this is like a memory tracker.
+  // Assigning each one its own ID is a way to keep track of
+  // all the instances of the DensityComponentBase class.
+  static uint32_t
+      id_g; /**< global unique identifier for distribution modules */
+
+  // Input type is used to categorize likelihood contributions to order
+  // calculations to ensure simulation and one-step-ahead residuals are calculated correctly.
   std::string input_type; /**< string classifies the type of the negative
                              log-likelihood; options are: "priors",
-                             "random_effects", and "data" */
+                             "random_effects", "data", and "process" */
+  
+  // values fields are use to store user specified values that may be constant
+  // or estimated parameters.
+  std::vector<fims::Vector<Type>> observed_values; /**< Observed values of distribution 
+  function*/
+  std::vector<fims::Vector<Type>> expected_values; /**< expected values of distribution 
+  function*/
+  std::vector<fims::Vector<Type>> uncertainty_values; /**< Uncertainty values of distribution 
+  function*/
+  
+  // pointer fields are used to allow for the distribution functors to point to
+  // internal model objects such as data objects or derived quantities. If a 
+  // pointer is not specified it will point to the input values vectors above.
+  std::vector<fims::Vector<Type>*> observed_pointer = NULL; /**< pointer to process observed 
+  values*/
+  std::vector<fims::Vector<Type>*> expected_pointer = NULL; /**< pointer to process expected 
+  values*/
+  std::vector<fims::Vector<Type>*> uncertainty_pointer = NULL; /**< pointer to process 
+  uncertainty values*/
+  
+  // key fields are used to allow the user to input an ID key to a parameter or
+  // derived quantity vector in the model that the distribution functor will 
+  // point to. TODO: This needs to be updated from uint32_t to a type that
+  // allows for string or enum keys as well to identify derived quantities.
+  std::vector<uint32_t>
+      observed_key; /**< unique id for variable map that points to 
+      observed_pointer fims::Vector */
+  std::vector<uint32_t>
+      expected_key; /**< unique id for variable map that points to 
+      expected_pointer fims::Vector */
+  std::vector<uint32_t>
+      uncertainty_key; /**< unique id for variable map that points to 
+      uncertainty_pointer fims::Vector */
+  
+  // index fields are used to subset the observed, expected, and uncertainty 
+  // values to specify which values are included in the distribution likelihood 
+  // calculations. Will assume full vector is included if index vectors are not 
+  // specified.
+  std::vector<fims::Vector<Type>> observed_index; /**< Index of which observed values to 
+  include in density likelihood calculations*/
+  std::vector<fims::Vector<Type>> expected_index; /**< Index of which expected values to 
+  include in density likelihood calculations*/
+  std::vector<fims::Vector<Type>> uncertainty_index; /**< Index of which uncertainty values 
+  to include in density likelihood calculations*/
+  
+  // lambda is used to weight the likelihood contributions of each observation 
+  // in the distribution calculations. If lambda is not specified, all 
+  // observations will be given a weight of 1. This is used for cases where the 
+  // user may want to downweight certain observations/data sources in the 
+  // likelihood calculations to explore model sensitivity.
+  fims::Vector<Type> lambda = NULL; /**< process lambda likelihood weights*/
+
+  fims::Vector<Type> lpdf_vec; /**< vector to record observation level negative
+                                  log-likelihood values */
+
+  Type lpdf = static_cast<Type>(0.0); /**< total log probability density
+                                         contribution of the distribution */
+
+  bool osa_flag = false; /**< Boolean; if true, osa residuals are calculated */
+  
+  bool simulate_flag =
+      false; /**< Boolean; if true, data are simulated from the distribution */
+
+
+  int observed_data_id_m = -999; /*!< id of observed data component*/
+  fims::Vector<Type> expected_mean; /**< the expected mean of the distribution, 
+  overrides expected values */
+  std::string use_mean = fims::to_string("no"); /**< should expected_mean
+                                          be used over expected values */
   std::shared_ptr<fims_data_object::DataObject<Type>>
       data_observed_values; /**< observed data*/
   fims::Vector<Type>* re = NULL; /**< pointer to random effects vector*/
@@ -36,31 +116,30 @@ struct DistributionElementObject {
   fims::Vector<Type>* data_expected_values = NULL; /**< expected value of data*/
   std::vector<fims::Vector<Type>*>
       priors; /**< vector of pointers where each points to a prior parameter */
-  fims::Vector<Type> observed_values; /**< Observed values of distribution 
-  function*/
-  fims::Vector<Type> expected_values; /**< expected values of distribution 
-  function*/
-  fims::Vector<Type> uncertainty_values; /**< Uncertainty values of distribution 
-  function*/
-  fims::Vector<Type>* observed_pointer = NULL; /**< pointer to process observed 
-  values*/
-  fims::Vector<Type>* expected_pointer = NULL; /**< pointer to process expected 
-  values*/
-  fims::Vector<Type>* uncertainty_pointer = NULL; /**< pointer to process 
-  uncertainty values*/
-  fims::Vector<Type> observed_index; /**< Index of which observed values to 
-  include in density likelihood calculations*/
-  fims::Vector<Type> expected_index; /**< Index of which expected values to 
-  include in density likelihood calculations*/
-  fims::Vector<Type> uncertainty_index; /**< Index of which uncertainty values 
-  to include in density likelihood calculations*/
-  fims::Vector<Type> lambda = NULL; /**< process lambda likelihood weights*/
-  fims::Vector<Type> expected_mean; /**< the expected mean of the distribution, 
-  overrides expected values */
-  std::string use_mean = fims::to_string("no"); /**< should expected_mean
-                                          be used over expected values */
-  // std::shared_ptr<DistributionElementObject<Type>> expected; /**< expected
-  // value of distribution function */
+  std::vector<uint32_t>
+      key; /**< unique id for variable map that points to a fims::Vector */
+
+#ifdef TMB_MODEL
+  ::objective_function<Type>* of; /**< Pointer to the TMB objective function */
+#endif
+
+  /** 
+   * @brief Constructor.
+   */
+  DensityComponentBase() {
+    // initialize the priors vector with a size of 1 and set the first element
+    // to NULL
+    this->priors.resize(1);
+    this->priors[0] = NULL;
+    this->id = DensityComponentBase::id_g++;
+  }
+
+  virtual ~DensityComponentBase() {}
+  /**
+   * @brief Generic probability density function. Calculates the pdf at the
+   * independent variable value.
+   */
+  virtual const Type evaluate() = 0;
 
   /**
    * Retrieve element from observed data set, random effect, or prior.
@@ -155,59 +234,6 @@ struct DistributionElementObject {
     }
     return observed_values.size();
   }
-};
-
-/** @brief Base class for all module_name functors.
- *
- * @tparam Type The type of the module_name functor.
- *
- */
-template <typename Type>
-struct DensityComponentBase : public fims_model_object::FIMSObject<Type>,
-                              public DistributionElementObject<Type> {
-  // id_g is the ID of the instance of the DensityComponentBase class.
-  // this is like a memory tracker.
-  // Assigning each one its own ID is a way to keep track of
-  // all the instances of the DensityComponentBase class.
-  static uint32_t
-      id_g; /**< global unique identifier for distribution modules */
-  int observed_data_id_m = -999; /*!< id of observed data component*/
-  fims::Vector<Type> lpdf_vec; /**< vector to record observation level negative
-                                  log-likelihood values */
-  fims::Vector<Type> report_lpdf_vec; /**< vector to record observation level
-                                         negative log-likelihood values */
-  bool osa_flag = false; /**< Boolean; if true, osa residuals are calculated */
-  bool simulate_flag =
-      false; /**< Boolean; if true, data are simulated from the distribution */
-  std::vector<uint32_t>
-      key; /**< unique id for variable map that points to a fims::Vector */
-  std::vector<uint32_t>
-      observed_key; /**< unique id for variable map that points to a fims::Vector */
-  std::vector<uint32_t>
-      expected_key; /**< unique id for variable map that points to a fims::Vector */
-  std::vector<uint32_t>
-      uncertainty_key; /**< unique id for variable map that points to a fims::Vector */
-
-#ifdef TMB_MODEL
-  ::objective_function<Type>* of; /**< Pointer to the TMB objective function */
-#endif
-
-  /** @brief Constructor.
-   */
-  DensityComponentBase() {
-    // initialize the priors vector with a size of 1 and set the first element
-    // to NULL
-    this->priors.resize(1);
-    this->priors[0] = NULL;
-    this->id = DensityComponentBase::id_g++;
-  }
-
-  virtual ~DensityComponentBase() {}
-  /**
-   * @brief Generic probability density function. Calculates the pdf at the
-   * independent variable value.
-   */
-  virtual const Type evaluate() = 0;
 };
 
 /** @brief Default id of the singleton distribution class

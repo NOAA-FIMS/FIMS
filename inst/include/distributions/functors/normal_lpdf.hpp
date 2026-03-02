@@ -23,8 +23,7 @@ template <typename Type>
 struct NormalLPDF : public DensityComponentBase<Type> {
   fims::Vector<Type> log_sd; /**< the natural log of the standard deviation of
                                 the distribution; can be a vector or scalar */
-  Type lpdf = static_cast<Type>(0.0); /**< total log probability density
-                                         contribution of the distribution */
+  
 
   /** @brief Constructor.
    */
@@ -44,10 +43,7 @@ struct NormalLPDF : public DensityComponentBase<Type> {
     size_t n_expected = this->get_n_expected();
     // setup vector for recording the log probability density function values
     this->lpdf_vec.resize(n_x);
-    this->report_lpdf_vec.resize(n_x);
     std::fill(this->lpdf_vec.begin(), this->lpdf_vec.end(),
-              static_cast<Type>(0));
-    std::fill(this->report_lpdf_vec.begin(), this->report_lpdf_vec.end(),
               static_cast<Type>(0));
     lpdf = static_cast<Type>(0);
 
@@ -88,7 +84,6 @@ struct NormalLPDF : public DensityComponentBase<Type> {
             dnorm(this->get_observed(i), this->get_expected(i),
                   fims_math::exp(log_sd.get_force_scalar(i)), true);
       }
-      this->report_lpdf_vec[i] = this->lpdf_vec[i];
       lpdf += this->lpdf_vec[i];
       if (this->simulate_flag) {
         FIMS_SIMULATE_F(this->of) {

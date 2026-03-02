@@ -23,8 +23,7 @@ struct LogNormalLPDF : public DensityComponentBase<Type> {
   fims::Vector<Type>
       log_sd; /**< natural log of the standard deviation of the distribution on
                  the log scale; can be a vector or scalar */
-  Type lpdf = static_cast<Type>(0.0); /**< total log probability density
-                                         contribution of the distribution */
+                 
   // data_indicator<tmbutils::vector<Type> , Type> keep; /**< Indicator used in
   // TMB one-step-ahead residual calculations */
 
@@ -46,10 +45,7 @@ struct LogNormalLPDF : public DensityComponentBase<Type> {
     size_t n_expected = this->get_n_expected();
     // setup vector for recording the log probability density function values
     this->lpdf_vec.resize(n_x);
-    this->report_lpdf_vec.resize(n_x);
     std::fill(this->lpdf_vec.begin(), this->lpdf_vec.end(),
-              static_cast<Type>(0));
-    std::fill(this->report_lpdf_vec.begin(), this->report_lpdf_vec.end(),
               static_cast<Type>(0));
     this->lpdf = static_cast<Type>(0);
 
@@ -101,7 +97,6 @@ struct LogNormalLPDF : public DensityComponentBase<Type> {
         }
       }
 
-      this->report_lpdf_vec[i] = this->lpdf_vec[i];
       lpdf += this->lpdf_vec[i];
       if (this->simulate_flag) {
         FIMS_SIMULATE_F(this->of) {  // preprocessor definition in interface.hpp

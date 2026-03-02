@@ -423,6 +423,382 @@ std::ostream& operator<<(std::ostream& out, ParameterVector& v) {
 }
 
 /**
+ * @brief An Rcpp interface class that defines the ParameterArray class.
+ *
+ * @details An Rcpp interface class that defines the interface between R and
+ * C++ for a parameter array type.
+ */
+class ParameterArray {
+ public:
+  /**
+   * @brief The static ID of the Parameter object.
+   */
+  static uint32_t id_g;
+  /**
+   * @brief Parameter storage.
+   */
+  std::shared_ptr<std::vector<std::vector<Parameter>>> storage_m;
+  /**
+   * @brief The local ID of the Parameter object.
+   */
+  uint32_t id_m;
+
+  /**
+   * @brief The constructor.
+   */
+  ParameterArray() {
+    this->id_m = ParameterArray::id_g++;
+    this->storage_m = std::make_shared<std::vector<std::vector<Parameter>>>();
+    this->storage_m->resize(1);  // push_back(Rcpp::wrap(p));
+    this->storage_m->at(0).resize(1); 
+  }
+
+  /**
+   * @brief The constructor.
+   */
+  ParameterArray(const ParameterArray& other)
+      : storage_m(other.storage_m), id_m(other.id_m) {}
+
+  /**
+   * @brief The constructor.
+   */
+  ParameterArray(Rcpp::IntegerVector size) {
+    this->id_m = ParameterArray::id_g++;
+    this->storage_m = std::make_shared<std::vector<std::vector<Parameter>>>();
+    this->storage_m->resize(size.size());
+    for (size_t i = 0; i < size.size(); i++) {
+      this->storage_m->at(i).resize(size[i]);
+      for (size_t j = 0; j < size[i]; j++) {
+        storage_m->at(i)[j] = Parameter();
+      }
+    }
+  }
+
+  /**
+   * @brief The constructor for initializing a parameter array.
+   * @param values The values to add to the array.
+   * @param size The number of elements to copy over to each vector in the array.
+   */
+  ParameterArray(Rcpp::NumericVector values, Rcpp::IntegerVector size) {
+    if (values.size() < std::accumulate(size.begin(), size.end(), 0)) {
+      throw std::invalid_argument(
+          "Error in call to ParameterArray(Rcpp::NumericVector values, "
+          "Rcpp::IntegerVector size): values.size() < size argument.");
+    } else {
+      this->id_m = ParameterArray::id_g++;
+      this->storage_m = std::make_shared<std::vector<std::vector<Parameter>>>();
+      this->storage_m->resize(size.size());
+      size_t index = 0;
+      for (size_t i = 0; i < size.size(); i++) {
+        this->storage_m->at(i).resize(size[i]);
+        for (size_t j = 0; j < size[i]; j++) {
+          storage_m->at(i)[j].initial_value_m = values[index++];
+        }
+      }
+    }
+  }
+
+  /**
+   * @brief The constructor for initializing a parameter array.
+   * @param values A data frame of values to add to the array.
+   */
+  ParameterArray(Rcpp::DataFrame values) {
+    this->id_m = ParameterArray::id_g++;
+    this->storage_m = std::make_shared<std::vector<std::vector<Parameter>>>();
+    this->storage_m->resize(values.size());
+    for (size_t i = 0; i < values.size(); i++) {
+      this->storage_m->at(i).resize(values[i].size());
+      for (size_t j = 0; j < values[i].size(); j++) {
+        storage_m->at(i)[j].initial_value_m = values[i][j];
+      }
+    }
+  }
+
+  /**
+   * @brief The constructor for initializing a parameter array.
+   * @param values A data frame of values to add to the array.
+   */
+  ParameterArray(Rcpp::List values) {
+    this->id_m = ParameterArray::id_g++;
+    this->storage_m = std::make_shared<std::vector<std::vector<Parameter>>>();
+    this->storage_m->resize(values.size());
+    for (size_t i = 0; i < values.size(); i++) {
+      this->storage_m->at(i).resize(values[i].size());
+      for (size_t j = 0; j < values[i].size(); j++) {
+        storage_m->at(i)[j].initial_value_m = values[i][j];
+      }
+    }
+  }
+
+  /**
+   * @brief The constructor for initializing a parameter array.
+   * @param v A vector of doubles.
+   */
+  ParameterArray(const fims::Vector<double>& v) {
+    this->id_m = ParameterArray::id_g++;
+    this->storage_m = std::make_shared<std::vector<std::vector<Parameter>>>();
+    this->storage_m->resize(1);
+    this->storage_m->at(0).resize(v.size());
+    for (size_t i = 0; i < v.size(); i++) {
+      storage_m->at(0)[i].initial_value_m = v[i];
+    }
+  }
+
+  /**
+   * @brief Destroy the Parameter Array object.
+   *
+   */
+  virtual ~ParameterArray() {}
+
+  /**
+   * @brief Gets the ID of the ParameterArray object.
+   */
+  virtual uint32_t get_id() { return this->id_m; }
+
+  /**
+   * @brief The accessor where the first index starts is zero.
+   * @param pos_row The row/observation position of the ParameterArray that 
+   * you want returned.
+   * @param pos_col The column/variable position of the ParameterVector that 
+   * you want returned.
+   */
+  inline Parameter& operator[](size_t pos_row, size_t pos_col) { return this->storage_m->at(pos_col)[pos_row]; }
+
+  /**
+   * @brief The accessor where the first index starts at one. This function is
+   * for calling accessing from R.
+   * @param pos_row The row/observation position of the ParameterArray that you want returned.
+   * @param pos_col The column/variable position of the ParameterVector that you want returned.
+   */
+  SEXP at(R_xlen_t pos_row, R_xlen_t pos_col) {
+    if (static_cast<size_t>(pos_row) == 0 ||
+        static_cast<size_t>(pos_col) == 0 ) {
+      throw std::invalid_argument("ParameterArray: Index out of range");
+      FIMS_ERROR_LOG(fims::to_string(pos) + " <= 0 it should start at 1");
+      return NULL;
+    }
+    if (static_cast<size_t>(pos_col) > this->storage_m->size()) {
+      throw std::invalid_argument("ParameterArray: Index out of range");
+      FIMS_ERROR_LOG(fims::to_string(pos_col) + "!<" +
+                     fims::to_string(this->storage_m->size()));
+      return NULL;
+    }
+    if (static_cast<size_t>(pos_row) > this->storage_m->at(pos_col - 1).size() ||
+        static_cast<size_t>(pos_col) > this->storage_m->size()) {
+      throw std::invalid_argument("ParameterArray: Index out of range");
+      FIMS_ERROR_LOG(fims::to_string(pos_row) + "!<" +
+                     fims::to_string(this->storage_m->at(pos_col - 1).size()));
+      return NULL;
+    }
+    return Rcpp::wrap(this->storage_m->at(pos_col - 1)[pos_row - 1]);
+  }
+
+  /**
+   * @brief An internal accessor for calling a position of a ParameterArray
+   * from R.
+   * @param pos_row An integer specifying the row/observation position of the 
+   * ParameterArray you want returned. The first position is one and the last 
+   * position is the same as the number of rows in the ParameterArray.
+   * @param pos_col An integer specifying the column/variable position of the
+   * ParameterArray you want returned. The first position is one and the last
+   * position is the same as the number of columns in the ParameterArray.
+   * @return The Parameter at the specified position in the ParameterArray.
+   */
+  Parameter& get(size_t pos_row, size_t pos_col) {
+    if (pos_col >= this->storage_m->size() || pos_row >= this->storage_m->at(pos_col).size()) {
+      throw std::invalid_argument("ParameterArray: Index out of range");
+    }
+    return (this->storage_m->at(pos_col)[pos_row]);
+  }
+
+  /**
+   * @brief An internal setter for setting a position of a ParameterArray
+   * from R.
+   * @param pos_row An integer specifying the row/observation position of the 
+   * ParameterArray you want to set. The first position is one and the last 
+   * position is the same as the number of rows in the ParameterArray.
+   * @param pos_col An integer specifying the column/variable position of the
+   * ParameterArray you want to set. The first position is one and the last
+   * position is the same as the number of columns in the ParameterArray.
+   * @param p A numeric value specifying the value to set position `pos` to
+   * in the ParameterArray.
+   */
+  void set(size_t pos_row, size_t pos_col, const Parameter& p) { 
+    this->storage_m->at(pos_col)[pos_row] = p; 
+  }
+  
+  /**
+   * @brief Returns the total number of elements in a ParameterArray.
+   */
+  size_t size() { return this->storage_m->size()*this->storage_m->at(0).size(); }
+
+  /**
+   * @brief Returns the number of rows in a ParameterArray.
+   */
+  size_t size_row() { return this->storage_m->at(0).size(); }
+
+  /**
+   * @brief Returns the number of columns in a ParameterArray.
+   */
+  size_t size_col() { return this->storage_m->size(); }
+
+  /**
+   * @brief Resizes a ParameterArray to the desired length.
+   * @param size_row An integer specifying the desired number of rows for the
+   * ParameterArray to be resized to.
+   * @param size_col An integer specifying the desired number of columns for the
+   * ParameterArray to be resized to.
+   */
+  void resize(size_t size_row, size_t size_col) { 
+    this->storage_m->resize(size_col); 
+    for (size_t i = 0; i < this->storage_m->size(); i++) {
+      this->storage_m->at(i).resize(size_row);
+    }
+  }
+
+  /**
+   * @brief Resizes a ParameterArray to the desired length.
+   * @param size Size to set the ParameterArray dimension to.
+   */
+  void resize_row(size_t size) { 
+    for (size_t i = 0; i < this->storage_m->size(); i++) {
+      this->storage_m->at(i).resize(size);
+    }
+  }
+
+  /**
+   * @brief Resizes a ParameterArray to the desired length.
+   * @param size Size to set the ParameterArray dimension to.
+   */
+  void resize_col(size_t size) { 
+    this->storage_m->resize(size); 
+  }
+
+  /**
+   * @brief Sets all Parameters within a ParameterArray as estimable.
+   *
+   * @param estimable A boolean specifying if all Parameters within the
+   * ParameterArray should be estimated within the model. A value of true
+   * leads to all Parameters being estimated.
+   */
+  void set_all_estimable(bool estimable) {
+    for (size_t i = 0; i < this->storage_m->size(); i++) {
+      for (size_t j = 0; j < this->storage_m->at(i).size(); j++) {
+        if (estimable) {
+          this->storage_m->at(i)[j].estimation_type_m.set("fixed_effects");
+        } else {
+          this->storage_m->at(i)[j].estimation_type_m.set("constant");
+        }
+      }
+    }
+  }
+
+  /**
+   * @brief Sets all Parameters within a ParameterArray as random effects.
+   *
+   * @param random A boolean specifying if all Parameters within the
+   * ParameterArray should be designated as random effects. A value of true
+   * leads to all Parameters being random effects.
+   */
+  void set_all_random(bool random) {
+    for (size_t i = 0; i < this->storage_m->size(); i++) {
+      for (size_t j = 0; j < this->storage_m->at(i).size(); j++) {
+        if (random) {
+          this->storage_m->at(i)[j].estimation_type_m.set("random_effects");
+        } else {
+          this->storage_m->at(i)[j].estimation_type_m.set("constant");
+        }
+      }
+    }
+  }
+
+  /**
+   * @brief Sets the value of all Parameters in the ParameterArray to the
+   * provided value.
+   *
+   * @param value A double specifying the value to set all Parameters to
+   * within the ParameterArray.
+   */
+  void fill(double value) {
+    for (size_t i = 0; i < this->storage_m->size(); i++) {
+      for (size_t j = 0; j < this->storage_m->at(i).size(); j++) {
+        storage_m->at(i)[j].initial_value_m = value;
+      }
+    }
+  }
+
+  /**
+   * @brief Assigns the given values to the minimum value of all elements in
+   * the ParameterArray.
+   *
+   * @param value The value to be assigned.
+   */
+  void fill_min(double value) {
+    for (size_t i = 0; i < this->storage_m->size(); i++) {
+      for (size_t j = 0; j < this->storage_m->at(i).size(); j++) {
+        storage_m->at(i)[j].min_m = value;
+      }
+    }
+  }
+
+  /**
+   * @brief Assigns the given values to the maximum value of all elements in
+   * the ParameterArray.
+   *
+   * @param value The value to be assigned.
+   */
+  void fill_max(double value) {
+    for (size_t i = 0; i < this->storage_m->size(); i++) {
+      for (size_t j = 0; j < this->storage_m->at(i).size(); j++) {
+        storage_m->at(i)[j].max_m = value;
+      }
+    }
+  }
+
+  /**
+   * @brief The printing methods for a ParameterVector.
+   *
+   */
+  void show() {
+    Rcpp::Rcout << this->storage_m->data() << "\n";
+
+    for (size_t i = 0; i < this->storage_m->size(); i++) {
+      for (size_t j = 0; j < this->storage_m->at(i).size(); j++) {
+        Rcpp::Rcout << storage_m->at(i)[j] << "  ";
+      }
+    }
+  }
+};
+uint32_t ParameterArray::id_g = 0;
+
+/**
+ * @brief Output for std::ostream& for a ParameterArray.
+ *
+ * @param out The stream.
+ * @param v A ParameterArray.
+ * @return std::ostream&
+ */
+std::ostream& operator<<(std::ostream& out, ParameterArray& v) {
+  out << "[";
+  size_t size = v.size();
+  for (size_t i = 0; i < size - 1; i++) {
+    out << "[";
+    size_t size_sub = v[i].size();
+    for (size_t j = 0; j < size_sub - 1; j++) {
+      out << v[i][j] << ", ";
+    }
+    out << v[i][size_sub - 1] << "], ";
+  }
+  out << "[";
+  size_t size_sub = v[size - 1].size();
+  for (size_t j = 0; j < size_sub - 1; j++) {
+      out << v[size - 1][j] << ", ";
+  }
+  out << v[size - 1][size_sub - 1] << "]]";
+  return out;
+}
+
+/**
  * @brief An Rcpp interface class that defines the RealVector class.
  *
  * @details An Rcpp interface class that defines the interface between R and
@@ -841,6 +1217,217 @@ class IntVector {
   }
 };
 uint32_t IntVector::id_g = 0;
+
+/**
+ * @brief An Rcpp interface class that defines the Uint32Vector class.
+ *
+ * @details An Rcpp interface class that defines the interface between R and
+ * C++ for an unsigned 32-bit integer vector type. Underlying values are held 
+ * in a shared pointer and are carried over to any copies of this vector.
+ */
+class Uint32Vector {
+ public:
+  /**
+   * @brief The static ID of the Uint32 Vector object.
+   */
+  static uint32_t id_g;
+  /**
+   * @brief unsigned 32-bit integer storage.
+   */
+  std::shared_ptr<std::vector<uint32_t>> storage_m;
+  /**
+   * @brief The local ID of the Uint32Vector object.
+   */
+  uint32_t id_m;
+
+  /**
+   * @brief The constructor.
+   */
+  Uint32Vector() {
+    this->id_m = Uint32Vector::id_g++;
+    this->storage_m = std::make_shared<std::vector<uint32_t>>();
+    this->storage_m->resize(1);
+  }
+
+  /**
+   * @brief The constructor.
+   */
+  Uint32Vector(const Uint32Vector& other)
+      : storage_m(other.storage_m), id_m(other.id_m) {}
+
+  /**
+   * @brief The constructor.
+   */
+  Uint32Vector(size_t size) {
+    this->id_m = Uint32Vector::id_g++;
+    this->storage_m = std::make_shared<std::vector<uint32_t>>();
+    this->storage_m->resize(size);
+  }
+
+  /**
+   * @brief The constructor for initializing an unsigned 32-bit integer vector.
+   * @param x A numeric vector.
+   * @param size The number of elements to copy over.
+   */
+  Uint32Vector(Rcpp::IntegerVector x, size_t size) {
+    this->id_m = Uint32Vector::id_g++;
+    this->storage_m = std::make_shared<std::vector<uint32_t>>();
+    this->resize(x.size());
+    for (size_t i = 0; i < x.size(); i++) {
+      storage_m->at(i) = x[i];
+    }
+  }
+
+  /**
+   * @brief The constructor for initializing an unsigned 32-bit integer vector.
+   * @param v A vector of unsigned 32-bit integers.
+   */
+  Uint32Vector(const fims::Vector<uint32_t>& v) {
+    this->id_m = Uint32Vector::id_g++;
+    this->storage_m = std::make_shared<std::vector<uint32_t>>();
+    this->storage_m->resize(v.size());
+    for (size_t i = 0; i < v.size(); i++) {
+      storage_m->at(i) = v[i];
+    }
+  }
+
+  /**
+   * @brief Destroy the unsigned 32-bit integer Vector object.
+   *
+   */
+  virtual ~Uint32Vector() {}
+
+  /**
+   * @brief
+   *
+   * @param v
+   * @return Uint32Vector&
+   */
+  Uint32Vector& operator=(const Rcpp::IntegerVector& v) {
+    this->storage_m->resize(v.size());
+    for (size_t i = 0; i < v.size(); i++) {
+      storage_m->at(i) = v[i];
+    }
+    return *this;
+  }
+
+  /**
+   * @brief Gets the ID of the Uint32Vector object.
+   */
+  virtual uint32_t get_id() { return this->id_m; }
+
+  /**
+   * @brief
+   *
+   * @param orig
+   */
+  void fromRVector(const Rcpp::IntegerVector& orig) {
+    this->storage_m->resize(orig.size());
+    for (size_t i = 0; i < this->storage_m->size(); i++) {
+      this->storage_m->at(i) = orig[i];
+    }
+  }
+
+  /**
+   * @brief
+   *
+   * @return Rcpp::IntegerVector
+   */
+  Rcpp::IntegerVector toRVector() {
+    Rcpp::IntegerVector ret(this->storage_m->size());
+    for (size_t i = 0; i < this->size(); i++) {
+      ret[i] = this->storage_m->at(i);
+    }
+
+    return ret;
+  }
+
+  /**
+   * @brief The accessor where the first index starts is zero.
+   * @param pos The position of the Uint32Vector that you want returned.
+   */
+  inline uint32_t& operator[](size_t pos) { return this->storage_m->at(pos); }
+
+  /**
+   * @brief The accessor where the first index starts at one. This function is
+   * for calling accessing from R.
+   * @param pos The position of the Uint32Vector that you want returned.
+   */
+  SEXP at(R_xlen_t pos) {
+    if (static_cast<size_t>(pos) == 0 ||
+        static_cast<size_t>(pos) > this->storage_m->size()) {
+      throw std::invalid_argument("Uint32Vector: Index out of range");
+      FIMS_ERROR_LOG(fims::to_string(pos) + "!<" +
+                     fims::to_string(this->size()));
+      return NULL;
+    }
+    return Rcpp::wrap(this->storage_m->at(pos - 1));
+  }
+
+  /**
+   * @brief An internal accessor for calling a position of a Uint32Vector
+   * from R.
+   * @param pos An integer specifying the position of the Uint32Vector
+   * you want returned. The first position is one and the last position is
+   * the same as the size of the Uint32Vector.
+   */
+  uint32_t& get(size_t pos) {
+    if (pos >= this->storage_m->size()) {
+      throw std::invalid_argument("Uint32Vector: Index out of range");
+    }
+    return (this->storage_m->at(pos));
+  }
+
+  /**
+   * @brief An internal setter for setting a position of a Uint32Vector
+   * from R.
+   * @param pos An integer specifying the position of the Uint32Vector
+   * you want to set. The first position is one and the last position is the
+   * same as the size of the Uint32Vector.
+   * @param p An integer value specifying the value to set position `pos` to
+   * in the Uint32Vector.
+   */
+  void set(size_t pos, const uint32_t& p) { this->storage_m->at(pos) = p; }
+
+  /**
+   * @brief Returns the size of a Uint32Vector.
+   */
+  size_t size() { return this->storage_m->size(); }
+
+  /**
+   * @brief Resizes a Uint32Vector to the desired length.
+   * @param size An integer specifying the desired length for the
+   * Uint32Vector to be resized to.
+   */
+  void resize(size_t size) { this->storage_m->resize(size); }
+
+  /**
+   * @brief Sets the value of all elements in the Uint32Vector to the
+   * provided value.
+   *
+   * @param value An integer specifying the value to set all elements to
+   * within the Uint32Vector.
+   */
+  void fill(uint32_t value) {
+    for (size_t i = 0; i < this->storage_m->size(); i++) {
+      storage_m->at(i) = value;
+    }
+  }
+
+  /**
+   * @brief The printing methods for a Uint32Vector.
+   *
+   */
+  void show() {
+    Rcpp::Rcout << this->storage_m->data() << "\n";
+
+    for (size_t i = 0; i < this->storage_m->size(); i++) {
+      Rcpp::Rcout << storage_m->at(i) << "  ";
+    }
+  }
+};
+uint32_t Uint32Vector::id_g = 0;
+
 
 /**
  *@brief Base class for all interface objects.
