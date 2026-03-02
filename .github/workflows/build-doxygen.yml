@@ -5,11 +5,11 @@
 name: run-doxygen
 
 on:
-  pull_request:
-  push:
-    branches:
-      - dev
-      - main
+  # pull_request:
+  # push:
+  #   branches:
+  #     - dev
+  #     - main
   workflow_dispatch:
   # below is a trigger for when there are changes to the fims website, it pulls
   # the bootstrap file name from there which occasionally changes
@@ -110,16 +110,16 @@ jobs:
         rm header.html
         rm DoxygenLayout.xml
 
-    - name: Push doxygen html files to FIMS website repo
-      if: ${{ github.ref == 'refs/heads/main' }}
-      uses: dmnemec/copy_file_to_another_repo_action@main
-      env:
-        API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
-      with:
-        source_file: 'doxygen'
-        destination_repo: 'noaa-fims/noaa-fims.github.io'
-        destination_folder: './'
-        destination_branch: 'main'
-        user_email: 'kelli.johnson@noaa.gov' # your email
-        user_name: 'Kelli Johnson'           # your login
-        commit_message: 'Docs: run Doxygen'
+    # - name: Push doxygen html files to FIMS website repo
+    #   if: ${{ github.ref == 'refs/heads/main' }}
+    #   uses: dmnemec/copy_file_to_another_repo_action@main
+    #   env:
+    #     API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
+    #   with:
+    #     source_file: 'doxygen'
+    #     destination_repo: 'noaa-fims/noaa-fims.github.io'
+    #     destination_folder: './'
+    #     destination_branch: 'main'
+    #     user_email: 'kelli.johnson@noaa.gov' # your email
+    #     user_name: 'Kelli Johnson'           # your login
+    #     commit_message: 'Docs: run Doxygen'

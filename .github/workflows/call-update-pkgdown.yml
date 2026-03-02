@@ -12,6 +12,8 @@ on:
       - main
       - dev
   workflow_dispatch:
+  repository_dispatch:
+    types: [file-updated]
 
 
 jobs:

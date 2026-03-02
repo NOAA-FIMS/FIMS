@@ -74,6 +74,12 @@ reference:
   - Cpp_classes
   - Cpp_functions
 
+- title: C++ Documentation
+  desc: C++ documentation generated with doxygen
+  contents:
+  - cpp_doxygen
+
+
 news:
   releases:
   - text: "Latest release"
