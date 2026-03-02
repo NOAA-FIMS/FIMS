@@ -166,7 +166,7 @@ jobs:
           cp -a doxygen/. docs/doxygen/
 
       - name: save pkgdown output
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: pkgdown-site-with-reports
           path: docs/
