@@ -271,6 +271,50 @@ class CatchAtAge : public FisheryModelBase<Type> {
 
     dq_["numbers_at_age"][i_age_year] =
         fims_math::exp(population->log_init_naa[age]);
+    
+    // [TEMPORARY_FEATURE] Begin calculating initial numbers at age using 
+    // equilibrium initalization logic
+    // Extract initial recruitment (age-0 abundance) from log-scale parameter
+    Type R1 = fims_math::exp(population->log_init_naa[0]);
+    // Extract initial fishing mortality scalar from first fleet's first year
+    Type F_init_scalar = population->fleets[0]->Fmort[0];
+
+    if (age == 0) {
+        // Age 0: Set initial numbers to the recruitment value R1
+        dq_["numbers_at_age"][i_age_year] = R1;
+    } else {
+        // Ages 1+: Calculate equilibrium age structure through recursive survival
+        // Previous age at year 0
+        size_t i_agem1_year0 = (age - 1) * population->n_years;
+        // Current age at year 0
+        size_t i_a_year0 = age * population->n_years;
+
+        // Calculate total mortality Z = M + F*selectivity for initialization period
+        // Selectivity at previous age
+        Type sel_prev = population->fleets[0]->selectivity->evaluate(population->ages[age-1]);
+        // Selectivity at current age
+        Type sel_current = population->fleets[0]->selectivity->evaluate(population->ages[age]);
+        // Total mortality Z at previous age
+        Type Z_init_prev = population->M[i_agem1_year0] + (F_init_scalar * sel_prev);
+        // Total mortality Z at current age (only needed for plus group)
+        Type Z_init_current = population->M[i_a_year0] + (F_init_scalar * sel_current);
+
+        // Index in numbers_at_age vector
+        size_t i_agem1_year1 = i_age_year - 1;  
+
+        // Branch based on whether this is a regular age or the plus group
+        if (age < (population->n_ages - 1)) {
+            // Non-plus group ages
+            dq_["numbers_at_age"][i_age_year] = dq_["numbers_at_age"][i_agem1_year1] * fims_math::exp(-Z_init_prev);
+        } else {
+            // Plus Group
+            dq_["numbers_at_age"][i_age_year] = 
+                (dq_["numbers_at_age"][i_agem1_year1] * fims_math::exp(-Z_init_prev)) / 
+                (static_cast<Type>(1.0) - fims_math::exp(-Z_init_current));
+        }
+    }
+    // [TEMPORARY_FEATURE] End calculating initial numbers at age using 
+    // equilibrium initalization logic
   }
 
   /**
