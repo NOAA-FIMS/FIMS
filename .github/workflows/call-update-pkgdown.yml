@@ -18,7 +18,7 @@ on:
 
 jobs:
   call-workflow:
-    uses: NOAA-FIMS/FIMS/.github/workflows/build-pkgdown.yml@main
+    uses: e-perl-NOAA/FIMS/.github/workflows/build-pkgdown.yml@main
     with:
       # These expressions are TRUE only on a push to main
       build_testdown: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
