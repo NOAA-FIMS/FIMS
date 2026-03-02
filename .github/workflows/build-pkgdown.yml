@@ -57,31 +57,31 @@ jobs:
           INPUT_TESTDOWN: ${{ inputs.build_testdown }}
           INPUT_CODE_COVERAGE: ${{ inputs.build_code_coverage }}
         run: |
-          reports_to_build <- c()
-          # Check the environment variables passed from the 'env' block above
-          # Note: GHA boolean inputs are passed as strings 'true' or 'false'
-          if (Sys.getenv("INPUT_TESTDOWN") == 'true') {
-            reports_to_build <- c(reports_to_build, "testdown")
-          }
+          # reports_to_build <- c()
+          # # Check the environment variables passed from the 'env' block above
+          # # Note: GHA boolean inputs are passed as strings 'true' or 'false'
+          # if (Sys.getenv("INPUT_TESTDOWN") == 'true') {
+          #   reports_to_build <- c(reports_to_build, "testdown")
+          # }
 
-          if (Sys.getenv("INPUT_CODE_COVERAGE") == 'true') {
-            reports_to_build <- c(reports_to_build, "coverage")
-          }
+          # if (Sys.getenv("INPUT_CODE_COVERAGE") == 'true') {
+          #   reports_to_build <- c(reports_to_build, "coverage")
+          # }
           
-          # Only run the function if there's at least one report to build
-          if (length(reports_to_build) > 0) {
-            lozen::build_pkgdown_with_reports(
-              pkg = ".",
-              pkgdown_path = "docs",
-              assets_path = "pkgdown/assets",
-              reports = reports_to_build
-            )
-          } else {
-            # Fallback to building a standard site if no reports are selected
+          # # Only run the function if there's at least one report to build
+          # if (length(reports_to_build) > 0) {
+          #   lozen::build_pkgdown_with_reports(
+          #     pkg = ".",
+          #     pkgdown_path = "docs",
+          #     assets_path = "pkgdown/assets",
+          #     reports = reports_to_build
+          #   )
+          # } else {
+          #  # Fallback to building a standard site if no reports are selected
             pkgdown::build_site(
               override = list(destination = "docs")
             )
-          }
+          # }
         shell: Rscript {0}
      
 
@@ -166,11 +166,11 @@ jobs:
           rm DoxygenLayout.xml
           cp -a doxygen/. docs/doxygen/
 
-      - name: save pkgdown output
-        uses: actions/upload-artifact@v6
-        with:
-          name: pkgdown-site-with-reports
-          path: docs/
+      # - name: save pkgdown output
+      #   uses: actions/upload-artifact@v6
+      #   with:
+      #     name: pkgdown-site-with-reports
+      #     path: docs/
   
       - name: Deploy package
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
