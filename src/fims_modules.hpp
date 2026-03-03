@@ -395,7 +395,7 @@ RCPP_MODULE(fims) {
               &DnormDistributionsInterface::set_distribution_mean)
       .method("set_distribution_links",
               &DnormDistributionsInterface::set_distribution_links)
-      .field("x", &DnormDistributionsInterface::x)
+      .field("observed_values", &DnormDistributionsInterface::observed_values)
       .field("expected_values", &DnormDistributionsInterface::expected_values)
       .field("expected_mean", &DnormDistributionsInterface::expected_mean)
       .field("log_sd", &DnormDistributionsInterface::log_sd);
@@ -412,7 +412,7 @@ RCPP_MODULE(fims) {
               &DlnormDistributionsInterface::set_observed_data)
       .method("set_distribution_links",
               &DlnormDistributionsInterface::set_distribution_links)
-      .field("x", &DlnormDistributionsInterface::x)
+      .field("observed_values", &DlnormDistributionsInterface::observed_values)
       .field("expected_values", &DlnormDistributionsInterface::expected_values)
       .field("log_sd", &DlnormDistributionsInterface::log_sd);
 
@@ -429,7 +429,7 @@ RCPP_MODULE(fims) {
       .method("set_distribution_links",
               &DmultinomDistributionsInterface::set_distribution_links)
       .method("set_note", &DmultinomDistributionsInterface::set_note)
-      .field("x", &DmultinomDistributionsInterface::x)
+      .field("observed_values", &DmultinomDistributionsInterface::observed_values)
       .field("expected_values",
              &DmultinomDistributionsInterface::expected_values)
       .field("dims", &DmultinomDistributionsInterface::dims);

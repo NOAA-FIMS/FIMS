@@ -26,9 +26,8 @@ namespace fims_distributions {
  * obtain log-density values.
  *
  * For `data` input, values equal to `na_value` are skipped and contribute zero
- * to the objective. Per-observation contributions are stored in `lpdf_vec` and
- * mirrored to `report_lpdf_vec`; the summed total is returned by `evaluate()`
- * and stored in `lpdf`.
+ * to the objective. Per-observation contributions are stored in `lpdf_vec`; 
+ * the summed total is returned by `evaluate()` and stored in `lpdf`.
  */
 template <typename Type>
 struct NormalLPDF : public DensityComponentBase<Type> {
@@ -39,11 +38,6 @@ struct NormalLPDF : public DensityComponentBase<Type> {
    * \ref fims::Vector::get_force_scalar(size_t) "get_force_scalar()".
    */
   fims::Vector<Type> log_sd;
-
-  /**
-   * @brief Total log probability density contribution of the distribution.
-   */
-  Type lpdf = static_cast<Type>(0.0);
 
   /** @brief Constructor.
    */
@@ -70,12 +64,9 @@ struct NormalLPDF : public DensityComponentBase<Type> {
     size_t n_expected = this->get_n_expected();
     // setup vector for recording the log probability density function values
     this->lpdf_vec.resize(n_x);
-    this->report_lpdf_vec.resize(n_x);
     std::fill(this->lpdf_vec.begin(), this->lpdf_vec.end(),
               static_cast<Type>(0));
-    std::fill(this->report_lpdf_vec.begin(), this->report_lpdf_vec.end(),
-              static_cast<Type>(0));
-    lpdf = static_cast<Type>(0);
+    this->lpdf = static_cast<Type>(0);
 
     // Dimension checks
     if (n_x != n_expected) {
@@ -100,7 +91,7 @@ struct NormalLPDF : public DensityComponentBase<Type> {
       if (this->input_type == "data") {
         // if data, check if there are any NA values and skip lpdf calculation
         // if there are
-        if (this->get_observed(i) != this->observed_values->na_value) {
+        if (this->get_observed(i) != this->data_observed_values->na_value) {
           this->lpdf_vec[i] =
               dnorm(this->get_observed(i), this->get_expected(i),
                     fims_math::exp(log_sd.get_force_scalar(i)), true);
@@ -114,12 +105,11 @@ struct NormalLPDF : public DensityComponentBase<Type> {
             dnorm(this->get_observed(i), this->get_expected(i),
                   fims_math::exp(log_sd.get_force_scalar(i)), true);
       }
-      this->report_lpdf_vec[i] = this->lpdf_vec[i];
-      lpdf += this->lpdf_vec[i];
+      this->lpdf += this->lpdf_vec[i];
       if (this->simulate_flag) {
         FIMS_SIMULATE_F(this->of) {
           if (this->input_type == "data") {
-            this->observed_values->at(i) =
+            this->data_observed_values->at(i) =
                 rnorm(this->get_expected(i),
                       fims_math::exp(log_sd.get_force_scalar(i)));
           }
@@ -138,16 +128,16 @@ struct NormalLPDF : public DensityComponentBase<Type> {
       /* osa not working yet
         if(osa_flag){//data observation type implements osa residuals
             //code for osa cdf method
-            this->lpdf_vec[i] = this->keep.cdf_lower[i] * log( pnorm(this->x[i],
+            this->lpdf_vec[i] = this->keep.cdf_lower[i] * log( pnorm(this->observed_values[i],
         this->get_expected(i), sd[i]) ); this->lpdf_vec[i] =
-        this->keep.cdf_upper[i] * log( 1.0 - pnorm(this->x[i],
+        this->keep.cdf_upper[i] * log( 1.0 - pnorm(this->observed_values[i],
         this->get_expected(i), sd[i]) );
         } */
     }
 #ifdef TMB_MODEL
-    vector<Type> normal_x = this->x.to_tmb();
+    vector<Type> normal_observed_values = this->observed_values.to_tmb();
 #endif
-    return (lpdf);
+    return (this->lpdf);
   }
 };
 

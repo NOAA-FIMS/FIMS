@@ -23,23 +23,22 @@
 
 namespace fims_distributions {
 
-/**
- * @brief Container that stores input vectors and pointers used by distribution
- * functors.
- * @details Provides a common access layer to retrieve observed and expected
- * values across "data", "random_effects", and "prior" pathways.
+/** @brief Base class for all module_name functors.
+ *
+ * @tparam Type The type of the module_name functor.
+ *
  */
 template <typename Type>
-struct DistributionElementObject {
+struct DensityComponentBase : public fims_model_object::FIMSObject<Type> {
   /**
    * @brief Classification of the input pathway for this distribution object.
    * Options used by accessor methods are, "prior", "random_effects", and
-   * "data".
    */
+   * "data".
   std::string input_type;
 
   /** @brief Observed data. */
-  std::shared_ptr<fims_data_object::DataObject<Type>> observed_values;
+  std::shared_ptr<fims_data_object::DataObject<Type>> data_observed_values;
 
   /** @brief Expected value vector for prior-based pathways. */
   fims::Vector<Type> expected_values;
@@ -59,7 +58,7 @@ struct DistributionElementObject {
   /**
    * @brief Input value of distribution function for priors or random effects.
    */
-  fims::Vector<Type> x;
+  fims::Vector<Type> observed_values;
 
   /**
    * @brief The expected mean of the distribution; overrides expected values.
@@ -83,7 +82,7 @@ struct DistributionElementObject {
    */
   inline Type& get_observed(size_t i) {
     if (this->input_type == "data") {
-      return observed_values->at(i);
+      return data_observed_values->at(i);
     }
     if (this->input_type == "random_effects") {
       return (*re)[i];
@@ -97,7 +96,7 @@ struct DistributionElementObject {
         return (*(priors[i]))[0];
       }
     }
-    return x[i];
+    return observed_values[i];
   }
 
   /**
@@ -108,15 +107,9 @@ struct DistributionElementObject {
    */
   inline Type& get_observed(size_t i, size_t j) {
     if (this->input_type == "data") {
-      return observed_values->at(i, j);
+      return data_observed_values->at(i, j);
     }
-    if (this->input_type == "random_effects") {
-      return (*re)[i, j];
-    }
-    if (this->input_type == "prior") {
-      return (*(priors[i, j]))[0];
-    }
-    return x[i];
+    return observed_values[i * ( j - 1 ) + j];
   }
 
   /**
@@ -144,7 +137,7 @@ struct DistributionElementObject {
    */
   inline size_t get_n_x() {
     if (this->input_type == "data") {
-      return this->observed_values->data.size();
+      return this->data_observed_values->data.size();
     }
     if (this->input_type == "random_effects") {
       return (*re).size();
@@ -152,7 +145,7 @@ struct DistributionElementObject {
     if (this->input_type == "prior") {
       return this->expected_values.size();
     }
-    return x.size();
+    return observed_values.size();
   }
 
   /**
@@ -169,19 +162,9 @@ struct DistributionElementObject {
     if (this->input_type == "prior") {
       return this->expected_values.size();
     }
-    return x.size();
+    return observed_values.size();
   }
-};
-
-/**
- * @brief Base class for concrete distribution functors used in likelihood
- * evaluations.
- * @tparam Type Scalar type used by the model (e.g., double or AD type).
- */
-template <typename Type>
-struct DensityComponentBase : public fims_model_object::FIMSObject<Type>,
-                              public DistributionElementObject<Type> {
-  // id_g is the ID of the instance of the DensityComponentBase class.
+                                // id_g is the ID of the instance of the DensityComponentBase class.
   // this is like a memory tracker.
   // Assigning each one its own ID is a way to keep track of
   // all the instances of the DensityComponentBase class.
@@ -189,6 +172,12 @@ struct DensityComponentBase : public fims_model_object::FIMSObject<Type>,
    * @brief Global unique identifier for distribution modules.
    */
   static uint32_t id_g;
+  
+  /**
+   * @brief Total log probability density contribution of the distribution.
+   * 
+   */
+  Type lpdf; 
 
   /**
    * @brief ID of observed data component.
@@ -199,11 +188,6 @@ struct DensityComponentBase : public fims_model_object::FIMSObject<Type>,
    * @brief Vector storing observation-level log-likelihood contributions.
    */
   fims::Vector<Type> lpdf_vec;
-
-  /**
-   * @brief Vector mirrored for report output at the observation level.
-   */
-  fims::Vector<Type> report_lpdf_vec;
 
   /**
    * @brief Boolean; if true, one-step-ahead (OSA) residuals are calculated.

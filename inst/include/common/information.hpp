@@ -302,7 +302,7 @@ class Information {
           d->priors[i] = (*vmit).second;
         }
         FIMS_INFO_LOG("Prior size for distribution " + fims::to_string(d->id) +
-                      "is: " + fims::to_string(d->x.size()));
+                      "is: " + fims::to_string(d->observed_values.size()));
       }
     }
   }
@@ -333,7 +333,7 @@ class Information {
         }
         FIMS_INFO_LOG("Random effect size for distribution " +
                       fims::to_string(d->id) +
-                      " is: " + fims::to_string(d->x.size()));
+                      " is: " + fims::to_string(d->observed_values.size()));
       }
     }
   }
@@ -704,7 +704,7 @@ class Information {
           data_iterator it = this->data_objects.find(observed_data_id);
 
           if (it != this->data_objects.end()) {
-            d->observed_values = (*it).second;
+            d->data_observed_values = (*it).second;
             FIMS_INFO_LOG("Observed data " + fims::to_string(observed_data_id) +
                           " successfully set to density component " +
                           fims::to_string(d->id));
