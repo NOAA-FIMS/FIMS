@@ -299,7 +299,7 @@ dimension_folded_to_tibble <- function(section) {
     return(NA)
   }
   while (length(section) == 1) {
-    unlist(section, recursive = FALSE)
+    section <- unlist(section, recursive = FALSE)
   }
   temp <- dimensions_to_tibble(section[["dimensionality"]]) |>
     dplyr::mutate(name = section[["name"]])
