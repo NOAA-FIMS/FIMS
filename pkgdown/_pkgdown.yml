@@ -87,11 +87,22 @@ news:
 
 navbar:
   structure:
+    left:
+     - reference
+     - articles
+     - news
     right:
       - website
       - github
       - search
   components:
+    reference_menu:
+      text: Reference
+      menu:
+        - text: R functions
+          href: reference/index.html
+        - text: C++ / Doxygen
+          href: https://e-perl-noaa.github.io/FIMS/doxygen/index.html
     website:
       text: fims website
       href: https://noaa-fims.github.io/
