@@ -150,13 +150,13 @@ a:hover { color: #0b535e; }
 
 /* Light mode default */
 html {
-  --side-nav-background: #ffffff !important;
+  --my-side-nav-background: #ffffff !important;
 }
 
 /* Force nav panes to use the variable (wins over theme) */
 #side-nav,
 #nav-tree {
-  background: var(--side-nav-background) !important;
+  background: var(--my-side-nav-background) !important;
 }
 
 #nav-tree .label {
@@ -239,7 +239,7 @@ a.anchor {
   html:not(.light-mode) {
     color-scheme: dark;
     --primary-color: #4896a1;
-    --side-nav-background: #0e181e;
+    --my-side-nav-background: #0e181e;
     --side-nav-foreground: #bed9de;
     --page-background-color: #0e181e;
     --odd-color: rgba(14, 24, 30, .10);
