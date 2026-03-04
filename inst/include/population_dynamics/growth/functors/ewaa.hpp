@@ -12,8 +12,8 @@
 // #include "../../../interface/interface.hpp"
 #include <map>
 
-#include "growth_base.hpp"
-
+// #include "growth_base.hpp"
+FIMS_DEPENDS(growth_base.hpp);
 namespace fims_popdy {
 
 /**

@@ -12,8 +12,15 @@
 #ifndef FIMS_POPULATION_DYNAMICS_SELECTIVITY_HPP
 #define FIMS_POPULATION_DYNAMICS_SELECTIVITY_HPP
 
-#include "functors/double_logistic.hpp"
-#include "functors/logistic.hpp"
-#include "functors/selectivity_base.hpp"
+// #include "functors/double_logistic.hpp"
+// #include "functors/logistic.hpp"
+// #include "functors/selectivity_base.hpp"
+// Use FIMS_DEPENDS for packaged headers when installing
+// #include "functors/double_logistic.hpp"
+FIMS_DEPENDS(double_logistic.hpp);
+// #include "functors/logistic.hpp"
+FIMS_DEPENDS(logistic.hpp);
+// #include "functors/selectivity_base.hpp"
+FIMS_DEPENDS(selectivity_base.hpp);
 
 #endif /* FIMS_POPULATION_DYNAMICS_SELECTIVITY_HPP */

@@ -10,9 +10,16 @@
 #define POPULATION_DYNAMICS_SELECTIVITY_DOUBLE_LOGISTIC_HPP
 
 // #include "../../../interface/interface.hpp"
-#include "../../../common/fims_math.hpp"
-#include "../../../common/fims_vector.hpp"
-#include "selectivity_base.hpp"
+// #include "../../../common/fims_math.hpp"
+// #include "../../../common/fims_vector.hpp"
+// #include "selectivity_base.hpp"
+// Use FIMS_DEPENDS for packaged headers when installing
+// #include "../../../common/fims_math.hpp"
+FIMS_DEPENDS(fims_math.hpp);
+// #include "../../../common/fims_vector.hpp"
+FIMS_DEPENDS(fims_vector.hpp);
+// #include "selectivity_base.hpp"
+FIMS_DEPENDS(selectivity_base.hpp);
 
 namespace fims_popdy {
 

@@ -8,7 +8,10 @@
 #ifndef FIMS_VECTOR_HPP
 #define FIMS_VECTOR_HPP
 
-#include "../interface/interface.hpp"
+// #include "../interface/interface.hpp"
+// Use FIMS_DEPENDS for packaged headers when installing
+// #include "../interface/interface.hpp"
+FIMS_DEPENDS(interface.hpp);
 #include <ostream>
 #include <iomanip>
 

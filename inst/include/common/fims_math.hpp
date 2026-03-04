@@ -14,8 +14,13 @@
 #include <random>
 #include <sstream>
 
-#include "../interface/interface.hpp"
-#include "fims_vector.hpp"
+// #include "../interface/interface.hpp"
+// #include "fims_vector.hpp"
+// Use FIMS_DEPENDS for packaged headers when installing
+// #include "../interface/interface.hpp"
+FIMS_DEPENDS(interface.hpp);
+// #include "fims_vector.hpp"
+FIMS_DEPENDS(fims_vector.hpp);
 
 namespace fims_math {
 #ifdef STD_LIB

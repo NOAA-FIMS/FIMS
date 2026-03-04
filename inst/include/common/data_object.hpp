@@ -13,8 +13,14 @@
 #include <exception>
 #include <vector>
 
-#include "model_object.hpp"
-#include "fims_vector.hpp"
+// #include "model_object.hpp"
+// #include "fims_vector.hpp"
+// Use FIMS_DEPENDS for packaged headers when installing
+// #include "model_object.hpp"
+
+FIMS_DEPENDS(model_object.hpp);
+// #include "fims_vector.hpp"
+FIMS_DEPENDS(fims_vector.hpp);
 
 namespace fims_data_object {
 

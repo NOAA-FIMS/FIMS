@@ -11,8 +11,8 @@
 #ifndef POPULATION_DYNAMICS_MATURITY_BASE_HPP
 #define POPULATION_DYNAMICS_MATURITY_BASE_HPP
 
-#include "../../../common/model_object.hpp"
-
+// #include "../../../common/model_object.hpp"
+FIMS_DEPENDS(model_object.hpp);
 namespace fims_popdy {
 
 /** @brief Base class for all maturity functors.

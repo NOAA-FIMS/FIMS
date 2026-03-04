@@ -9,8 +9,13 @@
 #ifndef FIMS_INTERFACE_RCPP_RCPP_OBJECTS_MATH_HPP
 #define FIMS_INTERFACE_RCPP_RCPP_OBJECTS_MATH_HPP
 
-#include "rcpp_interface_base.hpp"
-#include "../../../common/fims_math.hpp"
+// #include "rcpp_interface_base.hpp"
+// #include "../../../common/fims_math.hpp"
+// Use FIMS_DEPENDS for packaged headers when installing
+// #include "rcpp_interface_base.hpp"
+FIMS_DEPENDS(rcpp_interface_base.hpp);
+// #include "../../../common/fims_math.hpp"
+FIMS_DEPENDS(fims_math.hpp);
 
 /**
  * @brief A rcpp interface to the logit function.

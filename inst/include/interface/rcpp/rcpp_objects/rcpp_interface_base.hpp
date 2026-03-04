@@ -13,10 +13,19 @@
 #include <map>
 #include <vector>
 
-#include "../../../common/def.hpp"
-#include "../../../common/information.hpp"
-#include "../../interface.hpp"
-#include "rcpp_shared_primitive.hpp"
+// #include "../../../common/def.hpp"
+// #include "../../../common/information.hpp"
+// #include "../../interface.hpp"
+// #include "rcpp_shared_primitive.hpp"
+// Use FIMS_DEPENDS for packaged headers when installing
+// #include "../../../common/def.hpp"
+FIMS_DEPENDS(def.hpp);
+// #include "../../../common/information.hpp"
+FIMS_DEPENDS(information.hpp);
+// #include "../../interface.hpp"
+FIMS_DEPENDS(interface.hpp);
+// #include "rcpp_shared_primitive.hpp"
+FIMS_DEPENDS(rcpp_shared_primitive.hpp);
 #include <limits>
 
 #define RCPP_NO_SUGAR

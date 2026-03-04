@@ -11,9 +11,18 @@
 #ifndef FIMS_DISTRIBUTIONS_HPP
 #define FIMS_DISTRIBUTIONS_HPP
 
-#include "functors/density_components_base.hpp"
-#include "functors/lognormal_lpdf.hpp"
-#include "functors/multinomial_lpmf.hpp"
-#include "functors/normal_lpdf.hpp"
+// #include "functors/density_components_base.hpp"
+// #include "functors/lognormal_lpdf.hpp"
+// #include "functors/multinomial_lpmf.hpp"
+// #include "functors/normal_lpdf.hpp"
+// Use FIMS_DEPENDS for packaged headers when installing
+// #include "functors/density_components_base.hpp"
+FIMS_DEPENDS(density_components_base.hpp);
+// #include "functors/lognormal_lpdf.hpp"
+FIMS_DEPENDS(lognormal_lpdf.hpp);
+// #include "functors/multinomial_lpmf.hpp"
+FIMS_DEPENDS(multinomial_lpmf.hpp);
+// #include "functors/normal_lpdf.hpp"
+FIMS_DEPENDS(normal_lpdf.hpp);
 
 #endif /* FIMS_DISTRIBUTIONS_HPP */

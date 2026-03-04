@@ -26,7 +26,6 @@
 // #include "def.hpp"
 // #include "fims_vector.hpp"
 // #include "model_object.hpp"
-
 FIMS_DEPENDS(distributions.hpp);
 FIMS_DEPENDS(fishery_model_base.hpp);
 FIMS_DEPENDS(fleet.hpp);

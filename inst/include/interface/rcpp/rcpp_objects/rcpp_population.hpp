@@ -9,8 +9,13 @@
 #ifndef FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_POPULATION_HPP
 #define FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_POPULATION_HPP
 
-#include "../../../population_dynamics/population/population.hpp"
-#include "rcpp_interface_base.hpp"
+// #include "../../../population_dynamics/population/population.hpp"
+// #include "rcpp_interface_base.hpp"
+// Use FIMS_DEPENDS for packaged headers when installing
+// #include "../../../population_dynamics/population/population.hpp"
+FIMS_DEPENDS(population.hpp);
+// #include "rcpp_interface_base.hpp"
+FIMS_DEPENDS(rcpp_interface_base.hpp);
 
 /**
  * @brief Rcpp interface that serves as the parent class for Rcpp population

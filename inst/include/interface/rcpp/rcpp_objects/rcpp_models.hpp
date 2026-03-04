@@ -10,17 +10,33 @@
 #define FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_MODELS_HPP
 
 #include <set>
-#include "../../../common/def.hpp"
-#include "../../../models/fisheries_models.hpp"
-#include "../../../utilities/fims_json.hpp"
-#include "rcpp_population.hpp"
+// #include "../../../common/def.hpp"
+// #include "../../../models/fisheries_models.hpp"
+// #include "../../../utilities/fims_json.hpp"
+// #include "rcpp_population.hpp"
 
-#include "rcpp_interface_base.hpp"
-#include "rcpp_population.hpp"
-#include "rcpp_fleet.hpp"
-#include "rcpp_maturity.hpp"
-#include "rcpp_recruitment.hpp"
-#include "rcpp_selectivity.hpp"
+// Use FIMS_DEPENDS for packaged headers when installing
+// #include "../../../common/def.hpp"
+FIMS_DEPENDS(def.hpp);
+// #include "../../../models/fisheries_models.hpp"
+FIMS_DEPENDS(fisheries_models.hpp);
+// #include "../../../utilities/fims_json.hpp"
+FIMS_DEPENDS(fims_json.hpp);
+// #include "rcpp_population.hpp"
+FIMS_DEPENDS(rcpp_population.hpp);
+
+// #include "rcpp_interface_base.hpp"
+FIMS_DEPENDS(rcpp_interface_base.hpp);
+// #include "rcpp_population.hpp"
+FIMS_DEPENDS(rcpp_population.hpp);
+// #include "rcpp_fleet.hpp"
+FIMS_DEPENDS(rcpp_fleet.hpp);
+// #include "rcpp_maturity.hpp"
+FIMS_DEPENDS(rcpp_maturity.hpp);
+// #include "rcpp_recruitment.hpp"
+FIMS_DEPENDS(rcpp_recruitment.hpp);
+// #include "rcpp_selectivity.hpp"
+FIMS_DEPENDS(rcpp_selectivity.hpp);
 #include <valarray>
 #include <cmath>
 #include <mutex>

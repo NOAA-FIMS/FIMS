@@ -11,7 +11,10 @@
 #include <set>
 #include <regex>
 
-#include "fishery_model_base.hpp"
+// #include "fishery_model_base.hpp"
+// Use FIMS_DEPENDS for packaged headers when installing
+// #include "fishery_model_base.hpp"
+FIMS_DEPENDS(fishery_model_base.hpp);
 
 /* Dictionary block for shared parameter snippet documentations.
  * Referenced in function docs via @snippet{doc} this snippet_id.

@@ -10,9 +10,16 @@
 #ifndef POPULATION_DYNAMICS_MATURITY_LOGISTIC_HPP
 #define POPULATION_DYNAMICS_MATURITY_LOGISTIC_HPP
 
-#include "../../../common/fims_math.hpp"
-#include "../../../common/fims_vector.hpp"
-#include "maturity_base.hpp"
+// #include "../../../common/fims_math.hpp"
+// #include "../../../common/fims_vector.hpp"
+// #include "maturity_base.hpp"
+// Use FIMS_DEPENDS for packaged headers when installing
+// #include "../../../common/fims_math.hpp"
+FIMS_DEPENDS(fims_math.hpp);
+// #include "../../../common/fims_vector.hpp"
+FIMS_DEPENDS(fims_vector.hpp);
+// #include "maturity_base.hpp"
+FIMS_DEPENDS(maturity_base.hpp);
 
 namespace fims_popdy {
 

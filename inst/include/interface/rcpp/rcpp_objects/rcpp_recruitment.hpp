@@ -10,8 +10,13 @@
 #ifndef FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_RECRUITMENT_HPP
 #define FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_RECRUITMENT_HPP
 
-#include "../../../population_dynamics/recruitment/recruitment.hpp"
-#include "rcpp_interface_base.hpp"
+// #include "../../../population_dynamics/recruitment/recruitment.hpp"
+// #include "rcpp_interface_base.hpp"
+// Use FIMS_DEPENDS for packaged headers when installing
+// #include "../../../population_dynamics/recruitment/recruitment.hpp"
+FIMS_DEPENDS(recruitment.hpp);
+// #include "rcpp_interface_base.hpp"
+FIMS_DEPENDS(rcpp_interface_base.hpp);
 
 /**
  * @brief Rcpp interface that serves as the parent class for Rcpp recruitment

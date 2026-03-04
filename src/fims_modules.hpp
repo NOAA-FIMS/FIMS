@@ -9,18 +9,32 @@
 #ifndef SRC_FIMS_MODULES_HPP
 #define SRC_FIMS_MODULES_HPP
 
-#include "../inst/include/interface/rcpp/rcpp_objects/rcpp_data.hpp"
-#include "../inst/include/interface/rcpp/rcpp_objects/rcpp_fleet.hpp"
-#include "../inst/include/interface/rcpp/rcpp_objects/rcpp_growth.hpp"
-#include "../inst/include/interface/rcpp/rcpp_objects/rcpp_math.hpp"
-#include "../inst/include/interface/rcpp/rcpp_objects/rcpp_maturity.hpp"
-#include "../inst/include/interface/rcpp/rcpp_objects/rcpp_natural_mortality.hpp"
-#include "../inst/include/interface/rcpp/rcpp_objects/rcpp_population.hpp"
-#include "../inst/include/interface/rcpp/rcpp_objects/rcpp_recruitment.hpp"
-#include "../inst/include/interface/rcpp/rcpp_objects/rcpp_selectivity.hpp"
-#include "../inst/include/interface/rcpp/rcpp_objects/rcpp_distribution.hpp"
-#include "../inst/include/interface/rcpp/rcpp_objects/rcpp_interface_base.hpp"
-#include "../inst/include/interface/rcpp/rcpp_interface.hpp"
+// #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_data.hpp"
+// #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_fleet.hpp"
+// #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_growth.hpp"
+// #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_math.hpp"
+// #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_maturity.hpp"
+// #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_natural_mortality.hpp"
+// #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_population.hpp"
+// #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_recruitment.hpp"
+// #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_selectivity.hpp"
+// #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_distribution.hpp"
+// #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_interface_base.hpp"
+// #include "../inst/include/interface/rcpp/rcpp_interface.hpp"
+
+
+FIMS_DEPENDS(rcpp_data.hpp);
+FIMS_DEPENDS(rcpp_fleet.hpp);
+FIMS_DEPENDS(rcpp_growth.hpp);
+FIMS_DEPENDS(rcpp_math.hpp);
+FIMS_DEPENDS(rcpp_maturity.hpp);
+FIMS_DEPENDS(rcpp_natural_mortality.hpp);
+FIMS_DEPENDS(rcpp_population.hpp);
+FIMS_DEPENDS(rcpp_recruitment.hpp);
+FIMS_DEPENDS(rcpp_selectivity.hpp);
+FIMS_DEPENDS(rcpp_distribution.hpp);
+FIMS_DEPENDS(rcpp_interface_base.hpp);
+FIMS_DEPENDS(rcpp_interface.hpp);
 
 RCPP_EXPOSED_CLASS(Parameter)
 RCPP_EXPOSED_CLASS(ParameterVector)

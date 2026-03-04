@@ -1,0 +1,2 @@
+#!/bin/sh
+Rscript tools/generate_fims.R

@@ -10,9 +10,16 @@
 #ifndef MULTINOMIAL_LPMF
 #define MULTINOMIAL_LPMF
 
-#include "density_components_base.hpp"
-#include "../../common/fims_vector.hpp"
-#include "../../common/def.hpp"
+// #include "density_components_base.hpp"
+// #include "../../common/fims_vector.hpp"
+// #include "../../common/def.hpp"
+// Use FIMS_DEPENDS for packaged headers when installing
+// #include "density_components_base.hpp"
+FIMS_DEPENDS(density_components_base.hpp);
+// #include "../../common/fims_vector.hpp"
+FIMS_DEPENDS(fims_vector.hpp);
+// #include "../../common/def.hpp"
+FIMS_DEPENDS(def.hpp);
 
 namespace fims_distributions {
 /**

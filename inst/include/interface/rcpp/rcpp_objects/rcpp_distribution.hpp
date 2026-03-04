@@ -9,9 +9,16 @@
 #ifndef FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_DISTRIBUTION_HPP
 #define FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_DISTRIBUTION_HPP
 
-#include "../../../distributions/distributions.hpp"
-#include "../../interface.hpp"
-#include "rcpp_interface_base.hpp"
+// #include "../../../distributions/distributions.hpp"
+// #include "../../interface.hpp"
+// #include "rcpp_interface_base.hpp"
+// Use FIMS_DEPENDS for packaged headers when installing
+// #include "../../../distributions/distributions.hpp"
+FIMS_DEPENDS(distributions.hpp);
+// #include "../../interface.hpp"
+FIMS_DEPENDS(interface.hpp);
+// #include "rcpp_interface_base.hpp"
+FIMS_DEPENDS(rcpp_interface_base.hpp);
 
 /**
  * @brief Rcpp interface that serves as the parent class for Rcpp distribution

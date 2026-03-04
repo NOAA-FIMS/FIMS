@@ -9,9 +9,16 @@
 #ifndef FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_FLEET_HPP
 #define FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_FLEET_HPP
 
-#include "../../../common/def.hpp"
-#include "../../../population_dynamics/fleet/fleet.hpp"
-#include "rcpp_interface_base.hpp"
+// #include "../../../common/def.hpp"
+// #include "../../../population_dynamics/fleet/fleet.hpp"
+// #include "rcpp_interface_base.hpp"
+// Use FIMS_DEPENDS for packaged headers when installing
+// #include "../../../common/def.hpp"
+FIMS_DEPENDS(def.hpp);
+// #include "../../../population_dynamics/fleet/fleet.hpp"
+FIMS_DEPENDS(fleet.hpp);
+// #include "rcpp_interface_base.hpp"
+FIMS_DEPENDS(rcpp_interface_base.hpp);
 
 /**
  * @brief Rcpp interface that serves as the parent class for Rcpp fleet

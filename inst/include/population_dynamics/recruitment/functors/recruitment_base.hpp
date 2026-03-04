@@ -12,10 +12,15 @@
 
 #include <cmath>  // for using std::pow and M_PI
 
-#include "../../../common/fims_math.hpp"  // for using fims_math::log()
-#include "../../../common/fims_vector.hpp"
-#include "../../../common/model_object.hpp"
-#include "../../../distributions/distributions.hpp"
+// #include "../../../common/fims_math.hpp"  // for using fims_math::log()
+// #include "../../../common/fims_vector.hpp"
+// #include "../../../common/model_object.hpp"
+// #include "../../../distributions/distributions.hpp"
+// Use FIMS_DEPENDS for packaged headers when installing
+FIMS_DEPENDS(fims_math.hpp);
+FIMS_DEPENDS(fims_vector.hpp);
+FIMS_DEPENDS(model_object.hpp);
+FIMS_DEPENDS(distributions.hpp);
 
 namespace fims_popdy {
 

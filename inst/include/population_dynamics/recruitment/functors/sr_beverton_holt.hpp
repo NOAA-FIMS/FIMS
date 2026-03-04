@@ -10,8 +10,11 @@
 #ifndef FIMS_POPULATION_DYNAMICS_RECRUITMENT_SR_BEVERTON_HOLT_HPP
 #define FIMS_POPULATION_DYNAMICS_RECRUITMENT_SR_BEVERTON_HOLT_HPP
 
-#include "recruitment_base.hpp"
-#include "../../../common/fims_vector.hpp"
+// #include "recruitment_base.hpp"
+// #include "../../../common/fims_vector.hpp"
+
+FIMS_DEPENDS(recruitment_base.hpp);
+FIMS_DEPENDS(fims_vector.hpp);
 
 namespace fims_popdy {
 

@@ -9,9 +9,10 @@
 #ifndef FIMS_POPULATION_DYNAMICS_RECRUITMENT_LOG_R_HPP
 #define FIMS_POPULATION_DYNAMICS_RECRUITMENT_LOG_R_HPP
 
-#include "recruitment_base.hpp"
-#include "../../../common/fims_vector.hpp"
-
+// #include "recruitment_base.hpp"
+// #include "../../../common/fims_vector.hpp"
+FIMS_DEPENDS(recruitment_base.hpp);
+FIMS_DEPENDS(fims_vector.hpp);
 namespace fims_popdy {
 
 /** @brief Log Devs class that returns the log of the input added to the log of

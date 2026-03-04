@@ -12,7 +12,11 @@
 #include <future>
 #include <memory>
 
-#include "information.hpp"
+// #include "information.hpp"
+// Use FIMS_DEPENDS for packaged headers when installing
+// #include "information.hpp"
+
+FIMS_DEPENDS(information.hpp);
 
 namespace fims_model {
 

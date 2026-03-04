@@ -13,7 +13,12 @@
 #ifndef FIMS_POPULATION_DYNAMICS_MATURITY_HPP
 #define FIMS_POPULATION_DYNAMICS_MATURITY_HPP
 
-#include "functors/logistic.hpp"
-#include "functors/maturity_base.hpp"
+// #include "functors/logistic.hpp"
+// #include "functors/maturity_base.hpp"
+// Use FIMS_DEPENDS for packaged headers when installing
+// #include "functors/logistic.hpp"
+FIMS_DEPENDS(logistic.hpp);
+// #include "functors/maturity_base.hpp"
+FIMS_DEPENDS(maturity_base.hpp);
 
 #endif /* FIMS_POPULATION_DYNAMICS_MATURITY_HPP */
