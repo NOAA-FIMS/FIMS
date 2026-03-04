@@ -278,6 +278,7 @@ initialize_recruitment <- function(parameters, data) {
     data = data,
     module_name = "Recruitment"
   )
+  return(module)
 }
 
 #' Initialize a growth module
@@ -296,6 +297,7 @@ initialize_growth <- function(parameters, data) {
     data = data,
     module_name = "Growth"
   )
+  return(module)
 }
 
 #' Initialize a maturity module
@@ -314,6 +316,7 @@ initialize_maturity <- function(parameters, data) {
     data = data,
     module_name = "Maturity"
   )
+  return(module)
 }
 
 #' Initialize a population module.
@@ -382,6 +385,7 @@ initialize_selectivity <- function(parameters, data, fleet_name) {
     module_name = module_name,
     fleet_name = fleet_name
   )
+  return(module)
 }
 
 # TODO: Do we want to put initialize_selectivity(), initialize_index(), and
@@ -584,9 +588,10 @@ initialize_comp <- function(data,
 
   # Validate that the fleet's composition data is available
   comp_data <- comp[["m_comp"]](data, fleet_name)
+  pretty_comp_name <- gsub("_comp", "-composition", comp[['name']])
   if (is.null(comp_data) || length(comp_data) == 0) {
     cli::cli_abort(c(
-      "`{comp[['name']]}`-composition data for fleet `{fleet_name}` is
+      "The {pretty_comp_name} data for fleet {.var {fleet_name}} is
       unavailable or empty."
     ))
   }
@@ -1017,7 +1022,7 @@ set_param_vector <- function(field, module, module_input) {
 
   # Check if module_input is a list
   if (!tibble::is_tibble(module_input)) {
-    cli::cli_abort("The {.var module_input} argument must be tibble.")
+    cli::cli_abort("The {.var module_input} argument must be a tibble.")
   }
 
   # Extract the value of the parameter vector
