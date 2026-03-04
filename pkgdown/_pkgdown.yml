@@ -91,13 +91,14 @@ navbar:
      - reference
      - articles
      - news
+     - reports
     right:
       - website
       - github
       - search
   components:
     reference_menu:
-      text: Reference
+      text: reference
       menu:
         - text: R functions
           href: reference/index.html
