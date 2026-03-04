@@ -9,21 +9,20 @@
 #ifndef FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_MODELS_HPP
 #define FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_MODELS_HPP
 
+#include <cmath>
+#include <mutex>
 #include <set>
+#include <valarray>
+
 #include "../../../common/def.hpp"
 #include "../../../models/fisheries_models.hpp"
 #include "../../../utilities/fims_json.hpp"
-#include "rcpp_population.hpp"
-
-#include "rcpp_interface_base.hpp"
-#include "rcpp_population.hpp"
 #include "rcpp_fleet.hpp"
+#include "rcpp_interface_base.hpp"
 #include "rcpp_maturity.hpp"
+#include "rcpp_population.hpp"
 #include "rcpp_recruitment.hpp"
 #include "rcpp_selectivity.hpp"
-#include <valarray>
-#include <cmath>
-#include <mutex>
 
 /**
  * @brief The FisheryModelInterfaceBase class is the base class for all fishery
@@ -1521,14 +1520,7 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
 
   virtual bool add_to_fims_tmb() {
     this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
-#ifdef TMBAD_FRAMEWORK
     this->add_to_fims_tmb_internal<TMBAD_FIMS_TYPE>();
-#else
-    this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
-    this->add_to_fims_tmb_internal<TMB_FIMS_FIRST_ORDER>();
-    this->add_to_fims_tmb_internal<TMB_FIMS_SECOND_ORDER>();
-    this->add_to_fims_tmb_internal<TMB_FIMS_THIRD_ORDER>();
-#endif
     return true;
   }
 
