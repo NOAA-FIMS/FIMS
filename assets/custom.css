@@ -11,9 +11,6 @@ html {
     --page-foreground-color: #213f4b;
     --page-secondary-foreground-color: #6f7e8e;
 
-    /* used by some doxygen-awesome rules */
-    --separator-color: rgba(33, 63, 75, 0.20);
-
 }
 
 body {
