@@ -24,7 +24,8 @@
 // issue
 #include <math.h>
 
-#include <TMB.hpp>
+// #pragma once
+// #include <TMB.hpp>
 
 // define REPORT, ADREPORT, and SIMULATE
 #define FIMS_REPORT_F(name, F)                                         \

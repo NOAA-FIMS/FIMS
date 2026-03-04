@@ -12,8 +12,8 @@ FIMS_DEPENDS(fims_modules.hpp);
 // FIMS_DEPENDS(fims_modules.hpp);
 FIMS_DEPENDS(rcpp_interface.hpp);
 FIMS_DEPENDS(interface.hpp);
-// FIMS_DEPENDS(model.hpp);
-#include "F_common_model_object.h"
+//  FIMS_DEPENDS(model.hpp);
+#include "F_common_model.h"
 
 /// @cond
 /**
