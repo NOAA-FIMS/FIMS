@@ -48,6 +48,7 @@ a:hover { color: #0b535e; }
 #projectname {
     color: #51595d;
     font-family: Outfit, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    font-size: 1.4rem !important;
     font-weight: 400;
     letter-spacing: 1px;
 }
@@ -67,6 +68,10 @@ a:hover { color: #0b535e; }
 /* Make nav links behave like pkgdown (no underline, hover color) */
 .navbar .nav-link {
   text-decoration: none;
+  font-size: 1.1rem !important;
+  padding-left: 1.5rem !important;
+  padding-right: 1.5rem !important;
+  letter-spacing: 1px !important;
   transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out;
 }
 
