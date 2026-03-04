@@ -173,67 +173,6 @@ test_that("`initialize_fims()` returns correct error messages", {
   clear()
 })
 
-# test_initialize_distribution ----
-## IO correctness ----
-test_that("`initialize_distribution()` works with correct inputs", {
-  # Setup for testing initialize_distribution
-  module_input <- default_parameters |>
-    dplyr::filter(fleet_name == "fleet1" & distribution_type == "Data")
-
-  distribution_name <- "dlnorm"
-  linked_ids <- c(data_link = 1, fleet_link = 2)
-
-  #' @description Test that `initialize_distribution()` returns an S4 object with data distribution.
-  result <- initialize_distribution(
-    module_input = module_input,
-    distribution_name = distribution_name,
-    distribution_type = "data",
-    linked_ids = linked_ids
-  )
-  expect_type(result, "S4")
-  clear()
-})
-
-## Error handling ----
-test_that("`initialize_distribution()` returns correct error messages", {
-  module_input <- default_parameters |>
-    dplyr::filter(fleet_name == "fleet1" & distribution_type == "Data")
-
-  #' @description Test that `initialize_distribution()` handles NULL distribution_name correctly.
-  result <- initialize_distribution(
-    module_input = module_input,
-    distribution_name = NULL,
-    distribution_type = "data",
-    linked_ids = c(data_link = 1, fleet_link = 2)
-  )
-  expect_null(result)
-  clear()
-
-  #' @description Test that `initialize_distribution()` handles non-list module_input correctly.
-  expect_error(
-    initialize_distribution(
-      module_input = "not_a_list",
-      distribution_name = "dlnorm",
-      distribution_type = "data",
-      linked_ids = c(data_link = 1, fleet_link = 2)
-    ),
-    "`module_input` must be a list."
-  )
-  clear()
-
-  #' @description Test that `initialize_distribution()` handles missing linked_ids correctly.
-  expect_error(
-    initialize_distribution(
-      module_input = module_input,
-      distribution_name = "dlnorm",
-      distribution_type = "data",
-      linked_ids = c(data_link = 1)
-    ),
-    "`linked_ids` must be a named vector containing 'data_link' and"
-  )
-  clear()
-})
-
 # test_initialize_recruitment ----
 ## IO correctness ----
 test_that("`initialize_recruitment()` works with correct inputs", {

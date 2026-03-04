@@ -278,6 +278,7 @@ initialize_recruitment <- function(parameters, data) {
     data = data,
     module_name = "Recruitment"
   )
+  return(module)
 }
 
 #' Initialize a growth module
@@ -296,6 +297,7 @@ initialize_growth <- function(parameters, data) {
     data = data,
     module_name = "Growth"
   )
+  return(module)
 }
 
 #' Initialize a maturity module
@@ -314,6 +316,7 @@ initialize_maturity <- function(parameters, data) {
     data = data,
     module_name = "Maturity"
   )
+  return(module)
 }
 
 #' Initialize a population module.
@@ -382,6 +385,7 @@ initialize_selectivity <- function(parameters, data, fleet_name) {
     module_name = module_name,
     fleet_name = fleet_name
   )
+  return(module)
 }
 
 # TODO: Do we want to put initialize_selectivity(), initialize_index(), and
