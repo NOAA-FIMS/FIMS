@@ -72,5 +72,10 @@ test_that("Rcpp interface returns correct error messages", {
     methods::new(EWAAGrowth, "a"),
     regexp = "no valid constructor available for the argument list"
   )
+  #' @description Test that `get_log_module()` errors when no argument is passed.
+  expect_error(
+    get_log_module(),
+    regexp = "'module' argument is required"
+  )
   clear()
 })
