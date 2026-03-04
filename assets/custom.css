@@ -15,11 +15,20 @@ html {
 
 body {
   font-family: Outfit, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-    Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
-  font-size: 16px;
-  line-height: 1.6;
-  color: var(--page-foreground-color);
-  background-color: var(--page-background-color);
+    Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif !important;
+  font-size: 16px !important;
+  line-height: 1.6 !important;
+  color: var(--page-foreground-color !important;
+  background-color: var(--page-background-color) !important;
+}
+
+#nav-tree .label, #nav-tree a {
+  font-family: Outfit, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif !important;
+  color: var(--primary-color) !important;
+  font-weight: 400 !important;
+  margin-top: 1.5rem !important;
+  margin-bottom: 0.75rem !important;
 }
 
 /* Headings: Outfit + primary teal, lighter weight (pkgdown style) */
@@ -52,7 +61,12 @@ a:hover { color: #0b535e; }
     font-weight: 400;
     letter-spacing: 1px;
 }
-
+#projectlogo img {
+    margin-left: 20px !important;
+    width: 90px !important;
+    max-width: 80px !important;
+    min-width: 80px !important;
+}
 /* ---- Header / navbar (match pkgdown look) ---- */
 
 /* Remove Doxygen top border */
@@ -69,8 +83,8 @@ a:hover { color: #0b535e; }
 .navbar .nav-link {
   text-decoration: none;
   font-size: 1.1rem !important;
-  padding-left: 1.5rem !important;
-  padding-right: 1.5rem !important;
+  padding-left: 1rem !important;
+  padding-right: 1rem !important;
   letter-spacing: 1px !important;
   transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out;
 }
@@ -90,7 +104,7 @@ a:hover { color: #0b535e; }
 }
 
 .navbar-nav .nav-item .nav-link .bi-github {
-    color: var(--bs-navbar-color);
+    color: var(--bs-navbar-color) !important;
 }
 
 .navbar .nav-link .menu-text {
@@ -136,14 +150,19 @@ html {
 
 #nav-tree .label {
     font-family: Outfit, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif !important;
+    font-weight: 600;
+    padding: 0.25rem 0.5rem;
+    margin-bottom: 2px;
+    border-radius: .375rem;
 }
 
-#nav-tree .label a {
-    font-weight: 700;
-}
+/* #nav-tree .label a {
+    font-weight: 600;
+} */
 
 #nav-tree .selected a {
-    font-weight: 600;
+    background-color: #0e6876 !important;
+    color: #FFFFFF !important;
 }
 
 div.toc li, div.toc h3 {
