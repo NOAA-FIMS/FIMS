@@ -18,7 +18,7 @@ body {
     Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif !important;
   font-size: 16px !important;
   line-height: 1.6 !important;
-  color: var(--page-foreground-color !important;
+  color: var(--page-foreground-color) !important;
   background-color: var(--page-background-color) !important;
 }
 
@@ -49,7 +49,6 @@ h4 { font-size: 1.5rem; }
 h5 { font-size: 1.25rem; line-height: 1.4; }
 h6 { font-size: 1rem; }
 
-a { font-weight: bold; }
 a:link { color: var(--primary-color); }
 a:visited { color: var(--primary-color); }
 a:hover { color: #0b535e; }
@@ -76,18 +75,30 @@ a:hover { color: #0b535e; }
 .navbar {
   --bs-navbar-color: #51595d;
   --bs-navbar-hover-color: rgba(14, 104, 118, 0.80);
-  --bs-navbar-active-color: var(--primary-color);
 }
 
 /* Make nav links behave like pkgdown (no underline, hover color) */
 .navbar .nav-link {
-  text-decoration: none;
-  font-size: 1.1rem !important;
+  color: #51595d !important;
+  text-decoration: none !important;
+  font-size: 1.4rem !important;
   padding-left: 1rem !important;
   padding-right: 1rem !important;
   letter-spacing: 1px !important;
+  text-underline-offset: 0px !important;
   transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out;
 }
+
+.navbar-nav .nav-item.active .nav-link {
+    border-bottom: 3px solid #f54f61 !important;
+    color: #0e6876 !important;
+    background: none !important;
+}
+
+.navbar-nav .nav-item .nav-link, .nav-item .nav-link:visited {
+    color: #51595d !important;
+    text-transform: lowercase !important;
+    font-size: 1.1rem !important;
 
 /* Dropdown menu coloring like pkgdown */
 .dropdown-menu {
@@ -110,15 +121,15 @@ a:hover { color: #0b535e; }
 .navbar .nav-link .menu-text {
     position: relative;
     display: inline-block;
-    color: var(--bs-navbar-color);
+    color: var(--bs-navbar-color) !important;
 }
 
 .navbar .nav-link:hover .menu-text { 
-    color: var(--bs-navbar-hover-color); 
+    color: var(--bs-navbar-hover-color) !important; 
 }
 
 .navbar .nav-link.active .menu-text { 
-    color: var(--bs-navbar-active-color); 
+    color: var(--bs-navbar-active-color) !important; 
 }
 
 .navbar .nav-link .menu-text::after {
@@ -139,7 +150,7 @@ a:hover { color: #0b535e; }
 
 /* Light mode default */
 html {
-  --side-nav-background: #ffffff;
+  --side-nav-background: #ffffff !important;
 }
 
 /* Force nav panes to use the variable (wins over theme) */
