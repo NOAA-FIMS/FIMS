@@ -53,13 +53,6 @@ struct FIMSObject {
     return true;
   }
 
-  /**
-   * @brief Create a map of report vectors for the object.
-   * used to populate the report_vectors map in FisheryModelBase.
-   */
-  virtual void create_report_vectors(
-      std::map<std::string, fims::Vector<fims::Vector<Type>>>& report_vectors) {
-  }
 };
 
 }  // namespace fims_model_object

@@ -49,17 +49,6 @@ struct EWAAGrowth : public GrowthBase<Type> {
     return ret;
   }
 
-  /**
-   * @brief Create a map of report vectors for the growth object.
-   */
-  virtual void create_report_vectors(
-      std::map<std::string, fims::Vector<fims::Vector<Type>>>& report_vectors) {
-    // fims::Vector<Type> ewaa_vector;
-    // for (auto const& pair : ewaa) {
-    //   ewaa_vector.push_back(pair.second);
-    // }
-    // report_vectors["ewaa"] = ewaa_vector;
-  }
 };
 }  // namespace fims_popdy
 #endif /* POPULATION_DYNAMICS_GROWTH_EWAA_HPP */

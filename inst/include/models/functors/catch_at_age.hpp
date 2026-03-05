@@ -1237,15 +1237,8 @@ class CatchAtAge : public FisheryModelBase<Type> {
       // initiate population index for structuring report out objects
       int pop_idx = 0;
       for (size_t p = 0; p < this->populations.size(); p++) {
-        this->populations[p]->create_report_vectors(report_vectors);
-        // std::shared_ptr<fims_popdy::Population<Type>> &population =
-        //     this->populations[p];
         std::map<std::string, fims::Vector<Type>> &derived_quantities =
             this->GetPopulationDerivedQuantities(this->populations[p]->GetId());
-        this->populations[p]->maturity->create_report_vectors(report_vectors);
-        this->populations[p]->growth->create_report_vectors(report_vectors);
-        this->populations[p]->recruitment->create_report_vectors(
-            report_vectors);
         biomass_p(pop_idx) = derived_quantities["biomass"].to_tmb();
         expected_recruitment_p(pop_idx) =
             derived_quantities["expected_recruitment"].to_tmb();
@@ -1281,8 +1274,6 @@ class CatchAtAge : public FisheryModelBase<Type> {
       fleet_iterator fit;
       for (fit = this->fleets.begin(); fit != this->fleets.end(); ++fit) {
         std::shared_ptr<fims_popdy::Fleet<Type>> &fleet = (*fit).second;
-        fleet->create_report_vectors(report_vectors);
-        fleet->selectivity->create_report_vectors(report_vectors);
         std::map<std::string, fims::Vector<Type>> &derived_quantities =
             this->GetFleetDerivedQuantities(fleet->GetId());
 
