@@ -79,8 +79,6 @@ annual fishing mortality multipliers to scale total mortality of all fleets*/
    */
   virtual void create_report_vectors(
       std::map<std::string, fims::Vector<fims::Vector<Type>>>& report_vectors) {
-    report_vectors["log_init_naa"].emplace_back(this->log_init_naa);
-    report_vectors["log_M"].emplace_back(this->log_M);
     report_vectors["log_f_multiplier"].emplace_back(this->log_f_multiplier);
     report_vectors["spawning_biomass_ratio"].emplace_back(
         this->spawning_biomass_ratio);
@@ -91,8 +89,6 @@ annual fishing mortality multipliers to scale total mortality of all fleets*/
    */
   virtual void get_report_vector_count(
       std::map<std::string, size_t>& report_vector_count) {
-    report_vector_count["log_init_naa"] += 1;
-    report_vector_count["log_M"] += 1;
     report_vector_count["log_f_multiplier"] += 1;
     report_vector_count["spawning_biomass_ratio"] += 1;
   }

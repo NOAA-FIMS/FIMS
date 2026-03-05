@@ -151,7 +151,6 @@ reshape_json_estimates <- function(model_output) {
     ) |>
     tidyr::unnest(parameters)
 
-  # TODO: Bring in TMB estimates
   # TODO: Change some column names
   # Bring everything together
   out <- dplyr::bind_rows(
@@ -188,7 +187,8 @@ reshape_json_estimates <- function(model_output) {
 #' @param sdreport An object of the `sdreport` class as returned from
 #'   [TMB::sdreport()].
 #' @param opt An object returned from an optimizer, typically from
-#'   [stats::nlminb()], used to fit a TMB model.
+#'   [stats::nlminb()], used to fit a TMB model. If the model is not optimized,
+#'   opt is an empty list and is not used in the function.
 #' @param parameter_names A character vector of parameter names. This is used to
 #'   identify the parameters in the `std` object.
 #' @return A tibble containing the reshaped estimates (i.e., parameters and

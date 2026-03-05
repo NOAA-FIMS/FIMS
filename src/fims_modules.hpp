@@ -442,7 +442,6 @@ RCPP_MODULE(fims) {
       .constructor()
       .method("AddPopulation", &CatchAtAgeInterface::AddPopulation)
       .method("get_output", &CatchAtAgeInterface::to_json)
-      .method("GetReport", &CatchAtAgeInterface::get_report)
       .method("GetId", &CatchAtAgeInterface::get_id)
       .method("DoReporting", &CatchAtAgeInterface::DoReporting)
       .method("IsReporting", &CatchAtAgeInterface::IsReporting);

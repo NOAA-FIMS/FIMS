@@ -665,43 +665,6 @@ class FIMSRcppInterfaceBase {
     FIMS_WARNING_LOG("Method not yet defined.");
     return "{\"name\": \"not yet implemented\"}";
   }
-  /**
-   * @brief Method to extract standard error values from the se_values
-   * working map.
-   */
-  void get_se_values(std::string name,
-                     std::map<std::string, std::vector<double>>& se_values,
-                     fims::Vector<double>& values) {
-    auto se_vals = se_values.find(name);
-    if (se_vals != se_values.end()) {
-      std::vector<double>& se_vals_vector = (*se_vals).second;
-      std::vector<double> uncertainty_std(
-          se_vals_vector.begin(), se_vals_vector.begin() + values.size());
-      std::vector<double> temp(se_vals_vector.begin() + values.size(),
-                               se_vals_vector.end());
-      se_vals_vector = temp;
-      fims::Vector<double> uncertainty(uncertainty_std);
-      values = uncertainty;
-    } else {
-      std::fill(values.begin(), values.end(), -999);
-    }
-  }
-
-  /**
-   * @brief Set uncertainty values for the interface object.
-   *
-   * @details This virtual method is intended to be overridden in derived
-   * classes to set uncertainty (standard error) values
-   * for model parameters or quantities using the provided map of standard
-   * error values. The default implementation logs a warning.
-   *
-   * @param se_values A map from parameter names to vectors of standard error
-   * values.
-   */
-  virtual void set_uncertainty(
-      std::map<std::string, std::vector<double>>& se_values) {
-    FIMS_WARNING_LOG("Method not yet defined.");
-  }
 
   /**
    * @brief Report the parameter value as a string.

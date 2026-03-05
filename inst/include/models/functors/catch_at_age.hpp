@@ -1196,14 +1196,6 @@ class CatchAtAge : public FisheryModelBase<Type> {
 #ifdef TMB_MODEL
     if (this->do_reporting == true) {
       report_vectors.clear();
-      // std::shared_ptr<UncertaintyReportInfoMap>
-      // population_uncertainty_report_info_map =
-      //     this->GetPopulationUncertaintyReportInfoMap();
-
-      // std::shared_ptr<UncertaintyReportInfoMap>
-      // fleet_uncertainty_report_info_map =
-      //     this->GetFleetUncertaintyReportInfoMap();
-
       // initialize population vectors
       vector<vector<Type>> biomass_p(n_pops);
       vector<vector<Type>> expected_recruitment_p(n_pops);

@@ -80,18 +80,13 @@ class FisheryModelInterfaceBase : public FIMSRcppInterfaceBase {
    * Derived classes should override this method to provide model-specific
    * serialization logic.
    *
-   * @param do_sd_report A boolean to include standard deviation report
-   * calculations in the output if true. This is typically set to false when
-   * maximum likelihood estimation optimization is not performed, to avoid
-   * unnecessary computations. Default is true.
    * @return A JSON string representing the current state of the model. The
    * base implementation returns a placeholder string indicating the method is
    * not yet implemented.
    */
-  virtual std::string to_json(bool do_sd_report = true) {
+  virtual std::string to_json() {
     return "std::string to_json() not yet implemented.";
   }
-  virtual std::string to_json() { return this->to_json(false); }
   /**
    * @brief A function to calculate reference points for the fishery model.
    *
@@ -277,11 +272,8 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
       ss << " \"maturity_id\": " << population_interface->maturity_id << ",\n";
 
       ss << " \"parameters\": [\n";
-      fims::Vector<double> log_M_uncertainty(pop->log_M.size(), -999);
-      this->get_se_values("log_M", this->se_values, log_M_uncertainty);
       for (size_t i = 0; i < pop->log_M.size(); i++) {
         population_interface_ptr->log_M[i].final_value_m = pop->log_M[i];
-        population_interface_ptr->log_M[i].uncertainty_m = log_M_uncertainty[i];
       }
 
       ss << "{\n \"name\": \"log_M\",\n";
@@ -294,15 +286,9 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
       ss << " \"values\": " << population_interface->log_M << "\n\n";
       ss << "},\n";
 
-      fims::Vector<double> log_f_multiplier_uncertainty(
-          pop->log_f_multiplier.size(), -999);
-      this->get_se_values("log_f_multiplier", this->se_values,
-                          log_f_multiplier_uncertainty);
       for (size_t i = 0; i < pop->log_f_multiplier.size(); i++) {
         population_interface_ptr->log_f_multiplier[i].final_value_m =
             pop->log_f_multiplier[i];
-        population_interface_ptr->log_f_multiplier[i].uncertainty_m =
-            log_f_multiplier_uncertainty[i];
       }
 
       ss << "{\n \"name\": \"log_f_multiplier\",\n";
@@ -315,15 +301,9 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
       ss << " \"values\": " << population_interface->log_f_multiplier << "\n\n";
       ss << "},\n";
 
-      fims::Vector<double> spawning_biomass_ratio_uncertainty(
-          pop->spawning_biomass_ratio.size(), -999);
-      this->get_se_values("spawning_biomass_ratio", this->se_values,
-                          spawning_biomass_ratio_uncertainty);
       for (size_t i = 0; i < pop->spawning_biomass_ratio.size(); i++) {
         population_interface_ptr->spawning_biomass_ratio[i].final_value_m =
             pop->spawning_biomass_ratio[i];
-        population_interface_ptr->spawning_biomass_ratio[i].uncertainty_m =
-            spawning_biomass_ratio_uncertainty[i];
       }
 
       ss << "{\n \"name\": \"spawning_biomass_ratio\",\n";
@@ -338,15 +318,9 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
          << "\n\n";
       ss << "},\n";
 
-      fims::Vector<double> log_init_naa_uncertainty(pop->log_init_naa.size(),
-                                                    -999);
-      this->get_se_values("log_init_naa", this->se_values,
-                          log_init_naa_uncertainty);
       for (size_t i = 0; i < pop->log_init_naa.size(); i++) {
         population_interface_ptr->log_init_naa[i].final_value_m =
             pop->log_init_naa[i];
-        population_interface_ptr->log_init_naa[i].uncertainty_m =
-            log_init_naa_uncertainty[i];
       }
       ss << " {\n\"name\": \"log_init_naa\",\n";
       ss << "  \"id\":" << population_interface->log_init_naa.id_m << ",\n";
@@ -476,37 +450,16 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
     } else {
       ss << "],\n";
     }
-    if (has_se) {
-      try {
-        std::vector<double> &se_vals_vector = (*se_vals).second;
-        if (se_vals_vector.size() < dq.size()) {
-          throw std::runtime_error(
-              "Standard error vector size is smaller than derived quantity "
-              "size for derived quantity " +
-              name);
-        }
-        std::vector<double> uncertainty_std(se_vals_vector.begin(),
-                                            se_vals_vector.begin() + dq.size());
-        std::vector<double> temp(se_vals_vector.begin() + dq.size(),
-                                 se_vals_vector.end());
-        se_vals_vector = temp;
-        fims::Vector<double> uncertainty(uncertainty_std);
-        ss << "\"uncertainty\": " << uncertainty << "\n";
-      } catch (const std::exception &e) {
-        throw std::runtime_error(
-            "Error processing uncertainty for derived quantity " + name + ": " +
-            e.what());
+    // Default uncertainty for derived quantities
+    ss << "\"uncertainty\": [";
+    for (size_t i = 0; i < dq.size(); ++i) {
+      ss << "-999.0";  // Placeholder for uncertainty values
+      if (i < dq.size() - 1) {
+        ss << ", ";
       }
-    } else {
-      ss << "\"uncertainty\": [";
-      for (size_t i = 0; i < dq.size(); ++i) {
-        ss << "-999.0";  // Placeholder for uncertainty values
-        if (i < dq.size() - 1) {
-          ss << ", ";
-        }
-      }
-      ss << "]\n";
     }
+    ss << "]\n";
+    // end Default uncertainty for derived quantities
     ss << "}";
 
     return ss.str();
@@ -595,11 +548,8 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
       ss << "],\n";
       ss << "\"parameters\": [\n";
       ss << "{\n";
-      fims::Vector<double> log_Fmort_uncertainty(fleet->log_Fmort.size(), -999);
-      this->get_se_values("log_Fmort", this->se_values, log_Fmort_uncertainty);
       for (size_t i = 0; i < fleet_interface->log_Fmort.size(); i++) {
         fleet_interface->log_Fmort[i].final_value_m = fleet->log_Fmort[i];
-        fleet_interface->log_Fmort[i].uncertainty_m = log_Fmort_uncertainty[i];
       }
 
       ss << " \"name\": \"log_Fmort\",\n";
@@ -612,11 +562,8 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
       ss << " \"values\": " << fleet_interface->log_Fmort << "},\n";
 
       ss << " {\n";
-      fims::Vector<double> log_q_uncertainty(fleet->log_q.size(), -999);
-      this->get_se_values("log_q", this->se_values, log_q_uncertainty);
       for (size_t i = 0; i < fleet->log_q.size(); i++) {
         fleet_interface->log_q[i].final_value_m = fleet->log_q[i];
-        fleet_interface->log_q[i].uncertainty_m = log_q_uncertainty[i];
       }
       ss << " \"name\": \"log_q\",\n";
       ss << " \"id\":" << fleet_interface->log_q.id_m << ",\n";
@@ -688,136 +635,9 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
   }
 
   /**
-   * @brief Get the report output for the CatchAtAge model.
-   *
-   * @details Returns a list containing the report results for the CatchAtAge
-   * model, including derived quantities and diagnostics.
-   * @param do_sd_report  A boolean indicating whether to perform sdreport
-   * calculations, which should be skipped when MLE optimization is false.
-   * Default is true.
-   * @return Rcpp::List containing the report output.
-   */
-  Rcpp::List get_report(bool do_sd_report = true) {
-    Rcpp::Environment base = Rcpp::Environment::base_env();
-    Rcpp::Function summary = base["summary"];
-
-    // Grab needed R functions
-    Rcpp::Environment TMB = Rcpp::Environment::namespace_env("TMB");
-    Rcpp::Function MakeADFun = TMB["MakeADFun"];
-    Rcpp::Function sdreport = TMB["sdreport"];
-    // Grab your helpers from R global environment
-    Rcpp::Environment global = Rcpp::Environment::global_env();
-    // Build parameters list
-    Rcpp::List parameters = Rcpp::List::create(
-        Rcpp::Named("p") = this->get_fixed_parameters_vector(),
-        Rcpp::Named("re") = this->get_random_parameters_vector());
-    // Call MakeADFun with map = NULL
-    Rcpp::List obj = MakeADFun(
-        Rcpp::Named("data") = Rcpp::List::create(),
-        Rcpp::Named("parameters") = parameters, Rcpp::Named("DLL") = "FIMS",
-        Rcpp::Named("silent") = true, Rcpp::Named("map") = R_NilValue,
-        Rcpp::Named("random") = "re");
-    // Call obj$report()
-    Rcpp::Function report = obj["report"];
-    Rcpp::Function func = obj["fn"];
-    Rcpp::Function gradient = obj["gr"];
-    Rcpp::NumericVector grad = gradient(this->get_fixed_parameters_vector());
-    double maxgc = -999;
-    for (R_xlen_t i = 0; i < grad.size(); i++) {
-      if (std::fabs(grad[i]) > maxgc) {
-        maxgc = std::fabs(grad[i]);
-      }
-    }
-    double of_value =
-        Rcpp::as<double>(func(this->get_fixed_parameters_vector()));
-    Rcpp::List rep = report();
-
-    // Initialize variables for sdreport results
-    Rcpp::RObject sdr_summary;
-    Rcpp::NumericMatrix mat;
-    Rcpp::CharacterVector rownames;
-    Rcpp::CharacterVector colnames;
-    Rcpp::List grouped_out = Rcpp::List::create();
-    double first_est = 0.0;
-
-    // Only run sdreport if do_sd_report is true
-    if (do_sd_report) {
-      SEXP sdr = sdreport(obj);
-      sdr_summary = summary(sdr, "report");
-
-      mat = Rcpp::NumericMatrix(sdr_summary);
-      Rcpp::List dimnames = mat.attr("dimnames");
-      rownames = dimnames[0];
-      colnames = dimnames[1];
-
-      // ---- Group into map ----
-      std::map<std::string, std::vector<double>> grouped;
-      int nrow = mat.nrow();
-      for (int i = 0; i < nrow; i++) {
-        std::string key = Rcpp::as<std::string>(rownames[i]);
-        double val = mat(i, 1);  // col 1 = "Std. Error"
-        grouped[key].push_back(val);
-      }
-
-      // ---- Convert map -> R list ----
-      for (auto const &kv : grouped) {
-        grouped_out[kv.first] = Rcpp::wrap(kv.second);
-      }
-
-      // Example: grab "Estimate" for first row
-      if (nrow > 0) {
-        first_est = mat(0, 0);
-      }
-    } else {
-      // Return empty objects when do_sd_report is false
-      sdr_summary = R_NilValue;
-      mat = Rcpp::NumericMatrix(0, 0);
-      rownames = Rcpp::CharacterVector(0);
-      colnames = Rcpp::CharacterVector(0);
-      grouped_out = Rcpp::List::create();
-      // first_est is already initialized to 0.0
-    }
-
-    return Rcpp::List::create(
-        Rcpp::Named("objective_function_value") = of_value,
-        Rcpp::Named("gradient") = grad,
-        Rcpp::Named("max_gradient_component") = maxgc,
-        Rcpp::Named("report") = rep, Rcpp::Named("sdr_summary") = sdr_summary,
-        Rcpp::Named("sdr_summary_matrix") = mat,
-        Rcpp::Named("first_est") = first_est,
-        Rcpp::Named("rownames") = rownames, Rcpp::Named("colnames") = colnames,
-        Rcpp::Named("grouped_se") = grouped_out);
-  }
-  /**
    * @copydoc FisheryModelInterfaceBase::to_json
    */
-  virtual std::string to_json(bool do_sd_report = true) {
-    Rcpp::List report = get_report(do_sd_report);
-    Rcpp::List grouped_out = report["grouped_se"];
-    double max_gc = Rcpp::as<double>(report["max_gradient_component"]);
-    Rcpp::NumericVector grad = report["gradient"];
-    double of_value = Rcpp::as<double>(report["objective_function_value"]);
-
-    fims::Vector<double> gradient(grad.size());
-    for (R_xlen_t i = 0; i < grad.size(); i++) {
-      gradient[i] = grad[i];
-    }
-    // Assume grouped_out is an Rcpp::List
-    std::map<std::string, std::vector<double>> grouped_cpp;
-    if (grouped_out.size() > 0) {
-      Rcpp::CharacterVector names = grouped_out.names();
-      for (R_xlen_t i = 0; i < grouped_out.size(); i++) {
-        std::string key = Rcpp::as<std::string>(names[i]);
-        Rcpp::NumericVector vec =
-            grouped_out[i];  // each element is a numeric vector
-        std::vector<double> vec_std(vec.size());
-        for (R_xlen_t j = 0; j < vec.size(); j++) {
-          vec_std[j] = vec[j];
-        }
-        grouped_cpp[key] = vec_std;
-      }
-    }
-    this->se_values = grouped_cpp;
+  virtual std::string to_json() {
 
     std::set<uint32_t> recruitment_ids;
     std::set<uint32_t> growth_ids;
@@ -892,7 +712,6 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
           GrowthInterfaceBase::live_objects[*module_id_it];
 
       if (growth_interface != NULL) {
-        growth_interface->set_uncertainty(this->se_values);
         growth_interface->finalize();
         ss << growth_interface->to_json();
         if (std::next(module_id_it) != growth_ids.end()) {
@@ -909,7 +728,6 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
       std::shared_ptr<RecruitmentInterfaceBase> recruitment_interface =
           RecruitmentInterfaceBase::live_objects[*module_id_it];
       if (recruitment_interface) {
-        recruitment_interface->set_uncertainty(this->se_values);
         recruitment_interface->finalize();
         ss << recruitment_interface->to_json();
         if (std::next(module_id_it) != recruitment_ids.end()) {
@@ -925,7 +743,6 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
       std::shared_ptr<MaturityInterfaceBase> maturity_interface =
           MaturityInterfaceBase::live_objects[*module_id_it];
       if (maturity_interface) {
-        maturity_interface->set_uncertainty(this->se_values);
         maturity_interface->finalize();
         ss << maturity_interface->to_json();
         if (std::next(module_id_it) != maturity_ids.end()) {
@@ -941,7 +758,6 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
       std::shared_ptr<SelectivityInterfaceBase> selectivity_interface =
           SelectivityInterfaceBase::live_objects[*module_id_it];
       if (selectivity_interface) {
-        selectivity_interface->set_uncertainty(this->se_values);
         selectivity_interface->finalize();
         ss << selectivity_interface->to_json();
         if (std::next(module_id_it) != selectivity_ids.end()) {
