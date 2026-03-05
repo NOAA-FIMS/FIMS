@@ -14,11 +14,11 @@
 // #include "rcpp_interface_base.hpp"
 // Use FIMS_DEPENDS for packaged headers when installing
 // #include "../../../common/def.hpp"
-FIMS_DEPENDS(def.hpp);
+FIMS_DEPENDS(def);
 // #include "../../../population_dynamics/fleet/fleet.hpp"
-FIMS_DEPENDS(fleet.hpp);
+FIMS_DEPENDS(fleet);
 // #include "rcpp_interface_base.hpp"
-FIMS_DEPENDS(rcpp_interface_base.hpp);
+FIMS_DEPENDS(rcpp_interface_base);
 
 /**
  * @brief Rcpp interface that serves as the parent class for Rcpp fleet

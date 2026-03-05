@@ -14,11 +14,11 @@
 // #include "rcpp_interface_base.hpp"
 // Use FIMS_DEPENDS for packaged headers when installing
 // #include "../../../distributions/distributions.hpp"
-FIMS_DEPENDS(distributions.hpp);
+FIMS_DEPENDS(distributions);
 // #include "../../interface.hpp"
-FIMS_DEPENDS(interface.hpp);
+FIMS_DEPENDS(interface);
 // #include "rcpp_interface_base.hpp"
-FIMS_DEPENDS(rcpp_interface_base.hpp);
+FIMS_DEPENDS(rcpp_interface_base);
 
 /**
  * @brief Rcpp interface that serves as the parent class for Rcpp distribution

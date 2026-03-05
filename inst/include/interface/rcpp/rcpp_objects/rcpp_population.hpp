@@ -13,9 +13,9 @@
 // #include "rcpp_interface_base.hpp"
 // Use FIMS_DEPENDS for packaged headers when installing
 // #include "../../../population_dynamics/population/population.hpp"
-FIMS_DEPENDS(population.hpp);
+FIMS_DEPENDS(population);
 // #include "rcpp_interface_base.hpp"
-FIMS_DEPENDS(rcpp_interface_base.hpp);
+FIMS_DEPENDS(rcpp_interface_base);
 
 /**
  * @brief Rcpp interface that serves as the parent class for Rcpp population
@@ -319,7 +319,7 @@ class PopulationInterface : public PopulationInterfaceBase {
       if (static_cast<size_t>(this->n_ages.get()) == this->ages.size()) {
         population->ages.resize(this->n_ages.get());
       } else {
-        warning("The ages vector is not of size n_ages.");
+        Rcpp::warning("The ages vector is not of size n_ages.");
       }
     }
 

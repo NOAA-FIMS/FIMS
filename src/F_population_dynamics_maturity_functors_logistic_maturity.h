@@ -1,3 +1,6 @@
+#ifndef FIMS_POPULATION_DYNAMICS_MATURITY_FUNCTORS_LOGISTIC_MATURITY_H
+#define FIMS_POPULATION_DYNAMICS_MATURITY_FUNCTORS_LOGISTIC_MATURITY_H
+
 /**
  * @file logistic.hpp
  * @brief Defines the LogisticMaturity class, which inherits from the
@@ -15,11 +18,11 @@
 // #include "maturity_base.hpp"
 // Use FIMS_DEPENDS for packaged headers when installing
 // #include "../../../common/fims_math.hpp"
-FIMS_DEPENDS(fims_math.hpp);
+#include "F_common_fims_math.h"
 // #include "../../../common/fims_vector.hpp"
-FIMS_DEPENDS(fims_vector.hpp);
+#include "F_common_fims_vector.h"
 // #include "maturity_base.hpp"
-FIMS_DEPENDS(maturity_base.hpp);
+#include "F_population_dynamics_maturity_functors_maturity_base.h"
 
 namespace fims_popdy {
 
@@ -84,3 +87,5 @@ interest (x); e.g. age at which 50 percent of the fish are mature */
 }  // namespace fims_popdy
 
 #endif /* POPULATION_DYNAMICS_MATURITY_LOGISTIC_HPP */
+
+#endif

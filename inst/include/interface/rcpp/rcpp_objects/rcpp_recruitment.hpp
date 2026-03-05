@@ -14,9 +14,9 @@
 // #include "rcpp_interface_base.hpp"
 // Use FIMS_DEPENDS for packaged headers when installing
 // #include "../../../population_dynamics/recruitment/recruitment.hpp"
-FIMS_DEPENDS(recruitment.hpp);
+FIMS_DEPENDS(recruitment);
 // #include "rcpp_interface_base.hpp"
-FIMS_DEPENDS(rcpp_interface_base.hpp);
+FIMS_DEPENDS(rcpp_interface_base);
 
 /**
  * @brief Rcpp interface that serves as the parent class for Rcpp recruitment
@@ -196,7 +196,7 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
     BevHolt.logit_steep.resize(1);
     BevHolt.logit_steep[0] = this->logit_steep[0].initial_value_m;
     if (this->logit_steep[0].initial_value_m == 1.0) {
-      warning(
+      Rcpp::warning(
           "Steepness is subject to a logit transformation. "
           "Fixing it at 1.0 is not currently possible.");
     }

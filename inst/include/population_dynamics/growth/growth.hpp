@@ -14,7 +14,7 @@
 
 // #include "functors/ewaa.hpp"
 // #include "functors/growth_base.hpp"
-FIMS_DEPENDS(ewaa.hpp);
-FIMS_DEPENDS(growth_base.hpp);
+FIMS_DEPENDS(ewaa);
+FIMS_DEPENDS(growth_base);
 
 #endif /* FIMS_POPULATION_DYNAMICS_GROWTH_HPP */

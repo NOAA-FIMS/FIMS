@@ -12,7 +12,7 @@
 #define POPULATION_DYNAMICS_GROWTH_BASE_HPP
 
 // #include "../../../common/model_object.hpp"
-FIMS_DEPENDS(model_object.hpp);
+FIMS_DEPENDS(model_object);
 
 namespace fims_popdy {
 

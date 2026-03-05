@@ -17,9 +17,9 @@
 // #include "functors/log_devs.hpp"
 // #include "functors/log_r.hpp"
 
-FIMS_DEPENDS(recruitment_base.hpp);
-FIMS_DEPENDS(sr_beverton_holt.hpp);
-FIMS_DEPENDS(log_devs.hpp);
-FIMS_DEPENDS(log_r.hpp);
+FIMS_DEPENDS(recruitment_base);
+FIMS_DEPENDS(sr_beverton_holt);
+FIMS_DEPENDS(log_devs);
+FIMS_DEPENDS(log_r);
 
 #endif /* FIMS_POPULATION_DYNAMICS_RECRUITMENT_HPP */

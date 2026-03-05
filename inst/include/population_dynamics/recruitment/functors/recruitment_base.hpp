@@ -17,10 +17,10 @@
 // #include "../../../common/model_object.hpp"
 // #include "../../../distributions/distributions.hpp"
 // Use FIMS_DEPENDS for packaged headers when installing
-FIMS_DEPENDS(fims_math.hpp);
-FIMS_DEPENDS(fims_vector.hpp);
-FIMS_DEPENDS(model_object.hpp);
-FIMS_DEPENDS(distributions.hpp);
+FIMS_DEPENDS(fims_math);
+FIMS_DEPENDS(fims_vector);
+FIMS_DEPENDS(model_object);
+FIMS_DEPENDS(distributions);
 
 namespace fims_popdy {
 

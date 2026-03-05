@@ -13,9 +13,9 @@
 // #include "rcpp_interface_base.hpp"
 // Use FIMS_DEPENDS for packaged headers when installing
 // #include "../../../population_dynamics/selectivity/selectivity.hpp"
-FIMS_DEPENDS(selectivity.hpp);
+FIMS_DEPENDS(selectivity);
 // #include "rcpp_interface_base.hpp"
-FIMS_DEPENDS(rcpp_interface_base.hpp);
+FIMS_DEPENDS(rcpp_interface_base);
 
 /**
  * @brief Rcpp interface that serves as the parent class for Rcpp selectivity

@@ -18,9 +18,9 @@
 // Use FIMS_DEPENDS for packaged headers when installing
 // #include "model_object.hpp"
 
-FIMS_DEPENDS(model_object.hpp);
+FIMS_DEPENDS(model_object);
 // #include "fims_vector.hpp"
-FIMS_DEPENDS(fims_vector.hpp);
+FIMS_DEPENDS(fims_vector);
 
 namespace fims_data_object {
 

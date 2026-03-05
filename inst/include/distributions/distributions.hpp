@@ -17,12 +17,12 @@
 // #include "functors/normal_lpdf.hpp"
 // Use FIMS_DEPENDS for packaged headers when installing
 // #include "functors/density_components_base.hpp"
-FIMS_DEPENDS(density_components_base.hpp);
+FIMS_DEPENDS(density_components_base);
 // #include "functors/lognormal_lpdf.hpp"
-FIMS_DEPENDS(lognormal_lpdf.hpp);
+FIMS_DEPENDS(lognormal_lpdf);
 // #include "functors/multinomial_lpmf.hpp"
-FIMS_DEPENDS(multinomial_lpmf.hpp);
+FIMS_DEPENDS(multinomial_lpmf);
 // #include "functors/normal_lpdf.hpp"
-FIMS_DEPENDS(normal_lpdf.hpp);
+FIMS_DEPENDS(normal_lpdf);
 
 #endif /* FIMS_DISTRIBUTIONS_HPP */

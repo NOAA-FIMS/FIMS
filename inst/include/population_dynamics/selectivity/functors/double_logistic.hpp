@@ -9,17 +9,18 @@
 #ifndef POPULATION_DYNAMICS_SELECTIVITY_DOUBLE_LOGISTIC_HPP
 #define POPULATION_DYNAMICS_SELECTIVITY_DOUBLE_LOGISTIC_HPP
 
+FIMS_DEPENDS(tmb_adapter);
 // #include "../../../interface/interface.hpp"
 // #include "../../../common/fims_math.hpp"
 // #include "../../../common/fims_vector.hpp"
 // #include "selectivity_base.hpp"
 // Use FIMS_DEPENDS for packaged headers when installing
 // #include "../../../common/fims_math.hpp"
-FIMS_DEPENDS(fims_math.hpp);
+FIMS_DEPENDS(fims_math);
 // #include "../../../common/fims_vector.hpp"
-FIMS_DEPENDS(fims_vector.hpp);
+FIMS_DEPENDS(fims_vector);
 // #include "selectivity_base.hpp"
-FIMS_DEPENDS(selectivity_base.hpp);
+FIMS_DEPENDS(selectivity_base);
 
 namespace fims_popdy {
 
@@ -89,11 +90,11 @@ struct DoubleLogisticSelectivity : public SelectivityBase<Type> {
   virtual void create_report_vectors(
       std::map<std::string, fims::Vector<fims::Vector<Type>>>& report_vectors) {
     report_vectors["inflection_point_asc"].emplace_back(
-        inflection_point_asc.to_tmb());
-    report_vectors["slope_asc"].emplace_back(slope_asc.to_tmb());
+        fims::adapter::to_tmb(inflection_point_asc));
+    report_vectors["slope_asc"].emplace_back(fims::adapter::to_tmb(slope_asc));
     report_vectors["inflection_point_desc"].emplace_back(
-        inflection_point_desc.to_tmb());
-    report_vectors["slope_desc"].emplace_back(slope_desc.to_tmb());
+        fims::adapter::to_tmb(inflection_point_desc));
+    report_vectors["slope_desc"].emplace_back(fims::adapter::to_tmb(slope_desc));
   }
 
   virtual void get_report_vector_count(

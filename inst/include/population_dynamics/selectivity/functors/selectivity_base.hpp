@@ -14,7 +14,7 @@
 // #include "../../../common/model_object.hpp"
 // Use FIMS_DEPENDS for packaged headers when installing
 // #include "../../../common/model_object.hpp"
-FIMS_DEPENDS(model_object.hpp);
+FIMS_DEPENDS(model_object);
 
 namespace fims_popdy {
 

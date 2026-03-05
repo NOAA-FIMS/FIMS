@@ -11,8 +11,8 @@
 
 // #include "recruitment_base.hpp"
 // #include "../../../common/fims_vector.hpp"
-FIMS_DEPENDS(recruitment_base.hpp);
-FIMS_DEPENDS(fims_vector.hpp);
+FIMS_DEPENDS(recruitment_base);
+FIMS_DEPENDS(fims_vector);
 
 namespace fims_popdy {
 

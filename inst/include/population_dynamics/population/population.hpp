@@ -14,12 +14,12 @@
 // #include "../recruitment/recruitment.hpp"
 // #include "../../interface/interface.hpp"
 // #include "../maturity/maturity.hpp"
-FIMS_DEPENDS(model_object.hpp);
-FIMS_DEPENDS(fleet.hpp);
-FIMS_DEPENDS(growth.hpp);
-FIMS_DEPENDS(recruitment.hpp);
-FIMS_DEPENDS(interface.hpp);
-FIMS_DEPENDS(maturity.hpp);
+FIMS_DEPENDS(model_object);
+FIMS_DEPENDS(fleet);
+FIMS_DEPENDS(growth);
+FIMS_DEPENDS(recruitment);
+FIMS_DEPENDS(interface);
+FIMS_DEPENDS(maturity);
 
 namespace fims_popdy {
 

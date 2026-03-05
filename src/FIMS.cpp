@@ -1,19 +1,26 @@
-#include <TMB.hpp>
-#include <Rcpp.h>
-#include <cmath>
 
-// #include "../inst/include/interface/rcpp/rcpp_interface.hpp"
-// #include "../inst/include/interface/interface.hpp"
-#include "init.hpp"
-FIMS_DEPENDS(fims_modules.hpp);
-// #include "../inst/include/common/model.hpp"
-// #include "FIMS.h"
-// FIMS_DEPENDS(init.hpp);
+
+#undef isNull
+// #include <Rcpp.h>
+// #include <cmath>
+
+// // #include "../inst/include/interface/rcpp/rcpp_interface.hpp"
+// // #include "../inst/include/interface/interface.hpp"
+// #include "init.hpp"
 // FIMS_DEPENDS(fims_modules.hpp);
-FIMS_DEPENDS(rcpp_interface.hpp);
-FIMS_DEPENDS(interface.hpp);
-//  FIMS_DEPENDS(model.hpp);
-#include "F_common_model.h"
+// // #include "../inst/include/common/model.hpp"
+// // #include "FIMS.h"
+// // FIMS_DEPENDS(init.hpp);
+// // FIMS_DEPENDS(fims_modules.hpp);
+// FIMS_DEPENDS(rcpp_interface.hpp);
+// FIMS_DEPENDS(interface.hpp);
+// //  FIMS_DEPENDS(model.hpp);
+// #include "F_common_model.h"
+#ifndef TMB_HPP
+#define TMB_HPP
+#include <TMB.hpp>
+#endif
+#include "FIMS_all.hpp"
 
 /// @cond
 /**

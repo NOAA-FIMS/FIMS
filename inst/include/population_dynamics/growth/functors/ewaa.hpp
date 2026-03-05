@@ -13,7 +13,8 @@
 #include <map>
 
 // #include "growth_base.hpp"
-FIMS_DEPENDS(growth_base.hpp);
+FIMS_DEPENDS(growth_base);
+
 namespace fims_popdy {
 
 /**

@@ -26,16 +26,16 @@
 // #include "def.hpp"
 // #include "fims_vector.hpp"
 // #include "model_object.hpp"
-FIMS_DEPENDS(distributions.hpp);
-FIMS_DEPENDS(fishery_model_base.hpp);
-FIMS_DEPENDS(fleet.hpp);
-FIMS_DEPENDS(growth.hpp);
-FIMS_DEPENDS(population.hpp);
-FIMS_DEPENDS(recruitment.hpp);
-FIMS_DEPENDS(selectivity.hpp);
-FIMS_DEPENDS(def.hpp);
-FIMS_DEPENDS(fims_vector.hpp);
-FIMS_DEPENDS(model_object.hpp);
+FIMS_DEPENDS(distributions);
+FIMS_DEPENDS(fishery_model_base);
+FIMS_DEPENDS(fleet);
+FIMS_DEPENDS(growth);
+FIMS_DEPENDS(population);
+FIMS_DEPENDS(recruitment);
+FIMS_DEPENDS(selectivity);
+FIMS_DEPENDS(def);
+FIMS_DEPENDS(fims_vector);
+FIMS_DEPENDS(model_object);
 
 namespace fims_info {
 

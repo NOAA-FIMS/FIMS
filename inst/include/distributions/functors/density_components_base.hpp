@@ -18,15 +18,15 @@
 // #include "../../common/fims_math.hpp"
 // Use FIMS_DEPENDS for packaged headers when installing
 // #include "../../common/data_object.hpp"
-FIMS_DEPENDS(data_object.hpp);
+FIMS_DEPENDS(data_object);
 // #include "../../common/model_object.hpp"
-FIMS_DEPENDS(model_object.hpp);
+FIMS_DEPENDS(model_object);
 // #include "../../interface/interface.hpp"
-FIMS_DEPENDS(interface.hpp);
+FIMS_DEPENDS(interface_tmb);
 // #include "../../common/fims_vector.hpp"
-FIMS_DEPENDS(fims_vector.hpp);
+FIMS_DEPENDS(fims_vector);
 // #include "../../common/fims_math.hpp"
-FIMS_DEPENDS(fims_math.hpp);
+FIMS_DEPENDS(fims_math);
 
 namespace fims_distributions {
 

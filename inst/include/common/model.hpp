@@ -16,7 +16,11 @@
 // Use FIMS_DEPENDS for packaged headers when installing
 // #include "information.hpp"
 
-FIMS_DEPENDS(information.hpp);
+FIMS_DEPENDS(information);
+
+#ifdef TMB_MODEL
+FIMS_DEPENDS(interface_tmb);
+#endif
 
 namespace fims_model {
 

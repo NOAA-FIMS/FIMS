@@ -13,10 +13,10 @@
 // #include "../../common/fims_math.hpp"
 // #include "../../common/fims_vector.hpp"
 // #include "../../population_dynamics/population/population.hpp"
-FIMS_DEPENDS(model_object.hpp);
-FIMS_DEPENDS(fims_math.hpp);
-FIMS_DEPENDS(fims_vector.hpp);
-FIMS_DEPENDS(population.hpp);
+FIMS_DEPENDS(model_object);
+FIMS_DEPENDS(fims_math);
+FIMS_DEPENDS(fims_vector);
+FIMS_DEPENDS(population);
 /**
  * @brief The population dynamics of FIMS.
  *

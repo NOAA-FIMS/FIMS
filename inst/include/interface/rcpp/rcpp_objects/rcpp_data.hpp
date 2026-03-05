@@ -9,9 +9,11 @@
 #ifndef FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_DATA_HPP
 #define FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_DATA_HPP
 
-#include "../../../common/information.hpp"
-#include "rcpp_interface_base.hpp"
+// #include "../../../common/information.hpp"
+// #include "rcpp_interface_base.hpp"
 
+FIMS_DEPENDS(information);
+FIMS_DEPENDS(rcpp_interface_base);
 /**
  * @brief Rcpp interface that serves as the parent class for Rcpp data
  * interfaces. This type should be inherited and not called from R directly.

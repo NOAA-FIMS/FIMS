@@ -14,11 +14,11 @@
 // #include "../../common/model_object.hpp"
 // #include "../../distributions/distributions.hpp"
 // #include "../selectivity/selectivity.hpp"
-FIMS_DEPENDS(data_object.hpp);
-FIMS_DEPENDS(fims_vector.hpp);
-FIMS_DEPENDS(model_object.hpp);
-FIMS_DEPENDS(distributions.hpp);
-FIMS_DEPENDS(selectivity.hpp);
+FIMS_DEPENDS(data_object);
+FIMS_DEPENDS(fims_vector);
+FIMS_DEPENDS(model_object);
+FIMS_DEPENDS(distributions);
+FIMS_DEPENDS(selectivity);
 
 namespace fims_popdy {
 

@@ -13,9 +13,9 @@
 // #include "../../../common/fims_math.hpp"
 // Use FIMS_DEPENDS for packaged headers when installing
 // #include "rcpp_interface_base.hpp"
-FIMS_DEPENDS(rcpp_interface_base.hpp);
+FIMS_DEPENDS(rcpp_interface_base);
 // #include "../../../common/fims_math.hpp"
-FIMS_DEPENDS(fims_math.hpp);
+FIMS_DEPENDS(fims_math);
 
 /**
  * @brief A rcpp interface to the logit function.

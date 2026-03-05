@@ -23,31 +23,31 @@
 // Use FIMS_DEPENDS for packaged headers when installing
 // #include "../../common/model.hpp"
 
-FIMS_DEPENDS(model.hpp);
+FIMS_DEPENDS(model);
 // #include "../../utilities/fims_json.hpp"
-FIMS_DEPENDS(fims_json.hpp);
+FIMS_DEPENDS(fims_json);
 // #include "rcpp_objects/rcpp_data.hpp"
-FIMS_DEPENDS(rcpp_data.hpp);
+FIMS_DEPENDS(rcpp_data);
 // #include "rcpp_objects/rcpp_distribution.hpp"
-FIMS_DEPENDS(rcpp_distribution.hpp);
+FIMS_DEPENDS(rcpp_distribution);
 // #include "rcpp_objects/rcpp_fleet.hpp"
-FIMS_DEPENDS(rcpp_fleet.hpp);
+FIMS_DEPENDS(rcpp_fleet);
 // #include "rcpp_objects/rcpp_growth.hpp"
-FIMS_DEPENDS(rcpp_growth.hpp);
+FIMS_DEPENDS(rcpp_growth);
 // #include "rcpp_objects/rcpp_interface_base.hpp"
-FIMS_DEPENDS(rcpp_interface_base.hpp);
+FIMS_DEPENDS(rcpp_interface_base);
 // #include "rcpp_objects/rcpp_maturity.hpp"
-FIMS_DEPENDS(rcpp_maturity.hpp);
+FIMS_DEPENDS(rcpp_maturity);
 // #include "rcpp_objects/rcpp_models.hpp"
-FIMS_DEPENDS(rcpp_models.hpp);
+FIMS_DEPENDS(rcpp_models);
 // #include "rcpp_objects/rcpp_natural_mortality.hpp"
-FIMS_DEPENDS(rcpp_natural_mortality.hpp);
+FIMS_DEPENDS(rcpp_natural_mortality);
 // #include "rcpp_objects/rcpp_population.hpp"
-FIMS_DEPENDS(rcpp_population.hpp);
+FIMS_DEPENDS(rcpp_population);
 // #include "rcpp_objects/rcpp_recruitment.hpp"
-FIMS_DEPENDS(rcpp_recruitment.hpp);
+FIMS_DEPENDS(rcpp_recruitment);
 // #include "rcpp_objects/rcpp_selectivity.hpp"
-FIMS_DEPENDS(rcpp_selectivity.hpp);
+FIMS_DEPENDS(rcpp_selectivity);
 
 /**
  * Initializes the logging system, setting all signal handling.

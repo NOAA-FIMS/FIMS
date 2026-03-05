@@ -9,7 +9,7 @@
 #ifndef FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_INTERFACE_BASE_HPP
 #define FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_INTERFACE_BASE_HPP
 
-#include <RcppCommon.h>
+// #include <RcppCommon.h>
 #include <map>
 #include <vector>
 
@@ -19,13 +19,13 @@
 // #include "rcpp_shared_primitive.hpp"
 // Use FIMS_DEPENDS for packaged headers when installing
 // #include "../../../common/def.hpp"
-FIMS_DEPENDS(def.hpp);
+FIMS_DEPENDS(def);
 // #include "../../../common/information.hpp"
-FIMS_DEPENDS(information.hpp);
+FIMS_DEPENDS(information);
 // #include "../../interface.hpp"
-FIMS_DEPENDS(interface.hpp);
+FIMS_DEPENDS(interface);
 // #include "rcpp_shared_primitive.hpp"
-FIMS_DEPENDS(rcpp_shared_primitive.hpp);
+FIMS_DEPENDS(rcpp_shared_primitive);
 #include <limits>
 
 #define RCPP_NO_SUGAR
@@ -283,7 +283,7 @@ class ParameterVector {
    * for calling accessing from R.
    * @param pos The position of the ParameterVector that you want returned.
    */
-  SEXP at(R_xlen_t pos) {
+  Parameter at(R_xlen_t pos) {
     if (static_cast<size_t>(pos) == 0 ||
         static_cast<size_t>(pos) > this->storage_m->size()) {
       throw std::invalid_argument("ParameterVector: Index out of range");
@@ -291,7 +291,7 @@ class ParameterVector {
                      fims::to_string(this->size()));
       return NULL;
     }
-    return Rcpp::wrap(this->storage_m->at(pos - 1));
+    return this->storage_m->at(pos - 1);//Rcpp::wrap(this->storage_m->at(pos - 1));
   }
 
   /**

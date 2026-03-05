@@ -11,5 +11,5 @@
 #define FIMS_MODELS_FISHERIES_MODELS_HPP
 
 // #include "functors/catch_at_age.hpp"
-FIMS_DEPENDS(catch_at_age.hpp);
+FIMS_DEPENDS(catch_at_age);
 #endif

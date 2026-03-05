@@ -17,10 +17,10 @@
 // #include "functors/selectivity_base.hpp"
 // Use FIMS_DEPENDS for packaged headers when installing
 // #include "functors/double_logistic.hpp"
-FIMS_DEPENDS(double_logistic.hpp);
+FIMS_DEPENDS(double_logistic);
 // #include "functors/logistic.hpp"
-FIMS_DEPENDS(logistic.hpp);
+FIMS_DEPENDS(logistic);
 // #include "functors/selectivity_base.hpp"
-FIMS_DEPENDS(selectivity_base.hpp);
+FIMS_DEPENDS(selectivity_base);
 
 #endif /* FIMS_POPULATION_DYNAMICS_SELECTIVITY_HPP */

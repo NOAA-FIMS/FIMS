@@ -17,26 +17,26 @@
 
 // Use FIMS_DEPENDS for packaged headers when installing
 // #include "../../../common/def.hpp"
-FIMS_DEPENDS(def.hpp);
+FIMS_DEPENDS(def);
 // #include "../../../models/fisheries_models.hpp"
-FIMS_DEPENDS(fisheries_models.hpp);
+FIMS_DEPENDS(fisheries_models);
 // #include "../../../utilities/fims_json.hpp"
-FIMS_DEPENDS(fims_json.hpp);
+FIMS_DEPENDS(fims_json);
 // #include "rcpp_population.hpp"
-FIMS_DEPENDS(rcpp_population.hpp);
+FIMS_DEPENDS(rcpp_population);
 
 // #include "rcpp_interface_base.hpp"
-FIMS_DEPENDS(rcpp_interface_base.hpp);
+FIMS_DEPENDS(rcpp_interface_base);
 // #include "rcpp_population.hpp"
-FIMS_DEPENDS(rcpp_population.hpp);
+FIMS_DEPENDS(rcpp_population);
 // #include "rcpp_fleet.hpp"
-FIMS_DEPENDS(rcpp_fleet.hpp);
+FIMS_DEPENDS(rcpp_fleet);
 // #include "rcpp_maturity.hpp"
-FIMS_DEPENDS(rcpp_maturity.hpp);
+FIMS_DEPENDS(rcpp_maturity);
 // #include "rcpp_recruitment.hpp"
-FIMS_DEPENDS(rcpp_recruitment.hpp);
+FIMS_DEPENDS(rcpp_recruitment);
 // #include "rcpp_selectivity.hpp"
-FIMS_DEPENDS(rcpp_selectivity.hpp);
+FIMS_DEPENDS(rcpp_selectivity);
 #include <valarray>
 #include <cmath>
 #include <mutex>
