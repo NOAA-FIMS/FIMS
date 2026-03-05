@@ -158,7 +158,7 @@ bool CreateTMBModel() {
   \code{.R}
   set_fixed_parameters(c(1, 2, 3))
   set_random_parameters(c(1, 2, 3))
-  catch_at_age$get_output(do_sd_report = FALSE)
+  catch_at_age$get_output()
   \endcode
   [details_set_x_parameters]
 */
