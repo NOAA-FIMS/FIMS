@@ -32,7 +32,7 @@ body {
 }
 
 /* Headings: Outfit + primary teal, lighter weight (pkgdown style) */
-h1, h2, h3, h4, h5, h6 {
+h1, h2, h3, h4, h5, h6, div {
   font-family: Outfit, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
     Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif !important;
   color: var(--primary-color);
@@ -49,15 +49,21 @@ h4 { font-size: 1.5rem; }
 h5 { font-size: 1.25rem; line-height: 1.4; }
 h6 { font-size: 1rem; }
 
-a:link { color: var(--primary-color); }
-a:visited { color: var(--primary-color); }
-a:hover { color: #0b535e; }
+
+.navbar a:active {
+  color: #0e6876 !important;
+}
+
+.navbar a:hover { 
+  color: #0b535ecc !important;
+  font-weight: 400 !important; 
+}
 
 #projectname {
-    margin-left: 15px !important;
+    margin-left: 10px !important;
     color: #51595d;
     font-family: Outfit, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-    font-size: 1.35rem !important;
+    font-size: 1.325rem !important;
     font-weight: 400;
     letter-spacing: 1px;
 }
@@ -96,6 +102,10 @@ a:hover { color: #0b535e; }
     background: none !important;
 }
 
+a:link, a:visited, a:hover, a:focus, a:active {
+    font-weight: 400 !important;
+}
+
 .navbar-nav .nav-item .nav-link, .nav-item .nav-link:visited {
     color: #51595d !important;
     text-transform: lowercase !important;
@@ -123,6 +133,10 @@ a:hover { color: #0b535e; }
 
 .navbar-nav .nav-item .nav-link .bi-github {
     color: var(--bs-navbar-color) !important;
+}
+
+.fa-lg {
+    vertical-align: 0em !important;
 }
 
 .navbar .nav-link .menu-text {
@@ -172,16 +186,26 @@ html {
     padding: 0.25rem 0.5rem;
     margin-bottom: 2px;
     border-radius: .375rem;
-    font-size: 18px;
+    font-size: 22px;
 }
 
-/* #nav-tree .label a {
-    font-weight: 600;
-} */
-
-#nav-tree .selected a {
+/* #nav-tree .selected a {
     background-color: #0e6876 !important;
     color: #FFFFFF !important;
+} */
+
+#nav-tree .selected {
+    background-color: #0e6876 !important;
+    position: relative;
+    color: #FFFFFF !important;
+    font-weight: 600;
+    padding: 0.25rem 0.5rem;
+    margin-bottom: 2px;
+    border-radius: .375rem;
+}
+
+#nav-tree a:hover {
+  background-color: #0e6876cc !important;
 }
 
 div.toc li, div.toc h3 {
