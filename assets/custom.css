@@ -110,6 +110,7 @@ a:link, a:visited, a:hover, a:focus, a:active {
     color: #51595d !important;
     text-transform: lowercase !important;
     font-size: 1.1rem !important;
+}
 
 .navbar .dropdown-header {
     text-transform: lowercase !important;
@@ -189,11 +190,6 @@ html {
     font-size: 22px !important;
 }
 
-/* #nav-tree .selected a {
-    background-color: #0e6876 !important;
-    color: #FFFFFF !important;
-} */
-
 #nav-tree .selected a {
     background-color: #0e6876 !important;
     position: relative !important;
@@ -263,7 +259,7 @@ div.contents .toc {
 }
 
 a.anchor {
-  scroll-margin-top: 120px; /* increase if header is tall */
+  scroll-margin-top: 120px;
 }
 
 /* Dark mode override */
@@ -296,9 +292,6 @@ a.anchor {
     --bs-navbar-color: #a0a4a6;
   }
 
-  /* html:not(.light-mode) .navbar .nav-link .menu-text {
-    color: var(--bs-navbar-color) !important;
-  } */
 
    html:not(.light-mode) #projectname {
     color: #a0a4a6; 
