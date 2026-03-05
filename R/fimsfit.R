@@ -4,7 +4,6 @@ utils::globalVariables(c(
   "parameter_id", "module_name", "module_id", "label",
   "estimate", "estimate.x", "estimate.y",
   "initial", "initial.x", "initial.y",
-  "uncertainty.x", "uncertainty.y",
   "derived_quantity_id",
   "distribution", "module_type", "n", "type_id", "values",
   "module_name.x", "module_name.y",
@@ -255,22 +254,13 @@ methods::setMethod(
     # Join the two outputs on parameter_id to compare and consolidate information.
     estimates <- dplyr::left_join(
       # There are more rows in json_estimates than tmb_estimates
-      x = json_output |>
-      # TODO: Remove uncertainty of -999 from json
-        dplyr::select(-uncertainty),
+      x = json_output,
       y = tmb_output |>
         dplyr::select(unique_id, uncertainty, log_like_cv, gradient),
       by = c("unique_id")
     ) |>
       dplyr::select(-unique_id) |>
-      dplyr::relocate(uncertainty, .after = estimation_type) |>
-      dplyr::mutate(
-        uncertainty = dplyr::if_else(
-          condition = estimation_type == "constant",
-          true = 0,
-          false = uncertainty
-        )
-      )
+      dplyr::relocate(uncertainty, .after = estimation_type)
   }
 )
 

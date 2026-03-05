@@ -168,7 +168,6 @@ reshape_json_estimates <- function(model_output) {
       estimated = "estimated_value",
       "expected" = expected_values,
       "observed" = observed_values,
-      uncertainty,
       estimation_type,
       distribution,
       input_type, lpdf = "lpdf_value", likelihood,
@@ -313,13 +312,11 @@ dimension_folded_to_tibble <- function(section) {
       dplyr::bind_cols(
         tibble::tibble(data = section[["values"]]) |>
           tidyr::unnest_wider(data)
-      ) |>
-      dplyr::select(-min, -max)
+      )
   } else {
     temp |>
       dplyr::bind_cols(
         estimated_value = unlist(section[["value"]]),
-        uncertainty = unlist(section[["uncertainty"]]),
         estimation_type = "derived_quantity"
       )
   }

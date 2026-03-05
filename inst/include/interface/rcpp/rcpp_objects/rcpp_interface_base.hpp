@@ -46,22 +46,6 @@ class Parameter {
    * @brief The final value of the parameter.
    */
   double final_value_m = 0.0;
-
-  /**
-   * @brief The standard error of the parameter estimate, where the default is
-   * -999.0.
-   */
-  double uncertainty_m = -999.0;
-  /**
-   * @brief The minimum possible parameter value, where the default is negative
-   * infinity.
-   */
-  double min_m = -std::numeric_limits<double>::infinity();
-  /**
-   * @brief The maximum possible parameter value, where the default is positive
-   * infinity.
-   */
-  double max_m = std::numeric_limits<double>::infinity();
   /**
    * @brief A string indicating the estimation type. Options are: constant,
    * fixed_effects, or random_effects, where the default is constant.
@@ -71,11 +55,9 @@ class Parameter {
   /**
    * @brief The constructor for initializing a parameter.
    */
-  Parameter(double value, double min, double max, std::string estimation_type)
+  Parameter(double value, std::string estimation_type)
       : id_m(Parameter::id_g++),
         initial_value_m(value),
-        min_m(min),
-        max_m(max),
         estimation_type_m(estimation_type) {}
 
   /**
@@ -85,8 +67,6 @@ class Parameter {
       : id_m(other.id_m),
         initial_value_m(other.initial_value_m),
         final_value_m(other.final_value_m),
-        min_m(other.min_m),
-        max_m(other.max_m),
         estimation_type_m(other.estimation_type_m) {}
 
   /**
@@ -99,8 +79,6 @@ class Parameter {
     this->id_m = right.id_m;
     this->initial_value_m = right.initial_value_m;
     this->estimation_type_m = right.estimation_type_m;
-    this->min_m = right.min_m;
-    this->max_m = right.max_m;
     return *this;
   }
 
@@ -149,21 +127,7 @@ inline double sanitize_val(double x) {
 std::ostream& operator<<(std::ostream& out, const Parameter& p) {
   out << "{\"id\": " << p.id_m
       << ",\n\"value\": " << sanitize_val(p.initial_value_m)
-      << ",\n\"estimated_value\": " << sanitize_val(p.final_value_m)
-      << ",\n\"uncertainty\": " << sanitize_val(p.uncertainty_m)
-      << ",\n\"min\": ";
-  if (p.min_m == -std::numeric_limits<double>::infinity()) {
-    out << "\"-Infinity\"";
-  } else {
-    out << p.min_m;
-  }
-  out << ",\n\"max\": ";
-  if (p.max_m == std::numeric_limits<double>::infinity()) {
-    out << "\"Infinity\"";
-  } else {
-    out << p.max_m;
-  }
-
+      << ",\n\"estimated_value\": " << sanitize_val(p.final_value_m);
   out << ",\n\"estimation_type\": \"" << p.estimation_type_m << "\"\n}";
 
   return out;
@@ -366,30 +330,6 @@ class ParameterVector {
   void fill(double value) {
     for (size_t i = 0; i < this->storage_m->size(); i++) {
       storage_m->at(i).initial_value_m = value;
-    }
-  }
-
-  /**
-   * @brief Assigns the given values to the minimum value of all elements in
-   * the vector.
-   *
-   * @param value The value to be assigned.
-   */
-  void fill_min(double value) {
-    for (size_t i = 0; i < this->storage_m->size(); i++) {
-      storage_m->at(i).min_m = value;
-    }
-  }
-
-  /**
-   * @brief Assigns the given values to the maximum value of all elements in
-   * the vector.
-   *
-   * @param value The value to be assigned.
-   */
-  void fill_max(double value) {
-    for (size_t i = 0; i < this->storage_m->size(); i++) {
-      storage_m->at(i).max_m = value;
     }
   }
 
