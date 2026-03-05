@@ -80,9 +80,9 @@ h6 { font-size: 1rem; }
 .navbar .nav-link {
   color: #51595d !important;
   text-decoration: none !important;
-  font-size: 1.25rem !important;
-  padding-left: 0.7rem !important;
-  padding-right: 0.7rem !important;
+  font-size: 1.15rem !important;
+  padding-left: 0.6rem !important;
+  padding-right: 0.6rem !important;
   letter-spacing: 1px !important;
   text-underline-offset: 0px !important;
   transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out;
@@ -91,23 +91,25 @@ h6 { font-size: 1rem; }
 .navbar-nav .nav-item .nav-link, .nav-item .nav-link:visited {
     color: #51595d !important;
     text-transform: lowercase !important;
-    font-size: 1.1rem !important;
+    font-size: 1rem !important;
+    font-weight: 375 !important;
 }
 
 .nav-item .nav-link:visited { 
-  font-weight: 400 !important; 
+  font-weight: 375 !important; 
 }
 
 .nav-item .nav-link:hover { 
   color: #0b535ecc !important;
-  font-weight: 400 !important; 
+  font-weight: 375 !important; 
 }
 
 .navbar .dropdown-header {
     color: #0b535e !important;
     text-transform: lowercase !important;
-    font-size: 1.1rem;
+    font-size: 1rem;
     padding: 0 .5rem;
+    font-weight: 375 !important;
 }
 
 /* Dropdown menu coloring like pkgdown */
@@ -124,8 +126,8 @@ h6 { font-size: 1rem; }
 }
 
 .navbar-nav .dropdown-menu {
-    min-width: 180px;
-    font-size: 1rem;
+    min-width: 170px;
+    font-size: 0.9rem;
 }
 
 .navbar .dropdown-menu .dropdown-item:hover { color: #ffffff !important; }
