@@ -136,7 +136,7 @@ a:link, a:visited, a:hover, a:focus, a:active {
 }
 
 .fa-lg {
-    vertical-align: 0em !important;
+    vertical-align: 1em !important;
 }
 
 .navbar .nav-link .menu-text {
