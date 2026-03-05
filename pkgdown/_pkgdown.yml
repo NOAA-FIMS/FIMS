@@ -88,7 +88,12 @@ news:
 navbar:
   structure:
     left:
-      - reference
+      - text: "reference"
+        menu:
+          - text: "r functions"
+            href: reference/index.html
+          - text: "c++/doxygen"
+            href: https://e-perl-noaa.github.io/FIMS/doxygen/index.html
       - articles
       - news
       - reports
@@ -97,20 +102,6 @@ navbar:
       - github
       - search
   components:
-    reference:
-      menu:
-        - text: r functions
-          href: reference/index.html
-        - text: c++/doxygen
-          href: https://e-perl-noaa.github.io/FIMS/doxygen/index.html
-    reports:
-      menu:
-        - text: coverage
-          href: https://noaa-fims.github.io/FIMS/coverage/coverage.html
-        - text: coverage explained
-          href: https://noaa-fims.github.io/FIMS/coverage/codecoverage_explanation.html
-        - text: testdown
-          href: https://noaa-fims.github.io/FIMS/testdown/testdown-report-for-fims.html
     website:
       text: fims website
       href: https://noaa-fims.github.io/

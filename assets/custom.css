@@ -32,7 +32,7 @@ body {
 }
 
 /* Headings: Outfit + primary teal, lighter weight (pkgdown style) */
-h1, h2, h3, h4, h5, h6, div {
+h1, h2, h3, h4, h5, h6, div.header .title {
   font-family: Outfit, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
     Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif !important;
   color: var(--primary-color);
@@ -50,11 +50,11 @@ h5 { font-size: 1.25rem; line-height: 1.4; }
 h6 { font-size: 1rem; }
 
 
-.navbar a:active {
+.navbar nav-link:active {
   color: #0e6876 !important;
 }
 
-.navbar a:hover { 
+.navbar .nav-link:hover { 
   color: #0b535ecc !important;
   font-weight: 400 !important; 
 }
@@ -182,11 +182,11 @@ html {
 
 #nav-tree .label {
     font-family: Outfit, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif !important;
-    font-weight: 600;
+    font-weight: 400;
     padding: 0.25rem 0.5rem;
     margin-bottom: 2px;
     border-radius: .375rem;
-    font-size: 22px;
+    font-size: 22px !important;
 }
 
 /* #nav-tree .selected a {
@@ -194,14 +194,14 @@ html {
     color: #FFFFFF !important;
 } */
 
-#nav-tree .selected {
+#nav-tree .selected a {
     background-color: #0e6876 !important;
-    position: relative;
+    position: relative !important;
     color: #FFFFFF !important;
-    font-weight: 600;
-    padding: 0.25rem 0.5rem;
-    margin-bottom: 2px;
-    border-radius: .375rem;
+    font-weight: 400 !important;
+    padding: 0.25rem 0.5rem !important;
+    margin-bottom: 2px !important;
+    border-radius: .375rem !important;
 }
 
 #nav-tree a:hover {
@@ -225,7 +225,7 @@ div.toc li a {
     text-decoration: none; /* Ensure no underline */
     /* Default link color */
     color: var(--primary-color) !important;
-    font-weight: 600;
+    font-weight: 400;
 }
 
 /* Hover/Focus style for ALL links */
@@ -241,7 +241,7 @@ div.toc li a:focus {
 div.toc li a.aboveActive {
   background-color: transparent !important;
   color: var(--primary-color) !important; /* or inherit if you want */
-  font-weight: 600 !important;
+  font-weight: 400 !important;
   text-decoration: none !important;
   box-shadow: none !important;
   opacity: 1 !important;
