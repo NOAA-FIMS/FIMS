@@ -135,8 +135,6 @@ RCPP_MODULE(fims) {
       .constructor<Parameter>()
       .field("value", &Parameter::initial_value_m)
       .field("value", &Parameter::final_value_m)
-      .field("min", &Parameter::min_m)
-      .field("max", &Parameter::max_m)
       .field("id", &Parameter::id_m)
       .field("estimation_type", &Parameter::estimation_type_m);
 

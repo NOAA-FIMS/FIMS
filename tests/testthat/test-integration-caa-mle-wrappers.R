@@ -183,7 +183,7 @@ test_that("catch-at-age model (estimation MLE with wrappers) works with mixed es
   )
   #' @description Test that there are 20 years of estimates with standard errors because they are estimated as fixed effects.
   expect_equal(
-    sum(mixed_output[["uncertainty"]] == 0),
+    sum(is.na(mixed_output[["uncertainty"]])),
     10
   )
 

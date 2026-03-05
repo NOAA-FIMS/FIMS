@@ -444,23 +444,13 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
       }
       if (dq[dq.size() - 1] != dq[dq.size() - 1])  // check for NaN
       {
-        ss << "-999]" << ",\n";
+        ss << "-999]" << "\n";
       } else {
-        ss << dq[dq.size() - 1] << "],\n";
+        ss << dq[dq.size() - 1] << "]\n";
       }
     } else {
-      ss << "],\n";
+      ss << "]\n";
     }
-    // Default uncertainty for derived quantities
-    ss << "\"uncertainty\": [";
-    for (size_t i = 0; i < dq.size(); ++i) {
-      ss << "-999.0";  // Placeholder for uncertainty values
-      if (i < dq.size() - 1) {
-        ss << ", ";
-      }
-    }
-    ss << "]\n";
-    // end Default uncertainty for derived quantities
     ss << "}";
 
     return ss.str();
