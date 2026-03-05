@@ -20,28 +20,6 @@ template:
       <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
       <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap" rel="stylesheet">
 
-
-articles:
-- title: FIMS
-  contents:
-  - fims-demo
-  - fims-logging
-  - fims-user-setup-guide
-  - fims-demo-projections
-
-- title: Developer
-  contents:
-  - fims-path-maturity
-
-- title: C++ Training
-  contents:
-  - training-intro-cpp
-  - training-intro-rcpp
-
-- title: Research and development
-  contents:
-  - RD-re-sparsity
-
 reference:
 - title: Data
   desc: >
@@ -100,10 +78,36 @@ navbar:
     reference:
       text: reference
       menu:
-          - text: r functions
-            href: reference/index.html
-          - text: c++/doxygen
-            href: https://e-perl-noaa.github.io/FIMS/doxygen/index.html
+        - text: r functions
+          href: reference/index.html
+        - text: c++/doxygen
+          href: https://e-perl-noaa.github.io/FIMS/doxygen/index.html
+    articles:
+      text: articles
+      menu:
+        - text: Intro to FIMS
+        - text: Introducing the Fisheries Integrated Modeling System (FIMS)
+          href: vignettes/fims-demo.html
+        - text: Introducing the FIMS Logging System
+          href: vignettes/fims-logging.html
+        - text: FIMS User Setup Guide
+          href: vignettes/fims-user-setup-guide.html
+        - text: Simple projections using FIMS
+          href: vignettes/fims-demo-projections.html
+        - text: -------
+        - text: Developer
+        - text: FIMS Path: Maturity
+          href: vignettes/fims-path-maturity.html
+        - text: -------
+        - text: C++ Training
+        - text: Intro to C++
+          href: vignettes/training-intro-cpp.html
+        - text: Intro to Rcpp
+          href: vignettes/training-intro-rcpp.html
+        - text: -------
+        - text: Research and Development
+        - text: RE Sparsity
+          href: vignettes/RD-re-sparsity.html
     website:
       text: fims website
       href: https://noaa-fims.github.io/
@@ -111,4 +115,3 @@ navbar:
       icon: fa-brands fa-github fa-lg
       href: https://github.com/noaa-fims/fims/
       aria-label: GitHub repository for FIMS
-
