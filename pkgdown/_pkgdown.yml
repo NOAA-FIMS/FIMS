@@ -108,6 +108,15 @@ navbar:
         - text: Research and Development
         - text: RE Sparsity
           href: vignettes/RD-re-sparsity.html
+    reports:
+      text: reports
+      menu: 
+        - text: coverage
+          href: https://noaa-fims.github.io/FIMS/coverage/coverage.html
+        - text: coverage explained
+          href: https://noaa-fims.github.io/FIMS/coverage/codecoverage_explanation.html
+        - text: testdown
+          href: https://noaa-fims.github.io/FIMS/testdown/index.html
     website:
       text: fims website
       href: https://noaa-fims.github.io/
