@@ -80,9 +80,9 @@ h6 { font-size: 1rem; }
 .navbar .nav-link {
   color: #51595d !important;
   text-decoration: none !important;
-  font-size: 1.3rem !important;
-  padding-left: 0.8rem !important;
-  padding-right: 0.8rem !important;
+  font-size: 1.25rem !important;
+  padding-left: 0.7rem !important;
+  padding-right: 0.7rem !important;
   letter-spacing: 1px !important;
   text-underline-offset: 0px !important;
   transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out;
@@ -92,6 +92,10 @@ h6 { font-size: 1rem; }
     color: #51595d !important;
     text-transform: lowercase !important;
     font-size: 1.1rem !important;
+}
+
+.nav-item .nav-link:visited { 
+  font-weight: 400 !important; 
 }
 
 .nav-item .nav-link:hover { 
@@ -117,8 +121,13 @@ h6 { font-size: 1rem; }
   text-decoration: none; 
   color: var(--bs-dropdown-link-color) !important;
   font-size: 1 !important;
-  min-width: 180px !important;
 }
+
+.navbar-nav .dropdown-menu {
+    min-width: 180px;
+    font-size: 1rem;
+}
+
 .navbar .dropdown-menu .dropdown-item:hover { color: #ffffff !important; }
 
 .dropdown-toggle::after {
@@ -130,7 +139,7 @@ h6 { font-size: 1rem; }
 }
 
 .fa-lg {
-    vertical-align: 1em !important;
+    vertical-align: middle !important;
 }
 
 .navbar .nav-link .menu-text {
