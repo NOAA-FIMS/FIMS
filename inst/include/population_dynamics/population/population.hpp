@@ -74,24 +74,6 @@ annual fishing mortality multipliers to scale total mortality of all fleets*/
    */
   Population() { this->id = Population::id_g++; }
 
-  /**
-   * @brief Create a map of report vectors for the object.
-   */
-  virtual void create_report_vectors(
-      std::map<std::string, fims::Vector<fims::Vector<Type>>>& report_vectors) {
-    report_vectors["log_f_multiplier"].emplace_back(this->log_f_multiplier);
-    report_vectors["spawning_biomass_ratio"].emplace_back(
-        this->spawning_biomass_ratio);
-  }
-
-  /**
-   * @brief Get the report vector count object.
-   */
-  virtual void get_report_vector_count(
-      std::map<std::string, size_t>& report_vector_count) {
-    report_vector_count["log_f_multiplier"] += 1;
-    report_vector_count["spawning_biomass_ratio"] += 1;
-  }
 };
 template <class Type>
 uint32_t Population<Type>::id_g = 0;
