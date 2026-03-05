@@ -98,8 +98,8 @@ navbar:
       - search
   components:
     reference:
-      - text: reference
-        menu:
+      text: reference
+      menu:
           - text: r functions
             href: reference/index.html
           - text: c++/doxygen
