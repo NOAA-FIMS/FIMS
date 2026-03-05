@@ -193,8 +193,6 @@ GetDouble
 GetFixedEffectsParameters
 GetFleetDerivedQuantities
 GetFleetDimensionInfo
-GetFleetUncertaintyReportInfo
-GetFleetUncertaintyReportInfoMap
 GetId
 GetInstance
 GetInt
@@ -210,8 +208,6 @@ GetParameters
 GetPopulationDerivedQuantities
 GetPopulationDimensionInfo
 GetPopulationIds
-GetPopulationUncertaintyReportInfo
-GetPopulationUncertaintyReportInfoMap
 GetPopulations
 GetRandomEffectsParameters
 GetReport
@@ -468,8 +464,6 @@ Tsuda
 ULPs
 UNLEN
 UNPROTECT
-UncertaintyReportInfo
-UncertaintyReportInfoMap
 Unfished
 Unnesting
 UseDoubleValues
