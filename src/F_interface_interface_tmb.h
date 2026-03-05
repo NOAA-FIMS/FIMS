@@ -21,7 +21,7 @@
 // traits for interfacing with TMB
 #pragma once
 #ifdef TMB_MODEL
-#include <TMB.hpp>
+// #include <TMB.hpp>
 // use isnan macro in math.h instead of TMB's isnan for fixing the r-cmd-check
 // issue
 #include <math.h>

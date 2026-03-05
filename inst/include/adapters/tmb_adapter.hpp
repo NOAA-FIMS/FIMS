@@ -3,8 +3,8 @@
 
 #pragma once
 
-#include <TMB.hpp>
-#include "F_common_fims_vector.h"
+// #include <TMB.hpp>
+FIMS_DEPENDS(fims_vector);
 
 namespace fims {
 namespace adapter {
