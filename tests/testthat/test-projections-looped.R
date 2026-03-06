@@ -109,6 +109,11 @@ run_FIMS_projection_scenario <- function(om_input,
   fishing_fleet$n_ages$set(om_input[["nages"]])
   # Set number of length bins
   fishing_fleet$n_lengths$set(om_input[["nlengths"]])
+  fishing_fleet$lengths$resize(om_input[["nlengths"]])
+  purrr::walk(
+    seq_along(em_input[["lengths"]]),
+    \(x) fishing_fleet$lengths$set(x - 1, em_input[["lengths"]][x])
+  )
 
   fishing_fleet$log_Fmort$resize(om_input[["nyr"]] + n_projection_years)
   for (y in 1:om_input$nyr) {
@@ -229,6 +234,11 @@ run_FIMS_projection_scenario <- function(om_input,
   survey_fleet$n_ages$set(om_input[["nages"]])
   survey_fleet$n_years$set(om_input[["nyr"]] + n_projection_years)
   survey_fleet$n_lengths$set(om_input[["nlengths"]])
+  survey_fleet$lengths$resize(om_input[["nlengths"]])
+  purrr::walk(
+    seq_along(em_input[["lengths"]]),
+    \(x) survey_fleet$lengths$set(x - 1, em_input[["lengths"]][x])
+  )
   survey_fleet$log_Fmort$resize(om_input[["nyr"]] + n_projection_years)
   for (y in 1:(om_input$nyr + n_projection_years)) {
     # Set very low survey fishing mortality

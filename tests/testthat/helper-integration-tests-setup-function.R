@@ -139,6 +139,11 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   fishing_fleet$n_ages$set(om_input[["nages"]])
   # Set number of length bins
   fishing_fleet$n_lengths$set(om_input[["nlengths"]])
+  fishing_fleet$lengths$resize(om_input[["nlengths"]])
+  purrr::walk(
+    seq_along(em_input[["lengths"]]),
+    \(x) fishing_fleet$lengths$set(x - 1, em_input[["lengths"]][x])
+  )
 
   fishing_fleet$log_Fmort$resize(om_input[["nyr"]])
   for (y in 1:om_input$nyr) {
@@ -232,6 +237,11 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   survey_fleet$n_ages$set(om_input[["nages"]])
   survey_fleet$n_years$set(om_input[["nyr"]])
   survey_fleet$n_lengths$set(om_input[["nlengths"]])
+  survey_fleet$lengths$resize(om_input[["nlengths"]])
+  purrr::walk(
+    seq_along(em_input[["lengths"]]),
+    \(x) survey_fleet$lengths$set(x - 1, em_input[["lengths"]][x])
+  )
   survey_fleet$log_Fmort$resize(om_input[["nyr"]])
   for (y in 1:om_input$nyr) {
     # Set very low survey fishing mortality

@@ -36,7 +36,7 @@ test_that("`get_input()` works with correct inputs", {
     #' @description Test that `get_input()` returns correct names for the `input` slot.
     expect_equal(
       object = names(input),
-      expected = c("parameters", "model")
+      expected = c("parameters", "model", "metadata")
     )
   }
 

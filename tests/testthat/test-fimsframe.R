@@ -91,6 +91,30 @@ test_that("`fims_frame()` works with the correct inputs", {
   expect_no_error(FIMS::FIMSFrame(data1))
 })
 
+test_that("`FIMSFrame()` treats length-bin rows as fleet metadata only", {
+  baseline_lengths <- FIMS::get_lengths(FIMS::FIMSFrame(data1))
+  custom_data <- dplyr::bind_rows(
+    data1,
+    tibble::tibble(
+      type = "length-bin",
+      name = "survey1",
+      age = NA_real_,
+      length = c(-25, 1125),
+      timing = min(data1$timing[data1$name == "survey1"], na.rm = TRUE),
+      value = NA_real_,
+      unit = unique(data1$unit[data1$name == "survey1"])[1],
+      uncertainty = NA_real_
+    )
+  )
+
+  #' @description Test that 'FIMSFrame()' accepts `length-bin` rows as supported input.
+  expect_no_warning(frame <- FIMS::FIMSFrame(custom_data))
+
+  #' @description Test that `length-bin` metadata does not alter the global `lengths` vector.
+  expect_equal(FIMS::get_lengths(frame), baseline_lengths)
+  expect_false(any(c(-25, 1125) %in% FIMS::get_lengths(frame)))
+})
+
 ## Edge handling ----
 # No edge cases to test.
 

@@ -16,15 +16,36 @@ default_parameters <- create_default_configurations(data = data) |>
   create_default_parameters(data = data) |>
   tidyr::unnest(cols = data)
 
+make_no_local_alk_fleet_context <- function() {
+  no_local_alk_data <- data |>
+    get_data() |>
+    dplyr::filter(
+      !(
+        name == "fleet1" &
+          type %in% c("age-to-length-conversion", "length-bin")
+      )
+    )
+
+  frame <- FIMS::FIMSFrame(no_local_alk_data)
+  parameters <- create_default_configurations(data = frame) |>
+    create_default_parameters(data = frame) |>
+    tidyr::unnest(cols = data)
+
+  list(
+    data = frame,
+    parameters = parameters
+  )
+}
+
 ## IO correctness ----
 test_that("`initialize_fims()` works with correct inputs", {
   result <- initialize_fims(parameters = default_parameters, data = data)
   #' @description Test that `initialize_fims()` returns a list.
   expect_type(result, "list")
   #' @description Test that `initialize_fims()` returns an output with correct names.
-  expect_named(result, c("parameters", "model"))
-  #' @description Test that `initialize_fims()` returns a list with two elements.
-  expect_equal(length(result), 2)
+  expect_named(result, c("parameters", "model", "metadata"))
+  #' @description Test that `initialize_fims()` returns a list with three elements.
+  expect_equal(length(result), 3)
   clear()
 
   result <- initialize_comp(
@@ -107,6 +128,28 @@ test_that("`initialize_fims()` works with edge cases", {
   expect_equal(length(init_parm_multiple_types$parameters$p), length(init_parm_default$parameters$p) - 10)
 })
 
+test_that("fleet LengthComp falls back to global bins when no local bins are present", {
+  ctx <- make_no_local_alk_fleet_context()
+  on.exit({ rm(ctx); gc() }, add = TRUE)
+
+  fleet_module <- initialize_module(
+    parameters = ctx$parameters,
+    data = ctx$data,
+    module_name = "Fleet",
+    fleet_name = "fleet1"
+  )
+
+  global_lengths <- FIMS::get_lengths(ctx$data)
+
+  #' @description Test that fleet-level n_lengths stays nonzero via global fallback when no local bins exist.
+  expect_gt(fleet_module$n_lengths$get(), 0)
+  #' @description Test that fleet-level n_lengths equals the global fallback bin count when no local bins exist.
+  expect_equal(fleet_module$n_lengths$get(), length(global_lengths))
+  #' @description Test that fleet-level lengths equal the global fallback bins when no local bins exist.
+  expect_equal(fleet_module$lengths$toRVector(), global_lengths)
+  clear()
+})
+
 ## Error handling ----
 
 test_that("`initialize_fims()` returns correct error messages", {
@@ -156,6 +199,93 @@ test_that("`initialize_fims()` returns correct error messages", {
 
   clear()
 
+  base_data <- get_data(data)
+  fleet1_length_bins <- base_data |>
+    dplyr::filter(
+      .data[["name"]] == "fleet1",
+      .data[["type"]] == "length_comp",
+      !is.na(.data[["length"]])
+    ) |>
+    dplyr::pull(.data[["length"]]) |>
+    unique() |>
+    sort()
+  local_bin_rows <- tibble::tibble(
+    type = "length-bin",
+    name = "fleet1",
+    age = NA_real_,
+    length = fleet1_length_bins,
+    value = NA_real_,
+    unit = base_data |>
+      dplyr::filter(
+        .data[["name"]] == "fleet1",
+        .data[["type"]] == "length_comp"
+      ) |>
+      dplyr::pull(.data[["unit"]]) |>
+      unique() |>
+      (\(x) x[[1]])(),
+    timing = min(
+      base_data |>
+        dplyr::filter(
+          .data[["name"]] == "fleet1",
+          .data[["type"]] == "length_comp"
+        ) |>
+        dplyr::pull(.data[["timing"]]),
+      na.rm = TRUE
+    ),
+    uncertainty = NA_real_
+  )
+  local_bin_data <- base_data |>
+    dplyr::filter(!(
+      .data[["name"]] == "fleet1" &
+        .data[["type"]] == "age-to-length-conversion"
+    )) |>
+    dplyr::bind_rows(local_bin_rows)
+  local_bin_frame <- FIMS::FIMSFrame(local_bin_data)
+
+  base_lengthcomp <- initialize_comp(
+    data = local_bin_frame,
+    fleet_name = "fleet1",
+    type = "LengthComp"
+  )$length_comp_data$toRVector()
+  template_row <- local_bin_data |>
+    dplyr::filter(name == "fleet1", type == "length_comp") |>
+    dplyr::slice_head(n = 1)
+  out_of_bin_length <- max(fleet1_length_bins, na.rm = TRUE) + 100
+
+  bad_row <- template_row |>
+    dplyr::mutate(
+      length = out_of_bin_length,
+      value = 0.25
+    )
+  bad_frame <- FIMS::FIMSFrame(dplyr::bind_rows(local_bin_data, bad_row))
+  #' @description Test that `initialize_comp()` hard-fails when local-bin fleets contain non-missing out-of-bin length_comp rows.
+  expect_error(
+    initialize_comp(
+      data = bad_frame,
+      fleet_name = "fleet1",
+      type = "LengthComp"
+    ),
+    "outside its resolved length bins"
+  )
+  clear()
+
+  missing_row <- template_row |>
+    dplyr::mutate(
+      length = out_of_bin_length,
+      value = -999
+    )
+  missing_frame <- FIMS::FIMSFrame(dplyr::bind_rows(local_bin_data, missing_row))
+  #' @description Test that placeholder (-999) out-of-bin rows are allowed and ignored for local-bin fleets.
+  expect_no_error(
+    missing_result <- initialize_comp(
+      data = missing_frame,
+      fleet_name = "fleet1",
+      type = "LengthComp"
+    )
+  )
+  expect_equal(missing_result$length_comp_data$toRVector(), base_lengthcomp)
+  clear()
+
   parameters_wrong_type <- default_parameters |>
     dplyr::mutate(
       estimation_type = dplyr::if_else(
@@ -169,6 +299,17 @@ test_that("`initialize_fims()` returns correct error messages", {
   expect_error(
     initialize_fims(parameters = parameters_wrong_type, data = data),
     "The `estimation_type` must be one of: constant, fixed_effects, and random_effects."
+  )
+  clear()
+
+  ctx <- make_no_local_alk_fleet_context()
+  on.exit({ rm(ctx); gc() }, add = TRUE)
+  #' @description Test that fleets on the fixed path hard-fail when n_lengths > 0 but fixed ALK is empty.
+  expect_error(
+    ctx$parameters |>
+      initialize_fims(data = ctx$data) |>
+      fit_fims(optimize = FALSE),
+    regexp = "no usable age-to-length conversion path"
   )
   clear()
 })

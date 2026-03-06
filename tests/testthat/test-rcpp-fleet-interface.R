@@ -61,3 +61,32 @@ test_that("rcpp fleet returns correct error messages", {
   expect_error(fleet1$SetObservedIndexDataID("id"))
   clear()
 })
+
+test_that("rcpp fleet loader rejects malformed non-empty fixed ALK size", {
+  clear()
+  fleet <- methods::new(Fleet)
+
+  fleet$n_ages$set(2)
+  fleet$n_years$set(1)
+  fleet$n_lengths$set(3)
+
+  fleet$lengths$resize(3)
+  fleet$lengths$set(0, 10)
+  fleet$lengths$set(1, 20)
+  fleet$lengths$set(2, 30)
+
+  fleet$log_Fmort$resize(1)
+  fleet$log_Fmort[1][["value"]] <- 0
+
+  # Non-empty but malformed: expected 2 * 3 = 6 entries, supplied 2.
+  fleet$age_to_length_conversion$resize(2)
+  fleet$age_to_length_conversion[1][["value"]] <- 0.5
+  fleet$age_to_length_conversion[2][["value"]] <- 0.5
+
+  #' @description Test that the fleet loader throws on malformed non-empty fixed age-to-length conversion size.
+  expect_error(
+    CreateTMBModel(),
+    regexp = "Fleet age_to_length_conversion size mismatch"
+  )
+  clear()
+})
