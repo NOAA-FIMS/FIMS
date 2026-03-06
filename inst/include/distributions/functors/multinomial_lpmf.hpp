@@ -10,6 +10,11 @@
 #ifndef MULTINOMIAL_LPMF
 #define MULTINOMIAL_LPMF
 
+#ifdef TMB_MODEL
+FIMS_DEPENDS(tmb_adapter);
+FIMS_DEPENDS(ad_macros);
+
+#endif
 // #include "density_components_base.hpp"
 // #include "../../common/fims_vector.hpp"
 // #include "../../common/def.hpp"
@@ -126,7 +131,7 @@ struct MultinomialLPMF : public DensityComponentBase<Type> {
 
       if (!containsNA) {
         this->lpdf_vec[i] =
-            dmultinom(x_vector.to_tmb(), prob_vector.to_tmb(), true);
+            dmultinom(fims::adapter::to_tmb(x_vector), fims::adapter::to_tmb(prob_vector), true);
       } else {
         this->lpdf_vec[i] = 0;
       }

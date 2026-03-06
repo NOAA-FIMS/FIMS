@@ -90,6 +90,9 @@
 #define TMB_FIMS_SECOND_ORDER AD<TMB_FIMS_FIRST_ORDER>
 #define TMB_FIMS_THIRD_ORDER AD<TMB_FIMS_SECOND_ORDER>
 #endif
+
+
+
 #endif
 
 namespace fims {
@@ -571,8 +574,7 @@ class FIMSLog {
   }
 };
 
-std::shared_ptr<FIMSLog> FIMSLog::fims_log = std::make_shared<FIMSLog>();
-
+// 
 }  // namespace fims
 
 #ifdef FIMS_DEBUG

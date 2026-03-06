@@ -28,6 +28,11 @@ FIMS_DEPENDS(fims_vector);
 // #include "../../common/fims_math.hpp"
 FIMS_DEPENDS(fims_math);
 
+
+template<typename Type>
+class objective_function;
+
+
 namespace fims_distributions {
 
 /**

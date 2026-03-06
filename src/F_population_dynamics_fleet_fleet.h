@@ -112,8 +112,8 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
    */
   virtual void create_report_vectors(
       std::map<std::string, fims::Vector<fims::Vector<Type>>>& report_vectors) {
-    report_vectors["log_Fmort"].emplace_back(this->log_Fmort.to_tmb());
-    report_vectors["log_q"].emplace_back(this->log_q.to_tmb());
+    report_vectors["log_Fmort"].emplace_back(fims::adapter::to_tmb(this->log_Fmort));
+    report_vectors["log_q"].emplace_back(fims::adapter::to_tmb(this->log_q));
   }
 
   /**

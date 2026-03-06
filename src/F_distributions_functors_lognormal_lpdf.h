@@ -13,6 +13,11 @@
 #ifndef LOGNORMAL_LPDF
 #define LOGNORMAL_LPDF
 
+#ifdef TMB_MODEL
+#include "F_adapters_tmb_adapter.h"
+#include "F_adapters_ad_macros.h"
+
+#endif
 // #include "density_components_base.hpp"
 // #include "../../common/fims_vector.hpp"
 // #include "../../common/def.hpp"
@@ -24,6 +29,9 @@
 // #include "../../common/def.hpp"
 #include "F_common_def.h"
 
+#ifdef TMB_MODEL
+#include "F_adapters_tmb_adapter.h"
+#endif
 namespace fims_distributions {
 /**
  * LogNormal Log Probability Density Function
@@ -136,7 +144,7 @@ struct LogNormalLPDF : public DensityComponentBase<Type> {
 #endif
     }
 #ifdef TMB_MODEL
-    vector<Type> lognormal_x = this->x.to_tmb();
+    vector<Type> lognormal_x = fims::adapter::to_tmb(this->x);
     //  FIMS_REPORT_F(lognormal_x, this->of);
 #endif
     return (lpdf);

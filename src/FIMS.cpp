@@ -22,6 +22,62 @@
 #endif
 #include "FIMS_all.hpp"
 
+
+
+
+
+namespace fims {
+namespace adapter {
+
+// Convert TMB vector -> FIMS vector
+template<typename Type>
+fims::Vector<Type> from_tmb(const tmbutils::vector<Type>& x) {
+    Vector<Type> out(x.size());
+    for (int i = 0; i < x.size(); ++i) {
+        out[i] = x[i];
+    }
+    return out;
+}
+
+// Convert FIMS vector -> TMB vector
+template<typename Type>
+tmbutils::vector<Type> to_tmb(const fims::Vector<Type>& x) {
+    tmbutils::vector<Type> out(x.size());
+    for (int i = 0; i < x.size(); ++i) {
+        out[i] = x[i];
+    }
+    return out;
+}
+
+} // namespace adapter
+} // namespace fims
+
+
+
+
+// #define ADREPORT_F(name, F) F->reportvector.push(name, #name);
+// #define FIMS_SIMULATE_F(F) if (isDouble<Type>::value && F->do_simulate)
+
+
+template <typename Type>
+tmbutils::vector<Type> ADREPORTvector(tmbutils::vector<tmbutils::vector<Type> > x) {
+  int outer_dim = x.size();
+  int dim = 0;
+  for (int i = 0; i < outer_dim; i++) {
+    dim += x(i).size();
+  }
+  vector<Type> res(dim);
+  int idx = 0;
+  for (int i = 0; i < outer_dim; i++) {
+    int inner_dim = x(i).size();
+    for (int j = 0; j < inner_dim; j++) {
+      res(idx) = x(i)(j);
+      idx += 1;
+    }
+  }
+  return res;
+}
+
 /// @cond
 /**
  * @brief TMB objective function

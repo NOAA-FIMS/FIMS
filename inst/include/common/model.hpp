@@ -154,7 +154,7 @@ class Model {  // may need singleton
 
 // report out nll components
 #ifdef TMB_MODEL
-    vector<Type> nll_components = nll_vec.to_tmb();
+    vector<Type> nll_components = fims::adapter::to_tmb(nll_vec);
     FIMS_REPORT_F(nll_components, this->of);
     FIMS_REPORT_F(jnll, this->of);
 #endif

@@ -10,7 +10,7 @@
 #define FIMS_INTERFACE_RCPP_RCPP_OBJECTS_SHARED_PRIMITIVE_HPP
 
 #include <memory>
-
+#include <ostream>
 /**
  * @class SharedInt
  * @brief A class that provides shared ownership of an integer value.

@@ -40,6 +40,14 @@
 #include "F_interface_rcpp_rcpp_objects_rcpp_recruitment.h"
 // #include "rcpp_selectivity.hpp"
 #include "F_interface_rcpp_rcpp_objects_rcpp_selectivity.h"
+
+#include "F_interface_rcpp_rcpp_objects_rcpp_growth.h"
+#include "F_interface_rcpp_rcpp_objects_rcpp_data.h"
+#include "F_interface_rcpp_rcpp_objects_rcpp_distribution.h"
+
+#include "F_common_information.h"
+#include "F_common_model.h"
+
 #include <valarray>
 #include <cmath>
 #include <mutex>

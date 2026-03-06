@@ -3,6 +3,7 @@
 
 // Auto-generated master include. Do not edit manually.
 
+#include "F_adapters_ad_macros.h"
 #include "F_adapters_tmb_adapter.h"
 #include "F_common_data_object.h"
 #include "F_common_def.h"

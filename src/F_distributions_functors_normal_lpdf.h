@@ -14,6 +14,11 @@
 #ifndef NORMAL_LPDF
 #define NORMAL_LPDF
 
+#ifdef TMB_MODEL
+#include "F_adapters_tmb_adapter.h"
+#include "F_adapters_ad_macros.h"
+
+#endif
 // #include "density_components_base.hpp"
 // #include "../../common/fims_vector.hpp"
 // #include "../../common/def.hpp"
@@ -24,6 +29,10 @@
 #include "F_common_fims_vector.h"
 // #include "../../common/def.hpp"
 #include "F_common_def.h"
+
+#ifdef TMB_MODEL
+#include "F_adapters_tmb_adapter.h"
+#endif
 
 namespace fims_distributions {
 /**
@@ -129,7 +138,7 @@ struct NormalLPDF : public DensityComponentBase<Type> {
         } */
     }
 #ifdef TMB_MODEL
-    vector<Type> normal_x = this->x.to_tmb();
+    tmbutils::vector<Type> normal_x = fims::adapter::to_tmb(this->x);
 #endif
     return (lpdf);
   }

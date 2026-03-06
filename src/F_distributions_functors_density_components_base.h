@@ -31,6 +31,11 @@
 // #include "../../common/fims_math.hpp"
 #include "F_common_fims_math.h"
 
+
+template<typename Type>
+class objective_function;
+
+
 namespace fims_distributions {
 
 /**

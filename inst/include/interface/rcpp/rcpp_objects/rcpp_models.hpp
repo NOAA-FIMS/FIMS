@@ -37,6 +37,14 @@ FIMS_DEPENDS(rcpp_maturity);
 FIMS_DEPENDS(rcpp_recruitment);
 // #include "rcpp_selectivity.hpp"
 FIMS_DEPENDS(rcpp_selectivity);
+
+FIMS_DEPENDS(rcpp_growth);
+FIMS_DEPENDS(rcpp_data);
+FIMS_DEPENDS(rcpp_distribution);
+
+FIMS_DEPENDS(information);
+FIMS_DEPENDS(model);
+
 #include <valarray>
 #include <cmath>
 #include <mutex>
