@@ -406,13 +406,6 @@ std::string get_log_warnings() {
 std::string get_log_info() { return fims::FIMSLog::fims_log->get_info(); }
 
 /**
- * @brief Gets log entries by module as a string in JSON format.
- */
-std::string get_log_module(const std::string &module) {
-  return fims::FIMSLog::fims_log->get_module(module);
-}
-
-/**
  * @brief If true, writes the log on exit.
  */
 void write_log(bool write) {

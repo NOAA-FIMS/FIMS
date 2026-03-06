@@ -6,7 +6,6 @@
 \alias{get_fixed}
 \alias{get_log}
 \alias{get_log_errors}
-\alias{get_log_module}
 \alias{get_log_warnings}
 \alias{get_parameter_names}
 \alias{get_random}
@@ -32,7 +31,6 @@ C++ docs.
 \item \href{https://noaa-fims.github.io/doxygen/rcpp__interface_8hpp.html}{get_fixed}
 \item \href{https://noaa-fims.github.io/doxygen/rcpp__interface_8hpp.html}{get_log}
 \item \href{https://noaa-fims.github.io/doxygen/rcpp__interface_8hpp.html}{get_log_errors}
-\item \href{https://noaa-fims.github.io/doxygen/rcpp__interface_8hpp.html}{get_log_module}
 \item \href{https://noaa-fims.github.io/doxygen/rcpp__interface_8hpp.html}{get_log_warnings}
 \item \href{https://noaa-fims.github.io/doxygen/rcpp__interface_8hpp.html}{get_parameter_names}
 \item \href{https://noaa-fims.github.io/doxygen/rcpp__interface_8hpp.html}{get_random}
