@@ -9,21 +9,21 @@
 #ifndef FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_MODELS_HPP
 #define FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_MODELS_HPP
 
-#include <set>
 #include "../../../common/def.hpp"
 #include "../../../models/fisheries_models.hpp"
 #include "../../../utilities/fims_json.hpp"
 #include "rcpp_population.hpp"
+#include <set>
 
-#include "rcpp_interface_base.hpp"
-#include "rcpp_population.hpp"
 #include "rcpp_fleet.hpp"
+#include "rcpp_interface_base.hpp"
 #include "rcpp_maturity.hpp"
+#include "rcpp_population.hpp"
 #include "rcpp_recruitment.hpp"
 #include "rcpp_selectivity.hpp"
-#include <valarray>
 #include <cmath>
 #include <mutex>
+#include <valarray>
 
 /**
  * @brief The FisheryModelInterfaceBase class is the base class for all fishery
@@ -278,7 +278,8 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
       ss << " \"maturity_id\": " << population_interface->maturity_id << ",\n";
 
       ss << " \"parameters\": [\n";
-      fims::Vector<double> log_M_uncertainty(pop->log_M.size(), -999);
+      fims::Vector<double> log_M_uncertainty(
+          pop->log_M.size(), std::numeric_limits<double>::quiet_NaN());
       this->get_se_values("log_M", this->se_values, log_M_uncertainty);
       for (size_t i = 0; i < pop->log_M.size(); i++) {
         population_interface_ptr->log_M[i].final_value_m = pop->log_M[i];
@@ -289,14 +290,17 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
       ss << " \"id\":" << population_interface->log_M.id_m << ",\n";
       ss << " \"type\": \"vector\",\n";
       ss << " \"dimensionality\": {\n";
-      ss << "  \"header\": [" << "\"n_years\", \"n_ages\"" << "],\n";
+      ss << "  \"header\": ["
+         << "\"n_years\", \"n_ages\""
+         << "],\n";
       ss << "  \"dimensions\": [" << population_interface->n_years.get() << ", "
          << population_interface->n_ages.get() << "]\n},\n";
       ss << " \"values\": " << population_interface->log_M << "\n\n";
       ss << "},\n";
 
       fims::Vector<double> log_f_multiplier_uncertainty(
-          pop->log_f_multiplier.size(), -999);
+          pop->log_f_multiplier.size(),
+          std::numeric_limits<double>::quiet_NaN());
       this->get_se_values("log_f_multiplier", this->se_values,
                           log_f_multiplier_uncertainty);
       for (size_t i = 0; i < pop->log_f_multiplier.size(); i++) {
@@ -310,14 +314,17 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
       ss << " \"id\":" << population_interface->log_f_multiplier.id_m << ",\n";
       ss << " \"type\": \"vector\",\n";
       ss << " \"dimensionality\": {\n";
-      ss << "  \"header\": [" << "\"n_years\"" << "],\n";
+      ss << "  \"header\": ["
+         << "\"n_years\""
+         << "],\n";
       ss << "  \"dimensions\": [" << population_interface->n_years.get()
          << "]\n},\n";
       ss << " \"values\": " << population_interface->log_f_multiplier << "\n\n";
       ss << "},\n";
 
       fims::Vector<double> spawning_biomass_ratio_uncertainty(
-          pop->spawning_biomass_ratio.size(), -999);
+          pop->spawning_biomass_ratio.size(),
+          std::numeric_limits<double>::quiet_NaN());
       this->get_se_values("spawning_biomass_ratio", this->se_values,
                           spawning_biomass_ratio_uncertainty);
       for (size_t i = 0; i < pop->spawning_biomass_ratio.size(); i++) {
@@ -332,15 +339,17 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
          << ",\n";
       ss << " \"type\": \"vector\",\n";
       ss << " \"dimensionality\": {\n";
-      ss << "  \"header\": [" << "\"n_years\"" << "],\n";
+      ss << "  \"header\": ["
+         << "\"n_years\""
+         << "],\n";
       ss << "  \"dimensions\": [" << (population_interface->n_years.get() + 1)
          << "]\n},\n";
       ss << " \"values\": " << population_interface->spawning_biomass_ratio
          << "\n\n";
       ss << "},\n";
 
-      fims::Vector<double> log_init_naa_uncertainty(pop->log_init_naa.size(),
-                                                    -999);
+      fims::Vector<double> log_init_naa_uncertainty(
+          pop->log_init_naa.size(), std::numeric_limits<double>::quiet_NaN());
       this->get_se_values("log_init_naa", this->se_values,
                           log_init_naa_uncertainty);
       for (size_t i = 0; i < pop->log_init_naa.size(); i++) {
@@ -353,7 +362,9 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
       ss << "  \"id\":" << population_interface->log_init_naa.id_m << ",\n";
       ss << "  \"type\": \"vector\",\n";
       ss << " \"dimensionality\": {\n";
-      ss << "  \"header\": [" << "\"n_ages\"" << "],\n";
+      ss << "  \"header\": ["
+         << "\"n_ages\""
+         << "],\n";
       ss << "  \"dimensions\": [" << population_interface->n_ages.get()
          << "]\n},\n";
 
@@ -463,14 +474,16 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
       for (size_t i = 0; i < dq.size() - 1; i++) {
         if (dq[i] != dq[i])  // check for NaN
         {
-          ss << "-999" << ", ";
+          ss << "-999"
+             << ", ";
         } else {
           ss << dq[i] << ", ";
         }
       }
       if (dq[dq.size() - 1] != dq[dq.size() - 1])  // check for NaN
       {
-        ss << "-999]" << ",\n";
+        ss << "-999]"
+           << ",\n";
       } else {
         ss << dq[dq.size() - 1] << "],\n";
       }
@@ -596,7 +609,8 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
       ss << "],\n";
       ss << "\"parameters\": [\n";
       ss << "{\n";
-      fims::Vector<double> log_Fmort_uncertainty(fleet->log_Fmort.size(), -999);
+      fims::Vector<double> log_Fmort_uncertainty(
+          fleet->log_Fmort.size(), std::numeric_limits<double>::quiet_NaN());
       this->get_se_values("log_Fmort", this->se_values, log_Fmort_uncertainty);
       for (size_t i = 0; i < fleet_interface->log_Fmort.size(); i++) {
         fleet_interface->log_Fmort[i].final_value_m = fleet->log_Fmort[i];
@@ -607,13 +621,16 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
       ss << " \"id\":" << fleet_interface->log_Fmort.id_m << ",\n";
       ss << " \"type\": \"vector\",\n";
       ss << " \"dimensionality\": {\n";
-      ss << "  \"header\": [\"" << "n_years" << "\"],\n";
+      ss << "  \"header\": [\""
+         << "n_years"
+         << "\"],\n";
       ss << "  \"dimensions\": [" << fleet_interface->n_years.get()
          << "]\n},\n";
       ss << " \"values\": " << fleet_interface->log_Fmort << "},\n";
 
       ss << " {\n";
-      fims::Vector<double> log_q_uncertainty(fleet->log_q.size(), -999);
+      fims::Vector<double> log_q_uncertainty(
+          fleet->log_q.size(), std::numeric_limits<double>::quiet_NaN());
       this->get_se_values("log_q", this->se_values, log_q_uncertainty);
       for (size_t i = 0; i < fleet->log_q.size(); i++) {
         fleet_interface->log_q[i].final_value_m = fleet->log_q[i];
@@ -623,7 +640,9 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
       ss << " \"id\":" << fleet_interface->log_q.id_m << ",\n";
       ss << " \"type\": \"vector\",\n";
       ss << " \"dimensionality\": {\n";
-      ss << "  \"header\": [\"" << "na" << "\"],\n";
+      ss << "  \"header\": [\""
+         << "na"
+         << "\"],\n";
       ss << "  \"dimensions\": [" << fleet->log_q.size() << "]\n},\n";
 
       ss << " \"values\": " << fleet_interface->log_q << "}\n";
@@ -723,7 +742,7 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
     Rcpp::Function func = obj["fn"];
     Rcpp::Function gradient = obj["gr"];
     Rcpp::NumericVector grad = gradient(this->get_fixed_parameters_vector());
-    double maxgc = -999;
+    double maxgc = std::numeric_limits<double>::quiet_NaN();
     for (R_xlen_t i = 0; i < grad.size(); i++) {
       if (std::fabs(grad[i]) > maxgc) {
         maxgc = std::fabs(grad[i]);

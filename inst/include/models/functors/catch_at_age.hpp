@@ -8,8 +8,12 @@
 #ifndef FIMS_MODELS_CATCH_AT_AGE_HPP
 #define FIMS_MODELS_CATCH_AT_AGE_HPP
 
-#include <set>
+#include <cmath>
+#include <map>
 #include <regex>
+#include <set>
+#include <string>
+#include <vector>
 
 #include "fishery_model_base.hpp"
 

@@ -11,6 +11,7 @@
 
 #include "../../../population_dynamics/selectivity/selectivity.hpp"
 #include "rcpp_interface_base.hpp"
+#include <limits>
 
 /**
  * @brief Rcpp interface that serves as the parent class for Rcpp selectivity
@@ -195,10 +196,12 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
   virtual void set_uncertainty(
       std::map<std::string, std::vector<double>> &se_values) {
     fims::Vector<double> inflection_point_uncertainty(
-        this->inflection_point.size(), -999);
+        this->inflection_point.size(),
+        std::numeric_limits<double>::quiet_NaN());
     this->get_se_values("inflection_point", se_values,
                         inflection_point_uncertainty);
-    fims::Vector<double> slope_uncertainty(this->slope.size(), -999);
+    fims::Vector<double> slope_uncertainty(
+        this->slope.size(), std::numeric_limits<double>::quiet_NaN());
     this->get_se_values("slope", se_values, slope_uncertainty);
     for (size_t i = 0; i < this->inflection_point.size(); i++) {
       this->inflection_point[i].uncertainty_m = inflection_point_uncertainty[i];
@@ -469,16 +472,20 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
   virtual void set_uncertainty(
       std::map<std::string, std::vector<double>> &se_values) {
     fims::Vector<double> inflection_point_asc_uncertainty(
-        this->inflection_point_asc.size(), -999);
+        this->inflection_point_asc.size(),
+        std::numeric_limits<double>::quiet_NaN());
     this->get_se_values("inflection_point_asc", se_values,
                         inflection_point_asc_uncertainty);
-    fims::Vector<double> slope_asc_uncertainty(this->slope_asc.size(), -999);
+    fims::Vector<double> slope_asc_uncertainty(
+        this->slope_asc.size(), std::numeric_limits<double>::quiet_NaN());
     this->get_se_values("slope_asc", se_values, slope_asc_uncertainty);
     fims::Vector<double> inflection_point_desc_uncertainty(
-        this->inflection_point_desc.size(), -999);
+        this->inflection_point_desc.size(),
+        std::numeric_limits<double>::quiet_NaN());
     this->get_se_values("inflection_point_desc", se_values,
                         inflection_point_desc_uncertainty);
-    fims::Vector<double> slope_desc_uncertainty(this->slope_desc.size(), -999);
+    fims::Vector<double> slope_desc_uncertainty(
+        this->slope_desc.size(), std::numeric_limits<double>::quiet_NaN());
     this->get_se_values("slope_desc", se_values, slope_desc_uncertainty);
     for (size_t i = 0; i < this->inflection_point_asc.size(); i++) {
       this->inflection_point_asc[i].uncertainty_m =

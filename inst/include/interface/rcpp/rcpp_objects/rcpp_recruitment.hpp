@@ -12,6 +12,7 @@
 
 #include "../../../population_dynamics/recruitment/recruitment.hpp"
 #include "rcpp_interface_base.hpp"
+#include <limits>
 
 /**
  * @brief Rcpp interface that serves as the parent class for Rcpp recruitment
@@ -280,14 +281,14 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
    */
   virtual void set_uncertainty(
       std::map<std::string, std::vector<double>> &se_values) {
-    fims::Vector<double> logit_steep_uncertainty(this->logit_steep.size(),
-                                                 -99999999);
+    fims::Vector<double> logit_steep_uncertainty(
+        this->logit_steep.size(), std::numeric_limits<double>::quiet_NaN());
     this->get_se_values("logit_steep", se_values, logit_steep_uncertainty);
-    fims::Vector<double> log_rzero_uncertainty(this->log_rzero.size(),
-                                               -999999999);
+    fims::Vector<double> log_rzero_uncertainty(
+        this->log_rzero.size(), std::numeric_limits<double>::quiet_NaN());
     this->get_se_values("log_rzero", se_values, log_rzero_uncertainty);
-    fims::Vector<double> log_devs_uncertainty(this->log_devs.size(),
-                                              -999999999);
+    fims::Vector<double> log_devs_uncertainty(
+        this->log_devs.size(), std::numeric_limits<double>::quiet_NaN());
     this->get_se_values("log_devs", se_values, log_devs_uncertainty);
     for (size_t i = 0; i < this->logit_steep.size(); i++) {
       this->logit_steep[i].uncertainty_m = logit_steep_uncertainty[i];
