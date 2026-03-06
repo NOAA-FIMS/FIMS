@@ -13,7 +13,8 @@ reshape_tmb_estimates(obj, sdreport = NULL, opt = NULL, parameter_names)
 \code{\link[TMB:sdreport]{TMB::sdreport()}}.}
 
 \item{opt}{An object returned from an optimizer, typically from
-\code{\link[stats:nlminb]{stats::nlminb()}}, used to fit a TMB model.}
+\code{\link[stats:nlminb]{stats::nlminb()}}, used to fit a TMB model. If the model is not optimized,
+opt is an empty list and is not used in the function.}
 
 \item{parameter_names}{A character vector of parameter names. This is used to
 identify the parameters in the \code{std} object.}
