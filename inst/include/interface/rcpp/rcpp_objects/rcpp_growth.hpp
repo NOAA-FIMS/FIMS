@@ -183,7 +183,7 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
     ss << " \"module_type\": \"EWAA\",\n";
     ss << " \"module_id\":" << this->id << ",\n";
     ss << " \"parameters\": [\n{\n";
-    ss << " \"name\": null,\n";
+    ss << " \"name\": \"weight_at_age\",\n";
     ss << " \"id\": null,\n";
     ss << " \"type\": \"vector\",\n";
     ss << " \"dimensionality\": {\n";
