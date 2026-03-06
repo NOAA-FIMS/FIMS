@@ -11,6 +11,7 @@
 #ifndef FIMS_POPULATION_DYNAMICS_POPULATION_HPP
 #define FIMS_POPULATION_DYNAMICS_POPULATION_HPP
 
+#include <set>
 // #include "../../common/model_object.hpp"
 // #include "../fleet/fleet.hpp"
 // #include "../growth/growth.hpp"

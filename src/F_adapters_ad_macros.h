@@ -3,15 +3,24 @@
 
 #pragma once
 
-#ifdef TMB_MODEL
+#ifdef TMB_MODEL__
 #include <TMB.hpp>
+
+
+
+
+
+template <typename Type>
+bool is_double(const Type& x) {
+  return std::is_same<Type, double>::value;
+}
 
 #define ADREPORT_F(name, F) F->reportvector.push(name, #name)
 
 #define FIMS_SIMULATE_F(F) \
-    if (isDouble<Type>::value && F->do_simulate)
+    if (is_double<Type>(F->do_simulate))
 
-    // define REPORT, ADREPORT, and SIMULATE
+// define REPORT, ADREPORT, and SIMULATE
 #define FIMS_REPORT_F(name, F)                                         \
   if (isDouble<Type>::value &&                                         \
       F->current_parallel_region < static_cast<Type>(0)) {             \
@@ -29,6 +38,10 @@
 #else
 
 #define ADREPORT_F(name, F)
+
+#define FIMS_REPORT_F(name, F) 
+
+#define FIMS_REPORT_F_(name, obj, F) 
 
 #define FIMS_SIMULATE_F(F) \
     if(false)

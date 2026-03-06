@@ -15,6 +15,7 @@
 // Use FIMS_DEPENDS for packaged headers when installing
 // #include "fishery_model_base.hpp"
 FIMS_DEPENDS(fishery_model_base);
+FIMS_DEPENDS(ad_macros);
 
 /* Dictionary block for shared parameter snippet documentations.
  * Referenced in function docs via @snippet{doc} this snippet_id.
@@ -1245,45 +1246,45 @@ class CatchAtAge : public FisheryModelBase<Type> {
       //     this->GetFleetUncertaintyReportInfoMap();
 
       // initialize population vectors
-      vector<vector<Type>> biomass_p(n_pops);
-      vector<vector<Type>> expected_recruitment_p(n_pops);
-      vector<vector<Type>> mortality_F_p(n_pops);
-      vector<vector<Type>> mortality_M_p(n_pops);
-      vector<vector<Type>> mortality_Z_p(n_pops);
-      vector<vector<Type>> numbers_at_age_p(n_pops);
-      vector<vector<Type>> proportion_mature_at_age_p(n_pops);
-      vector<vector<Type>> spawning_biomass_p(n_pops);
-      vector<vector<Type>> sum_selectivity_p(n_pops);
-      vector<vector<Type>> total_landings_numbers_p(n_pops);
-      vector<vector<Type>> total_landings_weight_p(n_pops);
-      vector<vector<Type>> unfished_biomass_p(n_pops);
-      vector<vector<Type>> unfished_numbers_at_age_p(n_pops);
-      vector<vector<Type>> unfished_spawning_biomass_p(n_pops);
-      vector<vector<Type>> log_M_p(n_pops);
-      vector<vector<Type>> log_init_naa_p(n_pops);
-      vector<vector<Type>> spawning_biomass_ratio_p(n_pops);
-      vector<vector<Type>> log_f_multiplier_p(n_pops);
+      tmbutils::vector<tmbutils::vector<Type>> biomass_p(n_pops);
+      tmbutils::vector<tmbutils::vector<Type>> expected_recruitment_p(n_pops);
+      tmbutils::vector<tmbutils::vector<Type>> mortality_F_p(n_pops);
+      tmbutils::vector<tmbutils::vector<Type>> mortality_M_p(n_pops);
+      tmbutils::vector<tmbutils::vector<Type>> mortality_Z_p(n_pops);
+      tmbutils::vector<tmbutils::vector<Type>> numbers_at_age_p(n_pops);
+      tmbutils::vector<tmbutils::vector<Type>> proportion_mature_at_age_p(n_pops);
+      tmbutils::vector<tmbutils::vector<Type>> spawning_biomass_p(n_pops);
+      tmbutils::vector<tmbutils::vector<Type>> sum_selectivity_p(n_pops);
+      tmbutils::vector<tmbutils::vector<Type>> total_landings_numbers_p(n_pops);
+      tmbutils::vector<tmbutils::vector<Type>> total_landings_weight_p(n_pops);
+      tmbutils::vector<tmbutils::vector<Type>> unfished_biomass_p(n_pops);
+      tmbutils::vector<tmbutils::vector<Type>> unfished_numbers_at_age_p(n_pops);
+      tmbutils::vector<tmbutils::vector<Type>> unfished_spawning_biomass_p(n_pops);
+      tmbutils::vector<tmbutils::vector<Type>> log_M_p(n_pops);
+      tmbutils::vector<tmbutils::vector<Type>> log_init_naa_p(n_pops);
+      tmbutils::vector<tmbutils::vector<Type>> spawning_biomass_ratio_p(n_pops);
+      tmbutils::vector<tmbutils::vector<Type>> log_f_multiplier_p(n_pops);
 
       // initialize fleet vectors
-      vector<vector<Type>> agecomp_expected_f(n_fleets);
-      vector<vector<Type>> agecomp_proportion_f(n_fleets);
-      vector<vector<Type>> catch_index_f(n_fleets);
-      vector<vector<Type>> index_expected_f(n_fleets);
-      vector<vector<Type>> index_numbers_f(n_fleets);
-      vector<vector<Type>> index_numbers_at_age_f(n_fleets);
-      vector<vector<Type>> index_numbers_at_length_f(n_fleets);
-      vector<vector<Type>> index_weight_f(n_fleets);
-      vector<vector<Type>> index_weight_at_age_f(n_fleets);
-      vector<vector<Type>> landings_expected_f(n_fleets);
-      vector<vector<Type>> landings_numbers_f(n_fleets);
-      vector<vector<Type>> landings_numbers_at_age_f(n_fleets);
-      vector<vector<Type>> landings_numbers_at_length_f(n_fleets);
-      vector<vector<Type>> landings_weight_f(n_fleets);
-      vector<vector<Type>> landings_weight_at_age_f(n_fleets);
-      vector<vector<Type>> lengthcomp_expected_f(n_fleets);
-      vector<vector<Type>> lengthcomp_proportion_f(n_fleets);
-      vector<vector<Type>> log_index_expected_f(n_fleets);
-      vector<vector<Type>> log_landings_expected_f(n_fleets);
+      tmbutils::vector<tmbutils::vector<Type>> agecomp_expected_f(n_fleets);
+      tmbutils::vector<tmbutils::vector<Type>> agecomp_proportion_f(n_fleets);
+      tmbutils::vector<tmbutils::vector<Type>> catch_index_f(n_fleets);
+      tmbutils::vector<tmbutils::vector<Type>> index_expected_f(n_fleets);
+      tmbutils::vector<tmbutils::vector<Type>> index_numbers_f(n_fleets);
+      tmbutils::vector<tmbutils::vector<Type>> index_numbers_at_age_f(n_fleets);
+      tmbutils::vector<tmbutils::vector<Type>> index_numbers_at_length_f(n_fleets);
+      tmbutils::vector<tmbutils::vector<Type>> index_weight_f(n_fleets);
+      tmbutils::vector<tmbutils::vector<Type>> index_weight_at_age_f(n_fleets);
+      tmbutils::vector<tmbutils::vector<Type>> landings_expected_f(n_fleets);
+      tmbutils::vector<tmbutils::vector<Type>> landings_numbers_f(n_fleets);
+      tmbutils::vector<tmbutils::vector<Type>> landings_numbers_at_age_f(n_fleets);
+      tmbutils::vector<tmbutils::vector<Type>> landings_numbers_at_length_f(n_fleets);
+      tmbutils::vector<tmbutils::vector<Type>> landings_weight_f(n_fleets);
+      tmbutils::vector<tmbutils::vector<Type>> landings_weight_at_age_f(n_fleets);
+      tmbutils::vector<tmbutils::vector<Type>> lengthcomp_expected_f(n_fleets);
+      tmbutils::vector<tmbutils::vector<Type>> lengthcomp_proportion_f(n_fleets);
+      tmbutils::vector<tmbutils::vector<Type>> log_index_expected_f(n_fleets);
+      tmbutils::vector<tmbutils::vector<Type>> log_landings_expected_f(n_fleets);
 
       // initiate population index for structuring report out objects
       int pop_idx = 0;
@@ -1385,58 +1386,58 @@ class CatchAtAge : public FisheryModelBase<Type> {
         fleet_idx += 1;
       }
 
-      vector<Type> biomass = ADREPORTvector(biomass_p);
-      vector<Type> expected_recruitment =
+      tmbutils::vector<Type> biomass = ADREPORTvector(biomass_p);
+      tmbutils::vector<Type> expected_recruitment =
           ADREPORTvector(expected_recruitment_p);
-      vector<Type> mortality_F = ADREPORTvector(mortality_F_p);
-      vector<Type> mortality_M = ADREPORTvector(mortality_M_p);
-      vector<Type> mortality_Z = ADREPORTvector(mortality_Z_p);
-      vector<Type> numbers_at_age = ADREPORTvector(numbers_at_age_p);
-      vector<Type> proportion_mature_at_age =
+      tmbutils::vector<Type> mortality_F = ADREPORTvector(mortality_F_p);
+      tmbutils::vector<Type> mortality_M = ADREPORTvector(mortality_M_p);
+      tmbutils::vector<Type> mortality_Z = ADREPORTvector(mortality_Z_p);
+      tmbutils::vector<Type> numbers_at_age = ADREPORTvector(numbers_at_age_p);
+      tmbutils::vector<Type> proportion_mature_at_age =
           ADREPORTvector(proportion_mature_at_age_p);
-      vector<Type> spawning_biomass = ADREPORTvector(spawning_biomass_p);
-      vector<Type> sum_selectivity = ADREPORTvector(sum_selectivity_p);
-      vector<Type> total_landings_numbers =
+      tmbutils::vector<Type> spawning_biomass = ADREPORTvector(spawning_biomass_p);
+      tmbutils::vector<Type> sum_selectivity = ADREPORTvector(sum_selectivity_p);
+      tmbutils::vector<Type> total_landings_numbers =
           ADREPORTvector(total_landings_numbers_p);
-      vector<Type> total_landings_weight =
+      tmbutils::vector<Type> total_landings_weight =
           ADREPORTvector(total_landings_weight_p);
-      vector<Type> unfished_biomass = ADREPORTvector(unfished_biomass_p);
-      vector<Type> unfished_numbers_at_age =
+      tmbutils::vector<Type> unfished_biomass = ADREPORTvector(unfished_biomass_p);
+      tmbutils::vector<Type> unfished_numbers_at_age =
           ADREPORTvector(unfished_numbers_at_age_p);
-      vector<Type> unfished_spawning_biomass =
+      tmbutils::vector<Type> unfished_spawning_biomass =
           ADREPORTvector(unfished_spawning_biomass_p);
-      vector<Type> spawning_biomass_ratio =
+      tmbutils::vector<Type> spawning_biomass_ratio =
           ADREPORTvector(spawning_biomass_ratio_p);
-      vector<Type> log_f_multiplier = ADREPORTvector(log_f_multiplier_p);
+      tmbutils::vector<Type> log_f_multiplier = ADREPORTvector(log_f_multiplier_p);
 
-      vector<Type> agecomp_expected = ADREPORTvector(agecomp_expected_f);
-      vector<Type> agecomp_proportion = ADREPORTvector(agecomp_proportion_f);
-      vector<Type> catch_index = ADREPORTvector(catch_index_f);
-      vector<Type> index_expected = ADREPORTvector(index_expected_f);
-      vector<Type> index_numbers = ADREPORTvector(index_numbers_f);
-      vector<Type> index_numbers_at_age =
+      tmbutils::vector<Type> agecomp_expected = ADREPORTvector(agecomp_expected_f);
+      tmbutils::vector<Type> agecomp_proportion = ADREPORTvector(agecomp_proportion_f);
+      tmbutils::vector<Type> catch_index = ADREPORTvector(catch_index_f);
+      tmbutils::vector<Type> index_expected = ADREPORTvector(index_expected_f);
+      tmbutils::vector<Type> index_numbers = ADREPORTvector(index_numbers_f);
+      tmbutils::vector<Type> index_numbers_at_age =
           ADREPORTvector(index_numbers_at_age_f);
-      vector<Type> index_numbers_at_length =
+      tmbutils::vector<Type> index_numbers_at_length =
           ADREPORTvector(index_numbers_at_length_f);
-      vector<Type> index_weight = ADREPORTvector(index_weight_f);
-      vector<Type> index_weight_at_age = ADREPORTvector(index_weight_at_age_f);
-      vector<Type> landings_expected = ADREPORTvector(landings_expected_f);
-      vector<Type> landings_numbers = ADREPORTvector(landings_numbers_f);
-      vector<Type> landings_numbers_at_age =
+      tmbutils::vector<Type> index_weight = ADREPORTvector(index_weight_f);
+      tmbutils::vector<Type> index_weight_at_age = ADREPORTvector(index_weight_at_age_f);
+      tmbutils::vector<Type> landings_expected = ADREPORTvector(landings_expected_f);
+      tmbutils::vector<Type> landings_numbers = ADREPORTvector(landings_numbers_f);
+      tmbutils::vector<Type> landings_numbers_at_age =
           ADREPORTvector(landings_numbers_at_age_f);
-      vector<Type> landings_numbers_at_length =
+      tmbutils::vector<Type> landings_numbers_at_length =
           ADREPORTvector(landings_numbers_at_length_f);
-      vector<Type> landings_weight = ADREPORTvector(landings_weight_f);
-      vector<Type> landings_weight_at_age =
+      tmbutils::vector<Type> landings_weight = ADREPORTvector(landings_weight_f);
+      tmbutils::vector<Type> landings_weight_at_age =
           ADREPORTvector(landings_weight_at_age_f);
       // vector<Type> length_comp_expected =
       // ADREPORTvector(length_comp_expected_f); vector<Type>
       // length_comp_proportion = ADREPORTvector(length_comp_proportion_f);
-      vector<Type> lengthcomp_expected = ADREPORTvector(lengthcomp_expected_f);
-      vector<Type> lengthcomp_proportion =
+      tmbutils::vector<Type> lengthcomp_expected = ADREPORTvector(lengthcomp_expected_f);
+      tmbutils::vector<Type> lengthcomp_proportion =
           ADREPORTvector(lengthcomp_proportion_f);
-      vector<Type> log_index_expected = ADREPORTvector(log_index_expected_f);
-      vector<Type> log_landings_expected =
+      tmbutils::vector<Type> log_index_expected = ADREPORTvector(log_index_expected_f);
+      tmbutils::vector<Type> log_landings_expected =
           ADREPORTvector(log_landings_expected_f);
       // populations
       // report
@@ -1542,7 +1543,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
         for (int i = 0; i < outer_dim; i++) {
           dim += x[i].size();
         }
-        vector<Type> res(dim);
+        tmbutils::vector<Type> res(dim);
         int idx = 0;
         for (int i = 0; i < outer_dim; i++) {
           int inner_dim = x[i].size();

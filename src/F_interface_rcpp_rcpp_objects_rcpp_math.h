@@ -28,9 +28,7 @@
  * @param x A single numeric value (double) to be transformed on the real line.
  * @return A double in real space rather than the bounded space.
  */
-double logit_rcpp(double a, double b, double x) {
-  return fims_math::logit<double>(a, b, x);
-}
+double logit_rcpp(double a, double b, double x);
 
 /**
  * @brief A rcpp interface to the inverse-logit function.
@@ -40,9 +38,7 @@ double logit_rcpp(double a, double b, double x) {
  * @param logit_x A single numeric value (double) in real space.
  * @return A double in the bounded space rather than real space.
  */
-double inv_logit_rcpp(double a, double b, double logit_x) {
-  return fims_math::inv_logit<double>(a, b, logit_x);
-}
+double inv_logit_rcpp(double a, double b, double logit_x);
 
 #endif
 
