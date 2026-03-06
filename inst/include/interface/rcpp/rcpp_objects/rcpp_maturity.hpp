@@ -11,6 +11,7 @@
 
 #include "../../../population_dynamics/maturity/maturity.hpp"
 #include "rcpp_interface_base.hpp"
+#include <limits>
 
 /**
  * @brief Rcpp interface that serves as the parent class for Rcpp maturity
@@ -49,7 +50,7 @@ class MaturityInterfaceBase : public FIMSRcppInterfaceBase {
    *
    * @param other
    */
-  MaturityInterfaceBase(const MaturityInterfaceBase& other) : id(other.id) {}
+  MaturityInterfaceBase(const MaturityInterfaceBase &other) : id(other.id) {}
 
   /**
    * @brief The destructor.
@@ -104,7 +105,7 @@ class LogisticMaturityInterface : public MaturityInterfaceBase {
    *
    * @param other
    */
-  LogisticMaturityInterface(const LogisticMaturityInterface& other)
+  LogisticMaturityInterface(const LogisticMaturityInterface &other)
       : MaturityInterfaceBase(other),
         inflection_point(other.inflection_point),
         slope(other.slope) {}
@@ -192,10 +193,12 @@ class LogisticMaturityInterface : public MaturityInterfaceBase {
    * values.
    */
   virtual void set_uncertainty(
-      std::map<std::string, std::vector<double>>& se_values) {
+      std::map<std::string, std::vector<double>> &se_values) {
     fims::Vector<double> inflection_point_uncertainty(
-        this->inflection_point.size(), -999);
-    fims::Vector<double> slope_uncertainty(this->slope.size(), -999);
+        this->inflection_point.size(),
+        std::numeric_limits<double>::quiet_NaN());
+    fims::Vector<double> slope_uncertainty(
+        this->slope.size(), std::numeric_limits<double>::quiet_NaN());
     this->get_se_values("inflection_point", se_values,
                         inflection_point_uncertainty);
     this->get_se_values("slope", se_values, slope_uncertainty);

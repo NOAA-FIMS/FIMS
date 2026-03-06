@@ -49,9 +49,9 @@ class Parameter {
 
   /**
    * @brief The standard error of the parameter estimate, where the default is
-   * -999.0.
+   * NaN.
    */
-  double uncertainty_m = -999.0;
+  double uncertainty_m = std::numeric_limits<double>::quiet_NaN();
   /**
    * @brief The minimum possible parameter value, where the default is negative
    * infinity.
@@ -81,7 +81,7 @@ class Parameter {
   /**
    * @brief The constructor for initializing a parameter.
    */
-  Parameter(const Parameter& other)
+  Parameter(const Parameter &other)
       : id_m(other.id_m),
         initial_value_m(other.initial_value_m),
         final_value_m(other.final_value_m),
@@ -92,7 +92,7 @@ class Parameter {
   /**
    * @brief The constructor for initializing a parameter.
    */
-  Parameter& operator=(const Parameter& right) {
+  Parameter &operator=(const Parameter &right) {
     // Check for self-assignment!
     if (this == &right)  // Same object?
       return *this;      // Yes, so skip assignment, and just return *this.
@@ -127,14 +127,14 @@ class Parameter {
 uint32_t Parameter::id_g = 0;
 
 /**
- * @brief Sanitize a double value by replacing NaN or Inf with -999.0.
+ * @brief Sanitize a double value by replacing NaN or Inf with quiet_NaN.
  *
  * @param x The input double value.
  * @return The sanitized double value.
  */
 inline double sanitize_val(double x) {
   if (std::isnan(x) || std::isinf(x)) {
-    return -999.0;
+    return std::numeric_limits<double>::quiet_NaN();
   }
   return x;
 }
@@ -146,7 +146,7 @@ inline double sanitize_val(double x) {
  * @param p A parameter.
  * @return std::ostream&
  */
-std::ostream& operator<<(std::ostream& out, const Parameter& p) {
+std::ostream &operator<<(std::ostream &out, const Parameter &p) {
   out << "{\"id\": " << p.id_m
       << ",\n\"value\": " << sanitize_val(p.initial_value_m)
       << ",\n\"estimated_value\": " << sanitize_val(p.final_value_m)
@@ -202,7 +202,7 @@ class ParameterVector {
   /**
    * @brief The constructor.
    */
-  ParameterVector(const ParameterVector& other)
+  ParameterVector(const ParameterVector &other)
       : storage_m(other.storage_m), id_m(other.id_m) {}
 
   /**
@@ -243,7 +243,7 @@ class ParameterVector {
    * @brief The constructor for initializing a parameter vector.
    * @param v A vector of doubles.
    */
-  ParameterVector(const fims::Vector<double>& v) {
+  ParameterVector(const fims::Vector<double> &v) {
     this->id_m = ParameterVector::id_g++;
     this->storage_m = std::make_shared<std::vector<Parameter>>();
     this->storage_m->resize(v.size());
@@ -267,7 +267,7 @@ class ParameterVector {
    * @brief The accessor where the first index starts is zero.
    * @param pos The position of the ParameterVector that you want returned.
    */
-  inline Parameter& operator[](size_t pos) { return this->storage_m->at(pos); }
+  inline Parameter &operator[](size_t pos) { return this->storage_m->at(pos); }
 
   /**
    * @brief The accessor where the first index starts at one. This function is
@@ -292,7 +292,7 @@ class ParameterVector {
    * you want returned. The first position is one and the last position is
    * the same as the size of the ParameterVector.
    */
-  Parameter& get(size_t pos) {
+  Parameter &get(size_t pos) {
     if (pos >= this->storage_m->size()) {
       throw std::invalid_argument("ParameterVector: Index out of range");
     }
@@ -308,7 +308,7 @@ class ParameterVector {
    * @param p A numeric value specifying the value to set position `pos` to
    * in the ParameterVector.
    */
-  void set(size_t pos, const Parameter& p) { this->storage_m->at(pos) = p; }
+  void set(size_t pos, const Parameter &p) { this->storage_m->at(pos) = p; }
 
   /**
    * @brief Returns the size of a ParameterVector.
@@ -414,7 +414,7 @@ uint32_t ParameterVector::id_g = 0;
  * @param v A ParameterVector.
  * @return std::ostream&
  */
-std::ostream& operator<<(std::ostream& out, ParameterVector& v) {
+std::ostream &operator<<(std::ostream &out, ParameterVector &v) {
   out << "[";
   size_t size = v.size();
   for (size_t i = 0; i < size - 1; i++) {
@@ -458,7 +458,7 @@ class RealVector {
   /**
    * @brief The constructor.
    */
-  RealVector(const RealVector& other)
+  RealVector(const RealVector &other)
       : storage_m(other.storage_m), id_m(other.id_m) {}
 
   /**
@@ -485,7 +485,7 @@ class RealVector {
    * @brief The constructor for initializing a real vector.
    * @param v A vector of doubles.
    */
-  RealVector(const fims::Vector<double>& v) {
+  RealVector(const fims::Vector<double> &v) {
     this->id_m = RealVector::id_g++;
     this->storage_m = std::make_shared<std::vector<double>>();
     this->storage_m->resize(v.size());
@@ -506,7 +506,7 @@ class RealVector {
    * @param v
    * @return RealVector&
    */
-  RealVector& operator=(const Rcpp::NumericVector& v) {
+  RealVector &operator=(const Rcpp::NumericVector &v) {
     this->storage_m->assign(v.begin(), v.end());
     return *this;
   }
@@ -521,7 +521,7 @@ class RealVector {
    *
    * @param orig
    */
-  void fromRVector(const Rcpp::NumericVector& orig) {
+  void fromRVector(const Rcpp::NumericVector &orig) {
     this->storage_m->resize(orig.size());
     for (size_t i = 0; i < this->storage_m->size(); i++) {
       this->storage_m->at(i) = orig[i];
@@ -546,7 +546,7 @@ class RealVector {
    * @brief The accessor where the first index starts is zero.
    * @param pos The position of the RealVector that you want returned.
    */
-  inline double& operator[](size_t pos) { return this->storage_m->at(pos); }
+  inline double &operator[](size_t pos) { return this->storage_m->at(pos); }
 
   /**
    * @brief The accessor where the first index starts at one. This function is
@@ -571,7 +571,7 @@ class RealVector {
    * you want returned. The first position is one and the last position is
    * the same as the size of the RealVector.
    */
-  double& get(size_t pos) {
+  double &get(size_t pos) {
     if (pos >= this->storage_m->size()) {
       throw std::invalid_argument("RealVector: Index out of range");
     }
@@ -587,7 +587,7 @@ class RealVector {
    * @param p A numeric value specifying the value to set position `pos` to
    * in the RealVector.
    */
-  void set(size_t pos, const double& p) { this->storage_m->at(pos) = p; }
+  void set(size_t pos, const double &p) { this->storage_m->at(pos) = p; }
 
   /**
    * @brief Returns the size of a RealVector.
@@ -670,11 +670,11 @@ class FIMSRcppInterfaceBase {
    * working map.
    */
   void get_se_values(std::string name,
-                     std::map<std::string, std::vector<double>>& se_values,
-                     fims::Vector<double>& values) {
+                     std::map<std::string, std::vector<double>> &se_values,
+                     fims::Vector<double> &values) {
     auto se_vals = se_values.find(name);
     if (se_vals != se_values.end()) {
-      std::vector<double>& se_vals_vector = (*se_vals).second;
+      std::vector<double> &se_vals_vector = (*se_vals).second;
       std::vector<double> uncertainty_std(
           se_vals_vector.begin(), se_vals_vector.begin() + values.size());
       std::vector<double> temp(se_vals_vector.begin() + values.size(),
@@ -683,7 +683,8 @@ class FIMSRcppInterfaceBase {
       fims::Vector<double> uncertainty(uncertainty_std);
       values = uncertainty;
     } else {
-      std::fill(values.begin(), values.end(), -999);
+      std::fill(values.begin(), values.end(),
+                std::numeric_limits<double>::quiet_NaN());
     }
   }
 
@@ -699,7 +700,7 @@ class FIMSRcppInterfaceBase {
    * values.
    */
   virtual void set_uncertainty(
-      std::map<std::string, std::vector<double>>& se_values) {
+      std::map<std::string, std::vector<double>> &se_values) {
     FIMS_WARNING_LOG("Method not yet defined.");
   }
 

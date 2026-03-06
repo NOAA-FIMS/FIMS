@@ -12,8 +12,10 @@
 #define FIMS_COMMON_INFORMATION_HPP
 
 #include <algorithm>
+#include <cmath>
 #include <map>
 #include <memory>
+#include <string>
 #include <vector>
 
 #include "../distributions/distributions.hpp"
@@ -40,11 +42,11 @@ class Information {
   size_t n_ages = 0;  /**< number of ages>*/
 
   static std::shared_ptr<Information<Type>>
-      fims_information;          /**< singleton instance >*/
-  std::vector<Type*> parameters; /**< list of all estimated parameters >*/
-  std::vector<Type*>
+      fims_information;           /**< singleton instance >*/
+  std::vector<Type *> parameters; /**< list of all estimated parameters >*/
+  std::vector<Type *>
       random_effects_parameters; /**< list of all random effects parameters >*/
-  std::vector<Type*>
+  std::vector<Type *>
       fixed_effects_parameters; /**< list of all fixed effects parameters >*/
   std::vector<std::string> parameter_names; /**< list of all parameter names
                                                estimated in the model */
@@ -139,10 +141,10 @@ class Information {
       uint32_t, std::shared_ptr<fims_popdy::FisheryModelBase<Type>>>::iterator
       model_map_iterator; /**< iterator for variable map>*/
 
-  std::unordered_map<uint32_t, fims::Vector<Type>*>
+  std::unordered_map<uint32_t, fims::Vector<Type> *>
       variable_map; /**<hash map to link a parameter, derived value, or
                       observation to its shared location in memory */
-  typedef typename std::unordered_map<uint32_t, fims::Vector<Type>*>::iterator
+  typedef typename std::unordered_map<uint32_t, fims::Vector<Type> *>::iterator
       variable_map_iterator; /**< iterator for variable map>*/
 
   Information() {}
@@ -248,7 +250,7 @@ class Information {
    *
    * @param p parameter
    */
-  void RegisterParameter(Type& p) {
+  void RegisterParameter(Type &p) {
     this->fixed_effects_parameters.push_back(&p);
   }
 
@@ -257,7 +259,7 @@ class Information {
    *
    * @param re random effect
    */
-  void RegisterRandomEffect(Type& re) {
+  void RegisterRandomEffect(Type &re) {
     this->random_effects_parameters.push_back(&re);
   }
 
@@ -370,7 +372,7 @@ class Information {
    * model is valid.
    * @param f shared pointer to fleet module
    */
-  void SetFleetLandingsData(bool& valid_model,
+  void SetFleetLandingsData(bool &valid_model,
                             std::shared_ptr<fims_popdy::Fleet<Type>> f) {
     if (f->fleet_observed_landings_data_id_m != static_cast<Type>(-999)) {
       uint32_t observed_landings_id =
@@ -397,7 +399,7 @@ class Information {
    * model is valid.
    * @param f shared pointer to fleet module
    */
-  void SetFleetIndexData(bool& valid_model,
+  void SetFleetIndexData(bool &valid_model,
                          std::shared_ptr<fims_popdy::Fleet<Type>> f) {
     if (f->fleet_observed_index_data_id_m != static_cast<Type>(-999)) {
       uint32_t observed_index_id =
@@ -424,7 +426,7 @@ class Information {
    * model is valid.
    * @param f shared pointer to fleet module
    */
-  void SetAgeCompositionData(bool& valid_model,
+  void SetAgeCompositionData(bool &valid_model,
                              std::shared_ptr<fims_popdy::Fleet<Type>> f) {
     if (f->fleet_observed_agecomp_data_id_m != static_cast<Type>(-999)) {
       uint32_t observed_agecomp_id =
@@ -451,7 +453,7 @@ class Information {
    * model is valid.
    * @param f shared pointer to fleet module
    */
-  void SetLengthCompositionData(bool& valid_model,
+  void SetLengthCompositionData(bool &valid_model,
                                 std::shared_ptr<fims_popdy::Fleet<Type>> f) {
     if (f->fleet_observed_lengthcomp_data_id_m != static_cast<Type>(-999)) {
       uint32_t observed_lengthcomp_id =
@@ -479,7 +481,7 @@ class Information {
    * model is valid.
    * @param f shared pointer to fleet module
    */
-  void SetFleetSelectivityModel(bool& valid_model,
+  void SetFleetSelectivityModel(bool &valid_model,
                                 std::shared_ptr<fims_popdy::Fleet<Type>> f) {
     if (f->fleet_selectivity_id_m != static_cast<Type>(-999)) {
       uint32_t sel_id = static_cast<uint32_t>(
@@ -514,7 +516,7 @@ class Information {
    * model is valid.
    * @param p shared pointer to population module
    */
-  void SetRecruitment(bool& valid_model,
+  void SetRecruitment(bool &valid_model,
                       std::shared_ptr<fims_popdy::Population<Type>> p) {
     if (p->recruitment_id != static_cast<Type>(-999)) {
       uint32_t recruitment_uint = static_cast<uint32_t>(p->recruitment_id);
@@ -553,7 +555,7 @@ class Information {
    * model is valid.
    * @param p shared pointer to population module
    */
-  void SetRecruitmentProcess(bool& valid_model,
+  void SetRecruitmentProcess(bool &valid_model,
                              std::shared_ptr<fims_popdy::Population<Type>> p) {
     std::shared_ptr<fims_popdy::RecruitmentBase<Type>> r = p->recruitment;
     // if recruitment is defined
@@ -595,7 +597,7 @@ class Information {
    * model is valid.
    * @param p shared pointer to population module
    */
-  void SetGrowth(bool& valid_model,
+  void SetGrowth(bool &valid_model,
                  std::shared_ptr<fims_popdy::Population<Type>> p) {
     if (p->growth_id != static_cast<Type>(-999)) {
       uint32_t growth_uint = static_cast<uint32_t>(p->growth_id);
@@ -633,7 +635,7 @@ class Information {
    * model is valid.
    * @param p shared pointer to population module
    */
-  void SetMaturity(bool& valid_model,
+  void SetMaturity(bool &valid_model,
                    std::shared_ptr<fims_popdy::Population<Type>> p) {
     if (p->maturity_id != static_cast<Type>(-999)) {
       uint32_t maturity_uint = static_cast<uint32_t>(p->maturity_id);
@@ -666,7 +668,7 @@ class Information {
    * @param &valid_model reference to true/false boolean indicating whether
    * model is valid.
    */
-  void CreateFleetObjects(bool& valid_model) {
+  void CreateFleetObjects(bool &valid_model) {
     for (fleet_iterator it = this->fleets.begin(); it != this->fleets.end();
          ++it) {
       std::shared_ptr<fims_popdy::Fleet<Type>> f = (*it).second;
@@ -690,7 +692,7 @@ class Information {
    * @param &valid_model reference to true/false boolean indicating whether
    * model is valid.
    */
-  void SetDataObjects(bool& valid_model) {
+  void SetDataObjects(bool &valid_model) {
     for (density_components_iterator it = this->density_components.begin();
          it != this->density_components.end(); ++it) {
       std::shared_ptr<fims_distributions::DensityComponentBase<Type>> d =
@@ -731,7 +733,7 @@ class Information {
    * @param &valid_model reference to true/false boolean indicating whether
    * model is valid.
    */
-  void CreatePopulationObjects(bool& valid_model) {
+  void CreatePopulationObjects(bool &valid_model) {
     for (population_iterator it = this->populations.begin();
          it != this->populations.end(); ++it) {
       std::shared_ptr<fims_popdy::Population<Type>> p = (*it).second;
@@ -796,10 +798,10 @@ class Information {
   /**
    * @brief Loop over all models and set pointers to population objects
    */
-  void CreateModelingObjects(bool& valid_model) {
+  void CreateModelingObjects(bool &valid_model) {
     for (model_map_iterator it = this->models_map.begin();
          it != this->models_map.end(); ++it) {
-      std::shared_ptr<fims_popdy::FisheryModelBase<Type>>& model = (*it).second;
+      std::shared_ptr<fims_popdy::FisheryModelBase<Type>> &model = (*it).second;
       std::set<uint32_t>::iterator jt;
 
       for (jt = model->population_ids.begin();
@@ -884,14 +886,14 @@ class Information {
    *
    * @return std::vector<Type*>&
    */
-  std::vector<Type*>& GetParameters() { return parameters; }
+  std::vector<Type *> &GetParameters() { return parameters; }
 
   /**
    * @brief Get the Fixed Effects Parameters object
    *
    * @return std::vector<Type*>&
    */
-  std::vector<Type*>& GetFixedEffectsParameters() {
+  std::vector<Type *> &GetFixedEffectsParameters() {
     return fixed_effects_parameters;
   }
 
@@ -900,7 +902,7 @@ class Information {
    *
    * @return std::vector<Type*>&
    */
-  std::vector<Type*>& GetRandomEffectsParameters() {
+  std::vector<Type *> &GetRandomEffectsParameters() {
     return random_effects_parameters;
   }
 
@@ -915,7 +917,7 @@ class Information {
     bool valid_model = true;
     for (model_map_iterator it = this->models_map.begin();
          it != this->models_map.end(); ++it) {
-      std::shared_ptr<fims_popdy::FisheryModelBase<Type>>& model = (*it).second;
+      std::shared_ptr<fims_popdy::FisheryModelBase<Type>> &model = (*it).second;
       std::set<uint32_t>::iterator jt;
 
       for (jt = model->population_ids.begin();
