@@ -9,6 +9,85 @@ utils::globalVariables(c(
   "valid_n"
 ))
 
+# Fleet-specific length-bin precedence:
+# 1. A fixed age-to-length-conversion matrix is authoritative for that fleet.
+# 2. Otherwise, explicit `length-bin` rows are authoritative for that fleet.
+# 3. Otherwise, the wrapper falls back to the historical global length vector.
+# The resolved fleet bins are what get passed into the interface/runtime fleet
+# object; `FIMSFrame@lengths` remains only a global summary/fallback.
+get_explicit_fleet_length_bins <- function(data, fleet_name) {
+  data_input <- get_data(data)
+  if (!"length" %in% names(data_input)) {
+    return(numeric(0))
+  }
+
+  explicit_bins <- data_input |>
+    dplyr::filter(
+      .data[["type"]] == "length-bin",
+      .data[["name"]] %in% fleet_name
+    ) |>
+    dplyr::pull(.data[["length"]]) |>
+    unique() |>
+    sort()
+
+  explicit_bins[!is.na(explicit_bins)]
+}
+
+get_fixed_alk_fleet_length_bins <- function(data, fleet_name) {
+  data_input <- get_data(data)
+  if (!"length" %in% names(data_input)) {
+    return(numeric(0))
+  }
+
+  alk_bins <- data_input |>
+    dplyr::filter(
+      .data[["name"]] %in% fleet_name,
+      .data[["type"]] == "age-to-length-conversion",
+      !is.na(.data[["length"]])
+    ) |>
+    dplyr::pull(.data[["length"]]) |>
+    unique() |>
+    sort()
+
+  alk_bins[!is.na(alk_bins)]
+}
+
+get_local_fleet_length_bins <- function(data, fleet_name) {
+  explicit_bins <- get_explicit_fleet_length_bins(data, fleet_name)
+  alk_bins <- get_fixed_alk_fleet_length_bins(data, fleet_name)
+
+  if (length(alk_bins) > 0) {
+    if (length(explicit_bins) > 0 && !identical(explicit_bins, alk_bins)) {
+      cli::cli_abort(c(
+        "Fleet `{fleet_name}` has conflicting fixed age-to-length and explicit length-bin definitions.",
+        "i" = "When `age-to-length-conversion` is provided, its bin definition is authoritative.",
+        "i" = "Either remove the conflicting `length-bin` rows or make them match exactly."
+      ))
+    }
+    return(alk_bins)
+  }
+
+  if (length(explicit_bins) > 0) {
+    return(explicit_bins)
+  }
+
+  numeric(0)
+}
+
+fleet_has_local_length_bins <- function(data, fleet_name) {
+  length(get_local_fleet_length_bins(data, fleet_name)) > 0
+}
+
+get_fleet_length_bins <- function(data, fleet_name) {
+  local_bins <- get_local_fleet_length_bins(data, fleet_name)
+
+  if (length(local_bins) > 0) {
+    return(local_bins)
+  }
+
+  get_lengths(data)
+}
+
 #' Initialize a generic module
 #'
 #' @description
@@ -24,7 +103,10 @@ utils::globalVariables(c(
 #' @return
 #' The initialized module as an object.
 #' @noRd
-initialize_module <- function(parameters, data, module_name, fleet_name = NA_character_) {
+initialize_module <- function(parameters,
+                              data,
+                              module_name,
+                              fleet_name = NA_character_) {
   module_input <- parameters |>
     # Using !! to unquote the variables
     dplyr::filter(module_name == !!module_name)
@@ -78,24 +160,29 @@ initialize_module <- function(parameters, data, module_name, fleet_name = NA_cha
     data_distribution_names_for_fleet_i <- parameters |>
       dplyr::filter(fleet_name == !!fleet_name & distribution_type == "Data") |>
       dplyr::pull(module_type)
-    if ("age-to-length-conversion" %in% fleet_types &&
-      "LengthComp" %in% data_distribution_names_for_fleet_i) {
+
+    has_length_comp <- "LengthComp" %in% data_distribution_names_for_fleet_i
+    has_fixed_alk <- "age-to-length-conversion" %in% fleet_types
+
+    if (has_fixed_alk && has_length_comp) {
       age_to_length_conversion_value <- FIMS::m_age_to_length_conversion(data, fleet_name)
       module[["age_to_length_conversion"]]$resize(length(age_to_length_conversion_value))
-      # Assign each value to the corresponding position in the parameter vector
       purrr::walk(
         seq_along(age_to_length_conversion_value),
         \(x) module[["age_to_length_conversion"]][x][["value"]] <- age_to_length_conversion_value[x]
       )
 
-      # Set the estimation information for the entire parameter vector
       module[["age_to_length_conversion"]]$set_all_estimable(FALSE)
-
       module[["age_to_length_conversion"]]$set_all_random(FALSE)
     } else {
+      # Ensure fleets without a fixed ALK do not carry a default non-empty
+      # age_to_length_conversion vector into the C++ loader.
+      module[["age_to_length_conversion"]]$resize(0)
+    }
+
+    if (!has_length_comp) {
       module_fields <- setdiff(module_fields, c(
-        # Right now we can also remove n_lengths because the default is 0
-        "n_lengths"
+        "n_lengths", "lengths"
       ))
     }
 
@@ -129,7 +216,7 @@ initialize_module <- function(parameters, data, module_name, fleet_name = NA_cha
   )
 
   real_vector_fields <- c(
-    "ages", "weights"
+    "ages", "weights", "lengths"
   )
 
   for (field in module_fields) {
@@ -143,18 +230,35 @@ initialize_module <- function(parameters, data, module_name, fleet_name = NA_cha
             unique() |>
             length(),
           # Or we can use get_n_fleets(data),
-          "n_lengths" = get_n_lengths(data),
+          "n_lengths" = if (module_class_name == "Fleet" && !is.na(fleet_name)) {
+            length(get_fleet_length_bins(data, fleet_name))
+          } else {
+            get_n_lengths(data)
+          },
           "n_years" = get_n_years(data)
         )
       )
-    } else if (field %in% c("ages", "weights")) {
+    } else if (field %in% real_vector_fields) {
+      # Pass population ages, weight-at-age, and fleet length-bin centers
+      # through the standard real-vector initialization path.
       get_value_function <- switch(field,
         "ages" = get_ages,
-        "weights" = m_weight_at_age
+        "weights" = m_weight_at_age,
+        "lengths" = if (module_class_name == "Fleet" && !is.na(fleet_name)) {
+          \(data) get_fleet_length_bins(data, fleet_name)
+        } else {
+          get_lengths
+        }
       )
-      module[[field]]$resize(get_n_ages(data))
-      purrr::walk(seq_len(get_n_ages(data)), function(x) {
-        module[[field]]$set(x - 1, get_value_function(data)[x])
+      n_values <- switch(field,
+        "weights" = get_n_ages(data),
+        "ages" = get_n_ages(data),
+        "lengths" = length(get_value_function(data))
+      )
+      values <- get_value_function(data)
+      module[[field]]$resize(n_values)
+      purrr::walk(seq_len(n_values), \(x) {
+        module[[field]]$set(x - 1, values[x])
       })
     } else {
       set_param_vector(
@@ -434,7 +538,10 @@ initialize_selectivity <- function(parameters, data, fleet_name) {
 #' @return
 #' The initialized fleet module as an object.
 #' @noRd
-initialize_fleet <- function(parameters, data, fleet_name, linked_ids) {
+initialize_fleet <- function(parameters,
+                             data,
+                             fleet_name,
+                             linked_ids) {
   module <- initialize_module(
     parameters = parameters,
     data = data,
@@ -592,7 +699,9 @@ initialize_comp <- function(data,
     "LengthComp" = list(
       "name" = "length_comp",
       "comp_data_field" = "length_comp_data",
-      "get_n_function" = get_n_lengths,
+      "get_n_function" = function(data, fleet_name) {
+          length(get_fleet_length_bins(data, fleet_name))
+        },
       "comp_object" = LengthComp,
       "m_comp" = m_lengthcomp
     )
@@ -611,14 +720,61 @@ initialize_comp <- function(data,
   }
 
   get_function <- comp[["get_n_function"]]
+  expected_n <- if (identical(type, "LengthComp")) {
+    get_function(data, fleet_name)
+  } else {
+    get_function(data)
+  }
+  n_values <- expected_n
   module <- methods::new(
     comp[["comp_object"]],
     get_n_years(data),
-    get_function(data)
+    n_values
   )
 
   # Validate that the fleet's composition data is available
   comp_data <- comp[["m_comp"]](data, fleet_name)
+  if (identical(type, "LengthComp") && fleet_has_local_length_bins(data, fleet_name)) {
+    comp_bins <- get_local_fleet_length_bins(data, fleet_name)
+
+    # Guard against silently dropping real observations that fall outside the
+    # resolved fleet bin definition.
+    out_of_bin_length_rows <- get_data(data) |>
+      dplyr::filter(
+        .data[["name"]] == fleet_name,
+        .data[["type"]] == comp[["name"]],
+        !is.na(.data[["length"]]),
+        !(.data[["length"]] %in% comp_bins)
+      )
+    out_of_bin_non_missing <- out_of_bin_length_rows |>
+      dplyr::filter(!is.na(.data[["value"]]), .data[["value"]] != -999)
+    if (nrow(out_of_bin_non_missing) > 0) {
+      out_of_bin_lengths <- out_of_bin_non_missing |>
+        dplyr::pull(.data[["length"]]) |>
+        unique() |>
+        sort()
+      out_of_bin_timings <- out_of_bin_non_missing |>
+        dplyr::pull(.data[["timing"]]) |>
+        unique() |>
+        sort()
+      cli::cli_abort(c(
+        "Fleet `{fleet_name}` has `{comp[['name']]}` rows outside its resolved length bins.",
+        "i" = "Out-of-bin non-missing lengths: {toString(out_of_bin_lengths)}",
+        "i" = "Affected timings: {toString(out_of_bin_timings)}",
+        "i" = "Set those rows to `value = -999` or align them to the resolved bins."
+      ))
+    }
+
+    comp_data <- get_data(data) |>
+      dplyr::filter(
+        .data[["name"]] == fleet_name,
+        .data[["type"]] == comp[["name"]],
+        .data[["length"]] %in% comp_bins
+      ) |>
+      dplyr::mutate(length_order = match(.data[["length"]], comp_bins)) |>
+      dplyr::arrange(.data[["timing"]], .data[["length_order"]]) |>
+      dplyr::pull(value)
+  }
   if (is.null(comp_data) || length(comp_data) == 0) {
     cli::cli_abort(c(
       "`{comp[['name']]}`-composition data for fleet `{fleet_name}` is
@@ -626,31 +782,39 @@ initialize_comp <- function(data,
     ))
   }
 
+  model_uncertainty <- get_data(data) |>
+    dplyr::filter(
+      name == fleet_name,
+      type == comp[["name"]]
+    )
+  if (identical(type, "LengthComp") && fleet_has_local_length_bins(data, fleet_name)) {
+    comp_bins <- get_local_fleet_length_bins(data, fleet_name)
+    model_uncertainty <- model_uncertainty |>
+      dplyr::filter(.data[["length"]] %in% comp_bins) |>
+      dplyr::mutate(length_order = match(.data[["length"]], comp_bins)) |>
+      dplyr::arrange(.data[["timing"]], .data[["length_order"]])
+  }
   model_data <- comp_data *
-    get_data(data) |>
-      dplyr::filter(
-        name == fleet_name,
-        type == comp[["name"]]
-      ) |>
+    model_uncertainty |>
       dplyr::mutate(
         valid_n = ifelse(value == -999, 1, uncertainty)
       ) |>
       dplyr::pull(valid_n)
 
-  if (length(model_data) != get_n_years(data) * get_function(data)) {
+  if (length(model_data) != get_n_years(data) * expected_n) {
     bad_data_years <- get_data(data) |>
       dplyr::filter(
         name == fleet_name,
         type == comp[["name"]]
       ) |>
       dplyr::count(timing) |>
-      dplyr::filter(n != get_function(data)) |>
+      dplyr::filter(n != expected_n) |>
       dplyr::pull(timing)
 
     cli::cli_abort(c(
       "The length of the `{comp[['name']]}`-composition data for fleet
       `{fleet_name}` does not match the expected dimensions.",
-      i = "Expected length: {get_n_years(data) * get_function(data)}",
+      i = "Expected length: {get_n_years(data) * expected_n}",
       i = "Actual length: {length(model_data)}",
       i = "Number of -999 values: {sum(model_data == -999)}",
       i = "Dates with invalid data: {bad_data_years}"
@@ -749,6 +913,12 @@ initialize_fims <- function(parameters, data) {
 
   # Clear any previous FIMS settings
   clear()
+
+  growth_module_types <- parameters |>
+    dplyr::filter(.data[["module_name"]] == "Growth") |>
+    dplyr::pull(.data[["module_type"]]) |>
+    unique() |>
+    stats::na.omit()
 
   fleet_names <- parameters |>
     dplyr::pull(fleet_name) |>
@@ -1014,7 +1184,10 @@ initialize_fims <- function(parameters, data) {
       p = get_fixed(),
       re = get_random()
     ),
-    model = fims_model
+    model = fims_model,
+    metadata = list(
+      growth_module_types = growth_module_types
+    )
   )
 
   return(parameter_list)

@@ -18,12 +18,32 @@
 namespace fims_popdy {
 
 /**
- * @brief vb growth model adapter so caa can keep calling evaluate(age).
+ * @brief Generic capability interface for growth models that can feed the
+ * growth-derived ALK / bin-based WAA path in catch-at-age.
  */
 template <typename Type>
-class VonBertalanffyGrowthModelAdapter : public GrowthBase<Type> {
+class GrowthDerivedObservationBase : public GrowthBase<Type> {
  public:
-  VonBertalanffyGrowthModelAdapter() : GrowthBase<Type>() {}
+  GrowthDerivedObservationBase() : GrowthBase<Type>() {}
+  virtual ~GrowthDerivedObservationBase() = default;
+
+  virtual void SetAgeOffset(double min_age) = 0;
+  virtual void Initialize(std::size_t n_years,
+                          std::size_t n_ages,
+                          std::size_t n_sexes = 1) = 0;
+  virtual bool SupportsGrowthDerivedALK() const = 0;
+  virtual const GrowthProducts<Type>& GetProductsForReporting() = 0;
+  virtual Type EvaluateWeightAtLength(const Type& length) const = 0;
+};
+
+/**
+ * @brief VonB growth model adapter implementing the generic growth-derived
+ * observation capability for catch-at-age.
+ */
+template <typename Type>
+class VonBertalanffyGrowthModelAdapter : public GrowthDerivedObservationBase<Type> {
+ public:
+  VonBertalanffyGrowthModelAdapter() : GrowthDerivedObservationBase<Type>() {}
 
   fims::Vector<Type>& LengthAtRefAge1Vector() {
     use_param_vectors_ = true;
@@ -67,7 +87,7 @@ class VonBertalanffyGrowthModelAdapter : public GrowthBase<Type> {
 
   // If ages do not start at zero, set the minimum age here so we can
   // translate age values to zero-based indices for cached products.
-  void SetAgeOffset(double min_age) {
+  void SetAgeOffset(double min_age) override {
     age_offset_ = min_age;
     age_offset_set_ = true;
     if (model_) {
@@ -77,8 +97,12 @@ class VonBertalanffyGrowthModelAdapter : public GrowthBase<Type> {
 
   void Initialize(std::size_t n_years,
                   std::size_t n_ages,
-                  std::size_t n_sexes = 1) {
+                  std::size_t n_sexes = 1) override {
     EnsureParamsSet();
+    if (n_sexes != 1) {
+      throw std::runtime_error(
+          "VonBertalanffyGrowthModelAdapter currently supports n_sexes == 1");
+    }
     n_years_ = n_years;
     n_ages_ = n_ages;
     n_sexes_ = n_sexes;
@@ -88,6 +112,8 @@ class VonBertalanffyGrowthModelAdapter : public GrowthBase<Type> {
       model_->SetAgeOffset(static_cast<Type>(age_offset_));
     }
   }
+
+  bool SupportsGrowthDerivedALK() const override { return true; }
 
   virtual const Type evaluate(const double& a) const override {
     if (a < 0.0) {
@@ -135,7 +161,7 @@ class VonBertalanffyGrowthModelAdapter : public GrowthBase<Type> {
   /**
    * @brief Prepare and return growth products for reporting.
    */
-  const GrowthProducts<Type>& GetProductsForReporting() {
+  const GrowthProducts<Type>& GetProductsForReporting() override {
     if (!model_) {
       if (n_ages_ == 0) {
         throw std::runtime_error(
@@ -147,6 +173,23 @@ class VonBertalanffyGrowthModelAdapter : public GrowthBase<Type> {
     SyncParamsToModel();
     model_->Prepare();
     return model_->GetProducts();
+  }
+
+  /**
+   * @brief Evaluate the length-weight relationship at a supplied length.
+   *
+   * This is used by fleet-level derived quantities that need a bin-based
+   * expectation over the same length bins used in the dynamic ALK path.
+   *
+   * @param length Length on the natural scale.
+   * @return Weight on the natural scale.
+   */
+  Type EvaluateWeightAtLength(const Type& length) const override {
+    EnsureParamsSet();
+    const Type length_safe =
+        fims_math::ad_max(length, static_cast<Type>(1e-8));
+    return CurrentLengthWeightA() *
+           fims_math::pow(length_safe, CurrentLengthWeightB());
   }
 
  private:
@@ -214,6 +257,23 @@ class VonBertalanffyGrowthModelAdapter : public GrowthBase<Type> {
         length_weight_a_vector_.size() < 1 || length_weight_b_vector_.size() < 1 || length_at_age_sd_at_ref_ages_vector_.size() < 2) {
       throw std::runtime_error(
           "VonBertalanffyGrowth parameters not set");
+    }
+    if (length_at_ref_age_1_vector_.size() != 1 ||
+        length_at_ref_age_2_vector_.size() != 1 ||
+        growth_coefficient_K_vector_.size() != 1 ||
+        reference_age_for_length_1_vector_.size() != 1 ||
+        reference_age_for_length_2_vector_.size() != 1 ||
+        length_weight_a_vector_.size() != 1 ||
+        length_weight_b_vector_.size() != 1) {
+      throw std::runtime_error(
+          "VonBertalanffyGrowthModelAdapter currently supports a single "
+          "growth pattern; expected size 1 for VonB and length-weight "
+          "parameter vectors");
+    }
+    if (length_at_age_sd_at_ref_ages_vector_.size() != 2) {
+      throw std::runtime_error(
+          "VonBertalanffyGrowthModelAdapter expected exactly 2 "
+          "length_at_age_sd_at_ref_ages values");
     }
   }
 

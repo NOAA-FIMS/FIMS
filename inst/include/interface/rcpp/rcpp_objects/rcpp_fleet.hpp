@@ -161,7 +161,15 @@ class FleetInterface : public FleetInterfaceBase {
    * age-to-length-conversion matrix.
    */
   ParameterVector age_to_length_conversion;
-
+  /**
+   * @brief Length-bin centers for the fleet.
+   *
+   * Populated from R during initialization and copied into the runtime C++
+   * fleet object. Once copied, these bin centers are the authoritative
+   * fleet-level runtime bin definition used by the growth-derived ALK path
+   * and bin-based mean weight-at-age calculations.
+   */
+  RealVector lengths;
   // derived quantities
   /**
    * @brief Derived landings-at-age in numbers.
@@ -271,6 +279,9 @@ class FleetInterface : public FleetInterfaceBase {
         agecomp_proportion(other.agecomp_proportion),
         lengthcomp_proportion(other.lengthcomp_proportion),
         age_to_length_conversion(other.age_to_length_conversion),
+        // Copy the fleet-specific length-bin centers so duplicated interface objects
+        // preserve the runtime bin definition needed by the growth-derived ALK path.
+        lengths(other.lengths),
         derived_landings_naa(other.derived_landings_naa),
         derived_landings_nal(other.derived_landings_nal),
         derived_landings_waa(other.derived_landings_waa),
@@ -342,6 +353,7 @@ class FleetInterface : public FleetInterfaceBase {
   void SetObservedLandingsDataID(int observed_landings_data_id) {
     interface_observed_landings_data_id_m.set(observed_landings_data_id);
   }
+
   /**
    * @brief Set the unique ID for the selectivity object.
    * @param selectivity_id Unique ID for the observed object.
@@ -525,16 +537,61 @@ class FleetInterface : public FleetInterfaceBase {
     // add to variable_map
     info->variable_map[this->log_Fmort.id_m] = &(fleet)->log_Fmort;
 
+    // This FleetInterface object represents one fleet. If that fleet declares
+    // at least one length bin, move its numeric bin centers into the runtime
+    // C++ fleet object so later model code can use the actual bin values.
     if (this->n_lengths.get() > 0) {
+      // `n_lengths` is the declared number of bins for this fleet, while
+      // `lengths` is the vector of bin-center values supplied for this same
+      // fleet. These must agree exactly: one numeric bin center per declared
+      // fleet length bin.
+      //
+      // If they do not match, stop here rather than letting an inconsistent
+      // fleet bin definition reach the dynamic ALK or bin-based WAA code.
+      if (this->lengths.size() != static_cast<size_t>(this->n_lengths.get())) {
+        FIMS_ERROR_LOG(
+            "The size of `lengths` does not match `n_lengths`: " +
+            fims::to_string(this->lengths.size()) + " != " +
+            fims::to_string(this->n_lengths.get()));
+        throw std::invalid_argument(
+            "Fleet lengths size mismatch. Fleet lengths is of size " +
+            fims::to_string(this->lengths.size()) +
+            " and the number of lengths is " +
+            fims::to_string(this->n_lengths.get()));
+      }
+
+      // Resize the runtime fleet's length-bin vector to match the validated
+      // interface input for this fleet.
+      fleet->lengths.resize(this->lengths.size());
+
+      // Copy each fleet-specific bin center from the Rcpp interface object
+      // into the runtime C++ fleet object. After this copy, downstream code
+      // can use `fleet->lengths` as the authoritative bin definition for this
+      // fleet during model evaluation.
+      for (size_t i = 0; i < fleet->lengths.size(); i++) {
+        fleet->lengths[i] = this->lengths[i];
+      }
+
       fleet->age_to_length_conversion.resize(
           this->age_to_length_conversion.size());
 
-      if (this->age_to_length_conversion.size() !=
-          static_cast<size_t>(this->n_ages.get() * this->n_lengths.get())) {
+      // Validate fixed ALK input size before loading into the model.
+      // `age_to_length_conversion` is a flattened age-by-length table, so:
+      // expected length = n_ages * n_lengths.
+      // Size 0 is allowed and means "no fixed ALK provided" (e.g., use a
+      // growth-derived path instead). Any other nonzero size must match exactly.
+      const size_t expected_alk_size =
+          static_cast<size_t>(this->n_ages.get() * this->n_lengths.get());
+      const size_t supplied_alk_size = this->age_to_length_conversion.size();
+      if (supplied_alk_size != 0 && supplied_alk_size != expected_alk_size) {
         FIMS_ERROR_LOG(
-            "age_to_length_conversion don't match, " +
-            fims::to_string(this->age_to_length_conversion.size()) + " != " +
-            fims::to_string((this->n_ages.get() * this->n_lengths.get())));
+            "age_to_length_conversion size mismatch, " +
+            fims::to_string(supplied_alk_size) + " != " +
+            fims::to_string(expected_alk_size));
+        throw std::invalid_argument(
+            "Fleet age_to_length_conversion size mismatch. Expected " +
+            fims::to_string(expected_alk_size) + " values but received " +
+            fims::to_string(supplied_alk_size) + ".");
       }
 
       for (size_t i = 0; i < fleet->age_to_length_conversion.size(); i++) {

@@ -254,6 +254,7 @@ RCPP_MODULE(fims) {
       .field("n_ages", &FleetInterface::n_ages)
       .field("n_years", &FleetInterface::n_years)
       .field("n_lengths", &FleetInterface::n_lengths)
+      .field("lengths", &FleetInterface::lengths)
       .field("observed_landings_units",
              &FleetInterface::observed_landings_units)
       .field("observed_index_units", &FleetInterface::observed_index_units)
@@ -471,7 +472,11 @@ RCPP_MODULE(fims) {
       .method("GetReport", &CatchAtAgeInterface::get_report)
       .method("GetId", &CatchAtAgeInterface::get_id)
       .method("DoReporting", &CatchAtAgeInterface::DoReporting)
-      .method("IsReporting", &CatchAtAgeInterface::IsReporting);
+      .method("IsReporting", &CatchAtAgeInterface::IsReporting)
+      .method("ReportGrowthDerivedALKTensor",
+              &CatchAtAgeInterface::ReportGrowthDerivedALKTensor)
+      .method("IsReportingGrowthDerivedALKTensor",
+              &CatchAtAgeInterface::IsReportingGrowthDerivedALKTensor);
 }
 
 #endif /* SRC_FIMS_MODULES_HPP */

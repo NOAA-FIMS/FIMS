@@ -572,7 +572,7 @@ methods::setValidity(
     # Add validity check for types
     allowed_types <- c(
       "landings", "index", "age_comp", "length_comp",
-      "weight-at-age", "age-to-length-conversion"
+      "weight-at-age", "age-to-length-conversion", "length-bin"
     )
     present_types <- unique(object@data[["type"]])
 
@@ -718,7 +718,11 @@ FIMSFrame <- function(data) {
     if (all(is.na(data[["length"]]))) {
       lengths <- numeric()
     } else {
-      lengths <- sort(unique(data[["length"]]))
+      lengths <- data |>
+        dplyr::filter(.data[["type"]] != "length-bin") |>
+        dplyr::pull(.data[["length"]]) |>
+        unique() |>
+        sort()
       lengths <- lengths[!is.na(lengths)]
     }
   } else {

@@ -27,6 +27,9 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
   size_t n_years;       /*!< the number of years in the model*/
   size_t n_ages;        /*!< the number of ages in the model*/
   size_t n_lengths;     /*!< the number of lengths in the model*/
+  fims::Vector<Type> lengths; /*!< Length-bin centers for this fleet. These are
+used by the growth-derived ALK path to translate length-at-age distributions
+into probabilities over fleet bins, and to compute bin-based mean weight-at-age. */
 
   // selectivity
   int fleet_selectivity_id_m = -999; /*!< id of selectivity component*/
@@ -67,8 +70,8 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
   fims::Vector<Type>
       q; /*!< transformed parameter: the catchability of the fleet */
 
-  fims::Vector<Type> age_to_length_conversion; /*!<derived quantity age to
-                                                length conversion matrix*/
+  fims::Vector<Type>
+      age_to_length_conversion; /*!< derived age-to-length conversion matrix */
 
   /**
    * @brief Constructor.

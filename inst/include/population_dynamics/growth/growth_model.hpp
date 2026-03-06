@@ -101,10 +101,13 @@ class GrowthModel : public GrowthModelBase<Type> {
           // log-scale params live upstream; laa here is natural scale
           const Type laa = vb_.length_at_age(age);
           products_.MeanLAA(y, a, s) = laa;
-          products_.SdLAA(y, a, s) =
+          const Type sd_laa =
               (n_ages_ > 1)
-                  ? length_at_age_sd_at_reference_age_1_ + slope * (laa - laa_min)
+                  ? length_at_age_sd_at_reference_age_1_ +
+                        slope * (laa - laa_min)
                   : length_at_age_sd_at_reference_age_1_;
+          products_.SdLAA(y, a, s) = fims_math::ad_max(
+              sd_laa, static_cast<Type>(1e-8));
           products_.MeanWAA(y, a, s) = vb_.weight_at_age(age);
         }
       }
@@ -119,6 +122,7 @@ class GrowthModel : public GrowthModelBase<Type> {
 
   /// For testing caching behavior
  private:
+
   std::size_t n_years_;
   std::size_t n_ages_;
   std::size_t n_sexes_;

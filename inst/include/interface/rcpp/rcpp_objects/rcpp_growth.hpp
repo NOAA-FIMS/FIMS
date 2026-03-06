@@ -80,6 +80,63 @@ std::map<uint32_t, std::shared_ptr<GrowthInterfaceBase>>
     GrowthInterfaceBase::live_objects;
 
 /**
+ * @brief Rcpp interface base for growth models that can register a
+ * growth-derived observation capability with the runtime model.
+ *
+ * This keeps the Rcpp producer side aligned with the generic
+ * GrowthDerivedObservationBase contract used by catch-at-age while still
+ * allowing concrete interfaces to manage their own model-specific parameters.
+ */
+class GrowthDerivedObservationInterfaceBase : public GrowthInterfaceBase {
+ public:
+  GrowthDerivedObservationInterfaceBase() : GrowthInterfaceBase() {}
+
+  GrowthDerivedObservationInterfaceBase(
+      const GrowthDerivedObservationInterfaceBase& other)
+      : GrowthInterfaceBase(other) {}
+
+  virtual ~GrowthDerivedObservationInterfaceBase() {}
+
+ protected:
+  template <typename Type>
+  std::shared_ptr<fims_popdy::GrowthDerivedObservationBase<Type>>
+  GetGrowthObservationFromInfo() const {
+    std::shared_ptr<fims_info::Information<Type>> info =
+        fims_info::Information<Type>::GetInstance();
+
+    typename fims_info::Information<Type>::growth_models_iterator it =
+        info->growth_models.find(this->id);
+    if (it == info->growth_models.end()) {
+      FIMS_WARNING_LOG("Growth-derived observation model " +
+                       fims::to_string(this->id) +
+                       " not found in Information.");
+      return nullptr;
+    }
+
+    std::shared_ptr<fims_popdy::GrowthDerivedObservationBase<Type>>
+        growth_observation =
+            std::dynamic_pointer_cast<
+                fims_popdy::GrowthDerivedObservationBase<Type>>(it->second);
+    if (!growth_observation) {
+      FIMS_WARNING_LOG("Growth-derived observation type mismatch for id " +
+                       fims::to_string(this->id));
+      return nullptr;
+    }
+
+    return growth_observation;
+  }
+
+  template <typename Type>
+  void RegisterGrowthObservationInInfo(
+      const std::shared_ptr<fims_popdy::GrowthDerivedObservationBase<Type>>&
+          growth_observation) const {
+    std::shared_ptr<fims_info::Information<Type>> info =
+        fims_info::Information<Type>::GetInstance();
+    info->growth_models[growth_observation->id] = growth_observation;
+  }
+};
+
+/**
  * @brief Rcpp interface for EWAAGrowth to instantiate the object from R:
  * ewaa <- methods::new(EWAAGrowth). Where, EWAA stands for empirical weight at
  * age and growth is not actually estimated.
@@ -261,27 +318,38 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
 };
 
 /**
- * @brief Rcpp interface for VonBertalanffyGrowth to instantiate from R:
- * vb <- methods::new(VonBertalanffyGrowth)
+ * @brief Rcpp-facing Von Bertalanffy growth module.
+ * Inherits "derived observation" capability so this growth can support
+ * growth-derived outputs used by downstream ALK/WAA paths.
  */
-class VonBertalanffyGrowthInterface : public GrowthInterfaceBase {
+class VonBertalanffyGrowthInterface
+    : public GrowthDerivedObservationInterfaceBase {
  public:
   // Required parameters
+  // L1 = expected length at reference age 1
+  // L2 = expected length at reference age 2
+  // K  = growth coefficient
   ParameterVector length_at_ref_age_1;
   ParameterVector length_at_ref_age_2;
   ParameterVector growth_coefficient_K;
+
+   // Reference ages used to define the two-point VonB parameterization.
   ParameterVector reference_age_for_length_1;
   ParameterVector reference_age_for_length_2;
 
-  // Length-weight conversion params
+  // Length-to-weight relationship parameters: W = a * L^b
+
   ParameterVector length_weight_a;
   ParameterVector length_weight_b;
-  // Length-at-age SD params
+
+// Length-at-age SD values at reference ages (used to define variability).
   ParameterVector length_at_age_sd_at_ref_ages;
   // Age dimension (for bounds checking)
   SharedInt n_ages = 0;
 
-  VonBertalanffyGrowthInterface() : GrowthInterfaceBase() {
+  VonBertalanffyGrowthInterface() : GrowthDerivedObservationInterfaceBase() {
+     // Register this interface instance in global registries so it can be
+    // discovered and linked by ID during model initialization.
     GrowthInterfaceBase::live_objects[this->id] =
         std::make_shared<VonBertalanffyGrowthInterface>(*this);
     FIMSRcppInterfaceBase::fims_interface_objects.push_back(
@@ -289,7 +357,7 @@ class VonBertalanffyGrowthInterface : public GrowthInterfaceBase {
   }
 
   VonBertalanffyGrowthInterface(const VonBertalanffyGrowthInterface& other)
-      : GrowthInterfaceBase(other),
+      : GrowthDerivedObservationInterfaceBase(other),
         length_at_ref_age_1(other.length_at_ref_age_1),
         length_at_ref_age_2(other.length_at_ref_age_2),
         growth_coefficient_K(other.growth_coefficient_K),
@@ -302,6 +370,7 @@ class VonBertalanffyGrowthInterface : public GrowthInterfaceBase {
 
   virtual ~VonBertalanffyGrowthInterface() {}
 
+  // Return stable module ID used for linking this growth object to populations.
   virtual uint32_t get_id() { return this->id; }
 
   /**
@@ -316,20 +385,16 @@ class VonBertalanffyGrowthInterface : public GrowthInterfaceBase {
 
     this->finalized = true;
 
-    std::shared_ptr<fims_info::Information<double>> info =
-        fims_info::Information<double>::GetInstance();
-
-    fims_info::Information<double>::growth_models_iterator it;
-    it = info->growth_models.find(this->id);
-    if (it == info->growth_models.end()) {
-      FIMS_WARNING_LOG("VonBertalanffy Growth " + fims::to_string(this->id) +
-                       " not found in Information.");
+    std::shared_ptr<fims_popdy::GrowthDerivedObservationBase<double>>
+        growth_observation = this->GetGrowthObservationFromInfo<double>();
+    if (!growth_observation) {
       return;
     }
 
     std::shared_ptr<fims_popdy::VonBertalanffyGrowthModelAdapter<double>> vb =
         std::dynamic_pointer_cast<
-            fims_popdy::VonBertalanffyGrowthModelAdapter<double>>(it->second);
+            fims_popdy::VonBertalanffyGrowthModelAdapter<double>>(
+            growth_observation);
     if (!vb) {
       FIMS_WARNING_LOG("Growth model type mismatch for id " +
                        fims::to_string(this->id));
@@ -428,6 +493,12 @@ class VonBertalanffyGrowthInterface : public GrowthInterfaceBase {
     check_positive(this->growth_coefficient_K, "growth_coefficient_K");
     check_positive(this->length_weight_a, "length_weight_a");
     check_positive(this->length_weight_b, "length_weight_b");
+    if (this->length_at_ref_age_2[0].initial_value_m <=
+        this->length_at_ref_age_1[0].initial_value_m) {
+      Rcpp::stop(
+          "VonBertalanffyGrowth length_at_ref_age_2 must be > "
+          "length_at_ref_age_1");
+    }
     if (require_sd) {
       check_positive(this->length_at_age_sd_at_ref_ages,
                      "length_at_age_sd_at_ref_ages");
@@ -555,8 +626,17 @@ bool add_to_fims_tmb_internal() {
   std::shared_ptr<fims_info::Information<Type>> info =
       fims_info::Information<Type>::GetInstance();
 
+  std::shared_ptr<fims_popdy::GrowthDerivedObservationBase<Type>>
+      growth_observation =
+          std::make_shared<fims_popdy::VonBertalanffyGrowthModelAdapter<Type>>();
   std::shared_ptr<fims_popdy::VonBertalanffyGrowthModelAdapter<Type>> vb =
-      std::make_shared<fims_popdy::VonBertalanffyGrowthModelAdapter<Type>>();
+      std::dynamic_pointer_cast<
+          fims_popdy::VonBertalanffyGrowthModelAdapter<Type>>(
+          growth_observation);
+  if (!vb) {
+    Rcpp::stop(
+        "Failed to create VonBertalanffy growth-derived observation model");
+  }
 
   vb->id = this->id;
 
@@ -615,7 +695,7 @@ bool add_to_fims_tmb_internal() {
   load_and_register(this->length_at_age_sd_at_ref_ages, vb->LengthAtAgeSdAtRefAgesVector(),
                     "length_at_age_sd_at_ref_ages", true);
 
-  info->growth_models[vb->id] = vb;
+  this->RegisterGrowthObservationInInfo<Type>(growth_observation);
   return true;
 }
 

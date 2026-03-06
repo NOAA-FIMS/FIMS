@@ -8,8 +8,11 @@
 #ifndef FIMS_MODELS_CATCH_AT_AGE_HPP
 #define FIMS_MODELS_CATCH_AT_AGE_HPP
 
+#include <algorithm>
+#include <cmath>
 #include <set>
 #include <regex>
+#include <stdexcept>
 
 #include "fishery_model_base.hpp"
 
@@ -116,6 +119,13 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * parameters.
    */
   std::map<std::string, fims::Vector<fims::Vector<Type>>> report_vectors;
+  /**
+   * @brief Controls whether reporting materializes the full derived
+   * age-to-length tensor for fleets using the growth-derived ALK path.
+   *
+   * Default is false to avoid large report-side allocations.
+   */
+  bool report_growth_derived_alk_tensor = false;
 
  public:
   std::vector<Type> ages; /*!< vector of the ages for referencing*/
@@ -136,7 +146,11 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * @snippet{doc} this param_other
    */
   CatchAtAge(const CatchAtAge &other)
-      : FisheryModelBase<Type>(other), name_m(other.name_m), ages(other.ages) {
+      : FisheryModelBase<Type>(other),
+        name_m(other.name_m),
+        ages(other.ages),
+        report_growth_derived_alk_tensor(
+            other.report_growth_derived_alk_tensor) {
     this->model_type_m = "caa";
   }
 
@@ -434,8 +448,9 @@ class CatchAtAge : public FisheryModelBase<Type> {
     std::map<std::string, fims::Vector<Type>> &dq_ =
         this->GetPopulationDerivedQuantities(population->GetId());
 
-    dq_["biomass"][year] += dq_["numbers_at_age"][i_age_year] *
-                            population->growth->evaluate(population->ages[age]);
+    dq_["biomass"][year] +=
+        dq_["numbers_at_age"][i_age_year] *
+        population->growth->evaluate(population->ages[age]);
   }
 
   /**
@@ -939,6 +954,692 @@ class CatchAtAge : public FisheryModelBase<Type> {
     }
   }
 
+  // --- Growth-derived ALK helpers for temp VonB path ---
+  //
+  // Previous FIMS behavior used a precomputed fleet age_to_length_conversion
+  // matrix for length compositions and generic growth->evaluate(age) for
+  // weight-at-age. The helpers below were added so that, when VonB is active
+  // and supported, catch_at_age can instead:
+  // 1. build a dynamic ALK from fitted growth products and fleet length bins,
+  // 2. compute mean WAA from that same ALK row and the fleet's bin centers,
+  // 3. fall back to the historical path when the supported VonB path is
+  //    unavailable.
+
+  /**
+   * @brief Returns the midpoint between two adjacent fleet length bins.
+   *
+   * @param fleet Shared pointer to the fleet object.
+   * @param left Index of the left length bin center.
+   * @param right Index of the right length bin center.
+   * @return Midpoint between the two bin centers.
+   */
+  inline Type LengthBinMidpoint(const std::shared_ptr<fims_popdy::Fleet<Type>>& fleet,
+                                size_t left,
+                                size_t right) const {
+    return (fleet->lengths[left] + fleet->lengths[right]) *
+           static_cast<Type>(0.5);
+  }
+
+#ifdef TMB_MODEL
+  /**
+   * @brief Evaluates the normal cumulative distribution function.
+   *
+   * Uses TMB's atomic normal CDF implementation in model code and a standard
+   * erf-based fallback outside the TMB path.
+   *
+   * @param x Value at which to evaluate the CDF.
+   * @param mean Mean of the normal distribution.
+   * @param sd Standard deviation of the normal distribution.
+   * @return Lower-tail normal CDF evaluated at x.
+   */
+  inline Type NormalCdf(const Type& x, const Type& mean, const Type& sd) const {
+    CppAD::vector<Type> tx(1);
+    tx[0] = (x - mean) / sd;
+    return atomic::pnorm1(tx)[0];
+  }
+#else
+  /**
+   * @brief Evaluates the normal cumulative distribution function.
+   *
+   * @param x Value at which to evaluate the CDF.
+   * @param mean Mean of the normal distribution.
+   * @param sd Standard deviation of the normal distribution.
+   * @return Lower-tail normal CDF evaluated at x.
+   */
+  inline Type NormalCdf(const Type& x, const Type& mean, const Type& sd) const {
+    const double z = static_cast<double>(x - mean) /
+                     (static_cast<double>(sd) * std::sqrt(2.0));
+    return static_cast<Type>(0.5 * (1.0 + std::erf(z)));
+  }
+#endif
+
+  /**
+   * @brief Builds an age-to-length probability for one length bin from growth
+   * products and fleet length bins.
+   *
+   * The probability is computed from the normal CDF implied by mean and
+   * standard deviation of length-at-age for the given year and age.
+   *
+   * The first and last bins use one-sided tails; interior bins use the
+   * difference between upper and lower CDF bounds.
+   * 
+   * @param fleet Shared pointer to the fleet object.
+   * @param growth_products Growth products for the linked population.
+   * @param year Year index.
+   * @param age Age index.
+   * @param length_bin Length-bin index.
+   * @return Probability of observing the age in the requested length bin.
+   */
+  inline Type GrowthDerivedALKProb(
+      const std::shared_ptr<fims_popdy::Fleet<Type>>& fleet,
+      const fims_popdy::GrowthProducts<Type>& growth_products,
+      size_t year,
+      size_t age,
+      size_t length_bin) const {
+    if (fleet->n_lengths == 0) {
+      return static_cast<Type>(0.0);
+    }
+    if (fleet->n_lengths == 1) {
+      return static_cast<Type>(1.0);
+    }
+
+    const std::size_t y =
+        (growth_products.n_years == 0)
+            ? 0
+            : std::min(year, growth_products.n_years - 1);
+    const Type mean_laa = growth_products.MeanLAA(y, age, 0);
+    const Type sd_laa = fims_math::ad_max(
+        growth_products.SdLAA(y, age, 0), static_cast<Type>(1e-8));
+
+    if (length_bin == 0) {
+      const Type upper = LengthBinMidpoint(fleet, 0, 1);
+      return NormalCdf(upper, mean_laa, sd_laa);
+    }
+
+    if (length_bin + 1 == fleet->n_lengths) {
+      const Type lower =
+          LengthBinMidpoint(fleet, fleet->n_lengths - 2, fleet->n_lengths - 1);
+      return static_cast<Type>(1.0) - NormalCdf(lower, mean_laa, sd_laa);
+    }
+
+    const Type lower = LengthBinMidpoint(fleet, length_bin - 1, length_bin);
+    const Type upper = LengthBinMidpoint(fleet, length_bin, length_bin + 1);
+    return NormalCdf(upper, mean_laa, sd_laa) -
+           NormalCdf(lower, mean_laa, sd_laa);
+  }
+
+  /**
+   * @brief Builds a normalized growth-derived ALK row for one year and age.
+   *
+   * This helper turns the per-bin probabilities above into a full ALK row and
+   * normalizes it so the row sums to one before it is used in likelihood or
+   * derived quantities. Normalization was added to guard against small numeric
+   * drift from the CDF calculations.
+   *
+   * @param fleet Shared pointer to the fleet object.
+   * @param growth_products Growth products for the linked population.
+   * @param year Year index.
+   * @param age Age index.
+   * @return Normalized age-to-length probabilities for the requested year and
+   * age.
+   */
+  inline vector<Type> BuildNormalizedGrowthDerivedALKRow(
+      const std::shared_ptr<fims_popdy::Fleet<Type>>& fleet,
+      const fims_popdy::GrowthProducts<Type>& growth_products,
+      size_t year,
+      size_t age) const {
+    vector<Type> alk_row(fleet->n_lengths);
+    Type row_sum = static_cast<Type>(0.0);
+    for (size_t l = 0; l < fleet->n_lengths; ++l) {
+      alk_row(l) = GrowthDerivedALKProb(fleet, growth_products, year, age, l);
+      row_sum += alk_row(l);
+    }
+    const Type safe_row_sum =
+        fims_math::ad_max(row_sum, static_cast<Type>(1e-12));
+    for (size_t l = 0; l < fleet->n_lengths; ++l) {
+      alk_row(l) /= safe_row_sum;
+    }
+    return alk_row;
+  }
+
+  /**
+   * @brief Computes expected weight-at-age from a normalized ALK row and fleet
+   * length-bin centers.
+   * 
+   * This is the bin-based WAA step built to accomdate growth dervied ALK.
+   * Instead of using only growth->evaluate(age), it computes expected weight as
+   * the weighted average of weight-at-length over the same fleet bins used in
+   * the dynamic ALK row.
+   *
+   * @param growth_observation Shared pointer to the linked growth-derived
+   * observation capability.
+   * @param fleet Shared pointer to the fleet object.
+   * @param alk_row Normalized age-to-length probabilities for one year and age.
+   * @return Expected weight-at-age on the natural scale.
+   */
+  Type MeanWeightFromALKRow(
+      const std::shared_ptr<fims_popdy::GrowthDerivedObservationBase<Type>>&
+          growth_observation,
+      const std::shared_ptr<fims_popdy::Fleet<Type>>& fleet,
+      const vector<Type>& alk_row) {
+    Type mean_weight = static_cast<Type>(0.0);
+    for (size_t l = 0; l < fleet->n_lengths; ++l) {
+      mean_weight +=
+          alk_row(l) * growth_observation->EvaluateWeightAtLength(fleet->lengths[l]);
+    }
+    return mean_weight;
+  }
+
+  /**
+   * @brief Builds a normalized dynamic ALK row and returns the matching
+   * midpoint-based expected weight-at-age.
+   * 
+   * This bundles the ALK and WAA calculations together so both quantities are
+   * derived from the same row and cannot drift apart across callers.
+   *
+   * @param growth_observation Shared pointer to the linked growth-derived
+   * observation capability.
+   * @param fleet Shared pointer to the fleet object.
+   * @param growth_products Growth products for the linked population.
+   * @param year Year index.
+   * @param age Age index.
+   * @param alk_row Output vector storing the normalized age-to-length
+   * probabilities for the requested year and age.
+   * @return Expected weight-at-age from the same normalized ALK row.
+   */
+  Type BuildGrowthDerivedALKRowAndMeanWeight(
+      const std::shared_ptr<fims_popdy::GrowthDerivedObservationBase<Type>>&
+          growth_observation,
+      const std::shared_ptr<fims_popdy::Fleet<Type>>& fleet,
+      const fims_popdy::GrowthProducts<Type>& growth_products,
+      size_t year,
+      size_t age,
+      vector<Type>& alk_row) {
+    alk_row = BuildNormalizedGrowthDerivedALKRow(fleet, growth_products, year,
+                                                 age);
+    return MeanWeightFromALKRow(growth_observation, fleet, alk_row);
+  }
+
+  /**
+   * @brief Attempts to build a normalized dynamic ALK row for one fleet, year,
+   * and age.
+   *
+   * This wrapper was added so callers can ask for the supported growth-derived
+   * observation path
+   * without duplicating eligibility checks everywhere. A return value of false
+   * means "fall back to historical behavior."
+   * 
+   * @param fleet Shared pointer to the fleet object.
+   * @param year Year index.
+   * @param age Age index.
+   * @param alk_row Output vector storing the normalized age-to-length
+   * probabilities when the supported path is available.
+   * @return True when the supported growth-derived ALK path is available.
+   */
+  bool TryBuildGrowthDerivedALKRow(
+      const std::shared_ptr<fims_popdy::Fleet<Type>>& fleet,
+      size_t year,
+      size_t age,
+      vector<Type>& alk_row) {
+    const fims_popdy::GrowthProducts<Type>* growth_products =
+        GetGrowthProductsForFleet(fleet);
+    if (growth_products == nullptr || fleet->lengths.size() != fleet->n_lengths) {
+      return false;
+    }
+    alk_row =
+        BuildNormalizedGrowthDerivedALKRow(fleet, *growth_products, year, age);
+    return true;
+  }
+
+  /**
+   * @brief Attempts to build a normalized dynamic ALK row and matching
+   * midpoint-based expected weight-at-age for one fleet, year, and age.
+   *
+   * This is the same pattern as above, but for callers that need both
+   * the ALK row and the corresponding bin-based mean WAA from the same row.
+   * 
+   * @param fleet Shared pointer to the fleet object.
+   * @param year Year index.
+   * @param age Age index.
+   * @param alk_row Output vector storing the normalized age-to-length
+   * probabilities when the supported path is available.
+   * @param mean_weight Output expected weight-at-age from the same ALK row.
+   * @return True when the supported growth-derived ALK path is available.
+   */
+  bool TryBuildGrowthDerivedALKRowAndMeanWeight(
+      const std::shared_ptr<fims_popdy::Fleet<Type>>& fleet,
+      size_t year,
+      size_t age,
+      vector<Type>& alk_row,
+      Type& mean_weight) {
+    std::shared_ptr<fims_popdy::GrowthDerivedObservationBase<Type>>
+        growth_observation = GetGrowthObservationForFleet(fleet);
+    const fims_popdy::GrowthProducts<Type>* growth_products =
+        GetGrowthProductsForFleet(fleet);
+    if (growth_observation == nullptr || growth_products == nullptr ||
+        fleet->lengths.size() != fleet->n_lengths) {
+      return false;
+    }
+    mean_weight = BuildGrowthDerivedALKRowAndMeanWeight(
+        growth_observation, fleet, *growth_products, year, age, alk_row);
+    return true;
+  }
+
+  /**
+   * @brief Computes fleet-specific expected weight-at-age from the same
+   * normalized ALK row used in the dynamic length-composition path.
+   * 
+   * This was added so fleet-level quantities like landings and index weights
+   * can use the same fleet-bin-aware WAA as the active growth-derived length
+   * pathway,
+   * rather than always the historical generic growth evaluation.
+   *
+   * @param population Shared pointer to the population object.
+   * @param fleet Shared pointer to the fleet object.
+   * @param year Year index.
+   * @param age Age index.
+   * @return Expected fleet-specific weight-at-age for the supported dynamic
+   * ALK path, or the default growth evaluation if the dynamic path is
+   * unavailable.
+   */
+  Type GrowthDerivedFleetMeanWeightAA(
+      const std::shared_ptr<fims_popdy::Population<Type>>& population,
+      const std::shared_ptr<fims_popdy::Fleet<Type>>& fleet,
+      size_t year,
+      size_t age) {
+    vector<Type> alk_row;
+    Type mean_weight = static_cast<Type>(0.0);
+    if (TryBuildGrowthDerivedALKRowAndMeanWeight(fleet, year, age, alk_row,
+                                                 mean_weight)) {
+      return mean_weight;
+    }
+    return population->growth->evaluate(population->ages[age]);
+  }
+
+  /**
+   * @brief Computes population-level mean weight-at-age using the same
+   * explicit-bin expectation as the supported dynamic ALK path when possible.
+   *
+   * This replaces direct use of growth->evaluate(age) for biomass and reference
+   * point quantities when all linked fleets share one reusable explicit-bin
+   * definition. If that shared definition does not exist, the historical
+   * population growth evaluation is still used.
+   *
+   * @param population Shared pointer to the population object.
+   * @param year Year index.
+   * @param age Age index.
+   * @return Mean weight-at-age on the natural scale.
+   */
+  Type PopulationMeanWeightAA(
+      const std::shared_ptr<fims_popdy::Population<Type>>& population,
+      size_t year,
+      size_t age) {
+    std::shared_ptr<fims_popdy::Fleet<Type>> canonical_fleet =
+        GetCanonicalGrowthDerivedWeightFleet(population);
+    if (canonical_fleet != nullptr) {
+      return GrowthDerivedFleetMeanWeightAA(
+          population, canonical_fleet, year, age);
+    }
+
+    // Historical fallback when no single shared fleet-bin definition can be
+    // reused safely at the population level.
+    return population->growth->evaluate(population->ages[age]);
+  }
+
+  /**
+   * @brief Returns the canonical fleet whose explicit bins can be reused for
+   * population-level growth-derived weight calculations.
+   *
+   * This helper was added because population-level biomass quantities do not
+   * naturally belong to one fleet, but the bin-based WAA path needs one shared
+   * bin definition. The canonical fleet is only accepted when every linked
+   * fleet supports the narrow VonB path and all fleets share identical bins.
+   *
+   * @param population Shared pointer to the population object.
+   * @return Shared pointer to the canonical fleet, or nullptr when the
+   * population cannot use a single shared fleet-bin definition.
+   */
+  std::shared_ptr<fims_popdy::Fleet<Type>> GetCanonicalGrowthDerivedWeightFleet(
+      const std::shared_ptr<fims_popdy::Population<Type>>& population) {
+    if (population->fleets.size() == 0) {
+      return nullptr;
+    }
+    const std::shared_ptr<fims_popdy::Fleet<Type>>& canonical_fleet =
+        population->fleets[0];
+    if (GetGrowthProductsForFleet(canonical_fleet) == nullptr ||
+        canonical_fleet->lengths.size() != canonical_fleet->n_lengths) {
+      return nullptr;
+    }
+    for (size_t fleet_ = 1; fleet_ < population->fleets.size(); ++fleet_) {
+      const std::shared_ptr<fims_popdy::Fleet<Type>>& fleet =
+          population->fleets[fleet_];
+      if (GetGrowthProductsForFleet(fleet) == nullptr ||
+          fleet->n_lengths != canonical_fleet->n_lengths ||
+          fleet->lengths.size() != canonical_fleet->lengths.size()) {
+        return nullptr;
+      }
+      for (size_t l = 0; l < canonical_fleet->lengths.size(); ++l) {
+        if (fleet->lengths[l] != canonical_fleet->lengths[l]) {
+          return nullptr;
+        }
+      }
+    }
+    return canonical_fleet;
+  }
+
+  /**
+   * @brief Returns whether a population can use a single canonical explicit
+   * length-bin definition for the current growth-derived weight path.
+   *
+   * Small convenience wrapper used to keep reporting and higher-level logic
+   * readable when checking whether the population can reuse one shared fleet
+   * bin definition.
+   * 
+   * This is true when every linked fleet supports the narrow dynamic ALK path
+   * and all linked fleets share the same length-bin centers.
+   *
+   * @param population Shared pointer to the population object.
+   * @return True if a canonical fleet-bin definition can be used.
+   */
+  bool PopulationUsesCanonicalGrowthDerivedWeightBins(
+      const std::shared_ptr<fims_popdy::Population<Type>>& population) {
+    return GetCanonicalGrowthDerivedWeightFleet(population) != nullptr;
+  }
+
+  /**
+   * @brief Returns the population linked to a fleet.
+   * 
+   * This lookup helper was added because fleets do not own growth objects
+   * directly. The dynamic VonB path has to recover the linked population first
+   * before it can access growth state for that fleet.
+   *
+   * @param fleet Shared pointer to the fleet object.
+   * @return Linked population pointer, or nullptr if no population matches the
+   * fleet.
+   */
+  std::shared_ptr<fims_popdy::Population<Type>> GetPopulationForFleet(
+      const std::shared_ptr<fims_popdy::Fleet<Type>>& fleet) {
+    for (size_t p = 0; p < this->populations.size(); ++p) {
+      std::shared_ptr<fims_popdy::Population<Type>>& population =
+          this->populations[p];
+      for (size_t fleet_ = 0; fleet_ < population->fleets.size(); ++fleet_) {
+        if (population->fleets[fleet_]->GetId() == fleet->GetId()) {
+          return population;
+        }
+      }
+    }
+    return nullptr;
+  }
+
+  /**
+   * @brief Returns the growth-derived observation capability for the
+   * population linked to a fleet.
+   *
+   * This keeps the new path intentionally narrow: only fleets linked to a
+   * growth model exposing the growth-derived observation contract can use the
+   * dynamic ALK and bin-based WAA logic.
+   * 
+   * @param fleet Shared pointer to the fleet object.
+   * @return Shared pointer to the linked growth-derived observation
+   * capability, or nullptr.
+   */
+  std::shared_ptr<fims_popdy::GrowthDerivedObservationBase<Type>>
+  GetGrowthObservationForFleet(const std::shared_ptr<fims_popdy::Fleet<Type>>&
+                                   fleet) {
+    std::shared_ptr<fims_popdy::Population<Type>> population =
+        GetPopulationForFleet(fleet);
+    if (population == nullptr) {
+      return nullptr;
+    }
+    return std::dynamic_pointer_cast<
+        fims_popdy::GrowthDerivedObservationBase<Type>>(population->growth);
+  }
+
+  /**
+   * @brief Returns growth products for the population linked to a fleet.
+   *
+   * This currently requires the linked growth object to expose the
+   * growth-derived observation capability and returns `nullptr` when the fleet
+   * is not linked to a supported growth model.
+   *
+   * @param fleet Shared pointer to the fleet object.
+   * @return Pointer to the linked population growth products, or nullptr.
+   */
+  const fims_popdy::GrowthProducts<Type>* GetGrowthProductsForFleet(
+      const std::shared_ptr<fims_popdy::Fleet<Type>>& fleet) {
+    std::shared_ptr<fims_popdy::GrowthDerivedObservationBase<Type>>
+        growth_observation = GetGrowthObservationForFleet(fleet);
+    if (growth_observation == nullptr ||
+        !growth_observation->SupportsGrowthDerivedALK()) {
+      return nullptr;
+    }
+    const fims_popdy::GrowthProducts<Type>& gp =
+        growth_observation->GetProductsForReporting();
+    if (gp.n_sexes == 1) {
+      return &gp;
+    }
+    return nullptr;
+  }
+
+  /**
+   * @brief Returns whether a fleet can use the narrow growth-derived ALK path.
+   *
+   * Central eligibility gate for the growth-derived path. A fleet is eligible only
+   * when supported growth products are available and the runtime fleet has a
+   * consistent explicit length-bin definition.
+   * 
+   * @param fleet Shared pointer to the fleet object.
+   * @return True when the fleet is linked to a supported single-sex
+   * growth-derived observation path and has explicit length bins.
+   */
+  bool FleetUsesGrowthDerivedALK(
+      const std::shared_ptr<fims_popdy::Fleet<Type>>& fleet) {
+    return GetGrowthProductsForFleet(fleet) != nullptr &&
+           fleet->lengths.size() == fleet->n_lengths;
+  }
+
+/**
+ * @brief Builds fleet-level realized dynamic ALK and optional mean
+ * weight-at-age vectors for the supported growth-derived path.
+ *
+ * Central eligibility gate for the growth-derived path. A fleet is eligible only
+ * when supported growth products are available and the runtime fleet has a
+ * consistent explicit length-bin definition.
+ * 
+ * @param fleet Shared pointer to the fleet object.
+ * @param growth_derived_age_to_length_conversion Output vector storing the
+ * realized year-age-length probabilities.
+ * @param growth_derived_mean_WAA Optional output vector storing fleet-
+ * specific expected weight-at-age by year and age.
+ * @return True when the fleet supports the narrow growth-derived ALK path.
+ */
+bool TryBuildGrowthDerivedFleetALKAndMeanWeight(
+    const std::shared_ptr<fims_popdy::Fleet<Type>>& fleet,
+    vector<Type>& growth_derived_age_to_length_conversion,
+    vector<Type>* growth_derived_mean_WAA = nullptr) {
+  // Stop immediately unless this fleet is linked to the supported
+  // single-sex growth-derived observation path and has a consistent runtime
+  // bin definition.
+  if (!FleetUsesGrowthDerivedALK(fleet)) {
+    return false;
+  }
+
+  // Allocate flattened [year, age, length] storage for the realized ALK.
+  growth_derived_age_to_length_conversion.resize(
+      fleet->n_years * fleet->n_ages * fleet->n_lengths);
+
+  // If fleet-specific mean WAA output was requested, allocate flattened
+  // [year, age] storage for those values.
+  if (growth_derived_mean_WAA != nullptr) {
+    growth_derived_mean_WAA->resize(fleet->n_years * fleet->n_ages);
+  }
+
+  // Build one normalized ALK row, and its matching mean WAA, for each
+  // year-age combination in this fleet.
+  for (size_t y = 0; y < fleet->n_years; ++y) {
+    for (size_t a = 0; a < fleet->n_ages; ++a) {
+      // Temporary ALK row over length bins for this (year, age).
+      vector<Type> alk_row;
+
+      // Flattened [year, age] index for optional mean WAA storage.
+      const size_t i_age_year = y * fleet->n_ages + a;
+
+      // Expected mean WAA associated with this ALK row.
+      Type mean_weight = static_cast<Type>(0.0);
+
+      // Build the normalized ALK row and the matching mean WAA for this
+      // year-age combination.
+      if (!TryBuildGrowthDerivedALKRowAndMeanWeight(fleet, y, a, alk_row,
+                                                    mean_weight)) {
+        // This should be unreachable after the earlier fleet-level
+        // eligibility check. If it happens, emit an error message and abort.
+        std::stringstream ss;
+        ss << "Growth-derived ALK eligibility changed while building fleet "
+           << "growth report outputs for fleet id " << fleet->GetId()
+           << ".";
+        FIMS_ERROR_LOG(ss.str());
+        return false;
+      }
+
+      // Store fleet-specific mean WAA for this (year, age) when requested.
+      if (growth_derived_mean_WAA != nullptr) {
+        (*growth_derived_mean_WAA)(i_age_year) = mean_weight;
+      }
+
+      // Copy this temporary ALK row into flattened [year, age, length]
+      // storage using the report output order.
+      for (size_t l = 0; l < fleet->n_lengths; ++l) {
+        const size_t i_length_age_year =
+            y * (fleet->n_ages * fleet->n_lengths) +
+            a * fleet->n_lengths + l;
+        growth_derived_age_to_length_conversion(i_length_age_year) =
+            alk_row(l);
+      }
+    }
+  }
+
+  // Report that the supported growth-derived path was used successfully.
+  return true;
+}
+
+  /**
+   * @brief Resolves and validates which fleet ALK path is usable for the
+   * current fleet context.
+   *
+   * Growth-derived ALK is preferred when the linked growth module supports the
+   * derived path for this fleet. Otherwise, the historical fixed
+   * age-to-length conversion is used when available. If neither path is valid
+   * for a fleet with length bins, this throws a runtime error.
+   *
+   * @param fleet Shared pointer to the fleet object.
+   * @param use_growth_derived_alk Output flag indicating selected ALK path.
+   * @param has_fixed_age_to_length_matrix Output flag indicating whether a
+   * valid fixed ALK matrix is available.
+   * @param growth_derived_age_to_length_conversion Output realized dynamic ALK
+   * values when the growth-derived path is selected.
+   * @param growth_derived_mean_WAA Optional output realized mean WAA values
+   * when the growth-derived path is selected.
+   * @param context_label Short label used in logs/errors to identify caller
+   * context.
+   * @param materialize_growth_derived_alk Whether to materialize the full
+   * [year, age, length] derived ALK tensor when selecting the derived path.
+   * Use false in objective-side evaluation to avoid large AD allocations.
+   * @return True when the growth-derived ALK path was selected.
+   */
+  bool ResolveFleetALKPath(
+      const std::shared_ptr<fims_popdy::Fleet<Type>>& fleet,
+      bool& use_growth_derived_alk,
+      bool& has_fixed_age_to_length_matrix,
+      vector<Type>& growth_derived_age_to_length_conversion,
+      vector<Type>* growth_derived_mean_WAA = nullptr,
+      const std::string& context_label = "model evaluation",
+      bool materialize_growth_derived_alk = true) {
+    has_fixed_age_to_length_matrix =
+        fleet->age_to_length_conversion.size() ==
+        (fleet->n_ages * fleet->n_lengths);
+
+    use_growth_derived_alk = false;
+    growth_derived_age_to_length_conversion.resize(0);
+    if (growth_derived_mean_WAA != nullptr) {
+      growth_derived_mean_WAA->resize(0);
+    }
+
+    // Preferred path: if this fleet supports growth-derived ALK, use it.
+    if (FleetUsesGrowthDerivedALK(fleet)) {
+      if (materialize_growth_derived_alk) {
+        if (TryBuildGrowthDerivedFleetALKAndMeanWeight(
+                fleet, growth_derived_age_to_length_conversion,
+                growth_derived_mean_WAA)) {
+          use_growth_derived_alk = true;
+        } else {
+          std::stringstream ss;
+          ss << "Growth-derived ALK eligibility changed while resolving "
+             << context_label << " path for fleet id " << fleet->GetId() << ".";
+          FIMS_ERROR_LOG(ss.str());
+          throw std::runtime_error(ss.str());
+        }
+      } else {
+        // Objective-side check: verify derived ALK availability using one
+        // representative (year, age) row without allocating the full tensor.
+        vector<Type> probe_row;
+        if (fleet->n_years == 0 || fleet->n_ages == 0 ||
+            TryBuildGrowthDerivedALKRow(fleet, 0, 0, probe_row)) {
+          use_growth_derived_alk = true;
+        } else {
+          std::stringstream ss;
+          ss << "Growth-derived ALK eligibility changed while resolving "
+             << context_label << " path for fleet id " << fleet->GetId() << ".";
+          FIMS_ERROR_LOG(ss.str());
+          throw std::runtime_error(ss.str());
+        }
+
+        // Report-side lightweight path: compute only fleet mean WAA on-demand
+        // with row-wise ALK construction, without materializing the full
+        // [year, age, length] tensor.
+        if (use_growth_derived_alk && growth_derived_mean_WAA != nullptr) {
+          growth_derived_mean_WAA->resize(fleet->n_years * fleet->n_ages);
+          for (size_t y = 0; y < fleet->n_years; ++y) {
+            for (size_t a = 0; a < fleet->n_ages; ++a) {
+              const size_t i_age_year = y * fleet->n_ages + a;
+              vector<Type> alk_row;
+              Type mean_weight = static_cast<Type>(0.0);
+              if (!TryBuildGrowthDerivedALKRowAndMeanWeight(
+                      fleet, y, a, alk_row, mean_weight)) {
+                std::stringstream mean_waa_ss;
+                mean_waa_ss
+                    << "Growth-derived ALK eligibility changed while resolving "
+                    << context_label << " mean WAA for fleet id "
+                    << fleet->GetId() << ".";
+                FIMS_ERROR_LOG(mean_waa_ss.str());
+                throw std::runtime_error(mean_waa_ss.str());
+              }
+              (*growth_derived_mean_WAA)(i_age_year) = mean_weight;
+            }
+          }
+        }
+      }
+    }
+
+    // Fallback path: use historical fixed ALK when available.
+    if (!use_growth_derived_alk && has_fixed_age_to_length_matrix) {
+      return false;
+    }
+
+    if (fleet->n_lengths > 0 && !use_growth_derived_alk) {
+      std::stringstream ss;
+      ss << "Fleet id " << fleet->GetId()
+         << " has length composition bins but no usable age-to-length "
+         << "conversion path for " << context_label << ". Provide fixed "
+         << "age-to-length conversion of size "
+         << (fleet->n_ages * fleet->n_lengths)
+         << " or use a supported growth-derived ALK path.";
+      FIMS_ERROR_LOG(ss.str());
+      throw std::runtime_error(ss.str());
+    }
+
+    return use_growth_derived_alk;
+  }
+
   /**
    * Evaluate the proportion of landings numbers at length.
    */
@@ -951,6 +1652,15 @@ class CatchAtAge : public FisheryModelBase<Type> {
       std::shared_ptr<fims_popdy::Fleet<Type>> &fleet = (*fit).second;
 
       if (fleet->n_lengths > 0) {
+        bool use_growth_derived_alk = false;
+        bool has_fixed_age_to_length_matrix = false;
+        vector<Type> growth_derived_age_to_length_conversion;
+        ResolveFleetALKPath(fleet, use_growth_derived_alk,
+                            has_fixed_age_to_length_matrix,
+                            growth_derived_age_to_length_conversion, nullptr,
+                            "length composition", false);
+        (void)has_fixed_age_to_length_matrix;
+
         for (size_t y = 0; y < fleet->n_years; y++) {
           Type sum = static_cast<Type>(0.0);
           Type sum_obs = static_cast<Type>(0.0);
@@ -961,24 +1671,39 @@ class CatchAtAge : public FisheryModelBase<Type> {
           // before testing sum robust is used to calculate the total sum of
           // robust additions to ensure that proportions sum to 1. Type
           // robust_sum = static_cast<Type>(1.0);
-          for (size_t l = 0; l < fleet->n_lengths; l++) {
-            size_t i_length_year = y * fleet->n_lengths + l;
-            for (size_t a = 0; a < fleet->n_ages; a++) {
-              size_t i_age_year = y * fleet->n_ages + a;
-              size_t i_length_age = a * fleet->n_lengths + l;
+          for (size_t a = 0; a < fleet->n_ages; a++) {
+            size_t i_age_year = y * fleet->n_ages + a;
+            size_t i_length_age_base = a * fleet->n_lengths;
+            vector<Type> alk_row;
+            if (use_growth_derived_alk &&
+                !TryBuildGrowthDerivedALKRow(fleet, y, a, alk_row)) {
+              std::stringstream ss;
+              ss << "Growth-derived ALK eligibility changed while resolving "
+                 << "length composition row for fleet id " << fleet->GetId()
+                 << ".";
+              FIMS_ERROR_LOG(ss.str());
+              throw std::runtime_error(ss.str());
+            }
+            for (size_t l = 0; l < fleet->n_lengths; l++) {
+              size_t i_length_year = y * fleet->n_lengths + l;
+              const Type age_to_length_prob =
+                  use_growth_derived_alk ? alk_row(l)
+                                         : fleet->age_to_length_conversion[i_length_age_base + l];
               fdq_["lengthcomp_expected"][i_length_year] +=
-                  fdq_["agecomp_expected"][i_age_year] *
-                  fleet->age_to_length_conversion[i_length_age];
+                  fdq_["agecomp_expected"][i_age_year] * age_to_length_prob;
 
               fdq_["landings_numbers_at_length"][i_length_year] +=
                   fdq_["landings_numbers_at_age"][i_age_year] *
-                  fleet->age_to_length_conversion[i_length_age];
+                  age_to_length_prob;
 
               fdq_["index_numbers_at_length"][i_length_year] +=
                   fdq_["index_numbers_at_age"][i_age_year] *
-                  fleet->age_to_length_conversion[i_length_age];
+                  age_to_length_prob;
             }
+          }
 
+          for (size_t l = 0; l < fleet->n_lengths; l++) {
+            size_t i_length_year = y * fleet->n_lengths + l;
             sum += fdq_["lengthcomp_expected"][i_length_year];
             // robust_sum -= robust_add;
 
@@ -1232,6 +1957,9 @@ class CatchAtAge : public FisheryModelBase<Type> {
       vector<vector<Type>> agecomp_proportion_f(n_fleets);
       vector<vector<Type>> age_to_length_conversion_f(n_fleets);
       vector<vector<Type>> catch_index_f(n_fleets);
+      vector<vector<Type>> growth_derived_age_to_length_conversion_f(n_fleets);
+      vector<vector<Type>> growth_derived_alk_used_f(n_fleets);
+      vector<vector<Type>> growth_derived_mean_WAA_f(n_fleets);
       vector<vector<Type>> index_expected_f(n_fleets);
       vector<vector<Type>> index_numbers_f(n_fleets);
       vector<vector<Type>> index_numbers_at_age_f(n_fleets);
@@ -1292,19 +2020,30 @@ class CatchAtAge : public FisheryModelBase<Type> {
         log_f_multiplier_p(pop_idx) =
             this->populations[pop_idx]->log_f_multiplier.to_tmb();
 
-        if (std::shared_ptr<fims_popdy::VonBertalanffyGrowthModelAdapter<Type>>
-                adapter = std::dynamic_pointer_cast<
-                    fims_popdy::VonBertalanffyGrowthModelAdapter<Type>>(
+        if (std::shared_ptr<fims_popdy::GrowthDerivedObservationBase<Type>>
+                growth_observation = std::dynamic_pointer_cast<
+                    fims_popdy::GrowthDerivedObservationBase<Type>>(
                     this->populations[p]->growth)) {
-          const auto& gp = adapter->GetProductsForReporting();
+          const auto& gp = growth_observation->GetProductsForReporting();
           const std::size_t n = gp.Size();
           vector<Type> mean_laa(n);
           vector<Type> sd_laa(n);
           vector<Type> mean_waa(n);
+          const bool use_growth_derived_mean_waa =
+              isDouble<Type>::value &&
+              PopulationUsesCanonicalGrowthDerivedWeightBins(
+                  this->populations[p]);
           for (std::size_t i = 0; i < n; ++i) {
             mean_laa(i) = gp.mean_LAA[i];
             sd_laa(i) = gp.sd_LAA[i];
-            mean_waa(i) = gp.mean_WAA[i];
+            if (use_growth_derived_mean_waa) {
+              const std::size_t year = i / this->populations[p]->n_ages;
+              const std::size_t age = i % this->populations[p]->n_ages;
+              mean_waa(i) =
+                  PopulationMeanWeightAA(this->populations[p], year, age);
+            } else {
+              mean_waa(i) = gp.mean_WAA[i];
+            }
           }
           growth_mean_LAA_p(pop_idx) = mean_laa;
           growth_sd_LAA_p(pop_idx) = sd_laa;
@@ -1330,6 +2069,29 @@ class CatchAtAge : public FisheryModelBase<Type> {
             derived_quantities["agecomp_proportion"].to_tmb();
         age_to_length_conversion_f(fleet_idx) =
             fleet->age_to_length_conversion.to_tmb();
+        vector<Type> growth_derived_age_to_length_conversion;
+        vector<Type> growth_derived_alk_used;
+        vector<Type> growth_derived_mean_WAA;
+        if (isDouble<Type>::value) {
+          growth_derived_alk_used.resize(1);
+          bool use_growth_derived_alk = false;
+          bool has_fixed_age_to_length_matrix = false;
+          const bool materialize_growth_derived_alk_report =
+              this->report_growth_derived_alk_tensor;
+          ResolveFleetALKPath(
+              fleet, use_growth_derived_alk, has_fixed_age_to_length_matrix,
+              growth_derived_age_to_length_conversion,
+              &growth_derived_mean_WAA, "reporting",
+              materialize_growth_derived_alk_report);
+          (void)has_fixed_age_to_length_matrix;
+          growth_derived_alk_used(0) =
+              use_growth_derived_alk ? static_cast<Type>(1.0)
+                                     : static_cast<Type>(0.0);
+        }
+        growth_derived_age_to_length_conversion_f(fleet_idx) =
+            growth_derived_age_to_length_conversion;
+        growth_derived_alk_used_f(fleet_idx) = growth_derived_alk_used;
+        growth_derived_mean_WAA_f(fleet_idx) = growth_derived_mean_WAA;
         catch_index_f(fleet_idx) = derived_quantities["catch_index"].to_tmb();
         index_expected_f(fleet_idx) =
             derived_quantities["index_expected"].to_tmb();
@@ -1475,6 +2237,12 @@ class CatchAtAge : public FisheryModelBase<Type> {
       FIMS_REPORT_F_("agecomp_expected", agecomp_expected_f, this->of);
       FIMS_REPORT_F_("agecomp_proportion", agecomp_proportion_f, this->of);
       FIMS_REPORT_F_("age_to_length_conversion", age_to_length_conversion_f,
+                     this->of);
+      FIMS_REPORT_F_("growth_derived_age_to_length_conversion",
+                     growth_derived_age_to_length_conversion_f, this->of);
+      FIMS_REPORT_F_("growth_derived_alk_used", growth_derived_alk_used_f,
+                     this->of);
+      FIMS_REPORT_F_("growth_derived_mean_WAA", growth_derived_mean_WAA_f,
                      this->of);
       FIMS_REPORT_F_("catch_index", catch_index_f, this->of);
       FIMS_REPORT_F_("index_expected", index_expected_f, this->of);

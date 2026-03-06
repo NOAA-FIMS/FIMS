@@ -51,6 +51,73 @@ methods::setClass(
   )
 )
 
+.growth_module_types_input <- function(input) {
+  metadata <- input[["metadata"]]
+  if (is.null(metadata)) {
+    return(character())
+  }
+
+  growth_module_types <- metadata[["growth_module_types"]]
+  if (is.null(growth_module_types)) {
+    return(character())
+  }
+
+  unique(stats::na.omit(as.character(growth_module_types)))
+}
+
+# TODO: Wrapper Newton support and log-scale delta uncertainty are staged for
+# VonBertalanffy only. Generalize these helper lists once additional growth
+# models implement the growth-derived observation capability end to end.
+.growth_modules_using_logscale_delta_uncertainty <- function() {
+  c("VonBertalanffy")
+}
+
+.growth_modules_supporting_wrapper_newton <- function() {
+  c("VonBertalanffy")
+}
+
+# TODO: Replace the label-based growth uncertainty transform with parameter-
+# scale metadata once additional growth models support growth-derived
+# observation outputs through the generic interface.
+.merge_fims_uncertainty <- function(estimates,
+                                    growth_module_types = character()) {
+  fallback_uncertainty <- dplyr::if_else(
+    is.na(estimates[["uncertainty.x"]]) | estimates[["uncertainty.x"]] == -999,
+    estimates[["uncertainty.y"]],
+    estimates[["uncertainty.x"]]
+  )
+
+  uses_logscale_delta_uncertainty <- any(
+    growth_module_types %in% .growth_modules_using_logscale_delta_uncertainty()
+  )
+
+  if (!uses_logscale_delta_uncertainty) {
+    estimates[["uncertainty"]] <- fallback_uncertainty
+    return(estimates)
+  }
+
+  growth_log_scale_labels <- c(
+    "length_at_ref_age_1",
+    "length_at_ref_age_2",
+    "growth_coefficient_K",
+    "length_weight_a",
+    "length_weight_b",
+    "length_at_age_sd_at_ref_ages"
+  )
+
+  growth_delta_uncertainty <- dplyr::if_else(
+    estimates[["module_name"]] == "Growth" &
+      estimates[["label"]] %in% growth_log_scale_labels &
+      (is.na(estimates[["uncertainty.x"]]) | estimates[["uncertainty.x"]] == -999) &
+      !is.na(estimates[["uncertainty.y"]]),
+    abs(estimates[["estimated"]]) * estimates[["uncertainty.y"]],
+    fallback_uncertainty
+  )
+
+  estimates[["uncertainty"]] <- growth_delta_uncertainty
+  estimates
+}
+
 # methods::setMethod: printers ----
 # TODO: add `get_report`, `get_opt`, etc. to the list of available slots in show()?
 methods::setMethod(
@@ -242,10 +309,10 @@ methods::setMethod(
         dplyr::select(-initial, -module_name, -module_id, -estimate, -label),
       by = c("parameter_id")
     ) |>
-      dplyr::mutate(
-        uncertainty = dplyr::coalesce(uncertainty.x, uncertainty.y),
-        .after = "estimation_type"
+      .merge_fims_uncertainty(
+        growth_module_types = .growth_module_types_input(x@input)
       ) |>
+      dplyr::relocate(uncertainty, .after = "estimation_type") |>
       dplyr::select(-uncertainty.x, -uncertainty.y)
   }
 )
@@ -471,10 +538,10 @@ FIMSFit <- function(
       dplyr::select(-initial, -module_name, -module_id, -estimate, -label),
     by = c("parameter_id")
   ) |>
-    dplyr::mutate(
-      uncertainty = dplyr::coalesce(uncertainty.x, uncertainty.y),
-      .after = "estimation_type"
-    ) |>
+      .merge_fims_uncertainty(
+        growth_module_types = .growth_module_types_input(input)
+      ) |>
+    dplyr::relocate(uncertainty, .after = "estimation_type") |>
     dplyr::select(-uncertainty.x, -uncertainty.y)
 
   fit <- methods::new(
@@ -507,7 +574,8 @@ FIMSFit <- function(
 #' @param optimize Optimize (TRUE, default) or (FALSE) build and return
 #'   a list containing the obj and report slot.
 #' @param number_of_newton_steps The number of Newton steps using the inverse
-#'   Hessian to do after optimization. Not yet implemented.
+#'   Hessian to do after optimization. Only supported for certain growth
+#'   modules.
 #' @param control A list of optimizer settings passed to [stats::nlminb()]. The
 #'   the default is a list of length three with `eval.max = 1000`,
 #'   `iter.max = 10000`, and `trace = 0`.
@@ -537,6 +605,10 @@ fit_fims <- function(input,
                        trace = 0
                      ),
                      filename = NULL) {
+  growth_module_types <- .growth_module_types_input(input)
+  supports_wrapper_newton <- any(
+    growth_module_types %in% .growth_modules_supporting_wrapper_newton()
+  )
   # See issue 455 of sdmTMB to see what should be used.
   # https://github.com/pbs-assess/sdmTMB/issues/455
   # NOTE: When we add implementation for newton step we need to
@@ -544,8 +616,16 @@ fit_fims <- function(input,
   # between outputs as last.par may not equal last.par.best due to
   # the smallest newton gradient solution not matching the smallest
   # likelihood value. This can cause sanity issues in output reporting.
-  if (number_of_newton_steps > 0) {
-    cli::cli_abort("Newton steps not implemented yet.")
+  if (number_of_newton_steps < 0) {
+    cli::cli_abort("number_of_newton_steps ({.par {number_of_newton_steps}}) must be >= 0.")
+  }
+  if (number_of_newton_steps > 0 && !supports_wrapper_newton) {
+    cli::cli_abort(
+      c(
+        "Newton polishing is only implemented for certain growth modules.",
+        "i" = "Currently supported: {paste(.growth_modules_supporting_wrapper_newton(), collapse = ', ')}."
+      )
+    )
   }
   if (number_of_loops < 0) {
     cli::cli_abort("number_of_loops ({.par {number_of_loops}}) must be >= 0.")
@@ -617,12 +697,81 @@ fit_fims <- function(input,
   }
   time_optimization <- Sys.time() - t0
   cli::cli_inform(c("v" = "Finished optimization"))
+
+  if (number_of_newton_steps > 0) {
+    for (ii in seq_len(number_of_newton_steps)) {
+      par_old <- opt[["par"]]
+      obj_old <- obj[["fn"]](par_old)
+      grad_old <- as.numeric(obj[["gr"]](par_old))
+      maxgrad_old <- max(abs(grad_old))
+
+      hessian <- tryCatch(
+        obj[["he"]](par_old),
+        error = function(e) NULL
+      )
+      if (is.null(hessian) || is.null(dim(hessian)) || any(!is.finite(hessian))) {
+        hessian <- tryCatch(
+          stats::optimHess(
+            par_old,
+            fn = obj[["fn"]],
+            gr = obj[["gr"]]
+          ),
+          error = function(e) NULL
+        )
+      }
+      if (is.null(hessian) || is.null(dim(hessian)) || any(!is.finite(hessian))) {
+        cli::cli_inform(
+          "Stopping Newton polish at step {ii} because the Hessian could not be computed."
+        )
+        break
+      }
+
+      step <- tryCatch(
+        solve(hessian, grad_old),
+        error = function(e) NULL
+      )
+      if (is.null(step) || any(!is.finite(step))) {
+        cli::cli_inform(
+          "Stopping Newton polish at step {ii} because the Hessian was singular."
+        )
+        break
+      }
+
+      par_new <- par_old - step
+      obj_new <- obj[["fn"]](par_new)
+      grad_new <- as.numeric(obj[["gr"]](par_new))
+      maxgrad_new <- max(abs(grad_new))
+
+      if (!is.finite(obj_new) || !is.finite(maxgrad_new)) {
+        cli::cli_inform(
+          "Stopping Newton polish at step {ii} because the updated objective or gradient was not finite."
+        )
+        obj[["fn"]](opt[["par"]])
+        break
+      }
+
+      if (obj_new < obj_old && maxgrad_new < maxgrad_old) {
+        opt[["par"]] <- par_new
+        opt[["objective"]] <- obj_new
+        maxgrad <- maxgrad_new
+      } else {
+        cli::cli_inform(
+          "Stopping Newton polish at step {ii} because the step did not improve both objective and gradient."
+        )
+        obj[["fn"]](opt[["par"]])
+        break
+      }
+    }
+  }
+
+  opt[["objective"]] <- obj[["fn"]](opt[["par"]])
+  maxgrad <- max(abs(obj[["gr"]](opt[["par"]])))
   FIMS::set_fixed(opt$par)
 
   time_sdreport <- NA
   if (get_sd) {
     t2 <- Sys.time()
-    sdreport <- TMB::sdreport(obj)
+    sdreport <- TMB::sdreport(obj, par.fixed = opt[["par"]])
     cli::cli_inform(c("v" = "Finished sdreport"))
     time_sdreport <- Sys.time() - t2
   } else {

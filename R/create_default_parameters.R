@@ -222,23 +222,39 @@ create_default_growth <- function(unnested_configurations, data) {
       reference_age_for_length_2 <- max(ages, na.rm = TRUE)
     }
 
-    default <- create_default_parameters_template(n_parameters = 9) |>
+        default <- create_default_parameters_template(n_parameters = 9) |>
       dplyr::mutate(
         module_name = "Growth",
         module_type = "VonBertalanffy",
-        label = c("length_at_ref_age_1", "length_at_ref_age_2",
-                  "growth_coefficient_K", "reference_age_for_length_1",
-                  "reference_age_for_length_2", "length_weight_a",
-                  "length_weight_b", "length_at_age_sd_at_ref_ages",
-                  "length_at_age_sd_at_ref_ages"),
-        age = c(NA_real_, NA_real_, NA_real_, NA_real_, NA_real_,
-                NA_real_, NA_real_,
-                reference_age_for_length_1, reference_age_for_length_2),
-        value = c(275, 725, 0.18,
-                  reference_age_for_length_1, reference_age_for_length_2,
-                  2.5e-11, 3,
-                  28, 73),
-        estimation_type = "constant"
+        label = c(
+          "length_at_ref_age_1", "length_at_ref_age_2",
+          "growth_coefficient_K", "reference_age_for_length_1",
+          "reference_age_for_length_2", "length_weight_a",
+          "length_weight_b", "length_at_age_sd_at_ref_ages",
+          "length_at_age_sd_at_ref_ages"
+        ),
+        age = c(
+          NA_real_, NA_real_, NA_real_, NA_real_, NA_real_,
+          NA_real_, NA_real_,
+          reference_age_for_length_1, reference_age_for_length_2
+        ),
+        value = c(
+          275, 725, 0.18,
+          reference_age_for_length_1, reference_age_for_length_2,
+          2.5e-11, 3,
+          28, 73
+        ),
+        estimation_type = c(
+          "fixed_effects",  # length_at_ref_age_1
+          "fixed_effects",  # length_at_ref_age_2
+          "fixed_effects",  # growth_coefficient_K
+          "constant",       # reference_age_for_length_1
+          "constant",       # reference_age_for_length_2
+          "constant",       # length_weight_a
+          "constant",       # length_weight_b
+          "constant",       # sd at ref age 1
+          "constant"        # sd at ref age 2
+        )
       )
 
     return(default)

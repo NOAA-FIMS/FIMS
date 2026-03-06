@@ -608,11 +608,17 @@ class Information {
         p->growth =
             (*it).second;  // growth defined in population.hpp (the object
         // is called p, growth is within p)
-        if (std::shared_ptr<fims_popdy::VonBertalanffyGrowthModelAdapter<Type>>
-                adapter = std::dynamic_pointer_cast<
-                    fims_popdy::VonBertalanffyGrowthModelAdapter<Type>>(
+        // Some growth modules provide extra year-age products used by the
+        // growth-derived ALK/WAA path (for example, the VonB adapter).
+        // `dynamic_pointer_cast` checks for that capability at runtime.
+        // If capability is present, initialize those products to match the
+        // population dimensions; otherwise do nothing and use normal growth.
+        if (std::shared_ptr<fims_popdy::GrowthDerivedObservationBase<Type>>
+                growth_observation = std::dynamic_pointer_cast<
+                    fims_popdy::GrowthDerivedObservationBase<Type>>(
                     p->growth)) {
-          adapter->Initialize(p->n_years, p->n_ages, 1);
+        // Dimensions: years x ages x sexes (single-sex here, so 1).
+          growth_observation->Initialize(p->n_years, p->n_ages, 1);
           if (p->ages.size() > 0) {
             double min_age = p->ages[0];
             for (size_t i = 1; i < p->ages.size(); ++i) {
@@ -620,7 +626,9 @@ class Information {
                 min_age = p->ages[i];
               }
             }
-            adapter->SetAgeOffset(static_cast<double>(min_age));
+        // Use the smallest model age as the index origin so age values map
+        // correctly into zero-based internal arrays.
+            growth_observation->SetAgeOffset(static_cast<double>(min_age));
           }
         }
         FIMS_INFO_LOG("Growth model " + fims::to_string(growth_uint) +
