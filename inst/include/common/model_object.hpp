@@ -52,7 +52,6 @@ struct FIMSObject {
 
     return true;
   }
-
 };
 
 }  // namespace fims_model_object
