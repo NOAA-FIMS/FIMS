@@ -98,9 +98,6 @@ RCPP_MODULE(fims) {
       "get_log_info", get_log_info,
       "See https://noaa-fims.github.io/doxygen/rcpp__interface_8hpp.html.");
   Rcpp::function(
-      "get_log_module", get_log_module,
-      "See https://noaa-fims.github.io/doxygen/rcpp__interface_8hpp.html.");
-  Rcpp::function(
       "write_log", write_log,
       "See https://noaa-fims.github.io/doxygen/rcpp__interface_8hpp.html.");
   Rcpp::function(

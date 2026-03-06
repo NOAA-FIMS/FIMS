@@ -406,17 +406,6 @@ std::string get_log_warnings() {
 std::string get_log_info() { return fims::FIMSLog::fims_log->get_info(); }
 
 /**
- * @brief Gets log entries by module as a string in JSON format.
- * @param module The module name to filter log entries by.
- */
-std::string get_log_module(std::string module = "") {
-  if (module.empty()) {
-    Rcpp::stop("'module' argument is required.");
-  }
-  return fims::FIMSLog::fims_log->get_module(module);
-}
-
-/**
  * @brief If true, writes the log on exit.
  */
 void write_log(bool write) {
