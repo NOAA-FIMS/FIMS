@@ -620,7 +620,6 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
    * @copydoc FisheryModelInterfaceBase::to_json
    */
   virtual std::string to_json() {
-
     std::set<uint32_t> recruitment_ids;
     std::set<uint32_t> growth_ids;
     std::set<uint32_t> maturity_ids;
