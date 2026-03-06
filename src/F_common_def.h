@@ -79,8 +79,7 @@
 #endif
 
 #ifdef TMB_MODEL
-#pragma once
-#include <TMB.hpp>
+
 // simplify access to singletons
 #define TMB_FIMS_REAL_TYPE double
 #ifdef TMBAD_FRAMEWORK

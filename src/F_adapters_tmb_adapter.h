@@ -4,6 +4,12 @@
 #ifndef FIMS_ADAPTERS_TMB_ADAPTER_HPP
 #define FIMS_ADAPTERS_TMB_ADAPTER_HPP
 
+// #pragma once
+// #ifndef TMB_HPP
+// #define TMB_HPP
+// #include <TMB.hpp>
+// #endif
+
 namespace tmbutils {
 template<typename Type>
 struct vector;
