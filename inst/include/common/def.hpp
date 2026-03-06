@@ -8,23 +8,25 @@
  */
 #ifndef DEF_HPP
 #define DEF_HPP
-#include <signal.h>
-#include <stdlib.h>
-
-#include <chrono>
-#include <csignal>
-#include <cstdlib>
-#include <cstring>
-#include <filesystem>
 #include <fstream>
-#include <iostream>
 #include <map>
 #include <memory>
-#include <sstream>
-#include <stdexcept>
+#include <vector>
 #include <string>
 #include <unordered_map>
-#include <vector>
+
+#include <cstdlib>
+#include <chrono>
+#include <sstream>
+#include <iostream>
+#include <filesystem>
+#include <stdlib.h>
+#include <fstream>
+#include <signal.h>
+#include <csignal>
+#include <cstring>
+
+#include <stdexcept>
 
 #if defined(linux) || defined(__linux) || defined(__linux__)
 #define FIMS_LINUX
@@ -60,11 +62,11 @@
 #endif
 
 #ifdef FIMS_WINDOWS
-#include <Lmcons.h>  // for UNLEN
 #include <Windows.h>
+#include <Lmcons.h>  // for UNLEN
 #elif defined(FIMS_LINUX) || defined(FIMS_MACOS) || defined(FIMS_BSD)
-#include <pwd.h>
 #include <unistd.h>
+#include <pwd.h>
 #endif
 
 #if !defined(__PRETTY_FUNCTION__) && !defined(__GNUC__)
