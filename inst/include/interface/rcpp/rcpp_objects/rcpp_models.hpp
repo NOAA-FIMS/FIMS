@@ -87,15 +87,6 @@ class FisheryModelInterfaceBase : public FIMSRcppInterfaceBase {
   virtual std::string to_json() {
     return "std::string to_json() not yet implemented.";
   }
-  /**
-   * @brief A function to calculate reference points for the fishery model.
-   *
-   * @return Rcpp::List
-   */
-  virtual Rcpp::List calculate_reference_points() {
-    Rcpp::List result;
-    return result;
-  }
 
   /**
    * @brief Get the ID for the child fleet interface objects to inherit.
