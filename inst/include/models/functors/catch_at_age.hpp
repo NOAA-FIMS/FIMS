@@ -1083,12 +1083,12 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * @return Normalized age-to-length probabilities for the requested year and
    * age.
    */
-  inline vector<Type> BuildNormalizedGrowthDerivedALKRow(
+  inline  fims::Vector<Type>  BuildNormalizedGrowthDerivedALKRow(
       const std::shared_ptr<fims_popdy::Fleet<Type>>& fleet,
       const fims_popdy::GrowthProducts<Type>& growth_products,
       size_t year,
       size_t age) const {
-    vector<Type> alk_row(fleet->n_lengths);
+     fims::Vector<Type>  alk_row(fleet->n_lengths);
     Type row_sum = static_cast<Type>(0.0);
     for (size_t l = 0; l < fleet->n_lengths; ++l) {
       alk_row(l) = GrowthDerivedALKProb(fleet, growth_products, year, age, l);
@@ -1121,7 +1121,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
       const std::shared_ptr<fims_popdy::GrowthDerivedObservationBase<Type>>&
           growth_observation,
       const std::shared_ptr<fims_popdy::Fleet<Type>>& fleet,
-      const vector<Type>& alk_row) {
+      const  fims::Vector<Type> & alk_row) {
     Type mean_weight = static_cast<Type>(0.0);
     for (size_t l = 0; l < fleet->n_lengths; ++l) {
       mean_weight +=
@@ -1154,7 +1154,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
       const fims_popdy::GrowthProducts<Type>& growth_products,
       size_t year,
       size_t age,
-      vector<Type>& alk_row) {
+       fims::Vector<Type> & alk_row) {
     alk_row = BuildNormalizedGrowthDerivedALKRow(fleet, growth_products, year,
                                                  age);
     return MeanWeightFromALKRow(growth_observation, fleet, alk_row);
@@ -1180,7 +1180,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
       const std::shared_ptr<fims_popdy::Fleet<Type>>& fleet,
       size_t year,
       size_t age,
-      vector<Type>& alk_row) {
+       fims::Vector<Type> & alk_row) {
     const fims_popdy::GrowthProducts<Type>* growth_products =
         GetGrowthProductsForFleet(fleet);
     if (growth_products == nullptr || fleet->lengths.size() != fleet->n_lengths) {
@@ -1210,7 +1210,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
       const std::shared_ptr<fims_popdy::Fleet<Type>>& fleet,
       size_t year,
       size_t age,
-      vector<Type>& alk_row,
+       fims::Vector<Type> & alk_row,
       Type& mean_weight) {
     std::shared_ptr<fims_popdy::GrowthDerivedObservationBase<Type>>
         growth_observation = GetGrowthObservationForFleet(fleet);
@@ -1247,7 +1247,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
       const std::shared_ptr<fims_popdy::Fleet<Type>>& fleet,
       size_t year,
       size_t age) {
-    vector<Type> alk_row;
+     fims::Vector<Type>  alk_row;
     Type mean_weight = static_cast<Type>(0.0);
     if (TryBuildGrowthDerivedALKRowAndMeanWeight(fleet, year, age, alk_row,
                                                  mean_weight)) {
@@ -1455,8 +1455,8 @@ class CatchAtAge : public FisheryModelBase<Type> {
  */
 bool TryBuildGrowthDerivedFleetALKAndMeanWeight(
     const std::shared_ptr<fims_popdy::Fleet<Type>>& fleet,
-    vector<Type>& growth_derived_age_to_length_conversion,
-    vector<Type>* growth_derived_mean_WAA = nullptr) {
+     fims::Vector<Type> & growth_derived_age_to_length_conversion,
+     fims::Vector<Type> * growth_derived_mean_WAA = nullptr) {
   // Stop immediately unless this fleet is linked to the supported
   // single-sex growth-derived observation path and has a consistent runtime
   // bin definition.
@@ -1479,7 +1479,7 @@ bool TryBuildGrowthDerivedFleetALKAndMeanWeight(
   for (size_t y = 0; y < fleet->n_years; ++y) {
     for (size_t a = 0; a < fleet->n_ages; ++a) {
       // Temporary ALK row over length bins for this (year, age).
-      vector<Type> alk_row;
+       fims::Vector<Type>  alk_row;
 
       // Flattened [year, age] index for optional mean WAA storage.
       const size_t i_age_year = y * fleet->n_ages + a;
@@ -1550,8 +1550,8 @@ bool TryBuildGrowthDerivedFleetALKAndMeanWeight(
       const std::shared_ptr<fims_popdy::Fleet<Type>>& fleet,
       bool& use_growth_derived_alk,
       bool& has_fixed_age_to_length_matrix,
-      vector<Type>& growth_derived_age_to_length_conversion,
-      vector<Type>* growth_derived_mean_WAA = nullptr,
+       fims::Vector<Type> & growth_derived_age_to_length_conversion,
+       fims::Vector<Type> * growth_derived_mean_WAA = nullptr,
       const std::string& context_label = "model evaluation",
       bool materialize_growth_derived_alk = true) {
     has_fixed_age_to_length_matrix =
@@ -1581,7 +1581,7 @@ bool TryBuildGrowthDerivedFleetALKAndMeanWeight(
       } else {
         // Objective-side check: verify derived ALK availability using one
         // representative (year, age) row without allocating the full tensor.
-        vector<Type> probe_row;
+         fims::Vector<Type>  probe_row;
         if (fleet->n_years == 0 || fleet->n_ages == 0 ||
             TryBuildGrowthDerivedALKRow(fleet, 0, 0, probe_row)) {
           use_growth_derived_alk = true;
@@ -1601,7 +1601,7 @@ bool TryBuildGrowthDerivedFleetALKAndMeanWeight(
           for (size_t y = 0; y < fleet->n_years; ++y) {
             for (size_t a = 0; a < fleet->n_ages; ++a) {
               const size_t i_age_year = y * fleet->n_ages + a;
-              vector<Type> alk_row;
+               fims::Vector<Type>  alk_row;
               Type mean_weight = static_cast<Type>(0.0);
               if (!TryBuildGrowthDerivedALKRowAndMeanWeight(
                       fleet, y, a, alk_row, mean_weight)) {
@@ -1654,7 +1654,7 @@ bool TryBuildGrowthDerivedFleetALKAndMeanWeight(
       if (fleet->n_lengths > 0) {
         bool use_growth_derived_alk = false;
         bool has_fixed_age_to_length_matrix = false;
-        vector<Type> growth_derived_age_to_length_conversion;
+         fims::Vector<Type>  growth_derived_age_to_length_conversion;
         ResolveFleetALKPath(fleet, use_growth_derived_alk,
                             has_fixed_age_to_length_matrix,
                             growth_derived_age_to_length_conversion, nullptr,
@@ -1674,7 +1674,7 @@ bool TryBuildGrowthDerivedFleetALKAndMeanWeight(
           for (size_t a = 0; a < fleet->n_ages; a++) {
             size_t i_age_year = y * fleet->n_ages + a;
             size_t i_length_age_base = a * fleet->n_lengths;
-            vector<Type> alk_row;
+             fims::Vector<Type>  alk_row;
             if (use_growth_derived_alk &&
                 !TryBuildGrowthDerivedALKRow(fleet, y, a, alk_row)) {
               std::stringstream ss;
