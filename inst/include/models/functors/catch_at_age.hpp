@@ -1091,13 +1091,13 @@ class CatchAtAge : public FisheryModelBase<Type> {
      fims::Vector<Type>  alk_row(fleet->n_lengths);
     Type row_sum = static_cast<Type>(0.0);
     for (size_t l = 0; l < fleet->n_lengths; ++l) {
-      alk_row(l) = GrowthDerivedALKProb(fleet, growth_products, year, age, l);
-      row_sum += alk_row(l);
+      alk_row[l] = GrowthDerivedALKProb(fleet, growth_products, year, age, l);
+      row_sum += alk_row[l];
     }
     const Type safe_row_sum =
         fims_math::ad_max(row_sum, static_cast<Type>(1e-12));
     for (size_t l = 0; l < fleet->n_lengths; ++l) {
-      alk_row(l) /= safe_row_sum;
+      alk_row[l] /= safe_row_sum;
     }
     return alk_row;
   }
@@ -1125,7 +1125,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
     Type mean_weight = static_cast<Type>(0.0);
     for (size_t l = 0; l < fleet->n_lengths; ++l) {
       mean_weight +=
-          alk_row(l) * growth_observation->EvaluateWeightAtLength(fleet->lengths[l]);
+          alk_row[l] * growth_observation->EvaluateWeightAtLength(fleet->lengths[l]);
     }
     return mean_weight;
   }
@@ -1503,7 +1503,7 @@ bool TryBuildGrowthDerivedFleetALKAndMeanWeight(
 
       // Store fleet-specific mean WAA for this (year, age) when requested.
       if (growth_derived_mean_WAA != nullptr) {
-        (*growth_derived_mean_WAA)(i_age_year) = mean_weight;
+        (*growth_derived_mean_WAA)[i_age_year] = mean_weight;
       }
 
       // Copy this temporary ALK row into flattened [year, age, length]
@@ -1512,8 +1512,8 @@ bool TryBuildGrowthDerivedFleetALKAndMeanWeight(
         const size_t i_length_age_year =
             y * (fleet->n_ages * fleet->n_lengths) +
             a * fleet->n_lengths + l;
-        growth_derived_age_to_length_conversion(i_length_age_year) =
-            alk_row(l);
+        growth_derived_age_to_length_conversion[i_length_age_year] =
+            alk_row[l];
       }
     }
   }
@@ -1613,7 +1613,7 @@ bool TryBuildGrowthDerivedFleetALKAndMeanWeight(
                 FIMS_ERROR_LOG(mean_waa_ss.str());
                 throw std::runtime_error(mean_waa_ss.str());
               }
-              (*growth_derived_mean_WAA)(i_age_year) = mean_weight;
+              (*growth_derived_mean_WAA)[i_age_year] = mean_weight;
             }
           }
         }
@@ -1687,7 +1687,7 @@ bool TryBuildGrowthDerivedFleetALKAndMeanWeight(
             for (size_t l = 0; l < fleet->n_lengths; l++) {
               size_t i_length_year = y * fleet->n_lengths + l;
               const Type age_to_length_prob =
-                  use_growth_derived_alk ? alk_row(l)
+                  use_growth_derived_alk ? alk_row[l]
                                          : fleet->age_to_length_conversion[i_length_age_base + l];
               fdq_["lengthcomp_expected"][i_length_year] +=
                   fdq_["agecomp_expected"][i_age_year] * age_to_length_prob;
