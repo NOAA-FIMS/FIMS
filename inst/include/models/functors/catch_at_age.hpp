@@ -2069,9 +2069,9 @@ bool TryBuildGrowthDerivedFleetALKAndMeanWeight(
             derived_quantities["agecomp_proportion"].to_tmb();
         age_to_length_conversion_f(fleet_idx) =
             fleet->age_to_length_conversion.to_tmb();
-        vector<Type> growth_derived_age_to_length_conversion;
-        vector<Type> growth_derived_alk_used;
-        vector<Type> growth_derived_mean_WAA;
+        fims::Vector<Type> growth_derived_age_to_length_conversion;
+        fims::Vector<Type> growth_derived_alk_used;
+        fims::Vector<Type> growth_derived_mean_WAA;
         if (isDouble<Type>::value) {
           growth_derived_alk_used.resize(1);
           bool use_growth_derived_alk = false;
@@ -2084,14 +2084,14 @@ bool TryBuildGrowthDerivedFleetALKAndMeanWeight(
               &growth_derived_mean_WAA, "reporting",
               materialize_growth_derived_alk_report);
           (void)has_fixed_age_to_length_matrix;
-          growth_derived_alk_used(0) =
+          growth_derived_alk_used[0] =
               use_growth_derived_alk ? static_cast<Type>(1.0)
                                      : static_cast<Type>(0.0);
         }
         growth_derived_age_to_length_conversion_f(fleet_idx) =
-            growth_derived_age_to_length_conversion;
-        growth_derived_alk_used_f(fleet_idx) = growth_derived_alk_used;
-        growth_derived_mean_WAA_f(fleet_idx) = growth_derived_mean_WAA;
+            growth_derived_age_to_length_conversion.to_tmb();
+        growth_derived_alk_used_f(fleet_idx) = growth_derived_alk_used.to_tmb();
+        growth_derived_mean_WAA_f(fleet_idx) = growth_derived_mean_WAA.to_tmb();
         catch_index_f(fleet_idx) = derived_quantities["catch_index"].to_tmb();
         index_expected_f(fleet_idx) =
             derived_quantities["index_expected"].to_tmb();
