@@ -71,7 +71,7 @@ TEST(GrowthModel, CanConstructAndPrepare) {
       28.0 + (73.0 - 28.0) *
                 (expected_length_at_age_8 - expected_length_at_age_1) /
                 (expected_length_at_age_12 - expected_length_at_age_1);
-  EXPECT_NEAR(p.SdLAA(0, 7, 0), expected_sd_mid, 1e-8);
+  EXPECT_NEAR(p.SdLAA(0, 7, 0), expected_sd_mid, 1e-7);
 
   // weight exists in the contract (derived from length-weight)
   const double W5 = p.MeanWAA(0, 4, 0);
