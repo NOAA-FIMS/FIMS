@@ -1,3 +1,4 @@
+git commit -m "Refactor duplicated JSON serialization logic for normal and log_normal distributions (#1260)"
 This PR refactors duplicated JSON serialization logic used by the normal and log_normal distributions in:
 
 FIMS/inst/include/interface/rcpp/rcpp_objects/rcpp_distribution.hpp
