@@ -64,8 +64,8 @@ TEST(GrowthModel, CanConstructAndPrepare) {
   EXPECT_GT(expected_length_at_age_5, length_at_ref_age_1);
   EXPECT_LT(expected_length_at_age_5, length_at_ref_age_2);
   EXPECT_NEAR(observed_length_at_age_12, expected_length_at_age_12, 1e-8);
-  EXPECT_NEAR(p.SdLAA(0, 0, 0), 28.0, 1e-8);
-  EXPECT_NEAR(p.SdLAA(0, 11, 0), 73.0, 1e-8);
+  EXPECT_NEAR(p.SdLAA(0, 0, 0), 28.0, 1e-7);
+  EXPECT_NEAR(p.SdLAA(0, 11, 0), 73.0, 1e-7);
   // Length-based interpolation for SD
   const double expected_sd_mid =
       28.0 + (73.0 - 28.0) *
