@@ -231,10 +231,10 @@ namespace fims {
  */
 template <typename Type>
 struct fims::ModelTraits {
-  typedef typename CppAD::vector<Type> DataVector; /**< A vector
-        of the data that is differentiable */
-  typedef typename CppAD::vector<Type> ParameterVector; /**< A
-  vector of the parameters that is differentiable */
+  typedef typename tmbutils::vector<Type> DataVector;       /**< A vector
+        of the data that is differentiable (Type is the TMB/TMBad scalar). */
+  typedef typename tmbutils::vector<Type> ParameterVector;  /**< A vector
+        of the parameters that is differentiable. */
   typedef typename tmbutils::vector<Type>
       EigenVector; /**< A vector as defined in the Eigen namespace in TMB */
 };

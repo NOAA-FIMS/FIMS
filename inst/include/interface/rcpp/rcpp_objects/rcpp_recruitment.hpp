@@ -465,15 +465,8 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
    * @return A boolean of true.
    */
   virtual bool add_to_fims_tmb() {
-#ifdef TMBAD_FRAMEWORK
     this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
     this->add_to_fims_tmb_internal<TMBAD_FIMS_TYPE>();
-#else
-    this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
-    this->add_to_fims_tmb_internal<TMB_FIMS_FIRST_ORDER>();
-    this->add_to_fims_tmb_internal<TMB_FIMS_SECOND_ORDER>();
-    this->add_to_fims_tmb_internal<TMB_FIMS_THIRD_ORDER>();
-#endif
 
     return true;
   }
@@ -547,15 +540,8 @@ class LogDevsRecruitmentInterface : public RecruitmentInterfaceBase {
    * @return A boolean of true.
    */
   virtual bool add_to_fims_tmb() {
-#ifdef TMBAD_FRAMEWORK
     this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
     this->add_to_fims_tmb_internal<TMBAD_FIMS_TYPE>();
-#else
-    this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
-    this->add_to_fims_tmb_internal<TMB_FIMS_FIRST_ORDER>();
-    this->add_to_fims_tmb_internal<TMB_FIMS_SECOND_ORDER>();
-    this->add_to_fims_tmb_internal<TMB_FIMS_THIRD_ORDER>();
-#endif
 
     return true;
   }
@@ -629,15 +615,8 @@ class LogRRecruitmentInterface : public RecruitmentInterfaceBase {
    * @return A boolean of true.
    */
   virtual bool add_to_fims_tmb() {
-#ifdef TMBAD_FRAMEWORK
     this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
     this->add_to_fims_tmb_internal<TMBAD_FIMS_TYPE>();
-#else
-    this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
-    this->add_to_fims_tmb_internal<TMB_FIMS_FIRST_ORDER>();
-    this->add_to_fims_tmb_internal<TMB_FIMS_SECOND_ORDER>();
-    this->add_to_fims_tmb_internal<TMB_FIMS_THIRD_ORDER>();
-#endif
 
     return true;
   }
