@@ -20,8 +20,8 @@ struct BenchCAAEvaluate : public CAAEvaluateTestFixture {
       auto& fdq = catch_at_age_model->GetFleetDerivedQuantities(fleet_id);
       fdq["landings_numbers_at_age"][i_age_year] = 0.0;
     }
-    catch_at_age_model->CalculateLandingsNumbersAA(
-        population, i_age_year, year, age);
+    catch_at_age_model->CalculateLandingsNumbersAA(population, i_age_year, year,
+                                                   age);
     catch_at_age_model->CalculateLandingsWeightAA(population, year, age);
     auto fleet0_id = population->fleets[0]->GetId();
     auto& fdq0 = catch_at_age_model->GetFleetDerivedQuantities(fleet0_id);
