@@ -30,7 +30,7 @@ namespace fims_distributions {
  * contributions are stored in `lpdf_vec`; values are expanded into
  * `report_lpdf_vec` for output consistency with the full matrix dimensions.
  * The summed total is returned by `evaluate()` and stored in `lpdf`.
- * 
+ *
  * Row observations could be counts of each age for a given time step, where
  * additional time steps would be additional rows. Thus, columns are bins.
  */
@@ -56,16 +56,15 @@ struct MultinomialLPMF : public DensityComponentBase<Type> {
   virtual ~MultinomialLPMF() {}
 
   /**
-    * @brief Evaluates the multinomial log probability mass function.
-    * @details The following equation is the multinomial probability mass
-    * function, and thus, the log of it is evaluated:
-    * \f[
-    * f(\underline{y}) = \frac{n!}{y_{1}!... y_{k}!}p^{y_{1}}_{1}...p^{y_{k}}_{k},
-    * \f]
-    * where \f$k\f$ is the number of categories, \f$n\f$ is the sample size,
-    * \f$\mu_{i}\f$ is the mean of \f$y_{i}\f$ and is equal to \f$np_{i}\f$, and
-    * \f$\sigma^{2}_{i}\f$ is the variance of \f$y_{i}\f$ and is equal to
-    * \f$np_{i}(1-p_{i})\f$. 
+   * @brief Evaluates the multinomial log probability mass function.
+   * @details The following equation is the multinomial probability mass
+   * function, and thus, the log of it is evaluated:
+   * \f[
+   * f(\underline{y}) = \frac{n!}{y_{1}!...
+   * y_{k}!}p^{y_{1}}_{1}...p^{y_{k}}_{k}, \f] where \f$k\f$ is the number of
+   * categories, \f$n\f$ is the sample size, \f$\mu_{i}\f$ is the mean of
+   * \f$y_{i}\f$ and is equal to \f$np_{i}\f$, and \f$\sigma^{2}_{i}\f$ is the
+   * variance of \f$y_{i}\f$ and is equal to \f$np_{i}(1-p_{i})\f$.
    */
   virtual const Type evaluate() {
     // set dims using observed_values if no user input

@@ -48,7 +48,6 @@ struct EWAAGrowth : public GrowthBase<Type> {
     Type ret = (*it).second;  // itewaa[a];
     return ret;
   }
-
 };
 }  // namespace fims_popdy
 #endif /* POPULATION_DYNAMICS_GROWTH_EWAA_HPP */
