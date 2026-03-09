@@ -35,6 +35,7 @@ Beverton
 BevertonHolt
 BevertonHoltRecruitment
 BevertonHoltRecruitmentInterface
+Bigg
 Bjarne
 Bool
 CAA
@@ -193,8 +194,6 @@ GetDouble
 GetFixedEffectsParameters
 GetFleetDerivedQuantities
 GetFleetDimensionInfo
-GetFleetUncertaintyReportInfo
-GetFleetUncertaintyReportInfoMap
 GetId
 GetInstance
 GetInt
@@ -210,8 +209,6 @@ GetParameters
 GetPopulationDerivedQuantities
 GetPopulationDimensionInfo
 GetPopulationIds
-GetPopulationUncertaintyReportInfo
-GetPopulationUncertaintyReportInfoMap
 GetPopulations
 GetRandomEffectsParameters
 GetReport
@@ -468,8 +465,6 @@ Tsuda
 ULPs
 UNLEN
 UNPROTECT
-UncertaintyReportInfo
-UncertaintyReportInfoMap
 Unfished
 Unnesting
 UseDoubleValues
@@ -492,6 +487,7 @@ ZAA
 absolutePath
 acomp
 acos
+adcomp
 adreport
 aes
 ageage
@@ -582,6 +578,7 @@ const
 containsNA
 conventionalcommits
 conversiondouble
+copybrief
 copydoc
 coreutils
 cout
@@ -777,6 +774,7 @@ jsonValue
 jsonlite
 jt
 kable
+kaskr
 kelli
 kellijohnson
 kmax
@@ -796,6 +794,7 @@ libs
 linux
 llvm
 lmax
+ln
 loadModule
 loadNamespace
 logR
@@ -876,6 +875,7 @@ noaa
 noexcept
 noreply
 normalizePath
+np
 npos
 nrecruits
 nrow

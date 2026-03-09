@@ -1196,14 +1196,6 @@ class CatchAtAge : public FisheryModelBase<Type> {
 #ifdef TMB_MODEL
     if (this->do_reporting == true) {
       report_vectors.clear();
-      // std::shared_ptr<UncertaintyReportInfoMap>
-      // population_uncertainty_report_info_map =
-      //     this->GetPopulationUncertaintyReportInfoMap();
-
-      // std::shared_ptr<UncertaintyReportInfoMap>
-      // fleet_uncertainty_report_info_map =
-      //     this->GetFleetUncertaintyReportInfoMap();
-
       // initialize population vectors
       vector<vector<Type>> biomass_p(n_pops);
       vector<vector<Type>> expected_recruitment_p(n_pops);
@@ -1219,10 +1211,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
       vector<vector<Type>> unfished_biomass_p(n_pops);
       vector<vector<Type>> unfished_numbers_at_age_p(n_pops);
       vector<vector<Type>> unfished_spawning_biomass_p(n_pops);
-      vector<vector<Type>> log_M_p(n_pops);
-      vector<vector<Type>> log_init_naa_p(n_pops);
       vector<vector<Type>> spawning_biomass_ratio_p(n_pops);
-      vector<vector<Type>> log_f_multiplier_p(n_pops);
 
       // initialize fleet vectors
       vector<vector<Type>> agecomp_expected_f(n_fleets);
@@ -1248,15 +1237,8 @@ class CatchAtAge : public FisheryModelBase<Type> {
       // initiate population index for structuring report out objects
       int pop_idx = 0;
       for (size_t p = 0; p < this->populations.size(); p++) {
-        this->populations[p]->create_report_vectors(report_vectors);
-        // std::shared_ptr<fims_popdy::Population<Type>> &population =
-        //     this->populations[p];
         std::map<std::string, fims::Vector<Type>> &derived_quantities =
             this->GetPopulationDerivedQuantities(this->populations[p]->GetId());
-        this->populations[p]->maturity->create_report_vectors(report_vectors);
-        this->populations[p]->growth->create_report_vectors(report_vectors);
-        this->populations[p]->recruitment->create_report_vectors(
-            report_vectors);
         biomass_p(pop_idx) = derived_quantities["biomass"].to_tmb();
         expected_recruitment_p(pop_idx) =
             derived_quantities["expected_recruitment"].to_tmb();
@@ -1281,13 +1263,8 @@ class CatchAtAge : public FisheryModelBase<Type> {
             derived_quantities["unfished_numbers_at_age"].to_tmb();
         unfished_spawning_biomass_p(pop_idx) =
             derived_quantities["unfished_spawning_biomass"].to_tmb();
-        log_M_p(pop_idx) = this->populations[pop_idx]->log_M.to_tmb();
-        log_init_naa_p(pop_idx) =
-            this->populations[pop_idx]->log_init_naa.to_tmb();
         spawning_biomass_ratio_p(pop_idx) =
             this->populations[pop_idx]->spawning_biomass_ratio.to_tmb();
-        log_f_multiplier_p(pop_idx) =
-            this->populations[pop_idx]->log_f_multiplier.to_tmb();
 
         pop_idx += 1;
       }
@@ -1297,8 +1274,6 @@ class CatchAtAge : public FisheryModelBase<Type> {
       fleet_iterator fit;
       for (fit = this->fleets.begin(); fit != this->fleets.end(); ++fit) {
         std::shared_ptr<fims_popdy::Fleet<Type>> &fleet = (*fit).second;
-        fleet->create_report_vectors(report_vectors);
-        fleet->selectivity->create_report_vectors(report_vectors);
         std::map<std::string, fims::Vector<Type>> &derived_quantities =
             this->GetFleetDerivedQuantities(fleet->GetId());
 
@@ -1367,7 +1342,6 @@ class CatchAtAge : public FisheryModelBase<Type> {
           ADREPORTvector(unfished_spawning_biomass_p);
       vector<Type> spawning_biomass_ratio =
           ADREPORTvector(spawning_biomass_ratio_p);
-      vector<Type> log_f_multiplier = ADREPORTvector(log_f_multiplier_p);
 
       vector<Type> agecomp_expected = ADREPORTvector(agecomp_expected_f);
       vector<Type> agecomp_proportion = ADREPORTvector(agecomp_proportion_f);
@@ -1419,11 +1393,8 @@ class CatchAtAge : public FisheryModelBase<Type> {
                      this->of);
       FIMS_REPORT_F_("unfished_spawning_biomass", unfished_spawning_biomass_p,
                      this->of);
-      FIMS_REPORT_F_("log_M", log_M_p, this->of);
-      FIMS_REPORT_F_("log_init_naa", log_init_naa_p, this->of);
       FIMS_REPORT_F_("spawning_biomass_ratio", spawning_biomass_ratio_p,
                      this->of);
-      FIMS_REPORT_F_("log_f_multiplier", log_f_multiplier_p, this->of);
 
       // adreport
       ADREPORT_F(biomass, this->of);
@@ -1441,7 +1412,6 @@ class CatchAtAge : public FisheryModelBase<Type> {
       ADREPORT_F(unfished_numbers_at_age, this->of);
       ADREPORT_F(unfished_spawning_biomass, this->of);
       ADREPORT_F(spawning_biomass_ratio, this->of);
-      ADREPORT_F(log_f_multiplier, this->of);
 
       // fleets
       // report
