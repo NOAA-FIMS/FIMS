@@ -126,6 +126,15 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * Default is false to avoid large report-side allocations.
    */
   bool report_growth_derived_alk_tensor = false;
+  /**
+   * @brief Optional per-evaluation cache of growth-derived fleet mean WAA.
+   *
+   * Storage is flattened as [year, age] for each fleet and only populated
+   * when the fleet is eligible for the supported growth-derived ALK path.
+   * This avoids repeated row-by-row ALK reconstruction in objective-side
+   * weight calculations while avoiding full [year, age, length] allocation.
+   */
+  std::map<uint32_t, fims::Vector<Type>> fleet_growth_derived_mean_waa_cache;
 
  public:
   std::vector<Type> ages; /*!< vector of the ages for referencing*/
@@ -196,6 +205,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * fleet to a given value.
    */
   virtual void Prepare() {
+    this->fleet_growth_derived_mean_waa_cache.clear();
     for (size_t p = 0; p < this->populations.size(); p++) {
       std::shared_ptr<fims_popdy::Population<Type>> &population =
           this->populations[p];
@@ -450,7 +460,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
 
     dq_["biomass"][year] +=
         dq_["numbers_at_age"][i_age_year] *
-        population->growth->evaluate(population->ages[age]);
+        PopulationMeanWeightAA(population, year, age);
   }
 
   /**
@@ -475,7 +485,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
 
     dq_["unfished_biomass"][year] +=
         dq_["unfished_numbers_at_age"][i_age_year] *
-        population->growth->evaluate(population->ages[age]);
+        PopulationMeanWeightAA(population, year, age);
   }
 
   /**
@@ -503,7 +513,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
     dq_["spawning_biomass"][year] +=
         population->proportion_female[age] * dq_["numbers_at_age"][i_age_year] *
         dq_["proportion_mature_at_age"][i_age_year] *
-        population->growth->evaluate(population->ages[age]);
+        PopulationMeanWeightAA(population, year, age);
   }
 
   /**
@@ -531,7 +541,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
         population->proportion_female[age] *
         dq_["unfished_numbers_at_age"][i_age_year] *
         dq_["proportion_mature_at_age"][i_age_year] *
-        population->growth->evaluate(population->ages[age]);
+        PopulationMeanWeightAA(population, year, age);
   }
 
   /**
@@ -589,12 +599,12 @@ class CatchAtAge : public FisheryModelBase<Type> {
     Type phi_0 = 0.0;
     phi_0 += numbers_spr[0] * population->proportion_female[0] *
              dq_["proportion_mature_at_age"][0] *
-             population->growth->evaluate(population->ages[0]);
+             PopulationMeanWeightAA(population, 0, 0);
     for (size_t a = 1; a < (population->n_ages - 1); a++) {
       numbers_spr[a] = numbers_spr[a - 1] * fims_math::exp(-population->M[a]);
       phi_0 += numbers_spr[a] * population->proportion_female[a] *
                dq_["proportion_mature_at_age"][a] *
-               population->growth->evaluate(population->ages[a]);
+               PopulationMeanWeightAA(population, 0, a);
     }
 
     numbers_spr[population->n_ages - 1] =
@@ -605,7 +615,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
         numbers_spr[population->n_ages - 1] *
         population->proportion_female[population->n_ages - 1] *
         dq_["proportion_mature_at_age"][population->n_ages - 1] *
-        population->growth->evaluate(population->ages[population->n_ages - 1]);
+        PopulationMeanWeightAA(population, 0, population->n_ages - 1);
 
     return phi_0;
   }
@@ -745,12 +755,14 @@ class CatchAtAge : public FisheryModelBase<Type> {
       size_t age) {
     int i_age_year = year * population->n_ages + age;
     for (size_t fleet_ = 0; fleet_ < population->n_fleets; fleet_++) {
+      std::shared_ptr<fims_popdy::Fleet<Type>> &fleet =
+          population->fleets[fleet_];
       std::map<std::string, fims::Vector<Type>> &fdq_ =
-          this->GetFleetDerivedQuantities(population->fleets[fleet_]->GetId());
+          this->GetFleetDerivedQuantities(fleet->GetId());
 
       fdq_["landings_weight_at_age"][i_age_year] =
           fdq_["landings_numbers_at_age"][i_age_year] *
-          population->growth->evaluate(population->ages[age]);
+          GrowthDerivedFleetMeanWeightAA(population, fleet, year, age);
     }
   }
 
@@ -877,12 +889,14 @@ class CatchAtAge : public FisheryModelBase<Type> {
       size_t age) {
     int i_age_year = year * population->n_ages + age;
     for (size_t fleet_ = 0; fleet_ < population->n_fleets; fleet_++) {
+      std::shared_ptr<fims_popdy::Fleet<Type>> &fleet =
+          population->fleets[fleet_];
       std::map<std::string, fims::Vector<Type>> &fdq_ =
-          this->GetFleetDerivedQuantities(population->fleets[fleet_]->GetId());
+          this->GetFleetDerivedQuantities(fleet->GetId());
 
       fdq_["index_weight_at_age"][i_age_year] =
           fdq_["index_numbers_at_age"][i_age_year] *
-          population->growth->evaluate(population->ages[age]);
+          GrowthDerivedFleetMeanWeightAA(population, fleet, year, age);
     }
   }
 
@@ -1161,6 +1175,78 @@ class CatchAtAge : public FisheryModelBase<Type> {
   }
 
   /**
+   * @brief Try to read fleet-specific mean WAA from the per-evaluation cache.
+   *
+   * @param fleet Shared pointer to the fleet object.
+   * @param year Year index.
+   * @param age Age index.
+   * @param mean_weight Output cached expected mean WAA.
+   * @return True when a valid cached value was found.
+   */
+  bool TryGetCachedGrowthDerivedFleetMeanWeightAA(
+      const std::shared_ptr<fims_popdy::Fleet<Type>>& fleet,
+      size_t year,
+      size_t age,
+      Type& mean_weight) {
+    if (fleet == nullptr || fleet->n_ages == 0) {
+      return false;
+    }
+
+    auto cache_it =
+        this->fleet_growth_derived_mean_waa_cache.find(fleet->GetId());
+    if (cache_it == this->fleet_growth_derived_mean_waa_cache.end()) {
+      return false;
+    }
+
+    const fims::Vector<Type>& cached = cache_it->second;
+    if (cached.size() == 0) {
+      return false;
+    }
+
+    const size_t y =
+        (fleet->n_years == 0) ? 0 : std::min(year, fleet->n_years - 1);
+    const size_t a = std::min(age, fleet->n_ages - 1);
+    const size_t i_age_year = y * fleet->n_ages + a;
+    if (i_age_year >= cached.size()) {
+      return false;
+    }
+
+    mean_weight = cached[i_age_year];
+    return true;
+  }
+
+  /**
+   * @brief Build growth-derived fleet mean WAA cache for the current
+   * evaluation.
+   *
+   * Only [year, age] mean WAA is cached. The full derived ALK tensor is not
+   * materialized in objective-side evaluation.
+   */
+  void RefreshFleetGrowthDerivedMeanWAACache() {
+    this->fleet_growth_derived_mean_waa_cache.clear();
+
+    fleet_iterator fit;
+    for (fit = this->fleets.begin(); fit != this->fleets.end(); ++fit) {
+      std::shared_ptr<fims_popdy::Fleet<Type>>& fleet = (*fit).second;
+      bool use_growth_derived_alk = false;
+      bool has_fixed_age_to_length_matrix = false;
+      fims::Vector<Type> growth_derived_age_to_length_conversion;
+      fims::Vector<Type> growth_derived_mean_WAA;
+
+      ResolveFleetALKPath(
+          fleet, use_growth_derived_alk, has_fixed_age_to_length_matrix,
+          growth_derived_age_to_length_conversion, &growth_derived_mean_WAA,
+          "objective weight cache", false);
+      (void)has_fixed_age_to_length_matrix;
+
+      if (use_growth_derived_alk && growth_derived_mean_WAA.size() > 0) {
+        this->fleet_growth_derived_mean_waa_cache[fleet->GetId()] =
+            growth_derived_mean_WAA;
+      }
+    }
+  }
+
+  /**
    * @brief Attempts to build a normalized dynamic ALK row for one fleet, year,
    * and age.
    *
@@ -1247,7 +1333,13 @@ class CatchAtAge : public FisheryModelBase<Type> {
       const std::shared_ptr<fims_popdy::Fleet<Type>>& fleet,
       size_t year,
       size_t age) {
-     fims::Vector<Type>  alk_row;
+    Type cached_mean_weight = static_cast<Type>(0.0);
+    if (TryGetCachedGrowthDerivedFleetMeanWeightAA(
+            fleet, year, age, cached_mean_weight)) {
+      return cached_mean_weight;
+    }
+
+    fims::Vector<Type> alk_row;
     Type mean_weight = static_cast<Type>(0.0);
     if (TryBuildGrowthDerivedALKRowAndMeanWeight(fleet, year, age, alk_row,
                                                  mean_weight)) {
@@ -1779,6 +1871,7 @@ bool TryBuildGrowthDerivedFleetALKAndMeanWeight(
                Sets recruitment deviations to mean 0.
      */
     Prepare();
+    RefreshFleetGrowthDerivedMeanWAACache();
     /*
      start at year=0, age=0;
      here year 0 is the estimated initial population structure and age 0 are

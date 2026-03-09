@@ -190,6 +190,31 @@ test_that("von bertalanffy growth converges when L1 L2 and K are estimable", {
     tolerance = 1e-8
   )
 
+  #' @description Test that objective-side index weight-at-age uses the same fleet mean WAA as the derived VonB path.
+  fleet_index_numbers_at_age <- report[["index_numbers_at_age"]][[1]]
+  fleet_index_weight_at_age <- report[["index_weight_at_age"]][[1]]
+  fleet_derived_mean_waa <- report[["growth_derived_mean_WAA"]][[1]]
+  positive_index_cells <- abs(fleet_index_numbers_at_age) > 0
+  expect_true(any(positive_index_cells))
+  expect_equal(
+    fleet_index_weight_at_age[positive_index_cells] /
+      fleet_index_numbers_at_age[positive_index_cells],
+    fleet_derived_mean_waa[positive_index_cells],
+    tolerance = 1e-8
+  )
+
+  #' @description Test that objective-side landings weight-at-age uses the same fleet mean WAA as the derived VonB path.
+  fleet_landings_numbers_at_age <- report[["landings_numbers_at_age"]][[1]]
+  fleet_landings_weight_at_age <- report[["landings_weight_at_age"]][[1]]
+  positive_landings_cells <- abs(fleet_landings_numbers_at_age) > 0
+  expect_true(any(positive_landings_cells))
+  expect_equal(
+    fleet_landings_weight_at_age[positive_landings_cells] /
+      fleet_landings_numbers_at_age[positive_landings_cells],
+    fleet_derived_mean_waa[positive_landings_cells],
+    tolerance = 1e-8
+  )
+
   realized_alk <- report[["growth_derived_age_to_length_conversion"]][[1]]
   n_years <- FIMS::get_n_years(ctx$data)
   n_ages <- FIMS::get_n_ages(ctx$data)
