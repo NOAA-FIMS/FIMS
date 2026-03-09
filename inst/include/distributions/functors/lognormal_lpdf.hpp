@@ -2,7 +2,7 @@
  * @file lognormal_lpdf.hpp
  * @brief Implements the LogNormalLPDF distribution functor used by FIMS to
  * evaluate observation-level and total log-likelihood contributions under a
- * lognormal error model for data, priors, and random effects. 
+ * lognormal error model for data, priors, and random effects.
  * @copyright This file is part of the NOAA, National Marine Fisheries Service
  * Fisheries Integrated Modeling System project. See LICENSE in the source
  * folder for reuse information.
@@ -26,7 +26,7 @@ namespace fims_distributions {
  * values. For data inputs, the Jacobian adjustment `-log(x)` is applied where
  * appropriate to convert from normal density on the log scale to the lognormal
  * density on the original scale.
- * 
+ *
  * For `data` input, values equal to `na_value` are skipped and contribute zero
  * to the objective. Per-observation contributions are stored in `lpdf_vec` and
  * mirrored to `report_lpdf_vec`; the summed total is returned by `evaluate()`
@@ -59,7 +59,8 @@ struct LogNormalLPDF : public DensityComponentBase<Type> {
    * @details The following equation is the lognormal probability density
    * function, and thus, the log of it is evaluated:
    * \f[
-   * f(x) = \frac{1.0}{ x\sigma\sqrt{2\pi} }\mathrm{exp}\Bigg(-\frac{(\mathrm{ln}(x) - \mu)^{2}}{2\sigma^{2}}\Bigg),
+   * f(x) = \frac{1.0}{ x\sigma\sqrt{2\pi}
+   * }\mathrm{exp}\Bigg(-\frac{(\mathrm{ln}(x) - \mu)^{2}}{2\sigma^{2}}\Bigg),
    * \f]
    * where \f$\mu\f$ is the mean of the distribution of \f$\mathrm{ln(x)}\f$
    * and \f$\sigma^2\f$ is the variance of \f$\mathrm{ln}(x)\f$.

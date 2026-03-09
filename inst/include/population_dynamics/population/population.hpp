@@ -73,7 +73,6 @@ annual fishing mortality multipliers to scale total mortality of all fleets*/
    * @brief Constructor.
    */
   Population() { this->id = Population::id_g++; }
-
 };
 template <class Type>
 uint32_t Population<Type>::id_g = 0;

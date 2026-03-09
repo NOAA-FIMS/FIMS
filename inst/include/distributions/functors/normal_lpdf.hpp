@@ -2,7 +2,7 @@
  * @file normal_lpdf.hpp
  * @brief Implements the NormalLPDF distribution functor used by FIMS to
  * evaluate observation-level and total log-likelihood contributions under a
- * normal error model for data, priors, and random effects. 
+ * normal error model for data, priors, and random effects.
  * @copyright This file is part of the NOAA, National Marine Fisheries Service
  * Fisheries Integrated Modeling System project. See LICENSE in the source
  * folder for reuse information.
@@ -24,7 +24,7 @@ namespace fims_distributions {
  * normal log-density calculations. Specifically, when evaluating the normal
  * likelihood, observations are passed to `dnorm(..., give_log = true)` to
  * obtain log-density values.
- * 
+ *
  * For `data` input, values equal to `na_value` are skipped and contribute zero
  * to the objective. Per-observation contributions are stored in `lpdf_vec` and
  * mirrored to `report_lpdf_vec`; the summed total is returned by `evaluate()`
@@ -58,10 +58,10 @@ struct NormalLPDF : public DensityComponentBase<Type> {
    * @details The following equation is normal probability density function,
    * and thus, the log of it evaluated:
    * \f[
-   * f(x) = \frac{1}{\sigma\sqrt{2\pi}}\mathrm{exp}\Bigg(-\frac{(x-\mu)^2}{2\sigma^2} \Bigg),
-   * \f]
-   * where \f$\mu\f$ is the mean of the distribution and \f$\sigma^2\f$ is the
-   * variance.
+   * f(x) =
+   * \frac{1}{\sigma\sqrt{2\pi}}\mathrm{exp}\Bigg(-\frac{(x-\mu)^2}{2\sigma^2}
+   * \Bigg), \f] where \f$\mu\f$ is the mean of the distribution and
+   * \f$\sigma^2\f$ is the variance.
    */
   virtual const Type evaluate() {
     // set vector size based on input type (prior, process, or data)

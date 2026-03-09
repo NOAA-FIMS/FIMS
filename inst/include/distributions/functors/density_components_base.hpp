@@ -39,8 +39,7 @@ struct DistributionElementObject {
   std::string input_type;
 
   /** @brief Observed data. */
-  std::shared_ptr<fims_data_object::DataObject<Type>>
-    observed_values;
+  std::shared_ptr<fims_data_object::DataObject<Type>> observed_values;
 
   /** @brief Expected value vector for prior-based pathways. */
   fims::Vector<Type> expected_values;
@@ -49,8 +48,7 @@ struct DistributionElementObject {
   fims::Vector<Type>* re = NULL;
 
   /** @brief Expected value vector for random-effects pathways. */
-  fims::Vector<Type>* re_expected_values =
-    NULL;
+  fims::Vector<Type>* re_expected_values = NULL;
 
   /** @brief Expected value vector for data pathways. */
   fims::Vector<Type>* data_expected_values = NULL;
@@ -71,7 +69,7 @@ struct DistributionElementObject {
   /**
    * @brief If "yes", `expected_mean` is used instead of `expected_values`. The
    * default is "no" leading to the use of `expected_values`.
-  */
+   */
   std::string use_mean = fims::to_string("no");
 
   // std::shared_ptr<DistributionElementObject<Type>> expected;
@@ -187,50 +185,51 @@ struct DensityComponentBase : public fims_model_object::FIMSObject<Type>,
   // this is like a memory tracker.
   // Assigning each one its own ID is a way to keep track of
   // all the instances of the DensityComponentBase class.
-  /** 
+  /**
    * @brief Global unique identifier for distribution modules.
-  */
+   */
   static uint32_t id_g;
 
   /**
    * @brief ID of observed data component.
-  */
+   */
   int observed_data_id_m = -999;
 
   /**
    * @brief Vector storing observation-level log-likelihood contributions.
-  */
+   */
   fims::Vector<Type> lpdf_vec;
 
   /**
    * @brief Vector mirrored for report output at the observation level.
-  */
+   */
   fims::Vector<Type> report_lpdf_vec;
 
   /**
    * @brief Boolean; if true, one-step-ahead (OSA) residuals are calculated.
-  */
+   */
   bool osa_flag = false;
 
   /**
    * @brief Boolean; if true, data are simulated from the distribution.
-  */
+   */
   bool simulate_flag = false;
 
   /**
    * @brief Unique ID for variable map that points to a fims::Vector.
-  */
+   */
   std::vector<uint32_t> key;
 
 #ifdef TMB_MODEL
   /**
    * @brief Pointer to the TMB objective function.
-  */
+   */
   ::objective_function<Type>* of;
 #endif
 
   /**
-   * @brief Constructor, which initializes default prior pointer state and ID. */
+   * @brief Constructor, which initializes default prior pointer state and ID.
+   */
   DensityComponentBase() {
     // initialize the priors vector with a size of 1 and set the first element
     // to NULL
