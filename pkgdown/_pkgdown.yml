@@ -78,7 +78,7 @@ navbar:
     reference:
       text: reference
       menu:
-        - text: r functions
+        - text: r/roxygen
           href: reference/index.html
         - text: c++/doxygen
           href: https://e-perl-noaa.github.io/FIMS/doxygen/index.html
