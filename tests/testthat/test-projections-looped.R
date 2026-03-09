@@ -654,11 +654,11 @@ estimation_error <- max(abs(sdr_fixed_5_year_project_catch_low[-c(33:37), "Estim
 
 sd_error <- max(abs(sdr_fixed_5_year_project_catch_low[-c(33:37), "Std. Error"] - sdr_fixed_no_project[, "Std. Error"]) / abs(sdr_fixed_no_project[, "Std. Error"]))
 
-#rec_devs <- sdr_report_5_year_project_catch_low[row.names(sdr_report_5_year_project_catch_low) == "log_devs", ][30:34, ]
+# rec_devs <- sdr_report_5_year_project_catch_low[row.names(sdr_report_5_year_project_catch_low) == "log_devs", ][30:34, ]
 
 test_that("projections with low catch data achieve same estimates and no projection model run", {
   #' @description Test that rec devs were fixed at zero in projection.
-  #expect_equal(sum(rec_devs[, "Estimate"]), 0)
+  # expect_equal(sum(rec_devs[, "Estimate"]), 0)
 
   #' @description Test that the maximum parameter estimate difference between a low catch projection run and no projection run is less than 10%.
   expect_lt(estimation_error, 0.1)
