@@ -3,8 +3,11 @@
  * @file density_components_base.hpp
  * @brief Declares the DensityComponentBase class, which is the base class for
  * all distribution functors.
- * @details Defines guards for distributions module outline to define the
- * density_components_base hpp file if not already defined.
+ * @details This header defines two core templates used by concrete
+ * distribution functors (e.g., NormalLPDF, LogNormalLPDF, MultinomialLPMF):
+ * DistributionElementObject, which stores and resolves observed/expected
+ * inputs, and DensityComponentBase, which adds shared bookkeeping for
+ * log-likelihood contributions and simulation/reporting behavior.
  * @copyright This file is part of the NOAA, National Marine Fisheries Service
  * Fisheries Integrated Modeling System project. See LICENSE in the source
  * folder for reuse information.
@@ -21,36 +24,62 @@
 namespace fims_distributions {
 
 /**
- * Container to hold density components including pointers to density inputs.
+ * @brief Container that stores input vectors and pointers used by distribution
+ * functors.
+ * @details Provides a common access layer to retrieve observed and expected
+ * values across "data", "random_effects", and "prior" pathways.
  */
 template <typename Type>
 struct DistributionElementObject {
-  std::string input_type; /**< string classifies the type of the negative
-                             log-likelihood; options are: "priors",
-                             "random_effects", and "data" */
-  std::shared_ptr<fims_data_object::DataObject<Type>>
-      observed_values; /**< observed data*/
-  fims::Vector<Type>
-      expected_values;           /**< expected value of distribution function*/
-  fims::Vector<Type>* re = NULL; /**< pointer to random effects vector*/
-  fims::Vector<Type>* re_expected_values =
-      NULL; /**< expected value of random effects*/
-  fims::Vector<Type>* data_expected_values = NULL; /**< expected value of data*/
-  std::vector<fims::Vector<Type>*>
-      priors; /**< vector of pointers where each points to a prior parameter */
-  fims::Vector<Type> x; /**< input value of distribution function for priors or
-                           random effects*/
-  fims::Vector<Type> expected_mean;             /**< the expected mean of the
-                                            distribution, overrides expected values */
-  std::string use_mean = fims::to_string("no"); /**< should expected_mean
-                                          be used over expected values */
-  // std::shared_ptr<DistributionElementObject<Type>> expected; /**< expected
-  // value of distribution function */
+  /**
+   * @brief Classification of the input pathway for this distribution object.
+   * Options used by accessor methods are, "prior", "random_effects", and
+   * "data".
+   */
+  std::string input_type;
+
+  /** @brief Observed data. */
+  std::shared_ptr<fims_data_object::DataObject<Type>> observed_values;
+
+  /** @brief Expected value vector for prior-based pathways. */
+  fims::Vector<Type> expected_values;
+
+  /** @brief Pointer to random effects vector. */
+  fims::Vector<Type>* re = NULL;
+
+  /** @brief Expected value vector for random-effects pathways. */
+  fims::Vector<Type>* re_expected_values = NULL;
+
+  /** @brief Expected value vector for data pathways. */
+  fims::Vector<Type>* data_expected_values = NULL;
+
+  /** @brief Vector of pointers where each entry points to a prior parameter. */
+  std::vector<fims::Vector<Type>*> priors;
 
   /**
-   * Retrieve element from observed data set, random effect, or prior.
-   * @param i index referencing vector or pointer
-   * @return the reference to the value of the vector or pointer at position i
+   * @brief Input value of distribution function for priors or random effects.
+   */
+  fims::Vector<Type> x;
+
+  /**
+   * @brief The expected mean of the distribution; overrides expected values.
+   */
+  fims::Vector<Type> expected_mean;
+
+  /**
+   * @brief If "yes", `expected_mean` is used instead of `expected_values`. The
+   * default is "no" leading to the use of `expected_values`.
+   */
+  std::string use_mean = fims::to_string("no");
+
+  // std::shared_ptr<DistributionElementObject<Type>> expected;
+  // // Expected value of distribution function.
+
+  /**
+   * @brief Retrieve one observed value based on `input_type`.
+   * @param i Index into the active observed source, e.g., vector or pointer.
+   * @return Reference to the selected observed value.
+   * @throws std::runtime_error If input_type is "prior" and priors is empty.
    */
   inline Type& get_observed(size_t i) {
     if (this->input_type == "data") {
@@ -72,10 +101,10 @@ struct DistributionElementObject {
   }
 
   /**
-   * Retrieve element from observed data set, random effect, or prior.
-   * @param i index referencing row
-   * @param j index referencing column
-   * @return the reference to the row and column at position i, j
+   * @brief Retrieve one observed matrix-like value based on `input_type`.
+   * @param i Row index.
+   * @param j Column index.
+   * @return Reference to the selected observed value.
    */
   inline Type& get_observed(size_t i, size_t j) {
     if (this->input_type == "data") {
@@ -91,9 +120,11 @@ struct DistributionElementObject {
   }
 
   /**
-   * Retrieve expected element given data, random effect, or prior.
-   * @param i index referencing vector or pointer
-   * @return the reference to the value of the vector or pointer at position i
+   * @brief Retrieve one expected value based on `input_type` and `use_mean`.
+   * @param i Index into the active expected source, e.g., vector or pointer.
+   * @return Reference to the selected expected value.
+   * @details If `use_mean == "yes"`, `expected_mean` overrides other expected
+   * vectors and is accessed via scalar/vector semantics.
    */
   inline Type& get_expected(size_t i) {
     if (this->input_type == "data") {
@@ -108,8 +139,8 @@ struct DistributionElementObject {
   }
 
   /**
-   * Retrieve expected element size given data, random effect, or prior.
-   * @return The size of the element.
+   * @brief Get length of the active observed input vector.
+   * @return Size of the observed input under the current `input_type`.
    */
   inline size_t get_n_x() {
     if (this->input_type == "data") {
@@ -125,8 +156,8 @@ struct DistributionElementObject {
   }
 
   /**
-   * Retrieve expected value element size given data, random effect, or prior.
-   * @return The size of the element.
+   * @brief Get length of the active expected input vector.
+   * @return Size of the expected input under the current `input_type`.
    */
   inline size_t get_n_expected() {
     if (this->input_type == "data") {
@@ -142,10 +173,10 @@ struct DistributionElementObject {
   }
 };
 
-/** @brief Base class for all module_name functors.
- *
- * @tparam Type The type of the module_name functor.
- *
+/**
+ * @brief Base class for concrete distribution functors used in likelihood
+ * evaluations.
+ * @tparam Type Scalar type used by the model (e.g., double or AD type).
  */
 template <typename Type>
 struct DensityComponentBase : public fims_model_object::FIMSObject<Type>,
@@ -154,24 +185,50 @@ struct DensityComponentBase : public fims_model_object::FIMSObject<Type>,
   // this is like a memory tracker.
   // Assigning each one its own ID is a way to keep track of
   // all the instances of the DensityComponentBase class.
-  static uint32_t
-      id_g; /**< global unique identifier for distribution modules */
-  int observed_data_id_m = -999; /*!< id of observed data component*/
-  fims::Vector<Type> lpdf_vec; /**< vector to record observation level negative
-                                  log-likelihood values */
-  fims::Vector<Type> report_lpdf_vec; /**< vector to record observation level
-                                         negative log-likelihood values */
-  bool osa_flag = false; /**< Boolean; if true, osa residuals are calculated */
-  bool simulate_flag =
-      false; /**< Boolean; if true, data are simulated from the distribution */
-  std::vector<uint32_t>
-      key; /**< unique id for variable map that points to a fims::Vector */
+  /**
+   * @brief Global unique identifier for distribution modules.
+   */
+  static uint32_t id_g;
+
+  /**
+   * @brief ID of observed data component.
+   */
+  int observed_data_id_m = -999;
+
+  /**
+   * @brief Vector storing observation-level log-likelihood contributions.
+   */
+  fims::Vector<Type> lpdf_vec;
+
+  /**
+   * @brief Vector mirrored for report output at the observation level.
+   */
+  fims::Vector<Type> report_lpdf_vec;
+
+  /**
+   * @brief Boolean; if true, one-step-ahead (OSA) residuals are calculated.
+   */
+  bool osa_flag = false;
+
+  /**
+   * @brief Boolean; if true, data are simulated from the distribution.
+   */
+  bool simulate_flag = false;
+
+  /**
+   * @brief Unique ID for variable map that points to a fims::Vector.
+   */
+  std::vector<uint32_t> key;
 
 #ifdef TMB_MODEL
-  ::objective_function<Type>* of; /**< Pointer to the TMB objective function */
+  /**
+   * @brief Pointer to the TMB objective function.
+   */
+  ::objective_function<Type>* of;
 #endif
 
-  /** @brief Constructor.
+  /**
+   * @brief Constructor, which initializes default prior pointer state and ID.
    */
   DensityComponentBase() {
     // initialize the priors vector with a size of 1 and set the first element
@@ -183,8 +240,8 @@ struct DensityComponentBase : public fims_model_object::FIMSObject<Type>,
 
   virtual ~DensityComponentBase() {}
   /**
-   * @brief Generic probability density function. Calculates the pdf at the
-   * independent variable value.
+   * @brief Evaluate the distribution-specific log-likelihood contribution.
+   * @return Total log-likelihood contribution for the active inputs.
    */
   virtual const Type evaluate() = 0;
 };

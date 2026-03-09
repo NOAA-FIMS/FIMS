@@ -1,8 +1,8 @@
 /**
  * @file lognormal_lpdf.hpp
- * @brief Lognormal Log Probability Density Function (LPDF) defines the
- * Lognormal LPDF class and its fields and returns the log probability density
- * function.
+ * @brief Implements the LogNormalLPDF distribution functor used by FIMS to
+ * evaluate observation-level and total log-likelihood contributions under a
+ * lognormal error model for data, priors, and random effects.
  * @copyright This file is part of the NOAA, National Marine Fisheries Service
  * Fisheries Integrated Modeling System project. See LICENSE in the source
  * folder for reuse information.
@@ -16,15 +16,36 @@
 
 namespace fims_distributions {
 /**
- * LogNormal Log Probability Density Function
+ * @copybrief lognormal_lpdf.hpp
+ *
+ * @details This implementation relies on [TMB's R-style `dnorm()` utility](
+ * https://kaskr.github.io/adcomp/group__R__style__distribution.html) for
+ * normal log-density calculations on log-transformed values. Specifically,
+ * when evaluating the lognormal likelihood, observations are transformed with
+ * `log(x)` and passed to `dnorm(..., give_log = true)` to obtain log-density
+ * values. For data inputs, the Jacobian adjustment `-log(x)` is applied where
+ * appropriate to convert from normal density on the log scale to the lognormal
+ * density on the original scale.
+ *
+ * For `data` input, values equal to `na_value` are skipped and contribute zero
+ * to the objective. Per-observation contributions are stored in `lpdf_vec` and
+ * mirrored to `report_lpdf_vec`; the summed total is returned by `evaluate()`
+ * and stored in `lpdf`.
  */
 template <typename Type>
 struct LogNormalLPDF : public DensityComponentBase<Type> {
-  fims::Vector<Type>
-      log_sd; /**< natural log of the standard deviation of the distribution on
-                 the log scale; can be a vector or scalar */
-  Type lpdf = static_cast<Type>(0.0); /**< total log probability density
-                                         contribution of the distribution */
+  /**
+   * @brief Natural log of the standard deviation of the distribution on the
+   * log scale. The argument can be a vector or scalar, where the latter is
+   * referenced for each instance through the use of
+   * \ref fims::Vector::get_force_scalar(size_t) "get_force_scalar()".
+   */
+  fims::Vector<Type> log_sd;
+
+  /**
+   * @brief Total log probability density contribution of the distribution.
+   */
+  Type lpdf = static_cast<Type>(0.0);
   /** @brief Constructor.
    */
   LogNormalLPDF() : DensityComponentBase<Type>() {}
@@ -34,7 +55,15 @@ struct LogNormalLPDF : public DensityComponentBase<Type> {
   virtual ~LogNormalLPDF() {}
 
   /**
-   * @brief Evaluates the lognormal probability density function
+   * @brief Evaluates the lognormal log probability density function.
+   * @details The following equation is the lognormal probability density
+   * function, and thus, the log of it is evaluated:
+   * \f[
+   * f(x) = \frac{1.0}{ x\sigma\sqrt{2\pi}
+   * }\mathrm{exp}\Bigg(-\frac{(\mathrm{ln}(x) - \mu)^{2}}{2\sigma^{2}}\Bigg),
+   * \f]
+   * where \f$\mu\f$ is the mean of the distribution of \f$\mathrm{ln(x)}\f$
+   * and \f$\sigma^2\f$ is the variance of \f$\mathrm{ln}(x)\f$.
    */
   virtual const Type evaluate() {
     // set vector size based on input type (prior, process, or data)

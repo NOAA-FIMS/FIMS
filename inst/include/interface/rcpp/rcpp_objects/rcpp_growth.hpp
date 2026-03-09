@@ -183,7 +183,7 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
     ss << " \"module_type\": \"EWAA\",\n";
     ss << " \"module_id\":" << this->id << ",\n";
     ss << " \"parameters\": [\n{\n";
-    ss << " \"name\": null,\n";
+    ss << " \"name\": \"weight_at_age\",\n";
     ss << " \"id\": null,\n";
     ss << " \"type\": \"vector\",\n";
     ss << " \"dimensionality\": {\n";
@@ -196,9 +196,6 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
       ss << "\"id\": null,\n";
       ss << "\"value\": " << weights[i] << ",\n";
       ss << "\"estimated_value\": " << weights[i] << ",\n";
-      ss << "\"uncertainty\": " << 0 << ",\n";
-      ss << "\"min\": \"-Infinity\",\n";
-      ss << "\"max\": \"Infinity\",\n";
       ss << "\"estimation_type\": \"constant\"\n";
       ss << "},\n";
     }
@@ -206,9 +203,6 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
     ss << "\"id\": null,\n";
     ss << "\"value\": " << weights[weights.size() - 1] << ",\n";
     ss << "\"estimated_value\": " << weights[weights.size() - 1] << ",\n";
-    ss << "\"uncertainty\": " << 0 << ",\n";
-    ss << "\"min\": \"-Infinity\",\n";
-    ss << "\"max\": \"Infinity\",\n";
     ss << "\"estimation_type\": \"constant\"\n";
     ss << "}\n]\n";
     ss << "}\n]\n}\n";

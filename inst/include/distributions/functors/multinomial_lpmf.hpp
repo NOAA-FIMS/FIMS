@@ -1,8 +1,8 @@
 /**
  * @file multinomial_lpmf.hpp
- * @brief Multinomial Log Probability Mass Function (LPMF) module file defines
- * the Multinomial LPMF class and its fields and returns the log probability
- * mass function.
+ * @brief Implements the MultinomialLPMF distribution functor used by FIMS to
+ * evaluate the observation-level and total log-likelihood contributions under
+ * a multinomial error model for data, priors, and random effects.
  * @copyright This file is part of the NOAA, National Marine Fisheries Service
  * Fisheries Integrated Modeling System project. See LICENSE in the source
  * folder for reuse information.
@@ -16,14 +16,36 @@
 
 namespace fims_distributions {
 /**
- * Multinomial Log Probability Mass Function
+ * @copybrief multinomial_lpmf.hpp
+ *
+ * @details This implementation relies on [TMB's R-style `dmultinom()`
+ * utility]( https://kaskr.github.io/adcomp/group__R__style__distribution.html)
+ * to compute row-wise multinomial log-probability mass contributions from
+ * observed counts (`x_vector`) and expected proportions (`prob_vector`).
+ * Specifically, when evaluating the multinomial likelihood, observations are
+ * passed to `dmultinom(..., give_log = true)`.
+ *
+ * For `data` input, if any element in a row is equal to `na_value`, the entire
+ * row is skipped and contributes zero to the objective. Row-level
+ * contributions are stored in `lpdf_vec`; values are expanded into
+ * `report_lpdf_vec` for output consistency with the full matrix dimensions.
+ * The summed total is returned by `evaluate()` and stored in `lpdf`.
+ *
+ * Row observations could be counts of each age for a given time step, where
+ * additional time steps would be additional rows. Thus, columns are bins.
  */
 template <typename Type>
 struct MultinomialLPMF : public DensityComponentBase<Type> {
-  Type lpdf = static_cast<Type>(0.0); /**< total negative log-likelihood
-                                         contribution of the distribution */
-  fims::Vector<size_t> dims; /**< Dimensions of the number of rows and columns
-                                of the multivariate dataset */
+  /**
+   * @brief Total log-likelihood contribution of the distribution.
+   */
+  Type lpdf = static_cast<Type>(0.0);
+
+  /**
+   * @brief Dimensions of the number of rows and columns of the multivariate
+   * dataset.
+   */
+  fims::Vector<size_t> dims;
 
   /** @brief Constructor.
    */
@@ -34,7 +56,15 @@ struct MultinomialLPMF : public DensityComponentBase<Type> {
   virtual ~MultinomialLPMF() {}
 
   /**
-   * @brief Evaluates the multinomial probability mass function
+   * @brief Evaluates the multinomial log probability mass function.
+   * @details The following equation is the multinomial probability mass
+   * function, and thus, the log of it is evaluated:
+   * \f[
+   * f(\underline{y}) = \frac{n!}{y_{1}!...
+   * y_{k}!}p^{y_{1}}_{1}...p^{y_{k}}_{k}, \f] where \f$k\f$ is the number of
+   * categories, \f$n\f$ is the sample size, \f$\mu_{i}\f$ is the mean of
+   * \f$y_{i}\f$ and is equal to \f$np_{i}\f$, and \f$\sigma^{2}_{i}\f$ is the
+   * variance of \f$y_{i}\f$ and is equal to \f$np_{i}(1-p_{i})\f$.
    */
   virtual const Type evaluate() {
     // set dims using observed_values if no user input
@@ -44,9 +74,9 @@ struct MultinomialLPMF : public DensityComponentBase<Type> {
       dims[1] = this->observed_values->get_jmax();
     }
 
-    // setup vector for recording the log probability density function values
-    Type lpdf = static_cast<Type>(0.0); /**< total log probability mass
-                                           contribution of the distribution */
+    // setup vector for recording row-level log probability mass values
+    // total log probability mass contribution of the distribution
+    Type lpdf = static_cast<Type>(0.0);
     this->lpdf_vec.resize(dims[0]);
     this->report_lpdf_vec.clear();
     std::fill(this->lpdf_vec.begin(), this->lpdf_vec.end(), 0);
@@ -90,7 +120,8 @@ struct MultinomialLPMF : public DensityComponentBase<Type> {
       x_vector.resize(dims[1]);
       prob_vector.resize(dims[1]);
 
-      bool containsNA = false; /**< skips the entire row if any values are NA */
+      // Skips the entire row if any values are NA
+      bool containsNA = false;
 
 #ifdef TMB_MODEL
       for (size_t j = 0; j < dims[1]; j++) {

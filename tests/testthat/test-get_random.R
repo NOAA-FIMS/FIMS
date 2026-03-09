@@ -63,8 +63,6 @@ test_that("`get_random()` works with correct inputs", {
 
   selectivity <- methods::new(LogisticSelectivity)
   selectivity$inflection_point[1]$value <- 11.0
-  selectivity$inflection_point[1]$min <- 8.0
-  selectivity$inflection_point[1]$max <- 12.0
   selectivity$inflection_point[1]$estimation_type$set("random_effects")
   selectivity$slope[1]$value <- 0.5
   selectivity$slope[1]$estimation_type$set("random_effects")
@@ -75,8 +73,6 @@ test_that("`get_random()` works with correct inputs", {
   spawns <- 9.55784 * 10^6
   ssb0 <- 0.0102562
   recruitment$logit_steep[1]$value <- -log(1.0 - h) + log(h - 0.2)
-  recruitment$logit_steep[1]$min <- 0.21
-  recruitment$logit_steep[1]$max <- 1.0
   recruitment$logit_steep[1]$estimation_type$set("random_effects")
   recruitment$log_rzero[1]$value <- log(r0)
   recruitment$log_rzero[1]$estimation_type$set("random_effects")
