@@ -160,19 +160,8 @@ h6 { font-size: 1rem; }
 }
 
 #dropdown-reference {
-  font-size: 1.1rem;
-}
-
-#dropdown-reference::after {
-    height: .1rem;
-    width: 0%;
-    display: inline-block;
-    content: "";
-    position: absolute;
-    bottom: -10px;
-    left: 0px;
-    transition: width 200ms ease-in-out;
-    background-color: #f54f61;
+  font-size: 1.1rem !important;
+  border-bottom: 3px solid #f54f61 !important;
 }
 
 .navbar .nav-link.active .menu-text::after {
@@ -207,6 +196,10 @@ html {
     padding: 0.25rem 0.5rem !important;
     margin-bottom: 2px !important;
     border-radius: .375rem !important;
+}
+
+#nav-tree .selected a:hover {
+    color: #FFFFFF !important;
 }
 
 #nav-tree a:hover {
