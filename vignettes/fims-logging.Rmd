@@ -95,7 +95,6 @@ log_warnings_str <- get_log_warnings()
 
 # get log errors only
 log_errors_str <- get_log_errors()
-
 ```
 
 Another useful option is `set_throw_on_error()`. If this option is set to TRUE, FIMS will abort immediately when an error occurs and if `write_log(TRUE)` was previously called, the log file will be written before FIMS terminates the session. Below is an example of how to throw on error.
