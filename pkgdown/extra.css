@@ -302,16 +302,3 @@ footer p {
 footer a:link { color: #4a636c; text-decoration: none; }
 footer a:visited { color: #4a636c; text-decoration: none; }
 footer a:hover { color: #213f4b; text-decoration: none; }
-
-
-/* Move TOC to left */
-@media (min-width: 768px) {
-  .contents {
-    float: right;
-  }
-  .toc-sidebar {
-    float: left;
-    margin-left: 0;
-    margin-right: 20px; /* Add space between TOC and content */
-  }
-}
