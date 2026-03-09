@@ -52,11 +52,6 @@ reference:
   - Cpp_classes
   - Cpp_functions
 
-- title: C++ Documentation
-  desc: C++ documentation generated with doxygen
-  contents:
-  - cpp_doxygen
-
 
 news:
   releases:
@@ -81,7 +76,7 @@ navbar:
         - text: r/roxygen
           href: reference/index.html
         - text: c++/doxygen
-          href: https://e-perl-noaa.github.io/FIMS/doxygen/index.html
+          href: https://noaa-fims.github.io/FIMS/doxygen/index.html
     articles:
       text: articles
       menu:
