@@ -965,6 +965,8 @@ recr
 recruitments
 rect
 refClass
+refClassDef
+refMethods
 registerRoutines
 relativePath
 reltol
