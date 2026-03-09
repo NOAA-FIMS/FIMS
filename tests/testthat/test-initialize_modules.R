@@ -182,8 +182,16 @@ test_that("`initialize_recruitment()` works with correct inputs", {
     data = data
   )
   expect_type(result, "S4")
-  #' @description Test that `initialize_recruitment()` creates a module with expected fields.
-  expect_true("get_id" %in% names(result))
+  #' @description Test that `initialize_recruitment()` creates a module with expected methods in the class definition method table.
+  expect_true(all(
+    c(
+      "initialize",
+      "finalize",
+      "get_id",
+      "evaluate_mean",
+      "SetRecruitmentProcessID"
+    ) %in% names(result$.refClassDef@refMethods)
+  ))
   clear()
 })
 
@@ -196,8 +204,15 @@ test_that("`initialize_growth()` works with correct inputs", {
     data = data
   )
   expect_type(result, "S4")
-  #' @description Test that `initialize_growth()` creates a module with expected fields.
-  expect_true("get_id" %in% names(result))
+  #' @description Test that `initialize_growth()` creates a module with expected methods in the class definition method table.
+  expect_true(all(
+    c(
+      "initialize",
+      "finalize",
+      "get_id",
+      "evaluate"
+    ) %in% names(result$.refClassDef@refMethods)
+  ))
   clear()
 })
 
@@ -210,8 +225,15 @@ test_that("`initialize_maturity()` works with correct inputs", {
     data = data
   )
   expect_type(result, "S4")
-  #' @description Test that `initialize_maturity()` creates a module with expected fields.
-  expect_true("get_id" %in% names(result))
+  #' @description Test that `initialize_maturity()` creates a module with expected methods in the class definition method table.
+  expect_true(all(
+    c(
+      "initialize",
+      "finalize",
+      "get_id",
+      "evaluate"
+    ) %in% names(result$.refClassDef@refMethods)
+  ))
   clear()
 })
 
@@ -245,8 +267,20 @@ test_that("`initialize_population()` works with correct inputs", {
     linked_ids = linked_ids
   )
   expect_type(result, "S4")
-  #' @description Test that `initialize_population()` creates a module with expected fields.
-  expect_true("get_id" %in% names(result))
+  #' @description Test that `initialize_population()` creates a module with expected methods in the class definition method table.
+  expect_true(all(
+    c(
+      "initialize",
+      "finalize",
+      "get_id",
+      "SetRecruitmentID",
+      "SetName",
+      "SetMaturityID",
+      "SetGrowthID",
+      "GetName",
+      "AddFleet"
+    ) %in% names(result$.refClassDef@refMethods)
+  ))
   clear()
 })
 
@@ -274,8 +308,15 @@ test_that("`initialize_selectivity()` works with correct inputs", {
     fleet_name = "fleet1"
   )
   expect_type(result, "S4")
-  #' @description Test that `initialize_selectivity()` creates a module with expected fields.
-  expect_true("get_id" %in% names(result))
+  #' @description Test that `initialize_selectivity()` creates a module with expected methods in the class definition method table.
+  expect_true(all(
+    c(
+      "initialize",
+      "finalize",
+      "get_id",
+      "evaluate"
+    ) %in% names(result$.refClassDef@refMethods)
+  ))
   clear()
 })
 
@@ -301,8 +342,24 @@ test_that("`initialize_fleet()` works with correct inputs", {
     linked_ids = linked_ids
   )
   expect_type(result, "S4")
-  #' @description Test that `initialize_fleet()` creates a module with expected fields.
-  expect_true("get_id" %in% names(result))
+  #' @description Test that `initialize_fleet()` creates a module with expected methods in the class definition method table.
+  expect_true(all(
+    c(
+      "initialize",
+      "finalize",
+      "get_id",
+      "SetSelectivityID",
+      "SetObservedLengthCompDataID",
+      "SetObservedLandingsDataID",
+      "SetObservedIndexDataID",
+      "SetObservedAgeCompDataID",
+      "SetName",
+      "GetObservedLengthCompDataID",
+      "GetObservedAgeCompDataID",
+      "GetObservedIndexDataID",
+      "GetObservedAgeCompDataID"
+    ) %in% names(result$.refClassDef@refMethods)
+  ))
   clear()
 })
 
@@ -315,8 +372,14 @@ test_that("`initialize_landings()` works with correct inputs", {
     fleet_name = "fleet1"
   )
   expect_type(result, "S4")
-  #' @description Test that `initialize_landings()` creates a module with expected fields.
-  expect_true("get_id" %in% names(result))
+  #' @description Test that `initialize_landings()` creates a module with expected methods in the class definition method table.
+  expect_true(all(
+    c(
+      "initialize",
+      "finalize",
+      "get_id"
+    ) %in% names(result$.refClassDef@refMethods)
+  ))
   #' @description Test that `initialize_landings()` module contains landings_data field.
   expect_true("landings_data" %in% names(result))
   clear()
@@ -344,8 +407,14 @@ test_that("`initialize_index()` works with correct inputs", {
     fleet_name = "survey1"
   )
   expect_type(result, "S4")
-  #' @description Test that `initialize_index()` creates a module with expected fields.
-  expect_true("get_id" %in% names(result))
+  #' @description Test that `initialize_index()` creates a module with expected methods in the class definition method table.
+  expect_true(all(
+    c(
+      "initialize",
+      "finalize",
+      "get_id"
+    ) %in% names(result$.refClassDef@refMethods)
+  ))
   #' @description Test that `initialize_index()` module contains index_data field.
   expect_true("index_data" %in% names(result))
   clear()
@@ -363,6 +432,3 @@ test_that("`initialize_index()` returns correct error messages", {
   )
   clear()
 })
-
-# TODO: most lines with no coverage are error checks that are not verified to
-# work via the tests.
