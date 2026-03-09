@@ -91,7 +91,7 @@ h6 { font-size: 1rem; }
 .navbar-nav .nav-item .nav-link, .nav-item .nav-link:visited {
     color: #51595d !important;
     text-transform: lowercase !important;
-    font-size: 1.05rem !important;
+    font-size: 1.1rem !important;
     font-weight: 400 !important;
 }
 
@@ -160,7 +160,7 @@ h6 { font-size: 1rem; }
 }
 
 #dropdown-reference {
-  font-size: 1.1rem !important;
+  color: #0e6876 !important;
   border-bottom: 3px solid #f54f61 !important;
 }
 
