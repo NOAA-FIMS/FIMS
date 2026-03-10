@@ -590,7 +590,7 @@ initialize_comp <- function(data,
   comp_data <- comp[["m_comp"]](data, fleet_name)
   if (is.null(comp_data) || length(comp_data) == 0) {
     cli::cli_abort(c(
-      "`{comp[['name']]}`-composition data for fleet `{fleet_name}` is
+      "{gsub('_', '-', comp[['name']])}osition data for fleet `{fleet_name}` is
       unavailable or empty."
     ))
   }
@@ -1021,7 +1021,7 @@ set_param_vector <- function(field, module, module_input) {
 
   # Check if module_input is a list
   if (!tibble::is_tibble(module_input)) {
-    cli::cli_abort("The {.var module_input} argument must be tibble.")
+    cli::cli_abort("The {.var module_input} argument must be a tibble.")
   }
 
   # Extract the value of the parameter vector

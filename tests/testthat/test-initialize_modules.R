@@ -7,7 +7,7 @@
 #' multiple lines, that will be used in the bookdown report of the results from
 #' {testthat}.
 
-# test_initialize_modules ----
+# test_initialize_fims ----
 ## Setup ----
 
 data <- FIMS::FIMSFrame(data1)
@@ -25,60 +25,14 @@ test_that("`initialize_fims()` works with correct inputs", {
   expect_named(result, c("parameters", "model"))
   #' @description Test that `initialize_fims()` returns a list with two elements.
   expect_equal(length(result), 2)
-  clear()
-
-  result <- initialize_comp(
-    data = data,
-    fleet_name = "fleet1",
-    type = "AgeComp"
-  )
-
-  #' @description Test that `initialize_comp()` works with `AgeComp` type and returns an S4 object.
-  expect_type(result, "S4")
-  #' @description Test that `initialize_comp()` works with `AgeComp` type and does not produce an error.
-  expect_no_error(result[["age_comp_data"]])
-  #' @description Test that `initialize_comp()` works with `AgeComp` type and sets `length_comp_data` to NULL.
-  expect_null(result[["length_comp_data"]])
-  #' @description Test that `initialize_comp()` output contains the correct structure.
-  expect_true(
-    all(c("age_comp_data", "initialize", "finalize", ".pointer") %in%
-      names(result))
-  )
-  #' @description Test that the age-composition data in the returned object from `initialize_comp()` has the correct values.
-  expect_equal(
-    result$age_comp_data$toRVector(),
-    data |>
-      get_data() |>
-      dplyr::filter(type == "age_comp", name == "fleet1") |>
-      dplyr::mutate(out = value * uncertainty) |>
-      dplyr::pull(out)
-  )
-  clear()
-
-  result <- initialize_comp(
-    data = data,
-    fleet_name = "fleet1",
-    type = "LengthComp"
-  )
-  #' @description Test that `initialize_fims()` works with `LengthComp` type and returns an S4 object.
-  expect_type(result, "S4")
-  #' @description Test that `initialize_fims()` works with `LengthComp` type and does not produce an error.
-  expect_no_error(result[["length_comp_data"]])
-  #' @description Test that `initialize_fims()` works with `LengthComp` type and sets `age_comp_data` to NULL.
-  expect_null(result[["age_comp_data"]])
-  #' @description Test that `initialize_fims()` output contains the correct structure.
-  expect_true(
-    all(c("length_comp_data", "initialize", "finalize", ".pointer") %in%
-      names(result))
-  )
-  #' @description Test that the length-composition data in the returned object from `initialize_comp()` has the correct values.
-  expect_equal(
-    result$length_comp_data$toRVector(),
-    data |>
-      get_data() |>
-      dplyr::filter(type == "length_comp", name == "fleet1") |>
-      dplyr::mutate(out = value * uncertainty) |>
-      dplyr::pull(out)
+  #' @description Test that `initialize_fims()` returns a list when it is provided parameters that are nested.
+  expect_type(
+    initialize_fims(
+      parameters = create_default_configurations(data = data) |>
+        create_default_parameters(data = data),
+      data = data
+    ),
+    "list"
   )
   clear()
 })
@@ -101,10 +55,19 @@ test_that("`initialize_fims()` works with edge cases", {
     # Remove rows where label is "log_devs" but keep the rows where label is NA
     dplyr::filter(label != "log_devs" | is.na(label)) |>
     dplyr::bind_rows(modified_log_devs)
-  init_parm_default <- initialize_fims(parameters = default_parameters, data = data)
-  init_parm_multiple_types <- initialize_fims(parameters = parameters_multiple_types, data = data)
+  init_parm_default <- initialize_fims(
+    parameters = default_parameters,
+    data = data
+  )
+  init_parm_multiple_types <- initialize_fims(
+    parameters = parameters_multiple_types,
+    data = data
+  )
   #' @description Test that `initialize_fims()` works with multiple estimation types.
-  expect_equal(length(init_parm_multiple_types$parameters$p), length(init_parm_default$parameters$p) - 10)
+  expect_equal(
+    length(init_parm_multiple_types$parameters$p),
+    length(init_parm_default$parameters$p) - 10
+  )
 })
 
 ## Error handling ----
@@ -133,29 +96,6 @@ test_that("`initialize_fims()` returns correct error messages", {
   )
   clear()
 
-  #' @description Test that `initialize_comp()` correctly returns error on unknown `fleet_name`.
-  expect_error(
-    initialize_comp(
-      data = data,
-      fleet_name = "unknown_fleet",
-      type = "AgeComp"
-    ),
-    "Fleet `unknown_fleet` not found in the data object."
-  )
-  clear()
-
-  #' @description Test that `initialize_comp()` correctly returns error on unknown `type`.
-  expect_error(
-    initialize_comp(
-      data = data,
-      fleet_name = "fleet1",
-      type = "unknown"
-    ),
-    "should be one of"
-  )
-
-  clear()
-
   parameters_wrong_type <- default_parameters |>
     dplyr::mutate(
       estimation_type = dplyr::if_else(
@@ -164,7 +104,11 @@ test_that("`initialize_fims()` returns correct error messages", {
         estimation_type
       )
     )
-  parameters_wrong_type[["parameters"]][["recruitment"]][["BevertonHoltRecruitment.log_devs.estimation_type"]] <- "fixed.effects"
+  parameters_wrong_type[[
+    "parameters"]][[
+    "recruitment"]][[
+    "BevertonHoltRecruitment.log_devs.estimation_type"]] <-
+  "fixed.effects"
   #' @description Test that `initialize_fims()` correctly returns an error on an unknown estimation_type.
   expect_error(
     initialize_fims(parameters = parameters_wrong_type, data = data),
@@ -382,6 +326,13 @@ test_that("`initialize_landings()` works with correct inputs", {
   ))
   #' @description Test that `initialize_landings()` module contains landings_data field.
   expect_true("landings_data" %in% names(result))
+  #' @description Test that `initialize_landings()` returns `NULL` if there are no landings for the fleet.
+  expect_null(
+    initialize_landings(
+      data,
+      fleet_name = "survey1"
+    )
+  )
   clear()
 })
 
@@ -417,6 +368,13 @@ test_that("`initialize_index()` works with correct inputs", {
   ))
   #' @description Test that `initialize_index()` module contains index_data field.
   expect_true("index_data" %in% names(result))
+    #' @description Test that `initialize_landings()` returns `NULL` if there are no landings for the fleet.
+  expect_null(
+    initialize_index(
+      data,
+      fleet_name = "fleet1"
+    )
+  )
   clear()
 })
 
@@ -429,6 +387,155 @@ test_that("`initialize_index()` returns correct error messages", {
       fleet_name = "unknown_fleet"
     ),
     "Fleet unknown_fleet not found in the data object."
+  )
+  clear()
+})
+
+# test_initialize_comp ----
+## IO correctness ----
+test_that("`initialize_comp()` works with correct inputs", {
+  result <- initialize_comp(
+    data = data,
+    fleet_name = "fleet1",
+    type = "AgeComp"
+  )
+
+  #' @description Test that `initialize_comp()` works with `AgeComp` type and returns an S4 object.
+  expect_type(result, "S4")
+  #' @description Test that `initialize_comp()` works with `AgeComp` type and does not produce an error.
+  expect_no_error(result[["age_comp_data"]])
+  #' @description Test that `initialize_comp()` works with `AgeComp` type and sets `length_comp_data` to NULL.
+  expect_null(result[["length_comp_data"]])
+  #' @description Test that `initialize_comp()` output contains the correct structure.
+  expect_true(
+    all(c("age_comp_data", "initialize", "finalize", ".pointer") %in%
+      names(result))
+  )
+  #' @description Test that the age-composition data in the returned object from `initialize_comp()` has the correct values.
+  expect_equal(
+    result$age_comp_data$toRVector(),
+    data |>
+      get_data() |>
+      dplyr::filter(type == "age_comp", name == "fleet1") |>
+      dplyr::mutate(out = value * uncertainty) |>
+      dplyr::pull(out)
+  )
+  clear()
+
+  result <- initialize_comp(
+    data = data,
+    fleet_name = "fleet1",
+    type = "LengthComp"
+  )
+  #' @description Test that `initialize_fims()` works with `LengthComp` type and returns an S4 object.
+  expect_type(result, "S4")
+  #' @description Test that `initialize_fims()` works with `LengthComp` type and does not produce an error.
+  expect_no_error(result[["length_comp_data"]])
+  #' @description Test that `initialize_fims()` works with `LengthComp` type and sets `age_comp_data` to NULL.
+  expect_null(result[["age_comp_data"]])
+  #' @description Test that `initialize_fims()` output contains the correct structure.
+  expect_true(
+    all(c("length_comp_data", "initialize", "finalize", ".pointer") %in%
+      names(result))
+  )
+  #' @description Test that the length-composition data in the returned object from `initialize_comp()` has the correct values.
+  expect_equal(
+    result$length_comp_data$toRVector(),
+    data |>
+      get_data() |>
+      dplyr::filter(type == "length_comp", name == "fleet1") |>
+      dplyr::mutate(out = value * uncertainty) |>
+      dplyr::pull(out)
+  )
+  clear()
+})
+
+## Error handling ----
+
+test_that("`initialize_comp()` returns correct error messages", {
+  #' @description Test that `initialize_comp()` correctly returns error on unknown `fleet_name`.
+  expect_error(
+    initialize_comp(
+      data = data,
+      fleet_name = "unknown_fleet",
+      type = "AgeComp"
+    ),
+    "Fleet `unknown_fleet` not found in the data object."
+  )
+  clear()
+
+  #' @description Test that `initialize_comp()` correctly returns error on unknown `type`.
+  expect_error(
+    initialize_comp(
+      data = data,
+      fleet_name = "fleet1",
+      type = "unknown"
+    ),
+    "should be one of"
+  )
+  clear()
+
+  #' @description Test that `initialize_comp()` correctly returns error when there are no composition data for a given fleet.
+  expect_error(
+    initialize_comp(
+      data = data |>
+        get_data() |>
+        dplyr::filter(type != "age_comp"),
+      fleet_name = "fleet1",
+      type = "AgeComp"
+    ),
+    "is unavailable or empty"
+  )
+  clear()
+
+  #' @description Test that `initialize_comp()` correctly returns error when there are missing bins for a given fleet.
+  bad_data <- data
+  bad_data@data <- bad_data |>
+    get_data() |>
+    dplyr::filter(age != 2)
+  expect_error(
+    initialize_comp(
+      data = bad_data,
+      fleet_name = "fleet1",
+      type = "AgeComp"
+    ),
+    "does not match the expected dimensions"
+  )
+  clear()
+})
+
+# test_set_param_vector ----
+## IO correctness ----
+
+## Edge handling ----
+
+## Error handling ----
+
+test_that("`set_param_vector()` returns correct error messages", {
+  #' @description Test that `set_param_vector()` requires the field argument.
+  expect_error(
+    set_param_vector(),
+    "argument must be a non-empty character string."
+  )
+
+
+  #' @description Test that `set_param_vector()` requires the module parameter is a refence class object.
+  expect_error(
+    set_param_vector(
+      field = "x",
+      module = 1:10
+    ),
+    "argument must be a reference class"
+  )
+
+  #' @description Test that `set_param_vector()` requires the `module_input` argument to be a tibble.
+  expect_error(
+    set_param_vector(
+      field = "x",
+      module = methods::new(EWAAGrowth),
+      module_input = 1:10
+    ),
+    "argument must be a tibble"
   )
   clear()
 })
