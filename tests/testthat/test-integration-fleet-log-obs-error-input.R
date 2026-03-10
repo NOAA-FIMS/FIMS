@@ -13,9 +13,9 @@
 load(test_path("fixtures", "integration_test_data.RData"))
 
 # Load sample data
-data("data1")
+data("data_big")
 # Prepare data for FIMS model
-data_4_model <- FIMSFrame(data1)
+data_4_model <- FIMSFrame(data_big)
 
 # Create parameters
 default_parameters <- data_4_model |>

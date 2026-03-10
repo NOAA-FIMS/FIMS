@@ -86,7 +86,7 @@ NULL
 #' a FIMS model in a long format. The tibble will potentially have the
 #' following columns depending if it fits to ages and lengths or just one of
 #' them:
-#' `r glue::glue_collapse(colnames(data1), sep = ", ", last = ", and ")`.
+#' `r glue::glue_collapse(colnames(data_big), sep = ", ", last = ", and ")`.
 #' @export
 #' @rdname get_FIMSFrame
 #' @keywords FIMSFrame
@@ -420,7 +420,7 @@ methods::setMethod(
   function(x) {
     dplyr::filter(
       .data = as.data.frame(x@data),
-      .data[["type"]] == "weight-at-age"
+      .data[["type"]] == "weight_at_age"
     ) |>
       dplyr::group_by(.data[["age"]]) |>
       dplyr::mutate(
@@ -456,7 +456,7 @@ methods::setMethod(
     if ("length" %in% colnames(x@data)) {
       dplyr::filter(
         .data = as.data.frame(x@data),
-        .data[["type"]] == "age-to-length-conversion",
+        .data[["type"]] == "age_to_length_conversion",
         .data[["name"]] %in% fleet_name
       ) |>
         dplyr::group_by(.data[["age"]], .data[["length"]]) |>
@@ -551,10 +551,10 @@ methods::setValidity(
       errors <- c(errors, "data must have at least one row")
     }
 
-    # FIMS models currently cannot run without weight-at-age data
-    weight_at_age_data <- dplyr::filter(object@data, type == "weight-at-age")
+    # FIMS models currently cannot run without weight_at_age data
+    weight_at_age_data <- dplyr::filter(object@data, type == "weight_at_age")
     if (NROW(weight_at_age_data) == 0) {
-      errors <- c(errors, "data must contain data of the type weight-at-age")
+      errors <- c(errors, "data must contain data of the type weight_at_age")
     }
 
     errors <- c(errors, validate_data_colnames(object@data))
@@ -572,7 +572,7 @@ methods::setValidity(
     # Add validity check for types
     allowed_types <- c(
       "landings", "index", "age_comp", "length_comp",
-      "weight-at-age", "age-to-length-conversion"
+      "weight_at_age", "age_to_length_conversion"
     )
     present_types <- unique(object@data[["type"]])
 
@@ -670,8 +670,8 @@ validate_data_colnames <- function(data) {
 #'
 #' @param data A `data.frame` that contains the necessary columns to construct
 #'   a `FIMSFrame-class` object. Currently, those columns are
-#'   `r glue::glue_collapse(colnames(data1), sep = ", ", last = ", and ")`. See
-#'   the data1 object in FIMS, e.g., `data(data1, package = "FIMS")`.
+#'   `r glue::glue_collapse(colnames(data_big), sep = ", ", last = ", and ")`. See
+#'   the data_big object in FIMS, e.g., `data(data_big, package = "FIMS")`.
 #'
 #' @return
 #' An object of the S4 class `FIMSFrame` class, or one of its child classes, is
@@ -739,7 +739,7 @@ FIMSFrame <- function(data) {
       bins = ages,
       timings = years,
       column = age,
-      types = c("weight-at-age", "age_comp")
+      types = c("weight_at_age", "age_comp")
     )
   } else {
     missing_ages <- missing_time_series[0, ]
@@ -755,13 +755,13 @@ FIMSFrame <- function(data) {
   } else {
     missing_lengths <- missing_time_series[0, ]
   }
-  if ("age-to-length-conversion" %in% formatted_data[["type"]]) {
+  if ("age_to_length_conversion" %in% formatted_data[["type"]]) {
     # Must do this by hand because it is across two dimensions
     temp_age_to_length_data <- formatted_data |>
       dplyr::group_by(type, name)
     missing_age_to_length <- temp_age_to_length_data |>
       dplyr::group_by(type, name) |>
-      dplyr::filter(type %in% "age-to-length-conversion") |>
+      dplyr::filter(type %in% "age_to_length_conversion") |>
       tidyr::expand(unit, timing = years, age = ages, length = lengths) |>
       dplyr::anti_join(
         y = dplyr::select(

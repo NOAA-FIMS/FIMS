@@ -10,7 +10,7 @@ FIMSFrame(data)
 \item{data}{A \code{data.frame} that contains the necessary columns to construct
 a \code{FIMSFrame-class} object. Currently, those columns are
 type, name, age, length, timing, value, unit, and uncertainty. See
-the data1 object in FIMS, e.g., \code{data(data1, package = "FIMS")}.}
+the data_big object in FIMS, e.g., \code{data(data_big, package = "FIMS")}.}
 }
 \value{
 An object of the S4 class \code{FIMSFrame} class, or one of its child classes, is

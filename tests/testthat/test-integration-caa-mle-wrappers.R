@@ -201,7 +201,7 @@ test_that("catch-at-age model (estimation MLE with wrappers) works with mixed es
 ## Error handling ----
 test_that("catch-at-age model (estimation MLE with wrappers) returns an error when there are no estimated parameters for optimization", {
   # Load data
-  data_age_length_comp <- FIMSFrame(data1)
+  data_age_length_comp <- FIMSFrame(data_big)
   # Load pre-configured parameters
   parameters <- readRDS(
     testthat::test_path("fixtures", "parameters_model_comparison_project.RDS")

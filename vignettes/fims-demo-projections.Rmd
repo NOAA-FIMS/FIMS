@@ -43,9 +43,9 @@ The code below uses the built-in data within FIMS and sets up a simple catch-at-
 
 ```{r data-without-projections}
 # Bring the package data into your environment
-data("data1")
+data("data_big")
 # Prepare the package data for being used in a FIMS model
-data_4_model <- FIMSFrame(data1)
+data_4_model <- FIMSFrame(data_big)
 
 # Create default model configurations based on the data
 default_configurations <- create_default_configurations(data = data_4_model)
@@ -66,15 +66,15 @@ In the future, we will integrate more of the process below coded below into wrap
 ```{r projection-data}
 # Add a single row of landings to the original data for the maximum year you
 # want to project to
-data1_with_extra_year <- dplyr::add_row(
-  data1,
+data_big_with_extra_year <- dplyr::add_row(
+  data_big,
   type = "landings",
   timing = get_end_year(data_4_model) + years_of_projection,
   name = "fleet1",
   value = -999,
   unit = "mt"
 )
-data_4_projections <- data1_with_extra_year |>
+data_4_projections <- data_big_with_extra_year |>
   # Make a FIMSFrame object out of this data frame with the extra row to add all
   # of the other missing years for each data type
   FIMSFrame() |>

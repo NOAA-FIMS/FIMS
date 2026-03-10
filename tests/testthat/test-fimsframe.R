@@ -9,7 +9,7 @@
 
 # fims_frame ----
 ## Setup ----
-fims_frame <- FIMS::FIMSFrame(data1)
+fims_frame <- FIMS::FIMSFrame(data_big)
 
 # A helper function that creates a figure from code
 save_png <- function(code, width = 1000, height = 1000) {
@@ -88,7 +88,7 @@ test_that("`fims_frame()` works with the correct inputs", {
   #' @description Test that the `show()` method works as expected on a `FIMSFrame` object.
   expect_output(suppressMessages(show(fims_frame)))
   #' @description Test that 'FIMSFrame()' succeeds cleanly with valid inputs.
-  expect_no_error(FIMS::FIMSFrame(data1))
+  expect_no_error(FIMS::FIMSFrame(data_big))
 })
 
 ## Edge handling ----
@@ -141,7 +141,7 @@ test_that("`FIMSFrame()` returns correct error messages", {
 
 # m_* ----
 ## Setup ----
-fims_frame <- FIMS::FIMSFrame(data1)
+fims_frame <- FIMS::FIMSFrame(data_big)
 n_years <- get_n_years(fims_frame)
 n_ages <- get_n_ages(fims_frame)
 
@@ -239,7 +239,7 @@ test_that("`get_n_fleets()` works with correct inputs", {
 ## Check that FIMSFrame warns on unexpected data types
 test_that("FIMSFrame() warns on unexpected data types", {
   bad <- dplyr::mutate(
-    data1,
+    data_big,
     type = ifelse(type == "index", "indexes", type) # Introduce an unsupported type
   )
   #' @description Test that 'FIMSFrame()' warns on unexpected data types.
