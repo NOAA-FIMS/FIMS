@@ -9,18 +9,18 @@
 #ifndef SRC_FIMS_MODULES_HPP
 #define SRC_FIMS_MODULES_HPP
 
+#include "../inst/include/interface/rcpp/rcpp_interface.hpp"
 #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_data.hpp"
+#include "../inst/include/interface/rcpp/rcpp_objects/rcpp_distribution.hpp"
 #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_fleet.hpp"
 #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_growth.hpp"
+#include "../inst/include/interface/rcpp/rcpp_objects/rcpp_interface_base.hpp"
 #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_math.hpp"
 #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_maturity.hpp"
 #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_natural_mortality.hpp"
 #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_population.hpp"
 #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_recruitment.hpp"
 #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_selectivity.hpp"
-#include "../inst/include/interface/rcpp/rcpp_objects/rcpp_distribution.hpp"
-#include "../inst/include/interface/rcpp/rcpp_objects/rcpp_interface_base.hpp"
-#include "../inst/include/interface/rcpp/rcpp_interface.hpp"
 
 RCPP_EXPOSED_CLASS(Parameter)
 RCPP_EXPOSED_CLASS(ParameterVector)
@@ -148,6 +148,28 @@ RCPP_MODULE(fims) {
       .method("set", &ParameterVector::set)
       .method("show", &ParameterVector::show)
       .method("at", &ParameterVector::at)
+      .method("values_from_R_vector", &ParameterVector::values_from_R_vector)
+      .method("min_values_from_R_vector",
+              &ParameterVector::min_values_from_R_vector)
+      .method("max_values_from_R_vector",
+              &ParameterVector::max_values_from_R_vector)
+      .method("final_values_from_R_vector",
+              &ParameterVector::final_values_from_R_vector)
+      .method("uncertainty_values_from_R_vector",
+              &ParameterVector::uncertainty_values_from_R_vector)
+      .method("estimation_types_from_R_vector",
+              &ParameterVector::estimation_types_from_R_vector)
+      .method("values_to_R_vector", &ParameterVector::values_to_R_vector)
+      .method("min_values_to_R_vector",
+              &ParameterVector::min_values_to_R_vector)
+      .method("max_values_to_R_vector",
+              &ParameterVector::max_values_to_R_vector)
+      .method("final_values_to_R_vector",
+              &ParameterVector::final_values_to_R_vector)
+      .method("uncertainty_values_to_R_vector",
+              &ParameterVector::uncertainty_values_to_R_vector)
+      .method("estimation_types_to_R_vector",
+              &ParameterVector::estimation_types_to_R_vector)
       .method("size", &ParameterVector::size)
       .method("resize", &ParameterVector::resize)
       .method("set_all_estimable", &ParameterVector::set_all_estimable)
@@ -163,8 +185,8 @@ RCPP_MODULE(fims) {
       .constructor<Rcpp::NumericVector, size_t>()
       .method("get", &RealVector::get)
       .method("set", &RealVector::set)
-      .method("fromRVector", &RealVector::fromRVector)
-      .method("toRVector", &RealVector::toRVector)
+      .method("from_R_vector", &RealVector::from_R_vector)
+      .method("to_R_vector", &RealVector::to_R_vector)
       .method("show", &RealVector::show)
       .method("at", &RealVector::at)
       .method("size", &RealVector::size)
