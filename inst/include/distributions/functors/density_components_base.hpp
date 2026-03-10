@@ -33,8 +33,8 @@ struct DensityComponentBase : public fims_model_object::FIMSObject<Type> {
   /**
    * @brief Classification of the input pathway for this distribution object.
    * Options used by accessor methods are, "prior", "random_effects", and
+   *"data".
    */
-   * "data".
   std::string input_type;
 
   /** @brief Observed data. */
