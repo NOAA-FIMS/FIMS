@@ -58,11 +58,11 @@ After loading FIMS and the default data set that comes with FIMS, a maturity mod
 library(FIMS)
 
 # Load a built-in data set from the FIMS package
-data("data1")
+data("data_big")
 
 # Convert the data into a FIMSFrame object, which is an S4 class.
 # See ?FIMSFrame for more information.
-fims_frame <- FIMSFrame(data1)
+fims_frame <- FIMSFrame(data_big)
 
 # Create default maturity parameters using internal function
 default_parameters <- create_default_configurations(fims_frame) |>
