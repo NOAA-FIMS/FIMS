@@ -1,0 +1,27 @@
+var rcpp__shared__primitive_8hpp =
+[
+    [ "SharedInt", "classSharedInt.html", "classSharedInt" ],
+    [ "SharedReal", "classSharedReal.html", "classSharedReal" ],
+    [ "SharedString", "classSharedString.html", "classSharedString" ],
+    [ "SharedBoolean", "classSharedBoolean.html", "classSharedBoolean" ],
+    [ "fims_bool", "rcpp__shared__primitive_8hpp.html#a2776e3cef942893bbeeb300f2c7126eb", null ],
+    [ "fims_double", "rcpp__shared__primitive_8hpp.html#a23aef349e639b6b4235ed6f4525902b9", null ],
+    [ "fims_int", "rcpp__shared__primitive_8hpp.html#a7a3a24a8e169b1e0070317b543e927fd", null ],
+    [ "fims_string", "rcpp__shared__primitive_8hpp.html#ad417724f0f3a22c2c03d4efdee760f74", null ],
+    [ "operator*", "rcpp__shared__primitive_8hpp.html#afc6ce10541843f3f469086b414da0664", null ],
+    [ "operator*", "rcpp__shared__primitive_8hpp.html#aa47045d26d6c104ed2efe76c8bbb2422", null ],
+    [ "operator+", "rcpp__shared__primitive_8hpp.html#a2349c3c62cac570c72495a1203d9e1e8", null ],
+    [ "operator+", "rcpp__shared__primitive_8hpp.html#a422a4670f4c19eae83e608e849d7694b", null ],
+    [ "operator-", "rcpp__shared__primitive_8hpp.html#af1b36bcfc2992ef26d6e7aed083c4668", null ],
+    [ "operator-", "rcpp__shared__primitive_8hpp.html#a00f0fc40ef1733b6bdca13d317fb90b9", null ],
+    [ "operator/", "rcpp__shared__primitive_8hpp.html#ac7f8b831f320a7d7a3eaaeefdff29f7a", null ],
+    [ "operator/", "rcpp__shared__primitive_8hpp.html#a8c9435923aa8f19b42ab4d1dc662796c", null ],
+    [ "operator<", "rcpp__shared__primitive_8hpp.html#a91a73014b3356292d85d089a018b94bc", null ],
+    [ "operator<", "rcpp__shared__primitive_8hpp.html#aa705a61e951b104cd8f08a03917e0bfd", null ],
+    [ "operator<=", "rcpp__shared__primitive_8hpp.html#aa082af628cd1530b6b13d3c2fe9b6775", null ],
+    [ "operator<=", "rcpp__shared__primitive_8hpp.html#accad4119a60d6376ef13ccd0ef388ea0", null ],
+    [ "operator>", "rcpp__shared__primitive_8hpp.html#a2fe41b60285ef4fb2762cb04b28d01ea", null ],
+    [ "operator>", "rcpp__shared__primitive_8hpp.html#a61621b0f9e096ada92994b0cdab98cf5", null ],
+    [ "operator>=", "rcpp__shared__primitive_8hpp.html#a08e15f76b24c75497507635546136fd9", null ],
+    [ "operator>=", "rcpp__shared__primitive_8hpp.html#a86b74fed45bf4b4fb5c3b020e4cdfb3a", null ]
+];

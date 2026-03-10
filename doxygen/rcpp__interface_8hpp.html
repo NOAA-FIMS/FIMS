@@ -1,0 +1,609 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" data-bs-theme="auto">
+<head>
+    <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=9"/>
+    <meta name="generator" content="Doxygen 1.9.8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>FIMS</title><link href="tabs.css" rel="stylesheet" type="text/css"/>
+    <link rel="icon" type="image/png" href="https://noaa-fims.github.io/images/FIMS_hexlogo.png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+    <link href="https://noaa-fims.github.io/site_libs/bootstrap/bootstrap-5477dd34fdf9f443df58de9070e2fbd7.min.css" rel="stylesheet">
+    <link href="https://noaa-fims.github.io/site_libs/bootstrap/bootstrap-dark-429bd3fc0b6810d1347fc340b0896c35.min.css" rel="stylesheet" media="(prefers-color-scheme: dark)">
+    <script type="text/javascript" src="jquery.js"></script>
+    <script type="text/javascript" src="dynsections.js"></script>
+    <link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+    <link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+  $(document).ready(function() { init_search(); });
+/* @license-end */
+</script>
+    <script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  extensions: ["tex2jax.js"],
+  jax: ["input/TeX","output/HTML-CSS"],
+});
+</script>
+<script type="text/javascript" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js"></script>
+    <link href="doxygen.css" rel="stylesheet" type="text/css" />
+    <link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
+<link href="custom.css" rel="stylesheet" type="text/css"/>
+    <script src="https://noaa-fims.github.io/site_libs/quarto-nav/quarto-nav.js"></script>
+    <script src="https://noaa-fims.github.io/site_libs/bootstrap/bootstrap.min.js"></script>
+    <script src="https://noaa-fims.github.io/site_libs/quarto-html/quarto.js" type="module"></script>
+</head>
+<body>
+<div id="top">
+    <div id="titlearea">
+        <table cellspacing="0" cellpadding="0">
+            <tbody>
+            <tr style="height: 70px;">
+                <td id="projectlogo"><img alt="Logo" src="FIMS_logo3.png"/></td>
+                <td id="projectalign" style="padding-left: 0.5em;">
+                    <div id="projectname">FIMS
+                        &#160;<span id="projectnumber">v0.8.1</span></div>
+                    <div id="projectbrief"></div></td>
+                <td style="padding-left: 0.5em;">
+                    <div id="projectbrief"></div>
+                </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <nav class="navbar navbar-expand-lg " data-bs-theme="auto">
+      <div class="navbar-container container-fluid">
+        <div class="navbar-brand-container mx-auto">
+          <a href="https://noaa-fims.github.io/" class="navbar-brand navbar-brand-logo"></a>
+          <a class="navbar-brand" href="https://noaa-fims.github.io/">
+          </a>
+        </div>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+          <ul class="navbar-nav navbar-nav-scroll ms-auto">
+           <li class="nav-item dropdown">
+            <button class="nav-link dropdown-toggle" type="button" id="dropdown-reference" data-bs-toggle="dropdown"
+                    aria-expanded="false" aria-haspopup="true">reference</button>
+            <ul class="dropdown-menu" aria-labelledby="dropdown-reference">
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/reference/index.html">r/roxygen</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/doxygen/index.html">c++/doxygen</a></li>
+            </ul>
+           </li>
+            <li class="nav-item dropdown">
+            <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown"
+                    aria-expanded="false" aria-haspopup="true">articles</button>
+            <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
+              <li><h6 class="dropdown-header" data-toc-skip>intro to fims</h6></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/fims-demo.html">introducing the fisheries integrated modeling system (fims)</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/fims-logging.html">Introducing the fims logging system</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/fims-user-setup-guide.html">fims user setup guide</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/fims-demo-projections.html">simple projections using fims</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><h6 class="dropdown-header" data-toc-skip>developer</h6></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/fims-path-maturity.html">fims path - maturity</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><h6 class="dropdown-header" data-toc-skip>c++ training</h6></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/training-intro-cpp.html">intro to c++</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/training-intro-rcpp.html">intro to rcpp</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><h6 class="dropdown-header" data-toc-skip>research and development</h6></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/RD-re-sparsity.html">re sparsity</a></li>
+            </ul>
+          </li>
+            <li class="nav-item dropdown">
+              <button class="nav-link dropdown-toggle" type="button" id="dropdown-news" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">news</button>
+              <ul class="dropdown-menu" aria-labelledby="dropdown-news">
+                <li><h6 class="dropdown-header" data-toc-skip="">Releases</h6></li>
+                <li><a class="external-link dropdown-item" href="https://github.com/NOAA-FIMS/FIMS/releases/latest">latest release</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/news/index.html">changelog</a></li>
+              </ul>
+            </li>
+          <li class="nav-item dropdown">
+            <button class="nav-link dropdown-toggle" type="button" id="dropdown-reports" data-bs-toggle="dropdown"
+                    aria-expanded="false" aria-haspopup="true">reports</button>
+            <ul class="dropdown-menu" aria-labelledby="dropdown-reports">
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/coverage/coverage.html">coverage</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/coverage/codecoverage_explanation.html">coverage explained</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/testdown/index.html">testdown</a></li>
+            </ul>
+          </li>
+          <ul class="navbar-nav">
+            <li class="nav-item"><a class="external-link nav-link" href="https://noaa-fims.github.io/">fims website</a></li>
+            <li class="nav-item">
+              <a class="external-link nav-link" href="https://github.com/noaa-fims/fims/" aria-label="GitHub repository for FIMS">
+                <span class="fa fa-brands fa-github fa-lg"></span>
+              </a>
+            </li>
+            <!-- Keep the input; pkgdown’s autocomplete wrapper won’t exist in Doxygen -->
+            <li class="nav-item">
+              <form class="form-inline" role="search" onsubmit="return false;">
+                <input class="form-control" type="search" name="search-input" id="search-input"
+                      autocomplete="off" aria-label="Search site" placeholder="Search for">
+              </form>
+            </li>
+          </ul>
+      </div>
+    </div>
+  </nav>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  // Only on the cpp_directory_structure page!
+  document.querySelectorAll('.toc a').forEach(function(link) {
+    if (link.href && link.href.indexOf(location.pathname) !== -1) {
+      link.href = link.hash; // Just use the fragment
+    }
+  });
+});
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  function updateTocActive() {
+    var links = Array.from(document.querySelectorAll('.toc a'));
+    var anchors = links.map(link => document.getElementById(link.getAttribute('href').replace('#', '')));
+    var scrollTop = window.scrollY || document.documentElement.scrollTop;
+    var offset = 150; // Match your scroll-margin-top
+    let currentActive = -1;
+    for (let i = anchors.length - 1; i >= 0; i--) {
+      if (anchors[i] && (anchors[i].getBoundingClientRect().top + window.scrollY - offset) <= scrollTop) {
+        currentActive = i;
+        break;
+      }
+    }
+    links.forEach((link, i) => {
+      link.classList.remove('active', 'aboveActive');
+      if (i === currentActive) {
+        link.classList.add('active');
+      } else if (i < currentActive) {
+        link.classList.add('aboveActive');
+      }
+    });
+  }
+  window.addEventListener('scroll', updateTocActive);
+  window.addEventListener('hashchange', updateTocActive);
+  updateTocActive();
+});
+</script>
+    <!-- end header part -->
+<!-- Generated by Doxygen 1.9.8 -->
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+/* @license-end */
+</script>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(document).ready(function(){initNavTree('rcpp__interface_8hpp.html',''); initResizable(); });
+/* @license-end */
+</script>
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">Loading...</div>
+<div class="SRStatus" id="Searching">Searching...</div>
+<div class="SRStatus" id="NoMatches">No Matches</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="summary">
+<a href="#func-members">Functions</a>  </div>
+  <div class="headertitle"><div class="title">rcpp_interface.hpp File Reference</div></div>
+</div><!--header-->
+<div class="contents">
+
+<p>The Rcpp interface to declare things.  
+<a href="#details">More...</a></p>
+<div class="textblock"><code>#include &quot;<a class="el" href="model_8hpp_source.html">../../common/model.hpp</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="fims__json_8hpp_source.html">../../utilities/fims_json.hpp</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="rcpp__data_8hpp_source.html">rcpp_objects/rcpp_data.hpp</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="rcpp__distribution_8hpp_source.html">rcpp_objects/rcpp_distribution.hpp</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="rcpp__fleet_8hpp_source.html">rcpp_objects/rcpp_fleet.hpp</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="rcpp__growth_8hpp_source.html">rcpp_objects/rcpp_growth.hpp</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="rcpp__interface__base_8hpp_source.html">rcpp_objects/rcpp_interface_base.hpp</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="rcpp__maturity_8hpp_source.html">rcpp_objects/rcpp_maturity.hpp</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="rcpp__models_8hpp_source.html">rcpp_objects/rcpp_models.hpp</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="rcpp__natural__mortality_8hpp_source.html">rcpp_objects/rcpp_natural_mortality.hpp</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="rcpp__population_8hpp_source.html">rcpp_objects/rcpp_population.hpp</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="rcpp__recruitment_8hpp_source.html">rcpp_objects/rcpp_recruitment.hpp</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="rcpp__selectivity_8hpp_source.html">rcpp_objects/rcpp_selectivity.hpp</a>&quot;</code><br />
+</div>
+<p><a href="rcpp__interface_8hpp_source.html">Go to the source code of this file.</a></p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
+Functions</h2></td></tr>
+<tr class="memitem:ad8bf2ebe714bdb6a1e216ed7d9efa7a3" id="r_ad8bf2ebe714bdb6a1e216ed7d9efa7a3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rcpp__interface_8hpp.html#ad8bf2ebe714bdb6a1e216ed7d9efa7a3">init_logging</a> ()</td></tr>
+<tr class="separator:ad8bf2ebe714bdb6a1e216ed7d9efa7a3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1d0c303c2c44fcb296368608a5f2ff1a" id="r_a1d0c303c2c44fcb296368608a5f2ff1a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rcpp__interface_8hpp.html#a1d0c303c2c44fcb296368608a5f2ff1a">CreateTMBModel</a> ()</td></tr>
+<tr class="memdesc:a1d0c303c2c44fcb296368608a5f2ff1a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize and construct the FIMS model using TMB.  <br /></td></tr>
+<tr class="separator:a1d0c303c2c44fcb296368608a5f2ff1a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aecc723970498500fa938ca77a1502e25" id="r_aecc723970498500fa938ca77a1502e25"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rcpp__interface_8hpp.html#aecc723970498500fa938ca77a1502e25">set_fixed_parameters</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Rcpp::NumericVector</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">par</a>)</td></tr>
+<tr class="memdesc:aecc723970498500fa938ca77a1502e25"><td class="mdescLeft">&#160;</td><td class="mdescRight">Update fixed parameters in the tape, so the output is correct.  <br /></td></tr>
+<tr class="separator:aecc723970498500fa938ca77a1502e25"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:accd5cf41c12b933a40a5d3808cee44a5" id="r_accd5cf41c12b933a40a5d3808cee44a5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Rcpp::NumericVector</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rcpp__interface_8hpp.html#accd5cf41c12b933a40a5d3808cee44a5">get_fixed_parameters_vector</a> ()</td></tr>
+<tr class="memdesc:accd5cf41c12b933a40a5d3808cee44a5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the fixed parameters vector object.  <br /></td></tr>
+<tr class="separator:accd5cf41c12b933a40a5d3808cee44a5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a602703ef3357097ff34a6751fd13c3f5" id="r_a602703ef3357097ff34a6751fd13c3f5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rcpp__interface_8hpp.html#a602703ef3357097ff34a6751fd13c3f5">set_random_parameters</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Rcpp::NumericVector</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">par</a>)</td></tr>
+<tr class="memdesc:a602703ef3357097ff34a6751fd13c3f5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Update random effect parameters in the tape, so the output is correct.  <br /></td></tr>
+<tr class="separator:a602703ef3357097ff34a6751fd13c3f5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ace395771e2a80c98b2ae2e3da4d141dc" id="r_ace395771e2a80c98b2ae2e3da4d141dc"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Rcpp::NumericVector</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rcpp__interface_8hpp.html#ace395771e2a80c98b2ae2e3da4d141dc">get_random_parameters_vector</a> ()</td></tr>
+<tr class="memdesc:ace395771e2a80c98b2ae2e3da4d141dc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the random parameters vector object.  <br /></td></tr>
+<tr class="separator:ace395771e2a80c98b2ae2e3da4d141dc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a82e3a00b5981f857ed79cd594f70bf0e" id="r_a82e3a00b5981f857ed79cd594f70bf0e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Rcpp::List</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rcpp__interface_8hpp.html#a82e3a00b5981f857ed79cd594f70bf0e">get_parameter_names</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Rcpp::List</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">pars</a>)</td></tr>
+<tr class="memdesc:a82e3a00b5981f857ed79cd594f70bf0e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the parameter names object.  <br /></td></tr>
+<tr class="separator:a82e3a00b5981f857ed79cd594f70bf0e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af9adbb18f4b688138a54a189ff3b36e1" id="r_af9adbb18f4b688138a54a189ff3b36e1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Rcpp::List</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rcpp__interface_8hpp.html#af9adbb18f4b688138a54a189ff3b36e1">get_random_names</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Rcpp::List</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">pars</a>)</td></tr>
+<tr class="memdesc:af9adbb18f4b688138a54a189ff3b36e1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the random effects names object.  <br /></td></tr>
+<tr class="separator:af9adbb18f4b688138a54a189ff3b36e1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9f5a235582e7cc0f29e3431fc89ef10d" id="r_a9f5a235582e7cc0f29e3431fc89ef10d"><td class="memTemplParams" colspan="2">template&lt;typename Type &gt; </td></tr>
+<tr class="memitem:a9f5a235582e7cc0f29e3431fc89ef10d"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">clear_internal</a> ()</td></tr>
+<tr class="memdesc:a9f5a235582e7cc0f29e3431fc89ef10d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clears the internal objects.  <br /></td></tr>
+<tr class="separator:a9f5a235582e7cc0f29e3431fc89ef10d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac8bb3912a3ce86b15842e79d0b421204" id="r_ac8bb3912a3ce86b15842e79d0b421204"><td class="memItemLeft" align="right" valign="top"><a id="ac8bb3912a3ce86b15842e79d0b421204" name="ac8bb3912a3ce86b15842e79d0b421204"></a>
+<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><b>clear</b> ()</td></tr>
+<tr class="memdesc:ac8bb3912a3ce86b15842e79d0b421204"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clears the vector of independent variables. <br /></td></tr>
+<tr class="separator:ac8bb3912a3ce86b15842e79d0b421204"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a924e08ad8be03c00824757641ed43619" id="r_a924e08ad8be03c00824757641ed43619"><td class="memItemLeft" align="right" valign="top"><a id="a924e08ad8be03c00824757641ed43619" name="a924e08ad8be03c00824757641ed43619"></a>
+std::string&#160;</td><td class="memItemRight" valign="bottom"><b>get_log</b> ()</td></tr>
+<tr class="memdesc:a924e08ad8be03c00824757641ed43619"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the log entries as a string in JSON format. <br /></td></tr>
+<tr class="separator:a924e08ad8be03c00824757641ed43619"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7665d61cdec92aa03255c2cd09633cc8" id="r_a7665d61cdec92aa03255c2cd09633cc8"><td class="memItemLeft" align="right" valign="top"><a id="a7665d61cdec92aa03255c2cd09633cc8" name="a7665d61cdec92aa03255c2cd09633cc8"></a>
+std::string&#160;</td><td class="memItemRight" valign="bottom"><b>get_log_errors</b> ()</td></tr>
+<tr class="memdesc:a7665d61cdec92aa03255c2cd09633cc8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the error entries from the log as a string in JSON format. <br /></td></tr>
+<tr class="separator:a7665d61cdec92aa03255c2cd09633cc8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1143b71f2fae1d0fdc570a326f2ae84e" id="r_a1143b71f2fae1d0fdc570a326f2ae84e"><td class="memItemLeft" align="right" valign="top"><a id="a1143b71f2fae1d0fdc570a326f2ae84e" name="a1143b71f2fae1d0fdc570a326f2ae84e"></a>
+std::string&#160;</td><td class="memItemRight" valign="bottom"><b>get_log_warnings</b> ()</td></tr>
+<tr class="memdesc:a1143b71f2fae1d0fdc570a326f2ae84e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the warning entries from the log as a string in JSON format. <br /></td></tr>
+<tr class="separator:a1143b71f2fae1d0fdc570a326f2ae84e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2c59f540047725fab06de92844d9e243" id="r_a2c59f540047725fab06de92844d9e243"><td class="memItemLeft" align="right" valign="top"><a id="a2c59f540047725fab06de92844d9e243" name="a2c59f540047725fab06de92844d9e243"></a>
+std::string&#160;</td><td class="memItemRight" valign="bottom"><b>get_log_info</b> ()</td></tr>
+<tr class="memdesc:a2c59f540047725fab06de92844d9e243"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the info entries from the log as a string in JSON format. <br /></td></tr>
+<tr class="separator:a2c59f540047725fab06de92844d9e243"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1c842aac2387ac8c4b0df86ce2b369d0" id="r_a1c842aac2387ac8c4b0df86ce2b369d0"><td class="memItemLeft" align="right" valign="top"><a id="a1c842aac2387ac8c4b0df86ce2b369d0" name="a1c842aac2387ac8c4b0df86ce2b369d0"></a>
+std::string&#160;</td><td class="memItemRight" valign="bottom"><b>get_log_module</b> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> std::string &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">module</a>)</td></tr>
+<tr class="memdesc:a1c842aac2387ac8c4b0df86ce2b369d0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets log entries by module as a string in JSON format. <br /></td></tr>
+<tr class="separator:a1c842aac2387ac8c4b0df86ce2b369d0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad2abfffed726ee7fcbf89f0ec216fe62" id="r_ad2abfffed726ee7fcbf89f0ec216fe62"><td class="memItemLeft" align="right" valign="top"><a id="ad2abfffed726ee7fcbf89f0ec216fe62" name="ad2abfffed726ee7fcbf89f0ec216fe62"></a>
+<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><b>write_log</b> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">write</a>)</td></tr>
+<tr class="memdesc:ad2abfffed726ee7fcbf89f0ec216fe62"><td class="mdescLeft">&#160;</td><td class="mdescRight">If true, writes the log on exit. <br /></td></tr>
+<tr class="separator:ad2abfffed726ee7fcbf89f0ec216fe62"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0b21c940ec97b43420185f5c0cada013" id="r_a0b21c940ec97b43420185f5c0cada013"><td class="memItemLeft" align="right" valign="top"><a id="a0b21c940ec97b43420185f5c0cada013" name="a0b21c940ec97b43420185f5c0cada013"></a>
+<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><b>set_log_path</b> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> std::string &amp;path)</td></tr>
+<tr class="memdesc:a0b21c940ec97b43420185f5c0cada013"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the path for the log file to be written to. <br /></td></tr>
+<tr class="separator:a0b21c940ec97b43420185f5c0cada013"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8307f81a8310f0c70a7bf7bc5b4aa5ea" id="r_a8307f81a8310f0c70a7bf7bc5b4aa5ea"><td class="memItemLeft" align="right" valign="top"><a id="a8307f81a8310f0c70a7bf7bc5b4aa5ea" name="a8307f81a8310f0c70a7bf7bc5b4aa5ea"></a>
+<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><b>set_log_throw_on_error</b> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a> throw_on_error)</td></tr>
+<tr class="memdesc:a8307f81a8310f0c70a7bf7bc5b4aa5ea"><td class="mdescLeft">&#160;</td><td class="mdescRight">If true, throws a runtime exception when an error is logged. <br /></td></tr>
+<tr class="separator:a8307f81a8310f0c70a7bf7bc5b4aa5ea"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abb302b24e64ea5019d869cbab4a6e17f" id="r_abb302b24e64ea5019d869cbab4a6e17f"><td class="memItemLeft" align="right" valign="top"><a id="abb302b24e64ea5019d869cbab4a6e17f" name="abb302b24e64ea5019d869cbab4a6e17f"></a>
+<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><b>log_info</b> (std::string <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">log_entry</a>)</td></tr>
+<tr class="memdesc:abb302b24e64ea5019d869cbab4a6e17f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds an info entry to the log from the R environment. <br /></td></tr>
+<tr class="separator:abb302b24e64ea5019d869cbab4a6e17f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a78b2e675893b5a855befac2d0932d927" id="r_a78b2e675893b5a855befac2d0932d927"><td class="memItemLeft" align="right" valign="top"><a id="a78b2e675893b5a855befac2d0932d927" name="a78b2e675893b5a855befac2d0932d927"></a>
+<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><b>log_warning</b> (std::string <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">log_entry</a>)</td></tr>
+<tr class="memdesc:a78b2e675893b5a855befac2d0932d927"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds a warning entry to the log from the R environment. <br /></td></tr>
+<tr class="separator:a78b2e675893b5a855befac2d0932d927"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a14b639ccdb08205804ff4bfef6641f02" id="r_a14b639ccdb08205804ff4bfef6641f02"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rcpp__interface_8hpp.html#a14b639ccdb08205804ff4bfef6641f02">escapeQuotes</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> std::string &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">input</a>)</td></tr>
+<tr class="memdesc:a14b639ccdb08205804ff4bfef6641f02"><td class="mdescLeft">&#160;</td><td class="mdescRight">Escapes quotations.  <br /></td></tr>
+<tr class="separator:a14b639ccdb08205804ff4bfef6641f02"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3d5c2c9072a935ebf9b36ac49cc63ef6" id="r_a3d5c2c9072a935ebf9b36ac49cc63ef6"><td class="memItemLeft" align="right" valign="top"><a id="a3d5c2c9072a935ebf9b36ac49cc63ef6" name="a3d5c2c9072a935ebf9b36ac49cc63ef6"></a>
+<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><b>log_error</b> (std::string <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">log_entry</a>)</td></tr>
+<tr class="memdesc:a3d5c2c9072a935ebf9b36ac49cc63ef6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds a error entry to the log from the R environment. <br /></td></tr>
+<tr class="separator:a3d5c2c9072a935ebf9b36ac49cc63ef6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>The Rcpp interface to declare things. </p>
+<dl class="section copyright"><dt>Copyright</dt><dd>This file is part of the NOAA, National Marine Fisheries Service Fisheries Integrated Modeling System project. See LICENSE in the source folder for reuse information. </dd></dl>
+</div><h2 class="groupheader">Function Documentation</h2>
+<a id="a9f5a235582e7cc0f29e3431fc89ef10d" name="a9f5a235582e7cc0f29e3431fc89ef10d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9f5a235582e7cc0f29e3431fc89ef10d">&#9670;&#160;</a></span>clear_internal()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Type &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">void clear_internal </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Clears the internal objects. </p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">Type</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a1d0c303c2c44fcb296368608a5f2ff1a" name="a1d0c303c2c44fcb296368608a5f2ff1a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1d0c303c2c44fcb296368608a5f2ff1a">&#9670;&#160;</a></span>CreateTMBModel()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a> CreateTMBModel </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Initialize and construct the FIMS model using TMB. </p>
+<p>This function sets up the core C++ objects required for building the objective function with TMB before optimizing a FIMS model. The main steps of the function are as follows:</p><ul>
+<li>The logging system is initialized and any existing model structures are cleared, ensuring a clean slate for a new model.</li>
+<li>It resets and prepares the main model information objects (<a class="el" href="classfims__info_1_1Information.html" title="Stores FIMS model information and creates model. Contains all objects and data pre-model construction...">fims_info::Information</a> singletons), ensuring all internal data and settings are cleared and ready for a new model run. This step is essential for both initializing the model structure and avoiding conflicts from previous runs.</li>
+<li>It iterates over all registered FIMS interface objects and adds them to the TMB model context.</li>
+<li>After all of the objects are registered, it calls <a class="el" href="classfims__info_1_1Information.html#a87a3d2d9a1575dbba625398e7cadd904" title="Create the generalized stock assessment model that will evaluate the objective function....">fims_info::Information::CreateModel()</a> and <a class="el" href="classfims__info_1_1Information.html#a7fa2c6cc68de26e26b6c1085600675bc" title="Checks to make sure all required modules are present for specified model.">fims_info::Information::CheckModel()</a> on the base <a class="el" href="classfims__info_1_1Information.html" title="Stores FIMS model information and creates model. Contains all objects and data pre-model construction...">fims_info::Information</a> object.</li>
+<li>It instantiates the singleton <a class="el" href="classfims__model_1_1Model.html" title="Model class. FIMS objective function.">fims_model::Model</a> object which represents the constructed TMB model.</li>
+</ul>
+<p>Typically the average user does not interact with this function because it is called within <a href="https://noaa-fims.github.io/FIMS/reference/initialize_fims.html"><code>initialize_fims</code></a>.</p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="rcpp__interface_8hpp.html#ad8bf2ebe714bdb6a1e216ed7d9efa7a3">init_logging()</a> </dd>
+<dd>
+<a class="el" href="classfims__info_1_1Information.html#a8b9e6bc88cfee7e80b360eea2d2853b5" title="Clears all containers.">fims_info::Information::Clear()</a> </dd>
+<dd>
+<a class="el" href="classfims__info_1_1Information.html#a87a3d2d9a1575dbba625398e7cadd904" title="Create the generalized stock assessment model that will evaluate the objective function....">fims_info::Information::CreateModel()</a> </dd>
+<dd>
+<a class="el" href="classfims__info_1_1Information.html#a7fa2c6cc68de26e26b6c1085600675bc" title="Checks to make sure all required modules are present for specified model.">fims_info::Information::CheckModel()</a> </dd>
+<dd>
+<a class="el" href="classfims__info_1_1Information.html#aea0008a9935a78fe17f5ec217ac4c621" title="Returns a singleton Information object for type T.">fims_info::Information::GetInstance()</a> </dd>
+<dd>
+<a href="https://noaa-fims.github.io/FIMS/reference/initialize_fims.html" target="_blank"><code>initialize_fims()</code></a> </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>A boolean is returned, where true indicates that the model was successfully created. </dd></dl>
+
+</div>
+</div>
+<a id="a14b639ccdb08205804ff4bfef6641f02" name="a14b639ccdb08205804ff4bfef6641f02"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a14b639ccdb08205804ff4bfef6641f02">&#9670;&#160;</a></span>escapeQuotes()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string escapeQuotes </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> std::string &amp;&#160;</td>
+          <td class="paramname"><em>input</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Escapes quotations. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">input</td><td>A string. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>std::string </dd></dl>
+
+</div>
+</div>
+<a id="accd5cf41c12b933a40a5d3808cee44a5" name="accd5cf41c12b933a40a5d3808cee44a5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#accd5cf41c12b933a40a5d3808cee44a5">&#9670;&#160;</a></span>get_fixed_parameters_vector()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Rcpp::NumericVector</a> get_fixed_parameters_vector </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Gets the fixed parameters vector object. </p>
+<dl class="section return"><dt>Returns</dt><dd>Rcpp::NumericVector </dd></dl>
+
+</div>
+</div>
+<a id="a82e3a00b5981f857ed79cd594f70bf0e" name="a82e3a00b5981f857ed79cd594f70bf0e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a82e3a00b5981f857ed79cd594f70bf0e">&#9670;&#160;</a></span>get_parameter_names()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Rcpp::List</a> get_parameter_names </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Rcpp::List</a>&#160;</td>
+          <td class="paramname"><em>pars</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Gets the parameter names object. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">pars</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Rcpp::List </dd></dl>
+
+</div>
+</div>
+<a id="af9adbb18f4b688138a54a189ff3b36e1" name="af9adbb18f4b688138a54a189ff3b36e1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af9adbb18f4b688138a54a189ff3b36e1">&#9670;&#160;</a></span>get_random_names()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Rcpp::List</a> get_random_names </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Rcpp::List</a>&#160;</td>
+          <td class="paramname"><em>pars</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Gets the random effects names object. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">pars</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Rcpp::List </dd></dl>
+
+</div>
+</div>
+<a id="ace395771e2a80c98b2ae2e3da4d141dc" name="ace395771e2a80c98b2ae2e3da4d141dc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ace395771e2a80c98b2ae2e3da4d141dc">&#9670;&#160;</a></span>get_random_parameters_vector()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Rcpp::NumericVector</a> get_random_parameters_vector </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Gets the random parameters vector object. </p>
+<dl class="section return"><dt>Returns</dt><dd>Rcpp::NumericVector </dd></dl>
+
+</div>
+</div>
+<a id="ad8bf2ebe714bdb6a1e216ed7d9efa7a3" name="ad8bf2ebe714bdb6a1e216ed7d9efa7a3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad8bf2ebe714bdb6a1e216ed7d9efa7a3">&#9670;&#160;</a></span>init_logging()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a> init_logging </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Initializes the logging system, setting all signal handling. </p>
+
+</div>
+</div>
+<a id="aecc723970498500fa938ca77a1502e25" name="aecc723970498500fa938ca77a1502e25"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aecc723970498500fa938ca77a1502e25">&#9670;&#160;</a></span>set_fixed_parameters()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a> set_fixed_parameters </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Rcpp::NumericVector</a>&#160;</td>
+          <td class="paramname"><em>par</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Update fixed parameters in the tape, so the output is correct. </p>
+<p>Updates the internal parameter values for the model base of type TMB_FIMS_REAL_TYPE. It is typically called before finalize() or <a class="el" href="classCatchAtAgeInterface.html#aa1879000c24be96ab99dd36baf58f92d">`get_output()`</a> to ensure the correct values are used because TMB doesn't always keep the updated parameters in the "double" version of the tape. So we need to update those first. <br  />
+<br  />
+Usage example in R: </p><div class="fragment"><div class="line">set_fixed_parameters(c(1, 2, 3))</div>
+<div class="line">set_random_parameters(c(1, 2, 3))</div>
+<div class="line">catch_at_age$get_output(do_sd_report = FALSE)</div>
+</div><!-- fragment -->  <dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">par</td><td>A vector of parameter values. </td></tr>
+  </table>
+  </dd>
+</dl>
+ </p><dl class="section see"><dt>See also</dt><dd><a class="el" href="rcpp__interface_8hpp.html#a602703ef3357097ff34a6751fd13c3f5" title="Update random effect parameters in the tape, so the output is correct.">set_random_parameters()</a> </dd></dl>
+
+</div>
+</div>
+<a id="a602703ef3357097ff34a6751fd13c3f5" name="a602703ef3357097ff34a6751fd13c3f5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a602703ef3357097ff34a6751fd13c3f5">&#9670;&#160;</a></span>set_random_parameters()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a> set_random_parameters </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Rcpp::NumericVector</a>&#160;</td>
+          <td class="paramname"><em>par</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Update random effect parameters in the tape, so the output is correct. </p>
+<p>Updates the internal parameter values for the model base of type TMB_FIMS_REAL_TYPE. It is typically called before finalize() or <a class="el" href="classCatchAtAgeInterface.html#aa1879000c24be96ab99dd36baf58f92d">`get_output()`</a> to ensure the correct values are used because TMB doesn't always keep the updated parameters in the "double" version of the tape. So we need to update those first. <br  />
+<br  />
+Usage example in R: </p><div class="fragment"><div class="line">set_fixed_parameters(c(1, 2, 3))</div>
+<div class="line">set_random_parameters(c(1, 2, 3))</div>
+<div class="line">catch_at_age$get_output(do_sd_report = FALSE)</div>
+</div><!-- fragment -->  <dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">par</td><td>A vector of parameter values. </td></tr>
+  </table>
+  </dd>
+</dl>
+ </p><dl class="section see"><dt>See also</dt><dd><a class="el" href="rcpp__interface_8hpp.html#aecc723970498500fa938ca77a1502e25" title="Update fixed parameters in the tape, so the output is correct.">set_fixed_parameters()</a> </dd></dl>
+
+</div>
+</div>
+</div><!-- contents -->
+</div><!-- doc-content -->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a class="el" href="dir_920884c6b3b2f0be94e27d51660adee5.html">inst</a></li><li class="navelem"><a class="el" href="dir_2b5d1a398a9eec011391d543f21db223.html">include</a></li><li class="navelem"><a class="el" href="dir_78bab4de0b210d1f38696a0ee50fd3de.html">interface</a></li><li class="navelem"><a class="el" href="dir_cf9876eeb8486b9ec32ec52ea9e00fbd.html">rcpp</a></li><li class="navelem"><a class="el" href="rcpp__interface_8hpp.html">rcpp_interface.hpp</a></li>
+    <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.8 </li>
+  </ul>
+</div>
+</body>
+</html>

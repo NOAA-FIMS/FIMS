@@ -521,7 +521,7 @@ fit <- parameters_4_model |>
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
     ## ℹ FIMS model version: 0.8.1
-    ## ℹ Total run time was 1.23077 minutes
+    ## ℹ Total run time was 1.27536 minutes
     ## ℹ Number of parameters: fixed_effects=77, random_effects=0, and total=77
     ## ℹ Maximum gradient= 0.00218
     ## ℹ Negative log likelihood (NLL):
@@ -566,11 +566,6 @@ stockplotr::plot_spawning_biomass(
 
     ## Warning in max(dat$year[dat$era == era_name], na.rm = TRUE): no non-missing
     ## arguments to max; returning -Inf
-
-    ## Scale for colour is already present.
-    ## Adding another scale for colour, which will replace the existing scale.
-    ## Scale for fill is already present.
-    ## Adding another scale for fill, which will replace the existing scale.
 
     ## Warning: Removed 1 row containing missing values or values outside the scale range
     ## (`geom_hline()`).
@@ -688,7 +683,7 @@ high_slope_fit <- parameters_high_slope |>
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
     ## ℹ FIMS model version: 0.8.1
-    ## ℹ Total run time was 1.22333 minutes
+    ## ℹ Total run time was 1.27651 minutes
     ## ℹ Number of parameters: fixed_effects=77, random_effects=0, and total=77
     ## ℹ Maximum gradient= 0.00253
     ## ℹ Negative log likelihood (NLL):
@@ -710,7 +705,7 @@ low_slope_fit <- parameters_low_slope |>
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
     ## ℹ FIMS model version: 0.8.1
-    ## ℹ Total run time was 1.22494 minutes
+    ## ℹ Total run time was 1.29056 minutes
     ## ℹ Number of parameters: fixed_effects=77, random_effects=0, and total=77
     ## ℹ Maximum gradient= 0.00318
     ## ℹ Negative log likelihood (NLL):
@@ -745,7 +740,7 @@ age_only_fit <- parameters_4_model |>
     ## ℹ Maximum gradient went from 0.01253 to 8e-04 after 3 steps.
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
-    ## ℹ FIMS model version: 0.8.1 ℹ Total run time was 9.74425 seconds ℹ Number of
+    ## ℹ FIMS model version: 0.8.1 ℹ Total run time was 10.87983 seconds ℹ Number of
     ## parameters: fixed_effects=77, random_effects=0, and total=77 ℹ Maximum
     ## gradient= 8e-04 ℹ Negative log likelihood (NLL): • Marginal NLL= 1565.4676 •
     ## Total NLL= 1565.4676 ℹ Terminal SB= 1724.28921
@@ -777,7 +772,7 @@ length_only_fit <- parameters_4_model |>
     ## ℹ Maximum gradient went from 0.00422 to 0.03063 after 3 steps.
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
-    ## ℹ FIMS model version: 0.8.1 ℹ Total run time was 59.44192 seconds ℹ Number of
+    ## ℹ FIMS model version: 0.8.1 ℹ Total run time was 1.03534 minutes ℹ Number of
     ## parameters: fixed_effects=77, random_effects=0, and total=77 ℹ Maximum
     ## gradient= 0.03063 ℹ Negative log likelihood (NLL): • Marginal NLL= 1520.03752 •
     ## Total NLL= 1520.03752 ℹ Terminal SB= 1706.89135

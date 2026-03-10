@@ -1,0 +1,1989 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" data-bs-theme="auto">
+<head>
+    <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=9"/>
+    <meta name="generator" content="Doxygen 1.9.8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>FIMS</title><link href="tabs.css" rel="stylesheet" type="text/css"/>
+    <link rel="icon" type="image/png" href="https://noaa-fims.github.io/images/FIMS_hexlogo.png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+    <link href="https://noaa-fims.github.io/site_libs/bootstrap/bootstrap-5477dd34fdf9f443df58de9070e2fbd7.min.css" rel="stylesheet">
+    <link href="https://noaa-fims.github.io/site_libs/bootstrap/bootstrap-dark-429bd3fc0b6810d1347fc340b0896c35.min.css" rel="stylesheet" media="(prefers-color-scheme: dark)">
+    <script type="text/javascript" src="jquery.js"></script>
+    <script type="text/javascript" src="dynsections.js"></script>
+    <link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+    <link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+  $(document).ready(function() { init_search(); });
+/* @license-end */
+</script>
+    <script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  extensions: ["tex2jax.js"],
+  jax: ["input/TeX","output/HTML-CSS"],
+});
+</script>
+<script type="text/javascript" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js"></script>
+    <link href="doxygen.css" rel="stylesheet" type="text/css" />
+    <link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
+<link href="custom.css" rel="stylesheet" type="text/css"/>
+    <script src="https://noaa-fims.github.io/site_libs/quarto-nav/quarto-nav.js"></script>
+    <script src="https://noaa-fims.github.io/site_libs/bootstrap/bootstrap.min.js"></script>
+    <script src="https://noaa-fims.github.io/site_libs/quarto-html/quarto.js" type="module"></script>
+</head>
+<body>
+<div id="top">
+    <div id="titlearea">
+        <table cellspacing="0" cellpadding="0">
+            <tbody>
+            <tr style="height: 70px;">
+                <td id="projectlogo"><img alt="Logo" src="FIMS_logo3.png"/></td>
+                <td id="projectalign" style="padding-left: 0.5em;">
+                    <div id="projectname">FIMS
+                        &#160;<span id="projectnumber">v0.8.1</span></div>
+                    <div id="projectbrief"></div></td>
+                <td style="padding-left: 0.5em;">
+                    <div id="projectbrief"></div>
+                </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <nav class="navbar navbar-expand-lg " data-bs-theme="auto">
+      <div class="navbar-container container-fluid">
+        <div class="navbar-brand-container mx-auto">
+          <a href="https://noaa-fims.github.io/" class="navbar-brand navbar-brand-logo"></a>
+          <a class="navbar-brand" href="https://noaa-fims.github.io/">
+          </a>
+        </div>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+          <ul class="navbar-nav navbar-nav-scroll ms-auto">
+           <li class="nav-item dropdown">
+            <button class="nav-link dropdown-toggle" type="button" id="dropdown-reference" data-bs-toggle="dropdown"
+                    aria-expanded="false" aria-haspopup="true">reference</button>
+            <ul class="dropdown-menu" aria-labelledby="dropdown-reference">
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/reference/index.html">r/roxygen</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/doxygen/index.html">c++/doxygen</a></li>
+            </ul>
+           </li>
+            <li class="nav-item dropdown">
+            <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown"
+                    aria-expanded="false" aria-haspopup="true">articles</button>
+            <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
+              <li><h6 class="dropdown-header" data-toc-skip>intro to fims</h6></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/fims-demo.html">introducing the fisheries integrated modeling system (fims)</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/fims-logging.html">Introducing the fims logging system</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/fims-user-setup-guide.html">fims user setup guide</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/fims-demo-projections.html">simple projections using fims</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><h6 class="dropdown-header" data-toc-skip>developer</h6></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/fims-path-maturity.html">fims path - maturity</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><h6 class="dropdown-header" data-toc-skip>c++ training</h6></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/training-intro-cpp.html">intro to c++</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/training-intro-rcpp.html">intro to rcpp</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><h6 class="dropdown-header" data-toc-skip>research and development</h6></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/RD-re-sparsity.html">re sparsity</a></li>
+            </ul>
+          </li>
+            <li class="nav-item dropdown">
+              <button class="nav-link dropdown-toggle" type="button" id="dropdown-news" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">news</button>
+              <ul class="dropdown-menu" aria-labelledby="dropdown-news">
+                <li><h6 class="dropdown-header" data-toc-skip="">Releases</h6></li>
+                <li><a class="external-link dropdown-item" href="https://github.com/NOAA-FIMS/FIMS/releases/latest">latest release</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/news/index.html">changelog</a></li>
+              </ul>
+            </li>
+          <li class="nav-item dropdown">
+            <button class="nav-link dropdown-toggle" type="button" id="dropdown-reports" data-bs-toggle="dropdown"
+                    aria-expanded="false" aria-haspopup="true">reports</button>
+            <ul class="dropdown-menu" aria-labelledby="dropdown-reports">
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/coverage/coverage.html">coverage</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/coverage/codecoverage_explanation.html">coverage explained</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/testdown/index.html">testdown</a></li>
+            </ul>
+          </li>
+          <ul class="navbar-nav">
+            <li class="nav-item"><a class="external-link nav-link" href="https://noaa-fims.github.io/">fims website</a></li>
+            <li class="nav-item">
+              <a class="external-link nav-link" href="https://github.com/noaa-fims/fims/" aria-label="GitHub repository for FIMS">
+                <span class="fa fa-brands fa-github fa-lg"></span>
+              </a>
+            </li>
+            <!-- Keep the input; pkgdown’s autocomplete wrapper won’t exist in Doxygen -->
+            <li class="nav-item">
+              <form class="form-inline" role="search" onsubmit="return false;">
+                <input class="form-control" type="search" name="search-input" id="search-input"
+                      autocomplete="off" aria-label="Search site" placeholder="Search for">
+              </form>
+            </li>
+          </ul>
+      </div>
+    </div>
+  </nav>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  // Only on the cpp_directory_structure page!
+  document.querySelectorAll('.toc a').forEach(function(link) {
+    if (link.href && link.href.indexOf(location.pathname) !== -1) {
+      link.href = link.hash; // Just use the fragment
+    }
+  });
+});
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  function updateTocActive() {
+    var links = Array.from(document.querySelectorAll('.toc a'));
+    var anchors = links.map(link => document.getElementById(link.getAttribute('href').replace('#', '')));
+    var scrollTop = window.scrollY || document.documentElement.scrollTop;
+    var offset = 150; // Match your scroll-margin-top
+    let currentActive = -1;
+    for (let i = anchors.length - 1; i >= 0; i--) {
+      if (anchors[i] && (anchors[i].getBoundingClientRect().top + window.scrollY - offset) <= scrollTop) {
+        currentActive = i;
+        break;
+      }
+    }
+    links.forEach((link, i) => {
+      link.classList.remove('active', 'aboveActive');
+      if (i === currentActive) {
+        link.classList.add('active');
+      } else if (i < currentActive) {
+        link.classList.add('aboveActive');
+      }
+    });
+  }
+  window.addEventListener('scroll', updateTocActive);
+  window.addEventListener('hashchange', updateTocActive);
+  updateTocActive();
+});
+</script>
+    <!-- end header part -->
+<!-- Generated by Doxygen 1.9.8 -->
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+/* @license-end */
+</script>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(document).ready(function(){initNavTree('classSharedReal.html',''); initResizable(); });
+/* @license-end */
+</script>
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">Loading...</div>
+<div class="SRStatus" id="Searching">Searching...</div>
+<div class="SRStatus" id="NoMatches">No Matches</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="summary">
+<a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#friends">Friends</a> &#124;
+<a href="classSharedReal-members.html">List of all members</a>  </div>
+  <div class="headertitle"><div class="title">SharedReal Class Reference</div></div>
+</div><!--header-->
+<div class="contents">
+
+<p>A class that provides shared ownership of an integer value.  
+ <a href="classSharedReal.html#details">More...</a></p>
+
+<p><code>#include &lt;<a class="el" href="rcpp__shared__primitive_8hpp_source.html">rcpp_shared_primitive.hpp</a>&gt;</code></p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
+Public Member Functions</h2></td></tr>
+<tr class="memitem:a7c7ff90ad66e189f87ef960ed92db9aa" id="r_a7c7ff90ad66e189f87ef960ed92db9aa"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSharedReal.html#a7c7ff90ad66e189f87ef960ed92db9aa">SharedReal</a> ()</td></tr>
+<tr class="memdesc:a7c7ff90ad66e189f87ef960ed92db9aa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs a new <code><a class="el" href="classSharedReal.html" title="A class that provides shared ownership of an integer value.">SharedReal</a></code> object with a default value.  <br /></td></tr>
+<tr class="separator:a7c7ff90ad66e189f87ef960ed92db9aa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae33e28e15fedf7fbaaf00e4e5df0c955" id="r_ae33e28e15fedf7fbaaf00e4e5df0c955"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSharedReal.html#ae33e28e15fedf7fbaaf00e4e5df0c955">SharedReal</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">int</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">val</a>)</td></tr>
+<tr class="memdesc:ae33e28e15fedf7fbaaf00e4e5df0c955"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs a new <code><a class="el" href="classSharedReal.html" title="A class that provides shared ownership of an integer value.">SharedReal</a></code> object from an integer value.  <br /></td></tr>
+<tr class="separator:ae33e28e15fedf7fbaaf00e4e5df0c955"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab8c379ac3de82f88bef026e8faafaabd" id="r_ab8c379ac3de82f88bef026e8faafaabd"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSharedReal.html#ab8c379ac3de82f88bef026e8faafaabd">SharedReal</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="classSharedReal.html">SharedReal</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">other</a>)</td></tr>
+<tr class="memdesc:ab8c379ac3de82f88bef026e8faafaabd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy constructs a new <code><a class="el" href="classSharedReal.html" title="A class that provides shared ownership of an integer value.">SharedReal</a></code> object.  <br /></td></tr>
+<tr class="separator:ab8c379ac3de82f88bef026e8faafaabd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a99fba932a18bbbae9636435f7a709ba6" id="r_a99fba932a18bbbae9636435f7a709ba6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classSharedReal.html">SharedReal</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSharedReal.html#a99fba932a18bbbae9636435f7a709ba6">operator=</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="classSharedReal.html">SharedReal</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">other</a>)</td></tr>
+<tr class="memdesc:a99fba932a18bbbae9636435f7a709ba6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overloaded copy assignment operator.  <br /></td></tr>
+<tr class="separator:a99fba932a18bbbae9636435f7a709ba6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a097afbbcb6aa192d9915208eb7b30847" id="r_a097afbbcb6aa192d9915208eb7b30847"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classSharedReal.html">SharedReal</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSharedReal.html#a097afbbcb6aa192d9915208eb7b30847">operator=</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">int</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">other</a>)</td></tr>
+<tr class="memdesc:a097afbbcb6aa192d9915208eb7b30847"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overloaded assignment operator for an integer value.  <br /></td></tr>
+<tr class="separator:a097afbbcb6aa192d9915208eb7b30847"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaed684a4623305a32f7bc639407915ff" id="r_aaed684a4623305a32f7bc639407915ff"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSharedReal.html#aaed684a4623305a32f7bc639407915ff">SharedReal</a> (<a class="el" href="classSharedReal.html">SharedReal</a> &amp;&amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">other</a>) <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">noexcept</a></td></tr>
+<tr class="memdesc:aaed684a4623305a32f7bc639407915ff"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs a new <code><a class="el" href="classSharedReal.html" title="A class that provides shared ownership of an integer value.">SharedReal</a></code> object by moving resources.  <br /></td></tr>
+<tr class="separator:aaed684a4623305a32f7bc639407915ff"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a572d3a05dfc9f7e33223968ba1d14843" id="r_a572d3a05dfc9f7e33223968ba1d14843"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classSharedReal.html">SharedReal</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSharedReal.html#a572d3a05dfc9f7e33223968ba1d14843">operator=</a> (<a class="el" href="classSharedReal.html">SharedReal</a> &amp;&amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">other</a>) <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">noexcept</a></td></tr>
+<tr class="memdesc:a572d3a05dfc9f7e33223968ba1d14843"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overloaded move assignment operator.  <br /></td></tr>
+<tr class="separator:a572d3a05dfc9f7e33223968ba1d14843"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa8f38a240ca8077f542a4a40feb5dfa5" id="r_aa8f38a240ca8077f542a4a40feb5dfa5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">int</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSharedReal.html#aa8f38a240ca8077f542a4a40feb5dfa5">get</a> () <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a></td></tr>
+<tr class="memdesc:aa8f38a240ca8077f542a4a40feb5dfa5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieves the integer value managed by the object.  <br /></td></tr>
+<tr class="separator:aa8f38a240ca8077f542a4a40feb5dfa5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a21e68e76bc23a5e1f5989a94553e8c8c" id="r_a21e68e76bc23a5e1f5989a94553e8c8c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSharedReal.html#a21e68e76bc23a5e1f5989a94553e8c8c">set</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">int</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">val</a>)</td></tr>
+<tr class="memdesc:a21e68e76bc23a5e1f5989a94553e8c8c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the integer value of the object.  <br /></td></tr>
+<tr class="separator:a21e68e76bc23a5e1f5989a94553e8c8c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a72fccf69775cf0ee72b7d030cf20f459" id="r_a72fccf69775cf0ee72b7d030cf20f459"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSharedReal.html#a72fccf69775cf0ee72b7d030cf20f459">operator int</a> ()</td></tr>
+<tr class="memdesc:a72fccf69775cf0ee72b7d030cf20f459"><td class="mdescLeft">&#160;</td><td class="mdescRight">User-defined conversion to <code>int</code>.  <br /></td></tr>
+<tr class="separator:a72fccf69775cf0ee72b7d030cf20f459"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6fa65a1797de01a4ed3f1c17a297f03d" id="r_a6fa65a1797de01a4ed3f1c17a297f03d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">int</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSharedReal.html#a6fa65a1797de01a4ed3f1c17a297f03d">operator*</a> () <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a></td></tr>
+<tr class="memdesc:a6fa65a1797de01a4ed3f1c17a297f03d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overloads the dereference operator (<code>*</code>).  <br /></td></tr>
+<tr class="separator:a6fa65a1797de01a4ed3f1c17a297f03d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a231cc4a3697a5dc74ff14013798cd376" id="r_a231cc4a3697a5dc74ff14013798cd376"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">int</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSharedReal.html#a231cc4a3697a5dc74ff14013798cd376">operator-&gt;</a> ()</td></tr>
+<tr class="memdesc:a231cc4a3697a5dc74ff14013798cd376"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overloads the member access operator (<code>-&gt;</code>).  <br /></td></tr>
+<tr class="separator:a231cc4a3697a5dc74ff14013798cd376"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a651cacebfc417faba7b4da1c94dd515c" id="r_a651cacebfc417faba7b4da1c94dd515c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">int</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSharedReal.html#a651cacebfc417faba7b4da1c94dd515c">operator-&gt;</a> () <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a></td></tr>
+<tr class="memdesc:a651cacebfc417faba7b4da1c94dd515c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overloads the member access operator (<code>-&gt;</code>) for const objects.  <br /></td></tr>
+<tr class="separator:a651cacebfc417faba7b4da1c94dd515c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a97962ea3a0b5e52b1d5b8bf7939a3d50" id="r_a97962ea3a0b5e52b1d5b8bf7939a3d50"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classSharedReal.html">SharedReal</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSharedReal.html#a97962ea3a0b5e52b1d5b8bf7939a3d50">operator++</a> ()</td></tr>
+<tr class="memdesc:a97962ea3a0b5e52b1d5b8bf7939a3d50"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overloads the prefix increment operator (<code>++</code>).  <br /></td></tr>
+<tr class="separator:a97962ea3a0b5e52b1d5b8bf7939a3d50"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5489c1d8d3128671bc89b685a9611254" id="r_a5489c1d8d3128671bc89b685a9611254"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classSharedReal.html">SharedReal</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSharedReal.html#a5489c1d8d3128671bc89b685a9611254">operator++</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">int</a>)</td></tr>
+<tr class="memdesc:a5489c1d8d3128671bc89b685a9611254"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overloads the postfix increment operator.  <br /></td></tr>
+<tr class="separator:a5489c1d8d3128671bc89b685a9611254"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7553bb2dac690dbca45854a99ceb71c2" id="r_a7553bb2dac690dbca45854a99ceb71c2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classSharedReal.html">SharedReal</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSharedReal.html#a7553bb2dac690dbca45854a99ceb71c2">operator--</a> ()</td></tr>
+<tr class="memdesc:a7553bb2dac690dbca45854a99ceb71c2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overloads the prefix decrement operator (<code>--</code>).  <br /></td></tr>
+<tr class="separator:a7553bb2dac690dbca45854a99ceb71c2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acd99844ccd200971d9fbbc3ebc04c95b" id="r_acd99844ccd200971d9fbbc3ebc04c95b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classSharedReal.html">SharedReal</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSharedReal.html#acd99844ccd200971d9fbbc3ebc04c95b">operator--</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">int</a>)</td></tr>
+<tr class="memdesc:acd99844ccd200971d9fbbc3ebc04c95b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overloads the postfix decrement operator.  <br /></td></tr>
+<tr class="separator:acd99844ccd200971d9fbbc3ebc04c95b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0a8dec1541c1ff8cd6ee6bc3b4fed0db" id="r_a0a8dec1541c1ff8cd6ee6bc3b4fed0db"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classSharedReal.html">SharedReal</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSharedReal.html#a0a8dec1541c1ff8cd6ee6bc3b4fed0db">operator+</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="classSharedReal.html">SharedReal</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">other</a>) <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a></td></tr>
+<tr class="memdesc:a0a8dec1541c1ff8cd6ee6bc3b4fed0db"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overloads the binary addition operator (<code>+</code>).  <br /></td></tr>
+<tr class="separator:a0a8dec1541c1ff8cd6ee6bc3b4fed0db"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a419f17ccda90b09be2ed6cafab81eeaa" id="r_a419f17ccda90b09be2ed6cafab81eeaa"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classSharedReal.html">SharedReal</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSharedReal.html#a419f17ccda90b09be2ed6cafab81eeaa">operator-</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="classSharedReal.html">SharedReal</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">other</a>) <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a></td></tr>
+<tr class="memdesc:a419f17ccda90b09be2ed6cafab81eeaa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overloads the binary subtraction operator (<code>-</code>).  <br /></td></tr>
+<tr class="separator:a419f17ccda90b09be2ed6cafab81eeaa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a913af863e85991b07c4dcf6737e3f66c" id="r_a913af863e85991b07c4dcf6737e3f66c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classSharedReal.html">SharedReal</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSharedReal.html#a913af863e85991b07c4dcf6737e3f66c">operator*</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="classSharedReal.html">SharedReal</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">other</a>) <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a></td></tr>
+<tr class="memdesc:a913af863e85991b07c4dcf6737e3f66c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overloads the binary multiplication operator (<code>*</code>).  <br /></td></tr>
+<tr class="separator:a913af863e85991b07c4dcf6737e3f66c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7aaf5a8c9208306d6d03f7be91064f4f" id="r_a7aaf5a8c9208306d6d03f7be91064f4f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classSharedReal.html">SharedReal</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSharedReal.html#a7aaf5a8c9208306d6d03f7be91064f4f">operator/</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="classSharedReal.html">SharedReal</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">other</a>) <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a></td></tr>
+<tr class="memdesc:a7aaf5a8c9208306d6d03f7be91064f4f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overloads the binary division operator (<code>/</code>).  <br /></td></tr>
+<tr class="separator:a7aaf5a8c9208306d6d03f7be91064f4f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae950bf60d77ada0bff9080f2bee9d3b5" id="r_ae950bf60d77ada0bff9080f2bee9d3b5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classSharedReal.html">SharedReal</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSharedReal.html#ae950bf60d77ada0bff9080f2bee9d3b5">operator+</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">int</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">other</a>) <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a></td></tr>
+<tr class="memdesc:ae950bf60d77ada0bff9080f2bee9d3b5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overloads the binary addition operator (<code>+</code>) for an integer.  <br /></td></tr>
+<tr class="separator:ae950bf60d77ada0bff9080f2bee9d3b5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a71348415f445d9a34044568fa802e3c9" id="r_a71348415f445d9a34044568fa802e3c9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classSharedReal.html">SharedReal</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSharedReal.html#a71348415f445d9a34044568fa802e3c9">operator-</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">int</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">other</a>) <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a></td></tr>
+<tr class="memdesc:a71348415f445d9a34044568fa802e3c9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overloads the binary subtraction operator (<code>-</code>) for an integer.  <br /></td></tr>
+<tr class="separator:a71348415f445d9a34044568fa802e3c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3734072fe7e23fd75032ed0415f1c512" id="r_a3734072fe7e23fd75032ed0415f1c512"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classSharedReal.html">SharedReal</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSharedReal.html#a3734072fe7e23fd75032ed0415f1c512">operator*</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">int</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">other</a>) <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a></td></tr>
+<tr class="memdesc:a3734072fe7e23fd75032ed0415f1c512"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overloads the binary multiplication operator (<code>*</code>) for an integer.  <br /></td></tr>
+<tr class="separator:a3734072fe7e23fd75032ed0415f1c512"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a953b4668cc6eabadb5db92c294fa8f8e" id="r_a953b4668cc6eabadb5db92c294fa8f8e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classSharedReal.html">SharedReal</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSharedReal.html#a953b4668cc6eabadb5db92c294fa8f8e">operator/</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">int</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">other</a>) <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a></td></tr>
+<tr class="memdesc:a953b4668cc6eabadb5db92c294fa8f8e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overloads the binary division operator (<code>/</code>) for an integer.  <br /></td></tr>
+<tr class="separator:a953b4668cc6eabadb5db92c294fa8f8e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a67a9b97cee17f1240b6b2b99d10c68cf" id="r_a67a9b97cee17f1240b6b2b99d10c68cf"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classSharedReal.html">SharedReal</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSharedReal.html#a67a9b97cee17f1240b6b2b99d10c68cf">operator+=</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="classSharedReal.html">SharedReal</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">other</a>)</td></tr>
+<tr class="memdesc:a67a9b97cee17f1240b6b2b99d10c68cf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overloads the compound assignment operator (<code>+=</code>).  <br /></td></tr>
+<tr class="separator:a67a9b97cee17f1240b6b2b99d10c68cf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5cff409c7cbcaa04c670f17d5f64eb8b" id="r_a5cff409c7cbcaa04c670f17d5f64eb8b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classSharedReal.html">SharedReal</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSharedReal.html#a5cff409c7cbcaa04c670f17d5f64eb8b">operator-=</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="classSharedReal.html">SharedReal</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">other</a>)</td></tr>
+<tr class="memdesc:a5cff409c7cbcaa04c670f17d5f64eb8b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overloads the compound assignment operator (<code>-=</code>).  <br /></td></tr>
+<tr class="separator:a5cff409c7cbcaa04c670f17d5f64eb8b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2bef72075dbb22643acc3d5e0365e888" id="r_a2bef72075dbb22643acc3d5e0365e888"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classSharedReal.html">SharedReal</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSharedReal.html#a2bef72075dbb22643acc3d5e0365e888">operator*=</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="classSharedReal.html">SharedReal</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">other</a>)</td></tr>
+<tr class="memdesc:a2bef72075dbb22643acc3d5e0365e888"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overloads the compound assignment operator (<code>*=</code>).  <br /></td></tr>
+<tr class="separator:a2bef72075dbb22643acc3d5e0365e888"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8383ec17320cf6ee8a97de2acc369351" id="r_a8383ec17320cf6ee8a97de2acc369351"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classSharedReal.html">SharedReal</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSharedReal.html#a8383ec17320cf6ee8a97de2acc369351">operator/=</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="classSharedReal.html">SharedReal</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">other</a>)</td></tr>
+<tr class="memdesc:a8383ec17320cf6ee8a97de2acc369351"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overloads the compound assignment operator (<code>/=</code>).  <br /></td></tr>
+<tr class="separator:a8383ec17320cf6ee8a97de2acc369351"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1e234a5b453ad971f60065437915251a" id="r_a1e234a5b453ad971f60065437915251a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classSharedReal.html">SharedReal</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSharedReal.html#a1e234a5b453ad971f60065437915251a">operator+=</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">int</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">other</a>)</td></tr>
+<tr class="memdesc:a1e234a5b453ad971f60065437915251a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overloads the compound assignment operator (<code>+=</code>) for an integer.  <br /></td></tr>
+<tr class="separator:a1e234a5b453ad971f60065437915251a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8afae7923c2c088fc6546769430e70a8" id="r_a8afae7923c2c088fc6546769430e70a8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classSharedReal.html">SharedReal</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSharedReal.html#a8afae7923c2c088fc6546769430e70a8">operator-=</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">int</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">other</a>)</td></tr>
+<tr class="memdesc:a8afae7923c2c088fc6546769430e70a8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overloads the compound assignment operator (<code>-=</code>) for an integer.  <br /></td></tr>
+<tr class="separator:a8afae7923c2c088fc6546769430e70a8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a360d65ca4cebc25b0af0a358aa933ad1" id="r_a360d65ca4cebc25b0af0a358aa933ad1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classSharedReal.html">SharedReal</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSharedReal.html#a360d65ca4cebc25b0af0a358aa933ad1">operator*=</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">int</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">other</a>)</td></tr>
+<tr class="memdesc:a360d65ca4cebc25b0af0a358aa933ad1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overloads the compound assignment operator (<code>*=</code>) for an integer.  <br /></td></tr>
+<tr class="separator:a360d65ca4cebc25b0af0a358aa933ad1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a25b34654e8aa2d3c384aebbcfd2a7f7b" id="r_a25b34654e8aa2d3c384aebbcfd2a7f7b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classSharedReal.html">SharedReal</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSharedReal.html#a25b34654e8aa2d3c384aebbcfd2a7f7b">operator/=</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">int</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">other</a>)</td></tr>
+<tr class="memdesc:a25b34654e8aa2d3c384aebbcfd2a7f7b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overloads the compound assignment operator (<code>/=</code>) for an integer.  <br /></td></tr>
+<tr class="separator:a25b34654e8aa2d3c384aebbcfd2a7f7b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad85f22c1c7876f5a4f0c48d11b9d9c5c" id="r_ad85f22c1c7876f5a4f0c48d11b9d9c5c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSharedReal.html#ad85f22c1c7876f5a4f0c48d11b9d9c5c">operator==</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="classSharedReal.html">SharedReal</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">other</a>) <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a></td></tr>
+<tr class="memdesc:ad85f22c1c7876f5a4f0c48d11b9d9c5c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overloads the equality operator (<code>==</code>).  <br /></td></tr>
+<tr class="separator:ad85f22c1c7876f5a4f0c48d11b9d9c5c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4c79cdfa7cf3ae8f0f455567d4eea230" id="r_a4c79cdfa7cf3ae8f0f455567d4eea230"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSharedReal.html#a4c79cdfa7cf3ae8f0f455567d4eea230">operator!=</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="classSharedReal.html">SharedReal</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">other</a>) <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a></td></tr>
+<tr class="memdesc:a4c79cdfa7cf3ae8f0f455567d4eea230"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overloads the inequality operator (<code>!=</code>).  <br /></td></tr>
+<tr class="separator:a4c79cdfa7cf3ae8f0f455567d4eea230"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afcce29f9d176c19bed365f8ff60574ca" id="r_afcce29f9d176c19bed365f8ff60574ca"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSharedReal.html#afcce29f9d176c19bed365f8ff60574ca">operator&lt;</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="classSharedReal.html">SharedReal</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">other</a>) <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a></td></tr>
+<tr class="memdesc:afcce29f9d176c19bed365f8ff60574ca"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overloads the less-than operator (<code>&lt;</code>).  <br /></td></tr>
+<tr class="separator:afcce29f9d176c19bed365f8ff60574ca"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a52ce6bd83814f074b9e352ef15720e46" id="r_a52ce6bd83814f074b9e352ef15720e46"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSharedReal.html#a52ce6bd83814f074b9e352ef15720e46">operator&lt;=</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="classSharedReal.html">SharedReal</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">other</a>) <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a></td></tr>
+<tr class="memdesc:a52ce6bd83814f074b9e352ef15720e46"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overloads the less-than-or-equal-to operator (<code>&lt;=</code>).  <br /></td></tr>
+<tr class="separator:a52ce6bd83814f074b9e352ef15720e46"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6b93223dfba022bb5ed8249ff5eb18bb" id="r_a6b93223dfba022bb5ed8249ff5eb18bb"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSharedReal.html#a6b93223dfba022bb5ed8249ff5eb18bb">operator&gt;</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="classSharedReal.html">SharedReal</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">other</a>) <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a></td></tr>
+<tr class="memdesc:a6b93223dfba022bb5ed8249ff5eb18bb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overloads the greater-than operator (<code>&gt;</code>).  <br /></td></tr>
+<tr class="separator:a6b93223dfba022bb5ed8249ff5eb18bb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a169d30289a6a210fab83b48750bc3207" id="r_a169d30289a6a210fab83b48750bc3207"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSharedReal.html#a169d30289a6a210fab83b48750bc3207">operator&gt;=</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="classSharedReal.html">SharedReal</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">other</a>) <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a></td></tr>
+<tr class="memdesc:a169d30289a6a210fab83b48750bc3207"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overloads the greater-than-or-equal-to operator (<code>&gt;=</code>).  <br /></td></tr>
+<tr class="separator:a169d30289a6a210fab83b48750bc3207"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a32faa91fe7410cce60e0c5e8c5c50398" id="r_a32faa91fe7410cce60e0c5e8c5c50398"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSharedReal.html#a32faa91fe7410cce60e0c5e8c5c50398">operator==</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">int</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">other</a>) <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a></td></tr>
+<tr class="memdesc:a32faa91fe7410cce60e0c5e8c5c50398"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overloads the equality operator (<code>==</code>) for an integer value.  <br /></td></tr>
+<tr class="separator:a32faa91fe7410cce60e0c5e8c5c50398"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa887566e3319cb2ddeb38a90b0d826ae" id="r_aa887566e3319cb2ddeb38a90b0d826ae"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSharedReal.html#aa887566e3319cb2ddeb38a90b0d826ae">operator!=</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">int</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">other</a>) <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a></td></tr>
+<tr class="memdesc:aa887566e3319cb2ddeb38a90b0d826ae"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overloads the inequality operator (<code>!=</code>) for an integer.  <br /></td></tr>
+<tr class="separator:aa887566e3319cb2ddeb38a90b0d826ae"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac2e94071b205420167310485afad749d" id="r_ac2e94071b205420167310485afad749d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSharedReal.html#ac2e94071b205420167310485afad749d">operator&lt;</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">int</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">other</a>) <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a></td></tr>
+<tr class="memdesc:ac2e94071b205420167310485afad749d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overloads the less-than operator (<code>&lt;</code>) for an integer.  <br /></td></tr>
+<tr class="separator:ac2e94071b205420167310485afad749d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abfeb66418f6cd9d47b428e8616980a5e" id="r_abfeb66418f6cd9d47b428e8616980a5e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSharedReal.html#abfeb66418f6cd9d47b428e8616980a5e">operator&lt;=</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">int</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">other</a>) <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a></td></tr>
+<tr class="memdesc:abfeb66418f6cd9d47b428e8616980a5e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overloads the less-than-or-equal-to operator (<code>&lt;=</code>) for an integer.  <br /></td></tr>
+<tr class="separator:abfeb66418f6cd9d47b428e8616980a5e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abc4e7f7d9df79ec003130a4822f6919e" id="r_abc4e7f7d9df79ec003130a4822f6919e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSharedReal.html#abc4e7f7d9df79ec003130a4822f6919e">operator&gt;</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">int</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">other</a>) <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a></td></tr>
+<tr class="memdesc:abc4e7f7d9df79ec003130a4822f6919e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overloads the greater-than operator (<code>&gt;</code>) for an integer.  <br /></td></tr>
+<tr class="separator:abc4e7f7d9df79ec003130a4822f6919e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1b092b6a5a59dc63e491a59a1a66a00c" id="r_a1b092b6a5a59dc63e491a59a1a66a00c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSharedReal.html#a1b092b6a5a59dc63e491a59a1a66a00c">operator&gt;=</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">int</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">other</a>) <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a></td></tr>
+<tr class="memdesc:a1b092b6a5a59dc63e491a59a1a66a00c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overloads the greater-than-or-equal-to operator (<code>&gt;=</code>) for an integer.  <br /></td></tr>
+<tr class="separator:a1b092b6a5a59dc63e491a59a1a66a00c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="friends" name="friends"></a>
+Friends</h2></td></tr>
+<tr class="memitem:a848880871389d5f0ea5ed14467f8a7c1" id="r_a848880871389d5f0ea5ed14467f8a7c1"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSharedReal.html#a848880871389d5f0ea5ed14467f8a7c1">operator&lt;&lt;</a> (std::ostream &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">os</a>, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="classSharedReal.html">SharedReal</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">sp</a>)</td></tr>
+<tr class="memdesc:a848880871389d5f0ea5ed14467f8a7c1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overloads the stream insertion operator (<code>&lt;&lt;</code>) for <a class="el" href="classSharedReal.html" title="A class that provides shared ownership of an integer value.">SharedReal</a>.  <br /></td></tr>
+<tr class="separator:a848880871389d5f0ea5ed14467f8a7c1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>A class that provides shared ownership of an integer value. </p>
+<p>This class wraps a <code>std::shared_ptr</code> to provide a reference-counted integer value. When a <a class="el" href="classSharedReal.html" title="A class that provides shared ownership of an integer value.">SharedReal</a> object is copied, it shares the same underlying integer with the original object. The integer's memory is automatically deallocated when the last <a class="el" href="classSharedReal.html" title="A class that provides shared ownership of an integer value.">SharedReal</a> object pointing to it is destroyed. </p>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a id="a7c7ff90ad66e189f87ef960ed92db9aa" name="a7c7ff90ad66e189f87ef960ed92db9aa"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7c7ff90ad66e189f87ef960ed92db9aa">&#9670;&#160;</a></span>SharedReal() <span class="overload">[1/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">SharedReal::SharedReal </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Constructs a new <code><a class="el" href="classSharedReal.html" title="A class that provides shared ownership of an integer value.">SharedReal</a></code> object with a default value. </p>
+<p>Initializes the object's internal shared pointer to manage a new integer with a value of zero. </p>
+
+</div>
+</div>
+<a id="ae33e28e15fedf7fbaaf00e4e5df0c955" name="ae33e28e15fedf7fbaaf00e4e5df0c955"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae33e28e15fedf7fbaaf00e4e5df0c955">&#9670;&#160;</a></span>SharedReal() <span class="overload">[2/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">SharedReal::SharedReal </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">int</a>&#160;</td>
+          <td class="paramname"><em>val</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Constructs a new <code><a class="el" href="classSharedReal.html" title="A class that provides shared ownership of an integer value.">SharedReal</a></code> object from an integer value. </p>
+<p>Initializes the object's internal shared pointer to manage a new integer with the value provided by the <code>val</code> parameter.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">val</td><td>The integer value to be stored in the shared pointer. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ab8c379ac3de82f88bef026e8faafaabd" name="ab8c379ac3de82f88bef026e8faafaabd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab8c379ac3de82f88bef026e8faafaabd">&#9670;&#160;</a></span>SharedReal() <span class="overload">[3/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">SharedReal::SharedReal </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="classSharedReal.html">SharedReal</a> &amp;&#160;</td>
+          <td class="paramname"><em>other</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Copy constructs a new <code><a class="el" href="classSharedReal.html" title="A class that provides shared ownership of an integer value.">SharedReal</a></code> object. </p>
+<p>Initializes the object by creating a new shared pointer that shares ownership of the integer managed by another <code><a class="el" href="classSharedReal.html" title="A class that provides shared ownership of an integer value.">SharedReal</a></code> object.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">other</td><td>The existing <code><a class="el" href="classSharedReal.html" title="A class that provides shared ownership of an integer value.">SharedReal</a></code> object to copy from. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="aaed684a4623305a32f7bc639407915ff" name="aaed684a4623305a32f7bc639407915ff"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aaed684a4623305a32f7bc639407915ff">&#9670;&#160;</a></span>SharedReal() <span class="overload">[4/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">SharedReal::SharedReal </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classSharedReal.html">SharedReal</a> &amp;&amp;&#160;</td>
+          <td class="paramname"><em>other</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Constructs a new <code><a class="el" href="classSharedReal.html" title="A class that provides shared ownership of an integer value.">SharedReal</a></code> object by moving resources. </p>
+<p>Transfers ownership of the shared integer from <code>other</code> to the new object. This is a non-throwing operation that is more efficient than a copy and is also known as a move constructor.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">other</td><td>The temporary <code><a class="el" href="classSharedReal.html" title="A class that provides shared ownership of an integer value.">SharedReal</a></code> object to move from. After this call, <code>other</code> will no longer own the resource. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<h2 class="groupheader">Member Function Documentation</h2>
+<a id="aa8f38a240ca8077f542a4a40feb5dfa5" name="aa8f38a240ca8077f542a4a40feb5dfa5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa8f38a240ca8077f542a4a40feb5dfa5">&#9670;&#160;</a></span>get()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">int</a> SharedReal::get </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Retrieves the integer value managed by the object. </p>
+<p>This is a getter function that returns a copy of the integer value. Since the function is <code>const</code>, it can be safely called on a constant instance of the class without modifying its state.</p>
+<dl class="section return"><dt>Returns</dt><dd>The integer value managed by the shared pointer. </dd></dl>
+
+</div>
+</div>
+<a id="a72fccf69775cf0ee72b7d030cf20f459" name="a72fccf69775cf0ee72b7d030cf20f459"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a72fccf69775cf0ee72b7d030cf20f459">&#9670;&#160;</a></span>operator int()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">SharedReal::operator <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">int</a> </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>User-defined conversion to <code>int</code>. </p>
+<p>This conversion operator allows the object to be implicitly converted to an <code>int</code>. The returned value is the integer managed by the object's internal shared pointer, which is retrieved by calling <code><a class="el" href="classSharedReal.html#aa8f38a240ca8077f542a4a40feb5dfa5" title="Retrieves the integer value managed by the object.">get()</a></code>.</p>
+<dl class="section return"><dt>Returns</dt><dd>The integer value held by the object. </dd></dl>
+
+</div>
+</div>
+<a id="aa887566e3319cb2ddeb38a90b0d826ae" name="aa887566e3319cb2ddeb38a90b0d826ae"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa887566e3319cb2ddeb38a90b0d826ae">&#9670;&#160;</a></span>operator!=() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a> SharedReal::operator!= </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">int</a> &amp;&#160;</td>
+          <td class="paramname"><em>other</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Overloads the inequality operator (<code>!=</code>) for an integer. </p>
+<p>Compares the integer value of the current object with an <code>int</code> for inequality. This is a non-mutating operation.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">other</td><td>The integer value to compare against. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd><code>true</code> if the values are not equal, <code>false</code> otherwise. </dd></dl>
+
+</div>
+</div>
+<a id="a4c79cdfa7cf3ae8f0f455567d4eea230" name="a4c79cdfa7cf3ae8f0f455567d4eea230"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4c79cdfa7cf3ae8f0f455567d4eea230">&#9670;&#160;</a></span>operator!=() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a> SharedReal::operator!= </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="classSharedReal.html">SharedReal</a> &amp;&#160;</td>
+          <td class="paramname"><em>other</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Overloads the inequality operator (<code>!=</code>). </p>
+<p>Compares the integer value of the current object with the integer value of <code>other</code> for inequality. This is a non-mutating operation.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">other</td><td>The <a class="el" href="classSharedReal.html" title="A class that provides shared ownership of an integer value.">SharedReal</a> object to compare against. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd><code>true</code> if the values are not equal, <code>false</code> otherwise. </dd></dl>
+
+</div>
+</div>
+<a id="a6fa65a1797de01a4ed3f1c17a297f03d" name="a6fa65a1797de01a4ed3f1c17a297f03d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6fa65a1797de01a4ed3f1c17a297f03d">&#9670;&#160;</a></span>operator*() <span class="overload">[1/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">int</a> SharedReal::operator* </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Overloads the dereference operator (<code>*</code>). </p>
+<p>Provides direct access to the integer value managed by the internal shared pointer. This function is <code>const</code> and provides a read-only view of the data.</p>
+<dl class="section return"><dt>Returns</dt><dd>The integer value held by the object. </dd></dl>
+
+</div>
+</div>
+<a id="a3734072fe7e23fd75032ed0415f1c512" name="a3734072fe7e23fd75032ed0415f1c512"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3734072fe7e23fd75032ed0415f1c512">&#9670;&#160;</a></span>operator*() <span class="overload">[2/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classSharedReal.html">SharedReal</a> SharedReal::operator* </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">int</a> &amp;&#160;</td>
+          <td class="paramname"><em>other</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Overloads the binary multiplication operator (<code>*</code>) for an integer. </p>
+<p>Multiplies the current object's value by an integer. This operation does not modify the current object; it returns a new <code><a class="el" href="classSharedReal.html" title="A class that provides shared ownership of an integer value.">SharedReal</a></code> object containing the product.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">other</td><td>The integer value to multiply the current object by. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A new <code><a class="el" href="classSharedReal.html" title="A class that provides shared ownership of an integer value.">SharedReal</a></code> object containing the product. </dd></dl>
+
+</div>
+</div>
+<a id="a913af863e85991b07c4dcf6737e3f66c" name="a913af863e85991b07c4dcf6737e3f66c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a913af863e85991b07c4dcf6737e3f66c">&#9670;&#160;</a></span>operator*() <span class="overload">[3/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classSharedReal.html">SharedReal</a> SharedReal::operator* </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="classSharedReal.html">SharedReal</a> &amp;&#160;</td>
+          <td class="paramname"><em>other</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Overloads the binary multiplication operator (<code>*</code>). </p>
+<p>Multiplies the integer value of the current object by the integer value of <code>other</code>. This operation does not modify either object; it returns a new <code><a class="el" href="classSharedReal.html" title="A class that provides shared ownership of an integer value.">SharedReal</a></code> object containing the product.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">other</td><td>The <code><a class="el" href="classSharedReal.html" title="A class that provides shared ownership of an integer value.">SharedReal</a></code> object to multiply by. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A new <code><a class="el" href="classSharedReal.html" title="A class that provides shared ownership of an integer value.">SharedReal</a></code> object containing the product of the two values. </dd></dl>
+
+</div>
+</div>
+<a id="a360d65ca4cebc25b0af0a358aa933ad1" name="a360d65ca4cebc25b0af0a358aa933ad1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a360d65ca4cebc25b0af0a358aa933ad1">&#9670;&#160;</a></span>operator*=() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classSharedReal.html">SharedReal</a> &amp; SharedReal::operator*= </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">int</a> &amp;&#160;</td>
+          <td class="paramname"><em>other</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Overloads the compound assignment operator (<code>*=</code>) for an integer. </p>
+<p>Multiplies the integer value of the current object by the integer value of <code>other</code>, modifying the object in place.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">other</td><td>The integer value to multiply the current object by. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A reference to the current object (<code>*this</code>) after the multiplication. </dd></dl>
+
+</div>
+</div>
+<a id="a2bef72075dbb22643acc3d5e0365e888" name="a2bef72075dbb22643acc3d5e0365e888"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2bef72075dbb22643acc3d5e0365e888">&#9670;&#160;</a></span>operator*=() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classSharedReal.html">SharedReal</a> &amp; SharedReal::operator*= </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="classSharedReal.html">SharedReal</a> &amp;&#160;</td>
+          <td class="paramname"><em>other</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Overloads the compound assignment operator (<code>*=</code>). </p>
+<p>Multiplies the integer value of the current object by the value of <code>other</code>, modifying the object in place.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">other</td><td>The <a class="el" href="classSharedReal.html" title="A class that provides shared ownership of an integer value.">SharedReal</a> object to multiply by. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A reference to the current object (<code>*this</code>) after the multiplication. </dd></dl>
+
+</div>
+</div>
+<a id="ae950bf60d77ada0bff9080f2bee9d3b5" name="ae950bf60d77ada0bff9080f2bee9d3b5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae950bf60d77ada0bff9080f2bee9d3b5">&#9670;&#160;</a></span>operator+() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classSharedReal.html">SharedReal</a> SharedReal::operator+ </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">int</a> &amp;&#160;</td>
+          <td class="paramname"><em>other</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Overloads the binary addition operator (<code>+</code>) for an integer. </p>
+<p>Adds an integer value to the current object's value. This operation does not modify the current object; it returns a new <code><a class="el" href="classSharedReal.html" title="A class that provides shared ownership of an integer value.">SharedReal</a></code> object containing the sum.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">other</td><td>The integer value to add to the current object. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A new <code><a class="el" href="classSharedReal.html" title="A class that provides shared ownership of an integer value.">SharedReal</a></code> object containing the sum. </dd></dl>
+
+</div>
+</div>
+<a id="a0a8dec1541c1ff8cd6ee6bc3b4fed0db" name="a0a8dec1541c1ff8cd6ee6bc3b4fed0db"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0a8dec1541c1ff8cd6ee6bc3b4fed0db">&#9670;&#160;</a></span>operator+() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classSharedReal.html">SharedReal</a> SharedReal::operator+ </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="classSharedReal.html">SharedReal</a> &amp;&#160;</td>
+          <td class="paramname"><em>other</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Overloads the binary addition operator (<code>+</code>). </p>
+<p>Adds the integer value of the current object to the integer value of <code>other</code>. This operation does not modify either object; it returns a new <code><a class="el" href="classSharedReal.html" title="A class that provides shared ownership of an integer value.">SharedReal</a></code> object containing the sum.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">other</td><td>The <code><a class="el" href="classSharedReal.html" title="A class that provides shared ownership of an integer value.">SharedReal</a></code> object to add to the current object. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A new <code><a class="el" href="classSharedReal.html" title="A class that provides shared ownership of an integer value.">SharedReal</a></code> object containing the sum of the two values. </dd></dl>
+
+</div>
+</div>
+<a id="a97962ea3a0b5e52b1d5b8bf7939a3d50" name="a97962ea3a0b5e52b1d5b8bf7939a3d50"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a97962ea3a0b5e52b1d5b8bf7939a3d50">&#9670;&#160;</a></span>operator++() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classSharedReal.html">SharedReal</a> &amp; SharedReal::operator++ </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Overloads the prefix increment operator (<code>++</code>). </p>
+<p>Increments the integer value managed by the shared pointer. As a prefix operator, it increments the value <em>before</em> returning the result.</p>
+<dl class="section return"><dt>Returns</dt><dd>A reference to the current object (<code>*this</code>) after the increment has occurred. </dd></dl>
+
+</div>
+</div>
+<a id="a5489c1d8d3128671bc89b685a9611254" name="a5489c1d8d3128671bc89b685a9611254"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5489c1d8d3128671bc89b685a9611254">&#9670;&#160;</a></span>operator++() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classSharedReal.html">SharedReal</a> SharedReal::operator++ </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">int</a>&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Overloads the postfix increment operator. </p>
+<p>This is a postfix operation. It first creates a copy of the object's current state, then increments the underlying integer value, and finally returns the temporary copy, which holds the original value. A dummy parameter used by the compiler to distinguish this operator from the prefix version. </p><dl class="section return"><dt>Returns</dt><dd>A copy of the object's state <em>before</em> the increment occurred. </dd></dl>
+
+</div>
+</div>
+<a id="a1e234a5b453ad971f60065437915251a" name="a1e234a5b453ad971f60065437915251a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1e234a5b453ad971f60065437915251a">&#9670;&#160;</a></span>operator+=() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classSharedReal.html">SharedReal</a> &amp; SharedReal::operator+= </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">int</a> &amp;&#160;</td>
+          <td class="paramname"><em>other</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Overloads the compound assignment operator (<code>+=</code>) for an integer. </p>
+<p>Adds an integer value to the current object's value, modifying the object in place.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">other</td><td>The integer value to add to the current object. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A reference to the current object (<code>*this</code>) after the addition. </dd></dl>
+
+</div>
+</div>
+<a id="a67a9b97cee17f1240b6b2b99d10c68cf" name="a67a9b97cee17f1240b6b2b99d10c68cf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a67a9b97cee17f1240b6b2b99d10c68cf">&#9670;&#160;</a></span>operator+=() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classSharedReal.html">SharedReal</a> &amp; SharedReal::operator+= </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="classSharedReal.html">SharedReal</a> &amp;&#160;</td>
+          <td class="paramname"><em>other</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Overloads the compound assignment operator (<code>+=</code>). </p>
+<p>Adds the integer value of <code>other</code> to the current object's value, modifying the object in place.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">other</td><td>The <a class="el" href="classSharedReal.html" title="A class that provides shared ownership of an integer value.">SharedReal</a> object to add. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A reference to the current object (<code>*this</code>) after the addition. </dd></dl>
+
+</div>
+</div>
+<a id="a71348415f445d9a34044568fa802e3c9" name="a71348415f445d9a34044568fa802e3c9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a71348415f445d9a34044568fa802e3c9">&#9670;&#160;</a></span>operator-() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classSharedReal.html">SharedReal</a> SharedReal::operator- </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">int</a> &amp;&#160;</td>
+          <td class="paramname"><em>other</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Overloads the binary subtraction operator (<code>-</code>) for an integer. </p>
+<p>Subtracts an integer value from the current object's value. This operation does not modify the current object; it returns a new <code><a class="el" href="classSharedReal.html" title="A class that provides shared ownership of an integer value.">SharedReal</a></code> object containing the result.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">other</td><td>The integer value to subtract from the current object. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A new <code><a class="el" href="classSharedReal.html" title="A class that provides shared ownership of an integer value.">SharedReal</a></code> object containing the result. </dd></dl>
+
+</div>
+</div>
+<a id="a419f17ccda90b09be2ed6cafab81eeaa" name="a419f17ccda90b09be2ed6cafab81eeaa"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a419f17ccda90b09be2ed6cafab81eeaa">&#9670;&#160;</a></span>operator-() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classSharedReal.html">SharedReal</a> SharedReal::operator- </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="classSharedReal.html">SharedReal</a> &amp;&#160;</td>
+          <td class="paramname"><em>other</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Overloads the binary subtraction operator (<code>-</code>). </p>
+<p>Subtracts the integer value of <code>other</code> from the current object's value. This operation does not modify either object; it returns a new <code><a class="el" href="classSharedReal.html" title="A class that provides shared ownership of an integer value.">SharedReal</a></code> object containing the result.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">other</td><td>The <code><a class="el" href="classSharedReal.html" title="A class that provides shared ownership of an integer value.">SharedReal</a></code> object to subtract from the current object. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A new <code><a class="el" href="classSharedReal.html" title="A class that provides shared ownership of an integer value.">SharedReal</a></code> object containing the result of the subtraction. </dd></dl>
+
+</div>
+</div>
+<a id="a7553bb2dac690dbca45854a99ceb71c2" name="a7553bb2dac690dbca45854a99ceb71c2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7553bb2dac690dbca45854a99ceb71c2">&#9670;&#160;</a></span>operator--() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classSharedReal.html">SharedReal</a> &amp; SharedReal::operator-- </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Overloads the prefix decrement operator (<code>--</code>). </p>
+<p>Decrements the integer value managed by the shared pointer. As a prefix operator, it decrements the value <em>before</em> returning the result.</p>
+<dl class="section return"><dt>Returns</dt><dd>A reference to the current object (<code>*this</code>) after the decrement has occurred. </dd></dl>
+
+</div>
+</div>
+<a id="acd99844ccd200971d9fbbc3ebc04c95b" name="acd99844ccd200971d9fbbc3ebc04c95b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acd99844ccd200971d9fbbc3ebc04c95b">&#9670;&#160;</a></span>operator--() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classSharedReal.html">SharedReal</a> SharedReal::operator-- </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">int</a>&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Overloads the postfix decrement operator. </p>
+<p>This is a postfix operation. It first creates a copy of the object's current state, then decrements the underlying integer value, and finally returns the temporary copy, which holds the original value. A dummy parameter used by the compiler to distinguish this operator from the prefix version. </p><dl class="section return"><dt>Returns</dt><dd>A copy of the object's state <em>before</em> the decrement occurred. </dd></dl>
+
+</div>
+</div>
+<a id="a8afae7923c2c088fc6546769430e70a8" name="a8afae7923c2c088fc6546769430e70a8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8afae7923c2c088fc6546769430e70a8">&#9670;&#160;</a></span>operator-=() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classSharedReal.html">SharedReal</a> &amp; SharedReal::operator-= </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">int</a> &amp;&#160;</td>
+          <td class="paramname"><em>other</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Overloads the compound assignment operator (<code>-=</code>) for an integer. </p>
+<p>Subtracts an integer value from the current object's value, modifying the object in place.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">other</td><td>The integer value to subtract from the current object. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A reference to the current object (<code>*this</code>) after the subtraction. </dd></dl>
+
+</div>
+</div>
+<a id="a5cff409c7cbcaa04c670f17d5f64eb8b" name="a5cff409c7cbcaa04c670f17d5f64eb8b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5cff409c7cbcaa04c670f17d5f64eb8b">&#9670;&#160;</a></span>operator-=() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classSharedReal.html">SharedReal</a> &amp; SharedReal::operator-= </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="classSharedReal.html">SharedReal</a> &amp;&#160;</td>
+          <td class="paramname"><em>other</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Overloads the compound assignment operator (<code>-=</code>). </p>
+<p>Subtracts the integer value of <code>other</code> from the current object's value, modifying the object in place.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">other</td><td>The <a class="el" href="classSharedReal.html" title="A class that provides shared ownership of an integer value.">SharedReal</a> object to subtract. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A reference to the current object (<code>*this</code>) after the subtraction. </dd></dl>
+
+</div>
+</div>
+<a id="a231cc4a3697a5dc74ff14013798cd376" name="a231cc4a3697a5dc74ff14013798cd376"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a231cc4a3697a5dc74ff14013798cd376">&#9670;&#160;</a></span>operator-&gt;() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">int</a> * SharedReal::operator-&gt; </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Overloads the member access operator (<code>-&gt;</code>). </p>
+<p>This function provides a way to access the underlying integer value by returning a raw pointer to it. It returns the result of the <code>std::shared_ptr::get()</code> method.</p>
+<dl class="section return"><dt>Returns</dt><dd>A raw pointer (<code>int*</code>) to the integer managed by the shared pointer. </dd></dl>
+
+</div>
+</div>
+<a id="a651cacebfc417faba7b4da1c94dd515c" name="a651cacebfc417faba7b4da1c94dd515c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a651cacebfc417faba7b4da1c94dd515c">&#9670;&#160;</a></span>operator-&gt;() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">int</a> * SharedReal::operator-&gt; </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Overloads the member access operator (<code>-&gt;</code>) for const objects. </p>
+<p>This function provides a way to get a read-only raw pointer to the underlying integer. The <code>const</code> return type prevents modification of the integer value through this pointer. The function itself is also <code>const</code>, ensuring it can be called on <code>const</code> instances of the class.</p>
+<dl class="section return"><dt>Returns</dt><dd>A <code>const</code> raw pointer to the integer managed by the shared pointer. </dd></dl>
+
+</div>
+</div>
+<a id="a953b4668cc6eabadb5db92c294fa8f8e" name="a953b4668cc6eabadb5db92c294fa8f8e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a953b4668cc6eabadb5db92c294fa8f8e">&#9670;&#160;</a></span>operator/() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classSharedReal.html">SharedReal</a> SharedReal::operator/ </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">int</a> &amp;&#160;</td>
+          <td class="paramname"><em>other</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Overloads the binary division operator (<code>/</code>) for an integer. </p>
+<p>Divides the current object's value by an integer. This operation does not modify the current object; it returns a new <code><a class="el" href="classSharedReal.html" title="A class that provides shared ownership of an integer value.">SharedReal</a></code> object containing the quotient.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">other</td><td>The integer value to divide the current object by. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A new <code><a class="el" href="classSharedReal.html" title="A class that provides shared ownership of an integer value.">SharedReal</a></code> object containing the quotient. </dd></dl>
+
+</div>
+</div>
+<a id="a7aaf5a8c9208306d6d03f7be91064f4f" name="a7aaf5a8c9208306d6d03f7be91064f4f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7aaf5a8c9208306d6d03f7be91064f4f">&#9670;&#160;</a></span>operator/() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classSharedReal.html">SharedReal</a> SharedReal::operator/ </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="classSharedReal.html">SharedReal</a> &amp;&#160;</td>
+          <td class="paramname"><em>other</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Overloads the binary division operator (<code>/</code>). </p>
+<p>Divides the integer value of the current object by the integer value of <code>other</code>. This operation does not modify either object; it returns a new <code><a class="el" href="classSharedReal.html" title="A class that provides shared ownership of an integer value.">SharedReal</a></code> object containing the quotient.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">other</td><td>The <code><a class="el" href="classSharedReal.html" title="A class that provides shared ownership of an integer value.">SharedReal</a></code> object to divide by. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A new <code><a class="el" href="classSharedReal.html" title="A class that provides shared ownership of an integer value.">SharedReal</a></code> object containing the quotient of the two values. </dd></dl>
+
+</div>
+</div>
+<a id="a25b34654e8aa2d3c384aebbcfd2a7f7b" name="a25b34654e8aa2d3c384aebbcfd2a7f7b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a25b34654e8aa2d3c384aebbcfd2a7f7b">&#9670;&#160;</a></span>operator/=() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classSharedReal.html">SharedReal</a> &amp; SharedReal::operator/= </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">int</a> &amp;&#160;</td>
+          <td class="paramname"><em>other</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Overloads the compound assignment operator (<code>/=</code>) for an integer. </p>
+<p>Divides the integer value of the current object by the integer value of <code>other</code>, modifying the object in place.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">other</td><td>The integer value to divide the current object by. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A reference to the current object (<code>*this</code>) after the division. </dd></dl>
+
+</div>
+</div>
+<a id="a8383ec17320cf6ee8a97de2acc369351" name="a8383ec17320cf6ee8a97de2acc369351"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8383ec17320cf6ee8a97de2acc369351">&#9670;&#160;</a></span>operator/=() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classSharedReal.html">SharedReal</a> &amp; SharedReal::operator/= </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="classSharedReal.html">SharedReal</a> &amp;&#160;</td>
+          <td class="paramname"><em>other</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Overloads the compound assignment operator (<code>/=</code>). </p>
+<p>Divides the integer value of the current object by the value of <code>other</code>, modifying the object in place.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">other</td><td>The <a class="el" href="classSharedReal.html" title="A class that provides shared ownership of an integer value.">SharedReal</a> object to divide by. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A reference to the current object (<code>*this</code>) after the division. </dd></dl>
+
+</div>
+</div>
+<a id="ac2e94071b205420167310485afad749d" name="ac2e94071b205420167310485afad749d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac2e94071b205420167310485afad749d">&#9670;&#160;</a></span>operator&lt;() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a> SharedReal::operator&lt; </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">int</a> &amp;&#160;</td>
+          <td class="paramname"><em>other</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Overloads the less-than operator (<code>&lt;</code>) for an integer. </p>
+<p>Compares the integer value of the current object with an <code>int</code>. This is a non-mutating operation.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">other</td><td>The integer value to compare against. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd><code>true</code> if the current object's value is less than <code>other</code>, <code>false</code> otherwise. </dd></dl>
+
+</div>
+</div>
+<a id="afcce29f9d176c19bed365f8ff60574ca" name="afcce29f9d176c19bed365f8ff60574ca"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afcce29f9d176c19bed365f8ff60574ca">&#9670;&#160;</a></span>operator&lt;() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a> SharedReal::operator&lt; </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="classSharedReal.html">SharedReal</a> &amp;&#160;</td>
+          <td class="paramname"><em>other</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Overloads the less-than operator (<code>&lt;</code>). </p>
+<p>Compares the integer value of the current object with the integer value of <code>other</code>. This is a non-mutating operation.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">other</td><td>The <a class="el" href="classSharedReal.html" title="A class that provides shared ownership of an integer value.">SharedReal</a> object to compare against. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd><code>true</code> if the current object's value is less than <code>other</code>'s value, <code>false</code> otherwise. </dd></dl>
+
+</div>
+</div>
+<a id="abfeb66418f6cd9d47b428e8616980a5e" name="abfeb66418f6cd9d47b428e8616980a5e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abfeb66418f6cd9d47b428e8616980a5e">&#9670;&#160;</a></span>operator&lt;=() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a> SharedReal::operator&lt;= </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">int</a> &amp;&#160;</td>
+          <td class="paramname"><em>other</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Overloads the less-than-or-equal-to operator (<code>&lt;=</code>) for an integer. </p>
+<p>Compares the integer value of the current object with an <code>int</code>. This is a non-mutating operation.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">other</td><td>The integer value to compare against. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd><code>true</code> if the current object's value is less than or equal to <code>other</code>, <code>false</code> otherwise. </dd></dl>
+
+</div>
+</div>
+<a id="a52ce6bd83814f074b9e352ef15720e46" name="a52ce6bd83814f074b9e352ef15720e46"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a52ce6bd83814f074b9e352ef15720e46">&#9670;&#160;</a></span>operator&lt;=() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a> SharedReal::operator&lt;= </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="classSharedReal.html">SharedReal</a> &amp;&#160;</td>
+          <td class="paramname"><em>other</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Overloads the less-than-or-equal-to operator (<code>&lt;=</code>). </p>
+<p>Compares the integer value of the current object with the integer value of <code>other</code>. This is a non-mutating operation.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">other</td><td>The <a class="el" href="classSharedReal.html" title="A class that provides shared ownership of an integer value.">SharedReal</a> object to compare against. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd><code>true</code> if the current object's value is less than or equal to <code>other</code>'s value, <code>false</code> otherwise. </dd></dl>
+
+</div>
+</div>
+<a id="a097afbbcb6aa192d9915208eb7b30847" name="a097afbbcb6aa192d9915208eb7b30847"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a097afbbcb6aa192d9915208eb7b30847">&#9670;&#160;</a></span>operator=() <span class="overload">[1/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classSharedReal.html">SharedReal</a> &amp; SharedReal::operator= </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">int</a> &amp;&#160;</td>
+          <td class="paramname"><em>other</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Overloaded assignment operator for an integer value. </p>
+<p>Assigns a new integer value to the underlying shared integer, modifying the object in place.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">other</td><td>The integer value to assign. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A reference to the current object (<code>*this</code>) to allow for chained assignments. </dd></dl>
+
+</div>
+</div>
+<a id="a99fba932a18bbbae9636435f7a709ba6" name="a99fba932a18bbbae9636435f7a709ba6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a99fba932a18bbbae9636435f7a709ba6">&#9670;&#160;</a></span>operator=() <span class="overload">[2/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classSharedReal.html">SharedReal</a> &amp; SharedReal::operator= </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="classSharedReal.html">SharedReal</a> &amp;&#160;</td>
+          <td class="paramname"><em>other</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Overloaded copy assignment operator. </p>
+<p>Assigns the shared state of <code>other</code> to the current object. If the objects are not the same, the current object will release its old resource and share ownership of the integer value managed by <code>other</code>.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">other</td><td>The <code><a class="el" href="classSharedReal.html" title="A class that provides shared ownership of an integer value.">SharedReal</a></code> object to assign from. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A reference to the current object (<code>*this</code>) to allow for chained assignments. </dd></dl>
+
+</div>
+</div>
+<a id="a572d3a05dfc9f7e33223968ba1d14843" name="a572d3a05dfc9f7e33223968ba1d14843"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a572d3a05dfc9f7e33223968ba1d14843">&#9670;&#160;</a></span>operator=() <span class="overload">[3/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classSharedReal.html">SharedReal</a> &amp; SharedReal::operator= </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classSharedReal.html">SharedReal</a> &amp;&amp;&#160;</td>
+          <td class="paramname"><em>other</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Overloaded move assignment operator. </p>
+<p>Moves the shared state from <code>other</code> to the current object, releasing any resources the current object might have held. This is a non-throwing and more efficient operation than a copy assignment and is also known as a move assignment operator.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">other</td><td>The temporary <code><a class="el" href="classSharedReal.html" title="A class that provides shared ownership of an integer value.">SharedReal</a></code> object to move from. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A reference to the current object (<code>*this</code>). </dd></dl>
+
+</div>
+</div>
+<a id="a32faa91fe7410cce60e0c5e8c5c50398" name="a32faa91fe7410cce60e0c5e8c5c50398"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a32faa91fe7410cce60e0c5e8c5c50398">&#9670;&#160;</a></span>operator==() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a> SharedReal::operator== </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">int</a> &amp;&#160;</td>
+          <td class="paramname"><em>other</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Overloads the equality operator (<code>==</code>) for an integer value. </p>
+<p>Compares the integer value of the current object with an <code>int</code> for equality. This is a non-mutating operation.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">other</td><td>The integer value to compare against. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd><code>true</code> if the values are equal, <code>false</code> otherwise. </dd></dl>
+
+</div>
+</div>
+<a id="ad85f22c1c7876f5a4f0c48d11b9d9c5c" name="ad85f22c1c7876f5a4f0c48d11b9d9c5c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad85f22c1c7876f5a4f0c48d11b9d9c5c">&#9670;&#160;</a></span>operator==() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a> SharedReal::operator== </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="classSharedReal.html">SharedReal</a> &amp;&#160;</td>
+          <td class="paramname"><em>other</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Overloads the equality operator (<code>==</code>). </p>
+<p>Compares the integer value of the current object with the integer value of <code>other</code> for equality. This is a non-mutating operation.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">other</td><td>The <a class="el" href="classSharedReal.html" title="A class that provides shared ownership of an integer value.">SharedReal</a> object to compare against. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd><code>true</code> if the values are equal, <code>false</code> otherwise. </dd></dl>
+
+</div>
+</div>
+<a id="abc4e7f7d9df79ec003130a4822f6919e" name="abc4e7f7d9df79ec003130a4822f6919e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abc4e7f7d9df79ec003130a4822f6919e">&#9670;&#160;</a></span>operator&gt;() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a> SharedReal::operator&gt; </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">int</a> &amp;&#160;</td>
+          <td class="paramname"><em>other</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Overloads the greater-than operator (<code>&gt;</code>) for an integer. </p>
+<p>Compares the integer value of the current object with an <code>int</code>. This is a non-mutating operation.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">other</td><td>The integer value to compare against. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd><code>true</code> if the current object's value is greater than <code>other</code>, <code>false</code> otherwise. </dd></dl>
+
+</div>
+</div>
+<a id="a6b93223dfba022bb5ed8249ff5eb18bb" name="a6b93223dfba022bb5ed8249ff5eb18bb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6b93223dfba022bb5ed8249ff5eb18bb">&#9670;&#160;</a></span>operator&gt;() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a> SharedReal::operator&gt; </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="classSharedReal.html">SharedReal</a> &amp;&#160;</td>
+          <td class="paramname"><em>other</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Overloads the greater-than operator (<code>&gt;</code>). </p>
+<p>Compares the integer value of the current object with the integer value of <code>other</code>. This is a non-mutating operation.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">other</td><td>The <a class="el" href="classSharedReal.html" title="A class that provides shared ownership of an integer value.">SharedReal</a> object to compare against. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd><code>true</code> if the current object's value is greater than <code>other</code>'s value, <code>false</code> otherwise. </dd></dl>
+
+</div>
+</div>
+<a id="a1b092b6a5a59dc63e491a59a1a66a00c" name="a1b092b6a5a59dc63e491a59a1a66a00c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1b092b6a5a59dc63e491a59a1a66a00c">&#9670;&#160;</a></span>operator&gt;=() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a> SharedReal::operator&gt;= </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">int</a> &amp;&#160;</td>
+          <td class="paramname"><em>other</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Overloads the greater-than-or-equal-to operator (<code>&gt;=</code>) for an integer. </p>
+<p>Compares the integer value of the current object with an <code>int</code>. This is a non-mutating operation.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">other</td><td>The integer value to compare against. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd><code>true</code> if the current object's value is greater than or equal to <code>other</code>, <code>false</code> otherwise. </dd></dl>
+
+</div>
+</div>
+<a id="a169d30289a6a210fab83b48750bc3207" name="a169d30289a6a210fab83b48750bc3207"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a169d30289a6a210fab83b48750bc3207">&#9670;&#160;</a></span>operator&gt;=() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a> SharedReal::operator&gt;= </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="classSharedReal.html">SharedReal</a> &amp;&#160;</td>
+          <td class="paramname"><em>other</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Overloads the greater-than-or-equal-to operator (<code>&gt;=</code>). </p>
+<p>Compares the integer value of the current object with the integer value of <code>other</code>. This is a non-mutating operation.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">other</td><td>The <a class="el" href="classSharedReal.html" title="A class that provides shared ownership of an integer value.">SharedReal</a> object to compare against. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd><code>true</code> if the current object's value is greater than or equal to <code>other</code>'s value, <code>false</code> otherwise. </dd></dl>
+
+</div>
+</div>
+<a id="a21e68e76bc23a5e1f5989a94553e8c8c" name="a21e68e76bc23a5e1f5989a94553e8c8c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a21e68e76bc23a5e1f5989a94553e8c8c">&#9670;&#160;</a></span>set()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a> SharedReal::set </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">int</a>&#160;</td>
+          <td class="paramname"><em>val</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Sets the integer value of the object. </p>
+<p>Assigns a new integer value to the underlying shared integer.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">val</td><td>The integer value to set. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<h2 class="groupheader">Friends And Related Symbol Documentation</h2>
+<a id="a848880871389d5f0ea5ed14467f8a7c1" name="a848880871389d5f0ea5ed14467f8a7c1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a848880871389d5f0ea5ed14467f8a7c1">&#9670;&#160;</a></span>operator&lt;&lt;</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::ostream &amp; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">operator</a>&lt;&lt; </td>
+          <td>(</td>
+          <td class="paramtype">std::ostream &amp;&#160;</td>
+          <td class="paramname"><em>os</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="classSharedReal.html">SharedReal</a> &amp;&#160;</td>
+          <td class="paramname"><em>sp</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">friend</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Overloads the stream insertion operator (<code>&lt;&lt;</code>) for <a class="el" href="classSharedReal.html" title="A class that provides shared ownership of an integer value.">SharedReal</a>. </p>
+<p>Provides a way to print the integer value of a <a class="el" href="classSharedReal.html" title="A class that provides shared ownership of an integer value.">SharedReal</a> object to an output stream.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">os</td><td>The output stream to write to. </td></tr>
+    <tr><td class="paramname">sp</td><td>The <a class="el" href="classSharedReal.html" title="A class that provides shared ownership of an integer value.">SharedReal</a> object to print. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A reference to the output stream, allowing for chained insertions. </dd></dl>
+
+</div>
+</div>
+<hr/>The documentation for this class was generated from the following file:<ul>
+<li>inst/include/interface/rcpp/rcpp_objects/<a class="el" href="rcpp__shared__primitive_8hpp_source.html">rcpp_shared_primitive.hpp</a></li>
+</ul>
+</div><!-- contents -->
+</div><!-- doc-content -->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a class="el" href="classSharedReal.html">SharedReal</a></li>
+    <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.8 </li>
+  </ul>
+</div>
+</body>
+</html>

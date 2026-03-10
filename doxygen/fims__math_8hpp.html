@@ -1,0 +1,732 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" data-bs-theme="auto">
+<head>
+    <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=9"/>
+    <meta name="generator" content="Doxygen 1.9.8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>FIMS</title><link href="tabs.css" rel="stylesheet" type="text/css"/>
+    <link rel="icon" type="image/png" href="https://noaa-fims.github.io/images/FIMS_hexlogo.png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+    <link href="https://noaa-fims.github.io/site_libs/bootstrap/bootstrap-5477dd34fdf9f443df58de9070e2fbd7.min.css" rel="stylesheet">
+    <link href="https://noaa-fims.github.io/site_libs/bootstrap/bootstrap-dark-429bd3fc0b6810d1347fc340b0896c35.min.css" rel="stylesheet" media="(prefers-color-scheme: dark)">
+    <script type="text/javascript" src="jquery.js"></script>
+    <script type="text/javascript" src="dynsections.js"></script>
+    <link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+    <link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+  $(document).ready(function() { init_search(); });
+/* @license-end */
+</script>
+    <script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  extensions: ["tex2jax.js"],
+  jax: ["input/TeX","output/HTML-CSS"],
+});
+</script>
+<script type="text/javascript" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js"></script>
+    <link href="doxygen.css" rel="stylesheet" type="text/css" />
+    <link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
+<link href="custom.css" rel="stylesheet" type="text/css"/>
+    <script src="https://noaa-fims.github.io/site_libs/quarto-nav/quarto-nav.js"></script>
+    <script src="https://noaa-fims.github.io/site_libs/bootstrap/bootstrap.min.js"></script>
+    <script src="https://noaa-fims.github.io/site_libs/quarto-html/quarto.js" type="module"></script>
+</head>
+<body>
+<div id="top">
+    <div id="titlearea">
+        <table cellspacing="0" cellpadding="0">
+            <tbody>
+            <tr style="height: 70px;">
+                <td id="projectlogo"><img alt="Logo" src="FIMS_logo3.png"/></td>
+                <td id="projectalign" style="padding-left: 0.5em;">
+                    <div id="projectname">FIMS
+                        &#160;<span id="projectnumber">v0.8.1</span></div>
+                    <div id="projectbrief"></div></td>
+                <td style="padding-left: 0.5em;">
+                    <div id="projectbrief"></div>
+                </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <nav class="navbar navbar-expand-lg " data-bs-theme="auto">
+      <div class="navbar-container container-fluid">
+        <div class="navbar-brand-container mx-auto">
+          <a href="https://noaa-fims.github.io/" class="navbar-brand navbar-brand-logo"></a>
+          <a class="navbar-brand" href="https://noaa-fims.github.io/">
+          </a>
+        </div>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+          <ul class="navbar-nav navbar-nav-scroll ms-auto">
+           <li class="nav-item dropdown">
+            <button class="nav-link dropdown-toggle" type="button" id="dropdown-reference" data-bs-toggle="dropdown"
+                    aria-expanded="false" aria-haspopup="true">reference</button>
+            <ul class="dropdown-menu" aria-labelledby="dropdown-reference">
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/reference/index.html">r/roxygen</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/doxygen/index.html">c++/doxygen</a></li>
+            </ul>
+           </li>
+            <li class="nav-item dropdown">
+            <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown"
+                    aria-expanded="false" aria-haspopup="true">articles</button>
+            <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
+              <li><h6 class="dropdown-header" data-toc-skip>intro to fims</h6></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/fims-demo.html">introducing the fisheries integrated modeling system (fims)</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/fims-logging.html">Introducing the fims logging system</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/fims-user-setup-guide.html">fims user setup guide</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/fims-demo-projections.html">simple projections using fims</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><h6 class="dropdown-header" data-toc-skip>developer</h6></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/fims-path-maturity.html">fims path - maturity</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><h6 class="dropdown-header" data-toc-skip>c++ training</h6></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/training-intro-cpp.html">intro to c++</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/training-intro-rcpp.html">intro to rcpp</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><h6 class="dropdown-header" data-toc-skip>research and development</h6></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/RD-re-sparsity.html">re sparsity</a></li>
+            </ul>
+          </li>
+            <li class="nav-item dropdown">
+              <button class="nav-link dropdown-toggle" type="button" id="dropdown-news" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">news</button>
+              <ul class="dropdown-menu" aria-labelledby="dropdown-news">
+                <li><h6 class="dropdown-header" data-toc-skip="">Releases</h6></li>
+                <li><a class="external-link dropdown-item" href="https://github.com/NOAA-FIMS/FIMS/releases/latest">latest release</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/news/index.html">changelog</a></li>
+              </ul>
+            </li>
+          <li class="nav-item dropdown">
+            <button class="nav-link dropdown-toggle" type="button" id="dropdown-reports" data-bs-toggle="dropdown"
+                    aria-expanded="false" aria-haspopup="true">reports</button>
+            <ul class="dropdown-menu" aria-labelledby="dropdown-reports">
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/coverage/coverage.html">coverage</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/coverage/codecoverage_explanation.html">coverage explained</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/testdown/index.html">testdown</a></li>
+            </ul>
+          </li>
+          <ul class="navbar-nav">
+            <li class="nav-item"><a class="external-link nav-link" href="https://noaa-fims.github.io/">fims website</a></li>
+            <li class="nav-item">
+              <a class="external-link nav-link" href="https://github.com/noaa-fims/fims/" aria-label="GitHub repository for FIMS">
+                <span class="fa fa-brands fa-github fa-lg"></span>
+              </a>
+            </li>
+            <!-- Keep the input; pkgdown’s autocomplete wrapper won’t exist in Doxygen -->
+            <li class="nav-item">
+              <form class="form-inline" role="search" onsubmit="return false;">
+                <input class="form-control" type="search" name="search-input" id="search-input"
+                      autocomplete="off" aria-label="Search site" placeholder="Search for">
+              </form>
+            </li>
+          </ul>
+      </div>
+    </div>
+  </nav>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  // Only on the cpp_directory_structure page!
+  document.querySelectorAll('.toc a').forEach(function(link) {
+    if (link.href && link.href.indexOf(location.pathname) !== -1) {
+      link.href = link.hash; // Just use the fragment
+    }
+  });
+});
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  function updateTocActive() {
+    var links = Array.from(document.querySelectorAll('.toc a'));
+    var anchors = links.map(link => document.getElementById(link.getAttribute('href').replace('#', '')));
+    var scrollTop = window.scrollY || document.documentElement.scrollTop;
+    var offset = 150; // Match your scroll-margin-top
+    let currentActive = -1;
+    for (let i = anchors.length - 1; i >= 0; i--) {
+      if (anchors[i] && (anchors[i].getBoundingClientRect().top + window.scrollY - offset) <= scrollTop) {
+        currentActive = i;
+        break;
+      }
+    }
+    links.forEach((link, i) => {
+      link.classList.remove('active', 'aboveActive');
+      if (i === currentActive) {
+        link.classList.add('active');
+      } else if (i < currentActive) {
+        link.classList.add('aboveActive');
+      }
+    });
+  }
+  window.addEventListener('scroll', updateTocActive);
+  window.addEventListener('hashchange', updateTocActive);
+  updateTocActive();
+});
+</script>
+    <!-- end header part -->
+<!-- Generated by Doxygen 1.9.8 -->
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+/* @license-end */
+</script>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(document).ready(function(){initNavTree('fims__math_8hpp.html',''); initResizable(); });
+/* @license-end */
+</script>
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">Loading...</div>
+<div class="SRStatus" id="Searching">Searching...</div>
+<div class="SRStatus" id="NoMatches">No Matches</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="summary">
+<a href="#func-members">Functions</a>  </div>
+  <div class="headertitle"><div class="title">fims_math.hpp File Reference</div></div>
+</div><!--header-->
+<div class="contents">
+
+<p>A collection of mathematical functions used in FIMS.  
+<a href="#details">More...</a></p>
+<div class="textblock"><code>#include &lt;cmath&gt;</code><br />
+<code>#include &lt;random&gt;</code><br />
+<code>#include &lt;sstream&gt;</code><br />
+<code>#include &quot;<a class="el" href="interface_8hpp_source.html">../interface/interface.hpp</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="fims__vector_8hpp_source.html">fims_vector.hpp</a>&quot;</code><br />
+</div>
+<p><a href="fims__math_8hpp_source.html">Go to the source code of this file.</a></p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
+Functions</h2></td></tr>
+<tr class="memitem:ae8d003754148800ba87fbf228bc7d062" id="r_ae8d003754148800ba87fbf228bc7d062"><td class="memTemplParams" colspan="2">template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">class</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </td></tr>
+<tr class="memitem:ae8d003754148800ba87fbf228bc7d062"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="fims__math_8hpp.html#ae8d003754148800ba87fbf228bc7d062">fims_math::logistic</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &amp;inflection_point, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &amp;slope, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &amp;x)</td></tr>
+<tr class="memdesc:ae8d003754148800ba87fbf228bc7d062"><td class="mdescLeft">&#160;</td><td class="mdescRight">The general logistic function.  <br /></td></tr>
+<tr class="separator:ae8d003754148800ba87fbf228bc7d062"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0fef2c2ffd54b4d023d194653ebeb1f0" id="r_a0fef2c2ffd54b4d023d194653ebeb1f0"><td class="memTemplParams" colspan="2">template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">class</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </td></tr>
+<tr class="memitem:a0fef2c2ffd54b4d023d194653ebeb1f0"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="fims__math_8hpp.html#a0fef2c2ffd54b4d023d194653ebeb1f0">fims_math::logit</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">a</a>, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">b</a>, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &amp;x)</td></tr>
+<tr class="memdesc:a0fef2c2ffd54b4d023d194653ebeb1f0"><td class="mdescLeft">&#160;</td><td class="mdescRight">A logit function for bounding of parameters.  <br /></td></tr>
+<tr class="separator:a0fef2c2ffd54b4d023d194653ebeb1f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab0329c7a64173d4612e7a1d0ddb3f3e6" id="r_ab0329c7a64173d4612e7a1d0ddb3f3e6"><td class="memTemplParams" colspan="2">template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">class</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </td></tr>
+<tr class="memitem:ab0329c7a64173d4612e7a1d0ddb3f3e6"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="fims__math_8hpp.html#ab0329c7a64173d4612e7a1d0ddb3f3e6">fims_math::inv_logit</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">a</a>, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">b</a>, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">logit_x</a>)</td></tr>
+<tr class="memdesc:ab0329c7a64173d4612e7a1d0ddb3f3e6"><td class="mdescLeft">&#160;</td><td class="mdescRight">An inverse logit function for bounding of parameters.  <br /></td></tr>
+<tr class="separator:ab0329c7a64173d4612e7a1d0ddb3f3e6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4f55d4bf901b546a57ed3a626a445e52" id="r_a4f55d4bf901b546a57ed3a626a445e52"><td class="memTemplParams" colspan="2">template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">class</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </td></tr>
+<tr class="memitem:a4f55d4bf901b546a57ed3a626a445e52"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="fims__math_8hpp.html#a4f55d4bf901b546a57ed3a626a445e52">fims_math::double_logistic</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &amp;inflection_point_asc, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &amp;slope_asc, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &amp;inflection_point_desc, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &amp;slope_desc, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &amp;x)</td></tr>
+<tr class="memdesc:a4f55d4bf901b546a57ed3a626a445e52"><td class="mdescLeft">&#160;</td><td class="mdescRight">The general double logistic function.  <br /></td></tr>
+<tr class="separator:a4f55d4bf901b546a57ed3a626a445e52"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abda4b1b8b7ea34fcde2a05e78217d522" id="r_abda4b1b8b7ea34fcde2a05e78217d522"><td class="memTemplParams" colspan="2">template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">class</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </td></tr>
+<tr class="memitem:abda4b1b8b7ea34fcde2a05e78217d522"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="fims__math_8hpp.html#abda4b1b8b7ea34fcde2a05e78217d522">fims_math::ad_fabs</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &amp;x, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">C</a>=1<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">e</a>-5)</td></tr>
+<tr class="separator:abda4b1b8b7ea34fcde2a05e78217d522"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4c3897f03cbc7860a4b73b21f58558f6" id="r_a4c3897f03cbc7860a4b73b21f58558f6"><td class="memTemplParams" colspan="2">template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </td></tr>
+<tr class="memitem:a4c3897f03cbc7860a4b73b21f58558f6"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="fims__math_8hpp.html#a4c3897f03cbc7860a4b73b21f58558f6">fims_math::ad_min</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">a</a>, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">b</a>, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">C</a>=1<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">e</a>-5)</td></tr>
+<tr class="separator:a4c3897f03cbc7860a4b73b21f58558f6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a54cfbb09833fa0de10e18203526e8321" id="r_a54cfbb09833fa0de10e18203526e8321"><td class="memTemplParams" colspan="2">template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </td></tr>
+<tr class="memitem:a54cfbb09833fa0de10e18203526e8321"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="fims__math_8hpp.html#a54cfbb09833fa0de10e18203526e8321">fims_math::ad_max</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">a</a>, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">b</a>, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">C</a>=1<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">e</a>-5)</td></tr>
+<tr class="separator:a54cfbb09833fa0de10e18203526e8321"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2f6d3a9290062d44590350c1bc739217" id="r_a2f6d3a9290062d44590350c1bc739217"><td class="memTemplParams" colspan="2">template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">class</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">T</a> &gt; </td></tr>
+<tr class="memitem:a2f6d3a9290062d44590350c1bc739217"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">T</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="fims__math_8hpp.html#a2f6d3a9290062d44590350c1bc739217">fims_math::sum</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> std::vector&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">T</a> &gt; &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">v</a>)</td></tr>
+<tr class="separator:a2f6d3a9290062d44590350c1bc739217"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a60f8fb42e9a4786ca5e30b9fad43afed" id="r_a60f8fb42e9a4786ca5e30b9fad43afed"><td class="memTemplParams" colspan="2">template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">class</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">T</a> &gt; </td></tr>
+<tr class="memitem:a60f8fb42e9a4786ca5e30b9fad43afed"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">T</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="fims__math_8hpp.html#a60f8fb42e9a4786ca5e30b9fad43afed">fims_math::sum</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">T</a> &gt; &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">v</a>)</td></tr>
+<tr class="separator:a60f8fb42e9a4786ca5e30b9fad43afed"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>A collection of mathematical functions used in FIMS. </p>
+<dl class="section copyright"><dt>Copyright</dt><dd>This file is part of the NOAA, National Marine Fisheries Service Fisheries Integrated Modeling System project. See LICENSE in the source folder for reuse information. </dd></dl>
+</div><h2 class="groupheader">Function Documentation</h2>
+<a id="abda4b1b8b7ea34fcde2a05e78217d522" name="abda4b1b8b7ea34fcde2a05e78217d522"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abda4b1b8b7ea34fcde2a05e78217d522">&#9670;&#160;</a></span>ad_fabs()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">class</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> fims_math::ad_fabs </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &amp;&#160;</td>
+          <td class="paramname"><em>x</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a>&#160;</td>
+          <td class="paramname"><em>C</em> = <code>1<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">e</a>-5</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Used when x could evaluate to zero, which will result in a NaN for derivative values.</p>
+<p>Evaluates:</p>
+<p>\( (x^2+C)^.5 \)</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">x</td><td>value to keep positive </td></tr>
+    <tr><td class="paramname">C</td><td>default = 1e-5 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd></dd></dl>
+
+</div>
+</div>
+<a id="a54cfbb09833fa0de10e18203526e8321" name="a54cfbb09833fa0de10e18203526e8321"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a54cfbb09833fa0de10e18203526e8321">&#9670;&#160;</a></span>ad_max()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> fims_math::ad_max </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &amp;&#160;</td>
+          <td class="paramname"><em>a</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &amp;&#160;</td>
+          <td class="paramname"><em>b</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a>&#160;</td>
+          <td class="paramname"><em>C</em> = <code>1<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">e</a>-5</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Returns the maximum between a and b in a continuous manner using:</p>
+<p>(a + b + <a class="el" href="fims__math_8hpp.html#abda4b1b8b7ea34fcde2a05e78217d522">fims_math::ad_fabs</a>(a - b)) *.5; Reference: <a class="el" href="fims__math_8hpp.html#abda4b1b8b7ea34fcde2a05e78217d522">fims_math::ad_fabs()</a> This is an approximation with minimal error.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">a</td><td></td></tr>
+    <tr><td class="paramname">b</td><td></td></tr>
+    <tr><td class="paramname">C</td><td>default = 1e-5 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd></dd></dl>
+
+</div>
+</div>
+<a id="a4c3897f03cbc7860a4b73b21f58558f6" name="a4c3897f03cbc7860a4b73b21f58558f6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4c3897f03cbc7860a4b73b21f58558f6">&#9670;&#160;</a></span>ad_min()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> fims_math::ad_min </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &amp;&#160;</td>
+          <td class="paramname"><em>a</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &amp;&#160;</td>
+          <td class="paramname"><em>b</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a>&#160;</td>
+          <td class="paramname"><em>C</em> = <code>1<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">e</a>-5</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Returns the minimum between a and b in a continuous manner using:</p>
+<p>(a + b - <a class="el" href="fims__math_8hpp.html#abda4b1b8b7ea34fcde2a05e78217d522">fims_math::ad_fabs</a>(a - b))*.5; Reference: <a class="el" href="fims__math_8hpp.html#abda4b1b8b7ea34fcde2a05e78217d522">fims_math::ad_fabs()</a></p>
+<p>This is an approximation with minimal error.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">a</td><td></td></tr>
+    <tr><td class="paramname">b</td><td></td></tr>
+    <tr><td class="paramname">C</td><td>default = 1e-5 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd></dd></dl>
+
+</div>
+</div>
+<a id="a4f55d4bf901b546a57ed3a626a445e52" name="a4f55d4bf901b546a57ed3a626a445e52"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4f55d4bf901b546a57ed3a626a445e52">&#9670;&#160;</a></span>double_logistic()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">class</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> fims_math::double_logistic </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &amp;&#160;</td>
+          <td class="paramname"><em>inflection_point_asc</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &amp;&#160;</td>
+          <td class="paramname"><em>slope_asc</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &amp;&#160;</td>
+          <td class="paramname"><em>inflection_point_desc</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &amp;&#160;</td>
+          <td class="paramname"><em>slope_desc</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &amp;&#160;</td>
+          <td class="paramname"><em>x</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>The general double logistic function. </p>
+<p>\( \frac{1.0}{ 1.0 + exp(-1.0 * slope_{asc} (x - inflection_point_{asc}))}
+\left(1-\frac{1.0}{ 1.0 + exp(-1.0 * slope_{desc} (x -
+inflection_point_{desc}))} \right)\)</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">inflection_point_asc</td><td>the inflection point of the ascending limb of the double logistic function </td></tr>
+    <tr><td class="paramname">slope_asc</td><td>the slope of the ascending limb of the double logistic function </td></tr>
+    <tr><td class="paramname">inflection_point_desc</td><td>the inflection point of the descending limb of the double logistic function, where inflection_point_desc &gt; inflection_point_asc </td></tr>
+    <tr><td class="paramname">slope_desc</td><td>the slope of the descending limb of the double logistic function </td></tr>
+    <tr><td class="paramname">x</td><td>the index the logistic function should be evaluated at </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd></dd></dl>
+
+</div>
+</div>
+<a id="ab0329c7a64173d4612e7a1d0ddb3f3e6" name="ab0329c7a64173d4612e7a1d0ddb3f3e6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab0329c7a64173d4612e7a1d0ddb3f3e6">&#9670;&#160;</a></span>inv_logit()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">class</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> fims_math::inv_logit </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &amp;&#160;</td>
+          <td class="paramname"><em>a</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &amp;&#160;</td>
+          <td class="paramname"><em>b</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &amp;&#160;</td>
+          <td class="paramname"><em>logit_x</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>An inverse logit function for bounding of parameters. </p>
+<p>\( a+\frac{b-a}{1+\mathrm{exp}(-\mathrm{logit}(x))}\) </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">a</td><td>lower bound </td></tr>
+    <tr><td class="paramname">b</td><td>upper bound </td></tr>
+    <tr><td class="paramname">logit_x</td><td>the parameter in real space </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the parameter in bounded space </dd></dl>
+
+</div>
+</div>
+<a id="ae8d003754148800ba87fbf228bc7d062" name="ae8d003754148800ba87fbf228bc7d062"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae8d003754148800ba87fbf228bc7d062">&#9670;&#160;</a></span>logistic()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">class</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> fims_math::logistic </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &amp;&#160;</td>
+          <td class="paramname"><em>inflection_point</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &amp;&#160;</td>
+          <td class="paramname"><em>slope</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &amp;&#160;</td>
+          <td class="paramname"><em>x</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>The general logistic function. </p>
+<p>The logistic function can range from zero to one or one to zero, depending on the slope parameter, but it is not normalized to force values to reach those ranges.</p>
+<p>\( \frac{1.0}{ 1.0 + exp(-1.0 * slope (x - inflection_point))} \)</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">inflection_point</td><td>the inflection point of the logistic function </td></tr>
+    <tr><td class="paramname">slope</td><td>the slope of the logistic function. A positive slope results in an ascending logistic curve (0 to 1), while a negative slope results in a descending logistic curve (1 to 0). </td></tr>
+    <tr><td class="paramname">x</td><td>the index the logistic function should be evaluated at </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd></dd></dl>
+
+</div>
+</div>
+<a id="a0fef2c2ffd54b4d023d194653ebeb1f0" name="a0fef2c2ffd54b4d023d194653ebeb1f0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0fef2c2ffd54b4d023d194653ebeb1f0">&#9670;&#160;</a></span>logit()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">class</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> fims_math::logit </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &amp;&#160;</td>
+          <td class="paramname"><em>a</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &amp;&#160;</td>
+          <td class="paramname"><em>b</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &amp;&#160;</td>
+          <td class="paramname"><em>x</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>A logit function for bounding of parameters. </p>
+<p>\( -\mathrm{log}(b-x) + \mathrm{log}(x-a) \) </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">a</td><td>lower bound </td></tr>
+    <tr><td class="paramname">b</td><td>upper bound </td></tr>
+    <tr><td class="paramname">x</td><td>the parameter in bounded space </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the parameter in real space </dd></dl>
+
+</div>
+</div>
+<a id="a60f8fb42e9a4786ca5e30b9fad43afed" name="a60f8fb42e9a4786ca5e30b9fad43afed"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a60f8fb42e9a4786ca5e30b9fad43afed">&#9670;&#160;</a></span>sum() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">class</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">T</a> &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">T</a> fims_math::sum </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">T</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>v</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Sum elements of a vector</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">v</td><td>A vector of constants. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A single numeric value. </dd></dl>
+
+</div>
+</div>
+<a id="a2f6d3a9290062d44590350c1bc739217" name="a2f6d3a9290062d44590350c1bc739217"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2f6d3a9290062d44590350c1bc739217">&#9670;&#160;</a></span>sum() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">class</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">T</a> &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">T</a> fims_math::sum </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> std::vector&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">T</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>v</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Sum elements of a vector</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">v</td><td>A vector of constants. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A single numeric value. </dd></dl>
+
+</div>
+</div>
+</div><!-- contents -->
+</div><!-- doc-content -->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a class="el" href="dir_920884c6b3b2f0be94e27d51660adee5.html">inst</a></li><li class="navelem"><a class="el" href="dir_2b5d1a398a9eec011391d543f21db223.html">include</a></li><li class="navelem"><a class="el" href="dir_825acd3dee85b944c8adc67f8f95c8cb.html">common</a></li><li class="navelem"><a class="el" href="fims__math_8hpp.html">fims_math.hpp</a></li>
+    <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.8 </li>
+  </ul>
+</div>
+</body>
+</html>

@@ -1,0 +1,1970 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" data-bs-theme="auto">
+<head>
+    <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=9"/>
+    <meta name="generator" content="Doxygen 1.9.8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>FIMS</title><link href="tabs.css" rel="stylesheet" type="text/css"/>
+    <link rel="icon" type="image/png" href="https://noaa-fims.github.io/images/FIMS_hexlogo.png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+    <link href="https://noaa-fims.github.io/site_libs/bootstrap/bootstrap-5477dd34fdf9f443df58de9070e2fbd7.min.css" rel="stylesheet">
+    <link href="https://noaa-fims.github.io/site_libs/bootstrap/bootstrap-dark-429bd3fc0b6810d1347fc340b0896c35.min.css" rel="stylesheet" media="(prefers-color-scheme: dark)">
+    <script type="text/javascript" src="jquery.js"></script>
+    <script type="text/javascript" src="dynsections.js"></script>
+    <link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+    <link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+  $(document).ready(function() { init_search(); });
+/* @license-end */
+</script>
+    <script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  extensions: ["tex2jax.js"],
+  jax: ["input/TeX","output/HTML-CSS"],
+});
+</script>
+<script type="text/javascript" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js"></script>
+    <link href="doxygen.css" rel="stylesheet" type="text/css" />
+    <link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
+<link href="custom.css" rel="stylesheet" type="text/css"/>
+    <script src="https://noaa-fims.github.io/site_libs/quarto-nav/quarto-nav.js"></script>
+    <script src="https://noaa-fims.github.io/site_libs/bootstrap/bootstrap.min.js"></script>
+    <script src="https://noaa-fims.github.io/site_libs/quarto-html/quarto.js" type="module"></script>
+</head>
+<body>
+<div id="top">
+    <div id="titlearea">
+        <table cellspacing="0" cellpadding="0">
+            <tbody>
+            <tr style="height: 70px;">
+                <td id="projectlogo"><img alt="Logo" src="FIMS_logo3.png"/></td>
+                <td id="projectalign" style="padding-left: 0.5em;">
+                    <div id="projectname">FIMS
+                        &#160;<span id="projectnumber">v0.8.1</span></div>
+                    <div id="projectbrief"></div></td>
+                <td style="padding-left: 0.5em;">
+                    <div id="projectbrief"></div>
+                </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <nav class="navbar navbar-expand-lg " data-bs-theme="auto">
+      <div class="navbar-container container-fluid">
+        <div class="navbar-brand-container mx-auto">
+          <a href="https://noaa-fims.github.io/" class="navbar-brand navbar-brand-logo"></a>
+          <a class="navbar-brand" href="https://noaa-fims.github.io/">
+          </a>
+        </div>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+          <ul class="navbar-nav navbar-nav-scroll ms-auto">
+           <li class="nav-item dropdown">
+            <button class="nav-link dropdown-toggle" type="button" id="dropdown-reference" data-bs-toggle="dropdown"
+                    aria-expanded="false" aria-haspopup="true">reference</button>
+            <ul class="dropdown-menu" aria-labelledby="dropdown-reference">
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/reference/index.html">r/roxygen</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/doxygen/index.html">c++/doxygen</a></li>
+            </ul>
+           </li>
+            <li class="nav-item dropdown">
+            <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown"
+                    aria-expanded="false" aria-haspopup="true">articles</button>
+            <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
+              <li><h6 class="dropdown-header" data-toc-skip>intro to fims</h6></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/fims-demo.html">introducing the fisheries integrated modeling system (fims)</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/fims-logging.html">Introducing the fims logging system</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/fims-user-setup-guide.html">fims user setup guide</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/fims-demo-projections.html">simple projections using fims</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><h6 class="dropdown-header" data-toc-skip>developer</h6></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/fims-path-maturity.html">fims path - maturity</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><h6 class="dropdown-header" data-toc-skip>c++ training</h6></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/training-intro-cpp.html">intro to c++</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/training-intro-rcpp.html">intro to rcpp</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><h6 class="dropdown-header" data-toc-skip>research and development</h6></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/RD-re-sparsity.html">re sparsity</a></li>
+            </ul>
+          </li>
+            <li class="nav-item dropdown">
+              <button class="nav-link dropdown-toggle" type="button" id="dropdown-news" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">news</button>
+              <ul class="dropdown-menu" aria-labelledby="dropdown-news">
+                <li><h6 class="dropdown-header" data-toc-skip="">Releases</h6></li>
+                <li><a class="external-link dropdown-item" href="https://github.com/NOAA-FIMS/FIMS/releases/latest">latest release</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/news/index.html">changelog</a></li>
+              </ul>
+            </li>
+          <li class="nav-item dropdown">
+            <button class="nav-link dropdown-toggle" type="button" id="dropdown-reports" data-bs-toggle="dropdown"
+                    aria-expanded="false" aria-haspopup="true">reports</button>
+            <ul class="dropdown-menu" aria-labelledby="dropdown-reports">
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/coverage/coverage.html">coverage</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/coverage/codecoverage_explanation.html">coverage explained</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/testdown/index.html">testdown</a></li>
+            </ul>
+          </li>
+          <ul class="navbar-nav">
+            <li class="nav-item"><a class="external-link nav-link" href="https://noaa-fims.github.io/">fims website</a></li>
+            <li class="nav-item">
+              <a class="external-link nav-link" href="https://github.com/noaa-fims/fims/" aria-label="GitHub repository for FIMS">
+                <span class="fa fa-brands fa-github fa-lg"></span>
+              </a>
+            </li>
+            <!-- Keep the input; pkgdown’s autocomplete wrapper won’t exist in Doxygen -->
+            <li class="nav-item">
+              <form class="form-inline" role="search" onsubmit="return false;">
+                <input class="form-control" type="search" name="search-input" id="search-input"
+                      autocomplete="off" aria-label="Search site" placeholder="Search for">
+              </form>
+            </li>
+          </ul>
+      </div>
+    </div>
+  </nav>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  // Only on the cpp_directory_structure page!
+  document.querySelectorAll('.toc a').forEach(function(link) {
+    if (link.href && link.href.indexOf(location.pathname) !== -1) {
+      link.href = link.hash; // Just use the fragment
+    }
+  });
+});
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  function updateTocActive() {
+    var links = Array.from(document.querySelectorAll('.toc a'));
+    var anchors = links.map(link => document.getElementById(link.getAttribute('href').replace('#', '')));
+    var scrollTop = window.scrollY || document.documentElement.scrollTop;
+    var offset = 150; // Match your scroll-margin-top
+    let currentActive = -1;
+    for (let i = anchors.length - 1; i >= 0; i--) {
+      if (anchors[i] && (anchors[i].getBoundingClientRect().top + window.scrollY - offset) <= scrollTop) {
+        currentActive = i;
+        break;
+      }
+    }
+    links.forEach((link, i) => {
+      link.classList.remove('active', 'aboveActive');
+      if (i === currentActive) {
+        link.classList.add('active');
+      } else if (i < currentActive) {
+        link.classList.add('aboveActive');
+      }
+    });
+  }
+  window.addEventListener('scroll', updateTocActive);
+  window.addEventListener('hashchange', updateTocActive);
+  updateTocActive();
+});
+</script>
+    <!-- end header part -->
+<!-- Generated by Doxygen 1.9.8 -->
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+/* @license-end */
+</script>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(document).ready(function(){initNavTree('classfims__info_1_1Information.html',''); initResizable(); });
+/* @license-end */
+</script>
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">Loading...</div>
+<div class="SRStatus" id="Searching">Searching...</div>
+<div class="SRStatus" id="NoMatches">No Matches</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="summary">
+<a href="#pub-types">Public Types</a> &#124;
+<a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pub-static-methods">Static Public Member Functions</a> &#124;
+<a href="#pub-attribs">Public Attributes</a> &#124;
+<a href="#pub-static-attribs">Static Public Attributes</a> &#124;
+<a href="classfims__info_1_1Information-members.html">List of all members</a>  </div>
+  <div class="headertitle"><div class="title">fims_info::Information&lt; Type &gt; Class Template Reference</div></div>
+</div><!--header-->
+<div class="contents">
+
+<p>Stores FIMS model information and creates model. Contains all objects and data pre-model construction.  
+ <a href="classfims__info_1_1Information.html#details">More...</a></p>
+
+<p><code>#include &lt;<a class="el" href="information_8hpp_source.html">information.hpp</a>&gt;</code></p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-types" name="pub-types"></a>
+Public Types</h2></td></tr>
+<tr class="memitem:a18535d2c0c99b9616aed2d891c45fb9b" id="r_a18535d2c0c99b9616aed2d891c45fb9b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typedef</a> std::map&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a>, std::shared_ptr&lt; <a class="el" href="structfims__data__object_1_1DataObject.html">fims_data_object::DataObject</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt; &gt;::iterator&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__info_1_1Information.html#a18535d2c0c99b9616aed2d891c45fb9b">data_iterator</a></td></tr>
+<tr class="separator:a18535d2c0c99b9616aed2d891c45fb9b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7b3b33b46cbb65c847ad47e50ef17c98" id="r_a7b3b33b46cbb65c847ad47e50ef17c98"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typedef</a> std::map&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a>, std::shared_ptr&lt; <a class="el" href="structfims__popdy_1_1RecruitmentBase.html">fims_popdy::RecruitmentBase</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt; &gt;::iterator&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__info_1_1Information.html#a7b3b33b46cbb65c847ad47e50ef17c98">recruitment_models_iterator</a></td></tr>
+<tr class="separator:a7b3b33b46cbb65c847ad47e50ef17c98"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:accc31564a8057bebc1b0013d72498b24" id="r_accc31564a8057bebc1b0013d72498b24"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typedef</a> std::map&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a>, std::shared_ptr&lt; <a class="el" href="structfims__popdy_1_1RecruitmentBase.html">fims_popdy::RecruitmentBase</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt; &gt;::iterator&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__info_1_1Information.html#accc31564a8057bebc1b0013d72498b24">recruitment_process_iterator</a></td></tr>
+<tr class="separator:accc31564a8057bebc1b0013d72498b24"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad6b814e85fe0f43684f775cb46eb808a" id="r_ad6b814e85fe0f43684f775cb46eb808a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typedef</a> std::map&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a>, std::shared_ptr&lt; <a class="el" href="structfims__popdy_1_1SelectivityBase.html">fims_popdy::SelectivityBase</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt; &gt;::iterator&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__info_1_1Information.html#ad6b814e85fe0f43684f775cb46eb808a">selectivity_models_iterator</a></td></tr>
+<tr class="separator:ad6b814e85fe0f43684f775cb46eb808a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a097b77c0c18c6e4bccac2950a20604ca" id="r_a097b77c0c18c6e4bccac2950a20604ca"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typedef</a> std::map&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a>, std::shared_ptr&lt; <a class="el" href="structfims__popdy_1_1GrowthBase.html">fims_popdy::GrowthBase</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt; &gt;::iterator&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__info_1_1Information.html#a097b77c0c18c6e4bccac2950a20604ca">growth_models_iterator</a></td></tr>
+<tr class="separator:a097b77c0c18c6e4bccac2950a20604ca"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae05182ea1e481f936b81e0eb2b3d46b6" id="r_ae05182ea1e481f936b81e0eb2b3d46b6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typedef</a> std::map&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a>, std::shared_ptr&lt; <a class="el" href="structfims__popdy_1_1MaturityBase.html">fims_popdy::MaturityBase</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt; &gt;::iterator&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__info_1_1Information.html#ae05182ea1e481f936b81e0eb2b3d46b6">maturity_models_iterator</a></td></tr>
+<tr class="separator:ae05182ea1e481f936b81e0eb2b3d46b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4600849d863f485cd353a55dae321d54" id="r_a4600849d863f485cd353a55dae321d54"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typedef</a> std::map&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a>, std::shared_ptr&lt; <a class="el" href="structfims__popdy_1_1Fleet.html">fims_popdy::Fleet</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt; &gt;::iterator&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__info_1_1Information.html#a4600849d863f485cd353a55dae321d54">fleet_iterator</a></td></tr>
+<tr class="separator:a4600849d863f485cd353a55dae321d54"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a59798203b69a6288904fed2c867fb95d" id="r_a59798203b69a6288904fed2c867fb95d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typedef</a> std::map&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a>, std::shared_ptr&lt; <a class="el" href="structfims__popdy_1_1Population.html">fims_popdy::Population</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt; &gt;::iterator&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__info_1_1Information.html#a59798203b69a6288904fed2c867fb95d">population_iterator</a></td></tr>
+<tr class="separator:a59798203b69a6288904fed2c867fb95d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa0ab5ab8f6374ddc30987f978c8f1fac" id="r_aa0ab5ab8f6374ddc30987f978c8f1fac"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typedef</a> std::map&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a>, std::shared_ptr&lt; <a class="el" href="structfims__distributions_1_1DensityComponentBase.html">fims_distributions::DensityComponentBase</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt; &gt;::iterator&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__info_1_1Information.html#aa0ab5ab8f6374ddc30987f978c8f1fac">density_components_iterator</a></td></tr>
+<tr class="separator:aa0ab5ab8f6374ddc30987f978c8f1fac"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9626f44ca9843b5b443519b933438a8f" id="r_a9626f44ca9843b5b443519b933438a8f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typedef</a> std::unordered_map&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a>, std::shared_ptr&lt; <a class="el" href="classfims__popdy_1_1FisheryModelBase.html">fims_popdy::FisheryModelBase</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt; &gt;::iterator&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__info_1_1Information.html#a9626f44ca9843b5b443519b933438a8f">model_map_iterator</a></td></tr>
+<tr class="separator:a9626f44ca9843b5b443519b933438a8f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad368f0de6ac26ced1ae33721a89772b5" id="r_ad368f0de6ac26ced1ae33721a89772b5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typedef</a> std::unordered_map&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a>, <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; * &gt;::iterator&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__info_1_1Information.html#ad368f0de6ac26ced1ae33721a89772b5">variable_map_iterator</a></td></tr>
+<tr class="separator:ad368f0de6ac26ced1ae33721a89772b5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
+Public Member Functions</h2></td></tr>
+<tr class="memitem:a8b9e6bc88cfee7e80b360eea2d2853b5" id="r_a8b9e6bc88cfee7e80b360eea2d2853b5"><td class="memItemLeft" align="right" valign="top"><a id="a8b9e6bc88cfee7e80b360eea2d2853b5" name="a8b9e6bc88cfee7e80b360eea2d2853b5"></a>
+<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><b>Clear</b> ()</td></tr>
+<tr class="memdesc:a8b9e6bc88cfee7e80b360eea2d2853b5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clears all containers. <br /></td></tr>
+<tr class="separator:a8b9e6bc88cfee7e80b360eea2d2853b5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae8eae11b55e1c570310b064348b3d586" id="r_ae8eae11b55e1c570310b064348b3d586"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__info_1_1Information.html#ae8eae11b55e1c570310b064348b3d586">State</a> ()</td></tr>
+<tr class="memdesc:ae8eae11b55e1c570310b064348b3d586"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a summary string of the <a class="el" href="classfims__info_1_1Information.html" title="Stores FIMS model information and creates model. Contains all objects and data pre-model construction...">Information</a> object state.  <br /></td></tr>
+<tr class="separator:ae8eae11b55e1c570310b064348b3d586"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a59f18d95d8425246661e3513cecdc0a2" id="r_a59f18d95d8425246661e3513cecdc0a2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__info_1_1Information.html#a59f18d95d8425246661e3513cecdc0a2">RegisterParameter</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">p</a>)</td></tr>
+<tr class="memdesc:a59f18d95d8425246661e3513cecdc0a2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Register a parameter as estimable.  <br /></td></tr>
+<tr class="separator:a59f18d95d8425246661e3513cecdc0a2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a638e4deb58e190b72db9fb6225325b79" id="r_a638e4deb58e190b72db9fb6225325b79"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__info_1_1Information.html#a638e4deb58e190b72db9fb6225325b79">RegisterRandomEffect</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &amp;re)</td></tr>
+<tr class="memdesc:a638e4deb58e190b72db9fb6225325b79"><td class="mdescLeft">&#160;</td><td class="mdescRight">Register a random effect as estimable.  <br /></td></tr>
+<tr class="separator:a638e4deb58e190b72db9fb6225325b79"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad8957d597804821e05f7c710c8ac5d76" id="r_ad8957d597804821e05f7c710c8ac5d76"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__info_1_1Information.html#ad8957d597804821e05f7c710c8ac5d76">RegisterParameterName</a> (std::string <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">p_name</a>)</td></tr>
+<tr class="memdesc:ad8957d597804821e05f7c710c8ac5d76"><td class="mdescLeft">&#160;</td><td class="mdescRight">Register a parameter name.  <br /></td></tr>
+<tr class="separator:ad8957d597804821e05f7c710c8ac5d76"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a17b83c06fd67ff15f52c851426de5f41" id="r_a17b83c06fd67ff15f52c851426de5f41"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__info_1_1Information.html#a17b83c06fd67ff15f52c851426de5f41">RegisterRandomEffectName</a> (std::string <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">re_name</a>)</td></tr>
+<tr class="memdesc:a17b83c06fd67ff15f52c851426de5f41"><td class="mdescLeft">&#160;</td><td class="mdescRight">Register a random effects name.  <br /></td></tr>
+<tr class="separator:a17b83c06fd67ff15f52c851426de5f41"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad07784f2c8952afd95d5bdffa6d5dcff" id="r_ad07784f2c8952afd95d5bdffa6d5dcff"><td class="memItemLeft" align="right" valign="top"><a id="ad07784f2c8952afd95d5bdffa6d5dcff" name="ad07784f2c8952afd95d5bdffa6d5dcff"></a>
+<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><b>SetupPriors</b> ()</td></tr>
+<tr class="memdesc:ad07784f2c8952afd95d5bdffa6d5dcff"><td class="mdescLeft">&#160;</td><td class="mdescRight">Loop over distributions and set links to distribution x value if distribution is a prior type. <br /></td></tr>
+<tr class="separator:ad07784f2c8952afd95d5bdffa6d5dcff"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0c86d113a211bc07a12ed569d8c68c1b" id="r_a0c86d113a211bc07a12ed569d8c68c1b"><td class="memItemLeft" align="right" valign="top"><a id="a0c86d113a211bc07a12ed569d8c68c1b" name="a0c86d113a211bc07a12ed569d8c68c1b"></a>
+<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><b>SetupRandomEffects</b> ()</td></tr>
+<tr class="memdesc:a0c86d113a211bc07a12ed569d8c68c1b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Loop over distributions and set links to distribution x value if distribution is a random effects type. <br /></td></tr>
+<tr class="separator:a0c86d113a211bc07a12ed569d8c68c1b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adacf560208a607b69e46d503f76fec14" id="r_adacf560208a607b69e46d503f76fec14"><td class="memItemLeft" align="right" valign="top"><a id="adacf560208a607b69e46d503f76fec14" name="adacf560208a607b69e46d503f76fec14"></a>
+<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><b>SetupData</b> ()</td></tr>
+<tr class="memdesc:adacf560208a607b69e46d503f76fec14"><td class="mdescLeft">&#160;</td><td class="mdescRight">Loop over distributions and set links to distribution expected value if distribution is a data type. <br /></td></tr>
+<tr class="separator:adacf560208a607b69e46d503f76fec14"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1b5343821495e628e1cf91f1d4316a9c" id="r_a1b5343821495e628e1cf91f1d4316a9c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__info_1_1Information.html#a1b5343821495e628e1cf91f1d4316a9c">SetFleetLandingsData</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">valid_model</a>, std::shared_ptr&lt; <a class="el" href="structfims__popdy_1_1Fleet.html">fims_popdy::Fleet</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">f</a>)</td></tr>
+<tr class="memdesc:a1b5343821495e628e1cf91f1d4316a9c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set pointers to landings data in the fleet module.  <br /></td></tr>
+<tr class="separator:a1b5343821495e628e1cf91f1d4316a9c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a21cdc88c62adecae565dc8d092445c3b" id="r_a21cdc88c62adecae565dc8d092445c3b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__info_1_1Information.html#a21cdc88c62adecae565dc8d092445c3b">SetFleetIndexData</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">valid_model</a>, std::shared_ptr&lt; <a class="el" href="structfims__popdy_1_1Fleet.html">fims_popdy::Fleet</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">f</a>)</td></tr>
+<tr class="memdesc:a21cdc88c62adecae565dc8d092445c3b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set pointers to index data in the fleet module.  <br /></td></tr>
+<tr class="separator:a21cdc88c62adecae565dc8d092445c3b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa5ba1172e68e3de66dbadbbaa1ed5c11" id="r_aa5ba1172e68e3de66dbadbbaa1ed5c11"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__info_1_1Information.html#aa5ba1172e68e3de66dbadbbaa1ed5c11">SetAgeCompositionData</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">valid_model</a>, std::shared_ptr&lt; <a class="el" href="structfims__popdy_1_1Fleet.html">fims_popdy::Fleet</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">f</a>)</td></tr>
+<tr class="memdesc:aa5ba1172e68e3de66dbadbbaa1ed5c11"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set pointers to age composition data in the fleet module.  <br /></td></tr>
+<tr class="separator:aa5ba1172e68e3de66dbadbbaa1ed5c11"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a51c74194eb52450d2a0256c80187b75d" id="r_a51c74194eb52450d2a0256c80187b75d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__info_1_1Information.html#a51c74194eb52450d2a0256c80187b75d">SetLengthCompositionData</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">valid_model</a>, std::shared_ptr&lt; <a class="el" href="structfims__popdy_1_1Fleet.html">fims_popdy::Fleet</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">f</a>)</td></tr>
+<tr class="memdesc:a51c74194eb52450d2a0256c80187b75d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set pointers to length composition data in the fleet module.  <br /></td></tr>
+<tr class="separator:a51c74194eb52450d2a0256c80187b75d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a573d4dea26550f00973bf8b1186d9d5d" id="r_a573d4dea26550f00973bf8b1186d9d5d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__info_1_1Information.html#a573d4dea26550f00973bf8b1186d9d5d">SetFleetSelectivityModel</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">valid_model</a>, std::shared_ptr&lt; <a class="el" href="structfims__popdy_1_1Fleet.html">fims_popdy::Fleet</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">f</a>)</td></tr>
+<tr class="memdesc:a573d4dea26550f00973bf8b1186d9d5d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set pointers to the selectivity module referenced in the fleet module.  <br /></td></tr>
+<tr class="separator:a573d4dea26550f00973bf8b1186d9d5d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a668558a0e718a108fb7976c1da5583c6" id="r_a668558a0e718a108fb7976c1da5583c6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__info_1_1Information.html#a668558a0e718a108fb7976c1da5583c6">SetRecruitment</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">valid_model</a>, std::shared_ptr&lt; <a class="el" href="structfims__popdy_1_1Population.html">fims_popdy::Population</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">p</a>)</td></tr>
+<tr class="memdesc:a668558a0e718a108fb7976c1da5583c6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set pointers to the recruitment module referenced in the population module.  <br /></td></tr>
+<tr class="separator:a668558a0e718a108fb7976c1da5583c6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7da455d8f48af95add1a75bf1b495f8a" id="r_a7da455d8f48af95add1a75bf1b495f8a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__info_1_1Information.html#a7da455d8f48af95add1a75bf1b495f8a">SetRecruitmentProcess</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">valid_model</a>, std::shared_ptr&lt; <a class="el" href="structfims__popdy_1_1Population.html">fims_popdy::Population</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">p</a>)</td></tr>
+<tr class="memdesc:a7da455d8f48af95add1a75bf1b495f8a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set pointers to the recruitment process module referenced in the population module.  <br /></td></tr>
+<tr class="separator:a7da455d8f48af95add1a75bf1b495f8a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a25c05134865b8f7a2ff4dc53a02d47f4" id="r_a25c05134865b8f7a2ff4dc53a02d47f4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__info_1_1Information.html#a25c05134865b8f7a2ff4dc53a02d47f4">SetGrowth</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">valid_model</a>, std::shared_ptr&lt; <a class="el" href="structfims__popdy_1_1Population.html">fims_popdy::Population</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">p</a>)</td></tr>
+<tr class="memdesc:a25c05134865b8f7a2ff4dc53a02d47f4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set pointers to the growth module referenced in the population module.  <br /></td></tr>
+<tr class="separator:a25c05134865b8f7a2ff4dc53a02d47f4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a43f5f387c501dde13948832e4d856df9" id="r_a43f5f387c501dde13948832e4d856df9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__info_1_1Information.html#a43f5f387c501dde13948832e4d856df9">SetMaturity</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">valid_model</a>, std::shared_ptr&lt; <a class="el" href="structfims__popdy_1_1Population.html">fims_popdy::Population</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">p</a>)</td></tr>
+<tr class="memdesc:a43f5f387c501dde13948832e4d856df9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set pointers to the maturity module referenced in the population module.  <br /></td></tr>
+<tr class="separator:a43f5f387c501dde13948832e4d856df9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abc3b88b939a39ab003021f11ad9e88c1" id="r_abc3b88b939a39ab003021f11ad9e88c1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__info_1_1Information.html#abc3b88b939a39ab003021f11ad9e88c1">CreateFleetObjects</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">valid_model</a>)</td></tr>
+<tr class="memdesc:abc3b88b939a39ab003021f11ad9e88c1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Loop over all fleets and set pointers to fleet objects.  <br /></td></tr>
+<tr class="separator:abc3b88b939a39ab003021f11ad9e88c1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4a1c03ce871c9a8c2e300aaeda49ff38" id="r_a4a1c03ce871c9a8c2e300aaeda49ff38"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__info_1_1Information.html#a4a1c03ce871c9a8c2e300aaeda49ff38">SetDataObjects</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">valid_model</a>)</td></tr>
+<tr class="memdesc:a4a1c03ce871c9a8c2e300aaeda49ff38"><td class="mdescLeft">&#160;</td><td class="mdescRight">Loop over all density components and set pointers to data objects.  <br /></td></tr>
+<tr class="separator:a4a1c03ce871c9a8c2e300aaeda49ff38"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4dfbfb078010da333e1be823deccc76f" id="r_a4dfbfb078010da333e1be823deccc76f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__info_1_1Information.html#a4dfbfb078010da333e1be823deccc76f">CreatePopulationObjects</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">valid_model</a>)</td></tr>
+<tr class="memdesc:a4dfbfb078010da333e1be823deccc76f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Loop over all populations and set pointers to population objects.  <br /></td></tr>
+<tr class="separator:a4dfbfb078010da333e1be823deccc76f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aea88d0c494b23532c09dbd73ad632602" id="r_aea88d0c494b23532c09dbd73ad632602"><td class="memItemLeft" align="right" valign="top"><a id="aea88d0c494b23532c09dbd73ad632602" name="aea88d0c494b23532c09dbd73ad632602"></a>
+<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><b>CreateModelingObjects</b> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">valid_model</a>)</td></tr>
+<tr class="memdesc:aea88d0c494b23532c09dbd73ad632602"><td class="mdescLeft">&#160;</td><td class="mdescRight">Loop over all models and set pointers to population objects. <br /></td></tr>
+<tr class="separator:aea88d0c494b23532c09dbd73ad632602"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a87a3d2d9a1575dbba625398e7cadd904" id="r_a87a3d2d9a1575dbba625398e7cadd904"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__info_1_1Information.html#a87a3d2d9a1575dbba625398e7cadd904">CreateModel</a> ()</td></tr>
+<tr class="memdesc:a87a3d2d9a1575dbba625398e7cadd904"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create the generalized stock assessment model that will evaluate the objective function. Does error checking to make sure the program has all necessary components for the model and that they're in the right dimensions. This sets up pointers to all memory objects and initializes fleet and population objects.  <br /></td></tr>
+<tr class="separator:a87a3d2d9a1575dbba625398e7cadd904"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6f0c12f547444da4af4068bdc79efafe" id="r_a6f0c12f547444da4af4068bdc79efafe"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__info_1_1Information.html#a6f0c12f547444da4af4068bdc79efafe">GetNages</a> () <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a></td></tr>
+<tr class="memdesc:a6f0c12f547444da4af4068bdc79efafe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Nages object.  <br /></td></tr>
+<tr class="separator:a6f0c12f547444da4af4068bdc79efafe"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6e14a55eaacbc681d65b112e978ec35d" id="r_a6e14a55eaacbc681d65b112e978ec35d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__info_1_1Information.html#a6e14a55eaacbc681d65b112e978ec35d">SetNages</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a> <a class="el" href="classfims__info_1_1Information.html#a91fe02769f34b8f3571b20d300c6b7d5">n_ages</a>)</td></tr>
+<tr class="memdesc:a6e14a55eaacbc681d65b112e978ec35d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the Nages object.  <br /></td></tr>
+<tr class="separator:a6e14a55eaacbc681d65b112e978ec35d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad35271c481119df45a855ac00f1957fb" id="r_ad35271c481119df45a855ac00f1957fb"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__info_1_1Information.html#ad35271c481119df45a855ac00f1957fb">GetNyears</a> () <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a></td></tr>
+<tr class="memdesc:ad35271c481119df45a855ac00f1957fb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the n_years object.  <br /></td></tr>
+<tr class="separator:ad35271c481119df45a855ac00f1957fb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7778e9861c1a7ebde61d9d46f2429224" id="r_a7778e9861c1a7ebde61d9d46f2429224"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__info_1_1Information.html#a7778e9861c1a7ebde61d9d46f2429224">SetNyears</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a> <a class="el" href="classfims__info_1_1Information.html#a4bba008c429f6c2b43ab2248899f012a">n_years</a>)</td></tr>
+<tr class="memdesc:a7778e9861c1a7ebde61d9d46f2429224"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the n_years object.  <br /></td></tr>
+<tr class="separator:a7778e9861c1a7ebde61d9d46f2429224"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acc18255fcff0c2823763f8c894856aee" id="r_acc18255fcff0c2823763f8c894856aee"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> * &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__info_1_1Information.html#acc18255fcff0c2823763f8c894856aee">GetParameters</a> ()</td></tr>
+<tr class="memdesc:acc18255fcff0c2823763f8c894856aee"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Parameters object.  <br /></td></tr>
+<tr class="separator:acc18255fcff0c2823763f8c894856aee"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1898b705511747d5d21415cb6633e9f9" id="r_a1898b705511747d5d21415cb6633e9f9"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> * &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__info_1_1Information.html#a1898b705511747d5d21415cb6633e9f9">GetFixedEffectsParameters</a> ()</td></tr>
+<tr class="memdesc:a1898b705511747d5d21415cb6633e9f9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Fixed Effects Parameters object.  <br /></td></tr>
+<tr class="separator:a1898b705511747d5d21415cb6633e9f9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac9ff87a4ab5063bf366c18a8e67b900c" id="r_ac9ff87a4ab5063bf366c18a8e67b900c"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> * &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__info_1_1Information.html#ac9ff87a4ab5063bf366c18a8e67b900c">GetRandomEffectsParameters</a> ()</td></tr>
+<tr class="memdesc:ac9ff87a4ab5063bf366c18a8e67b900c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Random Effects Parameters object.  <br /></td></tr>
+<tr class="separator:ac9ff87a4ab5063bf366c18a8e67b900c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7fa2c6cc68de26e26b6c1085600675bc" id="r_a7fa2c6cc68de26e26b6c1085600675bc"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__info_1_1Information.html#a7fa2c6cc68de26e26b6c1085600675bc">CheckModel</a> ()</td></tr>
+<tr class="memdesc:a7fa2c6cc68de26e26b6c1085600675bc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks to make sure all required modules are present for specified model.  <br /></td></tr>
+<tr class="separator:a7fa2c6cc68de26e26b6c1085600675bc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
+Static Public Member Functions</h2></td></tr>
+<tr class="memitem:aea0008a9935a78fe17f5ec217ac4c621" id="r_aea0008a9935a78fe17f5ec217ac4c621"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">static</a> std::shared_ptr&lt; <a class="el" href="classfims__info_1_1Information.html">Information</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__info_1_1Information.html#aea0008a9935a78fe17f5ec217ac4c621">GetInstance</a> ()</td></tr>
+<tr class="memdesc:aea0008a9935a78fe17f5ec217ac4c621"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a singleton <a class="el" href="classfims__info_1_1Information.html" title="Stores FIMS model information and creates model. Contains all objects and data pre-model construction...">Information</a> object for type T.  <br /></td></tr>
+<tr class="separator:aea0008a9935a78fe17f5ec217ac4c621"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
+Public Attributes</h2></td></tr>
+<tr class="memitem:a4bba008c429f6c2b43ab2248899f012a" id="r_a4bba008c429f6c2b43ab2248899f012a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__info_1_1Information.html#a4bba008c429f6c2b43ab2248899f012a">n_years</a> = 0</td></tr>
+<tr class="separator:a4bba008c429f6c2b43ab2248899f012a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a91fe02769f34b8f3571b20d300c6b7d5" id="r_a91fe02769f34b8f3571b20d300c6b7d5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__info_1_1Information.html#a91fe02769f34b8f3571b20d300c6b7d5">n_ages</a> = 0</td></tr>
+<tr class="separator:a91fe02769f34b8f3571b20d300c6b7d5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4eaf81c500c0d0abdcccb621b73df4e0" id="r_a4eaf81c500c0d0abdcccb621b73df4e0"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__info_1_1Information.html#a4eaf81c500c0d0abdcccb621b73df4e0">parameters</a></td></tr>
+<tr class="separator:a4eaf81c500c0d0abdcccb621b73df4e0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af78de7edc3287ccc7b047cea2275db8d" id="r_af78de7edc3287ccc7b047cea2275db8d"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__info_1_1Information.html#af78de7edc3287ccc7b047cea2275db8d">random_effects_parameters</a></td></tr>
+<tr class="separator:af78de7edc3287ccc7b047cea2275db8d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad4f84b2d8e58abddbc6408344bbc1f96" id="r_ad4f84b2d8e58abddbc6408344bbc1f96"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__info_1_1Information.html#ad4f84b2d8e58abddbc6408344bbc1f96">fixed_effects_parameters</a></td></tr>
+<tr class="separator:ad4f84b2d8e58abddbc6408344bbc1f96"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac1fbb03c15a0c6ca3d634b8761804823" id="r_ac1fbb03c15a0c6ca3d634b8761804823"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__info_1_1Information.html#ac1fbb03c15a0c6ca3d634b8761804823">parameter_names</a></td></tr>
+<tr class="separator:ac1fbb03c15a0c6ca3d634b8761804823"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acae6ee10137877bb3a4d3f353bd2b49a" id="r_acae6ee10137877bb3a4d3f353bd2b49a"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__info_1_1Information.html#acae6ee10137877bb3a4d3f353bd2b49a">random_effects_names</a></td></tr>
+<tr class="separator:acae6ee10137877bb3a4d3f353bd2b49a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afe718e2553694ba44247477ee0d187e9" id="r_afe718e2553694ba44247477ee0d187e9"><td class="memItemLeft" align="right" valign="top">std::map&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a>, std::shared_ptr&lt; <a class="el" href="structfims__data__object_1_1DataObject.html">fims_data_object::DataObject</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__info_1_1Information.html#afe718e2553694ba44247477ee0d187e9">data_objects</a></td></tr>
+<tr class="separator:afe718e2553694ba44247477ee0d187e9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af84f12390187dbdf6864fdf5d052b499" id="r_af84f12390187dbdf6864fdf5d052b499"><td class="memItemLeft" align="right" valign="top">std::map&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a>, std::shared_ptr&lt; <a class="el" href="structfims__popdy_1_1RecruitmentBase.html">fims_popdy::RecruitmentBase</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__info_1_1Information.html#af84f12390187dbdf6864fdf5d052b499">recruitment_models</a></td></tr>
+<tr class="separator:af84f12390187dbdf6864fdf5d052b499"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2ef86120762c7b017f3db7edbb929364" id="r_a2ef86120762c7b017f3db7edbb929364"><td class="memItemLeft" align="right" valign="top">std::map&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a>, std::shared_ptr&lt; <a class="el" href="structfims__popdy_1_1RecruitmentBase.html">fims_popdy::RecruitmentBase</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__info_1_1Information.html#a2ef86120762c7b017f3db7edbb929364">recruitment_process_models</a></td></tr>
+<tr class="separator:a2ef86120762c7b017f3db7edbb929364"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a85b08dfc5ad664cb9a655fab6285952c" id="r_a85b08dfc5ad664cb9a655fab6285952c"><td class="memItemLeft" align="right" valign="top">std::map&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a>, std::shared_ptr&lt; <a class="el" href="structfims__popdy_1_1SelectivityBase.html">fims_popdy::SelectivityBase</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__info_1_1Information.html#a85b08dfc5ad664cb9a655fab6285952c">selectivity_models</a></td></tr>
+<tr class="separator:a85b08dfc5ad664cb9a655fab6285952c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4edd9876dd8d49da388487ec26b5ada6" id="r_a4edd9876dd8d49da388487ec26b5ada6"><td class="memItemLeft" align="right" valign="top">std::map&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a>, std::shared_ptr&lt; <a class="el" href="structfims__popdy_1_1GrowthBase.html">fims_popdy::GrowthBase</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__info_1_1Information.html#a4edd9876dd8d49da388487ec26b5ada6">growth_models</a></td></tr>
+<tr class="separator:a4edd9876dd8d49da388487ec26b5ada6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac266167f6ac429cc29ea8846c3da8781" id="r_ac266167f6ac429cc29ea8846c3da8781"><td class="memItemLeft" align="right" valign="top">std::map&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a>, std::shared_ptr&lt; <a class="el" href="structfims__popdy_1_1MaturityBase.html">fims_popdy::MaturityBase</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__info_1_1Information.html#ac266167f6ac429cc29ea8846c3da8781">maturity_models</a></td></tr>
+<tr class="separator:ac266167f6ac429cc29ea8846c3da8781"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4d544f7e8c08032dd12ef14961e40822" id="r_a4d544f7e8c08032dd12ef14961e40822"><td class="memItemLeft" align="right" valign="top">std::map&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a>, std::shared_ptr&lt; <a class="el" href="structfims__popdy_1_1Fleet.html">fims_popdy::Fleet</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__info_1_1Information.html#a4d544f7e8c08032dd12ef14961e40822">fleets</a></td></tr>
+<tr class="separator:a4d544f7e8c08032dd12ef14961e40822"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a13bc1ac7074aeb44f7ceb0d2b9bb8531" id="r_a13bc1ac7074aeb44f7ceb0d2b9bb8531"><td class="memItemLeft" align="right" valign="top">std::map&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a>, std::shared_ptr&lt; <a class="el" href="structfims__popdy_1_1Population.html">fims_popdy::Population</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__info_1_1Information.html#a13bc1ac7074aeb44f7ceb0d2b9bb8531">populations</a></td></tr>
+<tr class="separator:a13bc1ac7074aeb44f7ceb0d2b9bb8531"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a628c455233e9564933cbd8c6f0ce1589" id="r_a628c455233e9564933cbd8c6f0ce1589"><td class="memItemLeft" align="right" valign="top">std::map&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a>, std::shared_ptr&lt; <a class="el" href="structfims__distributions_1_1DensityComponentBase.html">fims_distributions::DensityComponentBase</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__info_1_1Information.html#a628c455233e9564933cbd8c6f0ce1589">density_components</a></td></tr>
+<tr class="separator:a628c455233e9564933cbd8c6f0ce1589"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a14847edc29ac248e9dcaf194d824112b" id="r_a14847edc29ac248e9dcaf194d824112b"><td class="memItemLeft" align="right" valign="top">std::unordered_map&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a>, std::shared_ptr&lt; <a class="el" href="classfims__popdy_1_1FisheryModelBase.html">fims_popdy::FisheryModelBase</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__info_1_1Information.html#a14847edc29ac248e9dcaf194d824112b">models_map</a></td></tr>
+<tr class="separator:a14847edc29ac248e9dcaf194d824112b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9909a48c22cda7a54bd7b88da355ef97" id="r_a9909a48c22cda7a54bd7b88da355ef97"><td class="memItemLeft" align="right" valign="top">std::unordered_map&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a>, <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__info_1_1Information.html#a9909a48c22cda7a54bd7b88da355ef97">variable_map</a></td></tr>
+<tr class="separator:a9909a48c22cda7a54bd7b88da355ef97"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-static-attribs" name="pub-static-attribs"></a>
+Static Public Attributes</h2></td></tr>
+<tr class="memitem:af21bebe91662251ada5ac37feaac1af5" id="r_af21bebe91662251ada5ac37feaac1af5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">static</a> std::shared_ptr&lt; <a class="el" href="classfims__info_1_1Information.html">Information</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__info_1_1Information.html#af21bebe91662251ada5ac37feaac1af5">fims_information</a></td></tr>
+<tr class="separator:af21bebe91662251ada5ac37feaac1af5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><div class="compoundTemplParams">template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a>&gt;<br />
+class fims_info::Information&lt; Type &gt;</div><p>Stores FIMS model information and creates model. Contains all objects and data pre-model construction. </p>
+</div><h2 class="groupheader">Member Typedef Documentation</h2>
+<a id="a18535d2c0c99b9616aed2d891c45fb9b" name="a18535d2c0c99b9616aed2d891c45fb9b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a18535d2c0c99b9616aed2d891c45fb9b">&#9670;&#160;</a></span>data_iterator</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typedef</a> std::map&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a>,std::shared_ptr&lt;<a class="el" href="structfims__data__object_1_1DataObject.html">fims_data_object::DataObject</a>&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a>&gt;&gt;&gt;::iterator <a class="el" href="classfims__info_1_1Information.html">fims_info::Information</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::data_iterator</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>iterator for the data objects </p>
+
+</div>
+</div>
+<a id="aa0ab5ab8f6374ddc30987f978c8f1fac" name="aa0ab5ab8f6374ddc30987f978c8f1fac"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa0ab5ab8f6374ddc30987f978c8f1fac">&#9670;&#160;</a></span>density_components_iterator</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typedef</a> std::map&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a>,std::shared_ptr&lt;<a class="el" href="structfims__distributions_1_1DensityComponentBase.html">fims_distributions::DensityComponentBase</a>&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a>&gt;&gt;&gt;::iterator <a class="el" href="classfims__info_1_1Information.html">fims_info::Information</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::density_components_iterator</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>iterator for distribution objects&gt; </p>
+
+</div>
+</div>
+<a id="a4600849d863f485cd353a55dae321d54" name="a4600849d863f485cd353a55dae321d54"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4600849d863f485cd353a55dae321d54">&#9670;&#160;</a></span>fleet_iterator</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typedef</a> std::map&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a>,std::shared_ptr&lt;<a class="el" href="structfims__popdy_1_1Fleet.html">fims_popdy::Fleet</a>&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a>&gt;&gt;&gt;::iterator <a class="el" href="classfims__info_1_1Information.html">fims_info::Information</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::fleet_iterator</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>iterator for fleet objects&gt; </p>
+
+</div>
+</div>
+<a id="a097b77c0c18c6e4bccac2950a20604ca" name="a097b77c0c18c6e4bccac2950a20604ca"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a097b77c0c18c6e4bccac2950a20604ca">&#9670;&#160;</a></span>growth_models_iterator</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typedef</a> std::map&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a>,std::shared_ptr&lt;<a class="el" href="structfims__popdy_1_1GrowthBase.html">fims_popdy::GrowthBase</a>&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a>&gt;&gt;&gt;::iterator <a class="el" href="classfims__info_1_1Information.html">fims_info::Information</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::growth_models_iterator</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>iterator for growth objects&gt; </p>
+
+</div>
+</div>
+<a id="ae05182ea1e481f936b81e0eb2b3d46b6" name="ae05182ea1e481f936b81e0eb2b3d46b6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae05182ea1e481f936b81e0eb2b3d46b6">&#9670;&#160;</a></span>maturity_models_iterator</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typedef</a> std::map&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a>,std::shared_ptr&lt;<a class="el" href="structfims__popdy_1_1MaturityBase.html">fims_popdy::MaturityBase</a>&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a>&gt;&gt;&gt;::iterator <a class="el" href="classfims__info_1_1Information.html">fims_info::Information</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::maturity_models_iterator</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>iterator for maturity objects&gt; </p>
+
+</div>
+</div>
+<a id="a9626f44ca9843b5b443519b933438a8f" name="a9626f44ca9843b5b443519b933438a8f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9626f44ca9843b5b443519b933438a8f">&#9670;&#160;</a></span>model_map_iterator</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typedef</a> std::unordered_map&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a>,std::shared_ptr&lt;<a class="el" href="classfims__popdy_1_1FisheryModelBase.html">fims_popdy::FisheryModelBase</a>&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a>&gt;&gt;&gt;::iterator <a class="el" href="classfims__info_1_1Information.html">fims_info::Information</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::model_map_iterator</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>iterator for variable map&gt; </p>
+
+</div>
+</div>
+<a id="a59798203b69a6288904fed2c867fb95d" name="a59798203b69a6288904fed2c867fb95d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a59798203b69a6288904fed2c867fb95d">&#9670;&#160;</a></span>population_iterator</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typedef</a> std::map&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a>,std::shared_ptr&lt;<a class="el" href="structfims__popdy_1_1Population.html">fims_popdy::Population</a>&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a>&gt;&gt;&gt;::iterator <a class="el" href="classfims__info_1_1Information.html">fims_info::Information</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::population_iterator</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>iterator for population objects&gt; </p>
+
+</div>
+</div>
+<a id="a7b3b33b46cbb65c847ad47e50ef17c98" name="a7b3b33b46cbb65c847ad47e50ef17c98"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7b3b33b46cbb65c847ad47e50ef17c98">&#9670;&#160;</a></span>recruitment_models_iterator</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typedef</a> std::map&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a>,std::shared_ptr&lt;<a class="el" href="structfims__popdy_1_1RecruitmentBase.html">fims_popdy::RecruitmentBase</a>&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a>&gt;&gt;&gt;::iterator <a class="el" href="classfims__info_1_1Information.html">fims_info::Information</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::recruitment_models_iterator</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>iterator for recruitment objects&gt; </p>
+
+</div>
+</div>
+<a id="accc31564a8057bebc1b0013d72498b24" name="accc31564a8057bebc1b0013d72498b24"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#accc31564a8057bebc1b0013d72498b24">&#9670;&#160;</a></span>recruitment_process_iterator</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typedef</a> std::map&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a>,std::shared_ptr&lt;<a class="el" href="structfims__popdy_1_1RecruitmentBase.html">fims_popdy::RecruitmentBase</a>&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a>&gt;&gt;&gt;::iterator <a class="el" href="classfims__info_1_1Information.html">fims_info::Information</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::recruitment_process_iterator</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>iterator for recruitment process objects&gt; </p>
+
+</div>
+</div>
+<a id="ad6b814e85fe0f43684f775cb46eb808a" name="ad6b814e85fe0f43684f775cb46eb808a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad6b814e85fe0f43684f775cb46eb808a">&#9670;&#160;</a></span>selectivity_models_iterator</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typedef</a> std::map&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a>,std::shared_ptr&lt;<a class="el" href="structfims__popdy_1_1SelectivityBase.html">fims_popdy::SelectivityBase</a>&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a>&gt;&gt;&gt;::iterator <a class="el" href="classfims__info_1_1Information.html">fims_info::Information</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::selectivity_models_iterator</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>iterator for selectivity objects&gt; </p>
+
+</div>
+</div>
+<a id="ad368f0de6ac26ced1ae33721a89772b5" name="ad368f0de6ac26ced1ae33721a89772b5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad368f0de6ac26ced1ae33721a89772b5">&#9670;&#160;</a></span>variable_map_iterator</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typedef</a> std::unordered_map&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a>,<a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a>&gt;*&gt;::iterator <a class="el" href="classfims__info_1_1Information.html">fims_info::Information</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::variable_map_iterator</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>iterator for variable map&gt; </p>
+
+</div>
+</div>
+<h2 class="groupheader">Member Function Documentation</h2>
+<a id="a7fa2c6cc68de26e26b6c1085600675bc" name="a7fa2c6cc68de26e26b6c1085600675bc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7fa2c6cc68de26e26b6c1085600675bc">&#9670;&#160;</a></span>CheckModel()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a> <a class="el" href="classfims__info_1_1Information.html">fims_info::Information</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::CheckModel </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Checks to make sure all required modules are present for specified model. </p>
+<dl class="section return"><dt>Returns</dt><dd>True if valid model, False if invalid model, check fims.log for errors. </dd></dl>
+
+</div>
+</div>
+<a id="abc3b88b939a39ab003021f11ad9e88c1" name="abc3b88b939a39ab003021f11ad9e88c1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abc3b88b939a39ab003021f11ad9e88c1">&#9670;&#160;</a></span>CreateFleetObjects()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a> <a class="el" href="classfims__info_1_1Information.html">fims_info::Information</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::CreateFleetObjects </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a> &amp;&#160;</td>
+          <td class="paramname"><em>valid_model</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Loop over all fleets and set pointers to fleet objects. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">&amp;valid_model</td><td>reference to true/false boolean indicating whether model is valid. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a87a3d2d9a1575dbba625398e7cadd904" name="a87a3d2d9a1575dbba625398e7cadd904"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a87a3d2d9a1575dbba625398e7cadd904">&#9670;&#160;</a></span>CreateModel()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a> <a class="el" href="classfims__info_1_1Information.html">fims_info::Information</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::CreateModel </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Create the generalized stock assessment model that will evaluate the objective function. Does error checking to make sure the program has all necessary components for the model and that they're in the right dimensions. This sets up pointers to all memory objects and initializes fleet and population objects. </p>
+<dl class="section return"><dt>Returns</dt><dd>True if valid model, False if invalid model, check fims.log for errors. </dd></dl>
+
+</div>
+</div>
+<a id="a4dfbfb078010da333e1be823deccc76f" name="a4dfbfb078010da333e1be823deccc76f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4dfbfb078010da333e1be823deccc76f">&#9670;&#160;</a></span>CreatePopulationObjects()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a> <a class="el" href="classfims__info_1_1Information.html">fims_info::Information</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::CreatePopulationObjects </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a> &amp;&#160;</td>
+          <td class="paramname"><em>valid_model</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Loop over all populations and set pointers to population objects. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">&amp;valid_model</td><td>reference to true/false boolean indicating whether model is valid. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a1898b705511747d5d21415cb6633e9f9" name="a1898b705511747d5d21415cb6633e9f9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1898b705511747d5d21415cb6633e9f9">&#9670;&#160;</a></span>GetFixedEffectsParameters()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> * &gt; &amp; <a class="el" href="classfims__info_1_1Information.html">fims_info::Information</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::GetFixedEffectsParameters </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the Fixed Effects Parameters object. </p>
+<dl class="section return"><dt>Returns</dt><dd>std::vector&lt;Type*&gt;&amp; </dd></dl>
+
+</div>
+</div>
+<a id="aea0008a9935a78fe17f5ec217ac4c621" name="aea0008a9935a78fe17f5ec217ac4c621"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aea0008a9935a78fe17f5ec217ac4c621">&#9670;&#160;</a></span>GetInstance()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">static</a> std::shared_ptr&lt; <a class="el" href="classfims__info_1_1Information.html">Information</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt; <a class="el" href="classfims__info_1_1Information.html">fims_info::Information</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::GetInstance </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Returns a singleton <a class="el" href="classfims__info_1_1Information.html" title="Stores FIMS model information and creates model. Contains all objects and data pre-model construction...">Information</a> object for type T. </p>
+<dl class="section return"><dt>Returns</dt><dd>singleton for type T </dd></dl>
+
+</div>
+</div>
+<a id="a6f0c12f547444da4af4068bdc79efafe" name="a6f0c12f547444da4af4068bdc79efafe"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6f0c12f547444da4af4068bdc79efafe">&#9670;&#160;</a></span>GetNages()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a> <a class="el" href="classfims__info_1_1Information.html">fims_info::Information</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::GetNages </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the Nages object. </p>
+<dl class="section return"><dt>Returns</dt><dd>size_t </dd></dl>
+
+</div>
+</div>
+<a id="ad35271c481119df45a855ac00f1957fb" name="ad35271c481119df45a855ac00f1957fb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad35271c481119df45a855ac00f1957fb">&#9670;&#160;</a></span>GetNyears()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a> <a class="el" href="classfims__info_1_1Information.html">fims_info::Information</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::GetNyears </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the n_years object. </p>
+<dl class="section return"><dt>Returns</dt><dd>size_t </dd></dl>
+
+</div>
+</div>
+<a id="acc18255fcff0c2823763f8c894856aee" name="acc18255fcff0c2823763f8c894856aee"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acc18255fcff0c2823763f8c894856aee">&#9670;&#160;</a></span>GetParameters()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> * &gt; &amp; <a class="el" href="classfims__info_1_1Information.html">fims_info::Information</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::GetParameters </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the Parameters object. </p>
+<dl class="section return"><dt>Returns</dt><dd>std::vector&lt;Type*&gt;&amp; </dd></dl>
+
+</div>
+</div>
+<a id="ac9ff87a4ab5063bf366c18a8e67b900c" name="ac9ff87a4ab5063bf366c18a8e67b900c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac9ff87a4ab5063bf366c18a8e67b900c">&#9670;&#160;</a></span>GetRandomEffectsParameters()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> * &gt; &amp; <a class="el" href="classfims__info_1_1Information.html">fims_info::Information</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::GetRandomEffectsParameters </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the Random Effects Parameters object. </p>
+<dl class="section return"><dt>Returns</dt><dd>std::vector&lt;Type*&gt;&amp; </dd></dl>
+
+</div>
+</div>
+<a id="a59f18d95d8425246661e3513cecdc0a2" name="a59f18d95d8425246661e3513cecdc0a2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a59f18d95d8425246661e3513cecdc0a2">&#9670;&#160;</a></span>RegisterParameter()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a> <a class="el" href="classfims__info_1_1Information.html">fims_info::Information</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::RegisterParameter </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &amp;&#160;</td>
+          <td class="paramname"><em>p</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Register a parameter as estimable. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">p</td><td>parameter </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ad8957d597804821e05f7c710c8ac5d76" name="ad8957d597804821e05f7c710c8ac5d76"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad8957d597804821e05f7c710c8ac5d76">&#9670;&#160;</a></span>RegisterParameterName()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a> <a class="el" href="classfims__info_1_1Information.html">fims_info::Information</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::RegisterParameterName </td>
+          <td>(</td>
+          <td class="paramtype">std::string&#160;</td>
+          <td class="paramname"><em>p_name</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Register a parameter name. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">p_name</td><td>parameter name </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a638e4deb58e190b72db9fb6225325b79" name="a638e4deb58e190b72db9fb6225325b79"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a638e4deb58e190b72db9fb6225325b79">&#9670;&#160;</a></span>RegisterRandomEffect()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a> <a class="el" href="classfims__info_1_1Information.html">fims_info::Information</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::RegisterRandomEffect </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &amp;&#160;</td>
+          <td class="paramname"><em>re</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Register a random effect as estimable. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">re</td><td>random effect </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a17b83c06fd67ff15f52c851426de5f41" name="a17b83c06fd67ff15f52c851426de5f41"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a17b83c06fd67ff15f52c851426de5f41">&#9670;&#160;</a></span>RegisterRandomEffectName()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a> <a class="el" href="classfims__info_1_1Information.html">fims_info::Information</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::RegisterRandomEffectName </td>
+          <td>(</td>
+          <td class="paramtype">std::string&#160;</td>
+          <td class="paramname"><em>re_name</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Register a random effects name. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">re_name</td><td>random effects name </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="aa5ba1172e68e3de66dbadbbaa1ed5c11" name="aa5ba1172e68e3de66dbadbbaa1ed5c11"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa5ba1172e68e3de66dbadbbaa1ed5c11">&#9670;&#160;</a></span>SetAgeCompositionData()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a> <a class="el" href="classfims__info_1_1Information.html">fims_info::Information</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::SetAgeCompositionData </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a> &amp;&#160;</td>
+          <td class="paramname"><em>valid_model</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::shared_ptr&lt; <a class="el" href="structfims__popdy_1_1Fleet.html">fims_popdy::Fleet</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt;&#160;</td>
+          <td class="paramname"><em>f</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Set pointers to age composition data in the fleet module. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">&amp;valid_model</td><td>reference to true/false boolean indicating whether model is valid. </td></tr>
+    <tr><td class="paramname">f</td><td>shared pointer to fleet module </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a4a1c03ce871c9a8c2e300aaeda49ff38" name="a4a1c03ce871c9a8c2e300aaeda49ff38"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4a1c03ce871c9a8c2e300aaeda49ff38">&#9670;&#160;</a></span>SetDataObjects()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a> <a class="el" href="classfims__info_1_1Information.html">fims_info::Information</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::SetDataObjects </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a> &amp;&#160;</td>
+          <td class="paramname"><em>valid_model</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Loop over all density components and set pointers to data objects. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">&amp;valid_model</td><td>reference to true/false boolean indicating whether model is valid. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a21cdc88c62adecae565dc8d092445c3b" name="a21cdc88c62adecae565dc8d092445c3b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a21cdc88c62adecae565dc8d092445c3b">&#9670;&#160;</a></span>SetFleetIndexData()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a> <a class="el" href="classfims__info_1_1Information.html">fims_info::Information</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::SetFleetIndexData </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a> &amp;&#160;</td>
+          <td class="paramname"><em>valid_model</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::shared_ptr&lt; <a class="el" href="structfims__popdy_1_1Fleet.html">fims_popdy::Fleet</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt;&#160;</td>
+          <td class="paramname"><em>f</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Set pointers to index data in the fleet module. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">&amp;valid_model</td><td>reference to true/false boolean indicating whether model is valid. </td></tr>
+    <tr><td class="paramname">f</td><td>shared pointer to fleet module </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a1b5343821495e628e1cf91f1d4316a9c" name="a1b5343821495e628e1cf91f1d4316a9c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1b5343821495e628e1cf91f1d4316a9c">&#9670;&#160;</a></span>SetFleetLandingsData()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a> <a class="el" href="classfims__info_1_1Information.html">fims_info::Information</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::SetFleetLandingsData </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a> &amp;&#160;</td>
+          <td class="paramname"><em>valid_model</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::shared_ptr&lt; <a class="el" href="structfims__popdy_1_1Fleet.html">fims_popdy::Fleet</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt;&#160;</td>
+          <td class="paramname"><em>f</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Set pointers to landings data in the fleet module. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">&amp;valid_model</td><td>reference to true/false boolean indicating whether model is valid. </td></tr>
+    <tr><td class="paramname">f</td><td>shared pointer to fleet module </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a573d4dea26550f00973bf8b1186d9d5d" name="a573d4dea26550f00973bf8b1186d9d5d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a573d4dea26550f00973bf8b1186d9d5d">&#9670;&#160;</a></span>SetFleetSelectivityModel()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a> <a class="el" href="classfims__info_1_1Information.html">fims_info::Information</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::SetFleetSelectivityModel </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a> &amp;&#160;</td>
+          <td class="paramname"><em>valid_model</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::shared_ptr&lt; <a class="el" href="structfims__popdy_1_1Fleet.html">fims_popdy::Fleet</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt;&#160;</td>
+          <td class="paramname"><em>f</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Set pointers to the selectivity module referenced in the fleet module. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">&amp;valid_model</td><td>reference to true/false boolean indicating whether model is valid. </td></tr>
+    <tr><td class="paramname">f</td><td>shared pointer to fleet module </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a25c05134865b8f7a2ff4dc53a02d47f4" name="a25c05134865b8f7a2ff4dc53a02d47f4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a25c05134865b8f7a2ff4dc53a02d47f4">&#9670;&#160;</a></span>SetGrowth()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a> <a class="el" href="classfims__info_1_1Information.html">fims_info::Information</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::SetGrowth </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a> &amp;&#160;</td>
+          <td class="paramname"><em>valid_model</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::shared_ptr&lt; <a class="el" href="structfims__popdy_1_1Population.html">fims_popdy::Population</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt;&#160;</td>
+          <td class="paramname"><em>p</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Set pointers to the growth module referenced in the population module. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">&amp;valid_model</td><td>reference to true/false boolean indicating whether model is valid. </td></tr>
+    <tr><td class="paramname">p</td><td>shared pointer to population module </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a51c74194eb52450d2a0256c80187b75d" name="a51c74194eb52450d2a0256c80187b75d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a51c74194eb52450d2a0256c80187b75d">&#9670;&#160;</a></span>SetLengthCompositionData()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a> <a class="el" href="classfims__info_1_1Information.html">fims_info::Information</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::SetLengthCompositionData </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a> &amp;&#160;</td>
+          <td class="paramname"><em>valid_model</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::shared_ptr&lt; <a class="el" href="structfims__popdy_1_1Fleet.html">fims_popdy::Fleet</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt;&#160;</td>
+          <td class="paramname"><em>f</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Set pointers to length composition data in the fleet module. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">&amp;valid_model</td><td>reference to true/false boolean indicating whether model is valid. </td></tr>
+    <tr><td class="paramname">f</td><td>shared pointer to fleet module </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a43f5f387c501dde13948832e4d856df9" name="a43f5f387c501dde13948832e4d856df9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a43f5f387c501dde13948832e4d856df9">&#9670;&#160;</a></span>SetMaturity()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a> <a class="el" href="classfims__info_1_1Information.html">fims_info::Information</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::SetMaturity </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a> &amp;&#160;</td>
+          <td class="paramname"><em>valid_model</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::shared_ptr&lt; <a class="el" href="structfims__popdy_1_1Population.html">fims_popdy::Population</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt;&#160;</td>
+          <td class="paramname"><em>p</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Set pointers to the maturity module referenced in the population module. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">&amp;valid_model</td><td>reference to true/false boolean indicating whether model is valid. </td></tr>
+    <tr><td class="paramname">p</td><td>shared pointer to population module </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a6e14a55eaacbc681d65b112e978ec35d" name="a6e14a55eaacbc681d65b112e978ec35d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6e14a55eaacbc681d65b112e978ec35d">&#9670;&#160;</a></span>SetNages()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a> <a class="el" href="classfims__info_1_1Information.html">fims_info::Information</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::SetNages </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a>&#160;</td>
+          <td class="paramname"><em>n_ages</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Set the Nages object. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">n_ages</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a7778e9861c1a7ebde61d9d46f2429224" name="a7778e9861c1a7ebde61d9d46f2429224"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7778e9861c1a7ebde61d9d46f2429224">&#9670;&#160;</a></span>SetNyears()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a> <a class="el" href="classfims__info_1_1Information.html">fims_info::Information</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::SetNyears </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a>&#160;</td>
+          <td class="paramname"><em>n_years</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Set the n_years object. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">n_years</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a668558a0e718a108fb7976c1da5583c6" name="a668558a0e718a108fb7976c1da5583c6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a668558a0e718a108fb7976c1da5583c6">&#9670;&#160;</a></span>SetRecruitment()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a> <a class="el" href="classfims__info_1_1Information.html">fims_info::Information</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::SetRecruitment </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a> &amp;&#160;</td>
+          <td class="paramname"><em>valid_model</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::shared_ptr&lt; <a class="el" href="structfims__popdy_1_1Population.html">fims_popdy::Population</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt;&#160;</td>
+          <td class="paramname"><em>p</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Set pointers to the recruitment module referenced in the population module. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">&amp;valid_model</td><td>reference to true/false boolean indicating whether model is valid. </td></tr>
+    <tr><td class="paramname">p</td><td>shared pointer to population module </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a7da455d8f48af95add1a75bf1b495f8a" name="a7da455d8f48af95add1a75bf1b495f8a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7da455d8f48af95add1a75bf1b495f8a">&#9670;&#160;</a></span>SetRecruitmentProcess()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a> <a class="el" href="classfims__info_1_1Information.html">fims_info::Information</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::SetRecruitmentProcess </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a> &amp;&#160;</td>
+          <td class="paramname"><em>valid_model</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::shared_ptr&lt; <a class="el" href="structfims__popdy_1_1Population.html">fims_popdy::Population</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt;&#160;</td>
+          <td class="paramname"><em>p</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Set pointers to the recruitment process module referenced in the population module. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">&amp;valid_model</td><td>reference to true/false boolean indicating whether model is valid. </td></tr>
+    <tr><td class="paramname">p</td><td>shared pointer to population module </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ae8eae11b55e1c570310b064348b3d586" name="ae8eae11b55e1c570310b064348b3d586"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae8eae11b55e1c570310b064348b3d586">&#9670;&#160;</a></span>State()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string <a class="el" href="classfims__info_1_1Information.html">fims_info::Information</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::State </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get a summary string of the <a class="el" href="classfims__info_1_1Information.html" title="Stores FIMS model information and creates model. Contains all objects and data pre-model construction...">Information</a> object state. </p>
+<p>Returns a string containing the sizes and states of all major containers and model components in the <a class="el" href="classfims__info_1_1Information.html" title="Stores FIMS model information and creates model. Contains all objects and data pre-model construction...">Information</a> object. Useful for debugging and diagnostics.</p>
+<dl class="section return"><dt>Returns</dt><dd>std::string summary of the <a class="el" href="classfims__info_1_1Information.html" title="Stores FIMS model information and creates model. Contains all objects and data pre-model construction...">Information</a> object state. </dd></dl>
+
+</div>
+</div>
+<h2 class="groupheader">Member Data Documentation</h2>
+<a id="afe718e2553694ba44247477ee0d187e9" name="afe718e2553694ba44247477ee0d187e9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afe718e2553694ba44247477ee0d187e9">&#9670;&#160;</a></span>data_objects</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">std::map&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a>, std::shared_ptr&lt;<a class="el" href="structfims__data__object_1_1DataObject.html">fims_data_object::DataObject</a>&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a>&gt; &gt; &gt; <a class="el" href="classfims__info_1_1Information.html">fims_info::Information</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::data_objects</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>map that holds data objects &gt; </p>
+
+</div>
+</div>
+<a id="a628c455233e9564933cbd8c6f0ce1589" name="a628c455233e9564933cbd8c6f0ce1589"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a628c455233e9564933cbd8c6f0ce1589">&#9670;&#160;</a></span>density_components</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">std::map&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a>, std::shared_ptr&lt;<a class="el" href="structfims__distributions_1_1DensityComponentBase.html">fims_distributions::DensityComponentBase</a>&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a>&gt; &gt; &gt; <a class="el" href="classfims__info_1_1Information.html">fims_info::Information</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::density_components</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>hash map to link each object to its shared location in memory </p>
+
+</div>
+</div>
+<a id="af21bebe91662251ada5ac37feaac1af5" name="af21bebe91662251ada5ac37feaac1af5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af21bebe91662251ada5ac37feaac1af5">&#9670;&#160;</a></span>fims_information</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::shared_ptr&lt; <a class="el" href="classfims__info_1_1Information.html">Information</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt; <a class="el" href="classfims__info_1_1Information.html">fims_info::Information</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::fims_information</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<b>Initial value:</b><div class="fragment"><div class="line">=</div>
+<div class="line">    <span class="keyword">nullptr</span></div>
+</div><!-- fragment --><p>singleton instance &gt; </p>
+
+</div>
+</div>
+<a id="ad4f84b2d8e58abddbc6408344bbc1f96" name="ad4f84b2d8e58abddbc6408344bbc1f96"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad4f84b2d8e58abddbc6408344bbc1f96">&#9670;&#160;</a></span>fixed_effects_parameters</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> *&gt; <a class="el" href="classfims__info_1_1Information.html">fims_info::Information</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::fixed_effects_parameters</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>list of all fixed effects parameters &gt; </p>
+
+</div>
+</div>
+<a id="a4d544f7e8c08032dd12ef14961e40822" name="a4d544f7e8c08032dd12ef14961e40822"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4d544f7e8c08032dd12ef14961e40822">&#9670;&#160;</a></span>fleets</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">std::map&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a>, std::shared_ptr&lt;<a class="el" href="structfims__popdy_1_1Fleet.html">fims_popdy::Fleet</a>&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a>&gt; &gt; &gt; <a class="el" href="classfims__info_1_1Information.html">fims_info::Information</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::fleets</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>hash map to link each object to its shared location in memory </p>
+
+</div>
+</div>
+<a id="a4edd9876dd8d49da388487ec26b5ada6" name="a4edd9876dd8d49da388487ec26b5ada6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4edd9876dd8d49da388487ec26b5ada6">&#9670;&#160;</a></span>growth_models</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">std::map&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a>, std::shared_ptr&lt;<a class="el" href="structfims__popdy_1_1GrowthBase.html">fims_popdy::GrowthBase</a>&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a>&gt; &gt; &gt; <a class="el" href="classfims__info_1_1Information.html">fims_info::Information</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::growth_models</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>hash map to link each object to its shared location in memory </p>
+
+</div>
+</div>
+<a id="ac266167f6ac429cc29ea8846c3da8781" name="ac266167f6ac429cc29ea8846c3da8781"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac266167f6ac429cc29ea8846c3da8781">&#9670;&#160;</a></span>maturity_models</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">std::map&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a>, std::shared_ptr&lt;<a class="el" href="structfims__popdy_1_1MaturityBase.html">fims_popdy::MaturityBase</a>&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a>&gt; &gt; &gt; <a class="el" href="classfims__info_1_1Information.html">fims_info::Information</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::maturity_models</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>hash map to link each object to its shared location in memory </p>
+
+</div>
+</div>
+<a id="a14847edc29ac248e9dcaf194d824112b" name="a14847edc29ac248e9dcaf194d824112b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a14847edc29ac248e9dcaf194d824112b">&#9670;&#160;</a></span>models_map</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">std::unordered_map&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a>, std::shared_ptr&lt;<a class="el" href="classfims__popdy_1_1FisheryModelBase.html">fims_popdy::FisheryModelBase</a>&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a>&gt; &gt; &gt; <a class="el" href="classfims__info_1_1Information.html">fims_info::Information</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::models_map</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>hash map of fishery models, e.g., CAA, GMACS, Spatial, etc </p>
+
+</div>
+</div>
+<a id="a91fe02769f34b8f3571b20d300c6b7d5" name="a91fe02769f34b8f3571b20d300c6b7d5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a91fe02769f34b8f3571b20d300c6b7d5">&#9670;&#160;</a></span>n_ages</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a> <a class="el" href="classfims__info_1_1Information.html">fims_info::Information</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::n_ages = 0</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>number of ages&gt; </p>
+
+</div>
+</div>
+<a id="a4bba008c429f6c2b43ab2248899f012a" name="a4bba008c429f6c2b43ab2248899f012a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4bba008c429f6c2b43ab2248899f012a">&#9670;&#160;</a></span>n_years</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a> <a class="el" href="classfims__info_1_1Information.html">fims_info::Information</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::n_years = 0</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>number of years &gt; </p>
+
+</div>
+</div>
+<a id="ac1fbb03c15a0c6ca3d634b8761804823" name="ac1fbb03c15a0c6ca3d634b8761804823"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac1fbb03c15a0c6ca3d634b8761804823">&#9670;&#160;</a></span>parameter_names</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt;std::string&gt; <a class="el" href="classfims__info_1_1Information.html">fims_info::Information</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::parameter_names</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>list of all parameter names estimated in the model </p>
+
+</div>
+</div>
+<a id="a4eaf81c500c0d0abdcccb621b73df4e0" name="a4eaf81c500c0d0abdcccb621b73df4e0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4eaf81c500c0d0abdcccb621b73df4e0">&#9670;&#160;</a></span>parameters</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> *&gt; <a class="el" href="classfims__info_1_1Information.html">fims_info::Information</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::parameters</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>list of all estimated parameters &gt; </p>
+
+</div>
+</div>
+<a id="a13bc1ac7074aeb44f7ceb0d2b9bb8531" name="a13bc1ac7074aeb44f7ceb0d2b9bb8531"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a13bc1ac7074aeb44f7ceb0d2b9bb8531">&#9670;&#160;</a></span>populations</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">std::map&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a>, std::shared_ptr&lt;<a class="el" href="structfims__popdy_1_1Population.html">fims_popdy::Population</a>&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a>&gt; &gt; &gt; <a class="el" href="classfims__info_1_1Information.html">fims_info::Information</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::populations</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>hash map to link each object to its shared location in memory </p>
+
+</div>
+</div>
+<a id="acae6ee10137877bb3a4d3f353bd2b49a" name="acae6ee10137877bb3a4d3f353bd2b49a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acae6ee10137877bb3a4d3f353bd2b49a">&#9670;&#160;</a></span>random_effects_names</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt;std::string&gt; <a class="el" href="classfims__info_1_1Information.html">fims_info::Information</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::random_effects_names</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>list of all random effects names estimated in the model </p>
+
+</div>
+</div>
+<a id="af78de7edc3287ccc7b047cea2275db8d" name="af78de7edc3287ccc7b047cea2275db8d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af78de7edc3287ccc7b047cea2275db8d">&#9670;&#160;</a></span>random_effects_parameters</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> *&gt; <a class="el" href="classfims__info_1_1Information.html">fims_info::Information</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::random_effects_parameters</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>list of all random effects parameters &gt; </p>
+
+</div>
+</div>
+<a id="af84f12390187dbdf6864fdf5d052b499" name="af84f12390187dbdf6864fdf5d052b499"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af84f12390187dbdf6864fdf5d052b499">&#9670;&#160;</a></span>recruitment_models</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">std::map&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a>, std::shared_ptr&lt;<a class="el" href="structfims__popdy_1_1RecruitmentBase.html">fims_popdy::RecruitmentBase</a>&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a>&gt; &gt; &gt; <a class="el" href="classfims__info_1_1Information.html">fims_info::Information</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::recruitment_models</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>hash map to link each object to its shared location in memory </p>
+
+</div>
+</div>
+<a id="a2ef86120762c7b017f3db7edbb929364" name="a2ef86120762c7b017f3db7edbb929364"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2ef86120762c7b017f3db7edbb929364">&#9670;&#160;</a></span>recruitment_process_models</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">std::map&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a>, std::shared_ptr&lt;<a class="el" href="structfims__popdy_1_1RecruitmentBase.html">fims_popdy::RecruitmentBase</a>&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a>&gt; &gt; &gt; <a class="el" href="classfims__info_1_1Information.html">fims_info::Information</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::recruitment_process_models</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>hash map to link each object to its shared location in memory </p>
+
+</div>
+</div>
+<a id="a85b08dfc5ad664cb9a655fab6285952c" name="a85b08dfc5ad664cb9a655fab6285952c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a85b08dfc5ad664cb9a655fab6285952c">&#9670;&#160;</a></span>selectivity_models</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">std::map&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a>, std::shared_ptr&lt;<a class="el" href="structfims__popdy_1_1SelectivityBase.html">fims_popdy::SelectivityBase</a>&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a>&gt; &gt; &gt; <a class="el" href="classfims__info_1_1Information.html">fims_info::Information</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::selectivity_models</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>hash map to link each object to its shared location in memory </p>
+
+</div>
+</div>
+<a id="a9909a48c22cda7a54bd7b88da355ef97" name="a9909a48c22cda7a54bd7b88da355ef97"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9909a48c22cda7a54bd7b88da355ef97">&#9670;&#160;</a></span>variable_map</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">std::unordered_map&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a>, <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a>&gt; *&gt; <a class="el" href="classfims__info_1_1Information.html">fims_info::Information</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::variable_map</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>hash map to link a parameter, derived value, or observation to its shared location in memory </p>
+
+</div>
+</div>
+<hr/>The documentation for this class was generated from the following file:<ul>
+<li>inst/include/common/<a class="el" href="information_8hpp_source.html">information.hpp</a></li>
+</ul>
+</div><!-- contents -->
+</div><!-- doc-content -->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><b>fims_info</b></li><li class="navelem"><a class="el" href="classfims__info_1_1Information.html">Information</a></li>
+    <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.8 </li>
+  </ul>
+</div>
+</body>
+</html>

@@ -1,0 +1,1237 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" data-bs-theme="auto">
+<head>
+    <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=9"/>
+    <meta name="generator" content="Doxygen 1.9.8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>FIMS</title><link href="tabs.css" rel="stylesheet" type="text/css"/>
+    <link rel="icon" type="image/png" href="https://noaa-fims.github.io/images/FIMS_hexlogo.png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+    <link href="https://noaa-fims.github.io/site_libs/bootstrap/bootstrap-5477dd34fdf9f443df58de9070e2fbd7.min.css" rel="stylesheet">
+    <link href="https://noaa-fims.github.io/site_libs/bootstrap/bootstrap-dark-429bd3fc0b6810d1347fc340b0896c35.min.css" rel="stylesheet" media="(prefers-color-scheme: dark)">
+    <script type="text/javascript" src="jquery.js"></script>
+    <script type="text/javascript" src="dynsections.js"></script>
+    <link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+    <link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+  $(document).ready(function() { init_search(); });
+/* @license-end */
+</script>
+    <script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  extensions: ["tex2jax.js"],
+  jax: ["input/TeX","output/HTML-CSS"],
+});
+</script>
+<script type="text/javascript" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js"></script>
+    <link href="doxygen.css" rel="stylesheet" type="text/css" />
+    <link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
+<link href="custom.css" rel="stylesheet" type="text/css"/>
+    <script src="https://noaa-fims.github.io/site_libs/quarto-nav/quarto-nav.js"></script>
+    <script src="https://noaa-fims.github.io/site_libs/bootstrap/bootstrap.min.js"></script>
+    <script src="https://noaa-fims.github.io/site_libs/quarto-html/quarto.js" type="module"></script>
+</head>
+<body>
+<div id="top">
+    <div id="titlearea">
+        <table cellspacing="0" cellpadding="0">
+            <tbody>
+            <tr style="height: 70px;">
+                <td id="projectlogo"><img alt="Logo" src="FIMS_logo3.png"/></td>
+                <td id="projectalign" style="padding-left: 0.5em;">
+                    <div id="projectname">FIMS
+                        &#160;<span id="projectnumber">v0.8.1</span></div>
+                    <div id="projectbrief"></div></td>
+                <td style="padding-left: 0.5em;">
+                    <div id="projectbrief"></div>
+                </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <nav class="navbar navbar-expand-lg " data-bs-theme="auto">
+      <div class="navbar-container container-fluid">
+        <div class="navbar-brand-container mx-auto">
+          <a href="https://noaa-fims.github.io/" class="navbar-brand navbar-brand-logo"></a>
+          <a class="navbar-brand" href="https://noaa-fims.github.io/">
+          </a>
+        </div>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+          <ul class="navbar-nav navbar-nav-scroll ms-auto">
+           <li class="nav-item dropdown">
+            <button class="nav-link dropdown-toggle" type="button" id="dropdown-reference" data-bs-toggle="dropdown"
+                    aria-expanded="false" aria-haspopup="true">reference</button>
+            <ul class="dropdown-menu" aria-labelledby="dropdown-reference">
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/reference/index.html">r/roxygen</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/doxygen/index.html">c++/doxygen</a></li>
+            </ul>
+           </li>
+            <li class="nav-item dropdown">
+            <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown"
+                    aria-expanded="false" aria-haspopup="true">articles</button>
+            <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
+              <li><h6 class="dropdown-header" data-toc-skip>intro to fims</h6></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/fims-demo.html">introducing the fisheries integrated modeling system (fims)</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/fims-logging.html">Introducing the fims logging system</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/fims-user-setup-guide.html">fims user setup guide</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/fims-demo-projections.html">simple projections using fims</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><h6 class="dropdown-header" data-toc-skip>developer</h6></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/fims-path-maturity.html">fims path - maturity</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><h6 class="dropdown-header" data-toc-skip>c++ training</h6></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/training-intro-cpp.html">intro to c++</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/training-intro-rcpp.html">intro to rcpp</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><h6 class="dropdown-header" data-toc-skip>research and development</h6></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/RD-re-sparsity.html">re sparsity</a></li>
+            </ul>
+          </li>
+            <li class="nav-item dropdown">
+              <button class="nav-link dropdown-toggle" type="button" id="dropdown-news" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">news</button>
+              <ul class="dropdown-menu" aria-labelledby="dropdown-news">
+                <li><h6 class="dropdown-header" data-toc-skip="">Releases</h6></li>
+                <li><a class="external-link dropdown-item" href="https://github.com/NOAA-FIMS/FIMS/releases/latest">latest release</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/news/index.html">changelog</a></li>
+              </ul>
+            </li>
+          <li class="nav-item dropdown">
+            <button class="nav-link dropdown-toggle" type="button" id="dropdown-reports" data-bs-toggle="dropdown"
+                    aria-expanded="false" aria-haspopup="true">reports</button>
+            <ul class="dropdown-menu" aria-labelledby="dropdown-reports">
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/coverage/coverage.html">coverage</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/coverage/codecoverage_explanation.html">coverage explained</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/testdown/index.html">testdown</a></li>
+            </ul>
+          </li>
+          <ul class="navbar-nav">
+            <li class="nav-item"><a class="external-link nav-link" href="https://noaa-fims.github.io/">fims website</a></li>
+            <li class="nav-item">
+              <a class="external-link nav-link" href="https://github.com/noaa-fims/fims/" aria-label="GitHub repository for FIMS">
+                <span class="fa fa-brands fa-github fa-lg"></span>
+              </a>
+            </li>
+            <!-- Keep the input; pkgdown’s autocomplete wrapper won’t exist in Doxygen -->
+            <li class="nav-item">
+              <form class="form-inline" role="search" onsubmit="return false;">
+                <input class="form-control" type="search" name="search-input" id="search-input"
+                      autocomplete="off" aria-label="Search site" placeholder="Search for">
+              </form>
+            </li>
+          </ul>
+      </div>
+    </div>
+  </nav>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  // Only on the cpp_directory_structure page!
+  document.querySelectorAll('.toc a').forEach(function(link) {
+    if (link.href && link.href.indexOf(location.pathname) !== -1) {
+      link.href = link.hash; // Just use the fragment
+    }
+  });
+});
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  function updateTocActive() {
+    var links = Array.from(document.querySelectorAll('.toc a'));
+    var anchors = links.map(link => document.getElementById(link.getAttribute('href').replace('#', '')));
+    var scrollTop = window.scrollY || document.documentElement.scrollTop;
+    var offset = 150; // Match your scroll-margin-top
+    let currentActive = -1;
+    for (let i = anchors.length - 1; i >= 0; i--) {
+      if (anchors[i] && (anchors[i].getBoundingClientRect().top + window.scrollY - offset) <= scrollTop) {
+        currentActive = i;
+        break;
+      }
+    }
+    links.forEach((link, i) => {
+      link.classList.remove('active', 'aboveActive');
+      if (i === currentActive) {
+        link.classList.add('active');
+      } else if (i < currentActive) {
+        link.classList.add('aboveActive');
+      }
+    });
+  }
+  window.addEventListener('scroll', updateTocActive);
+  window.addEventListener('hashchange', updateTocActive);
+  updateTocActive();
+});
+</script>
+    <!-- end header part -->
+<!-- Generated by Doxygen 1.9.8 -->
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+/* @license-end */
+</script>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(document).ready(function(){initNavTree('classSharedBoolean.html',''); initResizable(); });
+/* @license-end */
+</script>
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">Loading...</div>
+<div class="SRStatus" id="Searching">Searching...</div>
+<div class="SRStatus" id="NoMatches">No Matches</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="summary">
+<a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#friends">Friends</a> &#124;
+<a href="classSharedBoolean-members.html">List of all members</a>  </div>
+  <div class="headertitle"><div class="title">SharedBoolean Class Reference</div></div>
+</div><!--header-->
+<div class="contents">
+
+<p>A class that provides shared ownership of a boolean value.  
+ <a href="classSharedBoolean.html#details">More...</a></p>
+
+<p><code>#include &lt;<a class="el" href="rcpp__shared__primitive_8hpp_source.html">rcpp_shared_primitive.hpp</a>&gt;</code></p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
+Public Member Functions</h2></td></tr>
+<tr class="memitem:ae2484c0af01b96f9c4a07019b0b54500" id="r_ae2484c0af01b96f9c4a07019b0b54500"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSharedBoolean.html#ae2484c0af01b96f9c4a07019b0b54500">SharedBoolean</a> ()</td></tr>
+<tr class="memdesc:ae2484c0af01b96f9c4a07019b0b54500"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs a new <a class="el" href="classSharedBoolean.html" title="A class that provides shared ownership of a boolean value.">SharedBoolean</a> object with a default value.  <br /></td></tr>
+<tr class="separator:ae2484c0af01b96f9c4a07019b0b54500"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1b40cf8675248cf767cdf3855ac6068f" id="r_a1b40cf8675248cf767cdf3855ac6068f"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSharedBoolean.html#a1b40cf8675248cf767cdf3855ac6068f">SharedBoolean</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">val</a>)</td></tr>
+<tr class="memdesc:a1b40cf8675248cf767cdf3855ac6068f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs a new <a class="el" href="classSharedBoolean.html" title="A class that provides shared ownership of a boolean value.">SharedBoolean</a> object from a boolean value.  <br /></td></tr>
+<tr class="separator:a1b40cf8675248cf767cdf3855ac6068f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a668a15075fd5c294a24afae90242f293" id="r_a668a15075fd5c294a24afae90242f293"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSharedBoolean.html#a668a15075fd5c294a24afae90242f293">SharedBoolean</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="classSharedBoolean.html">SharedBoolean</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">other</a>)</td></tr>
+<tr class="memdesc:a668a15075fd5c294a24afae90242f293"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy constructs a new <a class="el" href="classSharedBoolean.html" title="A class that provides shared ownership of a boolean value.">SharedBoolean</a> object.  <br /></td></tr>
+<tr class="separator:a668a15075fd5c294a24afae90242f293"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a927766d991dc5c5e954fec59c5d0aa0b" id="r_a927766d991dc5c5e954fec59c5d0aa0b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classSharedBoolean.html">SharedBoolean</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSharedBoolean.html#a927766d991dc5c5e954fec59c5d0aa0b">operator=</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="classSharedBoolean.html">SharedBoolean</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">other</a>)</td></tr>
+<tr class="memdesc:a927766d991dc5c5e954fec59c5d0aa0b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overloaded copy assignment operator.  <br /></td></tr>
+<tr class="separator:a927766d991dc5c5e954fec59c5d0aa0b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a79248875981d3036155623e571b52230" id="r_a79248875981d3036155623e571b52230"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classSharedBoolean.html">SharedBoolean</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSharedBoolean.html#a79248875981d3036155623e571b52230">operator=</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">other</a>)</td></tr>
+<tr class="memdesc:a79248875981d3036155623e571b52230"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overloaded assignment operator for a boolean value.  <br /></td></tr>
+<tr class="separator:a79248875981d3036155623e571b52230"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a007e521a52dee22933b89a0fc75765d8" id="r_a007e521a52dee22933b89a0fc75765d8"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSharedBoolean.html#a007e521a52dee22933b89a0fc75765d8">SharedBoolean</a> (<a class="el" href="classSharedBoolean.html">SharedBoolean</a> &amp;&amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">other</a>) <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">noexcept</a></td></tr>
+<tr class="memdesc:a007e521a52dee22933b89a0fc75765d8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs a new <a class="el" href="classSharedBoolean.html" title="A class that provides shared ownership of a boolean value.">SharedBoolean</a> object by moving resources.  <br /></td></tr>
+<tr class="separator:a007e521a52dee22933b89a0fc75765d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab5ebf547dd141ba0d6e582c63e74506e" id="r_ab5ebf547dd141ba0d6e582c63e74506e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classSharedBoolean.html">SharedBoolean</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSharedBoolean.html#ab5ebf547dd141ba0d6e582c63e74506e">operator=</a> (<a class="el" href="classSharedBoolean.html">SharedBoolean</a> &amp;&amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">other</a>) <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">noexcept</a></td></tr>
+<tr class="memdesc:ab5ebf547dd141ba0d6e582c63e74506e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overloaded move assignment operator.  <br /></td></tr>
+<tr class="separator:ab5ebf547dd141ba0d6e582c63e74506e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab8616ea19b6bc2c6f9b1fbb22f4adc95" id="r_ab8616ea19b6bc2c6f9b1fbb22f4adc95"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSharedBoolean.html#ab8616ea19b6bc2c6f9b1fbb22f4adc95">get</a> () <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a></td></tr>
+<tr class="memdesc:ab8616ea19b6bc2c6f9b1fbb22f4adc95"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieves the boolean value managed by the object.  <br /></td></tr>
+<tr class="separator:ab8616ea19b6bc2c6f9b1fbb22f4adc95"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9c3be0e9259ef7ac613b433c3001292d" id="r_a9c3be0e9259ef7ac613b433c3001292d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSharedBoolean.html#a9c3be0e9259ef7ac613b433c3001292d">set</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">val</a>)</td></tr>
+<tr class="memdesc:a9c3be0e9259ef7ac613b433c3001292d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the boolean value of the object.  <br /></td></tr>
+<tr class="separator:a9c3be0e9259ef7ac613b433c3001292d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a18729f0ece4defe8f94c479196c521f5" id="r_a18729f0ece4defe8f94c479196c521f5"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSharedBoolean.html#a18729f0ece4defe8f94c479196c521f5">operator bool</a> ()</td></tr>
+<tr class="memdesc:a18729f0ece4defe8f94c479196c521f5"><td class="mdescLeft">&#160;</td><td class="mdescRight">User-defined conversion to <code>bool</code>.  <br /></td></tr>
+<tr class="separator:a18729f0ece4defe8f94c479196c521f5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af0069caf4a06003c422518f5c1f05d41" id="r_af0069caf4a06003c422518f5c1f05d41"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSharedBoolean.html#af0069caf4a06003c422518f5c1f05d41">operator*</a> () <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a></td></tr>
+<tr class="memdesc:af0069caf4a06003c422518f5c1f05d41"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overloads the dereference operator (<code>*</code>).  <br /></td></tr>
+<tr class="separator:af0069caf4a06003c422518f5c1f05d41"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa898e2f92d2da4ec105c2c69fffec622" id="r_aa898e2f92d2da4ec105c2c69fffec622"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSharedBoolean.html#aa898e2f92d2da4ec105c2c69fffec622">operator-&gt;</a> ()</td></tr>
+<tr class="memdesc:aa898e2f92d2da4ec105c2c69fffec622"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overloads the member access operator (<code>-&gt;</code>).  <br /></td></tr>
+<tr class="separator:aa898e2f92d2da4ec105c2c69fffec622"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7a1d91b38c825363b4d0f37b65d0f85d" id="r_a7a1d91b38c825363b4d0f37b65d0f85d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSharedBoolean.html#a7a1d91b38c825363b4d0f37b65d0f85d">operator-&gt;</a> () <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a></td></tr>
+<tr class="memdesc:a7a1d91b38c825363b4d0f37b65d0f85d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overloads the member access operator (<code>-&gt;</code>) for const objects.  <br /></td></tr>
+<tr class="separator:a7a1d91b38c825363b4d0f37b65d0f85d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a94dcfd6590ef018d246fd3b3b4f09ca0" id="r_a94dcfd6590ef018d246fd3b3b4f09ca0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSharedBoolean.html#a94dcfd6590ef018d246fd3b3b4f09ca0">operator==</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="classSharedBoolean.html">SharedBoolean</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">other</a>) <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a></td></tr>
+<tr class="memdesc:a94dcfd6590ef018d246fd3b3b4f09ca0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overloads the equality operator (<code>==</code>).  <br /></td></tr>
+<tr class="separator:a94dcfd6590ef018d246fd3b3b4f09ca0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a92c84aa51faeef11c0ba1aac6a0175ef" id="r_a92c84aa51faeef11c0ba1aac6a0175ef"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSharedBoolean.html#a92c84aa51faeef11c0ba1aac6a0175ef">operator!=</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="classSharedBoolean.html">SharedBoolean</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">other</a>) <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a></td></tr>
+<tr class="memdesc:a92c84aa51faeef11c0ba1aac6a0175ef"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overloads the inequality operator (<code>!=</code>).  <br /></td></tr>
+<tr class="separator:a92c84aa51faeef11c0ba1aac6a0175ef"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5d996d8892869465cbeac737834bafc8" id="r_a5d996d8892869465cbeac737834bafc8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSharedBoolean.html#a5d996d8892869465cbeac737834bafc8">operator&lt;</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="classSharedBoolean.html">SharedBoolean</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">other</a>) <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a></td></tr>
+<tr class="memdesc:a5d996d8892869465cbeac737834bafc8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overloads the less-than operator (<code>&lt;</code>).  <br /></td></tr>
+<tr class="separator:a5d996d8892869465cbeac737834bafc8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adac52b11b590d9eedfbd011e54ff088d" id="r_adac52b11b590d9eedfbd011e54ff088d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSharedBoolean.html#adac52b11b590d9eedfbd011e54ff088d">operator&lt;=</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="classSharedBoolean.html">SharedBoolean</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">other</a>) <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a></td></tr>
+<tr class="memdesc:adac52b11b590d9eedfbd011e54ff088d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overloads the less-than-or-equal-to operator (<code>&lt;=</code>).  <br /></td></tr>
+<tr class="separator:adac52b11b590d9eedfbd011e54ff088d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa0c78d77d0f9243c8633716e89568571" id="r_aa0c78d77d0f9243c8633716e89568571"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSharedBoolean.html#aa0c78d77d0f9243c8633716e89568571">operator&gt;</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="classSharedBoolean.html">SharedBoolean</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">other</a>) <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a></td></tr>
+<tr class="memdesc:aa0c78d77d0f9243c8633716e89568571"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overloads the greater-than operator (<code>&gt;</code>).  <br /></td></tr>
+<tr class="separator:aa0c78d77d0f9243c8633716e89568571"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a82ed7e4f3565622949ba762393d46645" id="r_a82ed7e4f3565622949ba762393d46645"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSharedBoolean.html#a82ed7e4f3565622949ba762393d46645">operator&gt;=</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="classSharedBoolean.html">SharedBoolean</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">other</a>) <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a></td></tr>
+<tr class="memdesc:a82ed7e4f3565622949ba762393d46645"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overloads the greater-than-or-equal-to operator (<code>&gt;=</code>).  <br /></td></tr>
+<tr class="separator:a82ed7e4f3565622949ba762393d46645"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa5cf7a0255dbd50221018885d503ae8f" id="r_aa5cf7a0255dbd50221018885d503ae8f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSharedBoolean.html#aa5cf7a0255dbd50221018885d503ae8f">operator==</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">other</a>) <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a></td></tr>
+<tr class="memdesc:aa5cf7a0255dbd50221018885d503ae8f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overloads the equality operator (<code>==</code>) for a boolean value.  <br /></td></tr>
+<tr class="separator:aa5cf7a0255dbd50221018885d503ae8f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0c064738978baa4731092865ec7fe810" id="r_a0c064738978baa4731092865ec7fe810"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSharedBoolean.html#a0c064738978baa4731092865ec7fe810">operator!=</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">other</a>) <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a></td></tr>
+<tr class="memdesc:a0c064738978baa4731092865ec7fe810"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overloads the inequality operator (<code>!=</code>) for a boolean value.  <br /></td></tr>
+<tr class="separator:a0c064738978baa4731092865ec7fe810"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a445eaf5818d0c01f1c1f982c2729c11d" id="r_a445eaf5818d0c01f1c1f982c2729c11d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSharedBoolean.html#a445eaf5818d0c01f1c1f982c2729c11d">operator&lt;</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">other</a>) <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a></td></tr>
+<tr class="memdesc:a445eaf5818d0c01f1c1f982c2729c11d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overloads the less-than operator (<code>&lt;</code>) for a boolean value.  <br /></td></tr>
+<tr class="separator:a445eaf5818d0c01f1c1f982c2729c11d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab81fcfac57e617947cf91d548fdca71b" id="r_ab81fcfac57e617947cf91d548fdca71b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSharedBoolean.html#ab81fcfac57e617947cf91d548fdca71b">operator&lt;=</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">other</a>) <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a></td></tr>
+<tr class="memdesc:ab81fcfac57e617947cf91d548fdca71b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overloads the less-than-or-equal-to operator (<code>&lt;=</code>) for a boolean.  <br /></td></tr>
+<tr class="separator:ab81fcfac57e617947cf91d548fdca71b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aeac9e6e6c02a46aabedb506266d0b023" id="r_aeac9e6e6c02a46aabedb506266d0b023"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSharedBoolean.html#aeac9e6e6c02a46aabedb506266d0b023">operator&gt;</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">other</a>) <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a></td></tr>
+<tr class="memdesc:aeac9e6e6c02a46aabedb506266d0b023"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overloads the greater-than operator (<code>&gt;</code>) for a boolean value.  <br /></td></tr>
+<tr class="separator:aeac9e6e6c02a46aabedb506266d0b023"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a44246bc74472d77f222d9bfbd75275a3" id="r_a44246bc74472d77f222d9bfbd75275a3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSharedBoolean.html#a44246bc74472d77f222d9bfbd75275a3">operator&gt;=</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">other</a>) <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a></td></tr>
+<tr class="memdesc:a44246bc74472d77f222d9bfbd75275a3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overloads the greater-than-or-equal-to operator (<code>&gt;=</code>) for a boolean.  <br /></td></tr>
+<tr class="separator:a44246bc74472d77f222d9bfbd75275a3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="friends" name="friends"></a>
+Friends</h2></td></tr>
+<tr class="memitem:ac7366f21aa30767933e4cbfbc31c3f92" id="r_ac7366f21aa30767933e4cbfbc31c3f92"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSharedBoolean.html#ac7366f21aa30767933e4cbfbc31c3f92">operator&lt;&lt;</a> (std::ostream &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">os</a>, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="classSharedBoolean.html">SharedBoolean</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">sp</a>)</td></tr>
+<tr class="memdesc:ac7366f21aa30767933e4cbfbc31c3f92"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overloads the stream insertion operator (<code>&lt;&lt;</code>) for <a class="el" href="classSharedBoolean.html" title="A class that provides shared ownership of a boolean value.">SharedBoolean</a>.  <br /></td></tr>
+<tr class="separator:ac7366f21aa30767933e4cbfbc31c3f92"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>A class that provides shared ownership of a boolean value. </p>
+<p>This class wraps a <code>std::shared_ptr</code> to provide a reference-counted boolean value. When a <a class="el" href="classSharedBoolean.html" title="A class that provides shared ownership of a boolean value.">SharedBoolean</a> object is copied, it shares the same underlying boolean with the original object. The boolean's memory is automatically deallocated when the last <a class="el" href="classSharedBoolean.html" title="A class that provides shared ownership of a boolean value.">SharedBoolean</a> object pointing to it is destroyed. </p>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a id="ae2484c0af01b96f9c4a07019b0b54500" name="ae2484c0af01b96f9c4a07019b0b54500"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae2484c0af01b96f9c4a07019b0b54500">&#9670;&#160;</a></span>SharedBoolean() <span class="overload">[1/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">SharedBoolean::SharedBoolean </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Constructs a new <a class="el" href="classSharedBoolean.html" title="A class that provides shared ownership of a boolean value.">SharedBoolean</a> object with a default value. </p>
+<p>Initializes the object's internal shared pointer to manage a new boolean with a default value of <code>false</code>. </p>
+
+</div>
+</div>
+<a id="a1b40cf8675248cf767cdf3855ac6068f" name="a1b40cf8675248cf767cdf3855ac6068f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1b40cf8675248cf767cdf3855ac6068f">&#9670;&#160;</a></span>SharedBoolean() <span class="overload">[2/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">SharedBoolean::SharedBoolean </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a>&#160;</td>
+          <td class="paramname"><em>val</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Constructs a new <a class="el" href="classSharedBoolean.html" title="A class that provides shared ownership of a boolean value.">SharedBoolean</a> object from a boolean value. </p>
+<p>Initializes the object's internal shared pointer to manage a new boolean with the value provided by the <code>val</code> parameter.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">val</td><td>The boolean value to be stored in the shared pointer. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a668a15075fd5c294a24afae90242f293" name="a668a15075fd5c294a24afae90242f293"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a668a15075fd5c294a24afae90242f293">&#9670;&#160;</a></span>SharedBoolean() <span class="overload">[3/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">SharedBoolean::SharedBoolean </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="classSharedBoolean.html">SharedBoolean</a> &amp;&#160;</td>
+          <td class="paramname"><em>other</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Copy constructs a new <a class="el" href="classSharedBoolean.html" title="A class that provides shared ownership of a boolean value.">SharedBoolean</a> object. </p>
+<p>Initializes the object by creating a new shared pointer that shares ownership of the boolean managed by another <a class="el" href="classSharedBoolean.html" title="A class that provides shared ownership of a boolean value.">SharedBoolean</a> object.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">other</td><td>The existing <a class="el" href="classSharedBoolean.html" title="A class that provides shared ownership of a boolean value.">SharedBoolean</a> object to copy from. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a007e521a52dee22933b89a0fc75765d8" name="a007e521a52dee22933b89a0fc75765d8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a007e521a52dee22933b89a0fc75765d8">&#9670;&#160;</a></span>SharedBoolean() <span class="overload">[4/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">SharedBoolean::SharedBoolean </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classSharedBoolean.html">SharedBoolean</a> &amp;&amp;&#160;</td>
+          <td class="paramname"><em>other</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Constructs a new <a class="el" href="classSharedBoolean.html" title="A class that provides shared ownership of a boolean value.">SharedBoolean</a> object by moving resources. </p>
+<p>Transfers ownership of the shared boolean from <code>other</code> to the new object. This is a non-throwing operation that is more efficient than a copy.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">other</td><td>The temporary <a class="el" href="classSharedBoolean.html" title="A class that provides shared ownership of a boolean value.">SharedBoolean</a> object to move from. After this call, <code>other</code> will no longer own the resource. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<h2 class="groupheader">Member Function Documentation</h2>
+<a id="ab8616ea19b6bc2c6f9b1fbb22f4adc95" name="ab8616ea19b6bc2c6f9b1fbb22f4adc95"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab8616ea19b6bc2c6f9b1fbb22f4adc95">&#9670;&#160;</a></span>get()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a> SharedBoolean::get </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Retrieves the boolean value managed by the object. </p>
+<p>This is a getter function that returns a copy of the boolean value. Since the function is <code>const</code>, it can be safely called on a constant instance of the class without modifying its state.</p>
+<dl class="section return"><dt>Returns</dt><dd>The boolean value managed by the shared pointer. </dd></dl>
+
+</div>
+</div>
+<a id="a18729f0ece4defe8f94c479196c521f5" name="a18729f0ece4defe8f94c479196c521f5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a18729f0ece4defe8f94c479196c521f5">&#9670;&#160;</a></span>operator bool()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">SharedBoolean::operator <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a> </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>User-defined conversion to <code>bool</code>. </p>
+<p>This conversion operator allows the object to be implicitly converted to a <code>bool</code>. The returned value is the boolean managed by the object's internal shared pointer.</p>
+<dl class="section return"><dt>Returns</dt><dd>The boolean value held by the object. </dd></dl>
+
+</div>
+</div>
+<a id="a0c064738978baa4731092865ec7fe810" name="a0c064738978baa4731092865ec7fe810"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0c064738978baa4731092865ec7fe810">&#9670;&#160;</a></span>operator!=() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a> SharedBoolean::operator!= </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a> &amp;&#160;</td>
+          <td class="paramname"><em>other</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Overloads the inequality operator (<code>!=</code>) for a boolean value. </p>
+<p>Compares the boolean value of the current object with a <code>bool</code> for inequality. This is a non-mutating operation.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">other</td><td>The boolean value to compare against. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd><code>true</code> if the values are not equal, <code>false</code> otherwise. </dd></dl>
+
+</div>
+</div>
+<a id="a92c84aa51faeef11c0ba1aac6a0175ef" name="a92c84aa51faeef11c0ba1aac6a0175ef"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a92c84aa51faeef11c0ba1aac6a0175ef">&#9670;&#160;</a></span>operator!=() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a> SharedBoolean::operator!= </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="classSharedBoolean.html">SharedBoolean</a> &amp;&#160;</td>
+          <td class="paramname"><em>other</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Overloads the inequality operator (<code>!=</code>). </p>
+<p>Compares the boolean value of the current object with the boolean value of <code>other</code> for inequality. This is a non-mutating operation.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">other</td><td>The <a class="el" href="classSharedBoolean.html" title="A class that provides shared ownership of a boolean value.">SharedBoolean</a> object to compare against. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd><code>true</code> if the values are not equal, <code>false</code> otherwise. </dd></dl>
+
+</div>
+</div>
+<a id="af0069caf4a06003c422518f5c1f05d41" name="af0069caf4a06003c422518f5c1f05d41"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af0069caf4a06003c422518f5c1f05d41">&#9670;&#160;</a></span>operator*()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a> SharedBoolean::operator* </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Overloads the dereference operator (<code>*</code>). </p>
+<p>Provides direct access to the boolean value managed by the internal shared pointer. This function is <code>const</code> and provides a read-only view of the data.</p>
+<dl class="section return"><dt>Returns</dt><dd>The boolean value held by the object. </dd></dl>
+
+</div>
+</div>
+<a id="aa898e2f92d2da4ec105c2c69fffec622" name="aa898e2f92d2da4ec105c2c69fffec622"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa898e2f92d2da4ec105c2c69fffec622">&#9670;&#160;</a></span>operator-&gt;() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a> * SharedBoolean::operator-&gt; </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Overloads the member access operator (<code>-&gt;</code>). </p>
+<p>This function provides a way to access the underlying boolean value by returning a raw pointer to it. It returns the result of the <code>std::shared_ptr::get()</code> method.</p>
+<dl class="section return"><dt>Returns</dt><dd>A raw pointer (<code>bool*</code>) to the boolean managed by the shared pointer. </dd></dl>
+
+</div>
+</div>
+<a id="a7a1d91b38c825363b4d0f37b65d0f85d" name="a7a1d91b38c825363b4d0f37b65d0f85d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7a1d91b38c825363b4d0f37b65d0f85d">&#9670;&#160;</a></span>operator-&gt;() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a> * SharedBoolean::operator-&gt; </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Overloads the member access operator (<code>-&gt;</code>) for const objects. </p>
+<p>This function provides a way to get a read-only raw pointer to the underlying boolean. The <code>const</code> return type prevents modification of the boolean value through this pointer. The function itself is also <code>const</code>, ensuring it can be called on <code>const</code> instances of the class.</p>
+<dl class="section return"><dt>Returns</dt><dd>A <code>const</code> raw pointer to the boolean managed by the shared pointer. </dd></dl>
+
+</div>
+</div>
+<a id="a445eaf5818d0c01f1c1f982c2729c11d" name="a445eaf5818d0c01f1c1f982c2729c11d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a445eaf5818d0c01f1c1f982c2729c11d">&#9670;&#160;</a></span>operator&lt;() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a> SharedBoolean::operator&lt; </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a> &amp;&#160;</td>
+          <td class="paramname"><em>other</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Overloads the less-than operator (<code>&lt;</code>) for a boolean value. </p>
+<p>Compares the boolean value of the current object with a <code>bool</code>. This is a non-mutating operation.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">other</td><td>The boolean value to compare against. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd><code>true</code> if the current object's value is less than <code>other</code>, <code>false</code> otherwise. </dd></dl>
+
+</div>
+</div>
+<a id="a5d996d8892869465cbeac737834bafc8" name="a5d996d8892869465cbeac737834bafc8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5d996d8892869465cbeac737834bafc8">&#9670;&#160;</a></span>operator&lt;() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a> SharedBoolean::operator&lt; </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="classSharedBoolean.html">SharedBoolean</a> &amp;&#160;</td>
+          <td class="paramname"><em>other</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Overloads the less-than operator (<code>&lt;</code>). </p>
+<p>Compares the boolean value of the current object with the boolean value of <code>other</code>. This is a non-mutating operation.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">other</td><td>The <a class="el" href="classSharedBoolean.html" title="A class that provides shared ownership of a boolean value.">SharedBoolean</a> object to compare against. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd><code>true</code> if the current object's value is less than <code>other</code>'s value, <code>false</code> otherwise. </dd></dl>
+
+</div>
+</div>
+<a id="ab81fcfac57e617947cf91d548fdca71b" name="ab81fcfac57e617947cf91d548fdca71b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab81fcfac57e617947cf91d548fdca71b">&#9670;&#160;</a></span>operator&lt;=() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a> SharedBoolean::operator&lt;= </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a> &amp;&#160;</td>
+          <td class="paramname"><em>other</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Overloads the less-than-or-equal-to operator (<code>&lt;=</code>) for a boolean. </p>
+<p>Compares the boolean value of the current object with a <code>bool</code>. This is a non-mutating operation.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">other</td><td>The boolean value to compare against. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd><code>true</code> if the current object's value is less than or equal to <code>other</code>, <code>false</code> otherwise. </dd></dl>
+
+</div>
+</div>
+<a id="adac52b11b590d9eedfbd011e54ff088d" name="adac52b11b590d9eedfbd011e54ff088d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adac52b11b590d9eedfbd011e54ff088d">&#9670;&#160;</a></span>operator&lt;=() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a> SharedBoolean::operator&lt;= </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="classSharedBoolean.html">SharedBoolean</a> &amp;&#160;</td>
+          <td class="paramname"><em>other</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Overloads the less-than-or-equal-to operator (<code>&lt;=</code>). </p>
+<p>Compares the boolean value of the current object with the boolean value of <code>other</code>. This is a non-mutating operation.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">other</td><td>The <a class="el" href="classSharedBoolean.html" title="A class that provides shared ownership of a boolean value.">SharedBoolean</a> object to compare against. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd><code>true</code> if the current object's value is less than or equal to <code>other</code>'s value, <code>false</code> otherwise. </dd></dl>
+
+</div>
+</div>
+<a id="a79248875981d3036155623e571b52230" name="a79248875981d3036155623e571b52230"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a79248875981d3036155623e571b52230">&#9670;&#160;</a></span>operator=() <span class="overload">[1/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classSharedBoolean.html">SharedBoolean</a> &amp; SharedBoolean::operator= </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a> &amp;&#160;</td>
+          <td class="paramname"><em>other</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Overloaded assignment operator for a boolean value. </p>
+<p>Assigns a new boolean value to the underlying shared boolean, modifying the object in place.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">other</td><td>The boolean value to assign. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A reference to the current object (<code>*this</code>) to allow for chained assignments. </dd></dl>
+
+</div>
+</div>
+<a id="a927766d991dc5c5e954fec59c5d0aa0b" name="a927766d991dc5c5e954fec59c5d0aa0b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a927766d991dc5c5e954fec59c5d0aa0b">&#9670;&#160;</a></span>operator=() <span class="overload">[2/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classSharedBoolean.html">SharedBoolean</a> &amp; SharedBoolean::operator= </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="classSharedBoolean.html">SharedBoolean</a> &amp;&#160;</td>
+          <td class="paramname"><em>other</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Overloaded copy assignment operator. </p>
+<p>Assigns the shared state of <code>other</code> to the current object. If the objects are not the same, the current object will release its old resource and share ownership of the boolean value managed by <code>other</code>.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">other</td><td>The <a class="el" href="classSharedBoolean.html" title="A class that provides shared ownership of a boolean value.">SharedBoolean</a> object to assign from. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A reference to the current object (<code>*this</code>) to allow for chained assignments. </dd></dl>
+
+</div>
+</div>
+<a id="ab5ebf547dd141ba0d6e582c63e74506e" name="ab5ebf547dd141ba0d6e582c63e74506e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab5ebf547dd141ba0d6e582c63e74506e">&#9670;&#160;</a></span>operator=() <span class="overload">[3/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classSharedBoolean.html">SharedBoolean</a> &amp; SharedBoolean::operator= </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classSharedBoolean.html">SharedBoolean</a> &amp;&amp;&#160;</td>
+          <td class="paramname"><em>other</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Overloaded move assignment operator. </p>
+<p>Moves the shared state from <code>other</code> to the current object, releasing any resources the current object might have held. This is a non-throwing and more efficient operation than a copy assignment.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">other</td><td>The temporary <a class="el" href="classSharedBoolean.html" title="A class that provides shared ownership of a boolean value.">SharedBoolean</a> object to move from. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A reference to the current object (<code>*this</code>). </dd></dl>
+
+</div>
+</div>
+<a id="aa5cf7a0255dbd50221018885d503ae8f" name="aa5cf7a0255dbd50221018885d503ae8f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa5cf7a0255dbd50221018885d503ae8f">&#9670;&#160;</a></span>operator==() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a> SharedBoolean::operator== </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a> &amp;&#160;</td>
+          <td class="paramname"><em>other</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Overloads the equality operator (<code>==</code>) for a boolean value. </p>
+<p>Compares the boolean value of the current object with a <code>bool</code> for equality. This is a non-mutating operation.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">other</td><td>The boolean value to compare against. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd><code>true</code> if the values are equal, <code>false</code> otherwise. </dd></dl>
+
+</div>
+</div>
+<a id="a94dcfd6590ef018d246fd3b3b4f09ca0" name="a94dcfd6590ef018d246fd3b3b4f09ca0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a94dcfd6590ef018d246fd3b3b4f09ca0">&#9670;&#160;</a></span>operator==() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a> SharedBoolean::operator== </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="classSharedBoolean.html">SharedBoolean</a> &amp;&#160;</td>
+          <td class="paramname"><em>other</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Overloads the equality operator (<code>==</code>). </p>
+<p>Compares the boolean value of the current object with the boolean value of <code>other</code> for equality. This is a non-mutating operation.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">other</td><td>The <a class="el" href="classSharedBoolean.html" title="A class that provides shared ownership of a boolean value.">SharedBoolean</a> object to compare against. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd><code>true</code> if the values are equal, <code>false</code> otherwise. </dd></dl>
+
+</div>
+</div>
+<a id="aeac9e6e6c02a46aabedb506266d0b023" name="aeac9e6e6c02a46aabedb506266d0b023"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aeac9e6e6c02a46aabedb506266d0b023">&#9670;&#160;</a></span>operator&gt;() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a> SharedBoolean::operator&gt; </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a> &amp;&#160;</td>
+          <td class="paramname"><em>other</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Overloads the greater-than operator (<code>&gt;</code>) for a boolean value. </p>
+<p>Compares the boolean value of the current object with a <code>bool</code>. This is a non-mutating operation.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">other</td><td>The boolean value to compare against. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd><code>true</code> if the current object's value is greater than <code>other</code>, <code>false</code> otherwise. </dd></dl>
+
+</div>
+</div>
+<a id="aa0c78d77d0f9243c8633716e89568571" name="aa0c78d77d0f9243c8633716e89568571"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa0c78d77d0f9243c8633716e89568571">&#9670;&#160;</a></span>operator&gt;() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a> SharedBoolean::operator&gt; </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="classSharedBoolean.html">SharedBoolean</a> &amp;&#160;</td>
+          <td class="paramname"><em>other</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Overloads the greater-than operator (<code>&gt;</code>). </p>
+<p>Compares the boolean value of the current object with the boolean value of <code>other</code>. This is a non-mutating operation.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">other</td><td>The <a class="el" href="classSharedBoolean.html" title="A class that provides shared ownership of a boolean value.">SharedBoolean</a> object to compare against. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd><code>true</code> if the current object's value is greater than <code>other</code>'s value, <code>false</code> otherwise. </dd></dl>
+
+</div>
+</div>
+<a id="a44246bc74472d77f222d9bfbd75275a3" name="a44246bc74472d77f222d9bfbd75275a3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a44246bc74472d77f222d9bfbd75275a3">&#9670;&#160;</a></span>operator&gt;=() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a> SharedBoolean::operator&gt;= </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a> &amp;&#160;</td>
+          <td class="paramname"><em>other</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Overloads the greater-than-or-equal-to operator (<code>&gt;=</code>) for a boolean. </p>
+<p>Compares the boolean value of the current object with a <code>bool</code>. This is a non-mutating operation.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">other</td><td>The boolean value to compare against. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd><code>true</code> if the current object's value is greater than or equal to <code>other</code>, <code>false</code> otherwise. </dd></dl>
+
+</div>
+</div>
+<a id="a82ed7e4f3565622949ba762393d46645" name="a82ed7e4f3565622949ba762393d46645"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a82ed7e4f3565622949ba762393d46645">&#9670;&#160;</a></span>operator&gt;=() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a> SharedBoolean::operator&gt;= </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="classSharedBoolean.html">SharedBoolean</a> &amp;&#160;</td>
+          <td class="paramname"><em>other</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Overloads the greater-than-or-equal-to operator (<code>&gt;=</code>). </p>
+<p>Compares the boolean value of the current object with the boolean value of <code>other</code>. This is a non-mutating operation.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">other</td><td>The <a class="el" href="classSharedBoolean.html" title="A class that provides shared ownership of a boolean value.">SharedBoolean</a> object to compare against. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd><code>true</code> if the current object's value is greater than or equal to <code>other</code>'s value, <code>false</code> otherwise. </dd></dl>
+
+</div>
+</div>
+<a id="a9c3be0e9259ef7ac613b433c3001292d" name="a9c3be0e9259ef7ac613b433c3001292d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9c3be0e9259ef7ac613b433c3001292d">&#9670;&#160;</a></span>set()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a> SharedBoolean::set </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a>&#160;</td>
+          <td class="paramname"><em>val</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Sets the boolean value of the object. </p>
+<p>Assigns a new boolean value to the underlying shared boolean.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">val</td><td>The boolean value to set. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<h2 class="groupheader">Friends And Related Symbol Documentation</h2>
+<a id="ac7366f21aa30767933e4cbfbc31c3f92" name="ac7366f21aa30767933e4cbfbc31c3f92"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac7366f21aa30767933e4cbfbc31c3f92">&#9670;&#160;</a></span>operator&lt;&lt;</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::ostream &amp; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">operator</a>&lt;&lt; </td>
+          <td>(</td>
+          <td class="paramtype">std::ostream &amp;&#160;</td>
+          <td class="paramname"><em>os</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="classSharedBoolean.html">SharedBoolean</a> &amp;&#160;</td>
+          <td class="paramname"><em>sp</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">friend</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Overloads the stream insertion operator (<code>&lt;&lt;</code>) for <a class="el" href="classSharedBoolean.html" title="A class that provides shared ownership of a boolean value.">SharedBoolean</a>. </p>
+<p>Provides a way to print the boolean value of a <a class="el" href="classSharedBoolean.html" title="A class that provides shared ownership of a boolean value.">SharedBoolean</a> object to an output stream.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">os</td><td>The output stream to write to. </td></tr>
+    <tr><td class="paramname">sp</td><td>The <a class="el" href="classSharedBoolean.html" title="A class that provides shared ownership of a boolean value.">SharedBoolean</a> object to print. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A reference to the output stream, allowing for chained insertions. </dd></dl>
+
+</div>
+</div>
+<hr/>The documentation for this class was generated from the following file:<ul>
+<li>inst/include/interface/rcpp/rcpp_objects/<a class="el" href="rcpp__shared__primitive_8hpp_source.html">rcpp_shared_primitive.hpp</a></li>
+</ul>
+</div><!-- contents -->
+</div><!-- doc-content -->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a class="el" href="classSharedBoolean.html">SharedBoolean</a></li>
+    <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.8 </li>
+  </ul>
+</div>
+</body>
+</html>

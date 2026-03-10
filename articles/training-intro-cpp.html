@@ -37,8 +37,33 @@
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
-<li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
-<li class="active nav-item"><a class="nav-link" href="../articles/index.html">Articles</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-reference" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">reference</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-reference">
+<li><a class="dropdown-item" href="../reference/index.html">r/roxygen</a></li>
+    <li><a class="external-link dropdown-item" href="https://noaa-fims.github.io/FIMS/doxygen/index.html">c++/doxygen</a></li>
+  </ul>
+</li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">articles</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
+<li><h6 class="dropdown-header" data-toc-skip>Intro to FIMS</h6></li>
+    <li><a class="dropdown-item" href="../vignettes/fims-demo.html">Introducing the Fisheries Integrated Modeling System (FIMS)</a></li>
+    <li><a class="dropdown-item" href="../vignettes/fims-logging.html">Introducing the FIMS Logging System</a></li>
+    <li><a class="dropdown-item" href="../vignettes/fims-user-setup-guide.html">FIMS User Setup Guide</a></li>
+    <li><a class="dropdown-item" href="../vignettes/fims-demo-projections.html">Simple projections using FIMS</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Developer</h6></li>
+    <li><a class="dropdown-item" href="../vignettes/fims-path-maturity.html">FIMS Path - Maturity</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>C++ Training</h6></li>
+    <li><a class="dropdown-item" href="../vignettes/training-intro-cpp.html">Intro to C++</a></li>
+    <li><a class="dropdown-item" href="../vignettes/training-intro-rcpp.html">Intro to Rcpp</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Research and Development</h6></li>
+    <li><a class="dropdown-item" href="../vignettes/RD-re-sparsity.html">RE Sparsity</a></li>
+  </ul>
+</li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-news" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">News</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-news">
@@ -51,9 +76,9 @@
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-reports" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Reports</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-reports">
-<li><a class="dropdown-item" href="../coverage/coverage.html">coverage</a></li>
-    <li><a class="dropdown-item" href="../coverage/codecoverage_explanation.html">coverage explained</a></li>
-    <li><a class="dropdown-item" href="../testdown/index.html">testdown</a></li>
+<li><a class="external-link dropdown-item" href="https://noaa-fims.github.io/FIMS/coverage/coverage.html">coverage</a></li>
+    <li><a class="external-link dropdown-item" href="https://noaa-fims.github.io/FIMS/coverage/codecoverage_explanation.html">coverage explained</a></li>
+    <li><a class="external-link dropdown-item" href="https://noaa-fims.github.io/FIMS/testdown/index.html">testdown</a></li>
   </ul>
 </li>
       </ul>
@@ -794,8 +819,8 @@ will explore later.</p>
 <span></span>
 <span><span class="fu">pointer</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## x is equal to the address of y</span></span>
-<span><span class="co">## x is: 0x7ffcc5f440c4</span></span>
-<span><span class="co">## The address of y is: 0x7ffcc5f440c4</span></span>
+<span><span class="co">## x is: 0x7ffdd4230f74</span></span>
+<span><span class="co">## The address of y is: 0x7ffdd4230f74</span></span>
 <span><span class="co">## *x returns the value of y: 3.1459</span></span></code></pre>
 <pre><code><span><span class="co">## [1] 0</span></span></code></pre>
 </details>
@@ -834,8 +859,8 @@ e.g., <code>&amp;y</code>.</p>
 <span><span class="fu">reference</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## x is: 3</span></span>
 <span><span class="co">## y is: 3</span></span>
-<span><span class="co">## The memory address of x is: 0x7ffcc5f440c4</span></span>
-<span><span class="co">## The memory address of y is: 0x7ffcc5f440c4</span></span></code></pre>
+<span><span class="co">## The memory address of x is: 0x7ffdd4230f74</span></span>
+<span><span class="co">## The memory address of y is: 0x7ffdd4230f74</span></span></code></pre>
 <pre><code><span><span class="co">## [1] 0</span></span></code></pre>
 </details>
 </div>
@@ -899,9 +924,9 @@ following example?</p>
 <span></span>
 <span><span class="fu">reassign_pointer</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## c now equals the address of b</span></span>
-<span><span class="co">## &amp;a = 0x7ffcc5f440c0</span></span>
-<span><span class="co">## &amp;b = 0x7ffcc5f440c4</span></span>
-<span><span class="co">## c = 0x7ffcc5f440c4</span></span>
+<span><span class="co">## &amp;a = 0x7ffdd4230f70</span></span>
+<span><span class="co">## &amp;b = 0x7ffdd4230f74</span></span>
+<span><span class="co">## c = 0x7ffdd4230f74</span></span>
 <span><span class="co">## a = 100</span></span>
 <span><span class="co">## b = 10</span></span>
 <span><span class="co">## *c = 10</span></span></code></pre>
@@ -1014,9 +1039,9 @@ automatically deleted.</p>
 <span><span class="fu">shared_pointer</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## ptr1: 42</span></span>
 <span><span class="co">## ptr2: 24</span></span>
-<span><span class="co">## ptr1 = 0x556ab7a04510</span></span>
-<span><span class="co">## ptr2 = 0x556ab8a79f50</span></span>
-<span><span class="co">## ptr3 = 0x556ab7a04510</span></span></code></pre>
+<span><span class="co">## ptr1 = 0x55f25846dac0</span></span>
+<span><span class="co">## ptr2 = 0x55f25b4ae370</span></span>
+<span><span class="co">## ptr3 = 0x55f25846dac0</span></span></code></pre>
 <pre><code><span><span class="co">## [1] 0</span></span></code></pre>
 </details>
 </div>

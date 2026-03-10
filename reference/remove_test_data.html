@@ -18,8 +18,29 @@ input or output."><meta property="og:image" content="https://NOAA-FIMS.github.io
     </button>
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
-      <ul class="navbar-nav me-auto"><li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
-<li class="nav-item"><a class="nav-link" href="../articles/index.html">Articles</a></li>
+      <ul class="navbar-nav me-auto"><li class="active nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-reference" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">reference</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-reference"><li><a class="dropdown-item" href="../reference/index.html">r/roxygen</a></li>
+    <li><a class="external-link dropdown-item" href="https://noaa-fims.github.io/FIMS/doxygen/index.html">c++/doxygen</a></li>
+  </ul></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">articles</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><h6 class="dropdown-header" data-toc-skip>Intro to FIMS</h6></li>
+    <li><a class="dropdown-item" href="../vignettes/fims-demo.html">Introducing the Fisheries Integrated Modeling System (FIMS)</a></li>
+    <li><a class="dropdown-item" href="../vignettes/fims-logging.html">Introducing the FIMS Logging System</a></li>
+    <li><a class="dropdown-item" href="../vignettes/fims-user-setup-guide.html">FIMS User Setup Guide</a></li>
+    <li><a class="dropdown-item" href="../vignettes/fims-demo-projections.html">Simple projections using FIMS</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Developer</h6></li>
+    <li><a class="dropdown-item" href="../vignettes/fims-path-maturity.html">FIMS Path - Maturity</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>C++ Training</h6></li>
+    <li><a class="dropdown-item" href="../vignettes/training-intro-cpp.html">Intro to C++</a></li>
+    <li><a class="dropdown-item" href="../vignettes/training-intro-rcpp.html">Intro to Rcpp</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Research and Development</h6></li>
+    <li><a class="dropdown-item" href="../vignettes/RD-re-sparsity.html">RE Sparsity</a></li>
+  </ul></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-news" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">News</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-news"><li><h6 class="dropdown-header" data-toc-skip>Releases</h6></li>
@@ -29,9 +50,9 @@ input or output."><meta property="og:image" content="https://NOAA-FIMS.github.io
   </ul></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-reports" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Reports</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-reports"><li><a class="dropdown-item" href="../coverage/coverage.html">coverage</a></li>
-    <li><a class="dropdown-item" href="../coverage/codecoverage_explanation.html">coverage explained</a></li>
-    <li><a class="dropdown-item" href="../testdown/index.html">testdown</a></li>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-reports"><li><a class="external-link dropdown-item" href="https://noaa-fims.github.io/FIMS/coverage/coverage.html">coverage</a></li>
+    <li><a class="external-link dropdown-item" href="https://noaa-fims.github.io/FIMS/coverage/codecoverage_explanation.html">coverage explained</a></li>
+    <li><a class="external-link dropdown-item" href="https://noaa-fims.github.io/FIMS/testdown/index.html">testdown</a></li>
   </ul></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><a class="external-link nav-link" href="https://noaa-fims.github.io/">fims website</a></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/noaa-fims/fims/" aria-label="GitHub repository for FIMS"><span class="fa fa-brands fa-github fa-lg"></span></a></li>

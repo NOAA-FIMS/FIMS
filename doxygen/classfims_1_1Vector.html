@@ -1,0 +1,961 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" data-bs-theme="auto">
+<head>
+    <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=9"/>
+    <meta name="generator" content="Doxygen 1.9.8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>FIMS</title><link href="tabs.css" rel="stylesheet" type="text/css"/>
+    <link rel="icon" type="image/png" href="https://noaa-fims.github.io/images/FIMS_hexlogo.png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+    <link href="https://noaa-fims.github.io/site_libs/bootstrap/bootstrap-5477dd34fdf9f443df58de9070e2fbd7.min.css" rel="stylesheet">
+    <link href="https://noaa-fims.github.io/site_libs/bootstrap/bootstrap-dark-429bd3fc0b6810d1347fc340b0896c35.min.css" rel="stylesheet" media="(prefers-color-scheme: dark)">
+    <script type="text/javascript" src="jquery.js"></script>
+    <script type="text/javascript" src="dynsections.js"></script>
+    <link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+    <link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+  $(document).ready(function() { init_search(); });
+/* @license-end */
+</script>
+    <script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  extensions: ["tex2jax.js"],
+  jax: ["input/TeX","output/HTML-CSS"],
+});
+</script>
+<script type="text/javascript" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js"></script>
+    <link href="doxygen.css" rel="stylesheet" type="text/css" />
+    <link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
+<link href="custom.css" rel="stylesheet" type="text/css"/>
+    <script src="https://noaa-fims.github.io/site_libs/quarto-nav/quarto-nav.js"></script>
+    <script src="https://noaa-fims.github.io/site_libs/bootstrap/bootstrap.min.js"></script>
+    <script src="https://noaa-fims.github.io/site_libs/quarto-html/quarto.js" type="module"></script>
+</head>
+<body>
+<div id="top">
+    <div id="titlearea">
+        <table cellspacing="0" cellpadding="0">
+            <tbody>
+            <tr style="height: 70px;">
+                <td id="projectlogo"><img alt="Logo" src="FIMS_logo3.png"/></td>
+                <td id="projectalign" style="padding-left: 0.5em;">
+                    <div id="projectname">FIMS
+                        &#160;<span id="projectnumber">v0.8.1</span></div>
+                    <div id="projectbrief"></div></td>
+                <td style="padding-left: 0.5em;">
+                    <div id="projectbrief"></div>
+                </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <nav class="navbar navbar-expand-lg " data-bs-theme="auto">
+      <div class="navbar-container container-fluid">
+        <div class="navbar-brand-container mx-auto">
+          <a href="https://noaa-fims.github.io/" class="navbar-brand navbar-brand-logo"></a>
+          <a class="navbar-brand" href="https://noaa-fims.github.io/">
+          </a>
+        </div>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+          <ul class="navbar-nav navbar-nav-scroll ms-auto">
+           <li class="nav-item dropdown">
+            <button class="nav-link dropdown-toggle" type="button" id="dropdown-reference" data-bs-toggle="dropdown"
+                    aria-expanded="false" aria-haspopup="true">reference</button>
+            <ul class="dropdown-menu" aria-labelledby="dropdown-reference">
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/reference/index.html">r/roxygen</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/doxygen/index.html">c++/doxygen</a></li>
+            </ul>
+           </li>
+            <li class="nav-item dropdown">
+            <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown"
+                    aria-expanded="false" aria-haspopup="true">articles</button>
+            <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
+              <li><h6 class="dropdown-header" data-toc-skip>intro to fims</h6></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/fims-demo.html">introducing the fisheries integrated modeling system (fims)</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/fims-logging.html">Introducing the fims logging system</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/fims-user-setup-guide.html">fims user setup guide</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/fims-demo-projections.html">simple projections using fims</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><h6 class="dropdown-header" data-toc-skip>developer</h6></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/fims-path-maturity.html">fims path - maturity</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><h6 class="dropdown-header" data-toc-skip>c++ training</h6></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/training-intro-cpp.html">intro to c++</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/training-intro-rcpp.html">intro to rcpp</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><h6 class="dropdown-header" data-toc-skip>research and development</h6></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/RD-re-sparsity.html">re sparsity</a></li>
+            </ul>
+          </li>
+            <li class="nav-item dropdown">
+              <button class="nav-link dropdown-toggle" type="button" id="dropdown-news" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">news</button>
+              <ul class="dropdown-menu" aria-labelledby="dropdown-news">
+                <li><h6 class="dropdown-header" data-toc-skip="">Releases</h6></li>
+                <li><a class="external-link dropdown-item" href="https://github.com/NOAA-FIMS/FIMS/releases/latest">latest release</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/news/index.html">changelog</a></li>
+              </ul>
+            </li>
+          <li class="nav-item dropdown">
+            <button class="nav-link dropdown-toggle" type="button" id="dropdown-reports" data-bs-toggle="dropdown"
+                    aria-expanded="false" aria-haspopup="true">reports</button>
+            <ul class="dropdown-menu" aria-labelledby="dropdown-reports">
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/coverage/coverage.html">coverage</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/coverage/codecoverage_explanation.html">coverage explained</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/testdown/index.html">testdown</a></li>
+            </ul>
+          </li>
+          <ul class="navbar-nav">
+            <li class="nav-item"><a class="external-link nav-link" href="https://noaa-fims.github.io/">fims website</a></li>
+            <li class="nav-item">
+              <a class="external-link nav-link" href="https://github.com/noaa-fims/fims/" aria-label="GitHub repository for FIMS">
+                <span class="fa fa-brands fa-github fa-lg"></span>
+              </a>
+            </li>
+            <!-- Keep the input; pkgdown’s autocomplete wrapper won’t exist in Doxygen -->
+            <li class="nav-item">
+              <form class="form-inline" role="search" onsubmit="return false;">
+                <input class="form-control" type="search" name="search-input" id="search-input"
+                      autocomplete="off" aria-label="Search site" placeholder="Search for">
+              </form>
+            </li>
+          </ul>
+      </div>
+    </div>
+  </nav>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  // Only on the cpp_directory_structure page!
+  document.querySelectorAll('.toc a').forEach(function(link) {
+    if (link.href && link.href.indexOf(location.pathname) !== -1) {
+      link.href = link.hash; // Just use the fragment
+    }
+  });
+});
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  function updateTocActive() {
+    var links = Array.from(document.querySelectorAll('.toc a'));
+    var anchors = links.map(link => document.getElementById(link.getAttribute('href').replace('#', '')));
+    var scrollTop = window.scrollY || document.documentElement.scrollTop;
+    var offset = 150; // Match your scroll-margin-top
+    let currentActive = -1;
+    for (let i = anchors.length - 1; i >= 0; i--) {
+      if (anchors[i] && (anchors[i].getBoundingClientRect().top + window.scrollY - offset) <= scrollTop) {
+        currentActive = i;
+        break;
+      }
+    }
+    links.forEach((link, i) => {
+      link.classList.remove('active', 'aboveActive');
+      if (i === currentActive) {
+        link.classList.add('active');
+      } else if (i < currentActive) {
+        link.classList.add('aboveActive');
+      }
+    });
+  }
+  window.addEventListener('scroll', updateTocActive);
+  window.addEventListener('hashchange', updateTocActive);
+  updateTocActive();
+});
+</script>
+    <!-- end header part -->
+<!-- Generated by Doxygen 1.9.8 -->
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+/* @license-end */
+</script>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(document).ready(function(){initNavTree('classfims_1_1Vector.html',''); initResizable(); });
+/* @license-end */
+</script>
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">Loading...</div>
+<div class="SRStatus" id="Searching">Searching...</div>
+<div class="SRStatus" id="NoMatches">No Matches</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="summary">
+<a href="#pub-types">Public Types</a> &#124;
+<a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#friends">Friends</a> &#124;
+<a href="classfims_1_1Vector-members.html">List of all members</a>  </div>
+  <div class="headertitle"><div class="title">fims::Vector&lt; Type &gt; Class Template Reference</div></div>
+</div><!--header-->
+<div class="contents">
+
+<p><code>#include &lt;<a class="el" href="fims__vector_8hpp_source.html">fims_vector.hpp</a>&gt;</code></p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-types" name="pub-types"></a>
+Public Types</h2></td></tr>
+<tr class="memitem:a5292f6654fee6c143adf4b694958bd6d" id="r_a5292f6654fee6c143adf4b694958bd6d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typedef</a> std::vector&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::value_type&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims_1_1Vector.html#a5292f6654fee6c143adf4b694958bd6d">value_type</a></td></tr>
+<tr class="separator:a5292f6654fee6c143adf4b694958bd6d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab120f87c3bf405a86ed96bf78fba7045" id="r_ab120f87c3bf405a86ed96bf78fba7045"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typedef</a> std::vector&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::allocator_type&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims_1_1Vector.html#ab120f87c3bf405a86ed96bf78fba7045">allocator_type</a></td></tr>
+<tr class="separator:ab120f87c3bf405a86ed96bf78fba7045"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aef3c72aa69c97bdc441da6254a2aa310" id="r_aef3c72aa69c97bdc441da6254a2aa310"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typedef</a> std::vector&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::size_type&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims_1_1Vector.html#aef3c72aa69c97bdc441da6254a2aa310">size_type</a></td></tr>
+<tr class="separator:aef3c72aa69c97bdc441da6254a2aa310"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad9d16e530b0a67d301311031ecd0bf11" id="r_ad9d16e530b0a67d301311031ecd0bf11"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typedef</a> std::vector&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::difference_type&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims_1_1Vector.html#ad9d16e530b0a67d301311031ecd0bf11">difference_type</a></td></tr>
+<tr class="separator:ad9d16e530b0a67d301311031ecd0bf11"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2c822b39eaad468f2e61cca61956fb85" id="r_a2c822b39eaad468f2e61cca61956fb85"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typedef</a> std::vector&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::reference&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims_1_1Vector.html#a2c822b39eaad468f2e61cca61956fb85">reference</a></td></tr>
+<tr class="separator:a2c822b39eaad468f2e61cca61956fb85"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a73039a864dc3260fad2f479436f07634" id="r_a73039a864dc3260fad2f479436f07634"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typedef</a> std::vector&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::const_reference&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims_1_1Vector.html#a73039a864dc3260fad2f479436f07634">const_reference</a></td></tr>
+<tr class="separator:a73039a864dc3260fad2f479436f07634"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0c83eba16209dbed7640508d23762f9b" id="r_a0c83eba16209dbed7640508d23762f9b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typedef</a> std::vector&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::pointer&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims_1_1Vector.html#a0c83eba16209dbed7640508d23762f9b">pointer</a></td></tr>
+<tr class="separator:a0c83eba16209dbed7640508d23762f9b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae030f216c0277d6d6db26612dfda61a7" id="r_ae030f216c0277d6d6db26612dfda61a7"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typedef</a> std::vector&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::const_pointer&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims_1_1Vector.html#ae030f216c0277d6d6db26612dfda61a7">const_pointer</a></td></tr>
+<tr class="separator:ae030f216c0277d6d6db26612dfda61a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae325d4168cdf392083868a65da5057ec" id="r_ae325d4168cdf392083868a65da5057ec"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typedef</a> std::vector&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::iterator&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims_1_1Vector.html#ae325d4168cdf392083868a65da5057ec">iterator</a></td></tr>
+<tr class="separator:ae325d4168cdf392083868a65da5057ec"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1599f71fde1e54967526c394774c521a" id="r_a1599f71fde1e54967526c394774c521a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typedef</a> std::vector&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::const_iterator&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims_1_1Vector.html#a1599f71fde1e54967526c394774c521a">const_iterator</a></td></tr>
+<tr class="separator:a1599f71fde1e54967526c394774c521a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afb654ff466fb19c85e9d325c1cffcf05" id="r_afb654ff466fb19c85e9d325c1cffcf05"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typedef</a> std::vector&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::reverse_iterator&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims_1_1Vector.html#afb654ff466fb19c85e9d325c1cffcf05">reverse_iterator</a></td></tr>
+<tr class="separator:afb654ff466fb19c85e9d325c1cffcf05"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a222ede0334a583819b9013335be15dd9" id="r_a222ede0334a583819b9013335be15dd9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typedef</a> std::vector&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::const_reverse_iterator&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims_1_1Vector.html#a222ede0334a583819b9013335be15dd9">const_reverse_iterator</a></td></tr>
+<tr class="separator:a222ede0334a583819b9013335be15dd9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
+Public Member Functions</h2></td></tr>
+<tr class="memitem:ac0b39ccdfdbac0c50f67c9e5553031c1" id="r_ac0b39ccdfdbac0c50f67c9e5553031c1"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims_1_1Vector.html#ac0b39ccdfdbac0c50f67c9e5553031c1">Vector</a> ()</td></tr>
+<tr class="separator:ac0b39ccdfdbac0c50f67c9e5553031c1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7ddfcfcac8e0f9968ca1419ac0279f63" id="r_a7ddfcfcac8e0f9968ca1419ac0279f63"><td class="memItemLeft" align="right" valign="top"><a id="a7ddfcfcac8e0f9968ca1419ac0279f63" name="a7ddfcfcac8e0f9968ca1419ac0279f63"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>Vector</b> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a> <a class="el" href="classfims_1_1Vector.html#abe2abae6275f702ce15a62f6a63c7062">size</a>, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &amp;value=<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a>())</td></tr>
+<tr class="memdesc:a7ddfcfcac8e0f9968ca1419ac0279f63"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs a <a class="el" href="classfims_1_1Vector.html">Vector</a> of length "size" and sets the elements with the value from input "value". <br /></td></tr>
+<tr class="separator:a7ddfcfcac8e0f9968ca1419ac0279f63"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a23fbf3f78788d14bc1654746c40933ab" id="r_a23fbf3f78788d14bc1654746c40933ab"><td class="memItemLeft" align="right" valign="top"><a id="a23fbf3f78788d14bc1654746c40933ab" name="a23fbf3f78788d14bc1654746c40933ab"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>Vector</b> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="classfims_1_1Vector.html">Vector</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">other</a>)</td></tr>
+<tr class="memdesc:a23fbf3f78788d14bc1654746c40933ab"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy constructor. <br /></td></tr>
+<tr class="separator:a23fbf3f78788d14bc1654746c40933ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:addf83740127696a31cf8a5c4c75fffb1" id="r_addf83740127696a31cf8a5c4c75fffb1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classfims_1_1Vector.html">Vector</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims_1_1Vector.html#addf83740127696a31cf8a5c4c75fffb1">operator=</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="classfims_1_1Vector.html">Vector</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">other</a>)</td></tr>
+<tr class="memdesc:addf83740127696a31cf8a5c4c75fffb1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assignment operator for <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>.  <br /></td></tr>
+<tr class="separator:addf83740127696a31cf8a5c4c75fffb1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aea2a681e87739cbbec207566241179ce" id="r_aea2a681e87739cbbec207566241179ce"><td class="memItemLeft" align="right" valign="top"><a id="aea2a681e87739cbbec207566241179ce" name="aea2a681e87739cbbec207566241179ce"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>Vector</b> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> std::vector&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">other</a>)</td></tr>
+<tr class="memdesc:aea2a681e87739cbbec207566241179ce"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialization constructor from std::vector&lt;Type&gt; type. <br /></td></tr>
+<tr class="separator:aea2a681e87739cbbec207566241179ce"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3f1f102d2ed4e398c9c955cfd853e98b" id="r_a3f1f102d2ed4e398c9c955cfd853e98b"><td class="memItemLeft" align="right" valign="top"><a id="a3f1f102d2ed4e398c9c955cfd853e98b" name="a3f1f102d2ed4e398c9c955cfd853e98b"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>Vector</b> (std::initializer_list&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">init</a>)</td></tr>
+<tr class="memdesc:a3f1f102d2ed4e398c9c955cfd853e98b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialization constructor from std::initializer_list&lt;Type&gt; type. <br /></td></tr>
+<tr class="separator:a3f1f102d2ed4e398c9c955cfd853e98b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac4a01f5a939399c068281857077c9b0c" id="r_ac4a01f5a939399c068281857077c9b0c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims_1_1Vector.html#ac4a01f5a939399c068281857077c9b0c">operator[]</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">pos</a>)</td></tr>
+<tr class="memdesc:ac4a01f5a939399c068281857077c9b0c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a reference to the element at specified location pos. No bounds checking is performed.  <br /></td></tr>
+<tr class="separator:ac4a01f5a939399c068281857077c9b0c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a80d84335fdb8a8455507d4ac1e5bc1fa" id="r_a80d84335fdb8a8455507d4ac1e5bc1fa"><td class="memItemLeft" align="right" valign="top"><a id="a80d84335fdb8a8455507d4ac1e5bc1fa" name="a80d84335fdb8a8455507d4ac1e5bc1fa"></a>
+<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator[]</b> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">n</a>) <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a></td></tr>
+<tr class="memdesc:a80d84335fdb8a8455507d4ac1e5bc1fa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a constant reference to the element at specified location pos. No bounds checking is performed. <br /></td></tr>
+<tr class="separator:a80d84335fdb8a8455507d4ac1e5bc1fa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a58841d94f2a24b2fe00c3f584a0b025d" id="r_a58841d94f2a24b2fe00c3f584a0b025d"><td class="memItemLeft" align="right" valign="top"><a id="a58841d94f2a24b2fe00c3f584a0b025d" name="a58841d94f2a24b2fe00c3f584a0b025d"></a>
+<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>at</b> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">n</a>)</td></tr>
+<tr class="memdesc:a58841d94f2a24b2fe00c3f584a0b025d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a reference to the element at specified location pos. Bounds checking is performed. <br /></td></tr>
+<tr class="separator:a58841d94f2a24b2fe00c3f584a0b025d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1e36dcc06238b3e33fd3aae205a56bb1" id="r_a1e36dcc06238b3e33fd3aae205a56bb1"><td class="memItemLeft" align="right" valign="top"><a id="a1e36dcc06238b3e33fd3aae205a56bb1" name="a1e36dcc06238b3e33fd3aae205a56bb1"></a>
+<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>at</b> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">n</a>) <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a></td></tr>
+<tr class="memdesc:a1e36dcc06238b3e33fd3aae205a56bb1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a constant reference to the element at specified location pos. Bounds checking is performed. <br /></td></tr>
+<tr class="separator:a1e36dcc06238b3e33fd3aae205a56bb1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a70bfdc38a54b251b3d5dbebdb06df49d" id="r_a70bfdc38a54b251b3d5dbebdb06df49d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims_1_1Vector.html#a70bfdc38a54b251b3d5dbebdb06df49d">get_force_scalar</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">pos</a>)</td></tr>
+<tr class="memdesc:a70bfdc38a54b251b3d5dbebdb06df49d"><td class="mdescLeft">&#160;</td><td class="mdescRight">If this vector is size 1 and pos is greater than zero, the first index is returned. If this vector has size greater than 1 and pos is greater than size, a invalid_argument exception is thrown. Otherwise, the value at index pos is returned.  <br /></td></tr>
+<tr class="separator:a70bfdc38a54b251b3d5dbebdb06df49d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a50b58c7402c75b14d1dfbfba85e08bbd" id="r_a50b58c7402c75b14d1dfbfba85e08bbd"><td class="memItemLeft" align="right" valign="top"><a id="a50b58c7402c75b14d1dfbfba85e08bbd" name="a50b58c7402c75b14d1dfbfba85e08bbd"></a>
+<a class="el" href="classfims_1_1Vector.html#a2c822b39eaad468f2e61cca61956fb85">reference</a>&#160;</td><td class="memItemRight" valign="bottom"><b>front</b> ()</td></tr>
+<tr class="memdesc:a50b58c7402c75b14d1dfbfba85e08bbd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a reference to the first element in the container. <br /></td></tr>
+<tr class="separator:a50b58c7402c75b14d1dfbfba85e08bbd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a20686856d7e697c8245400c5fe793aa9" id="r_a20686856d7e697c8245400c5fe793aa9"><td class="memItemLeft" align="right" valign="top"><a id="a20686856d7e697c8245400c5fe793aa9" name="a20686856d7e697c8245400c5fe793aa9"></a>
+<a class="el" href="classfims_1_1Vector.html#a73039a864dc3260fad2f479436f07634">const_reference</a>&#160;</td><td class="memItemRight" valign="bottom"><b>front</b> () <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a></td></tr>
+<tr class="memdesc:a20686856d7e697c8245400c5fe793aa9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a constant reference to the first element in the container. <br /></td></tr>
+<tr class="separator:a20686856d7e697c8245400c5fe793aa9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7f08d9194dc3ee3f8935e23d9bc93068" id="r_a7f08d9194dc3ee3f8935e23d9bc93068"><td class="memItemLeft" align="right" valign="top"><a id="a7f08d9194dc3ee3f8935e23d9bc93068" name="a7f08d9194dc3ee3f8935e23d9bc93068"></a>
+<a class="el" href="classfims_1_1Vector.html#a2c822b39eaad468f2e61cca61956fb85">reference</a>&#160;</td><td class="memItemRight" valign="bottom"><b>back</b> ()</td></tr>
+<tr class="memdesc:a7f08d9194dc3ee3f8935e23d9bc93068"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a reference to the last element in the container. <br /></td></tr>
+<tr class="separator:a7f08d9194dc3ee3f8935e23d9bc93068"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af333496eac4dd104766cda659d1858c5" id="r_af333496eac4dd104766cda659d1858c5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classfims_1_1Vector.html#a73039a864dc3260fad2f479436f07634">const_reference</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims_1_1Vector.html#af333496eac4dd104766cda659d1858c5">back</a> () <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a></td></tr>
+<tr class="memdesc:af333496eac4dd104766cda659d1858c5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a constant reference to the last element in the container.  <br /></td></tr>
+<tr class="separator:af333496eac4dd104766cda659d1858c5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7e1dc8a5671358ba56f52b5fa4c0598e" id="r_a7e1dc8a5671358ba56f52b5fa4c0598e"><td class="memItemLeft" align="right" valign="top"><a id="a7e1dc8a5671358ba56f52b5fa4c0598e" name="a7e1dc8a5671358ba56f52b5fa4c0598e"></a>
+<a class="el" href="classfims_1_1Vector.html#a0c83eba16209dbed7640508d23762f9b">pointer</a>&#160;</td><td class="memItemRight" valign="bottom"><b>data</b> ()</td></tr>
+<tr class="memdesc:a7e1dc8a5671358ba56f52b5fa4c0598e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a pointer to the underlying data array. <br /></td></tr>
+<tr class="separator:a7e1dc8a5671358ba56f52b5fa4c0598e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abb8aa693fa992b944d17fd144ca4c40a" id="r_abb8aa693fa992b944d17fd144ca4c40a"><td class="memItemLeft" align="right" valign="top"><a id="abb8aa693fa992b944d17fd144ca4c40a" name="abb8aa693fa992b944d17fd144ca4c40a"></a>
+<a class="el" href="classfims_1_1Vector.html#ae030f216c0277d6d6db26612dfda61a7">const_pointer</a>&#160;</td><td class="memItemRight" valign="bottom"><b>data</b> () <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a></td></tr>
+<tr class="memdesc:abb8aa693fa992b944d17fd144ca4c40a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a constant pointer to the underlying data array. <br /></td></tr>
+<tr class="separator:abb8aa693fa992b944d17fd144ca4c40a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a299d04fd9a11b46933f4802b7a7a8341" id="r_a299d04fd9a11b46933f4802b7a7a8341"><td class="memItemLeft" align="right" valign="top"><a id="a299d04fd9a11b46933f4802b7a7a8341" name="a299d04fd9a11b46933f4802b7a7a8341"></a>
+<a class="el" href="classfims_1_1Vector.html#ae325d4168cdf392083868a65da5057ec">iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><b>begin</b> ()</td></tr>
+<tr class="memdesc:a299d04fd9a11b46933f4802b7a7a8341"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns an iterator to the first element of the vector. <br /></td></tr>
+<tr class="separator:a299d04fd9a11b46933f4802b7a7a8341"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2ccdf3d56b12fa0d175a4f9e8ad1f2d7" id="r_a2ccdf3d56b12fa0d175a4f9e8ad1f2d7"><td class="memItemLeft" align="right" valign="top"><a id="a2ccdf3d56b12fa0d175a4f9e8ad1f2d7" name="a2ccdf3d56b12fa0d175a4f9e8ad1f2d7"></a>
+<a class="el" href="classfims_1_1Vector.html#ae325d4168cdf392083868a65da5057ec">iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><b>end</b> ()</td></tr>
+<tr class="memdesc:a2ccdf3d56b12fa0d175a4f9e8ad1f2d7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns an iterator to the element following the last element of the vector. <br /></td></tr>
+<tr class="separator:a2ccdf3d56b12fa0d175a4f9e8ad1f2d7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab4cab34b7f946e3db28befa6ee590e2f" id="r_ab4cab34b7f946e3db28befa6ee590e2f"><td class="memItemLeft" align="right" valign="top"><a id="ab4cab34b7f946e3db28befa6ee590e2f" name="ab4cab34b7f946e3db28befa6ee590e2f"></a>
+<a class="el" href="classfims_1_1Vector.html#afb654ff466fb19c85e9d325c1cffcf05">reverse_iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><b>rbegin</b> ()</td></tr>
+<tr class="memdesc:ab4cab34b7f946e3db28befa6ee590e2f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a reverse iterator to the first element of the reversed vector. It corresponds to the last element of the non-reversed vector. <br /></td></tr>
+<tr class="separator:ab4cab34b7f946e3db28befa6ee590e2f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1b420e6d1d0898afb90b127a06bb11e6" id="r_a1b420e6d1d0898afb90b127a06bb11e6"><td class="memItemLeft" align="right" valign="top"><a id="a1b420e6d1d0898afb90b127a06bb11e6" name="a1b420e6d1d0898afb90b127a06bb11e6"></a>
+<a class="el" href="classfims_1_1Vector.html#afb654ff466fb19c85e9d325c1cffcf05">reverse_iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><b>rend</b> ()</td></tr>
+<tr class="memdesc:a1b420e6d1d0898afb90b127a06bb11e6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a reverse iterator to the element following the last element of the reversed vector. It corresponds to the element preceding the first element of the non-reversed vector. <br /></td></tr>
+<tr class="separator:a1b420e6d1d0898afb90b127a06bb11e6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa9e587a5f579f6901af405f1af903046" id="r_aa9e587a5f579f6901af405f1af903046"><td class="memItemLeft" align="right" valign="top"><a id="aa9e587a5f579f6901af405f1af903046" name="aa9e587a5f579f6901af405f1af903046"></a>
+<a class="el" href="classfims_1_1Vector.html#a222ede0334a583819b9013335be15dd9">const_reverse_iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><b>rbegin</b> () <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a></td></tr>
+<tr class="memdesc:aa9e587a5f579f6901af405f1af903046"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a constant reverse iterator to the first element of the reversed vector. It corresponds to the last element of the non-reversed vector. <br /></td></tr>
+<tr class="separator:aa9e587a5f579f6901af405f1af903046"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a864f6aaa6466ce9ea6723e6decd880df" id="r_a864f6aaa6466ce9ea6723e6decd880df"><td class="memItemLeft" align="right" valign="top"><a id="a864f6aaa6466ce9ea6723e6decd880df" name="a864f6aaa6466ce9ea6723e6decd880df"></a>
+<a class="el" href="classfims_1_1Vector.html#a222ede0334a583819b9013335be15dd9">const_reverse_iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><b>rend</b> () <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a></td></tr>
+<tr class="memdesc:a864f6aaa6466ce9ea6723e6decd880df"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a constant reverse iterator to the element following the last element of the reversed vector. It corresponds to the element preceding the first element of the non-reversed vector. <br /></td></tr>
+<tr class="separator:a864f6aaa6466ce9ea6723e6decd880df"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5d90390d8f99e15cadd1eadc0560733b" id="r_a5d90390d8f99e15cadd1eadc0560733b"><td class="memItemLeft" align="right" valign="top"><a id="a5d90390d8f99e15cadd1eadc0560733b" name="a5d90390d8f99e15cadd1eadc0560733b"></a>
+<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><b>empty</b> ()</td></tr>
+<tr class="memdesc:a5d90390d8f99e15cadd1eadc0560733b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks whether the container is empty. <br /></td></tr>
+<tr class="separator:a5d90390d8f99e15cadd1eadc0560733b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abe2abae6275f702ce15a62f6a63c7062" id="r_abe2abae6275f702ce15a62f6a63c7062"><td class="memItemLeft" align="right" valign="top"><a id="abe2abae6275f702ce15a62f6a63c7062" name="abe2abae6275f702ce15a62f6a63c7062"></a>
+<a class="el" href="classfims_1_1Vector.html#aef3c72aa69c97bdc441da6254a2aa310">size_type</a>&#160;</td><td class="memItemRight" valign="bottom"><b>size</b> () <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a></td></tr>
+<tr class="memdesc:abe2abae6275f702ce15a62f6a63c7062"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the number of elements. <br /></td></tr>
+<tr class="separator:abe2abae6275f702ce15a62f6a63c7062"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a15d40df5b4ef663486d9d712130dc6d7" id="r_a15d40df5b4ef663486d9d712130dc6d7"><td class="memItemLeft" align="right" valign="top"><a id="a15d40df5b4ef663486d9d712130dc6d7" name="a15d40df5b4ef663486d9d712130dc6d7"></a>
+<a class="el" href="classfims_1_1Vector.html#aef3c72aa69c97bdc441da6254a2aa310">size_type</a>&#160;</td><td class="memItemRight" valign="bottom"><b>max_size</b> () <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a></td></tr>
+<tr class="memdesc:a15d40df5b4ef663486d9d712130dc6d7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the maximum possible number of elements. <br /></td></tr>
+<tr class="separator:a15d40df5b4ef663486d9d712130dc6d7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a254cc7fdb1dc247fae2216726cc720e7" id="r_a254cc7fdb1dc247fae2216726cc720e7"><td class="memItemLeft" align="right" valign="top"><a id="a254cc7fdb1dc247fae2216726cc720e7" name="a254cc7fdb1dc247fae2216726cc720e7"></a>
+<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><b>reserve</b> (<a class="el" href="classfims_1_1Vector.html#aef3c72aa69c97bdc441da6254a2aa310">size_type</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">cap</a>)</td></tr>
+<tr class="memdesc:a254cc7fdb1dc247fae2216726cc720e7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reserves storage. <br /></td></tr>
+<tr class="separator:a254cc7fdb1dc247fae2216726cc720e7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4199a5050a85e9bd6e530f5af1846514" id="r_a4199a5050a85e9bd6e530f5af1846514"><td class="memItemLeft" align="right" valign="top"><a id="a4199a5050a85e9bd6e530f5af1846514" name="a4199a5050a85e9bd6e530f5af1846514"></a>
+<a class="el" href="classfims_1_1Vector.html#aef3c72aa69c97bdc441da6254a2aa310">size_type</a>&#160;</td><td class="memItemRight" valign="bottom"><b>capacity</b> ()</td></tr>
+<tr class="memdesc:a4199a5050a85e9bd6e530f5af1846514"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the number of elements that can be held in currently allocated storage. <br /></td></tr>
+<tr class="separator:a4199a5050a85e9bd6e530f5af1846514"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a37fe09f5a2b8f57272cc0638548c7345" id="r_a37fe09f5a2b8f57272cc0638548c7345"><td class="memItemLeft" align="right" valign="top"><a id="a37fe09f5a2b8f57272cc0638548c7345" name="a37fe09f5a2b8f57272cc0638548c7345"></a>
+<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><b>shrink_to_fit</b> ()</td></tr>
+<tr class="memdesc:a37fe09f5a2b8f57272cc0638548c7345"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reduces memory usage by freeing unused memory. <br /></td></tr>
+<tr class="separator:a37fe09f5a2b8f57272cc0638548c7345"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aee67983e5dafc3b081d3777220cb3c99" id="r_aee67983e5dafc3b081d3777220cb3c99"><td class="memItemLeft" align="right" valign="top"><a id="aee67983e5dafc3b081d3777220cb3c99" name="aee67983e5dafc3b081d3777220cb3c99"></a>
+<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><b>clear</b> ()</td></tr>
+<tr class="memdesc:aee67983e5dafc3b081d3777220cb3c99"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clears the contents. <br /></td></tr>
+<tr class="separator:aee67983e5dafc3b081d3777220cb3c99"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab0ee9390e43439d6ef5bc8f391095dbc" id="r_ab0ee9390e43439d6ef5bc8f391095dbc"><td class="memItemLeft" align="right" valign="top"><a id="ab0ee9390e43439d6ef5bc8f391095dbc" name="ab0ee9390e43439d6ef5bc8f391095dbc"></a>
+<a class="el" href="classfims_1_1Vector.html#ae325d4168cdf392083868a65da5057ec">iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><b>insert</b> (<a class="el" href="classfims_1_1Vector.html#a1599f71fde1e54967526c394774c521a">const_iterator</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">pos</a>, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &amp;value)</td></tr>
+<tr class="memdesc:ab0ee9390e43439d6ef5bc8f391095dbc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Inserts value before pos. <br /></td></tr>
+<tr class="separator:ab0ee9390e43439d6ef5bc8f391095dbc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afc9e14ef1b8158f976a13d35df4461e5" id="r_afc9e14ef1b8158f976a13d35df4461e5"><td class="memItemLeft" align="right" valign="top"><a id="afc9e14ef1b8158f976a13d35df4461e5" name="afc9e14ef1b8158f976a13d35df4461e5"></a>
+<a class="el" href="classfims_1_1Vector.html#ae325d4168cdf392083868a65da5057ec">iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><b>insert</b> (<a class="el" href="classfims_1_1Vector.html#a1599f71fde1e54967526c394774c521a">const_iterator</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">pos</a>, <a class="el" href="classfims_1_1Vector.html#aef3c72aa69c97bdc441da6254a2aa310">size_type</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">count</a>, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &amp;value)</td></tr>
+<tr class="memdesc:afc9e14ef1b8158f976a13d35df4461e5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Inserts count copies of the value before pos. <br /></td></tr>
+<tr class="separator:afc9e14ef1b8158f976a13d35df4461e5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5c11e84813c979560191675f1a5c9765" id="r_a5c11e84813c979560191675f1a5c9765"><td class="memTemplParams" colspan="2"><a id="a5c11e84813c979560191675f1a5c9765" name="a5c11e84813c979560191675f1a5c9765"></a>
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">class</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">InputIt</a> &gt; </td></tr>
+<tr class="memitem:a5c11e84813c979560191675f1a5c9765"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classfims_1_1Vector.html#ae325d4168cdf392083868a65da5057ec">iterator</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><b>insert</b> (<a class="el" href="classfims_1_1Vector.html#a1599f71fde1e54967526c394774c521a">const_iterator</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">pos</a>, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">InputIt</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">first</a>, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">InputIt</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">last</a>)</td></tr>
+<tr class="memdesc:a5c11e84813c979560191675f1a5c9765"><td class="mdescLeft">&#160;</td><td class="mdescRight">Inserts elements from range [first, last) before pos. <br /></td></tr>
+<tr class="separator:a5c11e84813c979560191675f1a5c9765"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab2101bfe7a6335797302aeebf1dd40f2" id="r_ab2101bfe7a6335797302aeebf1dd40f2"><td class="memItemLeft" align="right" valign="top"><a id="ab2101bfe7a6335797302aeebf1dd40f2" name="ab2101bfe7a6335797302aeebf1dd40f2"></a>
+<a class="el" href="classfims_1_1Vector.html#ae325d4168cdf392083868a65da5057ec">iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><b>insert</b> (<a class="el" href="classfims_1_1Vector.html#a1599f71fde1e54967526c394774c521a">const_iterator</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">pos</a>, std::initializer_list&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">ilist</a>)</td></tr>
+<tr class="memdesc:ab2101bfe7a6335797302aeebf1dd40f2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Inserts elements from initializer list ilist before pos. <br /></td></tr>
+<tr class="separator:ab2101bfe7a6335797302aeebf1dd40f2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0cb72bf01bf35d5bd49ad88b463391ce" id="r_a0cb72bf01bf35d5bd49ad88b463391ce"><td class="memTemplParams" colspan="2"><a id="a0cb72bf01bf35d5bd49ad88b463391ce" name="a0cb72bf01bf35d5bd49ad88b463391ce"></a>
+template&lt;class... Args&gt; </td></tr>
+<tr class="memitem:a0cb72bf01bf35d5bd49ad88b463391ce"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classfims_1_1Vector.html#ae325d4168cdf392083868a65da5057ec">iterator</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><b>emplace</b> (<a class="el" href="classfims_1_1Vector.html#a1599f71fde1e54967526c394774c521a">const_iterator</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">pos</a>, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Args</a> &amp;&amp;...<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">args</a>)</td></tr>
+<tr class="memdesc:a0cb72bf01bf35d5bd49ad88b463391ce"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs element in-place. <br /></td></tr>
+<tr class="separator:a0cb72bf01bf35d5bd49ad88b463391ce"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6877cca7b037e6a62996d2c8b558d9db" id="r_a6877cca7b037e6a62996d2c8b558d9db"><td class="memItemLeft" align="right" valign="top"><a id="a6877cca7b037e6a62996d2c8b558d9db" name="a6877cca7b037e6a62996d2c8b558d9db"></a>
+<a class="el" href="classfims_1_1Vector.html#ae325d4168cdf392083868a65da5057ec">iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><b>erase</b> (<a class="el" href="classfims_1_1Vector.html#ae325d4168cdf392083868a65da5057ec">iterator</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">pos</a>)</td></tr>
+<tr class="memdesc:a6877cca7b037e6a62996d2c8b558d9db"><td class="mdescLeft">&#160;</td><td class="mdescRight">Removes the element at pos. <br /></td></tr>
+<tr class="separator:a6877cca7b037e6a62996d2c8b558d9db"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa90013801ef54eec40e5863a69fcb53a" id="r_aa90013801ef54eec40e5863a69fcb53a"><td class="memItemLeft" align="right" valign="top"><a id="aa90013801ef54eec40e5863a69fcb53a" name="aa90013801ef54eec40e5863a69fcb53a"></a>
+<a class="el" href="classfims_1_1Vector.html#ae325d4168cdf392083868a65da5057ec">iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><b>erase</b> (<a class="el" href="classfims_1_1Vector.html#ae325d4168cdf392083868a65da5057ec">iterator</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">first</a>, <a class="el" href="classfims_1_1Vector.html#ae325d4168cdf392083868a65da5057ec">iterator</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">last</a>)</td></tr>
+<tr class="memdesc:aa90013801ef54eec40e5863a69fcb53a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Removes the elements in the range [first, last). <br /></td></tr>
+<tr class="separator:aa90013801ef54eec40e5863a69fcb53a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5ae1e430317d5068b40ef3a5a95fd2d3" id="r_a5ae1e430317d5068b40ef3a5a95fd2d3"><td class="memItemLeft" align="right" valign="top"><a id="a5ae1e430317d5068b40ef3a5a95fd2d3" name="a5ae1e430317d5068b40ef3a5a95fd2d3"></a>
+<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><b>push_back</b> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &amp;&amp;value)</td></tr>
+<tr class="memdesc:a5ae1e430317d5068b40ef3a5a95fd2d3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds an element to the end. <br /></td></tr>
+<tr class="separator:a5ae1e430317d5068b40ef3a5a95fd2d3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4bf81241924aa961c559adbddc7dac3d" id="r_a4bf81241924aa961c559adbddc7dac3d"><td class="memTemplParams" colspan="2"><a id="a4bf81241924aa961c559adbddc7dac3d" name="a4bf81241924aa961c559adbddc7dac3d"></a>
+template&lt;class... Args&gt; </td></tr>
+<tr class="memitem:a4bf81241924aa961c559adbddc7dac3d"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><b>emplace_back</b> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Args</a> &amp;&amp;...<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">args</a>)</td></tr>
+<tr class="memdesc:a4bf81241924aa961c559adbddc7dac3d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs an element in-place at the end. <br /></td></tr>
+<tr class="separator:a4bf81241924aa961c559adbddc7dac3d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8b76bd813c4883eb26c9ad1d8de3bcc7" id="r_a8b76bd813c4883eb26c9ad1d8de3bcc7"><td class="memItemLeft" align="right" valign="top"><a id="a8b76bd813c4883eb26c9ad1d8de3bcc7" name="a8b76bd813c4883eb26c9ad1d8de3bcc7"></a>
+<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><b>pop_back</b> ()</td></tr>
+<tr class="memdesc:a8b76bd813c4883eb26c9ad1d8de3bcc7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Removes the last element. <br /></td></tr>
+<tr class="separator:a8b76bd813c4883eb26c9ad1d8de3bcc7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a971eba3d10861eaabaf2b0252182fed9" id="r_a971eba3d10861eaabaf2b0252182fed9"><td class="memItemLeft" align="right" valign="top"><a id="a971eba3d10861eaabaf2b0252182fed9" name="a971eba3d10861eaabaf2b0252182fed9"></a>
+<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><b>resize</b> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">s</a>)</td></tr>
+<tr class="memdesc:a971eba3d10861eaabaf2b0252182fed9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Changes the number of elements stored. <br /></td></tr>
+<tr class="separator:a971eba3d10861eaabaf2b0252182fed9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5631f6d0649ac37b28a95a8e64be66a2" id="r_a5631f6d0649ac37b28a95a8e64be66a2"><td class="memItemLeft" align="right" valign="top"><a id="a5631f6d0649ac37b28a95a8e64be66a2" name="a5631f6d0649ac37b28a95a8e64be66a2"></a>
+<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><b>swap</b> (<a class="el" href="classfims_1_1Vector.html">Vector</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">other</a>)</td></tr>
+<tr class="memdesc:a5631f6d0649ac37b28a95a8e64be66a2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Swaps the contents. <br /></td></tr>
+<tr class="separator:a5631f6d0649ac37b28a95a8e64be66a2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa1957de9c634fc29f5760137832d0d45" id="r_aa1957de9c634fc29f5760137832d0d45"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims_1_1Vector.html#aa1957de9c634fc29f5760137832d0d45">operator std::vector&lt; Type &gt;</a> ()</td></tr>
+<tr class="memdesc:aa1957de9c634fc29f5760137832d0d45"><td class="mdescLeft">&#160;</td><td class="mdescRight">Converts fims::Vector&lt;Type&gt; to std::vector&lt;Type&gt;  <br /></td></tr>
+<tr class="separator:aa1957de9c634fc29f5760137832d0d45"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9e37062fc7adc07d64f29b648c08d4d9" id="r_a9e37062fc7adc07d64f29b648c08d4d9"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims_1_1Vector.html#a9e37062fc7adc07d64f29b648c08d4d9">to_std</a> () <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a></td></tr>
+<tr class="memdesc:a9e37062fc7adc07d64f29b648c08d4d9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert <a class="el" href="classfims_1_1Vector.html">fims::Vector</a> to std::vector.  <br /></td></tr>
+<tr class="separator:a9e37062fc7adc07d64f29b648c08d4d9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa55c883b29afa5bc59134bd00f785fc1" id="r_aa55c883b29afa5bc59134bd00f785fc1"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims_1_1Vector.html#aa55c883b29afa5bc59134bd00f785fc1">to_tmb</a> () <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a></td></tr>
+<tr class="memdesc:aa55c883b29afa5bc59134bd00f785fc1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert <a class="el" href="classfims_1_1Vector.html">fims::Vector</a> to TMB vector type.  <br /></td></tr>
+<tr class="separator:aa55c883b29afa5bc59134bd00f785fc1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a511709eee676fd7defff0b4460400370" id="r_a511709eee676fd7defff0b4460400370"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims_1_1Vector.html#a511709eee676fd7defff0b4460400370">get_tag</a> () <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a></td></tr>
+<tr class="memdesc:a511709eee676fd7defff0b4460400370"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the tag for the vector. A tag can represent anything and is not used internally by FIMS.  <br /></td></tr>
+<tr class="separator:a511709eee676fd7defff0b4460400370"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acb0fdd380d9f6fcadd354aa52509ee8d" id="r_acb0fdd380d9f6fcadd354aa52509ee8d"><td class="memItemLeft" align="right" valign="top"><a id="acb0fdd380d9f6fcadd354aa52509ee8d" name="acb0fdd380d9f6fcadd354aa52509ee8d"></a>
+<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><b>set_tag</b> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> std::string &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">tag</a>)</td></tr>
+<tr class="memdesc:acb0fdd380d9f6fcadd354aa52509ee8d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the tag for the vector. A tag can be set to any string value and is not used internally by FIMS. <br /></td></tr>
+<tr class="separator:acb0fdd380d9f6fcadd354aa52509ee8d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="friends" name="friends"></a>
+Friends</h2></td></tr>
+<tr class="memitem:afb4f20f0ebbb355ba7b9a3bcdec6286e" id="r_afb4f20f0ebbb355ba7b9a3bcdec6286e"><td class="memTemplParams" colspan="2"><a id="afb4f20f0ebbb355ba7b9a3bcdec6286e" name="afb4f20f0ebbb355ba7b9a3bcdec6286e"></a>
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">T</a> &gt; </td></tr>
+<tr class="memitem:afb4f20f0ebbb355ba7b9a3bcdec6286e"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><b>operator==</b> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">T</a> &gt; &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">lhs</a>, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">T</a> &gt; &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">rhs</a>)</td></tr>
+<tr class="memdesc:afb4f20f0ebbb355ba7b9a3bcdec6286e"><td class="mdescLeft">&#160;</td><td class="mdescRight">friend comparison operator. Allows the operator to see private members of fims::Vector&lt;Type&gt;. <br /></td></tr>
+<tr class="separator:afb4f20f0ebbb355ba7b9a3bcdec6286e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><div class="compoundTemplParams">template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a>&gt;<br />
+class fims::Vector&lt; Type &gt;</div><p>Wrapper class for std::vector types. If this file is compiled with -DTMB_MODEL, conversion operators are defined for TMB vector types.</p>
+<p>All std::vector functions are copied over from the std library. While some of these may not be called explicitly in FIMS, they may be required to run other std library functions. </p>
+</div><h2 class="groupheader">Member Typedef Documentation</h2>
+<a id="ab120f87c3bf405a86ed96bf78fba7045" name="ab120f87c3bf405a86ed96bf78fba7045"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab120f87c3bf405a86ed96bf78fba7045">&#9670;&#160;</a></span>allocator_type</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typedef</a> std::vector&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a>&gt;::allocator_type <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::allocator_type</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Allocator for type Type&gt; </p>
+
+</div>
+</div>
+<a id="a1599f71fde1e54967526c394774c521a" name="a1599f71fde1e54967526c394774c521a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1599f71fde1e54967526c394774c521a">&#9670;&#160;</a></span>const_iterator</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typedef</a> std::vector&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a>&gt;::const_iterator <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::const_iterator</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Constant iterator&gt; </p>
+
+</div>
+</div>
+<a id="ae030f216c0277d6d6db26612dfda61a7" name="ae030f216c0277d6d6db26612dfda61a7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae030f216c0277d6d6db26612dfda61a7">&#9670;&#160;</a></span>const_pointer</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typedef</a> std::vector&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a>&gt;::const_pointer <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::const_pointer</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Constant pointer type const Type*&gt; </p>
+
+</div>
+</div>
+<a id="a73039a864dc3260fad2f479436f07634" name="a73039a864dc3260fad2f479436f07634"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a73039a864dc3260fad2f479436f07634">&#9670;&#160;</a></span>const_reference</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typedef</a> std::vector&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a>&gt;::const_reference <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::const_reference</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Constant reference type const &amp;Type&gt; </p>
+
+</div>
+</div>
+<a id="a222ede0334a583819b9013335be15dd9" name="a222ede0334a583819b9013335be15dd9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a222ede0334a583819b9013335be15dd9">&#9670;&#160;</a></span>const_reverse_iterator</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typedef</a> std::vector&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a>&gt;::const_reverse_iterator <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::const_reverse_iterator</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Constant reverse iterator&gt; </p>
+
+</div>
+</div>
+<a id="ad9d16e530b0a67d301311031ecd0bf11" name="ad9d16e530b0a67d301311031ecd0bf11"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad9d16e530b0a67d301311031ecd0bf11">&#9670;&#160;</a></span>difference_type</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typedef</a> std::vector&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a>&gt;::difference_type <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::difference_type</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Difference type&gt; </p>
+
+</div>
+</div>
+<a id="ae325d4168cdf392083868a65da5057ec" name="ae325d4168cdf392083868a65da5057ec"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae325d4168cdf392083868a65da5057ec">&#9670;&#160;</a></span>iterator</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typedef</a> std::vector&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a>&gt;::iterator <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::iterator</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Iterator&gt; </p>
+
+</div>
+</div>
+<a id="a0c83eba16209dbed7640508d23762f9b" name="a0c83eba16209dbed7640508d23762f9b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0c83eba16209dbed7640508d23762f9b">&#9670;&#160;</a></span>pointer</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typedef</a> std::vector&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a>&gt;::pointer <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::pointer</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Pointer type Type*&gt; </p>
+
+</div>
+</div>
+<a id="a2c822b39eaad468f2e61cca61956fb85" name="a2c822b39eaad468f2e61cca61956fb85"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2c822b39eaad468f2e61cca61956fb85">&#9670;&#160;</a></span>reference</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typedef</a> std::vector&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a>&gt;::reference <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::reference</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Reference type &amp;Type&gt; </p>
+
+</div>
+</div>
+<a id="afb654ff466fb19c85e9d325c1cffcf05" name="afb654ff466fb19c85e9d325c1cffcf05"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afb654ff466fb19c85e9d325c1cffcf05">&#9670;&#160;</a></span>reverse_iterator</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typedef</a> std::vector&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a>&gt;::reverse_iterator <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::reverse_iterator</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Reverse iterator&gt; </p>
+
+</div>
+</div>
+<a id="aef3c72aa69c97bdc441da6254a2aa310" name="aef3c72aa69c97bdc441da6254a2aa310"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aef3c72aa69c97bdc441da6254a2aa310">&#9670;&#160;</a></span>size_type</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typedef</a> std::vector&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a>&gt;::size_type <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::size_type</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Size type&gt; </p>
+
+</div>
+</div>
+<a id="a5292f6654fee6c143adf4b694958bd6d" name="a5292f6654fee6c143adf4b694958bd6d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5292f6654fee6c143adf4b694958bd6d">&#9670;&#160;</a></span>value_type</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typedef</a> std::vector&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a>&gt;::value_type <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::value_type</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Member type Type&gt; </p>
+
+</div>
+</div>
+<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a id="ac0b39ccdfdbac0c50f67c9e5553031c1" name="ac0b39ccdfdbac0c50f67c9e5553031c1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac0b39ccdfdbac0c50f67c9e5553031c1">&#9670;&#160;</a></span>Vector()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::Vector </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Default constructor. </p>
+
+</div>
+</div>
+<h2 class="groupheader">Member Function Documentation</h2>
+<a id="af333496eac4dd104766cda659d1858c5" name="af333496eac4dd104766cda659d1858c5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af333496eac4dd104766cda659d1858c5">&#9670;&#160;</a></span>back()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classfims_1_1Vector.html#a73039a864dc3260fad2f479436f07634">const_reference</a> <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::back </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Returns a constant reference to the last element in the container. </p>
+<p>&#x2401;* </p>
+
+</div>
+</div>
+<a id="a70bfdc38a54b251b3d5dbebdb06df49d" name="a70bfdc38a54b251b3d5dbebdb06df49d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a70bfdc38a54b251b3d5dbebdb06df49d">&#9670;&#160;</a></span>get_force_scalar()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &amp; <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::get_force_scalar </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a>&#160;</td>
+          <td class="paramname"><em>pos</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>If this vector is size 1 and pos is greater than zero, the first index is returned. If this vector has size greater than 1 and pos is greater than size, a invalid_argument exception is thrown. Otherwise, the value at index pos is returned. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">pos</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>a constant reference to the element at specified location </dd></dl>
+
+</div>
+</div>
+<a id="a511709eee676fd7defff0b4460400370" name="a511709eee676fd7defff0b4460400370"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a511709eee676fd7defff0b4460400370">&#9670;&#160;</a></span>get_tag()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::get_tag </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Gets the tag for the vector. A tag can represent anything and is not used internally by FIMS. </p>
+<dl class="section return"><dt>Returns</dt><dd>The tag. </dd></dl>
+
+</div>
+</div>
+<a id="aa1957de9c634fc29f5760137832d0d45" name="aa1957de9c634fc29f5760137832d0d45"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa1957de9c634fc29f5760137832d0d45">&#9670;&#160;</a></span>operator std::vector&lt; Type &gt;()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">::operator</a> std::vector&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Converts fims::Vector&lt;Type&gt; to std::vector&lt;Type&gt; </p>
+<p>Conversion operators </p>
+
+</div>
+</div>
+<a id="addf83740127696a31cf8a5c4c75fffb1" name="addf83740127696a31cf8a5c4c75fffb1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#addf83740127696a31cf8a5c4c75fffb1">&#9670;&#160;</a></span>operator=()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classfims_1_1Vector.html">Vector</a> &amp; <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">::operator</a>= </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="classfims_1_1Vector.html">Vector</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>other</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Assignment operator for <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>. </p>
+<p>Assigns the contents of another <a class="el" href="classfims_1_1Vector.html">fims::Vector</a> to this vector. Cleans up existing contents and performs a deep copy.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">other</td><td>The vector to assign from. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Reference to this vector. </dd></dl>
+
+</div>
+</div>
+<a id="ac4a01f5a939399c068281857077c9b0c" name="ac4a01f5a939399c068281857077c9b0c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac4a01f5a939399c068281857077c9b0c">&#9670;&#160;</a></span>operator[]()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &amp; <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">::operator</a>[] </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a>&#160;</td>
+          <td class="paramname"><em>pos</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Returns a reference to the element at specified location pos. No bounds checking is performed. </p>
+<p>The following are std::vector functions copied over from the standard library. While some of these may not be called explicitly in FIMS, they may be required to run other std library functions. </p>
+
+</div>
+</div>
+<a id="a9e37062fc7adc07d64f29b648c08d4d9" name="a9e37062fc7adc07d64f29b648c08d4d9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9e37062fc7adc07d64f29b648c08d4d9">&#9670;&#160;</a></span>to_std()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::to_std </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Convert <a class="el" href="classfims_1_1Vector.html">fims::Vector</a> to std::vector. </p>
+<p>Returns a standard vector containing the same elements as the <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>.</p>
+<dl class="section return"><dt>Returns</dt><dd>std::vector&lt;Type&gt; with the same elements. </dd></dl>
+
+</div>
+</div>
+<a id="aa55c883b29afa5bc59134bd00f785fc1" name="aa55c883b29afa5bc59134bd00f785fc1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa55c883b29afa5bc59134bd00f785fc1">&#9670;&#160;</a></span>to_tmb()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::to_tmb </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Convert <a class="el" href="classfims_1_1Vector.html">fims::Vector</a> to TMB vector type. </p>
+<p>Returns a TMB-compatible vector containing the same elements as the <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>. Only available if compiled with TMB_MODEL.</p>
+<dl class="section return"><dt>Returns</dt><dd>TMB vector type with the same elements. </dd></dl>
+
+</div>
+</div>
+<hr/>The documentation for this class was generated from the following file:<ul>
+<li>inst/include/common/<a class="el" href="fims__vector_8hpp_source.html">fims_vector.hpp</a></li>
+</ul>
+</div><!-- contents -->
+</div><!-- doc-content -->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><b>fims</b></li><li class="navelem"><a class="el" href="classfims_1_1Vector.html">Vector</a></li>
+    <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.8 </li>
+  </ul>
+</div>
+</body>
+</html>

@@ -1,0 +1,769 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" data-bs-theme="auto">
+<head>
+    <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=9"/>
+    <meta name="generator" content="Doxygen 1.9.8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>FIMS</title><link href="tabs.css" rel="stylesheet" type="text/css"/>
+    <link rel="icon" type="image/png" href="https://noaa-fims.github.io/images/FIMS_hexlogo.png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+    <link href="https://noaa-fims.github.io/site_libs/bootstrap/bootstrap-5477dd34fdf9f443df58de9070e2fbd7.min.css" rel="stylesheet">
+    <link href="https://noaa-fims.github.io/site_libs/bootstrap/bootstrap-dark-429bd3fc0b6810d1347fc340b0896c35.min.css" rel="stylesheet" media="(prefers-color-scheme: dark)">
+    <script type="text/javascript" src="jquery.js"></script>
+    <script type="text/javascript" src="dynsections.js"></script>
+    <link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+    <link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+  $(document).ready(function() { init_search(); });
+/* @license-end */
+</script>
+    <script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  extensions: ["tex2jax.js"],
+  jax: ["input/TeX","output/HTML-CSS"],
+});
+</script>
+<script type="text/javascript" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js"></script>
+    <link href="doxygen.css" rel="stylesheet" type="text/css" />
+    <link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
+<link href="custom.css" rel="stylesheet" type="text/css"/>
+    <script src="https://noaa-fims.github.io/site_libs/quarto-nav/quarto-nav.js"></script>
+    <script src="https://noaa-fims.github.io/site_libs/bootstrap/bootstrap.min.js"></script>
+    <script src="https://noaa-fims.github.io/site_libs/quarto-html/quarto.js" type="module"></script>
+</head>
+<body>
+<div id="top">
+    <div id="titlearea">
+        <table cellspacing="0" cellpadding="0">
+            <tbody>
+            <tr style="height: 70px;">
+                <td id="projectlogo"><img alt="Logo" src="FIMS_logo3.png"/></td>
+                <td id="projectalign" style="padding-left: 0.5em;">
+                    <div id="projectname">FIMS
+                        &#160;<span id="projectnumber">v0.8.1</span></div>
+                    <div id="projectbrief"></div></td>
+                <td style="padding-left: 0.5em;">
+                    <div id="projectbrief"></div>
+                </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <nav class="navbar navbar-expand-lg " data-bs-theme="auto">
+      <div class="navbar-container container-fluid">
+        <div class="navbar-brand-container mx-auto">
+          <a href="https://noaa-fims.github.io/" class="navbar-brand navbar-brand-logo"></a>
+          <a class="navbar-brand" href="https://noaa-fims.github.io/">
+          </a>
+        </div>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+          <ul class="navbar-nav navbar-nav-scroll ms-auto">
+           <li class="nav-item dropdown">
+            <button class="nav-link dropdown-toggle" type="button" id="dropdown-reference" data-bs-toggle="dropdown"
+                    aria-expanded="false" aria-haspopup="true">reference</button>
+            <ul class="dropdown-menu" aria-labelledby="dropdown-reference">
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/reference/index.html">r/roxygen</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/doxygen/index.html">c++/doxygen</a></li>
+            </ul>
+           </li>
+            <li class="nav-item dropdown">
+            <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown"
+                    aria-expanded="false" aria-haspopup="true">articles</button>
+            <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
+              <li><h6 class="dropdown-header" data-toc-skip>intro to fims</h6></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/fims-demo.html">introducing the fisheries integrated modeling system (fims)</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/fims-logging.html">Introducing the fims logging system</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/fims-user-setup-guide.html">fims user setup guide</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/fims-demo-projections.html">simple projections using fims</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><h6 class="dropdown-header" data-toc-skip>developer</h6></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/fims-path-maturity.html">fims path - maturity</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><h6 class="dropdown-header" data-toc-skip>c++ training</h6></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/training-intro-cpp.html">intro to c++</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/training-intro-rcpp.html">intro to rcpp</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><h6 class="dropdown-header" data-toc-skip>research and development</h6></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/RD-re-sparsity.html">re sparsity</a></li>
+            </ul>
+          </li>
+            <li class="nav-item dropdown">
+              <button class="nav-link dropdown-toggle" type="button" id="dropdown-news" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">news</button>
+              <ul class="dropdown-menu" aria-labelledby="dropdown-news">
+                <li><h6 class="dropdown-header" data-toc-skip="">Releases</h6></li>
+                <li><a class="external-link dropdown-item" href="https://github.com/NOAA-FIMS/FIMS/releases/latest">latest release</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/news/index.html">changelog</a></li>
+              </ul>
+            </li>
+          <li class="nav-item dropdown">
+            <button class="nav-link dropdown-toggle" type="button" id="dropdown-reports" data-bs-toggle="dropdown"
+                    aria-expanded="false" aria-haspopup="true">reports</button>
+            <ul class="dropdown-menu" aria-labelledby="dropdown-reports">
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/coverage/coverage.html">coverage</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/coverage/codecoverage_explanation.html">coverage explained</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/testdown/index.html">testdown</a></li>
+            </ul>
+          </li>
+          <ul class="navbar-nav">
+            <li class="nav-item"><a class="external-link nav-link" href="https://noaa-fims.github.io/">fims website</a></li>
+            <li class="nav-item">
+              <a class="external-link nav-link" href="https://github.com/noaa-fims/fims/" aria-label="GitHub repository for FIMS">
+                <span class="fa fa-brands fa-github fa-lg"></span>
+              </a>
+            </li>
+            <!-- Keep the input; pkgdown’s autocomplete wrapper won’t exist in Doxygen -->
+            <li class="nav-item">
+              <form class="form-inline" role="search" onsubmit="return false;">
+                <input class="form-control" type="search" name="search-input" id="search-input"
+                      autocomplete="off" aria-label="Search site" placeholder="Search for">
+              </form>
+            </li>
+          </ul>
+      </div>
+    </div>
+  </nav>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  // Only on the cpp_directory_structure page!
+  document.querySelectorAll('.toc a').forEach(function(link) {
+    if (link.href && link.href.indexOf(location.pathname) !== -1) {
+      link.href = link.hash; // Just use the fragment
+    }
+  });
+});
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  function updateTocActive() {
+    var links = Array.from(document.querySelectorAll('.toc a'));
+    var anchors = links.map(link => document.getElementById(link.getAttribute('href').replace('#', '')));
+    var scrollTop = window.scrollY || document.documentElement.scrollTop;
+    var offset = 150; // Match your scroll-margin-top
+    let currentActive = -1;
+    for (let i = anchors.length - 1; i >= 0; i--) {
+      if (anchors[i] && (anchors[i].getBoundingClientRect().top + window.scrollY - offset) <= scrollTop) {
+        currentActive = i;
+        break;
+      }
+    }
+    links.forEach((link, i) => {
+      link.classList.remove('active', 'aboveActive');
+      if (i === currentActive) {
+        link.classList.add('active');
+      } else if (i < currentActive) {
+        link.classList.add('aboveActive');
+      }
+    });
+  }
+  window.addEventListener('scroll', updateTocActive);
+  window.addEventListener('hashchange', updateTocActive);
+  updateTocActive();
+});
+</script>
+    <!-- end header part -->
+<!-- Generated by Doxygen 1.9.8 -->
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+/* @license-end */
+</script>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(document).ready(function(){initNavTree('classSharedString.html',''); initResizable(); });
+/* @license-end */
+</script>
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">Loading...</div>
+<div class="SRStatus" id="Searching">Searching...</div>
+<div class="SRStatus" id="NoMatches">No Matches</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="summary">
+<a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#friends">Friends</a> &#124;
+<a href="classSharedString-members.html">List of all members</a>  </div>
+  <div class="headertitle"><div class="title">SharedString Class Reference</div></div>
+</div><!--header-->
+<div class="contents">
+
+<p>A class that provides shared ownership of a string.  
+ <a href="classSharedString.html#details">More...</a></p>
+
+<p><code>#include &lt;<a class="el" href="rcpp__shared__primitive_8hpp_source.html">rcpp_shared_primitive.hpp</a>&gt;</code></p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
+Public Member Functions</h2></td></tr>
+<tr class="memitem:af58b073e8b05be2ad32abdfb9588d982" id="r_af58b073e8b05be2ad32abdfb9588d982"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSharedString.html#af58b073e8b05be2ad32abdfb9588d982">SharedString</a> ()</td></tr>
+<tr class="memdesc:af58b073e8b05be2ad32abdfb9588d982"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs a new <a class="el" href="classSharedString.html" title="A class that provides shared ownership of a string.">SharedString</a> object with a default, empty value.  <br /></td></tr>
+<tr class="separator:af58b073e8b05be2ad32abdfb9588d982"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa45c93322d7100c462f0b1f526cdb461" id="r_aa45c93322d7100c462f0b1f526cdb461"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSharedString.html#aa45c93322d7100c462f0b1f526cdb461">SharedString</a> (std::string <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">val</a>)</td></tr>
+<tr class="memdesc:aa45c93322d7100c462f0b1f526cdb461"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs a new <a class="el" href="classSharedString.html" title="A class that provides shared ownership of a string.">SharedString</a> object from a string value.  <br /></td></tr>
+<tr class="separator:aa45c93322d7100c462f0b1f526cdb461"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9fe121568256581a611f8d06c38244ff" id="r_a9fe121568256581a611f8d06c38244ff"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSharedString.html#a9fe121568256581a611f8d06c38244ff">SharedString</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="classSharedString.html">SharedString</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">other</a>)</td></tr>
+<tr class="memdesc:a9fe121568256581a611f8d06c38244ff"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy constructs a new <a class="el" href="classSharedString.html" title="A class that provides shared ownership of a string.">SharedString</a> object.  <br /></td></tr>
+<tr class="separator:a9fe121568256581a611f8d06c38244ff"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab560028c3d852c68c69c2c3748e64794" id="r_ab560028c3d852c68c69c2c3748e64794"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classSharedString.html">SharedString</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSharedString.html#ab560028c3d852c68c69c2c3748e64794">operator=</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="classSharedString.html">SharedString</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">other</a>)</td></tr>
+<tr class="memdesc:ab560028c3d852c68c69c2c3748e64794"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overloaded copy assignment operator.  <br /></td></tr>
+<tr class="separator:ab560028c3d852c68c69c2c3748e64794"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac966c6d58b78ac307c05179bd27402ad" id="r_ac966c6d58b78ac307c05179bd27402ad"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classSharedString.html">SharedString</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSharedString.html#ac966c6d58b78ac307c05179bd27402ad">operator=</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> std::string &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">other</a>)</td></tr>
+<tr class="memdesc:ac966c6d58b78ac307c05179bd27402ad"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overloaded assignment operator for a string value.  <br /></td></tr>
+<tr class="separator:ac966c6d58b78ac307c05179bd27402ad"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a768413537eb0c588da611a4bd3c42a5a" id="r_a768413537eb0c588da611a4bd3c42a5a"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSharedString.html#a768413537eb0c588da611a4bd3c42a5a">SharedString</a> (<a class="el" href="classSharedString.html">SharedString</a> &amp;&amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">other</a>) <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">noexcept</a></td></tr>
+<tr class="memdesc:a768413537eb0c588da611a4bd3c42a5a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs a new <a class="el" href="classSharedString.html" title="A class that provides shared ownership of a string.">SharedString</a> object by moving resources.  <br /></td></tr>
+<tr class="separator:a768413537eb0c588da611a4bd3c42a5a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a55dd0becbb7cbba6b45ab555984349ff" id="r_a55dd0becbb7cbba6b45ab555984349ff"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classSharedString.html">SharedString</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSharedString.html#a55dd0becbb7cbba6b45ab555984349ff">operator=</a> (<a class="el" href="classSharedString.html">SharedString</a> &amp;&amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">other</a>) <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">noexcept</a></td></tr>
+<tr class="memdesc:a55dd0becbb7cbba6b45ab555984349ff"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overloaded move assignment operator.  <br /></td></tr>
+<tr class="separator:a55dd0becbb7cbba6b45ab555984349ff"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8076060b3bbe15d1c3dfd0ec2046ac87" id="r_a8076060b3bbe15d1c3dfd0ec2046ac87"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSharedString.html#a8076060b3bbe15d1c3dfd0ec2046ac87">get</a> () <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a></td></tr>
+<tr class="memdesc:a8076060b3bbe15d1c3dfd0ec2046ac87"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieves the string value managed by the object.  <br /></td></tr>
+<tr class="separator:a8076060b3bbe15d1c3dfd0ec2046ac87"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac69831cd7059e0008072fceb38e451a6" id="r_ac69831cd7059e0008072fceb38e451a6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSharedString.html#ac69831cd7059e0008072fceb38e451a6">set</a> (std::string <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">val</a>)</td></tr>
+<tr class="memdesc:ac69831cd7059e0008072fceb38e451a6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the string value of the object.  <br /></td></tr>
+<tr class="separator:ac69831cd7059e0008072fceb38e451a6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a038cb4515842977e53f34b742531bf71" id="r_a038cb4515842977e53f34b742531bf71"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSharedString.html#a038cb4515842977e53f34b742531bf71">operator std::string</a> ()</td></tr>
+<tr class="memdesc:a038cb4515842977e53f34b742531bf71"><td class="mdescLeft">&#160;</td><td class="mdescRight">User-defined conversion to <code>std::string</code>.  <br /></td></tr>
+<tr class="separator:a038cb4515842977e53f34b742531bf71"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad3fa2eeb73713c582bc49c54567f72a3" id="r_ad3fa2eeb73713c582bc49c54567f72a3"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSharedString.html#ad3fa2eeb73713c582bc49c54567f72a3">operator*</a> () <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a></td></tr>
+<tr class="memdesc:ad3fa2eeb73713c582bc49c54567f72a3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overloads the dereference operator (<code>*</code>).  <br /></td></tr>
+<tr class="separator:ad3fa2eeb73713c582bc49c54567f72a3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8c63c5195caee222a908064dc75e5fb9" id="r_a8c63c5195caee222a908064dc75e5fb9"><td class="memItemLeft" align="right" valign="top">std::string *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSharedString.html#a8c63c5195caee222a908064dc75e5fb9">operator-&gt;</a> ()</td></tr>
+<tr class="memdesc:a8c63c5195caee222a908064dc75e5fb9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overloads the member access operator (<code>-&gt;</code>).  <br /></td></tr>
+<tr class="separator:a8c63c5195caee222a908064dc75e5fb9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a50ecaac059213e7c416305978b8d2750" id="r_a50ecaac059213e7c416305978b8d2750"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> std::string *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSharedString.html#a50ecaac059213e7c416305978b8d2750">operator-&gt;</a> () <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a></td></tr>
+<tr class="memdesc:a50ecaac059213e7c416305978b8d2750"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overloads the member access operator (<code>-&gt;</code>) for const objects.  <br /></td></tr>
+<tr class="separator:a50ecaac059213e7c416305978b8d2750"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="friends" name="friends"></a>
+Friends</h2></td></tr>
+<tr class="memitem:aa50279173d4b0de1dadd8b75700be061" id="r_aa50279173d4b0de1dadd8b75700be061"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSharedString.html#aa50279173d4b0de1dadd8b75700be061">operator&lt;&lt;</a> (std::ostream &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">os</a>, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="classSharedString.html">SharedString</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">sp</a>)</td></tr>
+<tr class="memdesc:aa50279173d4b0de1dadd8b75700be061"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overloads the stream insertion operator (<code>&lt;&lt;</code>) for <a class="el" href="classSharedString.html" title="A class that provides shared ownership of a string.">SharedString</a>.  <br /></td></tr>
+<tr class="separator:aa50279173d4b0de1dadd8b75700be061"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>A class that provides shared ownership of a string. </p>
+<p>This class wraps a <code>std::shared_ptr</code> to provide a reference-counted string value. When a <a class="el" href="classSharedString.html" title="A class that provides shared ownership of a string.">SharedString</a> object is copied, it shares the same underlying string with the original object. The string's memory is automatically deallocated when the last <a class="el" href="classSharedString.html" title="A class that provides shared ownership of a string.">SharedString</a> object pointing to it is destroyed. </p>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a id="af58b073e8b05be2ad32abdfb9588d982" name="af58b073e8b05be2ad32abdfb9588d982"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af58b073e8b05be2ad32abdfb9588d982">&#9670;&#160;</a></span>SharedString() <span class="overload">[1/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">SharedString::SharedString </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Constructs a new <a class="el" href="classSharedString.html" title="A class that provides shared ownership of a string.">SharedString</a> object with a default, empty value. </p>
+<p>Initializes the object's internal shared pointer to manage a new string that is initially empty. </p>
+
+</div>
+</div>
+<a id="aa45c93322d7100c462f0b1f526cdb461" name="aa45c93322d7100c462f0b1f526cdb461"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa45c93322d7100c462f0b1f526cdb461">&#9670;&#160;</a></span>SharedString() <span class="overload">[2/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">SharedString::SharedString </td>
+          <td>(</td>
+          <td class="paramtype">std::string&#160;</td>
+          <td class="paramname"><em>val</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Constructs a new <a class="el" href="classSharedString.html" title="A class that provides shared ownership of a string.">SharedString</a> object from a string value. </p>
+<p>Initializes the object's internal shared pointer to manage a new string with the value provided by the <code>val</code> parameter.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">val</td><td>The string value to be stored in the shared pointer. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a9fe121568256581a611f8d06c38244ff" name="a9fe121568256581a611f8d06c38244ff"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9fe121568256581a611f8d06c38244ff">&#9670;&#160;</a></span>SharedString() <span class="overload">[3/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">SharedString::SharedString </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="classSharedString.html">SharedString</a> &amp;&#160;</td>
+          <td class="paramname"><em>other</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Copy constructs a new <a class="el" href="classSharedString.html" title="A class that provides shared ownership of a string.">SharedString</a> object. </p>
+<p>Initializes the object by creating a new shared pointer that shares ownership of the string managed by another <a class="el" href="classSharedString.html" title="A class that provides shared ownership of a string.">SharedString</a> object.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">other</td><td>The existing <a class="el" href="classSharedString.html" title="A class that provides shared ownership of a string.">SharedString</a> object to copy from. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a768413537eb0c588da611a4bd3c42a5a" name="a768413537eb0c588da611a4bd3c42a5a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a768413537eb0c588da611a4bd3c42a5a">&#9670;&#160;</a></span>SharedString() <span class="overload">[4/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">SharedString::SharedString </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classSharedString.html">SharedString</a> &amp;&amp;&#160;</td>
+          <td class="paramname"><em>other</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Constructs a new <a class="el" href="classSharedString.html" title="A class that provides shared ownership of a string.">SharedString</a> object by moving resources. </p>
+<p>Transfers ownership of the shared string from <code>other</code> to the new object. This is a non-throwing operation that is more efficient than a copy.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">other</td><td>The temporary <a class="el" href="classSharedString.html" title="A class that provides shared ownership of a string.">SharedString</a> object to move from. After this call, <code>other</code> will no longer own the resource. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<h2 class="groupheader">Member Function Documentation</h2>
+<a id="a8076060b3bbe15d1c3dfd0ec2046ac87" name="a8076060b3bbe15d1c3dfd0ec2046ac87"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8076060b3bbe15d1c3dfd0ec2046ac87">&#9670;&#160;</a></span>get()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string SharedString::get </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Retrieves the string value managed by the object. </p>
+<p>This is a getter function that returns a copy of the string value. The function is <code>const</code> and can be called on a constant instance of the class without modifying its state.</p>
+<dl class="section return"><dt>Returns</dt><dd>The string value managed by the shared pointer. </dd></dl>
+
+</div>
+</div>
+<a id="a038cb4515842977e53f34b742531bf71" name="a038cb4515842977e53f34b742531bf71"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a038cb4515842977e53f34b742531bf71">&#9670;&#160;</a></span>operator std::string()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">SharedString::operator std::string </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>User-defined conversion to <code>std::string</code>. </p>
+<p>This conversion operator allows the object to be implicitly converted to a <code>std::string</code>. The returned value is the string managed by the object's internal shared pointer.</p>
+<dl class="section return"><dt>Returns</dt><dd>The string value held by the object. </dd></dl>
+
+</div>
+</div>
+<a id="ad3fa2eeb73713c582bc49c54567f72a3" name="ad3fa2eeb73713c582bc49c54567f72a3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad3fa2eeb73713c582bc49c54567f72a3">&#9670;&#160;</a></span>operator*()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string SharedString::operator* </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Overloads the dereference operator (<code>*</code>). </p>
+<p>Provides direct access to the string value managed by the internal shared pointer. This function is <code>const</code> and provides a read-only view of the data.</p>
+<dl class="section return"><dt>Returns</dt><dd>The string value held by the object. </dd></dl>
+
+</div>
+</div>
+<a id="a8c63c5195caee222a908064dc75e5fb9" name="a8c63c5195caee222a908064dc75e5fb9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8c63c5195caee222a908064dc75e5fb9">&#9670;&#160;</a></span>operator-&gt;() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string * SharedString::operator-&gt; </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Overloads the member access operator (<code>-&gt;</code>). </p>
+<p>This function provides a way to access the underlying string value by returning a raw pointer to it. It returns the result of the <code>std::shared_ptr::get()</code> method.</p>
+<dl class="section return"><dt>Returns</dt><dd>A raw pointer (<code>std::string*</code>) to the string managed by the shared pointer. </dd></dl>
+
+</div>
+</div>
+<a id="a50ecaac059213e7c416305978b8d2750" name="a50ecaac059213e7c416305978b8d2750"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a50ecaac059213e7c416305978b8d2750">&#9670;&#160;</a></span>operator-&gt;() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> std::string * SharedString::operator-&gt; </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Overloads the member access operator (<code>-&gt;</code>) for const objects. </p>
+<p>This function provides a way to get a read-only raw pointer to the underlying string. The <code>const</code> return type prevents modification of the string value through this pointer. The function itself is also <code>const</code>, ensuring it can be called on <code>const</code> instances of the class.</p>
+<dl class="section return"><dt>Returns</dt><dd>A <code>const</code> raw pointer to the string managed by the shared pointer. </dd></dl>
+
+</div>
+</div>
+<a id="ab560028c3d852c68c69c2c3748e64794" name="ab560028c3d852c68c69c2c3748e64794"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab560028c3d852c68c69c2c3748e64794">&#9670;&#160;</a></span>operator=() <span class="overload">[1/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classSharedString.html">SharedString</a> &amp; SharedString::operator= </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="classSharedString.html">SharedString</a> &amp;&#160;</td>
+          <td class="paramname"><em>other</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Overloaded copy assignment operator. </p>
+<p>Assigns the shared state of <code>other</code> to the current object. If the objects are not the same, the current object will release its old resource and share ownership of the string value managed by <code>other</code>.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">other</td><td>The <a class="el" href="classSharedString.html" title="A class that provides shared ownership of a string.">SharedString</a> object to assign from. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A reference to the current object (<code>*this</code>) to allow for chained assignments. </dd></dl>
+
+</div>
+</div>
+<a id="ac966c6d58b78ac307c05179bd27402ad" name="ac966c6d58b78ac307c05179bd27402ad"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac966c6d58b78ac307c05179bd27402ad">&#9670;&#160;</a></span>operator=() <span class="overload">[2/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classSharedString.html">SharedString</a> &amp; SharedString::operator= </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> std::string &amp;&#160;</td>
+          <td class="paramname"><em>other</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Overloaded assignment operator for a string value. </p>
+<p>Assigns a new string value to the underlying shared string, modifying the object in place.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">other</td><td>The string value to assign. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A reference to the current object (<code>*this</code>) to allow for chained assignments. </dd></dl>
+
+</div>
+</div>
+<a id="a55dd0becbb7cbba6b45ab555984349ff" name="a55dd0becbb7cbba6b45ab555984349ff"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a55dd0becbb7cbba6b45ab555984349ff">&#9670;&#160;</a></span>operator=() <span class="overload">[3/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classSharedString.html">SharedString</a> &amp; SharedString::operator= </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classSharedString.html">SharedString</a> &amp;&amp;&#160;</td>
+          <td class="paramname"><em>other</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Overloaded move assignment operator. </p>
+<p>Moves the shared state from <code>other</code> to the current object, releasing any resources the current object might have held. This is a non-throwing and more efficient operation than a copy assignment.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">other</td><td>The temporary <a class="el" href="classSharedString.html" title="A class that provides shared ownership of a string.">SharedString</a> object to move from. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A reference to the current object (<code>*this</code>). </dd></dl>
+
+</div>
+</div>
+<a id="ac69831cd7059e0008072fceb38e451a6" name="ac69831cd7059e0008072fceb38e451a6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac69831cd7059e0008072fceb38e451a6">&#9670;&#160;</a></span>set()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a> SharedString::set </td>
+          <td>(</td>
+          <td class="paramtype">std::string&#160;</td>
+          <td class="paramname"><em>val</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Sets the string value of the object. </p>
+<p>Assigns a new string value to the underlying shared string.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">val</td><td>The string value to set. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<h2 class="groupheader">Friends And Related Symbol Documentation</h2>
+<a id="aa50279173d4b0de1dadd8b75700be061" name="aa50279173d4b0de1dadd8b75700be061"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa50279173d4b0de1dadd8b75700be061">&#9670;&#160;</a></span>operator&lt;&lt;</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::ostream &amp; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">operator</a>&lt;&lt; </td>
+          <td>(</td>
+          <td class="paramtype">std::ostream &amp;&#160;</td>
+          <td class="paramname"><em>os</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="classSharedString.html">SharedString</a> &amp;&#160;</td>
+          <td class="paramname"><em>sp</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">friend</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Overloads the stream insertion operator (<code>&lt;&lt;</code>) for <a class="el" href="classSharedString.html" title="A class that provides shared ownership of a string.">SharedString</a>. </p>
+<p>Provides a way to print the string value of a <a class="el" href="classSharedString.html" title="A class that provides shared ownership of a string.">SharedString</a> object to an output stream.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">os</td><td>The output stream to write to. </td></tr>
+    <tr><td class="paramname">sp</td><td>The <a class="el" href="classSharedString.html" title="A class that provides shared ownership of a string.">SharedString</a> object to print. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A reference to the output stream, allowing for chained insertions. </dd></dl>
+
+</div>
+</div>
+<hr/>The documentation for this class was generated from the following file:<ul>
+<li>inst/include/interface/rcpp/rcpp_objects/<a class="el" href="rcpp__shared__primitive_8hpp_source.html">rcpp_shared_primitive.hpp</a></li>
+</ul>
+</div><!-- contents -->
+</div><!-- doc-content -->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a class="el" href="classSharedString.html">SharedString</a></li>
+    <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.8 </li>
+  </ul>
+</div>
+</body>
+</html>

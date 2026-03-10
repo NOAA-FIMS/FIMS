@@ -1,0 +1,861 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" data-bs-theme="auto">
+<head>
+    <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=9"/>
+    <meta name="generator" content="Doxygen 1.9.8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>FIMS</title><link href="tabs.css" rel="stylesheet" type="text/css"/>
+    <link rel="icon" type="image/png" href="https://noaa-fims.github.io/images/FIMS_hexlogo.png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+    <link href="https://noaa-fims.github.io/site_libs/bootstrap/bootstrap-5477dd34fdf9f443df58de9070e2fbd7.min.css" rel="stylesheet">
+    <link href="https://noaa-fims.github.io/site_libs/bootstrap/bootstrap-dark-429bd3fc0b6810d1347fc340b0896c35.min.css" rel="stylesheet" media="(prefers-color-scheme: dark)">
+    <script type="text/javascript" src="jquery.js"></script>
+    <script type="text/javascript" src="dynsections.js"></script>
+    <link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+    <link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+  $(document).ready(function() { init_search(); });
+/* @license-end */
+</script>
+    <script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  extensions: ["tex2jax.js"],
+  jax: ["input/TeX","output/HTML-CSS"],
+});
+</script>
+<script type="text/javascript" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js"></script>
+    <link href="doxygen.css" rel="stylesheet" type="text/css" />
+    <link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
+<link href="custom.css" rel="stylesheet" type="text/css"/>
+    <script src="https://noaa-fims.github.io/site_libs/quarto-nav/quarto-nav.js"></script>
+    <script src="https://noaa-fims.github.io/site_libs/bootstrap/bootstrap.min.js"></script>
+    <script src="https://noaa-fims.github.io/site_libs/quarto-html/quarto.js" type="module"></script>
+</head>
+<body>
+<div id="top">
+    <div id="titlearea">
+        <table cellspacing="0" cellpadding="0">
+            <tbody>
+            <tr style="height: 70px;">
+                <td id="projectlogo"><img alt="Logo" src="FIMS_logo3.png"/></td>
+                <td id="projectalign" style="padding-left: 0.5em;">
+                    <div id="projectname">FIMS
+                        &#160;<span id="projectnumber">v0.8.1</span></div>
+                    <div id="projectbrief"></div></td>
+                <td style="padding-left: 0.5em;">
+                    <div id="projectbrief"></div>
+                </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <nav class="navbar navbar-expand-lg " data-bs-theme="auto">
+      <div class="navbar-container container-fluid">
+        <div class="navbar-brand-container mx-auto">
+          <a href="https://noaa-fims.github.io/" class="navbar-brand navbar-brand-logo"></a>
+          <a class="navbar-brand" href="https://noaa-fims.github.io/">
+          </a>
+        </div>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+          <ul class="navbar-nav navbar-nav-scroll ms-auto">
+           <li class="nav-item dropdown">
+            <button class="nav-link dropdown-toggle" type="button" id="dropdown-reference" data-bs-toggle="dropdown"
+                    aria-expanded="false" aria-haspopup="true">reference</button>
+            <ul class="dropdown-menu" aria-labelledby="dropdown-reference">
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/reference/index.html">r/roxygen</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/doxygen/index.html">c++/doxygen</a></li>
+            </ul>
+           </li>
+            <li class="nav-item dropdown">
+            <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown"
+                    aria-expanded="false" aria-haspopup="true">articles</button>
+            <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
+              <li><h6 class="dropdown-header" data-toc-skip>intro to fims</h6></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/fims-demo.html">introducing the fisheries integrated modeling system (fims)</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/fims-logging.html">Introducing the fims logging system</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/fims-user-setup-guide.html">fims user setup guide</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/fims-demo-projections.html">simple projections using fims</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><h6 class="dropdown-header" data-toc-skip>developer</h6></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/fims-path-maturity.html">fims path - maturity</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><h6 class="dropdown-header" data-toc-skip>c++ training</h6></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/training-intro-cpp.html">intro to c++</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/training-intro-rcpp.html">intro to rcpp</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><h6 class="dropdown-header" data-toc-skip>research and development</h6></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/RD-re-sparsity.html">re sparsity</a></li>
+            </ul>
+          </li>
+            <li class="nav-item dropdown">
+              <button class="nav-link dropdown-toggle" type="button" id="dropdown-news" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">news</button>
+              <ul class="dropdown-menu" aria-labelledby="dropdown-news">
+                <li><h6 class="dropdown-header" data-toc-skip="">Releases</h6></li>
+                <li><a class="external-link dropdown-item" href="https://github.com/NOAA-FIMS/FIMS/releases/latest">latest release</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/news/index.html">changelog</a></li>
+              </ul>
+            </li>
+          <li class="nav-item dropdown">
+            <button class="nav-link dropdown-toggle" type="button" id="dropdown-reports" data-bs-toggle="dropdown"
+                    aria-expanded="false" aria-haspopup="true">reports</button>
+            <ul class="dropdown-menu" aria-labelledby="dropdown-reports">
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/coverage/coverage.html">coverage</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/coverage/codecoverage_explanation.html">coverage explained</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/testdown/index.html">testdown</a></li>
+            </ul>
+          </li>
+          <ul class="navbar-nav">
+            <li class="nav-item"><a class="external-link nav-link" href="https://noaa-fims.github.io/">fims website</a></li>
+            <li class="nav-item">
+              <a class="external-link nav-link" href="https://github.com/noaa-fims/fims/" aria-label="GitHub repository for FIMS">
+                <span class="fa fa-brands fa-github fa-lg"></span>
+              </a>
+            </li>
+            <!-- Keep the input; pkgdown’s autocomplete wrapper won’t exist in Doxygen -->
+            <li class="nav-item">
+              <form class="form-inline" role="search" onsubmit="return false;">
+                <input class="form-control" type="search" name="search-input" id="search-input"
+                      autocomplete="off" aria-label="Search site" placeholder="Search for">
+              </form>
+            </li>
+          </ul>
+      </div>
+    </div>
+  </nav>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  // Only on the cpp_directory_structure page!
+  document.querySelectorAll('.toc a').forEach(function(link) {
+    if (link.href && link.href.indexOf(location.pathname) !== -1) {
+      link.href = link.hash; // Just use the fragment
+    }
+  });
+});
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  function updateTocActive() {
+    var links = Array.from(document.querySelectorAll('.toc a'));
+    var anchors = links.map(link => document.getElementById(link.getAttribute('href').replace('#', '')));
+    var scrollTop = window.scrollY || document.documentElement.scrollTop;
+    var offset = 150; // Match your scroll-margin-top
+    let currentActive = -1;
+    for (let i = anchors.length - 1; i >= 0; i--) {
+      if (anchors[i] && (anchors[i].getBoundingClientRect().top + window.scrollY - offset) <= scrollTop) {
+        currentActive = i;
+        break;
+      }
+    }
+    links.forEach((link, i) => {
+      link.classList.remove('active', 'aboveActive');
+      if (i === currentActive) {
+        link.classList.add('active');
+      } else if (i < currentActive) {
+        link.classList.add('aboveActive');
+      }
+    });
+  }
+  window.addEventListener('scroll', updateTocActive);
+  window.addEventListener('hashchange', updateTocActive);
+  updateTocActive();
+});
+</script>
+    <!-- end header part -->
+<!-- Generated by Doxygen 1.9.8 -->
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+/* @license-end */
+</script>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(document).ready(function(){initNavTree('classFleetInterface.html',''); initResizable(); });
+/* @license-end */
+</script>
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">Loading...</div>
+<div class="SRStatus" id="Searching">Searching...</div>
+<div class="SRStatus" id="NoMatches">No Matches</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="summary">
+<a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pub-attribs">Public Attributes</a> &#124;
+<a href="classFleetInterface-members.html">List of all members</a>  </div>
+  <div class="headertitle"><div class="title">FleetInterface Class Reference</div></div>
+</div><!--header-->
+<div class="contents">
+
+<p>The Rcpp interface for Fleet to instantiate from R: fleet &lt;- methods::new(Fleet)  
+ <a href="classFleetInterface.html#details">More...</a></p>
+
+<p><code>#include &lt;<a class="el" href="rcpp__fleet_8hpp_source.html">rcpp_fleet.hpp</a>&gt;</code></p>
+<div class="dynheader">
+Inheritance diagram for FleetInterface:</div>
+<div class="dyncontent">
+ <div class="center">
+  <img src="classFleetInterface.png" usemap="#FleetInterface_map" alt=""/>
+  <map id="FleetInterface_map" name="FleetInterface_map">
+<area href="classFleetInterfaceBase.html" title="Rcpp interface that serves as the parent class for Rcpp fleet interfaces. This type should be inherit..." alt="FleetInterfaceBase" shape="rect" coords="0,56,149,80"/>
+<area href="classFIMSRcppInterfaceBase.html" title="Base class for all interface objects." alt="FIMSRcppInterfaceBase" shape="rect" coords="0,0,149,24"/>
+  </map>
+</div></div>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
+Public Member Functions</h2></td></tr>
+<tr class="memitem:ac16abdc18e1ddf84b8800d5837bb0357" id="r_ac16abdc18e1ddf84b8800d5837bb0357"><td class="memItemLeft" align="right" valign="top"><a id="ac16abdc18e1ddf84b8800d5837bb0357" name="ac16abdc18e1ddf84b8800d5837bb0357"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>FleetInterface</b> ()</td></tr>
+<tr class="memdesc:ac16abdc18e1ddf84b8800d5837bb0357"><td class="mdescLeft">&#160;</td><td class="mdescRight">The constructor. <br /></td></tr>
+<tr class="separator:ac16abdc18e1ddf84b8800d5837bb0357"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5627fd6de3d7234b2d76f46d695242db" id="r_a5627fd6de3d7234b2d76f46d695242db"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFleetInterface.html#a5627fd6de3d7234b2d76f46d695242db">FleetInterface</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="classFleetInterface.html">FleetInterface</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">other</a>)</td></tr>
+<tr class="memdesc:a5627fd6de3d7234b2d76f46d695242db"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a new Fleet Interface object.  <br /></td></tr>
+<tr class="separator:a5627fd6de3d7234b2d76f46d695242db"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6d7f6b4fc08c0e53c1b0f1930d6b4920" id="r_a6d7f6b4fc08c0e53c1b0f1930d6b4920"><td class="memItemLeft" align="right" valign="top"><a id="a6d7f6b4fc08c0e53c1b0f1930d6b4920" name="a6d7f6b4fc08c0e53c1b0f1930d6b4920"></a>
+<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">virtual</a>&#160;</td><td class="memItemRight" valign="bottom"><b>~FleetInterface</b> ()</td></tr>
+<tr class="memdesc:a6d7f6b4fc08c0e53c1b0f1930d6b4920"><td class="mdescLeft">&#160;</td><td class="mdescRight">The destructor. <br /></td></tr>
+<tr class="separator:a6d7f6b4fc08c0e53c1b0f1930d6b4920"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a67ead41b510f7960a99a7a8697fb3cdd" id="r_a67ead41b510f7960a99a7a8697fb3cdd"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">virtual</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFleetInterface.html#a67ead41b510f7960a99a7a8697fb3cdd">get_id</a> ()</td></tr>
+<tr class="memdesc:a67ead41b510f7960a99a7a8697fb3cdd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the ID of the interface base object.  <br /></td></tr>
+<tr class="separator:a67ead41b510f7960a99a7a8697fb3cdd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa1b261a5a03404b70ce472b4ee0cc29d" id="r_aa1b261a5a03404b70ce472b4ee0cc29d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFleetInterface.html#aa1b261a5a03404b70ce472b4ee0cc29d">SetName</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> std::string &amp;<a class="el" href="classFleetInterface.html#a8c3947a5383186df7855801fd2fdd9fe">name</a>)</td></tr>
+<tr class="memdesc:aa1b261a5a03404b70ce472b4ee0cc29d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the name of the fleet.  <br /></td></tr>
+<tr class="separator:aa1b261a5a03404b70ce472b4ee0cc29d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa63cef53874620f9fd792b6584c7f5ee" id="r_aa63cef53874620f9fd792b6584c7f5ee"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFleetInterface.html#aa63cef53874620f9fd792b6584c7f5ee">GetName</a> () <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a></td></tr>
+<tr class="memdesc:aa63cef53874620f9fd792b6584c7f5ee"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the name of the fleet.  <br /></td></tr>
+<tr class="separator:aa63cef53874620f9fd792b6584c7f5ee"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a65787e7d01a48ca147b01764a636b6c7" id="r_a65787e7d01a48ca147b01764a636b6c7"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFleetInterface.html#a65787e7d01a48ca147b01764a636b6c7">SetObservedAgeCompDataID</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">int</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">observed_agecomp_data_id</a>)</td></tr>
+<tr class="memdesc:a65787e7d01a48ca147b01764a636b6c7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the unique ID for the observed age-composition data object.  <br /></td></tr>
+<tr class="separator:a65787e7d01a48ca147b01764a636b6c7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5d11ca742f04a2f7208c42ac6081c1b5" id="r_a5d11ca742f04a2f7208c42ac6081c1b5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFleetInterface.html#a5d11ca742f04a2f7208c42ac6081c1b5">SetObservedLengthCompDataID</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">int</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">observed_lengthcomp_data_id</a>)</td></tr>
+<tr class="memdesc:a5d11ca742f04a2f7208c42ac6081c1b5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the unique ID for the observed length-composition data object.  <br /></td></tr>
+<tr class="separator:a5d11ca742f04a2f7208c42ac6081c1b5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adac98c8e4fb6dd1d8414e24631a7ef72" id="r_adac98c8e4fb6dd1d8414e24631a7ef72"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFleetInterface.html#adac98c8e4fb6dd1d8414e24631a7ef72">SetObservedIndexDataID</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">int</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">observed_index_data_id</a>)</td></tr>
+<tr class="memdesc:adac98c8e4fb6dd1d8414e24631a7ef72"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the unique ID for the observed index data object.  <br /></td></tr>
+<tr class="separator:adac98c8e4fb6dd1d8414e24631a7ef72"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adacbc3bfc477835bfa6cb948165cb41a" id="r_adacbc3bfc477835bfa6cb948165cb41a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFleetInterface.html#adacbc3bfc477835bfa6cb948165cb41a">SetObservedLandingsDataID</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">int</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">observed_landings_data_id</a>)</td></tr>
+<tr class="memdesc:adacbc3bfc477835bfa6cb948165cb41a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the unique ID for the observed landings data object.  <br /></td></tr>
+<tr class="separator:adacbc3bfc477835bfa6cb948165cb41a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a68504064f7c1df03061c8611c9bdf329" id="r_a68504064f7c1df03061c8611c9bdf329"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFleetInterface.html#a68504064f7c1df03061c8611c9bdf329">SetSelectivityID</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">int</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">selectivity_id</a>)</td></tr>
+<tr class="memdesc:a68504064f7c1df03061c8611c9bdf329"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the unique ID for the selectivity object.  <br /></td></tr>
+<tr class="separator:a68504064f7c1df03061c8611c9bdf329"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3bcb379f52ba814e2187e526c6bc0cdc" id="r_a3bcb379f52ba814e2187e526c6bc0cdc"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFleetInterface.html#a3bcb379f52ba814e2187e526c6bc0cdc">GetSelectivityID</a> ()</td></tr>
+<tr class="memdesc:a3bcb379f52ba814e2187e526c6bc0cdc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the unique ID for the selectivity object.  <br /></td></tr>
+<tr class="separator:a3bcb379f52ba814e2187e526c6bc0cdc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a628a33214ac8082f1a91803ddc09ad8e" id="r_a628a33214ac8082f1a91803ddc09ad8e"><td class="memItemLeft" align="right" valign="top"><a id="a628a33214ac8082f1a91803ddc09ad8e" name="a628a33214ac8082f1a91803ddc09ad8e"></a>
+<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">int</a>&#160;</td><td class="memItemRight" valign="bottom"><b>GetObservedAgeCompDataID</b> ()</td></tr>
+<tr class="memdesc:a628a33214ac8082f1a91803ddc09ad8e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the unique ID for the observed age-composition data object. <br /></td></tr>
+<tr class="separator:a628a33214ac8082f1a91803ddc09ad8e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a83770b2a8aca2878095bc985bd2cc481" id="r_a83770b2a8aca2878095bc985bd2cc481"><td class="memItemLeft" align="right" valign="top"><a id="a83770b2a8aca2878095bc985bd2cc481" name="a83770b2a8aca2878095bc985bd2cc481"></a>
+<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">int</a>&#160;</td><td class="memItemRight" valign="bottom"><b>GetObservedLengthCompDataID</b> ()</td></tr>
+<tr class="memdesc:a83770b2a8aca2878095bc985bd2cc481"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the unique ID for the observed length-composition data object. <br /></td></tr>
+<tr class="separator:a83770b2a8aca2878095bc985bd2cc481"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a49ed6935eaaa190bb63ec97f9e81d045" id="r_a49ed6935eaaa190bb63ec97f9e81d045"><td class="memItemLeft" align="right" valign="top"><a id="a49ed6935eaaa190bb63ec97f9e81d045" name="a49ed6935eaaa190bb63ec97f9e81d045"></a>
+<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">int</a>&#160;</td><td class="memItemRight" valign="bottom"><b>GetObservedIndexDataID</b> ()</td></tr>
+<tr class="memdesc:a49ed6935eaaa190bb63ec97f9e81d045"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the unique id for the observed index data object. <br /></td></tr>
+<tr class="separator:a49ed6935eaaa190bb63ec97f9e81d045"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af989767c7a2dfee6cf569eda2abc0300" id="r_af989767c7a2dfee6cf569eda2abc0300"><td class="memItemLeft" align="right" valign="top"><a id="af989767c7a2dfee6cf569eda2abc0300" name="af989767c7a2dfee6cf569eda2abc0300"></a>
+<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">int</a>&#160;</td><td class="memItemRight" valign="bottom"><b>GetObservedLandingsDataID</b> ()</td></tr>
+<tr class="memdesc:af989767c7a2dfee6cf569eda2abc0300"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the unique id for the observed landings data object. <br /></td></tr>
+<tr class="separator:af989767c7a2dfee6cf569eda2abc0300"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a614a5a7742d8f05de4fb917998306baa" id="r_a614a5a7742d8f05de4fb917998306baa"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">virtual</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFleetInterface.html#a614a5a7742d8f05de4fb917998306baa">finalize</a> ()</td></tr>
+<tr class="memdesc:a614a5a7742d8f05de4fb917998306baa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Extracts the derived quantities from <code>Information</code> to the Rcpp object.  <br /></td></tr>
+<tr class="separator:a614a5a7742d8f05de4fb917998306baa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pub_methods_classFleetInterfaceBase"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classFleetInterfaceBase')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classFleetInterfaceBase.html">FleetInterfaceBase</a></td></tr>
+<tr class="memitem:a2605a9fcabeabe26b41e773ea502a22f inherit pub_methods_classFleetInterfaceBase" id="r_a2605a9fcabeabe26b41e773ea502a22f"><td class="memItemLeft" align="right" valign="top">
+&#160;</td><td class="memItemRight" valign="bottom"><b>FleetInterfaceBase</b> ()</td></tr>
+<tr class="memdesc:a2605a9fcabeabe26b41e773ea502a22f inherit pub_methods_classFleetInterfaceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">The constructor. <br /></td></tr>
+<tr class="separator:a2605a9fcabeabe26b41e773ea502a22f inherit pub_methods_classFleetInterfaceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac9b1c7f3becc53284f7d6e977979e414 inherit pub_methods_classFleetInterfaceBase" id="r_ac9b1c7f3becc53284f7d6e977979e414"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFleetInterfaceBase.html#ac9b1c7f3becc53284f7d6e977979e414">FleetInterfaceBase</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="classFleetInterfaceBase.html">FleetInterfaceBase</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">other</a>)</td></tr>
+<tr class="memdesc:ac9b1c7f3becc53284f7d6e977979e414 inherit pub_methods_classFleetInterfaceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a new Fleet Interface Base object.  <br /></td></tr>
+<tr class="separator:ac9b1c7f3becc53284f7d6e977979e414 inherit pub_methods_classFleetInterfaceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7077a1aba597110640aa3e67ff6e75f5 inherit pub_methods_classFleetInterfaceBase" id="r_a7077a1aba597110640aa3e67ff6e75f5"><td class="memItemLeft" align="right" valign="top">
+<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">virtual</a>&#160;</td><td class="memItemRight" valign="bottom"><b>~FleetInterfaceBase</b> ()</td></tr>
+<tr class="memdesc:a7077a1aba597110640aa3e67ff6e75f5 inherit pub_methods_classFleetInterfaceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">The destructor. <br /></td></tr>
+<tr class="separator:a7077a1aba597110640aa3e67ff6e75f5 inherit pub_methods_classFleetInterfaceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pub_methods_classFIMSRcppInterfaceBase"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classFIMSRcppInterfaceBase')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classFIMSRcppInterfaceBase.html">FIMSRcppInterfaceBase</a></td></tr>
+<tr class="memitem:a9183d9379777d8be70ab66af1a07f94c inherit pub_methods_classFIMSRcppInterfaceBase" id="r_a9183d9379777d8be70ab66af1a07f94c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">virtual</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFIMSRcppInterfaceBase.html#a9183d9379777d8be70ab66af1a07f94c">add_to_fims_tmb</a> ()</td></tr>
+<tr class="memdesc:a9183d9379777d8be70ab66af1a07f94c inherit pub_methods_classFIMSRcppInterfaceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">A virtual method to inherit to add objects to the TMB model.  <br /></td></tr>
+<tr class="separator:a9183d9379777d8be70ab66af1a07f94c inherit pub_methods_classFIMSRcppInterfaceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa97acd77c0c4d2e193c67cd0662d803c inherit pub_methods_classFIMSRcppInterfaceBase" id="r_aa97acd77c0c4d2e193c67cd0662d803c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">virtual</a> std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFIMSRcppInterfaceBase.html#aa97acd77c0c4d2e193c67cd0662d803c">to_json</a> ()</td></tr>
+<tr class="memdesc:aa97acd77c0c4d2e193c67cd0662d803c inherit pub_methods_classFIMSRcppInterfaceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert the data to json representation for the output.  <br /></td></tr>
+<tr class="separator:aa97acd77c0c4d2e193c67cd0662d803c inherit pub_methods_classFIMSRcppInterfaceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a72fc17f2f76b60a82db50167b1cde83d inherit pub_methods_classFIMSRcppInterfaceBase" id="r_a72fc17f2f76b60a82db50167b1cde83d"><td class="memItemLeft" align="right" valign="top">
+<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><b>get_se_values</b> (std::string name, std::map&lt; std::string, std::vector&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">double</a> &gt; &gt; &amp;se_values, <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">double</a> &gt; &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">values</a>)</td></tr>
+<tr class="memdesc:a72fc17f2f76b60a82db50167b1cde83d inherit pub_methods_classFIMSRcppInterfaceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Method to extract standard error values from the se_values working map. <br /></td></tr>
+<tr class="separator:a72fc17f2f76b60a82db50167b1cde83d inherit pub_methods_classFIMSRcppInterfaceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5e19680aa5d84f270939435588bce03b inherit pub_methods_classFIMSRcppInterfaceBase" id="r_a5e19680aa5d84f270939435588bce03b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">virtual</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFIMSRcppInterfaceBase.html#a5e19680aa5d84f270939435588bce03b">set_uncertainty</a> (std::map&lt; std::string, std::vector&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">double</a> &gt; &gt; &amp;se_values)</td></tr>
+<tr class="memdesc:a5e19680aa5d84f270939435588bce03b inherit pub_methods_classFIMSRcppInterfaceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set uncertainty values for the interface object.  <br /></td></tr>
+<tr class="separator:a5e19680aa5d84f270939435588bce03b inherit pub_methods_classFIMSRcppInterfaceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a46e0ce655ef707a6c66e863aa4f0b374 inherit pub_methods_classFIMSRcppInterfaceBase" id="r_a46e0ce655ef707a6c66e863aa4f0b374"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFIMSRcppInterfaceBase.html#a46e0ce655ef707a6c66e863aa4f0b374">value_to_string</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">double</a> value)</td></tr>
+<tr class="memdesc:a46e0ce655ef707a6c66e863aa4f0b374 inherit pub_methods_classFIMSRcppInterfaceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Report the parameter value as a string.  <br /></td></tr>
+<tr class="separator:a46e0ce655ef707a6c66e863aa4f0b374 inherit pub_methods_classFIMSRcppInterfaceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1fa6e0deb883a921fe70b328cdd30fee inherit pub_methods_classFIMSRcppInterfaceBase" id="r_a1fa6e0deb883a921fe70b328cdd30fee"><td class="memItemLeft" align="right" valign="top">
+std::string&#160;</td><td class="memItemRight" valign="bottom"><b>make_dimensions</b> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">start</a>, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a> end, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">rep</a>=1)</td></tr>
+<tr class="memdesc:a1fa6e0deb883a921fe70b328cdd30fee inherit pub_methods_classFIMSRcppInterfaceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Make a string of dimensions for the model. <br /></td></tr>
+<tr class="separator:a1fa6e0deb883a921fe70b328cdd30fee inherit pub_methods_classFIMSRcppInterfaceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
+Public Attributes</h2></td></tr>
+<tr class="memitem:a8c3947a5383186df7855801fd2fdd9fe" id="r_a8c3947a5383186df7855801fd2fdd9fe"><td class="memItemLeft" align="right" valign="top"><a id="a8c3947a5383186df7855801fd2fdd9fe" name="a8c3947a5383186df7855801fd2fdd9fe"></a>
+<a class="el" href="classSharedString.html">SharedString</a>&#160;</td><td class="memItemRight" valign="bottom"><b>name</b> = <a class="el" href="def_8hpp.html#ad28f97734d58355a40d01801bca1e2bf">fims::to_string</a>(&quot;NA&quot;)</td></tr>
+<tr class="memdesc:a8c3947a5383186df7855801fd2fdd9fe"><td class="mdescLeft">&#160;</td><td class="mdescRight">The name of the fleet. <br /></td></tr>
+<tr class="separator:a8c3947a5383186df7855801fd2fdd9fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9eee035642a547b13da5f925202a57dd" id="r_a9eee035642a547b13da5f925202a57dd"><td class="memItemLeft" align="right" valign="top"><a id="a9eee035642a547b13da5f925202a57dd" name="a9eee035642a547b13da5f925202a57dd"></a>
+<a class="el" href="classSharedInt.html">SharedInt</a>&#160;</td><td class="memItemRight" valign="bottom"><b>n_ages</b> = 0</td></tr>
+<tr class="memdesc:a9eee035642a547b13da5f925202a57dd"><td class="mdescLeft">&#160;</td><td class="mdescRight">The number of age bins in the fleet data. <br /></td></tr>
+<tr class="separator:a9eee035642a547b13da5f925202a57dd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac901b65d1568df1aaa3d906ba5150bd3" id="r_ac901b65d1568df1aaa3d906ba5150bd3"><td class="memItemLeft" align="right" valign="top"><a id="ac901b65d1568df1aaa3d906ba5150bd3" name="ac901b65d1568df1aaa3d906ba5150bd3"></a>
+<a class="el" href="classSharedInt.html">SharedInt</a>&#160;</td><td class="memItemRight" valign="bottom"><b>n_lengths</b> = 0</td></tr>
+<tr class="memdesc:ac901b65d1568df1aaa3d906ba5150bd3"><td class="mdescLeft">&#160;</td><td class="mdescRight">The number of length bins in the fleet data. <br /></td></tr>
+<tr class="separator:ac901b65d1568df1aaa3d906ba5150bd3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2491c7cb0730f82cb5d7723ae4e4f386" id="r_a2491c7cb0730f82cb5d7723ae4e4f386"><td class="memItemLeft" align="right" valign="top"><a id="a2491c7cb0730f82cb5d7723ae4e4f386" name="a2491c7cb0730f82cb5d7723ae4e4f386"></a>
+<a class="el" href="classSharedInt.html">SharedInt</a>&#160;</td><td class="memItemRight" valign="bottom"><b>n_years</b> = 0</td></tr>
+<tr class="memdesc:a2491c7cb0730f82cb5d7723ae4e4f386"><td class="mdescLeft">&#160;</td><td class="mdescRight">The number of years in the fleet data. <br /></td></tr>
+<tr class="separator:a2491c7cb0730f82cb5d7723ae4e4f386"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7de5e192bbaea9af8571be9e3a528d6a" id="r_a7de5e192bbaea9af8571be9e3a528d6a"><td class="memItemLeft" align="right" valign="top"><a id="a7de5e192bbaea9af8571be9e3a528d6a" name="a7de5e192bbaea9af8571be9e3a528d6a"></a>
+<a class="el" href="classSharedString.html">SharedString</a>&#160;</td><td class="memItemRight" valign="bottom"><b>observed_landings_units</b> = <a class="el" href="def_8hpp.html#ad28f97734d58355a40d01801bca1e2bf">fims::to_string</a>(&quot;weight&quot;)</td></tr>
+<tr class="memdesc:a7de5e192bbaea9af8571be9e3a528d6a"><td class="mdescLeft">&#160;</td><td class="mdescRight">What units are the observed landings for this fleet measured in. Options are weight or numbers, default is weight. <br /></td></tr>
+<tr class="separator:a7de5e192bbaea9af8571be9e3a528d6a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adace9cb3a219aee6d248ae4e444b5c11" id="r_adace9cb3a219aee6d248ae4e444b5c11"><td class="memItemLeft" align="right" valign="top"><a id="adace9cb3a219aee6d248ae4e444b5c11" name="adace9cb3a219aee6d248ae4e444b5c11"></a>
+<a class="el" href="classSharedString.html">SharedString</a>&#160;</td><td class="memItemRight" valign="bottom"><b>observed_index_units</b> = <a class="el" href="def_8hpp.html#ad28f97734d58355a40d01801bca1e2bf">fims::to_string</a>(&quot;weight&quot;)</td></tr>
+<tr class="memdesc:adace9cb3a219aee6d248ae4e444b5c11"><td class="mdescLeft">&#160;</td><td class="mdescRight">What units is the observed index of abundance for this fleet measured in. Options are weight or numbers, default is weight. <br /></td></tr>
+<tr class="separator:adace9cb3a219aee6d248ae4e444b5c11"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6cd303d699e4b0fdf9340af4b3126a3a" id="r_a6cd303d699e4b0fdf9340af4b3126a3a"><td class="memItemLeft" align="right" valign="top"><a id="a6cd303d699e4b0fdf9340af4b3126a3a" name="a6cd303d699e4b0fdf9340af4b3126a3a"></a>
+<a class="el" href="classParameterVector.html">ParameterVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>log_q</b></td></tr>
+<tr class="memdesc:a6cd303d699e4b0fdf9340af4b3126a3a"><td class="mdescLeft">&#160;</td><td class="mdescRight">The natural log of the index of abundance scaling parameter for this fleet. <br /></td></tr>
+<tr class="separator:a6cd303d699e4b0fdf9340af4b3126a3a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a848e00d1125012b1072f72160843cd2d" id="r_a848e00d1125012b1072f72160843cd2d"><td class="memItemLeft" align="right" valign="top"><a id="a848e00d1125012b1072f72160843cd2d" name="a848e00d1125012b1072f72160843cd2d"></a>
+<a class="el" href="classParameterVector.html">ParameterVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>log_Fmort</b></td></tr>
+<tr class="memdesc:a848e00d1125012b1072f72160843cd2d"><td class="mdescLeft">&#160;</td><td class="mdescRight">The vector of the natural log of fishing mortality rates for this fleet. <br /></td></tr>
+<tr class="separator:a848e00d1125012b1072f72160843cd2d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4ea2ebd360c633c37666731573489ef1" id="r_a4ea2ebd360c633c37666731573489ef1"><td class="memItemLeft" align="right" valign="top"><a id="a4ea2ebd360c633c37666731573489ef1" name="a4ea2ebd360c633c37666731573489ef1"></a>
+<a class="el" href="classParameterVector.html">ParameterVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>log_landings_expected</b></td></tr>
+<tr class="memdesc:a4ea2ebd360c633c37666731573489ef1"><td class="mdescLeft">&#160;</td><td class="mdescRight">The vector of natural log of the expected total landings for the fleet. <br /></td></tr>
+<tr class="separator:a4ea2ebd360c633c37666731573489ef1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a178ce2f344af25e89f7aaa8a1d349077" id="r_a178ce2f344af25e89f7aaa8a1d349077"><td class="memItemLeft" align="right" valign="top"><a id="a178ce2f344af25e89f7aaa8a1d349077" name="a178ce2f344af25e89f7aaa8a1d349077"></a>
+<a class="el" href="classParameterVector.html">ParameterVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>log_index_expected</b></td></tr>
+<tr class="memdesc:a178ce2f344af25e89f7aaa8a1d349077"><td class="mdescLeft">&#160;</td><td class="mdescRight">The vector of natural log of the expected index of abundance for the fleet. <br /></td></tr>
+<tr class="separator:a178ce2f344af25e89f7aaa8a1d349077"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0749fc3615237bec9f5afcef202b306e" id="r_a0749fc3615237bec9f5afcef202b306e"><td class="memItemLeft" align="right" valign="top"><a id="a0749fc3615237bec9f5afcef202b306e" name="a0749fc3615237bec9f5afcef202b306e"></a>
+<a class="el" href="classParameterVector.html">ParameterVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>agecomp_expected</b></td></tr>
+<tr class="memdesc:a0749fc3615237bec9f5afcef202b306e"><td class="mdescLeft">&#160;</td><td class="mdescRight">The vector of expected landings-at-age in numbers for the fleet. <br /></td></tr>
+<tr class="separator:a0749fc3615237bec9f5afcef202b306e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4f650bbc4f05b893557e31a2abc37f2e" id="r_a4f650bbc4f05b893557e31a2abc37f2e"><td class="memItemLeft" align="right" valign="top"><a id="a4f650bbc4f05b893557e31a2abc37f2e" name="a4f650bbc4f05b893557e31a2abc37f2e"></a>
+<a class="el" href="classParameterVector.html">ParameterVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>lengthcomp_expected</b></td></tr>
+<tr class="memdesc:a4f650bbc4f05b893557e31a2abc37f2e"><td class="mdescLeft">&#160;</td><td class="mdescRight">The vector of expected landings-at-length in numbers for the fleet. <br /></td></tr>
+<tr class="separator:a4f650bbc4f05b893557e31a2abc37f2e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a27af06606822e93d4ca831b5de058ee7" id="r_a27af06606822e93d4ca831b5de058ee7"><td class="memItemLeft" align="right" valign="top"><a id="a27af06606822e93d4ca831b5de058ee7" name="a27af06606822e93d4ca831b5de058ee7"></a>
+<a class="el" href="classParameterVector.html">ParameterVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>agecomp_proportion</b></td></tr>
+<tr class="memdesc:a27af06606822e93d4ca831b5de058ee7"><td class="mdescLeft">&#160;</td><td class="mdescRight">The vector of expected landings-at-age in numbers for the fleet. <br /></td></tr>
+<tr class="separator:a27af06606822e93d4ca831b5de058ee7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af7072b48780ec7245124c965f69672fe" id="r_af7072b48780ec7245124c965f69672fe"><td class="memItemLeft" align="right" valign="top"><a id="af7072b48780ec7245124c965f69672fe" name="af7072b48780ec7245124c965f69672fe"></a>
+<a class="el" href="classParameterVector.html">ParameterVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>lengthcomp_proportion</b></td></tr>
+<tr class="memdesc:af7072b48780ec7245124c965f69672fe"><td class="mdescLeft">&#160;</td><td class="mdescRight">The vector of expected landings-at-length in numbers for the fleet. <br /></td></tr>
+<tr class="separator:af7072b48780ec7245124c965f69672fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0a08ed1016f607eeb1c93d873ecd1cf3" id="r_a0a08ed1016f607eeb1c93d873ecd1cf3"><td class="memItemLeft" align="right" valign="top"><a id="a0a08ed1016f607eeb1c93d873ecd1cf3" name="a0a08ed1016f607eeb1c93d873ecd1cf3"></a>
+<a class="el" href="classParameterVector.html">ParameterVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>age_to_length_conversion</b></td></tr>
+<tr class="memdesc:a0a08ed1016f607eeb1c93d873ecd1cf3"><td class="mdescLeft">&#160;</td><td class="mdescRight">The vector of conversions to go from age to length, i.e., the age-to-length-conversion matrix. <br /></td></tr>
+<tr class="separator:a0a08ed1016f607eeb1c93d873ecd1cf3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a31b80ac1edace8b170099df9a9506a3c" id="r_a31b80ac1edace8b170099df9a9506a3c"><td class="memItemLeft" align="right" valign="top"><a id="a31b80ac1edace8b170099df9a9506a3c" name="a31b80ac1edace8b170099df9a9506a3c"></a>
+Rcpp::NumericVector&#160;</td><td class="memItemRight" valign="bottom"><b>derived_landings_naa</b></td></tr>
+<tr class="memdesc:a31b80ac1edace8b170099df9a9506a3c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Derived landings-at-age in numbers. <br /></td></tr>
+<tr class="separator:a31b80ac1edace8b170099df9a9506a3c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a875bd5bf9f0c2f2d7bd0e7dc134cac77" id="r_a875bd5bf9f0c2f2d7bd0e7dc134cac77"><td class="memItemLeft" align="right" valign="top"><a id="a875bd5bf9f0c2f2d7bd0e7dc134cac77" name="a875bd5bf9f0c2f2d7bd0e7dc134cac77"></a>
+Rcpp::NumericVector&#160;</td><td class="memItemRight" valign="bottom"><b>derived_landings_nal</b></td></tr>
+<tr class="memdesc:a875bd5bf9f0c2f2d7bd0e7dc134cac77"><td class="mdescLeft">&#160;</td><td class="mdescRight">Derived landings-at-length in numbers. <br /></td></tr>
+<tr class="separator:a875bd5bf9f0c2f2d7bd0e7dc134cac77"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9ba25f330e2b4a3c8db5bd059494baa2" id="r_a9ba25f330e2b4a3c8db5bd059494baa2"><td class="memItemLeft" align="right" valign="top"><a id="a9ba25f330e2b4a3c8db5bd059494baa2" name="a9ba25f330e2b4a3c8db5bd059494baa2"></a>
+Rcpp::NumericVector&#160;</td><td class="memItemRight" valign="bottom"><b>derived_landings_waa</b></td></tr>
+<tr class="memdesc:a9ba25f330e2b4a3c8db5bd059494baa2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Derived landings-at-age in weight (mt). <br /></td></tr>
+<tr class="separator:a9ba25f330e2b4a3c8db5bd059494baa2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aae330483a5cf506c32daaa8469ba80e3" id="r_aae330483a5cf506c32daaa8469ba80e3"><td class="memItemLeft" align="right" valign="top"><a id="aae330483a5cf506c32daaa8469ba80e3" name="aae330483a5cf506c32daaa8469ba80e3"></a>
+Rcpp::NumericVector&#160;</td><td class="memItemRight" valign="bottom"><b>derived_landings_expected</b></td></tr>
+<tr class="memdesc:aae330483a5cf506c32daaa8469ba80e3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Derived landings in observed units. <br /></td></tr>
+<tr class="separator:aae330483a5cf506c32daaa8469ba80e3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a25dc0b1c511de98cd7726cbbfeb3de19" id="r_a25dc0b1c511de98cd7726cbbfeb3de19"><td class="memItemLeft" align="right" valign="top"><a id="a25dc0b1c511de98cd7726cbbfeb3de19" name="a25dc0b1c511de98cd7726cbbfeb3de19"></a>
+Rcpp::NumericVector&#160;</td><td class="memItemRight" valign="bottom"><b>derived_landings_w</b></td></tr>
+<tr class="memdesc:a25dc0b1c511de98cd7726cbbfeb3de19"><td class="mdescLeft">&#160;</td><td class="mdescRight">Derived landings in weight. <br /></td></tr>
+<tr class="separator:a25dc0b1c511de98cd7726cbbfeb3de19"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a470d275255bd614b55bd822f706d796d" id="r_a470d275255bd614b55bd822f706d796d"><td class="memItemLeft" align="right" valign="top"><a id="a470d275255bd614b55bd822f706d796d" name="a470d275255bd614b55bd822f706d796d"></a>
+Rcpp::NumericVector&#160;</td><td class="memItemRight" valign="bottom"><b>derived_landings_n</b></td></tr>
+<tr class="memdesc:a470d275255bd614b55bd822f706d796d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Derived landings in numbers. <br /></td></tr>
+<tr class="separator:a470d275255bd614b55bd822f706d796d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a83a6122a180b0d7342f21d4bea79d966" id="r_a83a6122a180b0d7342f21d4bea79d966"><td class="memItemLeft" align="right" valign="top"><a id="a83a6122a180b0d7342f21d4bea79d966" name="a83a6122a180b0d7342f21d4bea79d966"></a>
+Rcpp::NumericVector&#160;</td><td class="memItemRight" valign="bottom"><b>derived_index_naa</b></td></tr>
+<tr class="memdesc:a83a6122a180b0d7342f21d4bea79d966"><td class="mdescLeft">&#160;</td><td class="mdescRight">Derived landings-at-age in numbers. <br /></td></tr>
+<tr class="separator:a83a6122a180b0d7342f21d4bea79d966"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aee3caceca3e8cac3cbdaa09caedc1bfe" id="r_aee3caceca3e8cac3cbdaa09caedc1bfe"><td class="memItemLeft" align="right" valign="top"><a id="aee3caceca3e8cac3cbdaa09caedc1bfe" name="aee3caceca3e8cac3cbdaa09caedc1bfe"></a>
+Rcpp::NumericVector&#160;</td><td class="memItemRight" valign="bottom"><b>derived_index_nal</b></td></tr>
+<tr class="memdesc:aee3caceca3e8cac3cbdaa09caedc1bfe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Derived landings-at-length in numbers. <br /></td></tr>
+<tr class="separator:aee3caceca3e8cac3cbdaa09caedc1bfe"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9fd6906e53cef339ff4daa2e68d1bc72" id="r_a9fd6906e53cef339ff4daa2e68d1bc72"><td class="memItemLeft" align="right" valign="top"><a id="a9fd6906e53cef339ff4daa2e68d1bc72" name="a9fd6906e53cef339ff4daa2e68d1bc72"></a>
+Rcpp::NumericVector&#160;</td><td class="memItemRight" valign="bottom"><b>derived_index_waa</b></td></tr>
+<tr class="memdesc:a9fd6906e53cef339ff4daa2e68d1bc72"><td class="mdescLeft">&#160;</td><td class="mdescRight">Derived landings-at-age in weight (mt). <br /></td></tr>
+<tr class="separator:a9fd6906e53cef339ff4daa2e68d1bc72"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a193813c21b5be79642af04a132ceb8b8" id="r_a193813c21b5be79642af04a132ceb8b8"><td class="memItemLeft" align="right" valign="top"><a id="a193813c21b5be79642af04a132ceb8b8" name="a193813c21b5be79642af04a132ceb8b8"></a>
+Rcpp::NumericVector&#160;</td><td class="memItemRight" valign="bottom"><b>derived_index_expected</b></td></tr>
+<tr class="memdesc:a193813c21b5be79642af04a132ceb8b8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Derived index in observed units. <br /></td></tr>
+<tr class="separator:a193813c21b5be79642af04a132ceb8b8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4d21e98b5fffa8ae2e949b2c7c3f3ed5" id="r_a4d21e98b5fffa8ae2e949b2c7c3f3ed5"><td class="memItemLeft" align="right" valign="top"><a id="a4d21e98b5fffa8ae2e949b2c7c3f3ed5" name="a4d21e98b5fffa8ae2e949b2c7c3f3ed5"></a>
+Rcpp::NumericVector&#160;</td><td class="memItemRight" valign="bottom"><b>derived_index_w</b></td></tr>
+<tr class="memdesc:a4d21e98b5fffa8ae2e949b2c7c3f3ed5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Derived index in weight. <br /></td></tr>
+<tr class="separator:a4d21e98b5fffa8ae2e949b2c7c3f3ed5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab4fe5103e5bd4555071861e7daabd1dd" id="r_ab4fe5103e5bd4555071861e7daabd1dd"><td class="memItemLeft" align="right" valign="top"><a id="ab4fe5103e5bd4555071861e7daabd1dd" name="ab4fe5103e5bd4555071861e7daabd1dd"></a>
+Rcpp::NumericVector&#160;</td><td class="memItemRight" valign="bottom"><b>derived_index_n</b></td></tr>
+<tr class="memdesc:ab4fe5103e5bd4555071861e7daabd1dd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Derived index in numbers. <br /></td></tr>
+<tr class="separator:ab4fe5103e5bd4555071861e7daabd1dd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa6b959eacafb84c8ae02811bb01c4680" id="r_aa6b959eacafb84c8ae02811bb01c4680"><td class="memItemLeft" align="right" valign="top"><a id="aa6b959eacafb84c8ae02811bb01c4680" name="aa6b959eacafb84c8ae02811bb01c4680"></a>
+Rcpp::NumericVector&#160;</td><td class="memItemRight" valign="bottom"><b>derived_agecomp_proportion</b></td></tr>
+<tr class="memdesc:aa6b959eacafb84c8ae02811bb01c4680"><td class="mdescLeft">&#160;</td><td class="mdescRight">Derived age composition proportions. <br /></td></tr>
+<tr class="separator:aa6b959eacafb84c8ae02811bb01c4680"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a92f6568a26eb99e47cd3c26f6d260614" id="r_a92f6568a26eb99e47cd3c26f6d260614"><td class="memItemLeft" align="right" valign="top"><a id="a92f6568a26eb99e47cd3c26f6d260614" name="a92f6568a26eb99e47cd3c26f6d260614"></a>
+Rcpp::NumericVector&#160;</td><td class="memItemRight" valign="bottom"><b>derived_lengthcomp_proportion</b></td></tr>
+<tr class="memdesc:a92f6568a26eb99e47cd3c26f6d260614"><td class="mdescLeft">&#160;</td><td class="mdescRight">Derived length composition proportions. <br /></td></tr>
+<tr class="separator:a92f6568a26eb99e47cd3c26f6d260614"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abab436620979497daaab6772cbfd3ed6" id="r_abab436620979497daaab6772cbfd3ed6"><td class="memItemLeft" align="right" valign="top"><a id="abab436620979497daaab6772cbfd3ed6" name="abab436620979497daaab6772cbfd3ed6"></a>
+Rcpp::NumericVector&#160;</td><td class="memItemRight" valign="bottom"><b>derived_agecomp_expected</b></td></tr>
+<tr class="memdesc:abab436620979497daaab6772cbfd3ed6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Derived age compositions. <br /></td></tr>
+<tr class="separator:abab436620979497daaab6772cbfd3ed6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abd4836a0d9324dd64918a9b939fd913b" id="r_abd4836a0d9324dd64918a9b939fd913b"><td class="memItemLeft" align="right" valign="top"><a id="abd4836a0d9324dd64918a9b939fd913b" name="abd4836a0d9324dd64918a9b939fd913b"></a>
+Rcpp::NumericVector&#160;</td><td class="memItemRight" valign="bottom"><b>derived_lengthcomp_expected</b></td></tr>
+<tr class="memdesc:abd4836a0d9324dd64918a9b939fd913b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Derived length compositions. <br /></td></tr>
+<tr class="separator:abd4836a0d9324dd64918a9b939fd913b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pub_attribs_classFleetInterfaceBase"><td colspan="2" onclick="javascript:toggleInherit('pub_attribs_classFleetInterfaceBase')"><img src="closed.png" alt="-"/>&#160;Public Attributes inherited from <a class="el" href="classFleetInterfaceBase.html">FleetInterfaceBase</a></td></tr>
+<tr class="memitem:a65f53edf247ffd853afb80ff0d615494 inherit pub_attribs_classFleetInterfaceBase" id="r_a65f53edf247ffd853afb80ff0d615494"><td class="memItemLeft" align="right" valign="top">
+<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a>&#160;</td><td class="memItemRight" valign="bottom"><b>id</b></td></tr>
+<tr class="memdesc:a65f53edf247ffd853afb80ff0d615494 inherit pub_attribs_classFleetInterfaceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">The local id of the <a class="el" href="classFleetInterfaceBase.html" title="Rcpp interface that serves as the parent class for Rcpp fleet interfaces. This type should be inherit...">FleetInterfaceBase</a> object. <br /></td></tr>
+<tr class="separator:a65f53edf247ffd853afb80ff0d615494 inherit pub_attribs_classFleetInterfaceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pub_attribs_classFIMSRcppInterfaceBase"><td colspan="2" onclick="javascript:toggleInherit('pub_attribs_classFIMSRcppInterfaceBase')"><img src="closed.png" alt="-"/>&#160;Public Attributes inherited from <a class="el" href="classFIMSRcppInterfaceBase.html">FIMSRcppInterfaceBase</a></td></tr>
+<tr class="memitem:a44e4e3b1dd18103bf79ccb30a76f5933 inherit pub_attribs_classFIMSRcppInterfaceBase" id="r_a44e4e3b1dd18103bf79ccb30a76f5933"><td class="memItemLeft" align="right" valign="top">
+<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><b>finalized</b> = <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">false</a></td></tr>
+<tr class="memdesc:a44e4e3b1dd18103bf79ccb30a76f5933 inherit pub_attribs_classFIMSRcppInterfaceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Is the object already finalized? The default is false. <br /></td></tr>
+<tr class="separator:a44e4e3b1dd18103bf79ccb30a76f5933 inherit pub_attribs_classFIMSRcppInterfaceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="inherited" name="inherited"></a>
+Additional Inherited Members</h2></td></tr>
+<tr class="inherit_header pub_static_attribs_classFleetInterfaceBase"><td colspan="2" onclick="javascript:toggleInherit('pub_static_attribs_classFleetInterfaceBase')"><img src="closed.png" alt="-"/>&#160;Static Public Attributes inherited from <a class="el" href="classFleetInterfaceBase.html">FleetInterfaceBase</a></td></tr>
+<tr class="memitem:a0c53dd713a9d01a8ba69172f1442a73f inherit pub_static_attribs_classFleetInterfaceBase" id="r_a0c53dd713a9d01a8ba69172f1442a73f"><td class="memItemLeft" align="right" valign="top">
+<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">static</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a>&#160;</td><td class="memItemRight" valign="bottom"><b>id_g</b> = 1</td></tr>
+<tr class="memdesc:a0c53dd713a9d01a8ba69172f1442a73f inherit pub_static_attribs_classFleetInterfaceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">The static id of the <a class="el" href="classFleetInterfaceBase.html" title="Rcpp interface that serves as the parent class for Rcpp fleet interfaces. This type should be inherit...">FleetInterfaceBase</a> object. <br /></td></tr>
+<tr class="separator:a0c53dd713a9d01a8ba69172f1442a73f inherit pub_static_attribs_classFleetInterfaceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad6ee1e07ed0468fcfa875a70e7a2eaa5 inherit pub_static_attribs_classFleetInterfaceBase" id="r_ad6ee1e07ed0468fcfa875a70e7a2eaa5"><td class="memItemLeft" align="right" valign="top">
+<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">static</a> std::map&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a>, std::shared_ptr&lt; <a class="el" href="classFleetInterfaceBase.html">FleetInterfaceBase</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>live_objects</b></td></tr>
+<tr class="memdesc:ad6ee1e07ed0468fcfa875a70e7a2eaa5 inherit pub_static_attribs_classFleetInterfaceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">The map associating the IDs of <a class="el" href="classFleetInterfaceBase.html" title="Rcpp interface that serves as the parent class for Rcpp fleet interfaces. This type should be inherit...">FleetInterfaceBase</a> to the objects. This is a live object, which is an object that has been created and lives in memory. <br /></td></tr>
+<tr class="separator:ad6ee1e07ed0468fcfa875a70e7a2eaa5 inherit pub_static_attribs_classFleetInterfaceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pub_static_attribs_classFIMSRcppInterfaceBase"><td colspan="2" onclick="javascript:toggleInherit('pub_static_attribs_classFIMSRcppInterfaceBase')"><img src="closed.png" alt="-"/>&#160;Static Public Attributes inherited from <a class="el" href="classFIMSRcppInterfaceBase.html">FIMSRcppInterfaceBase</a></td></tr>
+<tr class="memitem:a66ae9ad9c0adae77184eefa59e283c5e inherit pub_static_attribs_classFIMSRcppInterfaceBase" id="r_a66ae9ad9c0adae77184eefa59e283c5e"><td class="memItemLeft" align="right" valign="top">
+<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">static</a> std::vector&lt; std::shared_ptr&lt; <a class="el" href="classFIMSRcppInterfaceBase.html">FIMSRcppInterfaceBase</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>fims_interface_objects</b></td></tr>
+<tr class="memdesc:a66ae9ad9c0adae77184eefa59e283c5e inherit pub_static_attribs_classFIMSRcppInterfaceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">FIMS interface object vectors. <br /></td></tr>
+<tr class="separator:a66ae9ad9c0adae77184eefa59e283c5e inherit pub_static_attribs_classFIMSRcppInterfaceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>The Rcpp interface for Fleet to instantiate from R: fleet &lt;- methods::new(Fleet) </p>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a id="a5627fd6de3d7234b2d76f46d695242db" name="a5627fd6de3d7234b2d76f46d695242db"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5627fd6de3d7234b2d76f46d695242db">&#9670;&#160;</a></span>FleetInterface()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">FleetInterface::FleetInterface </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="classFleetInterface.html">FleetInterface</a> &amp;&#160;</td>
+          <td class="paramname"><em>other</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Construct a new Fleet Interface object. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">other</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<h2 class="groupheader">Member Function Documentation</h2>
+<a id="a614a5a7742d8f05de4fb917998306baa" name="a614a5a7742d8f05de4fb917998306baa"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a614a5a7742d8f05de4fb917998306baa">&#9670;&#160;</a></span>finalize()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">virtual</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a> FleetInterface::finalize </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Extracts the derived quantities from <code>Information</code> to the Rcpp object. </p>
+
+<p>Reimplemented from <a class="el" href="classFIMSRcppInterfaceBase.html#abdfb6b47bd4ea86042f84590236036d7">FIMSRcppInterfaceBase</a>.</p>
+
+</div>
+</div>
+<a id="a67ead41b510f7960a99a7a8697fb3cdd" name="a67ead41b510f7960a99a7a8697fb3cdd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a67ead41b510f7960a99a7a8697fb3cdd">&#9670;&#160;</a></span>get_id()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">virtual</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a> FleetInterface::get_id </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Gets the ID of the interface base object. </p>
+<dl class="section return"><dt>Returns</dt><dd>The ID. </dd></dl>
+
+<p>Implements <a class="el" href="classFleetInterfaceBase.html#ac5958e50afcac92d1ed137748860ced8">FleetInterfaceBase</a>.</p>
+
+</div>
+</div>
+<a id="aa63cef53874620f9fd792b6584c7f5ee" name="aa63cef53874620f9fd792b6584c7f5ee"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa63cef53874620f9fd792b6584c7f5ee">&#9670;&#160;</a></span>GetName()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string FleetInterface::GetName </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Gets the name of the fleet. </p>
+<dl class="section return"><dt>Returns</dt><dd>The name. </dd></dl>
+
+</div>
+</div>
+<a id="a3bcb379f52ba814e2187e526c6bc0cdc" name="a3bcb379f52ba814e2187e526c6bc0cdc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3bcb379f52ba814e2187e526c6bc0cdc">&#9670;&#160;</a></span>GetSelectivityID()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a> FleetInterface::GetSelectivityID </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the unique ID for the selectivity object. </p>
+<dl class="section return"><dt>Returns</dt><dd>uint32_t </dd></dl>
+
+</div>
+</div>
+<a id="aa1b261a5a03404b70ce472b4ee0cc29d" name="aa1b261a5a03404b70ce472b4ee0cc29d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa1b261a5a03404b70ce472b4ee0cc29d">&#9670;&#160;</a></span>SetName()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a> FleetInterface::SetName </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> std::string &amp;&#160;</td>
+          <td class="paramname"><em>name</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Sets the name of the fleet. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">name</td><td>The name to set. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a65787e7d01a48ca147b01764a636b6c7" name="a65787e7d01a48ca147b01764a636b6c7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a65787e7d01a48ca147b01764a636b6c7">&#9670;&#160;</a></span>SetObservedAgeCompDataID()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a> FleetInterface::SetObservedAgeCompDataID </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">int</a>&#160;</td>
+          <td class="paramname"><em>observed_agecomp_data_id</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Set the unique ID for the observed age-composition data object. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">observed_agecomp_data_id</td><td>Unique ID for the observed data object. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="adac98c8e4fb6dd1d8414e24631a7ef72" name="adac98c8e4fb6dd1d8414e24631a7ef72"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adac98c8e4fb6dd1d8414e24631a7ef72">&#9670;&#160;</a></span>SetObservedIndexDataID()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a> FleetInterface::SetObservedIndexDataID </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">int</a>&#160;</td>
+          <td class="paramname"><em>observed_index_data_id</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Set the unique ID for the observed index data object. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">observed_index_data_id</td><td>Unique ID for the observed data object. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="adacbc3bfc477835bfa6cb948165cb41a" name="adacbc3bfc477835bfa6cb948165cb41a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adacbc3bfc477835bfa6cb948165cb41a">&#9670;&#160;</a></span>SetObservedLandingsDataID()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a> FleetInterface::SetObservedLandingsDataID </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">int</a>&#160;</td>
+          <td class="paramname"><em>observed_landings_data_id</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Set the unique ID for the observed landings data object. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">observed_landings_data_id</td><td>Unique ID for the observed data object. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a5d11ca742f04a2f7208c42ac6081c1b5" name="a5d11ca742f04a2f7208c42ac6081c1b5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5d11ca742f04a2f7208c42ac6081c1b5">&#9670;&#160;</a></span>SetObservedLengthCompDataID()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a> FleetInterface::SetObservedLengthCompDataID </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">int</a>&#160;</td>
+          <td class="paramname"><em>observed_lengthcomp_data_id</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Set the unique ID for the observed length-composition data object. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">observed_lengthcomp_data_id</td><td>Unique ID for the observed data object. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a68504064f7c1df03061c8611c9bdf329" name="a68504064f7c1df03061c8611c9bdf329"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a68504064f7c1df03061c8611c9bdf329">&#9670;&#160;</a></span>SetSelectivityID()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a> FleetInterface::SetSelectivityID </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">int</a>&#160;</td>
+          <td class="paramname"><em>selectivity_id</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Set the unique ID for the selectivity object. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">selectivity_id</td><td>Unique ID for the observed object. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<hr/>The documentation for this class was generated from the following file:<ul>
+<li>inst/include/interface/rcpp/rcpp_objects/<a class="el" href="rcpp__fleet_8hpp_source.html">rcpp_fleet.hpp</a></li>
+</ul>
+</div><!-- contents -->
+</div><!-- doc-content -->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a class="el" href="classFleetInterface.html">FleetInterface</a></li>
+    <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.8 </li>
+  </ul>
+</div>
+</body>
+</html>

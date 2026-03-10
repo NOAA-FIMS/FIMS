@@ -1,0 +1,550 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" data-bs-theme="auto">
+<head>
+    <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=9"/>
+    <meta name="generator" content="Doxygen 1.9.8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>FIMS</title><link href="tabs.css" rel="stylesheet" type="text/css"/>
+    <link rel="icon" type="image/png" href="https://noaa-fims.github.io/images/FIMS_hexlogo.png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+    <link href="https://noaa-fims.github.io/site_libs/bootstrap/bootstrap-5477dd34fdf9f443df58de9070e2fbd7.min.css" rel="stylesheet">
+    <link href="https://noaa-fims.github.io/site_libs/bootstrap/bootstrap-dark-429bd3fc0b6810d1347fc340b0896c35.min.css" rel="stylesheet" media="(prefers-color-scheme: dark)">
+    <script type="text/javascript" src="jquery.js"></script>
+    <script type="text/javascript" src="dynsections.js"></script>
+    <link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+    <link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+  $(document).ready(function() { init_search(); });
+/* @license-end */
+</script>
+    <script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  extensions: ["tex2jax.js"],
+  jax: ["input/TeX","output/HTML-CSS"],
+});
+</script>
+<script type="text/javascript" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js"></script>
+    <link href="doxygen.css" rel="stylesheet" type="text/css" />
+    <link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
+<link href="custom.css" rel="stylesheet" type="text/css"/>
+    <script src="https://noaa-fims.github.io/site_libs/quarto-nav/quarto-nav.js"></script>
+    <script src="https://noaa-fims.github.io/site_libs/bootstrap/bootstrap.min.js"></script>
+    <script src="https://noaa-fims.github.io/site_libs/quarto-html/quarto.js" type="module"></script>
+</head>
+<body>
+<div id="top">
+    <div id="titlearea">
+        <table cellspacing="0" cellpadding="0">
+            <tbody>
+            <tr style="height: 70px;">
+                <td id="projectlogo"><img alt="Logo" src="FIMS_logo3.png"/></td>
+                <td id="projectalign" style="padding-left: 0.5em;">
+                    <div id="projectname">FIMS
+                        &#160;<span id="projectnumber">v0.8.1</span></div>
+                    <div id="projectbrief"></div></td>
+                <td style="padding-left: 0.5em;">
+                    <div id="projectbrief"></div>
+                </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <nav class="navbar navbar-expand-lg " data-bs-theme="auto">
+      <div class="navbar-container container-fluid">
+        <div class="navbar-brand-container mx-auto">
+          <a href="https://noaa-fims.github.io/" class="navbar-brand navbar-brand-logo"></a>
+          <a class="navbar-brand" href="https://noaa-fims.github.io/">
+          </a>
+        </div>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+          <ul class="navbar-nav navbar-nav-scroll ms-auto">
+           <li class="nav-item dropdown">
+            <button class="nav-link dropdown-toggle" type="button" id="dropdown-reference" data-bs-toggle="dropdown"
+                    aria-expanded="false" aria-haspopup="true">reference</button>
+            <ul class="dropdown-menu" aria-labelledby="dropdown-reference">
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/reference/index.html">r/roxygen</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/doxygen/index.html">c++/doxygen</a></li>
+            </ul>
+           </li>
+            <li class="nav-item dropdown">
+            <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown"
+                    aria-expanded="false" aria-haspopup="true">articles</button>
+            <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
+              <li><h6 class="dropdown-header" data-toc-skip>intro to fims</h6></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/fims-demo.html">introducing the fisheries integrated modeling system (fims)</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/fims-logging.html">Introducing the fims logging system</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/fims-user-setup-guide.html">fims user setup guide</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/fims-demo-projections.html">simple projections using fims</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><h6 class="dropdown-header" data-toc-skip>developer</h6></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/fims-path-maturity.html">fims path - maturity</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><h6 class="dropdown-header" data-toc-skip>c++ training</h6></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/training-intro-cpp.html">intro to c++</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/training-intro-rcpp.html">intro to rcpp</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><h6 class="dropdown-header" data-toc-skip>research and development</h6></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/RD-re-sparsity.html">re sparsity</a></li>
+            </ul>
+          </li>
+            <li class="nav-item dropdown">
+              <button class="nav-link dropdown-toggle" type="button" id="dropdown-news" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">news</button>
+              <ul class="dropdown-menu" aria-labelledby="dropdown-news">
+                <li><h6 class="dropdown-header" data-toc-skip="">Releases</h6></li>
+                <li><a class="external-link dropdown-item" href="https://github.com/NOAA-FIMS/FIMS/releases/latest">latest release</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/news/index.html">changelog</a></li>
+              </ul>
+            </li>
+          <li class="nav-item dropdown">
+            <button class="nav-link dropdown-toggle" type="button" id="dropdown-reports" data-bs-toggle="dropdown"
+                    aria-expanded="false" aria-haspopup="true">reports</button>
+            <ul class="dropdown-menu" aria-labelledby="dropdown-reports">
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/coverage/coverage.html">coverage</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/coverage/codecoverage_explanation.html">coverage explained</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/testdown/index.html">testdown</a></li>
+            </ul>
+          </li>
+          <ul class="navbar-nav">
+            <li class="nav-item"><a class="external-link nav-link" href="https://noaa-fims.github.io/">fims website</a></li>
+            <li class="nav-item">
+              <a class="external-link nav-link" href="https://github.com/noaa-fims/fims/" aria-label="GitHub repository for FIMS">
+                <span class="fa fa-brands fa-github fa-lg"></span>
+              </a>
+            </li>
+            <!-- Keep the input; pkgdown’s autocomplete wrapper won’t exist in Doxygen -->
+            <li class="nav-item">
+              <form class="form-inline" role="search" onsubmit="return false;">
+                <input class="form-control" type="search" name="search-input" id="search-input"
+                      autocomplete="off" aria-label="Search site" placeholder="Search for">
+              </form>
+            </li>
+          </ul>
+      </div>
+    </div>
+  </nav>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  // Only on the cpp_directory_structure page!
+  document.querySelectorAll('.toc a').forEach(function(link) {
+    if (link.href && link.href.indexOf(location.pathname) !== -1) {
+      link.href = link.hash; // Just use the fragment
+    }
+  });
+});
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  function updateTocActive() {
+    var links = Array.from(document.querySelectorAll('.toc a'));
+    var anchors = links.map(link => document.getElementById(link.getAttribute('href').replace('#', '')));
+    var scrollTop = window.scrollY || document.documentElement.scrollTop;
+    var offset = 150; // Match your scroll-margin-top
+    let currentActive = -1;
+    for (let i = anchors.length - 1; i >= 0; i--) {
+      if (anchors[i] && (anchors[i].getBoundingClientRect().top + window.scrollY - offset) <= scrollTop) {
+        currentActive = i;
+        break;
+      }
+    }
+    links.forEach((link, i) => {
+      link.classList.remove('active', 'aboveActive');
+      if (i === currentActive) {
+        link.classList.add('active');
+      } else if (i < currentActive) {
+        link.classList.add('aboveActive');
+      }
+    });
+  }
+  window.addEventListener('scroll', updateTocActive);
+  window.addEventListener('hashchange', updateTocActive);
+  updateTocActive();
+});
+</script>
+    <!-- end header part -->
+<!-- Generated by Doxygen 1.9.8 -->
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+/* @license-end */
+</script>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(document).ready(function(){initNavTree('classLogisticMaturityInterface.html',''); initResizable(); });
+/* @license-end */
+</script>
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">Loading...</div>
+<div class="SRStatus" id="Searching">Searching...</div>
+<div class="SRStatus" id="NoMatches">No Matches</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="summary">
+<a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pub-attribs">Public Attributes</a> &#124;
+<a href="classLogisticMaturityInterface-members.html">List of all members</a>  </div>
+  <div class="headertitle"><div class="title">LogisticMaturityInterface Class Reference</div></div>
+</div><!--header-->
+<div class="contents">
+
+<p>Rcpp interface for logistic maturity to instantiate the object from R: logistic_maturity &lt;- methods::new(logistic_maturity).  
+ <a href="classLogisticMaturityInterface.html#details">More...</a></p>
+
+<p><code>#include &lt;<a class="el" href="rcpp__maturity_8hpp_source.html">rcpp_maturity.hpp</a>&gt;</code></p>
+<div class="dynheader">
+Inheritance diagram for LogisticMaturityInterface:</div>
+<div class="dyncontent">
+ <div class="center">
+  <img src="classLogisticMaturityInterface.png" usemap="#LogisticMaturityInterface_map" alt=""/>
+  <map id="LogisticMaturityInterface_map" name="LogisticMaturityInterface_map">
+<area href="classMaturityInterfaceBase.html" title="Rcpp interface that serves as the parent class for Rcpp maturity interfaces. This type should be inhe..." alt="MaturityInterfaceBase" shape="rect" coords="0,56,151,80"/>
+<area href="classFIMSRcppInterfaceBase.html" title="Base class for all interface objects." alt="FIMSRcppInterfaceBase" shape="rect" coords="0,0,151,24"/>
+  </map>
+</div></div>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
+Public Member Functions</h2></td></tr>
+<tr class="memitem:a89b0780b678c15b88ca676caf01dfa04" id="r_a89b0780b678c15b88ca676caf01dfa04"><td class="memItemLeft" align="right" valign="top"><a id="a89b0780b678c15b88ca676caf01dfa04" name="a89b0780b678c15b88ca676caf01dfa04"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>LogisticMaturityInterface</b> ()</td></tr>
+<tr class="memdesc:a89b0780b678c15b88ca676caf01dfa04"><td class="mdescLeft">&#160;</td><td class="mdescRight">The constructor. <br /></td></tr>
+<tr class="separator:a89b0780b678c15b88ca676caf01dfa04"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab8f3bf35c6aa55a9f079018ccccc3f6f" id="r_ab8f3bf35c6aa55a9f079018ccccc3f6f"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLogisticMaturityInterface.html#ab8f3bf35c6aa55a9f079018ccccc3f6f">LogisticMaturityInterface</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="classLogisticMaturityInterface.html">LogisticMaturityInterface</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">other</a>)</td></tr>
+<tr class="memdesc:ab8f3bf35c6aa55a9f079018ccccc3f6f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a new Logistic Maturity Interface object.  <br /></td></tr>
+<tr class="separator:ab8f3bf35c6aa55a9f079018ccccc3f6f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2245dc534cabb81b42e07890dedbca99" id="r_a2245dc534cabb81b42e07890dedbca99"><td class="memItemLeft" align="right" valign="top"><a id="a2245dc534cabb81b42e07890dedbca99" name="a2245dc534cabb81b42e07890dedbca99"></a>
+<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">virtual</a>&#160;</td><td class="memItemRight" valign="bottom"><b>~LogisticMaturityInterface</b> ()</td></tr>
+<tr class="memdesc:a2245dc534cabb81b42e07890dedbca99"><td class="mdescLeft">&#160;</td><td class="mdescRight">The destructor. <br /></td></tr>
+<tr class="separator:a2245dc534cabb81b42e07890dedbca99"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9c9ab0ceda4ae98e6335e8a31b6ab6a0" id="r_a9c9ab0ceda4ae98e6335e8a31b6ab6a0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">virtual</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLogisticMaturityInterface.html#a9c9ab0ceda4ae98e6335e8a31b6ab6a0">get_id</a> ()</td></tr>
+<tr class="memdesc:a9c9ab0ceda4ae98e6335e8a31b6ab6a0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the ID of the interface base object.  <br /></td></tr>
+<tr class="separator:a9c9ab0ceda4ae98e6335e8a31b6ab6a0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aed4a368f3a145c633711bfd5a3ae2d7a" id="r_aed4a368f3a145c633711bfd5a3ae2d7a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">virtual</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">double</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLogisticMaturityInterface.html#aed4a368f3a145c633711bfd5a3ae2d7a">evaluate</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">double</a> x)</td></tr>
+<tr class="memdesc:aed4a368f3a145c633711bfd5a3ae2d7a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate maturity using the logistic function.  <br /></td></tr>
+<tr class="separator:aed4a368f3a145c633711bfd5a3ae2d7a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa714a1ef8cd5d36f545b9e4f5c71aac5" id="r_aa714a1ef8cd5d36f545b9e4f5c71aac5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">virtual</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLogisticMaturityInterface.html#aa714a1ef8cd5d36f545b9e4f5c71aac5">finalize</a> ()</td></tr>
+<tr class="memdesc:aa714a1ef8cd5d36f545b9e4f5c71aac5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Extracts derived quantities back to the Rcpp interface object from the Information object.  <br /></td></tr>
+<tr class="separator:aa714a1ef8cd5d36f545b9e4f5c71aac5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af4487f1ed44f5a1a38b6fd97436ec107" id="r_af4487f1ed44f5a1a38b6fd97436ec107"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">virtual</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLogisticMaturityInterface.html#af4487f1ed44f5a1a38b6fd97436ec107">set_uncertainty</a> (std::map&lt; std::string, std::vector&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">double</a> &gt; &gt; &amp;se_values)</td></tr>
+<tr class="memdesc:af4487f1ed44f5a1a38b6fd97436ec107"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set uncertainty values for logistic maturity parameters.  <br /></td></tr>
+<tr class="separator:af4487f1ed44f5a1a38b6fd97436ec107"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad239da2246abb3476ff179540fad8d7c" id="r_ad239da2246abb3476ff179540fad8d7c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">virtual</a> std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLogisticMaturityInterface.html#ad239da2246abb3476ff179540fad8d7c">to_json</a> ()</td></tr>
+<tr class="memdesc:ad239da2246abb3476ff179540fad8d7c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Converts the data to json representation for the output.  <br /></td></tr>
+<tr class="separator:ad239da2246abb3476ff179540fad8d7c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pub_methods_classMaturityInterfaceBase"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classMaturityInterfaceBase')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classMaturityInterfaceBase.html">MaturityInterfaceBase</a></td></tr>
+<tr class="memitem:ae8ca26cc171f8b471deb6259704cfc18 inherit pub_methods_classMaturityInterfaceBase" id="r_ae8ca26cc171f8b471deb6259704cfc18"><td class="memItemLeft" align="right" valign="top">
+&#160;</td><td class="memItemRight" valign="bottom"><b>MaturityInterfaceBase</b> ()</td></tr>
+<tr class="memdesc:ae8ca26cc171f8b471deb6259704cfc18 inherit pub_methods_classMaturityInterfaceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">The constructor. <br /></td></tr>
+<tr class="separator:ae8ca26cc171f8b471deb6259704cfc18 inherit pub_methods_classMaturityInterfaceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab191c30895c8dca3458e1e7f6a94e8c9 inherit pub_methods_classMaturityInterfaceBase" id="r_ab191c30895c8dca3458e1e7f6a94e8c9"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classMaturityInterfaceBase.html#ab191c30895c8dca3458e1e7f6a94e8c9">MaturityInterfaceBase</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="classMaturityInterfaceBase.html">MaturityInterfaceBase</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">other</a>)</td></tr>
+<tr class="memdesc:ab191c30895c8dca3458e1e7f6a94e8c9 inherit pub_methods_classMaturityInterfaceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a new Maturity Interface Base object.  <br /></td></tr>
+<tr class="separator:ab191c30895c8dca3458e1e7f6a94e8c9 inherit pub_methods_classMaturityInterfaceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a88de1cb811b86b2f2811f03973d258b6 inherit pub_methods_classMaturityInterfaceBase" id="r_a88de1cb811b86b2f2811f03973d258b6"><td class="memItemLeft" align="right" valign="top">
+<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">virtual</a>&#160;</td><td class="memItemRight" valign="bottom"><b>~MaturityInterfaceBase</b> ()</td></tr>
+<tr class="memdesc:a88de1cb811b86b2f2811f03973d258b6 inherit pub_methods_classMaturityInterfaceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">The destructor. <br /></td></tr>
+<tr class="separator:a88de1cb811b86b2f2811f03973d258b6 inherit pub_methods_classMaturityInterfaceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pub_methods_classFIMSRcppInterfaceBase"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classFIMSRcppInterfaceBase')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classFIMSRcppInterfaceBase.html">FIMSRcppInterfaceBase</a></td></tr>
+<tr class="memitem:a9183d9379777d8be70ab66af1a07f94c inherit pub_methods_classFIMSRcppInterfaceBase" id="r_a9183d9379777d8be70ab66af1a07f94c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">virtual</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFIMSRcppInterfaceBase.html#a9183d9379777d8be70ab66af1a07f94c">add_to_fims_tmb</a> ()</td></tr>
+<tr class="memdesc:a9183d9379777d8be70ab66af1a07f94c inherit pub_methods_classFIMSRcppInterfaceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">A virtual method to inherit to add objects to the TMB model.  <br /></td></tr>
+<tr class="separator:a9183d9379777d8be70ab66af1a07f94c inherit pub_methods_classFIMSRcppInterfaceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a72fc17f2f76b60a82db50167b1cde83d inherit pub_methods_classFIMSRcppInterfaceBase" id="r_a72fc17f2f76b60a82db50167b1cde83d"><td class="memItemLeft" align="right" valign="top">
+<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><b>get_se_values</b> (std::string name, std::map&lt; std::string, std::vector&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">double</a> &gt; &gt; &amp;se_values, <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">double</a> &gt; &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">values</a>)</td></tr>
+<tr class="memdesc:a72fc17f2f76b60a82db50167b1cde83d inherit pub_methods_classFIMSRcppInterfaceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Method to extract standard error values from the se_values working map. <br /></td></tr>
+<tr class="separator:a72fc17f2f76b60a82db50167b1cde83d inherit pub_methods_classFIMSRcppInterfaceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a46e0ce655ef707a6c66e863aa4f0b374 inherit pub_methods_classFIMSRcppInterfaceBase" id="r_a46e0ce655ef707a6c66e863aa4f0b374"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFIMSRcppInterfaceBase.html#a46e0ce655ef707a6c66e863aa4f0b374">value_to_string</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">double</a> value)</td></tr>
+<tr class="memdesc:a46e0ce655ef707a6c66e863aa4f0b374 inherit pub_methods_classFIMSRcppInterfaceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Report the parameter value as a string.  <br /></td></tr>
+<tr class="separator:a46e0ce655ef707a6c66e863aa4f0b374 inherit pub_methods_classFIMSRcppInterfaceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1fa6e0deb883a921fe70b328cdd30fee inherit pub_methods_classFIMSRcppInterfaceBase" id="r_a1fa6e0deb883a921fe70b328cdd30fee"><td class="memItemLeft" align="right" valign="top">
+std::string&#160;</td><td class="memItemRight" valign="bottom"><b>make_dimensions</b> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">start</a>, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a> end, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">rep</a>=1)</td></tr>
+<tr class="memdesc:a1fa6e0deb883a921fe70b328cdd30fee inherit pub_methods_classFIMSRcppInterfaceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Make a string of dimensions for the model. <br /></td></tr>
+<tr class="separator:a1fa6e0deb883a921fe70b328cdd30fee inherit pub_methods_classFIMSRcppInterfaceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
+Public Attributes</h2></td></tr>
+<tr class="memitem:a896a2d21435c89d6e97254c40ae08a63" id="r_a896a2d21435c89d6e97254c40ae08a63"><td class="memItemLeft" align="right" valign="top"><a id="a896a2d21435c89d6e97254c40ae08a63" name="a896a2d21435c89d6e97254c40ae08a63"></a>
+<a class="el" href="classParameterVector.html">ParameterVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>inflection_point</b></td></tr>
+<tr class="memdesc:a896a2d21435c89d6e97254c40ae08a63"><td class="mdescLeft">&#160;</td><td class="mdescRight">The index value at which the response reaches 0.5. <br /></td></tr>
+<tr class="separator:a896a2d21435c89d6e97254c40ae08a63"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a70646d633dee4a9a6c8a594cd6832e9e" id="r_a70646d633dee4a9a6c8a594cd6832e9e"><td class="memItemLeft" align="right" valign="top"><a id="a70646d633dee4a9a6c8a594cd6832e9e" name="a70646d633dee4a9a6c8a594cd6832e9e"></a>
+<a class="el" href="classParameterVector.html">ParameterVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>slope</b></td></tr>
+<tr class="memdesc:a70646d633dee4a9a6c8a594cd6832e9e"><td class="mdescLeft">&#160;</td><td class="mdescRight">The width of the curve at the inflection point. <br /></td></tr>
+<tr class="separator:a70646d633dee4a9a6c8a594cd6832e9e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pub_attribs_classMaturityInterfaceBase"><td colspan="2" onclick="javascript:toggleInherit('pub_attribs_classMaturityInterfaceBase')"><img src="closed.png" alt="-"/>&#160;Public Attributes inherited from <a class="el" href="classMaturityInterfaceBase.html">MaturityInterfaceBase</a></td></tr>
+<tr class="memitem:a9e437596bb8a8805a1106e850def8bbf inherit pub_attribs_classMaturityInterfaceBase" id="r_a9e437596bb8a8805a1106e850def8bbf"><td class="memItemLeft" align="right" valign="top">
+<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a>&#160;</td><td class="memItemRight" valign="bottom"><b>id</b></td></tr>
+<tr class="memdesc:a9e437596bb8a8805a1106e850def8bbf inherit pub_attribs_classMaturityInterfaceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">The local id of the <a class="el" href="classMaturityInterfaceBase.html" title="Rcpp interface that serves as the parent class for Rcpp maturity interfaces. This type should be inhe...">MaturityInterfaceBase</a> object. <br /></td></tr>
+<tr class="separator:a9e437596bb8a8805a1106e850def8bbf inherit pub_attribs_classMaturityInterfaceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pub_attribs_classFIMSRcppInterfaceBase"><td colspan="2" onclick="javascript:toggleInherit('pub_attribs_classFIMSRcppInterfaceBase')"><img src="closed.png" alt="-"/>&#160;Public Attributes inherited from <a class="el" href="classFIMSRcppInterfaceBase.html">FIMSRcppInterfaceBase</a></td></tr>
+<tr class="memitem:a44e4e3b1dd18103bf79ccb30a76f5933 inherit pub_attribs_classFIMSRcppInterfaceBase" id="r_a44e4e3b1dd18103bf79ccb30a76f5933"><td class="memItemLeft" align="right" valign="top">
+<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><b>finalized</b> = <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">false</a></td></tr>
+<tr class="memdesc:a44e4e3b1dd18103bf79ccb30a76f5933 inherit pub_attribs_classFIMSRcppInterfaceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Is the object already finalized? The default is false. <br /></td></tr>
+<tr class="separator:a44e4e3b1dd18103bf79ccb30a76f5933 inherit pub_attribs_classFIMSRcppInterfaceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="inherited" name="inherited"></a>
+Additional Inherited Members</h2></td></tr>
+<tr class="inherit_header pub_static_attribs_classMaturityInterfaceBase"><td colspan="2" onclick="javascript:toggleInherit('pub_static_attribs_classMaturityInterfaceBase')"><img src="closed.png" alt="-"/>&#160;Static Public Attributes inherited from <a class="el" href="classMaturityInterfaceBase.html">MaturityInterfaceBase</a></td></tr>
+<tr class="memitem:af28b36002fd4e5e21e8515df10be733a inherit pub_static_attribs_classMaturityInterfaceBase" id="r_af28b36002fd4e5e21e8515df10be733a"><td class="memItemLeft" align="right" valign="top">
+<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">static</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a>&#160;</td><td class="memItemRight" valign="bottom"><b>id_g</b> = 1</td></tr>
+<tr class="memdesc:af28b36002fd4e5e21e8515df10be733a inherit pub_static_attribs_classMaturityInterfaceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">The static id of the <a class="el" href="classMaturityInterfaceBase.html" title="Rcpp interface that serves as the parent class for Rcpp maturity interfaces. This type should be inhe...">MaturityInterfaceBase</a> object. <br /></td></tr>
+<tr class="separator:af28b36002fd4e5e21e8515df10be733a inherit pub_static_attribs_classMaturityInterfaceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9cda7708394b18d2ed2cef1ad1303c74 inherit pub_static_attribs_classMaturityInterfaceBase" id="r_a9cda7708394b18d2ed2cef1ad1303c74"><td class="memItemLeft" align="right" valign="top">
+<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">static</a> std::map&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a>, std::shared_ptr&lt; <a class="el" href="classMaturityInterfaceBase.html">MaturityInterfaceBase</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>live_objects</b></td></tr>
+<tr class="memdesc:a9cda7708394b18d2ed2cef1ad1303c74 inherit pub_static_attribs_classMaturityInterfaceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">The map associating the IDs of <a class="el" href="classMaturityInterfaceBase.html" title="Rcpp interface that serves as the parent class for Rcpp maturity interfaces. This type should be inhe...">MaturityInterfaceBase</a> to the objects. This is a live object, which is an object that has been created and lives in memory. <br /></td></tr>
+<tr class="separator:a9cda7708394b18d2ed2cef1ad1303c74 inherit pub_static_attribs_classMaturityInterfaceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pub_static_attribs_classFIMSRcppInterfaceBase"><td colspan="2" onclick="javascript:toggleInherit('pub_static_attribs_classFIMSRcppInterfaceBase')"><img src="closed.png" alt="-"/>&#160;Static Public Attributes inherited from <a class="el" href="classFIMSRcppInterfaceBase.html">FIMSRcppInterfaceBase</a></td></tr>
+<tr class="memitem:a66ae9ad9c0adae77184eefa59e283c5e inherit pub_static_attribs_classFIMSRcppInterfaceBase" id="r_a66ae9ad9c0adae77184eefa59e283c5e"><td class="memItemLeft" align="right" valign="top">
+<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">static</a> std::vector&lt; std::shared_ptr&lt; <a class="el" href="classFIMSRcppInterfaceBase.html">FIMSRcppInterfaceBase</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>fims_interface_objects</b></td></tr>
+<tr class="memdesc:a66ae9ad9c0adae77184eefa59e283c5e inherit pub_static_attribs_classFIMSRcppInterfaceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">FIMS interface object vectors. <br /></td></tr>
+<tr class="separator:a66ae9ad9c0adae77184eefa59e283c5e inherit pub_static_attribs_classFIMSRcppInterfaceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Rcpp interface for logistic maturity to instantiate the object from R: logistic_maturity &lt;- methods::new(logistic_maturity). </p>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a id="ab8f3bf35c6aa55a9f079018ccccc3f6f" name="ab8f3bf35c6aa55a9f079018ccccc3f6f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab8f3bf35c6aa55a9f079018ccccc3f6f">&#9670;&#160;</a></span>LogisticMaturityInterface()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">LogisticMaturityInterface::LogisticMaturityInterface </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="classLogisticMaturityInterface.html">LogisticMaturityInterface</a> &amp;&#160;</td>
+          <td class="paramname"><em>other</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Construct a new Logistic Maturity Interface object. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">other</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<h2 class="groupheader">Member Function Documentation</h2>
+<a id="aed4a368f3a145c633711bfd5a3ae2d7a" name="aed4a368f3a145c633711bfd5a3ae2d7a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aed4a368f3a145c633711bfd5a3ae2d7a">&#9670;&#160;</a></span>evaluate()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">virtual</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">double</a> LogisticMaturityInterface::evaluate </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">double</a>&#160;</td>
+          <td class="paramname"><em>x</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Evaluate maturity using the logistic function. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">x</td><td>The independent variable in the logistic function (e.g., age or size in maturity). </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Implements <a class="el" href="classMaturityInterfaceBase.html#a1652288f0784bcc4cbf6359d4a94a705">MaturityInterfaceBase</a>.</p>
+
+</div>
+</div>
+<a id="aa714a1ef8cd5d36f545b9e4f5c71aac5" name="aa714a1ef8cd5d36f545b9e4f5c71aac5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa714a1ef8cd5d36f545b9e4f5c71aac5">&#9670;&#160;</a></span>finalize()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">virtual</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a> LogisticMaturityInterface::finalize </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Extracts derived quantities back to the Rcpp interface object from the Information object. </p>
+
+<p>Reimplemented from <a class="el" href="classFIMSRcppInterfaceBase.html#abdfb6b47bd4ea86042f84590236036d7">FIMSRcppInterfaceBase</a>.</p>
+
+</div>
+</div>
+<a id="a9c9ab0ceda4ae98e6335e8a31b6ab6a0" name="a9c9ab0ceda4ae98e6335e8a31b6ab6a0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9c9ab0ceda4ae98e6335e8a31b6ab6a0">&#9670;&#160;</a></span>get_id()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">virtual</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a> LogisticMaturityInterface::get_id </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Gets the ID of the interface base object. </p>
+<dl class="section return"><dt>Returns</dt><dd>The ID. </dd></dl>
+
+<p>Implements <a class="el" href="classMaturityInterfaceBase.html#a99f01074cb3839a04da28bd338956c5d">MaturityInterfaceBase</a>.</p>
+
+</div>
+</div>
+<a id="af4487f1ed44f5a1a38b6fd97436ec107" name="af4487f1ed44f5a1a38b6fd97436ec107"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af4487f1ed44f5a1a38b6fd97436ec107">&#9670;&#160;</a></span>set_uncertainty()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">virtual</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a> LogisticMaturityInterface::set_uncertainty </td>
+          <td>(</td>
+          <td class="paramtype">std::map&lt; std::string, std::vector&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">double</a> &gt; &gt; &amp;&#160;</td>
+          <td class="paramname"><em>se_values</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Set uncertainty values for logistic maturity parameters. </p>
+<p>Sets the standard error values for the inflection point and slope parameters using the provided map. </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">se_values</td><td>A map from parameter names to vectors of standard error values. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Reimplemented from <a class="el" href="classFIMSRcppInterfaceBase.html#a5e19680aa5d84f270939435588bce03b">FIMSRcppInterfaceBase</a>.</p>
+
+</div>
+</div>
+<a id="ad239da2246abb3476ff179540fad8d7c" name="ad239da2246abb3476ff179540fad8d7c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad239da2246abb3476ff179540fad8d7c">&#9670;&#160;</a></span>to_json()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">virtual</a> std::string LogisticMaturityInterface::to_json </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Converts the data to json representation for the output. </p>
+<dl class="section return"><dt>Returns</dt><dd>A string is returned specifying that the module relates to the maturity interface with logistic maturity. It also returns the ID and the parameters. This string is formatted for a json file. </dd></dl>
+
+<p>Reimplemented from <a class="el" href="classFIMSRcppInterfaceBase.html#aa97acd77c0c4d2e193c67cd0662d803c">FIMSRcppInterfaceBase</a>.</p>
+
+</div>
+</div>
+<hr/>The documentation for this class was generated from the following file:<ul>
+<li>inst/include/interface/rcpp/rcpp_objects/<a class="el" href="rcpp__maturity_8hpp_source.html">rcpp_maturity.hpp</a></li>
+</ul>
+</div><!-- contents -->
+</div><!-- doc-content -->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a class="el" href="classLogisticMaturityInterface.html">LogisticMaturityInterface</a></li>
+    <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.8 </li>
+  </ul>
+</div>
+</body>
+</html>

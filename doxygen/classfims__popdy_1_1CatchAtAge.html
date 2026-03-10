@@ -1,0 +1,2348 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" data-bs-theme="auto">
+<head>
+    <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=9"/>
+    <meta name="generator" content="Doxygen 1.9.8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>FIMS</title><link href="tabs.css" rel="stylesheet" type="text/css"/>
+    <link rel="icon" type="image/png" href="https://noaa-fims.github.io/images/FIMS_hexlogo.png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+    <link href="https://noaa-fims.github.io/site_libs/bootstrap/bootstrap-5477dd34fdf9f443df58de9070e2fbd7.min.css" rel="stylesheet">
+    <link href="https://noaa-fims.github.io/site_libs/bootstrap/bootstrap-dark-429bd3fc0b6810d1347fc340b0896c35.min.css" rel="stylesheet" media="(prefers-color-scheme: dark)">
+    <script type="text/javascript" src="jquery.js"></script>
+    <script type="text/javascript" src="dynsections.js"></script>
+    <link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+    <link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+  $(document).ready(function() { init_search(); });
+/* @license-end */
+</script>
+    <script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  extensions: ["tex2jax.js"],
+  jax: ["input/TeX","output/HTML-CSS"],
+});
+</script>
+<script type="text/javascript" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js"></script>
+    <link href="doxygen.css" rel="stylesheet" type="text/css" />
+    <link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
+<link href="custom.css" rel="stylesheet" type="text/css"/>
+    <script src="https://noaa-fims.github.io/site_libs/quarto-nav/quarto-nav.js"></script>
+    <script src="https://noaa-fims.github.io/site_libs/bootstrap/bootstrap.min.js"></script>
+    <script src="https://noaa-fims.github.io/site_libs/quarto-html/quarto.js" type="module"></script>
+</head>
+<body>
+<div id="top">
+    <div id="titlearea">
+        <table cellspacing="0" cellpadding="0">
+            <tbody>
+            <tr style="height: 70px;">
+                <td id="projectlogo"><img alt="Logo" src="FIMS_logo3.png"/></td>
+                <td id="projectalign" style="padding-left: 0.5em;">
+                    <div id="projectname">FIMS
+                        &#160;<span id="projectnumber">v0.8.1</span></div>
+                    <div id="projectbrief"></div></td>
+                <td style="padding-left: 0.5em;">
+                    <div id="projectbrief"></div>
+                </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <nav class="navbar navbar-expand-lg " data-bs-theme="auto">
+      <div class="navbar-container container-fluid">
+        <div class="navbar-brand-container mx-auto">
+          <a href="https://noaa-fims.github.io/" class="navbar-brand navbar-brand-logo"></a>
+          <a class="navbar-brand" href="https://noaa-fims.github.io/">
+          </a>
+        </div>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+          <ul class="navbar-nav navbar-nav-scroll ms-auto">
+           <li class="nav-item dropdown">
+            <button class="nav-link dropdown-toggle" type="button" id="dropdown-reference" data-bs-toggle="dropdown"
+                    aria-expanded="false" aria-haspopup="true">reference</button>
+            <ul class="dropdown-menu" aria-labelledby="dropdown-reference">
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/reference/index.html">r/roxygen</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/doxygen/index.html">c++/doxygen</a></li>
+            </ul>
+           </li>
+            <li class="nav-item dropdown">
+            <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown"
+                    aria-expanded="false" aria-haspopup="true">articles</button>
+            <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
+              <li><h6 class="dropdown-header" data-toc-skip>intro to fims</h6></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/fims-demo.html">introducing the fisheries integrated modeling system (fims)</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/fims-logging.html">Introducing the fims logging system</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/fims-user-setup-guide.html">fims user setup guide</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/fims-demo-projections.html">simple projections using fims</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><h6 class="dropdown-header" data-toc-skip>developer</h6></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/fims-path-maturity.html">fims path - maturity</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><h6 class="dropdown-header" data-toc-skip>c++ training</h6></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/training-intro-cpp.html">intro to c++</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/training-intro-rcpp.html">intro to rcpp</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><h6 class="dropdown-header" data-toc-skip>research and development</h6></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/RD-re-sparsity.html">re sparsity</a></li>
+            </ul>
+          </li>
+            <li class="nav-item dropdown">
+              <button class="nav-link dropdown-toggle" type="button" id="dropdown-news" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">news</button>
+              <ul class="dropdown-menu" aria-labelledby="dropdown-news">
+                <li><h6 class="dropdown-header" data-toc-skip="">Releases</h6></li>
+                <li><a class="external-link dropdown-item" href="https://github.com/NOAA-FIMS/FIMS/releases/latest">latest release</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/news/index.html">changelog</a></li>
+              </ul>
+            </li>
+          <li class="nav-item dropdown">
+            <button class="nav-link dropdown-toggle" type="button" id="dropdown-reports" data-bs-toggle="dropdown"
+                    aria-expanded="false" aria-haspopup="true">reports</button>
+            <ul class="dropdown-menu" aria-labelledby="dropdown-reports">
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/coverage/coverage.html">coverage</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/coverage/codecoverage_explanation.html">coverage explained</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/testdown/index.html">testdown</a></li>
+            </ul>
+          </li>
+          <ul class="navbar-nav">
+            <li class="nav-item"><a class="external-link nav-link" href="https://noaa-fims.github.io/">fims website</a></li>
+            <li class="nav-item">
+              <a class="external-link nav-link" href="https://github.com/noaa-fims/fims/" aria-label="GitHub repository for FIMS">
+                <span class="fa fa-brands fa-github fa-lg"></span>
+              </a>
+            </li>
+            <!-- Keep the input; pkgdown’s autocomplete wrapper won’t exist in Doxygen -->
+            <li class="nav-item">
+              <form class="form-inline" role="search" onsubmit="return false;">
+                <input class="form-control" type="search" name="search-input" id="search-input"
+                      autocomplete="off" aria-label="Search site" placeholder="Search for">
+              </form>
+            </li>
+          </ul>
+      </div>
+    </div>
+  </nav>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  // Only on the cpp_directory_structure page!
+  document.querySelectorAll('.toc a').forEach(function(link) {
+    if (link.href && link.href.indexOf(location.pathname) !== -1) {
+      link.href = link.hash; // Just use the fragment
+    }
+  });
+});
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  function updateTocActive() {
+    var links = Array.from(document.querySelectorAll('.toc a'));
+    var anchors = links.map(link => document.getElementById(link.getAttribute('href').replace('#', '')));
+    var scrollTop = window.scrollY || document.documentElement.scrollTop;
+    var offset = 150; // Match your scroll-margin-top
+    let currentActive = -1;
+    for (let i = anchors.length - 1; i >= 0; i--) {
+      if (anchors[i] && (anchors[i].getBoundingClientRect().top + window.scrollY - offset) <= scrollTop) {
+        currentActive = i;
+        break;
+      }
+    }
+    links.forEach((link, i) => {
+      link.classList.remove('active', 'aboveActive');
+      if (i === currentActive) {
+        link.classList.add('active');
+      } else if (i < currentActive) {
+        link.classList.add('aboveActive');
+      }
+    });
+  }
+  window.addEventListener('scroll', updateTocActive);
+  window.addEventListener('hashchange', updateTocActive);
+  updateTocActive();
+});
+</script>
+    <!-- end header part -->
+<!-- Generated by Doxygen 1.9.8 -->
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+/* @license-end */
+</script>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(document).ready(function(){initNavTree('classfims__popdy_1_1CatchAtAge.html',''); initResizable(); });
+/* @license-end */
+</script>
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">Loading...</div>
+<div class="SRStatus" id="Searching">Searching...</div>
+<div class="SRStatus" id="NoMatches">No Matches</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="summary">
+<a href="#pub-types">Public Types</a> &#124;
+<a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pub-attribs">Public Attributes</a> &#124;
+<a href="classfims__popdy_1_1CatchAtAge-members.html">List of all members</a>  </div>
+  <div class="headertitle"><div class="title">fims_popdy::CatchAtAge&lt; Type &gt; Class Template Reference</div></div>
+</div><!--header-->
+<div class="contents">
+
+<p><a class="el" href="classfims__popdy_1_1CatchAtAge.html" title="CatchAtAge is a class containing a catch-at-age model, which is just one of many potential fishery mo...">CatchAtAge</a> is a class containing a catch-at-age model, which is just one of many potential fishery models that can be used in FIMS. The <a class="el" href="classfims__popdy_1_1CatchAtAge.html" title="CatchAtAge is a class containing a catch-at-age model, which is just one of many potential fishery mo...">CatchAtAge</a> class inherits from the <a class="el" href="classfims__popdy_1_1FisheryModelBase.html" title="FisheryModelBase is a base class for fishery models in FIMS.">FisheryModelBase</a> class and can be used to fit both age and length data even though it is called <a class="el" href="classfims__popdy_1_1CatchAtAge.html" title="CatchAtAge is a class containing a catch-at-age model, which is just one of many potential fishery mo...">CatchAtAge</a>.  
+ <a href="classfims__popdy_1_1CatchAtAge.html#details">More...</a></p>
+
+<p><code>#include &lt;<a class="el" href="catch__at__age_8hpp_source.html">catch_at_age.hpp</a>&gt;</code></p>
+<div class="dynheader">
+Inheritance diagram for fims_popdy::CatchAtAge&lt; Type &gt;:</div>
+<div class="dyncontent">
+ <div class="center">
+  <img src="classfims__popdy_1_1CatchAtAge.png" usemap="#fims_5Fpopdy::CatchAtAge_3C_20Type_20_3E_map" alt=""/>
+  <map id="fims_5Fpopdy::CatchAtAge_3C_20Type_20_3E_map" name="fims_5Fpopdy::CatchAtAge_3C_20Type_20_3E_map">
+<area href="classfims__popdy_1_1FisheryModelBase.html" title="FisheryModelBase is a base class for fishery models in FIMS." alt="fims_popdy::FisheryModelBase&lt; Type &gt;" shape="rect" coords="0,56,240,80"/>
+<area href="structfims__model__object_1_1FIMSObject.html" title="FIMSObject struct that defines member types and returns the unique id." alt="fims_model_object::FIMSObject&lt; Type &gt;" shape="rect" coords="0,0,240,24"/>
+  </map>
+</div></div>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-types" name="pub-types"></a>
+Public Types</h2></td></tr>
+<tr class="memitem:a1149caa64c7cb14a93af4f87a3a01149" id="r_a1149caa64c7cb14a93af4f87a3a01149"><td class="memItemLeft" align="right" valign="top"><a id="a1149caa64c7cb14a93af4f87a3a01149" name="a1149caa64c7cb14a93af4f87a3a01149"></a>
+<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typedef</a> std::map&lt; std::string, <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt;::iterator&#160;</td><td class="memItemRight" valign="bottom"><b>derived_quantities_iterator</b></td></tr>
+<tr class="memdesc:a1149caa64c7cb14a93af4f87a3a01149"><td class="mdescLeft">&#160;</td><td class="mdescRight">Iterate the derived quantities. <br /></td></tr>
+<tr class="separator:a1149caa64c7cb14a93af4f87a3a01149"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a98f3ae923dc0c7ab2f7f171b1e8873c9" id="r_a98f3ae923dc0c7ab2f7f171b1e8873c9"><td class="memItemLeft" align="right" valign="top"><a id="a98f3ae923dc0c7ab2f7f171b1e8873c9" name="a98f3ae923dc0c7ab2f7f171b1e8873c9"></a>
+<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typedef</a> std::map&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a>, std::map&lt; std::string, <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt; &gt;::iterator&#160;</td><td class="memItemRight" valign="bottom"><b>fleet_derived_quantities_iterator</b></td></tr>
+<tr class="memdesc:a98f3ae923dc0c7ab2f7f171b1e8873c9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Used to iterate through fleet-based derived quantities. <br /></td></tr>
+<tr class="separator:a98f3ae923dc0c7ab2f7f171b1e8873c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad07ed62aee3a3421b83651cc53958d9b" id="r_ad07ed62aee3a3421b83651cc53958d9b"><td class="memItemLeft" align="right" valign="top"><a id="ad07ed62aee3a3421b83651cc53958d9b" name="ad07ed62aee3a3421b83651cc53958d9b"></a>
+<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typedef</a> std::map&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a>, std::map&lt; std::string, <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a> &gt; &gt; &gt;::iterator&#160;</td><td class="memItemRight" valign="bottom"><b>fleet_derived_quantities_dims_iterator</b></td></tr>
+<tr class="memdesc:ad07ed62aee3a3421b83651cc53958d9b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Used to iterate through fleet-based derived quantities dimensions. <br /></td></tr>
+<tr class="separator:ad07ed62aee3a3421b83651cc53958d9b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9a5f5b81f887323b99d648956c2f5add" id="r_a9a5f5b81f887323b99d648956c2f5add"><td class="memItemLeft" align="right" valign="top"><a id="a9a5f5b81f887323b99d648956c2f5add" name="a9a5f5b81f887323b99d648956c2f5add"></a>
+<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typedef</a> std::map&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a>, std::map&lt; std::string, <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt; &gt;::iterator&#160;</td><td class="memItemRight" valign="bottom"><b>population_derived_quantities_iterator</b></td></tr>
+<tr class="memdesc:a9a5f5b81f887323b99d648956c2f5add"><td class="mdescLeft">&#160;</td><td class="mdescRight">Used to iterate through population-based derived quantities. <br /></td></tr>
+<tr class="separator:a9a5f5b81f887323b99d648956c2f5add"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a39033cb8a870b03026ed01fb3d2683f1" id="r_a39033cb8a870b03026ed01fb3d2683f1"><td class="memItemLeft" align="right" valign="top"><a id="a39033cb8a870b03026ed01fb3d2683f1" name="a39033cb8a870b03026ed01fb3d2683f1"></a>
+<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typedef</a> std::map&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a>, std::map&lt; std::string, <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a> &gt; &gt; &gt;::iterator&#160;</td><td class="memItemRight" valign="bottom"><b>population_derived_quantities_dims_iterator</b></td></tr>
+<tr class="memdesc:a39033cb8a870b03026ed01fb3d2683f1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Used to iterate through population-based derived quantities dimensions. <br /></td></tr>
+<tr class="separator:a39033cb8a870b03026ed01fb3d2683f1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3c704d5d6890765f3e0582928c786add" id="r_a3c704d5d6890765f3e0582928c786add"><td class="memItemLeft" align="right" valign="top"><a id="a3c704d5d6890765f3e0582928c786add" name="a3c704d5d6890765f3e0582928c786add"></a>
+<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typedef</a> std::map&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a>, std::shared_ptr&lt; <a class="el" href="structfims__popdy_1_1Fleet.html">fims_popdy::Fleet</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt; &gt;::iterator&#160;</td><td class="memItemRight" valign="bottom"><b>fleet_iterator</b></td></tr>
+<tr class="memdesc:a3c704d5d6890765f3e0582928c786add"><td class="mdescLeft">&#160;</td><td class="mdescRight">Iterate through fleets. <br /></td></tr>
+<tr class="separator:a3c704d5d6890765f3e0582928c786add"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0970c0c3a324482decf4ce64eacef293" id="r_a0970c0c3a324482decf4ce64eacef293"><td class="memItemLeft" align="right" valign="top"><a id="a0970c0c3a324482decf4ce64eacef293" name="a0970c0c3a324482decf4ce64eacef293"></a>
+<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typedef</a> std::map&lt; std::string, <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt;::iterator&#160;</td><td class="memItemRight" valign="bottom"><b>dq_iterator</b></td></tr>
+<tr class="memdesc:a0970c0c3a324482decf4ce64eacef293"><td class="mdescLeft">&#160;</td><td class="mdescRight">Iterate through derived quantities. <br /></td></tr>
+<tr class="separator:a0970c0c3a324482decf4ce64eacef293"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pub_types_classfims__popdy_1_1FisheryModelBase"><td colspan="2" onclick="javascript:toggleInherit('pub_types_classfims__popdy_1_1FisheryModelBase')"><img src="closed.png" alt="-"/>&#160;Public Types inherited from <a class="el" href="classfims__popdy_1_1FisheryModelBase.html">fims_popdy::FisheryModelBase&lt; Type &gt;</a></td></tr>
+<tr class="memitem:a80ec8af64c49e7da16332427f4964382 inherit pub_types_classfims__popdy_1_1FisheryModelBase" id="r_a80ec8af64c49e7da16332427f4964382"><td class="memItemLeft" align="right" valign="top">
+<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typedef</a> std::map&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a>, std::shared_ptr&lt; <a class="el" href="structfims__popdy_1_1Fleet.html">fims_popdy::Fleet</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt; &gt;::iterator&#160;</td><td class="memItemRight" valign="bottom"><b>fleet_iterator</b></td></tr>
+<tr class="memdesc:a80ec8af64c49e7da16332427f4964382 inherit pub_types_classfims__popdy_1_1FisheryModelBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fleet-based iterator. <br /></td></tr>
+<tr class="separator:a80ec8af64c49e7da16332427f4964382 inherit pub_types_classfims__popdy_1_1FisheryModelBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1c7499d26ff106bb6a49e06bfb389fdf inherit pub_types_classfims__popdy_1_1FisheryModelBase" id="r_a1c7499d26ff106bb6a49e06bfb389fdf"><td class="memItemLeft" align="right" valign="top">
+<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typedef</a> std::map&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a>, std::map&lt; std::string, <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>DerivedQuantitiesMap</b></td></tr>
+<tr class="memdesc:a1c7499d26ff106bb6a49e06bfb389fdf inherit pub_types_classfims__popdy_1_1FisheryModelBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Type definitions for derived quantities and dimension information maps. <br /></td></tr>
+<tr class="separator:a1c7499d26ff106bb6a49e06bfb389fdf inherit pub_types_classfims__popdy_1_1FisheryModelBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a06dfbb97663ee69d7eb30823dfdbd481 inherit pub_types_classfims__popdy_1_1FisheryModelBase" id="r_a06dfbb97663ee69d7eb30823dfdbd481"><td class="memItemLeft" align="right" valign="top">
+<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typedef</a> DerivedQuantitiesMap::iterator&#160;</td><td class="memItemRight" valign="bottom"><b>DerivedQuantitiesMapIterator</b></td></tr>
+<tr class="memdesc:a06dfbb97663ee69d7eb30823dfdbd481 inherit pub_types_classfims__popdy_1_1FisheryModelBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Iterator for the derived quantities map. <br /></td></tr>
+<tr class="separator:a06dfbb97663ee69d7eb30823dfdbd481 inherit pub_types_classfims__popdy_1_1FisheryModelBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5d46305b9a669a2e848c260e48380e16 inherit pub_types_classfims__popdy_1_1FisheryModelBase" id="r_a5d46305b9a669a2e848c260e48380e16"><td class="memItemLeft" align="right" valign="top">
+<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typedef</a> std::map&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a>, std::map&lt; std::string, <a class="el" href="structfims__popdy_1_1DimensionInfo.html">DimensionInfo</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>DimensionInfoMap</b></td></tr>
+<tr class="memdesc:a5d46305b9a669a2e848c260e48380e16 inherit pub_types_classfims__popdy_1_1FisheryModelBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Type definitions for dimension information maps. <br /></td></tr>
+<tr class="separator:a5d46305b9a669a2e848c260e48380e16 inherit pub_types_classfims__popdy_1_1FisheryModelBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7040d2c5bdca6bb3789f99bc7fb870f9 inherit pub_types_classfims__popdy_1_1FisheryModelBase" id="r_a7040d2c5bdca6bb3789f99bc7fb870f9"><td class="memItemLeft" align="right" valign="top">
+<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typedef</a> std::map&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a>, std::map&lt; std::string, <a class="el" href="structfims__popdy_1_1UncertaintyReportInfo.html">UncertaintyReportInfo</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>UncertaintyReportInfoMap</b></td></tr>
+<tr class="memdesc:a7040d2c5bdca6bb3789f99bc7fb870f9 inherit pub_types_classfims__popdy_1_1FisheryModelBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Type definition for the uncertainty report information map. <br /></td></tr>
+<tr class="separator:a7040d2c5bdca6bb3789f99bc7fb870f9 inherit pub_types_classfims__popdy_1_1FisheryModelBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
+Public Member Functions</h2></td></tr>
+<tr class="memitem:a7830c8f82e8a6158f83d4a765379ddf3" id="r_a7830c8f82e8a6158f83d4a765379ddf3"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__popdy_1_1CatchAtAge.html#a7830c8f82e8a6158f83d4a765379ddf3">CatchAtAge</a> ()</td></tr>
+<tr class="separator:a7830c8f82e8a6158f83d4a765379ddf3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6c621a6bc7cada49166db5fc96f32726" id="r_a6c621a6bc7cada49166db5fc96f32726"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__popdy_1_1CatchAtAge.html#a6c621a6bc7cada49166db5fc96f32726">CatchAtAge</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="classfims__popdy_1_1CatchAtAge.html">CatchAtAge</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">other</a>)</td></tr>
+<tr class="memdesc:a6c621a6bc7cada49166db5fc96f32726"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy constructor for the <a class="el" href="classfims__popdy_1_1CatchAtAge.html" title="CatchAtAge is a class containing a catch-at-age model, which is just one of many potential fishery mo...">CatchAtAge</a> class.  <br /></td></tr>
+<tr class="separator:a6c621a6bc7cada49166db5fc96f32726"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a670f526cd413fda8214e14e9cebcc18b" id="r_a670f526cd413fda8214e14e9cebcc18b"><td class="memItemLeft" align="right" valign="top"><a id="a670f526cd413fda8214e14e9cebcc18b" name="a670f526cd413fda8214e14e9cebcc18b"></a>
+<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">virtual</a>&#160;</td><td class="memItemRight" valign="bottom"><b>~CatchAtAge</b> ()</td></tr>
+<tr class="memdesc:a670f526cd413fda8214e14e9cebcc18b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destroy the Catch At Age object. <br /></td></tr>
+<tr class="separator:a670f526cd413fda8214e14e9cebcc18b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1aa9b74e3ec96502d6b74c0b659c278c" id="r_a1aa9b74e3ec96502d6b74c0b659c278c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">virtual</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__popdy_1_1CatchAtAge.html#a1aa9b74e3ec96502d6b74c0b659c278c">Initialize</a> ()</td></tr>
+<tr class="separator:a1aa9b74e3ec96502d6b74c0b659c278c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af0d27bcf828a778e839f3a8658c52135" id="r_af0d27bcf828a778e839f3a8658c52135"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">virtual</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__popdy_1_1CatchAtAge.html#af0d27bcf828a778e839f3a8658c52135">Prepare</a> ()</td></tr>
+<tr class="separator:af0d27bcf828a778e839f3a8658c52135"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac0b5da9501f105543cdd50f067d11da5" id="r_ac0b5da9501f105543cdd50f067d11da5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__popdy_1_1CatchAtAge.html#ac0b5da9501f105543cdd50f067d11da5">AddPopulation</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a> id)</td></tr>
+<tr class="separator:ac0b5da9501f105543cdd50f067d11da5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a382a4867d21c9d9bf78534e3f4a29217" id="r_a382a4867d21c9d9bf78534e3f4a29217"><td class="memItemLeft" align="right" valign="top"><a id="a382a4867d21c9d9bf78534e3f4a29217" name="a382a4867d21c9d9bf78534e3f4a29217"></a>
+std::set&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a> &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>GetPopulationIds</b> ()</td></tr>
+<tr class="memdesc:a382a4867d21c9d9bf78534e3f4a29217"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the population ids of the model. <br /></td></tr>
+<tr class="separator:a382a4867d21c9d9bf78534e3f4a29217"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aca027997da78686a12f60bd6f26f40ea" id="r_aca027997da78686a12f60bd6f26f40ea"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::shared_ptr&lt; <a class="el" href="structfims__popdy_1_1Population.html">fims_popdy::Population</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt; &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__popdy_1_1CatchAtAge.html#aca027997da78686a12f60bd6f26f40ea">GetPopulations</a> ()</td></tr>
+<tr class="separator:aca027997da78686a12f60bd6f26f40ea"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aef21eca36133b6a5769ec676050a73d2" id="r_aef21eca36133b6a5769ec676050a73d2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__popdy_1_1CatchAtAge.html#aef21eca36133b6a5769ec676050a73d2">CalculateInitialNumbersAA</a> (std::shared_ptr&lt; <a class="el" href="structfims__popdy_1_1Population.html">fims_popdy::Population</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt; &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">population</a>, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">i_age_year</a>, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">age</a>)</td></tr>
+<tr class="memdesc:aef21eca36133b6a5769ec676050a73d2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculates initial numbers at age for index and age.  <br /></td></tr>
+<tr class="separator:aef21eca36133b6a5769ec676050a73d2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9e5877ce7cc9b2093b14f0e5c5895674" id="r_a9e5877ce7cc9b2093b14f0e5c5895674"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__popdy_1_1CatchAtAge.html#a9e5877ce7cc9b2093b14f0e5c5895674">CalculateNumbersAA</a> (std::shared_ptr&lt; <a class="el" href="structfims__popdy_1_1Population.html">fims_popdy::Population</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt; &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">population</a>, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">i_age_year</a>, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">i_agem1_yearm1</a>, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">age</a>)</td></tr>
+<tr class="memdesc:a9e5877ce7cc9b2093b14f0e5c5895674"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculates numbers at age for a population.  <br /></td></tr>
+<tr class="separator:a9e5877ce7cc9b2093b14f0e5c5895674"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2876a340cab1830aff6110b8739d7e01" id="r_a2876a340cab1830aff6110b8739d7e01"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__popdy_1_1CatchAtAge.html#a2876a340cab1830aff6110b8739d7e01">CalculateUnfishedNumbersAA</a> (std::shared_ptr&lt; <a class="el" href="structfims__popdy_1_1Population.html">fims_popdy::Population</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt; &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">population</a>, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">i_age_year</a>, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">i_agem1_yearm1</a>, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">age</a>)</td></tr>
+<tr class="memdesc:a2876a340cab1830aff6110b8739d7e01"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculates unfished numbers at age at year and age specific indices.  <br /></td></tr>
+<tr class="separator:a2876a340cab1830aff6110b8739d7e01"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:addf4f18252cba85c7b770a215d828f02" id="r_addf4f18252cba85c7b770a215d828f02"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__popdy_1_1CatchAtAge.html#addf4f18252cba85c7b770a215d828f02">CalculateMortality</a> (std::shared_ptr&lt; <a class="el" href="structfims__popdy_1_1Population.html">fims_popdy::Population</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt; &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">population</a>, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">i_age_year</a>, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">year</a>, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">age</a>)</td></tr>
+<tr class="memdesc:addf4f18252cba85c7b770a215d828f02"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculates total mortality for a population.  <br /></td></tr>
+<tr class="separator:addf4f18252cba85c7b770a215d828f02"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2a20ec050477f0e1c4de7780459f9aec" id="r_a2a20ec050477f0e1c4de7780459f9aec"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__popdy_1_1CatchAtAge.html#a2a20ec050477f0e1c4de7780459f9aec">CalculateBiomass</a> (std::shared_ptr&lt; <a class="el" href="structfims__popdy_1_1Population.html">fims_popdy::Population</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt; &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">population</a>, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">i_age_year</a>, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">year</a>, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">age</a>)</td></tr>
+<tr class="memdesc:a2a20ec050477f0e1c4de7780459f9aec"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculates biomass for a population.  <br /></td></tr>
+<tr class="separator:a2a20ec050477f0e1c4de7780459f9aec"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a96fd50ab465e1028eb608d05bf3e5137" id="r_a96fd50ab465e1028eb608d05bf3e5137"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__popdy_1_1CatchAtAge.html#a96fd50ab465e1028eb608d05bf3e5137">CalculateUnfishedBiomass</a> (std::shared_ptr&lt; <a class="el" href="structfims__popdy_1_1Population.html">fims_popdy::Population</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt; &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">population</a>, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">i_age_year</a>, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">year</a>, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">age</a>)</td></tr>
+<tr class="memdesc:a96fd50ab465e1028eb608d05bf3e5137"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculates the unfished biomass for a population.  <br /></td></tr>
+<tr class="separator:a96fd50ab465e1028eb608d05bf3e5137"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a739bfeeb1135d24fda13ea87d7ba7c4c" id="r_a739bfeeb1135d24fda13ea87d7ba7c4c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__popdy_1_1CatchAtAge.html#a739bfeeb1135d24fda13ea87d7ba7c4c">CalculateSpawningBiomass</a> (std::shared_ptr&lt; <a class="el" href="structfims__popdy_1_1Population.html">fims_popdy::Population</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt; &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">population</a>, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">i_age_year</a>, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">year</a>, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">age</a>)</td></tr>
+<tr class="memdesc:a739bfeeb1135d24fda13ea87d7ba7c4c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculates spawning biomass for a population.  <br /></td></tr>
+<tr class="separator:a739bfeeb1135d24fda13ea87d7ba7c4c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8f410d2daae27b9aaaf7c6a32f57ab49" id="r_a8f410d2daae27b9aaaf7c6a32f57ab49"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__popdy_1_1CatchAtAge.html#a8f410d2daae27b9aaaf7c6a32f57ab49">CalculateUnfishedSpawningBiomass</a> (std::shared_ptr&lt; <a class="el" href="structfims__popdy_1_1Population.html">fims_popdy::Population</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt; &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">population</a>, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">i_age_year</a>, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">year</a>, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">age</a>)</td></tr>
+<tr class="memdesc:a8f410d2daae27b9aaaf7c6a32f57ab49"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculated unfished spawning biomass for a population.  <br /></td></tr>
+<tr class="separator:a8f410d2daae27b9aaaf7c6a32f57ab49"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a037e412d2183c0a23ad3410f6b222ef1" id="r_a037e412d2183c0a23ad3410f6b222ef1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__popdy_1_1CatchAtAge.html#a037e412d2183c0a23ad3410f6b222ef1">CalculateSpawningBiomassRatio</a> (std::shared_ptr&lt; <a class="el" href="structfims__popdy_1_1Population.html">fims_popdy::Population</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt; &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">population</a>, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">year</a>)</td></tr>
+<tr class="memdesc:a037e412d2183c0a23ad3410f6b222ef1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate the spawning biomass ratio for a population and year.  <br /></td></tr>
+<tr class="separator:a037e412d2183c0a23ad3410f6b222ef1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a15b4b7b778b0812fa9ea81e81571a877" id="r_a15b4b7b778b0812fa9ea81e81571a877"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__popdy_1_1CatchAtAge.html#a15b4b7b778b0812fa9ea81e81571a877">CalculateSBPR0</a> (std::shared_ptr&lt; <a class="el" href="structfims__popdy_1_1Population.html">fims_popdy::Population</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt; &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">population</a>)</td></tr>
+<tr class="memdesc:a15b4b7b778b0812fa9ea81e81571a877"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculates equilibrium spawning biomass per recruit.  <br /></td></tr>
+<tr class="separator:a15b4b7b778b0812fa9ea81e81571a877"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab3f51eeed2e951400a81fbd8c32b458e" id="r_ab3f51eeed2e951400a81fbd8c32b458e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__popdy_1_1CatchAtAge.html#ab3f51eeed2e951400a81fbd8c32b458e">CalculateRecruitment</a> (std::shared_ptr&lt; <a class="el" href="structfims__popdy_1_1Population.html">fims_popdy::Population</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt; &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">population</a>, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">i_age_year</a>, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">year</a>, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">i_dev</a>)</td></tr>
+<tr class="memdesc:ab3f51eeed2e951400a81fbd8c32b458e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculates expected recruitment for a population.  <br /></td></tr>
+<tr class="separator:ab3f51eeed2e951400a81fbd8c32b458e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a996fba214e1f3601324ec06ed924d09b" id="r_a996fba214e1f3601324ec06ed924d09b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__popdy_1_1CatchAtAge.html#a996fba214e1f3601324ec06ed924d09b">CalculateMaturityAA</a> (std::shared_ptr&lt; <a class="el" href="structfims__popdy_1_1Population.html">fims_popdy::Population</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt; &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">population</a>, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">i_age_year</a>, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">age</a>)</td></tr>
+<tr class="memdesc:a996fba214e1f3601324ec06ed924d09b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculates maturity at age, in proportion, for a population.  <br /></td></tr>
+<tr class="separator:a996fba214e1f3601324ec06ed924d09b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad8e81e9a6d6f819a2c3fb78367ecfea4" id="r_ad8e81e9a6d6f819a2c3fb78367ecfea4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__popdy_1_1CatchAtAge.html#ad8e81e9a6d6f819a2c3fb78367ecfea4">CalculateLandings</a> (std::shared_ptr&lt; <a class="el" href="structfims__popdy_1_1Population.html">fims_popdy::Population</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt; &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">population</a>, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">year</a>, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">age</a>)</td></tr>
+<tr class="memdesc:ad8e81e9a6d6f819a2c3fb78367ecfea4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculates total catch (landings) by fleet and population for a given year by aggregating age-specific catch over ages.  <br /></td></tr>
+<tr class="separator:ad8e81e9a6d6f819a2c3fb78367ecfea4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac1003ebcd348e09e945cb4f55fce4ae9" id="r_ac1003ebcd348e09e945cb4f55fce4ae9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__popdy_1_1CatchAtAge.html#ac1003ebcd348e09e945cb4f55fce4ae9">CalculateLandingsWeightAA</a> (std::shared_ptr&lt; <a class="el" href="structfims__popdy_1_1Population.html">fims_popdy::Population</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt; &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">population</a>, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">year</a>, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">age</a>)</td></tr>
+<tr class="memdesc:ac1003ebcd348e09e945cb4f55fce4ae9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculates weight at age of the landings for a given fleet from a population.  <br /></td></tr>
+<tr class="separator:ac1003ebcd348e09e945cb4f55fce4ae9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa01ecd33d4d19d03cc4b31b3049f87d9" id="r_aa01ecd33d4d19d03cc4b31b3049f87d9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__popdy_1_1CatchAtAge.html#aa01ecd33d4d19d03cc4b31b3049f87d9">CalculateLandingsNumbersAA</a> (std::shared_ptr&lt; <a class="el" href="structfims__popdy_1_1Population.html">fims_popdy::Population</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt; &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">population</a>, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">i_age_year</a>, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">year</a>, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">age</a>)</td></tr>
+<tr class="memdesc:aa01ecd33d4d19d03cc4b31b3049f87d9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculates numbers of fish for the landings for a given fleet from a population, year and age.  <br /></td></tr>
+<tr class="separator:aa01ecd33d4d19d03cc4b31b3049f87d9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a901059284bb502abd0f6a8f9252a275d" id="r_a901059284bb502abd0f6a8f9252a275d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__popdy_1_1CatchAtAge.html#a901059284bb502abd0f6a8f9252a275d">CalculateIndex</a> (std::shared_ptr&lt; <a class="el" href="structfims__popdy_1_1Population.html">fims_popdy::Population</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt; &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">population</a>, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">i_age_year</a>, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">year</a>, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">age</a>)</td></tr>
+<tr class="memdesc:a901059284bb502abd0f6a8f9252a275d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculates the index for a fleet from a population.  <br /></td></tr>
+<tr class="separator:a901059284bb502abd0f6a8f9252a275d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adfbcd55d8179b561d3d4e788fa63e661" id="r_adfbcd55d8179b561d3d4e788fa63e661"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__popdy_1_1CatchAtAge.html#adfbcd55d8179b561d3d4e788fa63e661">CalculateIndexNumbersAA</a> (std::shared_ptr&lt; <a class="el" href="structfims__popdy_1_1Population.html">fims_popdy::Population</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt; &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">population</a>, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">i_age_year</a>, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">year</a>, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">age</a>)</td></tr>
+<tr class="memdesc:adfbcd55d8179b561d3d4e788fa63e661"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculates the numbers for the index for a fleet from a population.  <br /></td></tr>
+<tr class="separator:adfbcd55d8179b561d3d4e788fa63e661"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a498396134f360e7243f0eb5605360a20" id="r_a498396134f360e7243f0eb5605360a20"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__popdy_1_1CatchAtAge.html#a498396134f360e7243f0eb5605360a20">CalculateIndexWeightAA</a> (std::shared_ptr&lt; <a class="el" href="structfims__popdy_1_1Population.html">fims_popdy::Population</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt; &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">population</a>, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">year</a>, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">age</a>)</td></tr>
+<tr class="memdesc:a498396134f360e7243f0eb5605360a20"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculates biomass of fish for the index for a given fleet from a population.  <br /></td></tr>
+<tr class="separator:a498396134f360e7243f0eb5605360a20"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4b7f463cdd464efc2c056a5b8328cec8" id="r_a4b7f463cdd464efc2c056a5b8328cec8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__popdy_1_1CatchAtAge.html#a4b7f463cdd464efc2c056a5b8328cec8">evaluate_age_comp</a> ()</td></tr>
+<tr class="separator:a4b7f463cdd464efc2c056a5b8328cec8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6270771e42f11407eb87b099087b1b55" id="r_a6270771e42f11407eb87b099087b1b55"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__popdy_1_1CatchAtAge.html#a6270771e42f11407eb87b099087b1b55">evaluate_length_comp</a> ()</td></tr>
+<tr class="separator:a6270771e42f11407eb87b099087b1b55"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afd9d2e41729f03ac80fd1d449bb6d8f9" id="r_afd9d2e41729f03ac80fd1d449bb6d8f9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__popdy_1_1CatchAtAge.html#afd9d2e41729f03ac80fd1d449bb6d8f9">evaluate_index</a> ()</td></tr>
+<tr class="separator:afd9d2e41729f03ac80fd1d449bb6d8f9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab529865b281351f69678c6fe31df1607" id="r_ab529865b281351f69678c6fe31df1607"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__popdy_1_1CatchAtAge.html#ab529865b281351f69678c6fe31df1607">evaluate_landings</a> ()</td></tr>
+<tr class="separator:ab529865b281351f69678c6fe31df1607"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a84c67ee2edf996a8f3cf736801a6eeb6" id="r_a84c67ee2edf996a8f3cf736801a6eeb6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">virtual</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__popdy_1_1CatchAtAge.html#a84c67ee2edf996a8f3cf736801a6eeb6">Evaluate</a> ()</td></tr>
+<tr class="memdesc:a84c67ee2edf996a8f3cf736801a6eeb6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate the model.  <br /></td></tr>
+<tr class="separator:a84c67ee2edf996a8f3cf736801a6eeb6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abf6dab88981668c7bf763590fa2ad43d" id="r_abf6dab88981668c7bf763590fa2ad43d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">virtual</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__popdy_1_1CatchAtAge.html#abf6dab88981668c7bf763590fa2ad43d">Report</a> ()</td></tr>
+<tr class="separator:abf6dab88981668c7bf763590fa2ad43d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pub_methods_classfims__popdy_1_1FisheryModelBase"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classfims__popdy_1_1FisheryModelBase')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classfims__popdy_1_1FisheryModelBase.html">fims_popdy::FisheryModelBase&lt; Type &gt;</a></td></tr>
+<tr class="memitem:a0e02fc17d15175fae2381ff6be0a05a9 inherit pub_methods_classfims__popdy_1_1FisheryModelBase" id="r_a0e02fc17d15175fae2381ff6be0a05a9"><td class="memItemLeft" align="right" valign="top">
+&#160;</td><td class="memItemRight" valign="bottom"><b>FisheryModelBase</b> ()</td></tr>
+<tr class="memdesc:a0e02fc17d15175fae2381ff6be0a05a9 inherit pub_methods_classfims__popdy_1_1FisheryModelBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a new Fishery Model Base object. <br /></td></tr>
+<tr class="separator:a0e02fc17d15175fae2381ff6be0a05a9 inherit pub_methods_classfims__popdy_1_1FisheryModelBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a294b383d2ffbbfead3a45550f705d6a9 inherit pub_methods_classfims__popdy_1_1FisheryModelBase" id="r_a294b383d2ffbbfead3a45550f705d6a9"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__popdy_1_1FisheryModelBase.html#a294b383d2ffbbfead3a45550f705d6a9">FisheryModelBase</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="classfims__popdy_1_1FisheryModelBase.html">FisheryModelBase</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">other</a>)</td></tr>
+<tr class="memdesc:a294b383d2ffbbfead3a45550f705d6a9 inherit pub_methods_classfims__popdy_1_1FisheryModelBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a new Fishery Model Base object.  <br /></td></tr>
+<tr class="separator:a294b383d2ffbbfead3a45550f705d6a9 inherit pub_methods_classfims__popdy_1_1FisheryModelBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5e4291cd1b6aa8835e005299659053a7 inherit pub_methods_classfims__popdy_1_1FisheryModelBase" id="r_a5e4291cd1b6aa8835e005299659053a7"><td class="memItemLeft" align="right" valign="top">
+<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">virtual</a>&#160;</td><td class="memItemRight" valign="bottom"><b>~FisheryModelBase</b> ()</td></tr>
+<tr class="memdesc:a5e4291cd1b6aa8835e005299659053a7 inherit pub_methods_classfims__popdy_1_1FisheryModelBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destroy the Fishery Model Base object. <br /></td></tr>
+<tr class="separator:a5e4291cd1b6aa8835e005299659053a7 inherit pub_methods_classfims__popdy_1_1FisheryModelBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae08a3a60d70f76854d53a4c5feac3db8 inherit pub_methods_classfims__popdy_1_1FisheryModelBase" id="r_ae08a3a60d70f76854d53a4c5feac3db8"><td class="memItemLeft" align="right" valign="top">std::map&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a>, std::map&lt; std::string, <a class="el" href="structfims__popdy_1_1DimensionInfo.html">DimensionInfo</a> &gt; &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__popdy_1_1FisheryModelBase.html#ae08a3a60d70f76854d53a4c5feac3db8">GetFleetDimensionInfo</a> ()</td></tr>
+<tr class="memdesc:ae08a3a60d70f76854d53a4c5feac3db8 inherit pub_methods_classfims__popdy_1_1FisheryModelBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the fleet dimension information.  <br /></td></tr>
+<tr class="separator:ae08a3a60d70f76854d53a4c5feac3db8 inherit pub_methods_classfims__popdy_1_1FisheryModelBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a75833099950f2296ffb1bec7342e5833 inherit pub_methods_classfims__popdy_1_1FisheryModelBase" id="r_a75833099950f2296ffb1bec7342e5833"><td class="memItemLeft" align="right" valign="top">std::map&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a>, std::map&lt; std::string, <a class="el" href="structfims__popdy_1_1DimensionInfo.html">DimensionInfo</a> &gt; &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__popdy_1_1FisheryModelBase.html#a75833099950f2296ffb1bec7342e5833">GetPopulationDimensionInfo</a> ()</td></tr>
+<tr class="memdesc:a75833099950f2296ffb1bec7342e5833 inherit pub_methods_classfims__popdy_1_1FisheryModelBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the population dimension information.  <br /></td></tr>
+<tr class="separator:a75833099950f2296ffb1bec7342e5833 inherit pub_methods_classfims__popdy_1_1FisheryModelBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4572a21c5fbcbe2e53a282c4aeed36dc inherit pub_methods_classfims__popdy_1_1FisheryModelBase" id="r_a4572a21c5fbcbe2e53a282c4aeed36dc"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classfims__popdy_1_1FisheryModelBase.html#a1c7499d26ff106bb6a49e06bfb389fdf">DerivedQuantitiesMap</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__popdy_1_1FisheryModelBase.html#a4572a21c5fbcbe2e53a282c4aeed36dc">GetFleetDerivedQuantities</a> ()</td></tr>
+<tr class="memdesc:a4572a21c5fbcbe2e53a282c4aeed36dc inherit pub_methods_classfims__popdy_1_1FisheryModelBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the fleet derived quantities.  <br /></td></tr>
+<tr class="separator:a4572a21c5fbcbe2e53a282c4aeed36dc inherit pub_methods_classfims__popdy_1_1FisheryModelBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a983f8cfc4b5d370a2c79cec270734fda inherit pub_methods_classfims__popdy_1_1FisheryModelBase" id="r_a983f8cfc4b5d370a2c79cec270734fda"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classfims__popdy_1_1FisheryModelBase.html#a1c7499d26ff106bb6a49e06bfb389fdf">DerivedQuantitiesMap</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__popdy_1_1FisheryModelBase.html#a983f8cfc4b5d370a2c79cec270734fda">GetPopulationDerivedQuantities</a> ()</td></tr>
+<tr class="memdesc:a983f8cfc4b5d370a2c79cec270734fda inherit pub_methods_classfims__popdy_1_1FisheryModelBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the population derived quantities.  <br /></td></tr>
+<tr class="separator:a983f8cfc4b5d370a2c79cec270734fda inherit pub_methods_classfims__popdy_1_1FisheryModelBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4baf2334e5a8320f46dddbb10ed66240 inherit pub_methods_classfims__popdy_1_1FisheryModelBase" id="r_a4baf2334e5a8320f46dddbb10ed66240"><td class="memItemLeft" align="right" valign="top">std::map&lt; std::string, <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__popdy_1_1FisheryModelBase.html#a4baf2334e5a8320f46dddbb10ed66240">GetFleetDerivedQuantities</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">fleet_id</a>)</td></tr>
+<tr class="memdesc:a4baf2334e5a8320f46dddbb10ed66240 inherit pub_methods_classfims__popdy_1_1FisheryModelBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the fleet derived quantities for a specified fleet.  <br /></td></tr>
+<tr class="separator:a4baf2334e5a8320f46dddbb10ed66240 inherit pub_methods_classfims__popdy_1_1FisheryModelBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a490871dc32791518446e9ae8945e7975 inherit pub_methods_classfims__popdy_1_1FisheryModelBase" id="r_a490871dc32791518446e9ae8945e7975"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__popdy_1_1FisheryModelBase.html#a490871dc32791518446e9ae8945e7975">InitializeFleetDerivedQuantities</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">fleet_id</a>)</td></tr>
+<tr class="memdesc:a490871dc32791518446e9ae8945e7975 inherit pub_methods_classfims__popdy_1_1FisheryModelBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the derived quantities map for a fleet.  <br /></td></tr>
+<tr class="separator:a490871dc32791518446e9ae8945e7975 inherit pub_methods_classfims__popdy_1_1FisheryModelBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a417287180a5d40eb17282a190c3ac8db inherit pub_methods_classfims__popdy_1_1FisheryModelBase" id="r_a417287180a5d40eb17282a190c3ac8db"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__popdy_1_1FisheryModelBase.html#a417287180a5d40eb17282a190c3ac8db">InitializePopulationDerivedQuantities</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">population_id</a>)</td></tr>
+<tr class="memdesc:a417287180a5d40eb17282a190c3ac8db inherit pub_methods_classfims__popdy_1_1FisheryModelBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the derived quantities map for a population.  <br /></td></tr>
+<tr class="separator:a417287180a5d40eb17282a190c3ac8db inherit pub_methods_classfims__popdy_1_1FisheryModelBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4f154744d1e34692b7db06fd43fed8c9 inherit pub_methods_classfims__popdy_1_1FisheryModelBase" id="r_a4f154744d1e34692b7db06fd43fed8c9"><td class="memItemLeft" align="right" valign="top">std::map&lt; std::string, <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__popdy_1_1FisheryModelBase.html#a4f154744d1e34692b7db06fd43fed8c9">GetPopulationDerivedQuantities</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">population_id</a>)</td></tr>
+<tr class="memdesc:a4f154744d1e34692b7db06fd43fed8c9 inherit pub_methods_classfims__popdy_1_1FisheryModelBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the population derived quantities for a specified population.  <br /></td></tr>
+<tr class="separator:a4f154744d1e34692b7db06fd43fed8c9 inherit pub_methods_classfims__popdy_1_1FisheryModelBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5ea0d2740b2cac0ec4d54401fbd52c8c inherit pub_methods_classfims__popdy_1_1FisheryModelBase" id="r_a5ea0d2740b2cac0ec4d54401fbd52c8c"><td class="memItemLeft" align="right" valign="top">std::map&lt; std::string, <a class="el" href="structfims__popdy_1_1DimensionInfo.html">DimensionInfo</a> &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__popdy_1_1FisheryModelBase.html#a5ea0d2740b2cac0ec4d54401fbd52c8c">GetFleetDimensionInfo</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">fleet_id</a>)</td></tr>
+<tr class="memdesc:a5ea0d2740b2cac0ec4d54401fbd52c8c inherit pub_methods_classfims__popdy_1_1FisheryModelBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the fleet dimension information for a specified fleet.  <br /></td></tr>
+<tr class="separator:a5ea0d2740b2cac0ec4d54401fbd52c8c inherit pub_methods_classfims__popdy_1_1FisheryModelBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a526ba6a0d8c53287ef6a78bf832b5139 inherit pub_methods_classfims__popdy_1_1FisheryModelBase" id="r_a526ba6a0d8c53287ef6a78bf832b5139"><td class="memItemLeft" align="right" valign="top">std::map&lt; std::string, <a class="el" href="structfims__popdy_1_1DimensionInfo.html">DimensionInfo</a> &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__popdy_1_1FisheryModelBase.html#a526ba6a0d8c53287ef6a78bf832b5139">GetPopulationDimensionInfo</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">population_id</a>)</td></tr>
+<tr class="memdesc:a526ba6a0d8c53287ef6a78bf832b5139 inherit pub_methods_classfims__popdy_1_1FisheryModelBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the population dimension information for a specified population.  <br /></td></tr>
+<tr class="separator:a526ba6a0d8c53287ef6a78bf832b5139 inherit pub_methods_classfims__popdy_1_1FisheryModelBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae8531a3a6bfe251523a7fb103cc66639 inherit pub_methods_classfims__popdy_1_1FisheryModelBase" id="r_ae8531a3a6bfe251523a7fb103cc66639"><td class="memItemLeft" align="right" valign="top">
+<a class="el" href="classfims__popdy_1_1FisheryModelBase.html#a7040d2c5bdca6bb3789f99bc7fb870f9">UncertaintyReportInfoMap</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>GetFleetUncertaintyReportInfo</b> ()</td></tr>
+<tr class="memdesc:ae8531a3a6bfe251523a7fb103cc66639 inherit pub_methods_classfims__popdy_1_1FisheryModelBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the fleet uncertainty report information. <br /></td></tr>
+<tr class="separator:ae8531a3a6bfe251523a7fb103cc66639 inherit pub_methods_classfims__popdy_1_1FisheryModelBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a04cf695f64cf2f900f82ba2a66a9f1d2 inherit pub_methods_classfims__popdy_1_1FisheryModelBase" id="r_a04cf695f64cf2f900f82ba2a66a9f1d2"><td class="memItemLeft" align="right" valign="top">
+<a class="el" href="classfims__popdy_1_1FisheryModelBase.html#a7040d2c5bdca6bb3789f99bc7fb870f9">UncertaintyReportInfoMap</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>GetPopulationUncertaintyReportInfo</b> ()</td></tr>
+<tr class="memdesc:a04cf695f64cf2f900f82ba2a66a9f1d2 inherit pub_methods_classfims__popdy_1_1FisheryModelBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the population uncertainty report information. <br /></td></tr>
+<tr class="separator:a04cf695f64cf2f900f82ba2a66a9f1d2 inherit pub_methods_classfims__popdy_1_1FisheryModelBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a89bd7b7543f648441e8051046fb616f9 inherit pub_methods_classfims__popdy_1_1FisheryModelBase" id="r_a89bd7b7543f648441e8051046fb616f9"><td class="memItemLeft" align="right" valign="top">std::map&lt; std::string, <a class="el" href="structfims__popdy_1_1UncertaintyReportInfo.html">UncertaintyReportInfo</a> &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__popdy_1_1FisheryModelBase.html#a89bd7b7543f648441e8051046fb616f9">GetFleetUncertaintyReportInfo</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">fleet_id</a>)</td></tr>
+<tr class="memdesc:a89bd7b7543f648441e8051046fb616f9 inherit pub_methods_classfims__popdy_1_1FisheryModelBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the fleet uncertainty report information for a specified fleet.  <br /></td></tr>
+<tr class="separator:a89bd7b7543f648441e8051046fb616f9 inherit pub_methods_classfims__popdy_1_1FisheryModelBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7f00fd7c32fdd75cc11e3aede8a41cfc inherit pub_methods_classfims__popdy_1_1FisheryModelBase" id="r_a7f00fd7c32fdd75cc11e3aede8a41cfc"><td class="memItemLeft" align="right" valign="top">std::map&lt; std::string, <a class="el" href="structfims__popdy_1_1UncertaintyReportInfo.html">UncertaintyReportInfo</a> &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__popdy_1_1FisheryModelBase.html#a7f00fd7c32fdd75cc11e3aede8a41cfc">GetPopulationUncertaintyReportInfo</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">population_id</a>)</td></tr>
+<tr class="memdesc:a7f00fd7c32fdd75cc11e3aede8a41cfc inherit pub_methods_classfims__popdy_1_1FisheryModelBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the population uncertainty report information for a specified population.  <br /></td></tr>
+<tr class="separator:a7f00fd7c32fdd75cc11e3aede8a41cfc inherit pub_methods_classfims__popdy_1_1FisheryModelBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab755a0916428375053ade26191ff76a0 inherit pub_methods_classfims__popdy_1_1FisheryModelBase" id="r_ab755a0916428375053ade26191ff76a0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">virtual</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__popdy_1_1FisheryModelBase.html#ab755a0916428375053ade26191ff76a0">ResetVector</a> (<a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">v</a>, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> value=0.0)</td></tr>
+<tr class="memdesc:ab755a0916428375053ade26191ff76a0 inherit pub_methods_classfims__popdy_1_1FisheryModelBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reset a vector from start to end with a value.  <br /></td></tr>
+<tr class="separator:ab755a0916428375053ade26191ff76a0 inherit pub_methods_classfims__popdy_1_1FisheryModelBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a051594cf3073d2221962833733167ff3 inherit pub_methods_classfims__popdy_1_1FisheryModelBase" id="r_a051594cf3073d2221962833733167ff3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__popdy_1_1FisheryModelBase.html#a051594cf3073d2221962833733167ff3">GetId</a> ()</td></tr>
+<tr class="memdesc:a051594cf3073d2221962833733167ff3 inherit pub_methods_classfims__popdy_1_1FisheryModelBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Id object.  <br /></td></tr>
+<tr class="separator:a051594cf3073d2221962833733167ff3 inherit pub_methods_classfims__popdy_1_1FisheryModelBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pub_methods_structfims__model__object_1_1FIMSObject"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_structfims__model__object_1_1FIMSObject')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="structfims__model__object_1_1FIMSObject.html">fims_model_object::FIMSObject&lt; Type &gt;</a></td></tr>
+<tr class="memitem:a7f1a6d1474f8ad7d8b460ce889ee6ebd inherit pub_methods_structfims__model__object_1_1FIMSObject" id="r_a7f1a6d1474f8ad7d8b460ce889ee6ebd"><td class="memItemLeft" align="right" valign="top">
+<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a>&#160;</td><td class="memItemRight" valign="bottom"><b>GetId</b> () <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a></td></tr>
+<tr class="memdesc:a7f1a6d1474f8ad7d8b460ce889ee6ebd inherit pub_methods_structfims__model__object_1_1FIMSObject"><td class="mdescLeft">&#160;</td><td class="mdescRight">Getter that returns the unique id for parameters in the model. <br /></td></tr>
+<tr class="separator:a7f1a6d1474f8ad7d8b460ce889ee6ebd inherit pub_methods_structfims__model__object_1_1FIMSObject"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a81239daf538745bbb96c56f627edc781 inherit pub_methods_structfims__model__object_1_1FIMSObject" id="r_a81239daf538745bbb96c56f627edc781"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__model__object_1_1FIMSObject.html#a81239daf538745bbb96c56f627edc781">CheckDimensions</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">actual</a>, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">expected</a>)</td></tr>
+<tr class="memdesc:a81239daf538745bbb96c56f627edc781 inherit pub_methods_structfims__model__object_1_1FIMSObject"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check the dimensions of an object.  <br /></td></tr>
+<tr class="separator:a81239daf538745bbb96c56f627edc781 inherit pub_methods_structfims__model__object_1_1FIMSObject"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7809cb0987940a515163b95ef7d330f9 inherit pub_methods_structfims__model__object_1_1FIMSObject" id="r_a7809cb0987940a515163b95ef7d330f9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">virtual</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__model__object_1_1FIMSObject.html#a7809cb0987940a515163b95ef7d330f9">create_report_vectors</a> (std::map&lt; std::string, <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt; &gt; &amp;report_vectors)</td></tr>
+<tr class="memdesc:a7809cb0987940a515163b95ef7d330f9 inherit pub_methods_structfims__model__object_1_1FIMSObject"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a map of report vectors for the object. used to populate the report_vectors map in FisheryModelBase.  <br /></td></tr>
+<tr class="separator:a7809cb0987940a515163b95ef7d330f9 inherit pub_methods_structfims__model__object_1_1FIMSObject"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a63d848a3fb69a0c4928b7afa5ce845d2 inherit pub_methods_structfims__model__object_1_1FIMSObject" id="r_a63d848a3fb69a0c4928b7afa5ce845d2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">virtual</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__model__object_1_1FIMSObject.html#a63d848a3fb69a0c4928b7afa5ce845d2">get_report_vector_count</a> (std::map&lt; std::string, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a> &gt; &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">report_vector_count</a>)</td></tr>
+<tr class="memdesc:a63d848a3fb69a0c4928b7afa5ce845d2 inherit pub_methods_structfims__model__object_1_1FIMSObject"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the report vector count object. used to get the length of each report vector for populating the UncertaintyReportInfo struct in FisheryModelBase.  <br /></td></tr>
+<tr class="separator:a63d848a3fb69a0c4928b7afa5ce845d2 inherit pub_methods_structfims__model__object_1_1FIMSObject"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
+Public Attributes</h2></td></tr>
+<tr class="memitem:a85beced6c3db3298b38f5d9e6c95472e" id="r_a85beced6c3db3298b38f5d9e6c95472e"><td class="memItemLeft" align="right" valign="top"><a id="a85beced6c3db3298b38f5d9e6c95472e" name="a85beced6c3db3298b38f5d9e6c95472e"></a>
+std::string&#160;</td><td class="memItemRight" valign="bottom"><b>name_m</b></td></tr>
+<tr class="memdesc:a85beced6c3db3298b38f5d9e6c95472e"><td class="mdescLeft">&#160;</td><td class="mdescRight">The name of the model. <br /></td></tr>
+<tr class="separator:a85beced6c3db3298b38f5d9e6c95472e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a30de85a9a907124a9a57243eccaa2a23" id="r_a30de85a9a907124a9a57243eccaa2a23"><td class="memItemLeft" align="right" valign="top"><a id="a30de85a9a907124a9a57243eccaa2a23" name="a30de85a9a907124a9a57243eccaa2a23"></a>
+std::map&lt; std::string, <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>report_vectors</b></td></tr>
+<tr class="memdesc:a30de85a9a907124a9a57243eccaa2a23"><td class="mdescLeft">&#160;</td><td class="mdescRight">A map of report vectors for the object. used to populate the report_vectors map in for submodule parameters. <br /></td></tr>
+<tr class="separator:a30de85a9a907124a9a57243eccaa2a23"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a25dc53adfee64cb0e8526e776e15bb0a" id="r_a25dc53adfee64cb0e8526e776e15bb0a"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__popdy_1_1CatchAtAge.html#a25dc53adfee64cb0e8526e776e15bb0a">ages</a></td></tr>
+<tr class="separator:a25dc53adfee64cb0e8526e776e15bb0a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pub_attribs_classfims__popdy_1_1FisheryModelBase"><td colspan="2" onclick="javascript:toggleInherit('pub_attribs_classfims__popdy_1_1FisheryModelBase')"><img src="closed.png" alt="-"/>&#160;Public Attributes inherited from <a class="el" href="classfims__popdy_1_1FisheryModelBase.html">fims_popdy::FisheryModelBase&lt; Type &gt;</a></td></tr>
+<tr class="memitem:a447bcdf764fc22206d311aa7e36e5c8f inherit pub_attribs_classfims__popdy_1_1FisheryModelBase" id="r_a447bcdf764fc22206d311aa7e36e5c8f"><td class="memItemLeft" align="right" valign="top">
+std::string&#160;</td><td class="memItemRight" valign="bottom"><b>model_type_m</b></td></tr>
+<tr class="memdesc:a447bcdf764fc22206d311aa7e36e5c8f inherit pub_attribs_classfims__popdy_1_1FisheryModelBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">A string specifying the model type. <br /></td></tr>
+<tr class="separator:a447bcdf764fc22206d311aa7e36e5c8f inherit pub_attribs_classfims__popdy_1_1FisheryModelBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4a544df4aaafba610711af17a8327a4b inherit pub_attribs_classfims__popdy_1_1FisheryModelBase" id="r_a4a544df4aaafba610711af17a8327a4b"><td class="memItemLeft" align="right" valign="top">
+std::set&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>population_ids</b></td></tr>
+<tr class="memdesc:a4a544df4aaafba610711af17a8327a4b inherit pub_attribs_classfims__popdy_1_1FisheryModelBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Unique identifier for the fishery model. <br /></td></tr>
+<tr class="separator:a4a544df4aaafba610711af17a8327a4b inherit pub_attribs_classfims__popdy_1_1FisheryModelBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a20d760548c290700f2148e911727b22d inherit pub_attribs_classfims__popdy_1_1FisheryModelBase" id="r_a20d760548c290700f2148e911727b22d"><td class="memItemLeft" align="right" valign="top">
+std::vector&lt; std::shared_ptr&lt; <a class="el" href="structfims__popdy_1_1Population.html">fims_popdy::Population</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>populations</b></td></tr>
+<tr class="memdesc:a20d760548c290700f2148e911727b22d inherit pub_attribs_classfims__popdy_1_1FisheryModelBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">A vector of populations in the fishery model. <br /></td></tr>
+<tr class="separator:a20d760548c290700f2148e911727b22d inherit pub_attribs_classfims__popdy_1_1FisheryModelBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0613bad21950ad03cf6e8a97077ee667 inherit pub_attribs_classfims__popdy_1_1FisheryModelBase" id="r_a0613bad21950ad03cf6e8a97077ee667"><td class="memItemLeft" align="right" valign="top">
+std::map&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a>, std::shared_ptr&lt; <a class="el" href="structfims__popdy_1_1Fleet.html">fims_popdy::Fleet</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>fleets</b></td></tr>
+<tr class="memdesc:a0613bad21950ad03cf6e8a97077ee667 inherit pub_attribs_classfims__popdy_1_1FisheryModelBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">A map of fleets in the fishery model, indexed by fleet id. Unique instances to eliminate duplicate initialization. <br /></td></tr>
+<tr class="separator:a0613bad21950ad03cf6e8a97077ee667 inherit pub_attribs_classfims__popdy_1_1FisheryModelBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8e6c66b78cf5afc3c6508ae383d33bc4 inherit pub_attribs_classfims__popdy_1_1FisheryModelBase" id="r_a8e6c66b78cf5afc3c6508ae383d33bc4"><td class="memItemLeft" align="right" valign="top">
+std::shared_ptr&lt; <a class="el" href="classfims__popdy_1_1FisheryModelBase.html#a1c7499d26ff106bb6a49e06bfb389fdf">DerivedQuantitiesMap</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>fleet_derived_quantities</b></td></tr>
+<tr class="memdesc:a8e6c66b78cf5afc3c6508ae383d33bc4 inherit pub_attribs_classfims__popdy_1_1FisheryModelBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Shared pointer for the fleet derived quantities map. <br /></td></tr>
+<tr class="separator:a8e6c66b78cf5afc3c6508ae383d33bc4 inherit pub_attribs_classfims__popdy_1_1FisheryModelBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a573b075bdd228855c49527a4efd9fc05 inherit pub_attribs_classfims__popdy_1_1FisheryModelBase" id="r_a573b075bdd228855c49527a4efd9fc05"><td class="memItemLeft" align="right" valign="top">
+std::shared_ptr&lt; <a class="el" href="classfims__popdy_1_1FisheryModelBase.html#a1c7499d26ff106bb6a49e06bfb389fdf">DerivedQuantitiesMap</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>population_derived_quantities</b></td></tr>
+<tr class="memdesc:a573b075bdd228855c49527a4efd9fc05 inherit pub_attribs_classfims__popdy_1_1FisheryModelBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Shared pointer for the population derived quantities map. <br /></td></tr>
+<tr class="separator:a573b075bdd228855c49527a4efd9fc05 inherit pub_attribs_classfims__popdy_1_1FisheryModelBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8e6b0921b0c4800371e4833ccc52c7be inherit pub_attribs_classfims__popdy_1_1FisheryModelBase" id="r_a8e6b0921b0c4800371e4833ccc52c7be"><td class="memItemLeft" align="right" valign="top">
+std::shared_ptr&lt; <a class="el" href="classfims__popdy_1_1FisheryModelBase.html#a5d46305b9a669a2e848c260e48380e16">DimensionInfoMap</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>fleet_dimension_info</b></td></tr>
+<tr class="memdesc:a8e6b0921b0c4800371e4833ccc52c7be inherit pub_attribs_classfims__popdy_1_1FisheryModelBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Shared pointer for the fleet dimension information map. <br /></td></tr>
+<tr class="separator:a8e6b0921b0c4800371e4833ccc52c7be inherit pub_attribs_classfims__popdy_1_1FisheryModelBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0272c60bb2e8298ca55e35ce0af5e4db inherit pub_attribs_classfims__popdy_1_1FisheryModelBase" id="r_a0272c60bb2e8298ca55e35ce0af5e4db"><td class="memItemLeft" align="right" valign="top">
+std::shared_ptr&lt; <a class="el" href="classfims__popdy_1_1FisheryModelBase.html#a5d46305b9a669a2e848c260e48380e16">DimensionInfoMap</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>population_dimension_info</b></td></tr>
+<tr class="memdesc:a0272c60bb2e8298ca55e35ce0af5e4db inherit pub_attribs_classfims__popdy_1_1FisheryModelBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Shared pointer for the population dimension information map. <br /></td></tr>
+<tr class="separator:a0272c60bb2e8298ca55e35ce0af5e4db inherit pub_attribs_classfims__popdy_1_1FisheryModelBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a56eb1b72eaa9c95cb831fe050b0e8232 inherit pub_attribs_classfims__popdy_1_1FisheryModelBase" id="r_a56eb1b72eaa9c95cb831fe050b0e8232"><td class="memItemLeft" align="right" valign="top">
+std::shared_ptr&lt; <a class="el" href="classfims__popdy_1_1FisheryModelBase.html#a7040d2c5bdca6bb3789f99bc7fb870f9">UncertaintyReportInfoMap</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>fleet_uncertainty_report_info</b></td></tr>
+<tr class="memdesc:a56eb1b72eaa9c95cb831fe050b0e8232 inherit pub_attribs_classfims__popdy_1_1FisheryModelBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Shared pointer for the uncertainty report information map. <br /></td></tr>
+<tr class="separator:a56eb1b72eaa9c95cb831fe050b0e8232 inherit pub_attribs_classfims__popdy_1_1FisheryModelBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3b5a176c06fad191401e5c327ae88b15 inherit pub_attribs_classfims__popdy_1_1FisheryModelBase" id="r_a3b5a176c06fad191401e5c327ae88b15"><td class="memItemLeft" align="right" valign="top">
+std::shared_ptr&lt; <a class="el" href="classfims__popdy_1_1FisheryModelBase.html#a7040d2c5bdca6bb3789f99bc7fb870f9">UncertaintyReportInfoMap</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>population_uncertainty_report_info</b></td></tr>
+<tr class="memdesc:a3b5a176c06fad191401e5c327ae88b15 inherit pub_attribs_classfims__popdy_1_1FisheryModelBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Shared pointer for the population uncertainty report information map. <br /></td></tr>
+<tr class="separator:a3b5a176c06fad191401e5c327ae88b15 inherit pub_attribs_classfims__popdy_1_1FisheryModelBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pub_attribs_structfims__model__object_1_1FIMSObject"><td colspan="2" onclick="javascript:toggleInherit('pub_attribs_structfims__model__object_1_1FIMSObject')"><img src="closed.png" alt="-"/>&#160;Public Attributes inherited from <a class="el" href="structfims__model__object_1_1FIMSObject.html">fims_model_object::FIMSObject&lt; Type &gt;</a></td></tr>
+<tr class="memitem:a3922946642efc5ec4309149f1e0b188a inherit pub_attribs_structfims__model__object_1_1FIMSObject" id="r_a3922946642efc5ec4309149f1e0b188a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__model__object_1_1FIMSObject.html#a3922946642efc5ec4309149f1e0b188a">id</a></td></tr>
+<tr class="separator:a3922946642efc5ec4309149f1e0b188a inherit pub_attribs_structfims__model__object_1_1FIMSObject"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac625a90f1af6d01d8c476d0a1ecb5343 inherit pub_attribs_structfims__model__object_1_1FIMSObject" id="r_ac625a90f1af6d01d8c476d0a1ecb5343"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__model__object_1_1FIMSObject.html#ac625a90f1af6d01d8c476d0a1ecb5343">parameters</a></td></tr>
+<tr class="separator:ac625a90f1af6d01d8c476d0a1ecb5343 inherit pub_attribs_structfims__model__object_1_1FIMSObject"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9d8ddb11af5bb51a811f7d4c855f49b3 inherit pub_attribs_structfims__model__object_1_1FIMSObject" id="r_a9d8ddb11af5bb51a811f7d4c855f49b3"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__model__object_1_1FIMSObject.html#a9d8ddb11af5bb51a811f7d4c855f49b3">random_effects_parameters</a></td></tr>
+<tr class="separator:a9d8ddb11af5bb51a811f7d4c855f49b3 inherit pub_attribs_structfims__model__object_1_1FIMSObject"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aca6a96ab8e6a4cca573daa5f52e71c67 inherit pub_attribs_structfims__model__object_1_1FIMSObject" id="r_aca6a96ab8e6a4cca573daa5f52e71c67"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__model__object_1_1FIMSObject.html#aca6a96ab8e6a4cca573daa5f52e71c67">fixed_effects_parameters</a></td></tr>
+<tr class="separator:aca6a96ab8e6a4cca573daa5f52e71c67 inherit pub_attribs_structfims__model__object_1_1FIMSObject"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><div class="compoundTemplParams">template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a>&gt;<br />
+class fims_popdy::CatchAtAge&lt; Type &gt;</div><p><a class="el" href="classfims__popdy_1_1CatchAtAge.html" title="CatchAtAge is a class containing a catch-at-age model, which is just one of many potential fishery mo...">CatchAtAge</a> is a class containing a catch-at-age model, which is just one of many potential fishery models that can be used in FIMS. The <a class="el" href="classfims__popdy_1_1CatchAtAge.html" title="CatchAtAge is a class containing a catch-at-age model, which is just one of many potential fishery mo...">CatchAtAge</a> class inherits from the <a class="el" href="classfims__popdy_1_1FisheryModelBase.html" title="FisheryModelBase is a base class for fishery models in FIMS.">FisheryModelBase</a> class and can be used to fit both age and length data even though it is called <a class="el" href="classfims__popdy_1_1CatchAtAge.html" title="CatchAtAge is a class containing a catch-at-age model, which is just one of many potential fishery mo...">CatchAtAge</a>. </p>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a id="a7830c8f82e8a6158f83d4a765379ddf3" name="a7830c8f82e8a6158f83d4a765379ddf3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7830c8f82e8a6158f83d4a765379ddf3">&#9670;&#160;</a></span>CatchAtAge() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classfims__popdy_1_1CatchAtAge.html">fims_popdy::CatchAtAge</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::CatchAtAge </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Constructor for the <a class="el" href="classfims__popdy_1_1CatchAtAge.html" title="CatchAtAge is a class containing a catch-at-age model, which is just one of many potential fishery mo...">CatchAtAge</a> class. This constructor initializes the name of the model and sets the id of the model. </p>
+
+</div>
+</div>
+<a id="a6c621a6bc7cada49166db5fc96f32726" name="a6c621a6bc7cada49166db5fc96f32726"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6c621a6bc7cada49166db5fc96f32726">&#9670;&#160;</a></span>CatchAtAge() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classfims__popdy_1_1CatchAtAge.html">fims_popdy::CatchAtAge</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::CatchAtAge </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="classfims__popdy_1_1CatchAtAge.html">CatchAtAge</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>other</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Copy constructor for the <a class="el" href="classfims__popdy_1_1CatchAtAge.html" title="CatchAtAge is a class containing a catch-at-age model, which is just one of many potential fishery mo...">CatchAtAge</a> class. </p>
+<p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">other</td><td>The other <a class="el" href="classfims__popdy_1_1CatchAtAge.html" title="CatchAtAge is a class containing a catch-at-age model, which is just one of many potential fishery mo...">CatchAtAge</a> object to copy from. </td></tr>
+  </table>
+  </dd>
+</dl>
+ </p>
+
+</div>
+</div>
+<h2 class="groupheader">Member Function Documentation</h2>
+<a id="ac0b5da9501f105543cdd50f067d11da5" name="ac0b5da9501f105543cdd50f067d11da5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac0b5da9501f105543cdd50f067d11da5">&#9670;&#160;</a></span>AddPopulation()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a> <a class="el" href="classfims__popdy_1_1CatchAtAge.html">fims_popdy::CatchAtAge</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::AddPopulation </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a>&#160;</td>
+          <td class="paramname"><em>id</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>This function is used to add a population id to the set of population ids. </p>
+
+</div>
+</div>
+<a id="a2a20ec050477f0e1c4de7780459f9aec" name="a2a20ec050477f0e1c4de7780459f9aec"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2a20ec050477f0e1c4de7780459f9aec">&#9670;&#160;</a></span>CalculateBiomass()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a> <a class="el" href="classfims__popdy_1_1CatchAtAge.html">fims_popdy::CatchAtAge</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::CalculateBiomass </td>
+          <td>(</td>
+          <td class="paramtype">std::shared_ptr&lt; <a class="el" href="structfims__popdy_1_1Population.html">fims_popdy::Population</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt; &amp;&#160;</td>
+          <td class="paramname"><em>population</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a>&#160;</td>
+          <td class="paramname"><em>i_age_year</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a>&#160;</td>
+          <td class="paramname"><em>year</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a>&#160;</td>
+          <td class="paramname"><em>age</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Calculates biomass for a population. </p>
+<p>Adds the biomass at age to the total biomass for a given year \(y\) by multiplying numbers at age \(a\) by weight at age \(w_a\):  </p><p class="formulaDsp">
+\[
+B_y \mathrel{+}= N_{a,y} \times w_a
+\]
+</p>
+<p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">population</td><td>Shared pointer to the population object. </td></tr>
+  </table>
+  </dd>
+</dl>
+ <dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">i_age_year</td><td>Dimension folded index for age and year. </td></tr>
+  </table>
+  </dd>
+</dl>
+ <dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">year</td><td>Year index. </td></tr>
+  </table>
+  </dd>
+</dl>
+ <dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">age</td><td>Age index. </td></tr>
+  </table>
+  </dd>
+</dl>
+ </p>
+
+</div>
+</div>
+<a id="a901059284bb502abd0f6a8f9252a275d" name="a901059284bb502abd0f6a8f9252a275d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a901059284bb502abd0f6a8f9252a275d">&#9670;&#160;</a></span>CalculateIndex()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a> <a class="el" href="classfims__popdy_1_1CatchAtAge.html">fims_popdy::CatchAtAge</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::CalculateIndex </td>
+          <td>(</td>
+          <td class="paramtype">std::shared_ptr&lt; <a class="el" href="structfims__popdy_1_1Population.html">fims_popdy::Population</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt; &amp;&#160;</td>
+          <td class="paramname"><em>population</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a>&#160;</td>
+          <td class="paramname"><em>i_age_year</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a>&#160;</td>
+          <td class="paramname"><em>year</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a>&#160;</td>
+          <td class="paramname"><em>age</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Calculates the index for a fleet from a population. </p>
+<p>This function updates the population indices for each fleet by adding the age- and year-specific index weights and numbers to the corresponding annual totals. The updated index weight and index numbers for a given fleet and year are calculated as:  </p><p class="formulaDsp">
+\[
+IW_{f,y} \mathrel{+}= IWAA_{a,y}, \quad
+IN_{f,y} \mathrel{+}= INAA_{a,y}
+\]
+</p>
+<p>where:</p><ul>
+<li>\(IW_{f,y}\) is the total index weight for fleet \(f\) in year \(y\)</li>
+<li>\(IN_{f,y}\) is the total index numbers for fleet \(f\) in year \(y\)</li>
+<li>\(IWAA_{a,y}\) is the index weight at age \(a\) in year \(y\)</li>
+<li>\(INAA_{a,y}\) is the index numbers at age \(a\) in year \(y\)</li>
+</ul>
+<p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">population</td><td>Shared pointer to the population object. </td></tr>
+  </table>
+  </dd>
+</dl>
+ <dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">i_age_year</td><td>Dimension folded index for age and year. </td></tr>
+  </table>
+  </dd>
+</dl>
+ <dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">year</td><td>Year index. </td></tr>
+  </table>
+  </dd>
+</dl>
+ <dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">age</td><td>Age index. </td></tr>
+  </table>
+  </dd>
+</dl>
+ </p>
+
+</div>
+</div>
+<a id="adfbcd55d8179b561d3d4e788fa63e661" name="adfbcd55d8179b561d3d4e788fa63e661"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adfbcd55d8179b561d3d4e788fa63e661">&#9670;&#160;</a></span>CalculateIndexNumbersAA()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a> <a class="el" href="classfims__popdy_1_1CatchAtAge.html">fims_popdy::CatchAtAge</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::CalculateIndexNumbersAA </td>
+          <td>(</td>
+          <td class="paramtype">std::shared_ptr&lt; <a class="el" href="structfims__popdy_1_1Population.html">fims_popdy::Population</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt; &amp;&#160;</td>
+          <td class="paramname"><em>population</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a>&#160;</td>
+          <td class="paramname"><em>i_age_year</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a>&#160;</td>
+          <td class="paramname"><em>year</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a>&#160;</td>
+          <td class="paramname"><em>age</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Calculates the numbers for the index for a fleet from a population. </p>
+<p>This function calculates the expected index in numbers at age for each fleet, using catchability, selectivity, and population numbers at age:  </p><p class="formulaDsp">
+\[
+I_{f,a,y} \mathrel{+}= q_{f,y} \times S_f(a) \times N_{a,y}
+\]
+</p>
+<p>where:</p><ul>
+<li>\(I_{f,a,y}\) is the index numbers for fleet \(f\) at age \(a\) in year \(y\)</li>
+<li>\(q_{f,y}\) is the catchability coefficient for fleet \(f\) at year \(y\)</li>
+<li>\(S_f(a)\) is the selectivity at age \(a\) for fleet \(f\)</li>
+<li>\(N_{a,y}\) is the population numbers at age \(a\) and year \(y\)</li>
+</ul>
+<p>When timing is accounted for within FIMS the equation will include the fraction of the year when the survey was conducted \(t_y\):  </p><p class="formulaDsp">
+\[ I_{f,a,y} \mathrel{+}= S_{f,y}(a) \times N_{a,y} \times
+e^{(-t_{y}Z_{a,y})}\]
+</p>
+<p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">population</td><td>Shared pointer to the population object. </td></tr>
+  </table>
+  </dd>
+</dl>
+ <dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">i_age_year</td><td>Dimension folded index for age and year. </td></tr>
+  </table>
+  </dd>
+</dl>
+ <dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">year</td><td>Year index. </td></tr>
+  </table>
+  </dd>
+</dl>
+ <dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">age</td><td>Age index. </td></tr>
+  </table>
+  </dd>
+</dl>
+ </p>
+
+</div>
+</div>
+<a id="a498396134f360e7243f0eb5605360a20" name="a498396134f360e7243f0eb5605360a20"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a498396134f360e7243f0eb5605360a20">&#9670;&#160;</a></span>CalculateIndexWeightAA()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a> <a class="el" href="classfims__popdy_1_1CatchAtAge.html">fims_popdy::CatchAtAge</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::CalculateIndexWeightAA </td>
+          <td>(</td>
+          <td class="paramtype">std::shared_ptr&lt; <a class="el" href="structfims__popdy_1_1Population.html">fims_popdy::Population</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt; &amp;&#160;</td>
+          <td class="paramname"><em>population</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a>&#160;</td>
+          <td class="paramname"><em>year</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a>&#160;</td>
+          <td class="paramname"><em>age</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Calculates biomass of fish for the index for a given fleet from a population. </p>
+<p>This function computes the expected index weight at age by multiplying the expected index numbers at age by the corresponding weight at age:  </p><p class="formulaDsp">
+\[
+IWAA_{f,a,y} = I_{f,a,y} \times w_a
+\]
+</p>
+<p>where \(IWAA_{f,a,y}\) is the index weight for fleet \(f\) at age \(a\) in year \(y\).</p>
+<p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">population</td><td>Shared pointer to the population object. </td></tr>
+  </table>
+  </dd>
+</dl>
+ <dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">year</td><td>Year index. </td></tr>
+  </table>
+  </dd>
+</dl>
+ <dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">age</td><td>Age index. </td></tr>
+  </table>
+  </dd>
+</dl>
+ </p>
+
+</div>
+</div>
+<a id="aef21eca36133b6a5769ec676050a73d2" name="aef21eca36133b6a5769ec676050a73d2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aef21eca36133b6a5769ec676050a73d2">&#9670;&#160;</a></span>CalculateInitialNumbersAA()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a> <a class="el" href="classfims__popdy_1_1CatchAtAge.html">fims_popdy::CatchAtAge</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::CalculateInitialNumbersAA </td>
+          <td>(</td>
+          <td class="paramtype">std::shared_ptr&lt; <a class="el" href="structfims__popdy_1_1Population.html">fims_popdy::Population</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt; &amp;&#160;</td>
+          <td class="paramname"><em>population</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a>&#160;</td>
+          <td class="paramname"><em>i_age_year</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a>&#160;</td>
+          <td class="paramname"><em>age</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Calculates initial numbers at age for index and age. </p>
+<p>The formula used is:  </p><p class="formulaDsp">
+\[
+N_{a,0} = \exp(\log N_{a,0})
+\]
+</p>
+<p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">population</td><td>Shared pointer to the population object. </td></tr>
+  </table>
+  </dd>
+</dl>
+ <dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">i_age_year</td><td>Dimension folded index for age and year. </td></tr>
+  </table>
+  </dd>
+</dl>
+ <dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">age</td><td>Age index. </td></tr>
+  </table>
+  </dd>
+</dl>
+ </p>
+
+</div>
+</div>
+<a id="ad8e81e9a6d6f819a2c3fb78367ecfea4" name="ad8e81e9a6d6f819a2c3fb78367ecfea4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad8e81e9a6d6f819a2c3fb78367ecfea4">&#9670;&#160;</a></span>CalculateLandings()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a> <a class="el" href="classfims__popdy_1_1CatchAtAge.html">fims_popdy::CatchAtAge</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::CalculateLandings </td>
+          <td>(</td>
+          <td class="paramtype">std::shared_ptr&lt; <a class="el" href="structfims__popdy_1_1Population.html">fims_popdy::Population</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt; &amp;&#160;</td>
+          <td class="paramname"><em>population</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a>&#160;</td>
+          <td class="paramname"><em>year</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a>&#160;</td>
+          <td class="paramname"><em>age</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Calculates total catch (landings) by fleet and population for a given year by aggregating age-specific catch over ages. </p>
+<p>This function updates fleet-specific and total expected landings for a given year and age by accumulating age-specific catch from each fleet:  </p><p class="formulaDsp">
+\[
+CW_{f,y} \mathrel{+}= CW_{f,a,y}, \quad
+C_{f,y} \mathrel{+}= C_{f,a,y}
+\]
+</p>
+<p>where</p><ul>
+<li>\(CW_{f,y}\) is total catch weight for fleet \(f\) in year \(y\)</li>
+<li>\(C_{f,y}\) is total catch numbers for fleet \(f\) in year \(y\)</li>
+<li>\(CW_{f,a,y}\), \(C_{f,a,y}\) are catch weight and numbers for fleet \(f\) at age \(a\) in year \(y\).</li>
+</ul>
+<p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">population</td><td>Shared pointer to the population object. </td></tr>
+  </table>
+  </dd>
+</dl>
+ <dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">year</td><td>Year index. </td></tr>
+  </table>
+  </dd>
+</dl>
+ <dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">age</td><td>Age index. </td></tr>
+  </table>
+  </dd>
+</dl>
+ </p>
+
+</div>
+</div>
+<a id="aa01ecd33d4d19d03cc4b31b3049f87d9" name="aa01ecd33d4d19d03cc4b31b3049f87d9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa01ecd33d4d19d03cc4b31b3049f87d9">&#9670;&#160;</a></span>CalculateLandingsNumbersAA()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a> <a class="el" href="classfims__popdy_1_1CatchAtAge.html">fims_popdy::CatchAtAge</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::CalculateLandingsNumbersAA </td>
+          <td>(</td>
+          <td class="paramtype">std::shared_ptr&lt; <a class="el" href="structfims__popdy_1_1Population.html">fims_popdy::Population</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt; &amp;&#160;</td>
+          <td class="paramname"><em>population</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a>&#160;</td>
+          <td class="paramname"><em>i_age_year</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a>&#160;</td>
+          <td class="paramname"><em>year</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a>&#160;</td>
+          <td class="paramname"><em>age</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Calculates numbers of fish for the landings for a given fleet from a population, year and age. </p>
+<p>This function uses the Baranov Catch Equation to calculate expected landings in numbers at age for each fleet. With F multiplier \(f_y\):  </p><p class="formulaDsp">
+\[
+C_{f,a,y} = \frac{F_{f,y} \times f_y \times S_f(a)}{Z_{a,y}} \times N_{a,y}
+\times
+\left( 1 - \exp(-Z_{a,y}) \right)
+\]
+</p>
+<p>where</p><ul>
+<li>\(C_{f,a,y}\) is the catch (landings) for fleet \(f\) at age \(a\) in year \(y\)</li>
+<li>\(F_{f,y}\) is fleet-specific fishing mortality in year \(y\)</li>
+<li>\(S_f(a)\) is selectivity at age \(a\) for fleet \(f\)</li>
+<li>\(Z_{a,y}\) is total mortality at age \(a\) and year \(y\)</li>
+<li>\(N_{a,y}\) is the number of individuals at age \(a\) and year \(y\)</li>
+</ul>
+<p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">population</td><td>Shared pointer to the population object. </td></tr>
+  </table>
+  </dd>
+</dl>
+ <dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">i_age_year</td><td>Dimension folded index for age and year. </td></tr>
+  </table>
+  </dd>
+</dl>
+ <dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">year</td><td>Year index. </td></tr>
+  </table>
+  </dd>
+</dl>
+ <dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">age</td><td>Age index. </td></tr>
+  </table>
+  </dd>
+</dl>
+ </p>
+
+</div>
+</div>
+<a id="ac1003ebcd348e09e945cb4f55fce4ae9" name="ac1003ebcd348e09e945cb4f55fce4ae9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac1003ebcd348e09e945cb4f55fce4ae9">&#9670;&#160;</a></span>CalculateLandingsWeightAA()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a> <a class="el" href="classfims__popdy_1_1CatchAtAge.html">fims_popdy::CatchAtAge</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::CalculateLandingsWeightAA </td>
+          <td>(</td>
+          <td class="paramtype">std::shared_ptr&lt; <a class="el" href="structfims__popdy_1_1Population.html">fims_popdy::Population</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt; &amp;&#160;</td>
+          <td class="paramname"><em>population</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a>&#160;</td>
+          <td class="paramname"><em>year</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a>&#160;</td>
+          <td class="paramname"><em>age</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Calculates weight at age of the landings for a given fleet from a population. </p>
+<p>This function computes the expected landings at age in weight by multiplying the expected landings numbers at age by the corresponding weight at age:  </p><p class="formulaDsp">
+\[
+CW_{f,a,y} = C_{f,a,y} \times w_a
+\]
+</p>
+<p>where \(CW_{f,a,y}\) is the catch weight for fleet \(f\) at age \(a\) in year \(y\).</p>
+<p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">population</td><td>Shared pointer to the population object. </td></tr>
+  </table>
+  </dd>
+</dl>
+ <dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">year</td><td>Year index. </td></tr>
+  </table>
+  </dd>
+</dl>
+ <dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">age</td><td>Age index. </td></tr>
+  </table>
+  </dd>
+</dl>
+ </p>
+
+</div>
+</div>
+<a id="a996fba214e1f3601324ec06ed924d09b" name="a996fba214e1f3601324ec06ed924d09b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a996fba214e1f3601324ec06ed924d09b">&#9670;&#160;</a></span>CalculateMaturityAA()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a> <a class="el" href="classfims__popdy_1_1CatchAtAge.html">fims_popdy::CatchAtAge</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::CalculateMaturityAA </td>
+          <td>(</td>
+          <td class="paramtype">std::shared_ptr&lt; <a class="el" href="structfims__popdy_1_1Population.html">fims_popdy::Population</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt; &amp;&#160;</td>
+          <td class="paramname"><em>population</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a>&#160;</td>
+          <td class="paramname"><em>i_age_year</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a>&#160;</td>
+          <td class="paramname"><em>age</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Calculates maturity at age, in proportion, for a population. </p>
+<p>This function evaluates the maturity ogive at the specified age to estimate the proportion of individuals that are mature:  </p><p class="formulaDsp">
+\[
+p_{mature,a} = \text{maturity}(a)
+\]
+</p>
+<p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">population</td><td>Shared pointer to the population object. </td></tr>
+  </table>
+  </dd>
+</dl>
+ <dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">i_age_year</td><td>Dimension folded index for age and year. </td></tr>
+  </table>
+  </dd>
+</dl>
+ <dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">age</td><td>Age index. </td></tr>
+  </table>
+  </dd>
+</dl>
+ </p>
+
+</div>
+</div>
+<a id="addf4f18252cba85c7b770a215d828f02" name="addf4f18252cba85c7b770a215d828f02"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#addf4f18252cba85c7b770a215d828f02">&#9670;&#160;</a></span>CalculateMortality()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a> <a class="el" href="classfims__popdy_1_1CatchAtAge.html">fims_popdy::CatchAtAge</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::CalculateMortality </td>
+          <td>(</td>
+          <td class="paramtype">std::shared_ptr&lt; <a class="el" href="structfims__popdy_1_1Population.html">fims_popdy::Population</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt; &amp;&#160;</td>
+          <td class="paramname"><em>population</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a>&#160;</td>
+          <td class="paramname"><em>i_age_year</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a>&#160;</td>
+          <td class="paramname"><em>year</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a>&#160;</td>
+          <td class="paramname"><em>age</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Calculates total mortality for a population. </p>
+<p>This function calculates total mortality \(Z\) for a specific age and year, combining natural mortality \(M\) and fishing mortality \(F\) from all fleets.</p>
+<p>The fishing mortality \(F_{f,a,y}\) for each fleet \(f\) is computed using age-specific selectivity \(S_f(a)\), fleet-specific annual fishing mortality \(F_{f,y}\), and year-specific F multiplier \(f_y\):  </p><p class="formulaDsp">
+\[
+F_{f,a,y} = F_{f,y} \times f_y \times S_f(a)
+\]
+</p>
+<p>Total fishing mortality at age \(a\) and year \(y\) is the sum over fleets:  </p><p class="formulaDsp">
+\[
+F_{a,y} = \sum_{f=1}^{N_{fleets}} F_{f,a,y}
+\]
+</p>
+<p>Total mortality \(Z_{a,y}\) is the sum of natural and fishing mortality:  </p><p class="formulaDsp">
+\[
+Z_{a,y} = M_{a,y} + F_{a,y}
+\]
+</p>
+<p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">population</td><td>Shared pointer to the population object. </td></tr>
+  </table>
+  </dd>
+</dl>
+ <dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">i_age_year</td><td>Dimension folded index for age and year. </td></tr>
+  </table>
+  </dd>
+</dl>
+ <dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">year</td><td>Year index. </td></tr>
+  </table>
+  </dd>
+</dl>
+ <dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">age</td><td>Age index. </td></tr>
+  </table>
+  </dd>
+</dl>
+ </p>
+
+</div>
+</div>
+<a id="a9e5877ce7cc9b2093b14f0e5c5895674" name="a9e5877ce7cc9b2093b14f0e5c5895674"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9e5877ce7cc9b2093b14f0e5c5895674">&#9670;&#160;</a></span>CalculateNumbersAA()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a> <a class="el" href="classfims__popdy_1_1CatchAtAge.html">fims_popdy::CatchAtAge</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::CalculateNumbersAA </td>
+          <td>(</td>
+          <td class="paramtype">std::shared_ptr&lt; <a class="el" href="structfims__popdy_1_1Population.html">fims_popdy::Population</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt; &amp;&#160;</td>
+          <td class="paramname"><em>population</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a>&#160;</td>
+          <td class="paramname"><em>i_age_year</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a>&#160;</td>
+          <td class="paramname"><em>i_agem1_yearm1</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a>&#160;</td>
+          <td class="paramname"><em>age</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Calculates numbers at age for a population. </p>
+<p>This function calculates numbers at age by applying total mortality \(Z\) to individuals from the previous time step. It also handles the accumulation of a plus group.</p>
+<p>Standard update:  </p><p class="formulaDsp">
+\[
+N_{a,y} = N_{a-1,y-1} \exp(-Z_{a-1,y-1})
+\]
+</p>
+<p>Plus group update (if \(a = A\)):  </p><p class="formulaDsp">
+\[
+N_{A,y} = N_{A-1,y-1} \exp(-Z_{A-1,y-1}) + N_{A,y-1} \exp(-Z_{A,y-1})
+\]
+</p>
+<p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">population</td><td>Shared pointer to the population object. </td></tr>
+  </table>
+  </dd>
+</dl>
+ <dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">i_age_year</td><td>Dimension folded index for age and year. </td></tr>
+  </table>
+  </dd>
+</dl>
+ <dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">i_agem1_yearm1</td><td>Dimension folded index for age-1 and year-1. </td></tr>
+  </table>
+  </dd>
+</dl>
+ <dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">age</td><td>Age index. </td></tr>
+  </table>
+  </dd>
+</dl>
+ </p>
+
+</div>
+</div>
+<a id="ab3f51eeed2e951400a81fbd8c32b458e" name="ab3f51eeed2e951400a81fbd8c32b458e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab3f51eeed2e951400a81fbd8c32b458e">&#9670;&#160;</a></span>CalculateRecruitment()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a> <a class="el" href="classfims__popdy_1_1CatchAtAge.html">fims_popdy::CatchAtAge</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::CalculateRecruitment </td>
+          <td>(</td>
+          <td class="paramtype">std::shared_ptr&lt; <a class="el" href="structfims__popdy_1_1Population.html">fims_popdy::Population</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt; &amp;&#160;</td>
+          <td class="paramname"><em>population</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a>&#160;</td>
+          <td class="paramname"><em>i_age_year</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a>&#160;</td>
+          <td class="paramname"><em>year</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a>&#160;</td>
+          <td class="paramname"><em>i_dev</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Calculates expected recruitment for a population. </p>
+<p>Calculates expected recruitment as a function of spawning biomass and equilibrium spawning biomass per recruit \(\phi_0\).</p>
+<p>The expected recruitment \(R_y\) in year \(y\) is given by:  </p><p class="formulaDsp">
+\[
+R_y =
+\begin{cases}
+f(SB_{y-1}, \phi_0), &amp; \text{if } i_{dev} = n_{years} \\
+\exp(g(y-1)), &amp; \text{otherwise}
+\end{cases}
+\]
+</p>
+<p>Where \(f()\) evaluates mean recruitment based on spawning biomass and \(\phi_0\), and \(g(y-1)\) evaluates recruitment deviations.</p>
+<p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">population</td><td>Shared pointer to the population object. </td></tr>
+  </table>
+  </dd>
+</dl>
+ <dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">i_age_year</td><td>Dimension folded index for age and year. </td></tr>
+  </table>
+  </dd>
+</dl>
+ <dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">year</td><td>Year index. </td></tr>
+  </table>
+  </dd>
+</dl>
+ <dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">i_dev</td><td>Index to log_recruit_dev of vector length n_years-1. </td></tr>
+  </table>
+  </dd>
+</dl>
+ </p>
+
+</div>
+</div>
+<a id="a15b4b7b778b0812fa9ea81e81571a877" name="a15b4b7b778b0812fa9ea81e81571a877"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a15b4b7b778b0812fa9ea81e81571a877">&#9670;&#160;</a></span>CalculateSBPR0()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> <a class="el" href="classfims__popdy_1_1CatchAtAge.html">fims_popdy::CatchAtAge</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::CalculateSBPR0 </td>
+          <td>(</td>
+          <td class="paramtype">std::shared_ptr&lt; <a class="el" href="structfims__popdy_1_1Population.html">fims_popdy::Population</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt; &amp;&#160;</td>
+          <td class="paramname"><em>population</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Calculates equilibrium spawning biomass per recruit. </p>
+<p>This function calculates the spawning biomass per recruit \(\phi_0\) at equilibrium, assuming an unfished stock. The biomass is calculated as the sum of the biomass contributions from each age \(a\):  </p><p class="formulaDsp">
+\[
+\phi_0 = \sum_{a=0}^{A} N_a \times p_{female,a} \times p_{mature,a} \times
+w_a
+\]
+</p>
+<p>The numbers at age \(N_a\) are calculated recursively with natural mortality: </p><p class="formulaDsp">
+\[ N_a = N_{a-1} \times \exp(-M_a) \quad \text{for } a = 1,
+\ldots, A-1 \]
+</p>
+<p>Plus group update:  </p><p class="formulaDsp">
+\[
+N_A = \frac{N_{A-1} \times \exp(-M_{A-1})}{1 - \exp(-M_A)}
+\]
+</p>
+<p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">population</td><td>Shared pointer to the population object. </td></tr>
+  </table>
+  </dd>
+</dl>
+ </p><dl class="section return"><dt>Returns</dt><dd>Type </dd></dl>
+
+</div>
+</div>
+<a id="a739bfeeb1135d24fda13ea87d7ba7c4c" name="a739bfeeb1135d24fda13ea87d7ba7c4c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a739bfeeb1135d24fda13ea87d7ba7c4c">&#9670;&#160;</a></span>CalculateSpawningBiomass()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a> <a class="el" href="classfims__popdy_1_1CatchAtAge.html">fims_popdy::CatchAtAge</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::CalculateSpawningBiomass </td>
+          <td>(</td>
+          <td class="paramtype">std::shared_ptr&lt; <a class="el" href="structfims__popdy_1_1Population.html">fims_popdy::Population</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt; &amp;&#160;</td>
+          <td class="paramname"><em>population</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a>&#160;</td>
+          <td class="paramname"><em>i_age_year</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a>&#160;</td>
+          <td class="paramname"><em>year</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a>&#160;</td>
+          <td class="paramname"><em>age</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Calculates spawning biomass for a population. </p>
+<p>This function computes yearly \(y\) spawning biomass \(SB_y\) by summing the contributions from each age \(a\), accounting for proportion female, proportion mature, and weight at age \(w_a\):  </p><p class="formulaDsp">
+\[
+SB_y \mathrel{+}= N_{a,y} \times w_a \times p_{female,a} \times
+p_{mature,a}
+\]
+</p>
+<p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">population</td><td>Shared pointer to the population object. </td></tr>
+  </table>
+  </dd>
+</dl>
+ <dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">i_age_year</td><td>Dimension folded index for age and year. </td></tr>
+  </table>
+  </dd>
+</dl>
+ <dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">year</td><td>Year index. </td></tr>
+  </table>
+  </dd>
+</dl>
+ <dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">age</td><td>Age index. </td></tr>
+  </table>
+  </dd>
+</dl>
+ </p>
+
+</div>
+</div>
+<a id="a037e412d2183c0a23ad3410f6b222ef1" name="a037e412d2183c0a23ad3410f6b222ef1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a037e412d2183c0a23ad3410f6b222ef1">&#9670;&#160;</a></span>CalculateSpawningBiomassRatio()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a> <a class="el" href="classfims__popdy_1_1CatchAtAge.html">fims_popdy::CatchAtAge</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::CalculateSpawningBiomassRatio </td>
+          <td>(</td>
+          <td class="paramtype">std::shared_ptr&lt; <a class="el" href="structfims__popdy_1_1Population.html">fims_popdy::Population</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt; &amp;&#160;</td>
+          <td class="paramname"><em>population</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a>&#160;</td>
+          <td class="paramname"><em>year</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Calculate the spawning biomass ratio for a population and year. </p>
+<p>This method computes the ratio of spawning biomass in a given year to the spawning biomass at year zero (typically unfished), for the specified population:  </p><p class="formulaDsp">
+\[
+\text{ratio}_y = \frac{SB_y}{SB^U_0}
+\]
+</p>
+<p>The result is stored in the population's spawning_biomass_ratio vector.</p>
+<p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">population</td><td>Shared pointer to the population object. </td></tr>
+  </table>
+  </dd>
+</dl>
+ <dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">year</td><td>Year index. </td></tr>
+  </table>
+  </dd>
+</dl>
+ </p>
+
+</div>
+</div>
+<a id="a96fd50ab465e1028eb608d05bf3e5137" name="a96fd50ab465e1028eb608d05bf3e5137"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a96fd50ab465e1028eb608d05bf3e5137">&#9670;&#160;</a></span>CalculateUnfishedBiomass()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a> <a class="el" href="classfims__popdy_1_1CatchAtAge.html">fims_popdy::CatchAtAge</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::CalculateUnfishedBiomass </td>
+          <td>(</td>
+          <td class="paramtype">std::shared_ptr&lt; <a class="el" href="structfims__popdy_1_1Population.html">fims_popdy::Population</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt; &amp;&#160;</td>
+          <td class="paramname"><em>population</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a>&#160;</td>
+          <td class="paramname"><em>i_age_year</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a>&#160;</td>
+          <td class="paramname"><em>year</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a>&#160;</td>
+          <td class="paramname"><em>age</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Calculates the unfished biomass for a population. </p>
+<p>Updates unfished biomass \(B^U_y\) by adding the biomass of age \(a\) in year \(y\):  </p><p class="formulaDsp">
+\[
+B^U_y \mathrel{+}= N^U_{a,y} \times w_a
+\]
+</p>
+<p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">population</td><td>Shared pointer to the population object. </td></tr>
+  </table>
+  </dd>
+</dl>
+ <dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">i_age_year</td><td>Dimension folded index for age and year. </td></tr>
+  </table>
+  </dd>
+</dl>
+ <dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">year</td><td>Year index. </td></tr>
+  </table>
+  </dd>
+</dl>
+ <dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">age</td><td>Age index. </td></tr>
+  </table>
+  </dd>
+</dl>
+ </p>
+
+</div>
+</div>
+<a id="a2876a340cab1830aff6110b8739d7e01" name="a2876a340cab1830aff6110b8739d7e01"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2876a340cab1830aff6110b8739d7e01">&#9670;&#160;</a></span>CalculateUnfishedNumbersAA()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a> <a class="el" href="classfims__popdy_1_1CatchAtAge.html">fims_popdy::CatchAtAge</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::CalculateUnfishedNumbersAA </td>
+          <td>(</td>
+          <td class="paramtype">std::shared_ptr&lt; <a class="el" href="structfims__popdy_1_1Population.html">fims_popdy::Population</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt; &amp;&#160;</td>
+          <td class="paramname"><em>population</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a>&#160;</td>
+          <td class="paramname"><em>i_age_year</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a>&#160;</td>
+          <td class="paramname"><em>i_agem1_yearm1</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a>&#160;</td>
+          <td class="paramname"><em>age</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Calculates unfished numbers at age at year and age specific indices. </p>
+<p>This function computes unfished numbers at age by applying survival through time using only natural mortality, without any fishing pressure. It also accounts for accumulation of the plus group.</p>
+<p>Standard update:  </p><p class="formulaDsp">
+\[
+N^U_{a,y} = N^U_{a-1,y-1} \exp(-M_{a-1,y-1})
+\]
+</p>
+<p>Plus group update (if \(a = A\)):  </p><p class="formulaDsp">
+\[
+N^U_{A,y} = N^U_{A-1,y-1} \exp(-M_{A-1,y-1}) + N^U_{A,y-1} \exp(-M_{A,y-1})
+\]
+</p>
+<p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">population</td><td>Shared pointer to the population object. </td></tr>
+  </table>
+  </dd>
+</dl>
+ <dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">i_age_year</td><td>Dimension folded index for age and year. </td></tr>
+  </table>
+  </dd>
+</dl>
+ <dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">i_agem1_yearm1</td><td>Dimension folded index for age-1 and year-1. </td></tr>
+  </table>
+  </dd>
+</dl>
+ <dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">age</td><td>Age index. </td></tr>
+  </table>
+  </dd>
+</dl>
+ </p>
+
+</div>
+</div>
+<a id="a8f410d2daae27b9aaaf7c6a32f57ab49" name="a8f410d2daae27b9aaaf7c6a32f57ab49"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8f410d2daae27b9aaaf7c6a32f57ab49">&#9670;&#160;</a></span>CalculateUnfishedSpawningBiomass()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a> <a class="el" href="classfims__popdy_1_1CatchAtAge.html">fims_popdy::CatchAtAge</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::CalculateUnfishedSpawningBiomass </td>
+          <td>(</td>
+          <td class="paramtype">std::shared_ptr&lt; <a class="el" href="structfims__popdy_1_1Population.html">fims_popdy::Population</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt; &amp;&#160;</td>
+          <td class="paramname"><em>population</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a>&#160;</td>
+          <td class="paramname"><em>i_age_year</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a>&#160;</td>
+          <td class="paramname"><em>year</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a>&#160;</td>
+          <td class="paramname"><em>age</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Calculated unfished spawning biomass for a population. </p>
+<p>Updates unfished spawning biomass \(SB^U_y\) by adding the biomass of age \(a\) in year \(y\):  </p><p class="formulaDsp">
+\[
+SB^U_y \mathrel{+}= N^U_{a,y} \times w_a \times p_{female,a} \times
+p_{mature,a}
+\]
+</p>
+<p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">population</td><td>Shared pointer to the population object. </td></tr>
+  </table>
+  </dd>
+</dl>
+ <dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">i_age_year</td><td>Dimension folded index for age and year. </td></tr>
+  </table>
+  </dd>
+</dl>
+ <dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">year</td><td>Year index. </td></tr>
+  </table>
+  </dd>
+</dl>
+ <dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">age</td><td>Age index. </td></tr>
+  </table>
+  </dd>
+</dl>
+ </p>
+
+</div>
+</div>
+<a id="a84c67ee2edf996a8f3cf736801a6eeb6" name="a84c67ee2edf996a8f3cf736801a6eeb6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a84c67ee2edf996a8f3cf736801a6eeb6">&#9670;&#160;</a></span>Evaluate()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">virtual</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a> <a class="el" href="classfims__popdy_1_1CatchAtAge.html">fims_popdy::CatchAtAge</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::Evaluate </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Evaluate the model. </p>
+
+<p>Reimplemented from <a class="el" href="classfims__popdy_1_1FisheryModelBase.html#a259bb2cc579b7b7710a0b5573968383c">fims_popdy::FisheryModelBase&lt; Type &gt;</a>.</p>
+
+</div>
+</div>
+<a id="a4b7f463cdd464efc2c056a5b8328cec8" name="a4b7f463cdd464efc2c056a5b8328cec8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4b7f463cdd464efc2c056a5b8328cec8">&#9670;&#160;</a></span>evaluate_age_comp()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a> <a class="el" href="classfims__popdy_1_1CatchAtAge.html">fims_popdy::CatchAtAge</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::evaluate_age_comp </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Evaluate the proportion of landings numbers at age. </p>
+
+</div>
+</div>
+<a id="afd9d2e41729f03ac80fd1d449bb6d8f9" name="afd9d2e41729f03ac80fd1d449bb6d8f9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afd9d2e41729f03ac80fd1d449bb6d8f9">&#9670;&#160;</a></span>evaluate_index()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a> <a class="el" href="classfims__popdy_1_1CatchAtAge.html">fims_popdy::CatchAtAge</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::evaluate_index </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Evaluate the natural log of the expected index. </p>
+
+</div>
+</div>
+<a id="ab529865b281351f69678c6fe31df1607" name="ab529865b281351f69678c6fe31df1607"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab529865b281351f69678c6fe31df1607">&#9670;&#160;</a></span>evaluate_landings()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a> <a class="el" href="classfims__popdy_1_1CatchAtAge.html">fims_popdy::CatchAtAge</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::evaluate_landings </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Evaluate the natural log of the expected landings. </p>
+
+</div>
+</div>
+<a id="a6270771e42f11407eb87b099087b1b55" name="a6270771e42f11407eb87b099087b1b55"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6270771e42f11407eb87b099087b1b55">&#9670;&#160;</a></span>evaluate_length_comp()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a> <a class="el" href="classfims__popdy_1_1CatchAtAge.html">fims_popdy::CatchAtAge</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::evaluate_length_comp </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Evaluate the proportion of landings numbers at length. </p>
+
+</div>
+</div>
+<a id="aca027997da78686a12f60bd6f26f40ea" name="aca027997da78686a12f60bd6f26f40ea"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aca027997da78686a12f60bd6f26f40ea">&#9670;&#160;</a></span>GetPopulations()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt; std::shared_ptr&lt; <a class="el" href="structfims__popdy_1_1Population.html">fims_popdy::Population</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt; &gt; &amp; <a class="el" href="classfims__popdy_1_1CatchAtAge.html">fims_popdy::CatchAtAge</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::GetPopulations </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>This function is used to get the populations of the model. It returns a vector of shared pointers to the populations. </p><dl class="section return"><dt>Returns</dt><dd>std::vector&lt;std::shared_ptr&lt;fims_popdy::Population&lt;Type&gt;&gt;&gt;&amp; </dd></dl>
+
+</div>
+</div>
+<a id="a1aa9b74e3ec96502d6b74c0b659c278c" name="a1aa9b74e3ec96502d6b74c0b659c278c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1aa9b74e3ec96502d6b74c0b659c278c">&#9670;&#160;</a></span>Initialize()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">virtual</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a> <a class="el" href="classfims__popdy_1_1CatchAtAge.html">fims_popdy::CatchAtAge</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::Initialize </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>This function is called once at the beginning of the model run. It initializes the derived quantities for the populations and fleets. </p>
+
+<p>Reimplemented from <a class="el" href="classfims__popdy_1_1FisheryModelBase.html#a5bd00f10b732406c5b11919d62cc87ab">fims_popdy::FisheryModelBase&lt; Type &gt;</a>.</p>
+
+</div>
+</div>
+<a id="af0d27bcf828a778e839f3a8658c52135" name="af0d27bcf828a778e839f3a8658c52135"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af0d27bcf828a778e839f3a8658c52135">&#9670;&#160;</a></span>Prepare()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">virtual</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a> <a class="el" href="classfims__popdy_1_1CatchAtAge.html">fims_popdy::CatchAtAge</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::Prepare </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>This function is used to reset the derived quantities of a population or fleet to a given value. </p>
+
+<p>Reimplemented from <a class="el" href="classfims__popdy_1_1FisheryModelBase.html#ae9f5db1ab4ec1337f4221a4cd2ad67c9">fims_popdy::FisheryModelBase&lt; Type &gt;</a>.</p>
+
+</div>
+</div>
+<a id="abf6dab88981668c7bf763590fa2ad43d" name="abf6dab88981668c7bf763590fa2ad43d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abf6dab88981668c7bf763590fa2ad43d">&#9670;&#160;</a></span>Report()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">virtual</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a> <a class="el" href="classfims__popdy_1_1CatchAtAge.html">fims_popdy::CatchAtAge</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::Report </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<ul>
+<li>This method is used to generate TMB reports from the population dynamics model. </li>
+</ul>
+
+<p>Reimplemented from <a class="el" href="classfims__popdy_1_1FisheryModelBase.html#abeb7bd84d2c45be018cc41549eeb65d5">fims_popdy::FisheryModelBase&lt; Type &gt;</a>.</p>
+
+</div>
+</div>
+<h2 class="groupheader">Member Data Documentation</h2>
+<a id="a25dc53adfee64cb0e8526e776e15bb0a" name="a25dc53adfee64cb0e8526e776e15bb0a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a25dc53adfee64cb0e8526e776e15bb0a">&#9670;&#160;</a></span>ages</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a>&gt; <a class="el" href="classfims__popdy_1_1CatchAtAge.html">fims_popdy::CatchAtAge</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::ages</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>vector of the ages for referencing </p>
+
+</div>
+</div>
+<hr/>The documentation for this class was generated from the following file:<ul>
+<li>inst/include/models/functors/<a class="el" href="catch__at__age_8hpp_source.html">catch_at_age.hpp</a></li>
+</ul>
+</div><!-- contents -->
+</div><!-- doc-content -->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a class="el" href="namespacefims__popdy.html">fims_popdy</a></li><li class="navelem"><a class="el" href="classfims__popdy_1_1CatchAtAge.html">CatchAtAge</a></li>
+    <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.8 </li>
+  </ul>
+</div>
+</body>
+</html>

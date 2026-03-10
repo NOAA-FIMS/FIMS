@@ -1,0 +1,688 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" data-bs-theme="auto">
+<head>
+    <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=9"/>
+    <meta name="generator" content="Doxygen 1.9.8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>FIMS</title><link href="tabs.css" rel="stylesheet" type="text/css"/>
+    <link rel="icon" type="image/png" href="https://noaa-fims.github.io/images/FIMS_hexlogo.png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+    <link href="https://noaa-fims.github.io/site_libs/bootstrap/bootstrap-5477dd34fdf9f443df58de9070e2fbd7.min.css" rel="stylesheet">
+    <link href="https://noaa-fims.github.io/site_libs/bootstrap/bootstrap-dark-429bd3fc0b6810d1347fc340b0896c35.min.css" rel="stylesheet" media="(prefers-color-scheme: dark)">
+    <script type="text/javascript" src="jquery.js"></script>
+    <script type="text/javascript" src="dynsections.js"></script>
+    <link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+    <link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+  $(document).ready(function() { init_search(); });
+/* @license-end */
+</script>
+    <script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  extensions: ["tex2jax.js"],
+  jax: ["input/TeX","output/HTML-CSS"],
+});
+</script>
+<script type="text/javascript" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js"></script>
+    <link href="doxygen.css" rel="stylesheet" type="text/css" />
+    <link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
+<link href="custom.css" rel="stylesheet" type="text/css"/>
+    <script src="https://noaa-fims.github.io/site_libs/quarto-nav/quarto-nav.js"></script>
+    <script src="https://noaa-fims.github.io/site_libs/bootstrap/bootstrap.min.js"></script>
+    <script src="https://noaa-fims.github.io/site_libs/quarto-html/quarto.js" type="module"></script>
+</head>
+<body>
+<div id="top">
+    <div id="titlearea">
+        <table cellspacing="0" cellpadding="0">
+            <tbody>
+            <tr style="height: 70px;">
+                <td id="projectlogo"><img alt="Logo" src="FIMS_logo3.png"/></td>
+                <td id="projectalign" style="padding-left: 0.5em;">
+                    <div id="projectname">FIMS
+                        &#160;<span id="projectnumber">v0.8.1</span></div>
+                    <div id="projectbrief"></div></td>
+                <td style="padding-left: 0.5em;">
+                    <div id="projectbrief"></div>
+                </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <nav class="navbar navbar-expand-lg " data-bs-theme="auto">
+      <div class="navbar-container container-fluid">
+        <div class="navbar-brand-container mx-auto">
+          <a href="https://noaa-fims.github.io/" class="navbar-brand navbar-brand-logo"></a>
+          <a class="navbar-brand" href="https://noaa-fims.github.io/">
+          </a>
+        </div>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+          <ul class="navbar-nav navbar-nav-scroll ms-auto">
+           <li class="nav-item dropdown">
+            <button class="nav-link dropdown-toggle" type="button" id="dropdown-reference" data-bs-toggle="dropdown"
+                    aria-expanded="false" aria-haspopup="true">reference</button>
+            <ul class="dropdown-menu" aria-labelledby="dropdown-reference">
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/reference/index.html">r/roxygen</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/doxygen/index.html">c++/doxygen</a></li>
+            </ul>
+           </li>
+            <li class="nav-item dropdown">
+            <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown"
+                    aria-expanded="false" aria-haspopup="true">articles</button>
+            <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
+              <li><h6 class="dropdown-header" data-toc-skip>intro to fims</h6></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/fims-demo.html">introducing the fisheries integrated modeling system (fims)</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/fims-logging.html">Introducing the fims logging system</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/fims-user-setup-guide.html">fims user setup guide</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/fims-demo-projections.html">simple projections using fims</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><h6 class="dropdown-header" data-toc-skip>developer</h6></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/fims-path-maturity.html">fims path - maturity</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><h6 class="dropdown-header" data-toc-skip>c++ training</h6></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/training-intro-cpp.html">intro to c++</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/training-intro-rcpp.html">intro to rcpp</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><h6 class="dropdown-header" data-toc-skip>research and development</h6></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/RD-re-sparsity.html">re sparsity</a></li>
+            </ul>
+          </li>
+            <li class="nav-item dropdown">
+              <button class="nav-link dropdown-toggle" type="button" id="dropdown-news" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">news</button>
+              <ul class="dropdown-menu" aria-labelledby="dropdown-news">
+                <li><h6 class="dropdown-header" data-toc-skip="">Releases</h6></li>
+                <li><a class="external-link dropdown-item" href="https://github.com/NOAA-FIMS/FIMS/releases/latest">latest release</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/news/index.html">changelog</a></li>
+              </ul>
+            </li>
+          <li class="nav-item dropdown">
+            <button class="nav-link dropdown-toggle" type="button" id="dropdown-reports" data-bs-toggle="dropdown"
+                    aria-expanded="false" aria-haspopup="true">reports</button>
+            <ul class="dropdown-menu" aria-labelledby="dropdown-reports">
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/coverage/coverage.html">coverage</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/coverage/codecoverage_explanation.html">coverage explained</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/testdown/index.html">testdown</a></li>
+            </ul>
+          </li>
+          <ul class="navbar-nav">
+            <li class="nav-item"><a class="external-link nav-link" href="https://noaa-fims.github.io/">fims website</a></li>
+            <li class="nav-item">
+              <a class="external-link nav-link" href="https://github.com/noaa-fims/fims/" aria-label="GitHub repository for FIMS">
+                <span class="fa fa-brands fa-github fa-lg"></span>
+              </a>
+            </li>
+            <!-- Keep the input; pkgdown’s autocomplete wrapper won’t exist in Doxygen -->
+            <li class="nav-item">
+              <form class="form-inline" role="search" onsubmit="return false;">
+                <input class="form-control" type="search" name="search-input" id="search-input"
+                      autocomplete="off" aria-label="Search site" placeholder="Search for">
+              </form>
+            </li>
+          </ul>
+      </div>
+    </div>
+  </nav>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  // Only on the cpp_directory_structure page!
+  document.querySelectorAll('.toc a').forEach(function(link) {
+    if (link.href && link.href.indexOf(location.pathname) !== -1) {
+      link.href = link.hash; // Just use the fragment
+    }
+  });
+});
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  function updateTocActive() {
+    var links = Array.from(document.querySelectorAll('.toc a'));
+    var anchors = links.map(link => document.getElementById(link.getAttribute('href').replace('#', '')));
+    var scrollTop = window.scrollY || document.documentElement.scrollTop;
+    var offset = 150; // Match your scroll-margin-top
+    let currentActive = -1;
+    for (let i = anchors.length - 1; i >= 0; i--) {
+      if (anchors[i] && (anchors[i].getBoundingClientRect().top + window.scrollY - offset) <= scrollTop) {
+        currentActive = i;
+        break;
+      }
+    }
+    links.forEach((link, i) => {
+      link.classList.remove('active', 'aboveActive');
+      if (i === currentActive) {
+        link.classList.add('active');
+      } else if (i < currentActive) {
+        link.classList.add('aboveActive');
+      }
+    });
+  }
+  window.addEventListener('scroll', updateTocActive);
+  window.addEventListener('hashchange', updateTocActive);
+  updateTocActive();
+});
+</script>
+    <!-- end header part -->
+<!-- Generated by Doxygen 1.9.8 -->
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+/* @license-end */
+</script>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(document).ready(function(){initNavTree('classDnormDistributionsInterface.html',''); initResizable(); });
+/* @license-end */
+</script>
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">Loading...</div>
+<div class="SRStatus" id="Searching">Searching...</div>
+<div class="SRStatus" id="NoMatches">No Matches</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="summary">
+<a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pub-attribs">Public Attributes</a> &#124;
+<a href="classDnormDistributionsInterface-members.html">List of all members</a>  </div>
+  <div class="headertitle"><div class="title">DnormDistributionsInterface Class Reference</div></div>
+</div><!--header-->
+<div class="contents">
+
+<p>The Rcpp interface for Dnorm to instantiate from R: dnorm_ &lt;- methods::new(DnormDistribution).  
+ <a href="classDnormDistributionsInterface.html#details">More...</a></p>
+
+<p><code>#include &lt;<a class="el" href="rcpp__distribution_8hpp_source.html">rcpp_distribution.hpp</a>&gt;</code></p>
+<div class="dynheader">
+Inheritance diagram for DnormDistributionsInterface:</div>
+<div class="dyncontent">
+ <div class="center">
+  <img src="classDnormDistributionsInterface.png" usemap="#DnormDistributionsInterface_map" alt=""/>
+  <map id="DnormDistributionsInterface_map" name="DnormDistributionsInterface_map">
+<area href="classDistributionsInterfaceBase.html" title="Rcpp interface that serves as the parent class for Rcpp distribution interfaces. This type should be ..." alt="DistributionsInterfaceBase" shape="rect" coords="0,56,168,80"/>
+<area href="classFIMSRcppInterfaceBase.html" title="Base class for all interface objects." alt="FIMSRcppInterfaceBase" shape="rect" coords="0,0,168,24"/>
+  </map>
+</div></div>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
+Public Member Functions</h2></td></tr>
+<tr class="memitem:a32d211998d5283f1898688d2b8914ac9" id="r_a32d211998d5283f1898688d2b8914ac9"><td class="memItemLeft" align="right" valign="top"><a id="a32d211998d5283f1898688d2b8914ac9" name="a32d211998d5283f1898688d2b8914ac9"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>DnormDistributionsInterface</b> ()</td></tr>
+<tr class="memdesc:a32d211998d5283f1898688d2b8914ac9"><td class="mdescLeft">&#160;</td><td class="mdescRight">The constructor. <br /></td></tr>
+<tr class="separator:a32d211998d5283f1898688d2b8914ac9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1ca0066f5d382c960a2006c4f79fdaea" id="r_a1ca0066f5d382c960a2006c4f79fdaea"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDnormDistributionsInterface.html#a1ca0066f5d382c960a2006c4f79fdaea">DnormDistributionsInterface</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="classDnormDistributionsInterface.html">DnormDistributionsInterface</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">other</a>)</td></tr>
+<tr class="memdesc:a1ca0066f5d382c960a2006c4f79fdaea"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a new Dnorm Distributions Interface object.  <br /></td></tr>
+<tr class="separator:a1ca0066f5d382c960a2006c4f79fdaea"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a449e7a2acd6b4a125f0ec13fff3e35eb" id="r_a449e7a2acd6b4a125f0ec13fff3e35eb"><td class="memItemLeft" align="right" valign="top"><a id="a449e7a2acd6b4a125f0ec13fff3e35eb" name="a449e7a2acd6b4a125f0ec13fff3e35eb"></a>
+<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">virtual</a>&#160;</td><td class="memItemRight" valign="bottom"><b>~DnormDistributionsInterface</b> ()</td></tr>
+<tr class="memdesc:a449e7a2acd6b4a125f0ec13fff3e35eb"><td class="mdescLeft">&#160;</td><td class="mdescRight">The destructor. <br /></td></tr>
+<tr class="separator:a449e7a2acd6b4a125f0ec13fff3e35eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af9d46a592495997817ca5eb2276aac29" id="r_af9d46a592495997817ca5eb2276aac29"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">virtual</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDnormDistributionsInterface.html#af9d46a592495997817ca5eb2276aac29">get_id</a> ()</td></tr>
+<tr class="memdesc:af9d46a592495997817ca5eb2276aac29"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the ID of the interface base object.  <br /></td></tr>
+<tr class="separator:af9d46a592495997817ca5eb2276aac29"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab2234ef63d314d70a9367053042c23a0" id="r_ab2234ef63d314d70a9367053042c23a0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">virtual</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDnormDistributionsInterface.html#ab2234ef63d314d70a9367053042c23a0">set_observed_data</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">int</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">observed_data_id</a>)</td></tr>
+<tr class="memdesc:ab2234ef63d314d70a9367053042c23a0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the unique ID for the observed data object.  <br /></td></tr>
+<tr class="separator:ab2234ef63d314d70a9367053042c23a0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abe721b78cee521cf61f350f1523749ec" id="r_abe721b78cee521cf61f350f1523749ec"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">virtual</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDnormDistributionsInterface.html#abe721b78cee521cf61f350f1523749ec">set_distribution_mean</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">double</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">input_value</a>)</td></tr>
+<tr class="memdesc:abe721b78cee521cf61f350f1523749ec"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the expected mean value for the distribution.    <br /></td></tr>
+<tr class="separator:abe721b78cee521cf61f350f1523749ec"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae5d27b7117db5c5308eff738689f43e4" id="r_ae5d27b7117db5c5308eff738689f43e4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">virtual</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDnormDistributionsInterface.html#ae5d27b7117db5c5308eff738689f43e4">set_distribution_links</a> (std::string input_type, Rcpp::IntegerVector <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">ids</a>)</td></tr>
+<tr class="memdesc:ae5d27b7117db5c5308eff738689f43e4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets pointers for data observations, random effects, or priors.    <br /></td></tr>
+<tr class="separator:ae5d27b7117db5c5308eff738689f43e4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a51741d62c5fef4c1ba89d6f9a40584aa" id="r_a51741d62c5fef4c1ba89d6f9a40584aa"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">virtual</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">double</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDnormDistributionsInterface.html#a51741d62c5fef4c1ba89d6f9a40584aa">evaluate</a> ()</td></tr>
+<tr class="memdesc:a51741d62c5fef4c1ba89d6f9a40584aa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate normal probability density function (pdf). The natural log of the pdf is returned.  <br /></td></tr>
+<tr class="separator:a51741d62c5fef4c1ba89d6f9a40584aa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a99391c0d44d07389f8f0d692d0008649" id="r_a99391c0d44d07389f8f0d692d0008649"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">virtual</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDnormDistributionsInterface.html#a99391c0d44d07389f8f0d692d0008649">finalize</a> ()</td></tr>
+<tr class="memdesc:a99391c0d44d07389f8f0d692d0008649"><td class="mdescLeft">&#160;</td><td class="mdescRight">Extracts the derived quantities from <code>Information</code> to the Rcpp object.  <br /></td></tr>
+<tr class="separator:a99391c0d44d07389f8f0d692d0008649"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3ac41c008229d455fc81b9893decd3a7" id="r_a3ac41c008229d455fc81b9893decd3a7"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">virtual</a> std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDnormDistributionsInterface.html#a3ac41c008229d455fc81b9893decd3a7">to_json</a> ()</td></tr>
+<tr class="memdesc:a3ac41c008229d455fc81b9893decd3a7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Converts the data to json representation for the output.  <br /></td></tr>
+<tr class="separator:a3ac41c008229d455fc81b9893decd3a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pub_methods_classDistributionsInterfaceBase"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classDistributionsInterfaceBase')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classDistributionsInterfaceBase.html">DistributionsInterfaceBase</a></td></tr>
+<tr class="memitem:afd3dd648eca4947c794973ef184e6b70 inherit pub_methods_classDistributionsInterfaceBase" id="r_afd3dd648eca4947c794973ef184e6b70"><td class="memItemLeft" align="right" valign="top">
+&#160;</td><td class="memItemRight" valign="bottom"><b>DistributionsInterfaceBase</b> ()</td></tr>
+<tr class="memdesc:afd3dd648eca4947c794973ef184e6b70 inherit pub_methods_classDistributionsInterfaceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">The constructor. <br /></td></tr>
+<tr class="separator:afd3dd648eca4947c794973ef184e6b70 inherit pub_methods_classDistributionsInterfaceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5024a4a0e2bc922354f5af0df9976f77 inherit pub_methods_classDistributionsInterfaceBase" id="r_a5024a4a0e2bc922354f5af0df9976f77"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDistributionsInterfaceBase.html#a5024a4a0e2bc922354f5af0df9976f77">DistributionsInterfaceBase</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="classDistributionsInterfaceBase.html">DistributionsInterfaceBase</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">other</a>)</td></tr>
+<tr class="memdesc:a5024a4a0e2bc922354f5af0df9976f77 inherit pub_methods_classDistributionsInterfaceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a new Distributions Interface Base object.  <br /></td></tr>
+<tr class="separator:a5024a4a0e2bc922354f5af0df9976f77 inherit pub_methods_classDistributionsInterfaceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a058951fc7d22a7a9a1e6f61bf287d7a9 inherit pub_methods_classDistributionsInterfaceBase" id="r_a058951fc7d22a7a9a1e6f61bf287d7a9"><td class="memItemLeft" align="right" valign="top">
+<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">virtual</a>&#160;</td><td class="memItemRight" valign="bottom"><b>~DistributionsInterfaceBase</b> ()</td></tr>
+<tr class="memdesc:a058951fc7d22a7a9a1e6f61bf287d7a9 inherit pub_methods_classDistributionsInterfaceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">The destructor. <br /></td></tr>
+<tr class="separator:a058951fc7d22a7a9a1e6f61bf287d7a9 inherit pub_methods_classDistributionsInterfaceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pub_methods_classFIMSRcppInterfaceBase"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classFIMSRcppInterfaceBase')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classFIMSRcppInterfaceBase.html">FIMSRcppInterfaceBase</a></td></tr>
+<tr class="memitem:a9183d9379777d8be70ab66af1a07f94c inherit pub_methods_classFIMSRcppInterfaceBase" id="r_a9183d9379777d8be70ab66af1a07f94c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">virtual</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFIMSRcppInterfaceBase.html#a9183d9379777d8be70ab66af1a07f94c">add_to_fims_tmb</a> ()</td></tr>
+<tr class="memdesc:a9183d9379777d8be70ab66af1a07f94c inherit pub_methods_classFIMSRcppInterfaceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">A virtual method to inherit to add objects to the TMB model.  <br /></td></tr>
+<tr class="separator:a9183d9379777d8be70ab66af1a07f94c inherit pub_methods_classFIMSRcppInterfaceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a72fc17f2f76b60a82db50167b1cde83d inherit pub_methods_classFIMSRcppInterfaceBase" id="r_a72fc17f2f76b60a82db50167b1cde83d"><td class="memItemLeft" align="right" valign="top">
+<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><b>get_se_values</b> (std::string name, std::map&lt; std::string, std::vector&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">double</a> &gt; &gt; &amp;se_values, <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">double</a> &gt; &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">values</a>)</td></tr>
+<tr class="memdesc:a72fc17f2f76b60a82db50167b1cde83d inherit pub_methods_classFIMSRcppInterfaceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Method to extract standard error values from the se_values working map. <br /></td></tr>
+<tr class="separator:a72fc17f2f76b60a82db50167b1cde83d inherit pub_methods_classFIMSRcppInterfaceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5e19680aa5d84f270939435588bce03b inherit pub_methods_classFIMSRcppInterfaceBase" id="r_a5e19680aa5d84f270939435588bce03b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">virtual</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFIMSRcppInterfaceBase.html#a5e19680aa5d84f270939435588bce03b">set_uncertainty</a> (std::map&lt; std::string, std::vector&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">double</a> &gt; &gt; &amp;se_values)</td></tr>
+<tr class="memdesc:a5e19680aa5d84f270939435588bce03b inherit pub_methods_classFIMSRcppInterfaceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set uncertainty values for the interface object.  <br /></td></tr>
+<tr class="separator:a5e19680aa5d84f270939435588bce03b inherit pub_methods_classFIMSRcppInterfaceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a46e0ce655ef707a6c66e863aa4f0b374 inherit pub_methods_classFIMSRcppInterfaceBase" id="r_a46e0ce655ef707a6c66e863aa4f0b374"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFIMSRcppInterfaceBase.html#a46e0ce655ef707a6c66e863aa4f0b374">value_to_string</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">double</a> value)</td></tr>
+<tr class="memdesc:a46e0ce655ef707a6c66e863aa4f0b374 inherit pub_methods_classFIMSRcppInterfaceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Report the parameter value as a string.  <br /></td></tr>
+<tr class="separator:a46e0ce655ef707a6c66e863aa4f0b374 inherit pub_methods_classFIMSRcppInterfaceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1fa6e0deb883a921fe70b328cdd30fee inherit pub_methods_classFIMSRcppInterfaceBase" id="r_a1fa6e0deb883a921fe70b328cdd30fee"><td class="memItemLeft" align="right" valign="top">
+std::string&#160;</td><td class="memItemRight" valign="bottom"><b>make_dimensions</b> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">start</a>, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a> end, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">rep</a>=1)</td></tr>
+<tr class="memdesc:a1fa6e0deb883a921fe70b328cdd30fee inherit pub_methods_classFIMSRcppInterfaceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Make a string of dimensions for the model. <br /></td></tr>
+<tr class="separator:a1fa6e0deb883a921fe70b328cdd30fee inherit pub_methods_classFIMSRcppInterfaceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
+Public Attributes</h2></td></tr>
+<tr class="memitem:a12310c938c2b7e57425947f39cd0ebd4" id="r_a12310c938c2b7e57425947f39cd0ebd4"><td class="memItemLeft" align="right" valign="top"><a id="a12310c938c2b7e57425947f39cd0ebd4" name="a12310c938c2b7e57425947f39cd0ebd4"></a>
+<a class="el" href="classParameterVector.html">ParameterVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>x</b></td></tr>
+<tr class="memdesc:a12310c938c2b7e57425947f39cd0ebd4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Observed data. <br /></td></tr>
+<tr class="separator:a12310c938c2b7e57425947f39cd0ebd4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a52b505e82789482f43f8be3462cf73d0" id="r_a52b505e82789482f43f8be3462cf73d0"><td class="memItemLeft" align="right" valign="top"><a id="a52b505e82789482f43f8be3462cf73d0" name="a52b505e82789482f43f8be3462cf73d0"></a>
+<a class="el" href="classParameterVector.html">ParameterVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>expected_values</b></td></tr>
+<tr class="memdesc:a52b505e82789482f43f8be3462cf73d0"><td class="mdescLeft">&#160;</td><td class="mdescRight">The expected values, which would be the mean of x for this distribution. <br /></td></tr>
+<tr class="separator:a52b505e82789482f43f8be3462cf73d0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2a9c2c77c88f5130b7bfffc2422e0d63" id="r_a2a9c2c77c88f5130b7bfffc2422e0d63"><td class="memItemLeft" align="right" valign="top"><a id="a2a9c2c77c88f5130b7bfffc2422e0d63" name="a2a9c2c77c88f5130b7bfffc2422e0d63"></a>
+<a class="el" href="classParameterVector.html">ParameterVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>expected_mean</b></td></tr>
+<tr class="memdesc:a2a9c2c77c88f5130b7bfffc2422e0d63"><td class="mdescLeft">&#160;</td><td class="mdescRight">The expected mean, which would be the mean of x for this distribution. <br /></td></tr>
+<tr class="separator:a2a9c2c77c88f5130b7bfffc2422e0d63"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adaaca1b7c950e10ab4be5ca3ba25e0a6" id="r_adaaca1b7c950e10ab4be5ca3ba25e0a6"><td class="memItemLeft" align="right" valign="top"><a id="adaaca1b7c950e10ab4be5ca3ba25e0a6" name="adaaca1b7c950e10ab4be5ca3ba25e0a6"></a>
+<a class="el" href="classParameterVector.html">ParameterVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>log_sd</b></td></tr>
+<tr class="memdesc:adaaca1b7c950e10ab4be5ca3ba25e0a6"><td class="mdescLeft">&#160;</td><td class="mdescRight">The uncertainty, which would be the standard deviation of x for the normal distribution. <br /></td></tr>
+<tr class="separator:adaaca1b7c950e10ab4be5ca3ba25e0a6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4e19322d31fc600f83b3a4fbbb393768" id="r_a4e19322d31fc600f83b3a4fbbb393768"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classRealVector.html">RealVector</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDnormDistributionsInterface.html#a4e19322d31fc600f83b3a4fbbb393768">lpdf_vec</a></td></tr>
+<tr class="memdesc:a4e19322d31fc600f83b3a4fbbb393768"><td class="mdescLeft">&#160;</td><td class="mdescRight">Vector that records the individual log probability function for each observation.  <br /></td></tr>
+<tr class="separator:a4e19322d31fc600f83b3a4fbbb393768"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pub_attribs_classDistributionsInterfaceBase"><td colspan="2" onclick="javascript:toggleInherit('pub_attribs_classDistributionsInterfaceBase')"><img src="closed.png" alt="-"/>&#160;Public Attributes inherited from <a class="el" href="classDistributionsInterfaceBase.html">DistributionsInterfaceBase</a></td></tr>
+<tr class="memitem:a59f4650de07c713946705e940bd1b5cd inherit pub_attribs_classDistributionsInterfaceBase" id="r_a59f4650de07c713946705e940bd1b5cd"><td class="memItemLeft" align="right" valign="top">
+<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a>&#160;</td><td class="memItemRight" valign="bottom"><b>id_m</b></td></tr>
+<tr class="memdesc:a59f4650de07c713946705e940bd1b5cd inherit pub_attribs_classDistributionsInterfaceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">The local ID of the <a class="el" href="classDistributionsInterfaceBase.html" title="Rcpp interface that serves as the parent class for Rcpp distribution interfaces. This type should be ...">DistributionsInterfaceBase</a> object. <br /></td></tr>
+<tr class="separator:a59f4650de07c713946705e940bd1b5cd inherit pub_attribs_classDistributionsInterfaceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3b021b76b77b2dc31b529875de79fdc3 inherit pub_attribs_classDistributionsInterfaceBase" id="r_a3b021b76b77b2dc31b529875de79fdc3"><td class="memItemLeft" align="right" valign="top">
+std::shared_ptr&lt; std::vector&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>key_m</b></td></tr>
+<tr class="memdesc:a3b021b76b77b2dc31b529875de79fdc3 inherit pub_attribs_classDistributionsInterfaceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">The unique ID for the variable map that points to a <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>. <br /></td></tr>
+<tr class="separator:a3b021b76b77b2dc31b529875de79fdc3 inherit pub_attribs_classDistributionsInterfaceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af64d56001f37f47acef0684814d50a5a inherit pub_attribs_classDistributionsInterfaceBase" id="r_af64d56001f37f47acef0684814d50a5a"><td class="memItemLeft" align="right" valign="top">
+<a class="el" href="classSharedString.html">SharedString</a>&#160;</td><td class="memItemRight" valign="bottom"><b>input_type_m</b></td></tr>
+<tr class="memdesc:af64d56001f37f47acef0684814d50a5a inherit pub_attribs_classDistributionsInterfaceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">The type of density input. The options are prior, re, or data. <br /></td></tr>
+<tr class="separator:af64d56001f37f47acef0684814d50a5a inherit pub_attribs_classDistributionsInterfaceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad3be554775b37d5cb817af2c50e0fc60 inherit pub_attribs_classDistributionsInterfaceBase" id="r_ad3be554775b37d5cb817af2c50e0fc60"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classSharedString.html">SharedString</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDistributionsInterfaceBase.html#ad3be554775b37d5cb817af2c50e0fc60">use_mean_m</a> = <a class="el" href="def_8hpp.html#ad28f97734d58355a40d01801bca1e2bf">fims::to_string</a>(&quot;no&quot;)</td></tr>
+<tr class="memdesc:ad3be554775b37d5cb817af2c50e0fc60 inherit pub_attribs_classDistributionsInterfaceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Control flag indicating whether to use the expected mean in the distribution calculations.  <br /></td></tr>
+<tr class="separator:ad3be554775b37d5cb817af2c50e0fc60 inherit pub_attribs_classDistributionsInterfaceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae0bcce99577896f4a18c7f1099cd6145 inherit pub_attribs_classDistributionsInterfaceBase" id="r_ae0bcce99577896f4a18c7f1099cd6145"><td class="memItemLeft" align="right" valign="top">
+<a class="el" href="classSharedInt.html">SharedInt</a>&#160;</td><td class="memItemRight" valign="bottom"><b>interface_observed_data_id_m</b> = -999</td></tr>
+<tr class="memdesc:ae0bcce99577896f4a18c7f1099cd6145 inherit pub_attribs_classDistributionsInterfaceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">The ID of the observed data object, which is set to -999. <br /></td></tr>
+<tr class="separator:ae0bcce99577896f4a18c7f1099cd6145 inherit pub_attribs_classDistributionsInterfaceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0364a4456745755b92c13378f688c517 inherit pub_attribs_classDistributionsInterfaceBase" id="r_a0364a4456745755b92c13378f688c517"><td class="memItemLeft" align="right" valign="top">
+<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">double</a>&#160;</td><td class="memItemRight" valign="bottom"><b>lpdf_value</b> = 0</td></tr>
+<tr class="memdesc:a0364a4456745755b92c13378f688c517 inherit pub_attribs_classDistributionsInterfaceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">The log probability density function value. <br /></td></tr>
+<tr class="separator:a0364a4456745755b92c13378f688c517 inherit pub_attribs_classDistributionsInterfaceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pub_attribs_classFIMSRcppInterfaceBase"><td colspan="2" onclick="javascript:toggleInherit('pub_attribs_classFIMSRcppInterfaceBase')"><img src="closed.png" alt="-"/>&#160;Public Attributes inherited from <a class="el" href="classFIMSRcppInterfaceBase.html">FIMSRcppInterfaceBase</a></td></tr>
+<tr class="memitem:a44e4e3b1dd18103bf79ccb30a76f5933 inherit pub_attribs_classFIMSRcppInterfaceBase" id="r_a44e4e3b1dd18103bf79ccb30a76f5933"><td class="memItemLeft" align="right" valign="top">
+<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><b>finalized</b> = <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">false</a></td></tr>
+<tr class="memdesc:a44e4e3b1dd18103bf79ccb30a76f5933 inherit pub_attribs_classFIMSRcppInterfaceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Is the object already finalized? The default is false. <br /></td></tr>
+<tr class="separator:a44e4e3b1dd18103bf79ccb30a76f5933 inherit pub_attribs_classFIMSRcppInterfaceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="inherited" name="inherited"></a>
+Additional Inherited Members</h2></td></tr>
+<tr class="inherit_header pub_static_attribs_classDistributionsInterfaceBase"><td colspan="2" onclick="javascript:toggleInherit('pub_static_attribs_classDistributionsInterfaceBase')"><img src="closed.png" alt="-"/>&#160;Static Public Attributes inherited from <a class="el" href="classDistributionsInterfaceBase.html">DistributionsInterfaceBase</a></td></tr>
+<tr class="memitem:af2f7855cea3e05c6b3db1984dbf9b499 inherit pub_static_attribs_classDistributionsInterfaceBase" id="r_af2f7855cea3e05c6b3db1984dbf9b499"><td class="memItemLeft" align="right" valign="top">
+<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">static</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a>&#160;</td><td class="memItemRight" valign="bottom"><b>id_g</b> = 1</td></tr>
+<tr class="memdesc:af2f7855cea3e05c6b3db1984dbf9b499 inherit pub_static_attribs_classDistributionsInterfaceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">The static ID of the <a class="el" href="classDistributionsInterfaceBase.html" title="Rcpp interface that serves as the parent class for Rcpp distribution interfaces. This type should be ...">DistributionsInterfaceBase</a> object. <br /></td></tr>
+<tr class="separator:af2f7855cea3e05c6b3db1984dbf9b499 inherit pub_static_attribs_classDistributionsInterfaceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af5a8c17c32f4f64e86f88611e1afc323 inherit pub_static_attribs_classDistributionsInterfaceBase" id="r_af5a8c17c32f4f64e86f88611e1afc323"><td class="memItemLeft" align="right" valign="top">
+<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">static</a> std::map&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a>, std::shared_ptr&lt; <a class="el" href="classDistributionsInterfaceBase.html">DistributionsInterfaceBase</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>live_objects</b></td></tr>
+<tr class="memdesc:af5a8c17c32f4f64e86f88611e1afc323 inherit pub_static_attribs_classDistributionsInterfaceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">The map associating the ID of the <a class="el" href="classDistributionsInterfaceBase.html" title="Rcpp interface that serves as the parent class for Rcpp distribution interfaces. This type should be ...">DistributionsInterfaceBase</a> to the <a class="el" href="classDistributionsInterfaceBase.html" title="Rcpp interface that serves as the parent class for Rcpp distribution interfaces. This type should be ...">DistributionsInterfaceBase</a> objects. This is a live object, which is an object that has been created and lives in memory. <br /></td></tr>
+<tr class="separator:af5a8c17c32f4f64e86f88611e1afc323 inherit pub_static_attribs_classDistributionsInterfaceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pub_static_attribs_classFIMSRcppInterfaceBase"><td colspan="2" onclick="javascript:toggleInherit('pub_static_attribs_classFIMSRcppInterfaceBase')"><img src="closed.png" alt="-"/>&#160;Static Public Attributes inherited from <a class="el" href="classFIMSRcppInterfaceBase.html">FIMSRcppInterfaceBase</a></td></tr>
+<tr class="memitem:a66ae9ad9c0adae77184eefa59e283c5e inherit pub_static_attribs_classFIMSRcppInterfaceBase" id="r_a66ae9ad9c0adae77184eefa59e283c5e"><td class="memItemLeft" align="right" valign="top">
+<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">static</a> std::vector&lt; std::shared_ptr&lt; <a class="el" href="classFIMSRcppInterfaceBase.html">FIMSRcppInterfaceBase</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>fims_interface_objects</b></td></tr>
+<tr class="memdesc:a66ae9ad9c0adae77184eefa59e283c5e inherit pub_static_attribs_classFIMSRcppInterfaceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">FIMS interface object vectors. <br /></td></tr>
+<tr class="separator:a66ae9ad9c0adae77184eefa59e283c5e inherit pub_static_attribs_classFIMSRcppInterfaceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>The Rcpp interface for Dnorm to instantiate from R: dnorm_ &lt;- methods::new(DnormDistribution). </p>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a id="a1ca0066f5d382c960a2006c4f79fdaea" name="a1ca0066f5d382c960a2006c4f79fdaea"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1ca0066f5d382c960a2006c4f79fdaea">&#9670;&#160;</a></span>DnormDistributionsInterface()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">DnormDistributionsInterface::DnormDistributionsInterface </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="classDnormDistributionsInterface.html">DnormDistributionsInterface</a> &amp;&#160;</td>
+          <td class="paramname"><em>other</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Construct a new Dnorm Distributions Interface object. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">other</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<h2 class="groupheader">Member Function Documentation</h2>
+<a id="a51741d62c5fef4c1ba89d6f9a40584aa" name="a51741d62c5fef4c1ba89d6f9a40584aa"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a51741d62c5fef4c1ba89d6f9a40584aa">&#9670;&#160;</a></span>evaluate()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">virtual</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">double</a> DnormDistributionsInterface::evaluate </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Evaluate normal probability density function (pdf). The natural log of the pdf is returned. </p>
+<dl class="section return"><dt>Returns</dt><dd>The natural log of the probability density function (pdf) is returned. </dd></dl>
+
+<p>Implements <a class="el" href="classDistributionsInterfaceBase.html#a09877510b57140479092bcacb0843703">DistributionsInterfaceBase</a>.</p>
+
+</div>
+</div>
+<a id="a99391c0d44d07389f8f0d692d0008649" name="a99391c0d44d07389f8f0d692d0008649"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a99391c0d44d07389f8f0d692d0008649">&#9670;&#160;</a></span>finalize()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">virtual</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a> DnormDistributionsInterface::finalize </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Extracts the derived quantities from <code>Information</code> to the Rcpp object. </p>
+
+<p>Reimplemented from <a class="el" href="classFIMSRcppInterfaceBase.html#abdfb6b47bd4ea86042f84590236036d7">FIMSRcppInterfaceBase</a>.</p>
+
+</div>
+</div>
+<a id="af9d46a592495997817ca5eb2276aac29" name="af9d46a592495997817ca5eb2276aac29"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af9d46a592495997817ca5eb2276aac29">&#9670;&#160;</a></span>get_id()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">virtual</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a> DnormDistributionsInterface::get_id </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Gets the ID of the interface base object. </p>
+<dl class="section return"><dt>Returns</dt><dd>The ID. </dd></dl>
+
+<p>Implements <a class="el" href="classDistributionsInterfaceBase.html#ac2c9fafbff23443ff4b5d9a9bee56c08">DistributionsInterfaceBase</a>.</p>
+
+</div>
+</div>
+<a id="ae5d27b7117db5c5308eff738689f43e4" name="ae5d27b7117db5c5308eff738689f43e4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae5d27b7117db5c5308eff738689f43e4">&#9670;&#160;</a></span>set_distribution_links()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">virtual</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a> DnormDistributionsInterface::set_distribution_links </td>
+          <td>(</td>
+          <td class="paramtype">std::string&#160;</td>
+          <td class="paramname"><em>input_type</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Rcpp::IntegerVector&#160;</td>
+          <td class="paramname"><em>ids</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Sets pointers for data observations, random effects, or priors.   </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">input_type</td><td>String that sets whether the distribution type is for priors, random effects, or data. </td></tr>
+    <tr><td class="paramname">ids</td><td>Vector of unique ids for each linked parameter(s), derived value(s), or observed data vector.   </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Reimplemented from <a class="el" href="classDistributionsInterfaceBase.html#ae8e42238a8b6e6cffbfbd9ac5a04d821">DistributionsInterfaceBase</a>.</p>
+
+</div>
+</div>
+<a id="abe721b78cee521cf61f350f1523749ec" name="abe721b78cee521cf61f350f1523749ec"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abe721b78cee521cf61f350f1523749ec">&#9670;&#160;</a></span>set_distribution_mean()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">virtual</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a> DnormDistributionsInterface::set_distribution_mean </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">double</a>&#160;</td>
+          <td class="paramname"><em>input_value</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Set the expected mean value for the distribution.   </p>
+<p>This virtual function provides an interface for setting a fixed mean value for distribution objects. When overridden in derived classes, this method typically stores the provided mean value as a fixed effect parameter and marks the distribution to use the mean in its calculations.</p>
+<p>The base class implementation returns false to indicate the operation is not supported. Derived classes that support mean specification should override this method to implement the actual functionality.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">input_value</td><td>The numeric value to set as the distribution's expected mean. This value will be treated as a fixed effect parameter (not estimated) in derived class implementations.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>bool Returns true if the mean was successfully set, false otherwise. The base class implementation always returns false to indicate the operation is not supported by default.</dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="classDnormDistributionsInterface.html#abe721b78cee521cf61f350f1523749ec" title="Set the expected mean value for the distribution.">DnormDistributionsInterface::set_distribution_mean</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d" title="Clears the internal objects.">for</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d" title="Clears the internal objects.">an</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d" title="Clears the internal objects.">example</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d" title="Clears the internal objects.">implementation</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d" title="Clears the internal objects.">that</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d" title="Clears the internal objects.">sets</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d" title="Clears the internal objects.">the</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d" title="Clears the internal objects.">mean</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d" title="Clears the internal objects.">as</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d" title="Clears the internal objects.">a</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d" title="Clears the internal objects.">fixed</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d" title="Clears the internal objects.">effect</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d" title="Clears the internal objects.">parameter</a>.   </dd></dl>
+
+<p>Reimplemented from <a class="el" href="classDistributionsInterfaceBase.html#ae5ee1ee2b9d117aecc7396e442b48b2f">DistributionsInterfaceBase</a>.</p>
+
+</div>
+</div>
+<a id="ab2234ef63d314d70a9367053042c23a0" name="ab2234ef63d314d70a9367053042c23a0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab2234ef63d314d70a9367053042c23a0">&#9670;&#160;</a></span>set_observed_data()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">virtual</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a> DnormDistributionsInterface::set_observed_data </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">int</a>&#160;</td>
+          <td class="paramname"><em>observed_data_id</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Set the unique ID for the observed data object. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">observed_data_id</td><td>Unique ID for the observed data object. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Reimplemented from <a class="el" href="classDistributionsInterfaceBase.html#a0071e40d5d56d8b1a2e5bf3c65edb45f">DistributionsInterfaceBase</a>.</p>
+
+</div>
+</div>
+<a id="a3ac41c008229d455fc81b9893decd3a7" name="a3ac41c008229d455fc81b9893decd3a7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3ac41c008229d455fc81b9893decd3a7">&#9670;&#160;</a></span>to_json()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">virtual</a> std::string DnormDistributionsInterface::to_json </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Converts the data to json representation for the output. </p>
+<dl class="section return"><dt>Returns</dt><dd>A string is returned specifying that the module relates to the distribution interface with a normal distribution. It also returns the ID and the natural log of the probability density function values themselves. This string is formatted for a json file. </dd></dl>
+
+<p>Reimplemented from <a class="el" href="classFIMSRcppInterfaceBase.html#aa97acd77c0c4d2e193c67cd0662d803c">FIMSRcppInterfaceBase</a>.</p>
+
+</div>
+</div>
+<h2 class="groupheader">Member Data Documentation</h2>
+<a id="a4e19322d31fc600f83b3a4fbbb393768" name="a4e19322d31fc600f83b3a4fbbb393768"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4e19322d31fc600f83b3a4fbbb393768">&#9670;&#160;</a></span>lpdf_vec</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classRealVector.html">RealVector</a> DnormDistributionsInterface::lpdf_vec</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Vector that records the individual log probability function for each observation. </p>
+<p>The vector </p>
+
+</div>
+</div>
+<hr/>The documentation for this class was generated from the following file:<ul>
+<li>inst/include/interface/rcpp/rcpp_objects/<a class="el" href="rcpp__distribution_8hpp_source.html">rcpp_distribution.hpp</a></li>
+</ul>
+</div><!-- contents -->
+</div><!-- doc-content -->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a class="el" href="classDnormDistributionsInterface.html">DnormDistributionsInterface</a></li>
+    <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.8 </li>
+  </ul>
+</div>
+</body>
+</html>

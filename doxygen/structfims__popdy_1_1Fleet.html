@@ -1,0 +1,779 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" data-bs-theme="auto">
+<head>
+    <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=9"/>
+    <meta name="generator" content="Doxygen 1.9.8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>FIMS</title><link href="tabs.css" rel="stylesheet" type="text/css"/>
+    <link rel="icon" type="image/png" href="https://noaa-fims.github.io/images/FIMS_hexlogo.png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+    <link href="https://noaa-fims.github.io/site_libs/bootstrap/bootstrap-5477dd34fdf9f443df58de9070e2fbd7.min.css" rel="stylesheet">
+    <link href="https://noaa-fims.github.io/site_libs/bootstrap/bootstrap-dark-429bd3fc0b6810d1347fc340b0896c35.min.css" rel="stylesheet" media="(prefers-color-scheme: dark)">
+    <script type="text/javascript" src="jquery.js"></script>
+    <script type="text/javascript" src="dynsections.js"></script>
+    <link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+    <link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+  $(document).ready(function() { init_search(); });
+/* @license-end */
+</script>
+    <script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  extensions: ["tex2jax.js"],
+  jax: ["input/TeX","output/HTML-CSS"],
+});
+</script>
+<script type="text/javascript" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js"></script>
+    <link href="doxygen.css" rel="stylesheet" type="text/css" />
+    <link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
+<link href="custom.css" rel="stylesheet" type="text/css"/>
+    <script src="https://noaa-fims.github.io/site_libs/quarto-nav/quarto-nav.js"></script>
+    <script src="https://noaa-fims.github.io/site_libs/bootstrap/bootstrap.min.js"></script>
+    <script src="https://noaa-fims.github.io/site_libs/quarto-html/quarto.js" type="module"></script>
+</head>
+<body>
+<div id="top">
+    <div id="titlearea">
+        <table cellspacing="0" cellpadding="0">
+            <tbody>
+            <tr style="height: 70px;">
+                <td id="projectlogo"><img alt="Logo" src="FIMS_logo3.png"/></td>
+                <td id="projectalign" style="padding-left: 0.5em;">
+                    <div id="projectname">FIMS
+                        &#160;<span id="projectnumber">v0.8.1</span></div>
+                    <div id="projectbrief"></div></td>
+                <td style="padding-left: 0.5em;">
+                    <div id="projectbrief"></div>
+                </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <nav class="navbar navbar-expand-lg " data-bs-theme="auto">
+      <div class="navbar-container container-fluid">
+        <div class="navbar-brand-container mx-auto">
+          <a href="https://noaa-fims.github.io/" class="navbar-brand navbar-brand-logo"></a>
+          <a class="navbar-brand" href="https://noaa-fims.github.io/">
+          </a>
+        </div>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+          <ul class="navbar-nav navbar-nav-scroll ms-auto">
+           <li class="nav-item dropdown">
+            <button class="nav-link dropdown-toggle" type="button" id="dropdown-reference" data-bs-toggle="dropdown"
+                    aria-expanded="false" aria-haspopup="true">reference</button>
+            <ul class="dropdown-menu" aria-labelledby="dropdown-reference">
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/reference/index.html">r/roxygen</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/doxygen/index.html">c++/doxygen</a></li>
+            </ul>
+           </li>
+            <li class="nav-item dropdown">
+            <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown"
+                    aria-expanded="false" aria-haspopup="true">articles</button>
+            <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
+              <li><h6 class="dropdown-header" data-toc-skip>intro to fims</h6></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/fims-demo.html">introducing the fisheries integrated modeling system (fims)</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/fims-logging.html">Introducing the fims logging system</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/fims-user-setup-guide.html">fims user setup guide</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/fims-demo-projections.html">simple projections using fims</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><h6 class="dropdown-header" data-toc-skip>developer</h6></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/fims-path-maturity.html">fims path - maturity</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><h6 class="dropdown-header" data-toc-skip>c++ training</h6></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/training-intro-cpp.html">intro to c++</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/training-intro-rcpp.html">intro to rcpp</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><h6 class="dropdown-header" data-toc-skip>research and development</h6></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/RD-re-sparsity.html">re sparsity</a></li>
+            </ul>
+          </li>
+            <li class="nav-item dropdown">
+              <button class="nav-link dropdown-toggle" type="button" id="dropdown-news" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">news</button>
+              <ul class="dropdown-menu" aria-labelledby="dropdown-news">
+                <li><h6 class="dropdown-header" data-toc-skip="">Releases</h6></li>
+                <li><a class="external-link dropdown-item" href="https://github.com/NOAA-FIMS/FIMS/releases/latest">latest release</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/news/index.html">changelog</a></li>
+              </ul>
+            </li>
+          <li class="nav-item dropdown">
+            <button class="nav-link dropdown-toggle" type="button" id="dropdown-reports" data-bs-toggle="dropdown"
+                    aria-expanded="false" aria-haspopup="true">reports</button>
+            <ul class="dropdown-menu" aria-labelledby="dropdown-reports">
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/coverage/coverage.html">coverage</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/coverage/codecoverage_explanation.html">coverage explained</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/testdown/index.html">testdown</a></li>
+            </ul>
+          </li>
+          <ul class="navbar-nav">
+            <li class="nav-item"><a class="external-link nav-link" href="https://noaa-fims.github.io/">fims website</a></li>
+            <li class="nav-item">
+              <a class="external-link nav-link" href="https://github.com/noaa-fims/fims/" aria-label="GitHub repository for FIMS">
+                <span class="fa fa-brands fa-github fa-lg"></span>
+              </a>
+            </li>
+            <!-- Keep the input; pkgdown’s autocomplete wrapper won’t exist in Doxygen -->
+            <li class="nav-item">
+              <form class="form-inline" role="search" onsubmit="return false;">
+                <input class="form-control" type="search" name="search-input" id="search-input"
+                      autocomplete="off" aria-label="Search site" placeholder="Search for">
+              </form>
+            </li>
+          </ul>
+      </div>
+    </div>
+  </nav>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  // Only on the cpp_directory_structure page!
+  document.querySelectorAll('.toc a').forEach(function(link) {
+    if (link.href && link.href.indexOf(location.pathname) !== -1) {
+      link.href = link.hash; // Just use the fragment
+    }
+  });
+});
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  function updateTocActive() {
+    var links = Array.from(document.querySelectorAll('.toc a'));
+    var anchors = links.map(link => document.getElementById(link.getAttribute('href').replace('#', '')));
+    var scrollTop = window.scrollY || document.documentElement.scrollTop;
+    var offset = 150; // Match your scroll-margin-top
+    let currentActive = -1;
+    for (let i = anchors.length - 1; i >= 0; i--) {
+      if (anchors[i] && (anchors[i].getBoundingClientRect().top + window.scrollY - offset) <= scrollTop) {
+        currentActive = i;
+        break;
+      }
+    }
+    links.forEach((link, i) => {
+      link.classList.remove('active', 'aboveActive');
+      if (i === currentActive) {
+        link.classList.add('active');
+      } else if (i < currentActive) {
+        link.classList.add('aboveActive');
+      }
+    });
+  }
+  window.addEventListener('scroll', updateTocActive);
+  window.addEventListener('hashchange', updateTocActive);
+  updateTocActive();
+});
+</script>
+    <!-- end header part -->
+<!-- Generated by Doxygen 1.9.8 -->
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+/* @license-end */
+</script>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(document).ready(function(){initNavTree('structfims__popdy_1_1Fleet.html',''); initResizable(); });
+/* @license-end */
+</script>
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">Loading...</div>
+<div class="SRStatus" id="Searching">Searching...</div>
+<div class="SRStatus" id="NoMatches">No Matches</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="summary">
+<a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pub-attribs">Public Attributes</a> &#124;
+<a href="#pub-static-attribs">Static Public Attributes</a> &#124;
+<a href="structfims__popdy_1_1Fleet-members.html">List of all members</a>  </div>
+  <div class="headertitle"><div class="title">fims_popdy::Fleet&lt; Type &gt; Struct Template Reference</div></div>
+</div><!--header-->
+<div class="contents">
+
+<p>Base class for all fleets.  
+ <a href="structfims__popdy_1_1Fleet.html#details">More...</a></p>
+
+<p><code>#include &lt;<a class="el" href="fleet_8hpp_source.html">fleet.hpp</a>&gt;</code></p>
+<div class="dynheader">
+Inheritance diagram for fims_popdy::Fleet&lt; Type &gt;:</div>
+<div class="dyncontent">
+ <div class="center">
+  <img src="structfims__popdy_1_1Fleet.png" usemap="#fims_5Fpopdy::Fleet_3C_20Type_20_3E_map" alt=""/>
+  <map id="fims_5Fpopdy::Fleet_3C_20Type_20_3E_map" name="fims_5Fpopdy::Fleet_3C_20Type_20_3E_map">
+<area href="structfims__model__object_1_1FIMSObject.html" title="FIMSObject struct that defines member types and returns the unique id." alt="fims_model_object::FIMSObject&lt; Type &gt;" shape="rect" coords="0,0,240,24"/>
+  </map>
+</div></div>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
+Public Member Functions</h2></td></tr>
+<tr class="memitem:a1aaf947b159a58a5d23d78e55c34a4fd" id="r_a1aaf947b159a58a5d23d78e55c34a4fd"><td class="memItemLeft" align="right" valign="top"><a id="a1aaf947b159a58a5d23d78e55c34a4fd" name="a1aaf947b159a58a5d23d78e55c34a4fd"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>Fleet</b> ()</td></tr>
+<tr class="memdesc:a1aaf947b159a58a5d23d78e55c34a4fd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor. <br /></td></tr>
+<tr class="separator:a1aaf947b159a58a5d23d78e55c34a4fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8daf372e70483efaeba014d5ebf7500b" id="r_a8daf372e70483efaeba014d5ebf7500b"><td class="memItemLeft" align="right" valign="top"><a id="a8daf372e70483efaeba014d5ebf7500b" name="a8daf372e70483efaeba014d5ebf7500b"></a>
+<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">virtual</a>&#160;</td><td class="memItemRight" valign="bottom"><b>~Fleet</b> ()</td></tr>
+<tr class="memdesc:a8daf372e70483efaeba014d5ebf7500b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destructor. <br /></td></tr>
+<tr class="separator:a8daf372e70483efaeba014d5ebf7500b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a889b7e1e0b2aa9f4a3114d3d6f8ad577" id="r_a889b7e1e0b2aa9f4a3114d3d6f8ad577"><td class="memItemLeft" align="right" valign="top"><a id="a889b7e1e0b2aa9f4a3114d3d6f8ad577" name="a889b7e1e0b2aa9f4a3114d3d6f8ad577"></a>
+<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><b>Prepare</b> ()</td></tr>
+<tr class="memdesc:a889b7e1e0b2aa9f4a3114d3d6f8ad577"><td class="mdescLeft">&#160;</td><td class="mdescRight">Prepare to run the fleet module. Called at each model iteration, and used to exponentiate the natural log of q and Fmort parameters prior to evaluation. <br /></td></tr>
+<tr class="separator:a889b7e1e0b2aa9f4a3114d3d6f8ad577"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa5124358776594999ae07f5a21c8a7e8" id="r_aa5124358776594999ae07f5a21c8a7e8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">virtual</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1Fleet.html#aa5124358776594999ae07f5a21c8a7e8">create_report_vectors</a> (std::map&lt; std::string, <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt; &gt; &amp;report_vectors)</td></tr>
+<tr class="separator:aa5124358776594999ae07f5a21c8a7e8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adba2cf93b21e95d5e7bf1490cf5ab45e" id="r_adba2cf93b21e95d5e7bf1490cf5ab45e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">virtual</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1Fleet.html#adba2cf93b21e95d5e7bf1490cf5ab45e">get_report_vector_count</a> (std::map&lt; std::string, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a> &gt; &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">report_vector_count</a>)</td></tr>
+<tr class="separator:adba2cf93b21e95d5e7bf1490cf5ab45e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pub_methods_structfims__model__object_1_1FIMSObject"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_structfims__model__object_1_1FIMSObject')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="structfims__model__object_1_1FIMSObject.html">fims_model_object::FIMSObject&lt; Type &gt;</a></td></tr>
+<tr class="memitem:a7f1a6d1474f8ad7d8b460ce889ee6ebd inherit pub_methods_structfims__model__object_1_1FIMSObject" id="r_a7f1a6d1474f8ad7d8b460ce889ee6ebd"><td class="memItemLeft" align="right" valign="top">
+<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a>&#160;</td><td class="memItemRight" valign="bottom"><b>GetId</b> () <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a></td></tr>
+<tr class="memdesc:a7f1a6d1474f8ad7d8b460ce889ee6ebd inherit pub_methods_structfims__model__object_1_1FIMSObject"><td class="mdescLeft">&#160;</td><td class="mdescRight">Getter that returns the unique id for parameters in the model. <br /></td></tr>
+<tr class="separator:a7f1a6d1474f8ad7d8b460ce889ee6ebd inherit pub_methods_structfims__model__object_1_1FIMSObject"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a81239daf538745bbb96c56f627edc781 inherit pub_methods_structfims__model__object_1_1FIMSObject" id="r_a81239daf538745bbb96c56f627edc781"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__model__object_1_1FIMSObject.html#a81239daf538745bbb96c56f627edc781">CheckDimensions</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">actual</a>, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">expected</a>)</td></tr>
+<tr class="memdesc:a81239daf538745bbb96c56f627edc781 inherit pub_methods_structfims__model__object_1_1FIMSObject"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check the dimensions of an object.  <br /></td></tr>
+<tr class="separator:a81239daf538745bbb96c56f627edc781 inherit pub_methods_structfims__model__object_1_1FIMSObject"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
+Public Attributes</h2></td></tr>
+<tr class="memitem:a6391035016ec648ac6c3d2891dc6fb25" id="r_a6391035016ec648ac6c3d2891dc6fb25"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1Fleet.html#a6391035016ec648ac6c3d2891dc6fb25">n_years</a></td></tr>
+<tr class="separator:a6391035016ec648ac6c3d2891dc6fb25"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8d3723853194985d3cc6645bb8fa206d" id="r_a8d3723853194985d3cc6645bb8fa206d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1Fleet.html#a8d3723853194985d3cc6645bb8fa206d">n_ages</a></td></tr>
+<tr class="separator:a8d3723853194985d3cc6645bb8fa206d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af145559ff2e9e95609c6520f912163f6" id="r_af145559ff2e9e95609c6520f912163f6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1Fleet.html#af145559ff2e9e95609c6520f912163f6">n_lengths</a></td></tr>
+<tr class="separator:af145559ff2e9e95609c6520f912163f6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3bfbbc0bf021aa8f6f2730d42027d17d" id="r_a3bfbbc0bf021aa8f6f2730d42027d17d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">int</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1Fleet.html#a3bfbbc0bf021aa8f6f2730d42027d17d">fleet_selectivity_id_m</a> = -999</td></tr>
+<tr class="separator:a3bfbbc0bf021aa8f6f2730d42027d17d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a260427acb5128fa3303459de353c048c" id="r_a260427acb5128fa3303459de353c048c"><td class="memItemLeft" align="right" valign="top">std::shared_ptr&lt; <a class="el" href="structfims__popdy_1_1SelectivityBase.html">SelectivityBase</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1Fleet.html#a260427acb5128fa3303459de353c048c">selectivity</a></td></tr>
+<tr class="separator:a260427acb5128fa3303459de353c048c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:accf7e5aec5b184c87b9f6e9d022a5348" id="r_accf7e5aec5b184c87b9f6e9d022a5348"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">int</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1Fleet.html#accf7e5aec5b184c87b9f6e9d022a5348">fleet_observed_landings_data_id_m</a> = -999</td></tr>
+<tr class="separator:accf7e5aec5b184c87b9f6e9d022a5348"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abcc5c15bc181b12eaa72a50a0dc912ca" id="r_abcc5c15bc181b12eaa72a50a0dc912ca"><td class="memItemLeft" align="right" valign="top">std::shared_ptr&lt; <a class="el" href="structfims__data__object_1_1DataObject.html">fims_data_object::DataObject</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1Fleet.html#abcc5c15bc181b12eaa72a50a0dc912ca">observed_landings_data</a></td></tr>
+<tr class="separator:abcc5c15bc181b12eaa72a50a0dc912ca"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a04ae2b0b588d2a3bbe9bc841ca6ff51a" id="r_a04ae2b0b588d2a3bbe9bc841ca6ff51a"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1Fleet.html#a04ae2b0b588d2a3bbe9bc841ca6ff51a">observed_landings_units</a></td></tr>
+<tr class="separator:a04ae2b0b588d2a3bbe9bc841ca6ff51a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab8fa4db5de7dba45fece778e182d4e27" id="r_ab8fa4db5de7dba45fece778e182d4e27"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">int</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1Fleet.html#ab8fa4db5de7dba45fece778e182d4e27">fleet_observed_index_data_id_m</a> = -999</td></tr>
+<tr class="separator:ab8fa4db5de7dba45fece778e182d4e27"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6c6fde31050e3ea49f38ecbc694ffff6" id="r_a6c6fde31050e3ea49f38ecbc694ffff6"><td class="memItemLeft" align="right" valign="top">std::shared_ptr&lt; <a class="el" href="structfims__data__object_1_1DataObject.html">fims_data_object::DataObject</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1Fleet.html#a6c6fde31050e3ea49f38ecbc694ffff6">observed_index_data</a></td></tr>
+<tr class="separator:a6c6fde31050e3ea49f38ecbc694ffff6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:affcc5764fce7eba009ba13845dedc962" id="r_affcc5764fce7eba009ba13845dedc962"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1Fleet.html#affcc5764fce7eba009ba13845dedc962">observed_index_units</a></td></tr>
+<tr class="separator:affcc5764fce7eba009ba13845dedc962"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a650c1f21f4efce9a78472408e4abd2d2" id="r_a650c1f21f4efce9a78472408e4abd2d2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">int</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1Fleet.html#a650c1f21f4efce9a78472408e4abd2d2">fleet_observed_agecomp_data_id_m</a> = -999</td></tr>
+<tr class="separator:a650c1f21f4efce9a78472408e4abd2d2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4eacf98c97dedaf93c7d7fec4107eace" id="r_a4eacf98c97dedaf93c7d7fec4107eace"><td class="memItemLeft" align="right" valign="top">std::shared_ptr&lt; <a class="el" href="structfims__data__object_1_1DataObject.html">fims_data_object::DataObject</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1Fleet.html#a4eacf98c97dedaf93c7d7fec4107eace">observed_agecomp_data</a></td></tr>
+<tr class="separator:a4eacf98c97dedaf93c7d7fec4107eace"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a33da0d3b4445a9407bd1d22ba1c7e31f" id="r_a33da0d3b4445a9407bd1d22ba1c7e31f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">int</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1Fleet.html#a33da0d3b4445a9407bd1d22ba1c7e31f">fleet_observed_lengthcomp_data_id_m</a> = -999</td></tr>
+<tr class="separator:a33da0d3b4445a9407bd1d22ba1c7e31f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa04ae98c8bab390e30431c8d046958c1" id="r_aa04ae98c8bab390e30431c8d046958c1"><td class="memItemLeft" align="right" valign="top">std::shared_ptr&lt; <a class="el" href="structfims__data__object_1_1DataObject.html">fims_data_object::DataObject</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1Fleet.html#aa04ae98c8bab390e30431c8d046958c1">observed_lengthcomp_data</a></td></tr>
+<tr class="separator:aa04ae98c8bab390e30431c8d046958c1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac572ee8c2fc48c99544ed01ae284c6e7" id="r_ac572ee8c2fc48c99544ed01ae284c6e7"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1Fleet.html#ac572ee8c2fc48c99544ed01ae284c6e7">log_Fmort</a></td></tr>
+<tr class="separator:ac572ee8c2fc48c99544ed01ae284c6e7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1e49af4939f8a9f32d76b354a4cf7581" id="r_a1e49af4939f8a9f32d76b354a4cf7581"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1Fleet.html#a1e49af4939f8a9f32d76b354a4cf7581">log_q</a></td></tr>
+<tr class="separator:a1e49af4939f8a9f32d76b354a4cf7581"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a78cadc41e2e95ece2282873ad8e3b2b4" id="r_a78cadc41e2e95ece2282873ad8e3b2b4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1Fleet.html#a78cadc41e2e95ece2282873ad8e3b2b4">Fmort</a></td></tr>
+<tr class="separator:a78cadc41e2e95ece2282873ad8e3b2b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9dbf02a91350fb062adc9ded0a89c66e" id="r_a9dbf02a91350fb062adc9ded0a89c66e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1Fleet.html#a9dbf02a91350fb062adc9ded0a89c66e">q</a></td></tr>
+<tr class="separator:a9dbf02a91350fb062adc9ded0a89c66e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab0ba9edd8d93288939648869c2ab6996" id="r_ab0ba9edd8d93288939648869c2ab6996"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1Fleet.html#ab0ba9edd8d93288939648869c2ab6996">age_to_length_conversion</a></td></tr>
+<tr class="separator:ab0ba9edd8d93288939648869c2ab6996"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pub_attribs_structfims__model__object_1_1FIMSObject"><td colspan="2" onclick="javascript:toggleInherit('pub_attribs_structfims__model__object_1_1FIMSObject')"><img src="closed.png" alt="-"/>&#160;Public Attributes inherited from <a class="el" href="structfims__model__object_1_1FIMSObject.html">fims_model_object::FIMSObject&lt; Type &gt;</a></td></tr>
+<tr class="memitem:a3922946642efc5ec4309149f1e0b188a inherit pub_attribs_structfims__model__object_1_1FIMSObject" id="r_a3922946642efc5ec4309149f1e0b188a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__model__object_1_1FIMSObject.html#a3922946642efc5ec4309149f1e0b188a">id</a></td></tr>
+<tr class="separator:a3922946642efc5ec4309149f1e0b188a inherit pub_attribs_structfims__model__object_1_1FIMSObject"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac625a90f1af6d01d8c476d0a1ecb5343 inherit pub_attribs_structfims__model__object_1_1FIMSObject" id="r_ac625a90f1af6d01d8c476d0a1ecb5343"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__model__object_1_1FIMSObject.html#ac625a90f1af6d01d8c476d0a1ecb5343">parameters</a></td></tr>
+<tr class="separator:ac625a90f1af6d01d8c476d0a1ecb5343 inherit pub_attribs_structfims__model__object_1_1FIMSObject"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9d8ddb11af5bb51a811f7d4c855f49b3 inherit pub_attribs_structfims__model__object_1_1FIMSObject" id="r_a9d8ddb11af5bb51a811f7d4c855f49b3"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__model__object_1_1FIMSObject.html#a9d8ddb11af5bb51a811f7d4c855f49b3">random_effects_parameters</a></td></tr>
+<tr class="separator:a9d8ddb11af5bb51a811f7d4c855f49b3 inherit pub_attribs_structfims__model__object_1_1FIMSObject"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aca6a96ab8e6a4cca573daa5f52e71c67 inherit pub_attribs_structfims__model__object_1_1FIMSObject" id="r_aca6a96ab8e6a4cca573daa5f52e71c67"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__model__object_1_1FIMSObject.html#aca6a96ab8e6a4cca573daa5f52e71c67">fixed_effects_parameters</a></td></tr>
+<tr class="separator:aca6a96ab8e6a4cca573daa5f52e71c67 inherit pub_attribs_structfims__model__object_1_1FIMSObject"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-static-attribs" name="pub-static-attribs"></a>
+Static Public Attributes</h2></td></tr>
+<tr class="memitem:a278d9ec006b19fdaccec3ea13ea1e1b2" id="r_a278d9ec006b19fdaccec3ea13ea1e1b2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">static</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1Fleet.html#a278d9ec006b19fdaccec3ea13ea1e1b2">id_g</a> = 0</td></tr>
+<tr class="separator:a278d9ec006b19fdaccec3ea13ea1e1b2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><div class="compoundTemplParams">template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">class</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a>&gt;<br />
+struct fims_popdy::Fleet&lt; Type &gt;</div><p>Base class for all fleets. </p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">Type</td><td>The type of the fleet object. </td></tr>
+  </table>
+  </dd>
+</dl>
+</div><h2 class="groupheader">Member Function Documentation</h2>
+<a id="aa5124358776594999ae07f5a21c8a7e8" name="aa5124358776594999ae07f5a21c8a7e8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa5124358776594999ae07f5a21c8a7e8">&#9670;&#160;</a></span>create_report_vectors()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">class</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">virtual</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a> <a class="el" href="structfims__popdy_1_1Fleet.html">fims_popdy::Fleet</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::create_report_vectors </td>
+          <td>(</td>
+          <td class="paramtype">std::map&lt; std::string, <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt; &gt; &amp;&#160;</td>
+          <td class="paramname"><em>report_vectors</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Create a map of report vectors for the object. </p>
+
+<p>Reimplemented from <a class="el" href="structfims__model__object_1_1FIMSObject.html#a7809cb0987940a515163b95ef7d330f9">fims_model_object::FIMSObject&lt; Type &gt;</a>.</p>
+
+</div>
+</div>
+<a id="adba2cf93b21e95d5e7bf1490cf5ab45e" name="adba2cf93b21e95d5e7bf1490cf5ab45e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adba2cf93b21e95d5e7bf1490cf5ab45e">&#9670;&#160;</a></span>get_report_vector_count()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">class</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">virtual</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a> <a class="el" href="structfims__popdy_1_1Fleet.html">fims_popdy::Fleet</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::get_report_vector_count </td>
+          <td>(</td>
+          <td class="paramtype">std::map&lt; std::string, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>report_vector_count</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Get the report vector count object. </p>
+
+<p>Reimplemented from <a class="el" href="structfims__model__object_1_1FIMSObject.html#a63d848a3fb69a0c4928b7afa5ce845d2">fims_model_object::FIMSObject&lt; Type &gt;</a>.</p>
+
+</div>
+</div>
+<h2 class="groupheader">Member Data Documentation</h2>
+<a id="ab0ba9edd8d93288939648869c2ab6996" name="ab0ba9edd8d93288939648869c2ab6996"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab0ba9edd8d93288939648869c2ab6996">&#9670;&#160;</a></span>age_to_length_conversion</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">class</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a>&gt; <a class="el" href="structfims__popdy_1_1Fleet.html">fims_popdy::Fleet</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::age_to_length_conversion</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>derived quantity age to length conversion matrix </p>
+
+</div>
+</div>
+<a id="a650c1f21f4efce9a78472408e4abd2d2" name="a650c1f21f4efce9a78472408e4abd2d2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a650c1f21f4efce9a78472408e4abd2d2">&#9670;&#160;</a></span>fleet_observed_agecomp_data_id_m</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">class</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">int</a> <a class="el" href="structfims__popdy_1_1Fleet.html">fims_popdy::Fleet</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::fleet_observed_agecomp_data_id_m = -999</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>id of age comp data </p>
+
+</div>
+</div>
+<a id="ab8fa4db5de7dba45fece778e182d4e27" name="ab8fa4db5de7dba45fece778e182d4e27"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab8fa4db5de7dba45fece778e182d4e27">&#9670;&#160;</a></span>fleet_observed_index_data_id_m</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">class</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">int</a> <a class="el" href="structfims__popdy_1_1Fleet.html">fims_popdy::Fleet</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::fleet_observed_index_data_id_m = -999</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>id of index data </p>
+
+</div>
+</div>
+<a id="accf7e5aec5b184c87b9f6e9d022a5348" name="accf7e5aec5b184c87b9f6e9d022a5348"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#accf7e5aec5b184c87b9f6e9d022a5348">&#9670;&#160;</a></span>fleet_observed_landings_data_id_m</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">class</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">int</a> <a class="el" href="structfims__popdy_1_1Fleet.html">fims_popdy::Fleet</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::fleet_observed_landings_data_id_m = -999</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>id of landings data </p>
+
+</div>
+</div>
+<a id="a33da0d3b4445a9407bd1d22ba1c7e31f" name="a33da0d3b4445a9407bd1d22ba1c7e31f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a33da0d3b4445a9407bd1d22ba1c7e31f">&#9670;&#160;</a></span>fleet_observed_lengthcomp_data_id_m</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">class</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">int</a> <a class="el" href="structfims__popdy_1_1Fleet.html">fims_popdy::Fleet</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::fleet_observed_lengthcomp_data_id_m = -999</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>id of length comp data </p>
+
+</div>
+</div>
+<a id="a3bfbbc0bf021aa8f6f2730d42027d17d" name="a3bfbbc0bf021aa8f6f2730d42027d17d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3bfbbc0bf021aa8f6f2730d42027d17d">&#9670;&#160;</a></span>fleet_selectivity_id_m</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">class</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">int</a> <a class="el" href="structfims__popdy_1_1Fleet.html">fims_popdy::Fleet</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::fleet_selectivity_id_m = -999</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>id of selectivity component </p>
+
+</div>
+</div>
+<a id="a78cadc41e2e95ece2282873ad8e3b2b4" name="a78cadc41e2e95ece2282873ad8e3b2b4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a78cadc41e2e95ece2282873ad8e3b2b4">&#9670;&#160;</a></span>Fmort</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">class</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a>&gt; <a class="el" href="structfims__popdy_1_1Fleet.html">fims_popdy::Fleet</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::Fmort</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>transformed parameter: Fishing mortality </p>
+
+</div>
+</div>
+<a id="a278d9ec006b19fdaccec3ea13ea1e1b2" name="a278d9ec006b19fdaccec3ea13ea1e1b2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a278d9ec006b19fdaccec3ea13ea1e1b2">&#9670;&#160;</a></span>id_g</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">class</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a> <a class="el" href="structfims__popdy_1_1Fleet.html">fims_popdy::Fleet</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::id_g = 0</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>reference id for fleet object </p>
+
+</div>
+</div>
+<a id="ac572ee8c2fc48c99544ed01ae284c6e7" name="ac572ee8c2fc48c99544ed01ae284c6e7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac572ee8c2fc48c99544ed01ae284c6e7">&#9670;&#160;</a></span>log_Fmort</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">class</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a>&gt; <a class="el" href="structfims__popdy_1_1Fleet.html">fims_popdy::Fleet</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::log_Fmort</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>estimated parameter: log Fishing mortality </p>
+
+</div>
+</div>
+<a id="a1e49af4939f8a9f32d76b354a4cf7581" name="a1e49af4939f8a9f32d76b354a4cf7581"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1e49af4939f8a9f32d76b354a4cf7581">&#9670;&#160;</a></span>log_q</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">class</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a>&gt; <a class="el" href="structfims__popdy_1_1Fleet.html">fims_popdy::Fleet</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::log_q</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>estimated parameter: catchability of the fleet </p>
+
+</div>
+</div>
+<a id="a8d3723853194985d3cc6645bb8fa206d" name="a8d3723853194985d3cc6645bb8fa206d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8d3723853194985d3cc6645bb8fa206d">&#9670;&#160;</a></span>n_ages</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">class</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a> <a class="el" href="structfims__popdy_1_1Fleet.html">fims_popdy::Fleet</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::n_ages</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>the number of ages in the model </p>
+
+</div>
+</div>
+<a id="af145559ff2e9e95609c6520f912163f6" name="af145559ff2e9e95609c6520f912163f6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af145559ff2e9e95609c6520f912163f6">&#9670;&#160;</a></span>n_lengths</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">class</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a> <a class="el" href="structfims__popdy_1_1Fleet.html">fims_popdy::Fleet</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::n_lengths</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>the number of lengths in the model </p>
+
+</div>
+</div>
+<a id="a6391035016ec648ac6c3d2891dc6fb25" name="a6391035016ec648ac6c3d2891dc6fb25"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6391035016ec648ac6c3d2891dc6fb25">&#9670;&#160;</a></span>n_years</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">class</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a> <a class="el" href="structfims__popdy_1_1Fleet.html">fims_popdy::Fleet</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::n_years</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>the number of years in the model </p>
+
+</div>
+</div>
+<a id="a4eacf98c97dedaf93c7d7fec4107eace" name="a4eacf98c97dedaf93c7d7fec4107eace"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4eacf98c97dedaf93c7d7fec4107eace">&#9670;&#160;</a></span>observed_agecomp_data</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">class</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">std::shared_ptr&lt;<a class="el" href="structfims__data__object_1_1DataObject.html">fims_data_object::DataObject</a>&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a>&gt; &gt; <a class="el" href="structfims__popdy_1_1Fleet.html">fims_popdy::Fleet</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::observed_agecomp_data</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>observed agecomp data </p>
+
+</div>
+</div>
+<a id="a6c6fde31050e3ea49f38ecbc694ffff6" name="a6c6fde31050e3ea49f38ecbc694ffff6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6c6fde31050e3ea49f38ecbc694ffff6">&#9670;&#160;</a></span>observed_index_data</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">class</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">std::shared_ptr&lt;<a class="el" href="structfims__data__object_1_1DataObject.html">fims_data_object::DataObject</a>&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a>&gt; &gt; <a class="el" href="structfims__popdy_1_1Fleet.html">fims_popdy::Fleet</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::observed_index_data</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>observed index data </p>
+
+</div>
+</div>
+<a id="affcc5764fce7eba009ba13845dedc962" name="affcc5764fce7eba009ba13845dedc962"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#affcc5764fce7eba009ba13845dedc962">&#9670;&#160;</a></span>observed_index_units</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">class</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string <a class="el" href="structfims__popdy_1_1Fleet.html">fims_popdy::Fleet</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::observed_index_units</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>is this fleet index in weight </p>
+
+</div>
+</div>
+<a id="abcc5c15bc181b12eaa72a50a0dc912ca" name="abcc5c15bc181b12eaa72a50a0dc912ca"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abcc5c15bc181b12eaa72a50a0dc912ca">&#9670;&#160;</a></span>observed_landings_data</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">class</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">std::shared_ptr&lt;<a class="el" href="structfims__data__object_1_1DataObject.html">fims_data_object::DataObject</a>&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a>&gt; &gt; <a class="el" href="structfims__popdy_1_1Fleet.html">fims_popdy::Fleet</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::observed_landings_data</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>observed landings data </p>
+
+</div>
+</div>
+<a id="a04ae2b0b588d2a3bbe9bc841ca6ff51a" name="a04ae2b0b588d2a3bbe9bc841ca6ff51a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a04ae2b0b588d2a3bbe9bc841ca6ff51a">&#9670;&#160;</a></span>observed_landings_units</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">class</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string <a class="el" href="structfims__popdy_1_1Fleet.html">fims_popdy::Fleet</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::observed_landings_units</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>is this fleet landings in weight </p>
+
+</div>
+</div>
+<a id="aa04ae98c8bab390e30431c8d046958c1" name="aa04ae98c8bab390e30431c8d046958c1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa04ae98c8bab390e30431c8d046958c1">&#9670;&#160;</a></span>observed_lengthcomp_data</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">class</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">std::shared_ptr&lt;<a class="el" href="structfims__data__object_1_1DataObject.html">fims_data_object::DataObject</a>&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a>&gt; &gt; <a class="el" href="structfims__popdy_1_1Fleet.html">fims_popdy::Fleet</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::observed_lengthcomp_data</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>observed lengthcomp data </p>
+
+</div>
+</div>
+<a id="a9dbf02a91350fb062adc9ded0a89c66e" name="a9dbf02a91350fb062adc9ded0a89c66e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9dbf02a91350fb062adc9ded0a89c66e">&#9670;&#160;</a></span>q</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">class</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a>&gt; <a class="el" href="structfims__popdy_1_1Fleet.html">fims_popdy::Fleet</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::q</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>transformed parameter: the catchability of the fleet </p>
+
+</div>
+</div>
+<a id="a260427acb5128fa3303459de353c048c" name="a260427acb5128fa3303459de353c048c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a260427acb5128fa3303459de353c048c">&#9670;&#160;</a></span>selectivity</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">class</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">std::shared_ptr&lt;<a class="el" href="structfims__popdy_1_1SelectivityBase.html">SelectivityBase</a>&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a>&gt; &gt; <a class="el" href="structfims__popdy_1_1Fleet.html">fims_popdy::Fleet</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::selectivity</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>selectivity component </p>
+
+</div>
+</div>
+<hr/>The documentation for this struct was generated from the following file:<ul>
+<li>inst/include/population_dynamics/fleet/<a class="el" href="fleet_8hpp_source.html">fleet.hpp</a></li>
+</ul>
+</div><!-- contents -->
+</div><!-- doc-content -->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a class="el" href="namespacefims__popdy.html">fims_popdy</a></li><li class="navelem"><a class="el" href="structfims__popdy_1_1Fleet.html">Fleet</a></li>
+    <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.8 </li>
+  </ul>
+</div>
+</body>
+</html>

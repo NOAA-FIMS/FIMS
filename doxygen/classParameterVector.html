@@ -1,0 +1,768 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" data-bs-theme="auto">
+<head>
+    <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=9"/>
+    <meta name="generator" content="Doxygen 1.9.8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>FIMS</title><link href="tabs.css" rel="stylesheet" type="text/css"/>
+    <link rel="icon" type="image/png" href="https://noaa-fims.github.io/images/FIMS_hexlogo.png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+    <link href="https://noaa-fims.github.io/site_libs/bootstrap/bootstrap-5477dd34fdf9f443df58de9070e2fbd7.min.css" rel="stylesheet">
+    <link href="https://noaa-fims.github.io/site_libs/bootstrap/bootstrap-dark-429bd3fc0b6810d1347fc340b0896c35.min.css" rel="stylesheet" media="(prefers-color-scheme: dark)">
+    <script type="text/javascript" src="jquery.js"></script>
+    <script type="text/javascript" src="dynsections.js"></script>
+    <link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+    <link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+  $(document).ready(function() { init_search(); });
+/* @license-end */
+</script>
+    <script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  extensions: ["tex2jax.js"],
+  jax: ["input/TeX","output/HTML-CSS"],
+});
+</script>
+<script type="text/javascript" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js"></script>
+    <link href="doxygen.css" rel="stylesheet" type="text/css" />
+    <link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
+<link href="custom.css" rel="stylesheet" type="text/css"/>
+    <script src="https://noaa-fims.github.io/site_libs/quarto-nav/quarto-nav.js"></script>
+    <script src="https://noaa-fims.github.io/site_libs/bootstrap/bootstrap.min.js"></script>
+    <script src="https://noaa-fims.github.io/site_libs/quarto-html/quarto.js" type="module"></script>
+</head>
+<body>
+<div id="top">
+    <div id="titlearea">
+        <table cellspacing="0" cellpadding="0">
+            <tbody>
+            <tr style="height: 70px;">
+                <td id="projectlogo"><img alt="Logo" src="FIMS_logo3.png"/></td>
+                <td id="projectalign" style="padding-left: 0.5em;">
+                    <div id="projectname">FIMS
+                        &#160;<span id="projectnumber">v0.8.1</span></div>
+                    <div id="projectbrief"></div></td>
+                <td style="padding-left: 0.5em;">
+                    <div id="projectbrief"></div>
+                </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <nav class="navbar navbar-expand-lg " data-bs-theme="auto">
+      <div class="navbar-container container-fluid">
+        <div class="navbar-brand-container mx-auto">
+          <a href="https://noaa-fims.github.io/" class="navbar-brand navbar-brand-logo"></a>
+          <a class="navbar-brand" href="https://noaa-fims.github.io/">
+          </a>
+        </div>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+          <ul class="navbar-nav navbar-nav-scroll ms-auto">
+           <li class="nav-item dropdown">
+            <button class="nav-link dropdown-toggle" type="button" id="dropdown-reference" data-bs-toggle="dropdown"
+                    aria-expanded="false" aria-haspopup="true">reference</button>
+            <ul class="dropdown-menu" aria-labelledby="dropdown-reference">
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/reference/index.html">r/roxygen</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/doxygen/index.html">c++/doxygen</a></li>
+            </ul>
+           </li>
+            <li class="nav-item dropdown">
+            <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown"
+                    aria-expanded="false" aria-haspopup="true">articles</button>
+            <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
+              <li><h6 class="dropdown-header" data-toc-skip>intro to fims</h6></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/fims-demo.html">introducing the fisheries integrated modeling system (fims)</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/fims-logging.html">Introducing the fims logging system</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/fims-user-setup-guide.html">fims user setup guide</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/fims-demo-projections.html">simple projections using fims</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><h6 class="dropdown-header" data-toc-skip>developer</h6></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/fims-path-maturity.html">fims path - maturity</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><h6 class="dropdown-header" data-toc-skip>c++ training</h6></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/training-intro-cpp.html">intro to c++</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/training-intro-rcpp.html">intro to rcpp</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><h6 class="dropdown-header" data-toc-skip>research and development</h6></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/vignettes/RD-re-sparsity.html">re sparsity</a></li>
+            </ul>
+          </li>
+            <li class="nav-item dropdown">
+              <button class="nav-link dropdown-toggle" type="button" id="dropdown-news" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">news</button>
+              <ul class="dropdown-menu" aria-labelledby="dropdown-news">
+                <li><h6 class="dropdown-header" data-toc-skip="">Releases</h6></li>
+                <li><a class="external-link dropdown-item" href="https://github.com/NOAA-FIMS/FIMS/releases/latest">latest release</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/news/index.html">changelog</a></li>
+              </ul>
+            </li>
+          <li class="nav-item dropdown">
+            <button class="nav-link dropdown-toggle" type="button" id="dropdown-reports" data-bs-toggle="dropdown"
+                    aria-expanded="false" aria-haspopup="true">reports</button>
+            <ul class="dropdown-menu" aria-labelledby="dropdown-reports">
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/coverage/coverage.html">coverage</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/coverage/codecoverage_explanation.html">coverage explained</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/testdown/index.html">testdown</a></li>
+            </ul>
+          </li>
+          <ul class="navbar-nav">
+            <li class="nav-item"><a class="external-link nav-link" href="https://noaa-fims.github.io/">fims website</a></li>
+            <li class="nav-item">
+              <a class="external-link nav-link" href="https://github.com/noaa-fims/fims/" aria-label="GitHub repository for FIMS">
+                <span class="fa fa-brands fa-github fa-lg"></span>
+              </a>
+            </li>
+            <!-- Keep the input; pkgdown’s autocomplete wrapper won’t exist in Doxygen -->
+            <li class="nav-item">
+              <form class="form-inline" role="search" onsubmit="return false;">
+                <input class="form-control" type="search" name="search-input" id="search-input"
+                      autocomplete="off" aria-label="Search site" placeholder="Search for">
+              </form>
+            </li>
+          </ul>
+      </div>
+    </div>
+  </nav>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  // Only on the cpp_directory_structure page!
+  document.querySelectorAll('.toc a').forEach(function(link) {
+    if (link.href && link.href.indexOf(location.pathname) !== -1) {
+      link.href = link.hash; // Just use the fragment
+    }
+  });
+});
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  function updateTocActive() {
+    var links = Array.from(document.querySelectorAll('.toc a'));
+    var anchors = links.map(link => document.getElementById(link.getAttribute('href').replace('#', '')));
+    var scrollTop = window.scrollY || document.documentElement.scrollTop;
+    var offset = 150; // Match your scroll-margin-top
+    let currentActive = -1;
+    for (let i = anchors.length - 1; i >= 0; i--) {
+      if (anchors[i] && (anchors[i].getBoundingClientRect().top + window.scrollY - offset) <= scrollTop) {
+        currentActive = i;
+        break;
+      }
+    }
+    links.forEach((link, i) => {
+      link.classList.remove('active', 'aboveActive');
+      if (i === currentActive) {
+        link.classList.add('active');
+      } else if (i < currentActive) {
+        link.classList.add('aboveActive');
+      }
+    });
+  }
+  window.addEventListener('scroll', updateTocActive);
+  window.addEventListener('hashchange', updateTocActive);
+  updateTocActive();
+});
+</script>
+    <!-- end header part -->
+<!-- Generated by Doxygen 1.9.8 -->
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+/* @license-end */
+</script>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(document).ready(function(){initNavTree('classParameterVector.html',''); initResizable(); });
+/* @license-end */
+</script>
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">Loading...</div>
+<div class="SRStatus" id="Searching">Searching...</div>
+<div class="SRStatus" id="NoMatches">No Matches</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="summary">
+<a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pub-attribs">Public Attributes</a> &#124;
+<a href="#pub-static-attribs">Static Public Attributes</a> &#124;
+<a href="classParameterVector-members.html">List of all members</a>  </div>
+  <div class="headertitle"><div class="title">ParameterVector Class Reference</div></div>
+</div><!--header-->
+<div class="contents">
+
+<p>An Rcpp interface class that defines the <a class="el" href="classParameterVector.html" title="An Rcpp interface class that defines the ParameterVector class.">ParameterVector</a> class.  
+ <a href="classParameterVector.html#details">More...</a></p>
+
+<p><code>#include &lt;<a class="el" href="rcpp__interface__base_8hpp_source.html">rcpp_interface_base.hpp</a>&gt;</code></p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
+Public Member Functions</h2></td></tr>
+<tr class="memitem:ada1e51ddf6e484390cedd92f5efae84f" id="r_ada1e51ddf6e484390cedd92f5efae84f"><td class="memItemLeft" align="right" valign="top"><a id="ada1e51ddf6e484390cedd92f5efae84f" name="ada1e51ddf6e484390cedd92f5efae84f"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>ParameterVector</b> ()</td></tr>
+<tr class="memdesc:ada1e51ddf6e484390cedd92f5efae84f"><td class="mdescLeft">&#160;</td><td class="mdescRight">The constructor. <br /></td></tr>
+<tr class="separator:ada1e51ddf6e484390cedd92f5efae84f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a65c888cbb2dc1af915d8e778c7a896f9" id="r_a65c888cbb2dc1af915d8e778c7a896f9"><td class="memItemLeft" align="right" valign="top"><a id="a65c888cbb2dc1af915d8e778c7a896f9" name="a65c888cbb2dc1af915d8e778c7a896f9"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>ParameterVector</b> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="classParameterVector.html">ParameterVector</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">other</a>)</td></tr>
+<tr class="memdesc:a65c888cbb2dc1af915d8e778c7a896f9"><td class="mdescLeft">&#160;</td><td class="mdescRight">The constructor. <br /></td></tr>
+<tr class="separator:a65c888cbb2dc1af915d8e778c7a896f9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a05db115fafbe61b9dced91b794b36657" id="r_a05db115fafbe61b9dced91b794b36657"><td class="memItemLeft" align="right" valign="top"><a id="a05db115fafbe61b9dced91b794b36657" name="a05db115fafbe61b9dced91b794b36657"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>ParameterVector</b> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a> <a class="el" href="classParameterVector.html#a1bc24e4c8af66ffef1b8aa88bb41a137">size</a>)</td></tr>
+<tr class="memdesc:a05db115fafbe61b9dced91b794b36657"><td class="mdescLeft">&#160;</td><td class="mdescRight">The constructor. <br /></td></tr>
+<tr class="separator:a05db115fafbe61b9dced91b794b36657"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1d7389c5c25377ee8806789e4cffc672" id="r_a1d7389c5c25377ee8806789e4cffc672"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classParameterVector.html#a1d7389c5c25377ee8806789e4cffc672">ParameterVector</a> (Rcpp::NumericVector x, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a> <a class="el" href="classParameterVector.html#a1bc24e4c8af66ffef1b8aa88bb41a137">size</a>)</td></tr>
+<tr class="memdesc:a1d7389c5c25377ee8806789e4cffc672"><td class="mdescLeft">&#160;</td><td class="mdescRight">The constructor for initializing a parameter vector.  <br /></td></tr>
+<tr class="separator:a1d7389c5c25377ee8806789e4cffc672"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a629cd4f1a62ea863d994225a66506357" id="r_a629cd4f1a62ea863d994225a66506357"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classParameterVector.html#a629cd4f1a62ea863d994225a66506357">ParameterVector</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">double</a> &gt; &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">v</a>)</td></tr>
+<tr class="memdesc:a629cd4f1a62ea863d994225a66506357"><td class="mdescLeft">&#160;</td><td class="mdescRight">The constructor for initializing a parameter vector.  <br /></td></tr>
+<tr class="separator:a629cd4f1a62ea863d994225a66506357"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae426de8e835ed4e670e8a38a5fdc7c64" id="r_ae426de8e835ed4e670e8a38a5fdc7c64"><td class="memItemLeft" align="right" valign="top"><a id="ae426de8e835ed4e670e8a38a5fdc7c64" name="ae426de8e835ed4e670e8a38a5fdc7c64"></a>
+<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">virtual</a>&#160;</td><td class="memItemRight" valign="bottom"><b>~ParameterVector</b> ()</td></tr>
+<tr class="memdesc:ae426de8e835ed4e670e8a38a5fdc7c64"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destroy the <a class="el" href="classParameter.html" title="An Rcpp interface that defines the Parameter class.">Parameter</a> Vector object. <br /></td></tr>
+<tr class="separator:ae426de8e835ed4e670e8a38a5fdc7c64"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8059836883b50a02abd1f6c26991a53e" id="r_a8059836883b50a02abd1f6c26991a53e"><td class="memItemLeft" align="right" valign="top"><a id="a8059836883b50a02abd1f6c26991a53e" name="a8059836883b50a02abd1f6c26991a53e"></a>
+<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">virtual</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a>&#160;</td><td class="memItemRight" valign="bottom"><b>get_id</b> ()</td></tr>
+<tr class="memdesc:a8059836883b50a02abd1f6c26991a53e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the ID of the <a class="el" href="classParameterVector.html" title="An Rcpp interface class that defines the ParameterVector class.">ParameterVector</a> object. <br /></td></tr>
+<tr class="separator:a8059836883b50a02abd1f6c26991a53e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab50a6d8fc19e86fb7799fc46b750301c" id="r_ab50a6d8fc19e86fb7799fc46b750301c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classParameter.html">Parameter</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classParameterVector.html#ab50a6d8fc19e86fb7799fc46b750301c">operator[]</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">pos</a>)</td></tr>
+<tr class="memdesc:ab50a6d8fc19e86fb7799fc46b750301c"><td class="mdescLeft">&#160;</td><td class="mdescRight">The accessor where the first index starts is zero.  <br /></td></tr>
+<tr class="separator:ab50a6d8fc19e86fb7799fc46b750301c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a58b8a06fb3070e59c179db2180ddb465" id="r_a58b8a06fb3070e59c179db2180ddb465"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">SEXP</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classParameterVector.html#a58b8a06fb3070e59c179db2180ddb465">at</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">R_xlen_t</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">pos</a>)</td></tr>
+<tr class="memdesc:a58b8a06fb3070e59c179db2180ddb465"><td class="mdescLeft">&#160;</td><td class="mdescRight">The accessor where the first index starts at one. This function is for calling accessing from R.  <br /></td></tr>
+<tr class="separator:a58b8a06fb3070e59c179db2180ddb465"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac21d6482b5d3a8992a9cd7a48b7482a4" id="r_ac21d6482b5d3a8992a9cd7a48b7482a4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classParameter.html">Parameter</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classParameterVector.html#ac21d6482b5d3a8992a9cd7a48b7482a4">get</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">pos</a>)</td></tr>
+<tr class="memdesc:ac21d6482b5d3a8992a9cd7a48b7482a4"><td class="mdescLeft">&#160;</td><td class="mdescRight">An internal accessor for calling a position of a <a class="el" href="classParameterVector.html" title="An Rcpp interface class that defines the ParameterVector class.">ParameterVector</a> from R.  <br /></td></tr>
+<tr class="separator:ac21d6482b5d3a8992a9cd7a48b7482a4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad78418fdc00b6b9fd5f914c3021bde7a" id="r_ad78418fdc00b6b9fd5f914c3021bde7a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classParameterVector.html#ad78418fdc00b6b9fd5f914c3021bde7a">set</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">pos</a>, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="classParameter.html">Parameter</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">p</a>)</td></tr>
+<tr class="memdesc:ad78418fdc00b6b9fd5f914c3021bde7a"><td class="mdescLeft">&#160;</td><td class="mdescRight">An internal setter for setting a position of a <a class="el" href="classParameterVector.html" title="An Rcpp interface class that defines the ParameterVector class.">ParameterVector</a> from R.  <br /></td></tr>
+<tr class="separator:ad78418fdc00b6b9fd5f914c3021bde7a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1bc24e4c8af66ffef1b8aa88bb41a137" id="r_a1bc24e4c8af66ffef1b8aa88bb41a137"><td class="memItemLeft" align="right" valign="top"><a id="a1bc24e4c8af66ffef1b8aa88bb41a137" name="a1bc24e4c8af66ffef1b8aa88bb41a137"></a>
+<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a>&#160;</td><td class="memItemRight" valign="bottom"><b>size</b> ()</td></tr>
+<tr class="memdesc:a1bc24e4c8af66ffef1b8aa88bb41a137"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the size of a <a class="el" href="classParameterVector.html" title="An Rcpp interface class that defines the ParameterVector class.">ParameterVector</a>. <br /></td></tr>
+<tr class="separator:a1bc24e4c8af66ffef1b8aa88bb41a137"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a098cdfbbf65f58ee93ffc76090a80e92" id="r_a098cdfbbf65f58ee93ffc76090a80e92"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classParameterVector.html#a098cdfbbf65f58ee93ffc76090a80e92">resize</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a> <a class="el" href="classParameterVector.html#a1bc24e4c8af66ffef1b8aa88bb41a137">size</a>)</td></tr>
+<tr class="memdesc:a098cdfbbf65f58ee93ffc76090a80e92"><td class="mdescLeft">&#160;</td><td class="mdescRight">Resizes a <a class="el" href="classParameterVector.html" title="An Rcpp interface class that defines the ParameterVector class.">ParameterVector</a> to the desired length.  <br /></td></tr>
+<tr class="separator:a098cdfbbf65f58ee93ffc76090a80e92"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af5723210fad2e222c33912e811934f44" id="r_af5723210fad2e222c33912e811934f44"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classParameterVector.html#af5723210fad2e222c33912e811934f44">set_all_estimable</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">estimable</a>)</td></tr>
+<tr class="memdesc:af5723210fad2e222c33912e811934f44"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets all Parameters within a <a class="el" href="classParameterVector.html" title="An Rcpp interface class that defines the ParameterVector class.">ParameterVector</a> as estimable.  <br /></td></tr>
+<tr class="separator:af5723210fad2e222c33912e811934f44"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a074e8b3737ef4fb2dfb3bde9a176e7fd" id="r_a074e8b3737ef4fb2dfb3bde9a176e7fd"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classParameterVector.html#a074e8b3737ef4fb2dfb3bde9a176e7fd">set_all_random</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">random</a>)</td></tr>
+<tr class="memdesc:a074e8b3737ef4fb2dfb3bde9a176e7fd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets all Parameters within a <a class="el" href="classParameterVector.html" title="An Rcpp interface class that defines the ParameterVector class.">ParameterVector</a> as random effects.  <br /></td></tr>
+<tr class="separator:a074e8b3737ef4fb2dfb3bde9a176e7fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9296d749eab1b882116aca96e07154d5" id="r_a9296d749eab1b882116aca96e07154d5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classParameterVector.html#a9296d749eab1b882116aca96e07154d5">fill</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">double</a> value)</td></tr>
+<tr class="memdesc:a9296d749eab1b882116aca96e07154d5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the value of all Parameters in the <a class="el" href="classParameterVector.html" title="An Rcpp interface class that defines the ParameterVector class.">ParameterVector</a> to the provided value.  <br /></td></tr>
+<tr class="separator:a9296d749eab1b882116aca96e07154d5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aefd11668d4c64505607526dcbe8d5cea" id="r_aefd11668d4c64505607526dcbe8d5cea"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classParameterVector.html#aefd11668d4c64505607526dcbe8d5cea">fill_min</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">double</a> value)</td></tr>
+<tr class="memdesc:aefd11668d4c64505607526dcbe8d5cea"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assigns the given values to the minimum value of all elements in the vector.  <br /></td></tr>
+<tr class="separator:aefd11668d4c64505607526dcbe8d5cea"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8376c23fd35532aaa83fe5d808e9431c" id="r_a8376c23fd35532aaa83fe5d808e9431c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classParameterVector.html#a8376c23fd35532aaa83fe5d808e9431c">fill_max</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">double</a> value)</td></tr>
+<tr class="memdesc:a8376c23fd35532aaa83fe5d808e9431c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assigns the given values to the maximum value of all elements in the vector.  <br /></td></tr>
+<tr class="separator:a8376c23fd35532aaa83fe5d808e9431c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0657ff7f5f27848156ba8dd11cf2de11" id="r_a0657ff7f5f27848156ba8dd11cf2de11"><td class="memItemLeft" align="right" valign="top"><a id="a0657ff7f5f27848156ba8dd11cf2de11" name="a0657ff7f5f27848156ba8dd11cf2de11"></a>
+<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><b>show</b> ()</td></tr>
+<tr class="memdesc:a0657ff7f5f27848156ba8dd11cf2de11"><td class="mdescLeft">&#160;</td><td class="mdescRight">The printing methods for a <a class="el" href="classParameterVector.html" title="An Rcpp interface class that defines the ParameterVector class.">ParameterVector</a>. <br /></td></tr>
+<tr class="separator:a0657ff7f5f27848156ba8dd11cf2de11"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
+Public Attributes</h2></td></tr>
+<tr class="memitem:ae05fb87cd78344afb0dcfd9f2ade7791" id="r_ae05fb87cd78344afb0dcfd9f2ade7791"><td class="memItemLeft" align="right" valign="top"><a id="ae05fb87cd78344afb0dcfd9f2ade7791" name="ae05fb87cd78344afb0dcfd9f2ade7791"></a>
+std::shared_ptr&lt; std::vector&lt; <a class="el" href="classParameter.html">Parameter</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>storage_m</b></td></tr>
+<tr class="memdesc:ae05fb87cd78344afb0dcfd9f2ade7791"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="classParameter.html" title="An Rcpp interface that defines the Parameter class.">Parameter</a> storage. <br /></td></tr>
+<tr class="separator:ae05fb87cd78344afb0dcfd9f2ade7791"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4412bae06d6d32142d19c42a60b9da0a" id="r_a4412bae06d6d32142d19c42a60b9da0a"><td class="memItemLeft" align="right" valign="top"><a id="a4412bae06d6d32142d19c42a60b9da0a" name="a4412bae06d6d32142d19c42a60b9da0a"></a>
+<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a>&#160;</td><td class="memItemRight" valign="bottom"><b>id_m</b></td></tr>
+<tr class="memdesc:a4412bae06d6d32142d19c42a60b9da0a"><td class="mdescLeft">&#160;</td><td class="mdescRight">The local ID of the <a class="el" href="classParameter.html" title="An Rcpp interface that defines the Parameter class.">Parameter</a> object. <br /></td></tr>
+<tr class="separator:a4412bae06d6d32142d19c42a60b9da0a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-static-attribs" name="pub-static-attribs"></a>
+Static Public Attributes</h2></td></tr>
+<tr class="memitem:a34f937ef52028cececebec0d8df1cc06" id="r_a34f937ef52028cececebec0d8df1cc06"><td class="memItemLeft" align="right" valign="top"><a id="a34f937ef52028cececebec0d8df1cc06" name="a34f937ef52028cececebec0d8df1cc06"></a>
+<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">static</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a>&#160;</td><td class="memItemRight" valign="bottom"><b>id_g</b> = 0</td></tr>
+<tr class="memdesc:a34f937ef52028cececebec0d8df1cc06"><td class="mdescLeft">&#160;</td><td class="mdescRight">The static ID of the <a class="el" href="classParameter.html" title="An Rcpp interface that defines the Parameter class.">Parameter</a> object. <br /></td></tr>
+<tr class="separator:a34f937ef52028cececebec0d8df1cc06"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>An Rcpp interface class that defines the <a class="el" href="classParameterVector.html" title="An Rcpp interface class that defines the ParameterVector class.">ParameterVector</a> class. </p>
+<p>An Rcpp interface class that defines the interface between R and C++ for a parameter vector type. </p>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a id="a1d7389c5c25377ee8806789e4cffc672" name="a1d7389c5c25377ee8806789e4cffc672"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1d7389c5c25377ee8806789e4cffc672">&#9670;&#160;</a></span>ParameterVector() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">ParameterVector::ParameterVector </td>
+          <td>(</td>
+          <td class="paramtype">Rcpp::NumericVector&#160;</td>
+          <td class="paramname"><em>x</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a>&#160;</td>
+          <td class="paramname"><em>size</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>The constructor for initializing a parameter vector. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">x</td><td>A numeric vector. </td></tr>
+    <tr><td class="paramname">size</td><td>The number of elements to copy over. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a629cd4f1a62ea863d994225a66506357" name="a629cd4f1a62ea863d994225a66506357"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a629cd4f1a62ea863d994225a66506357">&#9670;&#160;</a></span>ParameterVector() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">ParameterVector::ParameterVector </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">double</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>v</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>The constructor for initializing a parameter vector. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">v</td><td>A vector of doubles. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<h2 class="groupheader">Member Function Documentation</h2>
+<a id="a58b8a06fb3070e59c179db2180ddb465" name="a58b8a06fb3070e59c179db2180ddb465"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a58b8a06fb3070e59c179db2180ddb465">&#9670;&#160;</a></span>at()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">SEXP</a> ParameterVector::at </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">R_xlen_t</a>&#160;</td>
+          <td class="paramname"><em>pos</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>The accessor where the first index starts at one. This function is for calling accessing from R. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">pos</td><td>The position of the <a class="el" href="classParameterVector.html" title="An Rcpp interface class that defines the ParameterVector class.">ParameterVector</a> that you want returned. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a9296d749eab1b882116aca96e07154d5" name="a9296d749eab1b882116aca96e07154d5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9296d749eab1b882116aca96e07154d5">&#9670;&#160;</a></span>fill()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a> ParameterVector::fill </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">double</a>&#160;</td>
+          <td class="paramname"><em>value</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Sets the value of all Parameters in the <a class="el" href="classParameterVector.html" title="An Rcpp interface class that defines the ParameterVector class.">ParameterVector</a> to the provided value. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">value</td><td>A double specifying the value to set all Parameters to within the <a class="el" href="classParameterVector.html" title="An Rcpp interface class that defines the ParameterVector class.">ParameterVector</a>. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a8376c23fd35532aaa83fe5d808e9431c" name="a8376c23fd35532aaa83fe5d808e9431c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8376c23fd35532aaa83fe5d808e9431c">&#9670;&#160;</a></span>fill_max()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a> ParameterVector::fill_max </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">double</a>&#160;</td>
+          <td class="paramname"><em>value</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Assigns the given values to the maximum value of all elements in the vector. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">value</td><td>The value to be assigned. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="aefd11668d4c64505607526dcbe8d5cea" name="aefd11668d4c64505607526dcbe8d5cea"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aefd11668d4c64505607526dcbe8d5cea">&#9670;&#160;</a></span>fill_min()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a> ParameterVector::fill_min </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">double</a>&#160;</td>
+          <td class="paramname"><em>value</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Assigns the given values to the minimum value of all elements in the vector. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">value</td><td>The value to be assigned. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ac21d6482b5d3a8992a9cd7a48b7482a4" name="ac21d6482b5d3a8992a9cd7a48b7482a4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac21d6482b5d3a8992a9cd7a48b7482a4">&#9670;&#160;</a></span>get()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classParameter.html">Parameter</a> &amp; ParameterVector::get </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a>&#160;</td>
+          <td class="paramname"><em>pos</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>An internal accessor for calling a position of a <a class="el" href="classParameterVector.html" title="An Rcpp interface class that defines the ParameterVector class.">ParameterVector</a> from R. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">pos</td><td>An integer specifying the position of the <a class="el" href="classParameterVector.html" title="An Rcpp interface class that defines the ParameterVector class.">ParameterVector</a> you want returned. The first position is one and the last position is the same as the size of the <a class="el" href="classParameterVector.html" title="An Rcpp interface class that defines the ParameterVector class.">ParameterVector</a>. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ab50a6d8fc19e86fb7799fc46b750301c" name="ab50a6d8fc19e86fb7799fc46b750301c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab50a6d8fc19e86fb7799fc46b750301c">&#9670;&#160;</a></span>operator[]()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classParameter.html">Parameter</a> &amp; ParameterVector::operator[] </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a>&#160;</td>
+          <td class="paramname"><em>pos</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>The accessor where the first index starts is zero. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">pos</td><td>The position of the <a class="el" href="classParameterVector.html" title="An Rcpp interface class that defines the ParameterVector class.">ParameterVector</a> that you want returned. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a098cdfbbf65f58ee93ffc76090a80e92" name="a098cdfbbf65f58ee93ffc76090a80e92"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a098cdfbbf65f58ee93ffc76090a80e92">&#9670;&#160;</a></span>resize()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a> ParameterVector::resize </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a>&#160;</td>
+          <td class="paramname"><em>size</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Resizes a <a class="el" href="classParameterVector.html" title="An Rcpp interface class that defines the ParameterVector class.">ParameterVector</a> to the desired length. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">size</td><td>An integer specifying the desired length for the <a class="el" href="classParameterVector.html" title="An Rcpp interface class that defines the ParameterVector class.">ParameterVector</a> to be resized to. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ad78418fdc00b6b9fd5f914c3021bde7a" name="ad78418fdc00b6b9fd5f914c3021bde7a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad78418fdc00b6b9fd5f914c3021bde7a">&#9670;&#160;</a></span>set()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a> ParameterVector::set </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a>&#160;</td>
+          <td class="paramname"><em>pos</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="classParameter.html">Parameter</a> &amp;&#160;</td>
+          <td class="paramname"><em>p</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>An internal setter for setting a position of a <a class="el" href="classParameterVector.html" title="An Rcpp interface class that defines the ParameterVector class.">ParameterVector</a> from R. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">pos</td><td>An integer specifying the position of the <a class="el" href="classParameterVector.html" title="An Rcpp interface class that defines the ParameterVector class.">ParameterVector</a> you want to set. The first position is one and the last position is the same as the size of the <a class="el" href="classParameterVector.html" title="An Rcpp interface class that defines the ParameterVector class.">ParameterVector</a>. </td></tr>
+    <tr><td class="paramname">p</td><td>A numeric value specifying the value to set position <code>pos</code> to in the <a class="el" href="classParameterVector.html" title="An Rcpp interface class that defines the ParameterVector class.">ParameterVector</a>. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="af5723210fad2e222c33912e811934f44" name="af5723210fad2e222c33912e811934f44"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af5723210fad2e222c33912e811934f44">&#9670;&#160;</a></span>set_all_estimable()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a> ParameterVector::set_all_estimable </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a>&#160;</td>
+          <td class="paramname"><em>estimable</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Sets all Parameters within a <a class="el" href="classParameterVector.html" title="An Rcpp interface class that defines the ParameterVector class.">ParameterVector</a> as estimable. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">estimable</td><td>A boolean specifying if all Parameters within the <a class="el" href="classParameterVector.html" title="An Rcpp interface class that defines the ParameterVector class.">ParameterVector</a> should be estimated within the model. A value of true leads to all Parameters being estimated. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a074e8b3737ef4fb2dfb3bde9a176e7fd" name="a074e8b3737ef4fb2dfb3bde9a176e7fd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a074e8b3737ef4fb2dfb3bde9a176e7fd">&#9670;&#160;</a></span>set_all_random()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a> ParameterVector::set_all_random </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a>&#160;</td>
+          <td class="paramname"><em>random</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Sets all Parameters within a <a class="el" href="classParameterVector.html" title="An Rcpp interface class that defines the ParameterVector class.">ParameterVector</a> as random effects. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">random</td><td>A boolean specifying if all Parameters within the <a class="el" href="classParameterVector.html" title="An Rcpp interface class that defines the ParameterVector class.">ParameterVector</a> should be designated as random effects. A value of true leads to all Parameters being random effects. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<hr/>The documentation for this class was generated from the following file:<ul>
+<li>inst/include/interface/rcpp/rcpp_objects/<a class="el" href="rcpp__interface__base_8hpp_source.html">rcpp_interface_base.hpp</a></li>
+</ul>
+</div><!-- contents -->
+</div><!-- doc-content -->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a class="el" href="classParameterVector.html">ParameterVector</a></li>
+    <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.8 </li>
+  </ul>
+</div>
+</body>
+</html>
