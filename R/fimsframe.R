@@ -499,8 +499,7 @@ methods::setMethod(
       ggplot2::scale_color_brewer(palette = "Set3") +
       ggplot2::facet_wrap("type", scales = "free_y") +
       ggplot2::geom_point() +
-      ggplot2::scale_x_date(labels = scales::date_format("%Y-%m-%d")) +
-      ggplot2::xlab("Start date (Year-Month-Day)") +
+      ggplot2::xlab("Timing") +
       ggplot2::ylab("Value") +
       ggplot2::theme(
         axis.text.x = ggplot2::element_text(angle = 15)
@@ -570,22 +569,19 @@ methods::setValidity(
 
     # TODO: Add checks for other slots
     # Add validity check for types
-    allowed_types <- c(
+    fims_input_types <- c(
       "landings", "index", "age_comp", "length_comp",
       "weight_at_age", "age_to_length_conversion"
     )
     present_types <- unique(object@data[["type"]])
 
     # Issues warning if there are any unrecognized types
-    unknown_types <- setdiff(present_types, allowed_types)
+    unknown_types <- sort(setdiff(present_types, fims_input_types))
     if (length(unknown_types) > 0) {
       cli::cli_warn(c(
-        "!" = "Data contains unexpected type(s): {paste(sort(unknown_types), collapse = ', ')}",
-        "i" = "Allowed types are: {paste(allowed_types, collapse = ', ')}",
-        "i" = paste(
-          "Model will continue to run,",
-          "but check that data types are correct."
-        )
+        "!" = "Data contains unexpected type(s): {unknown_types}",
+        "i" = "Allowed types are: {fims_input_types}",
+        "i" = "Model will run but check that data types are correct."
       ))
     }
     # Return
