@@ -105,10 +105,13 @@ test_that("`initialize_fims()` returns correct error messages", {
       )
     )
   parameters_wrong_type[[
-    "parameters"]][[
-    "recruitment"]][[
-    "BevertonHoltRecruitment.log_devs.estimation_type"]] <-
-  "fixed.effects"
+    "parameters"
+  ]][[
+    "recruitment"
+  ]][[
+    "BevertonHoltRecruitment.log_devs.estimation_type"
+  ]] <-
+    "fixed.effects"
   #' @description Test that `initialize_fims()` correctly returns an error on an unknown estimation_type.
   expect_error(
     initialize_fims(parameters = parameters_wrong_type, data = data),
@@ -368,7 +371,7 @@ test_that("`initialize_index()` works with correct inputs", {
   ))
   #' @description Test that `initialize_index()` module contains index_data field.
   expect_true("index_data" %in% names(result))
-    #' @description Test that `initialize_landings()` returns `NULL` if there are no landings for the fleet.
+  #' @description Test that `initialize_landings()` returns `NULL` if there are no landings for the fleet.
   expect_null(
     initialize_index(
       data,
