@@ -22,7 +22,7 @@ test_that("rcpp distribution works with correct inputs", {
   # initialize the Dnorm module
   dnorm_ <- methods::new(DnormDistribution)
   # populate class members
-  dnorm_$x[1]$value <- y
+  dnorm_$observed_values[1]$value <- y
   dnorm_$expected_values[1]$value <- 0
   dnorm_$log_sd[1]$value <- log(1)
   # evaluate the density and compare with R
@@ -36,10 +36,10 @@ test_that("rcpp distribution works with correct inputs", {
   # initialize the Dnorm module
   dnorm_ <- methods::new(DnormDistribution)
   # populate class members
-  dnorm_$x$resize(length(y))
+  dnorm_$observed_values$resize(length(y))
   purrr::walk(
     seq_along(y),
-    \(x) dnorm_$x[x]$value <- y[x]
+    \(x) dnorm_$observed_values[x]$value <- y[x]
   )
   dnorm_$expected_values$resize(length(y))
   purrr::walk(
@@ -58,10 +58,10 @@ test_that("rcpp distribution works with correct inputs", {
   # initialize the Dnorm module
   dnorm_ <- methods::new(DnormDistribution)
   # populate class members
-  dnorm_$x$resize(length(y))
+  dnorm_$observed_values$resize(length(y))
   purrr::walk(
     seq_along(y),
-    \(x) dnorm_$x[x]$value <- y[x]
+    \(x) dnorm_$observed_values[x]$value <- y[x]
   )
   dnorm_$expected_values$resize(length(y))
   purrr::walk(
@@ -87,7 +87,7 @@ test_that("rcpp distribution works with correct inputs", {
   # initialize the Dlnorm module
   dlnorm_ <- methods::new(DlnormDistribution)
   # populate class members
-  dlnorm_$x[1]$value <- y
+  dlnorm_$observed_values[1]$value <- y
   dlnorm_$expected_values[1]$value <- 0
   dlnorm_$log_sd[1]$value <- log(1)
   # evaluate the density and compare with R
@@ -101,10 +101,10 @@ test_that("rcpp distribution works with correct inputs", {
   # initialize the Dlnorm module
   dlnorm_ <- methods::new(DlnormDistribution)
   # populate class members
-  dlnorm_$x$resize(length(y))
+  dlnorm_$observed_values$resize(length(y))
   purrr::walk(
     seq_along(y),
-    \(x) dlnorm_$x[x]$value <- y[x]
+    \(x) dlnorm_$observed_values[x]$value <- y[x]
   )
   dlnorm_$expected_values$resize(length(y))
   purrr::walk(
@@ -123,10 +123,10 @@ test_that("rcpp distribution works with correct inputs", {
   # initialize the Dlnorm module
   dlnorm_ <- methods::new(DlnormDistribution)
   # populate class members
-  dlnorm_$x$resize(length(y))
+  dlnorm_$observed_values$resize(length(y))
   purrr::walk(
     seq_along(y),
-    \(x) dlnorm_$x[x]$value <- y[x]
+    \(x) dlnorm_$observed_values[x]$value <- y[x]
   )
   dlnorm_$expected_values$resize(length(y))
   purrr::walk(
@@ -160,10 +160,10 @@ test_that("rcpp distribution works with correct inputs", {
     \(x) dmultinom_$expected_values[x]$value <- p[x]
   )
 
-  dmultinom_$x$resize(length(p))
+  dmultinom_$observed_values$resize(length(p))
   purrr::walk(
     seq_along(p),
-    \(x) dmultinom_$x[x]$value <- x_values[x]
+    \(x) dmultinom_$observed_values[x]$value <- x_values[x]
   )
 
   # evaluate the density and compare with R
@@ -185,7 +185,7 @@ test_that("rcpp_distribution returns correct outputs for edge cases", {
   # initialize the Dnorm module
   dnorm_ <- methods::new(DnormDistribution)
   # populate class members
-  dnorm_$x[1]$value <- y
+  dnorm_$observed_values[1]$value <- y
   dnorm_$expected_values[1]$value <- 0
   dnorm_$log_sd[1]$value <- log(1)
   # evaluate the density and compare with R
@@ -197,7 +197,7 @@ test_that("rcpp_distribution returns correct outputs for edge cases", {
   # initialize the Dnorm module
   dnorm_ <- methods::new(DnormDistribution)
   # populate class members
-  dnorm_$x[1]$value <- y
+  dnorm_$observed_values[1]$value <- y
   dnorm_$expected_values[1]$value <- 0
   dnorm_$log_sd[1]$value <- log(1)
   # evaluate the density and compare with R
@@ -210,7 +210,7 @@ test_that("rcpp_distribution returns correct outputs for edge cases", {
   # initialize the Dnorm module
   dnorm_ <- methods::new(DnormDistribution)
   # populate class members
-  dnorm_$x[1]$value <- y
+  dnorm_$observed_values[1]$value <- y
   dnorm_$expected_values[1]$value <- -1000
   dnorm_$log_sd[1]$value <- log(1)
   # evaluate the density and compare with R
@@ -222,7 +222,7 @@ test_that("rcpp_distribution returns correct outputs for edge cases", {
   # initialize the Dnorm module
   dnorm_ <- methods::new(DnormDistribution)
   # populate class members
-  dnorm_$x[1]$value <- y
+  dnorm_$observed_values[1]$value <- y
   dnorm_$expected_values[1]$value <- 1000
   dnorm_$log_sd[1]$value <- log(1)
   # evaluate the density and compare with R
@@ -235,7 +235,7 @@ test_that("rcpp_distribution returns correct outputs for edge cases", {
   # initialize the Dnorm module
   dnorm_ <- methods::new(DnormDistribution)
   # populate class members
-  dnorm_$x[1]$value <- y
+  dnorm_$observed_values[1]$value <- y
   dnorm_$expected_values[1]$value <- 0
   dnorm_$log_sd[1]$value <- 10
   # evaluate the density and compare with R
@@ -247,7 +247,7 @@ test_that("rcpp_distribution returns correct outputs for edge cases", {
   # initialize the Dnorm module
   dnorm_ <- methods::new(DnormDistribution)
   # populate class members
-  dnorm_$x[1]$value <- y
+  dnorm_$observed_values[1]$value <- y
   dnorm_$expected_values[1]$value <- 0
   dnorm_$log_sd[1]$value <- -10
   # evaluate the density and compare with R
@@ -258,7 +258,7 @@ test_that("rcpp_distribution returns correct outputs for edge cases", {
   y <- 0
   dlnorm_ <- methods::new(DlnormDistribution)
   # populate class members
-  dlnorm_$x[1]$value <- y
+  dlnorm_$observed_values[1]$value <- y
   dlnorm_$expected_values[1]$value <- 0
   dlnorm_$log_sd[1]$value <- log(1)
   # evaluate the density and compare with R
@@ -269,7 +269,7 @@ test_that("rcpp_distribution returns correct outputs for edge cases", {
   y <- -1
   dlnorm_ <- methods::new(DlnormDistribution)
   # populate class members
-  dlnorm_$x[1]$value <- y
+  dlnorm_$observed_values[1]$value <- y
   dlnorm_$expected_values[1]$value <- 0
   dlnorm_$log_sd[1]$value <- log(1)
   #' @description Test extreme observed values for dlnorm (-1) return expected output.
@@ -279,7 +279,7 @@ test_that("rcpp_distribution returns correct outputs for edge cases", {
   y <- 1000
   dlnorm_ <- methods::new(DlnormDistribution)
   # populate class members
-  dlnorm_$x[1]$value <- y
+  dlnorm_$observed_values[1]$value <- y
   dlnorm_$expected_values[1]$value <- 0
   dlnorm_$log_sd[1]$value <- log(1)
   #' @description Test extreme observed values for dlnorm (1000) return expected output.
@@ -289,7 +289,7 @@ test_that("rcpp_distribution returns correct outputs for edge cases", {
   y <- 1
   dlnorm_ <- methods::new(DlnormDistribution)
   # populate class members
-  dlnorm_$x[1]$value <- y
+  dlnorm_$observed_values[1]$value <- y
   dlnorm_$expected_values[1]$value <- -1000
   dlnorm_$log_sd[1]$value <- log(1)
   #' @description Test extreme expected values for dlnorm (-1000) return expected output.
@@ -298,7 +298,7 @@ test_that("rcpp_distribution returns correct outputs for edge cases", {
   y <- 1
   dlnorm_ <- methods::new(DlnormDistribution)
   # populate class members
-  dlnorm_$x[1]$value <- y
+  dlnorm_$observed_values[1]$value <- y
   dlnorm_$expected_values[1]$value <- 1000
   dlnorm_$log_sd[1]$value <- log(1)
   #' @description Test extreme expected values for dlnorm (1000) return expected output.
@@ -308,7 +308,7 @@ test_that("rcpp_distribution returns correct outputs for edge cases", {
   y <- 1
   dlnorm_ <- methods::new(DlnormDistribution)
   # populate class members
-  dlnorm_$x[1]$value <- y
+  dlnorm_$observed_values[1]$value <- y
   dlnorm_$expected_values[1]$value <- 0
   dlnorm_$log_sd[1]$value <- 10
   #' @description Test extreme log_sd values for dlnorm (10) return expected output.
@@ -317,7 +317,7 @@ test_that("rcpp_distribution returns correct outputs for edge cases", {
   y <- 1
   dlnorm_ <- methods::new(DlnormDistribution)
   # populate class members
-  dlnorm_$x[1]$value <- y
+  dlnorm_$observed_values[1]$value <- y
   dlnorm_$expected_values[1]$value <- 0
   dlnorm_$log_sd[1]$value <- -10
   #' @description Test extreme log_sd values for dlnorm (-10) return expected output.
@@ -340,10 +340,10 @@ test_that("rcpp_distribution returns correct outputs for edge cases", {
     \(x) dmultinom_$expected_values[x]$value <- p[x]
   )
 
-  dmultinom_$x$resize(length(p))
+  dmultinom_$observed_values$resize(length(p))
   purrr::walk(
     seq_along(p),
-    \(x) dmultinom_$x[x]$value <- x_values[x]
+    \(x) dmultinom_$observed_values[x]$value <- x_values[x]
   )
 
   # evaluate the density and compare with R
@@ -368,10 +368,10 @@ test_that("rcpp_distribution returns correct outputs for edge cases", {
     \(x) dmultinom_$expected_values[x]$value <- p[x]
   )
 
-  dmultinom_$x$resize(length(p))
+  dmultinom_$observed_values$resize(length(p))
   purrr::walk(
     seq_along(p),
-    \(x) dmultinom_$x[x]$value <- x_values[x]
+    \(x) dmultinom_$observed_values[x]$value <- x_values[x]
   )
 
   # evaluate the density and compare with R
@@ -390,10 +390,10 @@ test_that("rcpp distribution returns correct error messages", {
   # initialize the Dnorm module
   dnorm_ <- methods::new(DnormDistribution)
   # populate class members
-  dnorm_$x$resize(length(y) + 1)
+  dnorm_$observed_values$resize(length(y) + 1)
   purrr::walk(
     seq_along(y),
-    \(x) dnorm_$x[x]$value <- y[x]
+    \(x) dnorm_$observed_values[x]$value <- y[x]
   )
   dnorm_$expected_values$resize(length(y))
   dnorm_$log_sd$resize(length(y))
@@ -410,10 +410,10 @@ test_that("rcpp distribution returns correct error messages", {
 
   dnorm_ <- methods::new(DnormDistribution)
   # populate class members
-  dnorm_$x$resize(length(y))
+  dnorm_$observed_values$resize(length(y))
   purrr::walk(
     seq_along(dnorm_),
-    \(x) dnorm_$x[x]$value <- y[x]
+    \(x) dnorm_$observed_values[x]$value <- y[x]
   )
   dnorm_$expected_values$resize(length(y))
   dnorm_$log_sd$resize(3)
@@ -433,10 +433,10 @@ test_that("rcpp distribution returns correct error messages", {
   # initialize the Dlnorm module
   dlnorm_ <- methods::new(DlnormDistribution)
   # populate class members
-  dlnorm_$x$resize(length(y))
+  dlnorm_$observed_values$resize(length(y))
   purrr::walk(
     seq_along(y),
-    \(x) dlnorm_$x[x]$value <- y[x]
+    \(x) dlnorm_$observed_values[x]$value <- y[x]
   )
   dlnorm_$expected_values$resize(length(y) + 1)
   dlnorm_$log_sd$resize(length(y))
@@ -454,10 +454,10 @@ test_that("rcpp distribution returns correct error messages", {
   # initialize the Dlnorm module
   dlnorm_ <- methods::new(DlnormDistribution)
   # populate class members
-  dlnorm_$x$resize(length(y))
+  dlnorm_$observed_values$resize(length(y))
   purrr::walk(
     seq_along(y),
-    \(x) dlnorm_$x[x]$value <- y[x]
+    \(x) dlnorm_$observed_values[x]$value <- y[x]
   )
   dlnorm_$expected_values$resize(length(y))
   dlnorm_$log_sd$resize(3)
@@ -487,10 +487,10 @@ test_that("rcpp distribution returns correct error messages", {
     seq_along(p),
     \(x) dmultinom_$expected_values[x]$value <- p[x]
   )
-  dmultinom_$x$resize(length(p))
+  dmultinom_$observed_values$resize(length(p))
   purrr::walk(
     seq_along(p),
-    \(x) dmultinom_$x[x]$value <- x_values[x]
+    \(x) dmultinom_$observed_values[x]$value <- x_values[x]
   )
   #' @description dmultinom should error out when there is a dimension mismatch.
   expect_error(
@@ -514,10 +514,10 @@ test_that("rcpp distribution returns correct error messages", {
     seq_along(p),
     \(x) dmultinom_$expected_values[x]$value <- p[x]
   )
-  dmultinom_$x$resize(length(p) - 1)
+  dmultinom_$observed_values$resize(length(p) - 1)
   purrr::walk(
     seq_along(p[1:9]),
-    \(x) dmultinom_$x[x]$value <- x_values[x]
+    \(x) dmultinom_$observed_values[x]$value <- x_values[x]
   )
   #' @description dmultinom should error out when there is a dimension mismatch.
   expect_error(
