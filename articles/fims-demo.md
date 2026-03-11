@@ -521,7 +521,7 @@ fit <- parameters_4_model |>
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
     ## ℹ FIMS model version: 0.8.1
-    ## ℹ Total run time was 1.27536 minutes
+    ## ℹ Total run time was 1.28233 minutes
     ## ℹ Number of parameters: fixed_effects=77, random_effects=0, and total=77
     ## ℹ Maximum gradient= 0.00218
     ## ℹ Negative log likelihood (NLL):
@@ -683,7 +683,7 @@ high_slope_fit <- parameters_high_slope |>
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
     ## ℹ FIMS model version: 0.8.1
-    ## ℹ Total run time was 1.27651 minutes
+    ## ℹ Total run time was 1.29447 minutes
     ## ℹ Number of parameters: fixed_effects=77, random_effects=0, and total=77
     ## ℹ Maximum gradient= 0.00253
     ## ℹ Negative log likelihood (NLL):
@@ -705,7 +705,7 @@ low_slope_fit <- parameters_low_slope |>
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
     ## ℹ FIMS model version: 0.8.1
-    ## ℹ Total run time was 1.29056 minutes
+    ## ℹ Total run time was 1.28171 minutes
     ## ℹ Number of parameters: fixed_effects=77, random_effects=0, and total=77
     ## ℹ Maximum gradient= 0.00318
     ## ℹ Negative log likelihood (NLL):
@@ -740,7 +740,7 @@ age_only_fit <- parameters_4_model |>
     ## ℹ Maximum gradient went from 0.01253 to 8e-04 after 3 steps.
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
-    ## ℹ FIMS model version: 0.8.1 ℹ Total run time was 10.87983 seconds ℹ Number of
+    ## ℹ FIMS model version: 0.8.1 ℹ Total run time was 10.21057 seconds ℹ Number of
     ## parameters: fixed_effects=77, random_effects=0, and total=77 ℹ Maximum
     ## gradient= 8e-04 ℹ Negative log likelihood (NLL): • Marginal NLL= 1565.4676 •
     ## Total NLL= 1565.4676 ℹ Terminal SB= 1724.28921
@@ -772,7 +772,7 @@ length_only_fit <- parameters_4_model |>
     ## ℹ Maximum gradient went from 0.00422 to 0.03063 after 3 steps.
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
-    ## ℹ FIMS model version: 0.8.1 ℹ Total run time was 1.03534 minutes ℹ Number of
+    ## ℹ FIMS model version: 0.8.1 ℹ Total run time was 1.04821 minutes ℹ Number of
     ## parameters: fixed_effects=77, random_effects=0, and total=77 ℹ Maximum
     ## gradient= 0.03063 ℹ Negative log likelihood (NLL): • Marginal NLL= 1520.03752 •
     ## Total NLL= 1520.03752 ℹ Terminal SB= 1706.89135

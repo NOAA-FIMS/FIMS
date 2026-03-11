@@ -44,24 +44,24 @@
     <li><a class="external-link dropdown-item" href="https://noaa-fims.github.io/FIMS/doxygen/index.html">c++/doxygen</a></li>
   </ul>
 </li>
-<li class="nav-item dropdown">
+<li class="active nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><h6 class="dropdown-header" data-toc-skip>Intro to FIMS</h6></li>
-    <li><a class="dropdown-item" href="../vignettes/fims-demo.html">Introducing the Fisheries Integrated Modeling System (FIMS)</a></li>
-    <li><a class="dropdown-item" href="../vignettes/fims-logging.html">Introducing the FIMS Logging System</a></li>
-    <li><a class="dropdown-item" href="../vignettes/fims-user-setup-guide.html">FIMS User Setup Guide</a></li>
-    <li><a class="dropdown-item" href="../vignettes/fims-demo-projections.html">Simple projections using FIMS</a></li>
+    <li><a class="dropdown-item" href="../articles/fims-demo.html">Introducing the Fisheries Integrated Modeling System (FIMS)</a></li>
+    <li><a class="dropdown-item" href="../articles/fims-logging.html">Introducing the FIMS Logging System</a></li>
+    <li><a class="dropdown-item" href="../articles/fims-user-setup-guide.html">FIMS User Setup Guide</a></li>
+    <li><a class="dropdown-item" href="../articles/fims-demo-projections.html">Simple projections using FIMS</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>Developer</h6></li>
-    <li><a class="dropdown-item" href="../vignettes/fims-path-maturity.html">FIMS Path - Maturity</a></li>
+    <li><a class="dropdown-item" href="../articles/fims-path-maturity.html">FIMS Path - Maturity</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>C++ Training</h6></li>
-    <li><a class="dropdown-item" href="../vignettes/training-intro-cpp.html">Intro to C++</a></li>
-    <li><a class="dropdown-item" href="../vignettes/training-intro-rcpp.html">Intro to Rcpp</a></li>
+    <li><a class="dropdown-item" href="../articles/training-intro-cpp.html">Intro to C++</a></li>
+    <li><a class="dropdown-item" href="../articles/training-intro-rcpp.html">Intro to Rcpp</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>Research and Development</h6></li>
-    <li><a class="dropdown-item" href="../vignettes/RD-re-sparsity.html">RE Sparsity</a></li>
+    <li><a class="dropdown-item" href="../articles/RD-re-sparsity.html">RE Sparsity</a></li>
   </ul>
 </li>
 <li class="nav-item dropdown">
@@ -193,7 +193,7 @@ C++ code in <code><a href="https://rdrr.io/pkg/Rcpp/man/cppFunction.html" class=
 <span><span class="co"># after compiling, add works like a regular R function</span></span>
 <span><span class="va">add</span></span></code></pre></div>
 <pre><code><span><span class="co">## function (x, y, z) </span></span>
-<span><span class="co">## .Call(&lt;pointer: 0x7ff80f5d3530&gt;, x, y, z)</span></span></code></pre>
+<span><span class="co">## .Call(&lt;pointer: 0x7fc7221d0530&gt;, x, y, z)</span></span></code></pre>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">add</span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">3</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] 6</span></span></code></pre>
@@ -298,9 +298,9 @@ compiled <code>meanC</code> function against the R function
 <span>  <span class="fu">meanC</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Unit: microseconds</span></span>
-<span><span class="co">##      expr     min      lq     mean   median      uq       max neval</span></span>
-<span><span class="co">##   mean(x) 420.995 430.002 435.2827 434.2940 438.779   513.328   100</span></span>
-<span><span class="co">##  meanC(x) 371.703 372.119 479.5185 372.7755 381.521 10733.889   100</span></span></code></pre>
+<span><span class="co">##      expr     min       lq     mean   median      uq       max neval</span></span>
+<span><span class="co">##   mean(x) 421.337 435.8840 439.9257 436.8005 445.627   504.553   100</span></span>
+<span><span class="co">##  meanC(x) 371.965 372.3555 483.0577 372.9820 382.139 10998.252   100</span></span></code></pre>
 </details>
 </div>
 <div class="section level3">
