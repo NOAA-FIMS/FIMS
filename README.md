@@ -159,6 +159,12 @@ All contributions to this project are gratefully acknowledged using the [`allcon
 <a href="https://github.com/NOAA-FIMS/FIMS/commits?author=iantaylor-NOAA">iantaylor-NOAA</a>
 </td>
 <td align="center">
+<a href="https://github.com/e-perl-NOAA">
+<img src="https://avatars.githubusercontent.com/u/118312785?v=4" width="100px;" alt=""/>
+</a><br>
+<a href="https://github.com/NOAA-FIMS/FIMS/commits?author=e-perl-NOAA">e-perl-NOAA</a>
+</td>
+<td align="center">
 <a href="https://github.com/MOshima-PIFSC">
 <img src="https://avatars.githubusercontent.com/u/78562167?v=4" width="100px;" alt=""/>
 </a><br>
@@ -176,16 +182,16 @@ All contributions to this project are gratefully acknowledged using the [`allcon
 </a><br>
 <a href="https://github.com/NOAA-FIMS/FIMS/commits?author=e-perl-NOAA">e-perl-NOAA</a>
 </td>
+</tr>
+
+
+<tr>
 <td align="center">
 <a href="https://github.com/jimianelli">
 <img src="https://avatars.githubusercontent.com/u/2715618?v=4" width="100px;" alt=""/>
 </a><br>
 <a href="https://github.com/NOAA-FIMS/FIMS/commits?author=jimianelli">jimianelli</a>
 </td>
-</tr>
-
-
-<tr>
 <td align="center">
 <a href="https://github.com/timjmiller">
 <img src="https://avatars.githubusercontent.com/u/17852156?v=4" width="100px;" alt=""/>
