@@ -18,13 +18,140 @@
 // For example, include <iostream> to use `std::cerr` and `std::cout`:
 // #include <iostream>
 
+#include <cstdio>
+#include <fstream>
+#include <sstream>
+
 namespace
 {
   // JsonParser_WriteToFile 
   // IO correctness
-  
-  // Edge handling 
-  
+  TEST(JsonParser_Parse, HandlesObjectAndArrayInput) {
+    // Setup
+    using fims::JsonParser;
+    using fims::JsonValueType;
+
+    JsonParser parser;
+    auto json = parser.Parse(
+        "{\"num\":42,\"pi\":3.14,\"ok\":true,\"name\":\"fims\",\"arr\":[1,2,3],\"nested\":{\"x\":7}}"
+    );
+
+    // Test that object parsing and typed getters work for each value.
+    EXPECT_EQ(json.GetType(), JsonValueType::Object);
+    auto& object = json.GetObject();
+    EXPECT_EQ(object["num"].GetInt(), 42);
+    EXPECT_NEAR(object["pi"].GetDouble(), 3.14, 1e-12);
+    EXPECT_TRUE(object["ok"].GetBool());
+    EXPECT_EQ(object["name"].GetString(), "fims");
+    EXPECT_EQ(object["arr"].GetType(), JsonValueType::JArray);
+    EXPECT_EQ(object["arr"].GetArray().size(), 3);
+    EXPECT_EQ(object["arr"].GetArray()[2].GetInt(), 3);
+    EXPECT_EQ(object["nested"].GetObject()["x"].GetInt(), 7);
+  }
+
+  TEST(JsonParser_Parse, HandlesWhitespaceInput) {
+    // Setup
+    using fims::JsonParser;
+
+    JsonParser parser;
+    auto json = parser.Parse(
+      "  {  \n  \"a\" : 1 , \"b\" : [ true , false ] }  "
+    );
+
+    // Test that parser ignores whitespace and still decodes values.
+    auto& object = json.GetObject();
+    EXPECT_EQ(object["a"].GetInt(), 1);
+    EXPECT_TRUE(object["b"].GetArray()[0].GetBool());
+    EXPECT_FALSE(object["b"].GetArray()[1].GetBool());
+  }
+
+  TEST(JsonParser_WriteToFile, HandlesCorrectInput) {
+    // Setup
+    using fims::JsonArray;
+    using fims::JsonObject;
+    using fims::JsonParser;
+    using fims::JsonValue;
+
+    JsonParser parser;
+    JsonObject root;
+    root["id"] = JsonValue(99);
+    root["name"] = JsonValue(std::string("json"));
+    root["ok"] = JsonValue(true);
+    JsonArray arr;
+    arr.push_back(JsonValue(1));
+    arr.push_back(JsonValue(2));
+    root["arr"] = JsonValue(arr);
+
+    const std::string filename = "json_write_test_output.json";
+
+    // Write to disk and verify the contents can be parsed back correctly.
+    parser.WriteToFile(filename, JsonValue(root));
+
+    std::ifstream in(filename);
+    ASSERT_TRUE(in.is_open());
+    std::stringstream buffer;
+    buffer << in.rdbuf();
+    in.close();
+
+    auto test = parser.Parse(buffer.str());
+    auto& object = test.GetObject();
+    EXPECT_EQ(object["id"].GetInt(), 99);
+    EXPECT_EQ(object["name"].GetString(), "json");
+    EXPECT_TRUE(object["ok"].GetBool());
+    EXPECT_EQ(object["arr"].GetArray().size(), 2);
+    EXPECT_EQ(object["arr"].GetArray()[1].GetInt(), 2);
+
+    std::remove(filename.c_str());
+  }
+
+  TEST(JsonParser_Show, HandlesCorrectInput) {
+    // Setup
+    using fims::JsonParser;
+    using fims::JsonValue;
+
+    JsonParser parser;
+    JsonValue value(42);
+
+    // Redirect std::cout to capture printed output from Show().
+    std::stringstream captured_cout;
+    std::streambuf* old_cout = std::cout.rdbuf(captured_cout.rdbuf());
+    parser.Show(value);
+    std::cout.rdbuf(old_cout);
+
+    EXPECT_EQ(captured_cout.str(), "42\n");
+  }
+
+  // Edge handling
+  TEST(JsonParser_Parse, HandlesEdgeCaseNullAndInvalidBool) {
+    // Setup
+    using fims::JsonParser;
+    using fims::JsonValueType;
+
+    JsonParser parser;
+
+    // Test that valid null parses as Null.
+    auto null_value = parser.Parse("null");
+    EXPECT_EQ(null_value.GetType(), JsonValueType::Null);
+
+    // Test invalid bool token defaults to Null through ParseBool().
+    auto invalid_bool = parser.Parse("tru");
+    EXPECT_EQ(invalid_bool.GetType(), JsonValueType::Null);
+  }
+
+  TEST(JsonParser_Utilities, HandlesWhitespaceAndPrettyFormat) {
+    // Setup
+    using fims::JsonParser;
+
+    // Test removeWhitespace helper.
+    EXPECT_EQ(JsonParser::removeWhitespace(" { \n \t \"x\" : 1 } "), "{\"x\":1}");
+
+    // Test pretty formatting helper inserts newlines and indentation.
+    const std::string formatted = JsonParser::PrettyFormatJSON("{\"a\":1,\"b\":[2,3]}");
+    EXPECT_NE(formatted.find("\n"), std::string::npos);
+    EXPECT_NE(formatted.find("    \"a\": 1"), std::string::npos);
+    EXPECT_NE(formatted.find("    \"b\": ["), std::string::npos);
+  }
+
   // Error handling
   TEST(JsonParser_WriteToFile, CaptureError) {
     // Setup 

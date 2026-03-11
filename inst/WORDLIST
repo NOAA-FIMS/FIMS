@@ -223,6 +223,17 @@ GraphQL
 GrowthBase
 GrowthEvaluate
 GrowthInterfaceBase
+HandlesEdgeCaseNullAndInvalidBool
+HandlesMixedArrayInput
+HandlesNestedObjects
+HandlesNumberForms
+HandlesObjectAndArrayInput
+HandlesObjectOutput
+HandlesObjectWithTrailingWhitespace
+HandlesQuotedPunctuation
+HandlesThreeTimeSteps
+HandlesWhitespaceAndPrettyFormat
+HandlesWhitespaceInput
 HPP
 HPUX
 HandlesCorrectInput
@@ -231,6 +242,7 @@ HandlesNegativeSlope
 HardwareConcurrency
 IBMCPP
 INAA
+InvalidBooleanTokenReturnsNullValue
 IRIX
 IW
 IWAA
@@ -594,6 +606,7 @@ crossorigin
 crt
 csignal
 css
+cstdio
 cstdlib
 cstring
 csv
@@ -671,6 +684,7 @@ exprs
 extern
 fabs
 fallocate
+fals
 fcn
 fdq
 fdqit
@@ -834,6 +848,7 @@ modelTest
 modularity
 mort
 mpi
+msg
 msupernaw
 msy
 mult
@@ -1120,6 +1135,7 @@ tparam
 traceback
 tribble
 trigamma
+tru
 trunc
 tryCatch
 tryFormats
