@@ -82,27 +82,27 @@ navbar:
       menu:
         - text: Intro to FIMS
         - text: Introducing the Fisheries Integrated Modeling System (FIMS)
-          href: vignettes/fims-demo.html
+          href: articles/fims-demo.html
         - text: Introducing the FIMS Logging System
-          href: vignettes/fims-logging.html
+          href: articles/fims-logging.html
         - text: FIMS User Setup Guide
-          href: vignettes/fims-user-setup-guide.html
+          href: articles/fims-user-setup-guide.html
         - text: Simple projections using FIMS
-          href: vignettes/fims-demo-projections.html
+          href: articles/fims-demo-projections.html
         - text: -------
         - text: Developer
         - text: FIMS Path - Maturity
-          href: vignettes/fims-path-maturity.html
+          href: articles/fims-path-maturity.html
         - text: -------
         - text: C++ Training
         - text: Intro to C++
-          href: vignettes/training-intro-cpp.html
+          href: articles/training-intro-cpp.html
         - text: Intro to Rcpp
-          href: vignettes/training-intro-rcpp.html
+          href: articles/training-intro-rcpp.html
         - text: -------
         - text: Research and Development
         - text: RE Sparsity
-          href: vignettes/RD-re-sparsity.html
+          href: articles/RD-re-sparsity.html
     reports:
       text: reports
       menu: 
