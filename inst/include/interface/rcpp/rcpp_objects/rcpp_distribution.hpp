@@ -439,7 +439,9 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
       for (size_t i = 0; i < this->observed_values.size() - 1; i++) {
         ss << this->observed_values[i].final_value_m << ", ";
       }
-      ss << this->observed_values[this->observed_values.size() - 1].final_value_m << "]\n";
+      ss << this->observed_values[this->observed_values.size() - 1]
+                .final_value_m
+         << "]\n";
     }
     ss << " }}\n";
     return ss.str();
@@ -467,7 +469,8 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
     distribution->id = this->id_m;
     distribution->observed_values.resize(this->observed_values.size());
     for (size_t i = 0; i < this->observed_values.size(); i++) {
-      distribution->observed_values[i] = this->observed_values[i].initial_value_m;
+      distribution->observed_values[i] =
+          this->observed_values[i].initial_value_m;
     }
     // set relative info
     distribution->expected_values.resize(this->expected_values.size());
@@ -776,7 +779,9 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
       for (size_t i = 0; i < this->observed_values.size() - 1; i++) {
         ss << this->observed_values[i].final_value_m << ", ";
       }
-      ss << this->observed_values[this->observed_values.size() - 1].final_value_m << "]\n";
+      ss << this->observed_values[this->observed_values.size() - 1]
+                .final_value_m
+         << "]\n";
     }
     ss << " }}\n";
     return ss.str();
@@ -803,7 +808,8 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
     }
     distribution->observed_values.resize(this->observed_values.size());
     for (size_t i = 0; i < this->observed_values.size(); i++) {
-      distribution->observed_values[i] = this->observed_values[i].initial_value_m;
+      distribution->observed_values[i] =
+          this->observed_values[i].initial_value_m;
     }
     // set relative info
     distribution->expected_values.resize(this->expected_values.size());
@@ -1079,7 +1085,9 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
       for (size_t i = 0; i < this->observed_values.size() - 1; i++) {
         ss << this->observed_values[i].final_value_m << ", ";
       }
-      ss << this->observed_values[this->observed_values.size() - 1].final_value_m << "]\n";
+      ss << this->observed_values[this->observed_values.size() - 1]
+                .final_value_m
+         << "]\n";
     }
     ss << " }}\n";
     return ss.str();
@@ -1105,7 +1113,8 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
     }
     distribution->observed_values.resize(this->observed_values.size());
     for (size_t i = 0; i < this->observed_values.size(); i++) {
-      distribution->observed_values[i] = this->observed_values[i].initial_value_m;
+      distribution->observed_values[i] =
+          this->observed_values[i].initial_value_m;
     }
     // set relative info
     distribution->expected_values.resize(this->expected_values.size());

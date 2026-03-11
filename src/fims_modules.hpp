@@ -429,7 +429,8 @@ RCPP_MODULE(fims) {
       .method("set_distribution_links",
               &DmultinomDistributionsInterface::set_distribution_links)
       .method("set_note", &DmultinomDistributionsInterface::set_note)
-      .field("observed_values", &DmultinomDistributionsInterface::observed_values)
+      .field("observed_values",
+             &DmultinomDistributionsInterface::observed_values)
       .field("expected_values",
              &DmultinomDistributionsInterface::expected_values)
       .field("dims", &DmultinomDistributionsInterface::dims);

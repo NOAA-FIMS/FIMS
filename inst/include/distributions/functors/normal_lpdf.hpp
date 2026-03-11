@@ -26,7 +26,7 @@ namespace fims_distributions {
  * obtain log-density values.
  *
  * For `data` input, values equal to `na_value` are skipped and contribute zero
- * to the objective. Per-observation contributions are stored in `lpdf_vec`; 
+ * to the objective. Per-observation contributions are stored in `lpdf_vec`;
  * the summed total is returned by `evaluate()` and stored in `lpdf`.
  */
 template <typename Type>
@@ -128,10 +128,10 @@ struct NormalLPDF : public DensityComponentBase<Type> {
       /* osa not working yet
         if(osa_flag){//data observation type implements osa residuals
             //code for osa cdf method
-            this->lpdf_vec[i] = this->keep.cdf_lower[i] * log( pnorm(this->observed_values[i],
-        this->get_expected(i), sd[i]) ); this->lpdf_vec[i] =
-        this->keep.cdf_upper[i] * log( 1.0 - pnorm(this->observed_values[i],
-        this->get_expected(i), sd[i]) );
+            this->lpdf_vec[i] = this->keep.cdf_lower[i] * log(
+        pnorm(this->observed_values[i], this->get_expected(i), sd[i]) );
+        this->lpdf_vec[i] = this->keep.cdf_upper[i] * log( 1.0 -
+        pnorm(this->observed_values[i], this->get_expected(i), sd[i]) );
         } */
     }
 #ifdef TMB_MODEL
