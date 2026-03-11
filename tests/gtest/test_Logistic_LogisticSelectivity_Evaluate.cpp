@@ -57,9 +57,34 @@ namespace
   
   }
 
-  // Edge handling 
-  // No edge cases.
-
+  // Edge handling
+  // Test the use of get_force_scalar across multiple timesteps.
+  TEST(LogisticSelectivity_Evaluate, HandlesThreeTimeSteps) {
+    // Setup 
+    // Load or prepare any necessary data for testing
+    fims_popdy::LogisticSelectivity<double> fishery_selectivity;
+    fishery_selectivity.inflection_point.resize(3);
+    fishery_selectivity.slope.resize(1);
+    fishery_selectivity.inflection_point[0] = 20.5;
+    fishery_selectivity.inflection_point[1] = 30.0;
+    fishery_selectivity.inflection_point[2] = 35.0;
+    // Uses get_force_scalar internally to have the same slope for all 3 values
+    // but only the first one is set
+    fishery_selectivity.slope[0] = 0.2;
+    double fishery_x = 40.5;
+    // Expected values by position:
+    // pos 0: 1/(1+exp(-(40.5-20.5)*0.2)) = 0.9820138
+    // pos 1: 1/(1+exp(-(40.5-30.0)*0.2)) = 0.8909032
+    // pos 2: 1/(1+exp(-(40.5-35.0)*0.2)) = 0.7502601
+    double expected_fishery[3] = {0.9820138, 0.8909032, 0.7502601};
+    
+    // Test that evaluate(x, pos) returns the expected value at each timestep.
+    for (size_t pos = 0; pos < 3; ++pos) {
+      EXPECT_NEAR(fishery_selectivity.evaluate(fishery_x, pos),
+                  expected_fishery[pos], 0.0001);
+    }
+  
+  }
 
   // Error handling
   // No built-in errors/warnings.
