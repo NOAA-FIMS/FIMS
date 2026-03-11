@@ -201,10 +201,10 @@ test_that("prior predictive check", {
   # taken before the likelihood calculation
   recruitment_distribution$log_sd <- methods::new(ParameterVector, 1)
   recruitment_distribution$log_sd[1]$value <- log(om_input[["logR_sd"]])
-  recruitment_distribution$x$resize(om_input[["nyr"]] - 1)
+  recruitment_distribution$observed_values$resize(om_input[["nyr"]] - 1)
   recruitment_distribution$expected_values$resize(om_input[["nyr"]] - 1)
   for (i in 1:(om_input[["nyr"]] - 1)) {
-    recruitment_distribution$x[i]$value <- 0
+    recruitment_distribution$observed_values[i]$value <- 0
     recruitment_distribution$expected_values[i]$value <- 0
   }
   recruitment_distribution$set_distribution_links("random_effects", recruitment$log_devs$get_id())

@@ -222,7 +222,7 @@ initialize_distribution <- function(
   if (distribution_type == "data") {
     distribution_fields <- setdiff(
       distribution_fields,
-      c("expected_values", "x", "dims")
+      c("expected_values", "observed_values", "dims")
     )
   }
 

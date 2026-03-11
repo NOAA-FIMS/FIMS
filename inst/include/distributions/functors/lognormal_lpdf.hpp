@@ -28,9 +28,8 @@ namespace fims_distributions {
  * density on the original scale.
  *
  * For `data` input, values equal to `na_value` are skipped and contribute zero
- * to the objective. Per-observation contributions are stored in `lpdf_vec` and
- * mirrored to `report_lpdf_vec`; the summed total is returned by `evaluate()`
- * and stored in `lpdf`.
+ * to the objective. Per-observation contributions are stored in `lpdf_vec`;
+ * the summed total is returned by `evaluate()` and stored in `lpdf`.
  */
 template <typename Type>
 struct LogNormalLPDF : public DensityComponentBase<Type> {
@@ -42,10 +41,6 @@ struct LogNormalLPDF : public DensityComponentBase<Type> {
    */
   fims::Vector<Type> log_sd;
 
-  /**
-   * @brief Total log probability density contribution of the distribution.
-   */
-  Type lpdf = static_cast<Type>(0.0);
   /** @brief Constructor.
    */
   LogNormalLPDF() : DensityComponentBase<Type>() {}
@@ -72,10 +67,7 @@ struct LogNormalLPDF : public DensityComponentBase<Type> {
     size_t n_expected = this->get_n_expected();
     // setup vector for recording the log probability density function values
     this->lpdf_vec.resize(n_x);
-    this->report_lpdf_vec.resize(n_x);
     std::fill(this->lpdf_vec.begin(), this->lpdf_vec.end(),
-              static_cast<Type>(0));
-    std::fill(this->report_lpdf_vec.begin(), this->report_lpdf_vec.end(),
               static_cast<Type>(0));
     this->lpdf = static_cast<Type>(0);
 
@@ -105,7 +97,7 @@ struct LogNormalLPDF : public DensityComponentBase<Type> {
         // if there are See Deroba and Miller, 2016
         // (https://doi.org/10.1016/j.fishres.2015.12.002) for the use of
         // lognormal constant
-        if (this->get_observed(i) != this->observed_values->na_value) {
+        if (this->get_observed(i) != this->data_observed_values->na_value) {
           this->lpdf_vec[i] =
               dnorm(log(this->get_observed(i)), this->get_expected(i),
                     fims_math::exp(log_sd.get_force_scalar(i)), true) -
@@ -127,13 +119,12 @@ struct LogNormalLPDF : public DensityComponentBase<Type> {
         }
       }
 
-      this->report_lpdf_vec[i] = this->lpdf_vec[i];
-      lpdf += this->lpdf_vec[i];
+      this->lpdf += this->lpdf_vec[i];
       if (this->simulate_flag) {
         FIMS_SIMULATE_F(this->of) {  // preprocessor definition in interface.hpp
                                      // this simulates data that is mean biased
           if (this->input_type == "data") {
-            this->observed_values->at(i) = fims_math::exp(
+            this->data_observed_values->at(i) = fims_math::exp(
                 rnorm(this->get_expected(i),
                       fims_math::exp(log_sd.get_force_scalar(i))));
           }
@@ -152,10 +143,10 @@ struct LogNormalLPDF : public DensityComponentBase<Type> {
 #endif
     }
 #ifdef TMB_MODEL
-    vector<Type> lognormal_x = this->x.to_tmb();
-    //  FIMS_REPORT_F(lognormal_x, this->of);
+    vector<Type> lognormal_observed_values = this->observed_values.to_tmb();
+    //  FIMS_REPORT_F(lognormal_observed_values, this->of);
 #endif
-    return (lpdf);
+    return (this->lpdf);
   }
 };
 }  // namespace fims_distributions
