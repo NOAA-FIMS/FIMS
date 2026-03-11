@@ -109,7 +109,7 @@ struct DensityComponentBase : public fims_model_object::FIMSObject<Type> {
     if (this->input_type == "data") {
       return data_observed_values->at(i, j);
     }
-    return observed_values[i * ( j - 1 ) + j];
+    return observed_values[i * (j - 1) + j];
   }
 
   /**
@@ -164,7 +164,7 @@ struct DensityComponentBase : public fims_model_object::FIMSObject<Type> {
     }
     return observed_values.size();
   }
-                                // id_g is the ID of the instance of the DensityComponentBase class.
+  // id_g is the ID of the instance of the DensityComponentBase class.
   // this is like a memory tracker.
   // Assigning each one its own ID is a way to keep track of
   // all the instances of the DensityComponentBase class.
@@ -172,12 +172,12 @@ struct DensityComponentBase : public fims_model_object::FIMSObject<Type> {
    * @brief Global unique identifier for distribution modules.
    */
   static uint32_t id_g;
-  
+
   /**
    * @brief Total log probability density contribution of the distribution.
-   * 
+   *
    */
-  Type lpdf; 
+  Type lpdf;
 
   /**
    * @brief ID of observed data component.

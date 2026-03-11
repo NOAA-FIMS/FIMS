@@ -26,8 +26,8 @@ namespace fims_distributions {
  * passed to `dmultinom(..., give_log = true)`.
  *
  * For `data` input, if any element in a row is equal to `na_value`, the entire
- * row is skipped and contributes zero to the objective. Contributions are 
- * stored in `lpdf_vec`. The summed total is returned by `evaluate()` and 
+ * row is skipped and contributes zero to the objective. Contributions are
+ * stored in `lpdf_vec`. The summed total is returned by `evaluate()` and
  * stored in `lpdf`.
  *
  * Row observations could be counts of each age for a given time step, where
@@ -35,8 +35,6 @@ namespace fims_distributions {
  */
 template <typename Type>
 struct MultinomialLPMF : public DensityComponentBase<Type> {
-  
-
   /**
    * @brief Dimensions of the number of rows and columns of the multivariate
    * dataset.
@@ -135,8 +133,8 @@ struct MultinomialLPMF : public DensityComponentBase<Type> {
             prob_vector[j] = this->get_expected(idx);
           }
         } else {
-          // if not data (i.e. prior or process), use observed_values vector instead of
-          // data_observed_values
+          // if not data (i.e. prior or process), use observed_values vector
+          // instead of data_observed_values
           size_t idx = (i * dims[1]) + j;
           observed_values_vector[j] = this->get_observed(idx);
           prob_vector[j] = this->get_expected(idx);
@@ -144,10 +142,10 @@ struct MultinomialLPMF : public DensityComponentBase<Type> {
       }
 
       if (!containsNA) {
-        std::fill(this->lpdf_vec.begin() + lpdf_vec_idx, 
-                  this->lpdf_vec.begin() + lpdf_vec_idx + dims[1], 
-                  dmultinom(observed_values_vector.to_tmb(), 
-                  prob_vector.to_tmb(), true));
+        std::fill(this->lpdf_vec.begin() + lpdf_vec_idx,
+                  this->lpdf_vec.begin() + lpdf_vec_idx + dims[1],
+                  dmultinom(observed_values_vector.to_tmb(),
+                            prob_vector.to_tmb(), true));
 
         this->lpdf += this->lpdf_vec[lpdf_vec_idx];
       } else {

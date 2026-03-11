@@ -28,7 +28,7 @@ namespace fims_distributions {
  * density on the original scale.
  *
  * For `data` input, values equal to `na_value` are skipped and contribute zero
- * to the objective. Per-observation contributions are stored in `lpdf_vec`; 
+ * to the objective. Per-observation contributions are stored in `lpdf_vec`;
  * the summed total is returned by `evaluate()` and stored in `lpdf`.
  */
 template <typename Type>
