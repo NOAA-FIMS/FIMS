@@ -89,10 +89,86 @@ test_that("`fims_frame()` works with the correct inputs", {
   expect_output(suppressMessages(show(fims_frame)))
   #' @description Test that 'FIMSFrame()' succeeds cleanly with valid inputs.
   expect_no_error(FIMS::FIMSFrame(data_big))
+  #' @description Test that `is.FIMSFrame()` is `TRUE` when passed a FIMSFrame object.
+  expect_true(is.FIMSFrame(fims_frame))
+  #' @description Test that `is.FIMSFrame()` is FALSE when passed a data frame.
+  expect_false(is.FIMSFrame(data_big))
 })
 
 ## Edge handling ----
-# No edge cases to test.
+test_that("`FIMSFrame()` returns correct outputs for edge cases", {
+  #' @description Test that `get_data()` retrieves the data slot as a data frame when passed a data frame rather than a FIMSFrame object.
+  expect_s3_class(get_data(big_data), "data.frame")
+
+  #' @description Test that `get_fleets()` retrieves the fleet names as a character vector when passed a data frame rather than a FIMSFrame object.
+  expect_vector(get_fleets(big_data), ptype = character())
+
+  #' @description Test that `get_n_years()` retrieves the number of years as an integer when passed a data frame rather than a FIMSFrame object.
+  expect_type(get_n_years(big_data), "integer")
+
+  #' @description Test that `get_start_year()` retrieves the start year as a single value when passed a data frame rather than a FIMSFrame object.
+  expect_length(get_n_years(big_data), 1)
+
+  #' @description Test that `get_start_year()` retrieves the start year as an integer when passed a data frame rather than a FIMSFrame object.
+  expect_type(get_start_year(big_data), "integer")
+
+  #' @description Test that `get_start_year()` retrieves the start year as a single value when passed a data frame rather than a FIMSFrame object.
+  expect_length(get_start_year(big_data), 1)
+
+  #' @description Test that `get_end_year()` retrieves the end year as an integer when passed a data frame rather than a FIMSFrame object.
+  expect_type(get_end_year(big_data), "integer")
+
+  #' @description Test that `get_end_year()` retrieves the end year as a single value when passed a data frame rather than a FIMSFrame object.
+  expect_length(get_end_year(big_data), 1)
+
+  fleet_names <- get_fleets(big_data)
+  #' @description Test that `get_fleets()` retrieves the fleet names as a character vector when passed a data frame rather than a FIMSFrame object.
+  expect_vector(fleet_names, ptype = character())
+
+  #' @description Test that `get_ages()` retrieves the ages as an integer vector when passed a data frame rather than a FIMSFrame object.
+  expect_vector(get_ages(big_data), ptype = integer())
+
+  #' @description Test that `get_n_ages()` retrieves the number of ages as an integer when passed a data frame rather than a FIMSFrame object.
+  expect_type(get_n_ages(big_data), "integer")
+  #' @description Test that `get_n_ages()` retrieves the number of ages as a single value when passed a data frame rather than a FIMSFrame object.
+  expect_length(get_n_ages(big_data), 1)
+
+  #' @description Test that `m_landings()` retrieves landings data as a numeric vector when passed a data frame rather than a FIMSFrame object.
+  expect_vector(m_landings(big_data, fleet_names), ptype = numeric())
+
+  #' @description Test that `m_index()` retrieves index data as a numeric vector when passed a data frame rather than a FIMSFrame object.
+  expect_vector(m_index(big_data, fleet_names), ptype = numeric())
+
+  #' @description Test that `m_agecomp()` retrieves age composition data as a numeric vector when passed a data frame rather than a FIMSFrame object.
+  expect_vector(m_agecomp(big_data, fleet_names), ptype = numeric())
+
+  #' @description Test that `m_lengthcomp()` retrieves length composition data as a numeric vector when passed a data frame rather than a FIMSFrame object.
+  expect_vector(m_lengthcomp(big_data, fleet_names), ptype = numeric())
+
+  #' @description Test that `m_weight_at_age()` retrieves weight-at-age data as a numeric vector when passed a data frame rather than a FIMSFrame object.
+  expect_vector(m_weight_at_age(big_data), ptype = numeric())
+
+  #' @description Test that `m_age_to_length_conversion()` retrieves age-to-length conversion data as a numeric vector when passed a data frame rather than a FIMSFrame object.
+  expect_vector(
+    m_age_to_length_conversion(big_data, fleet_names),
+    ptype = numeric()
+  )
+
+  #' @description Test that `show()` returns NULL when there is no data in the FIMSFrame object.
+  expect_error(FIMSFrame(data_big[0, ]))
+
+  #' @description Test that `FIMSFrame()` works without an ages column.
+  expect_silent(FIMSFrame(data_big[, -"age"]))
+
+  #' @description Test that `FIMSFrame()` works without a length column.
+  expect_silent(FIMSFrame(
+    dplyr::filter(
+      data_big,
+      !type %in% c("length", "age_to_length_conversion")
+    ) |>
+      dplyr::select(-length)
+  ))
+})
 
 ## Error handling ----
 test_that("`FIMSFrame()` returns correct error messages", {
@@ -136,6 +212,22 @@ test_that("`FIMSFrame()` returns correct error messages", {
   expect_error(
     m_weight_at_age(fims_frame, fleet_names),
     regexp = "unused argument"
+  )
+
+  #' @description Test that `FIMSFrame()` returns an error when there are no age data.
+  expect_error(
+    FIMSFrame(dplyr::mutate(data_big, age = NA_integer_)),
+    regexp = "they are all `NA`"
+  )
+  #' @description Test that `FIMSFrame()` returns an error when the age column is not present but `age_to_length_conversion` is present in type.
+  expect_error(
+    FIMSFrame(dplyr::select(data_big, -length)),
+    "is a required column"
+  )
+  #' @description Test that `FIMSFrame()` returns an error when the length column is not present but `age_to_length_conversion` is present in type.
+  expect_error(
+    FIMSFrame(dplyr::select(data_big, -age)),
+    "is a required column"
   )
 })
 

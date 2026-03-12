@@ -514,9 +514,6 @@ methods::setMethod(
   signature = "FIMSFrame",
   definition = function(object) {
     message("tbl_df of class '", class(object), "'")
-    if (length(object@data) == 0) {
-      return()
-    }
     dat_types <- unique(object@data[[which(colnames(object@data) == "type")]])
     message("with the following 'types': ", paste0(dat_types, collapse = ", "))
     snames <- slotNames(object)
@@ -648,13 +645,13 @@ validate_data_colnames <- function(data) {
 #' The biological data are further sorted by bin. Thus, age-composition
 #' information will be arranged as follows:
 #'
-#' | type | name     | timing  | age  | value  |
-#' |:---- |:--------:|:-------:|:----:|-------:|
-#' | age  | fleet1   | 2022    | 1    | 0.3    |
-#' | age  | fleet1   | 2022    | 2    | 0.7    |
-#' | age  | fleet1   | 2023    | 1    | 0.5    |
+#' | type     | name     | timing  | age  | value  |
+#' |:-------- |:--------:|:-------:|:----:|-------:|
+#' | age_comp | fleet1   | 2022    | 1    | 0.3    |
+#' | age_comp | fleet1   | 2022    | 2    | 0.7    |
+#' | age_comp | fleet1   | 2023    | 1    | 0.5    |
 #'
-#' Length composition-data are sorted the same way but by length bin instead of
+#' Length-composition data are sorted the same way but by length bin instead of
 #' by age bin. It becomes more complicated for the age-to-length-conversion
 #' data, which are sorted by type, name, timing, age, and then length. So, a
 #' full set of length, e.g., length 10, length 20, length 30, etc., is placed
@@ -682,6 +679,11 @@ FIMSFrame <- function(data) {
     stop(
       "Check the columns of your data, the following are missing:\n",
       paste(errors, sep = "\n", collapse = "\n")
+    )
+  }
+  if (NROW(data) == 0) {
+    cli::cli_abort(
+      "{.var data} has 0 rows of data and cannot be used to make a FIMSFrame."
     )
   }
 
@@ -752,6 +754,16 @@ FIMSFrame <- function(data) {
     missing_lengths <- missing_time_series[0, ]
   }
   if ("age_to_length_conversion" %in% formatted_data[["type"]]) {
+    if (!"age" %in% colnames(data)) {
+      cli::cli_abort(
+        "age is a required column if you have age_to_length_conversion data."
+      )
+    }
+    if (!"length" %in% colnames(data)) {
+      cli::cli_abort(
+        "length is a required column if you have age_to_length_conversion data."
+      )
+    }
     # Must do this by hand because it is across two dimensions
     temp_age_to_length_data <- formatted_data |>
       dplyr::group_by(type, name)
