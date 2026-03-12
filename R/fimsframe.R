@@ -566,10 +566,6 @@ methods::setValidity(
 
     # TODO: Add checks for other slots
     # Add validity check for types
-    fims_input_types <- c(
-      "landings", "index", "age_comp", "length_comp",
-      "weight_at_age", "age_to_length_conversion"
-    )
     present_types <- unique(object@data[["type"]])
 
     # Issues warning if there are any unrecognized types
