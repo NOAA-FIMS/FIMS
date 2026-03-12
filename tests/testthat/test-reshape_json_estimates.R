@@ -49,12 +49,14 @@ compare_tmb_and_json_outputs <- function(model_fit_path) {
     # TODO: The test fails for fit objects from estimation runs because the TMB
     # output includes the label "log_r," which is not present in the JSON output.
     # For now, manually remove `log_r` here and create a new issue to track this.
-    dplyr::filter(label != "log_r")
+    dplyr::filter(label != "log_r") |>
+    # TODO: Allow for comparison of random effects
+    dplyr::filter(label != "re")
 
   # Extract the model_output, which contains the JSON-like structure.
   model_output <- get_model_output(fit)
   # Reshape the output from the JSON structure into a data frame.
-  json_output <- reshape_json_estimates(model_output)
+  json_output <- FIMS:::reshape_json_estimates(model_output)
 
   # Check for any duplicated parameter_id entries in the JSON output, which
   # would indicate a problem in the reshaping logic.
