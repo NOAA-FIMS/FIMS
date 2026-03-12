@@ -290,18 +290,6 @@ target_link_libraries(fims_math_logit
 gtest_discover_tests(fims_math_logit)
 
 
-# test_integration
-# add_executable(population_integration
-#   integration_test_population.cpp
-# )
-
-#  target_link_libraries(population_integration
-#   gtest_main
-#   fims_test
-#  )
-
-#  gtest_discover_tests(population_integration)
-
 # test_Logistic_LogisticSelectivity_Evaluate.cpp
 add_executable(Logistic_LogisticSelectivity_Evaluate
   test_Logistic_LogisticSelectivity_Evaluate.cpp
