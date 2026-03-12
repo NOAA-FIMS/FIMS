@@ -649,7 +649,7 @@ create_default_BevertonHoltRecruitment <- function(data) {
       label = "log_devs",
       value = 0.0,
       time = (get_start_year(data) + 1):get_end_year(data),
-      estimation_type = "fixed_effects"
+      estimation_type = "random_effects"
     )
 
   expected_recruitment <- create_default_parameters_template(

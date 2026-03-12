@@ -55,6 +55,17 @@ test_that("catch-at-age model (deterministic MLE with wrappers) returns correct 
   })
 })
 
+test_that("catch-at-age model (deterministic MLE with wrappers) check recruitment devs random effects", {
+  # Load the test data from an RDS file containing the model fit
+  deterministic_age_length_comp <- readRDS(testthat::test_path("fixtures", "fit_agecomp_random_effects.RDS"))
+
+  test_that("catch-at-age model (deterministic MLE with wrappers) returns correct number of parameters and random effects", {
+    #' @description Test that the number of fixed parameters are correct.
+    expect_equal(get_number_of_parameters(deterministic_age_length_comp)["fixed_effects"] |> unname(), 48)
+    #' @description Test that the number of random effects are correct.
+    expect_equal(get_number_of_parameters(deterministic_age_length_comp)["random_effects"] |> unname(), 29)
+  })
+})
 ## Edge handling ----
 # No edge cases to test
 

@@ -276,6 +276,40 @@ prepare_test_data <- function() {
     compress = FALSE
   )
 
+  ## Estimation run with age comp only using wrappers ----
+  modified_parameters_random_effects <- modified_parameters |>
+    dplyr::mutate(
+      estimation_type = dplyr::if_else(
+        label == "log_devs" & module_type == "BevertonHolt",
+        "random_effects",
+        estimation_type
+      )
+    )
+
+  saveRDS(
+    modified_parameters_random_effects,
+    file = testthat::test_path("fixtures", "parameters_model_comparison_project_random_effects.RDS"),
+    compress = FALSE
+  )
+
+  # Run FIMS model
+  fit_agecomp_random_effects <- modified_parameters_random_effects |>
+    # remove rows that have module_type == LengthComp
+    dplyr::rows_delete(
+      y = tibble::tibble(module_type = "LengthComp")
+    ) |>
+    initialize_fims(data = data_age_comp) |>
+    fit_fims(optimize = TRUE)
+
+  clear()
+
+  # Save FIMS results as a test fixture for additional fimsfit tests
+  saveRDS(
+    fit_agecomp_random_effects,
+    file = testthat::test_path("fixtures", "fit_agecomp_random_effects.RDS"),
+    compress = FALSE
+  )
+
   # Load a second dataset that contains missing age composition data
   data_age_comp_na <- readRDS(testthat::test_path("fixtures", "data_age_comp_na.RDS"))
   # Fit the FIMS model using the second dataset (with missing values)
