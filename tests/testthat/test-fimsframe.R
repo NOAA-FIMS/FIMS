@@ -154,8 +154,6 @@ test_that("`FIMSFrame()` returns correct outputs for edge cases", {
     ptype = numeric()
   )
 
-  #' @description Test that `show()` returns NULL when there is no data in the FIMSFrame object.
-  expect_error(FIMSFrame(data_big[0, ]))
 
   #' @description Test that `FIMSFrame()` works without an ages column.
   expect_silent(FIMSFrame(
@@ -219,6 +217,9 @@ test_that("`FIMSFrame()` returns correct error messages", {
     m_weight_at_age(fims_frame, fleet_names),
     regexp = "unused argument"
   )
+
+  #' @description Test that `FIMSFrame()` returns an error when there is no data in the FIMSFrame object.
+  expect_error(FIMSFrame(data_big[0, ]))
 
   #' @description Test that `FIMSFrame()` returns an error when there are no age data.
   expect_error(
