@@ -327,13 +327,3 @@ target_link_libraries(FIMSJson_JsonParser_WriteToFile
 
 gtest_discover_tests(FIMSJson_JsonParser_WriteToFile)
 
-# Google Benchmark: population_CatchNumbersAtAge
-add_executable(population_CatchNumbersAtAge_benchmark
-  population_CatchNumbersAtAge_benchmark.cpp
-)
-
-target_link_libraries(population_CatchNumbersAtAge_benchmark
-  benchmark::benchmark_main
-  fims_test
-  GTest::gtest
-)

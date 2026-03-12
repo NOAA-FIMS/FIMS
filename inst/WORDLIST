@@ -28,6 +28,7 @@ BOOL
 babySAM
 Baranov
 BasedOnStyle
+BenchCAAEvaluate
 Benchmarking
 Bertalanffy
 BevHolt
@@ -143,6 +144,7 @@ DnormDistributionsInterface
 DoReporting
 Doering
 DoozyX
+DoNotOptimize
 DoubleAgeInput
 DoubleInput
 DoubleLogistic
@@ -388,6 +390,7 @@ Robj
 Rscript
 Rslaves
 RTMB
+RunBenchmarkedCode
 RunModelLoop
 SBPR
 SDreports
