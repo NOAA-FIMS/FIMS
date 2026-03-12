@@ -501,8 +501,10 @@ methods::setMethod(
       # Using Set3 b/c it is the palette with the largest number of colors
       # and not {nmfspalette} b/c didn't want to depend on GitHub package
       ggplot2::scale_color_brewer(palette = "Set3") +
-      ggplot2::facet_wrap("type", scales = "free_y",
-      labeller = ggplot2::label_wrap_gen(width = 10)) +
+      ggplot2::facet_wrap("type",
+        scales = "free_y",
+        labeller = ggplot2::label_wrap_gen(width = 10)
+      ) +
       ggplot2::geom_point(alpha = 0.8) +
       ggplot2::xlab("Timing") +
       ggplot2::ylab("Value") +
