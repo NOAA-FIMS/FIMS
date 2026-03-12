@@ -1,3 +1,9 @@
+# To remove the NOTE
+# no visible binding for global variable
+utils::globalVariables(c(
+  "name", "timing", "value"
+))
+
 # Developers: ----
 
 # This file defines the parent class FIMSFrame and its potential children. The
@@ -276,7 +282,7 @@ methods::setMethod(
 #' data to a FIMS module because the data will have the appropriate indexing.
 #'
 #' @details
-#' Age-to-length-conversion data, i.e., the proportion of age "a" that are
+#' `Age_to_length_conversion` data, i.e., the proportion of age "a" that are
 #' length "l", are used to convert lengths (input data) to ages (modeled) as
 #' a way to fit length data without estimating growth.
 #'
@@ -481,29 +487,62 @@ methods::setMethod(
 # because @kellijohnson-NOAA did not quite understand how they actually work.
 
 # methods::setMethod: plot ----
-
+#' Plot a `FIMSFrame` object
+#'
+#' Use `ggplot2::geom_point()` to plot the information stored in the data slot
+#' of the `FIMSFrame` class.
+#'
+#' @param x A `FIMSFrame` object.
+#' @param y Unused (inherited from R base).
+#' @param ... Unused (inherited from R base).
+#'
+#' @return
+#' A \pkg{ggplot2} object is returned that uses [stockplotr::theme_noaa()].
+#' There will be one panel per input type with fleet-specific information
+#' denoted using colors.
+#' @examples
+#' \dontrun{
+#' data("data_big", package = "FIMS")
+#' data_4_model <- FIMSFrame(data_big)
+#' plot(data_4_model)
+#' }
+#'
+#' @export
+#' @method plot FIMSFrame
+setGeneric("plot", function(x, y, ...)
+  standardGeneric("plot")
+)
 methods::setMethod(
   f = "plot",
-  signature = "FIMSFrame",
+  signature = c(x = "FIMSFrame", y = "missing"),
   definition = function(x, y, ...) {
+    data_for_plot <- get_data(x) |>
+      dplyr::mutate(
+        type = gsub("_", " ", type)
+      )
     ggplot2::ggplot(
-      data = x@data,
+      data = data_for_plot,
       mapping = ggplot2::aes(
-        x = .data[["timing"]],
-        y = .data[["value"]],
-        col = .data[["name"]]
+        x = timing,
+        y = value,
+        col = name
       )
     ) +
       # Using Set3 b/c it is the palette with the largest number of colors
       # and not {nmfspalette} b/c didn't want to depend on GitHub package
       ggplot2::scale_color_brewer(palette = "Set3") +
-      ggplot2::facet_wrap("type", scales = "free_y") +
-      ggplot2::geom_point() +
+      ggplot2::facet_wrap(
+        "type",
+        scales = "free_y",
+        labeller = ggplot2::label_wrap_gen(width = 10)
+      ) +
+      ggplot2::geom_point(alpha = 0.8) +
       ggplot2::xlab("Timing") +
       ggplot2::ylab("Value") +
       ggplot2::theme(
         axis.text.x = ggplot2::element_text(angle = 15)
-      )
+      ) +
+      stockplotr::theme_noaa()
   }
 )
 
@@ -629,17 +668,17 @@ validate_data_colnames <- function(data) {
 #' It is important that the order of the rows in the data are correct but it is
 #' not expected that the user will do this. Instead, the returned data are
 #' sorted using [dplyr::arrange()] before placing them in the data slot. Data
-#' are first sorted by data type, placing all weight-at-age data next to other
-#' weight-at-age data and all landings data next to landings data. Thus,
-#' age-composition data will come first because their type is "age" and "a" is
+#' are first sorted by data type, placing all `weight_at_age` data next to
+#' other `weight_at_age` data and all landings data next to landings data.
+#' Thus, `age_comp` data will come first because their type is "age" and "a" is
 #' first in the alphabet. All other types will follow according to their order
 #' in the alphabet.
-#' Next, within each type, data are organized by fleet. So, age-composition
+#' Next, within each type, data are organized by fleet. So, `age_comp`
 #' information for fleet1 will come before survey1. Next, all data within type
 #' and fleet are arranged by timing, e.g., by year. That is the end of the
-#' sorting for time series data like landings and indices.
-#' The biological data are further sorted by bin. Thus, age-composition
-#' information will be arranged as follows:
+#' sorting for time series data like landings and indices. The biological data
+#' are further sorted by bin. Thus, `age_comp` information will be arranged as
+#' follows:
 #'
 #' | type     | name     | timing  | age  | value  |
 #' |:-------- |:--------:|:-------:|:----:|-------:|
@@ -647,8 +686,8 @@ validate_data_colnames <- function(data) {
 #' | age_comp | fleet1   | 2022    | 2    | 0.7    |
 #' | age_comp | fleet1   | 2023    | 1    | 0.5    |
 #'
-#' Length-composition data are sorted the same way but by length bin instead of
-#' by age bin. It becomes more complicated for the age-to-length-conversion
+#' `length_comp` data are sorted the same way but by length bin instead of
+#' by age bin. It becomes more complicated for the `age_to_length_conversion`
 #' data, which are sorted by type, name, timing, age, and then length. So, a
 #' full set of length, e.g., length 10, length 20, length 30, etc., is placed
 #' together for a given age. After that age, another entire set of length
@@ -659,8 +698,8 @@ validate_data_colnames <- function(data) {
 #'
 #' @param data A `data.frame` that contains the necessary columns to construct
 #'   a `FIMSFrame-class` object. Currently, those columns are
-#'   `r glue::glue_collapse(colnames(data_big), sep = ", ", last = ", and ")`. See
-#'   the data_big object in FIMS, e.g., `data(data_big, package = "FIMS")`.
+#'   `r glue::glue_collapse(colnames(data_big), sep = ", ", last = ", and ")`.
+#'   See the `data_big` object in FIMS, e.g., `data(data_big, package = "FIMS")`.
 #'
 #' @return
 #' An object of the S4 class `FIMSFrame` class, or one of its child classes, is
