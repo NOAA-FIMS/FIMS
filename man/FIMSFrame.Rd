@@ -10,7 +10,7 @@ FIMSFrame(data)
 \item{data}{A \code{data.frame} that contains the necessary columns to construct
 a \code{FIMSFrame-class} object. Currently, those columns are
 type, name, age, length, timing, value, unit, and uncertainty. See
-the data_big object in FIMS, e.g., \code{data(data_big, package = "FIMS")}.}
+the \code{data_big} object in FIMS, e.g., \code{data(data_big, package = "FIMS")}.}
 }
 \value{
 An object of the S4 class \code{FIMSFrame} class, or one of its child classes, is
@@ -36,7 +36,9 @@ not expected that the user will do this. Instead, the returned data are
 sorted using \code{\link[dplyr:arrange]{dplyr::arrange()}} before placing them in the data slot. Data
 are first sorted by data type, placing all weight-at-age data next to other
 weight-at-age data and all landings data next to landings data. Thus,
-age-composition data will come first because their type is "age" and "a" is
+are first sorted by data type, placing all \code{weight_at_age} data next to other
+\code{weight_at_age} data and all landings data next to \code{landings} data. Thus,
+\code{age_comp} data will come first because their type is "age" and "a" is
 first in the alphabet. All other types will follow according to their order
 in the alphabet.
 Next, within each type, data are organized by fleet. So, age-composition
@@ -52,8 +54,8 @@ information will be arranged as follows:\tabular{lcccr}{
 }
 
 
-Length-composition data are sorted the same way but by length bin instead of
-by age bin. It becomes more complicated for the age-to-length-conversion
+\code{length_comp} data are sorted the same way but by length bin instead of
+by age bin. It becomes more complicated for the \code{age_to_length_conversion}
 data, which are sorted by type, name, timing, age, and then length. So, a
 full set of length, e.g., length 10, length 20, length 30, etc., is placed
 together for a given age. After that age, another entire set of length
