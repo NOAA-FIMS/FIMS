@@ -227,12 +227,12 @@ test_that("`FIMSFrame()` returns correct error messages", {
   )
   #' @description Test that `FIMSFrame()` returns an error when the age column is not present but `age_to_length_conversion` is present in type.
   expect_error(
-    FIMSFrame(dplyr::select(data_big, -length)),
+    FIMSFrame(dplyr::select(data_big, -age)),
     "is a required column"
   )
   #' @description Test that `FIMSFrame()` returns an error when the length column is not present but `age_to_length_conversion` is present in type.
   expect_error(
-    FIMSFrame(dplyr::select(data_big, -age)),
+    FIMSFrame(dplyr::select(data_big, -length)),
     "is a required column"
   )
 })

@@ -276,7 +276,7 @@ methods::setMethod(
 #' data to a FIMS module because the data will have the appropriate indexing.
 #'
 #' @details
-#' Age-to-length-conversion data, i.e., the proportion of age "a" that are
+#' `age_to_length_conversion` data, i.e., the proportion of age "a" that are
 #' length "l", are used to convert lengths (input data) to ages (modeled) as
 #' a way to fit length data without estimating growth.
 #'
@@ -631,7 +631,9 @@ validate_data_colnames <- function(data) {
 #' sorted using [dplyr::arrange()] before placing them in the data slot. Data
 #' are first sorted by data type, placing all weight-at-age data next to other
 #' weight-at-age data and all landings data next to landings data. Thus,
-#' age-composition data will come first because their type is "age" and "a" is
+#' are first sorted by data type, placing all `weight_at_age` data next to other
+#' `weight_at_age` data and all landings data next to `landings` data. Thus,
+#' `age_comp` data will come first because their type is "age" and "a" is
 #' first in the alphabet. All other types will follow according to their order
 #' in the alphabet.
 #' Next, within each type, data are organized by fleet. So, age-composition
@@ -647,8 +649,8 @@ validate_data_colnames <- function(data) {
 #' | age_comp | fleet1   | 2022    | 2    | 0.7    |
 #' | age_comp | fleet1   | 2023    | 1    | 0.5    |
 #'
-#' Length-composition data are sorted the same way but by length bin instead of
-#' by age bin. It becomes more complicated for the age-to-length-conversion
+#' `length_comp` data are sorted the same way but by length bin instead of
+#' by age bin. It becomes more complicated for the `age_to_length_conversion`
 #' data, which are sorted by type, name, timing, age, and then length. So, a
 #' full set of length, e.g., length 10, length 20, length 30, etc., is placed
 #' together for a given age. After that age, another entire set of length
@@ -660,7 +662,7 @@ validate_data_colnames <- function(data) {
 #' @param data A `data.frame` that contains the necessary columns to construct
 #'   a `FIMSFrame-class` object. Currently, those columns are
 #'   `r glue::glue_collapse(colnames(data_big), sep = ", ", last = ", and ")`. See
-#'   the data_big object in FIMS, e.g., `data(data_big, package = "FIMS")`.
+#'   the `data_big` object in FIMS, e.g., `data(data_big, package = "FIMS")`.
 #'
 #' @return
 #' An object of the S4 class `FIMSFrame` class, or one of its child classes, is
