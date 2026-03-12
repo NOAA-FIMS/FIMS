@@ -48,6 +48,7 @@ reference:
       Example dataset used in FIMS demonstrations and examples.
   contents:
   - data_big
+  - fims_input_types
 
 - title: Run FIMS
   desc: Primary functions used when setting up or running a FIMS model.
