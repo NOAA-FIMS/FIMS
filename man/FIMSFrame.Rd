@@ -46,13 +46,13 @@ sorting for time series data like landings and indices.
 The biological data are further sorted by bin. Thus, age-composition
 information will be arranged as follows:\tabular{lcccr}{
    type \tab name \tab timing \tab age \tab value \cr
-   age \tab fleet1 \tab 2022 \tab 1 \tab 0.3 \cr
-   age \tab fleet1 \tab 2022 \tab 2 \tab 0.7 \cr
-   age \tab fleet1 \tab 2023 \tab 1 \tab 0.5 \cr
+   age_comp \tab fleet1 \tab 2022 \tab 1 \tab 0.3 \cr
+   age_comp \tab fleet1 \tab 2022 \tab 2 \tab 0.7 \cr
+   age_comp \tab fleet1 \tab 2023 \tab 1 \tab 0.5 \cr
 }
 
 
-Length composition-data are sorted the same way but by length bin instead of
+Length-composition data are sorted the same way but by length bin instead of
 by age bin. It becomes more complicated for the age-to-length-conversion
 data, which are sorted by type, name, timing, age, and then length. So, a
 full set of length, e.g., length 10, length 20, length 30, etc., is placed
