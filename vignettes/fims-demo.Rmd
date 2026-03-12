@@ -94,6 +94,18 @@ The data contains the following fleets:
 - A single fishery fleet with age- and length-composition, weight-at-age, and landings data
 - A single survey with age- and length-composition and index data
 
+You can use the base R function `plot(data_4_model)` to see the data types (e.g., landings, length composition, age composition, etc.) in the `data_4_model` object by fleet.
+
+```{r FIMSFrame-plot}
+#| warning: false
+#| message: false
+#|    fig.alt: >
+#|      The landings are increasing over time for fleet1 and the index is decreasing over time for survey1.
+#|    fig.cap: >
+#|      FIMS input values by type (panels) and fleet (colors).
+plot(data_4_model)
+```
+
 ## Configurations
 
 ### `create_default_configurations()`
