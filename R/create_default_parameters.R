@@ -68,8 +68,8 @@ utils::globalVariables(c(
 #' @examples
 #' \dontrun{
 #' # Load the example dataset and create a FIMS data frame
-#' data("data1")
-#' fims_frame <- FIMSFrame(data1)
+#' data("data_big")
+#' fims_frame <- FIMSFrame(data_big)
 #'
 #' # Create default configurations
 #' default_configurations <- create_default_configurations(fims_frame)
@@ -716,7 +716,7 @@ create_default_DnormDistribution <- function(
     new_params <- create_default_parameters_template(
       n_parameters = length(value)
     ) |>
-      dplyr::mutate(label = "x", value = 0) |>
+      dplyr::mutate(label = "observed_values", value = 0) |>
       dplyr::add_row(
         label = "expected_values",
         value = rep(0, length(value))
@@ -779,7 +779,7 @@ create_default_DlnormDistribution <- function(
   if (input_type == "process") {
     default <- default |>
       dplyr::add_row(
-        label = "x",
+        label = "observed_values",
         value = rep(0, get_n_years(data))
       )
   }
@@ -846,7 +846,7 @@ create_default_recruitment <- function(
         )
 
       expanded_rows <- distribution_default |>
-        dplyr::filter(label %in% c("x", "expected_values")) |>
+        dplyr::filter(label %in% c("observed_values", "expected_values")) |>
         # Create all combinations of the original rows and years
         tidyr::expand_grid(year = (get_start_year(data) + 1):get_end_year(data)) |>
         dplyr::mutate(

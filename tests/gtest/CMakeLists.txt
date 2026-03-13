@@ -14,18 +14,7 @@ gtest_main
 fims_test
 )
 
-# test_population_dynamics_selectivity_double_logistic
-add_executable(population_dynamics_selectivity_double_logistic
-  test_population_dynamics_selectivity_double_logistic.cpp
-)
-
-target_link_libraries(population_dynamics_selectivity_double_logistic
-  gtest_main
-  fims_test
-)
-
 gtest_discover_tests(population_dynamics_maturity_logistic)
-gtest_discover_tests(population_dynamics_selectivity_double_logistic)
 
 # test_fims_math_exp.cpp
 add_executable(fims_math_exp
@@ -289,18 +278,17 @@ target_link_libraries(fims_math_logit
 
 gtest_discover_tests(fims_math_logit)
 
+# test_DoubleLogistic_DoubleLogisticSelectivity_Evaluate.cpp
+add_executable(DoubleLogistic_DoubleLogisticSelectivity_Evaluate
+  test_DoubleLogistic_DoubleLogisticSelectivity_Evaluate.cpp
+)
 
-# test_integration
-# add_executable(population_integration
-#   integration_test_population.cpp
-# )
+target_link_libraries(DoubleLogistic_DoubleLogisticSelectivity_Evaluate
+  gtest_main
+  fims_test
+)
 
-#  target_link_libraries(population_integration
-#   gtest_main
-#   fims_test
-#  )
-
-#  gtest_discover_tests(population_integration)
+gtest_discover_tests(DoubleLogistic_DoubleLogisticSelectivity_Evaluate)
 
 # test_Logistic_LogisticSelectivity_Evaluate.cpp
 add_executable(Logistic_LogisticSelectivity_Evaluate
@@ -327,3 +315,14 @@ target_link_libraries(FIMSJson_JsonParser_WriteToFile
 
 gtest_discover_tests(FIMSJson_JsonParser_WriteToFile)
 
+# test_FIMSJson_JsonParser_Parse.cpp
+add_executable(FIMSJson_JsonParser_Parse
+  test_FIMSJson_JsonParser_Parse.cpp
+)
+
+target_link_libraries(FIMSJson_JsonParser_Parse
+  gtest_main
+  fims_test
+)
+
+gtest_discover_tests(FIMSJson_JsonParser_Parse)

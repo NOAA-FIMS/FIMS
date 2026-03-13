@@ -6,7 +6,7 @@
 #' This function prepares the input data for integration tests by generating
 #' datasets containing only age composition, only length composition data, or
 #' data with missing values. The integration_test_data_components.RData is
-#' generated after running the script R/data1.R.
+#' generated after running the script R/data_big.R.
 #'
 #' @return None. The function saves the generated datasets as RDS files in the
 #' specified directory.
@@ -19,7 +19,7 @@ prepare_test_data <- function() {
   # The section generates datasets containing only age composition, only length
   # composition data, or data with missing values.
   # The integration_test_data_components.RData is generated after running the
-  # script R/data1.R.
+  # script R/data_big.R.
   # Load required integration test data components
   load(testthat::test_path("fixtures", "integration_test_data_components.RData"))
 
@@ -69,7 +69,7 @@ prepare_test_data <- function() {
   data_length_comp_na <- data_length_comp_raw |>
     dplyr::filter(
       !(name == "survey1" &
-        type %in% c("index", "length_comp", "age-to-length-conversion") &
+        type %in% c("index", "length_comp", "age_to_length_conversion") &
         timing == na_index
       )
     ) |>
@@ -95,7 +95,7 @@ prepare_test_data <- function() {
     ) |>
     dplyr::filter(
       !(name == "fleet1" &
-        type %in% c("length_comp", "age-to-length-conversion") &
+        type %in% c("length_comp", "age_to_length_conversion") &
         timing == length_na_index
       )
     ) |>
@@ -122,7 +122,7 @@ prepare_test_data <- function() {
   om_output <- om_output_list[[iter_id]]
   em_input <- em_input_list[[iter_id]]
 
-  data_age_length_comp <- FIMSFrame(data1)
+  data_age_length_comp <- FIMSFrame(data_big)
   default_parameters <- create_default_configurations(
     data = data_age_length_comp
   ) |>

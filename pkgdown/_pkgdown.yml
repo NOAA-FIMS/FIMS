@@ -14,7 +14,7 @@ authors:
 template:
   bootstrap: 5
   includes:
-    before_title: <img class="navlogo" src="https://noaa-fims.github.io/images/FIMS_logo3.png" width = "60" align="left" />
+    before_title: <img class="navlogo" src="https://noaa-fims.github.io/images/FIMS_logo3.png" alt="FIMS logo with a fish" width="60" align="left" />
     in_header: |
       <link rel="preconnect" href="https://fonts.googleapis.com">
       <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -47,7 +47,9 @@ reference:
   desc: >
       Example dataset used in FIMS demonstrations and examples.
   contents:
-  - data1
+  - data_big
+  - fims_input_types
+  - plot
 
 - title: Run FIMS
   desc: Primary functions used when setting up or running a FIMS model.

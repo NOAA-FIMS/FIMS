@@ -70,58 +70,6 @@ struct DimensionInfo {
 };
 
 /**
- * TMB sdreport values are returned as a single vector, if there are multiple
- * populations or fleets then the report vectors are concatenated together.
- * This struct is used to store the name, id, and length of each report
- * vector so that they can be extracted from the single report vector.
- */
-struct UncertaintyReportInfo {
-  /**
-   * * name of the report vector
-   */
-  std::string name;
-  /**
-   * * id of the population or fleet the report is associated with
-   */
-  uint32_t id_m;
-  /**
-   * * starting index of the report vector in the overall report vector
-   */
-  size_t start_m;
-  /**
-   * * length of the report vector
-   */
-  size_t length_m;
-
-  /**
-   * @brief Default constructor for UncertaintyReportInfo.
-   */
-  UncertaintyReportInfo() : id_m(0), start_m(0), length_m(0) {}
-
-  /**
-   * @brief Constructor with parameters.
-   * @param name The name of the report vector.
-   * @param id The id of the population or fleet the report is associated with.
-   * @param start The starting index of the report vector in the overall report
-   * vector.
-   * @param length The length of the report vector.
-   */
-  UncertaintyReportInfo(const std::string &name, uint32_t id, size_t start,
-                        size_t length)
-      : name(name), id_m(id), start_m(start), length_m(length) {}
-
-  /**
-   * @brief Copy constructor.
-   * @param other The UncertaintyReportInfo object to copy from.
-   */
-  UncertaintyReportInfo(const UncertaintyReportInfo &other)
-      : name(other.name),
-        id_m(other.id_m),
-        start_m(other.start_m),
-        length_m(other.length_m) {}
-};
-
-/**
  * @brief FisheryModelBase is a base class for fishery models in FIMS.
  *
  */
@@ -202,24 +150,6 @@ class FisheryModelBase : public fims_model_object::FIMSObject<Type> {
    * @brief Shared pointer for the population dimension information map.
    */
   std::shared_ptr<DimensionInfoMap> population_dimension_info;
-
-  /**
-   * @brief Type definition for the uncertainty report information map.
-   */
-  typedef
-      typename std::map<uint32_t, std::map<std::string, UncertaintyReportInfo>>
-          UncertaintyReportInfoMap;
-
-  /**
-   * @brief Shared pointer for the uncertainty report information map.
-   */
-  std::shared_ptr<UncertaintyReportInfoMap> fleet_uncertainty_report_info;
-
-  /**
-   * @brief Shared pointer for the population uncertainty report information
-   * map.
-   */
-  std::shared_ptr<UncertaintyReportInfoMap> population_uncertainty_report_info;
 
 #ifdef TMB_MODEL
   ::objective_function<Type> *of;
@@ -407,43 +337,6 @@ class FisheryModelBase : public fims_model_object::FIMSObject<Type> {
   std::map<std::string, DimensionInfo> &GetPopulationDimensionInfo(
       uint32_t population_id) {
     return (*population_dimension_info)[population_id];
-  }
-
-  /**
-   * @brief Get the fleet uncertainty report information.
-   */
-  UncertaintyReportInfoMap &GetFleetUncertaintyReportInfo() {
-    return *fleet_uncertainty_report_info;
-  }
-
-  /**
-   * @brief Get the population uncertainty report information.
-   */
-  UncertaintyReportInfoMap &GetPopulationUncertaintyReportInfo() {
-    return *population_uncertainty_report_info;
-  }
-
-  /**
-   * @brief Get the fleet uncertainty report information for a specified fleet.
-   *
-   * @param fleet_id The ID of the fleet.
-   * @return std::map<std::string, UncertaintyReportInfo>&
-   */
-  std::map<std::string, UncertaintyReportInfo> &GetFleetUncertaintyReportInfo(
-      uint32_t fleet_id) {
-    return (*fleet_uncertainty_report_info)[fleet_id];
-  }
-
-  /**
-   * @brief Get the population uncertainty report information for a specified
-   * population.
-   *
-   * @param population_id The ID of the population.
-   * @return std::map<std::string, UncertaintyReportInfo>&
-   */
-  std::map<std::string, UncertaintyReportInfo> &
-  GetPopulationUncertaintyReportInfo(uint32_t population_id) {
-    return (*population_uncertainty_report_info)[population_id];
   }
 
   /**

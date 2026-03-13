@@ -360,10 +360,10 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   # taken before the likelihood calculation
   recruitment_distribution$log_sd$resize(1)
   recruitment_distribution$log_sd[1]$value <- log(om_input[["logR_sd"]])
-  recruitment_distribution$x$resize(om_input[["nyr"]] - 1)
+  recruitment_distribution$observed_values$resize(om_input[["nyr"]] - 1)
   recruitment_distribution$expected_values$resize(om_input[["nyr"]] - 1)
   for (i in 1:(om_input[["nyr"]] - 1)) {
-    recruitment_distribution$x[i]$value <- 0
+    recruitment_distribution$observed_values[i]$value <- 0
     recruitment_distribution$expected_values[i]$value <- 0
   }
   if ("recruitment" %in% names(random_effects)) {
@@ -451,7 +451,7 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
       control = list(eval.max = 10000, iter.max = 10000, trace = 0)
     )
     FIMS::set_fixed(opt$par)
-    fims_finalized <- caa$get_output(do_sd_report = estimation_mode)
+    fims_finalized <- caa$get_output()
   }
 
   # Call report using MLE parameter values, or
@@ -542,7 +542,7 @@ setup_and_run_FIMS_with_wrappers <- function(iter_id,
   # Clear any previous FIMS settings
   clear()
 
-  data <- FIMS::FIMSFrame(data1)
+  data <- FIMS::FIMSFrame(data_big)
   if (tibble::is_tibble(modified_parameters)) {
     parameters <- modified_parameters
   } else {

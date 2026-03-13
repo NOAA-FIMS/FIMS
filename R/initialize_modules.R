@@ -78,7 +78,7 @@ initialize_module <- function(parameters, data, module_name, fleet_name = NA_cha
     data_distribution_names_for_fleet_i <- parameters |>
       dplyr::filter(fleet_name == !!fleet_name & distribution_type == "Data") |>
       dplyr::pull(module_type)
-    if ("age-to-length-conversion" %in% fleet_types &&
+    if ("age_to_length_conversion" %in% fleet_types &&
       "LengthComp" %in% data_distribution_names_for_fleet_i) {
       age_to_length_conversion_value <- FIMS::m_age_to_length_conversion(data, fleet_name)
       module[["age_to_length_conversion"]]$resize(length(age_to_length_conversion_value))
@@ -110,10 +110,10 @@ initialize_module <- function(parameters, data, module_name, fleet_name = NA_cha
   # TODO:
   # - Population interface
   #   - Update the Population interface to consistently use n_ages and n_years,
-  #     as done in the S4 data1 object.
+  #     as done in the S4 data_big object.
   #     Update as needed.
-  #   - Add n_fleets to data1. Should n_fleets include both
-  #     fishing and survey fleets? Currently, data1@fleets equals 1.
+  #   - Add n_fleets to data_big. Should n_fleets include both
+  #     fishing and survey fleets? Currently, data_big@fleets equals 1.
   # - Fleet
   #   - Reconsider exposing `log_expected_index` and
   #     `agecomp_proportion` to users. Their IDs are linked with
@@ -222,7 +222,7 @@ initialize_distribution <- function(
   if (distribution_type == "data") {
     distribution_fields <- setdiff(
       distribution_fields,
-      c("expected_values", "x", "dims")
+      c("expected_values", "observed_values", "dims")
     )
   }
 
@@ -674,8 +674,8 @@ initialize_comp <- function(data,
 #' @examples
 #' \dontrun{
 #' # Prepare data for FIMS model
-#' data("data1", package = "FIMS")
-#' data_4_model <- FIMSFrame(data1)
+#' data("data_big", package = "FIMS")
+#' data_4_model <- FIMSFrame(data_big)
 #' # Instantiate modules
 #' parameters_list <- data_4_model |>
 #'   create_default_configurations() |>

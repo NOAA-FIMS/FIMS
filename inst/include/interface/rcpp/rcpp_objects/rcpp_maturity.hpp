@@ -184,31 +184,6 @@ class LogisticMaturityInterface : public MaturityInterfaceBase {
   }
 
   /**
-   * @brief Set uncertainty values for logistic maturity parameters.
-   *
-   * @details Sets the standard error values for the inflection point and slope
-   * parameters using the provided map.
-   * @param se_values A map from parameter names to vectors of standard error
-   * values.
-   */
-  virtual void set_uncertainty(
-      std::map<std::string, std::vector<double>>& se_values) {
-    fims::Vector<double> inflection_point_uncertainty(
-        this->inflection_point.size(), -999);
-    fims::Vector<double> slope_uncertainty(this->slope.size(), -999);
-    this->get_se_values("inflection_point", se_values,
-                        inflection_point_uncertainty);
-    this->get_se_values("slope", se_values, slope_uncertainty);
-
-    for (size_t i = 0; i < this->inflection_point.size(); i++) {
-      this->inflection_point[i].uncertainty_m = inflection_point_uncertainty[i];
-    }
-    for (size_t i = 0; i < this->slope.size(); i++) {
-      this->slope[i].uncertainty_m = slope_uncertainty[i];
-    }
-  }
-
-  /**
    * @brief Converts the data to json representation for the output.
    * @return A string is returned specifying that the module relates to the
    * maturity interface with logistic maturity. It also returns the ID and the

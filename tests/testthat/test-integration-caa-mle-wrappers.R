@@ -183,7 +183,7 @@ test_that("catch-at-age model (estimation MLE with wrappers) works with mixed es
   )
   #' @description Test that there are 20 years of estimates with standard errors because they are estimated as fixed effects.
   expect_equal(
-    sum(mixed_output[["uncertainty"]] == 0),
+    sum(is.na(mixed_output[["uncertainty"]])),
     10
   )
 
@@ -201,7 +201,7 @@ test_that("catch-at-age model (estimation MLE with wrappers) works with mixed es
 ## Error handling ----
 test_that("catch-at-age model (estimation MLE with wrappers) returns an error when there are no estimated parameters for optimization", {
   # Load data
-  data_age_length_comp <- FIMSFrame(data1)
+  data_age_length_comp <- FIMSFrame(data_big)
   # Load pre-configured parameters
   parameters <- readRDS(
     testthat::test_path("fixtures", "parameters_model_comparison_project.RDS")

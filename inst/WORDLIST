@@ -36,6 +36,7 @@ Beverton
 BevertonHolt
 BevertonHoltRecruitment
 BevertonHoltRecruitmentInterface
+Bigg
 Bjarne
 Bool
 CAA
@@ -195,8 +196,6 @@ GetDouble
 GetFixedEffectsParameters
 GetFleetDerivedQuantities
 GetFleetDimensionInfo
-GetFleetUncertaintyReportInfo
-GetFleetUncertaintyReportInfoMap
 GetId
 GetInstance
 GetInt
@@ -212,8 +211,6 @@ GetParameters
 GetPopulationDerivedQuantities
 GetPopulationDimensionInfo
 GetPopulationIds
-GetPopulationUncertaintyReportInfo
-GetPopulationUncertaintyReportInfoMap
 GetPopulations
 GetRandomEffectsParameters
 GetReport
@@ -228,6 +225,17 @@ GraphQL
 GrowthBase
 GrowthEvaluate
 GrowthInterfaceBase
+HandlesEdgeCaseNullAndInvalidBool
+HandlesMixedArrayInput
+HandlesNestedObjects
+HandlesNumberForms
+HandlesObjectAndArrayInput
+HandlesObjectOutput
+HandlesObjectWithTrailingWhitespace
+HandlesQuotedPunctuation
+HandlesThreeTimeSteps
+HandlesWhitespaceAndPrettyFormat
+HandlesWhitespaceInput
 HPP
 HPUX
 HandlesCorrectInput
@@ -236,6 +244,7 @@ HandlesNegativeSlope
 HardwareConcurrency
 IBMCPP
 INAA
+InvalidBooleanTokenReturnsNullValue
 IRIX
 IW
 IWAA
@@ -360,6 +369,7 @@ PrettyFormatJSON
 PrintJsonValue
 QNXNTO
 RData
+Rds
 README
 RObject
 RStudio
@@ -377,6 +387,7 @@ RealVector
 RecruitmentBase
 RecruitmentDeviations
 RecruitmentInterfaceBase
+RegExp
 RegisterParameter
 RegisterParameterName
 RegisterRandomEffect
@@ -471,8 +482,6 @@ Tsuda
 ULPs
 UNLEN
 UNPROTECT
-UncertaintyReportInfo
-UncertaintyReportInfoMap
 Unfished
 Unnesting
 UseDoubleValues
@@ -495,6 +504,7 @@ ZAA
 absolutePath
 acomp
 acos
+adcomp
 adreport
 aes
 ageage
@@ -523,6 +533,7 @@ bindenv
 bookdown
 bool
 boolean's
+botComment
 byrow
 caa
 calc
@@ -531,6 +542,7 @@ callout
 catchability
 cbind
 cctype
+cd
 cdf
 cdot
 cerr
@@ -568,6 +580,7 @@ classSharedString
 clearup
 cli
 closingIssuesReferences
+closingKeywords
 cls
 cmake
 cmakelist
@@ -584,6 +597,7 @@ const
 containsNA
 conventionalcommits
 conversiondouble
+copybrief
 copydoc
 coreutils
 cout
@@ -600,6 +614,7 @@ crossorigin
 crt
 csignal
 css
+cstdio
 cstdlib
 cstring
 csv
@@ -677,6 +692,7 @@ exprs
 extern
 fabs
 fallocate
+fals
 fcn
 fdq
 fdqit
@@ -717,6 +733,7 @@ ggplot
 gh
 gha
 ghactions
+gi
 github
 githubusercontent
 gitignore
@@ -767,6 +784,7 @@ isdigit
 isinf
 isnan
 isspace
+issueNumbers
 istringstream
 iter
 itewaa
@@ -779,25 +797,32 @@ jsonValue
 jsonlite
 jt
 kable
+kaskr
 kelli
 kellijohnson
 kmax
 knitr
 knum
 kv
+labeller
 lastname
 lcomp
 ldots
 len
 lengthcomp
 lgamma
+libcurl
 libPaths
 libname
 libpath
 libs
 linux
+listComments
+listCommits
+listEventsForTimeline
 llvm
 lmax
+ln
 loadModule
 loadNamespace
 logR
@@ -838,6 +863,7 @@ modelTest
 modularity
 mort
 mpi
+msg
 msupernaw
 msy
 mult
@@ -863,6 +889,7 @@ nchar
 ncol
 nd
 ndims
+newLabels
 newpage
 ninput
 nlengths
@@ -878,6 +905,7 @@ noaa
 noexcept
 noreply
 normalizePath
+np
 npos
 nrecruits
 nrow
@@ -896,6 +924,7 @@ ofstream
 ogive
 onLoad
 onUnload
+openssl
 oppy
 optim
 optimHess
@@ -933,6 +962,7 @@ popdy
 pos
 postfix
 postmle
+prBody
 pre
 precompiled
 preconnect
@@ -960,6 +990,7 @@ rdbuf
 rdev
 rdname
 rdrr
+rds
 readLines
 readRDS
 rebasing
@@ -992,7 +1023,7 @@ rnorm
 rowSums
 rowwise
 roxygen
-roxygenize
+roxygenise
 rspm
 rstan
 rstream
@@ -1084,6 +1115,7 @@ subfolders
 submodule
 subpopulation
 substr
+successMessage
 sudo
 superClass
 suppressMessages
@@ -1123,6 +1155,7 @@ tparam
 traceback
 tribble
 trigamma
+tru
 trunc
 tryCatch
 tryFormats
@@ -1144,6 +1177,7 @@ unname
 unnest
 unnested
 unserialization
+updateComment
 useDynLib
 useDynamicSymbols
 usethis

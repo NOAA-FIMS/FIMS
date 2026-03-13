@@ -78,7 +78,7 @@ e.g., weight_at_age. These accessor functions are the preferred way to pass
 data to a FIMS module because the data will have the appropriate indexing.
 }
 \details{
-Age-to-length-conversion data, i.e., the proportion of age "a" that are
+\code{Age_to_length_conversion} data, i.e., the proportion of age "a" that are
 length "l", are used to convert lengths (input data) to ages (modeled) as
 a way to fit length data without estimating growth.
 }

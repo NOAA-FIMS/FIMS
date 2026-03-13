@@ -134,9 +134,7 @@ RCPP_MODULE(fims) {
       .constructor<double>()
       .constructor<Parameter>()
       .field("value", &Parameter::initial_value_m)
-      .field("value", &Parameter::final_value_m)
-      .field("min", &Parameter::min_m)
-      .field("max", &Parameter::max_m)
+      .field("estimated_value", &Parameter::final_value_m)
       .field("id", &Parameter::id_m)
       .field("estimation_type", &Parameter::estimation_type_m);
 
@@ -397,7 +395,7 @@ RCPP_MODULE(fims) {
               &DnormDistributionsInterface::set_distribution_mean)
       .method("set_distribution_links",
               &DnormDistributionsInterface::set_distribution_links)
-      .field("x", &DnormDistributionsInterface::x)
+      .field("observed_values", &DnormDistributionsInterface::observed_values)
       .field("expected_values", &DnormDistributionsInterface::expected_values)
       .field("expected_mean", &DnormDistributionsInterface::expected_mean)
       .field("log_sd", &DnormDistributionsInterface::log_sd);
@@ -414,7 +412,7 @@ RCPP_MODULE(fims) {
               &DlnormDistributionsInterface::set_observed_data)
       .method("set_distribution_links",
               &DlnormDistributionsInterface::set_distribution_links)
-      .field("x", &DlnormDistributionsInterface::x)
+      .field("observed_values", &DlnormDistributionsInterface::observed_values)
       .field("expected_values", &DlnormDistributionsInterface::expected_values)
       .field("log_sd", &DlnormDistributionsInterface::log_sd);
 
@@ -431,7 +429,8 @@ RCPP_MODULE(fims) {
       .method("set_distribution_links",
               &DmultinomDistributionsInterface::set_distribution_links)
       .method("set_note", &DmultinomDistributionsInterface::set_note)
-      .field("x", &DmultinomDistributionsInterface::x)
+      .field("observed_values",
+             &DmultinomDistributionsInterface::observed_values)
       .field("expected_values",
              &DmultinomDistributionsInterface::expected_values)
       .field("dims", &DmultinomDistributionsInterface::dims);
@@ -442,7 +441,6 @@ RCPP_MODULE(fims) {
       .constructor()
       .method("AddPopulation", &CatchAtAgeInterface::AddPopulation)
       .method("get_output", &CatchAtAgeInterface::to_json)
-      .method("GetReport", &CatchAtAgeInterface::get_report)
       .method("GetId", &CatchAtAgeInterface::get_id)
       .method("DoReporting", &CatchAtAgeInterface::DoReporting)
       .method("IsReporting", &CatchAtAgeInterface::IsReporting);

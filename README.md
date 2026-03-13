@@ -46,9 +46,9 @@ A comprehensive list of all the tools needed to build, test, and document FIMS c
 ```r
 library(FIMS)
 # Load sample data
-data("data1")
+data("data_big")
 # Prepare data for FIMS model
-data_4_model <- FIMSFrame(data1)
+data_4_model <- FIMSFrame(data_big)
 
 # Create parameters
 parameters <- data_4_model |>
@@ -159,6 +159,12 @@ All contributions to this project are gratefully acknowledged using the [`allcon
 <a href="https://github.com/NOAA-FIMS/FIMS/commits?author=iantaylor-NOAA">iantaylor-NOAA</a>
 </td>
 <td align="center">
+<a href="https://github.com/e-perl-NOAA">
+<img src="https://avatars.githubusercontent.com/u/118312785?v=4" width="100px;" alt=""/>
+</a><br>
+<a href="https://github.com/NOAA-FIMS/FIMS/commits?author=e-perl-NOAA">e-perl-NOAA</a>
+</td>
+<td align="center">
 <a href="https://github.com/MOshima-PIFSC">
 <img src="https://avatars.githubusercontent.com/u/78562167?v=4" width="100px;" alt=""/>
 </a><br>
@@ -171,12 +177,6 @@ All contributions to this project are gratefully acknowledged using the [`allcon
 <a href="https://github.com/NOAA-FIMS/FIMS/commits?author=JonBrodziak">JonBrodziak</a>
 </td>
 <td align="center">
-<a href="https://github.com/jimianelli">
-<img src="https://avatars.githubusercontent.com/u/2715618?v=4" width="100px;" alt=""/>
-</a><br>
-<a href="https://github.com/NOAA-FIMS/FIMS/commits?author=jimianelli">jimianelli</a>
-</td>
-<td align="center">
 <a href="https://github.com/e-perl-NOAA">
 <img src="https://avatars.githubusercontent.com/u/118312785?v=4" width="100px;" alt=""/>
 </a><br>
@@ -186,6 +186,12 @@ All contributions to this project are gratefully acknowledged using the [`allcon
 
 
 <tr>
+<td align="center">
+<a href="https://github.com/jimianelli">
+<img src="https://avatars.githubusercontent.com/u/2715618?v=4" width="100px;" alt=""/>
+</a><br>
+<a href="https://github.com/NOAA-FIMS/FIMS/commits?author=jimianelli">jimianelli</a>
+</td>
 <td align="center">
 <a href="https://github.com/timjmiller">
 <img src="https://avatars.githubusercontent.com/u/17852156?v=4" width="100px;" alt=""/>
@@ -389,6 +395,12 @@ All contributions to this project are gratefully acknowledged using the [`allcon
 <a href="https://github.com/NOAA-FIMS/FIMS/issues?q=is%3Aissue+commenter%3Arklasky">rklasky</a>
 </td>
 <td align="center">
+<a href="https://github.com/codeafridi">
+<img src="https://avatars.githubusercontent.com/u/177653516?u=24b39c8ddee58de985ed50d88938a1b86ffeb59e&v=4" width="100px;" alt=""/>
+</a><br>
+<a href="https://github.com/NOAA-FIMS/FIMS/issues?q=is%3Aissue+commenter%3Acodeafridi">codeafridi</a>
+</td>
+<td align="center">
 <a href="https://github.com/cgrandin">
 <img src="https://avatars.githubusercontent.com/u/4551051?u=7d289d4508c6ba2f6d2691b71be5bd2dc5456115&v=4" width="100px;" alt=""/>
 </a><br>
@@ -433,6 +445,28 @@ All contributions to this project are gratefully acknowledged using the [`allcon
 <img src="https://avatars.githubusercontent.com/u/146266175?u=461532ddb4523c19ec9aa5168e2b12fe368ae63a&v=4" width="100px;" alt=""/>
 </a><br>
 <a href="https://github.com/NOAA-FIMS/FIMS/issues?q=is%3Aissue+commenter%3Aemilyliljestrand">emilyliljestrand</a>
+</td>
+<td align="center">
+<a href="https://github.com/ayushk687">
+<img src="https://avatars.githubusercontent.com/u/198456631?v=4" width="100px;" alt=""/>
+</a><br>
+<a href="https://github.com/NOAA-FIMS/FIMS/issues?q=is%3Aissue+commenter%3Aayushk687">ayushk687</a>
+</td>
+<td align="center">
+<a href="https://github.com/Nimra-Arshad51">
+<img src="https://avatars.githubusercontent.com/u/264476531?u=5ec89845980af7c7fcf686838b4996af9283c863&v=4" width="100px;" alt=""/>
+</a><br>
+<a href="https://github.com/NOAA-FIMS/FIMS/issues?q=is%3Aissue+commenter%3ANimra-Arshad51">Nimra-Arshad51</a>
+</td>
+</tr>
+
+
+<tr>
+<td align="center">
+<a href="https://github.com/madhavgairola">
+<img src="https://avatars.githubusercontent.com/u/214257149?u=6913da822e87fa18c8e5abcc371f2b175e26223e&v=4" width="100px;" alt=""/>
+</a><br>
+<a href="https://github.com/NOAA-FIMS/FIMS/issues?q=is%3Aissue+commenter%3Amadhavgairola">madhavgairola</a>
 </td>
 </tr>
 

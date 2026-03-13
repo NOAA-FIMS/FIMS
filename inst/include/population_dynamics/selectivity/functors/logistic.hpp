@@ -66,18 +66,6 @@ struct LogisticSelectivity : public SelectivityBase<Type> {
     return fims_math::logistic<Type>(inflection_point.get_force_scalar(pos),
                                      slope.get_force_scalar(pos), x);
   }
-
-  virtual void create_report_vectors(
-      std::map<std::string, fims::Vector<fims::Vector<Type>>> &report_vectors) {
-    report_vectors["inflection_point"].emplace_back(inflection_point);
-    report_vectors["slope"].emplace_back(slope);
-  }
-
-  virtual void get_report_vector_count(
-      std::map<std::string, size_t> &report_vector_count) {
-    report_vector_count["inflection_point"] += 1;
-    report_vector_count["slope"] += 1;
-  }
 };
 
 }  // namespace fims_popdy
