@@ -93,6 +93,12 @@ test_that("`fims_frame()` works with the correct inputs", {
   expect_true(is.FIMSFrame(fims_frame))
   #' @description Test that `is.FIMSFrame()` is FALSE when passed a data frame.
   expect_false(is.FIMSFrame(data_big))
+
+  #' @description Test that `pretty_type()`, an unexported function, returns space separated values with "comp" expanded to "composition".
+  expect_equal(
+    pretty_type(x = c("age_comp", "weight_at_age")),
+    c("age composition", "weight at age")
+  )
 })
 
 ## Edge handling ----
@@ -183,6 +189,13 @@ test_that("`FIMSFrame()` returns correct error messages", {
 
   #' @description Test that `FIMSFrame()` returns an error when there is no data in the FIMSFrame object.
   expect_error(FIMSFrame(data_big[0, ]))
+
+  #' @description Test that `FIMSFrame` validators pick up on a missing age in age-composition data.
+  expect_error(
+    FIMSFrame(
+      dplyr::filter(data_big, age != 3)
+    )
+  )
 
   #' @description Test that the `m_landings()` returns an error when a fleet is not supplied.
   expect_error(

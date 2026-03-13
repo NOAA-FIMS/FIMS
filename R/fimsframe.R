@@ -616,11 +616,20 @@ methods::setValidity(
         "i" = "Model will run but check that data types are correct."
       ))
     }
-    # Return
-    if (length(errors) == 0) {
-      return(TRUE)
-    } else {
-      return(errors)
+
+    # Ensure composition data sum to 1.0 per group if units are proportions
+    for (present_type in grep("_comp", present_types, value = TRUE)) {
+      test <- object@data |>
+        dplyr::filter(type == present_type, value != -999) |>
+        dplyr::group_by(name, timing, .drop = FALSE) |>
+        dplyr::group_map(.keep = TRUE, \(.x, .y) {
+          validate_composition_data(.x)
+        })
+      if (sum(unlist(test)) > 0) {
+        cli::cli_abort(
+          "The above errors were found in your {present_type}."
+        )
+      }
     }
   }
 )
@@ -647,6 +656,46 @@ validate_data_colnames <- function(data) {
     errors <- c(errors, "data must contain 'ages' and/or 'lengths'")
   }
   return(errors)
+}
+
+validate_composition_data <- function(data) {
+  composition_type <- pretty_type(unique(data[["type"]]))
+  if (all(data[["value"]] == -999)) {
+    return(0)
+  }
+  groupings <- names(data)[
+    sapply(
+      data,
+      function(x) dplyr::n_distinct(x, na.rm = FALSE) == 1 & !all(is.na(x)))
+  ]
+  grouping_message <- glue::glue("{groupings} = {data[1, groupings]}")
+  names(grouping_message) <- rep("*", length(grouping_message))
+  units <- unique(data[["unit"]])
+  errors <- vector()
+  if (length(units) != 1) {
+    errors <- c(
+      errors,
+      "x" = "There should only be one unit per grouping, units are {units}."
+    )
+  }
+  sum_of_value <- sum(data[["value"]])
+  if (all(units == "proportion") && abs(sum_of_value - 1.0) > 1e-8) {
+    errors <- c(
+      errors,
+      "x" = "The sum is equal to {sum_of_value}, not 1.0."
+    )
+  }
+  if (length(errors) > 0) {
+    cli::cli_bullets(c(
+      " " = "Group-level information for {composition_type} errors",
+      grouping_message,
+      "!" = "Errors are as follows:",
+      errors
+    ))
+    return(1)
+  } else {
+    return(0)
+  }
 }
 
 # Constructors ----
@@ -886,4 +935,9 @@ create_missing_data <- function(
       value = -999
     ) |>
     dplyr::ungroup()
+}
+
+pretty_type <- function(x) {
+  gsub("comp", "composition", x) |>
+    gsub(pattern = "_", replacement = " ")
 }
