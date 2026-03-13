@@ -70,6 +70,33 @@ class DistributionsInterfaceBase : public FIMSRcppInterfaceBase {
    * @brief The ID of the observed data object, which is set to -999.
    */
   SharedInt interface_observed_data_id_m = -999;
+  
+  /**
+   * @brief Observed values of the distribution. For example, these could be
+   * the observed data for a data component. For multinomial distributions, 
+   * this must be a vector of integer values.
+   */
+  ParameterVector observed_values;
+  
+  /**
+   * @brief The expected values of the distribution. For example, the mean
+   * of a normal distribution. For multinomial distributions, 
+   * this must be a vector of real values that sum to 1 for each set of 
+   * observations.
+   */
+  ParameterVector expected_values;
+  
+  /**
+   * @brief The expected mean, which would be the mean of x for this
+   * distribution.
+   */
+  ParameterVector expected_mean;
+  
+  /**
+   * @brief Vector that records the individual log probability function for each
+   * observation.
+   */
+  RealVector lpdf_vec; /**< The vector*/
 
   /**
    * @brief The log probability density function value.
@@ -95,6 +122,10 @@ class DistributionsInterfaceBase : public FIMSRcppInterfaceBase {
       : id_m(other.id_m),
         key_m(other.key_m),
         input_type_m(other.input_type_m),
+        lpdf_vec(other.lpdf_vec),
+        observed_values(other.observed_values),
+        expected_values(other.expected_values),
+        expected_mean(other.expected_mean),
         use_mean_m(other.use_mean_m),
         interface_observed_data_id_m(other.interface_observed_data_id_m) {}
 
@@ -104,9 +135,10 @@ class DistributionsInterfaceBase : public FIMSRcppInterfaceBase {
   virtual ~DistributionsInterfaceBase() {}
 
   /**
-   * @brief Get the ID for the child distribution interface objects to inherit.
+   * @brief Gets the ID of the interface base object.
+   * @return The ID.
    */
-  virtual uint32_t get_id() = 0;
+  virtual uint32_t get_id() { return this->id_m; }
 
   /**
    * @brief Sets pointers for data observations, random effects, or priors.
@@ -118,7 +150,12 @@ class DistributionsInterfaceBase : public FIMSRcppInterfaceBase {
    */
   virtual bool set_distribution_links(std::string input_type,
                                       Rcpp::IntegerVector ids) {
-    return false;
+    this->input_type_m.set(input_type);
+    this->key_m->resize(ids.size());
+    for (R_xlen_t i = 0; i < ids.size(); i++) {
+      this->key_m->at(i) = ids[i];
+    }
+    return true;
   }
 
   /**
@@ -144,7 +181,12 @@ class DistributionsInterfaceBase : public FIMSRcppInterfaceBase {
    * @see DnormDistributionsInterface::set_distribution_mean for an example
    * implementation that sets the mean as a fixed effect parameter.
    */
-  virtual bool set_distribution_mean(double input_value) { return false; }
+  virtual bool set_distribution_mean(double input_value) {     
+    this->expected_mean[0].initial_value_m = input_value;
+    this->expected_mean[0].estimation_type_m.set("fixed_effects");
+    this->use_mean_m.set(fims::to_string("yes"));
+    return true;
+  }
 
   /**
    * @brief Set the unique ID for the observed data object.
@@ -152,7 +194,10 @@ class DistributionsInterfaceBase : public FIMSRcppInterfaceBase {
    * @param observed_data_id Unique ID for the Observed Age Comp Data
    * object
    */
-  virtual bool set_observed_data(int observed_data_id) { return false; }
+  virtual bool set_observed_data(int observed_data_id) { 
+    this->interface_observed_data_id_m.set(observed_data_id);
+    return true;
+  }
 
   /**
    * @brief A method for each child distribution interface object to inherit so
@@ -173,30 +218,12 @@ std::map<uint32_t, std::shared_ptr<DistributionsInterfaceBase>>
  */
 class DnormDistributionsInterface : public DistributionsInterfaceBase {
  public:
-  /**
-   * @brief Observed data.
-   */
-  ParameterVector observed_values;
-  /**
-   * @brief The expected values, which would be the mean of x for this
-   * distribution.
-   */
-  ParameterVector expected_values;
-  /**
-   * @brief The expected mean, which would be the mean of x for this
-   * distribution.
-   */
-  ParameterVector expected_mean;
+  
   /**
    * @brief The uncertainty, which would be the standard deviation of x for the
    * normal distribution.
    */
   ParameterVector log_sd;
-  /**
-   * @brief Vector that records the individual log probability function for each
-   * observation.
-   */
-  RealVector lpdf_vec; /**< The vector*/
 
   /**
    * @brief The constructor.
@@ -215,54 +242,12 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
    */
   DnormDistributionsInterface(const DnormDistributionsInterface &other)
       : DistributionsInterfaceBase(other),
-        observed_values(other.observed_values),
-        expected_values(other.expected_values),
-        expected_mean(other.expected_mean),
-        log_sd(other.log_sd),
-        lpdf_vec(other.lpdf_vec) {}
+        log_sd(other.log_sd) {}
 
   /**
    * @brief The destructor.
    */
   virtual ~DnormDistributionsInterface() {}
-
-  /**
-   * @brief Gets the ID of the interface base object.
-   * @return The ID.
-   */
-  virtual uint32_t get_id() { return this->id_m; }
-
-  /**
-   * @brief Set the unique ID for the observed data object.
-   * @param observed_data_id Unique ID for the observed data object.
-   */
-  virtual bool set_observed_data(int observed_data_id) {
-    this->interface_observed_data_id_m.set(observed_data_id);
-    return true;
-  }
-
-  /**
-   * @copydoc DistributionsInterfaceBase::set_distribution_mean
-   */
-  virtual bool set_distribution_mean(double input_value) {
-    this->expected_mean[0].initial_value_m = input_value;
-    this->expected_mean[0].estimation_type_m.set("fixed_effects");
-    this->use_mean_m.set(fims::to_string("yes"));
-    return true;
-  }
-
-  /**
-   * @copydoc DistributionsInterfaceBase::set_distribution_links
-   */
-  virtual bool set_distribution_links(std::string input_type,
-                                      Rcpp::IntegerVector ids) {
-    this->input_type_m.set(input_type);
-    this->key_m->resize(ids.size());
-    for (R_xlen_t i = 0; i < ids.size(); i++) {
-      this->key_m->at(i) = ids[i];
-    }
-    return true;
-  }
 
   /**
    * @brief Evaluate normal probability density function (pdf). The natural log
@@ -272,6 +257,7 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
    */
   virtual double evaluate() {
     fims_distributions::NormalLPDF<double> dnorm;
+    dnorm.input_type = this->input_type_m.get();
     dnorm.observed_values.resize(this->observed_values.size());
     dnorm.expected_values.resize(this->expected_values.size());
     dnorm.log_sd.resize(this->log_sd.size());
@@ -533,15 +519,7 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
  */
 class DlnormDistributionsInterface : public DistributionsInterfaceBase {
  public:
-  /**
-   * @brief Observed data.
-   */
-  ParameterVector observed_values;
-  /**
-   * @brief The expected values, which would be the mean of log(x) for this
-   * distribution.
-   */
-  ParameterVector expected_values;
+  
   /**
    * @brief The uncertainty, which would be the natural logarithm of the
      standard deviation (sd) of log(x) for this distribution. The natural log
@@ -550,11 +528,6 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
      standard deviation is positive.
    */
   ParameterVector log_sd;
-  /**
-   * @brief Vector that records the individual log probability function for each
-   * observation.
-   */
-  RealVector lpdf_vec; /**< The vector */
 
   /**
    * @brief The constructor.
@@ -573,48 +546,12 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
    */
   DlnormDistributionsInterface(const DlnormDistributionsInterface &other)
       : DistributionsInterfaceBase(other),
-        observed_values(other.observed_values),
-        expected_values(other.expected_values),
-        log_sd(other.log_sd),
-        lpdf_vec(other.lpdf_vec) {}
+        log_sd(other.log_sd) {}
 
   /**
    * @brief The destructor.
    */
   virtual ~DlnormDistributionsInterface() {}
-
-  /**
-   * @brief Gets the ID of the interface base object.
-   * @return The ID.
-   */
-  virtual uint32_t get_id() { return this->id_m; }
-
-  /**
-   * @brief Set the unique ID for the observed data object.
-   * @param observed_data_id Unique ID for the observed data object.
-   */
-  virtual bool set_observed_data(int observed_data_id) {
-    this->interface_observed_data_id_m.set(observed_data_id);
-    return true;
-  }
-
-  /**
-   * @brief Sets pointers for data observations, random effects, or priors.
-   *
-   * @param input_type String that sets whether the distribution type is for
-   * priors, random effects, or data.
-   * @param ids Vector of unique ids for each linked parameter(s), derived
-   * value(s), or observed data vector.
-   */
-  virtual bool set_distribution_links(std::string input_type,
-                                      Rcpp::IntegerVector ids) {
-    this->input_type_m.set(input_type);
-    this->key_m->resize(ids.size());
-    for (R_xlen_t i = 0; i < ids.size(); i++) {
-      this->key_m->at(i) = ids[i];
-    }
-    return true;
-  }
 
   /**
    * @brief Evaluate lognormal probability density function (pdf). The natural
@@ -624,10 +561,11 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
    */
   virtual double evaluate() {
     fims_distributions::LogNormalLPDF<double> dlnorm;
+    dlnorm.input_type = this->input_type_m.get();
     dlnorm.observed_values.resize(this->observed_values.size());
     dlnorm.expected_values.resize(this->expected_values.size());
     dlnorm.log_sd.resize(this->log_sd.size());
-    // dlnorm.input_type = "prior";
+    dlnorm.expected_mean.resize(this->expected_mean.size());
     for (size_t i = 0; i < this->observed_values.size(); i++) {
       dlnorm.observed_values[i] = this->observed_values[i].initial_value_m;
     }
@@ -637,6 +575,10 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
     for (size_t i = 0; i < this->log_sd.size(); i++) {
       dlnorm.log_sd[i] = this->log_sd[i].initial_value_m;
     }
+    for (size_t i = 0; i < this->expected_mean.size(); i++) {
+      dlnorm.expected_mean[i] = this->expected_mean[i].initial_value_m;
+    }
+    dlnorm.use_mean = this->use_mean_m;  
     return dlnorm.evaluate();
   }
 
@@ -695,6 +637,15 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
           this->log_sd[i].final_value_m = this->log_sd[i].initial_value_m;
         } else {
           this->log_sd[i].final_value_m = dlnorm->log_sd.get_force_scalar(i);
+        }
+      }
+
+      for (size_t i = 0; i < this->expected_mean.size(); i++) {
+        if (this->expected_mean[i].estimation_type_m.get() == "constant") {
+          this->expected_mean[i].final_value_m =
+              this->expected_mean[i].initial_value_m;
+        } else {
+          this->expected_mean[i].final_value_m = dlnorm->expected_mean[i];
         }
       }
 
@@ -826,6 +777,24 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
     }
     info->variable_map[this->log_sd.id_m] = &(distribution)->log_sd;
 
+    distribution->use_mean = this->use_mean_m.get();
+    distribution->expected_mean.resize(this->expected_mean.size());
+    for (size_t i = 0; i < this->expected_mean.size(); i++) {
+      distribution->expected_mean[i] = this->expected_mean[i].initial_value_m;
+      if (this->expected_mean[i].estimation_type_m.get() == "fixed_effects") {
+        ss.str("");
+        ss << "dlnorm." << this->id_m << ".expected_mean."
+           << this->expected_mean[i].id_m;
+        info->RegisterParameterName(ss.str());
+        info->RegisterParameter(distribution->expected_mean[i]);
+      }
+      if (this->expected_mean[i].estimation_type_m.get() == "random_effects") {
+        FIMS_ERROR_LOG("expected_mean cannot be set to random effects");
+      }
+    }
+    info->variable_map[this->expected_mean.id_m] =
+        &(distribution)->expected_mean;
+
     info->density_components[distribution->id] = distribution;
 
     return true;
@@ -852,31 +821,10 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
 class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
  public:
   /**
-   * @brief Observed data, which should be a vector of length K of integers.
-   */
-  ParameterVector observed_values;
-  /**
-   * @brief The expected values, which should be a vector of length K where
-   * each value specifies the probability of class k. Note that, unlike in R,
-   * these probabilities must sum to 1.0.
-   */
-  ParameterVector expected_values;
-  /**
    * @brief The dimensions of the number of rows and columns of the
    * multivariate dataset.
    */
   RealVector dims;
-  /**
-   * @brief Vector that records the individual log probability function for each
-   * observation.
-   */
-  RealVector lpdf_vec; /**< The vector */
-
-  /**
-   * @brief TODO: document this.
-   *
-   */
-  SharedString notes;
 
   /**
    * @brief The constructor.
@@ -895,56 +843,13 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
    */
   DmultinomDistributionsInterface(const DmultinomDistributionsInterface &other)
       : DistributionsInterfaceBase(other),
-        observed_values(other.observed_values),
-        expected_values(other.expected_values),
-        dims(other.dims),
-        lpdf_vec(other.lpdf_vec),
-        notes(other.notes) {}
+        dims(other.dims) {}
 
   /**
    * @brief The destructor.
    */
   virtual ~DmultinomDistributionsInterface() {}
-  /**
-   * @brief Gets the ID of the interface base object.
-   * @return The ID.
-   */
-  virtual uint32_t get_id() { return this->id_m; }
-
-  /**
-   * @brief Set the unique ID for the observed data object.
-   * @param observed_data_id Unique ID for the observed data object.
-   */
-  virtual bool set_observed_data(int observed_data_id) {
-    this->interface_observed_data_id_m.set(observed_data_id);
-    return true;
-  }
-
-  /**
-   * @brief Sets pointers for data observations, random effects, or priors.
-   *
-   * @param input_type String that sets whether the distribution type is for
-   * priors, random effects, or data.
-   * @param ids Vector of unique ids for each linked parameter(s), derived
-   * value(s), or observed data vector.
-   */
-  virtual bool set_distribution_links(std::string input_type,
-                                      Rcpp::IntegerVector ids) {
-    this->input_type_m.set(input_type);
-    this->key_m->resize(ids.size());
-    for (R_xlen_t i = 0; i < ids.size(); i++) {
-      this->key_m->at(i) = ids[i];
-    }
-    return true;
-  }
-
-  /**
-   * @brief Set the note object
-   *
-   * @param note
-   */
-  void set_note(std::string note) { this->notes.set(note); }
-
+  
   /**
    * @brief
    *
@@ -953,8 +858,8 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
   virtual double evaluate() {
     fims_distributions::MultinomialLPMF<double> dmultinom;
     // Declare TMBVector in this scope
+    dmultinom.input_type = this->input_type_m.get();
     dmultinom.observed_values.resize(this->observed_values.size());
-    dmultinom.expected_values.resize(this->expected_values.size());
     for (size_t i = 0; i < observed_values.size(); i++) {
       dmultinom.observed_values[i] = this->observed_values[i].initial_value_m;
     }
