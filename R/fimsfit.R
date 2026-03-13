@@ -5,11 +5,14 @@ utils::globalVariables(c(
   "estimate", "estimate.x", "estimate.y",
   "initial", "initial.x", "initial.y",
   "derived_quantity_id",
-  "distribution", "module_type", "n", "type_id", "values",
+  "distribution", "gradient",
+  "log_like_cv",
+  "module_type", "n", "type_id", "values",
   "module_name.x", "module_name.y",
   "module_id.x", "module_id.y",
   "module_id_init",
-  "module_type.x", "module_type.y"
+  "module_type.x", "module_type.y",
+  "unique_id"
 ))
 
 # Developers: ----

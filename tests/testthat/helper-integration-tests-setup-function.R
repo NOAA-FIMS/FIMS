@@ -542,7 +542,7 @@ setup_and_run_FIMS_with_wrappers <- function(iter_id,
   # Clear any previous FIMS settings
   clear()
 
-  data <- FIMS::FIMSFrame(data1)
+  data <- FIMS::FIMSFrame(data_big)
   if (tibble::is_tibble(modified_parameters)) {
     parameters <- modified_parameters
   } else {

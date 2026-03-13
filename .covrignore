@@ -3,3 +3,5 @@
 # Exclude a specific file
 R/zzz.R
 R/check_fims.R
+R/use-gtest-template.R
+R/use-testthat-template.R

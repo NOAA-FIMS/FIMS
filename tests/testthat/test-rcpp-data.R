@@ -9,7 +9,7 @@
 
 # rcpp data ----
 ## Setup ----
-fims_frame <- FIMS::FIMSFrame(data1)
+fims_frame <- FIMS::FIMSFrame(data_big)
 n_years <- get_n_years(fims_frame)
 n_ages <- get_n_ages(fims_frame)
 

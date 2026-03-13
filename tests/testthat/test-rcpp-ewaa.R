@@ -10,7 +10,7 @@
 # EWAAGrowth ----
 ## Setup ----
 # Prepare data
-fims_frame <- FIMS::FIMSFrame(data1)
+fims_frame <- FIMS::FIMSFrame(data_big)
 # Ensure that the fims_frame object is removed after tests are completed
 on.exit(rm(fims_frame), add = TRUE)
 

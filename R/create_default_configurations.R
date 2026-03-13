@@ -60,8 +60,8 @@ utils::globalVariables(c(
 #'
 #' @examples
 #' # Load the example dataset and create a FIMS data frame
-#' data("data1")
-#' fims_frame <- FIMSFrame(data1)
+#' data("data_big")
+#' fims_frame <- FIMSFrame(data_big)
 #'
 #' # Create the default model configuration tibble
 #' default_configurations <- create_default_configurations(data = fims_frame)
@@ -106,8 +106,8 @@ create_default_configurations <- function(data, model_family = c("catch_at_age")
     dplyr::mutate(module_type = snake_to_pascal(type)) |>
     # Set module_type to NA for weight-at-age and age-to-length-conversion
     dplyr::mutate(module_type = dplyr::case_when(
-      type == "weight-at-age" ~ NA_character_,
-      type == "age-to-length-conversion" ~ NA_character_,
+      type == "weight_at_age" ~ NA_character_,
+      type == "age_to_length_conversion" ~ NA_character_,
       TRUE ~ module_type
     )) |>
     # Remove any combinations where the type did not match a known module.
