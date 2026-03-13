@@ -1,3 +1,9 @@
+# To remove the NOTE
+# no visible binding for global variable
+utils::globalVariables(c(
+  "name", "timing", "value"
+))
+
 # Developers: ----
 
 # This file defines the parent class FIMSFrame and its potential children. The
@@ -86,7 +92,7 @@ NULL
 #' a FIMS model in a long format. The tibble will potentially have the
 #' following columns depending if it fits to ages and lengths or just one of
 #' them:
-#' `r glue::glue_collapse(colnames(data1), sep = ", ", last = ", and ")`.
+#' `r glue::glue_collapse(colnames(data_big), sep = ", ", last = ", and ")`.
 #' @export
 #' @rdname get_FIMSFrame
 #' @keywords FIMSFrame
@@ -276,7 +282,7 @@ methods::setMethod(
 #' data to a FIMS module because the data will have the appropriate indexing.
 #'
 #' @details
-#' Age-to-length-conversion data, i.e., the proportion of age "a" that are
+#' `Age_to_length_conversion` data, i.e., the proportion of age "a" that are
 #' length "l", are used to convert lengths (input data) to ages (modeled) as
 #' a way to fit length data without estimating growth.
 #'
@@ -420,7 +426,7 @@ methods::setMethod(
   function(x) {
     dplyr::filter(
       .data = as.data.frame(x@data),
-      .data[["type"]] == "weight-at-age"
+      .data[["type"]] == "weight_at_age"
     ) |>
       dplyr::group_by(.data[["age"]]) |>
       dplyr::mutate(
@@ -456,7 +462,7 @@ methods::setMethod(
     if ("length" %in% colnames(x@data)) {
       dplyr::filter(
         .data = as.data.frame(x@data),
-        .data[["type"]] == "age-to-length-conversion",
+        .data[["type"]] == "age_to_length_conversion",
         .data[["name"]] %in% fleet_name
       ) |>
         dplyr::group_by(.data[["age"]], .data[["length"]]) |>
@@ -481,30 +487,62 @@ methods::setMethod(
 # because @kellijohnson-NOAA did not quite understand how they actually work.
 
 # methods::setMethod: plot ----
-
+#' Plot a `FIMSFrame` object
+#'
+#' Use `ggplot2::geom_point()` to plot the information stored in the data slot
+#' of the `FIMSFrame` class.
+#'
+#' @param x A `FIMSFrame` object.
+#' @param y Unused (inherited from R base).
+#' @param ... Unused (inherited from R base).
+#'
+#' @return
+#' A \pkg{ggplot2} object is returned that uses [stockplotr::theme_noaa()].
+#' There will be one panel per input type with fleet-specific information
+#' denoted using colors.
+#' @examples
+#' \dontrun{
+#' data("data_big", package = "FIMS")
+#' data_4_model <- FIMSFrame(data_big)
+#' plot(data_4_model)
+#' }
+#'
+#' @export
+#' @method plot FIMSFrame
+setGeneric("plot", function(x, y, ...)
+  standardGeneric("plot")
+)
 methods::setMethod(
   f = "plot",
-  signature = "FIMSFrame",
+  signature = c(x = "FIMSFrame", y = "missing"),
   definition = function(x, y, ...) {
+    data_for_plot <- get_data(x) |>
+      dplyr::mutate(
+        type = gsub("_", " ", type)
+      )
     ggplot2::ggplot(
-      data = x@data,
+      data = data_for_plot,
       mapping = ggplot2::aes(
-        x = .data[["timing"]],
-        y = .data[["value"]],
-        col = .data[["name"]]
+        x = timing,
+        y = value,
+        col = name
       )
     ) +
       # Using Set3 b/c it is the palette with the largest number of colors
       # and not {nmfspalette} b/c didn't want to depend on GitHub package
       ggplot2::scale_color_brewer(palette = "Set3") +
-      ggplot2::facet_wrap("type", scales = "free_y") +
-      ggplot2::geom_point() +
-      ggplot2::scale_x_date(labels = scales::date_format("%Y-%m-%d")) +
-      ggplot2::xlab("Start date (Year-Month-Day)") +
+      ggplot2::facet_wrap(
+        "type",
+        scales = "free_y",
+        labeller = ggplot2::label_wrap_gen(width = 10)
+      ) +
+      ggplot2::geom_point(alpha = 0.8) +
+      ggplot2::xlab("Timing") +
       ggplot2::ylab("Value") +
       ggplot2::theme(
         axis.text.x = ggplot2::element_text(angle = 15)
-      )
+      ) +
+      stockplotr::theme_noaa()
   }
 )
 
@@ -515,9 +553,6 @@ methods::setMethod(
   signature = "FIMSFrame",
   definition = function(object) {
     message("tbl_df of class '", class(object), "'")
-    if (length(object@data) == 0) {
-      return()
-    }
     dat_types <- unique(object@data[[which(colnames(object@data) == "type")]])
     message("with the following 'types': ", paste0(dat_types, collapse = ", "))
     snames <- slotNames(object)
@@ -551,10 +586,10 @@ methods::setValidity(
       errors <- c(errors, "data must have at least one row")
     }
 
-    # FIMS models currently cannot run without weight-at-age data
-    weight_at_age_data <- dplyr::filter(object@data, type == "weight-at-age")
+    # FIMS models currently cannot run without weight_at_age data
+    weight_at_age_data <- dplyr::filter(object@data, type == "weight_at_age")
     if (NROW(weight_at_age_data) == 0) {
-      errors <- c(errors, "data must contain data of the type weight-at-age")
+      errors <- c(errors, "data must contain data of the type weight_at_age")
     }
 
     errors <- c(errors, validate_data_colnames(object@data))
@@ -570,29 +605,31 @@ methods::setValidity(
 
     # TODO: Add checks for other slots
     # Add validity check for types
-    allowed_types <- c(
-      "landings", "index", "age_comp", "length_comp",
-      "weight-at-age", "age-to-length-conversion"
-    )
     present_types <- unique(object@data[["type"]])
 
     # Issues warning if there are any unrecognized types
-    unknown_types <- setdiff(present_types, allowed_types)
+    unknown_types <- sort(setdiff(present_types, fims_input_types))
     if (length(unknown_types) > 0) {
       cli::cli_warn(c(
-        "!" = "Data contains unexpected type(s): {paste(sort(unknown_types), collapse = ', ')}",
-        "i" = "Allowed types are: {paste(allowed_types, collapse = ', ')}",
-        "i" = paste(
-          "Model will continue to run,",
-          "but check that data types are correct."
-        )
+        "!" = "Data contains unexpected type(s): {unknown_types}",
+        "i" = "Allowed types are: {fims_input_types}",
+        "i" = "Model will run but check that data types are correct."
       ))
     }
-    # Return
-    if (length(errors) == 0) {
-      return(TRUE)
-    } else {
-      return(errors)
+
+    # Ensure composition data sum to 1.0 per group if units are proportions
+    for (present_type in grep("_comp", present_types, value = TRUE)) {
+      test <- object@data |>
+        dplyr::filter(type == present_type, value != -999) |>
+        dplyr::group_by(name, timing, .drop = FALSE) |>
+        dplyr::group_map(.keep = TRUE, \(.x, .y) {
+          validate_composition_data(.x)
+        })
+      if (sum(unlist(test)) > 0) {
+        cli::cli_abort(
+          "The above errors were found in your {present_type}."
+        )
+      }
     }
   }
 )
@@ -621,6 +658,46 @@ validate_data_colnames <- function(data) {
   return(errors)
 }
 
+validate_composition_data <- function(data) {
+  composition_type <- pretty_type(unique(data[["type"]]))
+  if (all(data[["value"]] == -999)) {
+    return(0)
+  }
+  groupings <- names(data)[
+    sapply(
+      data,
+      function(x) dplyr::n_distinct(x, na.rm = FALSE) == 1 & !all(is.na(x)))
+  ]
+  grouping_message <- glue::glue("{groupings} = {data[1, groupings]}")
+  names(grouping_message) <- rep("*", length(grouping_message))
+  units <- unique(data[["unit"]])
+  errors <- vector()
+  if (length(units) != 1) {
+    errors <- c(
+      errors,
+      "x" = "There should only be one unit per grouping, units are {units}."
+    )
+  }
+  sum_of_value <- sum(data[["value"]])
+  if (all(units == "proportion") && abs(sum_of_value - 1.0) > 1e-8) {
+    errors <- c(
+      errors,
+      "x" = "The sum is equal to {sum_of_value}, not 1.0."
+    )
+  }
+  if (length(errors) > 0) {
+    cli::cli_bullets(c(
+      " " = "Group-level information for {composition_type} errors",
+      grouping_message,
+      "!" = "Errors are as follows:",
+      errors
+    ))
+    return(1)
+  } else {
+    return(0)
+  }
+}
+
 # Constructors ----
 
 # All constructors in this file are documented in 1 roxygen file via @rdname.
@@ -640,26 +717,26 @@ validate_data_colnames <- function(data) {
 #' It is important that the order of the rows in the data are correct but it is
 #' not expected that the user will do this. Instead, the returned data are
 #' sorted using [dplyr::arrange()] before placing them in the data slot. Data
-#' are first sorted by data type, placing all weight-at-age data next to other
-#' weight-at-age data and all landings data next to landings data. Thus,
-#' age-composition data will come first because their type is "age" and "a" is
+#' are first sorted by data type, placing all `weight_at_age` data next to
+#' other `weight_at_age` data and all landings data next to landings data.
+#' Thus, `age_comp` data will come first because their type is "age" and "a" is
 #' first in the alphabet. All other types will follow according to their order
 #' in the alphabet.
-#' Next, within each type, data are organized by fleet. So, age-composition
+#' Next, within each type, data are organized by fleet. So, `age_comp`
 #' information for fleet1 will come before survey1. Next, all data within type
 #' and fleet are arranged by timing, e.g., by year. That is the end of the
-#' sorting for time series data like landings and indices.
-#' The biological data are further sorted by bin. Thus, age-composition
-#' information will be arranged as follows:
+#' sorting for time series data like landings and indices. The biological data
+#' are further sorted by bin. Thus, `age_comp` information will be arranged as
+#' follows:
 #'
-#' | type | name     | timing  | age  | value  |
-#' |:---- |:--------:|:-------:|:----:|-------:|
-#' | age  | fleet1   | 2022    | 1    | 0.3    |
-#' | age  | fleet1   | 2022    | 2    | 0.7    |
-#' | age  | fleet1   | 2023    | 1    | 0.5    |
+#' | type     | name     | timing  | age  | value  |
+#' |:-------- |:--------:|:-------:|:----:|-------:|
+#' | age_comp | fleet1   | 2022    | 1    | 0.3    |
+#' | age_comp | fleet1   | 2022    | 2    | 0.7    |
+#' | age_comp | fleet1   | 2023    | 1    | 0.5    |
 #'
-#' Length composition-data are sorted the same way but by length bin instead of
-#' by age bin. It becomes more complicated for the age-to-length-conversion
+#' `length_comp` data are sorted the same way but by length bin instead of
+#' by age bin. It becomes more complicated for the `age_to_length_conversion`
 #' data, which are sorted by type, name, timing, age, and then length. So, a
 #' full set of length, e.g., length 10, length 20, length 30, etc., is placed
 #' together for a given age. After that age, another entire set of length
@@ -670,8 +747,8 @@ validate_data_colnames <- function(data) {
 #'
 #' @param data A `data.frame` that contains the necessary columns to construct
 #'   a `FIMSFrame-class` object. Currently, those columns are
-#'   `r glue::glue_collapse(colnames(data1), sep = ", ", last = ", and ")`. See
-#'   the data1 object in FIMS, e.g., `data(data1, package = "FIMS")`.
+#'   `r glue::glue_collapse(colnames(data_big), sep = ", ", last = ", and ")`.
+#'   See the `data_big` object in FIMS, e.g., `data(data_big, package = "FIMS")`.
 #'
 #' @return
 #' An object of the S4 class `FIMSFrame` class, or one of its child classes, is
@@ -686,6 +763,11 @@ FIMSFrame <- function(data) {
     stop(
       "Check the columns of your data, the following are missing:\n",
       paste(errors, sep = "\n", collapse = "\n")
+    )
+  }
+  if (NROW(data) == 0) {
+    cli::cli_abort(
+      "{.var data} has 0 rows of data and cannot be used to make a FIMSFrame."
     )
   }
 
@@ -739,7 +821,7 @@ FIMSFrame <- function(data) {
       bins = ages,
       timings = years,
       column = age,
-      types = c("weight-at-age", "age_comp")
+      types = c("weight_at_age", "age_comp")
     )
   } else {
     missing_ages <- missing_time_series[0, ]
@@ -755,13 +837,23 @@ FIMSFrame <- function(data) {
   } else {
     missing_lengths <- missing_time_series[0, ]
   }
-  if ("age-to-length-conversion" %in% formatted_data[["type"]]) {
+  if ("age_to_length_conversion" %in% formatted_data[["type"]]) {
+    if (!"age" %in% colnames(data)) {
+      cli::cli_abort(
+        "age is a required column if you have age_to_length_conversion data."
+      )
+    }
+    if (!"length" %in% colnames(data)) {
+      cli::cli_abort(
+        "length is a required column if you have age_to_length_conversion data."
+      )
+    }
     # Must do this by hand because it is across two dimensions
     temp_age_to_length_data <- formatted_data |>
       dplyr::group_by(type, name)
     missing_age_to_length <- temp_age_to_length_data |>
       dplyr::group_by(type, name) |>
-      dplyr::filter(type %in% "age-to-length-conversion") |>
+      dplyr::filter(type %in% "age_to_length_conversion") |>
       tidyr::expand(unit, timing = years, age = ages, length = lengths) |>
       dplyr::anti_join(
         y = dplyr::select(
@@ -843,4 +935,9 @@ create_missing_data <- function(
       value = -999
     ) |>
     dplyr::ungroup()
+}
+
+pretty_type <- function(x) {
+  gsub("comp", "composition", x) |>
+    gsub(pattern = "_", replacement = " ")
 }

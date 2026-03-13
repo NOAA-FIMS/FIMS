@@ -9,7 +9,7 @@
 
 # create_default_* ----
 ## Setup ----
-data <- FIMS::FIMSFrame(data1)
+data <- FIMS::FIMSFrame(data_big)
 
 default_configurations <- create_default_configurations(data)
 

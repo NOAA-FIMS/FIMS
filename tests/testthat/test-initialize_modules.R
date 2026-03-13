@@ -10,7 +10,7 @@
 # test_initialize_modules ----
 ## Setup ----
 
-data <- FIMS::FIMSFrame(data1)
+data <- FIMS::FIMSFrame(data_big)
 
 default_parameters <- create_default_configurations(data = data) |>
   create_default_parameters(data = data) |>

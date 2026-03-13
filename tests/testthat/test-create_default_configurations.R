@@ -10,8 +10,8 @@
 # create_default_configurations ----
 ## Setup ----
 # Load or prepare any necessary data for testing
-data("data1")
-data_age_length <- FIMSFrame(data1)
+data("data_big")
+data_age_length <- FIMSFrame(data_big)
 
 ## IO correctness ----
 test_that("`create_default_configurations()` works with correct inputs", {
