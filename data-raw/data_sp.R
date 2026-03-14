@@ -1,3 +1,7 @@
+############################################################################
+## Setup data from JABBA for a surplus production model
+###########################################################################
+
 # FLCore is from the flr organization on GitHub
 
 # download OM surplus production test data
@@ -25,16 +29,23 @@ om_landings[is.na(om_landings)] <- 0
 iter_id <- 1
 
 # using FLR magic to get data out of FLQuant objects
-fishing_fleet_landings <- as.data.frame(
-  iterators::iter(om_landings, iter_id),
-  drop = TRUE
-)
+fishing_fleet_landings <- 
+  iter(om_landings, iter_id) |> 
+   FLCore::window(start = 1951) |>
+   as.data.frame() |>
+   dplyr::select(age, year, season, area, data) |>
+   stats::model.frame(drop = TRUE)
 
-survey_fleet_index <- stats::model.frame(
-  stats::window(iter(om_survey_indices, iter_id), start = 1951),
-  drop = TRUE
-)
+survey_fleet_index <- 
+ iter(om_survey_indices, iter_id) |> 
+  FLCore::window(start = 1951) |>
+  as.data.frame() 
+survey_fleet_index$A <- survey_fleet_index$data
+survey_fleet_index <- dplyr::select(survey_fleet_index, age, year, season, area, A) 
+
 survey_fleet_index$A <- ifelse(is.na(survey_fleet_index$A), -999, survey_fleet_index$A)
+survey_fleet_index <- stats::model.frame(survey_fleet_index, drop = TRUE)
+
 se <- survey_fleet_index
 # Assign indx.se
 se[, -1] <- as.list(om_survey_indices_se)
@@ -44,7 +55,7 @@ date_start <- paste0(fishing_fleet_landings$year, "-01-01")
 date_end <- paste0(fishing_fleet_landings$year, "-12-31")
 
 # create FIMS surplus production data object
-data_sp <- data.frame(
+data_sp_jabba <- data.frame(
   type = c(
     rep("landings", nrow(fishing_fleet_landings)),
     rep("index", nrow(survey_fleet_index))
@@ -63,4 +74,68 @@ data_sp <- data.frame(
 )
 
 # save data_sp
-usethis::use_data(data_sp, overwrite = TRUE)
+usethis::use_data(data_sp_jabba, overwrite = TRUE)
+
+########################################################################
+# Setup tuna dataset from Meyer and Millar (1999)
+########################################################################
+
+
+tuna_dat <- rbind(
+  c(15.9, 61.89),
+  c(25.7, 78.98),
+  c(28.5, 55.59),
+  c(23.7, 44.61),
+  c(25.0, 56.89),
+  c(33.3, 38.27),
+  c(28.2, 33.84),
+  c(19.7, 36.13),
+  c(17.5, 41.95),
+  c(19.3, 36.63),
+  c(21.6, 36.33),
+  c(23.1, 38.82),
+  c(22.5, 34.32),
+  c(22.5, 37.64),
+  c(23.6, 34.01),
+  c(29.1, 32.16),
+  c(14.4, 26.88),
+  c(13.2, 36.61),
+  c(28.4, 30.07),
+  c(34.6, 30.75),
+  c(37.5, 23.36),
+  c(25.9, 22.36),
+  c(25.3, 21.91))
+colnames(tuna_dat) <- c('C', 'I')
+tuna_dat <- as.data.frame(tuna_dat)
+tuna_dat$year <- tuna_dat$timing <- 0
+tuna_dat$year <- 1967:1989
+tuna_dat$timing <- 1: nrow(tuna_dat)
+
+# helper to get year to full date
+date_start <- paste0(tuna_dat$year, "-01-01")
+date_end <- paste0(tuna_dat$year, "-12-31")
+
+
+
+# create FIMS surplus production data object
+data_sp_tuna <- data.frame(
+  type = c(
+    rep("landings", nrow(tuna_dat)),
+    rep("index", nrow(tuna_dat))
+  ),
+  name = c(
+    rep("fleet1", nrow(tuna_dat)),
+    rep("survey1", nrow(tuna_dat))
+  ),
+  age = NA,
+  length = NA,
+  timing = rep(tuna_dat$timing, 2),
+  datestart = rep(as.Date(date_start, format = "%Y-%m-%d"), 2),
+  dateend = rep(as.Date(date_end, format = "%Y-%m-%d"), 2),
+  value = c(tuna_dat$C, tuna_dat$I),
+  unit = rep("t", nrow(tuna_dat), NA),
+  uncertainty = rep(0.1, nrow(tuna_dat)*2)
+)
+
+# save data_sp
+usethis::use_data(data_sp_tuna, overwrite = TRUE)

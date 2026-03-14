@@ -251,15 +251,13 @@ class SurplusProduction : public FisheryModelBase<Type> {
     std::map<std::string, fims::Vector<Type>> &population_derived_quantities_map_ =
         this->GetPopulationDerivedQuantities(population->GetId());
     
-        // in first year, set depletion to initial depletion 
+    // in first year, set the expectation of depletion to initial depletion 
     if (year == 0) {
       population->depletion->log_expected_depletion[0] =
       population->depletion->log_init_depletion[0];
 
     // for rest of time series, evaluation log_expected_depltion based on 
-    // user-defined function
-    // depletion[year+1] is the inv-log of log_depletion where depletion[year=0]
-    // is estimated based off of log_expected_depletion[0] = init_depletion
+    // depletion->evaluate_mean function
     } else {
       population->depletion->log_expected_depletion[year] =
           fims_math::log(
@@ -328,12 +326,12 @@ class SurplusProduction : public FisheryModelBase<Type> {
 
         if(population->fleets[fleet_]->observed_index_data->at(year) != 
           population->fleets[fleet_]->observed_index_data->na_value){
-          fleet_derived_quantities_map_["log_index_depletion_carrying_capacity_ratio"][year] =
+          fleet_derived_quantities_map_["log_index_to_depletion_carrying_capacity_ratio"][year] =
             fims_math::log(population->fleets[fleet_]->observed_index_data->at(year)) -
             fims_math::log(population->depletion->depletion[year]) - 
             population->depletion->log_carrying_capacity[0];
         } else {
-          fleet_derived_quantities_map_["log_index_depletion_carrying_capacity_ratio"][year] = 
+          fleet_derived_quantities_map_["log_index_to_depletion_carrying_capacity_ratio"][year] = 
             population->fleets[fleet_]->observed_index_data->na_value;
         }
       }
@@ -352,8 +350,8 @@ class SurplusProduction : public FisheryModelBase<Type> {
       int ny = 0;
       for (size_t year = 0; year < population->n_years; year++) {
         //TODO: currently hard coded to -999 to indicate missing data, but need to update
-        if(fleet_derived_quantities_map_["log_index_depletion_carrying_capacity_ratio"][year] != -999){
-          sum_log_q += fleet_derived_quantities_map_["log_index_depletion_carrying_capacity_ratio"][year];
+        if(fleet_derived_quantities_map_["log_index_to_depletion_carrying_capacity_ratio"][year] != -999){
+          sum_log_q += fleet_derived_quantities_map_["log_index_to_depletion_carrying_capacity_ratio"][year];
           ny++;
         }
       }

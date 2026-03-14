@@ -263,8 +263,8 @@ RCPP_MODULE(fims) {
       .field("age_to_length_conversion",
              &FleetInterface::age_to_length_conversion)
       .field("mean_log_q", &FleetInterface::mean_log_q)
-      .field("log_index_depletionK_ratio",
-             &FleetInterface::log_index_depletionK_ratio)
+      .field("log_index_to_depletion_carrying_capacity_ratio",
+             &FleetInterface::log_index_to_depletion_carrying_capacity_ratio)
       .method("get_id", &FleetInterface::get_id)
       .method("SetName", &FleetInterface::SetName)
       .method("GetName", &FleetInterface::GetName)

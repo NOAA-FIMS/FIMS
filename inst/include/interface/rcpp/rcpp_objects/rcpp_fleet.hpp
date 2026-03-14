@@ -168,7 +168,7 @@ class FleetInterface : public FleetInterfaceBase {
   /**
    * @brief log of the ratio of the index to the product of depletion and K.
    */
-  ParameterVector log_index_depletionK_ratio;
+  ParameterVector log_index_to_depletion_carrying_capacity_ratio;
 
   // derived quantities
   /**
@@ -280,7 +280,7 @@ class FleetInterface : public FleetInterfaceBase {
         lengthcomp_proportion(other.lengthcomp_proportion),
         age_to_length_conversion(other.age_to_length_conversion),
         mean_log_q(other.mean_log_q),
-        log_index_depletionK_ratio(other.log_index_depletionK_ratio),
+        log_index_to_depletion_carrying_capacity_ratio(other.log_index_to_depletion_carrying_capacity_ratio),
         derived_landings_naa(other.derived_landings_naa),
         derived_landings_nal(other.derived_landings_nal),
         derived_landings_waa(other.derived_landings_waa),

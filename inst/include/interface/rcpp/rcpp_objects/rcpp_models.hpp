@@ -1720,22 +1720,26 @@ class SurplusProductionInterface : public FisheryModelInterfaceBase {
           &(derived_quantities["log_index_expected"]);
 
       //This will not work for many populations to one fleet relationships
-      derived_quantities["log_index_depletionK_ratio"] =
+      derived_quantities["log_index_to_depletion_carrying_capacity_ratio"] =
         fims::Vector<Type>(fleet_interface->n_years.get());
-      derived_quantities_dim_info["log_index_depletionK_ratio"] =
+      derived_quantities["log_index_to_depletion_carrying_capacity_ratio"].set_tag(
+        "fleet." + std::to_string(fleet_interface->id) + ".log_index_to_depletion_carrying_capacity_ratio");
+      derived_quantities_dim_info["log_index_to_depletion_carrying_capacity_ratio"] =
       fims_popdy::DimensionInfo(
-          "log_index_depletionK_ratio",
+          "log_index_to_depletion_carrying_capacity_ratio",
           fims::Vector<int>{fleet_interface->n_years.get()},
           fims::Vector<std::string>{"n_years"});
       derived_quantities["mean_log_q"] = fims::Vector<Type>(1);
+      derived_quantities["mean_log_q"].set_tag(
+        "fleet." + std::to_string(fleet_interface->id) + ".mean_log_q");
       derived_quantities_dim_info["mean_log_q"] =
       fims_popdy::DimensionInfo(
           "mean_log_q",
           fims::Vector<int>{1},
           fims::Vector<std::string>{"scalar"});
 
-      info->variable_map[fleet_interface->log_index_depletionK_ratio.id_m] =
-        &(derived_quantities["log_index_depletionK_ratio"]);
+      info->variable_map[fleet_interface->log_index_to_depletion_carrying_capacity_ratio.id_m] =
+        &(derived_quantities["log_index_to_depletion_carrying_capacity_ratio"]);
       info->variable_map[fleet_interface->mean_log_q.id_m] =
         &(derived_quantities["mean_log_q"]);
       

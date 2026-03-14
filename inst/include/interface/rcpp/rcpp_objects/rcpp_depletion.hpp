@@ -316,6 +316,22 @@ class PellaTomlinsonInterface : public DepletionInterfaceBase {
           this->log_growth_rate[0].initial_value_m,
           this->growth_rate[0].initial_value_m
     );
+    
+    if(this->growth_rate[0].initial_value_m == -999.00 &&
+      this->log_growth_rate[0].initial_value_m == -999.00){
+        std::invalid_argument("Pella-Tomlinson Depletion " + 
+          fims::to_string(this->id) +
+          ": No initial value provided for growth rate. Please provide an " +
+          "initial value for either log_growth_rate or growth_rate.");
+    }
+    if(this->growth_rate[0].initial_value_m != -999.00 &&
+      this->log_growth_rate[0].initial_value_m != -999.00){
+        std::invalid_argument("Pella-Tomlinson Depletion " + 
+          fims::to_string(this->id) +
+          ": Initial values provided for both growth_rate and " + 
+          "log_growth_rate. Please provide an initial value for either " +
+          "log_growth_rate or growth_rate, but not both.");
+    }
     // User provided natural-scale values
     if (this->growth_rate[0].initial_value_m != -999.0 && 
       this->log_growth_rate[0].initial_value_m == -999.0) {
@@ -380,6 +396,22 @@ class PellaTomlinsonInterface : public DepletionInterfaceBase {
           this->log_carrying_capacity[0].initial_value_m,
           this->carrying_capacity[0].initial_value_m
     );
+     if(this->carrying_capacity[0].initial_value_m == -999.00 &&
+      this->log_carrying_capacity[0].initial_value_m == -999.00){
+        std::invalid_argument("Pella-Tomlinson Depletion " + 
+          fims::to_string(this->id) +
+          ": No initial value provided for carrying capacity. Please " + 
+          "provide an initial value for either log_carrying_capacity or " +
+          "carrying_capacity.");
+    }
+    if(this->carrying_capacity[0].initial_value_m != -999.00 &&
+      this->log_carrying_capacity[0].initial_value_m != -999.00){
+        std::invalid_argument("Pella-Tomlinson Depletion " + 
+          fims::to_string(this->id) +
+          ": Initial values provided for both carrying_capacity and " + 
+          "log_carrying_capacity. Please provide an initial value for either " +
+          "log_carrying_capacity or carrying_capacity, but not both.");
+    }
     if (this->carrying_capacity[0].initial_value_m != -999.0 && 
         this->log_carrying_capacity[0].initial_value_m == -999.0) {
         depletion_module->carrying_capacity.resize(1);
@@ -442,6 +474,21 @@ class PellaTomlinsonInterface : public DepletionInterfaceBase {
           this->log_shape[0].initial_value_m,
           this->shape[0].initial_value_m
     );
+     if(this->shape[0].initial_value_m == -999.00 &&
+      this->log_shape[0].initial_value_m == -999.00){
+        std::invalid_argument("Pella-Tomlinson Depletion " + 
+          fims::to_string(this->id) +
+          ": No initial value provided for shape. Please provide an " + 
+          "initial value for either log_shape or shape.");
+    }
+    if(this->shape[0].initial_value_m != -999.00 &&
+      this->log_shape[0].initial_value_m != -999.00){
+        std::invalid_argument("Pella-Tomlinson Depletion " + 
+          fims::to_string(this->id) +
+          ": Initial values provided for both shape and log_shape. " + 
+          "Please provide an initial value for either log_shape or " + 
+          "shape, but not both.");
+    }
     if (this->shape[0].initial_value_m != -999.0 && 
         this->log_shape[0].initial_value_m == -999.0) {
         depletion_module->shape.resize(1);
@@ -498,7 +545,7 @@ class PellaTomlinsonInterface : public DepletionInterfaceBase {
     }
     info->variable_map[this->shape.id_m] = &(depletion_module)->shape;
 
-      // set log_depletion and depletion
+    // set log_depletion and depletion
     // Set transformation module based on which parameters user provided
     depletion_module->depletion_transformation = 
       fims_transformations::CreateLogTransformation<Type>(
@@ -506,15 +553,39 @@ class PellaTomlinsonInterface : public DepletionInterfaceBase {
           this->depletion[0].initial_value_m
     );
 
+     if(this->depletion[0].initial_value_m == -999.00 &&
+      this->log_depletion[0].initial_value_m == -999.00){
+        std::invalid_argument("Pella-Tomlinson Depletion " + 
+          fims::to_string(this->id) +
+          ": No initial value provided for depletion. Please provide an " +
+          "initial value for either log_depletion or depletion.");
+    }
+    if(this->depletion[0].initial_value_m != -999.00 &&
+      this->log_depletion[0].initial_value_m != -999.00){
+        std::invalid_argument("Pella-Tomlinson Depletion " + 
+          fims::to_string(this->id) +
+          ": Initial values provided for both depletion and log_depletion. " + 
+          "Please provide an initial value for either log_depletion or " + 
+          "depletion, but not both.");
+    }
+
     // Check if user provided natural-scale or log-scale depletion values
     bool user_provided_natural_depletion = 
       (this->depletion[0].initial_value_m != -999.0 && 
        this->log_depletion[0].initial_value_m == -999.0);
 
-    // Resize vectors
-    size_t depletion_size = this->n_years.get();
+    // Resize fims vectors
+    size_t depletion_size = this->n_years.get()+1;
     depletion_module->depletion.resize(depletion_size);
     depletion_module->log_depletion.resize(depletion_size);
+    
+    // Set tag name for depletion for debugging
+    ss.str("");
+    ss << "depletion." << this->id << ".depletion";
+    depletion_module->depletion.set_tag(ss.str());
+    ss.str("");
+    ss << "depletion." << this->id << ".log_depletion";
+    depletion_module->log_depletion.set_tag(ss.str());
 
     // Initialize all elements
     for (size_t i = 0; i < depletion_size; i++) {
@@ -529,7 +600,7 @@ class PellaTomlinsonInterface : public DepletionInterfaceBase {
       }
     }
 
-    // Register log_depletion as parameter (not depletion)
+    // Register log_depletion as parameter 
     for (size_t i = 0; i < this->log_depletion.size(); i++) {
       if (this->log_depletion[i].estimation_type_m.get() == "fixed_effects") {
         ss.str("");
@@ -551,7 +622,7 @@ class PellaTomlinsonInterface : public DepletionInterfaceBase {
       }
     }
 
-    // Register both in variable map
+    // Register in variable map
     info->variable_map[this->log_depletion.id_m] = &(depletion_module)->log_depletion;
 
      // Register depletion as parameter
@@ -606,6 +677,9 @@ class PellaTomlinsonInterface : public DepletionInterfaceBase {
 
     // setup log_expected_depletion
     depletion_module->log_expected_depletion.resize(this->n_years.get() + 1);
+    ss.str("");
+    ss << "depletion." << this->id << ".log_expected_depletion";
+    depletion_module->log_expected_depletion.set_tag(ss.str());
     for (size_t i = 0; i < this->n_years.get() + 1; i++) {
       depletion_module->log_expected_depletion[i] = 0;
     }

@@ -17,7 +17,7 @@ namespace
             //  are correctly initialized and then we can remove the dq tests here.
             EXPECT_EQ(dq["index_expected"].size(), nyears);
             EXPECT_EQ(dq["log_index_expected"].size(), nyears);
-            EXPECT_EQ(dq["log_index_depletionK_ratio"].size(), nyears);
+            EXPECT_EQ(dq["log_index_to_depletion_carrying_capacity_ratio"].size(), nyears);
             EXPECT_EQ(dq["mean_log_q"].size(), 1);
             EXPECT_EQ(fleet->q.size(), 1);
             }
@@ -36,7 +36,7 @@ namespace
                 fims::Vector(nyears, 0.0));
             EXPECT_EQ(dq["log_index_expected"], 
                 fims::Vector(nyears, 0.0));
-            EXPECT_EQ(dq["log_index_depletionK_ratio"], 
+            EXPECT_EQ(dq["log_index_to_depletion_carrying_capacity_ratio"], 
                 fims::Vector(nyears, 0.0));
             EXPECT_EQ(dq["mean_log_q"], 
                 fims::Vector(1, 0.0));

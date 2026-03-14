@@ -90,7 +90,7 @@ class SPBaseTestFixture : public testing::Test {
     // as derived quantities of the population: biomass, observed_catch,
     // harvest_rate, fmsy, bmsy, and msy,
     // and of the fleet: index_expected, log_index_expected, 
-    // log_index_depletionK_ratio, and mean_log_q.
+    // log_index_to_depletion_carrying_capacity_ratio, and mean_log_q.
     this->surplus_production_model->InitializePopulationDerivedQuantities(
       population->GetId());
     std::map<std::string, fims::Vector<double>> &derived_quantities =
@@ -115,7 +115,7 @@ class SPBaseTestFixture : public testing::Test {
       
       derived_quantities["index_expected"] = fims::Vector<double>(nyears);
       derived_quantities["log_index_expected"] = fims::Vector<double>(nyears);
-      derived_quantities["log_index_depletionK_ratio"] = fims::Vector<double>(nyears);
+      derived_quantities["log_index_to_depletion_carrying_capacity_ratio"] = fims::Vector<double>(nyears);
       derived_quantities["mean_log_q"] = fims::Vector<double>(1);
     } 
   }

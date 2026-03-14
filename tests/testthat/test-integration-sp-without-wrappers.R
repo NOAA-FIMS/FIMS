@@ -9,24 +9,14 @@
 
 # Deterministic test ----
 ## Setup ----
-#load JABBA results
-jabba_output <- readRDS("tests/testthat/fixtures/jabba_output.RDS")
-jabba_biomass <- jabba_output$biomass
-jabba_pars <- jabba_output$pars
-jabba_biomass <- jabba_output$flqs |> 
-    dplyr::filter(qname == "biomass") |> dplyr::select(data) |> as.vector()
-jabba_expect_depletion <- (jabba_biomass |> unlist() |> unname()) / 
-    (jabba_pars |>
-      dplyr::filter(rownames(jabba_pars) == "K") |> 
-      dplyr::select(Median) |> unlist() |> unname())
-
+source("tests/testthat/helper-integration-tests-setup-function.R")
 
 ## IO correctness ----
 test_that("deterministic run works with correct inputs", {
   # Run FIMS surplus production without wrappers
   result <- setup_and_run_sp(bayesian_mode = FALSE, estimation_mode = FALSE)
 
-  #' @description Compare FIMS parameters with JABBA outputs.
+  #' @description Compare FIMS parameters with stan outputs.
   jabba_correct_pars <- c(
     jabba_pars |> 
       dplyr::filter(rownames(jabba_pars) == "q") |> 
@@ -149,11 +139,11 @@ colnames(tuna.dat) <- c('C', 'I')
 tuna.dat <- as.data.frame(tuna.dat)
 
 
-K_prior <- c(5.04, 0.5162)
-r_prior <- c(-1.38, 0.51)
+K_prior <- c(5.042905, sqrt(3.7603664))
+r_prior <- c(-1.38, sqrt(3.845))
 
 inits <- list(depletion=c(0.99,0.98,0.96,0.94,0.92,0.90,0.88,0.86,0.84,0.82,
-0.80,0.78,0.76,0.74,0.72,0.70,0.68,0.66,0.64,0.62,0.60,0.58,0.56,0.56),
+0.80,0.78,0.76,0.74,0.72,0.70,0.68,0.66,0.64,0.62,0.60,0.58,0.56, 0.56),
 r=0.8, K=200)
 
 clear()
@@ -201,7 +191,7 @@ survey_fleet_index_distribution <- new(DnormDistribution)
 survey_fleet_index_distribution$log_sd$resize(nyears)
 for (y in 1:nyears) {
     survey_fleet_index_distribution$log_sd[y]$value <- 
-          1.137E-2 |> sqrt() |> log() 
+          1.151663e-02 |> sqrt() |> log() 
 }
 survey_fleet_index_distribution$log_sd$set_all_estimable(FALSE)
 
@@ -211,7 +201,7 @@ survey_fleet_index_distribution$set_observed_data(survey_fleet$GetObservedIndexD
 #     survey_fleet$log_index_expected$get_id())
 #using random_effects as a hack to implement a distribution on a derived parameter
 survey_fleet_index_distribution$set_distribution_links("random_effects", 
-    c(survey_fleet$log_index_depletionK_ratio$get_id(), survey_fleet$mean_log_q$get_id()))
+    c(survey_fleet$log_index_to_depletion_carrying_capacity_ratio$get_id(), survey_fleet$mean_log_q$get_id()))
 
 
 # create depletion module
@@ -240,11 +230,11 @@ production$log_init_depletion[1]$value <- 0 # inital depletion ~ 1
 
 # Setup depletion
 if(bayesian == FALSE){
-production$log_depletion$resize(nyears+1)
-for (i in 1:(nyears+1)) {
-  production$log_depletion[i]$value <- log(inits$depletion[i])
-}
-production$log_depletion$set_all_random(TRUE)
+  production$log_depletion$resize(nyears+1)
+  for (i in 1:(nyears+1)) {
+    production$log_depletion[i]$value <- log(inits$depletion[i])
+  }
+  production$log_depletion$set_all_random(TRUE)
 } else {
   production$depletion$resize(nyears+1)
   for (i in 1:(nyears+1)) {
@@ -259,7 +249,7 @@ production$n_years$set(nyears)
 production_distribution <- new(DlnormDistribution)
 
 # Fix sd to jabba value as currently FIMS does not have prior distribution
-production_distribution$log_sd[1]$value <- log(sqrt(2.601E-3))
+production_distribution$log_sd[1]$value <- log(sqrt(3.1e-3))
 
 # depletion ~ LNormal(log_expected_depletion, sd)
 production_distribution$set_distribution_links(
@@ -314,13 +304,14 @@ obj <- TMB::MakeADFun(
 
 opt <- stats::nlminb(obj[["par"]], obj[["fn"]], obj[["gr"]],
         control = list(eval.max = 10000, iter.max = 10000, trace = 1))
-fit <- tmbstan::tmbstan(obj, init =  "best.last.par", iter = 10000,
-        lower = c(get_parameter_min_vector(), get_random_effects_min_vector()),
-        upper = c(get_parameter_max_vector(), get_random_effects_max_vector()),
+fit <- tmbstan::tmbstan(obj, init =  "last.par.best", iter = 10000,
+        lower = rep(0, length(obj$env$last.par.best)),
+        upper = rep(Inf, length(obj$env$last.par.best)),
         control = list(adapt_delta = 0.99))
 postmle <- as.matrix(fit)[, -ncol(as.matrix(fit))]
-obj$report(apply(postmle,2,median))$nll_components
+apply(postmle, 2, median)
+report <- obj$report(apply(postmle,2,median))
 
-
+save(fit, file = "tests/testthat/fixtures/sp_fimsfit.RData")
 np_fit = bayesplot::nuts_params(fit)
  bayesplot::mcmc_parcoord(postmle, pars = colnames(postmle), np = np_fit)
