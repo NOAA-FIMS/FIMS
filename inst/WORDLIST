@@ -30,6 +30,7 @@ Baranov
 BasedOnStyle
 BenchCAAEvaluate
 Benchmarking
+BenchFixture
 Bertalanffy
 BevHolt
 Beverton
@@ -225,6 +226,7 @@ GraphQL
 GrowthBase
 GrowthEvaluate
 GrowthInterfaceBase
+GTest
 HandlesEdgeCaseNullAndInvalidBool
 HandlesMixedArrayInput
 HandlesNestedObjects
@@ -318,6 +320,7 @@ MaturityAtAge
 MaturityBase
 MaturityInterfaceBase
 ModularTMBExample
+ModuleName
 MultinomialLPDF
 MultinomialLPMF
 MyClass
@@ -475,6 +478,7 @@ TOC
 TOMLINSON
 TREEVIEW
 TearDown
+TestBody
 ToDo
 ToJSON
 Tomlinson
@@ -500,6 +504,7 @@ WriteAtExit
 WriteJsonValue
 WriteToFile
 YJmYGEPuE
+Za
 ZAA
 absolutePath
 acomp
@@ -530,6 +535,7 @@ aug
 bcast
 beverton
 bindenv
+bm
 bookdown
 bool
 boolean's
@@ -716,6 +722,7 @@ fsel
 fstream
 func
 functors
+fx
 gc
 gcc
 gcovr
@@ -918,6 +925,7 @@ nullptr
 num
 nx
 nyr
+nzchar
 oE
 objs
 ofstream
