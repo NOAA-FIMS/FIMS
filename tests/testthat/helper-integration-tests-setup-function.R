@@ -573,14 +573,15 @@ setup_and_run_FIMS_with_wrappers <- function(iter_id,
 
 
 
-setup_and_run_sp <- function(bayesian_mode = FALSE,
-                             estimation_mode = TRUE,
-                             map = list()) {
+setup_and_run_surplus_production_model <- 
+    function(bayesian_mode = FALSE,
+             estimation_mode = TRUE,
+             map = list()) {
    
-  # TODO: add ability to create FIMSFrame from data_sp_tuna (doesn't work because of age)
-  # data_4_model <- FIMSFrame(data_sp_tuna)
+  # TODO: add ability to create FIMSFrame from data_limited_tuna (doesn't work because of age)
+  # data_4_model <- FIMSFrame(data_limited_tuna)
 
-  # Setup initial values and priors for the SP model parameters
+  # Setup initial values and priors for the surplus production model parameters
   # Values from Meyer and Millar 1999, Table 1, with lognormal priors on K and r
   K_prior <- c(5.042905, sqrt(3.7603664))
   r_prior <- c(-1.38, sqrt(3.845))
@@ -589,6 +590,10 @@ setup_and_run_sp <- function(bayesian_mode = FALSE,
   0.80,0.78,0.76,0.74,0.72,0.70,0.68,0.66,0.64,0.62,0.60,0.58,0.56, 0.56),
   r=0.8, K=200)
 
+  inits_true <- list(depletion = c(0.99,0.98,0.96,0.94,0.92,0.90,0.88,0.86,0.84,0.82,
+  0.80,0.78,0.76,0.74,0.72,0.70,0.68,0.66,0.64,0.62,0.60,0.58,0.56, 0.56),
+  r=0.3121, K = 255.6)
+
   clear()
 
   nyears <- 23
@@ -596,29 +601,13 @@ setup_and_run_sp <- function(bayesian_mode = FALSE,
   survey_index <- data_sp_tuna |> dplyr::filter(type == "index")
   landings <- data_sp_tuna |> dplyr::filter(type == "landings")
 
-
-
-  # #setup true data
-  # jabba_output <- readRDS("tests/testthat/fixtures/jabba_output.RDS")
-  # jabba_pars <- jabba_output$pars
-  # jabba_biomass <- jabba_output$flqs |> 
-  #   dplyr::filter(qname == "biomass") |> dplyr::select(data) |> as.vector()
-  # jabba_expect_depletion <- (jabba_biomass |> unlist() |> unname()) / 
-  #   (jabba_pars |>
-  #     dplyr::filter(rownames(jabba_pars) == "K") |> 
-  #     dplyr::select(Median) |> unlist() |> unname())
-  # nyears <- 70
-  # survey_index <- data_sp |> dplyr::filter(type == "index")
-  # landings <- data_sp |> dplyr::filter(type == "landings")
-  # survey_index_data <- data_sp |> dplyr::filter(type == "index")
-
   # create index module
   survey_fleet_index <- methods::new(Index, nyears)
   purrr::walk(
     1:nyears,
     \(x) survey_fleet_index$index_data$set(x - 1, survey_index$value[x])
   )
-
+ 
   # create catch module
   fishing_fleet_landings <- methods::new(Landings, nyears)
   purrr::walk(
@@ -634,16 +623,6 @@ setup_and_run_sp <- function(bayesian_mode = FALSE,
   fishing_fleet$SetObservedLandingsDataID(fishing_fleet_landings$get_id())
   survey_fleet <- methods::new(Fleet)
   survey_fleet$n_years$set(nyears)
-  # # Estimate q
-  # if(estimation_mode == FALSE) {
-  #   survey_fleet$log_q[1]$value <- 
-  #     jabba_pars |> dplyr::filter(rownames(jabba_pars) == "q") |> 
-  #     dplyr::select(Median) |> log() |> unlist()
-  # #  survey_fleet$log_q[1]$estimation_type$set("fixed_effects")
-  # } else {
-  #   survey_fleet$log_q[1]$value <- log(0.5)
-  # #  survey_fleet$log_q[1]$estimation_type$set("fixed_effects")
-  # }
   survey_fleet$SetObservedIndexDataID(survey_fleet_index$get_id())
   survey_fleet_index_distribution <- new(DnormDistribution)
 
@@ -658,9 +637,6 @@ setup_and_run_sp <- function(bayesian_mode = FALSE,
 
   # Set Data using the IDs from the modules defined above
   survey_fleet_index_distribution$set_observed_data(survey_fleet$GetObservedIndexDataID())
-  # survey_fleet_index_distribution$set_distribution_links("data",          
-  #     survey_fleet$log_index_expected$get_id())
-  #using random_effects as a hack to implement a distribution on a derived parameter
   survey_fleet_index_distribution$set_distribution_links("random_effects", 
       c(survey_fleet$log_index_to_depletion_carrying_capacity_ratio$get_id(), survey_fleet$mean_log_q$get_id()))
 
@@ -668,48 +644,87 @@ setup_and_run_sp <- function(bayesian_mode = FALSE,
   # create depletion module
   production <- new(PTDepletion)
 
-  # estimate log growth rate and log carrying capacity
-  if(bayesian_mode == FALSE){
-    production$log_growth_rate[1]$value <- log(inits$r)
-    production$log_growth_rate[1]$estimation_type$set("fixed_effects")
-    production$log_carrying_capacity[1]$value <- log(inits$K)
-    production$log_carrying_capacity[1]$estimation_type$set("fixed_effects")
+  if(estimation_mode == TRUE){
+
+    # estimate growth rate and carrying capacity
+    if(bayesian_mode == FALSE){
+      production$log_growth_rate[1]$value <- log(inits$r)
+      production$log_growth_rate[1]$estimation_type$set("fixed_effects")
+      production$log_carrying_capacity[1]$value <- log(inits$K)
+      production$log_carrying_capacity[1]$estimation_type$set("fixed_effects")
+    } else {
+      production$growth_rate[1]$value <- inits$r
+      production$growth_rate[1]$min <- 0
+      production$growth_rate[1]$estimation_type$set("fixed_effects")
+      production$carrying_capacity[1]$value <- inits$K
+      production$carrying_capacity[1]$min <- 0
+      production$carrying_capacity[1]$estimation_type$set("fixed_effects")
+    } 
   } else {
-    production$growth_rate[1]$value <- inits$r
-    production$growth_rate[1]$min <- 0
-    production$growth_rate[1]$estimation_type$set("fixed_effects")
-    production$carrying_capacity[1]$value <- inits$K
-    production$carrying_capacity[1]$min <- 0
-    production$carrying_capacity[1]$estimation_type$set("fixed_effects")
-  } 
+    if(bayesian_mode == FALSE){
+      production$log_growth_rate[1]$value <- log(inits_true$r)
+      production$log_growth_rate[1]$estimation_type$set("fixed_effects")
+      production$log_carrying_capacity[1]$value <- log(inits_true$K)
+      production$log_carrying_capacity[1]$estimation_type$set("fixed_effects")
+    } else {
+      production$growth_rate[1]$value <- inits_true$r
+      production$growth_rate[1]$min <- 0
+      production$growth_rate[1]$estimation_type$set("fixed_effects")
+      production$carrying_capacity[1]$value <- inits_true$K
+      production$carrying_capacity[1]$min <- 0
+      production$carrying_capacity[1]$estimation_type$set("fixed_effects")
+    } 
+  }
 
   # Fix to get Schaefer model
   production$log_shape[1]$value <- log(2)
 
 
-  production$log_init_depletion[1]$value <- 0 # inital depletion ~ 1
+  if(estimation_mode == TRUE){
+    production$log_init_depletion[1]$value <- 0 # inital depletion ~ 1
+  } else {
+    production$log_init_depletion[1]$value <- log(1.019)
+  }
 
   # Setup depletion
-  if(bayesian_mode == FALSE){
-    production$log_depletion$resize(nyears+1)
-    for (i in 1:(nyears+1)) {
-      production$log_depletion[i]$value <- log(inits$depletion[i])
-    }
-    production$log_depletion$set_all_random(TRUE)
-  } else {
-    production$depletion$resize(nyears+1)
-    for (i in 1:(nyears+1)) {
-      production$depletion[i]$value <- inits$depletion[i]
-      production$depletion[i]$min <- 0
-    }
-  production$depletion$set_all_random(TRUE)
+  if(estimation_mode == TRUE){
+    if(bayesian_mode == FALSE){
+      production$log_depletion$resize(nyears+1)
+      for (i in 1:(nyears+1)) {
+        production$log_depletion[i]$value <- log(inits$depletion[i])
+      }
+      production$log_depletion$set_all_random(TRUE)
+    } else {
+      production$depletion$resize(nyears+1)
+      for (i in 1:(nyears+1)) {
+        production$depletion[i]$value <- inits$depletion[i]
+        production$depletion[i]$min <- 0
+      }
+    production$depletion$set_all_random(TRUE)
 
+    }
+  } else {
+    if(bayesian_mode == FALSE){
+      production$log_depletion$resize(nyears+1)
+      for (i in 1:(nyears+1)) {
+        production$log_depletion[i]$value <- log(inits_true$depletion[i])
+      }
+      production$log_depletion$set_all_random(TRUE)
+    } else {
+      production$depletion$resize(nyears+1)
+      for (i in 1:(nyears+1)) {
+        production$depletion[i]$value <- inits_true$depletion[i]
+        production$depletion[i]$min <- 0
+      }
+    production$depletion$set_all_random(TRUE)
+
+    }
   }
   production$n_years$set(nyears)
 
   production_distribution <- new(DlnormDistribution)
 
-  # Fix sd to jabba value as currently FIMS does not have prior distribution
+  # Fix sd as currently FIMS does not have prior distribution
   production_distribution$log_sd[1]$value <- log(sqrt(3.1e-3))
 
   # depletion ~ LNormal(log_expected_depletion, sd)
@@ -756,13 +771,17 @@ setup_and_run_sp <- function(bayesian_mode = FALSE,
 
   obj <- TMB::MakeADFun(
     data = list(), parameters, DLL = "FIMS",
-    random = "re" 
-    #silent = TRUE, map = list()
+    random = "re", 
+    silent = TRUE, map = list()
   )
-  obj$env$tracepar = TRUE
+  
   if(estimation_mode == TRUE) {
     if(bayesian_mode == TRUE) {
-      fit <- tmbstan::tmbstan(obj, init =  "best.last.par", iter = 8000,
+      fit <- tmbstan::tmbstan(obj, init =  "last.par.best", iter = 8000,
+        lower = c(FIMS:::get_parameter_min_vector(), 
+          FIMS:::get_random_effects_min_vector()), 
+        upper = c(FIMS:::get_parameter_max_vector(), 
+          FIMS:::get_random_effects_max_vector()), 
         control = list(adapt_delta = 0.99))
       postmle <- as.matrix(fit)[, -ncol(as.matrix(fit))]
       ret <- list(
@@ -788,7 +807,7 @@ setup_and_run_sp <- function(bayesian_mode = FALSE,
       )
       }
       
-        # Call report using MLE parameter values, or
+      # Call report using MLE parameter values, or
       # the initial values if optimization is skipped
       report <- obj[["report"]](obj[["env"]][["last.par.best"]])
       sdr <- TMB::sdreport(obj)

@@ -5,13 +5,13 @@
 # FLCore is from the flr organization on GitHub
 
 # download OM surplus production test data
-path_sp_data <- testthat::test_path("fixtures", "integration_test_data_sp.RData")
+path_data <- testthat::test_path("fixtures", "integration_test_data_limited.RData")
 download.file(
   "https://github.com/iagomosqueira/simtest_SP/raw/main/data/sims.RData",
-  path_sp_data
+  path_data
 )
 # load om object
-load(path_sp_data)
+load(path_data)
 
 # Load om survey indices
 # TODO: remove lapply call
@@ -55,7 +55,7 @@ date_start <- paste0(fishing_fleet_landings$year, "-01-01")
 date_end <- paste0(fishing_fleet_landings$year, "-12-31")
 
 # create FIMS surplus production data object
-data_sp_jabba <- data.frame(
+data_limited_jabba <- data.frame(
   type = c(
     rep("landings", nrow(fishing_fleet_landings)),
     rep("index", nrow(survey_fleet_index))
@@ -74,7 +74,7 @@ data_sp_jabba <- data.frame(
 )
 
 # save data_sp
-usethis::use_data(data_sp_jabba, overwrite = TRUE)
+usethis::use_data(data_limited_jabba, overwrite = TRUE)
 
 ########################################################################
 # Setup tuna dataset from Meyer and Millar (1999)
@@ -118,7 +118,7 @@ date_end <- paste0(tuna_dat$year, "-12-31")
 
 
 # create FIMS surplus production data object
-data_sp_tuna <- data.frame(
+data_limited_tuna <- data.frame(
   type = c(
     rep("landings", nrow(tuna_dat)),
     rep("index", nrow(tuna_dat))
@@ -138,4 +138,18 @@ data_sp_tuna <- data.frame(
 )
 
 # save data_sp
-usethis::use_data(data_sp_tuna, overwrite = TRUE)
+usethis::use_data(data_limited_tuna, overwrite = TRUE)
+
+
+# Setup results table from Meyer and Millar (1999) Appendix
+data_limited_tuna_results <- data.frame(
+  label = c("growth_rate", "carrying_capacity", "q", "sigma2_depletion", 
+  "sigma2_obs", "depletion", "depletion", "depletion", "depletion", 
+  "depletion", "fmsy", "msy", "bmsy", "biomass_pred"),
+  mean = c(0.3287, 261.9, 0.2622, 0.003204, 0.0124, 1.019, 0.9945, 0.08735,
+  0.3253, NA, NA, NA, NA, NA),
+  median = c(0.3121, 255.6, 0.02471, 0.002689, 0.0116, 1.016, 0.9847, 0.8693,
+  0.3234, NA, NA, NA, NA, NA)
+)
+
+usethis::use_data(data_limited_tuna_results, overwrite = TRUE)

@@ -1,0 +1,256 @@
+ ---
+title: "Introducing the Fisheries Integrated Modeling System (FIMS)"
+output: github_document
+vignette: >
+  %\VignetteIndexEntry{Introducing the Fisheries Integrated Modeling System (FIMS)}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+# Set local options so vignette output is clean and consistent
+# (avoids color codes and subtle formatting in rendered docs)
+withr::local_options(list(
+  cli.num_colors = 1,
+  crayon.enabled = FALSE,
+  pillar.subtle = FALSE
+))
+```
+
+## FIMS - Surplus Production
+This demo sets up a surplus production model and walks through the steps of running the Bayesian implementaion through tmbstan. The model set-up relies on "power user" functions, which is a more advanced way of accessing FIMS code than the helper functions that have been developed to set up a catch-at-age model.
+
+```{r memory, warning=FALSE, message=FALSE}
+library(FIMS)
+library(ggplot2)
+library(stockplotr)
+
+# Use the {stockplotr} theme for all figures
+# ggplot2::theme_set(stockplotr::theme_noaa())
+
+
+# clear memory
+clear()
+```
+
+## Data
+
+Like the FIMS catch-at-age model, data are set up in long format. 
+
+### `data_limited_tuna`
+
+A sample data frame for a surplus production model is stored in the package as `data_limited_tuna`. This data set is based on data that was used in [Meyer and Millar 1999](https://d1wqtxts1xzle7.cloudfront.net/103328457/92d9f6b68861cc5d1c40beda0ad76d18db69-libre.pdf?1686646854=&response-content-disposition=inline%3B+filename%3DBUGS_in_Bayesian_stock_assessments.pdf&Expires=1772950518&Signature=FVjSv8rfM2XCCaCLReaKdw7ODsgA0kuclz0j82MnrjeXlJlDZUc4ysTDsW13K9cakbhBExer9xblpR3dcBA6ktXBH31Zr2snLoAih2UJ0T~VyQw~Wv8UtFG2bu5J5l8QNJE7XJ8JnBsFF3dK1O-OnzCALzjQ4593Xs8rxiMxqd7-8520e1dncKZAZgdBWGgt8uFEkFWfM62jfiL6Fzl7CB3jCw5-oUSpYcUvIDeQTf1l11K7PGj9VRtThb55M~8NSQNTe867fHMgpnJua7JvqtfmjOwzcnrZGCiMNKfrTXVPcZEaITckF79nRQOB09980CrKlR~SqTsLbXaaKUq3~A__&Key-Pair-Id=APKAJLOHF5GGSLRBV4ZA) to demonstrate a surplus production model in JAGS. The same analysis was later replicated by [Best and Punt]() to demonstrate surplus production model best practives using [Stan](). Prior and inital values used to set up the model are replicated from both analyses.
+
+```{r load-data}
+data("data_limited_tuna")
+carrying_capacity_prior <- c(5.042905, sqrt(3.7603664))
+growth_rate_prior <- c(-1.38, sqrt(3.845))
+
+inits <- list(depletion=c(0.99,0.98,0.96,0.94,0.92,0.90,0.88,0.86,0.84,0.82, 0.80,0.78,0.76,0.74,0.72,0.70,0.68,0.66,0.64,0.62,0.60,0.58,0.56, 0.56), growth_rate = 0.8, carrying_capacity = 200)
+
+nyears <- 23
+```
+
+## Index and Catch modules
+
+The "power user" approach builds up model components using the `methods::new()` function. This function creates an Rcpp module, afterwhich values and value attributes can be set directly. Users first set up the Data modules, followed by the Fleet module for both survey indeices and fishery landings. The data modules are then linked to their respective fleet modules.
+
+```{r setup-data-and-fleet}
+
+# Pull data from data_limited_tuna
+survey_index <- data_sp_tuna |> dplyr::filter(type == "index")
+landings <- data_sp_tuna |> dplyr::filter(type == "landings")
+
+
+# Create data index module and assign values to index_data
+survey_fleet_index <- methods::new(Index, nyears)
+purrr::walk(
+1:nyears,
+\(x) survey_fleet_index$index_data$set(x - 1, survey_index$value[x])
+)
+ 
+# create data landings module and assign values to landings_data
+fishing_fleet_landings <- methods::new(Landings, nyears)
+purrr::walk(
+1:nyears,
+\(x) fishing_fleet_landings$landings_data$set(x - 1, landings$value[x])
+)
+
+# Initialize the survey fleet module and link to data index module
+survey_fleet <- methods::new(Fleet)
+survey_fleet$n_years$set(nyears)
+survey_fleet$SetObservedIndexDataID(survey_fleet_index$get_id())
+
+# Initialize the fishing fleet module and link to data landing module
+fishing_fleet <- methods::new(Fleet)
+# Set number of years
+fishing_fleet$n_years$set(nyears)
+fishing_fleet$SetObservedLandingsDataID(fishing_fleet_landings$get_id())
+```
+
+## Distribution Modules
+
+Likelihood distributions are separate modules and linked to the respective index and landings modules. In this surplus production model, the q-marginalization method from [Best and Punt]() is used to improve model identifiability. Under this approach, the index data are not fit directly to expected index. Rather, a trandformation of index, the ratio: $Z = log(\frac{I}{PK})$ is used instead, where $I$ is Index, $P$ is depletion, and $K$ is the population carrying capactivy. Under this formulation, the sum of $Z$ is an approzimation of the mean of $log(q)$ and $Z \sim Normal(mean(log(q)), \sigma_{obs})$. 
+
+```{r distributions}
+
+# Set up distribution module for survey index and link to the survey 
+# fleet module and data index module
+survey_fleet_index_distribution <- new(DnormDistribution)
+survey_fleet_index_distribution$set_observed_data(
+    survey_fleet$GetObservedIndexDataID())
+
+# Fix sd to posterior median from Stan as FIMS currently does not have the 
+# ability to fit a prior inverse gamma prior distribution on sd
+survey_fleet_index_distribution$log_sd$resize(nyears)
+for (y in 1:nyears) {
+    survey_fleet_index_distribution$log_sd[y]$value <- 
+        1.151663e-02 |> sqrt() |> log() 
+}
+survey_fleet_index_distribution$log_sd$set_all_estimable(FALSE)
+
+# Link the dsitribution to observed ($Z$, a derived quantity in the model), and 
+# expected (mean of $log(q)$, a derived quantity in the model)
+# Using "random_effects" as a hack to implement a distribution on a derived parameter
+survey_fleet_index_distribution$set_distribution_links("random_effects", 
+    c(survey_fleet$log_index_to_depletion_carrying_capacity_ratio$get_id(), survey_fleet$mean_log_q$get_id()))
+```
+
+
+## Depletion
+
+Surplus Production models rely on a depletion module that caotures the depletion of the population over time. FIMS currently provides one option: the Pella-Tomlison model. This model includes a shape parameter that provides flexibility in the functional form. In this example, the shape parameter is fixed at 2, which reduces the Pella-Tominson down to a Shafer model. Again, the depletion module is first created using `methods::new()`, and then parameter values and their attributes are set.
+
+```{r depletion}
+# create depletion module
+production <- new(PTDepletion)
+
+# Set initial values and attributes
+production$growth_rate[1]$value <- inits$growth_rate
+production$growth_rate[1]$min <- 0
+production$growth_rate[1]$estimation_type$set("fixed_effects")
+production$carrying_capacity[1]$value <- inits$carrying_capacity
+production$carrying_capacity[1]$min <- 0
+production$carrying_capacity[1]$estimation_type$set("fixed_effects")
+
+# Fix to get Schaefer model (parameters are constant by default)
+production$log_shape[1]$value <- log(2)
+
+production$log_init_depletion[1]$value <- 0 # inital depletion ~ 1
+
+# Set-up the depletion random effect parameter 
+production$depletion$resize(nyears+1)
+for (i in 1:(nyears+1)) {
+    production$depletion[i]$value <- inits$depletion[i]
+    production$depletion[i]$min <- 0
+}
+production$depletion$set_all_random(TRUE)
+production$n_years$set(nyears)
+```
+
+## Depletion Distribution
+
+Next we need to set-up the distribution for the random effects model. In this example, depletion will follow a Lognormal distribution
+
+```{r depletion-distribution}
+production_distribution <- new(DlnormDistribution)
+
+# Fix sd to posterior median from Stan as FIMS currently does not have the 
+# ability to fit a prior inverse gamma prior distribution on sd
+production_distribution$log_sd[1]$value <- log(sqrt(3.1e-3))
+
+# depletion ~ LNormal(log_expected_depletion, sd)
+production_distribution$set_distribution_links(
+    "random_effects",
+    c(production$depletion$get_id(), production$log_expected_depletion$get_id())
+)
+```
+
+## Priors
+
+Priors can be added by initializing a new Distribution module and linking the observed and expected values to the parameter of interest and it's hypermean value. In this example, we put Lognormal priors on growth rate and carrying capacity. 
+
+```{r priors}
+growth_rate_Prior <- new(DlnormDistribution)
+growth_rate_Prior$expected_values[1]$value <- growth_rate_prior[1]
+growth_rate_Prior$log_sd[1]$value <- log(growth_rate_prior[2])
+growth_rate_Prior$set_distribution_links("prior", 
+    production$growth_rate$get_id())
+
+carrying_capacity_Prior <- new(DlnormDistribution)
+carrying_capacity_Prior$expected_values[1]$value <- carrying_capcity_prior[1]
+carrying_capacity_Prior$log_sd[1]$value <- log(carrying_capacity_prior[2])
+carrying_capacity_Prior$set_distribution_links("prior",         
+    production$carrying_capacity$get_id())
+```
+  
+## Population and Model
+
+The last two modules to set up are the population and the surplus production model. The depletion and fleet modules are linked to the population module and the population module is then linked to the surplus production mdoule.
+
+```{r population-and-surplus-production}
+
+# Set up new population
+population <- new(Population)
+population$n_years$set(nyears)
+population$n_ages$set(1) # only one age in surplus production
+population$ages$resize(1)
+population$ages$set(0, 0) # only one age in surplus production
+
+# Link modules to population
+population$SetDepletionID(production$get_id())
+population$AddFleet(fishing_fleet$get_id())
+population$AddFleet(survey_fleet$get_id())
+
+# Set up surplus production model and link the population module
+surplus_production <- methods::new(SurplusProduction)
+surplus_production$AddPopulation(population$get_id())
+```
+
+
+## TMB
+
+After the Rcpp modules are all intiialized and set-up, the user needs to call the `CreateTMBModel()` function. This function call loops over all the Rcpp modules and passes information into the respective C++ classes within the main FIMS code. After this step, functions are used to pull out parameter and random effects initial values to create the parameter list for TMB. Currently the FIMS TMB model does not require a data list because data are all passed into the model through the Rcpp data modules. The parameter list, therefore, is the only input input into `TMB::MakeADFun()`.
+
+
+```{r tmb}
+# Pass information into C++
+CreateTMBModel()
+
+# Create parameter list from Rcpp modules
+parameters <- list(
+    p = get_fixed(),
+    re = get_random()
+)
+
+# Create TMB object
+obj <- TMB::MakeADFun(
+    data = list(), parameters, DLL = "FIMS",
+    random = "re", 
+    silent = TRUE, map = list()
+)
+```
+
+## Optimization or MCMC
+
+After the TMB object is created, `obj` can be passed either to `nlminb()` or `tmbstan()`. This model set-up to be run as a Bayesian model so the demo will highlight how to pass this into `tmbstan()`. The `growth_rate` and `carrying_capacity` were set-up on the natural scale to avoid the need for Jacobian transformations, which are not available yet in FIMS. It is therefore neccessary to pass in a vector of parameter minimums (all set to 0) to prevent parameter sampling outside realistic ranges. The FIMS functions `get_parameter_min_vector()` and `get_random_effects_min_vector()` pull these values from the `min` parameter attribute. 
+  
+```{r fit-mcmc, eval = FALSE}
+
+opt <- stats::nlminb(obj[["par"]], obj[["fn"]], obj[["gr"]],
+    lower = c(FIMS:::get_parameter_min_vector(), 
+        FIMS:::get_random_effects_min_vector()), 
+    upper = c(FIMS:::get_parameter_max_vector(), 
+        FIMS:::get_random_effects_max_vector()), 
+    control = list(eval.max = 10000, iter.max = 10000)
+)
+
+fit <- tmbstan::tmbstan(obj, init =  "last.par.best", iter = 8000,
+    lower = c(FIMS:::get_parameter_min_vector(), 
+        FIMS:::get_random_effects_min_vector()), 
+    upper = c(FIMS:::get_parameter_max_vector(), 
+        FIMS:::get_random_effects_max_vector()), 
+    control = list(adapt_delta = 0.99))
+```

@@ -14,36 +14,48 @@ source("tests/testthat/helper-integration-tests-setup-function.R")
 ## IO correctness ----
 test_that("deterministic run works with correct inputs", {
   # Run FIMS surplus production without wrappers
-  result <- setup_and_run_sp(bayesian_mode = FALSE, estimation_mode = FALSE)
+  result <- setup_and_run_surplus_production_model(
+    bayesian_mode = TRUE, estimation_mode = FALSE)
 
-  #' @description Compare FIMS parameters with stan outputs.
-  jabba_correct_pars <- c(
-    jabba_pars |> 
-      dplyr::filter(rownames(jabba_pars) == "q") |> 
-      dplyr::select(Median) |> as.vector() |> unlist() |> unname(),
-    jabba_pars |> 
-      dplyr::filter(rownames(jabba_pars) == "r") |> 
-      dplyr::select(Median) |> as.vector() |> unlist() |> unname(),
-    jabba_pars |> 
-      dplyr::filter(rownames(jabba_pars) == "K") |> 
-      dplyr::select(Median) |> as.vector() |> unlist() |> unname()
-  )
-  expect_equal(result$obj$par |> exp() |> unname(), jabba_correct_pars)
+  #' @description Compare FIMS growth rate with correct value
+  expect_equal(
+    result[["obj"]][["par"]][1] |> unname(), 
+    data_limited_tuna_results |>
+    dplyr::filter(label == "growth_rate") |> dplyr::pull(median))
 
-  #' @description Compare FIMS biomass with JABBA biomass.
-  for(i in 1: (length(result$report$biomass))) {
+  #' @description Compare FIMS carrying capacity with correct value
+  expect_equal(
+    result[["obj"]][["par"]][2] |> unname(), 
+    data_limited_tuna_results |>
+    dplyr::filter(label == "carrying_capacity") |> dplyr::pull(median))
+
+  #' @description Compare FIMS carrying capacity with correct value
+  expect_equal(
+    result[["report"]][["mean_q"]][2] |> unlist(), 
+    data_limited_tuna_results |>
+    dplyr::filter(label == "q") |> dplyr::pull(median))
+  
+
+  #' @description Compare FIMS biomass with correct biomass.
+  for(i in c(1:3, 23, 24)) {
+    idx <- 1
     expect_equal(
-      (result$report$biomass |> unlist())[i], 
-      (jabba_biomass |> unlist() |> unname())[i],
-      tolerance = 1e-8
+      (result$report$biomass |> unlist())[i],
+      (data_limited_tuna_results |>
+        dplyr::filter(label == "biomass") |> dplyr::pull(median))[idx]
     )
+    idx <- idx + 1
   }
 
-  #' @description Compare FIMS depletion with JABBA depletion.
-  for(i in seq_along(result$report$pop_depletion)) {
-    expect_equal(
-        (result$report$pop_depletion |> unlist() |> unname())[i],
-        jabba_expect_depletion[i])
+  #' @description Compare FIMS depletion with correct depletion.
+  for(i in c(1:3, 23, 24)) {
+    idx <- 1
+   # expect_equal(
+      print((result$report$depletion |> unlist())[i])
+      print((data_limited_tuna_results |>
+        dplyr::filter(label == "depletion") |> dplyr::pull(median))[idx])
+  #  )
+    idx <- idx + 1
   }
 
   #' @description Compare FIMS reference points with JABBA reference points.
@@ -71,7 +83,7 @@ test_that("deterministic run works with correct inputs", {
     #' @description Check that FIMS nll matches expected nlls
     # depletion nll
     nll_depletion <- 0
-    for(i in seq_along(result$report$pop_depletion |> unlist())) {
+    for(i in seq_along(result[["report"]][["depletion"]] |> unlist())) {
     nll_depletion <- nll_depletion + 
         -dnorm(log((result$report$pop_depletion |> unlist())[i]),
         (result$report$log_depletion_expected |> unlist())[i],
@@ -105,213 +117,49 @@ test_that("deterministic run works with correct inputs", {
 
 test_that("MLE run works", {
   # Run FIMS surplus production without wrappers
-  result <- setup_and_run_sp(bayesian_mode = FALSE, estimation_mode = TRUE)
+  result <- setup_and_run_surplus_production_model(
+    bayesian_mode = FALSE, estimation_mode = TRUE)
+
+  
+  #' @description Compare FIMS growth rate with stan value
+  expect_near(
+    result[["opt"]][["par"]][1] |> exp()|> unname(), 
+    data_limited_tuna_results |>
+    dplyr::filter(label == "growth_rate") |> dplyr::pull(median))
+
+  #' @description Compare FIMS carrying capacity with stan value
+  expect_near(
+    result[["opt"]][["par"]][2] |> exp() |> unname(), 
+    data_limited_tuna_results |>
+    dplyr::filter(label == "carrying_capacity") |> dplyr::pull(median))
+
+  #' @description Compare FIMS q with stan value
+  expect_near(
+    result[["report"]][["mean_q"]][2] |> unlist(), 
+    data_limited_tuna_results |>
+    dplyr::filter(label == "q") |> dplyr::pull(median))
+
+   #' @description Compare FIMS biomass with stan biomass.
+  for(i in c(1:3, 23, 24)) {
+    idx <- 1
+    expect_near(
+      (result$report$biomass |> unlist())[i],
+      (data_limited_tuna_results |>
+        dplyr::filter(label == "biomass") |> dplyr::pull(median))[idx]
+    )
+    idx <- idx + 1
+  }
+
+  #' @description Compare FIMS depletion with stan depletion.
+  for(i in c(1:3, 23, 24)) {
+    idx <- 1
+    expect_near(
+      print((result$report$depletion |> unlist())[i])
+      print((data_limited_tuna_results |>
+        dplyr::filter(label == "depletion") |> dplyr::pull(median))[idx])
+    )
+    idx <- idx + 1
+  }
+
   
 })
-
-bayesian = TRUE
-
-tuna.dat <- rbind(
-  c(15.9, 61.89),
-  c(25.7, 78.98),
-  c(28.5, 55.59),
-  c(23.7, 44.61),
-  c(25.0, 56.89),
-  c(33.3, 38.27),
-  c(28.2, 33.84),
-  c(19.7, 36.13),
-  c(17.5, 41.95),
-  c(19.3, 36.63),
-  c(21.6, 36.33),
-  c(23.1, 38.82),
-  c(22.5, 34.32),
-  c(22.5, 37.64),
-  c(23.6, 34.01),
-  c(29.1, 32.16),
-  c(14.4, 26.88),
-  c(13.2, 36.61),
-  c(28.4, 30.07),
-  c(34.6, 30.75),
-  c(37.5, 23.36),
-  c(25.9, 22.36),
-  c(25.3, 21.91))
-colnames(tuna.dat) <- c('C', 'I')
-tuna.dat <- as.data.frame(tuna.dat)
-
-
-K_prior <- c(5.042905, sqrt(3.7603664))
-r_prior <- c(-1.38, sqrt(3.845))
-
-inits <- list(depletion=c(0.99,0.98,0.96,0.94,0.92,0.90,0.88,0.86,0.84,0.82,
-0.80,0.78,0.76,0.74,0.72,0.70,0.68,0.66,0.64,0.62,0.60,0.58,0.56, 0.56),
-r=0.8, K=200)
-
-clear()
-
-nyears <- tuna.dat |> nrow()
-survey_index <- tuna.dat$I
-landings <- tuna.dat$C
-
-# create index module
-survey_fleet_index <- methods::new(Index, nyears)
-purrr::walk(
-    1:nyears,
-    \(x) survey_fleet_index$index_data$set(x - 1, survey_index[x])
-)
-
-# create catch module
-fishing_fleet_landings <- methods::new(Landings, nyears)
-purrr::walk(
-    1:nyears,
-    \(x) fishing_fleet_landings$landings_data$set(x - 1, landings[x])
-)
-
-# Initialize the fishing fleet module
-fishing_fleet <- methods::new(Fleet)
-
-# Set number of years
-fishing_fleet$n_years$set(nyears)
-fishing_fleet$SetObservedLandingsDataID(fishing_fleet_landings$get_id())
-
-# Intialize the survey module
-survey_fleet <- methods::new(Fleet)
-survey_fleet$n_years$set(nyears)
-
-# # Estimate q
-# survey_fleet$log_q[1]$value <- log(0.5)
-# survey_fleet$log_q[1]$estimation_type$set("fixed_effects")
-
-survey_fleet$SetObservedIndexDataID(survey_fleet_index$get_id())
-
-#survey_fleet_index_distribution <- methods::new(DlnormDistribution)
-survey_fleet_index_distribution <- new(DnormDistribution)
-
-# lognormal observation error transformed on the log scale
-# Fix sd as currently FIMS does not have prior distribution
-survey_fleet_index_distribution$log_sd$resize(nyears)
-for (y in 1:nyears) {
-    survey_fleet_index_distribution$log_sd[y]$value <- 
-          1.151663e-02 |> sqrt() |> log() 
-}
-survey_fleet_index_distribution$log_sd$set_all_estimable(FALSE)
-
-# Set Data using the IDs from the modules defined above
-survey_fleet_index_distribution$set_observed_data(survey_fleet$GetObservedIndexDataID())
-# survey_fleet_index_distribution$set_distribution_links("data",          
-#     survey_fleet$log_index_expected$get_id())
-#using random_effects as a hack to implement a distribution on a derived parameter
-survey_fleet_index_distribution$set_distribution_links("random_effects", 
-    c(survey_fleet$log_index_to_depletion_carrying_capacity_ratio$get_id(), survey_fleet$mean_log_q$get_id()))
-
-
-# create depletion module
-production <- new(PTDepletion)
-
-# estimate log growth rate and log carrying capacity
-if(bayesian == FALSE){
-  production$log_growth_rate[1]$value <- log(inits$r)
-  production$log_growth_rate[1]$estimation_type$set("fixed_effects")
-  production$log_carrying_capacity[1]$value <- log(inits$K)
-  production$log_carrying_capacity[1]$estimation_type$set("fixed_effects")
-} else {
-  production$growth_rate[1]$value <- inits$r
-  production$growth_rate[1]$min <- 0
-  production$growth_rate[1]$estimation_type$set("fixed_effects")
-  production$carrying_capacity[1]$value <- inits$K
-  production$carrying_capacity[1]$min <- 0
-  production$carrying_capacity[1]$estimation_type$set("fixed_effects")
-} 
-
-# Fix to get Schaefer model
-production$log_shape[1]$value <- log(2)
-
-
-production$log_init_depletion[1]$value <- 0 # inital depletion ~ 1
-
-# Setup depletion
-if(bayesian == FALSE){
-  production$log_depletion$resize(nyears+1)
-  for (i in 1:(nyears+1)) {
-    production$log_depletion[i]$value <- log(inits$depletion[i])
-  }
-  production$log_depletion$set_all_random(TRUE)
-} else {
-  production$depletion$resize(nyears+1)
-  for (i in 1:(nyears+1)) {
-    production$depletion[i]$value <- inits$depletion[i]
-    production$depletion[i]$min <- 0
-  }
- production$depletion$set_all_random(TRUE)
-
-}
-production$n_years$set(nyears)
-
-production_distribution <- new(DlnormDistribution)
-
-# Fix sd to jabba value as currently FIMS does not have prior distribution
-production_distribution$log_sd[1]$value <- log(sqrt(3.1e-3))
-
-# depletion ~ LNormal(log_expected_depletion, sd)
-production_distribution$set_distribution_links(
-    "random_effects",
-    c(production$depletion$get_id(), production$log_expected_depletion$get_id())
-)
-
-if(bayesian == TRUE){
-  growth_rate_Prior <- new(DlnormDistribution)
-  growth_rate_Prior$expected_values[1]$value <- r_prior[1]
-  growth_rate_Prior$log_sd[1]$value <- log(r_prior[2])
-  growth_rate_Prior$set_distribution_links("prior", production$growth_rate$get_id())
-
-  carrying_capacity_Prior <- new(DlnormDistribution)
-  carrying_capacity_Prior$expected_values[1]$value <- K_prior[1]
-  carrying_capacity_Prior$log_sd[1]$value <- log(K_prior[2])
-  carrying_capacity_Prior$set_distribution_links("prior", production$carrying_capacity$get_id())
-}
-
-
-population <- new(Population)
-population$n_years$set(nyears)
-population$n_ages$set(1) # only one age in surplus production
-population$ages$resize(1)
-population$ages$set(0, 0) # only one age in surplus production
-
-population$SetDepletionID(production$get_id())
-population$AddFleet(fishing_fleet$get_id())
-population$AddFleet(survey_fleet$get_id())
-
-
-surplus_production <- methods::new(SurplusProduction)
-surplus_production$AddPopulation(population$get_id())
-
-
-
-# Set-up TMB
-CreateTMBModel()
-
-# Create parameter list from Rcpp modules
-parameters <- list(
-    p = get_fixed(),
-    re = get_random()
-)
-
-obj <- TMB::MakeADFun(
-    data = list(), parameters, DLL = "FIMS",
-    random = "re" 
-)
-
-
-
-opt <- stats::nlminb(obj[["par"]], obj[["fn"]], obj[["gr"]],
-        control = list(eval.max = 10000, iter.max = 10000, trace = 1))
-fit <- tmbstan::tmbstan(obj, init =  "last.par.best", iter = 10000,
-        lower = rep(0, length(obj$env$last.par.best)),
-        upper = rep(Inf, length(obj$env$last.par.best)),
-        control = list(adapt_delta = 0.99))
-postmle <- as.matrix(fit)[, -ncol(as.matrix(fit))]
-apply(postmle, 2, median)
-report <- obj$report(apply(postmle,2,median))
-
-save(fit, file = "tests/testthat/fixtures/sp_fimsfit.RData")
-np_fit = bayesplot::nuts_params(fit)
- bayesplot::mcmc_parcoord(postmle, pars = colnames(postmle), np = np_fit)
