@@ -588,18 +588,21 @@ setup_and_run_surplus_production_model <-
 
   inits <- list(depletion=c(0.99,0.98,0.96,0.94,0.92,0.90,0.88,0.86,0.84,0.82,
   0.80,0.78,0.76,0.74,0.72,0.70,0.68,0.66,0.64,0.62,0.60,0.58,0.56, 0.56),
-  r=0.8, K=200)
+  growth_rate = 0.8, carrying_capacity = 200)
 
-  inits_true <- list(depletion = c(0.99,0.98,0.96,0.94,0.92,0.90,0.88,0.86,0.84,0.82,
-  0.80,0.78,0.76,0.74,0.72,0.70,0.68,0.66,0.64,0.62,0.60,0.58,0.56, 0.56),
-  r=0.3121, K = 255.6)
+  inits_true <- list(depletion = data_limited_tuna_results |>
+    dplyr::filter(label == "depletion") |> dplyr::pull(median),
+  growth_rate = data_limited_tuna_results |>
+    dplyr::filter(label == "growth_rate") |> dplyr::pull(median),
+  carrying_capacity = data_limited_tuna_results |>
+    dplyr::filter(label == "carrying_capacity") |> dplyr::pull(median))
 
   clear()
 
   nyears <- 23
 
-  survey_index <- data_sp_tuna |> dplyr::filter(type == "index")
-  landings <- data_sp_tuna |> dplyr::filter(type == "landings")
+  survey_index <- data_limited_tuna |> dplyr::filter(type == "index")
+  landings <- data_limited_tuna |> dplyr::filter(type == "landings")
 
   # create index module
   survey_fleet_index <- methods::new(Index, nyears)
@@ -648,29 +651,29 @@ setup_and_run_surplus_production_model <-
 
     # estimate growth rate and carrying capacity
     if(bayesian_mode == FALSE){
-      production$log_growth_rate[1]$value <- log(inits$r)
+      production$log_growth_rate[1]$value <- log(inits$growth_rate)
       production$log_growth_rate[1]$estimation_type$set("fixed_effects")
-      production$log_carrying_capacity[1]$value <- log(inits$K)
+      production$log_carrying_capacity[1]$value <- log(inits$carrying_capacity)
       production$log_carrying_capacity[1]$estimation_type$set("fixed_effects")
     } else {
-      production$growth_rate[1]$value <- inits$r
+      production$growth_rate[1]$value <- inits$growth_rate
       production$growth_rate[1]$min <- 0
       production$growth_rate[1]$estimation_type$set("fixed_effects")
-      production$carrying_capacity[1]$value <- inits$K
+      production$carrying_capacity[1]$value <- inits$carrying_capacity
       production$carrying_capacity[1]$min <- 0
       production$carrying_capacity[1]$estimation_type$set("fixed_effects")
     } 
   } else {
     if(bayesian_mode == FALSE){
-      production$log_growth_rate[1]$value <- log(inits_true$r)
+      production$log_growth_rate[1]$value <- log(inits_true$growth_rate)
       production$log_growth_rate[1]$estimation_type$set("fixed_effects")
-      production$log_carrying_capacity[1]$value <- log(inits_true$K)
+      production$log_carrying_capacity[1]$value <- log(inits_true$carrying_capacity)
       production$log_carrying_capacity[1]$estimation_type$set("fixed_effects")
     } else {
-      production$growth_rate[1]$value <- inits_true$r
+      production$growth_rate[1]$value <- inits_true$growth_rate
       production$growth_rate[1]$min <- 0
       production$growth_rate[1]$estimation_type$set("fixed_effects")
-      production$carrying_capacity[1]$value <- inits_true$K
+      production$carrying_capacity[1]$value <- inits_true$carrying_capacity
       production$carrying_capacity[1]$min <- 0
       production$carrying_capacity[1]$estimation_type$set("fixed_effects")
     } 
@@ -683,7 +686,7 @@ setup_and_run_surplus_production_model <-
   if(estimation_mode == TRUE){
     production$log_init_depletion[1]$value <- 0 # inital depletion ~ 1
   } else {
-    production$log_init_depletion[1]$value <- log(1.019)
+    production$log_init_depletion[1]$value <- log(inits_true$depletion[1]) 
   }
 
   # Setup depletion

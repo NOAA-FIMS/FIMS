@@ -141,15 +141,21 @@ data_limited_tuna <- data.frame(
 usethis::use_data(data_limited_tuna, overwrite = TRUE)
 
 
-# Setup results table from Meyer and Millar (1999) Appendix
+# Setup results table from Best and Punt model run
 data_limited_tuna_results <- data.frame(
   label = c("growth_rate", "carrying_capacity", "q", "sigma2_depletion", 
-  "sigma2_obs", "depletion", "depletion", "depletion", "depletion", 
-  "depletion", "fmsy", "msy", "bmsy", "biomass_pred"),
-  mean = c(0.3287, 261.9, 0.2622, 0.003204, 0.0124, 1.019, 0.9945, 0.08735,
-  0.3253, NA, NA, NA, NA, NA),
-  median = c(0.3121, 255.6, 0.02471, 0.002689, 0.0116, 1.016, 0.9847, 0.8693,
-  0.3234, NA, NA, NA, NA, NA)
+  "sigma2_obs", rep("depletion", 24), "fmsy", "msy", "bmsy",
+  rep("biomass", 24), "nll_r", "nll_k", "nll_depletion", "nll_index", "jnll"),
+  median = c(0.2932445, 265.8702, 0.2371935, 0.002659187, 0.01081314, 
+  1.0171288, 0.9923817, 0.8784735, 0.7852791, 0.7518086, 0.6811942, 0.6102330, 
+  0.5840103, 0.5948108, 0.5947888, 0.5921779, 0.5860626, 0.5669873, 0.5580362, 
+  0.5386972, 0.5162792, 0.4750961, 0.5037366, 0.5162997, 0.4818774, 0.4221447, 
+  0.3592319, 0.3343711, 0.3043088, 0.1466222, 19.49124, 132.9351,
+  270.42424, 263.84471, 233.55991, 208.78232, 199.88350, 181.10924, 162.24276, 
+  155.27094, 158.14247, 158.13660, 157.44245, 155.81659, 150.74503, 148.36519, 
+  143.22353, 137.26324, 126.31388, 133.92856, 137.26869, 128.11683, 112.23570,  
+  95.50906,  88.89931,  80.90665, -0.9360452, 6.38816, 23.59655, -21.23632, 
+  -1.277472)
 )
 
 usethis::use_data(data_limited_tuna_results, overwrite = TRUE)
