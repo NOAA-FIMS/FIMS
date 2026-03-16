@@ -46,8 +46,6 @@ Below is a real-world example of a log entry that was created while running a FI
 ![Example of a log entry.](figures/selectivity_logging_entry.png)
 
 
-Additionally, if FIMS has been compiled with the `-DFIMS_DEBUG` pre-processing macro, output from the `FIMS_DEBUG_LOG` macro will also be available in the log file, allowing developers a more interactive developing experience. The output from this macro is turned off in the main branch, and thus, the macro is not available to the typical user to stop debugging statements from polluting the log file.
-
 ## Using the Logging System in R
 
 The FIMS Logging System is also available from R, with a caveat! Logging from R gives less information than logging from C++. When a log entry originates from R, file, routine, and line information are absent. Further implementations may rectify this issue. Below are examples of adding log entries from R.
