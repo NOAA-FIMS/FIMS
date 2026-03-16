@@ -8,3 +8,5 @@ updates:
     schedule:
       interval: "weekly"
     target-branch: "dev"
+    assignees:
+      - "kellijohnson-NOAA"
