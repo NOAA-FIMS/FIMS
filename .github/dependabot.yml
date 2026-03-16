@@ -9,4 +9,4 @@ updates:
       interval: "weekly"
     target-branch: "dev"
     assignees:
-      - "@NOAA-FIMS/project-lead"
+      - "kellijohnson-NOAA"
