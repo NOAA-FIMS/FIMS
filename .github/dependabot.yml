@@ -8,5 +8,3 @@ updates:
     schedule:
       interval: "weekly"
     target-branch: "dev"
-    assignees:
-      - "@NOAA-FIMS/project-lead"
