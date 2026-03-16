@@ -458,7 +458,7 @@ methods::setMethod(
       dplyr::mutate(
         value = ifelse(.data[["value"]] == -999, NA, .data[["value"]])
       ) |>
-      dplyr::summarise(
+      dplyr::summarize(
         value = mean(.data[["value"]], na.rm = TRUE)
       ) |>
       dplyr::mutate(
