@@ -395,6 +395,16 @@ methods::setMethod(
   "m_lengthcomp",
   "FIMSFrame",
   function(x, fleet_name) {
+    conversion_data <- dplyr::filter(
+      .data = x@data,
+      .data[["type"]] == "age_to_length_conversion"
+    )
+    if (NROW(conversion_data) == 0) {
+      cli::cli_abort(c(
+        "There are no {.var age_to_length_conversion} data present, therefore
+        you cannot fit to {.var length_comp} data."
+      ))
+    }
     dplyr::filter(
       .data = x@data,
       .data[["type"]] == "length_comp",
@@ -503,6 +513,9 @@ methods::setMethod(
   "FIMSFrame",
   function(x, fleet_name) {
     if ("length" %in% colnames(x@data)) {
+      if (!"age" %in% colnames(x@data)) {
+        cli::cli_abort("The age column is not present in your data.")
+      }
       dplyr::filter(
         .data = as.data.frame(x@data),
         .data[["type"]] == "age_to_length_conversion",
@@ -513,6 +526,10 @@ methods::setMethod(
           mean_value = mean(as.numeric(.data[["value"]]), na.rm = TRUE)
         ) |>
         dplyr::pull(as.numeric(.data[["mean_value"]]))
+    } else {
+    cli::cli_abort(
+      "The length column is not present in your data."
+    )
     }
   }
 )
