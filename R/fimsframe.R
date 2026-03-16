@@ -447,23 +447,23 @@ methods::setMethod(
     fleet_names <- unique(model_data[["name"]])
     if (length(fleet_names) > 1) {
       cli::cli_warn(c(
-       "x" = "Multiple fleets found in weight_at_age data.",
-       "i" = "{.fn model_weight_at_age} will average values across fleets."
+        "x" = "Multiple fleets found in weight_at_age data.",
+        "i" = "{.fn model_weight_at_age} will average values across fleets."
       ))
       model_data <- dplyr::group_by(
         .data = model_data,
         .data[["timing"]],
         .data[["age"]]
       ) |>
-      dplyr::mutate(
-        value = ifelse(.data[["value"]] == -999, NA, .data[["value"]])
-      ) |>
-      dplyr::summarize(
-        value = mean(.data[["value"]], na.rm = TRUE)
-      ) |>
-      dplyr::mutate(
-        value = ifelse(is.nan(.data[["value"]]), -999, .data[["value"]])
-      )
+        dplyr::mutate(
+          value = ifelse(.data[["value"]] == -999, NA, .data[["value"]])
+        ) |>
+        dplyr::summarize(
+          value = mean(.data[["value"]], na.rm = TRUE)
+        ) |>
+        dplyr::mutate(
+          value = ifelse(is.nan(.data[["value"]]), -999, .data[["value"]])
+        )
     }
     # Create time-series vector if only available by age
     n_rows <- NROW(dplyr::filter(model_data, value != -999))
@@ -528,9 +528,9 @@ methods::setMethod(
         ) |>
         dplyr::pull(as.numeric(.data[["mean_value"]]))
     } else {
-    cli::cli_abort(
-      "The length column is not present in your data."
-    )
+      cli::cli_abort(
+        "The length column is not present in your data."
+      )
     }
   }
 )
@@ -539,10 +539,12 @@ methods::setMethod(
 methods::setMethod(
   "model_age_to_length_conversion",
   "data.frame",
-  function(x, fleet_name) model_age_to_length_conversion(
-    FIMSFrame(x),
-    fleet_name
-  )
+  function(x, fleet_name) {
+    model_age_to_length_conversion(
+      FIMSFrame(x),
+      fleet_name
+    )
+  }
 )
 
 # methods::setMethod: initialize ----
@@ -576,9 +578,9 @@ methods::setMethod(
 #' @rdname plot
 #' @aliases plot,FIMSFrame,missing-method
 #' @exportMethod plot
-setGeneric("plot", function(x, y, ...)
+setGeneric("plot", function(x, y, ...) {
   standardGeneric("plot")
-)
+})
 methods::setMethod(
   f = "plot",
   signature = c(x = "FIMSFrame", y = "missing"),
@@ -733,7 +735,8 @@ validate_composition_data <- function(data) {
   groupings <- names(data)[
     sapply(
       data,
-      function(x) dplyr::n_distinct(x, na.rm = FALSE) == 1 & !all(is.na(x)))
+      function(x) dplyr::n_distinct(x, na.rm = FALSE) == 1 & !all(is.na(x))
+    )
   ]
   grouping_message <- glue::glue("{groupings} = {data[1, groupings]}")
   names(grouping_message) <- rep("*", length(grouping_message))
