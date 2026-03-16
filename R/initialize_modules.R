@@ -80,7 +80,7 @@ initialize_module <- function(parameters, data, module_name, fleet_name = NA_cha
       dplyr::pull(module_type)
     if ("age_to_length_conversion" %in% fleet_types &&
       "LengthComp" %in% data_distribution_names_for_fleet_i) {
-      age_to_length_conversion_value <- m_age_to_length_conversion(data, fleet_name)
+      age_to_length_conversion_value <- model_age_to_length_conversion(data, fleet_name)
       module[["age_to_length_conversion"]]$resize(length(age_to_length_conversion_value))
       # Assign each value to the corresponding position in the parameter vector
       purrr::walk(
@@ -150,7 +150,7 @@ initialize_module <- function(parameters, data, module_name, fleet_name = NA_cha
     } else if (field %in% c("ages", "weights")) {
       get_value_function <- switch(field,
         "ages" = get_ages,
-        "weights" = m_weight_at_age
+        "weights" = model_weight_at_age
       )
       module_length <- switch(field,
         "ages" = get_n_ages(data),
@@ -490,8 +490,8 @@ initialize_landings <- function(data, fleet_name) {
   if ("landings" %in% fleet_type) {
     module <- methods::new(Landings, get_n_years(data))
     purrr::walk(
-      seq_along(m_landings(data, fleet_name)),
-      \(x) module$landings_data$set(x - 1, m_landings(data, fleet_name)[x])
+      seq_along(model_landings(data, fleet_name)),
+      \(x) module$landings_data$set(x - 1, model_landings(data, fleet_name)[x])
     )
     return(module)
   } else {
@@ -526,8 +526,8 @@ initialize_index <- function(data, fleet_name) {
   if ("index" %in% fleet_type) {
     module <- methods::new(Index, get_n_years(data))
     purrr::walk(
-      seq_along(m_index(data, fleet_name)),
-      \(x) module$index_data$set(x - 1, m_index(data, fleet_name)[x])
+      seq_along(model_index(data, fleet_name)),
+      \(x) module$index_data$set(x - 1, model_index(data, fleet_name)[x])
     )
     return(module)
   } else {
@@ -562,14 +562,14 @@ initialize_comp <- function(data,
       "comp_data_field" = "age_comp_data",
       "get_n_function" = get_n_ages,
       "comp_object" = AgeComp,
-      "m_comp" = m_agecomp
+      "m_comp" = model_age_comp
     ),
     "LengthComp" = list(
       "name" = "length_comp",
       "comp_data_field" = "length_comp_data",
       "get_n_function" = get_n_lengths,
       "comp_object" = LengthComp,
-      "m_comp" = m_lengthcomp
+      "m_comp" = model_length_comp
     )
   )
 
