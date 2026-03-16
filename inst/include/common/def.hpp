@@ -481,32 +481,6 @@ class FIMSLog {
   }
 
   /**
-   * Query the log by module.
-   *
-   * @param module
-   * @return
-   */
-  std::string get_module(const std::string& module) {
-    std::stringstream ss;
-    std::vector<LogEntry> info;
-    for (size_t i = 0; i < log_entries.size(); i++) {
-      if (log_entries[i].file.find(module) != std::string::npos) {
-        info.push_back(this->log_entries[i]);
-      }
-    }
-
-    if (info.size() == 0) {
-      ss << "[\n]";
-    } else {
-      ss << "[\n";
-      for (size_t i = 0; i < info.size() - 1; i++) {
-        ss << "{\n" << info[i].to_string() << "},\n";
-      }
-
-      ss << "{\n" << info[info.size() - 1].to_string() << "}\n]";
-    }
-    return ss.str();
-  }
 
   /**
    * @brief Get the counts of the number of errors
