@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2026-03-11" />
+<meta name="date" content="2026-03-16" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -148,8 +148,8 @@
 <h2>Summary<a href="test-rcpp-recruitment-interface.html#summary-35" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <ul>
 <li><p><strong>Number of test(s)</strong> : 2</p></li>
-<li><p><strong>Number of expectation(s)</strong> : 9</p></li>
-<li><p><strong>Number of successful expectation(s)</strong> : 9</p></li>
+<li><p><strong>Number of expectation(s)</strong> : 7</p></li>
+<li><p><strong>Number of successful expectation(s)</strong> : 7</p></li>
 <li><p><strong>Number of failed expectation(s)</strong> : 0</p></li>
 <li><p><strong>Number of errored expectation(s)</strong> : 0</p></li>
 <li><p><strong>Number of expectations with warning(s)</strong> : 0</p></li>
@@ -159,13 +159,13 @@
 </div>
 <div id="details-35" class="section level2 unnumbered hasAnchor">
 <h2>Details<a href="test-rcpp-recruitment-interface.html#details-35" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<table>
+<table style="width:100%;">
 <colgroup>
 <col width="13%" />
 <col width="14%" />
 <col width="37%" />
 <col width="20%" />
-<col width="8%" />
+<col width="7%" />
 <col width="5%" />
 </colgroup>
 <thead>
@@ -184,72 +184,56 @@
 <td align="left">Test that the recruitment id is 1.</td>
 <td align="left">expect_equal( object = recruitment$get_id(), expected = 1 )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
-<td align="left">test-rcpp-recruitment-interface.R#31</td>
-<td align="left">2026-03-11 18:05:09.943425</td>
+<td align="left">test-rcpp-recruitment-interface.R#29</td>
+<td align="left">2026-03-16 18:13:54.514394</td>
 </tr>
 <tr class="even">
 <td align="left">rcpp recruitment interface works with correct inputs</td>
 <td align="left">Test that the logit_steep value is 0.78845736.</td>
 <td align="left">expect_equal( object = recruitment$logit_steep[1]$value, expected = 0.78845736 )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
-<td align="left">test-rcpp-recruitment-interface.R#36</td>
-<td align="left">2026-03-11 18:05:09.955285</td>
-</tr>
-<tr class="odd">
-<td align="left">rcpp recruitment interface works with correct inputs</td>
-<td align="left">Test that the logit_steep min is 0.21.</td>
-<td align="left">expect_equal( object = recruitment$logit_steep[1]$min, expected = 0.21 )</td>
-<td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
-<td align="left">test-rcpp-recruitment-interface.R#41</td>
-<td align="left">2026-03-11 18:05:09.966246</td>
-</tr>
-<tr class="even">
-<td align="left">rcpp recruitment interface works with correct inputs</td>
-<td align="left">Test that the logit_steep max is 1.0.</td>
-<td align="left">expect_equal( object = recruitment$logit_steep[1]$max, expected = 1.0 )</td>
-<td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
-<td align="left">test-rcpp-recruitment-interface.R#46</td>
-<td align="left">2026-03-11 18:05:09.976636</td>
+<td align="left">test-rcpp-recruitment-interface.R#34</td>
+<td align="left">2026-03-16 18:13:54.52398</td>
 </tr>
 <tr class="odd">
 <td align="left">rcpp recruitment interface works with correct inputs</td>
 <td align="left">Test that the logit_steep is a random effect.</td>
 <td align="left">expect_equal( object = recruitment$logit_steep[1]$estimation_type$get(), “random_effects” )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
-<td align="left">test-rcpp-recruitment-interface.R#51</td>
-<td align="left">2026-03-11 18:05:09.987319</td>
+<td align="left">test-rcpp-recruitment-interface.R#39</td>
+<td align="left">2026-03-16 18:13:54.532938</td>
 </tr>
 <tr class="even">
 <td align="left">rcpp recruitment interface works with correct inputs</td>
 <td align="left">Test that the log_rzero value is log(1000000.0).</td>
 <td align="left">expect_equal( object = recruitment$log_rzero[1]$value, expected = log(1000000.0) )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
-<td align="left">test-rcpp-recruitment-interface.R#55</td>
-<td align="left">2026-03-11 18:05:09.997837</td>
+<td align="left">test-rcpp-recruitment-interface.R#43</td>
+<td align="left">2026-03-16 18:13:54.541663</td>
 </tr>
 <tr class="odd">
 <td align="left">rcpp recruitment interface works with correct inputs</td>
 <td align="left">Test that recruitment$evaluate(spawns, ssb0) returns 1090802.68.</td>
 <td align="left">expect_equal( object = recruitment$evaluate_mean(spawns, ssb0), expected = 1090802.68 )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
-<td align="left">test-rcpp-recruitment-interface.R#60</td>
-<td align="left">2026-03-11 18:05:10.008435</td>
+<td align="left">test-rcpp-recruitment-interface.R#48</td>
+<td align="left">2026-03-16 18:13:54.5685</td>
 </tr>
 <tr class="even">
 <td align="left">rcpp recruitment interface works with correct inputs</td>
 <td align="left">Test that the log_devs are set correctly.</td>
 <td align="left">expect_equal( object = recruitment$log_devs[i]$value, expected = log_devs[i] )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
-<td align="left">test-rcpp-recruitment-interface.R#72</td>
-<td align="left">2026-03-11 18:05:10.022041</td>
+<td align="left">test-rcpp-recruitment-interface.R#60</td>
+<td align="left">2026-03-16 18:13:54.580365</td>
 </tr>
 <tr class="odd">
 <td align="left">test rcpp recruitment interface returns correct error messages</td>
 <td align="left">Test that recruitment errors if logit_steep==1.</td>
 <td align="left">expect_warning( object = recruitment$evaluate_mean(spawns, ssb0), regexp = “Steepness is subject to a logit transformation. Fixing it at 1.0 is not currently possible.” )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
-<td align="left">test-rcpp-recruitment-interface.R#102</td>
-<td align="left">2026-03-11 18:05:10.048408</td>
+<td align="left">test-rcpp-recruitment-interface.R#88</td>
+<td align="left">2026-03-16 18:13:54.602203</td>
 </tr>
 </tbody>
 </table>

@@ -255,10 +255,6 @@ Public Member Functions</h2></td></tr>
 <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><b>Prepare</b> ()</td></tr>
 <tr class="memdesc:a889b7e1e0b2aa9f4a3114d3d6f8ad577"><td class="mdescLeft">&#160;</td><td class="mdescRight">Prepare to run the fleet module. Called at each model iteration, and used to exponentiate the natural log of q and Fmort parameters prior to evaluation. <br /></td></tr>
 <tr class="separator:a889b7e1e0b2aa9f4a3114d3d6f8ad577"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa5124358776594999ae07f5a21c8a7e8" id="r_aa5124358776594999ae07f5a21c8a7e8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">virtual</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1Fleet.html#aa5124358776594999ae07f5a21c8a7e8">create_report_vectors</a> (std::map&lt; std::string, <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt; &gt; &amp;report_vectors)</td></tr>
-<tr class="separator:aa5124358776594999ae07f5a21c8a7e8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adba2cf93b21e95d5e7bf1490cf5ab45e" id="r_adba2cf93b21e95d5e7bf1490cf5ab45e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">virtual</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1Fleet.html#adba2cf93b21e95d5e7bf1490cf5ab45e">get_report_vector_count</a> (std::map&lt; std::string, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a> &gt; &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">report_vector_count</a>)</td></tr>
-<tr class="separator:adba2cf93b21e95d5e7bf1490cf5ab45e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_structfims__model__object_1_1FIMSObject"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_structfims__model__object_1_1FIMSObject')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="structfims__model__object_1_1FIMSObject.html">fims_model_object::FIMSObject&lt; Type &gt;</a></td></tr>
 <tr class="memitem:a7f1a6d1474f8ad7d8b460ce889ee6ebd inherit pub_methods_structfims__model__object_1_1FIMSObject" id="r_a7f1a6d1474f8ad7d8b460ce889ee6ebd"><td class="memItemLeft" align="right" valign="top">
 <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a>&#160;</td><td class="memItemRight" valign="bottom"><b>GetId</b> () <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a></td></tr>
@@ -334,70 +330,7 @@ struct fims_popdy::Fleet&lt; Type &gt;</div><p>Base class for all fleets. </p>
   </table>
   </dd>
 </dl>
-</div><h2 class="groupheader">Member Function Documentation</h2>
-<a id="aa5124358776594999ae07f5a21c8a7e8" name="aa5124358776594999ae07f5a21c8a7e8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa5124358776594999ae07f5a21c8a7e8">&#9670;&#160;</a></span>create_report_vectors()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">class</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">virtual</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a> <a class="el" href="structfims__popdy_1_1Fleet.html">fims_popdy::Fleet</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::create_report_vectors </td>
-          <td>(</td>
-          <td class="paramtype">std::map&lt; std::string, <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt; &gt; &amp;&#160;</td>
-          <td class="paramname"><em>report_vectors</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>Create a map of report vectors for the object. </p>
-
-<p>Reimplemented from <a class="el" href="structfims__model__object_1_1FIMSObject.html#a7809cb0987940a515163b95ef7d330f9">fims_model_object::FIMSObject&lt; Type &gt;</a>.</p>
-
-</div>
-</div>
-<a id="adba2cf93b21e95d5e7bf1490cf5ab45e" name="adba2cf93b21e95d5e7bf1490cf5ab45e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#adba2cf93b21e95d5e7bf1490cf5ab45e">&#9670;&#160;</a></span>get_report_vector_count()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">class</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">virtual</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a> <a class="el" href="structfims__popdy_1_1Fleet.html">fims_popdy::Fleet</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::get_report_vector_count </td>
-          <td>(</td>
-          <td class="paramtype">std::map&lt; std::string, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a> &gt; &amp;&#160;</td>
-          <td class="paramname"><em>report_vector_count</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>Get the report vector count object. </p>
-
-<p>Reimplemented from <a class="el" href="structfims__model__object_1_1FIMSObject.html#a63d848a3fb69a0c4928b7afa5ce845d2">fims_model_object::FIMSObject&lt; Type &gt;</a>.</p>
-
-</div>
-</div>
-<h2 class="groupheader">Member Data Documentation</h2>
+</div><h2 class="groupheader">Member Data Documentation</h2>
 <a id="ab0ba9edd8d93288939648869c2ab6996" name="ab0ba9edd8d93288939648869c2ab6996"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ab0ba9edd8d93288939648869c2ab6996">&#9670;&#160;</a></span>age_to_length_conversion</h2>
 

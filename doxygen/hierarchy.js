@@ -1,17 +1,14 @@
 var hierarchy =
 [
     [ "fims_popdy::DimensionInfo", "structfims__popdy_1_1DimensionInfo.html", null ],
-    [ "fims_distributions::DistributionElementObject< Type >", "structfims__distributions_1_1DistributionElementObject.html", [
+    [ "fims::FIMSLog", "classfims_1_1FIMSLog.html", null ],
+    [ "fims_model_object::FIMSObject< Type >", "structfims__model__object_1_1FIMSObject.html", [
+      [ "fims_data_object::DataObject< Type >", "structfims__data__object_1_1DataObject.html", null ],
       [ "fims_distributions::DensityComponentBase< Type >", "structfims__distributions_1_1DensityComponentBase.html", [
         [ "fims_distributions::LogNormalLPDF< Type >", "structfims__distributions_1_1LogNormalLPDF.html", null ],
         [ "fims_distributions::MultinomialLPMF< Type >", "structfims__distributions_1_1MultinomialLPMF.html", null ],
         [ "fims_distributions::NormalLPDF< Type >", "structfims__distributions_1_1NormalLPDF.html", null ]
-      ] ]
-    ] ],
-    [ "fims::FIMSLog", "classfims_1_1FIMSLog.html", null ],
-    [ "fims_model_object::FIMSObject< Type >", "structfims__model__object_1_1FIMSObject.html", [
-      [ "fims_data_object::DataObject< Type >", "structfims__data__object_1_1DataObject.html", null ],
-      [ "fims_distributions::DensityComponentBase< Type >", "structfims__distributions_1_1DensityComponentBase.html", null ],
+      ] ],
       [ "fims_popdy::FisheryModelBase< Type >", "classfims__popdy_1_1FisheryModelBase.html", [
         [ "fims_popdy::CatchAtAge< Type >", "classfims__popdy_1_1CatchAtAge.html", null ]
       ] ],
@@ -83,7 +80,6 @@ var hierarchy =
     [ "SharedReal", "classSharedReal.html", null ],
     [ "SharedString", "classSharedString.html", null ],
     [ "fims_popdy::Subpopulation< Type >", "classfims__popdy_1_1Subpopulation.html", null ],
-    [ "fims_popdy::UncertaintyReportInfo", "structfims__popdy_1_1UncertaintyReportInfo.html", null ],
     [ "fims::Vector< Type >", "classfims_1_1Vector.html", null ],
     [ "fims::Vector< double >", "classfims_1_1Vector.html", null ],
     [ "fims::Vector< int >", "classfims_1_1Vector.html", null ],

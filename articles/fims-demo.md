@@ -39,7 +39,7 @@ For example, `CreateTMBModel` is a C++ function that returns a boolean.
 ``` r
 methods::show(FIMS::CreateTMBModel)
 internal C++ function <0000014f7bd8ff00>
-    docstring : See the documentation for the Rcpp interface, https://noaa-fims.github.io/doxygen/rcpp__interface_8hpp.html.
+    docstring : See the documentation for the Rcpp interface, https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html.
     signature : bool CreateTMBModel()
 ```
 
@@ -60,8 +60,8 @@ clear()
 ## Data
 
 Data for a FIMS model must be stored in a single data frame using a long
-format, e.g., `data("data1", package = "FIMS")`. The design is similar
-to running a linear model where you pass a single data frame to
+format, e.g., `data("data_big", package = "FIMS")`. The design is
+similar to running a linear model where you pass a single data frame to
 [`lm()`](https://rdrr.io/r/stats/lm.html).
 
 The long format does lead to some information being duplicated. For
@@ -72,21 +72,21 @@ i.e.,
 [`FIMSFrame()`](https://NOAA-FIMS.github.io/FIMS/reference/FIMSFrame.md),
 is all that is needed to prepare the data to be used in a FIMS model.
 
-### `data1`
+### `data_big`
 
 A sample data frame for a catch-at-age model with both ages and lengths
-is stored in the package as `data1`. This data set is based on data that
-was used in [Li et al.](https://www.doi.org/10.7755/FB.119.2-3.5) for
-the Model Comparison Project ([github
+is stored in the package as `data_big`. This data set is based on data
+that was used in [Li et al.](https://www.doi.org/10.7755/FB.119.2-3.5)
+for the Model Comparison Project ([github
 site](https://github.com/NOAA-FIMS/Age_Structured_Stock_Assessment_Model_Comparison)).
 The length data have since been added
-[data-raw/data1.R](https://github.com/NOAA-FIMS/FIMS/blob/main/data-raw/data1.R)
+[data-raw/data_big.R](https://github.com/NOAA-FIMS/FIMS/blob/main/data-raw/data_big.R)
 based on an age-length conversion matrix.
 
 To see how this example data frame was created, see the R script here
-[R/data1.R](https://github.com/NOAA-FIMS/FIMS/blob/main/R/data1.R). To
-find out more about the columns that are present use
-[`?data1`](https://NOAA-FIMS.github.io/FIMS/reference/data1.md).
+[R/data_big.R](https://github.com/NOAA-FIMS/FIMS/blob/main/R/data_big.R).
+To find out more about the columns that are present use
+[`?data_big`](https://NOAA-FIMS.github.io/FIMS/reference/data_big.md).
 
 ### `FIMSFrame()`
 
@@ -99,9 +99,9 @@ S4 can be found [here](https://adv-r.hadley.nz/s4.html)).
 
 ``` r
 # Bring the package data into your environment
-data("data1")
+data("data_big")
 # Prepare the package data for being used in a FIMS model
-data_4_model <- FIMSFrame(data1)
+data_4_model <- FIMSFrame(data_big)
 ```
 
 There are helper functions for working with objects that have the
@@ -127,17 +127,17 @@ methods::show(data_4_model)
 
     ## tbl_df of class 'FIMSFrame'
 
-    ## with the following 'types': age-to-length-conversion, age_comp, landings, length_comp, weight-at-age, index
+    ## with the following 'types': age_comp, age_to_length_conversion, landings, length_comp, weight_at_age, index
 
     ## # A tibble: 6 × 8
-    ##   type                     name     age length timing    value unit  uncertainty
-    ##   <chr>                    <chr>  <int>  <dbl>  <int>    <dbl> <chr>       <dbl>
-    ## 1 age-to-length-conversion fleet1     1      0      1 1.26e-16 prop…         200
-    ## 2 age-to-length-conversion fleet1     1     50      1 8.39e-11 prop…         200
-    ## 3 age-to-length-conversion fleet1     1    100      1 2.30e- 6 prop…         200
-    ## 4 age-to-length-conversion fleet1     1    150      1 2.74e- 3 prop…         200
-    ## 5 age-to-length-conversion fleet1     1    200      1 1.63e- 1 prop…         200
-    ## 6 age-to-length-conversion fleet1     1    250      1 6.32e- 1 prop…         200
+    ##   type     name     age length timing value unit       uncertainty
+    ##   <chr>    <chr>  <int>  <dbl>  <dbl> <dbl> <chr>            <dbl>
+    ## 1 age_comp fleet1     1     NA      1 0.07  proportion         200
+    ## 2 age_comp fleet1     2     NA      1 0.1   proportion         200
+    ## 3 age_comp fleet1     3     NA      1 0.115 proportion         200
+    ## 4 age_comp fleet1     4     NA      1 0.15  proportion         200
+    ## 5 age_comp fleet1     5     NA      1 0.1   proportion         200
+    ## 6 age_comp fleet1     6     NA      1 0.05  proportion         200
     ## additional slots include the following:fleets:
     ## [1] "fleet1"  "survey1"
     ## n_years:
@@ -172,7 +172,7 @@ get_data(data_4_model) |>
 
     ## # A tibble: 30 × 8
     ##    type     name     age length timing value unit  uncertainty
-    ##    <chr>    <chr>  <int>  <dbl>  <int> <dbl> <chr>       <dbl>
+    ##    <chr>    <chr>  <int>  <dbl>  <dbl> <dbl> <chr>       <dbl>
     ##  1 landings fleet1    NA     NA      1  162. mt        0.01000
     ##  2 landings fleet1    NA     NA      2  461. mt        0.01000
     ##  3 landings fleet1    NA     NA      3  747. mt        0.01000
@@ -190,6 +190,19 @@ The data contains the following fleets:
 - A single fishery fleet with age- and length-composition,
   weight-at-age, and landings data
 - A single survey with age- and length-composition and index data
+
+You can use the base R function `plot(data_4_model)` to see the data
+types (e.g., landings, length composition, age composition, etc.) in the
+`data_4_model` object by fleet.
+
+``` r
+plot(data_4_model)
+```
+
+![Landings are increasing over time and the index is decreasing over
+time. ](fims-demo_files/figure-html/FIMSFrame-plot-1.png)
+
+FIMS input values by type (panels) and fleet (colors).
 
 ## Configurations
 
@@ -377,7 +390,7 @@ default_parameters_unnested
 ##  9 catch_at_age Fleet       fleet1     <NA>        log_… <NA>                 NA
 ## 10 catch_at_age Fleet       fleet1     <NA>        log_… <NA>                 NA
 ## # ℹ 645 more rows
-## # ℹ 6 more variables: length <dbl>, time <int>, value <dbl>,
+## # ℹ 6 more variables: length <dbl>, time <dbl>, value <dbl>,
 ## #   estimation_type <chr>, distribution_type <chr>, distribution <chr>
 ```
 
@@ -517,28 +530,20 @@ fit <- parameters_4_model |>
 
     ## ✔ Starting optimization ...
     ## ℹ Restarting optimizer 3 times to improve gradient.
-    ## ℹ Maximum gradient went from 0.04938 to 0.00218 after 3 steps.
+    ## ℹ Maximum gradient went from 0.00192 to 0.00143 after 3 steps.
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
-    ## ℹ FIMS model version: 0.8.1
-    ## ℹ Total run time was 1.28233 minutes
-    ## ℹ Number of parameters: fixed_effects=77, random_effects=0, and total=77
-    ## ℹ Maximum gradient= 0.00218
+    ## ℹ FIMS model version: 0.9.0
+    ## ℹ Total run time was 5.69248 seconds
+    ## ℹ Number of parameters: fixed_effects=48, random_effects=29, and total=77
+    ## ℹ Maximum gradient= 0.00143
     ## ℹ Negative log likelihood (NLL):
-    ## • Marginal NLL= 3166.02383
-    ## • Total NLL= 3166.02383
-    ## ℹ Terminal SB= 1779.19104
+    ## • Marginal NLL= 3232.32338
+    ## • Total NLL= 3166.02565
+    ## ℹ Terminal SB= 1783.64716
 
 ``` r
 clear()
-
-# Get information about the model and print a few characters to the screen
-recruitment_log <- get_log_module("information")
-substr(recruitment_log, 1, 100)
-```
-
-``` numberSource
-## [1] "[\n]"
 ```
 
 The results can be plotted with either base R, {ggplot2}, or
@@ -561,17 +566,6 @@ stockplotr::plot_spawning_biomass(
 ) +
   stockplotr::theme_noaa()
 ```
-
-    ## Warning: Unknown or uninitialised column: `era`.
-
-    ## Warning in max(dat$year[dat$era == era_name], na.rm = TRUE): no non-missing
-    ## arguments to max; returning -Inf
-
-    ## Warning: Removed 1 row containing missing values or values outside the scale range
-    ## (`geom_hline()`).
-
-    ## Warning: Removed 1 row containing missing values or values outside the scale range
-    ## (`geom_text()`).
 
 ![Plot of spawning
 biomass.](fims-demo_files/figure-html/fit-plot-spawning-biomass-1.png)
@@ -606,7 +600,7 @@ stockplotr::plot_timeseries(
 ) +
   ggplot2::geom_point(
     data = data.frame(
-      observed = m_index(data_4_model, "survey1"),
+      observed = model_index(data_4_model, "survey1"),
       expected = get_report(fit)[["index_expected"]][[2]],
       year = get_start_year(data_4_model):get_end_year(data_4_model)
     ),
@@ -679,17 +673,17 @@ high_slope_fit <- parameters_high_slope |>
 
     ## ✔ Starting optimization ...
     ## ℹ Restarting optimizer 3 times to improve gradient.
-    ## ℹ Maximum gradient went from 0.01423 to 0.00253 after 3 steps.
+    ## ℹ Maximum gradient went from 0.00532 to 0.00041 after 3 steps.
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
-    ## ℹ FIMS model version: 0.8.1
-    ## ℹ Total run time was 1.29447 minutes
-    ## ℹ Number of parameters: fixed_effects=77, random_effects=0, and total=77
-    ## ℹ Maximum gradient= 0.00253
+    ## ℹ FIMS model version: 0.9.0
+    ## ℹ Total run time was 5.60907 seconds
+    ## ℹ Number of parameters: fixed_effects=48, random_effects=29, and total=77
+    ## ℹ Maximum gradient= 0.00041
     ## ℹ Negative log likelihood (NLL):
-    ## • Marginal NLL= 3166.02383
-    ## • Total NLL= 3166.02383
-    ## ℹ Terminal SB= 1779.19104
+    ## • Marginal NLL= 3232.32338
+    ## • Total NLL= 3166.02566
+    ## ℹ Terminal SB= 1783.65752
 
 ``` r
 clear()
@@ -701,17 +695,17 @@ low_slope_fit <- parameters_low_slope |>
 
     ## ✔ Starting optimization ...
     ## ℹ Restarting optimizer 3 times to improve gradient.
-    ## ℹ Maximum gradient went from 0.01142 to 0.00318 after 3 steps.
+    ## ℹ Maximum gradient went from 0.00457 to 0.00033 after 3 steps.
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
-    ## ℹ FIMS model version: 0.8.1
-    ## ℹ Total run time was 1.28171 minutes
-    ## ℹ Number of parameters: fixed_effects=77, random_effects=0, and total=77
-    ## ℹ Maximum gradient= 0.00318
+    ## ℹ FIMS model version: 0.9.0
+    ## ℹ Total run time was 6.05316 seconds
+    ## ℹ Number of parameters: fixed_effects=48, random_effects=29, and total=77
+    ## ℹ Maximum gradient= 0.00033
     ## ℹ Negative log likelihood (NLL):
-    ## • Marginal NLL= 3166.02383
-    ## • Total NLL= 3166.02383
-    ## ℹ Terminal SB= 1779.19826
+    ## • Marginal NLL= 3232.32338
+    ## • Total NLL= 3166.02565
+    ## ℹ Terminal SB= 1783.63888
 
 ``` r
 clear()
@@ -737,13 +731,13 @@ age_only_fit <- parameters_4_model |>
     ## Matching, by = "module_type"
     ## ✔ Starting optimization ...
     ## ℹ Restarting optimizer 3 times to improve gradient.
-    ## ℹ Maximum gradient went from 0.01253 to 8e-04 after 3 steps.
+    ## ℹ Maximum gradient went from 0.00361 to 0.00026 after 3 steps.
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
-    ## ℹ FIMS model version: 0.8.1 ℹ Total run time was 10.21057 seconds ℹ Number of
-    ## parameters: fixed_effects=77, random_effects=0, and total=77 ℹ Maximum
-    ## gradient= 8e-04 ℹ Negative log likelihood (NLL): • Marginal NLL= 1565.4676 •
-    ## Total NLL= 1565.4676 ℹ Terminal SB= 1724.28921
+    ## ℹ FIMS model version: 0.9.0 ℹ Total run time was 1.16858 minutes ℹ Number of
+    ## parameters: fixed_effects=48, random_effects=29, and total=77 ℹ Maximum
+    ## gradient= 0.00026 ℹ Negative log likelihood (NLL): • Marginal NLL= 1628.97925 •
+    ## Total NLL= 1565.4718 ℹ Terminal SB= 1730.94266
 
 ``` r
 clear()
@@ -769,13 +763,13 @@ length_only_fit <- parameters_4_model |>
     ## Matching, by = "module_type"
     ## ✔ Starting optimization ...
     ## ℹ Restarting optimizer 3 times to improve gradient.
-    ## ℹ Maximum gradient went from 0.00422 to 0.03063 after 3 steps.
+    ## ℹ Maximum gradient went from 0.00118 to 0.00029 after 3 steps.
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
-    ## ℹ FIMS model version: 0.8.1 ℹ Total run time was 1.04821 minutes ℹ Number of
-    ## parameters: fixed_effects=77, random_effects=0, and total=77 ℹ Maximum
-    ## gradient= 0.03063 ℹ Negative log likelihood (NLL): • Marginal NLL= 1520.03752 •
-    ## Total NLL= 1520.03752 ℹ Terminal SB= 1706.89135
+    ## ℹ FIMS model version: 0.9.0 ℹ Total run time was 5.57161 seconds ℹ Number of
+    ## parameters: fixed_effects=48, random_effects=29, and total=77 ℹ Maximum
+    ## gradient= 0.00029 ℹ Negative log likelihood (NLL): • Marginal NLL= 1569.19613 •
+    ## Total NLL= 1520.05163 ℹ Terminal SB= 1714.84603
 
 ``` r
 clear()
@@ -799,17 +793,6 @@ stockplotr::plot_biomass(
   )
 )
 ```
-
-    ## Warning: Unknown or uninitialised column: `era`.
-
-    ## Warning in max(dat$year[dat$era == era_name], na.rm = TRUE): no non-missing
-    ## arguments to max; returning -Inf
-
-    ## Warning: Removed 1 row containing missing values or values outside the scale range
-    ## (`geom_hline()`).
-
-    ## Warning: Removed 1 row containing missing values or values outside the scale range
-    ## (`geom_text()`).
 
 ![Plot of spawning biomass for each sensitivity
 model.](fims-demo_files/figure-html/fit-plot-biomass-1.png)

@@ -25,14 +25,26 @@
 var NAVTREE =
 [
   [ "FIMS", "index.html", [
+    [ "Glossary", "glossary.html", [
+      [ "Population and Recruitment", "glossary.html#autotoc_md0", null ],
+      [ "Mortality", "glossary.html#autotoc_md1", null ],
+      [ "Biomass", "glossary.html#autotoc_md2", null ],
+      [ "Stock–Recruitment (Beverton–Holt)", "glossary.html#autotoc_md3", null ],
+      [ "Growth", "glossary.html#autotoc_md4", null ],
+      [ "Catch and Landings", "glossary.html#autotoc_md5", null ],
+      [ "Index of Abundance", "glossary.html#autotoc_md6", null ],
+      [ "Index Variables", "glossary.html#autotoc_md7", null ],
+      [ "Statistical", "glossary.html#autotoc_md8", null ],
+      [ "Common Abbreviations", "glossary.html#autotoc_md9", null ]
+    ] ],
     [ "C++ Directory Structure", "md_inst_2include_2README.html", [
-      [ "inst/include/", "md_inst_2include_2README.html#autotoc_md1", [
-        [ "inst/include/common/", "md_inst_2include_2README.html#autotoc_md2", null ],
-        [ "inst/include/distributions/", "md_inst_2include_2README.html#autotoc_md3", null ],
-        [ "inst/include/interface/", "md_inst_2include_2README.html#autotoc_md4", null ],
-        [ "inst/include/models/", "md_inst_2include_2README.html#autotoc_md5", null ],
-        [ "inst/include/population_dynamics/", "md_inst_2include_2README.html#autotoc_md6", null ],
-        [ "inst/include/utilities/", "md_inst_2include_2README.html#autotoc_md7", null ]
+      [ "inst/include/", "md_inst_2include_2README.html#autotoc_md11", [
+        [ "inst/include/common/", "md_inst_2include_2README.html#autotoc_md12", null ],
+        [ "inst/include/distributions/", "md_inst_2include_2README.html#autotoc_md13", null ],
+        [ "inst/include/interface/", "md_inst_2include_2README.html#autotoc_md14", null ],
+        [ "inst/include/models/", "md_inst_2include_2README.html#autotoc_md15", null ],
+        [ "inst/include/population_dynamics/", "md_inst_2include_2README.html#autotoc_md16", null ],
+        [ "inst/include/utilities/", "md_inst_2include_2README.html#autotoc_md17", null ]
       ] ]
     ] ],
     [ "Namespaces", "namespaces.html", [
@@ -65,12 +77,11 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "annotated.html",
-"classLengthCompDataInterface.html#ad7647c7018724e74a87b2b864ab998f7",
-"classSharedReal.html#a72fccf69775cf0ee72b7d030cf20f459",
-"classfims__popdy_1_1CatchAtAge.html#a901059284bb502abd0f6a8f9252a275d",
-"functions_vars_i.html",
-"structfims__model__object_1_1FIMSObject.html#aca6a96ab8e6a4cca573daa5f52e71c67",
-"structfims__popdy_1_1SelectivityBase.html#a0301114a39dc669b995569293e6a7e5f"
+"classLogDevsRecruitmentInterface.html#aa64e1facfe46a48f9a2ec25792ca7794",
+"classSharedReal.html#aa8f38a240ca8077f542a4a40feb5dfa5",
+"classfims__popdy_1_1CatchAtAge.html#ab3f51eeed2e951400a81fbd8c32b458e",
+"glossary.html#autotoc_md5",
+"structfims__popdy_1_1DoubleLogisticSelectivity.html#aa0d98542e054ce41349747abcbedff13"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

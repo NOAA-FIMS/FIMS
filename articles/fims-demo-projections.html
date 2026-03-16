@@ -26,9 +26,9 @@
 
 
     <nav class="navbar navbar-expand-lg fixed-top bg-light" data-bs-theme="light" aria-label="Site navigation"><div class="container">
-    <img class="navlogo" src="https://noaa-fims.github.io/images/FIMS_logo3.png" width="60" align="left"><a class="navbar-brand me-2" href="../index.html">FIMS</a>
+    <img class="navlogo" src="https://noaa-fims.github.io/images/FIMS_logo3.png" alt="FIMS logo with a fish" width="60" align="left"><a class="navbar-brand me-2" href="../index.html">FIMS</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -145,9 +145,9 @@ below can be found in the <a href="fims-demo.html">introductory
 vignette</a>.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Bring the package data into your environment</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"data1"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"data_big"</span><span class="op">)</span></span>
 <span><span class="co"># Prepare the package data for being used in a FIMS model</span></span>
-<span><span class="va">data_4_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/FIMSFrame.html">FIMSFrame</a></span><span class="op">(</span><span class="va">data1</span><span class="op">)</span></span>
+<span><span class="va">data_4_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/FIMSFrame.html">FIMSFrame</a></span><span class="op">(</span><span class="va">data_big</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Create default model configurations based on the data</span></span>
 <span><span class="va">default_configurations</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/create_default_configurations.html">create_default_configurations</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">data_4_model</span><span class="op">)</span></span></code></pre></div>
@@ -173,15 +173,28 @@ manipulation of the data is needed.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Add a single row of landings to the original data for the maximum year you</span></span>
 <span><span class="co"># want to project to</span></span>
-<span><span class="va">data1_with_extra_year</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/add_row.html" class="external-link">add_row</a></span><span class="op">(</span></span>
-<span>  <span class="va">data1</span>,</span>
+<span><span class="va">data_big_with_extra_year</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/add_row.html" class="external-link">add_row</a></span><span class="op">(</span></span>
+<span>  <span class="va">data_big</span>,</span>
 <span>  type <span class="op">=</span> <span class="st">"landings"</span>,</span>
 <span>  timing <span class="op">=</span> <span class="fu"><a href="../reference/get_FIMSFrame.html">get_end_year</a></span><span class="op">(</span><span class="va">data_4_model</span><span class="op">)</span> <span class="op">+</span> <span class="va">years_of_projection</span>,</span>
 <span>  name <span class="op">=</span> <span class="st">"fleet1"</span>,</span>
 <span>  value <span class="op">=</span> <span class="op">-</span><span class="fl">999</span>,</span>
 <span>  unit <span class="op">=</span> <span class="st">"mt"</span></span>
 <span><span class="op">)</span></span>
-<span><span class="va">data_4_projections</span> <span class="op">&lt;-</span> <span class="va">data1_with_extra_year</span> <span class="op">|&gt;</span></span>
+<span><span class="va">data_4_projections</span> <span class="op">&lt;-</span> <span class="va">data_big_with_extra_year</span> <span class="op">|&gt;</span></span>
+<span>  <span class="co"># Add on weight_at_age data for 10 more years because you don't want these</span></span>
+<span>  <span class="co"># filled with -999</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind_rows.html" class="external-link">bind_rows</a></span><span class="op">(</span></span>
+<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span></span>
+<span>      <span class="va">data_big</span>,</span>
+<span>      <span class="va">type</span> <span class="op">==</span> <span class="st">"weight_at_age"</span>,</span>
+<span>      <span class="va">timing</span> <span class="op">==</span> <span class="fl">1</span></span>
+<span>    <span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="op">-</span><span class="va">timing</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/merge.html" class="external-link">merge</a></span><span class="op">(</span></span>
+<span>      <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>timing <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">data_big</span><span class="op">[[</span><span class="st">"timing"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">:</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">data_big</span><span class="op">[[</span><span class="st">"timing"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span> <span class="op">+</span> <span class="fl">10</span><span class="op">)</span><span class="op">)</span></span>
+<span>    <span class="op">)</span></span>
+<span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="co"># Make a FIMSFrame object out of this data frame with the extra row to add all</span></span>
 <span>  <span class="co"># of the other missing years for each data type</span></span>
 <span>  <span class="fu"><a href="../reference/FIMSFrame.html">FIMSFrame</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -340,17 +353,17 @@ output will be in the same format that users are used to.</p>
 <span>  <span class="fu"><a href="../reference/fit_fims.html">fit_fims</a></span><span class="op">(</span>optimize <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## ✔ Starting optimization ...</span></span>
 <span><span class="co">## ℹ Restarting optimizer 3 times to improve gradient.</span></span>
-<span><span class="co">## ℹ Maximum gradient went from 0.01568 to 0.00186 after 3 steps.</span></span>
+<span><span class="co">## ℹ Maximum gradient went from 0.0046 to 0.00038 after 3 steps.</span></span>
 <span><span class="co">## ✔ Finished optimization</span></span>
 <span><span class="co">## ✔ Finished sdreport</span></span>
-<span><span class="co">## ℹ FIMS model version: 0.8.1</span></span>
-<span><span class="co">## ℹ Total run time was 2.46975 minutes</span></span>
-<span><span class="co">## ℹ Number of parameters: fixed_effects=87, random_effects=0, and total=87</span></span>
-<span><span class="co">## ℹ Maximum gradient= 0.00186</span></span>
+<span><span class="co">## ℹ FIMS model version: 0.9.0</span></span>
+<span><span class="co">## ℹ Total run time was 7.33392 seconds</span></span>
+<span><span class="co">## ℹ Number of parameters: fixed_effects=58, random_effects=29, and total=87</span></span>
+<span><span class="co">## ℹ Maximum gradient= 0.00038</span></span>
 <span><span class="co">## ℹ Negative log likelihood (NLL):</span></span>
-<span><span class="co">## • Marginal NLL= 3166.0503</span></span>
-<span><span class="co">## • Total NLL= 3166.0503</span></span>
-<span><span class="co">## ℹ Terminal SB= 990.87314</span></span></code></pre>
+<span><span class="co">## • Marginal NLL= 3232.34986</span></span>
+<span><span class="co">## • Total NLL= 3166.05213</span></span>
+<span><span class="co">## ℹ Terminal SB= 994.55006</span></span></code></pre>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/Cpp_functions.html">clear</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 </div>
@@ -391,7 +404,7 @@ comparison.</p>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Kelli F. Johnson, Grant D. Adams, Jon K. T. Brodziak, Kathryn L. Doering, Daniel R. Goethel, Andrea M. Havron, Ronald Klasky, Peter T. Kuriyama, Emily M. Liljestrand, Christopher M. Legault, Bai Li, Timothy J. Miller, Cole C. Monnahan, Megumi C. Oshima, Kyle W. Shertzer, Christine C. Stawitz, Jane Y. Sullivan, Matthew Supernaw, Ian G. Taylor, Nathan R. Vaughan, Erik H. Williams.</p>
+  <p>Developed by Kelli F. Johnson, Grant D. Adams, Jon K. T. Brodziak, Kathryn L. Doering, Daniel R. Goethel, Andrea M. Havron, Ronald Klasky, Peter T. Kuriyama, Emily M. Liljestrand, Christopher M. Legault, Bai Li, Timothy J. Miller, Cole C. Monnahan, Elizabeth F. Perl, Megumi C. Oshima, Kyle W. Shertzer, Christine C. Stawitz, Jane Y. Sullivan, Matthew Supernaw, Ian G. Taylor, Nathan R. Vaughan, Erik H. Williams.</p>
 </div>
 
 <div class="pkgdown-footer-right">

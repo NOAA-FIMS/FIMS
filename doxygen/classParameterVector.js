@@ -8,8 +8,6 @@ var classParameterVector =
     [ "~ParameterVector", "classParameterVector.html#ae426de8e835ed4e670e8a38a5fdc7c64", null ],
     [ "at", "classParameterVector.html#a58b8a06fb3070e59c179db2180ddb465", null ],
     [ "fill", "classParameterVector.html#a9296d749eab1b882116aca96e07154d5", null ],
-    [ "fill_max", "classParameterVector.html#a8376c23fd35532aaa83fe5d808e9431c", null ],
-    [ "fill_min", "classParameterVector.html#aefd11668d4c64505607526dcbe8d5cea", null ],
     [ "get", "classParameterVector.html#ac21d6482b5d3a8992a9cd7a48b7482a4", null ],
     [ "get_id", "classParameterVector.html#a8059836883b50a02abd1f6c26991a53e", null ],
     [ "operator[]", "classParameterVector.html#ab50a6d8fc19e86fb7799fc46b750301c", null ],

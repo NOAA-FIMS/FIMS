@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2026-03-11" />
+<meta name="date" content="2026-03-16" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -148,8 +148,8 @@
 <h2>Summary<a href="test-rcpp-selectivity.html#summary-36" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <ul>
 <li><p><strong>Number of test(s)</strong> : 3</p></li>
-<li><p><strong>Number of expectation(s)</strong> : 22</p></li>
-<li><p><strong>Number of successful expectation(s)</strong> : 22</p></li>
+<li><p><strong>Number of expectation(s)</strong> : 20</p></li>
+<li><p><strong>Number of successful expectation(s)</strong> : 20</p></li>
 <li><p><strong>Number of failed expectation(s)</strong> : 0</p></li>
 <li><p><strong>Number of errored expectation(s)</strong> : 0</p></li>
 <li><p><strong>Number of expectations with warning(s)</strong> : 0</p></li>
@@ -184,176 +184,160 @@
 <td align="left">Test that <code>get_id()</code> for <code>LogisticSelectivity</code> works.</td>
 <td align="left">expect_equal(selectivity1$get_id(), 1)</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
-<td align="left">test-rcpp-selectivity.R#25</td>
-<td align="left">2026-03-11 18:05:10.075462</td>
+<td align="left">test-rcpp-selectivity.R#23</td>
+<td align="left">2026-03-16 18:13:54.624164</td>
 </tr>
 <tr class="even">
 <td align="left">rcpp logistic selectivity works with correct inputs</td>
 <td align="left">Test that the <code>inflection_point</code> value is set to 10.0.</td>
 <td align="left">expect_equal(selectivity1$inflection_point[1]$value, 10.0)</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
-<td align="left">test-rcpp-selectivity.R#27</td>
-<td align="left">2026-03-11 18:05:10.091166</td>
-</tr>
-<tr class="odd">
-<td align="left">rcpp logistic selectivity works with correct inputs</td>
-<td align="left">Test that the <code>inflection_point</code> min is set to 8.0.</td>
-<td align="left">expect_equal(selectivity1$inflection_point[1]$min, 8.0)</td>
-<td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
-<td align="left">test-rcpp-selectivity.R#29</td>
-<td align="left">2026-03-11 18:05:10.106852</td>
-</tr>
-<tr class="even">
-<td align="left">rcpp logistic selectivity works with correct inputs</td>
-<td align="left">Test that the <code>inflection_point</code> max is set to 12.0.</td>
-<td align="left">expect_equal(selectivity1$inflection_point[1]$max, 12.0)</td>
-<td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
-<td align="left">test-rcpp-selectivity.R#31</td>
-<td align="left">2026-03-11 18:05:10.122834</td>
+<td align="left">test-rcpp-selectivity.R#25</td>
+<td align="left">2026-03-16 18:13:54.638206</td>
 </tr>
 <tr class="odd">
 <td align="left">rcpp logistic selectivity works with correct inputs</td>
 <td align="left">Test that the <code>inflection_point</code> estimation type is set to “random_effects”.</td>
 <td align="left">expect_equal(selectivity1$inflection_point[1]$estimation_type$get(), “random_effects”)</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
-<td align="left">test-rcpp-selectivity.R#33</td>
-<td align="left">2026-03-11 18:05:10.139595</td>
+<td align="left">test-rcpp-selectivity.R#27</td>
+<td align="left">2026-03-16 18:13:54.652474</td>
 </tr>
 <tr class="even">
 <td align="left">rcpp logistic selectivity works with correct inputs</td>
 <td align="left">Test that the <code>slope</code> value is set to 0.2.</td>
 <td align="left">expect_equal(selectivity1$slope[1]$value, 0.2)</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
-<td align="left">test-rcpp-selectivity.R#35</td>
-<td align="left">2026-03-11 18:05:10.155448</td>
+<td align="left">test-rcpp-selectivity.R#29</td>
+<td align="left">2026-03-16 18:13:54.666249</td>
 </tr>
 <tr class="odd">
 <td align="left">rcpp logistic selectivity works with correct inputs</td>
 <td align="left">Test that the <code>evaluate()</code> works for <code>LogisticSelectivity</code>.</td>
 <td align="left">expect_equal(selectivity1$evaluate(10.0), 0.5)</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
-<td align="left">test-rcpp-selectivity.R#37</td>
-<td align="left">2026-03-11 18:05:10.170546</td>
+<td align="left">test-rcpp-selectivity.R#31</td>
+<td align="left">2026-03-16 18:13:54.679626</td>
 </tr>
 <tr class="even">
 <td align="left">rcpp logistic selectivity works with correct inputs</td>
 <td align="left">Test that <code>get_id()</code> for <code>LogisticSelectivity</code> works when a second object is created.</td>
 <td align="left">expect_equal((selectivity2$get_id()), 2)</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
-<td align="left">test-rcpp-selectivity.R#42</td>
-<td align="left">2026-03-11 18:05:10.186283</td>
+<td align="left">test-rcpp-selectivity.R#36</td>
+<td align="left">2026-03-16 18:13:54.693201</td>
 </tr>
 <tr class="odd">
 <td align="left">rcpp double logistic selectivity works with correct inputs</td>
 <td align="left">Test that <code>get_id()</code> for <code>DoubleLogisticSelectivity</code> works.</td>
 <td align="left">expect_equal(selectivity1$get_id(), 1)</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
-<td align="left">test-rcpp-selectivity.R#58</td>
-<td align="left">2026-03-11 18:05:10.210411</td>
+<td align="left">test-rcpp-selectivity.R#52</td>
+<td align="left">2026-03-16 18:13:54.713683</td>
 </tr>
 <tr class="even">
 <td align="left">rcpp double logistic selectivity works with correct inputs</td>
 <td align="left">Test that the <code>inflection_point_asc</code> value is set to 10.5.</td>
 <td align="left">expect_equal(selectivity1$inflection_point_asc[1]$value, 10.5)</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
-<td align="left">test-rcpp-selectivity.R#60</td>
-<td align="left">2026-03-11 18:05:10.226287</td>
+<td align="left">test-rcpp-selectivity.R#54</td>
+<td align="left">2026-03-16 18:13:54.727583</td>
 </tr>
 <tr class="odd">
 <td align="left">rcpp double logistic selectivity works with correct inputs</td>
 <td align="left">Test that the <code>slope_asc</code> value is set to 0.2.</td>
 <td align="left">expect_equal(selectivity1$slope_asc[1]$value, 0.2)</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
-<td align="left">test-rcpp-selectivity.R#62</td>
-<td align="left">2026-03-11 18:05:10.259796</td>
+<td align="left">test-rcpp-selectivity.R#56</td>
+<td align="left">2026-03-16 18:13:54.741365</td>
 </tr>
 <tr class="even">
 <td align="left">rcpp double logistic selectivity works with correct inputs</td>
 <td align="left">Test that <code>evaluate()</code> works for <code>DoubleLogisticSelectivity</code>.</td>
 <td align="left">expect_equal( selectivity1$evaluate(34.5), # Line below equals 0.2716494 1.0 / (1.0 + exp(-(34.5 - 10.5) * 0.2)) * (1.0 - 1.0 / (1.0 + exp(-(34.5 - 15) * 0.05))), tolerance = 0.0000001 )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
-<td align="left">test-rcpp-selectivity.R#64</td>
-<td align="left">2026-03-11 18:05:10.275438</td>
+<td align="left">test-rcpp-selectivity.R#58</td>
+<td align="left">2026-03-16 18:13:54.754713</td>
 </tr>
 <tr class="odd">
 <td align="left">rcpp double logistic selectivity works with correct inputs</td>
 <td align="left">Test that <code>get_id()</code> for <code>DoubleLogisticSelectivity</code> works when a second object is created.</td>
 <td align="left">expect_equal(selectivity2$get_id(), 2)</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
-<td align="left">test-rcpp-selectivity.R#85</td>
-<td align="left">2026-03-11 18:05:10.298986</td>
+<td align="left">test-rcpp-selectivity.R#79</td>
+<td align="left">2026-03-16 18:13:54.774395</td>
 </tr>
 <tr class="even">
 <td align="left">rcpp double logistic selectivity works with correct inputs</td>
 <td align="left">Test that the <code>inflection_point_asc</code> value is set to 10.5.</td>
 <td align="left">expect_equal(selectivity2$inflection_point_asc[1]$value, 10.5)</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
-<td align="left">test-rcpp-selectivity.R#87</td>
-<td align="left">2026-03-11 18:05:10.315279</td>
+<td align="left">test-rcpp-selectivity.R#81</td>
+<td align="left">2026-03-16 18:13:54.788243</td>
 </tr>
 <tr class="odd">
 <td align="left">rcpp double logistic selectivity works with correct inputs</td>
 <td align="left">Test that the <code>slope_asc</code> value is set to 0.2.</td>
 <td align="left">expect_equal(selectivity2$slope_asc[1]$value, 0.2)</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
-<td align="left">test-rcpp-selectivity.R#89</td>
-<td align="left">2026-03-11 18:05:10.331392</td>
+<td align="left">test-rcpp-selectivity.R#83</td>
+<td align="left">2026-03-16 18:13:54.802182</td>
 </tr>
 <tr class="even">
 <td align="left">rcpp double logistic selectivity works with correct inputs</td>
 <td align="left">Test that the <code>inflection_point_asc</code> estimation type is set to “random_effects”.</td>
 <td align="left">expect_equal(selectivity2$inflection_point_asc[1]$estimation_type$get(), “random_effects”)</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
-<td align="left">test-rcpp-selectivity.R#91</td>
-<td align="left">2026-03-11 18:05:10.347724</td>
+<td align="left">test-rcpp-selectivity.R#85</td>
+<td align="left">2026-03-16 18:13:54.816558</td>
 </tr>
 <tr class="odd">
 <td align="left">rcpp double logistic selectivity works with correct inputs</td>
 <td align="left">Test that the <code>inflection_point_desc</code> estimation type is set to “random_effects”.</td>
 <td align="left">expect_equal(selectivity2$inflection_point_desc[1]$estimation_type$get(), “random_effects”)</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
-<td align="left">test-rcpp-selectivity.R#93</td>
-<td align="left">2026-03-11 18:05:10.364239</td>
+<td align="left">test-rcpp-selectivity.R#87</td>
+<td align="left">2026-03-16 18:13:54.83076</td>
 </tr>
 <tr class="even">
 <td align="left">rcpp double logistic selectivity works with correct inputs</td>
 <td align="left">Test that the <code>slope_asc</code> estimation type is set to “random_effects”.</td>
 <td align="left">expect_equal(selectivity2$slope_asc[1]$estimation_type$get(), “random_effects”)</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
-<td align="left">test-rcpp-selectivity.R#95</td>
-<td align="left">2026-03-11 18:05:10.381138</td>
+<td align="left">test-rcpp-selectivity.R#89</td>
+<td align="left">2026-03-16 18:13:54.844934</td>
 </tr>
 <tr class="odd">
 <td align="left">rcpp double logistic selectivity works with correct inputs</td>
 <td align="left">Test that the <code>slope_desc</code> estimation type is set to “random_effects”.</td>
 <td align="left">expect_equal(selectivity2$slope_desc[1]$estimation_type$get(), “random_effects”)</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
-<td align="left">test-rcpp-selectivity.R#97</td>
-<td align="left">2026-03-11 18:05:10.397453</td>
+<td align="left">test-rcpp-selectivity.R#91</td>
+<td align="left">2026-03-16 18:13:54.858896</td>
 </tr>
 <tr class="even">
 <td align="left">rcpp double logistic selectivity works with correct inputs</td>
 <td align="left">Test that <code>evaluate()</code> works for <code>DoubleLogisticSelectivity</code> when all parameters are set to “random_effects”.</td>
 <td align="left">expect_equal( selectivity2$evaluate(34.5), # Line below equals 0.2716494 1.0 / (1.0 + exp(-(34.5 - 10.5) * 0.2)) * (1.0 - 1.0 / (1.0 + exp(-(34.5 - 15) * 0.05))), tolerance = 0.0000001 )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
-<td align="left">test-rcpp-selectivity.R#99</td>
-<td align="left">2026-03-11 18:05:10.413107</td>
+<td align="left">test-rcpp-selectivity.R#93</td>
+<td align="left">2026-03-16 18:13:54.872217</td>
 </tr>
 <tr class="odd">
 <td align="left">rcpp selectivity returns correct outputs for edge cases</td>
 <td align="left">Test that rcpp selectivity returns default values when no parameters are set for input values of 20.</td>
 <td align="left">expect_equal( object = emptyLogistic$evaluate(20), expected = 0.5 )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
-<td align="left">test-rcpp-selectivity.R#113</td>
-<td align="left">2026-03-11 18:05:10.432431</td>
+<td align="left">test-rcpp-selectivity.R#107</td>
+<td align="left">2026-03-16 18:13:54.888939</td>
 </tr>
 <tr class="even">
 <td align="left">rcpp selectivity returns correct outputs for edge cases</td>
 <td align="left">Test that rcpp double selectivity returns default values when no parameters are set for input values of 20.</td>
 <td align="left">expect_equal( object = emptyDoubleLogistic$evaluate(20), expected = 0.25 )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
-<td align="left">test-rcpp-selectivity.R#121</td>
-<td align="left">2026-03-11 18:05:10.448097</td>
+<td align="left">test-rcpp-selectivity.R#115</td>
+<td align="left">2026-03-16 18:13:54.902617</td>
 </tr>
 </tbody>
 </table>

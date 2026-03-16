@@ -14,5 +14,5 @@ var classDnormDistributionsInterface =
     [ "expected_values", "classDnormDistributionsInterface.html#a52b505e82789482f43f8be3462cf73d0", null ],
     [ "log_sd", "classDnormDistributionsInterface.html#adaaca1b7c950e10ab4be5ca3ba25e0a6", null ],
     [ "lpdf_vec", "classDnormDistributionsInterface.html#a4e19322d31fc600f83b3a4fbbb393768", null ],
-    [ "x", "classDnormDistributionsInterface.html#a12310c938c2b7e57425947f39cd0ebd4", null ]
+    [ "observed_values", "classDnormDistributionsInterface.html#ab3fd79651ea01148c9e231e2a61ecfd5", null ]
 ];

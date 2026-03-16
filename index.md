@@ -81,16 +81,16 @@ repository](https://nmfs-ost.github.io/on-off-boarding/).
 
 ## Cheatsheet
 
-[![](https://raw.githubusercontent.com/noaa-fims/fims/main/pkgdown/assets/fims-cheatsheet-thumbs.png)](https://github.com/noaa-fims/fims/blob/main/pkgdown/assets/fims.pdf)
+[![](https://raw.githubusercontent.com/noaa-fims/fims/main/pkgdown/assets/fims-cheatsheet-thumb.png)](hhttps://github.com/NOAA-FIMS/FIMS/blob/main/pkgdown/assets/fims-cheatsheet.pdf)
 
 ## Usage
 
 ``` r
 library(FIMS)
 # Load sample data
-data("data1")
+data("data_big")
 # Prepare data for FIMS model
-data_4_model <- FIMSFrame(data1)
+data_4_model <- FIMSFrame(data_big)
 
 # Create parameters
 parameters <- data_4_model |>

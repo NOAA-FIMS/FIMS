@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2026-03-11" />
+<meta name="date" content="2026-03-16" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -144,18 +144,18 @@
             <section class="normal" id="section-">
 <div id="header">
 <h1 class="title">{testdown} report</h1>
-<p class="date"><em>2026-03-11</em></p>
+<p class="date"><em>2026-03-16</em></p>
 </div>
 <div id="testdown-report-for-fims" class="section level1 unnumbered hasAnchor">
 <h1><code>{testdown}</code> report for <code>{FIMS}</code><a href="testdown-report-for-fims.html#testdown-report-for-fims" class="anchor-section" aria-label="Anchor link to header"></a></h1>
 <blockquote>
-<p>Performed on the: 2026-03-11 18:05:25.398953 , using {testdown} version 0.1.2.9000</p>
+<p>Performed on the: 2026-03-16 18:14:08.312227 , using {testdown} version 0.1.2.9000</p>
 </blockquote>
 <hr />
 <p><strong>Tested Package Information:</strong></p>
 <ul>
 <li><strong>Title</strong> : The Fisheries Integrated Modeling System</li>
-<li><strong>Version</strong> : 0.8.1</li>
+<li><strong>Version</strong> : 0.9.0</li>
 <li><strong>Description</strong> : The Fisheries Integrated Modeling System is a next-generation
 framework of stock assessment models, assisting fishery managers with
 the goal of achieving sustainable fisheries. This system, when
@@ -176,14 +176,14 @@ stock assessment models.</li>
 <hr />
 <p><strong>Result Overview:</strong></p>
 <ul>
-<li><p><strong>Number of test(s)</strong> : 107</p></li>
-<li><p><strong>Number of expectation(s)</strong> : 425</p></li>
-<li><p><strong>Number of successful expectation(s)</strong> : 353</p></li>
+<li><p><strong>Number of test(s)</strong> : 123</p></li>
+<li><p><strong>Number of expectation(s)</strong> : 480</p></li>
+<li><p><strong>Number of successful expectation(s)</strong> : 406</p></li>
 <li><p><strong>Number of failed expectation(s)</strong> : 0</p></li>
 <li><p><strong>Number of errored expectation(s)</strong> : 0</p></li>
 <li><p><strong>Number of expectation(s) with warning(s)</strong> : 0</p></li>
 <li><p><strong>Number of validated skip expectation(s)</strong> : 8</p></li>
-<li><p><strong>Number of skipped expectation(s)</strong> : 64</p></li>
+<li><p><strong>Number of skipped expectation(s)</strong> : 66</p></li>
 </ul>
 <hr />
 <p><strong>Help:</strong></p>
@@ -191,7 +191,7 @@ stock assessment models.</li>
 <summary>
 Test session infrastructure (click to expand)
 </summary>
-<pre><code>R version 4.5.2 (2025-10-31)
+<pre><code>R version 4.5.3 (2026-03-11)
 Platform: x86_64-pc-linux-gnu
 Running under: Ubuntu 24.04.3 LTS
 
@@ -212,13 +212,13 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
-[1] FIMS_0.8.1     testthat_3.3.2
+[1] FIMS_0.9.0     testthat_3.3.2
 
 loaded via a namespace (and not attached):
-  [1] attempt_0.3.1       remotes_2.5.0       rlang_1.1.7        
-  [4] magrittr_2.0.4      otel_0.2.0          compiler_4.5.2     
-  [7] roxygen2_7.3.3      callr_3.7.6         vctrs_0.7.1        
- [10] stringr_1.6.0       pkgconfig_2.0.3     fastmap_1.2.0      
+  [1] attempt_0.3.1       rlang_1.1.7         magrittr_2.0.4     
+  [4] otel_0.2.0          compiler_4.5.3      roxygen2_7.3.3     
+  [7] callr_3.7.6         vctrs_0.7.1         stringr_1.6.0      
+ [10] pkgconfig_2.0.3     stockplotr_0.9.0    fastmap_1.2.0      
  [13] ellipsis_0.3.2      utf8_1.2.6          promises_1.5.0     
  [16] rmarkdown_2.30      markdown_2.0        sessioninfo_1.2.3  
  [19] ps_1.9.1            purrr_1.2.1         waldo_0.6.2        
@@ -232,7 +232,7 @@ loaded via a namespace (and not attached):
  [43] base64enc_0.1-6     httpuv_1.6.16       Matrix_1.7-4       
  [46] timechange_0.4.0    tidyselect_1.2.1    rstudioapi_0.18.0  
  [49] yaml_2.3.12         TMB_1.9.19          codetools_0.2-20   
- [52] processx_3.8.6      pkgbuild_1.4.8      lattice_0.22-7     
+ [52] processx_3.8.6      pkgbuild_1.4.8      lattice_0.22-9     
  [55] tibble_3.3.1        shiny_1.13.0        withr_3.0.2        
  [58] S7_0.2.1            askpass_1.2.1       evaluate_1.0.5     
  [61] arpr_0.1.2          desc_1.4.3          xml2_1.5.2         
@@ -240,16 +240,16 @@ loaded via a namespace (and not attached):
  [67] rex_1.2.1           generics_0.1.4      rprojroot_2.1.1    
  [70] credentials_2.0.3   ggplot2_4.0.2       commonmark_2.0.0   
  [73] scales_1.4.0        xtable_1.8-8        glue_1.8.0         
- [76] lazyeval_0.2.2      lozen_1.3.0.9001    tools_4.5.2        
+ [76] lazyeval_0.2.2      lozen_1.3.0.9001    tools_4.5.3        
  [79] sys_3.4.3           forcats_1.0.1       fs_1.6.7           
- [82] grid_4.5.2          tidyr_1.3.2         crosstalk_1.2.2    
- [85] gh_1.5.0            devtools_2.4.6      cli_3.6.5          
- [88] config_0.3.2        testdown_0.1.2.9000 dplyr_1.2.0        
- [91] gtable_0.3.6        sass_0.4.10         digest_0.6.39      
- [94] gitlabr_2.1.0.9000  htmlwidgets_1.6.4   farver_2.1.2       
- [97] memoise_2.0.1       htmltools_0.5.9     pkgdown_2.2.0      
-[100] lifecycle_1.0.5     httr_1.4.8          here_1.0.2         
-[103] mime_0.13           openssl_2.3.5      </code></pre>
+ [82] grid_4.5.3          tidyr_1.3.2         crosstalk_1.2.2    
+ [85] gh_1.5.0            devtools_2.5.0      cli_3.6.5          
+ [88] config_0.3.2        testdown_0.1.2.9000 viridisLite_0.4.3  
+ [91] dplyr_1.2.0         gtable_0.3.6        sass_0.4.10        
+ [94] digest_0.6.39       gitlabr_2.1.0.9000  htmlwidgets_1.6.4  
+ [97] farver_2.1.2        memoise_2.0.1       htmltools_0.5.9    
+[100] pkgdown_2.2.0       lifecycle_1.0.5     httr_1.4.8         
+[103] here_1.0.2          mime_0.13           openssl_2.3.5      </code></pre>
 </details>
 <details>
 <summary>

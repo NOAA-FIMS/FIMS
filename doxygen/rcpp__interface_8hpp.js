@@ -8,7 +8,6 @@ var rcpp__interface_8hpp =
     [ "get_log", "rcpp__interface_8hpp.html#a924e08ad8be03c00824757641ed43619", null ],
     [ "get_log_errors", "rcpp__interface_8hpp.html#a7665d61cdec92aa03255c2cd09633cc8", null ],
     [ "get_log_info", "rcpp__interface_8hpp.html#a2c59f540047725fab06de92844d9e243", null ],
-    [ "get_log_module", "rcpp__interface_8hpp.html#a1c842aac2387ac8c4b0df86ce2b369d0", null ],
     [ "get_log_warnings", "rcpp__interface_8hpp.html#a1143b71f2fae1d0fdc570a326f2ae84e", null ],
     [ "get_parameter_names", "rcpp__interface_8hpp.html#a82e3a00b5981f857ed79cd594f70bf0e", null ],
     [ "get_random_names", "rcpp__interface_8hpp.html#af9adbb18f4b688138a54a189ff3b36e1", null ],

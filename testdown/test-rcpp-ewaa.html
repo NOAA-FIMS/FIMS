@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2026-03-11" />
+<meta name="date" content="2026-03-16" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -161,12 +161,12 @@
 <h2>Details<a href="test-rcpp-ewaa.html#details-29" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <table>
 <colgroup>
-<col width="17%" />
-<col width="22%" />
-<col width="27%" />
-<col width="22%" />
+<col width="16%" />
+<col width="21%" />
+<col width="30%" />
+<col width="21%" />
 <col width="4%" />
-<col width="6%" />
+<col width="5%" />
 </colgroup>
 <thead>
 <tr class="header">
@@ -184,40 +184,40 @@
 <td align="left">Test that EWAAGrowth evaluate(1) returns the first value in the weight-at-age data.</td>
 <td align="left">expect_equal(ewaa_growth$evaluate(1), 0.00053065552)</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
-<td align="left">test-rcpp-ewaa.R#43</td>
-<td align="left">2026-03-11 18:05:06.061908</td>
+<td align="left">test-rcpp-ewaa.R#45</td>
+<td align="left">2026-03-16 18:13:50.757157</td>
 </tr>
 <tr class="even">
 <td align="left">EWAAGrowth get_id() works with correct input data</td>
 <td align="left">Test that id of ewaa_growth is 1.</td>
 <td align="left">expect_equal(ewaa_growth$get_id(), 1)</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
-<td align="left">test-rcpp-ewaa.R#48</td>
-<td align="left">2026-03-11 18:05:06.074488</td>
+<td align="left">test-rcpp-ewaa.R#50</td>
+<td align="left">2026-03-16 18:13:50.76924</td>
 </tr>
 <tr class="odd">
 <td align="left">EWAAGrowth get_id() works with correct input data</td>
 <td align="left">Test that id of ewaa_growth2 is 2.</td>
 <td align="left">expect_equal(ewaa_growth2$get_id(), 2)</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
-<td align="left">test-rcpp-ewaa.R#50</td>
-<td align="left">2026-03-11 18:05:06.083718</td>
+<td align="left">test-rcpp-ewaa.R#52</td>
+<td align="left">2026-03-16 18:13:50.77827</td>
 </tr>
 <tr class="even">
 <td align="left">EWAAGrowth evaluate() doesn’t work when missing weights</td>
 <td align="left">Test that EWAAGrowth evaluate(1) throws an error when weights are missing.</td>
 <td align="left">expect_error(ewaa_growth$evaluate(1))</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
-<td align="left">test-rcpp-ewaa.R#66</td>
-<td align="left">2026-03-11 18:05:06.110921</td>
+<td align="left">test-rcpp-ewaa.R#69</td>
+<td align="left">2026-03-16 18:13:50.802151</td>
 </tr>
 <tr class="odd">
 <td align="left">EWAAGrowth evaluate() returns expected error for mismatched input lengths</td>
 <td align="left">Test that EWAAGrowth evaluate() throws an error when the lengths of ages and weights don’t match.</td>
-<td align="left">expect_error( ewaa_growth$evaluate(1), regexp = “ages and weights must be the same length”, ignore.case = FALSE )</td>
+<td align="left">expect_error( ewaa_growth$evaluate(1), regexp = “does not match ages size or ages size times \(n_years \+ 1\)”, ignore.case = FALSE )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
-<td align="left">test-rcpp-ewaa.R#89</td>
-<td align="left">2026-03-11 18:05:06.139368</td>
+<td align="left">test-rcpp-ewaa.R#93</td>
+<td align="left">2026-03-16 18:13:50.927886</td>
 </tr>
 </tbody>
 </table>

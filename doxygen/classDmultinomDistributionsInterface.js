@@ -14,5 +14,5 @@ var classDmultinomDistributionsInterface =
     [ "expected_values", "classDmultinomDistributionsInterface.html#a63619adb012ab0dd45742eb125654b06", null ],
     [ "lpdf_vec", "classDmultinomDistributionsInterface.html#aceae16a92080ad46edfbc5062d69792a", null ],
     [ "notes", "classDmultinomDistributionsInterface.html#a126a9417e1c95bd2261ad41fbfdce06e", null ],
-    [ "x", "classDmultinomDistributionsInterface.html#a48a0a46a8a38f71c167bdaba657b9ba7", null ]
+    [ "observed_values", "classDmultinomDistributionsInterface.html#a7b5ce66ecb2d70d00f29a195e6bf0dbd", null ]
 ];

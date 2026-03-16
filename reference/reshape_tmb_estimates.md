@@ -25,7 +25,8 @@ reshape_tmb_estimates(obj, sdreport = NULL, opt = NULL, parameter_names)
 
   An object returned from an optimizer, typically from
   [`stats::nlminb()`](https://rdrr.io/r/stats/nlminb.html), used to fit
-  a TMB model.
+  a TMB model. If the model is not optimized, opt is an empty list and
+  is not used in the function.
 
 - parameter_names:
 

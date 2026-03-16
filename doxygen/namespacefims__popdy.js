@@ -16,6 +16,5 @@ var namespacefims__popdy =
     [ "RecruitmentBase", "structfims__popdy_1_1RecruitmentBase.html", "structfims__popdy_1_1RecruitmentBase" ],
     [ "SelectivityBase", "structfims__popdy_1_1SelectivityBase.html", "structfims__popdy_1_1SelectivityBase" ],
     [ "SRBevertonHolt", "structfims__popdy_1_1SRBevertonHolt.html", "structfims__popdy_1_1SRBevertonHolt" ],
-    [ "Subpopulation", "classfims__popdy_1_1Subpopulation.html", null ],
-    [ "UncertaintyReportInfo", "structfims__popdy_1_1UncertaintyReportInfo.html", "structfims__popdy_1_1UncertaintyReportInfo" ]
+    [ "Subpopulation", "classfims__popdy_1_1Subpopulation.html", null ]
 ];

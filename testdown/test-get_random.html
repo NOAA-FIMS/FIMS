@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2026-03-11" />
+<meta name="date" content="2026-03-16" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -185,7 +185,7 @@
 <td align="left">expect_equal( c(selectivity$inflection_point[1]$value, selectivity$slope[1]$value), get_random() )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-get_random.R#26</td>
-<td align="left">2026-03-11 16:43:02.723027</td>
+<td align="left">2026-03-16 17:19:01.992021</td>
 </tr>
 <tr class="even">
 <td align="left"><code>get_random()</code> works with correct inputs</td>
@@ -193,7 +193,7 @@
 <td align="left">expect_equal( selectivity$slope[1]$value, get_random() )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-get_random.R#38</td>
-<td align="left">2026-03-11 16:43:02.736636</td>
+<td align="left">2026-03-16 17:19:02.003591</td>
 </tr>
 <tr class="odd">
 <td align="left"><code>get_random()</code> works with correct inputs</td>
@@ -201,31 +201,31 @@
 <td align="left">expect_equal(get_random(), sel_parm)</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-get_random.R#61</td>
-<td align="left">2026-03-11 16:43:02.755271</td>
+<td align="left">2026-03-16 17:19:02.019978</td>
 </tr>
 <tr class="even">
 <td align="left"><code>get_random()</code> works with correct inputs</td>
 <td align="left">Test the counting of random effects parameters when multiple modules are involved, e.g., selectivity and recruitment.</td>
 <td align="left">expect_equal(c(sel_parm, rec_parm), get_random())</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
-<td align="left">test-get_random.R#87</td>
-<td align="left">2026-03-11 16:43:02.77647</td>
+<td align="left">test-get_random.R#83</td>
+<td align="left">2026-03-16 17:19:02.036346</td>
 </tr>
 <tr class="odd">
 <td align="left"><code>get_random()</code> returns correct outputs for edge cases</td>
 <td align="left">Test that zero parameters are registered after using <code>clear()</code>.</td>
 <td align="left">expect_equal(numeric(0), get_random())</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
-<td align="left">test-get_random.R#97</td>
-<td align="left">2026-03-11 16:43:02.78755</td>
+<td align="left">test-get_random.R#93</td>
+<td align="left">2026-03-16 17:19:02.047224</td>
 </tr>
 <tr class="even">
 <td align="left"><code>get_random()</code> returns correct outputs for edge cases</td>
 <td align="left">Test that zero parameters are registered after using <code>clear()</code> even if <code>CreateTMBModel()</code> is called.</td>
 <td align="left">expect_equal(numeric(0), get_random())</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
-<td align="left">test-get_random.R#100</td>
-<td align="left">2026-03-11 16:43:02.795739</td>
+<td align="left">test-get_random.R#96</td>
+<td align="left">2026-03-16 17:19:02.055284</td>
 </tr>
 </tbody>
 </table>

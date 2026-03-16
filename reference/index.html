@@ -4,9 +4,9 @@
 
 
     <nav class="navbar navbar-expand-lg fixed-top bg-light" data-bs-theme="light" aria-label="Site navigation"><div class="container">
-    <img class="navlogo" src="https://noaa-fims.github.io/images/FIMS_logo3.png" width="60" align="left"><a class="navbar-brand me-2" href="../index.html">FIMS</a>
+    <img class="navlogo" src="https://noaa-fims.github.io/images/FIMS_logo3.png" alt="FIMS logo with a fish" width="60" align="left"><a class="navbar-brand me-2" href="../index.html">FIMS</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -76,10 +76,24 @@
 
       <dl><dt>
 
-          <code><a href="data1.html">data1</a></code>
+          <code><a href="data_big.html">data_big</a></code>
 
         </dt>
         <dd>FIMS input data frame</dd>
+
+        <dt>
+
+          <code><a href="fims_input_types.html">fims_input_types</a></code>
+
+        </dt>
+        <dd>Vector of acceptable FIMS input types</dd>
+
+        <dt>
+
+          <code><a href="plot.html">plot()</a></code>
+
+        </dt>
+        <dd>Plot a <code>FIMSFrame</code> object</dd>
       </dl></div><div class="section level2">
       <h2 id="run-fims">Run FIMS<a class="anchor" aria-label="anchor" href="#run-fims"></a></h2>
 
@@ -106,7 +120,7 @@
 
         <dt>
 
-          <code><a href="m_.html">m_landings()</a></code> <code><a href="m_.html">m_index()</a></code> <code><a href="m_.html">m_agecomp()</a></code> <code><a href="m_.html">m_lengthcomp()</a></code> <code><a href="m_.html">m_weight_at_age()</a></code> <code><a href="m_.html">m_age_to_length_conversion()</a></code>
+          <code><a href="model_.html">model_landings()</a></code> <code><a href="model_.html">model_index()</a></code> <code><a href="model_.html">model_age_comp()</a></code> <code><a href="model_.html">model_length_comp()</a></code> <code><a href="model_.html">model_weight_at_age()</a></code> <code><a href="model_.html">model_age_to_length_conversion()</a></code>
 
         </dt>
         <dd>Get a vector of data to be passed to a FIMS module from a FIMSFrame object</dd>
@@ -278,7 +292,7 @@
 
         <dt>
 
-          <code><a href="Cpp_functions.html">Cpp_functions</a></code> <code><a href="Cpp_functions.html">clear</a></code> <code><a href="Cpp_functions.html">get_fixed</a></code> <code><a href="Cpp_functions.html">get_log</a></code> <code><a href="Cpp_functions.html">get_log_errors</a></code> <code><a href="Cpp_functions.html">get_log_module</a></code> <code><a href="Cpp_functions.html">get_log_warnings</a></code> <code><a href="Cpp_functions.html">get_parameter_names</a></code> <code><a href="Cpp_functions.html">get_random</a></code> <code><a href="Cpp_functions.html">get_random_names</a></code> <code><a href="Cpp_functions.html">inv_logit</a></code> <code><a href="Cpp_functions.html">log_error</a></code> <code><a href="Cpp_functions.html">log_info</a></code> <code><a href="Cpp_functions.html">log_warning</a></code> <code><a href="Cpp_functions.html">logit</a></code> <code><a href="Cpp_functions.html">set_fixed</a></code> <code><a href="Cpp_functions.html">set_log_throw_on_error</a></code> <code><a href="Cpp_functions.html">set_random</a></code> <code><a href="Cpp_functions.html">CreateTMBModel</a></code>
+          <code><a href="Cpp_functions.html">Cpp_functions</a></code> <code><a href="Cpp_functions.html">clear</a></code> <code><a href="Cpp_functions.html">get_fixed</a></code> <code><a href="Cpp_functions.html">get_log</a></code> <code><a href="Cpp_functions.html">get_log_errors</a></code> <code><a href="Cpp_functions.html">get_log_warnings</a></code> <code><a href="Cpp_functions.html">get_parameter_names</a></code> <code><a href="Cpp_functions.html">get_random</a></code> <code><a href="Cpp_functions.html">get_random_names</a></code> <code><a href="Cpp_functions.html">inv_logit</a></code> <code><a href="Cpp_functions.html">log_error</a></code> <code><a href="Cpp_functions.html">log_info</a></code> <code><a href="Cpp_functions.html">log_warning</a></code> <code><a href="Cpp_functions.html">logit</a></code> <code><a href="Cpp_functions.html">set_fixed</a></code> <code><a href="Cpp_functions.html">set_log_throw_on_error</a></code> <code><a href="Cpp_functions.html">set_random</a></code> <code><a href="Cpp_functions.html">CreateTMBModel</a></code>
 
         </dt>
         <dd>C++ Functions Exported via Rcpp</dd>
@@ -288,7 +302,7 @@
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Kelli F. Johnson, Grant D. Adams, Jon K. T. Brodziak, Kathryn L. Doering, Daniel R. Goethel, Andrea M. Havron, Ronald Klasky, Peter T. Kuriyama, Emily M. Liljestrand, Christopher M. Legault, Bai Li, Timothy J. Miller, Cole C. Monnahan, Megumi C. Oshima, Kyle W. Shertzer, Christine C. Stawitz, Jane Y. Sullivan, Matthew Supernaw, Ian G. Taylor, Nathan R. Vaughan, Erik H. Williams.</p>
+  <p>Developed by Kelli F. Johnson, Grant D. Adams, Jon K. T. Brodziak, Kathryn L. Doering, Daniel R. Goethel, Andrea M. Havron, Ronald Klasky, Peter T. Kuriyama, Emily M. Liljestrand, Christopher M. Legault, Bai Li, Timothy J. Miller, Cole C. Monnahan, Elizabeth F. Perl, Megumi C. Oshima, Kyle W. Shertzer, Christine C. Stawitz, Jane Y. Sullivan, Matthew Supernaw, Ian G. Taylor, Nathan R. Vaughan, Erik H. Williams.</p>
 </div>
 
 <div class="pkgdown-footer-right">

@@ -6,52 +6,52 @@ detailed usage, see the C++ docs.
 
 ## Details
 
-- [AgeComp](https://noaa-fims.github.io/doxygen/classAgeCompDataInterface.html)
+- [AgeComp](https://noaa-fims.github.io/FIMS/doxygen/classAgeCompDataInterface.html)
 
-- [BevertonHoltRecruitment](https://noaa-fims.github.io/doxygen/classBevertonHoltRecruitmentInterface.html)
+- [BevertonHoltRecruitment](https://noaa-fims.github.io/FIMS/doxygen/classBevertonHoltRecruitmentInterface.html)
 
-- [CatchAtAge](https://noaa-fims.github.io/doxygen/classCatchAtAgeInterface.html)
+- [CatchAtAge](https://noaa-fims.github.io/FIMS/doxygen/classCatchAtAgeInterface.html)
 
-- [DlnormDistribution](https://noaa-fims.github.io/doxygen/classDlnormDistributionsInterface.html)
+- [DlnormDistribution](https://noaa-fims.github.io/FIMS/doxygen/classDlnormDistributionsInterface.html)
 
-- [DmultinomDistribution](https://noaa-fims.github.io/doxygen/classDmultinomDistributionsInterface.html)
+- [DmultinomDistribution](https://noaa-fims.github.io/FIMS/doxygen/classDmultinomDistributionsInterface.html)
 
-- [DnormDistribution](https://noaa-fims.github.io/doxygen/classDnormDistributionsInterface.html)
+- [DnormDistribution](https://noaa-fims.github.io/FIMS/doxygen/classDnormDistributionsInterface.html)
 
-- [DoubleLogisticSelectivity](https://noaa-fims.github.io/doxygen/classDoubleLogisticSelectivityInterface.html)
+- [DoubleLogisticSelectivity](https://noaa-fims.github.io/FIMS/doxygen/classDoubleLogisticSelectivityInterface.html)
 
-- [EWAAGrowth](https://noaa-fims.github.io/doxygen/classEWAAGrowthInterface.html)
+- [EWAAGrowth](https://noaa-fims.github.io/FIMS/doxygen/classEWAAGrowthInterface.html)
 
-- [Fleet](https://noaa-fims.github.io/doxygen/classFleetInterface.html)
+- [Fleet](https://noaa-fims.github.io/FIMS/doxygen/classFleetInterface.html)
 
-- [Index](https://noaa-fims.github.io/doxygen/classIndexDataInterface.html)
+- [Index](https://noaa-fims.github.io/FIMS/doxygen/classIndexDataInterface.html)
 
-- [Landings](https://noaa-fims.github.io/doxygen/classLandingsDataInterface.html)
+- [Landings](https://noaa-fims.github.io/FIMS/doxygen/classLandingsDataInterface.html)
 
-- [LengthComp](https://noaa-fims.github.io/doxygen/classLengthCompDataInterface.html)
+- [LengthComp](https://noaa-fims.github.io/FIMS/doxygen/classLengthCompDataInterface.html)
 
-- [LogDevsRecruitmentProcess](https://noaa-fims.github.io/doxygen/classLogDevsRecruitmentInterface.html)
+- [LogDevsRecruitmentProcess](https://noaa-fims.github.io/FIMS/doxygen/classLogDevsRecruitmentInterface.html)
 
-- [LogRRecruitmentProcess](https://noaa-fims.github.io/doxygen/classLogRRecruitmentInterface.html)
+- [LogRRecruitmentProcess](https://noaa-fims.github.io/FIMS/doxygen/classLogRRecruitmentInterface.html)
 
-- [LogisticMaturity](https://noaa-fims.github.io/doxygen/classLogisticMaturityInterface.html)
+- [LogisticMaturity](https://noaa-fims.github.io/FIMS/doxygen/classLogisticMaturityInterface.html)
 
-- [LogisticSelectivity](https://noaa-fims.github.io/doxygen/classLogisticSelectivityInterface.html)
+- [LogisticSelectivity](https://noaa-fims.github.io/FIMS/doxygen/classLogisticSelectivityInterface.html)
 
-- [Parameter](https://noaa-fims.github.io/doxygen/classParameter.html)
+- [Parameter](https://noaa-fims.github.io/FIMS/doxygen/classParameter.html)
 
-- [ParameterVector](https://noaa-fims.github.io/doxygen/classParameterVector.html)
+- [ParameterVector](https://noaa-fims.github.io/FIMS/doxygen/classParameterVector.html)
 
-- [Population](https://noaa-fims.github.io/doxygen/classPopulationInterface.html)
+- [Population](https://noaa-fims.github.io/FIMS/doxygen/classPopulationInterface.html)
 
-- [RealVector](https://noaa-fims.github.io/doxygen/classRealVector.html)
+- [RealVector](https://noaa-fims.github.io/FIMS/doxygen/classRealVector.html)
 
-- [SharedInt](https://noaa-fims.github.io/doxygen/classSharedInt.html)
+- [SharedInt](https://noaa-fims.github.io/FIMS/doxygen/classSharedInt.html)
 
-- [SharedReal](https://noaa-fims.github.io/doxygen/classSharedReal.html)
+- [SharedReal](https://noaa-fims.github.io/FIMS/doxygen/classSharedReal.html)
 
-- [SharedString](https://noaa-fims.github.io/doxygen/classSharedString.html)
+- [SharedString](https://noaa-fims.github.io/FIMS/doxygen/classSharedString.html)
 
 ## C++ Documentation
 
-[NOAA-FIMS C++ Documentation](https://noaa-fims.github.io/doxygen/)
+[NOAA-FIMS C++ Documentation](https://noaa-fims.github.io/FIMS/doxygen/)

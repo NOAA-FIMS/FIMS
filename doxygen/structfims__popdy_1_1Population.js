@@ -1,8 +1,6 @@
 var structfims__popdy_1_1Population =
 [
     [ "Population", "structfims__popdy_1_1Population.html#ad7fa5749fe5de3b9937d462d2e13743c", null ],
-    [ "create_report_vectors", "structfims__popdy_1_1Population.html#af8ba21263fc544f3bd1da7d190f00b2e", null ],
-    [ "get_report_vector_count", "structfims__popdy_1_1Population.html#a23af344276ab16cf38d1f6d1fa5d5849", null ],
     [ "ages", "structfims__popdy_1_1Population.html#a23a683cac81c7ed67ac6a13cf129dfde", null ],
     [ "f_multiplier", "structfims__popdy_1_1Population.html#ab28151c31aea3b0cf9fac5e95b0c0220", null ],
     [ "fleet_ids", "structfims__popdy_1_1Population.html#ad3088db5680dac891e0b4f972fa925a4", null ],

@@ -12,5 +12,5 @@ var classDlnormDistributionsInterface =
     [ "expected_values", "classDlnormDistributionsInterface.html#a34ff4c41bc72eab179e3a8b617354cba", null ],
     [ "log_sd", "classDlnormDistributionsInterface.html#a8491faa65e18ae6abadc989775ae7309", null ],
     [ "lpdf_vec", "classDlnormDistributionsInterface.html#afd3831940b1df9108e630c5380a678eb", null ],
-    [ "x", "classDlnormDistributionsInterface.html#aab25846177b7941148b2c589771192da", null ]
+    [ "observed_values", "classDlnormDistributionsInterface.html#a731a805f4d075d438135d3a4ba4414a4", null ]
 ];

@@ -3,7 +3,6 @@ var classfims_1_1FIMSLog =
     [ "FIMSLog", "classfims_1_1FIMSLog.html#aa766eb84784fa15a905bec91f03ba920", null ],
     [ "~FIMSLog", "classfims_1_1FIMSLog.html#ad32e96778496a16f9a943f405c3956a9", null ],
     [ "clear", "classfims_1_1FIMSLog.html#a1bd3de73d5a5a6727e3f2b3bd8d4c43c", null ],
-    [ "debug_message", "classfims_1_1FIMSLog.html#a0242c7f16fb0bc047dad9f51d6ddee2c", null ],
     [ "error_message", "classfims_1_1FIMSLog.html#a18a705c8e1094b56390a7dd9f441d724", null ],
     [ "get_error_count", "classfims_1_1FIMSLog.html#aec60cfc5ad2b61d46557991af9bb3d4a", null ],
     [ "get_errors", "classfims_1_1FIMSLog.html#abd24b5080409560f74311cc0e4f22748", null ],

@@ -291,10 +291,6 @@ std::string&#160;</td><td class="memItemRight" valign="bottom"><b>get_log_warnin
 std::string&#160;</td><td class="memItemRight" valign="bottom"><b>get_log_info</b> ()</td></tr>
 <tr class="memdesc:a2c59f540047725fab06de92844d9e243"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the info entries from the log as a string in JSON format. <br /></td></tr>
 <tr class="separator:a2c59f540047725fab06de92844d9e243"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1c842aac2387ac8c4b0df86ce2b369d0" id="r_a1c842aac2387ac8c4b0df86ce2b369d0"><td class="memItemLeft" align="right" valign="top"><a id="a1c842aac2387ac8c4b0df86ce2b369d0" name="a1c842aac2387ac8c4b0df86ce2b369d0"></a>
-std::string&#160;</td><td class="memItemRight" valign="bottom"><b>get_log_module</b> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> std::string &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">module</a>)</td></tr>
-<tr class="memdesc:a1c842aac2387ac8c4b0df86ce2b369d0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets log entries by module as a string in JSON format. <br /></td></tr>
-<tr class="separator:a1c842aac2387ac8c4b0df86ce2b369d0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad2abfffed726ee7fcbf89f0ec216fe62" id="r_ad2abfffed726ee7fcbf89f0ec216fe62"><td class="memItemLeft" align="right" valign="top"><a id="ad2abfffed726ee7fcbf89f0ec216fe62" name="ad2abfffed726ee7fcbf89f0ec216fe62"></a>
 <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><b>write_log</b> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">write</a>)</td></tr>
 <tr class="memdesc:ad2abfffed726ee7fcbf89f0ec216fe62"><td class="mdescLeft">&#160;</td><td class="mdescRight">If true, writes the log on exit. <br /></td></tr>
@@ -549,11 +545,11 @@ template&lt;typename Type &gt; </div>
 </div><div class="memdoc">
 
 <p>Update fixed parameters in the tape, so the output is correct. </p>
-<p>Updates the internal parameter values for the model base of type TMB_FIMS_REAL_TYPE. It is typically called before finalize() or <a class="el" href="classCatchAtAgeInterface.html#aa1879000c24be96ab99dd36baf58f92d">`get_output()`</a> to ensure the correct values are used because TMB doesn't always keep the updated parameters in the "double" version of the tape. So we need to update those first. <br  />
+<p>Updates the internal parameter values for the model base of type TMB_FIMS_REAL_TYPE. It is typically called before finalize() or <a class="el" href="classCatchAtAgeInterface.html#a1c4ce93749a4b7a8375f077b3d134657">`get_output()`</a> to ensure the correct values are used because TMB doesn't always keep the updated parameters in the "double" version of the tape. So we need to update those first. <br  />
 <br  />
 Usage example in R: </p><div class="fragment"><div class="line">set_fixed_parameters(c(1, 2, 3))</div>
 <div class="line">set_random_parameters(c(1, 2, 3))</div>
-<div class="line">catch_at_age$get_output(do_sd_report = FALSE)</div>
+<div class="line">catch_at_age$get_output()</div>
 </div><!-- fragment -->  <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">par</td><td>A vector of parameter values. </td></tr>
@@ -581,11 +577,11 @@ Usage example in R: </p><div class="fragment"><div class="line">set_fixed_parame
 </div><div class="memdoc">
 
 <p>Update random effect parameters in the tape, so the output is correct. </p>
-<p>Updates the internal parameter values for the model base of type TMB_FIMS_REAL_TYPE. It is typically called before finalize() or <a class="el" href="classCatchAtAgeInterface.html#aa1879000c24be96ab99dd36baf58f92d">`get_output()`</a> to ensure the correct values are used because TMB doesn't always keep the updated parameters in the "double" version of the tape. So we need to update those first. <br  />
+<p>Updates the internal parameter values for the model base of type TMB_FIMS_REAL_TYPE. It is typically called before finalize() or <a class="el" href="classCatchAtAgeInterface.html#a1c4ce93749a4b7a8375f077b3d134657">`get_output()`</a> to ensure the correct values are used because TMB doesn't always keep the updated parameters in the "double" version of the tape. So we need to update those first. <br  />
 <br  />
 Usage example in R: </p><div class="fragment"><div class="line">set_fixed_parameters(c(1, 2, 3))</div>
 <div class="line">set_random_parameters(c(1, 2, 3))</div>
-<div class="line">catch_at_age$get_output(do_sd_report = FALSE)</div>
+<div class="line">catch_at_age$get_output()</div>
 </div><!-- fragment -->  <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">par</td><td>A vector of parameter values. </td></tr>

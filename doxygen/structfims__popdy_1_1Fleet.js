@@ -2,8 +2,6 @@ var structfims__popdy_1_1Fleet =
 [
     [ "Fleet", "structfims__popdy_1_1Fleet.html#a1aaf947b159a58a5d23d78e55c34a4fd", null ],
     [ "~Fleet", "structfims__popdy_1_1Fleet.html#a8daf372e70483efaeba014d5ebf7500b", null ],
-    [ "create_report_vectors", "structfims__popdy_1_1Fleet.html#aa5124358776594999ae07f5a21c8a7e8", null ],
-    [ "get_report_vector_count", "structfims__popdy_1_1Fleet.html#adba2cf93b21e95d5e7bf1490cf5ab45e", null ],
     [ "Prepare", "structfims__popdy_1_1Fleet.html#a889b7e1e0b2aa9f4a3114d3d6f8ad577", null ],
     [ "age_to_length_conversion", "structfims__popdy_1_1Fleet.html#ab0ba9edd8d93288939648869c2ab6996", null ],
     [ "fleet_observed_agecomp_data_id_m", "structfims__popdy_1_1Fleet.html#a650c1f21f4efce9a78472408e4abd2d2", null ],

@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2026-03-11" />
+<meta name="date" content="2026-03-16" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -185,7 +185,7 @@
 <td align="left">verify_fims_deterministic( report = result[[“report”]], estimates = result[[“sdr_fixed”]], om_input = om_input_list[[iter_id]], om_output = om_output_list[[iter_id]], em_input = em_input_list[[iter_id]], use_fimsfit = FALSE )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-integration-caa-mle.R#34</td>
-<td align="left">2026-03-11 16:45:30.442071</td>
+<td align="left">2026-03-16 17:21:38.441839</td>
 </tr>
 <tr class="even">
 <td align="left">catch-at-age model (deterministic MLE without wrappers) works with correct inputs</td>
@@ -193,7 +193,7 @@
 <td align="left">verify_fims_nll( report = result[[“report”]], om_input = om_input_list[[iter_id]], om_output = om_output_list[[iter_id]], em_input = em_input_list[[iter_id]] )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-integration-caa-mle.R#44</td>
-<td align="left">2026-03-11 16:45:30.531479</td>
+<td align="left">2026-03-16 17:21:38.552372</td>
 </tr>
 <tr class="odd">
 <td align="left">catch-at-age model (deterministic MLE without wrappers) works with correct inputs</td>
@@ -201,7 +201,7 @@
 <td align="left">expect_equal(length(result[[“obj”]][[“par”]]), 48)</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-integration-caa-mle.R#53</td>
-<td align="left">2026-03-11 16:45:30.564562</td>
+<td align="left">2026-03-16 17:21:38.584754</td>
 </tr>
 <tr class="even">
 <td align="left">catch-at-age model (estimation MLE without wrappers) works with correct inputs</td>
@@ -209,7 +209,7 @@
 <td align="left">validate_fims( report = result[[“report”]], estimates = result[[“sdr_report”]], om_input = om_input_list[[iter_id]], om_output = om_output_list[[iter_id]], em_input = em_input_list[[iter_id]] )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-integration-caa-mle.R#76</td>
-<td align="left">2026-03-11 16:47:56.290385</td>
+<td align="left">2026-03-16 17:22:58.609486</td>
 </tr>
 <tr class="odd">
 <td align="left">catch-at-age model (estimation MLE without wrappers) works with correct inputs</td>
@@ -217,7 +217,7 @@
 <td align="left">expect_equal(out_of_tolerance_parameters, 0)</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-integration-caa-mle.R#96</td>
-<td align="left">2026-03-11 16:47:56.324697</td>
+<td align="left">2026-03-16 17:22:58.642041</td>
 </tr>
 <tr class="even">
 <td align="left">catch-at-age model (estimation MLE without wrappers) returns correct outputs for missing values</td>
@@ -225,7 +225,7 @@
 <td align="left">expect_false(is.null(result[[“report”]]))</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-integration-caa-mle.R#117</td>
-<td align="left">2026-03-11 16:50:21.857333</td>
+<td align="left">2026-03-16 17:24:20.197526</td>
 </tr>
 <tr class="odd">
 <td align="left">catch-at-age model (estimation MLE without wrappers) returns correct outputs for missing values</td>
@@ -233,7 +233,7 @@
 <td align="left">expect_lte(max_gradient, 0.0001)</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-integration-caa-mle.R#131</td>
-<td align="left">2026-03-11 16:50:22.360862</td>
+<td align="left">2026-03-16 17:24:20.728662</td>
 </tr>
 <tr class="even">
 <td align="left">catch-at-age model (estimation MLE without wrappers) returns correct outputs for missing values</td>
@@ -241,7 +241,7 @@
 <td align="left">validate_fims( report = result[[“report”]], estimates = result[[“sdr_report”]], om_input = om_input_list[[iter_id]], om_output = om_output_list[[iter_id]], em_input = em_input_list[[iter_id]] )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-integration-caa-mle.R#134</td>
-<td align="left">2026-03-11 16:50:22.372621</td>
+<td align="left">2026-03-16 17:24:20.746045</td>
 </tr>
 <tr class="odd">
 <td align="left">catch-at-age model (estimation MLE without wrappers) returns correct outputs for sample size of 1</td>
@@ -249,7 +249,7 @@
 <td align="left">validate_fims( report = result[[“report”]], estimates = result[[“sdr_report”]], om_input = om_input_list[[iter_id]], om_output = om_output_list[[iter_id]], em_input = em_input_list[[iter_id]] )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-integration-caa-mle.R#165</td>
-<td align="left">2026-03-11 16:52:50.603379</td>
+<td align="left">2026-03-16 17:25:42.628269</td>
 </tr>
 <tr class="even">
 <td align="left">catch-at-age model (estimation MLE without wrappers) returns correct outputs with NA values and sample size of 1</td>
@@ -257,7 +257,7 @@
 <td align="left">validate_fims( report = result[[“report”]], estimates = result[[“sdr_report”]], om_input = om_input_list[[iter_id]], om_output = om_output_list[[iter_id]], em_input = em_input_list[[iter_id]] )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-integration-caa-mle.R#203</td>
-<td align="left">2026-03-11 16:55:17.756574</td>
+<td align="left">2026-03-16 17:27:03.707135</td>
 </tr>
 </tbody>
 </table>

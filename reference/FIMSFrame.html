@@ -10,9 +10,9 @@ needed for different types of models."><meta property="og:image" content="https:
 
 
     <nav class="navbar navbar-expand-lg fixed-top bg-light" data-bs-theme="light" aria-label="Site navigation"><div class="container">
-    <img class="navlogo" src="https://noaa-fims.github.io/images/FIMS_logo3.png" width="60" align="left"><a class="navbar-brand me-2" href="../index.html">FIMS</a>
+    <img class="navlogo" src="https://noaa-fims.github.io/images/FIMS_logo3.png" alt="FIMS logo with a fish" width="60" align="left"><a class="navbar-brand me-2" href="../index.html">FIMS</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -91,8 +91,8 @@ needed for different types of models.</p>
 <dl><dt id="arg-data">data<a class="anchor" aria-label="anchor" href="#arg-data"></a></dt>
 <dd><p>A <code>data.frame</code> that contains the necessary columns to construct
 a <code>FIMSFrame-class</code> object. Currently, those columns are
-type, name, age, length, timing, value, unit, and uncertainty. See
-the data1 object in FIMS, e.g., <code>data(data1, package = "FIMS")</code>.</p></dd>
+type, name, age, length, timing, value, unit, and uncertainty.
+See the <code>data_big</code> object in FIMS, e.g., <code>data(data_big, package = "FIMS")</code>.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -117,18 +117,18 @@ data slot.</p><div class="section">
 <p>It is important that the order of the rows in the data are correct but it is
 not expected that the user will do this. Instead, the returned data are
 sorted using <code><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">dplyr::arrange()</a></code> before placing them in the data slot. Data
-are first sorted by data type, placing all weight-at-age data next to other
-weight-at-age data and all landings data next to landings data. Thus,
-age-composition data will come first because their type is "age" and "a" is
+are first sorted by data type, placing all <code>weight_at_age</code> data next to
+other <code>weight_at_age</code> data and all landings data next to landings data.
+Thus, <code>age_comp</code> data will come first because their type is "age" and "a" is
 first in the alphabet. All other types will follow according to their order
 in the alphabet.
-Next, within each type, data are organized by fleet. So, age-composition
+Next, within each type, data are organized by fleet. So, <code>age_comp</code>
 information for fleet1 will come before survey1. Next, all data within type
 and fleet are arranged by timing, e.g., by year. That is the end of the
-sorting for time series data like landings and indices.
-The biological data are further sorted by bin. Thus, age-composition
-information will be arranged as follows:</p><table class="table table"><tr><td>type</td><td>name</td><td>timing</td><td>age</td><td>value</td></tr><tr><td>age</td><td>fleet1</td><td>2022</td><td>1</td><td>0.3</td></tr><tr><td>age</td><td>fleet1</td><td>2022</td><td>2</td><td>0.7</td></tr><tr><td>age</td><td>fleet1</td><td>2023</td><td>1</td><td>0.5</td></tr></table><p>Length composition-data are sorted the same way but by length bin instead of
-by age bin. It becomes more complicated for the age-to-length-conversion
+sorting for time series data like landings and indices. The biological data
+are further sorted by bin. Thus, <code>age_comp</code> information will be arranged as
+follows:</p><table class="table table"><tr><td>type</td><td>name</td><td>timing</td><td>age</td><td>value</td></tr><tr><td>age_comp</td><td>fleet1</td><td>2022</td><td>1</td><td>0.3</td></tr><tr><td>age_comp</td><td>fleet1</td><td>2022</td><td>2</td><td>0.7</td></tr><tr><td>age_comp</td><td>fleet1</td><td>2023</td><td>1</td><td>0.5</td></tr></table><p><code>length_comp</code> data are sorted the same way but by length bin instead of
+by age bin. It becomes more complicated for the <code>age_to_length_conversion</code>
 data, which are sorted by type, name, timing, age, and then length. So, a
 full set of length, e.g., length 10, length 20, length 30, etc., is placed
 together for a given age. After that age, another entire set of length
@@ -146,7 +146,7 @@ for a given fleet then the next year will begin.</p>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Kelli F. Johnson, Grant D. Adams, Jon K. T. Brodziak, Kathryn L. Doering, Daniel R. Goethel, Andrea M. Havron, Ronald Klasky, Peter T. Kuriyama, Emily M. Liljestrand, Christopher M. Legault, Bai Li, Timothy J. Miller, Cole C. Monnahan, Megumi C. Oshima, Kyle W. Shertzer, Christine C. Stawitz, Jane Y. Sullivan, Matthew Supernaw, Ian G. Taylor, Nathan R. Vaughan, Erik H. Williams.</p>
+  <p>Developed by Kelli F. Johnson, Grant D. Adams, Jon K. T. Brodziak, Kathryn L. Doering, Daniel R. Goethel, Andrea M. Havron, Ronald Klasky, Peter T. Kuriyama, Emily M. Liljestrand, Christopher M. Legault, Bai Li, Timothy J. Miller, Cole C. Monnahan, Elizabeth F. Perl, Megumi C. Oshima, Kyle W. Shertzer, Christine C. Stawitz, Jane Y. Sullivan, Matthew Supernaw, Ian G. Taylor, Nathan R. Vaughan, Erik H. Williams.</p>
 </div>
 
 <div class="pkgdown-footer-right">

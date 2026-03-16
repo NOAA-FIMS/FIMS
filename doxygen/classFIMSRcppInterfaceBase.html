@@ -260,13 +260,6 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:aa97acd77c0c4d2e193c67cd0662d803c" id="r_aa97acd77c0c4d2e193c67cd0662d803c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">virtual</a> std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFIMSRcppInterfaceBase.html#aa97acd77c0c4d2e193c67cd0662d803c">to_json</a> ()</td></tr>
 <tr class="memdesc:aa97acd77c0c4d2e193c67cd0662d803c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert the data to json representation for the output.  <br /></td></tr>
 <tr class="separator:aa97acd77c0c4d2e193c67cd0662d803c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a72fc17f2f76b60a82db50167b1cde83d" id="r_a72fc17f2f76b60a82db50167b1cde83d"><td class="memItemLeft" align="right" valign="top"><a id="a72fc17f2f76b60a82db50167b1cde83d" name="a72fc17f2f76b60a82db50167b1cde83d"></a>
-<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><b>get_se_values</b> (std::string name, std::map&lt; std::string, std::vector&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">double</a> &gt; &gt; &amp;se_values, <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">double</a> &gt; &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">values</a>)</td></tr>
-<tr class="memdesc:a72fc17f2f76b60a82db50167b1cde83d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Method to extract standard error values from the se_values working map. <br /></td></tr>
-<tr class="separator:a72fc17f2f76b60a82db50167b1cde83d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5e19680aa5d84f270939435588bce03b" id="r_a5e19680aa5d84f270939435588bce03b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">virtual</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFIMSRcppInterfaceBase.html#a5e19680aa5d84f270939435588bce03b">set_uncertainty</a> (std::map&lt; std::string, std::vector&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">double</a> &gt; &gt; &amp;se_values)</td></tr>
-<tr class="memdesc:a5e19680aa5d84f270939435588bce03b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set uncertainty values for the interface object.  <br /></td></tr>
-<tr class="separator:a5e19680aa5d84f270939435588bce03b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a46e0ce655ef707a6c66e863aa4f0b374" id="r_a46e0ce655ef707a6c66e863aa4f0b374"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFIMSRcppInterfaceBase.html#a46e0ce655ef707a6c66e863aa4f0b374">value_to_string</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">double</a> value)</td></tr>
 <tr class="memdesc:a46e0ce655ef707a6c66e863aa4f0b374"><td class="mdescLeft">&#160;</td><td class="mdescRight">Report the parameter value as a string.  <br /></td></tr>
 <tr class="separator:a46e0ce655ef707a6c66e863aa4f0b374"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -350,43 +343,6 @@ Static Public Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a5e19680aa5d84f270939435588bce03b" name="a5e19680aa5d84f270939435588bce03b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5e19680aa5d84f270939435588bce03b">&#9670;&#160;</a></span>set_uncertainty()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">virtual</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a> FIMSRcppInterfaceBase::set_uncertainty </td>
-          <td>(</td>
-          <td class="paramtype">std::map&lt; std::string, std::vector&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">double</a> &gt; &gt; &amp;&#160;</td>
-          <td class="paramname"><em>se_values</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Set uncertainty values for the interface object. </p>
-<p>This virtual method is intended to be overridden in derived classes to set uncertainty (standard error) values for model parameters or quantities using the provided map of standard error values. The default implementation logs a warning.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">se_values</td><td>A map from parameter names to vectors of standard error values. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p>Reimplemented in <a class="el" href="classLogisticMaturityInterface.html#af4487f1ed44f5a1a38b6fd97436ec107">LogisticMaturityInterface</a>, <a class="el" href="classBevertonHoltRecruitmentInterface.html#a0b4d4cd3a3ef120aa49e466bed475cf9">BevertonHoltRecruitmentInterface</a>, <a class="el" href="classLogisticSelectivityInterface.html#ae6099926f8bfad6f8b460c6b786d1562">LogisticSelectivityInterface</a>, and <a class="el" href="classDoubleLogisticSelectivityInterface.html#a8e11bab0b8c530e960f57a2f58ee4701">DoubleLogisticSelectivityInterface</a>.</p>
-
-</div>
-</div>
 <a id="aa97acd77c0c4d2e193c67cd0662d803c" name="aa97acd77c0c4d2e193c67cd0662d803c"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aa97acd77c0c4d2e193c67cd0662d803c">&#9670;&#160;</a></span>to_json()</h2>
 
@@ -412,7 +368,7 @@ Static Public Attributes</h2></td></tr>
 
 <p>Convert the data to json representation for the output. </p>
 
-<p>Reimplemented in <a class="el" href="classAgeCompDataInterface.html#a2ff550b84e84b05fac80726c92944ba6">AgeCompDataInterface</a>, <a class="el" href="classLengthCompDataInterface.html#adbd93e1f4c9087f10b3b32975cd10bd8">LengthCompDataInterface</a>, <a class="el" href="classIndexDataInterface.html#a1ad722d8f82198700a3dd72f9d11613c">IndexDataInterface</a>, <a class="el" href="classLandingsDataInterface.html#a6664332e0918bb63b119f8717c647458">LandingsDataInterface</a>, <a class="el" href="classDnormDistributionsInterface.html#a3ac41c008229d455fc81b9893decd3a7">DnormDistributionsInterface</a>, <a class="el" href="classDlnormDistributionsInterface.html#a36b83f73e6bef702b5435cd3471e92ee">DlnormDistributionsInterface</a>, <a class="el" href="classDmultinomDistributionsInterface.html#ac41624db2ed049445240e0b83793ae21">DmultinomDistributionsInterface</a>, <a class="el" href="classEWAAGrowthInterface.html#ae879683aa137986bded7572f0d4d4095">EWAAGrowthInterface</a>, <a class="el" href="classLogisticMaturityInterface.html#ad239da2246abb3476ff179540fad8d7c">LogisticMaturityInterface</a>, <a class="el" href="classBevertonHoltRecruitmentInterface.html#a3fe268ea362772d045c4fe7618bcf8fc">BevertonHoltRecruitmentInterface</a>, <a class="el" href="classLogisticSelectivityInterface.html#a6868e2168d5ebb91931548e9a3b508bc">LogisticSelectivityInterface</a>, and <a class="el" href="classDoubleLogisticSelectivityInterface.html#a99e6d2a07db1738ad10e33b7c786a881">DoubleLogisticSelectivityInterface</a>.</p>
+<p>Reimplemented in <a class="el" href="classAgeCompDataInterface.html#a2ff550b84e84b05fac80726c92944ba6">AgeCompDataInterface</a>, <a class="el" href="classLengthCompDataInterface.html#adbd93e1f4c9087f10b3b32975cd10bd8">LengthCompDataInterface</a>, <a class="el" href="classIndexDataInterface.html#a1ad722d8f82198700a3dd72f9d11613c">IndexDataInterface</a>, <a class="el" href="classLandingsDataInterface.html#a6664332e0918bb63b119f8717c647458">LandingsDataInterface</a>, <a class="el" href="classDnormDistributionsInterface.html#a3ac41c008229d455fc81b9893decd3a7">DnormDistributionsInterface</a>, <a class="el" href="classDlnormDistributionsInterface.html#a36b83f73e6bef702b5435cd3471e92ee">DlnormDistributionsInterface</a>, <a class="el" href="classDmultinomDistributionsInterface.html#ac41624db2ed049445240e0b83793ae21">DmultinomDistributionsInterface</a>, <a class="el" href="classEWAAGrowthInterface.html#ae879683aa137986bded7572f0d4d4095">EWAAGrowthInterface</a>, <a class="el" href="classLogisticMaturityInterface.html#ad239da2246abb3476ff179540fad8d7c">LogisticMaturityInterface</a>, <a class="el" href="classFisheryModelInterfaceBase.html#acda4ae1beacd1cd075898b5b09c1ed81">FisheryModelInterfaceBase</a>, <a class="el" href="classCatchAtAgeInterface.html#a1c4ce93749a4b7a8375f077b3d134657">CatchAtAgeInterface</a>, <a class="el" href="classBevertonHoltRecruitmentInterface.html#a3fe268ea362772d045c4fe7618bcf8fc">BevertonHoltRecruitmentInterface</a>, <a class="el" href="classLogisticSelectivityInterface.html#a6868e2168d5ebb91931548e9a3b508bc">LogisticSelectivityInterface</a>, and <a class="el" href="classDoubleLogisticSelectivityInterface.html#a99e6d2a07db1738ad10e33b7c786a881">DoubleLogisticSelectivityInterface</a>.</p>
 
 </div>
 </div>

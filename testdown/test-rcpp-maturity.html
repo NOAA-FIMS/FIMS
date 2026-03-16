@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2026-03-11" />
+<meta name="date" content="2026-03-16" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -148,8 +148,8 @@
 <h2>Summary<a href="test-rcpp-maturity.html#summary-32" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <ul>
 <li><p><strong>Number of test(s)</strong> : 1</p></li>
-<li><p><strong>Number of expectation(s)</strong> : 8</p></li>
-<li><p><strong>Number of successful expectation(s)</strong> : 8</p></li>
+<li><p><strong>Number of expectation(s)</strong> : 6</p></li>
+<li><p><strong>Number of successful expectation(s)</strong> : 6</p></li>
 <li><p><strong>Number of failed expectation(s)</strong> : 0</p></li>
 <li><p><strong>Number of errored expectation(s)</strong> : 0</p></li>
 <li><p><strong>Number of expectations with warning(s)</strong> : 0</p></li>
@@ -184,64 +184,48 @@
 <td align="left">Test that <code>get_id()</code> from the maturity module returns the correct id.</td>
 <td align="left">expect_equal(maturity1$get_id(), 1)</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
-<td align="left">test-rcpp-maturity.R#26</td>
-<td align="left">2026-03-11 18:05:06.502411</td>
+<td align="left">test-rcpp-maturity.R#24</td>
+<td align="left">2026-03-16 18:13:51.301743</td>
 </tr>
 <tr class="even">
 <td align="left">rcpp maturity works with correct inputs</td>
 <td align="left">Test that the value of <code>inflection_point</code> can be set and get correctly.</td>
 <td align="left">expect_equal(maturity1$inflection_point[1]$value, 10.0)</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
-<td align="left">test-rcpp-maturity.R#28</td>
-<td align="left">2026-03-11 18:05:06.511377</td>
-</tr>
-<tr class="odd">
-<td align="left">rcpp maturity works with correct inputs</td>
-<td align="left">Test that the min of <code>inflection_point</code> can be set and get correctly.</td>
-<td align="left">expect_equal(maturity1$inflection_point[1]$min, 8.0)</td>
-<td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
-<td align="left">test-rcpp-maturity.R#30</td>
-<td align="left">2026-03-11 18:05:06.520305</td>
-</tr>
-<tr class="even">
-<td align="left">rcpp maturity works with correct inputs</td>
-<td align="left">Test that the max of <code>inflection_point</code> can be set and get correctly.</td>
-<td align="left">expect_equal(maturity1$inflection_point[1]$max, 12.0)</td>
-<td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
-<td align="left">test-rcpp-maturity.R#32</td>
-<td align="left">2026-03-11 18:05:06.529159</td>
+<td align="left">test-rcpp-maturity.R#26</td>
+<td align="left">2026-03-16 18:13:51.309433</td>
 </tr>
 <tr class="odd">
 <td align="left">rcpp maturity works with correct inputs</td>
 <td align="left">Test that the <code>estimation_type</code> of <code>inflection_point</code> can be set and get correctly.</td>
 <td align="left">expect_equal(maturity1$inflection_point[1]$estimation_type$get(), “fixed_effects”)</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
-<td align="left">test-rcpp-maturity.R#34</td>
-<td align="left">2026-03-11 18:05:06.538449</td>
+<td align="left">test-rcpp-maturity.R#28</td>
+<td align="left">2026-03-16 18:13:51.317453</td>
 </tr>
 <tr class="even">
 <td align="left">rcpp maturity works with correct inputs</td>
 <td align="left">Test that the value of <code>slope</code> can be set and get correctly.</td>
 <td align="left">expect_equal(maturity1$slope[1]$value, 0.2)</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
-<td align="left">test-rcpp-maturity.R#36</td>
-<td align="left">2026-03-11 18:05:06.547309</td>
+<td align="left">test-rcpp-maturity.R#30</td>
+<td align="left">2026-03-16 18:13:51.32501</td>
 </tr>
 <tr class="odd">
 <td align="left">rcpp maturity works with correct inputs</td>
 <td align="left">Test that the <code>evaluate()</code> method from the maturity module works correctly.</td>
 <td align="left">expect_equal(maturity1$evaluate(10.0), 0.5)</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
-<td align="left">test-rcpp-maturity.R#38</td>
-<td align="left">2026-03-11 18:05:06.555559</td>
+<td align="left">test-rcpp-maturity.R#32</td>
+<td align="left">2026-03-16 18:13:51.332463</td>
 </tr>
 <tr class="even">
 <td align="left">rcpp maturity works with correct inputs</td>
 <td align="left">Test that rcpp maturity returns the correct id.</td>
 <td align="left">expect_equal((maturity2$get_id()), 2)</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
-<td align="left">test-rcpp-maturity.R#43</td>
-<td align="left">2026-03-11 18:05:06.564245</td>
+<td align="left">test-rcpp-maturity.R#37</td>
+<td align="left">2026-03-16 18:13:51.339831</td>
 </tr>
 </tbody>
 </table>

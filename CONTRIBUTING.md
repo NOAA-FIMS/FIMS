@@ -64,9 +64,13 @@ and `ctest --test-dir build`. This can also be done using
 [`setup_and_run_gtest()`](https://NOAA-FIMS.github.io/FIMS/reference/setup_and_run_gtest.md)
 in R. If there are failing tests, run
 `ctest --test-dir --rerun-failed --output-on-failure` to re-run the
-failed tests verbosely. \* Run clang format to format the C++ code using
-TODO: document how to run clang-format. \* Run clang tidy to check C++
-for common mistakes using TODO: document how to run clang-tidy. \* Spell
+failed tests verbosely. \* Format C++ code using clang-format version
+18.0.0 with Google style:
+`clang-format -i --style="{BasedOnStyle: Google, SortIncludes: false}" $(find ./inst/include ./src ./tests/gtest -name "*.hpp" -o -name "*.cpp")`.
+If you are contributing from a fork, the automated formatting workflow
+will add a comment to your pull request with detailed instructions on
+how to format your code locally. \* Run clang tidy to check C++ for
+common mistakes using TODO: document how to run clang-tidy. \* Spell
 check the package using
 `spelling::spell_check_files(list.files(c("R", "tests", file.path("inst", "include")), recursive = TRUE, full.names = TRUE, pattern = "\\.cpp|\\.hpp|\\.md|\\.R$|\\.Rmd|\\.txt"), ignore = spelling::get_wordlist())`.
 Remove all the .md files in the vignettes directory and then spell check
@@ -80,6 +84,8 @@ best practices. \* Implement the suite of testthat tests using
 Run
 [`styler::style_pkg()`](https://styler.r-lib.org/reference/style_pkg.html)
 to style R code. \* Run
+[`usethis::use_tidy_description()`](https://usethis.r-lib.org/reference/tidyverse.html)
+to update the DESCRIPTION file. \* Run
 [`devtools::check()`](https://devtools.r-lib.org/reference/check.html)
 to ensure the package can be compiled and R tests pass. If there are
 failing tests, run `devtools::test(filter = "file_name")` (where
@@ -116,6 +122,16 @@ formatting/structuring your reviewer comments. Navigate to the [Perforce
 Blog](https://www.perforce.com/blog/qac/9-best-practices-for-code-review)
 for nine best practices for code review and use the [FIMS Style
 Guide](#style-guide) to settle any style arguments.
+
+An automated workflow
+([pr-format.yml](https://github.com/NOAA-FIMS/FIMS/blob/main/.github/workflows/pr-format.yml))
+runs when you open or update a pull request. This workflow checks both
+C++ and R code formatting. If you are contributing from the main
+repository, the workflow will automatically create a pull request with
+formatting changes that need to be merged into your feature branch. If
+you are contributing from a fork, the workflow will add a comment to
+your pull request with detailed instructions on how to format your code
+locally, since the automated workflow cannot push changes to forks.
 
 Versioning follows [semantic versioning](https://semver.org/) to
 establish the major, minor, and patch number for a release. Often,

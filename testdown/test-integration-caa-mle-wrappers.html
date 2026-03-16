@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2026-03-11" />
+<meta name="date" content="2026-03-16" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -147,9 +147,9 @@
 <div id="summary-18" class="section level2 unnumbered hasAnchor">
 <h2>Summary<a href="test-integration-caa-mle-wrappers.html#summary-18" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <ul>
-<li><p><strong>Number of test(s)</strong> : 9</p></li>
-<li><p><strong>Number of expectation(s)</strong> : 16</p></li>
-<li><p><strong>Number of successful expectation(s)</strong> : 16</p></li>
+<li><p><strong>Number of test(s)</strong> : 10</p></li>
+<li><p><strong>Number of expectation(s)</strong> : 18</p></li>
+<li><p><strong>Number of successful expectation(s)</strong> : 18</p></li>
 <li><p><strong>Number of failed expectation(s)</strong> : 0</p></li>
 <li><p><strong>Number of errored expectation(s)</strong> : 0</p></li>
 <li><p><strong>Number of expectations with warning(s)</strong> : 0</p></li>
@@ -161,10 +161,10 @@
 <h2>Details<a href="test-integration-caa-mle-wrappers.html#details-18" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <table>
 <colgroup>
-<col width="25%" />
-<col width="16%" />
-<col width="36%" />
-<col width="13%" />
+<col width="26%" />
+<col width="15%" />
+<col width="35%" />
+<col width="12%" />
 <col width="5%" />
 <col width="3%" />
 </colgroup>
@@ -185,7 +185,7 @@
 <td align="left">verify_fims_deterministic( report = get_report(deterministic_age_length_comp), estimates = get_estimates(deterministic_age_length_comp), om_input = om_input_list[[iter_id]], om_output = om_output_list[[iter_id]], em_input = em_input_list[[iter_id]], use_fimsfit = TRUE )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-integration-caa-mle-wrappers.R#28</td>
-<td align="left">2026-03-11 16:43:35.026665</td>
+<td align="left">2026-03-16 17:19:47.177016</td>
 </tr>
 <tr class="even">
 <td align="left">catch-at-age model (deterministic MLE with wrappers) returns correct NLLs</td>
@@ -193,7 +193,7 @@
 <td align="left">verify_fims_nll( report = get_report(deterministic_age_length_comp), om_input = om_input_list[[iter_id]], om_output = om_output_list[[iter_id]], em_input = em_input_list[[iter_id]] )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-integration-caa-mle-wrappers.R#43</td>
-<td align="left">2026-03-11 16:43:35.222801</td>
+<td align="left">2026-03-16 17:19:47.435005</td>
 </tr>
 <tr class="odd">
 <td align="left">catch-at-age model (deterministic MLE with wrappers) returns correct NLLs / catch-at-age model (deterministic MLE with wrappers) returns correct number of parameters and random effects</td>
@@ -201,7 +201,7 @@
 <td align="left">expect_equal(get_number_of_parameters(deterministic_age_length_comp)[“fixed_effects”] |&gt; unname(), 77)</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-integration-caa-mle-wrappers.R#52</td>
-<td align="left">2026-03-11 16:43:35.261385</td>
+<td align="left">2026-03-16 17:19:47.502442</td>
 </tr>
 <tr class="even">
 <td align="left">catch-at-age model (deterministic MLE with wrappers) returns correct NLLs / catch-at-age model (deterministic MLE with wrappers) returns correct number of parameters and random effects</td>
@@ -209,103 +209,119 @@
 <td align="left">expect_equal(get_number_of_parameters(deterministic_age_length_comp)[“random_effects”] |&gt; unname(), 0)</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-integration-caa-mle-wrappers.R#54</td>
-<td align="left">2026-03-11 16:43:35.27754</td>
+<td align="left">2026-03-16 17:19:47.5329</td>
+</tr>
+<tr class="odd">
+<td align="left">catch-at-age model (deterministic MLE with wrappers) check recruitment devs random effects / catch-at-age model (deterministic MLE with wrappers) returns correct number of parameters and random effects</td>
+<td align="left">Test that the number of fixed parameters are correct.</td>
+<td align="left">expect_equal(get_number_of_parameters(deterministic_age_length_comp)[“fixed_effects”] |&gt; unname(), 48)</td>
+<td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
+<td align="left">test-integration-caa-mle-wrappers.R#64</td>
+<td align="left">2026-03-16 17:19:48.230486</td>
+</tr>
+<tr class="even">
+<td align="left">catch-at-age model (deterministic MLE with wrappers) check recruitment devs random effects / catch-at-age model (deterministic MLE with wrappers) returns correct number of parameters and random effects</td>
+<td align="left">Test that the number of random effects are correct.</td>
+<td align="left">expect_equal(get_number_of_parameters(deterministic_age_length_comp)[“random_effects”] |&gt; unname(), 29)</td>
+<td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
+<td align="left">test-integration-caa-mle-wrappers.R#66</td>
+<td align="left">2026-03-16 17:19:48.25269</td>
 </tr>
 <tr class="odd">
 <td align="left">catch-at-age model (estimation MLE with wrappers) works with age and length comp</td>
 <td align="left">Test that the output from FIMS matches the model comparison project OM values.</td>
 <td align="left">validate_fims( report = get_report(fit_age_length_comp), estimates = get_estimates(fit_age_length_comp), om_input = om_input_list[[iter_id]], om_output = om_output_list[[iter_id]], em_input = em_input_list[[iter_id]], use_fimsfit = TRUE )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
-<td align="left">test-integration-caa-mle-wrappers.R#73</td>
-<td align="left">2026-03-11 16:43:37.781901</td>
+<td align="left">test-integration-caa-mle-wrappers.R#84</td>
+<td align="left">2026-03-16 17:19:50.972943</td>
 </tr>
 <tr class="even">
 <td align="left">catch-at-age model (estimation MLE with wrappers) works with age comp only using wrappers</td>
 <td align="left">Test that the output from FIMS matches the model comparison project OM values.</td>
 <td align="left">validate_fims( report = get_report(fit_agecomp), estimates = get_estimates(fit_agecomp), om_input = om_input_list[[iter_id]], om_output = om_output_list[[iter_id]], em_input = em_input_list[[iter_id]], use_fimsfit = TRUE )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
-<td align="left">test-integration-caa-mle-wrappers.R#89</td>
-<td align="left">2026-03-11 16:43:39.284442</td>
+<td align="left">test-integration-caa-mle-wrappers.R#100</td>
+<td align="left">2026-03-16 17:19:52.513953</td>
 </tr>
 <tr class="odd">
 <td align="left">catch-at-age model (estimation MLE with wrappers) works with age comp only using wrappers</td>
 <td align="left">Test that the output from FIMS matches the model comparison project OM values when there are NAs.</td>
 <td align="left">validate_fims( report = get_report(fit_agecomp_na), estimates = get_estimates(fit_agecomp_na), om_input = om_input_list[[iter_id]], om_output = om_output_list[[iter_id]], em_input = em_input_list[[iter_id]], use_fimsfit = TRUE )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
-<td align="left">test-integration-caa-mle-wrappers.R#102</td>
-<td align="left">2026-03-11 16:43:40.78438</td>
+<td align="left">test-integration-caa-mle-wrappers.R#113</td>
+<td align="left">2026-03-16 17:19:53.994596</td>
 </tr>
 <tr class="even">
 <td align="left">catch-at-age model (estimation MLE with wrappers) works with length comp only using wrappers</td>
 <td align="left">Test that the output from FIMS matches the model comparison project OM values.</td>
 <td align="left">validate_fims( report = get_report(fit_lengthcomp), estimates = get_estimates(fit_lengthcomp), om_input = om_input_list[[iter_id]], om_output = om_output_list[[iter_id]], em_input = em_input_list[[iter_id]], use_fimsfit = TRUE )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
-<td align="left">test-integration-caa-mle-wrappers.R#117</td>
-<td align="left">2026-03-11 16:43:43.655421</td>
+<td align="left">test-integration-caa-mle-wrappers.R#128</td>
+<td align="left">2026-03-16 17:19:57.080616</td>
 </tr>
 <tr class="odd">
 <td align="left">catch-at-age model (estimation MLE with wrappers) works with length comp only using wrappers</td>
 <td align="left">Test that the output from FIMS matches the model comparison project OM values when there are NAs.</td>
 <td align="left">validate_fims( report = get_report(fit_lengthcomp_na), estimates = get_estimates(fit_lengthcomp_na), om_input = om_input_list[[iter_id]], om_output = om_output_list[[iter_id]], em_input = em_input_list[[iter_id]], use_fimsfit = TRUE )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
-<td align="left">test-integration-caa-mle-wrappers.R#130</td>
-<td align="left">2026-03-11 16:43:46.620202</td>
+<td align="left">test-integration-caa-mle-wrappers.R#141</td>
+<td align="left">2026-03-16 17:19:59.730056</td>
 </tr>
 <tr class="even">
 <td align="left">catch-at-age model (estimation MLE with wrappers) works with age and length comp with NAs</td>
 <td align="left">Test that the output from FIMS matches the model comparison project OM values when there are NAs.</td>
 <td align="left">validate_fims( report = get_report(fit_age_length_comp_na), estimates = get_estimates(fit_age_length_comp_na), om_input = om_input_list[[iter_id]], om_output = om_output_list[[iter_id]], em_input = em_input_list[[iter_id]], use_fimsfit = TRUE )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
-<td align="left">test-integration-caa-mle-wrappers.R#145</td>
-<td align="left">2026-03-11 16:43:48.026927</td>
+<td align="left">test-integration-caa-mle-wrappers.R#156</td>
+<td align="left">2026-03-16 17:20:01.291305</td>
 </tr>
 <tr class="odd">
 <td align="left">catch-at-age model (estimation MLE with wrappers) works with mixed estimation types</td>
 <td align="left">Test that there are 10 years of constant fishing mortality values and 20 years of fixed effects for the fishing fleet.</td>
 <td align="left">expect_equal( dplyr::pull(dplyr::count(mixed_output, estimation_type)), c(10, 20) )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
-<td align="left">test-integration-caa-mle-wrappers.R#180</td>
-<td align="left">2026-03-11 16:44:10.091359</td>
+<td align="left">test-integration-caa-mle-wrappers.R#191</td>
+<td align="left">2026-03-16 17:20:15.246774</td>
 </tr>
 <tr class="even">
 <td align="left">catch-at-age model (estimation MLE with wrappers) works with mixed estimation types</td>
 <td align="left">Test that there are 20 years of estimates with standard errors because they are estimated as fixed effects.</td>
-<td align="left">expect_equal( sum(mixed_output[[“uncertainty”]] == 0), 10 )</td>
+<td align="left">expect_equal( sum(is.na(mixed_output[[“uncertainty”]])), 10 )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
-<td align="left">test-integration-caa-mle-wrappers.R#185</td>
-<td align="left">2026-03-11 16:44:10.10729</td>
+<td align="left">test-integration-caa-mle-wrappers.R#196</td>
+<td align="left">2026-03-16 17:20:15.263777</td>
 </tr>
 <tr class="odd">
 <td align="left">catch-at-age model (estimation MLE with wrappers) works with mixed estimation types</td>
 <td align="left">Test that the output from FIMS matches the model comparison project OM values when Fmort estimation types are mixed.</td>
 <td align="left">validate_fims( report = get_report(fit_mixed_estimation_types), estimates = get_estimates(fit_mixed_estimation_types), om_input = om_input_list[[iter_id]], om_output = om_output_list[[iter_id]], em_input = em_input_list[[iter_id]], use_fimsfit = TRUE )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
-<td align="left">test-integration-caa-mle-wrappers.R#191</td>
-<td align="left">2026-03-11 16:44:10.768386</td>
+<td align="left">test-integration-caa-mle-wrappers.R#202</td>
+<td align="left">2026-03-16 17:20:15.884005</td>
 </tr>
 <tr class="even">
 <td align="left">catch-at-age model (estimation MLE with wrappers) returns an error when there are no estimated parameters for optimization</td>
 <td align="left">Test that estimate column should match input column when not optimized.</td>
 <td align="left">expect_equal( deterministic_output[[“estimated”]], deterministic_output[[“input”]] )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
-<td align="left">test-integration-caa-mle-wrappers.R#229</td>
-<td align="left">2026-03-11 16:44:15.109988</td>
+<td align="left">test-integration-caa-mle-wrappers.R#240</td>
+<td align="left">2026-03-16 17:20:19.900985</td>
 </tr>
 <tr class="odd">
 <td align="left">catch-at-age model (estimation MLE with wrappers) returns an error when there are no estimated parameters for optimization</td>
 <td align="left">Test that no warnings are produced when optimize = FALSE.</td>
 <td align="left">expect_no_warning( initialized_model |&gt; fit_fims(optimize = FALSE) )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
-<td align="left">test-integration-caa-mle-wrappers.R#235</td>
-<td align="left">2026-03-11 16:44:16.557371</td>
+<td align="left">test-integration-caa-mle-wrappers.R#246</td>
+<td align="left">2026-03-16 17:20:20.246777</td>
 </tr>
 <tr class="even">
 <td align="left">catch-at-age model (estimation MLE with wrappers) returns an error when there are no estimated parameters for optimization</td>
 <td align="left">Test that FIMS returns an error when there are no estimated parameters for optimization.</td>
 <td align="left">expect_error( object = initialized_model |&gt; fit_fims(optimize = TRUE), regexp = “FIMS must have at least one parameter to optimize.” )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
-<td align="left">test-integration-caa-mle-wrappers.R#242</td>
-<td align="left">2026-03-11 16:44:16.588156</td>
+<td align="left">test-integration-caa-mle-wrappers.R#253</td>
+<td align="left">2026-03-16 17:20:20.276305</td>
 </tr>
 </tbody>
 </table>

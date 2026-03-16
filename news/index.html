@@ -4,9 +4,9 @@
 
 
     <nav class="navbar navbar-expand-lg fixed-top bg-light" data-bs-theme="light" aria-label="Site navigation"><div class="container">
-    <img class="navlogo" src="https://noaa-fims.github.io/images/FIMS_logo3.png" width="60" align="left"><a class="navbar-brand me-2" href="../index.html">FIMS</a>
+    <img class="navlogo" src="https://noaa-fims.github.io/images/FIMS_logo3.png" alt="FIMS logo with a fish" width="60" align="left"><a class="navbar-brand me-2" href="../index.html">FIMS</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -65,6 +65,20 @@
       <small>Source: <a href="https://github.com/noaa-fims/fims/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.9.0" id="fims-090">FIMS 0.9.0<a class="anchor" aria-label="anchor" href="#fims-090"></a></h2>
+<ul><li>Adds time-varying weight-at-age</li>
+<li>Adds time-varying selectivity</li>
+<li>Makes recruitment deviations random effects by default when using the wrapper functions</li>
+<li>Adds a glossary of mathematical symbols to the doxygen documentation</li>
+<li>Brings doxygen to the pkgdown site</li>
+<li>Fixes hidden bug in <code>dimension_folded_to_tibble()</code> in while loop</li>
+<li>Removes get_log_module</li>
+<li>Removes calculation of uncertainty within the C++ code</li>
+<li>Changed package data name to data_big and added helper data</li>
+<li>Changes <code>m_*()</code> functions to <code>model_*()</code>
+</li>
+</ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.8.1" id="fims-081">FIMS 0.8.1<a class="anchor" aria-label="anchor" href="#fims-081"></a></h2>
 <ul><li>Fixes two bugs in <code>fit_fims</code> when getting random effect names and not wanting measurements of uncertainty</li>
@@ -201,7 +215,7 @@
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Kelli F. Johnson, Grant D. Adams, Jon K. T. Brodziak, Kathryn L. Doering, Daniel R. Goethel, Andrea M. Havron, Ronald Klasky, Peter T. Kuriyama, Emily M. Liljestrand, Christopher M. Legault, Bai Li, Timothy J. Miller, Cole C. Monnahan, Megumi C. Oshima, Kyle W. Shertzer, Christine C. Stawitz, Jane Y. Sullivan, Matthew Supernaw, Ian G. Taylor, Nathan R. Vaughan, Erik H. Williams.</p>
+  <p>Developed by Kelli F. Johnson, Grant D. Adams, Jon K. T. Brodziak, Kathryn L. Doering, Daniel R. Goethel, Andrea M. Havron, Ronald Klasky, Peter T. Kuriyama, Emily M. Liljestrand, Christopher M. Legault, Bai Li, Timothy J. Miller, Cole C. Monnahan, Elizabeth F. Perl, Megumi C. Oshima, Kyle W. Shertzer, Christine C. Stawitz, Jane Y. Sullivan, Matthew Supernaw, Ian G. Taylor, Nathan R. Vaughan, Erik H. Williams.</p>
 </div>
 
 <div class="pkgdown-footer-right">

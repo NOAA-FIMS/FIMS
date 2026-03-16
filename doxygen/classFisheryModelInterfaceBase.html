@@ -255,12 +255,9 @@ Public Member Functions</h2></td></tr>
 <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">virtual</a>&#160;</td><td class="memItemRight" valign="bottom"><b>~FisheryModelInterfaceBase</b> ()</td></tr>
 <tr class="memdesc:afc875cceae839ade097b065a0dfdf930"><td class="mdescLeft">&#160;</td><td class="mdescRight">The destructor. <br /></td></tr>
 <tr class="separator:afc875cceae839ade097b065a0dfdf930"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6fef56aac5628b0b054bd933e524cdff" id="r_a6fef56aac5628b0b054bd933e524cdff"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">virtual</a> std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFisheryModelInterfaceBase.html#a6fef56aac5628b0b054bd933e524cdff">to_json</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">do_sd_report</a>=<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">true</a>)</td></tr>
-<tr class="memdesc:a6fef56aac5628b0b054bd933e524cdff"><td class="mdescLeft">&#160;</td><td class="mdescRight">Serialize the fishery model to a JSON string.  <br /></td></tr>
-<tr class="separator:a6fef56aac5628b0b054bd933e524cdff"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9323cb82817da7d6061b562cbf1b9d0c" id="r_a9323cb82817da7d6061b562cbf1b9d0c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">virtual</a> Rcpp::List&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFisheryModelInterfaceBase.html#a9323cb82817da7d6061b562cbf1b9d0c">calculate_reference_points</a> ()</td></tr>
-<tr class="memdesc:a9323cb82817da7d6061b562cbf1b9d0c"><td class="mdescLeft">&#160;</td><td class="mdescRight">A function to calculate reference points for the fishery model.  <br /></td></tr>
-<tr class="separator:a9323cb82817da7d6061b562cbf1b9d0c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acda4ae1beacd1cd075898b5b09c1ed81" id="r_acda4ae1beacd1cd075898b5b09c1ed81"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">virtual</a> std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFisheryModelInterfaceBase.html#acda4ae1beacd1cd075898b5b09c1ed81">to_json</a> ()</td></tr>
+<tr class="memdesc:acda4ae1beacd1cd075898b5b09c1ed81"><td class="mdescLeft">&#160;</td><td class="mdescRight">Serialize the fishery model to a JSON string.  <br /></td></tr>
+<tr class="separator:acda4ae1beacd1cd075898b5b09c1ed81"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a57c422df7fa5a40495e1fe21496c4830" id="r_a57c422df7fa5a40495e1fe21496c4830"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">virtual</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFisheryModelInterfaceBase.html#a57c422df7fa5a40495e1fe21496c4830">get_id</a> ()=0</td></tr>
 <tr class="memdesc:a57c422df7fa5a40495e1fe21496c4830"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the ID for the child fleet interface objects to inherit.  <br /></td></tr>
 <tr class="separator:a57c422df7fa5a40495e1fe21496c4830"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -271,16 +268,6 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:abdfb6b47bd4ea86042f84590236036d7 inherit pub_methods_classFIMSRcppInterfaceBase" id="r_abdfb6b47bd4ea86042f84590236036d7"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">virtual</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFIMSRcppInterfaceBase.html#abdfb6b47bd4ea86042f84590236036d7">finalize</a> ()</td></tr>
 <tr class="memdesc:abdfb6b47bd4ea86042f84590236036d7 inherit pub_methods_classFIMSRcppInterfaceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Extracts derived quantities back to the Rcpp interface object from the Information object.  <br /></td></tr>
 <tr class="separator:abdfb6b47bd4ea86042f84590236036d7 inherit pub_methods_classFIMSRcppInterfaceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa97acd77c0c4d2e193c67cd0662d803c inherit pub_methods_classFIMSRcppInterfaceBase" id="r_aa97acd77c0c4d2e193c67cd0662d803c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">virtual</a> std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFIMSRcppInterfaceBase.html#aa97acd77c0c4d2e193c67cd0662d803c">to_json</a> ()</td></tr>
-<tr class="memdesc:aa97acd77c0c4d2e193c67cd0662d803c inherit pub_methods_classFIMSRcppInterfaceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert the data to json representation for the output.  <br /></td></tr>
-<tr class="separator:aa97acd77c0c4d2e193c67cd0662d803c inherit pub_methods_classFIMSRcppInterfaceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a72fc17f2f76b60a82db50167b1cde83d inherit pub_methods_classFIMSRcppInterfaceBase" id="r_a72fc17f2f76b60a82db50167b1cde83d"><td class="memItemLeft" align="right" valign="top">
-<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><b>get_se_values</b> (std::string name, std::map&lt; std::string, std::vector&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">double</a> &gt; &gt; &amp;se_values, <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">double</a> &gt; &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">values</a>)</td></tr>
-<tr class="memdesc:a72fc17f2f76b60a82db50167b1cde83d inherit pub_methods_classFIMSRcppInterfaceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Method to extract standard error values from the se_values working map. <br /></td></tr>
-<tr class="separator:a72fc17f2f76b60a82db50167b1cde83d inherit pub_methods_classFIMSRcppInterfaceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5e19680aa5d84f270939435588bce03b inherit pub_methods_classFIMSRcppInterfaceBase" id="r_a5e19680aa5d84f270939435588bce03b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">virtual</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFIMSRcppInterfaceBase.html#a5e19680aa5d84f270939435588bce03b">set_uncertainty</a> (std::map&lt; std::string, std::vector&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">double</a> &gt; &gt; &amp;se_values)</td></tr>
-<tr class="memdesc:a5e19680aa5d84f270939435588bce03b inherit pub_methods_classFIMSRcppInterfaceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set uncertainty values for the interface object.  <br /></td></tr>
-<tr class="separator:a5e19680aa5d84f270939435588bce03b inherit pub_methods_classFIMSRcppInterfaceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a46e0ce655ef707a6c66e863aa4f0b374 inherit pub_methods_classFIMSRcppInterfaceBase" id="r_a46e0ce655ef707a6c66e863aa4f0b374"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFIMSRcppInterfaceBase.html#a46e0ce655ef707a6c66e863aa4f0b374">value_to_string</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">double</a> value)</td></tr>
 <tr class="memdesc:a46e0ce655ef707a6c66e863aa4f0b374 inherit pub_methods_classFIMSRcppInterfaceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Report the parameter value as a string.  <br /></td></tr>
 <tr class="separator:a46e0ce655ef707a6c66e863aa4f0b374 inherit pub_methods_classFIMSRcppInterfaceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -355,34 +342,6 @@ Static Public Attributes</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="a9323cb82817da7d6061b562cbf1b9d0c" name="a9323cb82817da7d6061b562cbf1b9d0c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9323cb82817da7d6061b562cbf1b9d0c">&#9670;&#160;</a></span>calculate_reference_points()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">virtual</a> Rcpp::List FisheryModelInterfaceBase::calculate_reference_points </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>A function to calculate reference points for the fishery model. </p>
-<dl class="section return"><dt>Returns</dt><dd>Rcpp::List </dd></dl>
-
-</div>
-</div>
 <a id="a57c422df7fa5a40495e1fe21496c4830" name="a57c422df7fa5a40495e1fe21496c4830"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a57c422df7fa5a40495e1fe21496c4830">&#9670;&#160;</a></span>get_id()</h2>
 
@@ -412,8 +371,8 @@ Static Public Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a6fef56aac5628b0b054bd933e524cdff" name="a6fef56aac5628b0b054bd933e524cdff"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6fef56aac5628b0b054bd933e524cdff">&#9670;&#160;</a></span>to_json()</h2>
+<a id="acda4ae1beacd1cd075898b5b09c1ed81" name="acda4ae1beacd1cd075898b5b09c1ed81"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acda4ae1beacd1cd075898b5b09c1ed81">&#9670;&#160;</a></span>to_json()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -424,8 +383,7 @@ Static Public Attributes</h2></td></tr>
         <tr>
           <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">virtual</a> std::string FisheryModelInterfaceBase::to_json </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a>&#160;</td>
-          <td class="paramname"><em>do_sd_report</em> = <code><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">true</a></code></td><td>)</td>
+          <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -438,15 +396,11 @@ Static Public Attributes</h2></td></tr>
 
 <p>Serialize the fishery model to a JSON string. </p>
 <p>This method provides a standardized interface for converting the state of a fishery model into a JSON-formatted string. The JSON output is intended for use in reporting, diagnostics, or data exchange between C++ and R. Derived classes should override this method to provide model-specific serialization logic.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">do_sd_report</td><td>A boolean to include standard deviation report calculations in the output if true. This is typically set to false when maximum likelihood estimation optimization is not performed, to avoid unnecessary computations. Default is true. </td></tr>
-  </table>
-  </dd>
-</dl>
 <dl class="section return"><dt>Returns</dt><dd>A JSON string representing the current state of the model. The base implementation returns a placeholder string indicating the method is not yet implemented. </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classCatchAtAgeInterface.html#aa1879000c24be96ab99dd36baf58f92d">CatchAtAgeInterface</a>.</p>
+<p>Reimplemented from <a class="el" href="classFIMSRcppInterfaceBase.html#aa97acd77c0c4d2e193c67cd0662d803c">FIMSRcppInterfaceBase</a>.</p>
+
+<p>Reimplemented in <a class="el" href="classCatchAtAgeInterface.html#a1c4ce93749a4b7a8375f077b3d134657">CatchAtAgeInterface</a>.</p>
 
 </div>
 </div>

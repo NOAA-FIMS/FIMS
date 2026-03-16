@@ -4,8 +4,15 @@
 
 Example dataset used in FIMS demonstrations and examples.
 
-- [`data1`](https://NOAA-FIMS.github.io/FIMS/reference/data1.md) : FIMS
-  input data frame
+- [`data_big`](https://NOAA-FIMS.github.io/FIMS/reference/data_big.md) :
+  FIMS input data frame
+
+- [`fims_input_types`](https://NOAA-FIMS.github.io/FIMS/reference/fims_input_types.md)
+  : Vector of acceptable FIMS input types
+
+- [`plot()`](https://NOAA-FIMS.github.io/FIMS/reference/plot.md) :
+
+  Plot a `FIMSFrame` object
 
 ## Run FIMS
 
@@ -28,12 +35,12 @@ Primary functions used when setting up or running a FIMS model.
   [`get_n_lengths()`](https://NOAA-FIMS.github.io/FIMS/reference/get_FIMSFrame.md)
   : Get a slot in a FIMSFrame object
 
-- [`m_landings()`](https://NOAA-FIMS.github.io/FIMS/reference/m_.md)
-  [`m_index()`](https://NOAA-FIMS.github.io/FIMS/reference/m_.md)
-  [`m_agecomp()`](https://NOAA-FIMS.github.io/FIMS/reference/m_.md)
-  [`m_lengthcomp()`](https://NOAA-FIMS.github.io/FIMS/reference/m_.md)
-  [`m_weight_at_age()`](https://NOAA-FIMS.github.io/FIMS/reference/m_.md)
-  [`m_age_to_length_conversion()`](https://NOAA-FIMS.github.io/FIMS/reference/m_.md)
+- [`model_landings()`](https://NOAA-FIMS.github.io/FIMS/reference/model_.md)
+  [`model_index()`](https://NOAA-FIMS.github.io/FIMS/reference/model_.md)
+  [`model_age_comp()`](https://NOAA-FIMS.github.io/FIMS/reference/model_.md)
+  [`model_length_comp()`](https://NOAA-FIMS.github.io/FIMS/reference/model_.md)
+  [`model_weight_at_age()`](https://NOAA-FIMS.github.io/FIMS/reference/model_.md)
+  [`model_age_to_length_conversion()`](https://NOAA-FIMS.github.io/FIMS/reference/model_.md)
   : Get a vector of data to be passed to a FIMS module from a FIMSFrame
   object
 
@@ -141,7 +148,6 @@ Links to the relevant doxygen documentation for the C++ code.
   [`get_fixed`](https://NOAA-FIMS.github.io/FIMS/reference/Cpp_functions.md)
   [`get_log`](https://NOAA-FIMS.github.io/FIMS/reference/Cpp_functions.md)
   [`get_log_errors`](https://NOAA-FIMS.github.io/FIMS/reference/Cpp_functions.md)
-  [`get_log_module`](https://NOAA-FIMS.github.io/FIMS/reference/Cpp_functions.md)
   [`get_log_warnings`](https://NOAA-FIMS.github.io/FIMS/reference/Cpp_functions.md)
   [`get_parameter_names`](https://NOAA-FIMS.github.io/FIMS/reference/Cpp_functions.md)
   [`get_random`](https://NOAA-FIMS.github.io/FIMS/reference/Cpp_functions.md)

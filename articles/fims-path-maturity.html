@@ -26,9 +26,9 @@
 
 
     <nav class="navbar navbar-expand-lg fixed-top bg-light" data-bs-theme="light" aria-label="Site navigation"><div class="container">
-    <img class="navlogo" src="https://noaa-fims.github.io/images/FIMS_logo3.png" width="60" align="left"><a class="navbar-brand me-2" href="../index.html">FIMS</a>
+    <img class="navlogo" src="https://noaa-fims.github.io/images/FIMS_logo3.png" alt="FIMS logo with a fish" width="60" align="left"><a class="navbar-brand me-2" href="../index.html">FIMS</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -164,11 +164,11 @@ wrapper function.</p>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/noaa-fims/fims" class="external-link">FIMS</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Load a built-in data set from the FIMS package</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"data1"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"data_big"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Convert the data into a FIMSFrame object, which is an S4 class.</span></span>
 <span><span class="co"># See ?FIMSFrame for more information.</span></span>
-<span><span class="va">fims_frame</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/FIMSFrame.html">FIMSFrame</a></span><span class="op">(</span><span class="va">data1</span><span class="op">)</span></span>
+<span><span class="va">fims_frame</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/FIMSFrame.html">FIMSFrame</a></span><span class="op">(</span><span class="va">data_big</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Create default maturity parameters using internal function</span></span>
 <span><span class="va">default_parameters</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/create_default_configurations.html">create_default_configurations</a></span><span class="op">(</span><span class="va">fims_frame</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -386,10 +386,10 @@ specific data type definitions. Below is an example of a definition.</p>
 <span id="cb10-7"><a href="#cb10-7" tabindex="-1"></a><span class="co"> */</span></span>
 <span id="cb10-8"><a href="#cb10-8" tabindex="-1"></a><span class="kw">template</span> <span class="op">&lt;</span><span class="kw">typename</span> Type<span class="op">&gt;</span></span>
 <span id="cb10-9"><a href="#cb10-9" tabindex="-1"></a><span class="kw">struct</span> fims<span class="op">::</span>ModelTraits <span class="op">{</span></span>
-<span id="cb10-10"><a href="#cb10-10" tabindex="-1"></a>  <span class="kw">typedef</span> <span class="kw">typename</span> CppAD<span class="op">::</span>vector<span class="op">&lt;</span>Type<span class="op">&gt;</span> DataVector<span class="op">;</span> <span class="co">/**&lt; A vector</span></span>
-<span id="cb10-11"><a href="#cb10-11" tabindex="-1"></a><span class="co">        of the data that is differentiable */</span></span>
-<span id="cb10-12"><a href="#cb10-12" tabindex="-1"></a>  <span class="kw">typedef</span> <span class="kw">typename</span> CppAD<span class="op">::</span>vector<span class="op">&lt;</span>Type<span class="op">&gt;</span> ParameterVector<span class="op">;</span> <span class="co">/**&lt; A</span></span>
-<span id="cb10-13"><a href="#cb10-13" tabindex="-1"></a><span class="co">  vector of the parameters that is differentiable */</span></span>
+<span id="cb10-10"><a href="#cb10-10" tabindex="-1"></a>  <span class="kw">typedef</span> <span class="kw">typename</span> tmbutils<span class="op">::</span>vector<span class="op">&lt;</span>Type<span class="op">&gt;</span> DataVector<span class="op">;</span>       <span class="co">/**&lt; A vector</span></span>
+<span id="cb10-11"><a href="#cb10-11" tabindex="-1"></a><span class="co">        of the data that is differentiable (Type is the TMB/TMBad scalar). */</span></span>
+<span id="cb10-12"><a href="#cb10-12" tabindex="-1"></a>  <span class="kw">typedef</span> <span class="kw">typename</span> tmbutils<span class="op">::</span>vector<span class="op">&lt;</span>Type<span class="op">&gt;</span> ParameterVector<span class="op">;</span>  <span class="co">/**&lt; A vector</span></span>
+<span id="cb10-13"><a href="#cb10-13" tabindex="-1"></a><span class="co">        of the parameters that is differentiable. */</span></span>
 <span id="cb10-14"><a href="#cb10-14" tabindex="-1"></a>  <span class="kw">typedef</span> <span class="kw">typename</span> tmbutils<span class="op">::</span>vector<span class="op">&lt;</span>Type<span class="op">&gt;</span></span>
 <span id="cb10-15"><a href="#cb10-15" tabindex="-1"></a>      EigenVector<span class="op">;</span> <span class="co">/**&lt; A vector as defined in the Eigen namespace in TMB */</span></span>
 <span id="cb10-16"><a href="#cb10-16" tabindex="-1"></a><span class="op">};</span></span>
@@ -876,7 +876,7 @@ calculations.</p>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Kelli F. Johnson, Grant D. Adams, Jon K. T. Brodziak, Kathryn L. Doering, Daniel R. Goethel, Andrea M. Havron, Ronald Klasky, Peter T. Kuriyama, Emily M. Liljestrand, Christopher M. Legault, Bai Li, Timothy J. Miller, Cole C. Monnahan, Megumi C. Oshima, Kyle W. Shertzer, Christine C. Stawitz, Jane Y. Sullivan, Matthew Supernaw, Ian G. Taylor, Nathan R. Vaughan, Erik H. Williams.</p>
+  <p>Developed by Kelli F. Johnson, Grant D. Adams, Jon K. T. Brodziak, Kathryn L. Doering, Daniel R. Goethel, Andrea M. Havron, Ronald Klasky, Peter T. Kuriyama, Emily M. Liljestrand, Christopher M. Legault, Bai Li, Timothy J. Miller, Cole C. Monnahan, Elizabeth F. Perl, Megumi C. Oshima, Kyle W. Shertzer, Christine C. Stawitz, Jane Y. Sullivan, Matthew Supernaw, Ian G. Taylor, Nathan R. Vaughan, Erik H. Williams.</p>
 </div>
 
 <div class="pkgdown-footer-right">

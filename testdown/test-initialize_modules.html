@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2026-03-11" />
+<meta name="date" content="2026-03-16" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -147,9 +147,9 @@
 <div id="summary-17" class="section level2 unnumbered hasAnchor">
 <h2>Summary<a href="test-initialize_modules.html#summary-17" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <ul>
-<li><p><strong>Number of test(s)</strong> : 3</p></li>
-<li><p><strong>Number of expectation(s)</strong> : 20</p></li>
-<li><p><strong>Number of successful expectation(s)</strong> : 20</p></li>
+<li><p><strong>Number of test(s)</strong> : 17</p></li>
+<li><p><strong>Number of expectation(s)</strong> : 49</p></li>
+<li><p><strong>Number of successful expectation(s)</strong> : 49</p></li>
 <li><p><strong>Number of failed expectation(s)</strong> : 0</p></li>
 <li><p><strong>Number of errored expectation(s)</strong> : 0</p></li>
 <li><p><strong>Number of expectations with warning(s)</strong> : 0</p></li>
@@ -161,12 +161,12 @@
 <h2>Details<a href="test-initialize_modules.html#details-17" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <table>
 <colgroup>
-<col width="9%" />
-<col width="20%" />
-<col width="42%" />
-<col width="17%" />
-<col width="5%" />
+<col width="8%" />
+<col width="16%" />
+<col width="53%" />
+<col width="13%" />
 <col width="4%" />
+<col width="3%" />
 </colgroup>
 <thead>
 <tr class="header">
@@ -184,160 +184,392 @@
 <td align="left">Test that <code>initialize_fims()</code> returns a list.</td>
 <td align="left">expect_type(result, “list”)</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
-<td align="left">test-initialize_modules.R#23</td>
-<td align="left">2026-03-11 16:43:27.230536</td>
+<td align="left">test-initialize_modules.R#22</td>
+<td align="left">2026-03-16 17:19:28.322919</td>
 </tr>
 <tr class="even">
 <td align="left"><code>initialize_fims()</code> works with correct inputs</td>
 <td align="left">Test that <code>initialize_fims()</code> returns an output with correct names.</td>
 <td align="left">expect_named(result, c(“parameters”, “model”))</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
-<td align="left">test-initialize_modules.R#25</td>
-<td align="left">2026-03-11 16:43:27.245642</td>
+<td align="left">test-initialize_modules.R#24</td>
+<td align="left">2026-03-16 17:19:28.359608</td>
 </tr>
 <tr class="odd">
 <td align="left"><code>initialize_fims()</code> works with correct inputs</td>
 <td align="left">Test that <code>initialize_fims()</code> returns a list with two elements.</td>
 <td align="left">expect_equal(length(result), 2)</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
-<td align="left">test-initialize_modules.R#27</td>
-<td align="left">2026-03-11 16:43:27.261348</td>
+<td align="left">test-initialize_modules.R#26</td>
+<td align="left">2026-03-16 17:19:28.398469</td>
 </tr>
 <tr class="even">
 <td align="left"><code>initialize_fims()</code> works with correct inputs</td>
-<td align="left">Test that <code>initialize_comp()</code> works with <code>AgeComp</code> type and returns an S4 object.</td>
-<td align="left">expect_type(result, “S4”)</td>
+<td align="left">Test that <code>initialize_fims()</code> returns a list when it is provided parameters that are nested.</td>
+<td align="left">expect_type( initialize_fims( parameters = create_default_configurations(data = data) |&gt; create_default_parameters(data = data), data = data ), “list” )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
-<td align="left">test-initialize_modules.R#37</td>
-<td align="left">2026-03-11 16:43:27.434696</td>
+<td align="left">test-initialize_modules.R#28</td>
+<td align="left">2026-03-16 17:19:32.102191</td>
 </tr>
 <tr class="odd">
-<td align="left"><code>initialize_fims()</code> works with correct inputs</td>
-<td align="left">Test that <code>initialize_comp()</code> works with <code>AgeComp</code> type and does not produce an error.</td>
-<td align="left">expect_no_error(result[[“age_comp_data”]])</td>
-<td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
-<td align="left">test-initialize_modules.R#39</td>
-<td align="left">2026-03-11 16:43:27.451364</td>
-</tr>
-<tr class="even">
-<td align="left"><code>initialize_fims()</code> works with correct inputs</td>
-<td align="left">Test that <code>initialize_comp()</code> works with <code>AgeComp</code> type and sets <code>length_comp_data</code> to NULL.</td>
-<td align="left">expect_null(result[[“length_comp_data”]])</td>
-<td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
-<td align="left">test-initialize_modules.R#41</td>
-<td align="left">2026-03-11 16:43:27.468094</td>
-</tr>
-<tr class="odd">
-<td align="left"><code>initialize_fims()</code> works with correct inputs</td>
-<td align="left">Test that <code>initialize_comp()</code> output contains the correct structure.</td>
-<td align="left">expect_true( all(c(“age_comp_data”, “initialize”, “finalize”, “.pointer”) %in% names(result)) )</td>
-<td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
-<td align="left">test-initialize_modules.R#43</td>
-<td align="left">2026-03-11 16:43:27.484573</td>
-</tr>
-<tr class="even">
-<td align="left"><code>initialize_fims()</code> works with correct inputs</td>
-<td align="left">Test that the age-composition data in the returned object from <code>initialize_comp()</code> has the correct values.</td>
-<td align="left">expect_equal( result$age_comp_data$toRVector(), data |&gt; get_data() |&gt; dplyr::filter(type == “age_comp”, name == “fleet1”) |&gt; dplyr::mutate(out = value * uncertainty) |&gt; dplyr::pull(out) )</td>
-<td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
-<td align="left">test-initialize_modules.R#48</td>
-<td align="left">2026-03-11 16:43:27.504108</td>
-</tr>
-<tr class="odd">
-<td align="left"><code>initialize_fims()</code> works with correct inputs</td>
-<td align="left">Test that <code>initialize_fims()</code> works with <code>LengthComp</code> type and returns an S4 object.</td>
-<td align="left">expect_type(result, “S4”)</td>
-<td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
-<td align="left">test-initialize_modules.R#64</td>
-<td align="left">2026-03-11 16:43:27.769346</td>
-</tr>
-<tr class="even">
-<td align="left"><code>initialize_fims()</code> works with correct inputs</td>
-<td align="left">Test that <code>initialize_fims()</code> works with <code>LengthComp</code> type and does not produce an error.</td>
-<td align="left">expect_no_error(result[[“length_comp_data”]])</td>
-<td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
-<td align="left">test-initialize_modules.R#66</td>
-<td align="left">2026-03-11 16:43:27.784664</td>
-</tr>
-<tr class="odd">
-<td align="left"><code>initialize_fims()</code> works with correct inputs</td>
-<td align="left">Test that <code>initialize_fims()</code> works with <code>LengthComp</code> type and sets <code>age_comp_data</code> to NULL.</td>
-<td align="left">expect_null(result[[“age_comp_data”]])</td>
-<td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
-<td align="left">test-initialize_modules.R#68</td>
-<td align="left">2026-03-11 16:43:27.8004</td>
-</tr>
-<tr class="even">
-<td align="left"><code>initialize_fims()</code> works with correct inputs</td>
-<td align="left">Test that <code>initialize_fims()</code> output contains the correct structure.</td>
-<td align="left">expect_true( all(c(“length_comp_data”, “initialize”, “finalize”, “.pointer”) %in% names(result)) )</td>
-<td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
-<td align="left">test-initialize_modules.R#70</td>
-<td align="left">2026-03-11 16:43:27.816586</td>
-</tr>
-<tr class="odd">
-<td align="left"><code>initialize_fims()</code> works with correct inputs</td>
-<td align="left">Test that the length-composition data in the returned object from <code>initialize_comp()</code> has the correct values.</td>
-<td align="left">expect_equal( result$length_comp_data$toRVector(), data |&gt; get_data() |&gt; dplyr::filter(type == “length_comp”, name == “fleet1”) |&gt; dplyr::mutate(out = value * uncertainty) |&gt; dplyr::pull(out) )</td>
-<td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
-<td align="left">test-initialize_modules.R#75</td>
-<td align="left">2026-03-11 16:43:27.836005</td>
-</tr>
-<tr class="even">
 <td align="left"><code>initialize_fims()</code> works with edge cases</td>
 <td align="left">Test that <code>initialize_fims()</code> works with multiple estimation types.</td>
-<td align="left">expect_equal(length(init_parm_multiple_types$parameters$p), length(init_parm_default$parameters$p) - 10)</td>
+<td align="left">expect_equal( length(init_parm_multiple_types$parameters$p) + length(init_parm_multiple_types$parameters$re), length(init_parm_default$parameters$p) + length(init_parm_default$parameters$re) - 10 )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
-<td align="left">test-initialize_modules.R#107</td>
-<td align="left">2026-03-11 16:43:33.973445</td>
+<td align="left">test-initialize_modules.R#66</td>
+<td align="left">2026-03-16 17:19:39.375078</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left"><code>initialize_fims()</code> returns correct error messages</td>
 <td align="left">Test that <code>initialize_fims()</code> handles missing parameters input correctly.</td>
 <td align="left">expect_error( initialize_fims(data = data), “The <code>parameters</code> argument must be a tibble.” )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
-<td align="left">test-initialize_modules.R#114</td>
-<td align="left">2026-03-11 16:43:34.033647</td>
+<td align="left">test-initialize_modules.R#79</td>
+<td align="left">2026-03-16 17:19:39.43662</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left"><code>initialize_fims()</code> returns correct error messages</td>
 <td align="left">Test that <code>initialize_fims()</code> handles non-list parameters input correctly.</td>
 <td align="left">expect_error( initialize_fims(parameters = “not_a_list”, data = data), “The <code>parameters</code> argument must be a tibble.” )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
-<td align="left">test-initialize_modules.R#121</td>
-<td align="left">2026-03-11 16:43:34.070901</td>
+<td align="left">test-initialize_modules.R#86</td>
+<td align="left">2026-03-16 17:19:39.481862</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left"><code>initialize_fims()</code> returns correct error messages</td>
 <td align="left">Test that <code>initialize_fims()</code> fails when no fleets are provided.</td>
 <td align="left">expect_error( initialize_fims(parameters = parameters_no_fleets, data = data), “No fleets found in the provided <code>parameters</code>.” )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
-<td align="left">test-initialize_modules.R#130</td>
-<td align="left">2026-03-11 16:43:34.108956</td>
-</tr>
-<tr class="even">
-<td align="left"><code>initialize_fims()</code> returns correct error messages</td>
-<td align="left">Test that <code>initialize_comp()</code> correctly returns error on unknown <code>fleet_name</code>.</td>
-<td align="left">expect_error( initialize_comp( data = data, fleet_name = “unknown_fleet”, type = “AgeComp” ), “Fleet <code>unknown_fleet</code> not found in the data object.” )</td>
-<td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
-<td align="left">test-initialize_modules.R#137</td>
-<td align="left">2026-03-11 16:43:34.148041</td>
+<td align="left">test-initialize_modules.R#95</td>
+<td align="left">2026-03-16 17:19:39.530361</td>
 </tr>
 <tr class="odd">
-<td align="left"><code>initialize_fims()</code> returns correct error messages</td>
-<td align="left">Test that <code>initialize_comp()</code> correctly returns error on unknown <code>type</code>.</td>
-<td align="left">expect_error( initialize_comp( data = data, fleet_name = “fleet1”, type = “unknown” ), “should be one of” )</td>
-<td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
-<td align="left">test-initialize_modules.R#148</td>
-<td align="left">2026-03-11 16:43:34.168014</td>
-</tr>
-<tr class="even">
 <td align="left"><code>initialize_fims()</code> returns correct error messages</td>
 <td align="left">Test that <code>initialize_fims()</code> correctly returns an error on an unknown estimation_type.</td>
 <td align="left">expect_error( initialize_fims(parameters = parameters_wrong_type, data = data), “The <code>estimation_type</code> must be one of: constant, fixed_effects, and random_effects.” )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
-<td align="left">test-initialize_modules.R#169</td>
-<td align="left">2026-03-11 16:43:34.207695</td>
+<td align="left">test-initialize_modules.R#118</td>
+<td align="left">2026-03-16 17:19:39.582376</td>
+</tr>
+<tr class="even">
+<td align="left"><code>initialize_recruitment()</code> works with correct inputs</td>
+<td align="left"></td>
+<td align="left">expect_type(result, “S4”)</td>
+<td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
+<td align="left">test-initialize_modules.R#133</td>
+<td align="left">2026-03-16 17:19:39.8119</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>initialize_recruitment()</code> works with correct inputs</td>
+<td align="left">Test that <code>initialize_recruitment()</code> creates a module with expected methods in the class definition method table.</td>
+<td align="left">expect_true(all( c( “initialize”, “finalize”, “get_id”, “evaluate_mean”, “SetRecruitmentProcessID” ) %in% names(<a href="mailto:result$.refClassDef@refMethods" class="email">result$.refClassDef@refMethods</a>) ))</td>
+<td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
+<td align="left">test-initialize_modules.R#135</td>
+<td align="left">2026-03-16 17:19:39.85478</td>
+</tr>
+<tr class="even">
+<td align="left"><code>initialize_growth()</code> works with correct inputs</td>
+<td align="left"></td>
+<td align="left">expect_type(result, “S4”)</td>
+<td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
+<td align="left">test-initialize_modules.R#155</td>
+<td align="left">2026-03-16 17:19:40.839151</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>initialize_growth()</code> works with correct inputs</td>
+<td align="left">Test that <code>initialize_growth()</code> creates a module with expected methods in the class definition method table.</td>
+<td align="left">expect_true(all( c( “initialize”, “finalize”, “get_id”, “evaluate” ) %in% names(<a href="mailto:result$.refClassDef@refMethods" class="email">result$.refClassDef@refMethods</a>) ))</td>
+<td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
+<td align="left">test-initialize_modules.R#157</td>
+<td align="left">2026-03-16 17:19:40.870171</td>
+</tr>
+<tr class="even">
+<td align="left"><code>initialize_maturity()</code> works with correct inputs</td>
+<td align="left"></td>
+<td align="left">expect_type(result, “S4”)</td>
+<td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
+<td align="left">test-initialize_modules.R#176</td>
+<td align="left">2026-03-16 17:19:40.914796</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>initialize_maturity()</code> works with correct inputs</td>
+<td align="left">Test that <code>initialize_maturity()</code> creates a module with expected methods in the class definition method table.</td>
+<td align="left">expect_true(all( c( “initialize”, “finalize”, “get_id”, “evaluate” ) %in% names(<a href="mailto:result$.refClassDef@refMethods" class="email">result$.refClassDef@refMethods</a>) ))</td>
+<td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
+<td align="left">test-initialize_modules.R#178</td>
+<td align="left">2026-03-16 17:19:40.945907</td>
+</tr>
+<tr class="even">
+<td align="left"><code>initialize_population()</code> works with correct inputs</td>
+<td align="left"></td>
+<td align="left">expect_type(result, “S4”)</td>
+<td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
+<td align="left">test-initialize_modules.R#218</td>
+<td align="left">2026-03-16 17:19:43.282813</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>initialize_population()</code> works with correct inputs</td>
+<td align="left">Test that <code>initialize_population()</code> creates a module with expected methods in the class definition method table.</td>
+<td align="left">expect_true(all( c( “initialize”, “finalize”, “get_id”, “SetRecruitmentID”, “SetName”, “SetMaturityID”, “SetGrowthID”, “GetName”, “AddFleet” ) %in% names(<a href="mailto:result$.refClassDef@refMethods" class="email">result$.refClassDef@refMethods</a>) ))</td>
+<td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
+<td align="left">test-initialize_modules.R#220</td>
+<td align="left">2026-03-16 17:19:43.320492</td>
+</tr>
+<tr class="even">
+<td align="left"><code>initialize_population()</code> returns correct error messages</td>
+<td align="left">Test that <code>initialize_population()</code> handles missing linked_ids correctly.</td>
+<td align="left">expect_error( initialize_population( parameters = default_parameters, data = data, linked_ids = c(growth = 1) ), “<code>linked_ids</code> for population must include <code>growth</code>, <code>maturity</code>, and” )</td>
+<td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
+<td align="left">test-initialize_modules.R#239</td>
+<td align="left">2026-03-16 17:19:43.369353</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>initialize_selectivity()</code> works with correct inputs</td>
+<td align="left"></td>
+<td align="left">expect_type(result, “S4”)</td>
+<td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
+<td align="left">test-initialize_modules.R#259</td>
+<td align="left">2026-03-16 17:19:43.415087</td>
+</tr>
+<tr class="even">
+<td align="left"><code>initialize_selectivity()</code> works with correct inputs</td>
+<td align="left">Test that <code>initialize_selectivity()</code> creates a module with expected methods in the class definition method table.</td>
+<td align="left">expect_true(all( c( “initialize”, “finalize”, “get_id”, “evaluate” ) %in% names(<a href="mailto:result$.refClassDef@refMethods" class="email">result$.refClassDef@refMethods</a>) ))</td>
+<td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
+<td align="left">test-initialize_modules.R#261</td>
+<td align="left">2026-03-16 17:19:43.446898</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>initialize_fleet()</code> works with correct inputs</td>
+<td align="left"></td>
+<td align="left">expect_type(result, “S4”)</td>
+<td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
+<td align="left">test-initialize_modules.R#293</td>
+<td align="left">2026-03-16 17:19:43.907561</td>
+</tr>
+<tr class="even">
+<td align="left"><code>initialize_fleet()</code> works with correct inputs</td>
+<td align="left">Test that <code>initialize_fleet()</code> creates a module with expected methods in the class definition method table.</td>
+<td align="left">expect_true(all( c( “initialize”, “finalize”, “get_id”, “SetSelectivityID”, “SetObservedLengthCompDataID”, “SetObservedLandingsDataID”, “SetObservedIndexDataID”, “SetObservedAgeCompDataID”, “SetName”, “GetObservedLengthCompDataID”, “GetObservedAgeCompDataID”, “GetObservedIndexDataID”, “GetObservedLandingsDataID” ) %in% names(<a href="mailto:result$.refClassDef@refMethods" class="email">result$.refClassDef@refMethods</a>) ))</td>
+<td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
+<td align="left">test-initialize_modules.R#295</td>
+<td align="left">2026-03-16 17:19:43.954751</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>initialize_landings()</code> works with correct inputs</td>
+<td align="left"></td>
+<td align="left">expect_type(result, “S4”)</td>
+<td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
+<td align="left">test-initialize_modules.R#323</td>
+<td align="left">2026-03-16 17:19:44.060721</td>
+</tr>
+<tr class="even">
+<td align="left"><code>initialize_landings()</code> works with correct inputs</td>
+<td align="left">Test that <code>initialize_landings()</code> creates a module with expected methods in the class definition method table.</td>
+<td align="left">expect_true(all( c( “initialize”, “finalize”, “get_id” ) %in% names(<a href="mailto:result$.refClassDef@refMethods" class="email">result$.refClassDef@refMethods</a>) ))</td>
+<td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
+<td align="left">test-initialize_modules.R#325</td>
+<td align="left">2026-03-16 17:19:44.101233</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>initialize_landings()</code> works with correct inputs</td>
+<td align="left">Test that <code>initialize_landings()</code> module contains landings_data field.</td>
+<td align="left">expect_true(“landings_data” %in% names(result))</td>
+<td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
+<td align="left">test-initialize_modules.R#333</td>
+<td align="left">2026-03-16 17:19:44.132916</td>
+</tr>
+<tr class="even">
+<td align="left"><code>initialize_landings()</code> works with correct inputs</td>
+<td align="left">Test that <code>initialize_landings()</code> returns <code>NULL</code> if there are no landings for the fleet.</td>
+<td align="left">expect_null( initialize_landings( data, fleet_name = “survey1” ) )</td>
+<td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
+<td align="left">test-initialize_modules.R#335</td>
+<td align="left">2026-03-16 17:19:44.166995</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>initialize_landings()</code> returns correct error messages</td>
+<td align="left">Test that <code>initialize_landings()</code> handles unknown fleet_name correctly.</td>
+<td align="left">expect_error( initialize_landings( data = data, fleet_name = “unknown_fleet” ), “Fleet unknown_fleet not found in the data object.” )</td>
+<td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
+<td align="left">test-initialize_modules.R#347</td>
+<td align="left">2026-03-16 17:19:44.216168</td>
+</tr>
+<tr class="even">
+<td align="left"><code>initialize_index()</code> works with correct inputs</td>
+<td align="left"></td>
+<td align="left">expect_type(result, “S4”)</td>
+<td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
+<td align="left">test-initialize_modules.R#365</td>
+<td align="left">2026-03-16 17:19:44.304954</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>initialize_index()</code> works with correct inputs</td>
+<td align="left">Test that <code>initialize_index()</code> creates a module with expected methods in the class definition method table.</td>
+<td align="left">expect_true(all( c( “initialize”, “finalize”, “get_id” ) %in% names(<a href="mailto:result$.refClassDef@refMethods" class="email">result$.refClassDef@refMethods</a>) ))</td>
+<td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
+<td align="left">test-initialize_modules.R#367</td>
+<td align="left">2026-03-16 17:19:44.335865</td>
+</tr>
+<tr class="even">
+<td align="left"><code>initialize_index()</code> works with correct inputs</td>
+<td align="left">Test that <code>initialize_index()</code> module contains index_data field.</td>
+<td align="left">expect_true(“index_data” %in% names(result))</td>
+<td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
+<td align="left">test-initialize_modules.R#375</td>
+<td align="left">2026-03-16 17:19:44.366795</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>initialize_index()</code> works with correct inputs</td>
+<td align="left">Test that <code>initialize_index()</code> returns <code>NULL</code> if there are no landings for the fleet.</td>
+<td align="left">expect_null( initialize_index( data, fleet_name = “fleet1” ) )</td>
+<td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
+<td align="left">test-initialize_modules.R#377</td>
+<td align="left">2026-03-16 17:19:44.400313</td>
+</tr>
+<tr class="even">
+<td align="left"><code>initialize_index()</code> returns correct error messages</td>
+<td align="left">Test that <code>initialize_index()</code> handles unknown fleet_name correctly.</td>
+<td align="left">expect_error( initialize_index( data = data, fleet_name = “unknown_fleet” ), “Fleet unknown_fleet not found in the data object.” )</td>
+<td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
+<td align="left">test-initialize_modules.R#389</td>
+<td align="left">2026-03-16 17:19:44.48027</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>initialize_comp()</code> works with correct inputs</td>
+<td align="left">Test that <code>initialize_comp()</code> works with <code>AgeComp</code> type and returns an S4 object.</td>
+<td align="left">expect_type(result, “S4”)</td>
+<td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
+<td align="left">test-initialize_modules.R#409</td>
+<td align="left">2026-03-16 17:19:44.728454</td>
+</tr>
+<tr class="even">
+<td align="left"><code>initialize_comp()</code> works with correct inputs</td>
+<td align="left">Test that <code>initialize_comp()</code> works with <code>AgeComp</code> type and does not produce an error.</td>
+<td align="left">expect_no_error(result[[“age_comp_data”]])</td>
+<td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
+<td align="left">test-initialize_modules.R#411</td>
+<td align="left">2026-03-16 17:19:44.771024</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>initialize_comp()</code> works with correct inputs</td>
+<td align="left">Test that <code>initialize_comp()</code> works with <code>AgeComp</code> type and sets <code>length_comp_data</code> to NULL.</td>
+<td align="left">expect_null(result[[“length_comp_data”]])</td>
+<td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
+<td align="left">test-initialize_modules.R#413</td>
+<td align="left">2026-03-16 17:19:44.813247</td>
+</tr>
+<tr class="even">
+<td align="left"><code>initialize_comp()</code> works with correct inputs</td>
+<td align="left">Test that <code>initialize_comp()</code> output contains the correct structure.</td>
+<td align="left">expect_true( all(c(“age_comp_data”, “initialize”, “finalize”, “.pointer”) %in% names(result)) )</td>
+<td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
+<td align="left">test-initialize_modules.R#415</td>
+<td align="left">2026-03-16 17:19:44.851552</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>initialize_comp()</code> works with correct inputs</td>
+<td align="left">Test that the age-composition data in the returned object from <code>initialize_comp()</code> has the correct values.</td>
+<td align="left">expect_equal( result$age_comp_data$toRVector(), data |&gt; get_data() |&gt; dplyr::filter(type == “age_comp”, name == “fleet1”) |&gt; dplyr::mutate(out = value * uncertainty) |&gt; dplyr::pull(out) )</td>
+<td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
+<td align="left">test-initialize_modules.R#420</td>
+<td align="left">2026-03-16 17:19:44.894</td>
+</tr>
+<tr class="even">
+<td align="left"><code>initialize_comp()</code> works with correct inputs</td>
+<td align="left">Test that <code>initialize_fims()</code> works with <code>LengthComp</code> type and returns an S4 object.</td>
+<td align="left">expect_type(result, “S4”)</td>
+<td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
+<td align="left">test-initialize_modules.R#436</td>
+<td align="left">2026-03-16 17:19:45.138677</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>initialize_comp()</code> works with correct inputs</td>
+<td align="left">Test that <code>initialize_fims()</code> works with <code>LengthComp</code> type and does not produce an error.</td>
+<td align="left">expect_no_error(result[[“length_comp_data”]])</td>
+<td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
+<td align="left">test-initialize_modules.R#438</td>
+<td align="left">2026-03-16 17:19:45.169251</td>
+</tr>
+<tr class="even">
+<td align="left"><code>initialize_comp()</code> works with correct inputs</td>
+<td align="left">Test that <code>initialize_fims()</code> works with <code>LengthComp</code> type and sets <code>age_comp_data</code> to NULL.</td>
+<td align="left">expect_null(result[[“age_comp_data”]])</td>
+<td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
+<td align="left">test-initialize_modules.R#440</td>
+<td align="left">2026-03-16 17:19:45.251341</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>initialize_comp()</code> works with correct inputs</td>
+<td align="left">Test that <code>initialize_fims()</code> output contains the correct structure.</td>
+<td align="left">expect_true( all(c(“length_comp_data”, “initialize”, “finalize”, “.pointer”) %in% names(result)) )</td>
+<td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
+<td align="left">test-initialize_modules.R#442</td>
+<td align="left">2026-03-16 17:19:45.306843</td>
+</tr>
+<tr class="even">
+<td align="left"><code>initialize_comp()</code> works with correct inputs</td>
+<td align="left">Test that the length-composition data in the returned object from <code>initialize_comp()</code> has the correct values.</td>
+<td align="left">expect_equal( result$length_comp_data$toRVector(), data |&gt; get_data() |&gt; dplyr::filter(type == “length_comp”, name == “fleet1”) |&gt; dplyr::mutate(out = value * uncertainty) |&gt; dplyr::pull(out) )</td>
+<td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
+<td align="left">test-initialize_modules.R#447</td>
+<td align="left">2026-03-16 17:19:45.366334</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>initialize_comp()</code> returns correct error messages</td>
+<td align="left">Test that <code>initialize_comp()</code> correctly returns error on unknown <code>fleet_name</code>.</td>
+<td align="left">expect_error( initialize_comp( data = data, fleet_name = “unknown_fleet”, type = “AgeComp” ), “Fleet <code>unknown_fleet</code> not found in the data object.” )</td>
+<td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
+<td align="left">test-initialize_modules.R#462</td>
+<td align="left">2026-03-16 17:19:45.447357</td>
+</tr>
+<tr class="even">
+<td align="left"><code>initialize_comp()</code> returns correct error messages</td>
+<td align="left">Test that <code>initialize_comp()</code> correctly returns error on unknown <code>type</code>.</td>
+<td align="left">expect_error( initialize_comp( data = data, fleet_name = “fleet1”, type = “unknown” ), “should be one of” )</td>
+<td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
+<td align="left">test-initialize_modules.R#473</td>
+<td align="left">2026-03-16 17:19:45.490976</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>initialize_comp()</code> returns correct error messages</td>
+<td align="left">Test that <code>initialize_comp()</code> correctly returns error when there are no composition data for a given fleet.</td>
+<td align="left">expect_error( initialize_comp( data = data |&gt; get_data() |&gt; dplyr::filter(type != “age_comp”), fleet_name = “fleet1”, type = “AgeComp” ), “is unavailable or empty” )</td>
+<td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
+<td align="left">test-initialize_modules.R#484</td>
+<td align="left">2026-03-16 17:19:46.033176</td>
+</tr>
+<tr class="even">
+<td align="left"><code>initialize_comp()</code> returns correct error messages</td>
+<td align="left"></td>
+<td align="left">expect_error( initialize_comp( data = bad_data, fleet_name = “fleet1”, type = “AgeComp” ), “does not match the expected dimensions” )</td>
+<td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
+<td align="left">test-initialize_modules.R#501</td>
+<td align="left">2026-03-16 17:19:46.108224</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>set_param_vector()</code> returns correct error messages</td>
+<td align="left">Test that <code>set_param_vector()</code> requires the field argument.</td>
+<td align="left">expect_error( set_param_vector(), “argument must be a non-empty character string.” )</td>
+<td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
+<td align="left">test-initialize_modules.R#521</td>
+<td align="left">2026-03-16 17:19:46.19921</td>
+</tr>
+<tr class="even">
+<td align="left"><code>set_param_vector()</code> returns correct error messages</td>
+<td align="left">Test that <code>set_param_vector()</code> requires the module parameter is a reference class object.</td>
+<td align="left">expect_error( set_param_vector( field = “x”, module = 1:10 ), “argument must be a reference class” )</td>
+<td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
+<td align="left">test-initialize_modules.R#528</td>
+<td align="left">2026-03-16 17:19:46.283918</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>set_param_vector()</code> returns correct error messages</td>
+<td align="left">Test that <code>set_param_vector()</code> requires the <code>module_input</code> argument to be a tibble.</td>
+<td align="left">expect_error( set_param_vector( field = “x”, module = methods::new(EWAAGrowth), module_input = 1:10 ), “argument must be a tibble” )</td>
+<td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
+<td align="left">test-initialize_modules.R#537</td>
+<td align="left">2026-03-16 17:19:46.365393</td>
 </tr>
 </tbody>
 </table>

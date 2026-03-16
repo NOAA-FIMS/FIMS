@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['structure_0',['C++ Directory Structure',['../md_inst_2include_2README.html',1,'']]]
+  ['glossary_0',['Glossary',['../glossary.html',1,'']]]
 ];

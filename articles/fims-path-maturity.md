@@ -39,11 +39,11 @@ wrapper function.
 library(FIMS)
 
 # Load a built-in data set from the FIMS package
-data("data1")
+data("data_big")
 
 # Convert the data into a FIMSFrame object, which is an S4 class.
 # See ?FIMSFrame for more information.
-fims_frame <- FIMSFrame(data1)
+fims_frame <- FIMSFrame(data_big)
 
 # Create default maturity parameters using internal function
 default_parameters <- create_default_configurations(fims_frame) |>
@@ -304,10 +304,10 @@ namespace fims {
  */
 template <typename Type>
 struct fims::ModelTraits {
-  typedef typename CppAD::vector<Type> DataVector; /**< A vector
-        of the data that is differentiable */
-  typedef typename CppAD::vector<Type> ParameterVector; /**< A
-  vector of the parameters that is differentiable */
+  typedef typename tmbutils::vector<Type> DataVector;       /**< A vector
+        of the data that is differentiable (Type is the TMB/TMBad scalar). */
+  typedef typename tmbutils::vector<Type> ParameterVector;  /**< A vector
+        of the parameters that is differentiable. */
   typedef typename tmbutils::vector<Type>
       EigenVector; /**< A vector as defined in the Eigen namespace in TMB */
 };

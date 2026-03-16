@@ -2,7 +2,6 @@ var def_8hpp =
 [
     [ "fims::LogEntry", "structfims_1_1LogEntry.html", "structfims_1_1LogEntry" ],
     [ "fims::FIMSLog", "classfims_1_1FIMSLog.html", "classfims_1_1FIMSLog" ],
-    [ "FIMS_DEBUG_LOG", "def_8hpp.html#a288313ea80171ae7591b0aef7fe448f3", null ],
     [ "FIMS_ERROR_LOG", "def_8hpp.html#ae4ff8b8279af8e71e4459d586b695ebd", null ],
     [ "FIMS_INFO_LOG", "def_8hpp.html#a2b168389ac8c99d4f1bcdae5a9532c65", null ],
     [ "FIMS_STR", "def_8hpp.html#ac5d50460624b44c727e53d30026fb9c6", null ],

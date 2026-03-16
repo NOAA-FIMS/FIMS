@@ -2,10 +2,25 @@ var structfims__distributions_1_1DensityComponentBase =
 [
     [ "DensityComponentBase", "structfims__distributions_1_1DensityComponentBase.html#a7a2908958732ab755caccc7a65b0a514", null ],
     [ "evaluate", "structfims__distributions_1_1DensityComponentBase.html#a7b7536012f1fca930b11f7035aee8940", null ],
+    [ "get_expected", "structfims__distributions_1_1DensityComponentBase.html#a1a4855d5255ca42c1fb52e57fe98c41d", null ],
+    [ "get_n_expected", "structfims__distributions_1_1DensityComponentBase.html#a81ffea453315dd49adc2c44ebed7eef3", null ],
+    [ "get_n_x", "structfims__distributions_1_1DensityComponentBase.html#a870507987f001041dee9f41b3c8b41c4", null ],
+    [ "get_observed", "structfims__distributions_1_1DensityComponentBase.html#a88ad0c85be4d5d6abedab5641ee03c03", null ],
+    [ "get_observed", "structfims__distributions_1_1DensityComponentBase.html#afa63be85af143b368f5ea90e36d361da", null ],
+    [ "data_expected_values", "structfims__distributions_1_1DensityComponentBase.html#a73823b1bb84414a939e3eec101dfdd1d", null ],
+    [ "data_observed_values", "structfims__distributions_1_1DensityComponentBase.html#ac743ea47274d4a25195bee99f15aef72", null ],
+    [ "expected_mean", "structfims__distributions_1_1DensityComponentBase.html#afb97e4ee7b75a1bea37fa7671a3e2498", null ],
+    [ "expected_values", "structfims__distributions_1_1DensityComponentBase.html#aaad587f3651db4acddf855ca8d217c5d", null ],
+    [ "input_type", "structfims__distributions_1_1DensityComponentBase.html#a8be921f03a3ddd61dc806116d1bead9e", null ],
     [ "key", "structfims__distributions_1_1DensityComponentBase.html#a0232bd6e20b7b48685534e3d804178ac", null ],
+    [ "lpdf", "structfims__distributions_1_1DensityComponentBase.html#a57bd8cad0df41793f3b00dd5cdc73f80", null ],
     [ "lpdf_vec", "structfims__distributions_1_1DensityComponentBase.html#a08bb15b9414a58a745546eb53a683474", null ],
     [ "observed_data_id_m", "structfims__distributions_1_1DensityComponentBase.html#ae7d5d01278616316479ac9e6714a9b7f", null ],
+    [ "observed_values", "structfims__distributions_1_1DensityComponentBase.html#a09691bc1d7f187758b589cfbf3da10e9", null ],
     [ "osa_flag", "structfims__distributions_1_1DensityComponentBase.html#a2c61d62adbd802dcac6a689db3ef7b9b", null ],
-    [ "report_lpdf_vec", "structfims__distributions_1_1DensityComponentBase.html#a367e5731b7daf234896a653c03ecaa3e", null ],
-    [ "simulate_flag", "structfims__distributions_1_1DensityComponentBase.html#a1890ac36bc9150d388a6976965423a83", null ]
+    [ "priors", "structfims__distributions_1_1DensityComponentBase.html#af0f9cbf31816b7d9a3c30ec6129d099a", null ],
+    [ "re", "structfims__distributions_1_1DensityComponentBase.html#a8b75239aac8c9ca8911e68c54ac9d73d", null ],
+    [ "re_expected_values", "structfims__distributions_1_1DensityComponentBase.html#ab95f7bcda5a96b40d1d5ea6e127f54c2", null ],
+    [ "simulate_flag", "structfims__distributions_1_1DensityComponentBase.html#a1890ac36bc9150d388a6976965423a83", null ],
+    [ "use_mean", "structfims__distributions_1_1DensityComponentBase.html#a05e0ce908ecb58f7a24cd519ab6c45b8", null ]
 ];

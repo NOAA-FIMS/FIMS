@@ -248,12 +248,6 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:ad668df4ac02082db095bc86068a2c639"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac1881bd68c7990ff9b0b47904e72a2b6" id="r_ac1881bd68c7990ff9b0b47904e72a2b6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">virtual</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1SRBevertonHolt.html#ac1881bd68c7990ff9b0b47904e72a2b6">evaluate_process</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">pos</a>)</td></tr>
 <tr class="separator:ac1881bd68c7990ff9b0b47904e72a2b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa9e951a21d32b60fadd5207e3cdc6e87" id="r_aa9e951a21d32b60fadd5207e3cdc6e87"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">virtual</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1SRBevertonHolt.html#aa9e951a21d32b60fadd5207e3cdc6e87">create_report_vectors</a> (std::map&lt; std::string, <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt; &gt; &amp;report_vectors)</td></tr>
-<tr class="memdesc:aa9e951a21d32b60fadd5207e3cdc6e87"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a map of report vectors for the recruitment object.  <br /></td></tr>
-<tr class="separator:aa9e951a21d32b60fadd5207e3cdc6e87"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a12f5e6278719da00b9226c40a95a6c62" id="r_a12f5e6278719da00b9226c40a95a6c62"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">virtual</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1SRBevertonHolt.html#a12f5e6278719da00b9226c40a95a6c62">get_report_vector_count</a> (std::map&lt; std::string, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a> &gt; &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">report_vector_count</a>)</td></tr>
-<tr class="memdesc:a12f5e6278719da00b9226c40a95a6c62"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the report vector count object. used to get the length of each report vector for populating the <a class="el" href="structfims__popdy_1_1UncertaintyReportInfo.html">UncertaintyReportInfo</a> struct in <a class="el" href="classfims__popdy_1_1FisheryModelBase.html" title="FisheryModelBase is a base class for fishery models in FIMS.">FisheryModelBase</a>.  <br /></td></tr>
-<tr class="separator:a12f5e6278719da00b9226c40a95a6c62"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_structfims__popdy_1_1RecruitmentBase"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_structfims__popdy_1_1RecruitmentBase')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="structfims__popdy_1_1RecruitmentBase.html">fims_popdy::RecruitmentBase&lt; Type &gt;</a></td></tr>
 <tr class="memitem:ae0fef4d2bbcdfd8b80936bdf5d0dbe81 inherit pub_methods_structfims__popdy_1_1RecruitmentBase" id="r_ae0fef4d2bbcdfd8b80936bdf5d0dbe81"><td class="memItemLeft" align="right" valign="top">
 &#160;</td><td class="memItemRight" valign="bottom"><b>RecruitmentBase</b> ()</td></tr>
@@ -318,6 +312,7 @@ Additional Inherited Members</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><div class="compoundTemplParams">template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a>&gt;<br />
 struct fims_popdy::SRBevertonHolt&lt; Type &gt;</div><p>BevertonHolt class that returns the Beverton&ndash;Holt stock&ndash;recruitment from fims_math. </p>
+<p>See the <a class="el" href="glossary.html">Glossary</a> for definitions of mathematical symbols used below.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">logit_steep</td><td>Recruitment relative to unfished recruitment at 20 percent of unfished spawning biomass. Steepness is subject to a logit transformation to keep it between 0.2 and 1.0. </td></tr>
@@ -325,38 +320,6 @@ struct fims_popdy::SRBevertonHolt&lt; Type &gt;</div><p>BevertonHolt class that 
   </dd>
 </dl>
 </div><h2 class="groupheader">Member Function Documentation</h2>
-<a id="aa9e951a21d32b60fadd5207e3cdc6e87" name="aa9e951a21d32b60fadd5207e3cdc6e87"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa9e951a21d32b60fadd5207e3cdc6e87">&#9670;&#160;</a></span>create_report_vectors()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">virtual</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a> <a class="el" href="structfims__popdy_1_1SRBevertonHolt.html">fims_popdy::SRBevertonHolt</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::create_report_vectors </td>
-          <td>(</td>
-          <td class="paramtype">std::map&lt; std::string, <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt; &gt; &amp;&#160;</td>
-          <td class="paramname"><em>report_vectors</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Create a map of report vectors for the recruitment object. </p>
-
-<p>Reimplemented from <a class="el" href="structfims__model__object_1_1FIMSObject.html#a7809cb0987940a515163b95ef7d330f9">fims_model_object::FIMSObject&lt; Type &gt;</a>.</p>
-
-</div>
-</div>
 <a id="ad668df4ac02082db095bc86068a2c639" name="ad668df4ac02082db095bc86068a2c639"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ad668df4ac02082db095bc86068a2c639">&#9670;&#160;</a></span>evaluate_mean()</h2>
 
@@ -441,38 +404,6 @@ template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e34
 </dl>
 
 <p>Implements <a class="el" href="structfims__popdy_1_1RecruitmentBase.html#a049cd0eed9fae58a904da5dc27888db6">fims_popdy::RecruitmentBase&lt; Type &gt;</a>.</p>
-
-</div>
-</div>
-<a id="a12f5e6278719da00b9226c40a95a6c62" name="a12f5e6278719da00b9226c40a95a6c62"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a12f5e6278719da00b9226c40a95a6c62">&#9670;&#160;</a></span>get_report_vector_count()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">virtual</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a> <a class="el" href="structfims__popdy_1_1SRBevertonHolt.html">fims_popdy::SRBevertonHolt</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::get_report_vector_count </td>
-          <td>(</td>
-          <td class="paramtype">std::map&lt; std::string, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a> &gt; &amp;&#160;</td>
-          <td class="paramname"><em>report_vector_count</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Get the report vector count object. used to get the length of each report vector for populating the <a class="el" href="structfims__popdy_1_1UncertaintyReportInfo.html">UncertaintyReportInfo</a> struct in <a class="el" href="classfims__popdy_1_1FisheryModelBase.html" title="FisheryModelBase is a base class for fishery models in FIMS.">FisheryModelBase</a>. </p>
-
-<p>Reimplemented from <a class="el" href="structfims__model__object_1_1FIMSObject.html#a63d848a3fb69a0c4928b7afa5ce845d2">fims_model_object::FIMSObject&lt; Type &gt;</a>.</p>
 
 </div>
 </div>

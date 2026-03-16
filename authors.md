@@ -38,6 +38,9 @@
 - **Cole C. Monnahan**. Author.
   [](https://orcid.org/0000-0003-0871-6700)
 
+- **Elizabeth F. Perl**. Author.
+  [](https://orcid.org/0000-0003-1608-8628)
+
 - **Megumi C. Oshima**. Author.
   [](https://orcid.org/0009-0002-2239-1594)
 
@@ -64,8 +67,13 @@
 - **Kristan Blackhart**. Contributor.
   [](https://orcid.org/0000-0003-4232-2510)
 
+- **Edward J. Dick**. Contributor.
+  [](https://orcid.org/0000-0001-7681-9176)
+
 - **James N. Ianelli**. Contributor.
   [](https://orcid.org/0000-0002-7170-8677)
+
+- **Huihua Lee**. Contributor.
 
 ## Citation
 

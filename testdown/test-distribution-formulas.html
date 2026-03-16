@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2026-03-11" />
+<meta name="date" content="2026-03-16" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -185,23 +185,23 @@
 <td align="left">expect_equal(log(om_input$logR_sd), recruitment_distribution$log_sd[1]$value)</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-distribution-formulas.R#100</td>
-<td align="left">2026-03-11 16:41:57.130962</td>
+<td align="left">2026-03-16 17:17:46.380973</td>
 </tr>
 <tr class="even">
 <td align="left"><code>initialize_process_distribution()</code> works with correct inputs</td>
 <td align="left">Test that <code>initialize_process_distribution()</code> returns the correct dimension for x values.</td>
-<td align="left">expect_equal(length(recruitment$log_devs), length(recruitment_distribution$x))</td>
+<td align="left">expect_equal(length(recruitment$log_devs), length(recruitment_distribution$observed_values))</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-distribution-formulas.R#103</td>
-<td align="left">2026-03-11 16:41:57.148605</td>
+<td align="left">2026-03-16 17:17:46.39851</td>
 </tr>
 <tr class="odd">
 <td align="left"><code>initialize_process_distribution()</code> works with correct inputs</td>
 <td align="left">Test that <code>initialize_process_distribution()</code> matches the dimensions of x and expected values.</td>
-<td align="left">expect_equal( length(recruitment_distribution$x), length(recruitment_distribution$expected_values) )</td>
+<td align="left">expect_equal( length(recruitment_distribution$observed_values), length(recruitment_distribution$expected_values) )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-distribution-formulas.R#106</td>
-<td align="left">2026-03-11 16:41:57.166142</td>
+<td align="left">2026-03-16 17:17:46.906059</td>
 </tr>
 <tr class="even">
 <td align="left"><code>initialize_data_distribution()</code> works with correct inputs</td>
@@ -209,7 +209,7 @@
 <td align="left">expect_equal( log(fleet_sd[1]), fishing_fleet_index_distribution1$log_sd[1]$value )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-distribution-formulas.R#114</td>
-<td align="left">2026-03-11 16:41:57.186596</td>
+<td align="left">2026-03-16 17:17:46.926599</td>
 </tr>
 <tr class="odd">
 <td align="left"><code>initialize_data_distribution()</code> works with correct inputs</td>
@@ -217,7 +217,7 @@
 <td align="left">expect_equal( “constant”, fishing_fleet_index_distribution1$log_sd[1]$estimation_type$get() )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-distribution-formulas.R#119</td>
-<td align="left">2026-03-11 16:41:57.204333</td>
+<td align="left">2026-03-16 17:17:46.944653</td>
 </tr>
 <tr class="even">
 <td align="left"><code>initialize_data_distribution()</code> works with correct inputs</td>
@@ -225,7 +225,7 @@
 <td align="left">expect_equal( log(fleet_sd[1]), fishing_fleet_index_distribution2$log_sd[1]$value )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-distribution-formulas.R#124</td>
-<td align="left">2026-03-11 16:41:57.221756</td>
+<td align="left">2026-03-16 17:17:46.962221</td>
 </tr>
 <tr class="odd">
 <td align="left"><code>sd</code> value from <code>initialize_process_distribution()</code> must be greater than 0</td>
@@ -233,7 +233,7 @@
 <td align="left">expect_error( initialize_process_distribution( module = recruitment, par = “log_devs”, family = gaussian(), sd = list(value = -1, estimation_type = “constant”), is_random_effect = FALSE ), “are out of bounds” )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-distribution-formulas.R#133</td>
-<td align="left">2026-03-11 16:41:57.271603</td>
+<td align="left">2026-03-16 17:17:47.012704</td>
 </tr>
 <tr class="even">
 <td align="left"><code>initialize_process_distribution()</code> returns correct error messages</td>
@@ -241,7 +241,7 @@
 <td align="left">expect_error( initialize_process_distribution( module = recruitment, par = “log_devs”, family = multinomial(), sd = list(value = om_input$logR_sd, estimation_type = “constant”), is_random_effect = FALSE ), “FIMS currently does not allow the family” )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-distribution-formulas.R#149</td>
-<td align="left">2026-03-11 16:41:57.3168</td>
+<td align="left">2026-03-16 17:17:47.058817</td>
 </tr>
 <tr class="odd">
 <td align="left"><code>initialize_process_distribution()</code> returns correct error messages</td>
@@ -249,7 +249,7 @@
 <td align="left">expect_error( initialize_process_distribution( module = recruitment, par = “log_devs”, family = binomial(), sd = list(value = om_input$logR_sd, estimation_type = “constant”), is_random_effect = FALSE ), “FIMS currently does not allow the family” )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-distribution-formulas.R#161</td>
-<td align="left">2026-03-11 16:41:57.359536</td>
+<td align="left">2026-03-16 17:17:47.101813</td>
 </tr>
 <tr class="even">
 <td align="left"><code>initialize_process_distribution()</code> returns correct error messages</td>
@@ -257,7 +257,7 @@
 <td align="left">expect_error( initialize_process_distribution( module = recruitment, par = “log_devs”, family = gaussian(), sd = list( value = rep(om_input$logR_sd, 3), estimation_type = rep(“constant”, 2) ), is_random_effect = FALSE ), “must match” )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-distribution-formulas.R#173</td>
-<td align="left">2026-03-11 16:41:57.41224</td>
+<td align="left">2026-03-16 17:17:47.154725</td>
 </tr>
 <tr class="odd">
 <td align="left"><code>initialize_process_distribution()</code> returns correct error messages</td>
@@ -265,7 +265,7 @@
 <td align="left">expect_error( initialize_process_distribution( module = recruitment, par = “log_devs”, family = “normal”, sd = list( value = rep(om_input$logR_sd, 3), estimation_type = “constant” ), is_random_effect = FALSE ), “should be an object of class” )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-distribution-formulas.R#188</td>
-<td align="left">2026-03-11 16:41:57.454989</td>
+<td align="left">2026-03-16 17:17:47.19819</td>
 </tr>
 <tr class="even">
 <td align="left"><code>initialize_process_distribution()</code> returns correct error messages</td>
@@ -273,7 +273,7 @@
 <td align="left">expect_error( initialize_process_distribution( module = recruitment, par = “log_devs”, family = gaussian(), sd = list(value = 1), is_random_effect = FALSE ), “need to be present” )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-distribution-formulas.R#203</td>
-<td align="left">2026-03-11 16:41:57.510271</td>
+<td align="left">2026-03-16 17:17:47.240979</td>
 </tr>
 <tr class="odd">
 <td align="left"><code>initialize_data_distribution()</code> returns correct error messages</td>
@@ -281,7 +281,7 @@
 <td align="left">expect_error( initialize_data_distribution( module = fishing_fleet, family = multinomial(), sd = list(value = fleet_sd, estimation_type = “constant”), data_type = “index” ), “does not allow the family to be” )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-distribution-formulas.R#218</td>
-<td align="left">2026-03-11 16:41:57.557212</td>
+<td align="left">2026-03-16 17:17:47.28772</td>
 </tr>
 <tr class="even">
 <td align="left"><code>initialize_data_distribution()</code> returns correct error messages</td>
@@ -289,7 +289,7 @@
 <td align="left">expect_error( initialize_data_distribution( module = fishing_fleet, family = multinomial(), sd = list(value = fleet_sd, estimation_type = “constant”), data_type = “landings” ), “does not allow the family to be” )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-distribution-formulas.R#229</td>
-<td align="left">2026-03-11 16:41:57.599475</td>
+<td align="left">2026-03-16 17:17:47.331867</td>
 </tr>
 <tr class="odd">
 <td align="left"><code>initialize_data_distribution()</code> returns correct error messages</td>
@@ -297,7 +297,7 @@
 <td align="left">expect_error( initialize_data_distribution( module = fishing_fleet, family = gaussian(), sd = list(value = fleet_sd, estimation_type = “constant”), data_type = “agecomp” ), “does not allow the family to be” )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-distribution-formulas.R#240</td>
-<td align="left">2026-03-11 16:41:57.641224</td>
+<td align="left">2026-03-16 17:17:47.375642</td>
 </tr>
 <tr class="even">
 <td align="left"><code>initialize_data_distribution()</code> returns correct error messages</td>
@@ -305,7 +305,7 @@
 <td align="left">expect_error( initialize_data_distribution( module = fishing_fleet, family = lognormal(), sd = list(value = fleet_sd, estimation_type = “constant”), data_type = “lengthcomp” ), “does not allow the family to be” )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-distribution-formulas.R#251</td>
-<td align="left">2026-03-11 16:41:57.68285</td>
+<td align="left">2026-03-16 17:17:47.419926</td>
 </tr>
 <tr class="odd">
 <td align="left"><code>initialize_data_distribution()</code> returns correct error messages</td>
@@ -313,7 +313,7 @@
 <td align="left">expect_error( initialize_data_distribution( module = fishing_fleet, family = lognormal(), sd = list(value = fleet_sd, estimation_type = “constant”), data_type = “length_comp” ), “must be one of” )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-distribution-formulas.R#262</td>
-<td align="left">2026-03-11 16:41:57.716629</td>
+<td align="left">2026-03-16 17:17:47.455663</td>
 </tr>
 <tr class="even">
 <td align="left"><code>initialize_data_distribution()</code> returns correct error messages</td>
@@ -321,7 +321,7 @@
 <td align="left">expect_error( initialize_data_distribution( module = fishing_fleet, family = multinomial(), sd = list(value = fleet_sd, estimation_type = c(“constant”, “constant”)), data_type = “agecomp” ), “must match if more than one value” )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-distribution-formulas.R#273</td>
-<td align="left">2026-03-11 16:41:57.769357</td>
+<td align="left">2026-03-16 17:17:47.509266</td>
 </tr>
 <tr class="odd">
 <td align="left"><code>initialize_data_distribution()</code> returns correct error messages</td>
@@ -329,7 +329,7 @@
 <td align="left">expect_error( initialize_data_distribution( module = fishing_fleet, family = multinomial(), sd = list(estimation_type = “constant”), data_type = “agecomp” ), “need to be present” )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-distribution-formulas.R#284</td>
-<td align="left">2026-03-11 16:41:57.811367</td>
+<td align="left">2026-03-16 17:17:47.566588</td>
 </tr>
 <tr class="even">
 <td align="left"><code>initialize_data_distribution()</code> returns correct error messages</td>
@@ -337,7 +337,7 @@
 <td align="left">expect_error( initialize_data_distribution( module = fishing_fleet, sd = list(value = fleet_sd), data_type = “agecomp” ), “is missing from” )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-distribution-formulas.R#294</td>
-<td align="left">2026-03-11 16:41:57.849355</td>
+<td align="left">2026-03-16 17:17:47.608204</td>
 </tr>
 </tbody>
 </table>

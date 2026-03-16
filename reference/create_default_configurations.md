@@ -87,8 +87,8 @@ for building a complete FIMS model configuration.
 
 ``` r
 # Load the example dataset and create a FIMS data frame
-data("data1")
-fims_frame <- FIMSFrame(data1)
+data("data_big")
+fims_frame <- FIMSFrame(data_big)
 
 # Create the default model configuration tibble
 default_configurations <- create_default_configurations(data = fims_frame)

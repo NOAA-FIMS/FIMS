@@ -44,7 +44,7 @@ var classfims__info_1_1Information =
     [ "State", "classfims__info_1_1Information.html#ae8eae11b55e1c570310b064348b3d586", null ],
     [ "data_objects", "classfims__info_1_1Information.html#afe718e2553694ba44247477ee0d187e9", null ],
     [ "density_components", "classfims__info_1_1Information.html#a628c455233e9564933cbd8c6f0ce1589", null ],
-    [ "fixed_effects_parameters", "classfims__info_1_1Information.html#ad4f84b2d8e58abddbc6408344bbc1f96", null ],
+    [ "fixed_effects_parameters", "classfims__info_1_1Information.html#af95752279c137c15f9cb0ceb03327f02", null ],
     [ "fleets", "classfims__info_1_1Information.html#a4d544f7e8c08032dd12ef14961e40822", null ],
     [ "growth_models", "classfims__info_1_1Information.html#a4edd9876dd8d49da388487ec26b5ada6", null ],
     [ "maturity_models", "classfims__info_1_1Information.html#ac266167f6ac429cc29ea8846c3da8781", null ],
@@ -52,12 +52,12 @@ var classfims__info_1_1Information =
     [ "n_ages", "classfims__info_1_1Information.html#a91fe02769f34b8f3571b20d300c6b7d5", null ],
     [ "n_years", "classfims__info_1_1Information.html#a4bba008c429f6c2b43ab2248899f012a", null ],
     [ "parameter_names", "classfims__info_1_1Information.html#ac1fbb03c15a0c6ca3d634b8761804823", null ],
-    [ "parameters", "classfims__info_1_1Information.html#a4eaf81c500c0d0abdcccb621b73df4e0", null ],
+    [ "parameters", "classfims__info_1_1Information.html#ab32f7d2e0f24b8c8f651a1cdf99cac17", null ],
     [ "populations", "classfims__info_1_1Information.html#a13bc1ac7074aeb44f7ceb0d2b9bb8531", null ],
     [ "random_effects_names", "classfims__info_1_1Information.html#acae6ee10137877bb3a4d3f353bd2b49a", null ],
-    [ "random_effects_parameters", "classfims__info_1_1Information.html#af78de7edc3287ccc7b047cea2275db8d", null ],
+    [ "random_effects_parameters", "classfims__info_1_1Information.html#a1a1aab0813d3722c93487db9ca0ef168", null ],
     [ "recruitment_models", "classfims__info_1_1Information.html#af84f12390187dbdf6864fdf5d052b499", null ],
     [ "recruitment_process_models", "classfims__info_1_1Information.html#a2ef86120762c7b017f3db7edbb929364", null ],
     [ "selectivity_models", "classfims__info_1_1Information.html#a85b08dfc5ad664cb9a655fab6285952c", null ],
-    [ "variable_map", "classfims__info_1_1Information.html#a9909a48c22cda7a54bd7b88da355ef97", null ]
+    [ "variable_map", "classfims__info_1_1Information.html#a715d5d15c75f2d2067e1715bf6744b46", null ]
 ];

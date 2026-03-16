@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2026-03-11" />
+<meta name="date" content="2026-03-16" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -159,7 +159,7 @@
 </div>
 <div id="details-6" class="section level2 unnumbered hasAnchor">
 <h2>Details<a href="test-get_fixed.html#details-6" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<table style="width:100%;">
+<table>
 <colgroup>
 <col width="11%" />
 <col width="30%" />
@@ -185,7 +185,7 @@
 <td align="left">expect_equal( c(selectivity$inflection_point[1]$value, selectivity$slope[1]$value), get_fixed() )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-get_fixed.R#26</td>
-<td align="left">2026-03-11 16:42:19.793908</td>
+<td align="left">2026-03-16 17:18:16.293154</td>
 </tr>
 <tr class="even">
 <td align="left"><code>get_fixed()</code> works with correct inputs</td>
@@ -193,7 +193,7 @@
 <td align="left">expect_equal( selectivity$slope[1]$value, get_fixed() )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-get_fixed.R#38</td>
-<td align="left">2026-03-11 16:42:19.806255</td>
+<td align="left">2026-03-16 17:18:16.306926</td>
 </tr>
 <tr class="odd">
 <td align="left"><code>get_fixed()</code> works with correct inputs</td>
@@ -201,31 +201,31 @@
 <td align="left">expect_equal(get_fixed(), sel_parm)</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-get_fixed.R#61</td>
-<td align="left">2026-03-11 16:42:19.825213</td>
+<td align="left">2026-03-16 17:18:16.327344</td>
 </tr>
 <tr class="even">
 <td align="left"><code>get_fixed()</code> works with correct inputs</td>
 <td align="left">Test the counting of parameters when multiple modules are involved, e.g., selectivity and recruitment.</td>
 <td align="left">expect_equal(c(sel_parm, rec_parm), get_fixed())</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
-<td align="left">test-get_fixed.R#87</td>
-<td align="left">2026-03-11 16:42:19.846422</td>
+<td align="left">test-get_fixed.R#83</td>
+<td align="left">2026-03-16 17:18:16.347117</td>
 </tr>
 <tr class="odd">
 <td align="left"><code>get_fixed()</code> returns correct outputs for edge cases</td>
 <td align="left">Test that zero parameters are registered after using <code>clear()</code>.</td>
 <td align="left">expect_equal(numeric(0), get_fixed())</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
-<td align="left">test-get_fixed.R#97</td>
-<td align="left">2026-03-11 16:42:19.857579</td>
+<td align="left">test-get_fixed.R#93</td>
+<td align="left">2026-03-16 17:18:16.360028</td>
 </tr>
 <tr class="even">
 <td align="left"><code>get_fixed()</code> returns correct outputs for edge cases</td>
 <td align="left">Test that zero parameters are registered after using <code>clear()</code> even if <code>CreateTMBModel()</code> is called.</td>
 <td align="left">expect_equal(numeric(0), get_fixed())</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
-<td align="left">test-get_fixed.R#100</td>
-<td align="left">2026-03-11 16:42:19.865487</td>
+<td align="left">test-get_fixed.R#96</td>
+<td align="left">2026-03-16 17:18:16.369158</td>
 </tr>
 </tbody>
 </table>

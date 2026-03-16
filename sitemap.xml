@@ -12,6 +12,7 @@
 <url><loc>https://NOAA-FIMS.github.io/FIMS/articles/training-intro-cpp.html</loc></url>
 <url><loc>https://NOAA-FIMS.github.io/FIMS/articles/training-intro-rcpp.html</loc></url>
 <url><loc>https://NOAA-FIMS.github.io/FIMS/authors.html</loc></url>
+<url><loc>https://NOAA-FIMS.github.io/FIMS/copilot-instructions.html</loc></url>
 <url><loc>https://NOAA-FIMS.github.io/FIMS/coverage/codecoverage_explanation.html</loc></url>
 <url><loc>https://NOAA-FIMS.github.io/FIMS/coverage/coverage.html</loc></url>
 <url><loc>https://NOAA-FIMS.github.io/FIMS/index.html</loc></url>
@@ -24,7 +25,8 @@
 <url><loc>https://NOAA-FIMS.github.io/FIMS/reference/Rcpp_ParameterVector.html</loc></url>
 <url><loc>https://NOAA-FIMS.github.io/FIMS/reference/create_default_configurations.html</loc></url>
 <url><loc>https://NOAA-FIMS.github.io/FIMS/reference/create_default_parameters.html</loc></url>
-<url><loc>https://NOAA-FIMS.github.io/FIMS/reference/data1.html</loc></url>
+<url><loc>https://NOAA-FIMS.github.io/FIMS/reference/data_big.html</loc></url>
+<url><loc>https://NOAA-FIMS.github.io/FIMS/reference/fims_input_types.html</loc></url>
 <url><loc>https://NOAA-FIMS.github.io/FIMS/reference/fit_fims.html</loc></url>
 <url><loc>https://NOAA-FIMS.github.io/FIMS/reference/get_FIMSFit.html</loc></url>
 <url><loc>https://NOAA-FIMS.github.io/FIMS/reference/get_FIMSFrame.html</loc></url>
@@ -34,7 +36,8 @@
 <url><loc>https://NOAA-FIMS.github.io/FIMS/reference/is.FIMSFit.html</loc></url>
 <url><loc>https://NOAA-FIMS.github.io/FIMS/reference/is_fims_verbose.html</loc></url>
 <url><loc>https://NOAA-FIMS.github.io/FIMS/reference/lognormal.html</loc></url>
-<url><loc>https://NOAA-FIMS.github.io/FIMS/reference/m_.html</loc></url>
+<url><loc>https://NOAA-FIMS.github.io/FIMS/reference/model_.html</loc></url>
+<url><loc>https://NOAA-FIMS.github.io/FIMS/reference/plot.html</loc></url>
 <url><loc>https://NOAA-FIMS.github.io/FIMS/reference/remove_test_data.html</loc></url>
 <url><loc>https://NOAA-FIMS.github.io/FIMS/reference/reshape_json_estimates.html</loc></url>
 <url><loc>https://NOAA-FIMS.github.io/FIMS/reference/reshape_tmb_estimates.html</loc></url>

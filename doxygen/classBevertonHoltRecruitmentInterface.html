@@ -269,9 +269,6 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a4e183cccdd0aac1162b621b663b2848a" id="r_a4e183cccdd0aac1162b621b663b2848a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">virtual</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classBevertonHoltRecruitmentInterface.html#a4e183cccdd0aac1162b621b663b2848a">finalize</a> ()</td></tr>
 <tr class="memdesc:a4e183cccdd0aac1162b621b663b2848a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Extracts derived quantities back to the Rcpp interface object from the Information object.  <br /></td></tr>
 <tr class="separator:a4e183cccdd0aac1162b621b663b2848a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0b4d4cd3a3ef120aa49e466bed475cf9" id="r_a0b4d4cd3a3ef120aa49e466bed475cf9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">virtual</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classBevertonHoltRecruitmentInterface.html#a0b4d4cd3a3ef120aa49e466bed475cf9">set_uncertainty</a> (std::map&lt; std::string, std::vector&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">double</a> &gt; &gt; &amp;se_values)</td></tr>
-<tr class="memdesc:a0b4d4cd3a3ef120aa49e466bed475cf9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the uncertainty values for the parameters from the standard error values passed from R.  <br /></td></tr>
-<tr class="separator:a0b4d4cd3a3ef120aa49e466bed475cf9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3fe268ea362772d045c4fe7618bcf8fc" id="r_a3fe268ea362772d045c4fe7618bcf8fc"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">virtual</a> std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classBevertonHoltRecruitmentInterface.html#a3fe268ea362772d045c4fe7618bcf8fc">to_json</a> ()</td></tr>
 <tr class="memdesc:a3fe268ea362772d045c4fe7618bcf8fc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Converts the data to json representation for the output.  <br /></td></tr>
 <tr class="separator:a3fe268ea362772d045c4fe7618bcf8fc"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -291,10 +288,6 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a9183d9379777d8be70ab66af1a07f94c inherit pub_methods_classFIMSRcppInterfaceBase" id="r_a9183d9379777d8be70ab66af1a07f94c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">virtual</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFIMSRcppInterfaceBase.html#a9183d9379777d8be70ab66af1a07f94c">add_to_fims_tmb</a> ()</td></tr>
 <tr class="memdesc:a9183d9379777d8be70ab66af1a07f94c inherit pub_methods_classFIMSRcppInterfaceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">A virtual method to inherit to add objects to the TMB model.  <br /></td></tr>
 <tr class="separator:a9183d9379777d8be70ab66af1a07f94c inherit pub_methods_classFIMSRcppInterfaceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a72fc17f2f76b60a82db50167b1cde83d inherit pub_methods_classFIMSRcppInterfaceBase" id="r_a72fc17f2f76b60a82db50167b1cde83d"><td class="memItemLeft" align="right" valign="top">
-<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><b>get_se_values</b> (std::string name, std::map&lt; std::string, std::vector&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">double</a> &gt; &gt; &amp;se_values, <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">double</a> &gt; &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">values</a>)</td></tr>
-<tr class="memdesc:a72fc17f2f76b60a82db50167b1cde83d inherit pub_methods_classFIMSRcppInterfaceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Method to extract standard error values from the se_values working map. <br /></td></tr>
-<tr class="separator:a72fc17f2f76b60a82db50167b1cde83d inherit pub_methods_classFIMSRcppInterfaceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a46e0ce655ef707a6c66e863aa4f0b374 inherit pub_methods_classFIMSRcppInterfaceBase" id="r_a46e0ce655ef707a6c66e863aa4f0b374"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFIMSRcppInterfaceBase.html#a46e0ce655ef707a6c66e863aa4f0b374">value_to_string</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">double</a> value)</td></tr>
 <tr class="memdesc:a46e0ce655ef707a6c66e863aa4f0b374 inherit pub_methods_classFIMSRcppInterfaceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Report the parameter value as a string.  <br /></td></tr>
 <tr class="separator:a46e0ce655ef707a6c66e863aa4f0b374 inherit pub_methods_classFIMSRcppInterfaceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -550,42 +543,6 @@ Additional Inherited Members</h2></td></tr>
 <dl class="section return"><dt>Returns</dt><dd>The ID. </dd></dl>
 
 <p>Implements <a class="el" href="classRecruitmentInterfaceBase.html#a4bc18067795f5503eecc72ef13a9802a">RecruitmentInterfaceBase</a>.</p>
-
-</div>
-</div>
-<a id="a0b4d4cd3a3ef120aa49e466bed475cf9" name="a0b4d4cd3a3ef120aa49e466bed475cf9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0b4d4cd3a3ef120aa49e466bed475cf9">&#9670;&#160;</a></span>set_uncertainty()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">virtual</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a> BevertonHoltRecruitmentInterface::set_uncertainty </td>
-          <td>(</td>
-          <td class="paramtype">std::map&lt; std::string, std::vector&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">double</a> &gt; &gt; &amp;&#160;</td>
-          <td class="paramname"><em>se_values</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Sets the uncertainty values for the parameters from the standard error values passed from R. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">se_values</td><td>A map of parameter names and their associated standard error values. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p>Reimplemented from <a class="el" href="classFIMSRcppInterfaceBase.html#a5e19680aa5d84f270939435588bce03b">FIMSRcppInterfaceBase</a>.</p>
 
 </div>
 </div>

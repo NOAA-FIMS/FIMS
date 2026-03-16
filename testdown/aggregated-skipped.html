@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2026-03-11" />
+<meta name="date" content="2026-03-16" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -147,13 +147,13 @@
 <blockquote>
 <p>These expectations are either validated skip expectations, or they come after a validated skip expectations or an error and were not run.</p>
 </blockquote>
-<table style="width:100%;">
+<table>
 <colgroup>
+<col width="12%" />
 <col width="13%" />
-<col width="10%" />
+<col width="26%" />
 <col width="27%" />
-<col width="28%" />
-<col width="19%" />
+<col width="18%" />
 </colgroup>
 <thead>
 <tr class="header">
@@ -166,28 +166,28 @@
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left">test-integration-fims-bayesian-prior-predictive.R#287</td>
+<td align="left">test-integration-fims-bayesian-prior-predictive.R#290</td>
 <td align="left">prior predictive check</td>
 <td align="left">NA (was skipped)</td>
 <td align="left"># expect_equal(median(inflection_point_out[,i]), inflection_point_mean, tolerance = .1)</td>
 <td align="left">NA (was skipped)</td>
 </tr>
 <tr class="even">
-<td align="left">test-integration-fims-bayesian-prior-predictive.R#288</td>
+<td align="left">test-integration-fims-bayesian-prior-predictive.R#291</td>
 <td align="left">prior predictive check</td>
 <td align="left">NA (was skipped)</td>
 <td align="left"># expect_equal(median(slope_out[,i]), slope_mean, tolerance = .1)</td>
 <td align="left">NA (was skipped)</td>
 </tr>
 <tr class="odd">
-<td align="left">test-integration-fims-bayesian-prior-predictive.R#289</td>
+<td align="left">test-integration-fims-bayesian-prior-predictive.R#292</td>
 <td align="left">prior predictive check</td>
 <td align="left">NA (was skipped)</td>
 <td align="left"># expect_equal(var(inflection_point_out[,i]), 9, tolerance = .1)</td>
 <td align="left">NA (was skipped)</td>
 </tr>
 <tr class="even">
-<td align="left">test-integration-fims-bayesian-prior-predictive.R#290</td>
+<td align="left">test-integration-fims-bayesian-prior-predictive.R#293</td>
 <td align="left">prior predictive check</td>
 <td align="left">NA (was skipped)</td>
 <td align="left"># expect_equal(var(slope_out[,i]), 9, tolerance = .1)</td>
@@ -516,6 +516,20 @@
 <td align="left">NA (was skipped)</td>
 </tr>
 <tr class="odd">
+<td align="left">test-projections-looped.R#642</td>
+<td align="left"><code>inv_logit()</code> returns correct error messages</td>
+<td align="left">NA (was skipped)</td>
+<td align="left"># expect_equal(sum(rec_devs[, “Estimate”]), 0)</td>
+<td align="left">NA (was skipped)</td>
+</tr>
+<tr class="even">
+<td align="left">test-projections-looped.R#664</td>
+<td align="left">projections with no data achieve same estimates and no projection model run</td>
+<td align="left">NA (was skipped)</td>
+<td align="left"># expect_equal(sum(rec_devs[, “Estimate”]), 0)</td>
+<td align="left">NA (was skipped)</td>
+</tr>
+<tr class="odd">
 <td align="left">test-rcpp-distribution.R#451</td>
 <td align="left">rcpp distribution returns correct error messages</td>
 <td align="left">NA (was skipped)</td>
@@ -523,28 +537,28 @@
 <td align="left">NA (was skipped)</td>
 </tr>
 <tr class="even">
-<td align="left">test-reshape_json_estimates.R#62</td>
+<td align="left">test-reshape_json_estimates.R#64</td>
 <td align="left">rcpp selectivity returns correct outputs for edge cases</td>
 <td align="left">NA (was skipped)</td>
 <td align="left"># comparison using testthat::expect_equal fails.</td>
 <td align="left">NA (was skipped)</td>
 </tr>
 <tr class="odd">
-<td align="left">test-reshape_json_estimates.R#71</td>
+<td align="left">test-reshape_json_estimates.R#73</td>
 <td align="left">rcpp selectivity returns correct outputs for edge cases</td>
 <td align="left">NA (was skipped)</td>
 <td align="left">expect_equal(nrow(duplicated_parameter_ids), 0)</td>
 <td align="left">NA (was skipped)</td>
 </tr>
 <tr class="even">
-<td align="left">test-reshape_json_estimates.R#118</td>
+<td align="left">test-reshape_json_estimates.R#120</td>
 <td align="left">rcpp selectivity returns correct outputs for edge cases</td>
 <td align="left">NA (was skipped)</td>
 <td align="left">expect_equal(nrow(missing_module_name_in_json), 0)</td>
 <td align="left">NA (was skipped)</td>
 </tr>
 <tr class="odd">
-<td align="left">test-reshape_json_estimates.R#136</td>
+<td align="left">test-reshape_json_estimates.R#138</td>
 <td align="left">rcpp selectivity returns correct outputs for edge cases</td>
 <td align="left">NA (was skipped)</td>
 <td align="left">expect_equal(nrow(missing_label_in_json), 0)</td>

@@ -12,7 +12,6 @@ var annotated_dup =
     ] ],
     [ "fims_distributions", null, [
       [ "DensityComponentBase", "structfims__distributions_1_1DensityComponentBase.html", "structfims__distributions_1_1DensityComponentBase" ],
-      [ "DistributionElementObject", "structfims__distributions_1_1DistributionElementObject.html", "structfims__distributions_1_1DistributionElementObject" ],
       [ "LogNormalLPDF", "structfims__distributions_1_1LogNormalLPDF.html", "structfims__distributions_1_1LogNormalLPDF" ],
       [ "MultinomialLPMF", "structfims__distributions_1_1MultinomialLPMF.html", "structfims__distributions_1_1MultinomialLPMF" ],
       [ "NormalLPDF", "structfims__distributions_1_1NormalLPDF.html", "structfims__distributions_1_1NormalLPDF" ]
@@ -43,8 +42,7 @@ var annotated_dup =
       [ "RecruitmentBase", "structfims__popdy_1_1RecruitmentBase.html", "structfims__popdy_1_1RecruitmentBase" ],
       [ "SelectivityBase", "structfims__popdy_1_1SelectivityBase.html", "structfims__popdy_1_1SelectivityBase" ],
       [ "SRBevertonHolt", "structfims__popdy_1_1SRBevertonHolt.html", "structfims__popdy_1_1SRBevertonHolt" ],
-      [ "Subpopulation", "classfims__popdy_1_1Subpopulation.html", null ],
-      [ "UncertaintyReportInfo", "structfims__popdy_1_1UncertaintyReportInfo.html", "structfims__popdy_1_1UncertaintyReportInfo" ]
+      [ "Subpopulation", "classfims__popdy_1_1Subpopulation.html", null ]
     ] ],
     [ "AgeCompDataInterface", "classAgeCompDataInterface.html", "classAgeCompDataInterface" ],
     [ "BevertonHoltRecruitmentInterface", "classBevertonHoltRecruitmentInterface.html", "classBevertonHoltRecruitmentInterface" ],

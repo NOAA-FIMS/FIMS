@@ -40,9 +40,9 @@ vignette](https://NOAA-FIMS.github.io/FIMS/articles/fims-demo.md).
 
 ``` r
 # Bring the package data into your environment
-data("data1")
+data("data_big")
 # Prepare the package data for being used in a FIMS model
-data_4_model <- FIMSFrame(data1)
+data_4_model <- FIMSFrame(data_big)
 
 # Create default model configurations based on the data
 default_configurations <- create_default_configurations(data = data_4_model)
@@ -71,15 +71,28 @@ the data is needed.
 ``` r
 # Add a single row of landings to the original data for the maximum year you
 # want to project to
-data1_with_extra_year <- dplyr::add_row(
-  data1,
+data_big_with_extra_year <- dplyr::add_row(
+  data_big,
   type = "landings",
   timing = get_end_year(data_4_model) + years_of_projection,
   name = "fleet1",
   value = -999,
   unit = "mt"
 )
-data_4_projections <- data1_with_extra_year |>
+data_4_projections <- data_big_with_extra_year |>
+  # Add on weight_at_age data for 10 more years because you don't want these
+  # filled with -999
+  dplyr::bind_rows(
+    dplyr::filter(
+      data_big,
+      type == "weight_at_age",
+      timing == 1
+    ) |>
+    dplyr::select(-timing) |>
+    merge(
+      data.frame(timing = max(data_big[["timing"]]):(max(data_big[["timing"]]) + 10))
+    )
+  ) |>
   # Make a FIMSFrame object out of this data frame with the extra row to add all
   # of the other missing years for each data type
   FIMSFrame() |>
@@ -245,17 +258,17 @@ projection_fit <- parameters_projection |>
 
     ## ✔ Starting optimization ...
     ## ℹ Restarting optimizer 3 times to improve gradient.
-    ## ℹ Maximum gradient went from 0.01568 to 0.00186 after 3 steps.
+    ## ℹ Maximum gradient went from 0.0046 to 0.00038 after 3 steps.
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
-    ## ℹ FIMS model version: 0.8.1
-    ## ℹ Total run time was 2.46975 minutes
-    ## ℹ Number of parameters: fixed_effects=87, random_effects=0, and total=87
-    ## ℹ Maximum gradient= 0.00186
+    ## ℹ FIMS model version: 0.9.0
+    ## ℹ Total run time was 7.33392 seconds
+    ## ℹ Number of parameters: fixed_effects=58, random_effects=29, and total=87
+    ## ℹ Maximum gradient= 0.00038
     ## ℹ Negative log likelihood (NLL):
-    ## • Marginal NLL= 3166.0503
-    ## • Total NLL= 3166.0503
-    ## ℹ Terminal SB= 990.87314
+    ## • Marginal NLL= 3232.34986
+    ## • Total NLL= 3166.05213
+    ## ℹ Terminal SB= 994.55006
 
 ``` r
 clear()

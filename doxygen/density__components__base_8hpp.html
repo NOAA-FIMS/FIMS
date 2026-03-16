@@ -236,15 +236,13 @@ $(document).ready(function(){initNavTree('density__components__base_8hpp.html','
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="nested-classes" name="nested-classes"></a>
 Classes</h2></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__distributions_1_1DistributionElementObject.html">fims_distributions::DistributionElementObject&lt; Type &gt;</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__distributions_1_1DensityComponentBase.html">fims_distributions::DensityComponentBase&lt; Type &gt;</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Base class for all module_name functors.  <a href="structfims__distributions_1_1DensityComponentBase.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Declares the DensityComponentBase class, which is the base class for all distribution functors. </p>
-<p>Defines guards for distributions module outline to define the density_components_base hpp file if not already defined. </p><dl class="section copyright"><dt>Copyright</dt><dd>This file is part of the NOAA, National Marine Fisheries Service Fisheries Integrated Modeling System project. See LICENSE in the source folder for reuse information. </dd></dl>
+<p>This header defines two core templates used by concrete distribution functors (e.g., NormalLPDF, LogNormalLPDF, MultinomialLPMF): DistributionElementObject, which stores and resolves observed/expected inputs, and DensityComponentBase, which adds shared bookkeeping for log-likelihood contributions and simulation/reporting behavior. </p><dl class="section copyright"><dt>Copyright</dt><dd>This file is part of the NOAA, National Marine Fisheries Service Fisheries Integrated Modeling System project. See LICENSE in the source folder for reuse information. </dd></dl>
 </div></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
