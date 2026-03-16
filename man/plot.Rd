@@ -2,6 +2,7 @@
 % Please edit documentation in R/fimsframe.R
 \name{plot}
 \alias{plot}
+\alias{plot,FIMSFrame,missing-method}
 \title{Plot a \code{FIMSFrame} object}
 \usage{
 plot(x, y, ...)
