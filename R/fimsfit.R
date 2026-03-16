@@ -604,7 +604,7 @@ fit_fims <- function(input,
   }
   time_optimization <- Sys.time() - t0
   cli::cli_inform(c("v" = "Finished optimization"))
-  FIMS::set_fixed(opt$par)
+  set_fixed(opt$par)
 
   time_sdreport <- NA
   if (get_sd) {

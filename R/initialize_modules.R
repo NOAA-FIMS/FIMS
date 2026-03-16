@@ -80,7 +80,7 @@ initialize_module <- function(parameters, data, module_name, fleet_name = NA_cha
       dplyr::pull(module_type)
     if ("age_to_length_conversion" %in% fleet_types &&
       "LengthComp" %in% data_distribution_names_for_fleet_i) {
-      age_to_length_conversion_value <- FIMS::m_age_to_length_conversion(data, fleet_name)
+      age_to_length_conversion_value <- m_age_to_length_conversion(data, fleet_name)
       module[["age_to_length_conversion"]]$resize(length(age_to_length_conversion_value))
       # Assign each value to the corresponding position in the parameter vector
       purrr::walk(
