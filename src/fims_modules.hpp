@@ -59,77 +59,77 @@ RCPP_EXPOSED_CLASS(SharedBoolean)
 RCPP_MODULE(fims) {
   Rcpp::function(
       "CreateTMBModel", &CreateTMBModel,
-      "See https://noaa-fims.github.io/doxygen/rcpp__interface_8hpp.html.");
+      "See https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html.");
   Rcpp::function(
       // TODO: fix the naming mismatch
       "set_fixed", &set_fixed_parameters,
-      "See https://noaa-fims.github.io/doxygen/rcpp__interface_8hpp.html.");
+      "See https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html.");
   Rcpp::function(
       // TODO: fix the naming mismatch
       "get_fixed", &get_fixed_parameters_vector,
-      "See https://noaa-fims.github.io/doxygen/rcpp__interface_8hpp.html.");
+      "See https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html.");
   Rcpp::function(
       // TODO: fix the naming mismatch
       "set_random", &set_random_parameters,
-      "See https://noaa-fims.github.io/doxygen/rcpp__interface_8hpp.html.");
+      "See https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html.");
   Rcpp::function(
       // TODO: fix the naming mismatch
       "get_random", &get_random_parameters_vector,
-      "See https://noaa-fims.github.io/doxygen/rcpp__interface_8hpp.html.");
+      "See https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html.");
   Rcpp::function(
       "get_parameter_names", &get_parameter_names,
-      "See https://noaa-fims.github.io/doxygen/rcpp__interface_8hpp.html.");
+      "See https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html.");
   Rcpp::function(
       "get_random_names", &get_random_names,
-      "See https://noaa-fims.github.io/doxygen/rcpp__interface_8hpp.html.");
+      "See https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html.");
   Rcpp::function(
       "clear", clear,
-      "See https://noaa-fims.github.io/doxygen/rcpp__interface_8hpp.html.");
+      "See https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html.");
   Rcpp::function(
       "get_log", get_log,
-      "See https://noaa-fims.github.io/doxygen/rcpp__interface_8hpp.html.");
+      "See https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html.");
   Rcpp::function(
       "get_log_errors", get_log_errors,
-      "See https://noaa-fims.github.io/doxygen/rcpp__interface_8hpp.html.");
+      "See https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html.");
   Rcpp::function(
       "get_log_warnings", get_log_warnings,
-      "See https://noaa-fims.github.io/doxygen/rcpp__interface_8hpp.html.");
+      "See https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html.");
   Rcpp::function(
       "get_log_info", get_log_info,
-      "See https://noaa-fims.github.io/doxygen/rcpp__interface_8hpp.html.");
+      "See https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html.");
   Rcpp::function(
       "write_log", write_log,
-      "See https://noaa-fims.github.io/doxygen/rcpp__interface_8hpp.html.");
+      "See https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html.");
   Rcpp::function(
       "set_log_path", set_log_path,
-      "See https://noaa-fims.github.io/doxygen/rcpp__interface_8hpp.html.");
+      "See https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html.");
   Rcpp::function(
       "init_logging", init_logging,
-      "See https://noaa-fims.github.io/doxygen/rcpp__interface_8hpp.html.");
+      "See https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html.");
   Rcpp::function(
       "set_log_throw_on_error", set_log_throw_on_error,
-      "See https://noaa-fims.github.io/doxygen/rcpp__interface_8hpp.html.");
+      "See https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html.");
   Rcpp::function(
       "log_info", log_info,
-      "See https://noaa-fims.github.io/doxygen/rcpp__interface_8hpp.html.");
+      "See https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html.");
   Rcpp::function(
       "log_warning", log_warning,
-      "See https://noaa-fims.github.io/doxygen/rcpp__interface_8hpp.html.");
+      "See https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html.");
   Rcpp::function(
       "log_error", log_error,
-      "See https://noaa-fims.github.io/doxygen/rcpp__interface_8hpp.html.");
+      "See https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html.");
   Rcpp::function(
       // TODO: fix the naming mismatch
       "logit", logit_rcpp,
-      "See https://noaa-fims.github.io/doxygen/rcpp__interface_8hpp.html.");
+      "See https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html.");
   Rcpp::function(
       // TODO: fix the naming mismatch
       "inv_logit", inv_logit_rcpp,
-      "See https://noaa-fims.github.io/doxygen/rcpp__interface_8hpp.html.");
+      "See https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html.");
 
   Rcpp::class_<Parameter>(
       "Parameter",
-      "See https://noaa-fims.github.io/doxygen/classParameter.html.")
+      "See https://noaa-fims.github.io/FIMS/doxygen/classParameter.html.")
       .constructor()
       .constructor<double>()
       .constructor<Parameter>()
@@ -140,7 +140,7 @@ RCPP_MODULE(fims) {
 
   Rcpp::class_<ParameterVector>(
       "ParameterVector",
-      "See https://noaa-fims.github.io/doxygen/classParameterVector.html.")
+      "See https://noaa-fims.github.io/FIMS/doxygen/classParameterVector.html.")
       .constructor()
       .constructor<size_t>()
       .constructor<Rcpp::NumericVector, size_t>()
@@ -157,7 +157,7 @@ RCPP_MODULE(fims) {
 
   Rcpp::class_<RealVector>(
       "RealVector",
-      "See https://noaa-fims.github.io/doxygen/classRealVector.html.")
+      "See https://noaa-fims.github.io/FIMS/doxygen/classRealVector.html.")
       .constructor()
       .constructor<size_t>()
       .constructor<Rcpp::NumericVector, size_t>()
@@ -173,7 +173,7 @@ RCPP_MODULE(fims) {
 
   Rcpp::class_<SharedInt>(
       "SharedInt",
-      "See https://noaa-fims.github.io/doxygen/classSharedInt.html.")
+      "See https://noaa-fims.github.io/FIMS/doxygen/classSharedInt.html.")
       .constructor()
       .constructor<int>()
       .method("get", &SharedInt::get)
@@ -181,7 +181,7 @@ RCPP_MODULE(fims) {
 
   Rcpp::class_<SharedString>(
       "SharedString",
-      "See https://noaa-fims.github.io/doxygen/classSharedString.html.")
+      "See https://noaa-fims.github.io/FIMS/doxygen/classSharedString.html.")
       .constructor()
       .constructor<std::string>()
       .method("get", &SharedString::get)
@@ -189,7 +189,7 @@ RCPP_MODULE(fims) {
 
   Rcpp::class_<SharedBoolean>(
       "SharedBoolean",
-      "See https://noaa-fims.github.io/doxygen/classSharedBoolean.html.")
+      "See https://noaa-fims.github.io/FIMS/doxygen/classSharedBoolean.html.")
       .constructor()
       .constructor<bool>()
       .method("get", &SharedBoolean::get)
@@ -197,7 +197,7 @@ RCPP_MODULE(fims) {
 
   Rcpp::class_<SharedReal>(
       "SharedReal",
-      "See https://noaa-fims.github.io/doxygen/classSharedReal.html.")
+      "See https://noaa-fims.github.io/FIMS/doxygen/classSharedReal.html.")
       .constructor()
       .constructor<double>()
       .method("get", &SharedReal::get)
@@ -206,7 +206,7 @@ RCPP_MODULE(fims) {
   Rcpp::class_<BevertonHoltRecruitmentInterface>(
       "BevertonHoltRecruitment",
       "See "
-      "https://noaa-fims.github.io/doxygen/"
+      "https://noaa-fims.github.io/FIMS/doxygen/"
       "classBevertonHoltRecruitmentInterface.html.")
       .constructor()
       .field("logit_steep", &BevertonHoltRecruitmentInterface::logit_steep)
@@ -225,7 +225,7 @@ RCPP_MODULE(fims) {
   Rcpp::class_<LogDevsRecruitmentInterface>(
       "LogDevsRecruitmentProcess",
       "See "
-      "https://noaa-fims.github.io/doxygen/"
+      "https://noaa-fims.github.io/FIMS/doxygen/"
       "classLogDevsRecruitmentInterface.html.")
       .constructor()
       .method("get_id", &LogDevsRecruitmentInterface::get_id)
@@ -235,14 +235,14 @@ RCPP_MODULE(fims) {
   Rcpp::class_<LogRRecruitmentInterface>(
       "LogRRecruitmentProcess",
       "See "
-      "https://noaa-fims.github.io/doxygen/classLogRRecruitmentInterface.html.")
+      "https://noaa-fims.github.io/FIMS/doxygen/classLogRRecruitmentInterface.html.")
       .constructor()
       .method("get_id", &LogRRecruitmentInterface::get_id)
       .method("evaluate_process", &LogRRecruitmentInterface::evaluate_process);
 
   Rcpp::class_<FleetInterface>(
       "Fleet",
-      "See https://noaa-fims.github.io/doxygen/classFleetInterface.html.")
+      "See https://noaa-fims.github.io/FIMS/doxygen/classFleetInterface.html.")
       .constructor()
       .field("log_q", &FleetInterface::log_q)
       .field("log_Fmort", &FleetInterface::log_Fmort)
@@ -283,7 +283,7 @@ RCPP_MODULE(fims) {
 
   Rcpp::class_<AgeCompDataInterface>(
       "AgeComp",
-      "See https://noaa-fims.github.io/doxygen/classAgeCompDataInterface.html.")
+      "See https://noaa-fims.github.io/FIMS/doxygen/classAgeCompDataInterface.html.")
       .constructor<int, int>()
       .field("age_comp_data", &AgeCompDataInterface::age_comp_data)
       .method("get_id", &AgeCompDataInterface::get_id);
@@ -291,7 +291,7 @@ RCPP_MODULE(fims) {
   Rcpp::class_<LengthCompDataInterface>(
       "LengthComp",
       "See "
-      "https://noaa-fims.github.io/doxygen/classLengthCompDataInterface.html.")
+      "https://noaa-fims.github.io/FIMS/doxygen/classLengthCompDataInterface.html.")
       .constructor<int, int>()
       .field("length_comp_data", &LengthCompDataInterface::length_comp_data)
       .method("get_id", &LengthCompDataInterface::get_id);
@@ -299,21 +299,21 @@ RCPP_MODULE(fims) {
   Rcpp::class_<LandingsDataInterface>(
       "Landings",
       "See "
-      "https://noaa-fims.github.io/doxygen/classLandingsDataInterface.html.")
+      "https://noaa-fims.github.io/FIMS/doxygen/classLandingsDataInterface.html.")
       .constructor<int>()
       .field("landings_data", &LandingsDataInterface::landings_data)
       .method("get_id", &LandingsDataInterface::get_id);
 
   Rcpp::class_<IndexDataInterface>(
       "Index",
-      "See https://noaa-fims.github.io/doxygen/classIndexDataInterface.html.")
+      "See https://noaa-fims.github.io/FIMS/doxygen/classIndexDataInterface.html.")
       .constructor<int>()
       .field("index_data", &IndexDataInterface::index_data)
       .method("get_id", &IndexDataInterface::get_id);
 
   Rcpp::class_<PopulationInterface>(
       "Population",
-      "See https://noaa-fims.github.io/doxygen/classPopulationInterface.html.")
+      "See https://noaa-fims.github.io/FIMS/doxygen/classPopulationInterface.html.")
       .constructor()
       .method("get_id", &PopulationInterface::get_id)
       .field("n_ages", &PopulationInterface::n_ages)
@@ -336,7 +336,7 @@ RCPP_MODULE(fims) {
   Rcpp::class_<LogisticMaturityInterface>(
       "LogisticMaturity",
       "See "
-      "https://noaa-fims.github.io/doxygen/"
+      "https://noaa-fims.github.io/FIMS/doxygen/"
       "classLogisticMaturityInterface.html.")
       .constructor()
       .field("inflection_point", &LogisticMaturityInterface::inflection_point)
@@ -347,7 +347,7 @@ RCPP_MODULE(fims) {
   Rcpp::class_<LogisticSelectivityInterface>(
       "LogisticSelectivity",
       "See "
-      "https://noaa-fims.github.io/doxygen/"
+      "https://noaa-fims.github.io/FIMS/doxygen/"
       "classLogisticSelectivityInterface.html.")
       .constructor()
       .field("inflection_point",
@@ -359,7 +359,7 @@ RCPP_MODULE(fims) {
   Rcpp::class_<DoubleLogisticSelectivityInterface>(
       "DoubleLogisticSelectivity",
       "See "
-      "https://noaa-fims.github.io/doxygen/"
+      "https://noaa-fims.github.io/FIMS/doxygen/"
       "classDoubleLogisticSelectivityInterface.html.")
       .constructor()
       .field("inflection_point_asc",
@@ -373,7 +373,7 @@ RCPP_MODULE(fims) {
 
   Rcpp::class_<EWAAGrowthInterface>(
       "EWAAGrowth",
-      "See https://noaa-fims.github.io/doxygen/classEWAAGrowthInterface.html.")
+      "See https://noaa-fims.github.io/FIMS/doxygen/classEWAAGrowthInterface.html.")
       .constructor()
       .field("ages", &EWAAGrowthInterface::ages, "Ages for each age class.")
       .field("weights", &EWAAGrowthInterface::weights,
@@ -385,7 +385,7 @@ RCPP_MODULE(fims) {
   Rcpp::class_<DnormDistributionsInterface>(
       "DnormDistribution",
       "See "
-      "https://noaa-fims.github.io/doxygen/"
+      "https://noaa-fims.github.io/FIMS/doxygen/"
       "classDnormDistributionsInterface.html.")
       .constructor()
       .method("get_id", &DnormDistributionsInterface::get_id)
@@ -404,7 +404,7 @@ RCPP_MODULE(fims) {
   Rcpp::class_<DlnormDistributionsInterface>(
       "DlnormDistribution",
       "See "
-      "https://noaa-fims.github.io/doxygen/"
+      "https://noaa-fims.github.io/FIMS/doxygen/"
       "classDlnormDistributionsInterface.html.")
       .constructor()
       .method("get_id", &DlnormDistributionsInterface::get_id)
@@ -420,7 +420,7 @@ RCPP_MODULE(fims) {
   Rcpp::class_<DmultinomDistributionsInterface>(
       "DmultinomDistribution",
       "See "
-      "https://noaa-fims.github.io/doxygen/"
+      "https://noaa-fims.github.io/FIMS/doxygen/"
       "classDmultinomDistributionsInterface.html.")
       .constructor()
       .method("get_id", &DmultinomDistributionsInterface::get_id)
@@ -438,7 +438,7 @@ RCPP_MODULE(fims) {
 
   Rcpp::class_<CatchAtAgeInterface>(
       "CatchAtAge",
-      "See https://noaa-fims.github.io/doxygen/classCatchAtAgeInterface.html.")
+      "See https://noaa-fims.github.io/FIMS/doxygen/classCatchAtAgeInterface.html.")
       .constructor()
       .method("AddPopulation", &CatchAtAgeInterface::AddPopulation)
       .method("get_output", &CatchAtAgeInterface::to_json)
