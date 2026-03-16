@@ -299,6 +299,9 @@ methods::setMethod(
 #' @keywords FIMSFrame
 NULL
 
+#' @return
+#' [model_landings()] returns a numeric vector of landings data (type
+#' `"landings"`) for the specified fleet(s).
 #' @export
 #' @rdname model_
 #' @keywords FIMSFrame
@@ -327,6 +330,9 @@ methods::setMethod(
   function(x, fleet_name) model_landings(FIMSFrame(x), fleet_name)
 )
 
+#' @return
+#' [model_index()] returns a numeric vector of index data (type `"index"`) for
+#' the specified fleet(s).
 #' @export
 #' @rdname model_
 #' @keywords FIMSFrame
@@ -355,6 +361,9 @@ methods::setMethod(
   function(x, fleet_name) model_index(FIMSFrame(x), fleet_name)
 )
 
+#' @return
+#' [model_age_comp()] returns a numeric vector of age-composition data (type
+#' `"age_comp"`) for the specified fleet(s).
 #' @export
 #' @rdname model_
 #' @keywords FIMSFrame
@@ -383,6 +392,10 @@ methods::setMethod(
   function(x, fleet_name) model_age_comp(FIMSFrame(x), fleet_name)
 )
 
+#' @return
+#' [model_length_comp()] returns a numeric vector of length-composition data
+#' (type `"length_comp"`) for the specified fleet(s). This accessor requires
+#' that age-to-length conversion data are present in the `FIMSFrame` object.
 #' @export
 #' @rdname model_
 #' @keywords FIMSFrame
@@ -422,6 +435,11 @@ methods::setMethod(
   function(x, fleet_name) model_length_comp(FIMSFrame(x), fleet_name)
 )
 
+#' @return
+#' [model_weight_at_age()] returns a numeric vector of weight-at-age values
+#' (type `"weight_at_age"`), ordered by age and year (plus one additional year)
+#' and using `-999` to indicate missing values. When multiple fleets are
+#' present, values are averaged across fleets.
 #' @export
 #' @rdname model_
 #' @keywords FIMSFrame
@@ -500,6 +518,11 @@ methods::setMethod(
   }
 )
 
+#' @return
+#' [model_age_to_length_conversion()] returns a numeric vector of
+#' age-to-length conversion values (type `"age_to_length_conversion"`) for the
+#' specified fleet(s), ordered by age and length in the order defined by
+#' [FIMSFrame()].
 #' @export
 #' @rdname model_
 #' @keywords FIMSFrame
