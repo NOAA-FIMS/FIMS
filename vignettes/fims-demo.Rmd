@@ -39,7 +39,7 @@ For example, `CreateTMBModel` is a C++ function that returns a boolean.
 ```r
 methods::show(FIMS::CreateTMBModel)
 internal C++ function <0000014f7bd8ff00>
-    docstring : See the documentation for the Rcpp interface, https://noaa-fims.github.io/doxygen/rcpp__interface_8hpp.html.
+    docstring : See the documentation for the Rcpp interface, https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html.
     signature : bool CreateTMBModel()
 ```
 
@@ -346,7 +346,7 @@ stockplotr::plot_timeseries(
 ) +
   ggplot2::geom_point(
     data = data.frame(
-      observed = m_index(data_4_model, "survey1"),
+      observed = model_index(data_4_model, "survey1"),
       expected = get_report(fit)[["index_expected"]][[2]],
       year = get_start_year(data_4_model):get_end_year(data_4_model)
     ),

@@ -90,10 +90,15 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
    */
   RealVector ages;
   /**
+   * @brief An integer specifying the number of years.
+   *
+   */
+  SharedInt n_years;
+  /**
    * @brief A map of empirical weight-at-age values allowing multiple modules to
    * access and modify the weights without copying values between modules.
    */
-  std::shared_ptr<std::map<double, double>> ewaa;
+  std::shared_ptr<std::map<int, std::map<double, double>>> ewaa;
   /**
    * @brief Have weight and age vectors been set? The default is false.
    */
@@ -103,7 +108,7 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
    * @brief The constructor.
    */
   EWAAGrowthInterface() : GrowthInterfaceBase() {
-    this->ewaa = std::make_shared<std::map<double, double>>();
+    this->ewaa = std::make_shared<std::map<int, std::map<double, double>>>();
     GrowthInterfaceBase::live_objects[this->id] =
         std::make_shared<EWAAGrowthInterface>(*this);
     FIMSRcppInterfaceBase::fims_interface_objects.push_back(
@@ -119,6 +124,7 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
       : GrowthInterfaceBase(other),
         weights(other.weights),
         ages(other.ages),
+        n_years(other.n_years),
         ewaa(other.ewaa),
         initialized(other.initialized) {}
 
@@ -137,13 +143,52 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
    * @brief Create a map of input numeric vectors.
    * @param weights Type vector of weights.
    * @param ages Type vector of ages.
+   * @param n_years An integer specifying the number of years.
    * @return std::map<T, T>.
    */
-  inline std::map<double, double> make_map(RealVector ages,
-                                           RealVector weights) {
-    std::map<double, double> mymap;
-    for (size_t i = 0; i < ages.size(); i++) {
-      mymap.insert(std::pair<double, double>(ages[i], weights[i]));
+  inline std::map<int, std::map<double, double>> make_map(RealVector ages,
+                                                          RealVector weights,
+                                                          SharedInt n_years) {
+    std::map<int, std::map<double, double>> mymap;
+    const size_t n_years_plus_one = static_cast<size_t>(n_years.get() + 1);
+
+    // Reject invalid year counts because map keys are expected to include
+    // at least one model year.
+    if (n_years.get() < 1) {
+      Rcpp::stop("EWAA Error:: n_years must be at least 1");
+    }
+
+    // Reject empty vectors because we need at least one age-weight pair.
+    if (weights.size() == 0 || ages.size() == 0) {
+      Rcpp::stop("EWAA Error:: ages and weights must have at least one value");
+    }
+
+    // Accept either:
+    // 1) one weight vector by age (shared across years), or
+    // 2) a full year-by-age matrix flattened as (n_years + 1) * n_ages.
+    if ((weights.size() != ages.size() * n_years_plus_one) &&
+        (weights.size() != ages.size())) {
+      Rcpp::stop(
+          "weights size does not match ages size or ages size times "
+          "(n_years + 1), where the plus one is for the beginning "
+          "of the year after the terminal year spawning-biomass "
+          "calculations.");
+    } else if (weights.size() == ages.size()) {
+      // One age-specific vector was provided, so replicate the same
+      // weight-at-age values for every year key (0 through n_years).
+      for (size_t y = 0; y < n_years_plus_one; y++) {
+        for (size_t i = 0; i < ages.size(); i++) {
+          mymap[y][ages[i]] = weights[i];
+        }
+      }
+    } else if (weights.size() == ages.size() * n_years_plus_one) {
+      // A flattened year-by-age matrix was provided, so map each block of
+      // n_ages values to the corresponding year key (0 through n_years).
+      for (size_t y = 0; y < n_years_plus_one; y++) {
+        for (size_t i = 0; i < ages.size(); i++) {
+          mymap[y][ages[i]] = weights[y * ages.size() + i];
+        }
+      }
     }
     return mymap;
   }
@@ -156,25 +201,24 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
   virtual double evaluate(double age) {
     fims_popdy::EWAAGrowth<double> EWAAGrowth;
 
+    // Build the EWAA map once from R inputs the first time evaluate() is
+    // called.
     if (initialized == false) {
-      // Check that ages and weights vector are the same length
-      if (this->ages.size() != this->weights.size()) {
-        Rcpp::stop("ages and weights must be the same length");
-      }
-      EWAAGrowth.ewaa = make_map(this->ages, this->weights);
+      EWAAGrowth.ewaa = make_map(this->ages, this->weights, this->n_years);
       initialized = true;
     } else {
+      // Prevent re-initializing this object with a second evaluate() call.
       Rcpp::stop("this empirical weight at age object is already initialized");
     }
-    return EWAAGrowth.evaluate(age);
+    return EWAAGrowth.evaluate(0, age);
   }
 
   /**
    * @brief Converts the data to json representation for the output.
    * @return A string is returned specifying that the module relates to the
-   * growth interface with empirical weight at age. It also returns the ID, the
-   * rank of 1, the dimensions, age bins, and the calculated values themselves.
-   * This string is formatted for a json file.
+   * growth interface with empirical weight at age. It also returns the ID,
+   * the rank of 1, the dimensions, age bins, and the calculated values
+   * themselves. This string is formatted for a json file.
    */
   virtual std::string to_json() {
     std::stringstream ss;
@@ -187,8 +231,9 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
     ss << " \"id\": null,\n";
     ss << " \"type\": \"vector\",\n";
     ss << " \"dimensionality\": {\n";
-    ss << "  \"header\": [\"n_ages\"],\n";
-    ss << "  \"dimensions\": [" << this->ages.size() << "]\n},\n";
+    ss << "  \"header\": [\"n_years+1\",\"n_ages\"],\n";
+    ss << "  \"dimensions\": [" << this->n_years.get() + 1 << ","
+       << this->ages.size() << "]\n},\n";
 
     ss << " \"values\": [\n";
     for (size_t i = 0; i < weights.size() - 1; i++) {
@@ -221,7 +266,8 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
 
     // set relative info
     ewaa_growth->id = this->id;
-    ewaa_growth->ewaa = make_map(this->ages, this->weights);  // this->ewaa;
+    ewaa_growth->ewaa =
+        make_map(this->ages, this->weights, this->n_years);  // this->ewaa;
     // add to Information
     info->growth_models[ewaa_growth->id] = ewaa_growth;
 

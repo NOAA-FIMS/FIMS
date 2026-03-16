@@ -103,10 +103,7 @@ struct LogEntry {
   std::string message;
   /** The logging level, which is a result of which macro was used to generate
    * the message, e.g., FIMS_INFO_LOG(), FIMS_WARNING_LOG(), or FIMS_ERROR_LOG()
-   * results in "info", "warning", or "error", respectively, in the log file. An
-   * additional level is available to developers from FIMS_DEBUG_LOG(),
-   * resulting in a level of "debug", but this macro is only available in
-   * branches other than main.*/
+   * results in "info", "warning", or "error", respectively, in the log file.*/
   std::string level;
   /** The message id, directly corresponds to the order in which the entries
    * were created, e.g., "1", which is helpful for knowing the order of
@@ -299,38 +296,6 @@ class FIMSLog {
     l.timestamp = ctime_no_newline;
     l.message = str;
     l.level = "info";
-    l.rank = this->log_entries.size();
-    l.user = this->get_user();
-    l.wd = cwd.generic_string();
-    l.file = absolutePath.string();
-    l.line = line;
-    l.routine = func;
-    this->log_entries.push_back(l);
-  }
-
-  /**
-   * Add a "debug" level message to the log.
-   *
-   * @param str
-   * @param line
-   * @param file
-   * @param func
-   */
-  void debug_message(std::string str, int line, const char* file,
-                     const char* func) {
-    std::filesystem::path relativePath = file;
-    std::filesystem::path absolutePath =
-        getAbsolutePathWithoutDotDot(relativePath);
-    std::filesystem::path cwd = std::filesystem::current_path();
-    std::stringstream ss;
-    auto now = std::chrono::system_clock::now();
-    std::time_t now_time = std::chrono::system_clock::to_time_t(now);
-    std::string ctime_no_newline = strtok(ctime(&now_time), "\n");
-
-    LogEntry l;
-    l.timestamp = ctime_no_newline;
-    l.message = str;
-    l.level = "debug";
     l.rank = this->log_entries.size();
     l.user = this->get_user();
     l.wd = cwd.generic_string();
@@ -568,18 +533,6 @@ class FIMSLog {
 std::shared_ptr<FIMSLog> FIMSLog::fims_log = std::make_shared<FIMSLog>();
 
 }  // namespace fims
-
-#ifdef FIMS_DEBUG
-
-#define FIMS_DEBUG_LOG(MESSAGE)                                 \
-  FIMSLog::fims_log->debug_message(MESSAGE, __LINE__, __FILE__, \
-                                   __PRETTY_FUNCTION__);
-
-#else
-
-#define FIMS_DEBUG_LOG(MESSAGE) /**< Print MESSAGE to debug log */
-
-#endif
 
 #define FIMS_INFO_LOG(MESSAGE)           \
   fims::FIMSLog::fims_log->info_message( \

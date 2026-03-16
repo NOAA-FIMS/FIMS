@@ -3,11 +3,10 @@
 #' Necessary tests include input and output (IO) correctness [IO
 #' correctness], edge-case handling [Edge handling], and built-in errors and
 #' warnings [Error handling]. See `?FIMS:::use_testthat_template` for more
-#' information. Every test should have a @description tag, which can only span
-#' one lines, that will be used in the bookdown report of the results from
-#' {testthat}. This line can be more than 80 characters.
+#' information. Every test should have a one-line @description tag that will be
+#' used in the bookdown report of the results from {testthat}.
 
-# test_initialize_modules ----
+# test_initialize_fims ----
 ## Setup ----
 
 data <- FIMS::FIMSFrame(data_big)
@@ -25,8 +24,381 @@ test_that("`initialize_fims()` works with correct inputs", {
   expect_named(result, c("parameters", "model"))
   #' @description Test that `initialize_fims()` returns a list with two elements.
   expect_equal(length(result), 2)
+  #' @description Test that `initialize_fims()` returns a list when it is provided parameters that are nested.
+  expect_type(
+    initialize_fims(
+      parameters = create_default_configurations(data = data) |>
+        create_default_parameters(data = data),
+      data = data
+    ),
+    "list"
+  )
+  clear()
+})
+
+## Edge handling ----
+test_that("`initialize_fims()` works with edge cases", {
+  modified_log_devs <- default_parameters |>
+    dplyr::filter(label == "log_devs") |>
+    # change first 10 estimation_type for label of log_devs from fixed_effects
+    # to constant
+    dplyr::mutate(
+      estimation_type = dplyr::if_else(
+        time <= 11,
+        "constant",
+        estimation_type
+      )
+    )
+
+  parameters_multiple_types <- default_parameters |>
+    # Remove rows where label is "log_devs" but keep the rows where label is NA
+    dplyr::filter(label != "log_devs" | is.na(label)) |>
+    dplyr::bind_rows(modified_log_devs)
+  init_parm_default <- initialize_fims(
+    parameters = default_parameters,
+    data = data
+  )
+  init_parm_multiple_types <- initialize_fims(
+    parameters = parameters_multiple_types,
+    data = data
+  )
+  #' @description Test that `initialize_fims()` works with multiple estimation types.
+  expect_equal(
+    length(init_parm_multiple_types$parameters$p) +
+      length(init_parm_multiple_types$parameters$re),
+    length(init_parm_default$parameters$p) +
+      length(init_parm_default$parameters$re) - 10
+  )
+  clear()
+})
+
+## Error handling ----
+
+test_that("`initialize_fims()` returns correct error messages", {
+  #' @description Test that `initialize_fims()` handles missing parameters input correctly.
+  expect_error(
+    initialize_fims(data = data),
+    "The `parameters` argument must be a tibble."
+  )
   clear()
 
+  #' @description Test that `initialize_fims()` handles non-list parameters input correctly.
+  expect_error(
+    initialize_fims(parameters = "not_a_list", data = data),
+    "The `parameters` argument must be a tibble."
+  )
+  clear()
+
+  parameters_no_fleets <- default_parameters |>
+    dplyr::filter(!(fleet_name %in% c("fleet1", "survey1")))
+  #' @description Test that `initialize_fims()` fails when no fleets are provided.
+  expect_error(
+    initialize_fims(parameters = parameters_no_fleets, data = data),
+    "No fleets found in the provided `parameters`."
+  )
+  clear()
+
+  parameters_wrong_type <- default_parameters |>
+    dplyr::mutate(
+      estimation_type = dplyr::if_else(
+        estimation_type == "fixed_effects",
+        "fixed.effects",
+        estimation_type
+      )
+    )
+  parameters_wrong_type[[
+    "parameters"
+  ]][[
+    "recruitment"
+  ]][[
+    "BevertonHoltRecruitment.log_devs.estimation_type"
+  ]] <-
+    "fixed.effects"
+  #' @description Test that `initialize_fims()` correctly returns an error on an unknown estimation_type.
+  expect_error(
+    initialize_fims(parameters = parameters_wrong_type, data = data),
+    "The `estimation_type` must be one of: constant, fixed_effects, and random_effects."
+  )
+  clear()
+})
+
+# test_initialize_recruitment ----
+## IO correctness ----
+test_that("`initialize_recruitment()` works with correct inputs", {
+  #' @description Test that `initialize_recruitment()` returns an S4 object.
+  result <- initialize_recruitment(
+    parameters = default_parameters,
+    data = data
+  )
+  expect_type(result, "S4")
+  #' @description Test that `initialize_recruitment()` creates a module with expected methods in the class definition method table.
+  expect_true(all(
+    c(
+      "initialize",
+      "finalize",
+      "get_id",
+      "evaluate_mean",
+      "SetRecruitmentProcessID"
+    ) %in% names(result$.refClassDef@refMethods)
+  ))
+  clear()
+})
+
+# test_initialize_growth ----
+## IO correctness ----
+test_that("`initialize_growth()` works with correct inputs", {
+  #' @description Test that `initialize_growth()` returns an S4 object.
+  result <- initialize_growth(
+    parameters = default_parameters,
+    data = data
+  )
+  expect_type(result, "S4")
+  #' @description Test that `initialize_growth()` creates a module with expected methods in the class definition method table.
+  expect_true(all(
+    c(
+      "initialize",
+      "finalize",
+      "get_id",
+      "evaluate"
+    ) %in% names(result$.refClassDef@refMethods)
+  ))
+  clear()
+})
+
+# test_initialize_maturity ----
+## IO correctness ----
+test_that("`initialize_maturity()` works with correct inputs", {
+  #' @description Test that `initialize_maturity()` returns an S4 object.
+  result <- initialize_maturity(
+    parameters = default_parameters,
+    data = data
+  )
+  expect_type(result, "S4")
+  #' @description Test that `initialize_maturity()` creates a module with expected methods in the class definition method table.
+  expect_true(all(
+    c(
+      "initialize",
+      "finalize",
+      "get_id",
+      "evaluate"
+    ) %in% names(result$.refClassDef@refMethods)
+  ))
+  clear()
+})
+
+# test_initialize_population ----
+## IO correctness ----
+test_that("`initialize_population()` works with correct inputs", {
+  # Setup modules needed for population
+  recruitment <- initialize_recruitment(
+    parameters = default_parameters,
+    data = data
+  )
+  growth <- initialize_growth(
+    parameters = default_parameters,
+    data = data
+  )
+  maturity <- initialize_maturity(
+    parameters = default_parameters,
+    data = data
+  )
+
+  linked_ids <- c(
+    recruitment = recruitment$get_id(),
+    growth = growth$get_id(),
+    maturity = maturity$get_id()
+  )
+
+  #' @description Test that `initialize_population()` returns an S4 object.
+  result <- initialize_population(
+    parameters = default_parameters,
+    data = data,
+    linked_ids = linked_ids
+  )
+  expect_type(result, "S4")
+  #' @description Test that `initialize_population()` creates a module with expected methods in the class definition method table.
+  expect_true(all(
+    c(
+      "initialize",
+      "finalize",
+      "get_id",
+      "SetRecruitmentID",
+      "SetName",
+      "SetMaturityID",
+      "SetGrowthID",
+      "GetName",
+      "AddFleet"
+    ) %in% names(result$.refClassDef@refMethods)
+  ))
+  clear()
+})
+
+## Error handling ----
+test_that("`initialize_population()` returns correct error messages", {
+  #' @description Test that `initialize_population()` handles missing linked_ids correctly.
+  expect_error(
+    initialize_population(
+      parameters = default_parameters,
+      data = data,
+      linked_ids = c(growth = 1)
+    ),
+    "`linked_ids` for population must include `growth`, `maturity`, and"
+  )
+  clear()
+})
+
+# test_initialize_selectivity ----
+## IO correctness ----
+test_that("`initialize_selectivity()` works with correct inputs", {
+  #' @description Test that `initialize_selectivity()` returns an S4 object.
+  result <- initialize_selectivity(
+    parameters = default_parameters,
+    data = data,
+    fleet_name = "fleet1"
+  )
+  expect_type(result, "S4")
+  #' @description Test that `initialize_selectivity()` creates a module with expected methods in the class definition method table.
+  expect_true(all(
+    c(
+      "initialize",
+      "finalize",
+      "get_id",
+      "evaluate"
+    ) %in% names(result$.refClassDef@refMethods)
+  ))
+  clear()
+})
+
+# test_initialize_fleet ----
+## IO correctness ----
+test_that("`initialize_fleet()` works with correct inputs", {
+  # Setup selectivity module
+  selectivity <- initialize_selectivity(
+    parameters = default_parameters,
+    data = data,
+    fleet_name = "fleet1"
+  )
+
+  linked_ids <- c(
+    selectivity = selectivity$get_id()
+  )
+
+  #' @description Test that `initialize_fleet()` returns an S4 object.
+  result <- initialize_fleet(
+    parameters = default_parameters,
+    data = data,
+    fleet_name = "fleet1",
+    linked_ids = linked_ids
+  )
+  expect_type(result, "S4")
+  #' @description Test that `initialize_fleet()` creates a module with expected methods in the class definition method table.
+  expect_true(all(
+    c(
+      "initialize",
+      "finalize",
+      "get_id",
+      "SetSelectivityID",
+      "SetObservedLengthCompDataID",
+      "SetObservedLandingsDataID",
+      "SetObservedIndexDataID",
+      "SetObservedAgeCompDataID",
+      "SetName",
+      "GetObservedLengthCompDataID",
+      "GetObservedAgeCompDataID",
+      "GetObservedIndexDataID",
+      "GetObservedLandingsDataID"
+    ) %in% names(result$.refClassDef@refMethods)
+  ))
+  clear()
+})
+
+# test_initialize_landings ----
+## IO correctness ----
+test_that("`initialize_landings()` works with correct inputs", {
+  #' @description Test that `initialize_landings()` returns an S4 object for fleet with landings.
+  result <- initialize_landings(
+    data = data,
+    fleet_name = "fleet1"
+  )
+  expect_type(result, "S4")
+  #' @description Test that `initialize_landings()` creates a module with expected methods in the class definition method table.
+  expect_true(all(
+    c(
+      "initialize",
+      "finalize",
+      "get_id"
+    ) %in% names(result$.refClassDef@refMethods)
+  ))
+  #' @description Test that `initialize_landings()` module contains landings_data field.
+  expect_true("landings_data" %in% names(result))
+  #' @description Test that `initialize_landings()` returns `NULL` if there are no landings for the fleet.
+  expect_null(
+    initialize_landings(
+      data,
+      fleet_name = "survey1"
+    )
+  )
+  clear()
+})
+
+## Error handling ----
+test_that("`initialize_landings()` returns correct error messages", {
+  #' @description Test that `initialize_landings()` handles unknown fleet_name correctly.
+  expect_error(
+    initialize_landings(
+      data = data,
+      fleet_name = "unknown_fleet"
+    ),
+    "Fleet unknown_fleet not found in the data object."
+  )
+  clear()
+})
+
+# test_initialize_index ----
+## IO correctness ----
+test_that("`initialize_index()` works with correct inputs", {
+  #' @description Test that `initialize_index()` returns an S4 object for survey with index.
+  result <- initialize_index(
+    data = data,
+    fleet_name = "survey1"
+  )
+  expect_type(result, "S4")
+  #' @description Test that `initialize_index()` creates a module with expected methods in the class definition method table.
+  expect_true(all(
+    c(
+      "initialize",
+      "finalize",
+      "get_id"
+    ) %in% names(result$.refClassDef@refMethods)
+  ))
+  #' @description Test that `initialize_index()` module contains index_data field.
+  expect_true("index_data" %in% names(result))
+  #' @description Test that `initialize_index()` returns `NULL` if there are no landings for the fleet.
+  expect_null(
+    initialize_index(
+      data,
+      fleet_name = "fleet1"
+    )
+  )
+  clear()
+})
+
+## Error handling ----
+test_that("`initialize_index()` returns correct error messages", {
+  #' @description Test that `initialize_index()` handles unknown fleet_name correctly.
+  expect_error(
+    initialize_index(
+      data = data,
+      fleet_name = "unknown_fleet"
+    ),
+    "Fleet unknown_fleet not found in the data object."
+  )
+  clear()
+})
+
+# test_initialize_comp ----
+## IO correctness ----
+test_that("`initialize_comp()` works with correct inputs", {
   result <- initialize_comp(
     data = data,
     fleet_name = "fleet1",
@@ -83,56 +455,9 @@ test_that("`initialize_fims()` works with correct inputs", {
   clear()
 })
 
-## Edge handling ----
-test_that("`initialize_fims()` works with edge cases", {
-  modified_log_devs <- default_parameters |>
-    dplyr::filter(label == "log_devs") |>
-    # change first 10 estimation_type for label of log_devs from fixed_effects
-    # to constant
-    dplyr::mutate(
-      estimation_type = dplyr::if_else(
-        time <= 11,
-        "constant",
-        estimation_type
-      )
-    )
-
-  parameters_multiple_types <- default_parameters |>
-    # Remove rows where label is "log_devs" but keep the rows where label is NA
-    dplyr::filter(label != "log_devs" | is.na(label)) |>
-    dplyr::bind_rows(modified_log_devs)
-  init_parm_default <- initialize_fims(parameters = default_parameters, data = data)
-  init_parm_multiple_types <- initialize_fims(parameters = parameters_multiple_types, data = data)
-  #' @description Test that `initialize_fims()` works with multiple estimation types.
-  expect_equal(length(init_parm_multiple_types$parameters$p), length(init_parm_default$parameters$p) - 10)
-})
-
 ## Error handling ----
 
-test_that("`initialize_fims()` returns correct error messages", {
-  #' @description Test that `initialize_fims()` handles missing parameters input correctly.
-  expect_error(
-    initialize_fims(data = data),
-    "The `parameters` argument must be a tibble."
-  )
-  clear()
-
-  #' @description Test that `initialize_fims()` handles non-list parameters input correctly.
-  expect_error(
-    initialize_fims(parameters = "not_a_list", data = data),
-    "The `parameters` argument must be a tibble."
-  )
-  clear()
-
-  parameters_no_fleets <- default_parameters |>
-    dplyr::filter(!(fleet_name %in% c("fleet1", "survey1")))
-  #' @description Test that `initialize_fims()` fails when no fleets are provided.
-  expect_error(
-    initialize_fims(parameters = parameters_no_fleets, data = data),
-    "No fleets found in the provided `parameters`."
-  )
-  clear()
-
+test_that("`initialize_comp()` returns correct error messages", {
   #' @description Test that `initialize_comp()` correctly returns error on unknown `fleet_name`.
   expect_error(
     initialize_comp(
@@ -153,25 +478,69 @@ test_that("`initialize_fims()` returns correct error messages", {
     ),
     "should be one of"
   )
-
   clear()
 
-  parameters_wrong_type <- default_parameters |>
-    dplyr::mutate(
-      estimation_type = dplyr::if_else(
-        estimation_type == "fixed_effects",
-        "fixed.effects",
-        estimation_type
-      )
-    )
-  parameters_wrong_type[["parameters"]][["recruitment"]][["BevertonHoltRecruitment.log_devs.estimation_type"]] <- "fixed.effects"
-  #' @description Test that `initialize_fims()` correctly returns an error on an unknown estimation_type.
+  #' @description Test that `initialize_comp()` correctly returns error when there are no composition data for a given fleet.
   expect_error(
-    initialize_fims(parameters = parameters_wrong_type, data = data),
-    "The `estimation_type` must be one of: constant, fixed_effects, and random_effects."
+    initialize_comp(
+      data = data |>
+        get_data() |>
+        dplyr::filter(type != "age_comp"),
+      fleet_name = "fleet1",
+      type = "AgeComp"
+    ),
+    "is unavailable or empty"
+  )
+  clear()
+
+  #' @description Test that `initialize_comp()` correctly returns error when there are missing bins for a given fleet.
+  bad_data <- data
+  bad_data@data <- bad_data |>
+    get_data() |>
+    dplyr::filter(age != 2)
+  expect_error(
+    initialize_comp(
+      data = bad_data,
+      fleet_name = "fleet1",
+      type = "AgeComp"
+    ),
+    "does not match the expected dimensions"
   )
   clear()
 })
 
-# TODO: most lines with no coverage are error checks that are not verified to
-# work via the tests.
+# test_set_param_vector ----
+## IO correctness ----
+
+## Edge handling ----
+
+## Error handling ----
+
+test_that("`set_param_vector()` returns correct error messages", {
+  #' @description Test that `set_param_vector()` requires the field argument.
+  expect_error(
+    set_param_vector(),
+    "argument must be a non-empty character string."
+  )
+
+
+  #' @description Test that `set_param_vector()` requires the module parameter is a reference class object.
+  expect_error(
+    set_param_vector(
+      field = "x",
+      module = 1:10
+    ),
+    "argument must be a reference class"
+  )
+
+  #' @description Test that `set_param_vector()` requires the `module_input` argument to be a tibble.
+  expect_error(
+    set_param_vector(
+      field = "x",
+      module = methods::new(EWAAGrowth),
+      module_input = 1:10
+    ),
+    "argument must be a tibble"
+  )
+  clear()
+})

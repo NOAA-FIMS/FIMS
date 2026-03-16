@@ -300,11 +300,12 @@ class CAAEvaluateTestFixture : public testing::Test {
         std::make_shared<fims_popdy::EWAAGrowth<double>>();
     std::uniform_real_distribution<double> weight_at_age_distribution(
         weight_at_age_min, weight_at_age_max);
-    for (int i = 0; i < n_ages; i++) {
-      growth->ewaa[static_cast<double>(population->ages[i])] =
-          weight_at_age_distribution(generator);
+    for (int year = 0; year < n_years + 1; year++) {
+      for (int i = 0; i < n_ages; i++) {
+        growth->ewaa[year][static_cast<double>(population->ages[i])] =
+            weight_at_age_distribution(generator);
+      }
     }
-
     catch_at_age_model->populations[0]->growth = growth;
     // log_M
     double log_M_min = fims_math::log(0.1);
@@ -678,10 +679,12 @@ class CAAPrepareTestFixture : public testing::Test {
         std::make_shared<fims_popdy::EWAAGrowth<double>>();
     std::uniform_real_distribution<double> weight_at_age_distribution(
         weight_at_age_min, weight_at_age_max);
-    for (int i = 0; i < n_ages; i++) {
-      growth->ewaa[static_cast<double>(
-          catch_at_age_model->populations[0]->ages[i])] =
-          weight_at_age_distribution(generator);
+
+    for (int year = 0; year < n_years + 1; year++) {
+      for (int i = 0; i < n_ages; i++) {
+        growth->ewaa[year][static_cast<double>(population->ages[i])] =
+            weight_at_age_distribution(generator);
+      }
     }
 
     catch_at_age_model->populations[0]->growth = growth;

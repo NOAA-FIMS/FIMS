@@ -4,7 +4,7 @@ home:
   title: Fisheries Integrated Modeling System (FIMS)
   links:
   - text: Documentation of C++ Code
-    href: https://noaa-fims.github.io/doxygen/
+    href: https://noaa-fims.github.io/FIMS/doxygen/
 
 authors:
   FIMS implementation team:
@@ -20,28 +20,6 @@ template:
       <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
       <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap" rel="stylesheet">
 
-
-articles:
-- title: FIMS
-  contents:
-  - fims-demo
-  - fims-logging
-  - fims-user-setup-guide
-  - fims-demo-projections
-
-- title: Developer
-  contents:
-  - fims-path-maturity
-
-- title: C++ Training
-  contents:
-  - training-intro-cpp
-  - training-intro-rcpp
-
-- title: Research and development
-  contents:
-  - RD-re-sparsity
-
 reference:
 - title: Data
   desc: >
@@ -56,7 +34,7 @@ reference:
   contents:
   - starts_with("FIMSFrame")
   - starts_with("get_FIMSFrame")
-  - starts_with("m_")
+  - starts_with("model_")
   - starts_with("create_default_")
   - has_keyword("distribution")
   - starts_with("initialize_")
@@ -76,6 +54,7 @@ reference:
   - Cpp_classes
   - Cpp_functions
 
+
 news:
   releases:
   - text: "Latest release"
@@ -83,11 +62,58 @@ news:
 
 navbar:
   structure:
+    left:
+      - reference
+      - articles
+      - news
+      - reports
     right:
       - website
       - github
       - search
   components:
+    reference:
+      text: reference
+      menu:
+        - text: r/roxygen
+          href: reference/index.html
+        - text: c++/doxygen
+          href: https://noaa-fims.github.io/FIMS/doxygen/index.html
+    articles:
+      text: articles
+      menu:
+        - text: Intro to FIMS
+        - text: Introducing the Fisheries Integrated Modeling System (FIMS)
+          href: articles/fims-demo.html
+        - text: Introducing the FIMS Logging System
+          href: articles/fims-logging.html
+        - text: FIMS User Setup Guide
+          href: articles/fims-user-setup-guide.html
+        - text: Simple projections using FIMS
+          href: articles/fims-demo-projections.html
+        - text: -------
+        - text: Developer
+        - text: FIMS Path - Maturity
+          href: articles/fims-path-maturity.html
+        - text: -------
+        - text: C++ Training
+        - text: Intro to C++
+          href: articles/training-intro-cpp.html
+        - text: Intro to Rcpp
+          href: articles/training-intro-rcpp.html
+        - text: -------
+        - text: Research and Development
+        - text: RE Sparsity
+          href: articles/RD-re-sparsity.html
+    reports:
+      text: reports
+      menu: 
+        - text: coverage
+          href: https://noaa-fims.github.io/FIMS/coverage/coverage.html
+        - text: coverage explained
+          href: https://noaa-fims.github.io/FIMS/coverage/codecoverage_explanation.html
+        - text: testdown
+          href: https://noaa-fims.github.io/FIMS/testdown/index.html
     website:
       text: fims website
       href: https://noaa-fims.github.io/
@@ -95,4 +121,3 @@ navbar:
       icon: fa-brands fa-github fa-lg
       href: https://github.com/noaa-fims/fims/
       aria-label: GitHub repository for FIMS
-

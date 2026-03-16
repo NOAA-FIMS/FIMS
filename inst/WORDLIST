@@ -597,6 +597,7 @@ cobertura
 codebase
 codebasics
 codecov
+codecoverage
 cond
 config
 const
@@ -652,6 +653,7 @@ devcontainer
 devs
 devtools
 df
+diag
 difftime
 digamma
 dir
@@ -694,6 +696,7 @@ ewaa
 ewaagrowth
 expm
 exponentiate
+exportMethod
 exprs
 extern
 fabs
@@ -1007,6 +1010,8 @@ recr
 recruitments
 rect
 refClass
+refClassDef
+refMethods
 registerRoutines
 relativePath
 reltol
@@ -1148,7 +1153,6 @@ tidyr
 tidyverse
 timediff
 timing
-timingfishery
 timings
 tmb
 tmbstan
