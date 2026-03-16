@@ -39,7 +39,7 @@ For example, `CreateTMBModel` is a C++ function that returns a boolean.
 ```r
 methods::show(FIMS::CreateTMBModel)
 internal C++ function <0000014f7bd8ff00>
-    docstring : See the documentation for the Rcpp interface, https://noaa-fims.github.io/doxygen/rcpp__interface_8hpp.html.
+    docstring : See the documentation for the Rcpp interface, https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html.
     signature : bool CreateTMBModel()
 ```
 

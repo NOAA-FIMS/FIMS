@@ -27,27 +27,27 @@ C++ docs.
 }
 \details{
 \itemize{
-\item \href{https://noaa-fims.github.io/doxygen/rcpp__interface_8hpp.html}{clear}
-\item \href{https://noaa-fims.github.io/doxygen/rcpp__interface_8hpp.html}{get_fixed}
-\item \href{https://noaa-fims.github.io/doxygen/rcpp__interface_8hpp.html}{get_log}
-\item \href{https://noaa-fims.github.io/doxygen/rcpp__interface_8hpp.html}{get_log_errors}
-\item \href{https://noaa-fims.github.io/doxygen/rcpp__interface_8hpp.html}{get_log_warnings}
-\item \href{https://noaa-fims.github.io/doxygen/rcpp__interface_8hpp.html}{get_parameter_names}
-\item \href{https://noaa-fims.github.io/doxygen/rcpp__interface_8hpp.html}{get_random}
-\item \href{https://noaa-fims.github.io/doxygen/rcpp__interface_8hpp.html}{get_random_names}
-\item \href{https://noaa-fims.github.io/doxygen/rcpp__interface_8hpp.html}{inv_logit}
-\item \href{https://noaa-fims.github.io/doxygen/rcpp__interface_8hpp.html}{log_error}
-\item \href{https://noaa-fims.github.io/doxygen/rcpp__interface_8hpp.html}{log_info}
-\item \href{https://noaa-fims.github.io/doxygen/rcpp__interface_8hpp.html}{log_warning}
-\item \href{https://noaa-fims.github.io/doxygen/rcpp__interface_8hpp.html}{logit}
-\item \href{https://noaa-fims.github.io/doxygen/rcpp__interface_8hpp.html}{set_fixed}
-\item \href{https://noaa-fims.github.io/doxygen/rcpp__interface_8hpp.html}{set_log_throw_on_error}
-\item \href{https://noaa-fims.github.io/doxygen/rcpp__interface_8hpp.html}{set_random}
-\item \href{https://noaa-fims.github.io/doxygen/rcpp__interface_8hpp.html}{CreateTMBModel}
+\item \href{https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html}{clear}
+\item \href{https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html}{get_fixed}
+\item \href{https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html}{get_log}
+\item \href{https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html}{get_log_errors}
+\item \href{https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html}{get_log_warnings}
+\item \href{https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html}{get_parameter_names}
+\item \href{https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html}{get_random}
+\item \href{https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html}{get_random_names}
+\item \href{https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html}{inv_logit}
+\item \href{https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html}{log_error}
+\item \href{https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html}{log_info}
+\item \href{https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html}{log_warning}
+\item \href{https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html}{logit}
+\item \href{https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html}{set_fixed}
+\item \href{https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html}{set_log_throw_on_error}
+\item \href{https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html}{set_random}
+\item \href{https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html}{CreateTMBModel}
 }
 }
 \section{C++ Documentation}{
 
-\href{https://noaa-fims.github.io/doxygen/}{NOAA-FIMS C++ Documentation}
+\href{https://noaa-fims.github.io/FIMS/doxygen/}{NOAA-FIMS C++ Documentation}
 }
 
