@@ -64,24 +64,24 @@ test_that("`fims_frame()` works with the correct inputs", {
   #' @description Test that `get_n_ages()` retrieves the number of ages as a single value.
   expect_length(get_n_ages(fims_frame), 1)
 
-  #' @description Test that `m_landings()` retrieves landings data as a numeric vector.
-  expect_vector(m_landings(fims_frame, fleet_names), ptype = numeric())
+  #' @description Test that `model_landings()` retrieves landings data as a numeric vector.
+  expect_vector(model_landings(fims_frame, fleet_names), ptype = numeric())
 
-  #' @description Test that `m_index()` retrieves index data as a numeric vector.
-  expect_vector(m_index(fims_frame, fleet_names), ptype = numeric())
+  #' @description Test that `model_index()` retrieves index data as a numeric vector.
+  expect_vector(model_index(fims_frame, fleet_names), ptype = numeric())
 
-  #' @description Test that `m_agecomp()` retrieves age composition data as a numeric vector.
-  expect_vector(m_agecomp(fims_frame, fleet_names), ptype = numeric())
+  #' @description Test that `model_age_comp()` retrieves age composition data as a numeric vector.
+  expect_vector(model_age_comp(fims_frame, fleet_names), ptype = numeric())
 
-  #' @description Test that `m_lengthcomp()` retrieves length composition data as a numeric vector.
-  expect_vector(m_lengthcomp(fims_frame, fleet_names), ptype = numeric())
+  #' @description Test that `model_length_comp()` retrieves length composition data as a numeric vector.
+  expect_vector(model_length_comp(fims_frame, fleet_names), ptype = numeric())
 
-  #' @description Test that `m_weight_at_age()` retrieves weight-at-age data as a numeric vector.
-  expect_vector(m_weight_at_age(fims_frame), ptype = numeric())
+  #' @description Test that `model_weight_at_age()` retrieves weight-at-age data as a numeric vector.
+  expect_vector(model_weight_at_age(fims_frame), ptype = numeric())
 
-  #' @description Test that `m_age_to_length_conversion()` retrieves age-to-length conversion data as a numeric vector.
+  #' @description Test that `model_age_to_length_conversion()` retrieves age-to-length conversion data as a numeric vector.
   expect_vector(
-    m_age_to_length_conversion(fims_frame, fleet_names),
+    model_age_to_length_conversion(fims_frame, fleet_names),
     ptype = numeric()
   )
 
@@ -139,24 +139,24 @@ test_that("`FIMSFrame()` returns correct outputs for edge cases", {
   #' @description Test that `get_n_ages()` retrieves the number of ages as a single value when passed a data frame rather than a FIMSFrame object.
   expect_length(get_n_ages(data_big), 1)
 
-  #' @description Test that `m_landings()` retrieves landings data as a numeric vector when passed a data frame rather than a FIMSFrame object.
-  expect_vector(m_landings(data_big, fleet_names), ptype = numeric())
+  #' @description Test that `model_landings()` retrieves landings data as a numeric vector when passed a data frame rather than a FIMSFrame object.
+  expect_vector(model_landings(data_big, fleet_names), ptype = numeric())
 
-  #' @description Test that `m_index()` retrieves index data as a numeric vector when passed a data frame rather than a FIMSFrame object.
-  expect_vector(m_index(data_big, fleet_names), ptype = numeric())
+  #' @description Test that `model_index()` retrieves index data as a numeric vector when passed a data frame rather than a FIMSFrame object.
+  expect_vector(model_index(data_big, fleet_names), ptype = numeric())
 
-  #' @description Test that `m_agecomp()` retrieves age composition data as a numeric vector when passed a data frame rather than a FIMSFrame object.
-  expect_vector(m_agecomp(data_big, fleet_names), ptype = numeric())
+  #' @description Test that `model_age_comp()` retrieves age composition data as a numeric vector when passed a data frame rather than a FIMSFrame object.
+  expect_vector(model_age_comp(data_big, fleet_names), ptype = numeric())
 
-  #' @description Test that `m_lengthcomp()` retrieves length composition data as a numeric vector when passed a data frame rather than a FIMSFrame object.
-  expect_vector(m_lengthcomp(data_big, fleet_names), ptype = numeric())
+  #' @description Test that `model_length_comp()` retrieves length composition data as a numeric vector when passed a data frame rather than a FIMSFrame object.
+  expect_vector(model_length_comp(data_big, fleet_names), ptype = numeric())
 
-  #' @description Test that `m_weight_at_age()` retrieves weight-at-age data as a numeric vector when passed a data frame rather than a FIMSFrame object.
-  expect_vector(m_weight_at_age(data_big), ptype = numeric())
+  #' @description Test that `model_weight_at_age()` retrieves weight-at-age data as a numeric vector when passed a data frame rather than a FIMSFrame object.
+  expect_vector(model_weight_at_age(data_big), ptype = numeric())
 
-  #' @description Test that `m_age_to_length_conversion()` retrieves age-to-length conversion data as a numeric vector when passed a data frame rather than a FIMSFrame object.
+  #' @description Test that `model_age_to_length_conversion()` retrieves age-to-length conversion data as a numeric vector when passed a data frame rather than a FIMSFrame object.
   expect_vector(
-    m_age_to_length_conversion(data_big, fleet_names),
+    model_age_to_length_conversion(data_big, fleet_names),
     ptype = numeric()
   )
 
@@ -205,39 +205,39 @@ test_that("`FIMSFrame()` returns correct error messages", {
     regexp = "The above errors were found in your length_comp"
   )
 
-  #' @description Test that the `m_landings()` returns an error when a fleet is not supplied.
+  #' @description Test that the `model_landings()` returns an error when a fleet is not supplied.
   expect_error(
-    m_landings(fims_frame),
+    model_landings(fims_frame),
     regexp = "is missing, with no default"
   )
 
-  #' @description Test that the `m_index()` returns an error when a fleet is not supplied.
+  #' @description Test that the `model_index()` returns an error when a fleet is not supplied.
   expect_error(
-    m_index(fims_frame),
+    model_index(fims_frame),
     regexp = "is missing, with no default"
   )
 
-  #' @description Test that the `m_agecomp()` returns an error when a fleet is not supplied.
+  #' @description Test that the `model_age_comp()` returns an error when a fleet is not supplied.
   expect_error(
-    m_agecomp(fims_frame),
+    model_age_comp(fims_frame),
     regexp = "is missing, with no default"
   )
 
-  #' @description Test that the `m_lengthcomp()` returns an error when a fleet is not supplied.
+  #' @description Test that the `model_length_comp()` returns an error when a fleet is not supplied.
   expect_error(
-    m_lengthcomp(fims_frame),
+    model_length_comp(fims_frame),
     regexp = "is missing, with no default"
   )
 
-  #' @description Test that the `m_age_to_length_conversion()` returns an error when a fleet is not supplied.
+  #' @description Test that the `model_age_to_length_conversion()` returns an error when a fleet is not supplied.
   expect_error(
-    m_age_to_length_conversion(fims_frame),
+    model_age_to_length_conversion(fims_frame),
     regexp = "is missing, with no default"
   )
 
-  #' @description Test that the `m_weight_at_age()` returns an error when providing an unused argument.
+  #' @description Test that the `model_weight_at_age()` returns an error when providing an unused argument.
   expect_error(
-    m_weight_at_age(fims_frame, fleet_names),
+    model_weight_at_age(fims_frame, fleet_names),
     regexp = "unused argument"
   )
 
@@ -281,36 +281,36 @@ fleet_names_index <- dplyr::filter(
 n_index <- length(fleet_names_index)
 
 ## IO correctness ----
-test_that("`m_index()` works with correct inputs", {
+test_that("`model_index()` works with correct inputs", {
   index_dat <- vector(mode = "list", length = n_index)
   names(index_dat) <- fleet_names_index
 
   for (index_i in 1:n_index) {
     index <- Index
     index_dat[[fleet_names_index[index_i]]] <- methods::new(index, n_years)
-    #' @description Test that `m_index()` works with correct inputs.
+    #' @description Test that `model_index()` works with correct inputs.
     expect_silent(
       index_dat[[fleet_names_index[index_i]]] <-
-        m_index(fims_frame, fleet_names_index[index_i])
+        model_index(fims_frame, fleet_names_index[index_i])
     )
   }
 
   clear()
 })
 
-test_that("`m_agecomp()` works with correct inputs", {
+test_that("`model_age_comp()` works with correct inputs", {
   age_comp_dat <- vector(mode = "list", length = n_age_comp)
   names(age_comp_dat) <- fleet_names_age_comp
 
   for (fleet_f in 1:n_age_comp) {
     age_comp_dat[[fleet_names_age_comp[fleet_f]]] <- methods::new(AgeComp, n_years, n_ages)
-    #' @description Test that `m_agecomp()` works with correct inputs.
+    #' @description Test that `model_age_comp()` works with correct inputs.
     expect_silent(
       purrr::walk(
         1:(n_years * n_ages),
         \(x) age_comp_dat[[fleet_names_age_comp[fleet_f]]]$age_comp_data$set(
           x - 1,
-          m_agecomp(fims_frame, fleet_names_age_comp[fleet_f])[x]
+          model_age_comp(fims_frame, fleet_names_age_comp[fleet_f])[x]
         )
       )
     )

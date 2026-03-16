@@ -346,7 +346,7 @@ stockplotr::plot_timeseries(
 ) +
   ggplot2::geom_point(
     data = data.frame(
-      observed = m_index(data_4_model, "survey1"),
+      observed = model_index(data_4_model, "survey1"),
       expected = get_report(fit)[["index_expected"]][[2]],
       year = get_start_year(data_4_model):get_end_year(data_4_model)
     ),
