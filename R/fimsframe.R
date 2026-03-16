@@ -552,6 +552,9 @@ methods::setMethod(
 #'
 #' @export
 #' @method plot FIMSFrame
+#' @rdname plot
+#' @aliases plot,FIMSFrame,missing-method
+#' @exportMethod plot
 setGeneric("plot", function(x, y, ...)
   standardGeneric("plot")
 )
