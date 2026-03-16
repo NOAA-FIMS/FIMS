@@ -39,7 +39,7 @@ test_that("rcpp data works with correct inputs", {
     index_dat[[fleet_names_index[index_i]]] <- methods::new(index, n_years)
     #' @description Test that adding index data to a model is possible.
     expect_silent(index_dat[[fleet_names_index[index_i]]] <-
-      m_index(fims_frame, fleet_names_index[index_i]))
+      model_index(fims_frame, fleet_names_index[index_i]))
   }
 
   clear()
@@ -53,7 +53,7 @@ test_that("rcpp data works with correct inputs", {
     expect_silent(
       purrr::walk(
         1:(n_years * n_ages),
-        \(x) age_comp_dat[[fleet_names_age_comp[fleet_f]]]$age_comp_data$set(x - 1, m_agecomp(fims_frame, fleet_names_age_comp[fleet_f])[x])
+        \(x) age_comp_dat[[fleet_names_age_comp[fleet_f]]]$age_comp_data$set(x - 1, model_age_comp(fims_frame, fleet_names_age_comp[fleet_f])[x])
       )
     )
   }

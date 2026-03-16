@@ -24,9 +24,8 @@ utils::globalVariables(c(
 #    the FIMSFrame class you must remove the slot here.
 # 2. Add an accessor function, e.g., get_*(), to allow users to access the
 #    object stored in the new slot; or, remove the accessor function if you
-#    remove a slot. Some internal accessors are also available, e.g., m_*(),
-#    and should be used to provide data to a model but should not be used by
-#    average users.
+#    remove a slot. Some accessors are also available for data types, e.g.,
+#    model_*(), that provide vectorized data to use in a module.
 # 3. If we had setter functions for FIMSFrame, you would add or delete the
 #    appropriate setter functions next but we do not. Instead, we want users to
 #    re-run FIMSFrame() when they make any changes to their data, that way all
@@ -73,7 +72,7 @@ methods::setClass(
 
 # methods::setMethod: accessors ----
 
-# Methods for accessing info in the slots using get_*() or m_*()
+# Methods for accessing info in the slots using get_*() or model_*()
 
 #' Get a slot in a FIMSFrame object
 #'
@@ -276,10 +275,11 @@ methods::setMethod(
 #' Get a vector of data to be passed to a FIMS module from a FIMSFrame object
 #'
 #' There is an accessor function for each data type needed to run a FIMS model.
-#' A FIMS model accepts vectors of data and thus each of the `m_*()` functions,
-#' where the star can be replaced with the data type separated by underscores,
-#' e.g., weight_at_age. These accessor functions are the preferred way to pass
-#' data to a FIMS module because the data will have the appropriate indexing.
+#' A FIMS model accepts vectors of data and thus each of the `model_*()`
+#' functions, where the star can be replaced with the data type separated by
+#' underscores, e.g., weight_at_age. These accessor functions are the preferred
+#' way to pass data to a FIMS module because the data will have the appropriate
+#' indexing.
 #'
 #' @details
 #' `Age_to_length_conversion` data, i.e., the proportion of age "a" that are
@@ -291,24 +291,25 @@ methods::setMethod(
 #'   fleet(s) of interest that you want landings data for. The strings must
 #'   exactly match strings in the column `"name"` of `get_data(x)`.
 #' @return
-#' All of the `m_*()` functions return vectors of data. Currently, the order of
-#' the data is the same order as the data frame because no arranging is done in
-#' [FIMSFrame()] and the function just extracts the appropriate column.
-#' @name m_
+#' All of the `model_*()` functions return vectors of data. Currently, the
+#' order of the data is the same order as the data frame because no arranging
+#' is done in [FIMSFrame()] and the function just extracts the appropriate
+#' column.
+#' @name model_
 #' @keywords FIMSFrame
 NULL
 
 #' @export
-#' @rdname m_
+#' @rdname model_
 #' @keywords FIMSFrame
 methods::setGeneric(
-  "m_landings",
-  function(x, fleet_name) standardGeneric("m_landings")
+  "model_landings",
+  function(x, fleet_name) standardGeneric("model_landings")
 )
-#' @rdname m_
+#' @rdname model_
 #' @keywords FIMSFrame
 methods::setMethod(
-  "m_landings", "FIMSFrame",
+  "model_landings", "FIMSFrame",
   function(x, fleet_name) {
     dplyr::filter(
       .data = x@data,
@@ -318,25 +319,25 @@ methods::setMethod(
       dplyr::pull(.data[["value"]])
   }
 )
-#' @rdname m_
+#' @rdname model_
 #' @keywords FIMSFrame
 methods::setMethod(
-  "m_landings",
+  "model_landings",
   "data.frame",
-  function(x, fleet_name) m_landings(FIMSFrame(x), fleet_name)
+  function(x, fleet_name) model_landings(FIMSFrame(x), fleet_name)
 )
 
 #' @export
-#' @rdname m_
+#' @rdname model_
 #' @keywords FIMSFrame
 methods::setGeneric(
-  "m_index",
-  function(x, fleet_name) standardGeneric("m_index")
+  "model_index",
+  function(x, fleet_name) standardGeneric("model_index")
 )
-#' @rdname m_
+#' @rdname model_
 #' @keywords FIMSFrame
 methods::setMethod(
-  "m_index", "FIMSFrame",
+  "model_index", "FIMSFrame",
   function(x, fleet_name) {
     dplyr::filter(
       .data = x@data,
@@ -346,25 +347,25 @@ methods::setMethod(
       dplyr::pull(.data[["value"]])
   }
 )
-#' @rdname m_
+#' @rdname model_
 #' @keywords FIMSFrame
 methods::setMethod(
-  "m_index",
+  "model_index",
   "data.frame",
-  function(x, fleet_name) m_index(FIMSFrame(x), fleet_name)
+  function(x, fleet_name) model_index(FIMSFrame(x), fleet_name)
 )
 
 #' @export
-#' @rdname m_
+#' @rdname model_
 #' @keywords FIMSFrame
 methods::setGeneric(
-  "m_agecomp",
-  function(x, fleet_name) standardGeneric("m_agecomp")
+  "model_age_comp",
+  function(x, fleet_name) standardGeneric("model_age_comp")
 )
-#' @rdname m_
+#' @rdname model_
 #' @keywords FIMSFrame
 methods::setMethod(
-  "m_agecomp", "FIMSFrame",
+  "model_age_comp", "FIMSFrame",
   function(x, fleet_name) {
     dplyr::filter(
       .data = x@data,
@@ -374,25 +375,25 @@ methods::setMethod(
       dplyr::pull(.data[["value"]])
   }
 )
-#' @rdname m_
+#' @rdname model_
 #' @keywords FIMSFrame
 methods::setMethod(
-  "m_agecomp",
+  "model_age_comp",
   "data.frame",
-  function(x, fleet_name) m_agecomp(FIMSFrame(x), fleet_name)
+  function(x, fleet_name) model_age_comp(FIMSFrame(x), fleet_name)
 )
 
 #' @export
-#' @rdname m_
+#' @rdname model_
 #' @keywords FIMSFrame
 methods::setGeneric(
-  "m_lengthcomp",
-  function(x, fleet_name) standardGeneric("m_lengthcomp")
+  "model_length_comp",
+  function(x, fleet_name) standardGeneric("model_length_comp")
 )
-#' @rdname m_
+#' @rdname model_
 #' @keywords FIMSFrame
 methods::setMethod(
-  "m_lengthcomp",
+  "model_length_comp",
   "FIMSFrame",
   function(x, fleet_name) {
     conversion_data <- dplyr::filter(
@@ -413,25 +414,25 @@ methods::setMethod(
       dplyr::pull(.data[["value"]])
   }
 )
-#' @rdname m_
+#' @rdname model_
 #' @keywords FIMSFrame
 methods::setMethod(
-  "m_lengthcomp",
+  "model_length_comp",
   "data.frame",
-  function(x, fleet_name) m_lengthcomp(FIMSFrame(x), fleet_name)
+  function(x, fleet_name) model_length_comp(FIMSFrame(x), fleet_name)
 )
 
 #' @export
-#' @rdname m_
+#' @rdname model_
 #' @keywords FIMSFrame
 methods::setGeneric(
-  "m_weight_at_age",
-  function(x) standardGeneric("m_weight_at_age")
+  "model_weight_at_age",
+  function(x) standardGeneric("model_weight_at_age")
 )
-#' @rdname m_
+#' @rdname model_
 #' @keywords FIMSFrame
 methods::setMethod(
-  "m_weight_at_age",
+  "model_weight_at_age",
   "FIMSFrame",
   function(x) {
     model_data <- dplyr::filter(
@@ -447,7 +448,7 @@ methods::setMethod(
     if (length(fleet_names) > 1) {
       cli::cli_warn(c(
        "x" = "Multiple fleets found in weight_at_age data.",
-       "i" = "{.fn m_weight_at_age} will average values across fleets."
+       "i" = "{.fn model_weight_at_age} will average values across fleets."
       ))
       model_data <- dplyr::group_by(
         .data = model_data,
@@ -489,27 +490,27 @@ methods::setMethod(
       dplyr::pull(.data[["value"]])
   }
 )
-#' @rdname m_
+#' @rdname model_
 #' @keywords FIMSFrame
 methods::setMethod(
-  "m_weight_at_age",
+  "model_weight_at_age",
   "data.frame",
   function(x) {
-    m_weight_at_age(FIMSFrame(x))
+    model_weight_at_age(FIMSFrame(x))
   }
 )
 
 #' @export
-#' @rdname m_
+#' @rdname model_
 #' @keywords FIMSFrame
 methods::setGeneric(
-  "m_age_to_length_conversion",
-  function(x, fleet_name) standardGeneric("m_age_to_length_conversion")
+  "model_age_to_length_conversion",
+  function(x, fleet_name) standardGeneric("model_age_to_length_conversion")
 )
-#' @rdname m_
+#' @rdname model_
 #' @keywords FIMSFrame
 methods::setMethod(
-  "m_age_to_length_conversion",
+  "model_age_to_length_conversion",
   "FIMSFrame",
   function(x, fleet_name) {
     if ("length" %in% colnames(x@data)) {
@@ -533,12 +534,15 @@ methods::setMethod(
     }
   }
 )
-#' @rdname m_
+#' @rdname model_
 #' @keywords FIMSFrame
 methods::setMethod(
-  "m_age_to_length_conversion",
+  "model_age_to_length_conversion",
   "data.frame",
-  function(x, fleet_name) m_age_to_length_conversion(FIMSFrame(x), fleet_name)
+  function(x, fleet_name) model_age_to_length_conversion(
+    FIMSFrame(x),
+    fleet_name
+  )
 )
 
 # methods::setMethod: initialize ----
@@ -877,7 +881,7 @@ FIMSFrame <- function(data) {
   n_lengths <- length(lengths)
 
   # Work on filling in missing data with -999 and arrange in the correct
-  # order so that getting information out with m_*() are correct.
+  # order so that getting information out with model_*() are correct.
   formatted_data <- tibble::as_tibble(data)
   missing_time_series <- create_missing_data(
     data = formatted_data,

@@ -27,7 +27,7 @@ purrr::walk(
 )
 
 # Assign weight data to the EWAAGrowth object
-weights <- m_weight_at_age(fims_frame)
+weights <- model_weight_at_age(fims_frame)
 ewaa_growth$weights$resize(length(weights))
 purrr::walk(
   seq_along(weights),

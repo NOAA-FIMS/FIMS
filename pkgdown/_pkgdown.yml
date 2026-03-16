@@ -34,7 +34,7 @@ reference:
   contents:
   - starts_with("FIMSFrame")
   - starts_with("get_FIMSFrame")
-  - starts_with("m_")
+  - starts_with("model_")
   - starts_with("create_default_")
   - has_keyword("distribution")
   - starts_with("initialize_")
