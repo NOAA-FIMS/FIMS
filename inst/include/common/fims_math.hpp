@@ -321,14 +321,31 @@ inline const Type ad_min(const Type &a, const Type &b, Type C = 1e-5) {
  * Reference: \ref fims_math::ad_fabs()
  * This is an approximation with minimal error.
  *
- * @param a
- * @param b
+ * @param a The first value to compare.
+ * @param b The second value to compare.
  * @param C default = 1e-5
  * @return
  */
 template <typename Type>
 inline const Type ad_max(const Type &a, const Type &b, Type C = 1e-5) {
   return (a + b + fims_math::ad_fabs(a - b, C)) * static_cast<Type>(.5);
+}
+
+/**
+ * Returns the maximum value in a vector in a continuous manner using
+ * fims_math::ad_max() function.
+ *
+ * @param v A vector of constants.
+ * @param C default = 1e-5
+ * @return The maximum value in the vector.
+ */
+template <class T>
+T ad_max(const fims::Vector<T>& v, T C = 1e-5) {
+  T ret = v[0];
+  for (size_t i = 1; i < v.size(); ++i) {
+    ret = ad_max(ret, v[i], C);
+  }
+  return ret;
 }
 
 /**
@@ -363,6 +380,51 @@ T sum(const fims::Vector<T> &v) {
     ret += v[i];
   }
   return ret;
+}
+
+
+/**
+ * @brief Computes the log of the sum of exponentials of two log-transformed
+ * values in a numerically stable way.
+ *
+ * @param logx The first log-transformed value.
+ * @param logy The second log-transformed value.
+ * @return The log of the sum of exponentials of the input values.
+ */
+template <class T>
+T logspace_add_fims(T logx, T logy) {
+  #ifdef TMB_MODEL
+    // return TMB logspace_add function which uses an atomic function
+    // for edge case conditionals
+    return logspace_add(logx, logy);
+  #else
+    // logspace_add implementation for non-TMB models
+    if (std::isinf(logx) && logx < 0) return logy;
+    if (std::isinf(logy) && logy < 0) return logx;
+    T m = (logx > logy) ? logx : logy;
+    return m + log(exp(logx - m) + exp(logy - m));
+  #endif
+}
+
+/**
+ * @brief Computes the log of the sum of exponentials of the input vector
+ * elements in a numerically stable way.
+ *
+ * @param logx A vector of log-transformed values.
+ * @return The log of the sum of exponentials of the input vector elements.
+ */
+template<class T>
+T log_sum_exp(fims::Vector<T> logx){
+  T ret;
+  size_t n = logx.size();
+  T tmax = ad_max(logx);
+
+  ret = logx[0] - tmax;
+  for(size_t i=1; i<n; i++){
+    ret = logspace_add_fims(ret, logx[i] - tmax);
+  }
+  ret += tmax;
+  return(ret);
 }
 
 }  // namespace fims_math
