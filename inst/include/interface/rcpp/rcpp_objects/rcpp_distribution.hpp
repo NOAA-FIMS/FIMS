@@ -203,7 +203,7 @@ class DistributionsInterfaceBase : public FIMSRcppInterfaceBase {
    * @brief A method for each child distribution interface object to inherit so
    * each distribution can have an evaluate() function.
    */
-  virtual double evaluate() = 0;
+  virtual double evaluate() {return 0;}
 };
 // static id of the DistributionsInterfaceBase object
 uint32_t DistributionsInterfaceBase::id_g = 1;

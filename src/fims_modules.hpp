@@ -381,23 +381,32 @@ RCPP_MODULE(fims) {
       .method("get_id", &EWAAGrowthInterface::get_id)
       .method("evaluate", &EWAAGrowthInterface::evaluate);
 
+      Rcpp::class_<DistributionsInterfaceBase>(
+      "DistributionBase",
+      "See "
+      "https://noaa-fims.github.io/doxygen/"
+      "classDistributionsInterfaceBase.html.")
+      .constructor()
+      .method("get_id", &DistributionsInterfaceBase::get_id)
+      .method("evaluate", &DistributionsInterfaceBase::evaluate)
+      .method("set_observed_data",
+              &DistributionsInterfaceBase::set_observed_data)
+      .method("set_distribution_mean",
+              &DistributionsInterfaceBase::set_distribution_mean)
+      .method("set_distribution_links",
+              &DistributionsInterfaceBase::set_distribution_links)
+      .field("observed_values", &DistributionsInterfaceBase::observed_values)
+      .field("expected_values", &DistributionsInterfaceBase::expected_values)
+      .field("expected_mean", &DistributionsInterfaceBase::expected_mean);
+
   Rcpp::class_<DnormDistributionsInterface>(
       "DnormDistribution",
       "See "
       "https://noaa-fims.github.io/doxygen/"
       "classDnormDistributionsInterface.html.")
+      .derives<DistributionsInterfaceBase>("DistributionBase")
       .constructor()
-      .method("get_id", &DnormDistributionsInterface::get_id)
       .method("evaluate", &DnormDistributionsInterface::evaluate)
-      .method("set_observed_data",
-              &DnormDistributionsInterface::set_observed_data)
-      .method("set_distribution_mean",
-              &DnormDistributionsInterface::set_distribution_mean)
-      .method("set_distribution_links",
-              &DnormDistributionsInterface::set_distribution_links)
-      .field("observed_values", &DnormDistributionsInterface::observed_values)
-      .field("expected_values", &DnormDistributionsInterface::expected_values)
-      .field("expected_mean", &DnormDistributionsInterface::expected_mean)
       .field("log_sd", &DnormDistributionsInterface::log_sd);
 
   Rcpp::class_<DlnormDistributionsInterface>(
@@ -405,15 +414,9 @@ RCPP_MODULE(fims) {
       "See "
       "https://noaa-fims.github.io/doxygen/"
       "classDlnormDistributionsInterface.html.")
+      .derives<DistributionsInterfaceBase>("DistributionBase")
       .constructor()
-      .method("get_id", &DlnormDistributionsInterface::get_id)
       .method("evaluate", &DlnormDistributionsInterface::evaluate)
-      .method("set_observed_data",
-              &DlnormDistributionsInterface::set_observed_data)
-      .method("set_distribution_links",
-              &DlnormDistributionsInterface::set_distribution_links)
-      .field("observed_values", &DlnormDistributionsInterface::observed_values)
-      .field("expected_values", &DlnormDistributionsInterface::expected_values)
       .field("log_sd", &DlnormDistributionsInterface::log_sd);
 
   Rcpp::class_<DmultinomDistributionsInterface>(
@@ -421,17 +424,9 @@ RCPP_MODULE(fims) {
       "See "
       "https://noaa-fims.github.io/doxygen/"
       "classDmultinomDistributionsInterface.html.")
+      .derives<DistributionsInterfaceBase>("DistributionBase")
       .constructor()
-      .method("get_id", &DmultinomDistributionsInterface::get_id)
       .method("evaluate", &DmultinomDistributionsInterface::evaluate)
-      .method("set_observed_data",
-              &DmultinomDistributionsInterface::set_observed_data)
-      .method("set_distribution_links",
-              &DmultinomDistributionsInterface::set_distribution_links)
-      .method("set_note", &DmultinomDistributionsInterface::set_note)
-      .field("observed_values", &DmultinomDistributionsInterface::observed_values)
-      .field("expected_values",
-             &DmultinomDistributionsInterface::expected_values)
       .field("dims", &DmultinomDistributionsInterface::dims);
 
   Rcpp::class_<CatchAtAgeInterface>(
