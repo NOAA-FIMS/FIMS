@@ -94,60 +94,61 @@ namespace fims {
  */
 struct LogEntry {
   /**
-    * @brief The date and time that the log entry was created.
-    * @details Example: "Oct 28 09:18:51 2024". You can track how long it took
-    * to work through each portion of the model by analyzing the progression of
-    * the timestamp through the log file.
+   * @brief The date and time that the log entry was created.
+   * @details Example: "Oct 28 09:18:51 2024". You can track how long it took
+   * to work through each portion of the model by analyzing the progression of
+   * the timestamp through the log file.
    */
   std::string timestamp;
   /**
-    * @brief The description of the log entry.
-    * @details Example messages include "Adding Selectivity object to TMB" or
-    * "Mismatch dimension error", where descriptions are predefined in the C++
-    * code.
+   * @brief The description of the log entry.
+   * @details Example messages include "Adding Selectivity object to TMB" or
+   * "Mismatch dimension error", where descriptions are predefined in the C++
+   * code.
    */
   std::string message;
   /**
-    * @brief The logging level associated with the entry.
-    * @details The level is determined by the macro used to generate the
-    * message, for example FIMS_INFO_LOG(), FIMS_WARNING_LOG(), or
-    * FIMS_ERROR_LOG(), which map to "info", "warning", and "error",
-    * respectively.
+   * @brief The logging level associated with the entry.
+   * @details The level is determined by the macro used to generate the
+   * message, for example FIMS_INFO_LOG(), FIMS_WARNING_LOG(), or
+   * FIMS_ERROR_LOG(), which map to "info", "warning", and "error",
+   * respectively.
    */
   std::string level;
   /**
-    * @brief The message identifier corresponding to creation order.
-    * @details Example: "1". This helps track operation ordering across model
-    * runs.
+   * @brief The message identifier corresponding to creation order.
+   * @details Example: "1". This helps track operation ordering across model
+   * runs.
    */
   size_t rank;
   /**
-    * @brief The user name registered on the machine where the log was created.
-    * @details Example: "John.Doe".
+   * @brief The user name registered on the machine where the log was created.
+   * @details Example: "John.Doe".
    */
   std::string user;
   /**
-    * @brief The working directory for the environment that created the log.
-    * @details Example on Windows: "C:/github/NOAA-FIMS/FIMS/vignettes".
-    * Example on Linux: "/home/oppy/FIMS-Testing/dev/dev_logging/FIMS/vignettes".
+   * @brief The working directory for the environment that created the log.
+   * @details Example on Windows: "C:/github/NOAA-FIMS/FIMS/vignettes".
+   * Example on Linux: "/home/oppy/FIMS-Testing/dev/dev_logging/FIMS/vignettes".
    */
   std::string wd;
   /**
-    * @brief The full file path of the file that triggered the log entry.
-    * @details Example:
-    * "C:/github/NOAA-FIMS/FIMS/inst/include/interface/rcpp/rcpp_objects/rcpp_selectivity.hpp".
+   * @brief The full file path of the file that triggered the log entry.
+   * @details Example:
+   * "C:/github/NOAA-FIMS/FIMS/inst/include/interface/rcpp/rcpp_objects/rcpp_selectivity.hpp".
    */
   std::string file;
   /**
-    * @brief The function or method that initiated the log entry.
-    * @details Example: "virtual bool LogisticSelectivityInterface::add_to_fims_tmb()".
-    * For templated functions, type information is reported in square brackets,
-    * for example: "bool fims_info::Information<Type>::CreateModel() [with Type = double]".
+   * @brief The function or method that initiated the log entry.
+   * @details Example: "virtual bool
+   * LogisticSelectivityInterface::add_to_fims_tmb()". For templated functions,
+   * type information is reported in square brackets, for example: "bool
+   * fims_info::Information<Type>::CreateModel() [with Type = double]".
    */
   std::string routine;
   /**
-    * @brief The line in file where the log entry was initiated.
-    * @details Example: "219", which is a line inside the routine listed above.
+   * @brief The line in file where the log entry was initiated.
+   * @details Example: "219", which is a line inside the routine listed above.
    */
   int line;
 
@@ -593,28 +594,25 @@ std::shared_ptr<FIMSLog> FIMSLog::fims_log = std::make_shared<FIMSLog>();
  *
  * @param MESSAGE Human-readable log message describing what happened and why.
  */
-#define FIMS_INFO_LOG(MESSAGE)           \
-  fims::FIMSLog::fims_log->info_message( \
-      MESSAGE, __LINE__, __FILE__,       \
-      __PRETTY_FUNCTION__);
+#define FIMS_INFO_LOG(MESSAGE)                                       \
+  fims::FIMSLog::fims_log->info_message(MESSAGE, __LINE__, __FILE__, \
+                                        __PRETTY_FUNCTION__);
 
 /**
  * @def FIMS_WARNING_LOG(MESSAGE)
  * @copydoc FIMS_INFO_LOG(MESSAGE)
  */
-#define FIMS_WARNING_LOG(MESSAGE)           \
-  fims::FIMSLog::fims_log->warning_message( \
-      MESSAGE, __LINE__, __FILE__,          \
-      __PRETTY_FUNCTION__);
+#define FIMS_WARNING_LOG(MESSAGE)                                       \
+  fims::FIMSLog::fims_log->warning_message(MESSAGE, __LINE__, __FILE__, \
+                                           __PRETTY_FUNCTION__);
 
 /**
  * @def FIMS_ERROR_LOG(MESSAGE)
  * @copydoc FIMS_INFO_LOG(MESSAGE)
  */
-#define FIMS_ERROR_LOG(MESSAGE)           \
-  fims::FIMSLog::fims_log->error_message( \
-      MESSAGE, __LINE__, __FILE__,        \
-      __PRETTY_FUNCTION__);
+#define FIMS_ERROR_LOG(MESSAGE)                                       \
+  fims::FIMSLog::fims_log->error_message(MESSAGE, __LINE__, __FILE__, \
+                                         __PRETTY_FUNCTION__);
 
 /**
  * @def FIMS_STR(s)
