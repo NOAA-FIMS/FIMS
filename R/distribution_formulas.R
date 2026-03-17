@@ -281,17 +281,16 @@ get_expected_name <- function(family, data_type) {
 #' )
 #' }
 initialize_data_distribution <- function(
-  module,
-  family = NULL,
-  # Create a tibble with value and estimation_type column for sd
-  sd = tibble::tibble(
-    value = 1,
-    estimation_type = "constant"
-  ),
-  # FIXME: Move this argument to second to match where par is in
-  # initialize_process_distribution
-  data_type = c("landings", "index", "agecomp", "lengthcomp")
-) {
+    module,
+    family = NULL,
+    # Create a tibble with value and estimation_type column for sd
+    sd = tibble::tibble(
+      value = 1,
+      estimation_type = "constant"
+    ),
+    # FIXME: Move this argument to second to match where par is in
+    # initialize_process_distribution
+    data_type = c("landings", "index", "agecomp", "lengthcomp")) {
   data_type <- rlang::arg_match(data_type)
   # FIXME: Make the available families a data object
   # Could also make the matrix of distributions available per type as a
@@ -318,12 +317,13 @@ initialize_data_distribution <- function(
     # Using resize() and then assigning value to each element of log_sd directly
     # is correct, as creating a new ParameterVector for log_sd here would
     # trigger an error in integration tests with wrappers.
-    new_module$log_sd$resize(length(sd[["value"]]))
+    # new_module$log_sd$resize(length(sd[["value"]]))
 
-    purrr::walk(
-      seq_along(sd[["value"]]),
-      \(x) new_module[["log_sd"]][x][["value"]] <- log(sd[["value"]][x])
-    )
+    new_module$log_sd[] <- log(sd[["value"]])
+    # purrr::walk(
+    #   seq_along(sd[["value"]]),
+    #   \(x) new_module[["log_sd"]][x][["value"]] <- log(sd[["value"]][x])
+    # )
 
     purrr::walk(
       seq_along(sd[["estimation_type"]]),
@@ -378,15 +378,14 @@ initialize_data_distribution <- function(
 #' @keywords distribution
 #' @export
 initialize_process_distribution <- function(
-  module,
-  par,
-  family = NULL,
-  sd = tibble::tibble(
-    value = 1,
-    estimation_type = "constant"
-  ),
-  is_random_effect = FALSE
-) {
+    module,
+    par,
+    family = NULL,
+    sd = tibble::tibble(
+      value = 1,
+      estimation_type = "constant"
+    ),
+    is_random_effect = FALSE) {
   # validity check on user input
   args <- list(family = family, sd = sd)
   check_distribution_validity(args)
