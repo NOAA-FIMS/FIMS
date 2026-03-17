@@ -533,7 +533,6 @@ fit_fims <- function(input,
                        trace = 0
                      ),
                      filename = NULL) {
-
   # See issue 455 of sdmTMB to see what should be used.
   # https://github.com/pbs-assess/sdmTMB/issues/455
   # NOTE: When we add implementation for newton step we need to

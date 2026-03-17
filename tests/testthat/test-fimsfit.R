@@ -97,7 +97,7 @@ test_that("fit_fims() errors when optimization fails to converge", {
       fit_fims(optimize = TRUE, control = bad_control),
     regexp = "Optimization failed convergence checks"
   )
-  
+
   # Set control parameters that will allow convergence but
   # return large gradient
   bad_control <- list(
@@ -105,7 +105,7 @@ test_that("fit_fims() errors when optimization fails to converge", {
     trace = 0
   )
 
-   #' @description Test that fit_fims() throws an informative error when max gradient is high.
+  #' @description Test that fit_fims() throws an informative error when max gradient is high.
   expect_warning(
     result <- initialized_model |>
       fit_fims(optimize = TRUE, control = bad_control),
@@ -125,23 +125,23 @@ test_that("fit_fims() errors when optimization fails to converge", {
       fit_fims(optimize = TRUE, control = bad_control),
     regexp = "Optimization resulted in high gradients"
   )
-  
+
   clear()
 
   # Fix Landings sd at high value to cause high standard errors
   parameters_4_model <- parameters |>
-   dplyr::rows_update(
+    dplyr::rows_update(
       tibble::tibble(
         module_type = "Landings",
         label = "log_sd",
-        time = 1:30, 
+        time = 1:30,
         value = 10
       ),
       by = c("module_type", "label", "time")
-   ) 
+    )
 
-    initialized_model <- parameters_4_model |>
-      initialize_fims(data = data_age_comp)
+  initialized_model <- parameters_4_model |>
+    initialize_fims(data = data_age_comp)
 
   #' @description Test that fit_fims() throws an informative warning when parameter SE values are too large.
   expect_warning(
@@ -160,7 +160,7 @@ test_that("fit_fims() errors when optimization fails to converge", {
       by = c("label", "time")
     )
 
-   initialized_model <- parameters_4_model |>
+  initialized_model <- parameters_4_model |>
     initialize_fims(data = data_age_comp)
 
   #' @description Test that fit_fims() throws an informative warning when parameter SE values are NA.
@@ -170,7 +170,7 @@ test_that("fit_fims() errors when optimization fails to converge", {
   )
 
   clear()
-  
+
   # Add an additional slope parameter to make the model overparameterized
   parameters_4_model <- parameters |>
     dplyr::add_row(
@@ -182,7 +182,7 @@ test_that("fit_fims() errors when optimization fails to converge", {
       value = 1,
       estimation_type = "fixed_effects"
     )
-    
+
   initialized_model <- parameters_4_model |>
     initialize_fims(data = data_age_comp)
 
@@ -191,6 +191,4 @@ test_that("fit_fims() errors when optimization fails to converge", {
     result <- initialized_model |> fit_fims(optimize = TRUE),
     regexp = "Standard error calculations failed convergence checks"
   )
-
 })
-
