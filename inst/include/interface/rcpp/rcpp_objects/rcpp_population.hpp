@@ -314,7 +314,8 @@ class PopulationInterface : public PopulationInterfaceBase {
       if (static_cast<size_t>(this->n_ages.get()) == this->ages.size()) {
         population->ages.resize(this->n_ages.get());
       } else {
-        warning("The ages vector is not of size n_ages.");
+        throw std::invalid_argument("The size of the ages vector for population " + 
+          fims::to_string(this->id) + " is not equal to n_ages.");
       }
     }
 

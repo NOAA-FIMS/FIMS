@@ -143,6 +143,12 @@ class Model {  // may need singleton
         nll_vec_idx += 1;
       }
     }
+    FIMS_INFO_LOG(
+        "Model: Finished evaluating data likelihoods. The jnll after "
+        "evaluating priors, random effects, and " +
+        fims::to_string(n_data) + " data likelihoods is: " +
+        fims::to_string(jnll));
+
 
 // report out nll components
 #ifdef TMB_MODEL
