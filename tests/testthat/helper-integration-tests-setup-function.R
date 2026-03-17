@@ -175,7 +175,7 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   fishing_fleet_lengthcomp_distribution <- methods::new(DmultinomDistribution)
   fishing_fleet_lengthcomp_distribution$set_observed_data(fishing_fleet$GetObservedLengthCompDataID())
   fishing_fleet_lengthcomp_distribution$set_distribution_links("data", fishing_fleet$lengthcomp_proportion$get_id())
-  fishing_fleet_lengthcomp_distribution$set_note("fishing_fleet_lengthcomp_distribution")
+  
   # Set age-to-length conversion matrix
   # TODO: If an age_to_length_conversion matrix is provided, the code below
   # still executes. Consider adding a check in the Rcpp interface to ensure

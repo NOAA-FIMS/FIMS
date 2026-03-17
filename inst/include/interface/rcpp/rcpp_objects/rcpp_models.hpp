@@ -364,13 +364,13 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
     std::string name = (*it).first;
     fims::Vector<double> &dq = (*it).second;
     std::stringstream dim_entry;
-    bool has_se = false;
-    typename std::map<std::string, std::vector<double>>::iterator se_vals =
-        this->se_values.find(name);
+    //bool has_se = false;
+    //typename std::map<std::string, std::vector<double>>::iterator se_vals =
+    //    this->se_values.find(name);
 
-    if (se_vals != this->se_values.end()) {
-      has_se = true;
-    }
+    //if (se_vals != this->se_values.end()) {
+    //  has_se = true;
+    //}
     // gather dimension information
     switch (dim_info.ndims) {
       case 1:

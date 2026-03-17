@@ -64,10 +64,10 @@ struct MultinomialLPMF : public DensityComponentBase<Type> {
    */
   virtual const Type evaluate() {
     // set dims using data_observed_values if no user input
-    if (dims.size() != 2) {
-      dims.resize(2);
-      dims[0] = this->data_observed_values->get_imax();
-      dims[1] = this->data_observed_values->get_jmax();
+    if (this->dims.size() != 2) {
+      this->dims.resize(2);
+      this->dims[0] = this->data_observed_values->get_imax();
+      this->dims[1] = this->data_observed_values->get_jmax();
     }
 
     // setup vector for recording the log probability density function values
@@ -90,6 +90,7 @@ struct MultinomialLPMF : public DensityComponentBase<Type> {
         }
       }
     } else {
+      
       if (dims[0] * dims[1] != this->observed_values.size()) {
         throw std::invalid_argument(
             "MultinomialLPDF: Vector index out of bounds. The dimension of the "
@@ -118,7 +119,7 @@ struct MultinomialLPMF : public DensityComponentBase<Type> {
       // Skips the entire row if any values are NA
       bool containsNA = false;
 
-#ifdef TMB_MODEL
+    #ifdef TMB_MODEL
       for (size_t j = 0; j < dims[1]; j++) {
         if (this->input_type == "data") {
           // if data, check if there are any NA values and skip lpdf calculation
@@ -145,13 +146,11 @@ struct MultinomialLPMF : public DensityComponentBase<Type> {
 
       if (!containsNA) {
         std::fill(this->lpdf_vec.begin() + lpdf_vec_idx, 
-                  this->lpdf_vec.begin() + lpdf_vec_idx + dims[1], 
+                  this->lpdf_vec.begin() + lpdf_vec_idx + dims[1] - 1, 
                   dmultinom(observed_values_vector.to_tmb(), 
                   prob_vector.to_tmb(), true));
 
         this->lpdf += this->lpdf_vec[lpdf_vec_idx];
-      } else {
-        this->lpdf_vec[i] = 0;
       }
       lpdf_vec_idx += dims[1];
 /*

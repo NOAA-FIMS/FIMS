@@ -156,7 +156,7 @@ run_FIMS_projection_scenario <- function(om_input,
   fishing_fleet_lengthcomp_distribution <- methods::new(DmultinomDistribution)
   fishing_fleet_lengthcomp_distribution$set_observed_data(fishing_fleet$GetObservedLengthCompDataID())
   fishing_fleet_lengthcomp_distribution$set_distribution_links("data", fishing_fleet$lengthcomp_proportion$get_id())
-  fishing_fleet_lengthcomp_distribution$set_note("fishing_fleet_lengthcomp_distribution")
+  
   # Set age-to-length conversion matrix
   fishing_fleet$age_to_length_conversion$resize(om_input[["nages"]] * om_input[["nlengths"]])
   for (i in 1:length(em_input[["age_to_length_conversion"]])) {

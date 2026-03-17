@@ -59,13 +59,7 @@ class DistributionsInterfaceBase : public FIMSRcppInterfaceBase {
    * for the implementation that checks this flag.
    */
   SharedString use_mean_m = fims::to_string("no");
-  /**
-   * @brief The map associating the ID of the DistributionsInterfaceBase to the
-     DistributionsInterfaceBase objects. This is a live object, which is an
-     object that has been created and lives in memory.
-   */
-  static std::map<uint32_t, std::shared_ptr<DistributionsInterfaceBase>>
-      live_objects;
+
   /**
    * @brief The ID of the observed data object, which is set to -999.
    */
@@ -102,12 +96,21 @@ class DistributionsInterfaceBase : public FIMSRcppInterfaceBase {
    * @brief The log probability density function value.
    */
   double lpdf_value = 0;
+
+  /**
+   * @brief The map associating the ID of the DistributionsInterfaceBase to the
+   * DistributionsInterfaceBase objects. This is a live object, which is an
+   * object that has been created and lives in memory.
+   */
+  static std::map<uint32_t, std::shared_ptr<DistributionsInterfaceBase>>
+      live_objects;
+
   /**
    * @brief The constructor.
    */
   DistributionsInterfaceBase() {
-    this->key_m = std::make_shared<std::vector<uint32_t>>();
     this->id_m = DistributionsInterfaceBase::id_g++;
+    this->key_m = std::make_shared<std::vector<uint32_t>>();
     /* Create instance of map: key is id and value is pointer to
     DistributionsInterfaceBase */
     // DistributionsInterfaceBase::live_objects[this->id_m] = this;
@@ -122,12 +125,12 @@ class DistributionsInterfaceBase : public FIMSRcppInterfaceBase {
       : id_m(other.id_m),
         key_m(other.key_m),
         input_type_m(other.input_type_m),
-        lpdf_vec(other.lpdf_vec),
+        use_mean_m(other.use_mean_m),
+        interface_observed_data_id_m(other.interface_observed_data_id_m),
         observed_values(other.observed_values),
         expected_values(other.expected_values),
         expected_mean(other.expected_mean),
-        use_mean_m(other.use_mean_m),
-        interface_observed_data_id_m(other.interface_observed_data_id_m) {}
+        lpdf_vec(other.lpdf_vec) {}
 
   /**
    * @brief The destructor.
@@ -860,6 +863,7 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
     // Declare TMBVector in this scope
     dmultinom.input_type = this->input_type_m.get();
     dmultinom.observed_values.resize(this->observed_values.size());
+    dmultinom.expected_values.resize(this->expected_values.size());
     for (size_t i = 0; i < observed_values.size(); i++) {
       dmultinom.observed_values[i] = this->observed_values[i].initial_value_m;
     }

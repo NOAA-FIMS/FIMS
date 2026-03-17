@@ -96,7 +96,7 @@ struct DensityComponentBase : public fims_model_object::FIMSObject<Type> {
         return (*(priors[i]))[0];
       }
     }
-    return observed_values[i];
+    return this->observed_values.get_force_scalar(i);
   }
 
   /**
@@ -109,7 +109,7 @@ struct DensityComponentBase : public fims_model_object::FIMSObject<Type> {
     if (this->input_type == "data") {
       return data_observed_values->at(i, j);
     }
-    return observed_values[i * ( j - 1 ) + j];
+    return this->observed_values[i * ( j - 1 ) + j];
   }
 
   /**
@@ -145,7 +145,7 @@ struct DensityComponentBase : public fims_model_object::FIMSObject<Type> {
     if (this->input_type == "prior") {
       return this->expected_values.size();
     }
-    return observed_values.size();
+    return this->observed_values.size();
   }
 
   /**
@@ -162,7 +162,7 @@ struct DensityComponentBase : public fims_model_object::FIMSObject<Type> {
     if (this->input_type == "prior") {
       return this->expected_values.size();
     }
-    return observed_values.size();
+    return this->observed_values.size();
   }
                                 // id_g is the ID of the instance of the DensityComponentBase class.
   // this is like a memory tracker.

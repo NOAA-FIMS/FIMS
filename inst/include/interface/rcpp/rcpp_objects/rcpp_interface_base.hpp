@@ -9,7 +9,7 @@
 #ifndef FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_INTERFACE_BASE_HPP
 #define FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_INTERFACE_BASE_HPP
 
-#include <RcppCommon.h>
+
 #include <map>
 #include <vector>
 
@@ -21,6 +21,7 @@
 
 #define RCPP_NO_SUGAR
 #include <Rcpp.h>
+#include <RcppCommon.h>
 
 /**
  * @brief An Rcpp interface that defines the Parameter class.
