@@ -39,7 +39,7 @@ A comprehensive list of all the tools needed to build, test, and document FIMS c
 
 ## Cheatsheet
 
-<a href="hhttps://github.com/NOAA-FIMS/FIMS/blob/main/pkgdown/assets/fims-cheatsheet.pdf"><img src="https://raw.githubusercontent.com/noaa-fims/fims/main/pkgdown/assets/fims-cheatsheet-thumb.png" width="315" height="252"/></a>
+<a href="https://github.com/NOAA-FIMS/FIMS/blob/main/pkgdown/assets/fims-cheatsheet.pdf"><img src="https://raw.githubusercontent.com/noaa-fims/fims/main/pkgdown/assets/fims-cheatsheet-thumb.png" width="315" height="252"/></a>
 
 ## Usage
 
