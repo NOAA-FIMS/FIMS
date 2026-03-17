@@ -262,6 +262,12 @@ All contributions to this project are gratefully acknowledged using the [`allcon
 </a><br>
 <a href="https://github.com/NOAA-FIMS/FIMS/commits?author=Srajald">Srajald</a>
 </td>
+<td align="center">
+<a href="https://github.com/suhanimaurya05">
+<img src="https://avatars.githubusercontent.com/u/223435961?v=4" width="100px;" alt=""/>
+</a><br>
+<a href="https://github.com/NOAA-FIMS/FIMS/commits?author=suhanimaurya05">Suhani Maurya</a>
+</td>
 </tr>
 
 </table>
