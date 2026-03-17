@@ -17,6 +17,9 @@
 // traits for interfacing with TMB
 
 #ifdef TMB_MODEL
+#define RCPP_NO_SUGAR
+#include <Rcpp.h>
+
 // use isnan macro in math.h instead of TMB's isnan for fixing the r-cmd-check
 // issue
 #include <math.h>
