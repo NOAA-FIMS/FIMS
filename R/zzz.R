@@ -50,12 +50,56 @@ methods::setOldClass(Classes = "Rcpp_ParameterVector")
 #' @rdname Rcpp_ParameterVector
 methods::setMethod(
   f = "[<-",
-  signature = signature(
-    x = "Rcpp_ParameterVector"
-  ),
+  signature = signature(x = "Rcpp_ParameterVector"),
   definition = function(x, i, j, value) {
-    x$set(i - 1, value) # R uses 1-based indexing, C++ uses 0-based indexing
-    return(x) # Return the modified object
+
+    if (missing(i)) {
+      # p[] <- c(...)
+      x$resize(length(value))
+      for(k in 1:(length(value))){
+         x[k]$value<-value[k]
+      }
+    } else {
+      # p[i] <- value
+      x$set(i - 1, value)
+    }
+
+    return(x)
+  }
+)
+
+# Methods for Rcpp
+#' Setter for `Rcpp_ParameterVector`
+#'
+#' In R, indexing starts at one. But, in C++ indexing starts at zero. These
+#' functions do the translation for you so you can think in R terms.
+#'
+#' @param x A numeric vector.
+#' @param i An integer specifying the location in R speak, where indexing
+#'   starts at one, of the vector that you wish to set.
+#' @param j Not used with `Rcpp_ParameterVector` because it is a vector.
+#' @param value The value you want to set the indexed location to.
+#' @return
+#' For `[<-`, the index `i` of object `x` is set to `value`.
+#' @keywords internal
+#' @rdname Rcpp_ParameterVector
+methods::setMethod(
+  f = "[<-",
+  signature = signature(x = "Rcpp_RealVector"),
+  definition = function(x, i, j, value) {
+
+    if (missing(i)) {
+      # p[] <- c(...)
+      x$resize(length(value))
+      for(k in 1:(length(value))){
+         x[k]<-value[k]
+      }
+    } else {
+      # p[i] <- value
+      x$set(i - 1, value)
+    }
+
+    return(x)
   }
 )
 
@@ -74,6 +118,26 @@ methods::setMethod(
 methods::setMethod(
   f = "[",
   signature = signature(x = "Rcpp_ParameterVector", i = "numeric"),
+  definition = function(x, i) {
+    return(x$get(i - 1))
+  }
+)
+
+#' Get information from Rcpp_ParameterVector
+#'
+#' In R, indexing starts at one. But, in C++ indexing starts at zero. This
+#' function does the translation for you so you can think in R terms.
+#'
+#' @param x A numeric vector.
+#' @param i An integer specifying the location in R speak, where indexing
+#'   starts at one, of the vector that you wish to get information from.
+#' @return
+#' For `[`, the index `i` of object `x` is returned.
+#' @keywords internal
+#' @rdname Rcpp_ParameterVector
+methods::setMethod(
+  f = "[",
+  signature = signature(x = "Rcpp_RealVector", i = "numeric"),
   definition = function(x, i) {
     return(x$get(i - 1))
   }
