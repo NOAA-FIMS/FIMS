@@ -1,7 +1,6 @@
 /**
  * @file def.hpp
- * @brief Creates pre-processing macros such as what type of machine you are on
- * and creates the log information.
+ * @brief Platform macros and the core FIMS logging system.
  * @copyright This file is part of the NOAA, National Marine Fisheries Service
  * Fisheries Integrated Modeling System project. See LICENSE in the source
  * folder for reuse information.
@@ -77,8 +76,6 @@
 
 // The following rows initialize default log files for outputting model progress
 // comments used to assist in diagnosing model issues and tracking progress.
-// These files will only be created if a logs folder is added to the root model
-// directory.
 
 #ifdef TMB_MODEL
 // simplify access to singletons
@@ -89,50 +86,74 @@
 namespace fims {
 
 /**
- * Log entry.
+ * @brief JSON-serializable schema for a single log record.
+ *
+ * @details At run time, each log entry is stored in this structure with
+ * information on timestamp, severity level, message text, sequence id,
+ * username, working directory, source file, routine, and source line.
  */
 struct LogEntry {
-  /** The date/time that the log entry was created, e.g., "Oct 28 09:18:51
-   * 2024". You can track how long it took to work through each portion of the
-   * model by analyzing the progression of the timestamp through the log file.*/
+  /**
+    * @brief The date and time that the log entry was created.
+    * @details Example: "Oct 28 09:18:51 2024". You can track how long it took
+    * to work through each portion of the model by analyzing the progression of
+    * the timestamp through the log file.
+   */
   std::string timestamp;
-  /** The description of the log entry, e.g., "Adding Selectivity object to TMB"
-   * or "Mismatch dimension error", where the descriptions are predefined in the
-   * C++ code. Please make a GitHub issue or contact a developer if you have
-   * ideas for a more informative description.*/
+  /**
+    * @brief The description of the log entry.
+    * @details Example messages include "Adding Selectivity object to TMB" or
+    * "Mismatch dimension error", where descriptions are predefined in the C++
+    * code.
+   */
   std::string message;
-  /** The logging level, which is a result of which macro was used to generate
-   * the message, e.g., FIMS_INFO_LOG(), FIMS_WARNING_LOG(), or FIMS_ERROR_LOG()
-   * results in "info", "warning", or "error", respectively, in the log file.*/
+  /**
+    * @brief The logging level associated with the entry.
+    * @details The level is determined by the macro used to generate the
+    * message, for example FIMS_INFO_LOG(), FIMS_WARNING_LOG(), or
+    * FIMS_ERROR_LOG(), which map to "info", "warning", and "error",
+    * respectively.
+   */
   std::string level;
-  /** The message id, directly corresponds to the order in which the entries
-   * were created, e.g., "1", which is helpful for knowing the order of
-   * operations within the code base and comparing log files across model
-   * runs.*/
+  /**
+    * @brief The message identifier corresponding to creation order.
+    * @details Example: "1". This helps track operation ordering across model
+    * runs.
+   */
   size_t rank;
-  /** The user name registered to the computer where the log file was created,
-   * e.g., "John.Doe".*/
+  /**
+    * @brief The user name registered on the machine where the log was created.
+    * @details Example: "John.Doe".
+   */
   std::string user;
-  /** The working directory for the R environment that created the log file,
-   * e.g., "C:/github/NOAA-FIMS/FIMS/vignettes" if you are on a Windows machine
-   * or "/home/oppy/FIMS-Testing/dev/dev_logging/FIMS/vignettes" if you are on a
-   * linux machine.*/
+  /**
+    * @brief The working directory for the environment that created the log.
+    * @details Example on Windows: "C:/github/NOAA-FIMS/FIMS/vignettes".
+    * Example on Linux: "/home/oppy/FIMS-Testing/dev/dev_logging/FIMS/vignettes".
+   */
   std::string wd;
-  /** The full file path of the file that triggered the log entry, e.g.,
-   * "C:/github/NOAA-FIMS/FIMS/inst/include/interface/rcpp/rcpp_objects/rcpp_selectivity.hpp".*/
+  /**
+    * @brief The full file path of the file that triggered the log entry.
+    * @details Example:
+    * "C:/github/NOAA-FIMS/FIMS/inst/include/interface/rcpp/rcpp_objects/rcpp_selectivity.hpp".
+   */
   std::string file;
-  /** The function or method that led to the initialization the log entry, e.g.,
-   * "virtual bool LogisticSelectivityInterface::add_to_fims_tmb()". If the
-   * function is templated, then the function type will be reported here in
-   * square brackets after the function name, e.g., "bool
-   * fims_info::Information<Type>::CreateModel() [with Type = double]".*/
+  /**
+    * @brief The function or method that initiated the log entry.
+    * @details Example: "virtual bool LogisticSelectivityInterface::add_to_fims_tmb()".
+    * For templated functions, type information is reported in square brackets,
+    * for example: "bool fims_info::Information<Type>::CreateModel() [with Type = double]".
+   */
   std::string routine;
-  /** The line in `file` where the log entry was initiated, e.g., "219", which
-   * will be a line inside of the `routine` listed above.*/
+  /**
+    * @brief The line in file where the log entry was initiated.
+    * @details Example: "219", which is a line inside the routine listed above.
+   */
   int line;
 
   /**
-   * Convert this object to a string.
+   * @brief Serialize this entry to a JSON object string.
+   * @return A JSON object represented as a string (without trailing comma).
    */
   std::string to_string() {
     std::stringstream ss;
@@ -150,7 +171,16 @@ struct LogEntry {
 };
 
 /**
- * FIMS logging class.
+ * @brief Singleton logger for FIMS.
+ *
+ * @details `FIMSLog` accumulates log entries in memory and provides
+ * JSON-formatted accessors for all entries and severity-specific subsets.
+ *
+ * Runtime behavior:
+ * - `write_on_exit = true` writes the current log buffer to disk in the
+ *   destructor.
+ * - `throw_on_error = true` throws a `std::runtime_error` after recording an
+ *   error-level entry.
  */
 class FIMSLog {
   std::vector<std::string> entries;
@@ -232,7 +262,7 @@ class FIMSLog {
   }
 
   /**
-   * @brief Get the Absolute Path Without Dot Dot object
+   * @brief Get the absolute path without dot dot notation.
    *
    * Dot dot notation is for relative paths, where this function replaces
    * all dot dots with the actual full path.
@@ -260,26 +290,36 @@ class FIMSLog {
   }
 
   /**
-   * Set a path for the log file.
+   * @brief Set the destination file path for writing logs to disk.
    *
-   * @param path
+   * @details The configured path is used whenever the logger writes to disk,
+   * including destructor-time writes (when `write_on_exit` is `true`) and
+   * signal-triggered writes in `WriteAtExit()`.
+   *
+   * This method updates only the output location and does not clear or modify
+   * the in-memory log buffer.
+   *
+   * @param path Relative or absolute path to the output log file (for example,
+   * `"fims.log"` or `"logs/fims_run_01.json"`).
+   * @see get_path()
+   * @see write_on_exit
    */
   void set_path(std::string path) { this->path = path; }
 
   /**
-   * Get the path for the log file.
+   * @brief Get the current output path for on-disk logs.
    *
-   * @return
+   * @return Output file path.
    */
   std::string get_path() { return this->path; }
 
   /**
-   * Add a "info" level message to the log.
+   * Add a "info", "error", or "warning" level message to the log.
    *
-   * @param str
-   * @param line
-   * @param file
-   * @param func
+   * @param str Log message text.
+   * @param line Source line number where the message originated.
+   * @param file Source file where the message originated.
+   * @param func Function or method name where the message originated.
    */
   void info_message(std::string str, int line, const char* file,
                     const char* func) {
@@ -306,12 +346,7 @@ class FIMSLog {
   }
 
   /**
-   * Add a "error" level message to the log.
-   *
-   * @param str
-   * @param line
-   * @param file
-   * @param func
+   * @copydoc info_message
    */
   void error_message(std::string str, int line, const char* file,
                      const char* func) {
@@ -346,12 +381,7 @@ class FIMSLog {
   }
 
   /**
-   * Add a "warning" level message to the log.
-   *
-   * @param str
-   * @param line
-   * @param file
-   * @param func
+   * @copydoc info_message
    */
   void warning_message(std::string str, int line, const char* file,
                        const char* func) {
@@ -380,9 +410,18 @@ class FIMSLog {
   }
 
   /**
-   * Get the log as a string object.
+   * @brief Return all stored log entries as a JSON array string.
    *
-   * @return
+   * @details
+   * The returned value is a JSON array of serialized `LogEntry` objects in the
+   * same order they were recorded.
+   *
+   * If no entries are stored, this method returns an empty JSON array (`[]`).
+   *
+   * @see get_errors()
+   * @see get_warnings()
+   * @see get_info()
+   * @return JSON array string containing every stored `LogEntry`.
    */
   std::string get_log() {
     std::stringstream ss;
@@ -400,9 +439,18 @@ class FIMSLog {
   }
 
   /**
-   * Return only error entries from the log.
+   * @brief Return only error-level log entries as a JSON array string.
    *
-   * @return
+   * @details
+   * This method filters the in-memory log buffer and includes only entries
+   * where `level == "error"`.
+   *
+   * If no error entries exist, this method returns an empty JSON array (`[]`).
+   *
+   * @see get_log()
+   * @see get_warnings()
+   * @see get_info()
+   * @return JSON array string containing entries with `level == "error"`.
    */
   std::string get_errors() {
     std::stringstream ss;
@@ -427,9 +475,19 @@ class FIMSLog {
   }
 
   /**
-   * Return only warning entries from the log.
+   * @brief Return only warning-level log entries as a JSON array string.
    *
-   * @return
+   * @details
+   * This method filters the in-memory log buffer and includes only entries
+   * where `level == "warning"`.
+   *
+   * If no warning entries exist, this method returns an empty JSON array
+   * (`[]`).
+   *
+   * @see get_log()
+   * @see get_errors()
+   * @see get_info()
+   * @return JSON array string containing entries with `level == "warning"`.
    */
   std::string get_warnings() {
     std::stringstream ss;
@@ -454,9 +512,18 @@ class FIMSLog {
   }
 
   /**
-   * Return only info entries from the log.
+   * @brief Return only info-level log entries as a JSON array string.
    *
-   * @return
+   * @details
+   * This method filters the in-memory log buffer and includes only entries
+   * where `level == "info"`.
+   *
+   * If no info entries exist, this method returns an empty JSON array (`[]`).
+   *
+   * @see get_log()
+   * @see get_errors()
+   * @see get_warnings()
+   * @return JSON array string containing entries with `level == "info"`.
    */
   std::string get_info() {
     std::stringstream ss;
@@ -481,20 +548,25 @@ class FIMSLog {
   }
 
   /**
-
-  /**
-   * @brief Get the counts of the number of errors
+   * @brief Return the number of error or warning log entries currently stored.
+   *
+   * @details This value is reset to zero when `clear()` is called.
+   * @see clear()
+   * @return Count of error-level entries.
    */
   size_t get_error_count() const { return error_count; }
 
   /**
-   * @brief Get the counts of the number of warnings
+   * @copydoc get_error_count
    */
   size_t get_warning_count() const { return warning_count; }
 
   /**
-   * @brief Clears all pointers/references of a FIMS model.
+   * @brief Clear in-memory logging state.
    *
+   * @details Clears the raw entry cache and structured entries, resets warning
+   * and entry counters, and preserves configured output path and
+   * `throw_on_error` behavior.
    */
   void clear() {
     this->entries.clear();
@@ -508,30 +580,62 @@ std::shared_ptr<FIMSLog> FIMSLog::fims_log = std::make_shared<FIMSLog>();
 
 }  // namespace fims
 
+/**
+ * @def FIMS_INFO_LOG(MESSAGE)
+ * @brief Record an info, warning, or error log entry with metadata.
+ *
+ * @details The logging macros capture `MESSAGE` plus the call-site metadata
+ * (`__LINE__`, `__FILE__`, and `__PRETTY_FUNCTION__`) and forward those values
+ * to the appropriate logger function. Each function type, i.e., `INFO`,
+ * `WARNING`, and `ERROR` lead to different "level" entries within the log
+ * entry, where `level = "warning"` does not increment a counter whereas the
+ * other two options lead to increased warning or error counts.
+ *
+ * @param MESSAGE Human-readable log message describing what happened and why.
+ */
 #define FIMS_INFO_LOG(MESSAGE)           \
   fims::FIMSLog::fims_log->info_message( \
       MESSAGE, __LINE__, __FILE__,       \
-      __PRETTY_FUNCTION__); /**< Print MESSAGE to info log */
+      __PRETTY_FUNCTION__);
 
+/**
+ * @def FIMS_WARNING_LOG(MESSAGE)
+ * @copydoc FIMS_INFO_LOG(MESSAGE)
+ */
 #define FIMS_WARNING_LOG(MESSAGE)           \
   fims::FIMSLog::fims_log->warning_message( \
       MESSAGE, __LINE__, __FILE__,          \
-      __PRETTY_FUNCTION__); /**< Print MESSAGE to warning log */
+      __PRETTY_FUNCTION__);
 
+/**
+ * @def FIMS_ERROR_LOG(MESSAGE)
+ * @copydoc FIMS_INFO_LOG(MESSAGE)
+ */
 #define FIMS_ERROR_LOG(MESSAGE)           \
   fims::FIMSLog::fims_log->error_message( \
       MESSAGE, __LINE__, __FILE__,        \
-      __PRETTY_FUNCTION__); /**< Print MESSAGE to error log */
+      __PRETTY_FUNCTION__);
 
-#define FIMS_STR(s) #s /**< String of s */
+/**
+ * @def FIMS_STR(s)
+ * @brief Convert a preprocessor token to a string literal.
+ * @param s Token to stringify.
+ */
+#define FIMS_STR(s) #s
 
 namespace fims {
 
 /**
- * Signal intercept function. Writes the log to the disk before
- * a crash occurs.
+ * @brief Signal handler that records a terminal error and flushes log entries.
  *
- * @param sig
+ * @details On receipt of a supported signal, this function appends an
+ * error-level entry, writes the full log if `write_on_exit` is enabled,
+ * restores the default signal handler, and re-raises the signal.
+ *
+ * @param sig Integer signal identifier provided by the operating system when
+ * this handler is called (for example, SIGSEGV for invalid memory access,
+ * SIGINT for an interrupt such as Ctrl+C, or SIGTERM for a termination
+ * request).
  */
 void WriteAtExit(int sig) {
   std::string signal_error = "NA";
@@ -573,8 +677,10 @@ void WriteAtExit(int sig) {
 /**
  * Converts an object T to a string.
  *
- * @param v
- * @return
+ * @details The object `v` of type `T` must be able to be written to a
+ * `std::ostream` with the `<<` operator.
+ * @param v Value to convert to text using a string stream.
+ * @return String representation of `v`.
  */
 template <typename T>
 std::string to_string(T v) {
