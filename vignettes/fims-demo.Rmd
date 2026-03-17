@@ -288,6 +288,21 @@ clear()
 fit <- parameters_4_model |>
   initialize_fims(data = data_4_model) |>
   fit_fims(optimize = TRUE)
+```
+
+### Logging system
+
+You can look at the log file in R or write it to the disk but you must run `get_log()` before you run clear to obtain information about the model because clear removes everything from memory, including the log. `get_log()` returns the log information as a string. This string can be manipulated into a data frame using `jsonlite::fromJSON()`. There are three logging levels, "info", "warning", and "error". The log below will not have any error messages but if you were to have error messages and you want to know immediately upon the first error that there are problems, you can run `set_log_throw_on_error(TRUE)` prior to running your model. See the vignette on [FIMS logging](fims-logging.html) or the [doxygen documentation](https://noaa-fims.github.io/FIMS/doxygen/classfims_1_1FIMSLog.html) for more information.
+
+```{r example-log, eval = TRUE}
+log_json_string <- get_log()
+log_data_frame <- jsonlite::fromJSON(log_json_string)
+log_data_frame[1, ]
+dim(log_data_frame)
+# Print how many log entries there are of each type
+dplyr::count(log_data_frame, level)
+# Subset for just the warnings
+log_data_frame |> dplyr::filter(level == "warning")
 clear()
 ```
 
