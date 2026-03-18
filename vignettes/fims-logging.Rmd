@@ -56,9 +56,9 @@ jsonlite::fromJSON(get_log())
 clear()
 ```
 
-The example above just logs information and warnings but you can also log errors. Notice that the "routine" information in the error log is not super informative even though it is filled with a lot of information. The R stack trace in this column is to large to capture the root cause of the error. For that reason, it's advised to make the error message as detailed as possible when calling `log_error(x)` from R. Note that the formatting is better when written to a file rather than printed to the screen as is done here.
+The example above just logs information and warnings but you can also log errors. Notice that the "routine" information in the error log is not super informative even though it is filled with a lot of information. The R stack trace in this column is to large to capture the root cause of the error. For that reason, it's advised to make the error message as detailed as possible when calling `log_error(x)` from R. Note that the formatting is better when written to a file rather than printed to the screen so the following code chunk is not rendered here but you can on your own computer.
 
-```{r r-logging-error, eval=TRUE}
+```{r r-logging-error, eval=FALSE}
 error <- log_error("error entry from R script")
 jsonlite::fromJSON(get_log_errors())
 ```
