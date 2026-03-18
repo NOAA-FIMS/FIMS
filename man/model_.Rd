@@ -70,29 +70,6 @@ All of the \verb{model_*()} functions return vectors of data. Currently, the
 order of the data is the same order as the data frame because no arranging
 is done in \code{\link[=FIMSFrame]{FIMSFrame()}} and the function just extracts the appropriate
 column.
-
-\code{\link[=model_landings]{model_landings()}} returns a numeric vector of landings data (type
-\code{"landings"}) for the specified fleet(s).
-
-\code{\link[=model_index]{model_index()}} returns a numeric vector of index data (type \code{"index"}) for
-the specified fleet(s).
-
-\code{\link[=model_age_comp]{model_age_comp()}} returns a numeric vector of age-composition data (type
-\code{"age_comp"}) for the specified fleet(s).
-
-\code{\link[=model_length_comp]{model_length_comp()}} returns a numeric vector of length-composition data
-(type \code{"length_comp"}) for the specified fleet(s). This accessor requires
-that age-to-length conversion data are present in the \code{FIMSFrame} object.
-
-\code{\link[=model_weight_at_age]{model_weight_at_age()}} returns a numeric vector of weight-at-age values
-(type \code{"weight_at_age"}), ordered by age and year (plus one additional year)
-and using \code{-999} to indicate missing values. When multiple fleets are
-present, values are averaged across fleets.
-
-\code{\link[=model_age_to_length_conversion]{model_age_to_length_conversion()}} returns a numeric vector of
-age-to-length conversion values (type \code{"age_to_length_conversion"}) for the
-specified fleet(s), ordered by age and length in the order defined by
-\code{\link[=FIMSFrame]{FIMSFrame()}}.
 }
 \description{
 There is an accessor function for each data type needed to run a FIMS model.
