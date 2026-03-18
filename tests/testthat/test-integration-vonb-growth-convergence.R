@@ -116,6 +116,37 @@ make_default_growth_fixed_alk_context <- function() {
   )
 }
 
+make_vonb_model_comparison_context <- function() {
+  data("data1", package = "FIMS")
+  fims_frame <- FIMS::FIMSFrame(data1)
+
+  # Start from the model comparison project parameter fixture for all
+  # non-growth modules, then replace EWAA growth with VonB growth.
+  base_parameters <- readRDS(
+    testthat::test_path("fixtures", "parameters_model_comparison_project.RDS")
+  ) |>
+    dplyr::filter(module_name != "Growth")
+
+  vonb_growth <- FIMS::create_default_configurations(data = fims_frame) |>
+    tidyr::unnest(cols = data) |>
+    dplyr::mutate(
+      module_type = dplyr::if_else(
+        module_name == "Growth",
+        "VonBertalanffy",
+        module_type
+      )
+    ) |>
+    tidyr::nest(.by = c(model_family, module_name, fleet_name)) |>
+    FIMS::create_default_parameters(data = fims_frame) |>
+    tidyr::unnest(cols = data) |>
+    dplyr::filter(module_name == "Growth")
+
+  list(
+    data = fims_frame,
+    parameters = dplyr::bind_rows(base_parameters, vonb_growth)
+  )
+}
+
 ## IO correctness ----
 test_that("von bertalanffy growth converges when L1 L2 and K are estimable", {
   ctx <- make_vonb_convergence_context()
@@ -233,6 +264,96 @@ test_that("von bertalanffy growth converges when L1 L2 and K are estimable", {
   #' @description Test that the realized growth-derived ALK rows sum to one for each year and age.
   expect_true(all(abs(apply(realized_alk_array, c(2, 3), sum) - 1) < 1e-5))
 
+})
+
+test_that("von bertalanffy growth estimates stay close to Bai OM growth values", {
+  ctx <- make_vonb_model_comparison_context()
+  on.exit({ rm(ctx); gc() }, add = TRUE)
+
+  # Bai Li base-case OM values from save_initial_input.R
+  Linf <- 800
+  K <- 0.18
+  a0 <- -1.36
+
+  # Same VonB formula used in the model comparison OM and in data-raw/data1.R
+  AtoL <- function(a, Linf, K, a0) {
+    Linf * (1 - exp(-K * (a - a0)))
+  }
+
+  expected_growth <- tibble::tibble(
+    label = c(
+      "length_at_ref_age_1",
+      "length_at_ref_age_2",
+      "growth_coefficient_K"
+    ),
+    expected = c(
+      AtoL(1, Linf, K, a0),
+      AtoL(12, Linf, K, a0),
+      K
+    )
+  )
+
+  input <- ctx$parameters |>
+    FIMS::initialize_fims(data = ctx$data)
+  input$model$ReportGrowthDerivedALKTensor(TRUE)
+
+  fit <- FIMS::fit_fims(
+    input = input,
+    optimize = TRUE,
+    number_of_loops = 2,
+    number_of_newton_steps = 0,
+    get_sd = FALSE
+  )
+
+  #' @description Test that the VonB fit against Bai OM values converges normally.
+  expect_equal(FIMS::get_opt(fit)$convergence, 0)
+
+  #' @description Test that the VonB fit against Bai OM values reaches a small maximum gradient.
+  expect_lte(FIMS::get_max_gradient(fit), 0.01)
+
+  growth_estimates <- FIMS::get_estimates(fit) |>
+    dplyr::filter(
+      module_name == "Growth",
+      label %in% expected_growth$label
+    ) |>
+    dplyr::select(label, estimated) |>
+    dplyr::left_join(expected_growth, by = "label")
+
+  #' @description Test that the fitted VonB output includes Bai's three OM-truth growth parameters.
+  expect_setequal(growth_estimates$label, expected_growth$label)
+
+  #' @description Test that fitted length_at_ref_age_1 remains close to the model comparison OM value at age 1.
+  expect_equal(
+    growth_estimates |>
+      dplyr::filter(label == "length_at_ref_age_1") |>
+      dplyr::pull(estimated),
+    growth_estimates |>
+      dplyr::filter(label == "length_at_ref_age_1") |>
+      dplyr::pull(expected),
+    tolerance = 30
+  )
+
+  #' @description Test that fitted length_at_ref_age_2 remains close to the model comparison OM value at age 12.
+  expect_equal(
+    growth_estimates |>
+      dplyr::filter(label == "length_at_ref_age_2") |>
+      dplyr::pull(estimated),
+    growth_estimates |>
+      dplyr::filter(label == "length_at_ref_age_2") |>
+      dplyr::pull(expected),
+    tolerance = 30
+  )
+
+  #' @description Test that fitted growth_coefficient_K remains close to Bai's model comparison OM growth coefficient.
+  expect_equal(
+    growth_estimates |>
+      dplyr::filter(label == "growth_coefficient_K") |>
+      dplyr::pull(estimated),
+    growth_estimates |>
+      dplyr::filter(label == "growth_coefficient_K") |>
+      dplyr::pull(expected),
+    tolerance = 0.01
+  )
 })
 
 test_that("von bertalanffy report defaults to lightweight derived ALK diagnostics", {
