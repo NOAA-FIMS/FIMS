@@ -299,6 +299,35 @@ methods::setMethod(
 #' @keywords FIMSFrame
 NULL
 
+#' @details
+#' ## `model_landings()`
+#' Returns a numeric vector of landings data (type `"landings"`) for the
+#' specified fleet(s).
+#'
+#' ## `model_index()`
+#' Returns a numeric vector of index data (type `"index"`) for the specified
+#' fleet(s).
+#'
+#' ## `model_age_comp()`
+#' Returns a numeric vector of age-composition data (type `"age_comp"`) for the
+#' specified fleet(s).
+#'
+#' ## `model_length_comp()`
+#' Returns a numeric vector of length-composition data (type `"length_comp"`)
+#' for the specified fleet(s). This accessor requires that age-to-length
+#' conversion data are present in the `FIMSFrame` object.
+#'
+#' ## `model_weight_at_age()`
+#' Returns a numeric vector of weight-at-age values (type `"weight_at_age"`),
+#' ordered by age and year (plus one additional year) and using `-999` to
+#' indicate missing values. When multiple fleets are present, values are
+#' averaged across fleets.
+#'
+#' ## `model_age_to_length_conversion()`
+#' Returns a numeric vector of age-to-length conversion values (type
+#' `"age_to_length_conversion"`) for the specified fleet(s). Values are ordered
+#' by age and length in the order defined by [FIMSFrame()].
+#'
 #' @export
 #' @rdname model_
 #' @keywords FIMSFrame
