@@ -266,11 +266,11 @@ test_that("von bertalanffy growth converges when L1 L2 and K are estimable", {
 
 })
 
-test_that("von bertalanffy growth estimates stay close to Bai OM growth values", {
+test_that("von bertalanffy growth estimates stay close to Model Comparison OM growth values", {
   ctx <- make_vonb_model_comparison_context()
   on.exit({ rm(ctx); gc() }, add = TRUE)
 
-  # Bai Li base-case OM values from save_initial_input.R
+  # Model Comparison base-case OM values from save_initial_input.R
   Linf <- 800
   K <- 0.18
   a0 <- -1.36
@@ -305,10 +305,10 @@ test_that("von bertalanffy growth estimates stay close to Bai OM growth values",
     get_sd = FALSE
   )
 
-  #' @description Test that the VonB fit against Bai OM values converges normally.
+  #' @description Test that the VonB fit against Model Comparison OM values converges normally.
   expect_equal(FIMS::get_opt(fit)$convergence, 0)
 
-  #' @description Test that the VonB fit against Bai OM values reaches a small maximum gradient.
+  #' @description Test that the VonB fit against Model Comparison OM values reaches a small maximum gradient.
   expect_lte(FIMS::get_max_gradient(fit), 0.01)
 
   growth_estimates <- FIMS::get_estimates(fit) |>
@@ -319,7 +319,7 @@ test_that("von bertalanffy growth estimates stay close to Bai OM growth values",
     dplyr::select(label, estimated) |>
     dplyr::left_join(expected_growth, by = "label")
 
-  #' @description Test that the fitted VonB output includes Bai's three OM-truth growth parameters.
+  #' @description Test that the fitted VonB output includes the three Model Comparison OM-truth growth parameters.
   expect_setequal(growth_estimates$label, expected_growth$label)
 
   #' @description Test that fitted length_at_ref_age_1 remains close to the model comparison OM value at age 1.
@@ -344,15 +344,17 @@ test_that("von bertalanffy growth estimates stay close to Bai OM growth values",
     tolerance = 30
   )
 
-  #' @description Test that fitted growth_coefficient_K remains close to Bai's model comparison OM growth coefficient.
-  expect_equal(
-    growth_estimates |>
-      dplyr::filter(label == "growth_coefficient_K") |>
-      dplyr::pull(estimated),
-    growth_estimates |>
-      dplyr::filter(label == "growth_coefficient_K") |>
-      dplyr::pull(expected),
-    tolerance = 0.01
+  #' @description Test that fitted growth_coefficient_K remains within 0.01 of the Model Comparison OM growth coefficient.
+  expect_lte(
+    abs(
+      growth_estimates |>
+        dplyr::filter(label == "growth_coefficient_K") |>
+        dplyr::pull(estimated) -
+        growth_estimates |>
+        dplyr::filter(label == "growth_coefficient_K") |>
+        dplyr::pull(expected)
+    ),
+    0.01
   )
 })
 
