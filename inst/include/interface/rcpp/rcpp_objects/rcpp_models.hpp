@@ -1025,7 +1025,7 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
       }
       derived_quantities_dim_info["mortality_M"] = fims_popdy::DimensionInfo(
           "mortality_M",
-          fims::Vector<int>{population->log_M.size()},
+          fims::Vector<int>{static_cast<int>(population->log_M.size())},
           dim_names);
 
       derived_quantities["mortality_Z"] = fims::Vector<Type>(
