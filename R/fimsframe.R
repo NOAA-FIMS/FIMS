@@ -619,6 +619,7 @@ methods::setMethod(
         type = gsub("_", " ", type)
       ) |>
       dplyr::group_by(name, timing, type) |>
+      dplyr::filter(value != -999) |>
       dplyr::summarize(
         no = dplyr::n()
       ) |>
