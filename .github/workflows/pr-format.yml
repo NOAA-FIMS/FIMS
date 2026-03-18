@@ -49,7 +49,7 @@ permissions:
 
 # Cancel runs happening simultaneously only on the same PR, rather than the same branch.
 concurrency:
-  group: ${{ github.workflow }}-pr-${{ github.event.pull_request.number }}
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.run_id }}
   cancel-in-progress: true
 
 jobs:
