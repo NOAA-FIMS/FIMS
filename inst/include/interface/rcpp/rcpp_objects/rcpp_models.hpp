@@ -271,7 +271,7 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
       ss << " \"id\":" << population_interface->log_M.id_m << ",\n";
       ss << " \"type\": \"vector\",\n";
       ss << " \"dimensionality\": {\n";
-      ss << "  \"header\": [" << "na" << "],\n";
+      ss << "  \"header\": [\"na\"],\n";
       ss << "  \"dimensions\": [" << population_interface->log_M.size() << "]\n},\n";
       ss << " \"values\": " << population_interface->log_M << "\n\n";
       ss << "},\n";
@@ -1021,7 +1021,7 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
         dim_names[1] = "n_ages";
       } else {
         dim_names.resize(1);
-        dim_names[0] = "scalar"
+        dim_names[0] = "scalar";
       }
       derived_quantities_dim_info["mortality_M"] = fims_popdy::DimensionInfo(
           "mortality_M",
