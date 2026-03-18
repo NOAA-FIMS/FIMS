@@ -20,7 +20,7 @@ There will be one panel per input type with fleet-specific information
 denoted using colors.
 }
 \description{
-Use \code{ggplot2::geom_point()} to plot the information stored in the data slot
+Use \code{ggplot2::geom_point()} to plot summary information stored in the data slot
 of the \code{FIMSFrame} class.
 }
 \examples{
