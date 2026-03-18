@@ -584,7 +584,7 @@ methods::setMethod(
 # methods::setMethod: plot ----
 #' Plot a `FIMSFrame` object
 #'
-#' Use `ggplot2::geom_point()` to plot the information stored in the data slot
+#' Use `ggplot2::geom_point()` to plot summary information stored in the data slot
 #' of the `FIMSFrame` class.
 #'
 #' @param x A `FIMSFrame` object.
@@ -617,12 +617,17 @@ methods::setMethod(
     data_for_plot <- get_data(x) |>
       dplyr::mutate(
         type = gsub("_", " ", type)
-      )
+      ) |>
+      dplyr::group_by(name, timing, type) |>
+      dplyr::summarize(
+        no = dplyr::n()
+      ) |>
+      dplyr::filter(no > 0)
     ggplot2::ggplot(
       data = data_for_plot,
       mapping = ggplot2::aes(
         x = timing,
-        y = value,
+        y = name,
         col = name
       )
     ) +
@@ -632,14 +637,18 @@ methods::setMethod(
       ggplot2::facet_wrap(
         "type",
         scales = "free_y",
-        labeller = ggplot2::label_wrap_gen(width = 10)
+        labeller = ggplot2::label_wrap_gen(width = 10),
+        ncol=1
       ) +
       ggplot2::geom_point(alpha = 0.8) +
       ggplot2::xlab("Timing") +
-      ggplot2::ylab("Value") +
+      ggplot2::ylab("") +
       ggplot2::theme(
-        axis.text.x = ggplot2::element_text(angle = 15)
+        axis.text.x = ggplot2::element_text(angle = 15),
+        axis.text.y = ggplot2::element_blank(),
+        axis.ticks.y = ggplot2::element_blank()
       ) +
+      ggplot2::labs(col = "Fleet") +
       stockplotr::theme_noaa()
   }
 )
