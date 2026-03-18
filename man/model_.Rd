@@ -106,5 +106,45 @@ indexing.
 \code{Age_to_length_conversion} data, i.e., the proportion of age "a" that are
 length "l", are used to convert lengths (input data) to ages (modeled) as
 a way to fit length data without estimating growth.
+
+\subsection{\code{model_landings()}}{
+
+Returns a numeric vector of landings data (type \code{"landings"}) for the
+specified fleet(s).
+}
+
+\subsection{\code{model_index()}}{
+
+Returns a numeric vector of index data (type \code{"index"}) for the specified
+fleet(s).
+}
+
+\subsection{\code{model_age_comp()}}{
+
+Returns a numeric vector of age-composition data (type \code{"age_comp"}) for the
+specified fleet(s).
+}
+
+\subsection{\code{model_length_comp()}}{
+
+Returns a numeric vector of length-composition data (type \code{"length_comp"})
+for the specified fleet(s). This accessor requires that age-to-length
+conversion data are present in the \code{FIMSFrame} object.
+}
+
+\subsection{\code{model_weight_at_age()}}{
+
+Returns a numeric vector of weight-at-age values (type \code{"weight_at_age"}),
+ordered by age and year (plus one additional year) and using \code{-999} to
+indicate missing values. When multiple fleets are present, values are
+averaged across fleets.
+}
+
+\subsection{\code{model_age_to_length_conversion()}}{
+
+Returns a numeric vector of age-to-length conversion values (type
+\code{"age_to_length_conversion"}) for the specified fleet(s). Values are ordered
+by age and length in the order defined by \code{\link[=FIMSFrame]{FIMSFrame()}}.
+}
 }
 \keyword{FIMSFrame}
