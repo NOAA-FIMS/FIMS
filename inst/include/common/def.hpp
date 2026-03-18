@@ -86,7 +86,7 @@
 namespace fims {
 
 /**
- * @brief JSON-serializable schema for a single log record.
+ * @brief A data structure with defined fields for a single log record.
  *
  * @details At run time, each log entry is stored in this structure with
  * information on timestamp, severity level, message text, sequence id,
@@ -617,7 +617,7 @@ std::shared_ptr<FIMSLog> FIMSLog::fims_log = std::make_shared<FIMSLog>();
 /**
  * @def FIMS_STR(s)
  * @brief Convert a preprocessor token to a string literal.
- * @param s Token to stringify.
+ * @param s Input text from the macro that will be converted to a string.
  */
 #define FIMS_STR(s) #s
 
