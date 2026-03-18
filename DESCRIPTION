@@ -46,6 +46,8 @@ Authors@R: c(
            comment = c(ORCID = "0009-0000-3054-6950")),
     person(c("Erik", "H."), "Williams", role = "aut",
            comment = c(ORCID = "0000-0001-6623-4254")),
+    person(c("Adrianne", "T."), "Wilson", role = "aut",
+           comment = c(ORCID = "0009-0006-1171-6014")),
     person("Kristan", "Blackhart", role = "ctb",
            comment = c(ORCID = "0000-0003-4232-2510")),
     person(c("Edward", "J."), "Dick", role = "ctb",
