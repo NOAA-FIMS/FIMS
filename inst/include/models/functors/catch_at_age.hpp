@@ -203,8 +203,8 @@ class CatchAtAge : public FisheryModelBase<Type> {
       for (size_t age = 0; age < population->n_ages; age++) {
         for (size_t year = 0; year < population->n_years; year++) {
           size_t i_age_year = age * population->n_years + year;
-          population->M[i_age_year] =
-              fims_math::exp(population->log_M[i_age_year]);
+          population->M.get_force_scalar(i_age_year) =
+              fims_math::exp(population->log_M.get_force_scalar(i_age_year));
         }
       }
 
@@ -349,14 +349,14 @@ class CatchAtAge : public FisheryModelBase<Type> {
     // using M from previous age/year
     dq_["unfished_numbers_at_age"][i_age_year] =
         dq_["unfished_numbers_at_age"][i_agem1_yearm1] *
-        (fims_math::exp(-population->M[i_agem1_yearm1]));
+        (fims_math::exp(-population->M.get_force_scalar(i_agem1_yearm1)));
 
     // Plus group calculation
     if (age == (population->n_ages - 1)) {
       dq_["unfished_numbers_at_age"][i_age_year] =
           dq_["unfished_numbers_at_age"][i_age_year] +
           dq_["unfished_numbers_at_age"][i_agem1_yearm1 + 1] *
-              (fims_math::exp(-population->M[i_agem1_yearm1 + 1]));
+              (fims_math::exp(-population->M.get_force_scalar(i_agem1_yearm1 + 1)));
     }
   }
 
@@ -408,10 +408,10 @@ class CatchAtAge : public FisheryModelBase<Type> {
 
       dq_["sum_selectivity"][i_age_year] += s;
     }
-    dq_["mortality_M"][i_age_year] = population->M[i_age_year];
+    dq_["mortality_M"].get_force_scalar(i_age_year) = population->M.get_force_scalar(i_age_year);
 
     dq_["mortality_Z"][i_age_year] =
-        population->M[i_age_year] + dq_["mortality_F"][i_age_year];
+        population->M.get_force_scalar(i_age_year) + dq_["mortality_F"][i_age_year];
   }
 
   /**
@@ -577,16 +577,19 @@ class CatchAtAge : public FisheryModelBase<Type> {
              dq_["proportion_mature_at_age"][0] *
              population->growth->evaluate(0, population->ages[0]);
     for (size_t a = 1; a < (population->n_ages - 1); a++) {
-      numbers_spr[a] = numbers_spr[a - 1] * fims_math::exp(-population->M[a]);
+      //pull out M from the first year
+      size_t i_age_year = 0 * population->n_ages + a;
+      numbers_spr[a] = numbers_spr[a - 1] * fims_math::exp(-population->M.get_force_scalar(i_age_year));
       phi_0 += numbers_spr[a] * population->proportion_female[a] *
                dq_["proportion_mature_at_age"][a] *
                population->growth->evaluate(0, population->ages[a]);
     }
 
     numbers_spr[population->n_ages - 1] =
+        // M will be from first year
         (numbers_spr[population->n_ages - 2] *
-         fims_math::exp(-population->M[population->n_ages - 2])) /
-        (1 - fims_math::exp(-population->M[population->n_ages - 1]));
+         fims_math::exp(-population->M.get_force_scalar(population->n_ages - 2))) /
+        (1 - fims_math::exp(-population->M.get_force_scalar(population->n_ages - 1)));
     phi_0 += numbers_spr[population->n_ages - 1] *
              population->proportion_female[population->n_ages - 1] *
              dq_["proportion_mature_at_age"][population->n_ages - 1] *
