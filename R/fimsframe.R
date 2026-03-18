@@ -639,7 +639,7 @@ methods::setMethod(
         "type",
         scales = "free_y",
         labeller = ggplot2::label_wrap_gen(width = 10),
-        ncol=1
+        ncol = 1
       ) +
       ggplot2::geom_point(alpha = 0.8) +
       ggplot2::xlab("Timing") +
@@ -651,8 +651,8 @@ methods::setMethod(
         axis.ticks.y = ggplot2::element_blank()
       ) +
       ggplot2::labs(col = "Fleet") #+
-      # Replacing theme_noaa with theme_bw() due to issues recognizing stockplotr
-      #stockplotr::theme_noaa()
+    # Replacing theme_noaa with theme_bw() due to issues recognizing stockplotr
+    # stockplotr::theme_noaa()
   }
 )
 
