@@ -168,7 +168,8 @@ prepare_test_data <- function() {
       tibble::tibble(
         module_name = "Recruitment",
         label = "log_sd",
-        value = om_input_list[[iter_id]][["logR_sd"]]
+        value = om_input_list[[iter_id]][["logR_sd"]],
+        estimation_type = "constant"
       ),
       by = c("module_name", "label")
     ) |>
@@ -219,17 +220,27 @@ prepare_test_data <- function() {
   )
 
   # TODO: delete this lines 74-78 when log_devs estimation error fixed
-  modified_parameters <- modified_parameters |>
+  modified_parameters_constant <- modified_parameters |>
     dplyr::mutate(
       estimation_type = dplyr::if_else(
         label == "log_devs" & module_type == "BevertonHolt",
         "constant",
         estimation_type
-      )
-    )
+      ),
+      distribution_type = dplyr::if_else(
+        label == "log_devs" & module_type == "BevertonHolt",
+        NA_character_,
+        distribution_type
+      ),
+      distribution = dplyr::if_else(
+        label == "log_devs" & module_type == "BevertonHolt",
+        NA_character_,
+        distribution      )
+    ) |>
+    dplyr::filter(!(module_name == "Recruitment" & label == "log_sd"))
 
   saveRDS(
-    modified_parameters,
+    modified_parameters_constant,
     file = testthat::test_path("fixtures", "parameters_model_comparison_project.RDS"),
     compress = FALSE
   )
@@ -242,7 +253,7 @@ prepare_test_data <- function() {
     om_output_list = om_output_list,
     em_input_list = em_input_list,
     estimation_mode = TRUE,
-    modified_parameters = modified_parameters
+    modified_parameters = modified_parameters_constant
   )
 
   clear()

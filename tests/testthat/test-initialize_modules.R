@@ -184,6 +184,17 @@ test_that("`initialize_fims()` returns correct error messages", {
   
 ## Error handling ----
 test_that("`initialize_recruitment()` returns correct error messages", {
+   missing_recruitment_distribution <- create_default_configurations(data = data)  |>
+    tidyr::unnest(cols = data) |>
+    dplyr::rows_update(
+      y = tibble::tibble(
+        module_name = "Recruitment",
+        distribution_type = NA_character_,
+        distribution = NA_character_
+      ),
+      by = "module_name"
+    ) |>
+    create_default_parameters(data = data)
   missing_recruitment_distribution_error <-
     missing_recruitment_distribution |>
       tidyr::unnest(cols = data) |>

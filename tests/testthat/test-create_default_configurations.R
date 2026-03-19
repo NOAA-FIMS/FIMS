@@ -26,7 +26,7 @@ test_that("`create_default_configurations()` works with correct inputs", {
 
   expected_names_unnested <- c(
     "model_family", "module_name", "fleet_name", "module_type",
-    "label", "distribution_type", "distribution"
+    "distribution_type", "distribution"
   )
   default_configurations_unnested <- default_configurations |>
     tidyr::unnest(cols = data)
