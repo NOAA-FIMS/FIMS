@@ -644,15 +644,13 @@ methods::setMethod(
       ggplot2::geom_point(alpha = 0.8) +
       ggplot2::xlab("Timing") +
       ggplot2::ylab("") +
-      ggplot2::theme_bw() +
+      stockplotr::theme_noaa() +
       ggplot2::theme(
         axis.text.x = ggplot2::element_text(angle = 15),
         axis.text.y = ggplot2::element_blank(),
         axis.ticks.y = ggplot2::element_blank()
       ) +
-      ggplot2::labs(col = "Fleet") #+
-    # Replacing theme_noaa with theme_bw() due to issues recognizing stockplotr
-    # stockplotr::theme_noaa()
+      ggplot2::labs(col = "Fleet")
   }
 )
 
