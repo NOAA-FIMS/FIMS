@@ -397,15 +397,15 @@ run_FIMS_projection_scenario <- function(om_input,
   population$AddFleet(survey_fleet$get_id())
 
   if (!is.null(ssb_ratio_target)) {
-    # Setup log_f_multiplier to allow F_mort values in the projection period 
+    # Setup log_f_multiplier to allow F_mort values in the projection period
     # to be scaled to achieve the target spawning biomass ratio. log_Fmort will
-    # be constant in years where log_f_multiplier is estimates and 
+    # be constant in years where log_f_multiplier is estimates and
     # log_f_multiplier will be constant in the years where log_Fmort is
     # estimated to avoid confounding of the estimates.
-    # 
+    #
     population$log_f_multiplier$resize(om_input[["nyr"]] + n_projection_years)
     for (i in 1:(om_input[["nyr"]])) {
-      #log_f_multiplier will have no impact on results when fixed at 0
+      # log_f_multiplier will have no impact on results when fixed at 0
       population$log_f_multiplier[i]$value <- 0.0
       population$log_f_multiplier[i]$estimation_type$set("constant")
     }
@@ -419,14 +419,14 @@ run_FIMS_projection_scenario <- function(om_input,
 
       # log_f_multiplier likelihood is setup with an expected mean target
       # to force the values to be close to equal. This setup is needed because
-      # the currently likelihood pointer structure requires likelihood functions 
-      # to apply to an entire parameter vector rather than specific years. This 
-      # will replaced in future refactoring that is currently in progress to 
+      # the currently likelihood pointer structure requires likelihood functions
+      # to apply to an entire parameter vector rather than specific years. This
+      # will replaced in future refactoring that is currently in progress to
       # allow subvector pointers for likelihood components and to incorporate
-      # mapping off parameters through TMB. The convoluted process below of 
+      # mapping off parameters through TMB. The convoluted process below of
       # setting up various log_sd values was to maintain constant values without
-      # having the estimator get stuck fitting the mean rather than the 
-      # spawning biomass ratio target. 
+      # having the estimator get stuck fitting the mean rather than the
+      # spawning biomass ratio target.
 
       F_mult_distribution$set_distribution_mean(1)
       # F_mult_distribution$set_distribution_mean(-0.6931472)
@@ -463,7 +463,7 @@ run_FIMS_projection_scenario <- function(om_input,
     }
 
     # Setup projection prior target
-    # Similar issues occur here as with log_f_multiplier in that a prior has to 
+    # Similar issues occur here as with log_f_multiplier in that a prior has to
     # be set for all spawning biomass ratios rather than for just a single year.
     # This is being improved/replaced in ongoing development.
     SSB_ratio_prior <- methods::new(DnormDistribution)
