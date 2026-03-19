@@ -37,6 +37,7 @@ BevertonHoltRecruitment
 BevertonHoltRecruitmentInterface
 Bigg
 Bjarne
+Bmsy
 Bool
 CAA
 CAAEvaluateTestFixture
@@ -184,6 +185,7 @@ FleetInterfaceBase
 FleetPrepareWorks
 FleetTests
 Fmort
+Fmsy
 FunctionName
 GMACS
 GNUC
