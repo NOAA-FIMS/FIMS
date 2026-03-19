@@ -518,8 +518,7 @@ class Information {
                       std::shared_ptr<fims_popdy::Population<Type>> p) {
     if (p->recruitment_id != static_cast<Type>(-999)) {
       uint32_t recruitment_uint = static_cast<uint32_t>(p->recruitment_id);
-      FIMS_INFO_LOG("searching for recruitment model " +
-                    fims::to_string(recruitment_uint));
+
       recruitment_models_iterator it =
           this->recruitment_models.find(recruitment_uint);
 
@@ -618,7 +617,7 @@ class Information {
                        fims::to_string(growth_uint));
       }
     } else {
-      FIMS_WARNING_LOG("No growth function defined for population " +
+      FIMS_WARNING_LOG("Growth function undefined for population " +
                        fims::to_string(p->id) +
                        ". FIMS requires growth functions be defined for all "
                        "populations when running a catch at age model.");
@@ -653,7 +652,7 @@ class Information {
             fims::to_string(maturity_uint));
       }
     } else {
-      FIMS_WARNING_LOG("No maturity function defined for population " +
+      FIMS_WARNING_LOG("Maturity function undefined for population " +
                        fims::to_string(p->id) +
                        ". FIMS requires maturity functions be defined for all "
                        "populations when running a catch at age model.");

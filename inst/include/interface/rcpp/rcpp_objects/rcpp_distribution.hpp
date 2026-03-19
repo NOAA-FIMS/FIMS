@@ -300,7 +300,7 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
     if (this->finalized) {
       // log warning that finalize has been called more than once.
       FIMS_WARNING_LOG("DnormDistribution  " + fims::to_string(this->id_m) +
-                       " has been finalized already.");
+                       " has been finalized already.");                     
     }
 
     this->finalized = true;  // indicate this has been called already
@@ -1097,7 +1097,6 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
 
   template <typename Type>
   bool add_to_fims_tmb_internal() {
-    FIMS_INFO_LOG("Adding multinomial to FIMS.");
     std::shared_ptr<fims_info::Information<Type>> info =
         fims_info::Information<Type>::GetInstance();
 
@@ -1124,7 +1123,6 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
     }
 
     info->density_components[distribution->id] = distribution;
-    FIMS_INFO_LOG("Done adding multinomial to FIMS.");
     return true;
   }
 

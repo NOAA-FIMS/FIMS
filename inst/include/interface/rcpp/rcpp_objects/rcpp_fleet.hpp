@@ -493,7 +493,6 @@ class FleetInterface : public FleetInterfaceBase {
       }
     }
 
-    FIMS_INFO_LOG("adding Fleet fmort object to TMB");
     if (this->log_Fmort.size() != static_cast<size_t>(this->n_years.get())) {
       FIMS_ERROR_LOG("The size of `log_Fmort` does not match `n_years`: " +
                      fims::to_string(this->log_Fmort.size()) +
@@ -565,7 +564,6 @@ class FleetInterface : public FleetInterfaceBase {
 
     // add to Information
     info->fleets[fleet->id] = fleet;
-    FIMS_INFO_LOG("done adding Fleet object to TMB");
     return true;
   }
 
