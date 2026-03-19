@@ -721,6 +721,51 @@ methods::setValidity(
       ))
     }
 
+    # validate_bin_presence(
+    #   dplyr::filter(data_big, type == "age_comp"),
+    #   age, 1:13
+    # )
+    # validate_bin_presence(
+    #   dplyr::filter(data_big, type == "length_comp"),
+    #   length,
+    #   seq(0, 1100, 50)
+    # )
+
+    if (all(c("age_comp", "age_to_length_conversion") %in% present_types)) {
+      validate_bin_presence(
+        dplyr::filter(
+          data_big, type %in% c("age_comp", "age_to_length_conversion")
+        ),
+        age,
+        get_ages(object)
+      )
+      age_bins <- get_ages(object)
+      conversion_bins_age <- object@data |>
+        dplyr::filter(type == "age_to_length_conversion") |>
+        dplyr::pull(age) |>
+        unique()
+           
+      # check that they are the same
+      # if not the same immediate throw error
+      if (length(age_bins) != length(conversion_bins)) {
+        if(length(age_bins) > length(conversion_bin)) {
+          vec1 <- "age"
+          vec2 <- "age_to_length_conversion"
+          bins_not_in <- !age_bins %in% conversion_bins 
+        }
+
+        if(length(conversion_bin) > length(age_bin)) {
+          vec1 <- "age_to_length_conversion"
+          vec2 <- "age"
+          bins_not_in <- !conversion_bins %in% age_bins
+        }
+        
+        cli::cli_abort(
+          "The following bins in your {vec1} data are not in your 
+           {vec2} data: {bins_not_in}"
+        )
+      }
+
     # Ensure composition data sum to 1.0 per group if units are proportions
     for (present_type in grep("_comp", present_types, value = TRUE)) {
       test <- object@data |>
@@ -742,7 +787,7 @@ methods::setValidity(
     }
   }
 )
-
+ 
 validate_data_colnames <- function(data) {
   the_column_names <- colnames(data)
   errors <- character()
@@ -806,6 +851,43 @@ validate_composition_data <- function(data) {
   } else {
     return(0)
   }
+}
+
+#' Validate that all bin categories are present
+#'
+#' Check that all data bins that are specified in `good_values` are present
+#' in the bin column for all combinations of type, name, and timing in the
+#' provided data.
+#'
+#' @param data A data frame extracted from a `FIMSFrame` object.
+#' @param column The column name of the binning information, e.g., `age`,
+#'   without quotes.
+#' @param expected_bins A vector of integer or numeric values to check for in
+#'   the specified column.
+#' @return
+#' A tibble with the following five columns: type, name, timing, the column
+#' name specified in the `column` argument, and problem. The problem column
+#' takes on either `"missing"` or `"extra"` depending if the information is
+#' missing from `data` or if the information is extra and should not be in
+#' `data` based on matching `expected_bins`.
+#' An empty tibble is returned if there are no missing or extra bins.
+validate_bin_presence <- function(data, column, expected_bins) {
+  expected <- tidyr::expand_grid(
+    type = unique(data[["type"]]),
+    name = unique(data[["name"]]),
+    timing = unique(data[["timing"]]),
+    "{{column}}" := expected_bins
+  )
+  present <- data |>
+    dplyr::distinct(type, name, timing, {{ column  }})
+  missing <- expected |>
+    dplyr::anti_join(present, by = colnames(expected)) |>
+    dplyr::mutate(problem = "missing")
+  opposite_missing <- present |>
+    dplyr::anti_join(expected, by = colnames(expected)) |>
+    dplyr::mutate(problem = "extra")
+
+  dplyr::bind_rows(missing, opposite_missing)
 }
 
 # Constructors ----
