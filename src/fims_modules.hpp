@@ -172,6 +172,7 @@ RCPP_MODULE(fims) {
       .method("size", &ParameterVector::size)
       .method("resize", &ParameterVector::resize)
       .method("set_all_estimable", &ParameterVector::set_all_estimable)
+      .method("set_estimation_type", &ParameterVector::set_estimation_type)
       .method("set_all_random", &ParameterVector::set_all_random)
       .method("fill", &ParameterVector::fill)
       .method("get_id", &ParameterVector::get_id);

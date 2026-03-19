@@ -32,7 +32,7 @@
 
 methods::setOldClass(Classes = "Rcpp_Parameter")
 methods::setOldClass(Classes = "Rcpp_ParameterVector")
-
+methods::setOldClass(Classes = "Rcpp_RealVector")
 # Methods for Rcpp
 #' Setter for `Rcpp_ParameterVector`
 #'

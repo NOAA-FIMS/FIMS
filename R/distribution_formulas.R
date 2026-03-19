@@ -320,15 +320,16 @@ initialize_data_distribution <- function(
     # new_module$log_sd$resize(length(sd[["value"]]))
 
     new_module$log_sd[] <- log(sd[["value"]])
+    new_module$log_sd$set_estimation_type(c(sd[["estimation_type"]]))
     # purrr::walk(
     #   seq_along(sd[["value"]]),
     #   \(x) new_module[["log_sd"]][x][["value"]] <- log(sd[["value"]][x])
     # )
 
-    purrr::walk(
-      seq_along(sd[["estimation_type"]]),
-      \(x) new_module[["log_sd"]][x][["estimation_type"]]$set(sd[["estimation_type"]][x])
-    )
+    # purrr::walk(
+    #   seq_along(sd[["estimation_type"]]),
+    #   \(x) new_module[["log_sd"]][x][["estimation_type"]]$set(sd[["estimation_type"]][x])
+    # )
   }
 
   if (family[["family"]] == "gaussian") {

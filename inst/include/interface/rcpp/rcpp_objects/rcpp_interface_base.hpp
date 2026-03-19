@@ -9,7 +9,7 @@
 #ifndef FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_INTERFACE_BASE_HPP
 #define FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_INTERFACE_BASE_HPP
 
-#include <RcppCommon.h>
+
 #include <map>
 #include <vector>
 
@@ -20,7 +20,14 @@
 #include <limits>
 
 #define RCPP_NO_SUGAR
+#pragma push_macro("Rf_warning")
+#pragma push_macro("warning")
+#undef Rf_warning
 #include <Rcpp.h>
+#pragma pop_macro("Rf_warning")
+#pragma pop_macro("warning")
+
+
 
 /**
  * @brief An Rcpp interface that defines the Parameter class.
@@ -300,6 +307,12 @@ class ParameterVector {
       } else {
         this->storage_m->at(i).estimation_type_m.set("constant");
       }
+    }
+  }
+
+  void set_estimation_type(Rcpp::CharacterVector estimation_type){
+    for(size_t i = 0; i < this->storage_m->size(); i++){
+      this->storage_m->at(i).estimation_type_m.set(Rcpp::as<std::string>(estimation_type[i]));
     }
   }
 
