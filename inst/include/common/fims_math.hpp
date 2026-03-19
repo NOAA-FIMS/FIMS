@@ -66,6 +66,14 @@ inline const Type lgamma(const Type &x) {
 
 #ifdef TMB_MODEL
 
+double Value(const TMBAD_FIMS_TYPE& x){
+  return x.Value();
+}
+
+double Value(const double& x){
+  return x;
+}
+
 // Add the following line to CMakeLists.txt to enable documentation of TMB_MODEL
 // in doxygen or none of the following is rendered.
 // set(DOXYGEN_PREDEFINED "TMB_MODEL=1" "ENABLE_TMB_CODE")

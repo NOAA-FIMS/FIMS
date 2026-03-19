@@ -28,6 +28,7 @@ struct SelectivityBase : public fims_model_object::FIMSObject<Type> {
   // all the instances of the SelectivityBase class.
   static uint32_t
       id_g; /**< The ID of the instance of the SelectivityBase class */
+  // size_t n_ages; // AJ: do I need to provide this here? is this the best way to provide n_ages?
 
   /** @brief Constructor.
    */
