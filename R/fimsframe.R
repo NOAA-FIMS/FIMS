@@ -632,9 +632,6 @@ methods::setMethod(
         col = name
       )
     ) +
-      # Using Set3 b/c it is the palette with the largest number of colors
-      # and not {nmfspalette} b/c didn't want to depend on GitHub package
-      ggplot2::scale_color_brewer(palette = "Set3") +
       ggplot2::facet_wrap(
         "type",
         scales = "free_y",
@@ -646,10 +643,10 @@ methods::setMethod(
       stockplotr::theme_noaa() +
       ggplot2::theme(
         axis.text.x = ggplot2::element_text(angle = 15),
-        axis.text.y = ggplot2::element_blank(),
         axis.ticks.y = ggplot2::element_blank()
       ) +
-      ggplot2::labs(col = "Fleet")
+      ggplot2::labs(col = "Fleet") +
+      ggplot2::guides(color = "none")
   }
 )
 
