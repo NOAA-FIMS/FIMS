@@ -17,7 +17,7 @@ To open the container in a Codespace using the internet browser of your choice p
 
 ## 🐧 WSL2
 
-To open the container on your local Windows machine using Windows Subsystem for Linux 2 (WSL2), Docker Engine, and Visual Studio Code (VS Code) use the following instructions: 
+Instructions for installing Windows Subsystem for Linux 2 (WSL2) can be found on the on the [onboarding GitHub webpage](https://nmfs-ost.github.io/on-off-boarding/getting-started.html#wsl) for the National Stock Assessment Program. Once installed, to open the container on your local Windows machine using WSL2, Docker Engine, and Visual Studio Code (VS Code) use the following instructions:
 
 ### Connect VS Code to WSL
 
