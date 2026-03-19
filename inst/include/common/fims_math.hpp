@@ -16,6 +16,7 @@
 
 #include "../interface/interface.hpp"
 #include "fims_vector.hpp"
+#include "def.hpp"
 
 namespace fims_math {
 #ifdef STD_LIB
@@ -62,9 +63,15 @@ template <class Type>
 inline const Type lgamma(const Type &x) {
   return std::lgamma(x);
 }
+
+inline double Value(const double &x) { return x; }
 #endif
 
 #ifdef TMB_MODEL
+
+inline double Value(const TMBAD_FIMS_TYPE &x) { return x.Value(); }
+
+inline double Value(const double &x) { return x; }
 
 // Add the following line to CMakeLists.txt to enable documentation of TMB_MODEL
 // in doxygen or none of the following is rendered.

@@ -15,6 +15,7 @@ fleet <- get_data(data) |>
   unique() |>
   stats::na.omit() |>
   dplyr::first()
+n_ages <- FIMS::get_n_ages(data)
 
 ## IO correctness ----
 test_that("`setup_default_Selectivity()` works with correct inputs", {
@@ -38,6 +39,19 @@ test_that("`setup_default_Selectivity()` works with edge cases", {
 
   #' @description Test that DoubleLogistic returns four selectivity parameters.
   expect_equal(nrow(result), 4)
+
+  clear()
+})
+
+test_that("`setup_default_Selectivity()` works with edge cases", {
+  result <- setup_default_Selectivity(
+    data = data,
+    fleet = fleet,
+    module_type = "AgeSpecific"
+  )
+
+  #' @description Test that AgeSpecific returns n_ages selectivity parameters.
+  expect_equal(nrow(result), n_ages)
 
   clear()
 })
