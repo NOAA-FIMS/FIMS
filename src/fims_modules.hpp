@@ -371,6 +371,16 @@ RCPP_MODULE(fims) {
       .method("get_id", &DoubleLogisticSelectivityInterface::get_id)
       .method("evaluate", &DoubleLogisticSelectivityInterface::evaluate);
 
+  Rcpp::class_<SelectivityatAgeInterface>(
+      "SelectivityatAge",
+      "See "
+      "https://noaa-fims.github.io/doxygen/"
+      "classSelectivityatAgeInterfaceInterface.html.")
+      .constructor()
+      .field("sel_at_age", &SelectivityatAgeInterface::sel_at_age)
+      .method("get_id", &SelectivityatAgeInterface::get_id)
+      .method("evaluate", &SelectivityatAgeInterface::evaluate);
+
   Rcpp::class_<EWAAGrowthInterface>(
       "EWAAGrowth",
       "See https://noaa-fims.github.io/doxygen/classEWAAGrowthInterface.html.")

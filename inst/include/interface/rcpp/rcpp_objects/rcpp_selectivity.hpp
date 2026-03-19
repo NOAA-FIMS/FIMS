@@ -606,4 +606,219 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
 #endif
 };
 
+/**
+ * @brief Rcpp interface for selectivity_at_age to instantiate the object
+ * from R:
+ * selectivity_at_age <- methods::new(selectivity_at_age).
+ */
+class SelectivityatAgeInterface : public SelectivityInterfaceBase {
+ public:
+  /**
+   * @brief Age-specific selectivity parameter values.
+   */
+  ParameterVector sel_at_age;
+
+  /**
+   * @brief The constructor.
+   */
+  SelectivityatAgeInterface() : SelectivityInterfaceBase() {
+    SelectivityInterfaceBase::live_objects[this->id] =
+        std::make_shared<SelectivityatAgeInterface>(*this);
+    FIMSRcppInterfaceBase::fims_interface_objects.push_back(
+        SelectivityInterfaceBase::live_objects[this->id]);
+  }
+
+  /**
+   * @brief Construct a new Logistic Selectivity Interface object
+   *
+   * @param other
+   */
+  SelectivityatAgeInterface(const LogisticSelectivityInterface &other)
+      : SelectivityInterfaceBase(other),
+        sel_at_age(other.sel_at_age) {}
+
+  /**
+   * @brief The destructor.
+   */
+  virtual ~SelectivityatAgeInterface() {}
+
+  /**
+   * @brief Gets the ID of the interface base object.
+   * @return The ID.
+   */
+  virtual uint32_t get_id() { return this->id; }
+
+  /**
+   * @brief Evaluate selectivity using ???.
+   * @param x The independent variable in the logistic function (e.g., age or
+   * size in selectivity).
+   */
+  virtual double evaluate(double x) { // AJ: I'm not sure if we want to evaluate at age x
+          // AJ: Is there a better way to just inv_logit transform the vector of values before passing them on to TMB?
+          // AJ: Do we need a dedicated sel_at_age.hpp
+    fims_popdy::SelectivityatAge<double> SelatAge;
+    SelatAge.sel_at_age = this->sel_at_age.initial_value_m; // AJ: I think this should read in initial values for SelectivityatAge
+    return SelatAge.evaluate(x); // AJ: again, I'm not sure if we want to evaluate at age x
+  }
+
+  /**
+   * @brief Extracts derived quantities back to the Rcpp interface object from
+   * the Information object.
+   */
+  virtual void finalize() {
+    if (this->finalized) {
+      // log warning that finalize has been called more than once.
+      FIMS_WARNING_LOG("Selectivity at Age " + fims::to_string(this->id) +
+                       " has been finalized already.");
+    }
+
+    this->finalized = true;  // indicate this has been called already
+
+    std::shared_ptr<fims_info::Information<double>> info =
+        fims_info::Information<double>::GetInstance();
+
+    fims_info::Information<double>::selectivity_models_iterator it;
+
+    // search for maturity in Information
+    it = info->selectivity_models.find(this->id);
+    // if not found, just return
+    if (it == info->selectivity_models.end()) {
+      FIMS_WARNING_LOG("Selectivity at Age " + fims::to_string(this->id) +
+                       " not found in Information.");
+      return;
+    } else {
+      std::shared_ptr<fims_popdy::LogisticSelectivity<double>> sel =
+          std::dynamic_pointer_cast<fims_popdy::LogisticSelectivity<double>>(
+              it->second);
+
+      for (size_t i = 0; i < inflection_point.size(); i++) {
+        if (this->inflection_point[i].estimation_type_m.get() == "constant") {
+          this->inflection_point[i].final_value_m =
+              this->inflection_point[i].initial_value_m;
+        } else {
+          this->inflection_point[i].final_value_m = sel->inflection_point[i];
+        }
+      }
+
+      for (size_t i = 0; i < slope.size(); i++) {
+        if (this->slope[i].estimation_type_m.get() == "constant") {
+          this->slope[i].final_value_m = this->slope[i].initial_value_m;
+        } else {
+          this->slope[i].final_value_m = sel->slope[i];
+        }
+      }
+    }
+  }
+
+  /**
+   * @brief Converts the data to json representation for the output.
+   * @return A string is returned specifying that the module relates to the
+   * selectivity interface with logistic selectivity. It also returns the ID
+   * and the parameters. This string is formatted for a json file.
+   */
+  virtual std::string to_json() {
+    std::stringstream ss;
+
+    ss << "{\n";
+    ss << " \"module_name\":\"Selectivity\",\n";
+    ss << " \"module_type\": \"Logistic\",\n";
+    ss << " \"module_id\": " << this->id << ",\n";
+
+    ss << " \"parameters\": [\n{\n";
+    ss << "   \"name\": \"inflection_point\",\n";
+    ss << "   \"id\":" << this->inflection_point.id_m << ",\n";
+    ss << "   \"type\": \"vector\",\n";
+    ss << " \"dimensionality\": {\n";
+    ss << "  \"header\": [null],\n";
+    ss << "  \"dimensions\": [1]\n},\n";
+    ss << "   \"values\":" << this->inflection_point << "},\n ";
+
+    ss << "{\n";
+    ss << "   \"name\": \"slope\",\n";
+    ss << "   \"id\":" << this->slope.id_m << ",\n";
+    ss << "   \"type\": \"vector\",\n";
+    ss << " \"dimensionality\": {\n";
+    ss << "  \"header\": [null],\n";
+    ss << "  \"dimensions\": [1]\n},\n";
+    ss << "   \"values\":" << this->slope << "}]\n";
+
+    ss << "}";
+
+    return ss.str();
+  }
+
+#ifdef TMB_MODEL
+
+  template <typename Type>
+  bool add_to_fims_tmb_internal() {
+    std::shared_ptr<fims_info::Information<Type>> info =
+        fims_info::Information<Type>::GetInstance();
+
+    std::shared_ptr<fims_popdy::LogisticSelectivity<Type>> selectivity =
+        std::make_shared<fims_popdy::LogisticSelectivity<Type>>();
+    std::stringstream ss;
+    // set relative info
+    selectivity->id = this->id;
+    selectivity->inflection_point.resize(this->inflection_point.size());
+    for (size_t i = 0; i < this->inflection_point.size(); i++) {
+      selectivity->inflection_point[i] =
+          this->inflection_point[i].initial_value_m;
+      if (this->inflection_point[i].estimation_type_m.get() ==
+          "fixed_effects") {
+        ss.str("");
+        ss << "Selectivity." << this->id << ".inflection_point."
+           << this->inflection_point[i].id_m;
+        info->RegisterParameterName(ss.str());
+        info->RegisterParameter(selectivity->inflection_point[i]);
+      }
+      if (this->inflection_point[i].estimation_type_m.get() ==
+          "random_effects") {
+        ss.str("");
+        ss << "Selectivity." << this->id << ".inflection_point."
+           << this->inflection_point[i].id_m;
+        info->RegisterRandomEffect(selectivity->inflection_point[i]);
+        info->RegisterRandomEffectName(ss.str());
+      }
+    }
+    info->variable_map[this->inflection_point.id_m] =
+        &(selectivity)->inflection_point;
+
+    selectivity->slope.resize(this->slope.size());
+    for (size_t i = 0; i < this->slope.size(); i++) {
+      selectivity->slope[i] = this->slope[i].initial_value_m;
+      if (this->slope[i].estimation_type_m.get() == "fixed_effects") {
+        ss.str("");
+        ss << "Selectivity." << this->id << ".slope." << this->slope[i].id_m;
+        info->RegisterParameterName(ss.str());
+        info->RegisterParameter(selectivity->slope[i]);
+      }
+      if (this->slope[i].estimation_type_m.get() == "random_effects") {
+        ss.str("");
+        ss << "Selectivity." << this->id << ".slope." << this->slope[i].id_m;
+        info->RegisterRandomEffectName(ss.str());
+        info->RegisterRandomEffect(selectivity->slope[i]);
+      }
+    }
+    info->variable_map[this->slope.id_m] = &(selectivity)->slope;
+
+    // add to Information
+    info->selectivity_models[selectivity->id] = selectivity;
+
+    return true;
+  }
+
+  /**
+   * @brief Adds the parameters to the TMB model.
+   * @return A boolean of true.
+   */
+  virtual bool add_to_fims_tmb() {
+    this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
+    this->add_to_fims_tmb_internal<TMBAD_FIMS_TYPE>();
+
+    return true;
+  }
+
+#endif
+};
+
 #endif
