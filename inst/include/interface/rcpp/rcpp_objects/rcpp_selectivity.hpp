@@ -600,4 +600,209 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
 #endif
 };
 
+/**
+ * @brief Rcpp interface for selectivity_at_age to instantiate the object
+ * from R:
+ * selectivity_at_age <- methods::new(selectivity_at_age).
+ */
+class AgeSpecificSelectivityInterface : public SelectivityInterfaceBase {
+ public:
+   /**
+   * @brief The number of age bins.
+   */
+  SharedInt n_ages = 1;
+   /**
+   * @brief Vector of ages.
+   */
+  RealVector ages;
+   /**
+   * @brief Minimum observed age
+   */
+  SharedInt min_age = 1;
+   /**
+   * @brief Age-specific selectivity parameter values.
+   */
+  VariableVector logit_sel_at_age;
+
+  /**
+   * @brief The constructor.
+   */
+  AgeSpecificSelectivityInterface() : SelectivityInterfaceBase() {
+    SelectivityInterfaceBase::live_objects[this->id] =
+        std::make_shared<AgeSpecificSelectivityInterface>(*this);
+    FIMSRcppInterfaceBase::fims_interface_objects.push_back(
+        SelectivityInterfaceBase::live_objects[this->id]);
+  }
+
+  /**
+   * @brief Construct a new Selectivity-at-age Interface object
+   *
+   * @param other
+   */
+  AgeSpecificSelectivityInterface(const AgeSpecificSelectivityInterface &other)
+      : SelectivityInterfaceBase(other),
+        n_ages(other.n_ages),
+        ages(other.ages),
+        min_age(other.min_age),
+        logit_sel_at_age(other.logit_sel_at_age) {}
+
+  /**
+   * @brief The destructor.
+   */
+  virtual ~AgeSpecificSelectivityInterface() {}
+
+  /**
+   * @brief Gets the ID of the interface base object.
+   * @return The ID.
+   */
+  virtual uint32_t get_id() { return this->id; }
+
+  /**
+   * @brief Evaluate selectivity using fims_math::inv_logit.
+   * @param x The independent variable in the logistic function (e.g., age or
+   * size in selectivity).
+   */
+  virtual double evaluate(double x) { 
+    fims_popdy::AgeSpecificSelectivity<double> AgeSpecificSel;
+    AgeSpecificSel.n_ages = this->n_ages.get();
+    if (this->ages.size() > 0) {
+      AgeSpecificSel.min_age = static_cast<size_t>(
+          *std::min_element(this->ages.storage_m->begin(),
+                            this->ages.storage_m->end()));
+    } else {
+      AgeSpecificSel.min_age = static_cast<size_t>(this->min_age.get());
+    }
+    AgeSpecificSel.logit_sel_at_age.resize(this->logit_sel_at_age.size());
+    for (size_t i = 0; i < this->logit_sel_at_age.size(); i++) {
+      AgeSpecificSel.logit_sel_at_age[i] = this->logit_sel_at_age[i].initial_value_m;
+    } 
+    return AgeSpecificSel.evaluate(x); 
+  }
+
+  /**
+   * @brief Extracts derived quantities back to the Rcpp interface object from
+   * the Information object.
+   */
+  virtual void finalize() {
+    if (this->finalized) {
+      // log warning that finalize has been called more than once.
+      FIMS_WARNING_LOG("Age Specific Selectivity " + fims::to_string(this->id) +
+                       " has been finalized already.");
+    }
+
+    this->finalized = true;  // indicate this has been called already
+
+    std::shared_ptr<fims_info::Information<double>> info =
+        fims_info::Information<double>::GetInstance();
+
+    fims_info::Information<double>::selectivity_models_iterator it;
+
+    // search for maturity in Information
+    it = info->selectivity_models.find(this->id);
+    // if not found, just return
+    if (it == info->selectivity_models.end()) {
+      FIMS_WARNING_LOG("Age Specific Selectivity " + fims::to_string(this->id) +
+                       " not found in Information.");
+      return;
+    } else {
+      std::shared_ptr<fims_popdy::AgeSpecificSelectivity<double>> sel =
+          std::dynamic_pointer_cast<fims_popdy::AgeSpecificSelectivity<double>>(
+              it->second);
+      for (size_t i = 0; i < logit_sel_at_age.size(); i++) {
+        if (this->logit_sel_at_age[i].estimation_type_m.get() == "constant") {
+          this->logit_sel_at_age[i].final_value_m =
+              this->logit_sel_at_age[i].initial_value_m;
+        } else {
+          this->logit_sel_at_age[i].final_value_m = sel->logit_sel_at_age[i];
+        }
+      }
+    }
+  }
+
+  /**
+   * @brief Converts the data to json representation for the output.
+   * @return A string is returned specifying that the module relates to the
+   * selectivity interface with selectivity-at-age. It also returns the ID
+   * and the parameters. This string is formatted for a json file.
+   */
+  virtual std::string to_json() {
+    std::stringstream ss;
+
+    ss << "{\n";
+    ss << " \"module_name\":\"Selectivity\",\n";
+    ss << " \"module_type\": \"AgeSpecific\",\n";
+    ss << " \"module_id\": " << this->id << ",\n";
+
+    ss << " \"parameters\": [\n{\n";
+    ss << "   \"name\": \"logit_sel_at_age\",\n";
+    ss << "   \"id\":" << this->logit_sel_at_age.id_m << ",\n";
+    ss << "   \"type\": \"vector\",\n";
+    ss << " \"dimensionality\": {\n";
+    ss << "  \"header\": [null],\n";
+    ss << "  \"dimensions\": [" << this->logit_sel_at_age.size() << "]\n},\n"; 
+    ss << "   \"values\":" << this->logit_sel_at_age << "}]\n";
+
+    ss << "}";
+
+    return ss.str();
+  }
+
+#ifdef TMB_MODEL
+
+  template <typename Type>
+  bool add_to_fims_tmb_internal() {
+    std::shared_ptr<fims_info::Information<Type>> info =
+        fims_info::Information<Type>::GetInstance();
+
+    std::shared_ptr<fims_popdy::AgeSpecificSelectivity<Type>> selectivity =
+        std::make_shared<fims_popdy::AgeSpecificSelectivity<Type>>();
+    std::stringstream ss;
+    // set relative info
+    selectivity->id = this->id;
+    selectivity->n_ages = this->n_ages.get();
+    selectivity->min_age = *std::min_element(this->ages.storage_m->begin(), this->ages.storage_m->end());
+    selectivity->logit_sel_at_age.resize(this->logit_sel_at_age.size());
+    for (size_t i = 0; i < this->logit_sel_at_age.size(); i++) {
+      selectivity->logit_sel_at_age[i] =
+          this->logit_sel_at_age[i].initial_value_m;
+      if (this->logit_sel_at_age[i].estimation_type_m.get() ==
+          "fixed_effects") {
+        ss.str("");
+        ss << "Selectivity." << this->id << ".logit_sel_at_age."
+           << this->logit_sel_at_age[i].id_m;
+        info->RegisterParameterName(ss.str());
+        info->RegisterParameter(selectivity->logit_sel_at_age[i]);
+      }
+      if (this->logit_sel_at_age[i].estimation_type_m.get() ==
+          "random_effects") {
+        ss.str("");
+        ss << "Selectivity." << this->id << ".logit_sel_at_age."
+           << this->logit_sel_at_age[i].id_m;
+        info->RegisterRandomEffect(selectivity->logit_sel_at_age[i]);
+        info->RegisterRandomEffectName(ss.str());
+      }
+    }
+    info->variable_map[this->logit_sel_at_age.id_m] =
+        &(selectivity)->logit_sel_at_age;
+
+    // add to Information
+    info->selectivity_models[selectivity->id] = selectivity;
+
+    return true;
+  }
+
+  /**
+   * @brief Adds the parameters to the TMB model.
+   * @return A boolean of true.
+   */
+  virtual bool add_to_fims_tmb() {
+    this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
+    this->add_to_fims_tmb_internal<TMBAD_FIMS_TYPE>();
+
+    return true;
+  }
+
+#endif
+};
+
 #endif

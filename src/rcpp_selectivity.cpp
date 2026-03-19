@@ -43,4 +43,19 @@ void register_selectivity(Rcpp::Module& m) {
       .field("slope_desc", &DoubleLogisticSelectivityInterface::slope_desc)
       .method("get_id", &DoubleLogisticSelectivityInterface::get_id)
       .method("evaluate", &DoubleLogisticSelectivityInterface::evaluate);
+
+  Rcpp::class_<AgeSpecificSelectivityInterface>(
+      "AgeSpecificSelectivity",
+      "See "
+      "https://noaa-fims.github.io/doxygen/"
+      "classAgeSpecificSelectivityInterfaceInterface.html.")
+      .constructor()
+      .field("n_ages", &AgeSpecificSelectivityInterface::n_ages)
+      .field("ages", &AgeSpecificSelectivityInterface::ages, 
+             "Ages for each age class.")
+      .field("min_age", &AgeSpecificSelectivityInterface::min_age, 
+             "Minimum observed age")
+      .field("logit_sel_at_age", &AgeSpecificSelectivityInterface::logit_sel_at_age)
+      .method("get_id", &AgeSpecificSelectivityInterface::get_id)
+      .method("evaluate", &AgeSpecificSelectivityInterface::evaluate);
 }

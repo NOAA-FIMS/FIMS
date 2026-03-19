@@ -154,7 +154,7 @@ initialize_module <- function(parameters, data, module_name, fleet = NA_characte
 
   integer_fields <- c(
     "n_ages", "n_fleets", "n_lengths",
-    "n_years"
+    "n_years", "min_age"
   )
 
   boolean_fields <- c(
@@ -177,7 +177,8 @@ initialize_module <- function(parameters, data, module_name, fleet = NA_characte
             length(),
           # Or we can use get_n_fleets(data),
           "n_lengths" = get_n_lengths(data),
-          "n_years" = get_n_years(data)
+          "n_years" = get_n_years(data),
+          "min_age" = min(get_ages(data))
         )
       )
     } else if (field %in% c("ages", "weights")) {
