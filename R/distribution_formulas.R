@@ -380,7 +380,7 @@ initialize_process_distribution <- function(
   family = NULL,
   sd = tibble::tibble(
     value = 1,
-    estimation_type = "constant"
+    estimation_type = "fixed_effects"
   )
 ) {
   # validity check on user input

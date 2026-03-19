@@ -27,8 +27,6 @@ configurations. Unnesting this column reveals:
 \describe{
 \item{\code{module_type}:}{The specific type of the module (e.g.,
 "Logistic" for a "Selectivity" module).}
-\item{\code{label}:}{The component the distribution module
-links to.}
 \item{\code{distribution_type}:}{The type of distribution (e.g., "Data",
 "process").}
 \item{\code{distribution}:}{The name of distribution (e.g.,

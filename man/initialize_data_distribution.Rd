@@ -17,8 +17,7 @@ initialize_process_distribution(
   module,
   par,
   family = NULL,
-  sd = tibble::tibble(value = 1, estimation_type = "constant"),
-  is_random_effect = FALSE
+  sd = tibble::tibble(value = 1, estimation_type = "fixed_effects")
 )
 
 initialize_process_structure(module, par)
@@ -49,9 +48,6 @@ c.}
 \item{par}{A string specifying the parameter name the distribution applies
 to. Parameters must be members of the specified module. Use
 \code{methods::show(module)} to obtain names of parameters within the module.}
-
-\item{is_random_effect}{A boolean indicating whether or not the process is
-estimated as a random effect.}
 }
 \value{
 A reference class. is returned. Use \code{\link[methods:show]{methods::show()}} to view the various
@@ -93,8 +89,7 @@ recruitment_distribution <- initialize_process_distribution(
   module = recruitment,
   par = "log_devs",
   family = gaussian(),
-  sd = list(value = 0.4, estimation_type = "constant"),
-  is_random_effect = FALSE
+  sd = list(value = 0.4, estimation_type = "constant")
 )
 }
 }

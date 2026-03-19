@@ -614,10 +614,13 @@ create_default_maturity <- function(
 #' keep it between zero and one, and the time series of stock--recruitment
 #' deviations on the natural log scale.
 #' @param data An S4 object. FIMS input data.
+#' @param distribution A string specifying the distribution for recruitment process.
 #' @return
 #' A tibble containing default recruitment parameters.
 #' @noRd
-create_default_BevertonHoltRecruitment <- function(data) {
+create_default_BevertonHoltRecruitment <- function(
+  data,
+  distribution = NA_character_) {
   # Create default parameters for Beverton--Holt recruitment
   log_rzero <- create_default_parameters_template(
     n_parameters = 1
@@ -646,6 +649,17 @@ create_default_BevertonHoltRecruitment <- function(data) {
       time = (get_start_year(data) + 1):get_end_year(data),
       estimation_type = "random_effects"
     )
+  if(is.na(distribution)){
+    log_devs <- log_devs |>
+      dplyr::rows_update(
+        tibble::tibble(
+          label = "log_devs",
+          time = (get_start_year(data) + 1):get_end_year(data),
+          estimation_type = "constant"
+        ),
+        by = c("label", "time")
+      )
+  }
 
   default <- dplyr::bind_rows(
     log_rzero,
@@ -762,14 +776,31 @@ create_default_recruitment <- function(
   data
 ) {
   # Input checks
-  available_forms <- c("BevertonHolt")
+  # TODO: extend this code when there is more than one form of recruitment (i.e., multiple populations)
+  available_recruitment_forms <- c("BevertonHolt")
+  available_distribution_forms <- c("Dnorm")
   form <- unnested_configurations |>
     dplyr::filter(module_name == "Recruitment") |>
     dplyr::pull(module_type)
-  if (!form %in% available_forms) {
+  if (length(form) != 1) {
+    cli::cli_abort("There must be exactly one form (e.g. Beverton Holt) associated with Recruitment.")
+  }
+  if (!form %in% available_recruitment_forms) {
     cli::cli_abort(c(
       "Invalid `module_type` for Recruitment: {.var {form}}",
-      "i" = "Valid options include: {.var {available_forms}}"
+      "i" = "Valid options include: {.var {available_recruitment_forms}}"
+    ))
+  }
+  distribution <- unnested_configurations |>
+    dplyr::filter(module_name == "Recruitment") |>
+    dplyr::pull(distribution)
+  if (length(distribution) != 1) {
+    cli::cli_abort("There must be at most one distribution associated with Recruitment.")
+  }
+  if (!is.na(distribution) && !distribution %in% available_distribution_forms) {
+    cli::cli_abort(c(
+      "Invalid `distribution` for Recruitment: {.var {distribution}}",
+      "i" = "Valid options include: {.var {available_distribution_forms}}"
     ))
   }
   # Create default parameters based on the recruitment form
@@ -777,19 +808,27 @@ create_default_recruitment <- function(
   # arguments for `form` and their methods but be placed below in the call to
   # `switch`
   form_default <- switch(form,
-    "BevertonHolt" = create_default_BevertonHoltRecruitment(data)
+    "BevertonHolt" = create_default_BevertonHoltRecruitment(data, distribution)
   )
 
-  distribution_input <- unnested_configurations |>
-    dplyr::filter(module_name == "Recruitment")
+  # Keep an empty tibble with the same columns so bind_rows() always works.
+  distribution_default <- form_default |>
+    dplyr::slice(0)
 
-  if (!is.null(distribution_input[["distribution"]])) {
-    distribution_default <- switch(distribution_input[["distribution"]],
+  if (!is.na(distribution)) {
+    distribution_default <- switch(distribution,
       "Dnorm" = create_default_DnormDistribution(
         data = data,
         input_type = "process"
       )
     )
+    distribution_default <- 
+      distribution_default |> dplyr::rows_update(
+      tibble::tibble(
+        label = "log_sd",
+        estimation_type = "fixed_effects"),
+        by = "label"
+      )
   }
 
   default <- dplyr::bind_rows(form_default, distribution_default) |>

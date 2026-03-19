@@ -29,8 +29,6 @@ parameters. Unnesting this column reveals:
 \item{\code{module_type}:}{The specific type of the module (e.g.,
 "Logistic" for a "Selectivity" module).}
 \item{\code{label}:}{The name of the parameter (e.g., "inflection_point").}
-\item{\code{distribution_link}:}{The component the distribution module
-links to.}
 \item{\code{age}:}{The age the parameter applies to.}
 \item{\code{length}:}{The length bin the parameter applies to.}
 \item{\code{time}:}{The time step (i.e., year) the parameter applies to.}

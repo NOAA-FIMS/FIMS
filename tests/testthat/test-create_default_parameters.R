@@ -51,7 +51,45 @@ test_that("`create_default_parameters()` works with correct inputs", {
 })
 
 ## Edge handling ----
-# No edge cases to test.
+test_that("`create_default_parameters()` works with edge cases", {
+  # Set up a model without a distribution for recruitment, which should lead to 
+  # `log_devs` having an estimation_type of "constant" and no `log_sd` parameter 
+  # being created.
+  updated_configurations <- default_configurations |>
+    tidyr::unnest(cols = data) |>
+    dplyr::rows_update(
+      y = tibble::tibble(
+        module_name = "Recruitment",
+        distribution_type = NA_character_,
+        distribution = NA_character_
+      ),
+      by = "module_name"
+    )
+  result <- create_default_parameters(
+    configurations = updated_configurations,
+    data = data
+  )
+
+  #' @description Test that `log_sd` has not been set up when distribution is not specified.
+  expect_equal(
+    result |>
+      tidyr::unnest(cols = data) |>
+      dplyr::filter(module_name == "Recruitment", label == "log_sd") |>
+      dplyr::pull(value),
+    numeric(0)
+  )
+
+  #' @description Test that the `log_devs` estimation_type is set to "constant" when distribution is not specified.
+  expect_equal(
+    result |>
+      tidyr::unnest(cols = data) |>
+      dplyr::filter(module_name == "Recruitment", label == "log_devs") |>
+      dplyr::pull(estimation_type),
+    rep("constant", result |>
+      tidyr::unnest(cols = data) |>
+      dplyr::filter(module_name == "Recruitment", label == "log_devs") |>
+      nrow()))
+})
 
 ## Error handling ----
 # No built-in errors to test.
