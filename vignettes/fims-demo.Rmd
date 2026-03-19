@@ -106,6 +106,7 @@ You can use the base R function `plot(data_4_model)` to see the data types (e.g.
 plot(data_4_model)
 ```
 
+
 ## Parameters
 
 The parameters that are in the model will depend on which modules are used from the FIMS framework. This combination of modules rather than the use of a control file negates the need for complicated if{} else{} statements in the code.
@@ -157,7 +158,7 @@ parameters_4_model <- default_parameters |>
     ),
     by = c("fleet", "label", "timing")
   ) |>
-  # Update selectivity parameters and log_q for survey1
+  # Update log_q for survey1
   dplyr::rows_update(
     tibble::tibble(
       fleet = "survey1",
@@ -378,6 +379,60 @@ clear()
 low_slope_fit <- parameters_low_slope |>
   initialize_fims(data = data_4_model) |>
   fit_fims(optimize = TRUE)
+
+clear()
+```
+
+#### Age-specific selectivity
+
+One could also change the default selectivity configuration for the survey, update default parameterization, and evaluate the ability to estimate a small number of age-specific parameter values.
+
+```{r age-specific-selectivity}
+# Update "survey1" selectivity from "Logistic" to "AgeSpecificSelectivity"
+# This function is also used by setup_default_parameters()
+age_specific_selectivity_default <- setup_default_Selectivity(
+  data = data_4_model,
+  fleet = "survey1",
+  module_type = "AgeSpecific"
+)
+age_specific_selectivity_default
+
+parameters_age_specific_selectivity <- parameters_4_model |>
+  dplyr::filter(!(fleet == "survey1" & module_name == "Selectivity")) |>
+  dplyr::bind_rows(age_specific_selectivity_default)
+
+# Look at updated default parameters
+parameters_age_specific_selectivity |>
+  dplyr::filter(fleet == "survey1", module_name == "Selectivity") |>
+  dplyr::select(module_type, fleet, label, age, value, estimation_type)
+
+# Update the age-specific selectivity parameterization to facilitate estimation
+# Values for first two ages are set to generic initial values and estimated
+# using "fixed_effects"
+# Other values are fixed to true approximate values used in generating demo data
+parameters_age_specific_selectivity <- parameters_age_specific_selectivity |>
+  dplyr::rows_update(
+    tibble::tibble(
+      fleet = "survey1",
+      label = "logit_sel_at_age",
+      age = seq(get_n_ages(data_4_model)),
+      value = c(
+        0, 0, 2.999999, 4.999993, 6.999946,
+        8.999956, 11.000085, 12.982599, 15.019483, 18.420681,
+        18.420681, 18.420681
+      ),
+      estimation_type = c(rep("fixed_effects", 2), rep("constant", 10))
+    ),
+    by = c("fleet", "label", "age")
+  )
+
+# Run the model and look at estimated parameter values
+# True parameter values for the first two ages are -1 and 1, respectively
+age_specific_selectivity_fit <- parameters_age_specific_selectivity |>
+  initialize_fims(data = data_4_model) |>
+  fit_fims(optimize = TRUE)
+get_estimates(age_specific_selectivity_fit) |>
+  dplyr::filter(module_name == "Selectivity", module_type == "AgeSpecific")
 
 clear()
 ```

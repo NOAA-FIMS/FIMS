@@ -1,5 +1,6 @@
 ## usethis namespace: start
 #' @export AgeComp
+#' @export AgeSpecificSelectivity
 #' @export BevertonHoltRecruitment
 #' @export LogDevsRecruitmentProcess
 #' @export LogRRecruitmentProcess

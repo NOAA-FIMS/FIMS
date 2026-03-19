@@ -474,6 +474,42 @@ setup_default_DoubleLogistic <- function() {
     )
 }
 
+#' Create default age-specific selectivity parameters
+#'
+#' @description
+#' This function sets up default parameters for age-specific selectivity.
+#' Defaults based on what would be realized for a logistic curve with
+#' inflection point=2 and slope=1.
+#' Following recommended practices for age-specific selectivity, default
+#' realized selectivity at ages >= 10 is functionally equal to 1.
+#' The default estimation type for the max age selectivity parameter
+#' is also set to "constant".
+#' @return
+#' A tibble containing the default age-specific parameters on the logit scale.
+#' Number of parameters is equal to the number of age classes
+#' @seealso
+#' * [setup_default_parameters()]
+#' @noRd
+#' @examples
+#' \dontrun{
+#' default_age_specific_parameters <- FIMS:::setup_default_AgeSpecific()
+#' }
+setup_default_AgeSpecific <- function(
+  data
+) {
+  default <- setup_default_parameters_template(n_parameters = get_n_ages(data)) |>
+    dplyr::mutate(
+      module_type = "AgeSpecific",
+      label = "logit_sel_at_age",
+      age = get_ages(data),
+      value = qlogis(1 / (1 + (exp(-1 * (get_ages(data) - 2))))),
+      estimation_type = c(
+        rep("fixed_effects", length(get_ages(data)) - 1),
+        "constant"
+      )
+    )
+}
+
 #' Set up default selectivity parameters
 #'
 #' @description
@@ -503,7 +539,7 @@ setup_default_DoubleLogistic <- function() {
 setup_default_Selectivity <- function(
   data,
   fleet,
-  module_type = c("Logistic", "DoubleLogistic")
+  module_type = c("Logistic", "DoubleLogistic", "AgeSpecific")
 ) {
   # Input checks
   is.FIMSFrame(data)
@@ -515,7 +551,8 @@ setup_default_Selectivity <- function(
   # `switch`
   default <- switch(module_type,
     "Logistic" = setup_default_Logistic(),
-    "DoubleLogistic" = setup_default_DoubleLogistic()
+    "DoubleLogistic" = setup_default_DoubleLogistic(),
+    "AgeSpecific" = setup_default_AgeSpecific(data)
   ) |>
     dplyr::mutate(
       module_name = "Selectivity",

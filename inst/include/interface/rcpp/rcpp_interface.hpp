@@ -313,6 +313,9 @@ void clear_impl(bool get_error_msg) {
   DoubleLogisticSelectivityInterface::id_g = 1;
   DoubleLogisticSelectivityInterface::live_objects.clear();
 
+  AgeSpecificSelectivityInterface::id_g = 1;
+  AgeSpecificSelectivityInterface::live_objects.clear();
+
   // rcpp_distribution.hpp
   DistributionsInterfaceBase::id_g = 1;
   DistributionsInterfaceBase::live_objects.clear();

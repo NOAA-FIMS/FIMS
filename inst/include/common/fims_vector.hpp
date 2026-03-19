@@ -191,6 +191,32 @@ class Vector {
   }
 
   /**
+   *  @brief  If this vector is size 1 and pos is greater than zero,
+   * the first index is returned. If this vector has size
+   * greater than 1 and pos is greater than size, a wrapped index
+   * is returned. For example, if pos=10 and vector size=4,
+   * the value 2 will be returned Otherwise, the value at index pos is returned.
+   * This function allows for time-varying formulations to be applied to a
+   * parameter vector that is not time-varying.
+   *
+   * Currently only used for sel_at_age.hpp
+   *
+   * @param pos
+   * @return a constant reference to the element at specified location
+   */
+  inline Type &get_force_scalar_wrap(size_t pos) {
+    if (this->size() == 1 && pos > 0) {
+      return this->at(0);
+    } else if (this->size() > 1 && pos >= this->size()) {
+      size_t remain = pos % this->size();
+      // this only works if both pos and this->size() are integers
+      return this->at(remain);
+    } else {
+      return this->at(pos);
+    }
+  }
+
+  /**
    * @brief  Returns a reference to the first element in the container.
    */
   inline reference front() { return this->vec_m.front(); }

@@ -15,5 +15,6 @@
 #include "functors/double_logistic.hpp"
 #include "functors/logistic.hpp"
 #include "functors/selectivity_base.hpp"
+#include "functors/age_specific.hpp"
 
 #endif /* FIMS_POPULATION_DYNAMICS_SELECTIVITY_HPP */

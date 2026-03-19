@@ -7,7 +7,7 @@
 setup_default_Selectivity(
   data,
   fleet,
-  module_type = c("Logistic", "DoubleLogistic")
+  module_type = c("Logistic", "DoubleLogistic", "AgeSpecific")
 )
 }
 \arguments{
@@ -18,7 +18,7 @@ your long input data.}
 parameters are being created.}
 
 \item{module_type}{A string specifying the desired form of selectivity. Allowable
-forms include Logistic, DoubleLogistic
+forms include Logistic, DoubleLogistic, AgeSpecific
 and the default is
 Logistic.
 See \code{\link{setup_default_parameters}} for full column descriptions.}
