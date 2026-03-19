@@ -58,11 +58,41 @@ test_that("`fims_frame()` works with the correct inputs", {
 
   #' @description Test that `get_ages()` retrieves the ages as an integer vector.
   expect_vector(get_ages(fims_frame), ptype = integer())
+  #' @description Test that `get_ages()` retrieves a vector with length equal to expected number of ages.
+  expect_equal(length(get_ages(fims_frame)), get_n_ages(fims_frame))
+  #' @description Test that `get_ages()` returns a vector of `1:12` because that is how the operating model is set up.
+  expect_equal(get_ages(fims_frame), 1:12)
 
   #' @description Test that `get_n_ages()` retrieves the number of ages as an integer.
   expect_type(get_n_ages(fims_frame), "integer")
   #' @description Test that `get_n_ages()` retrieves the number of ages as a single value.
   expect_length(get_n_ages(fims_frame), 1)
+  #' @description Test that `get_n_ages()` retrieves the correct number of ages.
+  expect_equal(
+    get_n_ages(fims_frame),
+    length(na.omit(unique(data_big[["age"]])))
+  )
+  #' @description Test that `get_n_ages()` retrieves the number of ages as a single value when you pass it a data frame instead of a FIMSFrame object.
+  expect_length(get_n_ages(data_big), 1)
+
+#' @description Test that `get_lengths()` retrieves the lengths as an numeric (double) vector.
+  expect_vector(get_lengths(fims_frame), ptype = double())
+   #' @description Test that `get_lengths()` retrieves a vector with length equal to expected number of length.
+  expect_equal(length(get_lengths(fims_frame)), get_n_lengths(fims_frame))
+  #' @description Test that `get_lengths()` returns a vector with the correst sequence of length values.
+  expect_equal(get_lengths(fims_frame), seq(0, 1100, by = 50))
+
+  #' @description Test that `get_n_lengths()` retrieves the number of lengths as an integer.
+  expect_type(get_n_lengths(fims_frame), "integer")
+  #' @description Test that `get_n_lengths()` retrieves the number of lengths as a single value.
+  expect_length(get_n_lengths(fims_frame), 1)
+  #' @description Test that `get_n_lengths()` retrieves the correct number of lengths.
+  expect_equal(
+    get_n_lengths(fims_frame),
+    length(na.omit(unique(data_big[["length"]])))
+  )
+  #' @description Test that `get_n_lengths()` retrieves the number of lengths as a single value when you pass it a data frame instead of a FIMSFrame object.
+  expect_length(get_n_lengths(data_big), 1)
 
   #' @description Test that `model_landings()` retrieves landings data as a numeric vector.
   expect_vector(model_landings(fims_frame, fleet_names), ptype = numeric())
