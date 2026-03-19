@@ -735,6 +735,11 @@ methods::setValidity(
         )
       }
     }
+    if (length(errors) > 0) {
+      return(errors)
+    } else {
+      return(TRUE)
+    }
   }
 )
 

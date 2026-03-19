@@ -190,6 +190,9 @@ test_that("`FIMSFrame()` returns correct error messages", {
   #' @description Test that `FIMSFrame()` returns an error when there is no data in the FIMSFrame object.
   expect_error(FIMSFrame(data_big[0, ]))
 
+  #' @description Test that `FIMSFrame()` returns an error when a required type is not present.
+  expect_error(FIMSFrame(dplyr::filter(data_big, type != "weight_at_age")))
+
   #' @description Test that `FIMSFrame` validators pick up on a missing age in age-composition data.
   expect_error(
     capture_messages(FIMSFrame(
