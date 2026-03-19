@@ -638,7 +638,6 @@ methods::setMethod(
       ggplot2::facet_wrap(
         "type",
         scales = "free_y",
-        labeller = ggplot2::label_wrap_gen(width = 10),
         ncol = 1
       ) +
       ggplot2::geom_point(alpha = 0.8) +
