@@ -33,6 +33,7 @@
 methods::setOldClass(Classes = "Rcpp_Parameter")
 methods::setOldClass(Classes = "Rcpp_ParameterVector")
 methods::setOldClass(Classes = "Rcpp_RealVector")
+
 # Methods for Rcpp
 #' Setter for `Rcpp_ParameterVector`
 #'
@@ -69,7 +70,7 @@ methods::setMethod(
 )
 
 # Methods for Rcpp
-#' Setter for `Rcpp_ParameterVector`
+#' Setter for `Rcpp_RealVector`
 #'
 #' In R, indexing starts at one. But, in C++ indexing starts at zero. These
 #' functions do the translation for you so you can think in R terms.
@@ -82,7 +83,7 @@ methods::setMethod(
 #' @return
 #' For `[<-`, the index `i` of object `x` is set to `value`.
 #' @keywords internal
-#' @rdname Rcpp_ParameterVector
+#' @rdname Rcpp_RealVector
 methods::setMethod(
   f = "[<-",
   signature = signature(x = "Rcpp_RealVector"),
@@ -123,7 +124,7 @@ methods::setMethod(
   }
 )
 
-#' Get information from Rcpp_ParameterVector
+#' Get information from Rcpp_RealVector
 #'
 #' In R, indexing starts at one. But, in C++ indexing starts at zero. This
 #' function does the translation for you so you can think in R terms.
@@ -134,7 +135,7 @@ methods::setMethod(
 #' @return
 #' For `[`, the index `i` of object `x` is returned.
 #' @keywords internal
-#' @rdname Rcpp_ParameterVector
+#' @rdname Rcpp_RealVector
 methods::setMethod(
   f = "[",
   signature = signature(x = "Rcpp_RealVector", i = "numeric"),
