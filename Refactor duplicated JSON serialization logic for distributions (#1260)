@@ -1,0 +1,10 @@
+git commit -m "Refactor duplicated JSON serialization logic for normal and log_normal distributions (#1260)"
+This PR refactors duplicated JSON serialization logic used by the normal and log_normal distributions in:
+
+FIMS/inst/include/interface/rcpp/rcpp_objects/rcpp_distribution.hpp
+
+Both implementations currently contain nearly identical code except for the "module_type" field ("normal" vs "log_normal"). Maintaining duplicate implementations increases the maintenance burden and makes future distribution extensions more difficult.
+
+This PR extracts the shared JSON serialization logic into a reusable helper function called build_density_json. The distribution type is passed as a parameter, eliminating duplication while keeping the generated JSON output identical.
+
+No functional changes are introduced.
