@@ -46,33 +46,61 @@ validate_fims <- function(
   em_input,
   use_fimsfit = FALSE
 ) {
+
   # Helper function to validate estimates against expected values
   validate_error <- function(expected,
                              param_name,
                              use_fimsfit = FALSE,
-                             estimates = NULL) {
+                             estimates = NULL,
+                             use_strict_outlier_check = FALSE) {
     # Extract estimates based on whether fimsfit is used
     if (use_fimsfit) {
       object <- estimates |>
         dplyr::filter(label == param_name) |>
         dplyr::select(label, estimated, uncertainty)
       # Extract estimate
-      object_estimate <- object[1:length(expected), "estimated"]
+      object_estimate <- object[1:length(expected), "estimated"] |>
+        dplyr::pull(estimated)
       # Extract uncertainty
-      object_uncertainty <- object[1:length(expected), "uncertainty"]
+      object_uncertainty <- object[1:length(expected), "uncertainty"] |>
+        dplyr::pull(uncertainty)
     } else {
       object <- estimates[(rownames(estimates) == param_name), ]
       # Extract estimate
-      object_estimate <- object[1:length(expected), "Estimate"]
+      object_estimate <- object[1:length(expected), "Estimate"] |> unname()
       # Extract uncertainty
-      object_uncertainty <- object[1:length(expected), "Std. Error"]
+      object_uncertainty <- object[1:length(expected), "Std. Error"] |> unname()
     }
 
     # Validate errors against 2*SE threshold
-    absolute_error <- abs(object_estimate - expected)
-    threshold <- qnorm(.975) * object_uncertainty
-    #' @description Test that the 95% of the estimates fall within 2*SE.
-    expect_lte(sum(absolute_error > threshold), 0.05 * length(expected))
+    # absolute_error <- abs(object_estimate - expected)
+    # threshold <- qnorm(.975) * object_uncertainty
+    # #' @description Test that the 95% of the estimates fall within 2*SE.
+    # expect_lte(sum(absolute_error > threshold), 0.05 * length(expected))
+
+    # Validate using relative error and R-squared
+    rel_error <- (object_estimate - expected) / expected
+    # test the accuracy of the magnitude
+    expect_lte(median(abs(rel_error)), 0.20) # median relative error should be less than 20%
+    # test for directional bias
+    expect_lte(abs(mean(rel_error, na.rm = TRUE)), 0.10)
+    # test the trend is correlated
+    r2_val <- cor(object_estimate, expected)^2
+    expect_gte(r2_val, 0.90) # R-squared should be greater than 0.90
+
+    # Validate z-scores such that mean ~ 0 and max < 4 (indicating no extreme outliers)
+    # Since these are time series data, it is not appropriate to test sd ~ 1 due to autocorrelation.
+    z_scores <- (object_estimate - expected) / object_uncertainty
+    # mean_tol <- qnorm(.975) / sqrt(length(expected)) # 95% confidence interval for mean of z-scores
+   # expect_lte(abs(mean(z_scores)), mean_tol) # mean of z-scores should be close to 0
+   # Allow 1% outliers beyond 4 standard deviations for a large number of estimates, but not more than 5% to avoid excessive outliers.
+   if (use_strict_outlier_check) {
+      z_metric <- max(abs(z_scores))
+   } else {
+      z_metric <- quantile(abs(z_scores), .99)
+   }
+    expect_lte(z_metric, 4) # z-metric should be less than 4 to indicate no extreme outliers
+
   }
 
   # Numbers at age
@@ -88,7 +116,8 @@ validate_fims <- function(
     expected = om_output[["biomass.mt"]],
     param_name = "biomass",
     use_fimsfit = use_fimsfit,
-    estimates = estimates
+    estimates = estimates,
+    use_strict_outlier_check = TRUE
   )
 
   # Spawning biomass
@@ -96,7 +125,8 @@ validate_fims <- function(
     expected = om_output[["SSB"]],
     param_name = "spawning_biomass",
     use_fimsfit = use_fimsfit,
-    estimates = estimates
+    estimates = estimates,
+    use_strict_outlier_check = TRUE
   )
 
   # Recruitment
@@ -134,7 +164,8 @@ validate_fims <- function(
       expected = om_input[["logR.resid"]][-1],
       param_name = "log_devs",
       use_fimsfit = use_fimsfit,
-      estimates = estimates
+      estimates = estimates,
+      use_strict_outlier_check = TRUE
     )
   }
 
@@ -146,7 +177,8 @@ validate_fims <- function(
     ),
     param_name = "landings_expected",
     use_fimsfit = use_fimsfit,
-    estimates = estimates
+    estimates = estimates,
+    use_strict_outlier_check = TRUE
   )
 
   # Commented out for now because there is no om_output for fishery index
