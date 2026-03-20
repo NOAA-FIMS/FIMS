@@ -399,7 +399,7 @@ run_FIMS_projection_scenario <- function(om_input,
   if (!is.null(ssb_ratio_target)) {
     # Setup log_f_multiplier to allow F_mort values in the projection period
     # to be scaled to achieve the target spawning biomass ratio. log_Fmort will
-    # be constant in years where log_f_multiplier is estimates and
+    # be constant in years where log_f_multiplier is estimated and
     # log_f_multiplier will be constant in the years where log_Fmort is
     # estimated to avoid confounding of the estimates.
     #
@@ -421,7 +421,7 @@ run_FIMS_projection_scenario <- function(om_input,
       # to force the values to be close to equal. This setup is needed because
       # the currently likelihood pointer structure requires likelihood functions
       # to apply to an entire parameter vector rather than specific years. This
-      # will replaced in future refactoring that is currently in progress to
+      # will be replaced in future refactoring that is currently in progress to
       # allow subvector pointers for likelihood components and to incorporate
       # mapping off parameters through TMB. The convoluted process below of
       # setting up various log_sd values was to maintain constant values without

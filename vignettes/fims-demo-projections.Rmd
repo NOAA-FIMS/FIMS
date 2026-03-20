@@ -53,7 +53,7 @@ default_configurations <- create_default_configurations(data = data_4_model)
 
 ## Projections
 
-Here we specify how many years beyond the terminal data year projections should be run for. This could be short (<10) for constant catch scenarios or long (1 or more generations) in order to calculate equilibrium reference points such as Fmsy and Bmsy.
+Here we specify how many years beyond the terminal data year that projections extend out. This could be short (<10) for constant catch scenarios or long (one or more generations) to calculate equilibrium reference points such as fishing mortality at maximum sustainable yield or biomass at maximum sustainable yield.
 
 ```{r projections}
 years_of_projection <- 10
@@ -134,9 +134,9 @@ parameters_projection <- create_default_parameters(
 ) |>
   tidyr::unnest(cols = data) |>
   # Update log_Fmort initial values for Fleet1
-  # In this simple example we are simply projecting the population forward with
-  # the terminal year mortality values. More advanced approaches are included
-  # in the test file test-projections-looped.R
+  # Project the population forward with the terminal year mortality values.
+  # More advanced approaches are included in
+  # tests/testthat/test-projections-looped.R
   dplyr::rows_update(
     tibble::tibble(
       fleet_name = "fleet1",
@@ -229,13 +229,9 @@ parameters_projection <- create_default_parameters(
   )
 ```
 
-Setting up projections to achieve a reference point target
+Reference-point targets are currently achieved by specifying a prior on `spawning_biomass_ratio`, a derived population quantity, in the final year/s of the projection period. Additionally, a prior can be specified on `log_f_multiplier`, which is a simple annual multiplier of fishing mortality, i.e., `F_mort` that allows the total fishing mortality for the population to be adjusted while keeping relative fleet effort constant by fixing `log_Fmort`. This approach allows the annual `log_f_multiplier` to be estimated while ensuring that total fishing mortality is held constant during the projection period and achieves the spawning biomass target.
   
-Reference point targets are currently achieved by specifying a prior on the derived population quantity spawning_biomass_ratio in the final year/s of the projection period as well as a mean target for the parameter log_f_multiplier which is a simple annual multiplier of F_mort that allows the population total F to be adjusted while keeping relative fleet effort constant by fixing log_Fmort.
-  
-This approach allows annual log_f_multiplier to be estimated while ensuring that total F is held constant during the projection period and achieves the spawning biomass target.
-  
-The wrapper functions used in this vignette are not yet capable of setting up priors so the full projection approach is not included here. This is a high priority development goal that is in progress. Examples of setting up constraints on log_f_multiplier and a prior on spawning biomass ratio can be found in the test-projections-looped.R test files used to validate this approach.  
+The wrapper functions used in this vignette are not yet capable of setting up priors so the full projection approach is not included here. This is a high-priority development goal that is in progress. Examples of setting up constraints on `log_f_multiplier` and a prior on `spawning_biomass_ratio` can be found in the test-projections-looped.R test files used to verify this approach.  
 
 ### Model fit
 
