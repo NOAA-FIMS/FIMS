@@ -462,7 +462,35 @@ FIMSFit <- function(
     dimnames(sdreport[["cov.fixed"]]) <- list(parameter_names, parameter_names)
   }
 
-  model_output <- input[["model"]]$get_output()
+  # Reshape the TMB estimates
+  # If the model is not optimized, opt is an empty list and is not used in
+  # reshape_tmb_estimates().
+  tmb_estimates <- reshape_tmb_estimates(
+    obj = obj,
+    sdreport = sdreport,
+    opt = opt,
+    parameter_names = parameter_names
+  )
+
+  # Create JSON output for FIMS run
+  model_output <- input[["model"]]$get_output(do_sd_report = FALSE)
+  # Reshape the JSON estimates
+  json_estimates <- reshape_json_estimates(model_output)
+  # Merge json_estimates into tmb_estimates based on parameter id
+  # TODO: Need uncertainty from TMB for derived quantities
+  # TODO: change order of columns
+  estimates <- dplyr::left_join(
+    json_estimates,
+    tmb_estimates |>
+      dplyr::filter(!is.na(parameter_id)) |>
+      dplyr::select(-initial, -module_name, -module_id, -estimate, -label),
+    by = c("parameter_id")
+  ) |>
+    dplyr::mutate(
+      uncertainty = dplyr::coalesce(uncertainty.x, uncertainty.y),
+      .after = "estimation_type"
+    ) |>
+    dplyr::select(-uncertainty.x, -uncertainty.y)
 
   fit <- methods::new(
     "FIMSFit",
@@ -574,7 +602,7 @@ fit_fims <- function(input,
       control = control
     )
   )
-  maxgrad0 <- maxgrad <- max(abs(obj$gr(opt$par)))
+  maxgrad0 <- maxgrad <- max(abs(obj$gr(opt[["par"]])))
   if (number_of_loops > 0) {
     cli::cli_inform(c(
       "i" = "Restarting optimizer {number_of_loops} times to improve gradient."
@@ -604,7 +632,10 @@ fit_fims <- function(input,
   }
   time_optimization <- Sys.time() - t0
   cli::cli_inform(c("v" = "Finished optimization"))
-  set_fixed(opt$par)
+
+  check_mle_convergence(input, obj, opt, maxgrad, filename)
+
+  FIMS::set_fixed(opt[["par"]])
 
   time_sdreport <- NA
   if (get_sd) {
@@ -612,6 +643,7 @@ fit_fims <- function(input,
     sdreport <- TMB::sdreport(obj)
     cli::cli_inform(c("v" = "Finished sdreport"))
     time_sdreport <- Sys.time() - t2
+    check_sdreport_convergence(input, obj, opt, sdreport, filename)
   } else {
     sdreport <- list()
     time_sdreport <- as.difftime(0, units = "secs")
