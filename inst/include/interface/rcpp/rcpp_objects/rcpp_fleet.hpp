@@ -12,6 +12,8 @@
 #include "../../../common/def.hpp"
 #include "../../../population_dynamics/fleet/fleet.hpp"
 #include "rcpp_interface_base.hpp"
+#include <string>
+#include <exception>
 
 /**
  * @brief Rcpp interface that serves as the parent class for Rcpp fleet
@@ -390,6 +392,7 @@ class FleetInterface : public FleetInterfaceBase {
    * object.
    */
   virtual void finalize() {
+    FIMS_INFO_LOG(std::string("Finalizing Fleet ") + fims::to_string(this->id));
     if (this->finalized) {
       // log warning that finalize has been called more than once.
       FIMS_WARNING_LOG("Fleet " + fims::to_string(this->id) +
@@ -454,6 +457,11 @@ class FleetInterface : public FleetInterfaceBase {
 
     std::stringstream ss;
 
+    FIMS_INFO_LOG(std::string("add_to_fims_tmb_internal: linking Fleet id ") + fims::to_string(this->id) +
+            ", n_years=" + fims::to_string(this->n_years.get()) +
+            ", n_ages=" + fims::to_string(this->n_ages.get()) +
+            ", n_lengths=" + fims::to_string(this->n_lengths.get()));
+
     // set relative info
     fleet->id = this->id;
     fleet->n_ages = this->n_ages.get();
@@ -483,11 +491,13 @@ class FleetInterface : public FleetInterfaceBase {
         ss.str("");
         ss << "Fleet." << this->id << ".log_q." << this->log_q[i].id_m;
         info->RegisterParameterName(ss.str());
+        FIMS_INFO_LOG(std::string("Registering parameter: ") + ss.str());
         info->RegisterParameter(fleet->log_q[i]);
       }
       if (this->log_q[i].estimation_type_m.get() == "random_effects") {
         ss.str("");
         ss << "Fleet." << this->id << ".log_q." << this->log_q[i].id_m;
+        FIMS_INFO_LOG(std::string("Registering random effect: ") + ss.str());
         info->RegisterRandomEffectName(ss.str());
         info->RegisterRandomEffect(fleet->log_q[i]);
       }
@@ -511,14 +521,16 @@ class FleetInterface : public FleetInterfaceBase {
       if (this->log_Fmort[i].estimation_type_m.get() == "fixed_effects") {
         ss.str("");
         ss << "Fleet." << this->id << ".log_Fmort." << this->log_Fmort[i].id_m;
-        info->RegisterParameterName(ss.str());
-        info->RegisterParameter(fleet->log_Fmort[i]);
+          FIMS_INFO_LOG(std::string("Registering parameter: ") + ss.str());
+          info->RegisterParameterName(ss.str());
+          info->RegisterParameter(fleet->log_Fmort[i]);
       }
       if (this->log_Fmort[i].estimation_type_m.get() == "random_effects") {
         ss.str("");
         ss << "Fleet." << this->id << ".log_Fmort." << this->log_Fmort[i].id_m;
-        info->RegisterRandomEffectName(ss.str());
-        info->RegisterRandomEffect(fleet->log_Fmort[i]);
+          FIMS_INFO_LOG(std::string("Registering random effect: ") + ss.str());
+          info->RegisterRandomEffectName(ss.str());
+          info->RegisterRandomEffect(fleet->log_Fmort[i]);
       }
     }
     // add to variable_map
@@ -564,6 +576,7 @@ class FleetInterface : public FleetInterfaceBase {
 
     // add to Information
     info->fleets[fleet->id] = fleet;
+    FIMS_INFO_LOG(std::string("Registered Fleet in Information id ") + fims::to_string(fleet->id));
     return true;
   }
 

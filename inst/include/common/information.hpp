@@ -250,6 +250,7 @@ class Information {
    */
   void RegisterParameter(Type& p) {
     this->fixed_effects_parameters.push_back(&p);
+    FIMS_INFO_LOG("Registered fixed effect parameter (address) ");
   }
 
   /**
@@ -259,6 +260,7 @@ class Information {
    */
   void RegisterRandomEffect(Type& re) {
     this->random_effects_parameters.push_back(&re);
+    FIMS_INFO_LOG("Registered random effect parameter (address) ");
   }
 
   /**
@@ -268,6 +270,7 @@ class Information {
    */
   void RegisterParameterName(std::string p_name) {
     this->parameter_names.push_back(p_name);
+    FIMS_INFO_LOG(std::string("Registered parameter name: ") + p_name);
   }
 
   /**
@@ -277,6 +280,7 @@ class Information {
    */
   void RegisterRandomEffectName(std::string re_name) {
     this->random_effects_names.push_back(re_name);
+    FIMS_INFO_LOG(std::string("Registered random effect name: ") + re_name);
   }
 
   /**
@@ -808,9 +812,12 @@ class Information {
         if (pt != this->populations.end()) {
           std::shared_ptr<fims_popdy::Population<Type>> p = (*pt).second;
           model->populations.push_back(p);
-          for (size_t i = 0; i < p->fleets.size(); i++) {
-            model->fleets[p->fleets[i]->GetId()] = p->fleets[i];
-          }
+            for (size_t i = 0; i < p->fleets.size(); i++) {
+              uint32_t fid = p->fleets[i]->GetId();
+              model->fleets[fid] = p->fleets[i];
+              FIMS_INFO_LOG(std::string("Linked fleet id ") + fims::to_string(fid) +
+                            std::string(" into model id ") + fims::to_string(model->GetId()));
+            }
         } else {
           valid_model = false;
           FIMS_ERROR_LOG("No population object defined for model " +
