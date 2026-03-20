@@ -297,15 +297,18 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
     double res = dnorm.evaluate();
     if (std::isnan(res) || std::isinf(res)) {
       FIMS_ERROR_LOG(std::string("DnormDistribution evaluate returned NaN/Inf for id ") + fims::to_string(this->id_m));
+      Rcpp::Rcerr << std::string("DnormDistribution evaluate returned NaN/Inf for id ") + fims::to_string(this->id_m) << std::endl;
     } else {
       FIMS_INFO_LOG(std::string("DnormDistribution evaluate returned ") + std::to_string(res) + std::string(" for id ") + fims::to_string(this->id_m));
     }
     return res;
     } catch (const std::exception &e) {
       FIMS_ERROR_LOG(std::string("Exception evaluating DnormDistribution id ") + fims::to_string(this->id_m) + std::string(": ") + std::string(e.what()));
+      Rcpp::Rcerr << std::string("Exception evaluating DnormDistribution id ") + fims::to_string(this->id_m) + std::string(": ") + std::string(e.what()) << std::endl;
       return 0.0;
     } catch (...) {
       FIMS_ERROR_LOG(std::string("Unknown exception evaluating DnormDistribution id ") + fims::to_string(this->id_m));
+      Rcpp::Rcerr << std::string("Unknown exception evaluating DnormDistribution id ") + fims::to_string(this->id_m) << std::endl;
       return 0.0;
     }
   }
@@ -664,15 +667,18 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
     double res = dlnorm.evaluate();
     if (std::isnan(res) || std::isinf(res)) {
       FIMS_ERROR_LOG(std::string("LogNormalLPDF evaluate returned NaN/Inf for id ") + fims::to_string(this->id_m));
+      Rcpp::Rcerr << "LogNormalLPDF evaluate returned NaN/Inf for id " << this->id_m << std::endl;
     } else {
       FIMS_INFO_LOG(std::string("LogNormalLPDF evaluate returned ") + std::to_string(res) + std::string(" for id ") + fims::to_string(this->id_m));
     }
     return res;
     } catch (const std::exception &e) {
       FIMS_ERROR_LOG(std::string("Exception evaluating LogNormalLPDF id ") + fims::to_string(this->id_m) + std::string(": ") + std::string(e.what()));
+      Rcpp::Rcerr << "Exception evaluating LogNormalLPDF id " << this->id_m << ": " << e.what() << std::endl;
       return 0.0;
     } catch (...) {
       FIMS_ERROR_LOG(std::string("Unknown exception evaluating LogNormalLPDF id ") + fims::to_string(this->id_m));
+      Rcpp::Rcerr << "Unknown exception evaluating LogNormalLPDF id " << this->id_m << std::endl;
       return 0.0;
     }
   }
@@ -1010,15 +1016,18 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
     double res = dmultinom.evaluate();
     if (std::isnan(res) || std::isinf(res)) {
       FIMS_ERROR_LOG(std::string("MultinomialLPMF evaluate returned NaN/Inf for id ") + fims::to_string(this->id_m));
+      Rcpp::Rcerr << std::string("MultinomialLPMF evaluate returned NaN/Inf for id ") + fims::to_string(this->id_m) << std::endl;
     } else {
       FIMS_INFO_LOG(std::string("MultinomialLPMF evaluate returned ") + std::to_string(res) + std::string(" for id ") + fims::to_string(this->id_m));
     }
     return res;
     } catch (const std::exception &e) {
       FIMS_ERROR_LOG(std::string("Exception evaluating MultinomialLPMF id ") + fims::to_string(this->id_m) + std::string(": ") + std::string(e.what()));
+      Rcpp::Rcerr << std::string("Exception evaluating MultinomialLPMF id ") + fims::to_string(this->id_m) + std::string(": ") + std::string(e.what()) << std::endl;
       return 0.0;
     } catch (...) {
       FIMS_ERROR_LOG(std::string("Unknown exception evaluating MultinomialLPMF id ") + fims::to_string(this->id_m));
+      Rcpp::Rcerr << std::string("Unknown exception evaluating MultinomialLPMF id ") + fims::to_string(this->id_m) << std::endl;
       return 0.0;
     }
   }
