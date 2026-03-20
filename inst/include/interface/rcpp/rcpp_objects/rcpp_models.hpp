@@ -660,7 +660,24 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
     model->do_reporting = false;
 #endif
 
-    double value = model_internal->Evaluate();
+    double value;
+    FIMS_INFO_LOG(std::string("Calling Model::Evaluate for model id ") + fims::to_string(this->get_id()));
+    try {
+      value = model_internal->Evaluate();
+      if (std::isnan(value) || std::isinf(value)) {
+        FIMS_ERROR_LOG(std::string("Model::Evaluate returned NaN/Inf for model id ") + fims::to_string(this->get_id()));
+      } else {
+        FIMS_INFO_LOG(std::string("Model::Evaluate returned value ") + std::to_string(value) + " for model id " + fims::to_string(this->get_id()));
+      }
+    } catch (const std::exception &e) {
+      FIMS_ERROR_LOG(std::string("Exception during Model::Evaluate for model id ") + fims::to_string(this->get_id()) + ": " + std::string(e.what()));
+      value = static_cast<double>(0.0);
+      throw e;
+    } catch (...) {
+      FIMS_ERROR_LOG(std::string("Unknown exception during Model::Evaluate for model id ") + fims::to_string(this->get_id()));
+      value = static_cast<double>(0.0);
+      throw;
+    }
 
     std::stringstream ss;
 
@@ -797,7 +814,7 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
         fleet_ids.insert(*fids);
       }
       ss << this->population_to_json(population_interface.get());
-    } else {t
+    } else {
       FIMS_ERROR_LOG("CatchAtAge::to_json: Population with id " + fims::to_string(*pop_it) +
                      " not found in live objects.");
       ss << "{}";  // Return empty JSON for this population
