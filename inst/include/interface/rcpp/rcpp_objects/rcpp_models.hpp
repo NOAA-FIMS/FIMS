@@ -271,9 +271,17 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
       ss << " \"id\":" << population_interface->log_M.id_m << ",\n";
       ss << " \"type\": \"vector\",\n";
       ss << " \"dimensionality\": {\n";
-      ss << "  \"header\": [\"na\"],\n";
-      ss << "  \"dimensions\": [" << population_interface->log_M.size()
-         << "]\n},\n";
+      if (population_interface->log_M.size() ==
+        population_interface->n_years.get() * population_interface->n_ages.get()) {
+        ss << " \"header\": [\"n_years\", \"n_ages\"],\n";
+        ss << " \"dimensions\": [" << population_interface->n_years.get() << ", "
+        << population_interface->n_ages.get() << "]\n";
+      } else {
+        ss << " \"header\": [\"scalar\"],\n";
+        ss << " \"dimensions\": [" << population_interface->log_M.size()
+        << "]\n";
+      }
+      ss << "},\n";
       ss << " \"values\": " << population_interface->log_M << "\n\n";
       ss << "},\n";
 
@@ -1014,7 +1022,7 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
           fims::Vector<std::string>{"n_years", "n_ages"});
 
       derived_quantities["mortality_M"] = fims::Vector<Type>(
-          population->n_years.get() * population->n_ages.get());
+          this->log_M.size());
       fims::Vector<std::string> dim_names;
       if (population->log_M.size() ==
           population->n_years.get() * population->n_ages.get()) {
