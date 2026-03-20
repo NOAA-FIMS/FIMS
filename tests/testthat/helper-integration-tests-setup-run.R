@@ -235,7 +235,8 @@ prepare_test_data <- function() {
       distribution = dplyr::if_else(
         label == "log_devs" & module_type == "BevertonHolt",
         NA_character_,
-        distribution      )
+        distribution
+      )
     ) |>
     dplyr::filter(!(module_name == "Recruitment" & label == "log_sd"))
 

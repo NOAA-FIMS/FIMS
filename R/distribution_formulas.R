@@ -386,8 +386,8 @@ initialize_process_distribution <- function(
   # validity check on user input
   args <- list(family = family, sd = sd)
   check_distribution_validity(args)
-  
-  if(!is.element(par,c("log_devs", "log_r"))) {
+
+  if (!is.element(par, c("log_devs", "log_r"))) {
     return()
   }
   expected <- switch(paste0(par, "_", class(module)),
@@ -482,7 +482,7 @@ initialize_process_distribution <- function(
 #' @keywords distribution
 #' @export
 initialize_process_structure <- function(module, par) {
-  if(!is.element(par,c("log_devs", "log_r"))) {
+  if (!is.element(par, c("log_devs", "log_r"))) {
     return()
   }
   new_process_module <- switch(paste0(par, "_", class(module)),

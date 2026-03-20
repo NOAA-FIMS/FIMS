@@ -52,8 +52,8 @@ test_that("`create_default_parameters()` works with correct inputs", {
 
 ## Edge handling ----
 test_that("`create_default_parameters()` works with edge cases", {
-  # Set up a model without a distribution for recruitment, which should lead to 
-  # `log_devs` having an estimation_type of "constant" and no `log_sd` parameter 
+  # Set up a model without a distribution for recruitment, which should lead to
+  # `log_devs` having an estimation_type of "constant" and no `log_sd` parameter
   # being created.
   updated_configurations <- default_configurations |>
     tidyr::unnest(cols = data) |>
@@ -88,7 +88,8 @@ test_that("`create_default_parameters()` works with edge cases", {
     rep("constant", result |>
       tidyr::unnest(cols = data) |>
       dplyr::filter(module_name == "Recruitment", label == "log_devs") |>
-      nrow()))
+      nrow())
+  )
 })
 
 ## Error handling ----

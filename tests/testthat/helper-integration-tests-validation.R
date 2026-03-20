@@ -46,7 +46,6 @@ validate_fims <- function(
   em_input,
   use_fimsfit = FALSE
 ) {
-
   # Helper function to validate estimates against expected values
   validate_error <- function(expected,
                              param_name,
@@ -92,15 +91,14 @@ validate_fims <- function(
     # Since these are time series data, it is not appropriate to test sd ~ 1 due to autocorrelation.
     z_scores <- (object_estimate - expected) / object_uncertainty
     # mean_tol <- qnorm(.975) / sqrt(length(expected)) # 95% confidence interval for mean of z-scores
-   # expect_lte(abs(mean(z_scores)), mean_tol) # mean of z-scores should be close to 0
-   # Allow 1% outliers beyond 4 standard deviations for a large number of estimates, but not more than 5% to avoid excessive outliers.
-   if (use_strict_outlier_check) {
+    # expect_lte(abs(mean(z_scores)), mean_tol) # mean of z-scores should be close to 0
+    # Allow 1% outliers beyond 4 standard deviations for a large number of estimates, but not more than 5% to avoid excessive outliers.
+    if (use_strict_outlier_check) {
       z_metric <- max(abs(z_scores))
-   } else {
+    } else {
       z_metric <- quantile(abs(z_scores), .99)
-   }
+    }
     expect_lte(z_metric, 4) # z-metric should be less than 4 to indicate no extreme outliers
-
   }
 
   # Numbers at age

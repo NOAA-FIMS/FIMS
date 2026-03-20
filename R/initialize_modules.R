@@ -56,8 +56,8 @@ initialize_module <- function(parameters, data, module_name, fleet_name = NA_cha
       "spawning_biomass_ratio"
     ))
   }
-  
-  if(module_class_name == "BevertonHoltRecruitment"){
+
+  if (module_class_name == "BevertonHoltRecruitment") {
     module_fields <- setdiff(module_fields, c(
       "x",
       "log_r",
@@ -831,18 +831,20 @@ initialize_fims <- function(parameters, data) {
 
   recruitment_process_input <- parameters |>
     dplyr::filter(module_name == "Recruitment" & distribution_type == "process")
-  
+
   if (recruitment_process_input |> nrow() == 0) {
     process_par <- parameters |>
       dplyr::filter(module_name == "Recruitment" & (label == "log_devs" | label == "log_r"))
-    process_par_name <- process_par |> dplyr::pull(label) |> unique()
-    if(any(process_par[["estimation_type"]] != "constant")){
+    process_par_name <- process_par |>
+      dplyr::pull(label) |>
+      unique()
+    if (any(process_par[["estimation_type"]] != "constant")) {
       cli::cli_abort(c(
         x = "Missing required inputs for recruitment process random or fixed effects.",
         i = "There is no distribution specified for the {.var {process_par_name}} variable in the recruitment module.",
-        i = "Implement either one of the following options to resolve this error:", 
-              i = "1. Set a distribution and distribution_typefor the Recruitment {.var module_name} in configurations tibble.",
-              i = "2. Set the estimation_type for the recruitment {.var {process_par_name}} variable in the parameter tibble to {.var constant}."
+        i = "Implement either one of the following options to resolve this error:",
+        i = "1. Set a distribution and distribution_typefor the Recruitment {.var module_name} in configurations tibble.",
+        i = "2. Set the estimation_type for the recruitment {.var {process_par_name}} variable in the parameter tibble to {.var constant}."
       ))
     }
     # TODO: need to revisit initialize_process_structure and add R tests
@@ -851,32 +853,32 @@ initialize_fims <- function(parameters, data) {
       par = "log_devs"
     )
   } else {
-    par <- recruitment_process_input |> dplyr::filter(label != "log_sd") |>
+    par <- recruitment_process_input |>
+      dplyr::filter(label != "log_sd") |>
       dplyr::pull(label) |>
       unique()
 
-    if ( any(recruitment_process_input |> dplyr::filter(label != "log_sd") |>
-             dplyr::pull(estimation_type) == "constant") ) {
+    if (any(recruitment_process_input |> dplyr::filter(label != "log_sd") |>
+      dplyr::pull(estimation_type) == "constant")) {
       cli::cli_abort(c(
         x = "Missing required inputs for recruitment process random or fixed effects.",
         i = "The estimation type for {.var {par}} is constant, but there is a distribution specifified for the Recruitment {.var module_name} in the configurations tibble.",
-        i = "Implement either one of the following options to resolve this error:", 
-              i = "1. Set the distribution for the Recruitment distribution and distribution_type to {.var NA} in the configurations tibble.",
-              i = "2. Set the estimation_type for the recruitment {.var {par}} in the parameter tibble to {.var random_effects} or {.var fixed_effects}."
+        i = "Implement either one of the following options to resolve this error:",
+        i = "1. Set the distribution for the Recruitment distribution and distribution_type to {.var NA} in the configurations tibble.",
+        i = "2. Set the estimation_type for the recruitment {.var {par}} in the parameter tibble to {.var random_effects} or {.var fixed_effects}."
       ))
     }
 
-    
 
     # Initialize_process_distribution
-    sd_input <-  recruitment_process_input |> dplyr::filter(label == "log_sd")
+    sd_input <- recruitment_process_input |> dplyr::filter(label == "log_sd")
     recruitment_distribution <- initialize_process_distribution(
-        module = recruitment,
-        par = par,
-        # TODO: need to update family and match options from the distribution
-        # column from the parameters tibble
-        family = gaussian(),
-        sd = sd_input
+      module = recruitment,
+      par = par,
+      # TODO: need to update family and match options from the distribution
+      # column from the parameters tibble
+      family = gaussian(),
+      sd = sd_input
     )
 
     recruitment_process <- initialize_process_structure(
@@ -884,7 +886,7 @@ initialize_fims <- function(parameters, data) {
       par = par
     )
   }
-  
+
 
   # Growth
   growth <- initialize_growth(

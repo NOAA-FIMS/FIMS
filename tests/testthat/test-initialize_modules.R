@@ -47,12 +47,12 @@ test_that("`initialize_fims()` works with edge cases", {
         time <= 11,
         "constant",
         estimation_type
-      ), 
+      ),
       distribution_type = dplyr::if_else(
         time <= 11,
         NA_character_,
         distribution_type
-      ), 
+      ),
       distribution = dplyr::if_else(
         time <= 11,
         NA_character_,
@@ -81,7 +81,7 @@ test_that("`initialize_fims()` works with edge cases", {
   )
   clear()
 
-  missing_recruitment_distribution <- create_default_configurations(data = data)  |>
+  missing_recruitment_distribution <- create_default_configurations(data = data) |>
     tidyr::unnest(cols = data) |>
     dplyr::rows_update(
       y = tibble::tibble(
@@ -124,10 +124,11 @@ test_that("`initialize_fims()` works with edge cases", {
     ),
     random = "re",
     DLL = "FIMS"
-  ) 
-  
+  )
+
   expect_equal(
-    obj$report()[["nll_components"]] |> length(), 6)
+    obj$report()[["nll_components"]] |> length(), 6
+  )
 
   clear()
 })
@@ -181,61 +182,62 @@ test_that("`initialize_fims()` returns correct error messages", {
   )
   clear()
 
-  
-## Error handling ----
-test_that("`initialize_recruitment()` returns correct error messages", {
-   missing_recruitment_distribution <- create_default_configurations(data = data)  |>
-    tidyr::unnest(cols = data) |>
-    dplyr::rows_update(
-      y = tibble::tibble(
-        module_name = "Recruitment",
-        distribution_type = NA_character_,
-        distribution = NA_character_
-      ),
-      by = "module_name"
-    ) |>
-    create_default_parameters(data = data)
-  missing_recruitment_distribution_error <-
-    missing_recruitment_distribution |>
+
+  ## Error handling ----
+  test_that("`initialize_recruitment()` returns correct error messages", {
+    missing_recruitment_distribution <- create_default_configurations(data = data) |>
       tidyr::unnest(cols = data) |>
-        dplyr::rows_update(
-            y = tibble::tibble(
-              module_name = "Recruitment",
-              label = "log_devs",
-              time = 2:30,
-              estimation_type = "random_effects"
-            ),
-            by = c("module_name", "label", "time")
-        )
-  
-  #' @description Test that `initialize_fims()` returns correct error with distribution estimation type mismatch.
-  expect_error(
-    missing_recruitment_distribution_error |> 
-    initialize_fims(data = data),
-    "Missing required inputs for recruitment process")
-  
-  clear()
+      dplyr::rows_update(
+        y = tibble::tibble(
+          module_name = "Recruitment",
+          distribution_type = NA_character_,
+          distribution = NA_character_
+        ),
+        by = "module_name"
+      ) |>
+      create_default_parameters(data = data)
+    missing_recruitment_distribution_error <-
+      missing_recruitment_distribution |>
+      tidyr::unnest(cols = data) |>
+      dplyr::rows_update(
+        y = tibble::tibble(
+          module_name = "Recruitment",
+          label = "log_devs",
+          time = 2:30,
+          estimation_type = "random_effects"
+        ),
+        by = c("module_name", "label", "time")
+      )
 
-  mismatch_error <- default_parameters |> 
-    dplyr::rows_update(
-      y = tibble::tibble(
-        module_name = "Recruitment",
-        label = "log_devs",
-        time = 2:30,
-        estimation_type = "constant"
-      ),
-      by = c("module_name", "label", "time")
-    ) 
+    #' @description Test that `initialize_fims()` returns correct error with distribution estimation type mismatch.
+    expect_error(
+      missing_recruitment_distribution_error |>
+        initialize_fims(data = data),
+      "Missing required inputs for recruitment process"
+    )
 
-  #' @description Test that `initialize_recruitment()` handles missing distribution for recruitment correctly.
-   expect_error(
-    mismatch_error |> 
-      initialize_fims(data = data),
-    "Missing required inputs for recruitment process")
-  
-  clear()
-   })
-  
+    clear()
+
+    mismatch_error <- default_parameters |>
+      dplyr::rows_update(
+        y = tibble::tibble(
+          module_name = "Recruitment",
+          label = "log_devs",
+          time = 2:30,
+          estimation_type = "constant"
+        ),
+        by = c("module_name", "label", "time")
+      )
+
+    #' @description Test that `initialize_recruitment()` handles missing distribution for recruitment correctly.
+    expect_error(
+      mismatch_error |>
+        initialize_fims(data = data),
+      "Missing required inputs for recruitment process"
+    )
+
+    clear()
+  })
 })
 
 # test_initialize_recruitment ----
@@ -592,8 +594,8 @@ test_that("`initialize_fims()` works with edge cases", {
       distribution = dplyr::if_else(
         time <= 11,
         NA_character_,
-        distribution  
-    )
+        distribution
+      )
     )
 
   parameters_multiple_types <- default_parameters |>

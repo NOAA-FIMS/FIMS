@@ -171,7 +171,7 @@ create_default_parameters <- function(
     maturity_temp,
     population_temp
   )
- 
+
   # Merge with configuration_unnest
   expanded_configurations <- dplyr::full_join(
     temp,
@@ -179,20 +179,20 @@ create_default_parameters <- function(
     by = c("module_name", "fleet_name", "module_type")
   ) |>
     dplyr::mutate(
-    model_family = dplyr::coalesce(model_family.y, model_family.x),
-    distribution_type = dplyr::coalesce(distribution_type.y, distribution_type.x),
-    distribution = dplyr::coalesce(distribution.y, distribution.x),
-    distribution_type = dplyr::if_else(
-    module_name == "Recruitment" & !label %in% c("log_devs", "log_r", "log_sd"),
-    NA_character_,
-    distribution_type
-  ),
-  distribution = dplyr::if_else(
-    module_name == "Recruitment" & !label %in% c("log_devs", "log_r", "log_sd"),
-    NA_character_,
-    distribution
-  )
-) |>
+      model_family = dplyr::coalesce(model_family.y, model_family.x),
+      distribution_type = dplyr::coalesce(distribution_type.y, distribution_type.x),
+      distribution = dplyr::coalesce(distribution.y, distribution.x),
+      distribution_type = dplyr::if_else(
+        module_name == "Recruitment" & !label %in% c("log_devs", "log_r", "log_sd"),
+        NA_character_,
+        distribution_type
+      ),
+      distribution = dplyr::if_else(
+        module_name == "Recruitment" & !label %in% c("log_devs", "log_r", "log_sd"),
+        NA_character_,
+        distribution
+      )
+    ) |>
     dplyr::select(-dplyr::ends_with(c(".x", ".y"))) |>
     tidyr::fill(model_family, .direction = "downup") |>
     dplyr::select(
@@ -620,7 +620,8 @@ create_default_maturity <- function(
 #' @noRd
 create_default_BevertonHoltRecruitment <- function(
   data,
-  distribution = NA_character_) {
+  distribution = NA_character_
+) {
   # Create default parameters for Beverton--Holt recruitment
   log_rzero <- create_default_parameters_template(
     n_parameters = 1
@@ -649,7 +650,7 @@ create_default_BevertonHoltRecruitment <- function(
       time = (get_start_year(data) + 1):get_end_year(data),
       estimation_type = "random_effects"
     )
-  if(is.na(distribution)){
+  if (is.na(distribution)) {
     log_devs <- log_devs |>
       dplyr::rows_update(
         tibble::tibble(
@@ -822,16 +823,16 @@ create_default_recruitment <- function(
         input_type = "process"
       )
     )
-    distribution_default <- 
+    distribution_default <-
       distribution_default |> dplyr::rows_update(
-      tibble::tibble(
-        label = "log_sd",
-        estimation_type = "fixed_effects"),
+        tibble::tibble(
+          label = "log_sd",
+          estimation_type = "fixed_effects"
+        ),
         by = "label"
       )
   }
 
   default <- dplyr::bind_rows(form_default, distribution_default) |>
     tidyr::fill(module_name, module_type)
-  
 }
