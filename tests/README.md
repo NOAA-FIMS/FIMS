@@ -29,6 +29,27 @@ Prepare the test data in the new file or in a separate file if you plan on reusi
 
 Follow the structure of the new test file to write appropriate correctness, edge-handling, and error-handling tests.
 
+### :stopwatch: Add benchmarks for a test
+
+Benchmarks measure performance of selected C++ workloads (for example, a
+population dynamics calculation) using
+[Google Benchmark](https://github.com/google/benchmark). Benchmarks live in
+`tests/google_benchmark/` and are separate from unit tests.
+
+- Call `FIMS:::use_google_benchmark_template(name = "Module_Workload")` to
+  create a new benchmark file
+  `tests/google_benchmark/benchmark_Module_Workload.cpp` and register it in
+  `tests/google_benchmark/CMakeLists.txt`.
+- The generated file includes TODO comments that show where to:
+  - include the appropriate header or test fixture
+  - set up any shared state for the benchmark
+  - call the workload you want to time inside the benchmark loop
+- Whenever possible, reuse the same GoogleTest fixture that the corresponding
+  unit test uses so that the benchmark and test exercise the same workload.
+- Add a benchmark only when you care about performance of a specific,
+  well-defined workload (for example, after profiling has identified it as
+  slow, or when guarding against regressions in a critical section of code).
+
 #### :hammer: Helper functions to set up tests
 
 The following :hammer: helper functions are available to assist with writing integration tests in R.
@@ -56,6 +77,11 @@ The following {testthat} functions can be used at the beginning of a test file t
 
 - [`FIMS:::setup_and_run_gtest()`](https://noaa-fims.github.io/FIMS/reference/setup_and_run_gtest.html): Set up integration test data and run the GoogleTest suite.
 - [`FIMS:::run_gtest()`](https://noaa-fims.github.io/FIMS/reference/run_gtest.html): Run the GoogleTest suite.
+- C++ benchmarks are built as separate executables (for example,
+  `benchmark_population_CatchNumbersAtAge`) in `build/tests/google_benchmark/`.
+  After configuring and building with CMake, run a benchmark directly from the
+  command line, e.g.,
+  `./build/tests/google_benchmark/benchmark_population_CatchNumbersAtAge`.
 
 ### R
 
