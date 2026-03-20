@@ -149,8 +149,14 @@ methods::setMethod(
   "Ops",
   signature(e1 = "Rcpp_Parameter", e2 = "Rcpp_Parameter"),
   function(e1, e2) {
-    ret <- methods::new(Parameter)
-    ret$value <- methods::callGeneric(e1$value, e2$value)
+    result <- methods::callGeneric(e1$value, e2$value)
+    if (.Generic %in% c("+", "-", "*", "/", "^", "%%", "%/%")) {
+      ret <- methods::new(Parameter)
+      ret$value <- result
+      return(ret)
+    } else {
+      return(result)
+    }
   }
 )
 
@@ -162,8 +168,14 @@ methods::setMethod(
     if (length(e2) != 1) {
       stop("Call to operator Ops, value not scalar")
     }
-    ret <- methods::new(Parameter)
-    ret$value <- methods::callGeneric(e1$value, e2)
+    result <- methods::callGeneric(e1$value, e2)
+    if (.Generic %in% c("+", "-", "*", "/", "^", "%%", "%/%")) {
+      ret <- methods::new(Parameter)
+      ret$value <- result
+      return(ret)
+    } else {
+      return(result)
+    }
   }
 )
 
@@ -174,8 +186,14 @@ methods::setMethod(
     if (length(e1) != 1) {
       stop("Call to operator Ops, value not scalar")
     }
-    ret <- methods::new(Parameter)
-    ret$value <- methods::callGeneric(e1, e2$value)
+    result <- methods::callGeneric(e1, e2$value)
+    if (.Generic %in% c("+", "-", "*", "/", "^", "%%", "%/%")) {
+      ret <- methods::new(Parameter)
+      ret$value <- result
+      return(ret)
+    } else {
+      return(result)
+    }
   }
 )
 
