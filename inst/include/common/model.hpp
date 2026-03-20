@@ -98,7 +98,7 @@ class Model {  // may need singleton
             m->Evaluate();
           } catch (const std::exception &e) {
             FIMS_ERROR_LOG(std::string("Exception evaluating model ") + fims::to_string(model_id) + ": " + std::string(e.what()));
-            throe e;  // rethrow after logging
+            throw e;  // rethrow after logging
           } catch (...) {
             FIMS_ERROR_LOG(std::string("Unknown exception evaluating model ") + fims::to_string(model_id));
             throw;  // rethrow after logging
