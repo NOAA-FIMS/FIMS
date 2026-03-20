@@ -250,7 +250,6 @@ class Information {
    */
   void RegisterParameter(Type& p) {
     this->fixed_effects_parameters.push_back(&p);
-    FIMS_INFO_LOG("Registered fixed effect parameter (address) ");
   }
 
   /**
@@ -260,8 +259,7 @@ class Information {
    */
   void RegisterRandomEffect(Type& re) {
     this->random_effects_parameters.push_back(&re);
-    FIMS_INFO_LOG("Registered random effect parameter (address) ");
-  }
+\  }
 
   /**
    * @brief Register a parameter name.
@@ -270,7 +268,6 @@ class Information {
    */
   void RegisterParameterName(std::string p_name) {
     this->parameter_names.push_back(p_name);
-    FIMS_INFO_LOG(std::string("Registered parameter name: ") + p_name);
   }
 
   /**
@@ -280,7 +277,6 @@ class Information {
    */
   void RegisterRandomEffectName(std::string re_name) {
     this->random_effects_names.push_back(re_name);
-    FIMS_INFO_LOG(std::string("Registered random effect name: ") + re_name);
   }
 
   /**
@@ -766,20 +762,6 @@ class Information {
                          "\" undefined, not found for Population \"" +
                          fims::to_string(p->id) + "\". ");
         }
-        // // error check and set population elements
-        // // check me - add another fleet iterator to push information from
-        // for (fleet_iterator it = this->fleets.begin(); it !=
-        // this->fleets.end();
-        //      ++it)
-        // {
-        //     // Initialize fleet object
-        //     std::shared_ptr<fims_popdy::Fleet<Type>> f = (*it).second;
-        //     // population to the individual fleets This is to pass landings
-        //     at age
-        //     // from population to fleets?
-        //     // any shared member in p (population is pushed into fleets)
-        //     p->fleets.push_back(f);
-        // }
       }
 
       // set information dimensions
@@ -839,6 +821,7 @@ class Information {
    * errors.
    */
   bool CreateModel() {
+    FIMS_INFO_LOG("Creating model and checking for required components...");
     bool valid_model = true;
 
     CreateFleetObjects(valid_model);
@@ -853,6 +836,12 @@ class Information {
     SetupPriors();
     SetupRandomEffects();
     SetupData();
+    
+    if(valid_model) {
+      FIMS_INFO_LOG("Model successfully created.");
+    } else {
+      FIMS_ERROR_LOG("Model creation failed.");
+    }
 
     return valid_model;
   }
