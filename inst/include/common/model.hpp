@@ -47,6 +47,7 @@ class Model {  // may need singleton
       Model<Type>::fims_model = std::make_shared<fims_model::Model<Type>>();
       Model<Type>::fims_model->fims_information =
           fims_info::Information<Type>::GetInstance();
+      FIMS_INFO_LOG("Created Model singleton");
     }
     return Model<Type>::fims_model;
   }
@@ -84,17 +85,40 @@ class Model {  // may need singleton
     int nll_vec_idx = 0;
     size_t n_priors = 0;
     for (d_it = this->fims_information->density_components.begin();
+
+      // Log overview counts for easier diagnosis
+      size_t models_count = this->fims_information->models_map.size();
+      size_t densities_count = this->fims_information->density_components.size();
+      FIMS_INFO_LOG(std::string("Starting Evaluate(): ") + fims::to_string(models_count) + " models, " +
+                    fims::to_string(densities_count) + " density components");
+      if (models_count == 0) {
+        FIMS_WARNING_LOG("No models found in models_map");
+        return jnll;  // Return early since there's nothing to evaluate
+      }
+      if (densities_count == 0) {
+        FIMS_WARNING_LOG("No density components found in density_components");
+      }
          d_it != this->fims_information->density_components.end(); ++d_it) {
       std::shared_ptr<fims_distributions::DensityComponentBase<Type>> d =
           (*d_it).second;
-#ifdef TMB_MODEL
-      d->of = this->of;
-#endif
-      if (d->input_type == "prior") {
-        nll_vec[nll_vec_idx] = -d->evaluate();
-        jnll += nll_vec[nll_vec_idx];
-        n_priors += 1;
-        nll_vec_idx += 1;
+      for (m_it = this->fims_information->models_map.begin();
+           m_it != this->fims_information->models_map.end(); ++m_it) {
+        //(*m_it).second points to the Model module
+        uint32_t model_id = (*m_it).first;
+        FIMS_INFO_LOG(std::string("Preparing/Evaluating model ") + fims::to_string(model_id));
+        std::shared_ptr<fims_popdy::FisheryModelBase<Type>> m = (*m_it).second;
+        try {
+          m->of = this->of;  // link to TMB objective function
+          m->Prepare();
+          m->Evaluate();
+        } catch (const std::exception &e) {
+          FIMS_ERROR_LOG(std::string("Exception evaluating model ") + fims::to_string(model_id) + ": " + std::string(e.what()));
+          throw e;  // Re-throw the exception after logging
+        } catch (...) {
+          FIMS_ERROR_LOG(std::string("Unknown exception evaluating model ") + fims::to_string(model_id));
+          throw;  // Re-throw the exception after logging
+        }
+      }
       }
     }
   
@@ -151,6 +175,11 @@ class Model {  // may need singleton
 
     return jnll;
   }
+      FIMS_INFO_LOG(std::string("Evaluate summary: ") + fims::to_string(n_priors) + " priors, " +
+                    fims::to_string(n_random_effects) + " random_effects, " + fims::to_string(n_data) + " data components");
+      if (n_data == 0) {
+        FIMS_WARNING_LOG("No data components evaluated (n_data == 0)");
+      }
 };
 
 // Create singleton instance of Model class
