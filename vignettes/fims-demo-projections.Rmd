@@ -75,10 +75,13 @@ data_big_with_extra_year <- dplyr::add_row(
   name = "fleet1",
   value = -999,
   unit = "mt"
-)
+) |>
+  dplyr::filter(
+    !(type == "age_to_length_conversion" | type == "length_comp")
+  )
 data_4_projections <- data_big_with_extra_year |>
-  # Add on weight_at_age data for 10 more years because you don't want these
-  # filled with -999
+  # Add on weight_at_age and age_to_length_conversion data for 10 more years
+  # because you don't want these filled with -999
   dplyr::bind_rows(
     dplyr::filter(
       data_big,
@@ -87,7 +90,7 @@ data_4_projections <- data_big_with_extra_year |>
     ) |>
       dplyr::select(-timing) |>
       merge(
-        data.frame(timing = max(data_big[["timing"]]):(max(data_big[["timing"]]) + 10))
+        data.frame(timing = max(data_big[["timing"]]):(max(data_big[["timing"]]) + years_of_projection))
       )
   ) |>
   # Make a FIMSFrame object out of this data frame with the extra row to add all
