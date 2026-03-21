@@ -1,0 +1,744 @@
+name: build-metrics
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: read
+
+concurrency:
+  group: build-metrics-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  metrics:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      BASELINE_REPOSITORY: ${{ github.event.pull_request.base.repo.full_name || github.repository }}
+      REGRESSION_PCT: 15
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Install system dependencies
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y libcurl4-openssl-dev libfontconfig1-dev libfreetype6-dev libfribidi-dev libharfbuzz-dev libssl-dev libxml2-dev make pkg-config procps time
+
+      - uses: r-lib/actions/setup-r@v2
+
+      - name: Install package dependencies and capture metrics
+        run: |
+          set -euo pipefail
+
+          collect_descendant_pids() {
+            local parent_pid="$1"
+            local child_pid
+
+            echo "$parent_pid"
+            for child_pid in $(pgrep -P "$parent_pid" 2>/dev/null || true); do
+              collect_descendant_pids "$child_pid"
+            done
+          }
+
+          capture_memory_snapshot() {
+            local label="$1"
+
+            free -m > "${label}_free_m.txt" 2>/dev/null || true
+            cp /proc/meminfo "${label}_proc_meminfo.txt" 2>/dev/null || true
+
+            if [ -r /sys/fs/cgroup/memory.stat ]; then
+              cp /sys/fs/cgroup/memory.stat "${label}_cgroup_memory_stat.txt" 2>/dev/null || true
+            elif [ -r /sys/fs/cgroup/memory/memory.stat ]; then
+              cp /sys/fs/cgroup/memory/memory.stat "${label}_cgroup_memory_stat.txt" 2>/dev/null || true
+            fi
+
+            {
+              for cgroup_file in \
+                /sys/fs/cgroup/memory.current \
+                /sys/fs/cgroup/memory.peak \
+                /sys/fs/cgroup/memory.max \
+                /sys/fs/cgroup/memory.high \
+                /sys/fs/cgroup/memory.events \
+                /sys/fs/cgroup/memory.swap.current \
+                /sys/fs/cgroup/memory.swap.max \
+                /sys/fs/cgroup/memory/memory.usage_in_bytes \
+                /sys/fs/cgroup/memory/memory.max_usage_in_bytes \
+                /sys/fs/cgroup/memory/memory.limit_in_bytes \
+                /sys/fs/cgroup/memory/memory.memsw.usage_in_bytes \
+                /sys/fs/cgroup/memory/memory.memsw.limit_in_bytes; do
+                if [ -r "$cgroup_file" ]; then
+                  printf "%s\t%s\n" "$cgroup_file" "$(tr '\n' ' ' < "$cgroup_file")"
+                fi
+              done
+            } > "${label}_cgroup_memory_values.tsv"
+          }
+
+          sample_memory_until_done() {
+            local prefix="$1"
+            local command_pid="$2"
+            local samples_file="${prefix}_memory_samples.tsv"
+
+            printf "timestamp_epoch\tprocess_tree_rss_kb\tprocess_count\n" > "$samples_file"
+            while kill -0 "$command_pid" 2>/dev/null; do
+              local timestamp_epoch
+              local process_tree_rss_kb=0
+              local process_count=0
+              local pids
+
+              timestamp_epoch=$(date +%s)
+
+              pids=$(collect_descendant_pids "$command_pid" | sort -n | uniq | awk '{ pids = pids sep $1; sep = "," } END { print pids }')
+              if [ -n "$pids" ]; then
+                process_tree_rss_kb=$(ps -o rss= -p "$pids" 2>/dev/null | awk '{sum += $1} END {print sum + 0}')
+                process_count=$(printf "%s" "$pids" | awk -F, '{print NF}')
+              fi
+
+              printf "%s\t%s\t%s\n" "$timestamp_epoch" "$process_tree_rss_kb" "$process_count" >> "$samples_file"
+              sleep 1
+            done
+          }
+
+          run_with_memory_metrics() {
+            local prefix="$1"
+            shift
+
+            capture_memory_snapshot "${prefix}_before"
+
+            /usr/bin/time -v "$@" > >(tee "${prefix}.log") 2>&1 &
+            local command_pid=$!
+
+            sample_memory_until_done "$prefix" "$command_pid" &
+            local sampler_pid=$!
+
+            set +e
+            wait "$command_pid"
+            local install_status=$?
+            kill "$sampler_pid" 2>/dev/null
+            wait "$sampler_pid" 2>/dev/null
+            set -e
+
+            capture_memory_snapshot "${prefix}_after"
+
+            awk -F '\t' 'NR > 1 && max < $2 {max = $2} END {print max + 0}' "${prefix}_memory_samples.tsv" > "${prefix}_sampled_peak_process_tree_rss_kb.txt"
+            awk -F '\t' 'NR > 1 && max < $3 {max = $3} END {print max + 0}' "${prefix}_memory_samples.tsv" > "${prefix}_sampled_peak_process_count.txt"
+
+            return "$install_status"
+          }
+
+          run_with_memory_metrics dependency_install Rscript -e 'repos <- c(`noaa-fisheries-integrated-toolbox` = "https://noaa-fisheries-integrated-toolbox.r-universe.dev", CRAN = Sys.getenv("RSPM", "https://packagemanager.posit.co/cran/__linux__/noble/latest")); options(repos = repos); install.packages("remotes"); remotes::install_deps(dependencies = c("Depends", "Imports", "LinkingTo"), upgrade = "never")'
+
+          Rscript -e 'required <- unique(c("cli", "dplyr", "ggplot2", "glue", "jsonlite", "purrr", "Rcpp", "rlang", "scales", "tibble", "TMB", "RcppEigen")); missing <- required[!vapply(required, requireNamespace, logical(1), quietly = TRUE)]; if (length(missing)) { stop("Required packages failed to install: ", paste(missing, collapse = ", ")) }'
+
+      - name: Install FIMS and capture metrics
+        timeout-minutes: 10
+        run: |
+          set -euo pipefail
+
+          collect_descendant_pids() {
+            local parent_pid="$1"
+            local child_pid
+
+            echo "$parent_pid"
+            for child_pid in $(pgrep -P "$parent_pid" 2>/dev/null || true); do
+              collect_descendant_pids "$child_pid"
+            done
+          }
+
+          capture_memory_snapshot() {
+            local label="$1"
+
+            free -m > "${label}_free_m.txt" 2>/dev/null || true
+            cp /proc/meminfo "${label}_proc_meminfo.txt" 2>/dev/null || true
+
+            if [ -r /sys/fs/cgroup/memory.stat ]; then
+              cp /sys/fs/cgroup/memory.stat "${label}_cgroup_memory_stat.txt" 2>/dev/null || true
+            elif [ -r /sys/fs/cgroup/memory/memory.stat ]; then
+              cp /sys/fs/cgroup/memory/memory.stat "${label}_cgroup_memory_stat.txt" 2>/dev/null || true
+            fi
+
+            {
+              for cgroup_file in \
+                /sys/fs/cgroup/memory.current \
+                /sys/fs/cgroup/memory.peak \
+                /sys/fs/cgroup/memory.max \
+                /sys/fs/cgroup/memory.high \
+                /sys/fs/cgroup/memory.events \
+                /sys/fs/cgroup/memory.swap.current \
+                /sys/fs/cgroup/memory.swap.max \
+                /sys/fs/cgroup/memory/memory.usage_in_bytes \
+                /sys/fs/cgroup/memory/memory.max_usage_in_bytes \
+                /sys/fs/cgroup/memory/memory.limit_in_bytes \
+                /sys/fs/cgroup/memory/memory.memsw.usage_in_bytes \
+                /sys/fs/cgroup/memory/memory.memsw.limit_in_bytes; do
+                if [ -r "$cgroup_file" ]; then
+                  printf "%s\t%s\n" "$cgroup_file" "$(tr '\n' ' ' < "$cgroup_file")"
+                fi
+              done
+            } > "${label}_cgroup_memory_values.tsv"
+          }
+
+          sample_memory_until_done() {
+            local prefix="$1"
+            local command_pid="$2"
+            local samples_file="${prefix}_memory_samples.tsv"
+
+            printf "timestamp_epoch\tprocess_tree_rss_kb\tprocess_count\n" > "$samples_file"
+            while kill -0 "$command_pid" 2>/dev/null; do
+              local timestamp_epoch
+              local process_tree_rss_kb=0
+              local process_count=0
+              local pids
+
+              timestamp_epoch=$(date +%s)
+
+              pids=$(collect_descendant_pids "$command_pid" | sort -n | uniq | awk '{ pids = pids sep $1; sep = "," } END { print pids }')
+              if [ -n "$pids" ]; then
+                process_tree_rss_kb=$(ps -o rss= -p "$pids" 2>/dev/null | awk '{sum += $1} END {print sum + 0}')
+                process_count=$(printf "%s" "$pids" | awk -F, '{print NF}')
+              fi
+
+              printf "%s\t%s\t%s\n" "$timestamp_epoch" "$process_tree_rss_kb" "$process_count" >> "$samples_file"
+              sleep 1
+            done
+          }
+
+          run_with_memory_metrics() {
+            local prefix="$1"
+            shift
+
+            capture_memory_snapshot "${prefix}_before"
+
+            /usr/bin/time -v "$@" > >(tee "${prefix}.log") 2>&1 &
+            local command_pid=$!
+
+            sample_memory_until_done "$prefix" "$command_pid" &
+            local sampler_pid=$!
+
+            set +e
+            wait "$command_pid"
+            local install_status=$?
+            kill "$sampler_pid" 2>/dev/null
+            wait "$sampler_pid" 2>/dev/null
+            set -e
+
+            capture_memory_snapshot "${prefix}_after"
+
+            awk -F '\t' 'NR > 1 && max < $2 {max = $2} END {print max + 0}' "${prefix}_memory_samples.tsv" > "${prefix}_sampled_peak_process_tree_rss_kb.txt"
+            awk -F '\t' 'NR > 1 && max < $3 {max = $3} END {print max + 0}' "${prefix}_memory_samples.tsv" > "${prefix}_sampled_peak_process_count.txt"
+
+            return "$install_status"
+          }
+
+          run_with_memory_metrics package_install R CMD INSTALL .
+
+      - name: Capture installed package size metrics
+        run: |
+          set -euo pipefail
+          Rscript -e 'cat(system.file(package = "FIMS"))' > installed_package_path.txt
+          INSTALLED_PACKAGE_PATH=$(cat installed_package_path.txt)
+          if [ -z "$INSTALLED_PACKAGE_PATH" ]; then
+            echo "Could not find installed FIMS package path."
+            exit 1
+          fi
+
+          du -sh "$INSTALLED_PACKAGE_PATH" > installed_package_size.txt
+          du -sb "$INSTALLED_PACKAGE_PATH" | awk '{print $1}' > installed_package_size_bytes.txt
+          find "$INSTALLED_PACKAGE_PATH" -type f | wc -l > installed_file_count.txt
+          find "$INSTALLED_PACKAGE_PATH" \( -name "*.so" -o -name "*.dll" -o -name "*.dylib" \) -type f -printf "%p\t%s\n" | sort > installed_shared_objects.tsv
+          awk '{sum += $2} END {print sum + 0}' installed_shared_objects.tsv > installed_shared_object_total_bytes.txt
+          wc -l < installed_shared_objects.tsv > installed_shared_object_count.txt
+
+      - name: Parse metrics
+        run: |
+          set -euo pipefail
+
+          python3 <<'EOF'
+          import json
+          import re
+          from pathlib import Path
+
+          def read_text(path):
+              return Path(path).read_text(errors="replace") if Path(path).exists() else ""
+
+          def parse_elapsed_seconds(text):
+              match = re.search(r"Elapsed \(wall clock\) time.*?:\s*([0-9:.]+)\s*$", text, re.MULTILINE)
+              if not match:
+                  return None
+              raw = match.group(1)
+              parts = raw.split(":")
+              try:
+                  if len(parts) == 3:
+                      return round(float(parts[0]) * 3600 + float(parts[1]) * 60 + float(parts[2]), 2)
+                  if len(parts) == 2:
+                      return round(float(parts[0]) * 60 + float(parts[1]), 2)
+                  return round(float(parts[0]), 2)
+              except ValueError:
+                  return None
+
+          def parse_max_rss_kb(text):
+              match = re.search(r"Maximum resident set size.*?:\s*([0-9]+)\s*$", text, re.MULTILINE)
+              return int(match.group(1)) if match else None
+
+          def count_warnings(text):
+              return len(re.findall(r"warning:", text))
+
+          def count_errors(text):
+              lines = [line for line in text.splitlines() if not re.search(r"[0-9]+ error\(s\) generated", line)]
+              return sum("error:" in line for line in lines)
+
+          def read_int(path):
+              path = Path(path)
+              if not path.exists():
+                  return 0
+              text = path.read_text().strip()
+              return int(text) if text else 0
+
+          dependency_log = read_text("dependency_install.log")
+          package_log = read_text("package_install.log")
+
+          dependency_rss_kb = parse_max_rss_kb(dependency_log)
+          package_rss_kb = parse_max_rss_kb(package_log)
+          dependency_sampled_peak_process_tree_rss_kb = read_int("dependency_install_sampled_peak_process_tree_rss_kb.txt")
+          dependency_sampled_peak_process_count = read_int("dependency_install_sampled_peak_process_count.txt")
+          package_sampled_peak_process_tree_rss_kb = read_int("package_install_sampled_peak_process_tree_rss_kb.txt")
+          package_sampled_peak_process_count = read_int("package_install_sampled_peak_process_count.txt")
+
+          shared_objects = {}
+          shared_object_path = Path("installed_shared_objects.tsv")
+          if shared_object_path.exists():
+              for line in shared_object_path.read_text().splitlines():
+                  path, size = line.split("\t")
+                  shared_objects[path] = int(size)
+
+          metrics = {
+              "commit_sha": __import__("os").environ.get("GITHUB_SHA", "unknown"),
+              "timestamp": __import__("datetime").datetime.now(__import__("datetime").timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+              "dependency_install_time_sec": parse_elapsed_seconds(dependency_log),
+              "dependency_install_max_rss_kb": dependency_rss_kb,
+              "dependency_install_max_rss_mb": round(dependency_rss_kb / 1024, 2) if dependency_rss_kb is not None else None,
+              "dependency_install_sampled_peak_process_tree_rss_kb": dependency_sampled_peak_process_tree_rss_kb,
+              "dependency_install_sampled_peak_process_tree_rss_mb": round(dependency_sampled_peak_process_tree_rss_kb / 1024, 2),
+              "dependency_install_sampled_peak_process_count": dependency_sampled_peak_process_count,
+              "package_install_time_sec": parse_elapsed_seconds(package_log),
+              "package_install_max_rss_kb": package_rss_kb,
+              "package_install_max_rss_mb": round(package_rss_kb / 1024, 2) if package_rss_kb is not None else None,
+              "package_install_sampled_peak_process_tree_rss_kb": package_sampled_peak_process_tree_rss_kb,
+              "package_install_sampled_peak_process_tree_rss_mb": round(package_sampled_peak_process_tree_rss_kb / 1024, 2),
+              "package_install_sampled_peak_process_count": package_sampled_peak_process_count,
+              "peak_ram_mb": round(package_rss_kb / 1024, 2) if package_rss_kb is not None else None,
+              "warning_count": count_warnings(package_log),
+              "error_count": count_errors(package_log),
+              "installed_package_size_bytes": read_int("installed_package_size_bytes.txt"),
+              "installed_file_count": read_int("installed_file_count.txt"),
+              "installed_shared_object_total_bytes": read_int("installed_shared_object_total_bytes.txt"),
+              "installed_shared_object_count": read_int("installed_shared_object_count.txt"),
+              "installed_shared_objects": shared_objects,
+          }
+
+          Path("metrics.json").write_text(json.dumps(metrics, indent=2, sort_keys=True) + "\n")
+          print(Path("metrics.json").read_text())
+          EOF
+
+      - name: Download latest main metrics artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          echo "Looking for baseline metrics in $BASELINE_REPOSITORY."
+
+          BASELINE_RUN_IDS=$(gh run list \
+            --repo "$BASELINE_REPOSITORY" \
+            --workflow build-metrics.yml \
+            --branch main \
+            --event push \
+            --status success \
+            --limit 20 \
+            --json databaseId \
+            --jq '.[].databaseId')
+
+          if [ -z "$BASELINE_RUN_IDS" ]; then
+            echo "No successful main push run found for baseline metrics."
+            exit 0
+          fi
+
+          for BASELINE_RUN_ID in $BASELINE_RUN_IDS; do
+            echo "Checking main push run $BASELINE_RUN_ID for build-metrics-main artifact."
+            rm -rf baseline-metrics
+            mkdir -p baseline-metrics
+
+            if gh run download "$BASELINE_RUN_ID" \
+              --repo "$BASELINE_REPOSITORY" \
+              --name build-metrics-main \
+              --dir baseline-metrics; then
+              if [ -f baseline-metrics/metrics.json ]; then
+                cp baseline-metrics/metrics.json previous_metrics.json
+                echo "Downloaded baseline metrics from main push run $BASELINE_RUN_ID."
+                break
+              fi
+              echo "Run $BASELINE_RUN_ID had the artifact but no metrics.json file."
+            else
+              echo "No build-metrics-main artifact found for main push run $BASELINE_RUN_ID."
+            fi
+          done
+
+          if [ ! -f previous_metrics.json ]; then
+            echo "No usable build-metrics-main artifact found in the last 20 successful main push runs."
+          fi
+
+      - name: Compare against previous metrics
+        run: |
+          set -euo pipefail
+
+          python3 <<'EOF'
+          import json
+          import os
+          from pathlib import Path
+
+          threshold = float(os.environ["REGRESSION_PCT"])
+          current = json.loads(Path("metrics.json").read_text())
+          previous_path = Path("previous_metrics.json")
+
+          rows = []
+          regressions = []
+          summary_sections = []
+
+          metrics = [
+              ("dependency_install_time_sec", "Dependency install time", "s", False),
+              ("dependency_install_max_rss_mb", "Dependency install Max RSS", "MB", False),
+              ("dependency_install_sampled_peak_process_tree_rss_mb", "Dependency install sampled process tree RSS peak", "MB", False),
+              ("dependency_install_sampled_peak_process_count", "Dependency install sampled process count peak", "processes", False),
+              ("package_install_time_sec", "FIMS install time", "s", True),
+              ("package_install_max_rss_mb", "FIMS install Max RSS", "MB", True),
+              ("package_install_sampled_peak_process_tree_rss_mb", "FIMS install sampled process tree RSS peak", "MB", True),
+              ("package_install_sampled_peak_process_count", "FIMS install sampled process count peak", "processes", False),
+              ("peak_ram_mb", "Peak RAM during FIMS install", "MB", True),
+              ("installed_package_size_bytes", "Installed package size", "bytes", True),
+              ("installed_file_count", "Installed file count", "files", True),
+              ("installed_shared_object_total_bytes", "Installed shared object total size", "bytes", True),
+              ("installed_shared_object_count", "Installed shared object count", "files", True),
+              ("warning_count", "Warning count", "warnings", True),
+              ("error_count", "Error count", "errors", True),
+          ]
+
+          summary_metrics = [
+              (
+                  "FIMS installation",
+                  [
+                      ("package_install_time_sec", "Install time", "s"),
+                      ("package_install_max_rss_mb", "Max RSS from time -v", "MB"),
+                      ("package_install_sampled_peak_process_tree_rss_mb", "Sampled process tree RSS peak", "MB"),
+                      ("package_install_sampled_peak_process_count", "Sampled process count peak", "processes"),
+                      ("installed_package_size_bytes", "Installed package size", "bytes"),
+                      ("installed_file_count", "Installed file count", "files"),
+                      ("installed_shared_object_total_bytes", "Installed shared object total size", "bytes"),
+                      ("warning_count", "Warnings", "warnings"),
+                      ("error_count", "Errors", "errors"),
+                  ],
+              ),
+              (
+                  "Dependency installation",
+                  [
+                      ("dependency_install_time_sec", "Install time", "s"),
+                      ("dependency_install_max_rss_mb", "Max RSS from time -v", "MB"),
+                      ("dependency_install_sampled_peak_process_tree_rss_mb", "Sampled process tree RSS peak", "MB"),
+                      ("dependency_install_sampled_peak_process_count", "Sampled process count peak", "processes"),
+                  ],
+              ),
+          ]
+
+          def format_value(value, unit):
+              if value is None:
+                  return "null"
+              if unit == "bytes":
+                  try:
+                      return f"{int(value):,} bytes"
+                  except (TypeError, ValueError):
+                      return f"{value} bytes"
+              if unit in {"files", "processes", "warnings", "errors"}:
+                  return f"{value} {unit}"
+              return f"{value} {unit}"
+
+          def format_change(curr, prev):
+              if curr is None:
+                  return ""
+              if prev is None:
+                  return "no previous data"
+              if prev == 0:
+                  return "percent change unavailable"
+              pct = ((curr - prev) / prev) * 100
+              return f"{pct:+.1f}%"
+
+          def ram_class(mb):
+              if mb is None:
+                  return "unknown"
+              if mb <= 1024:
+                  return "1 GB"
+              if mb <= 2048:
+                  return "2 GB"
+              if mb <= 4096:
+                  return "4 GB"
+              if mb <= 8192:
+                  return "8 GB"
+              if mb <= 16384:
+                  return "16 GB"
+              return "32+ GB"
+
+          def numeric_values(*values):
+              result = []
+              for value in values:
+                  if value is None:
+                      continue
+                  try:
+                      result.append(float(value))
+                  except (TypeError, ValueError):
+                      continue
+              return result
+
+          def build_environment_estimate():
+              observed_candidates = numeric_values(
+                  current.get("package_install_sampled_peak_process_tree_rss_mb"),
+                  current.get("package_install_max_rss_mb"),
+              )
+              observed_peak_mb = max(observed_candidates) if observed_candidates else None
+              disk_bytes = current.get("installed_package_size_bytes")
+              disk_text = format_value(disk_bytes, "bytes")
+              if observed_peak_mb is None:
+                  return [
+                      "#### Estimated Minimum Build Environment",
+                      "",
+                      "Observed peak memory was unavailable, so the heuristic table could not be computed.",
+                      "",
+                  ]
+
+              clang_min_class = ram_class(observed_peak_mb * 2.0)
+              clang_rec_class = ram_class(observed_peak_mb * 4.0)
+              gcc_min_class = ram_class(observed_peak_mb * 4.0)
+              gcc_rec_class = ram_class(observed_peak_mb * 8.0)
+              observed_text = f"{observed_peak_mb:.2f} MB observed FIMS install peak RSS"
+
+              return [
+                  "#### Estimated Minimum Build Environment",
+                  "",
+                  "Estimated minimum build environment (heuristic):",
+                  "",
+                  "| Compiler | Estimated minimum RAM | Recommended RAM | Estimated disk space | Derived from |",
+                  "|---|---:|---:|---:|---|",
+                  f"| clang++ | {clang_min_class} | {clang_rec_class} | 2-4 GB | {observed_text} and {disk_text} installed package size |",
+                  f"| g++ | {gcc_min_class} | {gcc_rec_class} | 4-8 GB | {observed_text} with GCC safety multiplier and {disk_text} installed package size |",
+                  "",
+                  "These values are heuristic estimates based on observed peak RSS and safety multipliers. They are not guaranteed lower bounds.",
+                  "",
+              ]
+
+          def summary_table(title, entries, previous):
+              lines = [f"#### {title}", "", "| Metric | Current | Previous | Change |", "| --- | ---: | ---: | ---: |"]
+              for key, label, unit in entries:
+                  curr = current.get(key)
+                  prev = previous.get(key) if previous else None
+                  lines.append(
+                      f"| {label} | {format_value(curr, unit)} | {format_value(prev, unit) if previous else 'none'} | {format_change(curr, prev)} |"
+                  )
+              return lines
+
+          lines = ["PACKAGE RESOURCE METRICS COMPARISON:", ""]
+          lines.append(f"Current commit: {current.get('commit_sha', 'unknown')}")
+
+          previous = None
+          if previous_path.exists():
+              previous = json.loads(previous_path.read_text())
+              lines.append(f"Previous commit: {previous.get('commit_sha', 'unknown')}")
+          else:
+              lines.append("Previous commit: none")
+          lines.append("")
+
+          if previous is None:
+              lines.append("No previous metrics found. This is the first run for this workflow or no usable main artifact is available.")
+          else:
+              for key, label, unit, gated in metrics:
+                  curr = current.get(key)
+                  prev = previous.get(key)
+                  if curr is None:
+                      rows.append(f"{label}: null")
+                      continue
+                  if prev is None:
+                      rows.append(f"{label}: {curr} {unit} (no previous data)")
+                      continue
+                  if prev == 0:
+                      pct = None
+                  else:
+                      pct = ((curr - prev) / prev) * 100
+                  if pct is None:
+                      rows.append(f"{label}: {curr} {unit} (was {prev} {unit}, percent change unavailable)")
+                      if gated and curr > prev:
+                          regressions.append(f"WARNING: {label} increased from {prev} to {curr} {unit} (previous value was zero)")
+                  else:
+                      rows.append(f"{label}: {curr} {unit} (was {prev} {unit}, {pct:.1f}%)")
+                      if gated and pct > threshold:
+                          regressions.append(f"WARNING: {label} increased by {pct:.1f}% (threshold: {threshold:.0f}%)")
+
+              lines.extend(rows)
+              lines.append("")
+              lines.append("Dependency install metrics are reported but are not used to fail this workflow.")
+              lines.append("")
+              lines.append("Estimated minimum build environment (heuristic):")
+              lines.append("")
+              observed_candidates = numeric_values(
+                  current.get("package_install_sampled_peak_process_tree_rss_mb"),
+                  current.get("package_install_max_rss_mb"),
+              )
+              observed_peak_mb = max(observed_candidates) if observed_candidates else None
+              if observed_peak_mb is None:
+                  lines.append("Observed peak memory was unavailable, so the heuristic table could not be computed.")
+              else:
+                  disk_text = format_value(current.get("installed_package_size_bytes"), "bytes")
+                  lines.extend(
+                      [
+                          "| Compiler | Estimated minimum RAM | Recommended RAM | Estimated disk space | Derived from |",
+                          "|---|---:|---:|---:|---|",
+                          f"| clang++ | {ram_class(observed_peak_mb * 2.0)} | {ram_class(observed_peak_mb * 4.0)} | 2-4 GB | {observed_peak_mb:.2f}MB observed FIMS install peak RSS and {disk_text} installed package size |",
+                          f"| g++ | {ram_class(observed_peak_mb * 4.0)} | {ram_class(observed_peak_mb * 8.0)} | 4-8 GB | {observed_peak_mb:.2f}MB observed FIMS install peak RSS with GCC safety multiplier and {disk_text} installed package size |",
+                          "",
+                          "These values are heuristic estimates based on observed peak RSS and safety multipliers.",
+                          "They are not guaranteed lower bounds.",
+                      ]
+                  )
+              lines.append("")
+              if regressions:
+                  lines.append("REGRESSIONS DETECTED:")
+                  lines.extend(regressions)
+              else:
+                  lines.append("No gated regressions detected.")
+
+          Path("metrics_comparison.log").write_text("\n".join(lines) + "\n")
+          Path("regression.env").write_text(f"REGRESSION={1 if regressions else 0}\n")
+
+          summary = ["### Package resource metrics", ""]
+          summary.append(f"Current commit: `{current.get('commit_sha', 'unknown')}`")
+          summary.append(f"Previous commit: `{previous.get('commit_sha', 'unknown') if previous else 'none'}`")
+          summary.append("")
+          if regressions:
+              summary.append("**Regressions detected:**")
+              for regression in regressions:
+                  summary.append(f"- {regression}")
+          else:
+              summary.append("No gated regressions detected.")
+          summary.append("")
+
+          for title, entries in summary_metrics:
+              summary.extend(summary_table(title, entries, previous))
+              summary.append("")
+
+          summary.extend(build_environment_estimate())
+
+          summary.extend(
+              [
+                  "<details>",
+                  "<summary>Full comparison log</summary>",
+                  "",
+                  "```",
+                  Path("metrics_comparison.log").read_text().rstrip(),
+                  "```",
+                  "",
+                  "</details>",
+                  "",
+              ]
+          )
+          Path("metrics_summary.md").write_text("\n".join(summary))
+          print(Path("metrics_comparison.log").read_text())
+          EOF
+
+          cat regression.env >> "$GITHUB_ENV"
+          cat metrics_summary.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload metrics artifact
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: build-metrics-${{ github.sha }}
+          path: |
+            metrics.json
+            previous_metrics.json
+            dependency_install.log
+            dependency_install_memory_samples.tsv
+            dependency_install_sampled_peak_process_tree_rss_kb.txt
+            dependency_install_sampled_peak_process_count.txt
+            dependency_install_*_free_m.txt
+            dependency_install_*_proc_meminfo.txt
+            dependency_install_*_cgroup_memory_stat.txt
+            dependency_install_*_cgroup_memory_values.tsv
+            package_install.log
+            package_install_memory_samples.tsv
+            package_install_sampled_peak_process_tree_rss_kb.txt
+            package_install_sampled_peak_process_count.txt
+            package_install_*_free_m.txt
+            package_install_*_proc_meminfo.txt
+            package_install_*_cgroup_memory_stat.txt
+            package_install_*_cgroup_memory_values.tsv
+            installed_package_path.txt
+            installed_package_size.txt
+            installed_shared_objects.tsv
+            metrics_summary.md
+            metrics_comparison.log
+          if-no-files-found: ignore
+          retention-days: 90
+
+      - name: Upload main baseline metrics artifact
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: actions/upload-artifact@v7
+        with:
+          name: build-metrics-main
+          path: |
+            metrics.json
+            dependency_install.log
+            dependency_install_memory_samples.tsv
+            dependency_install_sampled_peak_process_tree_rss_kb.txt
+            dependency_install_sampled_peak_process_count.txt
+            dependency_install_*_free_m.txt
+            dependency_install_*_proc_meminfo.txt
+            dependency_install_*_cgroup_memory_stat.txt
+            dependency_install_*_cgroup_memory_values.tsv
+            package_install.log
+            package_install_memory_samples.tsv
+            package_install_sampled_peak_process_tree_rss_kb.txt
+            package_install_sampled_peak_process_count.txt
+            package_install_*_free_m.txt
+            package_install_*_proc_meminfo.txt
+            package_install_*_cgroup_memory_stat.txt
+            package_install_*_cgroup_memory_values.tsv
+            installed_package_path.txt
+            installed_package_size.txt
+            installed_shared_objects.tsv
+            metrics_summary.md
+            metrics_comparison.log
+          retention-days: 90
+
+      - name: Print metrics summary
+        run: |
+          if [ -f metrics_summary.md ]; then
+            cat metrics_summary.md
+          fi
+          echo ""
+          if [ -f metrics.json ]; then
+            cat metrics.json
+          fi
+          echo ""
+          if [ -f metrics_comparison.log ]; then
+            cat metrics_comparison.log
+          fi
+
+      - name: Fail on regression
+        run: |
+          if [ "$REGRESSION" = "1" ]; then
+            echo "Package resource regression detected. See metrics_comparison.log for details."
+            exit 1
+          fi
