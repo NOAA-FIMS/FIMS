@@ -324,9 +324,11 @@ NULL
 #' averaged across fleets.
 #'
 #' ## `model_age_to_length_conversion()`
-#' Returns a numeric vector of age-to-length conversion values (type
-#' `"age_to_length_conversion"`) for the specified fleet(s). Values are ordered
-#' by age and length in the order defined by [FIMSFrame()].
+#' Returns a numeric vector of age-to-length conversion values. Values are
+#' ordered by age and length in the order defined by [FIMSFrame()]. When
+#' multiple values are present across a single age and length, they are
+#' averaged because `age_to_length_conversion` data cannot vary across fleets
+#' or time.
 #'
 #' @export
 #' @rdname model_
@@ -534,7 +536,7 @@ methods::setMethod(
 #' @keywords FIMSFrame
 methods::setGeneric(
   "model_age_to_length_conversion",
-  function(x, fleet_name) standardGeneric("model_age_to_length_conversion")
+  function(x) standardGeneric("model_age_to_length_conversion")
 )
 #' @rdname model_
 #' @keywords FIMSFrame
@@ -576,11 +578,8 @@ methods::setMethod(
 methods::setMethod(
   "model_age_to_length_conversion",
   "data.frame",
-  function(x, fleet_name) {
-    model_age_to_length_conversion(
-      FIMSFrame(x),
-      fleet_name
-    )
+  function(x) {
+    model_age_to_length_conversion(FIMSFrame(x))
   }
 )
 

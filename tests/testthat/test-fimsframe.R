@@ -131,14 +131,14 @@ test_that("`fims_frame()` works with the correct inputs", {
   expect_no_error(FIMS::FIMSFrame(data_big))
 
   #' @description Test that `is.FIMSFrame()` is `TRUE` when passed a FIMSFrame object.
-  expect_true(is.FIMSFrame(fims_frame))
+  expect_true(FIMS:::is.FIMSFrame(fims_frame))
 
   #' @description Test that `is.FIMSFrame()` is FALSE when passed a data frame.
-  expect_false(is.FIMSFrame(data_big))
+  expect_false(FIMS:::is.FIMSFrame(data_big))
 
   #' @description Test that `pretty_type()`, an unexported function, returns space separated values with "comp" expanded to "composition".
   expect_equal(
-    pretty_type(x = c("age_comp", "weight_at_age")),
+    FIMS:::pretty_type(x = c("age_comp", "weight_at_age")),
     c("age composition", "weight at age")
   )
 })
@@ -296,13 +296,13 @@ test_that("`FIMSFrame()` returns correct error messages", {
   #' @description Test that `FIMSFrame()` returns an error when the age column is not present but `age_to_length_conversion` is present in type.
   expect_error(
     FIMSFrame(dplyr::select(data_big, -age)),
-    "is a required column"
+    "You are missing combinations"
   )
 
   #' @description Test that `FIMSFrame()` returns an error when the length column is not present but `age_to_length_conversion` is present in type.
   expect_error(
     FIMSFrame(dplyr::select(data_big, -length)),
-    "is a required column"
+    "You are missing combinations"
   )
 })
 
