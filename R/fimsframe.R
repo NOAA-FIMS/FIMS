@@ -686,27 +686,6 @@ methods::setValidity(
   method = function(object) {
     errors <- character()
 
-    if (NROW(object@data) == 0) {
-      errors <- c(errors, "data must have at least one row")
-    }
-
-    # FIMS models currently cannot run without weight_at_age data
-    weight_at_age_data <- dplyr::filter(object@data, type == "weight_at_age")
-    if (NROW(weight_at_age_data) == 0) {
-      errors <- c(errors, "data must contain data of the type weight_at_age")
-    }
-
-    errors <- c(errors, validate_data_colnames(object@data))
-
-    # Check the format for acceptable variants of the ideal numeric
-    if (!all(is.numeric(object@data[["timing"]]))) {
-      errors <- c(errors, "timing must be in numeric format")
-    }
-    if (!all(as.integer(object@data[["timing"]]) -
-      object@data[["timing"]] == 0)) {
-      errors <- c(errors, "timing can only handle years right now")
-    }
-
     # TODO: Add checks for other slots
     # Add validity check for types
     present_types <- unique(object@data[["type"]])
@@ -715,56 +694,11 @@ methods::setValidity(
     unknown_types <- sort(setdiff(present_types, fims_input_types))
     if (length(unknown_types) > 0) {
       cli::cli_warn(c(
-        "!" = "Data contains unexpected type(s): {unknown_types}",
-        "i" = "Allowed types are: {fims_input_types}",
+        "!" = "Data contains unexpected type{?s}: {.var {unknown_types}}.",
+        "i" = "Allowed types are: {.var {fims_input_types}}.",
         "i" = "Model will run but check that data types are correct."
       ))
     }
-
-    # validate_bin_presence(
-    #   dplyr::filter(data_big, type == "age_comp"),
-    #   age, 1:13
-    # )
-    # validate_bin_presence(
-    #   dplyr::filter(data_big, type == "length_comp"),
-    #   length,
-    #   seq(0, 1100, 50)
-    # )
-
-    if (all(c("age_comp", "age_to_length_conversion") %in% present_types)) {
-      validate_bin_presence(
-        dplyr::filter(
-          data_big, type %in% c("age_comp", "age_to_length_conversion")
-        ),
-        age,
-        get_ages(object)
-      )
-      age_bins <- get_ages(object)
-      conversion_bins_age <- object@data |>
-        dplyr::filter(type == "age_to_length_conversion") |>
-        dplyr::pull(age) |>
-        unique()
-           
-      # check that they are the same
-      # if not the same immediate throw error
-      if (length(age_bins) != length(conversion_bins)) {
-        if(length(age_bins) > length(conversion_bin)) {
-          vec1 <- "age"
-          vec2 <- "age_to_length_conversion"
-          bins_not_in <- !age_bins %in% conversion_bins 
-        }
-
-        if(length(conversion_bin) > length(age_bin)) {
-          vec1 <- "age_to_length_conversion"
-          vec2 <- "age"
-          bins_not_in <- !conversion_bins %in% age_bins
-        }
-        
-        cli::cli_abort(
-          "The following bins in your {vec1} data are not in your 
-           {vec2} data: {bins_not_in}"
-        )
-      }
 
     # Ensure composition data sum to 1.0 per group if units are proportions
     for (present_type in grep("_comp", present_types, value = TRUE)) {
@@ -787,7 +721,7 @@ methods::setValidity(
     }
   }
 )
- 
+
 validate_data_colnames <- function(data) {
   the_column_names <- colnames(data)
   errors <- character()
@@ -853,41 +787,30 @@ validate_composition_data <- function(data) {
   }
 }
 
-#' Validate that all bin categories are present
-#'
-#' Check that all data bins that are specified in `good_values` are present
-#' in the bin column for all combinations of type, name, and timing in the
-#' provided data.
-#'
-#' @param data A data frame extracted from a `FIMSFrame` object.
-#' @param column The column name of the binning information, e.g., `age`,
-#'   without quotes.
-#' @param expected_bins A vector of integer or numeric values to check for in
-#'   the specified column.
-#' @return
-#' A tibble with the following five columns: type, name, timing, the column
-#' name specified in the `column` argument, and problem. The problem column
-#' takes on either `"missing"` or `"extra"` depending if the information is
-#' missing from `data` or if the information is extra and should not be in
-#' `data` based on matching `expected_bins`.
-#' An empty tibble is returned if there are no missing or extra bins.
-validate_bin_presence <- function(data, column, expected_bins) {
-  expected <- tidyr::expand_grid(
-    type = unique(data[["type"]]),
-    name = unique(data[["name"]]),
-    timing = unique(data[["timing"]]),
-    "{{column}}" := expected_bins
+validate_dimension_of_conversion <- function(data, n_groups, n_timings) {
+  good_data <- dplyr::filter(data, value != -999)
+  good_type <- unique(data[["type"]])
+  if (length(good_type) > 1) {
+    cli::cli_abort("Only one type of data can exist in {.var data}.")
+  }
+  n_rows <- NROW(good_data)
+  n_timings <- dplyr::if_else(
+    length(unique(good_data[["timing"]])) == 1,
+    1,
+    n_timings
   )
-  present <- data |>
-    dplyr::distinct(type, name, timing, {{ column  }})
-  missing <- expected |>
-    dplyr::anti_join(present, by = colnames(expected)) |>
-    dplyr::mutate(problem = "missing")
-  opposite_missing <- present |>
-    dplyr::anti_join(expected, by = colnames(expected)) |>
-    dplyr::mutate(problem = "extra")
-
-  dplyr::bind_rows(missing, opposite_missing)
+  if (n_timings == 1 && n_rows == n_groups) {
+    return(TRUE)
+  }
+  if (n_timings * n_groups > n_rows) {
+    cli::cli_abort(
+      "You are missing combinations of timing and {good_type}, where your
+      {.var data} has {n_rows} row{?s} but should have at least
+      {n_groups * n_timings} rows."
+    )
+  } else {
+    return(TRUE)
+  }
 }
 
 # Constructors ----
@@ -950,6 +873,7 @@ validate_bin_presence <- function(data, column, expected_bins) {
 #' @export
 #' @keywords FIMSFrame
 FIMSFrame <- function(data) {
+  # Validate input data before starting to create object
   errors <- validate_data_colnames(data)
   if (length(errors) > 0) {
     stop(
@@ -962,11 +886,22 @@ FIMSFrame <- function(data) {
       "{.var data} has 0 rows of data and cannot be used to make a FIMSFrame."
     )
   }
+  # TODO: Change this check when internal estimation of growth is possible
+  if (NROW(dplyr::filter(data, type == "weight_at_age")) == 0) {
+    cli::cli_abort("{.var data} must contain {.var weight_at_age} data.")
+  }
+  if (!all(is.numeric(data[["timing"]]))) {
+    cli::cli_abort("{.var timing} must be in numeric format.")
+  }
+  if (!all(as.integer(data[["timing"]]) -
+    data[["timing"]] == 0)) {
+    cli::cli_abort("{.var timing} can only handle years right now.")
+  }
 
   # Get the earliest and latest year formatted as integers
   data_to_use_4_timing <- dplyr::filter(
     data,
-    type != "weight_at_age"
+    !type %in% c("age_to_length_conversion", "weight_at_age")
   ) |>
     dplyr::pull(timing)
   start_year <- as.integer(floor(min(data_to_use_4_timing, na.rm = TRUE)))
@@ -986,10 +921,28 @@ FIMSFrame <- function(data) {
     } else {
       # Forced to use annual age bins because the model has an annual time step
       # FUTURE: allow for different age bins rather than 1 year increment
-      ages <- min(data[["age"]], na.rm = TRUE):max(data[["age"]], na.rm = TRUE)
+      which_ages_are_not_integers <- which(
+        data[["age"]] != as.integer(data[["age"]])
+      )
+      n_bad_ages <- length(which_ages_are_not_integers)
+      if (n_bad_ages > 0) {
+        cli::cli_abort(
+          "There are {.qty {n_bad_ages}} rows of non-integer ages in
+          {.var data}. Please check the values in the {.var age} column of the
+          following row{?s}: {which_ages_are_not_integers}."
+        )
+      }
+      data_for_age_calculations <- dplyr::filter(data, type == "age_comp")
+      ages <- min(
+        data_for_age_calculations[["age"]],
+        na.rm = TRUE
+      ):max(
+        data_for_age_calculations[["age"]],
+        na.rm = TRUE
+      )
     }
   } else {
-    ages <- numeric()
+    ages <- integer()
   }
   n_ages <- length(ages)
 
@@ -997,17 +950,46 @@ FIMSFrame <- function(data) {
     if (all(is.na(data[["length"]]))) {
       lengths <- numeric()
     } else {
-      lengths <- sort(unique(data[["length"]]))
-      lengths <- lengths[!is.na(lengths)]
+      data_for_length_calculations <- dplyr::filter(data, type == "length_comp")
+      lengths <- sort(na.omit(
+        unique(data_for_length_calculations[["length"]])
+      ))
     }
   } else {
     lengths <- numeric()
   }
   n_lengths <- length(lengths)
 
+  # Check that full dimension information is available for
+  # age_to_length_conversion and weight_at_age
+  dplyr::group_by(
+    dplyr::filter(data, type == "weight_at_age"),
+    name
+  ) |>
+    dplyr::group_split() |>
+    purrr::walk(
+      validate_dimension_of_conversion,
+      n_groups = n_ages,
+      n_timings = n_years
+    )
+  dplyr::group_by(
+    dplyr::filter(data, type == "age_to_length_conversion"),
+    name
+  ) |>
+    dplyr::group_split() |>
+    purrr::walk(
+      validate_dimension_of_conversion,
+      n_groups = n_ages * n_lengths,
+      n_timings = n_years
+    )
+
   # Work on filling in missing data with -999 and arrange in the correct
   # order so that getting information out with model_*() are correct.
-  formatted_data <- tibble::as_tibble(data)
+  formatted_data <- data |>
+    dplyr::filter(
+      timing >= start_year
+    ) |>
+    tibble::as_tibble()
   missing_time_series <- create_missing_data(
     data = formatted_data,
     timings = years
@@ -1020,6 +1002,20 @@ FIMSFrame <- function(data) {
       column = age,
       types = c("weight_at_age", "age_comp")
     )
+    summary_by_name <- dplyr::count(missing_ages, name, timing) |>
+    dplyr::filter(n != n_ages) |>
+    dplyr::summarise(
+      timings = paste(timing, collapse = ", "),
+      .by = name
+    )
+    if (NROW(summary_by_name) > 0) {
+      cli::cli_abort(
+        "You cannot have missing age values for a given timing and name
+        combination. Please check your age-composition data for missing
+        ages in the following fleets, {summary_by_name$name},
+        in the following years, {summary_by_name$timings}, respectively."
+      )
+    }
   } else {
     missing_ages <- missing_time_series[0, ]
   }
@@ -1031,6 +1027,20 @@ FIMSFrame <- function(data) {
       column = length,
       types = "length_comp"
     )
+    summary_by_name <- dplyr::count(missing_lengths, name, timing) |>
+    dplyr::filter(n != n_lengths) |>
+    dplyr::summarise(
+      timings = paste(timing, collapse = ", "),
+      .by = name
+    )
+    if (NROW(summary_by_name) > 0) {
+      cli::cli_abort(
+        "You cannot have missing length values for a given timing and name
+        combination. Please check your length-composition data for missing
+        lengths in the following fleets, {summary_by_name$name},
+        in the following years, {summary_by_name$timings}, respectively."
+      )
+    }
   } else {
     missing_lengths <- missing_time_series[0, ]
   }
