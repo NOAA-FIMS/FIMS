@@ -1004,7 +1004,7 @@ FIMSFrame <- function(data) {
     )
     summary_by_name <- dplyr::count(missing_ages, name, timing) |>
     dplyr::filter(n != n_ages) |>
-    dplyr::summarise(
+    dplyr::summarize(
       timings = paste(timing, collapse = ", "),
       .by = name
     )
@@ -1029,7 +1029,7 @@ FIMSFrame <- function(data) {
     )
     summary_by_name <- dplyr::count(missing_lengths, name, timing) |>
     dplyr::filter(n != n_lengths) |>
-    dplyr::summarise(
+    dplyr::summarize(
       timings = paste(timing, collapse = ", "),
       .by = name
     )
