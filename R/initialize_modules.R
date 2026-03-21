@@ -476,9 +476,9 @@ initialize_fleet <- function(parameters, data, fleet_name, linked_ids) {
 #' @noRd
 initialize_landings <- function(data, fleet_name) {
   # Check if the specified fleet exists in the data
-  fleet_exists <- any(get_data(data)["name"] == fleet_name)
+  fleet_exists <- fleet_name %in% get_fleets(data)
   if (!fleet_exists) {
-    cli::cli_abort("Fleet {fleet_name} not found in the data object.")
+    cli::cli_abort("Fleet {.var {fleet_name}} not found in the data object.")
   }
 
   fleet_type <- dplyr::filter(
@@ -512,9 +512,9 @@ initialize_landings <- function(data, fleet_name) {
 #' @noRd
 initialize_index <- function(data, fleet_name) {
   # Check if the specified fleet exists in the data
-  fleet_exists <- any(get_data(data)["name"] == fleet_name)
+  fleet_exists <- fleet_name %in% get_fleets(data)
   if (!fleet_exists) {
-    cli::cli_abort("Fleet {fleet_name} not found in the data object.")
+    cli::cli_abort("Fleet {.var {fleet_name}} not found in the data object.")
   }
 
   fleet_type <- dplyr::filter(
@@ -581,9 +581,9 @@ initialize_comp <- function(data,
   comp <- comp_types[[type]]
 
   # Check if the specified fleet exists in the data
-  fleet_exists <- any(get_data(data)["name"] == fleet_name)
+  fleet_exists <- fleet_name %in% get_fleets(data)
   if (!fleet_exists) {
-    cli::cli_abort("Fleet `{fleet_name}` not found in the data object.")
+    cli::cli_abort("Fleet {.var fleet_name} not found in the data object.")
   }
 
   get_function <- comp[["get_n_function"]]

@@ -122,3 +122,4 @@ test_that("`create_default_configurations()` returns correct error messages", {
     )
   )
 })
+

@@ -69,7 +69,7 @@ prepare_test_data <- function() {
   data_length_comp_na <- data_length_comp_raw |>
     dplyr::filter(
       !(name == "survey1" &
-        type %in% c("index", "length_comp", "age_to_length_conversion") &
+        type %in% c("index", "length_comp") &
         timing == na_index
       )
     ) |>
@@ -95,7 +95,7 @@ prepare_test_data <- function() {
     ) |>
     dplyr::filter(
       !(name == "fleet1" &
-        type %in% c("length_comp", "age_to_length_conversion") &
+        type %in% c("length_comp") &
         timing == length_na_index
       )
     ) |>

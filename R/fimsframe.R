@@ -926,7 +926,7 @@ FIMSFrame <- function(data) {
   years <- start_year:end_year
 
   # Get the fleets represented in the data
-  fleets <- unique(data[["name"]])
+  fleets <- unique(na.omit(data[["name"]]))
   n_fleets <- length(fleets)
 
   if ("age" %in% colnames(data)) {
@@ -972,6 +972,12 @@ FIMSFrame <- function(data) {
       lengths <- sort(na.omit(
         unique(data_for_length_calculations[["length"]])
       ))
+      # Check that age_to_length_conversion data exist once
+      validate_dimension_of_conversion(
+        dplyr::filter(data, type == "age_to_length_conversion"),
+        n_groups = n_ages * length(lengths),
+        n_timings = 1
+      )
     }
   } else {
     lengths <- numeric()
@@ -989,12 +995,6 @@ FIMSFrame <- function(data) {
       n_groups = n_ages,
       n_timings = n_years
     )
-  # Check that age_to_length_conversion data exist once for all ages x lengths
-  validate_dimension_of_conversion(
-    dplyr::filter(data, type == "age_to_length_conversion"),
-    n_groups = n_ages * n_lengths,
-    n_timings = 1
-  )
 
   # Work on filling in missing data with -999 and arrange in the correct
   # order so that getting information out with model_*() are correct.
