@@ -932,7 +932,9 @@ FIMSFrame <- function(data) {
           following row{?s}: {which_ages_are_not_integers}."
         )
       }
-      data_for_age_calculations <- dplyr::filter(data, type == "age_comp")
+      data_for_age_calculations <- dplyr::filter(
+        data, type %in% c("age_comp", "weight_at_age")
+      )
       ages <- min(
         data_for_age_calculations[["age"]],
         na.rm = TRUE
