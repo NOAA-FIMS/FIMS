@@ -78,9 +78,9 @@ initialize_module <- function(parameters, data, module_name, fleet_name = NA_cha
     data_distribution_names_for_fleet_i <- parameters |>
       dplyr::filter(fleet_name == !!fleet_name & distribution_type == "Data") |>
       dplyr::pull(module_type)
-    if ("age_to_length_conversion" %in% fleet_types &&
+    if ("age_to_length_conversion" %in% get_data(data)[["type"]] &&
       "LengthComp" %in% data_distribution_names_for_fleet_i) {
-      age_to_length_conversion_value <- model_age_to_length_conversion(data, fleet_name)
+      age_to_length_conversion_value <- model_age_to_length_conversion(data)
       module[["age_to_length_conversion"]]$resize(length(age_to_length_conversion_value))
       # Assign each value to the corresponding position in the parameter vector
       purrr::walk(

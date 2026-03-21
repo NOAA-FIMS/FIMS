@@ -908,8 +908,10 @@ FIMSFrame <- function(data) {
   if (!all(is.numeric(data[["timing"]]))) {
     cli::cli_abort("{.var timing} must be in numeric format.")
   }
-  if (!all(as.integer(data[["timing"]]) -
-    data[["timing"]] == 0)) {
+  if (!all(
+    as.integer(data[["timing"]]) - data[["timing"]] == 0,
+    na.rm = TRUE
+  )) {
     cli::cli_abort("{.var timing} can only handle years right now.")
   }
 
@@ -999,7 +1001,7 @@ FIMSFrame <- function(data) {
   # order so that getting information out with model_*() are correct.
   formatted_data <- data |>
     dplyr::filter(
-      timing >= start_year
+      timing >= start_year | is.na(timing)
     ) |>
     tibble::as_tibble()
   missing_time_series <- create_missing_data(

@@ -120,7 +120,7 @@ test_that("`fims_frame()` works with the correct inputs", {
 
   #' @description Test that `model_age_to_length_conversion()` retrieves age-to-length conversion data as a numeric vector.
   expect_vector(
-    model_age_to_length_conversion(fims_frame, fleet_names),
+    model_age_to_length_conversion(fims_frame),
     ptype = numeric()
   )
 
@@ -199,7 +199,7 @@ test_that("`FIMSFrame()` returns correct outputs for edge cases", {
 
   #' @description Test that `model_age_to_length_conversion()` retrieves age-to-length conversion data as a numeric vector when passed a data frame rather than a FIMSFrame object.
   expect_vector(
-    model_age_to_length_conversion(data_big, fleet_names),
+    model_age_to_length_conversion(data_big),
     ptype = numeric()
   )
 
@@ -370,11 +370,8 @@ test_that("`model_*()` works with the correct inputs", {
 
 ## Error handling ----
 test_that("`model_*()` returns correct error messages", {
-  #' @description Test that the `model_age_to_length_conversion()` returns an error when a fleet is not supplied.
-  expect_error(
-    model_age_to_length_conversion(fims_frame),
-    regexp = "is missing, with no default"
-  )
+  #' @description Test that the `model_age_to_length_conversion()` returns an error when a fleet is supplied.
+  expect_error(model_age_to_length_conversion(fims_frame, fleet = "fleet1"))
 
   #' @description Test that the `model_weight_at_age()` returns an error when providing an unused argument.
   expect_error(
