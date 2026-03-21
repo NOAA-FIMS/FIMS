@@ -541,16 +541,24 @@ methods::setGeneric(
 methods::setMethod(
   "model_age_to_length_conversion",
   "FIMSFrame",
-  function(x, fleet_name) {
+  function(x) {
     if ("length" %in% colnames(x@data)) {
       if (!"age" %in% colnames(x@data)) {
         cli::cli_abort("The age column is not present in your data.")
       }
-      dplyr::filter(
+      model_data <- dplyr::filter(
         .data = as.data.frame(x@data),
-        .data[["type"]] == "age_to_length_conversion",
-        .data[["name"]] %in% fleet_name
-      ) |>
+        .data[["type"]] == "age_to_length_conversion"
+      )
+      if (NROW(model_data) > get_n_ages(x) * get_n_lengths(x)) {
+        cli::cli_warn(
+          "`age_to_length_conversion` data is time- and fleet-invariant and
+          should consist of {get_n_ages(x) * get_n_lengths(x)} rows not
+          {NROW(model_data)} rows like what is provided. Data passed to the
+          model will be averages over timing and name."
+        )
+      }
+       model_data |>
         dplyr::group_by(.data[["age"]], .data[["length"]]) |>
         dplyr::summarize(
           mean_value = mean(as.numeric(.data[["value"]]), na.rm = TRUE)
@@ -799,8 +807,15 @@ validate_dimension_of_conversion <- function(data, n_groups, n_timings) {
     1,
     n_timings
   )
-  if (n_timings == 1 && n_rows == n_groups) {
-    return(TRUE)
+  if (n_timings == 1) {
+    if (n_rows != n_groups) {
+      cli::cli_abort(
+        "You are missing combinations of {good_type}, where your {.var data}
+        has {n_rows} row{?s} but should have at least {n_groups} rows."
+      )
+    } else {
+      return(TRUE)
+    }
   }
   if (n_timings * n_groups > n_rows) {
     cli::cli_abort(
@@ -962,8 +977,7 @@ FIMSFrame <- function(data) {
   }
   n_lengths <- length(lengths)
 
-  # Check that full dimension information is available for
-  # age_to_length_conversion and weight_at_age
+  # Check that full dimension information is available for weight_at_age
   dplyr::group_by(
     dplyr::filter(data, type == "weight_at_age"),
     name
@@ -974,16 +988,12 @@ FIMSFrame <- function(data) {
       n_groups = n_ages,
       n_timings = n_years
     )
-  dplyr::group_by(
+  # Check that age_to_length_conversion data exist once for all ages x lengths
+  validate_dimension_of_conversion(
     dplyr::filter(data, type == "age_to_length_conversion"),
-    name
-  ) |>
-    dplyr::group_split() |>
-    purrr::walk(
-      validate_dimension_of_conversion,
-      n_groups = n_ages * n_lengths,
-      n_timings = n_years
-    )
+    n_groups = n_ages * n_lengths,
+    n_timings = 1
+  )
 
   # Work on filling in missing data with -999 and arrange in the correct
   # order so that getting information out with model_*() are correct.
@@ -1057,32 +1067,11 @@ FIMSFrame <- function(data) {
         "length is a required column if you have age_to_length_conversion data."
       )
     }
-    # Must do this by hand because it is across two dimensions
-    temp_age_to_length_data <- formatted_data |>
-      dplyr::group_by(type, name)
-    missing_age_to_length <- temp_age_to_length_data |>
-      dplyr::group_by(type, name) |>
-      dplyr::filter(type %in% "age_to_length_conversion") |>
-      tidyr::expand(unit, timing = years, age = ages, length = lengths) |>
-      dplyr::anti_join(
-        y = dplyr::select(
-          temp_age_to_length_data,
-          type, name, unit, timing, age, length
-        ),
-        by = dplyr::join_by(type, name, unit, timing, age, length)
-      ) |>
-      dplyr::mutate(
-        value = 0
-      ) |>
-      dplyr::ungroup()
-  } else {
-    missing_age_to_length <- missing_time_series[0, ]
   }
   missing_data <- dplyr::bind_rows(
     missing_time_series,
     missing_ages,
-    missing_lengths,
-    missing_age_to_length
+    missing_lengths
   )
   sort_order <- intersect(
     c("name", "type", "timing", "age", "length"),
@@ -1096,7 +1085,7 @@ FIMSFrame <- function(data) {
     dplyr::arrange(!!!rlang::parse_exprs(sort_order))
 
   # Fill the empty data frames with data extracted from the data file
-  out <- methods::new("FIMSFrame",
+  methods::new("FIMSFrame",
     data = complete_data,
     fleets = fleets,
     n_years = n_years,
@@ -1107,7 +1096,6 @@ FIMSFrame <- function(data) {
     lengths = lengths,
     n_lengths = n_lengths
   )
-  return(out)
 }
 
 # Unexported functions ----

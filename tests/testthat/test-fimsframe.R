@@ -86,7 +86,7 @@ test_that("`fims_frame()` works with the correct inputs", {
   #' @description Test that `get_lengths()` retrieves a vector with length equal to expected number of length.
   expect_equal(length(get_lengths(fims_frame)), get_n_lengths(fims_frame))
 
-  #' @description Test that `get_lengths()` returns a vector with the correst sequence of length values.
+  #' @description Test that `get_lengths()` returns a vector with the correct sequence of length values.
   expect_equal(get_lengths(fims_frame), seq(0, 1100, by = 50))
 
   #' @description Test that `get_n_lengths()` retrieves the number of lengths as an integer.
