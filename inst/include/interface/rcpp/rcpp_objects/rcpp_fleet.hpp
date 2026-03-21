@@ -162,72 +162,6 @@ class FleetInterface : public FleetInterfaceBase {
    */
   ParameterVector age_to_length_conversion;
 
-  // derived quantities
-  /**
-   * @brief Derived landings-at-age in numbers.
-   */
-  Rcpp::NumericVector derived_landings_naa;
-  /**
-   * @brief Derived landings-at-length in numbers.
-   */
-  Rcpp::NumericVector derived_landings_nal;
-  /**
-   * @brief Derived landings-at-age in weight (mt).
-   */
-  Rcpp::NumericVector derived_landings_waa;
-  /**
-   * @brief Derived landings in observed units.
-   */
-  Rcpp::NumericVector derived_landings_expected;
-  /**
-   * @brief Derived landings in weight.
-   */
-  Rcpp::NumericVector derived_landings_w;
-  /**
-   * @brief Derived landings in numbers.
-   */
-  Rcpp::NumericVector derived_landings_n;
-  /**
-   * @brief Derived landings-at-age in numbers.
-   */
-  Rcpp::NumericVector derived_index_naa;
-  /**
-   * @brief Derived landings-at-length in numbers.
-   */
-  Rcpp::NumericVector derived_index_nal;
-  /**
-   * @brief Derived landings-at-age in weight (mt).
-   */
-  Rcpp::NumericVector derived_index_waa;
-  /**
-   * @brief Derived index in observed units.
-   */
-  Rcpp::NumericVector derived_index_expected;
-  /**
-   * @brief Derived index in weight.
-   */
-  Rcpp::NumericVector derived_index_w;
-  /**
-   * @brief Derived index in numbers.
-   */
-  Rcpp::NumericVector derived_index_n;
-  /**
-   * @brief Derived age composition proportions.
-   */
-  Rcpp::NumericVector derived_agecomp_proportion;
-  /**
-   * @brief Derived length composition proportions.
-   */
-  Rcpp::NumericVector derived_lengthcomp_proportion;
-  /**
-   * @brief Derived age compositions.
-   */
-  Rcpp::NumericVector derived_agecomp_expected;
-  /**
-   * @brief Derived length compositions.
-   */
-  Rcpp::NumericVector derived_lengthcomp_expected;
-
   /**
    * @brief The constructor.
    */
@@ -270,23 +204,7 @@ class FleetInterface : public FleetInterfaceBase {
         lengthcomp_expected(other.lengthcomp_expected),
         agecomp_proportion(other.agecomp_proportion),
         lengthcomp_proportion(other.lengthcomp_proportion),
-        age_to_length_conversion(other.age_to_length_conversion),
-        derived_landings_naa(other.derived_landings_naa),
-        derived_landings_nal(other.derived_landings_nal),
-        derived_landings_waa(other.derived_landings_waa),
-        derived_landings_expected(other.derived_landings_expected),
-        derived_landings_w(other.derived_landings_w),
-        derived_landings_n(other.derived_landings_n),
-        derived_index_naa(other.derived_index_naa),
-        derived_index_nal(other.derived_index_nal),
-        derived_index_waa(other.derived_index_waa),
-        derived_index_expected(other.derived_index_expected),
-        derived_index_w(other.derived_index_w),
-        derived_index_n(other.derived_index_n),
-        derived_agecomp_proportion(other.derived_agecomp_proportion),
-        derived_lengthcomp_proportion(other.derived_lengthcomp_proportion),
-        derived_agecomp_expected(other.derived_agecomp_expected),
-        derived_lengthcomp_expected(other.derived_lengthcomp_expected) {}
+        age_to_length_conversion(other.age_to_length_conversion) {}
 
   /**
    * @brief The destructor.

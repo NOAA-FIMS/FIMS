@@ -31,6 +31,16 @@
  *
  */
 class FisheryModelInterfaceBase : public FIMSRcppInterfaceBase {
+ protected:
+  /**
+   * @brief The set of population ids that this fishery model operates on.
+   */
+  std::shared_ptr<std::set<uint32_t>> population_ids;
+  /**
+   * @brief Iterator for population ids.
+   */
+  typedef typename std::set<uint32_t>::iterator population_id_iterator;
+
  public:
   /**
    * @brief The static id of the FleetInterfaceBase object.
@@ -53,6 +63,7 @@ class FisheryModelInterfaceBase : public FIMSRcppInterfaceBase {
    */
   FisheryModelInterfaceBase() {
     this->id = FisheryModelInterfaceBase::id_g++;
+    this->population_ids = std::make_shared<std::set<uint32_t>>();
     /* Create instance of map: key is id and value is pointer to
     FleetInterfaceBase */
     // FisheryModelInterfaceBase::live_objects[this->id] = this;
@@ -64,7 +75,7 @@ class FisheryModelInterfaceBase : public FIMSRcppInterfaceBase {
    * @param other
    */
   FisheryModelInterfaceBase(const FisheryModelInterfaceBase &other)
-      : id(other.id) {}
+      : population_ids(other.population_ids), id(other.id) {}
 
   /**
    * @brief The destructor.
@@ -92,6 +103,107 @@ class FisheryModelInterfaceBase : public FIMSRcppInterfaceBase {
    * @brief Get the ID for the child fleet interface objects to inherit.
    */
   virtual uint32_t get_id() = 0;
+
+  /**
+   * @brief Get the vector of fixed effect parameters for the model.
+   *
+   * @details Returns a numeric vector containing the fixed effect parameters
+   * used in the model.
+   * @return Rcpp::NumericVector of fixed effect parameters.
+   */
+  Rcpp::NumericVector get_fixed_parameters_vector() {
+    std::shared_ptr<fims_info::Information<double>> info0 =
+        fims_info::Information<double>::GetInstance();
+
+    Rcpp::NumericVector p;
+
+    for (size_t i = 0; i < info0->fixed_effects_parameters.size(); i++) {
+      p.push_back(*info0->fixed_effects_parameters[i]);
+    }
+
+    return p;
+  }
+
+  /**
+   * @brief Get the vector of random effect parameters for the model.
+   *
+   * @details Returns a numeric vector containing the random effect parameters
+   * used in the model.
+   * @return Rcpp::NumericVector of random effect parameters.
+   */
+  Rcpp::NumericVector get_random_parameters_vector() {
+    std::shared_ptr<fims_info::Information<double>> d0 =
+        fims_info::Information<double>::GetInstance();
+
+    Rcpp::NumericVector p;
+
+    for (size_t i = 0; i < d0->random_effects_parameters.size(); i++) {
+      p.push_back(*d0->random_effects_parameters[i]);
+    }
+
+    return p;
+  }
+
+  /**
+   * @brief Sum method to calculate the sum of an array or vector of doubles.
+   *
+   * @param v
+   * @return double
+   */
+  double sum(const std::valarray<double> &v) {
+    double sum = 0.0;
+    for (size_t i = 0; i < v.size(); i++) {
+      sum += v[i];
+    }
+    return sum;
+  }
+
+  /**
+   * @brief Sum method for a vector of doubles.
+   *
+   * @param v
+   * @return double
+   */
+  double sum(const std::vector<double> &v) {
+    double sum = 0.0;
+    for (size_t i = 0; i < v.size(); i++) {
+      sum += v[i];
+    }
+    return sum;
+  }
+
+  /**
+   * @brief Minimum method to calculate the minimum of an array or vector
+   * of doubles.
+   *
+   * @param v
+   * @return double
+   */
+  double min(const std::valarray<double> &v) {
+    double min_value = v[0];
+    for (size_t i = 1; i < v.size(); i++) {
+      if (v[i] < min_value) {
+        min_value = v[i];
+      }
+    }
+    return min_value;
+  }
+
+  /**
+   * @brief A function to compute the absolute value of a value array of
+   * floating-point values. It is a wrapper around std::fabs.
+   *
+   * @param v A value array of floating-point values, where floating-point
+   * values is anything with decimals.
+   * @return std::valarray<double>
+   */
+  std::valarray<double> fabs(const std::valarray<double> &v) {
+    std::valarray<double> result(v.size());
+    for (size_t i = 0; i < v.size(); i++) {
+      result[i] = std::fabs(v[i]);
+    }
+    return result;
+  }
 };
 // static id of the FleetInterfaceBase object
 uint32_t FisheryModelInterfaceBase::id_g = 1;
@@ -105,28 +217,11 @@ std::map<uint32_t, std::shared_ptr<FisheryModelInterfaceBase>>
  * CatchAtAge model. It inherits from the FisheryModelInterfaceBase class.
  */
 class CatchAtAgeInterface : public FisheryModelInterfaceBase {
-  /**
-   * @brief The set of population ids that this catch at age model operates on.
-   */
-  std::shared_ptr<std::set<uint32_t>> population_ids;
-  /**
-   * @brief Iterator for population ids.
-   */
-  typedef typename std::set<uint32_t>::iterator population_id_iterator;
-
-  /**
-   * @brief A private working map of standard error values for all
-   * concatenated derived quantities. Elements are extracted in the
-   * to_json method.
-   */
-  std::map<std::string, std::vector<double>> se_values;
-
  public:
   /**
    * @brief The constructor.
    */
   CatchAtAgeInterface() : FisheryModelInterfaceBase() {
-    this->population_ids = std::make_shared<std::set<uint32_t>>();
     std::shared_ptr<CatchAtAgeInterface> caa =
         std::make_shared<CatchAtAgeInterface>(*this);
     FIMSRcppInterfaceBase::fims_interface_objects.push_back(caa);
@@ -139,8 +234,7 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
    * @param other
    */
   CatchAtAgeInterface(const CatchAtAgeInterface &other)
-      : FisheryModelInterfaceBase(other),
-        population_ids(other.population_ids) {}
+      : FisheryModelInterfaceBase(other) {}
 
   /**
    * Method to add a population id to the set of population ids.
@@ -566,48 +660,6 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
   }
 
   /**
-   * @brief Get the vector of fixed effect parameters for the CatchAtAge model.
-   *
-   * @details Returns a numeric vector containing the fixed effect parameters
-   * used in the model.
-   * @return Rcpp::NumericVector of fixed effect parameters.
-   */
-  Rcpp::NumericVector get_fixed_parameters_vector() {
-    // base model
-    std::shared_ptr<fims_info::Information<double>> info0 =
-        fims_info::Information<double>::GetInstance();
-
-    Rcpp::NumericVector p;
-
-    for (size_t i = 0; i < info0->fixed_effects_parameters.size(); i++) {
-      p.push_back(*info0->fixed_effects_parameters[i]);
-    }
-
-    return p;
-  }
-
-  /**
-   * @brief Get the vector of random effect parameters for the CatchAtAge model.
-   *
-   * @details Returns a numeric vector containing the random effect parameters
-   * used in the model.
-   * @return Rcpp::NumericVector of random effect parameters.
-   */
-  Rcpp::NumericVector get_random_parameters_vector() {
-    // base model
-    std::shared_ptr<fims_info::Information<double>> d0 =
-        fims_info::Information<double>::GetInstance();
-
-    Rcpp::NumericVector p;
-
-    for (size_t i = 0; i < d0->random_effects_parameters.size(); i++) {
-      p.push_back(*d0->random_effects_parameters[i]);
-    }
-
-    return p;
-  }
-
-  /**
    * @copydoc FisheryModelInterfaceBase::to_json
    */
   virtual std::string to_json() {
@@ -883,66 +935,6 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
     model->do_reporting = true;
 #endif
     return fims::JsonParser::PrettyFormatJSON(ss.str());
-  }
-
-  /**
-   * @brief Sum method to calculate the sum of an array or vector of doubles.
-   *
-   * @param v
-   * @return double
-   */
-  double sum(const std::valarray<double> &v) {
-    double sum = 0.0;
-    for (size_t i = 0; i < v.size(); i++) {
-      sum += v[i];
-    }
-    return sum;
-  }
-
-  /**
-   * @brief Sum method for a vector of doubles.
-   *
-   * @param v
-   * @return double
-   */
-  double sum(const std::vector<double> &v) {
-    double sum = 0.0;
-    for (size_t i = 0; i < v.size(); i++) {
-      sum += v[i];
-    }
-    return sum;
-  }
-
-  /**
-   * @brief Minimum method to calculate the minimum of an array or vector
-   * of doubles.
-   *
-   * @param v
-   * @return double
-   */
-  double min(const std::valarray<double> &v) {
-    double min = v[0];
-    for (size_t i = 1; i < v.size(); i++) {
-      if (v[i] < min) {
-        min = v[i];
-      }
-    }
-    return min;
-  }
-  /**
-   * @brief A function to compute the absolute value of a value array of
-   * floating-point values. It is a wrapper around std::fabs.
-   *
-   * @param v A value array of floating-point values, where floating-point
-   * values is anything with decimals.
-   * @return std::valarray<double>
-   */
-  std::valarray<double> fabs(const std::valarray<double> &v) {
-    std::valarray<double> result(v.size());
-    for (size_t i = 0; i < v.size(); i++) {
-      result[i] = std::fabs(v[i]);
-    }
-    return result;
   }
 
 #ifdef TMB_MODEL
