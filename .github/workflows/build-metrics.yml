@@ -1,0 +1,84 @@
+name: build-metrics
+
+on:
+  pull_request:
+    branches:
+      - dev
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Install Ninja
+        run: sudo apt-get install ninja-build
+
+      - name: Install time
+        run: sudo apt-get install -y time
+
+      - uses: r-lib/actions/setup-r@v2
+
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: any::remotes
+
+      - name: Install local version of FIMS
+        run: remotes::install_local(upgrade = "always", force = TRUE)
+        shell: Rscript {0}
+
+      - name: Setup for gtest
+        run: FIMS:::setup_gtest()
+        shell: Rscript {0}
+
+      - name: Restore previous metrics from cache
+        uses: actions/cache/restore@v4
+        with:
+          path: previous_metrics.json
+          key: build-metrics-previous
+
+      - name: Configure
+        run: cmake -S . -B build -DBUILD_DOC=OFF -G Ninja -DCMAKE_CXX_FLAGS="-ftime-report -ftemplate-backtrace-limit=0"
+
+      - name: Build and capture metrics
+        run: /usr/bin/time -v cmake --build build --parallel 16 2>&1 | tee build.log
+
+      - name: Capture binary sizes
+        run: |
+          echo "=== Binary and object file sizes ===" >> build.log
+          find build/ -name "*.so" -o -name "*.o" -o -name "*.a" | xargs ls -lh 2>/dev/null >> build.log || true
+          echo "=== du summary of build directory ===" >> build.log
+          du -sh build/ >> build.log
+
+      - name: Parse metrics
+        run: FIMS:::parse_build_metrics()
+        shell: Rscript {0}
+
+      - name: Compare against previous metrics
+        run: FIMS:::compare_build_metrics()
+        shell: Rscript {0}
+
+      - name: Save current metrics to cache
+        uses: actions/cache/save@v4
+        with:
+          path: metrics.json
+          key: build-metrics-previous
+
+      - name: Upload metrics artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: build-metrics-${{ github.sha }}
+          path: |
+            metrics.json
+            build.log
+            metrics_comparison.log
+          retention-days: 90
+
+      - name: Print metrics summary
+        run: |
+          cat metrics.json
+          echo "           "
+          cat metrics_comparison.log
