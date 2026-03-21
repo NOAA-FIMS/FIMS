@@ -29,7 +29,7 @@ and signal handling), see the following resources:
 * The source file: [inst/include/common/def.hpp](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/common/def.hpp)
 * The [documentation](https://noaa-fims.github.io/FIMS/doxygen/classfims_1_1FIMSLog.html) for the same header
 
-The log is initiated when `CreateTMBModel()` is run, where the first entry is always the call to this function, e.g.,
+The log is initiated when `CreateTMBModel()` is run, where the first entry is an info message indicating that FIMS objects are being added to TMB, e.g.,
 
 ```{r example-one-line}
 empty_model <- CreateTMBModel()
