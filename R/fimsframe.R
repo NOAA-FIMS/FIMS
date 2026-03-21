@@ -1003,11 +1003,11 @@ FIMSFrame <- function(data) {
       types = c("weight_at_age", "age_comp")
     )
     summary_by_name <- dplyr::count(missing_ages, name, timing) |>
-    dplyr::filter(n != n_ages) |>
-    dplyr::summarize(
-      timings = paste(timing, collapse = ", "),
-      .by = name
-    )
+      dplyr::filter(n != n_ages) |>
+      dplyr::summarize(
+        timings = paste(timing, collapse = ", "),
+        .by = name
+      )
     if (NROW(summary_by_name) > 0) {
       cli::cli_abort(
         "You cannot have missing age values for a given timing and name
@@ -1028,11 +1028,11 @@ FIMSFrame <- function(data) {
       types = "length_comp"
     )
     summary_by_name <- dplyr::count(missing_lengths, name, timing) |>
-    dplyr::filter(n != n_lengths) |>
-    dplyr::summarize(
-      timings = paste(timing, collapse = ", "),
-      .by = name
-    )
+      dplyr::filter(n != n_lengths) |>
+      dplyr::summarize(
+        timings = paste(timing, collapse = ", "),
+        .by = name
+      )
     if (NROW(summary_by_name) > 0) {
       cli::cli_abort(
         "You cannot have missing length values for a given timing and name
