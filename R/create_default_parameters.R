@@ -304,15 +304,11 @@ create_default_Population <- function(
   init_naa[n_ages] <- init_naa[n_ages] / M_value # sum of infinite series
 
   # Create a list of default parameters
-  default <- create_default_parameters_template(
-    n_parameters = n_years * n_ages
-  ) |>
+  default <- create_default_parameters_template() |>
     # Add the module type, label, value, and estimation type
     dplyr::mutate(
       label = "log_M",
       value = log(M_value),
-      age = rep(ages, n_years),
-      time = rep(years, each = n_ages),
       estimation_type = "constant"
     ) |>
     dplyr::add_row(
