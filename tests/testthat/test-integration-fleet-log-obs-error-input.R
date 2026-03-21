@@ -187,7 +187,6 @@ test_that("`log_Fmort` returns correct error messages when wrong dimensions", {
 
 ## IO correctness ----
 test_that("`log_M` output dimensions follow size rules", {
-
   # Check scalar log_M input
   parameters_4_model <- default_parameters |>
     tidyr::unnest(cols = data)
@@ -201,7 +200,7 @@ test_that("`log_M` output dimensions follow size rules", {
       uncertainty_label = "se",
       year = year_i,
       estimate = estimated
-  )
+    )
 
   log_m_input <- parameters_4_model |>
     dplyr::filter(label == "log_M") |>
@@ -228,7 +227,7 @@ test_that("`log_M` output dimensions follow size rules", {
 
   parameters_4_model <- default_parameters |>
     tidyr::unnest(cols = data)
-  
+
   log_m_template <- parameters_4_model |>
     dplyr::filter(label == "log_M") |>
     dplyr::select(-time, -age, -value)
@@ -254,7 +253,7 @@ test_that("`log_M` output dimensions follow size rules", {
       year = year_i,
       estimate = estimated
     )
-  
+
   log_m_input <- parameters_4_model |>
     dplyr::filter(label == "log_M") |>
     dplyr::pull(value)
@@ -273,15 +272,13 @@ test_that("`log_M` output dimensions follow size rules", {
   expect_equal(length(log_m_output), n_years * n_ages)
   #' @description Test that mortality_M output matches n_years * n_ages.
   expect_equal(length(mortality_m_output), n_years * n_ages)
-  
-  clear()  
 
+  clear()
 })
 
 
 ## Error handling ----
 test_that("`log_M` returns correct error messages when wrong dimensions", {
-
   #' @description Test that returns correct error message when log_M is too long.
   parameters_4_model <- default_parameters |>
     tidyr::unnest(cols = data) |>
