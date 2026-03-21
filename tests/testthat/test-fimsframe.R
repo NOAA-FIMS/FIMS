@@ -86,7 +86,7 @@ test_that("`fims_frame()` works with the correct inputs", {
   #' @description Test that `get_lengths()` retrieves a vector with length equal to expected number of length.
   expect_equal(length(get_lengths(fims_frame)), get_n_lengths(fims_frame))
 
-  #' @description Test that `get_lengths()` returns a vector with the correst sequence of length values.
+  #' @description Test that `get_lengths()` returns a vector with the correct sequence of length values.
   expect_equal(get_lengths(fims_frame), seq(0, 1100, by = 50))
 
   #' @description Test that `get_n_lengths()` retrieves the number of lengths as an integer.
@@ -120,7 +120,7 @@ test_that("`fims_frame()` works with the correct inputs", {
 
   #' @description Test that `model_age_to_length_conversion()` retrieves age-to-length conversion data as a numeric vector.
   expect_vector(
-    model_age_to_length_conversion(fims_frame, fleet_names),
+    model_age_to_length_conversion(fims_frame),
     ptype = numeric()
   )
 
@@ -131,14 +131,14 @@ test_that("`fims_frame()` works with the correct inputs", {
   expect_no_error(FIMS::FIMSFrame(data_big))
 
   #' @description Test that `is.FIMSFrame()` is `TRUE` when passed a FIMSFrame object.
-  expect_true(is.FIMSFrame(fims_frame))
+  expect_true(FIMS:::is.FIMSFrame(fims_frame))
 
   #' @description Test that `is.FIMSFrame()` is FALSE when passed a data frame.
-  expect_false(is.FIMSFrame(data_big))
+  expect_false(FIMS:::is.FIMSFrame(data_big))
 
   #' @description Test that `pretty_type()`, an unexported function, returns space separated values with "comp" expanded to "composition".
   expect_equal(
-    pretty_type(x = c("age_comp", "weight_at_age")),
+    FIMS:::pretty_type(x = c("age_comp", "weight_at_age")),
     c("age composition", "weight at age")
   )
 })
@@ -199,7 +199,7 @@ test_that("`FIMSFrame()` returns correct outputs for edge cases", {
 
   #' @description Test that `model_age_to_length_conversion()` retrieves age-to-length conversion data as a numeric vector when passed a data frame rather than a FIMSFrame object.
   expect_vector(
-    model_age_to_length_conversion(data_big, fleet_names),
+    model_age_to_length_conversion(data_big),
     ptype = numeric()
   )
 
@@ -296,7 +296,7 @@ test_that("`FIMSFrame()` returns correct error messages", {
   #' @description Test that `FIMSFrame()` returns an error when the age column is not present but `age_to_length_conversion` is present in type.
   expect_error(
     FIMSFrame(dplyr::select(data_big, -age)),
-    "is a required column"
+    "You are missing combinations"
   )
 
   #' @description Test that `FIMSFrame()` returns an error when the length column is not present but `age_to_length_conversion` is present in type.
@@ -370,11 +370,8 @@ test_that("`model_*()` works with the correct inputs", {
 
 ## Error handling ----
 test_that("`model_*()` returns correct error messages", {
-  #' @description Test that the `model_age_to_length_conversion()` returns an error when a fleet is not supplied.
-  expect_error(
-    model_age_to_length_conversion(fims_frame),
-    regexp = "is missing, with no default"
-  )
+  #' @description Test that the `model_age_to_length_conversion()` returns an error when a fleet is supplied.
+  expect_error(model_age_to_length_conversion(fims_frame, fleet = "fleet1"))
 
   #' @description Test that the `model_weight_at_age()` returns an error when providing an unused argument.
   expect_error(

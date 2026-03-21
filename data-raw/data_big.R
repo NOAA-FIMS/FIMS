@@ -346,38 +346,21 @@ data_big <- rbind(landings_data, index_data, age_data, weight_at_age_data) |>
 # Extract timing and fleets from milestone 1 data
 observers <- c("fleet1", "survey1")
 
-# Create data frame for new fleet and year-specific length at age conversion
-# proportions. These are identical across timing and fleets in this default
-# example.
+# Create data frame for length at age conversion proportions
 length_age_data <- data.frame(
   type = "age_to_length_conversion",
-  name = rep(
-    sort(rep(observers, length(len_bins) * length(ages))),
-    length(timing_fishery[["timing"]])
-  ),
-  age = rep(
-    sort(rep(ages, length(len_bins))),
-    length(observers) * length(timing_fishery[["timing"]])
-  ),
+  name = NA_character_,
+  age = rep(ages, each = length(len_bins)),
   length = rep(
     len_bins,
-    length(ages) * length(observers) * length(timing_fishery[["timing"]])
+    length(ages)
   ),
-  timing = rep(
-    timing_fishery[["timing"]],
-    each = length(len_bins) * length(ages) * length(observers)
-  ),
-  value = rep(
-    c(t(returned_om[["em_input"]][["age_to_length_conversion"]])),
-    length(observers) * length(timing_fishery[["timing"]])
-  ),
+  timing = NA_integer_,
+  value = c(t(returned_om[["em_input"]][["age_to_length_conversion"]])),
   unit = "proportion",
-  uncertainty = rep(
-    c(
-      em_input[["n.L.lengthcomp"]][["fleet1"]],
-      em_input[["n.survey.lengthcomp"]][["survey1"]]
-    ),
-    length(len_bins) * length(ages) * length(timing_fishery[["timing"]])
+  uncertainty = c(
+    em_input[["n.L.lengthcomp"]][["fleet1"]],
+    em_input[["n.survey.lengthcomp"]][["survey1"]]
   )
 )
 

@@ -468,7 +468,7 @@ test_that("`initialize_landings()` returns correct error messages", {
       data = data,
       fleet_name = "unknown_fleet"
     ),
-    "Fleet unknown_fleet not found in the data object."
+    "Fleet `unknown_fleet` not found in the data object."
   )
   clear()
 })
@@ -510,7 +510,7 @@ test_that("`initialize_index()` returns correct error messages", {
       data = data,
       fleet_name = "unknown_fleet"
     ),
-    "Fleet unknown_fleet not found in the data object."
+    "Fleet `unknown_fleet` not found in the data object."
   )
   clear()
 })
