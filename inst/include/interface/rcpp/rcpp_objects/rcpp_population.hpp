@@ -326,6 +326,16 @@ class PopulationInterface : public PopulationInterfaceBase {
     population->growth_id = this->growth_id.get();
     population->recruitment_id = this->recruitment_id.get();
     population->maturity_id = this->maturity_id.get();
+    if (this->log_M.size() != static_cast<size_t>(this->n_years.get() * this->n_ages.get()) && 
+        this->log_M.size() != 1) {
+      throw std::invalid_argument(
+          "Population log_M size mismatch."
+          "Population log_M is of size " +
+          fims::to_string(this->log_M.size()) +
+          ". Population log_M can only be either of size 1 or n_years * " +
+          "n_ages, and the number of n_years * n_ages is " +
+          fims::to_string(this->n_years.get() * this->n_ages.get()));
+    }
     population->log_M.resize(this->log_M.size());
 
     if (this->log_f_multiplier.size() ==

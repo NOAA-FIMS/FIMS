@@ -272,8 +272,8 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
       ss << " \"type\": \"vector\",\n";
       ss << " \"dimensionality\": {\n";
       if (population_interface->log_M.size() ==
-          population_interface->n_years.get() *
-              population_interface->n_ages.get()) {
+          static_cast<size_t>(population_interface->n_years.get() *
+              population_interface->n_ages.get()))  {
         ss << " \"header\": [\"n_years\", \"n_ages\"],\n";
         ss << " \"dimensions\": [" << population_interface->n_years.get()
            << ", " << population_interface->n_ages.get() << "]\n";
@@ -1027,7 +1027,7 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
       fims::Vector<int> dim_sizes;
       fims::Vector<std::string> dim_names;
       if (population->log_M.size() ==
-          population->n_years.get() * population->n_ages.get()) {
+          static_cast<size_t>(population->n_years.get() * population->n_ages.get())) {
         dim_sizes.resize(2);
         dim_sizes[0] = static_cast<int>(population->n_years.get());
         dim_sizes[1] = static_cast<int>(population->n_ages.get());
