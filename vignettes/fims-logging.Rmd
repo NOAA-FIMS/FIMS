@@ -74,7 +74,7 @@ ls("package:FIMS") |>
 methods::show(log_error)
 ```
 
-Another useful option is `set_throw_on_error()`. If this option is set to TRUE, FIMS will abort immediately when an error occurs and if `write_log(TRUE)` was previously called, the log file will be written before FIMS terminates the session.
+Another useful option is `set_log_throw_on_error()`. If this option is set to TRUE, FIMS will abort immediately when an error occurs and if `write_log(TRUE)` was previously called, the log file will be written before FIMS terminates the session.
 
 ```{r throw, eval = FALSE}
 set_log_throw_on_error(TRUE)
