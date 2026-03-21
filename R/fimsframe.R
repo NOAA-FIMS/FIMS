@@ -558,7 +558,7 @@ methods::setMethod(
           model will be averages over timing and name."
         )
       }
-       model_data |>
+      model_data |>
         dplyr::group_by(.data[["age"]], .data[["length"]]) |>
         dplyr::summarize(
           mean_value = mean(as.numeric(.data[["value"]]), na.rm = TRUE)
