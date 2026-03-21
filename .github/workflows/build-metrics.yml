@@ -54,11 +54,15 @@ jobs:
           du -sh build/ >> build.log
 
       - name: Parse metrics
-        run: FIMS:::parse_build_metrics()
+        run: |
+          source("R/build_metrics.R")
+          parse_build_metrics()
         shell: Rscript {0}
 
       - name: Compare against previous metrics
-        run: FIMS:::compare_build_metrics()
+        run: |
+          source("R/build_metrics.R")
+          compare_build_metrics()
         shell: Rscript {0}
 
       - name: Save current metrics to cache
