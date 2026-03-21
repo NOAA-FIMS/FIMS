@@ -80,10 +80,10 @@ test_that("`fims_frame()` works with the correct inputs", {
   #' @description Test that `get_n_ages()` retrieves the number of ages as a single value when you pass it a data frame instead of a FIMSFrame object.
   expect_length(get_n_ages(data_big), 1)
 
-#' @description Test that `get_lengths()` retrieves the lengths as an numeric (double) vector.
+  #' @description Test that `get_lengths()` retrieves the lengths as an numeric (double) vector.
   expect_vector(get_lengths(fims_frame), ptype = double())
 
-   #' @description Test that `get_lengths()` retrieves a vector with length equal to expected number of length.
+  #' @description Test that `get_lengths()` retrieves a vector with length equal to expected number of length.
   expect_equal(length(get_lengths(fims_frame)), get_n_lengths(fims_frame))
 
   #' @description Test that `get_lengths()` returns a vector with the correst sequence of length values.
