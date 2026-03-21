@@ -54,7 +54,7 @@ model_weight_at_age(x)
 
 model_age_to_length_conversion(x, fleet_name)
 
-\S4method{model_age_to_length_conversion}{FIMSFrame}(x, fleet_name)
+\S4method{model_age_to_length_conversion}{FIMSFrame}(x)
 
 \S4method{model_age_to_length_conversion}{data.frame}(x, fleet_name)
 }
