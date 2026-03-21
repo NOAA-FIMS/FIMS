@@ -160,8 +160,9 @@ initialize_module <- function(parameters, data, module_name, fleet_name = NA_cha
       purrr::walk(
         seq(module_length),
         function(x) {
-        module[[field]]$set(x - 1, get_value_function(data)[x])
-      })
+          module[[field]]$set(x - 1, get_value_function(data)[x])
+        }
+      )
     } else {
       set_param_vector(
         field = field,
@@ -594,7 +595,7 @@ initialize_comp <- function(data,
 
   # Validate that the fleet's composition data is available
   comp_data <- comp[["m_comp"]](data, fleet_name)
-  pretty_comp_name <- gsub("_comp", "-composition", comp[['name']])
+  pretty_comp_name <- gsub("_comp", "-composition", comp[["name"]])
   if (is.null(comp_data) || length(comp_data) == 0) {
     cli::cli_abort(c(
       "The {pretty_comp_name} data for fleet {.var {fleet_name}} is

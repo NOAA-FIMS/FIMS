@@ -65,9 +65,9 @@ test_that("`initialize_fims()` works with edge cases", {
   #' @description Test that `initialize_fims()` works with multiple estimation types.
   expect_equal(
     length(init_parm_multiple_types$parameters$p) +
-    length(init_parm_multiple_types$parameters$re),
+      length(init_parm_multiple_types$parameters$re),
     length(init_parm_default$parameters$p) +
-    length(init_parm_default$parameters$re) - 10
+      length(init_parm_default$parameters$re) - 10
   )
   clear()
 })

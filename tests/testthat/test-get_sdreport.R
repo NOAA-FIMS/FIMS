@@ -30,7 +30,7 @@ test_that("`get_sdreport()` works with correct inputs", {
 
   expected_names_re <- c(
     "value", "sd", "cov", "par.fixed", "cov.fixed",
-    "pdHess", "gradient.fixed","par.random", "diag.cov.random", "env"
+    "pdHess", "gradient.fixed", "par.random", "diag.cov.random", "env"
   )
 
   # Function to read the RDS file and get input
@@ -42,14 +42,14 @@ test_that("`get_sdreport()` works with correct inputs", {
       object = sdreport,
       expected = fit_data@sdreport
     )
-    
+
     if (any(grepl("fit_agecomp_random_effects.RDS", fit_file))) {
       #' @description Test that `get_sdreport()` returns correct names for the `sdreport` slot.
       expect_equal(
         object = names(sdreport),
         expected = expected_names_re
       )
-    }else{
+    } else {
       #' @description Test that `get_sdreport()` returns correct names for the `sdreport` slot.
       expect_equal(
         object = names(sdreport),
