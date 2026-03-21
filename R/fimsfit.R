@@ -462,35 +462,8 @@ FIMSFit <- function(
     dimnames(sdreport[["cov.fixed"]]) <- list(parameter_names, parameter_names)
   }
 
-  # Reshape the TMB estimates
-  # If the model is not optimized, opt is an empty list and is not used in
-  # reshape_tmb_estimates().
-  tmb_estimates <- reshape_tmb_estimates(
-    obj = obj,
-    sdreport = sdreport,
-    opt = opt,
-    parameter_names = parameter_names
-  )
-
-  # Create JSON output for FIMS run
-  model_output <- input[["model"]]$get_output(do_sd_report = FALSE)
-  # Reshape the JSON estimates
-  json_estimates <- reshape_json_estimates(model_output)
-  # Merge json_estimates into tmb_estimates based on parameter id
-  # TODO: Need uncertainty from TMB for derived quantities
-  # TODO: change order of columns
-  estimates <- dplyr::left_join(
-    json_estimates,
-    tmb_estimates |>
-      dplyr::filter(!is.na(parameter_id)) |>
-      dplyr::select(-initial, -module_name, -module_id, -estimate, -label),
-    by = c("parameter_id")
-  ) |>
-    dplyr::mutate(
-      uncertainty = dplyr::coalesce(uncertainty.x, uncertainty.y),
-      .after = "estimation_type"
-    ) |>
-    dplyr::select(-uncertainty.x, -uncertainty.y)
+  model_output <- input[["model"]]$get_output()
+  
 
   fit <- methods::new(
     "FIMSFit",
