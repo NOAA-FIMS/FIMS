@@ -120,7 +120,7 @@ VignetteBuilder:
 Remotes: 
     github::nmfs-ost/stockplotr,
     github::ThinkR-open/lozen,
-    github::ThinkR-open/testdown
+    github::ThinkR-open/testdown,
     github::noaa-afsc/SparseNUTS
 Additional_repositories: 
     https://noaa-fisheries-integrated-toolbox.r-universe.dev
