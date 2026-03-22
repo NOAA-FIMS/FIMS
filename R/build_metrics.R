@@ -149,7 +149,7 @@ parse_template_time <- function(lines){
   matches <- regmatches(lines, regexec("^\\s*TOTAL\\s*:\\s*[0-9.]+\\s+[0-9.]+\\s+([0-9.]+)",
     lines))
   totals <- sapply(matches, function(m){
-    if (length(m) >= 2) as.numeric(m[[2]]){else NA_real_}
+    if (length(m) >= 2) as.numeric(m[[2]]) else NA_real_
   })
   totals <- totals[!is.na(totals)]
   if (length(totals) == 0){
