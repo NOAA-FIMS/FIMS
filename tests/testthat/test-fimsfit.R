@@ -119,7 +119,7 @@ test_that("fit_fims() errors when optimization fails to converge", {
     trace = 0
   )
 
-  #' @description Test that fit_fims() throws an informative warning when max gradient is modertly high.
+  #' @description Test that fit_fims() throws an informative warning when max gradient is moderately high.
   expect_warning(
     result <- initialized_model |>
       fit_fims(optimize = TRUE, control = bad_control),

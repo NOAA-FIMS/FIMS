@@ -776,7 +776,9 @@ initializer
 inplace
 instantiation
 instantiations
+interpretable
 inv
+invertible
 io
 iomanip
 iostream
@@ -857,10 +859,12 @@ mget
 microbenchmark
 minimizR
 minimizer
+misspecification
 mkString
 mkdir
 mkswap
 MLE
+mle
 modelTest
 modularity
 mort
@@ -940,6 +944,7 @@ ostream
 ostringstream
 outputFile
 overfishing
+overparameterized
 packageVersion
 pandoc
 parList
@@ -1085,6 +1090,7 @@ snames
 sourceCpp
 sp
 spawners
+spHess
 spr
 sprintf
 sr
@@ -1150,6 +1156,7 @@ tmb
 tmbstan
 tmbutils
 tmp
+tol
 toRVector
 toJSON
 toString
@@ -1190,6 +1197,7 @@ validator
 validators
 vals
 vec
+vectorized
 visualstudio
 vmit
 von
