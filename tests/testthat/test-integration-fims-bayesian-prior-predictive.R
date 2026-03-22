@@ -171,7 +171,7 @@ test_that("posterior equals prior with no data", {
   recruitment <- methods::new(BevertonHoltRecruitment)
   recruitment_process <- new(LogDevsRecruitmentProcess)
 
-  # set up recruitmnet parameters and fix as constant (default)
+  # set up recruitment parameters and fix as constant (default)
   # do not set up a recruitment distribution as devs will be held constant
   # set up log_rzero (equilibrium recruitment) 
   recruitment$log_rzero[1]$value <- log(om_input[["R0"]])

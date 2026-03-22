@@ -776,6 +776,7 @@ initializer
 inplace
 instantiation
 instantiations
+interpretable
 inv
 io
 iomanip
@@ -861,6 +862,7 @@ mkString
 mkdir
 mkswap
 MLE
+mle
 modelTest
 modularity
 mort
@@ -1082,8 +1084,10 @@ simplifyVector
 sinh
 slotNames
 snames
+snuts
 sourceCpp
 sp
+SparseNUTS
 spawners
 spr
 sprintf
@@ -1190,6 +1194,7 @@ validator
 validators
 vals
 vec
+vectorized
 visualstudio
 vmit
 von
