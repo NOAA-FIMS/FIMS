@@ -121,10 +121,10 @@ Remotes:
     github::nmfs-ost/stockplotr,
     github::ThinkR-open/lozen,
     github::ThinkR-open/testdown,
+    github::andrjohns/StanEstimators,
     github::noaa-afsc/SparseNUTS
 Additional_repositories: 
     https://noaa-fisheries-integrated-toolbox.r-universe.dev
-    https://andrjohns.r-universe.dev
 Config/testthat/edition: 3
 Config/testthat/parallel: false
 Encoding: UTF-8
