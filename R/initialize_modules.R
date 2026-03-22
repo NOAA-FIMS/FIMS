@@ -583,7 +583,7 @@ initialize_comp <- function(data,
   # Check if the specified fleet exists in the data
   fleet_exists <- fleet_name %in% get_fleets(data)
   if (!fleet_exists) {
-    cli::cli_abort("Fleet {.var fleet_name} not found in the data object.")
+    cli::cli_abort("Fleet {.var {fleet_name}} not found in the data object.")
   }
 
   get_function <- comp[["get_n_function"]]
