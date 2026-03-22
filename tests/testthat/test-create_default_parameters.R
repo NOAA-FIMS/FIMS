@@ -58,5 +58,3 @@ test_that("`create_default_parameters()` works with correct inputs", {
 
 # TODO: Add additional tests for internal (unexposed) functions,
 # such as create_default_population().
-
-

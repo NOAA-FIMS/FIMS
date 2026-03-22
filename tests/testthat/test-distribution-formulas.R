@@ -301,4 +301,3 @@ test_that("`initialize_data_distribution()` returns correct error messages", {
   )
   clear()
 })
-
