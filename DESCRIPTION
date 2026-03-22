@@ -101,8 +101,8 @@ Suggests:
     remotes,
     rmarkdown,
     snowfall,
-    spelling,
     SparseNUTS,
+    spelling,
     StanEstimators,
     stockplotr,
     styler,
@@ -118,11 +118,11 @@ LinkingTo:
 VignetteBuilder:
     knitr
 Remotes: 
-    github::nmfs-ost/stockplotr,
-    github::ThinkR-open/lozen,
-    github::ThinkR-open/testdown,
     github::andrjohns/StanEstimators,
-    github::noaa-afsc/SparseNUTS
+    github::nmfs-ost/stockplotr,
+    github::noaa-afsc/SparseNUTS,
+    github::ThinkR-open/lozen,
+    github::ThinkR-open/testdown
 Additional_repositories: 
     https://noaa-fisheries-integrated-toolbox.r-universe.dev
 Config/testthat/edition: 3

@@ -10,9 +10,9 @@ em_input <- em_input_list[[iter_id]]
 
 test_that("posterior equals prior with no data", {
   # This test sets up a model without data likelihood components. All parameters
-  # without priors are fixed. Only selectivity parameters are estimated and given 
-  # priors, which are shared between the fishery and survey fleets. We run 
-  # Bayesian MCMC and expect the posterior means for the selectivity parameters 
+  # without priors are fixed. Only selectivity parameters are estimated and given
+  # priors, which are shared between the fishery and survey fleets. We run
+  # Bayesian MCMC and expect the posterior means for the selectivity parameters
   # to match the prior means and the posterior variances to match the prior variances.
 
   # Set up fleet and survey without data distributions
@@ -173,7 +173,7 @@ test_that("posterior equals prior with no data", {
 
   # set up recruitment parameters and fix as constant (default)
   # do not set up a recruitment distribution as devs will be held constant
-  # set up log_rzero (equilibrium recruitment) 
+  # set up log_rzero (equilibrium recruitment)
   recruitment$log_rzero[1]$value <- log(om_input[["R0"]])
   # set up logit_steep
   recruitment$logit_steep[1]$value <- -log(1.0 - om_input[["h"]]) + log(om_input[["h"]] - 0.2)
@@ -239,7 +239,7 @@ test_that("posterior equals prior with no data", {
 
   #' @description Test that the number of parameters in the model matches the expected number of parameters (4 selectivity parameters).
   expect_equal(length(parameters$p) + length(parameters$re), 4)
-  
+
   obj <- TMB::MakeADFun(
     data = list(), parameters, DLL = "FIMS",
     silent = TRUE, map = list()
@@ -256,15 +256,15 @@ test_that("posterior equals prior with no data", {
   #' @description Test the inflection point nll
   expect_equal(
     report_nll[2], -sum(dnorm(inflection_point_input, mean = inflection_point_mean, sd = 3, log = TRUE))
-  )   
+  )
 
   # Fit MCMC using SparseNUTS
   fit <- SparseNUTS::sample_snuts(obj, chains = 1)
-  inflection_point_est <- fit$mle$est[c(1,3)] |> unname()
-  inflection_point_se <- fit$mle$se[c(1,3)] |> unname()
-  slope_est <- fit$mle$est[c(2,4)] |> unname()
-  slope_se <- fit$mle$se[c(2,4)] |> unname()
-  for(i in 1:2){
+  inflection_point_est <- fit$mle$est[c(1, 3)] |> unname()
+  inflection_point_se <- fit$mle$se[c(1, 3)] |> unname()
+  slope_est <- fit$mle$est[c(2, 4)] |> unname()
+  slope_se <- fit$mle$se[c(2, 4)] |> unname()
+  for (i in 1:2) {
     #' @description Test that the posterior means for inflection point match the prior means.
     expect_equal(inflection_point_est[i], inflection_point_mean)
     #' @description Test that the posterior means for slope match the prior means.
@@ -273,7 +273,7 @@ test_that("posterior equals prior with no data", {
     expect_equal(inflection_point_se[i], inflection_point_sd)
     #' @description Test that the posterior standard errors for slope match the prior standard errors.
     expect_equal(slope_se[i], slope_sd)
-  } 
+  }
 
   clear()
 })
