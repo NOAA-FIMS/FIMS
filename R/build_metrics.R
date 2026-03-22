@@ -146,13 +146,17 @@ parse_binary_sizes <- function(lines){
 }
 
 parse_template_time <- function(lines){
-  raw <- extract_first(lines, "TOTAL\\s*:\\s*([0-9]+\\.[0-9]+)\\s*.*wall")
-  if (is.na(raw)){
+  matches <- regmatches(lines, regexec("^\\s*TOTAL\\s*:\\s*[0-9.]+\\s+[0-9.]+\\s+([0-9.]+)",
+    lines))
+  totals <- sapply(matches, function(m){
+    if (length(m) >= 2) as.numeric(m[[2]]){else NA_real_}
+  })
+  totals <- totals[!is.na(totals)]
+  if (length(totals) == 0){
     return(NA_real_)
   }
-  round(as.numeric(raw), 2)
+  round(sum(totals), 2)
 }
-
 extract_first <- function(lines, pattern){
   matches <- regmatches(lines, regexec(pattern, lines))
   for (m in matches){
