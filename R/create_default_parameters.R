@@ -349,16 +349,19 @@ create_default_DoubleLogistic <- function(module_name = NA_character_) {
 #' A tibble containing the default at-age parameters on the logit scale.
 #' Number of parameters is equal to the number of age classes
 #' @noRd
-create_default_SelectivityatAge <- function(module_name = NA_character_) {
-  default <- create_default_parameters_template(n_parameters = 4) |>
+create_default_SelectivityatAge <- function(
+  module_name = NA_character_,
+  data
+) {
+  default <- create_default_parameters_template(n_parameters = get_n_ages(data)) |>
     dplyr::mutate(
       module_name = !!module_name,
       module_type = "SelectivityatAge",
+      label = "sel_at_age"
+      age = get_ages(data)
       # default selectivity_at_age based on what would be defaults from logistic 
       # curve with inflection point 2 and slope 1:
-      selectivity_at_age = 1/(1+exp(get_ages(data)-2))
-      age = get_ages(data)
-      value = logit(selectivity_at_age),
+      value = logit(1/(1+exp(get_ages(data)-2))),
       estimation_type = "fixed_effects"
     )
 }
