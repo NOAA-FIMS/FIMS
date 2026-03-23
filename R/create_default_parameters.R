@@ -479,7 +479,7 @@ create_default_fleet <- function(unnested_configurations,
     index_distribution <- unnested_configurations |>
       dplyr::filter(
         fleet_name == current_fleet_name &
-        module_name == "Data" & module_type == "Index"
+          module_name == "Data" & module_type == "Index"
       ) |>
       dplyr::pull(distribution)
 
@@ -539,7 +539,7 @@ create_default_fleet <- function(unnested_configurations,
     landings_distribution <- unnested_configurations |>
       dplyr::filter(
         fleet_name == current_fleet_name &
-        module_name == "Data" & module_type == "Landings"
+          module_name == "Data" & module_type == "Landings"
       ) |>
       dplyr::pull(distribution)
 
