@@ -66,7 +66,7 @@ default maturity parameters will need modified.
 \details{
 The function processes the \code{configurations} tibble, which only contains
 high-level information for running your model by calling internal helper
-functions on each row and returning a mulit-row parameter set for each input
+functions on each row and returning a multi-row parameter set for each input
 row. For example, if a selectivity for the first fleet is configured as
 \code{"Logistic"}, it takes that single row of input information and returns a
 parameter set with two rows, one for each parameter, \code{"inflection_point"}
