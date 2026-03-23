@@ -1012,6 +1012,7 @@ refClass
 refClassDef
 refMethods
 registerRoutines
+registerS
 relativePath
 reltol
 removeTaskCallback
@@ -1200,6 +1201,7 @@ valarray
 validator
 validators
 vals
+vapply
 vec
 vectorized
 visualstudio

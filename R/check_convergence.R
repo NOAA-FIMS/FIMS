@@ -236,7 +236,8 @@ check_sdreport_convergence <- function(input, obj, opt, sdreport) {
             seq_len(n_show),
             function(i) {
               cli::format_inline(
-                "{i}. {.val {rownames(sdr_mat)[i]}}: {.val {format(sdr_mat[i, 'Std. Error'], scientific = TRUE)}}"
+                "{i}. {.val {rownames(sdr_mat)[i]}}:
+                {.val {format(sdr_mat[i, 'Std. Error'], scientific = TRUE)}}"
               )
             },
             character(1)
