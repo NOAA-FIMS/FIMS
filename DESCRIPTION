@@ -101,6 +101,7 @@ Suggests:
     remotes,
     rmarkdown,
     snowfall,
+    SparseNUTS,
     spelling,
     stockplotr,
     styler,
@@ -115,8 +116,9 @@ LinkingTo:
     TMB
 VignetteBuilder:
     knitr
-Remotes: 
+Remotes:
     github::nmfs-ost/stockplotr,
+    github::noaa-afsc/SparseNUTS,
     github::ThinkR-open/lozen,
     github::ThinkR-open/testdown
 Additional_repositories: 

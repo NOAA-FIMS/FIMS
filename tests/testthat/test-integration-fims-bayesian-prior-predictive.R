@@ -8,7 +8,13 @@ om_input <- om_input_list[[iter_id]]
 om_output <- om_output_list[[iter_id]]
 em_input <- em_input_list[[iter_id]]
 
-test_that("prior predictive check", {
+test_that("posterior equals prior with no data", {
+  # This test sets up a model without data likelihood components. All parameters
+  # without priors are fixed. Only selectivity parameters are estimated and given
+  # priors, which are shared between the fishery and survey fleets. We run
+  # Bayesian MCMC and expect the posterior means for the selectivity parameters
+  # to match the prior means and the posterior variances to match the prior variances.
+
   # Set up fleet and survey without data distributions
 
   # Extract fishing fleet landings data (observed) and initialize index module
@@ -68,7 +74,6 @@ test_that("prior predictive check", {
     # Log-transform OM fishing mortality
     fishing_fleet$log_Fmort[y]$value <- log(om_output[["f"]][y])
   }
-  fishing_fleet$log_Fmort$set_all_estimable(TRUE)
   fishing_fleet$log_q[1]$value <- log(1.0)
   fishing_fleet$SetSelectivityID(fishing_fleet_selectivity$get_id())
   fishing_fleet$SetObservedIndexDataID(fishing_fleet_index$get_id())
@@ -84,10 +89,6 @@ test_that("prior predictive check", {
     # Set the age-length conversion matrix values
     fishing_fleet$age_to_length_conversion[i]$value <- c(t(em_input[["age_to_length_conversion"]]))[i]
   }
-
-  # Turn off estimation for length-at-age
-  fishing_fleet$age_to_length_conversion$set_all_estimable(FALSE)
-  fishing_fleet$age_to_length_conversion$set_all_random(FALSE)
 
   # Repeat similar setup for the survey fleet (e.g., index, age comp, and length comp)
   # This includes initializing logistic selectivity, observed data modules, and distribution links.
@@ -133,9 +134,7 @@ test_that("prior predictive check", {
     # Log-transform OM fishing mortality
     survey_fleet$log_Fmort[y]$value <- (-200)
   }
-  survey_fleet$log_Fmort$set_all_estimable(FALSE)
   survey_fleet$log_q[1]$value <- log(om_output[["survey_q"]][["survey1"]])
-  survey_fleet$log_q[1]$estimation_type$set("fixed_effects")
   survey_fleet$SetSelectivityID(survey_fleet_selectivity$get_id())
   survey_fleet$SetObservedIndexDataID(survey_fleet_index$get_id())
   survey_fleet$SetObservedAgeCompDataID(survey_fleet_age_comp$get_id())
@@ -146,68 +145,46 @@ test_that("prior predictive check", {
     survey_fleet$age_to_length_conversion[i]$value <-
       c(t(em_input[["age_to_length_conversion"]]))[i]
   }
-  # Turn off estimation for length-at-age
-  survey_fleet$age_to_length_conversion$set_all_estimable(FALSE)
-  survey_fleet$age_to_length_conversion$set_all_random(FALSE)
 
+  # Set up priors for selectivity parameters and link to both fishery and survey selectivity
   slope_mean <- mean(c(om_input[["sel_fleet"]][["fleet1"]][["slope.sel1"]], om_input[["sel_survey"]][["survey1"]][["slope.sel1"]]))
+  slope_sd <- 3
   slope_prior <- methods::new(DnormDistribution)
   slope_prior$expected_values$resize(2)
   slope_prior$expected_values[1]$value <- slope_mean
   slope_prior$expected_values[2]$value <- slope_mean
   slope_prior$log_sd$resize(1)
-  slope_prior$log_sd[1]$value <- log(3)
+  slope_prior$log_sd[1]$value <- log(slope_sd)
   slope_prior$set_distribution_links("prior", c(fishing_fleet_selectivity$slope$get_id(), survey_fleet_selectivity$slope$get_id()))
 
   inflection_point_mean <- mean(c(om_input[["sel_fleet"]][["fleet1"]][["A50.sel1"]], om_input[["sel_survey"]][["survey1"]][["A50.sel1"]]))
+  inflection_point_sd <- 3
   inflection_point_prior <- methods::new(DnormDistribution)
   inflection_point_prior$expected_values$resize(2)
   inflection_point_prior$expected_values[1]$value <- inflection_point_mean
   inflection_point_prior$expected_values[2]$value <- inflection_point_mean
   inflection_point_prior$log_sd$resize(1)
-  inflection_point_prior$log_sd[1]$value <- log(3)
+  inflection_point_prior$log_sd[1]$value <- log(inflection_point_sd)
   inflection_point_prior$set_distribution_links("prior", c(fishing_fleet_selectivity$inflection_point$get_id(), survey_fleet_selectivity$inflection_point$get_id()))
 
-  # Add shared selectivity vague prior for fishery and survey
 
   recruitment <- methods::new(BevertonHoltRecruitment)
   recruitment_process <- new(LogDevsRecruitmentProcess)
-  # NOTE: in first set of parameters below (for recruitment),
-  # $is_random_effect (default is FALSE) and $estimated (default is FALSE)
-  # are defined even if they match the defaults in order to provide an example
-  # of how that is done. Other sections of the code below leave defaults in
-  # place as appropriate.
 
+  # set up recruitment parameters and fix as constant (default)
+  # do not set up a recruitment distribution as devs will be held constant
   # set up log_rzero (equilibrium recruitment)
   recruitment$log_rzero[1]$value <- log(om_input[["R0"]])
-  recruitment$log_rzero[1]$estimation_type$set("fixed_effects")
   # set up logit_steep
   recruitment$logit_steep[1]$value <- -log(1.0 - om_input[["h"]]) + log(om_input[["h"]] - 0.2)
-  recruitment$logit_steep[1]$estimation_type$set("constant")
-  # turn on estimation of deviations
   # recruit deviations should enter the model in normal space.
   # The log is taken in the likelihood calculations
-  # alternative setting: recruitment$log_devs <- rep(0, length(om_input$logR.resid))
   recruitment$log_devs$resize(om_input[["nyr"]] - 1)
   for (y in 1:(om_input[["nyr"]] - 1)) {
     recruitment$log_devs[y]$value <- om_input[["logR.resid"]][y + 1]
   }
-  recruitment$log_devs$set_all_estimable(TRUE)
   recruitment$n_years$set(om_input[["nyr"]])
   recruitment$SetRecruitmentProcessID(recruitment_process$get_id())
-  recruitment_distribution <- methods::new(DnormDistribution)
-  # set up logR_sd using the normal log_sd parameter
-  # logR_sd is NOT logged. It needs to enter the model logged b/c the exp() is
-  # taken before the likelihood calculation
-  recruitment_distribution$log_sd <- methods::new(ParameterVector, 1)
-  recruitment_distribution$log_sd[1]$value <- log(om_input[["logR_sd"]])
-  recruitment_distribution$observed_values$resize(om_input[["nyr"]] - 1)
-  recruitment_distribution$expected_values$resize(om_input[["nyr"]] - 1)
-  for (i in 1:(om_input[["nyr"]] - 1)) {
-    recruitment_distribution$observed_values[i]$value <- 0
-    recruitment_distribution$expected_values[i]$value <- 0
-  }
-  recruitment_distribution$set_distribution_links("random_effects", recruitment$log_devs$get_id())
 
   # Growth
   ewaa_growth <- methods::new(EWAAGrowth)
@@ -238,12 +215,10 @@ test_that("prior predictive check", {
   for (i in 1:(om_input[["nyr"]] * om_input[["nages"]])) {
     population$log_M[i]$value <- log(om_input[["M.age"]][1])
   }
-  population$log_M$set_all_estimable(FALSE)
   population$log_init_naa$resize(om_input[["nages"]])
   for (i in 1:om_input$nages) {
     population$log_init_naa[i]$value <- log(om_output[["N.age"]][1, i])
   }
-  population$log_init_naa$set_all_estimable(TRUE)
   population$n_ages$set(om_input[["nages"]])
   population$ages$resize(om_input[["nages"]])
   purrr::walk(
@@ -261,37 +236,44 @@ test_that("prior predictive check", {
   CreateTMBModel()
   # Create parameter list from Rcpp modules
   parameters <- list(p = get_fixed(), re = get_random())
+
+  #' @description Test that the number of parameters in the model matches the expected number of parameters (4 selectivity parameters).
+  expect_equal(length(parameters$p) + length(parameters$re), 4)
+
   obj <- TMB::MakeADFun(
     data = list(), parameters, DLL = "FIMS",
     silent = TRUE, map = list()
   )
 
-  opt <- stats::nlminb(obj[["par"]], obj[["fn"]], obj[["gr"]],
-    control = list(eval.max = 10000, iter.max = 10000, trace = 0)
+  # Test the prior nll values
+  report_nll <- obj$report()$nll_components
+  inflection_point_input <- c(om_input[["sel_fleet"]][["fleet1"]][["A50.sel1"]], om_input[["sel_survey"]][["survey1"]][["A50.sel1"]])
+  slope_input <- c(om_input[["sel_fleet"]][["fleet1"]][["slope.sel1"]], om_input[["sel_survey"]][["survey1"]][["slope.sel1"]])
+  #' @description Test the slope nll
+  expect_equal(
+    report_nll[1], -sum(dnorm(slope_input, mean = slope_mean, sd = 3, log = TRUE))
+  )
+  #' @description Test the inflection point nll
+  expect_equal(
+    report_nll[2], -sum(dnorm(inflection_point_input, mean = inflection_point_mean, sd = 3, log = TRUE))
   )
 
-  names(opt$par) <- names(get_parameter_names(opt$par))
-  inflection_point_out <- opt$par[grep(names(opt$par), pattern = "inflection_point")]
-  slope_out <- opt$par[grep(names(opt$par), pattern = "slope")]
+  # Fit MCMC using SparseNUTS
+  fit <- SparseNUTS::sample_snuts(obj, chains = 1)
+  inflection_point_est <- fit$mle$est[c(1, 3)]
+  inflection_point_se <- fit$mle$se[c(1, 3)]
+  slope_est <- fit$mle$est[c(2, 4)]
+  slope_se <- fit$mle$se[c(2, 4)]
   for (i in 1:2) {
-    #' @description Test that the posterior means for inflection point match the prior means within tolerance of 1e-4.
-    expect_equal(unname(inflection_point_out[i]), unname(inflection_point_mean), tolerance = 1e-4)
-    #' @description Test that the posterior means for slope match the prior means within tolerance of 1e-4.
-    expect_equal(unname(slope_out[i]), unname(slope_mean), tolerance = 1e-4)
+    #' @description Test that the posterior means for inflection point match the prior means.
+    expect_equal(inflection_point_est[[i]], inflection_point_mean)
+    #' @description Test that the posterior means for slope match the prior means.
+    expect_equal(slope_est[[i]], slope_mean)
+    #' @description Test that the posterior standard errors for inflection point match the prior standard errors.
+    expect_equal(inflection_point_se[[i]], inflection_point_sd)
+    #' @description Test that the posterior standard errors for slope match the prior standard errors.
+    expect_equal(slope_se[[i]], slope_sd)
   }
-
-
-  # fit <- tmbstan::tmbstan(obj, init =  "best.last.par")
-  # postmle <- as.matrix(fit)[, -ncol(as.matrix(fit))]
-  # colnames(postmle) <- names(get_parameter_names(obj$par))
-  # inflection_point_out <- postmle[,grep(colnames(postmle), pattern = "inflection_point")]
-  # slope_out <- postmle[,grep(colnames(postmle), pattern = "slope")]
-  # for(i in 1:2){
-  #   expect_equal(median(inflection_point_out[,i]), inflection_point_mean, tolerance = .1)
-  #   expect_equal(median(slope_out[,i]), slope_mean, tolerance = .1)
-  #   expect_equal(var(inflection_point_out[,i]), 9, tolerance = .1)
-  #   expect_equal(var(slope_out[,i]), 9, tolerance = .1)
-  # }
 
   clear()
 })
