@@ -259,7 +259,9 @@ test_that("posterior equals prior with no data", {
   )
 
   # Fit MCMC using SparseNUTS
-  fit <- SparseNUTS::sample_snuts(obj, chains = 1)
+  invisible(capture.output(
+    fit <- SparseNUTS::sample_snuts(obj, chains = 1)
+  ))
   inflection_point_est <- fit$mle$est[c(1, 3)]
   inflection_point_se <- fit$mle$se[c(1, 3)]
   slope_est <- fit$mle$est[c(2, 4)]
