@@ -229,16 +229,17 @@ get_expected_name <- function(family, data_type) {
 #' @param sd A list of length two. The first entry is named `"value"` and it
 #'   stores the initial values (scalar or vector) for the relevant standard
 #'   deviations. The default is `value = 1`. The second entry is named
-#'  `"estimation_type"` and it stores a vector of booleans (default = "constant") is a
-#'   string indicating whether or not standard deviation is estimated as a fixed effect
-#'   or held constant. If `"value"` is a vector and `"estimation_type"` is a scalar,
-#'   the single value specified `"estimation_type"` value will be repeated to match the length of
-#'   `value`. Otherwise, the dimensions of the two must match.
+#'  `"estimation_type"` and it stores a vector of booleans (default =
+#'   "constant") is a string indicating whether or not standard deviation is
+#'   estimated as a fixed effect or held constant. If `"value"` is a vector and
+#'   `"estimation_type"` is a scalar, the single value specified
+#'   `"estimation_type"` value will be repeated to match the length of `value`.
+#'   Otherwise, the dimensions of the two must match.
 #' @param data_type A string specifying the type of data that the
 #'   distribution will be fit to. Allowable types include
-#'   `r toString(formals(initialize_data_distribution)[["data_type"]])`
+#'   `r glue::glue_collapse(sprintf('"%s"', eval(formals(initialize_data_distribution)[["data_type"]])), sep = ", ", last = ", and ")`
 #'   and the default is
-#'   `r toString(formals(initialize_data_distribution)[["data_type"]][1])`.
+#'   `r eval(formals(initialize_data_distribution)[["data_type"]])[1]`.
 #' @param par A string specifying the parameter name the distribution applies
 #'   to. Parameters must be members of the specified module. Use
 #'   `methods::show(module)` to obtain names of parameters within the module.
@@ -259,7 +260,7 @@ get_expected_name <- function(family, data_type) {
 #'   family = lognormal(link = "log"),
 #'   sd = list(
 #'     value = rep(sqrt(log(0.01^2 + 1)), n_years),
-#'     estimation_type = rep("constant", n_years) # Could also be a single "constant"
+#'     estimation_type = rep("constant", n_years) # Can be a single "constant"
 #'   ),
 #'   data_type = "index"
 #' )

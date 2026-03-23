@@ -12,49 +12,64 @@ utils::globalVariables(c(
 #' Create default parameters for a FIMS model
 #'
 #' @description
-#' This function generates a Fisheries Integrated Modeling System (FIMS) model
-#' configuration with detailed parameter specifications. This function takes a
-#' high-level configuration `tibble` and generates the corresponding parameters
-#' with default initial values and estimation settings required to build and run
-#' the model.
+#' This function generates a tibble with all of the parameters necessary to run
+#' a FIMS model given the desired high-level configuration that is specified in
+#' `configurations`. The tibble contains default initial values and estimation
+#' settings required to build and run the model. You can edit the returned
+#' tibble if you want to changes things such as initial values to values more
+#' specific to your population before running your model. For example, the
+#' default maturity parameters will need modified.
 #'
 #' @details
-#' The function processes the input `configurations` tibble, which defines the
-#' modules for different model components (e.g., `"Selectivity"`, `"Recruitment"`).
-#' For each module specified, it calls internal helper functions to create a
-#' default set of parameters. For example, if a fleet's selectivity is configured
-#' as `"Logistic"`, it generates initial values for `"inflection_point"` and
-#' `"slope"`.
+#' The function processes the `configurations` tibble, which only contains
+#' high-level information for running your model by calling internal helper
+#' functions on each row and returning a mulit-row parameter set for each input
+#' row. For example, if a selectivity for the first fleet is configured as
+#' `"Logistic"`, it takes that single row of input information and returns a
+#' parameter set with two rows, one for each parameter, `"inflection_point"`
+#' and `"slope"`.
 #'
 #' @param configurations A tibble of model configurations. Typically created
 #'   by [create_default_configurations()]. Users can modify this tibble
-#'   to customize the model structure before generating default parameters.
-#' @param data An S4 object. FIMS input data.
-#' @return A `tibble` with default model parameters. The tibble has a nested
-#'   structure with the following top-level columns.
+#'   to customize the model structure before using it as input to this function.
+#' @param data A `FIMSFrame` object returned from running [FIMSFrame()] on
+#'   your long input data.
+#' @return
+#' A nested `tibble` containing information on parameters for your model with
+#' the same top-level columns as the input tibble passed to `configurations`
+#' but with additional information in the nested `data` column. See below for
+#' more details:
 #' \describe{
 #'   \item{\code{model_family}:}{The specified model family (e.g.,
 #'     "catch_at_age").}
 #'   \item{\code{module_name}:}{The name of the FIMS module (e.g.,
-#'     "Data", "Selectivity", "Recruitment", "Growth", "Maturity").}
+#'     "Data", "Selectivity", "Recruitment", "Growth", "Maturity"). These
+#'     entries are always written in PascalCase to match the names used in the
+#'     C++ code.}
 #'   \item{\code{fleet_name}:}{The name of the fleet the module applies to. This
 #'     will be `NA` for non-fleet-specific modules like "Recruitment".}
 #'   \item{\code{data}:}{A list-column containing a `tibble` with detailed
 #'     parameters. Unnesting this column reveals:
 #'     \describe{
 #'       \item{\code{module_type}:}{The specific type of the module (e.g.,
-#'         "Logistic" for a "Selectivity" module).}
-#'       \item{\code{label}:}{The name of the parameter (e.g., "inflection_point").}
+#'         "Logistic" for a "Selectivity" module). This column will always be
+#'         written in PascalCase to match the names used in the C++ code.}
+#'       \item{\code{label}:}{The name of the parameter (e.g.,
+#'         "inflection_point").}
 #'       \item{\code{age}:}{The age the parameter applies to.}
 #'       \item{\code{length}:}{The length bin the parameter applies to.}
-#'       \item{\code{time}:}{The time step (i.e., year) the parameter applies to.}
+#'       \item{\code{time}:}{The time step (i.e., year) the parameter applies
+#'         to.}
 #'       \item{\code{value}:}{The initial value of the parameter.}
 #'       \item{\code{estimation_type}:}{The type of estimation (e.g.,
 #'         "constant", "fixed_effects", "random_effects").}
-#'       \item{\code{distribution_type}:}{The type of distribution (e.g., "Data",
-#'         "process").}
+#'       \item{\code{distribution_type}:}{The type of distribution (e.g.,
+#'         "Data", "process"), where a process distribution can refer to a
+#'         fixed effect or a random effect but it does not fit to data, e.g.,
+#'         recruitment deviations.}
 #'       \item{\code{distribution}:}{The name of distribution (e.g.,
-#'         "Dlnorm", `Dmultinom`).}
+#'         "Dlnorm", `Dmultinom`). The column will always be written in
+#'         PascalCase to match the names used in the C++ code.}
 #'     }
 #'   }
 #' }
@@ -91,7 +106,7 @@ utils::globalVariables(c(
 #'
 #' # Do the same as above except, model fleet1 with double logistic selectivity
 #' # To see required parameters for double logistic selectivity, run
-#' # show(DoubleLogisticSelectivity)
+#' # show(DoubleLogisticSelectivity) and look at the Fields list
 #' parameters_with_double_logistic <- default_configurations |>
 #'   tidyr::unnest(cols = data) |>
 #'   dplyr::rows_update(
@@ -180,7 +195,10 @@ create_default_parameters <- function(
   ) |>
     dplyr::mutate(
       model_family = dplyr::coalesce(model_family.y, model_family.x),
-      distribution_type = dplyr::coalesce(distribution_type.y, distribution_type.x),
+      distribution_type = dplyr::coalesce(
+        distribution_type.y,
+        distribution_type.x
+      ),
       distribution = dplyr::coalesce(distribution.y, distribution.x),
       distribution_type = dplyr::if_else(
         module_name == "Recruitment" & !label %in% c("log_devs", "log_r", "log_sd"),
@@ -210,7 +228,8 @@ create_default_parameters <- function(
 #' Integrated Modeling System (FIMS) model. The template includes fields for
 #' module name, module type, label, fleet name, population name, age, length,
 #' time, value, estimation type, distribution type, and distribution.
-#' @param n_parameters An integer specifying the number of parameters in the template.
+#' @param n_parameters An integer specifying the number of parameters in the
+#' template.
 #' @return
 #' A tibble template for a FIMS model.
 #' @noRd
@@ -239,13 +258,14 @@ create_default_parameters_template <- function(n_parameters = 1) {
 #' @description
 #' This function sets up default parameters for a population module.
 #' @details
-#' The natural log of the initial numbers at age (`log_init_naa.value`) is set based on
-#' unexploited recruitment and natural mortality.
-#' @param unnested_configurations A tibble of model configurations. Typically created
-#'   by the `create_default_configurations()`.
+#' The natural log of the initial numbers at age (`log_init_naa.value`) is set
+#' based on unexploited recruitment and natural mortality.
+#' @param unnested_configurations A tibble of model configurations. Typically
+#'   created by the `create_default_configurations()`.
 #' @param data An S4 object. FIMS input data.
 #' @param log_rzero A numeric value representing the natural log of unexploited
 #'   recruitment.
+#' @inheritParams create_default_parameters
 #' @return
 #' A tibble of default population parameters, including initial numbers at
 #' age and natural mortality rate.
@@ -312,8 +332,8 @@ create_default_Population <- function(
 #' This function sets up default parameters for a logistic function. There are
 #' two specified parameters, the inflection point and slope.
 #' @return
-#' A tibble containing the default logistic parameters, with inflection_point and
-#' slope values and their estimation status.
+#' A tibble containing the default logistic parameters, with inflection_point
+#' and slope values and their estimation status.
 #' @noRd
 create_default_Logistic <- function() {
   # Create a template for default parameters
@@ -343,7 +363,12 @@ create_default_DoubleLogistic <- function(module_name = NA_character_) {
     dplyr::mutate(
       module_name = !!module_name,
       module_type = "DoubleLogistic",
-      label = c("inflection_point_asc", "slope_asc", "inflection_point_desc", "slope_desc"),
+      label = c(
+        "inflection_point_asc",
+        "slope_asc",
+        "inflection_point_desc",
+        "slope_desc"
+      ),
       # TODO: Determine if inflection_point_desc should really be 4?
       value = c(2, 1, 4, 1),
       estimation_type = "fixed_effects"
@@ -400,7 +425,8 @@ create_default_fleet <- function(unnested_configurations,
   if (length(current_fleet_name) > 1) {
     cli::cli_abort(c(
       "i" = "{.var current_fleet_name} should have a length of 1.",
-      "x" = "{.var current_fleet_name} has a length of {length(current_fleet_name)}."
+      "x" = "{.var current_fleet_name} has a length of
+        {length(current_fleet_name)}."
     ))
   }
   if (!inherits(current_fleet_name, "character")) {
@@ -452,7 +478,8 @@ create_default_fleet <- function(unnested_configurations,
 
     index_distribution <- unnested_configurations |>
       dplyr::filter(
-        fleet_name == current_fleet_name & module_name == "Data" & module_type == "Index"
+        fleet_name == current_fleet_name &
+        module_name == "Data" & module_type == "Index"
       ) |>
       dplyr::pull(distribution)
 
@@ -510,7 +537,10 @@ create_default_fleet <- function(unnested_configurations,
       )
 
     landings_distribution <- unnested_configurations |>
-      dplyr::filter(fleet_name == current_fleet_name & module_name == "Data" & module_type == "Landings") |>
+      dplyr::filter(
+        fleet_name == current_fleet_name &
+        module_name == "Data" & module_type == "Landings"
+      ) |>
       dplyr::pull(distribution)
 
     landings_uncertainty <- get_data(data) |>
@@ -597,8 +627,9 @@ create_default_maturity <- function(
     "Logistic" = create_default_Logistic()
   ) |>
     # We don't have an option to input maturity data into FIMS, so the maturity
-    # parameters aren't really estimable. The parameters should be constant for now.
-    # See more details from https://github.com/orgs/NOAA-FIMS/discussions/944.
+    # parameters aren't really estimable. The parameters should be constant for
+    # now. See more details from
+    # https://github.com/orgs/NOAA-FIMS/discussions/944.
     dplyr::mutate(
       estimation_type = "constant",
       module_name = "Maturity"
@@ -614,7 +645,8 @@ create_default_maturity <- function(
 #' keep it between zero and one, and the time series of stock--recruitment
 #' deviations on the natural log scale.
 #' @param data An S4 object. FIMS input data.
-#' @param distribution A string specifying the distribution for recruitment process.
+#' @param distribution A string specifying the distribution for the recruitment
+#' process.
 #' @return
 #' A tibble containing default recruitment parameters.
 #' @noRd
@@ -777,14 +809,18 @@ create_default_recruitment <- function(
   data
 ) {
   # Input checks
-  # TODO: extend this code when there is more than one form of recruitment (i.e., multiple populations)
+  # TODO: extend this code when there is more than one form of recruitment
+  #       (i.e., multiple populations)
   available_recruitment_forms <- c("BevertonHolt")
   available_distribution_forms <- c("Dnorm")
   form <- unnested_configurations |>
     dplyr::filter(module_name == "Recruitment") |>
     dplyr::pull(module_type)
   if (length(form) != 1) {
-    cli::cli_abort("There must be exactly one form (e.g. Beverton Holt) associated with Recruitment.")
+    cli::cli_abort(
+      "There must be exactly one form (e.g., BevertonHolt) associated with
+      Recruitment."
+    )
   }
   if (!form %in% available_recruitment_forms) {
     cli::cli_abort(c(
@@ -796,7 +832,9 @@ create_default_recruitment <- function(
     dplyr::filter(module_name == "Recruitment") |>
     dplyr::pull(distribution)
   if (length(distribution) != 1) {
-    cli::cli_abort("There must be at most one distribution associated with Recruitment.")
+    cli::cli_abort(
+      "There must be at most one distribution associated with Recruitment."
+    )
   }
   if (!is.na(distribution) && !distribution %in% available_distribution_forms) {
     cli::cli_abort(c(
