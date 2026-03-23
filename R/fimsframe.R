@@ -544,33 +544,24 @@ methods::setMethod(
   "model_age_to_length_conversion",
   "FIMSFrame",
   function(x) {
-    if ("length" %in% colnames(x@data)) {
-      if (!"age" %in% colnames(x@data)) {
-        cli::cli_abort("The age column is not present in your data.")
-      }
-      model_data <- dplyr::filter(
-        .data = as.data.frame(x@data),
-        .data[["type"]] == "age_to_length_conversion"
-      )
-      if (NROW(model_data) > get_n_ages(x) * get_n_lengths(x)) {
-        cli::cli_warn(
-          "`age_to_length_conversion` data is time- and fleet-invariant and
-          should consist of {get_n_ages(x) * get_n_lengths(x)} rows not
-          {NROW(model_data)} rows like what is provided. Data passed to the
-          model will be averages over timing and name."
-        )
-      }
-      model_data |>
-        dplyr::group_by(.data[["age"]], .data[["length"]]) |>
-        dplyr::summarize(
-          mean_value = mean(as.numeric(.data[["value"]]), na.rm = TRUE)
-        ) |>
-        dplyr::pull(as.numeric(.data[["mean_value"]]))
-    } else {
-      cli::cli_abort(
-        "The length column is not present in your data."
+    model_data <- dplyr::filter(
+      .data = as.data.frame(x@data),
+      .data[["type"]] == "age_to_length_conversion"
+    )
+    if (NROW(model_data) > get_n_ages(x) * get_n_lengths(x)) {
+      cli::cli_warn(
+        "`age_to_length_conversion` data is time- and fleet-invariant and
+        should consist of {get_n_ages(x) * get_n_lengths(x)} rows not
+        {NROW(model_data)} rows like what is provided. Data passed to the
+        model will be averages over timing and name."
       )
     }
+    model_data |>
+      dplyr::group_by(.data[["age"]], .data[["length"]]) |>
+      dplyr::summarize(
+        mean_value = mean(as.numeric(.data[["value"]]), na.rm = TRUE)
+      ) |>
+      dplyr::pull(as.numeric(.data[["mean_value"]]))
   }
 )
 #' @rdname model_
@@ -807,7 +798,7 @@ validate_dimension_of_conversion <- function(data, n_groups, n_timings) {
     n_timings
   )
   if (n_timings == 1) {
-    if (n_rows != n_groups) {
+    if (n_rows < n_groups) {
       cli::cli_abort(
         "You are missing combinations of {good_type}, where your {.var data}
         has {n_rows} row{?s} but should have at least {n_groups} rows."
@@ -972,6 +963,14 @@ FIMSFrame <- function(data) {
       lengths <- sort(na.omit(
         unique(data_for_length_calculations[["length"]])
       ))
+      # Check that the age column exists b/c conversion data depends on it
+      if (!"age" %in% colnames(data)) {
+        cli::cli_abort(
+          "You have length-composition data, which requires having an age column
+          because you have to convert lengths to ages using the
+          {.var age_to_length_conversion} type."
+        )
+      }
       # Check that age_to_length_conversion data exist once
       validate_dimension_of_conversion(
         dplyr::filter(data, type == "age_to_length_conversion"),
