@@ -168,7 +168,7 @@ parameters_projection <- create_default_parameters(
       estimation_type = rep("constant", years_of_projection)
     ),
     by = c("label", "time")
-  )  |>
+  ) |>
   # Update selectivity parameters and log_q for survey1
   dplyr::rows_update(
     tibble::tibble(
