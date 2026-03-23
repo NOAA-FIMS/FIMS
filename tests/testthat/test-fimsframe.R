@@ -252,30 +252,6 @@ test_that("`FIMSFrame()` returns correct error messages", {
     regexp = "Please check your length-composition data for missing lengths"
   )
 
-  #' @description Test that the `model_landings()` returns an error when a fleet is not supplied.
-  expect_error(
-    model_landings(fims_frame),
-    regexp = "is missing, with no default"
-  )
-
-  #' @description Test that the `model_index()` returns an error when a fleet is not supplied.
-  expect_error(
-    model_index(fims_frame),
-    regexp = "is missing, with no default"
-  )
-
-  #' @description Test that the `model_age_comp()` returns an error when a fleet is not supplied.
-  expect_error(
-    model_age_comp(fims_frame),
-    regexp = "is missing, with no default"
-  )
-
-  #' @description Test that the `model_length_comp()` returns an error when a fleet is not supplied.
-  expect_error(
-    model_length_comp(fims_frame),
-    regexp = "is missing, with no default"
-  )
-
   bad <- dplyr::mutate(
     data_big,
     type = ifelse(type == "index", "indexes", type) # Introduce an unsupported type
@@ -306,7 +282,7 @@ test_that("`FIMSFrame()` returns correct error messages", {
   )
 })
 
-# m_* ----
+# model_* ----
 ## Setup ----
 fims_frame <- FIMS::FIMSFrame(data_big)
 n_years <- get_n_years(fims_frame)
@@ -377,6 +353,30 @@ test_that("`model_*()` returns correct error messages", {
   expect_error(
     model_weight_at_age(fims_frame, fleet_names),
     regexp = "unused argument"
+  )
+
+  #' @description Test that the `model_landings()` returns an error when a fleet is not supplied.
+  expect_error(
+    model_landings(fims_frame),
+    regexp = "is missing, with no default"
+  )
+
+  #' @description Test that the `model_index()` returns an error when a fleet is not supplied.
+  expect_error(
+    model_index(fims_frame),
+    regexp = "is missing, with no default"
+  )
+
+  #' @description Test that the `model_age_comp()` returns an error when a fleet is not supplied.
+  expect_error(
+    model_age_comp(fims_frame),
+    regexp = "is missing, with no default"
+  )
+
+  #' @description Test that the `model_length_comp()` returns an error when a fleet is not supplied.
+  expect_error(
+    model_length_comp(fims_frame),
+    regexp = "is missing, with no default"
   )
 })
 
