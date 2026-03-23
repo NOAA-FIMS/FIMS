@@ -165,7 +165,6 @@ test_that("check_sdreport_convergence() returns correct outputs for edge cases",
     object = FIMS:::check_sdreport_convergence(list(), obj, opt, sdreport),
     regexp = "Unable to extract summary from sdreport"
   )
-
 })
 
 ## Error handling ----
