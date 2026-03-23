@@ -194,7 +194,7 @@ parameters_projection <- create_default_parameters(
         # recruitment deviations are fixed at zero for the projections
         rep(0, years_of_projection)
       ),
-      estimation_type = "fixed_effects"
+      estimation_type = "random_effects"
     ),
     by = c("label", "time")
   ) |>
@@ -215,7 +215,8 @@ parameters_projection <- create_default_parameters(
     tibble::tibble(
       module_name = "Recruitment",
       label = "log_sd",
-      value = 0.4
+      value = 0.4,
+      estimation_type = "fixed_effects"
     ),
     by = c("module_name", "label")
   ) |>
