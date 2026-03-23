@@ -206,7 +206,7 @@ check_sdreport_convergence <- function(input, obj, opt, sdreport, filename) {
       condition_number <- kappa(hessian)
       sdr_mat <- summary(sdreport) |>
         as.data.frame() |>
-        dplyr::arrange(desc(`Std. Error`)) |>
+        dplyr::arrange(dplyr::desc(`Std. Error`)) |>
         head(2)
 
 
