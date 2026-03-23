@@ -229,21 +229,20 @@ get_expected_name <- function(family, data_type) {
 #' @param sd A list of length two. The first entry is named `"value"` and it
 #'   stores the initial values (scalar or vector) for the relevant standard
 #'   deviations. The default is `value = 1`. The second entry is named
-#'  `"estimation_type"` and it stores a vector of booleans (default = "constant") is a
-#'   string indicating whether or not standard deviation is estimated as a fixed effect
-#'   or held constant. If `"value"` is a vector and `"estimation_type"` is a scalar,
-#'   the single value specified `"estimation_type"` value will be repeated to match the length of
-#'   `value`. Otherwise, the dimensions of the two must match.
+#'  `"estimation_type"` and it stores a vector of booleans (default =
+#'   "constant") is a string indicating whether or not standard deviation is
+#'   estimated as a fixed effect or held constant. If `"value"` is a vector and
+#'   `"estimation_type"` is a scalar, the single value specified
+#'   `"estimation_type"` value will be repeated to match the length of `value`.
+#'   Otherwise, the dimensions of the two must match.
 #' @param data_type A string specifying the type of data that the
 #'   distribution will be fit to. Allowable types include
-#'   `r toString(formals(initialize_data_distribution)[["data_type"]])`
+#'   `r glue::glue_collapse(sprintf('"%s"', eval(formals(initialize_data_distribution)[["data_type"]])), sep = ", ", last = ", and ")`
 #'   and the default is
-#'   `r toString(formals(initialize_data_distribution)[["data_type"]][1])`.
+#'   `r eval(formals(initialize_data_distribution)[["data_type"]])[1]`.
 #' @param par A string specifying the parameter name the distribution applies
 #'   to. Parameters must be members of the specified module. Use
 #'   `methods::show(module)` to obtain names of parameters within the module.
-#' @param is_random_effect A boolean indicating whether or not the process is
-#'   estimated as a random effect.
 #' @return
 #' A reference class. is returned. Use [methods::show()] to view the various
 #' Rcpp class fields, methods, and documentation.
@@ -261,7 +260,7 @@ get_expected_name <- function(family, data_type) {
 #'   family = lognormal(link = "log"),
 #'   sd = list(
 #'     value = rep(sqrt(log(0.01^2 + 1)), n_years),
-#'     estimation_type = rep("constant", n_years) # Could also be a single "constant"
+#'     estimation_type = rep("constant", n_years) # Can be a single "constant"
 #'   ),
 #'   data_type = "index"
 #' )
@@ -276,8 +275,7 @@ get_expected_name <- function(family, data_type) {
 #'   module = recruitment,
 #'   par = "log_devs",
 #'   family = gaussian(),
-#'   sd = list(value = 0.4, estimation_type = "constant"),
-#'   is_random_effect = FALSE
+#'   sd = list(value = 0.4, estimation_type = "constant")
 #' )
 #' }
 initialize_data_distribution <- function(
@@ -383,14 +381,16 @@ initialize_process_distribution <- function(
   family = NULL,
   sd = tibble::tibble(
     value = 1,
-    estimation_type = "constant"
-  ),
-  is_random_effect = FALSE
+    estimation_type = "fixed_effects"
+  )
 ) {
   # validity check on user input
   args <- list(family = family, sd = sd)
   check_distribution_validity(args)
 
+  if (!is.element(par, c("log_devs", "log_r"))) {
+    return()
+  }
   expected <- switch(paste0(par, "_", class(module)),
     "log_devs_Rcpp_BevertonHoltRecruitment" = NULL,
     "log_r_Rcpp_BevertonHoltRecruitment" = "log_expected_recruitment"
@@ -483,6 +483,9 @@ initialize_process_distribution <- function(
 #' @keywords distribution
 #' @export
 initialize_process_structure <- function(module, par) {
+  if (!is.element(par, c("log_devs", "log_r"))) {
+    return()
+  }
   new_process_module <- switch(paste0(par, "_", class(module)),
     "log_devs_Rcpp_BevertonHoltRecruitment" = new(LogDevsRecruitmentProcess),
     "log_r_Rcpp_BevertonHoltRecruitment" = new(LogRRecruitmentProcess)

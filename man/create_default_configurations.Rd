@@ -7,43 +7,56 @@
 create_default_configurations(data, model_family = c("catch_at_age"))
 }
 \arguments{
-\item{data}{An S4 object of class \code{FIMSFrame}. FIMS input data.}
+\item{data}{A \code{FIMSFrame} object returned from running \code{\link[=FIMSFrame]{FIMSFrame()}} on
+your long input data.}
 
-\item{model_family}{A string specifying the model family.
-Defaults to \code{"catch_at_age"}.}
+\item{model_family}{A string specifying the model family. Defaults to
+\code{"catch_at_age"}.}
 }
 \value{
-A \code{tibble} with default model configurations. The tibble has a nested
-structure with the following top-level columns.
+A nested \code{tibble} with the following top-level columns is returned:
 \describe{
 \item{\code{model_family}:}{The specified model family (e.g.,
 "catch_at_age").}
 \item{\code{module_name}:}{The name of the FIMS module (e.g.,
-"Data", "Selectivity", "Recruitment", "Growth", "Maturity").}
+"Data", "Selectivity", "Recruitment", "Growth", "Maturity"). These
+entries are always written in PascalCase to match the names used in the
+C++ code.}
 \item{\code{fleet_name}:}{The name of the fleet the module applies to. This
 will be \code{NA} for non-fleet-specific modules like "Recruitment".}
 \item{\code{data}:}{A list-column containing a \code{tibble} with detailed
 configurations. Unnesting this column reveals:
 \describe{
 \item{\code{module_type}:}{The specific type of the module (e.g.,
-"Logistic" for a "Selectivity" module).}
-\item{\code{distribution_link}:}{The component the distribution module
-links to.}
-\item{\code{distribution_type}:}{The type of distribution (e.g., "Data",
-"process").}
+"Logistic" for a "Selectivity" module). This column will always be
+written in PascalCase to match the names used in the C++ code.}
+\item{\code{distribution_type}:}{The type of distribution (e.g.,
+"Data", "process"), where a process distribution can refer to a
+fixed effect or a random effect but it does not fit to data, e.g.,
+recruitment deviations.}
 \item{\code{distribution}:}{The name of distribution (e.g.,
-"Dlnorm", \code{Dmultinom}).}
+"Dlnorm", \code{Dmultinom}). The column will always be written in
+PascalCase to match the names used in the C++ code.}
 }
 }
 }
 }
 \description{
-This function generates a default configuration tibble for a Fisheries
-Integrated Modeling System (FIMS) model based on the data input. It
-automatically creates configuration entries for data modules (e.g., landings,
-index, compositions) and, depending on the model family, standard population
-dynamics modules (recruitment, growth, maturity) and selectivity modules for
-fleets.
+A FIMS configuration tibble specifies the high-level model configuration,
+i.e., what parameter sets are needed, for a FIMS model. This high-level
+information can then be passed to \code{\link[=create_default_parameters]{create_default_parameters()}}, which
+returns a tibble with all of the parameters required to run your specified
+configuration. For example, logistic selectivity is the default, and this
+function will specify logistic selectivity for every fleet it finds in
+\code{data}. If you want double-normal selectivity you can run this function
+first and then edit the tibble that is returned, changing the entry in the
+\code{module_type} column before running \code{\link[=create_default_parameters]{create_default_parameters()}}. Thus,
+running this function is not strictly necessary to run a FIMS model but it
+is helpful to see what parameter sets are necessary given the data that you
+want to model. It automatically creates configuration entries for data
+modules (e.g., landings, index, compositions) and, depending on the model
+family, standard population dynamics modules (recruitment, growth, maturity)
+and selectivity modules for fleets.
 }
 \details{
 The function inspects the data to find unique combinations of fleet
@@ -57,7 +70,9 @@ and joins them with a predefined template of default settings. When the
 \item \strong{Maturity:} A logistic maturity module.
 }
 The final output is a nested tibble, which serves as a starting point for
-building a complete FIMS model configuration.
+building a complete FIMS model configuration. You can unnest the rows to see
+the full configuration with \code{\link[tidyr:unnest]{tidyr::unnest()}}, see the examples below for
+more details.
 }
 \examples{
 # Load the example dataset and create a FIMS data frame
@@ -72,7 +87,8 @@ default_configurations_unnest <- default_configurations |>
   tidyr::unnest(cols = data) |>
   print()
 
-# Model fleet1 with double logistic selectivity
+# Use dplyr::rows_update to modify the selectivity specified for fleet1
+# from logistic (the default) to double logistic
 configurations_double_logistic <- default_configurations_unnest |>
   dplyr::rows_update(
     tibble::tibble(
@@ -83,4 +99,10 @@ configurations_double_logistic <- default_configurations_unnest |>
     by = c("module_name", "fleet_name")
   ) |>
   print()
+}
+\seealso{
+\itemize{
+\item \code{\link[=FIMSFrame]{FIMSFrame()}}
+\item \code{\link[=create_default_parameters]{create_default_parameters()}}
+}
 }

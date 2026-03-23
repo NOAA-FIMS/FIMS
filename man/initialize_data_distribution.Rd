@@ -17,8 +17,7 @@ initialize_process_distribution(
   module,
   par,
   family = NULL,
-  sd = tibble::tibble(value = 1, estimation_type = "constant"),
-  is_random_effect = FALSE
+  sd = tibble::tibble(value = 1, estimation_type = "fixed_effects")
 )
 
 initialize_process_structure(module, par)
@@ -34,24 +33,22 @@ be used in the model. The argument takes a family class, e.g.,
 \item{sd}{A list of length two. The first entry is named \code{"value"} and it
 stores the initial values (scalar or vector) for the relevant standard
 deviations. The default is \code{value = 1}. The second entry is named
-\code{"estimation_type"} and it stores a vector of booleans (default = "constant") is a
-string indicating whether or not standard deviation is estimated as a fixed effect
-or held constant. If \code{"value"} is a vector and \code{"estimation_type"} is a scalar,
-the single value specified \code{"estimation_type"} value will be repeated to match the length of
-\code{value}. Otherwise, the dimensions of the two must match.}
+\code{"estimation_type"} and it stores a vector of booleans (default =
+"constant") is a string indicating whether or not standard deviation is
+estimated as a fixed effect or held constant. If \code{"value"} is a vector and
+\code{"estimation_type"} is a scalar, the single value specified
+\code{"estimation_type"} value will be repeated to match the length of \code{value}.
+Otherwise, the dimensions of the two must match.}
 
 \item{data_type}{A string specifying the type of data that the
 distribution will be fit to. Allowable types include
-c, landings, index, agecomp, lengthcomp
+"landings", "index", "agecomp", and "lengthcomp"
 and the default is
-c.}
+landings.}
 
 \item{par}{A string specifying the parameter name the distribution applies
 to. Parameters must be members of the specified module. Use
 \code{methods::show(module)} to obtain names of parameters within the module.}
-
-\item{is_random_effect}{A boolean indicating whether or not the process is
-estimated as a random effect.}
 }
 \value{
 A reference class. is returned. Use \code{\link[methods:show]{methods::show()}} to view the various
@@ -78,7 +75,7 @@ fleet_distribution <- initialize_data_distribution(
   family = lognormal(link = "log"),
   sd = list(
     value = rep(sqrt(log(0.01^2 + 1)), n_years),
-    estimation_type = rep("constant", n_years) # Could also be a single "constant"
+    estimation_type = rep("constant", n_years) # Can be a single "constant"
   ),
   data_type = "index"
 )
@@ -93,8 +90,7 @@ recruitment_distribution <- initialize_process_distribution(
   module = recruitment,
   par = "log_devs",
   family = gaussian(),
-  sd = list(value = 0.4, estimation_type = "constant"),
-  is_random_effect = FALSE
+  sd = list(value = 0.4, estimation_type = "constant")
 )
 }
 }

@@ -9,56 +9,68 @@ create_default_parameters(configurations, data)
 \arguments{
 \item{configurations}{A tibble of model configurations. Typically created
 by \code{\link[=create_default_configurations]{create_default_configurations()}}. Users can modify this tibble
-to customize the model structure before generating default parameters.}
+to customize the model structure before using it as input to this function.}
 
-\item{data}{An S4 object. FIMS input data.}
+\item{data}{A \code{FIMSFrame} object returned from running \code{\link[=FIMSFrame]{FIMSFrame()}} on
+your long input data.}
 }
 \value{
-A \code{tibble} with default model parameters. The tibble has a nested
-structure with the following top-level columns.
+A nested \code{tibble} containing information on parameters for your model with
+the same top-level columns as the input tibble passed to \code{configurations}
+but with additional information in the nested \code{data} column. See below for
+more details:
 \describe{
 \item{\code{model_family}:}{The specified model family (e.g.,
 "catch_at_age").}
 \item{\code{module_name}:}{The name of the FIMS module (e.g.,
-"Data", "Selectivity", "Recruitment", "Growth", "Maturity").}
+"Data", "Selectivity", "Recruitment", "Growth", "Maturity"). These
+entries are always written in PascalCase to match the names used in the
+C++ code.}
 \item{\code{fleet_name}:}{The name of the fleet the module applies to. This
 will be \code{NA} for non-fleet-specific modules like "Recruitment".}
 \item{\code{data}:}{A list-column containing a \code{tibble} with detailed
 parameters. Unnesting this column reveals:
 \describe{
 \item{\code{module_type}:}{The specific type of the module (e.g.,
-"Logistic" for a "Selectivity" module).}
-\item{\code{label}:}{The name of the parameter (e.g., "inflection_point").}
-\item{\code{distribution_link}:}{The component the distribution module
-links to.}
+"Logistic" for a "Selectivity" module). This column will always be
+written in PascalCase to match the names used in the C++ code.}
+\item{\code{label}:}{The name of the parameter (e.g.,
+"inflection_point").}
 \item{\code{age}:}{The age the parameter applies to.}
 \item{\code{length}:}{The length bin the parameter applies to.}
-\item{\code{time}:}{The time step (i.e., year) the parameter applies to.}
+\item{\code{time}:}{The time step (i.e., year) the parameter applies
+to.}
 \item{\code{value}:}{The initial value of the parameter.}
 \item{\code{estimation_type}:}{The type of estimation (e.g.,
 "constant", "fixed_effects", "random_effects").}
-\item{\code{distribution_type}:}{The type of distribution (e.g., "Data",
-"process").}
+\item{\code{distribution_type}:}{The type of distribution (e.g.,
+"Data", "process"), where a process distribution can refer to a
+fixed effect or a random effect but it does not fit to data, e.g.,
+recruitment deviations.}
 \item{\code{distribution}:}{The name of distribution (e.g.,
-"Dlnorm", \code{Dmultinom}).}
+"Dlnorm", \code{Dmultinom}). The column will always be written in
+PascalCase to match the names used in the C++ code.}
 }
 }
 }
 }
 \description{
-This function generates a Fisheries Integrated Modeling System (FIMS) model
-configuration with detailed parameter specifications. This function takes a
-high-level configuration \code{tibble} and generates the corresponding parameters
-with default initial values and estimation settings required to build and run
-the model.
+This function generates a tibble with all of the parameters necessary to run
+a FIMS model given the desired high-level configuration that is specified in
+\code{configurations}. The tibble contains default initial values and estimation
+settings required to build and run the model. You can edit the returned
+tibble if you want to changes things such as initial values to values more
+specific to your population before running your model. For example, the
+default maturity parameters will need modified.
 }
 \details{
-The function processes the input \code{configurations} tibble, which defines the
-modules for different model components (e.g., \code{"Selectivity"}, \code{"Recruitment"}).
-For each module specified, it calls internal helper functions to create a
-default set of parameters. For example, if a fleet's selectivity is configured
-as \code{"Logistic"}, it generates initial values for \code{"inflection_point"} and
-\code{"slope"}.
+The function processes the \code{configurations} tibble, which only contains
+high-level information for running your model by calling internal helper
+functions on each row and returning a multi-row parameter set for each input
+row. For example, if a selectivity for the first fleet is configured as
+\code{"Logistic"}, it takes that single row of input information and returns a
+parameter set with two rows, one for each parameter, \code{"inflection_point"}
+and \code{"slope"}.
 }
 \examples{
 \dontrun{
@@ -89,7 +101,7 @@ updated_parameters <- default_parameters |>
 
 # Do the same as above except, model fleet1 with double logistic selectivity
 # To see required parameters for double logistic selectivity, run
-# show(DoubleLogisticSelectivity)
+# show(DoubleLogisticSelectivity) and look at the Fields list
 parameters_with_double_logistic <- default_configurations |>
   tidyr::unnest(cols = data) |>
   dplyr::rows_update(
