@@ -463,7 +463,7 @@ FIMSFit <- function(
   }
 
   model_output <- input[["model"]]$get_output()
-  
+
 
   fit <- methods::new(
     "FIMSFit",

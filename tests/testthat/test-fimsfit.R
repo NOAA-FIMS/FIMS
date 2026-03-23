@@ -172,15 +172,15 @@ test_that("fit_fims() errors when optimization fails to converge", {
   clear()
 
   # Add an additional slope parameter to make the model overparameterized
-    parameters_4_model <- parameters |>
-      dplyr::rows_update(
-        tibble::tibble(
-          fleet_name = "fleet1",
-          label = "log_q",
-          estimation_type = "fixed_effects"
-        ),
-        by = c("fleet_name", "label")
-      )
+  parameters_4_model <- parameters |>
+    dplyr::rows_update(
+      tibble::tibble(
+        fleet_name = "fleet1",
+        label = "log_q",
+        estimation_type = "fixed_effects"
+      ),
+      by = c("fleet_name", "label")
+    )
 
   initialized_model <- parameters_4_model |>
     initialize_fims(data = data_age_comp)
@@ -192,5 +192,4 @@ test_that("fit_fims() errors when optimization fails to converge", {
   )
 
   clear()
-
 })
