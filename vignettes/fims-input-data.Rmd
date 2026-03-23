@@ -1,8 +1,8 @@
 ---
-title: "Input data and the FIMSFrame object"
+title: "Input data for FIMS: more detail"
 output: github_document
 vignette: >
-  %\VignetteIndexEntry{Input data and the FIMSFrame object}
+  %\VignetteIndexEntry{Input data for FIMS: more detail}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -33,7 +33,7 @@ The input data for a FIMS model is a single long data frame with the following c
 
 Two drawbacks of the long format are (1) some information is duplicated, and (2) the long format is harder to read and understand by looking at the raw data frame. To meet this second challenge, the FIMS team is working on functions to summarize, visualize, and check for errors in the input data.
 
-The currently available values for the `type` column are "landings", "index", "age_comp", "length_comp", "weight_at_age", and "age_to_length_conversion". The "weight_at_age" and "age_to_length_conversion" types are not currently treated as data in the sense that they are not included in the likelihood, just used within the population dynamics calculations. However, the input data is currently the most streamlined way to provide this information to the model.
+The currently available values for the `type` column are "landings", "index", "age_comp", "length_comp", "weight_at_age", and "age_to_length_conversion". The "weight_at_age" and "age_to_length_conversion" types are not currently treated as data in the sense that they are not included in the likelihood, just used within the population dynamics calculations.
 
 The individual data types are described in more detail below after introducing the example data set that is included in the package.
 
@@ -88,7 +88,7 @@ FIMS::data_big |>
 ```
 
 ### Age compositions (`type == "age_comp"`)
-The age composition data type contains the age distribution of a fleet for a time step. The `age` column contains the age, which needs to start at age 0, and the `value` column contains either the number or the proportion of the catch or survey in each age bin. The `unit` column should be either "number" or "proportion". The `uncertainty` column should be the input sample size for the time step (equal across all ages within that time step).
+The age composition data type contains the age distribution of a fleet for a time step. The `age` column contains the age, which needs to start at age 0, and the `value` column contains either the number or the proportion of the catch or survey in each age bin. The `unit` column should be either "number" or "proportion". If "proportion" is used, the values are checked at a later step to confirm that they sum to 1.0. The `uncertainty` column should be the input sample size for the time step (equal across all ages within that time step).
 
 ```{r data_big-age_comp}
 FIMS::data_big |>
@@ -107,12 +107,12 @@ FIMS::data_big |>
   ggplot2::geom_bar(stat = "identity") +
   ggplot2::xlab("Age") +
   ggplot2::ylab("Number") +
-  ggplot2::facet_wrap(~timing) + 
-  ggplot2::scale_x_continuous(breaks = 0:12)
+  ggplot2::facet_wrap(~timing) +
+  ggplot2::scale_x_continuous(breaks = 1:12)
 ```
 
 ### Length compositions (`type == "length_comp"`)
-The length composition data are similar to the age compositions, except with values in the `length` column and `age = NA`. FIMS does not yet have growth implemented, so the length bins can be any values as long as the distribution of each age among those bins is provided by the `age_to_length_conversion` data type described below.
+The length composition data are similar to the age compositions, except with values in the `length` column and `age = NA`. FIMS does not yet have parametric growth implemented, so the length bins can be any values as long as the distribution of each age among those bins is provided by the `age_to_length_conversion` data type described below.
 
 ```{r data_big-length_comp}
 FIMS::data_big |>
@@ -135,7 +135,98 @@ FIMS::data_big |>
 ```
 
 ### Weight-at-age data (`type == "weight_at_age"`)
+The weight-at-age data are not currently included in the likelihood and are just used for converting from numbers to biomass in the population dynamics. The `unit` column should be `mt` and the uncertainty should be `NA`.
 
-### Age-to-length conversion (`type == "age_to_length_conversion`)
+Two key features of the weight-at-age data are 
 
+  1. these data required for the one additional time step (final value for timing + 1), and
+  2. the values are currently shared among fleets (but need only be provided for the first fleet).
 
+The weight-at-age values for the `data_big` are identical across time steps, and are provided for timing = 1 to 31 and associated with name = "fleet1".
+
+```{r data_big-weight_at_age}
+# first and last entries  of the weight-at-age data
+FIMS::data_big |>
+  dplyr::filter(type == "weight_at_age") |>
+  head(3)
+FIMS::data_big |>
+  dplyr::filter(type == "weight_at_age") |>
+  tail(3)
+
+# check that the values are identical across time steps within each age
+FIMS::data_big |>
+  dplyr::filter(type == "weight_at_age") |>
+  dplyr::group_by(age) |>
+  dplyr::summarize(n_distinct = dplyr::n_distinct(value))
+```
+
+```{r data_big-weight_at_age-plot}
+#| fig.alt: >
+#|   Line plot showing weight at age showing identical monotonically increasing weight-at-age values ages that are the same across time steps.
+FIMS::data_big |>
+  dplyr::filter(type == "weight_at_age") |>
+  ggplot2::ggplot(
+    ggplot2::aes(x = age, y = value)
+  ) +
+  ggplot2::geom_line(color = "blue") +
+  ggplot2::xlab("Age") +
+  ggplot2::ylab("Weight (mt)") +
+  ggplot2::facet_wrap(~timing) +
+  ggplot2::scale_x_continuous(breaks = 1:12) +
+  geom_hline(yintercept = 0)
+```
+
+### Age-to-length conversion (`type == "age_to_length_conversion"`)
+The age-to-length conversion data type contains the distribution of lengths for each age. The `age` and `length` columns contain all the combinations of age and length bins, and the `value` column contains the proportion of fish at each age that are in each length bin. The `unit` column should be "proportion". The age-to-length conversion data are not currently included in the likelihood, but are used to convert numbers at age to numbers at length for the population dynamics calculations when length compositions are included in the model. 
+
+Note: purely age-based models which have no length composition data can omit the age-to-length conversion data as well.
+
+```{r data_big-age_to_length_conversion}
+# first and last entries in the age-to-length conversion data type
+FIMS::data_big |>
+  dplyr::filter(type == "age_to_length_conversion") |>
+  head(3)
+FIMS::data_big |>
+  dplyr::filter(type == "age_to_length_conversion") |>
+  tail(3)
+
+# show that the number of rows in the age-to-length conversion data type is equal to the product of the number of unique combinations of age, length, and timing
+FIMS::data_big |>
+  dplyr::filter(type == "age_to_length_conversion") |>
+  nrow()
+# 12 ages, 23 length bins, 30 time steps, and 2 fleets:
+12 * 23 * 30 * 2
+
+# confirm that the values are identical within each age/length combination across time steps
+FIMS::data_big |>
+  dplyr::filter(type == "age_to_length_conversion") |>
+  dplyr::group_by(age, length) |>
+  dplyr::summarize(n_distinct = dplyr::n_distinct(value), .groups = "drop") |>
+  dplyr::pull(n_distinct) |>
+  unique()
+```
+
+```{r data_big-age_to_length_conversion-plot}
+#| fig.alt: >
+#|   Scatter plot showing the age-to-length conversion with point size representing the proportion of fish at each age-length combination.
+FIMS::data_big |>
+  dplyr::filter(type == "age_to_length_conversion" & timing == 1) |>
+  ggplot2::ggplot(
+    ggplot2::aes(
+      x = age,
+      y = length,
+      size = value
+    )
+  ) +
+  ggplot2::geom_point(color = gray(0, alpha = 0.3)) +
+  ggplot2::scale_size_continuous(range = c(0.1, 12)) +
+  ggplot2::xlab("Age") +
+  ggplot2::ylab("Length (mm)") +
+  ggplot2::scale_x_continuous(breaks = 1:12) +
+  geom_hline(yintercept = 0)
+```
+
+### Unresolved questions for other members of the FIMS team:
+
+- Do the ages in the age_comp data need to start at 1 or can they start at 0?
+- Can we explain why ending time step + 1 is needed for the weight-at-age data type?
