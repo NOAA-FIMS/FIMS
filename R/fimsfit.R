@@ -464,6 +464,7 @@ FIMSFit <- function(
 
   model_output <- input[["model"]]$get_output()
 
+
   fit <- methods::new(
     "FIMSFit",
     input = input,
@@ -574,7 +575,7 @@ fit_fims <- function(input,
       control = control
     )
   )
-  maxgrad0 <- maxgrad <- max(abs(obj$gr(opt$par)))
+  maxgrad0 <- maxgrad <- max(abs(obj$gr(opt[["par"]])))
   if (number_of_loops > 0) {
     cli::cli_inform(c(
       "i" = "Restarting optimizer {number_of_loops} times to improve gradient."
@@ -604,7 +605,10 @@ fit_fims <- function(input,
   }
   time_optimization <- Sys.time() - t0
   cli::cli_inform(c("v" = "Finished optimization"))
-  set_fixed(opt$par)
+
+  check_mle_convergence(input, obj, opt, maxgrad)
+
+  FIMS::set_fixed(opt[["par"]])
 
   time_sdreport <- NA
   if (get_sd) {
@@ -612,6 +616,7 @@ fit_fims <- function(input,
     sdreport <- TMB::sdreport(obj)
     cli::cli_inform(c("v" = "Finished sdreport"))
     time_sdreport <- Sys.time() - t2
+    check_sdreport_convergence(input, obj, opt, sdreport)
   } else {
     sdreport <- list()
     time_sdreport <- as.difftime(0, units = "secs")

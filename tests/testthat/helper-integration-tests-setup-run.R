@@ -347,13 +347,17 @@ prepare_test_data <- function() {
   data_length_comp <- readRDS(testthat::test_path("fixtures", "data_length_comp.RDS"))
 
   # Run FIMS model
-  fit_lengthcomp <- modified_parameters |>
-    # remove rows that have module_type == AgeComp
-    dplyr::rows_delete(
-      y = tibble::tibble(module_type = "AgeComp")
-    ) |>
-    initialize_fims(data = data_length_comp) |>
-    fit_fims(optimize = TRUE)
+  fit_lengthcomp <- suppressWarnings(
+    suppressMessages(
+      modified_parameters |>
+        # remove rows that have module_type == AgeComp
+        dplyr::rows_delete(
+          y = tibble::tibble(module_type = "AgeComp")
+        ) |>
+        initialize_fims(data = data_length_comp) |>
+        fit_fims(optimize = TRUE)
+    )
+  )
 
   clear()
 
@@ -367,13 +371,17 @@ prepare_test_data <- function() {
   # Load a second dataset that contains missing length composition data
   data_length_comp_na <- readRDS(testthat::test_path("fixtures", "data_length_comp_na.RDS"))
   # Fit the FIMS model using the second dataset (with missing values)
-  fit_lengthcomp_na <- modified_parameters |>
-    # remove rows that have module_type == LengthComp
-    dplyr::rows_delete(
-      y = tibble::tibble(module_type = "AgeComp")
-    ) |>
-    initialize_fims(data = data_length_comp_na) |>
-    fit_fims(optimize = TRUE)
+  fit_lengthcomp_na <- suppressWarnings(
+    suppressMessages(
+      modified_parameters |>
+        # remove rows that have module_type == LengthComp
+        dplyr::rows_delete(
+          y = tibble::tibble(module_type = "AgeComp")
+        ) |>
+        initialize_fims(data = data_length_comp_na) |>
+        fit_fims(optimize = TRUE)
+    )
+  )
 
   clear()
 

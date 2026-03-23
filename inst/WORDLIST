@@ -780,6 +780,7 @@ instantiation
 instantiations
 interpretable
 inv
+invertible
 io
 iomanip
 iostream
@@ -860,6 +861,7 @@ mget
 microbenchmark
 minimizR
 minimizer
+misspecification
 mkString
 mkdir
 mkswap
@@ -944,6 +946,7 @@ ostream
 ostringstream
 outputFile
 overfishing
+overparameterized
 packageVersion
 pandoc
 parList
@@ -1009,6 +1012,7 @@ refClass
 refClassDef
 refMethods
 registerRoutines
+registerS
 relativePath
 reltol
 removeTaskCallback
@@ -1091,6 +1095,7 @@ sourceCpp
 sp
 SparseNUTS
 spawners
+spHess
 spr
 sprintf
 sr
@@ -1156,6 +1161,7 @@ tmb
 tmbstan
 tmbutils
 tmp
+tol
 toRVector
 toJSON
 toString
@@ -1195,6 +1201,7 @@ valarray
 validator
 validators
 vals
+vapply
 vec
 vectorized
 visualstudio
