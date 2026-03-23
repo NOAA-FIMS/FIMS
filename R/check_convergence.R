@@ -6,14 +6,20 @@
 #' purposes. If the optimizer converged but the maximum gradient is above
 #' certain thresholds, warnings are issued about potential convergence concerns.
 #'
-#' @param input The FIMS input object used for fitting, containing model configuration and data.
-#' @param obj The TMB object used for fitting, containing the model environment and random effects
-#' @param opt The optimization output from nlminb, containing convergence information.
-#' @param maxgrad The maximum absolute gradient from the optimization, used to assess convergence quality.
-#' @param filename Optional filename to save the fit object if convergence issues are detected.
-#' @return If convergence issues are detected, a FIMSFit object is returned for diagnostics. Otherwise, the function returns NULL and allows the fitting process to continue to sdreport.
+#' @param input The FIMS input object used for fitting, containing model
+#' configuration and data.
+#' @param obj The TMB object used for fitting, containing the model environment
+#' and random effects
+#' @param opt The optimization output from nlminb, containing convergence
+#' information.
+#' @param maxgrad The maximum absolute gradient from the optimization, used to
+#' assess convergence quality.
+#' @return
+#' If convergence issues are detected, a FIMSFit object is returned for
+#' diagnostics. Otherwise, the function returns NULL and allows the fitting
+#' process to continue to sdreport.
 #' @noRd
-check_mle_convergence <- function(input, obj, opt, maxgrad, filename) {
+check_mle_convergence <- function(input, obj, opt, maxgrad) {
   # Check convergence status
   convergence_issues <- c()
   convergence_warnings <- c()
@@ -21,13 +27,18 @@ check_mle_convergence <- function(input, obj, opt, maxgrad, filename) {
   # Check 1: nlminb convergence flag
   if (opt[["convergence"]] != 0) {
     convergence_message <- if (!is.null(opt[["message"]])) {
-      paste0("Convergence code = ", opt[["convergence"]], "; message = ", opt[["message"]])
+      paste0(
+        "Convergence code = ",
+        opt[["convergence"]], "; message = ",
+        opt[["message"]]
+      )
     } else {
       paste0("Convergence code = ", opt[["convergence"]])
     }
     convergence_issues <- c(convergence_issues, convergence_message)
   } else {
-    # if optimizer converged, check the gradient to see if it is close enough to zero
+    # if optimizer converged, check the gradient to see if it is close enough
+    # to zero
     # Check 2: Maximum gradient threshold (warning only)
     if (maxgrad > 1) {
       convergence_issues <- c(
@@ -50,13 +61,16 @@ check_mle_convergence <- function(input, obj, opt, maxgrad, filename) {
     }
   }
 
-  # If optimizer did not converge, skip sdreport, warn, and return fit for diagnostics
+  # If optimizer did not converge, skip sdreport, warn, and return fit for
+  # diagnostics
   if (length(convergence_issues) > 0) {
     cli::cli_warn(c(
       "x" = "Optimization failed convergence checks.",
       setNames(convergence_issues, rep("i", length(convergence_issues))),
-      "i" = "Skipping sdreport. Consider adjusting control parameters (eval.max, iter.max) or model structure.",
-      "i" = "Model fit returned for diagnostic purposes only. Results are not reliable."
+      "i" = "Skipping sdreport. Consider adjusting control parameters
+        (eval.max, iter.max) or model structure.",
+      "i" = "Model fit returned for diagnostic purposes only. Results are not
+        reliable."
     ))
   }
 
@@ -64,7 +78,8 @@ check_mle_convergence <- function(input, obj, opt, maxgrad, filename) {
     cli::cli_warn(c(
       "!" = "Optimization resulted in high gradients.",
       setNames(convergence_warnings, rep("i", length(convergence_warnings))),
-      "i" = "Model fit returned; results may be less reliable if the gradient is too far from zero.",
+      "i" = "Model fit returned; results may be less reliable if the gradient
+         is too far from zero.",
       "i" = "Consider adjusting model structure or starting values."
     ))
     fit <- FIMSFit(
@@ -79,12 +94,6 @@ check_mle_convergence <- function(input, obj, opt, maxgrad, filename) {
       )
     )
     print(fit)
-    if (!is.null(filename)) {
-      cli::cli_warn(c(
-        "i" = "Saving output to file is not yet implemented."
-      ))
-      # saveRDS(fit, file=file.path(input[["path"]], filename))
-    }
     return(fit)
   }
 }
@@ -99,10 +108,14 @@ check_mle_convergence <- function(input, obj, opt, maxgrad, filename) {
 #' If the Hessian is near singular (high condition number), a warning is issued
 #' about potential unreliability of standard errors and MLEs.
 #' @inheritParams check_mle_convergence
-#' @param sdreport The sdreport output from TMB, containing standard errors and Hessian information.
-#' @return If convergence issues are detected, a FIMSFit object is returned for diagnostics. Otherwise, the function returns NULL and allows the fitting process to continue to sdreport.
+#' @param sdreport The sdreport output from TMB, containing standard errors and
+#' Hessian information.
+#' @return
+#' If convergence issues are detected, a FIMSFit object is returned for
+#' diagnostics. Otherwise, the function returns NULL and allows the fitting
+#' process to continue to sdreport.
 #' @noRd
-check_sdreport_convergence <- function(input, obj, opt, sdreport, filename) {
+check_sdreport_convergence <- function(input, obj, opt, sdreport) {
   CONDITION_NUMBER_THRESHOLD <- 1e5
 
   # Check 1: Hessian is invertible (positive definite)
@@ -111,10 +124,14 @@ check_sdreport_convergence <- function(input, obj, opt, sdreport, filename) {
     # Warn and return output early
     cli::cli_warn(c(
       "x" = "Standard error calculations failed convergence checks:",
-      "i" = "Hessian is not positive definite, which may indicate convergence issues or model misspecification.",
-      "i" = "Standard errors cannot be reliably calculated, and MLEs may be unreliable.",
-      "i" = "Consider simplifying the model, improving data quality, or fixing poorly informed parameters.",
-      "i" = "Model fit returned for diagnostic purposes only. Results are not reliable."
+      "i" = "Hessian is not positive definite, which may indicate convergence
+        issues or model misspecification.",
+      "i" = "Standard errors cannot be reliably calculated, and MLEs may be
+        unreliable.",
+      "i" = "Consider simplifying the model, improving data quality, or fixing
+        poorly informed parameters.",
+      "i" = "Model fit returned for diagnostic purposes only. Results are not
+        reliable."
     ))
     # Skip the rest of the sdreport checks
     fit <- FIMSFit(
@@ -129,12 +146,6 @@ check_sdreport_convergence <- function(input, obj, opt, sdreport, filename) {
       )
     )
     print(fit)
-    if (!is.null(filename)) {
-      cli::cli_warn(c(
-        "i" = "Saving output to file is not yet implemented."
-      ))
-      # saveRDS(fit, file=file.path(input[["path"]], filename))
-    }
     return(fit)
   }
 
@@ -213,15 +224,26 @@ check_sdreport_convergence <- function(input, obj, opt, sdreport, filename) {
       if (condition_number > CONDITION_NUMBER_THRESHOLD) {
         list(warnings = c(
           paste0(
-            "Condition number of Hessian (", format(condition_number, scientific = TRUE),
+            "Condition number of Hessian (",
+            format(condition_number, scientific = TRUE),
             ") exceeds threshold of ", CONDITION_NUMBER_THRESHOLD,
             "."
           ),
           "This suggests the model is weakly identified and results may be unreliable.",
           "Consider simplifying the model, improving data quality, or fixing poorly informed parameters.",
           "The two largest standard error values are for parameters: ",
-          paste0("  - ", rownames(sdr_mat)[1], ": ", format(sdr_mat[1, "Std. Error"], scientific = TRUE)),
-          paste0("  - ", rownames(sdr_mat)[2], ": ", format(sdr_mat[2, "Std. Error"], scientific = TRUE)),
+          paste0(
+            "  - ",
+            rownames(sdr_mat)[1],
+            ": ",
+            format(sdr_mat[1, "Std. Error"], scientific = TRUE)
+          ),
+          paste0(
+            "  - ",
+            rownames(sdr_mat)[2],
+            ": ",
+            format(sdr_mat[2, "Std. Error"], scientific = TRUE)
+          ),
           "Standard errors and MLEs may be unreliable."
         ))
       } else {
@@ -229,7 +251,7 @@ check_sdreport_convergence <- function(input, obj, opt, sdreport, filename) {
       }
     },
     error = function(e) {
-      list(warnings = c("Unable to extract Hessian for condition number check"))
+      list(warnings = c("Unable to extract Hessian for condition number check."))
     }
   )
 
@@ -242,8 +264,12 @@ check_sdreport_convergence <- function(input, obj, opt, sdreport, filename) {
   } else {
     if (length(hessian_check_result$warnings) > 0) {
       cli::cli_warn(c(
-        "!" = "Large condition number detected in Hessian indicating it may be near singularity",
-        setNames(hessian_check_result$warnings, rep("i", length(hessian_check_result$warnings)))
+        "!" = "Large condition number detected in Hessian indicating it may be
+          near singularity",
+        setNames(
+          hessian_check_result$warnings,
+          rep("i", length(hessian_check_result$warnings))
+        )
       ))
     }
   }
