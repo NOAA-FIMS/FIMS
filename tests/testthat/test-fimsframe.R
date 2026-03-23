@@ -206,7 +206,6 @@ test_that("`FIMSFrame()` returns correct outputs for edge cases", {
     ) |>
       dplyr::select(-length)
   ))
-
 })
 
 ## Error handling ----
