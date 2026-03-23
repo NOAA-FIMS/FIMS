@@ -260,19 +260,19 @@ test_that("posterior equals prior with no data", {
 
   # Fit MCMC using SparseNUTS
   fit <- SparseNUTS::sample_snuts(obj, chains = 1)
-  inflection_point_est <- fit$mle$est[c(1, 3)] |> unname()
-  inflection_point_se <- fit$mle$se[c(1, 3)] |> unname()
-  slope_est <- fit$mle$est[c(2, 4)] |> unname()
-  slope_se <- fit$mle$se[c(2, 4)] |> unname()
+  inflection_point_est <- fit$mle$est[c(1, 3)]
+  inflection_point_se <- fit$mle$se[c(1, 3)]
+  slope_est <- fit$mle$est[c(2, 4)]
+  slope_se <- fit$mle$se[c(2, 4)]
   for (i in 1:2) {
     #' @description Test that the posterior means for inflection point match the prior means.
-    expect_equal(inflection_point_est[i], inflection_point_mean)
+    expect_equal(inflection_point_est[[i]], inflection_point_mean)
     #' @description Test that the posterior means for slope match the prior means.
-    expect_equal(slope_est[i], slope_mean)
+    expect_equal(slope_est[[i]], slope_mean)
     #' @description Test that the posterior standard errors for inflection point match the prior standard errors.
-    expect_equal(inflection_point_se[i], inflection_point_sd)
+    expect_equal(inflection_point_se[[i]], inflection_point_sd)
     #' @description Test that the posterior standard errors for slope match the prior standard errors.
-    expect_equal(slope_se[i], slope_sd)
+    expect_equal(slope_se[[i]], slope_sd)
   }
 
   clear()

@@ -103,7 +103,6 @@ Suggests:
     snowfall,
     SparseNUTS,
     spelling,
-    StanEstimators,
     stockplotr,
     styler,
     testdown,
@@ -117,8 +116,7 @@ LinkingTo:
     TMB
 VignetteBuilder:
     knitr
-Remotes: 
-    github::andrjohns/StanEstimators,
+Remotes:
     github::nmfs-ost/stockplotr,
     github::noaa-afsc/SparseNUTS,
     github::ThinkR-open/lozen,
