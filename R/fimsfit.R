@@ -606,7 +606,7 @@ fit_fims <- function(input,
   time_optimization <- Sys.time() - t0
   cli::cli_inform(c("v" = "Finished optimization"))
 
-  check_mle_convergence(input, obj, opt, maxgrad, filename)
+  check_mle_convergence(input, obj, opt, maxgrad)
 
   FIMS::set_fixed(opt[["par"]])
 
@@ -616,7 +616,7 @@ fit_fims <- function(input,
     sdreport <- TMB::sdreport(obj)
     cli::cli_inform(c("v" = "Finished sdreport"))
     time_sdreport <- Sys.time() - t2
-    check_sdreport_convergence(input, obj, opt, sdreport, filename)
+    check_sdreport_convergence(input, obj, opt, sdreport)
   } else {
     sdreport <- list()
     time_sdreport <- as.difftime(0, units = "secs")

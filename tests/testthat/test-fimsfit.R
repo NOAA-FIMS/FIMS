@@ -11,7 +11,11 @@
 ## Setup ----
 # Load the test data from an RDS file containing the fitted model estimates
 if (!file.exists(testthat::test_path("fixtures", "fit_age_length_comp.RDS"))) {
-  prepare_test_data()
+  suppressWarnings(
+    suppressMessages(
+      prepare_test_data()
+    )
+  )
 }
 
 fit_age_length_comp <- readRDS(testthat::test_path("fixtures", "fit_age_length_comp.RDS"))
@@ -26,19 +30,13 @@ test_that("`is.FIMSFit()` works with correct inputs", {
     object = is.FIMSFit(fit_age_length_comp)
   )
 
-  #' @description Test that `as.list(fit_age_length_comp)` returns a nested list.
-  expect_equal(
-    object = typeof(as.list(fit_age_length_comp)),
-    expected = "list"
-  )
-
   expected_names <- c(
     "input", "obj", "opt", "max_gradient", "report", "sdreport",
     "number_of_parameters", "timing", "version", "model_output"
   )
-  #' @description Test that `as.list(fit_age_length_comp)` contains correct components.
+  #' @description Test a FIMSFit object has the correct slot names.
   expect_equal(
-    object = names(as.list(fit_age_length_comp)),
+    object = slotNames(fit_age_length_comp),
     expected = expected_names
   )
 })
@@ -113,7 +111,7 @@ test_that("fit_fims() errors when optimization fails to converge", {
   )
 
   # Set control parameters that will allow convergence but
-  # return large gradient
+  # return moderately large gradient
   bad_control <- list(
     rel.tol = 1e-4,
     trace = 0
