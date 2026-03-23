@@ -332,7 +332,7 @@ class PopulationInterface : public PopulationInterfaceBase {
             static_cast<size_t>(this->n_years.get() * this->n_ages.get()) &&
         this->log_M.size() != 1) {
       throw std::invalid_argument(
-          "Population log_M size mismatch."
+          "Population log_M size mismatch. "
           "Population log_M is of size " +
           fims::to_string(this->log_M.size()) +
           ". Population log_M can only be either of size 1 or n_years * " +
