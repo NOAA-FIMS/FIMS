@@ -75,7 +75,7 @@ test_that("fit_fims() errors when optimization fails to converge", {
   load(testthat::test_path("fixtures", "integration_test_data.RData"))
 
   # Set up the model with data
-  data_age_comp <- FIMSFrame(data1)
+  data_age_comp <- FIMSFrame(data_big)
   parameters <- readRDS(
     testthat::test_path("fixtures", "parameters_model_comparison_project.RDS")
   )
@@ -172,16 +172,15 @@ test_that("fit_fims() errors when optimization fails to converge", {
   clear()
 
   # Add an additional slope parameter to make the model overparameterized
-  parameters_4_model <- parameters |>
-    dplyr::add_row(
-      model_family = "catch_at_age",
-      module_name = "Selectivity",
-      fleet_name = "fleet1",
-      module_type = "Logistic",
-      label = "slope",
-      value = 1,
-      estimation_type = "fixed_effects"
-    )
+    parameters_4_model <- parameters |>
+      dplyr::rows_update(
+        tibble::tibble(
+          fleet_name = "fleet1",
+          label = "log_q",
+          estimation_type = "fixed_effects"
+        ),
+        by = c("fleet_name", "label")
+      )
 
   initialized_model <- parameters_4_model |>
     initialize_fims(data = data_age_comp)
@@ -191,4 +190,7 @@ test_that("fit_fims() errors when optimization fails to converge", {
     result <- initialized_model |> fit_fims(optimize = TRUE),
     regexp = "Standard error calculations failed convergence checks"
   )
+
+  clear()
+
 })
