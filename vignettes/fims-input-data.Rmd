@@ -218,9 +218,9 @@ length(unique(na.omit(FIMS::data_big$age))) * length(unique(na.omit(FIMS::data_b
 ```{r data_big-age_to_length_conversion-plot}
 #| fig.alt: >
 #|   Scatter plot showing the age-to-length conversion with point size representing the proportion of fish at each age-length combination.
-# plot of age-to-length conversion values for the first time step
+# plot of age-to-length conversion values for the data_big example data set
 FIMS::data_big |>
-  dplyr::filter(type == "age_to_length_conversion" & timing == 1) |>
+  dplyr::filter(type == "age_to_length_conversion") |>
   ggplot2::ggplot(
     ggplot2::aes(
       x = age,
@@ -234,5 +234,5 @@ FIMS::data_big |>
   ggplot2::ylab("Length (mm)") +
   ggplot2::scale_x_continuous(breaks = 1:12) +
   geom_hline(yintercept = 0) +
-  ggtitle("Age-to-length conversion values for time step 1 in data_big example data set")
+  ggtitle("Age-to-length conversion values for the data_big example data set")
 ```
