@@ -30,8 +30,21 @@
   library.dynam.unload("FIMS", libpath)
 }
 
-methods::setClass("Rcpp_Parameter")
-methods::setClass("Rcpp_ParameterVector")
+if (!methods::isClass("Rcpp_Parameter")) {
+  methods::setClass(
+    Class = "Rcpp_Parameter",
+    representation = methods::representation(.xData = "environment"),
+    contains = "envRefClass"
+  )
+}
+
+if (!methods::isClass("Rcpp_ParameterVector")) {
+  methods::setClass(
+    Class = "Rcpp_ParameterVector",
+    representation = methods::representation(.xData = "environment"),
+    contains = "envRefClass"
+  )
+}
 
 # Methods for Rcpp
 #' Setter for `Rcpp_ParameterVector`
