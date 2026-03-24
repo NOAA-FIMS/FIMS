@@ -132,6 +132,7 @@ test_that("check_sdreport_convergence() works with correct inputs", {
         timing = timing
       )
     },
+    print = function(x, ...) invisible(x),
     {
       expect_warning(
         object = out <- FIMS:::check_sdreport_convergence(
