@@ -271,13 +271,15 @@ prepare_test_data <- function() {
   data_age_comp <- readRDS(testthat::test_path("fixtures", "data_age_comp.RDS"))
 
   # Run FIMS model
-  fit_agecomp <- modified_parameters |>
+  fit_agecomp <- suppressWarnings(
+    suppressMessages(modified_parameters |>
     # remove rows that have module_type == LengthComp
     dplyr::rows_delete(
       y = tibble::tibble(module_type = "LengthComp")
     ) |>
     initialize_fims(data = data_age_comp) |>
     fit_fims(optimize = TRUE)
+  ))
 
   clear()
 
@@ -325,13 +327,15 @@ prepare_test_data <- function() {
   # Load a second dataset that contains missing age composition data
   data_age_comp_na <- readRDS(testthat::test_path("fixtures", "data_age_comp_na.RDS"))
   # Fit the FIMS model using the second dataset (with missing values)
-  fit_agecomp_na <- modified_parameters |>
+  fit_agecomp_na <- suppressWarnings(
+    suppressMessages(modified_parameters |>
     # remove rows that have module_type == LengthComp
     dplyr::rows_delete(
       y = tibble::tibble(module_type = "LengthComp")
     ) |>
     initialize_fims(data = data_age_comp_na) |>
     fit_fims(optimize = TRUE)
+  ))
 
   clear()
 
@@ -402,11 +406,13 @@ prepare_test_data <- function() {
   # * Update parameters if any modifications are provided
   # * Initialize FIMS with the provided data (age and length composition with missing values)
   # * Fit the FIMS model with optimization enabled
-  fit_age_length_comp_na <- initialize_fims(
+  fit_age_length_comp_na <- suppressWarnings(
+    suppressMessages(initialize_fims(
     parameters = modified_parameters,
     data = data_age_length_comp_na
   ) |>
     fit_fims(optimize = TRUE)
+  ))
 
   clear()
 
