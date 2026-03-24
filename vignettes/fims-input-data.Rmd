@@ -42,7 +42,7 @@ The individual data types are described in more detail below after introducing t
 
 A sample data frame for a catch-at-age model with both ages and lengths is stored in the package as `data_big`. This data set is based on data that was used in [Li et al. (2021)](https://www.doi.org/10.7755/FB.119.2-3.5) for the Model Comparison Project ([github site](https://github.com/NOAA-FIMS/Age_Structured_Stock_Assessment_Model_Comparison)). The length data have since been added [data-raw/data_big.R](https://github.com/NOAA-FIMS/FIMS/blob/main/data-raw/data_big.R) based on an age--length conversion matrix. To see how this example data frame was created, see the R script here [R/data_big.R](https://github.com/NOAA-FIMS/FIMS/blob/main/R/data_big.R).
 
-### Landings (`type == "landings"`)
+## Landings (`type == "landings"`)
 
 The landings data type contains the total catch in weight for each time step. FIMS does not yet include the option to model discards internally, so "landings" should account for all catch. The landings are not associated with an age or length so those columns should only contain `NA` values. The `unit` column should currently always be `mt`. The `uncertainty` column should be the standard deviation of the logged observations if you are using the lognormal distribution to fit your data. `log_Fmort` parameters for each fleet and time step with catch can be estimated to fit the model to the landings data, informed by the uncertainty values. Common practice is to set the uncertainty to a small number, like 0.001, so the landings data are fit closely.
 
@@ -65,7 +65,7 @@ FIMS::data_big |>
   ggtitle("Landings time series in data_big example data set")
 ```
 
-### Indices (`type == "index"`)
+## Indices (`type == "index"`)
 
 The index data type contains the relative or absolute abundance index for each time step. The inputs are similar to landings, in having `NA` values for age and length, `mt` for `unit`, and index uncertainty as the standard deviation of the logged observations.
 
@@ -92,7 +92,7 @@ FIMS::data_big |>
   ggtitle("Index time series in data_big example data set")
 ```
 
-### Age compositions (`type == "age_comp"`)
+## Age compositions (`type == "age_comp"`)
 
 The age-composition data type contains the age distribution of a fleet for a time step. The `age` column contains integer ages defining the age bins, and should start at 0. The data_big example currently uses ages ranging from 1 to 12 for all types, but this will be changed in the future. The `value` column contains either the number or the proportion of the catch or survey in each age bin. The `unit` column should be either "number" or "proportion". If "proportion" is used, the values are checked at a later step to confirm that they sum to 1.0. The `uncertainty` column should be the input sample size for the time step (equal across all ages within that time step).
 
@@ -119,7 +119,7 @@ FIMS::data_big |>
   ggtitle("Age compositions by time step in data_big example data set")
 ```
 
-### Length compositions (`type == "length_comp"`)
+## Length compositions (`type == "length_comp"`)
 
 The length-composition data are similar to the age compositions, except with values in the `length` column and `age = NA`. FIMS does not yet have parametric growth implemented so the length bins can be any values as long as the distribution of each age among those bins is provided by the `age_to_length_conversion` data type described below.
 
@@ -145,7 +145,7 @@ FIMS::data_big |>
   ggtitle("Length compositions by time step in data_big example data set")
 ```
 
-### Weight-at-age data (`type == "weight_at_age"`)
+## Weight-at-age data (`type == "weight_at_age"`)
 
 The weight-at-age data are not currently included in the likelihood and are just used for converting from numbers to biomass in the population dynamics. The `unit` column should be `mt` and the uncertainty should be `NA`.
 
@@ -192,7 +192,7 @@ FIMS::data_big |>
   ggtitle("Weight-at-age values by time step in data_big example data set")
 ```
 
-### Age-to-length conversion (`type == "age_to_length_conversion"`)
+## Age-to-length conversion (`type == "age_to_length_conversion"`)
 
 The age-to-length conversion data type contains the distribution of lengths for each age. The `age` and `length` columns contain all the combinations of age and length bins, and the `value` column contains the proportion of fish at each age that are in each length bin. The `unit` column should be "proportion". A single set of the age-to-length conversion data is required, rather than separate copies for each fleet (name) or time step. The age-to-length conversion data are not currently included in the likelihood but are used to convert numbers at age to numbers at length for the population dynamics calculations when length compositions are included in the model.
 
