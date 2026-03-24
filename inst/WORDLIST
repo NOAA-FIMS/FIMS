@@ -692,6 +692,7 @@ endl
 enframe
 enum
 env
+envRefClass
 eq
 escapeQuotes
 et
@@ -797,6 +798,7 @@ invertible
 io
 iomanip
 iostream
+isClass
 isDouble
 isdigit
 isinf
@@ -1230,6 +1232,7 @@ withr
 wordlist
 writeLines
 www
+xData
 xlab
 xlen
 xp
