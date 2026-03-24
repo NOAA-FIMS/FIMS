@@ -1,8 +1,8 @@
 ---
-title: "Input data for FIMS: more detail"
+title: "Introducing FIMS input data"
 output: github_document
 vignette: >
-  %\VignetteIndexEntry{Input data for FIMS: more detail}
+  %\VignetteIndexEntry{Introducing FIMS input data}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -19,9 +19,10 @@ withr::local_options(list(
 ```
 
 ## Other sources of information
-This vignette is an expansion of the section on "Data" in the [FIMS overview vignette](https://noaa-fims.github.io/FIMS/articles/fims-demo.html). It provides more details about the data structure needed for a FIMS model and how to prepare your data for use in a FIMS model using the `FIMSFrame()` function.
 
-The FIMS cheatsheet (https://github.com/NOAA-FIMS/FIMS/blob/dev/pkgdown/assets/fims-cheatsheet.pdf) includes a quick summary of the input data format.
+This vignette is an expansion of the ["Data" section](https://noaa-fims.github.io/FIMS/articles/fims-demo.html#data) in the [FIMS overview vignette](https://noaa-fims.github.io/FIMS/articles/fims-demo.html). It provides more details about the data structure needed for a FIMS model and how to prepare your data for use in a FIMS model using the `FIMSFrame()` function.
+
+The [FIMS cheatsheet](https://github.com/NOAA-FIMS/FIMS/blob/dev/pkgdown/assets/fims-cheatsheet.pdf) includes a quick summary of the input data format.
 
 The help page for the `FIMS::data_big` data set (https://noaa-fims.github.io/FIMS/reference/data_big.html or via `?FIMS::data_big`) provides detailed information about the input data format.
 
@@ -29,23 +30,21 @@ Note: this vignette does not include anything about model configuration, which i
 
 ## Data format
 
-The input data for a FIMS model is a single long data frame with the following columns: `type`, `name`, `age`, `length`, `timing`, `value`, and `unit`. Both the single table and long format are a contrast to the input format for some legacy stock assessment models where the data are provided in multiple tables, each with a different format. The SS3 data file, for instance, has separate tables for catch, indices, age compositions, length compositions, with wide tables for the composition data (each age or length bin has a different column). The use of a single, long table for data input used by FIMS makes it easier to summarize and filter the data across data types (e.g. by fleet, time step, age, etc.), as well as being better suited to the widely-used tidyverse collection of packages in R.
+The input data for a FIMS model is a single long data frame with the following columns: `r glue::glue_collapse(colnames(data_big), sep = ", ", last = ", and ")`. Both the single table and long format are in contrast to the input format for some legacy stock assessment models where the data are provided in multiple tables, each with a different format. The SS3 data file, for instance, has separate tables for catch, indices, age compositions, length compositions, with wide tables for the composition data (each age or length bin has a different column). The use of a single, long table for data input used by FIMS makes it easier to summarize and filter the data across data types (e.g., by fleet, time step, age, etc.), as well as being better suited to the widely-used tidyverse collection of packages in R.
 
 Two drawbacks of the long format are (1) some information is duplicated, and (2) the long format is harder to read and understand by looking at the raw data frame. To meet this second challenge, the FIMS team is working on functions to summarize, visualize, and check for errors in the input data.
 
-The currently available values for the `type` column are "landings", "index", "age_comp", "length_comp", "weight_at_age", and "age_to_length_conversion". The "weight_at_age" and "age_to_length_conversion" types are not currently treated as data in the sense that they are not included in the likelihood, just used within the population dynamics calculations.
+The currently available values for the `type` column are `r glue::glue_collapse(fims_data_types, sep = ", ", last = ", and ")`. The "weight_at_age" and "age_to_length_conversion" types are not currently treated as data in the sense that they are not included in the likelihood, just used within the population dynamics calculations.
 
 The individual data types are described in more detail below after introducing the example data set that is included in the package.
 
 ## `data_big`
 
-A sample data frame for a catch-at-age model with both ages and lengths is stored in the package as `data_big`. This data set is based on data that was used in [Li et al.](https://www.doi.org/10.7755/FB.119.2-3.5) for the Model Comparison Project ([github site](https://github.com/NOAA-FIMS/Age_Structured_Stock_Assessment_Model_Comparison)). The length data have since been added [data-raw/data_big.R](https://github.com/NOAA-FIMS/FIMS/blob/main/data-raw/data_big.R) based on an age-length conversion matrix. To see how this example data frame was created, see the R script here [R/data_big.R](https://github.com/NOAA-FIMS/FIMS/blob/main/R/data_big.R).
-
-Here we explore each of the data types in turn.
+A sample data frame for a catch-at-age model with both ages and lengths is stored in the package as `data_big`. This data set is based on data that was used in [Li et al.](https://www.doi.org/10.7755/FB.119.2-3.5) for the Model Comparison Project ([github site](https://github.com/NOAA-FIMS/Age_Structured_Stock_Assessment_Model_Comparison)). The length data have since been added [data-raw/data_big.R](https://github.com/NOAA-FIMS/FIMS/blob/main/data-raw/data_big.R) based on an age--length conversion matrix. To see how this example data frame was created, see the R script here [R/data_big.R](https://github.com/NOAA-FIMS/FIMS/blob/main/R/data_big.R).
 
 ### Landings (`type == "landings"`)
 
-The landings data type contains the total catch in weight for each time step. FIMS does not yet include the option to model discards internally, so "landings" should account for all catch. The landings are not associated with an age or length so those columns should only contain `NA` values. The `unit` column should always be `mt` because this value is not yet processed so no conversion would be applied for other units. The `uncertainty` column should be the standard deviation of the logged observations if you are using the lognormal distribution to fit your data. `log_Fmort` parameters for each fleet and time step with catch can be estimated to fit the model to the landings data, informed by the uncertainty units. Common practice is to set the uncertainty to a small number, like 0.001.
+The landings data type contains the total catch in weight for each time step. FIMS does not yet include the option to model discards internally, so "landings" should account for all catch. The landings are not associated with an age or length so those columns should only contain `NA` values. The `unit` column should always be `mt` because this value is not yet processed so no conversion would be applied for other units. The `uncertainty` column should be the standard deviation of the logged observations if you are using the lognormal distribution to fit your data. `log_Fmort` parameters for each fleet and time step with catch can be estimated to fit the model to the landings data, informed by the uncertainty values. Common practice is to set the uncertainty to a small number, like 0.001.
 
 ```{r data_big-landings}
 FIMS::data_big |>
@@ -65,6 +64,7 @@ FIMS::data_big |>
 ```
 
 ### Indices (`type == "index"`)
+
 The index data type contains the relative or absolute abundance index for each time step. The inputs are similar to landings, in having `NA` values for age and length, `mt` for `unit`, and index uncertainty as the standard deviation of the logged observations. A `log_q` parameter can be fixed or estimated for each index.
 
 ```{r data_big-indices}
@@ -88,7 +88,8 @@ FIMS::data_big |>
 ```
 
 ### Age compositions (`type == "age_comp"`)
-The age composition data type contains the age distribution of a fleet for a time step. The `age` column contains the age, which needs to start at age 0, and the `value` column contains either the number or the proportion of the catch or survey in each age bin. The `unit` column should be either "number" or "proportion". If "proportion" is used, the values are checked at a later step to confirm that they sum to 1.0. The `uncertainty` column should be the input sample size for the time step (equal across all ages within that time step).
+
+The age composition data type contains the age distribution of a fleet for a time step. The `age` column contains integer ages defining the age bins, which should be consistent across years and fleets, and the `value` column contains either the number or the proportion of the catch or survey in each age bin. The `unit` column should be either "number" or "proportion". If "proportion" is used, the values are checked at a later step to confirm that they sum to 1.0. The `uncertainty` column should be the input sample size for the time step (equal across all ages within that time step).
 
 ```{r data_big-age_comp}
 FIMS::data_big |>
@@ -97,7 +98,7 @@ FIMS::data_big |>
 ```
 ```{r data_big-age_comp-plot}
 #| fig.alt: >
-#|   Barplot showing age comp by time step with a larger proportion of older ages (including a significant plus group at age 12 for the early time steps), and a truncated age distribution in the final time steps with relatively few fish over age 7.
+#|   Barplot showing age comp by time step with a larger proportion of older ages (including a significant plus group at age 12 for the early time steps) and a truncated age distribution in the final time steps with relatively few fish over age 7.
 
 FIMS::data_big |>
   dplyr::filter(type == "age_comp") |>
@@ -112,7 +113,8 @@ FIMS::data_big |>
 ```
 
 ### Length compositions (`type == "length_comp"`)
-The length composition data are similar to the age compositions, except with values in the `length` column and `age = NA`. FIMS does not yet have parametric growth implemented, so the length bins can be any values as long as the distribution of each age among those bins is provided by the `age_to_length_conversion` data type described below.
+
+The length-composition data are similar to the age compositions, except with values in the `length` column and `age = NA`. FIMS does not yet have parametric growth implemented so the length bins can be any values as long as the distribution of each age among those bins is provided by the `age_to_length_conversion` data type described below.
 
 ```{r data_big-length_comp}
 FIMS::data_big |>
@@ -135,11 +137,12 @@ FIMS::data_big |>
 ```
 
 ### Weight-at-age data (`type == "weight_at_age"`)
+
 The weight-at-age data are not currently included in the likelihood and are just used for converting from numbers to biomass in the population dynamics. The `unit` column should be `mt` and the uncertainty should be `NA`.
 
 Two key features of the weight-at-age data are 
 
-  1. these data required for the one additional time step (final value for timing + 1), and
+  1. these data are required for the one additional time step (final value for timing + 1), and
   2. the values are currently shared among fleets (but need only be provided for the first fleet).
 
 The weight-at-age values for the `data_big` are identical across time steps, and are provided for timing = 1 to 31 and associated with name = "fleet1".
@@ -177,9 +180,10 @@ FIMS::data_big |>
 ```
 
 ### Age-to-length conversion (`type == "age_to_length_conversion"`)
-The age-to-length conversion data type contains the distribution of lengths for each age. The `age` and `length` columns contain all the combinations of age and length bins, and the `value` column contains the proportion of fish at each age that are in each length bin. The `unit` column should be "proportion". The age-to-length conversion data are not currently included in the likelihood, but are used to convert numbers at age to numbers at length for the population dynamics calculations when length compositions are included in the model. 
 
-Note: purely age-based models which have no length composition data can omit the age-to-length conversion data as well.
+The age-to-length conversion data type contains the distribution of lengths for each age. The `age` and `length` columns contain all the combinations of age and length bins, and the `value` column contains the proportion of fish at each age that are in each length bin. The `unit` column should be "proportion". The age-to-length conversion data are not currently included in the likelihood but are used to convert numbers at age to numbers at length for the population dynamics calculations when length compositions are included in the model. 
+
+Note: purely age-based models which have no length-composition data can omit the age-to-length conversion data as well.
 
 ```{r data_big-age_to_length_conversion}
 # first and last entries in the age-to-length conversion data type
