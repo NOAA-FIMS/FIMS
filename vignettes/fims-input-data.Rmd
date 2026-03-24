@@ -94,7 +94,7 @@ FIMS::data_big |>
 
 ### Age compositions (`type == "age_comp"`)
 
-The age-composition data type contains the age distribution of a fleet for a time step. The `age` column contains integer ages defining the age bins, which should be consistent across years and fleets. In the data_big example, the ages range from 1 to 12 for all types, but it is better to start at 0. The `value` column contains either the number or the proportion of the catch or survey in each age bin. The `unit` column should be either "number" or "proportion". If "proportion" is used, the values are checked at a later step to confirm that they sum to 1.0. The `uncertainty` column should be the input sample size for the time step (equal across all ages within that time step).
+The age-composition data type contains the age distribution of a fleet for a time step. The `age` column contains integer ages defining the age bins, and should start at 0. The data_big example currently uses ages ranging from 1 to 12 for all types, but this will be changed in the future. The `value` column contains either the number or the proportion of the catch or survey in each age bin. The `unit` column should be either "number" or "proportion". If "proportion" is used, the values are checked at a later step to confirm that they sum to 1.0. The `uncertainty` column should be the input sample size for the time step (equal across all ages within that time step).
 
 ```{r data_big-age_comp}
 # first three rows of the age composition data
@@ -195,7 +195,7 @@ FIMS::data_big |>
 
 ### Age-to-length conversion (`type == "age_to_length_conversion"`)
 
-The age-to-length conversion data type contains the distribution of lengths for each age. The `age` and `length` columns contain all the combinations of age and length bins, and the `value` column contains the proportion of fish at each age that are in each length bin. The `unit` column should be "proportion". The age-to-length conversion data are not currently included in the likelihood but are used to convert numbers at age to numbers at length for the population dynamics calculations when length compositions are included in the model. 
+The age-to-length conversion data type contains the distribution of lengths for each age. The `age` and `length` columns contain all the combinations of age and length bins, and the `value` column contains the proportion of fish at each age that are in each length bin. The `unit` column should be "proportion". A single set of the age-to-length conversion data is required, rather than separate copies for each fleet (name) or time step. The age-to-length conversion data are not currently included in the likelihood but are used to convert numbers at age to numbers at length for the population dynamics calculations when length compositions are included in the model.
 
 Note: purely age-based models which have no length-composition data can omit the age-to-length conversion data as well.
 
@@ -208,20 +208,12 @@ FIMS::data_big |>
   dplyr::filter(type == "age_to_length_conversion") |>
   tail(3)
 
-# show that the number of rows in the age-to-length conversion data type is equal to the product of the number of unique combinations of age, length, and timing
+# show that the number of rows in the age-to-length conversion data type is equal to the product of the number of unique combinations of age and length
 FIMS::data_big |>
   dplyr::filter(type == "age_to_length_conversion") |>
   nrow()
-# 12 ages, 23 length bins, 30 time steps, and 2 fleets:
-12 * 23 * 30 * 2
-
-# confirm that the values are identical within each age/length combination across time steps
-FIMS::data_big |>
-  dplyr::filter(type == "age_to_length_conversion") |>
-  dplyr::group_by(age, length) |>
-  dplyr::summarize(n_distinct = dplyr::n_distinct(value), .groups = "drop") |>
-  dplyr::pull(n_distinct) |>
-  unique()
+# 12 ages, 23 length bins:
+length(unique(na.omit(FIMS::data_big$age))) * length(unique(na.omit(FIMS::data_big$length)))
 ```
 
 ```{r data_big-age_to_length_conversion-plot}
