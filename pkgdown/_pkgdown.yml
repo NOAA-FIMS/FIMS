@@ -85,6 +85,8 @@ navbar:
         - text: Intro to FIMS
         - text: Introducing the Fisheries Integrated Modeling System (FIMS)
           href: articles/fims-demo.html
+        - text: Introducing FIMS Input Data
+          href: articles/fims-input-data.html
         - text: Introducing the FIMS Logging System
           href: articles/fims-logging.html
         - text: FIMS User Setup Guide
