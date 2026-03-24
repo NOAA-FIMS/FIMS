@@ -43,6 +43,9 @@ jobs:
       - name: Configure
         run: cmake -S . -B build -DBUILD_DOC=OFF -G Ninja -DCMAKE_CXX_FLAGS="--coverage -ftime-report -ftemplate-backtrace-limit=0"
 
+      # NOTE: /usr/bin/time -v is specific to Linux
+      # When running locally on Windows, the -v flag should be removed
+
       - name: Build and capture metrics
         run: /usr/bin/time -v cmake --build build --parallel 16 2>&1 | tee build.log
 
