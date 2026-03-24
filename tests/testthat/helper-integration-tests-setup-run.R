@@ -273,13 +273,13 @@ prepare_test_data <- function() {
   # Run FIMS model
   fit_agecomp <- suppressWarnings(
     suppressMessages(modified_parameters |>
-    # remove rows that have module_type == LengthComp
-    dplyr::rows_delete(
-      y = tibble::tibble(module_type = "LengthComp")
-    ) |>
-    initialize_fims(data = data_age_comp) |>
-    fit_fims(optimize = TRUE)
-  ))
+      # remove rows that have module_type == LengthComp
+      dplyr::rows_delete(
+        y = tibble::tibble(module_type = "LengthComp")
+      ) |>
+      initialize_fims(data = data_age_comp) |>
+      fit_fims(optimize = TRUE))
+  )
 
   clear()
 
@@ -329,13 +329,13 @@ prepare_test_data <- function() {
   # Fit the FIMS model using the second dataset (with missing values)
   fit_agecomp_na <- suppressWarnings(
     suppressMessages(modified_parameters |>
-    # remove rows that have module_type == LengthComp
-    dplyr::rows_delete(
-      y = tibble::tibble(module_type = "LengthComp")
-    ) |>
-    initialize_fims(data = data_age_comp_na) |>
-    fit_fims(optimize = TRUE)
-  ))
+      # remove rows that have module_type == LengthComp
+      dplyr::rows_delete(
+        y = tibble::tibble(module_type = "LengthComp")
+      ) |>
+      initialize_fims(data = data_age_comp_na) |>
+      fit_fims(optimize = TRUE))
+  )
 
   clear()
 
@@ -408,11 +408,11 @@ prepare_test_data <- function() {
   # * Fit the FIMS model with optimization enabled
   fit_age_length_comp_na <- suppressWarnings(
     suppressMessages(initialize_fims(
-    parameters = modified_parameters,
-    data = data_age_length_comp_na
-  ) |>
-    fit_fims(optimize = TRUE)
-  ))
+      parameters = modified_parameters,
+      data = data_age_length_comp_na
+    ) |>
+      fit_fims(optimize = TRUE))
+  )
 
   clear()
 
