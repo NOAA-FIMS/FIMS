@@ -83,6 +83,21 @@
 #define TMBAD_FIMS_TYPE TMBad::ad_aug
 #endif
 
+/* Dictionary block for shared documentation.
+  [params_for_message]
+  @param str Log message text.
+  @param line Source line number where the message originated.
+  @param file Source file where the message originated.
+  @param func Function or method name where the message originated.
+  [params_for_message]
+*/
+
+/* Dictionary block for shared documentation.
+  [param_MESSAGE]
+  @param MESSAGE Human-readable log message describing what happened and why.
+  [param_MESSAGE]
+*/
+
 namespace fims {
 
 /**
@@ -315,12 +330,11 @@ class FIMSLog {
   std::string get_path() { return this->path; }
 
   /**
-   * Add a "info", "error", or "warning" level message to the log.
+   * Add a info-level message to the log.
    *
-   * @param str Log message text.
-   * @param line Source line number where the message originated.
-   * @param file Source file where the message originated.
-   * @param func Function or method name where the message originated.
+   * @snippet{doc} this params_for_message
+   * @see error_message()
+   * @see warning_message()
    */
   void info_message(std::string str, int line, const char* file,
                     const char* func) {
@@ -347,7 +361,11 @@ class FIMSLog {
   }
 
   /**
-   * @copydoc info_message
+   * Add a error-level message to the log.
+   *
+   * @snippet{doc} this params_for_message
+   * @see info_message()
+   * @see warning_message()
    */
   void error_message(std::string str, int line, const char* file,
                      const char* func) {
@@ -382,7 +400,11 @@ class FIMSLog {
   }
 
   /**
-   * @copydoc info_message
+   * Add a warning-level message to the log.
+   *
+   * @snippet{doc} this params_for_message
+   * @see error_message()
+   * @see info_message()
    */
   void warning_message(std::string str, int line, const char* file,
                        const char* func) {
@@ -549,29 +571,38 @@ class FIMSLog {
   }
 
   /**
-   * @brief Return the number of error or warning log entries currently stored.
+   * @brief Return the number of error-log entries currently stored.
    *
-   * @details This value is reset to zero when `clear()` is called.
+   * @details This counter is incremented whenever an error-level log entry is
+   * added and is reset to zero when `clear()` is called.
    * @see clear()
-   * @return Count of error-level entries.
+   * @see get_warning_count()
+   * @return Count of error-log entries.
    */
   size_t get_error_count() const { return error_count; }
 
   /**
-   * @copydoc get_error_count
+   * @brief Return the number of warning-log entries currently stored.
+   *
+   * @details  This counter is incremented whenever a warning-level log entry is
+   * added and is reset to zero when `clear()` is called.
+   * @see clear()
+   * @see get_error_count()
+   * @return Count of warning-log entries.
    */
   size_t get_warning_count() const { return warning_count; }
 
   /**
    * @brief Clear in-memory logging state.
    *
-   * @details Clears the raw entry cache and structured entries, resets warning
-   * and entry counters, and preserves configured output path and
+   * @details Clears the raw entry cache and structured entries, resets error,
+   * warning, and entry counters, and preserves configured output path and
    * `throw_on_error` behavior.
    */
   void clear() {
     this->entries.clear();
     this->log_entries.clear();
+    this->error_count = 0;
     this->warning_count = 0;
     this->entry_number = 0;
   }
@@ -583,14 +614,11 @@ std::shared_ptr<FIMSLog> FIMSLog::fims_log = std::make_shared<FIMSLog>();
 
 /**
  * @def FIMS_INFO_LOG(MESSAGE)
- * @brief Record an info, warning, or error log entry with metadata.
+ * @brief Record an info-log entry with metadata.
  *
- * @details The logging macros capture `MESSAGE` plus the call-site metadata
- * (`__LINE__`, `__FILE__`, and `__PRETTY_FUNCTION__`) and forward those values
- * to the appropriate logger function. Each function type, i.e., `INFO`,
- * `WARNING`, and `ERROR` lead to different "level" entries within the log
- * entry, where `level = "warning"` does not increment a counter whereas the
- * other two options lead to increased warning or error counts.
+ * @details The logging macro captures `MESSAGE` plus the call-site metadata
+ * (`__LINE__`, `__FILE__`, and `__PRETTY_FUNCTION__`) and forwards those values
+ * to `info_message`.
  *
  * @param MESSAGE Human-readable log message describing what happened and why.
  */
@@ -600,7 +628,11 @@ std::shared_ptr<FIMSLog> FIMSLog::fims_log = std::make_shared<FIMSLog>();
 
 /**
  * @def FIMS_WARNING_LOG(MESSAGE)
- * @copydoc FIMS_INFO_LOG(MESSAGE)
+ * @details The logging macro captures `MESSAGE` plus the call-site metadata
+ * (`__LINE__`, `__FILE__`, and `__PRETTY_FUNCTION__`) and forwards those values
+ * to `warning_message`.
+ *
+ * @snippet{doc} this param_MESSAGE
  */
 #define FIMS_WARNING_LOG(MESSAGE)                                       \
   fims::FIMSLog::fims_log->warning_message(MESSAGE, __LINE__, __FILE__, \
@@ -608,7 +640,15 @@ std::shared_ptr<FIMSLog> FIMSLog::fims_log = std::make_shared<FIMSLog>();
 
 /**
  * @def FIMS_ERROR_LOG(MESSAGE)
- * @copydoc FIMS_INFO_LOG(MESSAGE)
+ * @details The logging macro captures `MESSAGE` plus the call-site metadata
+ * (`__LINE__`, `__FILE__`, and `__PRETTY_FUNCTION__`) and forwards those values
+ * to `error_message`.
+ * @snippet{doc} this param_MESSAGE
+ * @see FIMS_INFO_LOG
+ * @see FIMS_WARNING_LOG
+ * @see error_message()
+ * @see info_message()
+ * @see warning_message()
  */
 #define FIMS_ERROR_LOG(MESSAGE)                                       \
   fims::FIMSLog::fims_log->error_message(MESSAGE, __LINE__, __FILE__, \

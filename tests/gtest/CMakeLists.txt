@@ -326,3 +326,16 @@ target_link_libraries(FIMSJson_JsonParser_Parse
 )
 
 gtest_discover_tests(FIMSJson_JsonParser_Parse)
+
+
+# test_def_FIMSLog_clear.cpp
+add_executable(def_FIMSLog_clear
+  test_def_FIMSLog_clear.cpp
+)
+
+target_link_libraries(def_FIMSLog_clear
+  gtest_main
+  fims_test
+)
+
+gtest_discover_tests(def_FIMSLog_clear)
