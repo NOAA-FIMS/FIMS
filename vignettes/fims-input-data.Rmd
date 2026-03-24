@@ -88,7 +88,7 @@ FIMS::data_big |>
     ymin = qlnorm(p = 0.025, meanlog = log(value), sdlog = uncertainty),
     ymax = qlnorm(p = 0.975, meanlog = log(value), sdlog = uncertainty)
   )) +
-  geom_hline(yintercept = 0) + 
+  geom_hline(yintercept = 0) +
   ggtitle("Index time series in data_big example data set")
 ```
 
@@ -143,7 +143,6 @@ FIMS::data_big |>
   ggplot2::ylab("Number") +
   ggplot2::facet_wrap(~timing) +
   ggtitle("Length compositions by time step in data_big example data set")
-
 ```
 
 ### Weight-at-age data (`type == "weight_at_age"`)
@@ -189,7 +188,7 @@ FIMS::data_big |>
   ggplot2::ylab("Weight (mt)") +
   ggplot2::facet_wrap(~timing) +
   ggplot2::scale_x_continuous(breaks = 1:12) +
-  geom_hline(yintercept = 0) + 
+  geom_hline(yintercept = 0) +
   ggtitle("Weight-at-age values by time step in data_big example data set")
 ```
 
