@@ -31,12 +31,7 @@ utils::globalVariables(c(
 # methods::setClass: ----
 
 # Need to use an S3 class for the following S4 class
-methods::setOldClass(Classes = "package_version")
-methods::setOldClass(Classes = "difftime")
-methods::setOldClass(Classes = "sdreport")
-# Join sdreport and list into a class in case the sdreport is not created
-methods::setClassUnion("sdreportOrList", members = c("sdreport", "list"))
-
+# Use "ANY" to avoid devtools::load_all() issues with S3 classes becoming undefined on reload.
 methods::setClass(
   Class = "FIMSFit",
   slots = c(
@@ -45,10 +40,10 @@ methods::setClass(
     opt = "list",
     max_gradient = "numeric",
     report = "list",
-    sdreport = "sdreportOrList",
+    sdreport = "ANY",
     number_of_parameters = "integer",
-    timing = "difftime",
-    version = "package_version",
+    timing = "ANY",
+    version = "ANY",
     model_output = "character"
   )
 )
@@ -336,6 +331,17 @@ methods::setValidity(
         "obj must be a list returned from TMB::MakeADFun() but it does not
         appear to be so because it does not have the standard names."
       )
+    }
+
+    # Verify our custom 'ANY' slots mapped from S3 classes
+    if (!inherits(object@sdreport, "sdreport") && !is.list(object@sdreport)) {
+      errors <- c(errors, "sdreport must be of class 'sdreport' or 'list'.")
+    }
+    if (!inherits(object@timing, "difftime")) {
+      errors <- c(errors, "timing must be of class 'difftime'.")
+    }
+    if (!inherits(object@version, "package_version")) {
+      errors <- c(errors, "version must be of class 'package_version'.")
     }
 
     # Return
