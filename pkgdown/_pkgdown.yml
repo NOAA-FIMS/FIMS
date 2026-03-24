@@ -110,8 +110,9 @@ navbar:
     reports:
       text: reports
       menu: 
-        - text: coverage
-          href: https://noaa-fims.github.io/FIMS/coverage/coverage.html
+        - text: coverage (codecov)
+          href: https://app.codecov.io/gh/NOAA-FIMS/FIMS
+          target: _blank
         - text: coverage explained
           href: https://noaa-fims.github.io/FIMS/coverage/codecoverage_explanation.html
         - text: testdown
