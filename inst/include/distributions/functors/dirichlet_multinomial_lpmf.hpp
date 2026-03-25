@@ -39,7 +39,8 @@ struct Dirichlet_multinomialLPMF : public DensityComponentBase<Type> {
    * @brief Dimensions of the number of rows and columns of the multivariate
    * dataset.
    */
-  fims::Vector<size_t> dims;
+  fims::Vector<size_t> dims; 
+        Type theta;
 
   /** @brief Constructor.
    */
@@ -90,7 +91,7 @@ struct Dirichlet_multinomialLPMF : public DensityComponentBase<Type> {
     } else {
       if (dims[0] * dims[1] != this->observed_values.size()) {
         throw std::invalid_argument(
-            "Dirichlet-multinomialLPDF: Vector index out of bounds. The dimension of the "
+            "Dirichlet_multinomialLPDF: Vector index out of bounds. The dimension of the "
             "number of  rows times the number of columns is of size " +
             fims::to_string(dims[0] * dims[1]) +
             " and the observed vector is of size " +
@@ -98,7 +99,7 @@ struct Dirichlet_multinomialLPMF : public DensityComponentBase<Type> {
       }
       if (this->observed_values.size() != this->expected_values.size()) {
         throw std::invalid_argument(
-            "Dirichlet-multinomialLPDF: Vector index out of bounds. The dimension of the "
+            "Dirichlet_multinomialLPDF: Vector index out of bounds. The dimension of the "
             "observed vector of size " +
             fims::to_string(this->observed_values.size()) +
             " and the expected vector is of size " +
@@ -144,8 +145,8 @@ struct Dirichlet_multinomialLPMF : public DensityComponentBase<Type> {
       if (!containsNA) {
         std::fill(this->lpdf_vec.begin() + lpdf_vec_idx,
                   this->lpdf_vec.begin() + lpdf_vec_idx + dims[1],
-                  dmultinom(observed_values_vector.to_tmb(),
-                            prob_vector.to_tmb(), true));
+                  ddiric_multinom(observed_values_vector,
+                            prob_vector, this->theta, true));
 
         this->lpdf += this->lpdf_vec[lpdf_vec_idx];
       } else {
