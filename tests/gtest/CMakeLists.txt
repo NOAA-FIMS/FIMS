@@ -332,3 +332,14 @@ target_link_libraries(def_FIMSLog_clear
   fims_test
 )
 gtest_discover_tests(def_FIMSLog_clear)
+
+# test_fims_math_ddiric_multinom.cpp
+add_executable(FimsMathDdiricMultinomTest
+  test_fims_math_ddiric_multinom.cpp
+)
+add_as_invoker_manifest(FimsMathDdiricMultinomTest)
+target_link_libraries(FimsMathDdiricMultinomTest
+  gtest_main
+  fims_test
+)
+gtest_discover_tests(FimsMathDdiricMultinomTest DISCOVERY_TIMEOUT 60)
