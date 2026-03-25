@@ -12,9 +12,6 @@
 #include "../../../distributions/distributions.hpp"
 #include "../../interface.hpp"
 #include "rcpp_interface_base.hpp"
-#include <cmath>
-#include <exception>
-#include <string>
 
 /**
  * @brief Rcpp interface that serves as the parent class for Rcpp distribution
@@ -274,9 +271,7 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
    * returned.
    */
   virtual double evaluate() {
-    FIMS_INFO_LOG(std::string("Evaluating DnormDistribution ") + fims::to_string(this->id_m));
-    try {
-      fims_distributions::NormalLPDF<double> dnorm;
+    fims_distributions::NormalLPDF<double> dnorm;
     dnorm.observed_values.resize(this->observed_values.size());
     dnorm.expected_values.resize(this->expected_values.size());
     dnorm.log_sd.resize(this->log_sd.size());
@@ -294,23 +289,7 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
       dnorm.expected_mean[i] = this->expected_mean[i].initial_value_m;
     }
     dnorm.use_mean = this->use_mean_m;
-    double res = dnorm.evaluate();
-    if (std::isnan(res) || std::isinf(res)) {
-      FIMS_ERROR_LOG(std::string("DnormDistribution evaluate returned NaN/Inf for id ") + fims::to_string(this->id_m));
-      Rcpp::Rcerr << std::string("DnormDistribution evaluate returned NaN/Inf for id ") + fims::to_string(this->id_m) << std::endl;
-    } else {
-      FIMS_INFO_LOG(std::string("DnormDistribution evaluate returned ") + std::to_string(res) + std::string(" for id ") + fims::to_string(this->id_m));
-    }
-    return res;
-    } catch (const std::exception &e) {
-      FIMS_ERROR_LOG(std::string("Exception evaluating DnormDistribution id ") + fims::to_string(this->id_m) + std::string(": ") + std::string(e.what()));
-      Rcpp::Rcerr << std::string("Exception evaluating DnormDistribution id ") + fims::to_string(this->id_m) + std::string(": ") + std::string(e.what()) << std::endl;
-      return 0.0;
-    } catch (...) {
-      FIMS_ERROR_LOG(std::string("Unknown exception evaluating DnormDistribution id ") + fims::to_string(this->id_m));
-      Rcpp::Rcerr << std::string("Unknown exception evaluating DnormDistribution id ") + fims::to_string(this->id_m) << std::endl;
-      return 0.0;
-    }
+    return dnorm.evaluate();
   }
 
   /**
@@ -318,7 +297,6 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
    * object.
    */
   virtual void finalize() {
-    FIMS_INFO_LOG(std::string("Finalizing DnormDistribution ") + fims::to_string(this->id_m));
     if (this->finalized) {
       // log warning that finalize has been called more than once.
       FIMS_WARNING_LOG("DnormDistribution  " + fims::to_string(this->id_m) +
@@ -648,9 +626,7 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
    * returned.
    */
   virtual double evaluate() {
-    FIMS_INFO_LOG(std::string("Evaluating LogNormalLPDF ") + fims::to_string(this->id_m));
-    try {
-      fims_distributions::LogNormalLPDF<double> dlnorm;
+    fims_distributions::LogNormalLPDF<double> dlnorm;
     dlnorm.observed_values.resize(this->observed_values.size());
     dlnorm.expected_values.resize(this->expected_values.size());
     dlnorm.log_sd.resize(this->log_sd.size());
@@ -664,23 +640,7 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
     for (size_t i = 0; i < this->log_sd.size(); i++) {
       dlnorm.log_sd[i] = this->log_sd[i].initial_value_m;
     }
-    double res = dlnorm.evaluate();
-    if (std::isnan(res) || std::isinf(res)) {
-      FIMS_ERROR_LOG(std::string("LogNormalLPDF evaluate returned NaN/Inf for id ") + fims::to_string(this->id_m));
-      Rcpp::Rcerr << "LogNormalLPDF evaluate returned NaN/Inf for id " << this->id_m << std::endl;
-    } else {
-      FIMS_INFO_LOG(std::string("LogNormalLPDF evaluate returned ") + std::to_string(res) + std::string(" for id ") + fims::to_string(this->id_m));
-    }
-    return res;
-    } catch (const std::exception &e) {
-      FIMS_ERROR_LOG(std::string("Exception evaluating LogNormalLPDF id ") + fims::to_string(this->id_m) + std::string(": ") + std::string(e.what()));
-      Rcpp::Rcerr << "Exception evaluating LogNormalLPDF id " << this->id_m << ": " << e.what() << std::endl;
-      return 0.0;
-    } catch (...) {
-      FIMS_ERROR_LOG(std::string("Unknown exception evaluating LogNormalLPDF id ") + fims::to_string(this->id_m));
-      Rcpp::Rcerr << "Unknown exception evaluating LogNormalLPDF id " << this->id_m << std::endl;
-      return 0.0;
-    }
+    return dlnorm.evaluate();
   }
 
   /**
@@ -688,7 +648,6 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
    * object.
    */
   virtual void finalize() {
-    FIMS_INFO_LOG(std::string("Finalizing LogNormalLPDF ") + fims::to_string(this->id_m));
     if (this->finalized) {
       // log warning that finalize has been called more than once.
       FIMS_WARNING_LOG("LogNormalLPDF  " + fims::to_string(this->id_m) +
@@ -998,9 +957,7 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
    * @return double
    */
   virtual double evaluate() {
-    FIMS_INFO_LOG(std::string("Evaluating MultinomialLPMF ") + fims::to_string(this->id_m));
-    try {
-      fims_distributions::MultinomialLPMF<double> dmultinom;
+    fims_distributions::MultinomialLPMF<double> dmultinom;
     // Declare TMBVector in this scope
     dmultinom.observed_values.resize(this->observed_values.size());
     dmultinom.expected_values.resize(this->expected_values.size());
@@ -1013,23 +970,7 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
     dmultinom.dims.resize(2);
     dmultinom.dims[0] = this->dims[0];
     dmultinom.dims[1] = this->dims[1];
-    double res = dmultinom.evaluate();
-    if (std::isnan(res) || std::isinf(res)) {
-      FIMS_ERROR_LOG(std::string("MultinomialLPMF evaluate returned NaN/Inf for id ") + fims::to_string(this->id_m));
-      Rcpp::Rcerr << std::string("MultinomialLPMF evaluate returned NaN/Inf for id ") + fims::to_string(this->id_m) << std::endl;
-    } else {
-      FIMS_INFO_LOG(std::string("MultinomialLPMF evaluate returned ") + std::to_string(res) + std::string(" for id ") + fims::to_string(this->id_m));
-    }
-    return res;
-    } catch (const std::exception &e) {
-      FIMS_ERROR_LOG(std::string("Exception evaluating MultinomialLPMF id ") + fims::to_string(this->id_m) + std::string(": ") + std::string(e.what()));
-      Rcpp::Rcerr << std::string("Exception evaluating MultinomialLPMF id ") + fims::to_string(this->id_m) + std::string(": ") + std::string(e.what()) << std::endl;
-      return 0.0;
-    } catch (...) {
-      FIMS_ERROR_LOG(std::string("Unknown exception evaluating MultinomialLPMF id ") + fims::to_string(this->id_m));
-      Rcpp::Rcerr << std::string("Unknown exception evaluating MultinomialLPMF id ") + fims::to_string(this->id_m) << std::endl;
-      return 0.0;
-    }
+    return dmultinom.evaluate();
   }
 
   void finalize() {
@@ -1156,6 +1097,7 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
 
   template <typename Type>
   bool add_to_fims_tmb_internal() {
+    FIMS_INFO_LOG("Adding multinomial to FIMS.");
     std::shared_ptr<fims_info::Information<Type>> info =
         fims_info::Information<Type>::GetInstance();
 
@@ -1182,6 +1124,7 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
     }
 
     info->density_components[distribution->id] = distribution;
+    FIMS_INFO_LOG("Done adding multinomial to FIMS.");
     return true;
   }
 
