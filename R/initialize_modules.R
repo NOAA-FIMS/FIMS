@@ -78,9 +78,9 @@ initialize_module <- function(parameters, data, module_name, fleet_name = NA_cha
     data_distribution_names_for_fleet_i <- parameters |>
       dplyr::filter(fleet_name == !!fleet_name & distribution_type == "Data") |>
       dplyr::pull(module_type)
-    if ("age-to-length-conversion" %in% fleet_types &&
+    if ("age_to_length_conversion" %in% fleet_types &&
       "LengthComp" %in% data_distribution_names_for_fleet_i) {
-      age_to_length_conversion_value <- FIMS::m_age_to_length_conversion(data, fleet_name)
+      age_to_length_conversion_value <- model_age_to_length_conversion(data, fleet_name)
       module[["age_to_length_conversion"]]$resize(length(age_to_length_conversion_value))
       # Assign each value to the corresponding position in the parameter vector
       purrr::walk(
@@ -110,10 +110,10 @@ initialize_module <- function(parameters, data, module_name, fleet_name = NA_cha
   # TODO:
   # - Population interface
   #   - Update the Population interface to consistently use n_ages and n_years,
-  #     as done in the S4 data1 object.
+  #     as done in the S4 data_big object.
   #     Update as needed.
-  #   - Add n_fleets to data1. Should n_fleets include both
-  #     fishing and survey fleets? Currently, data1@fleets equals 1.
+  #   - Add n_fleets to data_big. Should n_fleets include both
+  #     fishing and survey fleets? Currently, data_big@fleets equals 1.
   # - Fleet
   #   - Reconsider exposing `log_expected_index` and
   #     `agecomp_proportion` to users. Their IDs are linked with
@@ -150,10 +150,16 @@ initialize_module <- function(parameters, data, module_name, fleet_name = NA_cha
     } else if (field %in% c("ages", "weights")) {
       get_value_function <- switch(field,
         "ages" = get_ages,
-        "weights" = m_weight_at_age
+        "weights" = model_weight_at_age
       )
-      module[[field]]$resize(get_n_ages(data))
-      purrr::walk(seq_len(get_n_ages(data)), function(x) {
+      module_length <- switch(field,
+        "ages" = get_n_ages(data),
+        "weights" = get_n_ages(data) * (get_n_years(data) + 1)
+      )
+      module[[field]]$resize(module_length)
+      purrr::walk(
+        seq(module_length),
+        function(x) {
         module[[field]]$set(x - 1, get_value_function(data)[x])
       })
     } else {
@@ -222,7 +228,7 @@ initialize_distribution <- function(
   if (distribution_type == "data") {
     distribution_fields <- setdiff(
       distribution_fields,
-      c("expected_values", "x", "dims")
+      c("expected_values", "observed_values", "dims")
     )
   }
 
@@ -278,6 +284,7 @@ initialize_recruitment <- function(parameters, data) {
     data = data,
     module_name = "Recruitment"
   )
+  return(module)
 }
 
 #' Initialize a growth module
@@ -296,6 +303,7 @@ initialize_growth <- function(parameters, data) {
     data = data,
     module_name = "Growth"
   )
+  return(module)
 }
 
 #' Initialize a maturity module
@@ -314,6 +322,7 @@ initialize_maturity <- function(parameters, data) {
     data = data,
     module_name = "Maturity"
   )
+  return(module)
 }
 
 #' Initialize a population module.
@@ -382,6 +391,7 @@ initialize_selectivity <- function(parameters, data, fleet_name) {
     module_name = module_name,
     fleet_name = fleet_name
   )
+  return(module)
 }
 
 # TODO: Do we want to put initialize_selectivity(), initialize_index(), and
@@ -480,8 +490,8 @@ initialize_landings <- function(data, fleet_name) {
   if ("landings" %in% fleet_type) {
     module <- methods::new(Landings, get_n_years(data))
     purrr::walk(
-      seq_along(m_landings(data, fleet_name)),
-      \(x) module$landings_data$set(x - 1, m_landings(data, fleet_name)[x])
+      seq_along(model_landings(data, fleet_name)),
+      \(x) module$landings_data$set(x - 1, model_landings(data, fleet_name)[x])
     )
     return(module)
   } else {
@@ -516,8 +526,8 @@ initialize_index <- function(data, fleet_name) {
   if ("index" %in% fleet_type) {
     module <- methods::new(Index, get_n_years(data))
     purrr::walk(
-      seq_along(m_index(data, fleet_name)),
-      \(x) module$index_data$set(x - 1, m_index(data, fleet_name)[x])
+      seq_along(model_index(data, fleet_name)),
+      \(x) module$index_data$set(x - 1, model_index(data, fleet_name)[x])
     )
     return(module)
   } else {
@@ -552,14 +562,14 @@ initialize_comp <- function(data,
       "comp_data_field" = "age_comp_data",
       "get_n_function" = get_n_ages,
       "comp_object" = AgeComp,
-      "m_comp" = m_agecomp
+      "m_comp" = model_age_comp
     ),
     "LengthComp" = list(
       "name" = "length_comp",
       "comp_data_field" = "length_comp_data",
       "get_n_function" = get_n_lengths,
       "comp_object" = LengthComp,
-      "m_comp" = m_lengthcomp
+      "m_comp" = model_length_comp
     )
   )
 
@@ -584,9 +594,10 @@ initialize_comp <- function(data,
 
   # Validate that the fleet's composition data is available
   comp_data <- comp[["m_comp"]](data, fleet_name)
+  pretty_comp_name <- gsub("_comp", "-composition", comp[['name']])
   if (is.null(comp_data) || length(comp_data) == 0) {
     cli::cli_abort(c(
-      "`{comp[['name']]}`-composition data for fleet `{fleet_name}` is
+      "The {pretty_comp_name} data for fleet {.var {fleet_name}} is
       unavailable or empty."
     ))
   }
@@ -674,8 +685,8 @@ initialize_comp <- function(data,
 #' @examples
 #' \dontrun{
 #' # Prepare data for FIMS model
-#' data("data1", package = "FIMS")
-#' data_4_model <- FIMSFrame(data1)
+#' data("data_big", package = "FIMS")
+#' data_4_model <- FIMSFrame(data_big)
 #' # Instantiate modules
 #' parameters_list <- data_4_model |>
 #'   create_default_configurations() |>
@@ -1017,7 +1028,7 @@ set_param_vector <- function(field, module, module_input) {
 
   # Check if module_input is a list
   if (!tibble::is_tibble(module_input)) {
-    cli::cli_abort("The {.var module_input} argument must be tibble.")
+    cli::cli_abort("The {.var module_input} argument must be a tibble.")
   }
 
   # Extract the value of the parameter vector

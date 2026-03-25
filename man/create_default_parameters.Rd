@@ -63,8 +63,8 @@ as \code{"Logistic"}, it generates initial values for \code{"inflection_point"} 
 \examples{
 \dontrun{
 # Load the example dataset and create a FIMS data frame
-data("data1")
-fims_frame <- FIMSFrame(data1)
+data("data_big")
+fims_frame <- FIMSFrame(data_big)
 
 # Create default configurations
 default_configurations <- create_default_configurations(fims_frame)

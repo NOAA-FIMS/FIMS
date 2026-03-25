@@ -17,8 +17,6 @@ test_that("rcpp maturity works with correct inputs", {
   maturity1 <- methods::new(LogisticMaturity)
 
   maturity1$inflection_point[1]$value <- 10.0
-  maturity1$inflection_point[1]$min <- 8.0
-  maturity1$inflection_point[1]$max <- 12.0
   maturity1$inflection_point[1]$estimation_type$set("fixed_effects")
   maturity1$slope[1]$value <- 0.2
 
@@ -26,10 +24,6 @@ test_that("rcpp maturity works with correct inputs", {
   expect_equal(maturity1$get_id(), 1)
   #' @description Test that the value of `inflection_point` can be set and get correctly.
   expect_equal(maturity1$inflection_point[1]$value, 10.0)
-  #' @description Test that the min of `inflection_point` can be set and get correctly.
-  expect_equal(maturity1$inflection_point[1]$min, 8.0)
-  #' @description Test that the max of `inflection_point` can be set and get correctly.
-  expect_equal(maturity1$inflection_point[1]$max, 12.0)
   #' @description Test that the `estimation_type` of `inflection_point` can be set and get correctly.
   expect_equal(maturity1$inflection_point[1]$estimation_type$get(), "fixed_effects")
   #' @description Test that the value of `slope` can be set and get correctly.

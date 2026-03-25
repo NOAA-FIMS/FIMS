@@ -55,6 +55,17 @@ test_that("catch-at-age model (deterministic MLE with wrappers) returns correct 
   })
 })
 
+test_that("catch-at-age model (deterministic MLE with wrappers) check recruitment devs random effects", {
+  # Load the test data from an RDS file containing the model fit
+  deterministic_age_length_comp <- readRDS(testthat::test_path("fixtures", "fit_agecomp_random_effects.RDS"))
+
+  test_that("catch-at-age model (deterministic MLE with wrappers) returns correct number of parameters and random effects", {
+    #' @description Test that the number of fixed parameters are correct.
+    expect_equal(get_number_of_parameters(deterministic_age_length_comp)["fixed_effects"] |> unname(), 48)
+    #' @description Test that the number of random effects are correct.
+    expect_equal(get_number_of_parameters(deterministic_age_length_comp)["random_effects"] |> unname(), 29)
+  })
+})
 ## Edge handling ----
 # No edge cases to test
 
@@ -183,7 +194,7 @@ test_that("catch-at-age model (estimation MLE with wrappers) works with mixed es
   )
   #' @description Test that there are 20 years of estimates with standard errors because they are estimated as fixed effects.
   expect_equal(
-    sum(mixed_output[["uncertainty"]] == 0),
+    sum(is.na(mixed_output[["uncertainty"]])),
     10
   )
 
@@ -201,7 +212,7 @@ test_that("catch-at-age model (estimation MLE with wrappers) works with mixed es
 ## Error handling ----
 test_that("catch-at-age model (estimation MLE with wrappers) returns an error when there are no estimated parameters for optimization", {
   # Load data
-  data_age_length_comp <- FIMSFrame(data1)
+  data_age_length_comp <- FIMSFrame(data_big)
   # Load pre-configured parameters
   parameters <- readRDS(
     testthat::test_path("fixtures", "parameters_model_comparison_project.RDS")

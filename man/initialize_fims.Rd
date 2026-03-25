@@ -45,8 +45,8 @@ at least one fleet and population module.
 \examples{
 \dontrun{
 # Prepare data for FIMS model
-data("data1", package = "FIMS")
-data_4_model <- FIMSFrame(data1)
+data("data_big", package = "FIMS")
+data_4_model <- FIMSFrame(data_big)
 # Instantiate modules
 parameters_list <- data_4_model |>
   create_default_configurations() |>

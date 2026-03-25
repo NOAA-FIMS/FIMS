@@ -30,6 +30,9 @@
   library.dynam.unload("FIMS", libpath)
 }
 
+methods::setOldClass(Classes = "Rcpp_Parameter")
+methods::setOldClass(Classes = "Rcpp_ParameterVector")
+
 # Methods for Rcpp
 #' Setter for `Rcpp_ParameterVector`
 #'

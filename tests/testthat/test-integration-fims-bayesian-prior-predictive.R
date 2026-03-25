@@ -201,16 +201,17 @@ test_that("prior predictive check", {
   # taken before the likelihood calculation
   recruitment_distribution$log_sd <- methods::new(ParameterVector, 1)
   recruitment_distribution$log_sd[1]$value <- log(om_input[["logR_sd"]])
-  recruitment_distribution$x$resize(om_input[["nyr"]] - 1)
+  recruitment_distribution$observed_values$resize(om_input[["nyr"]] - 1)
   recruitment_distribution$expected_values$resize(om_input[["nyr"]] - 1)
   for (i in 1:(om_input[["nyr"]] - 1)) {
-    recruitment_distribution$x[i]$value <- 0
+    recruitment_distribution$observed_values[i]$value <- 0
     recruitment_distribution$expected_values[i]$value <- 0
   }
   recruitment_distribution$set_distribution_links("random_effects", recruitment$log_devs$get_id())
 
   # Growth
   ewaa_growth <- methods::new(EWAAGrowth)
+  ewaa_growth$n_years$set(om_input[["nyr"]])
   ewaa_growth$ages$resize(om_input[["nages"]])
   purrr::walk(
     seq_along(om_input[["ages"]]),
@@ -218,7 +219,9 @@ test_that("prior predictive check", {
   )
   ewaa_growth$weights$resize(om_input[["nages"]])
   purrr::walk(
-    seq_along(om_input[["W.mt"]]),
+    seq(ewaa_growth$weights$size()),
+    # Weights are only by age in the OM not by age and year. The modular math
+    # will repeat 1:n_ages over and over again for each year.
     \(x) ewaa_growth$weights$set(x - 1, om_input[["W.mt"]][x])
   )
 

@@ -60,23 +60,13 @@ struct LogisticSelectivity : public SelectivityBase<Type> {
 
   /**
    * @copydoc LogisticSelectivity::evaluate(const Type &x)
-   * @param pos Position index, e.g., which year.
+   * @param pos Position index, e.g., which year. If the index is out of bounds
+   * then it returns the first element, which would be the case when you do not
+   * have time-varying selectivity.
    */
   virtual const Type evaluate(const Type &x, size_t pos) {
     return fims_math::logistic<Type>(inflection_point.get_force_scalar(pos),
                                      slope.get_force_scalar(pos), x);
-  }
-
-  virtual void create_report_vectors(
-      std::map<std::string, fims::Vector<fims::Vector<Type>>> &report_vectors) {
-    report_vectors["inflection_point"].emplace_back(inflection_point);
-    report_vectors["slope"].emplace_back(slope);
-  }
-
-  virtual void get_report_vector_count(
-      std::map<std::string, size_t> &report_vector_count) {
-    report_vector_count["inflection_point"] += 1;
-    report_vector_count["slope"] += 1;
   }
 };
 

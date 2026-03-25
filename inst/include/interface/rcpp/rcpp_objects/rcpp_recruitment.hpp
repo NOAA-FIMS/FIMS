@@ -272,33 +272,6 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
       }
     }
   }
-  /**
-   * @brief Sets the uncertainty values for the parameters from the standard
-   * error values passed from R.
-   * @param se_values A map of parameter names and their associated standard
-   * error values.
-   */
-  virtual void set_uncertainty(
-      std::map<std::string, std::vector<double>> &se_values) {
-    fims::Vector<double> logit_steep_uncertainty(this->logit_steep.size(),
-                                                 -99999999);
-    this->get_se_values("logit_steep", se_values, logit_steep_uncertainty);
-    fims::Vector<double> log_rzero_uncertainty(this->log_rzero.size(),
-                                               -999999999);
-    this->get_se_values("log_rzero", se_values, log_rzero_uncertainty);
-    fims::Vector<double> log_devs_uncertainty(this->log_devs.size(),
-                                              -999999999);
-    this->get_se_values("log_devs", se_values, log_devs_uncertainty);
-    for (size_t i = 0; i < this->logit_steep.size(); i++) {
-      this->logit_steep[i].uncertainty_m = logit_steep_uncertainty[i];
-    }
-    for (size_t i = 0; i < this->log_rzero.size(); i++) {
-      this->log_rzero[i].uncertainty_m = log_rzero_uncertainty[i];
-    }
-    for (size_t i = 0; i < this->log_devs.size(); i++) {
-      this->log_devs[i].uncertainty_m = log_devs_uncertainty[i];
-    }
-  }
 
   /**
    * @brief Converts the data to json representation for the output.
@@ -465,15 +438,8 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
    * @return A boolean of true.
    */
   virtual bool add_to_fims_tmb() {
-#ifdef TMBAD_FRAMEWORK
     this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
     this->add_to_fims_tmb_internal<TMBAD_FIMS_TYPE>();
-#else
-    this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
-    this->add_to_fims_tmb_internal<TMB_FIMS_FIRST_ORDER>();
-    this->add_to_fims_tmb_internal<TMB_FIMS_SECOND_ORDER>();
-    this->add_to_fims_tmb_internal<TMB_FIMS_THIRD_ORDER>();
-#endif
 
     return true;
   }
@@ -547,15 +513,8 @@ class LogDevsRecruitmentInterface : public RecruitmentInterfaceBase {
    * @return A boolean of true.
    */
   virtual bool add_to_fims_tmb() {
-#ifdef TMBAD_FRAMEWORK
     this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
     this->add_to_fims_tmb_internal<TMBAD_FIMS_TYPE>();
-#else
-    this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
-    this->add_to_fims_tmb_internal<TMB_FIMS_FIRST_ORDER>();
-    this->add_to_fims_tmb_internal<TMB_FIMS_SECOND_ORDER>();
-    this->add_to_fims_tmb_internal<TMB_FIMS_THIRD_ORDER>();
-#endif
 
     return true;
   }
@@ -629,15 +588,8 @@ class LogRRecruitmentInterface : public RecruitmentInterfaceBase {
    * @return A boolean of true.
    */
   virtual bool add_to_fims_tmb() {
-#ifdef TMBAD_FRAMEWORK
     this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
     this->add_to_fims_tmb_internal<TMBAD_FIMS_TYPE>();
-#else
-    this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
-    this->add_to_fims_tmb_internal<TMB_FIMS_FIRST_ORDER>();
-    this->add_to_fims_tmb_internal<TMB_FIMS_SECOND_ORDER>();
-    this->add_to_fims_tmb_internal<TMB_FIMS_THIRD_ORDER>();
-#endif
 
     return true;
   }

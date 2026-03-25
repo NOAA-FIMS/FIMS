@@ -1,3 +1,17 @@
+# FIMS 0.9.0
+
+* Adds time-varying weight-at-age
+* Adds time-varying selectivity
+* Makes recruitment deviations random effects by default when using the wrapper
+  functions
+* Adds a glossary of mathematical symbols to the doxygen documentation
+* Brings doxygen to the pkgdown site
+* Fixes hidden bug in `dimension_folded_to_tibble()` in while loop
+* Removes get_log_module
+* Removes calculation of uncertainty within the C++ code
+* Changed package data name to data_big and added helper data
+* Changes `m_*()` functions to `model_*()`
+
 # FIMS 0.8.1
 
 * Fixes two bugs in `fit_fims` when getting random effect names and not wanting

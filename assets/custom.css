@@ -10,151 +10,204 @@ html {
     --page-background-color: #ffffff;
     --page-foreground-color: #213f4b;
     --page-secondary-foreground-color: #6f7e8e;
+
 }
 
+body {
+  font-family: Outfit, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif !important;
+  font-size: 16px !important;
+  line-height: 1.6 !important;
+  color: var(--page-foreground-color) !important;
+  background-color: var(--page-background-color) !important;
+}
+
+#nav-tree .label, #nav-tree a {
+  font-family: Outfit, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif !important;
+  color: var(--primary-color) !important;
+  font-weight: 400 !important;
+  margin-top: 1.5rem !important;
+  margin-bottom: 0.75rem !important;
+}
+
+/* Headings: Outfit + primary teal, lighter weight (pkgdown style) */
+h1, h2, h3, h4, h5, h6, div.header .title {
+  font-family: Outfit, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif !important;
+  color: var(--primary-color);
+  font-weight: 400;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+
+/* Pkgdown-like scaling */
+h1 { font-size: 2.5rem; }
+h2 { font-size: 2rem; }
+h3 { font-size: 1.75rem; }
+h4 { font-size: 1.5rem; }
+h5 { font-size: 1.25rem; line-height: 1.4; }
+h6 { font-size: 1rem; }
+
+
+
 #projectname {
+    margin-left: 10px !important;
     color: #51595d;
     font-family: Outfit, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    font-size: 1.335rem !important;
     font-weight: 400;
     letter-spacing: 1px;
 }
-
-/*#side-nav {
-    background: #ffffff;
-}*/
-
-
-/*@media (prefers-color-scheme: dark) {
-    html:not(.light-mode) {
-        color-scheme: dark;
-        --primary-color: #1982d2;
-        --primary-dark-color: #86a9c4;
-        --primary-light-color: #4779ac;
-        --box-shadow: 0 2px 8px 0 rgba(0, 0, 0, .35);
-        --odd-color: rgba(100, 100, 100, .06);
-        --menu-selected-background: rgba(0, 0, 0, .4);
-        --page-background-color: #1C1D1F;
-        --page-foreground-color: #d2dbde;
-        --page-secondary-foreground-color: #859399;
-        --separator-color: #38393b;
-        --code-background: #2a2c2f;
-        --tablehead-background: #2a2c2f;
-        --blockquote-background: #222325;
-        --blockquote-foreground: #7e8c92;
-        --warning-color: #3b2e04;
-        --warning-color-dark: #f1b602;
-        --warning-color-darker: #ceb670;
-        --note-color: #163750;
-        --note-color-dark: #1982D2;
-        --note-color-darker: #dcf0fa;
-        --todo-color: #2a2536;
-        --todo-color-dark: #7661b3;
-        --todo-color-darker: #ae9ed6;
-        --deprecated-color: #2e323b;
-        --deprecated-color-dark: #738396;
-        --deprecated-color-darker: #abb0bd;
-        --bug-color: #2e1917;
-        --bug-color-dark: #ad2617;
-        --bug-color-darker: #f5b1aa;
-        --invariant-color: #303a35;
-        --invariant-color-dark: #76ce96;
-        --invariant-color-darker: #cceed5;
-        --fragment-background: #282c34;
-        --fragment-foreground: #dbe4eb;
-        --fragment-keyword: #cc99cd;
-        --fragment-keywordtype: #ab99cd;
-        --fragment-keywordflow: #e08000;
-        --fragment-token: #7ec699;
-        --fragment-comment: #999999;
-        --fragment-link: #98c0e3;
-        --fragment-preprocessor: #65cabe;
-        --fragment-linenumber-color: #cccccc;
-        --fragment-linenumber-background: #35393c;
-        --fragment-linenumber-border: #1f1f1f;
-    }
+#projectlogo img {
+    margin-left: 15px !important;
+    width: 90px !important;
+    max-width: 80px !important;
+    min-width: 80px !important;
 }
-*/
+/* ---- Header / navbar (match pkgdown look) ---- */
 
+/* Remove Doxygen top border */
+#top { border-bottom: none; }
+
+/* Ensure your injected Bootstrap navbar looks like pkgdown */
 .navbar {
-    --bs-navbar-color: #51595d;
-    --bs-navbar-hover-color: #0e6876cc;
-    --bs-navbar-active-color: #0e6876;
+  --bs-navbar-color: #51595d;
+  --bs-navbar-hover-color: rgba(14, 104, 118, 0.80);
 }
 
+/* Make nav links behave like pkgdown (no underline, hover color) */
+.navbar .nav-link {
+  color: #51595d !important;
+  text-decoration: none !important;
+  font-size: 1.25rem !important;
+  padding-left: 0.65rem !important;
+  padding-right: 0.65rem !important;
+  letter-spacing: 1px !important;
+  text-underline-offset: 0px !important;
+  transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out;
+}
+
+.navbar-nav .nav-item .nav-link, .nav-item .nav-link:visited {
+    color: #51595d !important;
+    text-transform: lowercase !important;
+    font-size: 1.1rem !important;
+    font-weight: 400 !important;
+}
+
+.nav-item .nav-link:visited { 
+  font-weight: 400 !important; 
+}
+
+.nav-item .nav-link:hover { 
+  color: #0b535ecc !important;
+  font-weight: 400 !important; 
+}
+
+.navbar .dropdown-header {
+    color: #0b535e !important;
+    text-transform: lowercase !important;
+    font-size: 1.05rem;
+    padding: 0 .5rem;
+    font-weight: 400 !important;
+}
+
+/* Dropdown menu coloring like pkgdown */
 .dropdown-menu {
-    --bs-dropdown-link-color: #51595d;
-    --bs-dropdown-link-hover-color: #ffffff;
-    --bs-dropdown-link-hover-bg: #0e6876;
+  --bs-dropdown-link-color: #51595d;
+  --bs-dropdown-link-hover-color: #ffffff;
+  --bs-dropdown-link-hover-bg: var(--primary-color);
 }
 
-#top {
-    border-bottom: none;
+.navbar .dropdown-menu .dropdown-item { 
+  text-decoration: none; 
+  color: var(--bs-dropdown-link-color) !important;
+  font-size: 1.05 !important;
 }
+
+.navbar-nav .dropdown-menu {
+    min-width: 170px;
+    font-size: 0.95rem;
+}
+
+.navbar .dropdown-menu .dropdown-item:hover { color: #ffffff !important; }
 
 .dropdown-toggle::after {
     color: var(--bs-navbar-color);
 }
 
-.navbar .nav-link {
-    transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out;
-}
-
 .navbar-nav .nav-item .nav-link .bi-github {
-    color: var(--bs-navbar-color);
+    color: var(--bs-navbar-color) !important;
 }
 
-.navbar .dropdown-menu .dropdown-item {
-    text-decoration: none;
-}
-
-.navbar .dropdown-menu .dropdown-item:hover {
-    color: white !important;
+.fa-lg {
+    vertical-align: middle !important;
+    line-height: 1.05em !important;
 }
 
 .navbar .nav-link .menu-text {
     position: relative;
     display: inline-block;
-    color: var(--bs-navbar-color);
+    color: var(--bs-navbar-color) !important;
 }
 
-.navbar .nav-link:hover .menu-text {
-    color: var(--bs-navbar-hover-color);
+.navbar .nav-link:hover .menu-text { 
+    color: var(--bs-navbar-hover-color) !important; 
 }
 
-.navbar .nav-link.active .menu-text {
-    color: var(--bs-navbar-active-color);
+.navbar .nav-link.active .menu-text { 
+    color: var(--bs-navbar-active-color) !important; 
 }
 
-.navbar .nav-link .menu-text::after {
-    height: .1rem;
-    width: 0%;
-    display: inline-block;
-    content: "";
-    position: absolute;
-    bottom: -10px;
-    left: 0px;
-    transition: width 200ms ease-in-out;
-    background-color: #f54f61;
+#dropdown-reference {
+  color: #0e6876 !important;
+  border-bottom: 3px solid #f54f61 !important;
 }
 
 .navbar .nav-link.active .menu-text::after {
     width: 100%;
 }
 
-/*#nav-tree {
-    background: #ffffff;
-}*/
+/* Light mode default */
+html {
+  --side-nav-background: #ffffff !important;
+}
+
+/* Force nav panes to use the variable (wins over theme) */
+#side-nav,
+#nav-tree {
+  background: var(--side-nav-background) !important;
+}
 
 #nav-tree .label {
     font-family: Outfit, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif !important;
-}
-
-#nav-tree .label a {
-    font-weight: bold
+    font-weight: 400;
+    padding: 0.25rem 0.5rem;
+    margin-bottom: 2px;
+    border-radius: .375rem;
+    font-size: 18px !important;
 }
 
 #nav-tree .selected a {
-    font-weight: normal;
+    background-color: #0e6876 !important;
+    position: relative !important;
+    color: #FFFFFF !important;
+    font-weight: 400 !important;
+    padding: 0.25rem 0.5rem !important;
+    margin-bottom: 2px !important;
+    border-radius: .375rem !important;
+}
+
+#nav-tree .selected a:hover {
+    color: #FFFFFF !important;
+}
+
+#nav-tree a:hover {
+  color: #0e6876cc !important;
+}
+
+.arrow {
+  display: none !important;
 }
 
 div.toc li, div.toc h3 {
@@ -172,9 +225,9 @@ div.toc li a {
     min-height: 1.5em; /* Ensures a good touch target size */
     border-radius: var(--border-radius-small);
     text-decoration: none; /* Ensure no underline */
-
     /* Default link color */
     color: var(--primary-color) !important;
+    font-weight: 415;
 }
 
 /* Hover/Focus style for ALL links */
@@ -190,16 +243,18 @@ div.toc li a:focus {
 div.toc li a.aboveActive {
   background-color: transparent !important;
   color: var(--primary-color) !important; /* or inherit if you want */
-  font-weight: normal !important;
+  font-weight: 415 !important;
   text-decoration: none !important;
   box-shadow: none !important;
   opacity: 1 !important;
 }
+
 div.toc li a.active {
   background-color: var(--primary-color) !important;
   color: var(--on-primary-color) !important;
-  font-weight: bold !important;
+  font-weight: 700 !important;
 }
+
 div.toc li {
     white-space: normal;
     word-break: break-all;
@@ -210,18 +265,7 @@ div.contents .toc {
 }
 
 a.anchor {
-  scroll-margin-top: 120px; /* increase if header is tall */
-}
-
-/* Light mode default */
-html {
-  --side-nav-background: #ffffff;
-}
-
-/* Force nav panes to use the variable (wins over theme) */
-#side-nav,
-#nav-tree {
-  background: var(--side-nav-background) !important;
+  scroll-margin-top: 120px;
 }
 
 /* Dark mode override */
@@ -229,12 +273,17 @@ html {
   html:not(.light-mode) {
     color-scheme: dark;
     --primary-color: #4896a1;
-    --side-nav-background: #0e181e;
+    --my-side-nav-background: #0e181e;
     --side-nav-foreground: #bed9de;
     --page-background-color: #0e181e;
     --odd-color: rgba(14, 24, 30, .10);
     --directory-levels-background: #4896a1;
     --separator-color: #213f4b;
+  }
+
+  html:not(.light-mode) body {
+    color: var(--page-foreground-color);
+    background-color: var(--page-background-color);
   }
 
   html:not(.light-mode) div.header .title {
@@ -249,10 +298,6 @@ html {
     --bs-navbar-color: #a0a4a6;
   }
 
-
-  html:not(.light-mode) .navbar .nav-link .menu-text {
-    color: var(--bs-navbar-color) !important;
-  }
 
    html:not(.light-mode) #projectname {
     color: #a0a4a6; 

@@ -17,18 +17,12 @@ test_that("rcpp logistic selectivity works with correct inputs", {
   selectivity1 <- methods::new(LogisticSelectivity)
 
   selectivity1$inflection_point[1]$value <- 10.0
-  selectivity1$inflection_point[1]$min <- 8.0
-  selectivity1$inflection_point[1]$max <- 12.0
   selectivity1$inflection_point[1]$estimation_type$set("random_effects")
   selectivity1$slope[1]$value <- 0.2
   #' @description Test that `get_id()` for `LogisticSelectivity` works.
   expect_equal(selectivity1$get_id(), 1)
   #' @description Test that the `inflection_point` value is set to 10.0.
   expect_equal(selectivity1$inflection_point[1]$value, 10.0)
-  #' @description Test that the `inflection_point` min is set to 8.0.
-  expect_equal(selectivity1$inflection_point[1]$min, 8.0)
-  #' @description Test that the `inflection_point` max is set to 12.0.
-  expect_equal(selectivity1$inflection_point[1]$max, 12.0)
   #' @description Test that the `inflection_point` estimation type is set to "random_effects".
   expect_equal(selectivity1$inflection_point[1]$estimation_type$get(), "random_effects")
   #' @description Test that the `slope` value is set to 0.2.

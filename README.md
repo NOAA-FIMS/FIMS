@@ -39,16 +39,16 @@ A comprehensive list of all the tools needed to build, test, and document FIMS c
 
 ## Cheatsheet
 
-<a href="https://github.com/noaa-fims/fims/blob/main/pkgdown/assets/fims.pdf"><img src="https://raw.githubusercontent.com/noaa-fims/fims/main/pkgdown/assets/fims-cheatsheet-thumbs.png" width="315" height="252"/></a>
+<a href="hhttps://github.com/NOAA-FIMS/FIMS/blob/main/pkgdown/assets/fims-cheatsheet.pdf"><img src="https://raw.githubusercontent.com/noaa-fims/fims/main/pkgdown/assets/fims-cheatsheet-thumb.png" width="315" height="252"/></a>
 
 ## Usage
 
 ```r
 library(FIMS)
 # Load sample data
-data("data1")
+data("data_big")
 # Prepare data for FIMS model
-data_4_model <- FIMSFrame(data1)
+data_4_model <- FIMSFrame(data_big)
 
 # Create parameters
 parameters <- data_4_model |>
@@ -74,6 +74,7 @@ More information can be found on the <a href = "https://noaa-fims.github.io" tar
 ****************************
 
 ## Contributors
+
 
 
 
@@ -152,44 +153,10 @@ All contributions to this project are gratefully acknowledged using the [`allcon
 <a href="https://github.com/NOAA-FIMS/FIMS/commits?author=awilnoaa">awilnoaa</a>
 </td>
 <td align="center">
-<a href="https://github.com/JonBrodziak">
-<img src="https://avatars.githubusercontent.com/u/11236454?v=4" width="100px;" alt=""/>
-</a><br>
-<a href="https://github.com/NOAA-FIMS/FIMS/commits?author=JonBrodziak">JonBrodziak</a>
-</td>
-<td align="center">
-<a href="https://github.com/MOshima-PIFSC">
-<img src="https://avatars.githubusercontent.com/u/78562167?v=4" width="100px;" alt=""/>
-</a><br>
-<a href="https://github.com/NOAA-FIMS/FIMS/commits?author=MOshima-PIFSC">MOshima-PIFSC</a>
-</td>
-<td align="center">
 <a href="https://github.com/iantaylor-NOAA">
 <img src="https://avatars.githubusercontent.com/u/4992918?v=4" width="100px;" alt=""/>
 </a><br>
 <a href="https://github.com/NOAA-FIMS/FIMS/commits?author=iantaylor-NOAA">iantaylor-NOAA</a>
-</td>
-<td align="center">
-<a href="https://github.com/timjmiller">
-<img src="https://avatars.githubusercontent.com/u/17852156?v=4" width="100px;" alt=""/>
-</a><br>
-<a href="https://github.com/NOAA-FIMS/FIMS/commits?author=timjmiller">timjmiller</a>
-</td>
-<td align="center">
-<a href="https://github.com/jimianelli">
-<img src="https://avatars.githubusercontent.com/u/2715618?v=4" width="100px;" alt=""/>
-</a><br>
-<a href="https://github.com/NOAA-FIMS/FIMS/commits?author=jimianelli">jimianelli</a>
-</td>
-</tr>
-
-
-<tr>
-<td align="center">
-<a href="https://github.com/peterkuriyama-NOAA">
-<img src="https://avatars.githubusercontent.com/u/103060418?v=4" width="100px;" alt=""/>
-</a><br>
-<a href="https://github.com/NOAA-FIMS/FIMS/commits?author=peterkuriyama-NOAA">peterkuriyama-NOAA</a>
 </td>
 <td align="center">
 <a href="https://github.com/e-perl-NOAA">
@@ -198,22 +165,50 @@ All contributions to this project are gratefully acknowledged using the [`allcon
 <a href="https://github.com/NOAA-FIMS/FIMS/commits?author=e-perl-NOAA">e-perl-NOAA</a>
 </td>
 <td align="center">
+<a href="https://github.com/MOshima-PIFSC">
+<img src="https://avatars.githubusercontent.com/u/78562167?v=4" width="100px;" alt=""/>
+</a><br>
+<a href="https://github.com/NOAA-FIMS/FIMS/commits?author=MOshima-PIFSC">MOshima-PIFSC</a>
+</td>
+<td align="center">
+<a href="https://github.com/JonBrodziak">
+<img src="https://avatars.githubusercontent.com/u/11236454?v=4" width="100px;" alt=""/>
+</a><br>
+<a href="https://github.com/NOAA-FIMS/FIMS/commits?author=JonBrodziak">JonBrodziak</a>
+</td>
+<td align="center">
+<a href="https://github.com/e-perl-NOAA">
+<img src="https://avatars.githubusercontent.com/u/118312785?v=4" width="100px;" alt=""/>
+</a><br>
+<a href="https://github.com/NOAA-FIMS/FIMS/commits?author=e-perl-NOAA">e-perl-NOAA</a>
+</td>
+</tr>
+
+
+<tr>
+<td align="center">
+<a href="https://github.com/jimianelli">
+<img src="https://avatars.githubusercontent.com/u/2715618?v=4" width="100px;" alt=""/>
+</a><br>
+<a href="https://github.com/NOAA-FIMS/FIMS/commits?author=jimianelli">jimianelli</a>
+</td>
+<td align="center">
+<a href="https://github.com/timjmiller">
+<img src="https://avatars.githubusercontent.com/u/17852156?v=4" width="100px;" alt=""/>
+</a><br>
+<a href="https://github.com/NOAA-FIMS/FIMS/commits?author=timjmiller">timjmiller</a>
+</td>
+<td align="center">
+<a href="https://github.com/peterkuriyama-NOAA">
+<img src="https://avatars.githubusercontent.com/u/103060418?v=4" width="100px;" alt=""/>
+</a><br>
+<a href="https://github.com/NOAA-FIMS/FIMS/commits?author=peterkuriyama-NOAA">peterkuriyama-NOAA</a>
+</td>
+<td align="center">
 <a href="https://github.com/abhinav-1305">
 <img src="https://avatars.githubusercontent.com/u/113254225?v=4" width="100px;" alt=""/>
 </a><br>
 <a href="https://github.com/NOAA-FIMS/FIMS/commits?author=abhinav-1305">abhinav-1305</a>
-</td>
-<td align="center">
-<a href="https://github.com/KyleShertzer-NOAA">
-<img src="https://avatars.githubusercontent.com/u/81244856?v=4" width="100px;" alt=""/>
-</a><br>
-<a href="https://github.com/NOAA-FIMS/FIMS/commits?author=KyleShertzer-NOAA">KyleShertzer-NOAA</a>
-</td>
-<td align="center">
-<a href="https://github.com/alexjensen-NOAA">
-<img src="https://avatars.githubusercontent.com/u/168662602?v=4" width="100px;" alt=""/>
-</a><br>
-<a href="https://github.com/NOAA-FIMS/FIMS/commits?author=alexjensen-NOAA">alexjensen-NOAA</a>
 </td>
 <td align="center">
 <a href="https://github.com/ericward-noaa">
@@ -222,15 +217,39 @@ All contributions to this project are gratefully acknowledged using the [`allcon
 <a href="https://github.com/NOAA-FIMS/FIMS/commits?author=ericward-noaa">ericward-noaa</a>
 </td>
 <td align="center">
-<a href="https://github.com/mciechanumich">
-<img src="https://avatars.githubusercontent.com/u/110423309?v=4" width="100px;" alt=""/>
+<a href="https://github.com/KyleShertzer-NOAA">
+<img src="https://avatars.githubusercontent.com/u/81244856?v=4" width="100px;" alt=""/>
 </a><br>
-<a href="https://github.com/NOAA-FIMS/FIMS/commits?author=mciechanumich">mciechanumich</a>
+<a href="https://github.com/NOAA-FIMS/FIMS/commits?author=KyleShertzer-NOAA">KyleShertzer-NOAA</a>
+</td>
+<td align="center">
+<a href="https://github.com/szu-yun-ko">
+<img src="https://avatars.githubusercontent.com/u/210009874?v=4" width="100px;" alt=""/>
+</a><br>
+<a href="https://github.com/NOAA-FIMS/FIMS/commits?author=szu-yun-ko">szu-yun-ko</a>
+</td>
+<td align="center">
+<a href="https://github.com/alexjensen-NOAA">
+<img src="https://avatars.githubusercontent.com/u/168662602?v=4" width="100px;" alt=""/>
+</a><br>
+<a href="https://github.com/NOAA-FIMS/FIMS/commits?author=alexjensen-NOAA">alexjensen-NOAA</a>
 </td>
 </tr>
 
 
 <tr>
+<td align="center">
+<a href="https://github.com/LNo-cz">
+<img src="https://avatars.githubusercontent.com/u/174143032?v=4" width="100px;" alt=""/>
+</a><br>
+<a href="https://github.com/NOAA-FIMS/FIMS/commits?author=LNo-cz">LNo-cz</a>
+</td>
+<td align="center">
+<a href="https://github.com/mciechanumich">
+<img src="https://avatars.githubusercontent.com/u/110423309?v=4" width="100px;" alt=""/>
+</a><br>
+<a href="https://github.com/NOAA-FIMS/FIMS/commits?author=mciechanumich">mciechanumich</a>
+</td>
 <td align="center">
 <a href="https://github.com/RicardoYin01">
 <img src="https://avatars.githubusercontent.com/u/123024031?v=4" width="100px;" alt=""/>
@@ -288,6 +307,12 @@ All contributions to this project are gratefully acknowledged using the [`allcon
 <img src="https://avatars.githubusercontent.com/u/125507018?u=b6dab08f04000188734eb3bbf78a40616e99b921&v=4" width="100px;" alt=""/>
 </a><br>
 <a href="https://github.com/NOAA-FIMS/FIMS/issues?q=is%3Aissue+author%3ASchiano-NOAA">Schiano-NOAA</a>
+</td>
+<td align="center">
+<a href="https://github.com/Eshaan-byte">
+<img src="https://avatars.githubusercontent.com/u/146680427?u=0b4bd470e7930ec3987c9a24559684d38d1507d9&v=4" width="100px;" alt=""/>
+</a><br>
+<a href="https://github.com/NOAA-FIMS/FIMS/issues?q=is%3Aissue+author%3AEshaan-byte">Eshaan-byte</a>
 </td>
 </tr>
 
@@ -370,16 +395,16 @@ All contributions to this project are gratefully acknowledged using the [`allcon
 <a href="https://github.com/NOAA-FIMS/FIMS/issues?q=is%3Aissue+commenter%3Arklasky">rklasky</a>
 </td>
 <td align="center">
+<a href="https://github.com/codeafridi">
+<img src="https://avatars.githubusercontent.com/u/177653516?u=24b39c8ddee58de985ed50d88938a1b86ffeb59e&v=4" width="100px;" alt=""/>
+</a><br>
+<a href="https://github.com/NOAA-FIMS/FIMS/issues?q=is%3Aissue+commenter%3Acodeafridi">codeafridi</a>
+</td>
+<td align="center">
 <a href="https://github.com/cgrandin">
 <img src="https://avatars.githubusercontent.com/u/4551051?u=7d289d4508c6ba2f6d2691b71be5bd2dc5456115&v=4" width="100px;" alt=""/>
 </a><br>
 <a href="https://github.com/NOAA-FIMS/FIMS/issues?q=is%3Aissue+commenter%3Acgrandin">cgrandin</a>
-</td>
-<td align="center">
-<a href="https://github.com/szu-yun-ko">
-<img src="https://avatars.githubusercontent.com/u/210009874?u=5c9a6c92ce5c9f980d1c63978aa3dd1273a7135c&v=4" width="100px;" alt=""/>
-</a><br>
-<a href="https://github.com/NOAA-FIMS/FIMS/issues?q=is%3Aissue+commenter%3Aszu-yun-ko">szu-yun-ko</a>
 </td>
 <td align="center">
 <a href="https://github.com/grantdadams">
@@ -387,16 +412,16 @@ All contributions to this project are gratefully acknowledged using the [`allcon
 </a><br>
 <a href="https://github.com/NOAA-FIMS/FIMS/issues?q=is%3Aissue+commenter%3Agrantdadams">grantdadams</a>
 </td>
-</tr>
-
-
-<tr>
 <td align="center">
 <a href="https://github.com/mtvincent-NOAA">
 <img src="https://avatars.githubusercontent.com/u/37819533?u=bf0d6c72d33785c62ff89b70963f4a76c37ce9d7&v=4" width="100px;" alt=""/>
 </a><br>
 <a href="https://github.com/NOAA-FIMS/FIMS/issues?q=is%3Aissue+commenter%3Amtvincent-NOAA">mtvincent-NOAA</a>
 </td>
+</tr>
+
+
+<tr>
 <td align="center">
 <a href="https://github.com/averma2988225-droid">
 <img src="https://avatars.githubusercontent.com/u/228820491?u=65b366d015576fba0e42513d2443a57aa6f2d4fa&v=4" width="100px;" alt=""/>
@@ -404,10 +429,44 @@ All contributions to this project are gratefully acknowledged using the [`allcon
 <a href="https://github.com/NOAA-FIMS/FIMS/issues?q=is%3Aissue+commenter%3Aaverma2988225-droid">averma2988225-droid</a>
 </td>
 <td align="center">
+<a href="https://github.com/Rohith-1717">
+<img src="https://avatars.githubusercontent.com/u/200062616?u=cfafb21214d7c3cbb1dc8967588bab3e1aaccdd4&v=4" width="100px;" alt=""/>
+</a><br>
+<a href="https://github.com/NOAA-FIMS/FIMS/issues?q=is%3Aissue+commenter%3ARohith-1717">Rohith-1717</a>
+</td>
+<td align="center">
 <a href="https://github.com/mollystevens-noaa">
 <img src="https://avatars.githubusercontent.com/u/53794202?u=349e71933142169e93c418f94414fd6020a067f3&v=4" width="100px;" alt=""/>
 </a><br>
 <a href="https://github.com/NOAA-FIMS/FIMS/issues?q=is%3Aissue+commenter%3Amollystevens-noaa">mollystevens-noaa</a>
+</td>
+<td align="center">
+<a href="https://github.com/emilyliljestrand">
+<img src="https://avatars.githubusercontent.com/u/146266175?u=461532ddb4523c19ec9aa5168e2b12fe368ae63a&v=4" width="100px;" alt=""/>
+</a><br>
+<a href="https://github.com/NOAA-FIMS/FIMS/issues?q=is%3Aissue+commenter%3Aemilyliljestrand">emilyliljestrand</a>
+</td>
+<td align="center">
+<a href="https://github.com/ayushk687">
+<img src="https://avatars.githubusercontent.com/u/198456631?v=4" width="100px;" alt=""/>
+</a><br>
+<a href="https://github.com/NOAA-FIMS/FIMS/issues?q=is%3Aissue+commenter%3Aayushk687">ayushk687</a>
+</td>
+<td align="center">
+<a href="https://github.com/Nimra-Arshad51">
+<img src="https://avatars.githubusercontent.com/u/264476531?u=5ec89845980af7c7fcf686838b4996af9283c863&v=4" width="100px;" alt=""/>
+</a><br>
+<a href="https://github.com/NOAA-FIMS/FIMS/issues?q=is%3Aissue+commenter%3ANimra-Arshad51">Nimra-Arshad51</a>
+</td>
+</tr>
+
+
+<tr>
+<td align="center">
+<a href="https://github.com/madhavgairola">
+<img src="https://avatars.githubusercontent.com/u/214257149?u=6913da822e87fa18c8e5abcc371f2b175e26223e&v=4" width="100px;" alt=""/>
+</a><br>
+<a href="https://github.com/NOAA-FIMS/FIMS/issues?q=is%3Aissue+commenter%3Amadhavgairola">madhavgairola</a>
 </td>
 </tr>
 
@@ -416,6 +475,7 @@ All contributions to this project are gratefully acknowledged using the [`allcon
 <!-- markdownlint-enable -->
 <!-- prettier-ignore-end -->
 <!-- ALL-CONTRIBUTORS-LIST:END -->
+
 
 
 

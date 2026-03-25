@@ -17,7 +17,7 @@ clear()
 
 ```{r set-up-model, include=FALSE}
 # use FIMS data frame
-data_4_model <- FIMSFrame(data1)
+data_4_model <- FIMSFrame(data_big)
 
 default_parameters <- create_default_configurations(data = data_4_model) |>
   create_default_parameters(data = data_4_model)
@@ -45,8 +45,6 @@ Below is a real-world example of a log entry that was created while running a FI
 
 ![Example of a log entry.](figures/selectivity_logging_entry.png)
 
-
-Additionally, if FIMS has been compiled with the `-DFIMS_DEBUG` pre-processing macro, output from the `FIMS_DEBUG_LOG` macro will also be available in the log file, allowing developers a more interactive developing experience. The output from this macro is turned off in the main branch, and thus, the macro is not available to the typical user to stop debugging statements from polluting the log file.
 
 ## Using the Logging System in R
 
@@ -95,9 +93,6 @@ log_warnings_str <- get_log_warnings()
 
 # get log errors only
 log_errors_str <- get_log_errors()
-
-# get log entries from the information module
-information_log <- get_log_module("information")
 ```
 
 Another useful option is `set_throw_on_error()`. If this option is set to TRUE, FIMS will abort immediately when an error occurs and if `write_log(TRUE)` was previously called, the log file will be written before FIMS terminates the session. Below is an example of how to throw on error.

@@ -26,7 +26,7 @@ struct EWAAGrowth : public GrowthBase<Type> {
   // a map looks up values based on a reference key
   // in this case, our key is age (first double), and
   //  the value is the weight at that age (second double)
-  std::map<double, double> ewaa; /**<map of doubles for EWAA values by age,
+  std::map<int, std::map<double, double>> ewaa; /**<map of doubles for EWAA values by age,
           where age starts at zero > */
   typedef typename std::map<double, double>::iterator
       weight_iterator; /**< Iterator for ewaa map object > */
@@ -38,27 +38,11 @@ struct EWAAGrowth : public GrowthBase<Type> {
   /**
    * @brief Returns the weight at age a (in kg) from the input vector.
    *
+   * @param year year
    * @param a  age of the fish, the age vector must start at zero
    */
-  virtual const Type evaluate(const double& a) {
-    weight_iterator it = this->ewaa.find(a);
-    if (it == this->ewaa.end()) {
-      return 0.0;
-    }
-    Type ret = (*it).second;  // itewaa[a];
-    return ret;
-  }
-
-  /**
-   * @brief Create a map of report vectors for the growth object.
-   */
-  virtual void create_report_vectors(
-      std::map<std::string, fims::Vector<fims::Vector<Type>>>& report_vectors) {
-    // fims::Vector<Type> ewaa_vector;
-    // for (auto const& pair : ewaa) {
-    //   ewaa_vector.push_back(pair.second);
-    // }
-    // report_vectors["ewaa"] = ewaa_vector;
+  virtual const Type evaluate(int year, const double& a) {
+    return this->ewaa[year][a];
   }
 };
 }  // namespace fims_popdy

@@ -43,7 +43,7 @@ sim_num <- 4
 # Create the initial FIMS data and default parameter structures,
 # then map through the simulation iterations to apply iteration-specific
 # values from the operating model.
-data_age_length_comp <- FIMSFrame(data1)
+data_age_length_comp <- FIMSFrame(data_big)
 default_parameters <- create_default_configurations(
   data = data_age_length_comp
 ) |>

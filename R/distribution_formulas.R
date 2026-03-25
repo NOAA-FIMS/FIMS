@@ -450,13 +450,13 @@ initialize_process_distribution <- function(
   n_dim <- length(module$field(par))
 
   # create new Rcpp modules
-  new_module$x$resize(n_dim)
+  new_module$observed_values$resize(n_dim)
   new_module$expected_values$resize(n_dim)
 
   # initialize values with 0
   # these are overwritten in the code later by user input
   for (i in 1:n_dim) {
-    new_module$x[i]$value <- 0
+    new_module$observed_values[i]$value <- 0
     new_module$expected_values[i]$value <- 0
   }
 

@@ -33,33 +33,33 @@ docs.
 }
 \details{
 \itemize{
-\item \href{https://noaa-fims.github.io/doxygen/classAgeCompDataInterface.html}{AgeComp}
-\item \href{https://noaa-fims.github.io/doxygen/classBevertonHoltRecruitmentInterface.html}{BevertonHoltRecruitment}
-\item \href{https://noaa-fims.github.io/doxygen/classCatchAtAgeInterface.html}{CatchAtAge}
-\item \href{https://noaa-fims.github.io/doxygen/classDlnormDistributionsInterface.html}{DlnormDistribution}
-\item \href{https://noaa-fims.github.io/doxygen/classDmultinomDistributionsInterface.html}{DmultinomDistribution}
-\item \href{https://noaa-fims.github.io/doxygen/classDnormDistributionsInterface.html}{DnormDistribution}
-\item \href{https://noaa-fims.github.io/doxygen/classDoubleLogisticSelectivityInterface.html}{DoubleLogisticSelectivity}
-\item \href{https://noaa-fims.github.io/doxygen/classEWAAGrowthInterface.html}{EWAAGrowth}
-\item \href{https://noaa-fims.github.io/doxygen/classFleetInterface.html}{Fleet}
-\item \href{https://noaa-fims.github.io/doxygen/classIndexDataInterface.html}{Index}
-\item \href{https://noaa-fims.github.io/doxygen/classLandingsDataInterface.html}{Landings}
-\item \href{https://noaa-fims.github.io/doxygen/classLengthCompDataInterface.html}{LengthComp}
-\item \href{https://noaa-fims.github.io/doxygen/classLogDevsRecruitmentInterface.html}{LogDevsRecruitmentProcess}
-\item \href{https://noaa-fims.github.io/doxygen/classLogRRecruitmentInterface.html}{LogRRecruitmentProcess}
-\item \href{https://noaa-fims.github.io/doxygen/classLogisticMaturityInterface.html}{LogisticMaturity}
-\item \href{https://noaa-fims.github.io/doxygen/classLogisticSelectivityInterface.html}{LogisticSelectivity}
-\item \href{https://noaa-fims.github.io/doxygen/classParameter.html}{Parameter}
-\item \href{https://noaa-fims.github.io/doxygen/classParameterVector.html}{ParameterVector}
-\item \href{https://noaa-fims.github.io/doxygen/classPopulationInterface.html}{Population}
-\item \href{https://noaa-fims.github.io/doxygen/classRealVector.html}{RealVector}
-\item \href{https://noaa-fims.github.io/doxygen/classSharedInt.html}{SharedInt}
-\item \href{https://noaa-fims.github.io/doxygen/classSharedReal.html}{SharedReal}
-\item \href{https://noaa-fims.github.io/doxygen/classSharedString.html}{SharedString}
+\item \href{https://noaa-fims.github.io/FIMS/doxygen/classAgeCompDataInterface.html}{AgeComp}
+\item \href{https://noaa-fims.github.io/FIMS/doxygen/classBevertonHoltRecruitmentInterface.html}{BevertonHoltRecruitment}
+\item \href{https://noaa-fims.github.io/FIMS/doxygen/classCatchAtAgeInterface.html}{CatchAtAge}
+\item \href{https://noaa-fims.github.io/FIMS/doxygen/classDlnormDistributionsInterface.html}{DlnormDistribution}
+\item \href{https://noaa-fims.github.io/FIMS/doxygen/classDmultinomDistributionsInterface.html}{DmultinomDistribution}
+\item \href{https://noaa-fims.github.io/FIMS/doxygen/classDnormDistributionsInterface.html}{DnormDistribution}
+\item \href{https://noaa-fims.github.io/FIMS/doxygen/classDoubleLogisticSelectivityInterface.html}{DoubleLogisticSelectivity}
+\item \href{https://noaa-fims.github.io/FIMS/doxygen/classEWAAGrowthInterface.html}{EWAAGrowth}
+\item \href{https://noaa-fims.github.io/FIMS/doxygen/classFleetInterface.html}{Fleet}
+\item \href{https://noaa-fims.github.io/FIMS/doxygen/classIndexDataInterface.html}{Index}
+\item \href{https://noaa-fims.github.io/FIMS/doxygen/classLandingsDataInterface.html}{Landings}
+\item \href{https://noaa-fims.github.io/FIMS/doxygen/classLengthCompDataInterface.html}{LengthComp}
+\item \href{https://noaa-fims.github.io/FIMS/doxygen/classLogDevsRecruitmentInterface.html}{LogDevsRecruitmentProcess}
+\item \href{https://noaa-fims.github.io/FIMS/doxygen/classLogRRecruitmentInterface.html}{LogRRecruitmentProcess}
+\item \href{https://noaa-fims.github.io/FIMS/doxygen/classLogisticMaturityInterface.html}{LogisticMaturity}
+\item \href{https://noaa-fims.github.io/FIMS/doxygen/classLogisticSelectivityInterface.html}{LogisticSelectivity}
+\item \href{https://noaa-fims.github.io/FIMS/doxygen/classParameter.html}{Parameter}
+\item \href{https://noaa-fims.github.io/FIMS/doxygen/classParameterVector.html}{ParameterVector}
+\item \href{https://noaa-fims.github.io/FIMS/doxygen/classPopulationInterface.html}{Population}
+\item \href{https://noaa-fims.github.io/FIMS/doxygen/classRealVector.html}{RealVector}
+\item \href{https://noaa-fims.github.io/FIMS/doxygen/classSharedInt.html}{SharedInt}
+\item \href{https://noaa-fims.github.io/FIMS/doxygen/classSharedReal.html}{SharedReal}
+\item \href{https://noaa-fims.github.io/FIMS/doxygen/classSharedString.html}{SharedString}
 }
 }
 \section{C++ Documentation}{
 
-\href{https://noaa-fims.github.io/doxygen/}{NOAA-FIMS C++ Documentation}
+\href{https://noaa-fims.github.io/FIMS/doxygen/}{NOAA-FIMS C++ Documentation}
 }
 

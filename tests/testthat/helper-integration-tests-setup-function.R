@@ -360,10 +360,10 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   # taken before the likelihood calculation
   recruitment_distribution$log_sd$resize(1)
   recruitment_distribution$log_sd[1]$value <- log(om_input[["logR_sd"]])
-  recruitment_distribution$x$resize(om_input[["nyr"]] - 1)
+  recruitment_distribution$observed_values$resize(om_input[["nyr"]] - 1)
   recruitment_distribution$expected_values$resize(om_input[["nyr"]] - 1)
   for (i in 1:(om_input[["nyr"]] - 1)) {
-    recruitment_distribution$x[i]$value <- 0
+    recruitment_distribution$observed_values[i]$value <- 0
     recruitment_distribution$expected_values[i]$value <- 0
   }
   if ("recruitment" %in% names(random_effects)) {
@@ -384,15 +384,18 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
 
   # Growth
   ewaa_growth <- methods::new(EWAAGrowth)
+  ewaa_growth$n_years$set(om_input[["nyr"]])
   ewaa_growth$ages$resize(om_input[["nages"]])
   purrr::walk(
     seq_along(om_input[["ages"]]),
     \(x) ewaa_growth$ages$set(x - 1, om_input[["ages"]][x])
   )
-  ewaa_growth$weights$resize(om_input[["nages"]])
+  ewaa_growth$weights$resize((om_input[["nyr"]] + 1) * om_input[["nages"]])
   purrr::walk(
-    seq_along(om_input[["W.mt"]]),
-    \(x) ewaa_growth$weights$set(x - 1, om_input[["W.mt"]][x])
+    seq(ewaa_growth$weights$size()),
+    # Weights are only by age in the OM not by age and year. The modular math
+    # will repeat 1:n_ages over and over again for each year.
+    \(x) ewaa_growth$weights$set(x - 1, om_input[["W.mt"]][((x - 1) %% 12) + 1])
   )
 
   # Maturity
@@ -451,7 +454,7 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
       control = list(eval.max = 10000, iter.max = 10000, trace = 0)
     )
     FIMS::set_fixed(opt$par)
-    fims_finalized <- caa$get_output(do_sd_report = estimation_mode)
+    fims_finalized <- caa$get_output()
   }
 
   # Call report using MLE parameter values, or
@@ -542,7 +545,7 @@ setup_and_run_FIMS_with_wrappers <- function(iter_id,
   # Clear any previous FIMS settings
   clear()
 
-  data <- FIMS::FIMSFrame(data1)
+  data <- FIMS::FIMSFrame(data_big)
   if (tibble::is_tibble(modified_parameters)) {
     parameters <- modified_parameters
   } else {

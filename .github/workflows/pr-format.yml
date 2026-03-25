@@ -1,0 +1,241 @@
+# Combined formatting workflow for C++ and R code
+# 
+# This workflow runs clang-format on C++ code and devtools::document() + styler::style_pkg()
+# on R code when a PR is opened or updated.
+#
+# Fork Handling:
+# - If the PR is from a fork, the workflow adds a comment with formatting instructions
+#   (only if the comment doesn't already exist) and skips all formatting operations.
+#   This is necessary because the workflow cannot checkout fork repositories due to
+#   permission limitations.
+# - If the PR is NOT from a fork, the workflow runs all formatting actions and
+#   creates a PR with formatting changes targeting the original feature branch
+#   if changes are detected.
+#
+# Workflow Trigger:
+# - This workflow runs when a pull request is opened or updated (synchronized) 
+#   targeting the 'main' or 'dev' branches. It can also be triggered manually.
+# - The formatting is applied to the source (head) branch of the PR, NOT to main or dev.
+# - If formatting changes are needed, a new PR will be created targeting the 
+#   original feature branch (for non-forks).
+# - Example: If PR from 'feature-branch' -> 'dev' needs formatting, a new PR 
+#   'format-code-feature-branch' -> 'feature-branch' will be created.
+# - The formatting PR must be merged into the feature branch before the original
+#   PR can be merged into main/dev.
+#
+# Clang-Format Version:
+# - Using clang-format version 18.0.0 for consistency.
+# - Clang-format 17 had known bugs, so we explicitly set the version.
+#
+# More details:
+# - Clang-Format: https://clang.llvm.org/docs/ClangFormat.html
+# - Formatting in VS Code: https://code.visualstudio.com/docs/editor/codebasics#_formatting
+
+name: pr-format
+
+on:
+  # Use pull_request_target because we want it to work on forks
+  # see https://runs-on.com/github-actions/pull-request-vs-pull-request-target/
+  pull_request_target:
+    types: [opened, reopened, synchronize]
+    branches:
+      - main
+      - dev
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+# Cancel runs happening simultaneously on the same branch.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  format-code:
+    name: Format C++ and R code
+    runs-on: ubuntu-latest
+    steps:
+      # Check if this PR is from a fork
+      - name: Check if fork
+        id: check_fork
+        run: |
+          if [ "${{ github.event.pull_request.head.repo.fork }}" == "true" ]; then
+            echo "is_fork=true" >> "$GITHUB_OUTPUT"
+            echo "This PR is from a fork"
+          else
+            echo "is_fork=false" >> "$GITHUB_OUTPUT"
+            echo "This PR is from the same repository"
+          fi
+      
+      - name: Find comment about formatting (used in next step)
+        uses: peter-evans/find-comment@v3
+        id: pull
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          comment-author: 'github-actions[bot]'
+          body-includes: '🎨 Chore: code formatting workflow'
+
+      # If this is a fork, add a comment with instructions (if not already present) and exit
+      - name: Comment on fork PR with formatting instructions
+        if: steps.check_fork.outputs.is_fork == 'true'
+        uses: peter-evans/create-or-update-comment@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          comment-id: ${{ steps.pull.outputs.comment-id }}
+          issue-number: ${{ github.event.pull_request.number }}
+          body: |
+            ## 🎨 Chore: code formatting workflow
+            
+            Our automated workflows cannot run on forks because of permission issues, and thus, we ask that you run the following code locally and push any changes that are created to your feature branch. You will only be reminded of this once per PR. Thank you!
+            
+            ### Format C++ code
+            
+            1. Install clang-format version 18.0.0
+            2. Run the following command from the repository root:
+               ```bash
+               clang-format -i --style="{BasedOnStyle: Google, SortIncludes: false}" $(find ./inst/include ./src ./tests/gtest -name "*.hpp" -o -name "*.cpp")
+               ```
+            
+            ### Format R code
+            
+            1. Install {styler} and {roxygen2}
+            2. Run the following commands in R from the repository root:
+            ```r
+            styler::style_pkg() # Style R code
+            roxygen2::roxygenise() # Update documentation
+            styler::style_pkg() # Style R code again
+            roxygen2::roxygenise() # Update documentation again
+            usethis::use_tidy_description() # Style DESCRIPTION file
+            ```
+            
+            ### Push changes
+            
+            1. Commit the formatting with a commit message of "Chore: format feature branch"
+            2. Push to your fork
+          edit-mode: replace
+
+      # Checkout the source branch (head ref) of the Pull Request where
+      # formatting will be applied (only for non-forks)
+      - name: Checkout code
+        if: steps.check_fork.outputs.is_fork == 'false'
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.head_ref }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      # Install R dependencies for styling and documentation (only for non-forks)
+      - name: Install curl dependency
+        if: steps.check_fork.outputs.is_fork == 'false'
+        run: |
+          sudo apt-get update
+          sudo apt-get install libcurl4-openssl-dev
+
+      - name: Setup R
+        if: steps.check_fork.outputs.is_fork == 'false'
+        uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true
+
+      - name: Setup R dependencies
+        if: steps.check_fork.outputs.is_fork == 'false'
+        uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: |
+            remotes
+            styler
+            roxygen2
+            usethis
+
+      # Run R formatting and documentation (only for non-forks)
+      - name: Style R code
+        if: steps.check_fork.outputs.is_fork == 'false'
+        run: |
+          results <- styler::style_pkg()
+          if (any(is.na(results[["changed"]]))) {
+            stop("styler threw an error")
+          }
+        shell: Rscript {0}
+
+      - name: Document R code
+        if: steps.check_fork.outputs.is_fork == 'false'
+        run: Rscript -e 'roxygen2::roxygenise()'
+
+      - name: Style R code again
+        if: steps.check_fork.outputs.is_fork == 'false'
+        run: | 
+          results <- styler::style_pkg()
+          if (any(is.na(results[["changed"]]))) {
+            stop("styler threw an error")
+          }
+        shell: Rscript {0}
+
+      - name: Document R code again
+        if: steps.check_fork.outputs.is_fork == 'false'
+        run: Rscript -e 'roxygen2::roxygenise()'
+        
+      - name: Style DESCRIPTION file
+        if: steps.check_fork.outputs.is_fork == 'false'
+        run: Rscript -e 'usethis::use_tidy_description()'
+
+      - name: Clean up .github artifacts
+        if: steps.check_fork.outputs.is_fork == 'false'
+        run: |
+          cd .github
+          rm -f *.rds *.Rds R-version
+
+      # Run clang-format on C++ code (only for non-forks)
+      # Format hpp and cpp files under inst/include, src/, and tests/gtest
+      # We use Google style to format code.
+      - name: Run clang-format
+        if: steps.check_fork.outputs.is_fork == 'false'
+        uses: DoozyX/clang-format-lint-action@v0.20
+        with:
+          source: './inst/include ./src ./tests/gtest'
+          extensions: 'hpp, cpp'
+          style: "{BasedOnStyle: Google, SortIncludes: false}"
+          inplace: True
+
+      # Check if there are any changes after formatting (only for non-forks)
+      - name: Check for changes
+        if: steps.check_fork.outputs.is_fork == 'false'
+        id: check_changes
+        run: |
+          git diff --quiet || echo "has_changes=true" >> "$GITHUB_OUTPUT"
+          if [ -z "$(git status --porcelain)" ]; then
+            echo "has_changes=false" >> "$GITHUB_OUTPUT"
+            echo "No formatting changes needed"
+          else
+            echo "has_changes=true" >> "$GITHUB_OUTPUT"
+            echo "Formatting changes detected"
+          fi
+
+      # If NOT a fork AND there are changes, create a PR with formatting changes
+      - name: Create Pull Request with formatting changes
+        if: steps.check_fork.outputs.is_fork == 'false' && steps.check_changes.outputs.has_changes == 'true'
+        uses: peter-evans/create-pull-request@v8
+        with:
+          commit-message: 'chore: format feature branch'
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: format-code-${{ github.head_ref }}
+          base: ${{ github.head_ref }}
+          title: 'Chore: format feature branch'
+          body: |
+            Auto-generated by [pr-format.yml][1]
+            
+            This PR applies formatting to the feature branch `${{ github.head_ref }}`:
+            - **C++ formatting**: Applied clang-format (Google style) to `.hpp` and `.cpp` files
+            - **R formatting**: Applied `styler::style_pkg()` and updated documentation with `roxygen2::roxygenise()`
+            
+            **Action required**: Merge this PR into `${{ github.head_ref }}` before merging the original PR into `${{ github.base_ref }}`.
+            
+            @${{ github.event.pull_request.user.login }} please review and merge these formatting changes.
+            
+            [1]: https://github.com/${{ github.repository }}/blob/main/.github/workflows/pr-format.yml
+
+      # Success message when no changes are needed
+      - name: No formatting changes needed
+        if: steps.check_changes.outputs.has_changes == 'false'
+        run: |
+          echo "✅ All code is properly formatted. No changes needed."

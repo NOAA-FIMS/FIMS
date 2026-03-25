@@ -242,6 +242,10 @@ void JsonParser::SkipWhitespace() {
 JsonValue JsonParser::ParseValue() {
   /** Skip whitespace characters in the input string. */
   SkipWhitespace();
+  if (position >= data.size()) {
+    return JsonValue();
+  }
+
   char current = data[position];
   if (current == '{') {
     return ParseObject();
@@ -253,8 +257,12 @@ JsonValue JsonParser::ParseValue() {
     return ParseBool();
   } else if (current == 'n') {
     return ParseNull();
-  } else {
+  } else if (std::isdigit(current) || current == '-') {
     return ParseNumber();
+  } else {
+    // Unknown token.
+    position++;
+    return JsonValue();
   }
 }
 
@@ -279,11 +287,11 @@ JsonValue JsonParser::ParseNumber() {
   position = end_pos;
 
   if (is_float) {
-    double num;
+    double num = 0.0;
     std::istringstream(num_str) >> num;
     return JsonValue(num);
   } else {
-    int num;
+    int num = 0;
     std::istringstream(num_str) >> num;
     return JsonValue(num);
   }
@@ -296,6 +304,11 @@ JsonValue JsonParser::ParseNumber() {
 JsonValue JsonParser::ParseString() {
   position++;  // Skip the initial '"'
   size_t end_pos = data.find('"', position);
+  if (end_pos == std::string::npos) {
+    std::string str = data.substr(position);
+    position = data.size();
+    return JsonValue(str);
+  }
   std::string str = data.substr(position, end_pos - position);
   position = end_pos + 1;
   return JsonValue(str);
@@ -340,22 +353,37 @@ JsonValue JsonParser::ParseObject() {
   JsonObject obj;
   position++;  // Skip the initial '{'
 
-  while (data[position] != '}') {
+  SkipWhitespace();
+  if (position < data.size() && data[position] == '}') {
+    position++;  // Skip empty object close brace
+    return JsonValue(obj);
+  }
+
+  while (position < data.size() && data[position] != '}') {
     SkipWhitespace();
+    if (position >= data.size() || data[position] != '"') {
+      return JsonValue(obj);
+    }
     std::string key = ParseString().GetString();
 
+    SkipWhitespace();
+    if (position >= data.size() || data[position] != ':') {
+      return JsonValue(obj);
+    }
     position++;  // Skip the ':'
     SkipWhitespace();
     JsonValue value = ParseValue();
     obj[key] = value;
 
     SkipWhitespace();
-    if (data[position] == ',') {
+    if (position < data.size() && data[position] == ',') {
       position++;
     }
   }
 
-  position++;  // Skip the trailing '}'
+  if (position < data.size() && data[position] == '}') {
+    position++;  // Skip the trailing '}'
+  }
   return JsonValue(obj);
 }
 
@@ -367,18 +395,26 @@ JsonValue JsonParser::ParseArray() {
   JsonArray arr;
   position++;  // Skip the initial '['
 
-  while (data[position] != ']') {
+  SkipWhitespace();
+  if (position < data.size() && data[position] == ']') {
+    position++;  // Skip empty array close bracket
+    return JsonValue(arr);
+  }
+
+  while (position < data.size() && data[position] != ']') {
     SkipWhitespace();
     JsonValue value = ParseValue();
     arr.push_back(value);
 
     SkipWhitespace();
-    if (data[position] == ',') {
+    if (position < data.size() && data[position] == ',') {
       position++;
     }
   }
 
-  position++;  // Skip the trailing ']'
+  if (position < data.size() && data[position] == ']') {
+    position++;  // Skip the trailing ']'
+  }
   return JsonValue(arr);
 }
 

@@ -339,7 +339,7 @@ test_that("estimation test of fims using wrapper functions", {
 test_that("estimation test with recruitment re on logr", {
   #' @description Test that the estimation run of FIMS with recruitment random effects on log(R0) matches the operating model values.
   skip("Skipping test for deterministic FIMS with recruitment random effects until wrappers are fixed")
-  fims_data <- FIMS::FIMSFrame(data1)
+  fims_data <- FIMS::FIMSFrame(data_big)
 
   # Clear any previous FIMS settings
   clear()

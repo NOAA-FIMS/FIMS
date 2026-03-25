@@ -20,7 +20,6 @@
 #' @export get_random_names
 #' @export get_log
 #' @export get_log_errors
-#' @export get_log_module
 #' @export get_log_warnings
 #' @export get_random
 #' @export inv_logit

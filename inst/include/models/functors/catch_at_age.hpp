@@ -47,6 +47,8 @@ template <typename Type>
  * CatchAtAge class inherits from the FisheryModelBase class and can be used
  * to fit both age and length data even though it is called CatchAtAge.
  *
+ * See the @ref glossary for definitions of mathematical symbols used below.
+ *
  */
 class CatchAtAge : public FisheryModelBase<Type> {
  public:
@@ -398,7 +400,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
     for (size_t fleet_ = 0; fleet_ < population->n_fleets; fleet_++) {
       // evaluate is a member function of the selectivity class
       Type s = population->fleets[fleet_]->selectivity->evaluate(
-          population->ages[age]);
+          population->ages[age], year);
 
       dq_["mortality_F"][i_age_year] +=
           population->fleets[fleet_]->Fmort[year] *
@@ -433,7 +435,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
         this->GetPopulationDerivedQuantities(population->GetId());
 
     dq_["biomass"][year] += dq_["numbers_at_age"][i_age_year] *
-                            population->growth->evaluate(population->ages[age]);
+                            population->growth->evaluate(year, population->ages[age]);
   }
 
   /**
@@ -458,7 +460,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
 
     dq_["unfished_biomass"][year] +=
         dq_["unfished_numbers_at_age"][i_age_year] *
-        population->growth->evaluate(population->ages[age]);
+        population->growth->evaluate(year,population->ages[age]);
   }
 
   /**
@@ -486,7 +488,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
     dq_["spawning_biomass"][year] +=
         population->proportion_female[age] * dq_["numbers_at_age"][i_age_year] *
         dq_["proportion_mature_at_age"][i_age_year] *
-        population->growth->evaluate(population->ages[age]);
+        population->growth->evaluate(year,population->ages[age]);
   }
 
   /**
@@ -514,7 +516,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
         population->proportion_female[age] *
         dq_["unfished_numbers_at_age"][i_age_year] *
         dq_["proportion_mature_at_age"][i_age_year] *
-        population->growth->evaluate(population->ages[age]);
+        population->growth->evaluate(year,population->ages[age]);
   }
 
   /**
@@ -572,12 +574,12 @@ class CatchAtAge : public FisheryModelBase<Type> {
     Type phi_0 = 0.0;
     phi_0 += numbers_spr[0] * population->proportion_female[0] *
              dq_["proportion_mature_at_age"][0] *
-             population->growth->evaluate(population->ages[0]);
+             population->growth->evaluate(0,population->ages[0]);
     for (size_t a = 1; a < (population->n_ages - 1); a++) {
       numbers_spr[a] = numbers_spr[a - 1] * fims_math::exp(-population->M[a]);
       phi_0 += numbers_spr[a] * population->proportion_female[a] *
                dq_["proportion_mature_at_age"][a] *
-               population->growth->evaluate(population->ages[a]);
+               population->growth->evaluate(0,population->ages[a]);
     }
 
     numbers_spr[population->n_ages - 1] =
@@ -588,7 +590,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
         numbers_spr[population->n_ages - 1] *
         population->proportion_female[population->n_ages - 1] *
         dq_["proportion_mature_at_age"][population->n_ages - 1] *
-        population->growth->evaluate(population->ages[population->n_ages - 1]);
+        population->growth->evaluate(0,population->ages[population->n_ages - 1]);
 
     return phi_0;
   }
@@ -679,14 +681,6 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * C_{f,y} \mathrel{+}= C_{f,a,y}
    * \f]
    *
-   * where
-   * - \f$CW_{f,y}\f$ is total catch weight for fleet \f$f\f$ in year
-   * \f$y\f$
-   * - \f$C_{f,y}\f$ is total catch numbers for fleet \f$f\f$ in year
-   * \f$y\f$
-   * - \f$CW_{f,a,y}\f$, \f$C_{f,a,y}\f$ are catch weight and numbers for fleet
-   * \f$f\f$ at age \f$a\f$ in year \f$y\f$.
-   *
    * @snippet{doc} this param_population
    * @snippet{doc} this param_year
    * @snippet{doc} this param_age
@@ -727,9 +721,6 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * CW_{f,a,y} = C_{f,a,y} \times w_a
    * \f]
    *
-   * where \f$CW_{f,a,y}\f$ is the catch weight for fleet \f$f\f$ at age
-   * \f$a\f$ in year \f$y\f$.
-   *
    * @snippet{doc} this param_population
    * @snippet{doc} this param_year
    * @snippet{doc} this param_age
@@ -744,7 +735,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
 
       fdq_["landings_weight_at_age"][i_age_year] =
           fdq_["landings_numbers_at_age"][i_age_year] *
-          population->growth->evaluate(population->ages[age]);
+          population->growth->evaluate(year,population->ages[age]);
     }
   }
 
@@ -759,15 +750,6 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * \times
    * \left( 1 - \exp(-Z_{a,y}) \right)
    * \f]
-   *
-   * where
-   * - \f$C_{f,a,y}\f$ is the catch (landings) for fleet \f$f\f$ at age
-   * \f$a\f$ in year \f$y\f$
-   * - \f$F_{f,y}\f$ is fleet-specific fishing mortality in year \f$y\f$
-   * - \f$S_f(a)\f$ is selectivity at age \f$a\f$ for fleet \f$f\f$
-   * - \f$Z_{a,y}\f$ is total mortality at age \f$a\f$ and year \f$y\f$
-   * - \f$N_{a,y}\f$ is the number of individuals at age \f$a\f$ and year
-   * \f$y\f$
    *
    * @snippet{doc} this param_population
    * @snippet{doc} this param_i_age_year
@@ -789,7 +771,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
           (population->fleets[fleet_]->Fmort[year] *
            population->f_multiplier[year] *
            population->fleets[fleet_]->selectivity->evaluate(
-               population->ages[age])) /
+               population->ages[age],year)) /
           pdq_["mortality_Z"][i_age_year] * pdq_["numbers_at_age"][i_age_year] *
           (1 - fims_math::exp(-(pdq_["mortality_Z"][i_age_year])));
     }
@@ -806,14 +788,6 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * IW_{f,y} \mathrel{+}= IWAA_{a,y}, \quad
    * IN_{f,y} \mathrel{+}= INAA_{a,y}
    * \f]
-   *
-   * where:
-   * - \f$IW_{f,y}\f$ is the total index weight for fleet \f$f\f$ in year
-   * \f$y\f$
-   * - \f$IN_{f,y}\f$ is the total index numbers for fleet \f$f\f$ in year
-   * \f$y\f$
-   * - \f$IWAA_{a,y}\f$ is the index weight at age \f$a\f$ in year \f$y\f$
-   * - \f$INAA_{a,y}\f$ is the index numbers at age \f$a\f$ in year \f$y\f$
    *
    * @snippet{doc} this param_population
    * @snippet{doc} this param_i_age_year
@@ -838,20 +812,12 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * This function calculates the expected index in numbers at age for each
    * fleet, using catchability, selectivity, and population numbers at age:
    * \f[
-   * I_{f,a,y} \mathrel{+}= q_{f,y} \times S_f(a) \times N_{a,y}
+   * IN_{f,a,y} \mathrel{+}= q_{f,y} \times S_f(a) \times N_{a,y}
    * \f]
-   *
-   * where:
-   * - \f$I_{f,a,y}\f$ is the index numbers for fleet \f$f\f$ at age \f$a\f$ in
-   * year \f$y\f$
-   * - \f$q_{f,y}\f$ is the catchability coefficient for fleet \f$f\f$ at year
-   * \f$y\f$
-   * - \f$S_f(a)\f$ is the selectivity at age \f$a\f$ for fleet \f$f\f$
-   * - \f$N_{a,y}\f$ is the population numbers at age \f$a\f$ and year \f$y\f$
    *
    * When timing is accounted for within FIMS the equation will include the
    * fraction of the year when the survey was conducted \f$t_y\f$:
-   * \f[ I_{f,a,y} \mathrel{+}= S_{f,y}(a) \times N_{a,y} \times
+   * \f[ IN_{f,a,y} \mathrel{+}= S_{f,y}(a) \times N_{a,y} \times
    * e^{(-t_{y}Z_{a,y})}\f]
    *
    * @snippet{doc} this param_population
@@ -872,7 +838,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
       fdq_["index_numbers_at_age"][i_age_year] +=
           (population->fleets[fleet_]->q.get_force_scalar(year) *
            population->fleets[fleet_]->selectivity->evaluate(
-               population->ages[age])) *
+               population->ages[age],year)) *
           pdq_["numbers_at_age"][i_age_year];
     }
   }
@@ -884,11 +850,8 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * This function computes the expected index weight at age by multiplying the
    * expected index numbers at age by the corresponding weight at age:
    * \f[
-   * IWAA_{f,a,y} = I_{f,a,y} \times w_a
+   * IWAA_{f,a,y} = IN_{f,a,y} \times w_a
    * \f]
-   *
-   * where \f$IWAA_{f,a,y}\f$ is the index weight for fleet \f$f\f$ at age
-   * \f$a\f$ in year \f$y\f$.
    *
    * @snippet{doc} this param_population
    * @snippet{doc} this param_year
@@ -904,7 +867,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
 
       fdq_["index_weight_at_age"][i_age_year] =
           fdq_["index_numbers_at_age"][i_age_year] *
-          population->growth->evaluate(population->ages[age]);
+          population->growth->evaluate(year,population->ages[age]);
     }
   }
 
@@ -1233,14 +1196,6 @@ class CatchAtAge : public FisheryModelBase<Type> {
 #ifdef TMB_MODEL
     if (this->do_reporting == true) {
       report_vectors.clear();
-      // std::shared_ptr<UncertaintyReportInfoMap>
-      // population_uncertainty_report_info_map =
-      //     this->GetPopulationUncertaintyReportInfoMap();
-
-      // std::shared_ptr<UncertaintyReportInfoMap>
-      // fleet_uncertainty_report_info_map =
-      //     this->GetFleetUncertaintyReportInfoMap();
-
       // initialize population vectors
       vector<vector<Type>> biomass_p(n_pops);
       vector<vector<Type>> expected_recruitment_p(n_pops);
@@ -1256,10 +1211,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
       vector<vector<Type>> unfished_biomass_p(n_pops);
       vector<vector<Type>> unfished_numbers_at_age_p(n_pops);
       vector<vector<Type>> unfished_spawning_biomass_p(n_pops);
-      vector<vector<Type>> log_M_p(n_pops);
-      vector<vector<Type>> log_init_naa_p(n_pops);
       vector<vector<Type>> spawning_biomass_ratio_p(n_pops);
-      vector<vector<Type>> log_f_multiplier_p(n_pops);
 
       // initialize fleet vectors
       vector<vector<Type>> agecomp_expected_f(n_fleets);
@@ -1285,15 +1237,8 @@ class CatchAtAge : public FisheryModelBase<Type> {
       // initiate population index for structuring report out objects
       int pop_idx = 0;
       for (size_t p = 0; p < this->populations.size(); p++) {
-        this->populations[p]->create_report_vectors(report_vectors);
-        // std::shared_ptr<fims_popdy::Population<Type>> &population =
-        //     this->populations[p];
         std::map<std::string, fims::Vector<Type>> &derived_quantities =
             this->GetPopulationDerivedQuantities(this->populations[p]->GetId());
-        this->populations[p]->maturity->create_report_vectors(report_vectors);
-        this->populations[p]->growth->create_report_vectors(report_vectors);
-        this->populations[p]->recruitment->create_report_vectors(
-            report_vectors);
         biomass_p(pop_idx) = derived_quantities["biomass"].to_tmb();
         expected_recruitment_p(pop_idx) =
             derived_quantities["expected_recruitment"].to_tmb();
@@ -1318,13 +1263,8 @@ class CatchAtAge : public FisheryModelBase<Type> {
             derived_quantities["unfished_numbers_at_age"].to_tmb();
         unfished_spawning_biomass_p(pop_idx) =
             derived_quantities["unfished_spawning_biomass"].to_tmb();
-        log_M_p(pop_idx) = this->populations[pop_idx]->log_M.to_tmb();
-        log_init_naa_p(pop_idx) =
-            this->populations[pop_idx]->log_init_naa.to_tmb();
         spawning_biomass_ratio_p(pop_idx) =
             this->populations[pop_idx]->spawning_biomass_ratio.to_tmb();
-        log_f_multiplier_p(pop_idx) =
-            this->populations[pop_idx]->log_f_multiplier.to_tmb();
 
         pop_idx += 1;
       }
@@ -1334,8 +1274,6 @@ class CatchAtAge : public FisheryModelBase<Type> {
       fleet_iterator fit;
       for (fit = this->fleets.begin(); fit != this->fleets.end(); ++fit) {
         std::shared_ptr<fims_popdy::Fleet<Type>> &fleet = (*fit).second;
-        fleet->create_report_vectors(report_vectors);
-        fleet->selectivity->create_report_vectors(report_vectors);
         std::map<std::string, fims::Vector<Type>> &derived_quantities =
             this->GetFleetDerivedQuantities(fleet->GetId());
 
@@ -1404,7 +1342,6 @@ class CatchAtAge : public FisheryModelBase<Type> {
           ADREPORTvector(unfished_spawning_biomass_p);
       vector<Type> spawning_biomass_ratio =
           ADREPORTvector(spawning_biomass_ratio_p);
-      vector<Type> log_f_multiplier = ADREPORTvector(log_f_multiplier_p);
 
       vector<Type> agecomp_expected = ADREPORTvector(agecomp_expected_f);
       vector<Type> agecomp_proportion = ADREPORTvector(agecomp_proportion_f);
@@ -1456,11 +1393,8 @@ class CatchAtAge : public FisheryModelBase<Type> {
                      this->of);
       FIMS_REPORT_F_("unfished_spawning_biomass", unfished_spawning_biomass_p,
                      this->of);
-      FIMS_REPORT_F_("log_M", log_M_p, this->of);
-      FIMS_REPORT_F_("log_init_naa", log_init_naa_p, this->of);
       FIMS_REPORT_F_("spawning_biomass_ratio", spawning_biomass_ratio_p,
                      this->of);
-      FIMS_REPORT_F_("log_f_multiplier", log_f_multiplier_p, this->of);
 
       // adreport
       ADREPORT_F(biomass, this->of);
@@ -1478,7 +1412,6 @@ class CatchAtAge : public FisheryModelBase<Type> {
       ADREPORT_F(unfished_numbers_at_age, this->of);
       ADREPORT_F(unfished_spawning_biomass, this->of);
       ADREPORT_F(spawning_biomass_ratio, this->of);
-      ADREPORT_F(log_f_multiplier, this->of);
 
       // fleets
       // report

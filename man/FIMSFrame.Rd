@@ -9,8 +9,8 @@ FIMSFrame(data)
 \arguments{
 \item{data}{A \code{data.frame} that contains the necessary columns to construct
 a \code{FIMSFrame-class} object. Currently, those columns are
-type, name, age, length, timing, value, unit, and uncertainty. See
-the data1 object in FIMS, e.g., \code{data(data1, package = "FIMS")}.}
+type, name, age, length, timing, value, unit, and uncertainty.
+See the \code{data_big} object in FIMS, e.g., \code{data(data_big, package = "FIMS")}.}
 }
 \value{
 An object of the S4 class \code{FIMSFrame} class, or one of its child classes, is
@@ -34,26 +34,26 @@ data slot.
 It is important that the order of the rows in the data are correct but it is
 not expected that the user will do this. Instead, the returned data are
 sorted using \code{\link[dplyr:arrange]{dplyr::arrange()}} before placing them in the data slot. Data
-are first sorted by data type, placing all weight-at-age data next to other
-weight-at-age data and all landings data next to landings data. Thus,
-age-composition data will come first because their type is "age" and "a" is
+are first sorted by data type, placing all \code{weight_at_age} data next to
+other \code{weight_at_age} data and all landings data next to landings data.
+Thus, \code{age_comp} data will come first because their type is "age" and "a" is
 first in the alphabet. All other types will follow according to their order
 in the alphabet.
-Next, within each type, data are organized by fleet. So, age-composition
+Next, within each type, data are organized by fleet. So, \code{age_comp}
 information for fleet1 will come before survey1. Next, all data within type
 and fleet are arranged by timing, e.g., by year. That is the end of the
-sorting for time series data like landings and indices.
-The biological data are further sorted by bin. Thus, age-composition
-information will be arranged as follows:\tabular{lcccr}{
+sorting for time series data like landings and indices. The biological data
+are further sorted by bin. Thus, \code{age_comp} information will be arranged as
+follows:\tabular{lcccr}{
    type \tab name \tab timing \tab age \tab value \cr
-   age \tab fleet1 \tab 2022 \tab 1 \tab 0.3 \cr
-   age \tab fleet1 \tab 2022 \tab 2 \tab 0.7 \cr
-   age \tab fleet1 \tab 2023 \tab 1 \tab 0.5 \cr
+   age_comp \tab fleet1 \tab 2022 \tab 1 \tab 0.3 \cr
+   age_comp \tab fleet1 \tab 2022 \tab 2 \tab 0.7 \cr
+   age_comp \tab fleet1 \tab 2023 \tab 1 \tab 0.5 \cr
 }
 
 
-Length composition-data are sorted the same way but by length bin instead of
-by age bin. It becomes more complicated for the age-to-length-conversion
+\code{length_comp} data are sorted the same way but by length bin instead of
+by age bin. It becomes more complicated for the \code{age_to_length_conversion}
 data, which are sorted by type, name, timing, age, and then length. So, a
 full set of length, e.g., length 10, length 20, length 30, etc., is placed
 together for a given age. After that age, another entire set of length
