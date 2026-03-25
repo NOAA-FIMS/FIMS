@@ -457,10 +457,11 @@ class FleetInterface : public FleetInterfaceBase {
 
     std::stringstream ss;
 
-    FIMS_INFO_LOG(std::string("add_to_fims_tmb_internal: linking Fleet id ") + fims::to_string(this->id) +
-            ", n_years=" + fims::to_string(this->n_years.get()) +
-            ", n_ages=" + fims::to_string(this->n_ages.get()) +
-            ", n_lengths=" + fims::to_string(this->n_lengths.get()));
+    FIMS_INFO_LOG(std::string("add_to_fims_tmb_internal: linking Fleet id ") +
+                  fims::to_string(this->id) +
+                  ", n_years=" + fims::to_string(this->n_years.get()) +
+                  ", n_ages=" + fims::to_string(this->n_ages.get()) +
+                  ", n_lengths=" + fims::to_string(this->n_lengths.get()));
 
     // set relative info
     fleet->id = this->id;
@@ -521,16 +522,16 @@ class FleetInterface : public FleetInterfaceBase {
       if (this->log_Fmort[i].estimation_type_m.get() == "fixed_effects") {
         ss.str("");
         ss << "Fleet." << this->id << ".log_Fmort." << this->log_Fmort[i].id_m;
-          FIMS_INFO_LOG(std::string("Registering parameter: ") + ss.str());
-          info->RegisterParameterName(ss.str());
-          info->RegisterParameter(fleet->log_Fmort[i]);
+        FIMS_INFO_LOG(std::string("Registering parameter: ") + ss.str());
+        info->RegisterParameterName(ss.str());
+        info->RegisterParameter(fleet->log_Fmort[i]);
       }
       if (this->log_Fmort[i].estimation_type_m.get() == "random_effects") {
         ss.str("");
         ss << "Fleet." << this->id << ".log_Fmort." << this->log_Fmort[i].id_m;
-          FIMS_INFO_LOG(std::string("Registering random effect: ") + ss.str());
-          info->RegisterRandomEffectName(ss.str());
-          info->RegisterRandomEffect(fleet->log_Fmort[i]);
+        FIMS_INFO_LOG(std::string("Registering random effect: ") + ss.str());
+        info->RegisterRandomEffectName(ss.str());
+        info->RegisterRandomEffect(fleet->log_Fmort[i]);
       }
     }
     // add to variable_map
@@ -576,7 +577,8 @@ class FleetInterface : public FleetInterfaceBase {
 
     // add to Information
     info->fleets[fleet->id] = fleet;
-    FIMS_INFO_LOG(std::string("Registered Fleet in Information id ") + fims::to_string(fleet->id));
+    FIMS_INFO_LOG(std::string("Registered Fleet in Information id ") +
+                  fims::to_string(fleet->id));
     return true;
   }
 
