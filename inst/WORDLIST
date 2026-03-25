@@ -738,6 +738,7 @@ gcovr
 gdb
 geeksforgeeks
 getAbsolutePathWithoutDotDot
+getNamespaceExports   
 getOption
 getenv
 getline
@@ -766,6 +767,7 @@ gstatic
 gsub
 gte
 gtest
+hasMethod
 hexlogo
 holt
 hotfix
@@ -1078,6 +1080,7 @@ sel
 selD
 selL
 selZ
+selectMethod
 selex
 sep
 setClass

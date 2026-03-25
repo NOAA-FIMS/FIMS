@@ -77,6 +77,7 @@ Imports:
     dplyr,
     ggplot2,
     glue,
+    graphics,
     jsonlite,
     methods,
     purrr,

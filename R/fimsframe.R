@@ -582,8 +582,8 @@ methods::setMethod(
 # methods::setMethod: plot ----
 #' Plot a `FIMSFrame` object
 #'
-#' Use `ggplot2::geom_point()` to plot summary information stored in the data slot
-#' of the `FIMSFrame` class.
+#' Use `ggplot2::geom_point()` to plot summary information stored in the data
+#' slot of the `FIMSFrame` class.
 #'
 #' @param x A `FIMSFrame` object.
 #' @param y Unused (inherited from R base).
@@ -600,14 +600,13 @@ methods::setMethod(
 #' plot(data_4_model)
 #' }
 #'
-#' @export
+#' @importFrom graphics plot
 #' @method plot FIMSFrame
 #' @rdname plot
 #' @aliases plot,FIMSFrame,missing-method
+# Export the method so installed-package calls to `plot(FIMSFrame(...))`
+# dispatch correctly in user code and vignettes.
 #' @exportMethod plot
-setGeneric("plot", function(x, y, ...) {
-  standardGeneric("plot")
-})
 methods::setMethod(
   f = "plot",
   signature = c(x = "FIMSFrame", y = "missing"),
@@ -875,6 +874,7 @@ validate_dimension_of_conversion <- function(data, n_groups, n_timings) {
 #' validated and then returned. All objects will at a minimum have a slot
 #' called `data` to store the input data frame. Additional slots are dependent
 #' on the child class. Use [methods::showClass()] to see all available slots.
+#' @seealso [plot,FIMSFrame,missing-method()] for plotting `FIMSFrame` objects.
 #' @export
 #' @keywords FIMSFrame
 FIMSFrame <- function(data) {
