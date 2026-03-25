@@ -301,7 +301,6 @@ target_link_libraries(FIMSJson_JsonParser_WriteToFile
 )
 
 gtest_discover_tests(FIMSJson_JsonParser_WriteToFile DISCOVERY_TIMEOUT 60)
-
 # test_FIMSJson_JsonParser_Parse.cpp
 add_executable(FIMSJson_JsonParser_Parse
   test_FIMSJson_JsonParser_Parse.cpp
@@ -314,7 +313,7 @@ target_link_libraries(FIMSJson_JsonParser_Parse
 
 gtest_discover_tests(FIMSJson_JsonParser_Parse DISCOVERY_TIMEOUT 60)
 
-# test_fims_math_ddiric_multinom.cpp
+# test_FileName_ClassName_FunctionName.cpp
 add_executable(FimsMathDdiricMultinomTest
   test_fims_math_ddiric_multinom.cpp
 )
