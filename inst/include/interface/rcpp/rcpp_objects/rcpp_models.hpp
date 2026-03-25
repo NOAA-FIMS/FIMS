@@ -105,6 +105,14 @@ std::map<uint32_t, std::shared_ptr<FisheryModelInterfaceBase>>
  * CatchAtAge model. It inherits from the FisheryModelInterfaceBase class.
  */
 class CatchAtAgeInterface : public FisheryModelInterfaceBase {
+ public:
+  /**
+   * @brief Static ID counter for derived quantities exposed through the
+   * CatchAtAge interface.
+   */
+  static uint32_t derived_quantity_id_g;
+
+ private:
   /**
    * @brief The set of population ids that this catch at age model operates on.
    */
@@ -121,12 +129,35 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
    */
   std::map<std::string, std::vector<double>> se_values;
 
+  /**
+   * @brief Registry of population derived quantity IDs keyed by population ID
+   * and quantity name.
+   */
+  std::shared_ptr<std::map<uint32_t, std::map<std::string, uint32_t>>>
+      population_derived_quantity_ids;
+
+  uint32_t RegisterPopulationDerivedQuantityId(
+      uint32_t population_id, const std::string &quantity_name) {
+    auto &registry = *this->population_derived_quantity_ids;
+    auto &population_registry = registry[population_id];
+    auto it = population_registry.find(quantity_name);
+    if (it != population_registry.end()) {
+      return it->second;
+    }
+
+    uint32_t id = CatchAtAgeInterface::derived_quantity_id_g++;
+    population_registry[quantity_name] = id;
+    return id;
+  }
+
  public:
   /**
    * @brief The constructor.
    */
   CatchAtAgeInterface() : FisheryModelInterfaceBase() {
     this->population_ids = std::make_shared<std::set<uint32_t>>();
+    this->population_derived_quantity_ids =
+        std::make_shared<std::map<uint32_t, std::map<std::string, uint32_t>>>();
     std::shared_ptr<CatchAtAgeInterface> caa =
         std::make_shared<CatchAtAgeInterface>(*this);
     FIMSRcppInterfaceBase::fims_interface_objects.push_back(caa);
@@ -140,7 +171,8 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
    */
   CatchAtAgeInterface(const CatchAtAgeInterface &other)
       : FisheryModelInterfaceBase(other),
-        population_ids(other.population_ids) {}
+        population_ids(other.population_ids),
+        population_derived_quantity_ids(other.population_derived_quantity_ids) {}
 
   /**
    * Method to add a population id to the set of population ids.
@@ -204,6 +236,22 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
 #else
     return false;
 #endif
+  }
+
+  uint32_t GetPopulationDerivedQuantityId(uint32_t population_id,
+                                          std::string quantity_name) {
+    auto pop_it = this->population_derived_quantity_ids->find(population_id);
+    if (pop_it == this->population_derived_quantity_ids->end()) {
+      throw std::out_of_range(
+          "Population ID not found in derived quantity registry.");
+    }
+
+    auto quantity_it = pop_it->second.find(quantity_name);
+    if (quantity_it == pop_it->second.end()) {
+      throw std::out_of_range("Derived quantity not found for population.");
+    }
+
+    return quantity_it->second;
   }
 
   /**
@@ -1103,6 +1151,10 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
               fims::Vector<std::string>{"n_years", "n_ages"});
 
       // replace elements in the variable map
+      for (auto &dq : derived_quantities) {
+        info->variable_map[this->RegisterPopulationDerivedQuantityId(
+            population->id, dq.first)] = &(dq.second);
+      }
 
       for (fleet_ids_iterator fit = population->fleet_ids->begin();
            fit != population->fleet_ids->end(); ++fit) {
@@ -1314,5 +1366,7 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
 
 #endif
 };
+
+uint32_t CatchAtAgeInterface::derived_quantity_id_g = 1000000;
 
 #endif
