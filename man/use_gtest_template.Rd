@@ -2,7 +2,8 @@
 % Please edit documentation in R/use-gtest-template.R
 \name{use_gtest_template}
 \alias{use_gtest_template}
-\title{Create tests/gtest/test_*.cpp test file and register it in CMakeLists.txt}
+\title{file = R/use-gtest-template.R
+Create tests/gtest/test_*.cpp test file and register it in CMakeLists.txt}
 \usage{
 use_gtest_template(name = "FileName_ClassName_FunctionName")
 }
