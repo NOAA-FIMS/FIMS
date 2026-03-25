@@ -418,3 +418,14 @@ add_executable(information_RecruitmentLifetime
 add_as_invoker_manifest(information_RecruitmentLifetime)
 target_link_libraries(information_RecruitmentLifetime fims_test)
 add_test(NAME information_RecruitmentLifetime COMMAND information_RecruitmentLifetime)
+
+# test_fims_math_ddirichlet_multinom.cpp
+add_executable(FimsMathDdirichletMultinomTest
+  test_fims_math_ddirichlet_multinom.cpp
+)
+add_as_invoker_manifest(FimsMathDdirichletMultinomTest)
+target_link_libraries(FimsMathDdirichletMultinomTest
+  gtest_main
+  fims_test
+)
+gtest_discover_tests(FimsMathDdirichletMultinomTest DISCOVERY_TIMEOUT 10)

@@ -7,6 +7,7 @@
 #' @export CatchAtAge
 #' @export clear
 #' @export CreateTMBModel
+#' @export DDirichletMultinomDistribution
 #' @export DlnormDistribution
 #' @export DmultinomDistribution
 #' @export DnormDistribution
