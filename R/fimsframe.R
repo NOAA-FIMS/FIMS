@@ -830,8 +830,19 @@ validate_dimension_of_conversion <- function(data, n_groups, n_timings) {
 #'
 #' @details
 #' ## data
-#' The input data are both sorted and expanded before returning them in the
-#' data slot.
+#' The input data are both sorted (see the section below on sorting) and
+#' expanded before returning them in the data slot.
+#' ### Ages
+#' Currently, ages must be integers, i.e., FIMS cannot accommodate numeric ages
+#' like age 1.5 but we hope that this is something that we will be able to
+#' accommodate in the future. Additionally, the first age in your data set will
+#' be the age at which fish recruit to the population. So, if you do not have
+#' age-0 age compositions and age two is the first age you have in your
+#' composition data, then recruitment will happen at age two. Furthermore, you
+#' must have composition entries for every integer between your first and last
+#' age in the model. For example, you cannot bin fish into bins that span
+#' multiple years, you must have age-2, age-3, and age-4 not just age-2 and
+#' age-4 fish in your composition data.
 #' ### Sorting
 #' It is important that the order of the rows in the data are correct but it is
 #' not expected that the user will do this. Instead, the returned data are

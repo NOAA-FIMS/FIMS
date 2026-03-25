@@ -66,6 +66,12 @@ struct RecruitmentBase : public fims_model_object::FIMSObject<Type> {
 
   /** @brief Calculates the expected recruitment for a given spawning input.
    *
+   * @details Recruitment is evaluated for the first age you have in your data.
+   * For example, if you have age-1 fish in your weight-at-age and age-
+   * composition data then recruitment will happen for age-1 fish, not age-0.
+   * There is no way to set the age at which this function is evaluated for, it
+   * is solely based on your input data.
+   *
    * @param spawners A measure for spawning output.
    * @param ssbzero A measure for spawning output in unfished population.
    *
