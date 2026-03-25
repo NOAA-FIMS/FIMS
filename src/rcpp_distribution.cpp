@@ -70,4 +70,27 @@ void register_distributions(Rcpp::Module& m) {
       .field("expected_values",
              &DmultinomDistributionsInterface::expected_values)
       .field("dims", &DmultinomDistributionsInterface::dims);
+
+  Rcpp::class_<DDirichletMultinomialDistributionsInterface>(
+      "DDirichletMultinomDistribution",
+      "See "
+      "https://noaa-fims.github.io/FIMS/doxygen/"
+      "classDDirichletMultinomialDistributionsInterface.html.")
+      .constructor()
+      .method("get_id", &DDirichletMultinomialDistributionsInterface::get_id)
+      .method("evaluate",
+              &DDirichletMultinomialDistributionsInterface::evaluate)
+      .method("set_observed_data",
+              &DDirichletMultinomialDistributionsInterface::set_observed_data)
+      .method(
+          "set_distribution_links",
+          &DDirichletMultinomialDistributionsInterface::set_distribution_links)
+      .method("set_note",
+              &DDirichletMultinomialDistributionsInterface::set_note)
+      .field("observed_values",
+             &DDirichletMultinomialDistributionsInterface::observed_values)
+      .field("expected_values",
+             &DDirichletMultinomialDistributionsInterface::expected_values)
+      .field("dims", &DDirichletMultinomialDistributionsInterface::dims)
+      .field("theta", &DDirichletMultinomialDistributionsInterface::theta);
 }
