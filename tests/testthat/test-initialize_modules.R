@@ -25,6 +25,11 @@ test_that("`initialize_fims()` works with correct inputs", {
   expect_named(result, c("parameters", "model"))
   #' @description Test that `initialize_fims()` returns a list with two elements.
   expect_equal(length(result), 2)
+  #' @description Test that a population derived quantity can be referenced from R by name after model initialization.
+  expect_gte(
+    result$model$GetPopulationDerivedQuantityId(1, "spawning_biomass"),
+    1000000
+  )
   clear()
 
   result <- initialize_comp(
@@ -169,6 +174,14 @@ test_that("`initialize_fims()` returns correct error messages", {
   expect_error(
     initialize_fims(parameters = parameters_wrong_type, data = data),
     "The `estimation_type` must be one of: constant, fixed_effects, and random_effects."
+  )
+  clear()
+
+  result <- initialize_fims(parameters = default_parameters, data = data)
+  #' @description Test that requesting an unknown population derived quantity returns an informative error.
+  expect_error(
+    result$model$GetPopulationDerivedQuantityId(1, "not_a_real_quantity"),
+    "Derived quantity not found for population."
   )
   clear()
 })

@@ -444,6 +444,8 @@ RCPP_MODULE(fims) {
       "See https://noaa-fims.github.io/doxygen/classCatchAtAgeInterface.html.")
       .constructor()
       .method("AddPopulation", &CatchAtAgeInterface::AddPopulation)
+      .method("GetPopulationDerivedQuantityId",
+              &CatchAtAgeInterface::GetPopulationDerivedQuantityId)
       .method("get_output", &CatchAtAgeInterface::to_json)
       .method("GetReport", &CatchAtAgeInterface::get_report)
       .method("GetId", &CatchAtAgeInterface::get_id)
