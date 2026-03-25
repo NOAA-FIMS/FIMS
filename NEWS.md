@@ -1,3 +1,13 @@
+# FIMS 0.9.1
+
+* Adds vignette on FIMSFrame and data_big
+* Adds logging information to fims-demo and updates the logging vignette to be
+  dynamic instead of relying on a saved image
+* Adds a vignette on how to add new C++ modules to FIMS
+* Adds WHAM-inspired convergence checks to FIMS models
+* Relies on SparseNUTS for Bayesian test
+* Refactors FIMSFrame plot method to provide a summary of the data
+
 # FIMS 0.9.0
 
 * Adds time-varying weight-at-age
