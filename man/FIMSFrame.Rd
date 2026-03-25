@@ -63,4 +63,7 @@ for a given fleet then the next year will begin.
 
 }
 }
+\seealso{
+\code{\link[=plot,FIMSFrame,missing-method]{plot,FIMSFrame,missing-method()}} for plotting \code{FIMSFrame} objects.
+}
 \keyword{FIMSFrame}

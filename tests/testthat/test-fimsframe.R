@@ -26,8 +26,19 @@ test_that("`fims_frame()` works with the correct inputs", {
   #' @description Test that `fims_frame()` creates the S4 `FIMSFrame` classes.
   expect_s4_class(fims_frame, "FIMSFrame")
 
+  #' @description Test that the S4 `plot()` method remains registered for `FIMSFrame` without exporting `plot` from the package namespace.
+  expect_true(methods::hasMethod("plot", c("FIMSFrame", "missing")))
+
+  #' @description Test that `plot()` is exported from the `FIMS` namespace so installed-package calls dispatch for `FIMSFrame` objects.
+  expect_true("plot" %in% getNamespaceExports("FIMS"))
+
   #' @description Test that the returned object from `fims_frame()` can be plotted using the class structure and methods.
   expect_silent(save_png(plot(fims_frame)))
+
+  #' @description Test that the selected S4 `plot()` method for `FIMSFrame` can be called directly.
+  expect_silent(
+    save_png(methods::selectMethod("plot", c("FIMSFrame", "missing"))(fims_frame))
+  )
 
   #' @description Test that `get_data()` retrieves the data slot as a data frame.
   expect_s3_class(get_data(fims_frame), "data.frame")

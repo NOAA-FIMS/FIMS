@@ -692,6 +692,7 @@ endl
 enframe
 enum
 env
+envRefClass
 eq
 escapeQuotes
 et
@@ -737,6 +738,7 @@ gcovr
 gdb
 geeksforgeeks
 getAbsolutePathWithoutDotDot
+getNamespaceExports   
 getOption
 getenv
 getline
@@ -765,6 +767,7 @@ gstatic
 gsub
 gte
 gtest
+hasMethod
 hexlogo
 holt
 hotfix
@@ -797,6 +800,7 @@ invertible
 io
 iomanip
 iostream
+isClass
 isDouble
 isdigit
 isinf
@@ -1076,6 +1080,7 @@ sel
 selD
 selL
 selZ
+selectMethod
 selex
 sep
 setClass
@@ -1230,6 +1235,7 @@ withr
 wordlist
 writeLines
 www
+xData
 xlab
 xlen
 xp

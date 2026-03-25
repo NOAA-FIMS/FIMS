@@ -27,12 +27,12 @@ reference:
   contents:
   - data_big
   - fims_input_types
-  - plot
 
 - title: Run FIMS
   desc: Primary functions used when setting up or running a FIMS model.
   contents:
   - starts_with("FIMSFrame")
+  - "plot,FIMSFrame,missing-method"
   - starts_with("get_FIMSFrame")
   - starts_with("model_")
   - starts_with("create_default_")
