@@ -98,6 +98,7 @@ Codespace
 Codespaces
 ComputeProportions
 ConfigurePopulationModel
+ConfigRoutine
 Const
 ConstraintWorks
 CppAD
@@ -156,6 +157,7 @@ ELT
 ENDIF
 EOF
 EQ
+ErrorRoutine
 EWAA
 EWAAGrowth
 EWAAGrowthInterface
@@ -176,6 +178,7 @@ FMort
 FUNC
 FetchContent
 FileName
+FiltersEntriesBySeverity
 FisheryModelBase
 FisheryModelInterfaceBase
 FleetInitializeWorks
@@ -224,6 +227,7 @@ GrowthBase
 GrowthEvaluate
 GrowthInterfaceBase
 HandlesEdgeCaseNullAndInvalidBool
+HandlesEmptyLogger
 HandlesMixedArrayInput
 HandlesNestedObjects
 HandlesNumberForms
@@ -250,6 +254,7 @@ IndexDataInterface
 IndexExpected
 IndexNumberAtAge
 IndexNumberAtLength
+InfoRoutine
 InitializeCAA
 InitializeFleetDerivedQuantities
 InitializeFleetObject
@@ -311,6 +316,7 @@ MCPC
 MDFILE
 MakeADFun
 MakeAvailable
+MakeLogger
 Makevars
 MaturityAtAge
 MaturityBase
@@ -363,6 +369,7 @@ PopulationPrepareTestFixture
 Postfix
 PrepareCAA
 PrepareConstrainedDeviations
+PreservesPathAndThrowOnErrorConfiguration
 PrettyFormatJSON
 PrintJsonValue
 QNXNTO
@@ -473,6 +480,7 @@ TOC
 TOMLINSON
 TREEVIEW
 TearDown
+TestRoutine
 ToDo
 ToJSON
 Tomlinson
@@ -492,11 +500,14 @@ Validators
 WORDLIST
 WSL
 Wa
+WarnRoutine
 Wb
 widehat
 WriteAtExit
 WriteJsonValue
+WriteRoutine
 WriteToFile
+WritesLogToConfiguredPathOnDestruction
 YJmYGEPuE
 ZAA
 absolutePath
@@ -705,6 +716,7 @@ filesystem
 fims
 fimsfit
 fimsframe
+fimslog
 findutils
 firstname
 fishres

@@ -68,6 +68,13 @@ jobs:
           compare_build_metrics()
         shell: Rscript {0}
 
+      - name: Fail on regression
+        run: |
+          if grep -q "REGRESSIONS DETECTED" metrics_comparison.log; then
+            echo "Build regression detected"
+            exit 1
+          fi
+
       - name: Save current metrics to cache
         uses: actions/cache/save@v4
         with:
