@@ -126,8 +126,24 @@ test_that("fit_fims() errors when optimization fails to converge", {
 
   clear()
 
-  # Fix Landings sd at high value to cause high standard errors
+  # Fix Landings sd at high value in PNL model to cause high standard errors
   parameters_4_model <- parameters |>
+    dplyr::rows_update(
+      tibble::tibble(
+        label = "log_devs",
+        time = 2:30,
+        estimation_type = "fixed_effects"
+      ), 
+      by = c("label", "time")
+    ) |>
+    dplyr::rows_update(
+      tibble::tibble(
+        module_name = "Recruitment",
+        label = "log_sd",
+        estimation_type = "constant"
+      ),
+      by = c("module_name", "label")
+    ) |>
     dplyr::rows_update(
       tibble::tibble(
         module_type = "Landings",
@@ -147,12 +163,14 @@ test_that("fit_fims() errors when optimization fails to converge", {
     regexp = "Large condition number detected in Hessian"
   )
 
+  clear()
+
   # Estimate the first year of natural mortality to cause NA standard errors
   parameters_4_model <- parameters |>
     dplyr::rows_update(
       tibble::tibble(
         label = "log_M",
-        time = 1,
+        time = 1:12,
         estimation_type = "fixed_effects"
       ),
       by = c("label", "time")
