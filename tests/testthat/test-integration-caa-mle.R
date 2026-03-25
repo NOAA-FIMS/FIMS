@@ -25,7 +25,8 @@ result <- setup_and_run_FIMS_without_wrappers(
   om_input_list = om_input_list,
   om_output_list = om_output_list,
   em_input_list = em_input_list,
-  estimation_mode = FALSE
+  estimation_mode = FALSE,
+  random_effects = c(recruitment = "log_devs")
 )
 
 ## IO correctness ----
@@ -48,9 +49,10 @@ test_that("catch-at-age model (deterministic MLE without wrappers) works with co
     em_input = em_input_list[[iter_id]]
   )
 
-  # TODO: change parameter number to 77 after fixing log_devs estimation error
-  #' @description Test that the number of parameters is correct for deterministic run.
-  expect_equal(length(result[["obj"]][["par"]]), 48)
+  #' @description Test that the number of parameters are correct.
+  expect_equal(length(result[["obj"]][["par"]]), 49)
+  #' @description Test that the number of random effects are correct.
+  expect_equal(length(result[["obj"]][["env"]][["random"]]), 29)
 })
 
 ## Edge handling ----
@@ -66,7 +68,8 @@ result <- setup_and_run_FIMS_without_wrappers(
   om_input_list = om_input_list,
   om_output_list = om_output_list,
   em_input_list = em_input_list,
-  estimation_mode = TRUE
+  estimation_mode = TRUE,
+  random_effects = c(recruitment = "log_devs")
 )
 ## IO correctness ----
 # Compare FIMS results with model comparison project OM values
@@ -110,7 +113,8 @@ test_that("catch-at-age model (estimation MLE without wrappers) returns correct 
     om_input_list = om_input_list,
     om_output_list = om_output_list,
     em_input_list = em_input_list,
-    estimation_mode = TRUE
+    estimation_mode = TRUE,
+    random_effects = c(recruitment = "log_devs")
   )
 
   #' @description Test that FIMS runs with missing values in survey index observations using NA (missing value) placeholder in the second value and the report is not NULL.
@@ -158,7 +162,8 @@ test_that("catch-at-age model (estimation MLE without wrappers) returns correct 
     om_input_list = om_input_list,
     om_output_list = om_output_list,
     em_input_list = em_input_list,
-    estimation_mode = TRUE
+    estimation_mode = TRUE,
+    random_effects = c(recruitment = "log_devs")
   )
 
   #' @description Test that FIMS runs with only one observation in landings and survey data and the report is not NULL.
@@ -196,7 +201,8 @@ test_that("catch-at-age model (estimation MLE without wrappers) returns correct 
     om_input_list = om_input_list,
     om_output_list = om_output_list,
     em_input_list = em_input_list,
-    estimation_mode = TRUE
+    estimation_mode = TRUE,
+    random_effects = c(recruitment = "log_devs")
   )
 
   #' @description Test that FIMS runs with only one observation in landings and survey data and the report is not NULL.

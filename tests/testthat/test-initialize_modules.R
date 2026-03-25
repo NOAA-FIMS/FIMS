@@ -203,7 +203,7 @@ test_that("`initialize_fims()` returns correct error messages", {
         y = tibble::tibble(
           module_name = "Recruitment",
           label = "log_devs",
-          time = 2:30,
+          time = 2:get_n_years(data),
           estimation_type = "random_effects"
         ),
         by = c("module_name", "label", "time")
@@ -223,7 +223,7 @@ test_that("`initialize_fims()` returns correct error messages", {
         y = tibble::tibble(
           module_name = "Recruitment",
           label = "log_devs",
-          time = 2:30,
+          time = 2:get_n_years(data),
           estimation_type = "constant"
         ),
         by = c("module_name", "label", "time")

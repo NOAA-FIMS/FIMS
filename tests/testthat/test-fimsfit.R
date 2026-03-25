@@ -126,13 +126,29 @@ test_that("fit_fims() errors when optimization fails to converge", {
 
   clear()
 
-  # Fix Landings sd at high value to cause high standard errors
+  # Fix Landings sd at high value in penalized likelihood model to cause high standard errors
   parameters_4_model <- parameters |>
+    dplyr::rows_update(
+      tibble::tibble(
+        label = "log_devs",
+        time = 2:get_n_years(data_age_comp),
+        estimation_type = "fixed_effects"
+      ),
+      by = c("label", "time")
+    ) |>
+    dplyr::rows_update(
+      tibble::tibble(
+        module_name = "Recruitment",
+        label = "log_sd",
+        estimation_type = "constant"
+      ),
+      by = c("module_name", "label")
+    ) |>
     dplyr::rows_update(
       tibble::tibble(
         module_type = "Landings",
         label = "log_sd",
-        time = 1:30,
+        time = 1:get_n_years(data_age_comp),
         value = 10
       ),
       by = c("module_type", "label", "time")
@@ -147,8 +163,26 @@ test_that("fit_fims() errors when optimization fails to converge", {
     regexp = "Large condition number detected in Hessian"
   )
 
-  # Estimate the first year of natural mortality to cause NA standard errors
+  clear()
+
+  # Estimate the first (age, year) of natural mortality to cause NA standard errors
   parameters_4_model <- parameters |>
+    dplyr::rows_update(
+      tibble::tibble(
+        label = "log_devs",
+        time = 2:get_n_years(data_age_comp),
+        estimation_type = "fixed_effects"
+      ),
+      by = c("label", "time")
+    ) |>
+    dplyr::rows_update(
+      tibble::tibble(
+        module_name = "Recruitment",
+        label = "log_sd",
+        estimation_type = "constant"
+      ),
+      by = c("module_name", "label")
+    ) |>
     dplyr::rows_update(
       tibble::tibble(
         label = "log_M",

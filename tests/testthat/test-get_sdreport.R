@@ -43,17 +43,17 @@ test_that("`get_sdreport()` works with correct inputs", {
       expected = fit_data@sdreport
     )
 
-    if (any(grepl("fit_agecomp_random_effects.RDS", fit_file))) {
+    if (any(grepl("fixed_effects", fit_file))) {
       #' @description Test that `get_sdreport()` returns correct names for the `sdreport` slot.
       expect_equal(
         object = names(sdreport),
-        expected = expected_names_re
+        expected = expected_names
       )
     } else {
       #' @description Test that `get_sdreport()` returns correct names for the `sdreport` slot.
       expect_equal(
         object = names(sdreport),
-        expected = expected_names
+        expected = expected_names_re
       )
     }
   }
