@@ -57,10 +57,28 @@ initialize_module <- function(parameters, data, module_name, fleet_name = NA_cha
   }
 
   if (module_class_name == "BevertonHoltRecruitment") {
+    always_remove <- c("x", "log_expected_recruitment")
+    maybe_remove <- c("log_r", "log_devs")
+
+    models_pars <- parameters |> 
+      dplyr::pull(label) |> 
+      unique() |> 
+      na.omit()
+
+    # Check if both are present in the input parameters
+    if (all(maybe_remove %in% models_pars)) {
+      cli::cli_alert_warning(c(
+        "x" = "Both {.var log_devs} and {.var log_r} are specified in the model, but there can be only one!",
+        "!" = "Remove one of the two from your parameter list."
+      ))
+    }
+    
+    # Identify which of the optional fields are NOT in the parameters to remove them from module_fields
+    actual_missing <- setdiff(maybe_remove, models_pars)
+
     module_fields <- setdiff(module_fields, c(
-      "x",
-      "log_r",
-      "log_expected_recruitment"
+      always_remove,
+      actual_missing
     ))
   }
 

@@ -1,5 +1,10 @@
 load(testthat::test_path("fixtures", "integration_test_data.RData"))
 
+# Load necessary data for the integration test
+if (!file.exists(testthat::test_path("fixtures", "fit_age_length_comp.RDS"))) {
+  prepare_test_data()
+}
+
 # Set the iteration ID to 1 for accessing specific input/output list
 iter_id <- 1
 
@@ -8,32 +13,42 @@ om_input <- om_input_list[[iter_id]]
 om_output <- om_output_list[[iter_id]]
 em_input <- em_input_list[[iter_id]]
 
-# Define modified parameters for different modules
-modified_parameters <- vector(mode = "list", length = length(iter_id))
-modified_parameters[[iter_id]] <- list(
-  fleet1 = list(
-    Fleet.log_Fmort.value = log(om_output_list[[iter_id]][["f"]])
-  ),
-  survey1 = list(
-    LogisticSelectivity.inflection_point.value = 1.5,
-    LogisticSelectivity.slope.value = 2,
-    Fleet.log_q.value = log(om_output_list[[iter_id]][["survey_q"]][["survey1"]])
-  ),
-  recruitment = list(
-    BevertonHoltRecruitment.log_rzero.value = log(om_input_list[[iter_id]][["R0"]]),
-    BevertonHoltRecruitment.log_devs.value = om_input_list[[iter_id]][["logR.resid"]][-1],
-    DnormDistribution.log_sd.value = om_input_list[[iter_id]][["logR_sd"]]
-  ),
-  maturity = list(
-    LogisticMaturity.inflection_point.value = om_input_list[[iter_id]][["A50.mat"]],
-    LogisticMaturity.inflection_point.estimated = FALSE,
-    LogisticMaturity.slope.value = om_input_list[[iter_id]][["slope.mat"]],
-    LogisticMaturity.slope.estimated = FALSE
-  ),
-  population = list(
-    Population.log_init_naa.value = log(om_output_list[[iter_id]][["N.age"]][1, ])
+data_age_comp <- readRDS(testthat::test_path("fixtures", "data_age_comp.RDS"))
+
+modified_parameters <- readRDS(
+    testthat::test_path("fixtures", "parameters_model_comparison_project.RDS")
   )
-)
+
+fit_agecomp_log_devs <- modified_parameters |>
+      # remove rows that have module_type == LengthComp
+      dplyr::rows_delete(
+        y = tibble::tibble(module_type = "LengthComp")
+      ) |>
+    initialize_fims(data = data_age_comp) |>
+    fit_fims(optimize = TRUE)
+
+  clear()
+
+# Define modified parameters for different modules
+ fit_agecomp_log_r <- modified_parameters |>
+      # remove rows that have module_type == LengthComp
+      dplyr::rows_delete(
+        y = tibble::tibble(module_type = "LengthComp")
+      ) |>
+      dplyr::rows_update(
+        tibble::tibble(
+          module_name = "Recruitment",
+          time = 2:30,
+          estimation_type = "random_effects",
+          label = "log_r",
+          value = 0
+        ),
+        by = c("module_name", "time")
+      ) |>
+    initialize_fims(data = data_age_comp) |>
+    fit_fims(optimize = TRUE)
+
+  clear()
 
 test_that("deterministic test of fims with recruitment re", {
   #' @description Test that the deterministic FIMS run with recruitment random effects matches the operating model values.

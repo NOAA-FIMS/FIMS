@@ -327,15 +327,13 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
     if (random_effects[["recruitment"]] == "log_r") {
       recruitment$log_r$resize(om_input[["nyr"]] - 1)
       for (y in 1:(om_input[["nyr"]] - 1)) {
-        recruitment$log_r[y]$value <- 1
+        recruitment$log_r[y]$value <- om_input[["logR.resid"]][y + 1] + log(om_input[["R0"]])
       }
       recruitment$log_r$set_all_random(TRUE)
     }
   }
   if (is.null(random_effects)) {
-    # TODO: integration tests fail after setting recruitment log_devs all estimable.
-    # We need to debug the issue, then uncomment the line below.
-    # recruitment$log_devs$set_all_estimable(TRUE)
+    recruitment$log_devs$set_all_estimable(TRUE)
   }
 
   if ("selectivity" %in% names(random_effects)) {

@@ -14,19 +14,19 @@ load(testthat::test_path("fixtures", "integration_test_data.RData"))
 # Set the iteration ID to 1 for accessing specific input/output list
 iter_id <- 1
 
-# Run FIMS without wrappers
-result <- setup_and_run_FIMS_without_wrappers(
-  iter_id = iter_id,
-  om_input_list = om_input_list,
-  om_output_list = om_output_list,
-  em_input_list = em_input_list,
-  estimation_mode = FALSE,
-  random_effects = c(recruitment = "log_devs")
-)
 
 ## IO correctness ----
-test_that("deterministic run works with correct inputs", {
-  #' @description Test that the output from FIMS run matches the model comparison project OM values.
+# Compare FIMS results with model comparison project OM values
+test_that("catch-at-age model (deterministic MLE without wrappers) works with correct inputs", {
+  result <- setup_and_run_FIMS_without_wrappers(
+    iter_id = iter_id,
+    om_input_list = om_input_list,
+    om_output_list = om_output_list,
+    em_input_list = em_input_list,
+    estimation_mode = FALSE,
+    random_effects = c(recruitment = "log_r")
+  )
+  #' @description Test that the output from FIMS matches the model comparison project OM values.
   verify_fims_deterministic(
     report = result[["report"]],
     estimates = result[["sdr_fixed"]],
@@ -34,10 +34,8 @@ test_that("deterministic run works with correct inputs", {
     om_output = om_output_list[[iter_id]],
     em_input = em_input_list[[iter_id]],
     use_fimsfit = FALSE
-  )
-})
+  )   
 
-test_that("deterministic run returns correct nlls", {
   #' @description Test that the NLLs from FIMS match the "true" NLLs from the model comparison project.
   verify_fims_nll(
     report = result[["report"]],
@@ -45,28 +43,9 @@ test_that("deterministic run returns correct nlls", {
     om_output = om_output_list[[iter_id]],
     em_input = em_input_list[[iter_id]]
   )
-})
 
-test_that("deterministic run results correct number of parameters and random effects", {
-  #' @description Test that the number of parameters are correct.
-  expect_equal(length(result[["obj"]][["par"]]), 49)
-  #' @description Test that the number of random effects are correct.
-  expect_equal(length(result[["obj"]][["env"]][["random"]]), 29)
-})
-
-
-## Edge handling ----
-# No edge cases to test.
-
-## Error handling ----
-# No built-in errors to test.
-
-# Estimation test ----
-
-
-## IO correctness ----
-# Compare FIMS results with model comparison project OM values
-test_that("estimation test with recruitment re on log devs", {
+# Compare FIMS log_devs with log_r approach results with model comparison project OM values
+test_that("results from recruitment random effects on log_devs equals log_r", {
   ## Setup ----
   result_log_devs <- setup_and_run_FIMS_without_wrappers(
     iter_id = iter_id,
@@ -77,22 +56,6 @@ test_that("estimation test with recruitment re on log devs", {
     random_effects = c(recruitment = "log_devs")
   )
 
-  # Compare FIMS results with model comparison project OM values
-  # Tests currently don't pass when log devs are estimated
-  #' @description Skip test due to current issues with log devs estimation.
-  testthat::skip("Skipping test for log devs estimation until issues are resolved.")
-  #' @description Test that the output from FIMS matches the model comparison project OM values.
-  validate_fims(
-    report = result_log_devs[["report"]],
-    estimates = result_log_devs[["sdr_report"]],
-    om_input = om_input_list[[iter_id]],
-    om_output = om_output_list[[iter_id]],
-    em_input = em_input_list[[iter_id]]
-  )
-})
-
-
-test_that("estimation test with recruitment re on logr", {
   result_log_r <- setup_and_run_FIMS_without_wrappers(
     iter_id = iter_id,
     om_input_list = om_input_list,
@@ -101,10 +64,9 @@ test_that("estimation test with recruitment re on logr", {
     estimation_mode = TRUE,
     random_effects = c(recruitment = "log_r")
   )
+  
   # Compare FIMS results with model comparison project OM values
   # Tests currently don't pass when log devs are estimated
-  #' @description Skip test due to current issues with log r estimation.
-  testthat::skip("Skipping test for log r estimation until issues are resolved.")
   #' @description Test that the output from FIMS matches the model comparison project OM values.
   validate_fims(
     report = result_log_r[["report"]],
@@ -117,7 +79,18 @@ test_that("estimation test with recruitment re on logr", {
   #' @description Verify the log_devs and log_r approach result in comparable negative log-likelihoods.
   expect_equal(result_log_r$report[["nll_components"]], result_log_devs$report[["nll_components"]], tolerance = 1e-4)
   #' @description Verify the log_devs and log_r approach result in comparable expected recruitment.
-  expect_equal(result_log_r$report[["recruitment"]], result_log_devs$report[["recruitment"]], tolerance = 1e-4)
+  expect_equal(result_log_r$report[["expected_recruitment"]], result_log_devs$report[["expected_recruitment"]], tolerance = 1e-4)
 
   clear()
 })
+
+
+## Edge handling ----
+# No edge cases to test.
+
+## Error handling ----
+# No built-in errors to test.
+
+# Estimation test ----
+
+

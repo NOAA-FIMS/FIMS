@@ -219,6 +219,10 @@ test_that("catch-at-age model (estimation MLE with wrappers) returns an error wh
   )
   # Set all non-NA estimation types to "constant" and initialize the model
   initialized_model <- parameters |>
+   dplyr::rows_delete(
+        #log_devs has a special error when set to constant
+        y = tibble::tibble(label = "log_devs")
+      ) |>
     dplyr::mutate(
       estimation_type = dplyr::if_else(
         !is.na(estimation_type),
