@@ -94,7 +94,7 @@ FIMS::data_big |>
 
 ## Age compositions (`type == "age_comp"`)
 
-The age-composition data type contains the age distribution of a fleet for a time step. The `age` column contains integer ages defining the age bins, and should start at 0. The data_big example currently uses ages ranging from 1 to 12 for all types, but this will be changed in the future. The `value` column contains either the number or the proportion of the catch or survey in each age bin. The `unit` column should be either "number" or "proportion". If "proportion" is used, the values are checked at a later step to confirm that they sum to 1.0. The `uncertainty` column should be the input sample size for the time step (equal across all ages within that time step).
+The age-composition data type contains the age distribution of a fleet for a time step. The `age` column contains integer ages defining the age bins. While standard FIMS models typically assume age bins start at zero, the data_big example currently uses ages ranging from 1--12, and thus, recruitment will be age-1 fish not age-0 fish. The `value` column contains either the number or the proportion of the catch or survey in each age bin. The `unit` column should be either "number" or "proportion". If "proportion" is used, the values are checked at a later step to confirm that they sum to 1.0. The `uncertainty` column should be the input sample size for the time step (equal across all ages within that time step).
 
 ```{r data_big-age_comp}
 # first three rows of the age composition data

@@ -17,7 +17,9 @@
 #'   \item{name}{A character string providing the name of the information source
 #'     that the input was collected from, e.g., `"Trawl fishery"`.}
 #'   \item{age}{An integer age. Entry can be `NA` if information pertains to
-#'     multiple ages, e.g., total landings rather than landings of age-4 fish.}
+#'     multiple ages, e.g., total landings rather than landings of age-4 fish.
+#'     In this dataset, ages start at one, therefore recruitment happens at age
+#'     one not age zero.}
 #'   \item{length}{A numeric length. Entry can be `NA` if information doesn't
 #'     pertain to length.}
 #'   \item{timing}{The timing, i.e., year the data was collected.}
