@@ -5,7 +5,6 @@
 
 #include <gtest/gtest.h>
 #include "common/fims_math.hpp"
-#include "common/fims_vector.hpp"
 
 TEST(FimsMathDdiricMultinomTest, HandlesOneInput) {
     // Inputs matched to the reference R calculation.
