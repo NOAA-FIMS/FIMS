@@ -259,7 +259,7 @@ class Information {
    */
   void RegisterRandomEffect(Type& re) {
     this->random_effects_parameters.push_back(&re);
-\  }
+  }
 
   /**
    * @brief Register a parameter name.
