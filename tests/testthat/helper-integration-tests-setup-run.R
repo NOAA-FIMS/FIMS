@@ -137,7 +137,7 @@ prepare_test_data <- function() {
       tibble::tibble(
         fleet_name = "fleet1",
         label = "log_Fmort",
-        time = 1:30,
+        time = 1:get_n_years(data_age_length_comp),
         value = log(om_output_list[[iter_id]][["f"]]),
       ),
       by = c("fleet_name", "label", "time")
@@ -155,21 +155,21 @@ prepare_test_data <- function() {
     dplyr::rows_update(
       tibble::tibble(
         label = "log_devs",
-        time = 2:30,
-        value = om_input_list[[iter_id]][["logR.resid"]][-1],
-        # TODO: integration tests fail after setting recruitment log_devs all estimable.
-        # We need to debug the issue, then change constant to fixed_effects.
-        estimation_type = "fixed_effects"
+        time = 2:get_n_years(data_age_length_comp),
+        value = om_input_list[[iter_id]][["logR.resid"]][-1]
       ),
       by = c("label", "time")
     ) |>
     # Update log_sd for log_devs in the Recruitment module
+    # Note: logR_sd is the standard deviation on the natural scale of the
+    # log recruitment deviations. We take the log of it to match the
+    # parameterization in the model, which expects a log-transformed
+    # parameter value.
     dplyr::rows_update(
       tibble::tibble(
         module_name = "Recruitment",
         label = "log_sd",
-        value = om_input_list[[iter_id]][["logR_sd"]],
-        estimation_type = "constant"
+        value = log(om_input_list[[iter_id]][["logR_sd"]])
       ),
       by = c("module_name", "label")
     ) |>
@@ -189,7 +189,7 @@ prepare_test_data <- function() {
     dplyr::rows_update(
       tibble::tibble(
         label = "log_init_naa",
-        age = 1:12,
+        age = 1:get_n_ages(data_age_length_comp),
         value = log(om_output_list[[iter_id]][["N.age"]][1, ])
       ),
       by = c("label", "age")
@@ -219,33 +219,6 @@ prepare_test_data <- function() {
     compress = FALSE
   )
 
-  # TODO: delete this lines 74-78 when log_devs estimation error fixed
-  modified_parameters_constant <- modified_parameters |>
-    dplyr::mutate(
-      estimation_type = dplyr::if_else(
-        label == "log_devs" & module_type == "BevertonHolt",
-        "constant",
-        estimation_type
-      ),
-      distribution_type = dplyr::if_else(
-        label == "log_devs" & module_type == "BevertonHolt",
-        NA_character_,
-        distribution_type
-      ),
-      distribution = dplyr::if_else(
-        label == "log_devs" & module_type == "BevertonHolt",
-        NA_character_,
-        distribution
-      )
-    ) |>
-    dplyr::filter(!(module_name == "Recruitment" & label == "log_sd"))
-
-  saveRDS(
-    modified_parameters_constant,
-    file = testthat::test_path("fixtures", "parameters_model_comparison_project.RDS"),
-    compress = FALSE
-  )
-
   ## Estimation run with age and length comp using wrappers ----
   # Run FIMS using the setup_and_run_FIMS_with_wrappers function
   fit_age_length_comp <- setup_and_run_FIMS_with_wrappers(
@@ -254,7 +227,7 @@ prepare_test_data <- function() {
     om_output_list = om_output_list,
     em_input_list = em_input_list,
     estimation_mode = TRUE,
-    modified_parameters = modified_parameters_constant
+    modified_parameters = modified_parameters
   )
 
   clear()
@@ -271,43 +244,7 @@ prepare_test_data <- function() {
   data_age_comp <- readRDS(testthat::test_path("fixtures", "data_age_comp.RDS"))
 
   # Run FIMS model
-  fit_agecomp <- suppressWarnings(
-    suppressMessages(modified_parameters |>
-      # remove rows that have module_type == LengthComp
-      dplyr::rows_delete(
-        y = tibble::tibble(module_type = "LengthComp")
-      ) |>
-      initialize_fims(data = data_age_comp) |>
-      fit_fims(optimize = TRUE))
-  )
-
-  clear()
-
-  # Save FIMS results as a test fixture for additional fimsfit tests
-  saveRDS(
-    fit_agecomp,
-    file = testthat::test_path("fixtures", "fit_agecomp.RDS"),
-    compress = FALSE
-  )
-
-  ## Estimation run with age comp only using wrappers ----
-  modified_parameters_random_effects <- modified_parameters |>
-    dplyr::mutate(
-      estimation_type = dplyr::if_else(
-        label == "log_devs" & module_type == "BevertonHolt",
-        "random_effects",
-        estimation_type
-      )
-    )
-
-  saveRDS(
-    modified_parameters_random_effects,
-    file = testthat::test_path("fixtures", "parameters_model_comparison_project_random_effects.RDS"),
-    compress = FALSE
-  )
-
-  # Run FIMS model
-  fit_agecomp_random_effects <- modified_parameters_random_effects |>
+  fit_agecomp <- modified_parameters |>
     # remove rows that have module_type == LengthComp
     dplyr::rows_delete(
       y = tibble::tibble(module_type = "LengthComp")
@@ -319,23 +256,77 @@ prepare_test_data <- function() {
 
   # Save FIMS results as a test fixture for additional fimsfit tests
   saveRDS(
-    fit_agecomp_random_effects,
-    file = testthat::test_path("fixtures", "fit_agecomp_random_effects.RDS"),
+    fit_agecomp,
+    file = testthat::test_path("fixtures", "fit_agecomp.RDS"),
+    compress = FALSE
+  )
+
+  ## Estimation run with age comp only using wrappers ----
+  modified_parameters_fixed_effects <- modified_parameters |>
+    dplyr::mutate(
+      estimation_type = dplyr::if_else(
+        label == "log_devs" & module_type == "BevertonHolt",
+        "fixed_effects",
+        estimation_type
+      )
+    ) |>
+    # Update log_sd for log_devs in the Recruitment module
+    # Note: logR_sd is the standard deviation on the natural scale of the
+    # log recruitment deviations. We take the log of it to match the
+    # parameterization in the model, which expects a log-transformed
+    # parameter value.
+    dplyr::rows_update(
+      tibble::tibble(
+        module_name = "Recruitment",
+        label = "log_sd",
+        estimation_type = "constant",
+        value = log(om_input_list[[iter_id]][["logR_sd"]])
+      ),
+      by = c("module_name", "label")
+    )
+
+  saveRDS(
+    modified_parameters_fixed_effects,
+    file = testthat::test_path("fixtures", "parameters_model_comparison_project_fixed_effects.RDS"),
+    compress = FALSE
+  )
+  deterministic_age_length_comp_fixed_effects <- modified_parameters_fixed_effects |>
+    initialize_fims(data = data_age_length_comp) |>
+    fit_fims(optimize = FALSE)
+
+  clear()
+
+  # Save FIMS results as a test fixture for additional fimsfit tests
+  saveRDS(
+    deterministic_age_length_comp_fixed_effects,
+    file = testthat::test_path("fixtures", "deterministic_age_length_comp_fixed_effects.RDS"),
+    compress = FALSE
+  )
+
+  # Run FIMS model
+  fit_age_length_comp_fixed_effects <- modified_parameters_fixed_effects |>
+    initialize_fims(data = data_age_length_comp) |>
+    fit_fims(optimize = TRUE)
+
+  clear()
+
+  # Save FIMS results as a test fixture for additional fimsfit tests
+  saveRDS(
+    fit_age_length_comp_fixed_effects,
+    file = testthat::test_path("fixtures", "fit_age_length_comp_fixed_effects.RDS"),
     compress = FALSE
   )
 
   # Load a second dataset that contains missing age composition data
   data_age_comp_na <- readRDS(testthat::test_path("fixtures", "data_age_comp_na.RDS"))
   # Fit the FIMS model using the second dataset (with missing values)
-  fit_agecomp_na <- suppressWarnings(
-    suppressMessages(modified_parameters |>
-      # remove rows that have module_type == LengthComp
-      dplyr::rows_delete(
-        y = tibble::tibble(module_type = "LengthComp")
-      ) |>
-      initialize_fims(data = data_age_comp_na) |>
-      fit_fims(optimize = TRUE))
-  )
+  fit_agecomp_na <- modified_parameters |>
+    # remove rows that have module_type == LengthComp
+    dplyr::rows_delete(
+      y = tibble::tibble(module_type = "LengthComp")
+    ) |>
+    initialize_fims(data = data_age_comp_na) |>
+    fit_fims(optimize = TRUE)
 
   clear()
 
@@ -351,17 +342,13 @@ prepare_test_data <- function() {
   data_length_comp <- readRDS(testthat::test_path("fixtures", "data_length_comp.RDS"))
 
   # Run FIMS model
-  fit_lengthcomp <- suppressWarnings(
-    suppressMessages(
-      modified_parameters |>
-        # remove rows that have module_type == AgeComp
-        dplyr::rows_delete(
-          y = tibble::tibble(module_type = "AgeComp")
-        ) |>
-        initialize_fims(data = data_length_comp) |>
-        fit_fims(optimize = TRUE)
-    )
-  )
+  fit_lengthcomp <- modified_parameters |>
+    # remove rows that have module_type == AgeComp
+    dplyr::rows_delete(
+      y = tibble::tibble(module_type = "AgeComp")
+    ) |>
+    initialize_fims(data = data_length_comp) |>
+    fit_fims(optimize = TRUE)
 
   clear()
 
@@ -375,17 +362,13 @@ prepare_test_data <- function() {
   # Load a second dataset that contains missing length composition data
   data_length_comp_na <- readRDS(testthat::test_path("fixtures", "data_length_comp_na.RDS"))
   # Fit the FIMS model using the second dataset (with missing values)
-  fit_lengthcomp_na <- suppressWarnings(
-    suppressMessages(
-      modified_parameters |>
-        # remove rows that have module_type == LengthComp
-        dplyr::rows_delete(
-          y = tibble::tibble(module_type = "AgeComp")
-        ) |>
-        initialize_fims(data = data_length_comp_na) |>
-        fit_fims(optimize = TRUE)
-    )
-  )
+  fit_lengthcomp_na <- modified_parameters |>
+    # remove rows that have module_type == LengthComp
+    dplyr::rows_delete(
+      y = tibble::tibble(module_type = "AgeComp")
+    ) |>
+    initialize_fims(data = data_length_comp_na) |>
+    fit_fims(optimize = TRUE)
 
   clear()
 
@@ -406,13 +389,11 @@ prepare_test_data <- function() {
   # * Update parameters if any modifications are provided
   # * Initialize FIMS with the provided data (age and length composition with missing values)
   # * Fit the FIMS model with optimization enabled
-  fit_age_length_comp_na <- suppressWarnings(
-    suppressMessages(initialize_fims(
-      parameters = modified_parameters,
-      data = data_age_length_comp_na
-    ) |>
-      fit_fims(optimize = TRUE))
-  )
+  fit_age_length_comp_na <- initialize_fims(
+    parameters = modified_parameters,
+    data = data_age_length_comp_na
+  ) |>
+    fit_fims(optimize = TRUE)
 
   clear()
 
