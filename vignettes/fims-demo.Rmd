@@ -191,7 +191,7 @@ parameters_4_model <- default_parameters |>
     tibble::tibble(
       fleet_name = "fleet1",
       label = "log_Fmort",
-      time = 1:30,
+      time = 1:get_n_years(data_4_model),
       value = log(c(
         0.009459165, 0.027288858, 0.045063639,
         0.061017825, 0.048600752, 0.087420554,
@@ -220,7 +220,7 @@ parameters_4_model <- default_parameters |>
   dplyr::rows_update(
     tibble::tibble(
       label = "log_devs",
-      time = 2:30,
+      time = 2:get_n_years(data_4_model),
       value = c(
         0.43787763, -0.13299042, -0.43251973, 0.64861200, 0.50640852,
         -0.06958319, 0.30246260, -0.08257384, 0.20740372, 0.15289604,
@@ -254,7 +254,7 @@ parameters_4_model <- default_parameters |>
   dplyr::rows_update(
     tibble::tibble(
       label = "log_init_naa",
-      age = 1:12,
+      age = 1:get_n_ages(data_4_model),
       value = c(
         13.80944, 13.60690, 13.40217, 13.19525, 12.98692, 12.77791,
         12.56862, 12.35922, 12.14979, 11.94034, 11.73088, 13.18755
@@ -303,6 +303,7 @@ dim(log_data_frame)
 dplyr::count(log_data_frame, level)
 # Subset for just the warnings
 log_data_frame |> dplyr::filter(level == "warning")
+
 clear()
 ```
 

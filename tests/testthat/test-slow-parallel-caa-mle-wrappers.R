@@ -59,7 +59,7 @@ modified_parameters <- purrr::map(1:sim_num, \(iter_id) {
       tibble::tibble(
         fleet_name = "fleet1",
         label = "log_Fmort",
-        time = 1:30,
+        time = 1:get_n_years(data_age_length_comp),
         value = log(om_output_list[[iter_id]][["f"]]),
       ),
       by = c("fleet_name", "label", "time")
@@ -77,12 +77,8 @@ modified_parameters <- purrr::map(1:sim_num, \(iter_id) {
     dplyr::rows_update(
       tibble::tibble(
         label = "log_devs",
-        time = 2:30,
-        value = om_input_list[[iter_id]][["logR.resid"]][-1],
-        # TODO: integration tests fail after setting recruitment log_devs all estimable.
-        # We need to debug the issue, then change constant to fixed_effects.
-        # estimation_type = "fixed_effects"
-        estimation_type = "constant"
+        time = 2:get_n_years(data_age_length_comp),
+        value = om_input_list[[iter_id]][["logR.resid"]][-1]
       ),
       by = c("label", "time")
     ) |>
@@ -111,7 +107,7 @@ modified_parameters <- purrr::map(1:sim_num, \(iter_id) {
     dplyr::rows_update(
       tibble::tibble(
         label = "log_init_naa",
-        age = 1:12,
+        age = 1:get_n_ages(data_age_length_comp),
         value = log(om_output_list[[iter_id]][["N.age"]][1, ])
       ),
       by = c("label", "age")

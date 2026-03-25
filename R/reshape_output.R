@@ -28,6 +28,21 @@ utils::globalVariables(c(
 #'   family.
 #' @return A tibble containing the reshaped parameter estimates.
 reshape_json_estimates <- function(model_output) {
+  # Helper functions
+  join_density_information <- function(x, density_tibble) {
+    dplyr::left_join(x,
+      y = dplyr::filter(
+        density_tibble,
+        input_type == "random_effects"
+      ) |>
+        dplyr::select(-module_name, -module_id, -module_type),
+      by = c(
+        "estimation_type" = "input_type",
+        "estimated_value" = "observed_values"
+      )
+    )
+  }
+
   json_list <- jsonlite::fromJSON(model_output, simplifyVector = FALSE)
   read_list <- purrr::map(
     json_list[!names(json_list) %in% c(
@@ -37,6 +52,16 @@ reshape_json_estimates <- function(model_output) {
     )],
     \(x) tidyr::unnest_wider(tibble::tibble(json = x), json)
   )
+
+
+  # Process the density components
+  # TODO: Still need links to the parameter id because we are just joining by
+  #       parameter values, which is fragile
+  density_information <- read_list[["density_components"]] |>
+    dplyr::mutate(
+      density_component = purrr::map(density_component, density_to_tibble)
+    ) |>
+    tidyr::unnest(density_component)
 
   # Process the module parameters
   module_information <- purrr::map_df(
@@ -56,7 +81,8 @@ reshape_json_estimates <- function(model_output) {
       )
     )
   ) |>
-    tidyr::unnest(parameters)
+    tidyr::unnest(parameters) |>
+    join_density_information(density_information)
 
   # Process the fleet-level information
   fleet_density_data <- read_list[["fleets"]] |>
@@ -125,15 +151,6 @@ reshape_json_estimates <- function(model_output) {
     tidyr::unnest(c(dimensionality, value, uncertainty)) |>
     dplyr::mutate(value = unlist(value), uncertainty = unlist(uncertainty))
 
-  # Process the density components
-  # This is done above for fleet information but we will need to do it for
-  # parameter-level information once we have a link to the parameter id
-  density_information <- read_list[["density_components"]] |>
-    dplyr::mutate(
-      density_component = purrr::map(density_component, density_to_tibble)
-    ) |>
-    tidyr::unnest(density_component)
-
   # Process the population data
   population_information <- read_list[["populations"]] |>
     tidyr::pivot_longer(
@@ -149,12 +166,12 @@ reshape_json_estimates <- function(model_output) {
         \(x) purrr::map_df(x, dimension_folded_to_tibble)
       )
     ) |>
-    tidyr::unnest(parameters)
+    tidyr::unnest(parameters) |>
+    join_density_information(density_information)
 
   # TODO: Change some column names
   # Bring everything together
   out <- dplyr::bind_rows(
-    # density_information,
     fleet_information,
     module_information,
     population_information
