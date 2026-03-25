@@ -582,8 +582,8 @@ methods::setMethod(
 # methods::setMethod: plot ----
 #' Plot a `FIMSFrame` object
 #'
-#' Use `ggplot2::geom_point()` to plot summary information stored in the data slot
-#' of the `FIMSFrame` class.
+#' Use `ggplot2::geom_point()` to plot summary information stored in the data
+#' slot of the `FIMSFrame` class.
 #'
 #' @param x A `FIMSFrame` object.
 #' @param y Unused (inherited from R base).
@@ -600,14 +600,11 @@ methods::setMethod(
 #' plot(data_4_model)
 #' }
 #'
-#' @export
+#' @importFrom graphics plot
 #' @method plot FIMSFrame
 #' @rdname plot
 #' @aliases plot,FIMSFrame,missing-method
-#' @exportMethod plot
-setGeneric("plot", function(x, y, ...) {
-  standardGeneric("plot")
-})
+# Keep the method internal so attaching FIMS does not mask graphics::plot.
 methods::setMethod(
   f = "plot",
   signature = c(x = "FIMSFrame", y = "missing"),
