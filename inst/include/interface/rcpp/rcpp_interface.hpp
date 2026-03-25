@@ -361,9 +361,7 @@ std::string get_log_info() { return fims::FIMSLog::fims_log->get_info(); }
 /**
  * @brief If true, writes the log on exit.
  */
-void write_log(bool write) {
-  fims::FIMSLog::fims_log->write_on_exit = write;
-}
+void write_log(bool write) { fims::FIMSLog::fims_log->write_on_exit = write; }
 
 /**
  * @brief Sets the path for the log file to be written to.

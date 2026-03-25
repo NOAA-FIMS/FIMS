@@ -154,8 +154,8 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
       std::shared_ptr<PopulationInterfaceBase> &pop = (*pit).second;
       pop->initialize_catch_at_age.set(true);
     } else {
-      FIMS_ERROR_LOG("CatchAtAge::AddPopulation: Population with id " + fims::to_string(id) +
-                     " not found.");
+      FIMS_ERROR_LOG("CatchAtAge::AddPopulation: Population with id " +
+                     fims::to_string(id) + " not found.");
     }
   }
 
@@ -482,7 +482,8 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
 
     if (!fleet_interface) {
       FIMS_ERROR_LOG(
-          "CatachAtAge::fleet_to_json: Fleet pointer is null; cannot get id. Not found in live objects.");
+          "CatachAtAge::fleet_to_json: Fleet pointer is null; cannot get id. "
+          "Not found in live objects.");
       return "{}";  // Return empty JSON
     }
 
@@ -661,20 +662,30 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
 #endif
 
     double value;
-    FIMS_INFO_LOG(std::string("Calling Model::Evaluate for model id ") + fims::to_string(this->get_id()));
+    FIMS_INFO_LOG(std::string("Calling Model::Evaluate for model id ") +
+                  fims::to_string(this->get_id()));
     try {
       value = model_internal->Evaluate();
       if (std::isnan(value) || std::isinf(value)) {
-        FIMS_ERROR_LOG(std::string("Model::Evaluate returned NaN/Inf for model id ") + fims::to_string(this->get_id()));
+        FIMS_ERROR_LOG(
+            std::string("Model::Evaluate returned NaN/Inf for model id ") +
+            fims::to_string(this->get_id()));
       } else {
-        FIMS_INFO_LOG(std::string("Model::Evaluate returned value ") + std::to_string(value) + " for model id " + fims::to_string(this->get_id()));
+        FIMS_INFO_LOG(std::string("Model::Evaluate returned value ") +
+                      std::to_string(value) + " for model id " +
+                      fims::to_string(this->get_id()));
       }
     } catch (const std::exception &e) {
-      FIMS_ERROR_LOG(std::string("Exception during Model::Evaluate for model id ") + fims::to_string(this->get_id()) + ": " + std::string(e.what()));
+      FIMS_ERROR_LOG(
+          std::string("Exception during Model::Evaluate for model id ") +
+          fims::to_string(this->get_id()) + ": " + std::string(e.what()));
       value = static_cast<double>(0.0);
       throw e;
     } catch (...) {
-      FIMS_ERROR_LOG(std::string("Unknown exception during Model::Evaluate for model id ") + fims::to_string(this->get_id()));
+      FIMS_ERROR_LOG(
+          std::string(
+              "Unknown exception during Model::Evaluate for model id ") +
+          fims::to_string(this->get_id()));
       value = static_cast<double>(0.0);
       throw;
     }
@@ -798,7 +809,8 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
         population_interface->finalize();
         ss << this->population_to_json(population_interface.get()) << ",";
       } else {
-        FIMS_ERROR_LOG("CatchAtAge::population_to_json: Population with id " + fims::to_string(*pop_it) +
+        FIMS_ERROR_LOG("CatchAtAge::population_to_json: Population with id " +
+                       fims::to_string(*pop_it) +
                        " not found in live objects.");
         ss << "{}";  // Return empty JSON for this population
       }
@@ -815,8 +827,8 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
       }
       ss << this->population_to_json(population_interface.get());
     } else {
-      FIMS_ERROR_LOG("CatchAtAge::to_json: Population with id " + fims::to_string(*pop_it) +
-                     " not found in live objects.");
+      FIMS_ERROR_LOG("CatchAtAge::to_json: Population with id " +
+                     fims::to_string(*pop_it) + " not found in live objects.");
       ss << "{}";  // Return empty JSON for this population
     }
 
@@ -841,7 +853,8 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
         fleet_interface->finalize();
         ss << this->fleet_to_json(fleet_interface.get()) << ",";
       } else {
-        FIMS_ERROR_LOG("CatchAtAge::to_json: Fleet with id " + fims::to_string(*fleet_it) +
+        FIMS_ERROR_LOG("CatchAtAge::to_json: Fleet with id " +
+                       fims::to_string(*fleet_it) +
                        " not found in live objects.");
         ss << "{}";  // Return empty JSON for this fleet
       }
@@ -852,7 +865,8 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
     if (fleet_interface) {
       ss << this->fleet_to_json(fleet_interface.get());
     } else {
-      FIMS_ERROR_LOG("CatchAtAge::to_json: Fleet with id " + fims::to_string(*fleet_it) +
+      FIMS_ERROR_LOG("CatchAtAge::to_json: Fleet with id " +
+                     fims::to_string(*fleet_it) +
                      " not found in live objects.");
       ss << "{}";  // Return empty JSON for this fleet
     }
