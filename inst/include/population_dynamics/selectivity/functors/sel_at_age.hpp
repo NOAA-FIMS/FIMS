@@ -28,12 +28,7 @@ namespace fims_popdy {
 template <typename Type>
 struct SelectivityatAge : public SelectivityBase<Type> {
   fims::Vector<Type>
-      inflection_point;     /**< 50% quantile of the value of the quantity of
-  interest (x); e.g. age at which 50% of the fish are selected */
-  fims::Vector<Type> slope; /**<scalar multiplier of difference between quantity
-            of interest value (x) and inflection_point. Positive values create
-            an ascending curve (0 to 1), negative values create a descending
-            curve (1 to 0). */
+      logit_sel_at_age;     // update definition
 
   LogisticSelectivity() : SelectivityBase<Type>() {}
 
@@ -54,6 +49,9 @@ struct SelectivityatAge : public SelectivityBase<Type> {
    * size in selectivity).
    */
   virtual const Type evaluate(const Type &x) {
+    //return fims_math::inv_logit<Type>(logit_sel_at_age[x]); // AJ: figure out default rules for x (always starts at 1? guaranteed to run through all n_ages)
+      //AJ: we can add conditionals in case x
+      //AJ: run past Kelli/Nathan/Ian
     return fims_math::logistic<Type>(inflection_point[0], slope[0], x);
   }
 
@@ -62,6 +60,9 @@ struct SelectivityatAge : public SelectivityBase<Type> {
    * @param pos Position index, e.g., which year.
    */
   virtual const Type evaluate(const Type &x, size_t pos) {
+    //formula for i_age_year
+    size_t i_age_year = pos * this->n_ages + x; // might need adjustment if x starts at 1
+    //return fims_math::inv_logit<Type>(logit_sel_at_age[i_age_year]);
     return fims_math::logistic<Type>(inflection_point.get_force_scalar(pos),
                                      slope.get_force_scalar(pos), x);
   }

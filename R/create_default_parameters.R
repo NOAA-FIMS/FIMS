@@ -357,8 +357,8 @@ create_default_SelectivityatAge <- function(
     dplyr::mutate(
       module_name = !!module_name,
       module_type = "SelectivityatAge",
-      label = "sel_at_age"
-      age = get_ages(data)
+      label = "logit_sel_at_age",
+      age = get_ages(data),
       # default selectivity_at_age based on what would be defaults from logistic 
       # curve with inflection point 2 and slope 1:
       value = logit(1/(1+exp(get_ages(data)-2))),

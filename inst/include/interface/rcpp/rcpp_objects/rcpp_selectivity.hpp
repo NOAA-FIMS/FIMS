@@ -687,24 +687,16 @@ class SelectivityatAgeInterface : public SelectivityInterfaceBase {
                        " not found in Information.");
       return;
     } else {
-      std::shared_ptr<fims_popdy::LogisticSelectivity<double>> sel =
-          std::dynamic_pointer_cast<fims_popdy::LogisticSelectivity<double>>(
+      std::shared_ptr<fims_popdy::SelectivityatAge<double>> sel =
+          std::dynamic_pointer_cast<fims_popdy::SelectivityatAge<double>>(
               it->second);
-
+      // AJ: remove calls to old parameters, add in logit_sel_at_age (find+replace)
       for (size_t i = 0; i < inflection_point.size(); i++) {
         if (this->inflection_point[i].estimation_type_m.get() == "constant") {
           this->inflection_point[i].final_value_m =
               this->inflection_point[i].initial_value_m;
         } else {
           this->inflection_point[i].final_value_m = sel->inflection_point[i];
-        }
-      }
-
-      for (size_t i = 0; i < slope.size(); i++) {
-        if (this->slope[i].estimation_type_m.get() == "constant") {
-          this->slope[i].final_value_m = this->slope[i].initial_value_m;
-        } else {
-          this->slope[i].final_value_m = sel->slope[i];
         }
       }
     }
@@ -724,23 +716,15 @@ class SelectivityatAgeInterface : public SelectivityInterfaceBase {
     ss << " \"module_type\": \"Logistic\",\n";
     ss << " \"module_id\": " << this->id << ",\n";
 
+    // Find and replace inflection_point with logit_sel_at_age
     ss << " \"parameters\": [\n{\n";
     ss << "   \"name\": \"inflection_point\",\n";
     ss << "   \"id\":" << this->inflection_point.id_m << ",\n";
     ss << "   \"type\": \"vector\",\n";
     ss << " \"dimensionality\": {\n";
     ss << "  \"header\": [null],\n";
-    ss << "  \"dimensions\": [1]\n},\n";
+    ss << "  \"dimensions\": [1]\n},\n"; //AJ: need to update dimensions n_age somehow
     ss << "   \"values\":" << this->inflection_point << "},\n ";
-
-    ss << "{\n";
-    ss << "   \"name\": \"slope\",\n";
-    ss << "   \"id\":" << this->slope.id_m << ",\n";
-    ss << "   \"type\": \"vector\",\n";
-    ss << " \"dimensionality\": {\n";
-    ss << "  \"header\": [null],\n";
-    ss << "  \"dimensions\": [1]\n},\n";
-    ss << "   \"values\":" << this->slope << "}]\n";
 
     ss << "}";
 
@@ -759,7 +743,10 @@ class SelectivityatAgeInterface : public SelectivityInterfaceBase {
     std::stringstream ss;
     // set relative info
     selectivity->id = this->id;
+    //add n_ages
+    //AJ: find-and-replace, remove other parameter
     selectivity->inflection_point.resize(this->inflection_point.size());
+
     for (size_t i = 0; i < this->inflection_point.size(); i++) {
       selectivity->inflection_point[i] =
           this->inflection_point[i].initial_value_m;
