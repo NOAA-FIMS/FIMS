@@ -393,7 +393,6 @@ inline const Type ddiric_multinom(const fims::Vector<Type> &x,
                                          const Type &theta, 
                                          int give_log = 0) 
 {
-    // Use the FIMS custom sum function defined below in the file
     Type n = fims_math::sum(x);
     Type theta_n = theta * n;             
     
