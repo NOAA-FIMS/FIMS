@@ -1,3 +1,7 @@
+# FIMS 0.9.2
+
+* Fixes Rcpp creation of a new Parameter when the input is not valid
+
 # FIMS 0.9.1
 
 * Adds vignette on FIMSFrame and data_big
