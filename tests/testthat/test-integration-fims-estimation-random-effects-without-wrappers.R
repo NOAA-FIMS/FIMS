@@ -43,6 +43,8 @@ test_that("catch-at-age model (deterministic MLE without wrappers) works with co
     om_output = om_output_list[[iter_id]],
     em_input = em_input_list[[iter_id]]
   )
+}
+)
 
 # Compare FIMS log_devs with log_r approach results with model comparison project OM values
 test_that("results from recruitment random effects on log_devs equals log_r", {

@@ -326,14 +326,19 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
     }
     if (random_effects[["recruitment"]] == "log_r") {
       recruitment$log_r$resize(om_input[["nyr"]] - 1)
+      recruits_true <- matrix(c(t(om_output[["N.age"]])), 30, 12, byrow = TRUE)[,1]
       for (y in 1:(om_input[["nyr"]] - 1)) {
-        recruitment$log_r[y]$value <- om_input[["logR.resid"]][y + 1] + log(om_input[["R0"]])
+        if(!estimation_mode){
+          recruitment$log_r[y]$value <- recruits_true[y+1]
+        } else {
+          recruitment$log_r[y]$value <- 0
+        }
+        recruitment$log_r$set_all_random(TRUE)
       }
-      recruitment$log_r$set_all_random(TRUE)
     }
-  }
-  if (is.null(random_effects)) {
-    recruitment$log_devs$set_all_estimable(TRUE)
+    if (is.null(random_effects)) {
+      recruitment$log_devs$set_all_estimable(TRUE)
+    }
   }
 
   if ("selectivity" %in% names(random_effects)) {
@@ -358,12 +363,7 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   # taken before the likelihood calculation
   recruitment_distribution$log_sd$resize(1)
   recruitment_distribution$log_sd[1]$value <- log(om_input[["logR_sd"]])
-  recruitment_distribution$observed_values$resize(om_input[["nyr"]] - 1)
-  recruitment_distribution$expected_values$resize(om_input[["nyr"]] - 1)
-  for (i in 1:(om_input[["nyr"]] - 1)) {
-    recruitment_distribution$observed_values[i]$value <- 0
-    recruitment_distribution$expected_values[i]$value <- 0
-  }
+ 
   if ("recruitment" %in% names(random_effects)) {
     if (random_effects[["recruitment"]] == "log_devs") {
       recruitment_distribution$log_sd[1]$estimation_type$set("fixed_effects")
@@ -453,17 +453,25 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
     )
     FIMS::set_fixed(opt$par)
     fims_finalized <- caa$get_output()
+
+    sdr <- TMB::sdreport(obj)
+    sdr_report <- summary(sdr, "report")
+    sdr_fixed <- summary(sdr, "fixed")
+    sdr_random <- summary(sdr, "random")
+    row.names(sdr_fixed) <- names(FIMS:::get_parameter_names(sdr_fixed[, 1]))
+  } else {
+    sdr <- list()
+    sdr_report <- list()
+    sdr_fixed <- matrix(obj[["env"]]$parList()[["p"]], ncol = 1, dimnames = list(NULL, "Estimate"))
+    sdr_random <- matrix(obj[["env"]]$parList()[["re"]], ncol = 1, dimnames = list(NULL, "Estimate"))
+    row.names(sdr_fixed) <- names(FIMS:::get_parameter_names(sdr_fixed[, 1]))
+    row.names(sdr_random) <- names(FIMS:::get_random_names(sdr_random[, 1]))
   }
 
   # Call report using MLE parameter values, or
   # the input values if optimization is skipped
   report <- obj[["report"]](obj[["env"]][["last.par.best"]])
-
-
-  sdr <- TMB::sdreport(obj)
-  sdr_report <- summary(sdr, "report")
-  sdr_fixed <- summary(sdr, "fixed")
-  row.names(sdr_fixed) <- names(FIMS:::get_parameter_names(sdr_fixed[, 1]))
+  
 
   clear()
 
@@ -475,6 +483,7 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
     report = report,
     sdr_report = sdr_report,
     sdr_fixed = sdr_fixed,
+    sdr_random = sdr_random,
     sdr = sdr
   ))
 }
