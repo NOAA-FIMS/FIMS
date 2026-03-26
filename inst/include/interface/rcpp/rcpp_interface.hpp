@@ -84,7 +84,6 @@ bool CreateTMBModel() {
       fims_info::Information<TMBAD_FIMS_TYPE>::GetInstance();
   info->Clear();
 
-  
   for (size_t i = 0; i < FIMSRcppInterfaceBase::fims_interface_objects.size();
        i++) {
     FIMSRcppInterfaceBase::fims_interface_objects[i]->add_to_fims_tmb();
@@ -357,9 +356,7 @@ std::string get_log_info() { return fims::FIMSLog::fims_log->get_info(); }
 /**
  * @brief If true, writes the log on exit.
  */
-void write_log(bool write) {
-  fims::FIMSLog::fims_log->write_on_exit = write;
-}
+void write_log(bool write) { fims::FIMSLog::fims_log->write_on_exit = write; }
 
 /**
  * @brief Sets the path for the log file to be written to.
