@@ -397,10 +397,10 @@ inline const Type ddiric_multinom(const fims::Vector<Type> &x,
     Type theta_n = theta * n;             
     
     // 1. Base Multinomial combinatorial term: log(n!) = lgamma(n + 1)
-    Type log_like = fims_math::lgamma(n + static_cast<Type>(1.0));
+    Type log_like = ::lgamma(n + static_cast<Type>(1.0));
     
     // 2. Dirichlet base precision terms: log(Gamma(theta*n)) - log(Gamma(n + theta*n))
-    log_like += fims_math::lgamma(theta_n) - fims_math::lgamma(n + theta_n);
+    log_like += ::lgamma(theta_n) - ::lgamma(n + theta_n);
     
     // 3. Category-specific terms requiring a loop for compatibility
     for (size_t i = 0; i < x.size(); ++i) {
@@ -409,10 +409,10 @@ inline const Type ddiric_multinom(const fims::Vector<Type> &x,
         Type x_i = x[i];
 
         // Subtract log(x_i!)
-        log_like -= fims_math::lgamma(x_i + static_cast<Type>(1.0));
+        log_like -= ::lgamma(x_i + static_cast<Type>(1.0));
 
         // Add log(Gamma(x_i + alpha_i)) - log(Gamma(alpha_i))
-        log_like += fims_math::lgamma(x_i + alpha_i) - fims_math::lgamma(alpha_i);
+        log_like += ::lgamma(x_i + alpha_i) - ::lgamma(alpha_i);
     }
 
     if (give_log) {
