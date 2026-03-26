@@ -98,7 +98,6 @@ class Parameter {
    * If the input value is not valid, it throws an error with a descriptive message.
    * @param value An R object that should be a single numeric value for the parameter.
    * @throws Rcpp::stop if the input value is not a single numeric value or is NaN or Inf.
-   * @return A Parameter object initialized with the provided value.
    */
   Parameter(SEXP value) {
     if (TYPEOF(value) != REALSXP || Rf_xlength(value) != 1) {
