@@ -377,6 +377,7 @@ QNXNTO
 RData
 Rds
 README
+REALSXP
 RObject
 RStudio
 Rbuildignore
@@ -804,6 +805,7 @@ iostream
 isClass
 isDouble
 isdigit
+isfinite
 isinf
 isnan
 isspace
@@ -1239,6 +1241,7 @@ www
 xData
 xlab
 xlen
+xlength
 xp
 yearf
 yearm
