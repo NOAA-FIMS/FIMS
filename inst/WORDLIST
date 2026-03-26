@@ -99,6 +99,7 @@ Codespaces
 ComputeProportions
 ConfigRoutine
 ConfigurePopulationModel
+ConfigRoutine
 Const
 ConstraintWorks
 CppAD
@@ -158,6 +159,7 @@ ELT
 ENDIF
 EOF
 EQ
+ErrorRoutine
 EWAA
 EWAAGrowth
 EWAAGrowthInterface
@@ -508,8 +510,8 @@ widehat
 WriteAtExit
 WriteJsonValue
 WriteRoutine
-WritesLogToConfiguredPathOnDestruction
 WriteToFile
+WritesLogToConfiguredPathOnDestruction
 YJmYGEPuE
 ZAA
 absolutePath
