@@ -1173,7 +1173,7 @@ class DDirichletMultinomialDistributionsInterface : public DistributionsInterfac
    */
   DDirichletMultinomialDistributionsInterface() : DistributionsInterfaceBase() {
     DistributionsInterfaceBase::live_objects[this->id_m] =
-        std::make_shared<DirichletMultinomialDistributionsInterface>(*this);
+        std::make_shared<DDirichletMultinomialDistributionsInterface>(*this);
     FIMSRcppInterfaceBase::fims_interface_objects.push_back(
         DistributionsInterfaceBase::live_objects[this->id_m]);
   }
@@ -1183,7 +1183,8 @@ class DDirichletMultinomialDistributionsInterface : public DistributionsInterfac
    *
    * @param other
    */
-  DirichletMultinomialDistributionsInterface(const DirichletMultinomialDistributionsInterface &other)
+  DDirichletMultinomialDistributionsInterface(
+    const DDirichletMultinomialDistributionsInterface &other)
       : DistributionsInterfaceBase(other),
         observed_values(other.observed_values),
         expected_values(other.expected_values),
@@ -1245,7 +1246,7 @@ class DDirichletMultinomialDistributionsInterface : public DistributionsInterfac
     // Declare TMBVector in this scope
     dirichlet_multinomial.observed_values.resize(this->observed_values.size());
     dirichlet_multinomial.expected_values.resize(this->expected_values.size());
-    dirichlet_multinomial.theta = this->theta;
+    dirichlet_multinomial.theta = this->theta.initial_value_m;
     for (size_t i = 0; i < observed_values.size(); i++) {
       dirichlet_multinomial.observed_values[i] = this->observed_values[i].initial_value_m;
     }

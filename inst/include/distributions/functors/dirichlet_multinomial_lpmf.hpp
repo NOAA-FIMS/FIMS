@@ -13,6 +13,7 @@
 #include "density_components_base.hpp"
 #include "../../common/fims_vector.hpp"
 #include "../../common/def.hpp"
+#include "../../common/fims_math.hpp"
 
 namespace fims_distributions {
 /**
@@ -145,7 +146,7 @@ struct Dirichlet_multinomialLPMF : public DensityComponentBase<Type> {
       if (!containsNA) {
         std::fill(this->lpdf_vec.begin() + lpdf_vec_idx,
                   this->lpdf_vec.begin() + lpdf_vec_idx + dims[1],
-                  ddiric_multinom(observed_values_vector,
+                  fims_math::ddiric_multinom(observed_values_vector,
                             prob_vector, this->theta, true));
 
         this->lpdf += this->lpdf_vec[lpdf_vec_idx];

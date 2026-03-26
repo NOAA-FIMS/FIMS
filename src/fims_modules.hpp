@@ -462,24 +462,25 @@ RCPP_MODULE(fims) {
              &DmultinomDistributionsInterface::expected_values)
       .field("dims", &DmultinomDistributionsInterface::dims);
 
-  Rcpp::class_<DDirichletMultinomDistributionsInterface>(
+  Rcpp::class_<DDirichletMultinomialDistributionsInterface>(
       "DDirichletMultinomDistribution",
       "See "
       "https://noaa-fims.github.io/FIMS/doxygen/"
       "classDDirichletMultinomDistributionsInterface.html.")
       .constructor()
-      .method("get_id", &DDirichletMultinomDistributionsInterface::get_id)
-      .method("evaluate", &DDirichletMultinomDistributionsInterface::evaluate)
+      .method("get_id", &DDirichletMultinomialDistributionsInterface::get_id)
+      .method("evaluate", &DDirichletMultinomialDistributionsInterface::evaluate)
       .method("set_observed_data",
-              &DDirichletMultinomDistributionsInterface::set_observed_data)
+              &DDirichletMultinomialDistributionsInterface::set_observed_data)
       .method("set_distribution_links",
-              &DDirichletMultinomDistributionsInterface::set_distribution_links)
-      .method("set_note", &DDirichletMultinomDistributionsInterface::set_note)
+              &DDirichletMultinomialDistributionsInterface::set_distribution_links)
+      .method("set_note", &DDirichletMultinomialDistributionsInterface::set_note)
       .field("observed_values",
-             &DDirichletMultinomDistributionsInterface::observed_values)
+             &DDirichletMultinomialDistributionsInterface::observed_values)
       .field("expected_values",
-             &DDirichletMultinomDistributionsInterface::expected_values)
-      .field("dims", &DDirichletMultinomDistributionsInterface::dims);
+             &DDirichletMultinomialDistributionsInterface::expected_values)
+      .field("dims", &DDirichletMultinomialDistributionsInterface::dims)
+      .field("theta", &DDirichletMultinomialDistributionsInterface::theta);
 
   Rcpp::class_<CatchAtAgeInterface>(
       "CatchAtAge",
