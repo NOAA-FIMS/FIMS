@@ -1170,7 +1170,7 @@ class DDirichletMultinomialDistributionsInterface : public DistributionsInterfac
   }
 
   /**
-   * @brief Construct a new DdirichletMultinomial Distributions Interface object
+   * @brief Construct a new DDirichletMultinomial Distributions Interface object
    *
    * @param other
    */
