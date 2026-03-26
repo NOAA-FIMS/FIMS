@@ -138,6 +138,7 @@ Dmultinom
 DmultinomDistribution
 DmultinomDistributions
 DmultinomDistributionsInterface
+DDirichletMultinomialDistributionsInterface
 Dnorm
 DnormDistribution
 DnormDistributionsInterface
