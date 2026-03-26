@@ -41,6 +41,7 @@ databucket
 dataframe
 dataframes
 DCMAKE
+DDirichletMultinomialDistributionsInterface
 deqn
 dlognorm
 dmultinorm
