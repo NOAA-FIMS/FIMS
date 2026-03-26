@@ -280,7 +280,7 @@ test_that("prior predictive check", {
     expect_equal(unname(slope_out[i]), unname(slope_mean), tolerance = 1e-4)
   }
 
-print(opt$par)
+  print(opt$par)
   # fit <- tmbstan::tmbstan(obj, init =  "best.last.par")
   # postmle <- as.matrix(fit)[, -ncol(as.matrix(fit))]
   # colnames(postmle) <- names(get_parameter_names(obj$par))
