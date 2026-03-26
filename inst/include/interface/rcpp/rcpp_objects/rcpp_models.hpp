@@ -925,12 +925,8 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
         }
       }
     }
-    ss << "\n],\n";
-    // add log
-    ss << " \"log\": {\n";
-    ss << "\"info\": " << fims::FIMSLog::fims_log->get_info() << ","
-       << "\"warnings\": " << fims::FIMSLog::fims_log->get_warnings() << ","
-       << "\"errors\": " << fims::FIMSLog::fims_log->get_errors() << "}}";
+    ss << "\n]\n";
+    ss << "}\n";
 #ifdef TMB_MODEL
     model->do_reporting = true;
 #endif
