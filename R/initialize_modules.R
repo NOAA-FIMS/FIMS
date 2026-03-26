@@ -847,7 +847,7 @@ initialize_fims <- function(parameters, data) {
   )
 
   recruitment_process_input <- parameters |>
-    dplyr::filter(module_name == "Recruitment" & distribution_type == "process")
+    dplyr::filter(module_name == "Recruitment" & distribution_type == "process" & !is.na(distribution))
 
   if (recruitment_process_input |> nrow() == 0) {
     process_par <- parameters |>
@@ -858,7 +858,7 @@ initialize_fims <- function(parameters, data) {
     if (any(process_par[["estimation_type"]] != "constant")) {
       cli::cli_abort(c(
         x = "Missing required inputs for recruitment process random or fixed effects.",
-        i = "There is no distribution specified for the {.var {process_par_name}} variable in the recruitment module.",
+        i = "There is no distribution process specified for the {.var {process_par_name}} variable in the recruitment module.",
         i = "Implement either one of the following options to resolve this error:",
         i = "1. Set a distribution and distribution_type for the Recruitment {.var module_name} in configurations tibble.",
         i = "2. Set the estimation_type for the recruitment {.var {process_par_name}} variable in the parameter tibble to {.var constant}."
@@ -874,6 +874,16 @@ initialize_fims <- function(parameters, data) {
       dplyr::filter(label != "log_sd") |>
       dplyr::pull(label) |>
       unique()
+    
+    if(length(par) == 0) {
+      cli::cli_abort(c(
+        x = "Missing required inputs for recruitment process random or fixed effects.",
+        i = "There is a distribution specified for the Recruitment {.var module_name} in the configurations tibble, but no parameters are specified for the recruitment process in the parameters tibble.",
+        i = "Implement either one of the following options to resolve this error:",
+        i = "1. Add parameter, {.var log_devs} or {.var log_r}, for the recruitment process in the parameters tibble with an estimation_type of random_effects or fixed_effects.",
+        i = "2. Set the distribution for the Recruitment distribution and distribution_type to {.var NA} in the configurations tibble."
+      ))
+    }
 
     if (any(recruitment_process_input |> dplyr::filter(label != "log_sd") |>
       dplyr::pull(estimation_type) == "constant")) {
