@@ -95,9 +95,12 @@ class Parameter {
    * @brief The constructor for initializing a parameter.
    * @details This constructor is for initializing a parameter from R. It checks
    * that the input value is a single numeric value and is not NaN or Inf.
-   * If the input value is not valid, it throws an error with a descriptive message.
-   * @param value An R object that should be a single numeric value for the parameter.
-   * @throws Rcpp::stop if the input value is not a single numeric value or is NaN or Inf.
+   * If the input value is not valid, it throws an error with a descriptive
+   * message.
+   * @param value An R object that should be a single numeric value for the
+   * parameter.
+   * @throws Rcpp::stop if the input value is not a single numeric value or is
+   * NaN or Inf.
    */
   Parameter(SEXP value) {
     if (TYPEOF(value) != REALSXP || Rf_xlength(value) != 1) {
@@ -105,7 +108,8 @@ class Parameter {
     }
     double val = REAL(value)[0];
     if (!std::isfinite(val)) {
-      Rcpp::stop("Parameter value must be numeric. Received value: " + std::to_string(val));
+      Rcpp::stop("Parameter value must be numeric. Received value: " +
+                 std::to_string(val));
     }
     new (this) Parameter(val);
   }
