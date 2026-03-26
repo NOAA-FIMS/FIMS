@@ -1,6 +1,6 @@
 /**
  * @file Dirichlet_multinomial_lpmf.hpp
- * @brief Implements the Dirichlet-multinomialLPMF distribution functor used by FIMS to
+ * @brief Implements the Dirichlet_multinomialLPMF distribution functor used by FIMS to
  * evaluate the observation-level and total log-likelihood contributions under
  * a Dirichlet-multinomial error model for data, priors, and random effects.
  * @copyright This file is part of the NOAA, National Marine Fisheries Service
