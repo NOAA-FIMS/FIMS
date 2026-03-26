@@ -152,7 +152,7 @@ RCPP_MODULE(fims) {
       "Parameter",
       "See https://noaa-fims.github.io/FIMS/doxygen/classParameter.html.")
       .constructor()
-      .constructor<double>()
+      .constructor<SEXP>()
       .constructor<Parameter>()
       .field("value", &Parameter::initial_value_m)
       .field("estimated_value", &Parameter::final_value_m)
