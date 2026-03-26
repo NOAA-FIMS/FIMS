@@ -518,8 +518,7 @@ class Information {
                       std::shared_ptr<fims_popdy::Population<Type>> p) {
     if (p->recruitment_id != static_cast<Type>(-999)) {
       uint32_t recruitment_uint = static_cast<uint32_t>(p->recruitment_id);
-      FIMS_INFO_LOG("searching for recruitment model " +
-                    fims::to_string(recruitment_uint));
+
       recruitment_models_iterator it =
           this->recruitment_models.find(recruitment_uint);
 
@@ -618,7 +617,7 @@ class Information {
                        fims::to_string(growth_uint));
       }
     } else {
-      FIMS_WARNING_LOG("No growth function defined for population " +
+      FIMS_WARNING_LOG("Growth function undefined for population " +
                        fims::to_string(p->id) +
                        ". FIMS requires growth functions be defined for all "
                        "populations when running a catch at age model.");
@@ -653,7 +652,7 @@ class Information {
             fims::to_string(maturity_uint));
       }
     } else {
-      FIMS_WARNING_LOG("No maturity function defined for population " +
+      FIMS_WARNING_LOG("Maturity function undefined for population " +
                        fims::to_string(p->id) +
                        ". FIMS requires maturity functions be defined for all "
                        "populations when running a catch at age model.");
@@ -763,20 +762,6 @@ class Information {
                          "\" undefined, not found for Population \"" +
                          fims::to_string(p->id) + "\". ");
         }
-        // // error check and set population elements
-        // // check me - add another fleet iterator to push information from
-        // for (fleet_iterator it = this->fleets.begin(); it !=
-        // this->fleets.end();
-        //      ++it)
-        // {
-        //     // Initialize fleet object
-        //     std::shared_ptr<fims_popdy::Fleet<Type>> f = (*it).second;
-        //     // population to the individual fleets This is to pass landings
-        //     at age
-        //     // from population to fleets?
-        //     // any shared member in p (population is pushed into fleets)
-        //     p->fleets.push_back(f);
-        // }
       }
 
       // set information dimensions
@@ -810,7 +795,12 @@ class Information {
           std::shared_ptr<fims_popdy::Population<Type>> p = (*pt).second;
           model->populations.push_back(p);
           for (size_t i = 0; i < p->fleets.size(); i++) {
-            model->fleets[p->fleets[i]->GetId()] = p->fleets[i];
+            uint32_t fid = p->fleets[i]->GetId();
+            model->fleets[fid] = p->fleets[i];
+            FIMS_INFO_LOG(std::string("Linked fleet id ") +
+                          fims::to_string(fid) +
+                          std::string(" into model id ") +
+                          fims::to_string(model->GetId()));
           }
         } else {
           valid_model = false;
@@ -833,6 +823,7 @@ class Information {
    * errors.
    */
   bool CreateModel() {
+    FIMS_INFO_LOG("Creating model and checking for required components...");
     bool valid_model = true;
 
     CreateFleetObjects(valid_model);
@@ -847,6 +838,12 @@ class Information {
     SetupPriors();
     SetupRandomEffects();
     SetupData();
+
+    if (valid_model) {
+      FIMS_INFO_LOG("Model successfully created.");
+    } else {
+      FIMS_ERROR_LOG("Model creation failed.");
+    }
 
     return valid_model;
   }

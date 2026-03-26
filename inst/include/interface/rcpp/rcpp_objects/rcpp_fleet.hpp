@@ -411,7 +411,7 @@ class FleetInterface : public FleetInterfaceBase {
       }
     }
 
-    FIMS_INFO_LOG("adding Fleet fmort object to TMB");
+  
     if (this->log_Fmort.size() != static_cast<size_t>(this->n_years.get())) {
       FIMS_ERROR_LOG("The size of `log_Fmort` does not match `n_years`: " +
                      fims::to_string(this->log_Fmort.size()) +
@@ -458,9 +458,7 @@ class FleetInterface : public FleetInterfaceBase {
       for (size_t i = 0; i < fleet->age_to_length_conversion.size(); i++) {
         fleet->age_to_length_conversion[i] =
             this->age_to_length_conversion[i].initial_value_m;
-        FIMS_INFO_LOG(" adding Fleet length object to TMB in loop " +
-                      fims::to_string(i) + " of " +
-                      fims::to_string(fleet->age_to_length_conversion.size()));
+   
 
         if (this->age_to_length_conversion[i].estimation_type_m.get() ==
             "fixed_effects") {
@@ -483,7 +481,7 @@ class FleetInterface : public FleetInterfaceBase {
 
     // add to Information
     info->fleets[fleet->id] = fleet;
-    FIMS_INFO_LOG("done adding Fleet object to TMB");
+ 
     return true;
   }
 
