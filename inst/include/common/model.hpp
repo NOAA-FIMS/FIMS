@@ -61,7 +61,8 @@ class Model {  // may need singleton
     // Check if fims_information is set
     if (this->fims_information == nullptr) {
       FIMS_ERROR_LOG(
-          "Model: fims_information is not set. Please set fims_information before "
+          "Model: fims_information is not set. Please set fims_information "
+          "before "
           "calling Evaluate().");
       return jnll;
     }
@@ -97,7 +98,6 @@ class Model {  // may need singleton
         nll_vec_idx += 1;
       }
     }
-   
 
     // Loop over densities and evaluate joint negative log-likelihoods for
     // random effects
@@ -116,7 +116,6 @@ class Model {  // may need singleton
         nll_vec_idx += 1;
       }
     }
-   
 
     // Loop over and evaluate data joint negative log-likelihoods
     int n_data = 0;
@@ -135,7 +134,6 @@ class Model {  // may need singleton
         nll_vec_idx += 1;
       }
     }
-   
 
 // report out nll components
 #ifdef TMB_MODEL
