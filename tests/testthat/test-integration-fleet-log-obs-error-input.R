@@ -171,3 +171,119 @@ test_that("`log_Fmort` returns correct error messages when wrong dimensions", {
     regexp = "Fleet log_Fmort size mismatch"
   )
 })
+
+
+## IO correctness ----
+test_that("`log_M` output dimensions follow size rules", {
+  # Check scalar log_M input
+  parameters_4_model <- default_parameters |>
+    tidyr::unnest(cols = data)
+
+  test_fit <- parameters_4_model |>
+    initialize_fims(data = data_4_model) |>
+    fit_fims(optimize = FALSE)
+
+  output <- get_estimates(test_fit) |>
+    dplyr::mutate(
+      uncertainty_label = "se",
+      year = year_i,
+      estimate = estimated
+    )
+
+  log_m_input <- parameters_4_model |>
+    dplyr::filter(label == "log_M") |>
+    dplyr::pull(value)
+
+  mortality_m_output <- output |>
+    dplyr::filter(label == "mortality_M") |>
+    dplyr::pull(estimated)
+
+  log_m_output <- output |>
+    dplyr::filter(label == "log_M") |>
+    dplyr::pull(estimated)
+
+  #' @description Test that log_M input is scalar.
+  expect_true(length(log_m_input) == 1)
+  #' @description Test that log_M output is scalar.
+  expect_true(length(log_m_output) == 1)
+  #' @description Test that mortality_M output is scalar.
+  expect_true(length(mortality_m_output) == 1)
+
+  # Check log_M input with n_years * n_ages dimensions
+  n_years <- get_n_years(data_4_model)
+  n_ages <- get_n_ages(data_4_model)
+
+  parameters_4_model <- default_parameters |>
+    tidyr::unnest(cols = data)
+
+  log_m_template <- parameters_4_model |>
+    dplyr::filter(label == "log_M") |>
+    dplyr::select(-time, -age, -value)
+
+  log_m_grid <- tidyr::expand_grid(
+    time = 1:n_years,
+    age = 1:n_ages
+  ) |>
+    dplyr::mutate(value = log_m_input[1]) |>
+    dplyr::bind_cols(log_m_template[rep(1, n_years * n_ages), ])
+
+  parameters_4_model <- parameters_4_model |>
+    dplyr::filter(!(module_name == "Population" & label == "log_M")) |>
+    dplyr::bind_rows(log_m_grid)
+
+  test_fit <- parameters_4_model |>
+    initialize_fims(data = data_4_model) |>
+    fit_fims(optimize = FALSE)
+
+  output <- get_estimates(test_fit) |>
+    dplyr::mutate(
+      uncertainty_label = "se",
+      year = year_i,
+      estimate = estimated
+    )
+
+  log_m_input <- parameters_4_model |>
+    dplyr::filter(label == "log_M") |>
+    dplyr::pull(value)
+
+  mortality_m_output <- output |>
+    dplyr::filter(label == "mortality_M") |>
+    dplyr::pull(estimated)
+
+  log_m_output <- output |>
+    dplyr::filter(label == "log_M") |>
+    dplyr::pull(estimated)
+
+  #' @description Test that log_M input has n_years * n_ages dimensions.
+  expect_equal(length(log_m_input), n_years * n_ages)
+  #' @description Test that log_M output matches n_years * n_ages.
+  expect_equal(length(log_m_output), n_years * n_ages)
+  #' @description Test that mortality_M output matches n_years * n_ages.
+  expect_equal(length(mortality_m_output), n_years * n_ages)
+
+  clear()
+})
+
+
+## Error handling ----
+test_that("`log_M` returns correct error messages when wrong dimensions", {
+  #' @description Test that returns correct error message when log_M is too long.
+  parameters_4_model <- default_parameters |>
+    tidyr::unnest(cols = data) |>
+    dplyr::add_row(
+      model_family = "catch_at_age",
+      module_name = "Population",
+      estimation_type = "constant",
+      label = "log_M",
+      value = -3
+    )
+
+  expect_error(
+    {
+      test_fit <- parameters_4_model |>
+        initialize_fims(data = data_4_model) |>
+        fit_fims(optimize = FALSE)
+    },
+    regexp = "Population log_M size mismatch"
+  )
+})

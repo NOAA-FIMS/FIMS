@@ -365,9 +365,18 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
       ss << " \"id\":" << population_interface->log_M.id_m << ",\n";
       ss << " \"type\": \"vector\",\n";
       ss << " \"dimensionality\": {\n";
-      ss << "  \"header\": [" << "\"n_years\", \"n_ages\"" << "],\n";
-      ss << "  \"dimensions\": [" << population_interface->n_years.get() << ", "
-         << population_interface->n_ages.get() << "]\n},\n";
+      if (population_interface->log_M.size() ==
+          static_cast<size_t>(population_interface->n_years.get() *
+                              population_interface->n_ages.get())) {
+        ss << " \"header\": [\"n_years\", \"n_ages\"],\n";
+        ss << " \"dimensions\": [" << population_interface->n_years.get()
+           << ", " << population_interface->n_ages.get() << "]\n";
+      } else {
+        ss << " \"header\": [\"scalar\"],\n";
+        ss << " \"dimensions\": [" << population_interface->log_M.size()
+           << "]\n";
+      }
+      ss << "},\n";
       ss << " \"values\": " << population_interface->log_M << "\n\n";
       ss << "},\n";
 
@@ -1005,13 +1014,27 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
                             population->n_ages.get()},
           fims::Vector<std::string>{"n_years", "n_ages"});
 
-      derived_quantities["mortality_M"] = fims::Vector<Type>(
-          population->n_years.get() * population->n_ages.get());
-      derived_quantities_dim_info["mortality_M"] = fims_popdy::DimensionInfo(
-          "mortality_M",
-          fims::Vector<int>{population->n_years.get(),
-                            population->n_ages.get()},
-          fims::Vector<std::string>{"n_years", "n_ages"});
+      derived_quantities["mortality_M"] =
+          fims::Vector<Type>(population->log_M.size());
+      fims::Vector<int> dim_sizes;
+      fims::Vector<std::string> dim_names;
+      if (population->log_M.size() ==
+          static_cast<size_t>(population->n_years.get() *
+                              population->n_ages.get())) {
+        dim_sizes.resize(2);
+        dim_sizes[0] = static_cast<int>(population->n_years.get());
+        dim_sizes[1] = static_cast<int>(population->n_ages.get());
+        dim_names.resize(2);
+        dim_names[0] = "n_years";
+        dim_names[1] = "n_ages";
+      } else {
+        dim_sizes.resize(1);
+        dim_sizes[0] = static_cast<int>(population->log_M.size());
+        dim_names.resize(1);
+        dim_names[0] = "scalar";
+      }
+      derived_quantities_dim_info["mortality_M"] =
+          fims_popdy::DimensionInfo("mortality_M", dim_sizes, dim_names);
 
       derived_quantities["mortality_Z"] = fims::Vector<Type>(
           population->n_years.get() * population->n_ages.get());
