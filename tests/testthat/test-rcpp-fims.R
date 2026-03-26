@@ -55,7 +55,7 @@ test_that("Rcpp interface returns correct error messages", {
   #' @description Test that Rcpp Parameter interface returns an error when given incorrect input.
   expect_error(
     methods::new(Parameter, "a"),
-    regexp = "Not compatible with requested type"
+    regexp = "Parameter value must be a single numeric value"
   )
   #' @description Test that `BevertonHoltRecruitment` module returns an error when given incorrect input.
   expect_error(
