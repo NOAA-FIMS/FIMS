@@ -512,13 +512,13 @@ std::ostream &operator<<(std::ostream &out, const fims::Vector<Type> &v) {
   }
   for (size_t i = 0; i < v.size() - 1; i++) {
     if (v[i] != v[i]) {
-      out << "-999" << ",";
+      out << "\"NaN\"" << ",";
     } else {
       out << v[i] << ",";
     }
   }
   if (v[v.size() - 1] != v[v.size() - 1]) {
-    out << "-999]";
+    out << "\"NaN\"]";
   } else {
     out << v[v.size() - 1] << "]";
   }

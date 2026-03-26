@@ -105,17 +105,27 @@ class Parameter {
  */
 uint32_t Parameter::id_g = 0;
 
+#include <sstream>
+
 /**
- * @brief Sanitize a double value by replacing NaN or Inf with -999.0.
+ * @brief Sanitize a double value by replacing NaN or Inf with standard JSON string representations.
  *
  * @param x The input double value.
- * @return The sanitized double value.
+ * @return The formatted std::string for valid JSON parsing.
  */
-inline double sanitize_val(double x) {
-  if (std::isnan(x) || std::isinf(x)) {
-    return -999.0;
+inline std::string sanitize_val(double x) {
+  if (std::isnan(x)) {
+    return "\"NaN\"";
+  } else if (std::isinf(x)) {
+    if (x > 0) {
+      return "\"Infinity\"";
+    } else {
+      return "\"-Infinity\"";
+    }
   }
-  return x;
+  std::ostringstream ss;
+  ss << x;
+  return ss.str();
 }
 
 /**
@@ -620,7 +630,7 @@ class FIMSRcppInterfaceBase {
     } else if (value == -std::numeric_limits<double>::infinity()) {
       ss << "\"-Infinity\"";
     } else if (value != value) {
-      ss << "-999";
+      ss << "\"NaN\"";
     } else {
       // Set precision (R default is 16)
       ss << std::fixed << std::setprecision(16) << value;
