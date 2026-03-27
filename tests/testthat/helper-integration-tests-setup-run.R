@@ -161,6 +161,10 @@ prepare_test_data <- function() {
       by = c("label", "time")
     ) |>
     # Update log_sd for log_devs in the Recruitment module
+    # Note: logR_sd is the standard deviation on the natural scale of the
+    # log recruitment deviations. We take the log of it to match the
+    # parameterization in the model, which expects a log-transformed
+    # parameter value.
     dplyr::rows_update(
       tibble::tibble(
         module_name = "Recruitment",
@@ -266,6 +270,11 @@ prepare_test_data <- function() {
         estimation_type
       )
     ) |>
+    # Update log_sd for log_devs in the Recruitment module
+    # Note: logR_sd is the standard deviation on the natural scale of the
+    # log recruitment deviations. We take the log of it to match the
+    # parameterization in the model, which expects a log-transformed
+    # parameter value.
     dplyr::rows_update(
       tibble::tibble(
         module_name = "Recruitment",

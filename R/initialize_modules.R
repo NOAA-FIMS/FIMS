@@ -68,8 +68,11 @@ initialize_module <- function(parameters, data, module_name, fleet_name = NA_cha
     # Check if both are present in the input parameters
     if (all(maybe_remove %in% models_pars)) {
       cli::cli_alert_warning(c(
-        "x" = "Both {.var log_devs} and {.var log_r} are specified in the model, but there can be only one!",
-        "!" = "Remove one of the two from your parameter list."
+        "x" = "Both {.var log_devs} and {.var log_r} are specified in the model 
+        but there can be only one!",
+        "!" = "Currently the default model will use {.var log_devs}.",
+        "!" = "When fitting an AR1 to recruitment, use {.var log_r} for 
+        improved performance."
       ))
     }
 
@@ -363,32 +366,32 @@ initialize_fleet <- function(parameters, data, fleet_name, linked_ids) {
     dplyr::pull(module_type)
 
   # Link the observed landings data to the fleet module using its associated ID
-  # if the data type includes "landings" and if "Landings" exists in the data distribution
-  # specification
+  # if the data type includes "landings" and if "Landings" exists in the
+  # data distribution specification
   if ("landings" %in% fleet_types &&
     "Landings" %in% distribution_names_for_fleet) {
     module$SetObservedLandingsDataID(linked_ids["landings"])
   }
 
   # Link the observed index data to the fleet module using its associated ID
-  # if the data type includes "index" and if "Index" exists in the data distribution
-  # specification
+  # if the data type includes "index" and if "Index" exists in the
+  # data distribution specification
   if ("index" %in% fleet_types &&
     "Index" %in% distribution_names_for_fleet) {
     module$SetObservedIndexDataID(linked_ids["index"])
   }
 
-  # Link the observed age composition data to the fleet module using its associated ID
-  # if the data type includes "age_comp" and if "AgeComp" exists in the data distribution
-  # specification
+  # Link the observed age composition data to the fleet module using its
+  # associated ID if the data type includes "age_comp" and if "AgeComp" exists
+  # in the data distribution specification
   if ("age_comp" %in% fleet_types &&
     "AgeComp" %in% distribution_names_for_fleet) {
     module$SetObservedAgeCompDataID(linked_ids["age_comp"])
   }
 
-  # Link the observed length composition data to the fleet module using its associated ID
-  # if the data type includes "length_comp" and if "LengthComp" exists in the data
-  # distribution specification
+  # Link the observed length composition data to the fleet module using its
+  # associated ID if the data type includes "length_comp" and if "LengthComp"
+  # exists in the data distribution specification
   if ("length_comp" %in% fleet_types &&
     "LengthComp" %in% distribution_names_for_fleet) {
     module$SetObservedLengthCompDataID(linked_ids["length_comp"])
@@ -401,8 +404,8 @@ initialize_fleet <- function(parameters, data, fleet_name, linked_ids) {
 #' @description
 #' Initializes a landings module based on the provided data and fleet name.
 #' @inheritParams initialize_module
-#' @param fleet_name A character. Name of the fleet for which the landings module
-#'   is initialized.
+#' @param fleet_name A character. Name of the fleet for which the landings
+#'   module is initialized.
 #' @return
 #' The initialized landings module as an object.
 #' @noRd
@@ -857,11 +860,17 @@ initialize_fims <- function(parameters, data) {
       unique()
     if (any(process_par[["estimation_type"]] != "constant")) {
       cli::cli_abort(c(
-        x = "Missing required inputs for recruitment process random or fixed effects.",
-        i = "There is no distribution process specified for the {.var {process_par_name}} variable in the recruitment module.",
-        i = "Implement either one of the following options to resolve this error:",
-        i = "1. Set a distribution and distribution_type for the Recruitment {.var module_name} in configurations tibble.",
-        i = "2. Set the estimation_type for the recruitment {.var {process_par_name}} variable in the parameter tibble to {.var constant}."
+        x = "Missing required inputs for recruitment process random or 
+        fixed effects.",
+        i = "There is no distribution process specified for the 
+        {.var {process_par_name}} variable in the recruitment module.",
+        i = "Implement either one of the following options to resolve this 
+        error:",
+        i = "1. Set a distribution and distribution_type for the Recruitment 
+        {.var module_name} in configurations tibble.",
+        i = "2. Set the estimation_type for the recruitment 
+        {.var {process_par_name}} variable in the parameter tibble to 
+        {.var constant}."
       ))
     }
     # TODO: need to revisit initialize_process_structure and add R tests
@@ -877,22 +886,35 @@ initialize_fims <- function(parameters, data) {
 
     if (length(par) == 0) {
       cli::cli_abort(c(
-        x = "Missing required inputs for recruitment process random or fixed effects.",
-        i = "There is a distribution specified for the Recruitment {.var module_name} in the configurations tibble, but no parameters are specified for the recruitment process in the parameters tibble.",
-        i = "Implement either one of the following options to resolve this error:",
-        i = "1. Add parameter, {.var log_devs} or {.var log_r}, for the recruitment process in the parameters tibble with an estimation_type of random_effects or fixed_effects.",
-        i = "2. Set the distribution for the Recruitment distribution and distribution_type to {.var NA} in the configurations tibble."
+        x = "Missing required inputs for recruitment process random or 
+        fixed effects.",
+        i = "There is a distribution specified for the Recruitment 
+        {.var module_name} in the configurations tibble, but no parameters are 
+        specified for the recruitment process in the parameters tibble.",
+        i = "Implement either one of the following options to resolve this 
+        error:",
+        i = "1. Add parameter, {.var log_devs} or {.var log_r}, for the 
+        recruitment process in the parameters tibble with an estimation_type of 
+        random_effects or fixed_effects.",
+        i = "2. Set the distribution for the Recruitment distribution and 
+        distribution_type to {.var NA} in the configurations tibble."
       ))
     }
 
     if (any(recruitment_process_input |> dplyr::filter(label != "log_sd") |>
       dplyr::pull(estimation_type) == "constant")) {
       cli::cli_abort(c(
-        x = "Missing required inputs for recruitment process random or fixed effects.",
-        i = "The estimation type for {.var {par}} is constant, but there is a distribution specified for the Recruitment {.var module_name} in the configurations tibble.",
-        i = "Implement either one of the following options to resolve this error:",
-        i = "1. Set the distribution for the Recruitment distribution and distribution_type to {.var NA} in the configurations tibble.",
-        i = "2. Set the estimation_type for the recruitment {.var {par}} in the parameter tibble to {.var random_effects} or {.var fixed_effects}."
+        x = "Missing required inputs for recruitment process random or 
+        fixed effects.",
+        i = "The estimation type for {.var {par}} is constant, but there is a 
+        distribution specified for the Recruitment {.var module_name} in the 
+        configurations tibble.",
+        i = "Implement either one of the following options to resolve this 
+        error:",
+        i = "1. Set the distribution for the Recruitment distribution and 
+        distribution_type to {.var NA} in the configurations tibble.",
+        i = "2. Set the estimation_type for the recruitment {.var {par}} in the 
+        parameter tibble to {.var random_effects} or {.var fixed_effects}."
       ))
     }
 
@@ -1015,7 +1037,8 @@ set_param_vector <- function(field, module, module_input, module_class_name) {
   # Check if both value and estimation information are present
   if (length(field_value) == 0 || length(field_estimation_type) == 0) {
     cli::cli_abort(c(
-      "Missing value or estimation_type information for field {.var {field}} in module {.var {module_class_name}}."
+      "Missing value or estimation_type information for field {.var {field}} in 
+      module {.var {module_class_name}}."
     ))
   }
   # Resize the field in the module
