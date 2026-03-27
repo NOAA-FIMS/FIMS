@@ -326,10 +326,10 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
     }
     if (random_effects[["recruitment"]] == "log_r") {
       recruitment$log_r$resize(om_input[["nyr"]] - 1)
-      recruits_true <- matrix(c(t(om_output[["N.age"]])), 30, 12, byrow = TRUE)[,1]
+      recruits_true <- matrix(c(t(om_output[["N.age"]])), 30, 12, byrow = TRUE)[, 1]
       for (y in 1:(om_input[["nyr"]] - 1)) {
-        if(!estimation_mode){
-          recruitment$log_r[y]$value <- recruits_true[y+1]
+        if (!estimation_mode) {
+          recruitment$log_r[y]$value <- recruits_true[y + 1]
         } else {
           recruitment$log_r[y]$value <- 0
         }
@@ -370,7 +370,7 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
     recruitment_distribution$observed_values[i]$value <- 0
     recruitment_distribution$expected_values[i]$value <- 0
   }
- 
+
   if ("recruitment" %in% names(random_effects)) {
     if (random_effects[["recruitment"]] == "log_devs") {
       recruitment_distribution$log_sd[1]$estimation_type$set("fixed_effects")
@@ -478,7 +478,7 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   # Call report using MLE parameter values, or
   # the input values if optimization is skipped
   report <- obj[["report"]](obj[["env"]][["last.par.best"]])
-  
+
 
   clear()
 

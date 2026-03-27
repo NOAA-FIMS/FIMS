@@ -60,9 +60,9 @@ initialize_module <- function(parameters, data, module_name, fleet_name = NA_cha
     always_remove <- c("x", "log_expected_recruitment")
     maybe_remove <- c("log_r", "log_devs")
 
-    models_pars <- parameters |> 
-      dplyr::pull(label) |> 
-      unique() |> 
+    models_pars <- parameters |>
+      dplyr::pull(label) |>
+      unique() |>
       na.omit()
 
     # Check if both are present in the input parameters
@@ -72,7 +72,7 @@ initialize_module <- function(parameters, data, module_name, fleet_name = NA_cha
         "!" = "Remove one of the two from your parameter list."
       ))
     }
-    
+
     # Identify which of the optional fields are NOT in the parameters to remove them from module_fields
     actual_missing <- setdiff(maybe_remove, models_pars)
 
@@ -874,8 +874,8 @@ initialize_fims <- function(parameters, data) {
       dplyr::filter(label != "log_sd") |>
       dplyr::pull(label) |>
       unique()
-    
-    if(length(par) == 0) {
+
+    if (length(par) == 0) {
       cli::cli_abort(c(
         x = "Missing required inputs for recruitment process random or fixed effects.",
         i = "There is a distribution specified for the Recruitment {.var module_name} in the configurations tibble, but no parameters are specified for the recruitment process in the parameters tibble.",
@@ -898,7 +898,8 @@ initialize_fims <- function(parameters, data) {
 
 
     # Initialize_process_distribution
-    sd_input <- recruitment_process_input |> dplyr::filter(label == "log_sd") |>
+    sd_input <- recruitment_process_input |>
+      dplyr::filter(label == "log_sd") |>
       dplyr::mutate(
         label = "sd",
         value = exp(value)

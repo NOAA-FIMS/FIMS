@@ -241,13 +241,13 @@ prepare_test_data <- function() {
 
   # Run FIMS model
   fit_agecomp <- modified_parameters |>
-      # remove rows that have module_type == LengthComp
-      dplyr::rows_delete(
-        y = tibble::tibble(module_type = "LengthComp")
-      ) |>
-      initialize_fims(data = data_age_comp) |>
-      fit_fims(optimize = TRUE)
-  
+    # remove rows that have module_type == LengthComp
+    dplyr::rows_delete(
+      y = tibble::tibble(module_type = "LengthComp")
+    ) |>
+    initialize_fims(data = data_age_comp) |>
+    fit_fims(optimize = TRUE)
+
   clear()
 
   # Save FIMS results as a test fixture for additional fimsfit tests
@@ -265,7 +265,7 @@ prepare_test_data <- function() {
         "fixed_effects",
         estimation_type
       )
-    ) |> 
+    ) |>
     dplyr::rows_update(
       tibble::tibble(
         module_name = "Recruitment",
@@ -281,7 +281,7 @@ prepare_test_data <- function() {
     file = testthat::test_path("fixtures", "parameters_model_comparison_project_fixed_effects.RDS"),
     compress = FALSE
   )
-  deterministic_age_length_comp_fixed_effects <-  modified_parameters_fixed_effects |>
+  deterministic_age_length_comp_fixed_effects <- modified_parameters_fixed_effects |>
     initialize_fims(data = data_age_length_comp) |>
     fit_fims(optimize = FALSE)
 
@@ -312,12 +312,12 @@ prepare_test_data <- function() {
   data_age_comp_na <- readRDS(testthat::test_path("fixtures", "data_age_comp_na.RDS"))
   # Fit the FIMS model using the second dataset (with missing values)
   fit_agecomp_na <- modified_parameters |>
-      # remove rows that have module_type == LengthComp
-      dplyr::rows_delete(
-        y = tibble::tibble(module_type = "LengthComp")
-      ) |>
-      initialize_fims(data = data_age_comp_na) |>
-      fit_fims(optimize = TRUE)
+    # remove rows that have module_type == LengthComp
+    dplyr::rows_delete(
+      y = tibble::tibble(module_type = "LengthComp")
+    ) |>
+    initialize_fims(data = data_age_comp_na) |>
+    fit_fims(optimize = TRUE)
 
   clear()
 
@@ -334,12 +334,12 @@ prepare_test_data <- function() {
 
   # Run FIMS model
   fit_lengthcomp <- modified_parameters |>
-        # remove rows that have module_type == AgeComp
-        dplyr::rows_delete(
-          y = tibble::tibble(module_type = "AgeComp")
-        ) |>
-        initialize_fims(data = data_length_comp) |>
-        fit_fims(optimize = TRUE)
+    # remove rows that have module_type == AgeComp
+    dplyr::rows_delete(
+      y = tibble::tibble(module_type = "AgeComp")
+    ) |>
+    initialize_fims(data = data_length_comp) |>
+    fit_fims(optimize = TRUE)
 
   clear()
 
@@ -354,12 +354,12 @@ prepare_test_data <- function() {
   data_length_comp_na <- readRDS(testthat::test_path("fixtures", "data_length_comp_na.RDS"))
   # Fit the FIMS model using the second dataset (with missing values)
   fit_lengthcomp_na <- modified_parameters |>
-        # remove rows that have module_type == LengthComp
-        dplyr::rows_delete(
-          y = tibble::tibble(module_type = "AgeComp")
-        ) |>
-        initialize_fims(data = data_length_comp_na) |>
-        fit_fims(optimize = TRUE)
+    # remove rows that have module_type == LengthComp
+    dplyr::rows_delete(
+      y = tibble::tibble(module_type = "AgeComp")
+    ) |>
+    initialize_fims(data = data_length_comp_na) |>
+    fit_fims(optimize = TRUE)
 
   clear()
 
@@ -381,10 +381,10 @@ prepare_test_data <- function() {
   # * Initialize FIMS with the provided data (age and length composition with missing values)
   # * Fit the FIMS model with optimization enabled
   fit_age_length_comp_na <- initialize_fims(
-      parameters = modified_parameters,
-      data = data_age_length_comp_na
-    ) |>
-      fit_fims(optimize = TRUE)
+    parameters = modified_parameters,
+    data = data_age_length_comp_na
+  ) |>
+    fit_fims(optimize = TRUE)
 
   clear()
 
