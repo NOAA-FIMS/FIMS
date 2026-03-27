@@ -99,6 +99,11 @@ class Model {  // may need singleton
       }
     }
 
+    FIMS_INFO_LOG(
+        "Model: Finished evaluating prior distributions. The jnll after "
+        "evaluating " +
+        fims::to_string(n_priors) + " priors is: " + fims::to_string(jnll));
+
     // Loop over densities and evaluate joint negative log-likelihoods for
     // random effects
     size_t n_random_effects = 0;
@@ -117,6 +122,12 @@ class Model {  // may need singleton
       }
     }
 
+    FIMS_INFO_LOG(
+        "Model: Finished evaluating random effect distributions. The jnll "
+        "after evaluating priors and " +
+        fims::to_string(n_random_effects) +
+        " random_effects is: " + fims::to_string(jnll));
+
     // Loop over and evaluate data joint negative log-likelihoods
     int n_data = 0;
     for (d_it = this->fims_information->density_components.begin();
@@ -134,6 +145,12 @@ class Model {  // may need singleton
         nll_vec_idx += 1;
       }
     }
+
+    FIMS_INFO_LOG(
+        "Model: Finished evaluating data likelihoods. The jnll after "
+        "evaluating priors, random effects, and " +
+        fims::to_string(n_data) +
+        " data likelihoods is: " + fims::to_string(jnll));
 
 // report out nll components
 #ifdef TMB_MODEL

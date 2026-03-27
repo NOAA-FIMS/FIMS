@@ -795,10 +795,10 @@ class Information {
           std::shared_ptr<fims_popdy::Population<Type>> p = (*pt).second;
           model->populations.push_back(p);
           for (size_t i = 0; i < p->fleets.size(); i++) {
-            uint32_t fid = p->fleets[i]->GetId();
-            model->fleets[fid] = p->fleets[i];
+            uint32_t local_fleet_id = p->fleets[i]->GetId();
+            model->fleets[local_fleet_id] = p->fleets[i];
             FIMS_INFO_LOG(std::string("Linked fleet id ") +
-                          fims::to_string(fid) +
+                          fims::to_string(local_fleet_id) +
                           std::string(" into model id ") +
                           fims::to_string(model->GetId()));
           }
