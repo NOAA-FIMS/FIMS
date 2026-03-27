@@ -32,14 +32,14 @@ reshape_json_estimates <- function(model_output) {
   join_density_information <- function(x, density_tibble) {
     dplyr::left_join(x,
       y = dplyr::filter(
-          density_tibble,
-          input_type == "random_effects"
-        ) |>
-          dplyr::select(-module_name, -module_id, -module_type),
-        by = c(
-          "estimation_type" = "input_type",
-          "estimated_value" = "observed_values"
-        )
+        density_tibble,
+        input_type == "random_effects"
+      ) |>
+        dplyr::select(-module_name, -module_id, -module_type),
+      by = c(
+        "estimation_type" = "input_type",
+        "estimated_value" = "observed_values"
+      )
     )
   }
 
@@ -166,7 +166,7 @@ reshape_json_estimates <- function(model_output) {
       )
     ) |>
     tidyr::unnest(parameters) |>
-      join_density_information(density_information)
+    join_density_information(density_information)
 
   # TODO: Change some column names
   # Bring everything together
