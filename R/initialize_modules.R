@@ -68,10 +68,10 @@ initialize_module <- function(parameters, data, module_name, fleet_name = NA_cha
     # Check if both are present in the input parameters
     if (all(maybe_remove %in% models_pars)) {
       cli::cli_alert_warning(c(
-        "x" = "Both {.var log_devs} and {.var log_r} are specified in the model 
+        "x" = "Both {.var log_devs} and {.var log_r} are specified in the model
         but there can be only one!",
         "!" = "Currently the default model will use {.var log_devs}.",
-        "!" = "When fitting an AR1 to recruitment, use {.var log_r} for 
+        "!" = "When fitting an AR1 to recruitment, use {.var log_r} for
         improved performance."
       ))
     }
@@ -860,16 +860,16 @@ initialize_fims <- function(parameters, data) {
       unique()
     if (any(process_par[["estimation_type"]] != "constant")) {
       cli::cli_abort(c(
-        x = "Missing required inputs for recruitment process random or 
+        x = "Missing required inputs for recruitment process random or
         fixed effects.",
-        i = "There is no distribution process specified for the 
+        i = "There is no distribution process specified for the
         {.var {process_par_name}} variable in the recruitment module.",
-        i = "Implement either one of the following options to resolve this 
+        i = "Implement either one of the following options to resolve this
         error:",
-        i = "1. Set a distribution and distribution_type for the Recruitment 
+        i = "1. Set a distribution and distribution_type for the Recruitment
         {.var module_name} in configurations tibble.",
-        i = "2. Set the estimation_type for the recruitment 
-        {.var {process_par_name}} variable in the parameter tibble to 
+        i = "2. Set the estimation_type for the recruitment
+        {.var {process_par_name}} variable in the parameter tibble to
         {.var constant}."
       ))
     }
@@ -886,17 +886,17 @@ initialize_fims <- function(parameters, data) {
 
     if (length(par) == 0) {
       cli::cli_abort(c(
-        x = "Missing required inputs for recruitment process random or 
+        x = "Missing required inputs for recruitment process random or
         fixed effects.",
-        i = "There is a distribution specified for the Recruitment 
-        {.var module_name} in the configurations tibble, but no parameters are 
+        i = "There is a distribution specified for the Recruitment
+        {.var module_name} in the configurations tibble, but no parameters are
         specified for the recruitment process in the parameters tibble.",
-        i = "Implement either one of the following options to resolve this 
+        i = "Implement either one of the following options to resolve this
         error:",
-        i = "1. Add parameter, {.var log_devs} or {.var log_r}, for the 
-        recruitment process in the parameters tibble with an estimation_type of 
+        i = "1. Add parameter, {.var log_devs} or {.var log_r}, for the
+        recruitment process in the parameters tibble with an estimation_type of
         random_effects or fixed_effects.",
-        i = "2. Set the distribution for the Recruitment distribution and 
+        i = "2. Set the distribution for the Recruitment distribution and
         distribution_type to {.var NA} in the configurations tibble."
       ))
     }
@@ -904,16 +904,16 @@ initialize_fims <- function(parameters, data) {
     if (any(recruitment_process_input |> dplyr::filter(label != "log_sd") |>
       dplyr::pull(estimation_type) == "constant")) {
       cli::cli_abort(c(
-        x = "Missing required inputs for recruitment process random or 
+        x = "Missing required inputs for recruitment process random or
         fixed effects.",
-        i = "The estimation type for {.var {par}} is constant, but there is a 
-        distribution specified for the Recruitment {.var module_name} in the 
+        i = "The estimation type for {.var {par}} is constant, but there is a
+        distribution specified for the Recruitment {.var module_name} in the
         configurations tibble.",
-        i = "Implement either one of the following options to resolve this 
+        i = "Implement either one of the following options to resolve this
         error:",
-        i = "1. Set the distribution for the Recruitment distribution and 
+        i = "1. Set the distribution for the Recruitment distribution and
         distribution_type to {.var NA} in the configurations tibble.",
-        i = "2. Set the estimation_type for the recruitment {.var {par}} in the 
+        i = "2. Set the estimation_type for the recruitment {.var {par}} in the
         parameter tibble to {.var random_effects} or {.var fixed_effects}."
       ))
     }
@@ -1037,7 +1037,7 @@ set_param_vector <- function(field, module, module_input, module_class_name) {
   # Check if both value and estimation information are present
   if (length(field_value) == 0 || length(field_estimation_type) == 0) {
     cli::cli_abort(c(
-      "Missing value or estimation_type information for field {.var {field}} in 
+      "Missing value or estimation_type information for field {.var {field}} in
       module {.var {module_class_name}}."
     ))
   }
