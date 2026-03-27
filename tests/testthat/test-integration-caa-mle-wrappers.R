@@ -74,7 +74,6 @@ test_that("catch-at-age model (deterministic MLE with wrappers) recruitment devs
   expect_equal(get_number_of_parameters(deterministic_age_length_comp)["fixed_effects"] |> unname(), 77)
   #' @description Test that the number of random effects are correct.
   expect_equal(get_number_of_parameters(deterministic_age_length_comp)["random_effects"] |> unname(), 0)
-
 })
 ## Edge handling ----
 # No edge cases to test
@@ -244,23 +243,25 @@ test_that("catch-at-age model (estimation MLE with wrappers) returns an error wh
   )
   # Set all non-NA estimation types to "constant" and initialize the model
   initialized_model <- parameters |>
-   dplyr::rows_update(
-        #log_devs has a special error when set to constant
-        y = tibble::tibble(
-          label = "log_devs",
-          time = 2:30,
-          distribution_type = NA_character_,
-          distribution = NA_character_,),
-          by = c("label", "time")
-      ) |>
-      dplyr::rows_update( 
-        #log_sd has a special error when there isn't a log_devs or log_r parameter set
-        y = tibble::tibble(
-          module_name = "Recruitment", 
-          label = "log_sd",
-          distribution_type = NA_character_,
-          distribution = NA_character_,),
-          by = c("module_name", "label")
+    dplyr::rows_update(
+      # log_devs has a special error when set to constant
+      y = tibble::tibble(
+        label = "log_devs",
+        time = 2:30,
+        distribution_type = NA_character_,
+        distribution = NA_character_,
+      ),
+      by = c("label", "time")
+    ) |>
+    dplyr::rows_update(
+      # log_sd has a special error when there isn't a log_devs or log_r parameter set
+      y = tibble::tibble(
+        module_name = "Recruitment",
+        label = "log_sd",
+        distribution_type = NA_character_,
+        distribution = NA_character_,
+      ),
+      by = c("module_name", "label")
     ) |>
     dplyr::mutate(
       estimation_type = dplyr::if_else(
@@ -315,26 +316,28 @@ test_that("catch-at-age model (estimation MLE with wrappers) returns an error wh
       y = tibble::tibble(
         label = "log_devs",
         time = 2:30,
-        estimation_type = "constant"),
+        estimation_type = "constant"
+      ),
       by = c("label", "time")
-    ) 
-    
+    )
+
   #' @description Test that FIMS returns an error when log_devs are constant but Recruitment expects a distribution process.
   expect_error(
     object = initialized_parameters |>
-     initialize_fims(
-      data = data_age_length_comp
-    ),
+      initialize_fims(
+        data = data_age_length_comp
+      ),
     regexp = "Missing required inputs for recruitment process random or fixed effects."
   )
-  
+
   clear()
 
   initialized_parameters <- parameters |>
     dplyr::rows_delete(
       y = tibble::tibble(
-        label = "log_devs")
-    ) 
+        label = "log_devs"
+      )
+    )
   #' @description Test that FIMS returns an error when log_devs are deleted but Recruitment expects a distribution process.
   expect_error(
     object = initialized_parameters |>
@@ -348,12 +351,12 @@ test_that("catch-at-age model (estimation MLE with wrappers) returns an error wh
 
   initialized_parameters <- parameters |>
     dplyr::mutate(
-        distribution_type = dplyr::if_else(
-          !is.na(distribution_type),
-          NA_character_,
-          distribution_type
-        )
-      ) 
+      distribution_type = dplyr::if_else(
+        !is.na(distribution_type),
+        NA_character_,
+        distribution_type
+      )
+    )
   #' @description Test that FIMS returns an error when distribution_type is missing for recruitment process random or fixed effects.
   expect_error(
     object = initialized_parameters |>
@@ -367,12 +370,12 @@ test_that("catch-at-age model (estimation MLE with wrappers) returns an error wh
 
   initialized_parameters <- parameters |>
     dplyr::mutate(
-        distribution = dplyr::if_else(
-          module_name == "Recruitment" & !is.na(distribution),
-          NA_character_,
-          distribution
-        )
-      ) 
+      distribution = dplyr::if_else(
+        module_name == "Recruitment" & !is.na(distribution),
+        NA_character_,
+        distribution
+      )
+    )
   #' @description Test that FIMS returns an error when distribution is missing for recruitment process random or fixed effects.
   expect_error(
     object = initialized_parameters |>

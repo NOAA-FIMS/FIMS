@@ -133,7 +133,7 @@ test_that("fit_fims() errors when optimization fails to converge", {
         label = "log_devs",
         time = 2:30,
         estimation_type = "fixed_effects"
-      ), 
+      ),
       by = c("label", "time")
     ) |>
     dplyr::rows_update(
@@ -172,7 +172,7 @@ test_that("fit_fims() errors when optimization fails to converge", {
         label = "log_devs",
         time = 2:30,
         estimation_type = "fixed_effects"
-      ), 
+      ),
       by = c("label", "time")
     ) |>
     dplyr::rows_update(
