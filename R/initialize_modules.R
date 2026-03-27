@@ -898,7 +898,11 @@ initialize_fims <- function(parameters, data) {
 
 
     # Initialize_process_distribution
-    sd_input <- recruitment_process_input |> dplyr::filter(label == "log_sd")
+    sd_input <- recruitment_process_input |> dplyr::filter(label == "log_sd") |>
+      dplyr::mutate(
+        label = "sd",
+        value = exp(value)
+      )
     recruitment_distribution <- initialize_process_distribution(
       module = recruitment,
       par = par,

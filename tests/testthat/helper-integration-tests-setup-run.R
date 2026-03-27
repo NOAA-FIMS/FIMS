@@ -165,7 +165,7 @@ prepare_test_data <- function() {
       tibble::tibble(
         module_name = "Recruitment",
         label = "log_sd",
-        value = om_input_list[[iter_id]][["logR_sd"]]
+        value = log(om_input_list[[iter_id]][["logR_sd"]])
       ),
       by = c("module_name", "label")
     ) |>
@@ -271,7 +271,7 @@ prepare_test_data <- function() {
         module_name = "Recruitment",
         label = "log_sd",
         estimation_type = "constant",
-        value = om_input_list[[iter_id]][["logR_sd"]]
+        value = log(om_input_list[[iter_id]][["logR_sd"]])
       ),
       by = c("module_name", "label")
     )
@@ -281,25 +281,30 @@ prepare_test_data <- function() {
     file = testthat::test_path("fixtures", "parameters_model_comparison_project_fixed_effects.RDS"),
     compress = FALSE
   )
+  deterministic_age_length_comp_fixed_effects <-  modified_parameters_fixed_effects |>
+    initialize_fims(data = data_age_length_comp) |>
+    fit_fims(optimize = FALSE)
 
-  # Run FIMS model
-  #TODO: suppress wrappers can be removed once length comp data is added to default
-  # model will fit without warnings/errors when length comps are modeled.
-  fit_agecomp_fixed_effects <- suppressWarnings(
-    suppressMessages(modified_parameters_fixed_effects |>
-    # remove rows that have module_type == LengthComp
-    dplyr::rows_delete(
-      y = tibble::tibble(module_type = "LengthComp")
-    ) |>
-    initialize_fims(data = data_age_comp) |>
-    fit_fims(optimize = TRUE)
-    ))
   clear()
 
   # Save FIMS results as a test fixture for additional fimsfit tests
   saveRDS(
-    fit_agecomp_fixed_effects,
-    file = testthat::test_path("fixtures", "fit_agecomp_fixed_effects.RDS"),
+    deterministic_age_length_comp_fixed_effects,
+    file = testthat::test_path("fixtures", "deterministic_age_length_comp_fixed_effects.RDS"),
+    compress = FALSE
+  )
+
+  # Run FIMS model
+  fit_age_length_comp_fixed_effects <- modified_parameters_fixed_effects |>
+    initialize_fims(data = data_age_length_comp) |>
+    fit_fims(optimize = TRUE)
+
+  clear()
+
+  # Save FIMS results as a test fixture for additional fimsfit tests
+  saveRDS(
+    fit_age_length_comp_fixed_effects,
+    file = testthat::test_path("fixtures", "fit_age_length_comp_fixed_effects.RDS"),
     compress = FALSE
   )
 

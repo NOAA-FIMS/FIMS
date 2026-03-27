@@ -33,11 +33,6 @@ test_that("catch-at-age model (deterministic MLE with wrappers) works with corre
     em_input = em_input_list[[iter_id]],
     use_fimsfit = TRUE
   )
-})
-
-test_that("catch-at-age model (deterministic MLE with wrappers) returns correct NLLs", {
-  # Load the test data from an RDS file containing the model fit
-  deterministic_age_length_comp <- readRDS(testthat::test_path("fixtures", "deterministic_age_length_comp.RDS"))
 
   #' @description Test that the NLLs from FIMS match the "true" NLLs from the model comparison project.
   verify_fims_nll(
@@ -47,24 +42,39 @@ test_that("catch-at-age model (deterministic MLE with wrappers) returns correct 
     em_input = em_input_list[[iter_id]]
   )
 
-  test_that("catch-at-age model (deterministic MLE with wrappers) returns correct number of parameters and random effects", {
-    #' @description Test that the number of fixed parameters are correct.
-    expect_equal(get_number_of_parameters(deterministic_age_length_comp)["fixed_effects"] |> unname(), 49)
-    #' @description Test that the number of random effects are correct.
-    expect_equal(get_number_of_parameters(deterministic_age_length_comp)["random_effects"] |> unname(), 29)
-  })
+  #' @description Test that the number of fixed parameters are correct.
+  expect_equal(get_number_of_parameters(deterministic_age_length_comp)["fixed_effects"] |> unname(), 49)
+  #' @description Test that the number of random effects are correct.
+  expect_equal(get_number_of_parameters(deterministic_age_length_comp)["random_effects"] |> unname(), 29)
 })
 
-test_that("catch-at-age model (deterministic MLE with wrappers) check recruitment devs fixed effects", {
+test_that("catch-at-age model (deterministic MLE with wrappers) recruitment devs fixed effects works with correct inputs", {
   # Load the test data from an RDS file containing the model fit
-  deterministic_age_length_comp <- readRDS(testthat::test_path("fixtures", "fit_agecomp_fixed_effects.RDS"))
+  deterministic_age_length_comp <- readRDS(testthat::test_path("fixtures", "deterministic_age_length_comp_fixed_effects.RDS"))
 
-  test_that("catch-at-age model (deterministic MLE with wrappers) returns correct number of parameters and random effects", {
-    #' @description Test that the number of fixed parameters are correct.
-    expect_equal(get_number_of_parameters(deterministic_age_length_comp)["fixed_effects"] |> unname(), 77)
-    #' @description Test that the number of random effects are correct.
-    expect_equal(get_number_of_parameters(deterministic_age_length_comp)["random_effects"] |> unname(), 0)
-  })
+  #' @description Test that the output from FIMS deterministic run matches the model comparison project OM values.
+  verify_fims_deterministic(
+    report = get_report(deterministic_age_length_comp),
+    estimates = get_estimates(deterministic_age_length_comp),
+    om_input = om_input_list[[iter_id]],
+    om_output = om_output_list[[iter_id]],
+    em_input = em_input_list[[iter_id]],
+    use_fimsfit = TRUE
+  )
+
+  #' @description Test that the NLLs from FIMS match the "true" NLLs from the model comparison project.
+  verify_fims_nll(
+    report = get_report(deterministic_age_length_comp),
+    om_input = om_input_list[[iter_id]],
+    om_output = om_output_list[[iter_id]],
+    em_input = em_input_list[[iter_id]]
+  )
+
+  #' @description Test that the number of fixed parameters are correct.
+  expect_equal(get_number_of_parameters(deterministic_age_length_comp)["fixed_effects"] |> unname(), 77)
+  #' @description Test that the number of random effects are correct.
+  expect_equal(get_number_of_parameters(deterministic_age_length_comp)["random_effects"] |> unname(), 0)
+
 })
 ## Edge handling ----
 # No edge cases to test
@@ -79,6 +89,21 @@ test_that("catch-at-age model (deterministic MLE with wrappers) check recruitmen
 test_that("catch-at-age model (estimation MLE with wrappers) works with age and length comp", {
   # Load the test data from an RDS file containing the model fit
   fit_age_length_comp <- readRDS(testthat::test_path("fixtures", "fit_age_length_comp.RDS"))
+
+  #' @description Test that the output from FIMS matches the model comparison project OM values.
+  validate_fims(
+    report = get_report(fit_age_length_comp),
+    estimates = get_estimates(fit_age_length_comp),
+    om_input = om_input_list[[iter_id]],
+    om_output = om_output_list[[iter_id]],
+    em_input = em_input_list[[iter_id]],
+    use_fimsfit = TRUE
+  )
+})
+
+test_that("catch-at-age model (estimation MLE with wrappers) recruitment devs fixed effects works with age and length comp", {
+  # Load the test data from an RDS file containing the model fit
+  fit_age_length_comp <- readRDS(testthat::test_path("fixtures", "fit_age_length_comp_fixed_effects.RDS"))
 
   #' @description Test that the output from FIMS matches the model comparison project OM values.
   validate_fims(
