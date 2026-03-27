@@ -131,7 +131,7 @@ test_that("fit_fims() errors when optimization fails to converge", {
     dplyr::rows_update(
       tibble::tibble(
         label = "log_devs",
-        time = 2:30,
+        time = 2:get_n_years(data_age_comp),
         estimation_type = "fixed_effects"
       ),
       by = c("label", "time")
@@ -148,7 +148,7 @@ test_that("fit_fims() errors when optimization fails to converge", {
       tibble::tibble(
         module_type = "Landings",
         label = "log_sd",
-        time = 1:30,
+        time = 1:get_n_years(data_age_comp),
         value = 10
       ),
       by = c("module_type", "label", "time")
@@ -165,12 +165,12 @@ test_that("fit_fims() errors when optimization fails to converge", {
 
   clear()
 
-  # Estimate the first  year of natural mortality to cause NA standard errors
+  # Estimate the first (age, year) of natural mortality to cause NA standard errors
   parameters_4_model <- parameters |>
     dplyr::rows_update(
       tibble::tibble(
         label = "log_devs",
-        time = 2:30,
+        time = 2:get_n_years(data_age_comp),
         estimation_type = "fixed_effects"
       ),
       by = c("label", "time")

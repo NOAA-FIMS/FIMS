@@ -42,10 +42,20 @@ test_that("catch-at-age model (deterministic MLE with wrappers) works with corre
     em_input = em_input_list[[iter_id]]
   )
 
+  parameters <- readRDS(testthat::test_path("fixtures", "parameters_model_comparison_project.RDS"))
+  number_fixed_effects <- parameters |> 
+    dplyr::filter(estimation_type == "fixed_effects") |> 
+    dplyr::pull(estimation_type) |> 
+    length()
+  number_random_effects <- parameters |> 
+    dplyr::filter(estimation_type == "random_effects") |> 
+    dplyr::pull(estimation_type) |> 
+    length()
+
   #' @description Test that the number of fixed parameters are correct.
-  expect_equal(get_number_of_parameters(deterministic_age_length_comp)["fixed_effects"] |> unname(), 49)
+  expect_equal(get_number_of_parameters(deterministic_age_length_comp)["fixed_effects"] |> unname(), number_fixed_effects)
   #' @description Test that the number of random effects are correct.
-  expect_equal(get_number_of_parameters(deterministic_age_length_comp)["random_effects"] |> unname(), 29)
+  expect_equal(get_number_of_parameters(deterministic_age_length_comp)["random_effects"] |> unname(), number_random_effects)
 })
 
 test_that("catch-at-age model (deterministic MLE with wrappers) recruitment devs fixed effects works with correct inputs", {
@@ -70,10 +80,20 @@ test_that("catch-at-age model (deterministic MLE with wrappers) recruitment devs
     em_input = em_input_list[[iter_id]]
   )
 
+  parameters <- readRDS(testthat::test_path("fixtures", "parameters_model_comparison_project_fixed_effects.RDS"))
+  number_fixed_effects <- parameters |> 
+    dplyr::filter(estimation_type == "fixed_effects") |> 
+    dplyr::pull(estimation_type) |> 
+    length()
+  number_random_effects <- parameters |> 
+    dplyr::filter(estimation_type == "random_effects") |> 
+    dplyr::pull(estimation_type) |> 
+    length()
+
   #' @description Test that the number of fixed parameters are correct.
-  expect_equal(get_number_of_parameters(deterministic_age_length_comp)["fixed_effects"] |> unname(), 77)
+  expect_equal(get_number_of_parameters(deterministic_age_length_comp)["fixed_effects"] |> unname(), number_fixed_effects)
   #' @description Test that the number of random effects are correct.
-  expect_equal(get_number_of_parameters(deterministic_age_length_comp)["random_effects"] |> unname(), 0)
+  expect_equal(get_number_of_parameters(deterministic_age_length_comp)["random_effects"] |> unname(), number_random_effects)
 })
 ## Edge handling ----
 # No edge cases to test
@@ -247,7 +267,7 @@ test_that("catch-at-age model (estimation MLE with wrappers) returns an error wh
       # log_devs has a special error when set to constant
       y = tibble::tibble(
         label = "log_devs",
-        time = 2:30,
+        time = 2:get_n_years(data_age_length_comp),
         distribution_type = NA_character_,
         distribution = NA_character_,
       ),
@@ -315,7 +335,7 @@ test_that("catch-at-age model (estimation MLE with wrappers) returns an error wh
     dplyr::rows_update(
       y = tibble::tibble(
         label = "log_devs",
-        time = 2:30,
+        time = 2:get_n_years(data_age_length_comp),
         estimation_type = "constant"
       ),
       by = c("label", "time")

@@ -137,7 +137,7 @@ prepare_test_data <- function() {
       tibble::tibble(
         fleet_name = "fleet1",
         label = "log_Fmort",
-        time = 1:30,
+        time = 1:get_n_years(data_age_length_comp),
         value = log(om_output_list[[iter_id]][["f"]]),
       ),
       by = c("fleet_name", "label", "time")
@@ -155,7 +155,7 @@ prepare_test_data <- function() {
     dplyr::rows_update(
       tibble::tibble(
         label = "log_devs",
-        time = 2:30,
+        time = 2:get_n_years(data_age_length_comp),
         value = om_input_list[[iter_id]][["logR.resid"]][-1]
       ),
       by = c("label", "time")
@@ -189,7 +189,7 @@ prepare_test_data <- function() {
     dplyr::rows_update(
       tibble::tibble(
         label = "log_init_naa",
-        age = 1:12,
+        age = 1:get_n_ages(data_age_length_comp),
         value = log(om_output_list[[iter_id]][["N.age"]][1, ])
       ),
       by = c("label", "age")
