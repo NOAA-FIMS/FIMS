@@ -326,8 +326,10 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
     }
     if (random_effects[["recruitment"]] == "log_r") {
       recruitment$log_r$resize(om_input[["nyr"]] - 1)
-      recruits_true <- matrix(c(t(om_output[["N.age"]])), 
-        om_input[["nyr"]], om_input[["nages"]], byrow = TRUE)[, 1]
+      recruits_true <- matrix(c(t(om_output[["N.age"]])),
+        om_input[["nyr"]], om_input[["nages"]],
+        byrow = TRUE
+      )[, 1]
       for (y in 1:(om_input[["nyr"]] - 1)) {
         if (!estimation_mode) {
           recruitment$log_r[y]$value <- recruits_true[y + 1]
