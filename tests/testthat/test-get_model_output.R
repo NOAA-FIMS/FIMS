@@ -29,7 +29,7 @@ test_that("`get_model_output()` works with correct inputs", {
     "name", "type", "estimation_framework", "id", "objective_function_value",
     "growth", "recruitment", "maturity",
     "selectivity", "population_ids", "fleet_ids", "populations", "fleets",
-    "density_components", "data", "log"
+    "density_components", "data"
   )
 
   # Function to read the RDS file and get obj

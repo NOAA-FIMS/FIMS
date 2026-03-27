@@ -84,10 +84,6 @@ bool CreateTMBModel() {
       fims_info::Information<TMBAD_FIMS_TYPE>::GetInstance();
   info->Clear();
 
-  FIMS_INFO_LOG(
-      "Adding FIMS objects to TMB, " +
-      fims::to_string(FIMSRcppInterfaceBase::fims_interface_objects.size()) +
-      " objects");
   for (size_t i = 0; i < FIMSRcppInterfaceBase::fims_interface_objects.size();
        i++) {
     FIMSRcppInterfaceBase::fims_interface_objects[i]->add_to_fims_tmb();
@@ -246,7 +242,6 @@ void clear_internal() {
  * @brief Clears the vector of independent variables.
  */
 void clear() {
-  FIMS_INFO_LOG("Clearing FIMS objects from interface stack");
   // rcpp_interface_base.hpp
   FIMSRcppInterfaceBase::fims_interface_objects.clear();
 
@@ -361,16 +356,12 @@ std::string get_log_info() { return fims::FIMSLog::fims_log->get_info(); }
 /**
  * @brief If true, writes the log on exit.
  */
-void write_log(bool write) {
-  FIMS_INFO_LOG("Setting FIMS write log: " + fims::to_string(write));
-  fims::FIMSLog::fims_log->write_on_exit = write;
-}
+void write_log(bool write) { fims::FIMSLog::fims_log->write_on_exit = write; }
 
 /**
  * @brief Sets the path for the log file to be written to.
  */
 void set_log_path(const std::string &path) {
-  FIMS_INFO_LOG("Setting FIMS log path: " + path);
   fims::FIMSLog::fims_log->set_path(path);
 }
 
