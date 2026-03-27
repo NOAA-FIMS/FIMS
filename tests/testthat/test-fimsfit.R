@@ -126,7 +126,7 @@ test_that("fit_fims() errors when optimization fails to converge", {
 
   clear()
 
-  # Fix Landings sd at high value in PNL model to cause high standard errors
+  # Fix Landings sd at high value in penalized likelihood model to cause high standard errors
   parameters_4_model <- parameters |>
     dplyr::rows_update(
       tibble::tibble(
