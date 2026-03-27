@@ -43,13 +43,13 @@ test_that("catch-at-age model (deterministic MLE with wrappers) works with corre
   )
 
   parameters <- readRDS(testthat::test_path("fixtures", "parameters_model_comparison_project.RDS"))
-  number_fixed_effects <- parameters |> 
-    dplyr::filter(estimation_type == "fixed_effects") |> 
-    dplyr::pull(estimation_type) |> 
+  number_fixed_effects <- parameters |>
+    dplyr::filter(estimation_type == "fixed_effects") |>
+    dplyr::pull(estimation_type) |>
     length()
-  number_random_effects <- parameters |> 
-    dplyr::filter(estimation_type == "random_effects") |> 
-    dplyr::pull(estimation_type) |> 
+  number_random_effects <- parameters |>
+    dplyr::filter(estimation_type == "random_effects") |>
+    dplyr::pull(estimation_type) |>
     length()
 
   #' @description Test that the number of fixed parameters are correct.
@@ -81,13 +81,13 @@ test_that("catch-at-age model (deterministic MLE with wrappers) recruitment devs
   )
 
   parameters <- readRDS(testthat::test_path("fixtures", "parameters_model_comparison_project_fixed_effects.RDS"))
-  number_fixed_effects <- parameters |> 
-    dplyr::filter(estimation_type == "fixed_effects") |> 
-    dplyr::pull(estimation_type) |> 
+  number_fixed_effects <- parameters |>
+    dplyr::filter(estimation_type == "fixed_effects") |>
+    dplyr::pull(estimation_type) |>
     length()
-  number_random_effects <- parameters |> 
-    dplyr::filter(estimation_type == "random_effects") |> 
-    dplyr::pull(estimation_type) |> 
+  number_random_effects <- parameters |>
+    dplyr::filter(estimation_type == "random_effects") |>
+    dplyr::pull(estimation_type) |>
     length()
 
   #' @description Test that the number of fixed parameters are correct.
