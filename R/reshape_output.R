@@ -35,7 +35,12 @@ reshape_json_estimates <- function(model_output) {
         density_tibble,
         input_type == "random_effects"
       ) |>
-        dplyr::select(-module_name, -module_id, -module_type),
+        dplyr::select(
+          -module_name,
+          -module_id,
+          -module_type,
+          -observed_data_id
+        ),
       by = c(
         "estimation_type" = "input_type",
         "estimated_value" = "observed_values"
