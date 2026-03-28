@@ -97,6 +97,9 @@ compare_tmb_and_json_outputs <- function(model_fit_path) {
   # in the second data frame based on the specified column.
   missing_module_name_in_json <- dplyr::anti_join(
     tmb_output |>
+      # remove log_sd b/c this is a column in the json_output rather than a
+      # label with an entire row as it is in the tmb_output
+      dplyr::filter(label != "log_sd") |>
       dplyr::filter(!is.na(module_name)) |>
       dplyr::select(module_name),
     json_output |>
@@ -107,6 +110,9 @@ compare_tmb_and_json_outputs <- function(model_fit_path) {
   # Find labels that are present in TMB output but missing in JSON output.
   missing_label_in_json <- dplyr::anti_join(
     tmb_output |>
+      # remove log_sd b/c this is a column in the json_output rather than a
+      # label with an entire row as it is in the tmb_output
+      dplyr::filter(label != "log_sd") |>
       dplyr::select(label),
     json_output |>
       dplyr::select(label)

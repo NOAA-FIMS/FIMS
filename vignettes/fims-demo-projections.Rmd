@@ -235,7 +235,7 @@ parameters_projection <- create_default_parameters(
   dplyr::rows_update(
     tibble::tibble(
       label = "log_init_naa",
-      age = 1:12,
+      age = 1:get_n_ages(data_4_projections),
       value = c(
         13.80944, 13.60690, 13.40217, 13.19525, 12.98692, 12.77791,
         12.56862, 12.35922, 12.14979, 11.94034, 11.73088, 13.18755

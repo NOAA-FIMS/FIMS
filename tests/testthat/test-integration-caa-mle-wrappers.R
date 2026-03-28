@@ -33,11 +33,6 @@ test_that("catch-at-age model (deterministic MLE with wrappers) works with corre
     em_input = em_input_list[[iter_id]],
     use_fimsfit = TRUE
   )
-})
-
-test_that("catch-at-age model (deterministic MLE with wrappers) returns correct NLLs", {
-  # Load the test data from an RDS file containing the model fit
-  deterministic_age_length_comp <- readRDS(testthat::test_path("fixtures", "deterministic_age_length_comp.RDS"))
 
   #' @description Test that the NLLs from FIMS match the "true" NLLs from the model comparison project.
   verify_fims_nll(
@@ -47,24 +42,58 @@ test_that("catch-at-age model (deterministic MLE with wrappers) returns correct 
     em_input = em_input_list[[iter_id]]
   )
 
-  test_that("catch-at-age model (deterministic MLE with wrappers) returns correct number of parameters and random effects", {
-    #' @description Test that the number of fixed parameters are correct.
-    expect_equal(get_number_of_parameters(deterministic_age_length_comp)["fixed_effects"] |> unname(), 77)
-    #' @description Test that the number of random effects are correct.
-    expect_equal(get_number_of_parameters(deterministic_age_length_comp)["random_effects"] |> unname(), 0)
-  })
+  parameters <- readRDS(testthat::test_path("fixtures", "parameters_model_comparison_project.RDS"))
+  number_fixed_effects <- parameters |>
+    dplyr::filter(estimation_type == "fixed_effects") |>
+    dplyr::pull(estimation_type) |>
+    length()
+  number_random_effects <- parameters |>
+    dplyr::filter(estimation_type == "random_effects") |>
+    dplyr::pull(estimation_type) |>
+    length()
+
+  #' @description Test that the number of fixed parameters are correct.
+  expect_equal(get_number_of_parameters(deterministic_age_length_comp)["fixed_effects"] |> unname(), number_fixed_effects)
+  #' @description Test that the number of random effects are correct.
+  expect_equal(get_number_of_parameters(deterministic_age_length_comp)["random_effects"] |> unname(), number_random_effects)
 })
 
-test_that("catch-at-age model (deterministic MLE with wrappers) check recruitment devs random effects", {
+test_that("catch-at-age model (deterministic MLE with wrappers) recruitment devs fixed effects works with correct inputs", {
   # Load the test data from an RDS file containing the model fit
-  deterministic_age_length_comp <- readRDS(testthat::test_path("fixtures", "fit_agecomp_random_effects.RDS"))
+  deterministic_age_length_comp <- readRDS(testthat::test_path("fixtures", "deterministic_age_length_comp_fixed_effects.RDS"))
 
-  test_that("catch-at-age model (deterministic MLE with wrappers) returns correct number of parameters and random effects", {
-    #' @description Test that the number of fixed parameters are correct.
-    expect_equal(get_number_of_parameters(deterministic_age_length_comp)["fixed_effects"] |> unname(), 48)
-    #' @description Test that the number of random effects are correct.
-    expect_equal(get_number_of_parameters(deterministic_age_length_comp)["random_effects"] |> unname(), 29)
-  })
+  #' @description Test that the output from FIMS deterministic run matches the model comparison project OM values.
+  verify_fims_deterministic(
+    report = get_report(deterministic_age_length_comp),
+    estimates = get_estimates(deterministic_age_length_comp),
+    om_input = om_input_list[[iter_id]],
+    om_output = om_output_list[[iter_id]],
+    em_input = em_input_list[[iter_id]],
+    use_fimsfit = TRUE
+  )
+
+  #' @description Test that the NLLs from FIMS match the "true" NLLs from the model comparison project.
+  verify_fims_nll(
+    report = get_report(deterministic_age_length_comp),
+    om_input = om_input_list[[iter_id]],
+    om_output = om_output_list[[iter_id]],
+    em_input = em_input_list[[iter_id]]
+  )
+
+  parameters <- readRDS(testthat::test_path("fixtures", "parameters_model_comparison_project_fixed_effects.RDS"))
+  number_fixed_effects <- parameters |>
+    dplyr::filter(estimation_type == "fixed_effects") |>
+    dplyr::pull(estimation_type) |>
+    length()
+  number_random_effects <- parameters |>
+    dplyr::filter(estimation_type == "random_effects") |>
+    dplyr::pull(estimation_type) |>
+    length()
+
+  #' @description Test that the number of fixed parameters are correct.
+  expect_equal(get_number_of_parameters(deterministic_age_length_comp)["fixed_effects"] |> unname(), number_fixed_effects)
+  #' @description Test that the number of random effects are correct.
+  expect_equal(get_number_of_parameters(deterministic_age_length_comp)["random_effects"] |> unname(), number_random_effects)
 })
 ## Edge handling ----
 # No edge cases to test
@@ -79,6 +108,21 @@ test_that("catch-at-age model (deterministic MLE with wrappers) check recruitmen
 test_that("catch-at-age model (estimation MLE with wrappers) works with age and length comp", {
   # Load the test data from an RDS file containing the model fit
   fit_age_length_comp <- readRDS(testthat::test_path("fixtures", "fit_age_length_comp.RDS"))
+
+  #' @description Test that the output from FIMS matches the model comparison project OM values.
+  validate_fims(
+    report = get_report(fit_age_length_comp),
+    estimates = get_estimates(fit_age_length_comp),
+    om_input = om_input_list[[iter_id]],
+    om_output = om_output_list[[iter_id]],
+    em_input = em_input_list[[iter_id]],
+    use_fimsfit = TRUE
+  )
+})
+
+test_that("catch-at-age model (estimation MLE with wrappers) recruitment devs fixed effects works with age and length comp", {
+  # Load the test data from an RDS file containing the model fit
+  fit_age_length_comp <- readRDS(testthat::test_path("fixtures", "fit_age_length_comp_fixed_effects.RDS"))
 
   #' @description Test that the output from FIMS matches the model comparison project OM values.
   validate_fims(
@@ -219,6 +263,26 @@ test_that("catch-at-age model (estimation MLE with wrappers) returns an error wh
   )
   # Set all non-NA estimation types to "constant" and initialize the model
   initialized_model <- parameters |>
+    dplyr::rows_update(
+      # log_devs has a special error when set to constant
+      y = tibble::tibble(
+        label = "log_devs",
+        time = 2:get_n_years(data_age_length_comp),
+        distribution_type = NA_character_,
+        distribution = NA_character_,
+      ),
+      by = c("label", "time")
+    ) |>
+    dplyr::rows_update(
+      # log_sd has a special error when there isn't a log_devs or log_r parameter set
+      y = tibble::tibble(
+        module_name = "Recruitment",
+        label = "log_sd",
+        distribution_type = NA_character_,
+        distribution = NA_character_,
+      ),
+      by = c("module_name", "label")
+    ) |>
     dplyr::mutate(
       estimation_type = dplyr::if_else(
         !is.na(estimation_type),
@@ -229,6 +293,7 @@ test_that("catch-at-age model (estimation MLE with wrappers) returns an error wh
     initialize_fims(
       data = data_age_length_comp
     )
+
   # Fit model without optimization and get output from a deterministic run
   deterministic_output <- initialized_model |>
     fit_fims(optimize = FALSE) |>
@@ -256,4 +321,87 @@ test_that("catch-at-age model (estimation MLE with wrappers) returns an error wh
     regexp = "FIMS must have at least one parameter to optimize."
   )
   clear()
+})
+
+test_that("catch-at-age model (estimation MLE with wrappers) returns an error when there is a mismatch in parameters specified for recruitment process random or fixed effects", {
+  # Load data
+  data_age_length_comp <- FIMSFrame(data_big)
+  # Load pre-configured parameters
+  parameters <- readRDS(
+    testthat::test_path("fixtures", "parameters_model_comparison_project.RDS")
+  )
+  # Set log_devs constant but leave in Recruitment distribution parameters.
+  initialized_parameters <- parameters |>
+    dplyr::rows_update(
+      y = tibble::tibble(
+        label = "log_devs",
+        time = 2:get_n_years(data_age_length_comp),
+        estimation_type = "constant"
+      ),
+      by = c("label", "time")
+    )
+
+  #' @description Test that FIMS returns an error when log_devs are constant but Recruitment expects a distribution process.
+  expect_error(
+    object = initialized_parameters |>
+      initialize_fims(
+        data = data_age_length_comp
+      ),
+    regexp = "Missing required inputs for recruitment process random or fixed effects."
+  )
+
+  clear()
+
+  initialized_parameters <- parameters |>
+    dplyr::rows_delete(
+      y = tibble::tibble(
+        label = "log_devs"
+      )
+    )
+  #' @description Test that FIMS returns an error when log_devs are deleted but Recruitment expects a distribution process.
+  expect_error(
+    object = initialized_parameters |>
+      initialize_fims(
+        data = data_age_length_comp
+      ),
+    regexp = "Missing required inputs for recruitment process random or fixed effects."
+  )
+
+  clear()
+
+  initialized_parameters <- parameters |>
+    dplyr::mutate(
+      distribution_type = dplyr::if_else(
+        !is.na(distribution_type),
+        NA_character_,
+        distribution_type
+      )
+    )
+  #' @description Test that FIMS returns an error when distribution_type is missing for recruitment process random or fixed effects.
+  expect_error(
+    object = initialized_parameters |>
+      initialize_fims(
+        data = data_age_length_comp
+      ),
+    regexp = "Missing required inputs for recruitment process random or fixed effects."
+  )
+
+  clear()
+
+  initialized_parameters <- parameters |>
+    dplyr::mutate(
+      distribution = dplyr::if_else(
+        module_name == "Recruitment" & !is.na(distribution),
+        NA_character_,
+        distribution
+      )
+    )
+  #' @description Test that FIMS returns an error when distribution is missing for recruitment process random or fixed effects.
+  expect_error(
+    object = initialized_parameters |>
+      initialize_fims(
+        data = data_age_length_comp
+      ),
+    regexp = "Missing required inputs for recruitment process random or fixed effects."
+  )
 })
