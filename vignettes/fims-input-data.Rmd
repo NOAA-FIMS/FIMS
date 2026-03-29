@@ -16,6 +16,7 @@ withr::local_options(list(
   crayon.enabled = FALSE,
   pillar.subtle = FALSE
 ))
+library(FIMS)
 ```
 
 ## Other sources of information
@@ -41,6 +42,19 @@ The individual data types are described in more detail below after introducing t
 ## `data_big`
 
 A sample data frame for a catch-at-age model with both ages and lengths is stored in the package as `data_big`. This data set is based on data that was used in [Li et al. (2021)](https://www.doi.org/10.7755/FB.119.2-3.5) for the Model Comparison Project ([github site](https://github.com/NOAA-FIMS/Age_Structured_Stock_Assessment_Model_Comparison)). The length data have since been added [data-raw/data_big.R](https://github.com/NOAA-FIMS/FIMS/blob/main/data-raw/data_big.R) based on an age--length conversion matrix. To see how this example data frame was created, see the R script here [R/data_big.R](https://github.com/NOAA-FIMS/FIMS/blob/main/R/data_big.R).
+
+## `FIMSFrame()`
+
+`FIMSFrame()` must be used to create a data object that can be passed to a FIMS model. This function returns an object that has the `FIMSFrame` class. This class contains a data slot that stores the input data frame and several other slots that store summary information about the object, e.g., the fleet names, the number of age bins, etc. All of this information can be accessed using `get_*()` functions, e.g., `get_n_years()`, `get_fleets()`.
+
+When you execute `FIMSFrame()` on a long data frame, such as `data_big`, the function executes several error checks to help ensure that your data is ready for a FIMS model. For example, until the internal estimation of growth is possible, all catch-at-age models require weight-at-age data. If your data frame does not have weight-at-age data, then `FIMSFrame()` will error and return helpful information on what you are missing.
+
+The output of `FIMSFrame()` also contains summary information about your data and has an internal plotting function. See the [FIMS overview vignette](https://noaa-fims.github.io/FIMS/articles/fims-demo.html) for more information.
+
+```{r fims-frame}
+data_4_model <- FIMSFrame(data_big)
+data_4_model
+```
 
 ## Landings (`type == "landings"`)
 
@@ -115,7 +129,7 @@ FIMS::data_big |>
   ggplot2::xlab("Age") +
   ggplot2::ylab("Number") +
   ggplot2::facet_wrap(~timing) +
-  ggplot2::scale_x_continuous(breaks = 1:12) +
+  ggplot2::scale_x_continuous(breaks = get_ages(data_4_model)) +
   ggtitle("Age compositions by time step in data_big example data set")
 ```
 
@@ -187,7 +201,7 @@ FIMS::data_big |>
   ggplot2::xlab("Age") +
   ggplot2::ylab("Weight (mt)") +
   ggplot2::facet_wrap(~timing) +
-  ggplot2::scale_x_continuous(breaks = 1:12) +
+  ggplot2::scale_x_continuous(breaks = get_ages(data_4_model)) +
   geom_hline(yintercept = 0) +
   ggtitle("Weight-at-age values by time step in data_big example data set")
 ```
@@ -232,7 +246,7 @@ FIMS::data_big |>
   ggplot2::scale_size_continuous(range = c(0.1, 12)) +
   ggplot2::xlab("Age") +
   ggplot2::ylab("Length (mm)") +
-  ggplot2::scale_x_continuous(breaks = 1:12) +
+  ggplot2::scale_x_continuous(breaks = get_ages(data_4_model)) +
   geom_hline(yintercept = 0) +
   ggtitle("Age-to-length conversion values for the data_big example data set")
 ```
