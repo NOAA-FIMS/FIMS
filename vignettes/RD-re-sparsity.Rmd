@@ -67,7 +67,7 @@ nll <- nll - sum(dnorm(y, lambda, sdo, TRUE))
 
 Under this formulation, the process approach results in a sparse Hessian which is a function of the inverted covariance matrix, while the deviations approach results in a dense Hessian (Fig 1). Models were evaluated with RTMB (Kristensen, 2019) using the TMB package (Kristensen et al., 2016) in R (R Core Team, 2024). TMB relies on the Laplace approximation to integrate out random effects during an inner optimization step, and afterwards, the joint negative log likelihood is minimized with respect to the fixed effects. The Laplace approximation requires up to the second-order partial derivatives of the joint negative log likelihood with respect to the random effects to be evaluated at each inner optimization step. The computation cost of the Laplace approximation is primarily determined by the cost of inverting the Hessian, which is $O(N^3)$ for N-dimensional parameter space. As the number of random effects increases, the computational cost of inverting the dense Hessian from the deviations approach increases rapidly. Sparsity reduces this computational cost to $O(N)$ for an AR1 model, resulting in a slower increase in computational cost with increasing $N$.
 
-```{r ar1-hessian-figures, echo = FALSE, out.width = '49%', fig.show = 'hold'}
+```{r ar1-hessian-figures, echo = FALSE, out.width = '49%', fig.show = 'hold', fig.alt = c('Six hundred by six hundred hessian matrices, showing a dense Hessian matrix for an AR1 model under the deviations parameterization and a sparse Hessian matrix for an AR1 model under the process parameterization.')}
 knitr::include_graphics(c(
   "figures/ar1hess_deviations.jpg",
   "figures/ar1hess_process.jpg"
@@ -161,7 +161,7 @@ The process approach resulted in a sparse Hessian while the deviations approach 
 |Y        |deviations&nbsp;&nbsp;  |2.976              |1.695 |2.070 |9.903|
 |N        |deviations&nbsp;&nbsp;  |3.372              |1.324 |2.614 |9.613|
 
-```{r catch-at-age-hessian-figures, echo = FALSE, out.width = '49%', fig.show = 'hold'}
+```{r catch-at-age-hessian-figures, echo = FALSE, out.width = '49%', fig.show = 'hold', fig.alt = c('The two panels show the hessian matrices for random effects in the recruitment of a catch-at-age model under the deviations parameterization on the left and the process parameterization on the right. The figure on the left is dense and the one on the right is sparse, showing only the diagonal.')}
 knitr::include_graphics(c(
   "figures/basicfsa_ar1_dense.png",
   "figures/basicfsa_ar1_sparse.png"
