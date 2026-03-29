@@ -94,18 +94,25 @@ str(fit$data)
 We modified the model to structure recruitment under both the deviation and process approaches. The main structure for recruitment for years 2 and greater was applied to the numbers-at-age parameter, $N_{y, a=1}$ for year $y$ and for age 1 with mean recruitment $\hat{r}$, written as the following:
 
 **deviations approach**:
+
+$$
 \begin{aligned}
 z_{1} &\sim Normal\big(0, \sqrt{\sigma_{r}^{2}/(1 - \phi^2)}\big)\\
 z_{2:n} &\sim Normal(0, \sigma_{r})\\
 dev_{1} &= z_{1}\\
 dev_{y} &= \phi dev_{y-1} + z_{y}\\
-log(N_{y,1}) &= \bar{r} + dev_{y}
+\log(N_{y,1}) &= \bar{r} + dev_{y}
 \end{aligned}
+$$
+
 **process approach**:
+
+$$
 \begin{aligned}
-log(\widehat{N_{y,1}}) &= log(N_{y-1,1})\\
-log(N_{y,1}) &\sim Normal(\bar{r} + \phi(log(\widehat{N_{y,1}}) - \bar{r}), \sigma^{2}_{r})
+\log(\widehat{N_{y,1}}) &= \log(N_{y-1,1})\\
+\log(N_{y,1}) &\sim Normal\big(\bar{r} + \phi(\log(\widehat{N_{y,1}}) - \bar{r}), \sigma^{2}_{r}\big)
 \end{aligned}
+$$
 
 
 #### Code
