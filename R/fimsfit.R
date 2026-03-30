@@ -566,15 +566,49 @@ fit_fims <- function(input,
   ## optimize and compare
   cli::cli_inform(c("v" = "Starting optimization ..."))
   t0 <- Sys.time()
-  opt <- with(
-    obj,
-    nlminb(
-      start = par,
-      objective = fn,
-      gradient = gr,
-      control = control
-    )
+  opt <- tryCatch(
+    {
+      with(
+        obj,
+        nlminb(
+          start = par,
+          objective = fn,
+          gradient = gr,
+          control = control
+        )
+      )
+    },
+    error = function(e) {
+      cli::cli_warn(c(
+        "!" = paste("nlminb failed:", e$message)
+      ))
+      return(NULL)
+    }
   )
+
+  if (is.null(opt)) {
+    cli::cli_warn("Optimization failed. Returning partial results.")
+    
+    timing <- c(
+      time_optimization = Sys.time() - t0,
+      time_sdreport = as.difftime(0, units = "secs"),
+      time_total = Sys.time() - t0
+    )
+  
+    fit <- FIMSFit(
+      input = input,
+      obj = obj,
+      opt = list(
+        par = obj[["par"]],
+        objective = NA_real_,
+        convergence = 1
+      ),
+      sdreport = list(),
+      timing = timing
+    )
+    
+    return(fit)
+  }
   maxgrad0 <- maxgrad <- max(abs(obj$gr(opt[["par"]])))
   if (number_of_loops > 0) {
     cli::cli_inform(c(
@@ -585,15 +619,30 @@ fit_fims <- function(input,
       # differences in values printed out using control$trace will be
       # negligible between these different runs and is not worth printing
       control$trace <- 0
-      opt <- with(
-        obj,
-        nlminb(
-          start = opt[["par"]],
-          objective = fn,
-          gradient = gr,
-          control = control
-        )
+      opt <- tryCatch(
+        {
+          with(
+            obj,
+            nlminb(
+              start = opt[["par"]],
+              objective = fn,
+              gradient = gr,
+              control = control
+            )
+          )
+        },
+        error = function(e) {
+          cli::cli_warn(c(
+            "!" = paste("nlminb failed during loop:", e$message)
+          ))
+          return(NULL)
+        }
       )
+
+      if (is.null(opt)) {
+        break
+      }
+      
       maxgrad <- max(abs(obj[["gr"]](opt[["par"]])))
     }
     div_digit <- cli::cli_div(theme = list(.val = list(digits = 5)))
