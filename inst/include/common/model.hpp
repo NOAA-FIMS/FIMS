@@ -28,7 +28,8 @@ class Model {  // may need singleton
       fims_information; /**< Create a shared fims_information as a pointer to
                          Information*/
 
-bool do_reporting = true; /**< flag to control reporting of derived quantities >*/
+  bool do_reporting =
+      true; /**< flag to control reporting of derived quantities >*/
 
   /**
    * @brief Construct a new Model object.
@@ -48,7 +49,6 @@ bool do_reporting = true; /**< flag to control reporting of derived quantities >
 
   ::objective_function<Type> *of;
 #endif
-
 
   /**
    * Returns a single Information object for type Type.
@@ -165,7 +165,6 @@ bool do_reporting = true; /**< flag to control reporting of derived quantities >
         fims::to_string(n_data) +
         " data likelihoods is: " + fims::to_string(jnll));
 
-        
 // // report out nll components
 // if(this->do_reporting) {
 #ifdef TMB_MODEL
@@ -175,7 +174,7 @@ bool do_reporting = true; /**< flag to control reporting of derived quantities >
     FIMS_REPORT_F(jnll, this->of);
 
 #endif
-  
+
     // report out model family objects
     for (m_it = this->fims_information->models_map.begin();
          m_it != this->fims_information->models_map.end(); ++m_it) {
@@ -185,7 +184,7 @@ bool do_reporting = true; /**< flag to control reporting of derived quantities >
       // m->do_reporting = true;
       m->Report();
     }
-  // }
+    // }
 
     return jnll;
   }
