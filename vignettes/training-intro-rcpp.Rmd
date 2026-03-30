@@ -62,6 +62,16 @@ Using {Rcpp} you can compile C++ code using R and never have to interact with an
 <details>
 <summary><strong>Example: Inline C++ within R</strong></summary>
 
+```{r, echo = FALSE}
+# cleanup environment for Rcpp::sourceCpp to work
+if (isNamespaceLoaded("TMB")) {
+  devtools::unload(package = "TMB")
+}
+if (isNamespaceLoaded("Rcpp")) {
+  devtools::unload(package = "Rcpp")
+}
+```
+
 ```{r inline}
 library(Rcpp)
 

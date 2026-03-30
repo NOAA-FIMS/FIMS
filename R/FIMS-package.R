@@ -43,7 +43,6 @@
 #' @import methods
 #' @import stats
 #' @importFrom ggplot2 .data
-#' @importFrom Rcpp sourceCpp
 #' @importFrom rlang :=
 #' @importFrom TMB MakeADFun
 #' @useDynLib FIMS, .registration = TRUE

@@ -28,14 +28,23 @@ class Model {  // may need singleton
       fims_information; /**< Create a shared fims_information as a pointer to
                          Information*/
 
+  /**
+   * @brief Construct a new Model object.
+   *
+   */
+  Model() {}
+
+  /**
+   * @brief Destroy the Model object.
+   *
+   */
+  ~Model() {}
+  /**
+   * @brief Evaluate. Calculates the joint negative log-likelihood function.
+   */
 #ifdef TMB_MODEL
-  bool do_tmb_reporting = true;
   ::objective_function<Type> *of;
 #endif
-
-  // constructor
-
-  virtual ~Model() {}
 
   /**
    * Returns a single Information object for type Type.
@@ -75,7 +84,6 @@ class Model {  // may need singleton
          m_it != this->fims_information->models_map.end(); ++m_it) {
       //(*m_it).second points to the Model module
       std::shared_ptr<fims_popdy::FisheryModelBase<Type>> m = (*m_it).second;
-      m->of = this->of;  // link to TMB objective function
       m->Prepare();
       m->Evaluate();
     }
@@ -152,11 +160,14 @@ class Model {  // may need singleton
         fims::to_string(n_data) +
         " data likelihoods is: " + fims::to_string(jnll));
 
-// report out nll components
+    // report out nll components
+
 #ifdef TMB_MODEL
+
     vector<Type> nll_components = nll_vec.to_tmb();
     FIMS_REPORT_F(nll_components, this->of);
     FIMS_REPORT_F(jnll, this->of);
+
 #endif
 
     // report out model family objects
@@ -164,6 +175,7 @@ class Model {  // may need singleton
          m_it != this->fims_information->models_map.end(); ++m_it) {
       //(*m_it).second points to the Model module
       std::shared_ptr<fims_popdy::FisheryModelBase<Type>> m = (*m_it).second;
+      m->of = this->of;  // link to TMB objective function
       m->Report();
     }
 

@@ -353,7 +353,7 @@ initialize_fleet <- function(parameters, data, fleet_name, linked_ids) {
     module_name = "Fleet"
   )
 
-  module$SetSelectivityID(linked_ids["selectivity"])
+  module$SetSelectivityID(linked_ids[["selectivity"]])
 
   fleet_types <- get_data(data) |>
     dplyr::filter(name == fleet_name) |>
@@ -370,7 +370,7 @@ initialize_fleet <- function(parameters, data, fleet_name, linked_ids) {
   # data distribution specification
   if ("landings" %in% fleet_types &&
     "Landings" %in% distribution_names_for_fleet) {
-    module$SetObservedLandingsDataID(linked_ids["landings"])
+    module$SetObservedLandingsDataID(linked_ids[["landings"]])
   }
 
   # Link the observed index data to the fleet module using its associated ID
@@ -378,7 +378,7 @@ initialize_fleet <- function(parameters, data, fleet_name, linked_ids) {
   # data distribution specification
   if ("index" %in% fleet_types &&
     "Index" %in% distribution_names_for_fleet) {
-    module$SetObservedIndexDataID(linked_ids["index"])
+    module$SetObservedIndexDataID(linked_ids[["index"]])
   }
 
   # Link the observed age composition data to the fleet module using its
@@ -386,7 +386,7 @@ initialize_fleet <- function(parameters, data, fleet_name, linked_ids) {
   # in the data distribution specification
   if ("age_comp" %in% fleet_types &&
     "AgeComp" %in% distribution_names_for_fleet) {
-    module$SetObservedAgeCompDataID(linked_ids["age_comp"])
+    module$SetObservedAgeCompDataID(linked_ids[["age_comp"]])
   }
 
   # Link the observed length composition data to the fleet module using its
@@ -394,7 +394,7 @@ initialize_fleet <- function(parameters, data, fleet_name, linked_ids) {
   # exists in the data distribution specification
   if ("length_comp" %in% fleet_types &&
     "LengthComp" %in% distribution_names_for_fleet) {
-    module$SetObservedLengthCompDataID(linked_ids["length_comp"])
+    module$SetObservedLengthCompDataID(linked_ids[["length_comp"]])
   }
   return(module)
 }

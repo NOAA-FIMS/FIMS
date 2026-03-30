@@ -26,6 +26,7 @@ BEOS
 BH
 BOOL
 babySAM
+BACKTRACE
 Baranov
 BasedOnStyle
 Benchmarking
@@ -1204,6 +1205,7 @@ uid
 uint
 un
 uncomment
+undef
 unfished
 ungroup
 ungrouped

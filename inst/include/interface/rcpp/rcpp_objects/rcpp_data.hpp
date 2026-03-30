@@ -9,8 +9,8 @@
 #ifndef FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_DATA_HPP
 #define FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_DATA_HPP
 
-#include "../../../common/information.hpp"
 #include "rcpp_interface_base.hpp"
+#include "../../../common/information.hpp"
 
 /**
  * @brief Rcpp interface that serves as the parent class for Rcpp data

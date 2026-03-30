@@ -15,6 +15,17 @@ EP - in general it would be really helpful to have side by side examples of simi
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+```{r, echo = FALSE}
+# cleanup environment for Rcpp::sourceCpp to work
+if (isNamespaceLoaded("TMB")) {
+  devtools::unload(package = "TMB")
+}
+if (isNamespaceLoaded("Rcpp")) {
+  devtools::unload(package = "Rcpp")
+}
+library(Rcpp)
+```
+
 <!-- The section below creates a collpase/expand all button -->
 <div id="expand-collapse-buttons" style="margin-bottom: 20px;">
   <button onclick="expandAll()" class="btn btn-primary">Expand All</button>

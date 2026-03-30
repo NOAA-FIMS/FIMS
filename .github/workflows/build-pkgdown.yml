@@ -56,6 +56,9 @@ jobs:
           # Pass GHA inputs to the R script as environment variables
           INPUT_TESTDOWN: ${{ inputs.build_testdown }}
           INPUT_CODE_COVERAGE: ${{ inputs.build_code_coverage }}
+          R_KEEP_PKG_SOURCE: "yes"
+          TESTTHAT_PROGRESS: "plain"
+          R_BACKTRACE_ON_ERROR: "full"
         run: |
           reports_to_build <- c()
           # Check the environment variables passed from the 'env' block above
