@@ -701,7 +701,10 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
     std::shared_ptr<fims_info::Information<double>> info =
         fims_info::Information<double>::GetInstance();
 
-    std::shared_ptr<fims_popdy::CatchAtAge<double>> model =
+
+
+
+std::shared_ptr<fims_popdy::CatchAtAge<double>> model =
         std::dynamic_pointer_cast<fims_popdy::CatchAtAge<double>>(
             info->models_map[this->get_id()]);
 
