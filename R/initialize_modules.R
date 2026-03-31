@@ -353,7 +353,7 @@ initialize_fleet <- function(parameters, data, fleet_name, linked_ids) {
     module_name = "Fleet"
   )
 
-  module$SetSelectivityID(as.integer(linked_ids[["selectivity"]]))
+  module$SetSelectivityID(linked_ids[["selectivity"]])
 
   fleet_types <- get_data(data) |>
     dplyr::filter(name == fleet_name) |>
@@ -370,7 +370,7 @@ initialize_fleet <- function(parameters, data, fleet_name, linked_ids) {
   # data distribution specification
   if ("landings" %in% fleet_types &&
     "Landings" %in% distribution_names_for_fleet) {
-    module$SetObservedLandingsDataID(as.integer(linked_ids[["landings"]]))
+    module$SetObservedLandingsDataID(linked_ids[["landings"]])
   }
 
   # Link the observed index data to the fleet module using its associated ID
@@ -378,7 +378,7 @@ initialize_fleet <- function(parameters, data, fleet_name, linked_ids) {
   # data distribution specification
   if ("index" %in% fleet_types &&
     "Index" %in% distribution_names_for_fleet) {
-    module$SetObservedIndexDataID(as.integer(linked_ids[["index"]]))
+    module$SetObservedIndexDataID(linked_ids[["index"]])
   }
 
   # Link the observed age composition data to the fleet module using its
@@ -386,7 +386,7 @@ initialize_fleet <- function(parameters, data, fleet_name, linked_ids) {
   # in the data distribution specification
   if ("age_comp" %in% fleet_types &&
     "AgeComp" %in% distribution_names_for_fleet) {
-    module$SetObservedAgeCompDataID(as.integer(linked_ids[["age_comp"]]))
+    module$SetObservedAgeCompDataID(linked_ids[["age_comp"]])
   }
 
   # Link the observed length composition data to the fleet module using its
@@ -394,7 +394,7 @@ initialize_fleet <- function(parameters, data, fleet_name, linked_ids) {
   # exists in the data distribution specification
   if ("length_comp" %in% fleet_types &&
     "LengthComp" %in% distribution_names_for_fleet) {
-    module$SetObservedLengthCompDataID(as.integer(linked_ids[["length_comp"]]))
+    module$SetObservedLengthCompDataID(linked_ids[["length_comp"]])
   }
   return(module)
 }
@@ -689,7 +689,7 @@ initialize_fims <- function(parameters, data) {
     )
 
     fleet_module_ids <- c(
-      selectivity = fleet_selectivity[[i]]$get_id() |> as.integer()
+      selectivity = fleet_selectivity[[i]]$get_id()
     )
 
     fleet_types <- get_data(data) |>
@@ -714,7 +714,7 @@ initialize_fims <- function(parameters, data) {
       # Add the module ID for the initialized landings to the list of fleet module IDs
       fleet_module_ids <- c(
         fleet_module_ids,
-        c(landings = fleet_landings[[i]]$get_id() |> as.integer())
+        c(landings = fleet_landings[[i]]$get_id())
       )
     }
 
@@ -749,7 +749,7 @@ initialize_fims <- function(parameters, data) {
       # Add the module ID for the initialized age composition to the list of fleet module IDs
       fleet_module_ids <- c(
         fleet_module_ids,
-        c(age_comp = fleet_age_comp[[i]]$get_id() |> as.integer())
+        c(age_comp = fleet_age_comp[[i]]$get_id())
       )
     }
 
@@ -767,7 +767,7 @@ initialize_fims <- function(parameters, data) {
       # Add the module ID for the initialized length composition to the list of fleet module IDs
       fleet_module_ids <- c(
         fleet_module_ids,
-        c(length_comp = fleet_length_comp[[i]]$get_id() |> as.integer())
+        c(length_comp = fleet_length_comp[[i]]$get_id())
       )
     }
 
@@ -954,10 +954,10 @@ initialize_fims <- function(parameters, data) {
   )
 
   population_module_ids <- c(
-    recruitment = recruitment$get_id() |> as.integer(),
-    growth = growth$get_id() |> as.integer(),
-    maturity = maturity$get_id() |> as.integer(),
-    fleets = purrr::map(fleet, \(x) x$get_id() |> as.integer())
+    recruitment = recruitment$get_id(),
+    growth = growth$get_id(),
+    maturity = maturity$get_id(),
+    fleets = purrr::map(fleet, \(x) x$get_id())
   )
 
   # Population
