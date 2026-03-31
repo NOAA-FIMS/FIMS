@@ -28,9 +28,6 @@ class Model {  // may need singleton
       fims_information; /**< Create a shared fims_information as a pointer to
                          Information*/
 
-  bool do_reporting =
-      true; /**< flag to control reporting of derived quantities >*/
-
   /**
    * @brief Construct a new Model object.
    *
@@ -179,7 +176,6 @@ class Model {  // may need singleton
       //(*m_it).second points to the Model module
       std::shared_ptr<fims_popdy::FisheryModelBase<Type>> m = (*m_it).second;
       m->of = this->of;  // link to TMB objective function
-      m->do_reporting = this->do_reporting;
       m->Report();
     }
 
