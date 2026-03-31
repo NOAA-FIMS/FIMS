@@ -392,18 +392,33 @@ test_that("`initialize_selectivity()` works with correct inputs", {
 ## IO correctness ----
 test_that("`initialize_fleet()` works with correct inputs", {
   # Setup selectivity module
-  selectivity <- initialize_selectivity(
+  selectivity <- FIMS:::initialize_selectivity(
     parameters = default_parameters,
     data = data,
     fleet_name = "fleet1"
   )
-
+  landings <- FIMS:::initialize_landings(
+    data = data,
+    fleet_name = "fleet1"
+  )
+  age_comp <- FIMS:::initialize_comp(
+    data = data,
+    fleet_name = "fleet1"
+  )
+  length_comp <- FIMS:::initialize_comp(
+    data = data,
+    fleet_name = "fleet1",
+    type = "LengthComp"
+  )
   linked_ids <- c(
-    selectivity = selectivity$get_id()
+    selectivity = selectivity$get_id(),
+    landings = landings$get_id(),
+    age_comp = age_comp$get_id(),
+    length_comp = length_comp$get_id()
   )
 
   #' @description Test that `initialize_fleet()` returns an S4 object.
-  result <- initialize_fleet(
+  result <- FIMS:::initialize_fleet(
     parameters = default_parameters,
     data = data,
     fleet_name = "fleet1",
