@@ -29,6 +29,8 @@ babySAM
 BACKTRACE
 Baranov
 BasedOnStyle
+BenchCAAEvaluate
+BenchFixture
 Benchmarking
 Bertalanffy
 BevHolt
@@ -117,6 +119,7 @@ DDOXYGEN
 DFL
 DGTEST
 DL
+DoNotOptimize
 DTMB
 DWORD
 DataInterfaceBase
@@ -190,6 +193,7 @@ FleetPrepareWorks
 FleetTests
 Fmort
 FunctionName
+fx
 GMACS
 GNUC
 Gcov
@@ -228,6 +232,7 @@ GraphQL
 GrowthBase
 GrowthEvaluate
 GrowthInterfaceBase
+GTest
 HandlesEdgeCaseNullAndInvalidBool
 HandlesEmptyLogger
 HandlesMixedArrayInput
@@ -409,6 +414,7 @@ Robj
 Rscript
 Rslaves
 RTMB
+RunBenchmarkedCode
 RunModelLoop
 SBPR
 SDreports
@@ -473,6 +479,7 @@ Stroustrup
 Subpopulation
 subvector
 Sys
+TestBody
 TESTDOWN
 TLDR
 TMB
@@ -540,8 +547,10 @@ atan
 attr
 aug
 bca
+bm
 bcast
 bd
+benchmarking
 beverton
 bindenv
 bookdown
@@ -953,6 +962,7 @@ nullptr
 num
 nx
 nyr
+nzchar
 oE
 objs
 ofstream
@@ -1022,6 +1032,9 @@ qobj
 rapidjson
 rbegin
 rcmdcheck
+rcmdcheckgooglebenchmarkfixture
+rcmdcheckgooglebenchmarknameformat
+rcmdcheckgooglebenchmarksimple
 rcpp
 rdbuf
 rdev
