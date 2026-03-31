@@ -166,7 +166,7 @@ class Model {  // may need singleton
         " data likelihoods is: " + fims::to_string(jnll));
 
 // // report out nll components
-// if(this->do_reporting) {
+
 #ifdef TMB_MODEL
 
     vector<Type> nll_components = nll_vec.to_tmb();
@@ -184,7 +184,7 @@ class Model {  // may need singleton
       // m->do_reporting = true;
       m->Report();
     }
-    // }
+
 
     return jnll;
   }
