@@ -49,4 +49,3 @@ test_that("rcpp fleet works with correct inputs", {
 
 
 ## Error handling ----
-
