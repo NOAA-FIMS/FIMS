@@ -316,17 +316,10 @@ initialize_data_distribution <- function(
     # Using resize() and then assigning value to each element of log_sd directly
     # is correct, as creating a new ParameterVector for log_sd here would
     # trigger an error in integration tests with wrappers.
+    # new_module$log_sd$resize(length(sd[["value"]]))
     new_module$log_sd$resize(length(sd[["value"]]))
-
-    purrr::walk(
-      seq_along(sd[["value"]]),
-      \(x) new_module[["log_sd"]][x][["value"]] <- log(sd[["value"]][x])
-    )
-
-    purrr::walk(
-      seq_along(sd[["estimation_type"]]),
-      \(x) new_module[["log_sd"]][x][["estimation_type"]]$set(sd[["estimation_type"]][x])
-    )
+    new_module$log_sd$set_initial_values(log(sd[["value"]]))
+    new_module$log_sd$set_estimation_types(sd[["estimation_type"]])
   }
 
   if (family[["family"]] == "gaussian") {
