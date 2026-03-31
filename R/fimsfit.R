@@ -580,15 +580,15 @@ fit_fims <- function(input,
     },
     error = function(e) {
       cli::cli_warn(c(
-        "!" = paste("nlminb failed:", e$message)
+        "!" = "nlminb failed: {e$message}",
+        "i" = "Returning partial results."
       ))
       return(NULL)
     }
   )
 
   if (is.null(opt)) {
-    cli::cli_warn("Optimization failed. Returning partial results.")
-    
+
     timing <- c(
       time_optimization = Sys.time() - t0,
       time_sdreport = as.difftime(0, units = "secs"),
@@ -601,7 +601,7 @@ fit_fims <- function(input,
       opt = list(
         par = obj[["par"]],
         objective = NA_real_,
-        convergence = 1
+        convergence = 1L
       ),
       sdreport = list(),
       timing = timing
@@ -619,6 +619,8 @@ fit_fims <- function(input,
       # differences in values printed out using control$trace will be
       # negligible between these different runs and is not worth printing
       control$trace <- 0
+      # store the previous optimization result
+      prev_opt <- opt
       opt <- tryCatch(
         {
           with(
@@ -633,16 +635,20 @@ fit_fims <- function(input,
         },
         error = function(e) {
           cli::cli_warn(c(
-            "!" = paste("nlminb failed during loop:", e$message)
+            "!" = "nlminb failed during loop: {e$message}",
+            "i" = "Using previous optimization result."
           ))
           return(NULL)
         }
       )
 
       if (is.null(opt)) {
+        # fallback to last successful result
+        opt <- prev_opt
+        # exit loop early, keep valid opt
         break
       }
-      
+
       maxgrad <- max(abs(obj[["gr"]](opt[["par"]])))
     }
     div_digit <- cli::cli_div(theme = list(.val = list(digits = 5)))
