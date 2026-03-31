@@ -46,7 +46,6 @@ class Model {  // may need singleton
    * @brief Evaluate. Calculates the joint negative log-likelihood function.
    */
 #ifdef TMB_MODEL
-
   ::objective_function<Type> *of;
 #endif
 
@@ -88,7 +87,6 @@ class Model {  // may need singleton
          m_it != this->fims_information->models_map.end(); ++m_it) {
       //(*m_it).second points to the Model module
       std::shared_ptr<fims_popdy::FisheryModelBase<Type>> m = (*m_it).second;
-      m->of = this->of;  // link to TMB objective function
       m->Prepare();
       m->Evaluate();
     }
@@ -165,7 +163,7 @@ class Model {  // may need singleton
         fims::to_string(n_data) +
         " data likelihoods is: " + fims::to_string(jnll));
 
-// // report out nll components
+// report out nll components
 
 #ifdef TMB_MODEL
 
@@ -181,7 +179,7 @@ class Model {  // may need singleton
       //(*m_it).second points to the Model module
       std::shared_ptr<fims_popdy::FisheryModelBase<Type>> m = (*m_it).second;
       m->of = this->of;  // link to TMB objective function
-      // m->do_reporting = true;
+      m->do_reporting = this->do_reporting;
       m->Report();
     }
 
