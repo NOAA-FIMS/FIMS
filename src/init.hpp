@@ -9,7 +9,7 @@
 #define SRC_INIT_HPP
 #include <stdlib.h>
 #include <R_ext/Rdynload.h>
-
+#include <Rinternals.h>
 
 extern "C" {
 
