@@ -9,8 +9,8 @@
 #ifndef FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_POPULATION_HPP
 #define FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_POPULATION_HPP
 
-#include "../../../population_dynamics/population/population.hpp"
 #include "rcpp_interface_base.hpp"
+#include "../../../population_dynamics/population/population.hpp"
 
 /**
  * @brief Rcpp interface that serves as the parent class for Rcpp population

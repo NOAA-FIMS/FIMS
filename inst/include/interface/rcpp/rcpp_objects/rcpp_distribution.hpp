@@ -9,9 +9,8 @@
 #ifndef FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_DISTRIBUTION_HPP
 #define FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_DISTRIBUTION_HPP
 
-#include "../../../distributions/distributions.hpp"
-#include "../../interface.hpp"
 #include "rcpp_interface_base.hpp"
+#include "../../../distributions/distributions.hpp"
 
 /**
  * @brief Rcpp interface that serves as the parent class for Rcpp distribution
