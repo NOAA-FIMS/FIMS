@@ -345,8 +345,19 @@ class ParameterVector {
    * @brief Sets the estimation type for all Parameters within a ParameterVector.
    */
     void set_estimation_types(Rcpp::CharacterVector estimation_type){
+
+if(estimation_type.size() == 1){
+      std::string est_type = Rcpp::as<std::string>(estimation_type[0]);
+      if(est_type != "constant" && est_type != "fixed_effects" && est_type != "random_effects"){
+        throw std::invalid_argument("Invalid estimation type: " + est_type + ". Valid options are: constant, fixed_effects, or random_effects.");
+      }
+      for(size_t i = 0; i < this->storage_m->size(); i++){
+        this->storage_m->at(i).estimation_type_m.set(est_type);
+      }
+    } else {
+
       if(estimation_type.size() != this->storage_m->size()){
-        throw std::invalid_argument("Length of estimation_type vector must be the same as the size of the ParameterVector.");
+        throw std::invalid_argument("Length of estimation_type vector must be the same as the size of the ParameterVector. " + std::to_string(estimation_type.size()) + " != " + std::to_string(this->storage_m->size()));
       }
     for(size_t i = 0; i < this->storage_m->size(); i++){
       std::string est_type = Rcpp::as<std::string>(estimation_type[i]);
@@ -355,6 +366,7 @@ class ParameterVector {
       }
       this->storage_m->at(i).estimation_type_m.set(est_type);
     }
+  }
   }
 
 
