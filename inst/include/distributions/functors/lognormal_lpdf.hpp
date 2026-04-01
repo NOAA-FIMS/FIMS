@@ -10,9 +10,10 @@
 #ifndef LOGNORMAL_LPDF
 #define LOGNORMAL_LPDF
 
+
+#include "../../common/def.hpp"
 #include "density_components_base.hpp"
 #include "../../common/fims_vector.hpp"
-#include "../../common/def.hpp"
 
 namespace fims_distributions {
 /**
