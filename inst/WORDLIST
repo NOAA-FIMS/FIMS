@@ -539,7 +539,9 @@ assignees
 atan
 attr
 aug
+bca
 bcast
+bd
 beverton
 bindenv
 bookdown
@@ -552,6 +554,7 @@ calc
 callGeneric
 callout
 catchability
+cb
 cbind
 cctype
 cd
@@ -641,6 +644,7 @@ cv
 cwaa
 cwd
 cyclomatic
+dabf
 dat
 dbcceb
 de
@@ -683,6 +687,7 @@ dq
 dropdown
 dum
 dynam
+eac
 elif
 emph
 emplace
@@ -709,6 +714,7 @@ exportMethod
 exprs
 extern
 fabs
+faf
 fallocate
 fals
 fcn
