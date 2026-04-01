@@ -44,8 +44,17 @@ test_that("rcpp fleet works with correct inputs", {
   clear()
 })
 
-## Edge handling ----
-# No edge cases to test for this interface.
-
 
 ## Error handling ----
+test_that("rcpp fleet returns correct error messages", {
+  fleet1 <- methods::new(Fleet)
+  #' @description Test that the rcpp fleet interface returns an error when given a string as a selectivity ID rather than an integer.
+  expect_error(fleet1$SetSelectivityID("id"))
+  #' @description Test that the rcpp fleet interface returns an error when given a string as an age-composition ID rather than an integer.
+  expect_error(fleet1$SetObservedAgeCompDataID("id"))
+  #' @description Test that the rcpp fleet interface returns an error when given a string as an length-composition ID rather than an integer.
+  expect_error(fleet1$SetObservedLengthCompDataID("id"))
+  #' @description Test that the rcpp fleet interface returns an error when given a string as an index ID rather than an integer.
+  expect_error(fleet1$SetObservedIndexDataID("id"))
+  clear()
+})
