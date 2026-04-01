@@ -9,8 +9,8 @@
 #ifndef FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_FLEET_HPP
 #define FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_FLEET_HPP
 
-#include "../../../common/def.hpp"
 #include "rcpp_interface_base.hpp"
+#include "../../../common/def.hpp"
 #include "../../../population_dynamics/fleet/fleet.hpp"
 
 /**

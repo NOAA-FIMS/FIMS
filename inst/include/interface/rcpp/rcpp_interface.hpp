@@ -7,13 +7,13 @@
  */
 #ifndef FIMS_INTERFACE_RCPP_INTERFACE_HPP
 #define FIMS_INTERFACE_RCPP_INTERFACE_HPP
+#include "rcpp_objects/rcpp_interface_base.hpp"
 #include "../../common/model.hpp"
 #include "../../utilities/fims_json.hpp"
 #include "rcpp_objects/rcpp_data.hpp"
 #include "rcpp_objects/rcpp_distribution.hpp"
 #include "rcpp_objects/rcpp_fleet.hpp"
 #include "rcpp_objects/rcpp_growth.hpp"
-#include "rcpp_objects/rcpp_interface_base.hpp"
 #include "rcpp_objects/rcpp_maturity.hpp"
 #include "rcpp_objects/rcpp_models.hpp"
 #include "rcpp_objects/rcpp_natural_mortality.hpp"
