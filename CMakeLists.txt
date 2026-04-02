@@ -69,7 +69,7 @@ IF(BUILD_DOC)
   set(DOXYGEN_LAYOUT_FILE "doxygen/DoxygenLayout.xml")
   set(DOXYGEN_MARKDOWN_SUPPORT YES)
   set(DOXYGEN_AUTOLINK_SUPPORT YES)
-  set(DOXYGEN_OUTPUT_DIRECTORY "doxygen")
+  set(DOXYGEN_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/doxygen")
   set(DOXYGEN_HTML_OUTPUT ".")
 
   doxygen_add_docs(fims_doxygen

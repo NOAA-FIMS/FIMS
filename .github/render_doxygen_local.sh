@@ -7,9 +7,9 @@ set -euo pipefail
 #   bash .github/render_doxygen_local.sh
 #
 # Output:
-#   build/html (and whatever your CMake/Doxygen config produces)
+#   doxygen/ (and whatever your CMake/Doxygen config produces)
 
-ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT_DIR"
 
 # 4) Copy doxygen/* to repo root (same as workflow)
