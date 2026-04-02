@@ -44,6 +44,9 @@
 # CMake build files
 /build
 
+# Doxygen html output
+/doxygen/html
+
 # C++ ignore files
 # Prerequisites
 *.d
