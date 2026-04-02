@@ -86,14 +86,6 @@ jobs:
             )
           }
         shell: Rscript {0}
-     
-      # All of the doxygen steps
-      - name: Checkout External Docs Repository (Source of bootstrap CSS)
-        uses: actions/checkout@v6
-        with:
-          repository: noaa-fims/noaa-fims.github.io
-          ref: gh-pages
-          path: external-docs
 
       - name: Installing build dependencies
         run: |
