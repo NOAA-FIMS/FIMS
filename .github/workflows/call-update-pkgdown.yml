@@ -26,5 +26,5 @@ jobs:
     with:
       # These expressions are TRUE only on a push to main
       build_testdown: true
-      build_code_coverage: false
+      build_code_coverage: true
       is_main_push: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}

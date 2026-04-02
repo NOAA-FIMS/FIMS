@@ -9,8 +9,8 @@
 #ifndef FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_MATURITY_HPP
 #define FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_MATURITY_HPP
 
-#include "../../../population_dynamics/maturity/maturity.hpp"
 #include "rcpp_interface_base.hpp"
+#include "../../../population_dynamics/maturity/maturity.hpp"
 
 /**
  * @brief Rcpp interface that serves as the parent class for Rcpp maturity

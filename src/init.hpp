@@ -7,8 +7,9 @@
  */
 #ifndef SRC_INIT_HPP
 #define SRC_INIT_HPP
-#include <R_ext/Rdynload.h>
 #include <stdlib.h>
+#include <R_ext/Rdynload.h>
+#include <Rinternals.h>
 
 extern "C" {
 
@@ -34,7 +35,7 @@ static const R_CallMethodDef CallEntries[] = {
  */
 void R_init_FIMS(DllInfo *dll) {
   R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
-  R_useDynamicSymbols(dll, FALSE);
+  R_useDynamicSymbols(dll, (Rboolean)FALSE);
 #ifdef TMB_CCALLABLES
   TMB_CCALLABLES("FIMS");
 #endif

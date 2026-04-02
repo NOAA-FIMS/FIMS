@@ -16,6 +16,7 @@
 #include <memory>
 #include <vector>
 
+#include "def.hpp"
 #include "../distributions/distributions.hpp"
 #include "../models/functors/fishery_model_base.hpp"
 #include "../population_dynamics/fleet/fleet.hpp"
@@ -23,7 +24,6 @@
 #include "../population_dynamics/population/population.hpp"
 #include "../population_dynamics/recruitment/recruitment.hpp"
 #include "../population_dynamics/selectivity/selectivity.hpp"
-#include "def.hpp"
 #include "fims_vector.hpp"
 #include "model_object.hpp"
 

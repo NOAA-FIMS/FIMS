@@ -9,12 +9,11 @@
 #ifndef FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_MODELS_HPP
 #define FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_MODELS_HPP
 
-#include <set>
 #include "../../../common/def.hpp"
+#include "rcpp_interface_base.hpp"
+#include <set>
 #include "../../../models/fisheries_models.hpp"
 #include "../../../utilities/fims_json.hpp"
-
-#include "rcpp_interface_base.hpp"
 #include "rcpp_population.hpp"
 #include "rcpp_fleet.hpp"
 #include "rcpp_maturity.hpp"
