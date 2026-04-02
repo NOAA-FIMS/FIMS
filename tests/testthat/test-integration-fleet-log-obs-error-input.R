@@ -58,6 +58,8 @@ test_that("`log_obs_error scalar` works with correct inputs", {
     )
   }
 
+  clear()
+
   #' @description Test that `log_obs_error` works when it is an estimated scalar.
 
   # turn on estimation for log_sd
@@ -84,6 +86,8 @@ test_that("`log_obs_error scalar` works with correct inputs", {
   for (i in seq_along(log_sd_output)) {
     expect_equal(log_sd_input$value, log_sd_output[i])
   }
+
+  clear()
 })
 
 
@@ -107,6 +111,8 @@ test_that("`log_sd` returns correct error messages when wrong dimensions", {
     regexp = "The size of `log_sd` does not match"
   )
 
+  clear()
+
   #' @description Test that returns correct error message when log_sd is too long.
   #' The error should be caught in initialize_modules, not in C++.
   parameters_4_model <- default_parameters |>
@@ -126,6 +132,8 @@ test_that("`log_sd` returns correct error messages when wrong dimensions", {
     },
     regexp = "The size of `log_sd` does not match"
   )
+
+  clear()
 })
 
 
@@ -150,6 +158,8 @@ test_that("`log_Fmort` returns correct error messages when wrong dimensions", {
     regexp = "log_Fmort size mismatch.Fleet log_Fmort"
   )
 
+  clear()
+
   #' @description Test that returns correct error message when log_Fmort is too long.
   #' The error should be caught in initialize_modules, not in C++.
   parameters_4_model <- default_parameters |>
@@ -170,4 +180,6 @@ test_that("`log_Fmort` returns correct error messages when wrong dimensions", {
     },
     regexp = "Fleet log_Fmort size mismatch"
   )
+
+  clear()
 })

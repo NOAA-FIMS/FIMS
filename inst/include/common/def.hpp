@@ -62,8 +62,6 @@
 
 #ifdef FIMS_WINDOWS
 #include <Windows.h>
-#undef FALSE 
-#undef TRUE
 #include <Lmcons.h>  // for UNLEN
 #elif defined(FIMS_LINUX) || defined(FIMS_MACOS) || defined(FIMS_BSD)
 #include <unistd.h>
