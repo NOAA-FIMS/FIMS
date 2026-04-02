@@ -13,7 +13,7 @@ var searchData=
   ['maturityinterfacebase_10',['maturityinterfacebase',['../classMaturityInterfaceBase.html',1,'MaturityInterfaceBase'],['../classMaturityInterfaceBase.html#ab191c30895c8dca3458e1e7f6a94e8c9',1,'MaturityInterfaceBase::MaturityInterfaceBase(const MaturityInterfaceBase &amp;other)'],['../classMaturityInterfaceBase.html#ae8ca26cc171f8b471deb6259704cfc18',1,'MaturityInterfaceBase::MaturityInterfaceBase()']]],
   ['max_5fsize_11',['max_size',['../classfims_1_1Vector.html#a15d40df5b4ef663486d9d712130dc6d7',1,'fims::Vector']]],
   ['message_12',['message',['../structfims_1_1LogEntry.html#a700eef36069cb58bdbfd77b0dd1dd857',1,'fims::LogEntry']]],
-  ['min_13',['min',['../classCatchAtAgeInterface.html#a0baf4fd50416fb2d4392c1b76ed8cc0d',1,'CatchAtAgeInterface']]],
+  ['min_13',['min',['../classFisheryModelInterfaceBase.html#a04bf9092ad891e8286e2e2ce55108ffa',1,'FisheryModelInterfaceBase']]],
   ['model_14',['Model',['../classfims__model_1_1Model.html',1,'fims_model']]],
   ['model_2ehpp_15',['model.hpp',['../model_8hpp.html',1,'']]],
   ['model_5fmap_5fiterator_16',['model_map_iterator',['../classfims__info_1_1Information.html#a9626f44ca9843b5b443519b933438a8f',1,'fims_info::Information']]],

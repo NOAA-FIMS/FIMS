@@ -6,7 +6,7 @@
     <nav class="navbar navbar-expand-lg fixed-top bg-light" data-bs-theme="light" aria-label="Site navigation"><div class="container">
     <img class="navlogo" src="https://noaa-fims.github.io/images/FIMS_logo3.png" alt="FIMS logo with a fish" width="60" align="left"><a class="navbar-brand me-2" href="index.html">FIMS</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -23,11 +23,13 @@
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><h6 class="dropdown-header" data-toc-skip>Intro to FIMS</h6></li>
     <li><a class="dropdown-item" href="articles/fims-demo.html">Introducing the Fisheries Integrated Modeling System (FIMS)</a></li>
+    <li><a class="dropdown-item" href="articles/fims-input-data.html">Introducing FIMS Input Data</a></li>
     <li><a class="dropdown-item" href="articles/fims-logging.html">Introducing the FIMS Logging System</a></li>
     <li><a class="dropdown-item" href="articles/fims-user-setup-guide.html">FIMS User Setup Guide</a></li>
     <li><a class="dropdown-item" href="articles/fims-demo-projections.html">Simple projections using FIMS</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>Developer</h6></li>
+    <li><a class="dropdown-item" href="articles/adding-new-module.html">Adding a New C++ Module</a></li>
     <li><a class="dropdown-item" href="articles/fims-path-maturity.html">FIMS Path - Maturity</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>C++ Training</h6></li>
@@ -45,8 +47,8 @@
     <li><a class="dropdown-item" href="news/index.html">Changelog</a></li>
   </ul></li>
 <li class="nav-item dropdown">
-  <button class="nav-link dropdown-toggle" type="button" id="dropdown-reports" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Reports</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-reports"><li><a class="external-link dropdown-item" href="https://noaa-fims.github.io/FIMS/coverage/coverage.html">coverage</a></li>
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-reports" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">reports</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-reports"><li><a class="external-link dropdown-item" href="https://app.codecov.io/gh/NOAA-FIMS/FIMS" target="_blank">coverage (codecov)</a></li>
     <li><a class="external-link dropdown-item" href="https://noaa-fims.github.io/FIMS/coverage/codecoverage_explanation.html">coverage explained</a></li>
     <li><a class="external-link dropdown-item" href="https://noaa-fims.github.io/FIMS/testdown/index.html">testdown</a></li>
   </ul></li>
@@ -80,9 +82,58 @@
 <div class="section level2">
 <h2 id="contributing-code">Contributing code<a class="anchor" aria-label="anchor" href="#contributing-code"></a></h2>
 <div class="section level3">
+<h3 id="adding-a-new-module">Adding a new module<a class="anchor" aria-label="anchor" href="#adding-a-new-module"></a></h3>
+<p>If you are adding a new C++ module to FIMS (e.g., a new selectivity function, recruitment model, or other population dynamics component), start with the guide titled <a href="vignettes/adding-new-module.Rmd">Adding a New C++ Module</a>.</p>
+<p>That guide explains the current architecture in detail. The quick checklist below is intended to help you keep track of the files and workflows you will usually need to touch.</p>
+<div class="section level4">
+<h4 id="quick-checklist-for-new-module-work">Quick checklist for new module work<a class="anchor" aria-label="anchor" href="#quick-checklist-for-new-module-work"></a></h4>
+<p><strong>C++ implementation</strong></p>
+<p>Note that the examples below are for adding a new module to the population dynamics. If you are adding a module to a different section of <code>inst/include/</code>, the structure within each folder is the same so you will just need to replace <code>population_dynamics</code> with the appropriate folder name.</p>
+<ul class="task-list"><li><label><input type="checkbox">Add or update the base class in <code>inst/include/population_dynamics/[category]/functors/[category]_base.hpp</code> if you are creating a new module family.</label></li>
+<li><label><input type="checkbox">Add or update the concrete implementation in <code>inst/include/population_dynamics/[category]/functors/[name].hpp</code>.</label></li>
+<li><label><input type="checkbox">Add the implementation to the module umbrella header in <code>inst/include/population_dynamics/[category]/[category].hpp</code>.</label></li>
+<li><label><input type="checkbox">Add Doxygen comments while you build the module, not afterward.</label></li>
+</ul><p><strong>Rcpp interface and TMB integration</strong></p>
+<ul class="task-list"><li><label><input type="checkbox">Add or update the interface class in <code>inst/include/interface/rcpp/rcpp_objects/rcpp_[category].hpp</code>.</label></li>
+<li><label><input type="checkbox">Use <code>ParameterVector</code> in the Rcpp interface and <code>fims::Vector&lt;Type&gt;</code> in the C++ functor.</label></li>
+<li><label><input type="checkbox">Register the object in both the module-specific <code>live_objects</code> map and <code>FIMSRcppInterfaceBase::fims_interface_objects</code>.</label></li>
+<li><label><input type="checkbox">In <code>add_to_fims_tmb_internal()</code>, copy parameter values, register fixed/random effects, and add the <code>info-&gt;variable_map[...]</code> entry.</label></li>
+<li><label><input type="checkbox">Implement or update <code>finalize()</code> so optimized values are copied back to the R-facing object.</label></li>
+</ul><p><strong>R exposure and initialization</strong></p>
+<ul class="task-list"><li><label><input type="checkbox">Register the class in <code>src/fims_modules.hpp</code>.</label></li>
+<li><label><input type="checkbox">Export the class in <code>R/FIMS-package.R</code> and run <code><a href="https://devtools.r-lib.org/reference/document.html" class="external-link">devtools::document()</a></code>.</label></li>
+<li><label><input type="checkbox">Update <code>R/create_default_configurations.R</code> if the new module type should appear in the default configuration workflow.</label></li>
+<li><label><input type="checkbox">Update <code>R/create_default_parameters.R</code> so default values and estimation types are generated correctly.</label></li>
+<li><label><input type="checkbox">Update <code>R/initialize_modules.R</code> and <code><a href="reference/initialize_fims.html">initialize_fims()</a></code> if the module needs explicit initialization or linking behavior.</label></li>
+</ul><p><strong>Testing</strong></p>
+<ul class="task-list"><li><label><input type="checkbox">Add or update C++ gtests to validate the underlying math and logic.</label></li>
+<li><label><input type="checkbox">Add or update testthat tests to validate the Rcpp interface, object wiring, and user-facing behavior.</label></li>
+<li><label><input type="checkbox">Include checks for parameter setup/resizing, at least one known-value result, edge cases where relevant, and basic object lifecycle behavior such as IDs and repeated instantiation.</label></li>
+</ul><p><strong>Validation and follow-up</strong></p>
+<ul class="task-list"><li><label><input type="checkbox">Complete the tasks found in the <a href="#standard-contributor-checks">Standard contributor checks</a> section</label></li>
+<li><label><input type="checkbox">Update the <a href="vignettes/adding-new-module.Rmd">Adding a New C++ Module vignette</a> itself if your changes alter the recommended workflow.</label></li>
+<li><label><input type="checkbox">Provide feedback to the developers on how helpful the vignette was to your development process.</label></li>
+</ul></div>
+</div>
+<div class="section level3">
 <h3 id="feature-branches">Feature branches<a class="anchor" aria-label="anchor" href="#feature-branches"></a></h3>
 <p>Once an issue is approved and prioritized for work, a feature branch off of the dev branch, e.g., <code>dev-discards</code>, can be created to address the issue. Feature branches can be made within the repository or on a fork of the repository. When making a fork, be sure to fork all branches not just the default branch because feature branches should only be created off of main if they are a hotfix for the current release, e.g., <code>fix-pointer</code>. There are no hard and fast rules for branch names but we tend to use dashes to separate words. Often while working on this new feature branch, there will be updates to the dev branch. These updates must be brought in using <code>git rebase</code>. Branches that have merge commits will not be accepted into the code base. Please see the <a href="https://docs.github.com/en/get-started/using-git/about-git-rebase" class="external-link">GitHub documentation for rebasing</a> for more information.</p>
-<p>Along the development process it is important to add tests and ensure that the code is well documented. Below are the steps to follow to ensure that the code is ready for a pull request: * Build the doxygen-generated C++ documentation using <code>cmake --build build</code>, where the resulting html files will be in build/html. This can also be done using <code><a href="reference/setup_and_run_gtest.html">setup_and_run_gtest()</a></code> in R. * Implement the suite of Google tests using <code>cmake --build build</code> and <code>ctest --test-dir build</code>. This can also be done using <code><a href="reference/setup_and_run_gtest.html">setup_and_run_gtest()</a></code> in R. If there are failing tests, run <code>ctest --test-dir --rerun-failed --output-on-failure</code> to re-run the failed tests verbosely. * Format C++ code using clang-format version 18.0.0 with Google style: <code>clang-format -i --style="{BasedOnStyle: Google, SortIncludes: false}" $(find ./inst/include ./src ./tests/gtest -name "*.hpp" -o -name "*.cpp")</code>. If you are contributing from a fork, the automated formatting workflow will add a comment to your pull request with detailed instructions on how to format your code locally. * Run clang tidy to check C++ for common mistakes using TODO: document how to run clang-tidy. * Spell check the package using <code>spelling::spell_check_files(list.files(c("R", "tests", file.path("inst", "include")), recursive = TRUE, full.names = TRUE, pattern = "\\.cpp|\\.hpp|\\.md|\\.R$|\\.Rmd|\\.txt"), ignore = spelling::get_wordlist())</code>. Remove all the .md files in the vignettes directory and then spell check the package using <code>spelling::spell_check_package(pkg = ".", use_wordlist = TRUE)</code>. * Build the roxygen documentation using <code><a href="https://devtools.r-lib.org/reference/document.html" class="external-link">devtools::document()</a></code>. See the <a href="https://roxygen2.r-lib.org/" class="external-link">r-lib</a> for all available tags and best practices. * Implement the suite of testthat tests using <code><a href="https://devtools.r-lib.org/reference/test.html" class="external-link">devtools::test()</a></code>. * Run <code><a href="https://styler.r-lib.org/reference/style_pkg.html" class="external-link">styler::style_pkg()</a></code> to style R code. * Run <code><a href="https://usethis.r-lib.org/reference/tidyverse.html" class="external-link">usethis::use_tidy_description()</a></code> to update the DESCRIPTION file. * Run <code><a href="https://devtools.r-lib.org/reference/check.html" class="external-link">devtools::check()</a></code> to ensure the package can be compiled and R tests pass. If there are failing tests, run <code>devtools::test(filter = "file_name")</code> (where “test-file_name.R” is the testthat file containing failing tests) and edit code/tests to troubleshoot tests. During development, run <code><a href="https://devtools.r-lib.org/reference/build.html" class="external-link">devtools::build()</a></code> locally to build the package more frequently and faster. * Build the package down site using <code><a href="https://pkgdown.r-lib.org/reference/build_site.html" class="external-link">pkgdown::build_site()</a></code>. * Run the code coverage report using <code><a href="http://covr.r-lib.org/reference/report.html" class="external-link">covr::report()</a></code> to ensure that all of the code is covered, with the goal of maintaining 80 percent code coverage.</p>
+<p>Along the development process it is important to add tests and ensure that the code is well documented. Below are the standard contributor checks to follow so that the code is ready for a pull request:</p>
+<div class="section level4">
+<h4 id="standard-contributor-checks">Standard contributor checks<a class="anchor" aria-label="anchor" href="#standard-contributor-checks"></a></h4>
+<ul><li>Build the doxygen-generated C++ documentation using <code>cmake --build build</code>, where the resulting html files will be in build/html. This can also be done using <code><a href="reference/setup_and_run_gtest.html">setup_and_run_gtest()</a></code> in R.</li>
+<li>Implement the suite of Google tests using <code>cmake --build build</code> and <code>ctest --test-dir build</code>. This can also be done using <code><a href="reference/setup_and_run_gtest.html">setup_and_run_gtest()</a></code> in R. If there are failing tests, run <code>ctest --test-dir --rerun-failed --output-on-failure</code> to re-run the failed tests verbosely.</li>
+<li>Format C++ code using clang-format version 18.0.0 with Google style: <code>clang-format -i --style="{BasedOnStyle: Google, SortIncludes: false}" $(find ./inst/include ./src ./tests/gtest -name "*.hpp" -o -name "*.cpp")</code>. If you are contributing from a fork, the automated formatting workflow will add a comment to your pull request with detailed instructions on how to format your code locally.</li>
+<li>Run clang tidy to check C++ for common mistakes using TODO: document how to run clang-tidy.</li>
+<li>Spell check the package using <code>spelling::spell_check_files(list.files(c("R", "tests", file.path("inst", "include")), recursive = TRUE, full.names = TRUE, pattern = "\\.cpp|\\.hpp|\\.md|\\.R$|\\.Rmd|\\.txt"), ignore = spelling::get_wordlist())</code>. Remove all the .md files in the vignettes directory and then spell check the package using <code>spelling::spell_check_package(pkg = ".", use_wordlist = TRUE)</code>.</li>
+<li>Build the roxygen documentation using <code><a href="https://devtools.r-lib.org/reference/document.html" class="external-link">devtools::document()</a></code>. See the <a href="https://roxygen2.r-lib.org/" class="external-link">r-lib</a> for all available tags and best practices.</li>
+<li>Implement the suite of testthat tests using <code><a href="https://devtools.r-lib.org/reference/test.html" class="external-link">devtools::test()</a></code>.</li>
+<li>Run <code><a href="https://styler.r-lib.org/reference/style_pkg.html" class="external-link">styler::style_pkg()</a></code> to style R code.</li>
+<li>Run <code><a href="https://usethis.r-lib.org/reference/tidyverse.html" class="external-link">usethis::use_tidy_description()</a></code> to update the DESCRIPTION file.</li>
+<li>Run <code><a href="https://devtools.r-lib.org/reference/check.html" class="external-link">devtools::check()</a></code> to ensure the package can be compiled and R tests pass. If there are failing tests, run <code>devtools::test(filter = "file_name")</code> (where “test-file_name.R” is the testthat file containing failing tests) and edit code/tests to troubleshoot tests. During development, run <code><a href="https://devtools.r-lib.org/reference/build.html" class="external-link">devtools::build()</a></code> locally to build the package more frequently and faster.</li>
+<li>Build the package down site using <code><a href="https://pkgdown.r-lib.org/reference/build_site.html" class="external-link">pkgdown::build_site()</a></code>.</li>
+<li>Run the code coverage report using <code><a href="http://covr.r-lib.org/reference/report.html" class="external-link">covr::report()</a></code> to ensure that all of the code is covered, with the goal of maintaining 80 percent code coverage.</li>
+</ul></div>
 </div>
 <div class="section level3">
 <h3 id="pull-requests">Pull requests<a class="anchor" aria-label="anchor" href="#pull-requests"></a></h3>
@@ -108,7 +159,7 @@
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Kelli F. Johnson, Grant D. Adams, Jon K. T. Brodziak, Kathryn L. Doering, Daniel R. Goethel, Andrea M. Havron, Ronald Klasky, Peter T. Kuriyama, Emily M. Liljestrand, Christopher M. Legault, Bai Li, Timothy J. Miller, Cole C. Monnahan, Elizabeth F. Perl, Megumi C. Oshima, Kyle W. Shertzer, Christine C. Stawitz, Jane Y. Sullivan, Matthew Supernaw, Ian G. Taylor, Nathan R. Vaughan, Erik H. Williams.</p>
+  <p>Developed by Kelli F. Johnson, Grant D. Adams, Jon K. T. Brodziak, Kathryn L. Doering, Daniel R. Goethel, Andrea M. Havron, Ronald Klasky, Peter T. Kuriyama, Emily M. Liljestrand, Christopher M. Legault, Bai Li, Timothy J. Miller, Cole C. Monnahan, Elizabeth F. Perl, Megumi C. Oshima, Kyle W. Shertzer, Christine C. Stawitz, Jane Y. Sullivan, Matthew Supernaw, Ian G. Taylor, Nathan R. Vaughan, Erik H. Williams, Adrianne T. Wilson.</p>
 </div>
 
 <div class="pkgdown-footer-right">

@@ -23,8 +23,7 @@ initialize_process_distribution(
   module,
   par,
   family = NULL,
-  sd = tibble::tibble(value = 1, estimation_type = "constant"),
-  is_random_effect = FALSE
+  sd = tibble::tibble(value = 1, estimation_type = "fixed_effects")
 )
 
 initialize_process_structure(module, par)
@@ -58,8 +57,8 @@ initialize_process_structure(module, par)
 - data_type:
 
   A string specifying the type of data that the distribution will be fit
-  to. Allowable types include c, landings, index, agecomp, lengthcomp
-  and the default is c.
+  to. Allowable types include "landings", "index", "agecomp", and
+  "lengthcomp" and the default is landings.
 
 - par:
 
@@ -67,11 +66,6 @@ initialize_process_structure(module, par)
   Parameters must be members of the specified module. Use
   `methods::show(module)` to obtain names of parameters within the
   module.
-
-- is_random_effect:
-
-  A boolean indicating whether or not the process is estimated as a
-  random effect.
 
 ## Value
 
@@ -93,7 +87,7 @@ fleet_distribution <- initialize_data_distribution(
   family = lognormal(link = "log"),
   sd = list(
     value = rep(sqrt(log(0.01^2 + 1)), n_years),
-    estimation_type = rep("constant", n_years) # Could also be a single "constant"
+    estimation_type = rep("constant", n_years) # Can be a single "constant"
   ),
   data_type = "index"
 )
@@ -108,8 +102,7 @@ recruitment_distribution <- initialize_process_distribution(
   module = recruitment,
   par = "log_devs",
   family = gaussian(),
-  sd = list(value = 0.4, estimation_type = "constant"),
-  is_random_effect = FALSE
+  sd = list(value = 0.4, estimation_type = "constant")
 )
 } # }
 ```

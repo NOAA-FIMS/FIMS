@@ -51,13 +51,13 @@ default_parameters <- create_default_configurations(fims_frame) |>
   FIMS:::create_default_maturity(data = fims_frame)
 
 show(default_parameters)
-#> # A tibble: 2 × 13
-#>   model_family module_name module_type label  distribution_link fleet_name   age
-#>   <chr>        <chr>       <chr>       <chr>  <chr>             <chr>      <dbl>
-#> 1 NA           Maturity    Logistic    infle… NA                NA            NA
-#> 2 NA           Maturity    Logistic    slope  NA                NA            NA
-#> # ℹ 6 more variables: length <dbl>, time <int>, value <dbl>,
-#> #   estimation_type <chr>, distribution_type <chr>, distribution <chr>
+#> # A tibble: 2 × 12
+#>   model_family module_name module_type label fleet_name   age length  time value
+#>   <chr>        <chr>       <chr>       <chr> <chr>      <dbl>  <dbl> <int> <dbl>
+#> 1 NA           Maturity    Logistic    infl… NA            NA     NA    NA     2
+#> 2 NA           Maturity    Logistic    slope NA            NA     NA    NA     1
+#> # ℹ 3 more variables: estimation_type <chr>, distribution_type <chr>,
+#> #   distribution <chr>
 
 # The default maturity parameters can be updated
 parameters <- default_parameters |>
@@ -72,13 +72,13 @@ parameters <- default_parameters |>
   )
 
 show(parameters)
-#> # A tibble: 2 × 13
-#>   model_family module_name module_type label  distribution_link fleet_name   age
-#>   <chr>        <chr>       <chr>       <chr>  <chr>             <chr>      <dbl>
-#> 1 catch_at_age Maturity    Logistic    infle… NA                NA            NA
-#> 2 catch_at_age Maturity    Logistic    slope  NA                NA            NA
-#> # ℹ 6 more variables: length <dbl>, time <int>, value <dbl>,
-#> #   estimation_type <chr>, distribution_type <chr>, distribution <chr>
+#> # A tibble: 2 × 12
+#>   model_family module_name module_type label fleet_name   age length  time value
+#>   <chr>        <chr>       <chr>       <chr> <chr>      <dbl>  <dbl> <int> <dbl>
+#> 1 catch_at_age Maturity    Logistic    infl… NA            NA     NA    NA  2.25
+#> 2 catch_at_age Maturity    Logistic    slope NA            NA     NA    NA  3   
+#> # ℹ 3 more variables: estimation_type <chr>, distribution_type <chr>,
+#> #   distribution <chr>
 
 # Initialize maturity module based on the list of parameters
 maturity <- FIMS:::initialize_maturity(

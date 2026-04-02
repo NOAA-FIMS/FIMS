@@ -81,7 +81,7 @@ repository](https://nmfs-ost.github.io/on-off-boarding/).
 
 ## Cheatsheet
 
-[![](https://raw.githubusercontent.com/noaa-fims/fims/main/pkgdown/assets/fims-cheatsheet-thumb.png)](hhttps://github.com/NOAA-FIMS/FIMS/blob/main/pkgdown/assets/fims-cheatsheet.pdf)
+[![](https://raw.githubusercontent.com/noaa-fims/fims/main/pkgdown/assets/fims-cheatsheet-thumb.png)](https://github.com/NOAA-FIMS/FIMS/blob/main/pkgdown/assets/fims-cheatsheet.pdf)
 
 ## Usage
 

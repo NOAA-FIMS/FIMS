@@ -9,8 +9,8 @@
     <link rel="icon" type="image/png" href="https://noaa-fims.github.io/images/FIMS_hexlogo.png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
-    <link href="https://noaa-fims.github.io/site_libs/bootstrap/bootstrap-5477dd34fdf9f443df58de9070e2fbd7.min.css" rel="stylesheet">
-    <link href="https://noaa-fims.github.io/site_libs/bootstrap/bootstrap-dark-429bd3fc0b6810d1347fc340b0896c35.min.css" rel="stylesheet" media="(prefers-color-scheme: dark)">
+    <link href="https://noaa-fims.github.io/site_libs/bootstrap/bootstrap-5bca210c7b8f52bd43562cb73b8f998e.min.css" rel="stylesheet">
+    <link href="https://noaa-fims.github.io/site_libs/bootstrap/bootstrap-dark-dabf027eac5ab6a58e890faf792e317e.min.css" rel="stylesheet" media="(prefers-color-scheme: dark)">
     <script type="text/javascript" src="jquery.js"></script>
     <script type="text/javascript" src="dynsections.js"></script>
     <link href="navtree.css" rel="stylesheet" type="text/css"/>
@@ -48,7 +48,7 @@ MathJax.Hub.Config({
                 <td id="projectlogo"><img alt="Logo" src="FIMS_logo3.png"/></td>
                 <td id="projectalign" style="padding-left: 0.5em;">
                     <div id="projectname">FIMS
-                        &#160;<span id="projectnumber">v0.8.1</span></div>
+                        &#160;<span id="projectnumber">v0.9.2</span></div>
                     <div id="projectbrief"></div></td>
                 <td style="padding-left: 0.5em;">
                     <div id="projectbrief"></div>
@@ -83,11 +83,13 @@ MathJax.Hub.Config({
             <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
               <li><h6 class="dropdown-header" data-toc-skip>intro to fims</h6></li>
               <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/articles/fims-demo.html">introducing the fisheries integrated modeling system (fims)</a></li>
-              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/articles/fims-logging.html">Introducing the fims logging system</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/articles/fims-input-data.html">introducing FIMS input data</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/articles/fims-logging.html">introducing the fims logging system</a></li>
               <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/articles/fims-user-setup-guide.html">fims user setup guide</a></li>
               <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/articles/fims-demo-projections.html">simple projections using fims</a></li>
               <li><hr class="dropdown-divider"></li>
               <li><h6 class="dropdown-header" data-toc-skip>developer</h6></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/articles/adding-new-module.html">adding a new c++ module</a></li>
               <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/articles/fims-path-maturity.html">fims path - maturity</a></li>
               <li><hr class="dropdown-divider"></li>
               <li><h6 class="dropdown-header" data-toc-skip>c++ training</h6></li>
@@ -111,7 +113,7 @@ MathJax.Hub.Config({
             <button class="nav-link dropdown-toggle" type="button" id="dropdown-reports" data-bs-toggle="dropdown"
                     aria-expanded="false" aria-haspopup="true">reports</button>
             <ul class="dropdown-menu" aria-labelledby="dropdown-reports">
-              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/coverage/coverage.html">coverage</a></li>
+              <li><a class="dropdown-item" href="https://app.codecov.io/gh/NOAA-FIMS/FIMS" target="_blank">coverage (codecov)</a></li>
               <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/coverage/codecoverage_explanation.html">coverage explained</a></li>
               <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/testdown/index.html">testdown</a></li>
             </ul>
@@ -232,7 +234,7 @@ $(document).ready(function(){initNavTree('functions_m.html',''); initResizable()
 <li>MaturityInterfaceBase()&#160;:&#160;<a class="el" href="classMaturityInterfaceBase.html#ae8ca26cc171f8b471deb6259704cfc18">MaturityInterfaceBase</a></li>
 <li>max_size()&#160;:&#160;<a class="el" href="classfims_1_1Vector.html#a15d40df5b4ef663486d9d712130dc6d7">fims::Vector&lt; Type &gt;</a></li>
 <li>message&#160;:&#160;<a class="el" href="structfims_1_1LogEntry.html#a700eef36069cb58bdbfd77b0dd1dd857">fims::LogEntry</a></li>
-<li>min()&#160;:&#160;<a class="el" href="classCatchAtAgeInterface.html#a0baf4fd50416fb2d4392c1b76ed8cc0d">CatchAtAgeInterface</a></li>
+<li>min()&#160;:&#160;<a class="el" href="classFisheryModelInterfaceBase.html#a04bf9092ad891e8286e2e2ce55108ffa">FisheryModelInterfaceBase</a></li>
 <li>model_map_iterator&#160;:&#160;<a class="el" href="classfims__info_1_1Information.html#a9626f44ca9843b5b443519b933438a8f">fims_info::Information&lt; Type &gt;</a></li>
 <li>model_type_m&#160;:&#160;<a class="el" href="classfims__popdy_1_1FisheryModelBase.html#a447bcdf764fc22206d311aa7e36e5c8f">fims_popdy::FisheryModelBase&lt; Type &gt;</a></li>
 <li>models_map&#160;:&#160;<a class="el" href="classfims__info_1_1Information.html#a14847edc29ac248e9dcaf194d824112b">fims_info::Information&lt; Type &gt;</a></li>

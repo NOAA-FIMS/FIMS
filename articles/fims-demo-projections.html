@@ -28,7 +28,7 @@
     <nav class="navbar navbar-expand-lg fixed-top bg-light" data-bs-theme="light" aria-label="Site navigation"><div class="container">
     <img class="navlogo" src="https://noaa-fims.github.io/images/FIMS_logo3.png" alt="FIMS logo with a fish" width="60" align="left"><a class="navbar-brand me-2" href="../index.html">FIMS</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -49,11 +49,13 @@
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><h6 class="dropdown-header" data-toc-skip>Intro to FIMS</h6></li>
     <li><a class="dropdown-item" href="../articles/fims-demo.html">Introducing the Fisheries Integrated Modeling System (FIMS)</a></li>
+    <li><a class="dropdown-item" href="../articles/fims-input-data.html">Introducing FIMS Input Data</a></li>
     <li><a class="dropdown-item" href="../articles/fims-logging.html">Introducing the FIMS Logging System</a></li>
     <li><a class="dropdown-item" href="../articles/fims-user-setup-guide.html">FIMS User Setup Guide</a></li>
     <li><a class="dropdown-item" href="../articles/fims-demo-projections.html">Simple projections using FIMS</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>Developer</h6></li>
+    <li><a class="dropdown-item" href="../articles/adding-new-module.html">Adding a New C++ Module</a></li>
     <li><a class="dropdown-item" href="../articles/fims-path-maturity.html">FIMS Path - Maturity</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>C++ Training</h6></li>
@@ -74,9 +76,9 @@
   </ul>
 </li>
 <li class="nav-item dropdown">
-  <button class="nav-link dropdown-toggle" type="button" id="dropdown-reports" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Reports</button>
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-reports" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">reports</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-reports">
-<li><a class="external-link dropdown-item" href="https://noaa-fims.github.io/FIMS/coverage/coverage.html">coverage</a></li>
+<li><a class="external-link dropdown-item" href="https://app.codecov.io/gh/NOAA-FIMS/FIMS" target="_blank">coverage (codecov)</a></li>
     <li><a class="external-link dropdown-item" href="https://noaa-fims.github.io/FIMS/coverage/codecoverage_explanation.html">coverage explained</a></li>
     <li><a class="external-link dropdown-item" href="https://noaa-fims.github.io/FIMS/testdown/index.html">testdown</a></li>
   </ul>
@@ -155,6 +157,11 @@ vignette</a>.</p>
 <div class="section level2">
 <h2 id="projections">Projections<a class="anchor" aria-label="anchor" href="#projections"></a>
 </h2>
+<p>Here we specify how many years beyond the terminal data year that
+projections extend out. This could be short (&lt;10) for constant catch
+scenarios or long (one or more generations) to calculate equilibrium
+reference points such as fishing mortality at maximum sustainable yield
+or biomass at maximum sustainable yield.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">years_of_projection</span> <span class="op">&lt;-</span> <span class="fl">10</span></span></code></pre></div>
 <div class="section level3">
@@ -180,20 +187,22 @@ manipulation of the data is needed.</p>
 <span>  name <span class="op">=</span> <span class="st">"fleet1"</span>,</span>
 <span>  value <span class="op">=</span> <span class="op">-</span><span class="fl">999</span>,</span>
 <span>  unit <span class="op">=</span> <span class="st">"mt"</span></span>
-<span><span class="op">)</span></span>
+<span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span></span>
+<span>    <span class="op">!</span><span class="op">(</span><span class="va">type</span> <span class="op">==</span> <span class="st">"age_to_length_conversion"</span> <span class="op">|</span> <span class="va">type</span> <span class="op">==</span> <span class="st">"length_comp"</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
 <span><span class="va">data_4_projections</span> <span class="op">&lt;-</span> <span class="va">data_big_with_extra_year</span> <span class="op">|&gt;</span></span>
-<span>  <span class="co"># Add on weight_at_age data for 10 more years because you don't want these</span></span>
-<span>  <span class="co"># filled with -999</span></span>
+<span>  <span class="co"># Add on weight_at_age because you don't want these filled with -999</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind_rows.html" class="external-link">bind_rows</a></span><span class="op">(</span></span>
 <span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span></span>
 <span>      <span class="va">data_big</span>,</span>
 <span>      <span class="va">type</span> <span class="op">==</span> <span class="st">"weight_at_age"</span>,</span>
 <span>      <span class="va">timing</span> <span class="op">==</span> <span class="fl">1</span></span>
 <span>    <span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="op">-</span><span class="va">timing</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>    <span class="fu"><a href="https://rdrr.io/r/base/merge.html" class="external-link">merge</a></span><span class="op">(</span></span>
-<span>      <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>timing <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">data_big</span><span class="op">[[</span><span class="st">"timing"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">:</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">data_big</span><span class="op">[[</span><span class="st">"timing"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span> <span class="op">+</span> <span class="fl">10</span><span class="op">)</span><span class="op">)</span></span>
-<span>    <span class="op">)</span></span>
+<span>      <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="op">-</span><span class="va">timing</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>      <span class="fu"><a href="https://rdrr.io/r/base/merge.html" class="external-link">merge</a></span><span class="op">(</span></span>
+<span>        <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>timing <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">data_big</span><span class="op">[[</span><span class="st">"timing"</span><span class="op">]</span><span class="op">]</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">:</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">data_big</span><span class="op">[[</span><span class="st">"timing"</span><span class="op">]</span><span class="op">]</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">+</span> <span class="va">years_of_projection</span><span class="op">)</span><span class="op">)</span></span>
+<span>      <span class="op">)</span></span>
 <span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="co"># Make a FIMSFrame object out of this data frame with the extra row to add all</span></span>
 <span>  <span class="co"># of the other missing years for each data type</span></span>
@@ -248,6 +257,9 @@ dimensions.</p>
 <span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">tidyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyr.tidyverse.org/reference/unnest.html" class="external-link">unnest</a></span><span class="op">(</span>cols <span class="op">=</span> <span class="va">data</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="co"># Update log_Fmort initial values for Fleet1</span></span>
+<span>  <span class="co"># Project the population forward with the terminal year mortality values.</span></span>
+<span>  <span class="co"># More advanced approaches are included in</span></span>
+<span>  <span class="co"># tests/testthat/test-projections-looped.R</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/rows.html" class="external-link">rows_update</a></span><span class="op">(</span></span>
 <span>    <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span></span>
 <span>      fleet_name <span class="op">=</span> <span class="st">"fleet1"</span>,</span>
@@ -269,6 +281,16 @@ dimensions.</p>
 <span>      <span class="op">)</span><span class="op">)</span></span>
 <span>    <span class="op">)</span>,</span>
 <span>    by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"fleet_name"</span>, <span class="st">"label"</span>, <span class="st">"time"</span><span class="op">)</span></span>
+<span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="co"># Fix the projection period log_Fmort to constant</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/rows.html" class="external-link">rows_update</a></span><span class="op">(</span></span>
+<span>    <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span></span>
+<span>      label <span class="op">=</span> <span class="st">"log_Fmort"</span>,</span>
+<span>      time <span class="op">=</span> <span class="op">(</span><span class="fu"><a href="../reference/get_FIMSFrame.html">get_end_year</a></span><span class="op">(</span><span class="va">data_4_projections</span><span class="op">)</span> <span class="op">-</span> <span class="va">years_of_projection</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span><span class="op">:</span></span>
+<span>      <span class="fu"><a href="../reference/get_FIMSFrame.html">get_end_year</a></span><span class="op">(</span><span class="va">data_4_projections</span><span class="op">)</span>,</span>
+<span>      estimation_type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"constant"</span>, <span class="va">years_of_projection</span><span class="op">)</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"label"</span>, <span class="st">"time"</span><span class="op">)</span></span>
 <span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="co"># Update selectivity parameters and log_q for survey1</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/rows.html" class="external-link">rows_update</a></span><span class="op">(</span></span>
@@ -294,7 +316,8 @@ dimensions.</p>
 <span>        <span class="op">-</span><span class="fl">0.19556523</span>, <span class="fl">0.20094360</span>, <span class="fl">0.37248740</span>, <span class="op">-</span><span class="fl">0.07163145</span>,</span>
 <span>        <span class="co"># recruitment deviations are fixed at zero for the projections</span></span>
 <span>        <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">years_of_projection</span><span class="op">)</span></span>
-<span>      <span class="op">)</span></span>
+<span>      <span class="op">)</span>,</span>
+<span>      estimation_type <span class="op">=</span> <span class="st">"random_effects"</span></span>
 <span>    <span class="op">)</span>,</span>
 <span>    by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"label"</span>, <span class="st">"time"</span><span class="op">)</span></span>
 <span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -304,7 +327,9 @@ dimensions.</p>
 <span>      label <span class="op">=</span> <span class="st">"log_devs"</span>,</span>
 <span>      time <span class="op">=</span> <span class="op">(</span><span class="fu"><a href="../reference/get_FIMSFrame.html">get_end_year</a></span><span class="op">(</span><span class="va">data_4_projections</span><span class="op">)</span> <span class="op">-</span> <span class="va">years_of_projection</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span><span class="op">:</span></span>
 <span>      <span class="fu"><a href="../reference/get_FIMSFrame.html">get_end_year</a></span><span class="op">(</span><span class="va">data_4_projections</span><span class="op">)</span>,</span>
-<span>      estimation_type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"constant"</span>, <span class="va">years_of_projection</span><span class="op">)</span></span>
+<span>      estimation_type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"constant"</span>, <span class="va">years_of_projection</span><span class="op">)</span>,</span>
+<span>      distribution_type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="cn">NA</span>, <span class="va">years_of_projection</span><span class="op">)</span>,</span>
+<span>      distribution <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="cn">NA</span>, <span class="va">years_of_projection</span><span class="op">)</span></span>
 <span>    <span class="op">)</span>,</span>
 <span>    by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"label"</span>, <span class="st">"time"</span><span class="op">)</span></span>
 <span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -313,7 +338,8 @@ dimensions.</p>
 <span>    <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span></span>
 <span>      module_name <span class="op">=</span> <span class="st">"Recruitment"</span>,</span>
 <span>      label <span class="op">=</span> <span class="st">"log_sd"</span>,</span>
-<span>      value <span class="op">=</span> <span class="fl">0.4</span></span>
+<span>      value <span class="op">=</span> <span class="fl">0.4</span>,</span>
+<span>      estimation_type <span class="op">=</span> <span class="st">"fixed_effects"</span></span>
 <span>    <span class="op">)</span>,</span>
 <span>    by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"module_name"</span>, <span class="st">"label"</span><span class="op">)</span></span>
 <span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -330,16 +356,31 @@ dimensions.</p>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/rows.html" class="external-link">rows_update</a></span><span class="op">(</span></span>
 <span>    <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span></span>
 <span>      label <span class="op">=</span> <span class="st">"log_init_naa"</span>,</span>
-<span>      age <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">12</span>,</span>
+<span>      age <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="../reference/get_FIMSFrame.html">get_n_ages</a></span><span class="op">(</span><span class="va">data_4_projections</span><span class="op">)</span>,</span>
 <span>      value <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
 <span>        <span class="fl">13.80944</span>, <span class="fl">13.60690</span>, <span class="fl">13.40217</span>, <span class="fl">13.19525</span>, <span class="fl">12.98692</span>, <span class="fl">12.77791</span>,</span>
 <span>        <span class="fl">12.56862</span>, <span class="fl">12.35922</span>, <span class="fl">12.14979</span>, <span class="fl">11.94034</span>, <span class="fl">11.73088</span>, <span class="fl">13.18755</span></span>
 <span>      <span class="op">)</span></span>
 <span>    <span class="op">)</span>,</span>
 <span>    by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"label"</span>, <span class="st">"age"</span><span class="op">)</span></span>
-<span>  <span class="op">)</span></span>
-<span></span>
-<span><span class="co"># TODO: Figure out how to add SSB_ratio prior</span></span></code></pre></div>
+<span>  <span class="op">)</span></span></code></pre></div>
+<p>Reference-point targets are currently achieved by specifying a prior
+on <code>spawning_biomass_ratio</code>, a derived population quantity,
+in the final year/s of the projection period. Additionally, a prior can
+be specified on <code>log_f_multiplier</code>, which is a simple annual
+multiplier of fishing mortality, i.e., <code>F_mort</code> that allows
+the total fishing mortality for the population to be adjusted while
+keeping relative fleet effort constant by fixing <code>log_Fmort</code>.
+This approach allows the annual <code>log_f_multiplier</code> to be
+estimated while ensuring that total fishing mortality is held constant
+during the projection period and achieves the spawning biomass
+target.</p>
+<p>The wrapper functions used in this vignette are not yet capable of
+setting up priors so the full projection approach is not included here.
+This is a high-priority development goal that is in progress. Examples
+of setting up constraints on <code>log_f_multiplier</code> and a prior
+on <code>spawning_biomass_ratio</code> can be found in the
+test-projections-looped.R test files used to verify this approach.</p>
 </div>
 <div class="section level3">
 <h3 id="model-fit">Model fit<a class="anchor" aria-label="anchor" href="#model-fit"></a>
@@ -353,17 +394,17 @@ output will be in the same format that users are used to.</p>
 <span>  <span class="fu"><a href="../reference/fit_fims.html">fit_fims</a></span><span class="op">(</span>optimize <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## ✔ Starting optimization ...</span></span>
 <span><span class="co">## ℹ Restarting optimizer 3 times to improve gradient.</span></span>
-<span><span class="co">## ℹ Maximum gradient went from 0.0046 to 0.00038 after 3 steps.</span></span>
+<span><span class="co">## ℹ Maximum gradient went from 0.00316 to 0.00022 after 3 steps.</span></span>
 <span><span class="co">## ✔ Finished optimization</span></span>
 <span><span class="co">## ✔ Finished sdreport</span></span>
-<span><span class="co">## ℹ FIMS model version: 0.9.0</span></span>
-<span><span class="co">## ℹ Total run time was 7.33392 seconds</span></span>
-<span><span class="co">## ℹ Number of parameters: fixed_effects=58, random_effects=29, and total=87</span></span>
-<span><span class="co">## ℹ Maximum gradient= 0.00038</span></span>
+<span><span class="co">## ℹ FIMS model version: 0.9.2</span></span>
+<span><span class="co">## ℹ Total run time was 12.3673 seconds</span></span>
+<span><span class="co">## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78</span></span>
+<span><span class="co">## ℹ Maximum gradient= 0.00022</span></span>
 <span><span class="co">## ℹ Negative log likelihood (NLL):</span></span>
-<span><span class="co">## • Marginal NLL= 3232.34986</span></span>
-<span><span class="co">## • Total NLL= 3166.05213</span></span>
-<span><span class="co">## ℹ Terminal SB= 994.55006</span></span></code></pre>
+<span><span class="co">## • Marginal NLL= 1624.68892</span></span>
+<span><span class="co">## • Total NLL= 1560.83065</span></span>
+<span><span class="co">## ℹ Terminal SB= 993.45041</span></span></code></pre>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/Cpp_functions.html">clear</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 </div>
@@ -404,7 +445,7 @@ comparison.</p>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Kelli F. Johnson, Grant D. Adams, Jon K. T. Brodziak, Kathryn L. Doering, Daniel R. Goethel, Andrea M. Havron, Ronald Klasky, Peter T. Kuriyama, Emily M. Liljestrand, Christopher M. Legault, Bai Li, Timothy J. Miller, Cole C. Monnahan, Elizabeth F. Perl, Megumi C. Oshima, Kyle W. Shertzer, Christine C. Stawitz, Jane Y. Sullivan, Matthew Supernaw, Ian G. Taylor, Nathan R. Vaughan, Erik H. Williams.</p>
+  <p>Developed by Kelli F. Johnson, Grant D. Adams, Jon K. T. Brodziak, Kathryn L. Doering, Daniel R. Goethel, Andrea M. Havron, Ronald Klasky, Peter T. Kuriyama, Emily M. Liljestrand, Christopher M. Legault, Bai Li, Timothy J. Miller, Cole C. Monnahan, Elizabeth F. Perl, Megumi C. Oshima, Kyle W. Shertzer, Christine C. Stawitz, Jane Y. Sullivan, Matthew Supernaw, Ian G. Taylor, Nathan R. Vaughan, Erik H. Williams, Adrianne T. Wilson.</p>
 </div>
 
 <div class="pkgdown-footer-right">

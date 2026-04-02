@@ -50,6 +50,12 @@ default_configurations <- create_default_configurations(data = data_4_model)
 
 ## Projections
 
+Here we specify how many years beyond the terminal data year that
+projections extend out. This could be short (\<10) for constant catch
+scenarios or long (one or more generations) to calculate equilibrium
+reference points such as fishing mortality at maximum sustainable yield
+or biomass at maximum sustainable yield.
+
 ``` r
 years_of_projection <- 10
 ```
@@ -78,20 +84,22 @@ data_big_with_extra_year <- dplyr::add_row(
   name = "fleet1",
   value = -999,
   unit = "mt"
-)
+) |>
+  dplyr::filter(
+    !(type == "age_to_length_conversion" | type == "length_comp")
+  )
 data_4_projections <- data_big_with_extra_year |>
-  # Add on weight_at_age data for 10 more years because you don't want these
-  # filled with -999
+  # Add on weight_at_age because you don't want these filled with -999
   dplyr::bind_rows(
     dplyr::filter(
       data_big,
       type == "weight_at_age",
       timing == 1
     ) |>
-    dplyr::select(-timing) |>
-    merge(
-      data.frame(timing = max(data_big[["timing"]]):(max(data_big[["timing"]]) + 10))
-    )
+      dplyr::select(-timing) |>
+      merge(
+        data.frame(timing = max(data_big[["timing"]], na.rm = TRUE):(max(data_big[["timing"]], na.rm = TRUE) + years_of_projection))
+      )
   ) |>
   # Make a FIMSFrame object out of this data frame with the extra row to add all
   # of the other missing years for each data type
@@ -149,6 +157,9 @@ parameters_projection <- create_default_parameters(
 ) |>
   tidyr::unnest(cols = data) |>
   # Update log_Fmort initial values for Fleet1
+  # Project the population forward with the terminal year mortality values.
+  # More advanced approaches are included in
+  # tests/testthat/test-projections-looped.R
   dplyr::rows_update(
     tibble::tibble(
       fleet_name = "fleet1",
@@ -170,6 +181,16 @@ parameters_projection <- create_default_parameters(
       ))
     ),
     by = c("fleet_name", "label", "time")
+  ) |>
+  # Fix the projection period log_Fmort to constant
+  dplyr::rows_update(
+    tibble::tibble(
+      label = "log_Fmort",
+      time = (get_end_year(data_4_projections) - years_of_projection + 1):
+      get_end_year(data_4_projections),
+      estimation_type = rep("constant", years_of_projection)
+    ),
+    by = c("label", "time")
   ) |>
   # Update selectivity parameters and log_q for survey1
   dplyr::rows_update(
@@ -195,7 +216,8 @@ parameters_projection <- create_default_parameters(
         -0.19556523, 0.20094360, 0.37248740, -0.07163145,
         # recruitment deviations are fixed at zero for the projections
         rep(0, years_of_projection)
-      )
+      ),
+      estimation_type = "random_effects"
     ),
     by = c("label", "time")
   ) |>
@@ -205,7 +227,9 @@ parameters_projection <- create_default_parameters(
       label = "log_devs",
       time = (get_end_year(data_4_projections) - years_of_projection + 1):
       get_end_year(data_4_projections),
-      estimation_type = rep("constant", years_of_projection)
+      estimation_type = rep("constant", years_of_projection),
+      distribution_type = rep(NA, years_of_projection),
+      distribution = rep(NA, years_of_projection)
     ),
     by = c("label", "time")
   ) |>
@@ -214,7 +238,8 @@ parameters_projection <- create_default_parameters(
     tibble::tibble(
       module_name = "Recruitment",
       label = "log_sd",
-      value = 0.4
+      value = 0.4,
+      estimation_type = "fixed_effects"
     ),
     by = c("module_name", "label")
   ) |>
@@ -231,7 +256,7 @@ parameters_projection <- create_default_parameters(
   dplyr::rows_update(
     tibble::tibble(
       label = "log_init_naa",
-      age = 1:12,
+      age = 1:get_n_ages(data_4_projections),
       value = c(
         13.80944, 13.60690, 13.40217, 13.19525, 12.98692, 12.77791,
         12.56862, 12.35922, 12.14979, 11.94034, 11.73088, 13.18755
@@ -239,9 +264,25 @@ parameters_projection <- create_default_parameters(
     ),
     by = c("label", "age")
   )
-
-# TODO: Figure out how to add SSB_ratio prior
 ```
+
+Reference-point targets are currently achieved by specifying a prior on
+`spawning_biomass_ratio`, a derived population quantity, in the final
+year/s of the projection period. Additionally, a prior can be specified
+on `log_f_multiplier`, which is a simple annual multiplier of fishing
+mortality, i.e., `F_mort` that allows the total fishing mortality for
+the population to be adjusted while keeping relative fleet effort
+constant by fixing `log_Fmort`. This approach allows the annual
+`log_f_multiplier` to be estimated while ensuring that total fishing
+mortality is held constant during the projection period and achieves the
+spawning biomass target.
+
+The wrapper functions used in this vignette are not yet capable of
+setting up priors so the full projection approach is not included here.
+This is a high-priority development goal that is in progress. Examples
+of setting up constraints on `log_f_multiplier` and a prior on
+`spawning_biomass_ratio` can be found in the test-projections-looped.R
+test files used to verify this approach.
 
 ### Model fit
 
@@ -258,17 +299,17 @@ projection_fit <- parameters_projection |>
 
     ## ✔ Starting optimization ...
     ## ℹ Restarting optimizer 3 times to improve gradient.
-    ## ℹ Maximum gradient went from 0.0046 to 0.00038 after 3 steps.
+    ## ℹ Maximum gradient went from 0.00316 to 0.00022 after 3 steps.
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
-    ## ℹ FIMS model version: 0.9.0
-    ## ℹ Total run time was 7.33392 seconds
-    ## ℹ Number of parameters: fixed_effects=58, random_effects=29, and total=87
-    ## ℹ Maximum gradient= 0.00038
+    ## ℹ FIMS model version: 0.9.2
+    ## ℹ Total run time was 12.3673 seconds
+    ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
+    ## ℹ Maximum gradient= 0.00022
     ## ℹ Negative log likelihood (NLL):
-    ## • Marginal NLL= 3232.34986
-    ## • Total NLL= 3166.05213
-    ## ℹ Terminal SB= 994.55006
+    ## • Marginal NLL= 1624.68892
+    ## • Total NLL= 1560.83065
+    ## ℹ Terminal SB= 993.45041
 
 ``` r
 clear()

@@ -8,7 +8,6 @@ var classfims_1_1FIMSLog =
     [ "get_errors", "classfims_1_1FIMSLog.html#abd24b5080409560f74311cc0e4f22748", null ],
     [ "get_info", "classfims_1_1FIMSLog.html#afb81bfc20f758956b47d44b4cf454d4d", null ],
     [ "get_log", "classfims_1_1FIMSLog.html#a3d041abb4f0e14f6e37828e06483d274", null ],
-    [ "get_module", "classfims_1_1FIMSLog.html#a526bbe475dfd446c066c4e00353bd0b8", null ],
     [ "get_path", "classfims_1_1FIMSLog.html#a7376991d4437a576854c8d291b87624e", null ],
     [ "get_warning_count", "classfims_1_1FIMSLog.html#a3f29deca2e719527af53ef5c77e3548e", null ],
     [ "get_warnings", "classfims_1_1FIMSLog.html#a705132e231e03b37e6a47d6538439856", null ],

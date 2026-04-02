@@ -81,7 +81,7 @@ repository](https://nmfs-ost.github.io/on-off-boarding/).
 
 ## Cheatsheet
 
-[![](https://raw.githubusercontent.com/noaa-fims/fims/main/pkgdown/assets/fims-cheatsheet-thumb.png)](hhttps://github.com/NOAA-FIMS/FIMS/blob/main/pkgdown/assets/fims-cheatsheet.pdf)
+[![](https://raw.githubusercontent.com/noaa-fims/fims/main/pkgdown/assets/fims-cheatsheet-thumb.png)](https://github.com/NOAA-FIMS/FIMS/blob/main/pkgdown/assets/fims-cheatsheet.pdf)
 
 ## Usage
 
@@ -189,13 +189,8 @@ Example dataset used in FIMS demonstrations and examples.
 
 - [`data_big`](https://NOAA-FIMS.github.io/FIMS/reference/data_big.md) :
   FIMS input data frame
-
 - [`fims_input_types`](https://NOAA-FIMS.github.io/FIMS/reference/fims_input_types.md)
   : Vector of acceptable FIMS input types
-
-- [`plot()`](https://NOAA-FIMS.github.io/FIMS/reference/plot.md) :
-
-  Plot a `FIMSFrame` object
 
 ## Run FIMS
 
@@ -205,6 +200,11 @@ Primary functions used when setting up or running a FIMS model.
   :
 
   Class constructors for `FIMSFrame` and associated child classes
+
+- [`plot(`*`<FIMSFrame>`*`,`*`<missing>`*`)`](https://NOAA-FIMS.github.io/FIMS/reference/plot.md)
+  :
+
+  Plot a `FIMSFrame` object
 
 - [`get_data()`](https://NOAA-FIMS.github.io/FIMS/reference/get_FIMSFrame.md)
   [`get_fleets()`](https://NOAA-FIMS.github.io/FIMS/reference/get_FIMSFrame.md)
@@ -350,10 +350,14 @@ Links to the relevant doxygen documentation for the C++ code.
 
 ### All vignettes
 
+- [Adding a New C++
+  Module](https://NOAA-FIMS.github.io/FIMS/articles/adding-new-module.md):
 - [Simple projections using
   FIMS](https://NOAA-FIMS.github.io/FIMS/articles/fims-demo-projections.md):
 - [Introducing the Fisheries Integrated Modeling System
   (FIMS)](https://NOAA-FIMS.github.io/FIMS/articles/fims-demo.md):
+- [Introducing FIMS input
+  data](https://NOAA-FIMS.github.io/FIMS/articles/fims-input-data.md):
 - [Introducing the FIMS Logging
   System](https://NOAA-FIMS.github.io/FIMS/articles/fims-logging.md):
 - [FIMS Path:

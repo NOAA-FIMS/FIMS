@@ -127,7 +127,7 @@ methods::show(data_4_model)
 
     ## tbl_df of class 'FIMSFrame'
 
-    ## with the following 'types': age_comp, age_to_length_conversion, landings, length_comp, weight_at_age, index
+    ## with the following 'types': age_comp, landings, length_comp, weight_at_age, index, age_to_length_conversion
 
     ## # A tibble: 6 × 8
     ##   type     name     age length timing value unit       uncertainty
@@ -233,13 +233,13 @@ default_configurations
 ## # A tibble: 7 × 4
 ##   model_family module_name fleet_name data            
 ##   <chr>        <chr>       <chr>      <list>          
-## 1 catch_at_age Data        fleet1     <tibble [3 × 4]>
-## 2 catch_at_age Selectivity fleet1     <tibble [1 × 4]>
-## 3 catch_at_age Data        survey1    <tibble [3 × 4]>
-## 4 catch_at_age Selectivity survey1    <tibble [1 × 4]>
-## 5 catch_at_age Growth      <NA>       <tibble [1 × 4]>
-## 6 catch_at_age Maturity    <NA>       <tibble [1 × 4]>
-## 7 catch_at_age Recruitment <NA>       <tibble [1 × 4]>
+## 1 catch_at_age Data        fleet1     <tibble [3 × 3]>
+## 2 catch_at_age Selectivity fleet1     <tibble [1 × 3]>
+## 3 catch_at_age Data        survey1    <tibble [3 × 3]>
+## 4 catch_at_age Selectivity survey1    <tibble [1 × 3]>
+## 5 catch_at_age Growth      <NA>       <tibble [1 × 3]>
+## 6 catch_at_age Maturity    <NA>       <tibble [1 × 3]>
+## 7 catch_at_age Recruitment <NA>       <tibble [1 × 3]>
 ```
 
 ``` r
@@ -251,21 +251,21 @@ default_configurations_unnested
 ```
 
 ``` numberSource
-## # A tibble: 11 × 7
-##    model_family module_name fleet_name module_type  distribution_link
+## # A tibble: 11 × 6
+##    model_family module_name fleet_name module_type  distribution_type
 ##    <chr>        <chr>       <chr>      <chr>        <chr>            
-##  1 catch_at_age Data        fleet1     AgeComp      AgeComp          
-##  2 catch_at_age Data        fleet1     Landings     Landings         
-##  3 catch_at_age Data        fleet1     LengthComp   LengthComp       
+##  1 catch_at_age Data        fleet1     AgeComp      Data             
+##  2 catch_at_age Data        fleet1     Landings     Data             
+##  3 catch_at_age Data        fleet1     LengthComp   Data             
 ##  4 catch_at_age Selectivity fleet1     Logistic     <NA>             
-##  5 catch_at_age Data        survey1    AgeComp      AgeComp          
-##  6 catch_at_age Data        survey1    Index        Index            
-##  7 catch_at_age Data        survey1    LengthComp   LengthComp       
+##  5 catch_at_age Data        survey1    AgeComp      Data             
+##  6 catch_at_age Data        survey1    Index        Data             
+##  7 catch_at_age Data        survey1    LengthComp   Data             
 ##  8 catch_at_age Selectivity survey1    Logistic     <NA>             
 ##  9 catch_at_age Growth      <NA>       EWAA         <NA>             
 ## 10 catch_at_age Maturity    <NA>       Logistic     <NA>             
-## 11 catch_at_age Recruitment <NA>       BevertonHolt log_devs         
-## # ℹ 2 more variables: distribution_type <chr>, distribution <chr>
+## 11 catch_at_age Recruitment <NA>       BevertonHolt process          
+## # ℹ 1 more variable: distribution <chr>
 ```
 
 ### Update configurations
@@ -291,21 +291,21 @@ updated_configurations
 ```
 
 ``` numberSource
-## # A tibble: 11 × 7
-##    model_family module_name fleet_name module_type    distribution_link
+## # A tibble: 11 × 6
+##    model_family module_name fleet_name module_type    distribution_type
 ##    <chr>        <chr>       <chr>      <chr>          <chr>            
-##  1 catch_at_age Data        fleet1     AgeComp        AgeComp          
-##  2 catch_at_age Data        fleet1     Landings       Landings         
-##  3 catch_at_age Data        fleet1     LengthComp     LengthComp       
+##  1 catch_at_age Data        fleet1     AgeComp        Data             
+##  2 catch_at_age Data        fleet1     Landings       Data             
+##  3 catch_at_age Data        fleet1     LengthComp     Data             
 ##  4 catch_at_age Selectivity fleet1     Logistic       <NA>             
-##  5 catch_at_age Data        survey1    AgeComp        AgeComp          
-##  6 catch_at_age Data        survey1    Index          Index            
-##  7 catch_at_age Data        survey1    LengthComp     LengthComp       
+##  5 catch_at_age Data        survey1    AgeComp        Data             
+##  6 catch_at_age Data        survey1    Index          Data             
+##  7 catch_at_age Data        survey1    LengthComp     Data             
 ##  8 catch_at_age Selectivity survey1    DoubleLogistic <NA>             
 ##  9 catch_at_age Growth      <NA>       EWAA           <NA>             
 ## 10 catch_at_age Maturity    <NA>       Logistic       <NA>             
-## 11 catch_at_age Recruitment <NA>       BevertonHolt   log_devs         
-## # ℹ 2 more variables: distribution_type <chr>, distribution <chr>
+## 11 catch_at_age Recruitment <NA>       BevertonHolt   process          
+## # ℹ 1 more variable: distribution <chr>
 ```
 
 ``` r
@@ -354,18 +354,18 @@ default_parameters
 
 ``` numberSource
 ## # A tibble: 10 × 4
-##    model_family module_name fleet_name data               
-##    <chr>        <chr>       <chr>      <list>             
-##  1 catch_at_age Selectivity fleet1     <tibble [2 × 10]>  
-##  2 catch_at_age Fleet       fleet1     <tibble [31 × 10]> 
-##  3 catch_at_age Data        fleet1     <tibble [32 × 10]> 
-##  4 catch_at_age Selectivity survey1    <tibble [2 × 10]>  
-##  5 catch_at_age Fleet       survey1    <tibble [31 × 10]> 
-##  6 catch_at_age Data        survey1    <tibble [32 × 10]> 
-##  7 catch_at_age Recruitment <NA>       <tibble [150 × 10]>
-##  8 catch_at_age Maturity    <NA>       <tibble [2 × 10]>  
-##  9 catch_at_age Population  <NA>       <tibble [372 × 10]>
-## 10 catch_at_age Growth      <NA>       <tibble [1 × 10]>
+##    model_family module_name fleet_name data              
+##    <chr>        <chr>       <chr>      <list>            
+##  1 catch_at_age Selectivity fleet1     <tibble [2 × 9]>  
+##  2 catch_at_age Fleet       fleet1     <tibble [31 × 9]> 
+##  3 catch_at_age Data        fleet1     <tibble [32 × 9]> 
+##  4 catch_at_age Selectivity survey1    <tibble [2 × 9]>  
+##  5 catch_at_age Fleet       survey1    <tibble [31 × 9]> 
+##  6 catch_at_age Data        survey1    <tibble [32 × 9]> 
+##  7 catch_at_age Recruitment <NA>       <tibble [32 × 9]> 
+##  8 catch_at_age Maturity    <NA>       <tibble [2 × 9]>  
+##  9 catch_at_age Population  <NA>       <tibble [372 × 9]>
+## 10 catch_at_age Growth      <NA>       <tibble [1 × 9]>
 ```
 
 ``` r
@@ -376,22 +376,22 @@ default_parameters_unnested
 ```
 
 ``` numberSource
-## # A tibble: 655 × 13
-##    model_family module_name fleet_name module_type label distribution_link   age
-##    <chr>        <chr>       <chr>      <chr>       <chr> <chr>             <dbl>
-##  1 catch_at_age Selectivity fleet1     Logistic    infl… <NA>                 NA
-##  2 catch_at_age Selectivity fleet1     Logistic    slope <NA>                 NA
-##  3 catch_at_age Fleet       fleet1     <NA>        log_q <NA>                 NA
-##  4 catch_at_age Fleet       fleet1     <NA>        log_… <NA>                 NA
-##  5 catch_at_age Fleet       fleet1     <NA>        log_… <NA>                 NA
-##  6 catch_at_age Fleet       fleet1     <NA>        log_… <NA>                 NA
-##  7 catch_at_age Fleet       fleet1     <NA>        log_… <NA>                 NA
-##  8 catch_at_age Fleet       fleet1     <NA>        log_… <NA>                 NA
-##  9 catch_at_age Fleet       fleet1     <NA>        log_… <NA>                 NA
-## 10 catch_at_age Fleet       fleet1     <NA>        log_… <NA>                 NA
-## # ℹ 645 more rows
-## # ℹ 6 more variables: length <dbl>, time <dbl>, value <dbl>,
-## #   estimation_type <chr>, distribution_type <chr>, distribution <chr>
+## # A tibble: 537 × 12
+##    model_family module_name fleet_name module_type label        age length  time
+##    <chr>        <chr>       <chr>      <chr>       <chr>      <dbl>  <dbl> <dbl>
+##  1 catch_at_age Selectivity fleet1     Logistic    inflectio…    NA     NA    NA
+##  2 catch_at_age Selectivity fleet1     Logistic    slope         NA     NA    NA
+##  3 catch_at_age Fleet       fleet1     <NA>        log_q         NA     NA    NA
+##  4 catch_at_age Fleet       fleet1     <NA>        log_Fmort     NA     NA     1
+##  5 catch_at_age Fleet       fleet1     <NA>        log_Fmort     NA     NA     2
+##  6 catch_at_age Fleet       fleet1     <NA>        log_Fmort     NA     NA     3
+##  7 catch_at_age Fleet       fleet1     <NA>        log_Fmort     NA     NA     4
+##  8 catch_at_age Fleet       fleet1     <NA>        log_Fmort     NA     NA     5
+##  9 catch_at_age Fleet       fleet1     <NA>        log_Fmort     NA     NA     6
+## 10 catch_at_age Fleet       fleet1     <NA>        log_Fmort     NA     NA     7
+## # ℹ 527 more rows
+## # ℹ 4 more variables: value <dbl>, estimation_type <chr>,
+## #   distribution_type <chr>, distribution <chr>
 ```
 
 ### Update parameters
@@ -411,7 +411,7 @@ parameters_4_model <- default_parameters |>
     tibble::tibble(
       fleet_name = "fleet1",
       label = "log_Fmort",
-      time = 1:30,
+      time = seq(get_n_years(data_4_model)),
       value = log(c(
         0.009459165, 0.027288858, 0.045063639,
         0.061017825, 0.048600752, 0.087420554,
@@ -440,7 +440,7 @@ parameters_4_model <- default_parameters |>
   dplyr::rows_update(
     tibble::tibble(
       label = "log_devs",
-      time = 2:30,
+      time = 2:get_n_years(data_4_model),
       value = c(
         0.43787763, -0.13299042, -0.43251973, 0.64861200, 0.50640852,
         -0.06958319, 0.30246260, -0.08257384, 0.20740372, 0.15289604,
@@ -474,7 +474,7 @@ parameters_4_model <- default_parameters |>
   dplyr::rows_update(
     tibble::tibble(
       label = "log_init_naa",
-      age = 1:12,
+      age = seq(get_n_ages(data_4_model)),
       value = c(
         13.80944, 13.60690, 13.40217, 13.19525, 12.98692, 12.77791,
         12.56862, 12.35922, 12.14979, 11.94034, 11.73088, 13.18755
@@ -530,17 +530,96 @@ fit <- parameters_4_model |>
 
     ## ✔ Starting optimization ...
     ## ℹ Restarting optimizer 3 times to improve gradient.
-    ## ℹ Maximum gradient went from 0.00192 to 0.00143 after 3 steps.
+    ## ℹ Maximum gradient went from 0.00941 to 0.00101 after 3 steps.
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
-    ## ℹ FIMS model version: 0.9.0
-    ## ℹ Total run time was 5.69248 seconds
-    ## ℹ Number of parameters: fixed_effects=48, random_effects=29, and total=77
-    ## ℹ Maximum gradient= 0.00143
+    ## ℹ FIMS model version: 0.9.2
+    ## ℹ Total run time was 58.93121 seconds
+    ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
+    ## ℹ Maximum gradient= 0.00101
     ## ℹ Negative log likelihood (NLL):
-    ## • Marginal NLL= 3232.32338
-    ## • Total NLL= 3166.02565
-    ## ℹ Terminal SB= 1783.64716
+    ## • Marginal NLL= 3231.25994
+    ## • Total NLL= 3164.83637
+    ## ℹ Terminal SB= 1791.58311
+
+### Logging system
+
+You can look at the log file in R or write it to the disk but you must
+run
+[`get_log()`](https://NOAA-FIMS.github.io/FIMS/reference/Cpp_functions.md)
+before you run clear to obtain information about the model because clear
+removes everything from memory, including the log.
+[`get_log()`](https://NOAA-FIMS.github.io/FIMS/reference/Cpp_functions.md)
+returns the log information as a string. This string can be manipulated
+into a data frame using
+[`jsonlite::fromJSON()`](https://jeroen.r-universe.dev/jsonlite/reference/fromJSON.html).
+There are three logging levels, “info”, “warning”, and “error”. The log
+below will not have any error messages but if you were to have error
+messages and you want to know immediately upon the first error that
+there are problems, you can run `set_log_throw_on_error(TRUE)` prior to
+running your model. See the vignette on [FIMS
+logging](https://NOAA-FIMS.github.io/FIMS/articles/fims-logging.md) or
+the [doxygen
+documentation](https://noaa-fims.github.io/FIMS/doxygen/classfims_1_1FIMSLog.html)
+for more information.
+
+``` r
+log_json_string <- get_log()
+log_data_frame <- jsonlite::fromJSON(log_json_string)
+log_data_frame[1, ]
+```
+
+    ##                  timestamp   level
+    ## 1 Thu Apr  2 10:13:43 2026 warning
+    ##                                                                   message id
+    ## 1 The log_f_multiplier vector is not of size n_years. Filling with zeros.  0
+    ##     user                                    wd
+    ## 1 runner /home/runner/work/FIMS/FIMS/vignettes
+    ##                                                                                       file
+    ## 1 /home/runner/work/FIMS/FIMS/inst/include/interface/rcpp/rcpp_objects/rcpp_population.hpp
+    ##                                                                     routine
+    ## 1 bool PopulationInterface::add_to_fims_tmb_internal() [with Type = double]
+    ##   line
+    ## 1  337
+
+``` r
+dim(log_data_frame)
+```
+
+    ## [1] 127   9
+
+``` r
+# Print how many log entries there are of each type
+dplyr::count(log_data_frame, level)
+```
+
+    ##     level   n
+    ## 1    info 125
+    ## 2 warning   2
+
+``` r
+# Subset for just the warnings
+log_data_frame |> dplyr::filter(level == "warning")
+```
+
+    ##                  timestamp   level
+    ## 1 Thu Apr  2 10:13:43 2026 warning
+    ## 2 Thu Apr  2 10:13:43 2026 warning
+    ##                                                                   message id
+    ## 1 The log_f_multiplier vector is not of size n_years. Filling with zeros.  0
+    ## 2              Setting spawning_biomass_ratio vector to size n_years + 1.  1
+    ##     user                                    wd
+    ## 1 runner /home/runner/work/FIMS/FIMS/vignettes
+    ## 2 runner /home/runner/work/FIMS/FIMS/vignettes
+    ##                                                                                       file
+    ## 1 /home/runner/work/FIMS/FIMS/inst/include/interface/rcpp/rcpp_objects/rcpp_population.hpp
+    ## 2 /home/runner/work/FIMS/FIMS/inst/include/interface/rcpp/rcpp_objects/rcpp_population.hpp
+    ##                                                                     routine
+    ## 1 bool PopulationInterface::add_to_fims_tmb_internal() [with Type = double]
+    ## 2 bool PopulationInterface::add_to_fims_tmb_internal() [with Type = double]
+    ##   line
+    ## 1  337
+    ## 2  353
 
 ``` r
 clear()
@@ -673,17 +752,17 @@ high_slope_fit <- parameters_high_slope |>
 
     ## ✔ Starting optimization ...
     ## ℹ Restarting optimizer 3 times to improve gradient.
-    ## ℹ Maximum gradient went from 0.00532 to 0.00041 after 3 steps.
+    ## ℹ Maximum gradient went from 0.00616 to 0.00034 after 3 steps.
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
-    ## ℹ FIMS model version: 0.9.0
-    ## ℹ Total run time was 5.60907 seconds
-    ## ℹ Number of parameters: fixed_effects=48, random_effects=29, and total=77
-    ## ℹ Maximum gradient= 0.00041
+    ## ℹ FIMS model version: 0.9.2
+    ## ℹ Total run time was 57.53509 seconds
+    ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
+    ## ℹ Maximum gradient= 0.00034
     ## ℹ Negative log likelihood (NLL):
-    ## • Marginal NLL= 3232.32338
-    ## • Total NLL= 3166.02566
-    ## ℹ Terminal SB= 1783.65752
+    ## • Marginal NLL= 3231.25994
+    ## • Total NLL= 3164.83637
+    ## ℹ Terminal SB= 1791.58318
 
 ``` r
 clear()
@@ -695,17 +774,17 @@ low_slope_fit <- parameters_low_slope |>
 
     ## ✔ Starting optimization ...
     ## ℹ Restarting optimizer 3 times to improve gradient.
-    ## ℹ Maximum gradient went from 0.00457 to 0.00033 after 3 steps.
+    ## ℹ Maximum gradient went from 0.00308 to 4e-04 after 3 steps.
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
-    ## ℹ FIMS model version: 0.9.0
-    ## ℹ Total run time was 6.05316 seconds
-    ## ℹ Number of parameters: fixed_effects=48, random_effects=29, and total=77
-    ## ℹ Maximum gradient= 0.00033
+    ## ℹ FIMS model version: 0.9.2
+    ## ℹ Total run time was 59.35782 seconds
+    ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
+    ## ℹ Maximum gradient= 4e-04
     ## ℹ Negative log likelihood (NLL):
-    ## • Marginal NLL= 3232.32338
-    ## • Total NLL= 3166.02565
-    ## ℹ Terminal SB= 1783.63888
+    ## • Marginal NLL= 3231.25994
+    ## • Total NLL= 3164.83637
+    ## ℹ Terminal SB= 1791.58128
 
 ``` r
 clear()
@@ -731,13 +810,13 @@ age_only_fit <- parameters_4_model |>
     ## Matching, by = "module_type"
     ## ✔ Starting optimization ...
     ## ℹ Restarting optimizer 3 times to improve gradient.
-    ## ℹ Maximum gradient went from 0.00361 to 0.00026 after 3 steps.
+    ## ℹ Maximum gradient went from 0.00361 to 0.00038 after 3 steps.
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
-    ## ℹ FIMS model version: 0.9.0 ℹ Total run time was 1.16858 minutes ℹ Number of
-    ## parameters: fixed_effects=48, random_effects=29, and total=77 ℹ Maximum
-    ## gradient= 0.00026 ℹ Negative log likelihood (NLL): • Marginal NLL= 1628.97925 •
-    ## Total NLL= 1565.4718 ℹ Terminal SB= 1730.94266
+    ## ℹ FIMS model version: 0.9.2 ℹ Total run time was 10.47555 seconds ℹ Number of
+    ## parameters: fixed_effects=49, random_effects=29, and total=78 ℹ Maximum
+    ## gradient= 0.00038 ℹ Negative log likelihood (NLL): • Marginal NLL= 1627.76704 •
+    ## Total NLL= 1564.0853 ℹ Terminal SB= 1740.95207
 
 ``` r
 clear()
@@ -763,13 +842,13 @@ length_only_fit <- parameters_4_model |>
     ## Matching, by = "module_type"
     ## ✔ Starting optimization ...
     ## ℹ Restarting optimizer 3 times to improve gradient.
-    ## ℹ Maximum gradient went from 0.00118 to 0.00029 after 3 steps.
+    ## ℹ Maximum gradient went from 0.00715 to 0.00034 after 3 steps.
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
-    ## ℹ FIMS model version: 0.9.0 ℹ Total run time was 5.57161 seconds ℹ Number of
-    ## parameters: fixed_effects=48, random_effects=29, and total=77 ℹ Maximum
-    ## gradient= 0.00029 ℹ Negative log likelihood (NLL): • Marginal NLL= 1569.19613 •
-    ## Total NLL= 1520.05163 ℹ Terminal SB= 1714.84603
+    ## ℹ FIMS model version: 0.9.2 ℹ Total run time was 57.17 seconds ℹ Number of
+    ## parameters: fixed_effects=49, random_effects=29, and total=78 ℹ Maximum
+    ## gradient= 0.00034 ℹ Negative log likelihood (NLL): • Marginal NLL= 1568.32685 •
+    ## Total NLL= 1518.62644 ℹ Terminal SB= 1722.35744
 
 ``` r
 clear()

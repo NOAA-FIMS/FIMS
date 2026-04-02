@@ -28,7 +28,7 @@
     <nav class="navbar navbar-expand-lg fixed-top bg-light" data-bs-theme="light" aria-label="Site navigation"><div class="container">
     <img class="navlogo" src="https://noaa-fims.github.io/images/FIMS_logo3.png" alt="FIMS logo with a fish" width="60" align="left"><a class="navbar-brand me-2" href="../index.html">FIMS</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -49,11 +49,13 @@
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><h6 class="dropdown-header" data-toc-skip>Intro to FIMS</h6></li>
     <li><a class="dropdown-item" href="../articles/fims-demo.html">Introducing the Fisheries Integrated Modeling System (FIMS)</a></li>
+    <li><a class="dropdown-item" href="../articles/fims-input-data.html">Introducing FIMS Input Data</a></li>
     <li><a class="dropdown-item" href="../articles/fims-logging.html">Introducing the FIMS Logging System</a></li>
     <li><a class="dropdown-item" href="../articles/fims-user-setup-guide.html">FIMS User Setup Guide</a></li>
     <li><a class="dropdown-item" href="../articles/fims-demo-projections.html">Simple projections using FIMS</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>Developer</h6></li>
+    <li><a class="dropdown-item" href="../articles/adding-new-module.html">Adding a New C++ Module</a></li>
     <li><a class="dropdown-item" href="../articles/fims-path-maturity.html">FIMS Path - Maturity</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>C++ Training</h6></li>
@@ -74,9 +76,9 @@
   </ul>
 </li>
 <li class="nav-item dropdown">
-  <button class="nav-link dropdown-toggle" type="button" id="dropdown-reports" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Reports</button>
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-reports" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">reports</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-reports">
-<li><a class="external-link dropdown-item" href="https://noaa-fims.github.io/FIMS/coverage/coverage.html">coverage</a></li>
+<li><a class="external-link dropdown-item" href="https://app.codecov.io/gh/NOAA-FIMS/FIMS" target="_blank">coverage (codecov)</a></li>
     <li><a class="external-link dropdown-item" href="https://noaa-fims.github.io/FIMS/coverage/codecoverage_explanation.html">coverage explained</a></li>
     <li><a class="external-link dropdown-item" href="https://noaa-fims.github.io/FIMS/testdown/index.html">testdown</a></li>
   </ul>
@@ -480,9 +482,12 @@ the FIMS demo R script:</p></li>
 <p>For Windows users who prefer local execution of the FIMS user
 container, we recommend using WSL2 in conjunction with Docker
 Engine.</p>
-<p>To open the container on your local Windows machine using Windows
-Subsystem for Linux 2 (WSL2), Docker Engine, and Visual Studio Code (VS
-Code) use the following instructions:</p>
+<p>Instructions for installing Windows Subsystem for Linux 2 (WSL2) can
+be found on the on the <a href="https://nmfs-ost.github.io/on-off-boarding/getting-started.html#wsl" class="external-link">onboarding
+GitHub webpage</a> for the National Stock Assessment Program. Once
+installed, to open the container on your local Windows machine using
+WSL2, Docker Engine, and Visual Studio Code (VS Code) use the following
+instructions:</p>
 <div class="section level3">
 <h3 id="connect-vs-code-to-wsl">Connect VS Code to WSL<a class="anchor" aria-label="anchor" href="#connect-vs-code-to-wsl"></a>
 </h3>
@@ -608,7 +613,7 @@ GitHub.</p></li>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Kelli F. Johnson, Grant D. Adams, Jon K. T. Brodziak, Kathryn L. Doering, Daniel R. Goethel, Andrea M. Havron, Ronald Klasky, Peter T. Kuriyama, Emily M. Liljestrand, Christopher M. Legault, Bai Li, Timothy J. Miller, Cole C. Monnahan, Elizabeth F. Perl, Megumi C. Oshima, Kyle W. Shertzer, Christine C. Stawitz, Jane Y. Sullivan, Matthew Supernaw, Ian G. Taylor, Nathan R. Vaughan, Erik H. Williams.</p>
+  <p>Developed by Kelli F. Johnson, Grant D. Adams, Jon K. T. Brodziak, Kathryn L. Doering, Daniel R. Goethel, Andrea M. Havron, Ronald Klasky, Peter T. Kuriyama, Emily M. Liljestrand, Christopher M. Legault, Bai Li, Timothy J. Miller, Cole C. Monnahan, Elizabeth F. Perl, Megumi C. Oshima, Kyle W. Shertzer, Christine C. Stawitz, Jane Y. Sullivan, Matthew Supernaw, Ian G. Taylor, Nathan R. Vaughan, Erik H. Williams, Adrianne T. Wilson.</p>
 </div>
 
 <div class="pkgdown-footer-right">

@@ -12,7 +12,7 @@ needed for different types of models."><meta property="og:image" content="https:
     <nav class="navbar navbar-expand-lg fixed-top bg-light" data-bs-theme="light" aria-label="Site navigation"><div class="container">
     <img class="navlogo" src="https://noaa-fims.github.io/images/FIMS_logo3.png" alt="FIMS logo with a fish" width="60" align="left"><a class="navbar-brand me-2" href="../index.html">FIMS</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -29,11 +29,13 @@ needed for different types of models."><meta property="og:image" content="https:
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><h6 class="dropdown-header" data-toc-skip>Intro to FIMS</h6></li>
     <li><a class="dropdown-item" href="../articles/fims-demo.html">Introducing the Fisheries Integrated Modeling System (FIMS)</a></li>
+    <li><a class="dropdown-item" href="../articles/fims-input-data.html">Introducing FIMS Input Data</a></li>
     <li><a class="dropdown-item" href="../articles/fims-logging.html">Introducing the FIMS Logging System</a></li>
     <li><a class="dropdown-item" href="../articles/fims-user-setup-guide.html">FIMS User Setup Guide</a></li>
     <li><a class="dropdown-item" href="../articles/fims-demo-projections.html">Simple projections using FIMS</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>Developer</h6></li>
+    <li><a class="dropdown-item" href="../articles/adding-new-module.html">Adding a New C++ Module</a></li>
     <li><a class="dropdown-item" href="../articles/fims-path-maturity.html">FIMS Path - Maturity</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>C++ Training</h6></li>
@@ -51,8 +53,8 @@ needed for different types of models."><meta property="og:image" content="https:
     <li><a class="dropdown-item" href="../news/index.html">Changelog</a></li>
   </ul></li>
 <li class="nav-item dropdown">
-  <button class="nav-link dropdown-toggle" type="button" id="dropdown-reports" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Reports</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-reports"><li><a class="external-link dropdown-item" href="https://noaa-fims.github.io/FIMS/coverage/coverage.html">coverage</a></li>
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-reports" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">reports</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-reports"><li><a class="external-link dropdown-item" href="https://app.codecov.io/gh/NOAA-FIMS/FIMS" target="_blank">coverage (codecov)</a></li>
     <li><a class="external-link dropdown-item" href="https://noaa-fims.github.io/FIMS/coverage/codecoverage_explanation.html">coverage explained</a></li>
     <li><a class="external-link dropdown-item" href="https://noaa-fims.github.io/FIMS/testdown/index.html">testdown</a></li>
   </ul></li>
@@ -109,8 +111,24 @@ on the child class. Use <code><a href="https://rdrr.io/r/methods/RClassUtils.htm
 <h3 id="data">data<a class="anchor" aria-label="anchor" href="#data"></a></h3>
 
 
-<p>The input data are both sorted and expanded before returning them in the
-data slot.</p><div class="section">
+<p>The input data are both sorted (see the section below on sorting) and
+expanded before returning them in the data slot.</p><div class="section">
+<h4 id="ages">Ages<a class="anchor" aria-label="anchor" href="#ages"></a></h4>
+
+
+<p>Currently, ages must be integers, i.e., FIMS cannot accommodate numeric ages
+like age 1.5 but we hope that this is something that we will be able to
+accommodate in the future. Additionally, the first age in your data set will
+be the age at which fish recruit to the population. So, if you do not have
+age-0 age compositions and age two is the first age you have in your
+composition data, then recruitment will happen at age two. Furthermore, you
+must have composition entries for every integer between your first and last
+age in the model. For example, you cannot bin fish into bins that span
+multiple years, you must have age-2, age-3, and age-4 not just age-2 and
+age-4 fish in your composition data.</p>
+</div>
+
+<div class="section">
 <h4 id="sorting">Sorting<a class="anchor" aria-label="anchor" href="#sorting"></a></h4>
 
 
@@ -140,13 +158,17 @@ for a given fleet then the next year will begin.</p>
 </div>
 
     </div>
+    <div class="section level2">
+    <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
+    <div class="dont-index"><p><code><a href="plot.html">plot,FIMSFrame,missing-method()</a></code> for plotting <code>FIMSFrame</code> objects.</p></div>
+    </div>
 
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Kelli F. Johnson, Grant D. Adams, Jon K. T. Brodziak, Kathryn L. Doering, Daniel R. Goethel, Andrea M. Havron, Ronald Klasky, Peter T. Kuriyama, Emily M. Liljestrand, Christopher M. Legault, Bai Li, Timothy J. Miller, Cole C. Monnahan, Elizabeth F. Perl, Megumi C. Oshima, Kyle W. Shertzer, Christine C. Stawitz, Jane Y. Sullivan, Matthew Supernaw, Ian G. Taylor, Nathan R. Vaughan, Erik H. Williams.</p>
+  <p>Developed by Kelli F. Johnson, Grant D. Adams, Jon K. T. Brodziak, Kathryn L. Doering, Daniel R. Goethel, Andrea M. Havron, Ronald Klasky, Peter T. Kuriyama, Emily M. Liljestrand, Christopher M. Legault, Bai Li, Timothy J. Miller, Cole C. Monnahan, Elizabeth F. Perl, Megumi C. Oshima, Kyle W. Shertzer, Christine C. Stawitz, Jane Y. Sullivan, Matthew Supernaw, Ian G. Taylor, Nathan R. Vaughan, Erik H. Williams, Adrianne T. Wilson.</p>
 </div>
 
 <div class="pkgdown-footer-right">

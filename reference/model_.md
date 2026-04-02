@@ -50,13 +50,13 @@ model_weight_at_age(x)
 # S4 method for class 'data.frame'
 model_weight_at_age(x)
 
-model_age_to_length_conversion(x, fleet_name)
+model_age_to_length_conversion(x)
 
 # S4 method for class 'FIMSFrame'
-model_age_to_length_conversion(x, fleet_name)
+model_age_to_length_conversion(x)
 
 # S4 method for class 'data.frame'
-model_age_to_length_conversion(x, fleet_name)
+model_age_to_length_conversion(x)
 ```
 
 ## Arguments
@@ -85,3 +85,40 @@ and the function just extracts the appropriate column.
 `Age_to_length_conversion` data, i.e., the proportion of age "a" that
 are length "l", are used to convert lengths (input data) to ages
 (modeled) as a way to fit length data without estimating growth.
+
+### `model_landings()`
+
+Returns a numeric vector of landings data (type `"landings"`) for the
+specified fleet(s).
+
+### `model_index()`
+
+Returns a numeric vector of index data (type `"index"`) for the
+specified fleet(s).
+
+### `model_age_comp()`
+
+Returns a numeric vector of age-composition data (type `"age_comp"`) for
+the specified fleet(s).
+
+### `model_length_comp()`
+
+Returns a numeric vector of length-composition data (type
+`"length_comp"`) for the specified fleet(s). This accessor requires that
+age-to-length conversion data are present in the `FIMSFrame` object.
+
+### `model_weight_at_age()`
+
+Returns a numeric vector of weight-at-age values (type
+`"weight_at_age"`), ordered by age and year (plus one additional year)
+and using `-999` to indicate missing values. When multiple fleets are
+present, values are averaged across fleets.
+
+### `model_age_to_length_conversion()`
+
+Returns a numeric vector of age-to-length conversion values. Values are
+ordered by age and length in the order defined by
+[`FIMSFrame()`](https://NOAA-FIMS.github.io/FIMS/reference/FIMSFrame.md).
+When multiple values are present across a single age and length, they
+are averaged because `age_to_length_conversion` data cannot vary across
+fleets or time.

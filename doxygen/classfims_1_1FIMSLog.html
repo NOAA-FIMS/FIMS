@@ -9,8 +9,8 @@
     <link rel="icon" type="image/png" href="https://noaa-fims.github.io/images/FIMS_hexlogo.png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
-    <link href="https://noaa-fims.github.io/site_libs/bootstrap/bootstrap-5477dd34fdf9f443df58de9070e2fbd7.min.css" rel="stylesheet">
-    <link href="https://noaa-fims.github.io/site_libs/bootstrap/bootstrap-dark-429bd3fc0b6810d1347fc340b0896c35.min.css" rel="stylesheet" media="(prefers-color-scheme: dark)">
+    <link href="https://noaa-fims.github.io/site_libs/bootstrap/bootstrap-5bca210c7b8f52bd43562cb73b8f998e.min.css" rel="stylesheet">
+    <link href="https://noaa-fims.github.io/site_libs/bootstrap/bootstrap-dark-dabf027eac5ab6a58e890faf792e317e.min.css" rel="stylesheet" media="(prefers-color-scheme: dark)">
     <script type="text/javascript" src="jquery.js"></script>
     <script type="text/javascript" src="dynsections.js"></script>
     <link href="navtree.css" rel="stylesheet" type="text/css"/>
@@ -48,7 +48,7 @@ MathJax.Hub.Config({
                 <td id="projectlogo"><img alt="Logo" src="FIMS_logo3.png"/></td>
                 <td id="projectalign" style="padding-left: 0.5em;">
                     <div id="projectname">FIMS
-                        &#160;<span id="projectnumber">v0.8.1</span></div>
+                        &#160;<span id="projectnumber">v0.9.2</span></div>
                     <div id="projectbrief"></div></td>
                 <td style="padding-left: 0.5em;">
                     <div id="projectbrief"></div>
@@ -83,11 +83,13 @@ MathJax.Hub.Config({
             <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
               <li><h6 class="dropdown-header" data-toc-skip>intro to fims</h6></li>
               <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/articles/fims-demo.html">introducing the fisheries integrated modeling system (fims)</a></li>
-              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/articles/fims-logging.html">Introducing the fims logging system</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/articles/fims-input-data.html">introducing FIMS input data</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/articles/fims-logging.html">introducing the fims logging system</a></li>
               <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/articles/fims-user-setup-guide.html">fims user setup guide</a></li>
               <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/articles/fims-demo-projections.html">simple projections using fims</a></li>
               <li><hr class="dropdown-divider"></li>
               <li><h6 class="dropdown-header" data-toc-skip>developer</h6></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/articles/adding-new-module.html">adding a new c++ module</a></li>
               <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/articles/fims-path-maturity.html">fims path - maturity</a></li>
               <li><hr class="dropdown-divider"></li>
               <li><h6 class="dropdown-header" data-toc-skip>c++ training</h6></li>
@@ -111,7 +113,7 @@ MathJax.Hub.Config({
             <button class="nav-link dropdown-toggle" type="button" id="dropdown-reports" data-bs-toggle="dropdown"
                     aria-expanded="false" aria-haspopup="true">reports</button>
             <ul class="dropdown-menu" aria-labelledby="dropdown-reports">
-              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/coverage/coverage.html">coverage</a></li>
+              <li><a class="dropdown-item" href="https://app.codecov.io/gh/NOAA-FIMS/FIMS" target="_blank">coverage (codecov)</a></li>
               <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/coverage/codecoverage_explanation.html">coverage explained</a></li>
               <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/testdown/index.html">testdown</a></li>
             </ul>
@@ -227,6 +229,9 @@ $(document).ready(function(){initNavTree('classfims_1_1FIMSLog.html',''); initRe
 </div><!--header-->
 <div class="contents">
 
+<p>Singleton logger for FIMS.  
+ <a href="classfims_1_1FIMSLog.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="def_8hpp_source.html">def.hpp</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
@@ -236,11 +241,13 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ad32e96778496a16f9a943f405c3956a9" id="r_ad32e96778496a16f9a943f405c3956a9"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims_1_1FIMSLog.html#ad32e96778496a16f9a943f405c3956a9">~FIMSLog</a> ()</td></tr>
 <tr class="separator:ad32e96778496a16f9a943f405c3956a9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad7154dafdf1833d73313bed1820ad858" id="r_ad7154dafdf1833d73313bed1820ad858"><td class="memItemLeft" align="right" valign="top">std::filesystem::path&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims_1_1FIMSLog.html#ad7154dafdf1833d73313bed1820ad858">getAbsolutePathWithoutDotDot</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> std::filesystem::path &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">relativePath</a>)</td></tr>
-<tr class="memdesc:ad7154dafdf1833d73313bed1820ad858"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Absolute Path Without Dot Dot object.  <br /></td></tr>
+<tr class="memdesc:ad7154dafdf1833d73313bed1820ad858"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the absolute path without dot dot notation.  <br /></td></tr>
 <tr class="separator:ad7154dafdf1833d73313bed1820ad858"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acdbdf84d23788e3088e664361b1cba8b" id="r_acdbdf84d23788e3088e664361b1cba8b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims_1_1FIMSLog.html#acdbdf84d23788e3088e664361b1cba8b">set_path</a> (std::string path)</td></tr>
+<tr class="memdesc:acdbdf84d23788e3088e664361b1cba8b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the destination file path for writing logs to disk.  <br /></td></tr>
 <tr class="separator:acdbdf84d23788e3088e664361b1cba8b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7376991d4437a576854c8d291b87624e" id="r_a7376991d4437a576854c8d291b87624e"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims_1_1FIMSLog.html#a7376991d4437a576854c8d291b87624e">get_path</a> ()</td></tr>
+<tr class="memdesc:a7376991d4437a576854c8d291b87624e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the current output path for on-disk logs.  <br /></td></tr>
 <tr class="separator:a7376991d4437a576854c8d291b87624e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aec8a86ce4a58393a028983d55d8e38bf" id="r_aec8a86ce4a58393a028983d55d8e38bf"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims_1_1FIMSLog.html#aec8a86ce4a58393a028983d55d8e38bf">info_message</a> (std::string str, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">int</a> line, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">char</a> *file, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">char</a> *<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">func</a>)</td></tr>
 <tr class="separator:aec8a86ce4a58393a028983d55d8e38bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -249,26 +256,25 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a3d2755bc4efa212c6c5c975f16132376" id="r_a3d2755bc4efa212c6c5c975f16132376"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims_1_1FIMSLog.html#a3d2755bc4efa212c6c5c975f16132376">warning_message</a> (std::string str, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">int</a> line, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">char</a> *file, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">char</a> *<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">func</a>)</td></tr>
 <tr class="separator:a3d2755bc4efa212c6c5c975f16132376"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3d041abb4f0e14f6e37828e06483d274" id="r_a3d041abb4f0e14f6e37828e06483d274"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims_1_1FIMSLog.html#a3d041abb4f0e14f6e37828e06483d274">get_log</a> ()</td></tr>
+<tr class="memdesc:a3d041abb4f0e14f6e37828e06483d274"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return all stored log entries as a JSON array string.  <br /></td></tr>
 <tr class="separator:a3d041abb4f0e14f6e37828e06483d274"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abd24b5080409560f74311cc0e4f22748" id="r_abd24b5080409560f74311cc0e4f22748"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims_1_1FIMSLog.html#abd24b5080409560f74311cc0e4f22748">get_errors</a> ()</td></tr>
+<tr class="memdesc:abd24b5080409560f74311cc0e4f22748"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return only error-level log entries as a JSON array string.  <br /></td></tr>
 <tr class="separator:abd24b5080409560f74311cc0e4f22748"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a705132e231e03b37e6a47d6538439856" id="r_a705132e231e03b37e6a47d6538439856"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims_1_1FIMSLog.html#a705132e231e03b37e6a47d6538439856">get_warnings</a> ()</td></tr>
+<tr class="memdesc:a705132e231e03b37e6a47d6538439856"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return only warning-level log entries as a JSON array string.  <br /></td></tr>
 <tr class="separator:a705132e231e03b37e6a47d6538439856"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afb81bfc20f758956b47d44b4cf454d4d" id="r_afb81bfc20f758956b47d44b4cf454d4d"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims_1_1FIMSLog.html#afb81bfc20f758956b47d44b4cf454d4d">get_info</a> ()</td></tr>
+<tr class="memdesc:afb81bfc20f758956b47d44b4cf454d4d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return only info-level log entries as a JSON array string.  <br /></td></tr>
 <tr class="separator:afb81bfc20f758956b47d44b4cf454d4d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a526bbe475dfd446c066c4e00353bd0b8" id="r_a526bbe475dfd446c066c4e00353bd0b8"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims_1_1FIMSLog.html#a526bbe475dfd446c066c4e00353bd0b8">get_module</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> std::string &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">module</a>)</td></tr>
-<tr class="separator:a526bbe475dfd446c066c4e00353bd0b8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aec60cfc5ad2b61d46557991af9bb3d4a" id="r_aec60cfc5ad2b61d46557991af9bb3d4a"><td class="memItemLeft" align="right" valign="top"><a id="aec60cfc5ad2b61d46557991af9bb3d4a" name="aec60cfc5ad2b61d46557991af9bb3d4a"></a>
-<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a>&#160;</td><td class="memItemRight" valign="bottom"><b>get_error_count</b> () <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a></td></tr>
-<tr class="memdesc:aec60cfc5ad2b61d46557991af9bb3d4a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the counts of the number of errors. <br /></td></tr>
+<tr class="memitem:aec60cfc5ad2b61d46557991af9bb3d4a" id="r_aec60cfc5ad2b61d46557991af9bb3d4a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims_1_1FIMSLog.html#aec60cfc5ad2b61d46557991af9bb3d4a">get_error_count</a> () <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a></td></tr>
+<tr class="memdesc:aec60cfc5ad2b61d46557991af9bb3d4a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the number of error-log entries currently stored.  <br /></td></tr>
 <tr class="separator:aec60cfc5ad2b61d46557991af9bb3d4a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3f29deca2e719527af53ef5c77e3548e" id="r_a3f29deca2e719527af53ef5c77e3548e"><td class="memItemLeft" align="right" valign="top"><a id="a3f29deca2e719527af53ef5c77e3548e" name="a3f29deca2e719527af53ef5c77e3548e"></a>
-<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a>&#160;</td><td class="memItemRight" valign="bottom"><b>get_warning_count</b> () <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a></td></tr>
-<tr class="memdesc:a3f29deca2e719527af53ef5c77e3548e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the counts of the number of warnings. <br /></td></tr>
+<tr class="memitem:a3f29deca2e719527af53ef5c77e3548e" id="r_a3f29deca2e719527af53ef5c77e3548e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims_1_1FIMSLog.html#a3f29deca2e719527af53ef5c77e3548e">get_warning_count</a> () <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a></td></tr>
+<tr class="memdesc:a3f29deca2e719527af53ef5c77e3548e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the number of warning-log entries currently stored.  <br /></td></tr>
 <tr class="separator:a3f29deca2e719527af53ef5c77e3548e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1bd3de73d5a5a6727e3f2b3bd8d4c43c" id="r_a1bd3de73d5a5a6727e3f2b3bd8d4c43c"><td class="memItemLeft" align="right" valign="top"><a id="a1bd3de73d5a5a6727e3f2b3bd8d4c43c" name="a1bd3de73d5a5a6727e3f2b3bd8d4c43c"></a>
-<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><b>clear</b> ()</td></tr>
-<tr class="memdesc:a1bd3de73d5a5a6727e3f2b3bd8d4c43c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clears all pointers/references of a FIMS model. <br /></td></tr>
+<tr class="memitem:a1bd3de73d5a5a6727e3f2b3bd8d4c43c" id="r_a1bd3de73d5a5a6727e3f2b3bd8d4c43c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims_1_1FIMSLog.html#a1bd3de73d5a5a6727e3f2b3bd8d4c43c">clear</a> ()</td></tr>
+<tr class="memdesc:a1bd3de73d5a5a6727e3f2b3bd8d4c43c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clear in-memory logging state.  <br /></td></tr>
 <tr class="separator:a1bd3de73d5a5a6727e3f2b3bd8d4c43c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
@@ -290,7 +296,12 @@ Static Public Attributes</h2></td></tr>
 <tr class="separator:a942fd5b6d134573af288c0a986831ffd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>FIMS logging class. </p>
+<div class="textblock"><p>Singleton logger for FIMS. </p>
+<p><code><a class="el" href="classfims_1_1FIMSLog.html" title="Singleton logger for FIMS.">FIMSLog</a></code> accumulates log entries in memory and provides JSON-formatted accessors for all entries and severity-specific subsets.</p>
+<p>Runtime behavior:</p><ul>
+<li><code>write_on_exit = true</code> writes the current log buffer to disk in the destructor.</li>
+<li><code>throw_on_error = true</code> throws a <code>std::runtime_error</code> after recording an error-level entry. </li>
+</ul>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="aa766eb84784fa15a905bec91f03ba920" name="aa766eb84784fa15a905bec91f03ba920"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aa766eb84784fa15a905bec91f03ba920">&#9670;&#160;</a></span>FIMSLog()</h2>
@@ -314,7 +325,7 @@ Static Public Attributes</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Default constructor for <a class="el" href="classfims_1_1FIMSLog.html">FIMSLog</a>. </p>
+<p>Default constructor for <a class="el" href="classfims_1_1FIMSLog.html" title="Singleton logger for FIMS.">FIMSLog</a>. </p>
 
 </div>
 </div>
@@ -345,6 +356,34 @@ Static Public Attributes</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
+<a id="a1bd3de73d5a5a6727e3f2b3bd8d4c43c" name="a1bd3de73d5a5a6727e3f2b3bd8d4c43c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1bd3de73d5a5a6727e3f2b3bd8d4c43c">&#9670;&#160;</a></span>clear()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a> fims::FIMSLog::clear </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Clear in-memory logging state. </p>
+<p>Clears the raw entry cache and structured entries, resets error, warning, and entry counters, and preserves configured output path and <code>throw_on_error</code> behavior. </p>
+
+</div>
+</div>
 <a id="a18a705c8e1094b56390a7dd9f441d724" name="a18a705c8e1094b56390a7dd9f441d724"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a18a705c8e1094b56390a7dd9f441d724">&#9670;&#160;</a></span>error_message()</h2>
 
@@ -390,16 +429,50 @@ Static Public Attributes</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Add a "error" level message to the log.</p>
-<dl class="params"><dt>Parameters</dt><dd>
+<p>Add a error-level message to the log.</p>
+<p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">str</td><td></td></tr>
-    <tr><td class="paramname">line</td><td></td></tr>
-    <tr><td class="paramname">file</td><td></td></tr>
-    <tr><td class="paramname">func</td><td></td></tr>
+    <tr><td class="paramname">str</td><td>Log message text. </td></tr>
+    <tr><td class="paramname">line</td><td>Source line number where the message originated. </td></tr>
+    <tr><td class="paramname">file</td><td>Source file where the message originated. </td></tr>
+    <tr><td class="paramname">func</td><td>Function or method name where the message originated. </td></tr>
   </table>
   </dd>
 </dl>
+ </p><dl class="section see"><dt>See also</dt><dd><a class="el" href="classfims_1_1FIMSLog.html#aec8a86ce4a58393a028983d55d8e38bf">info_message()</a> </dd>
+<dd>
+<a class="el" href="classfims_1_1FIMSLog.html#a3d2755bc4efa212c6c5c975f16132376">warning_message()</a> </dd></dl>
+
+</div>
+</div>
+<a id="aec60cfc5ad2b61d46557991af9bb3d4a" name="aec60cfc5ad2b61d46557991af9bb3d4a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aec60cfc5ad2b61d46557991af9bb3d4a">&#9670;&#160;</a></span>get_error_count()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a> fims::FIMSLog::get_error_count </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Return the number of error-log entries currently stored. </p>
+<p>This counter is incremented whenever an error-level log entry is added and is reset to zero when <code><a class="el" href="classfims_1_1FIMSLog.html#a1bd3de73d5a5a6727e3f2b3bd8d4c43c" title="Clear in-memory logging state.">clear()</a></code> is called. </p><dl class="section see"><dt>See also</dt><dd><a class="el" href="classfims_1_1FIMSLog.html#a1bd3de73d5a5a6727e3f2b3bd8d4c43c" title="Clear in-memory logging state.">clear()</a> </dd>
+<dd>
+<a class="el" href="classfims_1_1FIMSLog.html#a3f29deca2e719527af53ef5c77e3548e" title="Return the number of warning-log entries currently stored.">get_warning_count()</a> </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>Count of error-log entries. </dd></dl>
 
 </div>
 </div>
@@ -425,8 +498,16 @@ Static Public Attributes</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Return only error entries from the log.</p>
-<dl class="section return"><dt>Returns</dt><dd></dd></dl>
+
+<p>Return only error-level log entries as a JSON array string. </p>
+<p>This method filters the in-memory log buffer and includes only entries where <code>level == "error"</code>.</p>
+<p>If no error entries exist, this method returns an empty JSON array (<code>[]</code>).</p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="classfims_1_1FIMSLog.html#a3d041abb4f0e14f6e37828e06483d274" title="Return all stored log entries as a JSON array string.">get_log()</a> </dd>
+<dd>
+<a class="el" href="classfims_1_1FIMSLog.html#a705132e231e03b37e6a47d6538439856" title="Return only warning-level log entries as a JSON array string.">get_warnings()</a> </dd>
+<dd>
+<a class="el" href="classfims_1_1FIMSLog.html#afb81bfc20f758956b47d44b4cf454d4d" title="Return only info-level log entries as a JSON array string.">get_info()</a> </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>JSON array string containing entries with <code>level == "error"</code>. </dd></dl>
 
 </div>
 </div>
@@ -452,8 +533,16 @@ Static Public Attributes</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Return only info entries from the log.</p>
-<dl class="section return"><dt>Returns</dt><dd></dd></dl>
+
+<p>Return only info-level log entries as a JSON array string. </p>
+<p>This method filters the in-memory log buffer and includes only entries where <code>level == "info"</code>.</p>
+<p>If no info entries exist, this method returns an empty JSON array (<code>[]</code>).</p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="classfims_1_1FIMSLog.html#a3d041abb4f0e14f6e37828e06483d274" title="Return all stored log entries as a JSON array string.">get_log()</a> </dd>
+<dd>
+<a class="el" href="classfims_1_1FIMSLog.html#abd24b5080409560f74311cc0e4f22748" title="Return only error-level log entries as a JSON array string.">get_errors()</a> </dd>
+<dd>
+<a class="el" href="classfims_1_1FIMSLog.html#a705132e231e03b37e6a47d6538439856" title="Return only warning-level log entries as a JSON array string.">get_warnings()</a> </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>JSON array string containing entries with <code>level == "info"</code>. </dd></dl>
 
 </div>
 </div>
@@ -479,42 +568,16 @@ Static Public Attributes</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Get the log as a string object.</p>
-<dl class="section return"><dt>Returns</dt><dd></dd></dl>
 
-</div>
-</div>
-<a id="a526bbe475dfd446c066c4e00353bd0b8" name="a526bbe475dfd446c066c4e00353bd0b8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a526bbe475dfd446c066c4e00353bd0b8">&#9670;&#160;</a></span>get_module()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">std::string fims::FIMSLog::get_module </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> std::string &amp;&#160;</td>
-          <td class="paramname"><em>module</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>Query the log by module.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">module</td><td></td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd></dd></dl>
+<p>Return all stored log entries as a JSON array string. </p>
+<p>The returned value is a JSON array of serialized <code><a class="el" href="structfims_1_1LogEntry.html" title="A data structure with defined fields for a single log record.">LogEntry</a></code> objects in the same order they were recorded.</p>
+<p>If no entries are stored, this method returns an empty JSON array (<code>[]</code>).</p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="classfims_1_1FIMSLog.html#abd24b5080409560f74311cc0e4f22748" title="Return only error-level log entries as a JSON array string.">get_errors()</a> </dd>
+<dd>
+<a class="el" href="classfims_1_1FIMSLog.html#a705132e231e03b37e6a47d6538439856" title="Return only warning-level log entries as a JSON array string.">get_warnings()</a> </dd>
+<dd>
+<a class="el" href="classfims_1_1FIMSLog.html#afb81bfc20f758956b47d44b4cf454d4d" title="Return only info-level log entries as a JSON array string.">get_info()</a> </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>JSON array string containing every stored <code><a class="el" href="structfims_1_1LogEntry.html" title="A data structure with defined fields for a single log record.">LogEntry</a></code>. </dd></dl>
 
 </div>
 </div>
@@ -540,8 +603,40 @@ Static Public Attributes</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Get the path for the log file.</p>
-<dl class="section return"><dt>Returns</dt><dd></dd></dl>
+
+<p>Get the current output path for on-disk logs. </p>
+<dl class="section return"><dt>Returns</dt><dd>Output file path. </dd></dl>
+
+</div>
+</div>
+<a id="a3f29deca2e719527af53ef5c77e3548e" name="a3f29deca2e719527af53ef5c77e3548e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3f29deca2e719527af53ef5c77e3548e">&#9670;&#160;</a></span>get_warning_count()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a> fims::FIMSLog::get_warning_count </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Return the number of warning-log entries currently stored. </p>
+<p>This counter is incremented whenever a warning-level log entry is added and is reset to zero when <code><a class="el" href="classfims_1_1FIMSLog.html#a1bd3de73d5a5a6727e3f2b3bd8d4c43c" title="Clear in-memory logging state.">clear()</a></code> is called. </p><dl class="section see"><dt>See also</dt><dd><a class="el" href="classfims_1_1FIMSLog.html#a1bd3de73d5a5a6727e3f2b3bd8d4c43c" title="Clear in-memory logging state.">clear()</a> </dd>
+<dd>
+<a class="el" href="classfims_1_1FIMSLog.html#aec60cfc5ad2b61d46557991af9bb3d4a" title="Return the number of error-log entries currently stored.">get_error_count()</a> </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>Count of warning-log entries. </dd></dl>
 
 </div>
 </div>
@@ -567,8 +662,16 @@ Static Public Attributes</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Return only warning entries from the log.</p>
-<dl class="section return"><dt>Returns</dt><dd></dd></dl>
+
+<p>Return only warning-level log entries as a JSON array string. </p>
+<p>This method filters the in-memory log buffer and includes only entries where <code>level == "warning"</code>.</p>
+<p>If no warning entries exist, this method returns an empty JSON array (<code>[]</code>).</p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="classfims_1_1FIMSLog.html#a3d041abb4f0e14f6e37828e06483d274" title="Return all stored log entries as a JSON array string.">get_log()</a> </dd>
+<dd>
+<a class="el" href="classfims_1_1FIMSLog.html#abd24b5080409560f74311cc0e4f22748" title="Return only error-level log entries as a JSON array string.">get_errors()</a> </dd>
+<dd>
+<a class="el" href="classfims_1_1FIMSLog.html#afb81bfc20f758956b47d44b4cf454d4d" title="Return only info-level log entries as a JSON array string.">get_info()</a> </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>JSON array string containing entries with <code>level == "warning"</code>. </dd></dl>
 
 </div>
 </div>
@@ -596,7 +699,7 @@ Static Public Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Get the Absolute Path Without Dot Dot object. </p>
+<p>Get the absolute path without dot dot notation. </p>
 <p>Dot dot notation is for relative paths, where this function replaces all dot dots with the actual full path.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -653,16 +756,19 @@ Static Public Attributes</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Add a "info" level message to the log.</p>
-<dl class="params"><dt>Parameters</dt><dd>
+<p>Add a info-level message to the log.</p>
+<p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">str</td><td></td></tr>
-    <tr><td class="paramname">line</td><td></td></tr>
-    <tr><td class="paramname">file</td><td></td></tr>
-    <tr><td class="paramname">func</td><td></td></tr>
+    <tr><td class="paramname">str</td><td>Log message text. </td></tr>
+    <tr><td class="paramname">line</td><td>Source line number where the message originated. </td></tr>
+    <tr><td class="paramname">file</td><td>Source file where the message originated. </td></tr>
+    <tr><td class="paramname">func</td><td>Function or method name where the message originated. </td></tr>
   </table>
   </dd>
 </dl>
+ </p><dl class="section see"><dt>See also</dt><dd><a class="el" href="classfims_1_1FIMSLog.html#a18a705c8e1094b56390a7dd9f441d724">error_message()</a> </dd>
+<dd>
+<a class="el" href="classfims_1_1FIMSLog.html#a3d2755bc4efa212c6c5c975f16132376">warning_message()</a> </dd></dl>
 
 </div>
 </div>
@@ -689,13 +795,19 @@ Static Public Attributes</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Set a path for the log file.</p>
+
+<p>Set the destination file path for writing logs to disk. </p>
+<p>The configured path is used whenever the logger writes to disk, including destructor-time writes (when <code>write_on_exit</code> is <code>true</code>) and signal-triggered writes in <code><a class="el" href="def_8hpp.html#a20c928a94e4d697a650545313de414b8" title="Signal handler that records a terminal error and flushes log entries.">WriteAtExit()</a></code>.</p>
+<p>This method updates only the output location and does not clear or modify the in-memory log buffer.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">path</td><td></td></tr>
+    <tr><td class="paramname">path</td><td>Relative or absolute path to the output log file (for example, <code>"fims.log"</code> or <code>"logs/fims_run_01.json"</code>). </td></tr>
   </table>
   </dd>
 </dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="classfims_1_1FIMSLog.html#a7376991d4437a576854c8d291b87624e" title="Get the current output path for on-disk logs.">get_path()</a> </dd>
+<dd>
+<a class="el" href="classfims_1_1FIMSLog.html#a1f92030e24364caa377ca4ba1174a1be" title="A boolean specifying if the log file is written when the session is terminated. The default is TRUE.">write_on_exit</a> </dd></dl>
 
 </div>
 </div>
@@ -744,16 +856,19 @@ Static Public Attributes</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Add a "warning" level message to the log.</p>
-<dl class="params"><dt>Parameters</dt><dd>
+<p>Add a warning-level message to the log.</p>
+<p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">str</td><td></td></tr>
-    <tr><td class="paramname">line</td><td></td></tr>
-    <tr><td class="paramname">file</td><td></td></tr>
-    <tr><td class="paramname">func</td><td></td></tr>
+    <tr><td class="paramname">str</td><td>Log message text. </td></tr>
+    <tr><td class="paramname">line</td><td>Source line number where the message originated. </td></tr>
+    <tr><td class="paramname">file</td><td>Source file where the message originated. </td></tr>
+    <tr><td class="paramname">func</td><td>Function or method name where the message originated. </td></tr>
   </table>
   </dd>
 </dl>
+ </p><dl class="section see"><dt>See also</dt><dd><a class="el" href="classfims_1_1FIMSLog.html#a18a705c8e1094b56390a7dd9f441d724">error_message()</a> </dd>
+<dd>
+<a class="el" href="classfims_1_1FIMSLog.html#aec8a86ce4a58393a028983d55d8e38bf">info_message()</a> </dd></dl>
 
 </div>
 </div>

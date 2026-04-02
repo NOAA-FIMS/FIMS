@@ -64,6 +64,9 @@
 - **Erik H. Williams**. Author.
   [](https://orcid.org/0000-0001-6623-4254)
 
+- **Adrianne T. Wilson**. Author.
+  [](https://orcid.org/0009-0006-1171-6014)
+
 - **Kristan Blackhart**. Contributor.
   [](https://orcid.org/0000-0003-4232-2510)
 

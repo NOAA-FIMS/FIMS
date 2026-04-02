@@ -2,12 +2,13 @@
 
 Use
 [`ggplot2::geom_point()`](https://ggplot2.tidyverse.org/reference/geom_point.html)
-to plot the information stored in the data slot of the `FIMSFrame`
+to plot summary information stored in the data slot of the `FIMSFrame`
 class.
 
 ## Usage
 
 ``` r
+# S4 method for class 'FIMSFrame,missing'
 plot(x, y, ...)
 ```
 

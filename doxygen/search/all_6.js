@@ -1,7 +1,7 @@
 var searchData=
 [
   ['f_5fmultiplier_0',['f_multiplier',['../structfims__popdy_1_1Population.html#ab28151c31aea3b0cf9fac5e95b0c0220',1,'fims_popdy::Population']]],
-  ['fabs_1',['fabs',['../classCatchAtAgeInterface.html#a9c4b575301f99466df4b54a0c070cf9e',1,'CatchAtAgeInterface']]],
+  ['fabs_1',['fabs',['../classFisheryModelInterfaceBase.html#ab9e041df1e1cb721164cca2ac5d2d5db',1,'FisheryModelInterfaceBase']]],
   ['file_2',['file',['../structfims_1_1LogEntry.html#a443d1be9aed07b8284c32dfbb2a389e0',1,'fims::LogEntry']]],
   ['fill_3',['fill',['../classRealVector.html#a90c21e5db9c0004200652892364cc523',1,'RealVector::fill()'],['../classParameterVector.html#a9296d749eab1b882116aca96e07154d5',1,'ParameterVector::fill()']]],
   ['fims_4',['FIMS',['../index.html',1,'']]],

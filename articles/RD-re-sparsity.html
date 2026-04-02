@@ -28,7 +28,7 @@
     <nav class="navbar navbar-expand-lg fixed-top bg-light" data-bs-theme="light" aria-label="Site navigation"><div class="container">
     <img class="navlogo" src="https://noaa-fims.github.io/images/FIMS_logo3.png" alt="FIMS logo with a fish" width="60" align="left"><a class="navbar-brand me-2" href="../index.html">FIMS</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -49,11 +49,13 @@
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><h6 class="dropdown-header" data-toc-skip>Intro to FIMS</h6></li>
     <li><a class="dropdown-item" href="../articles/fims-demo.html">Introducing the Fisheries Integrated Modeling System (FIMS)</a></li>
+    <li><a class="dropdown-item" href="../articles/fims-input-data.html">Introducing FIMS Input Data</a></li>
     <li><a class="dropdown-item" href="../articles/fims-logging.html">Introducing the FIMS Logging System</a></li>
     <li><a class="dropdown-item" href="../articles/fims-user-setup-guide.html">FIMS User Setup Guide</a></li>
     <li><a class="dropdown-item" href="../articles/fims-demo-projections.html">Simple projections using FIMS</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>Developer</h6></li>
+    <li><a class="dropdown-item" href="../articles/adding-new-module.html">Adding a New C++ Module</a></li>
     <li><a class="dropdown-item" href="../articles/fims-path-maturity.html">FIMS Path - Maturity</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>C++ Training</h6></li>
@@ -74,9 +76,9 @@
   </ul>
 </li>
 <li class="nav-item dropdown">
-  <button class="nav-link dropdown-toggle" type="button" id="dropdown-reports" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Reports</button>
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-reports" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">reports</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-reports">
-<li><a class="external-link dropdown-item" href="https://noaa-fims.github.io/FIMS/coverage/coverage.html">coverage</a></li>
+<li><a class="external-link dropdown-item" href="https://app.codecov.io/gh/NOAA-FIMS/FIMS" target="_blank">coverage (codecov)</a></li>
     <li><a class="external-link dropdown-item" href="https://noaa-fims.github.io/FIMS/coverage/codecoverage_explanation.html">coverage explained</a></li>
     <li><a class="external-link dropdown-item" href="https://noaa-fims.github.io/FIMS/testdown/index.html">testdown</a></li>
   </ul>
@@ -179,7 +181,7 @@ using two parameterizations:</p>
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>λ</mi><mi>t</mi></msub><mo>∼</mo><mi>N</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>ϕ</mi><mo>*</mo><msub><mi>λ</mi><mrow><mi>t</mi><mo>−</mo><mn>1</mn></mrow></msub><mo>,</mo><msubsup><mi>σ</mi><mi>λ</mi><mn>2</mn></msubsup><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\lambda_{t} \sim N(\phi * \lambda_{t-1}, \sigma^{2}_{\lambda})</annotation></semantics></math>
 </li>
 <li>deviations approach:
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>λ</mi><mi>t</mi></msub><mo>=</mo><mi>ϕ</mi><mo>*</mo><msub><mi>λ</mi><mrow><mi>t</mi><mo>−</mo><mn>1</mn></mrow></msub><mo>+</mo><mi>σ</mi><mo>*</mo><msub><mi>z</mi><mi>t</mi></msub><mo>,</mo><msub><mi>z</mi><mi>t</mi></msub><mo>∼</mo><mi>N</mi><mrow><mo stretchy="true" form="prefix">(</mo><mn>0</mn><mo>,</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\lambda_{t} = \phi * \lambda_{t-1} + \sigma * z_{t}, z_{t} \sim N(0,1)</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>λ</mi><mi>t</mi></msub><mo>=</mo><mi>ϕ</mi><mo>*</mo><msub><mi>λ</mi><mrow><mi>t</mi><mo>−</mo><mn>1</mn></mrow></msub><mo>+</mo><mi>σ</mi><mo>*</mo><msub><mi>z</mi><mi>t</mi></msub><mo>,</mo><mspace width="0.222em"></mspace><mspace width="0.222em"></mspace><msub><mi>z</mi><mi>t</mi></msub><mo>∼</mo><mi>N</mi><mrow><mo stretchy="true" form="prefix">(</mo><mn>0</mn><mo>,</mo><mn>1</mn><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\lambda_{t} = \phi * \lambda_{t-1} + \sigma * z_{t},~~ z_{t} \sim N(0,1)</annotation></semantics></math>
 </li>
 </ol>
 <ul>
@@ -193,8 +195,8 @@ remains in the range (-1,1).</p></li>
 <li><p><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>σ</mi><annotation encoding="application/x-tex">\sigma</annotation></semantics></math>
 is the process standard deviation.</p></li>
 <li><p>The stationary variance of the process is:
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">Var</mtext><mrow><mo stretchy="true" form="prefix">(</mo><mi>γ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mfrac><msup><mi>σ</mi><mn>2</mn></msup><mrow><mo stretchy="true" form="prefix">(</mo><mn>1</mn><mo>−</mo><msup><mi>ϕ</mi><mn>2</mn></msup><mo stretchy="true" form="postfix">)</mo></mrow></mfrac></mrow><annotation encoding="application/x-tex">
-\text{Var}(\gamma)=\frac{\sigma^2}{(1-\phi^2)}
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">Var</mtext><mrow><mo stretchy="true" form="prefix">(</mo><mi>λ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mfrac><msup><mi>σ</mi><mn>2</mn></msup><mrow><mo stretchy="true" form="prefix">(</mo><mn>1</mn><mo>−</mo><msup><mi>ϕ</mi><mn>2</mn></msup><mo stretchy="true" form="postfix">)</mo></mrow></mfrac></mrow><annotation encoding="application/x-tex">
+\text{Var}(\lambda)=\frac{\sigma^2}{(1-\phi^2)}
 </annotation></semantics></math></p></li>
 </ul>
 <p>Under a random-effects model, the process approach puts the random
@@ -213,7 +215,7 @@ and observations,
 are <em>iid</em> Normal:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># deviations approach</span></span>
-<span><span class="va">nll</span> <span class="op">&lt;-</span> <span class="va">nll</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">dnorm</a></span><span class="op">(</span><span class="va">z</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, <span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="va">sd</span> <span class="op">*</span> <span class="va">sd</span> <span class="op">/</span> <span class="op">(</span><span class="fl">1</span> <span class="op">-</span> <span class="va">phi</span> <span class="op">*</span> <span class="va">phi</span><span class="op">)</span><span class="op">)</span>, log <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="va">nll</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">dnorm</a></span><span class="op">(</span><span class="va">z</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, <span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="va">sd</span> <span class="op">*</span> <span class="va">sd</span> <span class="op">/</span> <span class="op">(</span><span class="fl">1</span> <span class="op">-</span> <span class="va">phi</span> <span class="op">*</span> <span class="va">phi</span><span class="op">)</span><span class="op">)</span>, log <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="va">nll</span> <span class="op">&lt;-</span> <span class="va">nll</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">dnorm</a></span><span class="op">(</span><span class="va">z</span><span class="op">[</span><span class="op">-</span><span class="fl">1</span><span class="op">]</span>, <span class="fl">0</span>, <span class="va">sd</span>, log <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">lamda</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">numeric</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">z</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">lamda</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fl">0</span> <span class="op">+</span> <span class="va">z</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span></span>
@@ -243,12 +245,15 @@ the Hessian, which is
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mrow><mo stretchy="true" form="prefix">(</mo><msup><mi>N</mi><mn>3</mn></msup><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">O(N^3)</annotation></semantics></math>
 for N-dimensional parameter space. As the number of random effects
 increases, the computational cost of inverting the dense Hessian from
-the deviations approach increases rapidly, while the cost of inverting
-the sparse Hessian from the process approach increases much more
-slowly.</p>
-<p><img src="figures/ar1hess_deviations.jpg"><img src="figures/ar1hess_process.jpg"><strong>Figure 1.</strong> Hessian
-matrix for a first-order autoregressive (AR1) process using deviations
-approach (top) and process approach (bottom).</p>
+the deviations approach increases rapidly. Sparsity reduces this
+computational cost to
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>N</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">O(N)</annotation></semantics></math>
+for an AR1 model, resulting in a slower increase in computational cost
+with increasing
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>N</mi><annotation encoding="application/x-tex">N</annotation></semantics></math>.</p>
+<p><img src="figures/ar1hess_deviations.jpg" class="r-plt" alt="Six hundred by six hundred hessian matrices, showing a dense Hessian matrix for an AR1 model under the deviations parameterization and a sparse Hessian matrix for an AR1 model under the process parameterization." width="49%"><img src="figures/ar1hess_process.jpg" class="r-plt" alt="Six hundred by six hundred hessian matrices, showing a dense Hessian matrix for an AR1 model under the deviations parameterization and a sparse Hessian matrix for an AR1 model under the process parameterization." width="49%"><strong>Figure 1.</strong> Hessian matrix for a first-order
+autoregressive (AR1) process using deviations approach (left) and
+process approach (right).</p>
 </div>
 <div class="section level3">
 <h3 id="catch-at-age-model">Catch-at-age model<a class="anchor" aria-label="anchor" href="#catch-at-age-model"></a>
@@ -257,49 +262,13 @@ approach (top) and process approach (bottom).</p>
 catch-at-age stock assessment model by extending an RTMB version of SAM,
 originally written by Anders Nielsen. The SAM model structures
 recruitment, numbers at age, and fishing mortality as AR1 processes.</p>
-<p>The case study is built off of an existing SAM model and the data
-list (<code>dat</code>) can be updated for RTMB as follows</p>
+<p>The case study is built off of an existing SAM model data set,
+<code>fit</code>.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/kaskr/RTMB" class="external-link">RTMB</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">stockassessment</span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/jabiru/tictoc" class="external-link">tictoc</a></span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/load.html" class="external-link">load</a></span><span class="op">(</span><span class="st">"../fit.RData"</span><span class="op">)</span></span>
-<span><span class="va">dat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="va">dat</span><span class="op">$</span><span class="va">logobs</span> <span class="op">&lt;-</span> <span class="va">fit</span><span class="op">$</span><span class="va">data</span><span class="op">$</span><span class="va">logobs</span></span>
-<span><span class="va">dat</span><span class="op">$</span><span class="va">aux</span> <span class="op">&lt;-</span> <span class="va">fit</span><span class="op">$</span><span class="va">data</span><span class="op">$</span><span class="va">aux</span></span>
-<span><span class="va">dat</span><span class="op">$</span><span class="va">idx1</span> <span class="op">&lt;-</span> <span class="va">fit</span><span class="op">$</span><span class="va">data</span><span class="op">$</span><span class="va">idx1</span></span>
-<span><span class="va">dat</span><span class="op">$</span><span class="va">idx2</span> <span class="op">&lt;-</span> <span class="va">fit</span><span class="op">$</span><span class="va">data</span><span class="op">$</span><span class="va">idx2</span></span>
-<span><span class="va">dat</span><span class="op">$</span><span class="va">minYear</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="va">fit</span><span class="op">$</span><span class="va">data</span><span class="op">$</span><span class="va">years</span><span class="op">)</span></span>
-<span><span class="va">dat</span><span class="op">$</span><span class="va">minAge</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="va">fit</span><span class="op">$</span><span class="va">data</span><span class="op">$</span><span class="va">minAgePerFleet</span><span class="op">)</span></span>
-<span><span class="va">dat</span><span class="op">$</span><span class="va">fleetTypes</span> <span class="op">&lt;-</span> <span class="va">fit</span><span class="op">$</span><span class="va">data</span><span class="op">$</span><span class="va">fleetTypes</span></span>
-<span><span class="va">dat</span><span class="op">$</span><span class="va">sampleTimes</span> <span class="op">&lt;-</span> <span class="va">fit</span><span class="op">$</span><span class="va">data</span><span class="op">$</span><span class="va">sampleTimes</span></span>
-<span><span class="va">dat</span><span class="op">$</span><span class="va">year</span> <span class="op">&lt;-</span> <span class="va">fit</span><span class="op">$</span><span class="va">data</span><span class="op">$</span><span class="va">years</span></span>
-<span><span class="va">dat</span><span class="op">$</span><span class="va">age</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="va">fit</span><span class="op">$</span><span class="va">data</span><span class="op">$</span><span class="va">minAgePerFleet</span><span class="op">)</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">fit</span><span class="op">$</span><span class="va">data</span><span class="op">$</span><span class="va">maxAgePerFleet</span><span class="op">)</span></span>
-<span><span class="va">dat</span><span class="op">$</span><span class="va">M</span> <span class="op">&lt;-</span> <span class="va">fit</span><span class="op">$</span><span class="va">data</span><span class="op">$</span><span class="va">natMor</span></span>
-<span><span class="va">dat</span><span class="op">$</span><span class="va">SW</span> <span class="op">&lt;-</span> <span class="va">fit</span><span class="op">$</span><span class="va">data</span><span class="op">$</span><span class="va">stockMeanWeight</span></span>
-<span><span class="va">dat</span><span class="op">$</span><span class="va">MO</span> <span class="op">&lt;-</span> <span class="va">fit</span><span class="op">$</span><span class="va">data</span><span class="op">$</span><span class="va">propMat</span></span>
-<span><span class="va">dat</span><span class="op">$</span><span class="va">PF</span> <span class="op">&lt;-</span> <span class="va">fit</span><span class="op">$</span><span class="va">data</span><span class="op">$</span><span class="va">propF</span></span>
-<span><span class="va">dat</span><span class="op">$</span><span class="va">PM</span> <span class="op">&lt;-</span> <span class="va">fit</span><span class="op">$</span><span class="va">data</span><span class="op">$</span><span class="va">propM</span></span>
-<span></span>
-<span><span class="va">dat</span><span class="op">$</span><span class="va">srmode</span> <span class="op">&lt;-</span> <span class="fl">0</span></span>
-<span><span class="va">dat</span><span class="op">$</span><span class="va">fcormode</span> <span class="op">&lt;-</span> <span class="fl">2</span></span>
-<span><span class="va">dat</span><span class="op">$</span><span class="va">keyF</span> <span class="op">&lt;-</span> <span class="va">fit</span><span class="op">$</span><span class="va">conf</span><span class="op">$</span><span class="va">keyLogFsta</span><span class="op">[</span><span class="fl">1</span>, <span class="op">]</span></span>
-<span><span class="va">dat</span><span class="op">$</span><span class="va">keyQ</span> <span class="op">&lt;-</span> <span class="va">fit</span><span class="op">$</span><span class="va">conf</span><span class="op">$</span><span class="va">keyLogFpar</span></span>
-<span><span class="va">dat</span><span class="op">$</span><span class="va">keySd</span> <span class="op">&lt;-</span> <span class="va">fit</span><span class="op">$</span><span class="va">conf</span><span class="op">$</span><span class="va">keyVarObs</span></span>
-<span><span class="va">dat</span><span class="op">$</span><span class="va">keySd</span><span class="op">[</span><span class="va">dat</span><span class="op">$</span><span class="va">keySd</span> <span class="op">&lt;</span> <span class="op">(</span><span class="op">-</span><span class="fl">.1</span><span class="op">)</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="cn">NA</span></span>
-<span><span class="va">dat</span><span class="op">$</span><span class="va">covType</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span></span>
-<span><span class="va">dat</span><span class="op">$</span><span class="va">keyIGAR</span> <span class="op">&lt;-</span> <span class="va">fit</span><span class="op">$</span><span class="va">conf</span><span class="op">$</span><span class="va">keyCorObs</span></span>
-<span><span class="va">dat</span><span class="op">$</span><span class="va">keyIGAR</span><span class="op">[</span><span class="va">fit</span><span class="op">$</span><span class="va">conf</span><span class="op">$</span><span class="va">keyCorObs</span> <span class="op">==</span> <span class="op">-</span><span class="fl">1</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="cn">NA</span></span>
-<span><span class="va">dat</span><span class="op">$</span><span class="va">keyIGAR</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">fit</span><span class="op">$</span><span class="va">conf</span><span class="op">$</span><span class="va">keyCorObs</span><span class="op">)</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="op">-</span><span class="fl">1</span></span>
-<span><span class="va">dat</span><span class="op">$</span><span class="va">keyIGAR</span><span class="op">[</span><span class="fl">2</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">4</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fl">0</span></span>
-<span><span class="va">dat</span><span class="op">$</span><span class="va">noParUS</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span></span>
-<span>  <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">dat</span><span class="op">$</span><span class="va">fleetTypes</span><span class="op">)</span>,</span>
-<span>  <span class="kw">function</span><span class="op">(</span><span class="va">f</span><span class="op">)</span> <span class="op">{</span></span>
-<span>    <span class="va">A</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">dat</span><span class="op">$</span><span class="va">keySd</span><span class="op">[</span><span class="va">f</span>, <span class="op">]</span><span class="op">)</span><span class="op">)</span></span>
-<span>    <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">dat</span><span class="op">$</span><span class="va">covType</span><span class="op">[</span><span class="va">f</span><span class="op">]</span> <span class="op">==</span> <span class="fl">2</span>, <span class="op">(</span><span class="va">A</span> <span class="op">*</span> <span class="va">A</span> <span class="op">-</span> <span class="va">A</span><span class="op">)</span> <span class="op">/</span> <span class="fl">2</span>, <span class="fl">0</span><span class="op">)</span></span>
-<span>  <span class="op">}</span></span>
-<span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">fit</span><span class="op">$</span><span class="va">data</span><span class="op">)</span></span></code></pre></div>
 <div class="section level4">
 <h4 id="parameters">Parameters<a class="anchor" aria-label="anchor" href="#parameters"></a>
 </h4>
@@ -312,56 +281,30 @@ for year
 and for age 1 with mean recruitment
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mover><mi>r</mi><mo accent="true">̂</mo></mover><annotation encoding="application/x-tex">\hat{r}</annotation></semantics></math>,
 written as the following:</p>
-<ol style="list-style-type: decimal">
-<li>deviations approach:
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>l</mi><mi>o</mi><mi>g</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>N</mi><mrow><mi>y</mi><mo>,</mo><mn>1</mn></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mover><mi>r</mi><mo accent="true">̂</mo></mover><mo>+</mo><msub><mi>z</mi><mi>y</mi></msub><mo>,</mo><mspace width="1.0em"></mspace><mi>w</mi><mi>h</mi><mi>e</mi><mi>r</mi><mi>e</mi><mspace width="1.0em"></mspace><msub><mi>z</mi><mi>y</mi></msub><mo>∼</mo><mi>N</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>z</mi><mrow><mi>y</mi><mo>−</mo><mn>1</mn></mrow></msub><mo>,</mo><msubsup><mi>σ</mi><mi>r</mi><mn>2</mn></msubsup><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">log(N_{y,1}) = \hat{r} + z_{y}, \quad where \quad z_{y} \sim N(z_{y-1},\sigma^{2}_{r})</annotation></semantics></math>
-</li>
-<li>process approach:
-log(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover><mrow><mi>N</mi><mrow><mi>y</mi><mo>,</mo><mn>1</mn></mrow></mrow><mo accent="true">̂</mo></mover><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mi>l</mi><mi>o</mi><mi>g</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>N</mi><mrow><mi>y</mi><mo>−</mo><mn>1</mn><mo>,</mo><mn>1</mn></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo><mspace width="1.0em"></mspace><mi>w</mi><mi>h</mi><mi>e</mi><mi>r</mi><mi>e</mi><mspace width="1.0em"></mspace><mi>l</mi><mi>o</mi><mi>g</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>N</mi><mrow><mi>y</mi><mo>,</mo><mn>1</mn></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>∼</mo><mi>N</mi><mrow><mo stretchy="true" form="prefix">(</mo><mover><mi>r</mi><mo accent="true">̂</mo></mover><mo>+</mo><mi>ϕ</mi><mo>*</mo><mrow><mo stretchy="true" form="prefix">(</mo><mi>l</mi><mi>o</mi><mi>g</mi><mrow><mo stretchy="true" form="prefix">(</mo><mover><msub><mi>N</mi><mrow><mi>y</mi><mo>−</mo><mn>1</mn><mo>,</mo><mn>1</mn></mrow></msub><mo accent="true">̂</mo></mover><mo stretchy="true" form="postfix">)</mo></mrow><mo>−</mo><mover><mi>r</mi><mo accent="true">̂</mo></mover><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\widehat{N{y,1}}) = log(N_{y-1, 1}), \quad where \quad log(N_{y, 1}) \sim N(\hat{r} + \phi*(log(\widehat{N_{y-1,1}}) - \hat{r}))</annotation></semantics></math>
-</li>
-</ol>
-<p>The parameters estimated in the RTMB code appear below; the
-parameters that matter most between implementations of the deviations
-and process approaches of recruitment deviations are the last two
-(<code>z</code> and <code>mean_recruitment</code>).</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Parameter section</span></span>
-<span><span class="va">par</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="va">par</span><span class="op">$</span><span class="va">logsdR</span> <span class="op">&lt;-</span> <span class="fl">0</span></span>
-<span><span class="va">par</span><span class="op">$</span><span class="va">logsdS</span> <span class="op">&lt;-</span> <span class="fl">0</span></span>
-<span><span class="va">par</span><span class="op">$</span><span class="va">logsdF</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">numeric</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">dat</span><span class="op">$</span><span class="va">keyF</span><span class="op">)</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span></span>
-<span><span class="va">par</span><span class="op">$</span><span class="va">rickerpar</span> <span class="op">&lt;-</span> <span class="kw">if</span> <span class="op">(</span><span class="va">dat</span><span class="op">$</span><span class="va">srmode</span> <span class="op">==</span> <span class="fl">1</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span></span>
-<span><span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">numeric</a></span><span class="op">(</span><span class="fl">0</span><span class="op">)</span></span>
-<span><span class="op">}</span></span>
-<span><span class="va">par</span><span class="op">$</span><span class="va">transRhoF</span> <span class="op">&lt;-</span> <span class="kw">if</span> <span class="op">(</span><span class="va">dat</span><span class="op">$</span><span class="va">fcormode</span> <span class="op">==</span> <span class="fl">0</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">numeric</a></span><span class="op">(</span><span class="fl">0</span><span class="op">)</span></span>
-<span><span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span>
-<span>  <span class="fl">0.1</span></span>
-<span><span class="op">}</span></span>
-<span><span class="va">par</span><span class="op">$</span><span class="va">bhpar</span> <span class="op">&lt;-</span> <span class="kw">if</span> <span class="op">(</span><span class="va">dat</span><span class="op">$</span><span class="va">srmode</span> <span class="op">==</span> <span class="fl">2</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span></span>
-<span><span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">numeric</a></span><span class="op">(</span><span class="fl">0</span><span class="op">)</span></span>
-<span><span class="op">}</span></span>
-<span><span class="va">par</span><span class="op">$</span><span class="va">logQ</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">numeric</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">dat</span><span class="op">$</span><span class="va">keyQ</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span></span>
-<span><span class="va">par</span><span class="op">$</span><span class="va">logsd</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">numeric</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">dat</span><span class="op">$</span><span class="va">keySd</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span></span>
-<span><span class="va">par</span><span class="op">$</span><span class="va">logIGARdist</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">numeric</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">dat</span><span class="op">$</span><span class="va">keyIGAR</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span></span>
-<span><span class="va">par</span><span class="op">$</span><span class="va">parUS</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">numeric</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">dat</span><span class="op">$</span><span class="va">noParUS</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">par</span><span class="op">$</span><span class="va">logN</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fl">0</span>, nrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">dat</span><span class="op">$</span><span class="va">year</span><span class="op">)</span>, ncol <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">dat</span><span class="op">$</span><span class="va">age</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">par</span><span class="op">$</span><span class="va">logF</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fl">0</span>, nrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">dat</span><span class="op">$</span><span class="va">year</span><span class="op">)</span>, ncol <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">dat</span><span class="op">$</span><span class="va">keyF</span><span class="op">)</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span></span>
-<span><span class="va">par</span><span class="op">$</span><span class="va">missing</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">numeric</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">dat</span><span class="op">$</span><span class="va">logobs</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">par</span><span class="op">$</span><span class="va">tPhi</span> <span class="op">&lt;-</span> <span class="fl">1</span> <span class="co"># AR phi for recruitment</span></span>
-<span><span class="va">par</span><span class="op">$</span><span class="va">z</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">dat</span><span class="op">$</span><span class="va">year</span><span class="op">)</span><span class="op">)</span> <span class="co"># Standard normal innovations</span></span>
-<span><span class="va">par</span><span class="op">$</span><span class="va">mean_recruitment</span> <span class="op">&lt;-</span> <span class="fl">0</span> <span class="co"># mapped off if not estimated</span></span></code></pre></div>
+<p><strong>deviations approach</strong>:</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right" style="text-align: right"><msub><mi>z</mi><mn>1</mn></msub></mtd><mtd columnalign="left" style="text-align: left"><mo>∼</mo><mi>N</mi><mi>o</mi><mi>r</mi><mi>m</mi><mi>a</mi><mi>l</mi><mo minsize="1.2" maxsize="1.2" stretchy="false" form="prefix">(</mo><mn>0</mn><mo>,</mo><msqrt><mrow><msubsup><mi>σ</mi><mi>r</mi><mn>2</mn></msubsup><mi>/</mi><mrow><mo stretchy="true" form="prefix">(</mo><mn>1</mn><mo>−</mo><msup><mi>ϕ</mi><mn>2</mn></msup><mo stretchy="true" form="postfix">)</mo></mrow></mrow></msqrt><mo minsize="1.2" maxsize="1.2" stretchy="false" form="postfix">)</mo></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"><msub><mi>z</mi><mrow><mn>2</mn><mo>:</mo><mi>n</mi></mrow></msub></mtd><mtd columnalign="left" style="text-align: left"><mo>∼</mo><mi>N</mi><mi>o</mi><mi>r</mi><mi>m</mi><mi>a</mi><mi>l</mi><mrow><mo stretchy="true" form="prefix">(</mo><mn>0</mn><mo>,</mo><msub><mi>σ</mi><mi>r</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"><mi>d</mi><mi>e</mi><msub><mi>v</mi><mn>1</mn></msub></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><msub><mi>z</mi><mn>1</mn></msub></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"><mi>d</mi><mi>e</mi><msub><mi>v</mi><mi>y</mi></msub></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><mi>ϕ</mi><mi>d</mi><mi>e</mi><msub><mi>v</mi><mrow><mi>y</mi><mo>−</mo><mn>1</mn></mrow></msub><mo>+</mo><msub><mi>z</mi><mi>y</mi></msub></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"><mo>log</mo><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>N</mi><mrow><mi>y</mi><mo>,</mo><mn>1</mn></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><mover><mi>r</mi><mo accent="true">‾</mo></mover><mo>+</mo><mi>d</mi><mi>e</mi><msub><mi>v</mi><mi>y</mi></msub></mtd></mtr></mtable><annotation encoding="application/x-tex">
+\begin{aligned}
+z_{1} &amp;\sim Normal\big(0, \sqrt{\sigma_{r}^{2}/(1 - \phi^2)}\big)\\
+z_{2:n} &amp;\sim Normal(0, \sigma_{r})\\
+dev_{1} &amp;= z_{1}\\
+dev_{y} &amp;= \phi dev_{y-1} + z_{y}\\
+\log(N_{y,1}) &amp;= \bar{r} + dev_{y}
+\end{aligned}
+</annotation></semantics></math></p>
+<p><strong>process approach</strong>:</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtable><mtr><mtd columnalign="right" style="text-align: right"><mo>log</mo><mrow><mo stretchy="true" form="prefix">(</mo><mover><msub><mi>N</mi><mrow><mi>y</mi><mo>,</mo><mn>1</mn></mrow></msub><mo accent="true">̂</mo></mover><mo stretchy="true" form="postfix">)</mo></mrow></mtd><mtd columnalign="left" style="text-align: left"><mo>=</mo><mo>log</mo><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>N</mi><mrow><mi>y</mi><mo>−</mo><mn>1</mn><mo>,</mo><mn>1</mn></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow></mtd></mtr><mtr><mtd columnalign="right" style="text-align: right"><mo>log</mo><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>N</mi><mrow><mi>y</mi><mo>,</mo><mn>1</mn></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow></mtd><mtd columnalign="left" style="text-align: left"><mo>∼</mo><mi>N</mi><mi>o</mi><mi>r</mi><mi>m</mi><mi>a</mi><mi>l</mi><mo minsize="1.2" maxsize="1.2" stretchy="false" form="prefix">(</mo><mover><mi>r</mi><mo accent="true">‾</mo></mover><mo>+</mo><mi>ϕ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mo>log</mo><mrow><mo stretchy="true" form="prefix">(</mo><mover><msub><mi>N</mi><mrow><mi>y</mi><mo>,</mo><mn>1</mn></mrow></msub><mo accent="true">̂</mo></mover><mo stretchy="true" form="postfix">)</mo></mrow><mo>−</mo><mover><mi>r</mi><mo accent="true">‾</mo></mover><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo><msubsup><mi>σ</mi><mi>r</mi><mn>2</mn></msubsup><mo minsize="1.2" maxsize="1.2" stretchy="false" form="postfix">)</mo></mtd></mtr></mtable><annotation encoding="application/x-tex">
+\begin{aligned}
+\log(\widehat{N_{y,1}}) &amp;= \log(N_{y-1,1})\\
+\log(N_{y,1}) &amp;\sim Normal\big(\bar{r} + \phi(\log(\widehat{N_{y,1}}) - \bar{r}), \sigma^{2}_{r}\big)
+\end{aligned}
+</annotation></semantics></math></p>
 </div>
 <div class="section level4">
 <h4 id="code">Code<a class="anchor" aria-label="anchor" href="#code"></a>
 </h4>
 <p>The joint negative log likelihood for recruitment under each approach
 was computed using the state space form as:</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># deviations approach</span></span>
 <span><span class="co"># AR1 for standard normal innovations at initial condition</span></span>
 <span><span class="va">jnll</span> <span class="op">&lt;-</span> <span class="va">jnll</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">dnorm</a></span><span class="op">(</span><span class="va">z</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, <span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="va">sdR</span> <span class="op">*</span> <span class="va">sdR</span> <span class="op">/</span> <span class="op">(</span><span class="fl">1</span> <span class="op">-</span> <span class="va">phi</span> <span class="op">*</span> <span class="va">phi</span><span class="op">)</span><span class="op">)</span>, log <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
@@ -410,22 +353,30 @@ parameter, and (4) estimated mean and variances of recruitment
 deviations. For all comparisons, we found parameters to be perfectly
 correlated between the deviations and process approaches.</p>
 <p>The process approach resulted in a sparse Hessian while the
-deviations approach resulted in a Hessian that was dense in recruitment
-(Fig. 2). Results from the speed test indicated the process approach was
-approximately 2x times faster than the deviations approach both with and
-without an estimated intercept (Table 1). While speed up for a single
-AR1 process is minimal, more complex stock assessments currently include
-AR1 random effects in multiple processes (e.g., numbers at age,
-maturity, mortality, etc.). The computational cost of fitting the
-deviations approach scales significantly, warranting the need to adopt
-the more computationally efficient process parameterization when
-estimating AR1 processes as random effects.</p>
+deviations approach resulted in a dense one (Fig. 2). Results from the
+speed test indicated the process approach was approximately 2x times
+faster than the deviations approach both with and without an estimated
+intercept (Table 1). While speed up for a single AR1 process is minimal,
+more complex stock assessments currently include AR1 random effects in
+multiple processes (e.g., numbers at age, maturity, mortality, etc.).
+The computational cost of fitting the deviations approach scales
+significantly, warranting the need to adopt the more computationally
+efficient process parameterization when estimating AR1 processes as
+random effects.</p>
 <p><strong>Table 1.</strong> Results from speed test (in seconds) from
 running models 25 times. The standard deviation (SD), minimum (Min), and
 maximum (Max) of the run times are also shown. Note that absolute
 results are machine dependent but relative results will be consistent
 across operating systems and machine specifications.</p>
 <table class="table">
+<colgroup>
+<col width="15%">
+<col width="21%">
+<col width="33%">
+<col width="10%">
+<col width="10%">
+<col width="8%">
+</colgroup>
 <thead><tr class="header">
 <th>Intercept</th>
 <th>Model</th>
@@ -453,7 +404,7 @@ across operating systems and machine specifications.</p>
 </tr>
 <tr class="odd">
 <td>Y</td>
-<td>deviations</td>
+<td>deviations  </td>
 <td>2.976</td>
 <td>1.695</td>
 <td>2.070</td>
@@ -461,7 +412,7 @@ across operating systems and machine specifications.</p>
 </tr>
 <tr class="even">
 <td>N</td>
-<td>deviations</td>
+<td>deviations  </td>
 <td>3.372</td>
 <td>1.324</td>
 <td>2.614</td>
@@ -469,11 +420,11 @@ across operating systems and machine specifications.</p>
 </tr>
 </tbody>
 </table>
-<p><img src="figures/devs_intercept.png"><img src="figures/process_intercept.png"></p>
+<p><img src="figures/basicfsa_ar1_dense.png" class="r-plt" alt="The two panels show the hessian matrices for random effects in the recruitment of a catch-at-age model under the deviations parameterization on the left and the process parameterization on the right. The figure on the left is dense and the one on the right is sparse, showing only the diagonal." width="49%"><img src="figures/basicfsa_ar1_sparse.png" class="r-plt" alt="The two panels show the hessian matrices for random effects in the recruitment of a catch-at-age model under the deviations parameterization on the left and the process parameterization on the right. The figure on the left is dense and the one on the right is sparse, showing only the diagonal." width="49%"></p>
 <p><strong>Figure 2.</strong> Hessian matrix for random effects model
 with a first-order autoregressive (AR1) process on recruitment in a
-catch-at-age model using deviations approach (top) and process approach
-(bottom).</p>
+catch-at-age model using deviations approach (left) and process approach
+(right).</p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
@@ -482,7 +433,7 @@ catch-at-age model using deviations approach (top) and process approach
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Kelli F. Johnson, Grant D. Adams, Jon K. T. Brodziak, Kathryn L. Doering, Daniel R. Goethel, Andrea M. Havron, Ronald Klasky, Peter T. Kuriyama, Emily M. Liljestrand, Christopher M. Legault, Bai Li, Timothy J. Miller, Cole C. Monnahan, Elizabeth F. Perl, Megumi C. Oshima, Kyle W. Shertzer, Christine C. Stawitz, Jane Y. Sullivan, Matthew Supernaw, Ian G. Taylor, Nathan R. Vaughan, Erik H. Williams.</p>
+  <p>Developed by Kelli F. Johnson, Grant D. Adams, Jon K. T. Brodziak, Kathryn L. Doering, Daniel R. Goethel, Andrea M. Havron, Ronald Klasky, Peter T. Kuriyama, Emily M. Liljestrand, Christopher M. Legault, Bai Li, Timothy J. Miller, Cole C. Monnahan, Elizabeth F. Perl, Megumi C. Oshima, Kyle W. Shertzer, Christine C. Stawitz, Jane Y. Sullivan, Matthew Supernaw, Ian G. Taylor, Nathan R. Vaughan, Erik H. Williams, Adrianne T. Wilson.</p>
 </div>
 
 <div class="pkgdown-footer-right">

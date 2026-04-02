@@ -6,13 +6,8 @@ Example dataset used in FIMS demonstrations and examples.
 
 - [`data_big`](https://NOAA-FIMS.github.io/FIMS/reference/data_big.md) :
   FIMS input data frame
-
 - [`fims_input_types`](https://NOAA-FIMS.github.io/FIMS/reference/fims_input_types.md)
   : Vector of acceptable FIMS input types
-
-- [`plot()`](https://NOAA-FIMS.github.io/FIMS/reference/plot.md) :
-
-  Plot a `FIMSFrame` object
 
 ## Run FIMS
 
@@ -22,6 +17,11 @@ Primary functions used when setting up or running a FIMS model.
   :
 
   Class constructors for `FIMSFrame` and associated child classes
+
+- [`plot(`*`<FIMSFrame>`*`,`*`<missing>`*`)`](https://NOAA-FIMS.github.io/FIMS/reference/plot.md)
+  :
+
+  Plot a `FIMSFrame` object
 
 - [`get_data()`](https://NOAA-FIMS.github.io/FIMS/reference/get_FIMSFrame.md)
   [`get_fleets()`](https://NOAA-FIMS.github.io/FIMS/reference/get_FIMSFrame.md)

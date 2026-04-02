@@ -9,8 +9,8 @@
     <link rel="icon" type="image/png" href="https://noaa-fims.github.io/images/FIMS_hexlogo.png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
-    <link href="https://noaa-fims.github.io/site_libs/bootstrap/bootstrap-5477dd34fdf9f443df58de9070e2fbd7.min.css" rel="stylesheet">
-    <link href="https://noaa-fims.github.io/site_libs/bootstrap/bootstrap-dark-429bd3fc0b6810d1347fc340b0896c35.min.css" rel="stylesheet" media="(prefers-color-scheme: dark)">
+    <link href="https://noaa-fims.github.io/site_libs/bootstrap/bootstrap-5bca210c7b8f52bd43562cb73b8f998e.min.css" rel="stylesheet">
+    <link href="https://noaa-fims.github.io/site_libs/bootstrap/bootstrap-dark-dabf027eac5ab6a58e890faf792e317e.min.css" rel="stylesheet" media="(prefers-color-scheme: dark)">
     <script type="text/javascript" src="jquery.js"></script>
     <script type="text/javascript" src="dynsections.js"></script>
     <link href="navtree.css" rel="stylesheet" type="text/css"/>
@@ -48,7 +48,7 @@ MathJax.Hub.Config({
                 <td id="projectlogo"><img alt="Logo" src="FIMS_logo3.png"/></td>
                 <td id="projectalign" style="padding-left: 0.5em;">
                     <div id="projectname">FIMS
-                        &#160;<span id="projectnumber">v0.8.1</span></div>
+                        &#160;<span id="projectnumber">v0.9.2</span></div>
                     <div id="projectbrief"></div></td>
                 <td style="padding-left: 0.5em;">
                     <div id="projectbrief"></div>
@@ -83,11 +83,13 @@ MathJax.Hub.Config({
             <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
               <li><h6 class="dropdown-header" data-toc-skip>intro to fims</h6></li>
               <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/articles/fims-demo.html">introducing the fisheries integrated modeling system (fims)</a></li>
-              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/articles/fims-logging.html">Introducing the fims logging system</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/articles/fims-input-data.html">introducing FIMS input data</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/articles/fims-logging.html">introducing the fims logging system</a></li>
               <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/articles/fims-user-setup-guide.html">fims user setup guide</a></li>
               <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/articles/fims-demo-projections.html">simple projections using fims</a></li>
               <li><hr class="dropdown-divider"></li>
               <li><h6 class="dropdown-header" data-toc-skip>developer</h6></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/articles/adding-new-module.html">adding a new c++ module</a></li>
               <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/articles/fims-path-maturity.html">fims path - maturity</a></li>
               <li><hr class="dropdown-divider"></li>
               <li><h6 class="dropdown-header" data-toc-skip>c++ training</h6></li>
@@ -111,7 +113,7 @@ MathJax.Hub.Config({
             <button class="nav-link dropdown-toggle" type="button" id="dropdown-reports" data-bs-toggle="dropdown"
                     aria-expanded="false" aria-haspopup="true">reports</button>
             <ul class="dropdown-menu" aria-labelledby="dropdown-reports">
-              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/coverage/coverage.html">coverage</a></li>
+              <li><a class="dropdown-item" href="https://app.codecov.io/gh/NOAA-FIMS/FIMS" target="_blank">coverage (codecov)</a></li>
               <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/coverage/codecoverage_explanation.html">coverage explained</a></li>
               <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/testdown/index.html">testdown</a></li>
             </ul>
@@ -222,6 +224,8 @@ $(document).ready(function(){initNavTree('classFisheryModelInterfaceBase.html','
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pub-attribs">Public Attributes</a> &#124;
 <a href="#pub-static-attribs">Static Public Attributes</a> &#124;
+<a href="#pro-types">Protected Types</a> &#124;
+<a href="#pro-attribs">Protected Attributes</a> &#124;
 <a href="classFisheryModelInterfaceBase-members.html">List of all members</a>  </div>
   <div class="headertitle"><div class="title">FisheryModelInterfaceBase Class Reference<span class="mlabels"><span class="mlabel">abstract</span></span></div></div>
 </div><!--header-->
@@ -261,6 +265,24 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a57c422df7fa5a40495e1fe21496c4830" id="r_a57c422df7fa5a40495e1fe21496c4830"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">virtual</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFisheryModelInterfaceBase.html#a57c422df7fa5a40495e1fe21496c4830">get_id</a> ()=0</td></tr>
 <tr class="memdesc:a57c422df7fa5a40495e1fe21496c4830"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the ID for the child fleet interface objects to inherit.  <br /></td></tr>
 <tr class="separator:a57c422df7fa5a40495e1fe21496c4830"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae94f8778da8069e63f29c1d0a05d2cfd" id="r_ae94f8778da8069e63f29c1d0a05d2cfd"><td class="memItemLeft" align="right" valign="top">Rcpp::NumericVector&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFisheryModelInterfaceBase.html#ae94f8778da8069e63f29c1d0a05d2cfd">get_fixed_parameters_vector</a> ()</td></tr>
+<tr class="memdesc:ae94f8778da8069e63f29c1d0a05d2cfd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the vector of fixed effect parameters for the model.  <br /></td></tr>
+<tr class="separator:ae94f8778da8069e63f29c1d0a05d2cfd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae4965acc6bcbeb26494532bfd0dabfd8" id="r_ae4965acc6bcbeb26494532bfd0dabfd8"><td class="memItemLeft" align="right" valign="top">Rcpp::NumericVector&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFisheryModelInterfaceBase.html#ae4965acc6bcbeb26494532bfd0dabfd8">get_random_parameters_vector</a> ()</td></tr>
+<tr class="memdesc:ae4965acc6bcbeb26494532bfd0dabfd8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the vector of random effect parameters for the model.  <br /></td></tr>
+<tr class="separator:ae4965acc6bcbeb26494532bfd0dabfd8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae01554532f799c6c579bcda39f91e8fa" id="r_ae01554532f799c6c579bcda39f91e8fa"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">double</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFisheryModelInterfaceBase.html#ae01554532f799c6c579bcda39f91e8fa">sum</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> std::valarray&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">double</a> &gt; &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">v</a>)</td></tr>
+<tr class="memdesc:ae01554532f799c6c579bcda39f91e8fa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sum method to calculate the sum of an array or vector of doubles.  <br /></td></tr>
+<tr class="separator:ae01554532f799c6c579bcda39f91e8fa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afe39cc9103addb408671a6b4969daa37" id="r_afe39cc9103addb408671a6b4969daa37"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">double</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFisheryModelInterfaceBase.html#afe39cc9103addb408671a6b4969daa37">sum</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> std::vector&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">double</a> &gt; &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">v</a>)</td></tr>
+<tr class="memdesc:afe39cc9103addb408671a6b4969daa37"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sum method for a vector of doubles.  <br /></td></tr>
+<tr class="separator:afe39cc9103addb408671a6b4969daa37"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a04bf9092ad891e8286e2e2ce55108ffa" id="r_a04bf9092ad891e8286e2e2ce55108ffa"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">double</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFisheryModelInterfaceBase.html#a04bf9092ad891e8286e2e2ce55108ffa">min</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> std::valarray&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">double</a> &gt; &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">v</a>)</td></tr>
+<tr class="memdesc:a04bf9092ad891e8286e2e2ce55108ffa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Minimum method to calculate the minimum of an array or vector of doubles.  <br /></td></tr>
+<tr class="separator:a04bf9092ad891e8286e2e2ce55108ffa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab9e041df1e1cb721164cca2ac5d2d5db" id="r_ab9e041df1e1cb721164cca2ac5d2d5db"><td class="memItemLeft" align="right" valign="top">std::valarray&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">double</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFisheryModelInterfaceBase.html#ab9e041df1e1cb721164cca2ac5d2d5db">fabs</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> std::valarray&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">double</a> &gt; &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">v</a>)</td></tr>
+<tr class="memdesc:ab9e041df1e1cb721164cca2ac5d2d5db"><td class="mdescLeft">&#160;</td><td class="mdescRight">A function to compute the absolute value of a value array of floating-point values. It is a wrapper around std::fabs.  <br /></td></tr>
+<tr class="separator:ab9e041df1e1cb721164cca2ac5d2d5db"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classFIMSRcppInterfaceBase"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classFIMSRcppInterfaceBase')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classFIMSRcppInterfaceBase.html">FIMSRcppInterfaceBase</a></td></tr>
 <tr class="memitem:a9183d9379777d8be70ab66af1a07f94c inherit pub_methods_classFIMSRcppInterfaceBase" id="r_a9183d9379777d8be70ab66af1a07f94c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">virtual</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFIMSRcppInterfaceBase.html#a9183d9379777d8be70ab66af1a07f94c">add_to_fims_tmb</a> ()</td></tr>
 <tr class="memdesc:a9183d9379777d8be70ab66af1a07f94c inherit pub_methods_classFIMSRcppInterfaceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">A virtual method to inherit to add objects to the TMB model.  <br /></td></tr>
@@ -303,6 +325,20 @@ Static Public Attributes</h2></td></tr>
 <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">static</a> std::vector&lt; std::shared_ptr&lt; <a class="el" href="classFIMSRcppInterfaceBase.html">FIMSRcppInterfaceBase</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>fims_interface_objects</b></td></tr>
 <tr class="memdesc:a66ae9ad9c0adae77184eefa59e283c5e inherit pub_static_attribs_classFIMSRcppInterfaceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">FIMS interface object vectors. <br /></td></tr>
 <tr class="separator:a66ae9ad9c0adae77184eefa59e283c5e inherit pub_static_attribs_classFIMSRcppInterfaceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pro-types" name="pro-types"></a>
+Protected Types</h2></td></tr>
+<tr class="memitem:aa585905560a011a2f76044e8072e478f" id="r_aa585905560a011a2f76044e8072e478f"><td class="memItemLeft" align="right" valign="top"><a id="aa585905560a011a2f76044e8072e478f" name="aa585905560a011a2f76044e8072e478f"></a>
+<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typedef</a> std::set&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a> &gt;::iterator&#160;</td><td class="memItemRight" valign="bottom"><b>population_id_iterator</b></td></tr>
+<tr class="memdesc:aa585905560a011a2f76044e8072e478f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Iterator for population ids. <br /></td></tr>
+<tr class="separator:aa585905560a011a2f76044e8072e478f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pro-attribs" name="pro-attribs"></a>
+Protected Attributes</h2></td></tr>
+<tr class="memitem:aed724f1826987211b33db52450ca5441" id="r_aed724f1826987211b33db52450ca5441"><td class="memItemLeft" align="right" valign="top"><a id="aed724f1826987211b33db52450ca5441" name="aed724f1826987211b33db52450ca5441"></a>
+std::shared_ptr&lt; std::set&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>population_ids</b></td></tr>
+<tr class="memdesc:aed724f1826987211b33db52450ca5441"><td class="mdescLeft">&#160;</td><td class="mdescRight">The set of population ids that this fishery model operates on. <br /></td></tr>
+<tr class="separator:aed724f1826987211b33db52450ca5441"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>The <a class="el" href="classFisheryModelInterfaceBase.html" title="The FisheryModelInterfaceBase class is the base class for all fishery models in the FIMS Rcpp interfa...">FisheryModelInterfaceBase</a> class is the base class for all fishery models in the FIMS Rcpp interface. It inherits from the <a class="el" href="classFIMSRcppInterfaceBase.html" title="Base class for all interface objects.">FIMSRcppInterfaceBase</a>. </p>
@@ -342,6 +378,69 @@ Static Public Attributes</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
+<a id="ab9e041df1e1cb721164cca2ac5d2d5db" name="ab9e041df1e1cb721164cca2ac5d2d5db"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab9e041df1e1cb721164cca2ac5d2d5db">&#9670;&#160;</a></span>fabs()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::valarray&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">double</a> &gt; FisheryModelInterfaceBase::fabs </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> std::valarray&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">double</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>v</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>A function to compute the absolute value of a value array of floating-point values. It is a wrapper around std::fabs. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">v</td><td>A value array of floating-point values, where floating-point values is anything with decimals. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>std::valarray&lt;double&gt; </dd></dl>
+
+</div>
+</div>
+<a id="ae94f8778da8069e63f29c1d0a05d2cfd" name="ae94f8778da8069e63f29c1d0a05d2cfd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae94f8778da8069e63f29c1d0a05d2cfd">&#9670;&#160;</a></span>get_fixed_parameters_vector()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">Rcpp::NumericVector FisheryModelInterfaceBase::get_fixed_parameters_vector </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the vector of fixed effect parameters for the model. </p>
+<p>Returns a numeric vector containing the fixed effect parameters used in the model. </p><dl class="section return"><dt>Returns</dt><dd>Rcpp::NumericVector of fixed effect parameters. </dd></dl>
+
+</div>
+</div>
 <a id="a57c422df7fa5a40495e1fe21496c4830" name="a57c422df7fa5a40495e1fe21496c4830"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a57c422df7fa5a40495e1fe21496c4830">&#9670;&#160;</a></span>get_id()</h2>
 
@@ -368,6 +467,139 @@ Static Public Attributes</h2></td></tr>
 <p>Get the ID for the child fleet interface objects to inherit. </p>
 
 <p>Implemented in <a class="el" href="classCatchAtAgeInterface.html#a7bdfe469de81b88c082b37fe36dab1d6">CatchAtAgeInterface</a>.</p>
+
+</div>
+</div>
+<a id="ae4965acc6bcbeb26494532bfd0dabfd8" name="ae4965acc6bcbeb26494532bfd0dabfd8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae4965acc6bcbeb26494532bfd0dabfd8">&#9670;&#160;</a></span>get_random_parameters_vector()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">Rcpp::NumericVector FisheryModelInterfaceBase::get_random_parameters_vector </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the vector of random effect parameters for the model. </p>
+<p>Returns a numeric vector containing the random effect parameters used in the model. </p><dl class="section return"><dt>Returns</dt><dd>Rcpp::NumericVector of random effect parameters. </dd></dl>
+
+</div>
+</div>
+<a id="a04bf9092ad891e8286e2e2ce55108ffa" name="a04bf9092ad891e8286e2e2ce55108ffa"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a04bf9092ad891e8286e2e2ce55108ffa">&#9670;&#160;</a></span>min()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">double</a> FisheryModelInterfaceBase::min </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> std::valarray&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">double</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>v</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Minimum method to calculate the minimum of an array or vector of doubles. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">v</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>double </dd></dl>
+
+</div>
+</div>
+<a id="ae01554532f799c6c579bcda39f91e8fa" name="ae01554532f799c6c579bcda39f91e8fa"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae01554532f799c6c579bcda39f91e8fa">&#9670;&#160;</a></span>sum() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">double</a> FisheryModelInterfaceBase::sum </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> std::valarray&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">double</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>v</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Sum method to calculate the sum of an array or vector of doubles. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">v</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>double </dd></dl>
+
+</div>
+</div>
+<a id="afe39cc9103addb408671a6b4969daa37" name="afe39cc9103addb408671a6b4969daa37"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afe39cc9103addb408671a6b4969daa37">&#9670;&#160;</a></span>sum() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">double</a> FisheryModelInterfaceBase::sum </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> std::vector&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">double</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>v</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Sum method for a vector of doubles. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">v</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>double </dd></dl>
 
 </div>
 </div>

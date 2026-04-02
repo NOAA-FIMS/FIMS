@@ -5,6 +5,6 @@ var searchData=
   ['maturitybase_2',['MaturityBase',['../structfims__popdy_1_1MaturityBase.html#aba833b4d42149ff56e3f4c8c28333d7a',1,'fims_popdy::MaturityBase']]],
   ['maturityinterfacebase_3',['maturityinterfacebase',['../classMaturityInterfaceBase.html#ae8ca26cc171f8b471deb6259704cfc18',1,'MaturityInterfaceBase::MaturityInterfaceBase()'],['../classMaturityInterfaceBase.html#ab191c30895c8dca3458e1e7f6a94e8c9',1,'MaturityInterfaceBase::MaturityInterfaceBase(const MaturityInterfaceBase &amp;other)']]],
   ['max_5fsize_4',['max_size',['../classfims_1_1Vector.html#a15d40df5b4ef663486d9d712130dc6d7',1,'fims::Vector']]],
-  ['min_5',['min',['../classCatchAtAgeInterface.html#a0baf4fd50416fb2d4392c1b76ed8cc0d',1,'CatchAtAgeInterface']]],
+  ['min_5',['min',['../classFisheryModelInterfaceBase.html#a04bf9092ad891e8286e2e2ce55108ffa',1,'FisheryModelInterfaceBase']]],
   ['multinomiallpmf_6',['MultinomialLPMF',['../structfims__distributions_1_1MultinomialLPMF.html#ab31b77abbda5863a2d6fd43cefb27b7e',1,'fims_distributions::MultinomialLPMF']]]
 ];

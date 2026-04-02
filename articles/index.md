@@ -2,10 +2,14 @@
 
 ### All vignettes
 
+- [Adding a New C++
+  Module](https://NOAA-FIMS.github.io/FIMS/articles/adding-new-module.md):
 - [Simple projections using
   FIMS](https://NOAA-FIMS.github.io/FIMS/articles/fims-demo-projections.md):
 - [Introducing the Fisheries Integrated Modeling System
   (FIMS)](https://NOAA-FIMS.github.io/FIMS/articles/fims-demo.md):
+- [Introducing FIMS input
+  data](https://NOAA-FIMS.github.io/FIMS/articles/fims-input-data.md):
 - [Introducing the FIMS Logging
   System](https://NOAA-FIMS.github.io/FIMS/articles/fims-logging.md):
 - [FIMS Path:

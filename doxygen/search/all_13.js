@@ -70,6 +70,6 @@ var searchData=
   ['structure_67',['C++ Directory Structure',['../md_inst_2include_2README.html',1,'']]],
   ['subpopulation_68',['Subpopulation',['../classfims__popdy_1_1Subpopulation.html',1,'fims_popdy']]],
   ['subpopulation_2ehpp_69',['subpopulation.hpp',['../subpopulation_8hpp.html',1,'']]],
-  ['sum_70',['sum',['../classCatchAtAgeInterface.html#a8b4c7cb01b8a29290780f96b23bbda1b',1,'CatchAtAgeInterface::sum(const std::vector&lt; double &gt; &amp;v)'],['../classCatchAtAgeInterface.html#a96d90f8b4e02936465b49f8189603a59',1,'CatchAtAgeInterface::sum(const std::valarray&lt; double &gt; &amp;v)'],['../fims__math_8hpp.html#a2f6d3a9290062d44590350c1bc739217',1,'fims_math::sum(const std::vector&lt; T &gt; &amp;v)'],['../fims__math_8hpp.html#a60f8fb42e9a4786ca5e30b9fad43afed',1,'fims_math::sum(const fims::Vector&lt; T &gt; &amp;v)']]],
+  ['sum_70',['sum',['../classFisheryModelInterfaceBase.html#afe39cc9103addb408671a6b4969daa37',1,'FisheryModelInterfaceBase::sum(const std::vector&lt; double &gt; &amp;v)'],['../classFisheryModelInterfaceBase.html#ae01554532f799c6c579bcda39f91e8fa',1,'FisheryModelInterfaceBase::sum(const std::valarray&lt; double &gt; &amp;v)'],['../fims__math_8hpp.html#a2f6d3a9290062d44590350c1bc739217',1,'fims_math::sum(const std::vector&lt; T &gt; &amp;v)'],['../fims__math_8hpp.html#a60f8fb42e9a4786ca5e30b9fad43afed',1,'fims_math::sum(const fims::Vector&lt; T &gt; &amp;v)']]],
   ['swap_71',['swap',['../classfims_1_1Vector.html#a5631f6d0649ac37b28a95a8e64be66a2',1,'fims::Vector']]]
 ];

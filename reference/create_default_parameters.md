@@ -1,10 +1,13 @@
 # Create default parameters for a FIMS model
 
-This function generates a Fisheries Integrated Modeling System (FIMS)
-model configuration with detailed parameter specifications. This
-function takes a high-level configuration `tibble` and generates the
-corresponding parameters with default initial values and estimation
-settings required to build and run the model.
+This function generates a tibble with all of the parameters necessary to
+run a FIMS model given the desired high-level configuration that is
+specified in `configurations`. The tibble contains default initial
+values and estimation settings required to build and run the model. You
+can edit the returned tibble if you want to changes things such as
+initial values to values more specific to your population before running
+your model. For example, the default maturity parameters will need
+modified.
 
 ## Usage
 
@@ -19,16 +22,20 @@ create_default_parameters(configurations, data)
   A tibble of model configurations. Typically created by
   [`create_default_configurations()`](https://NOAA-FIMS.github.io/FIMS/reference/create_default_configurations.md).
   Users can modify this tibble to customize the model structure before
-  generating default parameters.
+  using it as input to this function.
 
 - data:
 
-  An S4 object. FIMS input data.
+  A `FIMSFrame` object returned from running
+  [`FIMSFrame()`](https://NOAA-FIMS.github.io/FIMS/reference/FIMSFrame.md)
+  on your long input data.
 
 ## Value
 
-A `tibble` with default model parameters. The tibble has a nested
-structure with the following top-level columns.
+A nested `tibble` containing information on parameters for your model
+with the same top-level columns as the input tibble passed to
+`configurations` but with additional information in the nested `data`
+column. See below for more details:
 
 - `model_family`::
 
@@ -37,7 +44,8 @@ structure with the following top-level columns.
 - `module_name`::
 
   The name of the FIMS module (e.g., "Data", "Selectivity",
-  "Recruitment", "Growth", "Maturity").
+  "Recruitment", "Growth", "Maturity"). These entries are always written
+  in PascalCase to match the names used in the C++ code.
 
 - `fleet_name`::
 
@@ -52,15 +60,12 @@ structure with the following top-level columns.
   `module_type`:
 
   :   The specific type of the module (e.g., "Logistic" for a
-      "Selectivity" module).
+      "Selectivity" module). This column will always be written in
+      PascalCase to match the names used in the C++ code.
 
   `label`:
 
   :   The name of the parameter (e.g., "inflection_point").
-
-  `distribution_link`:
-
-  :   The component the distribution module links to.
 
   `age`:
 
@@ -85,20 +90,25 @@ structure with the following top-level columns.
 
   `distribution_type`:
 
-  :   The type of distribution (e.g., "Data", "process").
+  :   The type of distribution (e.g., "Data", "process"), where a
+      process distribution can refer to a fixed effect or a random
+      effect but it does not fit to data, e.g., recruitment deviations.
 
   `distribution`:
 
-  :   The name of distribution (e.g., "Dlnorm", `Dmultinom`).
+  :   The name of distribution (e.g., "Dlnorm", `Dmultinom`). The column
+      will always be written in PascalCase to match the names used in
+      the C++ code.
 
 ## Details
 
-The function processes the input `configurations` tibble, which defines
-the modules for different model components (e.g., `"Selectivity"`,
-`"Recruitment"`). For each module specified, it calls internal helper
-functions to create a default set of parameters. For example, if a
-fleet's selectivity is configured as `"Logistic"`, it generates initial
-values for `"inflection_point"` and `"slope"`.
+The function processes the `configurations` tibble, which only contains
+high-level information for running your model by calling internal helper
+functions on each row and returning a multi-row parameter set for each
+input row. For example, if a selectivity for the first fleet is
+configured as `"Logistic"`, it takes that single row of input
+information and returns a parameter set with two rows, one for each
+parameter, `"inflection_point"` and `"slope"`.
 
 ## See also
 
@@ -137,7 +147,7 @@ updated_parameters <- default_parameters |>
 
 # Do the same as above except, model fleet1 with double logistic selectivity
 # To see required parameters for double logistic selectivity, run
-# show(DoubleLogisticSelectivity)
+# show(DoubleLogisticSelectivity) and look at the Fields list
 parameters_with_double_logistic <- default_configurations |>
   tidyr::unnest(cols = data) |>
   dplyr::rows_update(

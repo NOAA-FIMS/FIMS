@@ -16,7 +16,7 @@ data_big
 
 ## Format
 
-A data frame with 19092 observations of 8 variables:
+A data frame with 2808 observations of 8 variables:
 
 - type:
 
@@ -32,7 +32,9 @@ A data frame with 19092 observations of 8 variables:
 - age:
 
   An integer age. Entry can be `NA` if information pertains to multiple
-  ages, e.g., total landings rather than landings of age-4 fish.
+  ages, e.g., total landings rather than landings of age-4 fish. In this
+  dataset, ages start at one, therefore recruitment happens at age one
+  not age zero.
 
 - length:
 
