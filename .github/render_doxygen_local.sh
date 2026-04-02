@@ -9,8 +9,8 @@ set -euo pipefail
 # Output:
 #   build/html (and whatever your CMake/Doxygen config produces)
 
-# ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-# cd "$ROOT_DIR"
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$ROOT_DIR"
 
 # 4) Copy doxygen/* to repo root (same as workflow)
 echo "==> Copying doxygen/* into repo root"
