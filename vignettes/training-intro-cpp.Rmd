@@ -17,8 +17,12 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r, echo = FALSE}
 # cleanup environment for Rcpp::sourceCpp to work
+if(isNamespaceLoaded("TMB")){
 devtools::unload(package = "TMB")
-devtools::unload(package = "Rcpp")
+}
+if(isNamespaceLoaded("Rcpp")){
+  devtools::unload(package = "Rcpp")
+}
 library(Rcpp)
 ```
 
