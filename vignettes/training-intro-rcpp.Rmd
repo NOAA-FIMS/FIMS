@@ -64,10 +64,10 @@ Using {Rcpp} you can compile C++ code using R and never have to interact with an
 
 ```{r, echo = FALSE}
 # cleanup environment for Rcpp::sourceCpp to work
-if(isNamespaceLoaded("TMB")){
-devtools::unload(package = "TMB")
+if (isNamespaceLoaded("TMB")) {
+  devtools::unload(package = "TMB")
 }
-if(isNamespaceLoaded("Rcpp")){
+if (isNamespaceLoaded("Rcpp")) {
   devtools::unload(package = "Rcpp")
 }
 ```

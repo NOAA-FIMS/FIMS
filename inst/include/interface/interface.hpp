@@ -24,7 +24,6 @@
 // issue
 #include <math.h>
 
-
 #ifdef FIMS_WINDOWS
 #ifdef FALSE
 #pragma push_macro("FALSE")
@@ -50,7 +49,6 @@
 #undef FIMS_RESTORE_FALSE_MACRO
 #endif
 #endif
-
 
 // define REPORT, ADREPORT, and SIMULATE
 #define FIMS_REPORT_F(name, F)                                         \
