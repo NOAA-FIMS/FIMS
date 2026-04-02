@@ -59,18 +59,25 @@ IF(BUILD_DOC)
   set(DOXYGEN_FULL_SIDEBAR "NO")
   set(DOXYGEN_PROJECT_NUMBER ${VERSION})
   set(DOXYGEN_PROJECT_NAME "FIMS")
-  set(DOXYGEN_PROJECT_LOGO "FIMS_logo3.png")
+  set(DOXYGEN_PROJECT_LOGO "doxygen/FIMS_logo3.png")
   set(DOXYGEN_GENERATE_HTML "YES")
   set(DOXYGEN_HTML_DYNAMIC_SECTIONS "NO")
-  set(DOXYGEN_HTML_EXTRA_STYLESHEET "doxygen-awesome.css" "custom.css")
+  set(DOXYGEN_HTML_EXTRA_STYLESHEET
+    "doxygen/doxygen-awesome.css"
+    "doxygen/custom.css"
+  )
+  set(DOXYGEN_HTML_EXTRA_FILES
+    "doxygen/bootstrap-5bca210c7b8f52bd43562cb73b8f998e.min.css"
+    "doxygen/bootstrap-dark-dabf027eac5ab6a58e890faf792e317e.min.css"
+  )
   set(DOXYGEN_HTML_COLORSTYLE "LIGHT")
   set(DOXYGEN_USE_MDFILE_AS_MAINPAGE "inst/include/common/MAIN.md")
-  set(DOXYGEN_HTML_HEADER "header.html")
-  set(DOXYGEN_LAYOUT_FILE "DoxygenLayout.xml")
+  set(DOXYGEN_HTML_HEADER "doxygen/header.html")
+  set(DOXYGEN_LAYOUT_FILE "doxygen/DoxygenLayout.xml")
   set(DOXYGEN_MARKDOWN_SUPPORT YES)
   set(DOXYGEN_AUTOLINK_SUPPORT YES)
   set(DOXYGEN_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/doxygen")
-  set(DOXYGEN_HTML_OUTPUT ".")
+  set(DOXYGEN_HTML_OUTPUT "html")
 
   doxygen_add_docs(fims_doxygen
     inst/include

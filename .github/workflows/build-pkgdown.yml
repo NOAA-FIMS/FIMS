@@ -96,7 +96,6 @@ jobs:
         # Do not run -DDOXYGEN_WARN_AS_ERROR=YES locally
         # FIX? run cmake --build build --parallel 16
         run: |
-          cp -r doxygen/* ./
           cmake -S . -B build -G Ninja -DDOXYGEN_WARN_AS_ERROR=FAIL_ON_WARNINGS
           cmake --build build
 
@@ -104,8 +103,8 @@ jobs:
         # Do not run mkdir doxygen and mv build/html doxygen locally
         if: ${{ github.ref == 'refs/heads/main' }}
         run: |
-          cp FIMS_hexlogo.png ./doxygen/
-          cp -a doxygen/. docs/doxygen/
+          mkdir -p docs/doxygen
+          cp -a doxygen/html/. docs/doxygen/
 
       - name: save pkgdown output
         uses: actions/upload-artifact@v7
