@@ -225,3 +225,48 @@ test_that("fit_fims() errors when optimization fails to converge", {
 
   clear()
 })
+
+test_that("set_fixed() handles mapped TMB parameters safely", {
+  skip_if_not(file.exists(testthat::test_path("fixtures", "integration_test_data.RData")))
+
+  load(testthat::test_path("fixtures", "integration_test_data.RData"))
+
+  data_age_comp <- FIMSFrame(data_big)
+  parameters <- readRDS(
+    testthat::test_path("fixtures", "parameters_model_comparison_project.RDS")
+  )
+
+  initialized_model <- parameters |>
+    initialize_fims(data = data_age_comp)
+
+  on.exit(clear(), add = TRUE)
+
+  n_fixed <- length(initialized_model[["parameters"]][["p"]])
+  skip_if(n_fixed < 2)
+
+  initialized_model[["map"]] <- list(
+    p = factor(c(1L, 1L, seq_len(n_fixed - 2L) + 1L))
+  )
+
+  obj <- TMB::MakeADFun(
+    data = list(),
+    parameters = initialized_model[["parameters"]],
+    map = initialized_model[["map"]],
+    random = "re",
+    DLL = "FIMS",
+    silent = TRUE
+  )
+
+  opt <- stats::nlminb(
+    obj[["par"]],
+    obj[["fn"]],
+    obj[["gr"]],
+    control = list(eval.max = 10000, iter.max = 10000, trace = 0)
+  )
+
+  expect_error(
+    FIMS::set_fixed(opt[["par"]]),
+    regexp = "expanded parameter vector"
+  )
+  expect_no_error(FIMS::set_fixed(obj[["env"]][["last.par.best"]]))
+})

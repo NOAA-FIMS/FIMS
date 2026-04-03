@@ -461,7 +461,7 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
     opt <- stats::nlminb(obj[["par"]], obj[["fn"]], obj[["gr"]],
       control = list(eval.max = 10000, iter.max = 10000, trace = 0)
     )
-    FIMS::set_fixed(opt$par)
+    FIMS::set_fixed(obj[["env"]][["last.par.best"]])
     fims_finalized <- caa$get_output()
 
     sdr <- TMB::sdreport(obj)
