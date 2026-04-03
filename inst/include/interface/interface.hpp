@@ -14,7 +14,6 @@
  * to interface with multiple modeling platforms.
  */
 
-
 // traits for interfacing with TMB
 
 #ifdef TMB_MODEL
