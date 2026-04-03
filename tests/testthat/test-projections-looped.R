@@ -511,7 +511,8 @@ run_FIMS_projection_scenario <- function(om_input,
   opt <- stats::nlminb(obj[["par"]], obj[["fn"]], obj[["gr"]],
     control = list(eval.max = 10000, iter.max = 10000, trace = 0)
   )
-  FIMS::set_fixed(obj[["env"]][["last.par.best"]])
+  expanded_fixed <- obj[["env"]]$parList(opt[["par"]])[["p"]]
+  FIMS::set_fixed(expanded_fixed)
   fims_finalized <- caa$get_output()
 
   # Call report using MLE parameter values, or

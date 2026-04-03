@@ -218,6 +218,8 @@ reshape_tmb_estimates <- function(obj,
                                   sdreport = NULL,
                                   opt = NULL,
                                   parameter_names) {
+  n_fixed_parameters <- length(parameter_names)
+
   # Outline for the estimates table
   estimates_outline <- tibble::tibble(
     # The FIMS Rcpp module
@@ -243,33 +245,53 @@ reshape_tmb_estimates <- function(obj,
 
   if (length(sdreport) > 0) {
     std <- summary(sdreport)
+
+    if (nrow(std) < n_fixed_parameters) {
+      cli::cli_abort(
+        "The number of rows in `summary(sdreport)` ({nrow(std)}) is less than the number of fixed parameters ({n_fixed_parameters})."
+      )
+    }
+
     # Number of rows for derived quantities: based on the difference
     # between the total number of rows in std and the length of parameter_names.
-    derived_quantity_nrow <- nrow(std) - length(parameter_names)
+    derived_quantity_nrow <- nrow(std) - n_fixed_parameters
+
+    fixed_initial <- as.numeric(obj[["par"]])
+    if (length(fixed_initial) != n_fixed_parameters) {
+      fixed_initial <- fixed_initial[seq_len(n_fixed_parameters)]
+    }
+
+    fixed_gradient <- if (length(opt) > 0) {
+      obj[["gr"]](opt[["par"]])
+    } else {
+      rep(NA_real_, n_fixed_parameters)
+    }
+
+    if (length(fixed_gradient) != n_fixed_parameters) {
+      fixed_gradient <- fixed_gradient[seq_len(n_fixed_parameters)]
+    }
+
     # Create a tibble with the data from the std, and then apply transformations.
     estimates <- estimates_outline |>
       tibble::add_row(
         label = dimnames(std)[[1]],
         estimate = std[, "Estimate"],
         uncertainty = std[, "Std. Error"],
-        # Use obj[["env"]][["parameters"]][["p"]] as this will return both initial
-        # fixed and random effects while obj[["par"]] only returns initial fixed
-        # effects
         initial = c(
-          obj[["env"]][["parameters"]][["p"]],
+          fixed_initial,
           rep(NA_real_, derived_quantity_nrow)
         ),
         gradient = c(
-          obj[["gr"]](opt[["par"]]),
+          fixed_gradient,
           rep(NA_real_, derived_quantity_nrow)
         )
       )
   } else {
     estimates <- estimates_outline |>
       tibble::add_row(
-        label = names(obj[["par"]]),
-        initial = obj[["env"]][["parameters"]][["p"]],
-        estimate = obj[["env"]][["parameters"]][["p"]]
+        label = parameter_names,
+        initial = as.numeric(obj[["par"]]),
+        estimate = as.numeric(obj[["par"]])
       )
   }
 
