@@ -181,7 +181,7 @@ initialize_module <- function(parameters, data, module_name, fleet_name = NA_cha
         "ages" = get_n_ages(data),
         "weights" = get_n_ages(data) * (get_n_years(data) + 1)
       )
-      module[[field]]$resize(module_length)
+      # module[[field]]$resize(module_length)
       module[[field]]$fromRVector(get_value_function(data))
     
     } else {
