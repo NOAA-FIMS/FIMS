@@ -192,12 +192,13 @@ initialize_module <- function(parameters, data, module_name, fleet_name = NA_cha
         "weights" = get_n_ages(data) * (get_n_years(data) + 1)
       )
       module[[field]]$resize(module_length)
-      purrr::walk(
-        seq(module_length),
-        function(x) {
-          module[[field]]$set(x - 1, get_value_function(data)[x])
-        }
-      )
+      module[[field]]$fromRVector(get_value_function(data))
+      # purrr::walk(
+      #   seq(module_length),
+      #   function(x) {
+      #     module[[field]]$set(x - 1, get_value_function(data)[x])
+      #   }
+      # )
     } else {
       set_param_vector(
         field = field,
