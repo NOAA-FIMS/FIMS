@@ -36,17 +36,18 @@ run_FIMS_projection_scenario <- function(om_input,
   # set fishing fleet landings data, need to set dimensions of data index
   # currently FIMS only has a fleet module that takes index for both survey index and fishery landings
   fishing_fleet_landings <- methods::new(Landings, om_input[["nyr"]] + n_projection_years)
-  purrr::walk(
-    1:om_input[["nyr"]],
-    \(x) fishing_fleet_landings$landings_data$set(x - 1, landings[x])
-  )
+  fishing_fleet_landings$landings_data$fromRVector(c(landings, projected_landings))
+  # purrr::walk(
+  #   1:om_input[["nyr"]],
+  #   \(x) fishing_fleet_landings$landings_data$set(x - 1, landings[x])
+  # )
   # set projection years
-  if (n_projection_years > 0) {
-    purrr::walk(
-      (om_input[["nyr"]] + 1):(om_input[["nyr"]] + n_projection_years),
-      \(x) fishing_fleet_landings$landings_data$set(x - 1, projected_landings[x - om_input[["nyr"]]])
-    )
-  }
+  # if (n_projection_years > 0) {
+  #   purrr::walk(
+  #     (om_input[["nyr"]] + 1):(om_input[["nyr"]] + n_projection_years),
+  #     \(x) fishing_fleet_landings$landings_data$set(x - 1, projected_landings[x - om_input[["nyr"]]])
+  #   )
+  # }
   # set fishing fleet age comp data, need to set dimensions of age comps
   # Here the new function initializes the object with length nyr*n_ages
   fishing_fleet_age_comp <- methods::new(AgeComp, (om_input[["nyr"]] + n_projection_years), om_input[["nages"]])
@@ -61,13 +62,14 @@ run_FIMS_projection_scenario <- function(om_input,
       matrix(-999, nrow = n_projection_years, ncol = om_input[["nages"]])
     )
   }
-  purrr::walk(
-    1:((om_input[["nyr"]] + n_projection_years) * om_input[["nages"]]),
-    \(x) fishing_fleet_age_comp$age_comp_data$set(
-      x - 1,
-      (c(t(projected_age_comps)))[x]
-    )
-  )
+  fishing_fleet_age_comp$age_comp_data$fromRVector(c(t(projected_age_comps))) 
+  # purrr::walk(
+  #   1:((om_input[["nyr"]] + n_projection_years) * om_input[["nages"]]),
+  #   \(x) fishing_fleet_age_comp$age_comp_data$set(
+  #     x - 1,
+  #     (c(t(projected_age_comps)))[x]
+  #   )
+  # )
 
 
   # set fishing fleet length comp data, need to set dimensions of length comps
@@ -81,14 +83,15 @@ run_FIMS_projection_scenario <- function(om_input,
     projected_length_comps,
     matrix(-999, nrow = n_projection_years, ncol = om_input[["nlengths"]])
   )
+fishing_fleet_length_comp$length_comp_data$fromRVector(c(t(projected_length_comps)))
+  # purrr::walk(
+  #   1:((om_input[["nyr"]] + n_projection_years) * om_input[["nlengths"]]),
+  #   \(x) fishing_fleet_length_comp$length_comp_data$set(
+  #     x - 1,
+  #     (c(t(projected_length_comps)))[x]
+  #   )
+  # )
 
-  purrr::walk(
-    1:((om_input[["nyr"]] + n_projection_years) * om_input[["nlengths"]]),
-    \(x) fishing_fleet_length_comp$length_comp_data$set(
-      x - 1,
-      (c(t(projected_length_comps)))[x]
-    )
-  )
   # Fleet
   # Create the fishing fleet
   fishing_fleet_selectivity <- methods::new(LogisticSelectivity)

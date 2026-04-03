@@ -69,7 +69,8 @@ fishing_fleet_index$index_data$fromRVector(catch)
 fishing_fleet <- methods::new(Fleet)
 fishing_fleet$n_ages$set(om_input$nages)
 fishing_fleet$n_years$set(om_input$nyr)
-fishing_fleet$log_Fmort$fromRVector(log(om_output$f))
+fishing_fleet$log_Fmort$resize(length(om_output$f))
+fishing_fleet$log_Fmort$set_initial_values(log(om_output$f))
 # purrr::walk(
 #   seq_along(log(om_output$f)),
 #   \(x) fishing_fleet$log_Fmort[x]$value <- log(om_output$f)[x]
