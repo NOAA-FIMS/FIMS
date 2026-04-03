@@ -135,7 +135,22 @@ void set_fixed_parameters(Rcpp::NumericVector par) {
   std::shared_ptr<fims_info::Information<TMB_FIMS_REAL_TYPE>> info0 =
       fims_info::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
 
-  for (size_t i = 0; i < info0->fixed_effects_parameters.size(); i++) {
+  const size_t n_fixed = info0->fixed_effects_parameters.size();
+  const size_t n_random = info0->random_effects_parameters.size();
+  const R_xlen_t par_size = par.size();
+
+  if (par_size != static_cast<R_xlen_t>(n_fixed) &&
+      par_size != static_cast<R_xlen_t>(n_fixed + n_random)) {
+    Rcpp::stop(
+        "set_fixed() expected %d fixed-effect parameters or %d total "
+        "parameters, but received %d. When using TMB mapping, pass an "
+        "expanded parameter vector such as obj$env$last.par.best rather than "
+        "opt$par.",
+        static_cast<int>(n_fixed), static_cast<int>(n_fixed + n_random),
+        static_cast<int>(par_size));
+  }
+
+  for (size_t i = 0; i < n_fixed; i++) {
     *info0->fixed_effects_parameters[i] = par[i];
   }
 }
@@ -170,8 +185,23 @@ void set_random_parameters(Rcpp::NumericVector par) {
   std::shared_ptr<fims_info::Information<TMB_FIMS_REAL_TYPE>> info0 =
       fims_info::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
 
-  for (size_t i = 0; i < info0->random_effects_parameters.size(); i++) {
-    *info0->random_effects_parameters[i] = par[i];
+  const size_t n_fixed = info0->fixed_effects_parameters.size();
+  const size_t n_random = info0->random_effects_parameters.size();
+  const R_xlen_t par_size = par.size();
+
+  if (par_size != static_cast<R_xlen_t>(n_random) &&
+      par_size != static_cast<R_xlen_t>(n_fixed + n_random)) {
+    Rcpp::stop(
+        "set_random_parameters() expected %d random-effect parameters or %d "
+        "total parameters, but received %d.",
+      static_cast<int>(n_random), static_cast<int>(n_fixed + n_random),
+        static_cast<int>(par_size));
+  }
+
+  const size_t offset = par_size == static_cast<R_xlen_t>(n_random) ? 0 : n_fixed;
+
+  for (size_t i = 0; i < n_random; i++) {
+    *info0->random_effects_parameters[i] = par[offset + i];
   }
 }
 

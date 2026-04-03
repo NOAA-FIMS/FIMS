@@ -631,7 +631,7 @@ fit_fims <- function(input,
 
   check_mle_convergence(input, obj, opt, maxgrad)
 
-  FIMS::set_fixed(opt[["par"]])
+  FIMS::set_fixed(obj[["env"]][["last.par.best"]])
 
   time_sdreport <- NA
   if (get_sd) {
