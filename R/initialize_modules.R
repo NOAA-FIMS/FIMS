@@ -111,10 +111,11 @@ initialize_module <- function(parameters, data, module_name, fleet_name = NA_cha
       age_to_length_conversion_value <- model_age_to_length_conversion(data)
       module[["age_to_length_conversion"]]$resize(length(age_to_length_conversion_value))
       # Assign each value to the corresponding position in the parameter vector
-      purrr::walk(
-        seq_along(age_to_length_conversion_value),
-        \(x) module[["age_to_length_conversion"]][x][["value"]] <- age_to_length_conversion_value[x]
-      )
+      module[["age_to_length_conversion"]]$set_initial_values(age_to_length_conversion_value)
+      # purrr::walk(
+      #   seq_along(age_to_length_conversion_value),
+      #   \(x) module[["age_to_length_conversion"]][x][["value"]] <- age_to_length_conversion_value[x]
+      # )
 
       # Set the estimation information for the entire parameter vector
       module[["age_to_length_conversion"]]$set_all_estimable(FALSE)
@@ -185,12 +186,13 @@ initialize_module <- function(parameters, data, module_name, fleet_name = NA_cha
         "weights" = get_n_ages(data) * (get_n_years(data) + 1)
       )
       module[[field]]$resize(module_length)
-      purrr::walk(
-        seq(module_length),
-        function(x) {
-          module[[field]]$set(x - 1, get_value_function(data)[x])
-        }
-      )
+      module[[field]]$fromRVector(get_value_function(data))
+      # purrr::walk(
+      #   seq(module_length),
+      #   function(x) {
+      #     module[[field]]$set(x - 1, get_value_function(data)[x])
+      #   }
+      # )
     } else {
       set_param_vector(
         field = field,
@@ -425,10 +427,11 @@ initialize_landings <- function(data, fleet_name) {
 
   if ("landings" %in% fleet_type) {
     module <- methods::new(Landings, get_n_years(data))
-    purrr::walk(
-      seq_along(model_landings(data, fleet_name)),
-      \(x) module$landings_data$set(x - 1, model_landings(data, fleet_name)[x])
-    )
+    module$landings_data$fromRVector(model_landings(data, fleet_name))
+    # purrr::walk(
+    #   seq_along(model_landings(data, fleet_name)),
+    #   \(x) module$landings_data$set(x - 1, model_landings(data, fleet_name)[x])
+    # )
     return(module)
   } else {
     return(NULL)
@@ -461,10 +464,11 @@ initialize_index <- function(data, fleet_name) {
 
   if ("index" %in% fleet_type) {
     module <- methods::new(Index, get_n_years(data))
-    purrr::walk(
-      seq_along(model_index(data, fleet_name)),
-      \(x) module$index_data$set(x - 1, model_index(data, fleet_name)[x])
-    )
+    module$index_data$fromRVector(model_index(data, fleet_name))
+    # purrr::walk(
+    #   seq_along(model_index(data, fleet_name)),
+    #   \(x) module$index_data$set(x - 1, model_index(data, fleet_name)[x])
+    # )
     return(module)
   } else {
     return(NULL)
@@ -568,11 +572,11 @@ initialize_comp <- function(data,
       i = "Dates with invalid data: {bad_data_years}"
     ))
   }
-
-  purrr::walk(
-    seq_along(model_data),
-    \(x) module[[comp[["comp_data_field"]]]]$set(x - 1, model_data[x])
-  )
+module[[comp[["comp_data_field"]]]]$fromRVector(model_data)
+  # purrr::walk(
+  #   seq_along(model_data),
+  #   \(x) module[[comp[["comp_data_field"]]]]$set(x - 1, model_data[x])
+  # )
 
   return(module)
 }

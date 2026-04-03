@@ -325,17 +325,12 @@ initialize_data_distribution <- function(
   if (family[["family"]] == "gaussian") {
     # create new Rcpp module
     new_module <- methods::new(DnormDistribution)
+    new_module$log_sd$resize(length(sd[["value"]]))
+        # populate logged standard deviation parameter with log of input
 
-    # populate logged standard deviation parameter with log of input
-    purrr::walk(
-      seq_along(sd[["value"]]),
-      \(x) new_module[["log_sd"]][x][["value"]] <- log(sd[["value"]][x])
-    )
+    new_module$log_sd$set_initial_values(log(sd[["value"]]))
+    new_module$log_sd$set_estimation_types(sd[["estimation_type"]])
 
-    purrr::walk(
-      seq_along(sd[["estimation_type"]]),
-      \(x) new_module[["log_sd"]][x][["estimation_type"]]$set(sd[["estimation_type"]][x])
-    )
   }
 
   if (family[["family"]] == "multinomial") {
@@ -396,11 +391,8 @@ initialize_process_distribution <- function(
 
     # populate logged standard deviation parameter with log of input
     new_module$log_sd$resize(length(sd[["value"]]))
-    purrr::walk(
-      seq_along(sd[["value"]]),
-      \(x) new_module[["log_sd"]][x][["value"]] <- log(sd[["value"]][x])
-    )
-
+    new_module$log_sd$set_initial_values(log(sd[["value"]]))
+ 
     # setup whether or not sd parameter is estimated
     if (length(sd[["value"]]) > 1 && length(sd[["estimation_type"]]) == 1) {
       if (sd[["estimation_type"]] == "constant") {
