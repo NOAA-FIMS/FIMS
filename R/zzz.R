@@ -70,7 +70,7 @@ methods::setMethod(
     if (missing(i)) {
       # p[] <- c(...)
       x$resize(length(value))
-      x$set_initial_values(value)
+      x$set_values(value)
     } else {
       # p[i] <- value
       x$set(i - 1, value)

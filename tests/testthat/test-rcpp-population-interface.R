@@ -19,25 +19,15 @@ test_that("rcpp population interface works with correct inputs", {
   n_ages <- 10
   log_M_length <- n_years * n_ages
   population$log_M$resize(log_M_length)
-  population$log_M$set_initial_values(rep(-1, log_M_length))
-  # purrr::walk(
-  #   seq_along(1:log_M_length),
-  #   \(x) population$log_M[x]$value <- -1
-  # )
+  population$log_M$set_values(rep(-1, log_M_length))
+
   population$log_init_naa$resize(n_ages)
-  population$log_init_naa$set_initial_values(rep(0, n_ages))
-  # purrr::walk(
-  #   seq_along(1:n_ages),
-  #   \(x) population$log_init_naa[x]$value <- 0
-  # )
+  population$log_init_naa$set_values(rep(0, n_ages))
+
   population$log_init_naa$set_all_estimable(TRUE)
   population$n_ages$set(n_ages)
   population$ages$resize(n_ages)
   population$ages$fromRVector(seq(1, n_ages))
-  # purrr::walk(
-  #   seq_along(1:n_ages),
-  #   \(x) population$ages$set(x - 1, x)
-  # )
   population$n_fleets$set(2)
   population$n_years$set(n_years)
 

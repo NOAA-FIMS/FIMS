@@ -318,7 +318,7 @@ initialize_data_distribution <- function(
     # trigger an error in integration tests with wrappers.
     # new_module$log_sd$resize(length(sd[["value"]]))
     new_module$log_sd$resize(length(sd[["value"]]))
-    new_module$log_sd$set_initial_values(log(sd[["value"]]))
+    new_module$log_sd$set_values(log(sd[["value"]]))
     new_module$log_sd$set_estimation_types(sd[["estimation_type"]])
   }
 
@@ -328,7 +328,7 @@ initialize_data_distribution <- function(
     new_module$log_sd$resize(length(sd[["value"]]))
         # populate logged standard deviation parameter with log of input
 
-    new_module$log_sd$set_initial_values(log(sd[["value"]]))
+    new_module$log_sd$set_values(log(sd[["value"]]))
     new_module$log_sd$set_estimation_types(sd[["estimation_type"]])
 
   }
@@ -391,7 +391,7 @@ initialize_process_distribution <- function(
 
     # populate logged standard deviation parameter with log of input
     new_module$log_sd$resize(length(sd[["value"]]))
-    new_module$log_sd$set_initial_values(log(sd[["value"]]))
+    new_module$log_sd$set_values(log(sd[["value"]]))
  
     # setup whether or not sd parameter is estimated
     if (length(sd[["value"]]) > 1 && length(sd[["estimation_type"]]) == 1) {
