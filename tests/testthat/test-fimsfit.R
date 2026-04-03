@@ -268,5 +268,6 @@ test_that("set_fixed() handles mapped TMB parameters safely", {
     FIMS::set_fixed(opt[["par"]]),
     regexp = "expanded parameter vector"
   )
-  expect_no_error(FIMS::set_fixed(obj[["env"]][["last.par.best"]]))
+  expanded_fixed <- obj[["env"]]$parList(opt[["par"]])[["p"]]
+  expect_no_error(FIMS::set_fixed(expanded_fixed))
 })

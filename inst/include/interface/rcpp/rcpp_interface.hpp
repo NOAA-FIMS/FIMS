@@ -235,7 +235,19 @@ Rcpp::List get_parameter_names(Rcpp::List pars) {
   std::shared_ptr<fims_info::Information<TMB_FIMS_REAL_TYPE>> d0 =
       fims_info::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
 
-  pars.attr("names") = d0->parameter_names;
+  const R_xlen_t n_pars = Rf_xlength(pars);
+  Rcpp::CharacterVector parameter_names(n_pars);
+  const size_t n_available = d0->parameter_names.size();
+
+  for (R_xlen_t i = 0; i < n_pars; i++) {
+    if (static_cast<size_t>(i) < n_available) {
+      parameter_names[i] = d0->parameter_names[i];
+    } else {
+      parameter_names[i] = "";
+    }
+  }
+
+  pars.attr("names") = parameter_names;
 
   return pars;
 }
@@ -251,7 +263,19 @@ Rcpp::List get_random_names(Rcpp::List pars) {
   std::shared_ptr<fims_info::Information<TMB_FIMS_REAL_TYPE>> d0 =
       fims_info::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
 
-  pars.attr("names") = d0->random_effects_names;
+  const R_xlen_t n_pars = Rf_xlength(pars);
+  Rcpp::CharacterVector random_effect_names(n_pars);
+  const size_t n_available = d0->random_effects_names.size();
+
+  for (R_xlen_t i = 0; i < n_pars; i++) {
+    if (static_cast<size_t>(i) < n_available) {
+      random_effect_names[i] = d0->random_effects_names[i];
+    } else {
+      random_effect_names[i] = "";
+    }
+  }
+
+  pars.attr("names") = random_effect_names;
 
   return pars;
 }

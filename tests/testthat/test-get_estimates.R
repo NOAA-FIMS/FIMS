@@ -98,3 +98,35 @@ test_that("`get_estimates()` returns correct outputs for edge cases", {
 
 ## Error handling ----
 # No built-in errors to test.
+
+test_that("`get_estimates()` works with mapped fixed effects", {
+  skip_if_not(file.exists(testthat::test_path("fixtures", "integration_test_data.RData")))
+
+  load(testthat::test_path("fixtures", "integration_test_data.RData"))
+
+  data_age_comp <- FIMSFrame(data_big)
+  parameters <- readRDS(
+    testthat::test_path("fixtures", "parameters_model_comparison_project.RDS")
+  )
+
+  initialized_model <- parameters |>
+    initialize_fims(data = data_age_comp)
+
+  on.exit(clear(), add = TRUE)
+
+  n_fixed <- length(initialized_model[["parameters"]][["p"]])
+  skip_if(n_fixed < 2)
+
+  initialized_model[["map"]] <- list(
+    p = factor(c(1L, 1L, seq_len(n_fixed - 2L) + 1L))
+  )
+
+  mapped_fit <- fit_fims(
+    input = initialized_model,
+    optimize = TRUE,
+    number_of_loops = 0
+  )
+
+  expect_no_error(estimates <- get_estimates(mapped_fit))
+  expect_true(nrow(estimates) > 0)
+})
