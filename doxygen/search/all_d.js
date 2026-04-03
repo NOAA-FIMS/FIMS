@@ -14,7 +14,7 @@ var searchData=
   ['max_5fsize_11',['max_size',['../classfims_1_1Vector.html#a15d40df5b4ef663486d9d712130dc6d7',1,'fims::Vector']]],
   ['message_12',['message',['../structfims_1_1LogEntry.html#a700eef36069cb58bdbfd77b0dd1dd857',1,'fims::LogEntry']]],
   ['min_13',['min',['../classFisheryModelInterfaceBase.html#a04bf9092ad891e8286e2e2ce55108ffa',1,'FisheryModelInterfaceBase']]],
-  ['model_14',['Model',['../classfims__model_1_1Model.html',1,'fims_model']]],
+  ['model_14',['model',['../classfims__model_1_1Model.html',1,'fims_model::Model&lt; Type &gt;'],['../classfims__model_1_1Model.html#a4538641e7f150147bf85aa0d4515e03d',1,'fims_model::Model::Model()']]],
   ['model_2ehpp_15',['model.hpp',['../model_8hpp.html',1,'']]],
   ['model_5fmap_5fiterator_16',['model_map_iterator',['../classfims__info_1_1Information.html#a9626f44ca9843b5b443519b933438a8f',1,'fims_info::Information']]],
   ['model_5fobject_2ehpp_17',['model_object.hpp',['../model__object_8hpp.html',1,'']]],

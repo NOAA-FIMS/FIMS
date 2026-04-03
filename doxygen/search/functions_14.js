@@ -25,12 +25,13 @@ var searchData=
   ['_7elognormallpdf_22',['~LogNormalLPDF',['../structfims__distributions_1_1LogNormalLPDF.html#a4ed2110fd6e2c78e57f2f9889f0e8a08',1,'fims_distributions::LogNormalLPDF']]],
   ['_7elogrrecruitmentinterface_23',['~LogRRecruitmentInterface',['../classLogRRecruitmentInterface.html#a26490dd59b6f9c7ed0c90b20412ddc94',1,'LogRRecruitmentInterface']]],
   ['_7ematurityinterfacebase_24',['~MaturityInterfaceBase',['../classMaturityInterfaceBase.html#a88de1cb811b86b2f2811f03973d258b6',1,'MaturityInterfaceBase']]],
-  ['_7emultinomiallpmf_25',['~MultinomialLPMF',['../structfims__distributions_1_1MultinomialLPMF.html#a19cf1504c3524fed2381c092431115b7',1,'fims_distributions::MultinomialLPMF']]],
-  ['_7enormallpdf_26',['~NormalLPDF',['../structfims__distributions_1_1NormalLPDF.html#aad56aa8133d0db1a265532955c061b65',1,'fims_distributions::NormalLPDF']]],
-  ['_7eparametervector_27',['~ParameterVector',['../classParameterVector.html#ae426de8e835ed4e670e8a38a5fdc7c64',1,'ParameterVector']]],
-  ['_7epopulationinterface_28',['~PopulationInterface',['../classPopulationInterface.html#a8a7d5144ac7974ec4887becf308a35eb',1,'PopulationInterface']]],
-  ['_7epopulationinterfacebase_29',['~PopulationInterfaceBase',['../classPopulationInterfaceBase.html#a048977a840e86eeb67419f3fbfc8f602',1,'PopulationInterfaceBase']]],
-  ['_7erealvector_30',['~RealVector',['../classRealVector.html#a22d7d0d15cf8e641a3d9d2d7d93e77f7',1,'RealVector']]],
-  ['_7erecruitmentinterfacebase_31',['~RecruitmentInterfaceBase',['../classRecruitmentInterfaceBase.html#a619e3736e9b4049638639647b453bca8',1,'RecruitmentInterfaceBase']]],
-  ['_7eselectivityinterfacebase_32',['~SelectivityInterfaceBase',['../classSelectivityInterfaceBase.html#a109aa1dea96e11fac9bdaa82b4688d62',1,'SelectivityInterfaceBase']]]
+  ['_7emodel_25',['~Model',['../classfims__model_1_1Model.html#a893676693cfab4577c8f6458680d417b',1,'fims_model::Model']]],
+  ['_7emultinomiallpmf_26',['~MultinomialLPMF',['../structfims__distributions_1_1MultinomialLPMF.html#a19cf1504c3524fed2381c092431115b7',1,'fims_distributions::MultinomialLPMF']]],
+  ['_7enormallpdf_27',['~NormalLPDF',['../structfims__distributions_1_1NormalLPDF.html#aad56aa8133d0db1a265532955c061b65',1,'fims_distributions::NormalLPDF']]],
+  ['_7eparametervector_28',['~ParameterVector',['../classParameterVector.html#ae426de8e835ed4e670e8a38a5fdc7c64',1,'ParameterVector']]],
+  ['_7epopulationinterface_29',['~PopulationInterface',['../classPopulationInterface.html#a8a7d5144ac7974ec4887becf308a35eb',1,'PopulationInterface']]],
+  ['_7epopulationinterfacebase_30',['~PopulationInterfaceBase',['../classPopulationInterfaceBase.html#a048977a840e86eeb67419f3fbfc8f602',1,'PopulationInterfaceBase']]],
+  ['_7erealvector_31',['~RealVector',['../classRealVector.html#a22d7d0d15cf8e641a3d9d2d7d93e77f7',1,'RealVector']]],
+  ['_7erecruitmentinterfacebase_32',['~RecruitmentInterfaceBase',['../classRecruitmentInterfaceBase.html#a619e3736e9b4049638639647b453bca8',1,'RecruitmentInterfaceBase']]],
+  ['_7eselectivityinterfacebase_33',['~SelectivityInterfaceBase',['../classSelectivityInterfaceBase.html#a109aa1dea96e11fac9bdaa82b4688d62',1,'SelectivityInterfaceBase']]]
 ];

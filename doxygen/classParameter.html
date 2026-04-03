@@ -9,8 +9,8 @@
     <link rel="icon" type="image/png" href="https://noaa-fims.github.io/images/FIMS_hexlogo.png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
-    <link href="https://noaa-fims.github.io/site_libs/bootstrap/bootstrap-5bca210c7b8f52bd43562cb73b8f998e.min.css" rel="stylesheet">
-    <link href="https://noaa-fims.github.io/site_libs/bootstrap/bootstrap-dark-dabf027eac5ab6a58e890faf792e317e.min.css" rel="stylesheet" media="(prefers-color-scheme: dark)">
+    <link href="bootstrap-5bca210c7b8f52bd43562cb73b8f998e.min.css" rel="stylesheet">
+    <link href="bootstrap-dark-dabf027eac5ab6a58e890faf792e317e.min.css" rel="stylesheet" media="(prefers-color-scheme: dark)">
     <script type="text/javascript" src="jquery.js"></script>
     <script type="text/javascript" src="dynsections.js"></script>
     <link href="navtree.css" rel="stylesheet" type="text/css"/>
@@ -252,9 +252,6 @@ Public Member Functions</h2></td></tr>
 &#160;</td><td class="memItemRight" valign="bottom"><b>Parameter</b> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">double</a> value)</td></tr>
 <tr class="memdesc:a0daabd9177ee8c2e46af55347279ef5d"><td class="mdescLeft">&#160;</td><td class="mdescRight">The constructor for initializing a parameter. <br /></td></tr>
 <tr class="separator:a0daabd9177ee8c2e46af55347279ef5d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab165b54c81b34812eec248433fa64a14" id="r_ab165b54c81b34812eec248433fa64a14"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classParameter.html#ab165b54c81b34812eec248433fa64a14">Parameter</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">SEXP</a> value)</td></tr>
-<tr class="memdesc:ab165b54c81b34812eec248433fa64a14"><td class="mdescLeft">&#160;</td><td class="mdescRight">The constructor for initializing a parameter.  <br /></td></tr>
-<tr class="separator:ab165b54c81b34812eec248433fa64a14"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5ba93ca36c3261d3850e67f92717c2f5" id="r_a5ba93ca36c3261d3850e67f92717c2f5"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classParameter.html#a5ba93ca36c3261d3850e67f92717c2f5">Parameter</a> ()</td></tr>
 <tr class="memdesc:a5ba93ca36c3261d3850e67f92717c2f5"><td class="mdescLeft">&#160;</td><td class="mdescRight">The constructor for initializing a parameter.  <br /></td></tr>
 <tr class="separator:a5ba93ca36c3261d3850e67f92717c2f5"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -288,48 +285,8 @@ Static Public Attributes</h2></td></tr>
 <div class="textblock"><p>An Rcpp interface that defines the <a class="el" href="classParameter.html" title="An Rcpp interface that defines the Parameter class.">Parameter</a> class. </p>
 <p>An Rcpp interface class that defines the interface between R and C++ for a parameter type. </p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="ab165b54c81b34812eec248433fa64a14" name="ab165b54c81b34812eec248433fa64a14"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab165b54c81b34812eec248433fa64a14">&#9670;&#160;</a></span>Parameter() <span class="overload">[1/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">Parameter::Parameter </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">SEXP</a>&#160;</td>
-          <td class="paramname"><em>value</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>The constructor for initializing a parameter. </p>
-<p>This constructor is for initializing a parameter from R. It checks that the input value is a single numeric value and is not NaN or Inf. If the input value is not valid, it throws an error with a descriptive message. </p><dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">value</td><td>An R object that should be a single numeric value for the parameter. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="exception"><dt>Exceptions</dt><dd>
-  <table class="exception">
-    <tr><td class="paramname">Rcpp::stop</td><td>if the input value is not a single numeric value or is NaN or Inf. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
 <a id="a5ba93ca36c3261d3850e67f92717c2f5" name="a5ba93ca36c3261d3850e67f92717c2f5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5ba93ca36c3261d3850e67f92717c2f5">&#9670;&#160;</a></span>Parameter() <span class="overload">[2/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a5ba93ca36c3261d3850e67f92717c2f5">&#9670;&#160;</a></span>Parameter()</h2>
 
 <div class="memitem">
 <div class="memproto">

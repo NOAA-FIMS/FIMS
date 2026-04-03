@@ -1,0 +1,9 @@
+bookdown::gitbook:
+  toc_depth: 1
+  css: style.css
+  config:
+    toc:
+      before: |
+        <h3>&nbsp;&nbsp;&nbsp;{testdown} report</h3>
+      after: |
+        <li><a href="https://github.com/ThinkR-open/testdown" target="blank">Built with {testdown} and {bookdown}</a></li>

@@ -9,8 +9,8 @@
     <link rel="icon" type="image/png" href="https://noaa-fims.github.io/images/FIMS_hexlogo.png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
-    <link href="https://noaa-fims.github.io/site_libs/bootstrap/bootstrap-5bca210c7b8f52bd43562cb73b8f998e.min.css" rel="stylesheet">
-    <link href="https://noaa-fims.github.io/site_libs/bootstrap/bootstrap-dark-dabf027eac5ab6a58e890faf792e317e.min.css" rel="stylesheet" media="(prefers-color-scheme: dark)">
+    <link href="bootstrap-5bca210c7b8f52bd43562cb73b8f998e.min.css" rel="stylesheet">
+    <link href="bootstrap-dark-dabf027eac5ab6a58e890faf792e317e.min.css" rel="stylesheet" media="(prefers-color-scheme: dark)">
     <script type="text/javascript" src="jquery.js"></script>
     <script type="text/javascript" src="dynsections.js"></script>
     <link href="navtree.css" rel="stylesheet" type="text/css"/>
@@ -237,6 +237,14 @@ $(document).ready(function(){initNavTree('classfims__model_1_1Model.html',''); i
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
+<tr class="memitem:a4538641e7f150147bf85aa0d4515e03d" id="r_a4538641e7f150147bf85aa0d4515e03d"><td class="memItemLeft" align="right" valign="top"><a id="a4538641e7f150147bf85aa0d4515e03d" name="a4538641e7f150147bf85aa0d4515e03d"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>Model</b> ()</td></tr>
+<tr class="memdesc:a4538641e7f150147bf85aa0d4515e03d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a new <a class="el" href="classfims__model_1_1Model.html" title="Model class. FIMS objective function.">Model</a> object. <br /></td></tr>
+<tr class="separator:a4538641e7f150147bf85aa0d4515e03d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a893676693cfab4577c8f6458680d417b" id="r_a893676693cfab4577c8f6458680d417b"><td class="memItemLeft" align="right" valign="top"><a id="a893676693cfab4577c8f6458680d417b" name="a893676693cfab4577c8f6458680d417b"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>~Model</b> ()</td></tr>
+<tr class="memdesc:a893676693cfab4577c8f6458680d417b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destroy the <a class="el" href="classfims__model_1_1Model.html" title="Model class. FIMS objective function.">Model</a> object. <br /></td></tr>
+<tr class="separator:a893676693cfab4577c8f6458680d417b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad90b8d1d3de83cd359cca7982518f28d" id="r_ad90b8d1d3de83cd359cca7982518f28d"><td class="memItemLeft" align="right" valign="top"><a id="ad90b8d1d3de83cd359cca7982518f28d" name="ad90b8d1d3de83cd359cca7982518f28d"></a>
 <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a>&#160;</td><td class="memItemRight" valign="bottom"><b>Evaluate</b> ()</td></tr>
 <tr class="memdesc:ad90b8d1d3de83cd359cca7982518f28d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate. Calculates the joint negative log-likelihood function. <br /></td></tr>
@@ -245,6 +253,7 @@ Public Member Functions</h2></td></tr>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
 <tr class="memitem:aa1648bf1cc5adc5cacc43b0dbc7fb7aa" id="r_aa1648bf1cc5adc5cacc43b0dbc7fb7aa"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">static</a> std::shared_ptr&lt; <a class="el" href="classfims__model_1_1Model.html">Model</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__model_1_1Model.html#aa1648bf1cc5adc5cacc43b0dbc7fb7aa">GetInstance</a> ()</td></tr>
+<tr class="memdesc:aa1648bf1cc5adc5cacc43b0dbc7fb7aa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate. Calculates the joint negative log-likelihood function.  <br /></td></tr>
 <tr class="separator:aa1648bf1cc5adc5cacc43b0dbc7fb7aa"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
@@ -285,6 +294,8 @@ template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e34
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Evaluate. Calculates the joint negative log-likelihood function. </p>
 <p>Returns a single Information object for type Type.</p>
 <dl class="section return"><dt>Returns</dt><dd>singleton for type Type </dd></dl>
 
