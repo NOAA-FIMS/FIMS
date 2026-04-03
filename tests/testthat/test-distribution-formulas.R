@@ -40,10 +40,11 @@ recruitment$log_r$resize(om_input$nyr - 1)
 recruitment$log_r$set_all_random(TRUE)
 
 logR_resid <- om_input$logR.resid[-1]
-purrr::walk(
-  seq_along(logR_resid),
-  \(x) recruitment$log_devs[x]$value <- logR_resid[x]
-)
+recruitment$log_devs$set_initial_values(logR_resid)
+# purrr::walk(
+#   seq_along(logR_resid),
+#   \(x) recruitment$log_devs[x]$value <- logR_resid[x]
+# )
 
 
 # set up logR_sd using the normal log_sd parameter
@@ -60,18 +61,19 @@ catch <- em_input$L.obs$fleet1
 # FIMS only has a fleet module that takes index for both survey index and
 # fishery catch
 fishing_fleet_index <- methods::new(Index, om_input$nyr)
-purrr::walk(
-  seq_along(catch),
-  \(x) fishing_fleet_index$index_data$set(x - 1, catch[x])
-)
+fishing_fleet_index$index_data$fromRVector(catch)
+# purrr::walk(
+#   seq_along(catch),
+#   \(x) fishing_fleet_index$index_data$set(x - 1, catch[x])
+# )
 fishing_fleet <- methods::new(Fleet)
 fishing_fleet$n_ages$set(om_input$nages)
 fishing_fleet$n_years$set(om_input$nyr)
-fishing_fleet$log_Fmort$resize(om_input$nyr)
-purrr::walk(
-  seq_along(log(om_output$f)),
-  \(x) fishing_fleet$log_Fmort[x]$value <- log(om_output$f)[x]
-)
+fishing_fleet$log_Fmort$fromRVector(log(om_output$f))
+# purrr::walk(
+#   seq_along(log(om_output$f)),
+#   \(x) fishing_fleet$log_Fmort[x]$value <- log(om_output$f)[x]
+# )
 fishing_fleet$log_Fmort$set_all_estimable(TRUE)
 fishing_fleet$log_q[1]$value <- log(1.0)
 fishing_fleet$log_q$set_all_estimable(FALSE)
