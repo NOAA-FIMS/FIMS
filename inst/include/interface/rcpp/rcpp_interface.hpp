@@ -194,11 +194,12 @@ void set_random_parameters(Rcpp::NumericVector par) {
     Rcpp::stop(
         "set_random_parameters() expected %d random-effect parameters or %d "
         "total parameters, but received %d.",
-      static_cast<int>(n_random), static_cast<int>(n_fixed + n_random),
+        static_cast<int>(n_random), static_cast<int>(n_fixed + n_random),
         static_cast<int>(par_size));
   }
 
-  const size_t offset = par_size == static_cast<R_xlen_t>(n_random) ? 0 : n_fixed;
+  const size_t offset =
+      par_size == static_cast<R_xlen_t>(n_random) ? 0 : n_fixed;
 
   for (size_t i = 0; i < n_random; i++) {
     *info0->random_effects_parameters[i] = par[offset + i];
