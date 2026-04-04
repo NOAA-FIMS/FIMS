@@ -426,9 +426,8 @@ JsonValue JsonParser::ParseArray() {
 void JsonParser::WriteToFile(const std::string& filename, JsonValue jsonValue) {
   std::ofstream outputFile(filename);
   if (!outputFile) {
-    throw std::runtime_error("Unable to open file " + filename + " for writing.");
-    // std::cerr << "Error: Unable to open file " << filename << " for writing."
-    //           << std::endl;
+    std::cerr << "Error: Unable to open file " << filename << " for writing."
+              << std::endl;
     return;
   }
 
