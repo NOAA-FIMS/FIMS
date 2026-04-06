@@ -46,6 +46,13 @@ if (!methods::isClass("Rcpp_ParameterVector")) {
   )
 }
 
+if (!methods::isClass("Rcpp_RealVector")) {
+  methods::setClass(
+    Class = "Rcpp_RealVector",
+    representation = methods::representation(.xData = "environment"),
+    contains = "envRefClass"
+  )
+}
 
 # Methods for Rcpp
 #' Setter for `Rcpp_ParameterVector`
@@ -286,6 +293,26 @@ methods::setMethod(
     for (i in 1:e1$size()) {
       ret[i]$value <- methods::callGeneric(e1[i]$value, e2[i])
     }
+    return(ret)
+  }
+)
+
+#' @rdname Rcpp_Math
+methods::setMethod(
+  "Ops",
+  signature(e1 = "Rcpp_RealVector", e2 = "numeric"),
+  function(e1, e2) {
+    if (e1$size() != length(e2)) {
+      if (length(e2) == 1) {
+        ret <- methods::new(RealVector, e1$size())
+        ret$fromRVector(rep(e2, e1$size()))
+  
+        return(ret)
+      }
+      stop("Call to Ops, vectors not equal length")
+    }
+    ret <- methods::new(RealVector, e1$size())
+    ret$fromRVector(e2)
     return(ret)
   }
 )
