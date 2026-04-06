@@ -410,3 +410,15 @@ multinomial <- function(link = "logit") {
   class(family_class) <- "family"
   return(family_class)
 }
+
+#' @rdname lognormal
+#' @keywords distribution
+#' @export
+dirichlet_multinomial <- function(link = "logit") {
+  family_class <- c(
+    list(family = "dirichlet_multinomial", link = link),
+    stats::make.link(link)
+  )
+  class(family_class) <- "family"
+  return(family_class)
+}
