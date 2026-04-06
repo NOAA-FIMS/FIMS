@@ -27,10 +27,10 @@ test_that("posterior equals prior with no data", {
   # set fishing fleet age comp data, need to set dimensions of age comps
   # Here the new function initializes the object with length nyr*nages
   fishing_fleet_age_comp <- methods::new(AgeComp, om_input[["nyr"]], om_input[["nages"]])
-  fishing_fleet_age_comp$age_comp_data$fromRVector(c(t(em_input[["L.age.obs"]][["fleet1"]])) * em_input[["n.L"]][["fleet1"]])
   # Here we fill in the values for the object with the observed age comps for fleet one
   # we multiply these proportions by the sample size for likelihood weighting
- 
+  fishing_fleet_age_comp$age_comp_data$fromRVector(c(t(em_input[["L.age.obs"]][["fleet1"]])) * em_input[["n.L"]][["fleet1"]])
+
 
   # set fishing fleet length comp data, need to set dimensions of length comps
   fishing_fleet_length_comp <- methods::new(LengthComp, om_input[["nyr"]], om_input[["nlengths"]])

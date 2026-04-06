@@ -54,7 +54,6 @@ test_that("EWAAGrowth evaluate() doesn't work when missing weights", {
   ewaa_growth <- methods::new(EWAAGrowth)
   ewaa_growth$n_years$set(get_n_years(fims_frame))
   # Assign age data to the EWAAGrowth object
-  ewaa_growth$ages$resize(length(ages))
   ewaa_growth$ages$fromRVector(c(ages))
 
   #' @description Test that EWAAGrowth evaluate(1) throws an error when weights are missing.
@@ -74,7 +73,6 @@ test_that("EWAAGrowth evaluate() returns expected error for mismatched input len
   ewaa_growth$ages$fromRVector(c(age_vector_long))
 
   # Assign weight data to the EWAAGrowth object
-  ewaa_growth$weights$resize(length(weights))
   ewaa_growth$weights$fromRVector(c(weights))
 
   #' @description Test that EWAAGrowth evaluate() throws an error when the lengths of ages and weights don't match.

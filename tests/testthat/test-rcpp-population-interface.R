@@ -26,7 +26,6 @@ test_that("rcpp population interface works with correct inputs", {
 
   population$log_init_naa$set_all_estimable(TRUE)
   population$n_ages$set(n_ages)
-  population$ages$resize(n_ages)
   population$ages$fromRVector(seq(1, n_ages))
   population$n_fleets$set(2)
   population$n_years$set(n_years)
