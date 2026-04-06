@@ -132,7 +132,7 @@ blog](https://noaa-fims.github.io/blog/).
 
 All contributions to this project are gratefully acknowledged using the
 [`allcontributors` package](https://github.com/ropensci/allcontributors)
-following the [all-contributors](https://allcontributors.org)
+following the [allcontributors](https://allcontributors.org)
 specification. Contributions of any kind are welcome!
 
 ### Code

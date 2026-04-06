@@ -79,7 +79,6 @@
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-reports" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Reports</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-reports">
 <li><a class="external-link dropdown-item" href="https://app.codecov.io/gh/NOAA-FIMS/FIMS" target="_blank">coverage (codecov)</a></li>
-    <li><a class="external-link dropdown-item" href="https://noaa-fims.github.io/FIMS/coverage/codecoverage_explanation.html">coverage explained</a></li>
     <li><a class="external-link dropdown-item" href="https://noaa-fims.github.io/FIMS/testdown/index.html">testdown</a></li>
   </ul>
 </li>
@@ -195,7 +194,7 @@ C++ code in <code><a href="https://rdrr.io/pkg/Rcpp/man/cppFunction.html" class=
 <span><span class="co"># after compiling, add works like a regular R function</span></span>
 <span><span class="va">add</span></span></code></pre></div>
 <pre><code><span><span class="co">## function (x, y, z) </span></span>
-<span><span class="co">## .Call(&lt;pointer: 0x7f1b66cdb530&gt;, x, y, z)</span></span></code></pre>
+<span><span class="co">## .Call(&lt;pointer: 0x7f6d2d063530&gt;, x, y, z)</span></span></code></pre>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">add</span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">3</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] 6</span></span></code></pre>
@@ -300,9 +299,9 @@ compiled <code>meanC</code> function against the R function
 <span>  <span class="fu">meanC</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Unit: microseconds</span></span>
-<span><span class="co">##      expr     min       lq     mean   median       uq      max neval</span></span>
-<span><span class="co">##   mean(x) 174.186 174.4905 176.9296 174.7045 176.3350  255.742   100</span></span>
-<span><span class="co">##  meanC(x) 258.363 258.5425 356.1626 258.6525 262.0495 9838.556   100</span></span></code></pre>
+<span><span class="co">##      expr     min      lq     mean  median       uq       max neval</span></span>
+<span><span class="co">##   mean(x) 422.869 431.775 436.9891 435.948 442.7765   503.479   100</span></span>
+<span><span class="co">##  meanC(x) 371.924 372.415 475.2762 375.601 382.8335 10104.053   100</span></span></code></pre>
 </details>
 </div>
 <div class="section level3">

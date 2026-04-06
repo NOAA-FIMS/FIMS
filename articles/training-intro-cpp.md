@@ -732,8 +732,8 @@ pointer()
 ```
 
     ## x is equal to the address of y
-    ## x is: 0x7fffa92ab094
-    ## The address of y is: 0x7fffa92ab094
+    ## x is: 0x7ffe8a2949f4
+    ## The address of y is: 0x7ffe8a2949f4
     ## *x returns the value of y: 3.1459
 
     ## [1] 0
@@ -773,8 +773,8 @@ reference()
 
     ## x is: 3
     ## y is: 3
-    ## The memory address of x is: 0x7fffa92ab094
-    ## The memory address of y is: 0x7fffa92ab094
+    ## The memory address of x is: 0x7ffe8a2949f4
+    ## The memory address of y is: 0x7ffe8a2949f4
 
     ## [1] 0
 
@@ -845,9 +845,9 @@ reassign_pointer()
 ```
 
     ## c now equals the address of b
-    ## &a = 0x7fffa92ab090
-    ## &b = 0x7fffa92ab094
-    ## c = 0x7fffa92ab094
+    ## &a = 0x7ffe8a2949f0
+    ## &b = 0x7ffe8a2949f4
+    ## c = 0x7ffe8a2949f4
     ## a = 100
     ## b = 10
     ## *c = 10
@@ -978,8 +978,8 @@ shared_pointer()
 
     ## ptr1: 42
     ## ptr2: 24
-    ## ptr1 = 0x55dfc4bf2100
-    ## ptr2 = 0x55dfc4985760
-    ## ptr3 = 0x55dfc4bf2100
+    ## ptr1 = 0x561e0dac1a30
+    ## ptr2 = 0x561e11192b70
+    ## ptr3 = 0x561e0dac1a30
 
     ## [1] 0
