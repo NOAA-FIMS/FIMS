@@ -344,7 +344,7 @@ test_that("`model_*()` works with the correct inputs", {
     #' @description Test that `model_age_comp()` works with correct inputs.
     age_comp_dat[[fleet_names_age_comp[fleet_f]]]$age_comp_data$fromRVector(model_age_comp(fims_frame, fleet_names_age_comp[fleet_f]))
     expect_silent(
-         age_comp_dat[[fleet_names_age_comp[fleet_f]]]$age_comp_data$fromRVector(model_age_comp(fims_frame, fleet_names_age_comp[fleet_f]))
+      age_comp_dat[[fleet_names_age_comp[fleet_f]]]$age_comp_data$fromRVector(model_age_comp(fims_frame, fleet_names_age_comp[fleet_f]))
     )
   }
 

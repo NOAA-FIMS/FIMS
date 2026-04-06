@@ -6,6 +6,7 @@
 \alias{Ops,numeric,Rcpp_Parameter-method}
 \alias{Ops,Rcpp_ParameterVector,Rcpp_ParameterVector-method}
 \alias{Ops,Rcpp_ParameterVector,numeric-method}
+\alias{Ops,Rcpp_RealVector,numeric-method}
 \alias{Ops,numeric,Rcpp_ParameterVector-method}
 \alias{Math,Rcpp_ParameterVector-method}
 \title{Sets methods for operators under the S4 Generic Group, Ops}
@@ -19,6 +20,8 @@
 \S4method{Ops}{Rcpp_ParameterVector,Rcpp_ParameterVector}(e1, e2)
 
 \S4method{Ops}{Rcpp_ParameterVector,numeric}(e1, e2)
+
+\S4method{Ops}{Rcpp_RealVector,numeric}(e1, e2)
 
 \S4method{Ops}{numeric,Rcpp_ParameterVector}(e1, e2)
 

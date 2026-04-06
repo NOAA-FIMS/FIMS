@@ -37,7 +37,7 @@ run_FIMS_projection_scenario <- function(om_input,
   # currently FIMS only has a fleet module that takes index for both survey index and fishery landings
   fishing_fleet_landings <- methods::new(Landings, om_input[["nyr"]] + n_projection_years)
   fishing_fleet_landings$landings_data$fromRVector(c(landings, projected_landings))
-  
+
   # set fishing fleet age comp data, need to set dimensions of age comps
   # Here the new function initializes the object with length nyr*n_ages
   fishing_fleet_age_comp <- methods::new(AgeComp, (om_input[["nyr"]] + n_projection_years), om_input[["nages"]])
@@ -52,8 +52,8 @@ run_FIMS_projection_scenario <- function(om_input,
       matrix(-999, nrow = n_projection_years, ncol = om_input[["nages"]])
     )
   }
-  fishing_fleet_age_comp$age_comp_data$fromRVector(c(t(projected_age_comps))) 
-  
+  fishing_fleet_age_comp$age_comp_data$fromRVector(c(t(projected_age_comps)))
+
 
   # set fishing fleet length comp data, need to set dimensions of length comps
   fishing_fleet_length_comp <- methods::new(LengthComp, (om_input[["nyr"]] + n_projection_years), om_input[["nlengths"]])
@@ -66,8 +66,8 @@ run_FIMS_projection_scenario <- function(om_input,
     projected_length_comps,
     matrix(-999, nrow = n_projection_years, ncol = om_input[["nlengths"]])
   )
-fishing_fleet_length_comp$length_comp_data$fromRVector(c(t(projected_length_comps)))
- 
+  fishing_fleet_length_comp$length_comp_data$fromRVector(c(t(projected_length_comps)))
+
 
   # Fleet
   # Create the fishing fleet
@@ -152,7 +152,7 @@ fishing_fleet_length_comp$length_comp_data$fromRVector(c(t(projected_length_comp
   survey_index <- em_input[["surveyB.obs"]][["survey1"]]
   survey_fleet_index <- methods::new(Index, om_input[["nyr"]] + n_projection_years)
   survey_fleet_index$index_data$fromRVector(c(survey_index, projected_index))
- 
+
 
   survey_fleet_age_comp <- methods::new(AgeComp, (om_input[["nyr"]] + n_projection_years), om_input[["nages"]])
 
@@ -172,7 +172,7 @@ fishing_fleet_length_comp$length_comp_data$fromRVector(c(t(projected_length_comp
     matrix(-999, nrow = n_projection_years, ncol = om_input[["nlengths"]])
   )
   survey_fleet_length_comp$length_comp_data$fromRVector(c(t(projected_survey_length_comps)))
- 
+
   # Fleet
   # Create the survey fleet
   survey_fleet_selectivity <- methods::new(LogisticSelectivity)
@@ -335,7 +335,7 @@ fishing_fleet_length_comp$length_comp_data$fromRVector(c(t(projected_length_comp
   population$log_init_naa$set_all_estimable(TRUE)
   population$n_ages$set(om_input[["nages"]])
   population$ages$fromRVector(om_input[["ages"]])
- 
+
   population$n_fleets$set(sum(om_input[["fleet_num"]], om_input[["survey_num"]]))
   population$n_years$set(om_input[["nyr"]] + n_projection_years)
   population$SetRecruitmentID(recruitment$get_id())
