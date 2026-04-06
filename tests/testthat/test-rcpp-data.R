@@ -51,7 +51,7 @@ test_that("rcpp data works with correct inputs", {
     age_comp_dat[[fleet_names_age_comp[fleet_f]]] <- methods::new(AgeComp, n_years, n_ages)
     #' @description Test that adding age-composition data to a model is possible.
     expect_silent(
-        age_comp_dat[[fleet_names_age_comp[fleet_f]]]$age_comp_data$fromRVector(c(t(model_age_comp(fims_frame, fleet_names_age_comp[fleet_f]))))
+      age_comp_dat[[fleet_names_age_comp[fleet_f]]]$age_comp_data$fromRVector(c(t(model_age_comp(fims_frame, fleet_names_age_comp[fleet_f]))))
     )
   }
 

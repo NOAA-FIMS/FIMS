@@ -132,7 +132,7 @@ test_that("rcpp distribution works with correct inputs", {
 
   dmultinom_$observed_values$resize(length(p))
   dmultinom_$observed_values$set_values(c(x_values))
- 
+
 
   # evaluate the density and compare with R
   #' @description Test that dmultinom works with vector inputs.
@@ -350,7 +350,7 @@ test_that("rcpp distribution returns correct error messages", {
   dnorm_$expected_values$resize(length(y))
   dnorm_$expected_values$set_values(rep(log(1), length(y)))
   dnorm_$log_sd$resize(length(y))
- 
+
   #' @description dnorm should error out when there is a dimension mismatch where it is expecting `expected_values` to have a size 10 but is provided a size 11 vector.
   expect_error(
     object = dnorm_$evaluate(),
@@ -420,7 +420,7 @@ test_that("rcpp distribution returns correct error messages", {
 
   dmultinom_$observed_values$resize(length(p))
   dmultinom_$observed_values$set_values(c(x_values))
- 
+
   #' @description dmultinom should error out when there is a dimension mismatch.
   expect_error(
     object = dmultinom_$evaluate(),

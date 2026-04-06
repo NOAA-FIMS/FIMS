@@ -73,7 +73,6 @@ methods::setMethod(
   f = "[<-",
   signature = signature(x = "Rcpp_ParameterVector"),
   definition = function(x, i, j, value) {
-
     if (missing(i)) {
       # p[] <- c(...)
       x$resize(length(value))
@@ -126,7 +125,6 @@ methods::setMethod(
   f = "[<-",
   signature = signature(x = "Rcpp_RealVector"),
   definition = function(x, i, j, value) {
-
     if (missing(i)) {
       # p[] <- c(...)
       x$fromRVector(value)
@@ -306,7 +304,7 @@ methods::setMethod(
       if (length(e2) == 1) {
         ret <- methods::new(RealVector, e1$size())
         ret$fromRVector(rep(e2, e1$size()))
-  
+
         return(ret)
       }
       stop("Call to Ops, vectors not equal length")

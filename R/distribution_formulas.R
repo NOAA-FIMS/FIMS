@@ -326,11 +326,10 @@ initialize_data_distribution <- function(
     # create new Rcpp module
     new_module <- methods::new(DnormDistribution)
     new_module$log_sd$resize(length(sd[["value"]]))
-        # populate logged standard deviation parameter with log of input
+    # populate logged standard deviation parameter with log of input
 
     new_module$log_sd$set_values(log(sd[["value"]]))
     new_module$log_sd$set_estimation_types(sd[["estimation_type"]])
-
   }
 
   if (family[["family"]] == "multinomial") {
@@ -392,7 +391,7 @@ initialize_process_distribution <- function(
     # populate logged standard deviation parameter with log of input
     new_module$log_sd$resize(length(sd[["value"]]))
     new_module$log_sd$set_values(log(sd[["value"]]))
- 
+
     # setup whether or not sd parameter is estimated
     if (length(sd[["value"]]) > 1 && length(sd[["estimation_type"]]) == 1) {
       if (sd[["estimation_type"]] == "constant") {

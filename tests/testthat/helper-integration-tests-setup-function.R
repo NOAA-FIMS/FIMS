@@ -92,21 +92,21 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   # currently FIMS only has a fleet module that takes index for both survey index and fishery landings
   fishing_fleet_landings <- methods::new(Landings, om_input[["nyr"]])
   fishing_fleet_landings$landings_data$fromRVector(landings)
- 
+
 
   # set fishing fleet age comp data, need to set dimensions of age comps
   # Here the new function initializes the object with length nyr*n_ages
   fishing_fleet_age_comp <- methods::new(AgeComp, om_input[["nyr"]], om_input[["nages"]])
   # Here we fill in the values for the object with the observed age comps for fleet one
   # we multiply these proportions by the sample size for likelihood weighting
-  
+
   fishing_fleet_age_comp$age_comp_data$fromRVector(c(t(em_input[["L.age.obs"]][["fleet1"]])) * em_input[["n.L"]][["fleet1"]])
 
 
   # set fishing fleet length comp data, need to set dimensions of length comps
   fishing_fleet_length_comp <- methods::new(LengthComp, om_input[["nyr"]], om_input[["nlengths"]])
   fishing_fleet_length_comp$length_comp_data$fromRVector(c(t(em_input[["L.length.obs"]][["fleet1"]])) * em_input[["n.L.lengthcomp"]][["fleet1"]])
- 
+
   # Fleet
   # Create the fishing fleet
   fishing_fleet_selectivity <- methods::new(LogisticSelectivity)
@@ -186,12 +186,12 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
 
   survey_fleet_age_comp <- methods::new(AgeComp, om_input[["nyr"]], om_input[["nages"]])
   survey_fleet_age_comp$age_comp_data$fromRVector(c(t(em_input[["survey.age.obs"]][["survey1"]])) * em_input[["n.survey"]][["survey1"]])
- 
+
 
   survey_lengthcomp <- em_input[["survey.length.obs"]][["survey1"]]
   survey_fleet_length_comp <- methods::new(LengthComp, om_input[["nyr"]], om_input[["nlengths"]])
   survey_fleet_length_comp$length_comp_data$fromRVector(c(t(em_input[["survey.length.obs"]][["survey1"]])) * em_input[["n.survey.lengthcomp"]][["survey1"]])
- 
+
   # Fleet
   # Create the survey fleet
   survey_fleet_selectivity <- methods::new(LogisticSelectivity)

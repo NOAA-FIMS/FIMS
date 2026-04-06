@@ -112,7 +112,7 @@ initialize_module <- function(parameters, data, module_name, fleet_name = NA_cha
       module[["age_to_length_conversion"]]$resize(length(age_to_length_conversion_value))
       # Assign each value to the corresponding position in the parameter vector
       module[["age_to_length_conversion"]]$set_values(age_to_length_conversion_value)
-    
+
       # Set the estimation information for the entire parameter vector
       module[["age_to_length_conversion"]]$set_all_estimable(FALSE)
 
@@ -173,8 +173,7 @@ initialize_module <- function(parameters, data, module_name, fleet_name = NA_cha
         )
       )
     } else if (field %in% c("ages", "weights")) {
-
-     get_value_function <- switch(field,
+      get_value_function <- switch(field,
         "ages" = get_ages,
         "weights" = model_weight_at_age
       )
@@ -184,7 +183,6 @@ initialize_module <- function(parameters, data, module_name, fleet_name = NA_cha
       )
       module[[field]]$resize(module_length)
       module[[field]]$fromRVector(get_value_function(data))
-     
     } else {
       set_param_vector(
         field = field,
@@ -420,7 +418,7 @@ initialize_landings <- function(data, fleet_name) {
   if ("landings" %in% fleet_type) {
     module <- methods::new(Landings, get_n_years(data))
     module$landings_data$fromRVector(model_landings(data, fleet_name))
-   
+
     return(module)
   } else {
     return(NULL)
@@ -454,7 +452,7 @@ initialize_index <- function(data, fleet_name) {
   if ("index" %in% fleet_type) {
     module <- methods::new(Index, get_n_years(data))
     module$index_data$fromRVector(model_index(data, fleet_name))
-   
+
     return(module)
   } else {
     return(NULL)
