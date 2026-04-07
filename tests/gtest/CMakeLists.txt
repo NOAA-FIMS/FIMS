@@ -342,4 +342,4 @@ target_link_libraries(FimsMathDdiricMultinomTest
   gtest_main
   fims_test
 )
-gtest_discover_tests(FimsMathDdiricMultinomTest DISCOVERY_TIMEOUT 60)
+gtest_discover_tests(FimsMathDdiricMultinomTest DISCOVERY_TIMEOUT 10)
