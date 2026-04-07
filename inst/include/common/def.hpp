@@ -610,8 +610,6 @@ class FIMSLog {
   }
 };
 
-// std::shared_ptr<FIMSLog> FIMSLog::fims_log = std::make_shared<FIMSLog>();
-
 }  // namespace fims
 
 /**
