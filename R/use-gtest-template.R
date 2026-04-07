@@ -1,3 +1,4 @@
+#' file = R/use-gtest-template.R
 #' Create tests/gtest/test_*.cpp test file and register it in CMakeLists.txt
 #'
 #' This helper function generates a GoogleTest (gtest) C++ template file for a

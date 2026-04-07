@@ -1,5 +1,6 @@
 /**
  * @file fims_modules.hpp
+ * in src
  * @brief Rcpp module definitions. Allows for the use of
  * methods::new() in R.
  * @copyright This file is part of the NOAA, National Marine Fisheries Service
