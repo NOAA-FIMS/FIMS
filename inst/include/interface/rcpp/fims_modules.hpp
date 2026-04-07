@@ -22,7 +22,7 @@
 #include "rcpp_objects/rcpp_interface_base.hpp"
 #include "rcpp_interface.hpp"
 
-RCPP_EXPOSED_CLASS(Parameter)
+
 RCPP_EXPOSED_CLASS(ParameterVector)
 RCPP_EXPOSED_CLASS(RealVector)
 RCPP_EXPOSED_CLASS(SharedInt)

@@ -10,6 +10,10 @@
 #define FIMS_INTERFACE_RCPP_RCPP_OBJECTS_SHARED_PRIMITIVE_HPP
 
 #include <memory>
+#include <ostream>
+#include <sstream>
+#include <string>
+
 
 /**
  * @class SharedInt

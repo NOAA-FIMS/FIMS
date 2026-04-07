@@ -133,6 +133,8 @@ std::ostream& operator<<(std::ostream& out, const Parameter& p) {
   return out;
 }
 
+RCPP_EXPOSED_CLASS(Parameter)
+
 /**
  * @brief An Rcpp interface class that defines the ParameterVector class.
  *
