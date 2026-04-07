@@ -41,7 +41,7 @@ check_distribution_validity <- function(args) {
       EXPR = ifelse(grepl("comp", data_type), "composition", data_type),
       "landings" = c("lognormal", "gaussian"),
       "index" = c("lognormal", "gaussian"),
-      "composition" = c("multinomial"),
+      "composition" = c("multinomial","dirichlet_multinomial"),
       "unavailable data type"
     )
   }
@@ -350,6 +350,11 @@ initialize_data_distribution <- function(
     new_module <- methods::new(DmultinomDistribution)
   }
 
+    if (family[["family"]] == "dirichlet_multinomial") {
+    # create new Rcpp module
+    new_module <- methods::new(DDirichletMultinomDistribution)
+  }
+  
   # setup link to observed data
   if (data_type == "landings") {
     new_module$set_observed_data(module$GetObservedLandingsDataID())
@@ -541,6 +546,18 @@ lognormal <- function(link = "log") {
 multinomial <- function(link = "logit") {
   family_class <- c(
     list(family = "multinomial", link = link),
+    stats::make.link(link)
+  )
+  class(family_class) <- "family"
+  return(family_class)
+}
+
+#' @rdname lognormal
+#' @keywords distribution
+#' @export
+dirichlet_multinomial <- function(link = "logit") {
+  family_class <- c(
+    list(family = "dirichlet_multinomial", link = link),
     stats::make.link(link)
   )
   class(family_class) <- "family"
