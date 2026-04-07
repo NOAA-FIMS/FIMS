@@ -23,7 +23,7 @@ namespace fims_distributions {
  * @details This implementation computes row-wise Dirichlet-multinomial 
  * log-probability mass contributions from
  * observed counts (`x_vector`) and expected proportions (`prob_vector`).
- * Specifically, when evaluating the Dirichlet-multinomial likelihood, 
+ * Specifically, when evaluating the Dirichlet-multinomial log-likelihood,
  * observations are passed to `ddiric_multinom(..., give_log = true)`.
  *
  * For `data` input, if any element in a row is equal to `na_value`, the entire
