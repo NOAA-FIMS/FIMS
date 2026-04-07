@@ -1,3 +1,4 @@
+#' file = R/distribution_formulas.R
 #' Validity checks for distributions
 #'
 #' This function checks the validity of arguments passed to functions that
