@@ -1,5 +1,6 @@
 /**
  * @file rcpp_distribution.hpp
+ * in inst/include/interface/rcpp/rcpp_objects
  * @brief The Rcpp interface to declare different distributions, e.g.,
  * normal and log normal. Allows for the use of methods::new() in R.
  * @copyright This file is part of the NOAA, National Marine Fisheries Service
