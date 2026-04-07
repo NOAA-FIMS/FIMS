@@ -19,12 +19,11 @@ namespace fims_distributions {
 /**
  * @copybrief dirichlet_multinomial_lpmf.hpp
  *
- * @details This implementation relies on [TMB's R-style `dmultinom()`
- * utility]( https://kaskr.github.io/adcomp/group__R__style__distribution.html)
- * to compute row-wise Dirichlet-multinomial log-probability mass contributions from
+ * @details This implementation computes row-wise Dirichlet-multinomial 
+ * log-probability mass contributions from
  * observed counts (`x_vector`) and expected proportions (`prob_vector`).
- * Specifically, when evaluating the Dirichlet-multinomial likelihood, observations are
- * passed to `ddiric_multinom(..., give_log = true)`.
+ * Specifically, when evaluating the Dirichlet-multinomial log-likelihood, 
+ * observations are passed to `ddiric_multinom(..., give_log = true)`.
  *
  * For `data` input, if any element in a row is equal to `na_value`, the entire
  * row is skipped and contributes zero to the objective. Contributions are
