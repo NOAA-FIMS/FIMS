@@ -411,7 +411,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
     derived_quantities_map_["mortality_M"][i_age_year] = population->M[i_age_year];
 
     derived_quantities_map_["mortality_Z"][i_age_year] =
-        population->M[i_age_year] + derived_quantities_map_"mortality_F"][i_age_year];
+        population->M[i_age_year] + derived_quantities_map_["mortality_F"][i_age_year];
   }
 
   /**
@@ -591,7 +591,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
         numbers_spr[population->n_ages - 1] *
         population->proportion_female[population->n_ages - 1] *
         derived_quantities_map_["proportion_mature_at_age"][population->n_ages - 1] *
-        population->growth->evaluate(population->ages[population->n_ages - 1]);
+        population->growth->evaluate(0, population->ages[population->n_ages - 1]);
 
     return phi_0;
   }
@@ -736,7 +736,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
 
       fleet_derived_quantities_map_["landings_weight_at_age"][i_age_year] =
           fleet_derived_quantities_map_["landings_numbers_at_age"][i_age_year] *
-          population->growth->evaluate(population->ages[age]);
+          population->growth->evaluate(year, population->ages[age]);
     }
   }
 
@@ -869,7 +869,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
 
       fleet_derived_quantities_map_["index_weight_at_age"][i_age_year] =
           fleet_derived_quantities_map_["index_numbers_at_age"][i_age_year] *
-          population->growth->evaluate(population->ages[age]);
+          population->growth->evaluate(year, population->ages[age]);
     }
   }
 
