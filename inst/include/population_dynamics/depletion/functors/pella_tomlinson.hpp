@@ -45,22 +45,6 @@ struct PellaTomlinsonDepletion : public DepletionBase<Type> {
            catch_ym1 / this->carrying_capacity[0];
   }
 
-  /**
-   * @brief Create a map of report vectors for the maturity object.
-   */
-  virtual void create_report_vectors(
-      std::map<std::string, fims::Vector<fims::Vector<Type>>>& report_vectors) {
-    report_vectors["growth_rate"].emplace_back(this->growth_rate);
-    report_vectors["carrying_capacity"].emplace_back(this->carrying_capacity);
-    report_vectors["shape"].emplace_back(this->shape);
-  }
-  virtual void get_report_vector_count(
-      std::map<std::string, size_t>& report_vector_count) {
-    report_vector_count["growth_rate"] += 1;
-    report_vector_count["carrying_capacity"] += 1;
-    report_vector_count["shape"] += 1;
-  }
-
 };
 }  // namespace fims_popdy
 
