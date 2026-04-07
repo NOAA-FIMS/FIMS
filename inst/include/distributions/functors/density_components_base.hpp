@@ -69,7 +69,7 @@ struct DensityComponentBase : public fims_model_object::FIMSObject<Type> {
    * @brief If "yes", `expected_mean` is used instead of `expected_values`. The
    * default is "no" leading to the use of `expected_values`.
    */
-  std::string use_mean = fims::to_string("no");
+  std::string use_mean = std::string("no");
 
   // std::shared_ptr<DistributionElementObject<Type>> expected;
   // // Expected value of distribution function.

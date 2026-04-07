@@ -610,7 +610,7 @@ class FIMSLog {
   }
 };
 
-std::shared_ptr<FIMSLog> FIMSLog::fims_log = std::make_shared<FIMSLog>();
+// std::shared_ptr<FIMSLog> FIMSLog::fims_log = std::make_shared<FIMSLog>();
 
 }  // namespace fims
 
@@ -677,7 +677,7 @@ namespace fims {
  * SIGINT for an interrupt such as Ctrl+C, or SIGTERM for a termination
  * request).
  */
-void WriteAtExit(int sig) {
+inline void WriteAtExit(int sig) {
   std::string signal_error = "NA";
   switch (sig) {
     case SIGSEGV:

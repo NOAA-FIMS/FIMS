@@ -17,7 +17,6 @@
 #include <map>
 #include <vector>
 
-#include "../../../common/def.hpp"
 #include "../../../common/information.hpp"
 #include "../../interface.hpp"
 #include "rcpp_shared_primitive.hpp"
