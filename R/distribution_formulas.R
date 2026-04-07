@@ -41,7 +41,7 @@ check_distribution_validity <- function(args) {
       EXPR = ifelse(grepl("comp", data_type), "composition", data_type),
       "landings" = c("lognormal", "gaussian"),
       "index" = c("lognormal", "gaussian"),
-      "composition" = c("multinomial","dirichlet_multinomial"),
+      "composition" = c("multinomial", "dirichlet_multinomial"),
       "unavailable data type"
     )
   }
