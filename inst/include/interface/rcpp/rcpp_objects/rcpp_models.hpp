@@ -52,10 +52,6 @@ class FisheryModelInterfaceBase : public FIMSRcppInterfaceBase {
    */
   uint32_t id;
   /**
-   * @brief The set of population ids that this catch at age model operates on.
-   */
-  std::shared_ptr<std::set<uint32_t>> population_ids;
-  /**
    * @brief A private working map of standard error values for all
    * concatenated derived quantities. Elements are extracted in the
    * to_json method.
@@ -1406,22 +1402,17 @@ class SurplusProductionInterface : public FisheryModelInterfaceBase {
   }
 
   /**
-   * @brief Method to get the population id.
+   * @brief Method to get the this id.
    */
-  virtual uint32_t get_id() {
-    typename std::map<uint32_t,
-                      std::shared_ptr<PopulationInterfaceBase>>::iterator pit;
-    return this->id;
-  }
+  virtual uint32_t get_id() { return this->id; }
 
   /**
    *
    */
   virtual void finalize() {}
 
-  // TODO: implement population_to_json(), derived_quantity_to_json, derived_quantities_component_to_json, fleet_to_json()
-// get_fixed_parameter_vector, get_random_parameter_vector, get_report, to_json,
-//sum, sum, min, valarray
+  // TODO: implement population_to_json(), derived_quantity_to_json, 
+  // derived_quantities_component_to_json, fleet_to_json(), to_json
 
 #ifdef TMB_MODEL
   template <typename Type>

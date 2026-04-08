@@ -448,12 +448,8 @@ class SurplusProduction : public FisheryModelBase<Type> {
     // initiate population index for structuring report out objects
     int pop_idx = 0;
     for (size_t p = 0; p < this->populations.size(); p++) {
-      this->populations[p]->create_report_vectors(report_vectors);
-      // std::shared_ptr<fims_popdy::Population<Type>> &population =
-      //     this->populations[p];
       std::map<std::string, fims::Vector<Type>> &derived_quantities =
           this->GetPopulationDerivedQuantities(this->populations[p]->GetId());
-      this->populations[p]->depletion->create_report_vectors(report_vectors);
       biomass_(pop_idx) = derived_quantities["biomass"].to_tmb();
       depletion_(pop_idx) = 
           (this->populations[p]->depletion->depletion).to_tmb();
@@ -473,7 +469,6 @@ class SurplusProduction : public FisheryModelBase<Type> {
     fleet_iterator fit;
     for (fit = this->fleets.begin(); fit != this->fleets.end(); ++fit) {
       std::shared_ptr<fims_popdy::Fleet<Type>> &fleet = (*fit).second;
-      fleet->create_report_vectors(report_vectors);
       std::map<std::string, fims::Vector<Type>> &derived_quantities =
           this->GetFleetDerivedQuantities(fleet->GetId());
 

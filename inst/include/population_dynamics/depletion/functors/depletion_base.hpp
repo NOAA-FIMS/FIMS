@@ -74,7 +74,7 @@ struct DepletionBase : public fims_model_object::FIMSObject<Type> {
     growth_rate_transformation->Transform(this->log_growth_rate[0], this->growth_rate[0]);
     carrying_capacity_transformation->Transform(this->log_carrying_capacity[0], this->carrying_capacity[0]);
     shape_transformation->Transform(this->log_shape[0], this->shape[0]);
-    for(int i=0; i < this->depletion.size(); i++){
+    for(size_t i=0; i < this->depletion.size(); i++){
         depletion_transformation->Transform(this->log_depletion[i], this->depletion[i]);
     }
   }

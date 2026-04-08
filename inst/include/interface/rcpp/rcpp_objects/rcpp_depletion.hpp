@@ -680,7 +680,7 @@ class PellaTomlinsonInterface : public DepletionInterfaceBase {
     ss.str("");
     ss << "depletion." << this->id << ".log_expected_depletion";
     depletion_module->log_expected_depletion.set_tag(ss.str());
-    for (size_t i = 0; i < this->n_years.get() + 1; i++) {
+    for (size_t i = 0; i < static_cast<size_t>(this->n_years.get() + 1); i++) {
       depletion_module->log_expected_depletion[i] = 0;
     }
     info->variable_map[this->log_expected_depletion.id_m] =
