@@ -863,28 +863,36 @@ class DgammaDistributionsInterface : public DistributionsInterfaceBase {
   /**
    * @brief Observed data.
    */
-  ParameterVector x;
+  ParameterVector observed_values;
   /**
    * @brief The expected values, which would be the mean of x for this
    * distribution.
    */
   ParameterVector expected_values;
+    /**
+   * @brief The expected mean, which would be the mean of x for this
+   * distribution.
+   */
+  ParameterVector expected_mean;
   /**
    * @brief The uncertainty, which would be the standard deviation of x for the
    * gamma distribution.
    */
   ParameterVector log_sd;
   /**
-   * @brief The vector. TODO: document this more.
+   * @brief Vector that records the individual log probability function for each
+   * observation.
    */
   RealVector lpdf_vec; /**< The vector*/
 
   /**
    * @brief The constructor.
    */
-  DgammaDistributionsInterface() : DistributionsInterfaceBase() {
+  DgammaDistributionsInterface() : DistributionsInterfaceBase()  {
+    DistributionsInterfaceBase::live_objects[this->id_m] =
+        std::make_shared<DgammaDistributionsInterface>(*this);
     FIMSRcppInterfaceBase::fims_interface_objects.push_back(
-        std::make_shared<DgammaDistributionsInterface>(*this));
+        DistributionsInterfaceBase::live_objects[this->id_m]);
   }
 
   /**
@@ -894,8 +902,9 @@ class DgammaDistributionsInterface : public DistributionsInterfaceBase {
    */
   DgammaDistributionsInterface(const DgammaDistributionsInterface& other)
       : DistributionsInterfaceBase(other),
-        x(other.x),
+        observed_values(other.observed_values),
         expected_values(other.expected_values),
+        expected_mean(other.expected_mean),
         log_sd(other.log_sd),
         lpdf_vec(other.lpdf_vec) {}
 
@@ -919,13 +928,18 @@ class DgammaDistributionsInterface : public DistributionsInterfaceBase {
     return true;
   }
 
-  /**
-   * @brief Sets pointers for data observations, random effects, or priors.
-   *
-   * @param input_type String that sets whether the distribution type is for
-   * priors, random effects, or data.
-   * @param ids Vector of unique ids for each linked parameter(s), derived
-   * value(s), or observed data vector.
+   /**
+   * @copydoc DistributionsInterfaceBase::set_distribution_mean
+   */
+  virtual bool set_distribution_mean(double input_value) {
+    this->expected_mean[0].initial_value_m = input_value;
+    this->expected_mean[0].estimation_type_m.set("fixed_effects");
+    this->use_mean_m.set(fims::to_string("yes"));
+    return true;
+  }
+
+   /**
+   * @copydoc DistributionsInterfaceBase::set_distribution_links
    */
   virtual bool set_distribution_links(std::string input_type,
                                       Rcpp::IntegerVector ids) {
@@ -945,11 +959,12 @@ class DgammaDistributionsInterface : public DistributionsInterfaceBase {
    */
   virtual double evaluate() {
     fims_distributions::GammaLPDF<double> dgamma;
-    dgamma.x.resize(this->x.size());
+    dgamma.observed_values.resize(this->observed_values.size());
     dgamma.expected_values.resize(this->expected_values.size());
     dgamma.log_sd.resize(this->log_sd.size());
-    for (size_t i = 0; i < x.size(); i++) {
-      dgamma.x[i] = this->x[i].initial_value_m;
+    dgamma.expected_mean.resize(this->expected_mean.size());
+    for (size_t i = 0; i < observed_values.size(); i++) {
+      dgamma.observed_values[i] = this->observed_values[i].initial_value_m;
     }
     for (size_t i = 0; i < expected_values.size(); i++) {
       dgamma.expected_values[i] = this->expected_values[i].initial_value_m;
@@ -957,6 +972,10 @@ class DgammaDistributionsInterface : public DistributionsInterfaceBase {
     for (size_t i = 0; i < log_sd.size(); i++) {
       dgamma.log_sd[i] = this->log_sd[i].initial_value_m;
     }
+    for (size_t i = 0; i < expected_mean.size(); i++) {
+      dgamma.expected_mean[i] = this->expected_mean[i].initial_value_m;
+    }
+    dgamma.use_mean = this->use_mean_m;
     return dgamma.evaluate();
   }
 
@@ -990,27 +1009,57 @@ class DgammaDistributionsInterface : public DistributionsInterfaceBase {
           std::dynamic_pointer_cast<fims_distributions::GammaLPDF<double>>(
               it->second);
 
-      for (size_t i = 0; i < this->log_sd.size(); i++) {
+      this->lpdf_value = dgamma->lpdf;
+
+      size_t n_x = dgamma->get_n_x();
+
+      // If input log_sd is a scalar, resize to n_x and fill with the scalar
+      // value
+      if (this->log_sd.size() != n_x) {
+        // If log_sd size == 1 (scalar), repeat the entry
+        if (this->log_sd.size() == 1) {
+          auto tmp = this->log_sd[0];  // copy the one log_sd param
+          this->log_sd.resize(n_x);
+          for (size_t i = 0; i < n_x; ++i) {
+            this->log_sd[i] = tmp;  // copies all fields in Param
+          }
+        } else {
+          // Handle error
+          FIMS_WARNING_LOG(
+              "log_sd size does not match number of observations and is not "
+              "scalar.");
+        }
+      }
+      for (size_t i = 0; i < n_x; i++) {
         if (this->log_sd[i].estimation_type_m.get() == "constant") {
           this->log_sd[i].final_value_m = this->log_sd[i].initial_value_m;
         } else {
-          this->log_sd[i].final_value_m = dgamma->log_sd[i];
+          this->log_sd[i].final_value_m = dgamma->log_sd.get_force_scalar(i);
         }
       }
 
-      this->lpdf_vec = RealVector(dgamma->report_lpdf_vec.size());
-      if (this->expected_values.size() == 1) {
-        this->expected_values.resize(dgamma->expected_values.size());
-      }
-      if (this->x.size() == 1) {
-        size_t nx = dgamma->get_n_x();
-        this->x.resize(nx);
+      for (size_t i = 0; i < this->expected_mean.size(); i++) {
+        if (this->expected_mean[i].estimation_type_m.get() == "constant") {
+          this->expected_mean[i].final_value_m =
+              this->expected_mean[i].initial_value_m;
+        } else {
+          this->expected_mean[i].final_value_m = dgamma->expected_mean[i];
+        }
       }
 
-      for (R_xlen_t i = 0; i < this->lpdf_vec.size(); i++) {
-        this->lpdf_vec[i] = dgamma->report_lpdf_vec[i];
+      this->lpdf_vec = RealVector(n_x);
+      if (this->expected_values.size() == 1) {
+        this->expected_values.resize(n_x);
+      }
+      if (this->observed_values.size() == 1) {
+        size_t nx = dgamma->get_n_x();
+        this->observed_values.resize(nx);
+      }
+
+      for (size_t i = 0; i < this->lpdf_vec.size(); i++) {
+        this->lpdf_vec[i] = dgamma->lpdf_vec[i];
         this->expected_values[i].final_value_m = dgamma->get_expected(i);
-        this->x[i].final_value_m = dgamma->get_observed(i);
+        this->observed_values[i].final_value_m = dgamma->get_observed(i);
       }
     }
   }
@@ -1025,51 +1074,64 @@ class DgammaDistributionsInterface : public DistributionsInterfaceBase {
   virtual std::string to_json() {
     std::stringstream ss;
 
-    ss << "{\n";
-    ss << " \"name\": \"DgammaDistribution\",\n";
-    ss << " \"type\": \"gamma\",\n";
-    ss << " \"id\": " << this->id_m << ",\n";
-
+     ss << "{\n";
+    ss << " \"module_name\": \"density\",\n";
+    ss << " \"module_id\": " << this->id_m << ",\n";
+    ss << " \"module_type\": \"Gamma\",\n";
+    ss << " \"observed_data_id\" : " << this->interface_observed_data_id_m
+       << ",\n";
+    ss << " \"input_type\" : \"" << this->input_type_m << "\",\n";
     ss << " \"density_component\": {\n";
-    ss << "  \"name\": \"lpdf_vec\",\n";
-    ss << "  \"values\":[";
+    ss << "  \"lpdf_value\": " << this->lpdf_value << ",\n";
+    ss << "  \"value\":[";
     if (this->lpdf_vec.size() == 0) {
-      ss << "]\n";
+      ss << "],\n";
     } else {
-      for (R_xlen_t i = 0; i < this->lpdf_vec.size() - 1; i++) {
-        ss << this->lpdf_vec[i] << ", ";
+      for (size_t i = 0; i < this->lpdf_vec.size() - 1; i++) {
+        ss << this->value_to_string(this->lpdf_vec[i]);
+        ss << ", ";
       }
-      ss << this->lpdf_vec[this->lpdf_vec.size() - 1] << "]\n";
-    }
-    ss << " },\n";
+      ss << this->value_to_string(this->lpdf_vec[this->lpdf_vec.size() - 1]);
 
-    ss << " \"expected_values\": {\n";
-    ss << "  \"name\": \"expected_values\",\n";
-    ss << "  \"values\":[";
+      ss << "],\n";
+    }
+     ss << "  \"expected_values\":[";
     if (this->expected_values.size() == 0) {
+      ss << "],\n";
+    } else {
+      for (size_t i = 0; i < this->expected_values.size() - 1; i++) {
+        ss << this->value_to_string(this->expected_values[i].final_value_m)
+           << ", ";
+      }
+      ss << this->value_to_string(
+          this->expected_values[this->expected_values.size() - 1]
+              .final_value_m);
+      ss << "],\n";
+    }
+    ss << "  \"log_sd_values\":[";
+    if (this->log_sd.size() == 0) {
+      ss << "],\n";
+    } else {
+      for (R_xlen_t i = 0; i < static_cast<R_xlen_t>(this->log_sd.size()) - 1;
+           i++) {
+        ss << this->value_to_string(this->log_sd[i].final_value_m) << ", ";
+      }
+      ss << this->value_to_string(
+                this->log_sd[this->log_sd.size() - 1].final_value_m)
+         << "],\n";
+    }
+     ss << "  \"observed_values\":[";
+    if (this->observed_values.size() == 0) {
       ss << "]\n";
     } else {
-      for (R_xlen_t i = 0; i < this->expected_values.size() - 1; i++) {
-        ss << this->expected_values[i].final_value_m << ", ";
+      for (size_t i = 0; i < this->observed_values.size() - 1; i++) {
+        ss << this->observed_values[i].final_value_m << ", ";
       }
-      ss << this->expected_values[this->expected_values.size() - 1]
+      ss << this->observed_values[this->observed_values.size() - 1]
                 .final_value_m
          << "]\n";
     }
-    ss << " },\n";
-    ss << " \"observed_values\": {\n";
-    ss << "  \"name\": \"x\",\n";
-    ss << "  \"values\":[";
-    if (this->x.size() == 0) {
-      ss << "]\n";
-    } else {
-      for (R_xlen_t i = 0; i < this->x.size() - 1; i++) {
-        ss << this->x[i].final_value_m << ", ";
-      }
-      ss << this->x[this->x.size() - 1].final_value_m << "]\n";
-    }
     ss << " }}\n";
-
     return ss.str();
   }
 
@@ -1093,9 +1155,9 @@ class DgammaDistributionsInterface : public DistributionsInterfaceBase {
       distribution->key[i] = this->key_m->at(i);
     }
     distribution->id = this->id_m;
-    distribution->x.resize(this->x.size());
-    for (size_t i = 0; i < this->x.size(); i++) {
-      distribution->x[i] = this->x[i].initial_value_m;
+    distribution->observed_values.resize(this->observed_values.size());
+    for (size_t i = 0; i < this->observed_values.size(); i++) {
+      distribution->observed_values[i] = this->observed_values[i].initial_value_m;
     }
     // set relative info
     distribution->expected_values.resize(this->expected_values.size());
@@ -1120,25 +1182,36 @@ class DgammaDistributionsInterface : public DistributionsInterfaceBase {
     }
     info->variable_map[this->log_sd.id_m] = &(distribution)->log_sd;
 
+    distribution->use_mean = this->use_mean_m.get();
+    distribution->expected_mean.resize(this->expected_mean.size());
+    for (size_t i = 0; i < this->expected_mean.size(); i++) {
+      distribution->expected_mean[i] = this->expected_mean[i].initial_value_m;
+      if (this->expected_mean[i].estimation_type_m.get() == "fixed_effects") {
+        ss.str("");
+        ss << "dgamma." << this->id_m << ".expected_mean."
+           << this->expected_mean[i].id_m;
+        info->RegisterParameterName(ss.str());
+        info->RegisterParameter(distribution->expected_mean[i]);
+      }
+      if (this->expected_mean[i].estimation_type_m.get() == "random_effects") {
+        FIMS_ERROR_LOG("expected_mean cannot be set to random effects");
+      }
+    }
+    info->variable_map[this->expected_mean.id_m] =
+        &(distribution)->expected_mean;
+
     info->density_components[distribution->id] = distribution;
 
     return true;
   }
 
-  /**
+   /**
    * @brief Adds the parameters to the TMB model.
    * @return A boolean of true.
    */
   virtual bool add_to_fims_tmb() {
-#ifdef TMBAD_FRAMEWORK
     this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
     this->add_to_fims_tmb_internal<TMBAD_FIMS_TYPE>();
-#else
-    this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
-    this->add_to_fims_tmb_internal<TMB_FIMS_FIRST_ORDER>();
-    this->add_to_fims_tmb_internal<TMB_FIMS_SECOND_ORDER>();
-    this->add_to_fims_tmb_internal<TMB_FIMS_THIRD_ORDER>();
-#endif
 
     return true;
   }

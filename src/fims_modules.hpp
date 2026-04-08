@@ -434,7 +434,11 @@ RCPP_MODULE(fims) {
       .method("get_id", &EWAAGrowthInterface::get_id)
       .method("evaluate", &EWAAGrowthInterface::evaluate);
 
-  Rcpp::class_<PellaTomlinsonInterface>("PTDepletion")
+  Rcpp::class_<PellaTomlinsonInterface>(
+      "PTDepletion",
+      "See "
+      "https://noaa-fims.github.io/FIMS/doxygen/"
+      "classPellaTomlinsonInterface.html.")
       .constructor()
       .field("log_growth_rate", &PellaTomlinsonInterface::log_growth_rate)
       .field("log_carrying_capacity", &PellaTomlinsonInterface::log_carrying_capacity)
@@ -490,7 +494,10 @@ RCPP_MODULE(fims) {
       .field("expected_values", &DlnormDistributionsInterface::expected_values)
       .field("log_sd", &DlnormDistributionsInterface::log_sd);
 
-  Rcpp::class_<DgammaDistributionsInterface>("DgammaDistribution")
+  Rcpp::class_<DgammaDistributionsInterface>("DgammaDistribution",
+      "See "
+      "https://noaa-fims.github.io/FIMS/doxygen/"
+      "classDgammaDistributionsInterface.html.")
       .constructor()
       .method("get_id", &DgammaDistributionsInterface::get_id,
               "Returns a unique ID for the Dgamma distribution class.")
@@ -505,7 +512,7 @@ RCPP_MODULE(fims) {
               &DgammaDistributionsInterface::set_distribution_links,
               "Accepts a unique ID for a given parameter to link the parameter "
               "with the distribution.")
-      .field("x", &DgammaDistributionsInterface::x,
+      .field("observed_values", &DgammaDistributionsInterface::observed_values,
              "Input for distribution when not observations, e.g., prior or "
              "random effect.")
       .field("expected_values", &DgammaDistributionsInterface::expected_values,
@@ -543,9 +550,15 @@ RCPP_MODULE(fims) {
       .method("DoReporting", &CatchAtAgeInterface::DoReporting)
       .method("IsReporting", &CatchAtAgeInterface::IsReporting);
 
-  Rcpp::class_<SurplusProductionInterface>("SurplusProduction")
+  Rcpp::class_<SurplusProductionInterface>(
+      "SurplusProduction",
+      "See "
+      "https://noaa-fims.github.io/FIMS/doxygen/classSurplusProductionInterface.html.")
       .constructor()
-      .method("AddPopulation", &SurplusProductionInterface::AddPopulation);
+      .method("AddPopulation", &SurplusProductionInterface::AddPopulation)
+      .method("GetId", &SurplusProductionInterface::get_id)
+      .method("DoReporting", &SurplusProductionInterface::DoReporting)
+      .method("IsReporting", &SurplusProductionInterface::IsReporting);
 }
 
 #endif /* SRC_FIMS_MODULES_HPP */
