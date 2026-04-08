@@ -8,6 +8,9 @@ CXX_STD = CXX17
 PKG_CXXFLAGS = -DTMB_MODEL -DTMB_EIGEN_DISABLE_WARNINGS -DTMBAD_FRAMEWORK -w
 
 # Include paths
-PKG_CPPFLAGS += -I$(shell ${R_HOME}/bin/Rscript -e 'cat(system.file("include", package="TMB"))')
-PKG_CPPFLAGS += -I$(shell ${R_HOME}/bin/Rscript -e 'cat(system.file("include", package="Rcpp"))')
-PKG_CPPFLAGS += -I$(shell ${R_HOME}/bin/Rscript -e 'cat(system.file("include", package="RcppEigen"))')
+# PKG_CPPFLAGS += -I$(shell ${R_HOME}/bin/Rscript -e 'cat(system.file("include", package="TMB"))')
+# PKG_CPPFLAGS += -I$(shell ${R_HOME}/bin/Rscript -e 'cat(system.file("include", package="Rcpp"))')
+# PKG_CPPFLAGS += -I$(shell ${R_HOME}/bin/Rscript -e 'cat(system.file("include", package="RcppEigen"))')
+
+CXX17STD = -std=c++17 
+USE_CXX17 = "yes"

@@ -208,12 +208,6 @@ class FisheryModelInterfaceBase : public FIMSRcppInterfaceBase {
     return result;
   }
 };
-// static id of the FleetInterfaceBase object
-uint32_t FisheryModelInterfaceBase::id_g = 1;
-
-// FleetInterfaceBase to the FleetInterfaceBase objects
-std::map<uint32_t, std::shared_ptr<FisheryModelInterfaceBase>>
-    FisheryModelInterfaceBase::live_objects;
 
 /**
  * @brief The CatchAtAgeInterface class is used to interface with the

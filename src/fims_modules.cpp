@@ -1,1 +1,1 @@
-// #include "../inst/include/interface/rcpp/fims_modules.hpp"
+ #include "../inst/include/interface/rcpp/fims_modules.hpp"

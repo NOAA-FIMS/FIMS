@@ -67,12 +67,7 @@ class MaturityInterfaceBase : public FIMSRcppInterfaceBase {
    */
   virtual double evaluate(double x) = 0;
 };
-// static id of the MaturityInterfaceBase object
-uint32_t MaturityInterfaceBase::id_g = 1;
-// local id of the MaturityInterfaceBase object map relating the ID of the
-// MaturityInterfaceBase to the MaturityInterfaceBase objects
-std::map<uint32_t, std::shared_ptr<MaturityInterfaceBase>>
-    MaturityInterfaceBase::live_objects;
+
 
 /**
  * @brief Rcpp interface for logistic maturity to instantiate the object from R:

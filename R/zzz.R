@@ -26,10 +26,6 @@
 
 
 .onLoad <- function(libname, pkgname) {
- if (!requireNamespace("TMB", quietly = TRUE)) {
-    stop("TMB must be installed before loading FIMS")
-  }
-  library(TMB)
   Rcpp::loadModule(module = "fims", what = TRUE)
 }
 
