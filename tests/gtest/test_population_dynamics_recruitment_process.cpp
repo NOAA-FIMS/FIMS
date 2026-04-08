@@ -1,8 +1,8 @@
 #include "gtest/gtest.h"
-#include "population_dynamics/recruitment/functors/recruitment_base.hpp"
-#include "population_dynamics/recruitment/functors/sr_beverton_holt.hpp"
-#include "population_dynamics/recruitment/functors/log_r.hpp"
-#include "population_dynamics/recruitment/functors/log_devs.hpp"
+#include "recruitment/functors/recruitment_base.hpp"
+#include "recruitment/functors/sr_beverton_holt.hpp"
+#include "recruitment/functors/log_r.hpp"
+#include "recruitment/functors/log_devs.hpp"
 
 
 namespace

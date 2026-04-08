@@ -3,7 +3,7 @@
 #include <random>
 
 #include "../../inst/include/models/functors/catch_at_age.hpp"
-#include "population_dynamics/population/population.hpp"
+#include "population/population.hpp"
 
 namespace {
 

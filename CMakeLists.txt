@@ -121,10 +121,16 @@ enable_testing()
 # Creates an interface library fims_test
 add_library(fims_test INTERFACE)
 
+
+
 # Add include directories to the fims_test target
 target_include_directories(fims_test
   INTERFACE
-    inst/include
+    inst/include/common
+    inst/include/distributions
+    inst/include/models
+    inst/include/population_dynamics
+    inst/include/utilities
     ${rcpp_SOURCE_DIR}/inst/include
     ${R_HOME}/include
 )

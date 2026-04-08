@@ -1,5 +1,5 @@
 #include "gtest/gtest.h"
-#include "population_dynamics/maturity/functors/logistic.hpp"
+#include "maturity/functors/logistic.hpp"
 
 namespace
 {

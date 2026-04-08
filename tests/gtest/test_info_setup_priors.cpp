@@ -1,7 +1,7 @@
 #include "gtest/gtest.h"
-#include "common/information.hpp"
-#include "distributions/distributions.hpp"
-
+#include "information.hpp"
+#include "distributions.hpp"
+#include "test_stubs.hpp"
 namespace
 {
   // Test random effects using variable map and double values
