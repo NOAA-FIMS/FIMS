@@ -20,7 +20,7 @@ withr::local_options(list(
 ```
 
 ## FIMS - Surplus Production
-This demo sets up a surplus production model and walks through the steps of running the Bayesian implementaion through tmbstan. The model set-up relies on "power user" functions, which is a more advanced way of accessing FIMS code than the helper functions that have been developed to set up a catch-at-age model.
+This demo sets up a surplus production model and walks through the steps of running the Bayesian implementaion through SparseNUTS. The model set-up relies on "power user" functions, which is a more advanced way of accessing FIMS code than the helper functions that have been developed to set up a catch-at-age model.
 
 ```{r memory, warning=FALSE, message=FALSE}
 library(FIMS)
@@ -235,7 +235,7 @@ obj <- TMB::MakeADFun(
 
 ## Optimization or MCMC
 
-After the TMB object is created, `obj` can be passed either to `nlminb()` or `tmbstan()`. This model set-up to be run as a Bayesian model so the demo will highlight how to pass this into `tmbstan()`. The `growth_rate` and `carrying_capacity` were set-up on the natural scale to avoid the need for Jacobian transformations, which are not available yet in FIMS. It is therefore neccessary to pass in a vector of parameter minimums (all set to 0) to prevent parameter sampling outside realistic ranges. The FIMS functions `get_parameter_min_vector()` and `get_random_effects_min_vector()` pull these values from the `min` parameter attribute. 
+After the TMB object is created, `obj` can be passed either to `nlminb()` or `SparseNUTS::sample_nuts()`. This model set-up to be run as a Bayesian model so the demo will highlight how to pass this into `SparseNUTS::sample_nuts()`. The `growth_rate` and `carrying_capacity` were set-up on the natural scale to avoid the need for Jacobian transformations, which are not available yet in FIMS. It is therefore neccessary to pass in a vector of parameter minimums (all set to 0) to prevent parameter sampling outside realistic ranges. The FIMS functions `get_parameter_min_vector()` and `get_random_effects_min_vector()` pull these values from the `min` parameter attribute. 
   
 ```{r fit-mcmc, eval = FALSE}
 

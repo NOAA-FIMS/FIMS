@@ -89,9 +89,11 @@ initialize_module <- function(parameters, data, module_name, fleet_name = NA_cha
     # Remove certain fields for the Fleet module
     module_fields <- setdiff(module_fields, c(
       "log_index_expected",
+      "log_index_to_depletion_carrying_capacity_ratio",
       "log_landings_expected",
       "index_expected",
       "landings_expected",
+      "mean_log_q",
       "agecomp_expected",
       "agecomp_proportion",
       "observed_index_units",
