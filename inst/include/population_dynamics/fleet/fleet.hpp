@@ -79,25 +79,6 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
    * @brief Destructor.
    */
   virtual ~Fleet() {}
-
-  /**
-   * @brief Prepare to run the fleet module. Called at each model
-   * iteration, and used to exponentiate the natural log of q and Fmort
-   * parameters prior to evaluation.
-   *
-   */
-  void Prepare() {
-    // for(size_t fleet_ = 0; fleet_ <= this->n_fleets; fleet_++) {
-    // this -> Fmort[fleet_] = fims_math::exp(this -> log_Fmort[fleet_]);
-
-    for (size_t i = 0; i < this->log_q.size(); i++) {
-      this->q[i] = fims_math::exp(this->log_q[i]);
-    }
-
-    for (size_t year = 0; year < this->n_years; year++) {
-      this->Fmort[year] = fims_math::exp(this->log_Fmort[year]);
-    }
-  }
 };
 
 // default id of the singleton fleet class

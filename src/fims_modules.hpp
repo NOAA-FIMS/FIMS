@@ -164,6 +164,8 @@ RCPP_MODULE(fims) {
       .constructor<double>()
       .constructor<Parameter>()
       .field("value", &Parameter::initial_value_m)
+      .field("min", &Parameter::min_m)
+      .field("max", &Parameter::max_m)
       .field("estimated_value", &Parameter::final_value_m)
       .field("id", &Parameter::id_m)
       .field("estimation_type", &Parameter::estimation_type_m);
@@ -183,6 +185,8 @@ RCPP_MODULE(fims) {
       .method("set_all_estimable", &ParameterVector::set_all_estimable)
       .method("set_all_random", &ParameterVector::set_all_random)
       .method("fill", &ParameterVector::fill)
+      .method("fill_min", &ParameterVector::fill_min)
+      .method("fill_max", &ParameterVector::fill_max)
       .method("get_id", &ParameterVector::get_id);
 
   Rcpp::class_<RealVector>(

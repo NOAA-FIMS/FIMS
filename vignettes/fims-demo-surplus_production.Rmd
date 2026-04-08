@@ -60,8 +60,8 @@ The "power user" approach builds up model components using the `methods::new()` 
 ```{r setup-data-and-fleet}
 
 # Pull data from data_limited_tuna
-survey_index <- data_sp_tuna |> dplyr::filter(type == "index")
-landings <- data_sp_tuna |> dplyr::filter(type == "landings")
+survey_index <- data_limited_tuna |> dplyr::filter(type == "index")
+landings <- data_limited_tuna |> dplyr::filter(type == "landings")
 
 
 # Create data index module and assign values to index_data
@@ -180,7 +180,7 @@ growth_rate_Prior$set_distribution_links("prior",
     production$growth_rate$get_id())
 
 carrying_capacity_Prior <- new(DlnormDistribution)
-carrying_capacity_Prior$expected_values[1]$value <- carrying_capcity_prior[1]
+carrying_capacity_Prior$expected_values[1]$value <- carrying_capacity_prior[1]
 carrying_capacity_Prior$log_sd[1]$value <- log(carrying_capacity_prior[2])
 carrying_capacity_Prior$set_distribution_links("prior",         
     production$carrying_capacity$get_id())
@@ -239,18 +239,29 @@ After the TMB object is created, `obj` can be passed either to `nlminb()` or `tm
   
 ```{r fit-mcmc, eval = FALSE}
 
-opt <- stats::nlminb(obj[["par"]], obj[["fn"]], obj[["gr"]],
-    lower = c(FIMS:::get_parameter_min_vector(), 
-        FIMS:::get_random_effects_min_vector()), 
-    upper = c(FIMS:::get_parameter_max_vector(), 
-        FIMS:::get_random_effects_max_vector()), 
-    control = list(eval.max = 10000, iter.max = 10000)
-)
+ # Fit MCMC using SparseNUTS
+  fit <- NULL
+  invisible(capture.output(
+    invisible(capture.output(
+       fit <<- SparseNUTS::sample_snuts(
+        obj,
+        num_samples = 8000,
+        chains = 1,
+        metric = "stan",
+        print = FALSE,
+        refresh = 0,
+        quiet = TRUE,
+        lower = c(FIMS:::get_parameter_min_vector(), 
+            FIMS:::get_random_effects_min_vector()), 
+        upper = c(FIMS:::get_parameter_max_vector(), 
+            FIMS:::get_random_effects_max_vector()), 
+        control = list(adapt_delta = 0.99),
+        skip_optimization = TRUE
+      ),
+      type = "message"
+    ))
+  ))
 
-fit <- tmbstan::tmbstan(obj, init =  "last.par.best", iter = 8000,
-    lower = c(FIMS:::get_parameter_min_vector(), 
-        FIMS:::get_random_effects_min_vector()), 
-    upper = c(FIMS:::get_parameter_max_vector(), 
-        FIMS:::get_random_effects_max_vector()), 
-    control = list(adapt_delta = 0.99))
+  print(fit$mle$est)
+
 ```
