@@ -91,6 +91,10 @@ class GrowthDerivedObservationInterfaceBase : public GrowthInterfaceBase {
  public:
   GrowthDerivedObservationInterfaceBase() : GrowthInterfaceBase() {}
 
+  /**
+   * @brief Copy constructor.
+   * @param other Source interface object.
+   */
   GrowthDerivedObservationInterfaceBase(
       const GrowthDerivedObservationInterfaceBase& other)
       : GrowthInterfaceBase(other) {}
@@ -99,6 +103,10 @@ class GrowthDerivedObservationInterfaceBase : public GrowthInterfaceBase {
 
  protected:
   template <typename Type>
+  /**
+   * @brief Look up the registered growth-derived observation object.
+   * @return Shared pointer to the registered runtime growth object, or null.
+   */
   std::shared_ptr<fims_popdy::GrowthDerivedObservationBase<Type>>
   GetGrowthObservationFromInfo() const {
     std::shared_ptr<fims_info::Information<Type>> info =
@@ -127,6 +135,10 @@ class GrowthDerivedObservationInterfaceBase : public GrowthInterfaceBase {
   }
 
   template <typename Type>
+  /**
+   * @brief Register a runtime growth-derived observation in Information.
+   * @param growth_observation Runtime growth object to register.
+   */
   void RegisterGrowthObservationInInfo(
       const std::shared_ptr<fims_popdy::GrowthDerivedObservationBase<Type>>&
           growth_observation) const {
@@ -325,28 +337,19 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
 class VonBertalanffyGrowthInterface
     : public GrowthDerivedObservationInterfaceBase {
  public:
-  // Required parameters
-  // L1 = expected length at reference age 1
-  // L2 = expected length at reference age 2
-  // K  = growth coefficient
-  ParameterVector length_at_ref_age_1;
-  ParameterVector length_at_ref_age_2;
-  ParameterVector growth_coefficient_K;
+  ParameterVector length_at_ref_age_1; /**< expected length at reference age 1 */
+  ParameterVector length_at_ref_age_2; /**< expected length at reference age 2 */
+  ParameterVector growth_coefficient_K; /**< Von Bertalanffy growth coefficient */
+  ParameterVector reference_age_for_length_1; /**< first reference age */
+  ParameterVector reference_age_for_length_2; /**< second reference age */
+  ParameterVector length_weight_a; /**< coefficient in W = a * L^b */
+  ParameterVector length_weight_b; /**< exponent in W = a * L^b */
+  ParameterVector length_at_age_sd_at_ref_ages; /**< SD values at the two reference ages */
+  SharedInt n_ages = 0; /**< modeled number of ages for validation */
 
-   // Reference ages used to define the two-point VonB parameterization.
-  ParameterVector reference_age_for_length_1;
-  ParameterVector reference_age_for_length_2;
-
-  // Length-to-weight relationship parameters: W = a * L^b
-
-  ParameterVector length_weight_a;
-  ParameterVector length_weight_b;
-
-// Length-at-age SD values at reference ages (used to define variability).
-  ParameterVector length_at_age_sd_at_ref_ages;
-  // Age dimension (for bounds checking)
-  SharedInt n_ages = 0;
-
+  /**
+   * @brief Construct a new Von Bertalanffy growth interface.
+   */
   VonBertalanffyGrowthInterface() : GrowthDerivedObservationInterfaceBase() {
      // Register this interface instance in global registries so it can be
     // discovered and linked by ID during model initialization.
@@ -356,6 +359,10 @@ class VonBertalanffyGrowthInterface
         std::make_shared<VonBertalanffyGrowthInterface>(*this));
   }
 
+  /**
+   * @brief Copy constructor.
+   * @param other Source interface object.
+   */
   VonBertalanffyGrowthInterface(const VonBertalanffyGrowthInterface& other)
       : GrowthDerivedObservationInterfaceBase(other),
         length_at_ref_age_1(other.length_at_ref_age_1),

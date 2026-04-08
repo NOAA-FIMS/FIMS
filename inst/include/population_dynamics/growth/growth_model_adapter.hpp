@@ -27,12 +27,39 @@ class GrowthDerivedObservationBase : public GrowthBase<Type> {
   GrowthDerivedObservationBase() : GrowthBase<Type>() {}
   virtual ~GrowthDerivedObservationBase() = default;
 
+  /**
+   * @brief Set the minimum modeled age used to translate cached age indices.
+   * @param min_age Minimum age on the natural scale.
+   */
   virtual void SetAgeOffset(double min_age) = 0;
+
+  /**
+   * @brief Initialize any cached growth products.
+   * @param n_years Number of modeled years.
+   * @param n_ages Number of modeled ages.
+   * @param n_sexes Number of modeled sexes.
+   */
   virtual void Initialize(std::size_t n_years,
                           std::size_t n_ages,
                           std::size_t n_sexes = 1) = 0;
+
+  /**
+   * @brief Report whether this growth object can support the dynamic ALK path.
+   * @return True when growth-derived ALK calculations are available.
+   */
   virtual bool SupportsGrowthDerivedALK() const = 0;
+
+  /**
+   * @brief Return cached growth products for reporting or downstream use.
+   * @return Reference to the cached growth-product container.
+   */
   virtual const GrowthProducts<Type>& GetProductsForReporting() = 0;
+
+  /**
+   * @brief Evaluate weight at a supplied length.
+   * @param length Length on the natural scale.
+   * @return Weight on the natural scale.
+   */
   virtual Type EvaluateWeightAtLength(const Type& length) const = 0;
 };
 
@@ -45,48 +72,89 @@ class VonBertalanffyGrowthModelAdapter : public GrowthDerivedObservationBase<Typ
  public:
   VonBertalanffyGrowthModelAdapter() : GrowthDerivedObservationBase<Type>() {}
 
+  /**
+   * @brief Access the log-scale length-at-reference-age-1 parameter vector.
+   * @return Mutable parameter vector.
+   */
   fims::Vector<Type>& LengthAtRefAge1Vector() {
     use_param_vectors_ = true;
     vb_params_set_ = true;
     return length_at_ref_age_1_vector_;
   }
+
+  /**
+   * @brief Access the log-scale length-at-reference-age-2 parameter vector.
+   * @return Mutable parameter vector.
+   */
   fims::Vector<Type>& LengthAtRefAge2Vector() {
     use_param_vectors_ = true;
     vb_params_set_ = true;
     return length_at_ref_age_2_vector_;
   }
+
+  /**
+   * @brief Access the log-scale Von Bertalanffy growth coefficient vector.
+   * @return Mutable parameter vector.
+   */
   fims::Vector<Type>& GrowthCoefficientKVector() {
     use_param_vectors_ = true;
     vb_params_set_ = true;
     return growth_coefficient_K_vector_;
   }
+
+  /**
+   * @brief Access the first reference-age vector.
+   * @return Mutable parameter vector.
+   */
   fims::Vector<Type>& ReferenceAgeForLength1Vector() {
     use_param_vectors_ = true;
     vb_params_set_ = true;
     return reference_age_for_length_1_vector_;
   }
+
+  /**
+   * @brief Access the second reference-age vector.
+   * @return Mutable parameter vector.
+   */
   fims::Vector<Type>& ReferenceAgeForLength2Vector() {
     use_param_vectors_ = true;
     vb_params_set_ = true;
     return reference_age_for_length_2_vector_;
   }
+
+  /**
+   * @brief Access the log-scale length-weight-a vector.
+   * @return Mutable parameter vector.
+   */
   fims::Vector<Type>& LengthWeightAVector() {
     use_param_vectors_ = true;
     lw_params_set_ = true;
     return length_weight_a_vector_;
   }
+
+  /**
+   * @brief Access the log-scale length-weight-b vector.
+   * @return Mutable parameter vector.
+   */
   fims::Vector<Type>& LengthWeightBVector() {
     use_param_vectors_ = true;
     lw_params_set_ = true;
     return length_weight_b_vector_;
   }
+
+  /**
+   * @brief Access the log-scale length-at-age SD vector at the two reference ages.
+   * @return Mutable parameter vector.
+   */
   fims::Vector<Type>& LengthAtAgeSdAtRefAgesVector() {
     use_param_vectors_ = true;
     return length_at_age_sd_at_ref_ages_vector_;
   }
 
-  // If ages do not start at zero, set the minimum age here so we can
-  // translate age values to zero-based indices for cached products.
+  /**
+   * @brief Set the minimum modeled age used by cached growth products.
+   * @param min_age Minimum age on the natural scale.
+   */
   void SetAgeOffset(double min_age) override {
     age_offset_ = min_age;
     age_offset_set_ = true;
@@ -95,6 +163,12 @@ class VonBertalanffyGrowthModelAdapter : public GrowthDerivedObservationBase<Typ
     }
   }
 
+  /**
+   * @brief Initialize the backing growth model and cache dimensions.
+   * @param n_years Number of modeled years.
+   * @param n_ages Number of modeled ages.
+   * @param n_sexes Number of modeled sexes.
+   */
   void Initialize(std::size_t n_years,
                   std::size_t n_ages,
                   std::size_t n_sexes = 1) override {
@@ -113,6 +187,10 @@ class VonBertalanffyGrowthModelAdapter : public GrowthDerivedObservationBase<Typ
     }
   }
 
+  /**
+   * @brief Report that the adapter supports growth-derived ALK calculations.
+   * @return Always true for this adapter.
+   */
   bool SupportsGrowthDerivedALK() const override { return true; }
 
   virtual const Type evaluate(const double& a) const override {

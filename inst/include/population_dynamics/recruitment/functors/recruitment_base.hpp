@@ -104,7 +104,7 @@ struct RecruitmentBase : public fims_model_object::FIMSObject<Type> {
 };
 
 template <class Type>
-uint32_t RecruitmentBase<Type>::id_g = 0;
+uint32_t RecruitmentBase<Type>::id_g = 0; /**< global counter for recruitment ids */
 }  // namespace fims_popdy
 
 #endif /* FIMS_POPULATION_DYNAMICS_RECRUITMENT_BASE_HPP */

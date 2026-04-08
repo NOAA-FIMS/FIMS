@@ -14,6 +14,7 @@
 #include "../../common/model_object.hpp"
 #include "../../distributions/distributions.hpp"
 #include "../selectivity/selectivity.hpp"
+#include "../alk/functors/alk_base.hpp"
 
 namespace fims_popdy {
 
@@ -35,6 +36,10 @@ into probabilities over fleet bins, and to compute bin-based mean weight-at-age.
   int fleet_selectivity_id_m = -999; /*!< id of selectivity component*/
   std::shared_ptr<SelectivityBase<Type>>
       selectivity; /*!< selectivity component*/
+
+  // age-length key
+  std::shared_ptr<ALKBase<Type>>
+      alk; /*!< fleet-specific age-length key component */
 
   // landings data
   int fleet_observed_landings_data_id_m = -999; /*!< id of landings data */
@@ -123,7 +128,7 @@ into probabilities over fleet bins, and to compute bin-based mean weight-at-age.
 
 // default id of the singleton fleet class
 template <class Type>
-uint32_t Fleet<Type>::id_g = 0;
+uint32_t Fleet<Type>::id_g = 0; /**< global counter for fleet ids */
 
 }  // end namespace fims_popdy
 

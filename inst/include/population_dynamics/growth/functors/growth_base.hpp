@@ -36,14 +36,14 @@ struct GrowthBase : public fims_model_object::FIMSObject<Type> {
   virtual ~GrowthBase() {}
 
   /**
-   * @brief Calculates the  growth at the independent variable value.
+   * @brief Calculates the growth at the given age.
    * @param a The age at which to return weight of the fish.
    */
   virtual const Type evaluate(const double& a) const = 0;
 };
 
 template <typename Type>
-uint32_t GrowthBase<Type>::id_g = 0;
+uint32_t GrowthBase<Type>::id_g = 0; /**< global counter for growth ids */
 
 }  // namespace fims_popdy
 

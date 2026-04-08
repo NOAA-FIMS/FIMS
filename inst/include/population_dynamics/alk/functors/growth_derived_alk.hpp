@@ -1,0 +1,214 @@
+/**
+ * @file growth_derived_alk.hpp
+ * @brief Declares the GrowthDerivedALK class, which implements ALKBase
+ * using growth-derived length-at-age information and fleet length bins.
+ * @details Defines guards for the growth-derived ALK functor.
+ * @copyright This file is part of the NOAA, National Marine Fisheries Service
+ * Fisheries Integrated Modeling System project. See LICENSE in the source
+ * folder for reuse information.
+ */
+#ifndef POPULATION_DYNAMICS_GROWTH_DERIVED_ALK_HPP
+#define POPULATION_DYNAMICS_GROWTH_DERIVED_ALK_HPP
+
+#include <algorithm>
+#include <cmath>
+#include <cstddef>
+#include <memory>
+
+#include "../../../common/fims_math.hpp"
+#include "alk_base.hpp"
+#include "../../fleet/fleet.hpp"
+#include "../../growth/growth_model_adapter.hpp"
+
+namespace fims_popdy {
+
+/**
+ * @brief Growth-derived ALK implementation using fleet length bins and
+ * growth-derived length-at-age information.
+ */
+template <typename Type>
+struct GrowthDerivedALK : public ALKBase<Type> {
+  std::weak_ptr<Fleet<Type>> fleet; /**< non-owning link to the fleet */
+  std::shared_ptr<GrowthDerivedObservationBase<Type>>
+      growth_observation; /**< growth-derived observation capability */
+  const GrowthProducts<Type>* growth_products =
+      nullptr; /**< growth products used to build ALK rows */
+
+  /**
+   * @brief Constructor.
+   * @param fleet Shared pointer to the fleet using this ALK.
+   * @param growth_observation Shared pointer to the growth-derived
+   * observation capability.
+   * @param growth_products Pointer to the linked growth products.
+   */
+  GrowthDerivedALK(
+      const std::shared_ptr<Fleet<Type>>& fleet,
+      const std::shared_ptr<GrowthDerivedObservationBase<Type>>&
+          growth_observation,
+      const GrowthProducts<Type>* growth_products)
+      : ALKBase<Type>(),
+        fleet(fleet),
+        growth_observation(growth_observation),
+        growth_products(growth_products) {}
+
+  /**
+   * @brief Destructor.
+   */
+  virtual ~GrowthDerivedALK() {}
+
+  /**
+   * @brief Returns whether this growth-derived ALK is active and usable.
+   * @return True if the linked fleet, growth object, and growth products are
+   * valid and the fleet has a consistent explicit bin definition.
+   */
+  virtual bool IsActive() const override {
+    std::shared_ptr<Fleet<Type>> fleet_ptr = fleet.lock();
+    return fleet_ptr != nullptr &&
+           growth_observation != nullptr &&
+           growth_products != nullptr &&
+           growth_observation->SupportsGrowthDerivedALK() &&
+           growth_products->n_sexes == 1 &&
+           fleet_ptr->n_ages > 0 &&
+           fleet_ptr->n_lengths > 0 &&
+           fleet_ptr->lengths.size() == fleet_ptr->n_lengths;
+  }
+
+  /**
+   * @brief Builds the normalized ALK row for a given year and age.
+   * @param year Year index.
+   * @param age Age index.
+   * @param out_row Output age-to-length probability row.
+   * @return True if the ALK row was built successfully.
+   */
+  virtual bool BuildALKRow(size_t year,
+                           size_t age,
+                           fims::Vector<Type>& out_row) const override {
+    std::shared_ptr<Fleet<Type>> fleet_ptr = fleet.lock();
+    if (fleet_ptr == nullptr || !IsActive() || age >= fleet_ptr->n_ages) {
+      return false;
+    }
+
+    out_row = BuildNormalizedGrowthDerivedALKRow(year, age);
+    return out_row.size() == fleet_ptr->n_lengths;
+  }
+
+ protected:
+  /**
+   * @brief Returns the midpoint between two neighboring fleet length bins.
+   * @param fleet_ptr Shared pointer to the fleet.
+   * @param left_bin Left bin index.
+   * @param right_bin Right bin index.
+   * @return Midpoint between the two bin centers.
+   */
+  Type LengthBinMidpoint(const std::shared_ptr<Fleet<Type>>& fleet_ptr,
+                         size_t left_bin,
+                         size_t right_bin) const {
+    return static_cast<Type>(0.5) *
+           (fleet_ptr->lengths[left_bin] + fleet_ptr->lengths[right_bin]);
+  }
+
+  /**
+   * @brief Normal CDF helper used for bin probability calculations.
+   * @param x Evaluation point.
+   * @param mean Mean of the normal distribution.
+   * @param sd Standard deviation of the normal distribution.
+   * @return Probability that a normal random variable is less than or equal to x.
+   */
+#ifdef TMB_MODEL
+  Type NormalCdf(const Type& x, const Type& mean, const Type& sd) const {
+    CppAD::vector<Type> tx(1);
+    tx[0] = (x - mean) / sd;
+    return atomic::pnorm1(tx)[0];
+  }
+#else
+  Type NormalCdf(const Type& x, const Type& mean, const Type& sd) const {
+    const double z = static_cast<double>(x - mean) /
+                     (static_cast<double>(sd) * std::sqrt(2.0));
+    return static_cast<Type>(0.5 * (1.0 + std::erf(z)));
+  }
+#endif
+
+  /**
+   * @brief Computes the probability that a fish of a given age falls in one
+   * fleet length bin.
+   * @param year Year index.
+   * @param age Age index.
+   * @param length_bin Length-bin index.
+   * @return Probability mass in the requested length bin.
+   */
+  Type GrowthDerivedALKProb(size_t year,
+                            size_t age,
+                            size_t length_bin) const {
+    std::shared_ptr<Fleet<Type>> fleet_ptr = fleet.lock();
+    if (fleet_ptr == nullptr || !IsActive()) {
+      return static_cast<Type>(0.0);
+    }
+
+    if (fleet_ptr->n_lengths == 1) {
+      return static_cast<Type>(1.0);
+    }
+
+    const std::size_t y =
+        (growth_products->n_years == 0)
+            ? 0
+            : std::min(year, growth_products->n_years - 1);
+
+    const Type mean_laa = growth_products->MeanLAA(y, age, 0);
+    const Type sd_laa = fims_math::ad_max(
+        growth_products->SdLAA(y, age, 0), static_cast<Type>(1e-8));
+
+    if (length_bin == 0) {
+      const Type upper = LengthBinMidpoint(fleet_ptr, 0, 1);
+      return NormalCdf(upper, mean_laa, sd_laa);
+    }
+
+    if (length_bin + 1 == fleet_ptr->n_lengths) {
+      const Type lower =
+          LengthBinMidpoint(fleet_ptr,
+                            fleet_ptr->n_lengths - 2,
+                            fleet_ptr->n_lengths - 1);
+      return static_cast<Type>(1.0) - NormalCdf(lower, mean_laa, sd_laa);
+    }
+
+    const Type lower = LengthBinMidpoint(fleet_ptr, length_bin - 1, length_bin);
+    const Type upper = LengthBinMidpoint(fleet_ptr, length_bin, length_bin + 1);
+
+    return NormalCdf(upper, mean_laa, sd_laa) -
+           NormalCdf(lower, mean_laa, sd_laa);
+  }
+
+  /**
+   * @brief Builds a normalized growth-derived ALK row for one year and age.
+   * @param year Year index.
+   * @param age Age index.
+   * @return Normalized age-to-length probability row.
+   */
+  fims::Vector<Type> BuildNormalizedGrowthDerivedALKRow(size_t year,
+                                                        size_t age) const {
+    std::shared_ptr<Fleet<Type>> fleet_ptr = fleet.lock();
+    if (fleet_ptr == nullptr || !IsActive() || age >= fleet_ptr->n_ages) {
+      return fims::Vector<Type>();
+    }
+
+    fims::Vector<Type> alk_row(fleet_ptr->n_lengths);
+
+    Type row_sum = static_cast<Type>(0.0);
+    for (size_t l = 0; l < fleet_ptr->n_lengths; ++l) {
+      alk_row[l] = GrowthDerivedALKProb(year, age, l);
+      row_sum += alk_row[l];
+    }
+
+    const Type safe_row_sum =
+        fims_math::ad_max(row_sum, static_cast<Type>(1e-12));
+
+    for (size_t l = 0; l < fleet_ptr->n_lengths; ++l) {
+      alk_row[l] /= safe_row_sum;
+    }
+
+    return alk_row;
+  }
+};
+
+}  // namespace fims_popdy
+
+#endif /* POPULATION_DYNAMICS_GROWTH_DERIVED_ALK_HPP */

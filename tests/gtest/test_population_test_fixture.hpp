@@ -4,6 +4,7 @@
 
 #include "../../inst/include/models/functors/catch_at_age.hpp"
 #include "population_dynamics/population/population.hpp"
+#include "population_dynamics/alk/functors/fixed_matrix_alk.hpp"
 
 namespace {
 
@@ -631,6 +632,7 @@ class CAAPrepareTestFixture : public testing::Test {
       for (int j = 0; j < n_ages * n_lengths; j++) {
         fleet->age_to_length_conversion[j] = alc_distribution(generator);
       }
+      fleet->alk = std::make_shared<fims_popdy::FixedMatrixALK<double>>(fleet);
       auto selectivity =
           std::make_shared<fims_popdy::LogisticSelectivity<double>>();
       selectivity->inflection_point.resize(1);

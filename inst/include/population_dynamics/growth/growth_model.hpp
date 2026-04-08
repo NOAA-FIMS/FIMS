@@ -30,6 +30,12 @@ namespace fims_popdy {
 template <typename Type>
 class GrowthModel : public GrowthModelBase<Type> {
  public:
+  /**
+   * @brief Construct a growth model with fixed dimensions.
+   * @param n_years Number of years.
+   * @param n_ages Number of ages.
+   * @param n_sexes Number of sexes.
+   */
   GrowthModel(std::size_t n_years,
               std::size_t n_ages,
               std::size_t n_sexes = 1)

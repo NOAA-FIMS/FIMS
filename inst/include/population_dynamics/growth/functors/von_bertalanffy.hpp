@@ -29,19 +29,23 @@ namespace fims_popdy {
  */
 template <typename Type>
 struct VonBertalanffyGrowth : public GrowthBase<Type> {
-  Type length_at_ref_age_1 = Type(0.0);
-  Type length_at_ref_age_2 = Type(0.0);
-  Type growth_coefficient_K = Type(0.0);
-  Type reference_age_for_length_1 = Type(0.0);
-  Type reference_age_for_length_2 = Type(0.0);
+  Type length_at_ref_age_1 = Type(0.0); /**< expected length at reference age 1 */
+  Type length_at_ref_age_2 = Type(0.0); /**< expected length at reference age 2 */
+  Type growth_coefficient_K = Type(0.0); /**< Von Bertalanffy growth coefficient */
+  Type reference_age_for_length_1 = Type(0.0); /**< first reference age */
+  Type reference_age_for_length_2 = Type(0.0); /**< second reference age */
 
-  // length-weight conversion
-  Type length_weight_a = Type(0.0);
-  Type length_weight_b = Type(3.0);
+  Type length_weight_a = Type(0.0); /**< coefficient in W = a * L^b */
+  Type length_weight_b = Type(3.0); /**< exponent in W = a * L^b */
 
   VonBertalanffyGrowth() : GrowthBase<Type>() {}
   virtual ~VonBertalanffyGrowth() {}
 
+  /**
+   * @brief Evaluate mean length at age.
+   * @param age Age on the natural scale.
+   * @return Mean length at the requested age.
+   */
   Type length_at_age(const Type& age) const {
     const Type denom = Type(1.0) -
         fims_math::exp(-growth_coefficient_K * (reference_age_for_length_2 -
@@ -56,6 +60,11 @@ struct VonBertalanffyGrowth : public GrowthBase<Type> {
            (length_at_ref_age_2 - length_at_ref_age_1) * numer / denom_safe;
   }
 
+  /**
+   * @brief Evaluate mean weight at age via the length-weight relationship.
+   * @param age Age on the natural scale.
+   * @return Mean weight at the requested age.
+   */
   Type weight_at_age(const Type& age) const {
     Type length = length_at_age(age);
     return length_weight_a * fims_math::pow(length, length_weight_b);

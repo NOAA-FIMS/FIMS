@@ -47,6 +47,35 @@ make_vonb_convergence_context <- function() {
   )
 }
 
+make_vonb_no_fixed_alk_context <- function() {
+  data("data1", package = "FIMS")
+  no_fixed_alk_data <- data1 |>
+    dplyr::filter(type != "age-to-length-conversion")
+  fims_frame <- FIMS::FIMSFrame(no_fixed_alk_data)
+
+  configurations <- FIMS::create_default_configurations(data = fims_frame) |>
+    tidyr::unnest(cols = data) |>
+    dplyr::mutate(
+      module_type = dplyr::if_else(
+        module_name == "Growth",
+        "VonBertalanffy",
+        module_type
+      )
+    ) |>
+    tidyr::nest(.by = c(model_family, module_name, fleet_name))
+
+  parameters <- FIMS::create_default_parameters(
+    configurations = configurations,
+    data = fims_frame
+  ) |>
+    tidyr::unnest(cols = data)
+
+  list(
+    data = fims_frame,
+    parameters = parameters
+  )
+}
+
 make_two_fleet_length_context <- function() {
   data("data1", package = "FIMS")
   survey1_short_bins <- seq(0, 550, 50)
@@ -376,6 +405,26 @@ test_that("von bertalanffy report defaults to lightweight derived ALK diagnostic
 
   #' @description Test that default reporting does not materialize the full derived ALK tensor.
   expect_equal(length(report[["growth_derived_age_to_length_conversion"]][[1]]), 0)
+})
+
+test_that("von bertalanffy uses growth-derived ALK without a fixed age-to-length matrix", {
+  ctx <- make_vonb_no_fixed_alk_context()
+  on.exit({ rm(ctx); gc() }, add = TRUE)
+
+  fit <- ctx$parameters |>
+    FIMS::initialize_fims(data = ctx$data) |>
+    FIMS::fit_fims(optimize = FALSE)
+
+  report <- FIMS::get_report(fit)
+
+  #' @description Test that the growth-derived ALK path is selected when VonB growth is used without a fixed age-to-length matrix.
+  expect_equal(report[["growth_derived_alk_used"]][[1]][1], 1)
+
+  #' @description Test that no fixed age-to-length conversion matrix is reported when the fleet relies only on the growth-derived ALK path.
+  expect_equal(length(report[["age_to_length_conversion"]][[1]]), 0)
+
+  #' @description Test that growth-derived mean WAA is still reported when no fixed age-to-length matrix is supplied.
+  expect_gt(length(report[["growth_derived_mean_WAA"]][[1]]), 0)
 })
 
 test_that("default non-derived growth keeps the historical fixed ALK path", {

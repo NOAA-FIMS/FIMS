@@ -56,7 +56,7 @@ struct SelectivityBase : public fims_model_object::FIMSObject<Type> {
 
 // default id of the singleton selectivity class
 template <typename Type>
-uint32_t SelectivityBase<Type>::id_g = 0;
+uint32_t SelectivityBase<Type>::id_g = 0; /**< global counter for selectivity ids */
 
 }  // namespace fims_popdy
 
