@@ -10,6 +10,7 @@
 #define SRC_FIMS_MODULES_HPP
 
 #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_data.hpp"
+#include "../inst/include/interface/rcpp/rcpp_objects/rcpp_depletion.hpp"
 #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_fleet.hpp"
 #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_growth.hpp"
 #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_math.hpp"
@@ -89,6 +90,14 @@ RCPP_MODULE(fims) {
       "get_random_names", &get_random_names,
       "See "
       "https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html.");
+  Rcpp::function("get_parameter_min_vector", &get_parameter_min_vector,
+                 "Gets a vector of parameter minimum values.");
+  Rcpp::function("get_parameter_max_vector", &get_parameter_max_vector,
+                 "Gets a vector of parameter maximum values.");
+  Rcpp::function("get_random_effects_min_vector", &get_random_effects_min_vector,
+                 "Gets a vector of random effects minimum values.");
+  Rcpp::function("get_random_effects_max_vector", &get_random_effects_max_vector,
+                 "Gets a vector of random effects maximum values.");
   Rcpp::function(
       "clear", clear,
       "See "
@@ -155,6 +164,8 @@ RCPP_MODULE(fims) {
       .constructor<double>()
       .constructor<Parameter>()
       .field("value", &Parameter::initial_value_m)
+      .field("min", &Parameter::min_m)
+      .field("max", &Parameter::max_m)
       .field("estimated_value", &Parameter::final_value_m)
       .field("id", &Parameter::id_m)
       .field("estimation_type", &Parameter::estimation_type_m);
@@ -174,6 +185,8 @@ RCPP_MODULE(fims) {
       .method("set_all_estimable", &ParameterVector::set_all_estimable)
       .method("set_all_random", &ParameterVector::set_all_random)
       .method("fill", &ParameterVector::fill)
+      .method("fill_min", &ParameterVector::fill_min)
+      .method("fill_max", &ParameterVector::fill_max)
       .method("get_id", &ParameterVector::get_id);
 
   Rcpp::class_<RealVector>(
@@ -282,6 +295,9 @@ RCPP_MODULE(fims) {
       .field("lengthcomp_proportion", &FleetInterface::lengthcomp_proportion)
       .field("age_to_length_conversion",
              &FleetInterface::age_to_length_conversion)
+      .field("mean_log_q", &FleetInterface::mean_log_q)
+      .field("log_index_to_depletion_carrying_capacity_ratio",
+             &FleetInterface::log_index_to_depletion_carrying_capacity_ratio)
       .method("get_id", &FleetInterface::get_id)
       .method("SetName", &FleetInterface::SetName)
       .method("GetName", &FleetInterface::GetName)
@@ -340,23 +356,37 @@ RCPP_MODULE(fims) {
       "See "
       "https://noaa-fims.github.io/FIMS/doxygen/classPopulationInterface.html.")
       .constructor()
-      .method("get_id", &PopulationInterface::get_id)
-      .field("n_ages", &PopulationInterface::n_ages)
-      .field("n_fleets", &PopulationInterface::n_fleets)
-      .field("n_years", &PopulationInterface::n_years)
-      .field("n_lengths", &PopulationInterface::n_lengths)
-      .field("log_M", &PopulationInterface::log_M)
-      .field("log_f_multiplier", &PopulationInterface::log_f_multiplier)
+      .method("get_id", &PopulationInterface::get_id, "get population ID")
+      .field("n_ages", &PopulationInterface::n_ages, "number of ages")
+      .field("n_fleets", &PopulationInterface::n_fleets, "number of fleets")
+      .field("n_years", &PopulationInterface::n_years, "number of years")
+      .field("n_lengths", &PopulationInterface::n_lengths, "number of lengths")
+      .field("log_M", &PopulationInterface::log_M,
+             "natural log of the natural mortality of the population")
+      .field("log_f_multiplier", &PopulationInterface::log_f_multiplier,
+             "natural log of the fishing mortality multiplier")
       .field("spawning_biomass_ratio",
-             &PopulationInterface::spawning_biomass_ratio)
-      .field("log_init_naa", &PopulationInterface::log_init_naa)
-      .field("ages", &PopulationInterface::ages)
-      .method("SetMaturityID", &PopulationInterface::SetMaturityID)
-      .method("SetGrowthID", &PopulationInterface::SetGrowthID)
-      .method("SetRecruitmentID", &PopulationInterface::SetRecruitmentID)
-      .method("AddFleet", &PopulationInterface::AddFleet)
-      .method("SetName", &PopulationInterface::SetName)
-      .method("GetName", &PopulationInterface::GetName);
+             &PopulationInterface::spawning_biomass_ratio,
+             "spawning biomass ratio")
+      .field("log_init_naa", &PopulationInterface::log_init_naa,
+             "natural log of the initial numbers at age")
+      .field("ages", &PopulationInterface::ages,
+             "vector of ages in the population; length n_ages")
+      .method("SetMaturityID", &PopulationInterface::SetMaturityID,
+              "Set the unique id for the Maturity object")
+      .method("SetGrowthID", &PopulationInterface::SetGrowthID,
+              "Set the unique id for the growth object")
+      .method("SetRecruitmentID", &PopulationInterface::SetRecruitmentID,
+              "Set the unique id for the Recruitment object")
+      .method("SetDepletionID", &PopulationInterface::SetDepletionID,
+              "Set the unique id for the Depletion object")
+      .method("AddFleet", &PopulationInterface::AddFleet,
+              "Set a unique fleet id to the list of fleets operating on this "
+              "population")
+      .method("SetName", &PopulationInterface::SetName,
+              "Set the name of the population")
+      .method("GetName", &PopulationInterface::GetName,
+              "Get the name of the population");
 
   Rcpp::class_<LogisticMaturityInterface>(
       "LogisticMaturity",
@@ -408,6 +438,31 @@ RCPP_MODULE(fims) {
       .method("get_id", &EWAAGrowthInterface::get_id)
       .method("evaluate", &EWAAGrowthInterface::evaluate);
 
+  Rcpp::class_<PellaTomlinsonInterface>(
+      "PTDepletion",
+      "See "
+      "https://noaa-fims.github.io/FIMS/doxygen/"
+      "classPellaTomlinsonInterface.html.")
+      .constructor()
+      .field("log_growth_rate", &PellaTomlinsonInterface::log_growth_rate)
+      .field("log_carrying_capacity", &PellaTomlinsonInterface::log_carrying_capacity)
+      .field("log_shape", &PellaTomlinsonInterface::log_shape)
+      .field("growth_rate", &PellaTomlinsonInterface::growth_rate)
+      .field("carrying_capacity", &PellaTomlinsonInterface::carrying_capacity)
+      .field("shape", &PellaTomlinsonInterface::shape)
+      .field("depletion", &PellaTomlinsonInterface::depletion,
+             "The depletion process")
+      .field("log_depletion", &PellaTomlinsonInterface::log_depletion,
+             "The log-transformed depletion process")
+      .field("log_init_depletion", &PellaTomlinsonInterface::log_init_depletion,
+             "natural log of the initial depletion level")
+      .field("log_expected_depletion",
+             &PellaTomlinsonInterface::log_expected_depletion,
+             "expected depletion as a random effect on the natural log scale")
+      .field("n_years", &PellaTomlinsonInterface::n_years, "number of years")
+      .method("get_id", &PellaTomlinsonInterface::get_id)
+      .method("evaluate_mean", &PellaTomlinsonInterface::evaluate_mean);
+
   Rcpp::class_<DnormDistributionsInterface>(
       "DnormDistribution",
       "See "
@@ -443,25 +498,64 @@ RCPP_MODULE(fims) {
       .field("expected_values", &DlnormDistributionsInterface::expected_values)
       .field("log_sd", &DlnormDistributionsInterface::log_sd);
 
-  Rcpp::class_<DinvgammaDistributionsInterface>(
-      "DinvgammaDistribution",
+  Rcpp::class_<DgammaDistributionsInterface>("DgammaDistribution",
+      "See "
+      "https://noaa-fims.github.io/FIMS/doxygen/"
+      "classDgammaDistributionsInterface.html.")
+      .constructor()
+      .method("get_id", &DgammaDistributionsInterface::get_id,
+              "Returns a unique ID for the Dgamma distribution class.")
+      .method("evaluate", &DgammaDistributionsInterface::evaluate,
+              "Evaluates the gamma distribution given input data and "
+              "parameter values.")
+      .method("set_observed_data",
+              &DgammaDistributionsInterface::set_observed_data,
+              "Accepts a unique ID for a given Data Object class to link the "
+              "data with the distribution.")
+      .method("set_distribution_links",
+              &DgammaDistributionsInterface::set_distribution_links,
+              "Accepts a unique ID for a given parameter to link the parameter "
+              "with the distribution.")
+      .field("observed_values", &DgammaDistributionsInterface::observed_values,
+             "Input for distribution when not observations, e.g., prior or "
+             "random effect.")
+      .field("expected_values", &DgammaDistributionsInterface::expected_values,
+             "Mean of the distribution.")
+      .field("log_sd", &DgammaDistributionsInterface::log_sd,
+             "The natural log of the standard deviation.");
+
+  Rcpp::class_<DinvgammaDistributionsInterface>("DinvgammaDistribution",
       "See "
       "https://noaa-fims.github.io/FIMS/doxygen/"
       "classDinvgammaDistributionsInterface.html.")
       .constructor()
-      .method("get_id", &DinvgammaDistributionsInterface::get_id)
-      .method("evaluate", &DinvgammaDistributionsInterface::evaluate)
+      .method("get_id", &DinvgammaDistributionsInterface::get_id,
+              "Returns a unique ID for the Dinvgamma distribution class.")
+      .method("evaluate", &DinvgammaDistributionsInterface::evaluate,
+              "Evaluates the inverse gamma distribution given input data and "
+              "parameter values.")
       .method("set_observed_data",
-              &DinvgammaDistributionsInterface::set_observed_data)
+              &DinvgammaDistributionsInterface::set_observed_data,
+              "Accepts a unique ID for a given Data Object class to link the "
+              "data with the distribution.")
+      .method("set_distribution_mean",
+              &DinvgammaDistributionsInterface::set_distribution_mean,
+              "Sets the mean of the distribution to a fixed value.")
       .method("set_distribution_links",
-              &DinvgammaDistributionsInterface::set_distribution_links)
-      .field("observed_values",
-             &DinvgammaDistributionsInterface::observed_values)
-      .field("expected_values",
-             &DinvgammaDistributionsInterface::expected_values)
-      .field("log_sd", &DinvgammaDistributionsInterface::log_sd);
+              &DinvgammaDistributionsInterface::set_distribution_links,
+              "Accepts a unique ID for a given parameter to link the parameter "
+              "with the distribution.")
+      .field("observed_values", &DinvgammaDistributionsInterface::observed_values,
+             "Input for distribution when not observations, e.g., prior or "
+             "random effect.")
+      .field("expected_values", &DinvgammaDistributionsInterface::expected_values,
+             "Mean of the distribution.")
+      .field("expected_mean", &DinvgammaDistributionsInterface::expected_mean,
+             "Mean of the distribution when set_distribution_mean is used.")
+      .field("log_sd", &DinvgammaDistributionsInterface::log_sd,
+             "The natural log of the standard deviation.");
 
-  Rcpp::class_<DmultinomDistributionsInterface>(
+   Rcpp::class_<DmultinomDistributionsInterface>(
       "DmultinomDistribution",
       "See "
       "https://noaa-fims.github.io/FIMS/doxygen/"
@@ -490,6 +584,16 @@ RCPP_MODULE(fims) {
       .method("GetId", &CatchAtAgeInterface::get_id)
       .method("DoReporting", &CatchAtAgeInterface::DoReporting)
       .method("IsReporting", &CatchAtAgeInterface::IsReporting);
+
+  Rcpp::class_<SurplusProductionInterface>(
+      "SurplusProduction",
+      "See "
+      "https://noaa-fims.github.io/FIMS/doxygen/classSurplusProductionInterface.html.")
+      .constructor()
+      .method("AddPopulation", &SurplusProductionInterface::AddPopulation)
+      .method("GetId", &SurplusProductionInterface::get_id)
+      .method("DoReporting", &SurplusProductionInterface::DoReporting)
+      .method("IsReporting", &SurplusProductionInterface::IsReporting);
 }
 
 #endif /* SRC_FIMS_MODULES_HPP */

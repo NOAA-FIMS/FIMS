@@ -12,7 +12,15 @@
 
 # Load or prepare any necessary data for testing
 ## IO correctness ----
-test_that("rcpp distribution works with correct inputs", {
+
+# dinvgamma helper for validation
+dinvgamma_r <- function(x, shape, scale, logscale = TRUE) {
+  ret <- shape * log(scale) - lgamma(shape) - (shape + 1) * log(x) - scale / x
+  if (logscale) ret else exp(ret)
+}
+
+
+test_that("DnormDistribution works with correct inputs", {
   # generate data using R stats::rnorm
   set.seed(123)
 
@@ -77,7 +85,9 @@ test_that("rcpp distribution works with correct inputs", {
   #' @description Test that dnorm works with vectors of state variables (x) and arguments, e.g., an index likelihood vector.
   expect_equal(dnorm_$evaluate(), sum(stats::dnorm(y, 0, 1, TRUE)))
   clear()
+})
 
+test_that("DlnormDistribution works with correct inputs", {
   # generate data using R stats::rlnorm
   set.seed(123)
   # simulate lognormal data
@@ -142,8 +152,164 @@ test_that("rcpp distribution works with correct inputs", {
   #' @description Test that dlnorm with vectors of state variables (x) and arguments, e.g., an index likelihood vector.
   expect_equal(dlnorm_$evaluate(), sum(stats::dlnorm(y, 0, 1, TRUE)))
   clear()
+})
 
-  # generate data using R stats:rnorm
+test_that("DgammaDistribution works with correct inputs", {
+  # generate data using R stats::rgamma
+  set.seed(123)
+
+  # simulate gamma data with scalar input
+  # e.g. a prior on a parameter
+  # Using shape=4, scale=2 which gives mean=8, sd=4
+  mean_val <- 8
+  sd_val <- 4
+  shape_val <- (mean_val / sd_val)^2
+  scale_val <- (sd_val^2) / mean_val
+  
+  y <- stats::rgamma(1, shape = shape_val, scale = scale_val)
+  
+  # create a fims Rcpp object
+  # initialize the Dgamma module
+  dgamma_ <- methods::new(DgammaDistribution)
+  # populate class members
+  dgamma_$observed_values[1]$value <- y
+  dgamma_$expected_values[1]$value <- mean_val
+  dgamma_$log_sd[1]$value <- log(sd_val)
+  # evaluate the density and compare with R
+  #' @description Test that dgamma works with a single value input,
+  expect_equal(dgamma_$evaluate(), stats::dgamma(y, shape = shape_val, scale = scale_val, log = TRUE))
+  clear()
+
+  # Test that dgamma works with a vector of state variables,
+  # but scalar arguments, e.g., a random effect vector
+
+  # simulate gamma data
+  y <- stats::rgamma(10, shape = shape_val, scale = scale_val)
+  # create a fims Rcpp object
+  # initialize the Dgamma module
+  dgamma_ <- methods::new(DgammaDistribution)
+  # populate class members
+  dgamma_$observed_values$resize(length(y))
+  purrr::walk(
+    seq_along(y),
+    \(x) dgamma_$observed_values[x]$value <- y[x]
+  )
+  dgamma_$expected_values$resize(length(y))
+  purrr::walk(
+    seq_along(y),
+    \(x) dgamma_$expected_values[x]$value <- mean_val
+  )
+  dgamma_$log_sd[1]$value <- log(sd_val)
+  # evaluate the density and compare with R
+  #' @description Test that dgamma works with a vector of state variables, but scalar arguments.
+  expect_equal(dgamma_$evaluate(), sum(stats::dgamma(y, shape = shape_val, scale = scale_val, log = TRUE)))
+  clear()
+
+  # Test that dgamma works with vectors of state variables (x)
+  # and arguments, e.g., an index likelihood vector
+
+  # simulate gamma data
+  y <- stats::rgamma(10, shape = shape_val, scale = scale_val)
+  # create a fims Rcpp object
+  # initialize the Dgamma module
+  dgamma_ <- methods::new(DgammaDistribution)
+  # populate class members
+  dgamma_$observed_values$resize(length(y))
+  purrr::walk(
+    seq_along(y),
+    \(x) dgamma_$observed_values[x]$value <- y[x]
+  )
+  dgamma_$expected_values$resize(length(y))
+  purrr::walk(
+    seq_along(y),
+    \(x) dgamma_$expected_values[x]$value <- mean_val
+  )
+  dgamma_$log_sd$resize(length(y))
+  purrr::walk(
+    seq_along(y),
+    \(x) dgamma_$log_sd[x]$value <- log(sd_val)
+  )
+  # evaluate the density and compare with R
+  #' @description Test that dgamma works with vectors of state variables (x) and arguments.
+  expect_equal(dgamma_$evaluate(), sum(stats::dgamma(y, shape = shape_val, scale = scale_val, log = TRUE)))
+  clear()
+})
+
+test_that("DinvgammaDistribution works with correct inputs", {
+  # generate data using R 1/rgamma
+  set.seed(123)
+
+  # simulate inverse gamma data with scalar input
+  # Using mean=8, sd=4 which gives shape=4, scale=2
+  mean_val <- 8
+  sd_val <- 4
+  shape_val <- (mean_val / sd_val)^2
+  scale_val <- (sd_val^2) / mean_val
+
+  y <- 1 / stats::rgamma(1, shape = shape_val, rate = scale_val)
+
+  # create a fims Rcpp object
+  dinvgamma_ <- methods::new(DinvgammaDistribution)
+  # populate class members
+  dinvgamma_$observed_values[1]$value <- y
+  dinvgamma_$expected_values[1]$value <- mean_val
+  dinvgamma_$log_sd[1]$value <- log(sd_val)
+  # evaluate the density and compare with R reference
+  #' @description Test that dinvgamma works with a single value input, e.g. a prior on a parameter.
+  expect_equal(dinvgamma_$evaluate(), dinvgamma_r(y, shape_val, scale_val))
+  clear()
+
+  # simulate inverse gamma data for a vector
+  y <- 1 / stats::rgamma(10, shape = shape_val, rate = scale_val)
+  # create a fims Rcpp object
+  dinvgamma_ <- methods::new(DinvgammaDistribution)
+  # populate class members
+  dinvgamma_$observed_values$resize(length(y))
+  purrr::walk(
+    seq_along(y),
+    \(x) dinvgamma_$observed_values[x]$value <- y[x]
+  )
+  dinvgamma_$expected_values$resize(length(y))
+  purrr::walk(
+    seq_along(y),
+    \(x) dinvgamma_$expected_values[x]$value <- mean_val
+  )
+  dinvgamma_$log_sd[1]$value <- log(sd_val)
+  # evaluate the density and compare with R reference
+  #' @description Test that dinvgamma works with a vector of state variables, but scalar arguments.
+  expect_equal(dinvgamma_$evaluate(), sum(dinvgamma_r(y, shape_val, scale_val)))
+  clear()
+
+  # simulate inverse gamma data for a vector with vector log_sd
+  y <- 1 / stats::rgamma(10, shape = shape_val, rate = scale_val)
+  # create a fims Rcpp object
+  dinvgamma_ <- methods::new(DinvgammaDistribution)
+  # populate class members
+  dinvgamma_$observed_values$resize(length(y))
+  purrr::walk(
+    seq_along(y),
+    \(x) dinvgamma_$observed_values[x]$value <- y[x]
+  )
+  dinvgamma_$expected_values$resize(length(y))
+  purrr::walk(
+    seq_along(y),
+    \(x) dinvgamma_$expected_values[x]$value <- mean_val
+  )
+  dinvgamma_$log_sd$resize(length(y))
+  purrr::walk(
+    seq_along(y),
+    \(x) dinvgamma_$log_sd[x]$value <- log(sd_val)
+  )
+  # evaluate the density and compare with R reference
+  #' @description Test that dinvgamma works with vectors of state variables (x) and arguments.
+  expect_equal(dinvgamma_$evaluate(), sum(dinvgamma_r(y, shape_val, scale_val)))
+  clear()
+})
+
+
+test_that("DmultinomDistribution works with correct inputs", {
+
+  # generate data using R stats:rmultinom
   set.seed(123)
   p <- (1:10) / sum(1:10)
   x_values <- t(stats::rmultinom(1, 100, p))
@@ -178,7 +344,7 @@ test_that("rcpp distribution works with correct inputs", {
 
 ## Edge handling ----
 
-test_that("rcpp_distribution returns correct outputs for edge cases", {
+test_that("DnormDistribution returns correct outputs for edge cases", {
   set.seed(123)
   y <- -1000
   # create a fims Rcpp object
@@ -254,7 +420,10 @@ test_that("rcpp_distribution returns correct outputs for edge cases", {
   #' @description Test extreme log_sd values for dnorm (-10) return expected output.
   expect_equal(dnorm_$evaluate(), stats::dnorm(y, 0, exp(-10), TRUE))
   clear()
+})
 
+test_that("DlnormDistribution returns correct outputs for edge cases", {
+  set.seed(123)
   y <- 0
   dlnorm_ <- methods::new(DlnormDistribution)
   # populate class members
@@ -323,7 +492,177 @@ test_that("rcpp_distribution returns correct outputs for edge cases", {
   #' @description Test extreme log_sd values for dlnorm (-10) return expected output.
   expect_equal(dlnorm_$evaluate(), 9.0810615)
   clear()
+})
 
+test_that("DgammaDistribution returns correct outputs for edge cases", {
+   set.seed(123)
+  
+  mean_val <- 8
+  sd_val <- 4
+  shape_val <- (mean_val / sd_val)^2
+  scale_val <- (sd_val^2) / mean_val
+  
+  y <- 0.001
+  # create a fims Rcpp object
+  # initialize the Dgamma module
+  dgamma_ <- methods::new(DgammaDistribution)
+  # populate class members
+  dgamma_$observed_values[1]$value <- y
+  dgamma_$expected_values[1]$value <- mean_val
+  dgamma_$log_sd[1]$value <- log(sd_val)
+  # evaluate the density and compare with R
+  #' @description Test extreme observed values for dgamma (y <- 0.001) return expected output.
+  expect_equal(dgamma_$evaluate(), stats::dgamma(y, shape = shape_val, scale = scale_val, log = TRUE))
+  clear()
+  
+  y <- 1000
+  # create a fims Rcpp object
+  # initialize the Dgamma module
+  dgamma_ <- methods::new(DgammaDistribution)
+  # populate class members
+  dgamma_$observed_values[1]$value <- y
+  dgamma_$expected_values[1]$value <- mean_val
+  dgamma_$log_sd[1]$value <- log(sd_val)
+  # evaluate the density and compare with R
+  #' @description Test extreme observed values for dgamma (y <- 1000) return expected output.
+  expect_equal(dgamma_$evaluate(), stats::dgamma(y, shape = shape_val, scale = scale_val, log = TRUE))
+  clear()
+
+  y <- 5
+  mean_val <- 0.1
+  sd_val <- 0.05
+  shape_val <- (mean_val / sd_val)^2
+  scale_val <- (sd_val^2) / mean_val
+  # create a fims Rcpp object
+  # initialize the Dgamma module
+  dgamma_ <- methods::new(DgammaDistribution)
+  # populate class members
+  dgamma_$observed_values[1]$value <- y
+  dgamma_$expected_values[1]$value <- mean_val
+  dgamma_$log_sd[1]$value <- log(sd_val)
+  # evaluate the density and compare with R
+  #' @description Test extreme expected values for dgamma (mean = 0.1) return expected output.
+  expect_equal(dgamma_$evaluate(), stats::dgamma(y, shape = shape_val, scale = scale_val, log = TRUE))
+  clear()
+  
+  y <- 5
+  mean_val <- 1000
+  sd_val <- 500
+  shape_val <- (mean_val / sd_val)^2
+  scale_val <- (sd_val^2) / mean_val
+  # create a fims Rcpp object
+  # initialize the Dgamma module
+  dgamma_ <- methods::new(DgammaDistribution)
+  # populate class members
+  dgamma_$observed_values[1]$value <- y
+  dgamma_$expected_values[1]$value <- mean_val
+  dgamma_$log_sd[1]$value <- log(sd_val)
+  # evaluate the density and compare with R
+    #' @description Test extreme expected values for dgamma (mean = 1000) return expected output.
+  expect_equal(dgamma_$evaluate(), stats::dgamma(y, shape = shape_val, scale = scale_val, log = TRUE))
+  clear()
+
+  y <- 5
+  mean_val <- 8
+  sd_val <- exp(3)
+  shape_val <- (mean_val / sd_val)^2
+  scale_val <- (sd_val^2) / mean_val
+  # create a fims Rcpp object
+  # initialize the Dgamma module
+  dgamma_ <- methods::new(DgammaDistribution)
+  # populate class members
+  dgamma_$observed_values[1]$value <- y
+  dgamma_$expected_values[1]$value <- mean_val
+  dgamma_$log_sd[1]$value <- 3
+  # evaluate the density and compare with R
+  #' @description Test extreme log_sd values for dgamma (log_sd = exp(3)) return expected output.
+  expect_equal(dgamma_$evaluate(), stats::dgamma(y, shape = shape_val, scale = scale_val, log = TRUE))
+  clear()
+  
+  y <- 5
+  mean_val <- 8
+  sd_val <- exp(-3)
+  shape_val <- (mean_val / sd_val)^2
+  scale_val <- (sd_val^2) / mean_val
+  # create a fims Rcpp object
+  # initialize the Dgamma module
+  dgamma_ <- methods::new(DgammaDistribution)
+  # populate class members
+  dgamma_$observed_values[1]$value <- y
+  dgamma_$expected_values[1]$value <- mean_val
+  dgamma_$log_sd[1]$value <- -3
+  # evaluate the density and compare with R
+  #' @description Test extreme log_sd values for dgamma (log_sd = exp(-3)) return expected output.
+  expect_equal(dgamma_$evaluate(), stats::dgamma(y, shape = shape_val, scale = scale_val, log = TRUE))
+  clear()
+  
+  y <- -1
+  mean_val <- 8
+  sd_val <- 4
+  shape_val <- (mean_val / sd_val)^2
+  scale_val <- (sd_val^2) / mean_val
+  dgamma_ <- methods::new(DgammaDistribution)
+  # populate class members
+  dgamma_$observed_values[1]$value <- y
+  dgamma_$expected_values[1]$value <- mean_val
+  dgamma_$log_sd[1]$value <- log(sd_val)
+  #' @description Test that dgamma returns -Inf for negative observed values
+  expect_true(is.nan(dgamma_$evaluate()))
+  clear()
+  
+  y <- 0
+  dgamma_ <- methods::new(DgammaDistribution)
+  # populate class members
+  dgamma_$observed_values[1]$value <- y
+  dgamma_$expected_values[1]$value <- mean_val
+  dgamma_$log_sd[1]$value <- log(sd_val)
+  #' @description Test that dgamma returns -Inf for zero observed values
+  expect_equal(dgamma_$evaluate(), -Inf)
+  clear()
+})
+
+test_that("DinvgammaDistribution returns correct outputs for edge cases", {
+  set.seed(123)
+
+  mean_val <- 8
+  sd_val <- 4
+  shape_val <- (mean_val / sd_val)^2
+  scale_val <- (sd_val^2) / mean_val
+
+  # Test with a very small positive x
+  y <- 0.001
+  dinvgamma_ <- methods::new(DinvgammaDistribution)
+  dinvgamma_$observed_values[1]$value <- y
+  dinvgamma_$expected_values[1]$value <- mean_val
+  dinvgamma_$log_sd[1]$value <- log(sd_val)
+  #' @description Test extreme observed values for dinvgamma (very small positive x) return expected output.
+  expect_equal(dinvgamma_$evaluate(), dinvgamma_r(y, shape_val, scale_val))
+  clear()
+
+  # Test with large positive x
+  y <- 1000.0
+  dinvgamma_ <- methods::new(DinvgammaDistribution)
+  dinvgamma_$observed_values[1]$value <- y
+  dinvgamma_$expected_values[1]$value <- mean_val
+  dinvgamma_$log_sd[1]$value <- log(sd_val)
+  #' @description Test extreme observed values for dinvgamma (large positive x) return expected output.
+  expect_equal(dinvgamma_$evaluate(), dinvgamma_r(y, shape_val, scale_val))
+  clear()
+
+  # Test with x = 0 (should return -Inf due to log(0))
+  y <- 0.0
+  dinvgamma_ <- methods::new(DinvgammaDistribution)
+  dinvgamma_$observed_values[1]$value <- y
+  dinvgamma_$expected_values[1]$value <- mean_val
+  dinvgamma_$log_sd[1]$value <- log(sd_val)
+  #' @description Test that dinvgamma returns -Inf for x = 0.
+  expect_equal(dinvgamma_$evaluate(), -Inf)
+  clear()
+})
+
+
+test_that("DmultinomDistribution returns correct outputs for edge cases", {
+   set.seed(123)
   # generate data using R stats:rnorm
   p <- c(1, rep(0, 9))
   x_values <- t(stats::rmultinom(1, 1000, p))
@@ -384,7 +723,8 @@ test_that("rcpp_distribution returns correct outputs for edge cases", {
 })
 
 ## Error handling ----
-test_that("rcpp distribution returns correct error messages", {
+test_that("DnormDistribution returns correct error messages", {
+  set.seed(123)
   y <- stats::rnorm(10)
   # create a fims Rcpp object
   # initialize the Dnorm module
@@ -412,7 +752,7 @@ test_that("rcpp distribution returns correct error messages", {
   # populate class members
   dnorm_$observed_values$resize(length(y))
   purrr::walk(
-    seq_along(dnorm_),
+    seq_along(dnorm_$observed_values),
     \(x) dnorm_$observed_values[x]$value <- y[x]
   )
   dnorm_$expected_values$resize(length(y))
@@ -427,7 +767,10 @@ test_that("rcpp distribution returns correct error messages", {
     regexp = "NormalLPDF::Vector .* out of bounds. .* 10 .* 3"
   )
   clear()
+})
 
+test_that("DlnormDistribution returns correct error messages", {
+  set.seed(123)
   y <- stats::rlnorm(n = 10, meanlog = 0, sdlog = 1)
   # create a fims Rcpp object
   # initialize the Dlnorm module
@@ -471,7 +814,75 @@ test_that("rcpp distribution returns correct error messages", {
     regexp = "LognormalLPDF::Vector .* out of bounds. .* 10 .* 3"
   )
   clear()
+})
 
+test_that("DgammaDistribution returns correct error messages", {
+  set.seed(123)
+  y <- stats::rgamma(10, shape = 4, scale = 2)
+  # create a fims Rcpp object
+  # initialize the Dgamma module
+  dgamma_ <- methods::new(DgammaDistribution)
+  # populate class members
+  dgamma_$observed_values$resize(length(y))
+  purrr::walk(
+    seq_along(y),
+    \(x) dgamma_$observed_values[x]$value <- y[x]
+  )
+  dgamma_$expected_values$resize(length(y))
+  purrr::walk(
+    seq_along(y),
+    \(x) dgamma_$expected_values[x]$value <- 8
+  )
+  dgamma_$log_sd$resize(3)
+  purrr::walk(
+    1:3,
+    \(x) dgamma_$log_sd[x]$value <- log(4)
+  )
+  #' @description dgamma should error out when there is a dimension mismatch
+  #' where it is expecting log_sd to have a size 10
+  #' but is provided a size 3 vector.
+  expect_error(
+    object = dgamma_$evaluate(),
+    regexp = "GammaLPDF::Vector .* out of bounds. .* 10 .* 3"
+  )
+  clear()
+})
+
+test_that("DinvgammaDistribution returns correct error messages", {
+  set.seed(123)
+  mean_val <- 8
+  sd_val <- 4
+  shape_val <- (mean_val / sd_val)^2
+  scale_val <- (sd_val^2) / mean_val
+  y <- 1 / stats::rgamma(10, shape = shape_val, rate = scale_val)
+
+  # create a fims Rcpp object with mismatched log_sd size
+  dinvgamma_ <- methods::new(DinvgammaDistribution)
+  # populate class members
+  dinvgamma_$observed_values$resize(length(y))
+  purrr::walk(
+    seq_along(y),
+    \(x) dinvgamma_$observed_values[x]$value <- y[x]
+  )
+  dinvgamma_$expected_values$resize(length(y))
+  purrr::walk(
+    seq_along(y),
+    \(x) dinvgamma_$expected_values[x]$value <- mean_val
+  )
+  dinvgamma_$log_sd$resize(3)
+  purrr::walk(
+    1:3,
+    \(x) dinvgamma_$log_sd[x]$value <- log(sd_val)
+  )
+  #' @description dinvgamma should error out when there is a dimension mismatch where log_sd has size 3 but should be size 10.
+  expect_error(
+    object = dinvgamma_$evaluate(),
+    regexp = "InvGammaLPDF::Vector .* out of bounds. .* 10 .* 3"
+  )
+  clear()
+})
+
+test_that("DmultinomDistribution returns correct error messages", {
   set.seed(123)
   p <- (1:12) / sum(1:12)
   x_values <- t(stats::rmultinom(1, 100, p))
@@ -499,7 +910,6 @@ test_that("rcpp distribution returns correct error messages", {
   )
   clear()
 
-  set.seed(123)
   p <- (1:10) / sum(1:10)
   x_values <- t(stats::rmultinom(1, 100, p))
   # create a fims Rcpp object

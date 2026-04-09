@@ -1,12 +1,13 @@
 /**
  * @file invgamma_lpdf.hpp
- * @brief Implements the InvGammaLPDF distribution functor used by FIMS to
- * evaluate observation-level and total log-likelihood contributions under an
- * inverse gamma error model for data, priors, and random effects.
+ * @brief Inverse Gamma Log Probability Density Function (LPDF) module file
+ * defines the InvGamma LPDF class and its fields and returns the log
+ * probability density function.
  * @copyright This file is part of the NOAA, National Marine Fisheries Service
  * Fisheries Integrated Modeling System project. See LICENSE in the source
  * folder for reuse information.
  */
+
 #ifndef INVGAMMA_LPDF
 #define INVGAMMA_LPDF
 
@@ -55,7 +56,7 @@ struct InvGammaLPDF : public DensityComponentBase<Type> {
   /**
    * @brief Evaluates the inverse gamma log probability density function.
    * @details The following equation is the inverse gamma probability density
-   * function, and thus, the log of it is evaluated:
+   * function:
    * \f[
    * f(x) = \frac{\mathrm{scale}^{\mathrm{shape}}}{\Gamma(\mathrm{shape})}
    * x^{-\mathrm{shape}-1} \exp\left(-\frac{\mathrm{scale}}{x}\right),
@@ -75,12 +76,13 @@ struct InvGammaLPDF : public DensityComponentBase<Type> {
     this->lpdf = static_cast<Type>(0);
 
     // Dimension checks
-    if (n_x != n_expected) {
-      if (n_expected == 1) {
-        n_expected = n_x;
-      } else if (n_x > n_expected) {
-        n_x = n_expected;
-      }
+    if (n_expected > 1 && n_expected != n_x) {
+      throw std::invalid_argument(
+          "InvGammaLPDF::Vector index out of bounds. The size of observed "
+          "data does not equal the expected size. The observed data vector "
+          "is of size " +
+          fims::to_string(n_x) +
+          " and the expected size is " + fims::to_string(n_expected));
     }
 
     if (this->log_sd.size() > 1 && n_x != this->log_sd.size()) {
@@ -93,15 +95,16 @@ struct InvGammaLPDF : public DensityComponentBase<Type> {
     }
 
     for (size_t i = 0; i < n_x; i++) {
-      Type log_sd_i = log_sd.get_force_scalar(i);
-      Type mu_i = this->get_expected(i);
-      // shape = (mu / exp(log_sd))^2 = (mu / sigma)^2
-      Type shape = fims_math::pow(mu_i / fims_math::exp(log_sd_i),
-                                  static_cast<Type>(2.0));
-      // scale = exp(2 * log_sd) / mu = sigma^2 / mu
-      Type scale =
-          fims_math::exp(static_cast<Type>(2.0) * log_sd_i) / mu_i;
 #ifdef TMB_MODEL
+      // Calculate shape and scale parameters from mean (expected value) and
+      // standard deviation:
+      // shape = (mean/sd)^2
+      // scale = sd^2/mean
+      Type mean_val = this->get_expected(i);
+      Type sd_val = fims_math::exp(log_sd.get_force_scalar(i));
+      Type shape = (mean_val / sd_val) * (mean_val / sd_val);
+      Type scale = (sd_val * sd_val) / mean_val;
+
       if (this->input_type == "data") {
         // if data, check if there are any NA values and skip lpdf calculation
         // if there are
@@ -111,9 +114,15 @@ struct InvGammaLPDF : public DensityComponentBase<Type> {
         } else {
           this->lpdf_vec[i] = 0;
         }
+        // if not data (i.e. prior or process), use x vector instead of
+        // observed_values
       } else {
-        this->lpdf_vec[i] =
-            fims_math::dinvgamma(this->get_observed(i), shape, scale);
+        // TODO: hard coded for now but need to address NA values when observed
+        // value is derived from data
+        if (this->get_observed(i) != -999) {
+          this->lpdf_vec[i] =
+              fims_math::dinvgamma(this->get_observed(i), shape, scale);
+        }
       }
       this->lpdf += this->lpdf_vec[i];
       if (this->simulate_flag) {
