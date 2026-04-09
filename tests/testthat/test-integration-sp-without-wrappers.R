@@ -9,7 +9,6 @@
 
 # Deterministic test ----
 ## Setup ----
-source("tests/testthat/helper-integration-tests-setup-function.R")
 
 ## IO correctness ----
 test_that("deterministic run works with correct inputs", {
@@ -158,9 +157,9 @@ test_that("MLE run works", {
   for(i in c(1:3, 23, 24)) {
     idx <- 1
     expect_near(
-      print((result$report$depletion |> unlist())[i])
-      print((data_limited_tuna_results |>
-        dplyr::filter(label == "depletion") |> dplyr::pull(median))[idx])
+      (result$report$depletion |> unlist())[i],
+      (data_limited_tuna_results |>
+        dplyr::filter(label == "depletion") |> dplyr::pull(median))[idx]
     )
     idx <- idx + 1
   }
