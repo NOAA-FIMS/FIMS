@@ -31,25 +31,20 @@ struct GrowthDerivedALK : public ALKBase<Type> {
   std::weak_ptr<Fleet<Type>> fleet; /**< non-owning link to the fleet */
   std::shared_ptr<GrowthDerivedObservationBase<Type>>
       growth_observation; /**< growth-derived observation capability */
-  const GrowthProducts<Type>* growth_products =
-      nullptr; /**< growth products used to build ALK rows */
 
   /**
    * @brief Constructor.
    * @param fleet Shared pointer to the fleet using this ALK.
    * @param growth_observation Shared pointer to the growth-derived
    * observation capability.
-   * @param growth_products Pointer to the linked growth products.
    */
   GrowthDerivedALK(
       const std::shared_ptr<Fleet<Type>>& fleet,
       const std::shared_ptr<GrowthDerivedObservationBase<Type>>&
-          growth_observation,
-      const GrowthProducts<Type>* growth_products)
+          growth_observation)
       : ALKBase<Type>(),
         fleet(fleet),
-        growth_observation(growth_observation),
-        growth_products(growth_products) {}
+        growth_observation(growth_observation) {}
 
   /**
    * @brief Destructor.
@@ -58,11 +53,14 @@ struct GrowthDerivedALK : public ALKBase<Type> {
 
   /**
    * @brief Returns whether this growth-derived ALK is active and usable.
-   * @return True if the linked fleet, growth object, and growth products are
-   * valid and the fleet has a consistent explicit bin definition.
+   * @return True if the linked fleet and growth object are valid, the linked
+   * growth products support the single-sex path, and the fleet has a
+   * consistent explicit bin definition.
    */
   virtual bool IsActive() const override {
     std::shared_ptr<Fleet<Type>> fleet_ptr = fleet.lock();
+    const GrowthProducts<Type>* growth_products = TryGetGrowthProducts();
+
     return fleet_ptr != nullptr &&
            growth_observation != nullptr &&
            growth_products != nullptr &&
@@ -83,16 +81,29 @@ struct GrowthDerivedALK : public ALKBase<Type> {
   virtual bool BuildALKRow(size_t year,
                            size_t age,
                            fims::Vector<Type>& out_row) const override {
-    std::shared_ptr<Fleet<Type>> fleet_ptr = fleet.lock();
-    if (fleet_ptr == nullptr || !IsActive() || age >= fleet_ptr->n_ages) {
-      return false;
-    }
-
     out_row = BuildNormalizedGrowthDerivedALKRow(year, age);
-    return out_row.size() == fleet_ptr->n_lengths;
+    std::shared_ptr<Fleet<Type>> fleet_ptr = fleet.lock();
+    return fleet_ptr != nullptr && out_row.size() == fleet_ptr->n_lengths;
   }
 
  protected:
+  /**
+   * @brief Try to get the current growth products from the linked growth object.
+   * @return Pointer to the current growth products, or nullptr if unavailable.
+   */
+  const GrowthProducts<Type>* TryGetGrowthProducts() const {
+    if (growth_observation == nullptr ||
+        !growth_observation->SupportsGrowthDerivedALK()) {
+      return nullptr;
+    }
+
+    try {
+      return &(growth_observation->GetProductsForReporting());
+    } catch (...) {
+      return nullptr;
+    }
+  }
+
   /**
    * @brief Returns the midpoint between two neighboring fleet length bins.
    * @param fleet_ptr Shared pointer to the fleet.
@@ -131,31 +142,30 @@ struct GrowthDerivedALK : public ALKBase<Type> {
   /**
    * @brief Computes the probability that a fish of a given age falls in one
    * fleet length bin.
+   * @param fleet_ptr Shared pointer to the fleet.
+   * @param growth_products Reference to the linked growth products.
    * @param year Year index.
    * @param age Age index.
    * @param length_bin Length-bin index.
    * @return Probability mass in the requested length bin.
    */
-  Type GrowthDerivedALKProb(size_t year,
+  Type GrowthDerivedALKProb(const std::shared_ptr<Fleet<Type>>& fleet_ptr,
+                            const GrowthProducts<Type>& growth_products,
+                            size_t year,
                             size_t age,
                             size_t length_bin) const {
-    std::shared_ptr<Fleet<Type>> fleet_ptr = fleet.lock();
-    if (fleet_ptr == nullptr || !IsActive()) {
-      return static_cast<Type>(0.0);
-    }
-
     if (fleet_ptr->n_lengths == 1) {
       return static_cast<Type>(1.0);
     }
 
     const std::size_t y =
-        (growth_products->n_years == 0)
+        (growth_products.n_years == 0)
             ? 0
-            : std::min(year, growth_products->n_years - 1);
+            : std::min(year, growth_products.n_years - 1);
 
-    const Type mean_laa = growth_products->MeanLAA(y, age, 0);
+    const Type mean_laa = growth_products.MeanLAA(y, age, 0);
     const Type sd_laa = fims_math::ad_max(
-        growth_products->SdLAA(y, age, 0), static_cast<Type>(1e-8));
+        growth_products.SdLAA(y, age, 0), static_cast<Type>(1e-8));
 
     if (length_bin == 0) {
       const Type upper = LengthBinMidpoint(fleet_ptr, 0, 1);
@@ -186,7 +196,15 @@ struct GrowthDerivedALK : public ALKBase<Type> {
   fims::Vector<Type> BuildNormalizedGrowthDerivedALKRow(size_t year,
                                                         size_t age) const {
     std::shared_ptr<Fleet<Type>> fleet_ptr = fleet.lock();
-    if (fleet_ptr == nullptr || !IsActive() || age >= fleet_ptr->n_ages) {
+    const GrowthProducts<Type>* growth_products = TryGetGrowthProducts();
+
+    if (fleet_ptr == nullptr ||
+        growth_products == nullptr ||
+        age >= fleet_ptr->n_ages ||
+        growth_products->n_sexes != 1 ||
+        fleet_ptr->n_ages == 0 ||
+        fleet_ptr->n_lengths == 0 ||
+        fleet_ptr->lengths.size() != fleet_ptr->n_lengths) {
       return fims::Vector<Type>();
     }
 
@@ -194,7 +212,8 @@ struct GrowthDerivedALK : public ALKBase<Type> {
 
     Type row_sum = static_cast<Type>(0.0);
     for (size_t l = 0; l < fleet_ptr->n_lengths; ++l) {
-      alk_row[l] = GrowthDerivedALKProb(year, age, l);
+      alk_row[l] = GrowthDerivedALKProb(
+        fleet_ptr, *growth_products, year, age, l);
       row_sum += alk_row[l];
     }
 

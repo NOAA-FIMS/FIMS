@@ -55,8 +55,7 @@ std::shared_ptr<ALKBase<Type>> BuildFleetALK(
           fleet->lengths.size() == fleet->n_lengths) {
         std::shared_ptr<ALKBase<Type>> alk =
             std::make_shared<GrowthDerivedALK<Type>>(
-                fleet, growth_observation, &growth_products);
-
+                fleet, growth_observation);
         if (alk != nullptr && alk->IsActive()) {
           FIMS_INFO_LOG("Growth-derived ALK successfully set to fleet " +
                         fims::to_string(fleet->id) + " for population " +
