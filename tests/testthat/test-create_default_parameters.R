@@ -43,21 +43,14 @@ test_that("`create_default_parameters()` works with correct inputs", {
     )
   )
 
-  result <- tryCatch(
-  {
+ 
   #' @description Test that the generated parameter values have not changed from the accepted snapshot.
   expect_snapshot_file(
     save_csv(result_unnested),
     "default_parameters.csv",
     compare = compare_file_text
-  ) },
-  error = function(e) {
-    message("ERROR MESSAGE: ", conditionMessage(e))
-    message("CALL: ")
-    print(e$call)
-    stop(e)  # IMPORTANT: rethrow so testthat still fails
-  }
-)
+  ) 
+})
 
 ## Edge handling ----
 test_that("`create_default_parameters()` works with edge cases", {
@@ -106,3 +99,4 @@ test_that("`create_default_parameters()` works with edge cases", {
 
 # TODO: Add additional tests for internal (unexposed) functions,
 # such as create_default_population().
+
