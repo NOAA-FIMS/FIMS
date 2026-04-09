@@ -819,7 +819,7 @@ setup_and_run_surplus_production_model <-
     } else {
       # Optimization with nlminb
       opt <- stats::nlminb(obj[["par"]], obj[["fn"]], obj[["gr"]],
-        control = list(eval.max = 10000, iter.max = 10000, trace = 1)
+        control = list(eval.max = 10000, iter.max = 10000)
       )
       for(i in 1:3){
        opt <- with(
