@@ -462,6 +462,23 @@ RCPP_MODULE(fims) {
              &DmultinomDistributionsInterface::expected_values)
       .field("dims", &DmultinomDistributionsInterface::dims);
 
+  Rcpp::class_<DinvgammaDistributionsInterface>(
+      "DinvgammaDistribution",
+      "See "
+      "https://noaa-fims.github.io/FIMS/doxygen/"
+      "classDinvgammaDistributionsInterface.html.")
+      .constructor()
+      .method("get_id", &DinvgammaDistributionsInterface::get_id)
+      .method("evaluate", &DinvgammaDistributionsInterface::evaluate)
+      .method("set_observed_data",
+              &DinvgammaDistributionsInterface::set_observed_data)
+      .method("set_distribution_links",
+              &DinvgammaDistributionsInterface::set_distribution_links)
+      .field("observed_values",
+             &DinvgammaDistributionsInterface::observed_values)
+      .field("shape", &DinvgammaDistributionsInterface::shape)
+      .field("scale", &DinvgammaDistributionsInterface::scale);
+
   Rcpp::class_<CatchAtAgeInterface>(
       "CatchAtAge",
       "See "

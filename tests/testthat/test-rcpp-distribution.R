@@ -526,3 +526,146 @@ test_that("rcpp distribution returns correct error messages", {
   )
   clear()
 })
+
+## IO correctness ----
+test_that("dinvgamma works with correct inputs", {
+  # Reference dinvgamma function matching the C++ implementation
+  dinvgamma_r <- function(x, shape, scale, logscale = TRUE) {
+    ret <- shape * log(scale) - lgamma(shape) - (shape + 1) * log(x) -
+      scale / x
+    if (logscale) {
+      return(ret)
+    } else {
+      return(exp(ret))
+    }
+  }
+
+  # simulate inverse gamma data with scalar input
+  set.seed(123)
+  y <- 1 / stats::rgamma(1, shape = 2, rate = 1)
+  # create a fims Rcpp object
+  # initialize the Dinvgamma module
+  dinvgamma_ <- methods::new(DinvgammaDistribution)
+  # populate class members
+  dinvgamma_$observed_values[1]$value <- y
+  dinvgamma_$shape[1]$value <- 2
+  dinvgamma_$scale[1]$value <- 1
+  # evaluate the density and compare with R
+  #' @description Test that dinvgamma works with a single value input, e.g. a prior on a parameter.
+  expect_equal(dinvgamma_$evaluate(), dinvgamma_r(y, 2, 1))
+  clear()
+
+  # simulate inverse gamma data with vector input
+  set.seed(123)
+  y <- 1 / stats::rgamma(10, shape = 2, rate = 1)
+  # initialize the Dinvgamma module
+  dinvgamma_ <- methods::new(DinvgammaDistribution)
+  # populate class members
+  dinvgamma_$observed_values$resize(length(y))
+  purrr::walk(
+    seq_along(y),
+    \(x) dinvgamma_$observed_values[x]$value <- y[x]
+  )
+  dinvgamma_$shape[1]$value <- 2
+  dinvgamma_$scale[1]$value <- 1
+  # evaluate the density and compare with R
+  #' @description Test that dinvgamma works with a vector of state variables and scalar shape and scale arguments.
+  expect_equal(dinvgamma_$evaluate(), sum(dinvgamma_r(y, 2, 1)))
+  clear()
+
+  # simulate inverse gamma data with vector shape and scale
+  set.seed(123)
+  y <- 1 / stats::rgamma(10, shape = 3, rate = 2)
+  # initialize the Dinvgamma module
+  dinvgamma_ <- methods::new(DinvgammaDistribution)
+  # populate class members
+  dinvgamma_$observed_values$resize(length(y))
+  purrr::walk(
+    seq_along(y),
+    \(x) dinvgamma_$observed_values[x]$value <- y[x]
+  )
+  dinvgamma_$shape$resize(length(y))
+  purrr::walk(
+    seq_along(y),
+    \(x) dinvgamma_$shape[x]$value <- 3
+  )
+  dinvgamma_$scale$resize(length(y))
+  purrr::walk(
+    seq_along(y),
+    \(x) dinvgamma_$scale[x]$value <- 0.5
+  )
+  # evaluate the density and compare with R
+  #' @description Test that dinvgamma works with vectors of state variables (x) and arguments.
+  expect_equal(dinvgamma_$evaluate(), sum(dinvgamma_r(y, 3, 0.5)))
+  clear()
+})
+
+## Edge handling ----
+test_that("dinvgamma returns correct outputs for edge cases", {
+  # Reference dinvgamma function matching the C++ implementation
+  dinvgamma_r <- function(x, shape, scale, logscale = TRUE) {
+    ret <- shape * log(scale) - lgamma(shape) - (shape + 1) * log(x) -
+      scale / x
+    if (logscale) {
+      return(ret)
+    } else {
+      return(exp(ret))
+    }
+  }
+
+  # test with small positive x
+  y <- 1e-4
+  dinvgamma_ <- methods::new(DinvgammaDistribution)
+  dinvgamma_$observed_values[1]$value <- y
+  dinvgamma_$shape[1]$value <- 2
+  dinvgamma_$scale[1]$value <- 1
+  #' @description Test that dinvgamma returns the correct output for a very small x value (1e-4).
+  expect_equal(dinvgamma_$evaluate(), dinvgamma_r(y, 2, 1))
+  clear()
+
+  # test with large x
+  y <- 1e4
+  dinvgamma_ <- methods::new(DinvgammaDistribution)
+  dinvgamma_$observed_values[1]$value <- y
+  dinvgamma_$shape[1]$value <- 2
+  dinvgamma_$scale[1]$value <- 1
+  #' @description Test that dinvgamma returns the correct output for a very large x value (1e4).
+  expect_equal(dinvgamma_$evaluate(), dinvgamma_r(y, 2, 1))
+  clear()
+
+  # test with x = 0 (should return -Inf)
+  y <- 0
+  dinvgamma_ <- methods::new(DinvgammaDistribution)
+  dinvgamma_$observed_values[1]$value <- y
+  dinvgamma_$shape[1]$value <- 2
+  dinvgamma_$scale[1]$value <- 1
+  #' @description Test that dinvgamma returns -Inf when x = 0.
+  expect_equal(dinvgamma_$evaluate(), -Inf)
+  clear()
+})
+
+## Error handling ----
+test_that("dinvgamma returns correct error messages", {
+  y <- 1 / stats::rgamma(10, shape = 2, rate = 1)
+  # create a fims Rcpp object
+  # initialize the Dinvgamma module
+  dinvgamma_ <- methods::new(DinvgammaDistribution)
+  # populate class members with mismatched dimensions
+  dinvgamma_$observed_values$resize(length(y))
+  purrr::walk(
+    seq_along(y),
+    \(x) dinvgamma_$observed_values[x]$value <- y[x]
+  )
+  dinvgamma_$shape$resize(3)
+  purrr::walk(
+    1:3,
+    \(x) dinvgamma_$shape[x]$value <- 2
+  )
+  dinvgamma_$scale[1]$value <- 1
+  #' @description dinvgamma should error out when there is a dimension mismatch where it is expecting shape to have a size 10 but is provided a size 3 vector.
+  expect_error(
+    object = dinvgamma_$evaluate(),
+    regexp = "InvGammaLPDF::Vector .* out of bounds. .* 10 .* 3"
+  )
+  clear()
+})

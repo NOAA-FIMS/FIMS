@@ -339,3 +339,15 @@ target_link_libraries(def_FIMSLog_clear
 )
 
 gtest_discover_tests(def_FIMSLog_clear)
+
+# test_fims_math_dinvgamma.cpp
+add_executable(fims_math_dinvgamma
+  test_fims_math_dinvgamma.cpp
+)
+
+target_link_libraries(fims_math_dinvgamma
+  gtest_main
+  fims_test
+)
+
+gtest_discover_tests(fims_math_dinvgamma)

@@ -349,6 +349,36 @@ T sum(const std::vector<T> &v) {
 }
 
 /**
+ * @brief The log probability density function of the inverse gamma distribution.
+ *
+ * @details Computes the log of the inverse gamma probability density function:
+ * \f[
+ * \log f(x; \alpha, \beta) = \alpha \log(\beta) - \log\Gamma(\alpha)
+ *   - (\alpha + 1) \log(x) - \frac{\beta}{x}
+ * \f]
+ * where \f$\alpha\f$ is the shape parameter and \f$\beta\f$ is the scale
+ * parameter.
+ *
+ * @param x The value at which to evaluate the log density. Must be positive.
+ * @param shape The shape parameter \f$\alpha\f$ of the distribution.
+ * @param scale The scale parameter \f$\beta\f$ of the distribution.
+ * @param logscale If true (default), returns the log of the density; otherwise
+ * returns the density itself.
+ * @return The log probability density (or density if logscale is false).
+ */
+template <class Type>
+inline const Type dinvgamma(const Type &x, const Type &shape, const Type &scale,
+                            bool logscale = true) {
+  Type ret = shape * fims_math::log(scale) - fims_math::lgamma(shape) -
+             (shape + static_cast<Type>(1.0)) * fims_math::log(x) - scale / x;
+  if (logscale) {
+    return ret;
+  } else {
+    return fims_math::exp(ret);
+  }
+}
+
+/**
  * Sum elements of a vector
  *
  * @brief
