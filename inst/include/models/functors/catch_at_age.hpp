@@ -200,6 +200,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
       fleet->q.resize(fleet->log_q.size());
       fleet->Fmort.resize(fleet->n_years);
     }
+        EnsureAllFleetALKs();
   }
 
   /**
@@ -1392,7 +1393,6 @@ class CatchAtAge : public FisheryModelBase<Type> {
                Sets recruitment deviations to mean 0.
      */
     Prepare();
-    EnsureAllFleetALKs();
     RefreshFleetGrowthDerivedMeanWAACache();
     /*
      start at year=0, age=0;
@@ -1535,7 +1535,6 @@ class CatchAtAge : public FisheryModelBase<Type> {
     int n_pops = this->populations.size();
 #ifdef TMB_MODEL
     if (this->do_reporting == true) {
-        EnsureAllFleetALKs();
       report_vectors.clear();
       // std::shared_ptr<UncertaintyReportInfoMap>
       // population_uncertainty_report_info_map =

@@ -20,6 +20,20 @@
 
 namespace fims_popdy {
 
+/**
+ * @brief Build the active ALK for a fleet from the current population and fleet
+ * state.
+ *
+ * Prefers the supported growth-derived ALK path when the linked population
+ * growth object exposes the required observation capability and the fleet has
+ * a valid explicit length-bin definition. Falls back to the fixed
+ * age-to-length conversion matrix when available.
+ *
+ * @param population Shared pointer to the owning population.
+ * @param fleet Shared pointer to the fleet.
+ * @return Shared pointer to an active ALK implementation, or nullptr when no
+ * usable ALK path exists.
+ */
 template <typename Type>
 std::shared_ptr<ALKBase<Type>> BuildFleetALK(
     const std::shared_ptr<Population<Type>>& population,
@@ -73,6 +87,16 @@ std::shared_ptr<ALKBase<Type>> BuildFleetALK(
   return nullptr;
 }
 
+/**
+ * @brief Ensure a fleet has an active ALK before length-based calculations.
+ *
+ * Rebuilds the fleet ALK from the current population and fleet state when the
+ * stored ALK pointer is missing or inactive. Throws when the fleet has length
+ * bins but no usable ALK path can be constructed.
+ *
+ * @param population Shared pointer to the owning population.
+ * @param fleet Shared pointer to the fleet.
+ */
 template <typename Type>
 void EnsureFleetALK(const std::shared_ptr<Population<Type>>& population,
                     const std::shared_ptr<Fleet<Type>>& fleet) {
@@ -101,6 +125,15 @@ void EnsureFleetALK(const std::shared_ptr<Population<Type>>& population,
   }
 }
 
+/**
+ * @brief Ensure all fleets linked to a population have an active ALK.
+ *
+ * Applies EnsureFleetALK() to each fleet linked to the population so runtime
+ * length-based calculations can safely assume ALK availability.
+ *
+ * @param population Shared pointer to the population whose fleets should be
+ * checked.
+ */
 template <typename Type>
 void EnsurePopulationFleetALKs(
     const std::shared_ptr<Population<Type>>& population) {
