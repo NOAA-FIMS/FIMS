@@ -5,6 +5,15 @@
 #' @return The file path of the saved CSV file.
 save_csv <- function(data) {
   path <- tempfile(fileext = ".csv")
-  write.csv(data, path)
+  result <- tryCatch(
+    {
+      write.csv(data, path, row.names = FALSE)
+      return(path)
+    },
+    error = function(e) {
+      stop("Error saving CSV file: ", e$message)
+    }
+  )
+  # write.csv(data, path)
   path
 }
