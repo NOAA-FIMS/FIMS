@@ -118,17 +118,16 @@ struct InvGammaLPDF : public DensityComponentBase<Type> {
       this->lpdf += this->lpdf_vec[i];
       if (this->simulate_flag) {
         FIMS_SIMULATE_F(this->of) {  // preprocessor definition in interface.hpp
+          Type sim_val =
+              static_cast<Type>(1.0) / rgamma(shape, static_cast<Type>(1.0) / scale);
           if (this->input_type == "data") {
-            this->data_observed_values->at(i) =
-                static_cast<Type>(1.0) / rgamma(shape, static_cast<Type>(1.0) / scale);
+            this->data_observed_values->at(i) = sim_val;
           }
           if (this->input_type == "random_effects") {
-            (*this->re)[i] =
-                static_cast<Type>(1.0) / rgamma(shape, static_cast<Type>(1.0) / scale);
+            (*this->re)[i] = sim_val;
           }
           if (this->input_type == "prior") {
-            (*(this->priors[i]))[0] =
-                static_cast<Type>(1.0) / rgamma(shape, static_cast<Type>(1.0) / scale);
+            (*(this->priors[i]))[0] = sim_val;
           }
         }
       }

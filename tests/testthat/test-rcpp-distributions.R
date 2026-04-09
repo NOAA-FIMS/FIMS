@@ -4,7 +4,7 @@
 #' correctness], edge-case handling [Edge handling], and built-in errors and
 #' warnings [Error handling]. See `?FIMS:::use_testthat_template` for more
 #' information. Every test should have a @description tag, which can only span
-#' one lines, that will be used in the bookdown report of the results from
+#' one line, that will be used in the bookdown report of the results from
 #' {testthat}. This line can be more than 80 characters.
 
 # rcpp distributions ----
