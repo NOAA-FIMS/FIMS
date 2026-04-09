@@ -61,9 +61,12 @@
 #endif
 
 #ifdef FIMS_WINDOWS
+#define NOMINMAX
+#define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 #undef TRUE
 #undef FALSE
+#undef GetObject
 #include <Lmcons.h>  // for UNLEN
 #elif defined(FIMS_LINUX) || defined(FIMS_MACOS) || defined(FIMS_BSD)
 #include <unistd.h>
