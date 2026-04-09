@@ -188,6 +188,7 @@ test_that("von bertalanffy growth converges when L1 L2 and K are estimable", {
   fit <- FIMS::fit_fims(
     input = input,
     optimize = TRUE,
+    number_of_loops = 2,
     get_sd = FALSE
   )
 
