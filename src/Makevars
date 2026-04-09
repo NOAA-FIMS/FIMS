@@ -1,16 +1,11 @@
-# Find include paths dynamically
-TMB_INC = $(shell "${R_HOME}/bin/Rscript" -e "cat(system.file('include', package='TMB'))")
-EIGEN_INC = $(shell "${R_HOME}/bin/Rscript" -e "cat(system.file('include', package='RcppEigen'))")
+# # Find include paths dynamically
+# TMB_INC = $(shell "${R_HOME}/bin/Rscript" -e "cat(system.file('include', package='TMB'))")
+# EIGEN_INC = $(shell "${R_HOME}/bin/Rscript" -e "cat(system.file('include', package='RcppEigen'))")
 
 # Set Preprocessor flags
 # TMBAD_FRAMEWORK is often required for modern TMB models
 CXX_STD = CXX17
 PKG_CXXFLAGS = -DTMB_MODEL -DTMB_EIGEN_DISABLE_WARNINGS -DTMBAD_FRAMEWORK -w
-
-# Include paths
-# PKG_CPPFLAGS += -I$(shell ${R_HOME}/bin/Rscript -e 'cat(system.file("include", package="TMB"))')
-# PKG_CPPFLAGS += -I$(shell ${R_HOME}/bin/Rscript -e 'cat(system.file("include", package="Rcpp"))')
-# PKG_CPPFLAGS += -I$(shell ${R_HOME}/bin/Rscript -e 'cat(system.file("include", package="RcppEigen"))')
-
+MAKEFLAGS= -j2 # Use 2 cores for compilation, adjust as needed
 CXX17STD = -std=c++17 
 USE_CXX17 = "yes"

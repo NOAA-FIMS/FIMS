@@ -1,8 +1,26 @@
  #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_models.hpp"
-
+ #include "../inst/include/interface/rcpp/fims_modules.hpp"
  // static id of the FleetInterfaceBase object
 uint32_t FisheryModelInterfaceBase::id_g = 1;
 
 // FleetInterfaceBase to the FleetInterfaceBase objects
 std::map<uint32_t, std::shared_ptr<FisheryModelInterfaceBase>>
     FisheryModelInterfaceBase::live_objects;
+
+    #include <Rcpp.h>
+
+
+
+    
+    void register_fishery_models(Rcpp::Module& m) {
+         Rcpp::class_<CatchAtAgeInterface>(
+      "CatchAtAge",
+      "See "
+      "https://noaa-fims.github.io/FIMS/doxygen/classCatchAtAgeInterface.html.")
+      .constructor()
+      .method("AddPopulation", &CatchAtAgeInterface::AddPopulation)
+      .method("get_output", &CatchAtAgeInterface::to_json)
+      .method("GetId", &CatchAtAgeInterface::get_id)
+      .method("DoReporting", &CatchAtAgeInterface::DoReporting)
+      .method("IsReporting", &CatchAtAgeInterface::IsReporting);
+}

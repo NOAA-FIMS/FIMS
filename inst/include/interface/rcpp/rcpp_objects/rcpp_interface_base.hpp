@@ -132,6 +132,18 @@ inline std::ostream& operator<<(std::ostream& out, const Parameter& p) {
 
 RCPP_EXPOSED_CLASS(Parameter)
 
+// namespace Rcpp {
+// template <>
+// SEXP wrap(const Parameter& p) {
+//   Rcpp::List list = Rcpp::List::create(
+//       Rcpp::Named("id") = p.id_m, 
+//       Rcpp::Named("value") = p.initial_value_m,
+//       Rcpp::Named("estimated_value") = p.final_value_m,
+//       Rcpp::Named("estimation_type") = p.estimation_type_m.get());
+//   return list;
+// }
+// }
+
 /**
  * @brief An Rcpp interface class that defines the ParameterVector class.
  *
@@ -565,6 +577,38 @@ class RealVector {
     }
   }
 };
+
+// RCPP_EXPOSED_CLASS(Parameter)
+RCPP_EXPOSED_CLASS(ParameterVector)
+RCPP_EXPOSED_CLASS(RealVector)
+
+// namespace Rcpp {
+//   template <>
+//   SEXP wrap(const RealVector& x) {
+//    Rcpp::NumericVector ret(x.storage_m->size());
+//     for (size_t i = 0; i < x.storage_m->size(); i++) {
+//       ret[i] = x.storage_m->at(i);
+//     }     
+//     return ret;
+//   }
+
+//   namespace traits {
+
+// template <>
+// class Exporter<RealVector> {
+// public:
+//   Exporter(SEXP x) : vec(Rcpp::as<Rcpp::NumericVector>(x)) {}
+
+//   RealVector get() {
+//     return RealVector(vec, vec.size());
+//   }
+
+// private:
+//   Rcpp::NumericVector vec;
+// };
+
+// } // namespace traits
+// }
 
 
 /**

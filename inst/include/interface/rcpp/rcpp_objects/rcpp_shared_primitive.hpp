@@ -14,6 +14,8 @@
 #include <sstream>
 #include <string>
 
+#include <Rcpp.h>
+
 
 /**
  * @class SharedInt
@@ -2128,5 +2130,11 @@ typedef SharedString fims_string;
  * representing a reference-counted boolean.
  */
 typedef SharedBoolean fims_bool;
+
+
+RCPP_EXPOSED_CLASS(SharedInt)
+RCPP_EXPOSED_CLASS(SharedString)
+RCPP_EXPOSED_CLASS(SharedReal)
+RCPP_EXPOSED_CLASS(SharedBoolean)
 
 #endif
