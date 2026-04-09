@@ -136,6 +136,32 @@ out <<"number of fleets: "<<n_fleets<<"\n";
 - Use `?debug` to learn how to set, unset, or query the debugging flag on a function.
 - Visit the [Debugging Guide](https://support.posit.co/hc/en-us/articles/205612627-Debugging-with-the-RStudio-IDE) for instructions on debugging with the RStudio IDE.
 
+### Long-running or crashing tests
+
+If a test crashes or hangs, it helps to save the output so you can see which test was running last. See the help file for [`LocationReporter`](https://testthat.r-lib.org/reference/LocationReporter.html) from {testthat} to understand how the following line is helpful for C++ code:
+
+```bash
+Rscript -e "devtools::test(reporter = 'location')" > test_log.txt 2>&1
+```
+
+You can also set the following environment variables to for better diagnostics:
+
+```bash
+R_KEEP_PKG_SOURCE=yes R_BACKTRACE_ON_ERROR=full TESTTHAT_PROGRESS=plain \
+  Rscript -e "devtools::test(reporter = 'location')" > test_log.txt 2>&1
+```
+
+For segfaults, running under GDB (which probably will not work on a Windows machine) gives you a native backtrace. If you are on a Windows machine and want good backtrace information, consider [installing WSL](https://nmfs-ost.github.io/on-off-boarding/getting-started.html#software-and-tools).
+
+```bash
+# Linux
+gdb -batch -ex "run" -ex "bt" --args R --vanilla -e "devtools::test()" > backtrace_log.txt
+
+# Windows (with Rtools on PATH)
+export PATH="/c/rtools44/usr/bin:$PATH"
+gdb -batch -ex "run" -ex "bt" --args R --vanilla -e "devtools::test()" > backtrace_log.txt
+```
+
 ### Random numbers
 
 Failed tests might arise because different random numbers are used or the order of the simulation changes through model development (see [FIMS-planning discussion 25](https://github.com/NOAA-FIMS/FIMS-planning/issues/25)). One can try the following solutions:
