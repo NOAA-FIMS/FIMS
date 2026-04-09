@@ -7,6 +7,7 @@
  */
 #ifndef SRC_INIT_HPP
 #define SRC_INIT_HPP
+
 #include <stdlib.h>
 #include <R_ext/Rdynload.h>
 
