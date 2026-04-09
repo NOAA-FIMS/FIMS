@@ -23,8 +23,7 @@
 #include "../population_dynamics/population/population.hpp"
 #include "../population_dynamics/recruitment/recruitment.hpp"
 #include "../population_dynamics/selectivity/selectivity.hpp"
-#include "../population_dynamics/alk/functors/fixed_matrix_alk.hpp"
-#include "../population_dynamics/alk/functors/growth_derived_alk.hpp"
+#include "../population_dynamics/alk/functors/alk_runtime.hpp"
 #include "def.hpp"
 #include "fims_vector.hpp"
 #include "model_object.hpp"
@@ -509,79 +508,41 @@ class Information {
     }
   }
 
-  /**
-   * @brief Set the ALK module referenced by the fleet and population modules.
-   *
-   * Prefers the growth-derived ALK path when the linked population growth
-   * object exposes the supported growth-derived observation capability and the
-   * fleet has a consistent explicit length-bin definition. Falls back to the
-   * historical fixed age-to-length matrix when available.
-   *
-   * @param &valid_model reference to true/false boolean indicating whether
-   * model is valid.
-   * @param p shared pointer to population module
-   * @param f shared pointer to fleet module
-   */
-  void SetFleetALKModel(bool &valid_model,
-                        std::shared_ptr<fims_popdy::Population<Type>> p,
-                        std::shared_ptr<fims_popdy::Fleet<Type>> f) {
-
-    if (p == nullptr || f == nullptr) {
-      valid_model = false;
-      FIMS_ERROR_LOG("Unable to set fleet ALK because the population or fleet "
-                     "pointer was null.");
-      return;
-    }
-    f->alk = nullptr;
-    if (std::shared_ptr<fims_popdy::GrowthDerivedObservationBase<Type>>
-            growth_observation = std::dynamic_pointer_cast<
-                fims_popdy::GrowthDerivedObservationBase<Type>>(p->growth)) {
-      if (growth_observation->SupportsGrowthDerivedALK()) {
-        const fims_popdy::GrowthProducts<Type>& growth_products =
-            growth_observation->GetProductsForReporting();
-
-        if (growth_products.n_sexes == 1 &&
-            f->n_ages > 0 &&
-            f->n_lengths > 0 &&
-            f->lengths.size() == f->n_lengths) {
-          f->alk = std::make_shared<fims_popdy::GrowthDerivedALK<Type>>(
-              f, growth_observation, &growth_products);
-
-          if (f->alk != nullptr && f->alk->IsActive()) {
-            FIMS_INFO_LOG("Growth-derived ALK successfully set to fleet " +
-                          fims::to_string(f->id) + " for population " +
-                          fims::to_string(p->id));
-            return;
-          }
-        }
-      }
-    }
-
-    const bool has_fixed_age_to_length_matrix =
-        f->n_ages > 0 &&
-        f->n_lengths > 0 &&
-        f->age_to_length_conversion.size() == (f->n_ages * f->n_lengths);
-
-    if (has_fixed_age_to_length_matrix) {
-      f->alk = std::make_shared<fims_popdy::FixedMatrixALK<Type>>(f);
-
-      if (f->alk != nullptr && f->alk->IsActive()) {
-        FIMS_INFO_LOG("Fixed age-to-length matrix successfully set to fleet " +
-                      fims::to_string(f->id));
-        return;
-      }
-    }
-
-    if (f->n_lengths > 0) {
-      valid_model = false;
-      FIMS_ERROR_LOG("Fleet " + fims::to_string(f->id) +
-                     " has length composition bins but no usable "
-                     "age-to-length conversion path. Provide fixed "
-                     "age-to-length conversion of size " +
-                     fims::to_string(f->n_ages * f->n_lengths) +
-                     " or use a supported growth-derived ALK path.");
-    }
+/**
+ * @brief Set the ALK module referenced by the fleet and population modules.
+ *
+ * @param &valid_model reference to true/false boolean indicating whether
+ * model is valid.
+ * @param p shared pointer to population module
+ * @param f shared pointer to fleet module
+ */
+void SetFleetALKModel(bool &valid_model,
+                      std::shared_ptr<fims_popdy::Population<Type>> p,
+                      std::shared_ptr<fims_popdy::Fleet<Type>> f) {
+  if (p == nullptr || f == nullptr) {
+    valid_model = false;
+    FIMS_ERROR_LOG("Unable to set fleet ALK because the population or fleet "
+                   "pointer was null.");
+    return;
   }
+
+  f->alk = fims_popdy::BuildFleetALK<Type>(p, f);
+
+
+  if (f->alk != nullptr && f->alk->IsActive()) {
+    return;
+  }
+
+  if (f->n_lengths > 0) {
+    valid_model = false;
+    FIMS_ERROR_LOG("Fleet " + fims::to_string(f->id) +
+                   " has length composition bins but no usable "
+                   "age-to-length conversion path. Provide fixed "
+                   "age-to-length conversion of size " +
+                   fims::to_string(f->n_ages * f->n_lengths) +
+                   " or use a supported growth-derived ALK path.");
+  }
+}
 
   /**
    * @brief Set pointers to the recruitment module referenced in the population

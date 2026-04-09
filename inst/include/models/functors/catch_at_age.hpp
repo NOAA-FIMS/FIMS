@@ -15,7 +15,7 @@
 #include <stdexcept>
 
 #include "fishery_model_base.hpp"
-#include "../../population_dynamics/alk/functors/growth_derived_alk.hpp"
+#include "../../population_dynamics/alk/functors/alk_runtime.hpp"
 
 
 /* Dictionary block for shared parameter snippet documentations.
@@ -1093,6 +1093,18 @@ class CatchAtAge : public FisheryModelBase<Type> {
     }
   }
 
+  /**
+   * @brief Ensure all fleets linked to this model have an active ALK.
+   *
+   * Rebuilds missing or inactive fleet ALK objects from the current
+   * population and fleet state before evaluation or reporting uses them.
+   */
+  void EnsureAllFleetALKs() {
+    for (size_t p = 0; p < this->populations.size(); ++p) {
+      fims_popdy::EnsurePopulationFleetALKs<Type>(this->populations[p]);
+    }
+  }
+
    /**
    * @brief Computes fleet-specific expected weight-at-age from the same
    * normalized ALK row used in the dynamic length-composition path.
@@ -1380,6 +1392,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
                Sets recruitment deviations to mean 0.
      */
     Prepare();
+    EnsureAllFleetALKs();
     RefreshFleetGrowthDerivedMeanWAACache();
     /*
      start at year=0, age=0;
@@ -1522,6 +1535,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
     int n_pops = this->populations.size();
 #ifdef TMB_MODEL
     if (this->do_reporting == true) {
+        EnsureAllFleetALKs();
       report_vectors.clear();
       // std::shared_ptr<UncertaintyReportInfoMap>
       // population_uncertainty_report_info_map =
