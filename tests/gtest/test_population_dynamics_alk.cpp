@@ -1,3 +1,4 @@
+#include <cstddef>
 #include <memory>
 
 #include "gtest/gtest.h"
@@ -12,6 +13,44 @@
 
 namespace {
 
+/**
+ * @brief Minimal growth-derived observation used to control cached products in
+ * ALK unit tests.
+ */
+struct FakeGrowthDerivedObservation
+    : public fims_popdy::GrowthDerivedObservationBase<double> {
+  fims_popdy::GrowthProducts<double> products;
+  bool supports_growth_derived_alk = true;
+
+  void SetAgeOffset(double) override {}
+
+  void Initialize(std::size_t n_years,
+                  std::size_t n_ages,
+                  std::size_t n_sexes = 1) override {
+    products.Resize(n_years, n_ages, n_sexes);
+  }
+
+  bool SupportsGrowthDerivedALK() const override {
+    return supports_growth_derived_alk;
+  }
+
+  const fims_popdy::GrowthProducts<double>& GetProductsForReporting() override {
+    return products;
+  }
+
+  double EvaluateWeightAtLength(const double& length) const override {
+    return length;
+  }
+
+  const double evaluate(const double& age) const override {
+    return age;
+  }
+};
+
+/**
+ * @brief Fill a Von Bertalanffy adapter with a consistent single-sex test
+ * parameter set.
+ */
 void ConfigureAdapter(
     fims_popdy::VonBertalanffyGrowthModelAdapter<double>& adapter,
     double length_at_ref_age_1,
@@ -45,6 +84,9 @@ void ConfigureAdapter(
       fims_math::log(length_at_age_sd_at_reference_age_2);
 }
 
+/**
+ * @brief Build a fleet with explicit test length bins.
+ */
 std::shared_ptr<fims_popdy::Fleet<double>> MakeFleet() {
   auto fleet = std::make_shared<fims_popdy::Fleet<double>>();
   fleet->n_years = 1;
@@ -58,6 +100,9 @@ std::shared_ptr<fims_popdy::Fleet<double>> MakeFleet() {
   return fleet;
 }
 
+/**
+ * @brief Fill a fleet with a fixed age-to-length conversion matrix.
+ */
 void FillFixedMatrix(const std::shared_ptr<fims_popdy::Fleet<double>>& fleet) {
   fleet->age_to_length_conversion.resize(fleet->n_ages * fleet->n_lengths);
 
@@ -120,28 +165,19 @@ TEST(GrowthDerivedALK, IsInactiveWithoutExplicitLengthBins) {
       *growth, 275.0, 725.0, 0.18, 1.0, 12.0, 2.5e-11, 3.0, 28.0, 73.0);
   growth->SetAgeOffset(1.0);
   growth->Initialize(1, 3, 1);
-  const auto& products = growth->GetProductsForReporting();
 
-  fims_popdy::GrowthDerivedALK<double> alk(fleet, growth, &products);
+  fims_popdy::GrowthDerivedALK<double> alk(fleet, growth);
 
   EXPECT_FALSE(alk.IsActive());
 }
 
 TEST(GrowthDerivedALK, IsInactiveForMultiSexProducts) {
   auto fleet = MakeFleet();
+  auto growth = std::make_shared<FakeGrowthDerivedObservation>();
 
-  auto growth =
-      std::make_shared<fims_popdy::VonBertalanffyGrowthModelAdapter<double>>();
-  ConfigureAdapter(
-      *growth, 275.0, 725.0, 0.18, 1.0, 12.0, 2.5e-11, 3.0, 28.0, 73.0);
-  growth->SetAgeOffset(1.0);
-  growth->Initialize(1, fleet->n_ages, 1);
-  const auto& products = growth->GetProductsForReporting();
+  growth->Initialize(1, fleet->n_ages, 2);
 
-  fims_popdy::GrowthProducts<double> multi_sex_products = products;
-  multi_sex_products.n_sexes = 2;
-
-  fims_popdy::GrowthDerivedALK<double> alk(fleet, growth, &multi_sex_products);
+  fims_popdy::GrowthDerivedALK<double> alk(fleet, growth);
 
   EXPECT_FALSE(alk.IsActive());
 }
@@ -155,9 +191,8 @@ TEST(GrowthDerivedALK, BuildALKRowReturnsNormalizedRow) {
       *growth, 275.0, 725.0, 0.18, 1.0, 12.0, 2.5e-11, 3.0, 28.0, 73.0);
   growth->SetAgeOffset(1.0);
   growth->Initialize(1, fleet->n_ages, 1);
-  const auto& products = growth->GetProductsForReporting();
 
-  fims_popdy::GrowthDerivedALK<double> alk(fleet, growth, &products);
+  fims_popdy::GrowthDerivedALK<double> alk(fleet, growth);
   fims::Vector<double> row;
 
   ASSERT_TRUE(alk.IsActive());
@@ -165,7 +200,7 @@ TEST(GrowthDerivedALK, BuildALKRowReturnsNormalizedRow) {
   ASSERT_EQ(row.size(), fleet->n_lengths);
 
   double row_sum = 0.0;
-  for (size_t i = 0; i < row.size(); ++i) {
+  for (std::size_t i = 0; i < row.size(); ++i) {
     EXPECT_GE(row[i], 0.0);
     row_sum += row[i];
   }
@@ -182,9 +217,8 @@ TEST(GrowthDerivedALK, BuildALKRowFailsForOutOfRangeAge) {
       *growth, 275.0, 725.0, 0.18, 1.0, 12.0, 2.5e-11, 3.0, 28.0, 73.0);
   growth->SetAgeOffset(1.0);
   growth->Initialize(1, fleet->n_ages, 1);
-  const auto& products = growth->GetProductsForReporting();
 
-  fims_popdy::GrowthDerivedALK<double> alk(fleet, growth, &products);
+  fims_popdy::GrowthDerivedALK<double> alk(fleet, growth);
   fims::Vector<double> row;
 
   EXPECT_FALSE(alk.BuildALKRow(0, fleet->n_ages, row));
