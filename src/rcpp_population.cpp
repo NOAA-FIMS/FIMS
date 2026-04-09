@@ -9,6 +9,7 @@ std::map<uint32_t, std::shared_ptr<PopulationInterfaceBase>>
     PopulationInterfaceBase::live_objects;
 
     #include <Rcpp.h>
+    
  void register_population(Rcpp::Module& m) {
     Rcpp::class_<PopulationInterface>(
       "Population",
