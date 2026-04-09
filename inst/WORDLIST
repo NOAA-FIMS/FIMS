@@ -137,6 +137,10 @@ DllInfo
 Dlnorm
 DlnormDistribution
 DlnormDistributionsInterface
+Dinvgamma
+DinvgammaDistribution
+DinvgammaDistributionsInterface
+dinvgamma
 Dmultinom
 DmultinomDistribution
 DmultinomDistributions
@@ -269,6 +273,9 @@ IntegerVector
 IntegrationTest
 InvLogit
 InvLogitLogit
+InvGamma
+InvGammaLPDF
+invgamma
 IsReporting
 JArray
 JSON
@@ -572,6 +579,7 @@ clangFormatVersion
 classAgeCompDataInterface
 classBevertonHoltRecruitmentInterface
 classCatchAtAgeInterface
+classDinvgammaDistributionsInterface
 classDlnormDistributionsInterface
 classDmultinomDistributionsInterface
 classDnormDistributionsInterface

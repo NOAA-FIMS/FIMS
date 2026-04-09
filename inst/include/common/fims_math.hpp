@@ -188,6 +188,37 @@ inline const Type lgamma(const Type &x) {
 #endif
 
 /**
+ * @brief The log probability density function of the inverse gamma
+ * distribution.
+ *
+ * @details
+ * The inverse gamma log probability density function is:
+ * \f[
+ * \mathrm{shape} \cdot \log(\mathrm{scale}) - \log\Gamma(\mathrm{shape}) -
+ * (\mathrm{shape} + 1) \cdot \log(x) - \frac{\mathrm{scale}}{x}
+ * \f]
+ * @param x The value to evaluate the distribution at. Must be positive.
+ * @param shape The shape parameter of the inverse gamma distribution.
+ * @param scale The scale parameter of the inverse gamma distribution.
+ * @param logscale If true (default), the natural log of the probability
+ * density is returned. If false, the probability density is returned.
+ * @return The log probability density (if logscale is true) or probability
+ * density (if logscale is false) of x given the inverse gamma distribution
+ * with the given shape and scale parameters.
+ */
+template <class Type>
+inline const Type dinvgamma(const Type &x, const Type &shape, const Type &scale,
+                            bool logscale = true) {
+  Type ret = shape * fims_math::log(scale) - fims_math::lgamma(shape) -
+             (shape + static_cast<Type>(1.0)) * fims_math::log(x) - scale / x;
+  if (logscale) {
+    return ret;
+  } else {
+    return fims_math::exp(ret);
+  }
+}
+
+/**
  * @brief The general logistic function
  *
  * @details

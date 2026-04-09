@@ -443,6 +443,24 @@ RCPP_MODULE(fims) {
       .field("expected_values", &DlnormDistributionsInterface::expected_values)
       .field("log_sd", &DlnormDistributionsInterface::log_sd);
 
+  Rcpp::class_<DinvgammaDistributionsInterface>(
+      "DinvgammaDistribution",
+      "See "
+      "https://noaa-fims.github.io/FIMS/doxygen/"
+      "classDinvgammaDistributionsInterface.html.")
+      .constructor()
+      .method("get_id", &DinvgammaDistributionsInterface::get_id)
+      .method("evaluate", &DinvgammaDistributionsInterface::evaluate)
+      .method("set_observed_data",
+              &DinvgammaDistributionsInterface::set_observed_data)
+      .method("set_distribution_links",
+              &DinvgammaDistributionsInterface::set_distribution_links)
+      .field("observed_values",
+             &DinvgammaDistributionsInterface::observed_values)
+      .field("expected_values",
+             &DinvgammaDistributionsInterface::expected_values)
+      .field("log_sd", &DinvgammaDistributionsInterface::log_sd);
+
   Rcpp::class_<DmultinomDistributionsInterface>(
       "DmultinomDistribution",
       "See "

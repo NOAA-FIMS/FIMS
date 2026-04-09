@@ -328,6 +328,18 @@ target_link_libraries(FIMSJson_JsonParser_Parse
 gtest_discover_tests(FIMSJson_JsonParser_Parse)
 
 
+# test_fims_math_dinvgamma.cpp
+add_executable(fims_math_dinvgamma
+  test_fims_math_dinvgamma.cpp
+)
+
+target_link_libraries(fims_math_dinvgamma
+  gtest_main
+  fims_test
+)
+
+gtest_discover_tests(fims_math_dinvgamma)
+
 # test_def_FIMSLog_clear.cpp
 add_executable(def_FIMSLog_clear
   test_def_FIMSLog_clear.cpp

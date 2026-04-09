@@ -851,6 +851,329 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
 };
 
 /**
+ * @brief The Rcpp interface for Dinvgamma to instantiate from R:
+ * dinvgamma_ <- methods::new(DinvgammaDistribution).
+ */
+class DinvgammaDistributionsInterface : public DistributionsInterfaceBase {
+ public:
+  /**
+   * @brief Observed data.
+   */
+  ParameterVector observed_values;
+  /**
+   * @brief The expected values, which would be the mean of x for this
+   * distribution.
+   */
+  ParameterVector expected_values;
+  /**
+   * @brief The uncertainty, which would be the natural logarithm of the
+     standard deviation (sd) of x for this distribution. The natural log
+     of the standard deviation is necessary because the exponential link
+     function is applied to the log transformed standard deviation to ensure
+     standard deviation is positive. The shape and scale of the inverse gamma
+     are derived from the expected value and log_sd:
+     shape = (expected / exp(log_sd))^2, scale = exp(2 * log_sd) / expected.
+   */
+  ParameterVector log_sd;
+  /**
+   * @brief Vector that records the individual log probability function for each
+   * observation.
+   */
+  RealVector lpdf_vec; /**< The vector */
+
+  /**
+   * @brief The constructor.
+   */
+  DinvgammaDistributionsInterface() : DistributionsInterfaceBase() {
+    DistributionsInterfaceBase::live_objects[this->id_m] =
+        std::make_shared<DinvgammaDistributionsInterface>(*this);
+    FIMSRcppInterfaceBase::fims_interface_objects.push_back(
+        DistributionsInterfaceBase::live_objects[this->id_m]);
+  }
+
+  /**
+   * @brief Construct a new Dinvgamma Distributions Interface object
+   *
+   * @param other
+   */
+  DinvgammaDistributionsInterface(const DinvgammaDistributionsInterface &other)
+      : DistributionsInterfaceBase(other),
+        observed_values(other.observed_values),
+        expected_values(other.expected_values),
+        log_sd(other.log_sd),
+        lpdf_vec(other.lpdf_vec) {}
+
+  /**
+   * @brief The destructor.
+   */
+  virtual ~DinvgammaDistributionsInterface() {}
+
+  /**
+   * @brief Gets the ID of the interface base object.
+   * @return The ID.
+   */
+  virtual uint32_t get_id() { return this->id_m; }
+
+  /**
+   * @brief Set the unique ID for the observed data object.
+   * @param observed_data_id Unique ID for the observed data object.
+   */
+  virtual bool set_observed_data(int observed_data_id) {
+    this->interface_observed_data_id_m.set(observed_data_id);
+    return true;
+  }
+
+  /**
+   * @brief Sets pointers for data observations, random effects, or priors.
+   *
+   * @param input_type String that sets whether the distribution type is for
+   * priors, random effects, or data.
+   * @param ids Vector of unique ids for each linked parameter(s), derived
+   * value(s), or observed data vector.
+   */
+  virtual bool set_distribution_links(std::string input_type,
+                                      Rcpp::IntegerVector ids) {
+    this->input_type_m.set(input_type);
+    this->key_m->resize(ids.size());
+    for (R_xlen_t i = 0; i < ids.size(); i++) {
+      this->key_m->at(i) = ids[i];
+    }
+    return true;
+  }
+
+  /**
+   * @brief Evaluate inverse gamma log probability density function (lpdf).
+   * @return The natural log of the probability density function (pdf) is
+   * returned.
+   */
+  virtual double evaluate() {
+    fims_distributions::InvGammaLPDF<double> dinvgamma;
+    dinvgamma.observed_values.resize(this->observed_values.size());
+    dinvgamma.expected_values.resize(this->expected_values.size());
+    dinvgamma.log_sd.resize(this->log_sd.size());
+    for (size_t i = 0; i < this->observed_values.size(); i++) {
+      dinvgamma.observed_values[i] = this->observed_values[i].initial_value_m;
+    }
+    for (size_t i = 0; i < this->expected_values.size(); i++) {
+      dinvgamma.expected_values[i] = this->expected_values[i].initial_value_m;
+    }
+    for (size_t i = 0; i < this->log_sd.size(); i++) {
+      dinvgamma.log_sd[i] = this->log_sd[i].initial_value_m;
+    }
+    return dinvgamma.evaluate();
+  }
+
+  /**
+   * @brief Extracts the derived quantities from `Information` to the Rcpp
+   * object.
+   */
+  virtual void finalize() {
+    if (this->finalized) {
+      // log warning that finalize has been called more than once.
+      FIMS_WARNING_LOG("InvGammaLPDF  " + fims::to_string(this->id_m) +
+                       " has been finalized already.");
+    }
+
+    this->finalized = true;  // indicate this has been called already
+
+    std::shared_ptr<fims_info::Information<double>> info =
+        fims_info::Information<double>::GetInstance();
+
+    fims_info::Information<double>::density_components_iterator it;
+
+    // search for density component in Information
+    it = info->density_components.find(this->id_m);
+    // if not found, just return
+    if (it == info->density_components.end()) {
+      FIMS_WARNING_LOG("InvGammaLPDF " + fims::to_string(this->id_m) +
+                       " not found in Information.");
+      return;
+    } else {
+      std::shared_ptr<fims_distributions::InvGammaLPDF<double>> dinvgamma =
+          std::dynamic_pointer_cast<
+              fims_distributions::InvGammaLPDF<double>>(it->second);
+
+      this->lpdf_value = dinvgamma->lpdf;
+
+      size_t n_x = dinvgamma->get_n_x();
+
+      if (this->log_sd.size() != n_x) {
+        // If log_sd size == 1 (scalar), repeat the entry
+        if (this->log_sd.size() == 1) {
+          auto tmp = this->log_sd[0];  // copy the one log_sd param
+          this->log_sd.resize(n_x);
+          for (size_t i = 0; i < n_x; ++i) {
+            this->log_sd[i] = tmp;  // copies all fields in Param
+          }
+        } else {
+          // Handle error
+          FIMS_WARNING_LOG(
+              "log_sd size does not match number of observations and is not "
+              "scalar.");
+        }
+      }
+
+      for (size_t i = 0; i < n_x; i++) {
+        if (this->log_sd[i].estimation_type_m.get() == "constant") {
+          this->log_sd[i].final_value_m = this->log_sd[i].initial_value_m;
+        } else {
+          this->log_sd[i].final_value_m =
+              dinvgamma->log_sd.get_force_scalar(i);
+        }
+      }
+
+      this->lpdf_vec = RealVector(n_x);
+      if (this->expected_values.size() == 1) {
+        this->expected_values.resize(n_x);
+      }
+      if (this->observed_values.size() == 1) {
+        this->observed_values.resize(n_x);
+      }
+      for (size_t i = 0; i < this->lpdf_vec.size(); i++) {
+        this->lpdf_vec[i] = dinvgamma->lpdf_vec[i];
+        this->expected_values[i].final_value_m = dinvgamma->get_expected(i);
+        this->observed_values[i].final_value_m = dinvgamma->get_observed(i);
+      }
+    }
+  }
+
+  /**
+   * @brief Converts the data to json representation for the output.
+   * @return A string is returned specifying that the module relates to the
+   * distribution interface with an inverse gamma distribution. It also returns
+   * the ID and the natural log of the probability density function values
+   * themselves. This string is formatted for a json file.
+   */
+  virtual std::string to_json() {
+    std::stringstream ss;
+
+    ss << "{\n";
+    ss << " \"module_name\": \"density\",\n";
+    ss << " \"module_id\": " << this->id_m << ",\n";
+    ss << " \"module_type\": \"inv_gamma\",\n";
+    ss << " \"observed_data_id\" : " << this->interface_observed_data_id_m
+       << ",\n";
+    ss << " \"input_type\" : \"" << this->input_type_m << "\",\n";
+    ss << " \"density_component\": {\n";
+    ss << "  \"lpdf_value\": " << this->lpdf_value << ",\n";
+    ss << "  \"value\":[";
+    if (this->lpdf_vec.size() == 0) {
+      ss << "],\n";
+    } else {
+      for (size_t i = 0; i < this->lpdf_vec.size() - 1; i++) {
+        ss << this->value_to_string(this->lpdf_vec[i]) << ", ";
+      }
+      ss << this->value_to_string(this->lpdf_vec[this->lpdf_vec.size() - 1]);
+
+      ss << "],\n";
+    }
+    ss << "  \"expected_values\":[";
+    if (this->expected_values.size() == 0) {
+      ss << "],\n";
+    } else {
+      for (size_t i = 0; i < this->expected_values.size() - 1; i++) {
+        ss << this->value_to_string(this->expected_values[i].final_value_m)
+           << ", ";
+      }
+      ss << this->value_to_string(
+          this->expected_values[this->expected_values.size() - 1]
+              .final_value_m);
+
+      ss << "],\n";
+    }
+    ss << "  \"log_sd_values\":[";
+    if (this->log_sd.size() == 0) {
+      ss << "],\n";
+    } else {
+      for (R_xlen_t i = 0; i < static_cast<R_xlen_t>(this->log_sd.size()) - 1;
+           i++) {
+        ss << this->value_to_string(this->log_sd[i].final_value_m) << ", ";
+      }
+      ss << this->value_to_string(
+                this->log_sd[this->log_sd.size() - 1].final_value_m)
+         << "],\n";
+    }
+    ss << "  \"observed_values\":[";
+    if (this->observed_values.size() == 0) {
+      ss << "]\n";
+    } else {
+      for (size_t i = 0; i < this->observed_values.size() - 1; i++) {
+        ss << this->observed_values[i].final_value_m << ", ";
+      }
+      ss << this->observed_values[this->observed_values.size() - 1]
+                .final_value_m
+         << "]\n";
+    }
+    ss << " }}\n";
+    return ss.str();
+  }
+
+#ifdef TMB_MODEL
+
+  template <typename Type>
+  bool add_to_fims_tmb_internal() {
+    std::shared_ptr<fims_info::Information<Type>> info =
+        fims_info::Information<Type>::GetInstance();
+
+    std::shared_ptr<fims_distributions::InvGammaLPDF<Type>> distribution =
+        std::make_shared<fims_distributions::InvGammaLPDF<Type>>();
+
+    // set relative info
+    distribution->id = this->id_m;
+    std::stringstream ss;
+    distribution->observed_data_id_m = interface_observed_data_id_m;
+    distribution->input_type = this->input_type_m;
+    distribution->key.resize(this->key_m->size());
+    for (size_t i = 0; i < this->key_m->size(); i++) {
+      distribution->key[i] = this->key_m->at(i);
+    }
+    distribution->observed_values.resize(this->observed_values.size());
+    for (size_t i = 0; i < this->observed_values.size(); i++) {
+      distribution->observed_values[i] =
+          this->observed_values[i].initial_value_m;
+    }
+    // set relative info
+    distribution->expected_values.resize(this->expected_values.size());
+    for (size_t i = 0; i < this->expected_values.size(); i++) {
+      distribution->expected_values[i] =
+          this->expected_values[i].initial_value_m;
+    }
+    distribution->log_sd.resize(this->log_sd.size());
+    for (size_t i = 0; i < this->log_sd.size(); i++) {
+      distribution->log_sd[i] = this->log_sd[i].initial_value_m;
+      if (this->log_sd[i].estimation_type_m.get() == "fixed_effects") {
+        ss.str("");
+        ss << "dinvgamma." << this->id_m << ".log_sd."
+           << this->log_sd[i].id_m;
+        info->RegisterParameterName(ss.str());
+        info->RegisterParameter(distribution->log_sd[i]);
+      }
+      if (this->log_sd[i].estimation_type_m.get() == "random_effects") {
+        FIMS_ERROR_LOG("standard deviations cannot be set to random effects");
+      }
+    }
+    info->variable_map[this->log_sd.id_m] = &(distribution)->log_sd;
+
+    info->density_components[distribution->id] = distribution;
+
+    return true;
+  }
+
+  /**
+   * @brief Adds the parameters to the TMB model.
+   * @return A boolean of true.
+   */
+  virtual bool add_to_fims_tmb() {
+    this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
+    this->add_to_fims_tmb_internal<TMBAD_FIMS_TYPE>();
+
+    return true;
+  }
+
+#endif
+};
+
+/**
  * @brief The Rcpp interface for Dmultinom to instantiate from R:
  * dmultinom_ <- methods::new(DmultinomDistribution).
  */
