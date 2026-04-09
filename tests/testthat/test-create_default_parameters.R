@@ -50,10 +50,14 @@ test_that("`create_default_parameters()` works with correct inputs", {
     save_csv(result_unnested),
     "default_parameters.csv",
     compare = compare_file_text
-  )}, error = function(e) {
-    stop("Error in snapshot testing: ", e$message)
-  })
-})
+  ) },
+  error = function(e) {
+    message("ERROR MESSAGE: ", conditionMessage(e))
+    message("CALL: ")
+    print(e$call)
+    stop(e)  # IMPORTANT: rethrow so testthat still fails
+  }
+)
 
 ## Edge handling ----
 test_that("`create_default_parameters()` works with edge cases", {

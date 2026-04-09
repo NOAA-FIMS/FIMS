@@ -11,9 +11,12 @@ save_csv <- function(data) {
       return(path)
     },
     error = function(e) {
-      stop("Error saving CSV file: ", e$message)
+    message("ERROR MESSAGE: ", conditionMessage(e))
+    message("CALL: ")
+    print(e$call)
+    stop(e)  #rethrow so testthat still fails
     }
-  )
+)
   # write.csv(data, path)
   path
 }
