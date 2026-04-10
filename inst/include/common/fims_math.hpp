@@ -182,7 +182,7 @@ template <class Type>
 inline const Type lgamma(const Type &x) {
   // use std::lgamma for double type, look for TMB version of lgamma if AD type
   using std::lgamma;
-  return lgamma(x);
+  return ::lgamma(x);
 }
 
 #endif
@@ -363,6 +363,36 @@ T sum(const fims::Vector<T> &v) {
     ret += v[i];
   }
   return ret;
+}
+
+/**
+ * @brief The probability density function of the inverse gamma distribution.
+ *
+ * @details Computes the inverse gamma density function in log space:
+ * \f[
+ * \log f(x; \alpha, \theta) = - \alpha \log(\theta) - \log\Gamma(\alpha)
+ *   - (\alpha + 1) \log(x) - \frac{1}{\theta x}
+ * \f]
+ * where \f$\alpha > 0\f$ is the shape parameter and \f$\theta > 0\f$ is the scale
+ * parameter.
+ *
+ * @param x The value at which to evaluate the density. Must be positive.
+ * @param shape The shape parameter \f$\alpha\f$ of the distribution. Must be positive.
+ * @param scale The scale parameter \f$\theta\f$ of the distribution. Must be positive.
+ * @param logscale If true, returns the log of the density; otherwise
+ * returns the density itself (default).
+ * @return The log probability density (or density if logscale is false).
+ */
+template <class Type>
+inline const Type dinvgamma(const Type &x, const Type &shape, const Type &scale,
+                            bool logscale = false) {
+  Type ret = - shape * fims_math::log(scale) - fims_math::lgamma(shape) -
+             (shape + static_cast<Type>(1.0)) * fims_math::log(x) - static_cast<Type>(1.0) / (scale * x);
+  if (logscale) {
+    return ret;
+  } else {
+    return fims_math::exp(ret);
+  }
 }
 
 }  // namespace fims_math

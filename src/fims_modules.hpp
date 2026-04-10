@@ -503,26 +503,32 @@ RCPP_MODULE(fims) {
       "https://noaa-fims.github.io/FIMS/doxygen/"
       "classDgammaDistributionsInterface.html.")
       .constructor()
-      .method("get_id", &DgammaDistributionsInterface::get_id,
-              "Returns a unique ID for the Dgamma distribution class.")
-      .method("evaluate", &DgammaDistributionsInterface::evaluate,
-              "Evaluates the gamma distribution given input data and "
-              "parameter values.")
+      .method("get_id", &DgammaDistributionsInterface::get_id)
+      .method("evaluate", &DgammaDistributionsInterface::evaluate)
       .method("set_observed_data",
-              &DgammaDistributionsInterface::set_observed_data,
-              "Accepts a unique ID for a given Data Object class to link the "
-              "data with the distribution.")
+              &DgammaDistributionsInterface::set_observed_data)
       .method("set_distribution_links",
-              &DgammaDistributionsInterface::set_distribution_links,
-              "Accepts a unique ID for a given parameter to link the parameter "
-              "with the distribution.")
-      .field("observed_values", &DgammaDistributionsInterface::observed_values,
-             "Input for distribution when not observations, e.g., prior or "
-             "random effect.")
-      .field("expected_values", &DgammaDistributionsInterface::expected_values,
-             "Mean of the distribution.")
-      .field("log_sd", &DgammaDistributionsInterface::log_sd,
-             "The natural log of the standard deviation.");
+              &DgammaDistributionsInterface::set_distribution_links)
+      .field("observed_values", &DgammaDistributionsInterface::observed_values)
+      .field("expected_values", &DgammaDistributionsInterface::expected_values)
+      .field("log_sd", &DgammaDistributionsInterface::log_sd);
+    
+     Rcpp::class_<DinvgammaDistributionsInterface>(
+      "DinvgammaDistribution",
+      "See "
+      "https://noaa-fims.github.io/FIMS/doxygen/"
+      "classDinvgammaDistributionsInterface.html.")
+      .constructor()
+      .method("get_id", &DinvgammaDistributionsInterface::get_id)
+      .method("evaluate", &DinvgammaDistributionsInterface::evaluate)
+      .method("set_observed_data",
+              &DinvgammaDistributionsInterface::set_observed_data)
+      .method("set_distribution_links",
+              &DinvgammaDistributionsInterface::set_distribution_links)
+      .field("observed_values",
+             &DinvgammaDistributionsInterface::observed_values)
+      .field("log_shape", &DinvgammaDistributionsInterface::log_shape)
+      .field("log_scale", &DinvgammaDistributionsInterface::log_scale);
 
    Rcpp::class_<DmultinomDistributionsInterface>(
       "DmultinomDistribution",
