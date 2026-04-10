@@ -1,3 +1,4 @@
+# file = FIMS/tests/testthat/helper-integration-tests-validation.R 
 # Helper file for FIMS R tests----
 # This file contains multiple functions that are used to set up and run
 # FIMS models with or without wrapper functions. The functions are sourced by
@@ -35,16 +36,29 @@
 #'   om_input = om_input_list[[1]],
 #'   om_output = om_output_list[[1]],
 #'   em_input = em_input_list[[1]],
-#'   use_fimsfit = FALSE
+#'   use_fimsfit = FALSE,
+#'   comp_theta = NULL
 #' )
 #' }
+ 
+validate_comp_nll <- function(observed_prop, sample_size, expected_prop, theta = NULL) {
+  observed_counts <- observed_prop * sample_size
+  
+  if (is.null(theta)) {
+    return(FIMS_dmultinom(observed_counts, expected_prop, give_log = TRUE))
+  } else {
+    return(ddiric_multinom(observed_counts, expected_prop, theta, give_log = TRUE))
+  }
+}
+
 validate_fims <- function(
   report,
   estimates,
   om_input,
   om_output,
   em_input,
-  use_fimsfit = FALSE
+  use_fimsfit = FALSE,
+  comp_theta = NULL
 ) {
   # Helper function to validate estimates against expected values
   validate_error <- function(expected,
@@ -479,22 +493,45 @@ verify_fims_nll <- function(report,
   survey_acomp_observed <- em_input[["survey.age.obs"]][["survey1"]]
   survey_acomp_expected <- 0.0 + (1.0 - 0.0 * om_input[["nages"]]) * om_output[["survey_age_comp"]][["survey1"]] /
     rowSums(om_output[["survey_age_comp"]][["survey1"]])
+  
   age_comp_nll_fleet <- age_comp_nll_survey <- 0
+  
   for (y in 1:om_input[["nyr"]]) {
     age_comp_nll_fleet <- age_comp_nll_fleet -
       dmultinom(
         fishing_acomp_observed[y, ] * em_input[["n.L"]][["fleet1"]], em_input[["n.L"]][["fleet1"]],
-        fishing_acomp_expected[y, ], TRUE
-      )
-
+        fishing_acomp_expected[y, ], TRUE)
     age_comp_nll_survey <- age_comp_nll_survey -
       dmultinom(
         survey_acomp_observed[y, ] * em_input[["n.survey"]][["survey1"]], em_input[["n.survey"]][["survey1"]],
-        survey_acomp_expected[y, ], TRUE
-      )
+        survey_acomp_expected[y, ], TRUE)
   }
   age_comp_nll <- age_comp_nll_fleet + age_comp_nll_survey
 
+# check fishing_acomp_ll values by year
+  fishing_acomp_ll_check <- purrr::map_dbl(
+    seq_len(om_input[["nyr"]]),
+    \(y) validate_comp_nll(
+      observed_prop = fishing_acomp_observed[y, ],
+      sample_size = em_input[["n.L"]][["fleet1"]],
+      expected_prop = fishing_acomp_expected[y, ],
+      theta = comp_theta
+    )
+  )
+  expect_true(all(is.finite(fishing_acomp_ll_check)))
+
+  # check survey_acomp_ll values by year
+  survey_acomp_ll_check <- purrr::map_dbl(
+    seq_len(om_input[["nyr"]]),
+    \(y) validate_comp_nll(
+      observed_prop = survey_acomp_observed[y, ],
+      sample_size = em_input[["n.survey"]][["survey1"]],
+      expected_prop = survey_acomp_expected[y, ],
+      theta = comp_theta
+    )
+  )
+  expect_true(all(is.finite(survey_acomp_ll_check)))
+  
   # length comp likelihoods
   fishing_lengthcomp_observed <- em_input[["L.length.obs"]][["fleet1"]]
   fishing_lengthcomp_expected <- 0.0 + (1.0 - 0.0 * om_input[["nlengths"]]) * om_output[["L.length"]][["fleet1"]] / rowSums(om_output[["L.length"]][["fleet1"]])
@@ -517,6 +554,30 @@ verify_fims_nll <- function(report,
       )
   }
   lengthcomp_nll <- lengthcomp_nll_fleet + lengthcomp_nll_survey
+  
+  # check fishing_lengthcomp_ll values by year
+  fishing_lengthcomp_ll_check <- purrr::map_dbl(
+    seq_len(om_input[["nyr"]]),
+    \(y) validate_comp_nll(
+      observed_prop = fishing_lengthcomp_observed[y, ],
+      sample_size = em_input[["n.L"]][["fleet1"]],
+      expected_prop = fishing_lengthcomp_expected[y, ],
+      theta = comp_theta
+    )
+  )
+  expect_true(all(is.finite(fishing_lengthcomp_ll_check)))
+  
+  # check survey_lengthcomp_ll values by year
+  survey_lengthcomp_ll_check <- purrr::map_dbl(
+    seq_len(om_input[["nyr"]]),
+    \(y) validate_comp_nll(
+      observed_prop = survey_lengthcomp_observed[y, ],
+      sample_size = em_input[["n.survey"]][["survey1"]],
+      expected_prop = survey_lengthcomp_expected[y, ],
+      theta = comp_theta
+    )
+  )
+  expect_true(all(is.finite(survey_lengthcomp_ll_check)))
 
   expected_jnll <- rec_nll + landings_nll + index_nll + age_comp_nll + lengthcomp_nll
   jnll <- report[["jnll"]]
