@@ -16,7 +16,20 @@ jobs:
     if: failure()
     runs-on: ubuntu-latest
     steps:
-      - name: Log Errors to Summary
+      - name: Download R Check Logs
+        uses: actions/download-artifact@v4
+        with:
+          # Note: The name depends on the reusable workflow. 
+          # Common names are 'check-logs' or 'r-cmd-check-results'
+          path: check-logs
+
+      - name: Write Specific Errors to Summary
         run: |
-          echo "### ⚠️ VM Error detected" >> $GITHUB_STEP_SUMMARY
-          echo "The R CMD CHECK workflow failed. Check the logs for specific package errors." >> $GITHUB_STEP_SUMMARY
+          echo "### ⚠️ R CMD CHECK Failure Details" >> $GITHUB_STEP_SUMMARY
+          echo "#### Extract from 00check.log:" >> $GITHUB_STEP_SUMMARY
+          echo '```text' >> $GITHUB_STEP_SUMMARY
+          
+          # Find any .log files in the downloaded artifact and show the last 20 lines
+          find check-logs -name "*.log" -exec tail -n 20 {} + >> $GITHUB_STEP_SUMMARY
+          
+          echo '```' >> $GITHUB_STEP_SUMMARY
