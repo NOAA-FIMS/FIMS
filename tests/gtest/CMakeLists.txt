@@ -81,10 +81,16 @@ add_executable(fims_math_dinvgamma
   test_fims_math_dinvgamma.cpp
 )
 
+find_library(R_LIB 
+  NAMES R 
+  PATHS "${R_HOME}/lib" "${R_HOME}/bin"
+  NO_DEFAULT_PATH
+)
+
 target_link_libraries(fims_math_dinvgamma
   gtest_main
   fims_test
-  ${R_HOME}/lib/libR.so
+  ${R_LIB}
 )
 
 gtest_discover_tests(fims_math_dinvgamma)
