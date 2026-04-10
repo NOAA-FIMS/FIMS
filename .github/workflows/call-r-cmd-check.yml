@@ -10,4 +10,13 @@ jobs:
     uses: nmfs-ost/ghactions4r/.github/workflows/r-cmd-check.yml@main
     with: 
       gha_timeout_minutes: 60
-      
+
+  log-errors-job:
+    needs: call-workflow
+    if: failure()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Log Errors to Summary
+        run: |
+          echo "### ⚠️ VM Error detected" >> $GITHUB_STEP_SUMMARY
+          echo "The R CMD CHECK workflow failed. Check the logs for specific package errors." >> $GITHUB_STEP_SUMMARY
