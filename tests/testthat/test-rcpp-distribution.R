@@ -227,6 +227,54 @@ test_that("DgammaDistribution works with correct inputs", {
   clear()
 })
 
+test_that("DinvgammaDistribution works with correct inputs", {
+  # Reference dinvgamma function from R
+  dinvgamma_r <- function(x, shape, scale, logscale = FALSE) {
+    # return the log density of the inverse gamma distribution using the relationship to the gamma distribution
+    ret <- stats::dgamma(1 / x, shape = shape, scale = scale, log = TRUE) - 2 * log(x)
+    if (logscale) {
+      return(ret)
+    } else {
+      return(exp(ret))
+    }
+  }
+
+  # simulate inverse gamma data with scalar input
+  set.seed(123)
+  y <- 1 / stats::rgamma(1, shape = 2, rate = 2)
+  # create a fims Rcpp object
+  # initialize the Dinvgamma module
+  dinvgamma_ <- methods::new(DinvgammaDistribution)
+  # populate class members
+  dinvgamma_$observed_values[1]$value <- y
+  dinvgamma_$log_shape[1]$value <- log(2)
+  dinvgamma_$log_scale[1]$value <- log(1/2)
+  # evaluate the density and compare with R
+  #' @description Test that dinvgamma works with a single value input, e.g. a prior on a parameter.
+  expect_equal(dinvgamma_$evaluate(), dinvgamma_r(y, 2, 1/2, TRUE))
+  clear()
+
+  # simulate inverse gamma data with vector input
+  set.seed(123)
+  y <- 1 / stats::rgamma(10, shape = 2, rate = 2)
+  # initialize the Dinvgamma module
+  dinvgamma_ <- methods::new(DinvgammaDistribution)
+  # populate class members
+  dinvgamma_$observed_values$resize(length(y))
+  purrr::walk(
+    seq_along(y),
+    \(x) dinvgamma_$observed_values[x]$value <- y[x]
+  )
+  dinvgamma_$log_shape[1]$value <- log(2)
+  dinvgamma_$log_scale[1]$value <- log(1/2)
+  # evaluate the density and compare with R
+  #' @description Test that dinvgamma works with a vector of state variables and scalar shape and scale arguments.
+  expect_equal(dinvgamma_$evaluate(), sum(dinvgamma_r(y, 2, 1/2, TRUE)))
+  clear()
+
+})
+
+
 test_that("DmultinomDistribution works with correct inputs", {
 
   # generate data using R stats:rmultinom
@@ -541,6 +589,88 @@ test_that("DgammaDistribution returns correct outputs for edge cases", {
   clear()
 })
 
+
+test_that("dinvgamma returns correct outputs for edge cases", {
+  # Reference dinvgamma function from R
+  dinvgamma_r <- function(x, shape, scale, logscale = FALSE) {
+    # return the log density of the inverse gamma distribution using the relationship to the gamma distribution
+    ret <- stats::dgamma(1 / x, shape = shape, scale = scale, log = TRUE) - 2 * log(x)
+    if (logscale) {
+      return(ret)
+    } else {
+      return(exp(ret))
+    }
+  }
+
+  # test with small positive x
+  y <- 1e-4
+  dinvgamma_ <- methods::new(DinvgammaDistribution)
+  dinvgamma_$observed_values[1]$value <- y
+  dinvgamma_$log_shape[1]$value <- log(2)
+  dinvgamma_$log_scale[1]$value <- log(1/2)
+  #' @description Test that dinvgamma returns the correct output for a very small x value (1e-4).
+  expect_equal(dinvgamma_$evaluate(), dinvgamma_r(y, 2, 1/2, TRUE))
+  clear()
+
+  # test with large x
+  y <- 1e4
+  dinvgamma_ <- methods::new(DinvgammaDistribution)
+  dinvgamma_$observed_values[1]$value <- y
+  dinvgamma_$log_shape[1]$value <- log(2)
+  dinvgamma_$log_scale[1]$value <- log(1/2)
+  #' @description Test that dinvgamma returns the correct output for a very large x value (1e4).
+  expect_equal(dinvgamma_$evaluate(), dinvgamma_r(y, 2, 1/2, TRUE))
+  clear()
+
+  # test with x = 0 (should return -Inf)
+  y <- 0
+  dinvgamma_ <- methods::new(DinvgammaDistribution)
+  dinvgamma_$observed_values[1]$value <- y
+  dinvgamma_$log_shape[1]$value <- log(2)
+  dinvgamma_$log_scale[1]$value <- log(1/2)
+  #' @description Test that dinvgamma returns NaN when x = 0.
+  expect_equal(dinvgamma_$evaluate(), NaN)
+  clear()
+
+  # test with small shape and scale parameters
+  y <- 1
+  dinvgamma_ <- methods::new(DinvgammaDistribution)
+  dinvgamma_$observed_values[1]$value <- y
+  dinvgamma_$log_shape[1]$value <- log(1e-4)
+  dinvgamma_$log_scale[1]$value <- log(2)
+  #' @description Test that dinvgamma returns the correct output for small shape parameters (1e-4).
+  expect_equal(dinvgamma_$evaluate(), dinvgamma_r(y, 1e-4, 2, TRUE))
+  clear() 
+
+  y <- 1
+  dinvgamma_ <- methods::new(DinvgammaDistribution)
+  dinvgamma_$observed_values[1]$value <- y
+  dinvgamma_$log_shape[1]$value <- log(2)
+  dinvgamma_$log_scale[1]$value <- log(1e-4)
+  #' @description Test that dinvgamma returns the correct output for small scale parameters (1e-4).
+  expect_equal(dinvgamma_$evaluate(), dinvgamma_r(y, 2, 1e-4, TRUE))
+  clear() 
+
+  # test large shape and scale parameters
+  y <- 1
+  dinvgamma_ <- methods::new(DinvgammaDistribution)
+  dinvgamma_$observed_values[1]$value <- y
+  dinvgamma_$log_shape[1]$value <- log(1e4)
+  dinvgamma_$log_scale[1]$value <- log(2)
+  #' @description Test that dinvgamma returns the correct output for large shape parameters (1e4).
+  expect_equal(dinvgamma_$evaluate(), dinvgamma_r(y, 1e4, 2, TRUE))
+  clear() 
+
+  y <- 1
+  dinvgamma_ <- methods::new(DinvgammaDistribution)
+  dinvgamma_$observed_values[1]$value <- y      
+  dinvgamma_$log_shape[1]$value <- log(2)
+  dinvgamma_$log_scale[1]$value <- log(1e4)
+  #' @description Test that dinvgamma returns the correct output for large scale parameters (1e4).
+  expect_equal(dinvgamma_$evaluate(), dinvgamma_r(y, 2, 1e4, TRUE))
+  clear() 
+})
+
 test_that("DmultinomDistribution returns correct outputs for edge cases", {
    set.seed(123)
   # generate data using R stats:rnorm
@@ -724,6 +854,31 @@ test_that("DgammaDistribution returns correct error messages", {
   expect_error(
     object = dgamma_$evaluate(),
     regexp = "GammaLPDF::Vector .* out of bounds. .* 10 .* 3"
+  )
+  clear()
+})
+
+test_that("dinvgamma returns correct error messages", {
+  y <- 1 / stats::rgamma(10, shape = 2, rate = 1)
+  # create a fims Rcpp object
+  # initialize the Dinvgamma module
+  dinvgamma_ <- methods::new(DinvgammaDistribution)
+  # populate class members with mismatched dimensions
+  dinvgamma_$observed_values$resize(length(y))
+  purrr::walk(
+    seq_along(y),
+    \(x) dinvgamma_$observed_values[x]$value <- y[x]
+  )
+  dinvgamma_$log_shape$resize(3)
+  purrr::walk(
+    1:3,
+    \(x) dinvgamma_$log_shape[x]$value <- 2
+  )
+  dinvgamma_$log_scale[1]$value <- 1
+  #' @description dinvgamma should error out when there is a dimension mismatch where it is expecting shape to have a size 10 but is provided a size 3 vector.
+  expect_error(
+    object = dinvgamma_$evaluate(),
+    regexp = "InvGammaLPDF::Vector .* out of bounds. .* 10 .* 3"
   )
   clear()
 })

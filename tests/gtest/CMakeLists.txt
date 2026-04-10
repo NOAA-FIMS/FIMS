@@ -76,6 +76,19 @@ target_link_libraries(fims_math_fabs_min_max
 
 gtest_discover_tests(fims_math_fabs_min_max)
 
+# test_fims_math_dinvgamma.cpp
+add_executable(fims_math_dinvgamma
+  test_fims_math_dinvgamma.cpp
+)
+
+target_link_libraries(fims_math_dinvgamma
+  gtest_main
+  fims_test
+  ${R_HOME}/lib/libR.so
+)
+
+gtest_discover_tests(fims_math_dinvgamma)
+
 # test_parameter_transformations_log.cpp
 add_executable(parameter_transformations_log
   test_parameter_transformations_log.cpp
