@@ -3,19 +3,18 @@
   "language": "en",
   "dictionaryDefinitions": [
     {
-      "name": "fims-dict",
-      "path": "./fims-dict.txt",
+      "name": "fims-wordlist",
+      "path": "./inst/WORDLIST",
       "addWords": true
     }
   ],
   "dictionaries": [
-    "fims-dict",
+    "fims-wordlist",
     "cpp",
     "r",
     "softwareTerms"
   ],
   "ignorePaths": [
-    "inst/WORDLIST",
     "**/node_modules/**",
     "*.Rproj",
     ".github/workflows/**",

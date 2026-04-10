@@ -103,7 +103,6 @@ Suggests:
     rmarkdown,
     snowfall,
     SparseNUTS,
-    spelling,
     stockplotr,
     styler,
     testdown,
