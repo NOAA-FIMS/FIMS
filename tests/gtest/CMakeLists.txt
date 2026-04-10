@@ -82,10 +82,21 @@ add_executable(fims_math_dinvgamma
 )
 
 find_library(R_LIB 
-  NAMES R 
-  PATHS "${R_HOME}/lib" "${R_HOME}/bin"
-  NO_DEFAULT_PATH
+  NAMES R R.dll R.lib
+  HINTS "${R_HOME}"
+  PATHS 
+    "${R_HOME}/bin/x64"     # Standard Windows 64-bit path
+    "${R_HOME}/bin"         # Older Windows or specialized builds
+    "${R_HOME}/lib"         # Linux/macOS standard
+  PATH_SUFFIXES "x64" "i386"
 )
+
+# Crucial for debugging CI:
+message(STATUS "Final R_LIB path: ${R_LIB}")
+
+if(NOT R_LIB)
+    message(FATAL_ERROR "Could not find R_LIB. Search attempted in ${R_HOME}")
+endif()
 
 target_link_libraries(fims_math_dinvgamma
   gtest_main
