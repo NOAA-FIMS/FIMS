@@ -29,7 +29,7 @@ jobs:
           echo "#### Extract from 00check.log:" >> $GITHUB_STEP_SUMMARY
           echo '```text' >> $GITHUB_STEP_SUMMARY
           
-          # Find any .log files in the downloaded artifact and show the last 20 lines
-          find check-logs -name "*.log" -exec tail -n 20 {} + >> $GITHUB_STEP_SUMMARY
+          # Find any .log files in the downloaded artifact and show the last 120 lines
+          find check-logs -name "*.log" -exec tail -n 120 {} + >> $GITHUB_STEP_SUMMARY
           
           echo '```' >> $GITHUB_STEP_SUMMARY
