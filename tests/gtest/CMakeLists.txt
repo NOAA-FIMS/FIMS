@@ -477,3 +477,15 @@ target_link_libraries(def_FIMSLog_clear
 )
 
 gtest_discover_tests(def_FIMSLog_clear)
+
+# test_fims_transformations_ApplyBackTransformation.cpp
+add_executable(fims_transformations_ApplyBackTransformation
+  test_fims_transformations_ApplyBackTransformation.cpp
+)
+
+target_link_libraries(fims_transformations_ApplyBackTransformation
+  gtest_main
+  fims_test
+)
+
+gtest_discover_tests(fims_transformations_ApplyBackTransformation)

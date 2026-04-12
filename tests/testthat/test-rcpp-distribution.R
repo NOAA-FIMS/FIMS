@@ -16,6 +16,40 @@ test_that("DnormDistribution works with correct inputs", {
   # generate data using R stats::rnorm
   set.seed(123)
 
+  # simple scalar checks for uncertainty back-transformations
+  y <- 1
+  mu <- 0
+
+  dnorm_ <- methods::new(DnormDistribution)
+  dnorm_$observed_values[1]$value <- y
+  dnorm_$expected_values[1]$value <- mu
+  dnorm_$uncertainty$set_transformation("identity")
+  dnorm_$uncertainty$set_uncertainty_name("sd")
+  dnorm_$uncertainty[1]$value <- 2
+  #' @description Test dnorm with identity transformation and sd uncertainty on a scalar input.
+  expect_equal(dnorm_$evaluate(), stats::dnorm(y, mu, sd = 2, log = TRUE))
+  clear()
+
+  dnorm_ <- methods::new(DnormDistribution)
+  dnorm_$observed_values[1]$value <- y
+  dnorm_$expected_values[1]$value <- mu
+  dnorm_$uncertainty$set_transformation("log")
+  dnorm_$uncertainty$set_uncertainty_name("var")
+  dnorm_$uncertainty[1]$value <- log(4)
+  #' @description Test dnorm with log transformation and var uncertainty on a scalar input.
+  expect_equal(dnorm_$evaluate(), stats::dnorm(y, mu, sd = 2, log = TRUE))
+  clear()
+
+  dnorm_ <- methods::new(DnormDistribution)
+  dnorm_$observed_values[1]$value <- y
+  dnorm_$expected_values[1]$value <- mu
+  dnorm_$uncertainty$set_transformation("identity")
+  dnorm_$uncertainty$set_uncertainty_name("var")
+  dnorm_$uncertainty[1]$value <- 4
+  #' @description Test dnorm with identity transformation and var uncertainty on a scalar input.
+  expect_equal(dnorm_$evaluate(), stats::dnorm(y, mu, sd = 2, log = TRUE))
+  clear()
+
   # simulate normal data with scalar input
   y <- stats::rnorm(1)
   # create a fims Rcpp object

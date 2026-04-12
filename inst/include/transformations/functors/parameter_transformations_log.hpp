@@ -2,8 +2,8 @@
  * @file parameter_transformations_log.hpp
  * @brief Defines transformation strategies for parameters between log and natural scales
  */
-#ifndef FIMS_TRANSFORMATIONS_PARAMETER_TRANSFORMATIONS_LOG_HPP
-#define FIMS_TRANSFORMATIONS_PARAMETER_TRANSFORMATIONS_LOG_HPP
+#ifndef TRANSFORMATIONS_PARAMETER_TRANSFORMATIONS_LOG_HPP
+#define TRANSFORMATIONS_PARAMETER_TRANSFORMATIONS_LOG_HPP
 
 namespace fims_transformations {
 
@@ -56,4 +56,4 @@ std::shared_ptr<ParameterTransformationBase<Type>> CreateLogTransformation(
 
 } // namespace fims_transformations
 
-#endif /* FIMS_TRANSFORMATIONS_PARAMETER_TRANSFORMATIONS_LOG_HPP */
+#endif /* TRANSFORMATIONS_PARAMETER_TRANSFORMATIONS_LOG_HPP */

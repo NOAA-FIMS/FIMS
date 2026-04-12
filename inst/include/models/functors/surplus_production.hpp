@@ -444,6 +444,7 @@ class SurplusProduction : public FisheryModelBase<Type> {
     vector<vector<Type>> bmsy_(n_pops);
     vector<vector<Type>> msy_(n_pops);
     vector<vector<Type>> harvest_rate_(n_pops);
+    vector<vector<Type>> log_index_to_depletion_carrying_capacity_ratio_(n_fleets);
     vector<vector<Type>> mean_q_(n_fleets);
     // initiate population index for structuring report out objects
     int pop_idx = 0;
@@ -471,7 +472,8 @@ class SurplusProduction : public FisheryModelBase<Type> {
       std::shared_ptr<fims_popdy::Fleet<Type>> &fleet = (*fit).second;
       std::map<std::string, fims::Vector<Type>> &derived_quantities =
           this->GetFleetDerivedQuantities(fleet->GetId());
-
+      log_index_to_depletion_carrying_capacity_ratio_(fleet_idx) =
+          derived_quantities["log_index_to_depletion_carrying_capacity_ratio"].to_tmb();
       log_index_expected_(fleet_idx) =
           derived_quantities["log_index_expected"].to_tmb();
       mean_q_(fleet_idx) =
@@ -488,6 +490,7 @@ class SurplusProduction : public FisheryModelBase<Type> {
     FIMS_REPORT_F_("msy", msy_, this->of);
     FIMS_REPORT_F_("log_index_expected", log_index_expected_, this->of);
     FIMS_REPORT_F_("mean_q", mean_q_, this->of);
+    FIMS_REPORT_F_("log_index_to_depletion_carrying_capacity_ratio", log_index_to_depletion_carrying_capacity_ratio_, this->of);
     /*ADREPORT using ADREPORTvector defined in
      * inst/include/interface/interface.hpp:
      * function collapses the nested vector into a single vector
@@ -501,7 +504,7 @@ class SurplusProduction : public FisheryModelBase<Type> {
     vector<Type> msy = ADREPORTvector(msy_);
     vector<Type> log_index_expected = ADREPORTvector(log_index_expected_);
     vector<Type> mean_q = ADREPORTvector(mean_q_);
-
+    vector<Type> log_index_to_depletion_carrying_capacity_ratio = ADREPORTvector(log_index_to_depletion_carrying_capacity_ratio_);
     ADREPORT_F(biomass, this->of);
     ADREPORT_F(depletion, this->of);
     ADREPORT_F(observed_catch, this->of);
@@ -511,6 +514,7 @@ class SurplusProduction : public FisheryModelBase<Type> {
     ADREPORT_F(msy, this->of);
     ADREPORT_F(log_index_expected, this->of);
     ADREPORT_F(mean_q, this->of);
+    ADREPORT_F(log_index_to_depletion_carrying_capacity_ratio, this->of); 
      std::stringstream var_name;
       typename std::map<std::string, fims::Vector<fims::Vector<Type>>>::iterator
           rvit;

@@ -20,6 +20,7 @@
 #include "../../interface/interface.hpp"
 #include "../../common/fims_vector.hpp"
 #include "../../common/fims_math.hpp"
+#include "../../common/fims_transformations.hpp"
 
 namespace fims_distributions {
 

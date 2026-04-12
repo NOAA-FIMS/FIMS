@@ -8,6 +8,7 @@
 #ifndef FIMS_VECTOR_HPP
 #define FIMS_VECTOR_HPP
 
+#include "def.hpp"
 #include "../interface/interface.hpp"
 #include <ostream>
 #include <iomanip>
@@ -27,6 +28,7 @@ namespace fims {
 template <typename Type>
 class Vector {
   std::vector<Type> vec_m;
+  Transformation transformation_m;
   /**
    * @brief friend comparison operator. Allows the operator to see private
    * members of fims::Vector<Type>.
@@ -73,6 +75,7 @@ class Vector {
    */
   Vector(size_t size, const Type &value = Type()) {
     this->vec_m.resize(size, value);
+    this->transformation_m = Transformation{};  
   }
 
   /**
@@ -83,6 +86,7 @@ class Vector {
     for (size_t i = 0; i < this->vec_m.size(); i++) {
       this->vec_m[i] = other[i];
     }
+    this->transformation_m = Transformation{};  
   }
 
   /**
@@ -107,7 +111,10 @@ class Vector {
   /**
    * @brief Initialization constructor from std::vector<Type> type.
    */
-  Vector(const std::vector<Type> &other) { this->vec_m = other; }
+  Vector(const std::vector<Type> &other) { 
+    this->vec_m = other; 
+    this->transformation_m = Transformation{};  
+  }
 
   // TMB specific constructor
 #ifdef TMB_MODEL
@@ -120,6 +127,7 @@ class Vector {
     for (size_t i = 0; i < this->vec_m.size(); i++) {
       this->vec_m[i] = other[i];
     }
+    this->transformation_m = Transformation{};
   }
 
 #endif
@@ -129,6 +137,7 @@ class Vector {
    */
   Vector(std::initializer_list<Type> init) {
     this->vec_m = std::vector<Type>(init);
+    this->transformation_m = Transformation{};
   }
 
   /**
@@ -189,6 +198,10 @@ class Vector {
     } else {
       return this->at(pos);
     }
+  }
+
+  inline Transformation &get_transformation() {
+    return this->transformation_m;
   }
 
   /**

@@ -10,10 +10,10 @@
  * Fisheries Integrated Modeling System project. See LICENSE in the source
  * folder for reuse information.
  */
-#ifndef FIMS_TRANSFORMATIONS_HPP
-#define FIMS_TRANSFORMATIONS_HPP
+#ifndef TRANSFORMATIONS_HPP
+#define TRANSFORMATIONS_HPP
 
 #include "functors/parameter_transformations_base.hpp"
 #include "functors/parameter_transformations_log.hpp"
 
-#endif /* FIMS_TRANSFORMATIONS_HPP */
+#endif /* TRANSFORMATIONS_HPP */

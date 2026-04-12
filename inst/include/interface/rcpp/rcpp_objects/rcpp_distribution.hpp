@@ -190,7 +190,7 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
    * @brief The uncertainty, which would be the standard deviation of x for the
    * normal distribution.
    */
-  ParameterVector log_sd;
+  ParameterVector uncertainty;
   /**
    * @brief Vector that records the individual log probability function for each
    * observation.
@@ -217,7 +217,7 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
         observed_values(other.observed_values),
         expected_values(other.expected_values),
         expected_mean(other.expected_mean),
-        log_sd(other.log_sd),
+        uncertainty(other.uncertainty),
         lpdf_vec(other.lpdf_vec) {}
 
   /**
@@ -271,9 +271,11 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
    */
   virtual double evaluate() {
     fims_distributions::NormalLPDF<double> dnorm;
+     dnorm.uncertainty.get_transformation() =
+      *(this->uncertainty.transformation_m);
     dnorm.observed_values.resize(this->observed_values.size());
     dnorm.expected_values.resize(this->expected_values.size());
-    dnorm.log_sd.resize(this->log_sd.size());
+    dnorm.uncertainty.resize(this->uncertainty.size());
     dnorm.expected_mean.resize(this->expected_mean.size());
     for (size_t i = 0; i < this->observed_values.size(); i++) {
       dnorm.observed_values[i] = this->observed_values[i].initial_value_m;
@@ -281,8 +283,8 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
     for (size_t i = 0; i < this->expected_values.size(); i++) {
       dnorm.expected_values[i] = this->expected_values[i].initial_value_m;
     }
-    for (size_t i = 0; i < this->log_sd.size(); i++) {
-      dnorm.log_sd[i] = this->log_sd[i].initial_value_m;
+    for (size_t i = 0; i < this->uncertainty.size(); i++) {
+      dnorm.uncertainty[i] = this->uncertainty[i].initial_value_m;
     }
     for (size_t i = 0; i < this->expected_mean.size(); i++) {
       dnorm.expected_mean[i] = this->expected_mean[i].initial_value_m;
@@ -325,28 +327,28 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
 
       size_t n_x = dnorm->get_n_x();
 
-      // If input log_sd is a scalar, resize to n_x and fill with the scalar
+      // If input uncertainty is a scalar, resize to n_x and fill with the scalar
       // value
-      if (this->log_sd.size() != n_x) {
-        // If log_sd size == 1 (scalar), repeat the entry
-        if (this->log_sd.size() == 1) {
-          auto tmp = this->log_sd[0];  // copy the one log_sd param
-          this->log_sd.resize(n_x);
+      if (this->uncertainty.size() != n_x) {
+        // If uncertainty size == 1 (scalar), repeat the entry
+        if (this->uncertainty.size() == 1) {
+          auto tmp = this->uncertainty[0];  // copy the one uncertainty param
+          this->uncertainty.resize(n_x);
           for (size_t i = 0; i < n_x; ++i) {
-            this->log_sd[i] = tmp;  // copies all fields in Param
+            this->uncertainty[i] = tmp;  // copies all fields in Param
           }
         } else {
           // Handle error
           FIMS_WARNING_LOG(
-              "log_sd size does not match number of observations and is not "
+              "uncertainty size does not match number of observations and is not "
               "scalar.");
         }
       }
       for (size_t i = 0; i < n_x; i++) {
-        if (this->log_sd[i].estimation_type_m.get() == "constant") {
-          this->log_sd[i].final_value_m = this->log_sd[i].initial_value_m;
+        if (this->uncertainty[i].estimation_type_m.get() == "constant") {
+          this->uncertainty[i].final_value_m = this->uncertainty[i].initial_value_m;
         } else {
-          this->log_sd[i].final_value_m = dnorm->log_sd.get_force_scalar(i);
+          this->uncertainty[i].final_value_m = dnorm->uncertainty.get_force_scalar(i);
         }
       }
 
@@ -419,16 +421,16 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
               .final_value_m);
       ss << "],\n";
     }
-    ss << "  \"log_sd_values\":[";
-    if (this->log_sd.size() == 0) {
+    ss << "  \"uncertainty_values\":[";
+    if (this->uncertainty.size() == 0) {
       ss << "],\n";
     } else {
-      for (R_xlen_t i = 0; i < static_cast<R_xlen_t>(this->log_sd.size()) - 1;
+      for (R_xlen_t i = 0; i < static_cast<R_xlen_t>(this->uncertainty.size()) - 1;
            i++) {
-        ss << this->value_to_string(this->log_sd[i].final_value_m) << ", ";
+        ss << this->value_to_string(this->uncertainty[i].final_value_m) << ", ";
       }
       ss << this->value_to_string(
-                this->log_sd[this->log_sd.size() - 1].final_value_m)
+                this->uncertainty[this->uncertainty.size() - 1].final_value_m)
          << "],\n";
     }
     ss << "  \"observed_values\":[";
@@ -477,22 +479,24 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
       distribution->expected_values[i] =
           this->expected_values[i].initial_value_m;
     }
-    distribution->log_sd.resize(this->log_sd.size());
-    for (size_t i = 0; i < this->log_sd.size(); i++) {
-      distribution->log_sd[i] = this->log_sd[i].initial_value_m;
-      if (this->log_sd[i].estimation_type_m.get() == "fixed_effects") {
+    distribution->uncertainty.get_transformation() =
+      *(this->uncertainty.transformation_m);
+    distribution->uncertainty.resize(this->uncertainty.size());
+    for (size_t i = 0; i < this->uncertainty.size(); i++) {
+      distribution->uncertainty[i] = this->uncertainty[i].initial_value_m;
+      if (this->uncertainty[i].estimation_type_m.get() == "fixed_effects") {
         ss.str("");
-        ss << "dnorm." << this->id_m << ".log_sd." << this->log_sd[i].id_m;
+        ss << "dnorm." << this->id_m << ".uncertainty." << this->uncertainty[i].id_m;
         info->RegisterParameterName(ss.str());
-        info->RegisterParameter(distribution->log_sd[i]);
-        info->RegisterParameterBounds(this->log_sd[i].min_m,
-                                     this->log_sd[i].max_m);
+        info->RegisterParameter(distribution->uncertainty[i]);
+        info->RegisterParameterBounds(this->uncertainty[i].min_m,
+                                     this->uncertainty[i].max_m);
       }
-      if (this->log_sd[i].estimation_type_m.get() == "random_effects") {
-        FIMS_ERROR_LOG("standard deviations cannot be set to random effects");
+      if (this->uncertainty[i].estimation_type_m.get() == "random_effects") {
+        FIMS_ERROR_LOG("uncertainty values cannot be set to random effects");
       }
     }
-    info->variable_map[this->log_sd.id_m] = &(distribution)->log_sd;
+    info->variable_map[this->uncertainty.id_m] = &(distribution)->uncertainty;
 
     distribution->use_mean = this->use_mean_m.get();
     distribution->expected_mean.resize(this->expected_mean.size());

@@ -104,12 +104,10 @@ survey_fleet_index_distribution$set_observed_data(
 
 # Fix sd to posterior median from Stan as FIMS currently does not have the 
 # ability to fit a prior inverse gamma prior distribution on sd
-survey_fleet_index_distribution$log_sd$resize(nyears)
-for (y in 1:nyears) {
-    survey_fleet_index_distribution$log_sd[y]$value <- 
-        1.151663e-02 |> sqrt() |> log() 
-}
-survey_fleet_index_distribution$log_sd$set_all_estimable(FALSE)
+survey_fleet_index_distribution$uncertainty[1]$value <- 1.151663e-02 
+survey_fleet_index_distribution$uncertainty$set_transformation("identity", list())
+survey_fleet_index_distribution$uncertainty$set_uncertainty_name("var")
+survey_fleet_index_distribution$uncertainty[1]$estimation_type$set("fixed_effects")
 
 # Link the dsitribution to observed ($Z$, a derived quantity in the model), and 
 # expected (mean of $log(q)$, a derived quantity in the model)

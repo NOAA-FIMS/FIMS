@@ -12,6 +12,7 @@
 #define NORMAL_LPDF
 
 #include "../../common/def.hpp"
+#include "../../common/fims_transformations.hpp"
 #include "density_components_base.hpp"
 #include "../../common/fims_vector.hpp"
 namespace fims_distributions {
@@ -36,7 +37,7 @@ struct NormalLPDF : public DensityComponentBase<Type> {
    * each instance through the use of
    * \ref fims::Vector::get_force_scalar(size_t) "get_force_scalar()".
    */
-  fims::Vector<Type> log_sd;
+  fims::Vector<Type> uncertainty;
 
   /** @brief Constructor.
    */
@@ -77,24 +78,26 @@ struct NormalLPDF : public DensityComponentBase<Type> {
             " and the expected size is " + fims::to_string(n_expected));
     }
 
-    if (this->log_sd.size() > 1 && n_x != this->log_sd.size()) {
+    if (this->uncertainty.size() > 1 && n_x != this->uncertainty.size()) {
       throw std::invalid_argument(
           "NormalLPDF::Vector index out of bounds. The size of observed data "
-          "does not equal the size of the log_sd vector. The observed data "
+          "does not equal the size of the uncertainty vector. The observed data "
           "vector is of size " +
-          fims::to_string(n_x) + " and the log_sd vector is of size " +
-          fims::to_string(this->log_sd.size()));
+          fims::to_string(n_x) + " and the uncertainty vector is of size " +
+          fims::to_string(this->uncertainty.size()));
     }
 
     for (size_t i = 0; i < n_x; i++) {
 #ifdef TMB_MODEL
+      Type sd = fims_transformations::ApplyBackTransformation(
+        this->uncertainty.get_force_scalar(i),
+        this->uncertainty.get_transformation()); 
       if (this->input_type == "data") {
         // if data, check if there are any NA values and skip lpdf calculation
         // if there are
         if (this->get_observed(i) != this->data_observed_values->na_value) {
           this->lpdf_vec[i] =
-              dnorm(this->get_observed(i), this->get_expected(i),
-                    fims_math::exp(log_sd.get_force_scalar(i)), true);
+              dnorm(this->get_observed(i), this->get_expected(i), sd, true);
         } else {
           this->lpdf_vec[i] = 0;
         }
@@ -103,8 +106,7 @@ struct NormalLPDF : public DensityComponentBase<Type> {
       } else {
         if(this->get_observed(i) != -999){
           this->lpdf_vec[i] =
-              dnorm(this->get_observed(i), this->get_expected(i),
-                    fims_math::exp(log_sd.get_force_scalar(i)), true);
+              dnorm(this->get_observed(i), this->get_expected(i), sd, true);
         }
       }
       this->lpdf += this->lpdf_vec[i];
@@ -112,17 +114,14 @@ struct NormalLPDF : public DensityComponentBase<Type> {
         FIMS_SIMULATE_F(this->of) {
           if (this->input_type == "data") {
             this->data_observed_values->at(i) =
-                rnorm(this->get_expected(i),
-                      fims_math::exp(log_sd.get_force_scalar(i)));
+                rnorm(this->get_expected(i), sd);
           }
           if (this->input_type == "random_effects") {
-            (*this->re)[i] = rnorm(this->get_expected(i),
-                                   fims_math::exp(log_sd.get_force_scalar(i)));
+            (*this->re)[i] = rnorm(this->get_expected(i), sd);
           }
           if (this->input_type == "prior") {
             (*(this->priors[i]))[0] =
-                rnorm(this->get_expected(i),
-                      fims_math::exp(log_sd.get_force_scalar(i)));
+                rnorm(this->get_expected(i), sd);
           }
         }
       }

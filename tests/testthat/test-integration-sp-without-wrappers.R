@@ -9,39 +9,60 @@
 
 # Deterministic test ----
 ## Setup ----
+K_prior <- c(5.042905, sqrt(3.7603664))
+r_prior <- c(-1.38, sqrt(3.845))
+
+inits <- list(depletion=c(0.99,0.98,0.96,0.94,0.92,0.90,0.88,0.86,0.84,0.82,
+0.80,0.78,0.76,0.74,0.72,0.70,0.68,0.66,0.64,0.62,0.60,0.58,0.56, 0.56),
+growth_rate = 0.8, carrying_capacity = 200, sigma2_obs = 0.1, 
+sigma2_depletion = 0.1, q = 0.2)
+
+inits_true <- list(depletion = data_limited_tuna_results |>
+  dplyr::filter(label == "depletion") |> dplyr::pull(median),
+growth_rate = data_limited_tuna_results |>
+  dplyr::filter(label == "growth_rate") |> dplyr::pull(median),
+carrying_capacity = data_limited_tuna_results |>
+  dplyr::filter(label == "carrying_capacity") |> dplyr::pull(median),
+sigma2_depletion = data_limited_tuna_results |>
+  dplyr::filter(label == "sigma2_depletion") |> dplyr::pull(median),
+sigma2_obs = data_limited_tuna_results |>
+  dplyr::filter(label == "sigma2_obs") |> dplyr::pull(median),
+q = data_limited_tuna_results |>
+  dplyr::filter(label == "q") |> dplyr::pull(median))
+
 
 ## IO correctness ----
-test_that("deterministic run works with correct inputs", {
+test_that("deterministic MCMC run works with correct inputs", {
   # Run FIMS surplus production without wrappers
   result <- setup_and_run_surplus_production_model(
     bayesian_mode = TRUE, estimation_mode = FALSE)
 
+  #' @description Compare FIMS obs var with correct value
+  expect_equal(
+    result[["obj"]][["par"]][1] |> unname(), inits_true[["sigma2_obs"]]
+  )
+
   #' @description Compare FIMS growth rate with correct value
   expect_equal(
-    result[["obj"]][["par"]][1] |> unname(), 
-    data_limited_tuna_results |>
-    dplyr::filter(label == "growth_rate") |> dplyr::pull(median))
+    result[["obj"]][["par"]][2] |> unname(), inits_true[["growth_rate"]]
+  )
 
   #' @description Compare FIMS carrying capacity with correct value
   expect_equal(
-    result[["obj"]][["par"]][2] |> unname(), 
-    data_limited_tuna_results |>
-    dplyr::filter(label == "carrying_capacity") |> dplyr::pull(median))
+    result[["obj"]][["par"]][3] |> unname(), inits_true[["carrying_capacity"]]
+  )
 
   #' @description Compare FIMS carrying capacity with correct value, use tolerance as value is approximated using marginalization method
   expect_equal(
-    result[["report"]][["mean_q"]][2] |> unlist(), 
-    data_limited_tuna_results |>
-    dplyr::filter(label == "q") |> dplyr::pull(median), tolerance = 1e-6)
+    result[["report"]][["mean_q"]][2] |> unlist(), inits_true[["q"]], tolerance = 1e-4
+  )
   
 
   #' @description Compare FIMS biomass with correct biomass.
   for(i in 1:24) {
     expect_equal(
       (result$report$biomass |> unlist())[i],
-      (data_limited_tuna_results |>
-        dplyr::filter(label == "biomass") |> dplyr::pull(median))[i],
-        tolerance = 1e-6
+      inits_true[["depletion"]][i] * inits_true[["carrying_capacity"]]
     )
   }
 
@@ -49,67 +70,107 @@ test_that("deterministic run works with correct inputs", {
   for(i in 1:24) {
     expect_equal(
       (result$report$depletion |> unlist())[i],
-      (data_limited_tuna_results |>
-        dplyr::filter(label == "depletion") |> dplyr::pull(median))[i]
+      inits_true[["depletion"]][i]
     )
   }
 
-  #' @description Compare FIMS reference points with JABBA reference points.
-  #' TODO: uncomment after fixing tests; differences are due to rounding in JABBA output
-#   expect_equal(
-#     result$report$fmsy |> unlist() |> unname(),
-#     jabba_output$estimates |> 
-#       dplyr::filter(rownames(jabba_output$estimates) == "Hmsy") |> 
-#       dplyr::select(mu) |> as.vector() |> unlist() |> unname()
-#   )
-#   expect_equal(
-#       result$report$bmsy |> unlist() |> unname(),
-#       jabba_output$estimates |> 
-#         dplyr::filter(rownames(jabba_output$estimates) == "SBmsy") |> 
-#         dplyr::select(mu) |> as.vector() |> unlist() |> unname()
-#   )
-#   expect_equal(
-#       result$report$msy |> unlist() |> unname(),
-#       jabba_output$estimates |> 
-#         dplyr::filter(rownames(jabba_output$estimates) == "MSY") |> 
-#         dplyr::select(mu) |> as.vector() |> unlist() |> unname()
-#   )
+  # growth rate prior
+  nll_growth_rate <- 
+    -dlnorm(inits_true$growth_rate, r_prior[1], r_prior[2], TRUE
+  )
+  # carrying capacity prior
+  nll_carrying_capacity <- 
+    -dlnorm(inits_true$carrying_capacity, K_prior[1], K_prior[2], TRUE
+  )
 
-    # depletion nll
-    nll_depletion <- 0
-    sd_depletion <- data_limited_tuna_results |>
-        dplyr::filter(label == "sigma2_depletion") |> dplyr::pull(median) |>
-        sqrt()
-    for(i in seq_along(result[["report"]][["depletion"]] |> unlist())) {
-    nll_depletion <- nll_depletion + 
-        -dnorm(log((result[["report"]][["depletion"]] |> unlist())[i]),
-        (result$report$log_depletion_expected |> unlist())[i],
-        sd_depletion, 
-        TRUE
-        )
-    }
+  # depletion nll
+  sd_depletion <- inits_true[["sigma2_depletion"]] |> sqrt()
+  nll_depletion <- -dlnorm(inits_true[["depletion"]],
+      result$report$log_depletion_expected |> unlist(),
+      sd_depletion, 
+      TRUE
+  ) |> sum()
    
-    survey_index_data <- data_limited_tuna |> dplyr::filter(type == "index")
-    idx <- which(survey_index_data$value != -999)
-    survey_index <- survey_index_data[idx,] |> dplyr::select(value) |> 
-        as.vector() |> unlist() |> unname()
-    nll_index <- rep(0, length(survey_index))
-    sd_index <- data_limited_tuna_results |>
-        dplyr::filter(label == "sigma2_obs") |> dplyr::pull(median) |>
-        sqrt()
-    survey_index_expected <- (result$report$log_index_expected)[[2]][idx] 
-    for(i in seq_along(survey_index)){
-    nll_index[i] = -dlnorm(
-        survey_index[i],
-        survey_index_expected[i],
-        sd_index,
-        TRUE
+  obs <- result$report$log_index_to_depletion_carrying_capacity_ratio[[2]] |> 
+    unlist() |> unname()
+  mean <- result[["report"]][["mean_q"]][2] |> unlist() |> unname() |> log()
+  sd <- inits_true[["sigma2_obs"]] |> sqrt()
+  
+  nll_index <- -dnorm(obs, mean, sd, TRUE) |> sum()
+
+  #' @description Check that FIMS nll matches expected nlls
+  expect_equal(c(nll_growth_rate, nll_carrying_capacity, nll_index, nll_depletion), 
+    result$report$nll_components)
+
+  clear()
+
+})
+
+
+test_that("deterministic MLE run works with correct inputs", {
+  # Run FIMS surplus production without wrappers
+  result <- setup_and_run_surplus_production_model(
+    bayesian_mode = FALSE, estimation_mode = FALSE)
+
+  #' @description Compare FIMS obs var with correct value
+  expect_equal(
+    result[["obj"]][["par"]][1] |> unname(), 
+    inits_true[["sigma2_obs"]] |> sqrt() |> log()
+  )
+
+  #' @description Compare FIMS growth rate with correct value
+  expect_equal(
+    result[["obj"]][["par"]][2] |> unname(), 
+    inits_true[["growth_rate"]] |> log()
+  )
+
+  #' @description Compare FIMS carrying capacity with correct value
+  expect_equal(
+    result[["obj"]][["par"]][3] |> unname(), 
+    inits_true[["carrying_capacity"]] |> log()
+  )
+
+  #' @description Compare FIMS carrying capacity with correct value, use tolerance as value is approximated using marginalization method
+  expect_equal(
+    result[["report"]][["mean_q"]][2] |> unlist(), inits_true[["q"]], tolerance = 1e-4
+  )
+  
+
+  #' @description Compare FIMS biomass with correct biomass.
+  for(i in 1:24) {
+    expect_equal(
+      (result$report$biomass |> unlist())[i],
+      inits_true[["depletion"]][i] * inits_true[["carrying_capacity"]]
     )
-    }
-    #' @description Check that FIMS nll matches expected nlls
-    skip("nll values are not matching, need to investigate further")
-    expect_equal(c(nll_depletion, sum(nll_index)), result$report$nll_components,
-      tolerance = 1e-6)
+  }
+
+  #' @description Compare FIMS depletion with correct depletion.
+  for(i in 1:24) {
+    expect_equal(
+      (result$report$depletion |> unlist())[i],
+      inits_true[["depletion"]][i]
+    )
+  }
+
+
+  # depletion nll
+  sd_depletion <- inits_true[["sigma2_depletion"]] |> sqrt()
+  nll_depletion <- -dlnorm(inits_true[["depletion"]],
+      result$report$log_depletion_expected |> unlist(),
+      sd_depletion, 
+      TRUE
+  ) |> sum()
+   
+  obs <- result$report$log_index_to_depletion_carrying_capacity_ratio[[2]] |> 
+    unlist() |> unname()
+  mean <- result[["report"]][["mean_q"]][2] |> unlist() |> unname() |> log()
+  sd <- inits_true[["sigma2_obs"]] |> sqrt()
+  
+  nll_index <- -dnorm(obs, mean, sd, TRUE) |> sum()
+
+  #' @description Check that FIMS nll matches expected nlls
+  expect_equal(c(nll_index, nll_depletion), 
+    result$report$nll_components)
 
 })
 
@@ -119,26 +180,28 @@ test_that("MLE run works", {
     bayesian_mode = FALSE, estimation_mode = TRUE)
 
   
-  #' @description Compare FIMS growth rate with stan value
+  #' @description Compare FIMS sigma2_obs with stan value
   skip("Need to redo tests for MLE run using new testing criteria")
+   expect_near(
+    result[["opt"]][["par"]][1] |> exp() |> unname(), 
+    inits_true[["sigma2_obs"]] |> sqrt())
+
+  #' @description Compare FIMS growth rate with stan value
   expect_near(
-    result[["opt"]][["par"]][1] |> exp()|> unname(), 
-    data_limited_tuna_results |>
-    dplyr::filter(label == "growth_rate") |> dplyr::pull(median))
+    result[["opt"]][["par"]][2] |> exp() |> unname(), 
+    inits_true[["growth_rate"]])
 
   #' @description Compare FIMS carrying capacity with stan value
   skip("Need to redo tests for MLE run using new testing criteria")
   expect_near(
-    result[["opt"]][["par"]][2] |> exp() |> unname(), 
-    data_limited_tuna_results |>
-    dplyr::filter(label == "carrying_capacity") |> dplyr::pull(median))
+    result[["opt"]][["par"]][3] |> exp() |> unname(), 
+    inits_true[["carrying_capacity"]])
 
   #' @description Compare FIMS q with stan value
   skip("Need to redo tests for MLE run using new testing criteria")
-  expect_near(
-    result[["report"]][["mean_q"]][2] |> unlist(), 
-    data_limited_tuna_results |>
-    dplyr::filter(label == "q") |> dplyr::pull(median))
+  expect_equal(
+    result[["report"]][["mean_q"]][2] |> unlist(),
+    inits_true[["q"]], tolerance = 1e-4)
 
    #' @description Compare FIMS biomass with stan biomass.
   skip("Need to redo tests for MLE run using new testing criteria")

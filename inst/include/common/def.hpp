@@ -103,6 +103,59 @@
 namespace fims {
 
 /**
+ * @brief A data structure for transforming parameters
+ * 
+ * @details The `Transformation` struct defines the type of transformation to 
+ * apply to a parameter, any necessary arguments for that transformation, and 
+ * how to handle uncertainty. This allows for flexible parameter transformations 
+ * within the FIMS framework.
+ */
+struct Transformation {
+  /**
+   * @brief An enumeration of supported transformation types.
+   * @details Supported transformations include:
+   * - `identity`: No transformation, parameter is on the natural scale.
+   * - `log`: Log transformation, parameter is on the log scale.
+   * - `logit`: Logit transformation, parameter is on the logit scale.
+   * - `square`: Square transformation, parameter is on the square scale.
+   */
+    enum class Label {
+      identity,
+      log,
+      logit,
+      square
+    }; 
+    /**
+     * @brief A structure to hold arguments for transformations that require them.
+     * @details For the logit transformation, `lower` and `upper` specify the
+     * bounds of the parameter in natural space. 
+     */
+    struct Args {
+      //used by logit
+      double lower = 0.0;
+      double upper = 1.0;
+    };
+
+    /**
+     * @brief An enumeration of supported uncertainty types for parameters.
+     * @details Supported uncertainty types include:
+     * - `none`: No uncertainty specified.
+     * - `sd`: Standard deviation of the parameter on the transformed scale.
+     * - `var`: Variance of the parameter on the transformed scale.
+     */
+    enum class UncertaintyLabel {
+      none,
+      sd,
+      var
+    };
+
+    Label label = Label::log;
+    Args args{};
+    UncertaintyLabel uncertainty_label = UncertaintyLabel::none;
+
+  };
+
+/**
  * @brief A data structure with defined fields for a single log record.
  *
  * @details At run time, each log entry is stored in this structure with

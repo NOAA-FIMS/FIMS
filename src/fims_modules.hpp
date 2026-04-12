@@ -176,6 +176,13 @@ RCPP_MODULE(fims) {
       .constructor()
       .constructor<size_t>()
       .constructor<Rcpp::NumericVector, size_t>()
+      .method("set_transformation",
+              (void (ParameterVector::*)(std::string))
+                  &ParameterVector::set_transformation)
+      .method("set_transformation",
+              (void (ParameterVector::*)(std::string, Rcpp::List))
+                  &ParameterVector::set_transformation)
+      .method("set_uncertainty_name", &ParameterVector::set_uncertainty_name)
       .method("get", &ParameterVector::get)
       .method("set", &ParameterVector::set)
       .method("show", &ParameterVector::show)
@@ -480,7 +487,7 @@ RCPP_MODULE(fims) {
       .field("observed_values", &DnormDistributionsInterface::observed_values)
       .field("expected_values", &DnormDistributionsInterface::expected_values)
       .field("expected_mean", &DnormDistributionsInterface::expected_mean)
-      .field("log_sd", &DnormDistributionsInterface::log_sd);
+      .field("uncertainty", &DnormDistributionsInterface::uncertainty);
 
   Rcpp::class_<DlnormDistributionsInterface>(
       "DlnormDistribution",

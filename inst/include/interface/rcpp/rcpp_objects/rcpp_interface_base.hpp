@@ -188,12 +188,15 @@ class ParameterVector {
    */
   uint32_t id_m;
 
+  std::shared_ptr<fims::Transformation> transformation_m;
+
   /**
    * @brief The constructor.
    */
   ParameterVector() {
     this->id_m = ParameterVector::id_g++;
     this->storage_m = std::make_shared<std::vector<Parameter>>();
+    this->transformation_m = std::make_shared<fims::Transformation>();
     this->storage_m->resize(1);  // push_back(Rcpp::wrap(p));
   }
 
@@ -201,7 +204,9 @@ class ParameterVector {
    * @brief The constructor.
    */
   ParameterVector(const ParameterVector& other)
-      : storage_m(other.storage_m), id_m(other.id_m) {}
+      : storage_m(other.storage_m),
+        id_m(other.id_m),
+        transformation_m(other.transformation_m) {}
 
   /**
    * @brief The constructor.
@@ -209,6 +214,7 @@ class ParameterVector {
   ParameterVector(size_t size) {
     this->id_m = ParameterVector::id_g++;
     this->storage_m = std::make_shared<std::vector<Parameter>>();
+    this->transformation_m = std::make_shared<fims::Transformation>();
     this->storage_m->resize(size);
     for (size_t i = 0; i < size; i++) {
       storage_m->at(i) = Parameter();
@@ -228,6 +234,7 @@ class ParameterVector {
     } else {
       this->id_m = ParameterVector::id_g++;
       this->storage_m = std::make_shared<std::vector<Parameter>>();
+      this->transformation_m = std::make_shared<fims::Transformation>();
       // Use std::min to avoid comparing signed and unsigned types
       size_t n = std::min(static_cast<size_t>(x.size()), size);
       this->storage_m->resize(n);
@@ -244,6 +251,7 @@ class ParameterVector {
   ParameterVector(const fims::Vector<double>& v) {
     this->id_m = ParameterVector::id_g++;
     this->storage_m = std::make_shared<std::vector<Parameter>>();
+    this->transformation_m = std::make_shared<fims::Transformation>();
     this->storage_m->resize(v.size());
     for (size_t i = 0; i < v.size(); i++) {
       storage_m->at(i).initial_value_m = v[i];
@@ -282,6 +290,73 @@ class ParameterVector {
     }
     return Rcpp::wrap(this->storage_m->at(pos - 1));
   }
+
+  /**
+   * @brief Set the transformation for the ParameterVector.
+   *
+   * @param transformation_label A string specifying the type of transformation.
+   * Supported transformations are "identity", "log", "logit", and "square".
+   */
+  void set_transformation(std::string transformation_label) {
+    this->set_transformation(transformation_label, Rcpp::List());
+  }
+
+  /**
+   * @brief Set the transformation for the ParameterVector.
+   *
+   * @param transformation_label A string specifying the type of transformation.
+   * Supported transformations are "identity", "log", "logit", and "square".
+   * @param transformation_args A list of arguments for the transformation. For
+   * the logit transformation, this should include "lower" and "upper" values.
+   */
+  void set_transformation(std::string transformation_label,
+      Rcpp::List transformation_args) {
+    if (!this->transformation_m) {
+      this->transformation_m = std::make_shared<fims::Transformation>();
+    }
+    if (transformation_label == "identity") {
+      this->transformation_m->label = fims::Transformation::Label::identity;
+    } else if (transformation_label == "log") {
+      this->transformation_m->label = fims::Transformation::Label::log;
+    } else if (transformation_label == "logit") {
+      this->transformation_m->label = fims::Transformation::Label::logit;
+      if (transformation_args.containsElementNamed("lower")) {
+        this->transformation_m->args.lower =
+            Rcpp::as<double>(transformation_args["lower"]);
+      }
+      if (transformation_args.containsElementNamed("upper")) {
+        this->transformation_m->args.upper =
+            Rcpp::as<double>(transformation_args["upper"]);
+      }
+      if (this->transformation_m->args.lower >=
+          this->transformation_m->args.upper) {
+        throw std::invalid_argument(
+            "Logit transformation requires lower < upper.");
+      }
+    } else if (transformation_label == "square") {
+      this->transformation_m->label = fims::Transformation::Label::square;
+    } else {
+      throw std::invalid_argument("Unsupported transformation label: " + transformation_label);
+    }
+  }
+
+  void set_uncertainty_name(std::string uncertainty_label = "none") {
+    if (!this->transformation_m) {
+      this->transformation_m = std::make_shared<fims::Transformation>();
+    }
+    if (uncertainty_label == "none") {
+      this->transformation_m->uncertainty_label =
+          fims::Transformation::UncertaintyLabel::none;
+    } else if (uncertainty_label == "sd") {
+      this->transformation_m->uncertainty_label =
+          fims::Transformation::UncertaintyLabel::sd;
+    } else if (uncertainty_label == "var") {
+      this->transformation_m->uncertainty_label =
+          fims::Transformation::UncertaintyLabel::var;
+    } else {
+      throw std::invalid_argument("Unsupported uncertainty label: " + uncertainty_label);
+    }
+  } 
 
   /**
    * @brief An internal accessor for calling a position of a ParameterVector

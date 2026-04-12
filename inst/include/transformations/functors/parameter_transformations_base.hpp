@@ -2,8 +2,8 @@
  * @file parameter_transformations_base.hpp
  * @brief Defines transformation strategies for parameters between transformed and natural scales
  */
-#ifndef FIMS_TRANSFORMATIONS_PARAMETER_TRANSFORMATION_BASE_HPP
-#define FIMS_TRANSFORMATIONS_PARAMETER_TRANSFORMATION_BASE_HPP
+#ifndef TRANSFORMATIONS_PARAMETER_TRANSFORMATION_BASE_HPP
+#define TRANSFORMATIONS_PARAMETER_TRANSFORMATION_BASE_HPP
 
 #include "../../common/fims_math.hpp"
 
@@ -27,4 +27,4 @@ class ParameterTransformationBase {
 };
 } // namespace fims_transformations
 
-#endif /* FIMS_TRANSFORMATIONS_PARAMETER_TRANSFORMATION_BASE_HPP */
+#endif /* TRANSFORMATIONS_PARAMETER_TRANSFORMATION_BASE_HPP */
