@@ -10,7 +10,7 @@
 # create_default_* ----
 ## Setup ----
 data <- FIMS::FIMSFrame(data_big)
-clear()
+
 default_configurations <- create_default_configurations(data)
 
 # create_default_parameters ----
@@ -50,6 +50,7 @@ test_that("`create_default_parameters()` works with correct inputs", {
     "default_parameters.csv",
     compare = compare_file_text
   ) 
+  write(result_unnested, "default_parameters.log") # for updating the snapshot when needed
 })
 
 ## Edge handling ----
