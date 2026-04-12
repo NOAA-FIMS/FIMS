@@ -138,11 +138,55 @@ class Information {
   typedef typename std::unordered_map<
       uint32_t, std::shared_ptr<fims_popdy::FisheryModelBase<Type>>>::iterator
       model_map_iterator; /**< iterator for variable map>*/
+  
+/**
+ * @brief A structure to hold a pointer to a parameter vector and its transformation 
+ * metadata for use in the variable map.
+ * 
+ * @details Each entry in the variable map corresponds to a single parameter
+ * vector and stores a pointer to the parameter values along with two
+ * transformation labels:
+ * - `input_transformation`: the transformation applied to the parameter
+ *   in the input space (e.g. log, logit). This is the space in which
+ *   the parameter is estimated.
+ * - `prior_transformation`: the transformation applied to the parameter
+ *   in the prior space (e.g. identity, square). This is the space in
+ *   which the prior distribution is defined.
+ */ 
+struct VariableMapEntry {
+  fims::Vector<Type>* variable = nullptr;
+  fims::Transformation input_transformation;
+  fims::Transformation prior_transformation;
 
-  std::unordered_map<uint32_t, fims::Vector<Type>*>
+/**
+ * @brief Constructor for VariableMapEntry.
+ */
+VariableMapEntry() {
+  input_transformation.label = fims::Transformation::Label::log;
+  prior_transformation.label = fims::Transformation::Label::log;
+}
+
+/**
+ * @brief Constructor for VariableMapEntry with all fields initialized.
+ * 
+ * @param variable Pointer to the fims::Vector holding the parameter values.
+ * @param input_transformation The transformation applied to the parameter
+ * in the input space (e.g. log, logit).
+ * @param prior_transformation The transformation applied to the parameter
+ * in the prior space (e.g. identity, square).
+ */
+  VariableMapEntry(fims::Vector<Type>* variable,
+                 fims::Transformation input_transformation,
+                 fims::Transformation prior_transformation)
+    : variable(variable),
+      input_transformation(input_transformation),
+      prior_transformation(prior_transformation) {}
+};
+
+  std::unordered_map<uint32_t, VariableMapEntry>
       variable_map; /**<hash map to link a parameter, derived value, or
                       observation to its shared location in memory */
-  typedef typename std::unordered_map<uint32_t, fims::Vector<Type>*>::iterator
+  typedef typename std::unordered_map<uint32_t, VariableMapEntry>::iterator
       variable_map_iterator; /**< iterator for variable map>*/
 
   Information() {}
@@ -294,12 +338,16 @@ class Information {
         FIMS_INFO_LOG("Link prior from distribution " + fims::to_string(d->id) +
                       " to parameter " + fims::to_string(d->key[0]));
         d->priors.resize(d->key.size());
+        d->input_transformation.resize(d->key.size());
+        d->prior_transformation.resize(d->key.size());
         for (size_t i = 0; i < d->key.size(); i++) {
           FIMS_INFO_LOG("Link prior from distribution " +
                         fims::to_string(d->id) + " to parameter " +
                         fims::to_string(d->key[0]));
           vmit = this->variable_map.find(d->key[i]);
-          d->priors[i] = (*vmit).second;
+          d->priors[i] = (*vmit).second.variable;
+          d->input_transformation[i] = &(*vmit).second.input_transformation;
+          d->prior_transformation[i] = &(*vmit).second.prior_transformation;
         }
         FIMS_INFO_LOG("Prior size for distribution " + fims::to_string(d->id) +
                       "is: " + fims::to_string(d->observed_values.size()));
@@ -324,10 +372,10 @@ class Information {
                       fims::to_string(d->id) + " to derived value " +
                       fims::to_string(d->key[0]));
         vmit = this->variable_map.find(d->key[0]);
-        d->re = (*vmit).second;
+        d->re = (*vmit).second.variable;
         if (d->key.size() == 2) {
           vmit = this->variable_map.find(d->key[1]);
-          d->re_expected_values = (*vmit).second;
+          d->re_expected_values = (*vmit).second.variable;
         } else {
           d->re_expected_values = &d->expected_values;
         }
@@ -355,7 +403,7 @@ class Information {
                       fims::to_string(d->id) + " to derived value " +
                       fims::to_string(d->key[0]));
         vmit = this->variable_map.find(d->key[0]);
-        d->data_expected_values = (*vmit).second;
+        d->data_expected_values = (*vmit).second.variable;
         FIMS_INFO_LOG(
             "Expected value size for distribution " + fims::to_string(d->id) +
             " is: " + fims::to_string((*d->data_expected_values).size()));

@@ -356,7 +356,7 @@ class PopulationInterface : public PopulationInterfaceBase {
       population->spawning_biomass_ratio.resize(
           this->spawning_biomass_ratio.size());
     }
-    info->variable_map[this->spawning_biomass_ratio.id_m] =
+    info->variable_map[this->spawning_biomass_ratio.id_m].variable =
         &(population)->spawning_biomass_ratio;
 
     population->log_init_naa.resize(this->log_init_naa.size());
@@ -375,7 +375,7 @@ class PopulationInterface : public PopulationInterfaceBase {
         info->RegisterRandomEffect(population->log_M[i]);
       }
     }
-    info->variable_map[this->log_M.id_m] = &(population)->log_M;
+    info->variable_map[this->log_M.id_m].variable = &(population)->log_M;
 
     for (size_t i = 0; i < log_f_multiplier.size(); i++) {
       population->log_f_multiplier[i] =
@@ -397,7 +397,7 @@ class PopulationInterface : public PopulationInterfaceBase {
         info->RegisterRandomEffect(population->log_f_multiplier[i]);
       }
     }
-    info->variable_map[this->log_f_multiplier.id_m] =
+    info->variable_map[this->log_f_multiplier.id_m].variable =
         &(population)->log_f_multiplier;
 
     for (size_t i = 0; i < log_init_naa.size(); i++) {
@@ -417,7 +417,7 @@ class PopulationInterface : public PopulationInterfaceBase {
         info->RegisterRandomEffect(population->log_init_naa[i]);
       }
     }
-    info->variable_map[this->log_init_naa.id_m] = &(population)->log_init_naa;
+    info->variable_map[this->log_init_naa.id_m].variable = &(population)->log_init_naa;
 
     for (size_t i = 0; i < ages.size(); i++) {
       population->ages[i] = this->ages[i];

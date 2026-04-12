@@ -13,6 +13,7 @@
 #include <memory>
 
 #include "information.hpp"
+#include "fims_transformations.hpp"
 
 namespace fims_model {
 
@@ -27,6 +28,7 @@ class Model {  // may need singleton
   std::shared_ptr<fims_info::Information<Type>>
       fims_information; /**< Create a shared fims_information as a pointer to
                          Information*/
+  bool jacobian_flag;
 
   /**
    * @brief Construct a new Model object.
@@ -99,8 +101,21 @@ class Model {  // may need singleton
 #ifdef TMB_MODEL
       d->of = this->of;
 #endif
+      d->Prepare();
       if (d->input_type == "prior") {
         nll_vec[nll_vec_idx] = -d->evaluate();
+        if (this->jacobian_flag) {
+          for(size_t i=0; i < d->key.size(); i++) {
+            if ((*(d->input_transformation[i])).label != 
+                (*(d->prior_transformation[i])).label) {
+              nll_vec[nll_vec_idx] += 
+                -fims_transformations::AddLogJacobian(
+                  *(d->priors[i]),
+                  *(d->input_transformation[i]),
+                  *(d->prior_transformation[i]));
+            }
+          }
+        }
         jnll += nll_vec[nll_vec_idx];
         n_priors += 1;
         nll_vec_idx += 1;

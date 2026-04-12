@@ -19,6 +19,7 @@
 
 #include "../../../common/def.hpp"
 #include "../../../common/information.hpp"
+#include "../../../common/types.hpp"
 #include "../../interface.hpp"
 #include "rcpp_shared_primitive.hpp"
 #include <limits>
@@ -151,6 +152,16 @@ class ParameterVector {
    */
   std::shared_ptr<std::vector<Parameter>> storage_m;
   /**
+   * @brief The transformation of the parameter in the prior distribution.
+   */
+  std::shared_ptr<fims::Transformation> input_transformation_m = 
+    std::make_shared<fims::Transformation>();
+  /**
+   * @brief The transformation of the parameter in the prior distribution.
+   */
+  std::shared_ptr<fims::Transformation> prior_transformation_m = 
+    std::make_shared<fims::Transformation>();
+  /**
    * @brief The local ID of the Parameter object.
    */
   uint32_t id_m;
@@ -161,14 +172,19 @@ class ParameterVector {
   ParameterVector() {
     this->id_m = ParameterVector::id_g++;
     this->storage_m = std::make_shared<std::vector<Parameter>>();
+    this->input_transformation_m = std::make_shared<fims::Transformation>();
+    this->prior_transformation_m = std::make_shared<fims::Transformation>();
     this->storage_m->resize(1);  // push_back(Rcpp::wrap(p));
   }
 
   /**
-   * @brief The constructor.
+   * @brief The copy constructor.
    */
   ParameterVector(const ParameterVector& other)
-      : storage_m(other.storage_m), id_m(other.id_m) {}
+      : storage_m(other.storage_m),
+        input_transformation_m(other.input_transformation_m),
+        prior_transformation_m(other.prior_transformation_m),
+        id_m(other.id_m) {}
 
   /**
    * @brief The constructor.
@@ -176,6 +192,8 @@ class ParameterVector {
   ParameterVector(size_t size) {
     this->id_m = ParameterVector::id_g++;
     this->storage_m = std::make_shared<std::vector<Parameter>>();
+    this->input_transformation_m = std::make_shared<fims::Transformation>();
+    this->prior_transformation_m = std::make_shared<fims::Transformation>();
     this->storage_m->resize(size);
     for (size_t i = 0; i < size; i++) {
       storage_m->at(i) = Parameter();
@@ -197,6 +215,8 @@ class ParameterVector {
       this->storage_m = std::make_shared<std::vector<Parameter>>();
       // Use std::min to avoid comparing signed and unsigned types
       size_t n = std::min(static_cast<size_t>(x.size()), size);
+      this->input_transformation_m = std::make_shared<fims::Transformation>();
+      this->prior_transformation_m = std::make_shared<fims::Transformation>();
       this->storage_m->resize(n);
       for (size_t i = 0; i < n; i++) {
         storage_m->at(i).initial_value_m = x[i];
@@ -211,6 +231,8 @@ class ParameterVector {
   ParameterVector(const fims::Vector<double>& v) {
     this->id_m = ParameterVector::id_g++;
     this->storage_m = std::make_shared<std::vector<Parameter>>();
+    this->input_transformation_m = std::make_shared<fims::Transformation>();
+    this->prior_transformation_m = std::make_shared<fims::Transformation>();
     this->storage_m->resize(v.size());
     for (size_t i = 0; i < v.size(); i++) {
       storage_m->at(i).initial_value_m = v[i];
@@ -248,6 +270,20 @@ class ParameterVector {
       return NULL;
     }
     return Rcpp::wrap(this->storage_m->at(pos - 1));
+  }
+
+  // register function first to avoid issues with circular dependancies 
+  // in the include chain. The setup_prior_function will be set to equal the 
+  // setup_prior() function in rcpp_interface.hpp.
+  static std::function<void(Rcpp::Formula, Rcpp::List)> setup_prior_function;
+
+  void add_prior(Rcpp::Formula f) {
+     if (setup_prior_function) {
+        Rcpp::List pv_list = Rcpp::List::create(Rcpp::wrap(*this));
+        setup_prior_function(f, pv_list);
+    } else {
+      throw std::runtime_error("setup_prior_function not registered.");
+    }
   }
 
   /**
@@ -346,7 +382,10 @@ class ParameterVector {
     }
   }
 };
-uint32_t ParameterVector::id_g = 0;
+// static member definitions
+uint32_t ParameterVector::id_g = 0; 
+std::function<void(Rcpp::Formula, Rcpp::List)> ParameterVector::setup_prior_function = nullptr;
+
 
 /**
  * @brief Output for std::ostream& for a ParameterVector.
@@ -400,7 +439,8 @@ class RealVector {
    * @brief The constructor.
    */
   RealVector(const RealVector& other)
-      : storage_m(other.storage_m), id_m(other.id_m) {}
+      : storage_m(other.storage_m), 
+        id_m(other.id_m) {}
 
   /**
    * @brief The constructor.
@@ -645,8 +685,24 @@ class FIMSRcppInterfaceBase {
     }
     return ss.str();
   }
+
+template<typename Type>
+void set_variable_map(fims::Vector<Type>* ptr_fims_vector, 
+  ParameterVector parameter_vector) {
+
+  std::shared_ptr<fims_info::Information<Type>> info =
+    fims_info::Information<Type>::GetInstance();
+  
+  info->variable_map[parameter_vector.id_m] = 
+    typename fims_info::Information<Type>::VariableMapEntry(
+        ptr_fims_vector,
+        *parameter_vector.input_transformation_m,
+        *parameter_vector.prior_transformation_m);
+  }
+
 };
 std::vector<std::shared_ptr<FIMSRcppInterfaceBase>>
     FIMSRcppInterfaceBase::fims_interface_objects;
+
 
 #endif

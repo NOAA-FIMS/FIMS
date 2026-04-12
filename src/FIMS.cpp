@@ -16,6 +16,8 @@
 template<class Type>
 Type objective_function<Type>::operator()() {
 
+    DATA_INTEGER(do_mcmc);
+
 
     PARAMETER_VECTOR(p);
     PARAMETER_VECTOR(re);
@@ -38,6 +40,7 @@ Type objective_function<Type>::operator()() {
         *information->random_effects_parameters[i] = re[i];
     }
     model -> of = this;
+    model -> jacobian_flag = (do_mcmc == 1);
 
     Type nll = 0;
     //evaluate the model objective function value

@@ -114,7 +114,7 @@ struct NormalLPDF : public DensityComponentBase<Type> {
           }
           if (this->input_type == "random_effects") {
             (*this->re)[i] = rnorm(this->get_expected(i),
-                                   fims_math::exp(log_sd.get_force_scalar(i)));
+                        fims_math::exp(log_sd.get_force_scalar(i)));
           }
           if (this->input_type == "prior") {
             (*(this->priors[i]))[0] =

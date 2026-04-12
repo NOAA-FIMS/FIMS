@@ -121,12 +121,19 @@ enable_testing()
 # Creates an interface library fims_test
 add_library(fims_test INTERFACE)
 
+# Get the exact include path directly from R
+EXECUTE_PROCESS(
+    COMMAND R "--slave" "--no-save" "-e" "cat(R.home('include'))"
+    OUTPUT_VARIABLE R_INCLUDE_DIR
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+
 # Add include directories to the fims_test target
 target_include_directories(fims_test
   INTERFACE
     inst/include
     ${rcpp_SOURCE_DIR}/inst/include
-    ${R_HOME}/include
+    ${R_INCLUDE_DIR}  
 )
 
 # Add compile definition STD_LIB to the fims_test target.

@@ -8,6 +8,7 @@
 #ifndef FIMS_VECTOR_HPP
 #define FIMS_VECTOR_HPP
 
+#include "types.hpp"
 #include "../interface/interface.hpp"
 #include <ostream>
 #include <iomanip>

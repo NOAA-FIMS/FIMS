@@ -12,6 +12,7 @@
 #' @export DoubleLogisticSelectivity
 #' @export EWAAGrowth
 #' @export Fleet
+#' @export add_shared_prior
 #' @export set_fixed
 #' @export get_fixed
 #' @export set_random
