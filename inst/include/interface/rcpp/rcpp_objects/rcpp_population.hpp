@@ -370,7 +370,7 @@ class PopulationInterface : public PopulationInterfaceBase {
       population->spawning_biomass_ratio.resize(
           this->spawning_biomass_ratio.size());
     }
-    info->variable_map[this->spawning_biomass_ratio.id_m] =
+    info->variable_map[this->spawning_biomass_ratio.id_m].variable =
         &(population)->spawning_biomass_ratio;
 
     population->log_init_naa.resize(this->log_init_naa.size());
@@ -381,19 +381,15 @@ class PopulationInterface : public PopulationInterfaceBase {
         ss << "Population." << this->id << ".log_M." << this->log_M[i].id_m;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(population->log_M[i]);
-        info->RegisterParameterBounds(this->log_M[i].min_m,
-            this->log_M[i].max_m);
       }
       if (this->log_M[i].estimation_type_m.get() == "random_effects") {
         ss.str("");
         ss << "Population." << this->id << ".log_M." << this->log_M[i].id_m;
         info->RegisterRandomEffectName(ss.str());
         info->RegisterRandomEffect(population->log_M[i]);
-        info->RegisterRandomEffectBounds(this->log_M[i].min_m,
-            this->log_M[i].max_m);
       }
     }
-    info->variable_map[this->log_M.id_m] = &(population)->log_M;
+    info->variable_map[this->log_M.id_m].variable = &(population)->log_M;
 
     for (size_t i = 0; i < log_f_multiplier.size(); i++) {
       population->log_f_multiplier[i] =
@@ -415,7 +411,7 @@ class PopulationInterface : public PopulationInterfaceBase {
         info->RegisterRandomEffect(population->log_f_multiplier[i]);
       }
     }
-    info->variable_map[this->log_f_multiplier.id_m] =
+    info->variable_map[this->log_f_multiplier.id_m].variable =
         &(population)->log_f_multiplier;
 
     for (size_t i = 0; i < log_init_naa.size(); i++) {
@@ -426,8 +422,6 @@ class PopulationInterface : public PopulationInterfaceBase {
            << this->log_init_naa[i].id_m;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(population->log_init_naa[i]);
-        info->RegisterParameterBounds(this->log_init_naa[i].min_m,
-            this->log_init_naa[i].max_m);
       }
       if (this->log_init_naa[i].estimation_type_m.get() == "random_effects") {
         ss.str("");
@@ -435,11 +429,9 @@ class PopulationInterface : public PopulationInterfaceBase {
            << this->log_init_naa[i].id_m;
         info->RegisterRandomEffectName(ss.str());
         info->RegisterRandomEffect(population->log_init_naa[i]);
-        info->RegisterRandomEffectBounds(this->log_init_naa[i].min_m,
-            this->log_init_naa[i].max_m);
       }
     }
-    info->variable_map[this->log_init_naa.id_m] = &(population)->log_init_naa;
+    info->variable_map[this->log_init_naa.id_m].variable = &(population)->log_init_naa;
 
     for (size_t i = 0; i < ages.size(); i++) {
       population->ages[i] = this->ages[i];

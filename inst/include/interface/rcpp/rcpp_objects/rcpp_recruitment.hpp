@@ -344,8 +344,6 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
            << this->logit_steep[i].id_m;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(recruitment->logit_steep[i]);
-        info->RegisterParameterBounds(this->logit_steep[i].min_m,
-            this->logit_steep[i].max_m);
       }
       if (this->logit_steep[i].estimation_type_m.get() == "random_effects") {
         ss.str("");
@@ -353,11 +351,16 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
            << this->logit_steep[i].id_m;
         info->RegisterRandomEffectName(ss.str());
         info->RegisterRandomEffect(recruitment->logit_steep[i]);
-        info->RegisterRandomEffectBounds(this->logit_steep[i].min_m,
-            this->logit_steep[i].max_m);
       }
     }
-    info->variable_map[this->logit_steep.id_m] = &(recruitment)->logit_steep;
+    
+    //set transformations for parameter since default is log
+    logit_steep.input_transformation_m->label = fims::Transformation::Label::logit;
+    logit_steep.input_transformation_m->args.lower = 0.2;
+    logit_steep.input_transformation_m->args.upper = 1.0;
+    logit_steep.prior_transformation_m->label = fims::Transformation::Label::logit;
+    logit_steep.prior_transformation_m->args.lower = 0.2;
+    logit_steep.prior_transformation_m->args.upper = 1.0;
 
     // set log_rzero
     recruitment->log_rzero.resize(this->log_rzero.size());
@@ -370,8 +373,6 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
            << this->log_rzero[i].id_m;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(recruitment->log_rzero[i]);
-        info->RegisterParameterBounds(this->log_rzero[i].min_m,
-            this->log_rzero[i].max_m);
       }
       if (this->log_rzero[i].estimation_type_m.get() == "random_effects") {
         ss.str("");
@@ -379,11 +380,9 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
            << this->log_rzero[i].id_m;
         info->RegisterRandomEffectName(ss.str());
         info->RegisterRandomEffect(recruitment->log_rzero[i]);
-        info->RegisterRandomEffectBounds(this->log_rzero[i].min_m,
-            this->log_rzero[i].max_m);
       }
     }
-    info->variable_map[this->log_rzero.id_m] = &(recruitment)->log_rzero;
+    info->variable_map[this->log_rzero.id_m].variable = &(recruitment)->log_rzero;
     // set log_recruit_devs
     recruitment->log_recruit_devs.resize(this->log_devs.size());
     for (size_t i = 0; i < this->log_devs.size(); i++) {
@@ -395,8 +394,6 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
            << this->log_devs[i].id_m;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(recruitment->log_recruit_devs[i]);
-        info->RegisterParameterBounds(this->log_devs[i].min_m,
-            this->log_devs[i].max_m);
       }
       if (this->log_devs[i].estimation_type_m.get() == "random_effects") {
         ss.str("");
@@ -404,12 +401,10 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
            << this->log_devs[i].id_m;
         info->RegisterRandomEffectName(ss.str());
         info->RegisterRandomEffect(recruitment->log_recruit_devs[i]);
-        info->RegisterRandomEffectBounds(this->log_devs[i].min_m,
-            this->log_devs[i].max_m);
       }
     }
 
-    info->variable_map[this->log_devs.id_m] = &(recruitment)->log_recruit_devs;
+    info->variable_map[this->log_devs.id_m].variable = &(recruitment)->log_recruit_devs;
 
     // set log_r
     recruitment->log_r.resize(this->log_r.size());
@@ -421,26 +416,22 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
         ss << "Recruitment." << this->id << ".log_r." << this->log_r[i].id_m;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(recruitment->log_r[i]);
-        info->RegisterParameterBounds(this->log_r[i].min_m,
-            this->log_r[i].max_m);
       }
       if (this->log_r[i].estimation_type_m.get() == "random_effects") {
         ss.str("");
         ss << "Recruitment." << this->id << ".log_r." << this->log_r[i].id_m;
         info->RegisterRandomEffectName(ss.str());
         info->RegisterRandomEffect(recruitment->log_r[i]);
-        info->RegisterRandomEffectBounds(this->log_r[i].min_m,
-            this->log_r[i].max_m);
       }
     }
 
-    info->variable_map[this->log_r.id_m] = &(recruitment)->log_r;
+    info->variable_map[this->log_r.id_m].variable = &(recruitment)->log_r;
     // set log_expected_recruitment
     recruitment->log_expected_recruitment.resize(this->n_years.get() - 1);
     for (size_t i = 0; i < static_cast<size_t>(this->n_years.get() - 1); i++) {
       recruitment->log_expected_recruitment[i] = 0;
     }
-    info->variable_map[this->log_expected_recruitment.id_m] =
+    info->variable_map[this->log_expected_recruitment.id_m].variable =
         &(recruitment)->log_expected_recruitment;
 
     // add to Information

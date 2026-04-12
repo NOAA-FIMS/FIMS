@@ -412,16 +412,12 @@ class FleetInterface : public FleetInterfaceBase {
         ss << "Fleet." << this->id << ".log_q." << this->log_q[i].id_m;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(fleet->log_q[i]);
-        info->RegisterParameterBounds(this->log_q[i].min_m,
-                                     this->log_q[i].max_m);
       }
       if (this->log_q[i].estimation_type_m.get() == "random_effects") {
         ss.str("");
         ss << "Fleet." << this->id << ".log_q." << this->log_q[i].id_m;
         info->RegisterRandomEffectName(ss.str());
         info->RegisterRandomEffect(fleet->log_q[i]);
-        info->RegisterRandomEffectBounds(this->log_q[i].min_m,
-                                        this->log_q[i].max_m);
       }
     }
 
@@ -434,20 +430,16 @@ class FleetInterface : public FleetInterfaceBase {
         ss << "Fleet." << this->id << ".log_Fmort." << this->log_Fmort[i].id_m;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(fleet->log_Fmort[i]);
-        info->RegisterParameterBounds(this->log_Fmort[i].min_m,
-                                     this->log_Fmort[i].max_m);
       }
       if (this->log_Fmort[i].estimation_type_m.get() == "random_effects") {
         ss.str("");
         ss << "Fleet." << this->id << ".log_Fmort." << this->log_Fmort[i].id_m;
         info->RegisterRandomEffectName(ss.str());
         info->RegisterRandomEffect(fleet->log_Fmort[i]);
-        info->RegisterRandomEffectBounds(this->log_Fmort[i].min_m,
-                                        this->log_Fmort[i].max_m);
       }
     }
     // add to variable_map
-    info->variable_map[this->log_Fmort.id_m] = &(fleet)->log_Fmort;
+    info->variable_map[this->log_Fmort.id_m].variable = &(fleet)->log_Fmort;
 
     if (this->n_lengths.get() > 0) {
       fleet->age_to_length_conversion.resize(
@@ -472,9 +464,6 @@ class FleetInterface : public FleetInterfaceBase {
              << this->age_to_length_conversion[i].id_m;
           info->RegisterParameterName(ss.str());
           info->RegisterParameter(fleet->age_to_length_conversion[i]);
-          info->RegisterParameterBounds(
-              this->age_to_length_conversion[i].min_m,
-              this->age_to_length_conversion[i].max_m);
         }
         if (this->age_to_length_conversion[i].estimation_type_m.get() ==
             "random_effects") {
@@ -483,7 +472,7 @@ class FleetInterface : public FleetInterfaceBase {
         }
       }
 
-      info->variable_map[this->age_to_length_conversion.id_m] =
+      info->variable_map[this->age_to_length_conversion.id_m].variable =
           &(fleet)->age_to_length_conversion;
     }
 

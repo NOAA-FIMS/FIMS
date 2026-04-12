@@ -10,7 +10,6 @@
 #define FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_DEPLETION_HPP
 
 #include "../../../population_dynamics/depletion/depletion.hpp"
-#include "../../../transformations/transformations.hpp"
 #include "rcpp_interface_base.hpp"
 
 /**
@@ -97,26 +96,9 @@ class PellaTomlinsonInterface : public DepletionInterfaceBase {
    */
   ParameterVector log_shape;
   /**
-   * @brief The intrinsic growth rate as a natural parameter.
-   */
-  ParameterVector growth_rate;
-  /**
-   * @brief The carrying capacity as a natural parameter.
-   */
-  ParameterVector carrying_capacity;
-  /**
-   * @brief The shape parameter that adjusts the curvature of the growth
-   * function as a natural parameter.
-   */
-  ParameterVector shape;
-  /**
    * @brief The depletion level
    */
-  ParameterVector depletion;
-  /**
-   * @brief The log of the depletion level
-   */
-  ParameterVector log_depletion; 
+  ParameterVector log_depletion;
   /**
    * @brief The natural log of the initial depletion.
    */
@@ -135,16 +117,6 @@ class PellaTomlinsonInterface : public DepletionInterfaceBase {
   PellaTomlinsonInterface() : DepletionInterfaceBase() {
     FIMSRcppInterfaceBase::fims_interface_objects.push_back(
         std::make_shared<PellaTomlinsonInterface>(*this));
-
-    //set default values
-    this->log_growth_rate[0].initial_value_m = -999.0;
-    this->log_carrying_capacity[0].initial_value_m = -999.0;
-    this->log_shape[0].initial_value_m = -999.0;
-    this->growth_rate[0].initial_value_m = -999.0;
-    this->carrying_capacity[0].initial_value_m = -999.0;
-    this->shape[0].initial_value_m = -999.0;
-    this->depletion[0].initial_value_m = -999.0;
-    this->log_depletion[0].initial_value_m = -999.0;
   }
 
   /**
@@ -157,10 +129,6 @@ class PellaTomlinsonInterface : public DepletionInterfaceBase {
         log_growth_rate(other.log_growth_rate),
         log_carrying_capacity(other.log_carrying_capacity),
         log_shape(other.log_shape),
-        growth_rate(other.growth_rate),
-        carrying_capacity(other.carrying_capacity),
-        shape(other.shape),
-        depletion(other.depletion),
         log_depletion(other.log_depletion),
         log_init_depletion(other.log_init_depletion),
         log_expected_depletion(other.log_expected_depletion),
@@ -184,12 +152,17 @@ class PellaTomlinsonInterface : public DepletionInterfaceBase {
    */
   virtual double evaluate_mean(double depletion_ym1, double catch_ym1) {
     fims_popdy::PellaTomlinsonDepletion<double> PTDep;
+    PTDep.growth_rate.resize(1);
     PTDep.log_growth_rate.resize(1);
     PTDep.log_growth_rate[0] = this->log_growth_rate[0].initial_value_m;
+    PTDep.carrying_capacity.resize(1);
     PTDep.log_carrying_capacity.resize(1);
-    PTDep.log_carrying_capacity[0] = this->log_carrying_capacity[0].initial_value_m;
+    PTDep.log_carrying_capacity[0] = 
+      this->log_carrying_capacity[0].initial_value_m;
+    PTDep.shape.resize(1);
     PTDep.log_shape.resize(1);
     PTDep.log_shape[0] = this->log_shape[0].initial_value_m;
+
     return PTDep.evaluate_mean(depletion_ym1, catch_ym1);
   }
 
@@ -227,7 +200,8 @@ class PellaTomlinsonInterface : public DepletionInterfaceBase {
 
       for (size_t i = 0; i < log_growth_rate.size(); i++) {
         if (this->log_growth_rate[i].estimation_type_m.get() == "constant") {
-          this->log_growth_rate[i].final_value_m = this->log_growth_rate[i].initial_value_m;
+          this->log_growth_rate[i].final_value_m = 
+            this->log_growth_rate[i].initial_value_m;
         } else {
           this->log_growth_rate[i].final_value_m = dep->log_growth_rate[i];
         }
@@ -235,9 +209,11 @@ class PellaTomlinsonInterface : public DepletionInterfaceBase {
 
       for (size_t i = 0; i < log_carrying_capacity.size(); i++) {
         if (this->log_carrying_capacity[i].estimation_type_m.get() == "constant") {
-          this->log_carrying_capacity[i].final_value_m = this->log_carrying_capacity[i].initial_value_m;
+          this->log_carrying_capacity[i].final_value_m = 
+            this->log_carrying_capacity[i].initial_value_m;
         } else {
-          this->log_carrying_capacity[i].final_value_m = dep->log_carrying_capacity[i];
+          this->log_carrying_capacity[i].final_value_m = 
+            dep->log_carrying_capacity[i];
         }
       }
 
@@ -309,199 +285,58 @@ class PellaTomlinsonInterface : public DepletionInterfaceBase {
     depletion_module->id = this->id;
     std::stringstream ss;
 
-    // set log_growth_rate and growth_rate
-    // Set transformation module based on which parameters user provided
-    depletion_module->growth_rate_transformation = 
-      fims_transformations::CreateLogTransformation<Type>(
-          this->log_growth_rate[0].initial_value_m,
-          this->growth_rate[0].initial_value_m
-    );
-    
-    if(this->growth_rate[0].initial_value_m == -999.00 &&
-      this->log_growth_rate[0].initial_value_m == -999.00){
-        std::invalid_argument("Pella-Tomlinson Depletion " + 
-          fims::to_string(this->id) +
-          ": No initial value provided for growth rate. Please provide an " +
-          "initial value for either log_growth_rate or growth_rate.");
-    }
-    if(this->growth_rate[0].initial_value_m != -999.00 &&
-      this->log_growth_rate[0].initial_value_m != -999.00){
-        std::invalid_argument("Pella-Tomlinson Depletion " + 
-          fims::to_string(this->id) +
-          ": Initial values provided for both growth_rate and " + 
-          "log_growth_rate. Please provide an initial value for either " +
-          "log_growth_rate or growth_rate, but not both.");
-    }
-    // User provided natural-scale values
-    if (this->growth_rate[0].initial_value_m != -999.0 && 
-      this->log_growth_rate[0].initial_value_m == -999.0) {
-        depletion_module->growth_rate.resize(1);
-        depletion_module->growth_rate[0] = this->growth_rate[0].initial_value_m;
-        depletion_module->log_growth_rate.resize(1);
-        depletion_module->log_growth_rate[0] = fims_math::log(this->growth_rate[0].initial_value_m);
-    } else {
-      // User provided log_growth_rate
-      depletion_module->log_growth_rate.resize(1);
-      depletion_module->log_growth_rate[0] = this->log_growth_rate[0].initial_value_m;
-      depletion_module->growth_rate.resize(1);
-      depletion_module->growth_rate[0] = fims_math::exp(this->log_growth_rate[0].initial_value_m);
-    }
-    
+    // set growth_rate
+    depletion_module->growth_rate.resize(1);
+    depletion_module->log_growth_rate.resize(1);
+    depletion_module->log_growth_rate[0] = this->log_growth_rate[0].initial_value_m;
+  
     // Register log_growth_rate as parameter
     for (size_t i = 0; i < this->log_growth_rate.size(); i++) {
       if (this->log_growth_rate[i].estimation_type_m.get() == "fixed_effects") {
         ss.str("");
-        ss << "depletion." << this->id << "log_growth_rate." << this->log_growth_rate[i].id_m;
+        ss << "depletion." << this->id << "log_growth_rate." << 
+          this->log_growth_rate[i].id_m;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(depletion_module->log_growth_rate[i]);
-        info->RegisterParameterBounds(this->log_growth_rate[i].min_m,
-                                     this->log_growth_rate[i].max_m);
       }
       if (this->log_growth_rate[i].estimation_type_m.get() == "random_effects") {
         ss.str("");
-        ss << "depletion." << this->id << "log_growth_rate." << this->log_growth_rate[i].id_m;
+        ss << "depletion." << this->id << "log_growth_rate." << 
+          this->log_growth_rate[i].id_m;
         info->RegisterRandomEffectName(ss.str());
         info->RegisterRandomEffect(depletion_module->log_growth_rate[i]);
-        info->RegisterRandomEffectBounds(this->log_growth_rate[i].min_m,
-                                         this->log_growth_rate[i].max_m);
       }
     }
-    info->variable_map[this->log_growth_rate.id_m] = &(depletion_module)->log_growth_rate;
+    set_variable_map(&(depletion_module)->log_growth_rate, this->log_growth_rate);
 
-    // Register growth_rate as a parameter
-    for (size_t i = 0; i < this->growth_rate.size(); i++) {
-      if (this->growth_rate[i].estimation_type_m.get() == "fixed_effects") {
-        ss.str("");
-        ss << "depletion." << this->id << "growth_rate." << this->growth_rate[i].id_m;
-        info->RegisterParameterName(ss.str());
-        info->RegisterParameter(depletion_module->growth_rate[i]);
-        info->RegisterParameterBounds(this->growth_rate[i].min_m,
-                                      this->growth_rate[i].max_m);
-      }
-      if (this->growth_rate[i].estimation_type_m.get() == "random_effects") {
-        ss.str("");
-        ss << "depletion." << this->id << "growth_rate." << this->growth_rate[i].id_m;
-        info->RegisterRandomEffectName(ss.str());
-        info->RegisterRandomEffect(depletion_module->growth_rate[i]);
-        info->RegisterRandomEffectBounds(this->growth_rate[i].min_m,
-                                         this->growth_rate[i].max_m);
-      }
-    }
-    info->variable_map[this->growth_rate.id_m] = &(depletion_module)->growth_rate;
-
-
-    // set log_carrying_capacity and carrying_capacity
-    depletion_module->carrying_capacity_transformation = 
-      fims_transformations::CreateLogTransformation<Type>(
-          this->log_carrying_capacity[0].initial_value_m,
-          this->carrying_capacity[0].initial_value_m
-    );
-     if(this->carrying_capacity[0].initial_value_m == -999.00 &&
-      this->log_carrying_capacity[0].initial_value_m == -999.00){
-        std::invalid_argument("Pella-Tomlinson Depletion " + 
-          fims::to_string(this->id) +
-          ": No initial value provided for carrying capacity. Please " + 
-          "provide an initial value for either log_carrying_capacity or " +
-          "carrying_capacity.");
-    }
-    if(this->carrying_capacity[0].initial_value_m != -999.00 &&
-      this->log_carrying_capacity[0].initial_value_m != -999.00){
-        std::invalid_argument("Pella-Tomlinson Depletion " + 
-          fims::to_string(this->id) +
-          ": Initial values provided for both carrying_capacity and " + 
-          "log_carrying_capacity. Please provide an initial value for either " +
-          "log_carrying_capacity or carrying_capacity, but not both.");
-    }
-    if (this->carrying_capacity[0].initial_value_m != -999.0 && 
-        this->log_carrying_capacity[0].initial_value_m == -999.0) {
-        depletion_module->carrying_capacity.resize(1);
-        depletion_module->carrying_capacity[0] = this->carrying_capacity[0].initial_value_m;
-        depletion_module->log_carrying_capacity.resize(1);
-        depletion_module->log_carrying_capacity[0] = fims_math::log(this->carrying_capacity[0].initial_value_m);
-    } else {
-      // User provided log_carrying_capacity
-      depletion_module->log_carrying_capacity.resize(1);
-      depletion_module->log_carrying_capacity[0] = this->log_carrying_capacity[0].initial_value_m;
-      depletion_module->carrying_capacity.resize(1);
-      depletion_module->carrying_capacity[0] = fims_math::exp(this->log_carrying_capacity[0].initial_value_m);
-    }
-
+    // set carrying_capacity
+    depletion_module->carrying_capacity.resize(1);
+    depletion_module->log_carrying_capacity.resize(1);
+    depletion_module->log_carrying_capacity[0] = this->log_carrying_capacity[0].initial_value_m;
+  
     // Register log_carrying_capacity as parameter
     for (size_t i = 0; i < this->log_carrying_capacity.size(); i++) {
       if (this->log_carrying_capacity[i].estimation_type_m.get() == "fixed_effects") {
         ss.str("");
-        ss << "depletion." << this->id << "log_carrying_capacity." << this->log_carrying_capacity[i].id_m;
+        ss << "depletion." << this->id << "log_carrying_capacity." << 
+          this->log_carrying_capacity[i].id_m;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(depletion_module->log_carrying_capacity[i]);
-        info->RegisterParameterBounds(this->log_carrying_capacity[i].min_m,
-                                      this->log_carrying_capacity[i].max_m);
       }
       if (this->log_carrying_capacity[i].estimation_type_m.get() == "random_effects") {
         ss.str("");
-        ss << "depletion." << this->id << "log_carrying_capacity." << this->log_carrying_capacity[i].id_m;
+        ss << "depletion." << this->id << "log_carrying_capacity." << 
+          this->log_carrying_capacity[i].id_m;
         info->RegisterRandomEffectName(ss.str());
         info->RegisterRandomEffect(depletion_module->log_carrying_capacity[i]);
-        info->RegisterRandomEffectBounds(this->log_carrying_capacity[i].min_m,
-                                         this->log_carrying_capacity[i].max_m);
       }
     }
-    info->variable_map[this->log_carrying_capacity.id_m] = &(depletion_module)->log_carrying_capacity;
+    set_variable_map(&(depletion_module)->log_carrying_capacity, this->log_carrying_capacity);
 
-    // Register carrying_capacity as parameter
-    for (size_t i = 0; i < this->carrying_capacity.size(); i++) {
-      if (this->carrying_capacity[i].estimation_type_m.get() == "fixed_effects") {
-        ss.str("");
-        ss << "depletion." << this->id << "carrying_capacity." << this->carrying_capacity[i].id_m;
-        info->RegisterParameterName(ss.str());
-        info->RegisterParameter(depletion_module->carrying_capacity[i]);
-        info->RegisterParameterBounds(this->carrying_capacity[i].min_m,
-                                      this->carrying_capacity[i].max_m);
-      }
-      if (this->carrying_capacity[i].estimation_type_m.get() == "random_effects") {
-        ss.str("");
-        ss << "depletion." << this->id << "carrying_capacity." << this->carrying_capacity[i].id_m;
-        info->RegisterRandomEffectName(ss.str());
-        info->RegisterRandomEffect(depletion_module->carrying_capacity[i]);
-        info->RegisterRandomEffectBounds(this->carrying_capacity[i].min_m,
-                                         this->carrying_capacity[i].max_m);
-      }
-    }
-    info->variable_map[this->carrying_capacity.id_m] = &(depletion_module)->carrying_capacity;
-
-    // set log_shape and shape
-    depletion_module->shape_transformation = 
-      fims_transformations::CreateLogTransformation<Type>(
-          this->log_shape[0].initial_value_m,
-          this->shape[0].initial_value_m
-    );
-     if(this->shape[0].initial_value_m == -999.00 &&
-      this->log_shape[0].initial_value_m == -999.00){
-        std::invalid_argument("Pella-Tomlinson Depletion " + 
-          fims::to_string(this->id) +
-          ": No initial value provided for shape. Please provide an " + 
-          "initial value for either log_shape or shape.");
-    }
-    if(this->shape[0].initial_value_m != -999.00 &&
-      this->log_shape[0].initial_value_m != -999.00){
-        std::invalid_argument("Pella-Tomlinson Depletion " + 
-          fims::to_string(this->id) +
-          ": Initial values provided for both shape and log_shape. " + 
-          "Please provide an initial value for either log_shape or " + 
-          "shape, but not both.");
-    }
-    if (this->shape[0].initial_value_m != -999.0 && 
-        this->log_shape[0].initial_value_m == -999.0) {
-        depletion_module->shape.resize(1);
-        depletion_module->shape[0] = this->shape[0].initial_value_m;
-        depletion_module->log_shape.resize(1);
-        depletion_module->log_shape[0] = fims_math::log(this->shape[0].initial_value_m);
-    } else {
-      // User provided log_shape
-      depletion_module->log_shape.resize(1);
-      depletion_module->log_shape[0] = this->log_shape[0].initial_value_m;
-      depletion_module->shape.resize(1);
-      depletion_module->shape[0] = fims_math::exp(this->log_shape[0].initial_value_m);
-    }
+    // set shape
+    depletion_module->shape.resize(1);
+    depletion_module->log_shape.resize(1);
+    depletion_module->log_shape[0] = this->log_shape[0].initial_value_m;
 
     // Register log_shape as parameter
     for (size_t i = 0; i < this->log_shape.size(); i++) {
@@ -510,106 +345,29 @@ class PellaTomlinsonInterface : public DepletionInterfaceBase {
         ss << "depletion." << this->id << "log_shape." << this->log_shape[i].id_m;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(depletion_module->log_shape[i]);
-        info->RegisterParameterBounds(this->log_shape[i].min_m,
-                                     this->log_shape[i].max_m);
       }
       if (this->log_shape[i].estimation_type_m.get() == "random_effects") {
         ss.str("");
         ss << "depletion." << this->id << "log_shape." << this->log_shape[i].id_m;
         info->RegisterRandomEffectName(ss.str());
         info->RegisterRandomEffect(depletion_module->log_shape[i]);
-        info->RegisterRandomEffectBounds(this->log_shape[i].min_m,
-                                         this->log_shape[i].max_m);
       }
     }
-    info->variable_map[this->log_shape.id_m] = &(depletion_module)->log_shape;
+    set_variable_map(&(depletion_module)->log_shape, this->log_shape);
 
-    // Register shape as parameter
-    for (size_t i = 0; i < this->shape.size(); i++) {
-      if (this->shape[i].estimation_type_m.get() == "fixed_effects") {
-        ss.str("");
-        ss << "depletion." << this->id << "shape." << this->shape[i].id_m;
-        info->RegisterParameterName(ss.str());
-        info->RegisterParameter(depletion_module->shape[i]);
-        info->RegisterParameterBounds(this->shape[i].min_m,
-                                      this->shape[i].max_m);
-      }
-      if (this->shape[i].estimation_type_m.get() == "random_effects") {
-        ss.str("");
-        ss << "depletion." << this->id << "shape." << this->shape[i].id_m;
-        info->RegisterRandomEffectName(ss.str());
-        info->RegisterRandomEffect(depletion_module->shape[i]);
-        info->RegisterRandomEffectBounds(this->shape[i].min_m,
-                                         this->shape[i].max_m);
-      }
-    }
-    info->variable_map[this->shape.id_m] = &(depletion_module)->shape;
+    // set depletion
+    depletion_module->depletion.resize(this->log_depletion.size());
+    depletion_module->log_depletion.resize(this->log_depletion.size());
 
-    // set log_depletion and depletion
-    // Set transformation module based on which parameters user provided
-    depletion_module->depletion_transformation = 
-      fims_transformations::CreateLogTransformation<Type>(
-          this->log_depletion[0].initial_value_m,
-          this->depletion[0].initial_value_m
-    );
-
-     if(this->depletion[0].initial_value_m == -999.00 &&
-      this->log_depletion[0].initial_value_m == -999.00){
-        std::invalid_argument("Pella-Tomlinson Depletion " + 
-          fims::to_string(this->id) +
-          ": No initial value provided for depletion. Please provide an " +
-          "initial value for either log_depletion or depletion.");
-    }
-    if(this->depletion[0].initial_value_m != -999.00 &&
-      this->log_depletion[0].initial_value_m != -999.00){
-        std::invalid_argument("Pella-Tomlinson Depletion " + 
-          fims::to_string(this->id) +
-          ": Initial values provided for both depletion and log_depletion. " + 
-          "Please provide an initial value for either log_depletion or " + 
-          "depletion, but not both.");
-    }
-
-    // Check if user provided natural-scale or log-scale depletion values
-    bool user_provided_natural_depletion = 
-      (this->depletion[0].initial_value_m != -999.0 && 
-       this->log_depletion[0].initial_value_m == -999.0);
-
-    // Resize fims vectors
-    size_t depletion_size = this->n_years.get()+1;
-    depletion_module->depletion.resize(depletion_size);
-    depletion_module->log_depletion.resize(depletion_size);
-    
-    // Set tag name for depletion for debugging
-    ss.str("");
-    ss << "depletion." << this->id << ".depletion";
-    depletion_module->depletion.set_tag(ss.str());
-    ss.str("");
-    ss << "depletion." << this->id << ".log_depletion";
-    depletion_module->log_depletion.set_tag(ss.str());
-
-    // Initialize all elements
-    for (size_t i = 0; i < depletion_size; i++) {
-      if (user_provided_natural_depletion) {
-        // User provided natural-scale depletion
-        depletion_module->depletion[i] = this->depletion[i].initial_value_m;
-        depletion_module->log_depletion[i] = fims_math::log(this->depletion[i].initial_value_m);
-      } else {
-        // User provided log_depletion
-        depletion_module->log_depletion[i] = this->log_depletion[i].initial_value_m;
-        depletion_module->depletion[i] = fims_math::exp(this->log_depletion[i].initial_value_m);
-      }
-    }
-
-    // Register log_depletion as parameter 
+     // Register log_depletion as parameter
     for (size_t i = 0; i < this->log_depletion.size(); i++) {
+      depletion_module->log_depletion[i] = this->log_depletion[i].initial_value_m;
       if (this->log_depletion[i].estimation_type_m.get() == "fixed_effects") {
         ss.str("");
         ss << "depletion." << this->id << ".log_depletion."
           << this->log_depletion[i].id_m;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(depletion_module->log_depletion[i]);
-        info->RegisterParameterBounds(this->log_depletion[i].min_m,
-                                      this->log_depletion[i].max_m);
       }
       if (this->log_depletion[i].estimation_type_m.get() == "random_effects") {
         ss.str("");
@@ -617,74 +375,45 @@ class PellaTomlinsonInterface : public DepletionInterfaceBase {
           << this->log_depletion[i].id_m;
         info->RegisterRandomEffectName(ss.str());
         info->RegisterRandomEffect(depletion_module->log_depletion[i]);
-        info->RegisterRandomEffectBounds(this->log_depletion[i].min_m,
-                                         this->log_depletion[i].max_m);
       }
     }
-
-    // Register in variable map
-    info->variable_map[this->log_depletion.id_m] = &(depletion_module)->log_depletion;
-
-     // Register depletion as parameter
-    for (size_t i = 0; i < this->depletion.size(); i++) {
-      if (this->depletion[i].estimation_type_m.get() == "fixed_effects") {
-        ss.str("");
-        ss << "depletion." << this->id << ".depletion."
-          << this->depletion[i].id_m;
-        info->RegisterParameterName(ss.str());
-        info->RegisterParameter(depletion_module->depletion[i]);
-        info->RegisterParameterBounds(this->depletion[i].min_m,
-                                      this->depletion[i].max_m);
-      }
-      if (this->depletion[i].estimation_type_m.get() == "random_effects") {
-        ss.str("");
-        ss << "depletion." << this->id << ".depletion."
-          << this->depletion[i].id_m;
-        info->RegisterRandomEffectName(ss.str());
-        info->RegisterRandomEffect(depletion_module->depletion[i]);
-        info->RegisterRandomEffectBounds(this->depletion[i].min_m,
-                                         this->depletion[i].max_m);
-      }
-    }
-    info->variable_map[this->depletion.id_m] = &(depletion_module)->depletion;
+    set_variable_map(&(depletion_module)->log_depletion, this->log_depletion);
 
 
      // set log_init_depletion
-    depletion_module->log_init_depletion.resize(this->log_init_depletion.size());
-    for (size_t i = 0; i < log_init_depletion.size(); i++) {
-      depletion_module->log_init_depletion[i] = this->log_init_depletion[i].initial_value_m;
-
+    depletion_module->init_depletion.resize(1);
+    depletion_module->log_init_depletion.resize(1);
+    depletion_module->log_init_depletion[0] = this->log_init_depletion[0].initial_value_m;
+    
+    // Register log_init_depletion as parameter
+    for (size_t i = 0; i < this->log_init_depletion.size(); i++) {
       if (this->log_init_depletion[i].estimation_type_m.get() == "fixed_effects") {
         ss.str("");
         ss << "depletion." << this->id << ".log_init_depletion."
-           << this->log_init_depletion[i].id_m;
+          << this->log_init_depletion[i].id_m;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(depletion_module->log_init_depletion[i]);
-        info->RegisterParameterBounds(this->log_init_depletion[i].min_m,
-                                      this->log_init_depletion[i].max_m);
       }
       if (this->log_init_depletion[i].estimation_type_m.get() == "random_effects") {
         ss.str("");
         ss << "depletion." << this->id << ".log_init_depletion."
-           << this->log_init_depletion[i].id_m;
+          << this->log_init_depletion[i].id_m;
         info->RegisterRandomEffectName(ss.str());
         info->RegisterRandomEffect(depletion_module->log_init_depletion[i]);
-        info->RegisterRandomEffectBounds(this->log_init_depletion[i].min_m,
-                                         this->log_init_depletion[i].max_m);
       }
     }
-    info->variable_map[this->log_init_depletion.id_m] = &(depletion_module)->log_init_depletion;
+    set_variable_map(&(depletion_module)->log_init_depletion, 
+                     this->log_init_depletion);
 
     // setup log_expected_depletion
     depletion_module->log_expected_depletion.resize(this->n_years.get() + 1);
     ss.str("");
     ss << "depletion." << this->id << ".log_expected_depletion";
-    depletion_module->log_expected_depletion.set_tag(ss.str());
     for (size_t i = 0; i < static_cast<size_t>(this->n_years.get() + 1); i++) {
       depletion_module->log_expected_depletion[i] = 0;
     }
-    info->variable_map[this->log_expected_depletion.id_m] =
-        &(depletion_module)->log_expected_depletion;
+    set_variable_map(&(depletion_module)->log_expected_depletion, 
+                     this->log_expected_depletion);
 
   
     // add to Information

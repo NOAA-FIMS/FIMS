@@ -19,6 +19,7 @@
 
 #include "../../../common/def.hpp"
 #include "../../../common/information.hpp"
+#include "../../../common/types.hpp"
 #include "../../interface.hpp"
 #include "rcpp_shared_primitive.hpp"
 #include <limits>
@@ -48,20 +49,6 @@ class Parameter {
    */
   double final_value_m = 0.0;
   /**
-   * @brief The minimum possible parameter value, where the default is negative
-   * infinity.
-   */
-  double min_m = -std::numeric_limits<double>::infinity();
-  /**
-   * @brief The maximum possible parameter value, where the default is positive
-   * infinity.
-   */
-  double max_m = std::numeric_limits<double>::infinity();
-  /**
-   * @brief A string indicating the estimation type. Options are: constant,
-   * fixed_effects, or random_effects, where the default is constant.
-   */
-  /**
    * @brief A string indicating the estimation type. Options are: constant,
    * fixed_effects, or random_effects, where the default is constant.
    */
@@ -70,11 +57,9 @@ class Parameter {
   /**
    * @brief The constructor for initializing a parameter.
    */
-  Parameter(double value, double min, double max, std::string estimation_type)
+  Parameter(double value, std::string estimation_type)
       : id_m(Parameter::id_g++),
         initial_value_m(value),
-        min_m(min),
-        max_m(max),
         estimation_type_m(estimation_type) {}
 
   /**
@@ -84,8 +69,6 @@ class Parameter {
       : id_m(other.id_m),
         initial_value_m(other.initial_value_m),
         final_value_m(other.final_value_m),
-        min_m(other.min_m),
-        max_m(other.max_m),
         estimation_type_m(other.estimation_type_m) {}
 
   /**
@@ -98,8 +81,6 @@ class Parameter {
     this->id_m = right.id_m;
     this->initial_value_m = right.initial_value_m;
     this->final_value_m = right.final_value_m;
-    this->min_m = right.min_m;
-    this->max_m = right.max_m;
     this->estimation_type_m = right.estimation_type_m;
     return *this;
   }
@@ -149,19 +130,7 @@ inline double sanitize_val(double x) {
 std::ostream& operator<<(std::ostream& out, const Parameter& p) {
   out << "{\"id\": " << p.id_m
       << ",\n\"value\": " << sanitize_val(p.initial_value_m)
-      << ",\n\"estimated_value\": " << sanitize_val(p.final_value_m)
-      << ",\n\"min\": ";
-  if (p.min_m == -std::numeric_limits<double>::infinity()) {
-    out << "\"-Infinity\"";
-  } else {
-    out << p.min_m;
-  }
-  out << ",\n\"max\": ";
-  if (p.max_m == std::numeric_limits<double>::infinity()) {
-    out << "\"Infinity\"";
-  } else {
-    out << p.max_m;
-  }
+      << ",\n\"estimated_value\": " << sanitize_val(p.final_value_m);
   out << ",\n\"estimation_type\": \"" << p.estimation_type_m << "\"\n}";
 
   return out;
@@ -184,6 +153,16 @@ class ParameterVector {
    */
   std::shared_ptr<std::vector<Parameter>> storage_m;
   /**
+   * @brief The transformation of the parameter in the prior distribution.
+   */
+  std::shared_ptr<fims::Transformation> input_transformation_m = 
+    std::make_shared<fims::Transformation>();
+  /**
+   * @brief The transformation of the parameter in the prior distribution.
+   */
+  std::shared_ptr<fims::Transformation> prior_transformation_m = 
+    std::make_shared<fims::Transformation>();
+  /**
    * @brief The local ID of the Parameter object.
    */
   uint32_t id_m;
@@ -194,14 +173,19 @@ class ParameterVector {
   ParameterVector() {
     this->id_m = ParameterVector::id_g++;
     this->storage_m = std::make_shared<std::vector<Parameter>>();
+    this->input_transformation_m = std::make_shared<fims::Transformation>();
+    this->prior_transformation_m = std::make_shared<fims::Transformation>();
     this->storage_m->resize(1);  // push_back(Rcpp::wrap(p));
   }
 
   /**
-   * @brief The constructor.
+   * @brief The copy constructor.
    */
   ParameterVector(const ParameterVector& other)
-      : storage_m(other.storage_m), id_m(other.id_m) {}
+      : storage_m(other.storage_m),
+        input_transformation_m(other.input_transformation_m),
+        prior_transformation_m(other.prior_transformation_m),
+        id_m(other.id_m) {}
 
   /**
    * @brief The constructor.
@@ -209,6 +193,8 @@ class ParameterVector {
   ParameterVector(size_t size) {
     this->id_m = ParameterVector::id_g++;
     this->storage_m = std::make_shared<std::vector<Parameter>>();
+    this->input_transformation_m = std::make_shared<fims::Transformation>();
+    this->prior_transformation_m = std::make_shared<fims::Transformation>();
     this->storage_m->resize(size);
     for (size_t i = 0; i < size; i++) {
       storage_m->at(i) = Parameter();
@@ -230,6 +216,8 @@ class ParameterVector {
       this->storage_m = std::make_shared<std::vector<Parameter>>();
       // Use std::min to avoid comparing signed and unsigned types
       size_t n = std::min(static_cast<size_t>(x.size()), size);
+      this->input_transformation_m = std::make_shared<fims::Transformation>();
+      this->prior_transformation_m = std::make_shared<fims::Transformation>();
       this->storage_m->resize(n);
       for (size_t i = 0; i < n; i++) {
         storage_m->at(i).initial_value_m = x[i];
@@ -244,6 +232,8 @@ class ParameterVector {
   ParameterVector(const fims::Vector<double>& v) {
     this->id_m = ParameterVector::id_g++;
     this->storage_m = std::make_shared<std::vector<Parameter>>();
+    this->input_transformation_m = std::make_shared<fims::Transformation>();
+    this->prior_transformation_m = std::make_shared<fims::Transformation>();
     this->storage_m->resize(v.size());
     for (size_t i = 0; i < v.size(); i++) {
       storage_m->at(i).initial_value_m = v[i];
@@ -281,6 +271,20 @@ class ParameterVector {
       return NULL;
     }
     return Rcpp::wrap(this->storage_m->at(pos - 1));
+  }
+
+  // register function first to avoid issues with circular dependancies 
+  // in the include chain. The setup_prior_function will be set to equal the 
+  // setup_prior() function in rcpp_interface.hpp.
+  static std::function<void(Rcpp::Formula, Rcpp::List)> setup_prior_function;
+
+  void add_prior(Rcpp::Formula f) {
+     if (setup_prior_function) {
+        Rcpp::List pv_list = Rcpp::List::create(Rcpp::wrap(*this));
+        setup_prior_function(f, pv_list);
+    } else {
+      throw std::runtime_error("setup_prior_function not registered.");
+    }
   }
 
   /**
@@ -368,30 +372,6 @@ class ParameterVector {
   }
 
   /**
-   * @brief Assigns the given values to the minimum value of all elements in
-   * the vector.
-   *
-   * @param value The value to be assigned.
-   */
-  void fill_min(double value) {
-    for (size_t i = 0; i < this->storage_m->size(); i++) {
-      storage_m->at(i).min_m = value;
-    }
-  }
-
-  /**
-   * @brief Assigns the given values to the maximum value of all elements in
-   * the vector.
-   *
-   * @param value The value to be assigned.
-   */
-  void fill_max(double value) {
-    for (size_t i = 0; i < this->storage_m->size(); i++) {
-      storage_m->at(i).max_m = value;
-    }
-  }
-
-  /**
    * @brief The printing methods for a ParameterVector.
    *
    */
@@ -403,7 +383,10 @@ class ParameterVector {
     }
   }
 };
-uint32_t ParameterVector::id_g = 0;
+// static member definitions
+uint32_t ParameterVector::id_g = 0; 
+std::function<void(Rcpp::Formula, Rcpp::List)> ParameterVector::setup_prior_function = nullptr;
+
 
 /**
  * @brief Output for std::ostream& for a ParameterVector.
@@ -457,7 +440,8 @@ class RealVector {
    * @brief The constructor.
    */
   RealVector(const RealVector& other)
-      : storage_m(other.storage_m), id_m(other.id_m) {}
+      : storage_m(other.storage_m), 
+        id_m(other.id_m) {}
 
   /**
    * @brief The constructor.
@@ -702,8 +686,24 @@ class FIMSRcppInterfaceBase {
     }
     return ss.str();
   }
+
+template<typename Type>
+void set_variable_map(fims::Vector<Type>* ptr_fims_vector, 
+  ParameterVector parameter_vector) {
+
+  std::shared_ptr<fims_info::Information<Type>> info =
+    fims_info::Information<Type>::GetInstance();
+  
+  info->variable_map[parameter_vector.id_m] = 
+    typename fims_info::Information<Type>::VariableMapEntry(
+        ptr_fims_vector,
+        *parameter_vector.input_transformation_m,
+        *parameter_vector.prior_transformation_m);
+  }
+
 };
 std::vector<std::shared_ptr<FIMSRcppInterfaceBase>>
     FIMSRcppInterfaceBase::fims_interface_objects;
+
 
 #endif

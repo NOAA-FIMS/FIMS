@@ -12,16 +12,13 @@
 #' @export DoubleLogisticSelectivity
 #' @export EWAAGrowth
 #' @export Fleet
+#' @export add_shared_prior
 #' @export set_fixed
 #' @export get_fixed
 #' @export set_random
 #' @export get_random
 #' @export get_parameter_names
 #' @export get_random_names
-#' @export get_parameter_min_vector
-#' @export get_parameter_max_vector
-#' @export get_random_effects_min_vector
-#' @export get_random_effects_max_vector
 #' @export get_log
 #' @export get_log_errors
 #' @export get_log_warnings

@@ -90,14 +90,9 @@ RCPP_MODULE(fims) {
       "get_random_names", &get_random_names,
       "See "
       "https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html.");
-  Rcpp::function("get_parameter_min_vector", &get_parameter_min_vector,
-                 "Gets a vector of parameter minimum values.");
-  Rcpp::function("get_parameter_max_vector", &get_parameter_max_vector,
-                 "Gets a vector of parameter maximum values.");
-  Rcpp::function("get_random_effects_min_vector", &get_random_effects_min_vector,
-                 "Gets a vector of random effects minimum values.");
-  Rcpp::function("get_random_effects_max_vector", &get_random_effects_max_vector,
-                 "Gets a vector of random effects maximum values.");
+  Rcpp::function("add_shared_prior", &setup_prior, 
+      "See "
+      "https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html.");
   Rcpp::function(
       "clear", clear,
       "See "
@@ -164,8 +159,6 @@ RCPP_MODULE(fims) {
       .constructor<double>()
       .constructor<Parameter>()
       .field("value", &Parameter::initial_value_m)
-      .field("min", &Parameter::min_m)
-      .field("max", &Parameter::max_m)
       .field("estimated_value", &Parameter::final_value_m)
       .field("id", &Parameter::id_m)
       .field("estimation_type", &Parameter::estimation_type_m);
@@ -176,6 +169,7 @@ RCPP_MODULE(fims) {
       .constructor()
       .constructor<size_t>()
       .constructor<Rcpp::NumericVector, size_t>()
+      .method("add_prior", &ParameterVector::add_prior)
       .method("get", &ParameterVector::get)
       .method("set", &ParameterVector::set)
       .method("show", &ParameterVector::show)
@@ -185,8 +179,6 @@ RCPP_MODULE(fims) {
       .method("set_all_estimable", &ParameterVector::set_all_estimable)
       .method("set_all_random", &ParameterVector::set_all_random)
       .method("fill", &ParameterVector::fill)
-      .method("fill_min", &ParameterVector::fill_min)
-      .method("fill_max", &ParameterVector::fill_max)
       .method("get_id", &ParameterVector::get_id);
 
   Rcpp::class_<RealVector>(
@@ -447,19 +439,11 @@ RCPP_MODULE(fims) {
       .field("log_growth_rate", &PellaTomlinsonInterface::log_growth_rate)
       .field("log_carrying_capacity", &PellaTomlinsonInterface::log_carrying_capacity)
       .field("log_shape", &PellaTomlinsonInterface::log_shape)
-      .field("growth_rate", &PellaTomlinsonInterface::growth_rate)
-      .field("carrying_capacity", &PellaTomlinsonInterface::carrying_capacity)
-      .field("shape", &PellaTomlinsonInterface::shape)
-      .field("depletion", &PellaTomlinsonInterface::depletion,
-             "The depletion process")
-      .field("log_depletion", &PellaTomlinsonInterface::log_depletion,
-             "The log-transformed depletion process")
-      .field("log_init_depletion", &PellaTomlinsonInterface::log_init_depletion,
-             "natural log of the initial depletion level")
+      .field("log_depletion", &PellaTomlinsonInterface::log_depletion)
+      .field("log_init_depletion", &PellaTomlinsonInterface::log_init_depletion)
       .field("log_expected_depletion",
-             &PellaTomlinsonInterface::log_expected_depletion,
-             "expected depletion as a random effect on the natural log scale")
-      .field("n_years", &PellaTomlinsonInterface::n_years, "number of years")
+             &PellaTomlinsonInterface::log_expected_depletion)
+      .field("n_years", &PellaTomlinsonInterface::n_years)
       .method("get_id", &PellaTomlinsonInterface::get_id)
       .method("evaluate_mean", &PellaTomlinsonInterface::evaluate_mean);
 

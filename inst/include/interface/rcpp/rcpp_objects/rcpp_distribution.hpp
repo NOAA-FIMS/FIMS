@@ -187,7 +187,7 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
    */
   ParameterVector expected_mean;
   /**
-   * @brief The uncertainty, which would be the standard deviation of x for the
+   * @brief The log_sd, which would be the standard deviation of x for the
    * normal distribution.
    */
   ParameterVector log_sd;
@@ -485,14 +485,12 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
         ss << "dnorm." << this->id_m << ".log_sd." << this->log_sd[i].id_m;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(distribution->log_sd[i]);
-        info->RegisterParameterBounds(this->log_sd[i].min_m,
-                                     this->log_sd[i].max_m);
       }
       if (this->log_sd[i].estimation_type_m.get() == "random_effects") {
-        FIMS_ERROR_LOG("standard deviations cannot be set to random effects");
+        FIMS_ERROR_LOG("log_sd values cannot be set to random effects");
       }
     }
-    info->variable_map[this->log_sd.id_m] = &(distribution)->log_sd;
+    set_variable_map(&(distribution)->log_sd, this->log_sd);
 
     distribution->use_mean = this->use_mean_m.get();
     distribution->expected_mean.resize(this->expected_mean.size());
@@ -509,8 +507,9 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
         FIMS_ERROR_LOG("expected_mean cannot be set to random effects");
       }
     }
-    info->variable_map[this->expected_mean.id_m] =
-        &(distribution)->expected_mean;
+    expected_mean.input_transformation_m->label = fims::Transformation::Label::identity;
+    expected_mean.prior_transformation_m->label = fims::Transformation::Label::identity;
+    set_variable_map(&(distribution)->expected_mean, this->expected_mean);
 
     info->density_components[distribution->id] = distribution;
 
@@ -547,7 +546,7 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
    */
   ParameterVector expected_values;
   /**
-   * @brief The uncertainty, which would be the natural logarithm of the
+   * @brief The log_sd, which would be the natural logarithm of the
      standard deviation (sd) of log(x) for this distribution. The natural log
      of the standard deviation is necessary because the exponential link
      function is applied to the log transformed standard deviation to insure
@@ -826,14 +825,12 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
         ss << "dlnorm." << this->id_m << ".log_sd." << this->log_sd[i].id_m;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(distribution->log_sd[i]);
-        info->RegisterParameterBounds(this->log_sd[i].min_m,
-                                     this->log_sd[i].max_m);
       }
       if (this->log_sd[i].estimation_type_m.get() == "random_effects") {
         FIMS_ERROR_LOG("standard deviations cannot be set to random effects");
       }
     }
-    info->variable_map[this->log_sd.id_m] = &(distribution)->log_sd;
+    set_variable_map(&(distribution)->log_sd, this->log_sd); 
 
     info->density_components[distribution->id] = distribution;
 
@@ -1172,14 +1169,12 @@ class DgammaDistributionsInterface : public DistributionsInterfaceBase {
         ss << "dgamma." << this->id_m << ".log_sd." << this->log_sd[i].id_m;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(distribution->log_sd[i]);
-        info->RegisterParameterBounds(this->log_sd[i].min_m,
-                                     this->log_sd[i].max_m);
       }
       if (this->log_sd[i].estimation_type_m.get() == "random_effects") {
         FIMS_ERROR_LOG("standard deviations cannot be set to random effects");
       }
     }
-    info->variable_map[this->log_sd.id_m] = &(distribution)->log_sd;
+    set_variable_map(&(distribution)->log_sd, this->log_sd);
 
     distribution->use_mean = this->use_mean_m.get();
     distribution->expected_mean.resize(this->expected_mean.size());
@@ -1196,8 +1191,9 @@ class DgammaDistributionsInterface : public DistributionsInterfaceBase {
         FIMS_ERROR_LOG("expected_mean cannot be set to random effects");
       }
     }
-    info->variable_map[this->expected_mean.id_m] =
-        &(distribution)->expected_mean;
+    expected_mean.input_transformation_m->label = fims::Transformation::Label::identity;
+    expected_mean.prior_transformation_m->label = fims::Transformation::Label::identity;
+    set_variable_map(&(distribution)->expected_mean, this->expected_mean);
 
     info->density_components[distribution->id] = distribution;
 
@@ -1526,7 +1522,7 @@ class DinvgammaDistributionsInterface : public DistributionsInterfaceBase {
         FIMS_ERROR_LOG("log_shape cannot be set to random effects");
       }
     }
-    info->variable_map[this->log_shape.id_m] = &(distribution)->log_shape;
+    set_variable_map(&(distribution)->log_shape, this->log_shape);
 
     distribution->log_scale.resize(this->log_scale.size());
     for (size_t i = 0; i < this->log_scale.size(); i++) {
@@ -1541,7 +1537,7 @@ class DinvgammaDistributionsInterface : public DistributionsInterfaceBase {
         FIMS_ERROR_LOG("log_scale cannot be set to random effects");
       }
     }
-    info->variable_map[this->log_scale.id_m] = &(distribution)->log_scale;
+    set_variable_map(&(distribution)->log_scale, this->log_scale);
 
     info->density_components[distribution->id] = distribution;
 

@@ -44,11 +44,31 @@ Like the FIMS catch-at-age model, data are set up in long format.
 A sample data frame for a surplus production model is stored in the package as `data_limited_tuna`. This data set is based on data that was used in [Meyer and Millar 1999](https://d1wqtxts1xzle7.cloudfront.net/103328457/92d9f6b68861cc5d1c40beda0ad76d18db69-libre.pdf?1686646854=&response-content-disposition=inline%3B+filename%3DBUGS_in_Bayesian_stock_assessments.pdf&Expires=1772950518&Signature=FVjSv8rfM2XCCaCLReaKdw7ODsgA0kuclz0j82MnrjeXlJlDZUc4ysTDsW13K9cakbhBExer9xblpR3dcBA6ktXBH31Zr2snLoAih2UJ0T~VyQw~Wv8UtFG2bu5J5l8QNJE7XJ8JnBsFF3dK1O-OnzCALzjQ4593Xs8rxiMxqd7-8520e1dncKZAZgdBWGgt8uFEkFWfM62jfiL6Fzl7CB3jCw5-oUSpYcUvIDeQTf1l11K7PGj9VRtThb55M~8NSQNTe867fHMgpnJua7JvqtfmjOwzcnrZGCiMNKfrTXVPcZEaITckF79nRQOB09980CrKlR~SqTsLbXaaKUq3~A__&Key-Pair-Id=APKAJLOHF5GGSLRBV4ZA) to demonstrate a surplus production model in JAGS. The same analysis was later replicated by [Best and Punt]() to demonstrate surplus production model best practives using [Stan](). Prior and inital values used to set up the model are replicated from both analyses.
 
 ```{r load-data}
+# Setup initial values and priors for the surplus production model parameters
+# Values from Meyer and Millar 1999, Table 1, with lognormal priors on K and r
 data("data_limited_tuna")
-carrying_capacity_prior <- c(5.042905, sqrt(3.7603664))
-growth_rate_prior <- c(-1.38, sqrt(3.845))
+carrying_capacity_prior <- c(5.042905, 1/sqrt(3.7603664))
+growth_rate_prior <- c(-1.38, 1/sqrt(3.845))
 
-inits <- list(depletion=c(0.99,0.98,0.96,0.94,0.92,0.90,0.88,0.86,0.84,0.82, 0.80,0.78,0.76,0.74,0.72,0.70,0.68,0.66,0.64,0.62,0.60,0.58,0.56, 0.56), growth_rate = 0.8, carrying_capacity = 200)
+inits <- list(depletion=c(0.99,0.98,0.96,0.94,0.92,0.90,0.88,0.86,0.84,0.82,
+    0.80,0.78,0.76,0.74,0.72,0.70,0.68,0.66,0.64,0.62,0.60,0.58,0.56, 0.56),
+    growth_rate = 0.8, carrying_capacity = 200, sigma2_obs = 0.1, 
+    sigma2_depletion = 0.1, q = 0.2)
+
+inits_true <- list(
+    depletion = data_limited_tuna_results |>
+    dplyr::filter(label == "depletion") |> dplyr::pull(median),
+    growth_rate = data_limited_tuna_results |>
+    dplyr::filter(label == "growth_rate") |> dplyr::pull(median),
+    carrying_capacity = data_limited_tuna_results |>
+    dplyr::filter(label == "carrying_capacity") |> dplyr::pull(median),
+    sigma2_depletion = data_limited_tuna_results |>
+    dplyr::filter(label == "sigma2_depletion") |> dplyr::pull(median),
+    sigma2_obs = data_limited_tuna_results |>
+    dplyr::filter(label == "sigma2_obs") |> dplyr::pull(median),
+    q = data_limited_tuna_results |>
+    dplyr::filter(label == "q") |> dplyr::pull(median)
+)
 
 nyears <- 23
 ```
@@ -104,18 +124,17 @@ survey_fleet_index_distribution$set_observed_data(
 
 # Fix sd to posterior median from Stan as FIMS currently does not have the 
 # ability to fit a prior inverse gamma prior distribution on sd
-survey_fleet_index_distribution$log_sd$resize(nyears)
-for (y in 1:nyears) {
-    survey_fleet_index_distribution$log_sd[y]$value <- 
-        1.151663e-02 |> sqrt() |> log() 
-}
-survey_fleet_index_distribution$log_sd$set_all_estimable(FALSE)
+survey_fleet_index_distribution$log_sd[1]$value <- log(inits$sigma2_obs)
+survey_fleet_index_distribution$log_sd[1]$estimation_type$set("fixed_effects")
+survey_fleet_index_distribution$log_sd[1]$add_prior(sd^2 ~ InvGamma(1.708603, 1/0.008613854))
+
 
 # Link the dsitribution to observed ($Z$, a derived quantity in the model), and 
 # expected (mean of $log(q)$, a derived quantity in the model)
 # Using "random_effects" as a hack to implement a distribution on a derived parameter
 survey_fleet_index_distribution$set_distribution_links("random_effects", 
-    c(survey_fleet$log_index_to_depletion_carrying_capacity_ratio$get_id(), survey_fleet$mean_log_q$get_id()))
+    c(survey_fleet$log_index_to_depletion_carrying_capacity_ratio$get_id(), 
+    survey_fleet$mean_log_q$get_id()))
 ```
 
 
@@ -128,12 +147,13 @@ Surplus Production models rely on a depletion module that caotures the depletion
 production <- new(PTDepletion)
 
 # Set initial values and attributes
-production$growth_rate[1]$value <- inits$growth_rate
-production$growth_rate[1]$min <- 0
-production$growth_rate[1]$estimation_type$set("fixed_effects")
-production$carrying_capacity[1]$value <- inits$carrying_capacity
-production$carrying_capacity[1]$min <- 0
-production$carrying_capacity[1]$estimation_type$set("fixed_effects")
+production$log_growth_rate[1]$value <- log(inits$growth_rate)
+production$log_growth_rate[1]$estimation_type$set("fixed_effects")
+production$log_growth_rate$add_prior(growth_rate ~ Lognormal(-1.38, 0.5099785))
+production$log_carrying_capacity[1]$value <- log(inits$carrying_capacity)
+production$log_carrying_capacity[1]$estimation_type$set("fixed_effects")
+production$log_carrying_capacity$add_prior(carrying_capacity ~ Lognormal(5.0429050, 0.5156855))
+
 
 # Fix to get Schaefer model (parameters are constant by default)
 production$log_shape[1]$value <- log(2)
@@ -141,12 +161,11 @@ production$log_shape[1]$value <- log(2)
 production$log_init_depletion[1]$value <- 0 # inital depletion ~ 1
 
 # Set-up the depletion random effect parameter 
-production$depletion$resize(nyears+1)
+production$log_depletion$resize(nyears+1)
 for (i in 1:(nyears+1)) {
-    production$depletion[i]$value <- inits$depletion[i]
-    production$depletion[i]$min <- 0
+    production$log_depletion[i]$value <- log(inits$depletion[i])
 }
-production$depletion$set_all_random(TRUE)
+production$log_depletion$set_all_random(TRUE)
 production$n_years$set(nyears)
 ```
 
@@ -155,37 +174,20 @@ production$n_years$set(nyears)
 Next we need to set-up the distribution for the random effects model. In this example, depletion will follow a Lognormal distribution
 
 ```{r depletion-distribution}
-production_distribution <- new(DlnormDistribution)
-
-# Fix sd to posterior median from Stan as FIMS currently does not have the 
-# ability to fit a prior inverse gamma prior distribution on sd
-production_distribution$log_sd[1]$value <- log(sqrt(3.1e-3))
+production_distribution <- new(DnormDistribution)
+production_distribution$log_sd[1]$value <- log(3.1e-3)
+production_distribution$log_sd[1]$estimation_type$set("fixed_effects")
+production_distribution$log_sd$add_prior(sd^2 ~ InvGamma(3.785518, 1/0.010223))
 
 # depletion ~ LNormal(log_expected_depletion, sd)
 production_distribution$set_distribution_links(
     "random_effects",
-    c(production$depletion$get_id(), production$log_expected_depletion$get_id())
+    c(production$log_depletion$get_id(), 
+    production$log_expected_depletion$get_id())
 )
 ```
 
-## Priors
 
-Priors can be added by initializing a new Distribution module and linking the observed and expected values to the parameter of interest and it's hypermean value. In this example, we put Lognormal priors on growth rate and carrying capacity. 
-
-```{r priors}
-growth_rate_Prior <- new(DlnormDistribution)
-growth_rate_Prior$expected_values[1]$value <- growth_rate_prior[1]
-growth_rate_Prior$log_sd[1]$value <- log(growth_rate_prior[2])
-growth_rate_Prior$set_distribution_links("prior", 
-    production$growth_rate$get_id())
-
-carrying_capacity_Prior <- new(DlnormDistribution)
-carrying_capacity_Prior$expected_values[1]$value <- carrying_capacity_prior[1]
-carrying_capacity_Prior$log_sd[1]$value <- log(carrying_capacity_prior[2])
-carrying_capacity_Prior$set_distribution_links("prior",         
-    production$carrying_capacity$get_id())
-```
-  
 ## Population and Model
 
 The last two modules to set up are the population and the surplus production model. The depletion and fleet modules are linked to the population module and the population module is then linked to the surplus production mdoule.
@@ -227,7 +229,7 @@ parameters <- list(
 
 # Create TMB object
 obj <- TMB::MakeADFun(
-    data = list(), parameters, DLL = "FIMS",
+    data = list(do_mcmc = 0), parameters, DLL = "FIMS",
     random = "re", 
     silent = TRUE, map = list()
 )
@@ -235,33 +237,31 @@ obj <- TMB::MakeADFun(
 
 ## Optimization or MCMC
 
-After the TMB object is created, `obj` can be passed either to `nlminb()` or `SparseNUTS::sample_nuts()`. This model set-up to be run as a Bayesian model so the demo will highlight how to pass this into `SparseNUTS::sample_nuts()`. The `growth_rate` and `carrying_capacity` were set-up on the natural scale to avoid the need for Jacobian transformations, which are not available yet in FIMS. It is therefore neccessary to pass in a vector of parameter minimums (all set to 0) to prevent parameter sampling outside realistic ranges. The FIMS functions `get_parameter_min_vector()` and `get_random_effects_min_vector()` pull these values from the `min` parameter attribute. 
+After the TMB object is created, `obj` can be passed either to `nlminb()` or `SparseNUTS::sample_snuts()`. This model set-up to be run as a Bayesian model so the demo will highlight how to pass this into `SparseNUTS::sample_snuts()`. The `growth_rate` and `carrying_capacity` were set-up on the natural scale to avoid the need for Jacobian transformations, which are not available yet in FIMS. It is therefore neccessary to pass in a vector of parameter minimums (all set to 0) to prevent parameter sampling outside realistic ranges. The FIMS functions `get_parameter_min_vector()` and `get_random_effects_min_vector()` pull these values from the `min` parameter attribute. 
   
 ```{r fit-mcmc, eval = FALSE}
 
- # Fit MCMC using SparseNUTS
-  fit <- NULL
-  invisible(capture.output(
-    invisible(capture.output(
-       fit <<- SparseNUTS::sample_snuts(
-        obj,
-        num_samples = 8000,
-        chains = 1,
-        metric = "stan",
-        print = FALSE,
-        refresh = 0,
-        quiet = TRUE,
-        lower = c(FIMS:::get_parameter_min_vector(), 
-            FIMS:::get_random_effects_min_vector()), 
-        upper = c(FIMS:::get_parameter_max_vector(), 
-            FIMS:::get_random_effects_max_vector()), 
-        control = list(adapt_delta = 0.99),
-        skip_optimization = TRUE
-      ),
-      type = "message"
-    ))
-  ))
+ fit <- SparseNUTS::sample_snuts(
+     obj,
+     num_samples = 30000,
+     num_warmup = 5000,
+     chains = 4,
+     cores = 1, 
+     metric = "stan",
+     print = TRUE,
+     refresh = 100,
+     iter = 35000,
+     control = list(adapt_delta = 0.99),
+     skip_optimization = FALSE
+ )
 
-  print(fit$mle$est)
+ # SparseNUTS return structure can vary by version.
+ if (!is.null(fit[["mle"]]) && !is.null(fit[["mle"]][["est"]])) {
+     print(fit[["mle"]][["est"]])
+ } else if (!is.null(fit[["monitor"]]) && !is.null(fit[["monitor"]][["median"]])) {
+     print(fit[["monitor"]][["median"]])
+ } else {
+     print(names(fit))
+ }
 
 ```

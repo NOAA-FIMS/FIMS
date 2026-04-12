@@ -27,10 +27,10 @@ namespace
     selectivity2->slope[0] = 0.18;
     
     // Set up variable map to point to selectivity parameters
-    info->variable_map[1] = &(selectivity1)->inflection_point;
-    info->variable_map[2] = &(selectivity1)->slope;
-    info->variable_map[3] = &(selectivity2)->inflection_point;
-    info->variable_map[4] = &(selectivity2)->slope;
+    info->variable_map[1].variable = &(selectivity1)->inflection_point;
+    info->variable_map[2].variable = &(selectivity1)->slope;
+    info->variable_map[3].variable = &(selectivity2)->inflection_point;
+    info->variable_map[4].variable = &(selectivity2)->slope;
     
     //Create new normal distributions
     std::shared_ptr<fims_distributions::NormalLPDF<double> > normal_inflection_point =
@@ -54,6 +54,8 @@ namespace
     // Call function that links key ID to variable map pointers given variable map ID
     // This function will set the density component, priors, to the respective parameters
     info->SetupPriors();
+    normal_inflection_point->Prepare();
+    lognormal_slope->Prepare();
 
     EXPECT_EQ((*normal_inflection_point->priors[0])[0], selectivity1->inflection_point[0]);
     EXPECT_EQ((*normal_inflection_point->priors[1])[0], selectivity2->inflection_point[0]);
@@ -61,8 +63,8 @@ namespace
     EXPECT_EQ((*lognormal_slope->priors[1])[0], selectivity2->slope[0]);
     EXPECT_EQ((normal_inflection_point->get_observed(0)), selectivity1->inflection_point[0]);
     EXPECT_EQ((normal_inflection_point->get_observed(1)), selectivity2->inflection_point[0]);
-    EXPECT_EQ((lognormal_slope->get_observed(0)), selectivity1->slope[0]);
-    EXPECT_EQ((lognormal_slope->get_observed(1)), selectivity2->slope[0]);
+    EXPECT_NEAR((lognormal_slope->get_observed(0)), selectivity1->slope[0], 1e-10);
+    EXPECT_NEAR((lognormal_slope->get_observed(1)), selectivity2->slope[0], 1e-10);
     
     //update the value in normal to check if it is updated in selectivity
     (*normal_inflection_point->priors[0])[0] = 20.5;

@@ -1284,17 +1284,17 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
               fims::Vector<std::string>{"n_years", "n_lengths"});
 
       // replace elements in the variable map
-      info->variable_map[fleet_interface->log_landings_expected.id_m] =
+      info->variable_map[fleet_interface->log_landings_expected.id_m].variable =
           &(derived_quantities["log_landings_expected"]);
-      info->variable_map[fleet_interface->log_index_expected.id_m] =
+      info->variable_map[fleet_interface->log_index_expected.id_m].variable =
           &(derived_quantities["log_index_expected"]);
-      info->variable_map[fleet_interface->agecomp_expected.id_m] =
+      info->variable_map[fleet_interface->agecomp_expected.id_m].variable =
           &(derived_quantities["agecomp_expected"]);
-      info->variable_map[fleet_interface->agecomp_proportion.id_m] =
+      info->variable_map[fleet_interface->agecomp_proportion.id_m].variable =
           &(derived_quantities["agecomp_proportion"]);
-      info->variable_map[fleet_interface->lengthcomp_expected.id_m] =
+      info->variable_map[fleet_interface->lengthcomp_expected.id_m].variable =
           &(derived_quantities["lengthcomp_expected"]);
-      info->variable_map[fleet_interface->lengthcomp_proportion.id_m] =
+      info->variable_map[fleet_interface->lengthcomp_proportion.id_m].variable =
           &(derived_quantities["lengthcomp_proportion"]);
     }
 
@@ -1540,7 +1540,7 @@ class SurplusProductionInterface : public FisheryModelInterfaceBase {
               fims::Vector<int>{fleet_interface->n_years.get()},
               fims::Vector<std::string>{"n_years"});
       
-      info->variable_map[fleet_interface->log_index_expected.id_m] =
+      info->variable_map[fleet_interface->log_index_expected.id_m].variable =
           &(derived_quantities["log_index_expected"]);
 
       //This will not work for many populations to one fleet relationships
@@ -1562,9 +1562,9 @@ class SurplusProductionInterface : public FisheryModelInterfaceBase {
           fims::Vector<int>{1},
           fims::Vector<std::string>{"scalar"});
 
-      info->variable_map[fleet_interface->log_index_to_depletion_carrying_capacity_ratio.id_m] =
+      info->variable_map[fleet_interface->log_index_to_depletion_carrying_capacity_ratio.id_m].variable =
         &(derived_quantities["log_index_to_depletion_carrying_capacity_ratio"]);
-      info->variable_map[fleet_interface->mean_log_q.id_m] =
+      info->variable_map[fleet_interface->mean_log_q.id_m].variable =
         &(derived_quantities["mean_log_q"]);
       
     }

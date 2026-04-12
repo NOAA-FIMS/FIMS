@@ -13,7 +13,6 @@
 
 #include "../../../common/model_object.hpp"
 #include "../../../common/fims_vector.hpp"
-#include "../../../transformations/transformations.hpp"
 
 namespace fims_popdy {
 
@@ -29,32 +28,38 @@ struct DepletionBase : public fims_model_object::FIMSObject<Type> {
   // Assigning each one its own ID is a way to keep track of
   // all the instances of the DepletionBase class.
   static uint32_t
-      id_g; /**< The ID of the instance of the DepletionBase class */
-  fims::Vector<Type> log_depletion; /**< Natural log of the depletion used for
-                                       random effects. */
+    id_g; /**< The ID of the instance of the DepletionBase class */
+  fims::Vector<Type> 
+    log_depletion; /**< Transformed depletion input supplied by the user */
   fims::Vector<Type>
-      log_expected_depletion; /**< Expectation of the depletion process. */
-  fims::Vector<Type> depletion; /**< The depletion process. */
+    log_expected_depletion; /**< Log expectation of the depletion process. */
+  fims::Vector<Type> 
+    depletion; /**< The depletion process, back-transformed from 
+                    log_depletion. */
   fims::Vector<Type>
-      log_init_depletion; /*!< estimated parameter: natural log of initial depletion*/
-  fims::Vector<Type> log_carrying_capacity; /**< Carrying capacity of the population. */
-  fims::Vector<Type> log_growth_rate; /**< Intrinsic growth rate. */
-  fims::Vector<Type> log_shape; /**< Shape parameter that adjusts the curvature of
-                                   the growth function */
-  fims::Vector<Type> carrying_capacity; /**< Carrying capacity of the population. */
-  fims::Vector<Type> growth_rate; /**< Intrinsic growth rate. */
-  fims::Vector<Type> shape; /**< Shape parameter that adjusts the curvature of the growth function */
+    log_init_depletion; /*!< Transformed initial depletion supplied by the user*/
+  fims::Vector<Type>
+    init_depletion; /*!< estimated parameter: initial depletion 
+                        back-transformed from log_init_depletion*/
+  fims::Vector<Type> 
+    log_carrying_capacity; /**< Transformed carrying capacity of the 
+                                population supplied by the user */
+  fims::Vector<Type> 
+    log_growth_rate; /**< Transformed intrinsic growth rate supplied 
+                            by the user. */
+  fims::Vector<Type> 
+    log_shape; /**< Tranformed shape parameter that adjusts the curvature 
+                        of the growth function */
+  fims::Vector<Type> 
+    carrying_capacity; /**< Carrying capacity of the population 
+                            back-transformed from log_carrying_capacity. */
+  fims::Vector<Type> 
+    growth_rate; /**< Intrinsic growth rate back-transformed from 
+                        log_growth_rate. */
+  fims::Vector<Type> 
+    shape; /**< Shape parameter that adjusts the curvature of the growth 
+                function back-transformed from log_shape */
   
-  // Transformation modules
-  std::shared_ptr<fims_transformations::ParameterTransformationBase<Type>> 
-      growth_rate_transformation; /**< Pointer to the transformation function for the intrinsic growth rate */
-  std::shared_ptr<fims_transformations::ParameterTransformationBase<Type>> 
-      carrying_capacity_transformation; /**< Pointer to the transformation function for the carrying capacity */
-  std::shared_ptr<fims_transformations::ParameterTransformationBase<Type>> 
-      shape_transformation; /**< Pointer to the transformation function for the shape parameter */
-  std::shared_ptr<fims_transformations::ParameterTransformationBase<Type>> 
-      depletion_transformation; /**< Pointer to the transformation function for depletion */
-
   /** @brief Constructor.
    */
   DepletionBase() {
@@ -64,20 +69,6 @@ struct DepletionBase : public fims_model_object::FIMSObject<Type> {
 
   virtual ~DepletionBase() {}
 
-  
-  /**
-   * @brief Apply transformations between log and natural scales
-   * The transformation objects know which direction to transform
-   */
-  virtual void ApplyLogTransformations() {
-    // Always call transform - polymorphism handles the right direction
-    growth_rate_transformation->Transform(this->log_growth_rate[0], this->growth_rate[0]);
-    carrying_capacity_transformation->Transform(this->log_carrying_capacity[0], this->carrying_capacity[0]);
-    shape_transformation->Transform(this->log_shape[0], this->shape[0]);
-    for(size_t i=0; i < this->depletion.size(); i++){
-        depletion_transformation->Transform(this->log_depletion[i], this->depletion[i]);
-    }
-  }
 
   /**
    * @brief Calculates the depletion.

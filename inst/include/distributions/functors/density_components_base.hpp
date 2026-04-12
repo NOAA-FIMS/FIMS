@@ -18,8 +18,10 @@
 #include "../../common/data_object.hpp"
 #include "../../common/model_object.hpp"
 #include "../../interface/interface.hpp"
+#include "../../common/fims_transformations.hpp"
 #include "../../common/fims_vector.hpp"
 #include "../../common/fims_math.hpp"
+#include "../../common/types.hpp"
 
 namespace fims_distributions {
 
@@ -55,6 +57,15 @@ struct DensityComponentBase : public fims_model_object::FIMSObject<Type> {
   /** @brief Vector of pointers where each entry points to a prior parameter. */
   std::vector<fims::Vector<Type>*> priors;
 
+  /** @brief Pointer to input transformation */
+  std::vector<fims::Transformation*> input_transformation;
+  
+  /** @brief Pointer to prior transformation */
+  std::vector<fims::Transformation*> prior_transformation;
+
+  /** @brief Prior values after transformation */
+  fims::Vector<Type> transformed_priors;
+
   /**
    * @brief Input value of distribution function for priors or random effects.
    */
@@ -71,8 +82,28 @@ struct DensityComponentBase : public fims_model_object::FIMSObject<Type> {
    */
   std::string use_mean = fims::to_string("no");
 
-  // std::shared_ptr<DistributionElementObject<Type>> expected;
-  // // Expected value of distribution function.
+  virtual void Prepare() {
+    if (this->input_type == "prior") {
+      if (priors.size() == 0) {
+        throw std::runtime_error("No priors defined for this distribution.");
+      } else if (priors.size() == 1) {
+        this->transformed_priors.resize((*priors[0]).size());
+        this->transformed_priors = 
+          fims_transformations::TransformPrior(*(priors[0]), 
+                                               *(input_transformation[0]), 
+                                               *(prior_transformation[0]));
+      } else if (priors.size() > 1) {
+        size_t n = priors.size();
+        this->transformed_priors.resize(n);
+        for (size_t i = 0; i < n; i++) {
+          transformed_priors[i] = 
+            fims_transformations::TransformPrior((*(priors[i]))[0],
+                                                 *(input_transformation[i]),
+                                                 *(prior_transformation[i]));
+      }
+    }
+  }
+}
 
   /**
    * @brief Retrieve one observed value based on `input_type`.
@@ -88,13 +119,7 @@ struct DensityComponentBase : public fims_model_object::FIMSObject<Type> {
       return (*re)[i];
     }
     if (this->input_type == "prior") {
-      if (priors.size() == 0) {
-        throw std::runtime_error("No priors defined for this distribution.");
-      } else if (priors.size() == 1) {
-        return (*(priors[0]))[i];
-      } else if (priors.size() > 1) {
-        return (*(priors[i]))[0];
-      }
+      return transformed_priors[i];
     }
     return observed_values[i];
   }

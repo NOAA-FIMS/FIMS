@@ -50,6 +50,7 @@ NULL
 #'
 #' @details
 #' - [clear](https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html)
+#' - [add_shared_prior](https://noaa-fims.github.io/FIMS/doxygen/add__shared__prior_8hpp.html)
 #' - [get_fixed](https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html)
 #' - [get_log](https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html)
 #' - [get_log_errors](https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html)

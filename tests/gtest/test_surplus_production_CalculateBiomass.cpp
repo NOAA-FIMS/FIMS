@@ -18,8 +18,8 @@ namespace
 
         auto& dq_pop = surplus_production_model->GetPopulationDerivedQuantities(population->GetId());
 
-        biomass[year] = population->depletion->depletion[year] * 
-                exp(population->depletion->log_carrying_capacity[0]);
+        biomass[year] = population->depletion_module->depletion[year] * 
+                exp(population->depletion_module->log_carrying_capacity[0]);
         EXPECT_EQ( biomass[year], dq_pop["biomass"][year]);
 
     }

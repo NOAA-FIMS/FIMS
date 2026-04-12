@@ -83,11 +83,13 @@ add_executable(fims_math_dinvgamma
 
 find_library(R_LIB 
   NAMES R R.dll R.lib
-  HINTS "${R_HOME}"
-  PATHS 
-    "${R_HOME}/bin/x64"     # Standard Windows 64-bit path
-    "${R_HOME}/bin"         # Older Windows or specialized builds
-    "${R_HOME}/lib"         # Linux/macOS standard
+  HINTS
+    "${R_HOME}/lib"         # Linux/macOS: /usr/lib/R/lib
+    "${R_HOME}/bin/x64"     # Windows 64-bit
+    "${R_HOME}/bin"         # Windows fallback
+    "/usr/lib"              # Ubuntu system install (libR.so lands here sometimes)
+    "/usr/local/lib"        # macOS Homebrew / manual installs
+    "/Library/Frameworks/R.framework/Versions/Current/Resources/lib"  # macOS framework install from CRAN
   PATH_SUFFIXES "x64" "i386"
 )
 
@@ -105,18 +107,6 @@ target_link_libraries(fims_math_dinvgamma
 )
 
 gtest_discover_tests(fims_math_dinvgamma)
-
-# test_parameter_transformations_log.cpp
-add_executable(parameter_transformations_log
-  test_parameter_transformations_log.cpp
-)
-
-target_link_libraries(parameter_transformations_log
-  gtest_main
-  fims_test
-)
-
-gtest_discover_tests(parameter_transformations_log)
 
 # test_population_dynamics_growth.cpp
 add_executable(population_dynamics_growth
@@ -319,6 +309,30 @@ target_link_libraries(fims_math_logit
 )
 
 gtest_discover_tests(fims_math_logit)
+
+# test_fims_transformation_ApplyTransformation.cpp
+add_executable(fims_apply_transformation
+  test_fims_transformations_ApplyTransformation.cpp
+)
+
+target_link_libraries(fims_apply_transformation
+  gtest_main
+  fims_test
+)
+
+gtest_discover_tests(fims_apply_transformation)
+
+# test_fims_transformation_TransformPrior.cpp
+add_executable(fims_transform_prior
+  test_fims_transformations_TransformPrior.cpp
+)
+
+target_link_libraries(fims_transform_prior
+  gtest_main
+  fims_test
+)
+
+gtest_discover_tests(fims_transform_prior)
 
 # test_DoubleLogistic_DoubleLogisticSelectivity_Evaluate.cpp
 add_executable(DoubleLogistic_DoubleLogisticSelectivity_Evaluate

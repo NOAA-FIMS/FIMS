@@ -63,25 +63,12 @@ class SPBaseTestFixture : public testing::Test {
       //log transformation
       depletion->log_depletion[i] = log(input_depletion);
     }
-    //set up transformation modules
-    depletion->growth_rate_transformation = 
-      fims_transformations::CreateLogTransformation<double>(
-          depletion->log_growth_rate[0], -999.00);
-    depletion->carrying_capacity_transformation = 
-      fims_transformations::CreateLogTransformation<double>(
-          depletion->log_carrying_capacity[0], -999.00);
-    depletion->shape_transformation = 
-      fims_transformations::CreateLogTransformation<double>(
-          depletion->log_shape[0], -999.00);
-    depletion->depletion_transformation = 
-      fims_transformations::CreateLogTransformation<double>(
-          depletion->log_depletion[0], -999.00); 
     depletion->depletion.resize(nyears);
     depletion->log_expected_depletion.resize(nyears+1);
     depletion->log_init_depletion.resize(1);
     depletion->log_init_depletion[0] =
           log(init_depletion); //log transformation
-    population->depletion = depletion;
+    population->depletion_module = depletion;
     surplus_production_model->populations.push_back(population);
   }
 
