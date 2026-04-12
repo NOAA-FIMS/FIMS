@@ -14,6 +14,7 @@ save_csv <- function(data) {
     message("ERROR MESSAGE: ", conditionMessage(e))
     message("CALL: ")
     print(e$call)
+    log_error(paste("Error in save_csv:", conditionMessage(e)))
     stop(e)  #rethrow so testthat still fails
     }
 )
