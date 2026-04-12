@@ -8,6 +8,7 @@ save_csv <- function(data) {
   result <- tryCatch(
     {
       write.csv(data, path, row.names = FALSE)
+      log_info(paste("Successfully saved CSV to:", path))
       return(path)
     },
     error = function(e) {

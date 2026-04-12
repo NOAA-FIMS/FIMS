@@ -50,7 +50,6 @@ test_that("`create_default_parameters()` works with correct inputs", {
     "default_parameters.csv",
     compare = compare_file_text
   ) 
-  write(result_unnested, "default_parameters.log") # for updating the snapshot when needed
 })
 
 ## Edge handling ----
