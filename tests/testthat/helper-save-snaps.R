@@ -7,7 +7,7 @@ save_csv <- function(data) {
   path <- tempfile(fileext = ".csv")
   result <- tryCatch(
     {
-      write.csv(data, path, row.names = FALSE)
+      write.csv(data, path)#, row.names = FALSE)
       log_info(paste("Successfully saved CSV to:", path))
       return(path)
     },
