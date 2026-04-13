@@ -15,7 +15,7 @@ jobs:
     name: pr-checklist
     steps:
       - name: 'Update PR Description'
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           script: |
             const { data: pullRequest } = await github.rest.pulls.get({
