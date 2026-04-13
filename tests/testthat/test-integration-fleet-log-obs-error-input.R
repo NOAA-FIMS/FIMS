@@ -73,7 +73,16 @@ test_that("`log_obs_error scalar` works with correct inputs", {
     initialize_fims(data = data_4_model) |>
     fit_fims(optimize = FALSE)
 
-  json_estimates <- reshape_json_estimates(test_fit@model_output)
+  # json_estimates <- reshape_json_estimates(test_fit@model_output)
+  json_estimates <- tryCatch(
+  reshape_json_estimates(test_fit@model_output),
+  error = function(e) {
+    message("Error in reshape_json_estimates: ", e$message)
+    write(test_fit@model_output, file = "model_output_debug.json")
+    throw(e)  # rethrow the error after logging
+    NULL
+  }
+)
 
   log_sd_input <- parameters_4_model |>
     dplyr::filter(fleet_name == "fleet1" & label == "log_sd") |>
