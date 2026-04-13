@@ -22,14 +22,8 @@ jobs:
           # Note: The name depends on the reusable workflow. 
           # Common names are 'check-logs' or 'r-cmd-check-results'
           path: check-logs
-
-      - name: Write Specific Errors to Summary
+      - name: Show snapshot diff
         run: |
-          echo "### ⚠️ R CMD CHECK Failure Details" >> $GITHUB_STEP_SUMMARY
-          echo "#### Extract from 00check.log:" >> $GITHUB_STEP_SUMMARY
-          echo '```text' >> $GITHUB_STEP_SUMMARY
-          
-          # Find any .log files in the downloaded artifact and show the last 120 lines
-          find check-logs -name "*.log" -exec tail -n 120 {} + >> $GITHUB_STEP_SUMMARY
-          
-          echo '```' >> $GITHUB_STEP_SUMMARY
+              git status
+              git diff tests/testthat/_snaps || true
+
