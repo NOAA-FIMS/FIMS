@@ -68,7 +68,7 @@ annual fishing mortality multipliers to scale total mortality of all fleets*/
   // depletion
   int depletion_id = -999; /*!< id of depletion model object*/
   std::shared_ptr<fims_popdy::DepletionBase<Type>>
-      depletion; /*!< shared pointer to depletion module */
+      depletion_module; /*!< shared pointer to depletion module */
 
   // fleet
   std::set<uint32_t> fleet_ids; /*!< id of fleet model object*/

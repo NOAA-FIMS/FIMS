@@ -677,7 +677,7 @@ setup_and_run_surplus_production_model <-
   # create depletion module
   production <- new(PTDepletion)
   # Fix to get Schaefer model
-  production$log_shape[1]$value <- log(2)
+  production$shape_input[1]$value <- log(2)
   production$n_years$set(nyears)
 
   if(estimation_mode == TRUE){
@@ -689,17 +689,17 @@ setup_and_run_surplus_production_model <-
       survey_fleet_index_distribution$uncertainty[1]$value <- inits$sigma2_obs |> sqrt() |> log()
       survey_fleet_index_distribution$uncertainty[1]$estimation_type$set("fixed_effects")
 
-      production$log_growth_rate[1]$value <- log(inits$growth_rate)
-      production$log_growth_rate[1]$estimation_type$set("fixed_effects")
-      production$log_carrying_capacity[1]$value <- log(inits$carrying_capacity)
-      production$log_carrying_capacity[1]$estimation_type$set("fixed_effects")
-      production$log_init_depletion[1]$value <- 0 # inital depletion ~ 1
+      production$growth_rate_input[1]$value <- log(inits$growth_rate)
+      production$growth_rate_input[1]$estimation_type$set("fixed_effects")
+      production$carrying_capacity_input[1]$value <- log(inits$carrying_capacity)
+      production$carrying_capacity_input[1]$estimation_type$set("fixed_effects")
+      production$init_depletion_input[1]$value <- 0 # inital depletion ~ 1
 
-      production$log_depletion$resize(nyears+1)
+      production$depletion_input$resize(nyears+1)
       for (i in 1:(nyears+1)) {
-        production$log_depletion[i]$value <- log(inits$depletion[i])
+        production$depletion_input[i]$value <- log(inits$depletion[i])
       }
-      production$log_depletion$set_all_random(TRUE)
+      production$depletion_input$set_all_random(TRUE)
       
       # create production distribution module
       production_distribution <- new(DnormDistribution)
@@ -710,7 +710,7 @@ setup_and_run_surplus_production_model <-
       # log_depletion ~ Normal(log_expected_depletion, sd)
       production_distribution$set_distribution_links(
         "random_effects",
-        c(production$log_depletion$get_id(), production$log_expected_depletion$get_id())
+        c(production$depletion_input$get_id(), production$log_expected_depletion$get_id())
       )
 
     } else {
@@ -721,30 +721,33 @@ setup_and_run_surplus_production_model <-
       survey_fleet_index_distribution$uncertainty[1]$min <- 0
       survey_fleet_index_distribution$uncertainty[1]$estimation_type$set("fixed_effects")
 
-      production$growth_rate[1]$value <- inits$growth_rate
-      production$growth_rate[1]$min <- 0
-      production$growth_rate[1]$estimation_type$set("fixed_effects")
-      production$carrying_capacity[1]$value <- inits$carrying_capacity
-      production$carrying_capacity[1]$min <- 0
-      production$carrying_capacity[1]$estimation_type$set("fixed_effects")
-      production$log_init_depletion[1]$value <- 0 # inital depletion ~ 1
+      production$growth_rate_input[1]$value <- inits$growth_rate
+      production$growth_rate_input$set_transformation("identity")
+      production$growth_rate_input[1]$min <- 0
+      production$growth_rate_input[1]$estimation_type$set("fixed_effects")
+      production$carrying_capacity_input[1]$value <- inits$carrying_capacity
+      production$carrying_capacity_input$set_transformation("identity")
+      production$carrying_capacity_input[1]$min <- 0
+      production$carrying_capacity_input[1]$estimation_type$set("fixed_effects")
+      production$init_depletion_input[1]$value <- 0 # inital depletion ~ 1
 
-      production$depletion$resize(nyears+1)
+      production$depletion_input$resize(nyears+1)
+      production$depletion_input$set_transformation("identity")
       for (i in 1:(nyears+1)) {
-        production$depletion[i]$value <- inits$depletion[i]
-        production$depletion[i]$min <- 0
+        production$depletion_input[i]$value <- inits$depletion[i]
+        production$depletion_input[i]$min <- 0
       }
-      production$depletion$set_all_random(TRUE)
+      production$depletion_input$set_all_random(TRUE)
 
       growth_rate_Prior <- new(DlnormDistribution)
-      growth_rate_Prior$expected_values[1]$value <- r_prior[1]
-      growth_rate_Prior$uncertainty[1]$value <- log(r_prior[2])
-      growth_rate_Prior$set_distribution_links("prior", production$growth_rate$get_id())
+      growth_rate_Prior$expected_values[1]$value <- growth_rate_prior[1]
+      growth_rate_Prior$uncertainty[1]$value <- log(growth_rate_prior[2])
+      growth_rate_Prior$set_distribution_links("prior", production$growth_rate_input$get_id())
 
       carrying_capacity_Prior <- new(DlnormDistribution)
-      carrying_capacity_Prior$expected_values[1]$value <- K_prior[1]
-      carrying_capacity_Prior$uncertainty[1]$value <- log(K_prior[2])
-      carrying_capacity_Prior$set_distribution_links("prior", production$carrying_capacity$get_id())
+      carrying_capacity_Prior$expected_values[1]$value <- carrying_capacity_prior[1]
+      carrying_capacity_Prior$uncertainty[1]$value <- log(carrying_capacity_prior[2])
+      carrying_capacity_Prior$set_distribution_links("prior", production$carrying_capacity_input$get_id())
 
       # create production distribution module
       production_distribution <- new(DlnormDistribution)
@@ -756,7 +759,7 @@ setup_and_run_surplus_production_model <-
       # depletion ~ LNormal(log_expected_depletion, sd)
       production_distribution$set_distribution_links(
         "random_effects",
-        c(production$depletion$get_id(), production$log_expected_depletion$get_id())
+        c(production$depletion_input$get_id(), production$log_expected_depletion$get_id())
       )
 
     }
@@ -769,30 +772,35 @@ setup_and_run_surplus_production_model <-
       survey_fleet_index_distribution$uncertainty[1]$value <- inits_true$sigma2_obs
       survey_fleet_index_distribution$uncertainty[1]$estimation_type$set("fixed_effects")
 
-      production$growth_rate[1]$value <- inits_true$growth_rate
-      production$growth_rate[1]$estimation_type$set("fixed_effects")
-      production$carrying_capacity[1]$value <- inits_true$carrying_capacity
-      production$carrying_capacity[1]$estimation_type$set("fixed_effects")
-      production$log_init_depletion[1]$value <- inits_true$depletion[1] |> log()
-      production$depletion$resize(nyears+1)
+      production$growth_rate_input[1]$value <- inits_true$growth_rate
+      production$growth_rate_input$set_transformation("identity")
+      production$growth_rate_input[1]$estimation_type$set("fixed_effects")
+      production$carrying_capacity_input[1]$value <- inits_true$carrying_capacity
+      production$carrying_capacity_input$set_transformation("identity")
+      production$carrying_capacity_input[1]$estimation_type$set("fixed_effects")
+      production$init_depletion_input[1]$value <- inits_true$depletion[1] |> log()
+      production$depletion_input$resize(nyears+1)
+      production$depletion_input$set_transformation("identity")
       for (i in 1:(nyears+1)) {
-        production$depletion[i]$value <- inits_true$depletion[i]
-        production$depletion[i]$estimation_type$set("random_effects")
+        production$depletion_input[i]$value <- inits_true$depletion[i]
+        production$depletion_input[i]$estimation_type$set("random_effects")
       }
 
       growth_rate_Prior <- new(DlnormDistribution)
-      growth_rate_Prior$expected_values[1]$value <- r_prior[1]
-      growth_rate_Prior$uncertainty[1]$value <- r_prior[2]
+      growth_rate_Prior$expected_values[1]$value <- growth_rate_prior[1]
+      growth_rate_Prior$uncertainty[1]$value <- growth_rate_prior[2]
       growth_rate_Prior$uncertainty$set_transformation("identity")
       growth_rate_Prior$uncertainty$set_uncertainty_name("sd")
-      growth_rate_Prior$set_distribution_links("prior", production$growth_rate$get_id())
+      growth_rate_Prior$set_distribution_links("prior", 
+        production$growth_rate_input$get_id())
 
       carrying_capacity_Prior <- new(DlnormDistribution)
-      carrying_capacity_Prior$expected_values[1]$value <- K_prior[1]
-      carrying_capacity_Prior$uncertainty[1]$value <- K_prior[2]
+      carrying_capacity_Prior$expected_values[1]$value <- carrying_capacity_prior[1]
+      carrying_capacity_Prior$uncertainty[1]$value <- carrying_capacity_prior[2]
       carrying_capacity_Prior$uncertainty$set_transformation("identity")
       carrying_capacity_Prior$uncertainty$set_uncertainty_name("sd")
-      carrying_capacity_Prior$set_distribution_links("prior", production$carrying_capacity$get_id())
+      carrying_capacity_Prior$set_distribution_links("prior", 
+        production$carrying_capacity_input$get_id())
 
       # create production distribution module
       production_distribution <- new(DlnormDistribution)
@@ -804,7 +812,7 @@ setup_and_run_surplus_production_model <-
       # depletion ~ LNormal(log_expected_depletion, sd)
       production_distribution$set_distribution_links(
         "random_effects",
-        c(production$depletion$get_id(), production$log_expected_depletion$get_id())
+        c(production$depletion_input$get_id(), production$log_expected_depletion$get_id())
       )
 
      } else {
@@ -814,16 +822,16 @@ setup_and_run_surplus_production_model <-
       survey_fleet_index_distribution$uncertainty[1]$value <- inits_true$sigma2_obs |> sqrt() |> log()
       survey_fleet_index_distribution$uncertainty[1]$estimation_type$set("fixed_effects")
      
-      production$log_growth_rate[1]$value <- inits_true$growth_rate |> log()
-      production$log_growth_rate[1]$estimation_type$set("fixed_effects")
-      production$log_carrying_capacity[1]$value <- inits_true$carrying_capacity |> log()
-      production$log_carrying_capacity[1]$estimation_type$set("fixed_effects")
-      production$log_init_depletion[1]$value <- inits_true$depletion[1] |> log()
+      production$growth_rate_input[1]$value <- inits_true$growth_rate |> log()
+      production$growth_rate_input[1]$estimation_type$set("fixed_effects")
+      production$carrying_capacity_input[1]$value <- inits_true$carrying_capacity |> log()
+      production$carrying_capacity_input[1]$estimation_type$set("fixed_effects")
+      production$init_depletion_input[1]$value <- inits_true$depletion[1] |> log()
 
-      production$log_depletion$resize(nyears+1)
+      production$depletion_input$resize(nyears+1)
       for (i in 1:(nyears+1)) {
-        production$log_depletion[i]$value <- log(inits_true$depletion[i])
-        production$log_depletion[i]$estimation_type$set("random_effects")
+        production$depletion_input[i]$value <- log(inits_true$depletion[i])
+        production$depletion_input[i]$estimation_type$set("random_effects")
       }
 
       # create production distribution module
@@ -835,7 +843,7 @@ setup_and_run_surplus_production_model <-
       # log_depletion ~ Normal(log_expected_depletion, sd)
       production_distribution$set_distribution_links(
         "random_effects",
-        c(production$log_depletion$get_id(), production$log_expected_depletion$get_id())
+        c(production$depletion_input$get_id(), production$log_expected_depletion$get_id())
       )
 
      }

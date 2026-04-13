@@ -451,22 +451,14 @@ RCPP_MODULE(fims) {
       "https://noaa-fims.github.io/FIMS/doxygen/"
       "classPellaTomlinsonInterface.html.")
       .constructor()
-      .field("log_growth_rate", &PellaTomlinsonInterface::log_growth_rate)
-      .field("log_carrying_capacity", &PellaTomlinsonInterface::log_carrying_capacity)
-      .field("log_shape", &PellaTomlinsonInterface::log_shape)
-      .field("growth_rate", &PellaTomlinsonInterface::growth_rate)
-      .field("carrying_capacity", &PellaTomlinsonInterface::carrying_capacity)
-      .field("shape", &PellaTomlinsonInterface::shape)
-      .field("depletion", &PellaTomlinsonInterface::depletion,
-             "The depletion process")
-      .field("log_depletion", &PellaTomlinsonInterface::log_depletion,
-             "The log-transformed depletion process")
-      .field("log_init_depletion", &PellaTomlinsonInterface::log_init_depletion,
-             "natural log of the initial depletion level")
+      .field("growth_rate_input", &PellaTomlinsonInterface::growth_rate_input)
+      .field("carrying_capacity_input", &PellaTomlinsonInterface::carrying_capacity_input)
+      .field("shape_input", &PellaTomlinsonInterface::shape_input)
+      .field("depletion_input", &PellaTomlinsonInterface::depletion_input)
+      .field("init_depletion_input", &PellaTomlinsonInterface::init_depletion_input)
       .field("log_expected_depletion",
-             &PellaTomlinsonInterface::log_expected_depletion,
-             "expected depletion as a random effect on the natural log scale")
-      .field("n_years", &PellaTomlinsonInterface::n_years, "number of years")
+             &PellaTomlinsonInterface::log_expected_depletion)
+      .field("n_years", &PellaTomlinsonInterface::n_years)
       .method("get_id", &PellaTomlinsonInterface::get_id)
       .method("evaluate_mean", &PellaTomlinsonInterface::evaluate_mean);
 

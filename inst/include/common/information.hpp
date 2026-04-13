@@ -650,7 +650,7 @@ class Information {
           this->depletion_models.find(depletion_uint);
 
       if (it != this->depletion_models.end()) {
-        p->depletion = (*it).second;  // depletion defined in population.hpp
+        p->depletion_module = (*it).second;  // depletion defined in population.hpp
         FIMS_INFO_LOG("Depletion model " + fims::to_string(depletion_uint) +
                       " successfully set to population " +
                       fims::to_string(p->id));

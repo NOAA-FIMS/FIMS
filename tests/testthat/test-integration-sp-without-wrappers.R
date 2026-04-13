@@ -84,11 +84,13 @@ test_that("deterministic MCMC run works with correct inputs", {
 
   # growth rate prior
   nll_growth_rate <- 
-    -dlnorm(inits_true$growth_rate, r_prior[1], r_prior[2], TRUE
+    -dlnorm(inits_true$growth_rate, growth_rate_prior[1], 
+      growth_rate_prior[2], TRUE
   )
   # carrying capacity prior
   nll_carrying_capacity <- 
-    -dlnorm(inits_true$carrying_capacity, K_prior[1], K_prior[2], TRUE
+    -dlnorm(inits_true$carrying_capacity, carrying_capacity_prior[1], 
+      carrying_capacity_prior[2], TRUE
   )
 
   # depletion nll
