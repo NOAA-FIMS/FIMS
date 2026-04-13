@@ -92,6 +92,18 @@ struct NormalLPDF : public DensityComponentBase<Type> {
       Type sd = fims_transformations::ApplyBackTransformation(
         this->uncertainty.get_force_scalar(i),
         this->uncertainty.get_transformation()); 
+      if (sd <= 0) {
+        //TODO: make this a genric function to check a parameter is positive
+        throw std::invalid_argument(
+            "LogNormalLPDF::evaluate() error: standard deviation must be "
+            "positive. The standard deviation is " +
+            fims::to_string(sd) + " for index " + fims::to_string(i) +
+            ". Check the input value and transformation for the uncertainty "
+            "parameter. It is currently set to: " +
+            fims::to_string(uncertainty.get_uncertainty_name()) +
+            " with transformation " +
+            fims::to_string(uncertainty.get_transformation_name()));
+      }
       if (this->input_type == "data") {
         // if data, check if there are any NA values and skip lpdf calculation
         // if there are

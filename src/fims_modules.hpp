@@ -503,7 +503,7 @@ RCPP_MODULE(fims) {
               &DlnormDistributionsInterface::set_distribution_links)
       .field("observed_values", &DlnormDistributionsInterface::observed_values)
       .field("expected_values", &DlnormDistributionsInterface::expected_values)
-      .field("log_sd", &DlnormDistributionsInterface::log_sd);
+      .field("uncertainty", &DlnormDistributionsInterface::uncertainty);
 
   Rcpp::class_<DgammaDistributionsInterface>("DgammaDistribution",
       "See "

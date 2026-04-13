@@ -10,17 +10,6 @@
 
 namespace fims_transformations {
 
-  static const char* TransformationLabelToString(
-      fims::Transformation::Label label) {
-    switch (label) {
-      case fims::Transformation::Label::identity: return "identity";
-      case fims::Transformation::Label::log: return "log";
-      case fims::Transformation::Label::logit: return "logit";
-      case fims::Transformation::Label::square: return "square";
-      default: return "unknown";
-    }
-  }
-
   template <typename Type>
   inline Type ApplyBackTransformation(
       const Type& value, 

@@ -9,27 +9,30 @@
 
 # Deterministic test ----
 ## Setup ----
-K_prior <- c(5.042905, sqrt(3.7603664))
-r_prior <- c(-1.38, sqrt(3.845))
+# Setup initial values and priors for the surplus production model parameters
+# Values from Meyer and Millar 1999, Table 1, with lognormal priors on K and r
+carrying_capacity_prior <- c(5.042905, sqrt(3.7603664))
+growth_rate_prior <- c(-1.38, sqrt(3.845))
 
 inits <- list(depletion=c(0.99,0.98,0.96,0.94,0.92,0.90,0.88,0.86,0.84,0.82,
-0.80,0.78,0.76,0.74,0.72,0.70,0.68,0.66,0.64,0.62,0.60,0.58,0.56, 0.56),
-growth_rate = 0.8, carrying_capacity = 200, sigma2_obs = 0.1, 
-sigma2_depletion = 0.1, q = 0.2)
+    0.80,0.78,0.76,0.74,0.72,0.70,0.68,0.66,0.64,0.62,0.60,0.58,0.56, 0.56),
+    growth_rate = 0.8, carrying_capacity = 200, sigma2_obs = 0.1, 
+    sigma2_depletion = 0.1, q = 0.2)
 
-inits_true <- list(depletion = data_limited_tuna_results |>
-  dplyr::filter(label == "depletion") |> dplyr::pull(median),
-growth_rate = data_limited_tuna_results |>
-  dplyr::filter(label == "growth_rate") |> dplyr::pull(median),
-carrying_capacity = data_limited_tuna_results |>
-  dplyr::filter(label == "carrying_capacity") |> dplyr::pull(median),
-sigma2_depletion = data_limited_tuna_results |>
-  dplyr::filter(label == "sigma2_depletion") |> dplyr::pull(median),
-sigma2_obs = data_limited_tuna_results |>
-  dplyr::filter(label == "sigma2_obs") |> dplyr::pull(median),
-q = data_limited_tuna_results |>
-  dplyr::filter(label == "q") |> dplyr::pull(median))
-
+inits_true <- list(
+    depletion = data_limited_tuna_results |>
+    dplyr::filter(label == "depletion") |> dplyr::pull(median),
+    growth_rate = data_limited_tuna_results |>
+    dplyr::filter(label == "growth_rate") |> dplyr::pull(median),
+    carrying_capacity = data_limited_tuna_results |>
+    dplyr::filter(label == "carrying_capacity") |> dplyr::pull(median),
+    sigma2_depletion = data_limited_tuna_results |>
+    dplyr::filter(label == "sigma2_depletion") |> dplyr::pull(median),
+    sigma2_obs = data_limited_tuna_results |>
+    dplyr::filter(label == "sigma2_obs") |> dplyr::pull(median),
+    q = data_limited_tuna_results |>
+    dplyr::filter(label == "q") |> dplyr::pull(median)
+)
 
 ## IO correctness ----
 test_that("deterministic MCMC run works with correct inputs", {
@@ -50,6 +53,11 @@ test_that("deterministic MCMC run works with correct inputs", {
   #' @description Compare FIMS carrying capacity with correct value
   expect_equal(
     result[["obj"]][["par"]][3] |> unname(), inits_true[["carrying_capacity"]]
+  )
+
+  #' @description Compare FIMS depletion var with correct value
+  expect_equal(
+    result[["obj"]][["par"]][4] |> unname(), inits_true[["sigma2_depletion"]]
   )
 
   #' @description Compare FIMS carrying capacity with correct value, use tolerance as value is approximated using marginalization method
@@ -112,22 +120,28 @@ test_that("deterministic MLE run works with correct inputs", {
   result <- setup_and_run_surplus_production_model(
     bayesian_mode = FALSE, estimation_mode = FALSE)
 
-  #' @description Compare FIMS obs var with correct value
+  #' @description Compare FIMS obs log_sd with correct value
   expect_equal(
-    result[["obj"]][["par"]][1] |> unname(), 
+    result[["obj"]][["env"]][["last.par.best"]][1] |> unname(), 
     inits_true[["sigma2_obs"]] |> sqrt() |> log()
   )
 
-  #' @description Compare FIMS growth rate with correct value
+  #' @description Compare FIMS log growth rate with correct value
   expect_equal(
-    result[["obj"]][["par"]][2] |> unname(), 
+    result[["obj"]][["env"]][["last.par.best"]][2] |> unname(), 
     inits_true[["growth_rate"]] |> log()
   )
 
-  #' @description Compare FIMS carrying capacity with correct value
+  #' @description Compare FIMS log carrying capacity with correct value
   expect_equal(
-    result[["obj"]][["par"]][3] |> unname(), 
+    result[["obj"]][["env"]][["last.par.best"]][3] |> unname(), 
     inits_true[["carrying_capacity"]] |> log()
+  )
+
+  #' @description Compare FIMS depletion log_sd with correct value
+  expect_equal(
+    result[["obj"]][["env"]][["last.par.best"]][4] |> unname(), 
+    inits_true[["sigma2_depletion"]] |> sqrt() |> log()
   )
 
   #' @description Compare FIMS carrying capacity with correct value, use tolerance as value is approximated using marginalization method
@@ -155,7 +169,7 @@ test_that("deterministic MLE run works with correct inputs", {
 
   # depletion nll
   sd_depletion <- inits_true[["sigma2_depletion"]] |> sqrt()
-  nll_depletion <- -dlnorm(inits_true[["depletion"]],
+  nll_depletion <- -dnorm(inits_true[["depletion"]] |> log(),
       result$report$log_depletion_expected |> unlist(),
       sd_depletion, 
       TRUE
@@ -196,6 +210,12 @@ test_that("MLE run works", {
   expect_near(
     result[["opt"]][["par"]][3] |> exp() |> unname(), 
     inits_true[["carrying_capacity"]])
+
+  #' @description Compare FIMS sigma2_depletion with stan value
+  skip("Need to redo tests for MLE run using new testing criteria")
+  expect_near(
+    result[["opt"]][["par"]][4] |> exp() |> unname(), 
+    inits_true[["sigma2_depletion"]])
 
   #' @description Compare FIMS q with stan value
   skip("Need to redo tests for MLE run using new testing criteria")

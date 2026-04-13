@@ -204,6 +204,16 @@ class Vector {
     return this->transformation_m;
   }
 
+  inline const char *get_transformation_name() const {
+    return TransformationLabelToString(
+        this->transformation_m.label);
+  }
+
+  inline const char *get_uncertainty_name() const {
+    return UncertaintyLabelToString(
+        this->transformation_m.uncertainty_label);
+  }
+
   /**
    * @brief  Returns a reference to the first element in the container.
    */

@@ -137,12 +137,13 @@ run_FIMS_projection_scenario <- function(om_input,
   # Set up fishery index data using the lognormal
   fishing_fleet_landings_distribution <- methods::new(DlnormDistribution)
   # lognormal observation error transformed on the log scale
-  fishing_fleet_landings_distribution$log_sd$resize(om_input[["nyr"]] + n_projection_years)
+  fishing_fleet_landings_distribution$uncertainty$set_uncertainty_name("sd")
+  fishing_fleet_landings_distribution$uncertainty$resize(om_input[["nyr"]] + n_projection_years)
   for (y in 1:(om_input[["nyr"]] + n_projection_years)) {
     # Compute lognormal SD from OM coefficient of variation (CV)
-    fishing_fleet_landings_distribution$log_sd[y]$value <- (log(sqrt(log(em_input[["cv.L"]][["fleet1"]]^2 + 1))))
+    fishing_fleet_landings_distribution$uncertainty[y]$value <- (log(sqrt(log(em_input[["cv.L"]][["fleet1"]]^2 + 1))))
   }
-  fishing_fleet_landings_distribution$log_sd$set_all_estimable(FALSE)
+  fishing_fleet_landings_distribution$uncertainty$set_all_estimable(FALSE)
   # Set Data using the IDs from the modules defined above
   fishing_fleet_landings_distribution$set_observed_data(fishing_fleet$GetObservedLandingsDataID())
   fishing_fleet_landings_distribution$set_distribution_links("data", fishing_fleet$log_landings_expected$get_id())
@@ -247,11 +248,12 @@ run_FIMS_projection_scenario <- function(om_input,
 
   # lognormal observation error transformed on the log scale
   # sd = sqrt(log(cv^2 + 1)), sd is log transformed
-  survey_fleet_index_distribution$log_sd$resize(om_input[["nyr"]] + n_projection_years)
+  survey_fleet_index_distribution$uncertainty$set_uncertainty_name("sd")
+  survey_fleet_index_distribution$uncertainty$resize(om_input[["nyr"]] + n_projection_years)
   for (y in 1:(om_input$nyr + n_projection_years)) {
-    survey_fleet_index_distribution$log_sd[y]$value <- (log(sqrt(log(em_input[["cv.survey"]][["survey1"]]^2 + 1))))
+    survey_fleet_index_distribution$uncertainty[y]$value <- (log(sqrt(log(em_input[["cv.survey"]][["survey1"]]^2 + 1))))
   }
-  survey_fleet_index_distribution$log_sd$set_all_estimable(FALSE)
+  survey_fleet_index_distribution$uncertainty$set_all_estimable(FALSE)
   # Set Data using the IDs from the modules defined above
   survey_fleet_index_distribution$set_observed_data(survey_fleet$GetObservedIndexDataID())
   survey_fleet_index_distribution$set_distribution_links("data", survey_fleet$log_index_expected$get_id())
@@ -328,11 +330,12 @@ run_FIMS_projection_scenario <- function(om_input,
 
 
   recruitment_distribution <- methods::new(DnormDistribution)
-  # set up logR_sd using the normal log_sd parameter
+  # set up logR_sd using the normal uncertainty parameter
   # logR_sd is NOT logged. It needs to enter the model logged b/c the exp() is
   # taken before the likelihood calculation
-  recruitment_distribution$log_sd$resize(1)
-  recruitment_distribution$log_sd[1]$value <- (log(om_input[["logR_sd"]]))
+  recruitment_distribution$uncertainty$set_uncertainty_name("sd")
+  recruitment_distribution$uncertainty$resize(1)
+  recruitment_distribution$uncertainty[1]$value <- (log(om_input[["logR_sd"]]))
 
   # NOTE: If this doesn't work I would guess that this is the possible source of
   # issues due to the length of x or expected recruitment needing to be the
@@ -344,7 +347,7 @@ run_FIMS_projection_scenario <- function(om_input,
     recruitment_distribution$expected_values[i]$value <- (0)
   }
 
-  recruitment_distribution$log_sd[1]$estimation_type$set("fixed_effects")
+  recruitment_distribution$uncertainty[1]$estimation_type$set("fixed_effects")
   recruitment_distribution$set_distribution_links("random_effects", recruitment$log_devs$get_id())
 
   # Growth
@@ -424,7 +427,7 @@ run_FIMS_projection_scenario <- function(om_input,
       # will be replaced in future refactoring that is currently in progress to
       # allow subvector pointers for likelihood components and to incorporate
       # mapping off parameters through TMB. The convoluted process below of
-      # setting up various log_sd values was to maintain constant values without
+      # setting up various uncertainty values was to maintain constant values without
       # having the estimator get stuck fitting the mean rather than the
       # spawning biomass ratio target.
 
@@ -434,30 +437,31 @@ run_FIMS_projection_scenario <- function(om_input,
 
       F_mult_distribution$observed_values$resize(om_input[["nyr"]] + n_projection_years)
       F_mult_distribution$expected_values$resize(om_input[["nyr"]] + n_projection_years)
-      F_mult_distribution$log_sd$resize(om_input[["nyr"]] + n_projection_years)
+      F_mult_distribution$uncertainty$set_uncertainty_name("sd")
+      F_mult_distribution$uncertainty$resize(om_input[["nyr"]] + n_projection_years)
       for (i in 1:(om_input[["nyr"]])) {
         F_mult_distribution$observed_values[i]$value <- 0
         F_mult_distribution$expected_values[i]$value <- 0
-        F_mult_distribution$log_sd[i]$value <- 200
-        F_mult_distribution$log_sd[i]$estimation_type$set("constant")
+        F_mult_distribution$uncertainty[i]$value <- 200
+        F_mult_distribution$uncertainty[i]$estimation_type$set("constant")
       }
       for (i in (om_input[["nyr"]] + 1):(om_input[["nyr"]] + n_projection_years)) {
         F_mult_distribution$observed_values[i]$value <- 0
         F_mult_distribution$expected_values[i]$value <- 0
-        F_mult_distribution$log_sd[i]$value <- -0
-        F_mult_distribution$log_sd[i]$estimation_type$set("constant")
+        F_mult_distribution$uncertainty[i]$value <- -0
+        F_mult_distribution$uncertainty[i]$estimation_type$set("constant")
       }
       for (i in (om_input[["nyr"]] + max(1, (n_projection_years - 30))):(om_input[["nyr"]] + n_projection_years)) {
         F_mult_distribution$observed_values[i]$value <- 0
         F_mult_distribution$expected_values[i]$value <- 0
-        F_mult_distribution$log_sd[i]$value <- -5
-        F_mult_distribution$log_sd[i]$estimation_type$set("constant")
+        F_mult_distribution$uncertainty[i]$value <- -5
+        F_mult_distribution$uncertainty[i]$estimation_type$set("constant")
       }
       for (i in (om_input[["nyr"]] + max(1, (n_projection_years - 5))):(om_input[["nyr"]] + n_projection_years)) {
         F_mult_distribution$observed_values[i]$value <- 0
         F_mult_distribution$expected_values[i]$value <- 0
-        F_mult_distribution$log_sd[i]$value <- -5
-        F_mult_distribution$log_sd[i]$estimation_type$set("constant")
+        F_mult_distribution$uncertainty[i]$value <- -5
+        F_mult_distribution$uncertainty[i]$estimation_type$set("constant")
       }
       F_mult_distribution$set_distribution_links("random_effects", population$log_f_multiplier$get_id())
     }
@@ -469,23 +473,24 @@ run_FIMS_projection_scenario <- function(om_input,
     SSB_ratio_prior <- methods::new(DnormDistribution)
     SSB_ratio_prior$expected_values$resize((om_input[["nyr"]] + n_projection_years + 1))
     SSB_ratio_prior$observed_values$resize((om_input[["nyr"]] + n_projection_years + 1))
-    SSB_ratio_prior$log_sd$resize((om_input[["nyr"]] + n_projection_years + 1))
+    SSB_ratio_prior$uncertainty$set_uncertainty_name("sd")
+    SSB_ratio_prior$uncertainty$resize((om_input[["nyr"]] + n_projection_years + 1))
     for (y in 1:(om_input[["nyr"]] + 1)) {
       SSB_ratio_prior$observed_values[y]$value <- ssb_ratio_target
       SSB_ratio_prior$expected_values[y]$value <- ssb_ratio_target
-      SSB_ratio_prior$log_sd[y]$value <- 200
+      SSB_ratio_prior$uncertainty[y]$value <- 200
     }
     if (n_projection_years > 0) {
       for (y in (om_input[["nyr"]] + 2):(om_input[["nyr"]] + 1 + n_projection_years)) {
         SSB_ratio_prior$observed_values[y]$value <- ssb_ratio_target
         SSB_ratio_prior$expected_values[y]$value <- ssb_ratio_target
-        SSB_ratio_prior$log_sd[y]$value <- 200
+        SSB_ratio_prior$uncertainty[y]$value <- 200
       }
 
       for (y in (om_input[["nyr"]] + max(2, n_projection_years - 5)):(om_input[["nyr"]] + 1 + n_projection_years)) {
         SSB_ratio_prior$observed_values[y]$value <- ssb_ratio_target
         SSB_ratio_prior$expected_values[y]$value <- ssb_ratio_target
-        SSB_ratio_prior$log_sd[y]$value <- -5
+        SSB_ratio_prior$uncertainty[y]$value <- -5
       }
     }
     SSB_ratio_prior$set_distribution_links("prior", population$spawning_biomass_ratio$get_id())

@@ -155,6 +155,27 @@ struct Transformation {
 
   };
 
+  static const char* TransformationLabelToString(
+      fims::Transformation::Label label) {
+    switch (label) {
+      case fims::Transformation::Label::identity: return "identity";
+      case fims::Transformation::Label::log: return "log";
+      case fims::Transformation::Label::logit: return "logit";
+      case fims::Transformation::Label::square: return "square";
+      default: return "unknown";
+    }
+  }
+
+  static const char* UncertaintyLabelToString(
+      fims::Transformation::UncertaintyLabel label) {
+    switch (label) {
+      case fims::Transformation::UncertaintyLabel::none: return "none";
+      case fims::Transformation::UncertaintyLabel::sd: return "sd";
+      case fims::Transformation::UncertaintyLabel::var: return "var";
+      default: return "unknown";
+    }
+  }
+
 /**
  * @brief A data structure with defined fields for a single log record.
  *

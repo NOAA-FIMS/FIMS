@@ -44,11 +44,31 @@ Like the FIMS catch-at-age model, data are set up in long format.
 A sample data frame for a surplus production model is stored in the package as `data_limited_tuna`. This data set is based on data that was used in [Meyer and Millar 1999](https://d1wqtxts1xzle7.cloudfront.net/103328457/92d9f6b68861cc5d1c40beda0ad76d18db69-libre.pdf?1686646854=&response-content-disposition=inline%3B+filename%3DBUGS_in_Bayesian_stock_assessments.pdf&Expires=1772950518&Signature=FVjSv8rfM2XCCaCLReaKdw7ODsgA0kuclz0j82MnrjeXlJlDZUc4ysTDsW13K9cakbhBExer9xblpR3dcBA6ktXBH31Zr2snLoAih2UJ0T~VyQw~Wv8UtFG2bu5J5l8QNJE7XJ8JnBsFF3dK1O-OnzCALzjQ4593Xs8rxiMxqd7-8520e1dncKZAZgdBWGgt8uFEkFWfM62jfiL6Fzl7CB3jCw5-oUSpYcUvIDeQTf1l11K7PGj9VRtThb55M~8NSQNTe867fHMgpnJua7JvqtfmjOwzcnrZGCiMNKfrTXVPcZEaITckF79nRQOB09980CrKlR~SqTsLbXaaKUq3~A__&Key-Pair-Id=APKAJLOHF5GGSLRBV4ZA) to demonstrate a surplus production model in JAGS. The same analysis was later replicated by [Best and Punt]() to demonstrate surplus production model best practives using [Stan](). Prior and inital values used to set up the model are replicated from both analyses.
 
 ```{r load-data}
+# Setup initial values and priors for the surplus production model parameters
+# Values from Meyer and Millar 1999, Table 1, with lognormal priors on K and r
 data("data_limited_tuna")
 carrying_capacity_prior <- c(5.042905, sqrt(3.7603664))
 growth_rate_prior <- c(-1.38, sqrt(3.845))
 
-inits <- list(depletion=c(0.99,0.98,0.96,0.94,0.92,0.90,0.88,0.86,0.84,0.82, 0.80,0.78,0.76,0.74,0.72,0.70,0.68,0.66,0.64,0.62,0.60,0.58,0.56, 0.56), growth_rate = 0.8, carrying_capacity = 200)
+inits <- list(depletion=c(0.99,0.98,0.96,0.94,0.92,0.90,0.88,0.86,0.84,0.82,
+    0.80,0.78,0.76,0.74,0.72,0.70,0.68,0.66,0.64,0.62,0.60,0.58,0.56, 0.56),
+    growth_rate = 0.8, carrying_capacity = 200, sigma2_obs = 0.1, 
+    sigma2_depletion = 0.1, q = 0.2)
+
+inits_true <- list(
+    depletion = data_limited_tuna_results |>
+    dplyr::filter(label == "depletion") |> dplyr::pull(median),
+    growth_rate = data_limited_tuna_results |>
+    dplyr::filter(label == "growth_rate") |> dplyr::pull(median),
+    carrying_capacity = data_limited_tuna_results |>
+    dplyr::filter(label == "carrying_capacity") |> dplyr::pull(median),
+    sigma2_depletion = data_limited_tuna_results |>
+    dplyr::filter(label == "sigma2_depletion") |> dplyr::pull(median),
+    sigma2_obs = data_limited_tuna_results |>
+    dplyr::filter(label == "sigma2_obs") |> dplyr::pull(median),
+    q = data_limited_tuna_results |>
+    dplyr::filter(label == "q") |> dplyr::pull(median)
+)
 
 nyears <- 23
 ```
@@ -104,10 +124,12 @@ survey_fleet_index_distribution$set_observed_data(
 
 # Fix sd to posterior median from Stan as FIMS currently does not have the 
 # ability to fit a prior inverse gamma prior distribution on sd
-survey_fleet_index_distribution$uncertainty[1]$value <- 1.151663e-02 
-survey_fleet_index_distribution$uncertainty$set_transformation("identity", list())
+survey_fleet_index_distribution$uncertainty$set_transformation("identity")
 survey_fleet_index_distribution$uncertainty$set_uncertainty_name("var")
+survey_fleet_index_distribution$uncertainty[1]$value <- inits$sigma2_obs
+survey_fleet_index_distribution$uncertainty[1]$min <- 0
 survey_fleet_index_distribution$uncertainty[1]$estimation_type$set("fixed_effects")
+
 
 # Link the dsitribution to observed ($Z$, a derived quantity in the model), and 
 # expected (mean of $log(q)$, a derived quantity in the model)
@@ -154,10 +176,11 @@ Next we need to set-up the distribution for the random effects model. In this ex
 
 ```{r depletion-distribution}
 production_distribution <- new(DlnormDistribution)
-
-# Fix sd to posterior median from Stan as FIMS currently does not have the 
-# ability to fit a prior inverse gamma prior distribution on sd
-production_distribution$log_sd[1]$value <- log(sqrt(3.1e-3))
+production_distribution$uncertainty$set_transformation("identity")
+production_distribution$uncertainty$set_uncertainty_name("var")
+production_distribution$uncertainty[1]$value <- 3.1e-3
+production_distribution$uncertainty[1]$min <- 0
+production_distribution$uncertainty[1]$estimation_type$set("fixed_effects")
 
 # depletion ~ LNormal(log_expected_depletion, sd)
 production_distribution$set_distribution_links(
@@ -173,13 +196,17 @@ Priors can be added by initializing a new Distribution module and linking the ob
 ```{r priors}
 growth_rate_Prior <- new(DlnormDistribution)
 growth_rate_Prior$expected_values[1]$value <- growth_rate_prior[1]
-growth_rate_Prior$log_sd[1]$value <- log(growth_rate_prior[2])
+growth_rate_Prior$uncertainty$set_transformation("identity")
+growth_rate_Prior$uncertainty$set_uncertainty_name("sd")
+growth_rate_Prior$uncertainty[1]$value <- growth_rate_prior[2]
 growth_rate_Prior$set_distribution_links("prior", 
     production$growth_rate$get_id())
 
 carrying_capacity_Prior <- new(DlnormDistribution)
 carrying_capacity_Prior$expected_values[1]$value <- carrying_capacity_prior[1]
-carrying_capacity_Prior$log_sd[1]$value <- log(carrying_capacity_prior[2])
+carrying_capacity_Prior$uncertainty$set_transformation("identity")
+carrying_capacity_Prior$uncertainty$set_uncertainty_name("sd")
+carrying_capacity_Prior$uncertainty[1]$value <- carrying_capacity_prior[2]
 carrying_capacity_Prior$set_distribution_links("prior",         
     production$carrying_capacity$get_id())
 ```

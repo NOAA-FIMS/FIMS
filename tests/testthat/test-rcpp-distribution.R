@@ -58,7 +58,8 @@ test_that("DnormDistribution works with correct inputs", {
   # populate class members
   dnorm_$observed_values[1]$value <- y
   dnorm_$expected_values[1]$value <- 0
-  dnorm_$log_sd[1]$value <- log(1)
+  dnorm_$uncertainty[1]$value <- log(1)
+  dnorm_$uncertainty$set_uncertainty_name("sd")
   # evaluate the density and compare with R
   #' @description Test that dnorm works with a single value input, e.g. a prior on a parameter.
   expect_equal(dnorm_$evaluate(), stats::dnorm(y, 0, 1, TRUE))
@@ -80,7 +81,8 @@ test_that("DnormDistribution works with correct inputs", {
     seq_along(y),
     \(x) dnorm_$expected_values[x]$value <- 0
   )
-  dnorm_$log_sd[1]$value <- log(1)
+  dnorm_$uncertainty[1]$value <- log(1)
+  dnorm_$uncertainty$set_uncertainty_name("sd")
   # evaluate the density and compare with R
   #' @description Test that dnorm works with a vector of state variables, but scalar arguments, e.g., a random effect vector.
   expect_equal(dnorm_$evaluate(), sum(stats::dnorm(y, 0, 1, TRUE)))
@@ -102,10 +104,11 @@ test_that("DnormDistribution works with correct inputs", {
     seq_along(y),
     \(x) dnorm_$expected_values[x]$value <- 0
   )
-  dnorm_$log_sd$resize(length(y))
+  dnorm_$uncertainty$set_uncertainty_name("sd")
+  dnorm_$uncertainty$resize(length(y))
   purrr::walk(
     seq_along(y),
-    \(x) dnorm_$log_sd[x]$value <- log(1)
+    \(x) dnorm_$uncertainty[x]$value <- log(1)
   )
   # evaluate the density and compare with R
   #' @description Test that dnorm works with vectors of state variables (x) and arguments, e.g., an index likelihood vector.
@@ -125,7 +128,8 @@ test_that("DlnormDistribution works with correct inputs", {
   # populate class members
   dlnorm_$observed_values[1]$value <- y
   dlnorm_$expected_values[1]$value <- 0
-  dlnorm_$log_sd[1]$value <- log(1)
+  dlnorm_$uncertainty[1]$value <- log(1)
+  dlnorm_$uncertainty$set_uncertainty_name("sd")  
   # evaluate the density and compare with R
   #' @description Test that dlnorm works with a single value input, e.g. a prior on a parameter.
   expect_equal(dlnorm_$evaluate(), stats::dlnorm(y, 0, 1, TRUE))
@@ -147,7 +151,8 @@ test_that("DlnormDistribution works with correct inputs", {
     seq_along(y),
     \(x) dlnorm_$expected_values[x]$value <- 0
   )
-  dlnorm_$log_sd[1]$value <- log(1)
+  dlnorm_$uncertainty[1]$value <- log(1)
+  dlnorm_$uncertainty$set_uncertainty_name("sd")
   # evaluate the density and compare with R
   #' @description Test that dlnorm works with a vector of state variables, but scalar arguments, e.g., a random effect vector.
   expect_equal(dlnorm_$evaluate(), sum(stats::dlnorm(y, 0, 1, TRUE)))
@@ -169,10 +174,11 @@ test_that("DlnormDistribution works with correct inputs", {
     seq_along(y),
     \(x) dlnorm_$expected_values[x]$value <- 0
   )
-  dlnorm_$log_sd$resize(length(y))
+  dlnorm_$uncertainty$set_uncertainty_name("sd")
+  dlnorm_$uncertainty$resize(length(y))
   purrr::walk(
     seq_along(y),
-    \(x) dlnorm_$log_sd[x]$value <- log(1)
+    \(x) dlnorm_$uncertainty[x]$value <- log(1)
   )
   # evaluate the density and compare with R
   #' @description Test that dlnorm with vectors of state variables (x) and arguments, e.g., an index likelihood vector.
@@ -355,7 +361,8 @@ test_that("DnormDistribution returns correct outputs for edge cases", {
   # populate class members
   dnorm_$observed_values[1]$value <- y
   dnorm_$expected_values[1]$value <- 0
-  dnorm_$log_sd[1]$value <- log(1)
+  dnorm_$uncertainty[1]$value <- log(1)
+  dnorm_$uncertainty$set_uncertainty_name("sd")
   # evaluate the density and compare with R
   #' @description Test extreme observed values for dnorm (-1000) return expected output.
   expect_equal(dnorm_$evaluate(), stats::dnorm(y, 0, 1, TRUE))
@@ -367,7 +374,8 @@ test_that("DnormDistribution returns correct outputs for edge cases", {
   # populate class members
   dnorm_$observed_values[1]$value <- y
   dnorm_$expected_values[1]$value <- 0
-  dnorm_$log_sd[1]$value <- log(1)
+  dnorm_$uncertainty[1]$value <- log(1)
+  dnorm_$uncertainty$set_uncertainty_name("sd")
   # evaluate the density and compare with R
   #' @description Test extreme observed values for dnorm (1000) return expected output.
   expect_equal(dnorm_$evaluate(), stats::dnorm(y, 0, 1, TRUE))
@@ -380,7 +388,8 @@ test_that("DnormDistribution returns correct outputs for edge cases", {
   # populate class members
   dnorm_$observed_values[1]$value <- y
   dnorm_$expected_values[1]$value <- -1000
-  dnorm_$log_sd[1]$value <- log(1)
+  dnorm_$uncertainty[1]$value <- log(1)
+  dnorm_$uncertainty$set_uncertainty_name("sd")
   # evaluate the density and compare with R
   #' @description Test extreme expected values for dnorm (-1000) return expected output.
   expect_equal(dnorm_$evaluate(), stats::dnorm(y, -1000, 1, TRUE))
@@ -392,7 +401,8 @@ test_that("DnormDistribution returns correct outputs for edge cases", {
   # populate class members
   dnorm_$observed_values[1]$value <- y
   dnorm_$expected_values[1]$value <- 1000
-  dnorm_$log_sd[1]$value <- log(1)
+  dnorm_$uncertainty[1]$value <- log(1)
+  dnorm_$uncertainty$set_uncertainty_name("sd")
   # evaluate the density and compare with R
   #' @description Test extreme expected values for dnorm (1000) return expected output.
   expect_equal(dnorm_$evaluate(), stats::dnorm(y, 1000, 1, TRUE))
@@ -405,9 +415,10 @@ test_that("DnormDistribution returns correct outputs for edge cases", {
   # populate class members
   dnorm_$observed_values[1]$value <- y
   dnorm_$expected_values[1]$value <- 0
-  dnorm_$log_sd[1]$value <- 10
+  dnorm_$uncertainty[1]$value <- 10
+  dnorm_$uncertainty$set_uncertainty_name("sd")
   # evaluate the density and compare with R
-  #' @description Test extreme log_sd values for dnorm (10) return expected output.
+  #' @description Test extreme uncertainty values for dnorm (10) return expected output.
   expect_equal(dnorm_$evaluate(), stats::dnorm(y, 0, exp(10), TRUE))
   clear()
   y <- 1
@@ -417,9 +428,11 @@ test_that("DnormDistribution returns correct outputs for edge cases", {
   # populate class members
   dnorm_$observed_values[1]$value <- y
   dnorm_$expected_values[1]$value <- 0
-  dnorm_$log_sd[1]$value <- -10
+  dnorm_$uncertainty[1]$value <- -10
+  dnorm_$uncertainty$set_uncertainty_name("sd")
+
   # evaluate the density and compare with R
-  #' @description Test extreme log_sd values for dnorm (-10) return expected output.
+  #' @description Test extreme uncertainty values for dnorm (-10) return expected output.
   expect_equal(dnorm_$evaluate(), stats::dnorm(y, 0, exp(-10), TRUE))
   clear()
 })
@@ -431,7 +444,8 @@ test_that("DlnormDistribution returns correct outputs for edge cases", {
   # populate class members
   dlnorm_$observed_values[1]$value <- y
   dlnorm_$expected_values[1]$value <- 0
-  dlnorm_$log_sd[1]$value <- log(1)
+  dlnorm_$uncertainty[1]$value <- log(1)
+  dlnorm_$uncertainty$set_uncertainty_name("sd")
   # evaluate the density and compare with R
   #' @description Test extreme observed values for dlnorm (0) return expected output.
   expect_equal(dlnorm_$evaluate(), NaN)
@@ -442,7 +456,8 @@ test_that("DlnormDistribution returns correct outputs for edge cases", {
   # populate class members
   dlnorm_$observed_values[1]$value <- y
   dlnorm_$expected_values[1]$value <- 0
-  dlnorm_$log_sd[1]$value <- log(1)
+  dlnorm_$uncertainty[1]$value <- log(1)
+  dlnorm_$uncertainty$set_uncertainty_name("sd")
   #' @description Test extreme observed values for dlnorm (-1) return expected output.
   expect_equal(dlnorm_$evaluate(), NaN)
   clear()
@@ -452,7 +467,8 @@ test_that("DlnormDistribution returns correct outputs for edge cases", {
   # populate class members
   dlnorm_$observed_values[1]$value <- y
   dlnorm_$expected_values[1]$value <- 0
-  dlnorm_$log_sd[1]$value <- log(1)
+  dlnorm_$uncertainty[1]$value <- log(1)
+  dlnorm_$uncertainty$set_uncertainty_name("sd")
   #' @description Test extreme observed values for dlnorm (1000) return expected output.
   expect_equal(dlnorm_$evaluate(), stats::dlnorm(y, 0, 1, TRUE))
   clear()
@@ -462,7 +478,8 @@ test_that("DlnormDistribution returns correct outputs for edge cases", {
   # populate class members
   dlnorm_$observed_values[1]$value <- y
   dlnorm_$expected_values[1]$value <- -1000
-  dlnorm_$log_sd[1]$value <- log(1)
+  dlnorm_$uncertainty[1]$value <- log(1)
+  dlnorm_$uncertainty$set_uncertainty_name("sd")
   #' @description Test extreme expected values for dlnorm (-1000) return expected output.
   expect_equal(dlnorm_$evaluate(), stats::dlnorm(y, -1000, 1, TRUE))
   clear()
@@ -471,7 +488,8 @@ test_that("DlnormDistribution returns correct outputs for edge cases", {
   # populate class members
   dlnorm_$observed_values[1]$value <- y
   dlnorm_$expected_values[1]$value <- 1000
-  dlnorm_$log_sd[1]$value <- log(1)
+  dlnorm_$uncertainty[1]$value <- log(1)
+  dlnorm_$uncertainty$set_uncertainty_name("sd")
   #' @description Test extreme expected values for dlnorm (1000) return expected output.
   expect_equal(dlnorm_$evaluate(), -500000.92)
   clear()
@@ -481,8 +499,9 @@ test_that("DlnormDistribution returns correct outputs for edge cases", {
   # populate class members
   dlnorm_$observed_values[1]$value <- y
   dlnorm_$expected_values[1]$value <- 0
-  dlnorm_$log_sd[1]$value <- 10
-  #' @description Test extreme log_sd values for dlnorm (10) return expected output.
+  dlnorm_$uncertainty[1]$value <- 10
+  dlnorm_$uncertainty$set_uncertainty_name("sd")
+  #' @description Test extreme uncertainty values for dlnorm (10) return expected output.
   expect_equal(dlnorm_$evaluate(), stats::dlnorm(y, 0, exp(10), TRUE))
   clear()
   y <- 1
@@ -490,8 +509,9 @@ test_that("DlnormDistribution returns correct outputs for edge cases", {
   # populate class members
   dlnorm_$observed_values[1]$value <- y
   dlnorm_$expected_values[1]$value <- 0
-  dlnorm_$log_sd[1]$value <- -10
-  #' @description Test extreme log_sd values for dlnorm (-10) return expected output.
+  dlnorm_$uncertainty[1]$value <- -10
+  dlnorm_$uncertainty$set_uncertainty_name("sd")
+  #' @description Test extreme uncertainty values for dlnorm (-10) return expected output.
   expect_equal(dlnorm_$evaluate(), 9.0810615)
   clear()
 })
@@ -780,7 +800,8 @@ test_that("DnormDistribution returns correct error messages", {
     \(x) dnorm_$observed_values[x]$value <- y[x]
   )
   dnorm_$expected_values$resize(length(y))
-  dnorm_$log_sd$resize(length(y))
+  dnorm_$uncertainty$resize(length(y))
+  dnorm_$uncertainty$set_uncertainty_name("sd")
   purrr::walk(
     seq_along(length(y)),
     \(x) dnorm_$expected_values[x]$value <- log(1)
@@ -800,12 +821,13 @@ test_that("DnormDistribution returns correct error messages", {
     \(x) dnorm_$observed_values[x]$value <- y[x]
   )
   dnorm_$expected_values$resize(length(y))
-  dnorm_$log_sd$resize(3)
+  dnorm_$uncertainty$resize(3)
+  dnorm_$uncertainty$set_uncertainty_name("sd")
   purrr::walk(
     1:3,
-    \(x) dnorm_$log_sd[x]$value <- log(1)
+    \(x) dnorm_$uncertainty[x]$value <- log(1)
   )
-  #' @description dnorm should error out when there is a dimension mismatch where it is expecting `log_sd` to have a size 10 but is provided a size 3 vector.
+  #' @description dnorm should error out when there is a dimension mismatch where it is expecting `uncertainty` to have a size 10 but is provided a size 3 vector.
   expect_error(
     object = dnorm_$evaluate(),
     regexp = "NormalLPDF::Vector .* out of bounds. .* 10 .* 3"
@@ -826,10 +848,11 @@ test_that("DlnormDistribution returns correct error messages", {
     \(x) dlnorm_$observed_values[x]$value <- y[x]
   )
   dlnorm_$expected_values$resize(length(y) + 1)
-  dlnorm_$log_sd$resize(length(y))
+  dlnorm_$uncertainty$resize(length(y))
+  dlnorm_$uncertainty$set_uncertainty_name("sd")
   purrr::walk(
     1:10,
-    \(x) dlnorm_$log_sd[x]$value <- log(1)
+    \(x) dlnorm_$uncertainty[x]$value <- log(1)
   )
   # TODO: skip test until dimension checking is fixed in lognormal_lpdf.hpp
   # dlnorm should error out when there is a dimension mismatch
@@ -847,12 +870,13 @@ test_that("DlnormDistribution returns correct error messages", {
     \(x) dlnorm_$observed_values[x]$value <- y[x]
   )
   dlnorm_$expected_values$resize(length(y))
-  dlnorm_$log_sd$resize(3)
+  dlnorm_$uncertainty$resize(3)
+  dlnorm_$uncertainty$set_uncertainty_name("sd")
   purrr::walk(
     1:3,
-    \(x) dlnorm_$log_sd[x]$value <- log(1)
+    \(x) dlnorm_$uncertainty[x]$value <- log(1)
   )
-  #' @description dlnorm should error out when there is a dimension mismatch where it is expecting log_sd to have a size 10 but is provided a size 3 vector.
+  #' @description dlnorm should error out when there is a dimension mismatch where it is expecting uncertainty to have a size 10 but is provided a size 3 vector.
   expect_error(
     object = dlnorm_$evaluate(),
     regexp = "LognormalLPDF::Vector .* out of bounds. .* 10 .* 3"

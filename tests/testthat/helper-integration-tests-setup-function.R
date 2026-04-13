@@ -156,12 +156,13 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   # Set up fishery index data using the lognormal
   fishing_fleet_landings_distribution <- methods::new(DlnormDistribution)
   # lognormal observation error transformed on the log scale
-  fishing_fleet_landings_distribution$log_sd$resize(om_input[["nyr"]])
+  fishing_fleet_landings_distribution$uncertainty$set_uncertainty_name("sd")
+  fishing_fleet_landings_distribution$uncertainty$resize(om_input[["nyr"]])
   for (y in 1:om_input[["nyr"]]) {
     # Compute lognormal SD from OM coefficient of variation (CV)
-    fishing_fleet_landings_distribution$log_sd[y]$value <- log(sqrt(log(em_input[["cv.L"]][["fleet1"]]^2 + 1)))
+    fishing_fleet_landings_distribution$uncertainty[y]$value <- log(sqrt(log(em_input[["cv.L"]][["fleet1"]]^2 + 1)))
   }
-  fishing_fleet_landings_distribution$log_sd$set_all_estimable(FALSE)
+  fishing_fleet_landings_distribution$uncertainty$set_all_estimable(FALSE)
   # Set Data using the IDs from the modules defined above
   fishing_fleet_landings_distribution$set_observed_data(fishing_fleet$GetObservedLandingsDataID())
   fishing_fleet_landings_distribution$set_distribution_links("data", fishing_fleet$log_landings_expected$get_id())
@@ -250,11 +251,12 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
 
   # lognormal observation error transformed on the log scale
   # sd = sqrt(log(cv^2 + 1)), sd is log transformed
-  survey_fleet_index_distribution$log_sd$resize(om_input[["nyr"]])
+  survey_fleet_index_distribution$uncertainty$resize(om_input[["nyr"]])
+  survey_fleet_index_distribution$uncertainty$set_uncertainty_name("sd")
   for (y in 1:om_input$nyr) {
-    survey_fleet_index_distribution$log_sd[y]$value <- log(sqrt(log(em_input[["cv.survey"]][["survey1"]]^2 + 1)))
+    survey_fleet_index_distribution$uncertainty[y]$value <- log(sqrt(log(em_input[["cv.survey"]][["survey1"]]^2 + 1)))
   }
-  survey_fleet_index_distribution$log_sd$set_all_estimable(FALSE)
+  survey_fleet_index_distribution$uncertainty$set_all_estimable(FALSE)
   # Set Data using the IDs from the modules defined above
   survey_fleet_index_distribution$set_observed_data(survey_fleet$GetObservedIndexDataID())
   survey_fleet_index_distribution$set_distribution_links("data", survey_fleet$log_index_expected$get_id())
@@ -379,12 +381,14 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
 
   if ("recruitment" %in% names(random_effects)) {
     if (random_effects[["recruitment"]] == "log_devs") {
-      recruitment_distribution$log_sd[1]$estimation_type$set("fixed_effects")
+      recruitment_distribution$uncertainty$set_uncertainty_name("sd")
+      recruitment_distribution$uncertainty[1]$estimation_type$set("fixed_effects")
       recruitment_distribution$set_distribution_links("random_effects", recruitment$log_devs$get_id())
     }
     if (random_effects[["recruitment"]] == "log_r") {
-      recruitment_distribution$log_sd[1]$value <- log(1)
-      recruitment_distribution$log_sd[1]$estimation_type$set("fixed_effects")
+      recruitment_distribution$uncertainty$set_uncertainty_name("sd")
+      recruitment_distribution$uncertainty[1]$value <- log(1)
+      recruitment_distribution$uncertainty[1]$estimation_type$set("fixed_effects")
       recruitment_distribution$set_distribution_links("random_effects", c(recruitment$log_r$get_id(), recruitment$log_expected_recruitment$get_id()))
     }
   }
@@ -609,26 +613,28 @@ setup_and_run_surplus_production_model <-
 
   # Setup initial values and priors for the surplus production model parameters
   # Values from Meyer and Millar 1999, Table 1, with lognormal priors on K and r
-  K_prior <- c(5.042905, sqrt(3.7603664))
-  r_prior <- c(-1.38, sqrt(3.845))
+  carrying_capacity_prior <- c(5.042905, sqrt(3.7603664))
+  growth_rate_prior <- c(-1.38, sqrt(3.845))
 
   inits <- list(depletion=c(0.99,0.98,0.96,0.94,0.92,0.90,0.88,0.86,0.84,0.82,
-  0.80,0.78,0.76,0.74,0.72,0.70,0.68,0.66,0.64,0.62,0.60,0.58,0.56, 0.56),
-  growth_rate = 0.8, carrying_capacity = 200, sigma2_obs = 0.1, 
-  sigma2_depletion = 0.1, q = 0.2)
+      0.80,0.78,0.76,0.74,0.72,0.70,0.68,0.66,0.64,0.62,0.60,0.58,0.56, 0.56),
+      growth_rate = 0.8, carrying_capacity = 200, sigma2_obs = 0.1, 
+      sigma2_depletion = 0.1, q = 0.2)
 
-  inits_true <- list(depletion = data_limited_tuna_results |>
-    dplyr::filter(label == "depletion") |> dplyr::pull(median),
-  growth_rate = data_limited_tuna_results |>
-    dplyr::filter(label == "growth_rate") |> dplyr::pull(median),
-  carrying_capacity = data_limited_tuna_results |>
-    dplyr::filter(label == "carrying_capacity") |> dplyr::pull(median),
-  sigma2_obs = data_limited_tuna_results |>
-    dplyr::filter(label == "sigma2_obs") |> dplyr::pull(median),
-  sigma2_depletion = data_limited_tuna_results |>
-    dplyr::filter(label == "sigma2_depletion") |> dplyr::pull(median),
-  q = data_limited_tuna_results |>
-    dplyr::filter(label == "q") |> dplyr::pull(median))
+  inits_true <- list(
+      depletion = data_limited_tuna_results |>
+      dplyr::filter(label == "depletion") |> dplyr::pull(median),
+      growth_rate = data_limited_tuna_results |>
+      dplyr::filter(label == "growth_rate") |> dplyr::pull(median),
+      carrying_capacity = data_limited_tuna_results |>
+      dplyr::filter(label == "carrying_capacity") |> dplyr::pull(median),
+      sigma2_depletion = data_limited_tuna_results |>
+      dplyr::filter(label == "sigma2_depletion") |> dplyr::pull(median),
+      sigma2_obs = data_limited_tuna_results |>
+      dplyr::filter(label == "sigma2_obs") |> dplyr::pull(median),
+      q = data_limited_tuna_results |>
+      dplyr::filter(label == "q") |> dplyr::pull(median)
+  )
 
   clear()
 
@@ -670,6 +676,9 @@ setup_and_run_surplus_production_model <-
   
   # create depletion module
   production <- new(PTDepletion)
+  # Fix to get Schaefer model
+  production$log_shape[1]$value <- log(2)
+  production$n_years$set(nyears)
 
   if(estimation_mode == TRUE){
 
@@ -691,6 +700,19 @@ setup_and_run_surplus_production_model <-
         production$log_depletion[i]$value <- log(inits$depletion[i])
       }
       production$log_depletion$set_all_random(TRUE)
+      
+      # create production distribution module
+      production_distribution <- new(DnormDistribution)
+      production_distribution$uncertainty$set_uncertainty_name("sd")
+      production_distribution$uncertainty[1]$value <- inits_true$sigma2_depletion |> sqrt() |> log()
+      production_distribution$uncertainty[1]$estimation_type$set("fixed_effects")
+
+      # log_depletion ~ Normal(log_expected_depletion, sd)
+      production_distribution$set_distribution_links(
+        "random_effects",
+        c(production$log_depletion$get_id(), production$log_expected_depletion$get_id())
+      )
+
     } else {
       # MCMC: estimation mode TRUE, Bayesian mode TRUE
       survey_fleet_index_distribution$uncertainty$set_transformation("identity")
@@ -699,7 +721,6 @@ setup_and_run_surplus_production_model <-
       survey_fleet_index_distribution$uncertainty[1]$min <- 0
       survey_fleet_index_distribution$uncertainty[1]$estimation_type$set("fixed_effects")
 
-      # MCMC: estimation mode TRUE, Bayesian mode TRUE
       production$growth_rate[1]$value <- inits$growth_rate
       production$growth_rate[1]$min <- 0
       production$growth_rate[1]$estimation_type$set("fixed_effects")
@@ -717,13 +738,27 @@ setup_and_run_surplus_production_model <-
 
       growth_rate_Prior <- new(DlnormDistribution)
       growth_rate_Prior$expected_values[1]$value <- r_prior[1]
-      growth_rate_Prior$log_sd[1]$value <- log(r_prior[2])
+      growth_rate_Prior$uncertainty[1]$value <- log(r_prior[2])
       growth_rate_Prior$set_distribution_links("prior", production$growth_rate$get_id())
 
       carrying_capacity_Prior <- new(DlnormDistribution)
       carrying_capacity_Prior$expected_values[1]$value <- K_prior[1]
-      carrying_capacity_Prior$log_sd[1]$value <- log(K_prior[2])
+      carrying_capacity_Prior$uncertainty[1]$value <- log(K_prior[2])
       carrying_capacity_Prior$set_distribution_links("prior", production$carrying_capacity$get_id())
+
+      # create production distribution module
+      production_distribution <- new(DlnormDistribution)
+      production_distribution$uncertainty$set_transformation("identity")
+      production_distribution$uncertainty$set_uncertainty_name("var")
+      production_distribution$uncertainty[1]$value <- inits_true$sigma2_depletion 
+      production_distribution$uncertainty[1]$estimation_type$set("fixed_effects")
+
+      # depletion ~ LNormal(log_expected_depletion, sd)
+      production_distribution$set_distribution_links(
+        "random_effects",
+        c(production$depletion$get_id(), production$log_expected_depletion$get_id())
+      )
+
     }
   } else {
     # Deterministic MCMC: estimation mode FALSE so use true values from the OM
@@ -739,7 +774,6 @@ setup_and_run_surplus_production_model <-
       production$carrying_capacity[1]$value <- inits_true$carrying_capacity
       production$carrying_capacity[1]$estimation_type$set("fixed_effects")
       production$log_init_depletion[1]$value <- inits_true$depletion[1] |> log()
-      production$log_init_depletion[1]$estimation_type$set("fixed_effects")
       production$depletion$resize(nyears+1)
       for (i in 1:(nyears+1)) {
         production$depletion[i]$value <- inits_true$depletion[i]
@@ -748,13 +782,31 @@ setup_and_run_surplus_production_model <-
 
       growth_rate_Prior <- new(DlnormDistribution)
       growth_rate_Prior$expected_values[1]$value <- r_prior[1]
-      growth_rate_Prior$log_sd[1]$value <- log(r_prior[2])
+      growth_rate_Prior$uncertainty[1]$value <- r_prior[2]
+      growth_rate_Prior$uncertainty$set_transformation("identity")
+      growth_rate_Prior$uncertainty$set_uncertainty_name("sd")
       growth_rate_Prior$set_distribution_links("prior", production$growth_rate$get_id())
 
       carrying_capacity_Prior <- new(DlnormDistribution)
       carrying_capacity_Prior$expected_values[1]$value <- K_prior[1]
-      carrying_capacity_Prior$log_sd[1]$value <- log(K_prior[2])
+      carrying_capacity_Prior$uncertainty[1]$value <- K_prior[2]
+      carrying_capacity_Prior$uncertainty$set_transformation("identity")
+      carrying_capacity_Prior$uncertainty$set_uncertainty_name("sd")
       carrying_capacity_Prior$set_distribution_links("prior", production$carrying_capacity$get_id())
+
+      # create production distribution module
+      production_distribution <- new(DlnormDistribution)
+      production_distribution$uncertainty$set_transformation("identity")
+      production_distribution$uncertainty$set_uncertainty_name("var")
+      production_distribution$uncertainty[1]$value <- inits_true$sigma2_depletion 
+      production_distribution$uncertainty[1]$estimation_type$set("fixed_effects")
+
+      # depletion ~ LNormal(log_expected_depletion, sd)
+      production_distribution$set_distribution_links(
+        "random_effects",
+        c(production$depletion$get_id(), production$log_expected_depletion$get_id())
+      )
+
      } else {
       # Deterministic MLE: estimation mode FALSE so use true values from the OM
       survey_fleet_index_distribution$uncertainty$set_transformation("log")
@@ -773,6 +825,19 @@ setup_and_run_surplus_production_model <-
         production$log_depletion[i]$value <- log(inits_true$depletion[i])
         production$log_depletion[i]$estimation_type$set("random_effects")
       }
+
+      # create production distribution module
+      production_distribution <- new(DnormDistribution)
+      production_distribution$uncertainty$set_uncertainty_name("sd")
+      production_distribution$uncertainty[1]$value <- inits_true$sigma2_depletion |> sqrt() |> log()
+      production_distribution$uncertainty[1]$estimation_type$set("fixed_effects")
+
+      # log_depletion ~ Normal(log_expected_depletion, sd)
+      production_distribution$set_distribution_links(
+        "random_effects",
+        c(production$log_depletion$get_id(), production$log_expected_depletion$get_id())
+      )
+
      }
   }
   
@@ -780,22 +845,6 @@ setup_and_run_surplus_production_model <-
   survey_fleet_index_distribution$set_observed_data(survey_fleet$GetObservedIndexDataID())
   survey_fleet_index_distribution$set_distribution_links("random_effects", 
       c(survey_fleet$log_index_to_depletion_carrying_capacity_ratio$get_id(), survey_fleet$mean_log_q$get_id()))
-
-
-  # Fix to get Schaefer model
-  production$log_shape[1]$value <- log(2)
-  production$n_years$set(nyears)
-
-
-  production_distribution <- new(DlnormDistribution)
-  # Fix sd as currently FIMS does not have prior distribution
-  production_distribution$log_sd[1]$value <- inits_true$sigma2_depletion |> sqrt() |> log()
-
-  # depletion ~ LNormal(log_expected_depletion, sd)
-  production_distribution$set_distribution_links(
-      "random_effects",
-      c(production$depletion$get_id(), production$log_expected_depletion$get_id())
-  )
 
   population <- new(Population)
   population$n_years$set(nyears)
@@ -854,7 +903,7 @@ setup_and_run_surplus_production_model <-
           start = opt[["par"]],
           objective = fn,
           gradient = gr,
-          control = list(eval.max = 10000, iter.max = 10000, trace = 1)
+          control = list(eval.max = 10000, iter.max = 10000)
         )
       )
       }
