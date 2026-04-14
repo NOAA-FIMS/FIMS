@@ -10,20 +10,4 @@ jobs:
     uses: nmfs-ost/ghactions4r/.github/workflows/r-cmd-check.yml@main
     with: 
       gha_timeout_minutes: 60
-
-  log-errors-job:
-    needs: call-workflow
-    if: failure()
-    runs-on: ubuntu-latest
-    steps:
-      - name: Download R Check Logs
-        uses: actions/download-artifact@v4
-        with:
-          # Note: The name depends on the reusable workflow. 
-          # Common names are 'check-logs' or 'r-cmd-check-results'
-          path: check-logs
-      - name: Show snapshot diff
-        run: |
-              git status
-              git diff tests/testthat/_snaps || true
-
+      
