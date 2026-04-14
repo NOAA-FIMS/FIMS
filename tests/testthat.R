@@ -8,14 +8,14 @@ options(rlib_message_verbosity = "quiet")
 library(testthat)
 library(FIMS)
 
-source("testthat/helper-aaa-quiet-test-output.R")
-source("testthat/helper-integration-tests-validation.R")
-source("testthat/helper-integration-tests-setup-function.R")
-source("testthat/helper-save-snaps.R")
-source("testthat/helper-integration-tests-setup-run.R")
-# testthat::test_file("testthat/test-create_default_configurations.R")
-testthat::test_file("testthat/test-integration-fleet-log-obs-error-input.R")
-# test_check("FIMS")
+# source("testthat/helper-aaa-quiet-test-output.R")
+# source("testthat/helper-integration-tests-validation.R")
+# source("testthat/helper-integration-tests-setup-function.R")
+# source("testthat/helper-save-snaps.R")
+# source("testthat/helper-integration-tests-setup-run.R")
+# # testthat::test_file("testthat/test-create_default_configurations.R")
+# testthat::test_file("testthat/test-integration-fleet-log-obs-error-input.R")
+ test_check("FIMS")
 
 # Restore the original verbosity setting after tests
 if (!is.null(option_verbosity)) {
