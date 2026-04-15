@@ -5,6 +5,6 @@
 #' @return The file path of the saved CSV file.
 save_csv <- function(data) {
   path <- tempfile(fileext = ".csv")
-  write.csv(data, path, row.names = FALSE)
+  write.csv(data, path)
   path
 }
