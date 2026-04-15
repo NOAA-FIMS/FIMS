@@ -42,7 +42,8 @@ test_that("`log_obs_error scalar` works with correct inputs", {
 
 model_output <- get_model_output(test_fit)
 write(model_output, file = test_path("_snaps", "integration_test_model_output.json"))
-stop("fake error: Model output saved to _snaps/integration_test_model_output.json for snapshot testing. Please review the output and update the snapshot if it is correct.")
+  
+  
   json_estimates <- test_fit |>
     get_estimates()
 
