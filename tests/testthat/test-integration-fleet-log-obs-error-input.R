@@ -41,9 +41,8 @@ test_that("`log_obs_error scalar` works with correct inputs", {
     fit_fims(optimize = FALSE)
 
 model_output <- get_model_output(test_fit)
-write(model_output, file = test_path("_snaps", "integration_test_model_output.json"))
-  
-  
+write(model_output, file = test_path("fixtures", "integration_test_model_output.txt"))
+
   json_estimates <- test_fit |>
     get_estimates()
 
