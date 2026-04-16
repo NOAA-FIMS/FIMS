@@ -338,6 +338,7 @@ NaN
 Nages
 NetBSD
 NilValue
+NOMINMAX
 NormalLPDF
 NumbersAtAge
 NumericMatrix
@@ -369,6 +370,7 @@ PopulationInterface
 PopulationInterfaceBase
 PopulationPrepareTestFixture
 Postfix
+PRECOMPILE
 PrepareCAA
 PrepareConstrainedDeviations
 PreservesPathAndThrowOnErrorConfiguration
