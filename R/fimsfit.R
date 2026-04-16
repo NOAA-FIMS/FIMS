@@ -601,7 +601,8 @@ fit_fims <- function(input,
       opt = list(
         par = obj[["par"]],
         objective = NA_real_,
-        convergence = 1L
+        convergence = 1L,
+        message = "Optimization failed"
       ),
       sdreport = list(),
       timing = timing
