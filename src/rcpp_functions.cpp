@@ -7,9 +7,9 @@
  #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_math.hpp"
  
 #include <Rcpp.h>
+
 /**
  * Function to register function classes with the Rcpp module system.
- * 
  */
 void register_functions(Rcpp::Module& m) {
 
