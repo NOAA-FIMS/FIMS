@@ -12,7 +12,7 @@
 
 /**
  * Function to register parameter classes with the Rcpp module system.
- * @param m The Rcpp module to register the classes with.
+ * 
  */
 void register_parameter(Rcpp::Module& m) {
 
@@ -34,7 +34,7 @@ void register_parameter(Rcpp::Module& m) {
 /**
  * 
  * Function to register vector classes with the Rcpp module system.
- * @param m The Rcpp module to register the classes with.
+ * 
  */
 void register_vectors(Rcpp::Module& m) {
 

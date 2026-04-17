@@ -15,7 +15,7 @@ std::map<uint32_t, std::shared_ptr<GrowthInterfaceBase>>
 
 /**
  * Function to register growth classes with the Rcpp module system.
- * @param m The Rcpp module to register the classes with.
+ *
  */
 void register_growth(Rcpp::Module& m) {
    

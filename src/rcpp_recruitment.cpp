@@ -15,7 +15,7 @@ std::map<uint32_t, std::shared_ptr<RecruitmentInterfaceBase>>
 
 /**
  * Function to register recruitment classes with the Rcpp module system.
- * @param m The Rcpp module to register the classes with.
+ * 
  */
 void register_recruitment(Rcpp::Module& m) {
 

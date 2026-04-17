@@ -12,7 +12,7 @@
 
 /**
  * Function to register shared primitive classes with the Rcpp module system.
- * @param m The Rcpp module to register the classes with.
+ * 
  */
 void register_shared(Rcpp::Module& m) {
 

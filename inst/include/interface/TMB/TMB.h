@@ -4,6 +4,7 @@
 #ifndef TMB_OBJECTIVE_PTR
 
 #include "config.h"
+
 /**
  * \file TMB.h
  * \brief Include this file to extract declarations, definitions and selected code for pre-compilation
@@ -39,10 +40,27 @@
  * Redefine
  */
 #define WITH_LIBTMB //  Define WITH_LIBTMB to indicate that the TMB library is being used in user code. This can be used to conditionally compile code that depends on the TMB library.
-#undef  TMB_PRECOMPILE // Ensure that TMB_PRECOMPILE is not defined in user code to avoid conflicts with the TMB library's own compilation process.
-#define CSKIP(...) ; // Redefine CSKIP to expand to a semicolon, effectively skipping the code in user code contexts.
-#define IF_TMB_PRECOMPILE(...) // Redefine IF_TMB_PRECOMPILE to expand to nothing, effectively excluding the code in user code contexts.
-#define TMB_EXTERN extern // Redefine TMB_EXTERN to expand to 'extern', which is appropriate for declarations in user code contexts.
+/*Ensure that TMB_PRECOMPILE 
+is not defined in user code to 
+avoid conflicts with the TMB 
+library's own compilation process.*/
+#undef  TMB_PRECOMPILE 
+/** Redefine CSKIP to expand to a 
+ * semicolon, effectively skipping
+ *  the code in user code contexts.
+ */ 
+#define CSKIP(...) ; 
+/**Redefine IF_TMB_PRECOMPILE to 
+ * expand to nothing, effectively 
+ * excluding the code in user code 
+ * contexts. 
+ */
+#define IF_TMB_PRECOMPILE(...) // 
+/**Redefine TMB_EXTERN to expand to 
+ * extern, which is appropriate for 
+ * declarations in user code contexts.
+ */
+#define TMB_EXTERN extern // 
 #endif
 /**
  * if TMB_PRECOMPILE is defined, then the 

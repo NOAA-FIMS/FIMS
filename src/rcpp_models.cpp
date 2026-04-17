@@ -17,7 +17,7 @@ std::map<uint32_t, std::shared_ptr<FisheryModelInterfaceBase>>
 
 /**
  * Function to register fishery model classes with the Rcpp module system.
- * @param m The Rcpp module to register the classes with.
+ * 
  */    
 void register_fishery_models(Rcpp::Module& m) {
          Rcpp::class_<CatchAtAgeInterface>(

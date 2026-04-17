@@ -15,7 +15,7 @@ std::map<uint32_t, std::shared_ptr<MaturityInterfaceBase>>
 
 /**
  * Function to register maturity classes with the Rcpp module system.
- * @param m The Rcpp module to register the classes with.
+ * 
  */
 void register_maturity(Rcpp::Module& m) {
      Rcpp::class_<LogisticMaturityInterface>(

@@ -15,7 +15,7 @@ std::map<uint32_t, std::shared_ptr<FleetInterfaceBase>>
 
 /**
  * Function to register fleet classes with the Rcpp module system.
- * @param m The Rcpp module to register the classes with.
+ * 
  */
 void register_fleet(Rcpp::Module& m) {
   Rcpp::class_<FleetInterface>(
