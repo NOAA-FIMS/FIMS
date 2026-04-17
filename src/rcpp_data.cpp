@@ -13,7 +13,6 @@ std::map<uint32_t, std::shared_ptr<DataInterfaceBase>>
 
 /**
  * Function to register data classes with the Rcpp module system.
- * @param m The Rcpp module to register the classes with.
  */
 void register_data(Rcpp::Module& m) {
 

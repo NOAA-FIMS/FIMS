@@ -9,7 +9,8 @@
  * \brief Include this file to extract declarations, definitions and selected code for pre-compilation
  */
 #ifndef TMB_H
-#define TMB_H//define header guard
+/** @brief header guard*/
+#define TMB_H
 /** \file
     \brief Include this file to extract declarations only
 */
@@ -29,7 +30,7 @@
 /** \file
     \brief Include this file to extract declarations only
 */
-#undef WITH_LIBTMB // Ensure that WITH_LIBTMB is not defined in user code to avoid conflicts with the TMB library's own compilation process.
+#undef WITH_LIBTMB /** @brief Ensure that WITH_LIBTMB is not defined in user code to avoid conflicts with the TMB library's own compilation process.*/
 #undef TMB_PRECOMPILE // Ensure that TMB_PRECOMPILE is not defined in user code to avoid conflicts with the TMB library's own compilation process.
 #undef CSKIP // Undefine CSKIP to prevent it from affecting user code.
 #undef IF_TMB_PRECOMPILE // Undefine IF_TMB_PRECOMPILE to prevent it from affecting user code.
