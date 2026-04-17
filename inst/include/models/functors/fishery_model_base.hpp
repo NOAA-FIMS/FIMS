@@ -383,7 +383,7 @@ class FisheryModelBase : public fims_model_object::FIMSObject<Type> {
 };
 
 template <typename Type>
-uint32_t FisheryModelBase<Type>::id_g = 0;
+uint32_t FisheryModelBase<Type>::id_g = 0;/**< initializing the static id_g variable for FisheryModelBase class*/
 
 }  // namespace fims_popdy
 #endif

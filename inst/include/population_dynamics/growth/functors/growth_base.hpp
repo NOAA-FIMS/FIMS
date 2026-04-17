@@ -44,7 +44,7 @@ struct GrowthBase : public fims_model_object::FIMSObject<Type> {
 };
 
 template <typename Type>
-uint32_t GrowthBase<Type>::id_g = 0;
+uint32_t GrowthBase<Type>::id_g = 0;/**< initializing the static id_g variable for GrowthBase class*/
 
 }  // namespace fims_popdy
 
