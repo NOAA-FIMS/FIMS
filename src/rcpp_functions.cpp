@@ -9,7 +9,8 @@
 #include <Rcpp.h>
 
 /**
- * Function to register function classes with the Rcpp module system.
+ * Function to register functions with the Rcpp module system.
+ * 
  */
 void register_functions(Rcpp::Module& m) {
 
