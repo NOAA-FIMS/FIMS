@@ -71,11 +71,6 @@ void register_fishery_models(Rcpp::Module& m);
  * \param m The Rcpp module to register functions in.
  */
 void register_maturity(Rcpp::Module& m);
-/**
- * \brief Register the Rcpp classes and functions with the Rcpp module system.
- * \param m The Rcpp module to register classes and functions in.
- */
-void register_functions(Rcpp::Module& m);
 
 /**
  * Rcpp module definition for the FIMS framework. This module registers all the classes and functions that are exposed to R through Rcpp.
