@@ -1,3 +1,7 @@
+ /**
+ * \file rcpp_fleet.cpp
+ * \brief Implementation of Rcpp fleet interfaces for the FIMS framework.
+ */
  #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_fleet.hpp"
  #include "../inst/include/interface/rcpp/fims_modules.hpp"
 
@@ -9,7 +13,11 @@ uint32_t FleetInterfaceBase::id_g = 1;
 std::map<uint32_t, std::shared_ptr<FleetInterfaceBase>>
     FleetInterfaceBase::live_objects;
 
-    void register_fleet(Rcpp::Module& m) {
+/**
+ * Function to register fleet classes with the Rcpp module system.
+ * @param m The Rcpp module to register the classes with.
+ */
+void register_fleet(Rcpp::Module& m) {
   Rcpp::class_<FleetInterface>(
       "Fleet",
       "See https://noaa-fims.github.io/FIMS/doxygen/classFleetInterface.html.")

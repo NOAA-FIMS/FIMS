@@ -1,3 +1,8 @@
+/**
+ * \file fims_json.cpp
+ * \brief Implementation of the JsonParser class for parsing and handling JSON data in the FIMS framework.
+ */
+
 #include "../inst/include/utilities/fims_json.hpp"
 
 namespace fims{

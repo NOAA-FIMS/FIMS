@@ -1,4 +1,9 @@
- #include "../inst/include/interface/rcpp/fims_modules.hpp"
+/**
+ * \file fims_modules.cpp
+ * \brief Implementation of module registration functions for the FIMS framework.
+ */
+
+#include "../inst/include/interface/rcpp/fims_modules.hpp"
 #include <Rcpp.h>
 
 void register_population(Rcpp::Module& m);

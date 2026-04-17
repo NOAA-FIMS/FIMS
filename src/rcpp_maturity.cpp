@@ -1,3 +1,7 @@
+ /**
+ * \file rcpp_maturity.cpp
+ * \brief Implementation of Rcpp maturity interfaces for the FIMS framework.
+ */
  #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_maturity.hpp"
  #include "../inst/include/interface/rcpp/fims_modules.hpp"
  // static id of the MaturityInterfaceBase object
@@ -9,7 +13,11 @@ std::map<uint32_t, std::shared_ptr<MaturityInterfaceBase>>
 
     #include <Rcpp.h>
 
- void register_maturity(Rcpp::Module& m) {
+/**
+ * Function to register maturity classes with the Rcpp module system.
+ * @param m The Rcpp module to register the classes with.
+ */
+void register_maturity(Rcpp::Module& m) {
      Rcpp::class_<LogisticMaturityInterface>(
       "LogisticMaturity",
       "See "

@@ -1,3 +1,7 @@
+/**
+ * \file rcpp_interface_base.cpp
+ * \brief Implementation of the base class for Rcpp interfaces in the FIMS framework.
+ */
 #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_interface_base.hpp"
 
 

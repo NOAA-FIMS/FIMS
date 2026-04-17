@@ -1,3 +1,7 @@
+ /**
+ * \file rcpp_distribution.cpp
+ * \brief Implementation of Rcpp distribution interfaces for the FIMS framework.
+ */
  #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_distribution.hpp"
  #include "../inst/include/interface/rcpp/fims_modules.hpp"
 
@@ -9,7 +13,10 @@ std::map<uint32_t, std::shared_ptr<DistributionsInterfaceBase>>
     DistributionsInterfaceBase::live_objects;
 
 #include <Rcpp.h>
-
+/**
+ * Function to register distribution classes with the Rcpp module system.
+ * @param m The Rcpp module to register the classes with.
+ */
 void register_distributions(Rcpp::Module& m) {
     
   Rcpp::class_<DnormDistributionsInterface>(

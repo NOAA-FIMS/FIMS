@@ -1,5 +1,9 @@
+/**
+ * \file rcpp_recruitment.cpp
+ * \brief Implementation of Rcpp recruitment interfaces for the FIMS framework.
+ */
 #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_recruitment.hpp"
- #include "../inst/include/interface/rcpp/fims_modules.hpp"
+#include "../inst/include/interface/rcpp/fims_modules.hpp"
     #include <Rcpp.h>
 // static id of the RecruitmentInterfaceBase object
 uint32_t RecruitmentInterfaceBase::id_g = 1;
@@ -9,6 +13,10 @@ std::map<uint32_t, std::shared_ptr<RecruitmentInterfaceBase>>
     RecruitmentInterfaceBase::live_objects;
 
 
+/**
+ * Function to register recruitment classes with the Rcpp module system.
+ * @param m The Rcpp module to register the classes with.
+ */
 void register_recruitment(Rcpp::Module& m) {
 
  

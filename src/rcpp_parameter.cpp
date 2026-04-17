@@ -1,12 +1,19 @@
+/**
+ * \file rcpp_parameter.cpp
+ * \brief Implementation of Rcpp parameter interfaces for the FIMS framework.
+ */
 #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_interface_base.hpp"
- #include "../inst/include/interface/rcpp/fims_modules.hpp"
+#include "../inst/include/interface/rcpp/fims_modules.hpp"
 #include <RcppCommon.h>
  #include <Rcpp.h>
 
 
 
 
-
+/**
+ * Function to register parameter classes with the Rcpp module system.
+ * @param m The Rcpp module to register the classes with.
+ */
 void register_parameter(Rcpp::Module& m) {
 
   

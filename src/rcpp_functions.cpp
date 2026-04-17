@@ -1,9 +1,16 @@
 
+ /**
+  * \file rcpp_functions.cpp
+  * \brief Implementation of Rcpp function interfaces for the FIMS framework.
+  */
  #include "../inst/include/interface/rcpp/rcpp_interface.hpp"
  #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_math.hpp"
  
 #include <Rcpp.h>
-
+/**
+ * Function to register function classes with the Rcpp module system.
+ * @param m The Rcpp module to register the classes with.
+ */
 void register_functions(Rcpp::Module& m) {
 
   Rcpp::function("CreateTMBModel", &CreateTMBModel);

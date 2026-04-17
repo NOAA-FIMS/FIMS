@@ -1,5 +1,9 @@
+/**
+ * \file rcpp_population.cpp
+ * \brief Implementation of Rcpp population interfaces for the FIMS framework.
+ */
 #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_population.hpp"
- #include "../inst/include/interface/rcpp/fims_modules.hpp"
+#include "../inst/include/interface/rcpp/fims_modules.hpp"
 
 // static id of the PopulationInterfaceBase object
 uint32_t PopulationInterfaceBase::id_g = 1;
@@ -9,7 +13,10 @@ std::map<uint32_t, std::shared_ptr<PopulationInterfaceBase>>
     PopulationInterfaceBase::live_objects;
 
     #include <Rcpp.h>
-    
+ /**
+ * Function to register population classes with the Rcpp module system.
+ * @param m The Rcpp module to register the classes with.
+ */   
  void register_population(Rcpp::Module& m) {
     Rcpp::class_<PopulationInterface>(
       "Population",

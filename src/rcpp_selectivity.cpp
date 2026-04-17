@@ -1,3 +1,7 @@
+ /**
+ * \file rcpp_selectivity.cpp
+ * \brief Implementation of Rcpp selectivity interfaces for the FIMS framework.
+ */
  #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_selectivity.hpp"
  #include "../inst/include/interface/rcpp/fims_modules.hpp"
 
@@ -9,6 +13,10 @@ std::map<uint32_t, std::shared_ptr<SelectivityInterfaceBase>>
     SelectivityInterfaceBase::live_objects;
 #include <Rcpp.h>
     
+/**
+ * Function to register selectivity classes with the Rcpp module system.
+ * @param m The Rcpp module to register the classes with.
+ */
  void register_selectivity(Rcpp::Module& m) {
       Rcpp::class_<LogisticSelectivityInterface>(
       "LogisticSelectivity",

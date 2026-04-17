@@ -1,3 +1,10 @@
+/**
+ * \file TMB.h
+ * \brief Include this file to extract declarations, definitions and selected code for pre-compilation
+ */
+
+
+
 // TMB already included => skip!
 #ifndef TMB_OBJECTIVE_PTR
 

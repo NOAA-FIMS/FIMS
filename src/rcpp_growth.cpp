@@ -1,3 +1,7 @@
+ /**
+  * \file rcpp_growth.cpp
+  * \brief Implementation of Rcpp growth interfaces for the FIMS framework.
+  */
  #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_growth.hpp"
  #include "../inst/include/interface/rcpp/fims_modules.hpp"
  // static id of the GrowthInterfaceBase object
@@ -9,7 +13,11 @@ std::map<uint32_t, std::shared_ptr<GrowthInterfaceBase>>
 
     #include <Rcpp.h>
 
-    void register_growth(Rcpp::Module& m) {
+/**
+ * Function to register growth classes with the Rcpp module system.
+ * @param m The Rcpp module to register the classes with.
+ */
+void register_growth(Rcpp::Module& m) {
    
   Rcpp::class_<EWAAGrowthInterface>(
       "EWAAGrowth",

@@ -1,3 +1,7 @@
+ /**
+ * \file rcpp_models.cpp
+ * \brief Implementation of Rcpp fishery model interfaces for the FIMS framework.
+ */
  #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_models.hpp"
  #include "../inst/include/interface/rcpp/fims_modules.hpp"
  // static id of the FleetInterfaceBase object
@@ -11,8 +15,11 @@ std::map<uint32_t, std::shared_ptr<FisheryModelInterfaceBase>>
 
 
 
-    
-    void register_fishery_models(Rcpp::Module& m) {
+/**
+ * Function to register fishery model classes with the Rcpp module system.
+ * @param m The Rcpp module to register the classes with.
+ */    
+void register_fishery_models(Rcpp::Module& m) {
          Rcpp::class_<CatchAtAgeInterface>(
       "CatchAtAge",
       "See "

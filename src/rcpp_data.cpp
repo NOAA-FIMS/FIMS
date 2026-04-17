@@ -1,3 +1,7 @@
+ /**
+ * \file rcpp_data.cpp
+ * \brief Implementation of Rcpp data interfaces for the FIMS framework.
+ */
  #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_data.hpp"
  #include "../inst/include/interface/rcpp/fims_modules.hpp"
  // static id of the DataInterfaceBase object
@@ -7,7 +11,11 @@ uint32_t DataInterfaceBase::id_g = 1;
 std::map<uint32_t, std::shared_ptr<DataInterfaceBase>>
     DataInterfaceBase::live_objects;
 
-    void register_data(Rcpp::Module& m) {
+/**
+ * Function to register data classes with the Rcpp module system.
+ * @param m The Rcpp module to register the classes with.
+ */
+void register_data(Rcpp::Module& m) {
 
  Rcpp::class_<AgeCompDataInterface>("AgeComp",
                                      "See "
