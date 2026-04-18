@@ -115,6 +115,7 @@ LinkingTo:
     Rcpp,
     RcppEigen,
     TMB
+Roxygen: list(r6 = FALSE, markdown = TRUE, roclets = c("rd", "namespace"))
 VignetteBuilder:
     knitr
 Remotes:
