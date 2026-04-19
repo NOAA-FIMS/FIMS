@@ -96,6 +96,7 @@ use_gtest_template <- function(name = "FileName_ClassName_FunctionName") {
     add_executable({name}
       test_{name}.cpp
     )
+    add_as_invoker_manifest({name})
 
     target_link_libraries({name}
       gtest_main
