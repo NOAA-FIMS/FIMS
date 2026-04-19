@@ -27,6 +27,10 @@
 
 .onLoad <- function(libname, pkgname) {
   Rcpp::loadModule(module = "fims", what = TRUE)
+  dll <- getLoadedDLLs()[[pkgname]]
+  if (!is.null(dll)) {
+    .Call("R_init_FIMS_ext", dll)
+  }
 }
 
 .onUnload <- function(libpath) {
