@@ -19,7 +19,7 @@ class MyClass{
 };
 
 
-// [[Rcpp::export]]
+// [[Rcpp:: export]]
 void my_class_add(){ // use void since the main function has no return
 
   //create instance of class using a declaration
