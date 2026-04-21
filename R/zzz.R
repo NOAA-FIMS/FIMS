@@ -27,6 +27,7 @@
 
 .onLoad <- function(libname, pkgname) {
   Rcpp::loadModule(module = "fims", what = TRUE)
+  .Call("fims_post_load_init_tmb")
 }
 
 .onUnload <- function(libpath) {

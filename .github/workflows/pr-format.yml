@@ -196,12 +196,6 @@ jobs:
           extensions: 'hpp, cpp'
           style: "{BasedOnStyle: Google, SortIncludes: false}"
           inplace: True
-          
-      #remove RcppExports files since they are auto-generated and often cause merge conflicts. They will be re-generated when the package is built or documentation is updated.     
-      - name: Force remove RcppExports
-        if: steps.check_fork.outputs.is_fork == 'false'
-        run: |
-          rm -f src/RcppExports.cpp R/RcppExports.R
 
       # Check if there are any changes after formatting (only for non-forks)
       - name: Check for changes
