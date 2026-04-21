@@ -27,6 +27,11 @@ static const R_CallMethodDef CallEntries[] = {
     TMB_CALLDEFS,
     {NULL, NULL, 0}};
 
+    /**
+     * @brief The function that R calls when the package is loaded. 
+     * It registers the TMB C callables for the FIMS module, 
+     * allowing R to call C++ functions defined in the TMB library.
+     *   */
 extern "C" SEXP fims_post_load_init_tmb() {
 #ifdef TMB_CCALLABLES
 std::cout << "** Initializing TMB C callables for FIMS..." << std::endl;
