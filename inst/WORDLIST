@@ -46,6 +46,7 @@ CAAPopulationProxy
 CAAPrepareTestFixture
 CALLDEFS
 CCALLABLES
+callables
 Cheatsheet
 CMD
 CMake

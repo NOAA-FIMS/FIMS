@@ -25,7 +25,7 @@ SEXP _rcpp_module_boot_fims();
  */
 static const R_CallMethodDef CallEntries[] = {
     TMB_CALLDEFS,
-    // {"_rcpp_modul e_boot_fims", (DL_FUNC)&_rcpp_module_boot_fims, 0},
+    // {"_rcpp_module_boot_fims", (DL_FUNC)&_rcpp_module_boot_fims, 0},
     {NULL, NULL, 0}};
 
 extern "C" SEXP fims_post_load_init_tmb() {
