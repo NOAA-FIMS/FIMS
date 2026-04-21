@@ -34,7 +34,7 @@ public:
   }
 };
 
-// [[Rcpp:: export]]
+// [[Rcpp::export]]
 double calculate_areas(std::string shape, double length, double width = 0){
 
   double out = 0;
