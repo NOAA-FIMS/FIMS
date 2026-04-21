@@ -25,7 +25,6 @@ SEXP _rcpp_module_boot_fims();
  */
 static const R_CallMethodDef CallEntries[] = {
     TMB_CALLDEFS,
-    // {"_rcpp_module_boot_fims", (DL_FUNC)&_rcpp_module_boot_fims, 0},
     {NULL, NULL, 0}};
 
 extern "C" SEXP fims_post_load_init_tmb() {
@@ -36,18 +35,6 @@ std::cout << "** Initializing TMB C callables for FIMS..." << std::endl;
   return R_NilValue;
 }
 
-// /**
-//  * @brief FIMS shared object initializer.
-//  * @param dll TODO: provide a brief description.
-//  *
-//  */
-// void R_init_FIMS(DllInfo *dll) {
-//   R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
-//   R_useDynamicSymbols(dll, FALSE);
-// #ifdef TMB_CCALLABLES
-//   TMB_CCALLABLES("FIMS");
-// #endif
-// }
 }
 
 #endif  // SRC_INIT_HPP
