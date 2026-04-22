@@ -1,5 +1,5 @@
 /**
- * @file init.hpp
+ * @file init_tmb.hpp
  * @brief An interface to dynamically load the functions.
  * @copyright This file is part of the NOAA, National Marine Fisheries Service
  * Fisheries Integrated Modeling System project. See LICENSE in the source

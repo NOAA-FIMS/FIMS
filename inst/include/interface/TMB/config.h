@@ -13,7 +13,9 @@
 #define TMB_HAVE_THREAD_SAFE_R
 #endif
 // Use TMBad
+#ifndef TMBAD_FRAMEWORK
 #define TMBAD_FRAMEWORK
+#endif
 // Use 64 bit integers to ensure sizeof(ad)=16 (128 bit)
 #define TMBAD_INDEX_TYPE uint64_t
 // Enable out-of-bounds checking

@@ -62,6 +62,19 @@ library's own compilation process.*/
  */
 #define TMB_EXTERN extern // 
 #endif
+
+#if defined(__clang__)
+  #pragma clang diagnostic push
+  #pragma clang diagnostic ignored "-Weverything"
+  #pragma clang diagnostic ignored "-Wmacro-redefined"
+#elif defined(__GNUC__)
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wall"
+  #pragma GCC diagnostic ignored "-Wextra"
+  #pragma GCC diagnostic ignored "-Wunused-variable"
+  #pragma GCC diagnostic ignored "-Wunused-but-set-variable"
+  #pragma GCC diagnostic ignored "-Wmacro-redefined"
+#endif
 /**
  * if TMB_PRECOMPILE is defined, then the 
  * TMB library itself is being compiled, 
@@ -73,6 +86,12 @@ library's own compilation process.*/
  * library's header files.
  */
 #include <TMB.hpp>
+
+#if defined(__clang__)
+  #pragma clang diagnostic pop
+#elif defined(__GNUC__)
+  #pragma GCC diagnostic pop
+#endif
 #endif
 
 #endif
