@@ -294,7 +294,7 @@ void JsonParser::WriteJsonValue(std::ofstream& outputFile,
 void JsonParser::Show(JsonValue jsonValue) {
  
   #ifdef TMB_MODEL
-   this->PrintJsonValue(Rcpp::cout, jsonValue);
+   this->PrintJsonValue(Rcpp::Rcout, jsonValue);
     Rcpp::Rcout << std::endl;
   #else
    this->PrintJsonValue(std::cout, jsonValue);
