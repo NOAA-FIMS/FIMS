@@ -133,3 +133,4 @@ NeedsCompilation: yes
 Roxygen: list(markdown = TRUE, roclets = c("rd", "namespace"))
 RoxygenNote: 7.3.3
 SystemRequirements: GNU make
+Config/Rcpp/registration: none
