@@ -292,10 +292,12 @@ void JsonParser::WriteJsonValue(std::ofstream& outputFile,
  * @param jsonValue The JSON value to display.
  */
 void JsonParser::Show(JsonValue jsonValue) {
-  this->PrintJsonValue(std::cout, jsonValue);
+ 
   #ifdef TMB_MODEL
+   this->PrintJsonValue(Rcpp::cout, jsonValue);
     Rcpp::Rcout << std::endl;
   #else
+   this->PrintJsonValue(std::cout, jsonValue);
   std::cout << std::endl;
   #endif
 }

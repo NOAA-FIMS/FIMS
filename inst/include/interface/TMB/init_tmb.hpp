@@ -34,7 +34,7 @@ static const R_CallMethodDef CallEntries[] = {
      *   */
 extern "C" SEXP fims_post_load_init_tmb() {
 #ifdef TMB_CCALLABLES
-std::cout << "** Initializing TMB C callables for FIMS..." << std::endl;
+Rprintf("** Initializing TMB C callables for FIMS...\n");
   TMB_CCALLABLES("FIMS");
 #endif
   return R_NilValue;
