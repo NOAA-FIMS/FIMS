@@ -26,8 +26,10 @@
 
 
 .onLoad <- function(libname, pkgname) {
+  #  # 1. library.dynam returns the DLLInfo object invisibly
+  library.dynam(pkgname, pkgname, libname)
   Rcpp::loadModule(module = "fims", what = TRUE)
-  .Call("fims_post_load_init_tmb")
+  
 }
 
 .onUnload <- function(libpath) {
