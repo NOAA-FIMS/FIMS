@@ -12,7 +12,12 @@
 #include <Rcpp.h>
 #include <R_ext/Rdynload.h>
 
-
+/**
+ * @brief Function to register functions with the Rcpp module system.
+ * 
+ * This function is called when the Rcpp module is loaded, and it registers
+ * all of the TMB C callables. 
+ */
 extern "C" SEXP fims_post_load_init_tmb() {
 #ifdef TMB_CCALLABLES
   Rprintf("** Initializing TMB C callables for FIMS...\n");
