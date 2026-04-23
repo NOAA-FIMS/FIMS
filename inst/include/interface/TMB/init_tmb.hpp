@@ -29,7 +29,7 @@ DllInfo *g_dll = NULL;
 // /**
 //  * @brief Callback definition to load the FIMS module.
 //  */
-static const R_CallMethodDef CallEntries[] = {
+static const R_CallMethodDef FIMSCallEntries[] = {
     {"_rcpp_module_boot_fims", (DL_FUNC) &_rcpp_module_boot_fims, 0},
     // {"R_init_FIMS_internal", (DL_FUNC) &R_init_FIMS_internal, 1},
     TMB_CALLDEFS,
@@ -40,8 +40,8 @@ static const R_CallMethodDef CallEntries[] = {
  * @param dll TODO: provide a brief description.
  *
  */
-void R_init_FIMS(DllInfo *dll) {
-  R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
+void R_init_FIMS___(DllInfo *dll) {
+  R_registerRoutines(dll, NULL, FIMSCallEntries, NULL, NULL);
   R_useDynamicSymbols(dll, FALSE);
 #ifdef TMB_CCALLABLES
   TMB_CCALLABLES("FIMS");
@@ -51,5 +51,13 @@ void R_init_FIMS(DllInfo *dll) {
 #ifdef __cplusplus
 }
 #endif
+
+extern "C" SEXP fims_post_load_init_tmb() {
+#ifdef TMB_CCALLABLES
+  Rprintf("** Initializing TMB C callables for FIMS...\n");
+  TMB_CCALLABLES("FIMS");
+#endif
+  return R_NilValue;
+}
 
 #endif  // SRC_INIT_HPP
