@@ -99,6 +99,48 @@ test_that("rcpp double logistic selectivity works with correct inputs", {
   clear()
 })
 
+test_that("rcpp 3-parameter double logistic selectivity works with correct inputs", {
+  selectivity1 <- methods::new(DoubleLogistic3Selectivity)
+
+  selectivity1$p1[1]$value <- 2.0
+  selectivity1$p2[1]$value <- 4.0
+  selectivity1$p3[1]$value <- 2.5
+  selectivity1$p1[1]$estimation_type$set("fixed_effects")
+
+  #' @description Test that `get_id()` for `DoubleLogistic3Selectivity` works.
+  expect_equal(selectivity1$get_id(), 1)
+  #' @description Test that the `p1` value is set to 2.0.
+  expect_equal(selectivity1$p1[1]$value, 2.0)
+  #' @description Test that the `p1` estimation type is set to "fixed_effects".
+  expect_equal(selectivity1$p1[1]$estimation_type$get(), "fixed_effects")
+  #' @description Test that `evaluate()` works for `DoubleLogistic3Selectivity`.
+  expect_equal(
+    selectivity1$evaluate(9.0),
+    0.9350173,
+    tolerance = 0.0001
+  )
+
+  selectivity2 <- methods::new(DoubleLogistic3Selectivity)
+  selectivity2$p1[1]$value <- 1.0
+  selectivity2$p2[1]$value <- 4.0
+  selectivity2$p3[1]$value <- 2.5
+  selectivity2$p1[1]$estimation_type$set("random_effects")
+  selectivity2$p2[1]$estimation_type$set("random_effects")
+  selectivity2$p3[1]$estimation_type$set("random_effects")
+
+  #' @description Test that `get_id()` for `DoubleLogistic3Selectivity` works when a second object is created.
+  expect_equal(selectivity2$get_id(), 2)
+  #' @description Test that the `p3` estimation type is set to "random_effects".
+  expect_equal(selectivity2$p3[1]$estimation_type$get(), "random_effects")
+  #' @description Test that `evaluate()` works for a second `DoubleLogistic3Selectivity`.
+  expect_equal(
+    selectivity2$evaluate(8.0),
+    0.7124833,
+    tolerance = 0.0001
+  )
+  clear()
+})
+
 ## Edge handling ----
 test_that("rcpp selectivity returns correct outputs for edge cases", {
   # emptyLogistic

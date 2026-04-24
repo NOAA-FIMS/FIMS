@@ -64,6 +64,18 @@ target_link_libraries(fims_math_double_logistic
 
 gtest_discover_tests(fims_math_double_logistic)
 
+# test_fims_math_double_logistic3.cpp
+add_executable(fims_math_double_logistic3
+  test_fims_math_double_logistic3.cpp
+)
+
+target_link_libraries(fims_math_double_logistic3
+  gtest_main
+  fims_test
+)
+
+gtest_discover_tests(fims_math_double_logistic3)
+
 # test_fims_math_ad_fab_min_max.cpp
 add_executable(fims_math_fabs_min_max
   test_fims_math_ad_fabs_min_max.cpp
@@ -289,6 +301,18 @@ target_link_libraries(DoubleLogistic_DoubleLogisticSelectivity_Evaluate
 )
 
 gtest_discover_tests(DoubleLogistic_DoubleLogisticSelectivity_Evaluate)
+
+# test_DoubleLogistic3_DoubleLogistic3Selectivity_Evaluate.cpp
+add_executable(DoubleLogistic3_DoubleLogistic3Selectivity_Evaluate
+  test_DoubleLogistic3_DoubleLogistic3Selectivity_Evaluate.cpp
+)
+
+target_link_libraries(DoubleLogistic3_DoubleLogistic3Selectivity_Evaluate
+  gtest_main
+  fims_test
+)
+
+gtest_discover_tests(DoubleLogistic3_DoubleLogistic3Selectivity_Evaluate)
 
 # test_Logistic_LogisticSelectivity_Evaluate.cpp
 add_executable(Logistic_LogisticSelectivity_Evaluate

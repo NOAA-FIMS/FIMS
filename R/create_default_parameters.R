@@ -375,6 +375,26 @@ create_default_DoubleLogistic <- function(module_name = NA_character_) {
     )
 }
 
+#' Create default 3-parameter double logistic parameters
+#'
+#' @description
+#' This function sets up default parameters for a 3-parameter double logistic
+#' function.
+#' @return
+#' A tibble containing default p1, p2, and p3 values and their estimation
+#' status.
+#' @noRd
+create_default_DoubleLogistic3 <- function(module_name = NA_character_) {
+  default <- create_default_parameters_template(n_parameters = 3) |>
+    dplyr::mutate(
+      module_name = !!module_name,
+      module_type = "DoubleLogistic3",
+      label = c("p1", "p2", "p3"),
+      value = c(2, 4, 2.5),
+      estimation_type = "fixed_effects"
+    )
+}
+
 #' Create default selectivity parameters
 #'
 #' @description
@@ -388,7 +408,7 @@ create_default_DoubleLogistic <- function(module_name = NA_character_) {
 #' of selectivity.
 #' @noRd
 create_default_selectivity <- function(
-  form = c("Logistic", "DoubleLogistic")
+  form = c("Logistic", "DoubleLogistic", "DoubleLogistic3")
 ) {
   # Input checks
   form <- rlang::arg_match(form)
@@ -397,7 +417,8 @@ create_default_selectivity <- function(
   # `switch`
   default <- switch(form,
     "Logistic" = create_default_Logistic(),
-    "DoubleLogistic" = create_default_DoubleLogistic()
+    "DoubleLogistic" = create_default_DoubleLogistic(),
+    "DoubleLogistic3" = create_default_DoubleLogistic3()
   ) |>
     dplyr::mutate(
       module_name = "Selectivity"
