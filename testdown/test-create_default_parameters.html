@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2026-04-06" />
+<meta name="date" content="2026-04-28" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -187,7 +187,7 @@
 <td align="left">expect_s3_class(result, “tbl_df”)</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-create_default_parameters.R#27</td>
-<td align="left">2026-04-06 05:43:03.484367</td>
+<td align="left">2026-04-28 14:12:15.061407</td>
 </tr>
 <tr class="even">
 <td align="left"><code>create_default_parameters()</code> works with correct inputs</td>
@@ -195,7 +195,7 @@
 <td align="left">expect_equal( colnames(result), c(“model_family”, “module_name”, “fleet_name”, “data”) )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-create_default_parameters.R#29</td>
-<td align="left">2026-04-06 05:43:03.498319</td>
+<td align="left">2026-04-28 14:12:15.076723</td>
 </tr>
 <tr class="odd">
 <td align="left"><code>create_default_parameters()</code> works with correct inputs</td>
@@ -203,7 +203,7 @@
 <td align="left">expect_true(is.list(result[[“data”]]))</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-create_default_parameters.R#34</td>
-<td align="left">2026-04-06 05:43:03.507553</td>
+<td align="left">2026-04-28 14:12:15.091726</td>
 </tr>
 <tr class="even">
 <td align="left"><code>create_default_parameters()</code> works with correct inputs</td>
@@ -211,7 +211,7 @@
 <td align="left">expect_s3_class(result[[“data”]][[1]], “tbl_df”)</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-create_default_parameters.R#36</td>
-<td align="left">2026-04-06 05:43:03.515222</td>
+<td align="left">2026-04-28 14:12:15.101652</td>
 </tr>
 <tr class="odd">
 <td align="left"><code>create_default_parameters()</code> works with correct inputs</td>
@@ -219,7 +219,7 @@
 <td align="left">expect_equal( colnames(result[[“data”]][[1]]), c( “module_type”, “label”, “age”, “length”, “time”, “value”, “estimation_type”, “distribution_type”, “distribution” ) )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-create_default_parameters.R#38</td>
-<td align="left">2026-04-06 05:43:03.524585</td>
+<td align="left">2026-04-28 14:12:15.111928</td>
 </tr>
 <tr class="even">
 <td align="left"><code>create_default_parameters()</code> works with correct inputs</td>
@@ -227,7 +227,7 @@
 <td align="left">expect_snapshot_file( save_csv(result_unnested), “default_parameters.csv”, compare = compare_file_text )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-create_default_parameters.R#46</td>
-<td align="left">2026-04-06 05:43:03.535291</td>
+<td align="left">2026-04-28 14:12:15.123332</td>
 </tr>
 <tr class="odd">
 <td align="left"><code>create_default_parameters()</code> works with edge cases</td>
@@ -235,7 +235,7 @@
 <td align="left">expect_equal( result |&gt; tidyr::unnest(cols = data) |&gt; dplyr::filter(module_name == “Recruitment”, label == “log_sd”) |&gt; dplyr::pull(value), numeric(0) )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-create_default_parameters.R#74</td>
-<td align="left">2026-04-06 05:43:03.651194</td>
+<td align="left">2026-04-28 14:12:15.273294</td>
 </tr>
 <tr class="even">
 <td align="left"><code>create_default_parameters()</code> works with edge cases</td>
@@ -243,7 +243,7 @@
 <td align="left">expect_equal( result |&gt; tidyr::unnest(cols = data) |&gt; dplyr::filter(module_name == “Recruitment”, label == “log_devs”) |&gt; dplyr::pull(estimation_type), rep(“constant”, result |&gt; tidyr::unnest(cols = data) |&gt; dplyr::filter(module_name == “Recruitment”, label == “log_devs”) |&gt; nrow()) )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-create_default_parameters.R#83</td>
-<td align="left">2026-04-06 05:43:03.672672</td>
+<td align="left">2026-04-28 14:12:15.299874</td>
 </tr>
 </tbody>
 </table>

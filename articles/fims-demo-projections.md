@@ -302,8 +302,8 @@ projection_fit <- parameters_projection |>
     ## ℹ Maximum gradient went from 0.00316 to 0.00022 after 3 steps.
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
-    ## ℹ FIMS model version: 0.9.2
-    ## ℹ Total run time was 1.27309 minutes
+    ## ℹ FIMS model version: 0.9.3
+    ## ℹ Total run time was 1.2288 minutes
     ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
     ## ℹ Maximum gradient= 0.00022
     ## ℹ Negative log likelihood (NLL):
@@ -337,11 +337,6 @@ stockplotr::plot_biomass(
   )
 )
 ```
-
-    ## Warning: Unknown or uninitialised column: `era`.
-
-    ## Warning in max(dat$year[dat$era == era_name], na.rm = TRUE): no non-missing
-    ## arguments to max; returning -Inf
 
     ## Warning: Removed 1 row containing missing values or values outside the scale range
     ## (`geom_hline()`).

@@ -22,7 +22,7 @@
 
 
 
-<meta name="date" content="2026-04-06" />
+<meta name="date" content="2026-04-28" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -187,7 +187,7 @@
 <td align="left">expect_no_warning( out &lt;- FIMS:::check_mle_convergence(input, obj, opt, maxgrad = 1e-4) )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-check_mle_convergence.R#46</td>
-<td align="left">2026-04-06 05:19:38.934253</td>
+<td align="left">2026-04-28 13:50:54.703316</td>
 </tr>
 <tr class="even">
 <td align="left">check_mle_convergence() works with correct inputs</td>
@@ -195,7 +195,7 @@
 <td align="left">expect_null(out)</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-check_mle_convergence.R#49</td>
-<td align="left">2026-04-06 05:19:38.947795</td>
+<td align="left">2026-04-28 13:50:54.717105</td>
 </tr>
 <tr class="odd">
 <td align="left">check_mle_convergence() returns correct outputs for edge cases</td>
@@ -203,7 +203,7 @@
 <td align="left">expect_warning( object = FIMS:::check_mle_convergence(input, obj, opt, maxgrad = 1e-4), regexp = “Optimization failed convergence checks” )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-check_mle_convergence.R#59</td>
-<td align="left">2026-04-06 05:19:39.011469</td>
+<td align="left">2026-04-28 13:50:54.786557</td>
 </tr>
 <tr class="even">
 <td align="left">check_mle_convergence() returns correct error messages</td>
@@ -211,7 +211,7 @@
 <td align="left">expect_warning( object = out &lt;- FIMS:::check_mle_convergence(input, obj, opt, maxgrad), regexp = “Optimization resulted in high gradients” )</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-check_mle_convergence.R#78</td>
-<td align="left">2026-04-06 05:19:39.052734</td>
+<td align="left">2026-04-28 13:50:54.83047</td>
 </tr>
 <tr class="odd">
 <td align="left">check_mle_convergence() returns correct error messages</td>
@@ -219,7 +219,7 @@
 <td align="left">expect_equal(object = out$tag, expected = “mock_fit”)</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-check_mle_convergence.R#86</td>
-<td align="left">2026-04-06 05:19:39.061296</td>
+<td align="left">2026-04-28 13:50:54.839534</td>
 </tr>
 <tr class="even">
 <td align="left">check_mle_convergence() returns correct error messages</td>
@@ -227,7 +227,7 @@
 <td align="left">expect_identical(object = out$input, expected = input)</td>
 <td align="left"><span title="This expectation is successful.">✅ <font color='green'>Success</font></span></td>
 <td align="left">test-check_mle_convergence.R#87</td>
-<td align="left">2026-04-06 05:19:39.069511</td>
+<td align="left">2026-04-28 13:50:54.848086</td>
 </tr>
 </tbody>
 </table>
