@@ -606,4 +606,215 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
 #endif
 };
 
+/**
+ * @brief Rcpp interface for three-parameter double logistic selectivity.
+ */
+class DoubleLogistic3SelectivityInterface : public SelectivityInterfaceBase {
+ public:
+  ParameterVector p1; /**< Ascending limb width from 50% to 95%. */
+  ParameterVector p2; /**< Horizontal shift of the ascending limb. */
+  ParameterVector p3; /**< Descending limb width from 50% to 5%. */
+
+  DoubleLogistic3SelectivityInterface() : SelectivityInterfaceBase() {
+    SelectivityInterfaceBase::live_objects[this->id] =
+        std::make_shared<DoubleLogistic3SelectivityInterface>(*this);
+    FIMSRcppInterfaceBase::fims_interface_objects.push_back(
+        SelectivityInterfaceBase::live_objects[this->id]);
+  }
+
+  DoubleLogistic3SelectivityInterface(
+      const DoubleLogistic3SelectivityInterface &other)
+      : SelectivityInterfaceBase(other),
+        p1(other.p1),
+        p2(other.p2),
+        p3(other.p3) {}
+
+  virtual ~DoubleLogistic3SelectivityInterface() {}
+
+  virtual uint32_t get_id() { return this->id; }
+
+  virtual double evaluate(double x) {
+    fims_popdy::DoubleLogistic3Selectivity<double> DoubleLogistic3Sel;
+    DoubleLogistic3Sel.p1.resize(1);
+    DoubleLogistic3Sel.p1[0] = this->p1[0].initial_value_m;
+    DoubleLogistic3Sel.p2.resize(1);
+    DoubleLogistic3Sel.p2[0] = this->p2[0].initial_value_m;
+    DoubleLogistic3Sel.p3.resize(1);
+    DoubleLogistic3Sel.p3[0] = this->p3[0].initial_value_m;
+    return DoubleLogistic3Sel.evaluate(x);
+  }
+
+  virtual void finalize() {
+    if (this->finalized) {
+      FIMS_WARNING_LOG("Double Logistic 3 Selectivity  " +
+                       fims::to_string(this->id) +
+                       " has been finalized already.");
+    }
+
+    this->finalized = true;
+
+    std::shared_ptr<fims_info::Information<double>> info =
+        fims_info::Information<double>::GetInstance();
+
+    fims_info::Information<double>::selectivity_models_iterator it =
+        info->selectivity_models.find(this->id);
+    if (it == info->selectivity_models.end()) {
+      FIMS_WARNING_LOG("Double Logistic 3 Selectivity " +
+                       fims::to_string(this->id) +
+                       " not found in Information.");
+      return;
+    } else {
+      std::shared_ptr<fims_popdy::DoubleLogistic3Selectivity<double>> sel =
+          std::dynamic_pointer_cast<
+              fims_popdy::DoubleLogistic3Selectivity<double>>(it->second);
+
+      for (size_t i = 0; i < p1.size(); i++) {
+        if (this->p1[i].estimation_type_m.get() == "constant") {
+          this->p1[i].final_value_m = this->p1[i].initial_value_m;
+        } else {
+          this->p1[i].final_value_m = sel->p1[i];
+        }
+      }
+
+      for (size_t i = 0; i < p2.size(); i++) {
+        if (this->p2[i].estimation_type_m.get() == "constant") {
+          this->p2[i].final_value_m = this->p2[i].initial_value_m;
+        } else {
+          this->p2[i].final_value_m = sel->p2[i];
+        }
+      }
+
+      for (size_t i = 0; i < p3.size(); i++) {
+        if (this->p3[i].estimation_type_m.get() == "constant") {
+          this->p3[i].final_value_m = this->p3[i].initial_value_m;
+        } else {
+          this->p3[i].final_value_m = sel->p3[i];
+        }
+      }
+    }
+  }
+
+  virtual std::string to_json() {
+    std::stringstream ss;
+
+    ss << "{\n";
+    ss << " \"module_name\": \"Selectivity\",\n";
+    ss << " \"module_type\": \"DoubleLogistic3\",\n";
+    ss << " \"module_id\": " << this->id << ",\n";
+
+    ss << " \"parameters\":[\n{\n";
+    ss << "   \"name\": \"p1\",\n";
+    ss << "   \"id\":" << this->p1.id_m << ",\n";
+    ss << "   \"type\": \"vector\",\n";
+    ss << " \"dimensionality\": {\n";
+    ss << "  \"header\": [null],\n";
+    ss << "  \"dimensions\": [1]\n},\n";
+    ss << "   \"values\":" << this->p1 << "},\n";
+
+    ss << "{\n";
+    ss << "   \"name\": \"p2\",\n";
+    ss << "   \"id\":" << this->p2.id_m << ",\n";
+    ss << "   \"type\": \"vector\",\n";
+    ss << " \"dimensionality\": {\n";
+    ss << "  \"header\": [null],\n";
+    ss << "  \"dimensions\": [1]\n},\n";
+    ss << "   \"values\":" << this->p2 << "},\n";
+
+    ss << "{\n";
+    ss << "   \"name\": \"p3\",\n";
+    ss << "   \"id\":" << this->p3.id_m << ",\n";
+    ss << "   \"type\": \"vector\",\n";
+    ss << " \"dimensionality\": {\n";
+    ss << "  \"header\": [null],\n";
+    ss << "  \"dimensions\": [1]\n},\n";
+    ss << "   \"values\":" << this->p3 << "}]\n";
+
+    ss << "}";
+
+    return ss.str();
+  }
+
+#ifdef TMB_MODEL
+
+  template <typename Type>
+  bool add_to_fims_tmb_internal() {
+    std::shared_ptr<fims_info::Information<Type>> info =
+        fims_info::Information<Type>::GetInstance();
+
+    std::shared_ptr<fims_popdy::DoubleLogistic3Selectivity<Type>>
+        selectivity =
+            std::make_shared<fims_popdy::DoubleLogistic3Selectivity<Type>>();
+
+    std::stringstream ss;
+    selectivity->id = this->id;
+
+    selectivity->p1.resize(this->p1.size());
+    for (size_t i = 0; i < this->p1.size(); i++) {
+      selectivity->p1[i] = this->p1[i].initial_value_m;
+      if (this->p1[i].estimation_type_m.get() == "fixed_effects") {
+        ss.str("");
+        ss << "Selectivity." << this->id << ".p1." << this->p1[i].id_m;
+        info->RegisterParameterName(ss.str());
+        info->RegisterParameter(selectivity->p1[i]);
+      }
+      if (this->p1[i].estimation_type_m.get() == "random_effects") {
+        ss.str("");
+        ss << "Selectivity." << this->id << ".p1." << this->p1[i].id_m;
+        info->RegisterRandomEffectName(ss.str());
+        info->RegisterRandomEffect(selectivity->p1[i]);
+      }
+    }
+    info->variable_map[this->p1.id_m] = &(selectivity)->p1;
+
+    selectivity->p2.resize(this->p2.size());
+    for (size_t i = 0; i < this->p2.size(); i++) {
+      selectivity->p2[i] = this->p2[i].initial_value_m;
+      if (this->p2[i].estimation_type_m.get() == "fixed_effects") {
+        ss.str("");
+        ss << "Selectivity." << this->id << ".p2." << this->p2[i].id_m;
+        info->RegisterParameterName(ss.str());
+        info->RegisterParameter(selectivity->p2[i]);
+      }
+      if (this->p2[i].estimation_type_m.get() == "random_effects") {
+        ss.str("");
+        ss << "Selectivity." << this->id << ".p2." << this->p2[i].id_m;
+        info->RegisterRandomEffectName(ss.str());
+        info->RegisterRandomEffect(selectivity->p2[i]);
+      }
+    }
+    info->variable_map[this->p2.id_m] = &(selectivity)->p2;
+
+    selectivity->p3.resize(this->p3.size());
+    for (size_t i = 0; i < this->p3.size(); i++) {
+      selectivity->p3[i] = this->p3[i].initial_value_m;
+      if (this->p3[i].estimation_type_m.get() == "fixed_effects") {
+        ss.str("");
+        ss << "Selectivity." << this->id << ".p3." << this->p3[i].id_m;
+        info->RegisterParameterName(ss.str());
+        info->RegisterParameter(selectivity->p3[i]);
+      }
+      if (this->p3[i].estimation_type_m.get() == "random_effects") {
+        ss.str("");
+        ss << "Selectivity." << this->id << ".p3." << this->p3[i].id_m;
+        info->RegisterRandomEffectName(ss.str());
+        info->RegisterRandomEffect(selectivity->p3[i]);
+      }
+    }
+    info->variable_map[this->p3.id_m] = &(selectivity)->p3;
+
+    info->selectivity_models[selectivity->id] = selectivity;
+
+    return true;
+  }
+
+  virtual bool add_to_fims_tmb() {
+    this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
+    this->add_to_fims_tmb_internal<TMBAD_FIMS_TYPE>();
+
+    return true;
+  }
+
+#endif
+};
+
 #endif

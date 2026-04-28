@@ -396,6 +396,18 @@ RCPP_MODULE(fims) {
       .method("get_id", &DoubleLogisticSelectivityInterface::get_id)
       .method("evaluate", &DoubleLogisticSelectivityInterface::evaluate);
 
+  Rcpp::class_<DoubleLogistic3SelectivityInterface>(
+      "DoubleLogistic3Selectivity",
+      "See "
+      "https://noaa-fims.github.io/FIMS/doxygen/"
+      "classDoubleLogistic3SelectivityInterface.html.")
+      .constructor()
+      .field("p1", &DoubleLogistic3SelectivityInterface::p1)
+      .field("p2", &DoubleLogistic3SelectivityInterface::p2)
+      .field("p3", &DoubleLogistic3SelectivityInterface::p3)
+      .method("get_id", &DoubleLogistic3SelectivityInterface::get_id)
+      .method("evaluate", &DoubleLogistic3SelectivityInterface::evaluate);
+
   Rcpp::class_<EWAAGrowthInterface>(
       "EWAAGrowth",
       "See "

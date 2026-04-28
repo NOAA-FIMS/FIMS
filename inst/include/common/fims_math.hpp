@@ -315,6 +315,46 @@ inline const Type ad_min(const Type &a, const Type &b, Type C = 1e-5) {
 }
 
 /**
+ * @brief Three-parameter double logistic selectivity function.
+ *
+ * This form follows the parameterization:
+ * \f$ \gamma_1 = p_1 + p_2 \f$ and
+ * \f$ \gamma_2 = 2p_1 + p_2 + p_3 \f$.
+ *
+ * \f$ asc(x) = \frac{1}{1 + exp[-log(19)(x-\gamma_1)/p_1]} \f$
+ *
+ * \f$ desc(x) = 1 - \frac{1}{1 + exp[-log(19)(x-\gamma_2)/p_3]} \f$
+ *
+ * \f$ sel(x) = min(1, asc(x) desc(x) / 0.95^2) \f$
+ *
+ * @param p1 ascending limb width from 50% to 95% selectivity
+ * @param p2 horizontal shift of the ascending limb
+ * @param p3 descending limb width from 50% to 5% selectivity
+ * @param x the index the function should be evaluated at
+ * @return Selectivity at x, capped at one with a smooth minimum.
+ */
+template <class Type>
+inline const Type double_logistic3(const Type &p1, const Type &p2,
+                                   const Type &p3, const Type &x) {
+  const Type gamma1 = p1 + p2;
+  const Type gamma2 = static_cast<Type>(2.0) * p1 + p2 + p3;
+  const Type log19 = fims_math::log(static_cast<Type>(19.0));
+  const Type asc =
+      static_cast<Type>(1.0) /
+      (static_cast<Type>(1.0) +
+       exp(Type(-1.0) * log19 * (x - gamma1) / p1));
+  const Type desc =
+      static_cast<Type>(1.0) -
+      static_cast<Type>(1.0) /
+          (static_cast<Type>(1.0) +
+           exp(Type(-1.0) * log19 * (x - gamma2) / p3));
+  const Type normalized = asc * desc /
+                          (static_cast<Type>(0.95) * static_cast<Type>(0.95));
+  return fims_math::ad_min(normalized, static_cast<Type>(1.0),
+                           static_cast<Type>(1e-12));
+}
+
+/**
  * Returns the maximum between a and b in a continuous manner using:
  *
  * (a + b + fims_math::ad_fabs(a - b)) *.5;

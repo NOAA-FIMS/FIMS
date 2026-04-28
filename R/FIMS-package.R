@@ -10,6 +10,7 @@
 #' @export DmultinomDistribution
 #' @export DnormDistribution
 #' @export DoubleLogisticSelectivity
+#' @export DoubleLogistic3Selectivity
 #' @export EWAAGrowth
 #' @export Fleet
 #' @export set_fixed

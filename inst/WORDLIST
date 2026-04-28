@@ -150,6 +150,9 @@ DoozyX
 DoubleAgeInput
 DoubleInput
 DoubleLogistic
+DoubleLogistic3
+DoubleLogistic3Selectivity
+DoubleLogistic3SelectivityInterface
 DoubleLogisticSel
 DoubleLogisticSelectivity
 DoubleLogisticSelectivityInterface
