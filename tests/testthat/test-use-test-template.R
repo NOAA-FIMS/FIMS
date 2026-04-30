@@ -92,15 +92,15 @@ test_that("`use_gtest_template()` works with correct inputs", {
         "test_FIMSMath_ClassName_FunctionName.cpp",
         readLines(file.path(temp_path, cmakelist_path))
       )
-      # Test that `use_gtest_template()` appends the correct lines to 
+      # Test that `use_gtest_template()` appends the correct lines to
       # CMakeLists.txt when an additional test is added rather than writing
       # over it.
       expect_true(any(first_entry))
-      # Test that `use_gtest_template()` appends the correct lines to 
+      # Test that `use_gtest_template()` appends the correct lines to
       # CMakeLists.txt when an additional test is added rather than writing
       # over it.
       expect_true(any(second_entry))
-      # Test that `use_gtest_template()` appends the new test after the 
+      # Test that `use_gtest_template()` appends the new test after the
       # previous test in CMakeLists.txt.
       expect_gt(which(second_entry)[1], which(first_entry)[1])
     }
@@ -186,7 +186,7 @@ test_that("`use_testthat_template()` works with correct inputs", {
           temp_path, "tests", "testthat", "test-individual_function.R"
         )
       )
-      #Test that `use_testthat_template("individual_function")` creates the correct file.
+      # Test that `use_testthat_template("individual_function")` creates the correct file.
       expect_true(object_individual_function)
 
       suppressMessages(FIMS:::use_testthat_template("function-group"))
