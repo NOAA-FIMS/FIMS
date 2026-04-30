@@ -48,6 +48,7 @@ CAAPopulationProxy
 CAAPrepareTestFixture
 CALLDEFS
 CCALLABLES
+Changelog
 Cheatsheet
 CMD
 CMake
@@ -656,6 +657,7 @@ cyclomatic
 dabf
 dat
 dbcceb
+dcf
 de
 deallocated
 deallocates
@@ -677,6 +679,7 @@ diag
 difftime
 digamma
 dir
+dirname
 dit
 dll
 dlnorm
@@ -946,6 +949,7 @@ nmfs
 nmfspalette
 noRd
 noaa
+nocov
 noexcept
 noreply
 normalizePath
@@ -1231,6 +1235,7 @@ ungrouped
 unistd
 unlink
 unlist
+unlicense
 unname
 unnest
 unnested
