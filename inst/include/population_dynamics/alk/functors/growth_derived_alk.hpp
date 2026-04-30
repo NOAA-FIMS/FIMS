@@ -11,7 +11,6 @@
 #define POPULATION_DYNAMICS_GROWTH_DERIVED_ALK_HPP
 
 #include <algorithm>
-#include <cmath>
 #include <cstddef>
 #include <memory>
 
@@ -119,27 +118,6 @@ struct GrowthDerivedALK : public ALKBase<Type> {
   }
 
   /**
-   * @brief Normal CDF helper used for bin probability calculations.
-   * @param x Evaluation point.
-   * @param mean Mean of the normal distribution.
-   * @param sd Standard deviation of the normal distribution.
-   * @return Probability that a normal random variable is less than or equal to x.
-   */
-#ifdef TMB_MODEL
-  Type NormalCdf(const Type& x, const Type& mean, const Type& sd) const {
-    CppAD::vector<Type> tx(1);
-    tx[0] = (x - mean) / sd;
-    return atomic::pnorm1(tx)[0];
-  }
-#else
-  Type NormalCdf(const Type& x, const Type& mean, const Type& sd) const {
-    const double z = static_cast<double>(x - mean) /
-                     (static_cast<double>(sd) * std::sqrt(2.0));
-    return static_cast<Type>(0.5 * (1.0 + std::erf(z)));
-  }
-#endif
-
-  /**
    * @brief Computes the probability that a fish of a given age falls in one
    * fleet length bin.
    * @param fleet_ptr Shared pointer to the fleet.
@@ -169,7 +147,7 @@ struct GrowthDerivedALK : public ALKBase<Type> {
 
     if (length_bin == 0) {
       const Type upper = LengthBinMidpoint(fleet_ptr, 0, 1);
-      return NormalCdf(upper, mean_laa, sd_laa);
+      return fims_math::normalcdf(upper, mean_laa, sd_laa);
     }
 
     if (length_bin + 1 == fleet_ptr->n_lengths) {
@@ -177,14 +155,15 @@ struct GrowthDerivedALK : public ALKBase<Type> {
           LengthBinMidpoint(fleet_ptr,
                             fleet_ptr->n_lengths - 2,
                             fleet_ptr->n_lengths - 1);
-      return static_cast<Type>(1.0) - NormalCdf(lower, mean_laa, sd_laa);
+      return static_cast<Type>(1.0) -
+             fims_math::normalcdf(lower, mean_laa, sd_laa);
     }
 
     const Type lower = LengthBinMidpoint(fleet_ptr, length_bin - 1, length_bin);
     const Type upper = LengthBinMidpoint(fleet_ptr, length_bin, length_bin + 1);
 
-    return NormalCdf(upper, mean_laa, sd_laa) -
-           NormalCdf(lower, mean_laa, sd_laa);
+    return fims_math::normalcdf(upper, mean_laa, sd_laa) -
+           fims_math::normalcdf(lower, mean_laa, sd_laa);
   }
 
   /**
