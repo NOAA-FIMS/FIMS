@@ -589,27 +589,35 @@ fit_fims <- function(input,
 
   if (is.null(opt)) {
 
+    # Record timing information
     timing <- c(
       time_optimization = Sys.time() - t0,
       time_sdreport = as.difftime(0, units = "secs"),
       time_total = Sys.time() - t0
     )
-  
+
+    # Create a fallback optimizer result to maintain consistent structure
+    # convergence = 1L indicates non-convergence (integer as expected by nlminb)
+    opt <- list(
+      par = obj[["par"]],
+      objective = NA_real_,
+      convergence = 1L,
+      message = "Optimization failed"
+    )
+
+    # Construct a valid FIMSFit object using the standard constructor
+    # This ensures all required slots are properly populated
     fit <- FIMSFit(
       input = input,
       obj = obj,
-      opt = list(
-        par = obj[["par"]],
-        objective = NA_real_,
-        convergence = 1L,
-        message = "Optimization failed"
-      ),
+      opt = opt,
       sdreport = list(),
       timing = timing
     )
-    
+
     return(fit)
   }
+
   maxgrad0 <- maxgrad <- max(abs(obj$gr(opt[["par"]])))
   if (number_of_loops > 0) {
     cli::cli_inform(c(
