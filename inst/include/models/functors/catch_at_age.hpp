@@ -200,7 +200,6 @@ class CatchAtAge : public FisheryModelBase<Type> {
       fleet->q.resize(fleet->log_q.size());
       fleet->Fmort.resize(fleet->n_years);
     }
-        EnsureAllFleetALKs();
   }
 
   /**
@@ -1095,10 +1094,11 @@ class CatchAtAge : public FisheryModelBase<Type> {
   }
 
   /**
-   * @brief Ensure all fleets linked to this model have an active ALK.
+   * @brief Ensure all fleets linked to this model have a usable ALK.
    *
-   * Rebuilds missing or inactive fleet ALK objects from the current
-   * population and fleet state before evaluation or reporting uses them.
+   * Reuses each fleet's current ALK when it is active and can prepare for the
+   * current model state. Otherwise rebuilds the fleet ALK from the current
+   * population and fleet state before evaluation or reporting uses it.
    */
   void EnsureAllFleetALKs() {
     for (size_t p = 0; p < this->populations.size(); ++p) {
@@ -1393,6 +1393,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
                Sets recruitment deviations to mean 0.
      */
     Prepare();
+    EnsureAllFleetALKs();
     RefreshFleetGrowthDerivedMeanWAACache();
     /*
      start at year=0, age=0;
@@ -1535,6 +1536,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
     int n_pops = this->populations.size();
 #ifdef TMB_MODEL
     if (this->do_reporting == true) {
+      EnsureAllFleetALKs();
       report_vectors.clear();
       // std::shared_ptr<UncertaintyReportInfoMap>
       // population_uncertainty_report_info_map =
@@ -1639,8 +1641,12 @@ class CatchAtAge : public FisheryModelBase<Type> {
                 growth_observation = std::dynamic_pointer_cast<
                     fims_popdy::GrowthDerivedObservationBase<Type>>(
                     this->populations[p]->growth)) {
-          const auto& gp = growth_observation->GetProductsForReporting();
-          const std::size_t n = gp.Size();
+          const auto* gp = growth_observation->TryGetPreparedGrowthProducts();
+          if (gp == nullptr) {
+            throw std::runtime_error(
+                "Growth products were not prepared before report generation.");
+          }
+          const std::size_t n = gp->Size();
           vector<Type> mean_laa(n);
           vector<Type> sd_laa(n);
           vector<Type> mean_waa(n);
@@ -1649,15 +1655,15 @@ class CatchAtAge : public FisheryModelBase<Type> {
               PopulationUsesCanonicalGrowthDerivedWeightBins(
                   this->populations[p]);
           for (std::size_t i = 0; i < n; ++i) {
-            mean_laa(i) = gp.mean_LAA[i];
-            sd_laa(i) = gp.sd_LAA[i];
+            mean_laa(i) = gp->mean_LAA[i];
+            sd_laa(i) = gp->sd_LAA[i];
             if (use_growth_derived_mean_waa) {
               const std::size_t year = i / this->populations[p]->n_ages;
               const std::size_t age = i % this->populations[p]->n_ages;
               mean_waa(i) =
                   PopulationMeanWeightAA(this->populations[p], year, age);
             } else {
-              mean_waa(i) = gp.mean_WAA[i];
+              mean_waa(i) = gp->mean_WAA[i];
             }
           }
           growth_mean_LAA_p(pop_idx) = mean_laa;

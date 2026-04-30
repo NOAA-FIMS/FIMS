@@ -73,6 +73,14 @@ struct FixedMatrixALK : public ALKBase<Type> {
   }
 
   /**
+   * @brief Prepare the fixed-matrix ALK for the current model state.
+   * @return True if the fixed matrix is active and usable.
+   */
+  virtual bool PrepareForCurrentState() override {
+    return this->IsActive();
+  }
+
+  /**
    * @brief Builds the fixed ALK row for a given age.
    * @param year Year index. Unused for the current fixed-matrix path.
    * @param age Age index.

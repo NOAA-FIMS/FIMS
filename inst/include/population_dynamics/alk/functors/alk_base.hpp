@@ -37,6 +37,12 @@ struct ALKBase : public fims_model_object::FIMSObject<Type> {
   virtual bool IsActive() const = 0;
 
   /**
+   * @brief Prepare this ALK for the current model state.
+   * @return True if the ALK is ready to build rows for the current state.
+   */
+  virtual bool PrepareForCurrentState() = 0;
+
+  /**
    * @brief Builds the ALK row for a given year and age.
    * @param year Year index.
    * @param age Age index.

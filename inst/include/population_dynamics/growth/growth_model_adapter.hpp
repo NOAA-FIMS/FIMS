@@ -8,6 +8,7 @@
 
 #include <cmath>
 #include <memory>
+#include <stdexcept>
 
 #include "../../common/fims_vector.hpp"
 #include "../../common/fims_math.hpp"
@@ -50,10 +51,15 @@ class GrowthDerivedObservationBase : public GrowthBase<Type> {
   virtual bool SupportsGrowthDerivedALK() const = 0;
 
   /**
-   * @brief Return cached growth products for reporting or downstream use.
-   * @return Reference to the cached growth-product container.
+   * @brief Prepare growth products for the current model state.
    */
-  virtual const GrowthProducts<Type>& GetProductsForReporting() = 0;
+  virtual void PrepareGrowthProducts() = 0;
+
+  /**
+   * @brief Return prepared growth products without triggering preparation.
+   * @return Pointer to prepared growth products, or nullptr if unavailable.
+   */
+  virtual const GrowthProducts<Type>* TryGetPreparedGrowthProducts() const = 0;
 
   /**
    * @brief Evaluate weight at a supplied length.
@@ -79,6 +85,7 @@ class VonBertalanffyGrowthModelAdapter : public GrowthDerivedObservationBase<Typ
   fims::Vector<Type>& LengthAtRefAge1Vector() {
     use_param_vectors_ = true;
     vb_params_set_ = true;
+    growth_products_prepared_ = false;
     return length_at_ref_age_1_vector_;
   }
 
@@ -89,6 +96,7 @@ class VonBertalanffyGrowthModelAdapter : public GrowthDerivedObservationBase<Typ
   fims::Vector<Type>& LengthAtRefAge2Vector() {
     use_param_vectors_ = true;
     vb_params_set_ = true;
+    growth_products_prepared_ = false;
     return length_at_ref_age_2_vector_;
   }
 
@@ -99,6 +107,7 @@ class VonBertalanffyGrowthModelAdapter : public GrowthDerivedObservationBase<Typ
   fims::Vector<Type>& GrowthCoefficientKVector() {
     use_param_vectors_ = true;
     vb_params_set_ = true;
+    growth_products_prepared_ = false;
     return growth_coefficient_K_vector_;
   }
 
@@ -109,6 +118,7 @@ class VonBertalanffyGrowthModelAdapter : public GrowthDerivedObservationBase<Typ
   fims::Vector<Type>& ReferenceAgeForLength1Vector() {
     use_param_vectors_ = true;
     vb_params_set_ = true;
+    growth_products_prepared_ = false;
     return reference_age_for_length_1_vector_;
   }
 
@@ -119,6 +129,7 @@ class VonBertalanffyGrowthModelAdapter : public GrowthDerivedObservationBase<Typ
   fims::Vector<Type>& ReferenceAgeForLength2Vector() {
     use_param_vectors_ = true;
     vb_params_set_ = true;
+    growth_products_prepared_ = false;
     return reference_age_for_length_2_vector_;
   }
 
@@ -129,6 +140,7 @@ class VonBertalanffyGrowthModelAdapter : public GrowthDerivedObservationBase<Typ
   fims::Vector<Type>& LengthWeightAVector() {
     use_param_vectors_ = true;
     lw_params_set_ = true;
+    growth_products_prepared_ = false;
     return length_weight_a_vector_;
   }
 
@@ -139,6 +151,7 @@ class VonBertalanffyGrowthModelAdapter : public GrowthDerivedObservationBase<Typ
   fims::Vector<Type>& LengthWeightBVector() {
     use_param_vectors_ = true;
     lw_params_set_ = true;
+    growth_products_prepared_ = false;
     return length_weight_b_vector_;
   }
 
@@ -148,6 +161,7 @@ class VonBertalanffyGrowthModelAdapter : public GrowthDerivedObservationBase<Typ
    */
   fims::Vector<Type>& LengthAtAgeSdAtRefAgesVector() {
     use_param_vectors_ = true;
+    growth_products_prepared_ = false;
     return length_at_age_sd_at_ref_ages_vector_;
   }
 
@@ -158,6 +172,7 @@ class VonBertalanffyGrowthModelAdapter : public GrowthDerivedObservationBase<Typ
   void SetAgeOffset(double min_age) override {
     age_offset_ = min_age;
     age_offset_set_ = true;
+    growth_products_prepared_ = false;
     if (model_) {
       model_->SetAgeOffset(static_cast<Type>(age_offset_));
     }
@@ -180,6 +195,7 @@ class VonBertalanffyGrowthModelAdapter : public GrowthDerivedObservationBase<Typ
     n_years_ = n_years;
     n_ages_ = n_ages;
     n_sexes_ = n_sexes;
+    growth_products_prepared_ = false;
     model_ = std::make_shared<GrowthModel<Type>>(n_years, n_ages, n_sexes);
     SyncParamsToModel();
     if (age_offset_set_) {
@@ -237,9 +253,10 @@ class VonBertalanffyGrowthModelAdapter : public GrowthDerivedObservationBase<Typ
   }
 
   /**
-   * @brief Prepare and return growth products for reporting.
+   * @brief Prepare growth products for the current model state.
    */
-  const GrowthProducts<Type>& GetProductsForReporting() override {
+  void PrepareGrowthProducts() override {
+    growth_products_prepared_ = false;
     if (!model_) {
       if (n_ages_ == 0) {
         throw std::runtime_error(
@@ -250,7 +267,18 @@ class VonBertalanffyGrowthModelAdapter : public GrowthDerivedObservationBase<Typ
     }
     SyncParamsToModel();
     model_->Prepare();
-    return model_->GetProducts();
+    growth_products_prepared_ = true;
+  }
+
+  /**
+   * @brief Return prepared growth products without triggering preparation.
+   * @return Pointer to prepared growth products, or nullptr if unavailable.
+   */
+  const GrowthProducts<Type>* TryGetPreparedGrowthProducts() const override {
+    if (!model_ || !growth_products_prepared_) {
+      return nullptr;
+    }
+    return &(model_->GetProducts());
   }
 
   /**
@@ -288,6 +316,7 @@ class VonBertalanffyGrowthModelAdapter : public GrowthDerivedObservationBase<Typ
   bool age_offset_set_ = false;
   bool vb_params_set_ = false;
   bool lw_params_set_ = false;
+  bool growth_products_prepared_ = false;
 
   mutable std::shared_ptr<GrowthModel<Type>> model_;
 

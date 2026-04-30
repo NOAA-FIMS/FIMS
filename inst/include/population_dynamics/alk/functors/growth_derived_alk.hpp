@@ -51,23 +51,35 @@ struct GrowthDerivedALK : public ALKBase<Type> {
   virtual ~GrowthDerivedALK() {}
 
   /**
-   * @brief Returns whether this growth-derived ALK is active and usable.
-   * @return True if the linked fleet and growth object are valid, the linked
-   * growth products support the single-sex path, and the fleet has a
-   * consistent explicit bin definition.
+   * @brief Returns whether this growth-derived ALK is structurally active.
+   * @return True if the linked fleet and growth object are valid and the fleet
+   * has a consistent explicit bin definition.
    */
   virtual bool IsActive() const override {
     std::shared_ptr<Fleet<Type>> fleet_ptr = fleet.lock();
-    const GrowthProducts<Type>* growth_products = TryGetGrowthProducts();
 
     return fleet_ptr != nullptr &&
            growth_observation != nullptr &&
-           growth_products != nullptr &&
            growth_observation->SupportsGrowthDerivedALK() &&
-           growth_products->n_sexes == 1 &&
            fleet_ptr->n_ages > 0 &&
            fleet_ptr->n_lengths > 0 &&
            fleet_ptr->lengths.size() == fleet_ptr->n_lengths;
+  }
+
+  /**
+   * @brief Prepare growth-derived products for the current model state.
+   * @return True if prepared products are available and support this ALK path.
+   */
+  virtual bool PrepareForCurrentState() override {
+    if (!this->IsActive()) {
+      return false;
+    }
+
+    growth_observation->PrepareGrowthProducts();
+
+    const GrowthProducts<Type>* growth_products = TryGetGrowthProducts();
+
+    return growth_products != nullptr && growth_products->n_sexes == 1;
   }
 
   /**
@@ -75,7 +87,8 @@ struct GrowthDerivedALK : public ALKBase<Type> {
    * @param year Year index.
    * @param age Age index.
    * @param out_row Output age-to-length probability row.
-   * @return True if the ALK row was built successfully.
+   * @return True if the ALK row was built successfully using prepared growth
+   * products for the current model state.
    */
   virtual bool BuildALKRow(size_t year,
                            size_t age,
@@ -87,8 +100,8 @@ struct GrowthDerivedALK : public ALKBase<Type> {
 
  protected:
   /**
-   * @brief Try to get the current growth products from the linked growth object.
-   * @return Pointer to the current growth products, or nullptr if unavailable.
+   * @brief Try to get prepared growth products from the linked growth object.
+   * @return Pointer to prepared growth products, or nullptr if unavailable.
    */
   const GrowthProducts<Type>* TryGetGrowthProducts() const {
     if (growth_observation == nullptr ||
@@ -96,11 +109,7 @@ struct GrowthDerivedALK : public ALKBase<Type> {
       return nullptr;
     }
 
-    try {
-      return &(growth_observation->GetProductsForReporting());
-    } catch (...) {
-      return nullptr;
-    }
+    return growth_observation->TryGetPreparedGrowthProducts();
   }
 
   /**
