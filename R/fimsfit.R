@@ -636,7 +636,7 @@ fit_fims <- function(input,
         },
         error = function(e) {
           cli::cli_warn(c(
-            "!" = "nlminb failed during loop: {e$message}",
+            "!" = "{.fn nlminb} failed during loop {ii}: {e$message}",
             "i" = "Using previous optimization result."
           ))
           return(NULL)
