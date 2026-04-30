@@ -8,8 +8,8 @@
 #
 # This file is a standalone function for using testthat template, which
 # is used to create new test files for the testthat framework in R. The function
-# can be used across packages by running 
-# usethis::use_standalone("NOAA-FIMS/FIMS", file = "use-testthat-template"). 
+# can be used across packages by running
+# usethis::use_standalone("NOAA-FIMS/FIMS", file = "use-testthat-template").
 # The function creates a new test file based on a template and ensures that the
 # file does not already exist before creating it.
 #
@@ -49,7 +49,7 @@
 #' chaining of commands. If the function is unsuccessful, an error message is
 #' returned.
 #'
-#' A message is returned that states the file path of the newly created file. 
+#' A message is returned that states the file path of the newly created file.
 #' The file will not be automatically opened.
 #'
 #' @examples
@@ -69,17 +69,17 @@ use_testthat_template <- function(name) {
   }
   # Look for DESCRIPTION in the current working directory only
   description_file <- "DESCRIPTION"
-  
+
   if (!file.exists(description_file)) {
     cli::cli_abort(c(
       "x" = "Could not find a {.path DESCRIPTION} file in the current directory.",
       "i" = "Please ensure you are at the root of your R package project."
     ))
   }
-  
+
   # Extract the package name
   package_name <- read.dcf(description_file, fields = "Package")[1, 1]
-  
+
   # Create test file path
   path <- file.path("tests", "testthat", paste0("test-", name, ".R"))
 
@@ -92,7 +92,7 @@ use_testthat_template <- function(name) {
   # Replace both function name and package name in the template
   final_content <- gsub("{{{ function_name }}}", function_name, template_text, fixed = TRUE)
   final_content <- gsub("{{{ package_name }}}", package_name, final_content, fixed = TRUE)
-  
+
   # Create directory and write
   if (!dir.exists(dirname(path))) {
     dir.create(dirname(path), recursive = TRUE)
@@ -100,7 +100,7 @@ use_testthat_template <- function(name) {
 
   writeLines(final_content, path)
   cli::cli_alert_success(c("v" = "Setting up tests for {.val {path}} in {.pkg {package_name}}"))
-  
+
   invisible(TRUE)
 }
 
