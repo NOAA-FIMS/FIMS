@@ -580,7 +580,7 @@ fit_fims <- function(input,
     },
     error = function(e) {
       cli::cli_warn(c(
-        "!" = "nlminb failed: {e$message}",
+        "x" = "nlminb failed: {e$message}",
         "i" = "Returning partial results."
       ))
       return(NULL)
