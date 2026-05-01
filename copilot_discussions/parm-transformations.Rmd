@@ -1,0 +1,424 @@
+
+User: starting over. My model is being designed to fit using both MLE optimization and Bayesian MCMC. This mean I need to expose to the user different forms of a single parameter. Currently I'm thinking about standard deviation (sd). In the MLE context, the parameter being estimated is log_sd and the sqrt is taken inside the distribution function, e.g. dnorm(x, mu, exp(log_sd), true). In the Bayesian contect, however, I want to estimate the variance. Sometimes users will want to put a prior on the log variance, and sometimes on the naturial variance. I have a generic transformation system set up, but this only accounts for the log transformation. Would I need to apply a sqrt transformation child class here and only apply the transformation is var is defined and not sd? 
+
+GitHub Copilot: Short answer: not just a `sqrt` child class by itself. You need a consistent parameter-scale strategy plus Jacobian handling for priors.
+
+Recommended pattern:
+
+1. Pick one internal estimation scale as the source of truth  
+Use an unconstrained internal parameter, e.g. \(\eta \in \mathbb{R}\), and define:
+\[
+sd = \exp(\eta), \quad var = sd^2 = \exp(2\eta), \quad \log var = 2\eta
+\]
+This works for both MLE and MCMC.
+
+2. Treat `sd`, `var`, `log_sd`, `log_var` as derived views  
+Expose whichever form the user wants, but keep one internal value.  
+This avoids conflicting states like “both `sd` and `var` set but inconsistent”.
+
+3. Priors: apply on user-declared scale, then transform correctly  
+If sampler state is \(\eta\), and user specifies prior on:
+- `log_var`: evaluate prior at \(2\eta\), add Jacobian \(\log|d(2\eta)/d\eta| = \log 2\)
+- `var`: evaluate prior at \(\exp(2\eta)\), add Jacobian \(\log|d\,\exp(2\eta)/d\eta| = \log(2\exp(2\eta))\)
+
+In general:
+\[
+\log p(\eta) = \log p(g(\eta)) + \log\left|\frac{dg(\eta)}{d\eta}\right|
+\]
+
+4. Should you add sqrt transform?  
+Only as a utility for derived quantities (`sd = sqrt(var)`), not as the primary estimation mapping.  
+For positivity constraints, `log/exp` is the right core transform; `sqrt`/`square` are secondary conversions between variance and sd scales.
+
+5. API suggestion  
+Let users specify:
+- which quantity they are setting/estimating (`sd`, `var`, `log_sd`, `log_var`)
+- which scale prior is defined on  
+Then convert to internal \(\eta\) once and keep everything synchronized from that.
+
+If you want, I can sketch a concrete C++ interface design (enum + transformation registry + prior Jacobian hooks) that fits your current transformation framework.
+
+User: yes can you sketch a design?
+
+GitHub Copilot: I’m sketching this around one canonical internal parameter plus explicit user-facing views, so the design works for both optimization and priors without duplicating state.Yes. The clean design is to separate three concerns that are currently being conflated:
+
+1. the internal sampled/optimized parameter
+2. the user-facing parameter view
+3. the prior evaluation scale
+
+For `sd`/`var`, I would design it like this.
+
+**Core Idea**
+
+Keep exactly one canonical internal parameter for each positive scale parameter. For this case, use an unconstrained value:
+
+\[
+\eta \in \mathbb{R}
+\]
+
+and define all user-facing forms from it:
+
+\[
+\log sd = \eta
+\]
+\[
+sd = \exp(\eta)
+\]
+\[
+\log var = 2\eta
+\]
+\[
+var = \exp(2\eta)
+\]
+
+That gives you one estimation parameter for both MLE and Bayesian workflows, while still exposing multiple forms to the user.
+
+This is better than storing both `sd` and `var` as mutable state, because then you immediately have consistency problems.
+
+**What The User Chooses**
+
+The user should be allowed to specify two independent things:
+
+1. the parameter view they want to initialize or report
+2. the scale on which the prior is defined
+
+Those are not the same decision.
+
+Example:
+- estimate internally on `log_sd`
+- report summaries as `var`
+- put a prior on `log_var`
+
+That is completely valid if your system separates view from prior scale.
+
+**Suggested Types**
+
+A small enum is enough:
+
+```cpp
+enum class ParameterScale {
+  kLogSd,
+  kSd,
+  kLogVar,
+  kVar
+};
+```
+
+Then define a transformation interface that is richer than the current `Transform()` method. Right now your base class is too narrow because Bayesian priors need Jacobians.
+
+Something like this is more appropriate:
+
+```cpp
+template <typename Type>
+class ParameterScaleMapBase {
+ public:
+  virtual ~ParameterScaleMapBase() {}
+
+  // Convert canonical internal value eta to requested scale
+  virtual Type ToScale(const Type& eta) const = 0;
+
+  // Convert requested scale value back to canonical eta
+  virtual Type FromScale(const Type& value) const = 0;
+
+  // Log absolute Jacobian of ToScale with respect to eta
+  virtual Type LogAbsJacobian(const Type& eta) const = 0;
+};
+```
+
+Then each scale gets its own map.
+
+**Concrete Maps**
+
+For `log_sd`:
+```cpp
+ToScale(eta) = eta
+FromScale(x) = x
+LogAbsJacobian(eta) = 0
+```
+
+For `sd`:
+```cpp
+ToScale(eta) = exp(eta)
+FromScale(x) = log(x)
+LogAbsJacobian(eta) = eta
+```
+
+For `log_var`:
+```cpp
+ToScale(eta) = 2 * eta
+FromScale(x) = x / 2
+LogAbsJacobian(eta) = log(2)
+```
+
+For `var`:
+```cpp
+ToScale(eta) = exp(2 * eta)
+FromScale(x) = 0.5 * log(x)
+LogAbsJacobian(eta) = log(2) + 2 * eta
+```
+
+That immediately solves the Bayesian prior case correctly.
+
+**Why `sqrt` Should Not Be The Main Transform**
+
+A `sqrt` transform is mathematically fine as a derived conversion between `var` and `sd`, but it should not be your primary estimation transformation.
+
+Reason:
+- positivity is the actual constraint
+- `log` gives you a clean unconstrained canonical parameter
+- `sqrt` only changes which positive-scale representation you are talking about
+
+So I would not make the architecture “log transform plus optional sqrt child class if var is defined.” That approach is too ad hoc and will become brittle once you add more prior types and more parameter families.
+
+Instead:
+- one canonical unconstrained parameter
+- several named scale maps from that parameter
+
+**Parameter Object Design**
+
+A scale parameter object could look like this:
+
+```cpp
+template <typename Type>
+class PositiveScaleParameter {
+ public:
+  Type eta;
+
+  ParameterScale reporting_scale = ParameterScale::kSd;
+  ParameterScale prior_scale = ParameterScale::kLogSd;
+
+  Type GetValue(ParameterScale scale) const;
+  void SetInitialValue(Type value, ParameterScale scale);
+
+  Type EvaluatePrior() const;
+};
+```
+
+`GetValue(scale)` uses the appropriate map.  
+`SetInitialValue(value, scale)` converts the user value into `eta` using `FromScale()`.
+
+This avoids storing `sd`, `var`, `log_sd`, and `log_var` separately.
+
+**Prior Evaluation Design**
+
+A prior object should be defined on a declared scale, not on the canonical scale.
+
+For example:
+
+```cpp
+template <typename Type>
+class PriorBase {
+ public:
+  virtual ~PriorBase() {}
+  virtual Type LogDensity(const Type& x) const = 0;
+};
+```
+
+Then inside the parameter:
+
+```cpp
+Type EvaluatePrior() const {
+  auto map = GetScaleMap(prior_scale);
+  Type x = map->ToScale(eta);
+  return prior->LogDensity(x) + map->LogAbsJacobian(eta);
+}
+```
+
+This is the key Bayesian piece. If you skip the Jacobian, the prior is wrong whenever the prior scale differs from the canonical scale.
+
+**MLE vs Bayesian**
+
+This design supports both cleanly.
+
+For MLE:
+- objective contribution is likelihood only
+- canonical `eta` is optimized
+- distributions can request `sd` or `var` as needed
+
+For Bayesian:
+- same canonical `eta`
+- prior added through the declared prior scale with Jacobian
+
+So the distinction is not “MLE uses `log_sd`, Bayesian uses `var`.” The better formulation is:
+
+- both use the same canonical parameter
+- Bayesian additionally needs a prior scale mapping
+
+That keeps the model architecture unified.
+
+**How This Fits Your Existing Transformation System**
+
+Your current base class:
+
+```cpp
+virtual void Transform(Type& transform_value, Type& natural_value) = 0;
+```
+
+is too tied to a two-slot mental model:
+- transformed value
+- natural value
+
+That is enough for `log <-> natural`, but not enough once you have:
+- `log_sd`
+- `sd`
+- `log_var`
+- `var`
+- Jacobians for priors
+
+I would replace that interface rather than extend it with a one-off `sqrt` child.
+
+A better abstraction is:
+- canonical internal value
+- named scale maps
+- optional Jacobian
+
+That generalizes well beyond this one parameter.
+
+**Minimal First Implementation**
+
+If you want to keep change size small, I would start with:
+
+1. Introduce `ParameterScale`
+2. Replace `CreateLogTransformation()` with `CreateScaleMap(ParameterScale)`
+3. Keep `eta = log_sd` as canonical internal value
+4. Add `ToScale`, `FromScale`, `LogAbsJacobian`
+5. Update one positive scale parameter class to use it
+6. Add tests for:
+   - `sd -> eta -> sd`
+   - `var -> eta -> var`
+   - `log_var -> eta -> log_var`
+   - prior Jacobian correctness
+
+**Practical Rule**
+
+For positive parameters:
+- always estimate/sample internally on an unconstrained scale
+- expose multiple user-facing scales through deterministic maps
+- evaluate priors on the user-declared scale with Jacobian correction
+
+That is the design you want.
+
+If you want, I can next sketch the actual C++ header structure for this in FIMS style, using your current transformation namespace and class layout.
+
+User: What goes where? How would I reconstruct my NormalLPDF class for example?
+
+GitHub Copilot: Use a three-layer split. That keeps MLE and Bayesian behavior clean and avoids hard-coding one parameterization into the likelihood.
+
+1. Canonical parameter layer  
+Store one unconstrained internal value per scale parameter, for example \(\eta\), with:
+\[
+sd = \exp(\eta), \quad var = \exp(2\eta), \quad \log var = 2\eta
+\]
+This belongs in your transformation system around parameter_transformations_base.hpp and parameter_transformations_log.hpp.
+
+2. Likelihood layer  
+Likelihood code should ask for sd on demand and not care whether user supplied sd, var, log_sd, or log_var.  
+So normal_lpdf.hpp should consume sd, not own scale-conversion policy.
+
+3. Prior layer  
+Prior is evaluated on whichever scale the user declared, then add Jacobian to get density on \(\eta\):
+\[
+\log p(\eta) = \log p(g(\eta)) + \log\left|\frac{dg(\eta)}{d\eta}\right|
+\]
+This should not be inside NormalLPDF; it belongs in your prior component logic.
+
+For your NormalLPDF reconstruction, do this minimally:
+
+1. Replace single-field assumption log_sd with a generic scale holder + declared scale enum.
+2. Add one helper that returns sd for index i by mapping the declared scale to sd.
+3. Keep all dnorm and rnorm calls using that helper result.
+4. Keep NA handling and dimension checks as they are.
+
+Sketch:
+
+    enum class ScaleInput {
+      kLogSd,
+      kSd,
+      kLogVar,
+      kVar
+    };
+
+    template <typename Type>
+    struct NormalLPDF : public DensityComponentBase<Type> {
+      fims::Vector<Type> scale_value;
+      ScaleInput scale_input = ScaleInput::kLogSd;
+
+      Type get_sd(size_t i) const {
+        Type v = scale_value.get_force_scalar(i);
+        switch (scale_input) {
+          case ScaleInput::kLogSd:  return fims_math::exp(v);
+          case ScaleInput::kSd:     return v;
+          case ScaleInput::kLogVar: return fims_math::exp(v * Type(0.5));
+          case ScaleInput::kVar:    return fims_math::sqrt(v);
+        }
+        return fims_math::exp(v); // fallback
+      }
+
+      virtual const Type evaluate() {
+        ...
+        Type sd_i = get_sd(i);
+        this->lpdf_vec[i] = dnorm(this->get_observed(i), this->get_expected(i), sd_i, true);
+        ...
+      }
+    };
+
+What this buys you immediately:
+
+1. MLE stays exactly as before when scale_input is kLogSd.
+2. Bayesian can estimate canonical \(\eta\), but still expose priors/initialization on var or log_var outside NormalLPDF.
+3. You avoid introducing a special-case sqrt transformation class in likelihood code.
+
+If you want, I can turn this sketch into a concrete patch in normal_lpdf.hpp with backward compatibility by keeping log_sd as an alias during transition.
+
+Main question: what does the user supply?
+
+The user supplies two things:
+
+Parameter value(s)
+The representation those value(s) are on
+For uncertainty, representation is one of:
+
+sd
+log_sd
+var
+log_var
+Then your transform layer converts that input representation to whatever the model component needs (for dnorm, that target is sd).
+
+So in your current design:
+
+User gives value + representation.
+Code calls conversion to kSd.
+dnorm always receives sd.
+Examples:
+
+User supplies value = 0.3, representation = sd -> sd = 0.3
+User supplies value = log(0.3), representation = log_sd -> sd = exp(value)
+User supplies value = 0.09, representation = var -> sd = sqrt(value)
+User supplies value = log(0.09), representation = log_var -> sd = exp(0.5 * value)
+If you also support priors, user similarly supplies:
+
+prior distribution parameters
+prior representation (the scale that prior is defined on)
+That second piece is how you know whether a Jacobian is needed later.
+
+
+So currently the handoff is:
+R value -> Rcpp log_sd field -> C++ distribution log_sd vector -> exp(log_sd) -> dnorm sd.
+
+If you switch to name-based user input representation, the same handoff pattern still works. You just add one more piece of metadata in the interface layer: which representation was supplied.
+
+Two common ways to pass that metadata from R to C++:
+
+Add one field on DnormDistribution, for example uncertainty_representation = "sd" or "log_var".
+Infer from which input field is populated (sd, log_sd, var, log_var), ensuring exactly one is allowed.
+Then in add_to_fims_tmb_internal:
+
+Read supplied representation.
+Convert to target representation needed by core (for dnorm, sd).
+Store in core object in whatever internal slot you choose.
+If you want minimal change right now:
+
+Keep NormalLPDF unchanged.
+Convert incoming representation to log_sd in the interface layer.
+Continue assigning distribution->log_sd as today.
+That gives you new user-facing flexibility without forcing immediate core likelihood refactor.

@@ -151,8 +151,14 @@ class Vector {
    * bounds checking is performed.
    */
   inline Type &operator[](size_t pos) {
-    if (pos >= this->size()) {
-      throw std::invalid_argument("fims::Vector out of bounds");
+   if (pos >= this->size()) {
+      std::string error_msg = "fims::Vector out of bounds: index " + 
+                              std::to_string(pos + 1) + " >= size " + 
+                              std::to_string(this->size());
+      if (!this->tag_m.empty()) {
+        error_msg += " (vector: " + this->tag_m + ")";
+      }
+      throw std::invalid_argument(error_msg);
     }
     return this->vec_m[pos];
   }
@@ -161,11 +167,17 @@ class Vector {
    * @brief Returns a constant  reference to the element at specified location
    * pos. No bounds checking is performed.
    */
-  inline const Type &operator[](size_t n) const {
-    if (n >= this->size()) {
-      throw std::invalid_argument("fims::Vector out of bounds");
+  inline const Type &operator[](size_t pos) const {
+    if (pos >= this->size()) {
+      std::string error_msg = "fims::Vector out of bounds: index " + 
+                              std::to_string(pos + 1) + " >= size " + 
+                              std::to_string(this->size());
+      if (!this->tag_m.empty()) {
+        error_msg += " (vector: " + this->tag_m + ")";
+      }
+      throw std::invalid_argument(error_msg);
     }
-    return this->vec_m[n];
+    return this->vec_m[pos];
   }
 
   /**

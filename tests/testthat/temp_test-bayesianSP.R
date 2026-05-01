@@ -667,3 +667,30 @@ model_c_sig <- function(par){
     return(jnll)
 }
 
+
+
+
+# test gamma:
+# TMB:
+dgamma_TMB <- function(x, shape, scale, logscale = TRUE) {
+  -lgamma(shape)+(shape-1.0)*log(x)-x/scale-shape*log(scale)
+}
+dgamma_TMB(5, 4, 3, TRUE)
+dgamma(5, shape=4, scale=3, log=TRUE)
+
+dinvgamma_FIMS <- function(x, shape, scale, log = TRUE){
+   shape * log(scale) - lgamma(shape) -
+             (shape + 1.0) * log(x) - scale / x
+}
+
+dgamma(1 / 5, shape=4, scale=3, log=TRUE) - 2 * log(5)
+
+dinvgamma_FIMS(5, shape=4, scale=1/3, log = TRUE)
+dinvgamma(5, shape=4, scale=3, log = TRUE)
+dinvgamma_FIMS(1, shape = 2, scale = 1, log = TRUE)
+dinvgamma(1, shape = 2, scale = 1, log = TRUE)
+dinvgamma_FIMS(2, shape = 3, scale = 5, log = TRUE)
+dinvgamma(2, shape = 3, scale = 5, log = TRUE)
+dinvgamma_FIMS(.5, shape = 1, scale = 2, log = TRUE)
+dinvgamma(.5, shape = 1, scale = 2, log = TRUE)
+

@@ -209,6 +209,18 @@ carrying_capacity_Prior$uncertainty$set_uncertainty_name("sd")
 carrying_capacity_Prior$uncertainty[1]$value <- carrying_capacity_prior[2]
 carrying_capacity_Prior$set_distribution_links("prior",         
     production$carrying_capacity$get_id())
+
+sigma2obs_Prior <- new(DinvgammaDistribution)
+sigma2obs_Prior$log_shape[1]$value <- log(1.708603)
+sigma2obs_Prior$log_scale[1]$value <- log(1/0.008613854)
+sigma2obs_Prior$set_distribution_links( "prior", 
+    survey_fleet_index_distribution$uncertainty$get_id())
+
+sigma2depletion_Prior <- new(DinvgammaDistribution)
+sigma2depletion_Prior$log_shape[1]$value <- log(3.785518)
+sigma2depletion_Prior$log_scale[1]$value <- log(1/0.010223)
+sigma2depletion_Prior$set_distribution_links( "prior", 
+    production_distribution$uncertainty$get_id())
 ```
   
 ## Population and Model
