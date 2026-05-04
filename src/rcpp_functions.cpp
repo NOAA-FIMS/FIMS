@@ -1,18 +1,18 @@
 
- /**
-  * \file rcpp_functions.cpp
-  * \brief Implementation of Rcpp function interfaces for the FIMS framework.
-  */
- #include "../inst/include/interface/rcpp/rcpp_interface.hpp"
- #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_math.hpp"
- 
+/**
+ * \file rcpp_functions.cpp
+ * \brief Implementation of Rcpp function interfaces for the FIMS framework.
+ */
+#include "../inst/include/interface/rcpp/rcpp_interface.hpp"
+#include "../inst/include/interface/rcpp/rcpp_objects/rcpp_math.hpp"
 #include <Rcpp.h>
 
 /**
  * Function to register functions with the Rcpp module system.
- * 
+ *
  */
-void register_functions(Rcpp::Module& m) {
+void register_functions(Rcpp::Module &m)
+{
 
   Rcpp::function("CreateTMBModel", &CreateTMBModel);
   Rcpp::function("set_fixed", &set_fixed_parameters);

@@ -3,7 +3,6 @@
  * \brief Implementation of Rcpp selectivity interfaces for the FIMS framework.
  */
  #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_selectivity.hpp"
- #include "../inst/include/interface/rcpp/fims_modules.hpp"
 
  // static id of the SelectivityInterfaceBase object
 uint32_t SelectivityInterfaceBase::id_g = 1;

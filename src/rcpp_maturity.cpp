@@ -3,7 +3,6 @@
  * \brief Implementation of Rcpp maturity interfaces for the FIMS framework.
  */
  #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_maturity.hpp"
- #include "../inst/include/interface/rcpp/fims_modules.hpp"
  // static id of the MaturityInterfaceBase object
 uint32_t MaturityInterfaceBase::id_g = 1;
 // local id of the MaturityInterfaceBase object map relating the ID of the

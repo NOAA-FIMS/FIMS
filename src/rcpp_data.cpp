@@ -3,7 +3,6 @@
  * \brief Implementation of Rcpp data interfaces for the FIMS framework.
  */
  #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_data.hpp"
- #include "../inst/include/interface/rcpp/fims_modules.hpp"
  // static id of the DataInterfaceBase object
 uint32_t DataInterfaceBase::id_g = 1;
 // local id of the DataInterfaceBase object map relating the ID of the

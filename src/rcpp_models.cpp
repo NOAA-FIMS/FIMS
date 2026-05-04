@@ -3,7 +3,6 @@
  * \brief Implementation of Rcpp fishery model interfaces for the FIMS framework.
  */
  #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_models.hpp"
- #include "../inst/include/interface/rcpp/fims_modules.hpp"
  // static id of the FleetInterfaceBase object
 uint32_t FisheryModelInterfaceBase::id_g = 1;
 

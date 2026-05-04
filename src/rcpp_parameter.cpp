@@ -3,7 +3,6 @@
  * \brief Implementation of Rcpp parameter interfaces for the FIMS framework.
  */
 #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_interface_base.hpp"
-#include "../inst/include/interface/rcpp/fims_modules.hpp"
 #include <RcppCommon.h>
  #include <Rcpp.h>
 

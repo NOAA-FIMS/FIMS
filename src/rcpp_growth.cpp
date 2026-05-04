@@ -3,7 +3,6 @@
   * \brief Implementation of Rcpp growth interfaces for the FIMS framework.
   */
  #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_growth.hpp"
- #include "../inst/include/interface/rcpp/fims_modules.hpp"
  // static id of the GrowthInterfaceBase object
 uint32_t GrowthInterfaceBase::id_g = 1;
 // local id of the GrowthInterfaceBase object map relating the ID of the

@@ -3,7 +3,6 @@
  * \brief Implementation of Rcpp population interfaces for the FIMS framework.
  */
 #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_population.hpp"
-#include "../inst/include/interface/rcpp/fims_modules.hpp"
 
 // static id of the PopulationInterfaceBase object
 uint32_t PopulationInterfaceBase::id_g = 1;

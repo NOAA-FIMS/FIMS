@@ -3,7 +3,6 @@
  * \brief Implementation of Rcpp distribution interfaces for the FIMS framework.
  */
  #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_distribution.hpp"
- #include "../inst/include/interface/rcpp/fims_modules.hpp"
 
  // static id of the DistributionsInterfaceBase object
 uint32_t DistributionsInterfaceBase::id_g = 1;

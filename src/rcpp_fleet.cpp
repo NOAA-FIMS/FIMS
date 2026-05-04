@@ -3,7 +3,6 @@
  * \brief Implementation of Rcpp fleet interfaces for the FIMS framework.
  */
  #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_fleet.hpp"
- #include "../inst/include/interface/rcpp/fims_modules.hpp"
 
  #include <Rcpp.h>
  // static id of the FleetInterfaceBase object
