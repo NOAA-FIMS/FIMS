@@ -390,6 +390,7 @@ Rcout
 Rcpp
 RcppCommon
 RcppCore
+RcppExports
 RcppInterface
 Rdata
 Rdynload
@@ -409,6 +410,7 @@ Ricker
 Rmd
 Rmpi
 Robj
+roclets
 Rscript
 Rslaves
 RTMB
