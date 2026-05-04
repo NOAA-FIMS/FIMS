@@ -579,6 +579,7 @@ fit_fims <- function(input,
       )
     },
     error = function(e) {
+      cli::cli_rule(left = "nlminb failure detail")
       cli::cli_warn(c(
         "x" = "nlminb failed: {e$message}",
         "i" = "Returning partial results."
@@ -586,6 +587,19 @@ fit_fims <- function(input,
       return(NULL)
     }
   )
+
+  # Handle soft failures where nlminb returns an object but the objective
+  # value is not finite (e.g., Inf or NaN). In such cases, convergence and
+  # message fields may be unreliable, so treat this as a failure and trigger
+  # the fallback logic by setting opt to NULL.
+  if (!is.null(opt) && !is.finite(opt$objective)) {
+    cli::cli_rule(left = "nlminb failure detail")
+    cli::cli_warn(c(
+      "x" = "Optimization returned a non-finite objective value.",
+      "i" = "Returning partial results."
+    ))
+    opt <- NULL
+  }
 
   if (is.null(opt)) {
 
@@ -650,7 +664,18 @@ fit_fims <- function(input,
           return(NULL)
         }
       )
+      
+      # Handle soft failure inside loop
+      if (!is.null(opt) && !is.finite(opt$objective)) {
+        cli::cli_rule(left = "nlminb failure detail")
+        cli::cli_warn(c(
+          "x" = "Optimization returned a non-finite objective value.",
+          "i" = "Using previous optimization result."
+        ))
+        opt <- NULL
+      }
 
+      # Handle hard failures where nlminb didn't even return a list
       if (is.null(opt)) {
         # fallback to last successful result
         opt <- prev_opt
