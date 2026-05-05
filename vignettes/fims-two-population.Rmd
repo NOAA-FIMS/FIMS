@@ -19,10 +19,18 @@ knitr::opts_chunk$set(
 ## Overview
 
 This vignette demonstrates how to configure a FIMS catch-at-age model with two
-population objects. The example intentionally keeps the two populations simple:
-they share the same recruitment, growth, maturity, fishing fleet, and survey
-fleet modules. This is useful for demonstrating how multiple populations are
-registered with the top-level `CatchAtAge` model.
+population objects and then verify that the two populations are represented by
+separate model components. The example is written so that the two populations can
+be interpreted as two sexes, such as females and males. Most modules are shared
+between the two populations to keep the example compact, but the initial numbers
+at age are made population-specific so the fitted parameters can be inspected
+separately.
+
+This distinction is important: a vignette that only creates two populations shows
+that the syntax works, but it does not show how a user would confirm that the two
+populations can carry different assumptions or estimates. The checks near the end
+of this vignette show how to inspect the fixed-effect parameter table and compare
+population-specific quantities.
 
 The workflow is:
 
@@ -30,20 +38,26 @@ The workflow is:
 2. create observed-data objects for landings, survey indices, and age compositions,
 3. configure fleet and survey modules,
 4. define biological modules shared by both populations,
-5. create two population modules,
-6. add both populations to a `CatchAtAge` model, and
-7. build and fit the TMB objective function.
+5. create two population modules that can be interpreted as two sexes,
+6. make at least one parameter different between the populations,
+7. add both populations to a `CatchAtAge` model,
+8. build and fit the TMB objective function, and
+9. inspect the estimated parameter table to confirm the populations are distinct.
 
-> **Important:** because the two populations in this example share the same fleet,
-> survey, recruitment, growth, and maturity modules, this vignette should be read
-> as a minimal multi-population setup example. A more realistic application may
-> require population-specific fleets, surveys, recruitment processes, movement, or
-> biological parameters.
+> **Important:** this example uses two populations as a lightweight stand-in for a
+> sex-specific model. The two populations share recruitment, growth, maturity,
+> fishery, and survey modules, but they have separate `Population` objects and
+> separate initial numbers-at-age parameters. A fully sex-specific model may also
+> require sex-specific growth, maturity, natural mortality, selectivity, or data
+> likelihoods.
 
 ## Load FIMS and example data
 
 ```{r load-data}
 library(FIMS)
+library(dplyr)
+library(purrr)
+library(tibble)
 
 # Set the iteration ID to 1 for accessing specific input/output lists.
 iter_id <- 1
@@ -378,7 +392,14 @@ if (!is.null(random_effects) && "recruitment" %in% names(random_effects)) {
 
 ## Define shared growth and maturity
 
+The growth and maturity modules are shared by both populations in this example.
+That means the two populations use the same weights-at-age and maturity schedule.
+For a more detailed sex-specific application, this is one place where users may
+choose to create separate female and male growth or maturity modules.
+
 ```{r growth-maturity}
+# Empirical weight-at-age growth object. This object is shared by both
+# populations in the example.
 ewaa_growth <- methods::new(EWAAGrowth)
 ewaa_growth$n_years$set(om_input[["nyr"]])
 ewaa_growth$ages$resize(om_input[["nages"]])
@@ -388,6 +409,8 @@ purrr::walk(
   \(i) ewaa_growth$ages$set(i - 1, om_input[["ages"]][i])
 )
 
+# FIMS expects the annual weights-at-age as a flat vector. Here, the same
+# weight-at-age vector is repeated across years.
 ewaa_growth$weights$resize((om_input[["nyr"]] + 1) * om_input[["nages"]])
 
 purrr::walk(
@@ -398,6 +421,8 @@ purrr::walk(
   )
 )
 
+# Logistic maturity is also shared. In a sex-specific model, females and males
+# could receive separate maturity modules if their maturity schedules differ.
 maturity <- methods::new(LogisticMaturity)
 maturity$inflection_point[1]$value <- om_input[["A50.mat"]]
 maturity$inflection_point[1]$estimation_type$set("constant")
@@ -411,22 +436,37 @@ The helper below keeps the population setup consistent and avoids duplicating th
 same block of code for each population. Each population receives its own
 `Population` object but references the same biological and fleet modules.
 
+To make the example more useful than a pure setup demonstration, the two
+populations are labeled as `female` and `male`, and the male initial numbers at
+age are initialized with a multiplier. This gives the vignette a concrete
+sex-specific interpretation and provides a parameter block that can be inspected
+after fitting.
+
 ```{r populations}
-make_population <- function() {
+make_population <- function(init_naa_multiplier = 1.0) {
   population <- methods::new(Population)
 
+  # Natural mortality is held fixed in this vignette. The same value is used for
+  # all years and ages in both populations. For a sex-specific model, this could
+  # be changed to use different female and male M-at-age schedules.
   population$log_M$resize(om_input[["nyr"]] * om_input[["nages"]])
   for (i in seq_len(om_input[["nyr"]] * om_input[["nages"]])) {
     population$log_M[i]$value <- log(om_input[["M.age"]][1])
   }
   population$log_M$set_all_estimable(FALSE)
 
+  # Initial numbers at age are population-specific parameters. The multiplier is
+  # used only to make the two populations start from different values so that the
+  # user can verify that the two parameter blocks are distinct.
   population$log_init_naa$resize(om_input[["nages"]])
   for (i in seq_len(om_input[["nages"]])) {
-    population$log_init_naa[i]$value <- log(om_output[["N.age"]][1, i])
+    population$log_init_naa[i]$value <- log(
+      om_output[["N.age"]][1, i] * init_naa_multiplier
+    )
   }
   population$log_init_naa$set_all_estimable(TRUE)
 
+  # Basic population dimensions and age vector.
   population$n_ages$set(om_input[["nages"]])
   population$ages$resize(om_input[["nages"]])
   purrr::walk(
@@ -434,31 +474,55 @@ make_population <- function() {
     \(i) population$ages$set(i - 1, om_input[["ages"]][i])
   )
 
+  # Each population is connected to the fishery and survey fleets.
   population$n_fleets$set(sum(om_input[["fleet_num"]], om_input[["survey_num"]]))
   population$n_years$set(om_input[["nyr"]])
 
+  # Attach the shared biological modules.
   population$SetRecruitmentID(recruitment$get_id())
   population$SetGrowthID(ewaa_growth$get_id())
   population$SetMaturityID(maturity$get_id())
+
+  # Attach the shared fishery and survey modules.
   population$AddFleet(fishing_fleet$get_id())
   population$AddFleet(survey_fleet$get_id())
 
   population
 }
 
-population1 <- make_population()
-population2 <- make_population()
+# In this example, population 1 is interpreted as female and population 2 as
+# male. The male initial abundance is initialized lower so that the vignette can
+# demonstrate how to identify a population-specific parameter difference.
+female_population <- make_population(init_naa_multiplier = 1.0)
+male_population <- make_population(init_naa_multiplier = 0.75)
+
+# Keep a small lookup table that maps FIMS population IDs to the user-facing
+# labels used in the result summaries.
+population_lookup <- tibble::tibble(
+  population_id = c(female_population$get_id(), male_population$get_id()),
+  sex = c("female", "male"),
+  init_naa_multiplier = c(1.0, 0.75)
+)
+
+population_lookup
 ```
 
 ## Create and fit the catch-at-age model
 
 ```{r fit-model}
 caa <- methods::new(CatchAtAge)
-caa$AddPopulation(population1$get_id())
-caa$AddPopulation(population2$get_id())
+
+# Register both populations with the catch-at-age model. Because these are two
+# distinct Population objects, their population-level parameters can differ even
+# when they share other modules.
+caa$AddPopulation(female_population$get_id())
+caa$AddPopulation(male_population$get_id())
 
 CreateTMBModel()
 
+# The fixed-effect and random-effect vectors are the objects passed to TMB. The
+# population-specific initial numbers at age should appear in the fixed-effect
+# vector because they were marked estimable above.
 parameters <- list(
   p = get_fixed(),
   re = get_random()
@@ -474,6 +538,7 @@ obj <- TMB::MakeADFun(
 )
 
 if (estimation_mode) {
+  # Fit the model by minimizing the joint negative log-likelihood.
   opt <- stats::nlminb(
     obj[["par"]],
     obj[["fn"]],
@@ -481,9 +546,13 @@ if (estimation_mode) {
     control = list(eval.max = 10000, iter.max = 10000, trace = 0)
   )
 
+  # Update the FIMS fixed-effect vector with the optimizer solution before
+  # extracting model output.
   FIMS::set_fixed(opt$par)
   fims_finalized <- caa$get_output()
 
+  # sdreport gives parameter estimates and standard errors for fixed effects,
+  # random effects, and reported quantities.
   sdr <- TMB::sdreport(obj)
   sdr_report <- summary(sdr, "report")
   sdr_fixed <- summary(sdr, "fixed")
@@ -512,17 +581,85 @@ report <- obj[["report"]](obj[["env"]][["last.par.best"]])
 
 ## Inspect results
 
+The first check is numerical: confirm that the optimizer converged and that the
+final gradient is small. The second check is biological/model-structural: confirm
+that the parameter table contains population-specific parameters and that the
+female and male initial numbers at age can be inspected separately.
+
 ```{r inspect-results}
 # Gradient at the final parameter values. Values near zero indicate that the
 # optimizer has likely reached a local optimum.
 obj$gr()
 
-# Optimizer diagnostics and convergence code.
+# Optimizer diagnostics and convergence code. For nlminb(), convergence == 0
+# usually indicates successful convergence.
 opt
 
 # Reported quantities from the model.
 head(sdr_report)
 ```
+
+### Inspect population-specific parameters
+
+The exact parameter names can change as FIMS evolves, so the safest first step is
+to convert the `sdreport` output into a data frame and search for the parameter
+block of interest. Here, we search for `log_init_naa` because those parameters
+were intentionally made population-specific above.
+
+```{r inspect-population-parameters}
+fixed_effects <- tibble::as_tibble(
+  sdr_fixed,
+  rownames = "parameter"
+)
+
+# Show the available fixed-effect parameter names. This is useful when adapting
+# the vignette to a new FIMS version or to a different population-specific
+# parameter, such as sex-specific natural mortality or growth.
+fixed_effects$parameter
+
+# Pull out the initial numbers-at-age parameters. These should contain separate
+# entries for the two Population objects because each population has its own
+# log_init_naa vector.
+init_naa_parameters <- fixed_effects |>
+  dplyr::filter(grepl("log_init_naa", parameter))
+
+init_naa_parameters
+```
+
+### Compare the two population blocks
+
+For a sex-specific interpretation, it is helpful to summarize the estimated
+initial numbers at age by population. The code below assumes the `log_init_naa`
+parameters are ordered by population and then by age, which is the order used when
+the two populations are created and registered above. If the printed parameter
+names include explicit population IDs, users can join on those IDs instead.
+
+```{r compare-sex-specific-parameters}
+init_naa_by_sex <- init_naa_parameters |>
+  dplyr::mutate(
+    sex = rep(population_lookup$sex, each = om_input[["nages"]]),
+    age = rep(om_input[["ages"]], times = nrow(population_lookup)),
+    initial_numbers_at_age = exp(Estimate)
+  ) |>
+  dplyr::select(sex, age, parameter, Estimate, initial_numbers_at_age)
+
+init_naa_by_sex
+
+# A compact comparison by sex. Because the male population was initialized with a
+# 0.75 multiplier, this table should make it easy to confirm that the two
+# population-specific parameter blocks are not identical.
+init_naa_by_sex |>
+  dplyr::group_by(sex) |>
+  dplyr::summarise(
+    total_initial_abundance = sum(initial_numbers_at_age),
+    .groups = "drop"
+  )
+```
+
+The same pattern can be used for a more complete sex-specific model. For example,
+users could make female and male growth modules, assign each population a
+different growth module ID, and then inspect the corresponding growth parameters
+in `sdr_fixed`.
 
 ## Clean up
 
@@ -533,14 +670,19 @@ clear()
 ## Notes for extending this example
 
 This example demonstrates the mechanics of adding more than one population to a
-single catch-at-age model. Extensions may include:
+single catch-at-age model and checking that at least one population-specific
+parameter differs between the two population blocks. Extensions may include:
 
-- population-specific recruitment modules,
-- population-specific growth or maturity parameters,
-- separate fleets or surveys for each population,
+- sex-specific or population-specific recruitment modules,
+- sex-specific growth or maturity parameters,
+- sex-specific natural mortality schedules,
+- separate fleets or surveys for each population or sex,
 - movement between populations or areas, and
 - population-specific likelihood components.
 
 When adapting this example, check whether a module should be shared across
 populations or instantiated separately. Sharing a module means the populations use
-the same registered object and therefore the same parameterization.
+the same registered object and therefore the same parameterization. Creating
+separate modules makes the sex-specific or population-specific assumptions more
+explicit and makes the corresponding parameters easier to inspect in the fitted
+parameter tables.
