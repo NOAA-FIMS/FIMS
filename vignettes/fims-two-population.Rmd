@@ -6,30 +6,54 @@ vignette: >
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
+
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(
+  echo = TRUE,
+  collapse = TRUE,
+  comment = "#>",
+  eval = FALSE
+)
 ```
 
-## Introduction
+## Overview
 
-This vignette provides simple example of running a Fisheries Integrated Modeling System (FIMS) model 
-with two populations.
+This vignette demonstrates how to configure a FIMS catch-at-age model with two
+population objects. The example intentionally keeps the two populations simple:
+they share the same recruitment, growth, maturity, fishing fleet, and survey
+fleet modules. This is useful for demonstrating how multiple populations are
+registered with the top-level `CatchAtAge` model.
 
-## Setup
-Load the FIMS package and retrieve data:
-```r
+The workflow is:
+
+1. load operating-model data,
+2. create observed-data objects for landings, survey indices, and age compositions,
+3. configure fleet and survey modules,
+4. define biological modules shared by both populations,
+5. create two population modules,
+6. add both populations to a `CatchAtAge` model, and
+7. build and fit the TMB objective function.
+
+> **Important:** because the two populations in this example share the same fleet,
+> survey, recruitment, growth, and maturity modules, this vignette should be read
+> as a minimal multi-population setup example. A more realistic application may
+> require population-specific fleets, surveys, recruitment processes, movement, or
+> biological parameters.
+
+## Load FIMS and example data
+
+```{r load-data}
 library(FIMS)
 
-# Set the iteration ID to 1 for accessing specific input/output list
+# Set the iteration ID to 1 for accessing specific input/output lists.
 iter_id <- 1
+
+# Toggle estimation. If FALSE, the model reports values at the input parameters.
 estimation_mode <- TRUE
+
+# Optional random-effects configuration. Set to NULL for the default example.
 random_effects <- NULL
 map <- list()
-FIMS_dmultinom <- function(x, p) {
-  xp1 <- x + 1
-  log_pmf <- lgamma(sum(x) + 1) - sum(lgamma(xp1)) + sum(x * log(p))
-  return(log_pmf)
-}
 
 c_case <- 1
 github_dir <- paste0(
@@ -40,413 +64,483 @@ github_dir <- paste0(
   "/output/OM/"
 )
 
-r_data_file <- paste0("OM1", ".RData")
+r_data_file <- "OM1.RData"
 load(url(paste0(github_dir, r_data_file)))
 
-  # Clear any previous FIMS settings
-  clear()
-
-  # Extract fishing fleet landings data (observed) and initialize index module
-  landings <- em_input[["L.obs"]][["fleet1"]]
-
-  # set fishing fleet landings data, need to set dimensions of data index
-  # currently FIMS only has a fleet module that takes index for both survey index and fishery landings
-  fishing_fleet_landings <- methods::new(Landings, om_input[["nyr"]])
-  purrr::walk(
-    1:om_input[["nyr"]],
-    \(x) fishing_fleet_landings$landings_data$set(x - 1, landings[x])
-  )
-
-  # set fishing fleet age comp data, need to set dimensions of age comps
-  # Here the new function initializes the object with length nyr*n_ages
-  fishing_fleet_age_comp <- methods::new(AgeComp, om_input[["nyr"]], om_input[["nages"]])
-
-  # Here we fill in the values for the object with the observed age comps for fleet one
-  # we multiply these proportions by the sample size for likelihood weighting
-  purrr::walk(
-    1:(om_input[["nyr"]] * om_input[["nages"]]),
-    \(x) fishing_fleet_age_comp$age_comp_data$set(
-      x - 1,
-      (c(t(em_input[["L.age.obs"]][["fleet1"]])) * em_input[["n.L"]][["fleet1"]])[x]
-    )
-  )
-
-
+# Clear any previously registered FIMS modules before building the model.
+clear()
 ```
-## Define a single fleet and a single survey
-```r
-  # Fleet
-  # Create the fishing fleet
-  fishing_fleet_selectivity <- methods::new(LogisticSelectivity)
-  fishing_fleet_selectivity$inflection_point[1]$value <- om_input[["sel_fleet"]][["fleet1"]][["A50.sel1"]]
 
-  # turn on estimation of inflection_point
-  fishing_fleet_selectivity$inflection_point[1]$estimation_type$set("fixed_effects")
-  fishing_fleet_selectivity$slope[1]$value <- om_input[["sel_fleet"]][["fleet1"]][["slope.sel1"]]
+## Create observed data objects
 
-  # turn on estimation of slope
-  fishing_fleet_selectivity$slope[1]$estimation_type$set("fixed_effects")
+The fleet module uses observed landings and age-composition data. The survey
+module uses an abundance index and age-composition data.
 
-  # Initialize the fishing fleet module
-  fishing_fleet <- methods::new(Fleet)
-  # Set number of years
-  fishing_fleet$n_years$set(om_input[["nyr"]])
-  # Set number of age classes
-  fishing_fleet$n_ages$set(om_input[["nages"]])
+```{r observed-data}
+# Observed fishery landings.
+landings <- em_input[["L.obs"]][["fleet1"]]
+fishing_fleet_landings <- methods::new(Landings, om_input[["nyr"]])
 
-  fishing_fleet$log_Fmort$resize(om_input[["nyr"]])
-  for (y in 1:om_input$nyr) {
-    # Log-transform OM fishing mortality
-    fishing_fleet$log_Fmort[y]$value <- log(om_output[["f"]][y])
-  }
-  fishing_fleet$log_Fmort$set_all_estimable(TRUE)
-  fishing_fleet$log_q[1]$value <- log(1.0)
-  fishing_fleet$log_q[1]$estimation_type$set("constant")
-  fishing_fleet$SetSelectivityID(fishing_fleet_selectivity$get_id())
-  fishing_fleet$SetObservedLandingsDataID(fishing_fleet_landings$get_id())
-  fishing_fleet$SetObservedAgeCompDataID(fishing_fleet_age_comp$get_id())
+purrr::walk(
+  seq_len(om_input[["nyr"]]),
+  \(i) fishing_fleet_landings$landings_data$set(i - 1, landings[i])
+)
 
-  # Set up fishery index data using the lognormal
-  fishing_fleet_landings_distribution <- methods::new(DlnormDistribution)
-  # lognormal observation error transformed on the log scale
-  fishing_fleet_landings_distribution$log_sd$resize(om_input[["nyr"]])
-  for (y in 1:om_input[["nyr"]]) {
-    # Compute lognormal SD from OM coefficient of variation (CV)
-    fishing_fleet_landings_distribution$log_sd[y]$value <- log(sqrt(log(em_input[["cv.L"]][["fleet1"]]^2 + 1)))
-  }
-  fishing_fleet_landings_distribution$log_sd$set_all_estimable(FALSE)
-  # Set Data using the IDs from the modules defined above
-  fishing_fleet_landings_distribution$set_observed_data(fishing_fleet$GetObservedLandingsDataID())
-  fishing_fleet_landings_distribution$set_distribution_links("data", fishing_fleet$log_landings_expected$get_id())
+# Observed fishery age compositions, scaled by sample size for likelihood weighting.
+fishing_fleet_age_comp <- methods::new(
+  AgeComp,
+  om_input[["nyr"]],
+  om_input[["nages"]]
+)
 
-  # Set up fishery age composition data using the multinomial
-  fishing_fleet_agecomp_distribution <- methods::new(DmultinomDistribution)
-  fishing_fleet_agecomp_distribution$set_observed_data(fishing_fleet$GetObservedAgeCompDataID())
-  fishing_fleet_agecomp_distribution$set_distribution_links("data", fishing_fleet$agecomp_proportion$get_id())
+fishery_age_comp_counts <-
+  c(t(em_input[["L.age.obs"]][["fleet1"]])) * em_input[["n.L"]][["fleet1"]]
 
- 
+purrr::walk(
+  seq_along(fishery_age_comp_counts),
+  \(i) fishing_fleet_age_comp$age_comp_data$set(i - 1, fishery_age_comp_counts[i])
+)
 
-  # Repeat similar setup for the survey fleet (e.g., index, age comp, and length comp)
-  # This includes initializing logistic selectivity, observed data modules, and distribution links.
-  survey_index <- em_input[["survey.obs"]][["survey1"]]
-  survey_fleet_index <- methods::new(Index, om_input[["nyr"]])
-  purrr::walk(
-    1:om_input[["nyr"]],
-    \(x) survey_fleet_index$index_data$set(x - 1, survey_index[x])
-  )
+# Observed survey index.
+survey_index <- em_input[["survey.obs"]][["survey1"]]
+survey_fleet_index <- methods::new(Index, om_input[["nyr"]])
 
-  survey_fleet_age_comp <- methods::new(AgeComp, om_input[["nyr"]], om_input[["nages"]])
-  purrr::walk(
-    1:(om_input[["nyr"]] * om_input[["nages"]]),
-    \(x) survey_fleet_age_comp$age_comp_data$set(
-      x - 1,
-      (c(t(em_input[["survey.age.obs"]][["survey1"]])) * em_input[["n.survey"]][["survey1"]])[x]
-    )
-  )
+purrr::walk(
+  seq_len(om_input[["nyr"]]),
+  \(i) survey_fleet_index$index_data$set(i - 1, survey_index[i])
+)
 
-  # Fleet
-  # Create the survey fleet
-  survey_fleet_selectivity <- methods::new(LogisticSelectivity)
-  survey_fleet_selectivity$inflection_point[1]$value <- om_input[["sel_survey"]][["survey1"]][["A50.sel1"]]
+# Observed survey age compositions, scaled by sample size.
+survey_fleet_age_comp <- methods::new(
+  AgeComp,
+  om_input[["nyr"]],
+  om_input[["nages"]]
+)
 
-  # turn on estimation of inflection_point
-  survey_fleet_selectivity$inflection_point[1]$estimation_type$set("fixed_effects")
-  survey_fleet_selectivity$slope[1]$value <- om_input[["sel_survey"]][["survey1"]][["slope.sel1"]]
+survey_age_comp_counts <-
+  c(t(em_input[["survey.age.obs"]][["survey1"]])) * em_input[["n.survey"]][["survey1"]]
 
-  # turn on estimation of slope
-  survey_fleet_selectivity$slope[1]$estimation_type$set("fixed_effects")
-
-  survey_fleet <- methods::new(Fleet)
-  survey_fleet$n_ages$set(om_input[["nages"]])
-  survey_fleet$n_years$set(om_input[["nyr"]])
-  survey_fleet$log_Fmort$resize(om_input[["nyr"]])
-  for (y in 1:om_input$nyr) {
-    # Set very low survey fishing mortality
-    survey_fleet$log_Fmort[y]$value <- -200
-  }
-  survey_fleet$log_Fmort$set_all_estimable(FALSE)
-  survey_fleet$log_q[1]$value <- log(om_output[["survey_q"]][["survey1"]])
-  survey_fleet$log_q[1]$estimation_type$set("fixed_effects")
-  survey_fleet$SetSelectivityID(survey_fleet_selectivity$get_id())
-  survey_fleet$SetObservedIndexDataID(survey_fleet_index$get_id())
-  survey_fleet$SetObservedAgeCompDataID(survey_fleet_age_comp$get_id())
-
-  # Set up survey index data using the lognormal
-  survey_fleet_index_distribution <- methods::new(DlnormDistribution)
-
-  # lognormal observation error transformed on the log scale
-  # sd = sqrt(log(cv^2 + 1)), sd is log transformed
-  survey_fleet_index_distribution$log_sd$resize(om_input[["nyr"]])
-  for (y in 1:om_input$nyr) {
-    survey_fleet_index_distribution$log_sd[y]$value <- log(sqrt(log(em_input[["cv.survey"]][["survey1"]]^2 + 1)))
-  }
-  survey_fleet_index_distribution$log_sd$set_all_estimable(FALSE)
-  # Set Data using the IDs from the modules defined above
-  survey_fleet_index_distribution$set_observed_data(survey_fleet$GetObservedIndexDataID())
-  survey_fleet_index_distribution$set_distribution_links("data", survey_fleet$log_index_expected$get_id())
-
-  # Age composition distribution
-  survey_fleet_agecomp_distribution <- methods::new(DmultinomDistribution)
-  survey_fleet_agecomp_distribution$set_observed_data(survey_fleet$GetObservedAgeCompDataID())
-  survey_fleet_agecomp_distribution$set_distribution_links("data", survey_fleet$agecomp_proportion$get_id())
-
-
-  for (i in seq_along(em_input[["age_to_length_conversion"]])) {
-    survey_fleet$age_to_length_conversion[i]$value <- c(t(em_input[["age_to_length_conversion"]]))[i]
-  }
-  # Turn off estimation for length-at-age
-  survey_fleet$age_to_length_conversion$set_all_estimable(FALSE)
-  survey_fleet$age_to_length_conversion$set_all_random(FALSE)
-  
-  if ("selectivity" %in% names(random_effects)) {
-    if (random_effects[["selectivity"]] == "log_devs") {
-      fishing_fleet_selectivity$log_devs$set_all_random(TRUE)
-      survey_fleet_selectivity$log_devs$set_all_random(TRUE)
-    }
-    if (random_effects[["selectivity"]] == "log_sel") {
-      fishing_fleet_selectivity$log_sel$set_all_random(TRUE)
-      survey_fleet_selectivity$log_sel$set_all_random(TRUE)
-    }
-    if (random_effects[["selectivity"]] == "pars") {
-      fishing_fleet_selectivity$inflection_point$estimation_type$set("random_effects")
-      fishing_fleet_selectivity$inflection_point$slope <- "random_effects"
-      survey_fleet_selectivity$inflection_point$estimation_type$set("random_effects")
-      survey_fleet_selectivity$inflection_point$slope <- "random_effects"
-    }
-  }
+purrr::walk(
+  seq_along(survey_age_comp_counts),
+  \(i) survey_fleet_age_comp$age_comp_data$set(i - 1, survey_age_comp_counts[i])
+)
 ```
-## Define a recruitment module to be shared by two populations
 
-```r
-  # Recruitment
-  # create new module in the recruitment class (specifically Beverton-Holt,
-  # when there are other options, this would be where the option would be chosen)
-  recruitment <- methods::new(BevertonHoltRecruitment)
-  if (is.null(random_effects) || random_effects[["recruitment"]] == "log_devs") {
-    recruitment_process <- new(LogDevsRecruitmentProcess)
-  } else {
-    recruitment_process <- new(LogRRecruitmentProcess)
-  }
-  recruitment$SetRecruitmentProcessID(recruitment_process$get_id())
-  # set up log_rzero (equilibrium recruitment)
-  recruitment$log_rzero[1]$value <- log(om_input[["R0"]])
-  recruitment$log_rzero[1]$estimation_type$set("fixed_effects")
-  # set up logit_steep
-  recruitment$logit_steep[1]$value <- -log(1.0 - om_input[["h"]]) + log(om_input[["h"]] - 0.2)
-  recruitment$logit_steep[1]$estimation_type$set("constant")
-  recruitment$n_years$set(om_input[["nyr"]])
+## Configure the fishery fleet
 
-  # turn on estimation of deviations
-  # recruit deviations should enter the model in normal space.
-  # The log is taken in the likelihood calculations
-  # alternative setting: recruitment$log_devs <- rep(0, length(om_input$logR.resid))
+```{r fishery-fleet}
+fishing_fleet_selectivity <- methods::new(LogisticSelectivity)
+fishing_fleet_selectivity$inflection_point[1]$value <-
+  om_input[["sel_fleet"]][["fleet1"]][["A50.sel1"]]
+fishing_fleet_selectivity$inflection_point[1]$estimation_type$set("fixed_effects")
 
+fishing_fleet_selectivity$slope[1]$value <-
+  om_input[["sel_fleet"]][["fleet1"]][["slope.sel1"]]
+fishing_fleet_selectivity$slope[1]$estimation_type$set("fixed_effects")
 
-  if (is.null(random_effects) || random_effects[["recruitment"]] == "log_devs") {
-    recruitment$log_devs$resize(om_input[["nyr"]] - 1)
-    for (y in 1:(om_input[["nyr"]] - 1)) {
-      recruitment$log_devs[y]$value <- om_input[["logR.resid"]][y + 1]
-    }
-  }
-  if ("recruitment" %in% names(random_effects)) {
-    if (random_effects[["recruitment"]] == "log_devs") {
-      recruitment$log_devs$set_all_random(TRUE)
-    }
-    if (random_effects[["recruitment"]] == "log_r") {
-      recruitment$log_r$resize(om_input[["nyr"]] - 1)
-      recruits_true <- matrix(c(t(om_output[["N.age"]])),
-        om_input[["nyr"]], om_input[["nages"]],
-        byrow = TRUE
-      )[, 1]
-      for (y in 1:(om_input[["nyr"]] - 1)) {
-        if (!estimation_mode) {
-          recruitment$log_r[y]$value <- recruits_true[y + 1]
-        } else {
-          recruitment$log_r[y]$value <- 0
-        }
-        recruitment$log_r$set_all_random(TRUE)
-      }
-    }
-    if (is.null(random_effects)) {
-      recruitment$log_devs$set_all_estimable(TRUE)
-    }
-  }
+fishing_fleet <- methods::new(Fleet)
+fishing_fleet$n_years$set(om_input[["nyr"]])
+fishing_fleet$n_ages$set(om_input[["nages"]])
 
-
-  recruitment_distribution <- methods::new(DnormDistribution)
-  # set up logR_sd using the normal log_sd parameter
-  # logR_sd is NOT logged. It needs to enter the model logged b/c the exp() is
-  # taken before the likelihood calculation
-  recruitment_distribution$log_sd$resize(1)
-  recruitment_distribution$log_sd[1]$value <- log(om_input[["logR_sd"]])
-
-  recruitment_distribution$observed_values$resize(om_input[["nyr"]] - 1)
-  recruitment_distribution$expected_values$resize(om_input[["nyr"]] - 1)
-  for (i in 1:(om_input[["nyr"]] - 1)) {
-    recruitment_distribution$observed_values[i]$value <- 0
-    recruitment_distribution$expected_values[i]$value <- 0
-  }
-
-  if ("recruitment" %in% names(random_effects)) {
-    if (random_effects[["recruitment"]] == "log_devs") {
-      recruitment_distribution$log_sd[1]$estimation_type$set("fixed_effects")
-      recruitment_distribution$set_distribution_links("random_effects", recruitment$log_devs$get_id())
-    }
-    if (random_effects[["recruitment"]] == "log_r") {
-      recruitment_distribution$log_sd[1]$value <- log(1)
-      recruitment_distribution$log_sd[1]$estimation_type$set("fixed_effects")
-      recruitment_distribution$set_distribution_links("random_effects", c(recruitment$log_r$get_id(), recruitment$log_expected_recruitment$get_id()))
-    }
-  }
-
-  if (is.null(random_effects)) {
-    recruitment_distribution$set_distribution_links("random_effects", recruitment$log_devs$get_id())
-  }
-```
-## Define a growth module to be shared by two populations
-
-```r
-  # Growth
-  ewaa_growth <- methods::new(EWAAGrowth)
-  ewaa_growth$n_years$set(om_input[["nyr"]])
-  ewaa_growth$ages$resize(om_input[["nages"]])
-  purrr::walk(
-    seq_along(om_input[["ages"]]),
-    \(x) ewaa_growth$ages$set(x - 1, om_input[["ages"]][x])
-  )
-  ewaa_growth$weights$resize((om_input[["nyr"]] + 1) * om_input[["nages"]])
-  purrr::walk(
-    seq(ewaa_growth$weights$size()),
-    # Weights are only by age in the OM not by age and year. The modular math
-    # will repeat 1:n_ages over and over again for each year.
-    \(x) ewaa_growth$weights$set(x - 1, om_input[["W.mt"]][((x - 1) %% 12) + 1])
-  )
-```
-## Define a maturity module to be shared by two populations
-
-```r
-  # Maturity
-  maturity <- methods::new(LogisticMaturity)
-  maturity$inflection_point[1]$value <- om_input[["A50.mat"]]
-  maturity$inflection_point[1]$estimation_type$set("constant")
-  maturity$slope[1]$value <- om_input[["slope.mat"]]
-  maturity$slope[1]$estimation_type$set("constant")
-
-```
-## Define two populations
-
-```r
-
-  # Population 1
-  population1 <- methods::new(Population)
-  population1$log_M$resize(om_input[["nyr"]] * om_input[["nages"]])
-  for (i in 1:(om_input[["nyr"]] * om_input[["nages"]])) {
-    population1$log_M[i]$value <- log(om_input[["M.age"]][1])
-  }
-  population1$log_M$set_all_estimable(FALSE)
-  population1$log_init_naa$resize(om_input[["nages"]])
-  for (i in 1:om_input$nages) {
-    population1$log_init_naa[i]$value <- log(om_output[["N.age"]][1, i])
-  }
-  population1$log_init_naa$set_all_estimable(TRUE)
-  population1$n_ages$set(om_input[["nages"]])
-  population1$ages$resize(om_input[["nages"]])
-  purrr::walk(
-    seq_along(om_input[["ages"]]),
-    \(x) population1$ages$set(x - 1, om_input[["ages"]][x])
-  )
-  population1$n_fleets$set(sum(om_input[["fleet_num"]], om_input[["survey_num"]]))
-  population1$n_years$set(om_input[["nyr"]])
-  population1$SetRecruitmentID(recruitment$get_id())
-  population1$SetGrowthID(ewaa_growth$get_id())
-  population1$SetMaturityID(maturity$get_id())
-  population1$AddFleet(fishing_fleet$get_id())
-  population1$AddFleet(survey_fleet$get_id())
-
-#Population 2
-population2 <- methods::new(Population)
-population2$log_M$resize(om_input[["nyr"]] * om_input[["nages"]])
-for (i in 1:(om_input[["nyr"]] * om_input[["nages"]])) {
-  population2$log_M[i]$value <- log(om_input[["M.age"]][1])
+fishing_fleet$log_Fmort$resize(om_input[["nyr"]])
+for (y in seq_len(om_input[["nyr"]])) {
+  fishing_fleet$log_Fmort[y]$value <- log(om_output[["f"]][y])
 }
-population2$log_M$set_all_estimable(FALSE)
-population2$log_init_naa$resize(om_input[["nages"]])
-for (i in 1:om_input$nages) {
-  population2$log_init_naa[i]$value <- log(om_output[["N.age"]][1, i])
+fishing_fleet$log_Fmort$set_all_estimable(TRUE)
+
+# Catchability is fixed at 1 for the fishery landings example.
+fishing_fleet$log_q[1]$value <- log(1.0)
+fishing_fleet$log_q[1]$estimation_type$set("constant")
+
+fishing_fleet$SetSelectivityID(fishing_fleet_selectivity$get_id())
+fishing_fleet$SetObservedLandingsDataID(fishing_fleet_landings$get_id())
+fishing_fleet$SetObservedAgeCompDataID(fishing_fleet_age_comp$get_id())
+
+# Landings likelihood: lognormal observation model.
+fishing_fleet_landings_distribution <- methods::new(DlnormDistribution)
+fishing_fleet_landings_distribution$log_sd$resize(om_input[["nyr"]])
+
+for (y in seq_len(om_input[["nyr"]])) {
+  # Convert coefficient of variation to lognormal standard deviation,
+  # then store it on the log scale required by DlnormDistribution.
+  cv <- em_input[["cv.L"]][["fleet1"]]
+  fishing_fleet_landings_distribution$log_sd[y]$value <- log(sqrt(log(cv^2 + 1)))
 }
-population2$log_init_naa$set_all_estimable(TRUE)
-population2$n_ages$set(om_input[["nages"]])
-population2$ages$resize(om_input[["nages"]])
+fishing_fleet_landings_distribution$log_sd$set_all_estimable(FALSE)
+fishing_fleet_landings_distribution$set_observed_data(
+  fishing_fleet$GetObservedLandingsDataID()
+)
+fishing_fleet_landings_distribution$set_distribution_links(
+  "data",
+  fishing_fleet$log_landings_expected$get_id()
+)
+
+# Age-composition likelihood: multinomial observation model.
+fishing_fleet_agecomp_distribution <- methods::new(DmultinomDistribution)
+fishing_fleet_agecomp_distribution$set_observed_data(
+  fishing_fleet$GetObservedAgeCompDataID()
+)
+fishing_fleet_agecomp_distribution$set_distribution_links(
+  "data",
+  fishing_fleet$agecomp_proportion$get_id()
+)
+```
+
+## Configure the survey fleet
+
+The survey is represented with a fleet object that has negligible fishing
+mortality and an estimable survey catchability parameter.
+
+```{r survey-fleet}
+survey_fleet_selectivity <- methods::new(LogisticSelectivity)
+survey_fleet_selectivity$inflection_point[1]$value <-
+  om_input[["sel_survey"]][["survey1"]][["A50.sel1"]]
+survey_fleet_selectivity$inflection_point[1]$estimation_type$set("fixed_effects")
+
+survey_fleet_selectivity$slope[1]$value <-
+  om_input[["sel_survey"]][["survey1"]][["slope.sel1"]]
+survey_fleet_selectivity$slope[1]$estimation_type$set("fixed_effects")
+
+survey_fleet <- methods::new(Fleet)
+survey_fleet$n_years$set(om_input[["nyr"]])
+survey_fleet$n_ages$set(om_input[["nages"]])
+
+survey_fleet$log_Fmort$resize(om_input[["nyr"]])
+for (y in seq_len(om_input[["nyr"]])) {
+  survey_fleet$log_Fmort[y]$value <- -200
+}
+survey_fleet$log_Fmort$set_all_estimable(FALSE)
+
+survey_fleet$log_q[1]$value <- log(om_output[["survey_q"]][["survey1"]])
+survey_fleet$log_q[1]$estimation_type$set("fixed_effects")
+
+survey_fleet$SetSelectivityID(survey_fleet_selectivity$get_id())
+survey_fleet$SetObservedIndexDataID(survey_fleet_index$get_id())
+survey_fleet$SetObservedAgeCompDataID(survey_fleet_age_comp$get_id())
+
+# Survey index likelihood: lognormal observation model.
+survey_fleet_index_distribution <- methods::new(DlnormDistribution)
+survey_fleet_index_distribution$log_sd$resize(om_input[["nyr"]])
+
+for (y in seq_len(om_input[["nyr"]])) {
+  cv <- em_input[["cv.survey"]][["survey1"]]
+  survey_fleet_index_distribution$log_sd[y]$value <- log(sqrt(log(cv^2 + 1)))
+}
+survey_fleet_index_distribution$log_sd$set_all_estimable(FALSE)
+survey_fleet_index_distribution$set_observed_data(
+  survey_fleet$GetObservedIndexDataID()
+)
+survey_fleet_index_distribution$set_distribution_links(
+  "data",
+  survey_fleet$log_index_expected$get_id()
+)
+
+# Survey age-composition likelihood.
+survey_fleet_agecomp_distribution <- methods::new(DmultinomDistribution)
+survey_fleet_agecomp_distribution$set_observed_data(
+  survey_fleet$GetObservedAgeCompDataID()
+)
+survey_fleet_agecomp_distribution$set_distribution_links(
+  "data",
+  survey_fleet$agecomp_proportion$get_id()
+)
+
+# Age-to-length conversion matrix used by the survey fleet.
+for (i in seq_along(em_input[["age_to_length_conversion"]])) {
+  survey_fleet$age_to_length_conversion[i]$value <-
+    c(t(em_input[["age_to_length_conversion"]]))[i]
+}
+survey_fleet$age_to_length_conversion$set_all_estimable(FALSE)
+survey_fleet$age_to_length_conversion$set_all_random(FALSE)
+```
+
+## Optional selectivity random effects
+
+```{r selectivity-random-effects}
+if (!is.null(random_effects) && "selectivity" %in% names(random_effects)) {
+  if (random_effects[["selectivity"]] == "log_devs") {
+    fishing_fleet_selectivity$log_devs$set_all_random(TRUE)
+    survey_fleet_selectivity$log_devs$set_all_random(TRUE)
+  }
+
+  if (random_effects[["selectivity"]] == "log_sel") {
+    fishing_fleet_selectivity$log_sel$set_all_random(TRUE)
+    survey_fleet_selectivity$log_sel$set_all_random(TRUE)
+  }
+
+  if (random_effects[["selectivity"]] == "pars") {
+    fishing_fleet_selectivity$inflection_point$estimation_type$set("random_effects")
+    fishing_fleet_selectivity$slope$estimation_type$set("random_effects")
+    survey_fleet_selectivity$inflection_point$estimation_type$set("random_effects")
+    survey_fleet_selectivity$slope$estimation_type$set("random_effects")
+  }
+}
+```
+
+## Define shared recruitment
+
+Both populations use the same Beverton-Holt recruitment module in this example.
+Sharing the module means both populations reference the same recruitment
+parameters and process.
+
+```{r recruitment}
+recruitment <- methods::new(BevertonHoltRecruitment)
+
+if (is.null(random_effects) || random_effects[["recruitment"]] == "log_devs") {
+  recruitment_process <- methods::new(LogDevsRecruitmentProcess)
+} else {
+  recruitment_process <- methods::new(LogRRecruitmentProcess)
+}
+
+recruitment$SetRecruitmentProcessID(recruitment_process$get_id())
+recruitment$n_years$set(om_input[["nyr"]])
+
+# Equilibrium recruitment.
+recruitment$log_rzero[1]$value <- log(om_input[["R0"]])
+recruitment$log_rzero[1]$estimation_type$set("fixed_effects")
+
+# Beverton-Holt steepness on the FIMS logit scale.
+recruitment$logit_steep[1]$value <-
+  -log(1.0 - om_input[["h"]]) + log(om_input[["h"]] - 0.2)
+recruitment$logit_steep[1]$estimation_type$set("constant")
+
+if (is.null(random_effects) || random_effects[["recruitment"]] == "log_devs") {
+  recruitment$log_devs$resize(om_input[["nyr"]] - 1)
+  for (y in seq_len(om_input[["nyr"]] - 1)) {
+    recruitment$log_devs[y]$value <- om_input[["logR.resid"]][y + 1]
+  }
+}
+
+if (!is.null(random_effects) && "recruitment" %in% names(random_effects)) {
+  if (random_effects[["recruitment"]] == "log_devs") {
+    recruitment$log_devs$set_all_random(TRUE)
+  }
+
+  if (random_effects[["recruitment"]] == "log_r") {
+    recruitment$log_r$resize(om_input[["nyr"]] - 1)
+    recruits_true <- matrix(
+      c(t(om_output[["N.age"]])),
+      om_input[["nyr"]],
+      om_input[["nages"]],
+      byrow = TRUE
+    )[, 1]
+
+    for (y in seq_len(om_input[["nyr"]] - 1)) {
+      recruitment$log_r[y]$value <- if (estimation_mode) 0 else recruits_true[y + 1]
+    }
+    recruitment$log_r$set_all_random(TRUE)
+  }
+}
+
+if (is.null(random_effects)) {
+  recruitment$log_devs$set_all_estimable(TRUE)
+}
+
+recruitment_distribution <- methods::new(DnormDistribution)
+recruitment_distribution$log_sd$resize(1)
+recruitment_distribution$log_sd[1]$value <- log(om_input[["logR_sd"]])
+
+recruitment_distribution$observed_values$resize(om_input[["nyr"]] - 1)
+recruitment_distribution$expected_values$resize(om_input[["nyr"]] - 1)
+
+for (i in seq_len(om_input[["nyr"]] - 1)) {
+  recruitment_distribution$observed_values[i]$value <- 0
+  recruitment_distribution$expected_values[i]$value <- 0
+}
+
+if (!is.null(random_effects) && "recruitment" %in% names(random_effects)) {
+  if (random_effects[["recruitment"]] == "log_devs") {
+    recruitment_distribution$log_sd[1]$estimation_type$set("fixed_effects")
+    recruitment_distribution$set_distribution_links(
+      "random_effects",
+      recruitment$log_devs$get_id()
+    )
+  }
+
+  if (random_effects[["recruitment"]] == "log_r") {
+    recruitment_distribution$log_sd[1]$value <- log(1)
+    recruitment_distribution$log_sd[1]$estimation_type$set("fixed_effects")
+    recruitment_distribution$set_distribution_links(
+      "random_effects",
+      c(
+        recruitment$log_r$get_id(),
+        recruitment$log_expected_recruitment$get_id()
+      )
+    )
+  }
+} else {
+  recruitment_distribution$set_distribution_links(
+    "random_effects",
+    recruitment$log_devs$get_id()
+  )
+}
+```
+
+## Define shared growth and maturity
+
+```{r growth-maturity}
+ewaa_growth <- methods::new(EWAAGrowth)
+ewaa_growth$n_years$set(om_input[["nyr"]])
+ewaa_growth$ages$resize(om_input[["nages"]])
+
 purrr::walk(
   seq_along(om_input[["ages"]]),
-  \(x) population2$ages$set(x - 1, om_input[["ages"]][x])
+  \(i) ewaa_growth$ages$set(i - 1, om_input[["ages"]][i])
 )
-population2$n_fleets$set(sum(om_input[["fleet_num"]], om_input[["survey_num"]]))
-population2$n_years$set(om_input[["nyr"]])
-population2$SetRecruitmentID(recruitment$get_id())
-population2$SetGrowthID(ewaa_growth$get_id())
-population2$SetMaturityID(maturity$get_id())
-population2$AddFleet(fishing_fleet$get_id())
-population2$AddFleet(survey_fleet$get_id())
-```
-## Define a Catch-at-Age model and add both populations
 
-```r
-  # Set up catch at age model
-  caa <- methods::new(CatchAtAge)
-  caa$AddPopulation(population1$get_id())
-  caa$AddPopulation(population2$get_id())
-```
-## Create the model
+ewaa_growth$weights$resize((om_input[["nyr"]] + 1) * om_input[["nages"]])
 
-```r
-  # Set-up TMB
-  CreateTMBModel()
-  # Create parameter list from Rcpp modules
-  parameters <- list(
-    p = get_fixed(),
-    re = get_random()
+purrr::walk(
+  seq_len(ewaa_growth$weights$size()),
+  \(i) ewaa_growth$weights$set(
+    i - 1,
+    om_input[["W.mt"]][((i - 1) %% om_input[["nages"]]) + 1]
   )
-  obj <- TMB::MakeADFun(
-    data = list(), parameters, DLL = "FIMS",
-    silent = TRUE, map = map, random = "re"
-  )
+)
+
+maturity <- methods::new(LogisticMaturity)
+maturity$inflection_point[1]$value <- om_input[["A50.mat"]]
+maturity$inflection_point[1]$estimation_type$set("constant")
+maturity$slope[1]$value <- om_input[["slope.mat"]]
+maturity$slope[1]$estimation_type$set("constant")
 ```
-## Fit the model to data using nlminb.
 
-```r
-  # Optimization with nlminb
-  opt <- NULL
-  if (estimation_mode == TRUE) {
-    opt <- stats::nlminb(obj[["par"]], obj[["fn"]], obj[["gr"]],
-      control = list(eval.max = 10000, iter.max = 10000, trace = 0)
-    )
-   
-    FIMS::set_fixed(opt$par)
-    fims_finalized <- caa$get_output()
+## Define two population modules
 
-    sdr <- TMB::sdreport(obj)
-    sdr_report <- summary(sdr, "report")
-    sdr_fixed <- summary(sdr, "fixed")
-    sdr_random <- summary(sdr, "random")
-  } else {
-    sdr <- list()
-    sdr_report <- list()
-    sdr_fixed <- matrix(obj[["env"]]$parList()[["p"]], ncol = 1, dimnames = list(NULL, "Estimate"))
-    sdr_random <- matrix(obj[["env"]]$parList()[["re"]], ncol = 1, dimnames = list(NULL, "Estimate"))
+The helper below keeps the population setup consistent and avoids duplicating the
+same block of code for each population. Each population receives its own
+`Population` object but references the same biological and fleet modules.
+
+```{r populations}
+make_population <- function() {
+  population <- methods::new(Population)
+
+  population$log_M$resize(om_input[["nyr"]] * om_input[["nages"]])
+  for (i in seq_len(om_input[["nyr"]] * om_input[["nages"]])) {
+    population$log_M[i]$value <- log(om_input[["M.age"]][1])
   }
-  row.names(sdr_fixed) <- names(FIMS:::get_parameter_names(sdr_fixed[, 1]))
-  row.names(sdr_random) <- names(FIMS:::get_random_names(sdr_random[, 1]))
+  population$log_M$set_all_estimable(FALSE)
 
-  # Call report using MLE parameter values, or
-  # the input values if optimization is skipped
-  report <- obj[["report"]](obj[["env"]][["last.par.best"]])
+  population$log_init_naa$resize(om_input[["nages"]])
+  for (i in seq_len(om_input[["nages"]])) {
+    population$log_init_naa[i]$value <- log(om_output[["N.age"]][1, i])
+  }
+  population$log_init_naa$set_all_estimable(TRUE)
 
+  population$n_ages$set(om_input[["nages"]])
+  population$ages$resize(om_input[["nages"]])
+  purrr::walk(
+    seq_along(om_input[["ages"]]),
+    \(i) population$ages$set(i - 1, om_input[["ages"]][i])
+  )
 
+  population$n_fleets$set(sum(om_input[["fleet_num"]], om_input[["survey_num"]]))
+  population$n_years$set(om_input[["nyr"]])
 
-  clear()
-  print(obj$gr())
-  print(opt)
-    
+  population$SetRecruitmentID(recruitment$get_id())
+  population$SetGrowthID(ewaa_growth$get_id())
+  population$SetMaturityID(maturity$get_id())
+  population$AddFleet(fishing_fleet$get_id())
+  population$AddFleet(survey_fleet$get_id())
+
+  population
+}
+
+population1 <- make_population()
+population2 <- make_population()
 ```
- 
+
+## Create and fit the catch-at-age model
+
+```{r fit-model}
+caa <- methods::new(CatchAtAge)
+caa$AddPopulation(population1$get_id())
+caa$AddPopulation(population2$get_id())
+
+CreateTMBModel()
+
+parameters <- list(
+  p = get_fixed(),
+  re = get_random()
+)
+
+obj <- TMB::MakeADFun(
+  data = list(),
+  parameters = parameters,
+  DLL = "FIMS",
+  silent = TRUE,
+  map = map,
+  random = "re"
+)
+
+if (estimation_mode) {
+  opt <- stats::nlminb(
+    obj[["par"]],
+    obj[["fn"]],
+    obj[["gr"]],
+    control = list(eval.max = 10000, iter.max = 10000, trace = 0)
+  )
+
+  FIMS::set_fixed(opt$par)
+  fims_finalized <- caa$get_output()
+
+  sdr <- TMB::sdreport(obj)
+  sdr_report <- summary(sdr, "report")
+  sdr_fixed <- summary(sdr, "fixed")
+  sdr_random <- summary(sdr, "random")
+} else {
+  opt <- NULL
+  sdr <- list()
+  sdr_report <- list()
+  sdr_fixed <- matrix(
+    obj[["env"]]$parList()[["p"]],
+    ncol = 1,
+    dimnames = list(NULL, "Estimate")
+  )
+  sdr_random <- matrix(
+    obj[["env"]]$parList()[["re"]],
+    ncol = 1,
+    dimnames = list(NULL, "Estimate")
+  )
+}
+
+row.names(sdr_fixed) <- names(FIMS:::get_parameter_names(sdr_fixed[, 1]))
+row.names(sdr_random) <- names(FIMS:::get_random_names(sdr_random[, 1]))
+
+report <- obj[["report"]](obj[["env"]][["last.par.best"]])
+```
+
+## Inspect results
+
+```{r inspect-results}
+# Gradient at the final parameter values. Values near zero indicate that the
+# optimizer has likely reached a local optimum.
+obj$gr()
+
+# Optimizer diagnostics and convergence code.
+opt
+
+# Reported quantities from the model.
+head(sdr_report)
+```
+
+## Clean up
+
+```{r cleanup}
+clear()
+```
+
+## Notes for extending this example
+
+This example demonstrates the mechanics of adding more than one population to a
+single catch-at-age model. Extensions may include:
+
+- population-specific recruitment modules,
+- population-specific growth or maturity parameters,
+- separate fleets or surveys for each population,
+- movement between populations or areas, and
+- population-specific likelihood components.
+
+When adapting this example, check whether a module should be shared across
+populations or instantiated separately. Sharing a module means the populations use
+the same registered object and therefore the same parameterization.
