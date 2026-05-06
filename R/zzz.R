@@ -28,8 +28,6 @@
 .onLoad <- function(libname, pkgname) {
   # library.dynam(pkgname, pkgname, libname)
   Rcpp::loadModule(module = "fims", what = TRUE)
-  .Call("fims_post_load_init_tmb")
-  
 }
 
 .onUnload <- function(libpath) {

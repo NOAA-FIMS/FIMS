@@ -22,7 +22,6 @@
 // issue
 #include <math.h>
 
-// #include <TMB.hpp>
 #include "TMB/TMB.h"
 
 
