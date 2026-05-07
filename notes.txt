@@ -1,0 +1,54 @@
+# Plan for DSEM vignette
+### 1. Introduction:
+
+The vignette must start with a conceptual explanation of DSEM:
+*   **The Concept**: Explain DSEM as a "flowchart of cause-and-effect".
+*   **The Advantage**: Contrast DSEM with standard recruitment deviations.
+      While standard models treat every year’s recruitment as an independent 
+      "wobble," DSEM allows the user to say *why* recruitment is changing by 
+      linking it to environmental variables or other species.
+*   **Analogy**: Use the "social network of numbers" analogy—where recruitment 
+      in one year is "friends" with the water temperature of the previous year.
+
+### 2. Setup: Preparing the Data
+FIMS requires data in a long-format `FIMSFrame`. 
+*   **Environmental Covariates**: Show users how to include environmental 
+      indices (like Bottom Temperature or Sea Ice) in their initial data frame.
+*   **Initialization**: Remind users to call `clear()` at the start of their 
+      script to ensure a clean C++ memory slate.
+
+### 3. The Grammar: Writing the SEM String
+Teach the "arrow-and-lag" notation used to build the **Reticular Action Model (RAM)**.
+*   **Single-headed arrows (`->`)**: Define direct cause-and-effect (e.g., `Sea_Ice -> Recruitment`).
+*   **Double-headed arrows (`<->`)**: Define variance or "noise" (e.g., `Recruitment <-> Recruitment`).
+*   **The Lag**: Explain that a lag of 0 is "happening now," while a lag of 1 
+      means "what happened last year affects this year".
+*   **Example String**: 
+    ```r
+    # Temperature this year (lag 0) affects recruitment next year (lag 1)
+    my_sem <- "Temp -> recdevs1, 1, temp_effect, 0"
+    ```
+
+### 4. Configuration: Plugging DSEM into FIMS
+Following the standard R wrapper workflow, show users how to tell FIMS to use DSEM for recruitment.
+*   **`create_default_configurations()`**: Demonstrate modifying the recruitment `module_type` to "DSEM" instead of the default "BevertonHolt".
+*   **Assigning the SEM**: Show how to pass the `my_sem` string into the configuration object.
+
+### 5. Parameters: Managing Path Coefficients
+Explain how the `sem` string automatically generates new parameters in the FIMS parameter tibble.
+*   **`create_default_parameters()`**: Show that FIMS now expects a value for `temp_effect` (from the example string above).
+*   **Updating Values**: Demonstrate using `dplyr::rows_update()` to change starting guesses or to switch a path from "estimated" to "fixed".
+
+### 6. Fitting and Interpreting Results
+The final steps for running the model and viewing the output.
+*   **Running the Model**: Use `initialize_fims()` and `fit_fims(optimize = TRUE)`.
+*   **Viewing the Path Table**: Introduce the `summary()` method for DSEM-linked models, which produces a table of estimated "path coefficients" (the strength of the arrows) along with p-values to show which environmental effects were statistically significant.
+*   **Visualizing**: Use `{stockplotr}` or base FIMS plot methods to compare a model *with* environmental links to a standard model *without* them.
+
+### 7. Troubleshooting Tips
+A "Beginner’s Pitfalls" section based on common TMB/DSEM issues:
+*   **Phasing**: Advise users that DSEM models can be sensitive; using `phase = TRUE` helps the model find a good starting point before trying to estimate complex environmental links.
+*   **Naming Mismatches**: Remind users that the names in their `sem` string must match the column names in their `env_data` exactly.
+*   **Singularities**: Explain that if they draw too many arrows without enough data, the model might "crash" (non-positive definite Hessian), and they should simplify their flowchart.
+
+By following this plan, the vignette will guide a user from a simple biological hypothesis ("Temperature affects recruitment") to a fully fitted, statistically robust state-space model in FIMS.
