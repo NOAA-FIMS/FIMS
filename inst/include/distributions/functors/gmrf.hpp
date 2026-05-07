@@ -36,7 +36,7 @@ struct GMRF : public DensityComponentBase<Type> {
     GMRF() : DensityComponentBase<Type>() {}
 
     /** @brief Destructor. */
-    virtual ~GMRFLPDF() {}
+    virtual ~GMRF() {}
 
     /**
      * @brief Evaluates the GMRF log probability density function.
@@ -62,7 +62,7 @@ struct GMRF : public DensityComponentBase<Type> {
         // Dimension Check
         if (static_cast<size_t>(precision_matrix.rows()) != n_x) {
         throw std::invalid_argument(
-            "GMRFLPDF: Precision matrix dimension mismatch. Got rows: " + 
+            "GMRF: Precision matrix dimension mismatch. Got rows: " + 
             std::to_string(precision_matrix.rows()) + " but expected: " + 
             std::to_string(n_x) + "."
         );
