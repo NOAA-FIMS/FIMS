@@ -223,5 +223,27 @@ test_that("fit_fims() errors when optimization fails to converge", {
     regexp = "Standard error calculations failed convergence checks"
   )
 
+  #' @description Test that fit_fims() returns warning that the model did not converge.
+  data("data_big")
+  # Create parameters
+  initialized_poor_model <- FIMSFrame(data_big) |>
+    create_default_configurations() |>
+    create_default_parameters(data = data_4_model) |>
+    tidyr::unnest(cols = data) |>
+    dplyr::rows_update(
+      tibble::tibble(
+        module_name = "Population",
+        label = c("log_init_naa"),
+        age = 1,
+        value = -Inf
+      ),
+      by = c("module_name", "label", "age")
+    )  |>
+    initialize_fims(data = data_4_model)
+  expect_warning(
+    fit_fims(initialized_poor_model, optimize = TRUE),
+    "should not be used for management"
+  )
+
   clear()
 })

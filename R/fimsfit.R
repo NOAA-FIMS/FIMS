@@ -566,123 +566,49 @@ fit_fims <- function(input,
   ## optimize and compare
   cli::cli_inform(c("v" = "Starting optimization ..."))
   t0 <- Sys.time()
-  opt <- tryCatch(
-    {
-      with(
-        obj,
-        nlminb(
-          start = par,
-          objective = fn,
-          gradient = gr,
-          control = control
-        )
-      )
-    },
-    error = function(e) {
-      cli::cli_rule(left = "nlminb failure detail")
-      cli::cli_warn(c(
-        "x" = "nlminb failed: {e$message}",
-        "i" = "Returning partial results."
-      ))
-      return(NULL)
-    }
-  )
-
-  # Handle soft failures where nlminb returns an object but the objective
-  # value is not finite (e.g., Inf or NaN). In such cases, convergence and
-  # message fields may be unreliable, so treat this as a failure and trigger
-  # the fallback logic by setting opt to NULL.
-  if (!is.null(opt) && !is.finite(opt$objective)) {
-    cli::cli_rule(left = "nlminb failure detail")
-    cli::cli_warn(c(
-      "x" = "Optimization returned a non-finite objective value.",
-      "i" = "Returning partial results."
-    ))
-    opt <- NULL
-  }
+  opt <- try_nlminb(object = obj, control_list = control)
 
   if (is.null(opt)) {
-
-    # Record timing information
-    timing <- c(
-      time_optimization = Sys.time() - t0,
-      time_sdreport = as.difftime(0, units = "secs"),
-      time_total = Sys.time() - t0
-    )
-
-    # Create a fallback optimizer result to maintain consistent structure
-    # convergence = 1L indicates non-convergence (integer as expected by nlminb)
-    opt <- list(
-      par = obj[["par"]],
-      objective = NA_real_,
-      convergence = 1L,
-      message = "Optimization failed"
-    )
-
-    # Construct a valid FIMSFit object using the standard constructor
-    # This ensures all required slots are properly populated
-    fit <- FIMSFit(
+    failed_nlminb_object <- return_failed_nlminb(obj, t0)
+    failed_fit <-   fit <- FIMSFit(
       input = input,
       obj = obj,
-      opt = opt,
+      opt = failed_nlminb_object[["opt"]],
       sdreport = list(),
-      timing = timing
+      timing = failed_nlminb_object[["timing"]]
     )
-
-    return(fit)
+    return(failed_fit)
   }
 
   maxgrad0 <- maxgrad <- max(abs(obj$gr(opt[["par"]])))
   if (number_of_loops > 0) {
     cli::cli_inform(c(
-      "i" = "Restarting optimizer {number_of_loops} times to improve gradient."
+      "i" = "Restarting optimizer {number_of_loops} times{?s} to improve
+            gradient."
     ))
+    # control$trace is reset to zero regardless of verbosity because the
+    # differences in values printed out using control$trace will be
+    # negligible between these different runs and is not worth printing
+    control$trace <- 0
     for (ii in 1:number_of_loops) {
-      # control$trace is reset to zero regardless of verbosity because the
-      # differences in values printed out using control$trace will be
-      # negligible between these different runs and is not worth printing
-      control$trace <- 0
-      # store the previous optimization result
-      prev_opt <- opt
-      opt <- tryCatch(
-        {
-          with(
-            obj,
-            nlminb(
-              start = opt[["par"]],
-              objective = fn,
-              gradient = gr,
-              control = control
-            )
-          )
-        },
-        error = function(e) {
-          cli::cli_warn(c(
-            "!" = "{.fn nlminb} failed during loop {ii}: {e$message}",
-            "i" = "Using previous optimization result."
-          ))
-          return(NULL)
-        }
-      )
-      
-      # Handle soft failure inside loop
-      if (!is.null(opt) && !is.finite(opt$objective)) {
-        cli::cli_rule(left = "nlminb failure detail")
-        cli::cli_warn(c(
-          "x" = "Optimization returned a non-finite objective value.",
-          "i" = "Using previous optimization result."
-        ))
-        opt <- NULL
-      }
-
-      # Handle hard failures where nlminb didn't even return a list
+      opt <- try_nlminb(object = obj, control_list = control)
+      # Handle hard failures where try_nlminb did not return a list
       if (is.null(opt)) {
-        # fallback to last successful result
-        opt <- prev_opt
-        # exit loop early, keep valid opt
-        break
+        cli::cli_inform(message = c(
+          "!" = "{.fn nlminb} failed during loop {ii}.",
+          "i" = "The model successfully converged before this loop.",
+          "i" = "The failed results are being returned."
+        ))
+        failed_nlminb_object <- return_failed_nlminb(obj, t0)
+        failed_fit <-   fit <- FIMSFit(
+          input = input,
+          obj = obj,
+          opt = failed_nlminb_object[["opt"]],
+          sdreport = list(),
+          timing = failed_nlminb_object[["timing"]]
+        )
+        return(failed_fit)
       }
-
       maxgrad <- max(abs(obj[["gr"]](opt[["par"]])))
     }
     div_digit <- cli::cli_div(theme = list(.val = list(digits = 5)))
@@ -750,3 +676,65 @@ methods::setMethod("as.list", signature(x = "FIMSFit"), function(x) {
     SIMPLIFY = FALSE
   )
 })
+
+# Helper function used within fit_fims
+try_nlminb <- function(object, control_list) {
+  optimized <- tryCatch(
+    {
+      with(
+        object,
+        nlminb(
+          start = par,
+          objective = fn,
+          gradient = gr,
+          control = control_list
+        )
+      )
+    },
+    error = function(e) {
+      cli::cli_rule(left = "{.fun stats::nlminb} failure details")
+      NULL
+    }
+  )
+
+  # Handle soft failures where nlminb returns an object but the objective
+  # value is not finite (e.g., Inf or NaN). In such cases, convergence and
+  # message fields may be unreliable, so treat this as a failure and trigger
+  # the fallback logic by setting opt to NULL.
+  if (!is.null(optimized) && !is.finite(optimized[["objective"]])) {
+    cli::cli_warn(c(
+      "x" = "Optimization with {.fun stats::nlminb} returned a non-finite
+      objective value."
+    ))
+    return(NULL)
+  }
+
+  return(optimized)
+}
+
+return_failed_nlminb <- function(object) {
+  failed_nlminb_message <-  c(
+    "x" = "{.fun fit_fims} did not lead to a converged model.",
+    "i" = "The resulting coefficients, probability values, or predictions are
+    not accurate or stable and should not be used for management.",
+    "i" = "Partial results are returned as a {.var FIMSFit} object to
+    facilitate checking that the model is appropriately configured for your
+    data."
+  )
+  cli::cli_warn(message = failed_nlminb_message)
+  # Construct a fallback optimizer result with consistent structure, i.e.,
+  # convergence = 1L indicates non-convergence
+  return(list(
+    timing = c(
+      time_optimization = as.difftime(0, units = "secs"),
+      time_sdreport = as.difftime(0, units = "secs"),
+      time_total = as.difftime(0, units = "secs")
+    ),
+    opt = list(
+      par = object[["par"]],
+      objective = NA_real_,
+      convergence = 1L,
+      message = "Optimization failed"
+    )
+  ))
+}
