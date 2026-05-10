@@ -12,7 +12,7 @@ vignette: >
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-<!-- The section below creates a collpase/expand all button -->
+<!-- The section below creates a collapse/expand all button -->
 <div id="expand-collapse-buttons" style="margin-bottom: 20px;">
   <button onclick="expandAll()" class="btn btn-primary">Expand All</button>
   <button onclick="collapseAll()" class="btn btn-secondary">Collapse All</button>

@@ -18,7 +18,7 @@
     "**/node_modules/**",
     "*.Rproj",
     ".github/workflows/**",
-    "inst/include/interface/rcpp/**",
+    "build/**",
     "man/**"
   ],
   "ignoreRegExpList": [
