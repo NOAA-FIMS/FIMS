@@ -69,7 +69,7 @@ Along the development process it is important to add tests and ensure that the c
 * Implement the suite of Google tests using `cmake --build build` and `ctest --test-dir build`. This can also be done using `setup_and_run_gtest()` in R. If there are failing tests, run `ctest --test-dir --rerun-failed --output-on-failure` to re-run the failed tests verbosely.
 * Format C++ code using clang-format version 18.0.0 with Google style: `clang-format -i --style="{BasedOnStyle: Google, SortIncludes: false}" $(find ./inst/include ./src ./tests/gtest -name "*.hpp" -o -name "*.cpp")`. If you are contributing from a fork, the automated formatting workflow will add a comment to your pull request with detailed instructions on how to format your code locally.
 * Run clang tidy to check C++ for common mistakes using TODO: document how to run clang-tidy.
-* Spell check the package using `spelling::spell_check_files(list.files(c("R", "tests", file.path("inst", "include")), recursive = TRUE, full.names = TRUE, pattern = "\\.cpp|\\.hpp|\\.md|\\.R$|\\.Rmd|\\.txt"), ignore = spelling::get_wordlist())`. Remove all the .md files in the vignettes directory and then spell check the package using `spelling::spell_check_package(pkg = ".", use_wordlist = TRUE)`.
+* Spell check the package using [cspell](https://cspell.org/). Install with `npm install -g cspell` and run `cspell "**/*.{cpp,hpp,h,R,Rmd,md}"` from the package root. Add any project-specific terms to `inst/WORDLIST` (used as the cspell dictionary).
 * Build the roxygen documentation using `devtools::document()`. See the [r-lib](https://roxygen2.r-lib.org/) for all available tags and best practices.
 * Implement the suite of testthat tests using `devtools::test()`.
 * Run `styler::style_pkg()` to style R code.

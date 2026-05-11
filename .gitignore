@@ -91,6 +91,7 @@
 # All log files and json output
 *.log
 *.json
+!cspell.json
 
 #TMB tmp.def file
 src/tmp.def

@@ -7,6 +7,7 @@ tests/gtest
 tests/test_plan
 build
 ^codecov\.yml$
+^cspell\.json$
 .vscode
 .covrignore
 ^data-raw$

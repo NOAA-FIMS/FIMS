@@ -26,7 +26,7 @@ if (isNamespaceLoaded("Rcpp")) {
 library(Rcpp)
 ```
 
-<!-- The section below creates a collpase/expand all button -->
+<!-- The section below creates a collapse/expand all button -->
 <div id="expand-collapse-buttons" style="margin-bottom: 20px;">
   <button onclick="expandAll()" class="btn btn-primary">Expand All</button>
   <button onclick="collapseAll()" class="btn btn-secondary">Collapse All</button>
@@ -369,7 +369,7 @@ The `MyClass` example uses public inheritance, which is what is largely used in 
 
 When setting up inheritance, it's best to establish a base class with behavior shared with all the derived classes. This means that the base class should contain the data members and functions that are common to all derived classes so code is not duplicated and can be reused easily. By centralizing shared functionality in the base class, you make your code more organized, maintainable, and flexible — any changes to shared behavior only need to be made in one place, and all derived classes will automatically inherit those updates. This approach also makes it easier to extend your code in the future by adding new derived classes that benefit from the existing shared features.
 
-<!-- need example of inheritence in FIMS -->
+<!-- need example of inheritance in FIMS -->
 
 To refer to members (variables or functions) of the current object, `this->` is used inside of a class. It is especially useful in derived classes to clarify that you are accessing a member inherited from the base class, or to resolve naming conflicts. For example, if a derived class has a function or variable with the same name as one in the base class, using `this->` makes it clear you mean the member of the current object. In most cases, you can access members without `this->`, but it can help with code clarity and is sometimes required for templates or to avoid ambiguity.
 

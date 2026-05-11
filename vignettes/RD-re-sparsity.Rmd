@@ -51,12 +51,12 @@ Under a random-effects model, the process approach puts the random effect on $\l
 # deviations approach
 nll <- dnorm(z[1], 0, sqrt(sd * sd / (1 - phi * phi)), log = TRUE)
 nll <- nll - sum(dnorm(z[-1], 0, sd, log = TRUE))
-lamda <- numeric(length(z))
-lamda[1] <- 0 + z[1]
+lambda <- numeric(length(z))
+lambda[1] <- 0 + z[1]
 for (i in 2:timeSteps) {
-  lamda[i] <- phi * lamda[i - 1] + z[i]
+  lambda[i] <- phi * lambda[i - 1] + z[i]
 }
-nll <- nll - sum(dnorm(y, lamda, sdo, TRUE))
+nll <- nll - sum(dnorm(y, lambda, sdo, TRUE))
 
 
 # process approach
