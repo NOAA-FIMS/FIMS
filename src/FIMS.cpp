@@ -13,41 +13,53 @@
  *
  * @return Returns a joint negative log likelihood
  */
-template<class Type>
-Type objective_function<Type>::operator()() {
+template <class Type>
+Type objective_function<Type>::operator()()
+{
 
+  PARAMETER_VECTOR(p);
+  PARAMETER_VECTOR(re);
 
-    PARAMETER_VECTOR(p);
-    PARAMETER_VECTOR(re);
+  // code below copied from ModularTMBExample/src/tmb_objective_function.cpp
 
-    // code below copied from ModularTMBExample/src/tmb_objective_function.cpp
-
-    // get the singleton instance for Model Class
-    std::shared_ptr<fims_model::Model<Type>> model =
+  // get the singleton instance for Model Class
+  std::shared_ptr<fims_model::Model<Type>> model =
       fims_model::Model<Type>::GetInstance();
-    // get the singleton instance for Information Class
-    std::shared_ptr<fims_info::Information<Type>> information =
+  // get the singleton instance for Information Class
+  std::shared_ptr<fims_info::Information<Type>> information =
       fims_info::Information<Type>::GetInstance();
 
-    //update the fixed effects parameter values
-    for(size_t i =0; i < information->fixed_effects_parameters.size(); i++){
-        *information->fixed_effects_parameters[i] = p[i];
-    }
-    //update the random effects parameter values
-    for(size_t i =0; i < information->random_effects_parameters.size(); i++){
-        *information->random_effects_parameters[i] = re[i];
-    }
-    model -> of = this;
+  // update the fixed effects parameter values
+  for (size_t i = 0; i < information->fixed_effects_parameters.size(); i++)
+  {
+    *information->fixed_effects_parameters[i] = p[i];
+  }
+  // update the random effects parameter values
+  for (size_t i = 0; i < information->random_effects_parameters.size(); i++)
+  {
+    *information->random_effects_parameters[i] = re[i];
+  }
 
-    Type nll = 0;
-    //evaluate the model objective function value
-    try{
-      nll = model->Evaluate();
-    } catch (const std::exception& e) {
-      Rf_error("Error during model evaluation: %s",  std::string(e.what()).c_str());
-    }
+  // update map variables
+  for (size_t i = 0; i < information->variable_mapped_pairs.size(); i++)
+  {
+    size_t idx1 = information->variable_mapped_pairs[i].first;
+    size_t idx2 = information->variable_mapped_pairs[i].second;
+    information->variable_map[idx1] = information->variable_map[idx2];
+  }
+  model->of = this;
 
-    return nll;
+  Type nll = 0;
+  // evaluate the model objective function value
+  try
+  {
+    nll = model->Evaluate();
+  }
+  catch (const std::exception &e)
+  {
+    Rf_error("Error during model evaluation: %s", std::string(e.what()).c_str());
+  }
 
+  return nll;
 }
 /// @endcond
