@@ -466,10 +466,10 @@ void log_error(std::string log_entry)
   fims::FIMSLog::fims_log->error_message(log_entry, -1, "R_env", ret.c_str());
 }
 
-void map_to(const Parameter &a, const Parameter &b)
+void map_to(const uint32_t &a, const uint32_t &b)
 {
 
-  std::pair<uint32_t, uint32_t> p = std::make_pair(a.id_m, b.id_m);
+  std::pair<uint32_t, uint32_t> p = std::make_pair(a, b);
   fims_info::Information<double>::GetInstance()->variable_mapped_pairs.push_back(p);
 #ifdef TMB_MODEL
   fims_info::Information<TMBAD_FIMS_TYPE>::GetInstance()->variable_mapped_pairs.push_back(p);

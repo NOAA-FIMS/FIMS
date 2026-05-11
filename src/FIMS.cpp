@@ -39,6 +39,7 @@ Type objective_function<Type>::operator()()
   {
     *information->random_effects_parameters[i] = re[i];
   }
+  std::cout << "information->variable_mapped_pairs.size(): " << information->variable_mapped_pairs.size() << std::endl;
 
   // update map variables
   for (size_t i = 0; i < information->variable_mapped_pairs.size(); i++)
@@ -47,6 +48,7 @@ Type objective_function<Type>::operator()()
     size_t idx2 = information->variable_mapped_pairs[i].second;
     information->variable_map[idx1] = information->variable_map[idx2];
   }
+
   model->of = this;
 
   Type nll = 0;
