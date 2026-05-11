@@ -15,7 +15,7 @@
 
 ## IO correctness ----
 test_that("`use_google_benchmark_template()` works with correct inputs", {
-  temp_path <- file.path(tempdir(), "rcmdcheckgooglebenchmarksimple")
+  temp_path <- file.path(tempdir(), "rcmdcheck_google_benchmark_simple")
   benchmark_name <- "FIMSMath_ClassName_FunctionName"
   dir.create(temp_path, showWarnings = FALSE)
   on.exit(unlink(temp_path, recursive = TRUE, force = TRUE), add = TRUE)
@@ -55,7 +55,7 @@ test_that("`use_google_benchmark_template()` works with correct inputs", {
 
 ## Edge handling ----
 test_that("`use_google_benchmark_template()` supports fixture template", {
-  temp_path <- file.path(tempdir(), "rcmdcheckgooglebenchmarkfixture")
+  temp_path <- file.path(tempdir(), "rcmdcheck_google_benchmark_fixture")
   benchmark_name <- "FIMSMath_ClassName_FunctionName"
   dir.create(temp_path, showWarnings = FALSE)
   on.exit(unlink(temp_path, recursive = TRUE, force = TRUE), add = TRUE)
@@ -96,7 +96,7 @@ test_that("`use_google_benchmark_template()` supports fixture template", {
 
 ## Error handling ----
 test_that("`use_google_benchmark_template()` returns correct error messages", {
-  temp_path <- file.path(tempdir(), "rcmdcheckgooglebenchmarknameformat")
+  temp_path <- file.path(tempdir(), "rcmdcheck_google_benchmark_name_format")
   dir.create(temp_path, showWarnings = FALSE)
   on.exit(unlink(temp_path, recursive = TRUE, force = TRUE), add = TRUE)
 
