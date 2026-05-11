@@ -469,16 +469,11 @@ void log_error(std::string log_entry)
 void map_to(const Parameter &a, const Parameter &b)
 {
 
-  std::pair<uint32_t, uint32_t> p = std::make_pair(a.GetId(), b.GetId());
+  std::pair<uint32_t, uint32_t> p = std::make_pair(a.id_m, b.id_m);
   fims_info::Information<double>::GetInstance()->variable_mapped_pairs.push_back(p);
 #ifdef TMB_MODEL
   fims_info::Information<TMBAD_FIMS_TYPE>::GetInstance()->variable_mapped_pairs.push_back(p);
 #endif
-
-#ifdef
-}
-
-fims_info
 }
 
 #endif // FIMS_INTERFACE_RCPP_INTERFACE_HPP
