@@ -319,6 +319,7 @@ This distinction matters because the interface class receives
 A simple R example from the current selectivity tests looks like this:
 
 ``` r
+
 selectivity <- methods::new(LogisticSelectivity)
 selectivity$inflection_point[1]$value <- 10.0
 selectivity$inflection_point[1]$estimation_type$set("random_effects")
@@ -529,6 +530,7 @@ Rcpp::class_<LogisticSelectivityInterface>(
 Export the class so it is visible from R and rebuild the namespace:
 
 ``` r
+
 #' @export LogisticSelectivity
 ```
 
@@ -584,6 +586,7 @@ existing helper rather than add a brand new top-level function.
 `module_type` and `module_name`:
 
 ``` r
+
 module_class_name <- module_input |>
   dplyr::mutate(
     temp_name = paste0(
@@ -618,6 +621,7 @@ That means a new module type typically needs:
 The full user-facing workflow in current `dev` code is:
 
 ``` r
+
 parameters <- data_4_model |>
   create_default_configurations() |>
   create_default_parameters(data = data_4_model)

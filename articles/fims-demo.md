@@ -18,6 +18,7 @@ Calling [`library(FIMS)`](https://github.com/noaa-fims/fims) loads the R
 package, Rcpp functions, and Rcpp modules into the R environment.
 
 ``` r
+
 library(FIMS)
 library(ggplot2)
 library(stockplotr)
@@ -53,6 +54,7 @@ prior to modeling to ensure that the C++ memory from any previous FIMS
 model run is cleared out.
 
 ``` r
+
 # clear memory
 clear()
 ```
@@ -98,6 +100,7 @@ validation checks and returns an object with the `FIMSFrame` class. The
 S4 can be found [here](https://adv-r.hadley.nz/s4.html)).
 
 ``` r
+
 # Bring the package data into your environment
 data("data_big")
 # Prepare the package data for being used in a FIMS model
@@ -121,6 +124,7 @@ accessed using
 [`get_data()`](https://NOAA-FIMS.github.io/FIMS/reference/get_FIMSFrame.md).
 
 ``` r
+
 # Use show() to see what is stored in the FIMSFrame S4 class
 methods::show(data_4_model)
 ```
@@ -157,6 +161,7 @@ methods::show(data_4_model)
     ## [1] 30
 
 ``` r
+
 # Or, look at the structure using str()
 # Increase max.level to see more of the structure
 str(data_4_model, max.level = 1)
@@ -165,6 +170,7 @@ str(data_4_model, max.level = 1)
     ## Formal class 'FIMSFrame' [package "FIMS"] with 9 slots
 
 ``` r
+
 # Use dplyr to subset the data for just the landings
 get_data(data_4_model) |>
   dplyr::filter(type == "landings")
@@ -196,6 +202,7 @@ types (e.g., landings, length composition, age composition, etc.) in the
 `data_4_model` object by fleet.
 
 ``` r
+
 plot(data_4_model)
 ```
 
@@ -223,6 +230,7 @@ and what data types exist. For example, if you have three fleets, then
 will set up three logistic selectivity modules.
 
 ``` r
+
 # Create default configurations based on the data
 default_configurations <- create_default_configurations(data = data_4_model)
 
@@ -243,6 +251,7 @@ default_configurations
 ```
 
 ``` r
+
 # The output is a nested tibble, with details in the `data` column.
 default_configurations_unnested <- default_configurations |>
   tidyr::unnest(cols = data)
@@ -276,6 +285,7 @@ modify the default configurations as needed. For example, logistic
 selectivity for survey1 can be changed to double logistic selectivity.
 
 ``` r
+
 # Update the module_type for survey1's selectivity
 updated_configurations <- default_configurations_unnested |>
   dplyr::rows_update(
@@ -309,6 +319,7 @@ updated_configurations
 ```
 
 ``` r
+
 # Nest updated_configurations
 updated_configurations_nested <- updated_configurations |>
   tidyr::nest(.by = c(model_family, module_name, fleet_name))
@@ -343,6 +354,7 @@ growth, and maturity modules can be created. For example,
 - “Logistic” for Maturity module.
 
 ``` r
+
 # Create default parameters based on default_configurations and data
 default_parameters <- create_default_parameters(
   configurations = default_configurations,
@@ -369,6 +381,7 @@ default_parameters
 ```
 
 ``` r
+
 # Unnest the default_parameters to see the detailed parameters
 default_parameters_unnested <- tidyr::unnest(default_parameters, cols = data)
 
@@ -404,6 +417,7 @@ mortality, selectivity, maturity, and population parameters from their
 default values.
 
 ``` r
+
 parameters_4_model <- default_parameters |>
   tidyr::unnest(cols = data) |>
   # Update log_Fmort initial values for Fleet1
@@ -517,6 +531,7 @@ of the class `FIMSFit` will be returned.
 ### Example
 
 ``` r
+
 # Run the model without optimization to help ensure a viable model
 test_fit <- parameters_4_model |>
   initialize_fims(data = data_4_model) |>
@@ -530,17 +545,17 @@ fit <- parameters_4_model |>
 
     ## ✔ Starting optimization ...
     ## ℹ Restarting optimizer 3 times to improve gradient.
-    ## ℹ Maximum gradient went from 0.00941 to 0.00101 after 3 steps.
+    ## ℹ Maximum gradient went from 0.00539 to 0.00046 after 3 steps.
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
     ## ℹ FIMS model version: 0.9.3
-    ## ℹ Total run time was 5.63322 seconds
+    ## ℹ Total run time was 4.38177 seconds
     ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
-    ## ℹ Maximum gradient= 0.00101
+    ## ℹ Maximum gradient= 0.00046
     ## ℹ Negative log likelihood (NLL):
     ## • Marginal NLL= 3231.25994
     ## • Total NLL= 3164.83637
-    ## ℹ Terminal SB= 1791.58311
+    ## ℹ Terminal SB= 1791.58146
 
 ### Logging system
 
@@ -564,13 +579,14 @@ documentation](https://noaa-fims.github.io/FIMS/doxygen/classfims_1_1FIMSLog.htm
 for more information.
 
 ``` r
+
 log_json_string <- get_log()
 log_data_frame <- jsonlite::fromJSON(log_json_string)
 log_data_frame[1, ]
 ```
 
     ##                  timestamp   level
-    ## 1 Tue Apr 28 15:39:22 2026 warning
+    ## 1 Tue May 12 22:17:02 2026 warning
     ##                                                                   message id
     ## 1 The log_f_multiplier vector is not of size n_years. Filling with zeros.  0
     ##     user                                    wd
@@ -583,12 +599,14 @@ log_data_frame[1, ]
     ## 1  337
 
 ``` r
+
 dim(log_data_frame)
 ```
 
     ## [1] 127   9
 
 ``` r
+
 # Print how many log entries there are of each type
 dplyr::count(log_data_frame, level)
 ```
@@ -598,13 +616,14 @@ dplyr::count(log_data_frame, level)
     ## 2 warning   2
 
 ``` r
+
 # Subset for just the warnings
 log_data_frame |> dplyr::filter(level == "warning")
 ```
 
     ##                  timestamp   level
-    ## 1 Tue Apr 28 15:39:22 2026 warning
-    ## 2 Tue Apr 28 15:39:22 2026 warning
+    ## 1 Tue May 12 22:17:02 2026 warning
+    ## 2 Tue May 12 22:17:02 2026 warning
     ##                                                                   message id
     ## 1 The log_f_multiplier vector is not of size n_years. Filling with zeros.  0
     ## 2              Setting spawning_biomass_ratio vector to size n_years + 1.  1
@@ -622,6 +641,7 @@ log_data_frame |> dplyr::filter(level == "warning")
     ## 2  353
 
 ``` r
+
 clear()
 ```
 
@@ -629,6 +649,7 @@ The results can be plotted with either base R, {ggplot2}, or
 {stockplotr}. Where, we recommend using {stockplotr} where possible.
 
 ``` r
+
 # Temporary manipulation to the returned estimates to get them
 # to work with stockplotr
 output <- get_estimates(fit) |>
@@ -640,6 +661,7 @@ output <- get_estimates(fit) |>
 ```
 
 ``` r
+
 stockplotr::plot_spawning_biomass(
   dplyr::filter(output, label == "spawning_biomass")
 ) +
@@ -650,6 +672,7 @@ stockplotr::plot_spawning_biomass(
 biomass.](fims-demo_files/figure-html/fit-plot-spawning-biomass-1.png)
 
 ``` r
+
 stockplotr::plot_timeseries(
   stockplotr::filter_data(
     output |> dplyr::filter(module_id == 1),
@@ -667,6 +690,7 @@ stockplotr::plot_timeseries(
 mortality.](fims-demo_files/figure-html/fit-plot-log-fishing-mortality-1.png)
 
 ``` r
+
 stockplotr::plot_timeseries(
   stockplotr::filter_data(
     output |> dplyr::filter(module_id == 2),
@@ -692,6 +716,7 @@ stockplotr::plot_timeseries(
 values.](fims-demo_files/figure-html/fit-plot-index-of-abundance-1.png)
 
 ``` r
+
 stockplotr::plot_timeseries(
   stockplotr::filter_data(
     output |> dplyr::filter(module_id == 1),
@@ -722,6 +747,7 @@ the logistic curve for the survey to see if the terminal estimate
 changes due to changes to the initial value.
 
 ``` r
+
 parameters_high_slope <- parameters_4_model |>
   # Update the slope value of the logistic selectivity for the survey
   dplyr::mutate(
@@ -752,19 +778,20 @@ high_slope_fit <- parameters_high_slope |>
 
     ## ✔ Starting optimization ...
     ## ℹ Restarting optimizer 3 times to improve gradient.
-    ## ℹ Maximum gradient went from 0.00616 to 0.00034 after 3 steps.
+    ## ℹ Maximum gradient went from 0.00458 to 0.00035 after 3 steps.
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
     ## ℹ FIMS model version: 0.9.3
-    ## ℹ Total run time was 5.4551 seconds
+    ## ℹ Total run time was 4.50714 seconds
     ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
-    ## ℹ Maximum gradient= 0.00034
+    ## ℹ Maximum gradient= 0.00035
     ## ℹ Negative log likelihood (NLL):
     ## • Marginal NLL= 3231.25994
     ## • Total NLL= 3164.83637
-    ## ℹ Terminal SB= 1791.58318
+    ## ℹ Terminal SB= 1791.58533
 
 ``` r
+
 clear()
 
 low_slope_fit <- parameters_low_slope |>
@@ -774,19 +801,20 @@ low_slope_fit <- parameters_low_slope |>
 
     ## ✔ Starting optimization ...
     ## ℹ Restarting optimizer 3 times to improve gradient.
-    ## ℹ Maximum gradient went from 0.00308 to 4e-04 after 3 steps.
+    ## ℹ Maximum gradient went from 0.00549 to 5e-04 after 3 steps.
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
     ## ℹ FIMS model version: 0.9.3
-    ## ℹ Total run time was 5.6145 seconds
+    ## ℹ Total run time was 4.58613 seconds
     ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
-    ## ℹ Maximum gradient= 4e-04
+    ## ℹ Maximum gradient= 5e-04
     ## ℹ Negative log likelihood (NLL):
     ## • Marginal NLL= 3231.25994
-    ## • Total NLL= 3164.83637
-    ## ℹ Terminal SB= 1791.58128
+    ## • Total NLL= 3164.83638
+    ## ℹ Terminal SB= 1791.58716
 
 ``` r
+
 clear()
 ```
 
@@ -796,6 +824,7 @@ The same model can be fit to just the age data, removing the
 length-composition configurations.
 
 ``` r
+
 # Create default parameters, update with modified values, initialize FIMS,
 # and fit the model
 age_only_fit <- parameters_4_model |>
@@ -810,15 +839,16 @@ age_only_fit <- parameters_4_model |>
     ## Matching, by = "module_type"
     ## ✔ Starting optimization ...
     ## ℹ Restarting optimizer 3 times to improve gradient.
-    ## ℹ Maximum gradient went from 0.00361 to 0.00038 after 3 steps.
+    ## ℹ Maximum gradient went from 0.00347 to 0.00018 after 3 steps.
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
-    ## ℹ FIMS model version: 0.9.3 ℹ Total run time was 1.09781 minutes ℹ Number of
+    ## ℹ FIMS model version: 0.9.3 ℹ Total run time was 51.40575 seconds ℹ Number of
     ## parameters: fixed_effects=49, random_effects=29, and total=78 ℹ Maximum
-    ## gradient= 0.00038 ℹ Negative log likelihood (NLL): • Marginal NLL= 1627.76704 •
-    ## Total NLL= 1564.0853 ℹ Terminal SB= 1740.95207
+    ## gradient= 0.00018 ℹ Negative log likelihood (NLL): • Marginal NLL= 1627.76704 •
+    ## Total NLL= 1564.08529 ℹ Terminal SB= 1740.95344
 
 ``` r
+
 clear()
 ```
 
@@ -828,6 +858,7 @@ The same model can be fit to just the length data, removing the
 age-composition configurations.
 
 ``` r
+
 # Create default parameters, update with modified values, initialize FIMS,
 # and fit the model
 length_only_fit <- parameters_4_model |>
@@ -842,19 +873,21 @@ length_only_fit <- parameters_4_model |>
     ## Matching, by = "module_type"
     ## ✔ Starting optimization ...
     ## ℹ Restarting optimizer 3 times to improve gradient.
-    ## ℹ Maximum gradient went from 0.00715 to 0.00034 after 3 steps.
+    ## ℹ Maximum gradient went from 0.01595 to 0.00023 after 3 steps.
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
-    ## ℹ FIMS model version: 0.9.3 ℹ Total run time was 5.25669 seconds ℹ Number of
+    ## ℹ FIMS model version: 0.9.3 ℹ Total run time was 4.3564 seconds ℹ Number of
     ## parameters: fixed_effects=49, random_effects=29, and total=78 ℹ Maximum
-    ## gradient= 0.00034 ℹ Negative log likelihood (NLL): • Marginal NLL= 1568.32685 •
-    ## Total NLL= 1518.62644 ℹ Terminal SB= 1722.35744
+    ## gradient= 0.00023 ℹ Negative log likelihood (NLL): • Marginal NLL= 1568.32685 •
+    ## Total NLL= 1518.62644 ℹ Terminal SB= 1722.35742
 
 ``` r
+
 clear()
 ```
 
 ``` r
+
 stockplotr::plot_biomass(
   list(
     "age" = get_estimates(age_only_fit) |>

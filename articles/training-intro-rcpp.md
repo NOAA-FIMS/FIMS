@@ -50,6 +50,7 @@ functions:
 **Example: Inline C++ within R**
 
 ``` r
+
 library(Rcpp)
 
 # Compile inline C++ using R
@@ -63,15 +64,17 @@ add
 ```
 
     ## function (x, y, z) 
-    ## .Call(<pointer: 0x7f5a44b49410>, x, y, z)
+    ## .Call(<pointer: 0x7f2ade87a410>, x, y, z)
 
 ``` r
+
 add(1, 2, 3)
 ```
 
     ## [1] 6
 
 ``` r
+
 # Compile and execute C++ code
 # Find the square root of 16
 Rcpp::evalCpp("std::sqrt(16.0)")
@@ -80,6 +83,7 @@ Rcpp::evalCpp("std::sqrt(16.0)")
     ## [1] 4
 
 ``` r
+
 # Return the largest representable double value
 Rcpp::evalCpp("std::numeric_limits<double>::max()")
 ```
@@ -142,6 +146,7 @@ double meanC(NumericVector x) {
 **Example: Sourcing C++ Code in R**
 
 ``` r
+
 # code can be saved in .cpp file and compiled
 # Rcpp::sourceCpp("mean.cpp")
 # meanC(1:10)
@@ -178,6 +183,7 @@ Compiled C++ is often much faster than R. Below we compare our compiled
 **Example: Benchmarking R vs C++**
 
 ``` r
+
 library(microbenchmark)
 x <- runif(1e5)
 microbenchmark(
@@ -187,9 +193,9 @@ microbenchmark(
 ```
 
     ## Unit: microseconds
-    ##      expr     min      lq     mean  median       uq       max neval
-    ##   mean(x) 422.098 431.841 437.8122 436.214 442.0055   523.277   100
-    ##  meanC(x) 371.874 372.415 479.5506 372.971 382.5240 10701.069   100
+    ##      expr     min       lq     mean   median       uq      max neval
+    ##   mean(x) 363.030 382.4885 386.2799 383.2300 390.9460  445.292   100
+    ##  meanC(x) 325.604 326.0750 413.7005 326.7055 333.9815 8793.458   100
 
 ### C++ in FIMS
 
@@ -320,6 +326,7 @@ interact with C++ objects from R in an object-oriented way.
 **Example: Rcpp Vectors and Methods**
 
 ``` r
+
 src <-
   "#include <Rcpp.h>
   using namespace Rcpp;
@@ -434,6 +441,7 @@ After compiling with
 can use this class from R:
 
 ``` r
+
 # Create a new Uniform object
 u <- new(Uniform, 0, 10)
 

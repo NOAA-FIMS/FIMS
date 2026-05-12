@@ -33,6 +33,7 @@ The log is initiated when
 is run, where the first entry is always the call to this function, e.g.,
 
 ``` r
+
 empty_model <- CreateTMBModel()
 log_string <- get_log()
 log_data_frame <- jsonlite::fromJSON(log_string)
@@ -40,10 +41,10 @@ log_data_frame
 ```
 
     ##                  timestamp level
-    ## 1 Tue Apr 28 16:03:06 2026  info
-    ## 2 Tue Apr 28 16:03:06 2026  info
-    ## 3 Tue Apr 28 16:03:06 2026  info
-    ## 4 Tue Apr 28 16:03:06 2026  info
+    ## 1 Tue May 12 22:36:27 2026  info
+    ## 2 Tue May 12 22:36:27 2026  info
+    ## 3 Tue May 12 22:36:27 2026  info
+    ## 4 Tue May 12 22:36:27 2026  info
     ##                                                  message id   user
     ## 1 Creating model and checking for required components...  0 runner
     ## 2                            Model successfully created.  1 runner
@@ -71,6 +72,7 @@ log_data_frame
     ## 4  843
 
 ``` r
+
 clear()
 ```
 
@@ -100,14 +102,15 @@ Further implementations may rectify this issue. Below are examples of
 adding log entries from R.
 
 ``` r
+
 log_info("info entry from R script")
 log_warning("warning entry from R script")
 jsonlite::fromJSON(get_log())
 ```
 
     ##                  timestamp   level                     message id   user
-    ## 1 Tue Apr 28 16:03:06 2026    info    info entry from R script  0 runner
-    ## 2 Tue Apr 28 16:03:06 2026 warning warning entry from R script  1 runner
+    ## 1 Tue May 12 22:36:27 2026    info    info entry from R script  0 runner
+    ## 2 Tue May 12 22:36:27 2026 warning warning entry from R script  1 runner
     ##                                      wd
     ## 1 /home/runner/work/FIMS/FIMS/vignettes
     ## 2 /home/runner/work/FIMS/FIMS/vignettes
@@ -116,6 +119,7 @@ jsonlite::fromJSON(get_log())
     ## 2 /home/runner/work/FIMS/FIMS/vignettes/R_env R_script_entry   -1
 
 ``` r
+
 clear()
 ```
 
@@ -130,6 +134,7 @@ to the screen so the following code chunk is not rendered here but you
 can on your own computer.
 
 ``` r
+
 error <- log_error("error entry from R script")
 jsonlite::fromJSON(get_log_errors())
 ```
@@ -143,6 +148,7 @@ users call [`methods::show()`](https://rdrr.io/r/methods/show.html) on
 them.
 
 ``` r
+
 ls("package:FIMS") |>
   grep(pattern = "_log|log_", value = TRUE) |>
   cli::cli_bullets()
@@ -165,11 +171,12 @@ ls("package:FIMS") |>
     ## set_log_throw_on_error
 
 ``` r
+
 # Get documentation for log_error
 methods::show(log_error)
 ```
 
-    ## internal C++ function <0x55a8bf394e20>
+    ## internal C++ function <0x55aef7285e90>
     ##     docstring : See https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html.
     ##     signature : void log_error(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >)
 
@@ -179,6 +186,7 @@ to TRUE, FIMS will abort immediately when an error occurs and if
 before FIMS terminates the session.
 
 ``` r
+
 set_log_throw_on_error(TRUE)
 log_error("throwing now!")
 ```

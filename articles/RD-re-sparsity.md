@@ -5,16 +5,16 @@
 Many stock assessment models in the U.S.A. have historically used a
 hierarchical approach when estimating time-varying process variability
 in model parameters such as recruitment. In this approach a mean
-parameter value $\widetilde{P}$, and annual deviation values,
-$Pdev_{y}$, are estimated and combined to produce annual parameter
-estimates $P_{y}$ with deviations often being additive or multiplicative
-of the mean. Models utilizing this approach have predominantly
-implemented deviations as estimated fixed effects. In several tools,
-such as Stock Synthesis, sum to zero constraints have been applied to
-ensure that Hessian matrices are positive definite. A fixed-effect
-vector of deviation parameters does not require second order partial
-derivatives to be estimated until model optimization is complete and
-variance is estimated.
+parameter value $`\tilde{P}`$, and annual deviation values,
+$`Pdev_{y}`$, are estimated and combined to produce annual parameter
+estimates $`P_{y}`$ with deviations often being additive or
+multiplicative of the mean. Models utilizing this approach have
+predominantly implemented deviations as estimated fixed effects. In
+several tools, such as Stock Synthesis, sum to zero constraints have
+been applied to ensure that Hessian matrices are positive definite. A
+fixed-effect vector of deviation parameters does not require second
+order partial derivatives to be estimated until model optimization is
+complete and variance is estimated.
 
 Following statistical best practices, FIMS incorporates the use of
 random effects to model process variability in time-varying parameters.
@@ -23,11 +23,11 @@ optimization in TMB using the Laplace approximation. This integration
 requires the calculation of second-order partial derivatives and
 inversion of the Hessian at each optimization step. While simple to
 interpret and implement, the deviations approach results in a dense
-covariance matrix of correlations between the mean $\widetilde{P}$ and
-each annual deviation $Pdev_{y}$ estimate. Due to this difference, using
-the deviations approach in a random effects model has a much larger
-computational penalty than when only fixed effects were considered in
-historic modeling platforms.
+covariance matrix of correlations between the mean $`\tilde{P}`$ and
+each annual deviation $`Pdev_{y}`$ estimate. Due to this difference,
+using the deviations approach in a random effects model has a much
+larger computational penalty than when only fixed effects were
+considered in historic modeling platforms.
 
 To quantify the magnitude of this penalty we investigate the performance
 and optimization time of a simple random effects model under equivalent
@@ -54,35 +54,41 @@ assessment models.
 ### Time-series model
 
 We evaluated a simple time-series model where the latent state,
-$\lambda_{t}$, at time $t$ follows an AR1 process defined as:
-$\lambda_{t} = \phi*\lambda_{t - 1} + \epsilon_{t}$, using two
+$`\lambda_{t}`$, at time $`t`$ follows an AR1 process defined as:
+$`\lambda_{t} = \phi * \lambda_{t-1} + \epsilon_{t}`$, using two
 parameterizations:
 
 1.  process approach:
-    $\lambda_{t} \sim N\left( \phi*\lambda_{t - 1},\sigma_{\lambda}^{2} \right)$
+    $`\lambda_{t} \sim N(\phi * \lambda_{t-1}, \sigma^{2}_{\lambda})`$
 2.  deviations approach:
-    $\lambda_{t} = \phi*\lambda_{t - 1} + \sigma*z_{t},\ \ z_{t} \sim N(0,1)$
+    $`\lambda_{t} = \phi * \lambda_{t-1} + \sigma * z_{t},~~ z_{t} \sim N(0,1)`$
 
-- $\phi$ is the autoregressive coefficient, transformed as:
-  $$\phi = 2*\text{plogis}\left( \text{phiTrans} \right) - 1$$ which
-  ensures $\phi$ remains in the range (-1,1).
+- $`\phi`$ is the autoregressive coefficient, transformed as:
+  ``` math
+  \phi=2*\text{plogis}(\text{phiTrans})-1
+  ```
+  which ensures $`\phi`$ remains in the range (-1,1).
 
-- $\sigma$ is the process standard deviation.
+- $`\sigma`$ is the process standard deviation.
 
 - The stationary variance of the process is:
-  $$\text{Var}(\lambda) = \frac{\sigma^{2}}{\left( 1 - \phi^{2} \right)}$$
+  ``` math
+  \text{Var}(\lambda)=\frac{\sigma^2}{(1-\phi^2)}
+  ```
 
 Under a random-effects model, the process approach puts the random
-effect on $\lambda_{t}$, while in the deviations approach, the random
-effect is applied to $z_{t}$. Though we use the process and deviations
+effect on $`\lambda_{t}`$, while in the deviations approach, the random
+effect is applied to $`z_{t}`$. Though we use the process and deviations
 terminology to contrast these approaches, the statistical literature
 often refers to these as centered and non-centered parameterizations,
 respectively (Stan User’s Guide 2025; Reparameterization and Change of
 Variables). The joint negative log likelihood for this process is
 computed in state-space form where the process of the current time step
-is dependent on the previous one and observations, $y$ are *iid* Normal:
+is dependent on the previous one and observations, $`y`$ are *iid*
+Normal:
 
 ``` r
+
 # deviations approach
 nll <- dnorm(z[1], 0, sqrt(sd * sd / (1 - phi * phi)), log = TRUE)
 nll <- nll - sum(dnorm(z[-1], 0, sd, log = TRUE))
@@ -112,12 +118,12 @@ requires up to the second-order partial derivatives of the joint
 negative log likelihood with respect to the random effects to be
 evaluated at each inner optimization step. The computation cost of the
 Laplace approximation is primarily determined by the cost of inverting
-the Hessian, which is $O\left( N^{3} \right)$ for N-dimensional
-parameter space. As the number of random effects increases, the
-computational cost of inverting the dense Hessian from the deviations
-approach increases rapidly. Sparsity reduces this computational cost to
-$O(N)$ for an AR1 model, resulting in a slower increase in computational
-cost with increasing $N$.
+the Hessian, which is $`O(N^3)`$ for N-dimensional parameter space. As
+the number of random effects increases, the computational cost of
+inverting the dense Hessian from the deviations approach increases
+rapidly. Sparsity reduces this computational cost to $`O(N)`$ for an AR1
+model, resulting in a slower increase in computational cost with
+increasing $`N`$.
 
 ![Six hundred by six hundred hessian matrices, showing a dense Hessian
 matrix for an AR1 model under the deviations parameterization and a
@@ -140,6 +146,7 @@ recruitment, numbers at age, and fishing mortality as AR1 processes.
 The case study is built off of an existing SAM model data set, `fit`.
 
 ``` r
+
 library(RTMB)
 library(stockassessment)
 
@@ -150,26 +157,30 @@ str(fit$data)
 
 We modified the model to structure recruitment under both the deviation
 and process approaches. The main structure for recruitment for years 2
-and greater was applied to the numbers-at-age parameter, $N_{y,a = 1}$
-for year $y$ and for age 1 with mean recruitment $\widehat{r}$, written
+and greater was applied to the numbers-at-age parameter, $`N_{y, a=1}`$
+for year $`y`$ and for age 1 with mean recruitment $`\hat{r}`$, written
 as the following:
 
 **deviations approach**:
 
-$$\begin{aligned}
-z_{1} & {\sim Normal(0,\sqrt{\sigma_{r}^{2}/\left( 1 - \phi^{2} \right)})} \\
-z_{2:n} & {\sim Normal\left( 0,\sigma_{r} \right)} \\
-{dev_{1}} & {= z_{1}} \\
-{dev_{y}} & {= \phi dev_{y - 1} + z_{y}} \\
-{\log\left( N_{y,1} \right)} & {= \bar{r} + dev_{y}}
-\end{aligned}$$
+``` math
+\begin{aligned}
+z_{1} &\sim Normal\big(0, \sqrt{\sigma_{r}^{2}/(1 - \phi^2)}\big)\\
+z_{2:n} &\sim Normal(0, \sigma_{r})\\
+dev_{1} &= z_{1}\\
+dev_{y} &= \phi dev_{y-1} + z_{y}\\
+\log(N_{y,1}) &= \bar{r} + dev_{y}
+\end{aligned}
+```
 
 **process approach**:
 
-$$\begin{aligned}
-{\log\left( \widehat{N_{y,1}} \right)} & {= \log\left( N_{y - 1,1} \right)} \\
-{\log\left( N_{y,1} \right)} & {\sim Normal(\bar{r} + \phi\left( \log\left( \widehat{N_{y,1}} \right) - \bar{r} \right),\sigma_{r}^{2})}
-\end{aligned}$$
+``` math
+\begin{aligned}
+\log(\widehat{N_{y,1}}) &= \log(N_{y-1,1})\\
+\log(N_{y,1}) &\sim Normal\big(\bar{r} + \phi(\log(\widehat{N_{y,1}}) - \bar{r}), \sigma^{2}_{r}\big)
+\end{aligned}
+```
 
 #### Code
 
@@ -177,6 +188,7 @@ The joint negative log likelihood for recruitment under each approach
 was computed using the state space form as:
 
 ``` r
+
 # deviations approach
 # AR1 for standard normal innovations at initial condition
 jnll <- jnll - dnorm(z[1], 0, sqrt(sdR * sdR / (1 - phi * phi)), log = TRUE)

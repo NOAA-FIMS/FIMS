@@ -31,6 +31,7 @@ hosted by NOAA Fisheries Integrated Toolbox. You can install the latest
 version from GitHub.
 
 ``` r
+
 # Install the pre-compiled version of the latest release
 install.packages(
   "FIMS",
@@ -86,6 +87,7 @@ repository](https://nmfs-ost.github.io/on-off-boarding/).
 ## Usage
 
 ``` r
+
 library(FIMS)
 # Load sample data
 data("data_big")

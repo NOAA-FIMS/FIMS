@@ -100,6 +100,7 @@ vignette](https://noaa-fims.github.io/FIMS/articles/fims-demo.html) for
 more information.
 
 ``` r
+
 data_4_model <- FIMSFrame(data_big)
 data_4_model
 ```
@@ -150,6 +151,7 @@ uncertainty values. Common practice is to set the uncertainty to a small
 number, like 0.001, so the landings data are fit closely.
 
 ``` r
+
 # first three rows of the landings data
 FIMS::data_big |>
   dplyr::filter(type == "landings") |>
@@ -162,6 +164,7 @@ FIMS::data_big |>
     ## 3 landings fleet1  NA     NA      3 747.2900   mt  0.00999975
 
 ``` r
+
 # time series plot of landings data
 library(ggplot2)
 FIMS::data_big |>
@@ -183,6 +186,7 @@ values for age and length, `mt` for `unit`, and index uncertainty as the
 standard deviation of the logged observations.
 
 ``` r
+
 # first three rows of the index data
 FIMS::data_big |>
   dplyr::filter(type == "index") |>
@@ -195,6 +199,7 @@ FIMS::data_big |>
     ## 3 index survey1  NA     NA      3 0.006553376   mt   0.1980422
 
 ``` r
+
 # time series plot of index data
 FIMS::data_big |>
   dplyr::filter(type == "index") |>
@@ -227,6 +232,7 @@ the input sample size for the time step (equal across all ages within
 that time step).
 
 ``` r
+
 # first three rows of the age composition data
 FIMS::data_big |>
   dplyr::filter(type == "age_comp") |>
@@ -239,6 +245,7 @@ FIMS::data_big |>
     ## 3 age_comp fleet1   3     NA      1 0.115 proportion         200
 
 ``` r
+
 # plot of age compositions by time step
 FIMS::data_big |>
   dplyr::filter(type == "age_comp") |>
@@ -268,6 +275,7 @@ as long as the distribution of each age among those bins is provided by
 the `age_to_length_conversion` data type described below.
 
 ``` r
+
 # first three rows of the length composition data
 FIMS::data_big |>
   dplyr::filter(type == "length_comp") |>
@@ -280,6 +288,7 @@ FIMS::data_big |>
     ## 3 length_comp fleet1  NA    100      1 1.610390e-07 proportion         200
 
 ``` r
+
 # plot of length compositions by time step
 FIMS::data_big |>
   dplyr::filter(type == "length_comp") |>
@@ -320,6 +329,7 @@ steps, and are provided for timing = 1 to 31 and associated with name =
 “fleet1”.
 
 ``` r
+
 # first and last entries  of the weight-at-age data
 FIMS::data_big |>
   dplyr::filter(type == "weight_at_age") |>
@@ -332,6 +342,7 @@ FIMS::data_big |>
     ## 3 weight_at_age fleet1   1     NA      3 0.0005306555   mt          NA
 
 ``` r
+
 FIMS::data_big |>
   dplyr::filter(type == "weight_at_age") |>
   tail(3)
@@ -343,6 +354,7 @@ FIMS::data_big |>
     ## 372 weight_at_age fleet1  12     NA     31 0.009636695   mt          NA
 
 ``` r
+
 # check that the values are identical across time steps within each age
 FIMS::data_big |>
   dplyr::filter(type == "weight_at_age") |>
@@ -367,6 +379,7 @@ FIMS::data_big |>
     ## 12    12          1
 
 ``` r
+
 # plot of weight-at-age values by time step
 FIMS::data_big |>
   dplyr::filter(type == "weight_at_age") |>
@@ -403,6 +416,7 @@ Note: purely age-based models which have no length-composition data can
 omit the age-to-length conversion data as well.
 
 ``` r
+
 # first and last entries in the age-to-length conversion data type
 FIMS::data_big |>
   dplyr::filter(type == "age_to_length_conversion") |>
@@ -419,6 +433,7 @@ FIMS::data_big |>
     ## 3         200
 
 ``` r
+
 FIMS::data_big |>
   dplyr::filter(type == "age_to_length_conversion") |>
   tail(3)
@@ -434,6 +449,7 @@ FIMS::data_big |>
     ## 276         200
 
 ``` r
+
 # show that the number of rows in the age-to-length conversion data type is equal to the product of the number of unique combinations of age and length
 FIMS::data_big |>
   dplyr::filter(type == "age_to_length_conversion") |>
@@ -443,6 +459,7 @@ FIMS::data_big |>
     ## [1] 276
 
 ``` r
+
 # 12 ages, 23 length bins:
 length(unique(na.omit(FIMS::data_big$age))) * length(unique(na.omit(FIMS::data_big$length)))
 ```
@@ -450,6 +467,7 @@ length(unique(na.omit(FIMS::data_big$age))) * length(unique(na.omit(FIMS::data_b
     ## [1] 276
 
 ``` r
+
 # plot of age-to-length conversion values for the data_big example data set
 FIMS::data_big |>
   dplyr::filter(type == "age_to_length_conversion") |>
