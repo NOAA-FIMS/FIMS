@@ -67,7 +67,12 @@ struct GrowthDerivedALK : public ALKBase<Type> {
   }
 
   /**
-   * @brief Prepare growth-derived products for the current model state.
+   * @brief Ensures growth-derived products are available for the current model
+   * state.
+   *
+   * This helper reuses already prepared growth products when available and only
+   * triggers preparation when products have not yet been prepared.
+   *
    * @return True if prepared products are available and support this ALK path.
    */
   virtual bool PrepareForCurrentState() override {
@@ -75,9 +80,11 @@ struct GrowthDerivedALK : public ALKBase<Type> {
       return false;
     }
 
-    growth_observation->PrepareGrowthProducts();
-
     const GrowthProducts<Type>* growth_products = TryGetGrowthProducts();
+    if (growth_products == nullptr) {
+      growth_observation->PrepareGrowthProducts();
+      growth_products = TryGetGrowthProducts();
+    }
 
     return growth_products != nullptr && growth_products->n_sexes == 1;
   }

@@ -319,6 +319,21 @@ TEST(GrowthDerivedALK, PrepareForCurrentStateEnablesRowBuilding) {
   ASSERT_EQ(row.size(), fleet->n_lengths);
 }
 
+TEST(GrowthDerivedALK, PrepareForCurrentStateReusesAlreadyPreparedProducts) {
+  auto fleet = MakeFleet();
+  auto growth = std::make_shared<FakeGrowthDerivedObservation>();
+
+  growth->Initialize(1, fleet->n_ages, 1);
+  growth->PrepareGrowthProducts();
+  ASSERT_EQ(growth->prepare_calls, 1u);
+
+  fims_popdy::GrowthDerivedALK<double> alk(fleet, growth);
+
+  ASSERT_TRUE(alk.IsActive());
+  ASSERT_TRUE(alk.PrepareForCurrentState());
+  EXPECT_EQ(growth->prepare_calls, 1u);
+}
+
 TEST(GrowthDerivedALK, BuildALKRowReturnsNormalizedRow) {
   auto fleet = MakeFleet();
 
