@@ -28,7 +28,7 @@ else
         echo ">>> Installing Quarto for Linux..."
         Q_ARCH="amd64"
         if [[ "$ARCH" == "aarch64" || "$ARCH" == "arm64" ]]; then Q_ARCH="arm64"; fi
-        QUARTO_VER=$(curl -s "https://api.github.com/repos/quarto-dev/quarto-cli/releases/latest" | grep '"tag_name":' | sed -E 's/.*"v([^"]+)".*/\1/')
+        QUARTO_VER=$(gh release list -R quarto-dev/quarto-cli --limit 1 --json tagName -q ".[0].tagName" | sed 's/v//')
         wget -q -O "quarto.deb" "https://github.com/quarto-dev/quarto-cli/releases/download/v${QUARTO_VER}/quarto-${QUARTO_VER}-linux-${Q_ARCH}.deb"
         sudo dpkg -i "quarto.deb" && rm "quarto.deb"
     elif [ "$MACHINE" == "Mac" ] && command -v brew &> /dev/null; then
