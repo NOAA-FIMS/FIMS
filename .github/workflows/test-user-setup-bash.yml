@@ -4,7 +4,6 @@ on:
   pull_request:
     branches: 
       - main
-      - dev-ubuntu-workflow-fix
   # Runs the bash script from the main branch every day at midnight UTC
   schedule:
     - cron: '0 0 * * *'  
