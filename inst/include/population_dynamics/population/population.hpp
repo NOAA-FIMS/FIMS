@@ -14,6 +14,8 @@
 #include "../recruitment/recruitment.hpp"
 #include "../../interface/interface.hpp"
 #include "../maturity/maturity.hpp"
+#include "../size/size_distribution_provider_base.hpp"
+#include "../size/size_grid.hpp"
 
 namespace fims_popdy {
 
@@ -58,6 +60,12 @@ annual fishing mortality multipliers to scale total mortality of all fleets*/
   int growth_id = -999; /*!< id of growth model object*/
   std::shared_ptr<fims_popdy::GrowthBase<Type>>
       growth; /*!< shared pointer to growth module */
+
+  // size
+  SizeGrid size_grid; /*!< population-level biological size grid */
+  std::shared_ptr<fims_popdy::SizeDistributionProviderBase<Type>>
+      size_distribution_provider; /*!< shared pointer to population-level size
+                                     distribution provider */
 
   // maturity
   int maturity_id = -999; /*!< id of maturity model object*/
