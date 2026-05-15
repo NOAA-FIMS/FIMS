@@ -11,6 +11,7 @@
 #include "population_dynamics/fleet/fleet.hpp"
 #include "population_dynamics/growth/growth_model_adapter.hpp"
 #include "population_dynamics/growth/growth_products.hpp"
+#include "../../inst/include/models/functors/catch_at_age.hpp"
 
 namespace {
 
@@ -165,7 +166,7 @@ TEST(FixedMatrixALK, IsInactiveWithWrongMatrixSize) {
   EXPECT_FALSE(alk.IsActive());
 }
 
-TEST(RuntimeALK, BuildFleetALKFallsBackToFixedMatrixWhenGrowthDerivedPrepareFails) {
+TEST(RuntimeALK, BuildFleetALKReturnsNullWhenGrowthDerivedPrepareFails) {
   auto population = std::make_shared<fims_popdy::Population<double>>();
   auto fleet = MakeFleet();
   FillFixedMatrix(fleet);
@@ -178,18 +179,7 @@ TEST(RuntimeALK, BuildFleetALKFallsBackToFixedMatrixWhenGrowthDerivedPrepareFail
   std::shared_ptr<fims_popdy::ALKBase<double>> alk =
       fims_popdy::BuildFleetALK<double>(population, fleet);
 
-  ASSERT_NE(alk, nullptr);
-  EXPECT_NE(
-      std::dynamic_pointer_cast<fims_popdy::FixedMatrixALK<double>>(alk),
-      nullptr);
-
-  fims::Vector<double> row;
-  ASSERT_TRUE(alk->BuildALKRow(0, 1, row));
-  ASSERT_EQ(row.size(), fleet->n_lengths);
-  EXPECT_DOUBLE_EQ(row[0], 0.4);
-  EXPECT_DOUBLE_EQ(row[1], 0.3);
-  EXPECT_DOUBLE_EQ(row[2], 0.2);
-  EXPECT_DOUBLE_EQ(row[3], 0.1);
+  EXPECT_EQ(alk, nullptr);
 }
 
 TEST(RuntimeALK, BuildFleetALKUsesGrowthDerivedWhenPrepareSucceeds) {
@@ -214,7 +204,7 @@ TEST(RuntimeALK, BuildFleetALKUsesGrowthDerivedWhenPrepareSucceeds) {
   EXPECT_EQ(growth->prepare_calls, 1);
 }
 
-TEST(RuntimeALK, EnsureFleetALKRebuildsToFixedMatrixWhenExistingGrowthDerivedPrepareFails) {
+TEST(RuntimeALK, EnsureFleetALKThrowsWhenExistingGrowthDerivedPrepareFails) {
   auto population = std::make_shared<fims_popdy::Population<double>>();
   auto fleet = MakeFleet();
   FillFixedMatrix(fleet);
@@ -224,27 +214,57 @@ TEST(RuntimeALK, EnsureFleetALKRebuildsToFixedMatrixWhenExistingGrowthDerivedPre
 
   population->growth = growth;
 
-  fleet->alk = std::make_shared<fims_popdy::GrowthDerivedALK<double>>(fleet, growth);
+  fleet->alk =
+      std::make_shared<fims_popdy::GrowthDerivedALK<double>>(fleet, growth);
 
   ASSERT_NE(fleet->alk, nullptr);
   EXPECT_NE(
       std::dynamic_pointer_cast<fims_popdy::GrowthDerivedALK<double>>(fleet->alk),
       nullptr);
 
-  fims_popdy::EnsureFleetALK<double>(population, fleet);
+  EXPECT_THROW(
+      fims_popdy::EnsureFleetALK<double>(population, fleet),
+      std::runtime_error);
+}
+
+TEST(RuntimeALK, EnsureFleetALKDoesNotReuseFixedALKForGrowthDerivedPopulation) {
+  auto population = std::make_shared<fims_popdy::Population<double>>();
+  auto fleet = MakeFleet();
+  FillFixedMatrix(fleet);
+
+  auto growth = std::make_shared<FakeGrowthDerivedObservation>();
+  growth->Initialize(1, fleet->n_ages, 2);
+
+  population->growth = growth;
+
+  fleet->alk = std::make_shared<fims_popdy::FixedMatrixALK<double>>(fleet);
 
   ASSERT_NE(fleet->alk, nullptr);
   EXPECT_NE(
       std::dynamic_pointer_cast<fims_popdy::FixedMatrixALK<double>>(fleet->alk),
       nullptr);
 
-  fims::Vector<double> row;
-  ASSERT_TRUE(fleet->alk->BuildALKRow(0, 1, row));
-  ASSERT_EQ(row.size(), fleet->n_lengths);
-  EXPECT_DOUBLE_EQ(row[0], 0.4);
-  EXPECT_DOUBLE_EQ(row[1], 0.3);
-  EXPECT_DOUBLE_EQ(row[2], 0.2);
-  EXPECT_DOUBLE_EQ(row[3], 0.1);
+  EXPECT_THROW(
+      fims_popdy::EnsureFleetALK<double>(population, fleet),
+      std::runtime_error);
+}
+
+TEST(RuntimeALK, GrowthDerivedFleetMeanWeightAAThrowsWithoutFleetGrowthDerivedPath) {
+  fims_popdy::CatchAtAge<double> model;
+  auto fleet = MakeFleet();
+
+  EXPECT_THROW(
+      model.GrowthDerivedFleetMeanWeightAA(fleet, 0, 0),
+      std::runtime_error);
+}
+
+TEST(RuntimeALK, PopulationMeanWeightAAThrowsWithoutCanonicalGrowthDerivedFleet) {
+  fims_popdy::CatchAtAge<double> model;
+  auto population = std::make_shared<fims_popdy::Population<double>>();
+
+  EXPECT_THROW(
+      model.PopulationMeanWeightAA(population, 0, 0),
+      std::runtime_error);
 }
 
 TEST(GrowthDerivedALK, IsInactiveWithoutExplicitLengthBins) {
