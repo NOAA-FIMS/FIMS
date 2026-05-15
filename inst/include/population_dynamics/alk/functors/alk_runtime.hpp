@@ -126,7 +126,7 @@ void EnsureFleetALK(const std::shared_ptr<Population<Type>>& population,
 
   std::stringstream ss;
   ss << "Fleet " << fleet->GetId()
-     << " has length composition bins but no usable ALK could be built.";
+     << " has length composition bins but no usable age-to-length conversion path.";
 
   if (growth_observation != nullptr) {
     ss << " This population uses a growth-derived-capable growth object, so "

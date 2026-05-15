@@ -1376,7 +1376,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
         if (fleet->alk == nullptr || !fleet->alk->IsActive()) {
           std::stringstream ss;
           ss << "Fleet id " << fleet->GetId()
-             << " has length composition bins but no active ALK.";
+             << "no usable age-to-length conversion path";
           FIMS_ERROR_LOG(ss.str());
           throw std::runtime_error(ss.str());
         }
