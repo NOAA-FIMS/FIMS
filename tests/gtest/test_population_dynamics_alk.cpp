@@ -262,6 +262,16 @@ TEST(RuntimeALK, PopulationMeanWeightAAThrowsWithoutCanonicalGrowthDerivedFleet)
   fims_popdy::CatchAtAge<double> model;
   auto population = std::make_shared<fims_popdy::Population<double>>();
 
+  auto growth = std::make_shared<FakeGrowthDerivedObservation>();
+  growth->Initialize(1, 3, 1);
+
+  population->growth = growth;
+  population->n_ages = 3;
+  population->ages.resize(3);
+  population->ages[0] = 1.0;
+  population->ages[1] = 2.0;
+  population->ages[2] = 3.0;
+
   EXPECT_THROW(
       model.PopulationMeanWeightAA(population, 0, 0),
       std::runtime_error);
