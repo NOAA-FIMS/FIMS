@@ -28,7 +28,6 @@ utils::globalVariables(c(
 #'   family.
 #' @return A tibble containing the reshaped parameter estimates.
 reshape_json_estimates <- function(model_output) {
-  
   # Helper functions
   join_density_information <- function(x, density_tibble) {
     dplyr::left_join(x,

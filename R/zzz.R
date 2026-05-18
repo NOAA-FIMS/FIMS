@@ -1,4 +1,3 @@
-
 # Note
 #
 # Placing `Rcpp::loadModule(module = "fims", what = TRUE)` inside the

@@ -68,7 +68,6 @@ class MaturityInterfaceBase : public FIMSRcppInterfaceBase {
   virtual double evaluate(double x) = 0;
 };
 
-
 /**
  * @brief Rcpp interface for logistic maturity to instantiate the object from R:
  * logistic_maturity <- methods::new(logistic_maturity).

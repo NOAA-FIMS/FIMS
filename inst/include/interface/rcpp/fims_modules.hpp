@@ -70,24 +70,24 @@ void register_fishery_models(Rcpp::Module &m);
 void register_maturity(Rcpp::Module &m);
 
 /**
- * Rcpp module definition for the FIMS framework. This module registers all the classes and functions that are exposed to R through Rcpp.
+ * Rcpp module definition for the FIMS framework. This module registers all the
+ * classes and functions that are exposed to R through Rcpp.
  */
-RCPP_MODULE(fims)
-{
-    Rcpp::Module m("fims");
-    register_functions(m);
-    register_parameter(m);
-    register_vectors(m);
-    register_shared(m);
-    register_recruitment(m);
-    register_maturity(m);
-    register_fleet(m);
-    register_population(m);
-    register_selectivity(m);
-    register_growth(m);
-    register_distributions(m);
-    register_data(m);
-    register_fishery_models(m);
+RCPP_MODULE(fims) {
+  Rcpp::Module m("fims");
+  register_functions(m);
+  register_parameter(m);
+  register_vectors(m);
+  register_shared(m);
+  register_recruitment(m);
+  register_maturity(m);
+  register_fleet(m);
+  register_population(m);
+  register_selectivity(m);
+  register_growth(m);
+  register_distributions(m);
+  register_data(m);
+  register_fishery_models(m);
 }
 
-#endif // FIMS_MODULES_HPP
+#endif  // FIMS_MODULES_HPP

@@ -13,7 +13,6 @@
 
 #include <vector>
 
-
 #include "fims_vector.hpp"
 
 namespace fims_model_object {

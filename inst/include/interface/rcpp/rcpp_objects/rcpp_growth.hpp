@@ -68,7 +68,6 @@ class GrowthInterfaceBase : public FIMSRcppInterfaceBase {
   virtual double evaluate(double age) = 0;
 };
 
-
 /**
  * @brief Rcpp interface for EWAAGrowth to instantiate the object from R:
  * ewaa <- methods::new(EWAAGrowth). Where, EWAA stands for empirical weight at
