@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
   issues: write
 
 jobs:
@@ -56,24 +56,29 @@ jobs:
           script: |-
             const previousSha = '${{ steps.previous.outputs.previous_sha }}';
             const currentSha = '${{ steps.hash.outputs.remote_sha }}';
-            github.rest.issues.create({
+
+            await github.rest.issues.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
               title: 'Remote RTMB TMB.h changed',
-              body: `The remote file at https://raw.githubusercontent.com/kaskr/RTMB/refs/heads/master/RTMB/src/TMB.h has changed.
-
-Previous SHA256: ${previousSha}
-Current SHA256: ${currentSha}
-
-Please review the update to the upstream RTMB source file.`
+              body: [
+                'The remote file at https://raw.githubusercontent.com/kaskr/RTMB/refs/heads/master/RTMB/src/TMB.h has changed.',
+                '',
+                `Previous SHA256: ${previousSha}`,
+                `Current SHA256: ${currentSha}`,
+                '',
+                'Please review the update to the upstream RTMB source file.'
+              ].join('\n')
             });
 
       - name: Update stored RTMB hash snapshot
         if: steps.changed.outputs.changed == 'true'
+        env:
+          TARGET_REF: ${{ github.ref_name }}
         run: |
           mv .github/rtmb_tmb_sha256.txt.new .github/rtmb_tmb_sha256.txt
           git config user.name 'github-actions[bot]'
           git config user.email 'github-actions[bot]@users.noreply.github.com'
           git add .github/rtmb_tmb_sha256.txt
           git commit -m 'Update stored RTMB TMB.h snapshot hash' || echo 'No changes to commit.'
-          git push origin HEAD:${{ github.ref_name }}
+          git push origin "HEAD:${TARGET_REF}"
