@@ -43,13 +43,13 @@ test_that("`create_default_parameters()` works with correct inputs", {
     )
   )
 
- 
+
   #' @description Test that the generated parameter values have not changed from the accepted snapshot.
   expect_snapshot_file(
     save_csv(result_unnested),
     "default_parameters.csv",
     compare = compare_file_text
-  ) 
+  )
 })
 
 ## Edge handling ----
@@ -99,4 +99,3 @@ test_that("`create_default_parameters()` works with edge cases", {
 
 # TODO: Add additional tests for internal (unexposed) functions,
 # such as create_default_population().
-

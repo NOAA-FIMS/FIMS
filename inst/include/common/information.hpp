@@ -992,7 +992,7 @@ class Information {
 
 template <typename Type>
 std::shared_ptr<Information<Type>> Information<Type>::fims_information =
-    nullptr;  /**< static shared pointer to singleton Information object>*/
+    nullptr; /**< static shared pointer to singleton Information object>*/
 
 }  // namespace fims_info
 

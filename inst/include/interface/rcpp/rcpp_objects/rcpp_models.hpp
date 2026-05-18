@@ -13,7 +13,7 @@
 #include "../../../common/def.hpp"
 #include "rcpp_interface_base.hpp"
 #include "../../../models/fisheries_models.hpp"
-#include  "../../../common/model.hpp"
+#include "../../../common/model.hpp"
 #include "../../../utilities/fims_json.hpp"
 #include "rcpp_population.hpp"
 #include "rcpp_fleet.hpp"
