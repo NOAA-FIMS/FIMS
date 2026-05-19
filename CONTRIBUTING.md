@@ -16,7 +16,7 @@ Please use [GitHub Issues](https://github.com/NOAA-FIMS/FIMS/issues/new?template
 
 Not all contributions are code! Writing documentation, teaching, and other activities are also key parts of contributing to software that are much appreciated. For more information about open source contributions, see [the Open Source Guide's How to Contribute page](https://opensource.guide/how-to-contribute/). A good place to start is by looking for open issues with the [good first issue label](https://github.com/NOAA-FIMS/FIMS/contribute). These issues are generally small and well-defined, making them a good starting point for new contributors. We encourage collaborators to feel welcome to contribute in any way they can, and we will do our best to incorporate these contributions into the FIMS projects. Please see the [feature branches](#feature-branches), [pull requests](#pull-requests), and [style guide](#style-guide) sections below for how to make your contributions to FIMS. We thank you in advance for being part of the team. 
 
-Additionally, if you would like to make contributions to the [FIMS website](https://noaa-fims.github.io/) (write a blog, etc.), please follow the [contributing guide there](https://github.com/NOAA-FIMS/noaa-fims.github.io/blob/main/CONTRIBUTING.md).
+Additionally, if you would like to make contributions to the [NOAA-FIMS website](https://noaa-fims.github.io/) (write a blog, etc.), please follow this [contributing guide](https://github.com/NOAA-FIMS/noaa-fims.github.io/blob/main/CONTRIBUTING.md).
 
 ### Adding a new module
 
