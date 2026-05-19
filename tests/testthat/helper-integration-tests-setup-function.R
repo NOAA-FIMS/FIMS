@@ -34,20 +34,24 @@ FIMS_dmultinom <- function(x, p) {
 #' @return The log of the probability mass function for the Dirichlet-multinomial.
 FIMS_ddiric_multinom <- function(x, p, theta) {
   stopifnot(length(x) == length(p))
-  stopifnot(all(p >= 0))
+  stopifnot(all(is.finite(x)))
+  stopifnot(all(x >= 0))
+  stopifnot(all(is.finite(p)))
+  stopifnot(all(p > 0))
   stopifnot(abs(sum(p) - 1) < 1e-8)
+  stopifnot(is.finite(theta))
   stopifnot(theta > 0)
-  
-  alpha <- theta * p
+
   n <- sum(x)
-  
+  alpha <- theta * n * p
+
   log_pmf <-
     lgamma(n + 1) -
     sum(lgamma(x + 1)) +
     lgamma(sum(alpha)) -
     lgamma(n + sum(alpha)) +
     sum(lgamma(x + alpha) - lgamma(alpha))
-  
+
   return(log_pmf)
 }
 
