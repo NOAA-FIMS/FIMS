@@ -35,7 +35,7 @@ jobs:
               with:
                 commit-message: "chore: Updates contributors"
                 branch: update-contributors
-                base: dev
+                base: main
                 title: "Update contributors"
                 body: "This PR updates the contributors list."
                 labels: "auto-update"
