@@ -224,10 +224,10 @@ test_that("fit_fims() errors when optimization fails to converge", {
   )
 
   #' @description Test that fit_fims() returns warning that the model did not converge.
-  data("data_big")
+  data("data_big", package = "FIMS")
+  data_4_model <- FIMSFrame(data_big)
   # Create parameters
-  initialized_poor_model <- FIMSFrame(data_big) |>
-    create_default_configurations() |>
+  initialized_poor_model < create_default_configurations(data_4_model) |>
     create_default_parameters(data = data_4_model) |>
     tidyr::unnest(cols = data) |>
     dplyr::rows_update(

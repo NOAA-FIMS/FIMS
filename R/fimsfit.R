@@ -569,7 +569,7 @@ fit_fims <- function(input,
   opt <- try_nlminb(object = obj, control_list = control)
 
   if (is.null(opt)) {
-    failed_nlminb_object <- return_failed_nlminb(obj, t0)
+    failed_nlminb_object <- return_failed_nlminb(obj)
     failed_fit <-   fit <- FIMSFit(
       input = input,
       obj = obj,
@@ -599,7 +599,7 @@ fit_fims <- function(input,
           "i" = "The model successfully converged before this loop.",
           "i" = "The failed results are being returned."
         ))
-        failed_nlminb_object <- return_failed_nlminb(obj, t0)
+        failed_nlminb_object <- return_failed_nlminb(obj)
         failed_fit <-   fit <- FIMSFit(
           input = input,
           obj = obj,
