@@ -9,6 +9,7 @@
 #ifndef POPULATION_DYNAMICS_GROWTH_VON_BERTALANFFY_HPP
 #define POPULATION_DYNAMICS_GROWTH_VON_BERTALANFFY_HPP
 
+#include <stdexcept>
 #include "../../../common/fims_math.hpp"
 #include "growth_base.hpp"
 
@@ -42,11 +43,58 @@ struct VonBertalanffyGrowth : public GrowthBase<Type> {
   virtual ~VonBertalanffyGrowth() {}
 
   /**
+   * @brief Validate the Von Bertalanffy parameters.
+   *
+   * Throws when the stored parameter values are incompatible with the raw
+   * Von Bertalanffy growth calculation.
+   */
+  void ValidateParameters() const {
+    if (growth_coefficient_K <= Type(0.0)) {
+      throw std::runtime_error(
+          "VonBertalanffyGrowth growth_coefficient_K must be > 0");
+    }
+
+    if (length_at_ref_age_1 <= Type(0.0)) {
+      throw std::runtime_error(
+          "VonBertalanffyGrowth length_at_ref_age_1 must be > 0");
+    }
+
+    if (length_at_ref_age_2 <= Type(0.0)) {
+      throw std::runtime_error(
+          "VonBertalanffyGrowth length_at_ref_age_2 must be > 0");
+    }
+
+    if (reference_age_for_length_2 <= reference_age_for_length_1) {
+      throw std::runtime_error(
+          "VonBertalanffyGrowth reference_age_for_length_2 must be > "
+          "reference_age_for_length_1");
+    }
+
+    if (length_at_ref_age_2 <= length_at_ref_age_1) {
+      throw std::runtime_error(
+          "VonBertalanffyGrowth length_at_ref_age_2 must be > "
+          "length_at_ref_age_1");
+    }
+
+    if (length_weight_a <= Type(0.0)) {
+      throw std::runtime_error(
+          "VonBertalanffyGrowth length_weight_a must be > 0");
+    }
+
+    if (length_weight_b <= Type(0.0)) {
+      throw std::runtime_error(
+          "VonBertalanffyGrowth length_weight_b must be > 0");
+    }
+  }
+
+  /**
    * @brief Evaluate mean length at age.
    * @param age Age on the natural scale.
    * @return Mean length at the requested age.
    */
   Type length_at_age(const Type& age) const {
+    ValidateParameters();
+
     const Type denom = Type(1.0) -
         fims_math::exp(-growth_coefficient_K * (reference_age_for_length_2 -
                                               reference_age_for_length_1));
