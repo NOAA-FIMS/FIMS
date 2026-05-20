@@ -15,6 +15,7 @@
 #' for the K classes; must sum 1.
 #'
 #' @return The log of the probability mass function for the multinomial.
+
 FIMS_dmultinom <- function(x, p) {
   xp1 <- x + 1
   log_pmf <- lgamma(sum(x) + 1) - sum(lgamma(xp1)) + sum(x * log(p))
@@ -32,6 +33,7 @@ FIMS_dmultinom <- function(x, p) {
 #' @param theta A positive scalar concentration parameter.
 #'
 #' @return The log of the probability mass function for the Dirichlet-multinomial.
+
 FIMS_ddiric_multinom <- function(x, p, theta) {
   stopifnot(length(x) == length(p))
   stopifnot(all(is.finite(x)))
