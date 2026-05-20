@@ -13,15 +13,15 @@
 #   if changes are detected.
 #
 # Workflow Trigger:
-# - This workflow runs when a pull request is opened or updated (synchronized) 
-#   targeting the 'main' or 'dev' branches. It can also be triggered manually.
-# - The formatting is applied to the source (head) branch of the PR, NOT to main or dev.
+# - This workflow runs when a pull request is opened or updated (synchronized)
+#   targeting the 'main' branch. It can also be triggered manually.
+# - The formatting is applied to the source (head) branch of the PR, NOT to main.
 # - If formatting changes are needed, a new PR will be created targeting the 
 #   original feature branch (for non-forks).
-# - Example: If PR from 'feature-branch' -> 'dev' needs formatting, a new PR 
+# - Example: If PR from 'feature-branch' -> 'main' needs formatting, a new PR
 #   'format-code-feature-branch' -> 'feature-branch' will be created.
 # - The formatting PR must be merged into the feature branch before the original
-#   PR can be merged into main/dev.
+#   PR can be merged into main.
 #
 # Clang-Format Version:
 # - Using clang-format version 18.0.0 for consistency.
@@ -40,7 +40,6 @@ on:
     types: [opened, reopened, synchronize]
     branches:
       - main
-      - dev
   workflow_dispatch:
 
 permissions:
