@@ -45,9 +45,9 @@ validate_comp_nll <- function(observed_prop, sample_size, expected_prop, theta =
   observed_counts <- observed_prop * sample_size
   
   if (is.null(theta)) {
-    return(FIMS_dmultinom(observed_counts, expected_prop, give_log = TRUE))
+    return(FIMS_dmultinom(observed_counts, expected_prop))
   } else {
-    return(ddiric_multinom(observed_counts, expected_prop, theta, give_log = TRUE))
+    return(FIMS_ddiric_multinom(observed_counts, expected_prop, theta))
   }
 }
 
@@ -464,52 +464,45 @@ verify_fims_deterministic <- function(
 verify_fims_nll <- function(report,
                             om_input,
                             om_output,
-                            em_input) {
-  # recruitment likelihood
-  # log_devs is of length nyr-1
+                            em_input,
+                            comp_theta = NULL) {
+  # Recruitment likelihood
+  # log_devs is of length nyr - 1
   rec_nll <- -sum(dnorm(
-    om_input[["logR.resid"]][-1], rep(0, om_input[["nyr"]] - 1),
-    om_input[["logR_sd"]], TRUE
+    om_input[["logR.resid"]][-1],
+    rep(0, om_input[["nyr"]] - 1),
+    om_input[["logR_sd"]],
+    TRUE
   ))
 
-  # fishery landings expected likelihood
+  # Fishery landings expected likelihood
   landings_nll <- landings_nll_fleet <- -sum(dlnorm(
     em_input[["L.obs"]][["fleet1"]],
     log(om_output[["L.mt"]][["fleet1"]]),
-    sqrt(log(em_input[["cv.L"]][["fleet1"]]^2 + 1)), TRUE
+    sqrt(log(em_input[["cv.L"]][["fleet1"]]^2 + 1)),
+    TRUE
   ))
 
-  # survey index expected likelihood
+  # Survey index expected likelihood
   index_nll <- index_nll_survey <- -sum(dlnorm(
     em_input[["surveyB.obs"]][["survey1"]],
     log(om_output[["survey_index_biomass"]][["survey1"]]),
-    sqrt(log(em_input[["cv.survey"]][["survey1"]]^2 + 1)), TRUE
+    sqrt(log(em_input[["cv.survey"]][["survey1"]]^2 + 1)),
+    TRUE
   ))
 
-  # age comp likelihoods
+  # Age-composition likelihoods
   fishing_acomp_observed <- em_input[["L.age.obs"]][["fleet1"]]
-  fishing_acomp_expected <- 0.0 + (1.0 - 0.0 * om_input[["nages"]]) * om_output[["L.age"]][["fleet1"]] /
+  fishing_acomp_expected <- 0.0 + (1.0 - 0.0 * om_input[["nages"]]) *
+    om_output[["L.age"]][["fleet1"]] /
     rowSums(om_output[["L.age"]][["fleet1"]])
-  survey_acomp_observed <- em_input[["survey.age.obs"]][["survey1"]]
-  survey_acomp_expected <- 0.0 + (1.0 - 0.0 * om_input[["nages"]]) * om_output[["survey_age_comp"]][["survey1"]] /
-    rowSums(om_output[["survey_age_comp"]][["survey1"]])
-  
-  age_comp_nll_fleet <- age_comp_nll_survey <- 0
-  
-  for (y in 1:om_input[["nyr"]]) {
-    age_comp_nll_fleet <- age_comp_nll_fleet -
-      dmultinom(
-        fishing_acomp_observed[y, ] * em_input[["n.L"]][["fleet1"]], em_input[["n.L"]][["fleet1"]],
-        fishing_acomp_expected[y, ], TRUE)
-    age_comp_nll_survey <- age_comp_nll_survey -
-      dmultinom(
-        survey_acomp_observed[y, ] * em_input[["n.survey"]][["survey1"]], em_input[["n.survey"]][["survey1"]],
-        survey_acomp_expected[y, ], TRUE)
-  }
-  age_comp_nll <- age_comp_nll_fleet + age_comp_nll_survey
 
-# check fishing_acomp_ll values by year
-  fishing_acomp_ll_check <- purrr::map_dbl(
+  survey_acomp_observed <- em_input[["survey.age.obs"]][["survey1"]]
+  survey_acomp_expected <- 0.0 + (1.0 - 0.0 * om_input[["nages"]]) *
+    om_output[["survey_age_comp"]][["survey1"]] /
+    rowSums(om_output[["survey_age_comp"]][["survey1"]])
+
+  fishing_acomp_ll <- purrr::map_dbl(
     seq_len(om_input[["nyr"]]),
     \(y) validate_comp_nll(
       observed_prop = fishing_acomp_observed[y, ],
@@ -518,10 +511,9 @@ verify_fims_nll <- function(report,
       theta = comp_theta
     )
   )
-  expect_true(all(is.finite(fishing_acomp_ll_check)))
+  expect_true(all(is.finite(fishing_acomp_ll)))
 
-  # check survey_acomp_ll values by year
-  survey_acomp_ll_check <- purrr::map_dbl(
+  survey_acomp_ll <- purrr::map_dbl(
     seq_len(om_input[["nyr"]]),
     \(y) validate_comp_nll(
       observed_prop = survey_acomp_observed[y, ],
@@ -530,57 +522,54 @@ verify_fims_nll <- function(report,
       theta = comp_theta
     )
   )
-  expect_true(all(is.finite(survey_acomp_ll_check)))
-  
-  # length comp likelihoods
-  fishing_lengthcomp_observed <- em_input[["L.length.obs"]][["fleet1"]]
-  fishing_lengthcomp_expected <- 0.0 + (1.0 - 0.0 * om_input[["nlengths"]]) * om_output[["L.length"]][["fleet1"]] / rowSums(om_output[["L.length"]][["fleet1"]])
-  survey_lengthcomp_observed <- em_input[["survey.length.obs"]][["survey1"]]
-  survey_lengthcomp_expected <- 0.0 + (1.0 - 0.0 * om_input[["nlengths"]]) * om_output[["survey_length_comp"]][["survey1"]] / rowSums(om_output[["survey_length_comp"]][["survey1"]])
-  lengthcomp_nll_fleet <- lengthcomp_nll_survey <- 0
-  for (y in 1:om_input[["nyr"]]) {
-    # test using FIMS_dmultinom which matches the TMB dmultinom calculation and differs from R
-    # by NOT rounding obs to the nearest integer.
-    lengthcomp_nll_fleet <- lengthcomp_nll_fleet -
-      FIMS_dmultinom(
-        fishing_lengthcomp_observed[y, ] * em_input[["n.L.lengthcomp"]][["fleet1"]],
-        fishing_lengthcomp_expected[y, ]
-      )
+  expect_true(all(is.finite(survey_acomp_ll)))
 
-    lengthcomp_nll_survey <- lengthcomp_nll_survey -
-      FIMS_dmultinom(
-        survey_lengthcomp_observed[y, ] * em_input[["n.survey.lengthcomp"]][["survey1"]],
-        survey_lengthcomp_expected[y, ]
-      )
-  }
-  lengthcomp_nll <- lengthcomp_nll_fleet + lengthcomp_nll_survey
-  
-  # check fishing_lengthcomp_ll values by year
-  fishing_lengthcomp_ll_check <- purrr::map_dbl(
+  age_comp_nll_fleet <- -sum(fishing_acomp_ll)
+  age_comp_nll_survey <- -sum(survey_acomp_ll)
+  age_comp_nll <- age_comp_nll_fleet + age_comp_nll_survey
+
+  # Length-composition likelihoods
+  fishing_lengthcomp_observed <- em_input[["L.length.obs"]][["fleet1"]]
+  fishing_lengthcomp_expected <- 0.0 + (1.0 - 0.0 * om_input[["nlengths"]]) *
+    om_output[["L.length"]][["fleet1"]] /
+    rowSums(om_output[["L.length"]][["fleet1"]])
+
+  survey_lengthcomp_observed <- em_input[["survey.length.obs"]][["survey1"]]
+  survey_lengthcomp_expected <- 0.0 + (1.0 - 0.0 * om_input[["nlengths"]]) *
+    om_output[["survey_length_comp"]][["survey1"]] /
+    rowSums(om_output[["survey_length_comp"]][["survey1"]])
+
+  fishing_lengthcomp_ll <- purrr::map_dbl(
     seq_len(om_input[["nyr"]]),
     \(y) validate_comp_nll(
       observed_prop = fishing_lengthcomp_observed[y, ],
-      sample_size = em_input[["n.L"]][["fleet1"]],
+      sample_size = em_input[["n.L.lengthcomp"]][["fleet1"]],
       expected_prop = fishing_lengthcomp_expected[y, ],
       theta = comp_theta
     )
   )
-  expect_true(all(is.finite(fishing_lengthcomp_ll_check)))
-  
-  # check survey_lengthcomp_ll values by year
-  survey_lengthcomp_ll_check <- purrr::map_dbl(
+  expect_true(all(is.finite(fishing_lengthcomp_ll)))
+
+  survey_lengthcomp_ll <- purrr::map_dbl(
     seq_len(om_input[["nyr"]]),
     \(y) validate_comp_nll(
       observed_prop = survey_lengthcomp_observed[y, ],
-      sample_size = em_input[["n.survey"]][["survey1"]],
+      sample_size = em_input[["n.survey.lengthcomp"]][["survey1"]],
       expected_prop = survey_lengthcomp_expected[y, ],
       theta = comp_theta
     )
   )
-  expect_true(all(is.finite(survey_lengthcomp_ll_check)))
+  expect_true(all(is.finite(survey_lengthcomp_ll)))
 
-  expected_jnll <- rec_nll + landings_nll + index_nll + age_comp_nll + lengthcomp_nll
+  lengthcomp_nll_fleet <- -sum(fishing_lengthcomp_ll)
+  lengthcomp_nll_survey <- -sum(survey_lengthcomp_ll)
+  lengthcomp_nll <- lengthcomp_nll_fleet + lengthcomp_nll_survey
+
+  expected_jnll <- rec_nll + landings_nll + index_nll +
+    age_comp_nll + lengthcomp_nll
+
   jnll <- report[["jnll"]]
+
   #' @description Test that the recruitment jnll is equal to the expected jnll.
   expect_equal(report[["nll_components"]][1], rec_nll)
   #' @description Test that the landings jnll is equal to the expected jnll.
