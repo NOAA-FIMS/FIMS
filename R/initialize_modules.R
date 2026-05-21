@@ -199,10 +199,11 @@ initialize_module <- function(parameters, data, module_name) {
 #' The initialized distribution module as an object.
 #' @noRd
 initialize_distribution <- function(
-    module_input,
-    distribution_name,
-    distribution_type = c("data", "process"),
-    linked_ids) {
+  module_input,
+  distribution_name,
+  distribution_type = c("data", "process"),
+  linked_ids
+) {
   # Input checks
   # Check if distribution_name is provided
   if (is.null(distribution_name)) {
@@ -513,8 +514,6 @@ initialize_index <- function(data, fleet_name) {
   ) |>
     dplyr::distinct(type) |>
     dplyr::pull(type)
-
-
 
 
   if ("index" %in% fleet_type) {
@@ -982,7 +981,6 @@ set_param_vector <- function(field, module, module_input) {
     names(module_input),
     value = TRUE
   )
-
 
 
   # Check if both value and estimation information are present
