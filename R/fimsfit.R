@@ -566,7 +566,11 @@ fit_fims <- function(input,
   ## optimize and compare
   cli::cli_inform(c("v" = "Starting optimization ..."))
   t0 <- Sys.time()
-  opt <- try_nlminb(object = obj, control_list = control)
+  opt <- try_nlminb(
+    object = obj,
+    control_list = control,
+    starting_values = obj[["par"]]
+  )
 
   if (is.null(opt)) {
     failed_nlminb_object <- return_failed_nlminb(obj)
@@ -591,7 +595,11 @@ fit_fims <- function(input,
     # negligible between these different runs and is not worth printing
     control$trace <- 0
     for (ii in 1:number_of_loops) {
-      opt <- try_nlminb(object = obj, control_list = control)
+      opt <- try_nlminb(
+        object = obj,
+        control_list = control,
+        starting_values = opt[["par"]]
+      )
       # Handle hard failures where try_nlminb did not return a list
       if (is.null(opt)) {
         cli::cli_inform(message = c(
@@ -678,13 +686,13 @@ methods::setMethod("as.list", signature(x = "FIMSFit"), function(x) {
 })
 
 # Helper function used within fit_fims
-try_nlminb <- function(object, control_list) {
+try_nlminb <- function(object, control_list, starting_values) {
   optimized <- tryCatch(
     {
       with(
         object,
         nlminb(
-          start = par,
+          start = starting_values,
           objective = fn,
           gradient = gr,
           control = control_list
