@@ -38,9 +38,9 @@
 
 #' small FIMS input data frame
 #'
-#' A dataset containing minimal information necessary to run an 
+#' A dataset containing minimal information necessary to run an
 #' age-structured stock
-#' assessment model in FIMS. This data was generated using the script in 
+#' assessment model in FIMS. This data was generated using the script in
 #' `/data-raw/data_small.R` and does not correspond to any realistic population
 #' or sampling method (the values are mostly arbitrary).
 #'

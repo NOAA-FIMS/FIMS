@@ -14,20 +14,20 @@ fims_frame <- FIMS::FIMSFrame(data_small)
 
 ## IO correctness ----
 test_that("fims_frame() works with the correct inputs", {
-    #' @description Test that [fims_frame()] creates the S4 FIMSFrame classes.
-    expect_s4_class(fims_frame, "FIMSFrame")
+  #' @description Test that [fims_frame()] creates the S4 FIMSFrame classes.
+  expect_s4_class(fims_frame, "FIMSFrame")
 })
 
 ## Setup and run a model using data_small ----
 
 # Define fleet specification
 fleet1 <- list(
-    selectivity = list(form = "LogisticSelectivity"),
-    data_distribution = c(
-        Landings = "DlnormDistribution",
-        AgeComp = "DmultinomDistribution",
-        LengthComp = "DmultinomDistribution"
-    )
+  selectivity = list(form = "LogisticSelectivity"),
+  data_distribution = c(
+    Landings = "DlnormDistribution",
+    AgeComp = "DmultinomDistribution",
+    LengthComp = "DmultinomDistribution"
+  )
 )
 
 # create default parameters for the model
@@ -35,34 +35,34 @@ fleet1 <- list(
 # https://github.com/orgs/NOAA-FIMS/discussions/944#discussioncomment-14097152
 # is completed which will make maturity parameters constant by default.
 parameters <- fims_frame |>
-    create_default_parameters(fleets = list(fleet1 = fleet1)) |>
-    update_parameters(
-        modified_parameters = list(
-            maturity = list(
-                LogisticMaturity.inflection_point.value = 0.9,
-                LogisticMaturity.inflection_point.estimation_type = "constant",
-                LogisticMaturity.slope.value = 0.1,
-                LogisticMaturity.slope.estimation_type = "constant"
-            )
-        )
-    ) |>
-    # I'm not sure this is working to turn on estimation of q
-    update_parameters(
-        modified_parameters = list(
-            fleet1 = list(
-                Fleet.log_q.estimation_type = "fixed_effects"
-            )
-        )
+  create_default_parameters(fleets = list(fleet1 = fleet1)) |>
+  update_parameters(
+    modified_parameters = list(
+      maturity = list(
+        LogisticMaturity.inflection_point.value = 0.9,
+        LogisticMaturity.inflection_point.estimation_type = "constant",
+        LogisticMaturity.slope.value = 0.1,
+        LogisticMaturity.slope.estimation_type = "constant"
+      )
     )
+  ) |>
+  # I'm not sure this is working to turn on estimation of q
+  update_parameters(
+    modified_parameters = list(
+      fleet1 = list(
+        Fleet.log_q.estimation_type = "fixed_effects"
+      )
+    )
+  )
 
 # Run the  model with optimization
 fit <- parameters |>
-    initialize_fims(data = fims_frame) |>
-    fit_fims(optimize = TRUE)
+  initialize_fims(data = fims_frame) |>
+  fit_fims(optimize = TRUE)
 
 test_that("model successfully ran with optimization to fit to data_small", {
-    #' @description Test that [fit] is of the class FIMSFit.
-    expect_true(is.FIMSFit(fit))
+  #' @description Test that [fit] is of the class FIMSFit.
+  expect_true(is.FIMSFit(fit))
 })
 
 ## Edge handling ----

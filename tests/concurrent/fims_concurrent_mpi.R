@@ -44,7 +44,6 @@ on.exit(unlink(maindir, recursive = T), add = TRUE)
 setwd(working_dir)
 
 
-
 NUMBER_OF_MODEL_RUNS <- 100
 
 
@@ -85,7 +84,6 @@ init_fims <- function(i) {
   # Set number of years
   # fishing_fleet$nyears<-10
   # om_input[["nyr"]]
-
 
 
   # typeof(fishing_fleet$nyears)
@@ -314,7 +312,6 @@ init_fims <- function(i) {
   population$nseasons$set(1)
 
 
-
   population$SetRecruitmentID(recruitment$get_id())
   population$SetGrowthID(ewaa_growth$get_id())
   population$SetMaturityID(maturity$get_id())
@@ -326,8 +323,6 @@ init_fims <- function(i) {
   clear()
   return(obj)
 }
-
-
 
 
 run_fims <- function(begin, end) {
@@ -355,15 +350,8 @@ run_fims <- function(begin, end) {
 }
 
 
-
-
-
-
-
 id <- mpi.comm.rank(comm = 0)
 ns <- 11 # mpi.universe.size() - 1
-
-
 
 
 nsims <- NUMBER_OF_MODEL_RUNS
@@ -393,7 +381,6 @@ mpi.spawn.Rslaves(nslaves = ns)
 
 # capture minimizer output
 completed <- list()
-
 
 
 # pass the function to all slaves
