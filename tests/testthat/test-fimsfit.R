@@ -223,7 +223,7 @@ test_that("fit_fims() errors when optimization fails to converge", {
     regexp = "Standard error calculations failed convergence checks"
   )
 
-  #' @description Test that fit_fims() returns a non-converged model when you know it is not supposed to converge. The warnings and messages are surpressed because {nlmimb} uses backend code that we do not want to print to the screen during testing but we know will be there.
+  #' @description Test that fit_fims() returns a non-converged model when you know it is not supposed to converge. The warnings and messages are suppressed because {nlminb} uses backend code that we do not want to print to the screen during testing but we know will be there.
   data("data_big", package = "FIMS")
   data_4_model <- FIMSFrame(data_big)
   # Create parameters
