@@ -69,7 +69,6 @@ init_fims <- function(i) {
   # om_input[["nyr"]]
 
 
-
   # typeof(fishing_fleet$nyears)
 
   fishing_fleet$nyears$set(as.integer(om_input[["nyr"]]))
@@ -296,7 +295,6 @@ init_fims <- function(i) {
   population$nseasons$set(1)
 
 
-
   population$SetRecruitmentID(recruitment$get_id())
   population$SetGrowthID(ewaa_growth$get_id())
   population$SetMaturityID(maturity$get_id())
@@ -308,8 +306,6 @@ init_fims <- function(i) {
   clear()
   return(obj)
 }
-
-
 
 
 run_fims <- function(id, begin, end) {

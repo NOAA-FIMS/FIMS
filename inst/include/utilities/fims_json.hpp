@@ -104,7 +104,7 @@ class JsonValue {
 };
 
 /**< Default representation for NaN in JSON. */
-std::string JsonValue::NaN_Representation = "999"; 
+std::string JsonValue::NaN_Representation = "999";
 
 /**
  * Parses JSON strings and generates JSON values.
@@ -191,33 +191,30 @@ class JsonParser {
     JsonParser::replaceNaN(result);
     return result;
   }
-  
+
   /**
-   * @brief Replace occurrences of "NaN" or "nan" in a string with the 
+   * @brief Replace occurrences of "NaN" or "nan" in a string with the
    * specified representation.
    * @param s The string to modify.
    */
-  static void replaceNaN(std::string &s)
-    {
-      std::string target = "NaN";
-      std::string replacement = JsonValue::NaN_Representation;
-      size_t pos = 0;
+  static void replaceNaN(std::string& s) {
+    std::string target = "NaN";
+    std::string replacement = JsonValue::NaN_Representation;
+    size_t pos = 0;
 
-      while ((pos = s.find(target, pos)) != std::string::npos)
-      {
-        s.replace(pos, target.size(), replacement);
-        pos += replacement.size(); // move past the replacement
-      }
-
-      target = "nan";
-      pos = 0;
-
-      while ((pos = s.find(target, pos)) != std::string::npos)
-      {
-        s.replace(pos, target.size(), replacement);
-        pos += replacement.size(); // move past the replacement
-      }
+    while ((pos = s.find(target, pos)) != std::string::npos) {
+      s.replace(pos, target.size(), replacement);
+      pos += replacement.size();  // move past the replacement
     }
+
+    target = "nan";
+    pos = 0;
+
+    while ((pos = s.find(target, pos)) != std::string::npos) {
+      s.replace(pos, target.size(), replacement);
+      pos += replacement.size();  // move past the replacement
+    }
+  }
 
  private:
   /** Skip whitespace characters in the input string. */

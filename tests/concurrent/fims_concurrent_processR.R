@@ -7,7 +7,6 @@ library(processR)
 p <- Rcpp::Module(module = "processR", PACKAGE = "processR")
 
 
-
 ## Set-up OM (sigmaR = 0.4)
 working_dir <- getwd()
 
@@ -72,7 +71,6 @@ init_fims <- function(i) {
   # Set number of years
   # fishing_fleet$nyears<-10
   # om_input[["nyr"]]
-
 
 
   # typeof(fishing_fleet$nyears)
@@ -301,7 +299,6 @@ init_fims <- function(i) {
   population$nseasons$set(1)
 
 
-
   population$SetRecruitmentID(recruitment$get_id())
   population$SetGrowthID(ewaa_growth$get_id())
   population$SetMaturityID(maturity$get_id())
@@ -313,8 +310,6 @@ init_fims <- function(i) {
   clear()
   return(obj)
 }
-
-
 
 
 run_fims <- function() {
@@ -342,11 +337,6 @@ run_fims <- function() {
   }
   # return(results)
 }
-
-
-
-
-
 
 
 id <- 0 # mpi.comm.rank(comm = 0)
@@ -404,7 +394,6 @@ for (i in 1:processR::HardwareConcurrency()) {
 }
 
 end_ <- Sys.time()
-
 
 
 runtime <- (end_ - start)
