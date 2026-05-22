@@ -573,7 +573,7 @@ fit_fims <- function(input,
 
   if (is.null(opt)) {
     failed_nlminb_object <- return_failed_nlminb(obj)
-    failed_fit <-   fit <- FIMSFit(
+    failed_fit <- fit <- FIMSFit(
       input = input,
       obj = obj,
       opt = failed_nlminb_object[["opt"]],
@@ -607,7 +607,7 @@ fit_fims <- function(input,
           "i" = "The failed results are being returned."
         ))
         failed_nlminb_object <- return_failed_nlminb(obj)
-        failed_fit <-   fit <- FIMSFit(
+        failed_fit <- fit <- FIMSFit(
           input = input,
           obj = obj,
           opt = failed_nlminb_object[["opt"]],
@@ -721,7 +721,7 @@ try_nlminb <- function(object, control_list, starting_values) {
 }
 
 return_failed_nlminb <- function(object) {
-  failed_nlminb_message <-  c(
+  failed_nlminb_message <- c(
     "x" = "{.fun fit_fims} did not lead to a converged model.",
     "i" = "The resulting coefficients, probability values, or predictions are
     not accurate or stable and should not be used for management.",

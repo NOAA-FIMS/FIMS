@@ -238,7 +238,7 @@ test_that("fit_fims() errors when optimization fails to converge", {
         value = -Inf
       ),
       by = c("module_name", "label", "age")
-    )  |>
+    ) |>
     initialize_fims(data = data_4_model)
   test_results <- suppressWarnings(suppressMessages(
     fit_fims(initialized_poor_model, optimize = TRUE)
@@ -249,7 +249,7 @@ test_that("fit_fims() errors when optimization fails to converge", {
     names(get_opt(test_results)),
     c("par", "objective", "convergence", "message")
   )
-  
+
   clear()
 })
 
