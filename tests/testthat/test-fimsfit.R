@@ -223,5 +223,32 @@ test_that("fit_fims() errors when optimization fails to converge", {
     regexp = "Standard error calculations failed convergence checks"
   )
 
+  #' @description Test that fit_fims() returns a non-converged model when you know it is not supposed to converge. The warnings and messages are suppressed because {nlminb} uses backend code that we do not want to print to the screen during testing but we know will be there.
+  data("data_big", package = "FIMS")
+  data_4_model <- FIMSFrame(data_big)
+  # Create parameters
+  initialized_poor_model <- create_default_configurations(data_4_model) |>
+    create_default_parameters(data = data_4_model) |>
+    tidyr::unnest(cols = data) |>
+    dplyr::rows_update(
+      tibble::tibble(
+        module_name = "Population",
+        label = c("log_init_naa"),
+        age = 1,
+        value = -Inf
+      ),
+      by = c("module_name", "label", "age")
+    )  |>
+    initialize_fims(data = data_4_model)
+  test_results <- suppressWarnings(suppressMessages(
+    fit_fims(initialized_poor_model, optimize = TRUE)
+  ))
+  expect_true(inherits(test_results, "FIMSFit"))
+  expect_equal(get_opt(test_results)[["convergence"]], 1L)
+  expect_equal(
+    names(get_opt(test_results)),
+    c("par", "objective", "convergence", "message")
+  )
+  
   clear()
 })
