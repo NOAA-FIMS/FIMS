@@ -127,7 +127,7 @@ default_configurations_unnested
 
 ### Update configurations
 
-The default_configurations are just a starting point. Functions (e.g., `rows_*()`) from `{dplyr}` can be used to modify the default configurations as needed. For example, logistic selectivity for survey1 can be changed to double logistic selectivity.
+The default_configurations are just a starting point. Functions (e.g., `rows_*()`) from `{dplyr}` can be used to modify the default configurations as needed. For example, logistic selectivity for survey1 can be changed to age-based selectivity.
 ```{r updated_configurations, max.height='100px', attr.output='.numberLines'}
 # Update the module_type for survey1's selectivity
 updated_configurations <- default_configurations_unnested |>
@@ -135,7 +135,7 @@ updated_configurations <- default_configurations_unnested |>
     y = tibble::tibble(
       module_name = c("Selectivity"),
       fleet_name = c("survey1"),
-      module_type = c("DoubleLogistic")
+      module_type = c("SelectivityatAge")
     ),
     by = c("module_name", "fleet_name")
   )
@@ -208,14 +208,14 @@ parameters_4_model <- default_parameters |>
     by = c("fleet_name", "label", "time")
   ) |>
   # Update selectivity parameters and log_q for survey1
-  dplyr::rows_update(
-    tibble::tibble(
-      fleet_name = "survey1",
-      label = c("inflection_point", "slope", "log_q"),
-      value = c(1.5, 2, log(3.315143e-07))
-    ),
-    by = c("fleet_name", "label")
-  ) |>
+  #dplyr::rows_update(
+  #  tibble::tibble(
+  #    fleet_name = "survey1",
+  #    label = c("inflection_point", "slope", "log_q"),
+  #    value = c(1.5, 2, log(3.315143e-07))
+  #  ),
+  #  by = c("fleet_name", "label")
+  #) |>
   # Update log_devs in the Recruitment module (time steps 2-30)
   dplyr::rows_update(
     tibble::tibble(
