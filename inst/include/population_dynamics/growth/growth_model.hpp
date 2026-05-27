@@ -25,7 +25,6 @@ namespace fims_popdy {
  * - single sex (n_sexes = 1)
  * - no time variation (n_years = 1)
  * - fixed parameters
-
  */
 template <typename Type>
 class GrowthModel : public GrowthModelBase<Type> {
@@ -89,31 +88,27 @@ class GrowthModel : public GrowthModelBase<Type> {
           "reference_age_for_length_1");
     }
 
-    // Fill mean length-at-age and sd
     const Type laa_min = vb_.length_at_age(vb_.reference_age_for_length_1);
     const Type laa_max = vb_.length_at_age(vb_.reference_age_for_length_2);
     const Type laa_delta_safe = fims_math::ad_max(
         fims_math::ad_fabs(laa_max - laa_min), static_cast<Type>(1e-8));
     const Type slope =
         (n_ages_ > 1)
-            ? (length_at_age_sd_at_reference_age_2_ - length_at_age_sd_at_reference_age_1_) / laa_delta_safe
+            ? (length_at_age_sd_at_reference_age_2_ -
+               length_at_age_sd_at_reference_age_1_) / laa_delta_safe
             : Type(0.0);
+
+    // Fill mean length-at-age, sd, and mean weight-at-age.
     for (std::size_t y = 0; y < n_years_; ++y) {
       for (std::size_t a = 0; a < n_ages_; ++a) {
         for (std::size_t s = 0; s < n_sexes_; ++s) {
-          const Type age =
-              static_cast<Type>(a) + age_offset_;
+          const Type age = static_cast<Type>(a) + age_offset_;
 
           // log-scale params live upstream; laa here is natural scale
           const Type laa = vb_.length_at_age(age);
           products_.MeanLAA(y, a, s) = laa;
-          const Type sd_laa =
-              (n_ages_ > 1)
-                  ? length_at_age_sd_at_reference_age_1_ +
-                        slope * (laa - laa_min)
-                  : length_at_age_sd_at_reference_age_1_;
-          products_.SdLAA(y, a, s) = fims_math::ad_max(
-              sd_laa, static_cast<Type>(1e-8));
+          products_.SdLAA(y, a, s) =
+              ComputeLengthSdAtAge(laa, laa_min, slope);
           products_.MeanWAA(y, a, s) = vb_.weight_at_age(age);
         }
       }
@@ -126,8 +121,19 @@ class GrowthModel : public GrowthModelBase<Type> {
     return products_;
   }
 
-  /// For testing caching behavior
  private:
+  /// Interpolate length-at-age SD from the two reference-point SD values.
+  Type ComputeLengthSdAtAge(const Type& laa,
+                            const Type& laa_min,
+                            const Type& slope) const {
+    const Type sd_laa =
+        (n_ages_ > 1)
+            ? length_at_age_sd_at_reference_age_1_ + slope * (laa - laa_min)
+            : length_at_age_sd_at_reference_age_1_;
+
+    return fims_math::ad_max(sd_laa, static_cast<Type>(1e-8));
+  }
+
 
   std::size_t n_years_;
   std::size_t n_ages_;
