@@ -180,6 +180,11 @@ default_parameters
 default_parameters_unnested <- tidyr::unnest(default_parameters, cols = data)
 
 default_parameters_unnested
+
+# Look at default SelectivityatAge parameters
+default_parameters_unnested |> 
+  dplyr::filter(fleet_name == "survey1", module_name == "Selectivity") |>
+  dplyr::select(module_type, label, age, value, estimation_type)
 ```
 
 ### Update parameters
@@ -212,15 +217,27 @@ parameters_4_model <- default_parameters |>
     ),
     by = c("fleet_name", "label", "time")
   ) |>
-  # Update selectivity parameters and log_q for survey1
+  # Update log_q for survey1
   dplyr::rows_update(
-   tibble::tibble(
-     fleet_name = "survey1",
-     label = "logit_sel_at_age",
-     age = seq(get_n_ages(data_4_model)),
-     value = qlogis(c(0.001,0.1,0.5,0.5,0.5,0.5,0.5,0.999,0.999,0.999,0.999,0.999))
-   ),
-   by = c("fleet_name", "label","age")
+    tibble::tibble(
+      fleet_name = "survey1",
+      label = c("log_q"),
+      value = c(log(3.315143e-07))
+    ),
+    by = c("fleet_name", "label")
+  ) |>
+  # Update selectivity parameters for survey1
+  dplyr::rows_update(
+    tibble::tibble(
+      fleet_name = "survey1",
+      label = "logit_sel_at_age",
+      age = seq(get_n_ages(data_4_model)),
+      value = qlogis(c(0.001, 0.1, 0.5, 0.5, 0.5, 0.5, 0.5,
+                       0.999, 0.999, 0.999, 0.999, 0.999)),
+      estimation_type = c(rep("constant", 2), rep("fixed_effects", 5),
+                          rep("constant", 5))
+    ),
+   by = c("fleet_name", "label", "age")
   ) |>
   # Update log_devs in the Recruitment module (time steps 2-30)
   dplyr::rows_update(
@@ -268,6 +285,11 @@ parameters_4_model <- default_parameters |>
     ),
     by = c("label", "age")
   )
+
+# Look at updated SelectivityatAge parameters
+parameters_4_model |>
+  dplyr::filter(fleet_name == "survey1", module_name == "Selectivity") |>
+  dplyr::select(module_type, label, age, value, estimation_type)
 ```
 
 ## Fit
