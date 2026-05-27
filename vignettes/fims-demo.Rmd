@@ -232,10 +232,12 @@ parameters_4_model <- default_parameters |>
       fleet_name = "survey1",
       label = "logit_sel_at_age",
       age = seq(get_n_ages(data_4_model)),
-      value = qlogis(c(0.001, 0.1, 0.5, 0.5, 0.5, 0.5, 0.5,
-                       0.999, 0.999, 0.999, 0.999, 0.999)),
-      estimation_type = c(rep("constant", 2), rep("fixed_effects", 5),
-                          rep("constant", 5))
+      value = c(-1.000000, 1.000000, 2.999999, 4.999993, 6.999946,
+                8.999956, 11.000085, 12.982599, 15.019483, 18.420681,
+                18.420681, 18.420681),
+      estimation_type = c(rep("constant", 12))
+      #, rep("fixed_effects", 5),
+      #                    rep("constant", 5))
     ),
    by = c("fleet_name", "label", "age")
   ) |>
@@ -290,6 +292,10 @@ parameters_4_model <- default_parameters |>
 parameters_4_model |>
   dplyr::filter(fleet_name == "survey1", module_name == "Selectivity") |>
   dplyr::select(module_type, label, age, value, estimation_type)
+parameters_4_model |>
+  dplyr::filter(fleet_name == "survey1", label == "log_q") |>
+  dplyr::select(module_type, label, age, value, estimation_type)
+
 ```
 
 ## Fit
@@ -316,6 +322,11 @@ clear()
 fit <- parameters_4_model |>
   initialize_fims(data = data_4_model) |>
   fit_fims(optimize = TRUE)
+test_fit@obj$hessian
+fit@obj$hessian
+fit@obj$gr()
+fit@obj$par
+ests <- get_estimates(fit) #fails
 ```
 
 ### Logging system
