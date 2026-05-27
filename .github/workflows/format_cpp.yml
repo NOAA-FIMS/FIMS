@@ -1,35 +1,32 @@
-name: auto-clang-format
+name: clang-format
 
 on:
   push:
+  pull_request:
 
 jobs:
-  format:
+  clang-format:
     runs-on: ubuntu-latest
 
     permissions:
       contents: write
+
+    if: github.actor != 'github-actions[bot]'
 
     steps:
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
-      - name: Install clang-format
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y clang-format
+      - name: Run clang-format
+        uses: DoozyX/clang-format-lint-action@v0.20
+        with:
+          source: './inst/include ./src ./tests/gtest'
+          extensions: 'hpp, cpp'
+          style: "{BasedOnStyle: Google, SortIncludes: false}"
+          inplace: True
 
-      - name: Format source
-        run: |
-          find . \
-            \( -name '*.cpp' -o -name '*.hpp' -o -name '*.h' -o -name '*.cc' -o -name '*.cxx' \) \
-            -not -path './build/*' \
-            -not -path './.git/*' \
-            -print0 |
-          xargs -0 clang-format -i
-
-      - name: Commit changes
+      - name: Commit formatting changes
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
