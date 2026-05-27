@@ -78,7 +78,7 @@ struct RecruitmentBase : public fims_model_object::FIMSObject<Type> {
    */
   virtual const Type evaluate_mean(
       const Type &spawners,
-      const Type &phi_0  // need to add input parameter values
+      const Type &phi_0) = 0;  // need to add input parameter values
 
   /** @brief Handle error in recruitment
    *
