@@ -394,7 +394,7 @@ create_default_SelectivityatAge <- function(
       module_type = "SelectivityatAge",
       label = "logit_sel_at_age",
       age = get_ages(data),
-      # default selectivity_at_age based on what would be defaults from logistic 
+      # default selectivity_at_age based on what would be defaults from logistic
       # curve with inflection point 2 and slope 1:
       value = qlogis(1/(1+(exp(-1*(get_ages(data)-2))))),
       estimation_type = "fixed_effects"
@@ -414,7 +414,7 @@ create_default_SelectivityatAge <- function(
 #' of selectivity.
 #' @noRd
 create_default_selectivity <- function(
-  form = c("Logistic", "DoubleLogistic","SelectivityatAge")
+  form = c("Logistic", "DoubleLogistic","SelectivityatAge"),data
 ) {
   # Input checks
   form <- rlang::arg_match(form)
@@ -424,7 +424,7 @@ create_default_selectivity <- function(
   default <- switch(form,
     "Logistic" = create_default_Logistic(),
     "DoubleLogistic" = create_default_DoubleLogistic(),
-    "SelectivityatAge" = create_default_SelectivityatAge()
+    "SelectivityatAge" = create_default_SelectivityatAge(data=data)
   ) |>
     dplyr::mutate(
       module_name = "Selectivity"
@@ -469,7 +469,7 @@ create_default_fleet <- function(unnested_configurations,
     dplyr::pull(module_type)
 
   selectivity_default <- create_default_selectivity(
-    form = selectivity_form
+    form = selectivity_form, data=data
   ) |>
     # Add fleet name
     dplyr::mutate(

@@ -164,8 +164,13 @@ By just passing the configurations and the data to `create_default_parameters()`
 
 ```{r parameters, max.height='100px', attr.output='.numberLines'}
 # Create default parameters based on default_configurations and data
+# default_parameters <- create_default_parameters(
+#   configurations = default_configurations,
+#   data = data_4_model
+# )
+
 default_parameters <- create_default_parameters(
-  configurations = default_configurations,
+  configurations = updated_configurations,
   data = data_4_model
 )
 
@@ -208,14 +213,15 @@ parameters_4_model <- default_parameters |>
     by = c("fleet_name", "label", "time")
   ) |>
   # Update selectivity parameters and log_q for survey1
-  #dplyr::rows_update(
-  #  tibble::tibble(
-  #    fleet_name = "survey1",
-  #    label = c("inflection_point", "slope", "log_q"),
-  #    value = c(1.5, 2, log(3.315143e-07))
-  #  ),
-  #  by = c("fleet_name", "label")
-  #) |>
+  dplyr::rows_update(
+   tibble::tibble(
+     fleet_name = "survey1",
+     label = "logit_sel_at_age",
+     age = seq(get_n_ages(data_4_model)),
+     value = qlogis(c(0.001,0.1,0.5,0.5,0.5,0.5,0.5,0.999,0.999,0.999,0.999,0.999))
+   ),
+   by = c("fleet_name", "label","age")
+  ) |>
   # Update log_devs in the Recruitment module (time steps 2-30)
   dplyr::rows_update(
     tibble::tibble(

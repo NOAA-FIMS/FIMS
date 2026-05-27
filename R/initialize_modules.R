@@ -45,6 +45,7 @@ initialize_module <- function(parameters, data, module_name, fleet_name = NA_cha
     ) |>
     dplyr::pull(temp_name) |>
     unique()
+  if(module_class_name == 'SelectivityatAgeSelectivity') module_class_name <- "SelectivityatAge"
   module_class <- get(module_class_name)
   module_fields <- names(module_class@fields)
   module <- methods::new(module_class)
@@ -149,7 +150,7 @@ initialize_module <- function(parameters, data, module_name, fleet_name = NA_cha
 
   integer_fields <- c(
     "n_ages", "n_fleets", "n_lengths",
-    "n_years"
+    "n_years", "min_age"
   )
 
   boolean_fields <- c(
@@ -172,7 +173,8 @@ initialize_module <- function(parameters, data, module_name, fleet_name = NA_cha
             length(),
           # Or we can use get_n_fleets(data),
           "n_lengths" = get_n_lengths(data),
-          "n_years" = get_n_years(data)
+          "n_years" = get_n_years(data),
+          "min_age" = min(get_ages(data))
         )
       )
     } else if (field %in% c("ages", "weights")) {
