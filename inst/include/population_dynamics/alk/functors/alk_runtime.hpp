@@ -24,9 +24,11 @@ namespace fims_popdy {
  * @brief Build the active ALK for a fleet from the current population and fleet
  * state.
  *
- * Tries the growth-derived ALK path first when the linked population growth
- * object exposes the required observation capability. Falls back to the fixed
- * age-to-length conversion matrix when the growth-derived path is not usable.
+ * Tries the growth-derived ALK path when the linked population growth object
+ * exposes the required observation capability. When that capability exists,
+ * the growth-derived path must succeed or the build fails. Fixed age-to-length
+ * conversion is only used for growth objects that do not expose the
+ * growth-derived observation capability.
  *
  * @param population Shared pointer to the owning population.
  * @param fleet Shared pointer to the fleet.
@@ -47,21 +49,20 @@ std::shared_ptr<ALKBase<Type>> BuildFleetALK(
     std::shared_ptr<ALKBase<Type>> growth_alk =
         std::make_shared<GrowthDerivedALK<Type>>(fleet, growth_observation);
 
-    if (growth_alk != nullptr &&
-        growth_alk->IsActive() &&
+    if (growth_alk->IsActive() &&
         growth_alk->PrepareForCurrentState()) {
       FIMS_INFO_LOG("Growth-derived ALK successfully set to fleet " +
                     fims::to_string(fleet->id) + " for population " +
                     fims::to_string(population->id));
       return growth_alk;
     }
+    return nullptr;
   }
 
   std::shared_ptr<ALKBase<Type>> fixed_alk =
       std::make_shared<FixedMatrixALK<Type>>(fleet);
 
-  if (fixed_alk != nullptr &&
-      fixed_alk->IsActive() &&
+  if (fixed_alk->IsActive() &&
       fixed_alk->PrepareForCurrentState()) {
     FIMS_INFO_LOG("Fixed age-to-length matrix successfully set to fleet " +
                   fims::to_string(fleet->id));
@@ -74,10 +75,10 @@ std::shared_ptr<ALKBase<Type>> BuildFleetALK(
 /**
  * @brief Ensure a fleet has an active ALK before length-based calculations.
  *
- * Reuses the current fleet ALK when it is active and can prepare for the
- * current model state. Otherwise rebuilds the fleet ALK from the current
- * population and fleet state. Throws when the fleet has length bins but no
- * usable ALK path can be constructed.
+ * Reuses the current fleet ALK when it matches the current population growth
+ * path and can prepare for the current model state. Otherwise rebuilds the
+ * fleet ALK from the current population and fleet state. Throws when the fleet
+ * has length bins but no usable ALK path can be constructed.
  *
  * @param population Shared pointer to the owning population.
  * @param fleet Shared pointer to the fleet.
@@ -89,14 +90,32 @@ void EnsureFleetALK(const std::shared_ptr<Population<Type>>& population,
     throw std::runtime_error("Fleet pointer was null while resolving ALK.");
   }
 
+  if (population == nullptr) {
+    throw std::runtime_error("Population pointer was null while resolving ALK.");
+  }
+
   if (fleet->n_lengths == 0) {
     return;
   }
 
-  if (fleet->alk != nullptr &&
-      fleet->alk->IsActive() &&
-      fleet->alk->PrepareForCurrentState()) {
-    return;
+  std::shared_ptr<GrowthDerivedObservationBase<Type>> growth_observation =
+      std::dynamic_pointer_cast<GrowthDerivedObservationBase<Type>>(
+          population->growth);
+
+  if (fleet->alk != nullptr) {
+    if (growth_observation != nullptr) {
+      std::shared_ptr<GrowthDerivedALK<Type>> growth_alk =
+          std::dynamic_pointer_cast<GrowthDerivedALK<Type>>(fleet->alk);
+
+      if (growth_alk != nullptr &&
+          growth_alk->IsActive() &&
+          growth_alk->PrepareForCurrentState()) {
+        return;
+      }
+    } else if (fleet->alk->IsActive() &&
+               fleet->alk->PrepareForCurrentState()) {
+      return;
+    }
   }
 
   fleet->alk = BuildFleetALK<Type>(population, fleet);
@@ -107,11 +126,16 @@ void EnsureFleetALK(const std::shared_ptr<Population<Type>>& population,
 
   std::stringstream ss;
   ss << "Fleet " << fleet->GetId()
-     << " has length composition bins but no usable "
-     << "age-to-length conversion path. Provide fixed "
-     << "age-to-length conversion of size "
-     << (fleet->n_ages * fleet->n_lengths)
-     << " or use a supported growth-derived ALK path.";
+     << " has length composition bins but no usable age-to-length conversion path.";
+
+  if (growth_observation != nullptr) {
+    ss << " This population uses a growth-derived-capable growth object, so "
+       << "the growth-derived ALK path was required and could not be built.";
+  } else {
+    ss << " Provide a valid fixed age-to-length conversion matrix for this "
+       << "fleet or use a supported growth-derived-capable growth object.";
+  }
+
   FIMS_ERROR_LOG(ss.str());
   throw std::runtime_error(ss.str());
 }

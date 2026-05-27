@@ -747,7 +747,10 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * \f[
    * CW_{f,a,y} = C_{f,a,y} \times w_a
    * \f]
-   *
+   * Weight at age comes from the historical direct growth evaluation path
+   * unless the population growth object exposes the growth-derived
+   * observation interface, in which case the fleet-specific growth-derived
+   * path is used.
    * @snippet{doc} this param_population
    * @snippet{doc} this param_year
    * @snippet{doc} this param_age
@@ -756,15 +759,31 @@ class CatchAtAge : public FisheryModelBase<Type> {
       std::shared_ptr<fims_popdy::Population<Type>> &population, size_t year,
       size_t age) {
     int i_age_year = year * population->n_ages + age;
+
+    if (population->growth == nullptr) {
+      throw std::runtime_error(
+          "Population growth pointer was null while resolving landings weight-at-age.");
+    }
+
+    std::shared_ptr<fims_popdy::GrowthDerivedObservationBase<Type>>
+        growth_observation =
+            std::dynamic_pointer_cast<
+                fims_popdy::GrowthDerivedObservationBase<Type>>(
+                population->growth);
+
     for (size_t fleet_ = 0; fleet_ < population->n_fleets; fleet_++) {
       std::shared_ptr<fims_popdy::Fleet<Type>> &fleet =
           population->fleets[fleet_];
       std::map<std::string, fims::Vector<Type>> &fdq_ =
           this->GetFleetDerivedQuantities(fleet->GetId());
 
+      Type mean_weight_at_age =
+          (growth_observation != nullptr)
+              ? GrowthDerivedFleetMeanWeightAA(fleet, year, age)
+              : population->growth->evaluate(population->ages[age]);
+
       fdq_["landings_weight_at_age"][i_age_year] =
-          fdq_["landings_numbers_at_age"][i_age_year] *
-          GrowthDerivedFleetMeanWeightAA(population, fleet, year, age);
+          fdq_["landings_numbers_at_age"][i_age_year] * mean_weight_at_age;
     }
   }
 
@@ -881,7 +900,10 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * \f[
    * IWAA_{f,a,y} = IN_{f,a,y} \times w_a
    * \f]
-   *
+   * Weight at age comes from the historical direct growth evaluation path
+   * unless the population growth object exposes the growth-derived
+   * observation interface, in which case the fleet-specific growth-derived
+   * path is used.
    * @snippet{doc} this param_population
    * @snippet{doc} this param_year
    * @snippet{doc} this param_age
@@ -890,15 +912,31 @@ class CatchAtAge : public FisheryModelBase<Type> {
       std::shared_ptr<fims_popdy::Population<Type>> &population, size_t year,
       size_t age) {
     int i_age_year = year * population->n_ages + age;
+
+    if (population->growth == nullptr) {
+      throw std::runtime_error(
+          "Population growth pointer was null while resolving index weight-at-age.");
+    }
+
+    std::shared_ptr<fims_popdy::GrowthDerivedObservationBase<Type>>
+        growth_observation =
+            std::dynamic_pointer_cast<
+                fims_popdy::GrowthDerivedObservationBase<Type>>(
+                population->growth);
+
     for (size_t fleet_ = 0; fleet_ < population->n_fleets; fleet_++) {
       std::shared_ptr<fims_popdy::Fleet<Type>> &fleet =
           population->fleets[fleet_];
       std::map<std::string, fims::Vector<Type>> &fdq_ =
           this->GetFleetDerivedQuantities(fleet->GetId());
 
+      Type mean_weight_at_age =
+          (growth_observation != nullptr)
+              ? GrowthDerivedFleetMeanWeightAA(fleet, year, age)
+              : population->growth->evaluate(population->ages[age]);
+
       fdq_["index_weight_at_age"][i_age_year] =
-          fdq_["index_numbers_at_age"][i_age_year] *
-          GrowthDerivedFleetMeanWeightAA(population, fleet, year, age);
+          fdq_["index_numbers_at_age"][i_age_year] * mean_weight_at_age;
     }
   }
 
@@ -1096,9 +1134,10 @@ class CatchAtAge : public FisheryModelBase<Type> {
   /**
    * @brief Ensure all fleets linked to this model have a usable ALK.
    *
-   * Reuses each fleet's current ALK when it is active and can prepare for the
-   * current model state. Otherwise rebuilds the fleet ALK from the current
-   * population and fleet state before evaluation or reporting uses it.
+   * Reuses each fleet's current ALK when it matches the current population
+   * growth path and can prepare for the current model state. Otherwise
+   * rebuilds the fleet ALK from the current population and fleet state before
+   * evaluation or reporting uses it.
    */
   void EnsureAllFleetALKs() {
     for (size_t p = 0; p < this->populations.size(); ++p) {
@@ -1107,43 +1146,12 @@ class CatchAtAge : public FisheryModelBase<Type> {
   }
 
   /**
-   * @brief Returns prepared growth products for a population when that growth
-   * object supports the growth-derived observation interface.
-   *
-   * This helper centralizes the runtime checks needed to access prepared
-   * population growth products from catch-at-age code. It returns nullptr when
-   * the population has no growth object, when the growth object does not expose
-   * prepared products, or when products have not yet been prepared.
-   *
-   * @param population Shared pointer to the population object.
-   * @return Pointer to prepared growth products, or nullptr if unavailable.
-   */
-  const fims_popdy::GrowthProducts<Type>* TryGetPreparedPopulationGrowthProducts(
-      const std::shared_ptr<fims_popdy::Population<Type>>& population) const {
-    if (population == nullptr || population->growth == nullptr) {
-      return nullptr;
-    }
-
-    std::shared_ptr<fims_popdy::GrowthDerivedObservationBase<Type>>
-        growth_observation =
-            std::dynamic_pointer_cast<
-                fims_popdy::GrowthDerivedObservationBase<Type>>(
-                population->growth);
-
-    if (growth_observation == nullptr) {
-      return nullptr;
-    }
-
-    return growth_observation->TryGetPreparedGrowthProducts();
-  }
-
-  /**
    * @brief Prepares cached population growth products for all populations whose
    * growth objects expose the growth-derived observation interface.
    *
-   * This helper makes population growth-product preparation explicit inside
-   * catch-at-age evaluation so downstream population and fleet calculations can
-   * reuse prepared values.
+   * This helper makes sure growth-derived-capable populations prepare their
+   * cached growth products before catch-at-age evaluation so code that uses
+   * those prepared values can access them consistently.
    */
   void PreparePopulationGrowthProducts() {
     for (size_t p = 0; p < this->populations.size(); ++p) {
@@ -1167,26 +1175,28 @@ class CatchAtAge : public FisheryModelBase<Type> {
   }
 
   /**
-   * @brief Computes fleet-specific expected weight-at-age using the best
-   * available growth-derived path.
+   * @brief Computes fleet-specific expected weight-at-age using the
+   * growth-derived path.
    *
-   * This helper prefers fleet-bin-aware weight-at-age when available, first
-   * through the per-evaluation fleet cache and then through the dynamic ALK
-   * row path. If those paths are unavailable, it falls back to prepared
-   * population growth products and finally to direct growth evaluation for
-   * modules that only expose evaluate(age), such as EWAA.
+   * This helper uses the fleet-specific growth-derived path only. It first
+   * prefers the per-evaluation fleet WAA cache and then the dynamic ALK row
+   * path. If neither growth-derived path is available, the function fails
+   * rather than silently switching to a different weight-at-age meaning.
    *
-   * @param population Shared pointer to the population object.
    * @param fleet Shared pointer to the fleet object.
    * @param year Year index.
    * @param age Age index.
-   * @return Expected fleet-specific weight-at-age for the best available path.
+   * @return Expected fleet-specific weight-at-age from the growth-derived path.
    */
   Type GrowthDerivedFleetMeanWeightAA(
-      const std::shared_ptr<fims_popdy::Population<Type>>& population,
       const std::shared_ptr<fims_popdy::Fleet<Type>>& fleet,
       size_t year,
       size_t age) {
+    if (fleet == nullptr) {
+      throw std::runtime_error(
+          "Fleet pointer was null while resolving growth-derived fleet mean weight-at-age.");
+    }
+
     Type cached_mean_weight = static_cast<Type>(0.0);
     if (TryGetCachedGrowthDerivedFleetMeanWeightAA(
             fleet, year, age, cached_mean_weight)) {
@@ -1212,26 +1222,24 @@ class CatchAtAge : public FisheryModelBase<Type> {
                                   fleet, alk_row);
     }
 
-    const auto* gp = TryGetPreparedPopulationGrowthProducts(population);
-    if (gp != nullptr && gp->n_sexes > 0 &&
-        year < gp->n_years && age < gp->n_ages) {
-      return gp->MeanWAA(year, age, 0);
-    }
-
-    // Last-resort fallback when fleet-specific cached WAA, the dynamic ALK row
-    // path, and prepared population growth products are all unavailable.
-    return population->growth->evaluate(population->ages[age]);
+    std::stringstream ss;
+    ss << "Failed to resolve growth-derived fleet mean weight-at-age for fleet id "
+       << fleet->GetId() << ", year " << year
+       << ", age " << age << ".";
+    FIMS_ERROR_LOG(ss.str());
+    throw std::runtime_error(ss.str());
   }
 
   /**
-   * @brief Computes population-level mean weight-at-age using the best
-   * available growth-derived path.
+   * @brief Calculates population-level mean weight-at-age.
    *
-   * This helper prefers the canonical fleet/bin-aware growth-derived weight
-   * path when one shared fleet-bin definition can be reused safely at the
-   * population level. Otherwise it falls back to prepared population growth
-   * products and finally to direct growth evaluation for modules that only
-   * expose evaluate(age), such as EWAA.
+   * This function returns the mean weight at age \f$w_a\f$ for a population.
+   * For growth objects that do not expose the growth-derived observation
+   * interface, it uses the historical direct growth evaluation path.
+   * For growth-derived-capable populations, it uses the canonical
+   * fleet/bin-aware growth-derived weight path when one shared fleet-bin
+   * definition can be reused safely at the population level. If no such
+   * growth-derived path is available, the function fails.
    *
    * @param population Shared pointer to the population object.
    * @param year Year index.
@@ -1242,22 +1250,38 @@ class CatchAtAge : public FisheryModelBase<Type> {
       const std::shared_ptr<fims_popdy::Population<Type>>& population,
       size_t year,
       size_t age) {
+    if (population == nullptr) {
+      throw std::runtime_error(
+          "Population pointer was null while resolving population mean weight-at-age.");
+    }
+
+    if (population->growth == nullptr) {
+      throw std::runtime_error(
+          "Population growth pointer was null while resolving population mean weight-at-age.");
+    }
+
+    std::shared_ptr<fims_popdy::GrowthDerivedObservationBase<Type>>
+        growth_observation =
+            std::dynamic_pointer_cast<
+                fims_popdy::GrowthDerivedObservationBase<Type>>(
+                population->growth);
+
+    if (growth_observation == nullptr) {
+      return population->growth->evaluate(population->ages[age]);
+    }
+
     std::shared_ptr<fims_popdy::Fleet<Type>> canonical_fleet =
         GetCanonicalGrowthDerivedWeightFleet(population);
     if (canonical_fleet != nullptr) {
-      return GrowthDerivedFleetMeanWeightAA(
-          population, canonical_fleet, year, age);
+      return GrowthDerivedFleetMeanWeightAA(canonical_fleet, year, age);
     }
 
-    const auto* gp = TryGetPreparedPopulationGrowthProducts(population);
-    if (gp != nullptr && gp->n_sexes > 0 &&
-        year < gp->n_years && age < gp->n_ages) {
-      return gp->MeanWAA(year, age, 0);
-    }
-    // Historical last-resort fallback when no single shared fleet-bin
-    // definition can be reused safely at the population level and no prepared
-    // population growth products are available.
-    return population->growth->evaluate(population->ages[age]);
+    std::stringstream ss;
+    ss << "Failed to resolve population mean weight-at-age from the "
+       << "growth-derived path for population id " << population->GetId()
+       << ", year " << year << ", age " << age << ".";
+    FIMS_ERROR_LOG(ss.str());
+    throw std::runtime_error(ss.str());
   }
 
   /**
@@ -1276,6 +1300,11 @@ class CatchAtAge : public FisheryModelBase<Type> {
    */
   std::shared_ptr<fims_popdy::Fleet<Type>> GetCanonicalGrowthDerivedWeightFleet(
       const std::shared_ptr<fims_popdy::Population<Type>>& population) {
+    if (population == nullptr) {
+      throw std::runtime_error(
+          "Population pointer was null while resolving canonical growth-derived fleet.");
+    }
+
     if (population->fleets.size() == 0) {
       return nullptr;
     }
@@ -1321,7 +1350,6 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * Small convenience wrapper used to keep reporting and higher-level logic
    * readable when checking whether the population can reuse one shared fleet
    * bin definition.
-   * 
    * This is true when every linked fleet supports the narrow dynamic ALK path
    * and all linked fleets share the same length-bin centers.
    *
@@ -1333,7 +1361,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
     return GetCanonicalGrowthDerivedWeightFleet(population) != nullptr;
   }
 
-   /**
+  /**
    * Evaluate the proportion of landings numbers at length.
    */
   void evaluate_length_comp() {
@@ -1348,7 +1376,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
         if (fleet->alk == nullptr || !fleet->alk->IsActive()) {
           std::stringstream ss;
           ss << "Fleet id " << fleet->GetId()
-             << " has length composition bins but no active ALK.";
+             << "no usable age-to-length conversion path";
           FIMS_ERROR_LOG(ss.str());
           throw std::runtime_error(ss.str());
         }

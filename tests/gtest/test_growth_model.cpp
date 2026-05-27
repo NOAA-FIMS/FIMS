@@ -89,17 +89,13 @@ TEST(GrowthModel, ZeroAgesThrows) {
   EXPECT_THROW(gm.Prepare(), std::runtime_error);
 }
 
-TEST(GrowthModel, HandlesDegenerateLaaRangeWithoutThrow) {
+TEST(GrowthModel, RejectsNonIncreasingReferenceLengths) {
   fims_popdy::GrowthModel<double> gm(1, 2, 1);
   gm.SetVonBertalanffyParameters(275.0, 275.0, 0.18, 1.0, 12.0);
   gm.SetLengthWeightParameters(2.5e-11, 3.0);
   gm.SetLengthSdParams(28.0, 73.0);
 
-  EXPECT_NO_THROW(gm.Prepare());
-  const auto& p = gm.GetProducts();
-  EXPECT_TRUE(std::isfinite(p.MeanLAA(0, 0, 0)));
-  EXPECT_TRUE(std::isfinite(p.SdLAA(0, 0, 0)));
-  EXPECT_TRUE(std::isfinite(p.MeanWAA(0, 0, 0)));
+  EXPECT_THROW(gm.Prepare(), std::runtime_error);
 }
 
 TEST(GrowthModel, RejectsCoincidentReferenceAges) {
@@ -111,15 +107,13 @@ TEST(GrowthModel, RejectsCoincidentReferenceAges) {
   EXPECT_THROW(gm.Prepare(), std::runtime_error);
 }
 
-TEST(GrowthModel, HandlesZeroLengthWeightAWithoutThrow) {
+TEST(GrowthModel, RejectsNonPositiveLengthWeightA) {
   fims_popdy::GrowthModel<double> gm(1, 2, 1);
   gm.SetVonBertalanffyParameters(275.0, 725.0, 0.18, 1.0, 12.0);
   gm.SetLengthWeightParameters(0.0, 3.0);
   gm.SetLengthSdParams(28.0, 73.0);
 
-  EXPECT_NO_THROW(gm.Prepare());
-  const auto& p = gm.GetProducts();
-  EXPECT_NEAR(p.MeanWAA(0, 0, 0), 0.0, 1e-12);
+  EXPECT_THROW(gm.Prepare(), std::runtime_error);
 }
 
 TEST(GrowthModel, HandlesNegativeSdInputsWithoutThrow) {
@@ -136,7 +130,7 @@ TEST(GrowthModel, HandlesNegativeSdInputsWithoutThrow) {
 TEST(GrowthModel, SingleAgeRejectsCoincidentReferenceAges) {
   fims_popdy::GrowthModel<double> gm(1, 1, 1);
   // Coincident reference ages are invalid even with one modeled age.
-  gm.SetVonBertalanffyParameters(275.0, 275.0, 0.18, 1.0, 1.0);
+  gm.SetVonBertalanffyParameters(275.0, 725.0, 0.18, 1.0, 1.0);
   gm.SetLengthWeightParameters(2.5e-11, 3.0);
   gm.SetLengthSdParams(28.0, 73.0);
 
