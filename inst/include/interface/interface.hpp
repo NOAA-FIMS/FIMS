@@ -25,23 +25,24 @@
 #include "TMB/TMB.h"
 
 // define REPORT, ADREPORT, and SIMULATE
-#define FIMS_REPORT_F(name, F)                                                 \
-  if (isDouble<Type>::value &&                                                 \
-      F->current_parallel_region < static_cast<Type>(0)) {                     \
-    Rf_defineVar(Rf_install(#name), PROTECT(asSEXP(name)), F->report);         \
-    UNPROTECT(1);                                                              \
+#define FIMS_REPORT_F(name, F)                                         \
+  if (isDouble<Type>::value &&                                         \
+      F->current_parallel_region < static_cast<Type>(0)) {             \
+    Rf_defineVar(Rf_install(#name), PROTECT(asSEXP(name)), F->report); \
+    UNPROTECT(1);                                                      \
   }
 
-#define FIMS_REPORT_F_(name, obj, F)                                           \
-  if (isDouble<Type>::value &&                                                 \
-      F->current_parallel_region < static_cast<Type>(0)) {                     \
-    Rf_defineVar(Rf_install(name), PROTECT(asSEXP(obj)), F->report);           \
-    UNPROTECT(1);                                                              \
+#define FIMS_REPORT_F_(name, obj, F)                                 \
+  if (isDouble<Type>::value &&                                       \
+      F->current_parallel_region < static_cast<Type>(0)) {           \
+    Rf_defineVar(Rf_install(name), PROTECT(asSEXP(obj)), F->report); \
+    UNPROTECT(1);                                                    \
   }
 
 #define ADREPORT_F(name, F) F->reportvector.push(name, #name);
 
-template <typename Type> vector<Type> ADREPORTvector(vector<vector<Type>> x) {
+template <typename Type>
+vector<Type> ADREPORTvector(vector<vector<Type>> x) {
   int outer_dim = x.size();
   int dim = 0;
   for (int i = 0; i < outer_dim; i++) {

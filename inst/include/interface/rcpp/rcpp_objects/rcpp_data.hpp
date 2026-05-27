@@ -17,7 +17,7 @@
  * interfaces. This type should be inherited and not called from R directly.
  */
 class DataInterfaceBase : public FIMSRcppInterfaceBase {
-public:
+ public:
   /**
    * @brief The vector of data that is being passed from R.
    */
@@ -58,7 +58,8 @@ public:
    * @param other
    */
   DataInterfaceBase(const DataInterfaceBase &other)
-      : observed_data(other.observed_data), uncertainty(other.uncertainty),
+      : observed_data(other.observed_data),
+        uncertainty(other.uncertainty),
         id(other.id) {}
 
   /**
@@ -82,7 +83,7 @@ public:
  * acomp <- methods::new(AgeComp).
  */
 class AgeCompDataInterface : public DataInterfaceBase {
-public:
+ public:
   /**
    * @brief The first dimension of the data, which relates to the number of age
    * bins.
@@ -123,8 +124,11 @@ public:
    * @param other
    */
   AgeCompDataInterface(const AgeCompDataInterface &other)
-      : DataInterfaceBase(other), amax(other.amax), ymax(other.ymax),
-        age_comp_data(other.age_comp_data), uncertainty(other.uncertainty) {}
+      : DataInterfaceBase(other),
+        amax(other.amax),
+        ymax(other.ymax),
+        age_comp_data(other.age_comp_data),
+        uncertainty(other.uncertainty) {}
 
   /**
    * @brief The destructor.
@@ -170,7 +174,8 @@ public:
 
 #ifdef TMB_MODEL
 
-  template <typename Type> bool add_to_fims_tmb_internal() {
+  template <typename Type>
+  bool add_to_fims_tmb_internal() {
     std::shared_ptr<fims_data_object::DataObject<Type>> age_comp_data =
         std::make_shared<fims_data_object::DataObject<Type>>(this->ymax,
                                                              this->amax);
@@ -211,7 +216,7 @@ public:
  * lcomp <- methods::new(LengthComp).
  */
 class LengthCompDataInterface : public DataInterfaceBase {
-public:
+ public:
   /**
    * @brief The first dimension of the data, which relates to the number of
    * length bins.
@@ -252,7 +257,9 @@ public:
    * @param other
    */
   LengthCompDataInterface(const LengthCompDataInterface &other)
-      : DataInterfaceBase(other), lmax(other.lmax), ymax(other.ymax),
+      : DataInterfaceBase(other),
+        lmax(other.lmax),
+        ymax(other.ymax),
         length_comp_data(other.length_comp_data),
         uncertainty(other.uncertainty) {}
 
@@ -299,7 +306,8 @@ public:
   }
 
 #ifdef TMB_MODEL
-  template <typename Type> bool add_to_fims_tmb_internal() {
+  template <typename Type>
+  bool add_to_fims_tmb_internal() {
     std::shared_ptr<fims_data_object::DataObject<Type>> length_comp_data =
         std::make_shared<fims_data_object::DataObject<Type>>(this->ymax,
                                                              this->lmax);
@@ -336,7 +344,7 @@ public:
  * fleet <- methods::new(Index).
  */
 class IndexDataInterface : public DataInterfaceBase {
-public:
+ public:
   /**
    * @brief An integer that specifies the second dimension of the data.
    */
@@ -370,8 +378,10 @@ public:
    * @param other
    */
   IndexDataInterface(const IndexDataInterface &other)
-      : DataInterfaceBase(other), ymax(other.ymax),
-        index_data(other.index_data), uncertainty(other.uncertainty) {}
+      : DataInterfaceBase(other),
+        ymax(other.ymax),
+        index_data(other.index_data),
+        uncertainty(other.uncertainty) {}
 
   /**
    * @brief The destructor.
@@ -417,7 +427,8 @@ public:
 
 #ifdef TMB_MODEL
 
-  template <typename Type> bool add_to_fims_tmb_internal() {
+  template <typename Type>
+  bool add_to_fims_tmb_internal() {
     std::shared_ptr<fims_data_object::DataObject<Type>> data =
         std::make_shared<fims_data_object::DataObject<Type>>(this->ymax);
 
@@ -454,7 +465,7 @@ public:
  * fleet <- methods::new(Landings).
  */
 class LandingsDataInterface : public DataInterfaceBase {
-public:
+ public:
   /**
    * @brief An integer that specifies the second dimension of the data.
    */
@@ -488,8 +499,10 @@ public:
    * @param other
    */
   LandingsDataInterface(const LandingsDataInterface &other)
-      : DataInterfaceBase(other), ymax(other.ymax),
-        landings_data(other.landings_data), uncertainty(other.uncertainty) {}
+      : DataInterfaceBase(other),
+        ymax(other.ymax),
+        landings_data(other.landings_data),
+        uncertainty(other.uncertainty) {}
 
   /**
    * @brief The destructor.
@@ -535,7 +548,8 @@ public:
 
 #ifdef TMB_MODEL
 
-  template <typename Type> bool add_to_fims_tmb_internal() {
+  template <typename Type>
+  bool add_to_fims_tmb_internal() {
     std::shared_ptr<fims_data_object::DataObject<Type>> data =
         std::make_shared<fims_data_object::DataObject<Type>>(this->ymax);
 

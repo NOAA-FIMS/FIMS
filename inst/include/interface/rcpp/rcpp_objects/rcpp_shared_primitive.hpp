@@ -27,10 +27,10 @@
  * is destroyed.
  */
 class SharedInt {
-private:
+ private:
   std::shared_ptr<int> value;
 
-public:
+ public:
   /**
    * @brief Construct a new `SharedInt` object.
    *
@@ -787,10 +787,10 @@ inline bool operator>=(const int &lhs, const SharedInt &rhs) {
  * is destroyed.
  */
 class SharedReal {
-private:
+ private:
   std::shared_ptr<int> value;
 
-public:
+ public:
   /**
    * @brief Constructs a new `SharedReal` object with a default value.
    *
@@ -1511,10 +1511,10 @@ inline SharedReal operator/(const double &lhs, const SharedReal &rhs) {
  * is destroyed.
  */
 class SharedString {
-private:
+ private:
   std::shared_ptr<std::string> value;
 
-public:
+ public:
   /**
    * @brief Constructs a new SharedString object with a default, empty value.
    *
@@ -1702,10 +1702,10 @@ public:
  * is destroyed.
  */
 class SharedBoolean {
-private:
+ private:
   std::shared_ptr<bool> value;
 
-public:
+ public:
   /**
    * @brief Constructs a new SharedBoolean object with a default value.
    *

@@ -24,7 +24,8 @@ namespace fims_popdy {
  * percent of unfished spawning biomass. Steepness is subject to a logit
  * transformation to keep it between 0.2 and 1.0.
  */
-template <typename Type> struct SRBevertonHolt : public RecruitmentBase<Type> {
+template <typename Type>
+struct SRBevertonHolt : public RecruitmentBase<Type> {
   // Here we define the members that will be used in the Beverton--Holt
   // stock--recruitment function. These members are needed by the Beverton--Holt
   // stock--recruitment function but will not be common to all recruitment
@@ -72,6 +73,6 @@ template <typename Type> struct SRBevertonHolt : public RecruitmentBase<Type> {
   virtual const Type evaluate_process(size_t pos) { return 0; }
 };
 
-} // namespace fims_popdy
+}  // namespace fims_popdy
 
 #endif /* FIMS_POPULATION_DYNAMICS_RECRUITMENT_SR_BEVERTON_HOLT_HPP */

@@ -48,7 +48,7 @@ enum JsonValueType {
  * Represents a JSON value.
  */
 class JsonValue {
-public:
+ public:
   /** Default constructor, initializes to Null value. */
   JsonValue() : type(JsonValueType::Null) {}
 
@@ -91,7 +91,7 @@ public:
   /** Get the JSON array. */
   JsonArray &GetArray() { return array; }
 
-private:
+ private:
   JsonValueType type; /**< Type of the JSON value. */
   double number;      /**< Numeric value. */
   std::string str;    /**< String value. */
@@ -104,7 +104,7 @@ private:
  * Parses JSON strings and generates JSON values.
  */
 class JsonParser {
-public:
+ public:
   /** Parse a JSON string and return the corresponding JSON value. */
   JsonValue Parse(const std::string &json);
   /** Write a JSON value to a file. */
@@ -135,57 +135,56 @@ public:
       char current = input[i];
 
       switch (current) {
-      case '{':
-      case '[':
-        result += current;
-        if (!inQuotes) {
-          result += '\n';
-          indentLevel++;
-          result += std::string(indentLevel * 4, ' ');
-        }
-        break;
+        case '{':
+        case '[':
+          result += current;
+          if (!inQuotes) {
+            result += '\n';
+            indentLevel++;
+            result += std::string(indentLevel * 4, ' ');
+          }
+          break;
 
-      case '}':
-      case ']':
-        if (!inQuotes) {
-          result += '\n';
-          indentLevel--;
-          result += std::string(indentLevel * 4, ' ');
-        }
-        result += current;
-        break;
+        case '}':
+        case ']':
+          if (!inQuotes) {
+            result += '\n';
+            indentLevel--;
+            result += std::string(indentLevel * 4, ' ');
+          }
+          result += current;
+          break;
 
-      case ',':
-        result += current;
-        if (!inQuotes) {
-          result += '\n';
-          result += std::string(indentLevel * 4, ' ');
-        }
-        break;
+        case ',':
+          result += current;
+          if (!inQuotes) {
+            result += '\n';
+            result += std::string(indentLevel * 4, ' ');
+          }
+          break;
 
-      case ':':
-        result += current;
-        if (!inQuotes)
-          result += " ";
-        break;
+        case ':':
+          result += current;
+          if (!inQuotes) result += " ";
+          break;
 
-      case '"':
-        result += current;
-        // Toggle inQuotes when we encounter a double-quote
-        if (i == 0 || input[i - 1] != '\\') {
-          inQuotes = !inQuotes;
-        }
-        break;
+        case '"':
+          result += current;
+          // Toggle inQuotes when we encounter a double-quote
+          if (i == 0 || input[i - 1] != '\\') {
+            inQuotes = !inQuotes;
+          }
+          break;
 
-      default:
-        result += current;
-        break;
+        default:
+          result += current;
+          break;
       }
     }
     return result;
   }
 
-private:
+ private:
   /** Skip whitespace characters in the input string. */
   void SkipWhitespace();
   /** Parse a JSON value. */
@@ -215,5 +214,5 @@ private:
   size_t position;  /**< Current position in the data. */
 };
 
-} // namespace fims
+}  // namespace fims
 #endif

@@ -47,6 +47,6 @@ template <typename Type>
 uint32_t GrowthBase<Type>::id_g =
     0; /**< initializing the static id_g variable for GrowthBase class*/
 
-} // namespace fims_popdy
+}  // namespace fims_popdy
 
 #endif /* POPULATION_DYNAMICS_GROWTH_BASE_HPP */

@@ -78,6 +78,6 @@ template <class Type>
 uint32_t Population<Type>::id_g =
     0; /**< initializing the static id_g variable for Population class*/
 
-} // namespace fims_popdy
+}  // namespace fims_popdy
 
 #endif /* FIMS_POPULATION_DYNAMICS_POPULATION_HPP */

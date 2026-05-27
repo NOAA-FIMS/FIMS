@@ -18,7 +18,7 @@
  * interfaces. This type should be inherited and not called from R directly.
  */
 class RecruitmentInterfaceBase : public FIMSRcppInterfaceBase {
-public:
+ public:
   /**
    * @brief The static id of the RecruitmentInterfaceBase object.
    */
@@ -86,7 +86,7 @@ public:
  * beverton_holt <- methods::new(beverton_holt).
  */
 class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
-public:
+ public:
   /**
    * @brief The number of years.
    */
@@ -143,9 +143,12 @@ public:
    */
   BevertonHoltRecruitmentInterface(
       const BevertonHoltRecruitmentInterface &other)
-      : RecruitmentInterfaceBase(other), n_years(other.n_years),
-        logit_steep(other.logit_steep), log_rzero(other.log_rzero),
-        log_devs(other.log_devs), log_r(other.log_r),
+      : RecruitmentInterfaceBase(other),
+        n_years(other.n_years),
+        logit_steep(other.logit_steep),
+        log_rzero(other.log_rzero),
+        log_devs(other.log_devs),
+        log_r(other.log_r),
         log_expected_recruitment(other.log_expected_recruitment),
         estimated_logit_steep(other.estimated_logit_steep),
         estimated_log_rzero(other.estimated_log_rzero),
@@ -182,8 +185,9 @@ public:
     BevHolt.logit_steep.resize(1);
     BevHolt.logit_steep[0] = this->logit_steep[0].initial_value_m;
     if (this->logit_steep[0].initial_value_m == 1.0) {
-      Rf_warning("Steepness is subject to a logit transformation. "
-                 "Fixing it at 1.0 is not currently possible.");
+      Rf_warning(
+          "Steepness is subject to a logit transformation. "
+          "Fixing it at 1.0 is not currently possible.");
     }
     BevHolt.log_rzero.resize(1);
     BevHolt.log_rzero[0] = this->log_rzero[0].initial_value_m;
@@ -209,7 +213,7 @@ public:
                        " has been finalized already.");
     }
 
-    this->finalized = true; // indicate this has been called already
+    this->finalized = true;  // indicate this has been called already
 
     std::shared_ptr<fims_info::Information<double>> info =
         fims_info::Information<double>::GetInstance();
@@ -310,7 +314,8 @@ public:
 
 #ifdef TMB_MODEL
 
-  template <typename Type> bool add_to_fims_tmb_internal() {
+  template <typename Type>
+  bool add_to_fims_tmb_internal() {
     std::shared_ptr<fims_info::Information<Type>> info =
         fims_info::Information<Type>::GetInstance();
 
@@ -441,7 +446,7 @@ public:
  * log_devs <- methods::new(log_devs).
  */
 class LogDevsRecruitmentInterface : public RecruitmentInterfaceBase {
-public:
+ public:
   /**
    * @brief The constructor.
    */
@@ -480,7 +485,8 @@ public:
 
 #ifdef TMB_MODEL
 
-  template <typename Type> bool add_to_fims_tmb_internal() {
+  template <typename Type>
+  bool add_to_fims_tmb_internal() {
     std::shared_ptr<fims_info::Information<Type>> info =
         fims_info::Information<Type>::GetInstance();
 
@@ -515,7 +521,7 @@ public:
  * log_r <- methods::new(log_r).
  */
 class LogRRecruitmentInterface : public RecruitmentInterfaceBase {
-public:
+ public:
   /**
    * @brief The constructor.
    */
@@ -554,7 +560,8 @@ public:
 
 #ifdef TMB_MODEL
 
-  template <typename Type> bool add_to_fims_tmb_internal() {
+  template <typename Type>
+  bool add_to_fims_tmb_internal() {
     std::shared_ptr<fims_info::Information<Type>> info =
         fims_info::Information<Type>::GetInstance();
 

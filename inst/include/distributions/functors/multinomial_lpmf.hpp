@@ -176,5 +176,5 @@ if (this->simulate_flag)
     return (this->lpdf);
   }
 };
-} // namespace fims_distributions
+}  // namespace fims_distributions
 #endif

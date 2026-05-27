@@ -120,8 +120,8 @@ struct LogNormalLPDF : public DensityComponentBase<Type> {
 
       this->lpdf += this->lpdf_vec[i];
       if (this->simulate_flag) {
-        FIMS_SIMULATE_F(this->of) { // preprocessor definition in interface.hpp
-                                    // this simulates data that is mean biased
+        FIMS_SIMULATE_F(this->of) {  // preprocessor definition in interface.hpp
+                                     // this simulates data that is mean biased
           if (this->input_type == "data") {
             this->data_observed_values->at(i) = fims_math::exp(
                 rnorm(this->get_expected(i),
@@ -148,5 +148,5 @@ struct LogNormalLPDF : public DensityComponentBase<Type> {
     return (this->lpdf);
   }
 };
-} // namespace fims_distributions
+}  // namespace fims_distributions
 #endif

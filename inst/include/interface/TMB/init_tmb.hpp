@@ -60,6 +60,6 @@ void R_init_FIMS(DllInfo *dll) {
 }
 }
 
-#endif // FIMS_ONLOAD_INIT_TMB
+#endif  // FIMS_ONLOAD_INIT_TMB
 
-#endif // SRC_INIT_HPP
+#endif  // SRC_INIT_HPP

@@ -17,7 +17,8 @@ namespace fims_popdy {
 /** @brief Log Devs class that returns the log of the input added to the log of
  * the recruitment deviations.
  */
-template <typename Type> struct LogDevs : public RecruitmentBase<Type> {
+template <typename Type>
+struct LogDevs : public RecruitmentBase<Type> {
   LogDevs() : RecruitmentBase<Type>() {}
 
   virtual ~LogDevs() {}
@@ -41,6 +42,6 @@ template <typename Type> struct LogDevs : public RecruitmentBase<Type> {
   }
 };
 
-} // namespace fims_popdy
+}  // namespace fims_popdy
 
 #endif /* FIMS_POPULATION_DYNAMICS_RECRUITMENT_LOG_DEVS_HPP */

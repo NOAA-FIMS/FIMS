@@ -29,7 +29,7 @@
  * C++ for a parameter type.
  */
 class Parameter {
-public:
+ public:
   /**
    * @brief The static ID of the Parameter object.
    */
@@ -56,14 +56,16 @@ public:
    * @brief The constructor for initializing a parameter.
    */
   Parameter(double value, std::string estimation_type)
-      : id_m(Parameter::id_g++), initial_value_m(value),
+      : id_m(Parameter::id_g++),
+        initial_value_m(value),
         estimation_type_m(estimation_type) {}
 
   /**
    * @brief The constructor for initializing a parameter.
    */
   Parameter(const Parameter &other)
-      : id_m(other.id_m), initial_value_m(other.initial_value_m),
+      : id_m(other.id_m),
+        initial_value_m(other.initial_value_m),
         final_value_m(other.final_value_m),
         estimation_type_m(other.estimation_type_m) {}
 
@@ -72,8 +74,8 @@ public:
    */
   Parameter &operator=(const Parameter &right) {
     // Check for self-assignment!
-    if (this == &right) // Same object?
-      return *this;     // Yes, so skip assignment, and just return *this.
+    if (this == &right)  // Same object?
+      return *this;      // Yes, so skip assignment, and just return *this.
     this->id_m = right.id_m;
     this->initial_value_m = right.initial_value_m;
     this->estimation_type_m = right.estimation_type_m;
@@ -140,7 +142,7 @@ RCPP_EXPOSED_CLASS(Parameter)
  * C++ for a parameter vector type.
  */
 class ParameterVector {
-public:
+ public:
   /**
    * @brief The static ID of the Parameter object.
    */
@@ -160,7 +162,7 @@ public:
   ParameterVector() {
     this->id_m = ParameterVector::id_g++;
     this->storage_m = std::make_shared<std::vector<Parameter>>();
-    this->storage_m->resize(1); // push_back(Rcpp::wrap(p));
+    this->storage_m->resize(1);  // push_back(Rcpp::wrap(p));
   }
 
   /**
@@ -375,7 +377,7 @@ inline std::ostream &operator<<(std::ostream &out, ParameterVector &v) {
  * and are carried over to any copies of this vector.
  */
 class RealVector {
-public:
+ public:
   /**
    * @brief The static ID of the RealVector object.
    */
@@ -580,7 +582,7 @@ RCPP_EXPOSED_CLASS(RealVector)
  *@brief Base class for all interface objects.
  */
 class FIMSRcppInterfaceBase {
-public:
+ public:
   /**
    * @brief Is the object already finalized? The default is false.
    */

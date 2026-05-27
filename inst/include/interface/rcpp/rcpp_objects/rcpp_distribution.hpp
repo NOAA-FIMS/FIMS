@@ -17,7 +17,7 @@
  * interfaces. This type should be inherited and not called from R directly.
  */
 class DistributionsInterfaceBase : public FIMSRcppInterfaceBase {
-public:
+ public:
   /**
    * @brief The static ID of the DistributionsInterfaceBase object.
    */
@@ -91,7 +91,9 @@ public:
    * @param other
    */
   DistributionsInterfaceBase(const DistributionsInterfaceBase &other)
-      : id_m(other.id_m), key_m(other.key_m), input_type_m(other.input_type_m),
+      : id_m(other.id_m),
+        key_m(other.key_m),
+        input_type_m(other.input_type_m),
         use_mean_m(other.use_mean_m),
         interface_observed_data_id_m(other.interface_observed_data_id_m) {}
 
@@ -163,7 +165,7 @@ public:
  * dnorm_ <- methods::new(DnormDistribution).
  */
 class DnormDistributionsInterface : public DistributionsInterfaceBase {
-public:
+ public:
   /**
    * @brief Observed data.
    */
@@ -208,7 +210,8 @@ public:
       : DistributionsInterfaceBase(other),
         observed_values(other.observed_values),
         expected_values(other.expected_values),
-        expected_mean(other.expected_mean), log_sd(other.log_sd),
+        expected_mean(other.expected_mean),
+        log_sd(other.log_sd),
         lpdf_vec(other.lpdf_vec) {}
 
   /**
@@ -293,7 +296,7 @@ public:
                        " has been finalized already.");
     }
 
-    this->finalized = true; // indicate this has been called already
+    this->finalized = true;  // indicate this has been called already
 
     std::shared_ptr<fims_info::Information<double>> info =
         fims_info::Information<double>::GetInstance();
@@ -321,10 +324,10 @@ public:
       if (this->log_sd.size() != n_x) {
         // If log_sd size == 1 (scalar), repeat the entry
         if (this->log_sd.size() == 1) {
-          auto tmp = this->log_sd[0]; // copy the one log_sd param
+          auto tmp = this->log_sd[0];  // copy the one log_sd param
           this->log_sd.resize(n_x);
           for (size_t i = 0; i < n_x; ++i) {
-            this->log_sd[i] = tmp; // copies all fields in Param
+            this->log_sd[i] = tmp;  // copies all fields in Param
           }
         } else {
           // Handle error
@@ -439,7 +442,8 @@ public:
 
 #ifdef TMB_MODEL
 
-  template <typename Type> bool add_to_fims_tmb_internal() {
+  template <typename Type>
+  bool add_to_fims_tmb_internal() {
     std::shared_ptr<fims_info::Information<Type>> info =
         fims_info::Information<Type>::GetInstance();
 
@@ -524,7 +528,7 @@ public:
  * dlnorm_ <- methods::new(DlnormDistribution).
  */
 class DlnormDistributionsInterface : public DistributionsInterfaceBase {
-public:
+ public:
   /**
    * @brief Observed data.
    */
@@ -566,7 +570,8 @@ public:
   DlnormDistributionsInterface(const DlnormDistributionsInterface &other)
       : DistributionsInterfaceBase(other),
         observed_values(other.observed_values),
-        expected_values(other.expected_values), log_sd(other.log_sd),
+        expected_values(other.expected_values),
+        log_sd(other.log_sd),
         lpdf_vec(other.lpdf_vec) {}
 
   /**
@@ -642,7 +647,7 @@ public:
                        " has been finalized already.");
     }
 
-    this->finalized = true; // indicate this has been called already
+    this->finalized = true;  // indicate this has been called already
 
     std::shared_ptr<fims_info::Information<double>> info =
         fims_info::Information<double>::GetInstance();
@@ -668,10 +673,10 @@ public:
       if (this->log_sd.size() != n_x) {
         // If log_sd size == 1 (scalar), repeat the entry
         if (this->log_sd.size() == 1) {
-          auto tmp = this->log_sd[0]; // copy the one log_sd param
+          auto tmp = this->log_sd[0];  // copy the one log_sd param
           this->log_sd.resize(n_x);
           for (size_t i = 0; i < n_x; ++i) {
-            this->log_sd[i] = tmp; // copies all fields in Param
+            this->log_sd[i] = tmp;  // copies all fields in Param
           }
         } else {
           // Handle error
@@ -777,7 +782,8 @@ public:
 
 #ifdef TMB_MODEL
 
-  template <typename Type> bool add_to_fims_tmb_internal() {
+  template <typename Type>
+  bool add_to_fims_tmb_internal() {
     std::shared_ptr<fims_info::Information<Type>> info =
         fims_info::Information<Type>::GetInstance();
 
@@ -843,7 +849,7 @@ public:
  * dmultinom_ <- methods::new(DmultinomDistribution).
  */
 class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
-public:
+ public:
   /**
    * @brief Observed data, which should be a vector of length K of integers.
    */
@@ -889,8 +895,10 @@ public:
   DmultinomDistributionsInterface(const DmultinomDistributionsInterface &other)
       : DistributionsInterfaceBase(other),
         observed_values(other.observed_values),
-        expected_values(other.expected_values), dims(other.dims),
-        lpdf_vec(other.lpdf_vec), notes(other.notes) {}
+        expected_values(other.expected_values),
+        dims(other.dims),
+        lpdf_vec(other.lpdf_vec),
+        notes(other.notes) {}
 
   /**
    * @brief The destructor.
@@ -966,7 +974,7 @@ public:
                        " has been finalized already.");
     }
 
-    this->finalized = true; // indicate this has been called already
+    this->finalized = true;  // indicate this has been called already
 
     std::shared_ptr<fims_info::Information<double>> info =
         fims_info::Information<double>::GetInstance();
@@ -1080,7 +1088,8 @@ public:
 
 #ifdef TMB_MODEL
 
-  template <typename Type> bool add_to_fims_tmb_internal() {
+  template <typename Type>
+  bool add_to_fims_tmb_internal() {
     std::shared_ptr<fims_info::Information<Type>> info =
         fims_info::Information<Type>::GetInstance();
 

@@ -19,7 +19,8 @@ namespace fims_popdy {
 /**
  *  @brief EWAAGrowth class that returns the EWAA function value.
  */
-template <typename Type> struct EWAAGrowth : public GrowthBase<Type> {
+template <typename Type>
+struct EWAAGrowth : public GrowthBase<Type> {
   // add submodule class members here
   // these include parameters of the submodule
   // a map looks up values based on a reference key
@@ -44,5 +45,5 @@ template <typename Type> struct EWAAGrowth : public GrowthBase<Type> {
     return this->ewaa[year][a];
   }
 };
-} // namespace fims_popdy
+}  // namespace fims_popdy
 #endif /* POPULATION_DYNAMICS_GROWTH_EWAA_HPP */

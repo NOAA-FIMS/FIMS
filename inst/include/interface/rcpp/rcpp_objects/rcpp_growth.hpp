@@ -17,7 +17,7 @@
  * interfaces. This type should be inherited and not called from R directly.
  */
 class GrowthInterfaceBase : public FIMSRcppInterfaceBase {
-public:
+ public:
   /**
    * @brief The static id of the GrowthInterfaceBase object.
    */
@@ -74,7 +74,7 @@ public:
  * age and growth is not actually estimated.
  */
 class EWAAGrowthInterface : public GrowthInterfaceBase {
-public:
+ public:
   /**
    * @brief Weights (mt) for each age class.
    */
@@ -115,8 +115,11 @@ public:
    * @param other
    */
   EWAAGrowthInterface(const EWAAGrowthInterface &other)
-      : GrowthInterfaceBase(other), weights(other.weights), ages(other.ages),
-        n_years(other.n_years), ewaa(other.ewaa),
+      : GrowthInterfaceBase(other),
+        weights(other.weights),
+        ages(other.ages),
+        n_years(other.n_years),
+        ewaa(other.ewaa),
         initialized(other.initialized) {}
 
   /**
@@ -137,8 +140,9 @@ public:
    * @param n_years An integer specifying the number of years.
    * @return std::map<T, T>.
    */
-  inline std::map<int, std::map<double, double>>
-  make_map(RealVector ages, RealVector weights, SharedInt n_years) {
+  inline std::map<int, std::map<double, double>> make_map(RealVector ages,
+                                                          RealVector weights,
+                                                          SharedInt n_years) {
     std::map<int, std::map<double, double>> mymap;
     const size_t n_years_plus_one = static_cast<size_t>(n_years.get() + 1);
 
@@ -158,10 +162,11 @@ public:
     // 2) a full year-by-age matrix flattened as (n_years + 1) * n_ages.
     if ((weights.size() != ages.size() * n_years_plus_one) &&
         (weights.size() != ages.size())) {
-      Rcpp::stop("weights size does not match ages size or ages size times "
-                 "(n_years + 1), where the plus one is for the beginning "
-                 "of the year after the terminal year spawning-biomass "
-                 "calculations.");
+      Rcpp::stop(
+          "weights size does not match ages size or ages size times "
+          "(n_years + 1), where the plus one is for the beginning "
+          "of the year after the terminal year spawning-biomass "
+          "calculations.");
     } else if (weights.size() == ages.size()) {
       // One age-specific vector was provided, so replicate the same
       // weight-at-age values for every year key (0 through n_years).
@@ -245,7 +250,8 @@ public:
 
 #ifdef TMB_MODEL
 
-  template <typename Type> bool add_to_fims_tmb_internal() {
+  template <typename Type>
+  bool add_to_fims_tmb_internal() {
     std::shared_ptr<fims_info::Information<Type>> info =
         fims_info::Information<Type>::GetInstance();
 
@@ -255,7 +261,7 @@ public:
     // set relative info
     ewaa_growth->id = this->id;
     ewaa_growth->ewaa =
-        make_map(this->ages, this->weights, this->n_years); // this->ewaa;
+        make_map(this->ages, this->weights, this->n_years);  // this->ewaa;
     // add to Information
     info->growth_models[ewaa_growth->id] = ewaa_growth;
 

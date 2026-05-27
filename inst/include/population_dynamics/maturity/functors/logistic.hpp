@@ -20,7 +20,8 @@ namespace fims_popdy {
  *  @brief LogisticMaturity class that returns the logistic function value
  * from fims_math.
  */
-template <typename Type> struct LogisticMaturity : public MaturityBase<Type> {
+template <typename Type>
+struct LogisticMaturity : public MaturityBase<Type> {
   fims::Vector<Type>
       inflection_point; /**< 50 percent quantile of the value of the quantity of
 interest (x); e.g. age at which 50 percent of the fish are mature */
@@ -59,6 +60,6 @@ interest (x); e.g. age at which 50 percent of the fish are mature */
   }
 };
 
-} // namespace fims_popdy
+}  // namespace fims_popdy
 
 #endif /* POPULATION_DYNAMICS_MATURITY_LOGISTIC_HPP */

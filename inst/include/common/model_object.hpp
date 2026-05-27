@@ -20,7 +20,8 @@ namespace fims_model_object {
 /**
  * @brief FIMSObject struct that defines member types and returns the unique id
  */
-template <typename Type> struct FIMSObject {
+template <typename Type>
+struct FIMSObject {
   uint32_t id; /**< unique identifier assigned for all fims objects */
   std::vector<Type *> parameters; /**< list of estimable parameters */
   std::vector<Type *>
@@ -52,6 +53,6 @@ template <typename Type> struct FIMSObject {
   }
 };
 
-} // namespace fims_model_object
+}  // namespace fims_model_object
 
 #endif /* FIMS_COMMON_MODEL_OBJECT_HPP */

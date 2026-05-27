@@ -59,6 +59,6 @@ template <typename Type>
 uint32_t SelectivityBase<Type>::id_g =
     0; /**< initializing the static id_g variable for SelectivityBase class*/
 
-} // namespace fims_popdy
+}  // namespace fims_popdy
 
 #endif /* POPULATION_DYNAMICS_SELECTIVITY_BASE_HPP */

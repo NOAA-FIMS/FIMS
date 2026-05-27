@@ -105,6 +105,6 @@ template <class Type>
 uint32_t Fleet<Type>::id_g =
     0; /**< initializing the static id_g variable for Fleet class*/
 
-} // end namespace fims_popdy
+}  // end namespace fims_popdy
 
 #endif /* FIMS_POPULATION_DYNAMICS_FLEET_HPP */

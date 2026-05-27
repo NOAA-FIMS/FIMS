@@ -55,6 +55,6 @@ template <typename Type>
 uint32_t MaturityBase<Type>::id_g =
     0; /**< initializing the static id_g variable for MaturityBase class*/
 
-} // namespace fims_popdy
+}  // namespace fims_popdy
 
 #endif /* POPULATION_DYNAMICS_MATURITY_BASE_HPP */

@@ -17,7 +17,7 @@
  * interfaces. This type should be inherited and not called from R directly.
  */
 class FleetInterfaceBase : public FIMSRcppInterfaceBase {
-public:
+ public:
   /**
    * @brief The static id of the FleetInterfaceBase object.
    */
@@ -87,7 +87,7 @@ class FleetInterface : public FleetInterfaceBase {
    */
   SharedInt interface_selectivity_id_m = -999;
 
-public:
+ public:
   /**
    * @brief The name of the fleet.
    */
@@ -184,10 +184,13 @@ public:
         interface_observed_landings_data_id_m(
             other.interface_observed_landings_data_id_m),
         interface_selectivity_id_m(other.interface_selectivity_id_m),
-        name(other.name), n_ages(other.n_ages), n_lengths(other.n_lengths),
+        name(other.name),
+        n_ages(other.n_ages),
+        n_lengths(other.n_lengths),
         n_years(other.n_years),
         observed_landings_units(other.observed_landings_units),
-        observed_index_units(other.observed_index_units), log_q(other.log_q),
+        observed_index_units(other.observed_index_units),
+        log_q(other.log_q),
         log_Fmort(other.log_Fmort),
         log_landings_expected(other.log_landings_expected),
         log_index_expected(other.log_index_expected),
@@ -305,7 +308,7 @@ public:
                        " has been finalized already.");
     }
 
-    this->finalized = true; // indicate this has been called already
+    this->finalized = true;  // indicate this has been called already
 
     std::shared_ptr<fims_info::Information<double>> info =
         fims_info::Information<double>::GetInstance();
@@ -353,7 +356,8 @@ public:
 
 #ifdef TMB_MODEL
 
-  template <typename Type> bool add_to_fims_tmb_internal() {
+  template <typename Type>
+  bool add_to_fims_tmb_internal() {
     std::shared_ptr<fims_info::Information<Type>> info =
         fims_info::Information<Type>::GetInstance();
 
@@ -405,11 +409,12 @@ public:
       FIMS_ERROR_LOG("The size of `log_Fmort` does not match `n_years`: " +
                      fims::to_string(this->log_Fmort.size()) +
                      " != " + fims::to_string(this->n_years.get()));
-      throw std::invalid_argument("Fleet log_Fmort size mismatch."
-                                  "Fleet log_Fmort is of size " +
-                                  fims::to_string(this->log_Fmort.size()) +
-                                  " and the number of years is " +
-                                  fims::to_string(this->n_years.get()));
+      throw std::invalid_argument(
+          "Fleet log_Fmort size mismatch."
+          "Fleet log_Fmort is of size " +
+          fims::to_string(this->log_Fmort.size()) +
+          " and the number of years is " +
+          fims::to_string(this->n_years.get()));
     }
     fleet->log_Fmort.resize(static_cast<size_t>(this->log_Fmort.size()));
     for (size_t i = 0; i < log_Fmort.size(); i++) {

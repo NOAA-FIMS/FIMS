@@ -210,6 +210,6 @@ template <typename Type>
 uint32_t DataObject<Type>::id_g =
     0; /**< initializing the static id_g variable for DataObject class*/
 
-} // namespace fims_data_object
+}  // namespace fims_data_object
 
 #endif
