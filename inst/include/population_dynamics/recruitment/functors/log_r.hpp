@@ -35,7 +35,7 @@ struct LogR : public RecruitmentBase<Type> {
     return this->recruitment->log_r[pos];
   }
 
-  /** Empty return of base class function */
+  /** @copydoc RecruitmentBase::evaluate_mean */
   virtual const Type evaluate_mean(const Type& spawners, const Type& phi_0) {
     return 0;
   }

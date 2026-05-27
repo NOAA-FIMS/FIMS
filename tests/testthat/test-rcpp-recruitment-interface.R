@@ -19,7 +19,7 @@ test_that("rcpp recruitment interface works with correct inputs", {
   h <- 0.75
   r0 <- 1000000.0
   spawns <- 9.55784 * 10^6
-  ssb0 <- 0.0102562
+  phi_0 <- 0.0102562
 
   recruitment$logit_steep[1]$value <- -log(1.0 - h) + log(h - 0.2)
   recruitment$logit_steep[1]$estimation_type$set("random_effects")
@@ -44,9 +44,9 @@ test_that("rcpp recruitment interface works with correct inputs", {
     object = recruitment$log_rzero[1]$value,
     expected = log(1000000.0)
   )
-  #' @description Test that recruitment$evaluate(spawns, ssb0) returns 1090802.68.
+  #' @description Test that recruitment$evaluate(spawns, phi_0) returns 1090802.68.
   expect_equal(
-    object = recruitment$evaluate_mean(spawns, ssb0),
+    object = recruitment$evaluate_mean(spawns, phi_0),
     expected = 1090802.68
   )
   log_devs <- c(-1.0, 2.0, 3.0)
@@ -77,7 +77,7 @@ test_that("test rcpp recruitment interface returns correct error messages", {
   h <- 0.75
   r0 <- 1000000.0
   spawns <- 9.55784 * 10^6
-  ssb0 <- 0.0102562
+  phi_0 <- 0.0102562
 
   recruitment$logit_steep[1]$value <- 1
   recruitment$logit_steep[1]$estimation_type$set("random_effects")
@@ -86,7 +86,7 @@ test_that("test rcpp recruitment interface returns correct error messages", {
 
   #' @description Test that recruitment errors if logit_steep==1.
   expect_warning(
-    object = recruitment$evaluate_mean(spawns, ssb0),
+    object = recruitment$evaluate_mean(spawns, phi_0),
     regexp = "Steepness is subject to a logit transformation. Fixing it at 1.0 is not currently possible."
   )
   clear()
