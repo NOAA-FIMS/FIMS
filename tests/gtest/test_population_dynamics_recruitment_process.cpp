@@ -9,12 +9,12 @@ namespace
 {
   TEST(EvaluateRecruitmentProcess, UseMultipleInputs)
   {
-// BH_fcn(R0 = 1000, h = 0.75, phi0 = 0.1, x = 30): 837.2093 
-// BH_fcn(R0 = 1000, h = 0.99, phi0 = 0.1, x = 30): 994.1423
-// BH_fcn(R0 = 1000, h = 0.75, phi0 = 0.3, x = 30): 679.2453
-// BH_fcn(R0 = 1000, h = 0.99, phi0 = 0.3, x = 30): 985.8921
-// BH_fcn(R0 = 1000, h = 0.2, phi0 = 0.2, x = 40): 200
-// BH_fcn(R0 = 1000, h = 0.99, phi0 = 0.2, x = 40): 990
+// BH_fcn(R0 = 1000, h = 0.75, phi_0 = 0.1, x = 30): 837.2093 
+// BH_fcn(R0 = 1000, h = 0.99, phi_0 = 0.1, x = 30): 994.1423
+// BH_fcn(R0 = 1000, h = 0.75, phi_0 = 0.3, x = 30): 679.2453
+// BH_fcn(R0 = 1000, h = 0.99, phi_0 = 0.3, x = 30): 985.8921
+// BH_fcn(R0 = 1000, h = 0.2, phi_0 = 0.2, x = 40): 200
+// BH_fcn(R0 = 1000, h = 0.99, phi_0 = 0.2, x = 40): 990
 
       auto recruit1 = std::make_shared<fims_popdy::SRBevertonHolt<double>>();
       auto log_devs = std::make_shared<fims_popdy::LogDevs<double>>();
@@ -31,10 +31,10 @@ namespace
       double spawners = 30.000;
       double phi_0 = 0.1;
       // # R code that generates true values for testing
-      // BH_fcn <- function(R0, h, phi0, x) {
+      // BH_fcn <- function(R0, h, phi_0, x) {
       //  # R0 = unfished recruitment
       //  # h = steepness
-      //  # phi0 = unfished spawners per recruit
+      //  # phi_0 = unfished spawners per recruit
       //  # x = spawners
       //  recruits <- (0.8 * R0 * h * x) / (0.2 * 100.0 * (1.0 - h) + x * (h //  - 0.2))
       //  return(recruits)
@@ -58,12 +58,12 @@ namespace
       double spawners2 = 40.000;
       double phi_02 = 0.2;
       // # R code that generates true values for testing
-      // BH_fcn <- function(R0, h, phi0, x) {
+      // BH_fcn <- function(R0, h, phi_0, x) {
       //  # R0 = unfished recruitment
       //  # h = steepness
-      //  # phi0 = unfished spawners per recruit
+      //  # phi_0 = unfished spawners per recruit
       //  # x = spawners
-      //  recruits <- (0.8 * R0 * h * x) / (0.2 * ssb0 * (1.0 - h) + x * (h //  - 0.2))
+      //  recruits <- (0.8 * R0 * h * x) / (0.2 * phi_0 * R0 * (1.0 - h) + x * (h //  - 0.2))
       //  return(recruits)
       // }
       // log(200) = 5.298317

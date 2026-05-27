@@ -73,12 +73,12 @@ struct RecruitmentBase : public fims_model_object::FIMSObject<Type> {
    * is solely based on your input data.
    *
    * @param spawners A measure for spawning output.
-   * @param ssbzero A measure for spawning output in unfished population.
+   * @param phi_0 A measure for spawning output per recruit in unfished population.
    *
    */
   virtual const Type evaluate_mean(
       const Type &spawners,
-      const Type &ssbzero) = 0;  // need to add input parameter values
+      const Type &phi_0  // need to add input parameter values
 
   /** @brief Handle error in recruitment
    *

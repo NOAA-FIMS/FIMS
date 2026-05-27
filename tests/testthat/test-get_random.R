@@ -71,7 +71,7 @@ test_that("`get_random()` works with correct inputs", {
   h <- 0.75
   r0 <- 1000000.0
   spawns <- 9.55784 * 10^6
-  ssb0 <- 0.0102562
+  phi_0 <- 0.0102562
   recruitment$logit_steep[1]$value <- -log(1.0 - h) + log(h - 0.2)
   recruitment$logit_steep[1]$estimation_type$set("random_effects")
   recruitment$log_rzero[1]$value <- log(r0)

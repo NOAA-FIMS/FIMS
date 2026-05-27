@@ -46,7 +46,7 @@ struct SRBevertonHolt : public RecruitmentBase<Type> {
    * 0.2)} \f$
    *
    * @param spawners A measure of spawning output.
-   * @param phi_0 Number of spawners per recruit of an unfished population
+   * @param phi_0 A measure of spawners per recruit of an unfished population
    */
   virtual const Type evaluate_mean(const Type& spawners, const Type& phi_0) {
     Type recruits;

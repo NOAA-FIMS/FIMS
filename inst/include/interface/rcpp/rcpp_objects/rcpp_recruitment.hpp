@@ -71,7 +71,7 @@ class RecruitmentInterfaceBase : public FIMSRcppInterfaceBase {
    * @brief A method for each child recruitment interface object to inherit so
    * each recruitment option can have an evaluate_mean() function.
    */
-  virtual double evaluate_mean(double spawners, double ssbzero) = 0;
+  virtual double evaluate_mean(double spawners, double phi_0) = 0;
 
   /**
    * @brief A method for each child recruitment process interface object to
@@ -182,11 +182,10 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
   /**
    * @brief Evaluate recruitment using the Beverton--Holt stock--recruitment
    * relationship.
-   * @param spawners Spawning biomass per time step.
-   * @param ssbzero The biomass at unfished levels.
-   * TODO: Change to sbzero if continuing to use acronyms.
+   * @param spawners Measure of spawners at time step.
+   * @param phi_0 Measure of spawners per recruit at unfished levels.
    */
-  virtual double evaluate_mean(double spawners, double ssbzero) {
+  virtual double evaluate_mean(double spawners, double phi_0) {
     fims_popdy::SRBevertonHolt<double> BevHolt;
     BevHolt.logit_steep.resize(1);
     BevHolt.logit_steep[0] = this->logit_steep[0].initial_value_m;
@@ -198,7 +197,7 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
     BevHolt.log_rzero.resize(1);
     BevHolt.log_rzero[0] = this->log_rzero[0].initial_value_m;
 
-    return BevHolt.evaluate_mean(spawners, ssbzero);
+    return BevHolt.evaluate_mean(spawners, phi_0);
   }
 
   /**
@@ -474,10 +473,10 @@ class LogDevsRecruitmentInterface : public RecruitmentInterfaceBase {
 
   /**
    * @brief Evaluate mean - returns empty function for this module.
-   * @param spawners Spawning biomass per time step.
-   * @param ssbzero The biomass at unfished levels.
+   * @param spawners Measure of spawners at time step.
+   * @param phi_0 Measure of spawners per recruit at unfished levels.
    */
-  virtual double evaluate_mean(double spawners, double ssbzero) { return 0; }
+  virtual double evaluate_mean(double spawners, double phi_0) { return 0; }
 
   /**
    * @brief Evaluate recruitment process using the Log--Devs approach.
@@ -549,10 +548,10 @@ class LogRRecruitmentInterface : public RecruitmentInterfaceBase {
 
   /**
    * @brief Evaluate mean - returns empty function for this module.
-   * @param spawners Spawning biomass per time step.
-   * @param ssbzero The biomass at unfished levels.
+   * @param spawners Measure of spawners at time step.
+   * @param phi_0 Measure of spawners per recruit at unfished levels.
    */
-  virtual double evaluate_mean(double spawners, double ssbzero) { return 0; }
+  virtual double evaluate_mean(double spawners, double phi_0) { return 0; }
 
   /**
    * @brief Evaluate recruitment process using the Log--R approach.
