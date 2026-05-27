@@ -9,11 +9,11 @@
 #define FIMS_POPULATION_DYNAMICS_POPULATION_HPP
 
 #include "../../common/model_object.hpp"
+#include "../../interface/interface.hpp"
 #include "../fleet/fleet.hpp"
 #include "../growth/growth.hpp"
-#include "../recruitment/recruitment.hpp"
-#include "../../interface/interface.hpp"
 #include "../maturity/maturity.hpp"
+#include "../recruitment/recruitment.hpp"
 
 namespace fims_popdy {
 
@@ -78,6 +78,6 @@ template <class Type>
 uint32_t Population<Type>::id_g =
     0; /**< initializing the static id_g variable for Population class*/
 
-}  // namespace fims_popdy
+} // namespace fims_popdy
 
 #endif /* FIMS_POPULATION_DYNAMICS_POPULATION_HPP */

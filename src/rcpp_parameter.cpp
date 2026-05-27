@@ -3,19 +3,15 @@
  * \brief Implementation of Rcpp parameter interfaces for the FIMS framework.
  */
 #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_interface_base.hpp"
+#include <Rcpp.h>
 #include <RcppCommon.h>
- #include <Rcpp.h>
-
-
-
 
 /**
  * Function to register parameter classes with the Rcpp module system.
- * 
+ *
  */
-void register_parameter(Rcpp::Module& m) {
+void register_parameter(Rcpp::Module &m) {
 
-  
   Rcpp::class_<Parameter>(
       "Parameter",
       "See https://noaa-fims.github.io/FIMS/doxygen/classParameter.html.")
@@ -26,18 +22,15 @@ void register_parameter(Rcpp::Module& m) {
       .field("estimated_value", &Parameter::final_value_m)
       .field("id", &Parameter::id_m)
       .field("estimation_type", &Parameter::estimation_type_m);
-
 }
 
-
 /**
- * 
+ *
  * Function to register vector classes with the Rcpp module system.
- * 
+ *
  */
-void register_vectors(Rcpp::Module& m) {
+void register_vectors(Rcpp::Module &m) {
 
-  
   Rcpp::class_<ParameterVector>(
       "ParameterVector",
       "See https://noaa-fims.github.io/FIMS/doxygen/classParameterVector.html.")

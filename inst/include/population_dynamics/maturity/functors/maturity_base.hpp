@@ -40,14 +40,14 @@ struct MaturityBase : public fims_model_object::FIMSObject<Type> {
    * @param x The independent variable in the maturity function (e.g., logistic
    * maturity at age or size).
    */
-  virtual const Type evaluate(const Type& x) = 0;
+  virtual const Type evaluate(const Type &x) = 0;
   /**
    * @brief Calculates the selectivity.
    * @param x The independent variable in the logistic function (e.g., age or
    * size in selectivity).
    * @param pos Position index, e.g., which year.
    */
-  virtual const Type evaluate(const Type& x, size_t pos) = 0;
+  virtual const Type evaluate(const Type &x, size_t pos) = 0;
 };
 
 // default id of the singleton maturity class
@@ -55,6 +55,6 @@ template <typename Type>
 uint32_t MaturityBase<Type>::id_g =
     0; /**< initializing the static id_g variable for MaturityBase class*/
 
-}  // namespace fims_popdy
+} // namespace fims_popdy
 
 #endif /* POPULATION_DYNAMICS_MATURITY_BASE_HPP */

@@ -7,8 +7,8 @@
 // More assertion macros provided by GoogleTest can be found at
 // https://google.github.io/googletest/reference/assertions.html.
 
-#include "gtest/gtest.h"
 #include "def.hpp"
+#include "gtest/gtest.h"
 
 #include <cstdio>
 #include <fstream>
@@ -41,13 +41,16 @@ TEST(LogEntry_to_string, HandlesCorrectInput) {
 
   // Test that serialization includes each expected JSON field/value.
   const std::string serialized = entry.to_string();
-  EXPECT_NE(serialized.find("\"timestamp\": \"Jan 01 00:00:00 2000\""), std::string::npos);
+  EXPECT_NE(serialized.find("\"timestamp\": \"Jan 01 00:00:00 2000\""),
+            std::string::npos);
   EXPECT_NE(serialized.find("\"level\": \"warning\""), std::string::npos);
-  EXPECT_NE(serialized.find("\"message\": \"logger test message\""), std::string::npos);
+  EXPECT_NE(serialized.find("\"message\": \"logger test message\""),
+            std::string::npos);
   EXPECT_NE(serialized.find("\"id\": \"7\""), std::string::npos);
   EXPECT_NE(serialized.find("\"user\": \"tester\""), std::string::npos);
   EXPECT_NE(serialized.find("\"wd\": \"/tmp/fims\""), std::string::npos);
-  EXPECT_NE(serialized.find("\"file\": \"/tmp/fims/source.cpp\""), std::string::npos);
+  EXPECT_NE(serialized.find("\"file\": \"/tmp/fims/source.cpp\""),
+            std::string::npos);
   EXPECT_NE(serialized.find("\"routine\": \"TestRoutine\""), std::string::npos);
   EXPECT_NE(serialized.find("\"line\": \"123\""), std::string::npos);
 }
@@ -135,7 +138,8 @@ TEST(FIMSLog_clear, PreservesPathAndThrowOnErrorConfiguration) {
   fims::FIMSLog log = MakeLogger();
   log.set_path("custom/fims_test.log");
   log.throw_on_error = true;
-  log.warning_message("warning before clear", 40, "../tmp/config.cpp", "ConfigRoutine");
+  log.warning_message("warning before clear", 40, "../tmp/config.cpp",
+                      "ConfigRoutine");
 
   // Test that clear preserves configured path and throw_on_error behavior.
   log.clear();
@@ -144,10 +148,9 @@ TEST(FIMSLog_clear, PreservesPathAndThrowOnErrorConfiguration) {
   EXPECT_TRUE(log.throw_on_error);
 
   // Test that throw_on_error still applies after clear.
-  EXPECT_THROW(
-    log.error_message("error after clear", 50, "../tmp/config.cpp", "ConfigRoutine"),
-    std::runtime_error
-  );
+  EXPECT_THROW(log.error_message("error after clear", 50, "../tmp/config.cpp",
+                                 "ConfigRoutine"),
+               std::runtime_error);
 }
 
 TEST(FIMSLog_write_on_exit, WritesLogToConfiguredPathOnDestruction) {
@@ -176,4 +179,4 @@ TEST(FIMSLog_write_on_exit, WritesLogToConfiguredPathOnDestruction) {
   std::remove(file_path.c_str());
 }
 
-}  // namespace
+} // namespace

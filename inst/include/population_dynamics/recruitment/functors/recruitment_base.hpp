@@ -10,9 +10,9 @@
 #ifndef FIMS_POPULATION_DYNAMICS_RECRUITMENT_BASE_HPP
 #define FIMS_POPULATION_DYNAMICS_RECRUITMENT_BASE_HPP
 
-#include <cmath>  // for using std::pow and M_PI
+#include <cmath> // for using std::pow and M_PI
 
-#include "../../../common/fims_math.hpp"  // for using fims_math::log()
+#include "../../../common/fims_math.hpp" // for using fims_math::log()
 #include "../../../common/fims_vector.hpp"
 #include "../../../common/model_object.hpp"
 
@@ -75,9 +75,9 @@ struct RecruitmentBase : public fims_model_object::FIMSObject<Type> {
    * @param ssbzero A measure for spawning output in unfished population.
    *
    */
-  virtual const Type evaluate_mean(
-      const Type &spawners,
-      const Type &ssbzero) = 0;  // need to add input parameter values
+  virtual const Type
+  evaluate_mean(const Type &spawners,
+                const Type &ssbzero) = 0; // need to add input parameter values
 
   /** @brief Handle error in recruitment
    *
@@ -111,6 +111,6 @@ struct RecruitmentBase : public fims_model_object::FIMSObject<Type> {
 template <class Type>
 uint32_t RecruitmentBase<Type>::id_g =
     0; /**< initializing the static id_g variable for RecruitmentBase class*/
-}  // namespace fims_popdy
+} // namespace fims_popdy
 
 #endif /* FIMS_POPULATION_DYNAMICS_RECRUITMENT_BASE_HPP */

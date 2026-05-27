@@ -17,40 +17,42 @@ TEST(GrowthEvaluate, IntegerAgeInput) {
   ewaa1.ewaa[0][0] = 0.0;
   ewaa1.ewaa[0][1] = 0.005306555;
   ewaa1.ewaa[0][2] = 0.0011963283;
-      // set the expected values
-      std::map<int, std::map<double, double>> expect_ewaa0;
-      expect_ewaa0[0][0] = 0.0;
-      expect_ewaa0[0][1] = 0.005306555;
-      expect_ewaa0[0][2] = 0.0011963283;
-      // test the values at ages 0, 1, and 2
-      EXPECT_EQ(ewaa1.evaluate(0, 0), expect_ewaa0[0][0]);
-      EXPECT_EQ(ewaa1.evaluate(0, 1), expect_ewaa0[0][1]);
-      EXPECT_EQ(ewaa1.evaluate(0, 2), expect_ewaa0[0][2]);
-      // test that the id of the singleton class is set correctly
-      EXPECT_EQ(ewaa1.GetId(), 0);
-    }
+  // set the expected values
+  std::map<int, std::map<double, double>> expect_ewaa0;
+  expect_ewaa0[0][0] = 0.0;
+  expect_ewaa0[0][1] = 0.005306555;
+  expect_ewaa0[0][2] = 0.0011963283;
+  // test the values at ages 0, 1, and 2
+  EXPECT_EQ(ewaa1.evaluate(0, 0), expect_ewaa0[0][0]);
+  EXPECT_EQ(ewaa1.evaluate(0, 1), expect_ewaa0[0][1]);
+  EXPECT_EQ(ewaa1.evaluate(0, 2), expect_ewaa0[0][2]);
+  // test that the id of the singleton class is set correctly
+  EXPECT_EQ(ewaa1.GetId(), 0);
+}
 
-    TEST(GrowthEvaluate, DoubleAgeInput) {
-      // create a new ewaa singleton class
-      fims_popdy::EWAAGrowth<double> ewaa2;
-      // set the ewaa values
-      ewaa2.ewaa = std::map<int,std::map<double, double>>{
-          std::pair<int, std::map<double, double>>(0, std::map<double, double>{
-              std::pair<double, double>(0.0, 0.0),
-              std::pair<double, double>(1.0, 0.005306555),
-              std::pair<double, double>(2.0, 0.0011963283)})};
+TEST(GrowthEvaluate, DoubleAgeInput) {
+  // create a new ewaa singleton class
+  fims_popdy::EWAAGrowth<double> ewaa2;
+  // set the ewaa values
+  ewaa2.ewaa = std::map<int, std::map<double, double>>{
+      std::pair<int, std::map<double, double>>(
+          0, std::map<double, double>{
+                 std::pair<double, double>(0.0, 0.0),
+                 std::pair<double, double>(1.0, 0.005306555),
+                 std::pair<double, double>(2.0, 0.0011963283)})};
 
-      std::map<int, std::map<double, double>> expect_ewaa2 = {
-          std::pair<int, std::map<double, double>>(0, std::map<double, double>{
-              std::pair<double, double>(0.0, 0.0),
-              std::pair<double, double>(1.0, 0.005306555),
-              std::pair<double, double>(2.0, 0.0011963283)})};
-      // test the values at ages 1.5, which isn't yet implemented
-      // so should fail
-      EXPECT_EQ(ewaa2.evaluate(0,1.5), 0.0);
-      // test that the id of the singleton class is set correctly
-      // this is zero because we are running it in a different test case than
-      // above
-      EXPECT_EQ(ewaa2.GetId(), 0);
-    }
-  }
+  std::map<int, std::map<double, double>> expect_ewaa2 = {
+      std::pair<int, std::map<double, double>>(
+          0, std::map<double, double>{
+                 std::pair<double, double>(0.0, 0.0),
+                 std::pair<double, double>(1.0, 0.005306555),
+                 std::pair<double, double>(2.0, 0.0011963283)})};
+  // test the values at ages 1.5, which isn't yet implemented
+  // so should fail
+  EXPECT_EQ(ewaa2.evaluate(0, 1.5), 0.0);
+  // test that the id of the singleton class is set correctly
+  // this is zero because we are running it in a different test case than
+  // above
+  EXPECT_EQ(ewaa2.GetId(), 0);
+}
+} // namespace

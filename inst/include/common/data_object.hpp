@@ -13,8 +13,8 @@
 #include <exception>
 #include <vector>
 
-#include "model_object.hpp"
 #include "fims_vector.hpp"
+#include "model_object.hpp"
 
 namespace fims_data_object {
 
@@ -84,7 +84,7 @@ struct DataObject : public fims_model_object::FIMSObject<Type> {
    * @param i dimension of 1d data set
    * @return the reference to the value of the vector at position i
    */
-  inline Type& at(size_t i) {
+  inline Type &at(size_t i) {
     if (i >= this->data.size()) {
       throw std::overflow_error("DataObject error:i index out of bounds");
     }
@@ -108,7 +108,7 @@ struct DataObject : public fims_model_object::FIMSObject<Type> {
    * @param j 2nd dimension of 2d data set
    * @return the reference to the value of the matrix at position i, j
    */
-  inline Type& at(size_t i, size_t j) {
+  inline Type &at(size_t i, size_t j) {
     if ((i * jmax + j) >= this->data.size()) {
       throw std::overflow_error("DataObject error: index out of bounds");
     }
@@ -134,7 +134,7 @@ struct DataObject : public fims_model_object::FIMSObject<Type> {
    * @param k 3rd dimension of 3d data set
    * @return the reference to the value of the array at position i, j, k
    */
-  inline Type& at(size_t i, size_t j, size_t k) {
+  inline Type &at(size_t i, size_t j, size_t k) {
     if ((i * jmax * kmax + j * kmax + k) >= this->data.size()) {
       throw std::overflow_error("DataObject error: index out of bounds");
     }
@@ -162,7 +162,7 @@ struct DataObject : public fims_model_object::FIMSObject<Type> {
    * @param l 4th dimension of 4d data set
    * @return the reference to the value of the array at position i, j, k, l
    */
-  inline Type& at(size_t i, size_t j, size_t k, size_t l) {
+  inline Type &at(size_t i, size_t j, size_t k, size_t l) {
     if ((i * jmax * kmax * lmax + j * kmax * lmax + k * lmax + l) >=
         this->data.size()) {
       throw std::overflow_error("DataObject error: index out of bounds");
@@ -210,6 +210,6 @@ template <typename Type>
 uint32_t DataObject<Type>::id_g =
     0; /**< initializing the static id_g variable for DataObject class*/
 
-}  // namespace fims_data_object
+} // namespace fims_data_object
 
 #endif

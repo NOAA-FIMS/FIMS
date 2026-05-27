@@ -12,9 +12,9 @@
 #ifndef FIMS_POPULATION_DYNAMICS_RECRUITMENT_HPP
 #define FIMS_POPULATION_DYNAMICS_RECRUITMENT_HPP
 
-#include "functors/recruitment_base.hpp"
-#include "functors/sr_beverton_holt.hpp"
 #include "functors/log_devs.hpp"
 #include "functors/log_r.hpp"
+#include "functors/recruitment_base.hpp"
+#include "functors/sr_beverton_holt.hpp"
 
 #endif /* FIMS_POPULATION_DYNAMICS_RECRUITMENT_HPP */

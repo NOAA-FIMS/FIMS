@@ -231,8 +231,7 @@ Rcpp::List get_random_names(Rcpp::List pars) {
  *
  * @tparam Type
  */
-template <typename Type>
-void clear_internal() {
+template <typename Type> void clear_internal() {
   std::shared_ptr<fims_info::Information<Type>> d0 =
       fims_info::Information<Type>::GetInstance();
   d0->Clear();
@@ -404,7 +403,7 @@ std::string escapeQuotes(const std::string &input) {
   while (pos != std::string::npos) {
     result.replace(pos, search.size(), replace);
     pos = result.find(search,
-                      pos + replace.size());  // Move past the replaced position
+                      pos + replace.size()); // Move past the replaced position
   }
   return result;
 }
@@ -436,8 +435,8 @@ void log_error(std::string log_entry) {
   }
 
   std::string ret =
-      ss_ret.str();  //"find error";//Rcpp::as<std::string>(result);
+      ss_ret.str(); //"find error";//Rcpp::as<std::string>(result);
 
   fims::FIMSLog::fims_log->error_message(log_entry, -1, "R_env", ret.c_str());
 }
-#endif  // FIMS_INTERFACE_RCPP_INTERFACE_HPP
+#endif // FIMS_INTERFACE_RCPP_INTERFACE_HPP

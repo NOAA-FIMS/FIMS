@@ -19,8 +19,7 @@ namespace fims_popdy {
 /**
  *  @brief EWAAGrowth class that returns the EWAA function value.
  */
-template <typename Type>
-struct EWAAGrowth : public GrowthBase<Type> {
+template <typename Type> struct EWAAGrowth : public GrowthBase<Type> {
   // add submodule class members here
   // these include parameters of the submodule
   // a map looks up values based on a reference key
@@ -41,9 +40,9 @@ struct EWAAGrowth : public GrowthBase<Type> {
    * @param year year
    * @param a  age of the fish, the age vector must start at zero
    */
-  virtual const Type evaluate(int year, const double& a) {
+  virtual const Type evaluate(int year, const double &a) {
     return this->ewaa[year][a];
   }
 };
-}  // namespace fims_popdy
+} // namespace fims_popdy
 #endif /* POPULATION_DYNAMICS_GROWTH_EWAA_HPP */

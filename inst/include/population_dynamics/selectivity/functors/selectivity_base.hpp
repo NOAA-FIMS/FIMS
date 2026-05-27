@@ -43,7 +43,7 @@ struct SelectivityBase : public fims_model_object::FIMSObject<Type> {
    * @param x The independent variable in the logistic function (e.g., age or
    * size in selectivity).
    */
-  virtual const Type evaluate(const Type& x) = 0;
+  virtual const Type evaluate(const Type &x) = 0;
 
   /**
    * @brief Calculates the selectivity.
@@ -51,7 +51,7 @@ struct SelectivityBase : public fims_model_object::FIMSObject<Type> {
    * size in selectivity).
    * @param pos Position index, e.g., which year.
    */
-  virtual const Type evaluate(const Type& x, size_t pos) = 0;
+  virtual const Type evaluate(const Type &x, size_t pos) = 0;
 };
 
 // default id of the singleton selectivity class
@@ -59,6 +59,6 @@ template <typename Type>
 uint32_t SelectivityBase<Type>::id_g =
     0; /**< initializing the static id_g variable for SelectivityBase class*/
 
-}  // namespace fims_popdy
+} // namespace fims_popdy
 
 #endif /* POPULATION_DYNAMICS_SELECTIVITY_BASE_HPP */

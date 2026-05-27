@@ -12,8 +12,8 @@
 #define NORMAL_LPDF
 
 #include "../../common/def.hpp"
-#include "density_components_base.hpp"
 #include "../../common/fims_vector.hpp"
+#include "density_components_base.hpp"
 namespace fims_distributions {
 /**
  * @copybrief normal_lpdf.hpp
@@ -28,8 +28,7 @@ namespace fims_distributions {
  * to the objective. Per-observation contributions are stored in `lpdf_vec`;
  * the summed total is returned by `evaluate()` and stored in `lpdf`.
  */
-template <typename Type>
-struct NormalLPDF : public DensityComponentBase<Type> {
+template <typename Type> struct NormalLPDF : public DensityComponentBase<Type> {
   /**
    * @brief The natural log of the standard deviation of the distribution. The
    * argument can be a vector or scalar, where the latter is referenced for
@@ -140,5 +139,5 @@ struct NormalLPDF : public DensityComponentBase<Type> {
   }
 };
 
-}  // namespace fims_distributions
+} // namespace fims_distributions
 #endif

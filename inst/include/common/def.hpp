@@ -10,26 +10,26 @@
 #include <fstream>
 #include <map>
 #include <memory>
-#include <vector>
 #include <string>
 #include <unordered_map>
+#include <vector>
 
-#include <cstdlib>
 #include <chrono>
-#include <sstream>
-#include <iostream>
-#include <filesystem>
-#include <stdlib.h>
-#include <fstream>
-#include <signal.h>
 #include <csignal>
+#include <cstdlib>
 #include <cstring>
+#include <filesystem>
+#include <fstream>
+#include <iostream>
+#include <signal.h>
+#include <sstream>
+#include <stdlib.h>
 
 #include <stdexcept>
 
 #if defined(linux) || defined(__linux) || defined(__linux__)
 #define FIMS_LINUX
-#elif defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) || \
+#elif defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) ||   \
     defined(__DragonFly__)
 #define FIMS_BSD
 #elif defined(sun) || defined(__sun)
@@ -67,10 +67,10 @@
 #undef TRUE
 #undef FALSE
 #undef GetObject
-#include <Lmcons.h>  // for UNLEN
+#include <Lmcons.h> // for UNLEN
 #elif defined(FIMS_LINUX) || defined(FIMS_MACOS) || defined(FIMS_BSD)
-#include <unistd.h>
 #include <pwd.h>
+#include <unistd.h>
 #endif
 
 #if !defined(__PRETTY_FUNCTION__) && !defined(__GNUC__)
@@ -228,7 +228,8 @@ class FIMSLog {
 
 #elif defined(FIMS_LINUX) || defined(FIMS_MACOS) || defined(FIMS_BSD)
     const char *user_env = getenv("USER");
-    if (user_env) return std::string(user_env);
+    if (user_env)
+      return std::string(user_env);
 
     uid_t uid = getuid();
     struct passwd *pw = getpwuid(uid);
@@ -243,7 +244,7 @@ class FIMSLog {
 #endif
   }
 
- public:
+public:
   /**
    * @brief A boolean specifying if the log file is written when the session is
    * terminated. The default is TRUE.
@@ -291,8 +292,8 @@ class FIMSLog {
    * @param relativePath A path in your file system.
    * @return std::filesystem::path
    */
-  std::filesystem::path getAbsolutePathWithoutDotDot(
-      const std::filesystem::path &relativePath) {
+  std::filesystem::path
+  getAbsolutePathWithoutDotDot(const std::filesystem::path &relativePath) {
     std::filesystem::path absolutePath =
         std::filesystem::absolute(relativePath);
 
@@ -617,7 +618,7 @@ class FIMSLog {
 std::shared_ptr<FIMSLog> FIMSLog::fims_log = std::make_shared<FIMSLog>();
 #endif
 
-}  // namespace fims
+} // namespace fims
 
 /**
  * @def FIMS_INFO_LOG(MESSAGE)
@@ -629,8 +630,8 @@ std::shared_ptr<FIMSLog> FIMSLog::fims_log = std::make_shared<FIMSLog>();
  *
  * @param MESSAGE Human-readable log message describing what happened and why.
  */
-#define FIMS_INFO_LOG(MESSAGE)                                       \
-  fims::FIMSLog::fims_log->info_message(MESSAGE, __LINE__, __FILE__, \
+#define FIMS_INFO_LOG(MESSAGE)                                                 \
+  fims::FIMSLog::fims_log->info_message(MESSAGE, __LINE__, __FILE__,           \
                                         __PRETTY_FUNCTION__);
 
 /**
@@ -641,8 +642,8 @@ std::shared_ptr<FIMSLog> FIMSLog::fims_log = std::make_shared<FIMSLog>();
  *
  * @snippet{doc} this param_MESSAGE
  */
-#define FIMS_WARNING_LOG(MESSAGE)                                       \
-  fims::FIMSLog::fims_log->warning_message(MESSAGE, __LINE__, __FILE__, \
+#define FIMS_WARNING_LOG(MESSAGE)                                              \
+  fims::FIMSLog::fims_log->warning_message(MESSAGE, __LINE__, __FILE__,        \
                                            __PRETTY_FUNCTION__);
 
 /**
@@ -657,8 +658,8 @@ std::shared_ptr<FIMSLog> FIMSLog::fims_log = std::make_shared<FIMSLog>();
  * @see info_message()
  * @see warning_message()
  */
-#define FIMS_ERROR_LOG(MESSAGE)                                       \
-  fims::FIMSLog::fims_log->error_message(MESSAGE, __LINE__, __FILE__, \
+#define FIMS_ERROR_LOG(MESSAGE)                                                \
+  fims::FIMSLog::fims_log->error_message(MESSAGE, __LINE__, __FILE__,          \
                                          __PRETTY_FUNCTION__);
 
 /**
@@ -685,27 +686,27 @@ namespace fims {
 inline void WriteAtExit(int sig) {
   std::string signal_error = "NA";
   switch (sig) {
-    case SIGSEGV:
-      signal_error = "Invalid memory access (segmentation fault)";
-      break;
-    case SIGINT:
-      signal_error = "External interrupt, possibly initiated by the user.";
-      break;
-    case SIGABRT:
-      signal_error =
-          "Abnormal termination condition, possible call to std::abort.";
-      break;
-    case SIGFPE:
-      signal_error = "Erroneous arithmetic operation.";
-      break;
-    case SIGILL:
-      signal_error = "Invalid program image or invalid instruction";
-      break;
-    case SIGTERM:
-      signal_error = "Termination request, sent to the program.";
-      break;
-    default:
-      signal_error = "Unknown signal thrown";
+  case SIGSEGV:
+    signal_error = "Invalid memory access (segmentation fault)";
+    break;
+  case SIGINT:
+    signal_error = "External interrupt, possibly initiated by the user.";
+    break;
+  case SIGABRT:
+    signal_error =
+        "Abnormal termination condition, possible call to std::abort.";
+    break;
+  case SIGFPE:
+    signal_error = "Erroneous arithmetic operation.";
+    break;
+  case SIGILL:
+    signal_error = "Invalid program image or invalid instruction";
+    break;
+  case SIGTERM:
+    signal_error = "Termination request, sent to the program.";
+    break;
+  default:
+    signal_error = "Unknown signal thrown";
   }
 
   FIMSLog::fims_log->error_message(signal_error, -999, "?", "?");
@@ -727,13 +728,12 @@ inline void WriteAtExit(int sig) {
  * @param v Value to convert to text using a string stream.
  * @return String representation of `v`.
  */
-template <typename T>
-std::string to_string(T v) {
+template <typename T> std::string to_string(T v) {
   std::stringstream ss;
   ss << v;
   return ss.str();
 }
 
-}  // namespace fims
+} // namespace fims
 
 #endif /* TRAITS_HPP */

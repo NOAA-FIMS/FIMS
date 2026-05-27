@@ -17,7 +17,7 @@
  * interfaces. This type should be inherited and not called from R directly.
  */
 class MaturityInterfaceBase : public FIMSRcppInterfaceBase {
- public:
+public:
   /**
    * @brief The static id of the MaturityInterfaceBase object.
    */
@@ -49,7 +49,7 @@ class MaturityInterfaceBase : public FIMSRcppInterfaceBase {
    *
    * @param other
    */
-  MaturityInterfaceBase(const MaturityInterfaceBase& other) : id(other.id) {}
+  MaturityInterfaceBase(const MaturityInterfaceBase &other) : id(other.id) {}
 
   /**
    * @brief The destructor.
@@ -73,7 +73,7 @@ class MaturityInterfaceBase : public FIMSRcppInterfaceBase {
  * logistic_maturity <- methods::new(logistic_maturity).
  */
 class LogisticMaturityInterface : public MaturityInterfaceBase {
- public:
+public:
   /**
    * @brief The index value at which the response reaches 0.5.
    */
@@ -98,9 +98,8 @@ class LogisticMaturityInterface : public MaturityInterfaceBase {
    *
    * @param other
    */
-  LogisticMaturityInterface(const LogisticMaturityInterface& other)
-      : MaturityInterfaceBase(other),
-        inflection_point(other.inflection_point),
+  LogisticMaturityInterface(const LogisticMaturityInterface &other)
+      : MaturityInterfaceBase(other), inflection_point(other.inflection_point),
         slope(other.slope) {}
 
   /**
@@ -139,7 +138,7 @@ class LogisticMaturityInterface : public MaturityInterfaceBase {
                        " has been finalized already.");
     }
 
-    this->finalized = true;  // indicate this has been called already
+    this->finalized = true; // indicate this has been called already
 
     std::shared_ptr<fims_info::Information<double>> info =
         fims_info::Information<double>::GetInstance();
@@ -215,8 +214,7 @@ class LogisticMaturityInterface : public MaturityInterfaceBase {
 
 #ifdef TMB_MODEL
 
-  template <typename Type>
-  bool add_to_fims_tmb_internal() {
+  template <typename Type> bool add_to_fims_tmb_internal() {
     std::shared_ptr<fims_info::Information<Type>> info =
         fims_info::Information<Type>::GetInstance();
 

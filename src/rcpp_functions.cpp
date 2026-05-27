@@ -11,8 +11,7 @@
  * Function to register functions with the Rcpp module system.
  *
  */
-void register_functions(Rcpp::Module &m)
-{
+void register_functions(Rcpp::Module &m) {
   Rcpp::function(
       "CreateTMBModel", &CreateTMBModel,
       "See "

@@ -19,9 +19,8 @@ namespace fims_model {
 /**
  * @brief Model class. FIMS objective function.
  */
-template <typename Type>
-class Model {  // may need singleton
- public:
+template <typename Type> class Model { // may need singleton
+public:
   static std::shared_ptr<Model<Type>>
       fims_model; /**< Create a shared fims_model as a pointer to Model*/
   std::shared_ptr<fims_info::Information<Type>>
@@ -154,11 +153,10 @@ class Model {  // may need singleton
       }
     }
 
-    FIMS_INFO_LOG(
-        "Model: Finished evaluating data likelihoods. The jnll after "
-        "evaluating priors, random effects, and " +
-        fims::to_string(n_data) +
-        " data likelihoods is: " + fims::to_string(jnll));
+    FIMS_INFO_LOG("Model: Finished evaluating data likelihoods. The jnll after "
+                  "evaluating priors, random effects, and " +
+                  fims::to_string(n_data) +
+                  " data likelihoods is: " + fims::to_string(jnll));
 
     // report out nll components
 
@@ -175,7 +173,7 @@ class Model {  // may need singleton
          m_it != this->fims_information->models_map.end(); ++m_it) {
       //(*m_it).second points to the Model module
       std::shared_ptr<fims_popdy::FisheryModelBase<Type>> m = (*m_it).second;
-      m->of = this->of;  // link to TMB objective function
+      m->of = this->of; // link to TMB objective function
       m->Report();
     }
 
@@ -188,6 +186,6 @@ template <typename Type>
 std::shared_ptr<Model<Type>> Model<Type>::fims_model =
     nullptr; /**< initializing the static fims_model pointer to nullptr for
                 Model class*/
-}  // namespace fims_model
+} // namespace fims_model
 
 #endif /* FIMS_COMMON_MODEL_HPP */

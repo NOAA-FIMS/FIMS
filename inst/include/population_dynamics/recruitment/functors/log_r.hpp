@@ -9,16 +9,15 @@
 #ifndef FIMS_POPULATION_DYNAMICS_RECRUITMENT_LOG_R_HPP
 #define FIMS_POPULATION_DYNAMICS_RECRUITMENT_LOG_R_HPP
 
-#include "recruitment_base.hpp"
 #include "../../../common/fims_vector.hpp"
+#include "recruitment_base.hpp"
 
 namespace fims_popdy {
 
 /** @brief Log Devs class that returns the log of the input added to the log of
  * the recruitment deviations.
  */
-template <typename Type>
-struct LogR : public RecruitmentBase<Type> {
+template <typename Type> struct LogR : public RecruitmentBase<Type> {
   LogR() : RecruitmentBase<Type>() {}
 
   virtual ~LogR() {}
@@ -36,11 +35,11 @@ struct LogR : public RecruitmentBase<Type> {
   }
 
   /** Empty return of base class function */
-  virtual const Type evaluate_mean(const Type& spawners, const Type& phi_0) {
+  virtual const Type evaluate_mean(const Type &spawners, const Type &phi_0) {
     return 0;
   }
 };
 
-}  // namespace fims_popdy
+} // namespace fims_popdy
 
 #endif /* FIMS_POPULATION_DYNAMICS_RECRUITMENT_LOG_R_HPP */

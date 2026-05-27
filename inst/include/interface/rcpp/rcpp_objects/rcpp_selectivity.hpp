@@ -17,7 +17,7 @@
  * interfaces. This type should be inherited and not called from R directly.
  */
 class SelectivityInterfaceBase : public FIMSRcppInterfaceBase {
- public:
+public:
   /**
    * @brief The static id of the SelectivityInterfaceBase.
    */
@@ -75,7 +75,7 @@ class SelectivityInterfaceBase : public FIMSRcppInterfaceBase {
  * logistic_selectivity <- methods::new(logistic_selectivity).
  */
 class LogisticSelectivityInterface : public SelectivityInterfaceBase {
- public:
+public:
   /**
    * @brief The index value at which the response reaches 0.5.
    */
@@ -102,8 +102,7 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
    */
   LogisticSelectivityInterface(const LogisticSelectivityInterface &other)
       : SelectivityInterfaceBase(other),
-        inflection_point(other.inflection_point),
-        slope(other.slope) {}
+        inflection_point(other.inflection_point), slope(other.slope) {}
 
   /**
    * @brief The destructor.
@@ -141,7 +140,7 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
                        " has been finalized already.");
     }
 
-    this->finalized = true;  // indicate this has been called already
+    this->finalized = true; // indicate this has been called already
 
     std::shared_ptr<fims_info::Information<double>> info =
         fims_info::Information<double>::GetInstance();
@@ -218,8 +217,7 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
 
 #ifdef TMB_MODEL
 
-  template <typename Type>
-  bool add_to_fims_tmb_internal() {
+  template <typename Type> bool add_to_fims_tmb_internal() {
     std::shared_ptr<fims_info::Information<Type>> info =
         fims_info::Information<Type>::GetInstance();
 
@@ -296,7 +294,7 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
  * methods::new(logistic_selectivity)
  */
 class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
- public:
+public:
   ParameterVector inflection_point_asc; /**< the index value at which the
                                      response reaches .5 */
   ParameterVector
@@ -361,7 +359,7 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
                        " has been finalized already.");
     }
 
-    this->finalized = true;  // indicate this has been called already
+    this->finalized = true; // indicate this has been called already
 
     std::shared_ptr<fims_info::Information<double>> info =
         fims_info::Information<double>::GetInstance();
@@ -476,8 +474,7 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
 
 #ifdef TMB_MODEL
 
-  template <typename Type>
-  bool add_to_fims_tmb_internal() {
+  template <typename Type> bool add_to_fims_tmb_internal() {
     std::shared_ptr<fims_info::Information<Type>> info =
         fims_info::Information<Type>::GetInstance();
 

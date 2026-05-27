@@ -10,13 +10,13 @@
  * Fisheries Integrated Modeling System project. See LICENSE in the source
  * folder for reuse information.
  */
+#include <algorithm>
 #include <cctype>
-#include <iostream>
 #include <fstream>
+#include <iostream>
 #include <map>
 #include <sstream>
 #include <string>
-#include <algorithm>
 #include <vector>
 
 namespace fims {
@@ -48,7 +48,7 @@ enum JsonValueType {
  * Represents a JSON value.
  */
 class JsonValue {
- public:
+public:
   /** Default constructor, initializes to Null value. */
   JsonValue() : type(JsonValueType::Null) {}
 
@@ -59,16 +59,16 @@ class JsonValue {
   JsonValue(double num) : type(JsonValueType::Number), number(num) {}
 
   /** Constructor for string JSON value. */
-  JsonValue(const std::string& str) : type(JsonValueType::String), str(str) {}
+  JsonValue(const std::string &str) : type(JsonValueType::String), str(str) {}
 
   /** Constructor for boolean JSON value. */
   JsonValue(bool b) : type(JsonValueType::Bool), boolean(b) {}
 
   /** Constructor for JSON object value. */
-  JsonValue(const JsonObject& obj) : type(JsonValueType::Object), object(obj) {}
+  JsonValue(const JsonObject &obj) : type(JsonValueType::Object), object(obj) {}
 
   /** Constructor for JSON array value. */
-  JsonValue(const JsonArray& arr) : type(JsonValueType::JArray), array(arr) {}
+  JsonValue(const JsonArray &arr) : type(JsonValueType::JArray), array(arr) {}
 
   /** Get the type of the JSON value. */
   JsonValueType GetType() const { return type; }
@@ -80,18 +80,18 @@ class JsonValue {
   double GetDouble() const { return number; }
 
   /** Get the string value. */
-  const std::string& GetString() const { return str; }
+  const std::string &GetString() const { return str; }
 
   /** Get the boolean value. */
   bool GetBool() const { return boolean; }
 
   /** Get the JSON object. */
-  JsonObject& GetObject() { return object; }
+  JsonObject &GetObject() { return object; }
 
   /** Get the JSON array. */
-  JsonArray& GetArray() { return array; }
+  JsonArray &GetArray() { return array; }
 
- private:
+private:
   JsonValueType type; /**< Type of the JSON value. */
   double number;      /**< Numeric value. */
   std::string str;    /**< String value. */
@@ -104,16 +104,16 @@ class JsonValue {
  * Parses JSON strings and generates JSON values.
  */
 class JsonParser {
- public:
+public:
   /** Parse a JSON string and return the corresponding JSON value. */
-  JsonValue Parse(const std::string& json);
+  JsonValue Parse(const std::string &json);
   /** Write a JSON value to a file. */
-  void WriteToFile(const std::string& filename, JsonValue jsonValue);
+  void WriteToFile(const std::string &filename, JsonValue jsonValue);
   /** Display a JSON value to the standard output. */
   void Show(JsonValue jsonValue);
 
   /** Remove whitespace in JSON. */
-  static std::string removeWhitespace(const std::string& input) {
+  static std::string removeWhitespace(const std::string &input) {
     std::string result = input;
     result.erase(std::remove_if(result.begin(), result.end(), ::isspace),
                  result.end());
@@ -125,7 +125,7 @@ class JsonParser {
    * @param json
    * @return
    */
-  static std::string PrettyFormatJSON(const std::string& json) {
+  static std::string PrettyFormatJSON(const std::string &json) {
     std::string result;
     std::string input = JsonParser::removeWhitespace(json);
     int indentLevel = 0;
@@ -135,56 +135,57 @@ class JsonParser {
       char current = input[i];
 
       switch (current) {
-        case '{':
-        case '[':
-          result += current;
-          if (!inQuotes) {
-            result += '\n';
-            indentLevel++;
-            result += std::string(indentLevel * 4, ' ');
-          }
-          break;
+      case '{':
+      case '[':
+        result += current;
+        if (!inQuotes) {
+          result += '\n';
+          indentLevel++;
+          result += std::string(indentLevel * 4, ' ');
+        }
+        break;
 
-        case '}':
-        case ']':
-          if (!inQuotes) {
-            result += '\n';
-            indentLevel--;
-            result += std::string(indentLevel * 4, ' ');
-          }
-          result += current;
-          break;
+      case '}':
+      case ']':
+        if (!inQuotes) {
+          result += '\n';
+          indentLevel--;
+          result += std::string(indentLevel * 4, ' ');
+        }
+        result += current;
+        break;
 
-        case ',':
-          result += current;
-          if (!inQuotes) {
-            result += '\n';
-            result += std::string(indentLevel * 4, ' ');
-          }
-          break;
+      case ',':
+        result += current;
+        if (!inQuotes) {
+          result += '\n';
+          result += std::string(indentLevel * 4, ' ');
+        }
+        break;
 
-        case ':':
-          result += current;
-          if (!inQuotes) result += " ";
-          break;
+      case ':':
+        result += current;
+        if (!inQuotes)
+          result += " ";
+        break;
 
-        case '"':
-          result += current;
-          // Toggle inQuotes when we encounter a double-quote
-          if (i == 0 || input[i - 1] != '\\') {
-            inQuotes = !inQuotes;
-          }
-          break;
+      case '"':
+        result += current;
+        // Toggle inQuotes when we encounter a double-quote
+        if (i == 0 || input[i - 1] != '\\') {
+          inQuotes = !inQuotes;
+        }
+        break;
 
-        default:
-          result += current;
-          break;
+      default:
+        result += current;
+        break;
       }
     }
     return result;
   }
 
- private:
+private:
   /** Skip whitespace characters in the input string. */
   void SkipWhitespace();
   /** Parse a JSON value. */
@@ -202,17 +203,17 @@ class JsonParser {
   /** Parse a JSON array. */
   JsonValue ParseArray();
   /** Write a JSON value to an output file stream. */
-  void WriteJsonValue(std::ofstream& outputFile, JsonValue jsonValue);
+  void WriteJsonValue(std::ofstream &outputFile, JsonValue jsonValue);
   /** Display a JSON value to an output stream. */
-  void PrintJsonValue(std::ostream& outputFile, JsonValue jsonValue);
+  void PrintJsonValue(std::ostream &outputFile, JsonValue jsonValue);
   /** Indentation helper for printing JSON values in an output file stream. */
-  void Indent(std::ostream& outputFile, int level);
+  void Indent(std::ostream &outputFile, int level);
   /** Indentation helper for printing JSON values in an output stream. */
-  void Indent(std::ofstream& outputFile, int level);
+  void Indent(std::ofstream &outputFile, int level);
 
   std::string data; /**< Input JSON data. */
   size_t position;  /**< Current position in the data. */
 };
 
-}  // namespace fims
+} // namespace fims
 #endif

@@ -9,9 +9,9 @@
 #ifndef FIMS_MODELS_FISHERY_MODEL_BASE_HPP
 #define FIMS_MODELS_FISHERY_MODEL_BASE_HPP
 
-#include "../../common/model_object.hpp"
 #include "../../common/fims_math.hpp"
 #include "../../common/fims_vector.hpp"
+#include "../../common/model_object.hpp"
 #include "../../population_dynamics/population/population.hpp"
 /**
  * @brief The population dynamics of FIMS.
@@ -49,9 +49,7 @@ struct DimensionInfo {
    * Copy constructor
    */
   DimensionInfo(const DimensionInfo &other)
-      : name(other.name),
-        ndims(other.dims.size()),
-        dims(other.dims),
+      : name(other.name), ndims(other.dims.size()), dims(other.dims),
         dim_names(other.dim_names) {}
 
   /**
@@ -79,7 +77,7 @@ class FisheryModelBase : public fims_model_object::FIMSObject<Type> {
                            model object*/
   uint32_t id; /*!< unique identifier assigned for fishery model object */
 
- public:
+public:
 #ifdef TMB_MODEL
   bool do_reporting =
       true; /*!< flag to control reporting of derived quantities */
@@ -171,8 +169,7 @@ class FisheryModelBase : public fims_model_object::FIMSObject<Type> {
    * @param other
    */
   FisheryModelBase(const FisheryModelBase &other)
-      : id(other.id),
-        population_ids(other.population_ids),
+      : id(other.id), population_ids(other.population_ids),
         populations(other.populations),
         fleet_derived_quantities(other.fleet_derived_quantities),
         population_derived_quantities(other.population_derived_quantities),
@@ -229,8 +226,8 @@ class FisheryModelBase : public fims_model_object::FIMSObject<Type> {
    * @param fleet_id The ID of the fleet.
    * @return std::map<std::string, fims::Vector<Type>>&
    */
-  std::map<std::string, fims::Vector<Type>> &GetFleetDerivedQuantities(
-      uint32_t fleet_id) {
+  std::map<std::string, fims::Vector<Type>> &
+  GetFleetDerivedQuantities(uint32_t fleet_id) {
     if (!fleet_derived_quantities) {
       throw std::runtime_error(
           "GetFleetDerivedQuantities: fleet_derived_quantities is null");
@@ -299,8 +296,8 @@ class FisheryModelBase : public fims_model_object::FIMSObject<Type> {
    * @param population_id The ID of the population.
    * @return std::map<std::string, fims::Vector<Type>>&
    */
-  std::map<std::string, fims::Vector<Type>> &GetPopulationDerivedQuantities(
-      uint32_t population_id) {
+  std::map<std::string, fims::Vector<Type>> &
+  GetPopulationDerivedQuantities(uint32_t population_id) {
     if (!population_derived_quantities) {
       throw std::runtime_error(
           "GetPopulationDerivedQuantities: population_derived_quantities is "
@@ -323,8 +320,8 @@ class FisheryModelBase : public fims_model_object::FIMSObject<Type> {
    * @param fleet_id The ID of the fleet.
    * @return std::map<std::string, DimensionInfo>
    */
-  std::map<std::string, DimensionInfo> &GetFleetDimensionInfo(
-      uint32_t fleet_id) {
+  std::map<std::string, DimensionInfo> &
+  GetFleetDimensionInfo(uint32_t fleet_id) {
     return (*fleet_dimension_info)[fleet_id];
   }
 
@@ -334,8 +331,8 @@ class FisheryModelBase : public fims_model_object::FIMSObject<Type> {
    * @param population_id The ID of the population.
    * @return std::map<std::string, DimensionInfo>
    */
-  std::map<std::string, DimensionInfo> &GetPopulationDimensionInfo(
-      uint32_t population_id) {
+  std::map<std::string, DimensionInfo> &
+  GetPopulationDimensionInfo(uint32_t population_id) {
     return (*population_dimension_info)[population_id];
   }
 
@@ -386,5 +383,5 @@ template <typename Type>
 uint32_t FisheryModelBase<Type>::id_g =
     0; /**< initializing the static id_g variable for FisheryModelBase class*/
 
-}  // namespace fims_popdy
+} // namespace fims_popdy
 #endif

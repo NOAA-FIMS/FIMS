@@ -27,8 +27,7 @@ namespace fims_math {
  * an integer.
  * @return the exponentiated value
  */
-template <class Type>
-inline const Type exp(const Type &x) {
+template <class Type> inline const Type exp(const Type &x) {
   return std::exp(x);
 }
 
@@ -38,28 +37,23 @@ inline const Type exp(const Type &x) {
  * if x is an integer.
  * @return
  */
-template <class Type>
-inline const Type log(const Type &x) {
+template <class Type> inline const Type log(const Type &x) {
   return std::log(x);
 }
 
-template <class Type>
-inline const Type cos(const Type &x) {
+template <class Type> inline const Type cos(const Type &x) {
   return std::cos(x);
 }
 
-template <class Type>
-inline const Type sqrt(const Type &x) {
+template <class Type> inline const Type sqrt(const Type &x) {
   return std::sqrt(x);
 }
 
-template <class Type>
-inline const Type pow(const Type &x, const Type &y) {
+template <class Type> inline const Type pow(const Type &x, const Type &y) {
   return std::pow(x, y);
 }
 
-template <class Type>
-inline const Type lgamma(const Type &x) {
+template <class Type> inline const Type lgamma(const Type &x) {
   return std::lgamma(x);
 }
 #endif
@@ -81,8 +75,7 @@ inline const Type lgamma(const Type &x) {
  * x is an integer.
  * @return The exponentiated value of x.
  */
-template <class Type>
-inline const Type exp(const Type &x) {
+template <class Type> inline const Type exp(const Type &x) {
   // use std::exp for double type, look for TMB version of exp if AD type
   using std::exp;
   return exp(x);
@@ -100,8 +93,7 @@ inline const Type exp(const Type &x) {
  * integer.
  * @return The natural log of x.
  */
-template <class Type>
-inline const Type log(const Type &x) {
+template <class Type> inline const Type log(const Type &x) {
   // use std::log for double type, look for TMB version of log if AD type
   using std::log;
   return log(x);
@@ -119,8 +111,7 @@ inline const Type log(const Type &x) {
  * fims_math::cos<double>(x) if x is an integer.
  * @return The cosine of the angle x.
  */
-template <class Type>
-inline const Type cos(const Type &x) {
+template <class Type> inline const Type cos(const Type &x) {
   // use std::cos for double type, look for TMB version of cos if AD type
   using std::cos;
   return cos(x);
@@ -137,8 +128,7 @@ inline const Type cos(const Type &x) {
  * fims_math::sqrt<double>(x) if x is an integer.
  * @return The square root of x.
  */
-template <class Type>
-inline const Type sqrt(const Type &x) {
+template <class Type> inline const Type sqrt(const Type &x) {
   // use std::std for double type, look for TMB version of std if AD type
   using std::sqrt;
   return sqrt(x);
@@ -156,8 +146,7 @@ inline const Type sqrt(const Type &x) {
  * @param y The exponent to raise x to.
  * @return The power of x.
  */
-template <class Type>
-inline const Type pow(const Type &x, const Type &y) {
+template <class Type> inline const Type pow(const Type &x, const Type &y) {
   // use std::pow for double type, look for TMB version of pow if AD type
   using std::pow;
   return pow(x, y);
@@ -178,8 +167,7 @@ inline const Type pow(const Type &x, const Type &y) {
  * @return The natural logarithm of the absolute value of the gamma function of
  * x.
  */
-template <class Type>
-inline const Type lgamma(const Type &x) {
+template <class Type> inline const Type lgamma(const Type &x) {
   // use std::lgamma for double type, look for TMB version of lgamma if AD type
   using std::lgamma;
   return lgamma(x);
@@ -289,8 +277,7 @@ inline const Type double_logistic(const Type &inflection_point_asc,
  * @param C default = 1e-5
  * @return
  */
-template <class Type>
-const Type ad_fabs(const Type &x, Type C = 1e-5) {
+template <class Type> const Type ad_fabs(const Type &x, Type C = 1e-5) {
   return sqrt((x * x) + C);
 }
 
@@ -339,8 +326,7 @@ inline const Type ad_max(const Type &a, const Type &b, Type C = 1e-5) {
  * @param v A vector of constants.
  * @return A single numeric value.
  */
-template <class T>
-T sum(const std::vector<T> &v) {
+template <class T> T sum(const std::vector<T> &v) {
   T ret = 0.0;
   for (size_t i = 0; i < v.size(); i++) {
     ret += v[i];
@@ -356,8 +342,7 @@ T sum(const std::vector<T> &v) {
  * @param v A vector of constants.
  * @return A single numeric value.
  */
-template <class T>
-T sum(const fims::Vector<T> &v) {
+template <class T> T sum(const fims::Vector<T> &v) {
   T ret = 0.0;
   for (size_t i = 0; i < v.size(); i++) {
     ret += v[i];
@@ -365,6 +350,6 @@ T sum(const fims::Vector<T> &v) {
   return ret;
 }
 
-}  // namespace fims_math
+} // namespace fims_math
 
 #endif /* FIMS_MATH_HPP */

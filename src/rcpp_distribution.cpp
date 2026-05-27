@@ -1,10 +1,10 @@
- /**
+/**
  * \file rcpp_distribution.cpp
  * \brief Implementation of Rcpp distribution interfaces for the FIMS framework.
  */
- #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_distribution.hpp"
+#include "../inst/include/interface/rcpp/rcpp_objects/rcpp_distribution.hpp"
 
- // static id of the DistributionsInterfaceBase object
+// static id of the DistributionsInterfaceBase object
 uint32_t DistributionsInterfaceBase::id_g = 1;
 // local id of the DistributionsInterfaceBase object map relating the ID of the
 // DistributionsInterfaceBase to the DistributionsInterfaceBase objects
@@ -14,15 +14,14 @@ std::map<uint32_t, std::shared_ptr<DistributionsInterfaceBase>>
 #include <Rcpp.h>
 /**
  * Function to register distribution classes with the Rcpp module system.
- * 
+ *
  */
-void register_distributions(Rcpp::Module& m) {
-    
+void register_distributions(Rcpp::Module &m) {
+
   Rcpp::class_<DnormDistributionsInterface>(
-      "DnormDistribution",
-      "See "
-      "https://noaa-fims.github.io/FIMS/doxygen/"
-      "classDnormDistributionsInterface.html.")
+      "DnormDistribution", "See "
+                           "https://noaa-fims.github.io/FIMS/doxygen/"
+                           "classDnormDistributionsInterface.html.")
       .constructor()
       .method("get_id", &DnormDistributionsInterface::get_id)
       .method("evaluate", &DnormDistributionsInterface::evaluate)
@@ -38,10 +37,9 @@ void register_distributions(Rcpp::Module& m) {
       .field("log_sd", &DnormDistributionsInterface::log_sd);
 
   Rcpp::class_<DlnormDistributionsInterface>(
-      "DlnormDistribution",
-      "See "
-      "https://noaa-fims.github.io/FIMS/doxygen/"
-      "classDlnormDistributionsInterface.html.")
+      "DlnormDistribution", "See "
+                            "https://noaa-fims.github.io/FIMS/doxygen/"
+                            "classDlnormDistributionsInterface.html.")
       .constructor()
       .method("get_id", &DlnormDistributionsInterface::get_id)
       .method("evaluate", &DlnormDistributionsInterface::evaluate)
@@ -54,10 +52,9 @@ void register_distributions(Rcpp::Module& m) {
       .field("log_sd", &DlnormDistributionsInterface::log_sd);
 
   Rcpp::class_<DmultinomDistributionsInterface>(
-      "DmultinomDistribution",
-      "See "
-      "https://noaa-fims.github.io/FIMS/doxygen/"
-      "classDmultinomDistributionsInterface.html.")
+      "DmultinomDistribution", "See "
+                               "https://noaa-fims.github.io/FIMS/doxygen/"
+                               "classDmultinomDistributionsInterface.html.")
       .constructor()
       .method("get_id", &DmultinomDistributionsInterface::get_id)
       .method("evaluate", &DmultinomDistributionsInterface::evaluate)
@@ -71,4 +68,4 @@ void register_distributions(Rcpp::Module& m) {
       .field("expected_values",
              &DmultinomDistributionsInterface::expected_values)
       .field("dims", &DmultinomDistributionsInterface::dims);
-    }
+}

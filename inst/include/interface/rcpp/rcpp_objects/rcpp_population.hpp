@@ -9,15 +9,15 @@
 #ifndef FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_POPULATION_HPP
 #define FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_POPULATION_HPP
 
-#include "rcpp_interface_base.hpp"
 #include "../../../population_dynamics/population/population.hpp"
+#include "rcpp_interface_base.hpp"
 
 /**
  * @brief Rcpp interface that serves as the parent class for Rcpp population
  * interfaces. This type should be inherited and not called from R directly.
  */
 class PopulationInterfaceBase : public FIMSRcppInterfaceBase {
- public:
+public:
   /**
    * @brief The static id of the PopulationInterfaceBase object.
    */
@@ -78,7 +78,7 @@ class PopulationInterfaceBase : public FIMSRcppInterfaceBase {
  * population <- methods::new(population)
  */
 class PopulationInterface : public PopulationInterfaceBase {
- public:
+public:
   /**
    * @brief The number of age bins.
    */
@@ -162,22 +162,15 @@ class PopulationInterface : public PopulationInterfaceBase {
    * @param other
    */
   PopulationInterface(const PopulationInterface &other)
-      : PopulationInterfaceBase(other),
-        n_ages(other.n_ages),
-        n_fleets(other.n_fleets),
-        fleet_ids(other.fleet_ids),
-        n_years(other.n_years),
-        n_lengths(other.n_lengths),
-        maturity_id(other.maturity_id),
-        growth_id(other.growth_id),
+      : PopulationInterfaceBase(other), n_ages(other.n_ages),
+        n_fleets(other.n_fleets), fleet_ids(other.fleet_ids),
+        n_years(other.n_years), n_lengths(other.n_lengths),
+        maturity_id(other.maturity_id), growth_id(other.growth_id),
         recruitment_id(other.recruitment_id),
-        recruitment_err_id(other.recruitment_id),
-        log_M(other.log_M),
+        recruitment_err_id(other.recruitment_id), log_M(other.log_M),
         spawning_biomass_ratio(other.spawning_biomass_ratio),
         log_f_multiplier(other.log_f_multiplier),
-        log_init_naa(other.log_init_naa),
-        ages(other.ages),
-        name(other.name) {}
+        log_init_naa(other.log_init_naa), ages(other.ages), name(other.name) {}
 
   /**
    * @brief The destructor.
@@ -241,7 +234,7 @@ class PopulationInterface : public PopulationInterfaceBase {
                        " has been finalized already.");
     }
 
-    this->finalized = true;  // indicate this has been called already
+    this->finalized = true; // indicate this has been called already
 
     std::shared_ptr<fims_info::Information<double>> info =
         fims_info::Information<double>::GetInstance();
@@ -288,8 +281,7 @@ class PopulationInterface : public PopulationInterfaceBase {
 
 #ifdef TMB_MODEL
 
-  template <typename Type>
-  bool add_to_fims_tmb_internal() {
+  template <typename Type> bool add_to_fims_tmb_internal() {
     std::shared_ptr<fims_info::Information<Type>> info =
         fims_info::Information<Type>::GetInstance();
 

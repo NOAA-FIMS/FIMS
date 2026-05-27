@@ -27,10 +27,10 @@
  * is destroyed.
  */
 class SharedInt {
- private:
+private:
   std::shared_ptr<int> value;
 
- public:
+public:
   /**
    * @brief Construct a new `SharedInt` object.
    *
@@ -55,7 +55,7 @@ class SharedInt {
    *
    * @param other The existing `SharedInt` object to copy from.
    */
-  SharedInt(const SharedInt& other) : value(other.value) {}
+  SharedInt(const SharedInt &other) : value(other.value) {}
 
   /**
    * @brief Overloaded assignment operator for copying a `SharedInt` object.
@@ -67,7 +67,7 @@ class SharedInt {
    * @return A reference to the current object (`*this`) to allow for chaining
    * assignments.
    */
-  SharedInt& operator=(const SharedInt& other) {
+  SharedInt &operator=(const SharedInt &other) {
     if (this != &other) {
       value = other.value;
     }
@@ -83,7 +83,7 @@ class SharedInt {
    * @param other The integer value to assign.
    * @return A reference to the current object (`*this`).
    */
-  SharedInt& operator=(const int& other) {
+  SharedInt &operator=(const int &other) {
     *value = other;
 
     return *this;
@@ -98,7 +98,7 @@ class SharedInt {
    * @param other The temporary `SharedInt` object to move from. After this
    * call, `other` will no longer own the resource.
    */
-  SharedInt(SharedInt&& other) noexcept : value(std::move(other.value)) {}
+  SharedInt(SharedInt &&other) noexcept : value(std::move(other.value)) {}
 
   /**
    * @brief Overloaded move assignment operator.
@@ -110,7 +110,7 @@ class SharedInt {
    * @param other The temporary `SharedInt` object to move from.
    * @return A reference to the current object (`*this`).
    */
-  SharedInt& operator=(SharedInt&& other) noexcept {
+  SharedInt &operator=(SharedInt &&other) noexcept {
     if (this != &other) {
       value = std::move(other.value);
     }
@@ -167,7 +167,7 @@ class SharedInt {
    * @return A raw pointer (`int*`) to the integer managed by the shared
    * pointer.
    */
-  int* operator->() { return value.get(); }
+  int *operator->() { return value.get(); }
 
   /**
    * @brief Overloads the member access operator (`->`) for const objects.
@@ -179,7 +179,7 @@ class SharedInt {
    *
    * @return A `const` raw pointer to the integer managed by the shared pointer.
    */
-  const int* operator->() const { return value.get(); }
+  const int *operator->() const { return value.get(); }
 
   // Unary operators
 
@@ -192,7 +192,7 @@ class SharedInt {
    * @return A reference to the current object (`*this`) after the increment
    * has occurred.
    */
-  SharedInt& operator++() {
+  SharedInt &operator++() {
     ++(*value);
     return *this;
   }
@@ -222,7 +222,7 @@ class SharedInt {
    * @return A reference to the current object (`*this`) after the decrement
    * has occurred.
    */
-  SharedInt& operator--() {
+  SharedInt &operator--() {
     --(*value);
     return *this;
   }
@@ -255,7 +255,7 @@ class SharedInt {
    * @param other The `SharedInt` object to add to the current object.
    * @return A new `SharedInt` object containing the sum of the two values.
    */
-  SharedInt operator+(const SharedInt& other) const {
+  SharedInt operator+(const SharedInt &other) const {
     return SharedInt(*value + *other.value);
   }
 
@@ -270,7 +270,7 @@ class SharedInt {
    * @return A new `SharedInt` object containing the difference of the two
    * values.
    */
-  SharedInt operator-(const SharedInt& other) const {
+  SharedInt operator-(const SharedInt &other) const {
     return SharedInt(*value - *other.value);
   }
 
@@ -284,7 +284,7 @@ class SharedInt {
    * @param other The `SharedInt` object to multiply the current object by.
    * @return A new `SharedInt` object containing the product of the two values.
    */
-  SharedInt operator*(const SharedInt& other) const {
+  SharedInt operator*(const SharedInt &other) const {
     return SharedInt(*value * *other.value);
   }
 
@@ -298,7 +298,7 @@ class SharedInt {
    * @param other The `SharedInt` object to divide the current object by.
    * @return A new `SharedInt` object containing the quotient of the two values.
    */
-  SharedInt operator/(const SharedInt& other) const {
+  SharedInt operator/(const SharedInt &other) const {
     return SharedInt(*value / *other.value);
   }
 
@@ -314,7 +314,7 @@ class SharedInt {
    * @param other The integer value to add to the current object.
    * @return A new `SharedInt` object containing the sum of the two values.
    */
-  SharedInt operator+(const int& other) const {
+  SharedInt operator+(const int &other) const {
     return SharedInt(*value + other);
   }
 
@@ -328,7 +328,7 @@ class SharedInt {
    * @param other The integer value to subtract from the current object.
    * @return A new `SharedInt` object containing the result of the subtraction.
    */
-  SharedInt operator-(const int& other) const {
+  SharedInt operator-(const int &other) const {
     return SharedInt(*value - other);
   }
 
@@ -342,7 +342,7 @@ class SharedInt {
    * @param other The integer value to multiply the current object by.
    * @return A new `SharedInt` object containing the product of the two values.
    */
-  SharedInt operator*(const int& other) const {
+  SharedInt operator*(const int &other) const {
     return SharedInt(*value * other);
   }
 
@@ -356,7 +356,7 @@ class SharedInt {
    * @param other The integer value to divide the current object by.
    * @return A new `SharedInt` object containing the quotient of the two values.
    */
-  SharedInt operator/(const int& other) const {
+  SharedInt operator/(const int &other) const {
     return SharedInt(*value / other);
   }
 
@@ -371,7 +371,7 @@ class SharedInt {
    * @param other The `SharedInt` object to add.
    * @return A reference to the current object (`*this`) after the addition.
    */
-  SharedInt& operator+=(const SharedInt& other) {
+  SharedInt &operator+=(const SharedInt &other) {
     *value += *other.value;
     return *this;
   }
@@ -385,7 +385,7 @@ class SharedInt {
    * @param other The `SharedInt` object to subtract.
    * @return A reference to the current object (`*this`) after the subtraction.
    */
-  SharedInt& operator-=(const SharedInt& other) {
+  SharedInt &operator-=(const SharedInt &other) {
     *value -= *other.value;
     return *this;
   }
@@ -400,7 +400,7 @@ class SharedInt {
    * @return A reference to the current object (`*this`) after the
    * multiplication.
    */
-  SharedInt& operator*=(const SharedInt& other) {
+  SharedInt &operator*=(const SharedInt &other) {
     *value *= *other.value;
     return *this;
   }
@@ -414,7 +414,7 @@ class SharedInt {
    * @param other The `SharedInt` object to divide by.
    * @return A reference to the current object (`*this`) after the division.
    */
-  SharedInt& operator/=(const SharedInt& other) {
+  SharedInt &operator/=(const SharedInt &other) {
     *value /= *other.value;
     return *this;
   }
@@ -431,7 +431,7 @@ class SharedInt {
    * @param other The integer value to add to the current object.
    * @return A reference to the current object (`*this`) after the addition.
    */
-  SharedInt& operator+=(const int& other) {
+  SharedInt &operator+=(const int &other) {
     *value += other;
     return *this;
   }
@@ -446,7 +446,7 @@ class SharedInt {
    * @param other The integer value to subtract from the current object.
    * @return A reference to the current object (`*this`) after the subtraction.
    */
-  SharedInt& operator-=(const int& other) {
+  SharedInt &operator-=(const int &other) {
     *value -= other;
     return *this;
   }
@@ -462,7 +462,7 @@ class SharedInt {
    * @return A reference to the current object (`*this`) after the
    * multiplication.
    */
-  SharedInt& operator*=(const int& other) {
+  SharedInt &operator*=(const int &other) {
     *value *= other;
     return *this;
   }
@@ -477,7 +477,7 @@ class SharedInt {
    * @param other The integer value to divide the current object by.
    * @return A reference to the current object (`*this`) after the division.
    */
-  SharedInt& operator/=(const int& other) {
+  SharedInt &operator/=(const int &other) {
     *value /= other;
     return *this;
   }
@@ -493,7 +493,7 @@ class SharedInt {
    * @param other The `SharedInt` object to compare against.
    * @return `true` if the values are equal, `false` otherwise.
    */
-  bool operator==(const SharedInt& other) const {
+  bool operator==(const SharedInt &other) const {
     return *value == *other.value;
   }
 
@@ -506,7 +506,7 @@ class SharedInt {
    * @param other The `SharedInt` object to compare against.
    * @return `true` if the values are not equal, `false` otherwise.
    */
-  bool operator!=(const SharedInt& other) const {
+  bool operator!=(const SharedInt &other) const {
     return *value != *other.value;
   }
 
@@ -520,7 +520,7 @@ class SharedInt {
    * @return `true` if the current object's value is less than `other`'s value,
    * `false` otherwise.
    */
-  bool operator<(const SharedInt& other) const { return *value < *other.value; }
+  bool operator<(const SharedInt &other) const { return *value < *other.value; }
 
   /**
    * @brief Overloads the less-than-or-equal-to operator (`<=`).
@@ -532,7 +532,7 @@ class SharedInt {
    * @return `true` if the current object's value is less than or equal to
    * `other`'s value, `false` otherwise.
    */
-  bool operator<=(const SharedInt& other) const {
+  bool operator<=(const SharedInt &other) const {
     return *value <= *other.value;
   }
 
@@ -546,7 +546,7 @@ class SharedInt {
    * @return `true` if the current object's value is greater than `other`'s
    * value, `false` otherwise.
    */
-  bool operator>(const SharedInt& other) const { return *value > *other.value; }
+  bool operator>(const SharedInt &other) const { return *value > *other.value; }
 
   /**
    * @brief Overloads the greater-than-or-equal-to operator (`>=`).
@@ -558,7 +558,7 @@ class SharedInt {
    * @return `true` if the current object's value is greater than or equal to
    * `other`'s value, `false` otherwise.
    */
-  bool operator>=(const SharedInt& other) const {
+  bool operator>=(const SharedInt &other) const {
     return *value >= *other.value;
   }
 
@@ -573,7 +573,7 @@ class SharedInt {
    * @param other The integer value to compare against.
    * @return `true` if the values are equal, `false` otherwise.
    */
-  bool operator==(const int& other) const { return *value == other; }
+  bool operator==(const int &other) const { return *value == other; }
 
   /**
    * @brief Overloads the inequality operator (`!=`) for an integer value.
@@ -584,7 +584,7 @@ class SharedInt {
    * @param other The integer value to compare against.
    * @return `true` if the values are not equal, `false` otherwise.
    */
-  bool operator!=(const int& other) const { return *value != other; }
+  bool operator!=(const int &other) const { return *value != other; }
 
   /**
    * @brief Overloads the less-than operator (`<`) for an integer value.
@@ -596,7 +596,7 @@ class SharedInt {
    * @return `true` if the current object's value is less than `other`, `false`
    * otherwise.
    */
-  bool operator<(const int& other) const { return *value < other; }
+  bool operator<(const int &other) const { return *value < other; }
 
   /**
    * @brief Overloads the less-than-or-equal-to operator (`<=`) for an integer
@@ -609,7 +609,7 @@ class SharedInt {
    * @return `true` if the current object's value is less than or equal to
    * `other`, `false` otherwise.
    */
-  bool operator<=(const int& other) const { return *value <= other; }
+  bool operator<=(const int &other) const { return *value <= other; }
 
   /**
    * @brief Overloads the greater-than operator (`>`) for an integer value.
@@ -621,7 +621,7 @@ class SharedInt {
    * @return `true` if the current object's value is greater than `other`,
    * `false` otherwise.
    */
-  bool operator>(const int& other) const { return *value > other; }
+  bool operator>(const int &other) const { return *value > other; }
 
   /**
    * @brief Overloads the greater-than-or-equal-to operator (`>=`) for an
@@ -634,7 +634,7 @@ class SharedInt {
    * @return `true` if the current object's value is greater than or equal to
    * `other`, `false` otherwise.
    */
-  bool operator>=(const int& other) const { return *value >= other; }
+  bool operator>=(const int &other) const { return *value >= other; }
 
   /**
    * @brief Overloads the stream insertion operator (`<<`) for `SharedInt`.
@@ -646,7 +646,7 @@ class SharedInt {
    * @param sp The `SharedInt` object to print.
    * @return A reference to the output stream, allowing for chained insertions.
    */
-  friend std::ostream& operator<<(std::ostream& os, const SharedInt& sp) {
+  friend std::ostream &operator<<(std::ostream &os, const SharedInt &sp) {
     os << *sp.value;
     return os;
   }
@@ -666,7 +666,7 @@ class SharedInt {
  * @param rhs The `SharedInt` object on the right-hand side.
  * @return A new `SharedInt` object containing the sum.
  */
-inline SharedInt operator+(const int& lhs, const SharedInt& rhs) {
+inline SharedInt operator+(const int &lhs, const SharedInt &rhs) {
   return SharedInt(lhs + rhs.get());
 }
 
@@ -682,7 +682,7 @@ inline SharedInt operator+(const int& lhs, const SharedInt& rhs) {
  * @param rhs The `SharedInt` object on the right-hand side.
  * @return A new `SharedInt` object containing the result of the subtraction.
  */
-inline SharedInt operator-(const int& lhs, const SharedInt& rhs) {
+inline SharedInt operator-(const int &lhs, const SharedInt &rhs) {
   return SharedInt(lhs - rhs.get());
 }
 
@@ -697,7 +697,7 @@ inline SharedInt operator-(const int& lhs, const SharedInt& rhs) {
  * @param rhs The `SharedInt` object on the right-hand side.
  * @return A new `SharedInt` object containing the product.
  */
-inline SharedInt operator*(const int& lhs, const SharedInt& rhs) {
+inline SharedInt operator*(const int &lhs, const SharedInt &rhs) {
   return SharedInt(lhs * rhs.get());
 }
 
@@ -712,7 +712,7 @@ inline SharedInt operator*(const int& lhs, const SharedInt& rhs) {
  * @param rhs The `SharedInt` object on the right-hand side.
  * @return A new `SharedInt` object containing the quotient.
  */
-inline SharedInt operator/(const int& lhs, const SharedInt& rhs) {
+inline SharedInt operator/(const int &lhs, const SharedInt &rhs) {
   return SharedInt(lhs / rhs.get());
 }
 
@@ -727,7 +727,7 @@ inline SharedInt operator/(const int& lhs, const SharedInt& rhs) {
  * @return `true` if the integer is less than the `SharedInt`'s value,
  * `false` otherwise.
  */
-inline bool operator<(const int& lhs, const SharedInt& rhs) {
+inline bool operator<(const int &lhs, const SharedInt &rhs) {
   return (lhs < rhs.get());
 }
 
@@ -742,7 +742,7 @@ inline bool operator<(const int& lhs, const SharedInt& rhs) {
  * @return `true` if the integer is less than or equal to the `SharedInt`'s
  * value, `false` otherwise.
  */
-inline bool operator<=(const int& lhs, const SharedInt& rhs) {
+inline bool operator<=(const int &lhs, const SharedInt &rhs) {
   return (lhs <= rhs.get());
 }
 
@@ -757,7 +757,7 @@ inline bool operator<=(const int& lhs, const SharedInt& rhs) {
  * @return `true` if the integer is greater than the `SharedInt`'s value,
  * `false` otherwise.
  */
-inline bool operator>(const int& lhs, const SharedInt& rhs) {
+inline bool operator>(const int &lhs, const SharedInt &rhs) {
   return (lhs > rhs.get());
 }
 
@@ -772,7 +772,7 @@ inline bool operator>(const int& lhs, const SharedInt& rhs) {
  * @return `true` if the integer is greater than or equal to the
  * `SharedInt`'s value, `false` otherwise.
  */
-inline bool operator>=(const int& lhs, const SharedInt& rhs) {
+inline bool operator>=(const int &lhs, const SharedInt &rhs) {
   return (lhs >= rhs.get());
 }
 
@@ -787,10 +787,10 @@ inline bool operator>=(const int& lhs, const SharedInt& rhs) {
  * is destroyed.
  */
 class SharedReal {
- private:
+private:
   std::shared_ptr<int> value;
 
- public:
+public:
   /**
    * @brief Constructs a new `SharedReal` object with a default value.
    *
@@ -817,7 +817,7 @@ class SharedReal {
    *
    * @param other The existing `SharedReal` object to copy from.
    */
-  SharedReal(const SharedReal& other) : value(other.value) {}
+  SharedReal(const SharedReal &other) : value(other.value) {}
 
   /**
    * @brief Overloaded copy assignment operator.
@@ -830,7 +830,7 @@ class SharedReal {
    * @return A reference to the current object (`*this`) to allow for chained
    * assignments.
    */
-  SharedReal& operator=(const SharedReal& other) {
+  SharedReal &operator=(const SharedReal &other) {
     if (this != &other) {
       value = other.value;
     }
@@ -847,7 +847,7 @@ class SharedReal {
    * @return A reference to the current object (`*this`) to allow for
    * chained assignments.
    */
-  SharedReal& operator=(const int& other) {
+  SharedReal &operator=(const int &other) {
     *value = other;
 
     return *this;
@@ -863,7 +863,7 @@ class SharedReal {
    * @param other The temporary `SharedReal` object to move from. After this
    * call, `other` will no longer own the resource.
    */
-  SharedReal(SharedReal&& other) noexcept : value(std::move(other.value)) {}
+  SharedReal(SharedReal &&other) noexcept : value(std::move(other.value)) {}
 
   /**
    * @brief Overloaded move assignment operator.
@@ -876,7 +876,7 @@ class SharedReal {
    * @param other The temporary `SharedReal` object to move from.
    * @return A reference to the current object (`*this`).
    */
-  SharedReal& operator=(SharedReal&& other) noexcept {
+  SharedReal &operator=(SharedReal &&other) noexcept {
     if (this != &other) {
       value = std::move(other.value);
     }
@@ -937,7 +937,7 @@ class SharedReal {
    * @return A raw pointer (`int*`) to the integer managed by the shared
    * pointer.
    */
-  int* operator->() { return value.get(); }
+  int *operator->() { return value.get(); }
 
   /**
    * @brief Overloads the member access operator (`->`) for const objects.
@@ -949,7 +949,7 @@ class SharedReal {
    *
    * @return A `const` raw pointer to the integer managed by the shared pointer.
    */
-  const int* operator->() const { return value.get(); }
+  const int *operator->() const { return value.get(); }
 
   // Unary operators
 
@@ -962,7 +962,7 @@ class SharedReal {
    * @return A reference to the current object (`*this`) after the increment has
    * occurred.
    */
-  SharedReal& operator++() {
+  SharedReal &operator++() {
     ++(*value);
     return *this;
   }
@@ -993,7 +993,7 @@ class SharedReal {
    * @return A reference to the current object (`*this`) after the decrement has
    * occurred.
    */
-  SharedReal& operator--() {
+  SharedReal &operator--() {
     --(*value);
     return *this;
   }
@@ -1026,7 +1026,7 @@ class SharedReal {
    * @param other The `SharedReal` object to add to the current object.
    * @return A new `SharedReal` object containing the sum of the two values.
    */
-  SharedReal operator+(const SharedReal& other) const {
+  SharedReal operator+(const SharedReal &other) const {
     return SharedReal(*value + *other.value);
   }
 
@@ -1042,7 +1042,7 @@ class SharedReal {
    * @return A new `SharedReal` object containing the result of the
    * subtraction.
    */
-  SharedReal operator-(const SharedReal& other) const {
+  SharedReal operator-(const SharedReal &other) const {
     return SharedReal(*value - *other.value);
   }
 
@@ -1057,7 +1057,7 @@ class SharedReal {
    * @return A new `SharedReal` object containing the product of the two
    * values.
    */
-  SharedReal operator*(const SharedReal& other) const {
+  SharedReal operator*(const SharedReal &other) const {
     return SharedReal(*value * *other.value);
   }
 
@@ -1072,7 +1072,7 @@ class SharedReal {
    * @return A new `SharedReal` object containing the quotient of the two
    * values.
    */
-  SharedReal operator/(const SharedReal& other) const {
+  SharedReal operator/(const SharedReal &other) const {
     return SharedReal(*value / *other.value);
   }
 
@@ -1088,7 +1088,7 @@ class SharedReal {
    * @param other The integer value to add to the current object.
    * @return A new `SharedReal` object containing the sum.
    */
-  SharedReal operator+(const int& other) const {
+  SharedReal operator+(const int &other) const {
     return SharedReal(*value + other);
   }
 
@@ -1102,7 +1102,7 @@ class SharedReal {
    * @param other The integer value to subtract from the current object.
    * @return A new `SharedReal` object containing the result.
    */
-  SharedReal operator-(const int& other) const {
+  SharedReal operator-(const int &other) const {
     return SharedReal(*value - other);
   }
 
@@ -1117,7 +1117,7 @@ class SharedReal {
    * @param other The integer value to multiply the current object by.
    * @return A new `SharedReal` object containing the product.
    */
-  SharedReal operator*(const int& other) const {
+  SharedReal operator*(const int &other) const {
     return SharedReal(*value * other);
   }
 
@@ -1131,7 +1131,7 @@ class SharedReal {
    * @param other The integer value to divide the current object by.
    * @return A new `SharedReal` object containing the quotient.
    */
-  SharedReal operator/(const int& other) const {
+  SharedReal operator/(const int &other) const {
     return SharedReal(*value / other);
   }
 
@@ -1147,7 +1147,7 @@ class SharedReal {
    * @return A reference to the current object (`*this`) after the
    * addition.
    */
-  SharedReal& operator+=(const SharedReal& other) {
+  SharedReal &operator+=(const SharedReal &other) {
     *value += *other.value;
     return *this;
   }
@@ -1162,7 +1162,7 @@ class SharedReal {
    * @return A reference to the current object (`*this`) after the
    * subtraction.
    */
-  SharedReal& operator-=(const SharedReal& other) {
+  SharedReal &operator-=(const SharedReal &other) {
     *value -= *other.value;
     return *this;
   }
@@ -1177,7 +1177,7 @@ class SharedReal {
    * @return A reference to the current object (`*this`) after the
    * multiplication.
    */
-  SharedReal& operator*=(const SharedReal& other) {
+  SharedReal &operator*=(const SharedReal &other) {
     *value *= *other.value;
     return *this;
   }
@@ -1192,7 +1192,7 @@ class SharedReal {
    * @return A reference to the current object (`*this`) after the
    * division.
    */
-  SharedReal& operator/=(const SharedReal& other) {
+  SharedReal &operator/=(const SharedReal &other) {
     *value /= *other.value;
     return *this;
   }
@@ -1208,7 +1208,7 @@ class SharedReal {
    * @return A reference to the current object (`*this`) after the
    * addition.
    */
-  SharedReal& operator+=(const int& other) {
+  SharedReal &operator+=(const int &other) {
     *value += other;
     return *this;
   }
@@ -1224,7 +1224,7 @@ class SharedReal {
    * @return A reference to the current object (`*this`) after the
    * subtraction.
    */
-  SharedReal& operator-=(const int& other) {
+  SharedReal &operator-=(const int &other) {
     *value -= other;
     return *this;
   }
@@ -1240,7 +1240,7 @@ class SharedReal {
    * @return A reference to the current object (`*this`) after the
    * multiplication.
    */
-  SharedReal& operator*=(const int& other) {
+  SharedReal &operator*=(const int &other) {
     *value *= other;
     return *this;
   }
@@ -1256,7 +1256,7 @@ class SharedReal {
    * @return A reference to the current object (`*this`) after the
    * division.
    */
-  SharedReal& operator/=(const int& other) {
+  SharedReal &operator/=(const int &other) {
     *value /= other;
     return *this;
   }
@@ -1273,7 +1273,7 @@ class SharedReal {
    * @param other The SharedReal object to compare against.
    * @return `true` if the values are equal, `false` otherwise.
    */
-  bool operator==(const SharedReal& other) const {
+  bool operator==(const SharedReal &other) const {
     return *value == *other.value;
   }
 
@@ -1287,7 +1287,7 @@ class SharedReal {
    * @param other The SharedReal object to compare against.
    * @return `true` if the values are not equal, `false` otherwise.
    */
-  bool operator!=(const SharedReal& other) const {
+  bool operator!=(const SharedReal &other) const {
     return *value != *other.value;
   }
 
@@ -1301,7 +1301,7 @@ class SharedReal {
    * @return `true` if the current object's value is less than `other`'s
    * value, `false` otherwise.
    */
-  bool operator<(const SharedReal& other) const {
+  bool operator<(const SharedReal &other) const {
     return *value < *other.value;
   }
 
@@ -1315,7 +1315,7 @@ class SharedReal {
    * @return `true` if the current object's value is less than or equal
    * to `other`'s value, `false` otherwise.
    */
-  bool operator<=(const SharedReal& other) const {
+  bool operator<=(const SharedReal &other) const {
     return *value <= *other.value;
   }
 
@@ -1329,7 +1329,7 @@ class SharedReal {
    * @return `true` if the current object's value is greater than `other`'s
    * value, `false` otherwise.
    */
-  bool operator>(const SharedReal& other) const {
+  bool operator>(const SharedReal &other) const {
     return *value > *other.value;
   }
 
@@ -1343,7 +1343,7 @@ class SharedReal {
    * @return `true` if the current object's value is greater than or
    * equal to `other`'s value, `false` otherwise.
    */
-  bool operator>=(const SharedReal& other) const {
+  bool operator>=(const SharedReal &other) const {
     return *value >= *other.value;
   }
 
@@ -1358,7 +1358,7 @@ class SharedReal {
    * @param other The integer value to compare against.
    * @return `true` if the values are equal, `false` otherwise.
    */
-  bool operator==(const int& other) const { return *value == other; }
+  bool operator==(const int &other) const { return *value == other; }
 
   /**
    * @brief Overloads the inequality operator (`!=`) for an integer.
@@ -1369,7 +1369,7 @@ class SharedReal {
    * @param other The integer value to compare against.
    * @return `true` if the values are not equal, `false` otherwise.
    */
-  bool operator!=(const int& other) const { return *value != other; }
+  bool operator!=(const int &other) const { return *value != other; }
 
   /**
    * @brief Overloads the less-than operator (`<`) for an integer.
@@ -1381,7 +1381,7 @@ class SharedReal {
    * @return `true` if the current object's value is less than `other`,
    * `false` otherwise.
    */
-  bool operator<(const int& other) const { return *value < other; }
+  bool operator<(const int &other) const { return *value < other; }
 
   /**
    * @brief Overloads the less-than-or-equal-to operator (`<=`) for an
@@ -1394,7 +1394,7 @@ class SharedReal {
    * @return `true` if the current object's value is less than or equal
    * to `other`, `false` otherwise.
    */
-  bool operator<=(const int& other) const { return *value <= other; }
+  bool operator<=(const int &other) const { return *value <= other; }
 
   /**
    * @brief Overloads the greater-than operator (`>`) for an integer.
@@ -1406,7 +1406,7 @@ class SharedReal {
    * @return `true` if the current object's value is greater than
    * `other`, `false` otherwise.
    */
-  bool operator>(const int& other) const { return *value > other; }
+  bool operator>(const int &other) const { return *value > other; }
 
   /**
    * @brief Overloads the greater-than-or-equal-to operator (`>=`) for an
@@ -1419,7 +1419,7 @@ class SharedReal {
    * @return `true` if the current object's value is greater than or
    * equal to `other`, `false` otherwise.
    */
-  bool operator>=(const int& other) const { return *value >= other; }
+  bool operator>=(const int &other) const { return *value >= other; }
 
   /**
    * @brief Overloads the stream insertion operator (`<<`) for SharedReal.
@@ -1431,7 +1431,7 @@ class SharedReal {
    * @param sp The SharedReal object to print.
    * @return A reference to the output stream, allowing for chained insertions.
    */
-  friend std::ostream& operator<<(std::ostream& os, const SharedReal& sp) {
+  friend std::ostream &operator<<(std::ostream &os, const SharedReal &sp) {
     os << *sp.value;
     return os;
   }
@@ -1449,7 +1449,7 @@ class SharedReal {
  * @param rhs The SharedReal object on the right-hand side.
  * @return A new SharedReal object containing the sum.
  */
-inline SharedReal operator+(const double& lhs, const SharedReal& rhs) {
+inline SharedReal operator+(const double &lhs, const SharedReal &rhs) {
   return SharedReal(lhs + rhs.get());
 }
 
@@ -1466,7 +1466,7 @@ inline SharedReal operator+(const double& lhs, const SharedReal& rhs) {
  * @return A new SharedReal object containing the result of the
  * subtraction.
  */
-inline SharedReal operator-(const double& lhs, const SharedReal& rhs) {
+inline SharedReal operator-(const double &lhs, const SharedReal &rhs) {
   return SharedReal(lhs - rhs.get());
 }
 
@@ -1481,7 +1481,7 @@ inline SharedReal operator-(const double& lhs, const SharedReal& rhs) {
  * @param rhs The SharedReal object on the right-hand side.
  * @return A new SharedReal object containing the product.
  */
-inline SharedReal operator*(const double& lhs, const SharedReal& rhs) {
+inline SharedReal operator*(const double &lhs, const SharedReal &rhs) {
   return SharedReal(lhs * rhs.get());
 }
 
@@ -1496,7 +1496,7 @@ inline SharedReal operator*(const double& lhs, const SharedReal& rhs) {
  * @param rhs The SharedReal object on the right-hand side.
  * @return A new SharedReal object containing the quotient.
  */
-inline SharedReal operator/(const double& lhs, const SharedReal& rhs) {
+inline SharedReal operator/(const double &lhs, const SharedReal &rhs) {
   return SharedReal(lhs / rhs.get());
 }
 
@@ -1511,10 +1511,10 @@ inline SharedReal operator/(const double& lhs, const SharedReal& rhs) {
  * is destroyed.
  */
 class SharedString {
- private:
+private:
   std::shared_ptr<std::string> value;
 
- public:
+public:
   /**
    * @brief Constructs a new SharedString object with a default, empty value.
    *
@@ -1541,7 +1541,7 @@ class SharedString {
    *
    * @param other The existing SharedString object to copy from.
    */
-  SharedString(const SharedString& other) : value(other.value) {}
+  SharedString(const SharedString &other) : value(other.value) {}
 
   /**
    * @brief Overloaded copy assignment operator.
@@ -1554,7 +1554,7 @@ class SharedString {
    * @return A reference to the current object (`*this`) to allow for chained
    * assignments.
    */
-  SharedString& operator=(const SharedString& other) {
+  SharedString &operator=(const SharedString &other) {
     if (this != &other) {
       value = other.value;
     }
@@ -1571,7 +1571,7 @@ class SharedString {
    * @return A reference to the current object (`*this`) to allow for
    * chained assignments.
    */
-  SharedString& operator=(const std::string& other) {
+  SharedString &operator=(const std::string &other) {
     *value = other;
     return *this;
   }
@@ -1586,7 +1586,7 @@ class SharedString {
    * @param other The temporary SharedString object to move from. After
    * this call, `other` will no longer own the resource.
    */
-  SharedString(SharedString&& other) noexcept : value(std::move(other.value)) {}
+  SharedString(SharedString &&other) noexcept : value(std::move(other.value)) {}
 
   /**
    * @brief Overloaded move assignment operator.
@@ -1598,7 +1598,7 @@ class SharedString {
    * @param other The temporary SharedString object to move from.
    * @return A reference to the current object (`*this`).
    */
-  SharedString& operator=(SharedString&& other) noexcept {
+  SharedString &operator=(SharedString &&other) noexcept {
     if (this != &other) {
       value = std::move(other.value);
     }
@@ -1657,7 +1657,7 @@ class SharedString {
    * @return A raw pointer (`std::string*`) to the string managed by
    * the shared pointer.
    */
-  std::string* operator->() { return value.get(); }
+  std::string *operator->() { return value.get(); }
 
   /**
    * @brief Overloads the member access operator (`->`) for const objects.
@@ -1671,7 +1671,7 @@ class SharedString {
    * @return A `const` raw pointer to the string managed by the shared
    * pointer.
    */
-  const std::string* operator->() const { return value.get(); }
+  const std::string *operator->() const { return value.get(); }
 
   /**
    * @brief Overloads the stream insertion operator (`<<`) for
@@ -1685,7 +1685,7 @@ class SharedString {
    * @return A reference to the output stream, allowing for chained
    * insertions.
    */
-  friend std::ostream& operator<<(std::ostream& os, const SharedString& sp) {
+  friend std::ostream &operator<<(std::ostream &os, const SharedString &sp) {
     os << *sp.value;
     return os;
   }
@@ -1702,10 +1702,10 @@ class SharedString {
  * is destroyed.
  */
 class SharedBoolean {
- private:
+private:
   std::shared_ptr<bool> value;
 
- public:
+public:
   /**
    * @brief Constructs a new SharedBoolean object with a default value.
    *
@@ -1732,7 +1732,7 @@ class SharedBoolean {
    *
    * @param other The existing SharedBoolean object to copy from.
    */
-  SharedBoolean(const SharedBoolean& other) : value(other.value) {}
+  SharedBoolean(const SharedBoolean &other) : value(other.value) {}
 
   /**
    * @brief Overloaded copy assignment operator.
@@ -1745,7 +1745,7 @@ class SharedBoolean {
    * @return A reference to the current object (`*this`) to allow for chained
    * assignments.
    */
-  SharedBoolean& operator=(const SharedBoolean& other) {
+  SharedBoolean &operator=(const SharedBoolean &other) {
     if (this != &other) {
       value = other.value;
     }
@@ -1762,7 +1762,7 @@ class SharedBoolean {
    * @return A reference to the current object (`*this`) to allow for
    * chained assignments.
    */
-  SharedBoolean& operator=(const bool& other) {
+  SharedBoolean &operator=(const bool &other) {
     *value = other;
     return *this;
   }
@@ -1777,7 +1777,7 @@ class SharedBoolean {
    * @param other The temporary SharedBoolean object to move from. After this
    * call, `other` will no longer own the resource.
    */
-  SharedBoolean(SharedBoolean&& other) noexcept
+  SharedBoolean(SharedBoolean &&other) noexcept
       : value(std::move(other.value)) {}
 
   /**
@@ -1790,7 +1790,7 @@ class SharedBoolean {
    * @param other The temporary SharedBoolean object to move from.
    * @return A reference to the current object (`*this`).
    */
-  SharedBoolean& operator=(SharedBoolean&& other) noexcept {
+  SharedBoolean &operator=(SharedBoolean &&other) noexcept {
     if (this != &other) {
       value = std::move(other.value);
     }
@@ -1849,7 +1849,7 @@ class SharedBoolean {
    * @return A raw pointer (`bool*`) to the boolean managed by the
    * shared pointer.
    */
-  bool* operator->() { return value.get(); }
+  bool *operator->() { return value.get(); }
 
   /**
    * @brief Overloads the member access operator (`->`) for const objects.
@@ -1863,7 +1863,7 @@ class SharedBoolean {
    * @return A `const` raw pointer to the boolean managed by the shared
    * pointer.
    */
-  const bool* operator->() const { return value.get(); }
+  const bool *operator->() const { return value.get(); }
 
   /**
    * @brief Overloads the equality operator (`==`).
@@ -1875,7 +1875,7 @@ class SharedBoolean {
    * @param other The SharedBoolean object to compare against.
    * @return `true` if the values are equal, `false` otherwise.
    */
-  bool operator==(const SharedBoolean& other) const {
+  bool operator==(const SharedBoolean &other) const {
     return *value == *other.value;
   }
 
@@ -1889,7 +1889,7 @@ class SharedBoolean {
    * @param other The SharedBoolean object to compare against.
    * @return `true` if the values are not equal, `false` otherwise.
    */
-  bool operator!=(const SharedBoolean& other) const {
+  bool operator!=(const SharedBoolean &other) const {
     return *value != *other.value;
   }
 
@@ -1903,7 +1903,7 @@ class SharedBoolean {
    * @return `true` if the current object's value is less than `other`'s
    * value, `false` otherwise.
    */
-  bool operator<(const SharedBoolean& other) const {
+  bool operator<(const SharedBoolean &other) const {
     return *value < *other.value;
   }
 
@@ -1917,7 +1917,7 @@ class SharedBoolean {
    * @return `true` if the current object's value is less than or equal
    * to `other`'s value, `false` otherwise.
    */
-  bool operator<=(const SharedBoolean& other) const {
+  bool operator<=(const SharedBoolean &other) const {
     return *value <= *other.value;
   }
 
@@ -1931,7 +1931,7 @@ class SharedBoolean {
    * @return `true` if the current object's value is greater than `other`'s
    * value, `false` otherwise.
    */
-  bool operator>(const SharedBoolean& other) const {
+  bool operator>(const SharedBoolean &other) const {
     return *value > *other.value;
   }
 
@@ -1945,7 +1945,7 @@ class SharedBoolean {
    * @return `true` if the current object's value is greater than or
    * equal to `other`'s value, `false` otherwise.
    */
-  bool operator>=(const SharedBoolean& other) const {
+  bool operator>=(const SharedBoolean &other) const {
     return *value >= *other.value;
   }
 
@@ -1958,7 +1958,7 @@ class SharedBoolean {
    * @param other The boolean value to compare against.
    * @return `true` if the values are equal, `false` otherwise.
    */
-  bool operator==(const bool& other) const { return *value == other; }
+  bool operator==(const bool &other) const { return *value == other; }
 
   /**
    * @brief Overloads the inequality operator (`!=`) for a boolean value.
@@ -1969,7 +1969,7 @@ class SharedBoolean {
    * @param other The boolean value to compare against.
    * @return `true` if the values are not equal, `false` otherwise.
    */
-  bool operator!=(const bool& other) const { return *value != other; }
+  bool operator!=(const bool &other) const { return *value != other; }
 
   /**
    * @brief Overloads the less-than operator (`<`) for a boolean value.
@@ -1981,7 +1981,7 @@ class SharedBoolean {
    * @return `true` if the current object's value is less than `other`,
    * `false` otherwise.
    */
-  bool operator<(const bool& other) const { return *value < other; }
+  bool operator<(const bool &other) const { return *value < other; }
 
   /**
    * @brief Overloads the less-than-or-equal-to operator (`<=`) for a boolean.
@@ -1993,7 +1993,7 @@ class SharedBoolean {
    * @return `true` if the current object's value is less than or equal
    * to `other`, `false` otherwise.
    */
-  bool operator<=(const bool& other) const { return *value <= other; }
+  bool operator<=(const bool &other) const { return *value <= other; }
 
   /**
    * @brief Overloads the greater-than operator (`>`) for a boolean value.
@@ -2005,7 +2005,7 @@ class SharedBoolean {
    * @return `true` if the current object's value is greater than `other`,
    * `false` otherwise.
    */
-  bool operator>(const bool& other) const { return *value > other; }
+  bool operator>(const bool &other) const { return *value > other; }
 
   /**
    * @brief Overloads the greater-than-or-equal-to operator (`>=`) for a
@@ -2018,7 +2018,7 @@ class SharedBoolean {
    * @return `true` if the current object's value is greater than or
    * equal to `other`, `false` otherwise.
    */
-  bool operator>=(const bool& other) const { return *value >= other; }
+  bool operator>=(const bool &other) const { return *value >= other; }
 
   /**
    * @brief Overloads the stream insertion operator (`<<`) for
@@ -2031,7 +2031,7 @@ class SharedBoolean {
    * @param sp The SharedBoolean object to print.
    * @return A reference to the output stream, allowing for chained insertions.
    */
-  friend std::ostream& operator<<(std::ostream& os, const SharedBoolean& sp) {
+  friend std::ostream &operator<<(std::ostream &os, const SharedBoolean &sp) {
     os << *sp.value;
     return os;
   }
@@ -2048,7 +2048,7 @@ class SharedBoolean {
  * @return `true` if the boolean is less than the SharedBoolean's
  * value, `false` otherwise.
  */
-inline bool operator<(const bool& lhs, const SharedBoolean& rhs) {
+inline bool operator<(const bool &lhs, const SharedBoolean &rhs) {
   return (lhs < rhs.get());
 }
 
@@ -2063,7 +2063,7 @@ inline bool operator<(const bool& lhs, const SharedBoolean& rhs) {
  * @return `true` if the boolean is less than or equal to the
  * SharedBoolean's value, `false` otherwise.
  */
-inline bool operator<=(const bool& lhs, const SharedBoolean& rhs) {
+inline bool operator<=(const bool &lhs, const SharedBoolean &rhs) {
   return (lhs <= rhs.get());
 }
 
@@ -2078,7 +2078,7 @@ inline bool operator<=(const bool& lhs, const SharedBoolean& rhs) {
  * @return `true` if the boolean is greater than the SharedBoolean's
  * value, `false` otherwise.
  */
-inline bool operator>(const bool& lhs, const SharedBoolean& rhs) {
+inline bool operator>(const bool &lhs, const SharedBoolean &rhs) {
   return (lhs > rhs.get());
 }
 
@@ -2093,7 +2093,7 @@ inline bool operator>(const bool& lhs, const SharedBoolean& rhs) {
  * @return `true` if the boolean is greater than or equal to the
  * SharedBoolean's value, `false` otherwise.
  */
-inline bool operator>=(const bool& lhs, const SharedBoolean& rhs) {
+inline bool operator>=(const bool &lhs, const SharedBoolean &rhs) {
   return (lhs >= rhs.get());
 }
 

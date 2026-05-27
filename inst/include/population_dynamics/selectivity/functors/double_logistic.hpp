@@ -50,7 +50,7 @@ struct DoubleLogisticSelectivity : public SelectivityBase<Type> {
    * @param x  The independent variable in the double logistic function (e.g.,
    * age or size in selectivity).
    */
-  virtual const Type evaluate(const Type& x) {
+  virtual const Type evaluate(const Type &x) {
     return fims_math::double_logistic<Type>(
         inflection_point_asc[0], slope_asc[0], inflection_point_desc[0],
         slope_desc[0], x);
@@ -70,7 +70,7 @@ struct DoubleLogisticSelectivity : public SelectivityBase<Type> {
    * then it returns the first element, which would be the case when you do not
    * have time-varying selectivity.
    */
-  virtual const Type evaluate(const Type& x, size_t pos) {
+  virtual const Type evaluate(const Type &x, size_t pos) {
     return fims_math::double_logistic<Type>(
         inflection_point_asc.get_force_scalar(pos),
         slope_asc.get_force_scalar(pos),
@@ -79,6 +79,6 @@ struct DoubleLogisticSelectivity : public SelectivityBase<Type> {
   }
 };
 
-}  // namespace fims_popdy
+} // namespace fims_popdy
 
 #endif /* POPULATION_DYNAMICS_SELECTIVITY_DOUBLE_LOGISTIC_HPP */

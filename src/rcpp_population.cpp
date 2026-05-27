@@ -11,13 +11,13 @@ uint32_t PopulationInterfaceBase::id_g = 1;
 std::map<uint32_t, std::shared_ptr<PopulationInterfaceBase>>
     PopulationInterfaceBase::live_objects;
 
-    #include <Rcpp.h>
- /**
+#include <Rcpp.h>
+/**
  * Function to register population classes with the Rcpp module system.
- * 
- */   
- void register_population(Rcpp::Module& m) {
-    Rcpp::class_<PopulationInterface>(
+ *
+ */
+void register_population(Rcpp::Module &m) {
+  Rcpp::class_<PopulationInterface>(
       "Population",
       "See "
       "https://noaa-fims.github.io/FIMS/doxygen/classPopulationInterface.html.")
@@ -39,4 +39,4 @@ std::map<uint32_t, std::shared_ptr<PopulationInterfaceBase>>
       .method("AddFleet", &PopulationInterface::AddFleet)
       .method("SetName", &PopulationInterface::SetName)
       .method("GetName", &PopulationInterface::GetName);
- }
+}

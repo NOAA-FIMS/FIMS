@@ -13,7 +13,7 @@ namespace {
 class CAAInitializeTestFixture : public testing::Test {
   // Make members protected and they can be accessed from
   // sub-classes.
- protected:
+protected:
   // Use SetUp function to prepare the objects for each test.
   // Use override in C++11 to make sure SetUp (e.g., not Setup with
   // a lowercase u) is spelled
@@ -34,7 +34,7 @@ class CAAInitializeTestFixture : public testing::Test {
       fleet->log_q.resize(1);
       population->fleets.push_back(fleet);
       catch_at_age_model->fleets[fleet->GetId()] =
-          fleet;  // Add to CatchAtAge model's fleets map
+          fleet; // Add to CatchAtAge model's fleets map
     }
     catch_at_age_model->populations.push_back(population);
   }
@@ -219,11 +219,11 @@ class CAAInitializeTestFixture : public testing::Test {
 };
 
 class CAAEvaluateTestFixture : public testing::Test {
- protected:
+protected:
   // Declare population here as a member, and initialize it in SetUp
   std::shared_ptr<fims_popdy::Population<double>> population;
   std::shared_ptr<fims_popdy::CatchAtAge<double>>
-      catch_at_age_model;  // New member for the model
+      catch_at_age_model; // New member for the model
 
   void SetUp() override {
     // C++ code to set up true values for log_naa, log_M,
@@ -277,7 +277,7 @@ class CAAEvaluateTestFixture : public testing::Test {
       // Push fleet to population and catch_at_age_model
       population->fleets.push_back(fleet);
       catch_at_age_model->fleets[fleet->GetId()] =
-          fleet;  // Add to CatchAtAge model's fleets map
+          fleet; // Add to CatchAtAge model's fleets map
     }
 
     // Push population to catch_at_age_model
@@ -575,7 +575,7 @@ class CAAEvaluateTestFixture : public testing::Test {
 };
 
 class CAAPrepareTestFixture : public testing::Test {
- protected:
+protected:
   std::shared_ptr<fims_popdy::Population<double>> population;
   std::shared_ptr<fims_popdy::CatchAtAge<double>> catch_at_age_model;
   void SetUp() override {
@@ -642,7 +642,7 @@ class CAAPrepareTestFixture : public testing::Test {
 
       population->fleets.push_back(fleet);
       catch_at_age_model->fleets[fleet->GetId()] =
-          fleet;  // Add to CatchAtAge model's fleets map
+          fleet; // Add to CatchAtAge model's fleets map
     }
 
     population->ages.resize(n_ages);
@@ -864,6 +864,6 @@ class CAAPrepareTestFixture : public testing::Test {
   int n_fleets = 2;
   int n_lengths = 23;
 };
-}  // namespace
+} // namespace
 
 #endif

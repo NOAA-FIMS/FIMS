@@ -8,8 +8,8 @@
 #ifndef FIMS_MODELS_CATCH_AT_AGE_HPP
 #define FIMS_MODELS_CATCH_AT_AGE_HPP
 
-#include <set>
 #include <regex>
+#include <set>
 
 #include "fishery_model_base.hpp"
 
@@ -51,7 +51,7 @@ template <typename Type>
  *
  */
 class CatchAtAge : public FisheryModelBase<Type> {
- public:
+public:
   /**
    * @brief The name of the model.
    *
@@ -117,7 +117,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
    */
   std::map<std::string, fims::Vector<fims::Vector<Type>>> report_vectors;
 
- public:
+public:
   std::vector<Type> ages; /*!< vector of the ages for referencing*/
   /**
    * Constructor for the CatchAtAge class. This constructor initializes the
@@ -297,9 +297,9 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * @snippet{doc} this param_i_agem1_yearm1
    * @snippet{doc} this param_age
    */
-  void CalculateNumbersAA(
-      std::shared_ptr<fims_popdy::Population<Type>> &population,
-      size_t i_age_year, size_t i_agem1_yearm1, size_t age) {
+  void
+  CalculateNumbersAA(std::shared_ptr<fims_popdy::Population<Type>> &population,
+                     size_t i_age_year, size_t i_agem1_yearm1, size_t age) {
     // using Z from previous age/year
 
     std::map<std::string, fims::Vector<Type>> &dq_ =
@@ -391,9 +391,9 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * @snippet{doc} this param_year
    * @snippet{doc} this param_age
    */
-  void CalculateMortality(
-      std::shared_ptr<fims_popdy::Population<Type>> &population,
-      size_t i_age_year, size_t year, size_t age) {
+  void
+  CalculateMortality(std::shared_ptr<fims_popdy::Population<Type>> &population,
+                     size_t i_age_year, size_t year, size_t age) {
     std::map<std::string, fims::Vector<Type>> &dq_ =
         this->GetPopulationDerivedQuantities(population->GetId());
 
@@ -428,9 +428,9 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * @snippet{doc} this param_year
    * @snippet{doc} this param_age
    */
-  void CalculateBiomass(
-      std::shared_ptr<fims_popdy::Population<Type>> &population,
-      size_t i_age_year, size_t year, size_t age) {
+  void
+  CalculateBiomass(std::shared_ptr<fims_popdy::Population<Type>> &population,
+                   size_t i_age_year, size_t year, size_t age) {
     std::map<std::string, fims::Vector<Type>> &dq_ =
         this->GetPopulationDerivedQuantities(population->GetId());
 
@@ -566,8 +566,8 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * @snippet{doc} this param_population
    * @return Type
    */
-  Type CalculateSBPR0(
-      std::shared_ptr<fims_popdy::Population<Type>> &population) {
+  Type
+  CalculateSBPR0(std::shared_ptr<fims_popdy::Population<Type>> &population) {
     std::map<std::string, fims::Vector<Type>> &dq_ =
         this->GetPopulationDerivedQuantities(population->GetId());
 
@@ -661,9 +661,9 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * @snippet{doc} this param_i_age_year
    * @snippet{doc} this param_age
    */
-  void CalculateMaturityAA(
-      std::shared_ptr<fims_popdy::Population<Type>> &population,
-      size_t i_age_year, size_t age) {
+  void
+  CalculateMaturityAA(std::shared_ptr<fims_popdy::Population<Type>> &population,
+                      size_t i_age_year, size_t age) {
     std::map<std::string, fims::Vector<Type>> &dq_ =
         this->GetPopulationDerivedQuantities(population->GetId());
 
@@ -686,9 +686,9 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * @snippet{doc} this param_year
    * @snippet{doc} this param_age
    */
-  void CalculateLandings(
-      std::shared_ptr<fims_popdy::Population<Type>> &population, size_t year,
-      size_t age) {
+  void
+  CalculateLandings(std::shared_ptr<fims_popdy::Population<Type>> &population,
+                    size_t year, size_t age) {
     std::map<std::string, fims::Vector<Type>> &pdq_ =
         this->GetPopulationDerivedQuantities(population->GetId());
 
@@ -1489,6 +1489,6 @@ class CatchAtAge : public FisheryModelBase<Type> {
   }
 };
 
-}  // namespace fims_popdy
+} // namespace fims_popdy
 
 #endif

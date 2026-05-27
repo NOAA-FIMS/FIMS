@@ -16,7 +16,7 @@ std::shared_ptr<FIMSLog> FIMSLog::fims_log = std::make_shared<FIMSLog>();
  * @param json The JSON string to parse.
  * @return The parsed JSON value.
  */
-JsonValue JsonParser::Parse(const std::string& json) {
+JsonValue JsonParser::Parse(const std::string &json) {
   data = json;
   position = 0;
   return ParseValue();
@@ -99,7 +99,7 @@ JsonValue JsonParser::ParseNumber() {
  * @return The parsed JSON value.
  */
 JsonValue JsonParser::ParseString() {
-  position++;  // Skip the initial '"'
+  position++; // Skip the initial '"'
   size_t end_pos = data.find('"', position);
   if (end_pos == std::string::npos) {
     std::string str = data.substr(position);
@@ -148,11 +148,11 @@ JsonValue JsonParser::ParseNull() {
  */
 JsonValue JsonParser::ParseObject() {
   JsonObject obj;
-  position++;  // Skip the initial '{'
+  position++; // Skip the initial '{'
 
   SkipWhitespace();
   if (position < data.size() && data[position] == '}') {
-    position++;  // Skip empty object close brace
+    position++; // Skip empty object close brace
     return JsonValue(obj);
   }
 
@@ -167,7 +167,7 @@ JsonValue JsonParser::ParseObject() {
     if (position >= data.size() || data[position] != ':') {
       return JsonValue(obj);
     }
-    position++;  // Skip the ':'
+    position++; // Skip the ':'
     SkipWhitespace();
     JsonValue value = ParseValue();
     obj[key] = value;
@@ -179,7 +179,7 @@ JsonValue JsonParser::ParseObject() {
   }
 
   if (position < data.size() && data[position] == '}') {
-    position++;  // Skip the trailing '}'
+    position++; // Skip the trailing '}'
   }
   return JsonValue(obj);
 }
@@ -190,11 +190,11 @@ JsonValue JsonParser::ParseObject() {
  */
 JsonValue JsonParser::ParseArray() {
   JsonArray arr;
-  position++;  // Skip the initial '['
+  position++; // Skip the initial '['
 
   SkipWhitespace();
   if (position < data.size() && data[position] == ']') {
-    position++;  // Skip empty array close bracket
+    position++; // Skip empty array close bracket
     return JsonValue(arr);
   }
 
@@ -210,7 +210,7 @@ JsonValue JsonParser::ParseArray() {
   }
 
   if (position < data.size() && data[position] == ']') {
-    position++;  // Skip the trailing ']'
+    position++; // Skip the trailing ']'
   }
   return JsonValue(arr);
 }
@@ -220,7 +220,7 @@ JsonValue JsonParser::ParseArray() {
  * @param filename The name of the output file.
  * @param jsonValue The JSON value to write.
  */
-void JsonParser::WriteToFile(const std::string& filename, JsonValue jsonValue) {
+void JsonParser::WriteToFile(const std::string &filename, JsonValue jsonValue) {
   std::ofstream outputFile(filename);
   if (!outputFile) {
     std::cerr << "Error: Unable to open file " << filename << " for writing."
@@ -238,48 +238,48 @@ void JsonParser::WriteToFile(const std::string& filename, JsonValue jsonValue) {
  * @param outputFile The output file stream.
  *  @param jsonValue The JSON value to write.
  */
-void JsonParser::WriteJsonValue(std::ofstream& outputFile,
+void JsonParser::WriteJsonValue(std::ofstream &outputFile,
                                 JsonValue jsonValue) {
   switch (jsonValue.GetType()) {
-    case JsonValueType::Null:
-      outputFile << "null";
-      break;
-    case JsonValueType::Number:
-      outputFile << jsonValue.GetDouble();
-      break;
-    case JsonValueType::String:
-      outputFile << "\"" << jsonValue.GetString() << "\"";
-      break;
-    case JsonValueType::Bool:
-      outputFile << (jsonValue.GetBool() ? "true" : "false");
-      break;
-    case JsonValueType::Object: {
-      JsonObject& obj = jsonValue.GetObject();
-      outputFile << "{";
-      bool first = true;
-      for (const auto& pair : obj) {
-        if (!first) {
-          outputFile << ",";
-        }
-        first = false;
-        outputFile << "\"" << pair.first << "\":";
-        WriteJsonValue(outputFile, pair.second);
+  case JsonValueType::Null:
+    outputFile << "null";
+    break;
+  case JsonValueType::Number:
+    outputFile << jsonValue.GetDouble();
+    break;
+  case JsonValueType::String:
+    outputFile << "\"" << jsonValue.GetString() << "\"";
+    break;
+  case JsonValueType::Bool:
+    outputFile << (jsonValue.GetBool() ? "true" : "false");
+    break;
+  case JsonValueType::Object: {
+    JsonObject &obj = jsonValue.GetObject();
+    outputFile << "{";
+    bool first = true;
+    for (const auto &pair : obj) {
+      if (!first) {
+        outputFile << ",";
       }
-      outputFile << "}";
-    } break;
-    case JsonValueType::JArray: {
-      JsonArray& arr = jsonValue.GetArray();
-      outputFile << "[";
-      bool first = true;
-      for (const auto& value : arr) {
-        if (!first) {
-          outputFile << ",";
-        }
-        first = false;
-        WriteJsonValue(outputFile, value);
+      first = false;
+      outputFile << "\"" << pair.first << "\":";
+      WriteJsonValue(outputFile, pair.second);
+    }
+    outputFile << "}";
+  } break;
+  case JsonValueType::JArray: {
+    JsonArray &arr = jsonValue.GetArray();
+    outputFile << "[";
+    bool first = true;
+    for (const auto &value : arr) {
+      if (!first) {
+        outputFile << ",";
       }
-      outputFile << "]";
-    } break;
+      first = false;
+      WriteJsonValue(outputFile, value);
+    }
+    outputFile << "]";
+  } break;
   }
 }
 
@@ -297,50 +297,50 @@ void JsonParser::Show(JsonValue jsonValue) {
  * @param output The output stream.
  * @param jsonValue The JSON value to display.
  */
-void JsonParser::PrintJsonValue(std::ostream& output, JsonValue jsonValue) {
+void JsonParser::PrintJsonValue(std::ostream &output, JsonValue jsonValue) {
   switch (jsonValue.GetType()) {
-    case JsonValueType::Null:
-      output << "null";
-      break;
-    case JsonValueType::Number:
-      output << jsonValue.GetDouble();
-      break;
-    case JsonValueType::String:
-      output << "\"" << jsonValue.GetString() << "\"";
-      break;
-    case JsonValueType::Bool:
-      output << (jsonValue.GetBool() ? "true" : "false");
-      break;
-    case JsonValueType::Object: {
-      JsonObject& obj = jsonValue.GetObject();
-      output << "{";
-      bool first = true;
-      for (const auto& pair : obj) {
-        if (!first) {
-          output << ",";
-        }
-        first = false;
-        output << "\"" << pair.first << "\":";
-        PrintJsonValue(output, pair.second);
+  case JsonValueType::Null:
+    output << "null";
+    break;
+  case JsonValueType::Number:
+    output << jsonValue.GetDouble();
+    break;
+  case JsonValueType::String:
+    output << "\"" << jsonValue.GetString() << "\"";
+    break;
+  case JsonValueType::Bool:
+    output << (jsonValue.GetBool() ? "true" : "false");
+    break;
+  case JsonValueType::Object: {
+    JsonObject &obj = jsonValue.GetObject();
+    output << "{";
+    bool first = true;
+    for (const auto &pair : obj) {
+      if (!first) {
+        output << ",";
       }
-      output << "}";
-    } break;
-    case JsonValueType::JArray: {
-      JsonArray& arr = jsonValue.GetArray();
-      output << "[";
-      bool first = true;
-      for (const auto& value : arr) {
-        if (!first) {
-          output << ",";
-        }
-        first = false;
-        PrintJsonValue(output, value);
+      first = false;
+      output << "\"" << pair.first << "\":";
+      PrintJsonValue(output, pair.second);
+    }
+    output << "}";
+  } break;
+  case JsonValueType::JArray: {
+    JsonArray &arr = jsonValue.GetArray();
+    output << "[";
+    bool first = true;
+    for (const auto &value : arr) {
+      if (!first) {
+        output << ",";
       }
-      output << "]";
-    } break;
+      first = false;
+      PrintJsonValue(output, value);
+    }
+    output << "]";
+  } break;
   }
 }
 
-}  // namespace fims
+} // namespace fims
 
 #endif

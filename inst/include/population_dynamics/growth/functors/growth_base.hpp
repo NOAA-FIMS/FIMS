@@ -40,13 +40,13 @@ struct GrowthBase : public fims_model_object::FIMSObject<Type> {
    * @param year The year at which to return weight of the fish (in kg).
    * @param a The age at which to return weight of the fish (in kg).
    */
-  virtual const Type evaluate(int year, const double& a) = 0;
+  virtual const Type evaluate(int year, const double &a) = 0;
 };
 
 template <typename Type>
 uint32_t GrowthBase<Type>::id_g =
     0; /**< initializing the static id_g variable for GrowthBase class*/
 
-}  // namespace fims_popdy
+} // namespace fims_popdy
 
 #endif /* POPULATION_DYNAMICS_GROWTH_BASE_HPP */

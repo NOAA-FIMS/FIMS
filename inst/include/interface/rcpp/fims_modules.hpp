@@ -90,4 +90,4 @@ RCPP_MODULE(fims) {
   register_fishery_models(m);
 }
 
-#endif  // FIMS_MODULES_HPP
+#endif // FIMS_MODULES_HPP

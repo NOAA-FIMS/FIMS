@@ -10,8 +10,8 @@
 #ifndef MULTINOMIAL_LPMF
 #define MULTINOMIAL_LPMF
 
-#include "density_components_base.hpp"
 #include "../../common/fims_vector.hpp"
+#include "density_components_base.hpp"
 
 namespace fims_distributions {
 /**
@@ -176,5 +176,5 @@ if (this->simulate_flag)
     return (this->lpdf);
   }
 };
-}  // namespace fims_distributions
+} // namespace fims_distributions
 #endif

@@ -8,9 +8,9 @@
 #ifndef SRC_INIT_HPP
 #define SRC_INIT_HPP
 
-#include <stdlib.h>
-#include <Rcpp.h>
 #include <R_ext/Rdynload.h>
+#include <Rcpp.h>
+#include <stdlib.h>
 
 #ifdef FIMS_ONLOAD_INIT_TMB
 /**
@@ -60,6 +60,6 @@ void R_init_FIMS(DllInfo *dll) {
 }
 }
 
-#endif  // FIMS_ONLOAD_INIT_TMB
+#endif // FIMS_ONLOAD_INIT_TMB
 
-#endif  // SRC_INIT_HPP
+#endif // SRC_INIT_HPP
