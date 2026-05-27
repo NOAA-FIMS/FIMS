@@ -1,0 +1,41 @@
+name: auto-clang-format
+
+on:
+  push:
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Install clang-format
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang-format
+
+      - name: Format source
+        run: |
+          find . \
+            \( -name '*.cpp' -o -name '*.hpp' -o -name '*.h' -o -name '*.cc' -o -name '*.cxx' \) \
+            -not -path './build/*' \
+            -not -path './.git/*' \
+            -print0 |
+          xargs -0 clang-format -i
+
+      - name: Commit changes
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git diff --quiet && exit 0
+
+          git add .
+          git commit -m "Apply clang-format"
+          git push
