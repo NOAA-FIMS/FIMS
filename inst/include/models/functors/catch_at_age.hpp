@@ -625,12 +625,12 @@ class CatchAtAge : public FisheryModelBase<Type> {
     std::map<std::string, fims::Vector<Type>> &dq_ =
         this->GetPopulationDerivedQuantities(population->GetId());
 
-    Type phi0 = CalculateSBPR0(population);
+    Type phi_0 = CalculateSBPR0(population);
 
     if (i_dev == population->n_years) {
       dq_["numbers_at_age"][i_age_year] =
           population->recruitment->evaluate_mean(
-              dq_["spawning_biomass"][year - 1], phi0);
+              dq_["spawning_biomass"][year - 1], phi_0);
       /*the final year of the time series has no data to inform recruitment
       devs, so this value is set to the mean recruitment.*/
     } else {
@@ -639,7 +639,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
       // evaluate_process (see below)
       population->recruitment->log_expected_recruitment[year - 1] =
           fims_math::log(population->recruitment->evaluate_mean(
-              dq_["spawning_biomass"][year - 1], phi0));
+              dq_["spawning_biomass"][year - 1], phi_0));
 
       dq_["numbers_at_age"][i_age_year] = fims_math::exp(
           population->recruitment->process->evaluate_process(year - 1));

@@ -38,8 +38,8 @@ namespace
         }
         catch_at_age_model->CalculateSpawningBiomass(population, sb_i_age_year, sb_year, sb_age);
 
-        // calculating phi0
-        double phi0 = catch_at_age_model->CalculateSBPR0(population);
+        // calculating phi_0
+        double phi_0 = catch_at_age_model->CalculateSBPR0(population);
 
         // calculating recruitment for year 5
         int r_year = 5;
@@ -58,7 +58,7 @@ namespace
         corresponds to the second year of the time series.*/
         expect_recruitment[r_i_age_year] = 
         (0.8 * rzero * steep * dq["spawning_biomass"][sb_year]) /
-        (0.2 * phi0 * rzero * (1.0 - steep) + dq["spawning_biomass"][sb_year] * (steep - 0.2)) * fims_math::exp(population->recruitment->log_recruit_devs[r_year-1]); 
+        (0.2 * phi_0 * rzero * (1.0 - steep) + dq["spawning_biomass"][sb_year] * (steep - 0.2)) * fims_math::exp(population->recruitment->log_recruit_devs[r_year-1]); 
 
         // calculate recruitment in population module
         catch_at_age_model->CalculateRecruitment(population, r_i_age_year, r_year, r_year);

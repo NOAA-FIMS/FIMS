@@ -63,21 +63,27 @@ struct RecruitmentBase : public fims_model_object::FIMSObject<Type> {
               0.0);
   }
 
-  /** @brief Calculates the expected recruitment for a given spawning input.
+  /**
+   * @brief Evaluates expected recruitment from the stock--recruitment
+   * relationship before recruitment-process deviations are applied.
    *
-   * @details Recruitment is evaluated for the first age you have in your data.
-   * For example, if you have age-1 fish in your weight-at-age and age-
-   * composition data then recruitment will happen for age-1 fish, not age-0.
-   * There is no way to set the age at which this function is evaluated for, it
-   * is solely based on your input data.
+   * Recruitment is evaluated for the first age represented in the input data.
+   * For example, if the weight-at-age and age-composition data start at age 1,
+   * recruitment is evaluated for age-1 fish rather than age-0 fish. The
+   * recruitment age is not set directly by this function; it is determined by
+   * the age structure of the input data.
    *
-   * @param spawners A measure for spawning output.
-   * @param ssbzero A measure for spawning output in unfished population.
+   * Recruitment functors that do not define a stock--recruitment mean return
+   * the default value of zero.
    *
+   * @param spawners Spawning output at the time step being evaluated, such as
+   * spawning biomass or another model-specific measure of reproductive output.
+   * @param phi_0 Spawners per recruit at unfished equilibrium, used to scale
+   * the stock--recruitment relationship relative to unfished conditions.
+   * @return Expected recruitment before recruitment-process deviations or
+   * random effects are applied.
    */
-  virtual const Type evaluate_mean(
-      const Type &spawners,
-      const Type &ssbzero) = 0;  // need to add input parameter values
+  virtual const Type evaluate_mean(const Type &spawners, const Type &phi_0) = 0;
 
   /** @brief Handle error in recruitment
    *
