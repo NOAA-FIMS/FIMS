@@ -7,12 +7,9 @@
 #include "def.hpp"
 #include "fims_json.hpp"
 
+namespace fims {
 
-
-namespace fims{
-
-        std::shared_ptr<FIMSLog> FIMSLog::fims_log = 
-    std::make_shared<FIMSLog>();
+std::shared_ptr<FIMSLog> FIMSLog::fims_log = std::make_shared<FIMSLog>();
 
 /**
  * Parse a JSON string and return the corresponding JSON value.

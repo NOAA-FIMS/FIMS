@@ -1,10 +1,10 @@
- /**
+/**
  * \file rcpp_distribution.cpp
  * \brief Implementation of Rcpp distribution interfaces for the FIMS framework.
  */
- #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_distribution.hpp"
+#include "../inst/include/interface/rcpp/rcpp_objects/rcpp_distribution.hpp"
 
- // static id of the DistributionsInterfaceBase object
+// static id of the DistributionsInterfaceBase object
 uint32_t DistributionsInterfaceBase::id_g = 1;
 // local id of the DistributionsInterfaceBase object map relating the ID of the
 // DistributionsInterfaceBase to the DistributionsInterfaceBase objects
@@ -14,10 +14,9 @@ std::map<uint32_t, std::shared_ptr<DistributionsInterfaceBase>>
 #include <Rcpp.h>
 /**
  * Function to register distribution classes with the Rcpp module system.
- * 
+ *
  */
 void register_distributions(Rcpp::Module& m) {
-    
   Rcpp::class_<DnormDistributionsInterface>(
       "DnormDistribution",
       "See "
@@ -71,4 +70,4 @@ void register_distributions(Rcpp::Module& m) {
       .field("expected_values",
              &DmultinomDistributionsInterface::expected_values)
       .field("dims", &DmultinomDistributionsInterface::dims);
-    }
+}

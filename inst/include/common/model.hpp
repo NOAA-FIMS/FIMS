@@ -186,7 +186,8 @@ class Model {  // may need singleton
 // Create singleton instance of Model class
 template <typename Type>
 std::shared_ptr<Model<Type>> Model<Type>::fims_model =
-    nullptr;  /**< initializing the static fims_model pointer to nullptr for Model class*/
+    nullptr; /**< initializing the static fims_model pointer to nullptr for
+                Model class*/
 }  // namespace fims_model
 
 #endif /* FIMS_COMMON_MODEL_HPP */

@@ -1,11 +1,11 @@
- /**
+/**
  * \file rcpp_fleet.cpp
  * \brief Implementation of Rcpp fleet interfaces for the FIMS framework.
  */
- #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_fleet.hpp"
+#include "../inst/include/interface/rcpp/rcpp_objects/rcpp_fleet.hpp"
 
- #include <Rcpp.h>
- // static id of the FleetInterfaceBase object
+#include <Rcpp.h>
+// static id of the FleetInterfaceBase object
 uint32_t FleetInterfaceBase::id_g = 1;
 // local id of the FleetInterfaceBase object map relating the ID of the
 // FleetInterfaceBase to the FleetInterfaceBase objects
@@ -14,7 +14,7 @@ std::map<uint32_t, std::shared_ptr<FleetInterfaceBase>>
 
 /**
  * Function to register fleet classes with the Rcpp module system.
- * 
+ *
  */
 void register_fleet(Rcpp::Module& m) {
   Rcpp::class_<FleetInterface>(
@@ -55,4 +55,4 @@ void register_fleet(Rcpp::Module& m) {
       .method("GetObservedLandingsDataID",
               &FleetInterface::GetObservedLandingsDataID)
       .method("SetSelectivityID", &FleetInterface::SetSelectivityID);
-    }
+}

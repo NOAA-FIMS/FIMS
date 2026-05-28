@@ -3,7 +3,7 @@
  * \brief Implementation of Rcpp recruitment interfaces for the FIMS framework.
  */
 #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_recruitment.hpp"
-    #include <Rcpp.h>
+#include <Rcpp.h>
 // static id of the RecruitmentInterfaceBase object
 uint32_t RecruitmentInterfaceBase::id_g = 1;
 // local id of the RecruitmentInterfaceBase object map relating the ID of the
@@ -11,14 +11,11 @@ uint32_t RecruitmentInterfaceBase::id_g = 1;
 std::map<uint32_t, std::shared_ptr<RecruitmentInterfaceBase>>
     RecruitmentInterfaceBase::live_objects;
 
-
 /**
  * Function to register recruitment classes with the Rcpp module system.
- * 
+ *
  */
 void register_recruitment(Rcpp::Module& m) {
-
- 
   Rcpp::class_<BevertonHoltRecruitmentInterface>(
       "BevertonHoltRecruitment",
       "See "

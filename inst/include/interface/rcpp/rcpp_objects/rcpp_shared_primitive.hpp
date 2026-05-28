@@ -16,7 +16,6 @@
 
 #include <Rcpp.h>
 
-
 /**
  * @class SharedInt
  * @brief A class that provides shared ownership of an integer value.
@@ -2130,7 +2129,6 @@ typedef SharedString fims_string;
  * representing a reference-counted boolean.
  */
 typedef SharedBoolean fims_bool;
-
 
 RCPP_EXPOSED_CLASS(SharedInt)
 RCPP_EXPOSED_CLASS(SharedString)

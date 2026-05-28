@@ -1,14 +1,15 @@
 /**
  * \file fims_json.cpp
- * \brief Implementation of the JsonParser class for parsing and handling JSON data in the FIMS framework.
+ * \brief Implementation of the JsonParser class for parsing and handling JSON
+ * data in the FIMS framework.
  */
 
 #include "../inst/include/utilities/fims_json.hpp"
 #ifdef TMB_MODEL
-  #include <Rcpp.h>
+#include <Rcpp.h>
 #endif
 
-namespace fims{
+namespace fims {
 
 /**
  * Parse a JSON string and return the corresponding JSON value.
@@ -222,13 +223,13 @@ JsonValue JsonParser::ParseArray() {
 void JsonParser::WriteToFile(const std::string& filename, JsonValue jsonValue) {
   std::ofstream outputFile(filename);
   if (!outputFile) {
-    #ifdef TMB_MODEL
-      Rcpp::Rcerr << "Error: Unable to open file " << filename << " for writing."
-                 << std::endl;
-    #else
+#ifdef TMB_MODEL
+    Rcpp::Rcerr << "Error: Unable to open file " << filename << " for writing."
+                << std::endl;
+#else
     std::cerr << "Error: Unable to open file " << filename << " for writing."
               << std::endl;
-    #endif
+#endif
     return;
   }
 
@@ -292,14 +293,13 @@ void JsonParser::WriteJsonValue(std::ofstream& outputFile,
  * @param jsonValue The JSON value to display.
  */
 void JsonParser::Show(JsonValue jsonValue) {
- 
-  #ifdef TMB_MODEL
-   this->PrintJsonValue(Rcpp::Rcout, jsonValue);
-    Rcpp::Rcout << std::endl;
-  #else
-   this->PrintJsonValue(std::cout, jsonValue);
+#ifdef TMB_MODEL
+  this->PrintJsonValue(Rcpp::Rcout, jsonValue);
+  Rcpp::Rcout << std::endl;
+#else
+  this->PrintJsonValue(std::cout, jsonValue);
   std::cout << std::endl;
-  #endif
+#endif
 }
 
 /**

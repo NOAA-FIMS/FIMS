@@ -614,7 +614,7 @@ class FIMSLog {
 };
 
 #ifdef FIMS_HEADER_ONLY
-  std::shared_ptr<FIMSLog> FIMSLog::fims_log = std::make_shared<FIMSLog>();
+std::shared_ptr<FIMSLog> FIMSLog::fims_log = std::make_shared<FIMSLog>();
 #endif
 
 }  // namespace fims

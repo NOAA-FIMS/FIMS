@@ -1,20 +1,17 @@
- /**
- * \file rcpp_shared_primitive.cpp  
- * \brief Implementation of Rcpp shared primitive interfaces for the FIMS framework.
+/**
+ * \file rcpp_shared_primitive.cpp
+ * \brief Implementation of Rcpp shared primitive interfaces for the FIMS
+ * framework.
  */
- #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_shared_primitive.hpp"
+#include "../inst/include/interface/rcpp/rcpp_objects/rcpp_shared_primitive.hpp"
 
-
-
-
- #include <Rcpp.h>
+#include <Rcpp.h>
 
 /**
  * Function to register shared primitive classes with the Rcpp module system.
- * 
+ *
  */
 void register_shared(Rcpp::Module& m) {
-
   Rcpp::class_<SharedInt>(
       "SharedInt",
       "See https://noaa-fims.github.io/FIMS/doxygen/classSharedInt.html.")

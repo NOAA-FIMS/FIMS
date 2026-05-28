@@ -162,7 +162,7 @@ class ParameterVector {
   ParameterVector() {
     this->id_m = ParameterVector::id_g++;
     this->storage_m = std::make_shared<std::vector<Parameter>>();
-    this->storage_m->resize(1); // push_back(Rcpp::wrap(p));
+    this->storage_m->resize(1);  // push_back(Rcpp::wrap(p));
   }
 
   /**
