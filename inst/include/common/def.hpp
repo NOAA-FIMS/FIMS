@@ -61,9 +61,12 @@
 #endif
 
 #ifdef FIMS_WINDOWS
+#define NOMINMAX
+#define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 #undef TRUE
 #undef FALSE
+#undef GetObject
 #include <Lmcons.h>  // for UNLEN
 #elif defined(FIMS_LINUX) || defined(FIMS_MACOS) || defined(FIMS_BSD)
 #include <unistd.h>
@@ -610,7 +613,9 @@ class FIMSLog {
   }
 };
 
-std::shared_ptr<FIMSLog> FIMSLog::fims_log = std::make_shared<FIMSLog>();
+#ifdef FIMS_HEADER_ONLY
+  std::shared_ptr<FIMSLog> FIMSLog::fims_log = std::make_shared<FIMSLog>();
+#endif
 
 }  // namespace fims
 
@@ -677,7 +682,7 @@ namespace fims {
  * SIGINT for an interrupt such as Ctrl+C, or SIGTERM for a termination
  * request).
  */
-void WriteAtExit(int sig) {
+inline void WriteAtExit(int sig) {
   std::string signal_error = "NA";
   switch (sig) {
     case SIGSEGV:

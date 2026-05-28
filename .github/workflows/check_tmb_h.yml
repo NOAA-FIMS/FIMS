@@ -1,0 +1,84 @@
+name: Detect RTMB TMB.h Remote Change
+
+on:
+  schedule:
+    - cron: '0 12 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  detect-remote-change:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+
+      - name: Download remote RTMB TMB.h
+        run: |
+          url="https://raw.githubusercontent.com/kaskr/RTMB/refs/heads/master/RTMB/src/TMB.h"
+          curl -fsSL "$url" -o /tmp/RTMB_TMB.h
+
+      - id: hash
+        name: Compute remote file hash
+        run: |
+          sha=$(sha256sum /tmp/RTMB_TMB.h | awk '{print $1}')
+          echo "remote_sha=$sha" >> "$GITHUB_OUTPUT"
+          echo "$sha" > .github/rtmb_tmb_sha256.txt.new
+
+      - id: previous
+        name: Load previous hash
+        run: |
+          if [ -f .github/rtmb_tmb_sha256.txt ]; then
+            echo "previous_sha=$(cat .github/rtmb_tmb_sha256.txt)" >> "$GITHUB_OUTPUT"
+          else
+            echo "previous_sha=" >> "$GITHUB_OUTPUT"
+          fi
+
+      - id: changed
+        name: Check whether the remote file changed
+        run: |
+          if [ "${{ steps.previous.outputs.previous_sha }}" = "${{ steps.hash.outputs.remote_sha }}" ]; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create issue when TMB.h changed
+        if: steps.changed.outputs.changed == 'true' && steps.previous.outputs.previous_sha != ''
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |-
+            const previousSha = '${{ steps.previous.outputs.previous_sha }}';
+            const currentSha = '${{ steps.hash.outputs.remote_sha }}';
+
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: 'Remote RTMB TMB.h changed',
+              body: [
+                'The remote file at https://raw.githubusercontent.com/kaskr/RTMB/refs/heads/master/RTMB/src/TMB.h has changed.',
+                '',
+                `Previous SHA256: ${previousSha}`,
+                `Current SHA256: ${currentSha}`,
+                '',
+                'Please review the update to the upstream RTMB source file.'
+              ].join('\n')
+            });
+
+      - name: Update stored RTMB hash snapshot
+        if: steps.changed.outputs.changed == 'true'
+        env:
+          TARGET_REF: ${{ github.ref_name }}
+        run: |
+          mv .github/rtmb_tmb_sha256.txt.new .github/rtmb_tmb_sha256.txt
+          git config user.name 'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git add .github/rtmb_tmb_sha256.txt
+          git commit -m 'Update stored RTMB TMB.h snapshot hash' || echo 'No changes to commit.'
+          git push origin "HEAD:${TARGET_REF}"

@@ -10,6 +10,12 @@
 #define FIMS_INTERFACE_RCPP_RCPP_OBJECTS_SHARED_PRIMITIVE_HPP
 
 #include <memory>
+#include <ostream>
+#include <sstream>
+#include <string>
+
+#include <Rcpp.h>
+
 
 /**
  * @class SharedInt
@@ -661,7 +667,7 @@ class SharedInt {
  * @param rhs The `SharedInt` object on the right-hand side.
  * @return A new `SharedInt` object containing the sum.
  */
-SharedInt operator+(const int& lhs, const SharedInt& rhs) {
+inline SharedInt operator+(const int& lhs, const SharedInt& rhs) {
   return SharedInt(lhs + rhs.get());
 }
 
@@ -677,7 +683,7 @@ SharedInt operator+(const int& lhs, const SharedInt& rhs) {
  * @param rhs The `SharedInt` object on the right-hand side.
  * @return A new `SharedInt` object containing the result of the subtraction.
  */
-SharedInt operator-(const int& lhs, const SharedInt& rhs) {
+inline SharedInt operator-(const int& lhs, const SharedInt& rhs) {
   return SharedInt(lhs - rhs.get());
 }
 
@@ -692,7 +698,7 @@ SharedInt operator-(const int& lhs, const SharedInt& rhs) {
  * @param rhs The `SharedInt` object on the right-hand side.
  * @return A new `SharedInt` object containing the product.
  */
-SharedInt operator*(const int& lhs, const SharedInt& rhs) {
+inline SharedInt operator*(const int& lhs, const SharedInt& rhs) {
   return SharedInt(lhs * rhs.get());
 }
 
@@ -707,7 +713,7 @@ SharedInt operator*(const int& lhs, const SharedInt& rhs) {
  * @param rhs The `SharedInt` object on the right-hand side.
  * @return A new `SharedInt` object containing the quotient.
  */
-SharedInt operator/(const int& lhs, const SharedInt& rhs) {
+inline SharedInt operator/(const int& lhs, const SharedInt& rhs) {
   return SharedInt(lhs / rhs.get());
 }
 
@@ -722,7 +728,7 @@ SharedInt operator/(const int& lhs, const SharedInt& rhs) {
  * @return `true` if the integer is less than the `SharedInt`'s value,
  * `false` otherwise.
  */
-bool operator<(const int& lhs, const SharedInt& rhs) {
+inline bool operator<(const int& lhs, const SharedInt& rhs) {
   return (lhs < rhs.get());
 }
 
@@ -737,7 +743,7 @@ bool operator<(const int& lhs, const SharedInt& rhs) {
  * @return `true` if the integer is less than or equal to the `SharedInt`'s
  * value, `false` otherwise.
  */
-bool operator<=(const int& lhs, const SharedInt& rhs) {
+inline bool operator<=(const int& lhs, const SharedInt& rhs) {
   return (lhs <= rhs.get());
 }
 
@@ -752,7 +758,7 @@ bool operator<=(const int& lhs, const SharedInt& rhs) {
  * @return `true` if the integer is greater than the `SharedInt`'s value,
  * `false` otherwise.
  */
-bool operator>(const int& lhs, const SharedInt& rhs) {
+inline bool operator>(const int& lhs, const SharedInt& rhs) {
   return (lhs > rhs.get());
 }
 
@@ -767,7 +773,7 @@ bool operator>(const int& lhs, const SharedInt& rhs) {
  * @return `true` if the integer is greater than or equal to the
  * `SharedInt`'s value, `false` otherwise.
  */
-bool operator>=(const int& lhs, const SharedInt& rhs) {
+inline bool operator>=(const int& lhs, const SharedInt& rhs) {
   return (lhs >= rhs.get());
 }
 
@@ -1444,7 +1450,7 @@ class SharedReal {
  * @param rhs The SharedReal object on the right-hand side.
  * @return A new SharedReal object containing the sum.
  */
-SharedReal operator+(const double& lhs, const SharedReal& rhs) {
+inline SharedReal operator+(const double& lhs, const SharedReal& rhs) {
   return SharedReal(lhs + rhs.get());
 }
 
@@ -1461,7 +1467,7 @@ SharedReal operator+(const double& lhs, const SharedReal& rhs) {
  * @return A new SharedReal object containing the result of the
  * subtraction.
  */
-SharedReal operator-(const double& lhs, const SharedReal& rhs) {
+inline SharedReal operator-(const double& lhs, const SharedReal& rhs) {
   return SharedReal(lhs - rhs.get());
 }
 
@@ -1476,7 +1482,7 @@ SharedReal operator-(const double& lhs, const SharedReal& rhs) {
  * @param rhs The SharedReal object on the right-hand side.
  * @return A new SharedReal object containing the product.
  */
-SharedReal operator*(const double& lhs, const SharedReal& rhs) {
+inline SharedReal operator*(const double& lhs, const SharedReal& rhs) {
   return SharedReal(lhs * rhs.get());
 }
 
@@ -1491,7 +1497,7 @@ SharedReal operator*(const double& lhs, const SharedReal& rhs) {
  * @param rhs The SharedReal object on the right-hand side.
  * @return A new SharedReal object containing the quotient.
  */
-SharedReal operator/(const double& lhs, const SharedReal& rhs) {
+inline SharedReal operator/(const double& lhs, const SharedReal& rhs) {
   return SharedReal(lhs / rhs.get());
 }
 
@@ -2043,7 +2049,7 @@ class SharedBoolean {
  * @return `true` if the boolean is less than the SharedBoolean's
  * value, `false` otherwise.
  */
-bool operator<(const bool& lhs, const SharedBoolean& rhs) {
+inline bool operator<(const bool& lhs, const SharedBoolean& rhs) {
   return (lhs < rhs.get());
 }
 
@@ -2058,7 +2064,7 @@ bool operator<(const bool& lhs, const SharedBoolean& rhs) {
  * @return `true` if the boolean is less than or equal to the
  * SharedBoolean's value, `false` otherwise.
  */
-bool operator<=(const bool& lhs, const SharedBoolean& rhs) {
+inline bool operator<=(const bool& lhs, const SharedBoolean& rhs) {
   return (lhs <= rhs.get());
 }
 
@@ -2073,7 +2079,7 @@ bool operator<=(const bool& lhs, const SharedBoolean& rhs) {
  * @return `true` if the boolean is greater than the SharedBoolean's
  * value, `false` otherwise.
  */
-bool operator>(const bool& lhs, const SharedBoolean& rhs) {
+inline bool operator>(const bool& lhs, const SharedBoolean& rhs) {
   return (lhs > rhs.get());
 }
 
@@ -2088,7 +2094,7 @@ bool operator>(const bool& lhs, const SharedBoolean& rhs) {
  * @return `true` if the boolean is greater than or equal to the
  * SharedBoolean's value, `false` otherwise.
  */
-bool operator>=(const bool& lhs, const SharedBoolean& rhs) {
+inline bool operator>=(const bool& lhs, const SharedBoolean& rhs) {
   return (lhs >= rhs.get());
 }
 
@@ -2124,5 +2130,11 @@ typedef SharedString fims_string;
  * representing a reference-counted boolean.
  */
 typedef SharedBoolean fims_bool;
+
+
+RCPP_EXPOSED_CLASS(SharedInt)
+RCPP_EXPOSED_CLASS(SharedString)
+RCPP_EXPOSED_CLASS(SharedReal)
+RCPP_EXPOSED_CLASS(SharedBoolean)
 
 #endif

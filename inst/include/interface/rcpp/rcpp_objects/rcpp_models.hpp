@@ -13,9 +13,13 @@
 #include "../../../common/def.hpp"
 #include "rcpp_interface_base.hpp"
 #include "../../../models/fisheries_models.hpp"
+#include  "../../../common/model.hpp"
 #include "../../../utilities/fims_json.hpp"
 #include "rcpp_population.hpp"
 #include "rcpp_fleet.hpp"
+#include "rcpp_growth.hpp"
+#include "rcpp_distribution.hpp"
+#include "rcpp_data.hpp"
 #include "rcpp_maturity.hpp"
 #include "rcpp_recruitment.hpp"
 #include "rcpp_selectivity.hpp"
@@ -204,12 +208,6 @@ class FisheryModelInterfaceBase : public FIMSRcppInterfaceBase {
     return result;
   }
 };
-// static id of the FleetInterfaceBase object
-uint32_t FisheryModelInterfaceBase::id_g = 1;
-
-// FleetInterfaceBase to the FleetInterfaceBase objects
-std::map<uint32_t, std::shared_ptr<FisheryModelInterfaceBase>>
-    FisheryModelInterfaceBase::live_objects;
 
 /**
  * @brief The CatchAtAgeInterface class is used to interface with the

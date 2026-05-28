@@ -1,5 +1,5 @@
 #include "gtest/gtest.h"
-#include "population_dynamics/population/population.hpp"
+#include "population/population.hpp"
 #include "../../tests/gtest/test_population_test_fixture.hpp"
 #include "../../inst/include/models/functors/catch_at_age.hpp"             
 #include "../../tests/gtest/test_population_test_fixture.hpp" 

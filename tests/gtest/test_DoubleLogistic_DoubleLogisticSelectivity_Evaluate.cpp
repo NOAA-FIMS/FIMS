@@ -13,7 +13,7 @@
 // `LogisticSelectivity` class, include the corresponding header in the test 
 // file `tests/gtest/test_population_dynamics_selectivity_logistic.cpp`:
 // #include "population_dynamics/selectivity/functors/logistic.hpp"
-#include "population_dynamics/selectivity/functors/double_logistic.hpp"
+#include "selectivity/functors/double_logistic.hpp"
 // Include additional headers as needed
 // For example, include <iostream> to use `std::cerr` and `std::cout`:
 // #include <iostream>

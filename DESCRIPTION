@@ -132,3 +132,4 @@ LazyData: true
 NeedsCompilation: yes
 Roxygen: list(markdown = TRUE)
 SystemRequirements: GNU make
+Config/Rcpp/registration: none

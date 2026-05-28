@@ -17,7 +17,6 @@
 #include <map>
 #include <vector>
 
-#include "../../../common/def.hpp"
 #include "../../../common/information.hpp"
 #include "../../interface.hpp"
 #include "rcpp_shared_primitive.hpp"
@@ -100,10 +99,10 @@ class Parameter {
     id_m = Parameter::id_g++;
   }
 };
-/**
- * @brief The unique ID for the variable map that points to a fims::Vector.
- */
+
+#ifdef FIMS_HEADER_ONLY
 uint32_t Parameter::id_g = 0;
+#endif
 
 /**
  * @brief Sanitize a double value by replacing NaN or Inf with -999.0.
@@ -134,6 +133,8 @@ std::ostream& operator<<(std::ostream& out, const Parameter& p) {
   return out;
 }
 
+RCPP_EXPOSED_CLASS(Parameter)
+
 /**
  * @brief An Rcpp interface class that defines the ParameterVector class.
  *
@@ -161,7 +162,7 @@ class ParameterVector {
   ParameterVector() {
     this->id_m = ParameterVector::id_g++;
     this->storage_m = std::make_shared<std::vector<Parameter>>();
-    this->storage_m->resize(1);  // push_back(Rcpp::wrap(p));
+    this->storage_m->resize(1); // push_back(Rcpp::wrap(p));
   }
 
   /**
@@ -346,7 +347,10 @@ class ParameterVector {
     }
   }
 };
+
+#ifdef FIMS_HEADER_ONLY
 uint32_t ParameterVector::id_g = 0;
+#endif
 
 /**
  * @brief Output for std::ostream& for a ParameterVector.
@@ -567,7 +571,12 @@ class RealVector {
     }
   }
 };
+#ifdef FIMS_HEADER_ONLY
 uint32_t RealVector::id_g = 0;
+#endif
+
+RCPP_EXPOSED_CLASS(ParameterVector)
+RCPP_EXPOSED_CLASS(RealVector)
 
 /**
  *@brief Base class for all interface objects.
@@ -646,7 +655,5 @@ class FIMSRcppInterfaceBase {
     return ss.str();
   }
 };
-std::vector<std::shared_ptr<FIMSRcppInterfaceBase>>
-    FIMSRcppInterfaceBase::fims_interface_objects;
 
 #endif

@@ -8,10 +8,10 @@
 // https://google.github.io/googletest/reference/assertions.html.
 
 #include "gtest/gtest.h"
-#include "utilities/fims_json.hpp"
-
+#include "fims_json.hpp"
 #include <sstream>
 #include <string>
+#include "test_stubs.hpp"
 
 namespace
 {
