@@ -124,7 +124,7 @@ inline double sanitize_val(double x) {
  * @param p A parameter.
  * @return std::ostream&
  */
-std::ostream& operator<<(std::ostream& out, const Parameter& p) {
+inline std::ostream& operator<<(std::ostream& out, const Parameter& p) {
   out << "{\"id\": " << p.id_m
       << ",\n\"value\": " << sanitize_val(p.initial_value_m)
       << ",\n\"estimated_value\": " << sanitize_val(p.final_value_m);
@@ -359,7 +359,7 @@ uint32_t ParameterVector::id_g = 0;
  * @param v A ParameterVector.
  * @return std::ostream&
  */
-std::ostream& operator<<(std::ostream& out, ParameterVector& v) {
+inline std::ostream& operator<<(std::ostream& out, ParameterVector& v) {
   out << "[";
   size_t size = v.size();
   for (size_t i = 0; i < size - 1; i++) {
