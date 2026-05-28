@@ -13,6 +13,7 @@ Anders
 arni
 Arshad
 ASSAMC
+autodiff
 autoregressive
 averma
 awilnoaa
@@ -43,6 +44,7 @@ copydoc
 covr
 CPUE
 cran
+CSKIP
 ctest
 cwaa
 databucket
@@ -110,6 +112,7 @@ ldots
 lengthcomp
 lengthcomps
 libpath
+LIBTMB
 Linf
 lmax
 Lmcons
@@ -211,6 +214,7 @@ RTMB
 rtools
 rvit
 rzero
+SAFEBOUNDS
 SBPR
 sbzero
 Schiano
@@ -254,9 +258,13 @@ UNLEN
 unserialization
 usethis
 vmit
+Weverything
+Wextra
 widehat
 withr
+Wmacro
 WORDLIST
+Wunused
 xlab
 yearf
 yearm
