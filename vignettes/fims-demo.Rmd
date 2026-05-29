@@ -322,8 +322,7 @@ clear()
 fit <- parameters_4_model |>
   initialize_fims(data = data_4_model) |>
   fit_fims(optimize = TRUE)
-test_fit@obj$hessian
-fit@obj$hessian
+fit@sdreport$pdHess
 fit@obj$gr()
 fit@obj$par
 ests <- get_estimates(fit) #fails
