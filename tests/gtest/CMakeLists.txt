@@ -106,7 +106,17 @@ gtest_discover_tests(info_setup_random_effects)
    gtest_main
    fims_test
  )
- gtest_discover_tests(info_setup_priors)
+gtest_discover_tests(info_setup_priors)
+
+# test_likelihood_primitives.cpp
+add_executable(likelihood_primitives
+  test_likelihood_primitives.cpp
+)
+target_link_libraries(likelihood_primitives
+  gtest_main
+  fims_test
+)
+gtest_discover_tests(likelihood_primitives)
 
 # test_population_dynamics_recruitment_base.cpp
 add_executable(population_dynamics_recruitment_base
