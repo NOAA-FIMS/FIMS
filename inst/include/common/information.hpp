@@ -14,9 +14,11 @@
 #include <algorithm>
 #include <map>
 #include <memory>
+#include <set>
 #include <vector>
 
 #include "../distributions/distributions.hpp"
+#include "../likelihood/likelihood.hpp"
 #include "../models/functors/fishery_model_base.hpp"
 #include "../population_dynamics/fleet/fleet.hpp"
 #include "../population_dynamics/growth/growth.hpp"
@@ -131,6 +133,14 @@ class Information {
       density_components_iterator;
   /**< iterator for distribution objects>*/
 
+  // likelihood terms
+  std::vector<std::shared_ptr<fims_likelihood::LikelihoodTerm<Type>>>
+      likelihood_terms; /**< composable likelihood contribution objects >*/
+  typedef typename std::vector<
+      std::shared_ptr<fims_likelihood::LikelihoodTerm<Type>>>::iterator
+      likelihood_terms_iterator;
+  /**< iterator for likelihood terms>*/
+
   std::unordered_map<uint32_t,
                      std::shared_ptr<fims_popdy::FisheryModelBase<Type>>>
       models_map; /**<hash map of fishery models, e.g., CAA, GMACS, Spatial,
@@ -168,6 +178,7 @@ class Information {
     this->recruitment_process_models.clear();
     this->selectivity_models.clear();
     this->models_map.clear();
+    this->likelihood_terms.clear();
     this->n_years = 0;
     this->n_ages = 0;
 
@@ -227,6 +238,7 @@ class Information {
     ss << "n_ages: " << this->n_ages << std::endl;
     ss << "density_components: " << this->density_components.size()
        << std::endl;
+    ss << "likelihood_terms: " << this->likelihood_terms.size() << std::endl;
     return ss.str();
   }
 

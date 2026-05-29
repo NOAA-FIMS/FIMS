@@ -128,6 +128,16 @@ target_link_libraries(distribution_kernels
 )
 gtest_discover_tests(distribution_kernels)
 
+# test_info_likelihood_terms.cpp
+add_executable(info_likelihood_terms
+  test_info_likelihood_terms.cpp
+)
+target_link_libraries(info_likelihood_terms
+  gtest_main
+  fims_test
+)
+gtest_discover_tests(info_likelihood_terms)
+
 # test_population_dynamics_recruitment_base.cpp
 add_executable(population_dynamics_recruitment_base
 test_population_dynamics_recruitment_base.cpp
