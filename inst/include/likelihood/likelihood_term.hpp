@@ -8,6 +8,7 @@
 #ifndef FIMS_LIKELIHOOD_LIKELIHOOD_TERM_HPP
 #define FIMS_LIKELIHOOD_LIKELIHOOD_TERM_HPP
 
+#include <cstdint>
 #include <functional>
 #include <string>
 
@@ -33,6 +34,7 @@ struct LikelihoodTerm {
 
   LikelihoodTermType type = LikelihoodTermType::Data;
   std::string name;
+  uint32_t source_id = 0;
   ValueRef<Type> x;
   ValueRef<Type> location;
   ValueRef<Type> scale;

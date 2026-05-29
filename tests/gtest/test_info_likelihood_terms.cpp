@@ -37,4 +37,81 @@ TEST(InformationLikelihoodTerms, StoresAndClearsLikelihoodTerms) {
   EXPECT_EQ(info->likelihood_terms.size(), 0);
 }
 
+TEST(InformationLikelihoodTerms, MirrorsNormalPriorDensityComponent) {
+  std::shared_ptr<fims_info::Information<double>> info =
+      fims_info::Information<double>::GetInstance();
+  info->Clear();
+
+  fims::Vector<double> parameter{2.0};
+  info->variable_map[100] = &parameter;
+
+  std::shared_ptr<fims_distributions::NormalLPDF<double>> normal_prior =
+      std::make_shared<fims_distributions::NormalLPDF<double>>();
+  normal_prior->id = 1000;
+  normal_prior->input_type = "prior";
+  normal_prior->key.resize(1);
+  normal_prior->key[0] = 100;
+  normal_prior->expected_values.resize(1);
+  normal_prior->expected_values[0] = 0.0;
+  normal_prior->log_sd.resize(1);
+  normal_prior->log_sd[0] = std::log(1.0);
+  info->density_components[normal_prior->id] = normal_prior;
+
+  info->SetupPriors();
+
+  EXPECT_EQ(info->likelihood_terms.size(), 1);
+  EXPECT_EQ(info->likelihood_terms[0]->type,
+            fims_likelihood::LikelihoodTermType::Prior);
+  EXPECT_EQ(info->likelihood_terms[0]->source_id, normal_prior->id);
+  EXPECT_EQ(info->likelihood_terms[0]->name, "normal_prior.1000");
+  EXPECT_NEAR(info->likelihood_terms[0]->evaluate(),
+              fims_distributions::kernels::Normal<double>::log_density(
+                  2.0, 0.0, 1.0),
+              1e-12);
+
+  parameter[0] = 1.0;
+
+  EXPECT_NEAR(info->likelihood_terms[0]->evaluate(),
+              fims_distributions::kernels::Normal<double>::log_density(
+                  1.0, 0.0, 1.0),
+              1e-12);
+
+  info->Clear();
+}
+
+TEST(InformationLikelihoodTerms, MirrorsLognormalPriorDensityComponent) {
+  std::shared_ptr<fims_info::Information<double>> info =
+      fims_info::Information<double>::GetInstance();
+  info->Clear();
+
+  fims::Vector<double> parameter{2.0};
+  info->variable_map[101] = &parameter;
+
+  std::shared_ptr<fims_distributions::LogNormalLPDF<double>> lognormal_prior =
+      std::make_shared<fims_distributions::LogNormalLPDF<double>>();
+  lognormal_prior->id = 1001;
+  lognormal_prior->input_type = "prior";
+  lognormal_prior->key.resize(1);
+  lognormal_prior->key[0] = 101;
+  lognormal_prior->expected_values.resize(1);
+  lognormal_prior->expected_values[0] = 0.0;
+  lognormal_prior->log_sd.resize(1);
+  lognormal_prior->log_sd[0] = std::log(0.5);
+  info->density_components[lognormal_prior->id] = lognormal_prior;
+
+  info->SetupPriors();
+
+  EXPECT_EQ(info->likelihood_terms.size(), 1);
+  EXPECT_EQ(info->likelihood_terms[0]->type,
+            fims_likelihood::LikelihoodTermType::Prior);
+  EXPECT_EQ(info->likelihood_terms[0]->source_id, lognormal_prior->id);
+  EXPECT_EQ(info->likelihood_terms[0]->name, "lognormal_prior.1001");
+  EXPECT_NEAR(info->likelihood_terms[0]->evaluate(),
+              fims_distributions::kernels::LogNormal<double>::log_density(
+                  2.0, 0.0, 0.5),
+              1e-12);
+
+  info->Clear();
+}
+
 }  // namespace
