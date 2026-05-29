@@ -51,6 +51,7 @@ struct DensityComponentBase : public fims_model_object::FIMSObject<Type> {
 
   /** @brief Expected value vector for data pathways. */
   fims::Vector<Type>* data_expected_values = NULL;
+  // TODO(EDM): Route EDM predictions through the data expected-value pathway.
 
   /** @brief Vector of pointers where each entry points to a prior parameter. */
   std::vector<fims::Vector<Type>*> priors;
@@ -81,6 +82,7 @@ struct DensityComponentBase : public fims_model_object::FIMSObject<Type> {
    * @throws std::runtime_error If input_type is "prior" and priors is empty.
    */
   inline Type& get_observed(size_t i) {
+    // TODO(EDM): Confirm the observed time-series data pathway.
     if (this->input_type == "data") {
       return data_observed_values->at(i);
     }
@@ -120,6 +122,7 @@ struct DensityComponentBase : public fims_model_object::FIMSObject<Type> {
    * vectors and is accessed via scalar/vector semantics.
    */
   inline Type& get_expected(size_t i) {
+    // TODO(EDM): Use EDM predictions as expected values for fitted time points.
     if (this->input_type == "data") {
       return (*data_expected_values)[i];
     } else if (this->use_mean == "yes") {

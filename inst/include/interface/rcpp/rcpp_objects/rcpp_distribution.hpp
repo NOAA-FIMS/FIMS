@@ -449,6 +449,7 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
 
     std::shared_ptr<fims_distributions::NormalLPDF<Type>> distribution =
         std::make_shared<fims_distributions::NormalLPDF<Type>>();
+    // TODO(EDM): Follow this registration pattern for any new EDM likelihood.
 
     // interface to data/parameter value
 
@@ -479,6 +480,7 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
         ss << "dnorm." << this->id_m << ".log_sd." << this->log_sd[i].id_m;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(distribution->log_sd[i]);
+        // TODO(EDM): Register estimable EDM parameters through the same path.
       }
       if (this->log_sd[i].estimation_type_m.get() == "random_effects") {
         FIMS_ERROR_LOG("standard deviations cannot be set to random effects");

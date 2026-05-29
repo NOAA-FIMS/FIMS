@@ -57,6 +57,7 @@ struct NormalLPDF : public DensityComponentBase<Type> {
    * \f$\sigma^2\f$ is the variance.
    */
   virtual const Type evaluate() {
+    // TODO(EDM): Reuse this pattern for early observed-vs-predicted fitting.
     // set vector size based on input type (prior, process, or data)
     size_t n_x = this->get_n_x();
     // get expected value vector size
@@ -91,6 +92,7 @@ struct NormalLPDF : public DensityComponentBase<Type> {
         // if data, check if there are any NA values and skip lpdf calculation
         // if there are
         if (this->get_observed(i) != this->data_observed_values->na_value) {
+          // TODO(EDM): Check EDM predictions here once linked as expected values.
           this->lpdf_vec[i] =
               dnorm(this->get_observed(i), this->get_expected(i),
                     fims_math::exp(log_sd.get_force_scalar(i)), true);
