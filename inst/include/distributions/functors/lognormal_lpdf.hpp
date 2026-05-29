@@ -10,9 +10,10 @@
 #ifndef LOGNORMAL_LPDF
 #define LOGNORMAL_LPDF
 
-#include "density_components_base.hpp"
-#include "../../common/fims_vector.hpp"
 #include "../../common/def.hpp"
+#include "../../common/fims_vector.hpp"
+#include "../kernels/lognormal.hpp"
+#include "density_components_base.hpp"
 
 namespace fims_distributions {
 /**
@@ -98,10 +99,9 @@ struct LogNormalLPDF : public DensityComponentBase<Type> {
         // (https://doi.org/10.1016/j.fishres.2015.12.002) for the use of
         // lognormal constant
         if (this->get_observed(i) != this->data_observed_values->na_value) {
-          this->lpdf_vec[i] =
-              dnorm(log(this->get_observed(i)), this->get_expected(i),
-                    fims_math::exp(log_sd.get_force_scalar(i)), true) -
-              log(this->get_observed(i));
+          this->lpdf_vec[i] = kernels::LogNormal<Type>::log_density(
+              this->get_observed(i), this->get_expected(i),
+              fims_math::exp(log_sd.get_force_scalar(i)));
         } else {
           this->lpdf_vec[i] = 0;
         }
@@ -109,13 +109,13 @@ struct LogNormalLPDF : public DensityComponentBase<Type> {
         if (this->input_type == "random_effects") {
           // if random effects, no lognormal constant needs to be applied
           this->lpdf_vec[i] =
-              dnorm(log(this->get_observed(i)), this->get_expected(i),
-                    fims_math::exp(log_sd.get_force_scalar(i)), true);
+              kernels::LogNormal<Type>::log_density_log_scale(
+                  this->get_observed(i), this->get_expected(i),
+                  fims_math::exp(log_sd.get_force_scalar(i)));
         } else {
-          this->lpdf_vec[i] =
-              dnorm(log(this->get_observed(i)), this->get_expected(i),
-                    fims_math::exp(log_sd.get_force_scalar(i)), true) -
-              log(this->get_observed(i));
+          this->lpdf_vec[i] = kernels::LogNormal<Type>::log_density(
+              this->get_observed(i), this->get_expected(i),
+              fims_math::exp(log_sd.get_force_scalar(i)));
         }
       }
 

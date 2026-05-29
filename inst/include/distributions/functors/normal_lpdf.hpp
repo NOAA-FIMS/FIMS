@@ -12,8 +12,9 @@
 #define NORMAL_LPDF
 
 #include "../../common/def.hpp"
-#include "density_components_base.hpp"
 #include "../../common/fims_vector.hpp"
+#include "../kernels/normal.hpp"
+#include "density_components_base.hpp"
 namespace fims_distributions {
 /**
  * @copybrief normal_lpdf.hpp
@@ -91,18 +92,18 @@ struct NormalLPDF : public DensityComponentBase<Type> {
         // if data, check if there are any NA values and skip lpdf calculation
         // if there are
         if (this->get_observed(i) != this->data_observed_values->na_value) {
-          this->lpdf_vec[i] =
-              dnorm(this->get_observed(i), this->get_expected(i),
-                    fims_math::exp(log_sd.get_force_scalar(i)), true);
+          this->lpdf_vec[i] = kernels::Normal<Type>::log_density(
+              this->get_observed(i), this->get_expected(i),
+              fims_math::exp(log_sd.get_force_scalar(i)));
         } else {
           this->lpdf_vec[i] = 0;
         }
         // if not data (i.e. prior or process), use x vector instead of
         // observed_values
       } else {
-        this->lpdf_vec[i] =
-            dnorm(this->get_observed(i), this->get_expected(i),
-                  fims_math::exp(log_sd.get_force_scalar(i)), true);
+        this->lpdf_vec[i] = kernels::Normal<Type>::log_density(
+            this->get_observed(i), this->get_expected(i),
+            fims_math::exp(log_sd.get_force_scalar(i)));
       }
       this->lpdf += this->lpdf_vec[i];
       if (this->simulate_flag) {
