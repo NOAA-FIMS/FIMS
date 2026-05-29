@@ -32,6 +32,7 @@ void register_population(Rcpp::Module& m) {
       .field("spawning_biomass_ratio",
              &PopulationInterface::spawning_biomass_ratio)
       .field("log_init_naa", &PopulationInterface::log_init_naa)
+      .field("proportion_female", &PopulationInterface::proportion_female)
       .field("ages", &PopulationInterface::ages)
       .method("SetMaturityID", &PopulationInterface::SetMaturityID)
       .method("SetGrowthID", &PopulationInterface::SetGrowthID)

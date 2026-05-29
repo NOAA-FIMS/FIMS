@@ -535,4 +535,5 @@
 "534","catch_at_age","Population",NA,NA,"log_init_naa",10,NA,NA,12.0155105579643,"fixed_effects",NA,NA
 "535","catch_at_age","Population",NA,NA,"log_init_naa",11,NA,NA,11.8155105579643,"fixed_effects",NA,NA
 "536","catch_at_age","Population",NA,NA,"log_init_naa",12,NA,NA,13.2249484703984,"fixed_effects",NA,NA
-"537","catch_at_age","Growth",NA,"EWAA",NA,NA,NA,NA,NA,NA,NA,NA
+"537","catch_at_age","Population",NA,NA,"proportion_female",NA,NA,NA,0.5,"constant",NA,NA
+"538","catch_at_age","Growth",NA,"EWAA",NA,NA,NA,NA,NA,NA,NA,NA

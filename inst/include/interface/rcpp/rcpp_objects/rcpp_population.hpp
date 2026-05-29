@@ -136,6 +136,15 @@ class PopulationInterface : public PopulationInterfaceBase {
    */
   ParameterVector log_init_naa;
   /**
+   * @brief Proportion of females in the population.
+   *
+   * Used to calculate spawning biomass and other sex-specific derived
+   * quantities. Supplied from R as a single constant (length 1) and applied
+   * to all ages during model evaluation. Values should be in [0, 1].
+   * Out-of-range inputs are logged as warnings.
+   */
+  ParameterVector proportion_female;
+  /**
    * @brief Ages that are modeled in the population, the length of this vector
    * should equal \"n_ages\".
    */
@@ -149,6 +158,8 @@ class PopulationInterface : public PopulationInterfaceBase {
    * @brief The constructor.
    */
   PopulationInterface() : PopulationInterfaceBase() {
+    this->proportion_female[0].initial_value_m = static_cast<double>(0.5);
+    this->proportion_female[0].estimation_type_m.set("constant");
     this->fleet_ids = std::make_shared<std::set<uint32_t>>();
     std::shared_ptr<PopulationInterface> population =
         std::make_shared<PopulationInterface>(*this);
@@ -176,6 +187,7 @@ class PopulationInterface : public PopulationInterfaceBase {
         spawning_biomass_ratio(other.spawning_biomass_ratio),
         log_f_multiplier(other.log_f_multiplier),
         log_init_naa(other.log_init_naa),
+        proportion_female(other.proportion_female),
         ages(other.ages),
         name(other.name) {}
 
@@ -281,6 +293,16 @@ class PopulationInterface : public PopulationInterfaceBase {
               this->log_init_naa[i].initial_value_m;
         } else {
           this->log_init_naa[i].final_value_m = pop->log_init_naa[i];
+        }
+      }
+
+      for (size_t i = 0; i < this->proportion_female.size(); i++) {
+        if (this->proportion_female[i].estimation_type_m.get() == "constant") {
+          this->proportion_female[i].final_value_m =
+              this->proportion_female[i].initial_value_m;
+        } else {
+          this->proportion_female[i].final_value_m =
+              pop->proportion_female.get_force_scalar(i);
         }
       }
     }
@@ -412,6 +434,50 @@ class PopulationInterface : public PopulationInterfaceBase {
       }
     }
     info->variable_map[this->log_init_naa.id_m] = &(population)->log_init_naa;
+
+    if (this->proportion_female.size() == 1 ||
+        this->proportion_female.size() ==
+            static_cast<size_t>(this->n_ages.get())) {
+      population->proportion_female.resize(this->proportion_female.size());
+    } else {
+      FIMS_WARNING_LOG(
+          "The proportion_female vector is not of size 1 or n_ages. Filling "
+          "with 0.5.");
+      this->proportion_female.resize(1);
+      this->proportion_female[0].initial_value_m = static_cast<double>(0.5);
+      this->proportion_female[0].estimation_type_m.set("constant");
+      population->proportion_female.resize(this->proportion_female.size());
+    }
+
+    for (size_t i = 0; i < this->proportion_female.size(); i++) {
+      if (this->proportion_female[i].initial_value_m < 0.0 ||
+          this->proportion_female[i].initial_value_m > 1.0) {
+        FIMS_WARNING_LOG(
+            "proportion_female should be in [0, 1]; got " +
+            fims::to_string(this->proportion_female[i].initial_value_m) +
+            " at index " + fims::to_string(i) + ".");
+      }
+      population->proportion_female[i] =
+          this->proportion_female[i].initial_value_m;
+      if (this->proportion_female[i].estimation_type_m.get() ==
+          "fixed_effects") {
+        ss.str("");
+        ss << "Population." << this->id << ".proportion_female."
+           << this->proportion_female[i].id_m;
+        info->RegisterParameterName(ss.str());
+        info->RegisterParameter(population->proportion_female[i]);
+      }
+      if (this->proportion_female[i].estimation_type_m.get() ==
+          "random_effects") {
+        ss.str("");
+        ss << "Population." << this->id << ".proportion_female."
+           << this->proportion_female[i].id_m;
+        info->RegisterRandomEffectName(ss.str());
+        info->RegisterRandomEffect(population->proportion_female[i]);
+      }
+    }
+    info->variable_map[this->proportion_female.id_m] =
+        &(population)->proportion_female;
 
     for (size_t i = 0; i < ages.size(); i++) {
       population->ages[i] = this->ages[i];

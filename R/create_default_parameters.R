@@ -321,6 +321,11 @@ create_default_Population <- function(
       value = log(init_naa),
       estimation_type = "fixed_effects"
     ) |>
+    dplyr::add_row(
+      label = "proportion_female",
+      value = 0.5,
+      estimation_type = "constant"
+    ) |>
     dplyr::mutate(
       module_name = "Population"
     )

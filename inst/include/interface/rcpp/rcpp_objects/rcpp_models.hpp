@@ -413,6 +413,23 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
          << "]\n},\n";
 
       ss << "  \"values\":" << population_interface->log_init_naa << "\n";
+      ss << "},\n";
+
+      for (size_t i = 0; i < population_interface->proportion_female.size();
+           i++) {
+        population_interface_ptr->proportion_female[i].final_value_m =
+            pop->proportion_female.get_force_scalar(i);
+      }
+      ss << " {\n\"name\": \"proportion_female\",\n";
+      ss << "  \"id\":" << population_interface->proportion_female.id_m
+         << ",\n";
+      ss << "  \"type\": \"vector\",\n";
+      ss << " \"dimensionality\": {\n";
+      ss << "  \"header\": [" << "\"n_ages\"" << "],\n";
+      ss << "  \"dimensions\": ["
+         << population_interface->proportion_female.size() << "]\n},\n";
+
+      ss << "  \"values\":" << population_interface->proportion_female << "\n";
       ss << "}],\n";
 
       ss << " \"derived_quantities\": [\n";
