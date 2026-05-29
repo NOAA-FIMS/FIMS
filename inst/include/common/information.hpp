@@ -339,6 +339,61 @@ class Information {
   }
 
   /**
+   * @brief Find a likelihood term by legacy density component source ID.
+   *
+   * @param source_id ID of the mirrored legacy density component.
+   * @return Matching likelihood term, or nullptr if none exists.
+   */
+  std::shared_ptr<fims_likelihood::LikelihoodTerm<Type>> FindLikelihoodTerm(
+      uint32_t source_id) {
+    for (likelihood_terms_iterator it = this->likelihood_terms.begin();
+         it != this->likelihood_terms.end(); ++it) {
+      if ((*it)->source_id == source_id) {
+        return (*it);
+      }
+    }
+    return nullptr;
+  }
+
+  /**
+   * @brief Find a likelihood term by source ID and semantic type.
+   *
+   * @param source_id ID of the mirrored legacy density component.
+   * @param type likelihood term type to match
+   * @return Matching likelihood term, or nullptr if none exists.
+   */
+  std::shared_ptr<fims_likelihood::LikelihoodTerm<Type>> FindLikelihoodTerm(
+      uint32_t source_id, fims_likelihood::LikelihoodTermType type) {
+    for (likelihood_terms_iterator it = this->likelihood_terms.begin();
+         it != this->likelihood_terms.end(); ++it) {
+      if ((*it)->source_id == source_id && (*it)->type == type) {
+        return (*it);
+      }
+    }
+    return nullptr;
+  }
+
+  /**
+   * @brief Evaluate one mirrored likelihood term by source ID and type.
+   *
+   * @param source_id ID of the mirrored legacy density component.
+   * @param type likelihood term type to match
+   * @return Log-density contribution for the matching term.
+   * @throws std::runtime_error if no matching likelihood term exists.
+   */
+  Type EvaluateLikelihoodTerm(uint32_t source_id,
+                              fims_likelihood::LikelihoodTermType type) {
+    std::shared_ptr<fims_likelihood::LikelihoodTerm<Type>> term =
+        this->FindLikelihoodTerm(source_id, type);
+    if (term == nullptr) {
+      throw std::runtime_error(
+          "No likelihood term found for source_id " +
+          fims::to_string(source_id) + ".");
+    }
+    return term->evaluate();
+  }
+
+  /**
    * @brief Mirror legacy prior density components into likelihood terms.
    *
    * @details This builds the new composable representation without changing

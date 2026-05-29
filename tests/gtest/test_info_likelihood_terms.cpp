@@ -99,6 +99,56 @@ TEST(InformationLikelihoodTerms, EvaluatesTermsByTypeAndTotal) {
   info->Clear();
 }
 
+TEST(InformationLikelihoodTerms, FindsAndEvaluatesTermsBySource) {
+  std::shared_ptr<fims_info::Information<double>> info =
+      fims_info::Information<double>::GetInstance();
+  info->Clear();
+
+  fims::Vector<double> prior_parameter{2.0};
+  fims_likelihood::ValueRef<double> unit_sd =
+      fims_likelihood::constant_ref(1.0);
+
+  std::shared_ptr<fims_likelihood::LikelihoodTerm<double>> prior =
+      std::make_shared<fims_likelihood::LikelihoodTerm<double>>(
+          fims_likelihood::LikelihoodTermType::Prior, "prior.4000",
+          fims_likelihood::vector_ref(prior_parameter),
+          fims_likelihood::constant_ref(0.0), unit_sd,
+          fims_distributions::kernels::Normal<double>::log_density);
+  prior->source_id = 4000;
+
+  std::shared_ptr<fims_likelihood::LikelihoodTerm<double>> data =
+      std::make_shared<fims_likelihood::LikelihoodTerm<double>>(
+          fims_likelihood::LikelihoodTermType::Data, "data.4000",
+          fims_likelihood::vector_ref(prior_parameter),
+          fims_likelihood::constant_ref(1.0), unit_sd,
+          fims_distributions::kernels::Normal<double>::log_density);
+  data->source_id = 4000;
+
+  info->likelihood_terms.push_back(prior);
+  info->likelihood_terms.push_back(data);
+
+  EXPECT_EQ(info->FindLikelihoodTerm(4000), prior);
+  EXPECT_EQ(info->FindLikelihoodTerm(
+                4000, fims_likelihood::LikelihoodTermType::Prior),
+            prior);
+  EXPECT_EQ(info->FindLikelihoodTerm(
+                4000, fims_likelihood::LikelihoodTermType::Data),
+            data);
+  EXPECT_EQ(info->FindLikelihoodTerm(
+                4000, fims_likelihood::LikelihoodTermType::RandomEffect),
+            nullptr);
+  EXPECT_NEAR(info->EvaluateLikelihoodTerm(
+                  4000, fims_likelihood::LikelihoodTermType::Prior),
+              fims_distributions::kernels::Normal<double>::log_density(
+                  2.0, 0.0, 1.0),
+              1e-12);
+  EXPECT_THROW(info->EvaluateLikelihoodTerm(
+                   4000, fims_likelihood::LikelihoodTermType::RandomEffect),
+               std::runtime_error);
+
+  info->Clear();
+}
+
 TEST(InformationLikelihoodTerms, MirrorsNormalPriorDensityComponent) {
   std::shared_ptr<fims_info::Information<double>> info =
       fims_info::Information<double>::GetInstance();
