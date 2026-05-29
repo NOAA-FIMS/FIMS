@@ -591,6 +591,8 @@ initialize_comp <- function(data,
 #' clear()
 #' }
 initialize_fims <- function(parameters, data) {
+  # TODO(EDM): Add EDM initialization inputs after the module design is settled.
+
   # Validate parameters input
   if (missing(parameters) || !tibble::is_tibble(parameters)) {
     cli::cli_abort("The {.var parameters} argument must be a tibble.")
@@ -650,6 +652,12 @@ initialize_fims <- function(parameters, data) {
       dplyr::filter(.data$fleet == .env$fleets[i]) |>
       dplyr::pull(.data$type) |>
       unique()
+
+    # TODO(EDM): Decide whether EDM needs a new data type or can reuse index/recruitment.
+
+    # TODO(EDM): Detect any standalone EDM likelihood module from the configuration.
+
+    # TODO(EDM): Detect any standalone EDM likelihood module from the configuration.
 
     # Initialize catch module if the data type includes "catch" and
     # if "Catch" exists in the data distribution specification
@@ -790,6 +798,8 @@ initialize_fims <- function(parameters, data) {
     data = data
   )
 
+  # TODO(EDM): Consider recruitment as a later fisheries-specific EDM target.
+
   recruitment_process_input <- parameters |>
     dplyr::filter(.data$module_name == "Recruitment" & .data$distribution_type == "process" & !is.na(.data$distribution))
   if (recruitment_process_input |> nrow() == 0) {
@@ -910,11 +920,15 @@ initialize_fims <- function(parameters, data) {
     linked_ids = population_module_ids
   )
 
+  # TODO(EDM): Add EDM module IDs here if EDM becomes population-linked.
+
   # Set-up TMB
   # Hard code to be a catch-at-age model
+  # TODO(EDM): Generalize model-family selection for standalone/linked EDM models.
   fims_model <- methods::new(CatchAtAge)
   fims_model$AddPopulation(population$get_id())
 
+  # TODO(EDM): Register EDM modules and likelihood components before CreateTMBModel().
   CreateTMBModel()
   # Create parameter list from Rcpp modules
   parameter_list <- list(

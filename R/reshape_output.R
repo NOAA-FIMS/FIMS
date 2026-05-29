@@ -56,7 +56,7 @@ reshape_json_estimates <- function(model_output) {
         c(
           "name", "type", "estimation_framework", "id",
           "objective_function_value", "populations", "fleets", "data",
-          "density_components", "population_ids", "fleet_ids"
+          "density_components", "population_ids", "fleet_ids", "edm_models"
         )
     ],
     .f = \(y) dplyr::mutate(

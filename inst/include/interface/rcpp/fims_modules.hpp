@@ -64,6 +64,11 @@ void register_functions(Rcpp::Module &m);
  */
 void register_fishery_models(Rcpp::Module &m);
 /**
+ * \brief Register the EDM module.
+ * \param m The Rcpp module to register functions in.
+ */
+void register_edm(Rcpp::Module &m);
+/**
  * \brief Register the maturity module.
  * \param m The Rcpp module to register functions in.
  */
@@ -87,6 +92,7 @@ RcppExport RCPP_MODULE(fims) {
   register_growth(m);
   register_distributions(m);
   register_data(m);
+  register_edm(m);
   register_fishery_models(m);
 }
 

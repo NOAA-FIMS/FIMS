@@ -5,6 +5,7 @@
 \alias{AgeComp}
 \alias{BevertonHoltRecruitment}
 \alias{CatchAtAge}
+\alias{DelayEmbedding}
 \alias{DlnormDistribution}
 \alias{DmultinomDistribution}
 \alias{DnormDistribution}
@@ -36,6 +37,7 @@ docs.
 \item \href{https://noaa-fims.github.io/FIMS/doxygen/classAgeCompDataInterface.html}{AgeComp}
 \item \href{https://noaa-fims.github.io/FIMS/doxygen/classBevertonHoltRecruitmentInterface.html}{BevertonHoltRecruitment}
 \item \href{https://noaa-fims.github.io/FIMS/doxygen/classCatchAtAgeInterface.html}{CatchAtAge}
+\item \href{https://noaa-fims.github.io/FIMS/doxygen/classDelayEmbeddingInterface.html}{DelayEmbedding}
 \item \href{https://noaa-fims.github.io/FIMS/doxygen/classDlnormDistributionsInterface.html}{DlnormDistribution}
 \item \href{https://noaa-fims.github.io/FIMS/doxygen/classDmultinomDistributionsInterface.html}{DmultinomDistribution}
 \item \href{https://noaa-fims.github.io/FIMS/doxygen/classDnormDistributionsInterface.html}{DnormDistribution}

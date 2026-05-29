@@ -121,6 +121,25 @@ enable_testing()
 # Creates an interface library fims_test
 add_library(fims_test INTERFACE)
 
+EXECUTE_PROCESS(
+		COMMAND R "--slave" "--no-save" "-e" "cat(system.file('include', package = 'RcppEigen'))"
+		OUTPUT_VARIABLE RCPPEIGEN_INCLUDE_DIR
+		OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+if(NOT RCPPEIGEN_INCLUDE_DIR OR RCPPEIGEN_INCLUDE_DIR STREQUAL "")
+  message(STATUS "RcppEigen not found via R. Attempting to install it...")
+  EXECUTE_PROCESS(
+    COMMAND R "--slave" "--no-save" "-e" "install.packages('RcppEigen', repos='https://cloud.r-project.org'); cat(system.file('include', package = 'RcppEigen'))"
+    OUTPUT_VARIABLE RCPPEIGEN_INCLUDE_DIR
+    OUTPUT_STRIP_TRAILING_WHITESPACE)
+endif()
+
+if(RCPPEIGEN_INCLUDE_DIR AND NOT RCPPEIGEN_INCLUDE_DIR STREQUAL "")
+  message(STATUS "RcppEigen include dir: ${RCPPEIGEN_INCLUDE_DIR}")
+else()
+  message(WARNING "RcppEigen include directory could not be determined. Eigen-dependent tests may fail to compile.")
+endif()
+
 # Add include directories to the fims_test target
 target_include_directories(fims_test
   INTERFACE
@@ -132,7 +151,9 @@ target_include_directories(fims_test
     inst/include/utilities
     ${rcpp_SOURCE_DIR}/inst/include
     ${R_HOME}/include
+    ${RCPPEIGEN_INCLUDE_DIR}
 )
+
 
 # Add compile definition STD_LIB to the fims_test target.
 target_compile_definitions(fims_test

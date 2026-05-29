@@ -23,3 +23,5 @@ fims.log
 ^pkgdown$
 ^assets$
 setup_fims.sh
+^\.positai$
+^\.claude$

@@ -23,6 +23,8 @@
 #include "rcpp_maturity.hpp"
 #include "rcpp_recruitment.hpp"
 #include "rcpp_selectivity.hpp"
+#include "rcpp_edm.hpp"
+
 #include <valarray>
 #include <cmath>
 #include <mutex>
@@ -677,11 +679,41 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
    * @copydoc FisheryModelInterfaceBase::to_json
    */
   virtual std::string to_json() {
+    if (this->population_ids->empty()) {
+      std::stringstream ss;
+      ss << "{\n";
+      ss << " \"model_name\": \"CatchAtAge\",\n";
+      ss << " \"population_ids\": [],\n";
+      ss << " \"populations\": [],\n";
+      ss << " \"fleets\": [],\n";
+
+      ss << "\"edm_models\": [\n";
+      typename std::map<uint32_t, std::shared_ptr<EDMInterfaceBase>>::iterator eit;
+      for (eit = EDMInterfaceBase::live_objects.begin();
+           eit != EDMInterfaceBase::live_objects.end(); ++eit) {
+        std::shared_ptr<EDMInterfaceBase> edm_interface = (*eit).second;
+        if (edm_interface) {
+          edm_interface->finalize();
+          ss << edm_interface->to_json();
+          if (std::next(eit) != EDMInterfaceBase::live_objects.end()) {
+            ss << ",\n";
+          }
+        }
+      }
+      ss << "\n],\n";
+
+      ss << " \"density_components\": [],\n";
+      ss << " \"data\": []\n";
+      ss << "}\n";
+      return fims::JsonParser::PrettyFormatJSON(ss.str());
+    }
+
     std::set<uint32_t> recruitment_ids;
     std::set<uint32_t> growth_ids;
     std::set<uint32_t> maturity_ids;
     std::set<uint32_t> selectivity_ids;
     std::set<uint32_t> fleet_ids;
+
     // gather sub-module info from population and fleets
     typename std::set<uint32_t>::iterator module_id_it;  // generic
     typename std::set<uint32_t>::iterator pit;
@@ -907,6 +939,21 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
     }
 
     ss << "],\n";
+
+    ss << "\"edm_models\": [\n";
+    typename std::map<uint32_t, std::shared_ptr<EDMInterfaceBase>>::iterator eit;
+    for (eit = EDMInterfaceBase::live_objects.begin();
+         eit != EDMInterfaceBase::live_objects.end(); ++eit) {
+      std::shared_ptr<EDMInterfaceBase> edm_interface = (*eit).second;
+      if (edm_interface) {
+        edm_interface->finalize();
+        ss << edm_interface->to_json();
+        if (std::next(eit) != EDMInterfaceBase::live_objects.end()) {
+          ss << ",\n";
+        }
+      }
+    }
+    ss << "\n],\n";
 
     ss << "\"density_components\": [\n";
 

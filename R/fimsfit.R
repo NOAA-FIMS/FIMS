@@ -558,6 +558,7 @@ fit_fims <- function(input,
     DLL = "FIMS",
     silent = TRUE
   )
+  # TODO(EDM): Registered EDM parameters should flow through input$parameters.
   if (!optimize) {
     initial_fit <- FIMSFit(
       input = input,
@@ -589,6 +590,8 @@ fit_fims <- function(input,
     )
     return(failed_fit)
   }
+
+  # TODO(EDM): Test that fitted EDM parameters affect obj fn() as expected.
 
   maxgrad0 <- maxgrad <- max(abs(obj$gr(opt[["par"]])))
   if (number_of_loops > 0) {
