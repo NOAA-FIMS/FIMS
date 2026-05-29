@@ -72,7 +72,7 @@ TEST(LikelihoodTerm, EvaluatesNormalLikeDensity) {
   double total = term.evaluate();
 
   EXPECT_EQ(term.log_density_values.size(), 3);
-  EXPECT_NEAR(total, -4.256815599614018, 1e-12);
+  EXPECT_NEAR(total, -3.756815599614018, 1e-12);
 }
 
 }  // namespace

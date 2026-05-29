@@ -118,6 +118,16 @@ target_link_libraries(likelihood_primitives
 )
 gtest_discover_tests(likelihood_primitives)
 
+# test_distribution_kernels.cpp
+add_executable(distribution_kernels
+  test_distribution_kernels.cpp
+)
+target_link_libraries(distribution_kernels
+  gtest_main
+  fims_test
+)
+gtest_discover_tests(distribution_kernels)
+
 # test_population_dynamics_recruitment_base.cpp
 add_executable(population_dynamics_recruitment_base
 test_population_dynamics_recruitment_base.cpp
