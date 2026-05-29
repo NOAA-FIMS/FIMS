@@ -86,6 +86,7 @@ class Model {  // may need singleton
       std::shared_ptr<fims_popdy::FisheryModelBase<Type>> m = (*m_it).second;
       m->Prepare();
       m->Evaluate();
+      // TODO(EDM): Compute EDM predictions before evaluating data likelihoods.
     }
 
     // Loop over densities and evaluate joint negative log densities for priors
@@ -147,6 +148,7 @@ class Model {  // may need singleton
       // d->keep = this->keep;
 #endif
       if (d->input_type == "data") {
+        // TODO(EDM): Include observed-vs-predicted EDM fit in this likelihood loop.
         nll_vec[nll_vec_idx] = -d->evaluate();
         jnll += nll_vec[nll_vec_idx];
         n_data += 1;

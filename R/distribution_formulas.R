@@ -181,6 +181,7 @@ get_expected_name <- function(family, data_type) {
   # TODO: Think about if the name of the expected value should change based on
   # the link or if it should stay the same? Keeping track of different names in
   # the code base might be too complex for the output as well
+  # TODO(EDM): Map EDM prediction fields here if they use data likelihoods.
   family_string <- family[["family"]]
   link_string <- family[["link"]]
   expected_name <- dplyr::case_when(
@@ -291,6 +292,7 @@ initialize_data_distribution <- function(
   data_type = c("landings", "index", "agecomp", "lengthcomp")
 ) {
   data_type <- rlang::arg_match(data_type)
+  # TODO(EDM): Decide whether EDM reuses gaussian/lognormal or needs a wrapper.
   # FIXME: Make the available families a data object
   # Could also make the matrix of distributions available per type as a
   # data frame where the check could use the stored object.
@@ -368,6 +370,7 @@ initialize_data_distribution <- function(
   expected <- get_expected_name(family, data_type)
   # setup link to expected values
   new_module$set_distribution_links("data", module$field(expected)$get_id())
+  # TODO(EDM): Expose EDM predictions as module fields before linking here.
 
   return(new_module)
 }
