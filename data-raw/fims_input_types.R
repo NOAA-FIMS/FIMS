@@ -1,6 +1,8 @@
 fims_input_types <- c(
   "age_comp",
   "age_to_length_conversion",
+  # TODO(EDM): "edm" marks time-series columns that will be delay-embedded.
+  "edm",
   "index",
   # TODO: change to singular landing
   "landings",

@@ -1,9 +1,3 @@
-# To remove the NOTE
-# no visible binding for global variable
-utils::globalVariables(c(
-  "name", "timing", "value"
-))
-
 # Developers: ----
 
 # This file defines the parent class FIMSFrame and its potential children. The
@@ -29,12 +23,12 @@ utils::globalVariables(c(
 # 3. If we had setter functions for FIMSFrame, you would add or delete the
 #    appropriate setter functions next but we do not. Instead, we want users to
 #    re-run FIMSFrame() when they make any changes to their data, that way all
-#    of the slots will be updated simultaneously. @nathanvaughan-NOAA mentioned
+#    of the slots will be updated simultaneously. Nathan mentioned
 #    during Code club 2024-12-17 that this may be a problem for future use of
 #    FIMSFrame objects, especially when doing MSE or simulation when there is a
 #    large overhead in running FIMSFrame and you just want to change a small,
 #    simple thing in your data and re-run the model. We will cross that bridge
-#    later. @msupernaw also informed us about the ability to lock an R object
+#    later. Matthew also informed us about the ability to lock an R object
 #    so it cannot be altered. See https://rdrr.io/r/base/bindenv.html.
 # 4. Augment the validator functions to ensure that users do not pass
 #    incompatible information to FIMSFrame().
@@ -55,6 +49,8 @@ utils::globalVariables(c(
 # See the following link if we do want to document them in the future:
 # https://stackoverflow.com/questions/7368262/how-to-properly-document-s4-class-slots-using-roxygen2
 
+methods::setOldClass(c("tbl_df", "tbl", "data.frame"))
+
 methods::setClass(
   Class = "FIMSFrame",
   slots = c(
@@ -66,7 +62,12 @@ methods::setClass(
     lengths = "numeric",
     n_lengths = "integer",
     start_year = "integer",
-    end_year = "integer"
+    end_year = "integer",
+    # TODO(EDM): Slot holding a named list of delay-embedding results produced
+    # by create_edm_embedding(). Each element is itself a named list with
+    # fields: series_name, E, tau, drop_missing, n_rows, n_cols, values
+    # (row-major numeric vector), and target_values (numeric vector of x_t per row).
+    edm_embeddings = "list"
   )
 )
 
@@ -272,6 +273,27 @@ methods::setMethod(
   function(x) FIMSFrame(x)@n_lengths
 )
 
+#' @return
+#' [get_edm_embeddings()] returns a named list of delay-embedding results
+#' stored in the FIMSFrame object. Each element is itself a named list with
+#' fields `series_name`, `E` (embedding dimension), `tau` (time lag),
+#' `drop_missing` (logical), `n_rows`, `n_cols`, `embedded_values` (a numeric
+#' vector of the flattened row-major matrix), and `target_values` (a numeric
+#' vector of the target time-point values x_t for each row).
+#' Returns an empty list when [create_edm_embedding()] has not yet been called.
+#' @export
+#' @rdname get_FIMSFrame
+#' @keywords FIMSFrame
+methods::setGeneric(
+  "get_edm_embeddings",
+  function(x) standardGeneric("get_edm_embeddings")
+)
+#' @rdname get_FIMSFrame
+#' @keywords FIMSFrame
+methods::setMethod(
+  "get_edm_embeddings", "FIMSFrame", function(x) x@edm_embeddings
+)
+
 #' Get a vector of data to be passed to a FIMS module from a FIMSFrame object
 #'
 #' There is an accessor function for each data type needed to run a FIMS model.
@@ -287,9 +309,9 @@ methods::setMethod(
 #' a way to fit length data without estimating growth.
 #'
 #' @inheritParams get_data
-#' @param fleet_name A string, or vector of strings, specifying the name of the
-#'   fleet(s) of interest that you want landings data for. The strings must
-#'   exactly match strings in the column `"name"` of `get_data(x)`.
+#' @param fleet A string, or vector of strings, specifying the name of the
+#'   fleet(s) of interest that you want data for. The strings must
+#'   exactly match strings in the `"fleet"` column of `get_data(x)`.
 #' @return
 #' All of the `model_*()` functions return vectors of data. Currently, the
 #' order of the data is the same order as the data frame because no arranging
@@ -335,17 +357,17 @@ NULL
 #' @keywords FIMSFrame
 methods::setGeneric(
   "model_landings",
-  function(x, fleet_name) standardGeneric("model_landings")
+  function(x, fleet) standardGeneric("model_landings")
 )
 #' @rdname model_
 #' @keywords FIMSFrame
 methods::setMethod(
   "model_landings", "FIMSFrame",
-  function(x, fleet_name) {
+  function(x, fleet) {
     dplyr::filter(
       .data = x@data,
       .data[["type"]] == "landings",
-      .data[["name"]] %in% fleet_name
+      .data[["fleet"]] %in% .env$fleet
     ) |>
       dplyr::pull(.data[["value"]])
   }
@@ -355,7 +377,7 @@ methods::setMethod(
 methods::setMethod(
   "model_landings",
   "data.frame",
-  function(x, fleet_name) model_landings(FIMSFrame(x), fleet_name)
+  function(x, fleet) model_landings(FIMSFrame(x), fleet)
 )
 
 #' @export
@@ -363,17 +385,17 @@ methods::setMethod(
 #' @keywords FIMSFrame
 methods::setGeneric(
   "model_index",
-  function(x, fleet_name) standardGeneric("model_index")
+  function(x, fleet) standardGeneric("model_index")
 )
 #' @rdname model_
 #' @keywords FIMSFrame
 methods::setMethod(
   "model_index", "FIMSFrame",
-  function(x, fleet_name) {
+  function(x, fleet) {
     dplyr::filter(
       .data = x@data,
       .data[["type"]] == "index",
-      .data[["name"]] %in% fleet_name
+      .data[["fleet"]] %in% .env$fleet
     ) |>
       dplyr::pull(.data[["value"]])
   }
@@ -383,7 +405,7 @@ methods::setMethod(
 methods::setMethod(
   "model_index",
   "data.frame",
-  function(x, fleet_name) model_index(FIMSFrame(x), fleet_name)
+  function(x, fleet) model_index(FIMSFrame(x), fleet)
 )
 
 #' @export
@@ -391,17 +413,17 @@ methods::setMethod(
 #' @keywords FIMSFrame
 methods::setGeneric(
   "model_age_comp",
-  function(x, fleet_name) standardGeneric("model_age_comp")
+  function(x, fleet) standardGeneric("model_age_comp")
 )
 #' @rdname model_
 #' @keywords FIMSFrame
 methods::setMethod(
   "model_age_comp", "FIMSFrame",
-  function(x, fleet_name) {
+  function(x, fleet) {
     dplyr::filter(
       .data = x@data,
       .data[["type"]] == "age_comp",
-      .data[["name"]] %in% fleet_name
+      .data[["fleet"]] %in% .env$fleet
     ) |>
       dplyr::pull(.data[["value"]])
   }
@@ -411,7 +433,7 @@ methods::setMethod(
 methods::setMethod(
   "model_age_comp",
   "data.frame",
-  function(x, fleet_name) model_age_comp(FIMSFrame(x), fleet_name)
+  function(x, fleet) model_age_comp(FIMSFrame(x), fleet)
 )
 
 #' @export
@@ -419,14 +441,14 @@ methods::setMethod(
 #' @keywords FIMSFrame
 methods::setGeneric(
   "model_length_comp",
-  function(x, fleet_name) standardGeneric("model_length_comp")
+  function(x, fleet) standardGeneric("model_length_comp")
 )
 #' @rdname model_
 #' @keywords FIMSFrame
 methods::setMethod(
   "model_length_comp",
   "FIMSFrame",
-  function(x, fleet_name) {
+  function(x, fleet) {
     conversion_data <- dplyr::filter(
       .data = x@data,
       .data[["type"]] == "age_to_length_conversion"
@@ -440,7 +462,7 @@ methods::setMethod(
     dplyr::filter(
       .data = x@data,
       .data[["type"]] == "length_comp",
-      .data[["name"]] %in% fleet_name
+      .data[["fleet"]] %in% .env$fleet
     ) |>
       dplyr::pull(.data[["value"]])
   }
@@ -450,7 +472,7 @@ methods::setMethod(
 methods::setMethod(
   "model_length_comp",
   "data.frame",
-  function(x, fleet_name) model_length_comp(FIMSFrame(x), fleet_name)
+  function(x, fleet) model_length_comp(FIMSFrame(x), fleet)
 )
 
 #' @export
@@ -475,8 +497,8 @@ methods::setMethod(
         message = "No weight_at_age data found in FIMSFrame object."
       )
     }
-    fleet_names <- unique(model_data[["name"]])
-    if (length(fleet_names) > 1) {
+    all_fleets <- unique(model_data[["fleet"]])
+    if (length(all_fleets) > 1) {
       cli::cli_warn(c(
         "x" = "Multiple fleets found in weight_at_age data.",
         "i" = "{.fn model_weight_at_age} will average values across fleets."
@@ -497,7 +519,7 @@ methods::setMethod(
         )
     }
     # Create time-series vector if only available by age
-    n_rows <- NROW(dplyr::filter(model_data, value != -999))
+    n_rows <- NROW(dplyr::filter(model_data, .data$value != -999))
     n_rows_needed <- get_n_ages(x) * (get_n_years(x) + 1)
     if (n_rows < n_rows_needed) {
       if (n_rows == get_n_ages(x)) {
@@ -506,7 +528,7 @@ methods::setMethod(
             # Adds a year for terminal year + 1 because to calculate
             # spawning biomass after fishing in terminal year
             get_n_years(x) + 1,
-            dplyr::filter(model_data, value != -999),
+            dplyr::filter(model_data, .data$value != -999),
             simplify = FALSE
           )
         )
@@ -574,6 +596,243 @@ methods::setMethod(
   }
 )
 
+# methods::setMethod: EDM accessors ----
+
+#' @details
+#' ## `model_edm_matrix()`
+#' Returns a numeric matrix (n_rows × E) for a named delay embedding stored
+#' inside the FIMSFrame object. The matrix can be passed directly to an EDM
+#' prediction module. Rows correspond to embedded time points and columns
+#' correspond to the lagged coordinates `x_t, x_{t-tau}, ..., x_{t-(E-1)tau}`.
+#'
+#' @param embedding_name A single string matching one of the names in
+#'   [get_edm_embeddings()].
+#' @export
+#' @rdname model_
+#' @keywords FIMSFrame
+methods::setGeneric(
+  "model_edm_matrix",
+  function(x, embedding_name) standardGeneric("model_edm_matrix")
+)
+#' @rdname model_
+#' @keywords FIMSFrame
+methods::setMethod(
+  "model_edm_matrix",
+  "FIMSFrame",
+  function(x, embedding_name) {
+    embeddings <- get_edm_embeddings(x)
+    if (!embedding_name %in% names(embeddings)) {
+      cli::cli_abort(c(
+        "No embedding named {.val {embedding_name}} found in this FIMSFrame.",
+        "i" = "Available embeddings: {.val {names(embeddings)}}.",
+        "i" = "Use {.fn create_edm_embedding} to build one first."
+      ))
+    }
+    emb <- embeddings[[embedding_name]]
+    matrix(emb[["embedded_values"]], nrow = emb[["n_rows"]], ncol = emb[["n_cols"]],
+           byrow = TRUE)
+  }
+)
+
+#' Create a delay embedding and store it inside a FIMSFrame object
+#'
+#' Pulls a univariate time series from the `data` slot of a [FIMSFrame()]
+#' object, constructs the delay embedding matrix using the Rcpp
+#' `DelayEmbedding` module, and returns a **new** FIMSFrame with the result
+#' stored in the `edm_embeddings` slot under `embedding_name`.
+#'
+#' @details
+#' The time series is extracted by filtering `get_data(x)` on `type` and
+#' `fleet` (fleet / survey name). Values encoded as `-999` are treated as the
+#' FIMS missing-data sentinel. When `drop_missing = TRUE`,
+#' `construct_drop_missing()` is called so that rows containing `-999` are
+#' removed from the embedding matrix; when `FALSE`, `construct()` is called
+#' and those sentinel values remain in the matrix.
+#'
+#' Uncertainty propagation follows the same pointer-based pattern as the value
+#' fields. When `uncertainty_name` is supplied, the function extracts a
+#' matching time series (filtered on the same `series_type` and ordered by
+#' `timing`) and passes it to the Rcpp module. The resulting embedding list
+#' will include `embedded_uncertainty` and `target_uncertainty` numeric
+#' vectors laid out identically to `embedded_values` and `target_values`
+#' respectively. When `uncertainty_name` is `NULL` (the default) those fields
+#' are absent from the stored list.
+#'
+#' The returned FIMSFrame is identical to `x` except that `edm_embeddings`
+#' contains one additional element named `embedding_name`.
+#'
+#' @param x A [FIMSFrame()] object.
+#' @param series_type A single string giving the `type` value to filter on,
+#'   e.g. `"index"` or `"landings"`.
+#' @param series_name A single string giving the `fleet` (fleet / survey) value
+#'   to filter on, e.g. `"survey1"`.
+#' @param E A positive integer — the embedding dimension (number of lagged
+#'   coordinates per row).
+#' @param tau A positive integer — the time lag between successive coordinates.
+#' @param drop_missing Logical (default `TRUE`). When `TRUE`, rows containing
+#'   the FIMS missing-value sentinel `-999` are dropped from the embedding
+#'   matrix.
+#' @param uncertainty_name A single string giving the `fleet` column value for
+#'   an uncertainty series in the data slot (e.g. `"survey1_sd"`), or `NULL`
+#'   (default) to skip uncertainty propagation. The uncertainty series must
+#'   have the same length as the value series after filtering on
+#'   `series_type` and arranging by `timing`.
+#' @param embedding_name A single string used as the key under which the
+#'   result is stored in `edm_embeddings`. Defaults to
+#'   `paste0(series_type, "_", series_name, "_E", E, "_tau", tau)`.
+#'
+#' @return A [FIMSFrame()] object identical to `x` with the new embedding
+#'   appended to the `edm_embeddings` slot.
+#'
+#' @export
+#' @keywords FIMSFrame
+create_edm_embedding <- function(
+    x,
+    series_type,
+    series_name,
+    E,
+    tau,
+    drop_missing = TRUE,
+    uncertainty_name = NULL,
+    embedding_name = paste0(series_type, "_", series_name,
+                            "_E", E, "_tau", tau)) {
+  if (!methods::is(x, "FIMSFrame")) {
+    cli::cli_abort("{.var x} must be a {.cls FIMSFrame} object.")
+  }
+  if (!is.character(series_type) || length(series_type) != 1) {
+    cli::cli_abort("{.var series_type} must be a single string.")
+  }
+  if (!is.character(series_name) || length(series_name) != 1) {
+    cli::cli_abort("{.var series_name} must be a single string.")
+  }
+  if (!is.numeric(E) || length(E) != 1 || E < 1 || E %% 1 != 0) {
+    cli::cli_abort("{.var E} must be a positive integer.")
+  }
+  if (!is.null(uncertainty_name) &&
+        (!is.character(uncertainty_name) || length(uncertainty_name) != 1)) {
+    cli::cli_abort("{.var uncertainty_name} must be a single string or NULL.")
+  }
+  if (!is.numeric(tau) || length(tau) != 1 || tau < 1 || tau %% 1 != 0) {
+    cli::cli_abort("{.var tau} must be a positive integer.")
+  }
+
+  # Extract the univariate time series from the data slot
+  series_data <- dplyr::filter(
+    get_data(x),
+    .data[["type"]] == series_type,
+    .data[["fleet"]] == series_name
+  ) |>
+    dplyr::arrange(.data[["timing"]]) |>
+    dplyr::pull(.data[["value"]])
+
+  # Extract the optional uncertainty series
+  uncertainty_data <- numeric(0)
+  if (!is.null(uncertainty_name)) {
+    uncertainty_data <- dplyr::filter(
+      get_data(x),
+      .data[["type"]] == series_type,
+      .data[["fleet"]] == uncertainty_name
+    ) |>
+      dplyr::arrange(.data[["timing"]]) |>
+      dplyr::pull(.data[["value"]])
+
+    if (length(uncertainty_data) == 0) {
+      cli::cli_abort(c(
+        "No uncertainty data found for type {.val {series_type}} and fleet {.val {uncertainty_name}}.",
+        "i" = "Available fleets: {.val {unique(get_data(x)[[\"fleet\"]])}}."
+      ))
+    }
+    if (length(uncertainty_data) != length(series_data)) {
+      cli::cli_abort(c(
+        "Uncertainty series length ({length(uncertainty_data)}) does not match ",
+        "value series length ({length(series_data)}) for name {.val {uncertainty_name}}."
+      ))
+    }
+  }
+
+  if (length(series_data) == 0) {
+    cli::cli_abort(c(
+      "No data found for type {.val {series_type}} and name {.val {series_name}}.",
+      "i" = "Available types: {.val {unique(get_data(x)[[\"type\"]])}}.",
+      "i" = "Available names: {.val {unique(get_data(x)[[\"name\"]])}}."
+    ))
+  }
+
+  # Call the Rcpp DelayEmbedding module
+  edm_obj <- methods::new(DelayEmbedding)
+  tryCatch(
+    {
+      if (drop_missing) {
+        if (!is.null(uncertainty_name)) {
+          edm_obj$construct_drop_missing_with_uncertainty(
+            as.numeric(series_data),
+            as.integer(E),
+            as.integer(tau),
+            -999.0,
+            as.numeric(uncertainty_data)
+          )
+        } else {
+          edm_obj$construct_drop_missing(
+            as.numeric(series_data),
+            as.integer(E),
+            as.integer(tau),
+            -999.0
+          )
+        }
+      } else {
+        if (!is.null(uncertainty_name)) {
+          edm_obj$construct_with_uncertainty(
+            as.numeric(series_data),
+            as.integer(E),
+            as.integer(tau),
+            as.numeric(uncertainty_data)
+          )
+        } else {
+          edm_obj$construct(
+            as.numeric(series_data),
+            as.integer(E),
+            as.integer(tau)
+          )
+        }
+      }
+    },
+    error = function(e) {
+      cli::cli_abort(c(
+        "Failed to construct delay embedding.",
+        "i" = conditionMessage(e)
+      ))
+    }
+  )
+
+  # Package the result as a named list
+  embedding_result <- list(
+    series_name = series_name,
+    series_type = series_type,
+    E = as.integer(E),
+    tau = as.integer(tau),
+    drop_missing = drop_missing,
+    n_rows = as.integer(edm_obj$n_rows),
+    n_cols = as.integer(edm_obj$n_cols),
+    embedded_values = edm_obj$embedded_values$get_values(),
+    target_values = edm_obj$target_values$get_values()
+  )
+
+  # Append uncertainty fields only when an uncertainty series was provided
+  if (!is.null(uncertainty_name)) {
+    embedding_result[["embedded_uncertainty"]] <-
+      edm_obj$embedded_uncertainty$get_values()
+    embedding_result[["target_uncertainty"]] <-
+      edm_obj$target_uncertainty$get_values()
+  }
+
+  # Store in the edm_embeddings slot and return a new FIMSFrame
+  existing <- get_edm_embeddings(x)
+  existing[[embedding_name]] <- embedding_result
+  x@edm_embeddings <- existing
+  methods::validObject(x)
+  x
+}
+
 # methods::setMethod: initialize ----
 
 # Not currently using methods::setMethod(f = "initialize")
@@ -613,20 +872,22 @@ methods::setMethod(
   definition = function(x, y, ...) {
     data_for_plot <- get_data(x) |>
       dplyr::mutate(
-        type = gsub("_", " ", type)
+        type = gsub("_", " ", .data$type)
       ) |>
-      dplyr::group_by(name, timing, type) |>
-      dplyr::filter(value != -999) |>
+      dplyr::group_by(dplyr::across(
+        dplyr::all_of(c("fleet", "timing", "type"))
+      )) |>
+      dplyr::filter(.data$value != -999) |>
       dplyr::summarize(
         no = dplyr::n()
       ) |>
-      dplyr::filter(no > 0)
+      dplyr::filter(.data$no > 0)
     ggplot2::ggplot(
       data = data_for_plot,
       mapping = ggplot2::aes(
-        x = timing,
-        y = name,
-        col = name
+        x = .data$timing,
+        y = .data$fleet,
+        col = .data$fleet
       )
     ) +
       ggplot2::facet_wrap(
@@ -700,8 +961,8 @@ methods::setValidity(
     # Ensure composition data sum to 1.0 per group if units are proportions
     for (present_type in grep("_comp", present_types, value = TRUE)) {
       test <- object@data |>
-        dplyr::filter(type == present_type, value != -999) |>
-        dplyr::group_by(name, timing, .drop = FALSE) |>
+        dplyr::filter(.data$type == present_type, .data$value != -999) |>
+        dplyr::group_by(.data$fleet, .data$timing, .drop = FALSE) |>
         dplyr::group_map(.keep = TRUE, \(.x, .y) {
           validate_composition_data(.x)
         })
@@ -725,8 +986,8 @@ validate_data_colnames <- function(data) {
   if (!"type" %in% the_column_names) {
     errors <- c(errors, "data must contain 'type'")
   }
-  if (!"name" %in% the_column_names) {
-    errors <- c(errors, "data must contain 'name'")
+  if (!"fleet" %in% the_column_names) {
+    errors <- c(errors, "data must contain 'fleet'")
   }
   if (!"timing" %in% the_column_names) {
     errors <- c(errors, "data must contain 'timing'")
@@ -785,7 +1046,7 @@ validate_composition_data <- function(data) {
 }
 
 validate_dimension_of_conversion <- function(data, n_groups, n_timings) {
-  good_data <- dplyr::filter(data, value != -999)
+  good_data <- dplyr::filter(data, .data$value != -999)
   good_type <- unique(data[["type"]])
   if (length(good_type) > 1) {
     cli::cli_abort("Only one type of data can exist in {.var data}.")
@@ -903,7 +1164,7 @@ FIMSFrame <- function(data) {
     )
   }
   # TODO: Change this check when internal estimation of growth is possible
-  if (NROW(dplyr::filter(data, type == "weight_at_age")) == 0) {
+  if (NROW(dplyr::filter(data, .data$type == "weight_at_age")) == 0) {
     cli::cli_abort("{.var data} must contain {.var weight_at_age} data.")
   }
   if (!all(is.numeric(data[["timing"]]))) {
@@ -919,16 +1180,16 @@ FIMSFrame <- function(data) {
   # Get the earliest and latest year formatted as integers
   data_to_use_4_timing <- dplyr::filter(
     data,
-    !type %in% c("age_to_length_conversion", "weight_at_age")
+    !.data$type %in% c("age_to_length_conversion", "weight_at_age")
   ) |>
-    dplyr::pull(timing)
+    dplyr::pull(.data$timing)
   start_year <- as.integer(floor(min(data_to_use_4_timing, na.rm = TRUE)))
   end_year <- as.integer(floor(max(data_to_use_4_timing, na.rm = TRUE)))
   n_years <- as.integer(end_year - start_year + 1)
   years <- start_year:end_year
 
   # Get the fleets represented in the data
-  fleets <- unique(na.omit(data[["name"]]))
+  fleets <- unique(na.omit(data[["fleet"]]))
   n_fleets <- length(fleets)
 
   if ("age" %in% colnames(data)) {
@@ -951,7 +1212,7 @@ FIMSFrame <- function(data) {
         )
       }
       data_for_age_calculations <- dplyr::filter(
-        data, type %in% c("age_comp", "weight_at_age")
+        data, .data$type %in% c("age_comp", "weight_at_age")
       )
       ages <- min(
         data_for_age_calculations[["age"]],
@@ -970,7 +1231,7 @@ FIMSFrame <- function(data) {
     if (all(is.na(data[["length"]]))) {
       lengths <- numeric()
     } else {
-      data_for_length_calculations <- dplyr::filter(data, type == "length_comp")
+      data_for_length_calculations <- dplyr::filter(data, .data$type == "length_comp")
       lengths <- sort(na.omit(
         unique(data_for_length_calculations[["length"]])
       ))
@@ -984,7 +1245,7 @@ FIMSFrame <- function(data) {
       }
       # Check that age_to_length_conversion data exist once
       validate_dimension_of_conversion(
-        dplyr::filter(data, type == "age_to_length_conversion"),
+        dplyr::filter(data, .data$type == "age_to_length_conversion"),
         n_groups = n_ages * length(lengths),
         n_timings = 1
       )
@@ -996,8 +1257,8 @@ FIMSFrame <- function(data) {
 
   # Check that full dimension information is available for weight_at_age
   dplyr::group_by(
-    dplyr::filter(data, type == "weight_at_age"),
-    name
+    dplyr::filter(data, .data$type == "weight_at_age"),
+    .data[["fleet"]]
   ) |>
     dplyr::group_split() |>
     purrr::walk(
@@ -1010,7 +1271,7 @@ FIMSFrame <- function(data) {
   # order so that getting information out with model_*() are correct.
   formatted_data <- data |>
     dplyr::filter(
-      timing >= start_year | is.na(timing)
+      .data$timing >= start_year | is.na(.data$timing)
     ) |>
     tibble::as_tibble()
   missing_time_series <- create_missing_data(
@@ -1022,21 +1283,21 @@ FIMSFrame <- function(data) {
       data = formatted_data,
       bins = ages,
       timings = years,
-      column = age,
+      column = "age",
       types = c("weight_at_age", "age_comp")
     )
-    summary_by_name <- dplyr::count(missing_ages, name, timing) |>
-      dplyr::filter(n != n_ages) |>
+    summary_by_name <- dplyr::count(missing_ages, .data$fleet, .data$timing) |>
+      dplyr::filter(.data$n != n_ages) |>
       dplyr::summarize(
-        timings = paste(timing, collapse = ", "),
-        .by = name
+        timings = paste(.data$timing, collapse = ", "),
+        .by = dplyr::all_of("fleet")
       )
     if (NROW(summary_by_name) > 0) {
       cli::cli_abort(
-        "You cannot have missing age values for a given timing and name
-        combination. Please check your age-composition data for missing
-        ages in the following fleets, {summary_by_name$name},
-        in the following years, {summary_by_name$timings}, respectively."
+        "You cannot have missing age values for a given timing and fleet
+        combination. Please check the age-composition data for missing
+        ages in the following fleets, {summary_by_name$fleet},
+        for the following timings, {summary_by_name$timings}, respectively."
       )
     }
   } else {
@@ -1047,21 +1308,25 @@ FIMSFrame <- function(data) {
       data = formatted_data,
       bins = lengths,
       timings = years,
-      column = length,
+      column = "length",
       types = "length_comp"
     )
-    summary_by_name <- dplyr::count(missing_lengths, name, timing) |>
-      dplyr::filter(n != n_lengths) |>
+    summary_by_name <- dplyr::count(
+      missing_lengths,
+      .data$fleet,
+      .data$timing
+    ) |>
+      dplyr::filter(.data$n != n_lengths) |>
       dplyr::summarize(
-        timings = paste(timing, collapse = ", "),
-        .by = name
+        timings = paste(.data$timing, collapse = ", "),
+        .by = dplyr::all_of("fleet")
       )
     if (NROW(summary_by_name) > 0) {
       cli::cli_abort(
-        "You cannot have missing length values for a given timing and name
-        combination. Please check your length-composition data for missing
-        lengths in the following fleets, {summary_by_name$name},
-        in the following years, {summary_by_name$timings}, respectively."
+        "You cannot have missing length values for a given timing and fleet
+        combination. Please check the length-composition data for missing
+        lengths in the following fleets, {summary_by_name$fleet},
+        for the following timings, {summary_by_name$timings}, respectively."
       )
     }
   } else {
@@ -1085,7 +1350,7 @@ FIMSFrame <- function(data) {
     missing_lengths
   )
   sort_order <- intersect(
-    c("name", "type", "timing", "age", "length"),
+    c("fleet", "type", "timing", "age", "length"),
     colnames(formatted_data)
   )
   complete_data <- dplyr::full_join(
@@ -1105,7 +1370,9 @@ FIMSFrame <- function(data) {
     ages = ages,
     n_ages = n_ages,
     lengths = lengths,
-    n_lengths = n_lengths
+    n_lengths = n_lengths,
+    # TODO(EDM): edm_embeddings is populated lazily via create_edm_embedding().
+    edm_embeddings = list()
   )
 }
 
@@ -1117,25 +1384,43 @@ create_missing_data <- function(
   column,
   types = c("landings", "index")
 ) {
+  bin_column <- if (!missing(column)) {
+    rlang::sym(column)
+  }
   use_this_data <- data |>
-    dplyr::group_by(type, name)
+    dplyr::group_by(.data$type, .data$fleet)
   out_data <- if (missing(bins)) {
     # This only pertains to annual data without bins
     use_this_data |>
-      dplyr::filter(type %in% types) |>
-      tidyr::expand(unit, timing = timings) |>
+      dplyr::filter(.data$type %in% types) |>
+      tidyr::expand(
+        !!rlang::sym("unit"),
+        !!rlang::sym("timing") := timings
+      ) |>
       dplyr::anti_join(
-        y = dplyr::select(use_this_data, type, name, unit, timing),
-        by = dplyr::join_by(type, name, unit, timing)
+        y = dplyr::select(
+          use_this_data,
+          dplyr::all_of(c("type", "fleet", "unit", "timing"))
+        ),
+        by = c("type", "fleet", "unit", "timing")
       )
   } else {
     use_this_data |>
-      dplyr::group_by(type, name) |>
-      dplyr::filter(type %in% types) |>
-      tidyr::expand(unit, timing = timings, {{ column }} := bins) |>
+      dplyr::group_by(.data$type, .data$fleet) |>
+      dplyr::filter(.data$type %in% types) |>
+      tidyr::expand(
+        !!rlang::sym("unit"),
+        !!rlang::sym("timing") := timings,
+        !!bin_column := bins
+      ) |>
       dplyr::anti_join(
-        y = dplyr::select(use_this_data, type, name, unit, timing, {{ column }}),
-        by = dplyr::join_by(type, name, unit, timing, {{ column }})
+        y = dplyr::select(
+          use_this_data,
+          dplyr::all_of(
+            c("type", "fleet", "unit", "timing", rlang::as_string(bin_column))
+          )
+        ),
+        by = c("type", "fleet", "unit", "timing", rlang::as_string(bin_column))
       )
   }
   out_data |>

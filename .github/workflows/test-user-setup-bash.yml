@@ -9,6 +9,10 @@ on:
     - cron: '0 0 * * *'  
   workflow_dispatch: 
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   test-setup:
     name: ${{ matrix.os }}
@@ -20,7 +24,7 @@ jobs:
 
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - uses: r-lib/actions/setup-pandoc@v2
 
@@ -44,9 +48,8 @@ jobs:
       - name: Verify FIMS Installation
         shell: Rscript {0}
         run: |
-          # Verify FIMS is loadable and print version
           if (requireNamespace("FIMS", quietly = TRUE)) {
             message("SUCCESS: FIMS Version ", packageVersion("FIMS"), " is installed.")
           } else {
-            stop("CRITICAL: FIMS was not found in .libPaths()")
+            stop("CRITICAL: FIMS was not loadable from .libPaths()")
           }

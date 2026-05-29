@@ -86,6 +86,14 @@ class Model {  // may need singleton
       std::shared_ptr<fims_popdy::FisheryModelBase<Type>> m = (*m_it).second;
       m->Prepare();
       m->Evaluate();
+      // TODO(EDM): Compute EDM predictions before evaluating data likelihoods.
+    }
+
+    // Compute EDM predictions before evaluating data likelihoods.
+    for (typename fims_info::Information<Type>::edm_models_iterator e_it =
+             this->fims_information->edm_models.begin();
+         e_it != this->fims_information->edm_models.end(); ++e_it) {
+      e_it->second->Evaluate();
     }
 
     // Loop over densities and evaluate joint negative log densities for priors
@@ -147,6 +155,7 @@ class Model {  // may need singleton
       // d->keep = this->keep;
 #endif
       if (d->input_type == "data") {
+        // TODO(EDM): Include observed-vs-predicted EDM fit in this likelihood loop.
         nll_vec[nll_vec_idx] = -d->evaluate();
         jnll += nll_vec[nll_vec_idx];
         n_data += 1;
@@ -167,6 +176,14 @@ class Model {  // may need singleton
     vector<Type> nll_components = nll_vec.to_tmb();
     FIMS_REPORT_F(nll_components, this->of);
     FIMS_REPORT_F(jnll, this->of);
+
+    // report out EDM models
+    for (typename fims_info::Information<Type>::edm_models_iterator e_it =
+             this->fims_information->edm_models.begin();
+         e_it != this->fims_information->edm_models.end(); ++e_it) {
+      vector<Type> edm_preds_tmb = e_it->second->predictions.to_tmb();
+      FIMS_REPORT_F(edm_preds_tmb, this->of);
+    }
 
 #endif
 

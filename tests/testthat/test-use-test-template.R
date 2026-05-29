@@ -13,16 +13,7 @@
 
 # This is a meta-test that creates a temporary package structure to test the use
 # of the `use_gtest_template()` and `use_testthat_template()` functions. It works
-# inside the temporary environment created by the test file. However, it does not
-# work when using the reporting tool {testdown} because it cannot
-# find the path back to the original test file in the GitHub Actions runner. This
-# leads to errors like: In normalizePath(attr(result$srcref, "srcfile")$filename) :
-# path[1]="test-use-test-template.R": No such file or directory. To fix the issue,
-# we need to skip the test file when generating {testdown} reports.
-if (Sys.getenv("INPUT_TESTDOWN") == "true") {
-  #' @description Skip the test in {testdown} reports generation.
-  skip("Skipping test in {testdown} reports generation.")
-}
+# inside the temporary environment created by the test file.
 
 # Create a temporary package structure with the minimal files necessary for
 # testing purposes in a temporary directory. And, ensure the temporary directory

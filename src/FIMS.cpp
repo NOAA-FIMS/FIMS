@@ -31,10 +31,12 @@ Type objective_function<Type>::operator()() {
     for(size_t i =0; i < information->fixed_effects_parameters.size(); i++){
         *information->fixed_effects_parameters[i] = p[i];
     }
+    // TODO(EDM): Fixed-effect EDM parameters are updated from p here.
     //update the random effects parameter values
     for(size_t i =0; i < information->random_effects_parameters.size(); i++){
         *information->random_effects_parameters[i] = re[i];
     }
+    // TODO(EDM): Random-effect EDM states would be updated from re here.
     model -> of = this;
 
     Type nll = 0;

@@ -22,7 +22,7 @@ A nested \code{tibble} with the following top-level columns is returned:
 "Data", "Selectivity", "Recruitment", "Growth", "Maturity"). These
 entries are always written in PascalCase to match the names used in the
 C++ code.}
-\item{\code{fleet_name}:}{The name of the fleet the module applies to. This
+\item{\code{fleet}:}{The name of the fleet the module applies to. This
 will be \code{NA} for non-fleet-specific modules like "Recruitment".}
 \item{\code{data}:}{A list-column containing a \code{tibble} with detailed
 configurations. Unnesting this column reveals:
@@ -93,10 +93,10 @@ configurations_double_logistic <- default_configurations_unnest |>
   dplyr::rows_update(
     tibble::tibble(
       module_name = "Selectivity",
-      fleet_name = "fleet1",
+      fleet = "fleet1",
       module_type = "DoubleLogistic"
     ),
-    by = c("module_name", "fleet_name")
+    by = c("module_name", "fleet")
   ) |>
   print()
 }

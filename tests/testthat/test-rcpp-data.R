@@ -17,16 +17,16 @@ fleet_names_age_comp <- dplyr::filter(
   .data = as.data.frame(get_data(fims_frame)),
   type == "age_comp"
 ) |>
-  dplyr::distinct(name) |>
-  dplyr::pull(name)
+  dplyr::distinct(fleet) |>
+  dplyr::pull(fleet)
 n_age_comp <- length(fleet_names_age_comp)
 
 fleet_names_index <- dplyr::filter(
   .data = as.data.frame(get_data(fims_frame)),
   type == "index"
 ) |>
-  dplyr::distinct(name) |>
-  dplyr::pull(name)
+  dplyr::distinct(fleet) |>
+  dplyr::pull(fleet)
 n_index <- length(fleet_names_index)
 
 ## IO correctness ----
@@ -51,10 +51,7 @@ test_that("rcpp data works with correct inputs", {
     age_comp_dat[[fleet_names_age_comp[fleet_f]]] <- methods::new(AgeComp, n_years, n_ages)
     #' @description Test that adding age-composition data to a model is possible.
     expect_silent(
-      purrr::walk(
-        1:(n_years * n_ages),
-        \(x) age_comp_dat[[fleet_names_age_comp[fleet_f]]]$age_comp_data$set(x - 1, model_age_comp(fims_frame, fleet_names_age_comp[fleet_f])[x])
-      )
+      age_comp_dat[[fleet_names_age_comp[fleet_f]]]$age_comp_data[] <- c(t(model_age_comp(fims_frame, fleet_names_age_comp[fleet_f])))
     )
   }
 

@@ -33,9 +33,8 @@ namespace
     using fims::JsonValueType;
 
     JsonParser parser;
-    auto json = parser.Parse(
-        "{\"num\":42,\"pi\":3.14,\"ok\":true,\"name\":\"fims\",\"arr\":[1,2,3],\"nested\":{\"x\":7}}"
-    );
+  auto json = parser.Parse("{\"num\":42,\"pi\":3.14,\"ok\":true,\"name\":"
+                           "\"fims\",\"arr\":[1,2,3],\"nested\":{\"x\":7}}");
 
     // Test that object parsing and typed getters work for each value.
     EXPECT_EQ(json.GetType(), JsonValueType::Object);
@@ -194,9 +193,8 @@ namespace
   // Assert that the captured error output matches the expected error message
   EXPECT_EQ(
       // Get the captured error output as a string
-      captured_cerr.str(), 
-      "Error: Unable to open file bad_path/nonexistent_file.json for writing.\n"
-    );
+      captured_cerr.str(), "Error: Unable to open file "
+                           "bad_path/nonexistent_file.json for writing.\n");
   }
 
 }

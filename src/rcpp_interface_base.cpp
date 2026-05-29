@@ -8,9 +8,9 @@
 /**
  * @brief The unique ID for the variable map that points to a fims::Vector.
  */
-uint32_t Parameter::id_g = 0;
+uint32_t Variable::id_g = 0;
 
-uint32_t ParameterVector::id_g = 0;
+uint32_t VariableVector::id_g = 0;
 
 uint32_t RealVector::id_g = 0;
 

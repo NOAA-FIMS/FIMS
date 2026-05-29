@@ -181,6 +181,7 @@ get_expected_name <- function(family, data_type) {
   # TODO: Think about if the name of the expected value should change based on
   # the link or if it should stay the same? Keeping track of different names in
   # the code base might be too complex for the output as well
+  # TODO(EDM): Map EDM prediction fields here if they use data likelihoods.
   family_string <- family[["family"]]
   link_string <- family[["link"]]
   expected_name <- dplyr::case_when(
@@ -291,6 +292,7 @@ initialize_data_distribution <- function(
   data_type = c("landings", "index", "agecomp", "lengthcomp")
 ) {
   data_type <- rlang::arg_match(data_type)
+  # TODO(EDM): Decide whether EDM reuses gaussian/lognormal or needs a wrapper.
   # FIXME: Make the available families a data object
   # Could also make the matrix of distributions available per type as a
   # data frame where the check could use the stored object.
@@ -314,19 +316,10 @@ initialize_data_distribution <- function(
 
     # populate logged standard deviation parameter with log of input
     # Using resize() and then assigning value to each element of log_sd directly
-    # is correct, as creating a new ParameterVector for log_sd here would
+    # is correct, as creating a new VariableVector for log_sd here would
     # trigger an error in integration tests with wrappers.
-    new_module$log_sd$resize(length(sd[["value"]]))
-
-    purrr::walk(
-      seq_along(sd[["value"]]),
-      \(x) new_module[["log_sd"]][x][["value"]] <- log(sd[["value"]][x])
-    )
-
-    purrr::walk(
-      seq_along(sd[["estimation_type"]]),
-      \(x) new_module[["log_sd"]][x][["estimation_type"]]$set(sd[["estimation_type"]][x])
-    )
+    new_module$log_sd[] <- log(sd[["value"]])
+    new_module$log_sd$set_estimation_types(sd[["estimation_type"]])
   }
 
   if (family[["family"]] == "gaussian") {
@@ -334,15 +327,8 @@ initialize_data_distribution <- function(
     new_module <- methods::new(DnormDistribution)
 
     # populate logged standard deviation parameter with log of input
-    purrr::walk(
-      seq_along(sd[["value"]]),
-      \(x) new_module[["log_sd"]][x][["value"]] <- log(sd[["value"]][x])
-    )
-
-    purrr::walk(
-      seq_along(sd[["estimation_type"]]),
-      \(x) new_module[["log_sd"]][x][["estimation_type"]]$set(sd[["estimation_type"]][x])
-    )
+    new_module$log_sd[] <- log(sd[["value"]])
+    new_module$log_sd$set_estimation_types(sd[["estimation_type"]])
   }
 
   if (family[["family"]] == "multinomial") {
@@ -368,6 +354,7 @@ initialize_data_distribution <- function(
   expected <- get_expected_name(family, data_type)
   # setup link to expected values
   new_module$set_distribution_links("data", module$field(expected)$get_id())
+  # TODO(EDM): Expose EDM predictions as module fields before linking here.
 
   return(new_module)
 }
@@ -402,24 +389,12 @@ initialize_process_distribution <- function(
     new_module <- methods::new(DlnormDistribution)
 
     # populate logged standard deviation parameter with log of input
-    new_module$log_sd$resize(length(sd[["value"]]))
-    purrr::walk(
-      seq_along(sd[["value"]]),
-      \(x) new_module[["log_sd"]][x][["value"]] <- log(sd[["value"]][x])
-    )
+    new_module$log_sd[] <- log(sd[["value"]])
 
     # setup whether or not sd parameter is estimated
-    if (length(sd[["value"]]) > 1 && length(sd[["estimation_type"]]) == 1) {
-      if (sd[["estimation_type"]] == "constant") {
-        new_module$log_sd$set_all_estimable(FALSE)
-      } else {
-        new_module$log_sd$set_all_estimable(TRUE)
-      }
-    } else {
-      for (i in seq_along(sd[["estimation_type"]])) {
-        new_module$log_sd[i]$estimation_type$set(sd[["estimation_type"]][i])
-      }
-    }
+    et <- sd[["estimation_type"]]
+    et[is.na(et)] <- "constant"
+    new_module$log_sd$set_estimation_types(et)
   }
 
   if (family[["family"]] == "gaussian") {
@@ -433,19 +408,23 @@ initialize_process_distribution <- function(
     }
 
     # setup whether or not sd parameter is estimated
-    if (length(sd[["value"]]) > 1 && length(sd[["estimation_type"]]) == 1) {
-      if (sd[["estimation_type"]] == "constant") {
-        new_module$log_sd$set_all_estimable(FALSE)
-      } else {
-        new_module$log_sd$set_all_estimable(TRUE)
-      }
-    } else {
-      for (i in seq_along(sd[["estimation_type"]])) {
-        new_module$log_sd[i]$estimation_type$set(sd[["estimation_type"]][i])
-      }
-    }
-  }
+    et <- sd[["estimation_type"]]
+    et[is.na(et)] <- "constant"
+    new_module$log_sd$set_estimation_types(et)
 
+    #   if (length(sd[["value"]]) > 1 && length(sd[["estimation_type"]]) == 1) {
+    #     if (sd[["estimation_type"]] == "constant") {
+    #       new_module$log_sd$set_estimation_types(c("constant"))
+    #     } else {
+    #       new_module$log_sd$set_estimation_types(c("fixed_effects"))
+    #     }
+    #   } else {
+    #     for (i in seq_along(sd[["estimation_type"]])) {
+    #       new_module$log_sd[i]$estimation_type$set(sd[["estimation_type"]][i])
+    #     }
+    #   }
+    # }
+  }
 
   n_dim <- length(module$field(par))
 

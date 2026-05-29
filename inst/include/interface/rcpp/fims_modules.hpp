@@ -39,10 +39,10 @@ void register_recruitment(Rcpp::Module &m);
  */
 void register_fleet(Rcpp::Module &m);
 /**
- * \brief Register the parameter module.
+ * \brief Register the variable module.
  * \param m The Rcpp module to register functions in.
  */
-void register_parameter(Rcpp::Module &m);
+void register_variable(Rcpp::Module &m);
 /**
  * \brief Register the vectors module.
  * \param m The Rcpp module to register functions in.
@@ -64,6 +64,11 @@ void register_functions(Rcpp::Module &m);
  */
 void register_fishery_models(Rcpp::Module &m);
 /**
+ * \brief Register the EDM module.
+ * \param m The Rcpp module to register functions in.
+ */
+void register_edm(Rcpp::Module &m);
+/**
  * \brief Register the maturity module.
  * \param m The Rcpp module to register functions in.
  */
@@ -76,7 +81,7 @@ void register_maturity(Rcpp::Module &m);
 RcppExport RCPP_MODULE(fims) {
   Rcpp::Module m("fims");
   register_functions(m);
-  register_parameter(m);
+  register_variable(m);
   register_vectors(m);
   register_shared(m);
   register_recruitment(m);
@@ -87,6 +92,7 @@ RcppExport RCPP_MODULE(fims) {
   register_growth(m);
   register_distributions(m);
   register_data(m);
+  register_edm(m);
   register_fishery_models(m);
 }
 

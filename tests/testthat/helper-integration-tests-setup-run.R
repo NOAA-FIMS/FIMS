@@ -56,7 +56,7 @@ prepare_test_data <- function() {
 
   # Generate dataset with missing age composition for fleet1
   data_age_comp_na <- data_age_comp_raw |>
-    dplyr::filter(!(name == "fleet1" & type == "age_comp" & timing == na_index)) |>
+    dplyr::filter(!(fleet == "fleet1" & type == "age_comp" & timing == na_index)) |>
     FIMS::FIMSFrame()
   saveRDS(
     data_age_comp_na,
@@ -68,7 +68,7 @@ prepare_test_data <- function() {
   # and index for survey1
   data_length_comp_na <- data_length_comp_raw |>
     dplyr::filter(
-      !(name == "survey1" &
+      !(fleet == "survey1" &
         type %in% c("index", "length_comp") &
         timing == na_index
       )
@@ -91,10 +91,10 @@ prepare_test_data <- function() {
   )
   data_age_length_comp_na <- data_age_length_comp_raw |>
     dplyr::filter(
-      !(name == "survey1" & type %in% c("age_comp") & timing == na_index)
+      !(fleet == "survey1" & type %in% c("age_comp") & timing == na_index)
     ) |>
     dplyr::filter(
-      !(name == "fleet1" &
+      !(fleet == "fleet1" &
         type %in% c("length_comp") &
         timing == length_na_index
       )
@@ -135,21 +135,21 @@ prepare_test_data <- function() {
     # Update log_Fmort input values for Fleet1
     dplyr::rows_update(
       tibble::tibble(
-        fleet_name = "fleet1",
+        fleet = "fleet1",
         label = "log_Fmort",
         time = 1:get_n_years(data_age_length_comp),
         value = log(om_output_list[[iter_id]][["f"]]),
       ),
-      by = c("fleet_name", "label", "time")
+      by = c("fleet", "label", "time")
     ) |>
     # Update selectivity parameters and log_q for survey1
     dplyr::rows_update(
       tibble::tibble(
-        fleet_name = "survey1",
+        fleet = "survey1",
         label = c("inflection_point", "slope", "log_q"),
         value = c(1.5, 2, log(om_output_list[[iter_id]][["survey_q"]][["survey1"]]))
       ),
-      by = c("fleet_name", "label")
+      by = c("fleet", "label")
     ) |>
     # Update log_devs in the Recruitment module (time steps 2–30)
     dplyr::rows_update(

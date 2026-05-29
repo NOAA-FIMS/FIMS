@@ -152,8 +152,10 @@ class CatchAtAge : public FisheryModelBase<Type> {
    */
   virtual void Initialize() {
     for (size_t p = 0; p < this->populations.size(); p++) {
-      this->populations[p]->proportion_female.resize(
-          this->populations[p]->n_ages);
+      if (this->populations[p]->proportion_female.size() == 0) {
+        this->populations[p]->proportion_female.resize(1);
+        this->populations[p]->proportion_female[0] = static_cast<Type>(0.5);
+      }
 
       this->populations[p]->M.resize(this->populations[p]->n_years *
                                      this->populations[p]->n_ages);
@@ -192,11 +194,6 @@ class CatchAtAge : public FisheryModelBase<Type> {
       // Reset the derived quantities for the population
       for (auto &kv : derived_quantities) {
         this->ResetVector(kv.second);
-      }
-
-      // Prepare proportion_female
-      for (size_t age = 0; age < population->n_ages; age++) {
-        population->proportion_female[age] = 0.5;
       }
 
       // Transformation Section
@@ -487,7 +484,8 @@ class CatchAtAge : public FisheryModelBase<Type> {
         this->GetPopulationDerivedQuantities(population->GetId());
 
     dq_["spawning_biomass"][year] +=
-        population->proportion_female[age] * dq_["numbers_at_age"][i_age_year] *
+        population->proportion_female.get_force_scalar(age) *
+        dq_["numbers_at_age"][i_age_year] *
         dq_["proportion_mature_at_age"][i_age_year] *
         population->growth->evaluate(year, population->ages[age]);
   }
@@ -514,7 +512,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
         this->GetPopulationDerivedQuantities(population->GetId());
 
     dq_["unfished_spawning_biomass"][year] +=
-        population->proportion_female[age] *
+        population->proportion_female.get_force_scalar(age) *
         dq_["unfished_numbers_at_age"][i_age_year] *
         dq_["proportion_mature_at_age"][i_age_year] *
         population->growth->evaluate(year, population->ages[age]);
@@ -573,12 +571,14 @@ class CatchAtAge : public FisheryModelBase<Type> {
 
     std::vector<Type> numbers_spr(population->n_ages, 1.0);
     Type phi_0 = 0.0;
-    phi_0 += numbers_spr[0] * population->proportion_female[0] *
+    phi_0 += numbers_spr[0] *
+             population->proportion_female.get_force_scalar(0) *
              dq_["proportion_mature_at_age"][0] *
              population->growth->evaluate(0, population->ages[0]);
     for (size_t a = 1; a < (population->n_ages - 1); a++) {
       numbers_spr[a] = numbers_spr[a - 1] * fims_math::exp(-population->M[a]);
-      phi_0 += numbers_spr[a] * population->proportion_female[a] *
+      phi_0 += numbers_spr[a] *
+               population->proportion_female.get_force_scalar(a) *
                dq_["proportion_mature_at_age"][a] *
                population->growth->evaluate(0, population->ages[a]);
     }
@@ -587,11 +587,12 @@ class CatchAtAge : public FisheryModelBase<Type> {
         (numbers_spr[population->n_ages - 2] *
          fims_math::exp(-population->M[population->n_ages - 2])) /
         (1 - fims_math::exp(-population->M[population->n_ages - 1]));
-    phi_0 += numbers_spr[population->n_ages - 1] *
-             population->proportion_female[population->n_ages - 1] *
-             dq_["proportion_mature_at_age"][population->n_ages - 1] *
-             population->growth->evaluate(
-                 0, population->ages[population->n_ages - 1]);
+    phi_0 +=
+        numbers_spr[population->n_ages - 1] *
+        population->proportion_female.get_force_scalar(population->n_ages - 1) *
+        dq_["proportion_mature_at_age"][population->n_ages - 1] *
+        population->growth->evaluate(0,
+                                     population->ages[population->n_ages - 1]);
 
     return phi_0;
   }
@@ -1217,7 +1218,6 @@ class CatchAtAge : public FisheryModelBase<Type> {
       // initialize fleet vectors
       vector<vector<Type>> agecomp_expected_f(n_fleets);
       vector<vector<Type>> agecomp_proportion_f(n_fleets);
-      vector<vector<Type>> catch_index_f(n_fleets);
       vector<vector<Type>> index_expected_f(n_fleets);
       vector<vector<Type>> index_numbers_f(n_fleets);
       vector<vector<Type>> index_numbers_at_age_f(n_fleets);
@@ -1282,7 +1282,6 @@ class CatchAtAge : public FisheryModelBase<Type> {
             derived_quantities["agecomp_expected"].to_tmb();
         agecomp_proportion_f(fleet_idx) =
             derived_quantities["agecomp_proportion"].to_tmb();
-        catch_index_f(fleet_idx) = derived_quantities["catch_index"].to_tmb();
         index_expected_f(fleet_idx) =
             derived_quantities["index_expected"].to_tmb();
         index_numbers_f(fleet_idx) =
@@ -1346,7 +1345,6 @@ class CatchAtAge : public FisheryModelBase<Type> {
 
       vector<Type> agecomp_expected = ADREPORTvector(agecomp_expected_f);
       vector<Type> agecomp_proportion = ADREPORTvector(agecomp_proportion_f);
-      vector<Type> catch_index = ADREPORTvector(catch_index_f);
       vector<Type> index_expected = ADREPORTvector(index_expected_f);
       vector<Type> index_numbers = ADREPORTvector(index_numbers_f);
       vector<Type> index_numbers_at_age =
@@ -1418,7 +1416,6 @@ class CatchAtAge : public FisheryModelBase<Type> {
       // report
       FIMS_REPORT_F_("agecomp_expected", agecomp_expected_f, this->of);
       FIMS_REPORT_F_("agecomp_proportion", agecomp_proportion_f, this->of);
-      FIMS_REPORT_F_("catch_index", catch_index_f, this->of);
       FIMS_REPORT_F_("index_expected", index_expected_f, this->of);
       FIMS_REPORT_F_("index_numbers", index_numbers_f, this->of);
       FIMS_REPORT_F_("index_numbers_at_age", index_numbers_at_age_f, this->of);
@@ -1444,7 +1441,6 @@ class CatchAtAge : public FisheryModelBase<Type> {
       // adreport
       ADREPORT_F(agecomp_expected, this->of);
       ADREPORT_F(agecomp_proportion, this->of);
-      ADREPORT_F(catch_index, this->of);
       ADREPORT_F(index_expected, this->of);
       ADREPORT_F(index_numbers, this->of);
       ADREPORT_F(index_numbers_at_age, this->of);

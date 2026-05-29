@@ -134,17 +134,17 @@ updated_configurations <- default_configurations_unnested |>
   dplyr::rows_update(
     y = tibble::tibble(
       module_name = c("Selectivity"),
-      fleet_name = c("survey1"),
+      fleet = c("survey1"),
       module_type = c("DoubleLogistic")
     ),
-    by = c("module_name", "fleet_name")
+    by = c("module_name", "fleet")
   )
 
 updated_configurations
 
 # Nest updated_configurations
 updated_configurations_nested <- updated_configurations |>
-  tidyr::nest(.by = c(model_family, module_name, fleet_name))
+  tidyr::nest(.by = c(model_family, module_name, fleet))
 ```
 
 ## Parameters
@@ -189,7 +189,7 @@ parameters_4_model <- default_parameters |>
   # Update log_Fmort initial values for Fleet1
   dplyr::rows_update(
     tibble::tibble(
-      fleet_name = "fleet1",
+      fleet = "fleet1",
       label = "log_Fmort",
       time = seq(get_n_years(data_4_model)),
       value = log(c(
@@ -205,16 +205,16 @@ parameters_4_model <- default_parameters |>
         0.431745298, 0.328030899, 0.499675368
       ))
     ),
-    by = c("fleet_name", "label", "time")
+    by = c("fleet", "label", "time")
   ) |>
   # Update selectivity parameters and log_q for survey1
   dplyr::rows_update(
     tibble::tibble(
-      fleet_name = "survey1",
+      fleet = "survey1",
       label = c("inflection_point", "slope", "log_q"),
       value = c(1.5, 2, log(3.315143e-07))
     ),
-    by = c("fleet_name", "label")
+    by = c("fleet", "label")
   ) |>
   # Update log_devs in the Recruitment module (time steps 2-30)
   dplyr::rows_update(
@@ -401,7 +401,7 @@ parameters_high_slope <- parameters_4_model |>
   dplyr::mutate(
     value = dplyr::if_else(
       module_name == "Selectivity" &
-        fleet_name == "survey1" &
+        fleet == "survey1" &
         label == "slope",
       2.5,
       value
@@ -412,7 +412,7 @@ parameters_low_slope <- parameters_4_model |>
   dplyr::mutate(
     value = dplyr::if_else(
       module_name == "Selectivity" &
-        fleet_name == "survey1" &
+        fleet == "survey1" &
         label == "slope",
       1,
       value

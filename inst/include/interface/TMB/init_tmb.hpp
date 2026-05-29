@@ -48,7 +48,6 @@ static const R_CallMethodDef CallEntries[] = {
 
 /**
  * @brief FIMS shared object initializer.
- * @param dll TODO: provide a brief description.
  *
  */
 __attribute__((visibility("default"))) void R_init_FIMS(DllInfo *dll) {

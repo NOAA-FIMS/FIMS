@@ -1,14 +1,5 @@
 # TODO: Document the names/items in each list that are returned
 
-# To remove the WARNING
-# no visible binding for global variable
-utils::globalVariables(c(
-  "distribution.x", "distribution.y",
-  "distribution_type.x", "distribution_type.y",
-  "fleet_name",
-  "model_family", "model_family.x", "model_family.y"
-))
-
 #' Create default parameters for a FIMS model
 #'
 #' @description
@@ -46,7 +37,7 @@ utils::globalVariables(c(
 #'     "Data", "Selectivity", "Recruitment", "Growth", "Maturity"). These
 #'     entries are always written in PascalCase to match the names used in the
 #'     C++ code.}
-#'   \item{\code{fleet_name}:}{The name of the fleet the module applies to. This
+#'   \item{\code{fleet}:}{The name of the fleet the module applies to. This
 #'     will be `NA` for non-fleet-specific modules like "Recruitment".}
 #'   \item{\code{data}:}{A list-column containing a `tibble` with detailed
 #'     parameters. Unnesting this column reveals:
@@ -97,11 +88,11 @@ utils::globalVariables(c(
 #' updated_parameters <- default_parameters |>
 #'   dplyr::rows_update(
 #'     tibble::tibble(
-#'       fleet_name = "survey1",
+#'       fleet = "survey1",
 #'       label = c("inflection_point", "slope"),
 #'       value = c(1.5, 2)
 #'     ),
-#'     by = c("fleet_name", "label")
+#'     by = c("fleet", "label")
 #'   )
 #'
 #' # Do the same as above except, model fleet1 with double logistic selectivity
@@ -112,10 +103,10 @@ utils::globalVariables(c(
 #'   dplyr::rows_update(
 #'     tibble::tibble(
 #'       module_name = "Selectivity",
-#'       fleet_name = "fleet1",
+#'       fleet = "fleet1",
 #'       module_type = "DoubleLogistic"
 #'     ),
-#'     by = c("module_name", "fleet_name")
+#'     by = c("module_name", "fleet")
 #'   ) |>
 #'   create_default_parameters(
 #'     data = fims_frame
@@ -138,16 +129,16 @@ create_default_parameters <- function(
   }
 
   # Create fleet parameters
-  fleet_names <- unnested_configurations |>
-    dplyr::pull(fleet_name) |>
+  fleets <- unnested_configurations |>
+    dplyr::pull(.data$fleet) |>
     na.omit() |>
     unique()
   fleet_temp <- purrr::map(
-    fleet_names,
-    function(fleet_name_i) {
+    fleets,
+    function(fleet_i) {
       create_default_fleet(
         unnested_configurations = unnested_configurations,
-        current_fleet_name = fleet_name_i,
+        current_fleet = fleet_i,
         data = data
       )
     }
@@ -170,8 +161,8 @@ create_default_parameters <- function(
   # Create population parameters
   # Handle population parameters based on recruitment form
   log_rzero <- recruitment_temp |>
-    dplyr::filter(label == "log_rzero") |>
-    dplyr::pull(value)
+    dplyr::filter(.data$label == "log_rzero") |>
+    dplyr::pull(.data$value)
 
   population_temp <- create_default_Population(
     unnested_configurations = unnested_configurations,
@@ -191,35 +182,36 @@ create_default_parameters <- function(
   expanded_configurations <- dplyr::full_join(
     temp,
     unnested_configurations,
-    by = c("module_name", "fleet_name", "module_type")
+    by = c("module_name", "fleet", "module_type")
   ) |>
     dplyr::mutate(
-      model_family = dplyr::coalesce(model_family.y, model_family.x),
+      model_family = dplyr::coalesce(.data$model_family.y, .data$model_family.x),
       distribution_type = dplyr::coalesce(
-        distribution_type.y,
-        distribution_type.x
+        .data$distribution_type.y,
+        .data$distribution_type.x
       ),
-      distribution = dplyr::coalesce(distribution.y, distribution.x),
+      distribution = dplyr::coalesce(.data$distribution.y, .data$distribution.x),
       distribution_type = dplyr::if_else(
-        module_name == "Recruitment" & !label %in% c("log_devs", "log_r", "log_sd"),
+        .data$module_name == "Recruitment" & !.data$label %in% c("log_devs", "log_r", "log_sd"),
         NA_character_,
-        distribution_type
+        .data$distribution_type
       ),
       distribution = dplyr::if_else(
-        module_name == "Recruitment" & !label %in% c("log_devs", "log_r", "log_sd"),
+        .data$module_name == "Recruitment" & !.data$label %in% c("log_devs", "log_r", "log_sd"),
         NA_character_,
-        distribution
+        .data$distribution
       )
     ) |>
     dplyr::select(-dplyr::ends_with(c(".x", ".y"))) |>
-    tidyr::fill(model_family, .direction = "downup") |>
+    tidyr::fill(dplyr::all_of("model_family"), .direction = "downup") |>
     dplyr::select(
-      model_family, module_name, module_type, dplyr::everything()
+      dplyr::all_of(c("model_family", "module_name", "module_type")),
+      dplyr::everything()
     ) |>
     dplyr::filter(
-      !(is.na(label) & is.na(distribution_type) & is.na(distribution) & module_name != "Growth")
+      !(is.na(.data$label) & is.na(.data$distribution_type) & is.na(.data$distribution) & .data$module_name != "Growth")
     ) |>
-    tidyr::nest(.by = c(model_family, module_name, fleet_name))
+    tidyr::nest(.by = c("model_family", "module_name", "fleet"))
 }
 
 #' Create default parameters for a FIMS model
@@ -241,7 +233,7 @@ create_default_parameters_template <- function(n_parameters = 1) {
     module_name = NA_character_,
     module_type = NA_character_,
     label = NA_character_,
-    fleet_name = NA_character_,
+    fleet = NA_character_,
     age = NA_real_,
     length = NA_real_,
     time = NA_integer_,
@@ -320,6 +312,11 @@ create_default_Population <- function(
       age = get_ages(data),
       value = log(init_naa),
       estimation_type = "fixed_effects"
+    ) |>
+    dplyr::add_row(
+      label = "proportion_female",
+      value = 0.5,
+      estimation_type = "constant"
     ) |>
     dplyr::mutate(
       module_name = "Population"
@@ -413,80 +410,80 @@ create_default_selectivity <- function(
 #'
 #' @param unnested_configurations A tibble of model configurations. Typically
 #'   created by the `create_default_configurations()`.
-#' @param fleet_name A character. Name of the fleet.
+#' @param current_fleet A character. Name of the fleet.
 #' @param data An S4 object. FIMS input data.
 #' @return
 #' A tibble with default parameters for the fleet.
 #' @noRd
 create_default_fleet <- function(unnested_configurations,
-                                 current_fleet_name,
+                                 current_fleet,
                                  data) {
   # Input checks
-  if (length(current_fleet_name) > 1) {
+  if (length(current_fleet) > 1) {
     cli::cli_abort(c(
-      "i" = "{.var current_fleet_name} should have a length of 1.",
-      "x" = "{.var current_fleet_name} has a length of
-        {length(current_fleet_name)}."
+      "i" = "{.var current_fleet} should have a length of 1.",
+      "x" = "{.var current_fleet} has a length of
+        {length(current_fleet)}."
     ))
   }
-  if (!inherits(current_fleet_name, "character")) {
+  if (!inherits(current_fleet, "character")) {
     cli::cli_abort(c(
-      "i" = "{.var current_fleet_name} should be a string.",
-      "x" = "{.var current_fleet_name} is a {class(current_fleet_name)}."
+      "i" = "{.var current_fleet} should be a string.",
+      "x" = "{.var current_fleet} is a {class(current_fleet)}."
     ))
   }
 
   # Create default selectivity parameters
   selectivity_form <- unnested_configurations |>
-    dplyr::filter(fleet_name == current_fleet_name & module_name == "Selectivity") |>
-    dplyr::pull(module_type)
+    dplyr::filter(.data$fleet == current_fleet & .data$module_name == "Selectivity") |>
+    dplyr::pull(.data$module_type)
 
   selectivity_default <- create_default_selectivity(
     form = selectivity_form
   ) |>
     # Add fleet name
     dplyr::mutate(
-      fleet_name = current_fleet_name
+      fleet = current_fleet
     )
 
   # Get types of data for this fleet from the data object
   data_types_present <- get_data(data) |>
-    dplyr::filter(name == current_fleet_name) |>
-    dplyr::pull(type) |>
+    dplyr::filter(.data$fleet == current_fleet) |>
+    dplyr::pull(.data$type) |>
     unique()
 
   # Get data likelihood distributions assigned for this fleet
   distribution_names_for_fleet <- unnested_configurations |>
-    dplyr::filter(fleet_name == current_fleet_name & module_name == "Data") |>
-    dplyr::pull(module_type)
+    dplyr::filter(.data$fleet == current_fleet & .data$module_name == "Data") |>
+    dplyr::pull(.data$module_type)
 
   # Determine default fleet parameters based on types of data present
   if ("index" %in% data_types_present &&
     "Index" %in% distribution_names_for_fleet) {
     fleet_index <- get_data(data) |>
-      dplyr::filter(type == "index" & name == current_fleet_name) |>
-      dplyr::rename(time = timing)
+      dplyr::filter(.data$type == "index" & .data$fleet == current_fleet) |>
+      dplyr::rename(time = dplyr::all_of("timing"))
 
     q_default <- create_default_parameters_template(n_parameters = 1) |>
       dplyr::mutate(
         module_name = "Fleet",
         label = "log_q",
-        fleet_name = current_fleet_name,
+        fleet = current_fleet,
         value = 0,
         estimation_type = "fixed_effects"
       )
 
     index_distribution <- unnested_configurations |>
       dplyr::filter(
-        fleet_name == current_fleet_name &
-          module_name == "Data" & module_type == "Index"
+        .data$fleet == current_fleet &
+          .data$module_name == "Data" & .data$module_type == "Index"
       ) |>
-      dplyr::pull(distribution)
+      dplyr::pull(.data$distribution)
 
     index_uncertainty <- get_data(data) |>
-      dplyr::filter(name == current_fleet_name, type %in% c("index")) |>
-      dplyr::arrange(dplyr::desc(type)) |>
-      dplyr::pull(uncertainty)
+      dplyr::filter(.data$fleet == current_fleet, .data$type %in% c("index")) |>
+      dplyr::arrange(dplyr::desc(.data$type)) |>
+      dplyr::pull(.data$uncertainty)
 
     index_distribution_default <- switch(index_distribution,
       "Dnorm" = create_default_DnormDistribution(
@@ -503,7 +500,7 @@ create_default_fleet <- function(unnested_configurations,
       dplyr::mutate(
         module_name = "Data",
         module_type = "Index",
-        fleet_name = current_fleet_name,
+        fleet = current_fleet,
         time = fleet_index[["time"]]
       )
   } else {
@@ -511,7 +508,7 @@ create_default_fleet <- function(unnested_configurations,
       dplyr::mutate(
         module_name = "Fleet",
         label = "log_q",
-        fleet_name = current_fleet_name,
+        fleet = current_fleet,
         value = 0,
         estimation_type = "constant"
       )
@@ -521,8 +518,8 @@ create_default_fleet <- function(unnested_configurations,
   if ("landings" %in% data_types_present &&
     "Landings" %in% distribution_names_for_fleet) {
     fleet_landings <- get_data(data) |>
-      dplyr::filter(type == "landings" & name == current_fleet_name) |>
-      dplyr::rename(time = timing)
+      dplyr::filter(.data$type == "landings" & .data$fleet == current_fleet) |>
+      dplyr::rename(time = dplyr::all_of("timing"))
 
     log_Fmort_default <- create_default_parameters_template(
       n_parameters = get_n_years(data)
@@ -530,7 +527,7 @@ create_default_fleet <- function(unnested_configurations,
       dplyr::mutate(
         module_name = "Fleet",
         label = "log_Fmort",
-        fleet_name = current_fleet_name,
+        fleet = current_fleet,
         time = get_start_year(data):get_end_year(data),
         value = -3,
         estimation_type = "fixed_effects"
@@ -538,15 +535,15 @@ create_default_fleet <- function(unnested_configurations,
 
     landings_distribution <- unnested_configurations |>
       dplyr::filter(
-        fleet_name == current_fleet_name &
-          module_name == "Data" & module_type == "Landings"
+        .data$fleet == current_fleet &
+          .data$module_name == "Data" & .data$module_type == "Landings"
       ) |>
-      dplyr::pull(distribution)
+      dplyr::pull(.data$distribution)
 
     landings_uncertainty <- get_data(data) |>
-      dplyr::filter(name == current_fleet_name, type %in% c("landings")) |>
-      dplyr::arrange(dplyr::desc(type)) |>
-      dplyr::pull(uncertainty)
+      dplyr::filter(.data$fleet == current_fleet, .data$type %in% c("landings")) |>
+      dplyr::arrange(dplyr::desc(.data$type)) |>
+      dplyr::pull(.data$uncertainty)
 
     landings_distribution_default <- switch(landings_distribution,
       "Dnorm" = create_default_DnormDistribution(
@@ -563,12 +560,12 @@ create_default_fleet <- function(unnested_configurations,
       dplyr::mutate(
         module_name = "Data",
         module_type = "Landings",
-        fleet_name = current_fleet_name,
+        fleet = current_fleet,
         time = fleet_landings[["time"]]
       )
   } else {
     fleet_index <- get_data(data) |>
-      dplyr::filter(type == "index" & name == current_fleet_name)
+      dplyr::filter(.data$type == "index" & .data$fleet == current_fleet)
 
     log_Fmort_default <- create_default_parameters_template(
       n_parameters = get_n_years(data)
@@ -576,7 +573,7 @@ create_default_fleet <- function(unnested_configurations,
       dplyr::mutate(
         module_name = "Fleet",
         label = "log_Fmort",
-        fleet_name = current_fleet_name,
+        fleet = current_fleet,
         time = get_start_year(data):get_end_year(data),
         value = -200,
         estimation_type = "constant"
@@ -611,8 +608,8 @@ create_default_maturity <- function(
   # Input checks
   available_forms <- c("Logistic")
   form <- unnested_configurations |>
-    dplyr::filter(module_name == "Maturity") |>
-    dplyr::pull(module_type)
+    dplyr::filter(.data$module_name == "Maturity") |>
+    dplyr::pull(.data$module_type)
   if (!form %in% available_forms) {
     cli::cli_abort(c(
       "Invalid `module_type`` for Maturity: {.var {form}}",
@@ -814,8 +811,8 @@ create_default_recruitment <- function(
   available_recruitment_forms <- c("BevertonHolt")
   available_distribution_forms <- c("Dnorm")
   form <- unnested_configurations |>
-    dplyr::filter(module_name == "Recruitment") |>
-    dplyr::pull(module_type)
+    dplyr::filter(.data$module_name == "Recruitment") |>
+    dplyr::pull(.data$module_type)
   if (length(form) != 1) {
     cli::cli_abort(
       "There must be exactly one form (e.g., BevertonHolt) associated with
@@ -829,8 +826,8 @@ create_default_recruitment <- function(
     ))
   }
   distribution <- unnested_configurations |>
-    dplyr::filter(module_name == "Recruitment") |>
-    dplyr::pull(distribution)
+    dplyr::filter(.data$module_name == "Recruitment") |>
+    dplyr::pull(.data$distribution)
   if (length(distribution) != 1) {
     cli::cli_abort(
       "There must be at most one distribution associated with Recruitment."
@@ -872,5 +869,5 @@ create_default_recruitment <- function(
   }
 
   default <- dplyr::bind_rows(form_default, distribution_default) |>
-    tidyr::fill(module_name, module_type)
+    tidyr::fill(dplyr::all_of(c("module_name", "module_type")))
 }

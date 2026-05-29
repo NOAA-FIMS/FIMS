@@ -77,11 +77,11 @@ class LogisticMaturityInterface : public MaturityInterfaceBase {
   /**
    * @brief The index value at which the response reaches 0.5.
    */
-  ParameterVector inflection_point;
+  VariableVector inflection_point;
   /**
    * @brief The width of the curve at the inflection point.
    */
-  ParameterVector slope;
+  VariableVector slope;
 
   /**
    * @brief The constructor.

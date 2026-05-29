@@ -23,7 +23,7 @@ target_link_libraries(fimsMath_fimsMath_exp
   gtest_main
   fims_test
 )
-gtest_discover_tests(fimsMath_fimsMath_exp)
+gtest_discover_tests(fimsMath_fimsMath_exp DISCOVERY_MODE PRE_TEST)
 
 # test_fimsMath_fimsMath_log.cpp
 add_executable(fimsMath_fimsMath_log
@@ -34,7 +34,7 @@ target_link_libraries(fimsMath_fimsMath_log
   gtest_main
   fims_test
 )
-gtest_discover_tests(fimsMath_fimsMath_log)
+gtest_discover_tests(fimsMath_fimsMath_log DISCOVERY_MODE PRE_TEST)
 
 # test_fimsMath_fimsMath_logistic.cpp
 add_executable(fimsMath_fimsMath_logistic
@@ -45,7 +45,7 @@ target_link_libraries(fimsMath_fimsMath_logistic
   gtest_main
   fims_test
 )
-gtest_discover_tests(fimsMath_fimsMath_logistic)
+gtest_discover_tests(fimsMath_fimsMath_logistic DISCOVERY_MODE PRE_TEST)
 
 # test_fimsMath_fimsMath_doubleLogistic.cpp
 add_executable(fimsMath_fimsMath_doubleLogistic
@@ -56,7 +56,7 @@ target_link_libraries(fimsMath_fimsMath_doubleLogistic
   gtest_main
   fims_test
 )
-gtest_discover_tests(fimsMath_fimsMath_doubleLogistic)
+gtest_discover_tests(fimsMath_fimsMath_doubleLogistic DISCOVERY_MODE PRE_TEST)
 
 # test_fimsMath_fimsMath_adFabsMinMax.cpp
 add_executable(fimsMath_fimsMath_adFabsMinMax
@@ -67,7 +67,7 @@ target_link_libraries(fimsMath_fimsMath_adFabsMinMax
   gtest_main
   fims_test
 )
-gtest_discover_tests(fimsMath_fimsMath_adFabsMinMax)
+gtest_discover_tests(fimsMath_fimsMath_adFabsMinMax DISCOVERY_MODE PRE_TEST)
 
 # test_fimsMath_fimsMath_logit.cpp
 add_executable(fimsMath_fimsMath_logit
@@ -78,7 +78,18 @@ target_link_libraries(fimsMath_fimsMath_logit
   gtest_main
   fims_test
 )
-gtest_discover_tests(fimsMath_fimsMath_logit)
+gtest_discover_tests(fimsMath_fimsMath_logit DISCOVERY_MODE PRE_TEST)
+
+# test_fimsObject_MemoryTracker.cpp
+add_executable(fimsObject_MemoryTracker
+  test_fimsObject_MemoryTracker.cpp
+)
+add_as_invoker_manifest(fimsObject_MemoryTracker)
+target_link_libraries(fimsObject_MemoryTracker
+  gtest_main
+  fims_test
+)
+gtest_discover_tests(fimsObject_MemoryTracker DISCOVERY_MODE PRE_TEST)
 
 # test_growth_EWAAGrowth_evaluate.cpp
 add_executable(growth_EWAAGrowth_evaluate
@@ -89,7 +100,7 @@ target_link_libraries(growth_EWAAGrowth_evaluate
   gtest_main
   fims_test
 )
-gtest_discover_tests(growth_EWAAGrowth_evaluate)
+gtest_discover_tests(growth_EWAAGrowth_evaluate DISCOVERY_MODE PRE_TEST)
 
 # test_information_Information_SetupPriors.cpp
 add_executable(information_Information_SetupPriors
@@ -100,7 +111,7 @@ target_link_libraries(information_Information_SetupPriors
   gtest_main
   fims_test
 )
-gtest_discover_tests(information_Information_SetupPriors)
+gtest_discover_tests(information_Information_SetupPriors DISCOVERY_MODE PRE_TEST)
 
 # test_information_Information_SetupRandomEffects.cpp
 add_executable(information_Information_SetupRandomEffects
@@ -111,7 +122,7 @@ target_link_libraries(information_Information_SetupRandomEffects
   gtest_main
   fims_test
 )
-gtest_discover_tests(information_Information_SetupRandomEffects)
+gtest_discover_tests(information_Information_SetupRandomEffects DISCOVERY_MODE PRE_TEST)
 
 # test_srBevertonHolt_SRBevertonHolt_evaluateMean.cpp
 add_executable(srBevertonHolt_SRBevertonHolt_evaluateMean
@@ -122,7 +133,7 @@ target_link_libraries(srBevertonHolt_SRBevertonHolt_evaluateMean
   gtest_main
   fims_test
 )
-gtest_discover_tests(srBevertonHolt_SRBevertonHolt_evaluateMean)
+gtest_discover_tests(srBevertonHolt_SRBevertonHolt_evaluateMean DISCOVERY_MODE PRE_TEST)
 
 # test_maturityLogistic_LogisticMaturity_evaluate.cpp
 add_executable(maturityLogistic_LogisticMaturity_evaluate
@@ -133,7 +144,7 @@ target_link_libraries(maturityLogistic_LogisticMaturity_evaluate
   gtest_main
   fims_test
 )
-gtest_discover_tests(maturityLogistic_LogisticMaturity_evaluate)
+gtest_discover_tests(maturityLogistic_LogisticMaturity_evaluate DISCOVERY_MODE PRE_TEST)
 
 # test_recruitmentBase_SRBevertonHolt_PrepareConstrainedDeviations.cpp
 add_executable(recruitmentBase_SRBevertonHolt_PrepareConstrainedDeviations
@@ -144,7 +155,7 @@ target_link_libraries(recruitmentBase_SRBevertonHolt_PrepareConstrainedDeviation
   gtest_main
   fims_test
 )
-gtest_discover_tests(recruitmentBase_SRBevertonHolt_PrepareConstrainedDeviations)
+gtest_discover_tests(recruitmentBase_SRBevertonHolt_PrepareConstrainedDeviations DISCOVERY_MODE PRE_TEST)
 
 # test_recruitmentProcess_SRBevertonHolt_evaluateProcess.cpp
 add_executable(recruitmentProcess_SRBevertonHolt_evaluateProcess
@@ -155,7 +166,7 @@ target_link_libraries(recruitmentProcess_SRBevertonHolt_evaluateProcess
   gtest_main
   fims_test
 )
-gtest_discover_tests(recruitmentProcess_SRBevertonHolt_evaluateProcess)
+gtest_discover_tests(recruitmentProcess_SRBevertonHolt_evaluateProcess DISCOVERY_MODE PRE_TEST)
 
 # test_fleet_Fleet_InitializePrepare.cpp
 add_executable(fleet_Fleet_InitializePrepare
@@ -166,7 +177,7 @@ target_link_libraries(fleet_Fleet_InitializePrepare
   gtest_main
   fims_test
 )
-gtest_discover_tests(fleet_Fleet_InitializePrepare)
+gtest_discover_tests(fleet_Fleet_InitializePrepare DISCOVERY_MODE PRE_TEST)
 
 # test_population_Population_InitializePrepare.cpp
 add_executable(population_Population_InitializePrepare
@@ -177,7 +188,7 @@ target_link_libraries(population_Population_InitializePrepare
   gtest_main
   fims_test
 )
-gtest_discover_tests(population_Population_InitializePrepare)
+gtest_discover_tests(population_Population_InitializePrepare DISCOVERY_MODE PRE_TEST)
 
 # test_population_CatchAtAge_CalculateBiomass.cpp
 add_executable(population_CatchAtAge_CalculateBiomass
@@ -188,7 +199,7 @@ target_link_libraries(population_CatchAtAge_CalculateBiomass
   gtest_main
   fims_test
 )
-gtest_discover_tests(population_CatchAtAge_CalculateBiomass)
+gtest_discover_tests(population_CatchAtAge_CalculateBiomass DISCOVERY_MODE PRE_TEST)
 
 # test_population_CatchAtAge_CalculateLandings.cpp
 add_executable(population_CatchAtAge_CalculateLandings
@@ -199,7 +210,7 @@ target_link_libraries(population_CatchAtAge_CalculateLandings
   gtest_main
   fims_test
 )
-gtest_discover_tests(population_CatchAtAge_CalculateLandings)
+gtest_discover_tests(population_CatchAtAge_CalculateLandings DISCOVERY_MODE PRE_TEST)
 
 # test_population_CatchAtAge_CalculateLandingsNumbersAA.cpp
 add_executable(population_CatchAtAge_CalculateLandingsNumbersAA
@@ -210,7 +221,7 @@ target_link_libraries(population_CatchAtAge_CalculateLandingsNumbersAA
   gtest_main
   fims_test
 )
-gtest_discover_tests(population_CatchAtAge_CalculateLandingsNumbersAA)
+gtest_discover_tests(population_CatchAtAge_CalculateLandingsNumbersAA DISCOVERY_MODE PRE_TEST)
 
 # test_population_CatchAtAge_CalculateIndex.cpp
 add_executable(population_CatchAtAge_CalculateIndex
@@ -221,7 +232,7 @@ target_link_libraries(population_CatchAtAge_CalculateIndex
   gtest_main
   fims_test
 )
-gtest_discover_tests(population_CatchAtAge_CalculateIndex)
+gtest_discover_tests(population_CatchAtAge_CalculateIndex DISCOVERY_MODE PRE_TEST)
 
 # test_population_CatchAtAge_CalculateMaturityAA.cpp
 add_executable(population_CatchAtAge_CalculateMaturityAA
@@ -232,7 +243,7 @@ target_link_libraries(population_CatchAtAge_CalculateMaturityAA
   gtest_main
   fims_test
 )
-gtest_discover_tests(population_CatchAtAge_CalculateMaturityAA)
+gtest_discover_tests(population_CatchAtAge_CalculateMaturityAA DISCOVERY_MODE PRE_TEST)
 
 # test_population_CatchAtAge_CalculateNumbersAA.cpp
 add_executable(population_CatchAtAge_CalculateNumbersAA
@@ -243,18 +254,70 @@ target_link_libraries(population_CatchAtAge_CalculateNumbersAA
   gtest_main
   fims_test
 )
-gtest_discover_tests(population_CatchAtAge_CalculateNumbersAA)
+gtest_discover_tests(population_CatchAtAge_CalculateNumbersAA DISCOVERY_MODE PRE_TEST)
+
 
 # test_population_CatchAtAge_CalculateRecruitment.cpp
 add_executable(population_CatchAtAge_CalculateRecruitment
   test_population_CatchAtAge_CalculateRecruitment.cpp
 )
+
 add_as_invoker_manifest(population_CatchAtAge_CalculateRecruitment)
+
 target_link_libraries(population_CatchAtAge_CalculateRecruitment
   gtest_main
   fims_test
 )
-gtest_discover_tests(population_CatchAtAge_CalculateRecruitment)
+
+gtest_discover_tests(population_CatchAtAge_CalculateRecruitment DISCOVERY_MODE PRE_TEST)
+
+# test_edm_delay_embedding.cpp
+add_executable(edm_delay_embedding
+  test_edm_delay_embedding.cpp
+)
+
+target_link_libraries(edm_delay_embedding
+  gtest_main
+  fims_test
+)
+
+gtest_discover_tests(edm_delay_embedding DISCOVERY_MODE PRE_TEST)
+
+# test_edm_simplex_projection.cpp
+add_executable(edm_simplex_projection
+  test_edm_simplex_projection.cpp
+)
+
+target_link_libraries(edm_simplex_projection
+  gtest_main
+  fims_test
+)
+
+gtest_discover_tests(edm_simplex_projection DISCOVERY_MODE PRE_TEST)
+
+# test_edm_smap_projection.cpp
+add_executable(edm_smap_projection
+  test_edm_smap_projection.cpp
+)
+
+target_link_libraries(edm_smap_projection
+  gtest_main
+  fims_test
+)
+
+gtest_discover_tests(edm_smap_projection DISCOVERY_MODE PRE_TEST)
+
+# test_edm_gp_projection.cpp
+add_executable(edm_gp_projection
+  test_edm_gp_projection.cpp
+)
+
+target_link_libraries(edm_gp_projection
+  gtest_main
+  fims_test
+)
+
+gtest_discover_tests(edm_gp_projection DISCOVERY_MODE PRE_TEST)
 
 # test_population_CatchAtAge_CalculateUnfishedInitial.cpp
 add_executable(population_CatchAtAge_CalculateUnfishedInitial
@@ -265,7 +328,7 @@ target_link_libraries(population_CatchAtAge_CalculateUnfishedInitial
   gtest_main
   fims_test
 )
-gtest_discover_tests(population_CatchAtAge_CalculateUnfishedInitial)
+gtest_discover_tests(population_CatchAtAge_CalculateUnfishedInitial DISCOVERY_MODE PRE_TEST)
 
 # test_Logistic_LogisticSelectivity_Evaluate.cpp
 add_executable(Logistic_LogisticSelectivity_Evaluate
@@ -276,7 +339,7 @@ target_link_libraries(Logistic_LogisticSelectivity_Evaluate
   gtest_main
   fims_test
 )
-gtest_discover_tests(Logistic_LogisticSelectivity_Evaluate)
+gtest_discover_tests(Logistic_LogisticSelectivity_Evaluate DISCOVERY_MODE PRE_TEST)
 
 # test_DoubleLogistic_DoubleLogisticSelectivity_Evaluate.cpp
 add_executable(DoubleLogistic_DoubleLogisticSelectivity_Evaluate
@@ -287,7 +350,7 @@ target_link_libraries(DoubleLogistic_DoubleLogisticSelectivity_Evaluate
   gtest_main
   fims_test
 )
-gtest_discover_tests(DoubleLogistic_DoubleLogisticSelectivity_Evaluate)
+gtest_discover_tests(DoubleLogistic_DoubleLogisticSelectivity_Evaluate DISCOVERY_MODE PRE_TEST)
 
 # test_FIMSJson_JsonParser_Parse.cpp
 add_executable(FIMSJson_JsonParser_Parse
@@ -298,7 +361,7 @@ target_link_libraries(FIMSJson_JsonParser_Parse
   gtest_main
   fims_test
 )
-gtest_discover_tests(FIMSJson_JsonParser_Parse)
+gtest_discover_tests(FIMSJson_JsonParser_Parse DISCOVERY_MODE PRE_TEST)
 
 # test_FIMSJson_JsonParser_WriteToFile.cpp
 add_executable(FIMSJson_JsonParser_WriteToFile
@@ -309,7 +372,7 @@ target_link_libraries(FIMSJson_JsonParser_WriteToFile
   gtest_main
   fims_test
 )
-gtest_discover_tests(FIMSJson_JsonParser_WriteToFile)
+gtest_discover_tests(FIMSJson_JsonParser_WriteToFile DISCOVERY_MODE PRE_TEST)
 
 # test_def_FIMSLog_clear.cpp
 add_executable(def_FIMSLog_clear
@@ -320,4 +383,27 @@ target_link_libraries(def_FIMSLog_clear
   gtest_main
   fims_test
 )
-gtest_discover_tests(def_FIMSLog_clear)
+gtest_discover_tests(def_FIMSLog_clear DISCOVERY_MODE PRE_TEST)
+
+# test_distributions_mvnorm.cpp
+add_executable(distributions_mvnorm
+  test_distributions_mvnorm.cpp
+)
+add_as_invoker_manifest(distributions_mvnorm)
+target_link_libraries(distributions_mvnorm
+  gtest_main
+  fims_test
+)
+gtest_discover_tests(distributions_mvnorm DISCOVERY_MODE PRE_TEST)
+
+# test_distributions_beta.cpp
+add_executable(distributions_beta
+  test_distributions_beta.cpp
+)
+add_as_invoker_manifest(distributions_beta)
+target_link_libraries(distributions_beta
+  gtest_main
+  fims_test
+)
+gtest_discover_tests(distributions_beta DISCOVERY_MODE PRE_TEST)
+

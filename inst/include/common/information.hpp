@@ -23,6 +23,7 @@
 #include "../population_dynamics/population/population.hpp"
 #include "../population_dynamics/recruitment/recruitment.hpp"
 #include "../population_dynamics/selectivity/selectivity.hpp"
+#include "../edm/edm_model.hpp"
 #include "fims_vector.hpp"
 #include "model_object.hpp"
 
@@ -130,6 +131,15 @@ class Information {
       density_components_iterator;
   /**< iterator for distribution objects>*/
 
+  // EDM models
+  std::map<uint32_t, std::shared_ptr<fims_edm::EDMModel<Type>>>
+      edm_models; /**<hash map to link each EDM model object to its shared location in memory*/
+  typedef typename std::map<
+      uint32_t,
+      std::shared_ptr<fims_edm::EDMModel<Type>>>::iterator
+      edm_models_iterator;
+  /**< iterator for EDM model objects>*/
+
   std::unordered_map<uint32_t,
                      std::shared_ptr<fims_popdy::FisheryModelBase<Type>>>
       models_map; /**<hash map of fishery models, e.g., CAA, GMACS, Spatial,
@@ -163,27 +173,54 @@ class Information {
     this->parameters.clear();
     this->random_effects_names.clear();
     this->random_effects_parameters.clear();
-    this->recruitment_models.clear();
-    this->recruitment_process_models.clear();
     this->selectivity_models.clear();
     this->models_map.clear();
+    this->edm_models.clear();
     this->n_years = 0;
     this->n_ages = 0;
+
+    for (recruitment_models_iterator it = recruitment_models.begin();
+         it != recruitment_models.end(); ++it) {
+      std::shared_ptr<fims_popdy::RecruitmentBase<Type>> recruitment =
+          (*it).second;
+      if (recruitment->process) {
+        recruitment->process.reset();
+      }
+      if (recruitment->recruitment) {
+        recruitment->recruitment.reset();
+      }
+    }
+    for (recruitment_process_iterator it = recruitment_process_models.begin();
+         it != recruitment_process_models.end(); ++it) {
+      std::shared_ptr<fims_popdy::RecruitmentBase<Type>> recruitment =
+          (*it).second;
+      if (recruitment->process) {
+        recruitment->process.reset();
+      }
+      if (recruitment->recruitment) {
+        recruitment->recruitment.reset();
+      }
+    }
+    this->recruitment_models.clear();
+    this->recruitment_process_models.clear();
 
     for (density_components_iterator it = density_components.begin();
          it != density_components.end(); ++it) {
       std::shared_ptr<fims_distributions::DensityComponentBase<Type>> d =
           (*it).second;
-      if ((d->priors)[0] != NULL) {
+      if ((d->priors)[0]) {
         d->priors.clear();
       }
-      if (d->data_expected_values != NULL) {
+      if (d->data_observed_values) {
+        d->data_observed_values.reset();
+      }
+      if (d->data_expected_values) {
         d->data_expected_values->clear();
       }
-      if (d->re != NULL) {
+      if (d->re) {
         d->re->clear();
       }
-      if (d->re_expected_values != NULL) {
+      if (d->re_expected_values) {
         d->re_expected_values->clear();
       }
     }
@@ -342,6 +379,11 @@ class Information {
    * if distribution is a data type.
    */
   void SetupData() {
+    for (edm_models_iterator it = this->edm_models.begin();
+         it != this->edm_models.end(); ++it) {
+      this->variable_map[it->first] = &(it->second->predictions);
+    }
+
     for (density_components_iterator it = this->density_components.begin();
          it != this->density_components.end(); ++it) {
       std::shared_ptr<fims_distributions::DensityComponentBase<Type>> d =
@@ -355,6 +397,7 @@ class Information {
                       fims::to_string(d->key[0]));
         vmit = this->variable_map.find(d->key[0]);
         d->data_expected_values = (*vmit).second;
+        // TODO(EDM): Add EDM prediction vectors to variable_map before this link.
         FIMS_INFO_LOG(
             "Expected value size for distribution " + fims::to_string(d->id) +
             " is: " + fims::to_string((*d->data_expected_values).size()));
@@ -836,6 +879,7 @@ class Information {
     // setup priors, random effect, and data density components
     SetupPriors();
     SetupRandomEffects();
+    // TODO(EDM): Register EDM expected values before SetupData().
     SetupData();
 
     if (valid_model) {

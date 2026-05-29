@@ -3,6 +3,18 @@ name: run-googletest
 
 on:
   push:
+  pull_request:
+    branches:
+      - main
+    paths-ignore:
+      - .devcontainer
+      - .github
+      - '.gitignore'
+      - '.Rbuildignore'
+      - 'CONTRIBUTING.md'
+      - 'LICENSE'
+      - 'man'
+      - 'README.md'
   workflow_dispatch:
 
 jobs:
@@ -16,7 +28,7 @@ jobs:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
     - name: Install Ninja
       shell: bash
       run: ${{ runner.os == 'macOS' && 'brew install ninja' || runner.os == 'Windows' && 'choco install ninja' || 'sudo apt-get install ninja-build' }}

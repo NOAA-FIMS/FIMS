@@ -12,6 +12,8 @@
 \alias{get_opt,FIMSFit-method}
 \alias{get_max_gradient}
 \alias{get_max_gradient,FIMSFit-method}
+\alias{get_gradient}
+\alias{get_gradient,FIMSFit-method}
 \alias{get_sdreport}
 \alias{get_sdreport,FIMSFit-method}
 \alias{get_estimates}
@@ -45,6 +47,10 @@ get_opt(x)
 get_max_gradient(x)
 
 \S4method{get_max_gradient}{FIMSFit}(x)
+
+get_gradient(x)
+
+\S4method{get_gradient}{FIMSFit}(x)
 
 get_sdreport(x)
 
@@ -87,6 +93,11 @@ in \code{\link[=fit_fims]{fit_fims()}}.
 
 \code{\link[=get_max_gradient]{get_max_gradient()}} returns the maximum gradient found when optimizing the
 model.
+
+\code{\link[=get_gradient]{get_gradient()}} returns the per-parameter gradient vector at the MLE as
+stored during fitting. Unlike calling \code{get_obj(x)[["gr"]](get_opt(x)[["par"]])}
+this function is safe to call after \code{\link[=clear]{clear()}} because it reads
+from a stored R vector rather than the compiled C++ objective function.
 
 \code{\link[=get_sdreport]{get_sdreport()}} returns the list from \code{\link[TMB:sdreport]{TMB::sdreport()}}.
 

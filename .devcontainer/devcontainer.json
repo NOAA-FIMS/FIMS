@@ -20,8 +20,7 @@
       "updatePackages": true
     },
     "ghcr.io/rocker-org/devcontainer-features/r-packages:1": {
-      // covr, DT, htmltools, markdown, and testdown need to be installed for `lozen::build_pkgdown_with_reports()`
-      "packages": "covr,dplyr,devtools,DT,ggplot2,graphics,htmltools,jsonlite,github::ThinkR-open/lozen,github::noaa-afsc/SparseNUTS,markdown,methods,Rcpp,RcppEigen,scales,snowfall,github::ThinkR-open/testdown,TMB,tibble,tidyr,usethis,spelling",
+      "packages": "covr,dplyr,devtools,ggplot2,graphics,jsonlite,github::noaa-afsc/SparseNUTS,methods,Rcpp,RcppEigen,scales,snowfall,TMB,tibble,tidyr,usethis",
       "installSystemRequirements": true
     },
     // option to run rstudio. you can type rserver into the command line to

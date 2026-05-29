@@ -1,0 +1,20 @@
+name: Cleanup Development Branch Actions on Merge to Main
+
+on:
+  pull_request:
+    branches: [main]
+    types: [closed] # Triggers when a PR is merged or closed
+
+jobs:
+  cancel-active-runs:
+    # Only run this if the PR was actually merged into main, not just closed.
+    if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cancel Duplicate Workflow Runs
+        uses: styfle/cancel-workflow-action@0.13.1
+        with:
+          # Targets the workflow runs belonging specifically to the merged branch head sha
+          workflow_id: all
+          all_but_latest: false
+          access_token: ${{ github.token }}

@@ -105,7 +105,7 @@ namespace
         }
         EXPECT_EQ(catch_at_age_model->populations[0]->M.size(), n_years * n_ages);
 
-        // Test population.proportion_female
+        // proportion_female is user-provided; Prepare() does not reset it
         fims::Vector<double> p_female(n_ages, 0.5);
         for(int i = 0; i < n_ages; i++)
         {
