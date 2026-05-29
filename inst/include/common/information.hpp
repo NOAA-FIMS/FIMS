@@ -372,6 +372,73 @@ class Information {
   }
 
   /**
+   * @brief Mirror legacy random-effect density components into likelihood
+   * terms.
+   *
+   * @details This builds the new composable representation without changing
+   * model evaluation. Only complete normal and lognormal random-effect
+   * distributions are mirrored.
+   */
+  void SetupRandomEffectLikelihoodTerms() {
+    this->RemoveLikelihoodTerms(
+        fims_likelihood::LikelihoodTermType::RandomEffect);
+
+    for (density_components_iterator it = density_components.begin();
+         it != density_components.end(); ++it) {
+      std::shared_ptr<fims_distributions::DensityComponentBase<Type>> d =
+          (*it).second;
+      if (d->input_type != "random_effects" || d->re == NULL ||
+          d->re_expected_values == NULL || d->get_n_x() == 0 ||
+          d->get_n_expected() == 0) {
+        continue;
+      }
+
+      fims_likelihood::ValueRef<Type> x(
+          [d](size_t i) -> Type { return d->get_observed(i); }, d->get_n_x());
+      fims_likelihood::ValueRef<Type> location(
+          [d](size_t i) -> Type { return d->get_expected(i); },
+          d->get_n_expected());
+
+      std::shared_ptr<fims_distributions::NormalLPDF<Type>> normal =
+          std::dynamic_pointer_cast<fims_distributions::NormalLPDF<Type>>(d);
+      if (normal && normal->log_sd.size() > 0) {
+        fims_likelihood::ValueRef<Type> scale(
+            [normal](size_t i) -> Type {
+              return fims_math::exp(normal->log_sd.get_force_scalar(i));
+            },
+            normal->log_sd.size());
+        std::shared_ptr<fims_likelihood::LikelihoodTerm<Type>> term =
+            std::make_shared<fims_likelihood::LikelihoodTerm<Type>>(
+                fims_likelihood::LikelihoodTermType::RandomEffect,
+                "normal_random_effect." + fims::to_string(d->id), x, location,
+                scale, fims_distributions::kernels::Normal<Type>::log_density);
+        term->source_id = d->id;
+        this->likelihood_terms.push_back(term);
+        continue;
+      }
+
+      std::shared_ptr<fims_distributions::LogNormalLPDF<Type>> lognormal =
+          std::dynamic_pointer_cast<fims_distributions::LogNormalLPDF<Type>>(d);
+      if (lognormal && lognormal->log_sd.size() > 0) {
+        fims_likelihood::ValueRef<Type> scale(
+            [lognormal](size_t i) -> Type {
+              return fims_math::exp(lognormal->log_sd.get_force_scalar(i));
+            },
+            lognormal->log_sd.size());
+        std::shared_ptr<fims_likelihood::LikelihoodTerm<Type>> term =
+            std::make_shared<fims_likelihood::LikelihoodTerm<Type>>(
+                fims_likelihood::LikelihoodTermType::RandomEffect,
+                "lognormal_random_effect." + fims::to_string(d->id), x,
+                location, scale,
+                fims_distributions::kernels::LogNormal<
+                    Type>::log_density_log_scale);
+        term->source_id = d->id;
+        this->likelihood_terms.push_back(term);
+      }
+    }
+  }
+
+  /**
    * @brief Loop over distributions and set links to distribution x value if
    * distribution is a prior type.
    */
@@ -429,6 +496,7 @@ class Information {
                       " is: " + fims::to_string(d->observed_values.size()));
       }
     }
+    this->SetupRandomEffectLikelihoodTerms();
   }
 
   /**

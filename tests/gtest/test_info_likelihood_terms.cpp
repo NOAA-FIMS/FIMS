@@ -114,4 +114,90 @@ TEST(InformationLikelihoodTerms, MirrorsLognormalPriorDensityComponent) {
   info->Clear();
 }
 
+TEST(InformationLikelihoodTerms, MirrorsNormalRandomEffectDensityComponent) {
+  std::shared_ptr<fims_info::Information<double>> info =
+      fims_info::Information<double>::GetInstance();
+  info->Clear();
+
+  fims::Vector<double> random_effects{3.2, 4.1};
+  fims::Vector<double> expected{2.1, -1.7};
+  info->variable_map[200] = &random_effects;
+  info->variable_map[201] = &expected;
+
+  std::shared_ptr<fims_distributions::NormalLPDF<double>> normal_re =
+      std::make_shared<fims_distributions::NormalLPDF<double>>();
+  normal_re->id = 2000;
+  normal_re->input_type = "random_effects";
+  normal_re->key.resize(2);
+  normal_re->key[0] = 200;
+  normal_re->key[1] = 201;
+  normal_re->log_sd.resize(1);
+  normal_re->log_sd[0] = std::log(1.0);
+  info->density_components[normal_re->id] = normal_re;
+
+  info->SetupRandomEffects();
+
+  EXPECT_EQ(info->likelihood_terms.size(), 1);
+  EXPECT_EQ(info->likelihood_terms[0]->type,
+            fims_likelihood::LikelihoodTermType::RandomEffect);
+  EXPECT_EQ(info->likelihood_terms[0]->source_id, normal_re->id);
+  EXPECT_EQ(info->likelihood_terms[0]->name, "normal_random_effect.2000");
+  EXPECT_NEAR(info->likelihood_terms[0]->evaluate(),
+              fims_distributions::kernels::Normal<double>::log_density(
+                  3.2, 2.1, 1.0) +
+                  fims_distributions::kernels::Normal<double>::log_density(
+                      4.1, -1.7, 1.0),
+              1e-12);
+
+  random_effects[0] = 4.3;
+  expected[0] = 5.6;
+
+  EXPECT_NEAR(info->likelihood_terms[0]->evaluate(),
+              fims_distributions::kernels::Normal<double>::log_density(
+                  4.3, 5.6, 1.0) +
+                  fims_distributions::kernels::Normal<double>::log_density(
+                      4.1, -1.7, 1.0),
+              1e-12);
+
+  info->Clear();
+}
+
+TEST(InformationLikelihoodTerms,
+     MirrorsLognormalRandomEffectDensityComponentWithoutJacobian) {
+  std::shared_ptr<fims_info::Information<double>> info =
+      fims_info::Information<double>::GetInstance();
+  info->Clear();
+
+  fims::Vector<double> random_effects{2.0};
+  info->variable_map[202] = &random_effects;
+
+  std::shared_ptr<fims_distributions::LogNormalLPDF<double>> lognormal_re =
+      std::make_shared<fims_distributions::LogNormalLPDF<double>>();
+  lognormal_re->id = 2001;
+  lognormal_re->input_type = "random_effects";
+  lognormal_re->key.resize(1);
+  lognormal_re->key[0] = 202;
+  lognormal_re->expected_values.resize(1);
+  lognormal_re->expected_values[0] = 0.0;
+  lognormal_re->log_sd.resize(1);
+  lognormal_re->log_sd[0] = std::log(0.5);
+  info->density_components[lognormal_re->id] = lognormal_re;
+
+  info->SetupRandomEffects();
+
+  EXPECT_EQ(info->likelihood_terms.size(), 1);
+  EXPECT_EQ(info->likelihood_terms[0]->type,
+            fims_likelihood::LikelihoodTermType::RandomEffect);
+  EXPECT_EQ(info->likelihood_terms[0]->source_id, lognormal_re->id);
+  EXPECT_EQ(info->likelihood_terms[0]->name,
+            "lognormal_random_effect.2001");
+  EXPECT_NEAR(
+      info->likelihood_terms[0]->evaluate(),
+      fims_distributions::kernels::LogNormal<double>::log_density_log_scale(
+          2.0, 0.0, 0.5),
+      1e-12);
+
+  info->Clear();
+}
+
 }  // namespace
