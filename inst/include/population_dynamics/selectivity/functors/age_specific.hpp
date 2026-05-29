@@ -1,12 +1,12 @@
 /**
- * @file sel_at_age.hpp
- * @brief Declares the SelectivityatAge class which age-based selectivity.
+ * @file age_specific.hpp
+ * @brief Declares the AgeSpecificSelectivity class which age-based selectivity.
  * @copyright This file is part of the NOAA, National Marine Fisheries Service
  * Fisheries Integrated Modeling System project. See LICENSE in the source
  * folder for reuse information.
  */
-#ifndef POPULATION_DYNAMICS_SELECTIVITY_AT_AGE_HPP
-#define POPULATION_DYNAMICS_SELECTIVITY_AT_AGE_HPP
+#ifndef POPULATION_DYNAMICS_AGE_SPECIFIC_SELECTIVITY_HPP
+#define POPULATION_DYNAMICS_AGE_SPECIFIC_SELECTIVITY_HPP
 
 // #include "../../../interface/interface.hpp"
 #include "../../../common/fims_math.hpp"
@@ -16,16 +16,16 @@
 namespace fims_popdy {
 
 /**
- *  @brief SelectivityatAge class that returns the inverse logit function value
+ *  @brief AgeSpecificSelectivity class that returns the inverse logit function value
  * from fims_math.
  *
- * Selectivity-at-age allows users to estimate age-specific selectivity values,
+ * Age-specific selectivity allows users to estimate age-specific selectivity values,
  * with great inherent flexibility. The number of parameters (either estimated
  * or fixed) is equal to the number of ages. Users are recommended to fix selectivity
  * for at least one age to a value equal or close to 1.
  */
 template <typename Type>
-struct SelectivityatAge : public SelectivityBase<Type> {
+struct AgeSpecificSelectivity : public SelectivityBase<Type> {
   fims::Vector<Type>
       logit_sel_at_age;     
   size_t n_ages; // AJ: is this the best way to provide n_ages?
@@ -34,19 +34,19 @@ struct SelectivityatAge : public SelectivityBase<Type> {
   //std::map<int, size_t> age_index;
   //std::map<size_t, std::map<int, size_t>>index_map; // AJ: might remove
 
-  SelectivityatAge() : SelectivityBase<Type>() {}
+  AgeSpecificSelectivity() : SelectivityBase<Type>() {}
 
-  virtual ~SelectivityatAge() {}
+  virtual ~AgeSpecificSelectivity() {}
 
   /**
-   * @brief Method of the selectivity-at-age class that implements the
+   * @brief Method of the age-specific selectivity class that implements the
    * inverse logit function from FIMS math to properly transform parameter
    * values.
    *
    * a + (b - a) / (static_cast<Type>(1.0) + fims_math::exp(-logit_x))
    *
    *
-   * @param x  The independent variable in the selectivity-at-age function 
+   * @param x  The independent variable in the age-specific selectivity function 
    * (e.g., age).
    */
   virtual const Type evaluate(const Type &x) {
@@ -67,7 +67,7 @@ struct SelectivityatAge : public SelectivityBase<Type> {
   }
 
   /**
-   * @copydoc SelectivityatAge::evaluate(const Type &x)
+   * @copydoc AgeSpecificSelectivity::evaluate(const Type &x)
    * @param pos Position index, e.g., which year.
    */
   virtual const Type evaluate(const Type &x, size_t pos) {
@@ -88,4 +88,4 @@ struct SelectivityatAge : public SelectivityBase<Type> {
 
 }  // namespace fims_popdy
 
-#endif /* POPULATION_DYNAMICS_SELECTIVITY_LOGISTIC_HPP */
+#endif /* POPULATION_DYNAMICS_AGE_SPECIFIC_SELECTIVITY_HPP */

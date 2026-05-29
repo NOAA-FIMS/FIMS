@@ -309,8 +309,8 @@ void clear() {
   DoubleLogisticSelectivityInterface::id_g = 1;
   DoubleLogisticSelectivityInterface::live_objects.clear();
 
-  SelectivityatAgeInterface::id_g = 1;
-  SelectivityatAgeInterface::live_objects.clear();
+  AgeSpecificSelectivityInterface::id_g = 1;
+  AgeSpecificSelectivityInterface::live_objects.clear();
 
   // rcpp_distribution.hpp
   DistributionsInterfaceBase::id_g = 1;

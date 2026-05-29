@@ -375,23 +375,23 @@ create_default_DoubleLogistic <- function(module_name = NA_character_) {
     )
 }
 
-#' Create default selectivity-at-age parameters
+#' Create default age-specific selectivity parameters
 #'
 #' @description
-#' This function sets up default parameters for selectivity at age.
+#' This function sets up default parameters for age-specific selectivity.
 #' Defaults based on what would be realized for a logistic curve
 #' @return
-#' A tibble containing the default at-age parameters on the logit scale.
+#' A tibble containing the default age-specific parameters on the logit scale.
 #' Number of parameters is equal to the number of age classes
 #' @noRd
-create_default_SelectivityatAge <- function(
+create_default_AgeSpecific <- function(
   module_name = NA_character_,
   data
 ) {
   default <- create_default_parameters_template(n_parameters = get_n_ages(data)) |>
     dplyr::mutate(
       module_name = !!module_name,
-      module_type = "SelectivityatAge",
+      module_type = "AgeSpecific",
       label = "logit_sel_at_age",
       age = get_ages(data),
       # default selectivity_at_age based on what would be defaults from logistic
@@ -414,7 +414,7 @@ create_default_SelectivityatAge <- function(
 #' of selectivity.
 #' @noRd
 create_default_selectivity <- function(
-  form = c("Logistic", "DoubleLogistic","SelectivityatAge"),data
+  form = c("Logistic", "DoubleLogistic","AgeSpecific"),data
 ) {
   # Input checks
   form <- rlang::arg_match(form)
@@ -424,7 +424,7 @@ create_default_selectivity <- function(
   default <- switch(form,
     "Logistic" = create_default_Logistic(),
     "DoubleLogistic" = create_default_DoubleLogistic(),
-    "SelectivityatAge" = create_default_SelectivityatAge(data=data)
+    "AgeSpecific" = create_default_AgeSpecific(data=data)
   ) |>
     dplyr::mutate(
       module_name = "Selectivity"

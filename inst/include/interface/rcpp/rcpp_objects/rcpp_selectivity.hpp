@@ -615,7 +615,7 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
  * from R:
  * selectivity_at_age <- methods::new(selectivity_at_age).
  */
-class SelectivityatAgeInterface : public SelectivityInterfaceBase {
+class AgeSpecificSelectivityInterface : public SelectivityInterfaceBase {
  public:
    /**
    * @brief The number of age bins.
@@ -638,9 +638,9 @@ class SelectivityatAgeInterface : public SelectivityInterfaceBase {
   /**
    * @brief The constructor.
    */
-  SelectivityatAgeInterface() : SelectivityInterfaceBase() {
+  AgeSpecificSelectivityInterface() : SelectivityInterfaceBase() {
     SelectivityInterfaceBase::live_objects[this->id] =
-        std::make_shared<SelectivityatAgeInterface>(*this);
+        std::make_shared<AgeSpecificSelectivityInterface>(*this);
     FIMSRcppInterfaceBase::fims_interface_objects.push_back(
         SelectivityInterfaceBase::live_objects[this->id]);
   }
@@ -650,7 +650,7 @@ class SelectivityatAgeInterface : public SelectivityInterfaceBase {
    *
    * @param other
    */
-  SelectivityatAgeInterface(const SelectivityatAgeInterface &other)
+  AgeSpecificSelectivityInterface(const AgeSpecificSelectivityInterface &other)
       : SelectivityInterfaceBase(other),
         n_ages(other.n_ages),
         ages(other.ages), // AJ placeholder
@@ -660,7 +660,7 @@ class SelectivityatAgeInterface : public SelectivityInterfaceBase {
   /**
    * @brief The destructor.
    */
-  virtual ~SelectivityatAgeInterface() {}
+  virtual ~AgeSpecificSelectivityInterface() {}
 
   /**
    * @brief Gets the ID of the interface base object.
@@ -674,15 +674,15 @@ class SelectivityatAgeInterface : public SelectivityInterfaceBase {
    * size in selectivity).
    */
   virtual double evaluate(double x) { 
-    fims_popdy::SelectivityatAge<double> SelatAge;
-    SelatAge.n_ages = this->n_ages.get(); // AJ: is it necessary to call in n_ages here?
-    //SelatAge.min_age = std::ranges::min(this->ages); //AJ: doesn't work w/ this version of cpp?
+    fims_popdy::AgeSpecificSelectivity<double> AgeSpecificSel;
+    AgeSpecificSel.n_ages = this->n_ages.get(); // AJ: is it necessary to call in n_ages here?
+    //AgeSpecificSel.min_age = std::ranges::min(this->ages); //AJ: doesn't work w/ this version of cpp?
 
-    SelatAge.min_age = *std::min_element(this->ages.storage_m->begin(), this->ages.storage_m->end()); // AJ: only works w/ ages not defined as RealVector
+    AgeSpecificSel.min_age = *std::min_element(this->ages.storage_m->begin(), this->ages.storage_m->end()); // AJ: only works w/ ages not defined as RealVector
     for (size_t i = 0; i < this->logit_sel_at_age.size(); i++) {
-      SelatAge.logit_sel_at_age[i] = this->logit_sel_at_age[i].initial_value_m;
+      AgeSpecificSel.logit_sel_at_age[i] = this->logit_sel_at_age[i].initial_value_m;
     } 
-    return SelatAge.evaluate(x); 
+    return AgeSpecificSel.evaluate(x); 
   }
 
   /**
@@ -692,7 +692,7 @@ class SelectivityatAgeInterface : public SelectivityInterfaceBase {
   virtual void finalize() {
     if (this->finalized) {
       // log warning that finalize has been called more than once.
-      FIMS_WARNING_LOG("Selectivity at Age " + fims::to_string(this->id) +
+      FIMS_WARNING_LOG("Age Specific Selectivity " + fims::to_string(this->id) +
                        " has been finalized already.");
     }
 
@@ -707,12 +707,12 @@ class SelectivityatAgeInterface : public SelectivityInterfaceBase {
     it = info->selectivity_models.find(this->id);
     // if not found, just return
     if (it == info->selectivity_models.end()) {
-      FIMS_WARNING_LOG("Selectivity at Age " + fims::to_string(this->id) +
+      FIMS_WARNING_LOG("Age Specific Selectivity " + fims::to_string(this->id) +
                        " not found in Information.");
       return;
     } else {
-      std::shared_ptr<fims_popdy::SelectivityatAge<double>> sel =
-          std::dynamic_pointer_cast<fims_popdy::SelectivityatAge<double>>(
+      std::shared_ptr<fims_popdy::AgeSpecificSelectivity<double>> sel =
+          std::dynamic_pointer_cast<fims_popdy::AgeSpecificSelectivity<double>>(
               it->second);
       for (size_t i = 0; i < logit_sel_at_age.size(); i++) {
         if (this->logit_sel_at_age[i].estimation_type_m.get() == "constant") {
@@ -736,7 +736,7 @@ class SelectivityatAgeInterface : public SelectivityInterfaceBase {
 
     ss << "{\n";
     ss << " \"module_name\":\"Selectivity\",\n";
-    ss << " \"module_type\": \"SelectivityatAge\",\n";
+    ss << " \"module_type\": \"AgeSpecificSelectivity\",\n";
     ss << " \"module_id\": " << this->id << ",\n";
 
     ss << " \"parameters\": [\n{\n";
@@ -761,8 +761,8 @@ class SelectivityatAgeInterface : public SelectivityInterfaceBase {
     std::shared_ptr<fims_info::Information<Type>> info =
         fims_info::Information<Type>::GetInstance();
 
-    std::shared_ptr<fims_popdy::SelectivityatAge<Type>> selectivity =
-        std::make_shared<fims_popdy::SelectivityatAge<Type>>();
+    std::shared_ptr<fims_popdy::AgeSpecificSelectivity<Type>> selectivity =
+        std::make_shared<fims_popdy::AgeSpecificSelectivity<Type>>();
     std::stringstream ss;
     // set relative info
     selectivity->id = this->id;
