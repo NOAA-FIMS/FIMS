@@ -200,4 +200,104 @@ TEST(InformationLikelihoodTerms,
   info->Clear();
 }
 
+TEST(InformationLikelihoodTerms, MirrorsNormalDataDensityComponent) {
+  std::shared_ptr<fims_info::Information<double>> info =
+      fims_info::Information<double>::GetInstance();
+  info->Clear();
+
+  std::shared_ptr<fims_data_object::DataObject<double>> observed =
+      std::make_shared<fims_data_object::DataObject<double>>(3);
+  observed->id = 300;
+  observed->data[0] = 1.0;
+  observed->data[1] = observed->na_value;
+  observed->data[2] = 3.0;
+  info->data_objects[observed->id] = observed;
+
+  fims::Vector<double> expected{2.0, 2.0, 2.0};
+  info->variable_map[300] = &expected;
+
+  std::shared_ptr<fims_distributions::NormalLPDF<double>> normal_data =
+      std::make_shared<fims_distributions::NormalLPDF<double>>();
+  normal_data->id = 3000;
+  normal_data->input_type = "data";
+  normal_data->observed_data_id_m = observed->id;
+  normal_data->key.resize(1);
+  normal_data->key[0] = 300;
+  normal_data->log_sd.resize(1);
+  normal_data->log_sd[0] = std::log(1.0);
+  info->density_components[normal_data->id] = normal_data;
+
+  bool valid_model = true;
+  info->SetDataObjects(valid_model);
+  info->SetupData();
+
+  EXPECT_TRUE(valid_model);
+  EXPECT_EQ(info->likelihood_terms.size(), 1);
+  EXPECT_EQ(info->likelihood_terms[0]->type,
+            fims_likelihood::LikelihoodTermType::Data);
+  EXPECT_EQ(info->likelihood_terms[0]->source_id, normal_data->id);
+  EXPECT_EQ(info->likelihood_terms[0]->name, "normal_data.3000");
+  EXPECT_NEAR(info->likelihood_terms[0]->evaluate(),
+              fims_distributions::kernels::Normal<double>::log_density(
+                  1.0, 2.0, 1.0) +
+                  fims_distributions::kernels::Normal<double>::log_density(
+                      3.0, 2.0, 1.0),
+              1e-12);
+  EXPECT_EQ(info->likelihood_terms[0]->log_density_values[1], 0.0);
+
+  observed->data[0] = 2.0;
+
+  EXPECT_NEAR(info->likelihood_terms[0]->evaluate(),
+              fims_distributions::kernels::Normal<double>::log_density(
+                  2.0, 2.0, 1.0) +
+                  fims_distributions::kernels::Normal<double>::log_density(
+                      3.0, 2.0, 1.0),
+              1e-12);
+
+  info->Clear();
+}
+
+TEST(InformationLikelihoodTerms, MirrorsLognormalDataDensityComponent) {
+  std::shared_ptr<fims_info::Information<double>> info =
+      fims_info::Information<double>::GetInstance();
+  info->Clear();
+
+  std::shared_ptr<fims_data_object::DataObject<double>> observed =
+      std::make_shared<fims_data_object::DataObject<double>>(1);
+  observed->id = 301;
+  observed->data[0] = 2.0;
+  info->data_objects[observed->id] = observed;
+
+  fims::Vector<double> expected{0.0};
+  info->variable_map[301] = &expected;
+
+  std::shared_ptr<fims_distributions::LogNormalLPDF<double>> lognormal_data =
+      std::make_shared<fims_distributions::LogNormalLPDF<double>>();
+  lognormal_data->id = 3001;
+  lognormal_data->input_type = "data";
+  lognormal_data->observed_data_id_m = observed->id;
+  lognormal_data->key.resize(1);
+  lognormal_data->key[0] = 301;
+  lognormal_data->log_sd.resize(1);
+  lognormal_data->log_sd[0] = std::log(0.5);
+  info->density_components[lognormal_data->id] = lognormal_data;
+
+  bool valid_model = true;
+  info->SetDataObjects(valid_model);
+  info->SetupData();
+
+  EXPECT_TRUE(valid_model);
+  EXPECT_EQ(info->likelihood_terms.size(), 1);
+  EXPECT_EQ(info->likelihood_terms[0]->type,
+            fims_likelihood::LikelihoodTermType::Data);
+  EXPECT_EQ(info->likelihood_terms[0]->source_id, lognormal_data->id);
+  EXPECT_EQ(info->likelihood_terms[0]->name, "lognormal_data.3001");
+  EXPECT_NEAR(info->likelihood_terms[0]->evaluate(),
+              fims_distributions::kernels::LogNormal<double>::log_density(
+                  2.0, 0.0, 0.5),
+              1e-12);
+
+  info->Clear();
+}
+
 }  // namespace

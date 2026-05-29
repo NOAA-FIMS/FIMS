@@ -31,6 +31,7 @@ enum class LikelihoodTermType { Data, Prior, RandomEffect };
 template <typename Type>
 struct LikelihoodTerm {
   typedef std::function<Type(Type, Type, Type)> LogDensityFunction;
+  typedef std::function<bool(size_t)> IncludeFunction;
 
   LikelihoodTermType type = LikelihoodTermType::Data;
   std::string name;
@@ -39,6 +40,7 @@ struct LikelihoodTerm {
   ValueRef<Type> location;
   ValueRef<Type> scale;
   LogDensityFunction log_density;
+  IncludeFunction include;
   fims::Vector<Type> log_density_values;
   Type log_density_sum = static_cast<Type>(0);
 
@@ -67,6 +69,10 @@ struct LikelihoodTerm {
     this->log_density_sum = static_cast<Type>(0);
 
     for (size_t i = 0; i < n; ++i) {
+      if (this->include && !this->include(i)) {
+        this->log_density_values[i] = static_cast<Type>(0);
+        continue;
+      }
       Type value = this->log_density(
           this->x[i], this->location[this->index_for(this->location, i)],
           this->scale[this->index_for(this->scale, i)]);
