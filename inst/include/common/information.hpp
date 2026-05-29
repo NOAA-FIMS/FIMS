@@ -308,6 +308,37 @@ class Information {
   }
 
   /**
+   * @brief Evaluate all likelihood terms of a specific semantic type.
+   *
+   * @param type likelihood term type to evaluate
+   * @return Sum of log-density contributions for matching terms.
+   */
+  Type EvaluateLikelihoodTerms(fims_likelihood::LikelihoodTermType type) {
+    Type log_density_sum = static_cast<Type>(0);
+    for (likelihood_terms_iterator it = this->likelihood_terms.begin();
+         it != this->likelihood_terms.end(); ++it) {
+      if ((*it)->type == type) {
+        log_density_sum += (*it)->evaluate();
+      }
+    }
+    return log_density_sum;
+  }
+
+  /**
+   * @brief Evaluate all likelihood terms.
+   *
+   * @return Sum of log-density contributions across all terms.
+   */
+  Type EvaluateLikelihoodTerms() {
+    Type log_density_sum = static_cast<Type>(0);
+    for (likelihood_terms_iterator it = this->likelihood_terms.begin();
+         it != this->likelihood_terms.end(); ++it) {
+      log_density_sum += (*it)->evaluate();
+    }
+    return log_density_sum;
+  }
+
+  /**
    * @brief Mirror legacy prior density components into likelihood terms.
    *
    * @details This builds the new composable representation without changing

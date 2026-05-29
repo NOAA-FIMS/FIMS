@@ -37,6 +37,68 @@ TEST(InformationLikelihoodTerms, StoresAndClearsLikelihoodTerms) {
   EXPECT_EQ(info->likelihood_terms.size(), 0);
 }
 
+TEST(InformationLikelihoodTerms, EvaluatesTermsByTypeAndTotal) {
+  std::shared_ptr<fims_info::Information<double>> info =
+      fims_info::Information<double>::GetInstance();
+  info->Clear();
+
+  fims::Vector<double> prior_parameter{2.0};
+  fims::Vector<double> random_effects{3.2};
+  fims::Vector<double> observed{1.0, -999.0, 3.0};
+  fims::Vector<double> expected{2.0};
+  fims_likelihood::ValueRef<double> unit_sd =
+      fims_likelihood::constant_ref(1.0);
+
+  std::shared_ptr<fims_likelihood::LikelihoodTerm<double>> prior =
+      std::make_shared<fims_likelihood::LikelihoodTerm<double>>(
+          fims_likelihood::LikelihoodTermType::Prior, "prior",
+          fims_likelihood::vector_ref(prior_parameter),
+          fims_likelihood::constant_ref(0.0), unit_sd,
+          fims_distributions::kernels::Normal<double>::log_density);
+
+  std::shared_ptr<fims_likelihood::LikelihoodTerm<double>> random_effect =
+      std::make_shared<fims_likelihood::LikelihoodTerm<double>>(
+          fims_likelihood::LikelihoodTermType::RandomEffect, "random_effect",
+          fims_likelihood::vector_ref(random_effects),
+          fims_likelihood::constant_ref(2.1), unit_sd,
+          fims_distributions::kernels::Normal<double>::log_density);
+
+  std::shared_ptr<fims_likelihood::LikelihoodTerm<double>> data =
+      std::make_shared<fims_likelihood::LikelihoodTerm<double>>(
+          fims_likelihood::LikelihoodTermType::Data, "data",
+          fims_likelihood::vector_ref(observed),
+          fims_likelihood::vector_ref(expected), unit_sd,
+          fims_distributions::kernels::Normal<double>::log_density);
+  data->include = [&observed](size_t i) -> bool { return observed[i] != -999.0; };
+
+  info->likelihood_terms.push_back(prior);
+  info->likelihood_terms.push_back(random_effect);
+  info->likelihood_terms.push_back(data);
+
+  double prior_value =
+      fims_distributions::kernels::Normal<double>::log_density(2.0, 0.0, 1.0);
+  double random_effect_value =
+      fims_distributions::kernels::Normal<double>::log_density(3.2, 2.1, 1.0);
+  double data_value =
+      fims_distributions::kernels::Normal<double>::log_density(1.0, 2.0, 1.0) +
+      fims_distributions::kernels::Normal<double>::log_density(3.0, 2.0, 1.0);
+
+  EXPECT_NEAR(
+      info->EvaluateLikelihoodTerms(fims_likelihood::LikelihoodTermType::Prior),
+      prior_value, 1e-12);
+  EXPECT_NEAR(info->EvaluateLikelihoodTerms(
+                  fims_likelihood::LikelihoodTermType::RandomEffect),
+              random_effect_value, 1e-12);
+  EXPECT_NEAR(
+      info->EvaluateLikelihoodTerms(fims_likelihood::LikelihoodTermType::Data),
+      data_value, 1e-12);
+  EXPECT_NEAR(info->EvaluateLikelihoodTerms(),
+              prior_value + random_effect_value + data_value, 1e-12);
+  EXPECT_EQ(data->log_density_values[1], 0.0);
+
+  info->Clear();
+}
+
 TEST(InformationLikelihoodTerms, MirrorsNormalPriorDensityComponent) {
   std::shared_ptr<fims_info::Information<double>> info =
       fims_info::Information<double>::GetInstance();
