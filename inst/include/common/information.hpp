@@ -138,50 +138,50 @@ class Information {
   typedef typename std::unordered_map<
       uint32_t, std::shared_ptr<fims_popdy::FisheryModelBase<Type>>>::iterator
       model_map_iterator; /**< iterator for variable map>*/
-  
-/**
- * @brief A structure to hold a pointer to a parameter vector and its transformation 
- * metadata for use in the variable map.
- * 
- * @details Each entry in the variable map corresponds to a single parameter
- * vector and stores a pointer to the parameter values along with two
- * transformation labels:
- * - `input_transformation`: the transformation applied to the parameter
- *   in the input space (e.g. log, logit). This is the space in which
- *   the parameter is estimated.
- * - `prior_transformation`: the transformation applied to the parameter
- *   in the prior space (e.g. identity, square). This is the space in
- *   which the prior distribution is defined.
- */ 
-struct VariableMapEntry {
-  fims::Vector<Type>* variable = nullptr;
-  fims::Transformation input_transformation;
-  fims::Transformation prior_transformation;
 
-/**
- * @brief Constructor for VariableMapEntry.
- */
-VariableMapEntry() {
-  input_transformation.label = fims::Transformation::Label::log;
-  prior_transformation.label = fims::Transformation::Label::log;
-}
+  /**
+   * @brief A structure to hold a pointer to a parameter vector and its
+   * transformation metadata for use in the variable map.
+   *
+   * @details Each entry in the variable map corresponds to a single parameter
+   * vector and stores a pointer to the parameter values along with two
+   * transformation labels:
+   * - `input_transformation`: the transformation applied to the parameter
+   *   in the input space (e.g. log, logit). This is the space in which
+   *   the parameter is estimated.
+   * - `prior_transformation`: the transformation applied to the parameter
+   *   in the prior space (e.g. identity, square). This is the space in
+   *   which the prior distribution is defined.
+   */
+  struct VariableMapEntry {
+    fims::Vector<Type>* variable = nullptr;
+    fims::Transformation input_transformation;
+    fims::Transformation prior_transformation;
 
-/**
- * @brief Constructor for VariableMapEntry with all fields initialized.
- * 
- * @param variable Pointer to the fims::Vector holding the parameter values.
- * @param input_transformation The transformation applied to the parameter
- * in the input space (e.g. log, logit).
- * @param prior_transformation The transformation applied to the parameter
- * in the prior space (e.g. identity, square).
- */
-  VariableMapEntry(fims::Vector<Type>* variable,
-                 fims::Transformation input_transformation,
-                 fims::Transformation prior_transformation)
-    : variable(variable),
-      input_transformation(input_transformation),
-      prior_transformation(prior_transformation) {}
-};
+    /**
+     * @brief Constructor for VariableMapEntry.
+     */
+    VariableMapEntry() {
+      input_transformation.label = fims::Transformation::Label::log;
+      prior_transformation.label = fims::Transformation::Label::log;
+    }
+
+    /**
+     * @brief Constructor for VariableMapEntry with all fields initialized.
+     *
+     * @param variable Pointer to the fims::Vector holding the parameter values.
+     * @param input_transformation The transformation applied to the parameter
+     * in the input space (e.g. log, logit).
+     * @param prior_transformation The transformation applied to the parameter
+     * in the prior space (e.g. identity, square).
+     */
+    VariableMapEntry(fims::Vector<Type>* variable,
+                     fims::Transformation input_transformation,
+                     fims::Transformation prior_transformation)
+        : variable(variable),
+          input_transformation(input_transformation),
+          prior_transformation(prior_transformation) {}
+  };
 
   std::unordered_map<uint32_t, VariableMapEntry>
       variable_map; /**<hash map to link a parameter, derived value, or

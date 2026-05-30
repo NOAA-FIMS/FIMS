@@ -353,12 +353,14 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
         info->RegisterRandomEffect(recruitment->logit_steep[i]);
       }
     }
-    
-    //set transformations for parameter since default is log
-    logit_steep.input_transformation_m->label = fims::Transformation::Label::logit;
+
+    // set transformations for parameter since default is log
+    logit_steep.input_transformation_m->label =
+        fims::Transformation::Label::logit;
     logit_steep.input_transformation_m->args.lower = 0.2;
     logit_steep.input_transformation_m->args.upper = 1.0;
-    logit_steep.prior_transformation_m->label = fims::Transformation::Label::logit;
+    logit_steep.prior_transformation_m->label =
+        fims::Transformation::Label::logit;
     logit_steep.prior_transformation_m->args.lower = 0.2;
     logit_steep.prior_transformation_m->args.upper = 1.0;
 
@@ -382,7 +384,8 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
         info->RegisterRandomEffect(recruitment->log_rzero[i]);
       }
     }
-    info->variable_map[this->log_rzero.id_m].variable = &(recruitment)->log_rzero;
+    info->variable_map[this->log_rzero.id_m].variable =
+        &(recruitment)->log_rzero;
     // set log_recruit_devs
     recruitment->log_recruit_devs.resize(this->log_devs.size());
     for (size_t i = 0; i < this->log_devs.size(); i++) {
@@ -404,7 +407,8 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
       }
     }
 
-    info->variable_map[this->log_devs.id_m].variable = &(recruitment)->log_recruit_devs;
+    info->variable_map[this->log_devs.id_m].variable =
+        &(recruitment)->log_recruit_devs;
 
     // set log_r
     recruitment->log_r.resize(this->log_r.size());

@@ -507,8 +507,10 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
         FIMS_ERROR_LOG("expected_mean cannot be set to random effects");
       }
     }
-    expected_mean.input_transformation_m->label = fims::Transformation::Label::identity;
-    expected_mean.prior_transformation_m->label = fims::Transformation::Label::identity;
+    expected_mean.input_transformation_m->label =
+        fims::Transformation::Label::identity;
+    expected_mean.prior_transformation_m->label =
+        fims::Transformation::Label::identity;
     set_variable_map(&(distribution)->expected_mean, this->expected_mean);
 
     info->density_components[distribution->id] = distribution;
@@ -830,7 +832,7 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
         FIMS_ERROR_LOG("standard deviations cannot be set to random effects");
       }
     }
-    set_variable_map(&(distribution)->log_sd, this->log_sd); 
+    set_variable_map(&(distribution)->log_sd, this->log_sd);
 
     info->density_components[distribution->id] = distribution;
 
