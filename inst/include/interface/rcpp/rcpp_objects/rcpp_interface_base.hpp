@@ -439,8 +439,7 @@ class RealVector {
    * @brief The constructor.
    */
   RealVector(const RealVector& other)
-      : storage_m(other.storage_m), 
-        id_m(other.id_m) {}
+      : storage_m(other.storage_m), id_m(other.id_m) {}
 
   /**
    * @brief The constructor.
@@ -703,6 +702,5 @@ void set_variable_map(fims::Vector<Type>* ptr_fims_vector,
 };
 std::vector<std::shared_ptr<FIMSRcppInterfaceBase>>
     FIMSRcppInterfaceBase::fims_interface_objects;
-
 
 #endif

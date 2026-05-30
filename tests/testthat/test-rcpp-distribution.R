@@ -250,7 +250,6 @@ test_that("rcpp_distribution returns correct outputs for edge cases", {
   dnorm_$observed_values[1]$value <- y
   dnorm_$expected_values[1]$value <- 0
   dnorm_$log_sd[1]$value <- -10
-
   # evaluate the density and compare with R
   #' @description Test extreme log_sd values for dnorm (-10) return expected output.
   expect_equal(dnorm_$evaluate(), stats::dnorm(y, 0, exp(-10), TRUE))

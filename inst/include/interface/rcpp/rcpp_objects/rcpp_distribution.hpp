@@ -187,7 +187,7 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
    */
   ParameterVector expected_mean;
   /**
-   * @brief The log_sd, which would be the standard deviation of x for the
+   * @brief The uncertainty, which would be the standard deviation of x for the
    * normal distribution.
    */
   ParameterVector log_sd;
@@ -487,7 +487,7 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
         info->RegisterParameter(distribution->log_sd[i]);
       }
       if (this->log_sd[i].estimation_type_m.get() == "random_effects") {
-        FIMS_ERROR_LOG("log_sd values cannot be set to random effects");
+        FIMS_ERROR_LOG("standard deviations cannot be set to random effects");
       }
     }
     set_variable_map(&(distribution)->log_sd, this->log_sd);
@@ -546,7 +546,7 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
    */
   ParameterVector expected_values;
   /**
-   * @brief The log_sd, which would be the natural logarithm of the
+   * @brief The uncertainty, which would be the natural logarithm of the
      standard deviation (sd) of log(x) for this distribution. The natural log
      of the standard deviation is necessary because the exponential link
      function is applied to the log transformed standard deviation to insure
