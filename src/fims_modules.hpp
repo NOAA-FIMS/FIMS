@@ -89,7 +89,8 @@ RCPP_MODULE(fims) {
       "get_random_names", &get_random_names,
       "See "
       "https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html.");
-  Rcpp::function("add_shared_prior", &setup_prior, 
+  Rcpp::function(
+      "add_shared_prior", &setup_prior,
       "See "
       "https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html.");
   Rcpp::function(

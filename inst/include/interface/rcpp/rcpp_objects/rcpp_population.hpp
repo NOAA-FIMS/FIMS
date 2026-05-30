@@ -417,7 +417,8 @@ class PopulationInterface : public PopulationInterfaceBase {
         info->RegisterRandomEffect(population->log_init_naa[i]);
       }
     }
-    info->variable_map[this->log_init_naa.id_m].variable = &(population)->log_init_naa;
+    info->variable_map[this->log_init_naa.id_m].variable =
+        &(population)->log_init_naa;
 
     for (size_t i = 0; i < ages.size(); i++) {
       population->ages[i] = this->ages[i];
