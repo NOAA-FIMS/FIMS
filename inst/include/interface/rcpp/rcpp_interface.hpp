@@ -421,22 +421,6 @@ void setup_prior(Rcpp::Formula f, Rcpp::List parameter_vectors) {
       break;
     }
 
-    case fims::Distribution::Label::Gamma: {
-      auto prior = std::make_shared<DgammaDistributionsInterface>();
-      prior->expected_values[0].initial_value_m = fims_math::log(hyperparameters[0]);
-      prior->log_sd[0].initial_value_m = fims_math::log(hyperparameters[1]);
-      prior->set_distribution_links("prior", ids);
-      break;
-    }
-
-    case fims::Distribution::Label::InvGamma: {
-      auto prior = std::make_shared<DinvgammaDistributionsInterface>();
-      prior->log_shape[0].initial_value_m = fims_math::log(hyperparameters[0]);
-      prior->log_scale[0].initial_value_m = fims_math::log(hyperparameters[1]);
-      prior->set_distribution_links("prior", ids);
-      break;
-    }
-
     default:
       throw std::invalid_argument("Unsupported distribution type in add_prior.");
   }
