@@ -482,4 +482,142 @@ TEST(InformationLikelihoodTerms, MirrorsLognormalDataDensityComponent) {
   info->Clear();
 }
 
+TEST(InformationLikelihoodTerms, ModelEvaluationMatchesMirroredSetupPaths) {
+  std::shared_ptr<fims_info::Information<double>> info =
+      fims_info::Information<double>::GetInstance();
+  info->Clear();
+
+  fims::Vector<double> normal_prior_parameter{2.0};
+  fims::Vector<double> lognormal_prior_parameter{2.0};
+  fims::Vector<double> normal_random_effects{3.2};
+  fims::Vector<double> normal_random_effects_expected{2.1};
+  fims::Vector<double> lognormal_random_effects{2.0};
+  fims::Vector<double> normal_data_expected{2.0, 2.0, 2.0};
+  fims::Vector<double> lognormal_data_expected{0.0};
+
+  info->variable_map[500] = &normal_prior_parameter;
+  info->variable_map[501] = &lognormal_prior_parameter;
+  info->variable_map[502] = &normal_random_effects;
+  info->variable_map[503] = &normal_random_effects_expected;
+  info->variable_map[504] = &lognormal_random_effects;
+  info->variable_map[505] = &normal_data_expected;
+  info->variable_map[506] = &lognormal_data_expected;
+
+  std::shared_ptr<fims_data_object::DataObject<double>> normal_observed =
+      std::make_shared<fims_data_object::DataObject<double>>(3);
+  normal_observed->id = 500;
+  normal_observed->data[0] = 1.0;
+  normal_observed->data[1] = normal_observed->na_value;
+  normal_observed->data[2] = 3.0;
+  info->data_objects[normal_observed->id] = normal_observed;
+
+  std::shared_ptr<fims_data_object::DataObject<double>> lognormal_observed =
+      std::make_shared<fims_data_object::DataObject<double>>(1);
+  lognormal_observed->id = 501;
+  lognormal_observed->data[0] = 2.0;
+  info->data_objects[lognormal_observed->id] = lognormal_observed;
+
+  std::shared_ptr<fims_distributions::NormalLPDF<double>> normal_prior =
+      std::make_shared<fims_distributions::NormalLPDF<double>>();
+  normal_prior->id = 5000;
+  normal_prior->input_type = "prior";
+  normal_prior->key.resize(1);
+  normal_prior->key[0] = 500;
+  normal_prior->expected_values.resize(1);
+  normal_prior->expected_values[0] = 0.0;
+  normal_prior->log_sd.resize(1);
+  normal_prior->log_sd[0] = std::log(1.0);
+  info->density_components[normal_prior->id] = normal_prior;
+
+  std::shared_ptr<fims_distributions::LogNormalLPDF<double>> lognormal_prior =
+      std::make_shared<fims_distributions::LogNormalLPDF<double>>();
+  lognormal_prior->id = 5001;
+  lognormal_prior->input_type = "prior";
+  lognormal_prior->key.resize(1);
+  lognormal_prior->key[0] = 501;
+  lognormal_prior->expected_values.resize(1);
+  lognormal_prior->expected_values[0] = 0.0;
+  lognormal_prior->log_sd.resize(1);
+  lognormal_prior->log_sd[0] = std::log(0.5);
+  info->density_components[lognormal_prior->id] = lognormal_prior;
+
+  std::shared_ptr<fims_distributions::NormalLPDF<double>> normal_re =
+      std::make_shared<fims_distributions::NormalLPDF<double>>();
+  normal_re->id = 5002;
+  normal_re->input_type = "random_effects";
+  normal_re->key.resize(2);
+  normal_re->key[0] = 502;
+  normal_re->key[1] = 503;
+  normal_re->log_sd.resize(1);
+  normal_re->log_sd[0] = std::log(1.0);
+  info->density_components[normal_re->id] = normal_re;
+
+  std::shared_ptr<fims_distributions::LogNormalLPDF<double>> lognormal_re =
+      std::make_shared<fims_distributions::LogNormalLPDF<double>>();
+  lognormal_re->id = 5003;
+  lognormal_re->input_type = "random_effects";
+  lognormal_re->key.resize(1);
+  lognormal_re->key[0] = 504;
+  lognormal_re->expected_values.resize(1);
+  lognormal_re->expected_values[0] = 0.0;
+  lognormal_re->log_sd.resize(1);
+  lognormal_re->log_sd[0] = std::log(0.5);
+  info->density_components[lognormal_re->id] = lognormal_re;
+
+  std::shared_ptr<fims_distributions::NormalLPDF<double>> normal_data =
+      std::make_shared<fims_distributions::NormalLPDF<double>>();
+  normal_data->id = 5004;
+  normal_data->input_type = "data";
+  normal_data->observed_data_id_m = normal_observed->id;
+  normal_data->key.resize(1);
+  normal_data->key[0] = 505;
+  normal_data->log_sd.resize(1);
+  normal_data->log_sd[0] = std::log(1.0);
+  info->density_components[normal_data->id] = normal_data;
+
+  std::shared_ptr<fims_distributions::LogNormalLPDF<double>> lognormal_data =
+      std::make_shared<fims_distributions::LogNormalLPDF<double>>();
+  lognormal_data->id = 5005;
+  lognormal_data->input_type = "data";
+  lognormal_data->observed_data_id_m = lognormal_observed->id;
+  lognormal_data->key.resize(1);
+  lognormal_data->key[0] = 506;
+  lognormal_data->log_sd.resize(1);
+  lognormal_data->log_sd[0] = std::log(0.5);
+  info->density_components[lognormal_data->id] = lognormal_data;
+
+  bool valid_model = true;
+  info->SetDataObjects(valid_model);
+  info->SetupPriors();
+  info->SetupRandomEffects();
+  info->SetupData();
+  info->use_likelihood_terms = true;
+
+  double expected_nll =
+      -fims_distributions::kernels::Normal<double>::log_density(
+          2.0, 0.0, 1.0) -
+      fims_distributions::kernels::LogNormal<double>::log_density(
+          2.0, 0.0, 0.5) -
+      fims_distributions::kernels::Normal<double>::log_density(
+          3.2, 2.1, 1.0) -
+      fims_distributions::kernels::LogNormal<double>::log_density_log_scale(
+          2.0, 0.0, 0.5) -
+      fims_distributions::kernels::Normal<double>::log_density(
+          1.0, 2.0, 1.0) -
+      fims_distributions::kernels::Normal<double>::log_density(
+          3.0, 2.0, 1.0) -
+      fims_distributions::kernels::LogNormal<double>::log_density(
+          2.0, 0.0, 0.5);
+
+  std::shared_ptr<fims_model::Model<double>> model =
+      fims_model::Model<double>::GetInstance();
+  model->fims_information = info;
+
+  EXPECT_TRUE(valid_model);
+  EXPECT_EQ(info->likelihood_terms.size(), 6);
+  EXPECT_NEAR(model->Evaluate(), expected_nll, 1e-12);
+
+  info->Clear();
+}
+
 }  // namespace
