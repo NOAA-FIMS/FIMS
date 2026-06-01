@@ -17,6 +17,7 @@
 #include <set>
 #include <vector>
 
+#include "../distributions/kernels/distribution_kernels.hpp"
 #include "../distributions/distributions.hpp"
 #include "../likelihood/likelihood.hpp"
 #include "../models/functors/fishery_model_base.hpp"
@@ -460,6 +461,39 @@ class Information {
   }
 
   /**
+   * @brief Add a mirrored row-wise likelihood term.
+   *
+   * @param type likelihood term type
+   * @param name term name
+   * @param source_id ID of the mirrored legacy density component
+   * @param x observed/target values
+   * @param location expected/location values
+   * @param row_size number of entries per row-wise density contribution
+   * @param log_density row-wise distribution log-density function
+   * @param include optional predicate for skipping entries
+   */
+  void AddLikelihoodTerm(
+      fims_likelihood::LikelihoodTermType type, const std::string& name,
+      uint32_t source_id, fims_likelihood::ValueRef<Type> x,
+      fims_likelihood::ValueRef<Type> location, size_t row_size,
+      typename fims_likelihood::LikelihoodTerm<Type>::VectorLogDensityFunction
+          log_density,
+      typename fims_likelihood::LikelihoodTerm<Type>::IncludeFunction include =
+          nullptr) {
+    std::shared_ptr<fims_likelihood::LikelihoodTerm<Type>> term =
+        std::make_shared<fims_likelihood::LikelihoodTerm<Type>>();
+    term->type = type;
+    term->name = name;
+    term->source_id = source_id;
+    term->x = x;
+    term->location = location;
+    term->row_size = row_size;
+    term->vector_log_density = log_density;
+    term->include = include;
+    this->likelihood_terms.push_back(term);
+  }
+
+  /**
    * @brief Build a ValueRef for a density component's observed/target values.
    */
   fims_likelihood::ValueRef<Type> ObservedValueRef(
@@ -560,6 +594,43 @@ class Information {
     this->AddLikelihoodTerm(type, name, d->id, x, location,
                             this->ScaleValueRef(lognormal), log_density,
                             include);
+    return true;
+  }
+
+  /**
+   * @brief Try to mirror a legacy multinomial data density component.
+   *
+   * @return true if a multinomial likelihood term was added.
+   */
+  bool TryAddMultinomialDataLikelihoodTerm(
+      std::shared_ptr<fims_distributions::DensityComponentBase<Type>> d,
+      const std::string& name, fims_likelihood::ValueRef<Type> x,
+      fims_likelihood::ValueRef<Type> location,
+      typename fims_likelihood::LikelihoodTerm<Type>::IncludeFunction include =
+          nullptr) {
+    std::shared_ptr<fims_distributions::MultinomialLPMF<Type>> multinomial =
+        std::dynamic_pointer_cast<fims_distributions::MultinomialLPMF<Type>>(d);
+    if (!multinomial) {
+      return false;
+    }
+
+    size_t row_size = 0;
+    if (multinomial->dims.size() == 2) {
+      row_size = multinomial->dims[1];
+    } else if (multinomial->data_observed_values != NULL &&
+               multinomial->data_observed_values->dimensions >= 2) {
+      row_size = multinomial->data_observed_values->jmax;
+    }
+
+    if (row_size == 0 || x.size() % row_size != 0 ||
+        location.size() % row_size != 0) {
+      return false;
+    }
+
+    this->AddLikelihoodTerm(
+        fims_likelihood::LikelihoodTermType::Data, name, d->id, x, location,
+        row_size, fims_distributions::kernels::Multinomial<Type>::log_density,
+        include);
     return true;
   }
 
@@ -675,6 +746,10 @@ class Information {
           d, fims_likelihood::LikelihoodTermType::Data,
           "lognormal_data." + fims::to_string(d->id), x, location,
           fims_distributions::kernels::LogNormal<Type>::log_density, include);
+
+      this->TryAddMultinomialDataLikelihoodTerm(
+          d, "multinomial_data." + fims::to_string(d->id), x, location,
+          include);
     }
   }
 

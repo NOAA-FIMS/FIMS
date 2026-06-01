@@ -482,19 +482,21 @@ TEST(InformationLikelihoodTerms, MirrorsLognormalDataDensityComponent) {
   info->Clear();
 }
 
-TEST(InformationLikelihoodTerms, DoesNotMirrorUnsupportedDataDensityComponent) {
+TEST(InformationLikelihoodTerms, MirrorsMultinomialDataDensityComponent) {
   std::shared_ptr<fims_info::Information<double>> info =
       fims_info::Information<double>::GetInstance();
   info->Clear();
 
   std::shared_ptr<fims_data_object::DataObject<double>> observed =
-      std::make_shared<fims_data_object::DataObject<double>>(1, 2);
+      std::make_shared<fims_data_object::DataObject<double>>(2, 2);
   observed->id = 302;
   observed->data[0] = 3.0;
   observed->data[1] = 7.0;
+  observed->data[2] = observed->na_value;
+  observed->data[3] = 5.0;
   info->data_objects[observed->id] = observed;
 
-  fims::Vector<double> expected{0.3, 0.7};
+  fims::Vector<double> expected{0.3, 0.7, 0.4, 0.6};
   info->variable_map[302] = &expected;
 
   std::shared_ptr<fims_distributions::MultinomialLPMF<double>>
@@ -514,7 +516,21 @@ TEST(InformationLikelihoodTerms, DoesNotMirrorUnsupportedDataDensityComponent) {
   EXPECT_TRUE(valid_model);
   EXPECT_EQ(multinomial_data->data_observed_values, observed);
   EXPECT_EQ(multinomial_data->data_expected_values, &expected);
-  EXPECT_TRUE(info->likelihood_terms.empty());
+  EXPECT_EQ(info->likelihood_terms.size(), 1);
+  EXPECT_EQ(info->likelihood_terms[0]->type,
+            fims_likelihood::LikelihoodTermType::Data);
+  EXPECT_EQ(info->likelihood_terms[0]->source_id, multinomial_data->id);
+  EXPECT_EQ(info->likelihood_terms[0]->name, "multinomial_data.3002");
+  fims::Vector<double> first_observed_row{3.0, 7.0};
+  fims::Vector<double> first_expected_row{0.3, 0.7};
+  EXPECT_NEAR(info->likelihood_terms[0]->evaluate(),
+              fims_distributions::kernels::Multinomial<double>::log_density(
+                  first_observed_row, first_expected_row),
+              1e-12);
+  EXPECT_NEAR(info->likelihood_terms[0]->log_density_values[0],
+              info->likelihood_terms[0]->log_density_values[1], 1e-12);
+  EXPECT_EQ(info->likelihood_terms[0]->log_density_values[2], 0.0);
+  EXPECT_EQ(info->likelihood_terms[0]->log_density_values[3], 0.0);
 
   info->Clear();
 }

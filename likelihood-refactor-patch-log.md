@@ -197,7 +197,7 @@ lognormal are the only mirrored distribution families.
 
 ## Patch 17: Multinomial Density Kernel
 
-Status: local, not committed yet.
+Commit: `16d7e5df Add multinomial density kernel`
 
 Added a math-only multinomial kernel:
 
@@ -208,6 +208,19 @@ Added a math-only multinomial kernel:
 The kernel matches the current FIMS/TMB convention by evaluating the lgamma
 form directly and not rounding observations.
 
+## Patch 18: Multinomial Data Mirroring
+
+Status: local, not committed yet.
+
+Extended `LikelihoodTerm` with an optional row-wise vector density path, leaving
+the existing scalar normal/lognormal path unchanged.
+
+Added multinomial data mirroring in `Information`:
+
+- row-wise likelihood-term creation helper
+- `TryAddMultinomialDataLikelihoodTerm(...)`
+- data setup now mirrors complete multinomial data components
+
 ## Current State
 
 The branch currently has a side-by-side likelihood-term architecture:
@@ -215,15 +228,16 @@ The branch currently has a side-by-side likelihood-term architecture:
 - legacy behavior remains default
 - mirrored likelihood-term behavior is available behind `Information::use_likelihood_terms`
 - priors, random effects, and data are mirrored for normal/lognormal distributions
+- multinomial data can be mirrored as row-wise likelihood terms
 - unsupported distribution families are set up through the legacy path but are
   not mirrored until an explicit likelihood-term helper is added
 - model-level opt-in evaluation exists and has focused parity coverage
 
 Current local uncommitted work:
 
-- `inst/include/distributions/kernels/multinomial.hpp`: patch 17 kernel
-- `inst/include/distributions/kernels/distribution_kernels.hpp`: patch 17 include
-- `tests/gtest/test_distribution_kernels.cpp`: patch 17 kernel tests
-- `likelihood-refactor-patch-log.md`: patch 17 entry
+- `inst/include/likelihood/likelihood_term.hpp`: patch 18 row-wise evaluation
+- `inst/include/common/information.hpp`: patch 18 multinomial data mirroring
+- `tests/gtest/test_info_likelihood_terms.cpp`: patch 18 multinomial mirror test
+- `likelihood-refactor-patch-log.md`: patch 18 entry
 
 Note: `docs/likelihoods-distributions-refactor-chat.md` was also updated locally, but `docs/` is ignored by this repository, so this root-level file is the tracked version intended for commits.
