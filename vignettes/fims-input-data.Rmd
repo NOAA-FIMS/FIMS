@@ -23,7 +23,7 @@ library(FIMS)
 
 This vignette is an expansion of the ["Data" section](https://noaa-fims.github.io/FIMS/articles/fims-demo.html#data) in the [FIMS overview vignette](https://noaa-fims.github.io/FIMS/articles/fims-demo.html). It provides more details about the data structure needed for a FIMS model and how to prepare your data for use in a FIMS model using the `FIMSFrame()` function.
 
-The [FIMS cheatsheet](https://github.com/NOAA-FIMS/FIMS/blob/main/pkgdown/assets/fims-cheatsheet.pdf) includes a quick summary of the input data format.
+The [FIMS cheatsheet](https://github.com/NOAA-FIMS/FIMS/tree/main/pkgdown/assets/fims-cheatsheet.pdf) includes a quick summary of the input data format.
 
 The help page for the `FIMS::data_big` data set (https://noaa-fims.github.io/FIMS/reference/data_big.html or via `?FIMS::data_big`) provides detailed information about the input data format.
 
