@@ -40,6 +40,8 @@ class Information {
  public:
   size_t n_years = 0; /**< number of years >*/
   size_t n_ages = 0;  /**< number of ages>*/
+  bool use_likelihood_terms =
+      false; /**< opt-in flag for mirrored likelihood evaluation >*/
 
   static std::shared_ptr<Information<Type>>
       fims_information;          /**< singleton instance >*/
@@ -181,6 +183,7 @@ class Information {
     this->likelihood_terms.clear();
     this->n_years = 0;
     this->n_ages = 0;
+    this->use_likelihood_terms = false;
 
     for (density_components_iterator it = density_components.begin();
          it != density_components.end(); ++it) {
@@ -239,6 +242,7 @@ class Information {
     ss << "density_components: " << this->density_components.size()
        << std::endl;
     ss << "likelihood_terms: " << this->likelihood_terms.size() << std::endl;
+    ss << "use_likelihood_terms: " << this->use_likelihood_terms << std::endl;
     return ss.str();
   }
 

@@ -76,10 +76,6 @@ class Model {  // may need singleton
       return jnll;
     }
 
-    // Create vector for reporting out nll components
-    fims::Vector<Type> nll_vec(
-        this->fims_information->density_components.size(), 0.0);
-
     for (m_it = this->fims_information->models_map.begin();
          m_it != this->fims_information->models_map.end(); ++m_it) {
       //(*m_it).second points to the Model module
@@ -87,6 +83,37 @@ class Model {  // may need singleton
       m->Prepare();
       m->Evaluate();
     }
+
+    // Create vector for reporting out nll components
+    fims::Vector<Type> nll_vec(
+        this->fims_information->use_likelihood_terms
+            ? 3
+            : this->fims_information->density_components.size(),
+        0.0);
+
+    if (this->fims_information->use_likelihood_terms) {
+      nll_vec[0] = this->fims_information->EvaluateNegativeLogLikelihoodTerms(
+          fims_likelihood::LikelihoodTermType::Prior);
+      jnll += nll_vec[0];
+      FIMS_INFO_LOG(
+          "Model: Finished evaluating prior likelihood terms. The jnll is: " +
+          fims::to_string(jnll));
+
+      nll_vec[1] = this->fims_information->EvaluateNegativeLogLikelihoodTerms(
+          fims_likelihood::LikelihoodTermType::RandomEffect);
+      jnll += nll_vec[1];
+      FIMS_INFO_LOG(
+          "Model: Finished evaluating random effect likelihood terms. The "
+          "jnll is: " +
+          fims::to_string(jnll));
+
+      nll_vec[2] = this->fims_information->EvaluateNegativeLogLikelihoodTerms(
+          fims_likelihood::LikelihoodTermType::Data);
+      jnll += nll_vec[2];
+      FIMS_INFO_LOG(
+          "Model: Finished evaluating data likelihood terms. The jnll is: " +
+          fims::to_string(jnll));
+    } else {
 
     // Loop over densities and evaluate joint negative log densities for priors
     typename fims_info::Information<Type>::density_components_iterator d_it;
@@ -159,6 +186,7 @@ class Model {  // may need singleton
         "evaluating priors, random effects, and " +
         fims::to_string(n_data) +
         " data likelihoods is: " + fims::to_string(jnll));
+    }
 
     // report out nll components
 
@@ -175,7 +203,9 @@ class Model {  // may need singleton
          m_it != this->fims_information->models_map.end(); ++m_it) {
       //(*m_it).second points to the Model module
       std::shared_ptr<fims_popdy::FisheryModelBase<Type>> m = (*m_it).second;
+#ifdef TMB_MODEL
       m->of = this->of;  // link to TMB objective function
+#endif
       m->Report();
     }
 

@@ -4,6 +4,7 @@
 #include <memory>
 
 #include "common/information.hpp"
+#include "common/model.hpp"
 #include "distributions/kernels/distribution_kernels.hpp"
 
 namespace {
@@ -164,6 +165,56 @@ TEST(InformationLikelihoodTerms, FindsAndEvaluatesTermsBySource) {
   EXPECT_THROW(info->EvaluateNegativeLogLikelihoodTerm(
                    4000, fims_likelihood::LikelihoodTermType::RandomEffect),
                std::runtime_error);
+
+  info->Clear();
+}
+
+TEST(InformationLikelihoodTerms, ModelEvaluationUsesMirroredTermsWhenEnabled) {
+  std::shared_ptr<fims_info::Information<double>> info =
+      fims_info::Information<double>::GetInstance();
+  info->Clear();
+
+  fims::Vector<double> prior_parameter{2.0};
+  fims::Vector<double> observed{1.0, 3.0};
+  fims::Vector<double> expected{2.0};
+  fims_likelihood::ValueRef<double> unit_sd =
+      fims_likelihood::constant_ref(1.0);
+
+  std::shared_ptr<fims_likelihood::LikelihoodTerm<double>> prior =
+      std::make_shared<fims_likelihood::LikelihoodTerm<double>>(
+          fims_likelihood::LikelihoodTermType::Prior, "prior",
+          fims_likelihood::vector_ref(prior_parameter),
+          fims_likelihood::constant_ref(0.0), unit_sd,
+          fims_distributions::kernels::Normal<double>::log_density);
+
+  std::shared_ptr<fims_likelihood::LikelihoodTerm<double>> data =
+      std::make_shared<fims_likelihood::LikelihoodTerm<double>>(
+          fims_likelihood::LikelihoodTermType::Data, "data",
+          fims_likelihood::vector_ref(observed),
+          fims_likelihood::vector_ref(expected), unit_sd,
+          fims_distributions::kernels::Normal<double>::log_density);
+
+  info->likelihood_terms.push_back(prior);
+  info->likelihood_terms.push_back(data);
+
+  std::shared_ptr<fims_model::Model<double>> model =
+      fims_model::Model<double>::GetInstance();
+  model->fims_information = info;
+
+  EXPECT_EQ(info->use_likelihood_terms, false);
+  EXPECT_EQ(model->Evaluate(), 0.0);
+
+  info->use_likelihood_terms = true;
+
+  double expected_nll =
+      -fims_distributions::kernels::Normal<double>::log_density(
+          2.0, 0.0, 1.0) -
+      fims_distributions::kernels::Normal<double>::log_density(
+          1.0, 2.0, 1.0) -
+      fims_distributions::kernels::Normal<double>::log_density(
+          3.0, 2.0, 1.0);
+
+  EXPECT_NEAR(model->Evaluate(), expected_nll, 1e-12);
 
   info->Clear();
 }
