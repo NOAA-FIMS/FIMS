@@ -13,6 +13,16 @@ data <- FIMS::FIMSFrame(data1)
 
 default_configurations <- create_default_configurations(data)
 
+vonb_configurations <- default_configurations |>
+  tidyr::unnest(cols = data) |>
+  dplyr::rows_update(
+    tibble::tibble(
+      module_name = "Growth",
+      module_type = "VonBertalanffy"
+    ),
+    by = c("module_name")
+  )
+
 # create_default_parameters ----
 ## IO correctness ----
 test_that("`create_default_parameters()` works with correct inputs", {
@@ -48,6 +58,35 @@ test_that("`create_default_parameters()` works with correct inputs", {
     "default_parameters.csv",
     compare = compare_file_text
   )
+})
+
+test_that("default VonB growth parameters use delta-method variability defaults", {
+  growth_defaults <- create_default_parameters(
+    configurations = vonb_configurations,
+    data = data
+  ) |>
+    tidyr::unnest(cols = data) |>
+    dplyr::filter(
+      module_name == "Growth",
+      module_type == "VonBertalanffy"
+    )
+
+  delta_method_variability_labels <- c(
+    "log_sd_length_at_ref_age_1",
+    "log_sd_length_at_ref_age_2",
+    "log_sd_growth_coefficient_K",
+    "logit_corr_length_at_ref_age_1_length_at_ref_age_2",
+    "logit_corr_length_at_ref_age_1_k",
+    "logit_corr_length_at_ref_age_2_k"
+  )
+
+  #' @description Test that default VonB growth parameters include the
+  #' delta-method variability block.
+  expect_true(all(delta_method_variability_labels %in% growth_defaults$label))
+
+  #' @description Test that legacy interpolation SD-anchor defaults are no longer
+  #' part of the default VonB growth parameter table.
+  expect_false("length_at_age_sd_at_ref_ages" %in% growth_defaults$label)
 })
 
 ## Edge handling ----

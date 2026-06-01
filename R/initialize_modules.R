@@ -261,6 +261,20 @@ initialize_module <- function(parameters,
         module[[field]]$set(x - 1, values[x])
       })
     } else {
+      if (module_class_name == "VonBertalanffyGrowth" &&
+          field %in% c(
+            "length_at_age_sd_at_ref_ages",
+            "log_sd_length_at_ref_age_1",
+            "log_sd_length_at_ref_age_2",
+            "log_sd_growth_coefficient_K",
+            "logit_corr_length_at_ref_age_1_length_at_ref_age_2",
+            "logit_corr_length_at_ref_age_1_k",
+            "logit_corr_length_at_ref_age_2_k"
+          ) &&
+          !field %in% module_input$label) {
+        next
+      }
+
       set_param_vector(
         field = field,
         module = module,
@@ -404,6 +418,15 @@ initialize_growth <- function(parameters, data) {
     na.omit()
 
   if (length(growth_type) == 1 && growth_type == "VonBertalanffy") {
+    vonb_delta_method_labels <- c(
+      "log_sd_length_at_ref_age_1",
+      "log_sd_length_at_ref_age_2",
+      "log_sd_growth_coefficient_K",
+      "logit_corr_length_at_ref_age_1_length_at_ref_age_2",
+      "logit_corr_length_at_ref_age_1_k",
+      "logit_corr_length_at_ref_age_2_k"
+    )
+
     sd_rows <- parameters |>
       dplyr::filter(module_name == "Growth",
                     label == "length_at_age_sd_at_ref_ages")
@@ -418,6 +441,9 @@ initialize_growth <- function(parameters, data) {
         dplyr::bind_rows(sd_rows)
     }
 
+    growth_input <- parameters |>
+      dplyr::filter(module_name == "Growth")
+
     missing_labels <- setdiff(c("reference_age_for_length_1",
                                 "reference_age_for_length_2"),
                               growth_input$label)
@@ -426,6 +452,50 @@ initialize_growth <- function(parameters, data) {
         "VonBertalanffy Growth requires reference_age_for_length_1 and ",
         "reference_age_for_length_2. ",
         "Use create_default_parameters() or supply them explicitly."
+      )
+    }
+    has_interpolation_sd_inputs <- any(
+      growth_input$label == "length_at_age_sd_at_ref_ages"
+    )
+    present_vonb_delta_labels <- intersect(
+      vonb_delta_method_labels,
+      growth_input$label
+    )
+    missing_vonb_delta_labels <- setdiff(
+      vonb_delta_method_labels,
+      growth_input$label
+    )
+
+    if (length(present_vonb_delta_labels) > 0 &&
+        length(missing_vonb_delta_labels) > 0) {
+      stop(
+        "VonBertalanffy Growth delta-method variability inputs must be ",
+        "supplied as a complete set. ",
+        "Provide all of: ",
+        paste(vonb_delta_method_labels, collapse = ", "),
+        "."
+      )
+    }
+
+    if (has_interpolation_sd_inputs &&
+        length(present_vonb_delta_labels) == length(vonb_delta_method_labels)) {
+      stop(
+        "VonBertalanffy Growth requires variability inputs for exactly one ",
+        "supported path. Supply either the interpolation inputs ",
+        "length_at_age_sd_at_ref_ages, or all of: ",
+        paste(vonb_delta_method_labels, collapse = ", "),
+        " for the delta-method path, but not both."
+      )
+    }
+
+    if (!has_interpolation_sd_inputs &&
+        length(present_vonb_delta_labels) == 0) {
+      stop(
+        "VonBertalanffy Growth requires variability inputs for exactly one ",
+        "supported path. Supply either the interpolation inputs ",
+        "length_at_age_sd_at_ref_ages, or all of: ",
+        paste(vonb_delta_method_labels, collapse = ", "),
+        " for the delta-method path."
       )
     }
   }

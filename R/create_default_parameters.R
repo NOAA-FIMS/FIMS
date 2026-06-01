@@ -222,7 +222,11 @@ create_default_growth <- function(unnested_configurations, data) {
       reference_age_for_length_2 <- max(ages, na.rm = TRUE)
     }
 
-        default <- create_default_parameters_template(n_parameters = 9) |>
+    # Phase 1 default: populate the VonB variability block on the working
+    # parameter scale. The log_sd_* values are log-SD starting values, and
+    # the logit_corr_* values are transformed correlation parameters fixed
+    # at the working-scale value corresponding to zero correlation.
+    default <- create_default_parameters_template(n_parameters = 13) |>
       dplyr::mutate(
         module_name = "Growth",
         module_type = "VonBertalanffy",
@@ -230,19 +234,26 @@ create_default_growth <- function(unnested_configurations, data) {
           "length_at_ref_age_1", "length_at_ref_age_2",
           "growth_coefficient_K", "reference_age_for_length_1",
           "reference_age_for_length_2", "length_weight_a",
-          "length_weight_b", "length_at_age_sd_at_ref_ages",
-          "length_at_age_sd_at_ref_ages"
+          "length_weight_b",
+          "log_sd_length_at_ref_age_1",
+          "log_sd_length_at_ref_age_2",
+          "log_sd_growth_coefficient_K",
+          "logit_corr_length_at_ref_age_1_length_at_ref_age_2",
+          "logit_corr_length_at_ref_age_1_k",
+          "logit_corr_length_at_ref_age_2_k"
         ),
         age = c(
           NA_real_, NA_real_, NA_real_, NA_real_, NA_real_,
           NA_real_, NA_real_,
-          reference_age_for_length_1, reference_age_for_length_2
+          NA_real_, NA_real_, NA_real_,
+          NA_real_, NA_real_, NA_real_
         ),
         value = c(
           275, 725, 0.18,
           reference_age_for_length_1, reference_age_for_length_2,
           2.5e-11, 3,
-          28, 73
+          log(0.1), log(0.1), log(0.1),
+          0, 0, 0
         ),
         estimation_type = c(
           "fixed_effects",  # length_at_ref_age_1
@@ -252,11 +263,14 @@ create_default_growth <- function(unnested_configurations, data) {
           "constant",       # reference_age_for_length_2
           "constant",       # length_weight_a
           "constant",       # length_weight_b
-          "constant",       # sd at ref age 1
-          "constant"        # sd at ref age 2
+          "fixed_effects",  # log_sd_length_at_ref_age_1
+          "fixed_effects",  # log_sd_length_at_ref_age_2
+          "fixed_effects",  # log_sd_growth_coefficient_K
+          "constant",       # logit_corr_length_at_ref_age_1_length_at_ref_age_2
+          "constant",       # logit_corr_length_at_ref_age_1_k
+          "constant"        # logit_corr_length_at_ref_age_2_k
         )
       )
-
     return(default)
   }
 

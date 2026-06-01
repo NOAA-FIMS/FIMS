@@ -16,6 +16,44 @@ default_parameters <- create_default_configurations(data = data) |>
   create_default_parameters(data = data) |>
   tidyr::unnest(cols = data)
 
+vonb_parameters <- create_default_configurations(data = data) |>
+  tidyr::unnest(cols = data) |>
+  dplyr::rows_update(
+    tibble::tibble(
+      module_name = "Growth",
+      module_type = "VonBertalanffy"
+    ),
+    by = c("module_name")
+  ) |>
+  create_default_parameters(data = data) |>
+  tidyr::unnest(cols = data)
+
+make_vonb_interpolation_sd_rows <- function(parameters) {
+  reference_age_1 <- parameters |>
+    dplyr::filter(
+      module_name == "Growth",
+      label == "reference_age_for_length_1"
+    ) |>
+    dplyr::pull(value)
+
+  reference_age_2 <- parameters |>
+    dplyr::filter(
+      module_name == "Growth",
+      label == "reference_age_for_length_2"
+    ) |>
+    dplyr::pull(value)
+
+  create_default_parameters_template(n_parameters = 2) |>
+    dplyr::mutate(
+      module_name = "Growth",
+      module_type = "VonBertalanffy",
+      label = "length_at_age_sd_at_ref_ages",
+      age = c(reference_age_1, reference_age_2),
+      value = c(28, 73),
+      estimation_type = c("constant", "constant")
+    )
+}
+
 make_no_local_alk_fleet_context <- function() {
   no_local_alk_data <- data |>
     get_data() |>
@@ -101,6 +139,133 @@ test_that("`initialize_fims()` works with correct inputs", {
       dplyr::mutate(out = value * uncertainty) |>
       dplyr::pull(out)
   )
+  clear()
+})
+
+test_that("initialize_growth errors when neither variability path is supplied", {
+  parameters <- vonb_parameters |>
+    dplyr::filter(
+      !(module_name == "Growth" &
+          (label == "length_at_age_sd_at_ref_ages" |
+             label %in% c(
+               "log_sd_length_at_ref_age_1",
+               "log_sd_length_at_ref_age_2",
+               "log_sd_growth_coefficient_K",
+               "logit_corr_length_at_ref_age_1_length_at_ref_age_2",
+               "logit_corr_length_at_ref_age_1_k",
+               "logit_corr_length_at_ref_age_2_k"
+             )))
+    )
+
+  #' @description Test that initialize_growth() requires users to supply
+  #' either interpolation inputs or a complete delta-method variability block.
+  expect_error(
+    initialize_growth(
+      parameters = parameters,
+      data = data
+    ),
+    regexp = "requires variability inputs for exactly one supported path"
+  )
+  clear()
+})
+
+test_that("initialize_growth accepts interpolation inputs without delta-method inputs", {
+  interpolation_rows <- make_vonb_interpolation_sd_rows(vonb_parameters)
+
+  parameters <- vonb_parameters |>
+    dplyr::filter(
+      !(module_name == "Growth" &
+          label %in% c(
+            "log_sd_length_at_ref_age_1",
+            "log_sd_length_at_ref_age_2",
+            "log_sd_growth_coefficient_K",
+            "logit_corr_length_at_ref_age_1_length_at_ref_age_2",
+            "logit_corr_length_at_ref_age_1_k",
+            "logit_corr_length_at_ref_age_2_k"
+          ))
+    ) |>
+    dplyr::bind_rows(interpolation_rows)
+
+  growth <- initialize_growth(
+    parameters = parameters,
+    data = data
+  )
+
+  #' @description Test that initialize_growth() accepts the interpolation
+  #' inputs without requiring or silently backfilling the delta-method
+  #' variability block.
+  expect_equal(growth$length_at_age_sd_at_ref_ages$size(), 2)
+  expect_equal(growth$log_sd_length_at_ref_age_1$size(), 0)
+  expect_equal(growth$log_sd_length_at_ref_age_2$size(), 0)
+  expect_equal(growth$log_sd_growth_coefficient_K$size(), 0)
+  expect_equal(growth$logit_corr_length_at_ref_age_1_length_at_ref_age_2$size(), 0)
+  expect_equal(growth$logit_corr_length_at_ref_age_1_k$size(), 0)
+  expect_equal(growth$logit_corr_length_at_ref_age_2_k$size(), 0)
+  clear()
+})
+
+test_that("initialize_growth errors when both variability paths are supplied", {
+  interpolation_rows <- make_vonb_interpolation_sd_rows(vonb_parameters)
+
+  parameters <- vonb_parameters |>
+    dplyr::bind_rows(interpolation_rows)
+
+  #' @description Test that initialize_growth() rejects parameter tables that
+  #' supply both interpolation inputs and the full delta-method variability
+  #' block at the same time.
+  expect_error(
+    initialize_growth(
+      parameters = parameters,
+      data = data
+    ),
+    regexp = "for the delta-method path, but not both"
+  )
+  clear()
+})
+
+test_that("initialize_growth errors on partial delta-method variability inputs", {
+  parameters <- vonb_parameters
+
+  partial_parameters <- parameters |>
+    dplyr::filter(
+      !(module_name == "Growth" &
+          label %in% c(
+            "log_sd_length_at_ref_age_2",
+            "log_sd_growth_coefficient_K",
+            "logit_corr_length_at_ref_age_1_length_at_ref_age_2",
+            "logit_corr_length_at_ref_age_1_k",
+            "logit_corr_length_at_ref_age_2_k"
+          ))
+    )
+
+  #' @description Test that initialize_growth() rejects incomplete VonB
+  #' delta-method variability input sets.
+  expect_error(
+    initialize_growth(
+      parameters = partial_parameters,
+      data = data
+    ),
+    regexp = "delta-method variability inputs must be supplied as a complete set"
+  )
+  clear()
+})
+
+test_that("initialize_growth accepts complete delta-method variability inputs", {
+  parameters <- vonb_parameters
+
+  growth <- initialize_growth(
+    parameters = parameters,
+    data = data
+  )
+
+  #' @description Test that initialize_growth() accepts a complete VonB
+  #' delta-method variability block.
+  expect_equal(growth$log_sd_length_at_ref_age_1$size(), 1)
+  expect_equal(growth$log_sd_length_at_ref_age_2$size(), 1)
+  expect_equal(growth$log_sd_growth_coefficient_K$size(), 1)
+  expect_equal(growth$logit_corr_length_at_ref_age_1_length_at_ref_age_2$size(), 1)
+  expect_equal(growth$logit_corr_length_at_ref_age_1_k$size(), 1)
+  expect_equal(growth$logit_corr_length_at_ref_age_2_k$size(), 1)
   clear()
 })
 

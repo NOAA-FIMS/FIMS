@@ -405,6 +405,18 @@ RCPP_MODULE(fims) {
          &VonBertalanffyGrowthInterface::length_weight_b)
   .field("length_at_age_sd_at_ref_ages",
          &VonBertalanffyGrowthInterface::length_at_age_sd_at_ref_ages)
+  .field("log_sd_length_at_ref_age_1",
+         &VonBertalanffyGrowthInterface::log_sd_length_at_ref_age_1)
+  .field("log_sd_length_at_ref_age_2",
+         &VonBertalanffyGrowthInterface::log_sd_length_at_ref_age_2)
+  .field("log_sd_growth_coefficient_K",
+         &VonBertalanffyGrowthInterface::log_sd_growth_coefficient_K)
+  .field("logit_corr_length_at_ref_age_1_length_at_ref_age_2",
+         &VonBertalanffyGrowthInterface::logit_corr_length_at_ref_age_1_length_at_ref_age_2)
+  .field("logit_corr_length_at_ref_age_1_k",
+         &VonBertalanffyGrowthInterface::logit_corr_length_at_ref_age_1_k)
+  .field("logit_corr_length_at_ref_age_2_k",
+         &VonBertalanffyGrowthInterface::logit_corr_length_at_ref_age_2_k)
   .field("n_ages", &VonBertalanffyGrowthInterface::n_ages)
   .method("get_id", &VonBertalanffyGrowthInterface::get_id)
   .method("evaluate", &VonBertalanffyGrowthInterface::evaluate)

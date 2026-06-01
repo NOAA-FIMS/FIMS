@@ -105,6 +105,15 @@ methods::setClass(
     "length_at_age_sd_at_ref_ages"
   )
 
+  growth_working_scale_labels <- c(
+    "log_sd_length_at_ref_age_1",
+    "log_sd_length_at_ref_age_2",
+    "log_sd_growth_coefficient_K",
+    "logit_corr_length_at_ref_age_1_length_at_ref_age_2",
+    "logit_corr_length_at_ref_age_1_k",
+    "logit_corr_length_at_ref_age_2_k"
+  )
+
   growth_delta_uncertainty <- dplyr::if_else(
     estimates[["module_name"]] == "Growth" &
       estimates[["label"]] %in% growth_log_scale_labels &
@@ -112,6 +121,15 @@ methods::setClass(
       !is.na(estimates[["uncertainty.y"]]),
     abs(estimates[["estimated"]]) * estimates[["uncertainty.y"]],
     fallback_uncertainty
+  )
+
+  growth_delta_uncertainty <- dplyr::if_else(
+    estimates[["module_name"]] == "Growth" &
+      estimates[["label"]] %in% growth_working_scale_labels &
+      (is.na(estimates[["uncertainty.x"]]) | estimates[["uncertainty.x"]] == -999) &
+      !is.na(estimates[["uncertainty.y"]]),
+    estimates[["uncertainty.y"]],
+    growth_delta_uncertainty
   )
 
   estimates[["uncertainty"]] <- growth_delta_uncertainty

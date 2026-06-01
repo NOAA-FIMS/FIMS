@@ -115,4 +115,34 @@ TEST(VonBertalanffyGrowthModelAdapter, ExtrapolatesAboveCachedAgeRange) {
   EXPECT_NEAR(W, expected, 1e-8);
 }
 
+TEST(VonBertalanffyGrowthModelAdapter, RejectsBothVariabilityPaths) {
+  fims_popdy::VonBertalanffyGrowthModelAdapter<double> adapter;
+  ConfigureAdapter(adapter, 275.0, 725.0, 0.18, 1.0, 12.0,
+                   2.5e-11, 3.0, 28.0, 73.0);
+
+  adapter.LogSdLengthAtRefAge1Vector().resize(1);
+  adapter.LogSdLengthAtRefAge2Vector().resize(1);
+  adapter.LogSdGrowthCoefficientKVector().resize(1);
+  adapter.LogitCorrLengthAtRefAge1LengthAtRefAge2Vector().resize(1);
+  adapter.LogitCorrLengthAtRefAge1KVector().resize(1);
+  adapter.LogitCorrLengthAtRefAge2KVector().resize(1);
+
+  adapter.LogSdLengthAtRefAge1Vector()[0] = fims_math::log(0.1);
+  adapter.LogSdLengthAtRefAge2Vector()[0] = fims_math::log(0.1);
+  adapter.LogSdGrowthCoefficientKVector()[0] = fims_math::log(0.1);
+  adapter.LogitCorrLengthAtRefAge1LengthAtRefAge2Vector()[0] = 0.0;
+  adapter.LogitCorrLengthAtRefAge1KVector()[0] = 0.0;
+  adapter.LogitCorrLengthAtRefAge2KVector()[0] = 0.0;
+
+  adapter.SetAgeOffset(1.0);
+
+  try {
+    adapter.Initialize(1, 12, 1);
+    FAIL() << "Expected std::runtime_error";
+  } catch (const std::runtime_error& e) {
+    EXPECT_NE(std::string(e.what()).find("exactly one supported path"),
+              std::string::npos);
+  }
+}
+
 }  // namespace
