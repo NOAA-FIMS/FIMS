@@ -431,6 +431,35 @@ class Information {
   }
 
   /**
+   * @brief Add a mirrored likelihood term.
+   *
+   * @param type likelihood term type
+   * @param name term name
+   * @param source_id ID of the mirrored legacy density component
+   * @param x observed/target values
+   * @param location expected/location values
+   * @param scale scale values
+   * @param log_density distribution log-density function
+   * @param include optional predicate for skipping entries
+   */
+  void AddLikelihoodTerm(
+      fims_likelihood::LikelihoodTermType type, const std::string& name,
+      uint32_t source_id, fims_likelihood::ValueRef<Type> x,
+      fims_likelihood::ValueRef<Type> location,
+      fims_likelihood::ValueRef<Type> scale,
+      typename fims_likelihood::LikelihoodTerm<Type>::LogDensityFunction
+          log_density,
+      typename fims_likelihood::LikelihoodTerm<Type>::IncludeFunction include =
+          nullptr) {
+    std::shared_ptr<fims_likelihood::LikelihoodTerm<Type>> term =
+        std::make_shared<fims_likelihood::LikelihoodTerm<Type>>(
+            type, name, x, location, scale, log_density);
+    term->source_id = source_id;
+    term->include = include;
+    this->likelihood_terms.push_back(term);
+  }
+
+  /**
    * @brief Mirror legacy prior density components into likelihood terms.
    *
    * @details This builds the new composable representation without changing
@@ -464,13 +493,10 @@ class Information {
               return fims_math::exp(normal->log_sd.get_force_scalar(i));
             },
             normal->log_sd.size());
-        std::shared_ptr<fims_likelihood::LikelihoodTerm<Type>> term =
-            std::make_shared<fims_likelihood::LikelihoodTerm<Type>>(
-                fims_likelihood::LikelihoodTermType::Prior,
-                "normal_prior." + fims::to_string(d->id), x, location, scale,
-                fims_distributions::kernels::Normal<Type>::log_density);
-        term->source_id = d->id;
-        this->likelihood_terms.push_back(term);
+        this->AddLikelihoodTerm(
+            fims_likelihood::LikelihoodTermType::Prior,
+            "normal_prior." + fims::to_string(d->id), d->id, x, location,
+            scale, fims_distributions::kernels::Normal<Type>::log_density);
         continue;
       }
 
@@ -482,14 +508,11 @@ class Information {
               return fims_math::exp(lognormal->log_sd.get_force_scalar(i));
             },
             lognormal->log_sd.size());
-        std::shared_ptr<fims_likelihood::LikelihoodTerm<Type>> term =
-            std::make_shared<fims_likelihood::LikelihoodTerm<Type>>(
-                fims_likelihood::LikelihoodTermType::Prior,
-                "lognormal_prior." + fims::to_string(d->id), x, location,
-                scale,
-                fims_distributions::kernels::LogNormal<Type>::log_density);
-        term->source_id = d->id;
-        this->likelihood_terms.push_back(term);
+        this->AddLikelihoodTerm(
+            fims_likelihood::LikelihoodTermType::Prior,
+            "lognormal_prior." + fims::to_string(d->id), d->id, x, location,
+            scale,
+            fims_distributions::kernels::LogNormal<Type>::log_density);
       }
     }
   }
@@ -530,13 +553,11 @@ class Information {
               return fims_math::exp(normal->log_sd.get_force_scalar(i));
             },
             normal->log_sd.size());
-        std::shared_ptr<fims_likelihood::LikelihoodTerm<Type>> term =
-            std::make_shared<fims_likelihood::LikelihoodTerm<Type>>(
-                fims_likelihood::LikelihoodTermType::RandomEffect,
-                "normal_random_effect." + fims::to_string(d->id), x, location,
-                scale, fims_distributions::kernels::Normal<Type>::log_density);
-        term->source_id = d->id;
-        this->likelihood_terms.push_back(term);
+        this->AddLikelihoodTerm(
+            fims_likelihood::LikelihoodTermType::RandomEffect,
+            "normal_random_effect." + fims::to_string(d->id), d->id, x,
+            location, scale,
+            fims_distributions::kernels::Normal<Type>::log_density);
         continue;
       }
 
@@ -548,15 +569,12 @@ class Information {
               return fims_math::exp(lognormal->log_sd.get_force_scalar(i));
             },
             lognormal->log_sd.size());
-        std::shared_ptr<fims_likelihood::LikelihoodTerm<Type>> term =
-            std::make_shared<fims_likelihood::LikelihoodTerm<Type>>(
-                fims_likelihood::LikelihoodTermType::RandomEffect,
-                "lognormal_random_effect." + fims::to_string(d->id), x,
-                location, scale,
-                fims_distributions::kernels::LogNormal<
-                    Type>::log_density_log_scale);
-        term->source_id = d->id;
-        this->likelihood_terms.push_back(term);
+        this->AddLikelihoodTerm(
+            fims_likelihood::LikelihoodTermType::RandomEffect,
+            "lognormal_random_effect." + fims::to_string(d->id), d->id, x,
+            location, scale,
+            fims_distributions::kernels::LogNormal<
+                Type>::log_density_log_scale);
       }
     }
   }
@@ -595,16 +613,13 @@ class Information {
               return fims_math::exp(normal->log_sd.get_force_scalar(i));
             },
             normal->log_sd.size());
-        std::shared_ptr<fims_likelihood::LikelihoodTerm<Type>> term =
-            std::make_shared<fims_likelihood::LikelihoodTerm<Type>>(
-                fims_likelihood::LikelihoodTermType::Data,
-                "normal_data." + fims::to_string(d->id), x, location, scale,
-                fims_distributions::kernels::Normal<Type>::log_density);
-        term->source_id = d->id;
-        term->include = [d](size_t i) -> bool {
-          return d->get_observed(i) != d->data_observed_values->na_value;
-        };
-        this->likelihood_terms.push_back(term);
+        this->AddLikelihoodTerm(
+            fims_likelihood::LikelihoodTermType::Data,
+            "normal_data." + fims::to_string(d->id), d->id, x, location,
+            scale, fims_distributions::kernels::Normal<Type>::log_density,
+            [d](size_t i) -> bool {
+              return d->get_observed(i) != d->data_observed_values->na_value;
+            });
         continue;
       }
 
@@ -616,16 +631,13 @@ class Information {
               return fims_math::exp(lognormal->log_sd.get_force_scalar(i));
             },
             lognormal->log_sd.size());
-        std::shared_ptr<fims_likelihood::LikelihoodTerm<Type>> term =
-            std::make_shared<fims_likelihood::LikelihoodTerm<Type>>(
-                fims_likelihood::LikelihoodTermType::Data,
-                "lognormal_data." + fims::to_string(d->id), x, location, scale,
-                fims_distributions::kernels::LogNormal<Type>::log_density);
-        term->source_id = d->id;
-        term->include = [d](size_t i) -> bool {
-          return d->get_observed(i) != d->data_observed_values->na_value;
-        };
-        this->likelihood_terms.push_back(term);
+        this->AddLikelihoodTerm(
+            fims_likelihood::LikelihoodTermType::Data,
+            "lognormal_data." + fims::to_string(d->id), d->id, x, location,
+            scale, fims_distributions::kernels::LogNormal<Type>::log_density,
+            [d](size_t i) -> bool {
+              return d->get_observed(i) != d->data_observed_values->na_value;
+            });
       }
     }
   }
