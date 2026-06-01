@@ -210,7 +210,7 @@ form directly and not rounding observations.
 
 ## Patch 18: Multinomial Data Mirroring
 
-Status: local, not committed yet.
+Commit: `2ef2579e Mirror multinomial data likelihood terms`
 
 Extended `LikelihoodTerm` with an optional row-wise vector density path, leaving
 the existing scalar normal/lognormal path unchanged.
@@ -220,6 +220,18 @@ Added multinomial data mirroring in `Information`:
 - row-wise likelihood-term creation helper
 - `TryAddMultinomialDataLikelihoodTerm(...)`
 - data setup now mirrors complete multinomial data components
+
+## Patch 19: Likelihood Term Factory Helpers
+
+Status: local, not committed yet.
+
+Added named factory helpers in `likelihood_term.hpp`:
+
+- scalar likelihood-term construction
+- row-wise likelihood-term construction
+
+Refactored `Information::AddLikelihoodTerm(...)` to use these helpers, keeping
+term setup centralized and easier to expose through a friendlier interface.
 
 ## Current State
 
@@ -235,9 +247,9 @@ The branch currently has a side-by-side likelihood-term architecture:
 
 Current local uncommitted work:
 
-- `inst/include/likelihood/likelihood_term.hpp`: patch 18 row-wise evaluation
-- `inst/include/common/information.hpp`: patch 18 multinomial data mirroring
-- `tests/gtest/test_info_likelihood_terms.cpp`: patch 18 multinomial mirror test
-- `likelihood-refactor-patch-log.md`: patch 18 entry
+- `inst/include/likelihood/likelihood_term.hpp`: patch 19 factory helpers
+- `inst/include/common/information.hpp`: patch 19 factory helper use
+- `tests/gtest/test_likelihood_primitives.cpp`: patch 19 factory helper tests
+- `likelihood-refactor-patch-log.md`: patch 19 entry
 
 Note: `docs/likelihoods-distributions-refactor-chat.md` was also updated locally, but `docs/` is ignored by this repository, so this root-level file is the tracked version intended for commits.

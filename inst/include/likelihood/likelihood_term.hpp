@@ -10,6 +10,7 @@
 
 #include <cstdint>
 #include <functional>
+#include <memory>
 #include <string>
 
 #include "../common/fims_vector.hpp"
@@ -144,6 +145,47 @@ struct LikelihoodTerm {
     return ref.size() == 1 ? 0 : i;
   }
 };
+
+/**
+ * @brief Build a scalar likelihood term with named helper semantics.
+ */
+template <typename Type>
+inline std::shared_ptr<LikelihoodTerm<Type>> make_likelihood_term(
+    LikelihoodTermType type, const std::string& name, ValueRef<Type> x,
+    ValueRef<Type> location, ValueRef<Type> scale,
+    typename LikelihoodTerm<Type>::LogDensityFunction log_density,
+    typename LikelihoodTerm<Type>::IncludeFunction include = nullptr,
+    uint32_t source_id = 0) {
+  std::shared_ptr<LikelihoodTerm<Type>> term =
+      std::make_shared<LikelihoodTerm<Type>>(type, name, x, location, scale,
+                                             log_density);
+  term->source_id = source_id;
+  term->include = include;
+  return term;
+}
+
+/**
+ * @brief Build a row-wise likelihood term with named helper semantics.
+ */
+template <typename Type>
+inline std::shared_ptr<LikelihoodTerm<Type>> make_likelihood_term(
+    LikelihoodTermType type, const std::string& name, ValueRef<Type> x,
+    ValueRef<Type> location, size_t row_size,
+    typename LikelihoodTerm<Type>::VectorLogDensityFunction log_density,
+    typename LikelihoodTerm<Type>::IncludeFunction include = nullptr,
+    uint32_t source_id = 0) {
+  std::shared_ptr<LikelihoodTerm<Type>> term =
+      std::make_shared<LikelihoodTerm<Type>>();
+  term->type = type;
+  term->name = name;
+  term->source_id = source_id;
+  term->x = x;
+  term->location = location;
+  term->row_size = row_size;
+  term->vector_log_density = log_density;
+  term->include = include;
+  return term;
+}
 
 }  // namespace fims_likelihood
 

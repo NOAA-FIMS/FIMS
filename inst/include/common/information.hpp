@@ -452,12 +452,8 @@ class Information {
           log_density,
       typename fims_likelihood::LikelihoodTerm<Type>::IncludeFunction include =
           nullptr) {
-    std::shared_ptr<fims_likelihood::LikelihoodTerm<Type>> term =
-        std::make_shared<fims_likelihood::LikelihoodTerm<Type>>(
-            type, name, x, location, scale, log_density);
-    term->source_id = source_id;
-    term->include = include;
-    this->likelihood_terms.push_back(term);
+    this->likelihood_terms.push_back(fims_likelihood::make_likelihood_term(
+        type, name, x, location, scale, log_density, include, source_id));
   }
 
   /**
@@ -480,17 +476,8 @@ class Information {
           log_density,
       typename fims_likelihood::LikelihoodTerm<Type>::IncludeFunction include =
           nullptr) {
-    std::shared_ptr<fims_likelihood::LikelihoodTerm<Type>> term =
-        std::make_shared<fims_likelihood::LikelihoodTerm<Type>>();
-    term->type = type;
-    term->name = name;
-    term->source_id = source_id;
-    term->x = x;
-    term->location = location;
-    term->row_size = row_size;
-    term->vector_log_density = log_density;
-    term->include = include;
-    this->likelihood_terms.push_back(term);
+    this->likelihood_terms.push_back(fims_likelihood::make_likelihood_term(
+        type, name, x, location, row_size, log_density, include, source_id));
   }
 
   /**
