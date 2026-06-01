@@ -161,7 +161,7 @@ Refactored prior, random-effect, and data mirroring to use the helper.
 
 ## Patch 14: ValueRef Helper Cleanup
 
-Status: local, not committed yet.
+Commit: `aece25c8 Document likelihood refactor and clean up value refs`
 
 Added helper methods in `Information`:
 
@@ -173,7 +173,27 @@ Added helper methods in `Information`:
 
 Refactored prior, random-effect, and data mirroring to use those helpers.
 
-Verification so far: focused mirrored setup parity compile/run check passed.
+## Patch 15: Distribution-Specific Mirroring Helpers
+
+Commit: `ec1f6b65 Extract distribution-specific likelihood mirroring helpers`
+
+Added helper methods in `Information`:
+
+- `TryAddNormalLikelihoodTerm(...)`
+- `TryAddLogNormalLikelihoodTerm(...)`
+
+Refactored prior, random-effect, and data mirroring to use those helpers. This
+keeps the current normal/lognormal support explicit and makes each new
+distribution family a small helper-level addition.
+
+## Patch 16: Unsupported Distribution Boundary Test
+
+Status: local, not committed yet.
+
+Added a focused test that runs a complete multinomial data component through
+`SetDataObjects()` and `SetupData()`, then confirms it is not mirrored into
+`likelihood_terms` yet. This documents the current boundary while normal and
+lognormal are the only mirrored distribution families.
 
 ## Current State
 
@@ -182,11 +202,13 @@ The branch currently has a side-by-side likelihood-term architecture:
 - legacy behavior remains default
 - mirrored likelihood-term behavior is available behind `Information::use_likelihood_terms`
 - priors, random effects, and data are mirrored for normal/lognormal distributions
+- unsupported distribution families are set up through the legacy path but are
+  not mirrored until an explicit likelihood-term helper is added
 - model-level opt-in evaluation exists and has focused parity coverage
 
 Current local uncommitted work:
 
-- `inst/include/common/information.hpp`: patch 14 helper cleanup
-- `likelihood-refactor-patch-log.md`: this tracked patch log
+- `tests/gtest/test_info_likelihood_terms.cpp`: patch 16 unsupported boundary test
+- `likelihood-refactor-patch-log.md`: patch 16 entry
 
 Note: `docs/likelihoods-distributions-refactor-chat.md` was also updated locally, but `docs/` is ignored by this repository, so this root-level file is the tracked version intended for commits.

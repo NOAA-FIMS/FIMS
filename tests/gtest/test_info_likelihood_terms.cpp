@@ -482,6 +482,43 @@ TEST(InformationLikelihoodTerms, MirrorsLognormalDataDensityComponent) {
   info->Clear();
 }
 
+TEST(InformationLikelihoodTerms, DoesNotMirrorUnsupportedDataDensityComponent) {
+  std::shared_ptr<fims_info::Information<double>> info =
+      fims_info::Information<double>::GetInstance();
+  info->Clear();
+
+  std::shared_ptr<fims_data_object::DataObject<double>> observed =
+      std::make_shared<fims_data_object::DataObject<double>>(1, 2);
+  observed->id = 302;
+  observed->data[0] = 3.0;
+  observed->data[1] = 7.0;
+  info->data_objects[observed->id] = observed;
+
+  fims::Vector<double> expected{0.3, 0.7};
+  info->variable_map[302] = &expected;
+
+  std::shared_ptr<fims_distributions::MultinomialLPMF<double>>
+      multinomial_data =
+          std::make_shared<fims_distributions::MultinomialLPMF<double>>();
+  multinomial_data->id = 3002;
+  multinomial_data->input_type = "data";
+  multinomial_data->observed_data_id_m = observed->id;
+  multinomial_data->key.resize(1);
+  multinomial_data->key[0] = 302;
+  info->density_components[multinomial_data->id] = multinomial_data;
+
+  bool valid_model = true;
+  info->SetDataObjects(valid_model);
+  info->SetupData();
+
+  EXPECT_TRUE(valid_model);
+  EXPECT_EQ(multinomial_data->data_observed_values, observed);
+  EXPECT_EQ(multinomial_data->data_expected_values, &expected);
+  EXPECT_TRUE(info->likelihood_terms.empty());
+
+  info->Clear();
+}
+
 TEST(InformationLikelihoodTerms, ModelEvaluationMatchesMirroredSetupPaths) {
   std::shared_ptr<fims_info::Information<double>> info =
       fims_info::Information<double>::GetInstance();
