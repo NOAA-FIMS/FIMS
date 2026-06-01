@@ -339,6 +339,26 @@ class Information {
   }
 
   /**
+   * @brief Evaluate negative log-likelihood for terms of a specific type.
+   *
+   * @param type likelihood term type to evaluate
+   * @return Negative sum of log-density contributions for matching terms.
+   */
+  Type EvaluateNegativeLogLikelihoodTerms(
+      fims_likelihood::LikelihoodTermType type) {
+    return -this->EvaluateLikelihoodTerms(type);
+  }
+
+  /**
+   * @brief Evaluate negative log-likelihood for all likelihood terms.
+   *
+   * @return Negative sum of log-density contributions across all terms.
+   */
+  Type EvaluateNegativeLogLikelihoodTerms() {
+    return -this->EvaluateLikelihoodTerms();
+  }
+
+  /**
    * @brief Find a likelihood term by legacy density component source ID.
    *
    * @param source_id ID of the mirrored legacy density component.
@@ -391,6 +411,19 @@ class Information {
           fims::to_string(source_id) + ".");
     }
     return term->evaluate();
+  }
+
+  /**
+   * @brief Evaluate negative log-likelihood for one mirrored term.
+   *
+   * @param source_id ID of the mirrored legacy density component.
+   * @param type likelihood term type to match
+   * @return Negative log-density contribution for the matching term.
+   * @throws std::runtime_error if no matching likelihood term exists.
+   */
+  Type EvaluateNegativeLogLikelihoodTerm(
+      uint32_t source_id, fims_likelihood::LikelihoodTermType type) {
+    return -this->EvaluateLikelihoodTerm(source_id, type);
   }
 
   /**

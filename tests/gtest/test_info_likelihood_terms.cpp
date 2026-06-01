@@ -94,6 +94,17 @@ TEST(InformationLikelihoodTerms, EvaluatesTermsByTypeAndTotal) {
       data_value, 1e-12);
   EXPECT_NEAR(info->EvaluateLikelihoodTerms(),
               prior_value + random_effect_value + data_value, 1e-12);
+  EXPECT_NEAR(info->EvaluateNegativeLogLikelihoodTerms(
+                  fims_likelihood::LikelihoodTermType::Prior),
+              -prior_value, 1e-12);
+  EXPECT_NEAR(info->EvaluateNegativeLogLikelihoodTerms(
+                  fims_likelihood::LikelihoodTermType::RandomEffect),
+              -random_effect_value, 1e-12);
+  EXPECT_NEAR(info->EvaluateNegativeLogLikelihoodTerms(
+                  fims_likelihood::LikelihoodTermType::Data),
+              -data_value, 1e-12);
+  EXPECT_NEAR(info->EvaluateNegativeLogLikelihoodTerms(),
+              -(prior_value + random_effect_value + data_value), 1e-12);
   EXPECT_EQ(data->log_density_values[1], 0.0);
 
   info->Clear();
@@ -142,7 +153,15 @@ TEST(InformationLikelihoodTerms, FindsAndEvaluatesTermsBySource) {
               fims_distributions::kernels::Normal<double>::log_density(
                   2.0, 0.0, 1.0),
               1e-12);
+  EXPECT_NEAR(info->EvaluateNegativeLogLikelihoodTerm(
+                  4000, fims_likelihood::LikelihoodTermType::Prior),
+              -fims_distributions::kernels::Normal<double>::log_density(
+                  2.0, 0.0, 1.0),
+              1e-12);
   EXPECT_THROW(info->EvaluateLikelihoodTerm(
+                   4000, fims_likelihood::LikelihoodTermType::RandomEffect),
+               std::runtime_error);
+  EXPECT_THROW(info->EvaluateNegativeLogLikelihoodTerm(
                    4000, fims_likelihood::LikelihoodTermType::RandomEffect),
                std::runtime_error);
 
