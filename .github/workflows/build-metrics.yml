@@ -23,10 +23,14 @@ jobs:
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       BASELINE_REPOSITORY: ${{ github.event.pull_request.base.repo.full_name || github.repository }}
+      CURRENT_COMMIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
       REGRESSION_PCT: 15
 
     steps:
       - uses: actions/checkout@v6
+        with:
+          repository: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
       - name: Install system dependencies
         run: |
@@ -321,7 +325,7 @@ jobs:
                   shared_objects[path] = int(size)
 
           metrics = {
-              "commit_sha": __import__("os").environ.get("GITHUB_SHA", "unknown"),
+              "commit_sha": __import__("os").environ.get("CURRENT_COMMIT_SHA", __import__("os").environ.get("GITHUB_SHA", "unknown")),
               "timestamp": __import__("datetime").datetime.now(__import__("datetime").timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
               "dependency_install_time_sec": parse_elapsed_seconds(dependency_log),
               "dependency_install_max_rss_kb": dependency_rss_kb,
@@ -356,49 +360,167 @@ jobs:
           set -euo pipefail
           echo "Looking for baseline metrics in $BASELINE_REPOSITORY."
 
-          # Get the latest commit on main branch
-          LATEST_MAIN_COMMIT=$(git -C $BASELINE_REPOSITORY rev-parse origin/main 2>/dev/null || echo "")
+          LATEST_MAIN_COMMIT=$(gh api "repos/${BASELINE_REPOSITORY}/commits/main" --jq .sha 2>/dev/null || true)
+          if [ -z "$LATEST_MAIN_COMMIT" ]; then
+            LATEST_MAIN_COMMIT=$(git ls-remote "https://github.com/${BASELINE_REPOSITORY}.git" refs/heads/main | awk '{print $1}')
+          fi
           
           if [ -z "$LATEST_MAIN_COMMIT" ]; then
             echo "Could not determine latest main branch commit."
-            exit 0
+            if [ "$GITHUB_EVENT_NAME" = "pull_request" ]; then exit 1; else exit 0; fi
           fi
 
-          # Find the run for that commit (regardless of status)
-          BASELINE_RUN_ID=$(gh run list \
-            --repo "$BASELINE_REPOSITORY" \
-            --workflow build-metrics.yml \
-            --branch main \
-            --event push \
-            --limit 50 \
-            --json headSha,databaseId,conclusion \
-            --jq ".[] | select(.headSha == \"$LATEST_MAIN_COMMIT\") | .databaseId" | head -1)
+          echo "Latest main commit is $LATEST_MAIN_COMMIT."
+          export LATEST_MAIN_COMMIT
 
-          if [ -z "$BASELINE_RUN_ID" ]; then
-            echo "No build-metrics run found for latest main commit $LATEST_MAIN_COMMIT."
-            exit 0
-          fi
+          build_baseline_metrics_from_main() {
+            echo "Building baseline metrics from latest main commit $LATEST_MAIN_COMMIT."
+            rm -rf baseline-main baseline_package_install.log baseline_installed_shared_objects.tsv
+            git clone --depth 1 --branch main "https://github.com/${BASELINE_REPOSITORY}.git" baseline-main
+            git -C baseline-main checkout "$LATEST_MAIN_COMMIT"
 
-          echo "Found run $BASELINE_RUN_ID for latest main commit $LATEST_MAIN_COMMIT."
-          rm -rf baseline-metrics
-          mkdir -p baseline-metrics
-
-          if gh run download "$BASELINE_RUN_ID" \
-            --repo "$BASELINE_REPOSITORY" \
-            --name build-metrics-main \
-            --dir baseline-metrics; then
-            if [ -f baseline-metrics/metrics.json ]; then
-              cp baseline-metrics/metrics.json previous_metrics.json
-              echo "Downloaded baseline metrics from main commit $LATEST_MAIN_COMMIT (run $BASELINE_RUN_ID)."
-            else
-              echo "Run $BASELINE_RUN_ID had the artifact but no metrics.json file."
+            set +e
+            /usr/bin/time -v R CMD INSTALL baseline-main > baseline_package_install.log 2>&1
+            local baseline_status=$?
+            set -e
+            if [ "$baseline_status" -ne 0 ]; then
+              cat baseline_package_install.log
+              echo "Baseline main package install failed."
+              return "$baseline_status"
             fi
-          else
-            echo "No build-metrics-main artifact found for run $BASELINE_RUN_ID."
+
+            Rscript -e 'cat(system.file(package = "FIMS"))' > baseline_installed_package_path.txt
+            BASELINE_INSTALLED_PACKAGE_PATH=$(cat baseline_installed_package_path.txt)
+            if [ -z "$BASELINE_INSTALLED_PACKAGE_PATH" ]; then
+              echo "Could not find installed baseline FIMS package path."
+              return 1
+            fi
+
+            du -sb "$BASELINE_INSTALLED_PACKAGE_PATH" | awk '{print $1}' > baseline_installed_package_size_bytes.txt
+            find "$BASELINE_INSTALLED_PACKAGE_PATH" -type f | wc -l > baseline_installed_file_count.txt
+            find "$BASELINE_INSTALLED_PACKAGE_PATH" \( -name "*.so" -o -name "*.dll" -o -name "*.dylib" \) -type f -printf "%p\t%s\n" | sort > baseline_installed_shared_objects.tsv
+            awk '{sum += $2} END {print sum + 0}' baseline_installed_shared_objects.tsv > baseline_installed_shared_object_total_bytes.txt
+            wc -l < baseline_installed_shared_objects.tsv > baseline_installed_shared_object_count.txt
+
+            python3 <<'EOF'
+          import json
+          import os
+          import re
+          from pathlib import Path
+
+          def read_text(path):
+              return Path(path).read_text(errors="replace") if Path(path).exists() else ""
+
+          def parse_elapsed_seconds(text):
+              match = re.search(r"Elapsed \(wall clock\) time.*?:\s*([0-9:.]+)\s*$", text, re.MULTILINE)
+              if not match:
+                  return None
+              parts = match.group(1).split(":")
+              try:
+                  if len(parts) == 3:
+                      return round(float(parts[0]) * 3600 + float(parts[1]) * 60 + float(parts[2]), 2)
+                  if len(parts) == 2:
+                      return round(float(parts[0]) * 60 + float(parts[1]), 2)
+                  return round(float(parts[0]), 2)
+              except ValueError:
+                  return None
+
+          def parse_max_rss_kb(text):
+              match = re.search(r"Maximum resident set size.*?:\s*([0-9]+)\s*$", text, re.MULTILINE)
+              return int(match.group(1)) if match else None
+
+          def count_warnings(text):
+              return len(re.findall(r"warning:", text))
+
+          def count_errors(text):
+              lines = [line for line in text.splitlines() if not re.search(r"[0-9]+ error\(s\) generated", line)]
+              return sum("error:" in line for line in lines)
+
+          def read_int(path):
+              path = Path(path)
+              if not path.exists():
+                  return 0
+              text = path.read_text().strip()
+              return int(text) if text else 0
+
+          current = json.loads(Path("metrics.json").read_text())
+          package_log = read_text("baseline_package_install.log")
+          package_rss_kb = parse_max_rss_kb(package_log)
+          package_rss_mb = round(package_rss_kb / 1024, 2) if package_rss_kb is not None else None
+          shared_objects = {}
+          shared_object_path = Path("baseline_installed_shared_objects.tsv")
+          if shared_object_path.exists():
+              for line in shared_object_path.read_text().splitlines():
+                  path, size = line.split("\t")
+                  shared_objects[path] = int(size)
+
+          previous = {
+              "commit_sha": os.environ["LATEST_MAIN_COMMIT"],
+              "timestamp": current.get("timestamp"),
+              "dependency_install_time_sec": current.get("dependency_install_time_sec"),
+              "dependency_install_max_rss_kb": current.get("dependency_install_max_rss_kb"),
+              "dependency_install_max_rss_mb": current.get("dependency_install_max_rss_mb"),
+              "dependency_install_sampled_peak_process_tree_rss_kb": current.get("dependency_install_sampled_peak_process_tree_rss_kb"),
+              "dependency_install_sampled_peak_process_tree_rss_mb": current.get("dependency_install_sampled_peak_process_tree_rss_mb"),
+              "dependency_install_sampled_peak_process_count": current.get("dependency_install_sampled_peak_process_count"),
+              "package_install_time_sec": parse_elapsed_seconds(package_log),
+              "package_install_max_rss_kb": package_rss_kb,
+              "package_install_max_rss_mb": package_rss_mb,
+              "package_install_sampled_peak_process_tree_rss_kb": package_rss_kb or 0,
+              "package_install_sampled_peak_process_tree_rss_mb": package_rss_mb or 0,
+              "package_install_sampled_peak_process_count": 0,
+              "peak_ram_mb": package_rss_mb,
+              "warning_count": count_warnings(package_log),
+              "error_count": count_errors(package_log),
+              "installed_package_size_bytes": read_int("baseline_installed_package_size_bytes.txt"),
+              "installed_file_count": read_int("baseline_installed_file_count.txt"),
+              "installed_shared_object_total_bytes": read_int("baseline_installed_shared_object_total_bytes.txt"),
+              "installed_shared_object_count": read_int("baseline_installed_shared_object_count.txt"),
+              "installed_shared_objects": shared_objects,
+          }
+          Path("previous_metrics.json").write_text(json.dumps(previous, indent=2, sort_keys=True) + "\n")
+          print(Path("previous_metrics.json").read_text())
+          EOF
+          }
+
+          BASELINE_ARTIFACT_ID=$(gh api \
+            "repos/${BASELINE_REPOSITORY}/actions/artifacts?per_page=100" \
+            --jq ".artifacts[] | select(.expired == false and .workflow_run.head_sha == \"$LATEST_MAIN_COMMIT\" and (.name == \"build-metrics-main\" or .name == \"build-metrics-$LATEST_MAIN_COMMIT\")) | .id" | head -1)
+
+          if [ -z "$BASELINE_ARTIFACT_ID" ]; then
+            echo "No build metrics artifact found for latest main commit $LATEST_MAIN_COMMIT."
+            gh api \
+              "repos/${BASELINE_REPOSITORY}/actions/artifacts?per_page=20" \
+              --jq '.artifacts[] | "available artifact name=\(.name) id=\(.id) head_sha=\(.workflow_run.head_sha) expired=\(.expired) created_at=\(.created_at)"' || true
+            if ! build_baseline_metrics_from_main; then if [ "$GITHUB_EVENT_NAME" = "pull_request" ]; then exit 1; else exit 0; fi; fi
           fi
 
+          if [ -n "$BASELINE_ARTIFACT_ID" ]; then
+            echo "Downloading build metrics artifact $BASELINE_ARTIFACT_ID for latest main commit $LATEST_MAIN_COMMIT."
+            rm -rf baseline-metrics baseline-metrics.zip
+            mkdir -p baseline-metrics
+
+            gh api \
+              -H "Accept: application/vnd.github+json" \
+              "repos/${BASELINE_REPOSITORY}/actions/artifacts/${BASELINE_ARTIFACT_ID}/zip" \
+              > baseline-metrics.zip
+
+            python3 <<'EOF'
+          from pathlib import Path
+          from zipfile import ZipFile
+
+          ZipFile("baseline-metrics.zip").extractall("baseline-metrics")
+          metrics_files = list(Path("baseline-metrics").rglob("metrics.json"))
+          if not metrics_files:
+              raise SystemExit("Artifact did not contain metrics.json")
+          Path("previous_metrics.json").write_bytes(metrics_files[0].read_bytes())
+          EOF
+
+            echo "Downloaded baseline metrics from main commit $LATEST_MAIN_COMMIT (artifact $BASELINE_ARTIFACT_ID)."
+          fi
           if [ ! -f previous_metrics.json ]; then
-            echo "No usable build-metrics-main artifact found for latest main commit."
+            echo "No usable build metrics artifact found for latest main commit."
+            if ! build_baseline_metrics_from_main; then if [ "$GITHUB_EVENT_NAME" = "pull_request" ]; then exit 1; else exit 0; fi; fi
           fi
 
       - name: Compare against previous metrics
