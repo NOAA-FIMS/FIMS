@@ -29,6 +29,28 @@ TEST(DistributionKernels, LognormalLogScaleDensityOmitsJacobian) {
   EXPECT_NEAR(value, -1.1866973804811303, 1e-12);
 }
 
+TEST(DistributionKernels, MultinomialLogDensityMatchesKnownValue) {
+  fims::Vector<double> observed{3.0, 7.0};
+  fims::Vector<double> probabilities{0.3, 0.7};
+
+  double value =
+      fims_distributions::kernels::Multinomial<double>::log_density(
+          observed, probabilities);
+
+  EXPECT_NEAR(value, -1.3211512777668855, 1e-12);
+}
+
+TEST(DistributionKernels, MultinomialLogDensityDoesNotRoundObservations) {
+  fims::Vector<double> observed{0.5, 1.5};
+  fims::Vector<double> probabilities{0.2, 0.8};
+
+  double value =
+      fims_distributions::kernels::Multinomial<double>::log_density(
+          observed, probabilities);
+
+  EXPECT_NEAR(value, -0.61018773546609339, 1e-12);
+}
+
 TEST(DistributionKernels, NormalKernelWorksWithLikelihoodTerm) {
   fims::Vector<double> observed{1.0, 2.0, 3.0};
   fims::Vector<double> expected{2.0};

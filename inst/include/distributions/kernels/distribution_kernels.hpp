@@ -9,6 +9,7 @@
 #define FIMS_DISTRIBUTIONS_KERNELS_HPP
 
 #include "lognormal.hpp"
+#include "multinomial.hpp"
 #include "normal.hpp"
 
 #endif

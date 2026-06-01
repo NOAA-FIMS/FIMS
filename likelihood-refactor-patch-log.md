@@ -188,12 +188,25 @@ distribution family a small helper-level addition.
 
 ## Patch 16: Unsupported Distribution Boundary Test
 
-Status: local, not committed yet.
+Commit: `32ed28ce Test unsupported likelihood mirroring boundary`
 
 Added a focused test that runs a complete multinomial data component through
 `SetDataObjects()` and `SetupData()`, then confirms it is not mirrored into
 `likelihood_terms` yet. This documents the current boundary while normal and
 lognormal are the only mirrored distribution families.
+
+## Patch 17: Multinomial Density Kernel
+
+Status: local, not committed yet.
+
+Added a math-only multinomial kernel:
+
+- `inst/include/distributions/kernels/multinomial.hpp`
+- aggregate include through `distribution_kernels.hpp`
+- direct kernel tests for integer and fractional observations
+
+The kernel matches the current FIMS/TMB convention by evaluating the lgamma
+form directly and not rounding observations.
 
 ## Current State
 
@@ -208,7 +221,9 @@ The branch currently has a side-by-side likelihood-term architecture:
 
 Current local uncommitted work:
 
-- `tests/gtest/test_info_likelihood_terms.cpp`: patch 16 unsupported boundary test
-- `likelihood-refactor-patch-log.md`: patch 16 entry
+- `inst/include/distributions/kernels/multinomial.hpp`: patch 17 kernel
+- `inst/include/distributions/kernels/distribution_kernels.hpp`: patch 17 include
+- `tests/gtest/test_distribution_kernels.cpp`: patch 17 kernel tests
+- `likelihood-refactor-patch-log.md`: patch 17 entry
 
 Note: `docs/likelihoods-distributions-refactor-chat.md` was also updated locally, but `docs/` is ignored by this repository, so this root-level file is the tracked version intended for commits.
