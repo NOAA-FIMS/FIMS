@@ -278,6 +278,30 @@ target_link_libraries(fims_math_logit
 
 gtest_discover_tests(fims_math_logit)
 
+# test_fims_transformation_ApplyTransformation.cpp
+add_executable(fims_apply_transformation
+  test_fims_transformations_ApplyTransformation.cpp
+)
+
+target_link_libraries(fims_apply_transformation
+  gtest_main
+  fims_test
+)
+
+gtest_discover_tests(fims_apply_transformation)
+
+# test_fims_transformation_TransformPrior.cpp
+add_executable(fims_transform_prior
+  test_fims_transformations_TransformPrior.cpp
+)
+
+target_link_libraries(fims_transform_prior
+  gtest_main
+  fims_test
+)
+
+gtest_discover_tests(fims_transform_prior)
+
 # test_DoubleLogistic_DoubleLogisticSelectivity_Evaluate.cpp
 add_executable(DoubleLogistic_DoubleLogisticSelectivity_Evaluate
   test_DoubleLogistic_DoubleLogisticSelectivity_Evaluate.cpp

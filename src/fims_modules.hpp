@@ -90,6 +90,10 @@ RCPP_MODULE(fims) {
       "See "
       "https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html.");
   Rcpp::function(
+      "add_shared_prior", &setup_prior,
+      "See "
+      "https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html.");
+  Rcpp::function(
       "clear", clear,
       "See "
       "https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html.");
@@ -165,6 +169,7 @@ RCPP_MODULE(fims) {
       .constructor()
       .constructor<size_t>()
       .constructor<Rcpp::NumericVector, size_t>()
+      .method("add_prior", &ParameterVector::add_prior)
       .method("get", &ParameterVector::get)
       .method("set", &ParameterVector::set)
       .method("show", &ParameterVector::show)

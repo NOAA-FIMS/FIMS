@@ -255,7 +255,7 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
         info->RegisterRandomEffectName(ss.str());
       }
     }
-    info->variable_map[this->inflection_point.id_m] =
+    info->variable_map[this->inflection_point.id_m].variable =
         &(selectivity)->inflection_point;
 
     selectivity->slope.resize(this->slope.size());
@@ -274,7 +274,7 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
         info->RegisterRandomEffect(selectivity->slope[i]);
       }
     }
-    info->variable_map[this->slope.id_m] = &(selectivity)->slope;
+    info->variable_map[this->slope.id_m].variable = &(selectivity)->slope;
 
     // add to Information
     info->selectivity_models[selectivity->id] = selectivity;
@@ -514,7 +514,7 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
         info->RegisterRandomEffect(selectivity->inflection_point_asc[i]);
       }
     }
-    info->variable_map[this->inflection_point_asc.id_m] =
+    info->variable_map[this->inflection_point_asc.id_m].variable =
         &(selectivity)->inflection_point_asc;
 
     selectivity->slope_asc.resize(this->slope_asc.size());
@@ -536,7 +536,8 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
         info->RegisterRandomEffect(selectivity->slope_asc[i]);
       }
     }
-    info->variable_map[this->slope_asc.id_m] = &(selectivity)->slope_asc;
+    info->variable_map[this->slope_asc.id_m].variable =
+        &(selectivity)->slope_asc;
 
     selectivity->inflection_point_desc.resize(
         this->inflection_point_desc.size());
@@ -561,7 +562,7 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
         info->RegisterRandomEffect(selectivity->inflection_point_desc[i]);
       }
     }
-    info->variable_map[this->inflection_point_desc.id_m] =
+    info->variable_map[this->inflection_point_desc.id_m].variable =
         &(selectivity)->inflection_point_desc;
 
     selectivity->slope_desc.resize(this->slope_desc.size());
@@ -584,7 +585,8 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
       }
     }
 
-    info->variable_map[this->slope_desc.id_m] = &(selectivity)->slope_desc;
+    info->variable_map[this->slope_desc.id_m].variable =
+        &(selectivity)->slope_desc;
 
     // add to Information
     info->selectivity_models[selectivity->id] = selectivity;

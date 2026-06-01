@@ -28,6 +28,7 @@ C++ docs.
 \details{
 \itemize{
 \item \href{https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html}{clear}
+\item \href{https://noaa-fims.github.io/FIMS/doxygen/add__shared__prior_8hpp.html}{add_shared_prior}
 \item \href{https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html}{get_fixed}
 \item \href{https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html}{get_log}
 \item \href{https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html}{get_log_errors}

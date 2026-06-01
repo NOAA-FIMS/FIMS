@@ -19,8 +19,8 @@ namespace
     recruitment->log_expected_recruitment.resize(2);
     recruitment->log_expected_recruitment[0] = 2.1;
     recruitment->log_expected_recruitment[1] = -1.7;
-    info->variable_map[1] = &(recruitment)->log_r;
-    info->variable_map[2] = &(recruitment)->log_expected_recruitment;
+    info->variable_map[1].variable = &(recruitment)->log_r;
+    info->variable_map[2].variable = &(recruitment)->log_expected_recruitment;
     
     //Create a new normal distribution
     std::shared_ptr<fims_distributions::NormalLPDF<double> > normal =

@@ -148,23 +148,23 @@ test_that("posterior equals prior with no data", {
 
   # Set up priors for selectivity parameters and link to both fishery and survey selectivity
   slope_mean <- mean(c(om_input[["sel_fleet"]][["fleet1"]][["slope.sel1"]], om_input[["sel_survey"]][["survey1"]][["slope.sel1"]]))
-  slope_sd <- 3
+  slope_var <- 9
   slope_prior <- methods::new(DnormDistribution)
   slope_prior$expected_values$resize(2)
   slope_prior$expected_values[1]$value <- slope_mean
   slope_prior$expected_values[2]$value <- slope_mean
   slope_prior$log_sd$resize(1)
-  slope_prior$log_sd[1]$value <- log(slope_sd)
+  slope_prior$log_sd[1]$value <- slope_var
   slope_prior$set_distribution_links("prior", c(fishing_fleet_selectivity$slope$get_id(), survey_fleet_selectivity$slope$get_id()))
 
   inflection_point_mean <- mean(c(om_input[["sel_fleet"]][["fleet1"]][["A50.sel1"]], om_input[["sel_survey"]][["survey1"]][["A50.sel1"]]))
-  inflection_point_sd <- 3
+  inflection_point_var <- 9
   inflection_point_prior <- methods::new(DnormDistribution)
   inflection_point_prior$expected_values$resize(2)
   inflection_point_prior$expected_values[1]$value <- inflection_point_mean
   inflection_point_prior$expected_values[2]$value <- inflection_point_mean
   inflection_point_prior$log_sd$resize(1)
-  inflection_point_prior$log_sd[1]$value <- log(inflection_point_sd)
+  inflection_point_prior$log_sd[1]$value <- inflection_point_var
   inflection_point_prior$set_distribution_links("prior", c(fishing_fleet_selectivity$inflection_point$get_id(), survey_fleet_selectivity$inflection_point$get_id()))
 
 
@@ -251,11 +251,11 @@ test_that("posterior equals prior with no data", {
   slope_input <- c(om_input[["sel_fleet"]][["fleet1"]][["slope.sel1"]], om_input[["sel_survey"]][["survey1"]][["slope.sel1"]])
   #' @description Test the slope nll
   expect_equal(
-    report_nll[1], -sum(dnorm(slope_input, mean = slope_mean, sd = 3, log = TRUE))
+    report_nll[1], -sum(dnorm(slope_input, mean = slope_mean, sd = sqrt(slope_var), log = TRUE))
   )
   #' @description Test the inflection point nll
   expect_equal(
-    report_nll[2], -sum(dnorm(inflection_point_input, mean = inflection_point_mean, sd = 3, log = TRUE))
+    report_nll[2], -sum(dnorm(inflection_point_input, mean = inflection_point_mean, sd = sqrt(inflection_point_var), log = TRUE))
   )
 
   # Fit MCMC using SparseNUTS
@@ -282,9 +282,9 @@ test_that("posterior equals prior with no data", {
     #' @description Test that the posterior means for slope match the prior means.
     expect_equal(slope_est[[i]], slope_mean)
     #' @description Test that the posterior standard errors for inflection point match the prior standard errors.
-    expect_equal(inflection_point_se[[i]], inflection_point_sd)
+    expect_equal(inflection_point_se[[i]], sqrt(inflection_point_var))
     #' @description Test that the posterior standard errors for slope match the prior standard errors.
-    expect_equal(slope_se[[i]], slope_sd)
+    expect_equal(slope_se[[i]], sqrt(slope_var))
   }
 
   clear()

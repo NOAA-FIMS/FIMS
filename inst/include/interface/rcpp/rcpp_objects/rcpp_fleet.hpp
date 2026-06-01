@@ -440,7 +440,7 @@ class FleetInterface : public FleetInterfaceBase {
       }
     }
     // add to variable_map
-    info->variable_map[this->log_Fmort.id_m] = &(fleet)->log_Fmort;
+    info->variable_map[this->log_Fmort.id_m].variable = &(fleet)->log_Fmort;
 
     if (this->n_lengths.get() > 0) {
       fleet->age_to_length_conversion.resize(
@@ -473,7 +473,7 @@ class FleetInterface : public FleetInterfaceBase {
         }
       }
 
-      info->variable_map[this->age_to_length_conversion.id_m] =
+      info->variable_map[this->age_to_length_conversion.id_m].variable =
           &(fleet)->age_to_length_conversion;
     }
 
