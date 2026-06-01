@@ -514,6 +514,56 @@ class Information {
   }
 
   /**
+   * @brief Try to mirror a legacy normal density component.
+   *
+   * @return true if a normal likelihood term was added.
+   */
+  bool TryAddNormalLikelihoodTerm(
+      std::shared_ptr<fims_distributions::DensityComponentBase<Type>> d,
+      fims_likelihood::LikelihoodTermType type, const std::string& name,
+      fims_likelihood::ValueRef<Type> x,
+      fims_likelihood::ValueRef<Type> location,
+      typename fims_likelihood::LikelihoodTerm<Type>::IncludeFunction include =
+          nullptr) {
+    std::shared_ptr<fims_distributions::NormalLPDF<Type>> normal =
+        std::dynamic_pointer_cast<fims_distributions::NormalLPDF<Type>>(d);
+    if (!normal || normal->log_sd.size() == 0) {
+      return false;
+    }
+
+    this->AddLikelihoodTerm(
+        type, name, d->id, x, location, this->ScaleValueRef(normal),
+        fims_distributions::kernels::Normal<Type>::log_density, include);
+    return true;
+  }
+
+  /**
+   * @brief Try to mirror a legacy lognormal density component.
+   *
+   * @return true if a lognormal likelihood term was added.
+   */
+  bool TryAddLogNormalLikelihoodTerm(
+      std::shared_ptr<fims_distributions::DensityComponentBase<Type>> d,
+      fims_likelihood::LikelihoodTermType type, const std::string& name,
+      fims_likelihood::ValueRef<Type> x,
+      fims_likelihood::ValueRef<Type> location,
+      typename fims_likelihood::LikelihoodTerm<Type>::LogDensityFunction
+          log_density,
+      typename fims_likelihood::LikelihoodTerm<Type>::IncludeFunction include =
+          nullptr) {
+    std::shared_ptr<fims_distributions::LogNormalLPDF<Type>> lognormal =
+        std::dynamic_pointer_cast<fims_distributions::LogNormalLPDF<Type>>(d);
+    if (!lognormal || lognormal->log_sd.size() == 0) {
+      return false;
+    }
+
+    this->AddLikelihoodTerm(type, name, d->id, x, location,
+                            this->ScaleValueRef(lognormal), log_density,
+                            include);
+    return true;
+  }
+
+  /**
    * @brief Mirror legacy prior density components into likelihood terms.
    *
    * @details This builds the new composable representation without changing
@@ -536,26 +586,16 @@ class Information {
       fims_likelihood::ValueRef<Type> x = this->ObservedValueRef(d);
       fims_likelihood::ValueRef<Type> location = this->ExpectedValueRef(d);
 
-      std::shared_ptr<fims_distributions::NormalLPDF<Type>> normal =
-          std::dynamic_pointer_cast<fims_distributions::NormalLPDF<Type>>(d);
-      if (normal && normal->log_sd.size() > 0) {
-        this->AddLikelihoodTerm(
-            fims_likelihood::LikelihoodTermType::Prior,
-            "normal_prior." + fims::to_string(d->id), d->id, x, location,
-            this->ScaleValueRef(normal),
-            fims_distributions::kernels::Normal<Type>::log_density);
+      if (this->TryAddNormalLikelihoodTerm(
+              d, fims_likelihood::LikelihoodTermType::Prior,
+              "normal_prior." + fims::to_string(d->id), x, location)) {
         continue;
       }
 
-      std::shared_ptr<fims_distributions::LogNormalLPDF<Type>> lognormal =
-          std::dynamic_pointer_cast<fims_distributions::LogNormalLPDF<Type>>(d);
-      if (lognormal && lognormal->log_sd.size() > 0) {
-        this->AddLikelihoodTerm(
-            fims_likelihood::LikelihoodTermType::Prior,
-            "lognormal_prior." + fims::to_string(d->id), d->id, x, location,
-            this->ScaleValueRef(lognormal),
-            fims_distributions::kernels::LogNormal<Type>::log_density);
-      }
+      this->TryAddLogNormalLikelihoodTerm(
+          d, fims_likelihood::LikelihoodTermType::Prior,
+          "lognormal_prior." + fims::to_string(d->id), x, location,
+          fims_distributions::kernels::LogNormal<Type>::log_density);
     }
   }
 
@@ -584,27 +624,18 @@ class Information {
       fims_likelihood::ValueRef<Type> x = this->ObservedValueRef(d);
       fims_likelihood::ValueRef<Type> location = this->ExpectedValueRef(d);
 
-      std::shared_ptr<fims_distributions::NormalLPDF<Type>> normal =
-          std::dynamic_pointer_cast<fims_distributions::NormalLPDF<Type>>(d);
-      if (normal && normal->log_sd.size() > 0) {
-        this->AddLikelihoodTerm(
-            fims_likelihood::LikelihoodTermType::RandomEffect,
-            "normal_random_effect." + fims::to_string(d->id), d->id, x,
-            location, this->ScaleValueRef(normal),
-            fims_distributions::kernels::Normal<Type>::log_density);
+      if (this->TryAddNormalLikelihoodTerm(
+              d, fims_likelihood::LikelihoodTermType::RandomEffect,
+              "normal_random_effect." + fims::to_string(d->id), x,
+              location)) {
         continue;
       }
 
-      std::shared_ptr<fims_distributions::LogNormalLPDF<Type>> lognormal =
-          std::dynamic_pointer_cast<fims_distributions::LogNormalLPDF<Type>>(d);
-      if (lognormal && lognormal->log_sd.size() > 0) {
-        this->AddLikelihoodTerm(
-            fims_likelihood::LikelihoodTermType::RandomEffect,
-            "lognormal_random_effect." + fims::to_string(d->id), d->id, x,
-            location, this->ScaleValueRef(lognormal),
-            fims_distributions::kernels::LogNormal<
-                Type>::log_density_log_scale);
-      }
+      this->TryAddLogNormalLikelihoodTerm(
+          d, fims_likelihood::LikelihoodTermType::RandomEffect,
+          "lognormal_random_effect." + fims::to_string(d->id), x, location,
+          fims_distributions::kernels::LogNormal<
+              Type>::log_density_log_scale);
     }
   }
 
@@ -630,29 +661,20 @@ class Information {
 
       fims_likelihood::ValueRef<Type> x = this->ObservedValueRef(d);
       fims_likelihood::ValueRef<Type> location = this->ExpectedValueRef(d);
+      typename fims_likelihood::LikelihoodTerm<Type>::IncludeFunction include =
+          this->DataIncludePredicate(d);
 
-      std::shared_ptr<fims_distributions::NormalLPDF<Type>> normal =
-          std::dynamic_pointer_cast<fims_distributions::NormalLPDF<Type>>(d);
-      if (normal && normal->log_sd.size() > 0) {
-        this->AddLikelihoodTerm(
-            fims_likelihood::LikelihoodTermType::Data,
-            "normal_data." + fims::to_string(d->id), d->id, x, location,
-            this->ScaleValueRef(normal),
-            fims_distributions::kernels::Normal<Type>::log_density,
-            this->DataIncludePredicate(d));
+      if (this->TryAddNormalLikelihoodTerm(
+              d, fims_likelihood::LikelihoodTermType::Data,
+              "normal_data." + fims::to_string(d->id), x, location,
+              include)) {
         continue;
       }
 
-      std::shared_ptr<fims_distributions::LogNormalLPDF<Type>> lognormal =
-          std::dynamic_pointer_cast<fims_distributions::LogNormalLPDF<Type>>(d);
-      if (lognormal && lognormal->log_sd.size() > 0) {
-        this->AddLikelihoodTerm(
-            fims_likelihood::LikelihoodTermType::Data,
-            "lognormal_data." + fims::to_string(d->id), d->id, x, location,
-            this->ScaleValueRef(lognormal),
-            fims_distributions::kernels::LogNormal<Type>::log_density,
-            this->DataIncludePredicate(d));
-      }
+      this->TryAddLogNormalLikelihoodTerm(
+          d, fims_likelihood::LikelihoodTermType::Data,
+          "lognormal_data." + fims::to_string(d->id), x, location,
+          fims_distributions::kernels::LogNormal<Type>::log_density, include);
     }
   }
 
