@@ -313,7 +313,7 @@ struct FormulaComponents {
 //' Parse a Distributional Formula
 //'
 //' Parses an R formula specifying a target variable and its prior/likelihood
-//distribution ' along with its parameters (e.g., \code{y ~ dnorm(0, 1)}).
+// distribution ' along with its parameters (e.g., \code{y ~ dnorm(0, 1)}).
 //'
 //' @param f A standard R \code{Formula} object. It must follow the structure
 //'   \code{variable ~ distribution(param1, param2, ...)}.
@@ -323,17 +323,17 @@ struct FormulaComponents {
 //(AST) ' via the \code{Rcpp::Language} class: ' \itemize{ '   \item
 //\strong{Operator (\code{[0]}):} The tilde (\code{~}) operator. '   \item
 //\strong{LHS (\code{[1]}):} Extracted as a \code{Symbol} and converted to a
-//character vector representing the target variable name. '   \item \strong{RHS
+// character vector representing the target variable name. '   \item \strong{RHS
 //(\code{[2]}):} Treated as a nested \code{Language} call where the head
 //(\code{[0]}) is the distribution name, and subsequent elements are the numeric
-//parameters. ' }
+// parameters. ' }
 //'
 //' @return A named \code{Rcpp::List} containing three elements:
 //' \itemize{
 //'   \item \code{variable}: A character vector holding the name of the LHS
-//variable. '   \item \code{distribution}: A character vector holding the name
-//of the RHS distribution function. '   \item \code{hyperparameters}: A numeric
-//vector containing the extracted hyperparameter values. ' }
+// variable. '   \item \code{distribution}: A character vector holding the name
+// of the RHS distribution function. '   \item \code{hyperparameters}: A numeric
+// vector containing the extracted hyperparameter values. ' }
 FormulaComponents parse_distribution_formula(Rcpp::Formula f) {
   // Convert the Formula to a standard standard R language object (Call)
   Rcpp::Language formula = Rcpp::as<Rcpp::Language>(f);
