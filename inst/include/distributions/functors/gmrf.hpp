@@ -1,7 +1,8 @@
 /**
  * @file gmrf.hpp
  * @brief Implements the GMRF distribution functor used by FIMS to
- * evaluate the log-likelihood of Gaussian Markov Random Fields.
+ * evaluate the log-likelihood of Gaussian Markov Random Fields. This is the 
+ * "calculator" that goes into the PrecisionMatrixBuilder which is the "architect" 
  * @copyright This file is part of the NOAA, National Marine Fisheries Service
  * Fisheries Integrated Modeling System project. See LICENSE in the source
  * folder for reuse information.
@@ -54,7 +55,7 @@ struct GMRF : public DensityComponentBase<Type> {
         // std::fill(this->lpdf_vec.begin(), this->lpdf_vec.end(), static_cast<Type>(0));
         this->lpdf = static_cast<Type>(0);
 
-        // Centering: x - mu
+        // Centering: x - mu because TMB's GMRF expects input centered around a mean of 0.
         for (size_t i = 0; i < n_x; ++i) {
         x_centered(static_cast<int>(i)) = this->get_observed(i) - this->get_expected(i);
         }
@@ -68,7 +69,7 @@ struct GMRF : public DensityComponentBase<Type> {
         );
         }
 
-        // Evaluate TMB GMRF
+        // Evaluate TMB GMRF and multiply by -1 to convert from negative log-likelihood to log-likelihood.
         this->lpdf = -1.0 * density::GMRF(precision_matrix)(x_centered);
 
         return this->lpdf;
