@@ -7,6 +7,7 @@
  */
 #ifndef DEF_HPP
 #define DEF_HPP
+#include <algorithm>
 #include <fstream>
 #include <map>
 #include <memory>
@@ -18,7 +19,6 @@
 #include <chrono>
 #include <sstream>
 #include <iostream>
-#include <filesystem>
 #include <stdlib.h>
 #include <fstream>
 #include <signal.h>
@@ -65,6 +65,7 @@
 #undef TRUE
 #undef FALSE
 #include <Lmcons.h>  // for UNLEN
+#include <direct.h>
 #elif defined(FIMS_LINUX) || defined(FIMS_MACOS) || defined(FIMS_BSD)
 #include <unistd.h>
 #include <pwd.h>
@@ -280,31 +281,116 @@ class FIMSLog {
   }
 
   /**
+   * @brief Normalize path separators for log metadata.
+   *
+   * @param path A file path.
+   * @return Path using forward slashes.
+   */
+  std::string normalize_path_separators(std::string path) {
+    std::replace(path.begin(), path.end(), '\\', '/');
+    return path;
+  }
+
+  /**
+   * @brief Return whether a path is absolute.
+   *
+   * @param path A normalized file path.
+   * @return True if the path is absolute.
+   */
+  bool is_absolute_path(const std::string& path) {
+    if (path.empty()) {
+      return false;
+    }
+    if (path[0] == '/') {
+      return true;
+    }
+    return path.size() > 2 && path[1] == ':' && path[2] == '/';
+  }
+
+  /**
+   * @brief Return the current working directory.
+   *
+   * @return Current working directory using forward slashes.
+   */
+  std::string current_working_directory() {
+#ifdef FIMS_WINDOWS
+    DWORD size = GetCurrentDirectoryA(0, NULL);
+    if (size == 0) {
+      return ".";
+    }
+    std::string cwd(size, '\0');
+    DWORD copied = GetCurrentDirectoryA(size, &cwd[0]);
+    if (copied == 0) {
+      return ".";
+    }
+    cwd.resize(copied);
+    return this->normalize_path_separators(cwd);
+#elif defined(FIMS_LINUX) || defined(FIMS_MACOS) || defined(FIMS_BSD)
+    char cwd[4096];
+    if (getcwd(cwd, sizeof(cwd)) != NULL) {
+      return this->normalize_path_separators(std::string(cwd));
+    }
+    return ".";
+#else
+    return ".";
+#endif
+  }
+
+  /**
    * @brief Get the absolute path without dot dot notation.
    *
    * Dot dot notation is for relative paths, where this function replaces
    * all dot dots with the actual full path.
    *
-   * @param relativePath A path in your file system.
-   * @return std::filesystem::path
+   * @param path A path in your file system.
+   * @return Normalized absolute path.
    */
-  std::filesystem::path getAbsolutePathWithoutDotDot(
-      const std::filesystem::path& relativePath) {
-    std::filesystem::path absolutePath =
-        std::filesystem::absolute(relativePath);
-
-    std::filesystem::path result;
-    for (const auto& part : absolutePath) {
-      if (part == "..") {
-        if (!result.empty()) {
-          result = result.parent_path();
-        }
-      } else {
-        result /= part;
-      }
+  std::string getAbsolutePathWithoutDotDot(std::string path) {
+    path = this->normalize_path_separators(path);
+    if (!this->is_absolute_path(path)) {
+      path = this->current_working_directory() + "/" + path;
     }
 
-    return result.generic_string();
+    std::string prefix;
+    size_t start = 0;
+    if (path.size() > 2 && path[1] == ':' && path[2] == '/') {
+      prefix = path.substr(0, 2);
+      start = 3;
+    } else if (!path.empty() && path[0] == '/') {
+      prefix = "";
+      start = 1;
+    }
+
+    std::vector<std::string> parts;
+    std::stringstream path_stream(path.substr(start));
+    std::string part;
+    while (std::getline(path_stream, part, '/')) {
+      if (part.empty() || part == ".") {
+        continue;
+      }
+      if (part == "..") {
+        if (!parts.empty()) {
+          parts.pop_back();
+        }
+        continue;
+      }
+      parts.push_back(part);
+    }
+
+    std::stringstream normalized;
+    if (!prefix.empty()) {
+      normalized << prefix << "/";
+    } else if (!path.empty() && path[0] == '/') {
+      normalized << "/";
+    }
+    for (size_t i = 0; i < parts.size(); i++) {
+      if (i > 0) {
+        normalized << "/";
+      }
+      normalized << parts[i];
+    }
+
+    return normalized.str();
   }
 
   /**
@@ -340,10 +426,8 @@ class FIMSLog {
    */
   void info_message(std::string str, int line, const char* file,
                     const char* func) {
-    std::filesystem::path relativePath = file;
-    std::filesystem::path absolutePath =
-        getAbsolutePathWithoutDotDot(relativePath);
-    std::filesystem::path cwd = std::filesystem::current_path();
+    std::string absolutePath = getAbsolutePathWithoutDotDot(file);
+    std::string cwd = this->current_working_directory();
     std::stringstream ss;
     auto now = std::chrono::system_clock::now();
     std::time_t now_time = std::chrono::system_clock::to_time_t(now);
@@ -355,8 +439,8 @@ class FIMSLog {
     l.level = "info";
     l.rank = this->log_entries.size();
     l.user = this->get_user();
-    l.wd = cwd.generic_string();
-    l.file = absolutePath.string();
+    l.wd = cwd;
+    l.file = absolutePath;
     l.line = line;
     l.routine = func;
     this->log_entries.push_back(l);
@@ -372,10 +456,8 @@ class FIMSLog {
   void error_message(std::string str, int line, const char* file,
                      const char* func) {
     this->error_count++;
-    std::filesystem::path relativePath = file;
-    std::filesystem::path absolutePath =
-        getAbsolutePathWithoutDotDot(relativePath);
-    std::filesystem::path cwd = std::filesystem::current_path();
+    std::string absolutePath = getAbsolutePathWithoutDotDot(file);
+    std::string cwd = this->current_working_directory();
 
     std::stringstream ss;
     auto now = std::chrono::system_clock::now();
@@ -388,8 +470,8 @@ class FIMSLog {
     l.level = "error";
     l.rank = this->log_entries.size();
     l.user = this->get_user();
-    l.wd = cwd.generic_string();
-    l.file = absolutePath.string();
+    l.wd = cwd;
+    l.file = absolutePath;
     l.line = line;
     l.routine = func;
     this->log_entries.push_back(l);
@@ -411,10 +493,8 @@ class FIMSLog {
   void warning_message(std::string str, int line, const char* file,
                        const char* func) {
     this->warning_count++;
-    std::filesystem::path relativePath = file;
-    std::filesystem::path absolutePath =
-        getAbsolutePathWithoutDotDot(relativePath);
-    std::filesystem::path cwd = std::filesystem::current_path();
+    std::string absolutePath = getAbsolutePathWithoutDotDot(file);
+    std::string cwd = this->current_working_directory();
 
     std::stringstream ss;
     auto now = std::chrono::system_clock::now();
@@ -427,8 +507,8 @@ class FIMSLog {
     l.level = "warning";
     l.rank = this->log_entries.size();
     l.user = this->get_user();
-    l.wd = cwd.generic_string();
-    l.file = absolutePath.string();
+    l.wd = cwd;
+    l.file = absolutePath;
     l.line = line;
     l.routine = func;
     this->log_entries.push_back(l);

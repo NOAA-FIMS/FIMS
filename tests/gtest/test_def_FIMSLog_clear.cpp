@@ -55,13 +55,12 @@ TEST(LogEntry_to_string, HandlesCorrectInput) {
 TEST(FIMSLog_getAbsolutePathWithoutDotDot, HandlesCorrectInput) {
   // Setup a relative path containing parent-directory navigation.
   fims::FIMSLog log = MakeLogger();
-  const auto normalized_path =
+  const std::string normalized_path =
       log.getAbsolutePathWithoutDotDot("alpha/beta/../gamma.txt");
-  const std::string normalized_path_string = normalized_path.generic_string();
 
   // Test that dot-dot notation is removed from the absolute path.
-  EXPECT_EQ(normalized_path_string.find(".."), std::string::npos);
-  EXPECT_NE(normalized_path_string.find("alpha/gamma.txt"), std::string::npos);
+  EXPECT_EQ(normalized_path.find(".."), std::string::npos);
+  EXPECT_NE(normalized_path.find("alpha/gamma.txt"), std::string::npos);
 }
 
 TEST(FIMSLog_Getters, FiltersEntriesBySeverity) {

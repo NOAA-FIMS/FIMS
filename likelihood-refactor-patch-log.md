@@ -255,7 +255,7 @@ TMBad types during an Rcpp package build.
 
 ## Patch 21: R Likelihood-Term Helpers
 
-Status: local, not committed yet.
+Commit: `bc6684dc Add R likelihood term helper API`
 
 Added friendly R helpers over the Rcpp mirrored-likelihood controls:
 
@@ -265,6 +265,20 @@ Added friendly R helpers over the Rcpp mirrored-likelihood controls:
 
 The summary helper returns a data frame with `name`, `type`, and `source_id` so
 users do not need to call multiple camel-case Rcpp methods directly.
+
+## Patch 22: Remove Filesystem Dependency from Logger
+
+Status: local, not committed yet.
+
+Removed the C++ `<filesystem>` dependency from `FIMSLog` path metadata handling
+to avoid a Windows/Rtools 45 libstdc++ filesystem compile failure.
+
+Added small portable string-based path helpers for:
+
+- current working directory lookup
+- separator normalization
+- absolute path detection
+- dot-dot path cleanup
 
 ## Current State
 
@@ -280,10 +294,8 @@ The branch currently has a side-by-side likelihood-term architecture:
 
 Current local uncommitted work:
 
-- `R/likelihood_terms.R`: patch 21 R helper API
-- `NAMESPACE`: patch 21 exports
-- `R/FIMS-package.R`: patch 21 roxygen export hints
-- `tests/testthat/test-likelihood-terms.R`: patch 21 R helper tests
-- `likelihood-refactor-patch-log.md`: patch 21 entry
+- `inst/include/common/def.hpp`: patch 22 logger path helpers without filesystem
+- `tests/gtest/test_def_FIMSLog_clear.cpp`: patch 22 logger test update
+- `likelihood-refactor-patch-log.md`: patch 22 entry
 
 Note: `docs/likelihoods-distributions-refactor-chat.md` was also updated locally, but `docs/` is ignored by this repository, so this root-level file is the tracked version intended for commits.
