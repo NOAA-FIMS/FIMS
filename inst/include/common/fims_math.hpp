@@ -66,6 +66,14 @@ inline const Type lgamma(const Type &x) {
 
 #ifdef TMB_MODEL
 
+double Value(const TMBAD_FIMS_TYPE& x){
+  return x.Value();
+}
+
+double Value(const double& x){
+  return x;
+}
+
 // Add the following line to CMakeLists.txt to enable documentation of TMB_MODEL
 // in doxygen or none of the following is rendered.
 // set(DOXYGEN_PREDEFINED "TMB_MODEL=1" "ENABLE_TMB_CODE")
@@ -384,6 +392,7 @@ T sum(const fims::Vector<T> &v) {
 
 template <class Type>
 inline const Type double_normal(//const Type nages, //Option B
+                              const Type &max_age,
                               const Type &age_peak_sel_start,
                               const Type &width_peak_sel,
                               const Type &slope_asc,
@@ -398,7 +407,7 @@ inline const Type double_normal(//const Type nages, //Option B
       // Do I need static_cast for Type<2.0>?
     // Should use fims_math::inv_logit here instead, w/ a=0 and b=1
     // Am I using fims_math::pow() correctly?
-  const Type max_age = Type(12.0); // Option A
+  // const Type max_age = Type(12.0); // Option A
   //const Type max_age = nages // - static_cast<Type>(1.0); // Option B 
   const Type sel_age_zero = static_cast<Type>(1.0) / 
     (static_cast<Type>(1.0) + exp(Type(-1.0) * sel_age_zero_logit));

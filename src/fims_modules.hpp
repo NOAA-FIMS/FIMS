@@ -382,6 +382,8 @@ RCPP_MODULE(fims) {
       "https://noaa-fims.github.io/doxygen/"
       "classDoubleNormalSelectivityInterface.html.")
       .constructor()
+      .field("ages", &DoubleNormalSelectivityInterface::ages, "Ages for each age class.") // AJ: placeholder
+      .field("max_age", &DoubleNormalSelectivityInterface::max_age, "Maximum observed age") // AJ: placeholder
       //.field("max_age", &DoubleNormalSelectivityInterface::max_age) //Option C
       .field("age_peak_sel_start",
              &DoubleNormalSelectivityInterface::age_peak_sel_start)

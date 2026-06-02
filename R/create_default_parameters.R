@@ -355,22 +355,22 @@ create_default_DoubleLogistic <- function(module_name = NA_character_) {
 #' values and their estimation status.
 #' @noRd
 create_default_DoubleNormal <- function() {
-  default <- list(
-    age_peak_sel_start.value = 1, # consider making this a function of nages
-    age_peak_sel_start.estimation_type = "fixed_effects",
-    width_peak_sel.value = 1, # consider making this a function of nages
-    width_peak_sel.estimation_type = "fixed_effects",
-    slope_asc.value = 1,
-    slope_asc.estimation_type = "fixed_effects",
-    slope_desc.value = 1,
-    slope_desc.estimation_type = "fixed_effects",
-    sel_age_zero_logit.value = 0, # equivalent to selectivity = 0.5 at age 0
-    sel_age_zero_logit.estimation_type = "fixed_effects",
-    sel_age_A_logit.value = 0, # equivalent to selectivity = 0.5 at max age
-    sel_age_A_logit.estimation_type = "fixed_effects"
-  )
-
-  return(default)
+    default <- create_default_parameters_template(n_parameters = 6) |>
+    dplyr::mutate(
+      module_name = !!module_name,
+      module_type = "DoubleNormal",
+      label = c(
+        "age_peak_sel_start",
+        "width_peak_sel",
+        "slope_asc",
+        "slope_desc",
+        "sel_age_zero_logit",
+        "sel_age_A_logit"
+      ),
+      # TODO: Determine if inflection_point_desc should really be 4?
+      value = c(1, 1, 1, 1, 0, 0),
+      estimation_type = "fixed_effects"
+    )
 }
 
 #' Create default selectivity parameters

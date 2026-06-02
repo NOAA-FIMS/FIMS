@@ -12,6 +12,10 @@
 #include "../../../population_dynamics/selectivity/selectivity.hpp"
 #include "rcpp_interface_base.hpp"
 
+#include <algorithm>
+#include <iostream>
+#include <vector>
+
 /**
  * @brief Rcpp interface that serves as the parent class for Rcpp selectivity
  * interfaces. This type should be inherited and not called from R directly.
@@ -689,6 +693,17 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
 class DoubleNormalSelectivityInterface : public SelectivityInterfaceBase {
  public:
   //SharedInt max_age = 10; // Option C for double-normal
+
+  // * @brief Vector of ages.
+  // */
+  //std::vector<int> ages; //AJ: placeholder for reading in ages for calculation of max_age
+  RealVector ages;
+  // /**
+  // * @brief Minimum observed age
+  // */
+  SharedInt max_age = 0; //AJ: placeholder for calculating minimum age
+  /**
+
   ParameterVector age_peak_sel_start; /**< Age at which selectivity=1 
                                       starts (p1) */
   ParameterVector width_peak_sel; /**< Width of peak selectivity (in which 
@@ -714,7 +729,8 @@ class DoubleNormalSelectivityInterface : public SelectivityInterfaceBase {
   DoubleNormalSelectivityInterface(
       const DoubleNormalSelectivityInterface& other)
       : SelectivityInterfaceBase(other),
-        //max_age(other.max_age), # Option C for dbl-norm
+        ages(other.ages), // AJ: implementation of max_age
+        max_age(other.max_age), // AJ: implementation of max_age
         age_peak_sel_start(other.age_peak_sel_start),
         width_peak_sel(other.width_peak_sel),
         slope_asc(other.slope_asc),
@@ -733,6 +749,8 @@ class DoubleNormalSelectivityInterface : public SelectivityInterfaceBase {
    */
   virtual double evaluate(double x) {
     fims_popdy::DoubleNormalSelectivity<double> DoubleNormalSel;
+    AgeSpecificSel.n_ages = this->n_ages.get(); // AJ: is it necessary to call in n_ages here?
+    AgeSpecificSel.max_age = *std::max_element(this->ages.storage_m->begin(), this->ages.storage_m->end()); // AJ: only works w/ ages not defined as RealVector
     DoubleNormalSel.age_peak_sel_start.resize(1);
     DoubleNormalSel.age_peak_sel_start[0] =
         this->age_peak_sel_start[0].initial_value_m;
@@ -918,7 +936,8 @@ class DoubleNormalSelectivityInterface : public SelectivityInterfaceBase {
     std::stringstream ss;
     // set relative info
     selectivity->id = this->id;
-    //selectivity->max_age = this->max_age.get(); //Option C
+    selectivity->n_ages = this->n_ages.get();
+    selectivity->max_age = *std::max_element(this->ages.storage_m->begin(), this->ages.storage_m->end()); // AJ: placeholder
     selectivity->age_peak_sel_start.resize(this->age_peak_sel_start.size());
     for (size_t i = 0; i < this->age_peak_sel_start.size(); i++) {
       selectivity->age_peak_sel_start[i] =
