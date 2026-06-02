@@ -725,7 +725,7 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
     ss << "\"FIMS\",";
 #endif
     ss << " \"id\": " << this->get_id() << ",\n";
-    ss << " \"objective_function_value\": " << value << ",\n";
+    ss << " \"objective_function_value\": " << sanitize_val(value) << ",\n";
     ss << "\"growth\":[\n";
     for (module_id_it = growth_ids.begin(); module_id_it != growth_ids.end();
          module_id_it++) {
