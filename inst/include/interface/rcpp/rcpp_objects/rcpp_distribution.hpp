@@ -387,7 +387,7 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
        << ",\n";
     ss << " \"input_type\" : \"" << this->input_type_m << "\",\n";
     ss << " \"density_component\": {\n";
-    ss << "  \"lpdf_value\": " << this->lpdf_value << ",\n";
+    ss << "  \"lpdf_value\": " << sanitize_val(this->lpdf_value) << ",\n";
     ss << "  \"value\":[";
     if (this->lpdf_vec.size() == 0) {
       ss << "],\n";
@@ -727,7 +727,7 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
        << ",\n";
     ss << " \"input_type\" : \"" << this->input_type_m << "\",\n";
     ss << " \"density_component\": {\n";
-    ss << "  \"lpdf_value\": " << this->lpdf_value << ",\n";
+    ss << "  \"lpdf_value\": " << sanitize_val(this->lpdf_value) << ",\n";
     ss << "  \"value\":[";
     if (this->lpdf_vec.size() == 0) {
       ss << "],\n";
@@ -1043,7 +1043,7 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
        << ",\n";
     ss << " \"input_type\" : \"" << this->input_type_m << "\",\n";
     ss << " \"density_component\": {\n";
-    ss << "  \"lpdf_value\": " << this->lpdf_value << ",\n";
+    ss << "  \"lpdf_value\": " << sanitize_val(this->lpdf_value) << ",\n";
     ss << "  \"value\":[";
     if (this->lpdf_vec.size() == 0) {
       ss << "],\n";
