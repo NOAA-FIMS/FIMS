@@ -736,7 +736,7 @@ class AgeSpecificSelectivityInterface : public SelectivityInterfaceBase {
 
     ss << "{\n";
     ss << " \"module_name\":\"Selectivity\",\n";
-    ss << " \"module_type\": \"AgeSpecificSelectivity\",\n";
+    ss << " \"module_type\": \"AgeSpecific\",\n";
     ss << " \"module_id\": " << this->id << ",\n";
 
     ss << " \"parameters\": [\n{\n";
@@ -746,8 +746,8 @@ class AgeSpecificSelectivityInterface : public SelectivityInterfaceBase {
     ss << " \"dimensionality\": {\n";
     ss << "  \"header\": [null],\n";
     // ss << "  \"dimensions\": [1]\n},\n"; //AJ: replaced this line with the lines below
-    ss << "  \"dimensions\":" << this->n_ages.get() << "},\n"; //AJ: do I need the .get() call?
-    ss << "   \"values\":" << this->logit_sel_at_age << "},\n ";
+    ss << "  \"dimensions\": [" << this->logit_sel_at_age.size() << "]\n},\n"; 
+    ss << "   \"values\":" << this->logit_sel_at_age << "}]\n";
 
     ss << "}";
 
