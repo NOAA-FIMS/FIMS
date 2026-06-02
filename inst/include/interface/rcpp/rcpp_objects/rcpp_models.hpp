@@ -1603,7 +1603,7 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
           fims_popdy::DimensionInfo(
               "growth_derived_alk_used",
               fims::Vector<int>{1},
-              fims::Vector<std::string>{"n_values"});
+              fims::Vector<std::string>{"na"});
 
       derived_quantities["growth_derived_mean_WAA"] = fims::Vector<Type>(
           fleet_interface->n_years.get() * fleet_interface->n_ages.get());
