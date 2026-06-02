@@ -282,7 +282,7 @@ Added small portable string-based path helpers for:
 
 ## Patch 23: R Objective Parity Test
 
-Status: local, not committed yet.
+Commit: `5bc8a85d Add mirrored likelihood R parity test`
 
 Added an R-level parity test that:
 
@@ -293,6 +293,35 @@ Added an R-level parity test that:
 
 Also updated the Rcpp `UseLikelihoodTerms()` method to toggle the already-built
 `Information` singletons so the R helper works after `initialize_fims()`.
+
+## Patch 24: Legacy Evaluation Deprecation Warning
+
+Status: local, not committed yet.
+
+Added a once-per-model deprecation warning when `Model::Evaluate()` uses the
+legacy `density_components` objective path instead of mirrored likelihood
+terms.
+
+The warning points users to `Information::use_likelihood_terms` and the R
+helper `use_likelihood_terms(model, TRUE)`.
+
+## Patch 25: Direct Rcpp Likelihood-Term Example
+
+Status: local, not committed yet.
+
+Added a small R example that calls the Rcpp `CatchAtAge` likelihood-term methods
+directly:
+
+- `UseLikelihoodTerms()`
+- `UsesLikelihoodTerms()`
+- `LikelihoodTermCount()`
+- `LikelihoodTermNames()`
+- `LikelihoodTermTypes()`
+- `LikelihoodTermSourceIds()`
+
+The example intentionally avoids the R helper layer so developers can see the
+underlying Rcpp control surface. A test sources the example and checks that it
+returns the expected term table shape.
 
 ## Current State
 
@@ -308,8 +337,11 @@ The branch currently has a side-by-side likelihood-term architecture:
 
 Current local uncommitted work:
 
-- `inst/include/interface/rcpp/rcpp_objects/rcpp_models.hpp`: patch 23 live opt-in toggle
-- `tests/testthat/test-likelihood-terms-parity.R`: patch 23 R parity test
-- `likelihood-refactor-patch-log.md`: patch 23 entry
+- `inst/include/common/model.hpp`: patch 24 legacy deprecation warning
+- `tests/gtest/test_info_likelihood_terms.cpp`: patch 24 warning coverage
+- `inst/examples/likelihood_terms_rcpp_interface.R`: patch 25 direct
+  Rcpp example
+- `tests/testthat/test-rcpp-likelihood-terms-example.R`: patch 25 example test
+- `likelihood-refactor-patch-log.md`: patch 24 and 25 entries
 
 Note: `docs/likelihoods-distributions-refactor-chat.md` was also updated locally, but `docs/` is ignored by this repository, so this root-level file is the tracked version intended for commits.

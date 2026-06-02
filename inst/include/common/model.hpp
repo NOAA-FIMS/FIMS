@@ -27,6 +27,8 @@ class Model {  // may need singleton
   std::shared_ptr<fims_info::Information<Type>>
       fims_information; /**< Create a shared fims_information as a pointer to
                          Information*/
+  bool legacy_likelihood_warning_emitted =
+      false; /**< true after warning once about legacy likelihood evaluation */
 
   /**
    * @brief Construct a new Model object.
@@ -114,78 +116,87 @@ class Model {  // may need singleton
           "Model: Finished evaluating data likelihood terms. The jnll is: " +
           fims::to_string(jnll));
     } else {
-
-    // Loop over densities and evaluate joint negative log densities for priors
-    typename fims_info::Information<Type>::density_components_iterator d_it;
-    int nll_vec_idx = 0;
-    size_t n_priors = 0;
-    for (d_it = this->fims_information->density_components.begin();
-         d_it != this->fims_information->density_components.end(); ++d_it) {
-      std::shared_ptr<fims_distributions::DensityComponentBase<Type>> d =
-          (*d_it).second;
-#ifdef TMB_MODEL
-      d->of = this->of;
-#endif
-      if (d->input_type == "prior") {
-        nll_vec[nll_vec_idx] = -d->evaluate();
-        jnll += nll_vec[nll_vec_idx];
-        n_priors += 1;
-        nll_vec_idx += 1;
+      if (!this->legacy_likelihood_warning_emitted &&
+          this->fims_information->density_components.size() > 0) {
+        FIMS_WARNING_LOG(
+            "DEPRECATION: Legacy density component evaluation is deprecated. "
+            "Use mirrored likelihood terms by enabling "
+            "Information::use_likelihood_terms or calling "
+            "use_likelihood_terms(model, TRUE) from R.");
+        this->legacy_likelihood_warning_emitted = true;
       }
-    }
 
-    FIMS_INFO_LOG(
-        "Model: Finished evaluating prior distributions. The jnll after "
-        "evaluating " +
-        fims::to_string(n_priors) + " priors is: " + fims::to_string(jnll));
-
-    // Loop over densities and evaluate joint negative log-likelihoods for
-    // random effects
-    size_t n_random_effects = 0;
-    for (d_it = this->fims_information->density_components.begin();
-         d_it != this->fims_information->density_components.end(); ++d_it) {
-      std::shared_ptr<fims_distributions::DensityComponentBase<Type>> d =
-          (*d_it).second;
+      // Loop over densities and evaluate joint negative log densities for priors
+      typename fims_info::Information<Type>::density_components_iterator d_it;
+      int nll_vec_idx = 0;
+      size_t n_priors = 0;
+      for (d_it = this->fims_information->density_components.begin();
+           d_it != this->fims_information->density_components.end(); ++d_it) {
+        std::shared_ptr<fims_distributions::DensityComponentBase<Type>> d =
+            (*d_it).second;
 #ifdef TMB_MODEL
-      d->of = this->of;
+        d->of = this->of;
 #endif
-      if (d->input_type == "random_effects") {
-        nll_vec[nll_vec_idx] = -d->evaluate();
-        jnll += nll_vec[nll_vec_idx];
-        n_random_effects += 1;
-        nll_vec_idx += 1;
+        if (d->input_type == "prior") {
+          nll_vec[nll_vec_idx] = -d->evaluate();
+          jnll += nll_vec[nll_vec_idx];
+          n_priors += 1;
+          nll_vec_idx += 1;
+        }
       }
-    }
 
-    FIMS_INFO_LOG(
-        "Model: Finished evaluating random effect distributions. The jnll "
-        "after evaluating priors and " +
-        fims::to_string(n_random_effects) +
-        " random_effects is: " + fims::to_string(jnll));
+      FIMS_INFO_LOG(
+          "Model: Finished evaluating prior distributions. The jnll after "
+          "evaluating " +
+          fims::to_string(n_priors) + " priors is: " + fims::to_string(jnll));
 
-    // Loop over and evaluate data joint negative log-likelihoods
-    int n_data = 0;
-    for (d_it = this->fims_information->density_components.begin();
-         d_it != this->fims_information->density_components.end(); ++d_it) {
-      std::shared_ptr<fims_distributions::DensityComponentBase<Type>> d =
-          (*d_it).second;
+      // Loop over densities and evaluate joint negative log-likelihoods for
+      // random effects
+      size_t n_random_effects = 0;
+      for (d_it = this->fims_information->density_components.begin();
+           d_it != this->fims_information->density_components.end(); ++d_it) {
+        std::shared_ptr<fims_distributions::DensityComponentBase<Type>> d =
+            (*d_it).second;
 #ifdef TMB_MODEL
-      d->of = this->of;
-      // d->keep = this->keep;
+        d->of = this->of;
 #endif
-      if (d->input_type == "data") {
-        nll_vec[nll_vec_idx] = -d->evaluate();
-        jnll += nll_vec[nll_vec_idx];
-        n_data += 1;
-        nll_vec_idx += 1;
+        if (d->input_type == "random_effects") {
+          nll_vec[nll_vec_idx] = -d->evaluate();
+          jnll += nll_vec[nll_vec_idx];
+          n_random_effects += 1;
+          nll_vec_idx += 1;
+        }
       }
-    }
 
-    FIMS_INFO_LOG(
-        "Model: Finished evaluating data likelihoods. The jnll after "
-        "evaluating priors, random effects, and " +
-        fims::to_string(n_data) +
-        " data likelihoods is: " + fims::to_string(jnll));
+      FIMS_INFO_LOG(
+          "Model: Finished evaluating random effect distributions. The jnll "
+          "after evaluating priors and " +
+          fims::to_string(n_random_effects) +
+          " random_effects is: " + fims::to_string(jnll));
+
+      // Loop over and evaluate data joint negative log-likelihoods
+      int n_data = 0;
+      for (d_it = this->fims_information->density_components.begin();
+           d_it != this->fims_information->density_components.end(); ++d_it) {
+        std::shared_ptr<fims_distributions::DensityComponentBase<Type>> d =
+            (*d_it).second;
+#ifdef TMB_MODEL
+        d->of = this->of;
+        // d->keep = this->keep;
+#endif
+        if (d->input_type == "data") {
+          nll_vec[nll_vec_idx] = -d->evaluate();
+          jnll += nll_vec[nll_vec_idx];
+          n_data += 1;
+          nll_vec_idx += 1;
+        }
+      }
+
+      FIMS_INFO_LOG(
+          "Model: Finished evaluating data likelihoods. The jnll after "
+          "evaluating priors, random effects, and " +
+          fims::to_string(n_data) +
+          " data likelihoods is: " + fims::to_string(jnll));
     }
 
     // report out nll components

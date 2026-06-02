@@ -219,6 +219,44 @@ TEST(InformationLikelihoodTerms, ModelEvaluationUsesMirroredTermsWhenEnabled) {
   info->Clear();
 }
 
+TEST(InformationLikelihoodTerms, LegacyEvaluationWarnsOnce) {
+  std::shared_ptr<fims_info::Information<double>> info =
+      fims_info::Information<double>::GetInstance();
+  info->Clear();
+  fims::FIMSLog::fims_log->clear();
+
+  std::shared_ptr<fims_distributions::NormalLPDF<double>> normal_prior =
+      std::make_shared<fims_distributions::NormalLPDF<double>>();
+  normal_prior->id = 9000;
+  normal_prior->input_type = "prior";
+  normal_prior->expected_values.resize(1);
+  normal_prior->expected_values[0] = 0.0;
+  normal_prior->log_sd.resize(1);
+  normal_prior->log_sd[0] = std::log(1.0);
+  info->density_components[normal_prior->id] = normal_prior;
+
+  std::shared_ptr<fims_model::Model<double>> model =
+      fims_model::Model<double>::GetInstance();
+  model->fims_information = info;
+  model->legacy_likelihood_warning_emitted = false;
+
+  EXPECT_EQ(fims::FIMSLog::fims_log->get_warning_count(), 0);
+  model->Evaluate();
+  EXPECT_EQ(fims::FIMSLog::fims_log->get_warning_count(), 1);
+  model->Evaluate();
+  EXPECT_EQ(fims::FIMSLog::fims_log->get_warning_count(), 1);
+
+  info->use_likelihood_terms = true;
+  model->legacy_likelihood_warning_emitted = false;
+  fims::FIMSLog::fims_log->clear();
+
+  model->Evaluate();
+  EXPECT_EQ(fims::FIMSLog::fims_log->get_warning_count(), 0);
+
+  info->Clear();
+  fims::FIMSLog::fims_log->clear();
+}
+
 TEST(InformationLikelihoodTerms, MirrorsNormalPriorDensityComponent) {
   std::shared_ptr<fims_info::Information<double>> info =
       fims_info::Information<double>::GetInstance();
