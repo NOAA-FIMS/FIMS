@@ -39,7 +39,7 @@ struct PrecisionMatrixBuilderBase {
 
 /**
  * @brief DSEM precision-matrix builder based on a Reticular Action Model (RAM).
- * @details This class handles the math for "arrow-and-lag" models. DSEM is 
+ * @details This class handles the math for "arrow-and-lag" models (the RAM). DSEM is 
  * implemented here based on the [DSEM package](https://github.com/James-Thorson-NOAA/dsem) 
  * and the integration of DSEM in [RCEATTLE](https://github.com/grantdadams/Rceattle/tree/dev-DSEM).
  */
@@ -82,12 +82,12 @@ struct DSEMPrecisionMatrixBuilder : public PrecisionMatrixBuilderBase<Type> {
 
         // 2. Initialize sparse components
         // We create three empty grids that are "sparse"
-        Eigen::SparseMatrix<Type> Rho_kk(n_k, n_k);   // Grid for paths (from -> to)
+        Eigen::SparseMatrix<Type> Rho_kk(n_k, n_k);   // Grid for causal paths (from -> to)
         Eigen::SparseMatrix<Type> Gamma_kk(n_k, n_k); // Grid for variances (<->)
         Eigen::SparseMatrix<Type> I_kk(n_k, n_k);     // "Standard" grid (identity)
         I_kk.setIdentity(); // Fill diagonal with 1s
 
-        // 3. Translate the "arrows" into the grids
+        // 3. Translate the "arrows" (RAMPath) into the grids
         for (size_t r = 0; r < this->paths.size(); ++r) {
             // C++ starts counting at 0, but R starts at 1, so we subtract 1.
             const int from = this->paths[r].from - 1; 
