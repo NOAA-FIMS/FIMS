@@ -323,6 +323,23 @@ The example intentionally avoids the R helper layer so developers can see the
 underlying Rcpp control surface. A test sources the example and checks that it
 returns the expected term table shape.
 
+## Patch 26: Direct Rcpp CatchAtAge Example
+
+Status: local, not committed yet.
+
+Added a fuller CatchAtAge example that builds a small model by creating and
+linking Rcpp module objects directly:
+
+- data modules for landings, index, and age composition
+- recruitment, growth, maturity, selectivity, fleet, and population modules
+- linked data likelihood distributions
+- a `CatchAtAge` model with mirrored likelihood terms enabled directly through
+  `UseLikelihoodTerms(TRUE)`
+
+The example calls `CreateTMBModel()` and retrieves the direct Rcpp parameter
+vectors with `get_fixed()` and `get_random()` without using the high-level R
+model initialization or fitting wrappers.
+
 ## Current State
 
 The branch currently has a side-by-side likelihood-term architecture:
@@ -341,7 +358,9 @@ Current local uncommitted work:
 - `tests/gtest/test_info_likelihood_terms.cpp`: patch 24 warning coverage
 - `inst/examples/likelihood_terms_rcpp_interface.R`: patch 25 direct
   Rcpp example
+- `inst/examples/catch_at_age_rcpp_interface.R`: patch 26 direct CatchAtAge
+  example
 - `tests/testthat/test-rcpp-likelihood-terms-example.R`: patch 25 example test
-- `likelihood-refactor-patch-log.md`: patch 24 and 25 entries
+- `likelihood-refactor-patch-log.md`: patch 24 through 26 entries
 
 Note: `docs/likelihoods-distributions-refactor-chat.md` was also updated locally, but `docs/` is ignored by this repository, so this root-level file is the tracked version intended for commits.

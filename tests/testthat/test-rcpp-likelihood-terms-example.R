@@ -16,6 +16,13 @@ example_path <- testthat::test_path(
   "examples",
   "likelihood_terms_rcpp_interface.R"
 )
+catch_at_age_example_path <- testthat::test_path(
+  "..",
+  "..",
+  "inst",
+  "examples",
+  "catch_at_age_rcpp_interface.R"
+)
 
 ## IO correctness ----
 test_that("direct Rcpp likelihood-term example runs", {
@@ -33,6 +40,30 @@ test_that("direct Rcpp likelihood-term example runs", {
   example_text <- readLines(example_path, warn = FALSE)
   expect_false(any(grepl(
     "\\b(use_likelihood_terms|uses_likelihood_terms|get_likelihood_terms)\\b",
+    example_text
+  )))
+
+  clear()
+})
+
+test_that("direct Rcpp CatchAtAge example builds likelihood terms", {
+  #' @description Test that the direct Rcpp CatchAtAge example builds a model and mirrored data likelihood terms.
+  example_env <- new.env(parent = globalenv())
+
+  expect_no_error(sys.source(catch_at_age_example_path, envir = example_env))
+  expect_true(example_env$uses_terms_directly)
+  expect_s3_class(example_env$likelihood_terms, "data.frame")
+  expect_gt(nrow(example_env$likelihood_terms), 0L)
+  expect_true(any(example_env$likelihood_terms[["type"]] == "data"))
+  expect_equal(
+    example_env$likelihood_term_count,
+    nrow(example_env$likelihood_terms)
+  )
+  expect_named(example_env$parameters, c("p", "re"))
+
+  example_text <- readLines(catch_at_age_example_path, warn = FALSE)
+  expect_false(any(grepl(
+    "\\b(use_likelihood_terms|uses_likelihood_terms|get_likelihood_terms|initialize_fims|fit_fims|MakeADFun)\\b",
     example_text
   )))
 
