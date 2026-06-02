@@ -698,102 +698,45 @@ virtual std::string to_json() {
   ss << "    \"dimensions\": [" << this->length_weight_b.size() << "]\n";
   ss << "   },\n";
   ss << "   \"values\":" << this->length_weight_b << "\n";
-  ss << "},\n";
+  ss << "}";
 
-  // length_at_age_sd_at_ref_ages (SD1, SDA)
-  ss << "{\n";
-  ss << "   \"name\": \"length_at_age_sd_at_ref_ages\",\n";
-  ss << "   \"id\":" << this->length_at_age_sd_at_ref_ages.id_m << ",\n";
-  ss << "   \"type\": \"vector\",\n";
-  ss << "   \"dimensionality\": {\n";
-  ss << "    \"header\": [null],\n";
-  ss << "    \"dimensions\": [" << this->length_at_age_sd_at_ref_ages.size()
-     << "]\n";
-  ss << "   },\n";
-  ss << "   \"values\":" << this->length_at_age_sd_at_ref_ages << "\n";
-  ss << "},\n";
+  // Optional variability parameters
+  auto append_optional_parameter = [&](const std::string& name,
+                                       ParameterVector& pv) {
+    if (pv.size() == 0) {
+      return;
+    }
 
-  // log_sd_length_at_ref_age_1
-  ss << "{\n";
-  ss << "   \"name\": \"log_sd_length_at_ref_age_1\",\n";
-  ss << "   \"id\":" << this->log_sd_length_at_ref_age_1.id_m << ",\n";
-  ss << "   \"type\": \"vector\",\n";
-  ss << "   \"dimensionality\": {\n";
-  ss << "    \"header\": [null],\n";
-  ss << "    \"dimensions\": [" << this->log_sd_length_at_ref_age_1.size()
-     << "]\n";
-  ss << "   },\n";
-  ss << "   \"values\":" << this->log_sd_length_at_ref_age_1 << "\n";
-  ss << "},\n";
+    ss << ",\n";
+    ss << "{\n";
+    ss << "   \"name\": \"" << name << "\",\n";
+    ss << "   \"id\":" << pv.id_m << ",\n";
+    ss << "   \"type\": \"vector\",\n";
+    ss << "   \"dimensionality\": {\n";
+    ss << "    \"header\": [null],\n";
+    ss << "    \"dimensions\": [" << pv.size() << "]\n";
+    ss << "   },\n";
+    ss << "   \"values\":" << pv << "\n";
+    ss << "}";
+  };
 
-  // log_sd_length_at_ref_age_2
-  ss << "{\n";
-  ss << "   \"name\": \"log_sd_length_at_ref_age_2\",\n";
-  ss << "   \"id\":" << this->log_sd_length_at_ref_age_2.id_m << ",\n";
-  ss << "   \"type\": \"vector\",\n";
-  ss << "   \"dimensionality\": {\n";
-  ss << "    \"header\": [null],\n";
-  ss << "    \"dimensions\": [" << this->log_sd_length_at_ref_age_2.size()
-     << "]\n";
-  ss << "   },\n";
-  ss << "   \"values\":" << this->log_sd_length_at_ref_age_2 << "\n";
-  ss << "},\n";
+  append_optional_parameter("length_at_age_sd_at_ref_ages",
+                            this->length_at_age_sd_at_ref_ages);
+  append_optional_parameter("log_sd_length_at_ref_age_1",
+                            this->log_sd_length_at_ref_age_1);
+  append_optional_parameter("log_sd_length_at_ref_age_2",
+                            this->log_sd_length_at_ref_age_2);
+  append_optional_parameter("log_sd_growth_coefficient_K",
+                            this->log_sd_growth_coefficient_K);
+  append_optional_parameter(
+      "logit_corr_length_at_ref_age_1_length_at_ref_age_2",
+      this->logit_corr_length_at_ref_age_1_length_at_ref_age_2);
+  append_optional_parameter("logit_corr_length_at_ref_age_1_k",
+                            this->logit_corr_length_at_ref_age_1_k);
+  append_optional_parameter("logit_corr_length_at_ref_age_2_k",
+                            this->logit_corr_length_at_ref_age_2_k);
 
-  // log_sd_growth_coefficient_K
-  ss << "{\n";
-  ss << "   \"name\": \"log_sd_growth_coefficient_K\",\n";
-  ss << "   \"id\":" << this->log_sd_growth_coefficient_K.id_m << ",\n";
-  ss << "   \"type\": \"vector\",\n";
-  ss << "   \"dimensionality\": {\n";
-  ss << "    \"header\": [null],\n";
-  ss << "    \"dimensions\": [" << this->log_sd_growth_coefficient_K.size()
-     << "]\n";
-  ss << "   },\n";
-  ss << "   \"values\":" << this->log_sd_growth_coefficient_K << "\n";
-  ss << "},\n";
-
-  // logit_corr_length_at_ref_age_1_length_at_ref_age_2
-  ss << "{\n";
-  ss << "   \"name\": \"logit_corr_length_at_ref_age_1_length_at_ref_age_2\",\n";
-  ss << "   \"id\":"
-     << this->logit_corr_length_at_ref_age_1_length_at_ref_age_2.id_m << ",\n";
-  ss << "   \"type\": \"vector\",\n";
-  ss << "   \"dimensionality\": {\n";
-  ss << "    \"header\": [null],\n";
-  ss << "    \"dimensions\": ["
-     << this->logit_corr_length_at_ref_age_1_length_at_ref_age_2.size()
-     << "]\n";
-  ss << "   },\n";
-  ss << "   \"values\":"
-     << this->logit_corr_length_at_ref_age_1_length_at_ref_age_2 << "\n";
-  ss << "},\n";
-
-  // logit_corr_length_at_ref_age_1_k
-  ss << "{\n";
-  ss << "   \"name\": \"logit_corr_length_at_ref_age_1_k\",\n";
-  ss << "   \"id\":" << this->logit_corr_length_at_ref_age_1_k.id_m << ",\n";
-  ss << "   \"type\": \"vector\",\n";
-  ss << "   \"dimensionality\": {\n";
-  ss << "    \"header\": [null],\n";
-  ss << "    \"dimensions\": ["
-     << this->logit_corr_length_at_ref_age_1_k.size() << "]\n";
-  ss << "   },\n";
-  ss << "   \"values\":" << this->logit_corr_length_at_ref_age_1_k << "\n";
-  ss << "},\n";
-
-  // logit_corr_length_at_ref_age_2_k
-  ss << "{\n";
-  ss << "   \"name\": \"logit_corr_length_at_ref_age_2_k\",\n";
-  ss << "   \"id\":" << this->logit_corr_length_at_ref_age_2_k.id_m << ",\n";
-  ss << "   \"type\": \"vector\",\n";
-  ss << "   \"dimensionality\": {\n";
-  ss << "    \"header\": [null],\n";
-  ss << "    \"dimensions\": ["
-     << this->logit_corr_length_at_ref_age_2_k.size() << "]\n";
-  ss << "   },\n";
-  ss << "   \"values\":" << this->logit_corr_length_at_ref_age_2_k << "\n";
-  ss << "}]\n";
-
+  ss << "\n]\n";
   ss << "}";
 
   return ss.str();

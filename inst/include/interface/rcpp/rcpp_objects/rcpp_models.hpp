@@ -570,31 +570,32 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
       std::map<std::string, fims::Vector<double>> &dqs,
       std::map<std::string, fims_popdy::DimensionInfo> &dim_info) {
     std::stringstream ss;
-    std::map<std::string, fims_popdy::DimensionInfo>::iterator dim_info_it;
-    std::map<std::string, fims::Vector<double>>::iterator it;
-    std::map<std::string, fims::Vector<double>>::iterator end_it;
-    end_it = dqs.end();
-    typename std::map<std::string, fims::Vector<double>>::iterator
-        second_to_last;
-    second_to_last = dqs.end();
-    if (it != end_it) {
-      second_to_last--;
+
+    if (dqs.empty()) {
+      return ss.str();
     }
 
-    it = dqs.begin();
-    for (; it != second_to_last; ++it) {
-      dim_info_it = dim_info.find(it->first);
+    auto second_to_last = dqs.end();
+    --second_to_last;
+
+    for (auto it = dqs.begin(); it != second_to_last; ++it) {
+      auto dim_info_it = dim_info.find(it->first);
+      if (dim_info_it == dim_info.end()) {
+        throw std::runtime_error(
+            "Missing dimension metadata for derived quantity " + it->first);
+      }
       ss << this->derived_quantity_to_json(it, dim_info_it->second) << ",\n";
     }
 
-    dim_info_it = dim_info.find(second_to_last->first);
-    if (dim_info_it != dim_info.end()) {
-      ss << this->derived_quantity_to_json(second_to_last, dim_info_it->second)
-         << "\n";
-    } else {
-      ss << "{}";
-      // Handle case where dimension info is not found
+    auto dim_info_it = dim_info.find(second_to_last->first);
+    if (dim_info_it == dim_info.end()) {
+      throw std::runtime_error(
+          "Missing dimension metadata for derived quantity " +
+          second_to_last->first);
     }
+
+    ss << this->derived_quantity_to_json(second_to_last, dim_info_it->second)
+       << "\n";
     return ss.str();
   }
 
@@ -1363,6 +1364,32 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
               fims::Vector<int>{population->n_years.get(),
                                 population->n_ages.get()},
               fims::Vector<std::string>{"n_years", "n_ages"});
+      derived_quantities["growth_mean_LAA"] = fims::Vector<Type>(
+          population->n_years.get() * population->n_ages.get());
+      derived_quantities_dim_info["growth_mean_LAA"] =
+          fims_popdy::DimensionInfo(
+              "growth_mean_LAA",
+              fims::Vector<int>{population->n_years.get(),
+                                population->n_ages.get()},
+              fims::Vector<std::string>{"n_years", "n_ages"});
+
+      derived_quantities["growth_sd_LAA"] = fims::Vector<Type>(
+          population->n_years.get() * population->n_ages.get());
+      derived_quantities_dim_info["growth_sd_LAA"] =
+          fims_popdy::DimensionInfo(
+              "growth_sd_LAA",
+              fims::Vector<int>{population->n_years.get(),
+                                population->n_ages.get()},
+              fims::Vector<std::string>{"n_years", "n_ages"});
+
+      derived_quantities["growth_mean_WAA"] = fims::Vector<Type>(
+          population->n_years.get() * population->n_ages.get());
+      derived_quantities_dim_info["growth_mean_WAA"] =
+          fims_popdy::DimensionInfo(
+              "growth_mean_WAA",
+              fims::Vector<int>{population->n_years.get(),
+                                population->n_ages.get()},
+              fims::Vector<std::string>{"n_years", "n_ages"});
 
       // replace elements in the variable map
 
@@ -1549,6 +1576,43 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
               fims::Vector<int>{(fleet_interface->n_years.get()),
                                 (fleet_interface->n_lengths.get())},
               fims::Vector<std::string>{"n_years", "n_lengths"});
+      derived_quantities["age_to_length_conversion"] = fims::Vector<Type>(
+          fleet_interface->n_ages.get() * fleet_interface->n_lengths.get());
+      derived_quantities_dim_info["age_to_length_conversion"] =
+          fims_popdy::DimensionInfo(
+              "age_to_length_conversion",
+              fims::Vector<int>{fleet_interface->n_ages.get(),
+                                fleet_interface->n_lengths.get()},
+              fims::Vector<std::string>{"n_ages", "n_lengths"});
+
+      derived_quantities["growth_derived_age_to_length_conversion"] =
+          fims::Vector<Type>(
+              fleet_interface->n_years.get() *
+              fleet_interface->n_ages.get() *
+              fleet_interface->n_lengths.get());
+      derived_quantities_dim_info["growth_derived_age_to_length_conversion"] =
+          fims_popdy::DimensionInfo(
+              "growth_derived_age_to_length_conversion",
+              fims::Vector<int>{fleet_interface->n_years.get(),
+                                fleet_interface->n_ages.get(),
+                                fleet_interface->n_lengths.get()},
+              fims::Vector<std::string>{"n_years", "n_ages", "n_lengths"});
+
+      derived_quantities["growth_derived_alk_used"] = fims::Vector<Type>(1);
+      derived_quantities_dim_info["growth_derived_alk_used"] =
+          fims_popdy::DimensionInfo(
+              "growth_derived_alk_used",
+              fims::Vector<int>{1},
+              fims::Vector<std::string>{"n_values"});
+
+      derived_quantities["growth_derived_mean_WAA"] = fims::Vector<Type>(
+          fleet_interface->n_years.get() * fleet_interface->n_ages.get());
+      derived_quantities_dim_info["growth_derived_mean_WAA"] =
+          fims_popdy::DimensionInfo(
+              "growth_derived_mean_WAA",
+              fims::Vector<int>{fleet_interface->n_years.get(),
+                                fleet_interface->n_ages.get()},
+              fims::Vector<std::string>{"n_years", "n_ages"});
 
       // replace elements in the variable map
       info->variable_map[fleet_interface->log_landings_expected.id_m] =
