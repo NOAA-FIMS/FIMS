@@ -232,10 +232,14 @@ parameters_4_model <- default_parameters |>
       fleet_name = "survey1",
       label = "logit_sel_at_age",
       age = seq(get_n_ages(data_4_model)),
-      value = c(-1.000000, 1.000000, 2.999999, 4.999993, 6.999946,
+      #value = c(-1.000000, 1.000000, 2.999999, 4.999993, 6.999946, # true logit values
+      #          8.999956, 11.000085, 12.982599, 15.019483, 18.420681,
+      #          18.420681, 18.420681),
+      #estimation_type = c(rep("constant", 12))
+      value = c(0, 0, 2.999999, 4.999993, 6.999946,
                 8.999956, 11.000085, 12.982599, 15.019483, 18.420681,
                 18.420681, 18.420681),
-      estimation_type = c(rep("constant", 12))
+      estimation_type = c(rep("fixed_effects", 2), rep("constant", 10))
       #, rep("fixed_effects", 5),
       #                    rep("constant", 5))
     ),
