@@ -223,7 +223,7 @@ Added multinomial data mirroring in `Information`:
 
 ## Patch 19: Likelihood Term Factory Helpers
 
-Status: local, not committed yet.
+Commit: `2fc37463 Add likelihood term factory helpers`
 
 Added named factory helpers in `likelihood_term.hpp`:
 
@@ -232,6 +232,26 @@ Added named factory helpers in `likelihood_term.hpp`:
 
 Refactored `Information::AddLikelihoodTerm(...)` to use these helpers, keeping
 term setup centralized and easier to expose through a friendlier interface.
+
+## Patch 20: Rcpp Mirrored Likelihood Controls
+
+Status: local, not committed yet.
+
+Updated the Rcpp `CatchAtAge` interface with mirrored likelihood controls:
+
+- `UseLikelihoodTerms(TRUE/FALSE)`
+- `UsesLikelihoodTerms()`
+- `LikelihoodTermCount()`
+- `LikelihoodTermNames()`
+- `LikelihoodTermSourceIds()`
+- `LikelihoodTermTypes()`
+
+The opt-in preference is stored on the Rcpp model interface and applied when
+the model is rebuilt, so it survives `CreateTMBModel()` clearing `Information`.
+
+Also updated the TMB-model `fims_math::lgamma` wrapper to consider the global
+TMB overload, which is needed when the multinomial kernel is instantiated for
+TMBad types during an Rcpp package build.
 
 ## Current State
 
@@ -247,9 +267,10 @@ The branch currently has a side-by-side likelihood-term architecture:
 
 Current local uncommitted work:
 
-- `inst/include/likelihood/likelihood_term.hpp`: patch 19 factory helpers
-- `inst/include/common/information.hpp`: patch 19 factory helper use
-- `tests/gtest/test_likelihood_primitives.cpp`: patch 19 factory helper tests
-- `likelihood-refactor-patch-log.md`: patch 19 entry
+- `inst/include/interface/rcpp/rcpp_objects/rcpp_models.hpp`: patch 20 model controls
+- `inst/include/common/fims_math.hpp`: patch 20 TMBad lgamma overload lookup
+- `src/fims_modules.hpp`: patch 20 Rcpp method bindings
+- `tests/testthat/test-rcpp-fims.R`: patch 20 R-facing smoke test
+- `likelihood-refactor-patch-log.md`: patch 20 entry
 
 Note: `docs/likelihoods-distributions-refactor-chat.md` was also updated locally, but `docs/` is ignored by this repository, so this root-level file is the tracked version intended for commits.

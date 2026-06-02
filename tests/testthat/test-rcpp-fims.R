@@ -45,6 +45,16 @@ test_that("Rcpp interface works for modules", {
   #' @description Test that `get_id()` method works for `EWAAGrowth` module.
   expect_equal(ewaa_growth$get_id(), 1)
 
+  #' @description Test that Rcpp interface exposes mirrored likelihood-term controls.
+  expect_no_error(catch_at_age <- methods::new(CatchAtAge))
+  expect_false(catch_at_age$UsesLikelihoodTerms())
+  expect_no_error(catch_at_age$UseLikelihoodTerms(TRUE))
+  expect_true(catch_at_age$UsesLikelihoodTerms())
+  expect_equal(catch_at_age$LikelihoodTermCount(), 0)
+  expect_equal(catch_at_age$LikelihoodTermNames(), character())
+  expect_equal(catch_at_age$LikelihoodTermSourceIds(), integer())
+  expect_equal(catch_at_age$LikelihoodTermTypes(), character())
+
   clear()
 })
 

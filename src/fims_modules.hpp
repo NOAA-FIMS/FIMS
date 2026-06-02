@@ -471,7 +471,17 @@ RCPP_MODULE(fims) {
       .method("get_output", &CatchAtAgeInterface::to_json)
       .method("GetId", &CatchAtAgeInterface::get_id)
       .method("DoReporting", &CatchAtAgeInterface::DoReporting)
-      .method("IsReporting", &CatchAtAgeInterface::IsReporting);
+      .method("IsReporting", &CatchAtAgeInterface::IsReporting)
+      .method("UseLikelihoodTerms", &CatchAtAgeInterface::UseLikelihoodTerms)
+      .method("UsesLikelihoodTerms", &CatchAtAgeInterface::UsesLikelihoodTerms)
+      .method("LikelihoodTermCount",
+              &CatchAtAgeInterface::LikelihoodTermCount)
+      .method("LikelihoodTermNames",
+              &CatchAtAgeInterface::LikelihoodTermNames)
+      .method("LikelihoodTermSourceIds",
+              &CatchAtAgeInterface::LikelihoodTermSourceIds)
+      .method("LikelihoodTermTypes",
+              &CatchAtAgeInterface::LikelihoodTermTypes);
 }
 
 #endif /* SRC_FIMS_MODULES_HPP */

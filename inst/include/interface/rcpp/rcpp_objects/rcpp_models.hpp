@@ -41,6 +41,8 @@ class FisheryModelInterfaceBase : public FIMSRcppInterfaceBase {
   typedef typename std::set<uint32_t>::iterator population_id_iterator;
 
  public:
+  bool use_likelihood_terms_m = false; /**< opt into mirrored likelihood terms */
+
   /**
    * @brief The static id of the FleetInterfaceBase object.
    */
@@ -297,6 +299,79 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
 #else
     return false;
 #endif
+  }
+
+  /**
+   * @brief Enable or disable mirrored likelihood-term evaluation.
+   *
+   * @details The preference is stored on the Rcpp model interface because
+   * CreateTMBModel() clears and rebuilds Information before adding objects.
+   */
+  void UseLikelihoodTerms(bool use_likelihood_terms) {
+    this->use_likelihood_terms_m = use_likelihood_terms;
+  }
+
+  /**
+   * @brief Return whether mirrored likelihood-term evaluation is requested.
+   */
+  bool UsesLikelihoodTerms() { return this->use_likelihood_terms_m; }
+
+  /**
+   * @brief Return the number of mirrored likelihood terms currently set up.
+   */
+  size_t LikelihoodTermCount() {
+    std::shared_ptr<fims_info::Information<double>> info =
+        fims_info::Information<double>::GetInstance();
+    return info->likelihood_terms.size();
+  }
+
+  /**
+   * @brief Return the names of mirrored likelihood terms currently set up.
+   */
+  Rcpp::CharacterVector LikelihoodTermNames() {
+    std::shared_ptr<fims_info::Information<double>> info =
+        fims_info::Information<double>::GetInstance();
+    Rcpp::CharacterVector names;
+    for (size_t i = 0; i < info->likelihood_terms.size(); i++) {
+      names.push_back(info->likelihood_terms[i]->name);
+    }
+    return names;
+  }
+
+  /**
+   * @brief Return source density component IDs for mirrored likelihood terms.
+   */
+  Rcpp::IntegerVector LikelihoodTermSourceIds() {
+    std::shared_ptr<fims_info::Information<double>> info =
+        fims_info::Information<double>::GetInstance();
+    Rcpp::IntegerVector source_ids;
+    for (size_t i = 0; i < info->likelihood_terms.size(); i++) {
+      source_ids.push_back(info->likelihood_terms[i]->source_id);
+    }
+    return source_ids;
+  }
+
+  /**
+   * @brief Return semantic types for mirrored likelihood terms.
+   */
+  Rcpp::CharacterVector LikelihoodTermTypes() {
+    std::shared_ptr<fims_info::Information<double>> info =
+        fims_info::Information<double>::GetInstance();
+    Rcpp::CharacterVector types;
+    for (size_t i = 0; i < info->likelihood_terms.size(); i++) {
+      switch (info->likelihood_terms[i]->type) {
+        case fims_likelihood::LikelihoodTermType::Data:
+          types.push_back("data");
+          break;
+        case fims_likelihood::LikelihoodTermType::Prior:
+          types.push_back("prior");
+          break;
+        case fims_likelihood::LikelihoodTermType::RandomEffect:
+          types.push_back("random_effect");
+          break;
+      }
+    }
+    return types;
   }
 
   /**
@@ -938,6 +1013,7 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
   bool add_to_fims_tmb_internal() {
     std::shared_ptr<fims_info::Information<Type>> info =
         fims_info::Information<Type>::GetInstance();
+    info->use_likelihood_terms = this->use_likelihood_terms_m;
 
     std::shared_ptr<fims_popdy::CatchAtAge<Type>> model =
         std::make_shared<fims_popdy::CatchAtAge<Type>>();
