@@ -330,10 +330,39 @@ methods::setMethod(
       .merge_fims_uncertainty(
         growth_module_types = .growth_module_types_input(x@input)
       ) |>
+      .filter_get_estimates_rows() |>
       dplyr::relocate(uncertainty, .after = "estimation_type") |>
       dplyr::select(-uncertainty.x, -uncertainty.y)
   }
 )
+
+# Exclude growth-derived reporting diagnostics from get_estimates(); these
+# quantities remain available through get_report().
+.get_estimates_report_only_growth_labels <- function() {
+  c(
+    "age_to_length_conversion",
+    "growth_derived_age_to_length_conversion",
+    "growth_derived_alk_used",
+    "growth_derived_mean_WAA",
+    "growth_mean_LAA",
+    "growth_mean_WAA",
+    "growth_sd_LAA"
+  )
+}
+
+.filter_get_estimates_rows <- function(estimates) {
+  if (!all(c("label", "estimation_type") %in% names(estimates))) {
+    return(estimates)
+  }
+
+  estimates |>
+    dplyr::filter(
+      !(
+        .data$estimation_type == "derived_quantity" &
+          .data$label %in% .get_estimates_report_only_growth_labels()
+      )
+    )
+}
 
 #' @return
 #' [get_number_of_parameters()] returns a vector of integers specifying the
