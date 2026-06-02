@@ -235,7 +235,7 @@ term setup centralized and easier to expose through a friendlier interface.
 
 ## Patch 20: Rcpp Mirrored Likelihood Controls
 
-Status: local, not committed yet.
+Commit: `d1baedc2 Expose mirrored likelihood controls in Rcpp`
 
 Updated the Rcpp `CatchAtAge` interface with mirrored likelihood controls:
 
@@ -253,6 +253,19 @@ Also updated the TMB-model `fims_math::lgamma` wrapper to consider the global
 TMB overload, which is needed when the multinomial kernel is instantiated for
 TMBad types during an Rcpp package build.
 
+## Patch 21: R Likelihood-Term Helpers
+
+Status: local, not committed yet.
+
+Added friendly R helpers over the Rcpp mirrored-likelihood controls:
+
+- `use_likelihood_terms(model, value = TRUE)`
+- `uses_likelihood_terms(model)`
+- `get_likelihood_terms(model)`
+
+The summary helper returns a data frame with `name`, `type`, and `source_id` so
+users do not need to call multiple camel-case Rcpp methods directly.
+
 ## Current State
 
 The branch currently has a side-by-side likelihood-term architecture:
@@ -267,10 +280,10 @@ The branch currently has a side-by-side likelihood-term architecture:
 
 Current local uncommitted work:
 
-- `inst/include/interface/rcpp/rcpp_objects/rcpp_models.hpp`: patch 20 model controls
-- `inst/include/common/fims_math.hpp`: patch 20 TMBad lgamma overload lookup
-- `src/fims_modules.hpp`: patch 20 Rcpp method bindings
-- `tests/testthat/test-rcpp-fims.R`: patch 20 R-facing smoke test
-- `likelihood-refactor-patch-log.md`: patch 20 entry
+- `R/likelihood_terms.R`: patch 21 R helper API
+- `NAMESPACE`: patch 21 exports
+- `R/FIMS-package.R`: patch 21 roxygen export hints
+- `tests/testthat/test-likelihood-terms.R`: patch 21 R helper tests
+- `likelihood-refactor-patch-log.md`: patch 21 entry
 
 Note: `docs/likelihoods-distributions-refactor-chat.md` was also updated locally, but `docs/` is ignored by this repository, so this root-level file is the tracked version intended for commits.

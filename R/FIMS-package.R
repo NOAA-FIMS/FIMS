@@ -21,6 +21,7 @@
 #' @export get_log
 #' @export get_log_errors
 #' @export get_log_warnings
+#' @export get_likelihood_terms
 #' @export get_random
 #' @export inv_logit
 #' @export logit
@@ -37,6 +38,8 @@
 #' @export Population
 #' @export RealVector
 #' @export set_log_throw_on_error
+#' @export use_likelihood_terms
+#' @export uses_likelihood_terms
 #' @export SharedInt
 #' @export SharedReal
 #' @export SharedString
