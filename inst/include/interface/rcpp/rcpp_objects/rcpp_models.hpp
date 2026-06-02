@@ -309,6 +309,14 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
    */
   void UseLikelihoodTerms(bool use_likelihood_terms) {
     this->use_likelihood_terms_m = use_likelihood_terms;
+    std::shared_ptr<fims_info::Information<double>> info0 =
+        fims_info::Information<double>::GetInstance();
+    info0->use_likelihood_terms = use_likelihood_terms;
+#ifdef TMB_MODEL
+    std::shared_ptr<fims_info::Information<TMBAD_FIMS_TYPE>> info =
+        fims_info::Information<TMBAD_FIMS_TYPE>::GetInstance();
+    info->use_likelihood_terms = use_likelihood_terms;
+#endif
   }
 
   /**

@@ -268,7 +268,7 @@ users do not need to call multiple camel-case Rcpp methods directly.
 
 ## Patch 22: Remove Filesystem Dependency from Logger
 
-Status: local, not committed yet.
+Commit: `7cf5802e Remove filesystem dependency from logger`
 
 Removed the C++ `<filesystem>` dependency from `FIMSLog` path metadata handling
 to avoid a Windows/Rtools 45 libstdc++ filesystem compile failure.
@@ -279,6 +279,20 @@ Added small portable string-based path helpers for:
 - separator normalization
 - absolute path detection
 - dot-dot path cleanup
+
+## Patch 23: R Objective Parity Test
+
+Status: local, not committed yet.
+
+Added an R-level parity test that:
+
+- initializes a deterministic age-composition model through the real R helpers
+- evaluates the legacy objective
+- enables mirrored likelihood terms through `use_likelihood_terms()`
+- confirms the mirrored objective matches the legacy objective
+
+Also updated the Rcpp `UseLikelihoodTerms()` method to toggle the already-built
+`Information` singletons so the R helper works after `initialize_fims()`.
 
 ## Current State
 
@@ -294,8 +308,8 @@ The branch currently has a side-by-side likelihood-term architecture:
 
 Current local uncommitted work:
 
-- `inst/include/common/def.hpp`: patch 22 logger path helpers without filesystem
-- `tests/gtest/test_def_FIMSLog_clear.cpp`: patch 22 logger test update
-- `likelihood-refactor-patch-log.md`: patch 22 entry
+- `inst/include/interface/rcpp/rcpp_objects/rcpp_models.hpp`: patch 23 live opt-in toggle
+- `tests/testthat/test-likelihood-terms-parity.R`: patch 23 R parity test
+- `likelihood-refactor-patch-log.md`: patch 23 entry
 
 Note: `docs/likelihoods-distributions-refactor-chat.md` was also updated locally, but `docs/` is ignored by this repository, so this root-level file is the tracked version intended for commits.
