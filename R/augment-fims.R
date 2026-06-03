@@ -128,7 +128,7 @@ augment.FIMSFit <- function(x, include_weights = TRUE, ...) {
 #' Extracts observed-vs-expected pairs from a `FIMSFit` object via
 #' `augment.FIMSFit()` and evaluates a [yardstick::metric_set()] over them.
 #'
-#' By default the metrics are computed over **all** data streams combined.
+#' By default the metrics are computed over all data streams combined.
 #' Pass one or more column names to `group_by` to get per-stream breakdowns
 #' (e.g., `group_by = "label"` gives one row per data-stream label such as
 #' `"landings_expected"`, `"age_comp_expected"`, etc.).
@@ -230,7 +230,11 @@ get_fit_metrics <- function(
     aug <- dplyr::group_by(aug, dplyr::across(dplyr::all_of(group_by)))
   }
 
-  # Build the metric call: with or without case_weights
+  # Build the metric call: with or without case_weights.
+  # .truth, .pred, and .weight are column names passed to yardstick's NSE
+  # (truth = .truth, etc.). The .data$ pronoun used for dplyr verbs
+  # does not apply here; globalVariables() is used instead to suppress the
+  # R CMD CHECK notes for these three names.
   if (weighted && ".weight" %in% names(aug)) {
     result <- metrics(
       data          = aug,
@@ -248,6 +252,18 @@ get_fit_metrics <- function(
 
   result
 }
+
+# .truth, .pred, and .weight are column names passed via NSE to yardstick
+# metric functions (e.g. metrics(data, truth = .truth, estimate = .pred)).
+# The .data$ pronoun is dplyr-specific and does not work in this context.
+utils::globalVariables(c(".truth", ".pred", ".weight"))
+
+# .env is an rlang environment pronoun used in dplyr::filter() to explicitly
+# reference function arguments rather than columns, e.g.:
+#   dplyr::filter(aug, .data$module_id == .env$module_id)
+# Importing it suppresses the R CMD CHECK note.
+#' @importFrom rlang .env
+NULL
 
 #' Extract a single data stream from a FIMSFit augmented tibble
 #'
