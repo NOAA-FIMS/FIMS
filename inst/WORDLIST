@@ -48,6 +48,7 @@ Doering
 dotdash
 dontrun
 dplyr
+DSEM
 DTMB
 emph
 endcond
@@ -166,6 +167,7 @@ QNXNTO
 qobj
 rapidjson
 Rbuildignore
+RCEATTLE
 Rcerr
 rchunk
 rcmdcheck
