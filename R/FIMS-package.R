@@ -60,6 +60,8 @@
 #' @export ewaa_growth
 #' @export fleet
 #' @export module
+#' @export model_graph_from_tibbles
+#' @export model_graph_tibbles
 #' @export logistic_maturity
 #' @export logistic_selectivity
 #' @export population

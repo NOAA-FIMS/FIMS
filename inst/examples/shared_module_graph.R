@@ -96,7 +96,7 @@ fleet_b <- module(
   )
 )
 
-# Step 4: Convert modules and references into graph tibbles.
+# Step 4: Convert modules and references into a model graph.
 graph <- as_model_graph(list(
   shared_growth,
   shared_selectivity,
@@ -110,8 +110,25 @@ graph <- as_model_graph(list(
   fleet_b
 ))
 
-# The modules table stores each module once.
-print(graph$modules[, c("id", "type", "name")])
+# Step 5: Convert the graph to plain tibbles.
+tibbles <- model_graph_tibbles(graph)
+modules <- tibbles$modules
+links <- tibbles$links
 
-# The links table shows sharing explicitly.
-print(graph$links)
+# The modules tibble stores each module once.
+print(modules[, c("id", "type", "name")])
+
+# The links tibble shows sharing explicitly.
+print(links)
+
+# Step 6: Rebuild a graph object from the tibbles.
+rebuilt_graph <- model_graph_from_tibbles(
+  modules = modules,
+  links = links
+)
+
+stopifnot(isTRUE(all.equal(
+  as.data.frame(graph$links),
+  as.data.frame(rebuilt_graph$links),
+  check.attributes = FALSE
+)))

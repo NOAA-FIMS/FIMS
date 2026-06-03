@@ -6,11 +6,16 @@
 #'
 #' @param id Character identifier for a module.
 #' @param spec A FIMS component, observation, or distribution spec.
-#' @param x A module spec or list of module specs.
+#' @param x A module spec, list of module specs, or model graph.
+#' @param modules A tibble with `id`, `type`, `name`, and `spec` columns.
+#' @param links A tibble with `from`, `role`, and `to` columns.
 #'
 #' @return
 #' `module()` returns a `fims_module_spec`. `ref()` returns a `fims_ref_spec`.
 #' `as_model_graph()` returns a list with `modules` and `links` tibbles.
+#' `model_graph_tibbles()` returns the graph tibbles without nested graph
+#' class metadata. `model_graph_from_tibbles()` rebuilds a graph object from
+#' those tibbles.
 #'
 #' @name model_graph
 #' @keywords model
@@ -44,17 +49,11 @@ ref <- function(id) {
 #' @rdname model_graph
 #' @export
 as_model_graph <- function(x) {
-  modules <- as_module_list(x)
-  module_ids <- vapply(modules, `[[`, character(1), "id")
-
-  if (any(duplicated(module_ids))) {
-    duplicated_ids <- unique(module_ids[duplicated(module_ids)])
-    stop(
-      "Module ids must be unique. Duplicated ids: ",
-      paste(duplicated_ids, collapse = ", "),
-      call. = FALSE
-    )
+  if (inherits(x, "fims_model_graph")) {
+    return(x)
   }
+  modules <- as_module_list(x)
+  module_ids <- validate_module_ids(vapply(modules, `[[`, character(1), "id"))
 
   module_rows <- lapply(modules, module_row)
   link_rows <- unlist(lapply(modules, module_links), recursive = FALSE)
@@ -66,18 +65,51 @@ as_model_graph <- function(x) {
   )
   if (length(link_rows) > 0L) {
     links <- do.call(rbind, link_rows)
-    missing_ids <- setdiff(links[["to"]], module_ids)
-    if (length(missing_ids) > 0L) {
-      stop(
-        "References must point to existing module ids. Missing ids: ",
-        paste(missing_ids, collapse = ", "),
-        call. = FALSE
-      )
-    }
+    validate_graph_links(links, module_ids)
   }
 
-  out <- list(
+  new_fims_model_graph(
     modules = do.call(rbind, module_rows),
+    links = links
+  )
+}
+
+#' @rdname model_graph
+#' @export
+model_graph_tibbles <- function(x) {
+  x <- as_model_graph(x)
+  list(
+    modules = tibble::as_tibble(x[["modules"]]),
+    links = tibble::as_tibble(x[["links"]])
+  )
+}
+
+#' @rdname model_graph
+#' @export
+model_graph_from_tibbles <- function(modules, links) {
+  validate_modules_tibble(modules)
+  validate_links_tibble(links)
+
+  module_specs <- Map(module, modules[["id"]], modules[["spec"]])
+  graph <- as_model_graph(module_specs)
+  links <- tibble::as_tibble(links)
+
+  if (!same_graph_tibble(graph[["links"]], links)) {
+    stop(
+      "`links` must match the references stored in the module specs.",
+      call. = FALSE
+    )
+  }
+
+  new_fims_model_graph(
+    modules = tibble::as_tibble(modules),
+    links = links
+  )
+}
+
+new_fims_model_graph <- function(modules, links) {
+  out <- list(
+    modules = modules,
     links = links
   )
   class(out) <- c("fims_model_graph", "list")
@@ -142,4 +174,75 @@ check_graph_id <- function(id, name) {
     stop("`", name, "` must be a non-empty character scalar.", call. = FALSE)
   }
   invisible(id)
+}
+
+validate_module_ids <- function(module_ids) {
+  if (any(duplicated(module_ids))) {
+    duplicated_ids <- unique(module_ids[duplicated(module_ids)])
+    stop(
+      "Module ids must be unique. Duplicated ids: ",
+      paste(duplicated_ids, collapse = ", "),
+      call. = FALSE
+    )
+  }
+  module_ids
+}
+
+validate_modules_tibble <- function(modules) {
+  if (!tibble::is_tibble(modules) && !is.data.frame(modules)) {
+    stop("`modules` must be a tibble or data frame.", call. = FALSE)
+  }
+  required <- c("id", "type", "name", "spec")
+  missing <- setdiff(required, names(modules))
+  if (length(missing) > 0L) {
+    stop(
+      "`modules` is missing required columns: ",
+      paste(missing, collapse = ", "),
+      call. = FALSE
+    )
+  }
+  validate_module_ids(modules[["id"]])
+  if (!is.list(modules[["spec"]]) ||
+      !all(vapply(modules[["spec"]], inherits, logical(1), "fims_spec"))) {
+    stop("`modules$spec` must be a list-column of FIMS specs.", call. = FALSE)
+  }
+  invisible(modules)
+}
+
+validate_links_tibble <- function(links) {
+  if (!tibble::is_tibble(links) && !is.data.frame(links)) {
+    stop("`links` must be a tibble or data frame.", call. = FALSE)
+  }
+  required <- c("from", "role", "to")
+  missing <- setdiff(required, names(links))
+  if (length(missing) > 0L) {
+    stop(
+      "`links` is missing required columns: ",
+      paste(missing, collapse = ", "),
+      call. = FALSE
+    )
+  }
+  invisible(links)
+}
+
+validate_graph_links <- function(links, module_ids) {
+  missing_from <- setdiff(links[["from"]], module_ids)
+  missing_to <- setdiff(links[["to"]], module_ids)
+  missing_ids <- unique(c(missing_from, missing_to))
+  if (length(missing_ids) > 0L) {
+    stop(
+      "References must point to existing module ids. Missing ids: ",
+      paste(missing_ids, collapse = ", "),
+      call. = FALSE
+    )
+  }
+  invisible(links)
+}
+
+same_graph_tibble <- function(x, y) {
+  isTRUE(all.equal(
+    as.data.frame(x),
+    as.data.frame(y),
+    check.attributes = FALSE
+  ))
 }

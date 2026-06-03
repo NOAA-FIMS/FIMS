@@ -116,6 +116,45 @@ test_that("module graph specs represent shared submodules", {
   expect_true(all(selectivity_links[["role"]] == "selectivity"))
 })
 
+test_that("model graphs round trip through tibbles", {
+  #' @description Test that model graphs can be converted to tibbles and rebuilt from those tibbles.
+  shared_growth <- module("growth.shared", ewaa_growth(1:4, 1:4))
+  recruitment <- module(
+    "recruitment.a",
+    beverton_holt(estimate(log(1000)), constant(0.75))
+  )
+  maturity <- module("maturity.a", logistic_maturity(3, 1))
+  population_module <- module(
+    "population.a",
+    population(
+      name = "stock_a",
+      ages = 1:4,
+      years = 2020:2022,
+      growth = ref("growth.shared"),
+      maturity = ref("maturity.a"),
+      recruitment = ref("recruitment.a")
+    )
+  )
+  graph <- as_model_graph(list(
+    shared_growth,
+    recruitment,
+    maturity,
+    population_module
+  ))
+
+  tibbles <- model_graph_tibbles(graph)
+  expect_s3_class(tibbles[["modules"]], "data.frame")
+  expect_s3_class(tibbles[["links"]], "data.frame")
+
+  rebuilt_graph <- model_graph_from_tibbles(
+    modules = tibbles[["modules"]],
+    links = tibbles[["links"]]
+  )
+  expect_s3_class(rebuilt_graph, "fims_model_graph")
+  expect_equal(rebuilt_graph[["modules"]], graph[["modules"]])
+  expect_equal(rebuilt_graph[["links"]], graph[["links"]])
+})
+
 test_that("shared module graph example runs", {
   #' @description Test that the shared module graph example creates shared growth and selectivity links.
   example_env <- new.env(parent = globalenv())
@@ -124,6 +163,11 @@ test_that("shared module graph example runs", {
   expect_s3_class(example_env$graph, "fims_model_graph")
 
   links <- example_env$graph[["links"]]
+  expect_s3_class(example_env$tibbles[["modules"]], "data.frame")
+  expect_s3_class(example_env$tibbles[["links"]], "data.frame")
+  expect_s3_class(example_env$rebuilt_graph, "fims_model_graph")
+  expect_equal(example_env$rebuilt_graph[["links"]], example_env$graph[["links"]])
+
   growth_links <- links[links[["to"]] == "growth.shared", ]
   selectivity_links <- links[links[["to"]] == "selectivity.shared", ]
 
@@ -159,5 +203,26 @@ test_that("model graph specs validate module ids and references", {
   expect_error(
     as_model_graph(list(population_with_missing_ref)),
     regexp = "References must point to existing module ids"
+  )
+
+  graph <- as_model_graph(list(
+    growth,
+    module(
+      "population.a",
+      population(
+        name = "stock_a",
+        ages = 1:3,
+        years = 2020:2022,
+        growth = ref("growth.shared"),
+        maturity = logistic_maturity(3, 1),
+        recruitment = beverton_holt(estimate(log(1000)), constant(0.75))
+      )
+    )
+  ))
+  bad_links <- graph[["links"]]
+  bad_links[["to"]][1] <- "growth.other"
+  expect_error(
+    model_graph_from_tibbles(graph[["modules"]], bad_links),
+    regexp = "`links` must match the references stored in the module specs"
   )
 })

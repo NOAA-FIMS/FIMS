@@ -452,7 +452,7 @@ see estimated, constant, and random quantities directly in the model spec.
 
 ## Patch 34: Model Graph Tibble Primitives
 
-Status: local, not committed yet.
+Status: committed and pushed as `6cb84025 Add shared module graph specs`.
 
 Added first-pass graph representation helpers:
 
@@ -466,6 +466,23 @@ and two fleets can link to the same `selectivity.shared` module. The next patch
 can teach the builder to consume this graph and instantiate shared Rcpp objects
 once.
 
+## Patch 35: Model Graph Tibble Round Trip
+
+Status: local, not committed yet.
+
+Added explicit conversion helpers for model graph tibbles:
+
+- `model_graph_tibbles(graph)`: extract plain `modules` and `links` tibbles
+- `model_graph_from_tibbles(modules, links)`: rebuild a graph object from
+  those tibbles
+
+Updated `inst/examples/shared_module_graph.R` to show the full workflow:
+
+1. define shared modules
+2. create a graph
+3. convert the graph to tibbles
+4. rebuild the graph from those tibbles
+
 ## Current State
 
 The branch currently has a side-by-side likelihood-term architecture:
@@ -478,19 +495,16 @@ The branch currently has a side-by-side likelihood-term architecture:
   not mirrored until an explicit likelihood-term helper is added
 - model-level opt-in evaluation exists and has focused parity coverage
 
-Patch 34 local uncommitted work:
+Patch 35 local uncommitted work:
 
-- `R/model_graph.R`: `module()`, `ref()`, and `as_model_graph()` helpers
-- `R/model_specs.R`: population and fleet specs accept module references for
-  linked submodules
-- `R/FIMS-package.R` and `NAMESPACE`: exports for graph helpers
-- `inst/examples/shared_module_graph.R`: demo of shared growth and selectivity
-  modules represented as graph tibbles
-- `tests/testthat/test-model-graph.R`: graph representation and validation
+- `R/model_graph.R`: graph-to-tibble and graph-from-tibble helpers
+- `R/FIMS-package.R` and `NAMESPACE`: exports for round-trip helpers
+- `inst/examples/shared_module_graph.R`: explicit graph tibble round-trip demo
+- `tests/testthat/test-model-graph.R`: round-trip and validation
   coverage
-- `likelihood-refactor-patch-log.md`: patch 34 entry
+- `likelihood-refactor-patch-log.md`: patch 35 entry
 
 Note: `inst/examples/catch_at_age_rcpp_interface.R` also has a separate local
-edit from earlier work and is intentionally not part of Patch 34.
+edit from earlier work and is intentionally not part of Patch 35.
 
 Note: `docs/likelihoods-distributions-refactor-chat.md` was also updated locally, but `docs/` is ignored by this repository, so this root-level file is the tracked version intended for commits.
