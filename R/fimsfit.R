@@ -572,7 +572,6 @@ fit_fims <- function(input,
     control_list = control,
     starting_values = obj[["par"]]
   )
-<<<<<<< HEAD
 
   if (is.null(opt)) {
     failed_nlminb_object <- return_failed_nlminb(obj)
@@ -586,9 +585,8 @@ fit_fims <- function(input,
     return(failed_fit)
   }
 
-=======
   # TODO(EDM): Test that fitted EDM parameters affect obj fn() as expected.
->>>>>>> 5d54c2ad (Added TODO(EDM) comments to start with an implementation plan)
+
   maxgrad0 <- maxgrad <- max(abs(obj$gr(opt[["par"]])))
   if (number_of_loops > 0) {
     cli::cli_inform(c(
