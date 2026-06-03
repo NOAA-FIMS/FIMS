@@ -217,7 +217,8 @@ reshape_json_estimates <- function(model_output) {
 reshape_tmb_estimates <- function(obj,
                                   sdreport = NULL,
                                   opt = NULL,
-                                  parameter_names) {
+                                  parameter_names,
+                                  gradient = NULL) {
   # Outline for the estimates table
   estimates_outline <- tibble::tibble(
     # The FIMS Rcpp module
@@ -260,7 +261,13 @@ reshape_tmb_estimates <- function(obj,
           rep(NA_real_, derived_quantity_nrow)
         ),
         gradient = c(
-          obj[["gr"]](opt[["par"]]),
+          if (!is.null(gradient)) {
+            gradient
+          } else if (length(opt) > 0) {
+            obj[["gr"]](opt[["par"]])
+          } else {
+            rep(NA_real_, length(parameter_names))
+          },
           rep(NA_real_, derived_quantity_nrow)
         )
       )
