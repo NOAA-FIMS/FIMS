@@ -5,6 +5,7 @@ ADMB
 ADREPORT
 agecomp
 agem
+Akaike
 alexjensen
 aman
 amax
@@ -51,6 +52,7 @@ databucket
 dataframe
 dataframes
 DCMAKE
+deqn
 Deroba
 dlognorm
 dmultinorm
@@ -62,6 +64,7 @@ Ducharme
 emilyliljestrand
 emph
 endcond
+envir
 ericward
 Eshaan
 EWAA
@@ -127,6 +130,7 @@ magnusson
 maindir
 MAINPAGE
 Makevars
+mape
 mathrel
 mathrm
 maxgrad
@@ -161,6 +165,8 @@ nsurveys
 onclick
 opensci
 oppy
+optimised
+optimized
 ordinnames
 Oshima
 Ovec
@@ -204,6 +210,8 @@ rklasky
 rlang
 rlib
 rmarkdown
+rmse
+RMSE
 Rohith
 rowwise
 roxygen
