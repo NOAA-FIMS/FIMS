@@ -51,10 +51,11 @@
 #' @exportS3Method generics::augment
 augment.FIMSFit <- function(x, include_weights = TRUE, ...) {
   # augment() is a filtered, renamed view of get_estimates().
-  # This function only selects the data-fit rows (where both observed and
-  # expected are non-NA) and maps column names to the yardstick convention
-  # (.truth, .pred, .weight). After applying fimsfit-patches.R the gradient
-  # is stored in x@gradient, so this call is safe after clear().
+  # get_estimates() is the source of truth; this function only selects the
+  # data-fit rows (where both observed and expected are non-NA) and maps
+  # column names to the yardstick convention (.truth, .pred, .weight).
+  # After applying fimsfit-patches.R the gradient is stored in x@gradient at
+  # fit time, so this call is safe after clear().
   estimates <- get_estimates(x)
 
   # Keep only rows that are data-fit rows: both observed and expected must be
@@ -62,8 +63,8 @@ augment.FIMSFit <- function(x, include_weights = TRUE, ...) {
   # observed data counterpart are excluded.
   fit_rows <- estimates |>
     dplyr::filter(
-      !is.na(observed),
-      !is.na(expected)
+      !is.na(.data$observed),
+      !is.na(.data$expected)
     )
 
   if (nrow(fit_rows) == 0) {
@@ -96,27 +97,27 @@ augment.FIMSFit <- function(x, include_weights = TRUE, ...) {
   out <- fit_rows |>
     dplyr::select(
       dplyr::all_of(meta_cols),
-      ".truth"  = observed,
-      ".pred"   = expected,
+      ".truth"  = .data$observed,
+      ".pred"   = .data$expected,
       dplyr::any_of("uncertainty")
     ) |>
     dplyr::mutate(
-      .truth = as.numeric(.truth),
-      .pred  = as.numeric(.pred)
+      .truth = as.numeric(.data$.truth),
+      .pred  = as.numeric(.data$.pred)
     )
 
   if (include_weights && "uncertainty" %in% names(out)) {
     out <- out |>
       dplyr::mutate(
         .weight = dplyr::if_else(
-          !is.na(uncertainty) & uncertainty > 0,
-          1 / uncertainty^2,
+          !is.na(.data$uncertainty) & .data$uncertainty > 0,
+          1 / .data$uncertainty^2,
           NA_real_
         )
       ) |>
-      dplyr::select(-uncertainty)
+      dplyr::select(-"uncertainty")
   } else if ("uncertainty" %in% names(out)) {
-    out <- dplyr::select(out, -uncertainty)
+    out <- dplyr::select(out, -"uncertainty")
   }
 
   out
@@ -250,8 +251,9 @@ get_fit_metrics <- function(
 
 #' Extract a single data stream from a FIMSFit augmented tibble
 #'
-#' Convenience filter to pull out one specific data stream so you can pass it
-#' directly to any yardstick metric or plot it.
+#' Convenience filter to pull out one specific data stream (e.g. the landings
+#' for a given module) so you can pass it directly to any yardstick metric or
+#' plot it.
 #'
 #' @details
 #' In the FIMS output the `fleet` column is `NA` for derived-quantity rows
@@ -301,7 +303,7 @@ get_fit_stream <- function(x, stream_label = NULL, module_id = NULL, ...) {
   aug <- if (is.FIMSFit(x)) augment.FIMSFit(x, ...) else x
 
   if (!is.null(stream_label)) {
-    aug <- dplyr::filter(aug, label == stream_label)
+    aug <- dplyr::filter(aug, .data$label == stream_label)
   }
   if (!is.null(module_id)) {
     aug <- dplyr::filter(aug, .data$module_id == .env$module_id)

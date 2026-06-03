@@ -25,8 +25,9 @@ retain (e.g. \code{1} for the first fishing fleet, \code{2} for the first survey
 A \code{\link[tibble:tibble]{tibble::tibble()}} subset of the augmented data.
 }
 \description{
-Convenience filter to pull out one specific data stream so you can pass it
-directly to any yardstick metric or plot it.
+Convenience filter to pull out one specific data stream (e.g. the landings
+for a given module) so you can pass it directly to any yardstick metric or
+plot it.
 }
 \details{
 In the FIMS output the \code{fleet} column is \code{NA} for derived-quantity rows
