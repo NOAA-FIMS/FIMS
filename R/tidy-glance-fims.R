@@ -1,3 +1,15 @@
+#' @importFrom generics tidy
+#' @export
+generics::tidy
+
+#' @importFrom generics glance
+#' @export
+generics::glance
+
+#' @importFrom generics augment
+#' @export
+generics::augment
+
 #' Tidy a FIMSFit object into a parameter-level tibble
 #'
 #' Returns one row per estimated parameter following the
@@ -13,7 +25,7 @@
 #'     log_Fmort, log_q, …).}
 #'   \item{`"random_effects"`}{Integrated-out random effects (log_devs, …).}
 #'   \item{`"derived_quantity"`}{Model outputs that are not parameters
-#'     (spawning biomass, expected catches, ...). Uncertainty here comes from
+#'     (spawning biomass, expected catches, …). Uncertainty here comes from
 #'     the delta method via [TMB::sdreport()].}
 #' }
 #' Pass any subset of these strings to `parameters` to control which rows are
@@ -97,7 +109,7 @@ tidy.FIMSFit <- function(
   }
 
   # tidy() is a filtered, renamed view of get_estimates().
-  # get_estimates() is the source of truth; this function only selects the
+  # this function only selects the
   # parameter rows and maps column names to the generics/broom convention.
   # After applying fimsfit-patches.R the gradient is stored in x@gradient at
   # fit time, so this call is safe after clear().
@@ -112,27 +124,27 @@ tidy.FIMSFit <- function(
   )
 
   out <- estimates |>
-    dplyr::filter(estimation_type %in% parameters) |>
+    dplyr::filter(.data$estimation_type %in% parameters) |>
     dplyr::select(
-      term           = label,
-      estimate       = estimated,
-      std.error      = uncertainty,
+      term      = .data$label,
+      estimate  = .data$estimated,
+      std.error = .data$uncertainty,
       dplyr::all_of(meta_cols)
     ) |>
     dplyr::mutate(
-      estimate  = as.numeric(estimate),
-      std.error = as.numeric(std.error),
-      statistic = estimate / std.error,
-      p.value   = 2 * stats::pnorm(-abs(statistic))
+      estimate  = as.numeric(.data$estimate),
+      std.error = as.numeric(.data$std.error),
+      statistic = .data$estimate / .data$std.error,
+      p.value   = 2 * stats::pnorm(-abs(.data$statistic))
     ) |>
-    dplyr::relocate(statistic, p.value, .after = std.error)
+    dplyr::relocate("statistic", "p.value", .after = "std.error")
 
   if (conf.int) {
     z <- stats::qnorm((1 + conf.level) / 2)
     out <- out |>
       dplyr::mutate(
-        conf.low  = estimate - z * std.error,
-        conf.high = estimate + z * std.error
+        conf.low  = .data$estimate - z * .data$std.error,
+        conf.high = .data$estimate + z * .data$std.error
       )
   }
 
@@ -213,7 +225,7 @@ glance.FIMSFit <- function(x, ...) {
   report <- get_report(x)
   npar   <- get_number_of_parameters(x)
 
-  # parameter counts
+  # parameter count
   npar_fixed  <- as.integer(npar[["fixed_effects"]])
   npar_random <- as.integer(npar[["random_effects"]])
 
@@ -228,14 +240,14 @@ glance.FIMSFit <- function(x, ...) {
   # Count rows that have both observed and expected values.
   #
   # don't call get_estimates() here. That function calls
-  # reshape_tmb_estimates() which in turn calls obj$gr()
-  # function can segfaults after clear() has freed the C++ memory
+  # reshape_tmb_estimates() which in turn calls obj$gr() —- this
+  # function can segfault after clear() has freed the C++ memory.
   # reshape_json_estimates() only parses the stored JSON string (x@model_output)
   # and is safe to call at any time.
   json_estimates <- reshape_json_estimates(get_model_output(x))
   nobs <- sum(!is.na(json_estimates[["observed"]]) & !is.na(json_estimates[["expected"]]))
 
-  #ninformation criteria
+  # information criteria
   aic <- if (optimised) 2 * npar_fixed - 2 * log_lik else NA_real_
   bic <- if (optimised && nobs > 0) {
     npar_fixed * log(nobs) - 2 * log_lik
@@ -253,7 +265,7 @@ glance.FIMSFit <- function(x, ...) {
 
   # terminal spawning biomass
   # spawning_biomass is a list, one element per population; take the last
-  # value from each and store as a list-column
+  # value from each and store as a list-column (supports multi-population).
   ssb_list <- report[["spawning_biomass"]]
   terminal_ssb <- if (!is.null(ssb_list) && length(ssb_list) > 0) {
     list(vapply(ssb_list, utils::tail, n = 1L, FUN.VALUE = numeric(1L)))
