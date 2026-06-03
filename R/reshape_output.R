@@ -212,12 +212,18 @@ reshape_json_estimates <- function(model_output) {
 #'   opt is an empty list and is not used in the function.
 #' @param parameter_names A character vector of parameter names. This is used to
 #'   identify the parameters in the `std` object.
+#' @param precomputed_gradient A numeric vector of pre-computed gradient values
+#'   at the MLE, typically from `get_gradient(x)`. When provided, this avoids
+#'   a second call to `obj[["gr"]]()`, which would crash after [clear()] has
+#'   freed the C++ memory. If `NULL` (default), the gradient is computed
+#'   directly from `obj[["gr"]](opt[["par"]])`.
 #' @return A tibble containing the reshaped estimates (i.e., parameters and
 #' derived quantities).
 reshape_tmb_estimates <- function(obj,
                                   sdreport = NULL,
                                   opt = NULL,
-                                  parameter_names) {
+                                  parameter_names,
+                                  precomputed_gradient = NULL) {
   # Outline for the estimates table
   estimates_outline <- tibble::tibble(
     # The FIMS Rcpp module
@@ -260,7 +266,13 @@ reshape_tmb_estimates <- function(obj,
           rep(NA_real_, derived_quantity_nrow)
         ),
         gradient = c(
-          obj[["gr"]](opt[["par"]]),
+          if (!is.null(precomputed_gradient)) {
+            precomputed_gradient
+          } else if (length(opt) > 0) {
+            obj[["gr"]](opt[["par"]])
+          } else {
+            rep(NA_real_, length(parameter_names))
+          },
           rep(NA_real_, derived_quantity_nrow)
         )
       )

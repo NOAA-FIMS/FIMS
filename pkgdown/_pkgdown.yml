@@ -54,6 +54,14 @@ reference:
   - Cpp_classes
   - Cpp_functions
 
+- title: Model Tidying and Fit Evaluation
+  desc: Functions used to extract, tidy, and evaluate model fit results.
+  contents:
+  - augment.FIMSFit
+  - get_fit_metrics
+  - get_fit_stream
+  - glance.FIMSFit
+  - tidy.FIMSFit
 
 news:
   releases:
@@ -111,7 +119,7 @@ navbar:
           href: articles/RD-re-sparsity.html
     reports:
       text: reports
-      menu: 
+      menu:
         - text: coverage (codecov)
           href: https://app.codecov.io/gh/NOAA-FIMS/FIMS
           target: _blank

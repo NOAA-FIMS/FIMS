@@ -76,6 +76,7 @@ Depends:
 Imports:
     cli,
     dplyr,
+    generics (>= 0.1.3),
     ggplot2,
     glue,
     graphics,
@@ -88,7 +89,8 @@ Imports:
     stats,
     tibble,
     TMB (>= 1.8.0),
-    utils
+    utils,
+    yardstick (>= 1.3.0)
 Suggests:
     covr,
     devtools,
@@ -133,4 +135,5 @@ Language: en-US
 LazyData: true
 NeedsCompilation: yes
 Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.3
 SystemRequirements: GNU make

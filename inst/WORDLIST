@@ -5,7 +5,7 @@ ADMB
 ADREPORT
 agecomp
 agem
-aman
+Akaike
 amax
 AMIGAOS
 Anders
@@ -41,6 +41,7 @@ databucket
 dataframe
 dataframes
 DCMAKE
+deqn
 dlognorm
 dmultinorm
 Doering
@@ -49,6 +50,7 @@ dplyr
 DTMB
 emph
 endcond
+envir
 EWAA
 ewaagrowth
 exponentiated
@@ -102,6 +104,7 @@ LPMF
 maindir
 MAINPAGE
 Makevars
+mape
 mathrel
 mathrm
 maxgrad
@@ -168,6 +171,7 @@ Ricker
 rlang
 rlib
 rmarkdown
+RMSE
 rowwise
 roxygen
 Rscript
