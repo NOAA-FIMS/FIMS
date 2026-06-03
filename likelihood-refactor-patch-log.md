@@ -421,7 +421,7 @@ The example intentionally avoids low-level Rcpp calls such as
 
 ## Patch 32: initialize_fims Spec Bridge
 
-Status: local, not committed yet.
+Status: committed and pushed as `cc3cbdb8 Add clean spec fit bridge and role helpers`.
 
 Added an `initialize_fims()` bridge for `fims_model_spec` objects. The bridge
 calls `build_fims()` and returns the existing `fit_fims()` input shape:
@@ -437,7 +437,7 @@ Updated the clean R builder example to show:
 
 ## Patch 33: Friendly Parameter Role Names
 
-Status: local, not committed yet.
+Status: committed and pushed as `cc3cbdb8 Add clean spec fit bridge and role helpers`.
 
 Added user-facing role helpers for the R specification layer:
 
@@ -449,6 +449,22 @@ The existing `fixed_effect()` and `random_effect()` helpers remain available for
 compatibility and for users who prefer the more explicit statistical wording.
 The clean CatchAtAge builder example now uses the friendlier names so users can
 see estimated, constant, and random quantities directly in the model spec.
+
+## Patch 34: Model Graph Tibble Primitives
+
+Status: local, not committed yet.
+
+Added first-pass graph representation helpers:
+
+- `module(id, spec)`: define a reusable module once
+- `ref(id)`: point another module field to a reusable module
+- `as_model_graph(x)`: convert module specs into `modules` and `links` tibbles
+
+This patch lets the R layer represent shared submodules without building them
+yet. For example, two populations can link to the same `growth.shared` module,
+and two fleets can link to the same `selectivity.shared` module. The next patch
+can teach the builder to consume this graph and instantiate shared Rcpp objects
+once.
 
 ## Current State
 
@@ -462,29 +478,19 @@ The branch currently has a side-by-side likelihood-term architecture:
   not mirrored until an explicit likelihood-term helper is added
 - model-level opt-in evaluation exists and has focused parity coverage
 
-Patch 32 local uncommitted work:
+Patch 34 local uncommitted work:
 
-- `R/initialize_modules.R`: `initialize_fims()` spec bridge
-- `R/fimsfit.R`: deterministic `FIMSFit` return path for spec-built inputs
-  with `optimize = FALSE`
-- `inst/examples/catch_at_age_spec_builder.R`: demo uses
-  `initialize_fims(spec)` and `fit_fims(initialized, optimize = FALSE)`
-- `tests/testthat/test-spec-builder.R`: bridge and demo coverage
-- `likelihood-refactor-patch-log.md`: patch 32 entry
-
-Patch 33 local uncommitted work:
-
-- `R/likelihood_specs.R`: `estimate()`, `constant()`, and `random()` helpers
-- `R/spec_builder.R`: `constant` role translation to legacy
-  `estimation_type = "constant"`
-- `R/FIMS-package.R` and `NAMESPACE`: exports for new role helpers
-- `inst/examples/catch_at_age_spec_builder.R`: demo uses the friendlier role
-  names
-- `tests/testthat/test-likelihood-specs.R`: role helper coverage
-- `tests/testthat/test-spec-builder.R`: builder and demo coverage for role
-  helpers
+- `R/model_graph.R`: `module()`, `ref()`, and `as_model_graph()` helpers
+- `R/model_specs.R`: population and fleet specs accept module references for
+  linked submodules
+- `R/FIMS-package.R` and `NAMESPACE`: exports for graph helpers
+- `inst/examples/shared_module_graph.R`: demo of shared growth and selectivity
+  modules represented as graph tibbles
+- `tests/testthat/test-model-graph.R`: graph representation and validation
+  coverage
+- `likelihood-refactor-patch-log.md`: patch 34 entry
 
 Note: `inst/examples/catch_at_age_rcpp_interface.R` also has a separate local
-edit from earlier work and is intentionally not part of Patch 32.
+edit from earlier work and is intentionally not part of Patch 34.
 
 Note: `docs/likelihoods-distributions-refactor-chat.md` was also updated locally, but `docs/` is ignored by this repository, so this root-level file is the tracked version intended for commits.

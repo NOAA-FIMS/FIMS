@@ -59,9 +59,12 @@
 #' @export catch_at_age
 #' @export ewaa_growth
 #' @export fleet
+#' @export module
 #' @export logistic_maturity
 #' @export logistic_selectivity
 #' @export population
+#' @export ref
+#' @export as_model_graph
 #' @import methods
 #' @import stats
 #' @importFrom ggplot2 .data

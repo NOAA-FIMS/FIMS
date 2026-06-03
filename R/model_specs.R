@@ -91,8 +91,9 @@ beverton_holt <- function(log_rzero, steepness, deviations = NULL) {
 #' @export
 fleet <- function(name, selectivity, fishing_mortality = NULL) {
   check_name_spec(name, "name")
-  check_component_spec(selectivity, "selectivity")
-  if (selectivity[["component"]] != "logistic_selectivity") {
+  check_component_or_ref_spec(selectivity, "selectivity")
+  if (inherits(selectivity, "fims_component_spec") &&
+      selectivity[["component"]] != "logistic_selectivity") {
     stop("`selectivity` must be a selectivity component spec.", call. = FALSE)
   }
   if (!is.null(fishing_mortality)) {
@@ -113,17 +114,20 @@ population <- function(name, ages, years, growth, maturity, recruitment) {
   check_name_spec(name, "name")
   check_numeric_spec(ages, "ages")
   check_numeric_spec(years, "years")
-  check_component_spec(growth, "growth")
-  check_component_spec(maturity, "maturity")
-  check_component_spec(recruitment, "recruitment")
+  check_component_or_ref_spec(growth, "growth")
+  check_component_or_ref_spec(maturity, "maturity")
+  check_component_or_ref_spec(recruitment, "recruitment")
 
-  if (growth[["component"]] != "ewaa_growth") {
+  if (inherits(growth, "fims_component_spec") &&
+      growth[["component"]] != "ewaa_growth") {
     stop("`growth` must be a growth component spec.", call. = FALSE)
   }
-  if (maturity[["component"]] != "logistic_maturity") {
+  if (inherits(maturity, "fims_component_spec") &&
+      maturity[["component"]] != "logistic_maturity") {
     stop("`maturity` must be a maturity component spec.", call. = FALSE)
   }
-  if (recruitment[["component"]] != "beverton_holt") {
+  if (inherits(recruitment, "fims_component_spec") &&
+      recruitment[["component"]] != "beverton_holt") {
     stop("`recruitment` must be a recruitment component spec.", call. = FALSE)
   }
 
@@ -203,6 +207,17 @@ check_role_spec <- function(value, name) {
 check_component_spec <- function(value, name) {
   if (!inherits(value, "fims_component_spec")) {
     stop("`", name, "` must be a FIMS component spec.", call. = FALSE)
+  }
+  invisible(value)
+}
+
+check_component_or_ref_spec <- function(value, name) {
+  if (!inherits(value, "fims_component_spec") &&
+      !inherits(value, "fims_ref_spec")) {
+    stop(
+      "`", name, "` must be a FIMS component spec or reference.",
+      call. = FALSE
+    )
   }
   invisible(value)
 }
