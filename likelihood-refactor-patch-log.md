@@ -407,7 +407,7 @@ expected value links, and likelihood-term opt-in internally.
 
 ## Patch 31: Clean R CatchAtAge Builder Example
 
-Status: local, not committed yet.
+Status: committed and pushed as `859dea2e Add clean R spec builder layer`.
 
 Added an end-to-end example showing the new R specification layer:
 
@@ -418,6 +418,37 @@ Added an end-to-end example showing the new R specification layer:
 The example intentionally avoids low-level Rcpp calls such as
 `set_distribution_links()`, `set_observed_data()`, `methods::new()`, and
 `UseLikelihoodTerms()`.
+
+## Patch 32: initialize_fims Spec Bridge
+
+Status: local, not committed yet.
+
+Added an `initialize_fims()` bridge for `fims_model_spec` objects. The bridge
+calls `build_fims()` and returns the existing `fit_fims()` input shape:
+
+- `parameters = list(p = get_fixed(), re = get_random())`
+- `model = built$model`
+- `built = built`
+
+Updated the clean R builder example to show:
+
+- `initialized <- initialize_fims(spec)`
+- `fit <- fit_fims(initialized, optimize = FALSE)`
+
+## Patch 33: Friendly Parameter Role Names
+
+Status: local, not committed yet.
+
+Added user-facing role helpers for the R specification layer:
+
+- `estimate(value)`: estimated fixed effect
+- `constant(value)`: non-estimated parameter
+- `random(distribution)`: random effect shorthand
+
+The existing `fixed_effect()` and `random_effect()` helpers remain available for
+compatibility and for users who prefer the more explicit statistical wording.
+The clean CatchAtAge builder example now uses the friendlier names so users can
+see estimated, constant, and random quantities directly in the model spec.
 
 ## Current State
 
@@ -431,19 +462,29 @@ The branch currently has a side-by-side likelihood-term architecture:
   not mirrored until an explicit likelihood-term helper is added
 - model-level opt-in evaluation exists and has focused parity coverage
 
-Current local uncommitted work:
+Patch 32 local uncommitted work:
 
-- `R/likelihood_specs.R`: patch 27 R spec constructors
-- `R/likelihood_specs.R`: patch 28 R observation spec constructors
-- `R/model_specs.R`: patch 29 R model component spec constructors
-- `R/spec_builder.R`: patch 30 first R spec builder slice
-- `inst/examples/catch_at_age_spec_builder.R`: patch 31 clean R builder example
-- `R/distribution_formulas.R`: patch 27 FIMS spec metadata on existing
-  family constructors
-- `NAMESPACE`: patch 27 through 30 exports
-- `R/FIMS-package.R`: patch 27 through 30 export annotations
-- `tests/testthat/test-likelihood-specs.R`: patch 27 through 29 spec tests
-- `tests/testthat/test-spec-builder.R`: patch 30 and 31 builder tests
-- `likelihood-refactor-patch-log.md`: patch 27 through 31 entries
+- `R/initialize_modules.R`: `initialize_fims()` spec bridge
+- `R/fimsfit.R`: deterministic `FIMSFit` return path for spec-built inputs
+  with `optimize = FALSE`
+- `inst/examples/catch_at_age_spec_builder.R`: demo uses
+  `initialize_fims(spec)` and `fit_fims(initialized, optimize = FALSE)`
+- `tests/testthat/test-spec-builder.R`: bridge and demo coverage
+- `likelihood-refactor-patch-log.md`: patch 32 entry
+
+Patch 33 local uncommitted work:
+
+- `R/likelihood_specs.R`: `estimate()`, `constant()`, and `random()` helpers
+- `R/spec_builder.R`: `constant` role translation to legacy
+  `estimation_type = "constant"`
+- `R/FIMS-package.R` and `NAMESPACE`: exports for new role helpers
+- `inst/examples/catch_at_age_spec_builder.R`: demo uses the friendlier role
+  names
+- `tests/testthat/test-likelihood-specs.R`: role helper coverage
+- `tests/testthat/test-spec-builder.R`: builder and demo coverage for role
+  helpers
+
+Note: `inst/examples/catch_at_age_rcpp_interface.R` also has a separate local
+edit from earlier work and is intentionally not part of Patch 32.
 
 Note: `docs/likelihoods-distributions-refactor-chat.md` was also updated locally, but `docs/` is ignored by this repository, so this root-level file is the tracked version intended for commits.

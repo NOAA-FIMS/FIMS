@@ -8,7 +8,8 @@
 #' @param mean Numeric expected value for a normal distribution.
 #' @param sd Positive numeric standard deviation.
 #' @param distribution A FIMS distribution specification.
-#' @param value Numeric value or vector for a fixed effect or prior target.
+#' @param value Numeric value or vector for an estimated effect, constant
+#'   parameter, or prior target.
 #' @param fleet Character name of the fleet associated with an observation.
 #' @param data Observed data values. Vectors, matrices, and data frames are
 #'   accepted and stored without modification.
@@ -50,6 +51,12 @@ prior <- function(value, distribution) {
 
 #' @rdname likelihood_specs
 #' @export
+random <- function(distribution) {
+  random_effect(distribution)
+}
+
+#' @rdname likelihood_specs
+#' @export
 random_effect <- function(distribution) {
   check_distribution_spec(distribution)
   new_fims_role_spec(
@@ -60,10 +67,26 @@ random_effect <- function(distribution) {
 
 #' @rdname likelihood_specs
 #' @export
+estimate <- function(value) {
+  fixed_effect(value)
+}
+
+#' @rdname likelihood_specs
+#' @export
 fixed_effect <- function(value) {
   check_numeric_spec(value, "value")
   new_fims_role_spec(
     role = "fixed_effect",
+    value = value
+  )
+}
+
+#' @rdname likelihood_specs
+#' @export
+constant <- function(value) {
+  check_numeric_spec(value, "value")
+  new_fims_role_spec(
+    role = "constant",
     value = value
   )
 }

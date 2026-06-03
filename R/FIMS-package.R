@@ -5,6 +5,7 @@
 #' @export LogRRecruitmentProcess
 #' @export CatchAtAge
 #' @export clear
+#' @export constant
 #' @export CreateTMBModel
 #' @export DlnormDistribution
 #' @export DmultinomDistribution
@@ -13,6 +14,7 @@
 #' @export EWAAGrowth
 #' @export Fleet
 #' @export set_fixed
+#' @export estimate
 #' @export fixed_effect
 #' @export get_fixed
 #' @export set_random
@@ -43,6 +45,7 @@
 #' @export ParameterVector
 #' @export prior
 #' @export Population
+#' @export random
 #' @export random_effect
 #' @export RealVector
 #' @export set_log_throw_on_error

@@ -27,17 +27,21 @@ test_that("build_fims creates Rcpp modules from a small CatchAtAge spec", {
       ages = 1:4,
       years = 2020:2022,
       growth = ewaa_growth(ages = 1:4, weights = c(0.2, 0.5, 0.9, 1.1)),
-      maturity = logistic_maturity(a50 = 3, slope = 1.2),
+      maturity = logistic_maturity(a50 = constant(3), slope = constant(1.2)),
       recruitment = beverton_holt(
-        log_rzero = fixed_effect(log(1000)),
-        steepness = fixed_effect(0.75)
+        log_rzero = estimate(log(1000)),
+        steepness = constant(0.75),
+        deviations = random(normal(sd = 0.4))
       )
     ),
     fleets = list(
       fleet(
         name = "fishery",
-        selectivity = logistic_selectivity(a50 = 3, slope = 1.1),
-        fishing_mortality = fixed_effect(rep(log(0.1), 3))
+        selectivity = logistic_selectivity(
+          a50 = estimate(3),
+          slope = constant(1.1)
+        ),
+        fishing_mortality = estimate(rep(log(0.1), 3))
       )
     ),
     observations = list(
@@ -63,11 +67,13 @@ test_that("build_fims creates Rcpp modules from a small CatchAtAge spec", {
 })
 
 test_that("clean R CatchAtAge builder example runs end to end", {
-  #' @description Test that the clean R CatchAtAge builder example creates mirrored likelihood terms.
+  #' @description Test that the clean R CatchAtAge builder example creates mirrored likelihood terms and a deterministic fit.
   example_env <- new.env(parent = globalenv())
 
   expect_no_error(sys.source(example_path, envir = example_env))
   expect_s3_class(example_env$built, "FIMSBuilderResult")
+  expect_type(example_env$initialized, "list")
+  expect_s4_class(example_env$fit, "FIMSFit")
   expect_s3_class(example_env$likelihood_terms, "data.frame")
   expect_gt(nrow(example_env$likelihood_terms), 0L)
   expect_true(any(example_env$likelihood_terms[["type"]] == "data"))
@@ -77,6 +83,46 @@ test_that("clean R CatchAtAge builder example runs end to end", {
     "\\b(set_distribution_links|set_observed_data|methods::new|UseLikelihoodTerms)\\b",
     example_text
   )))
+  expect_true(any(grepl("\\bestimate\\(", example_text)))
+  expect_true(any(grepl("\\bconstant\\(", example_text)))
+  expect_true(any(grepl("\\brandom\\(", example_text)))
+
+  clear()
+})
+
+test_that("initialize_fims bridges model specs to fit_fims input", {
+  #' @description Test that initialize_fims returns the existing fit_fims input shape for model specs.
+  spec <- catch_at_age(
+    population = population(
+      name = "stock",
+      ages = 1:4,
+      years = 2020:2022,
+      growth = ewaa_growth(1:4, c(0.2, 0.5, 0.9, 1.1)),
+      maturity = logistic_maturity(constant(3), constant(1)),
+      recruitment = beverton_holt(
+        estimate(log(1000)),
+        constant(0.75),
+        deviations = random(normal(sd = 0.4))
+      )
+    ),
+    fleets = list(fleet(
+      "fishery",
+      logistic_selectivity(estimate(3), constant(1))
+    )),
+    observations = list(
+      observe_landings("fishery", c(100, 105, 110), lognormal(sd = 0.2))
+    )
+  )
+
+  initialized <- initialize_fims(spec)
+  expect_named(initialized, c("parameters", "model", "built"))
+  expect_named(initialized[["parameters"]], c("p", "re"))
+  expect_s3_class(initialized[["built"]], "FIMSBuilderResult")
+  expect_true(initialized[["model"]]$UsesLikelihoodTerms())
+  expect_gt(initialized[["model"]]$LikelihoodTermCount(), 0L)
+
+  fit <- fit_fims(initialized, optimize = FALSE)
+  expect_s4_class(fit, "FIMSFit")
 
   clear()
 })

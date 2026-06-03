@@ -55,11 +55,25 @@ test_that("role specs describe priors, random effects, and fixed effects", {
     "fims_distribution_spec"
   )
 
+  random_alias_spec <- random(normal(sd = 0.4))
+  expect_s3_class(random_alias_spec, "fims_role_spec")
+  expect_equal(random_alias_spec[["role"]], "random_effect")
+
   #' @description Test that fixed effect stores fixed numeric values.
   fixed_effect_spec <- fixed_effect(c(1, 2, 3))
   expect_s3_class(fixed_effect_spec, "fims_role_spec")
   expect_equal(fixed_effect_spec[["role"]], "fixed_effect")
   expect_equal(fixed_effect_spec[["value"]], c(1, 2, 3))
+
+  estimate_spec <- estimate(c(1, 2, 3))
+  expect_s3_class(estimate_spec, "fims_role_spec")
+  expect_equal(estimate_spec[["role"]], "fixed_effect")
+  expect_equal(estimate_spec[["value"]], c(1, 2, 3))
+
+  constant_spec <- constant(c(1, 2, 3))
+  expect_s3_class(constant_spec, "fims_role_spec")
+  expect_equal(constant_spec[["role"]], "constant")
+  expect_equal(constant_spec[["value"]], c(1, 2, 3))
 })
 
 test_that("observation specs describe data likelihoods without Rcpp links", {
@@ -106,12 +120,12 @@ test_that("observation specs describe data likelihoods without Rcpp links", {
 
 test_that("component specs describe the CatchAtAge model graph", {
   #' @description Test that component specs store backend targets and role specs.
-  selectivity <- logistic_selectivity(a50 = 4, slope = fixed_effect(1.5))
+  selectivity <- logistic_selectivity(a50 = estimate(4), slope = constant(1.5))
   expect_s3_class(selectivity, "fims_component_spec")
   expect_equal(selectivity[["component"]], "logistic_selectivity")
   expect_equal(selectivity[["backend"]], "LogisticSelectivity")
   expect_equal(selectivity[["a50"]][["role"]], "fixed_effect")
-  expect_equal(selectivity[["slope"]][["role"]], "fixed_effect")
+  expect_equal(selectivity[["slope"]][["role"]], "constant")
 
   maturity <- logistic_maturity(a50 = 3, slope = 1.1)
   expect_s3_class(maturity, "fims_component_spec")
@@ -123,8 +137,8 @@ test_that("component specs describe the CatchAtAge model graph", {
 
   recruitment <- beverton_holt(
     log_rzero = prior(log(1000), normal(sd = 10)),
-    steepness = fixed_effect(0.75),
-    deviations = random_effect(normal(sd = 0.4))
+    steepness = constant(0.75),
+    deviations = random(normal(sd = 0.4))
   )
   expect_s3_class(recruitment, "fims_component_spec")
   expect_equal(recruitment[["component"]], "beverton_holt")
@@ -133,7 +147,7 @@ test_that("component specs describe the CatchAtAge model graph", {
   fleet_spec <- fleet(
     name = "fishery",
     selectivity = selectivity,
-    fishing_mortality = fixed_effect(rep(log(0.1), 3))
+    fishing_mortality = estimate(rep(log(0.1), 3))
   )
   expect_s3_class(fleet_spec, "fims_component_spec")
   expect_equal(fleet_spec[["component"]], "fleet")
@@ -174,6 +188,8 @@ test_that("likelihood specs validate simple edge cases", {
 
   #' @description Test that role specs reject missing numeric values.
   expect_error(fixed_effect(NA_real_), regexp = "`value` must be a numeric")
+  expect_error(estimate(NA_real_), regexp = "`value` must be a numeric")
+  expect_error(constant(NA_real_), regexp = "`value` must be a numeric")
   expect_error(prior(NA_real_, normal()), regexp = "`value` must be a numeric")
 
   #' @description Test that observation specs reject missing data and fleet names.
@@ -206,6 +222,10 @@ test_that("role specs require distribution specifications", {
   )
   expect_error(
     random_effect(stats::gaussian()),
+    regexp = "`distribution` must be a FIMS distribution specification"
+  )
+  expect_error(
+    random(stats::gaussian()),
     regexp = "`distribution` must be a FIMS distribution specification"
   )
 })

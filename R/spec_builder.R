@@ -346,6 +346,7 @@ role_estimation_type <- function(role_spec) {
     fixed_effect = "fixed_effects",
     prior = "fixed_effects",
     random_effect = "random_effects",
+    constant = "constant",
     "constant"
   )
 }

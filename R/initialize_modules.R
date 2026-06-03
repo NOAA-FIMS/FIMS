@@ -631,6 +631,18 @@ initialize_comp <- function(data,
 #' clear()
 #' }
 initialize_fims <- function(parameters, data) {
+  if (inherits(parameters, "fims_model_spec")) {
+    built <- build_fims(parameters, create_model = TRUE)
+    return(list(
+      parameters = list(
+        p = get_fixed(),
+        re = get_random()
+      ),
+      model = built[["model"]],
+      built = built
+    ))
+  }
+
   # Validate parameters input
   if (missing(parameters) || !tibble::is_tibble(parameters)) {
     cli::cli_abort("The {.var parameters} argument must be a tibble.")

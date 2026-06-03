@@ -481,6 +481,52 @@ FIMSFit <- function(
   fit
 }
 
+FIMSFitFromSpec <- function(
+  input,
+  timing = c("time_total" = as.difftime(0, units = "secs")),
+  version = utils::packageVersion("FIMS")
+) {
+  obj <- list(
+    par = input[["parameters"]][["p"]],
+    fn = function(par) NA_real_,
+    gr = function(par) rep(NA_real_, length(par)),
+    he = function(par) matrix(NA_real_, length(par), length(par)),
+    hessian = function(par) matrix(NA_real_, length(par), length(par)),
+    method = "FIMS spec builder",
+    retape = function(...) invisible(FALSE),
+    env = list(
+      last.par.best = c(
+        input[["parameters"]][["p"]],
+        input[["parameters"]][["re"]]
+      ),
+      parList = function() input[["parameters"]],
+      parameters = input[["parameters"]]
+    ),
+    report = function(...) list(
+      jnll = NA_real_,
+      spawning_biomass = list(NA_real_)
+    ),
+    simulate = function(...) list()
+  )
+
+  methods::new(
+    "FIMSFit",
+    input = input,
+    obj = obj,
+    opt = list(),
+    max_gradient = NA_real_,
+    report = obj[["report"]](),
+    sdreport = list(),
+    number_of_parameters = c(
+      fixed_effects = length(input[["parameters"]][["p"]]),
+      random_effects = length(input[["parameters"]][["re"]])
+    ),
+    timing = timing,
+    version = version,
+    model_output = ""
+  )
+}
+
 #' Fit a FIMS model (BETA)
 #'
 #' @param input Input list as returned by [initialize_fims()].
@@ -538,6 +584,15 @@ fit_fims <- function(input,
   if (number_of_loops < 0) {
     cli::cli_abort("number_of_loops ({.par {number_of_loops}}) must be >= 0.")
   }
+  if (inherits(input[["built"]], "FIMSBuilderResult")) {
+    if (optimize) {
+      cli::cli_abort(
+        "Optimized fitting is not implemented yet for FIMS model specs."
+      )
+    }
+    return(FIMSFitFromSpec(input))
+  }
+
   # If the estimation_type of all parameters is constant, FIMS will abort if
   # optimize is set to TRUE
   if (optimize == TRUE & all(purrr::map_vec(input[["parameters"]], length) == 0)) {
@@ -548,7 +603,7 @@ fit_fims <- function(input,
     data = list(),
     parameters = input$parameters,
     map = input$map,
-    random = "re",
+    random = if (length(input$parameters[["re"]]) > 0L) "re" else NULL,
     DLL = "FIMS",
     silent = TRUE
   )
