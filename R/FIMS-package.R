@@ -13,6 +13,7 @@
 #' @export EWAAGrowth
 #' @export Fleet
 #' @export set_fixed
+#' @export fixed_effect
 #' @export get_fixed
 #' @export set_random
 #' @export get_random
@@ -25,6 +26,11 @@
 #' @export get_random
 #' @export inv_logit
 #' @export logit
+#' @export normal
+#' @export observe_age_comp
+#' @export observe_index
+#' @export observe_landings
+#' @export observe_length_comp
 #' @export Landings
 #' @export Index
 #' @export LengthComp
@@ -35,7 +41,9 @@
 #' @export LogisticSelectivity
 #' @export Parameter
 #' @export ParameterVector
+#' @export prior
 #' @export Population
+#' @export random_effect
 #' @export RealVector
 #' @export set_log_throw_on_error
 #' @export use_likelihood_terms
@@ -43,6 +51,14 @@
 #' @export SharedInt
 #' @export SharedReal
 #' @export SharedString
+#' @export beverton_holt
+#' @export build_fims
+#' @export catch_at_age
+#' @export ewaa_growth
+#' @export fleet
+#' @export logistic_maturity
+#' @export logistic_selectivity
+#' @export population
 #' @import methods
 #' @import stats
 #' @importFrom ggplot2 .data

@@ -296,7 +296,7 @@ Also updated the Rcpp `UseLikelihoodTerms()` method to toggle the already-built
 
 ## Patch 24: Legacy Evaluation Deprecation Warning
 
-Status: local, not committed yet.
+Commit: `34d34d1b Add likelihood legacy warning and Rcpp example`
 
 Added a once-per-model deprecation warning when `Model::Evaluate()` uses the
 legacy `density_components` objective path instead of mirrored likelihood
@@ -307,7 +307,7 @@ helper `use_likelihood_terms(model, TRUE)`.
 
 ## Patch 25: Direct Rcpp Likelihood-Term Example
 
-Status: local, not committed yet.
+Commit: `34d34d1b Add likelihood legacy warning and Rcpp example`
 
 Added a small R example that calls the Rcpp `CatchAtAge` likelihood-term methods
 directly:
@@ -325,7 +325,7 @@ returns the expected term table shape.
 
 ## Patch 26: Direct Rcpp CatchAtAge Example
 
-Status: local, not committed yet.
+Commit: `b7648b2f Add direct Rcpp CatchAtAge example`
 
 Added a fuller CatchAtAge example that builds a small model by creating and
 linking Rcpp module objects directly:
@@ -339,6 +339,85 @@ linking Rcpp module objects directly:
 The example calls `CreateTMBModel()` and retrieves the direct Rcpp parameter
 vectors with `get_fixed()` and `get_random()` without using the high-level R
 model initialization or fitting wrappers.
+
+## Patch 27: R Likelihood Specification Constructors
+
+Status: local, not committed yet.
+
+Added pure R specification constructors for the next user-facing likelihood
+interface:
+
+- `normal(mean, sd)` for normal distribution specs
+- `prior(value, distribution)` for prior roles
+- `random_effect(distribution)` for random-effect roles
+- `fixed_effect(value)` for fixed-effect roles
+
+The existing `lognormal()` and `multinomial()` family constructors now also
+carry FIMS distribution spec metadata while preserving their existing `family`
+class behavior.
+
+## Patch 28: R Observation Specification Constructors
+
+Status: local, not committed yet.
+
+Added pure R observation specs for the next user-facing model builder:
+
+- `observe_landings(fleet, data, distribution)`
+- `observe_index(fleet, data, distribution)`
+- `observe_age_comp(fleet, data, distribution)`
+- `observe_length_comp(fleet, data, distribution)`
+
+These specs store fleet names, observed data, and distribution choices without
+requiring users to call low-level Rcpp linking methods such as
+`set_distribution_links()`.
+
+## Patch 29: R Model Component Specification Constructors
+
+Status: local, not committed yet.
+
+Added pure R component specs for the next user-facing model builder:
+
+- `logistic_selectivity(a50, slope)`
+- `logistic_maturity(a50, slope)`
+- `ewaa_growth(ages, weights)`
+- `beverton_holt(log_rzero, steepness, deviations)`
+- `fleet(name, selectivity, fishing_mortality)`
+- `population(name, ages, years, growth, maturity, recruitment)`
+- `catch_at_age(population, fleets, observations, likelihood)`
+
+These specs describe the model graph by names and nested specs, not by Rcpp
+object IDs.
+
+## Patch 30: First R Spec Builder Slice
+
+Status: local, not committed yet.
+
+Added `build_fims()` to translate a small declarative CatchAtAge spec into the
+current Rcpp module objects. The first builder slice supports:
+
+- EWAA growth
+- logistic maturity
+- Beverton-Holt recruitment
+- logistic selectivity fleets
+- landings and index observations
+- normal/lognormal data distributions
+
+The builder performs the low-level Rcpp object creation, observed data links,
+expected value links, and likelihood-term opt-in internally.
+
+## Patch 31: Clean R CatchAtAge Builder Example
+
+Status: local, not committed yet.
+
+Added an end-to-end example showing the new R specification layer:
+
+- build a `catch_at_age()` spec
+- call `build_fims(spec)`
+- inspect mirrored likelihood terms with `get_likelihood_terms(built$model)`
+
+The example intentionally avoids low-level Rcpp calls such as
+`set_distribution_links()`, `set_observed_data()`, `methods::new()`, and
+`UseLikelihoodTerms()`.
 
 ## Current State
 
@@ -354,13 +433,17 @@ The branch currently has a side-by-side likelihood-term architecture:
 
 Current local uncommitted work:
 
-- `inst/include/common/model.hpp`: patch 24 legacy deprecation warning
-- `tests/gtest/test_info_likelihood_terms.cpp`: patch 24 warning coverage
-- `inst/examples/likelihood_terms_rcpp_interface.R`: patch 25 direct
-  Rcpp example
-- `inst/examples/catch_at_age_rcpp_interface.R`: patch 26 direct CatchAtAge
-  example
-- `tests/testthat/test-rcpp-likelihood-terms-example.R`: patch 25 example test
-- `likelihood-refactor-patch-log.md`: patch 24 through 26 entries
+- `R/likelihood_specs.R`: patch 27 R spec constructors
+- `R/likelihood_specs.R`: patch 28 R observation spec constructors
+- `R/model_specs.R`: patch 29 R model component spec constructors
+- `R/spec_builder.R`: patch 30 first R spec builder slice
+- `inst/examples/catch_at_age_spec_builder.R`: patch 31 clean R builder example
+- `R/distribution_formulas.R`: patch 27 FIMS spec metadata on existing
+  family constructors
+- `NAMESPACE`: patch 27 through 30 exports
+- `R/FIMS-package.R`: patch 27 through 30 export annotations
+- `tests/testthat/test-likelihood-specs.R`: patch 27 through 29 spec tests
+- `tests/testthat/test-spec-builder.R`: patch 30 and 31 builder tests
+- `likelihood-refactor-patch-log.md`: patch 27 through 31 entries
 
 Note: `docs/likelihoods-distributions-refactor-chat.md` was also updated locally, but `docs/` is ignored by this repository, so this root-level file is the tracked version intended for commits.

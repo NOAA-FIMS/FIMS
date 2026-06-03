@@ -507,6 +507,8 @@ initialize_process_structure <- function(module, par) {
 #'   `"identity"` or `"log"` are appropriate names for the [stats::gaussian()]
 #'   distribution. `"log"` and `"logit"` are the defaults for the lognormal and
 #'   the multinomial, respectively.
+#' @param sd Optional positive numeric standard deviation used by the new FIMS
+#'   distribution specification interface.
 #' @return
 #' An object of class `family` (which has a concise print method). This
 #' particular family has a truncated length compared to other distributions in
@@ -526,13 +528,21 @@ initialize_process_structure <- function(module, par) {
 #' a_family <- multinomial()
 #' a_family[["family"]]
 #' a_family[["link"]]
-lognormal <- function(link = "log") {
+lognormal <- function(link = "log", sd = NULL) {
+  if (!is.null(sd)) {
+    check_positive_numeric_spec(sd, "sd")
+  }
   family_class <- c(
     list(family = "lognormal", link = link),
     stats::make.link(link)
   )
   class(family_class) <- "family"
-  return(family_class)
+  return(as_fims_distribution_spec(
+    family = "lognormal",
+    backend = "DlnormDistribution",
+    family_class = family_class,
+    sd = sd
+  ))
 }
 
 #' @rdname lognormal
@@ -544,5 +554,9 @@ multinomial <- function(link = "logit") {
     stats::make.link(link)
   )
   class(family_class) <- "family"
-  return(family_class)
+  return(as_fims_distribution_spec(
+    family = "multinomial",
+    backend = "DmultinomDistribution",
+    family_class = family_class
+  ))
 }
