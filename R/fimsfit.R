@@ -259,7 +259,7 @@ methods::setMethod(
       sdreport = sdreport,
       opt = opt,
       parameter_names = parameter_names,
-      gradient = get_gradient(x)
+      precomputed_gradient = get_gradient(x)
     ) |>
       add_unique_id()
 
