@@ -468,7 +468,7 @@ once.
 
 ## Patch 35: Model Graph Tibble Round Trip
 
-Status: local, not committed yet.
+Status: committed and pushed as `cd187fe7 Add model graph tibble round trip`.
 
 Added explicit conversion helpers for model graph tibbles:
 
@@ -483,6 +483,18 @@ Updated `inst/examples/shared_module_graph.R` to show the full workflow:
 3. convert the graph to tibbles
 4. rebuild the graph from those tibbles
 
+## Patch 36: Shared Module Graph Data Demo
+
+Status: local, not committed yet.
+
+Added data modules to `inst/examples/shared_module_graph.R` so the demo shows:
+
+- shared biological/process modules
+- population and fleet modules
+- landings and index observation modules
+- conversion to `modules` and `links` tibbles
+- rebuilding the graph from those tibbles
+
 ## Current State
 
 The branch currently has a side-by-side likelihood-term architecture:
@@ -495,16 +507,14 @@ The branch currently has a side-by-side likelihood-term architecture:
   not mirrored until an explicit likelihood-term helper is added
 - model-level opt-in evaluation exists and has focused parity coverage
 
-Patch 35 local uncommitted work:
+Patch 36 local uncommitted work:
 
-- `R/model_graph.R`: graph-to-tibble and graph-from-tibble helpers
-- `R/FIMS-package.R` and `NAMESPACE`: exports for round-trip helpers
-- `inst/examples/shared_module_graph.R`: explicit graph tibble round-trip demo
-- `tests/testthat/test-model-graph.R`: round-trip and validation
+- `inst/examples/shared_module_graph.R`: added landings and index modules
+- `tests/testthat/test-model-graph.R`: demo coverage for observation modules
+- `likelihood-refactor-patch-log.md`: patch 36 entry
   coverage
-- `likelihood-refactor-patch-log.md`: patch 35 entry
 
 Note: `inst/examples/catch_at_age_rcpp_interface.R` also has a separate local
-edit from earlier work and is intentionally not part of Patch 35.
+edit from earlier work and is intentionally not part of Patch 36.
 
 Note: `docs/likelihoods-distributions-refactor-chat.md` was also updated locally, but `docs/` is ignored by this repository, so this root-level file is the tracked version intended for commits.

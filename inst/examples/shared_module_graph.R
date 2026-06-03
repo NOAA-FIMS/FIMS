@@ -96,7 +96,44 @@ fleet_b <- module(
   )
 )
 
-# Step 4: Convert modules and references into a model graph.
+# Step 4: Define observation modules for each fleet.
+landings_a <- module(
+  "landings.a",
+  observe_landings(
+    fleet = "fishery_a",
+    data = c(100, 105, 110),
+    distribution = lognormal(sd = 0.2)
+  )
+)
+
+landings_b <- module(
+  "landings.b",
+  observe_landings(
+    fleet = "fishery_b",
+    data = c(70, 72, 76),
+    distribution = lognormal(sd = 0.25)
+  )
+)
+
+index_a <- module(
+  "index.a",
+  observe_index(
+    fleet = "fishery_a",
+    data = c(1.2, 1.1, 1.3),
+    distribution = lognormal(sd = 0.15)
+  )
+)
+
+index_b <- module(
+  "index.b",
+  observe_index(
+    fleet = "fishery_b",
+    data = c(0.8, 0.85, 0.9),
+    distribution = lognormal(sd = 0.18)
+  )
+)
+
+# Step 5: Convert modules and references into a model graph.
 graph <- as_model_graph(list(
   shared_growth,
   shared_selectivity,
@@ -107,10 +144,14 @@ graph <- as_model_graph(list(
   population_a,
   population_b,
   fleet_a,
-  fleet_b
+  fleet_b,
+  landings_a,
+  landings_b,
+  index_a,
+  index_b
 ))
 
-# Step 5: Convert the graph to plain tibbles.
+# Step 6: Convert the graph to plain tibbles.
 tibbles <- model_graph_tibbles(graph)
 modules <- tibbles$modules
 links <- tibbles$links
@@ -121,7 +162,7 @@ print(modules[, c("id", "type", "name")])
 # The links tibble shows sharing explicitly.
 print(links)
 
-# Step 6: Rebuild a graph object from the tibbles.
+# Step 7: Rebuild a graph object from the tibbles.
 rebuilt_graph <- model_graph_from_tibbles(
   modules = modules,
   links = links

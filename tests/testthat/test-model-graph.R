@@ -163,6 +163,7 @@ test_that("shared module graph example runs", {
   expect_s3_class(example_env$graph, "fims_model_graph")
 
   links <- example_env$graph[["links"]]
+  modules <- example_env$graph[["modules"]]
   expect_s3_class(example_env$tibbles[["modules"]], "data.frame")
   expect_s3_class(example_env$tibbles[["links"]], "data.frame")
   expect_s3_class(example_env$rebuilt_graph, "fims_model_graph")
@@ -173,6 +174,9 @@ test_that("shared module graph example runs", {
 
   expect_equal(nrow(growth_links), 2L)
   expect_equal(nrow(selectivity_links), 2L)
+  expect_true(all(c("landings", "index") %in% modules[["type"]]))
+  expect_equal(sum(modules[["type"]] == "landings"), 2L)
+  expect_equal(sum(modules[["type"]] == "index"), 2L)
 })
 
 ## Edge handling ----
