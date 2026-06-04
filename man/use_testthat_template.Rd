@@ -2,7 +2,8 @@
 % Please edit documentation in R/use-testthat-template.R
 \name{use_testthat_template}
 \alias{use_testthat_template}
-\title{Create tests/testthat/test-*.R test file}
+\title{file = R/use-testthat-template.R
+Create tests/testthat/test-*.R test file}
 \usage{
 use_testthat_template(name)
 }

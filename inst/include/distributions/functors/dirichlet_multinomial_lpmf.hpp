@@ -1,9 +1,10 @@
 /**
  * @file dirichlet_multinomial_lpmf.hpp
  * in inst/include/distributions/functors
- * @brief Implements the Dirichlet_multinomialLPMF distribution functor used by FIMS to
- * evaluate the observation-level and total log-likelihood contributions under
- * a Dirichlet-multinomial error model for data, priors, and random effects.
+ * @brief Implements the Dirichlet_multinomialLPMF distribution functor used by
+ * FIMS to evaluate the observation-level and total log-likelihood contributions
+ * under a Dirichlet-multinomial error model for data, priors, and random
+ * effects.
  * @copyright This file is part of the NOAA, National Marine Fisheries Service
  * Fisheries Integrated Modeling System project. See LICENSE in the source
  * folder for reuse information.
@@ -20,10 +21,10 @@ namespace fims_distributions {
 /**
  * @copybrief dirichlet_multinomial_lpmf.hpp
  *
- * @details This implementation computes row-wise Dirichlet-multinomial 
+ * @details This implementation computes row-wise Dirichlet-multinomial
  * log-probability mass contributions from
  * observed counts (`x_vector`) and expected proportions (`prob_vector`).
- * Specifically, when evaluating the Dirichlet-multinomial likelihood, 
+ * Specifically, when evaluating the Dirichlet-multinomial likelihood,
  * observations are passed to `ddiric_multinom(..., give_log = true)`.
  *
  * For `data` input, if any element in a row is equal to `na_value`, the entire
@@ -40,8 +41,8 @@ struct Dirichlet_multinomialLPMF : public DensityComponentBase<Type> {
    * @brief Dimensions of the number of rows and columns of the multivariate
    * dataset.
    */
-  fims::Vector<size_t> dims; 
-        Type theta;
+  fims::Vector<size_t> dims;
+  Type theta;
 
   /** @brief Constructor.
    */
@@ -53,14 +54,13 @@ struct Dirichlet_multinomialLPMF : public DensityComponentBase<Type> {
 
   /**
    * @brief Evaluates the Dirichlet-multinomial log probability mass function.
-   * @details The following equation is the Dirichlet-multinomial probability mass
-   * function, and thus, the log of it is evaluated:
-   * \f[
-   * f(\underline{y}) = \frac{n!}{y_{1}!...
-   * y_{k}!}p^{y_{1}}_{1}...p^{y_{k}}_{k}, \f] where \f$k\f$ is the number of
-   * categories, \f$n\f$ is the sample size, \f$\mu_{i}\f$ is the mean of
-   * \f$y_{i}\f$ and is equal to \f$np_{i}\f$, and \f$\sigma^{2}_{i}\f$ is the
-   * variance of \f$y_{i}\f$ and is equal to \f$np_{i}(1-p_{i})\f$.
+   * @details The following equation is the Dirichlet-multinomial probability
+   * mass function, and thus, the log of it is evaluated: \f[ f(\underline{y}) =
+   * \frac{n!}{y_{1}!... y_{k}!}p^{y_{1}}_{1}...p^{y_{k}}_{k}, \f] where \f$k\f$
+   * is the number of categories, \f$n\f$ is the sample size, \f$\mu_{i}\f$ is
+   * the mean of \f$y_{i}\f$ and is equal to \f$np_{i}\f$, and
+   * \f$\sigma^{2}_{i}\f$ is the variance of \f$y_{i}\f$ and is equal to
+   * \f$np_{i}(1-p_{i})\f$.
    */
   virtual const Type evaluate() {
     // set dims using data_observed_values if no user input
@@ -81,7 +81,8 @@ struct Dirichlet_multinomialLPMF : public DensityComponentBase<Type> {
       if (this->data_expected_values) {
         if (dims[0] * dims[1] != this->data_expected_values->size()) {
           throw std::invalid_argument(
-              "Dirichlet_multinomialLPDF: Vector index out of bounds. The dimension of "
+              "Dirichlet_multinomialLPDF: Vector index out of bounds. The "
+              "dimension of "
               "the "
               "number of rows times the number of columns is of size " +
               fims::to_string(dims[0] * dims[1]) +
@@ -92,7 +93,8 @@ struct Dirichlet_multinomialLPMF : public DensityComponentBase<Type> {
     } else {
       if (dims[0] * dims[1] != this->observed_values.size()) {
         throw std::invalid_argument(
-            "Dirichlet_multinomialLPDF: Vector index out of bounds. The dimension of the "
+            "Dirichlet_multinomialLPDF: Vector index out of bounds. The "
+            "dimension of the "
             "number of  rows times the number of columns is of size " +
             fims::to_string(dims[0] * dims[1]) +
             " and the observed vector is of size " +
@@ -100,7 +102,8 @@ struct Dirichlet_multinomialLPMF : public DensityComponentBase<Type> {
       }
       if (this->observed_values.size() != this->expected_values.size()) {
         throw std::invalid_argument(
-            "Dirichlet_multinomialLPDF: Vector index out of bounds. The dimension of the "
+            "Dirichlet_multinomialLPDF: Vector index out of bounds. The "
+            "dimension of the "
             "observed vector of size " +
             fims::to_string(this->observed_values.size()) +
             " and the expected vector is of size " +
@@ -147,7 +150,7 @@ struct Dirichlet_multinomialLPMF : public DensityComponentBase<Type> {
         std::fill(this->lpdf_vec.begin() + lpdf_vec_idx,
                   this->lpdf_vec.begin() + lpdf_vec_idx + dims[1],
                   fims_math::ddiric_multinom(observed_values_vector,
-                            prob_vector, this->theta, true));
+                                             prob_vector, this->theta, true));
 
         this->lpdf += this->lpdf_vec[lpdf_vec_idx];
       } else {

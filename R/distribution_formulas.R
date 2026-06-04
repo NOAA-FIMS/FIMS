@@ -351,11 +351,11 @@ initialize_data_distribution <- function(
     new_module <- methods::new(DmultinomDistribution)
   }
 
-    if (family[["family"]] == "dirichlet_multinomial") {
+  if (family[["family"]] == "dirichlet_multinomial") {
     # create new Rcpp module
     new_module <- methods::new(DDirichletMultinomDistribution)
   }
-  
+
   # setup link to observed data
   if (data_type == "landings") {
     new_module$set_observed_data(module$GetObservedLandingsDataID())

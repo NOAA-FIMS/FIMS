@@ -470,12 +470,15 @@ RCPP_MODULE(fims) {
       "classDDirichletMultinomDistributionsInterface.html.")
       .constructor()
       .method("get_id", &DDirichletMultinomialDistributionsInterface::get_id)
-      .method("evaluate", &DDirichletMultinomialDistributionsInterface::evaluate)
+      .method("evaluate",
+              &DDirichletMultinomialDistributionsInterface::evaluate)
       .method("set_observed_data",
               &DDirichletMultinomialDistributionsInterface::set_observed_data)
-      .method("set_distribution_links",
-              &DDirichletMultinomialDistributionsInterface::set_distribution_links)
-      .method("set_note", &DDirichletMultinomialDistributionsInterface::set_note)
+      .method(
+          "set_distribution_links",
+          &DDirichletMultinomialDistributionsInterface::set_distribution_links)
+      .method("set_note",
+              &DDirichletMultinomialDistributionsInterface::set_note)
       .field("observed_values",
              &DDirichletMultinomialDistributionsInterface::observed_values)
       .field("expected_values",

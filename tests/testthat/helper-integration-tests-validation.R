@@ -1,4 +1,4 @@
-# file = FIMS/tests/testthat/helper-integration-tests-validation.R 
+# file = FIMS/tests/testthat/helper-integration-tests-validation.R
 # Helper file for FIMS R tests----
 # This file contains multiple functions that are used to set up and run
 # FIMS models with or without wrapper functions. The functions are sourced by
@@ -40,10 +40,9 @@
 #'   comp_theta = NULL
 #' )
 #' }
- 
 validate_comp_nll <- function(observed_prop, sample_size, expected_prop, theta = NULL) {
   observed_counts <- observed_prop * sample_size
-  
+
   if (is.null(theta)) {
     return(FIMS_dmultinom(observed_counts, expected_prop))
   } else {

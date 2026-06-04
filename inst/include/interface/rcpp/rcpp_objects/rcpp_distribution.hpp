@@ -1139,7 +1139,8 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
 #endif
 };
 
-class DDirichletMultinomialDistributionsInterface : public DistributionsInterfaceBase {
+class DDirichletMultinomialDistributionsInterface
+    : public DistributionsInterfaceBase {
  public:
   /**
    * @brief Observed data, which should be a vector of length K of integers.
@@ -1185,7 +1186,7 @@ class DDirichletMultinomialDistributionsInterface : public DistributionsInterfac
    * @param other
    */
   DDirichletMultinomialDistributionsInterface(
-    const DDirichletMultinomialDistributionsInterface &other)
+      const DDirichletMultinomialDistributionsInterface &other)
       : DistributionsInterfaceBase(other),
         observed_values(other.observed_values),
         expected_values(other.expected_values),
@@ -1249,10 +1250,12 @@ class DDirichletMultinomialDistributionsInterface : public DistributionsInterfac
     dirichlet_multinomial.expected_values.resize(this->expected_values.size());
     dirichlet_multinomial.theta = this->theta.initial_value_m;
     for (size_t i = 0; i < observed_values.size(); i++) {
-      dirichlet_multinomial.observed_values[i] = this->observed_values[i].initial_value_m;
+      dirichlet_multinomial.observed_values[i] =
+          this->observed_values[i].initial_value_m;
     }
     for (size_t i = 0; i < expected_values.size(); i++) {
-      dirichlet_multinomial.expected_values[i] = this->expected_values[i].initial_value_m;
+      dirichlet_multinomial.expected_values[i] =
+          this->expected_values[i].initial_value_m;
     }
     dirichlet_multinomial.dims.resize(2);
     dirichlet_multinomial.dims[0] = this->dims[0];
@@ -1279,13 +1282,15 @@ class DDirichletMultinomialDistributionsInterface : public DistributionsInterfac
     it = info->density_components.find(this->id_m);
     // if not found, just return
     if (it == info->density_components.end()) {
-      FIMS_WARNING_LOG("DDirichletMultinomialDistributions " + fims::to_string(this->id_m) +
+      FIMS_WARNING_LOG("DDirichletMultinomialDistributions " +
+                       fims::to_string(this->id_m) +
                        " not found in Information.");
       return;
     } else {
-      std::shared_ptr<fims_distributions::Dirichlet_multinomialLPMF<double>> dirichlet_multinomial =
-          std::dynamic_pointer_cast<
-              fims_distributions::Dirichlet_multinomialLPMF<double>>(it->second);
+      std::shared_ptr<fims_distributions::Dirichlet_multinomialLPMF<double>>
+          dirichlet_multinomial = std::dynamic_pointer_cast<
+              fims_distributions::Dirichlet_multinomialLPMF<double>>(
+              it->second);
 
       this->lpdf_value = dirichlet_multinomial->lpdf;
 
@@ -1299,9 +1304,11 @@ class DDirichletMultinomialDistributionsInterface : public DistributionsInterfac
       }
       for (size_t i = 0; i < this->lpdf_vec.size(); i++) {
         this->lpdf_vec[i] = dirichlet_multinomial->lpdf_vec[i];
-        this->expected_values[i].final_value_m = dirichlet_multinomial->get_expected(i);
+        this->expected_values[i].final_value_m =
+            dirichlet_multinomial->get_expected(i);
         if (dirichlet_multinomial->input_type != "data") {
-          this->observed_values[i].final_value_m = dirichlet_multinomial->get_observed(i);
+          this->observed_values[i].final_value_m =
+              dirichlet_multinomial->get_observed(i);
         }
       }
       if (dirichlet_multinomial->input_type == "data") {
@@ -1311,8 +1318,9 @@ class DDirichletMultinomialDistributionsInterface : public DistributionsInterfac
         for (size_t i = 0; i < dims[0]; i++) {
           for (size_t j = 0; j < dims[1]; j++) {
             size_t idx = (i * dims[1]) + j;
-            this->observed_values[idx].final_value_m = dirichlet_multinomial->get_observed(
-                static_cast<size_t>(i), static_cast<size_t>(j));
+            this->observed_values[idx].final_value_m =
+                dirichlet_multinomial->get_observed(static_cast<size_t>(i),
+                                                    static_cast<size_t>(j));
           }
         }
       }
@@ -1388,8 +1396,9 @@ class DDirichletMultinomialDistributionsInterface : public DistributionsInterfac
     std::shared_ptr<fims_info::Information<Type>> info =
         fims_info::Information<Type>::GetInstance();
 
-    std::shared_ptr<fims_distributions::Dirichlet_multinomialLPMF<Type>> distribution =
-        std::make_shared<fims_distributions::Dirichlet_multinomialLPMF<Type>>();
+    std::shared_ptr<fims_distributions::Dirichlet_multinomialLPMF<Type>>
+        distribution = std::make_shared<
+            fims_distributions::Dirichlet_multinomialLPMF<Type>>();
 
     distribution->id = this->id_m;
     distribution->theta = this->theta.initial_value_m;
@@ -1425,6 +1434,5 @@ class DDirichletMultinomialDistributionsInterface : public DistributionsInterfac
 
 #endif
 };
-
 
 #endif
