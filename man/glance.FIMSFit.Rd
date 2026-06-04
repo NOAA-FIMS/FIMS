@@ -23,7 +23,7 @@ observed and an expected value in \code{\link[=get_estimates]{get_estimates()}})
 \item{\code{npar_fixed}}{Number of fixed-effect parameters.}
 \item{\code{npar_random}}{Number of random-effect parameters.}
 \item{\code{marginal_nll}}{Marginal negative log-likelihood
-(\code{opt$objective}); \code{NA} if the model was not optimised.}
+(\code{opt$objective}); \code{NA} if the model was not optimized.}
 \item{\code{total_nll}}{Total (joint) negative log-likelihood from the TMB
 report (\code{report$jnll}).}
 \item{\code{max_gradient}}{Maximum absolute gradient at the MLE. Values
@@ -72,7 +72,7 @@ glance(fit)
 
 # Compare sensitivity runs in one table
 dplyr::bind_rows(
-  glance(age_only_fit)    |> dplyr::mutate(model = "age_only"),
+  glance(age_only_fit) |> dplyr::mutate(model = "age_only"),
   glance(length_only_fit) |> dplyr::mutate(model = "length_only")
 )
 }

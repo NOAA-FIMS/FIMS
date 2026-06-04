@@ -58,7 +58,7 @@ appended so the full context is available for filtering and plotting.
 
 FIMS distinguishes three \code{estimation_type} values:
 \describe{
-\item{\code{"fixed_effects"}}{Directly optimised parameters (selectivity,
+\item{\code{"fixed_effects"}}{Directly optimized parameters (selectivity,
 log_Fmort, log_q, …).}
 \item{\code{"random_effects"}}{Integrated-out random effects (log_devs, …).}
 \item{\code{"derived_quantity"}}{Model outputs that are not parameters
