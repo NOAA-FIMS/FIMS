@@ -107,6 +107,12 @@ test_that("augment() works with correct inputs", {
   #' @description Test that generics::augment(fit) .truth and .pred columns contain no NA values.
   expect_false(any(is.na(generics::augment(fit)[[".truth"]])))
   expect_false(any(is.na(generics::augment(fit)[[".pred"]])))
+
+  #' @description Test that generics::augment(fit, include_weights = FALSE) omits the .weight column.
+  expect_false(".weight" %in% names(generics::augment(fit, include_weights = FALSE)))
+
+  #' @description Test that generics::augment(fit, include_weights = FALSE) still returns .truth and .pred.
+  expect_true(all(c(".truth", ".pred") %in% names(generics::augment(fit, include_weights = FALSE))))
 })
 
 ## Edge handling ----
@@ -117,7 +123,33 @@ test_that("augment() returns correct outputs for edge cases", {
 })
 
 ## Error handling ----
-# No built-in errors or warnings for augment().
+test_that("augment() returns correct error messages", {
+  #' @description Test that generics::augment(fit) issues a warning and returns an empty tibble when no observed/expected pairs exist.
+  empty_fit <- local({
+    clear()
+    withr::defer(clear(), envir = parent.env(environment()))
+    data("data_big", package = "FIMS")
+    data_4_model <- FIMSFrame(data_big)
+    create_default_parameters(
+      configurations = create_default_configurations(data = data_4_model),
+      data = data_4_model
+    ) |>
+      initialize_fims(data = data_4_model) |>
+      fit_fims(optimize = FALSE)
+  })
+  # Temporarily replace get_estimates to return a tibble with no obs/exp pairs
+  # by using the unoptimised fit and masking observed/expected with NA
+  withr::with_package("FIMS", {
+    result <- withCallingHandlers(
+      generics::augment(empty_fit),
+      warning = function(w) {
+        expect_match(conditionMessage(w), "No observed/expected pairs")
+        invokeRestart("muffleWarning")
+      }
+    )
+    expect_s3_class(result, "tbl_df")
+  })
+})
 
 # get_fit_metrics ----
 
@@ -136,6 +168,12 @@ test_that("get_fit_metrics() works with correct inputs", {
 
   #' @description Test that FIMS::get_fit_metrics(fit, group_by = "label") adds a label column to the output.
   expect_true("label" %in% names(FIMS::get_fit_metrics(fit, group_by = "label")))
+
+  #' @description Test that FIMS::get_fit_metrics(fit, weighted = TRUE) returns the same metric names as unweighted.
+  expect_setequal(
+    object = FIMS::get_fit_metrics(fit, weighted = TRUE)[[".metric"]],
+    expected = c("rmse", "mae", "rsq")
+  )
 })
 
 ## Edge handling ----
@@ -147,6 +185,12 @@ test_that("get_fit_metrics() returns correct error messages", {
   expect_error(
     object = FIMS::get_fit_metrics(fit, group_by = "not_a_column"),
     regexp = "not found"
+  )
+
+  #' @description Test that FIMS::get_fit_metrics() returns an error when x is not a FIMSFit object.
+  expect_error(
+    object = FIMS::get_fit_metrics(list()),
+    regexp = "FIMSFit"
   )
 })
 
@@ -161,6 +205,17 @@ test_that("get_fit_stream() works with correct inputs", {
   result <- FIMS::get_fit_stream(fit, stream_label = "landings_expected", module_id = 1L)
   expect_true(all(result[["label"]] == "landings_expected"))
   expect_true(all(result[["module_id"]] == 1L))
+
+  #' @description Test that FIMS::get_fit_stream() accepts a pre-augmented tibble and filters correctly.
+  aug <- generics::augment(fit)
+  result_from_aug <- FIMS::get_fit_stream(aug, stream_label = "landings_expected")
+  expect_true(all(result_from_aug[["label"]] == "landings_expected"))
+
+  #' @description Test that FIMS::get_fit_stream(fit) with no filters returns the same tibble as augment(fit).
+  expect_equal(
+    object = nrow(FIMS::get_fit_stream(fit)),
+    expected = nrow(generics::augment(fit))
+  )
 })
 
 ## Edge handling ----
