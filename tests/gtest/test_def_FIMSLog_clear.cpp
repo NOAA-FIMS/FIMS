@@ -8,7 +8,7 @@
 // https://google.github.io/googletest/reference/assertions.html.
 
 #include "gtest/gtest.h"
-#include "common/def.hpp"
+#include "def.hpp"
 
 #include <cstdio>
 #include <fstream>

@@ -17,8 +17,7 @@
 #include <map>
 #include <vector>
 
-#include "../../../common/def.hpp"
-#include "../../../common/information.hpp"
+#include "common/information.hpp"
 #include "../../interface.hpp"
 #include "rcpp_shared_primitive.hpp"
 #include <limits>
@@ -100,10 +99,10 @@ class Parameter {
     id_m = Parameter::id_g++;
   }
 };
-/**
- * @brief The unique ID for the variable map that points to a fims::Vector.
- */
+
+#ifdef FIMS_HEADER_ONLY
 uint32_t Parameter::id_g = 0;
+#endif
 
 /**
  * @brief Sanitize a double value by replacing NaN or Inf with -999.0.
@@ -125,7 +124,7 @@ inline double sanitize_val(double x) {
  * @param p A parameter.
  * @return std::ostream&
  */
-std::ostream& operator<<(std::ostream& out, const Parameter& p) {
+inline std::ostream& operator<<(std::ostream& out, const Parameter& p) {
   out << "{\"id\": " << p.id_m
       << ",\n\"value\": " << sanitize_val(p.initial_value_m)
       << ",\n\"estimated_value\": " << sanitize_val(p.final_value_m);
@@ -133,6 +132,8 @@ std::ostream& operator<<(std::ostream& out, const Parameter& p) {
 
   return out;
 }
+
+RCPP_EXPOSED_CLASS(Parameter)
 
 /**
  * @brief An Rcpp interface class that defines the ParameterVector class.
@@ -346,7 +347,10 @@ class ParameterVector {
     }
   }
 };
+
+#ifdef FIMS_HEADER_ONLY
 uint32_t ParameterVector::id_g = 0;
+#endif
 
 /**
  * @brief Output for std::ostream& for a ParameterVector.
@@ -355,7 +359,7 @@ uint32_t ParameterVector::id_g = 0;
  * @param v A ParameterVector.
  * @return std::ostream&
  */
-std::ostream& operator<<(std::ostream& out, ParameterVector& v) {
+inline std::ostream& operator<<(std::ostream& out, ParameterVector& v) {
   out << "[";
   size_t size = v.size();
   for (size_t i = 0; i < size - 1; i++) {
@@ -567,7 +571,12 @@ class RealVector {
     }
   }
 };
+#ifdef FIMS_HEADER_ONLY
 uint32_t RealVector::id_g = 0;
+#endif
+
+RCPP_EXPOSED_CLASS(ParameterVector)
+RCPP_EXPOSED_CLASS(RealVector)
 
 /**
  *@brief Base class for all interface objects.
@@ -646,7 +655,5 @@ class FIMSRcppInterfaceBase {
     return ss.str();
   }
 };
-std::vector<std::shared_ptr<FIMSRcppInterfaceBase>>
-    FIMSRcppInterfaceBase::fims_interface_objects;
 
 #endif

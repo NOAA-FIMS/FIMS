@@ -72,12 +72,6 @@ class PopulationInterfaceBase : public FIMSRcppInterfaceBase {
    */
   virtual uint32_t get_id() = 0;
 };
-// static id of the PopulationInterfaceBase object
-uint32_t PopulationInterfaceBase::id_g = 1;
-// local id of the PopulationInterfaceBase object map relating the ID of the
-// PopulationInterfaceBase to the PopulationInterfaceBase objects
-std::map<uint32_t, std::shared_ptr<PopulationInterfaceBase>>
-    PopulationInterfaceBase::live_objects;
 
 /**
  * @brief Rcpp interface for a new Population to instantiate from R:

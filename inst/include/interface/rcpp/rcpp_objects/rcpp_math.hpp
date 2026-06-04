@@ -10,7 +10,7 @@
 #define FIMS_INTERFACE_RCPP_RCPP_OBJECTS_MATH_HPP
 
 #include "rcpp_interface_base.hpp"
-#include "../../../common/fims_math.hpp"
+#include "common/fims_math.hpp"
 
 /**
  * @brief A rcpp interface to the logit function.

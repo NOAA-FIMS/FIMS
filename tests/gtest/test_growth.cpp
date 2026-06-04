@@ -1,4 +1,4 @@
-#include "population_dynamics/growth/functors/ewaa.hpp"
+#include "growth/functors/ewaa.hpp"
 #include "gtest/gtest.h"
 
 namespace {

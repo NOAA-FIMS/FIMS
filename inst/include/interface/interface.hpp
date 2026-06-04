@@ -22,7 +22,7 @@
 // issue
 #include <math.h>
 
-#include <TMB.hpp>
+#include "TMB/TMB.h"
 
 // define REPORT, ADREPORT, and SIMULATE
 #define FIMS_REPORT_F(name, F)                                         \

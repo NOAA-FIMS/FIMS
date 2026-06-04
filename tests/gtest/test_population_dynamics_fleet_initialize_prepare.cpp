@@ -1,5 +1,5 @@
 #include "gtest/gtest.h"
-#include "population_dynamics/fleet/fleet.hpp"
+#include "fleet/fleet.hpp"
 #include "../../tests/gtest/test_population_test_fixture.hpp"
 #include <random>
 

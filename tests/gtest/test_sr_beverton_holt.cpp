@@ -1,5 +1,5 @@
 #include "gtest/gtest.h"
-#include "population_dynamics/recruitment/functors/sr_beverton_holt.hpp"
+#include "recruitment/functors/sr_beverton_holt.hpp"
 
  
 namespace

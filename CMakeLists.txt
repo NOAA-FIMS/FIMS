@@ -125,6 +125,11 @@ add_library(fims_test INTERFACE)
 target_include_directories(fims_test
   INTERFACE
     inst/include
+    inst/include/common
+    inst/include/distributions
+    inst/include/models
+    inst/include/population_dynamics
+    inst/include/utilities
     ${rcpp_SOURCE_DIR}/inst/include
     ${R_HOME}/include
 )

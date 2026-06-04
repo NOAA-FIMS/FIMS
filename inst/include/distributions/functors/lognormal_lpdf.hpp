@@ -12,7 +12,6 @@
 
 #include "density_components_base.hpp"
 #include "../../common/fims_vector.hpp"
-#include "../../common/def.hpp"
 
 namespace fims_distributions {
 /**
@@ -86,8 +85,8 @@ struct LogNormalLPDF : public DensityComponentBase<Type> {
           "LognormalLPDF::Vector index out of bounds. The size of observed "
           "data does not equal the size of the log_sd vector. The observed "
           "data vector is of size " +
-          fims::to_string(n_x) + " and the log_sd vector is of size " +
-          fims::to_string(this->log_sd.size()));
+          std::to_string(n_x) + " and the log_sd vector is of size " +
+          std::to_string(this->log_sd.size()));
     }
 
     for (size_t i = 0; i < n_x; i++) {

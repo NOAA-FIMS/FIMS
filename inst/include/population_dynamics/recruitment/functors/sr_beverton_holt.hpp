@@ -11,7 +11,7 @@
 #define FIMS_POPULATION_DYNAMICS_RECRUITMENT_SR_BEVERTON_HOLT_HPP
 
 #include "recruitment_base.hpp"
-#include "../../../common/fims_vector.hpp"
+#include "common/fims_vector.hpp"
 
 namespace fims_popdy {
 

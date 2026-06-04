@@ -2,7 +2,17 @@
 
 include(GoogleTest)
 
+if(WIN32)
+  enable_language(RC)
+endif()
+
 # Add tests: specify add_executable and target_link_libraries
+
+function(add_as_invoker_manifest target)
+  if(WIN32)
+    target_sources(${target} PRIVATE gtest_as_invoker.rc)
+  endif()
+endfunction()
 
 # test_population_dynamics_maturity_logistic
 add_executable(population_dynamics_maturity_logistic
@@ -92,6 +102,7 @@ gtest_discover_tests(growth_evaluate)
 add_executable(info_setup_random_effects
   test_info_setup_random_effects.cpp
 )
+add_as_invoker_manifest(info_setup_random_effects)
 target_link_libraries(info_setup_random_effects
   gtest_main
   fims_test
@@ -102,6 +113,7 @@ gtest_discover_tests(info_setup_random_effects)
  add_executable(info_setup_priors
    test_info_setup_priors.cpp
  )
+ add_as_invoker_manifest(info_setup_priors)
  target_link_libraries(info_setup_priors
    gtest_main
    fims_test
