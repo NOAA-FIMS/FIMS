@@ -72,7 +72,7 @@ glance(fit)
 
 # Compare sensitivity runs in one table
 dplyr::bind_rows(
-  glance(age_only_fit) |> dplyr::mutate(model = "age_only"),
+  glance(age_only_fit)    |> dplyr::mutate(model = "age_only"),
   glance(length_only_fit) |> dplyr::mutate(model = "length_only")
 )
 }

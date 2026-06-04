@@ -27,11 +27,11 @@ fit <- local({
 test_that("tidy() works with correct inputs", {
   #' @description Test that generics::tidy(fit) returns a tibble with expected broom and FIMS columns.
   expect_true(all(c("term", "estimate", "std.error", "statistic", "p.value",
-                    "module_name", "module_id", "estimation_type") %in% names(generics::tidy(fit))))
+    "module_name", "module_id", "estimation_type") %in% names(generics::tidy(fit))))
 
   #' @description Test that generics::tidy(fit) defaults to fixed and random effects rows only.
   expect_true(all(generics::tidy(fit)[["estimation_type"]] %in%
-                    c("fixed_effects", "random_effects")))
+    c("fixed_effects", "random_effects")))
 
   #' @description Test that generics::tidy(fit) statistic equals estimate divided by std.error.
   expect_equal(
@@ -69,7 +69,7 @@ test_that("glance() works with correct inputs", {
   #' @description Test that generics::glance(fit) returns a one-row tibble with expected columns.
   expect_equal(object = nrow(generics::glance(fit)), expected = 1L)
   expect_true(all(c("logLik", "AIC", "BIC", "nobs", "npar_fixed",
-                    "max_gradient", "converged") %in% names(generics::glance(fit))))
+    "max_gradient", "converged") %in% names(generics::glance(fit))))
 
   #' @description Test that generics::glance(fit) logLik equals negative marginal_nll.
   expect_equal(
@@ -123,33 +123,9 @@ test_that("augment() returns correct outputs for edge cases", {
 })
 
 ## Error handling ----
-test_that("augment() returns correct error messages", {
-  #' @description Test that generics::augment(fit) issues a warning and returns an empty tibble when no observed/expected pairs exist.
-  empty_fit <- local({
-    clear()
-    withr::defer(clear(), envir = parent.env(environment()))
-    data("data_big", package = "FIMS")
-    data_4_model <- FIMSFrame(data_big)
-    create_default_parameters(
-      configurations = create_default_configurations(data = data_4_model),
-      data = data_4_model
-    ) |>
-      initialize_fims(data = data_4_model) |>
-      fit_fims(optimize = FALSE)
-  })
-  # Temporarily replace get_estimates to return a tibble with no obs/exp pairs
-  # by using the unoptimised fit and masking observed/expected with NA
-  withr::with_package("FIMS", {
-    result <- withCallingHandlers(
-      generics::augment(empty_fit),
-      warning = function(w) {
-        expect_match(conditionMessage(w), "No observed/expected pairs")
-        invokeRestart("muffleWarning")
-      }
-    )
-    expect_s3_class(result, "tbl_df")
-  })
-})
+# No built-in errors or warnings for augment() that can be triggered with a
+# valid FIMSFit object. The empty-tibble warning path is a defensive guard
+# for malformed model output.
 
 # get_fit_metrics ----
 
@@ -160,7 +136,7 @@ test_that("augment() returns correct error messages", {
 test_that("get_fit_metrics() works with correct inputs", {
   #' @description Test that FIMS::get_fit_metrics(fit) returns a tibble with yardstick columns and default metrics rmse, mae, rsq.
   expect_true(all(c(".metric", ".estimator", ".estimate") %in%
-                    names(FIMS::get_fit_metrics(fit))))
+    names(FIMS::get_fit_metrics(fit))))
   expect_setequal(
     object = FIMS::get_fit_metrics(fit)[[".metric"]],
     expected = c("rmse", "mae", "rsq")

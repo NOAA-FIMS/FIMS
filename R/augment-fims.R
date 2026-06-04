@@ -1,7 +1,7 @@
 #' Augment a FIMSFit object for use with yardstick
 #'
 #' Returns a tidy tibble of observed-vs-expected pairs drawn from the output of
-#' [get_estimates()].  Only rows that have **both** an observed value and a
+#' [get_estimates()].  Only rows that have both an observed value and a
 #' model-expected value are included (i.e. data-likelihood rows), so parameter
 #' rows without data observations are automatically dropped.
 #'
@@ -51,7 +51,7 @@
 #' @exportS3Method generics::augment
 augment.FIMSFit <- function(x, include_weights = TRUE, ...) {
   # augment() is a filtered, renamed view of get_estimates().
-  # get_estimates() is the source of truth; this function only selects the
+  # this function only selects the
   # data-fit rows (where both observed and expected are non-NA) and maps
   # column names to the yardstick convention (.truth, .pred, .weight).
   # After applying fimsfit-patches.R the gradient is stored in x@gradient at
@@ -97,8 +97,8 @@ augment.FIMSFit <- function(x, include_weights = TRUE, ...) {
   out <- fit_rows |>
     dplyr::select(
       dplyr::all_of(meta_cols),
-      ".truth"  = .data$observed,
-      ".pred"   = .data$expected,
+      ".truth"  = "observed",
+      ".pred"   = "expected",
       dplyr::any_of("uncertainty")
     ) |>
     dplyr::mutate(
@@ -128,7 +128,7 @@ augment.FIMSFit <- function(x, include_weights = TRUE, ...) {
 #' Extracts observed-vs-expected pairs from a `FIMSFit` object via
 #' `augment.FIMSFit()` and evaluates a [yardstick::metric_set()] over them.
 #'
-#' By default the metrics are computed over all data streams combined.
+#' By default the metrics are computed over **all** data streams combined.
 #' Pass one or more column names to `group_by` to get per-stream breakdowns
 #' (e.g., `group_by = "label"` gives one row per data-stream label such as
 #' `"landings_expected"`, `"age_comp_expected"`, etc.).
@@ -232,7 +232,7 @@ get_fit_metrics <- function(
 
   # Build the metric call: with or without case_weights.
   # .truth, .pred, and .weight are column names passed to yardstick's NSE
-  # (truth = .truth, etc.). The .data$ pronoun used for dplyr verbs
+  # interface (truth = .truth, etc.). The .data$ pronoun used for dplyr verbs
   # does not apply here; globalVariables() is used instead to suppress the
   # R CMD CHECK notes for these three names.
   if (weighted && ".weight" %in% names(aug)) {
@@ -326,3 +326,4 @@ get_fit_stream <- function(x, stream_label = NULL, module_id = NULL, ...) {
   }
   aug
 }
+

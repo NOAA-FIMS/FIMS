@@ -46,7 +46,7 @@ Extracts observed-vs-expected pairs from a \code{FIMSFit} object via
 \code{augment.FIMSFit()} and evaluates a \code{\link[yardstick:metric_set]{yardstick::metric_set()}} over them.
 }
 \details{
-By default the metrics are computed over all data streams combined.
+By default the metrics are computed over \strong{all} data streams combined.
 Pass one or more column names to \code{group_by} to get per-stream breakdowns
 (e.g., \code{group_by = "label"} gives one row per data-stream label such as
 \code{"landings_expected"}, \code{"age_comp_expected"}, etc.).
