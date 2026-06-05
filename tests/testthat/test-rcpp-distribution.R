@@ -293,7 +293,6 @@ test_that("rcpp_distribution returns correct outputs for edge cases", {
   dmultinom_$observed_values[] <- x_values
 
 
-
   # evaluate the density and compare with R
   #' @description Test empty bins with large N (1000) in dmultinom return expected output.
   expect_equal(
