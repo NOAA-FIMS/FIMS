@@ -79,7 +79,6 @@ methods::setMethod(
       # p[] <- c(...)
       x$resize(length(value))
       x$set_values(value)
-
     } else {
       # p[i] <- value
       x$set(i - 1, value)

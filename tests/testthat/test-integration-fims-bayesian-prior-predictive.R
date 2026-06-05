@@ -84,12 +84,12 @@ test_that("posterior equals prior with no data", {
   survey_fleet_index$index_data[] <- survey_index
 
   survey_fleet_age_comp <- methods::new(AgeComp, om_input[["nyr"]], om_input[["nages"]])
-  survey_fleet_age_comp$age_comp_data[]<- c(t(em_input[["survey.age.obs"]][["survey1"]]) * em_input[["n.survey"]][["survey1"]])
+  survey_fleet_age_comp$age_comp_data[] <- c(t(em_input[["survey.age.obs"]][["survey1"]]) * em_input[["n.survey"]][["survey1"]])
 
 
   survey_lengthcomp <- em_input[["survey.length.obs"]][["survey1"]]
   survey_fleet_length_comp <- methods::new(LengthComp, om_input[["nyr"]], om_input[["nlengths"]])
-  survey_fleet_length_comp$length_comp_data[]<- c(t(em_input[["survey.length.obs"]][["survey1"]])) * em_input[["n.survey.lengthcomp"]][["survey1"]]
+  survey_fleet_length_comp$length_comp_data[] <- c(t(em_input[["survey.length.obs"]][["survey1"]])) * em_input[["n.survey.lengthcomp"]][["survey1"]]
 
 
   # Fleet

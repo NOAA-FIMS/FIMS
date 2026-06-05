@@ -392,7 +392,6 @@ initialize_process_distribution <- function(
     et <- sd[["estimation_type"]]
     et[is.na(et)] <- "constant"
     new_module$log_sd$set_estimation_types(et)
-
   }
 
   if (family[["family"]] == "gaussian") {
@@ -422,7 +421,7 @@ initialize_process_distribution <- function(
     #     }
     #   }
     # }
-      }
+  }
 
   n_dim <- length(module$field(par))
 
