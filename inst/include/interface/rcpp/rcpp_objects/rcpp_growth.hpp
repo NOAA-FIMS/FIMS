@@ -166,7 +166,10 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
           "weights size does not match ages size or ages size times "
           "(n_years + 1), where the plus one is for the beginning "
           "of the year after the terminal year spawning-biomass "
-          "calculations.");
+          "calculations. weights size: " +
+          std::to_string(weights.size()) +
+          " ages size: " + std::to_string(ages.size()) +
+          " n_years: " + std::to_string(n_years.get()));
     } else if (weights.size() == ages.size()) {
       // One age-specific vector was provided, so replicate the same
       // weight-at-age values for every year key (0 through n_years).
