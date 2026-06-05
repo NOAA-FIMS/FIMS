@@ -1,0 +1,444 @@
+---
+title: "How FIMS Passes Parameters to the Backend and Links Random Effects to Distributions"
+output: github_document
+vignette: >
+  %\VignetteIndexEntry{How FIMS Passes Parameters to the Backend and Links Random Effects to Distributions}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+# Set local options so vignette output is clean and consistent
+# (avoids color codes and subtle formatting in rendered docs)
+withr::local_options(list(
+  cli.num_colors = 1,
+  crayon.enabled = FALSE,
+  pillar.subtle = FALSE
+))
+```
+
+
+## Overview
+
+This vignette traces the full lifecycle of a random effects parameter in FIMS,
+using annual log-scale recruitment (`log_r`) from the Beverton--Holt recruitment
+module as a concrete example. The goal is to show how a value set in R ultimately
+participates in TMB's automatic differentiation and is linked to its likelihood
+distribution, from the R interface through the Rcpp layer into the C++/TMB backend.
+
+The journey has five stages:
+
+1. **R setup** -- the user configures parameter objects and their estimation type.
+2. **Rcpp interface** -- `BevertonHoltRecruitmentInterface` and `DnormDistributionsInterface`
+   store initial values and register distribution links.
+3. **`CreateTMBModel()`** -- each interface object calls `add_to_fims_tmb()`, which
+   pushes parameters into the `Information` singleton and populates the `variable_map`.
+4. **`SetupRandomEffects()`** -- pointers are resolved so each distribution knows
+   which parameter vector its random effect lives in.
+5. **TMB objective function** -- `re` values are written into memory, and the model
+   evaluates the joint negative log-likelihood.
+
+---
+
+## Two formulations of recruitment random effects
+
+Before tracing the code path, it is worth being precise about the statistical
+distinction between the two recruitment random effect formulations FIMS supports,
+because it determines which parameters are random effects, what the likelihood
+penalizes, and which process module the population model calls.
+
+### Log-deviations (`LogDevs`)
+
+In the deviations formulation the Beverton--Holt mean is computed first and
+recruitment deviations are added on the log scale:
+
+$$
+\log R_y = \log \hat{R}_y + \delta_y, \qquad \delta_y \sim N(0,\, \sigma_r)
+$$
+
+where $\hat{R}_y = \text{BH}(S_{y-1})$ is the stock-recruit mean and
+$\delta_y$ is `log_devs[y]`. The random effects are the deviations themselves,
+and the distribution links `log_devs` (observed) to zero (expected). The
+process module `LogDevs::evaluate_process` returns
+`log_expected_recruitment[y] + log_devs[y]`.
+
+### Log-recruitment (`LogR`)
+
+In the log-recruitment formulation, the annual log-recruitment values are the
+random effects, and the Beverton--Holt mean appears as the *expected value* of
+the distribution rather than an additive correction:
+
+$$
+\log R_y \sim N\!\left(\log \hat{R}_y,\, \sigma_r\right)
+$$
+
+Here `log_r[y]` is the random effect and `log_expected_recruitment[y]` (the
+BH mean on the log scale) is the distribution's expected value. The process
+module `LogR::evaluate_process` returns `log_r[y]` directly, so the population
+model uses the full random-effect draw as the realized log-recruitment.
+
+The table below summarizes the mapping:
+
+| | `LogDevs` | `LogR` |
+|---|---|---|
+| Random effect | `log_devs` | `log_r` |
+| `set_distribution_links` observed | `log_devs` id | `log_r` id |
+| `set_distribution_links` expected | (zero vector, scalar) | `log_expected_recruitment` id |
+| `evaluate_process` returns | `log_expected_recruitment[y] + log_devs[y]` | `log_r[y]` |
+| BH mean enters as | additive term in process | expected value of likelihood |
+
+Both approaches produce the same numbers at age: `CalculateRecruitment` writes
+`log_expected_recruitment[y]` from the BH mean and then calls
+`process->evaluate_process(y)` to get the realized log-recruitment that
+determines `numbers_at_age`. The difference is purely in which quantity is
+the random effect and how it is penalized.
+
+---
+
+## Stage 1: R Setup
+
+The user begins by creating a `BevertonHoltRecruitment` object and a companion
+process object. The choice of process module (`LogRRecruitmentProcess` vs.
+`LogDevsRecruitmentProcess`) determines the formulation above. The example
+below uses `LogRRecruitmentProcess`; the `LogDevs` case is noted where it
+differs. The process object is linked to the recruitment object by ID so
+`CalculateRecruitment` can dispatch `evaluate_process` through the correct
+module at runtime.
+
+```{r r-setup, eval = FALSE}
+recruitment <- methods::new(BevertonHoltRecruitment)
+
+# Choose the process module: LogRRecruitmentProcess (log_r formulation)
+# or LogDevsRecruitmentProcess (log_devs formulation)
+recruitment_process <- methods::new(LogRRecruitmentProcess)
+
+# Link the process to the recruitment object by ID.
+# CalculateRecruitment() calls process->evaluate_process() through this link.
+recruitment$SetRecruitmentProcessID(recruitment_process$get_id())
+
+# Fixed scalar parameters shared by both formulations
+recruitment$log_rzero[1]$value <- log(om_input[["R0"]])
+recruitment$log_rzero[1]$estimation_type$set("fixed_effects")
+
+recruitment$logit_steep[1]$value <- -log(1.0 - om_input[["h"]]) +
+                                      log(om_input[["h"]] - 0.2)
+recruitment$logit_steep[1]$estimation_type$set("constant")
+
+recruitment$n_years$set(om_input[["nyr"]])
+```
+
+#### `LogR` formulation
+
+`log_r` is resized to `n_years - 1` and every element is declared a random
+effect. Initial values of zero place the draws on the natural log scale with
+no starting offset.
+
+```{r log-r-setup, eval = FALSE}
+recruitment$log_r$resize(om_input[["nyr"]] - 1)
+for (y in 1:(om_input[["nyr"]] - 1)) {
+  recruitment$log_r[y]$value <- 0
+}
+recruitment$log_r$set_all_random(TRUE)
+```
+
+The `DnormDistribution` is then configured with two keys: `log_r` as the
+observed (random effect) vector and `log_expected_recruitment` as the expected
+value vector. When `SetupRandomEffects()` runs it resolves these IDs to raw
+pointers, so during model evaluation the distribution sees the BH mean in
+`re_expected_values` and the current random effect draw in `re`.
+
+```{r dnorm-setup-logr, eval = FALSE}
+recruitment_distribution <- methods::new(DnormDistribution)
+
+recruitment_distribution$log_sd$resize(1)
+recruitment_distribution$log_sd[1]$value <- log(1)
+recruitment_distribution$log_sd[1]$estimation_type$set("fixed_effects")
+
+# Both observed and expected slots are sized to n_years - 1.
+# Their actual values at runtime come through the re / re_expected_values
+# pointers set by SetupRandomEffects(), not from these initial values.
+recruitment_distribution$observed_values$resize(om_input[["nyr"]] - 1)
+recruitment_distribution$expected_values$resize(om_input[["nyr"]] - 1)
+for (i in 1:(om_input[["nyr"]] - 1)) {
+  recruitment_distribution$observed_values[i]$value <- 0
+  recruitment_distribution$expected_values[i]$value <- 0
+}
+
+# Two-key link: key[0] = log_r (the RE), key[1] = log_expected_recruitment
+# (the BH mean, used as the distribution's expected value)
+recruitment_distribution$set_distribution_links(
+  "random_effects",
+  c(recruitment$log_r$get_id(),
+    recruitment$log_expected_recruitment$get_id())
+)
+```
+
+#### `LogDevs` formulation (contrast)
+
+In the deviations case the setup is analogous, but only one key is passed to
+`set_distribution_links`: the `log_devs` vector. The expected value of the
+penalty is zero (deviations are mean-zero), so there is no second key and
+`SetupRandomEffects()` sets `re_expected_values = &d->expected_values` (the
+zero vector allocated inside the distribution itself).
+
+```{r dnorm-setup-logdevs, eval = FALSE}
+# LogDevs: only one key -- log_devs is penalized toward zero
+recruitment_distribution$set_distribution_links(
+  "random_effects",
+  c(recruitment$log_devs$get_id())   # no second key
+)
+```
+
+---
+
+## Stage 2: The Rcpp Interface Layer
+
+Each R-level object corresponds to a C++ class that inherits from
+`FIMSRcppInterfaceBase`. These classes hold `ParameterVector` members, which
+wrap individual parameters along with metadata like `initial_value_m`,
+`final_value_m`, and `estimation_type_m`.
+
+When `set_distribution_links()` is called from R, `DnormDistributionsInterface`
+stores the `input_type` string and the vector of integer keys in `key_m`:
+
+```cpp
+virtual bool set_distribution_links(std::string input_type,
+                                    Rcpp::IntegerVector ids) {
+  this->input_type_m.set(input_type);
+  this->key_m->resize(ids.size());
+  for (R_xlen_t i = 0; i < ids.size(); i++) {
+    this->key_m->at(i) = ids[i];
+  }
+  return true;
+}
+```
+
+No pointers are resolved yet. The interface simply records the user's intent.
+All actual linkage happens after `CreateTMBModel()` is called.
+
+---
+
+## Stage 3: `CreateTMBModel()` and `add_to_fims_tmb()`
+
+`CreateTMBModel()` iterates over every registered interface object and calls
+`add_to_fims_tmb()` on each one. For `BevertonHoltRecruitmentInterface`, this
+ultimately calls `add_to_fims_tmb_internal<Type>()` for each TMB type (double,
+and the AD types needed for first, second, and third derivatives).
+
+Inside `add_to_fims_tmb_internal`, the interface does three things for each
+parameter vector:
+
+**1. Copy initial values into a TMB-typed object.**
+
+```cpp
+recruitment->log_r.resize(this->log_r.size());
+for (size_t i = 0; i < log_r.size(); i++) {
+  recruitment->log_r[i] = this->log_r[i].initial_value_m;
+  ...
+}
+```
+
+**2. Register estimable parameters.**
+
+If `estimation_type_m` is `"fixed_effects"`, the parameter's address is passed
+to `info->RegisterParameter()`, which appends a pointer to
+`information->fixed_effects_parameters`. If it is `"random_effects"`, it goes
+to `information->random_effects_parameters` instead. Constants are neither
+registered nor differentiated.
+
+```cpp
+if (this->log_r[i].estimation_type_m.get() == "random_effects") {
+  ss.str("");
+  ss << "Recruitment." << this->id << ".log_r." << this->log_r[i].id_m;
+  info->RegisterRandomEffectName(ss.str());
+  info->RegisterRandomEffect(recruitment->log_r[i]);
+}
+```
+
+**3. Register the vector in `variable_map`.**
+
+After all elements are processed, the entire parameter vector is entered into
+`Information::variable_map` under the `ParameterVector`'s unique ID. This map
+is the mechanism by which distributions later find the memory location of their
+linked parameters.
+
+```cpp
+info->variable_map[this->log_r.id_m] = &(recruitment)->log_r;
+```
+
+The same pattern applies to `log_expected_recruitment`:
+
+```cpp
+info->variable_map[this->log_expected_recruitment.id_m] =
+    &(recruitment)->log_expected_recruitment;
+```
+
+`DnormDistributionsInterface::add_to_fims_tmb_internal` follows the same
+pattern for `log_sd`. It also copies `key_m` into the C++ distribution object's
+`key` vector, which is what `SetupRandomEffects()` uses in the next stage.
+
+---
+
+## Stage 4: `SetupRandomEffects()` Resolves Pointers
+
+After all interface objects have pushed their content into `Information`,
+`info->CreateModel()` is called. One of the internal steps is
+`SetupRandomEffects()`, which iterates over all registered density components.
+For any distribution whose `input_type` is `"random_effects"`, it uses the
+stored `key` values to look up actual memory addresses in `variable_map` and
+assign them to the distribution's `re` and `re_expected_values` pointers.
+
+```cpp
+void SetupRandomEffects() {
+  for (density_components_iterator it = this->density_components.begin();
+       it != this->density_components.end(); ++it) {
+    std::shared_ptr<fims_distributions::DensityComponentBase<Type>> d =
+        (*it).second;
+
+    if (d->input_type == "random_effects") {
+      variable_map_iterator vmit;
+
+      // key[0] -> the random effect vector (log_r)
+      vmit = this->variable_map.find(d->key[0]);
+      d->re = (*vmit).second;
+
+      // key[1] -> the expected value vector (log_expected_recruitment)
+      if (d->key.size() == 2) {
+        vmit = this->variable_map.find(d->key[1]);
+        d->re_expected_values = (*vmit).second;
+      } else {
+        d->re_expected_values = &d->expected_values;
+      }
+    }
+  }
+}
+```
+
+After this step, the `DnormDistribution` object in the backend directly holds
+raw pointers into the same memory as the recruitment model's `log_r` and
+`log_expected_recruitment` vectors. When the optimizer updates those values,
+the distribution sees the changes immediately.
+
+---
+
+## Stage 5: The TMB Objective Function
+
+After `CreateTMBModel()`, the user extracts the parameter vectors and passes
+them to `TMB::MakeADFun`:
+
+```{r make-adfun, eval = FALSE}
+parameters <- list(
+  p  = get_fixed(),
+  re = get_random()
+)
+
+obj <- TMB::MakeADFun(
+  data       = list(),
+  parameters = parameters,
+  DLL        = "FIMS",
+  silent     = TRUE,
+  map        = map,
+  random     = "re"
+)
+```
+
+TMB's Laplace approximation marginalizes over `re`. Internally, each call to the
+objective function executes `FIMS.cpp`:
+
+```cpp
+template<class Type>
+Type objective_function<Type>::operator()() {
+  PARAMETER_VECTOR(p);
+  PARAMETER_VECTOR(re);
+
+  std::shared_ptr<fims_info::Information<Type>> information =
+    fims_info::Information<Type>::GetInstance();
+
+  // Write fixed effects into model memory
+  for (size_t i = 0; i < information->fixed_effects_parameters.size(); i++) {
+    *information->fixed_effects_parameters[i] = p[i];
+  }
+
+  // Write random effects into model memory
+  for (size_t i = 0; i < information->random_effects_parameters.size(); i++) {
+    *information->random_effects_parameters[i] = re[i];
+  }
+
+  Type nll = 0;
+  nll = model->Evaluate();
+  return nll;
+}
+```
+
+The write loop copies each element of TMB's `re` vector directly into the
+addresses held by `information->random_effects_parameters`. Because those
+addresses are the same memory locations as `recruitment->log_r[i]`, and because
+the `DnormDistribution`'s `re` pointer points into that same vector, the
+likelihood computation in `model->Evaluate()` immediately sees the updated
+values. No data copying occurs; the entire system operates through shared memory
+addresses registered at model-build time.
+
+`model->Evaluate()` then loops over all density components. For the
+`DnormDistribution` linked to `log_r`, it computes the normal log-density of
+each `log_r[i]` value relative to the corresponding `log_expected_recruitment[i]`
+value, using `exp(log_sd)` as the standard deviation. The result is accumulated
+into the joint negative log-likelihood returned to TMB.
+
+---
+
+## How `CalculateRecruitment` uses the process module
+
+The process module is the link between the statistical random effect and the
+population dynamics. Each time step `CalculateRecruitment` is called with the
+current year index. It first writes the Beverton--Holt mean into
+`log_expected_recruitment`:
+
+```cpp
+population->recruitment->log_expected_recruitment[year - 1] =
+    fims_math::log(population->recruitment->evaluate_mean(
+        dq_["spawning_biomass"][year - 1], phi0));
+```
+
+It then calls `process->evaluate_process(year - 1)` to get the realized
+log-recruitment that populates `numbers_at_age`:
+
+```cpp
+dq_["numbers_at_age"][i_age_year] = fims_math::exp(
+    population->recruitment->process->evaluate_process(year - 1));
+```
+
+For `LogR`, `evaluate_process` returns `log_r[y]` -- the random effect draw --
+so the Laplace approximation marginalizes over the full distribution
+$\log R_y \sim N(\log\hat{R}_y,\, \sigma_r)$.
+
+For `LogDevs`, `evaluate_process` returns
+`log_expected_recruitment[y] + log_devs[y]`, so the BH mean is a deterministic
+correction and the deviation is the quantity that carries uncertainty.
+
+In both cases the population model sees a single log-recruitment value per year;
+only the source and interpretation of that value differ between formulations.
+
+---
+
+## Summary
+
+The table below summarizes how each piece of information flows through the system
+for both formulations.
+
+| | `LogR` | `LogDevs` |
+|---|---|---|
+| Random effect | `log_r` | `log_devs` |
+| RE registered in `variable_map` | `id_log_r → &log_r` | `id_log_devs → &log_devs` |
+| `set_distribution_links` keys | `[id_log_r, id_log_exp_rec]` | `[id_log_devs]` |
+| `NormalLPDF::re` points to | `log_r` | `log_devs` |
+| `NormalLPDF::re_expected_values` points to | `log_expected_recruitment` | internal zero vector |
+| `evaluate_process` returns | `log_r[y]` | `log_expected_recruitment[y] + log_devs[y]` |
+| BH mean enters likelihood as | expected value | additive process correction |
+
+The design achieves a clean separation of concerns: the R user specifies *what*
+parameters exist and *how* they relate to distributions; the Rcpp interface
+records that intent; `CreateTMBModel()` + `SetupRandomEffects()` resolve
+everything into raw pointer connections; and `CalculateRecruitment` dispatches
+through the process module to get a single realized log-recruitment value per
+year that is agnostic to which formulation is in use.
