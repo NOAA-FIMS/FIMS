@@ -89,7 +89,7 @@ data_4_projections <- data_big_with_extra_year |>
     ) |>
       dplyr::select(-timing) |>
       merge(
-        data.frame(timing = max(data_big[["timing"]], na.rm = TRUE):(max(data_big[["timing"]], na.rm = TRUE) + years_of_projection))
+        data.frame(timing = max(data_big[["timing"]], na.rm = TRUE):(max(data_big[["timing"]], na.rm = TRUE) + years_of_projection - 1))
       )
   ) |>
   # Make a FIMSFrame object out of this data frame with the extra row to add all

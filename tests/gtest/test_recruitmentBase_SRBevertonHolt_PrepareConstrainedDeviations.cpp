@@ -41,7 +41,8 @@ namespace
     recruit.constrain_deviations = true;
     recruit.PrepareConstrainedDeviations();
     // c(-1.0, 2.0, 3.0)-sum(c(-1.0, 2.0, 3.0))/3 = -2.3333333  0.6666667  1.6666667
-    std::vector<double> expected_deviations_true = {-2.3333333, 0.6666667, 1.6666667};
+  std::vector<double> expected_deviations_true = {-2.3333333, 0.6666667,
+                                                  1.6666667};
 
     for (int i = 0; i < recruit.log_recruit_devs.size(); i++)
     {

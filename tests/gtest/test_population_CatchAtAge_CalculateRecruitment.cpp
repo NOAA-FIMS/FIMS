@@ -65,7 +65,8 @@ namespace
         
         // testing that expected recruitment and population numbers_at_age match
         // EXPECT_DOUBLE_EQ() verifies that the two double values are approximately equal, to within 4 ULPs from each other.
-        EXPECT_DOUBLE_EQ(dq["numbers_at_age"][r_i_age_year], expect_recruitment[r_i_age_year]);
+  EXPECT_DOUBLE_EQ(dq["numbers_at_age"][r_i_age_year],
+                   expect_recruitment[r_i_age_year]);
         // testing that population numbers_at_age > 0.0
         EXPECT_GT(dq["numbers_at_age"][r_i_age_year], 0.0);
     }
