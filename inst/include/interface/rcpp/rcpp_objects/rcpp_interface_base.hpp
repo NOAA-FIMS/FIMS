@@ -189,15 +189,18 @@ class ParameterVector {
    * @param size The number of elements to copy over.
    */
   ParameterVector(Rcpp::NumericVector x, size_t size) {
-    if (static_cast<size_t>(x.size()) != size) {
+    const size_t input_size = static_cast<size_t>(x.size());
+    if (input_size != size) {
       throw std::invalid_argument(
-          "Error in call to ParameterVector(Rcpp::NumericVector x, size_t "
-          "size): x.size() != size argument.");
+          "ParameterVector::ParameterVector(Rcpp::NumericVector, size_t): `x` "
+          "length (" + std::to_string(input_size) + ") must equal the "
+          "requested size (" + std::to_string(size) + "). Received length: " +
+          std::to_string(input_size) + ".");
     } else {
       this->id_m = ParameterVector::id_g++;
       this->storage_m = std::make_shared<std::vector<Parameter>>();
       // Use std::min to avoid comparing signed and unsigned types
-      size_t n = std::min(static_cast<size_t>(x.size()), size);
+      size_t n = std::min(input_size, size);
       this->storage_m->resize(n);
       for (size_t i = 0; i < n; i++) {
         storage_m->at(i).initial_value_m = x[i];
@@ -289,36 +292,57 @@ class ParameterVector {
   void resize(size_t size) { this->storage_m->resize(size); }
 
   /**
-   * @brief Sets all Parameters within a ParameterVector as estimable.
-   *
-   * @param estimable A boolean specifying if all Parameters within the
-   * ParameterVector should be estimated within the model. A value of true
-   * leads to all Parameters being estimated.
+   * @brief Sets the initial values for all Parameters within a ParameterVector.
    */
-  void set_all_estimable(bool estimable) {
+  void set_values(Rcpp::NumericVector values) {
+    if (values.size() != this->storage_m->size()) {
+      const size_t input_size = values.size();
+      const size_t vector_size = this->storage_m->size();
+      throw std::invalid_argument(
+          "ParameterVector::set_values(): `values` length (" +
+              std::to_string(input_size) + ") must equal the ParameterVector "
+              "size (" + std::to_string(vector_size) + "). Received length: " +
+              std::to_string(input_size) + ". Pass a numeric vector of length " +
+              std::to_string(vector_size) + ".");
+    }
     for (size_t i = 0; i < this->storage_m->size(); i++) {
-      if (estimable) {
-        this->storage_m->at(i).estimation_type_m.set("fixed_effects");
-      } else {
-        this->storage_m->at(i).estimation_type_m.set("constant");
-      }
+      this->storage_m->at(i).initial_value_m = values[i];
     }
   }
 
   /**
-   * @brief Sets all Parameters within a ParameterVector as random effects.
-   *
-   * @param random A boolean specifying if all Parameters within the
-   * ParameterVector should be designated as random effects. A value of true
-   * leads to all Parameters being random effects.
+   * @brief Sets the estimation type for all Parameters within a
+   * ParameterVector.
    */
-  void set_all_random(bool random) {
-    for (size_t i = 0; i < this->storage_m->size(); i++) {
-      if (random) {
-        this->storage_m->at(i).estimation_type_m.set("random_effects");
-      } else {
-        this->storage_m->at(i).estimation_type_m.set("constant");
+  void set_estimation_types(Rcpp::CharacterVector estimation_types) {
+    const size_t vector_size = this->storage_m->size();
+    const size_t input_size = estimation_types.size();
+
+    if (input_size != 1 && input_size != vector_size) {
+      throw std::invalid_argument(
+          "ParameterVector::set_estimation_types(): `estimation_types` length (" +
+              std::to_string(input_size) + 
+              ") must be 1 (broadcast) or equal to the ParameterVector size (" +
+              std::to_string(vector_size) + ").\n"
+              "Received length: " + std::to_string(input_size) + ". "
+              "Pass a single estimation type to apply to all elements, or a "
+              "vector of length " + std::to_string(vector_size) + ".");
+    }
+
+    auto validate_estimation_type = [&](const std::string& est_type) {
+      if (est_type != "constant" && est_type != "fixed_effects" &&
+          est_type != "random_effects") {
+        throw std::invalid_argument(
+            "Invalid estimation_type: " + est_type +
+            ". Valid options are: constant, fixed_effects, or random_effects.");
       }
+    };
+
+    for (size_t i = 0; i < vector_size; i++) {
+      std::string est_type = Rcpp::as<std::string>(
+          estimation_types[input_size == 1 ? 0 : i]);
+      validate_estimation_type(est_type);
+      this->storage_m->at(i).estimation_type_m.set(est_type);
     }
   }
 
@@ -423,6 +447,14 @@ class RealVector {
   RealVector(Rcpp::NumericVector x, size_t size) {
     this->id_m = RealVector::id_g++;
     this->storage_m = std::make_shared<std::vector<double>>();
+    const size_t input_size = static_cast<size_t>(x.size());
+    if (input_size != size) {
+      throw std::invalid_argument(
+          "RealVector::RealVector(Rcpp::NumericVector, size_t): `x` length (" +
+              std::to_string(input_size) + ") must equal the requested "
+              "size (" + std::to_string(size) + "). Received length: " +
+              std::to_string(input_size) + ".");
+    }
     this->storage_m->assign(x.begin(), x.end());
   }
 
@@ -466,7 +498,7 @@ class RealVector {
    *
    * @param orig
    */
-  void fromRVector(const Rcpp::NumericVector& orig) {
+  void set_values(const Rcpp::NumericVector& orig) {
     this->storage_m->resize(orig.size());
     for (size_t i = 0; i < this->storage_m->size(); i++) {
       this->storage_m->at(i) = orig[i];
@@ -478,7 +510,7 @@ class RealVector {
    *
    * @return Rcpp::NumericVector
    */
-  Rcpp::NumericVector toRVector() {
+  Rcpp::NumericVector get_values() {
     Rcpp::NumericVector ret(this->storage_m->size());
     for (size_t i = 0; i < this->size(); i++) {
       ret[i] = this->storage_m->at(i);

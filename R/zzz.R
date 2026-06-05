@@ -46,6 +46,14 @@ if (!methods::isClass("Rcpp_ParameterVector")) {
   )
 }
 
+if (!methods::isClass("Rcpp_RealVector")) {
+  methods::setClass(
+    Class = "Rcpp_RealVector",
+    representation = methods::representation(.xData = "environment"),
+    contains = "envRefClass"
+  )
+}
+
 # Methods for Rcpp
 #' Setter for `Rcpp_ParameterVector`
 #'
@@ -67,8 +75,36 @@ methods::setMethod(
     x = "Rcpp_ParameterVector"
   ),
   definition = function(x, i, j, value) {
-    x$set(i - 1, value) # R uses 1-based indexing, C++ uses 0-based indexing
-    return(x) # Return the modified object
+    if (missing(i)) {
+      # p[] <- c(...)
+      x$resize(length(value))
+      x$set_values(value)
+    } else {
+      # p[i] <- value
+      if (methods::is(value, "Rcpp_Parameter")) {
+        for (index in seq_along(i)) {
+          x$set(i[index] - 1, value)
+        }
+      } else {
+        if (length(value) != 1 && length(value) != length(i)) {
+          stop(
+            "replacement has length ",
+            length(value),
+            ", expected 1 or ",
+            length(i)
+          )
+        }
+        for (index in seq_along(i)) {
+          value_index <- if (length(value) == 1) 1 else index
+          pos <- i[index] - 1
+          parameter <- x$get(pos)
+          parameter$value <- value[value_index]
+          x$set(pos, parameter)
+        }
+      }
+    }
+
+    return(x)
   }
 )
 
@@ -91,6 +127,38 @@ methods::setMethod(
     return(x$get(i - 1))
   }
 )
+
+# Methods for Rcpp
+#' Setter for `Rcpp_RealVector`
+#'
+#' In R, indexing starts at one. But, in C++ indexing starts at zero. These
+#' functions do the translation for you so you can think in R terms.
+#'
+#' @param x A numeric vector.
+#' @param i An integer specifying the location in R speak, where indexing
+#'   starts at one, of the vector that you wish to set.
+#' @param j Not used with `Rcpp_RealVector` because it is a vector.
+#' @param value The value you want to set the indexed location to.
+#' @return
+#' For `[<-`, the index `i` of object `x` is set to `value`.
+#' @keywords internal
+#' @rdname Rcpp_RealVector
+methods::setMethod(
+  f = "[<-",
+  signature = signature(x = "Rcpp_RealVector"),
+  definition = function(x, i, j, value) {
+    if (missing(i)) {
+      # p[] <- c(...)
+      x$set_values(value)
+    } else {
+      # p[i] <- value
+      x$set(i - 1, value)
+    }
+
+    return(x)
+  }
+)
+
 
 #' Get the length of an Rcpp_ParameterVector
 #'
@@ -246,6 +314,31 @@ methods::setMethod(
       ret[i]$value <- methods::callGeneric(e1[i]$value, e2[i])
     }
     return(ret)
+  }
+)
+
+#' @rdname Rcpp_Math
+methods::setMethod(
+  "Ops",
+  signature(e1 = "Rcpp_RealVector", e2 = "numeric"),
+  function(e1, e2) {
+    if (e1$size() != length(e2)) {
+      if (length(e2) == 1) {
+        result <- methods::callGeneric(e1$get_values(), e2)
+      } else {
+        stop("Call to Ops, vectors not equal length")
+      }
+    } else {
+      result <- methods::callGeneric(e1$get_values(), e2)
+    }
+
+    if (.Generic %in% c("+", "-", "*", "/", "^", "%%", "%/%")) {
+      ret <- methods::new(RealVector, length(result))
+      ret$set_values(result)
+      return(ret)
+    }
+
+    return(result)
   }
 )
 
