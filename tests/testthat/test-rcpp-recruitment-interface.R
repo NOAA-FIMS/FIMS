@@ -50,11 +50,9 @@ test_that("rcpp recruitment interface works with correct inputs", {
     expected = 1090802.68
   )
   log_devs <- c(-1.0, 2.0, 3.0)
-  recruitment$log_devs$resize(length(log_devs))
-  purrr::walk(
-    seq_along(log_devs),
-    \(x) recruitment$log_devs[x]$value <- log_devs[x]
-  )
+  recruitment$log_devs[] <- log_devs
+
+
   #' @description Test that the log_devs are set correctly.
   for (i in 1:length(log_devs)) {
     expect_equal(

@@ -36,16 +36,8 @@ test_that("rcpp distribution works with correct inputs", {
   # initialize the Dnorm module
   dnorm_ <- methods::new(DnormDistribution)
   # populate class members
-  dnorm_$observed_values$resize(length(y))
-  purrr::walk(
-    seq_along(y),
-    \(x) dnorm_$observed_values[x]$value <- y[x]
-  )
-  dnorm_$expected_values$resize(length(y))
-  purrr::walk(
-    seq_along(y),
-    \(x) dnorm_$expected_values[x]$value <- 0
-  )
+  dnorm_$observed_values[] <- y
+  dnorm_$expected_values[] <- rep(0, length(y))
   dnorm_$log_sd[1]$value <- log(1)
   # evaluate the density and compare with R
   #' @description Test that dnorm works with a vector of state variables, but scalar arguments, e.g., a random effect vector.
@@ -58,21 +50,9 @@ test_that("rcpp distribution works with correct inputs", {
   # initialize the Dnorm module
   dnorm_ <- methods::new(DnormDistribution)
   # populate class members
-  dnorm_$observed_values$resize(length(y))
-  purrr::walk(
-    seq_along(y),
-    \(x) dnorm_$observed_values[x]$value <- y[x]
-  )
-  dnorm_$expected_values$resize(length(y))
-  purrr::walk(
-    seq_along(y),
-    \(x) dnorm_$expected_values[x]$value <- 0
-  )
-  dnorm_$log_sd$resize(length(y))
-  purrr::walk(
-    seq_along(y),
-    \(x) dnorm_$log_sd[x]$value <- log(1)
-  )
+  dnorm_$observed_values[] <- y
+  dnorm_$expected_values[] <- rep(0, length(y))
+  dnorm_$log_sd[] <- log(1)
   # evaluate the density and compare with R
   #' @description Test that dnorm works with vectors of state variables (x) and arguments, e.g., an index likelihood vector.
   expect_equal(dnorm_$evaluate(), sum(stats::dnorm(y, 0, 1, TRUE)))
@@ -101,16 +81,8 @@ test_that("rcpp distribution works with correct inputs", {
   # initialize the Dlnorm module
   dlnorm_ <- methods::new(DlnormDistribution)
   # populate class members
-  dlnorm_$observed_values$resize(length(y))
-  purrr::walk(
-    seq_along(y),
-    \(x) dlnorm_$observed_values[x]$value <- y[x]
-  )
-  dlnorm_$expected_values$resize(length(y))
-  purrr::walk(
-    seq_along(y),
-    \(x) dlnorm_$expected_values[x]$value <- 0
-  )
+  dlnorm_$observed_values[] <- y
+  dlnorm_$expected_values[] <- rep(0, length(y))
   dlnorm_$log_sd[1]$value <- log(1)
   # evaluate the density and compare with R
   #' @description Test that dlnorm works with a vector of state variables, but scalar arguments, e.g., a random effect vector.
@@ -123,21 +95,10 @@ test_that("rcpp distribution works with correct inputs", {
   # initialize the Dlnorm module
   dlnorm_ <- methods::new(DlnormDistribution)
   # populate class members
-  dlnorm_$observed_values$resize(length(y))
-  purrr::walk(
-    seq_along(y),
-    \(x) dlnorm_$observed_values[x]$value <- y[x]
-  )
-  dlnorm_$expected_values$resize(length(y))
-  purrr::walk(
-    seq_along(y),
-    \(x) dlnorm_$expected_values[x]$value <- 0
-  )
-  dlnorm_$log_sd$resize(length(y))
-  purrr::walk(
-    seq_along(y),
-    \(x) dlnorm_$log_sd[x]$value <- log(1)
-  )
+  dlnorm_$observed_values[] <- y
+  dlnorm_$expected_values[] <- rep(0, length(y))
+  dlnorm_$log_sd[] <- rep(log(1), length(y))
+
   # evaluate the density and compare with R
   #' @description Test that dlnorm with vectors of state variables (x) and arguments, e.g., an index likelihood vector.
   expect_equal(dlnorm_$evaluate(), sum(stats::dlnorm(y, 0, 1, TRUE)))
@@ -154,17 +115,11 @@ test_that("rcpp distribution works with correct inputs", {
   dmultinom_$dims$resize(2)
   dmultinom_$dims$set(0, 1)
   dmultinom_$dims$set(1, length(p))
-  dmultinom_$expected_values$resize(length(p))
-  purrr::walk(
-    seq_along(p),
-    \(x) dmultinom_$expected_values[x]$value <- p[x]
-  )
+  dmultinom_$expected_values[] <- p
 
-  dmultinom_$observed_values$resize(length(p))
-  purrr::walk(
-    seq_along(p),
-    \(x) dmultinom_$observed_values[x]$value <- x_values[x]
-  )
+
+  dmultinom_$observed_values[] <- x_values
+
 
   # evaluate the density and compare with R
   #' @description Test that dmultinom works with vector inputs.
@@ -334,17 +289,10 @@ test_that("rcpp_distribution returns correct outputs for edge cases", {
   dmultinom_$dims$resize(2)
   dmultinom_$dims$set(0, 1)
   dmultinom_$dims$set(1, length(p))
-  dmultinom_$expected_values$resize(length(p))
-  purrr::walk(
-    seq_along(p),
-    \(x) dmultinom_$expected_values[x]$value <- p[x]
-  )
+  dmultinom_$expected_values[] <- p
+  dmultinom_$observed_values[] <- x_values
 
-  dmultinom_$observed_values$resize(length(p))
-  purrr::walk(
-    seq_along(p),
-    \(x) dmultinom_$observed_values[x]$value <- x_values[x]
-  )
+
 
   # evaluate the density and compare with R
   #' @description Test empty bins with large N (1000) in dmultinom return expected output.
@@ -362,17 +310,8 @@ test_that("rcpp_distribution returns correct outputs for edge cases", {
   dmultinom_$dims$resize(2)
   dmultinom_$dims$set(0, 1)
   dmultinom_$dims$set(1, length(p))
-  dmultinom_$expected_values$resize(length(p))
-  purrr::walk(
-    seq_along(p),
-    \(x) dmultinom_$expected_values[x]$value <- p[x]
-  )
-
-  dmultinom_$observed_values$resize(length(p))
-  purrr::walk(
-    seq_along(p),
-    \(x) dmultinom_$observed_values[x]$value <- x_values[x]
-  )
+  dmultinom_$expected_values[] <- p
+  dmultinom_$observed_values[] <- x_values
 
   # evaluate the density and compare with R
   #' @description Test empty bins with small N (1) in dmultinom return expected output.
@@ -390,17 +329,10 @@ test_that("rcpp distribution returns correct error messages", {
   # initialize the Dnorm module
   dnorm_ <- methods::new(DnormDistribution)
   # populate class members
-  dnorm_$observed_values$resize(length(y) + 1)
-  purrr::walk(
-    seq_along(y),
-    \(x) dnorm_$observed_values[x]$value <- y[x]
-  )
-  dnorm_$expected_values$resize(length(y))
-  dnorm_$log_sd$resize(length(y))
-  purrr::walk(
-    seq_along(length(y)),
-    \(x) dnorm_$expected_values[x]$value <- log(1)
-  )
+  dnorm_$observed_values[] <- c(y, 0)
+  dnorm_$expected_values[] <- rep(log(1), length(y))
+  dnorm_$log_sd[] <- rep(log(1), length(y))
+
   #' @description dnorm should error out when there is a dimension mismatch where it is expecting `expected_values` to have a size 10 but is provided a size 11 vector.
   expect_error(
     object = dnorm_$evaluate(),
@@ -410,17 +342,9 @@ test_that("rcpp distribution returns correct error messages", {
 
   dnorm_ <- methods::new(DnormDistribution)
   # populate class members
-  dnorm_$observed_values$resize(length(y))
-  purrr::walk(
-    seq_along(dnorm_),
-    \(x) dnorm_$observed_values[x]$value <- y[x]
-  )
-  dnorm_$expected_values$resize(length(y))
-  dnorm_$log_sd$resize(3)
-  purrr::walk(
-    1:3,
-    \(x) dnorm_$log_sd[x]$value <- log(1)
-  )
+  dnorm_$observed_values[] <- y
+  dnorm_$expected_values[] <- rep(log(1), length(y))
+  dnorm_$log_sd[] <- rep(log(1), 3)
   #' @description dnorm should error out when there is a dimension mismatch where it is expecting `log_sd` to have a size 10 but is provided a size 3 vector.
   expect_error(
     object = dnorm_$evaluate(),
@@ -433,17 +357,9 @@ test_that("rcpp distribution returns correct error messages", {
   # initialize the Dlnorm module
   dlnorm_ <- methods::new(DlnormDistribution)
   # populate class members
-  dlnorm_$observed_values$resize(length(y))
-  purrr::walk(
-    seq_along(y),
-    \(x) dlnorm_$observed_values[x]$value <- y[x]
-  )
-  dlnorm_$expected_values$resize(length(y) + 1)
-  dlnorm_$log_sd$resize(length(y))
-  purrr::walk(
-    1:10,
-    \(x) dlnorm_$log_sd[x]$value <- log(1)
-  )
+  dlnorm_$observed_values[] <- y
+  dlnorm_$expected_values[] <- rep(log(1), length(y) + 1)
+  dlnorm_$log_sd[] <- rep(log(1), length(y))
   # TODO: skip test until dimension checking is fixed in lognormal_lpdf.hpp
   # dlnorm should error out when there is a dimension mismatch
   # object <- dlnorm_$evaluate()
@@ -454,17 +370,10 @@ test_that("rcpp distribution returns correct error messages", {
   # initialize the Dlnorm module
   dlnorm_ <- methods::new(DlnormDistribution)
   # populate class members
-  dlnorm_$observed_values$resize(length(y))
-  purrr::walk(
-    seq_along(y),
-    \(x) dlnorm_$observed_values[x]$value <- y[x]
-  )
+  dlnorm_$observed_values[] <- y
   dlnorm_$expected_values$resize(length(y))
-  dlnorm_$log_sd$resize(3)
-  purrr::walk(
-    1:3,
-    \(x) dlnorm_$log_sd[x]$value <- log(1)
-  )
+  dlnorm_$log_sd[] <- rep(log(1), 3)
+
   #' @description dlnorm should error out when there is a dimension mismatch where it is expecting log_sd to have a size 10 but is provided a size 3 vector.
   expect_error(
     object = dlnorm_$evaluate(),
@@ -482,16 +391,10 @@ test_that("rcpp distribution returns correct error messages", {
   dmultinom_$dims$resize(2)
   dmultinom_$dims$set(0, 1)
   dmultinom_$dims$set(1, 10)
-  dmultinom_$expected_values$resize(length(p))
-  purrr::walk(
-    seq_along(p),
-    \(x) dmultinom_$expected_values[x]$value <- p[x]
-  )
-  dmultinom_$observed_values$resize(length(p))
-  purrr::walk(
-    seq_along(p),
-    \(x) dmultinom_$observed_values[x]$value <- x_values[x]
-  )
+  dmultinom_$expected_values[] <- rep(log(1), length(p))
+
+  dmultinom_$observed_values[] <- x_values
+
   #' @description dmultinom should error out when there is a dimension mismatch.
   expect_error(
     object = dmultinom_$evaluate(),
@@ -509,16 +412,9 @@ test_that("rcpp distribution returns correct error messages", {
   dmultinom_$dims$resize(2)
   dmultinom_$dims$set(0, 1)
   dmultinom_$dims$set(1, 9)
-  dmultinom_$expected_values$resize(length(p))
-  purrr::walk(
-    seq_along(p),
-    \(x) dmultinom_$expected_values[x]$value <- p[x]
-  )
-  dmultinom_$observed_values$resize(length(p) - 1)
-  purrr::walk(
-    seq_along(p[1:9]),
-    \(x) dmultinom_$observed_values[x]$value <- x_values[x]
-  )
+  dmultinom_$expected_values[] <- rep(log(1), length(p))
+  dmultinom_$observed_values[] <- x_values[1:9]
+
   #' @description dmultinom should error out when there is a dimension mismatch.
   expect_error(
     object = dmultinom_$evaluate(),

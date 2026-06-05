@@ -289,35 +289,53 @@ class ParameterVector {
   void resize(size_t size) { this->storage_m->resize(size); }
 
   /**
-   * @brief Sets all Parameters within a ParameterVector as estimable.
-   *
-   * @param estimable A boolean specifying if all Parameters within the
-   * ParameterVector should be estimated within the model. A value of true
-   * leads to all Parameters being estimated.
+   * @brief Sets the initial values for all Parameters within a ParameterVector.
    */
-  void set_all_estimable(bool estimable) {
+  void set_values(Rcpp::NumericVector values) {
+    if (values.size() != this->storage_m->size()) {
+      throw std::invalid_argument(
+          "Length of values vector must be the same as the size of the "
+          "ParameterVector.");
+    }
     for (size_t i = 0; i < this->storage_m->size(); i++) {
-      if (estimable) {
-        this->storage_m->at(i).estimation_type_m.set("fixed_effects");
-      } else {
-        this->storage_m->at(i).estimation_type_m.set("constant");
-      }
+      this->storage_m->at(i).initial_value_m = values[i];
     }
   }
 
   /**
-   * @brief Sets all Parameters within a ParameterVector as random effects.
-   *
-   * @param random A boolean specifying if all Parameters within the
-   * ParameterVector should be designated as random effects. A value of true
-   * leads to all Parameters being random effects.
+   * @brief Sets the estimation type for all Parameters within a
+   * ParameterVector.
    */
-  void set_all_random(bool random) {
-    for (size_t i = 0; i < this->storage_m->size(); i++) {
-      if (random) {
-        this->storage_m->at(i).estimation_type_m.set("random_effects");
-      } else {
-        this->storage_m->at(i).estimation_type_m.set("constant");
+  void set_estimation_types(Rcpp::CharacterVector estimation_type) {
+    if (estimation_type.size() == 1) {
+      std::string est_type = Rcpp::as<std::string>(estimation_type[0]);
+      if (est_type != "constant" && est_type != "fixed_effects" &&
+          est_type != "random_effects") {
+        throw std::invalid_argument(
+            "Invalid estimation type: " + est_type +
+            ". Valid options are: constant, fixed_effects, or random_effects.");
+      }
+      for (size_t i = 0; i < this->storage_m->size(); i++) {
+        this->storage_m->at(i).estimation_type_m.set(est_type);
+      }
+    } else {
+      if (estimation_type.size() != this->storage_m->size()) {
+        throw std::invalid_argument(
+            "Length of estimation_type vector must be the same as the size of "
+            "the ParameterVector. " +
+            std::to_string(estimation_type.size()) +
+            " != " + std::to_string(this->storage_m->size()));
+      }
+
+      for (size_t i = 0; i < this->storage_m->size(); i++) {
+        std::string est_type = Rcpp::as<std::string>(estimation_type[i]);
+        if (est_type != "constant" && est_type != "fixed_effects" &&
+            est_type != "random_effects") {
+          throw std::invalid_argument("Invalid estimation type: " + est_type +
+                                      ". Valid options are: constant, "
+                                      "fixed_effects, or random_effects.");
+        }
+        this->storage_m->at(i).estimation_type_m.set(est_type);
       }
     }
   }
@@ -466,7 +484,7 @@ class RealVector {
    *
    * @param orig
    */
-  void fromRVector(const Rcpp::NumericVector& orig) {
+  void set_values(const Rcpp::NumericVector& orig) {
     this->storage_m->resize(orig.size());
     for (size_t i = 0; i < this->storage_m->size(); i++) {
       this->storage_m->at(i) = orig[i];
@@ -478,7 +496,7 @@ class RealVector {
    *
    * @return Rcpp::NumericVector
    */
-  Rcpp::NumericVector toRVector() {
+  Rcpp::NumericVector get_values() {
     Rcpp::NumericVector ret(this->storage_m->size());
     for (size_t i = 0; i < this->size(); i++) {
       ret[i] = this->storage_m->at(i);

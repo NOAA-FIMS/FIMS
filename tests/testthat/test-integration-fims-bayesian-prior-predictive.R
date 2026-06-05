@@ -22,33 +22,20 @@ test_that("posterior equals prior with no data", {
   # set fishing fleet catch data, need to set dimensions of data index
   # currently FIMS only has a fleet module that takes index for both survey index and fishery catch
   fishing_fleet_index <- methods::new(Index, om_input[["nyr"]])
-  purrr::walk(
-    1:om_input[["nyr"]],
-    \(x) fishing_fleet_index$index_data$set(x - 1, catch[x])
-  )
+  fishing_fleet_index$index_data[] <- catch
 
   # set fishing fleet age comp data, need to set dimensions of age comps
   # Here the new function initializes the object with length nyr*nages
   fishing_fleet_age_comp <- methods::new(AgeComp, om_input[["nyr"]], om_input[["nages"]])
   # Here we fill in the values for the object with the observed age comps for fleet one
   # we multiply these proportions by the sample size for likelihood weighting
-  purrr::walk(
-    1:(om_input[["nyr"]] * om_input[["nages"]]),
-    \(x) fishing_fleet_age_comp$age_comp_data$set(
-      x - 1,
-      (c(t(em_input[["L.age.obs"]][["fleet1"]])) * em_input[["n.L"]][["fleet1"]])[x]
-    )
-  )
+  fishing_fleet_age_comp$age_comp_data[] <- c(t(em_input[["L.age.obs"]][["fleet1"]])) * em_input[["n.L"]][["fleet1"]]
+
 
   # set fishing fleet length comp data, need to set dimensions of length comps
   fishing_fleet_length_comp <- methods::new(LengthComp, om_input[["nyr"]], om_input[["nlengths"]])
-  purrr::walk(
-    1:(om_input[["nyr"]] * om_input[["nlengths"]]),
-    \(x) fishing_fleet_length_comp$length_comp_data$set(
-      x - 1,
-      (c(t(em_input[["L.length.obs"]][["fleet1"]])) * em_input[["n.L.lengthcomp"]][["fleet1"]])[x]
-    )
-  )
+  fishing_fleet_length_comp$length_comp_data[] <- c(t(em_input[["L.length.obs"]][["fleet1"]])) * em_input[["n.L.lengthcomp"]][["fleet1"]]
+
   # Fleet
   # Create the fishing fleet
   fishing_fleet_selectivity <- methods::new(LogisticSelectivity)
@@ -94,27 +81,17 @@ test_that("posterior equals prior with no data", {
   # This includes initializing logistic selectivity, observed data modules, and distribution links.
   survey_index <- em_input[["surveyB.obs"]][["survey1"]]
   survey_fleet_index <- methods::new(Index, om_input[["nyr"]])
-  purrr::walk(
-    1:om_input[["nyr"]],
-    \(x) survey_fleet_index$index_data$set(x - 1, survey_index[x])
-  )
+  survey_fleet_index$index_data[] <- survey_index
+
   survey_fleet_age_comp <- methods::new(AgeComp, om_input[["nyr"]], om_input[["nages"]])
-  purrr::walk(
-    1:(om_input[["nyr"]] * om_input[["nages"]]),
-    \(x) survey_fleet_age_comp$age_comp_data$set(
-      x - 1,
-      (c(t(em_input[["survey.age.obs"]][["survey1"]])) * em_input[["n.survey"]][["survey1"]])[x]
-    )
-  )
+  survey_fleet_age_comp$age_comp_data[]<- c(t(em_input[["survey.age.obs"]][["survey1"]]) * em_input[["n.survey"]][["survey1"]])
+
+
   survey_lengthcomp <- em_input[["survey.length.obs"]][["survey1"]]
   survey_fleet_length_comp <- methods::new(LengthComp, om_input[["nyr"]], om_input[["nlengths"]])
-  purrr::walk(
-    1:(om_input[["nyr"]] * om_input[["nlengths"]]),
-    \(x) survey_fleet_length_comp$length_comp_data$set(
-      x - 1,
-      (c(t(survey_lengthcomp)) * em_input[["n.survey.lengthcomp"]][["survey1"]])[x]
-    )
-  )
+  survey_fleet_length_comp$length_comp_data[]<- c(t(em_input[["survey.length.obs"]][["survey1"]])) * em_input[["n.survey.lengthcomp"]][["survey1"]]
+
+
   # Fleet
   # Create the survey fleet
   survey_fleet_selectivity <- methods::new(LogisticSelectivity)
@@ -189,18 +166,9 @@ test_that("posterior equals prior with no data", {
   # Growth
   ewaa_growth <- methods::new(EWAAGrowth)
   ewaa_growth$n_years$set(om_input[["nyr"]])
-  ewaa_growth$ages$resize(om_input[["nages"]])
-  purrr::walk(
-    seq_along(om_input[["ages"]]),
-    \(x) ewaa_growth$ages$set(x - 1, om_input[["ages"]][x])
-  )
-  ewaa_growth$weights$resize(om_input[["nages"]])
-  purrr::walk(
-    seq(ewaa_growth$weights$size()),
-    # Weights are only by age in the OM not by age and year. The modular math
-    # will repeat 1:n_ages over and over again for each year.
-    \(x) ewaa_growth$weights$set(x - 1, om_input[["W.mt"]][x])
-  )
+  ewaa_growth$ages[] <- om_input[["ages"]]
+  ewaa_growth$weights[] <- c(t(om_input[["W.mt"]]))
+
 
   # Maturity
   maturity <- methods::new(LogisticMaturity)
@@ -220,11 +188,7 @@ test_that("posterior equals prior with no data", {
     population$log_init_naa[i]$value <- log(om_output[["N.age"]][1, i])
   }
   population$n_ages$set(om_input[["nages"]])
-  population$ages$resize(om_input[["nages"]])
-  purrr::walk(
-    seq_along(om_input[["ages"]]),
-    \(x) population$ages$set(x - 1, om_input[["ages"]][x])
-  )
+  population$ages[] <- om_input[["ages"]]
   population$n_fleets$set(sum(om_input[["fleet_num"]], om_input[["survey_num"]]))
   population$n_years$set(om_input[["nyr"]])
   population$SetRecruitmentID(recruitment$get_id())

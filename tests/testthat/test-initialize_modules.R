@@ -552,7 +552,7 @@ test_that("`initialize_comp()` works with correct inputs", {
   )
   #' @description Test that the age-composition data in the returned object from `initialize_comp()` has the correct values.
   expect_equal(
-    result$age_comp_data$toRVector(),
+    result$age_comp_data$get_values(),
     data |>
       get_data() |>
       dplyr::filter(type == "age_comp", name == "fleet1") |>
@@ -579,7 +579,7 @@ test_that("`initialize_comp()` works with correct inputs", {
   )
   #' @description Test that the length-composition data in the returned object from `initialize_comp()` has the correct values.
   expect_equal(
-    result$length_comp_data$toRVector(),
+    result$length_comp_data$get_values(),
     data |>
       get_data() |>
       dplyr::filter(type == "length_comp", name == "fleet1") |>
