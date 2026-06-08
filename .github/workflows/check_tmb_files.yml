@@ -69,7 +69,7 @@ jobs:
           echo "config_sha=$config_sha" >> "$GITHUB_OUTPUT"
 
       - name: Create, reopen, or update RTMB tracking issue
-        uses: actions/github-script@v7
+        uses: actions/github-script@v9
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |-
