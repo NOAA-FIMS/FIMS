@@ -83,9 +83,7 @@ struct RecruitmentBase : public fims_model_object::FIMSObject<Type> {
    * @return Expected recruitment before recruitment-process deviations or
    * random effects are applied.
    */
-  virtual const Type evaluate_mean(
-      const Type &spawners,
-      const Type &phi_0) = 0;
+  virtual const Type evaluate_mean(const Type &spawners, const Type &phi_0) = 0;
 
   /** @brief Handle error in recruitment
    *
