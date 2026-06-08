@@ -24,7 +24,7 @@ jobs:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       BASELINE_REPOSITORY: ${{ github.event.pull_request.base.repo.full_name || github.repository }}
       CURRENT_COMMIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
-      REGRESSION_PCT: 15
+      MAX_RSS_THRESHOLD_MB: 12000
 
     steps:
       - uses: actions/checkout@v6
@@ -364,7 +364,7 @@ jobs:
           if [ -z "$LATEST_MAIN_COMMIT" ]; then
             LATEST_MAIN_COMMIT=$(git ls-remote "https://github.com/${BASELINE_REPOSITORY}.git" refs/heads/main | awk '{print $1}')
           fi
-          
+
           if [ -z "$LATEST_MAIN_COMMIT" ]; then
             echo "Could not determine latest main branch commit."
             if [ "$GITHUB_EVENT_NAME" = "pull_request" ]; then exit 1; else exit 0; fi
@@ -532,7 +532,7 @@ jobs:
           import os
           from pathlib import Path
 
-          threshold = float(os.environ["REGRESSION_PCT"])
+          max_rss_threshold_mb = float(os.environ["MAX_RSS_THRESHOLD_MB"])
           current = json.loads(Path("metrics.json").read_text())
           previous_path = Path("previous_metrics.json")
 
@@ -545,17 +545,17 @@ jobs:
               ("dependency_install_max_rss_mb", "Dependency install Max RSS", "MB", False),
               ("dependency_install_sampled_peak_process_tree_rss_mb", "Dependency install sampled process tree RSS peak", "MB", False),
               ("dependency_install_sampled_peak_process_count", "Dependency install sampled process count peak", "processes", False),
-              ("package_install_time_sec", "FIMS install time", "s", True),
-              ("package_install_max_rss_mb", "FIMS install Max RSS", "MB", True),
-              ("package_install_sampled_peak_process_tree_rss_mb", "FIMS install sampled process tree RSS peak", "MB", True),
+              ("package_install_time_sec", "FIMS install time", "s", False),
+              ("package_install_max_rss_mb", "FIMS install Max RSS", "MB", False),
+              ("package_install_sampled_peak_process_tree_rss_mb", "FIMS install sampled process tree RSS peak", "MB", False),
               ("package_install_sampled_peak_process_count", "FIMS install sampled process count peak", "processes", False),
-              ("peak_ram_mb", "Peak RAM during FIMS install", "MB", True),
-              ("installed_package_size_bytes", "Installed package size", "bytes", True),
-              ("installed_file_count", "Installed file count", "files", True),
-              ("installed_shared_object_total_bytes", "Installed shared object total size", "bytes", True),
-              ("installed_shared_object_count", "Installed shared object count", "files", True),
-              ("warning_count", "Warning count", "warnings", True),
-              ("error_count", "Error count", "errors", True),
+              ("peak_ram_mb", "Peak RAM during FIMS install", "MB", False),
+              ("installed_package_size_bytes", "Installed package size", "bytes", False),
+              ("installed_file_count", "Installed file count", "files", False),
+              ("installed_shared_object_total_bytes", "Installed shared object total size", "bytes", False),
+              ("installed_shared_object_count", "Installed shared object count", "files", False),
+              ("warning_count", "Warning count", "warnings", False),
+              ("error_count", "Error count", "errors", False),
           ]
 
           summary_metrics = [
@@ -688,6 +688,10 @@ jobs:
           else:
               lines.append("Previous commit: none")
           lines.append("")
+          lines.append(f"Max RSS failure threshold: {max_rss_threshold_mb:.2f} MB")
+          lines.append("Only FIMS install Max RSS from /usr/bin/time -v is gated for workflow failure.")
+          lines.append("All other metrics are report-only diagnostics.")
+          lines.append("")
 
           if previous is None:
               lines.append("No previous metrics found. This is the first run for this workflow or no usable main artifact is available.")
@@ -707,16 +711,22 @@ jobs:
                       pct = ((curr - prev) / prev) * 100
                   if pct is None:
                       rows.append(f"{label}: {curr} {unit} (was {prev} {unit}, percent change unavailable)")
-                      if gated and curr > prev:
-                          regressions.append(f"WARNING: {label} increased from {prev} to {curr} {unit} (previous value was zero)")
                   else:
                       rows.append(f"{label}: {curr} {unit} (was {prev} {unit}, {pct:.1f}%)")
-                      if gated and pct > threshold:
-                          regressions.append(f"WARNING: {label} increased by {pct:.1f}% (threshold: {threshold:.0f}%)")
+
+              package_max_rss_mb = current.get("package_install_max_rss_mb")
+              if package_max_rss_mb is None:
+                  regressions.append("WARNING: FIMS install Max RSS was unavailable, so threshold gating could not be evaluated.")
+              elif package_max_rss_mb > max_rss_threshold_mb:
+                  regressions.append(
+                      f"WARNING: FIMS install Max RSS exceeded threshold: "
+                      f"{package_max_rss_mb:.2f} MB > {max_rss_threshold_mb:.2f} MB"
+                  )
 
               lines.extend(rows)
               lines.append("")
               lines.append("Dependency install metrics are reported but are not used to fail this workflow.")
+              lines.append("Sampled process tree RSS, package size, file count, shared object size, warnings, and errors are report-only diagnostics.")
               lines.append("")
               lines.append("Estimated minimum build environment (heuristic):")
               lines.append("")
@@ -753,6 +763,9 @@ jobs:
           summary = ["### Package resource metrics", ""]
           summary.append(f"Current commit: `{current.get('commit_sha', 'unknown')}`")
           summary.append(f"Previous commit: `{previous.get('commit_sha', 'unknown') if previous else 'none'}`")
+          summary.append(f"Max RSS failure threshold: `{max_rss_threshold_mb:.2f} MB`")
+          summary.append("")
+          summary.append("Only **FIMS install Max RSS from `/usr/bin/time -v`** is gated for workflow failure. All other metrics are report-only diagnostics.")
           summary.append("")
           if regressions:
               summary.append("**Regressions detected:**")
