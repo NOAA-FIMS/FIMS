@@ -135,5 +135,5 @@ Language: en-US
 LazyData: true
 NeedsCompilation: yes
 Roxygen: list(markdown = TRUE)
-SystemRequirements: GNU make
 RoxygenNote: 7.3.3
+SystemRequirements: GNU make

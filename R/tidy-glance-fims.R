@@ -1,4 +1,3 @@
-
 #' @importFrom generics tidy
 #' @export
 generics::tidy
@@ -94,11 +93,11 @@ generics::augment
 #' @seealso [glance.FIMSFit()], [get_estimates()], [fit_fims()]
 #' @exportS3Method generics::tidy
 tidy.FIMSFit <- function(
-    x,
-    parameters = c("fixed_effects", "random_effects"),
-    conf.int   = FALSE,
-    conf.level = 0.95,
-    ...
+  x,
+  parameters = c("fixed_effects", "random_effects"),
+  conf.int = FALSE,
+  conf.level = 0.95,
+  ...
 ) {
   valid_types <- c("fixed_effects", "random_effects", "derived_quantity")
   bad <- setdiff(parameters, valid_types)
@@ -119,8 +118,10 @@ tidy.FIMSFit <- function(
   # Metadata columns to carry through (drop index columns and data columns
   # that belong in augment(), not tidy())
   meta_cols <- intersect(
-    c("module_name", "module_id", "module_type", "fleet",
-      "estimation_type", "gradient"),
+    c(
+      "module_name", "module_id", "module_type", "fleet",
+      "estimation_type", "gradient"
+    ),
     names(estimates)
   )
 
@@ -214,7 +215,7 @@ tidy.FIMSFit <- function(
 #'
 #' # Compare sensitivity runs in one table
 #' dplyr::bind_rows(
-#'   glance(age_only_fit)    |> dplyr::mutate(model = "age_only"),
+#'   glance(age_only_fit) |> dplyr::mutate(model = "age_only"),
 #'   glance(length_only_fit) |> dplyr::mutate(model = "length_only")
 #' )
 #' }
@@ -222,20 +223,20 @@ tidy.FIMSFit <- function(
 #' @seealso `tidy.FIMSFit()`, [get_estimates()], [fit_fims()]
 #' @exportS3Method generics::glance
 glance.FIMSFit <- function(x, ...) {
-  opt    <- get_opt(x)
+  opt <- get_opt(x)
   report <- get_report(x)
-  npar   <- get_number_of_parameters(x)
+  npar <- get_number_of_parameters(x)
 
   # ── parameter counts ───────────────────────────────────────────────────────
-  npar_fixed  <- as.integer(npar[["fixed_effects"]])
+  npar_fixed <- as.integer(npar[["fixed_effects"]])
   npar_random <- as.integer(npar[["random_effects"]])
 
   # ── likelihood ────────────────────────────────────────────────────────────
   # opt is an empty list when optimize = FALSE
-  optimized    <- length(opt) > 0
-  marginal_nll <- if (optimized) opt[["objective"]]     else NA_real_
-  log_lik      <- if (optimized) -marginal_nll           else NA_real_
-  total_nll    <- if (!is.null(report[["jnll"]])) report[["jnll"]] else NA_real_
+  optimized <- length(opt) > 0
+  marginal_nll <- if (optimized) opt[["objective"]] else NA_real_
+  log_lik <- if (optimized) -marginal_nll else NA_real_
+  total_nll <- if (!is.null(report[["jnll"]])) report[["jnll"]] else NA_real_
 
   # ── observations ──────────────────────────────────────────────────────────
   # Count rows that have both observed and expected values.
@@ -257,7 +258,7 @@ glance.FIMSFit <- function(x, ...) {
   }
 
   # convergence
-  max_grad  <- get_max_gradient(x)
+  max_grad <- get_max_gradient(x)
   converged <- if (optimized) {
     isTRUE(opt[["convergence"]] == 0L) && isTRUE(max_grad < 0.001)
   } else {
@@ -294,4 +295,3 @@ glance.FIMSFit <- function(x, ...) {
     runtime_secs = runtime_secs
   )
 }
-

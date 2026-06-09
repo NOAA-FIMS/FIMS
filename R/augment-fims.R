@@ -89,8 +89,10 @@ augment.FIMSFit <- function(x, include_weights = TRUE, ...) {
 
   # Core set of metadata columns to retain for grouping / filtering
   meta_cols <- intersect(
-    c("label", "module_id", "module_type", "fleet", "distribution",
-      "estimation_type", index_cols),
+    c(
+      "label", "module_id", "module_type", "fleet", "distribution",
+      "estimation_type", index_cols
+    ),
     names(fit_rows)
   )
 
@@ -187,15 +189,15 @@ augment.FIMSFit <- function(x, include_weights = TRUE, ...) {
 #' @seealso `augment.FIMSFit()`, [yardstick::metric_set()]
 #' @export
 get_fit_metrics <- function(
-    x,
-    metrics   = yardstick::metric_set(
-      yardstick::rmse,
-      yardstick::mae,
-      yardstick::rsq
-    ),
-    group_by  = NULL,
-    weighted  = FALSE,
-    ...
+  x,
+  metrics = yardstick::metric_set(
+    yardstick::rmse,
+    yardstick::mae,
+    yardstick::rsq
+  ),
+  group_by = NULL,
+  weighted = FALSE,
+  ...
 ) {
   if (!is.FIMSFit(x)) {
     cli::cli_abort("{.arg x} must be a {.cls FIMSFit} object.")
@@ -326,4 +328,3 @@ get_fit_stream <- function(x, stream_label = NULL, module_id = NULL, ...) {
   }
   aug
 }
-

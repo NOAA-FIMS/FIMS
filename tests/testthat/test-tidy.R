@@ -26,8 +26,10 @@ fit <- local({
 ## IO correctness ----
 test_that("tidy() works with correct inputs", {
   #' @description Test that generics::tidy(fit) returns a tibble with expected broom and FIMS columns.
-  expect_true(all(c("term", "estimate", "std.error", "statistic", "p.value",
-    "module_name", "module_id", "estimation_type") %in% names(generics::tidy(fit))))
+  expect_true(all(c(
+    "term", "estimate", "std.error", "statistic", "p.value",
+    "module_name", "module_id", "estimation_type"
+  ) %in% names(generics::tidy(fit))))
 
   #' @description Test that generics::tidy(fit) defaults to fixed and random effects rows only.
   expect_true(all(generics::tidy(fit)[["estimation_type"]] %in%
@@ -68,8 +70,10 @@ test_that("tidy() returns correct error messages", {
 test_that("glance() works with correct inputs", {
   #' @description Test that generics::glance(fit) returns a one-row tibble with expected columns.
   expect_equal(object = nrow(generics::glance(fit)), expected = 1L)
-  expect_true(all(c("logLik", "AIC", "BIC", "nobs", "npar_fixed",
-    "max_gradient", "converged") %in% names(generics::glance(fit))))
+  expect_true(all(c(
+    "logLik", "AIC", "BIC", "nobs", "npar_fixed",
+    "max_gradient", "converged"
+  ) %in% names(generics::glance(fit))))
 
   #' @description Test that generics::glance(fit) logLik equals negative marginal_nll.
   expect_equal(
