@@ -260,8 +260,6 @@ target_link_libraries(population_CatchAtAge_CalculateRecruitment
 
 gtest_discover_tests(population_CatchAtAge_CalculateRecruitment)
 
-gtest_discover_tests(fims_math_logit)
-
 # test_edm_delay_embedding.cpp
 add_executable(edm_delay_embedding
   test_edm_delay_embedding.cpp
@@ -273,11 +271,6 @@ target_link_libraries(edm_delay_embedding
 )
 
 gtest_discover_tests(edm_delay_embedding)
-
-# test_DoubleLogistic_DoubleLogisticSelectivity_Evaluate.cpp
-add_executable(DoubleLogistic_DoubleLogisticSelectivity_Evaluate
-  test_DoubleLogistic_DoubleLogisticSelectivity_Evaluate.cpp
-)
 
 # test_population_CatchAtAge_CalculateUnfishedInitial.cpp
 add_executable(population_CatchAtAge_CalculateUnfishedInitial
