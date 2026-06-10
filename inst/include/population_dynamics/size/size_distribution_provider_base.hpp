@@ -38,9 +38,38 @@ class SizeDistributionProviderBase {
   virtual const SizeGrid* TryGetSizeGrid() const = 0;
 
   /**
+   * @brief Configure the provider to use the canonical population size grid.
+   * @param size_grid Canonical population-level biological size grid.
+   *
+   * Providers should prepare any grid-based size products on this grid rather
+   * than creating an independent biological size definition.
+   */
+  virtual void SetPopulationSizeGrid(const SizeGrid* size_grid) = 0;
+
+  /**
+   * @brief Configure the provider dimensions for prepared size products.
+   * @param n_years Number of modeled years represented.
+   * @param n_ages Number of modeled ages represented.
+   *
+   * Providers use these dimensions together with the canonical population size
+   * grid to size any prepared population-level size products.
+   */
+  virtual void SetPopulationDimensions(std::size_t n_years,
+                                       std::size_t n_ages) = 0;
+
+  /**
    * @brief Prepare size products for the current model state.
    */
   virtual void PrepareSizeProducts() = 0;
+
+  /**
+   * @brief Invalidate any prepared size state held by this provider.
+   *
+   * This is called when upstream biological inputs or the canonical population
+   * size grid change and previously prepared size products should no longer be
+   * reused.
+   */
+  virtual void InvalidatePreparedSizeProducts() = 0;
 
   /**
    * @brief Return prepared size products without triggering preparation.

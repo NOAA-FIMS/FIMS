@@ -65,6 +65,11 @@ struct SizeBinMapping {
    * @param source_edges Source-bin edges.
    * @param destination_edges Destination-bin edges.
    * @return Matrix of weights stored as [destination_bin][source_bin].
+   *
+   * This helper performs geometric rebinning only. It requires destination
+   * support to cover source support and does not apply higher-level tail
+   * handling such as biological plus-group interpretation or observation-side
+   * compression rules.
    */
   static fims::Vector<fims::Vector<double>> BuildRebinWeights(
       const fims::Vector<double>& source_edges,
