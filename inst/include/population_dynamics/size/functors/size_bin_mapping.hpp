@@ -10,6 +10,7 @@
 #define FIMS_POPULATION_DYNAMICS_SIZE_BIN_MAPPING_HPP
 
 #include <algorithm>
+#include <stdexcept>
 
 #include "../size_grid.hpp"
 #include "../../../common/fims_vector.hpp"
@@ -41,41 +42,121 @@ struct SizeBinMapping {
   }
 
   /**
-   * @brief Map one population size bin onto all fleet observation bins.
-   * @param population_grid Population-level biological size grid.
-   * @param population_bin Index of the biological size bin.
-   * @param fleet_edges Fleet observation-bin edges.
-   * @return Vector of overlap proportions by fleet bin.
+   * @brief Check that a bin-edge vector is usable for geometric mapping.
+   * @param edges Bin edges to validate.
+   * @return True when there are at least 2 edges and they are strictly increasing.
    */
-  static fims::Vector<double> MapPopulationBinToFleetBins(
-      const SizeGrid& population_grid,
-      std::size_t population_bin,
-      const fims::Vector<double>& fleet_edges) {
-    fims::Vector<double> proportions;
-
-    if (!population_grid.IsConsistent() || fleet_edges.size() < 2 ||
-        population_bin >= population_grid.n_bins) {
-      return proportions;
+  static bool HasStrictlyIncreasingEdges(const fims::Vector<double>& edges) {
+    if (edges.size() < 2) {
+      return false;
     }
 
-    const double left = population_grid.edges[population_bin];
-    const double right = population_grid.edges[population_bin + 1];
-    const double width = right - left;
-
-    proportions.resize(fleet_edges.size() - 1);
-
-    if (width <= 0.0) {
-      return proportions;
+    for (std::size_t i = 0; i + 1 < edges.size(); ++i) {
+      if (!(edges[i + 1] > edges[i])) {
+        return false;
+      }
     }
 
-    for (std::size_t i = 0; i + 1 < fleet_edges.size(); ++i) {
-      const double overlap =
-          OverlapWidth(left, right, fleet_edges[i], fleet_edges[i + 1]);
-      proportions[i] = overlap / width;
-    }
-
-    return proportions;
+    return true;
   }
+
+  /**
+   * @brief Build overlap-based rebinning weights from source bins to destination bins.
+   * @param source_edges Source-bin edges.
+   * @param destination_edges Destination-bin edges.
+   * @return Matrix of weights stored as [destination_bin][source_bin].
+   */
+  static fims::Vector<fims::Vector<double>> BuildRebinWeights(
+      const fims::Vector<double>& source_edges,
+      const fims::Vector<double>& destination_edges) {
+    if (!HasStrictlyIncreasingEdges(source_edges) ||
+        !HasStrictlyIncreasingEdges(destination_edges)) {
+      throw std::runtime_error(
+          "SizeBinMapping requires strictly increasing source and "
+          "destination edges");
+    }
+
+    if (!DestinationCoversSourceRange(source_edges, destination_edges)) {
+      throw std::runtime_error(
+          "SizeBinMapping requires destination edges to cover the full "
+          "source-bin range");
+    }
+
+    const std::size_t n_source_bins = source_edges.size() - 1;
+    const std::size_t n_destination_bins = destination_edges.size() - 1;
+
+    fims::Vector<fims::Vector<double>> weights;
+    weights.resize(n_destination_bins);
+
+    for (std::size_t i = 0; i < n_destination_bins; ++i) {
+      weights[i].resize(n_source_bins);
+
+      for (std::size_t j = 0; j < n_source_bins; ++j) {
+        const double source_left = source_edges[j];
+        const double source_right = source_edges[j + 1];
+        const double destination_left = destination_edges[i];
+        const double destination_right = destination_edges[i + 1];
+        const double source_width = source_right - source_left;
+        const double overlap = OverlapWidth(source_left, source_right,
+                                            destination_left, destination_right);
+
+        weights[i][j] = source_width > 0.0 ? overlap / source_width : 0.0;
+      }
+    }
+
+    return weights;
+  }
+
+  /**
+   * @brief Check that the destination edges fully cover the source-bin range.
+   * @param source_edges Source-bin edges.
+   * @param destination_edges Destination-bin edges.
+   * @return True when the destination range contains the full source range.
+   */
+  static bool DestinationCoversSourceRange(
+      const fims::Vector<double>& source_edges,
+      const fims::Vector<double>& destination_edges) {
+    if (!HasStrictlyIncreasingEdges(source_edges) ||
+        !HasStrictlyIncreasingEdges(destination_edges)) {
+      return false;
+    }
+
+    return destination_edges[0] <= source_edges[0] &&
+           destination_edges[destination_edges.size() - 1] >=
+               source_edges[source_edges.size() - 1];
+  }
+
+  /**
+   * @brief Apply rebinning weights to a source mass vector.
+   * @param weights Overlap weights stored as [destination_bin][source_bin].
+   * @param source_mass Mass on the source bins.
+   * @return Rebinned mass on the destination bins.
+   */
+  template <typename Type>
+  static fims::Vector<Type> ApplyRebinWeights(
+      const fims::Vector<fims::Vector<double>>& weights,
+      const fims::Vector<Type>& source_mass) {
+    fims::Vector<Type> destination_mass;
+    destination_mass.resize(weights.size());
+
+    for (std::size_t i = 0; i < weights.size(); ++i) {
+      Type total = Type(0.0);
+
+      if (weights[i].size() != source_mass.size()) {
+        throw std::runtime_error(
+            "SizeBinMapping weight rows must match source mass length");
+      }
+
+      for (std::size_t j = 0; j < source_mass.size(); ++j) {
+        total += source_mass[j] * weights[i][j];
+      }
+
+      destination_mass[i] = total;
+    }
+
+    return destination_mass;
+  }
+
 };
 
 }  // namespace fims_popdy
