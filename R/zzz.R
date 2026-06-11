@@ -304,16 +304,21 @@ methods::setMethod(
   function(e1, e2) {
     if (e1$size() != length(e2)) {
       if (length(e2) == 1) {
-        ret <- methods::new(RealVector, e1$size())
-        ret$set_values(rep(e2, e1$size()))
-
-        return(ret)
+        result <- methods::callGeneric(e1$get_values(), e2)
+      } else {
+        stop("Call to Ops, vectors not equal length")
       }
-      stop("Call to Ops, vectors not equal length")
+    } else {
+      result <- methods::callGeneric(e1$get_values(), e2)
     }
-    ret <- methods::new(RealVector, e1$size())
-    ret$set_values(e2)
-    return(ret)
+
+    if (.Generic %in% c("+", "-", "*", "/", "^", "%%", "%/%")) {
+      ret <- methods::new(RealVector, length(result))
+      ret$set_values(result)
+      return(ret)
+    }
+
+    return(result)
   }
 )
 

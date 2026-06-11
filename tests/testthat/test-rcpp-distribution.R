@@ -390,7 +390,7 @@ test_that("rcpp distribution returns correct error messages", {
   dmultinom_$dims$resize(2)
   dmultinom_$dims$set(0, 1)
   dmultinom_$dims$set(1, 10)
-  dmultinom_$expected_values[] <- rep(log(1), length(p))
+  dmultinom_$expected_values[] <- p
 
   dmultinom_$observed_values[] <- x_values
 
@@ -411,7 +411,7 @@ test_that("rcpp distribution returns correct error messages", {
   dmultinom_$dims$resize(2)
   dmultinom_$dims$set(0, 1)
   dmultinom_$dims$set(1, 9)
-  dmultinom_$expected_values[] <- rep(log(1), length(p))
+  dmultinom_$expected_values[] <- p
   dmultinom_$observed_values[] <- x_values[1:9]
 
   #' @description dmultinom should error out when there is a dimension mismatch.
