@@ -1,20 +1,3 @@
-# To remove the NOTE
-# no visible binding for global variable
-utils::globalVariables(c(
-  "parameter_id", "module_name", "module_id", "label",
-  "estimate", "estimate.x", "estimate.y",
-  "initial", "initial.x", "initial.y",
-  "derived_quantity_id",
-  "distribution", "gradient",
-  "log_like_cv",
-  "module_type", "n", "type_id", "values",
-  "module_name.x", "module_name.y",
-  "module_id.x", "module_id.y",
-  "module_id_init",
-  "module_type.x", "module_type.y",
-  "unique_id"
-))
-
 # Developers: ----
 
 # This file defines the parent class of FIMSFit and its potential children. The
@@ -230,14 +213,14 @@ methods::setMethod(
   function(x) {
     # Helper function
     add_unique_id <- function(data) {
-      dplyr::group_by(data, label) |>
+      dplyr::group_by(data, .data$label) |>
         dplyr::mutate(
           unique_id = paste(
-            label,
+            .data$label,
             dplyr::if_else(
-              is.na(parameter_id),
+              is.na(.data$parameter_id),
               seq_len(dplyr::n()),
-              parameter_id
+              .data$parameter_id
             ),
             sep = "_"
           )
@@ -274,11 +257,11 @@ methods::setMethod(
       # There are more rows in json_estimates than tmb_estimates
       x = json_output,
       y = tmb_output |>
-        dplyr::select(unique_id, uncertainty, log_like_cv, gradient),
+        dplyr::select(dplyr::all_of(c("unique_id", "uncertainty", "log_like_cv", "gradient"))),
       by = c("unique_id")
     ) |>
-      dplyr::select(-unique_id) |>
-      dplyr::relocate(uncertainty, .after = estimation_type)
+      dplyr::select(-dplyr::all_of("unique_id")) |>
+      dplyr::relocate(dplyr::all_of("uncertainty"), .after = dplyr::all_of("estimation_type"))
   }
 )
 

@@ -42,7 +42,7 @@
 #' @export SharedString
 #' @import methods
 #' @import stats
-#' @importFrom ggplot2 .data
+#' @importFrom rlang .data
 #' @importFrom rlang :=
 #' @importFrom TMB MakeADFun
 #' @useDynLib FIMS, .registration = TRUE
