@@ -10,7 +10,7 @@
 #define FIMS_POPULATION_DYNAMICS_SIZE_DISTRIBUTION_PROVIDER_BASE_HPP
 
 #include "size_grid.hpp"
-#include "size_products.hpp"
+
 
 namespace fims_popdy {
 
@@ -72,10 +72,31 @@ class SizeDistributionProviderBase {
   virtual void InvalidatePreparedSizeProducts() = 0;
 
   /**
-   * @brief Return prepared size products without triggering preparation.
-   * @return Pointer to prepared size products, or nullptr if unavailable.
+   * @brief Read prepared mean length-at-age.
+   * @param y Year index.
+   * @param a Age index.
+   * @return Read-only mean length-at-age value.
    */
-  virtual const SizeProducts<Type>* TryGetPreparedSizeProducts() const = 0;
+  virtual const Type& MeanLAA(std::size_t y, std::size_t a) const = 0;
+
+  /**
+   * @brief Read prepared spread of length-at-age.
+   * @param y Year index.
+   * @param a Age index.
+   * @return Read-only spread of length-at-age value.
+   */
+  virtual const Type& SdLAA(std::size_t y, std::size_t a) const = 0;
+
+  /**
+   * @brief Read prepared age-to-size probability on the population grid.
+   * @param y Year index.
+   * @param a Age index.
+   * @param l Size-bin index.
+   * @return Read-only age-to-size probability value.
+   */
+  virtual const Type& ProbSize(std::size_t y,
+                               std::size_t a,
+                               std::size_t l) const = 0;
 };
 
 }  // namespace fims_popdy

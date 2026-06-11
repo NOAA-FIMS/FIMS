@@ -1,7 +1,7 @@
 /**
  * @file size_products.hpp
- * @brief Defines the SizeProducts container for prepared population-level size
- * outputs.
+ * @brief Defines the SizeProducts container for cached population-level size
+ * outputs on the biological size grid.
  * @copyright This file is part of the NOAA, National Marine Fisheries Service
  * Fisheries Integrated Modeling System project. See LICENSE in the source
  * folder for reuse information.
@@ -9,16 +9,19 @@
 #ifndef FIMS_POPULATION_DYNAMICS_SIZE_PRODUCTS_HPP
 #define FIMS_POPULATION_DYNAMICS_SIZE_PRODUCTS_HPP
 
+#include <cstddef>
+
 #include "../../common/fims_vector.hpp"
 
 namespace fims_popdy {
 
 /**
- * @brief Prepared population-level size products on a biological size grid.
+ * @brief Cached population-level size outputs on a biological size grid.
  *
- * This container stores cached size-related outputs for a pooled population,
- * including mean length-at-age, spread-at-age, and age-to-size probabilities
- * on the internal biological size grid.
+ * This container can be used by a size provider to store prepared size-related
+ * outputs for a pooled population, including mean length-at-age,
+ * spread-at-age, and age-to-size probabilities on the internal biological
+ * size grid.
  *
  * @tparam Type Numeric type used for cached values.
  */
