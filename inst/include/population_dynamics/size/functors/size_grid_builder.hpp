@@ -70,12 +70,21 @@ struct SizeGridBuilder {
     }
 
     fims::Vector<double> edges;
-    double edge = lower_edge;
-    edges.emplace_back(edge);
+    edges.emplace_back(lower_edge);
 
-    while (edge + bin_width < upper_edge) {
-      edge += bin_width;
-      edges.emplace_back(edge);
+    const double span = upper_edge - lower_edge;
+    const double tolerance = 1e-12 * (span > 1.0 ? span : 1.0);
+
+    std::size_t bin_index = 1;
+    while (true) {
+      const double next_edge = lower_edge + bin_index * bin_width;
+
+      if (next_edge >= upper_edge - tolerance) {
+        break;
+      }
+
+      edges.emplace_back(next_edge);
+      ++bin_index;
     }
 
     edges.emplace_back(upper_edge);
