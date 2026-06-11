@@ -1,14 +1,3 @@
-# To remove the WARNING
-# no visible binding for global variable
-utils::globalVariables(c(
-  "distribution_type",
-  "fleet_name",
-  "type", "name", "value", "unit", "uncertainty",
-  "timing", "age", "length", "year",
-  "temp_name",
-  "valid_n"
-))
-
 #' Initialize a generic module
 #'
 #' @description
@@ -27,11 +16,11 @@ utils::globalVariables(c(
 initialize_module <- function(parameters, data, module_name, fleet_name = NA_character_) {
   module_input <- parameters |>
     # Using !! to unquote the variables
-    dplyr::filter(module_name == !!module_name)
+    dplyr::filter(.data$module_name == !!module_name)
 
   if (!is.na(fleet_name)) {
     module_input <- module_input |>
-      dplyr::filter(fleet_name == !!fleet_name)
+      dplyr::filter(.data$fleet_name == !!fleet_name)
   }
 
   module_class_name <- module_input |>
@@ -39,11 +28,11 @@ initialize_module <- function(parameters, data, module_name, fleet_name = NA_cha
     dplyr::mutate(
       temp_name = paste0(
         # Replace NAs with ""
-        dplyr::coalesce(module_type, ""),
-        dplyr::coalesce(module_name, "")
+        dplyr::coalesce(.data$module_type, ""),
+        dplyr::coalesce(.data$module_name, "")
       )
     ) |>
-    dplyr::pull(temp_name) |>
+    dplyr::pull(.data$temp_name) |>
     unique()
   module_class <- get(module_class_name)
   module_fields <- names(module_class@fields)
@@ -61,7 +50,7 @@ initialize_module <- function(parameters, data, module_name, fleet_name = NA_cha
     maybe_remove <- c("log_r", "log_devs")
 
     models_pars <- parameters |>
-      dplyr::pull(label) |>
+      dplyr::pull(.data$label) |>
       unique() |>
       na.omit()
 
@@ -99,13 +88,13 @@ initialize_module <- function(parameters, data, module_name, fleet_name = NA_cha
     ))
 
     fleet_types <- get_data(data) |>
-      dplyr::filter(name == fleet_name) |>
-      dplyr::pull(type) |>
+      dplyr::filter(.data$name == fleet_name) |>
+      dplyr::pull(.data$type) |>
       unique()
 
     data_distribution_names_for_fleet_i <- parameters |>
-      dplyr::filter(fleet_name == !!fleet_name & distribution_type == "Data") |>
-      dplyr::pull(module_type)
+      dplyr::filter(.data$fleet_name == !!fleet_name & .data$distribution_type == "Data") |>
+      dplyr::pull(.data$module_type)
     if ("age_to_length_conversion" %in% get_data(data)[["type"]] &&
       "LengthComp" %in% data_distribution_names_for_fleet_i) {
       age_to_length_conversion_value <- model_age_to_length_conversion(data)
@@ -159,8 +148,8 @@ initialize_module <- function(parameters, data, module_name, fleet_name = NA_cha
         switch(field,
           "n_ages" = get_n_ages(data),
           "n_fleets" = parameters |>
-            dplyr::filter(module_name == "Fleet") |>
-            dplyr::pull(fleet_name) |>
+            dplyr::filter(.data$module_name == "Fleet") |>
+            dplyr::pull(.data$fleet_name) |>
             unique() |>
             length(),
           # Or we can use get_n_fleets(data),
@@ -343,14 +332,14 @@ initialize_fleet <- function(parameters, data, fleet_name, linked_ids) {
   module$SetSelectivityID(linked_ids[["selectivity"]])
 
   fleet_types <- get_data(data) |>
-    dplyr::filter(name == fleet_name) |>
-    dplyr::pull(type) |>
+    dplyr::filter(.data$name == fleet_name) |>
+    dplyr::pull(.data$type) |>
     unique()
 
 
   distribution_names_for_fleet <- parameters |>
-    dplyr::filter(fleet_name == !!fleet_name & distribution_type == "Data") |>
-    dplyr::pull(module_type)
+    dplyr::filter(.data$fleet_name == !!fleet_name & .data$distribution_type == "Data") |>
+    dplyr::pull(.data$module_type)
 
   # Link the observed landings data to the fleet module using its associated ID
   # if the data type includes "landings" and if "Landings" exists in the
@@ -405,10 +394,10 @@ initialize_landings <- function(data, fleet_name) {
 
   fleet_type <- dplyr::filter(
     .data = as.data.frame(get_data(data)),
-    name == fleet_name
+    .data$name == fleet_name
   ) |>
-    dplyr::distinct(type) |>
-    dplyr::pull(type)
+    dplyr::distinct(.data$type) |>
+    dplyr::pull(.data$type)
 
   if ("landings" %in% fleet_type) {
     module <- methods::new(Landings, get_n_years(data))
@@ -439,10 +428,10 @@ initialize_index <- function(data, fleet_name) {
 
   fleet_type <- dplyr::filter(
     .data = as.data.frame(get_data(data)),
-    name == fleet_name
+    .data$name == fleet_name
   ) |>
-    dplyr::distinct(type) |>
-    dplyr::pull(type)
+    dplyr::distinct(.data$type) |>
+    dplyr::pull(.data$type)
 
   if ("index" %in% fleet_type) {
     module <- methods::new(Index, get_n_years(data))
@@ -524,23 +513,23 @@ initialize_comp <- function(data,
   model_data <- comp_data *
     get_data(data) |>
       dplyr::filter(
-        name == fleet_name,
-        type == comp[["name"]]
+        .data$name == fleet_name,
+        .data$type == comp[["name"]]
       ) |>
       dplyr::mutate(
-        valid_n = ifelse(value == -999, 1, uncertainty)
+        valid_n = ifelse(.data$value == -999, 1, .data$uncertainty)
       ) |>
-      dplyr::pull(valid_n)
+      dplyr::pull(.data$valid_n)
 
   if (length(model_data) != get_n_years(data) * get_function(data)) {
     bad_data_years <- get_data(data) |>
       dplyr::filter(
-        name == fleet_name,
-        type == comp[["name"]]
+        .data$name == fleet_name,
+        .data$type == comp[["name"]]
       ) |>
-      dplyr::count(timing) |>
-      dplyr::filter(n != get_function(data)) |>
-      dplyr::pull(timing)
+      dplyr::count(.data$timing) |>
+      dplyr::filter(.data$n != get_function(data)) |>
+      dplyr::pull(.data$timing)
 
     cli::cli_abort(c(
       "The length of the `{comp[['name']]}`-composition data for fleet
@@ -626,8 +615,8 @@ initialize_fims <- function(parameters, data) {
   #
   valid_estimation_types <- c("constant", "fixed_effects", "random_effects")
   invalid_estimation_types <- parameters |>
-    dplyr::filter(!estimation_type %in% valid_estimation_types) |>
-    dplyr::pull(estimation_type) |>
+    dplyr::filter(!.data$estimation_type %in% valid_estimation_types) |>
+    dplyr::pull(.data$estimation_type) |>
     unique() |>
     na.omit()
 
@@ -642,7 +631,7 @@ initialize_fims <- function(parameters, data) {
   clear()
 
   fleet_names <- parameters |>
-    dplyr::pull(fleet_name) |>
+    dplyr::pull(.data$fleet_name) |>
     unique() |>
     na.omit()
 
@@ -672,13 +661,13 @@ initialize_fims <- function(parameters, data) {
     )
 
     fleet_types <- get_data(data) |>
-      dplyr::filter(name == fleet_names[i]) |>
-      dplyr::pull(type) |>
+      dplyr::filter(.data$name == fleet_names[i]) |>
+      dplyr::pull(.data$type) |>
       unique()
 
     data_distribution_names_for_fleet_i <- parameters |>
-      dplyr::filter(fleet_name == fleet_names[i] & distribution_type == "Data") |>
-      dplyr::pull(module_type)
+      dplyr::filter(.data$fleet_name == fleet_names[i] & .data$distribution_type == "Data") |>
+      dplyr::pull(.data$module_type)
 
     # Initialize landings module if the data type includes "landings" and
     # if "Landings" exists in the data distribution specification
@@ -760,10 +749,10 @@ initialize_fims <- function(parameters, data) {
     )
 
     fleet_sd_input <- parameters |>
-      dplyr::filter(fleet_name == fleet_names[i] & label == "log_sd") |>
+      dplyr::filter(.data$fleet_name == fleet_names[i] & .data$label == "log_sd") |>
       dplyr::mutate(
         label = "sd",
-        value = exp(value)
+        value = exp(.data$value)
       )
 
     if (length(fleet_sd_input) == 0) {
@@ -829,12 +818,12 @@ initialize_fims <- function(parameters, data) {
   )
 
   recruitment_process_input <- parameters |>
-    dplyr::filter(module_name == "Recruitment" & distribution_type == "process" & !is.na(distribution))
+    dplyr::filter(.data$module_name == "Recruitment" & .data$distribution_type == "process" & !is.na(.data$distribution))
   if (recruitment_process_input |> nrow() == 0) {
     process_par <- parameters |>
-      dplyr::filter(module_name == "Recruitment" & (label == "log_devs" | label == "log_r"))
+      dplyr::filter(.data$module_name == "Recruitment" & (.data$label == "log_devs" | .data$label == "log_r"))
     process_par_name <- process_par |>
-      dplyr::pull(label) |>
+      dplyr::pull(.data$label) |>
       unique()
     if (any(process_par[["estimation_type"]] != "constant")) {
       cli::cli_abort(c(
@@ -858,8 +847,8 @@ initialize_fims <- function(parameters, data) {
     )
   } else {
     par <- recruitment_process_input |>
-      dplyr::filter(label != "log_sd") |>
-      dplyr::pull(label) |>
+      dplyr::filter(.data$label != "log_sd") |>
+      dplyr::pull(.data$label) |>
       unique()
 
     if (length(par) == 0) {
@@ -879,8 +868,8 @@ initialize_fims <- function(parameters, data) {
       ))
     }
 
-    if (any(recruitment_process_input |> dplyr::filter(label != "log_sd") |>
-      dplyr::pull(estimation_type) == "constant")) {
+    if (any(recruitment_process_input |> dplyr::filter(.data$label != "log_sd") |>
+      dplyr::pull(.data$estimation_type) == "constant")) {
       cli::cli_abort(c(
         x = "Missing required inputs for recruitment process random or
         fixed effects.",
@@ -899,10 +888,10 @@ initialize_fims <- function(parameters, data) {
 
     # Initialize_process_distribution
     sd_input <- recruitment_process_input |>
-      dplyr::filter(label == "log_sd") |>
+      dplyr::filter(.data$label == "log_sd") |>
       dplyr::mutate(
         label = "sd",
-        value = exp(value)
+        value = exp(.data$value)
       )
     recruitment_distribution <- initialize_process_distribution(
       module = recruitment,
@@ -1005,12 +994,12 @@ set_param_vector <- function(field, module, module_input, module_class_name) {
 
   # Extract the value of the parameter vector
   field_value <- module_input |>
-    dplyr::filter(label == field) |>
-    dplyr::pull(value)
+    dplyr::filter(.data$label == field) |>
+    dplyr::pull(.data$value)
 
   field_estimation_type <- module_input |>
-    dplyr::filter(label == field) |>
-    dplyr::pull(estimation_type)
+    dplyr::filter(.data$label == field) |>
+    dplyr::pull(.data$estimation_type)
 
   # Check if both value and estimation information are present
   if (length(field_value) == 0 || length(field_estimation_type) == 0) {
