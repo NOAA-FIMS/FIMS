@@ -70,90 +70,113 @@ struct SizeProducts {
   }
 
   /**
+   * @brief Resize only the cached age-to-size probability array.
+   * @param years Number of modeled years.
+   * @param ages Number of modeled ages.
+   * @param size_bins Number of biological size bins.
+   *
+   * This is used by providers that read MeanLAA and SdLAA from upstream growth
+   * products and only own ProbSize locally.
+   */
+  void ResizeProbSizeOnly(std::size_t years,
+                          std::size_t ages,
+                          std::size_t size_bins) {
+    n_years = years;
+    n_ages = ages;
+    n_size_bins = size_bins;
+
+    mean_LAA.clear();
+    sd_LAA.clear();
+
+    const std::size_t n_prob = n_years * n_ages * n_size_bins;
+    prob_size.resize(n_prob);
+  }
+
+  /**
    * @brief Return the flattened index for year-age products.
-   * @param y Year index.
-   * @param a Age index.
+   * @param year_index Year index.
+   * @param age_index Age index.
    * @return Flattened year-age index.
    */
-  inline std::size_t AgeYearIndex(std::size_t y, std::size_t a) const {
-    return y * n_ages + a;
+  inline std::size_t AgeYearIndex(std::size_t year_index, std::size_t age_index) const {
+    return year_index * n_ages + age_index;
   }
 
   /**
    * @brief Return the flattened index for year-age-size-bin probabilities.
-   * @param y Year index.
-   * @param a Age index.
-   * @param l Size-bin index.
+   * @param year_index Year index.
+   * @param age_index Age index.
+   * @param size_bin_index Size-bin index.
    * @return Flattened year-age-size-bin index.
    */
-  inline std::size_t AgeYearSizeIndex(std::size_t y,
-                                      std::size_t a,
-                                      std::size_t l) const {
-    return y * (n_ages * n_size_bins) + a * n_size_bins + l;
+  inline std::size_t AgeYearSizeIndex(std::size_t year_index,
+                                      std::size_t age_index,
+                                      std::size_t size_bin_index) const {
+    return year_index * (n_ages * n_size_bins) + age_index * n_size_bins + size_bin_index;
   }
 
   /**
    * @brief Access mean length-at-age.
-   * @param y Year index.
-   * @param a Age index.
+   * @param year_index Year index.
+   * @param age_index Age index.
    * @return Reference to mean length-at-age.
    */
-  inline Type& MeanLAA(std::size_t y, std::size_t a) {
-    return mean_LAA[AgeYearIndex(y, a)];
+  inline Type& MeanLAA(std::size_t year_index, std::size_t age_index) {
+    return mean_LAA[AgeYearIndex(year_index, age_index)];
   }
 
   /**
    * @brief Access spread of length-at-age.
-   * @param y Year index.
-   * @param a Age index.
+   * @param year_index Year index.
+   * @param age_index Age index.
    * @return Reference to spread of length-at-age.
    */
-  inline Type& SdLAA(std::size_t y, std::size_t a) {
-    return sd_LAA[AgeYearIndex(y, a)];
+  inline Type& SdLAA(std::size_t year_index, std::size_t age_index) {
+    return sd_LAA[AgeYearIndex(year_index, age_index)];
   }
 
   /**
    * @brief Access age-to-size probability.
-   * @param y Year index.
-   * @param a Age index.
-   * @param l Size-bin index.
+   * @param year_index Year index.
+   * @param age_index Age index.
+   * @param size_bin_index Size-bin index.
    * @return Reference to age-to-size probability.
    */
-  inline Type& ProbSize(std::size_t y, std::size_t a, std::size_t l) {
-    return prob_size[AgeYearSizeIndex(y, a, l)];
+  inline Type& ProbSize(std::size_t year_index, std::size_t age_index, std::size_t size_bin_index) {
+    return prob_size[AgeYearSizeIndex(year_index, age_index, size_bin_index)];
   }
 
   /**
    * @brief Read mean length-at-age.
-   * @param y Year index.
-   * @param a Age index.
+   * @param year_index Year index.
+   * @param age_index Age index.
    * @return Const reference to mean length-at-age.
    */
-  inline const Type& MeanLAA(std::size_t y, std::size_t a) const {
-    return mean_LAA[AgeYearIndex(y, a)];
+  inline const Type& MeanLAA(std::size_t year_index, std::size_t age_index) const {
+    return mean_LAA[AgeYearIndex(year_index, age_index)];
   }
 
   /**
    * @brief Read spread of length-at-age.
-   * @param y Year index.
-   * @param a Age index.
+   * @param year_index Year index.
+   * @param age_index Age index.
    * @return Const reference to spread of length-at-age.
    */
-  inline const Type& SdLAA(std::size_t y, std::size_t a) const {
-    return sd_LAA[AgeYearIndex(y, a)];
+  inline const Type& SdLAA(std::size_t year_index, std::size_t age_index) const {
+    return sd_LAA[AgeYearIndex(year_index, age_index)];
   }
 
   /**
    * @brief Read age-to-size probability.
-   * @param y Year index.
-   * @param a Age index.
-   * @param l Size-bin index.
+   * @param year_index Year index.
+   * @param age_index Age index.
+   * @param size_bin_index Size-bin index.
    * @return Const reference to age-to-size probability.
    */
-  inline const Type& ProbSize(std::size_t y,
-                              std::size_t a,
-                              std::size_t l) const {
-    return prob_size[AgeYearSizeIndex(y, a, l)];
+  inline const Type& ProbSize(std::size_t year_index,
+                              std::size_t age_index,
+                              std::size_t size_bin_index) const {
+    return prob_size[AgeYearSizeIndex(year_index, age_index, size_bin_index)];
   }
 };
 
