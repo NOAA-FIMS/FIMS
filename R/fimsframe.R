@@ -1,9 +1,3 @@
-# To remove the NOTE
-# no visible binding for global variable
-utils::globalVariables(c(
-  "name", "timing", "value"
-))
-
 # Developers: ----
 
 # This file defines the parent class FIMSFrame and its potential children. The
@@ -54,6 +48,8 @@ utils::globalVariables(c(
 # Classes are not currently exported, and therefore, do not need documentation.
 # See the following link if we do want to document them in the future:
 # https://stackoverflow.com/questions/7368262/how-to-properly-document-s4-class-slots-using-roxygen2
+
+methods::setOldClass(c("tbl_df", "tbl", "data.frame"))
 
 methods::setClass(
   Class = "FIMSFrame",
@@ -497,7 +493,7 @@ methods::setMethod(
         )
     }
     # Create time-series vector if only available by age
-    n_rows <- NROW(dplyr::filter(model_data, value != -999))
+    n_rows <- NROW(dplyr::filter(model_data, .data$value != -999))
     n_rows_needed <- get_n_ages(x) * (get_n_years(x) + 1)
     if (n_rows < n_rows_needed) {
       if (n_rows == get_n_ages(x)) {
@@ -506,7 +502,7 @@ methods::setMethod(
             # Adds a year for terminal year + 1 because to calculate
             # spawning biomass after fishing in terminal year
             get_n_years(x) + 1,
-            dplyr::filter(model_data, value != -999),
+            dplyr::filter(model_data, .data$value != -999),
             simplify = FALSE
           )
         )
@@ -613,20 +609,20 @@ methods::setMethod(
   definition = function(x, y, ...) {
     data_for_plot <- get_data(x) |>
       dplyr::mutate(
-        type = gsub("_", " ", type)
+        type = gsub("_", " ", .data$type)
       ) |>
-      dplyr::group_by(name, timing, type) |>
-      dplyr::filter(value != -999) |>
+      dplyr::group_by(.data$name, .data$timing, .data$type) |>
+      dplyr::filter(.data$value != -999) |>
       dplyr::summarize(
         no = dplyr::n()
       ) |>
-      dplyr::filter(no > 0)
+      dplyr::filter(.data$no > 0)
     ggplot2::ggplot(
       data = data_for_plot,
       mapping = ggplot2::aes(
-        x = timing,
-        y = name,
-        col = name
+        x = .data$timing,
+        y = .data$name,
+        col = .data$name
       )
     ) +
       ggplot2::facet_wrap(
@@ -700,8 +696,8 @@ methods::setValidity(
     # Ensure composition data sum to 1.0 per group if units are proportions
     for (present_type in grep("_comp", present_types, value = TRUE)) {
       test <- object@data |>
-        dplyr::filter(type == present_type, value != -999) |>
-        dplyr::group_by(name, timing, .drop = FALSE) |>
+        dplyr::filter(.data$type == present_type, .data$value != -999) |>
+        dplyr::group_by(.data$name, .data$timing, .drop = FALSE) |>
         dplyr::group_map(.keep = TRUE, \(.x, .y) {
           validate_composition_data(.x)
         })
@@ -785,7 +781,7 @@ validate_composition_data <- function(data) {
 }
 
 validate_dimension_of_conversion <- function(data, n_groups, n_timings) {
-  good_data <- dplyr::filter(data, value != -999)
+  good_data <- dplyr::filter(data, .data$value != -999)
   good_type <- unique(data[["type"]])
   if (length(good_type) > 1) {
     cli::cli_abort("Only one type of data can exist in {.var data}.")
@@ -903,7 +899,7 @@ FIMSFrame <- function(data) {
     )
   }
   # TODO: Change this check when internal estimation of growth is possible
-  if (NROW(dplyr::filter(data, type == "weight_at_age")) == 0) {
+  if (NROW(dplyr::filter(data, .data$type == "weight_at_age")) == 0) {
     cli::cli_abort("{.var data} must contain {.var weight_at_age} data.")
   }
   if (!all(is.numeric(data[["timing"]]))) {
@@ -919,9 +915,9 @@ FIMSFrame <- function(data) {
   # Get the earliest and latest year formatted as integers
   data_to_use_4_timing <- dplyr::filter(
     data,
-    !type %in% c("age_to_length_conversion", "weight_at_age")
+    !.data$type %in% c("age_to_length_conversion", "weight_at_age")
   ) |>
-    dplyr::pull(timing)
+    dplyr::pull(.data$timing)
   start_year <- as.integer(floor(min(data_to_use_4_timing, na.rm = TRUE)))
   end_year <- as.integer(floor(max(data_to_use_4_timing, na.rm = TRUE)))
   n_years <- as.integer(end_year - start_year + 1)
@@ -951,7 +947,7 @@ FIMSFrame <- function(data) {
         )
       }
       data_for_age_calculations <- dplyr::filter(
-        data, type %in% c("age_comp", "weight_at_age")
+        data, .data$type %in% c("age_comp", "weight_at_age")
       )
       ages <- min(
         data_for_age_calculations[["age"]],
@@ -970,7 +966,7 @@ FIMSFrame <- function(data) {
     if (all(is.na(data[["length"]]))) {
       lengths <- numeric()
     } else {
-      data_for_length_calculations <- dplyr::filter(data, type == "length_comp")
+      data_for_length_calculations <- dplyr::filter(data, .data$type == "length_comp")
       lengths <- sort(na.omit(
         unique(data_for_length_calculations[["length"]])
       ))
@@ -984,7 +980,7 @@ FIMSFrame <- function(data) {
       }
       # Check that age_to_length_conversion data exist once
       validate_dimension_of_conversion(
-        dplyr::filter(data, type == "age_to_length_conversion"),
+        dplyr::filter(data, .data$type == "age_to_length_conversion"),
         n_groups = n_ages * length(lengths),
         n_timings = 1
       )
@@ -996,8 +992,8 @@ FIMSFrame <- function(data) {
 
   # Check that full dimension information is available for weight_at_age
   dplyr::group_by(
-    dplyr::filter(data, type == "weight_at_age"),
-    name
+    dplyr::filter(data, .data$type == "weight_at_age"),
+    .data$name
   ) |>
     dplyr::group_split() |>
     purrr::walk(
@@ -1010,7 +1006,7 @@ FIMSFrame <- function(data) {
   # order so that getting information out with model_*() are correct.
   formatted_data <- data |>
     dplyr::filter(
-      timing >= start_year | is.na(timing)
+      .data$timing >= start_year | is.na(.data$timing)
     ) |>
     tibble::as_tibble()
   missing_time_series <- create_missing_data(
@@ -1022,14 +1018,14 @@ FIMSFrame <- function(data) {
       data = formatted_data,
       bins = ages,
       timings = years,
-      column = age,
+      column = "age",
       types = c("weight_at_age", "age_comp")
     )
-    summary_by_name <- dplyr::count(missing_ages, name, timing) |>
-      dplyr::filter(n != n_ages) |>
+    summary_by_name <- dplyr::count(missing_ages, .data$name, .data$timing) |>
+      dplyr::filter(.data$n != n_ages) |>
       dplyr::summarize(
-        timings = paste(timing, collapse = ", "),
-        .by = name
+        timings = paste(.data$timing, collapse = ", "),
+        .by = .data$name
       )
     if (NROW(summary_by_name) > 0) {
       cli::cli_abort(
@@ -1047,14 +1043,14 @@ FIMSFrame <- function(data) {
       data = formatted_data,
       bins = lengths,
       timings = years,
-      column = length,
+      column = "length",
       types = "length_comp"
     )
-    summary_by_name <- dplyr::count(missing_lengths, name, timing) |>
-      dplyr::filter(n != n_lengths) |>
+    summary_by_name <- dplyr::count(missing_lengths, .data$name, .data$timing) |>
+      dplyr::filter(.data$n != n_lengths) |>
       dplyr::summarize(
-        timings = paste(timing, collapse = ", "),
-        .by = name
+        timings = paste(.data$timing, collapse = ", "),
+        .by = .data$name
       )
     if (NROW(summary_by_name) > 0) {
       cli::cli_abort(
@@ -1117,25 +1113,38 @@ create_missing_data <- function(
   column,
   types = c("landings", "index")
 ) {
+  bin_column <- if (!missing(column)) {
+    rlang::sym(column)
+  }
   use_this_data <- data |>
-    dplyr::group_by(type, name)
+    dplyr::group_by(.data$type, .data$name)
   out_data <- if (missing(bins)) {
     # This only pertains to annual data without bins
     use_this_data |>
-      dplyr::filter(type %in% types) |>
-      tidyr::expand(unit, timing = timings) |>
+      dplyr::filter(.data$type %in% types) |>
+      tidyr::expand(
+        !!rlang::sym("unit"),
+        !!rlang::sym("timing") := timings
+      ) |>
       dplyr::anti_join(
-        y = dplyr::select(use_this_data, type, name, unit, timing),
-        by = dplyr::join_by(type, name, unit, timing)
+        y = dplyr::select(use_this_data, dplyr::all_of(c("type", "name", "unit", "timing"))),
+        by = c("type", "name", "unit", "timing")
       )
   } else {
     use_this_data |>
-      dplyr::group_by(type, name) |>
-      dplyr::filter(type %in% types) |>
-      tidyr::expand(unit, timing = timings, {{ column }} := bins) |>
+      dplyr::group_by(.data$type, .data$name) |>
+      dplyr::filter(.data$type %in% types) |>
+      tidyr::expand(
+        !!rlang::sym("unit"),
+        !!rlang::sym("timing") := timings,
+        !!bin_column := bins
+      ) |>
       dplyr::anti_join(
-        y = dplyr::select(use_this_data, type, name, unit, timing, {{ column }}),
-        by = dplyr::join_by(type, name, unit, timing, {{ column }})
+        y = dplyr::select(
+          use_this_data,
+          dplyr::all_of(c("type", "name", "unit", "timing", rlang::as_string(bin_column)))
+        ),
+        by = c("type", "name", "unit", "timing", rlang::as_string(bin_column))
       )
   }
   out_data |>
