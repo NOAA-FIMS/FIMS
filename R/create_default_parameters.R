@@ -379,7 +379,8 @@ create_default_DoubleLogistic <- function(module_name = NA_character_) {
 #'
 #' @description
 #' This function sets up default parameters for age-specific selectivity.
-#' Defaults based on what would be realized for a logistic curve
+#' Defaults based on what would be realized for a logistic curve with
+#' inflection point=2 and slope=1.
 #' @return
 #' A tibble containing the default age-specific parameters on the logit scale.
 #' Number of parameters is equal to the number of age classes
@@ -394,8 +395,6 @@ create_default_AgeSpecific <- function(
       module_type = "AgeSpecific",
       label = "logit_sel_at_age",
       age = get_ages(data),
-      # default selectivity_at_age based on what would be defaults from logistic
-      # curve with inflection point 2 and slope 1:
       value = qlogis(1/(1+(exp(-1*(get_ages(data)-2))))),
       estimation_type = "fixed_effects"
     )

@@ -12,10 +12,6 @@
 #include "../../../population_dynamics/selectivity/selectivity.hpp"
 #include "rcpp_interface_base.hpp"
 
-#include <algorithm>
-#include <iostream>
-#include <vector>
-
 /**
  * @brief Rcpp interface that serves as the parent class for Rcpp selectivity
  * interfaces. This type should be inherited and not called from R directly.
@@ -620,17 +616,16 @@ class AgeSpecificSelectivityInterface : public SelectivityInterfaceBase {
    /**
    * @brief The number of age bins.
    */
-  SharedInt n_ages = 0; //AJ: should this be set to 0 (as in rcpp_population.hpp, or not?)
-  // /**
-  // * @brief Vector of ages.
-  // */
-  //std::vector<int> ages; //AJ: placeholder for reading in ages for calculation of min_age
+  SharedInt n_ages = 0;
+   /**
+   * @brief Vector of ages.
+   */
   RealVector ages;
-  // /**
-  // * @brief Minimum observed age
-  // */
-  SharedInt min_age = 0; //AJ: placeholder for calculating minimum age
-  /**
+   /**
+   * @brief Minimum observed age
+   */
+  SharedInt min_age = 0;
+   /**
    * @brief Age-specific selectivity parameter values.
    */
   ParameterVector logit_sel_at_age;
@@ -653,8 +648,8 @@ class AgeSpecificSelectivityInterface : public SelectivityInterfaceBase {
   AgeSpecificSelectivityInterface(const AgeSpecificSelectivityInterface &other)
       : SelectivityInterfaceBase(other),
         n_ages(other.n_ages),
-        ages(other.ages), // AJ placeholder
-        min_age(other.min_age), // AJ placeholder
+        ages(other.ages),
+        min_age(other.min_age),
         logit_sel_at_age(other.logit_sel_at_age) {}
 
   /**
@@ -675,10 +670,8 @@ class AgeSpecificSelectivityInterface : public SelectivityInterfaceBase {
    */
   virtual double evaluate(double x) { 
     fims_popdy::AgeSpecificSelectivity<double> AgeSpecificSel;
-    AgeSpecificSel.n_ages = this->n_ages.get(); // AJ: is it necessary to call in n_ages here?
-    //AgeSpecificSel.min_age = std::ranges::min(this->ages); //AJ: doesn't work w/ this version of cpp?
-
-    AgeSpecificSel.min_age = *std::min_element(this->ages.storage_m->begin(), this->ages.storage_m->end()); // AJ: only works w/ ages not defined as RealVector
+    AgeSpecificSel.n_ages = this->n_ages.get();
+    AgeSpecificSel.min_age = *std::min_element(this->ages.storage_m->begin(), this->ages.storage_m->end());
     for (size_t i = 0; i < this->logit_sel_at_age.size(); i++) {
       AgeSpecificSel.logit_sel_at_age[i] = this->logit_sel_at_age[i].initial_value_m;
     } 
@@ -745,7 +738,6 @@ class AgeSpecificSelectivityInterface : public SelectivityInterfaceBase {
     ss << "   \"type\": \"vector\",\n";
     ss << " \"dimensionality\": {\n";
     ss << "  \"header\": [null],\n";
-    // ss << "  \"dimensions\": [1]\n},\n"; //AJ: replaced this line with the lines below
     ss << "  \"dimensions\": [" << this->logit_sel_at_age.size() << "]\n},\n"; 
     ss << "   \"values\":" << this->logit_sel_at_age << "}]\n";
 
@@ -767,7 +759,7 @@ class AgeSpecificSelectivityInterface : public SelectivityInterfaceBase {
     // set relative info
     selectivity->id = this->id;
     selectivity->n_ages = this->n_ages.get();
-    selectivity->min_age = *std::min_element(this->ages.storage_m->begin(), this->ages.storage_m->end()); // AJ: placeholder
+    selectivity->min_age = *std::min_element(this->ages.storage_m->begin(), this->ages.storage_m->end());
     selectivity->logit_sel_at_age.resize(this->logit_sel_at_age.size());
     for (size_t i = 0; i < this->logit_sel_at_age.size(); i++) {
       selectivity->logit_sel_at_age[i] =

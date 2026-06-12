@@ -329,7 +329,7 @@ fit <- parameters_4_model |>
 fit@sdreport$pdHess
 fit@obj$gr()
 fit@obj$par
-ests <- get_estimates(fit) #fails
+ests <- get_estimates(fit)
 ```
 
 ### Logging system

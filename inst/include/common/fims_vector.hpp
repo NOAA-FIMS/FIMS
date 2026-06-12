@@ -11,7 +11,6 @@
 #include "../interface/interface.hpp"
 #include <ostream>
 #include <iomanip>
-#include <cmath> // AJ: necessary for std::fmod()
 
 namespace fims {
 
@@ -209,8 +208,8 @@ class Vector {
     if (this->size() == 1 && pos > 0) {
       return this->at(0);
     } else if (this->size() > 1 && pos >= this->size()) {
-      size_t remain = pos % this->size(); // AJ: this only works if both pos and this->size() are integers
-      // int remain = std::fmod(pos, this->size()); // AJ: not sure if this can return an integer class
+      size_t remain = pos % this->size(); 
+      // this only works if both pos and this->size() are integers
       return this->at(remain);
     } else {
       return this->at(pos);

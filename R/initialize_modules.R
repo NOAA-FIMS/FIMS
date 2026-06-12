@@ -45,7 +45,6 @@ initialize_module <- function(parameters, data, module_name, fleet_name = NA_cha
     ) |>
     dplyr::pull(temp_name) |>
     unique()
-  # if(module_class_name == 'SelectivityatAgeSelectivity') module_class_name <- "SelectivityatAge" # no longer needed with new AgeSpecificSelectivity class name
   module_class <- get(module_class_name)
   module_fields <- names(module_class@fields)
   module <- methods::new(module_class)
