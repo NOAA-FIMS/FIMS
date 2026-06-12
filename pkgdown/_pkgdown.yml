@@ -94,6 +94,12 @@ navbar:
         - text: Simple projections using FIMS
           href: articles/fims-demo-projections.html
         - text: -------
+        - text: Diagnostics
+        - text: "diagnostics: likelihood profile"
+          href: articles/likelihood_profile.html
+        - text: "diagnostics: retrospective"
+          href: articles/retrospective.html
+        - text: -------
         - text: Developer
         - text: Adding a New C++ Module
           href: articles/adding-new-module.html

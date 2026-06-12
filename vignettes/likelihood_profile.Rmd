@@ -1,0 +1,97 @@
+---
+title: "Running a likelihood profile on a FIMS model"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Running a likelihood profile on a FIMS model}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 9,
+  fig.height = 7,
+  out.width = "100%"
+)
+
+```
+
+```{r setup}
+library(FIMSdiags)
+library(FIMS)
+packageVersion("FIMS")
+
+clear()
+```
+
+## Set up FIMS model  
+Following the [minimal FIMS demo vignette](https://noaa-fims.github.io/FIMS/articles/fims-demo-minimal.html), we will set up a FIMS model and run it. We need to run it initially to get the MLE parameter estimates. For this example we are using the dataset included in the FIMS package and creating a set of default parameters.
+
+```{r run_fims_model}
+
+# Load sample data
+data("data_big")
+# Prepare data for FIMS model
+data_4_model <- FIMSFrame(data_big)
+
+# Create parameters
+parameters <- data_4_model |>
+  create_default_configurations() |>
+  create_default_parameters(data = data_4_model)
+
+# Run the  model with optimization
+base_model <- parameters |>
+  initialize_fims(data = data_4_model) |>
+  fit_fims(optimize = TRUE)
+
+# Clear memory post-run
+clear()
+```
+
+## Run likelihood profile  
+Once we have a model that is fit, we can run a likelihood profile analysis to see the impact of each data type on a given parameter. In this example, we will test the impact on R~0~ but any value can be tested by changing the `parameter_name` argument. *Note: The parameter name must match what it is called in the `label` column of the `parameters` tibble.* An optional input is the `module_name` the parameter is associated with. However, as long as there is only one parameter with that name, `module_name` can be left NULL. The `run_fims_likelihood` function takes a fitted FIMS model, finds the MLE estimate for the parameter being profiled over (in this case R~0~), and profiles over a vector of values based on the `min`, `max`, and `length` the user inputs. In the example below, it will profile over 5 values that range from the `MLE value - 1` to the `MLE value + 1`. If you are running many models at once, it can be computationally more efficient to use multiple cores. To do this, change the `n_cores` argument to as many as you want/can use. *NOTE: If left empty, the default for `n_cores` is one less than the number of cores on your machine so this could unexpectedly use up a lot of your computing power.* 
+
+```{r like_profile}
+#| message: false
+#| warning: false
+
+like_fit <- run_fims_likelihood(
+  model = base_model,
+  parameters = parameters,
+  parameter_name = "log_rzero", 
+  data = data_big,
+  n_cores = 1,
+  min = -1,
+  max = 1,
+  length = 5
+)
+```
+
+## Visualize results  
+To visualize the profile, use the function `plot_likelihood`. The plot shows the change in total likelihood over the R~0~ values profiled in the solid black line, and the change in likelihood for each data type in the color lines below it. This plot indicates that the R~0~ value estimated by the base model (13.9) is the value that leads to the lowest likelihood and all of the data types support this (i.e. the data do not conflict).  
+
+```{r}
+#| fig.alt: >
+#|   Curved lines showing change in likelihood in total and for each data type.
+fig_likelihood_profile <- plot_likelihood(like_fit)
+print(fig_likelihood_profile)
+
+```
+
+This function creates a `ggplot` object that can be customized and added onto as a normal `ggplot` can. The default theme is `stockplotr::theme_noaa`, however to change the theme or colors used, you can simply add them after the main plot function. 
+
+```{r}
+#| fig.alt: >
+#|   The same curved line plot as the one above but with a different ggplot theme.
+fig_likelihood_custom_theme <- plot_likelihood(like_fit) +
+ggplot2::theme_bw()
+print(fig_likelihood_custom_theme)
+```
+
+## Clean up 
+Once you have finished running a FIMS model, it is always good practice to clear the C++ memory from one FIMS model run to the next.
+```{r}
+clear()
+```
