@@ -694,12 +694,13 @@ create_edm_embedding <- function(
   if (!is.character(series_name) || length(series_name) != 1) {
     cli::cli_abort("{.var series_name} must be a single string.")
   }
-  if (!is.numeric(E) || length(E) != 1 || E < 1) {
+  if (!is.numeric(E) || length(E) != 1 || E < 1 || E %% 1 != 0) {
     cli::cli_abort("{.var E} must be a positive integer.")
   }
-  if (!is.numeric(tau) || length(tau) != 1 || tau < 1) {
+  if (!is.numeric(tau) || length(tau) != 1 || tau < 1 || tau %% 1 != 0) {
     cli::cli_abort("{.var tau} must be a positive integer.")
   }
+
 
   # Extract the univariate time series from the data slot
   series_data <- dplyr::filter(

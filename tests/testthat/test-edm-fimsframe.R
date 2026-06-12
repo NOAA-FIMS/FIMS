@@ -33,17 +33,30 @@ test_that("create_edm_embedding() validates bad inputs", {
     regexp = "series_type"
   )
 
-  # Bad E
+  # Bad E (0)
   expect_error(
     create_edm_embedding(data_4_model, "index", "survey1", E = 0, tau = 1),
     regexp = "E"
   )
 
-  # Bad tau
+  # Bad E (non-integer 3.5)
+  expect_error(
+    create_edm_embedding(data_4_model, "index", "survey1", E = 3.5, tau = 1),
+    regexp = "E"
+  )
+
+  # Bad tau (-1)
   expect_error(
     create_edm_embedding(data_4_model, "index", "survey1", E = 3, tau = -1),
     regexp = "tau"
   )
+
+  # Bad tau (non-integer 1.2)
+  expect_error(
+    create_edm_embedding(data_4_model, "index", "survey1", E = 3, tau = 1.2),
+    regexp = "tau"
+  )
+
 
   # Non-existent series
   expect_error(
