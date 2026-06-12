@@ -41,6 +41,11 @@ reference:
   - has_keyword("fit_fims")
   - is_fims_verbose
 
+- title: Diagnostics
+  desc: Primary functions used when diagnosing a FIMS model.
+  contents:
+  - has_keyword("diagnostics")
+
 - title: Package development
   desc: Primary functions used when developing FIMS package.
   contents:
@@ -101,6 +106,8 @@ navbar:
           href: articles/fims-user-setup-guide.html
         - text: Simple projections using FIMS
           href: articles/fims-demo-projections.html
+        - text: Running a diagnostics on a FIMS model
+          href: articles/fims-diagnostics.html
         - text: -------
         - text: Developer
         - text: Adding a New C++ Module

@@ -21,5 +21,5 @@ jobs:
   call-workflow:
     uses: nmfs-ost/ghactions4r/.github/workflows/r-cmd-check.yml@main
     with: 
-      gha_timeout_minutes: 60
+      gha_timeout_minutes: 100
       
