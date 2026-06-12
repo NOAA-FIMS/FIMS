@@ -99,6 +99,54 @@ test_that("rcpp double logistic selectivity works with correct inputs", {
   clear()
 })
 
+test_that("rcpp age specific selectivity works with correct inputs", {
+  # Create selectivity1
+  selectivity1 <- methods::new(AgeSpecificSelectivity)
+  # AJ: will this work w/o data to inform dimensions?
+
+  selectivity1$logit_sel_at_age[1]$value <- 1
+  selectivity1$slope_asc[1]$estimation_type$set("fixed_effects")
+
+  #' @description Test that `get_id()` for `AgeSpecificSelectivity` works.
+  expect_equal(selectivity1$get_id(), 1)
+  #' @description Test that the first `logit_sel_at_age` value is set to 1.
+  expect_equal(selectivity1$logit_sel_at_age[1]$value, 1)
+  #' @description Test that `evaluate()` works for `AgeSpecificSelectivity`.
+  expect_equal(
+    selectivity1$evaluate(1),
+    1.0 / (1.0 + exp(-1.0)), # inverse logit equation
+    tolerance = 0.0000001
+  )
+
+  # Can we test the performance of indexing as well, using min_age, e.g.
+    # Or is this dependent on input data (see above comment)
+  # selectivity1$logit_sel_at_age[2]$value <- 2
+  # selectivity$min_age <- 2
+  # TBD...
+
+  # Create selectivity2
+  selectivity2 <- methods::new(AgeSpecificSelectivity)
+
+  selectivity2$logit_sel_at_age[1]$value <- 1
+
+  selectivity2$logit_sel_at_age[1]$estimation_type$set("random_effects")
+
+  #' @description Test that `get_id()` for `AgeSpecificSelectivity` works when a second object is created.
+  expect_equal(selectivity2$get_id(), 2)
+  #' @description Test that the `logit_sel_at_age` value is set to 1.
+  expect_equal(selectivity2$logit_sel_at_age[1]$value, 1.0)
+  #' @description Test that the `logit_sel_at_age` estimation type is set to "random_effects".
+  expect_equal(selectivity2$logit_sel_at_age[1]$estimation_type$get(), "random_effects")
+  #' @description Test that `evaluate()` works for `DoubleLogisticSelectivity` when all parameters are set to "random_effects".
+  expect_equal(
+    selectivity2$evaluate(1),
+    # Line below equals 0.2716494
+    1.0 / (1.0 + exp(-1.0)), # inverse logit equation
+    tolerance = 0.0000001
+  )
+  clear()
+})
+
 ## Edge handling ----
 test_that("rcpp selectivity returns correct outputs for edge cases", {
   # emptyLogistic
@@ -115,6 +163,14 @@ test_that("rcpp selectivity returns correct outputs for edge cases", {
   expect_equal(
     object = emptyDoubleLogistic$evaluate(20),
     expected = 0.25
+  )
+
+    # emptyAgeSpecificLogistic
+  emptyAgeSpecific <- methods::new(AgeSpecificSelectivity)
+  #' @description Test that rcpp age-specific selectivity returns default values when no parameters are set for input values of 20.
+  expect_equal(
+    object = emptyAgeSpecific$evaluate(20),
+    expected = 0.25 # what is this default value? where is this specific?
   )
 })
 
