@@ -90,7 +90,8 @@ Imports:
     stats,
     tibble,
     TMB (>= 1.8.0),
-    utils
+    utils,
+    viridisLite
 Suggests:
     covr,
     devtools,
