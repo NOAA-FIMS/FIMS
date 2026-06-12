@@ -82,14 +82,15 @@ class DelayEmbeddingInterface : public EDMInterfaceBase {
    */
   uint32_t n_cols;
   /**
-   * @brief The flattened delay embedding matrix values, stored row-major.
+   * @brief The flattened delay embedding matrix, stored row-major. Element
+   * [row * n_cols + col] is the value of x_{t - col * tau} for that row.
    */
-  RealVector values;
+  RealVector embedded_values;
   /**
-   * @brief The indices of the original time series that correspond to each
-   * row's target time point.
+   * @brief The target time-point values for each row (i.e., x_t), dereferenced
+   * from the original series pointers.
    */
-  RealVector target_indices;
+  RealVector target_values;
 
   /**
    * @brief The constructor.
@@ -115,8 +116,8 @@ class DelayEmbeddingInterface : public EDMInterfaceBase {
         time_lag(other.time_lag),
         n_rows(other.n_rows),
         n_cols(other.n_cols),
-        values(other.values),
-        target_indices(other.target_indices) {}
+        embedded_values(other.embedded_values),
+        target_values(other.target_values) {}
 
   /**
    * @brief The destructor.
@@ -159,17 +160,16 @@ class DelayEmbeddingInterface : public EDMInterfaceBase {
     this->n_rows = embedding.n_rows;
     this->n_cols = embedding.n_cols;
 
-    // Copy flattened values into RealVector
-    this->values.resize(embedding.values.size());
-    for (size_t i = 0; i < embedding.values.size(); i++) {
-      this->values[i] = embedding.values[i];
+    // Copy flattened embedded values into RealVector (dereference pointers)
+    this->embedded_values.resize(embedding.embedded_values.size());
+    for (size_t i = 0; i < embedding.embedded_values.size(); i++) {
+      this->embedded_values[i] = *embedding.embedded_values[i];
     }
 
-    // Copy target indices into RealVector (cast size_t to double for R)
-    this->target_indices.resize(embedding.target_indices.size());
-    for (size_t i = 0; i < embedding.target_indices.size(); i++) {
-      this->target_indices[i] =
-          static_cast<double>(embedding.target_indices[i]);
+    // Copy target values into RealVector (dereference pointers)
+    this->target_values.resize(embedding.target_values.size());
+    for (size_t i = 0; i < embedding.target_values.size(); i++) {
+      this->target_values[i] = *embedding.target_values[i];
     }
   }
 
@@ -204,17 +204,16 @@ class DelayEmbeddingInterface : public EDMInterfaceBase {
     this->n_rows = embedding.n_rows;
     this->n_cols = embedding.n_cols;
 
-    // Copy flattened values into RealVector
-    this->values.resize(embedding.values.size());
-    for (size_t i = 0; i < embedding.values.size(); i++) {
-      this->values[i] = embedding.values[i];
+    // Copy flattened embedded values into RealVector (dereference pointers)
+    this->embedded_values.resize(embedding.embedded_values.size());
+    for (size_t i = 0; i < embedding.embedded_values.size(); i++) {
+      this->embedded_values[i] = *embedding.embedded_values[i];
     }
 
-    // Copy target indices into RealVector
-    this->target_indices.resize(embedding.target_indices.size());
-    for (size_t i = 0; i < embedding.target_indices.size(); i++) {
-      this->target_indices[i] =
-          static_cast<double>(embedding.target_indices[i]);
+    // Copy target values into RealVector (dereference pointers)
+    this->target_values.resize(embedding.target_values.size());
+    for (size_t i = 0; i < embedding.target_values.size(); i++) {
+      this->target_values[i] = *embedding.target_values[i];
     }
   }
 
@@ -230,7 +229,7 @@ class DelayEmbeddingInterface : public EDMInterfaceBase {
       throw std::invalid_argument(
           "DelayEmbeddingInterface::at() index out of bounds.");
     }
-    return this->values[row * this->n_cols + col];
+    return this->embedded_values[row * this->n_cols + col];
   }
 
   /**

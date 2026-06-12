@@ -28,8 +28,8 @@ void register_edm(Rcpp::Module& m) {
       .field("time_lag", &DelayEmbeddingInterface::time_lag)
       .field("n_rows", &DelayEmbeddingInterface::n_rows)
       .field("n_cols", &DelayEmbeddingInterface::n_cols)
-      .field("values", &DelayEmbeddingInterface::values)
-      .field("target_indices", &DelayEmbeddingInterface::target_indices)
+      .field("embedded_values", &DelayEmbeddingInterface::embedded_values)
+      .field("target_values", &DelayEmbeddingInterface::target_values)
       .method("get_id", &DelayEmbeddingInterface::get_id)
       .method("construct", &DelayEmbeddingInterface::construct)
       .method("construct_drop_missing",

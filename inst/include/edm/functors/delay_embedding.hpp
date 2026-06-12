@@ -18,26 +18,45 @@ namespace fims_edm {
 
 /**
  * @brief Flattened delay embedding matrix.
+ *
+ * @details Stores pointers into the original input_values series rather than
+ * copying values. This means:
+ *  - embedded_values: pointers to the E lagged coordinates per row
+ *    [x_t, x_{t-tau}, ..., x_{t-(E-1)tau}]
+ *  - target_values: pointers to the target time-point value x_t for each row
+ *
+ * Both point into the same underlying input_values vector, so any update to
+ * that vector (e.g., during TMB optimization iterations) is automatically
+ * reflected here without copying.
  */
 template <typename Type>
 struct DelayEmbeddingMatrix {
+  /** @brief Number of rows in the embedding matrix. */
   size_t n_rows = 0;
+  /** @brief Number of columns (equal to embedding dimension E). */
   size_t n_cols = 0;
-  fims::Vector<Type> values;
-  std::vector<size_t> target_indices;
+  /**
+   * @brief Flattened row-major pointers to the embedded lagged coordinates.
+   * element [row * n_cols + col] points to x_{t - col * tau}.
+   */
+  std::vector<const Type*> embedded_values;
+  /**
+   * @brief Pointers to the target time-point value for each row.
+   * target_values[row] == embedded_values[row * n_cols + 0] (i.e., x_t).
+   */
+  std::vector<const Type*> target_values;
 
-  Type& at(size_t row, size_t col) {
-    if (row >= n_rows || col >= n_cols) {
-      throw std::invalid_argument("DelayEmbeddingMatrix index out of bounds.");
-    }
-    return values[row * n_cols + col];
-  }
-
+  /**
+   * @brief Access an element of the embedding matrix.
+   * @param row Zero-based row index.
+   * @param col Zero-based column index.
+   * @return Const reference to the value at (row, col).
+   */
   const Type& at(size_t row, size_t col) const {
     if (row >= n_rows || col >= n_cols) {
       throw std::invalid_argument("DelayEmbeddingMatrix index out of bounds.");
     }
-    return values[row * n_cols + col];
+    return *embedded_values[row * n_cols + col];
   }
 };
 
@@ -46,6 +65,9 @@ struct DelayEmbeddingMatrix {
  *
  * Rows are ordered by increasing target time. Columns are ordered as
  * x_t, x_{t - tau}, ..., x_{t - (E - 1) tau}.
+ *
+ * Both embedded_values and target_values store pointers into @p series so
+ * that subsequent modifications to @p series are automatically reflected.
  */
 template <typename Type>
 DelayEmbeddingMatrix<Type> MakeDelayEmbedding(const fims::Vector<Type>& series,
@@ -67,14 +89,16 @@ DelayEmbeddingMatrix<Type> MakeDelayEmbedding(const fims::Vector<Type>& series,
   DelayEmbeddingMatrix<Type> embedding;
   embedding.n_rows = series.size() - lag_span;
   embedding.n_cols = embedding_dimension;
-  embedding.values.resize(embedding.n_rows * embedding.n_cols);
-  embedding.target_indices.resize(embedding.n_rows);
+  embedding.embedded_values.resize(embedding.n_rows * embedding.n_cols);
+  embedding.target_values.resize(embedding.n_rows);
 
   for (size_t row = 0; row < embedding.n_rows; row++) {
     const size_t target_index = row + lag_span;
-    embedding.target_indices[row] = target_index;
+    // target_values[row] points to the x_t value for this row
+    embedding.target_values[row] = &series[target_index];
     for (size_t col = 0; col < embedding.n_cols; col++) {
-      embedding.at(row, col) = series[target_index - col * time_lag];
+      embedding.embedded_values[row * embedding.n_cols + col] =
+          &series[target_index - col * time_lag];
     }
   }
 
@@ -82,7 +106,8 @@ DelayEmbeddingMatrix<Type> MakeDelayEmbedding(const fims::Vector<Type>& series,
 }
 
 /**
- * @brief Build a delay embedding matrix and omit rows containing missing values.
+ * @brief Build a delay embedding matrix and omit rows containing missing
+ * values.
  */
 template <typename Type>
 DelayEmbeddingMatrix<Type> MakeDelayEmbeddingDropMissing(
@@ -93,7 +118,6 @@ DelayEmbeddingMatrix<Type> MakeDelayEmbeddingDropMissing(
 
   DelayEmbeddingMatrix<Type> embedding;
   embedding.n_cols = full_embedding.n_cols;
-  std::vector<Type> kept_values;
 
   for (size_t row = 0; row < full_embedding.n_rows; row++) {
     bool row_has_missing = false;
@@ -104,15 +128,15 @@ DelayEmbeddingMatrix<Type> MakeDelayEmbeddingDropMissing(
     }
 
     if (!row_has_missing) {
-      embedding.target_indices.push_back(full_embedding.target_indices[row]);
+      embedding.target_values.push_back(full_embedding.target_values[row]);
       for (size_t col = 0; col < full_embedding.n_cols; col++) {
-        kept_values.push_back(full_embedding.at(row, col));
+        embedding.embedded_values.push_back(
+            full_embedding.embedded_values[row * full_embedding.n_cols + col]);
       }
     }
   }
 
-  embedding.n_rows = embedding.target_indices.size();
-  embedding.values = fims::Vector<Type>(kept_values);
+  embedding.n_rows = embedding.target_values.size();
   return embedding;
 }
 
