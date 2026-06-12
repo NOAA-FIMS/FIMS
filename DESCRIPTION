@@ -77,6 +77,8 @@ Imports:
     cli,
     dplyr,
     generics (>= 0.1.3),
+    furrr,
+    future,
     ggplot2,
     glue,
     graphics,
@@ -90,7 +92,8 @@ Imports:
     tibble,
     TMB (>= 1.8.0),
     utils,
-    yardstick (>= 1.3.0)
+    yardstick (>= 1.3.0),
+    viridisLite
 Suggests:
     covr,
     devtools,
