@@ -73,30 +73,30 @@ class SizeDistributionProviderBase {
 
   /**
    * @brief Read prepared mean length-at-age.
-   * @param y Year index.
-   * @param a Age index.
+   * @param year_index Year index.
+   * @param age_index Age index.
    * @return Read-only mean length-at-age value.
    */
-  virtual const Type& MeanLAA(std::size_t y, std::size_t a) const = 0;
+  virtual const Type& MeanLAA(std::size_t year_index, std::size_t age_index) const = 0;
 
   /**
    * @brief Read prepared spread of length-at-age.
-   * @param y Year index.
-   * @param a Age index.
+   * @param year_index Year index.
+   * @param age_index Age index.
    * @return Read-only spread of length-at-age value.
    */
-  virtual const Type& SdLAA(std::size_t y, std::size_t a) const = 0;
+  virtual const Type& SdLAA(std::size_t year_index, std::size_t age_index) const = 0;
 
   /**
    * @brief Read prepared age-to-size probability on the population grid.
-   * @param y Year index.
-   * @param a Age index.
-   * @param l Size-bin index.
+   * @param year_index Year index.
+   * @param age_index Age index.
+   * @param size_bin_index Size-bin index.
    * @return Read-only age-to-size probability value.
    */
-  virtual const Type& ProbSize(std::size_t y,
-                               std::size_t a,
-                               std::size_t l) const = 0;
+  virtual const Type& ProbSize(std::size_t year_index,
+                               std::size_t age_index,
+                               std::size_t size_bin_index) const = 0;
 };
 
 }  // namespace fims_popdy
