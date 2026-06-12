@@ -10,6 +10,7 @@
 #define FIMS_POPULATION_DYNAMICS_SIZE_PRODUCTS_HPP
 
 #include <cstddef>
+#include <stdexcept>
 
 #include "../../common/fims_vector.hpp"
 
@@ -98,7 +99,12 @@ struct SizeProducts {
    * @param age_index Age index.
    * @return Flattened year-age index.
    */
-  inline std::size_t AgeYearIndex(std::size_t year_index, std::size_t age_index) const {
+  inline std::size_t AgeYearIndex(std::size_t year_index,
+                                  std::size_t age_index) const {
+    if (year_index >= n_years || age_index >= n_ages) {
+      throw std::out_of_range("SizeProducts year-age index out of range");
+    }
+
     return year_index * n_ages + age_index;
   }
 
@@ -112,7 +118,15 @@ struct SizeProducts {
   inline std::size_t AgeYearSizeIndex(std::size_t year_index,
                                       std::size_t age_index,
                                       std::size_t size_bin_index) const {
-    return year_index * (n_ages * n_size_bins) + age_index * n_size_bins + size_bin_index;
+    if (year_index >= n_years ||
+        age_index >= n_ages ||
+        size_bin_index >= n_size_bins) {
+      throw std::out_of_range("SizeProducts year-age-size index out of range");
+    }
+
+    return year_index * (n_ages * n_size_bins) +
+           age_index * n_size_bins +
+           size_bin_index;
   }
 
   /**
