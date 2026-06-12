@@ -57,7 +57,6 @@ test_that("create_edm_embedding() validates bad inputs", {
     regexp = "tau"
   )
 
-
   # Non-existent series
   expect_error(
     create_edm_embedding(data_4_model, "index", "no_such_fleet", E = 3, tau = 1),
@@ -67,7 +66,7 @@ test_that("create_edm_embedding() validates bad inputs", {
 
 test_that("create_edm_embedding() stores correct metadata and matrix dimensions", {
   skip_if_not(
-    tryCatch({ fims::clear(); TRUE }, error = function(e) FALSE),
+    tryCatch({ clear(); TRUE }, error = function(e) FALSE),
     "FIMS module not available"
   )
 
@@ -75,7 +74,7 @@ test_that("create_edm_embedding() stores correct metadata and matrix dimensions"
   data_4_model <- FIMSFrame(data_big)
 
   # Identify an available fleet / type combination
-  fleet_nm <- get_fleets(data_4_model)[1]
+  fleet_nm <- "survey1"
   data_4_model_embedded <- create_edm_embedding(
     data_4_model,
     series_type = "index",
@@ -97,21 +96,21 @@ test_that("create_edm_embedding() stores correct metadata and matrix dimensions"
   expect_true(emb[["drop_missing"]])
   expect_identical(emb[["n_cols"]], 3L)
   expect_true(emb[["n_rows"]] > 0)
-  expect_length(emb[["values"]], emb[["n_rows"]] * emb[["n_cols"]])
-  expect_length(emb[["target_indices"]], emb[["n_rows"]])
-  fims::clear()
+  expect_length(emb[["embedded_values"]], emb[["n_rows"]] * emb[["n_cols"]])
+  expect_length(emb[["target_values"]], emb[["n_rows"]])
+  clear()
 })
 
 test_that("model_edm_matrix() returns a matrix of the correct shape", {
   skip_if_not(
-    tryCatch({ fims::clear(); TRUE }, error = function(e) FALSE),
+    tryCatch({ clear(); TRUE }, error = function(e) FALSE),
     "FIMS module not available"
   )
 
   data("data_big", package = "FIMS")
   data_4_model <- FIMSFrame(data_big)
 
-  fleet_nm <- get_fleets(data_4_model)[1]
+  fleet_nm <- "survey1"
   data_4_model_embedded <- create_edm_embedding(
     data_4_model,
     series_type = "index",
@@ -127,23 +126,23 @@ test_that("model_edm_matrix() returns a matrix of the correct shape", {
   expect_true(is.matrix(mat))
   expect_equal(nrow(mat), emb[["n_rows"]])
   expect_equal(ncol(mat), 3L)
-  fims::clear()
+  clear()
 })
 
 test_that("multiple embeddings can be stored in a single FIMSFrame", {
   skip_if_not(
-    tryCatch({ fims::clear(); TRUE }, error = function(e) FALSE),
+    tryCatch({ clear(); TRUE }, error = function(e) FALSE),
     "FIMS module not available"
   )
 
   data("data_big", package = "FIMS")
   data_4_model <- FIMSFrame(data_big)
 
-  fleet_nm <- get_fleets(data_4_model)[1]
+  fleet_nm <- "survey1"
   ff <- data_4_model |>
     create_edm_embedding("index", fleet_nm, E = 2L, tau = 1L) |>
     create_edm_embedding("index", fleet_nm, E = 3L, tau = 2L)
 
   expect_length(get_edm_embeddings(ff), 2)
-  fims::clear()
+  clear()
 })

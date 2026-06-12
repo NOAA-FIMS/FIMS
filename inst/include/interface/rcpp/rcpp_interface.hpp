@@ -20,6 +20,7 @@
 #include "rcpp_objects/rcpp_population.hpp"
 #include "rcpp_objects/rcpp_recruitment.hpp"
 #include "rcpp_objects/rcpp_selectivity.hpp"
+#include "rcpp_objects/rcpp_edm.hpp"
 
 /**
  * Initializes the logging system, setting all signal handling.
@@ -324,6 +325,10 @@ void clear() {
 
   FisheryModelInterfaceBase::id_g = 1;
   FisheryModelInterfaceBase::live_objects.clear();
+
+  // rcpp_edm.hpp
+  EDMInterfaceBase::id_g = 1;
+  EDMInterfaceBase::live_objects.clear();
 
   clear_internal<TMB_FIMS_REAL_TYPE>();
   clear_internal<TMBAD_FIMS_TYPE>();

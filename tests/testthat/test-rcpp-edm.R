@@ -42,8 +42,8 @@ test_that("rcpp edm works with correct inputs", {
   #' @description Test that n_cols is set correctly.
   expect_equal(de$n_cols, 3)
 
-  #' @description Test target indices mapping.
-  expect_equal(de$target_indices$toRVector(), c(2, 3, 4))
+  #' @description Test target values mapping (actual x_t values, not indices).
+  expect_equal(de$target_values$toRVector(), c(30.0, 40.0, 50.0))
 
   #' @description Test retrieving elements using at() method.
   expect_equal(de$at(0, 0), 30.0)
@@ -86,9 +86,9 @@ test_that("rcpp edm construct_drop_missing works correctly", {
   de2 <- methods::new(DelayEmbedding)
   de2$construct_drop_missing(series2, E, tau, missing_val)
 
-  #' @description Test that construct_drop_missing keeps valid windows and maps correct targets.
+  #' @description Test that construct_drop_missing keeps valid windows and maps correct target values.
   expect_equal(de2$n_rows, 2)
-  expect_equal(de2$target_indices$toRVector(), c(2, 6))
+  expect_equal(de2$target_values$toRVector(), c(30.0, 70.0))
   expect_equal(de2$at(0, 0), 30.0)
   expect_equal(de2$at(1, 2), 50.0)
 

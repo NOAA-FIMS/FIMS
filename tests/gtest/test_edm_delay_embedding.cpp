@@ -11,9 +11,12 @@ TEST(DelayEmbedding, BuildsEmbeddingWithUnitLag) {
 
   EXPECT_EQ(embedding.n_rows, 3);
   EXPECT_EQ(embedding.n_cols, 3);
-  EXPECT_EQ(embedding.target_indices[0], 2);
-  EXPECT_EQ(embedding.target_indices[2], 4);
 
+  // target_values[row] points to x_t for that row
+  EXPECT_DOUBLE_EQ(*embedding.target_values[0], 3.0);  // row 0 → x_2 = 3.0
+  EXPECT_DOUBLE_EQ(*embedding.target_values[2], 5.0);  // row 2 → x_4 = 5.0
+
+  // embedded_values: [x_t, x_{t-1}, x_{t-2}]
   EXPECT_DOUBLE_EQ(embedding.at(0, 0), 3.0);
   EXPECT_DOUBLE_EQ(embedding.at(0, 1), 2.0);
   EXPECT_DOUBLE_EQ(embedding.at(0, 2), 1.0);
@@ -30,7 +33,9 @@ TEST(DelayEmbedding, BuildsEmbeddingWithLargerLag) {
 
   EXPECT_EQ(embedding.n_rows, 4);
   EXPECT_EQ(embedding.n_cols, 2);
-  EXPECT_EQ(embedding.target_indices[0], 2);
+
+  // Row 0: target is x_2 = 30.0 (first valid index given lag_span = 2)
+  EXPECT_DOUBLE_EQ(*embedding.target_values[0], 30.0);
 
   EXPECT_DOUBLE_EQ(embedding.at(0, 0), 30.0);
   EXPECT_DOUBLE_EQ(embedding.at(0, 1), 10.0);
@@ -72,8 +77,10 @@ TEST(DelayEmbedding, DropsRowsWithMissingValues) {
 
   EXPECT_EQ(embedding.n_rows, 2);
   EXPECT_EQ(embedding.n_cols, 2);
-  EXPECT_EQ(embedding.target_indices[0], 1);
-  EXPECT_EQ(embedding.target_indices[1], 4);
+
+  // Row 0: target was x_1 = 2.0; Row 1: target was x_4 = 5.0
+  EXPECT_DOUBLE_EQ(*embedding.target_values[0], 2.0);
+  EXPECT_DOUBLE_EQ(*embedding.target_values[1], 5.0);
 
   EXPECT_DOUBLE_EQ(embedding.at(0, 0), 2.0);
   EXPECT_DOUBLE_EQ(embedding.at(0, 1), 1.0);
@@ -88,6 +95,28 @@ TEST(DelayEmbedding, ThrowsOnOutOfBoundsMatrixAccess) {
 
   EXPECT_THROW(embedding.at(embedding.n_rows, 0), std::invalid_argument);
   EXPECT_THROW(embedding.at(0, embedding.n_cols), std::invalid_argument);
+}
+
+TEST(DelayEmbedding, DynamicallyReflectsOriginalSeriesModifications) {
+  fims::Vector<double> series = {1.0, 2.0, 3.0, 4.0, 5.0};
+
+  fims_edm::DelayEmbeddingMatrix<double> embedding =
+      fims_edm::MakeDelayEmbedding(series, 3, 1);
+
+  // Initial values
+  EXPECT_DOUBLE_EQ(embedding.at(0, 0), 3.0);
+  EXPECT_DOUBLE_EQ(embedding.at(2, 0), 5.0);
+  EXPECT_DOUBLE_EQ(*embedding.target_values[0], 3.0);
+
+  // Modify the original series elements
+  series[2] = 99.0;
+  series[4] = 100.0;
+
+  // Both embedded_values and target_values dynamically reflect changes
+  EXPECT_DOUBLE_EQ(embedding.at(0, 0), 99.0);
+  EXPECT_DOUBLE_EQ(embedding.at(2, 0), 100.0);
+  EXPECT_DOUBLE_EQ(*embedding.target_values[0], 99.0);
+  EXPECT_DOUBLE_EQ(*embedding.target_values[2], 100.0);
 }
 
 }  // namespace

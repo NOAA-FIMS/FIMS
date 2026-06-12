@@ -70,7 +70,7 @@ methods::setClass(
     # TODO(EDM): Slot holding a named list of delay-embedding results produced
     # by create_edm_embedding(). Each element is itself a named list with
     # fields: series_name, E, tau, drop_missing, n_rows, n_cols, values
-    # (row-major numeric vector), and target_indices (integer vector).
+    # (row-major numeric vector), and target_values (numeric vector of x_t per row).
     edm_embeddings = "list"
   )
 )
@@ -281,9 +281,9 @@ methods::setMethod(
 #' [get_edm_embeddings()] returns a named list of delay-embedding results
 #' stored in the FIMSFrame object. Each element is itself a named list with
 #' fields `series_name`, `E` (embedding dimension), `tau` (time lag),
-#' `drop_missing` (logical), `n_rows`, `n_cols`, `values` (a numeric vector
-#' of the flattened row-major matrix), and `target_indices` (a numeric vector
-#' of the original time-series positions that map to each row).
+#' `drop_missing` (logical), `n_rows`, `n_cols`, `embedded_values` (a numeric
+#' vector of the flattened row-major matrix), and `target_values` (a numeric
+#' vector of the target time-point values x_t for each row).
 #' Returns an empty list when [create_edm_embedding()] has not yet been called.
 #' @export
 #' @rdname get_FIMSFrame
@@ -633,7 +633,7 @@ methods::setMethod(
       ))
     }
     emb <- embeddings[[embedding_name]]
-    matrix(emb[["values"]], nrow = emb[["n_rows"]], ncol = emb[["n_cols"]],
+    matrix(emb[["embedded_values"]], nrow = emb[["n_rows"]], ncol = emb[["n_cols"]],
            byrow = TRUE)
   }
 )
@@ -701,7 +701,6 @@ create_edm_embedding <- function(
     cli::cli_abort("{.var tau} must be a positive integer.")
   }
 
-
   # Extract the univariate time series from the data slot
   series_data <- dplyr::filter(
     get_data(x),
@@ -720,7 +719,7 @@ create_edm_embedding <- function(
   }
 
   # Call the Rcpp DelayEmbedding module
-  edm_obj <- methods::new(fims$DelayEmbedding)
+  edm_obj <- methods::new(DelayEmbedding)
   tryCatch(
     {
       if (drop_missing) {
@@ -753,10 +752,10 @@ create_edm_embedding <- function(
     E = as.integer(E),
     tau = as.integer(tau),
     drop_missing = drop_missing,
-    n_rows = edm_obj$n_rows,
-    n_cols = edm_obj$n_cols,
-    values = as.numeric(edm_obj$values),
-    target_indices = as.integer(edm_obj$target_indices)
+    n_rows = as.integer(edm_obj$n_rows),
+    n_cols = as.integer(edm_obj$n_cols),
+    embedded_values = edm_obj$embedded_values$toRVector(),
+    target_values = edm_obj$target_values$toRVector()
   )
 
   # Store in the edm_embeddings slot and return a new FIMSFrame
