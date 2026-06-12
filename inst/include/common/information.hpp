@@ -24,6 +24,8 @@
 #include "../population_dynamics/recruitment/recruitment.hpp"
 #include "../population_dynamics/selectivity/selectivity.hpp"
 #include "../population_dynamics/alk/functors/alk_runtime.hpp"
+#include "../population_dynamics/size/functors/size_grid_builder.hpp"
+#include "../population_dynamics/size/growth_derived_size_provider.hpp"
 #include "def.hpp"
 #include "fims_vector.hpp"
 #include "model_object.hpp"
@@ -626,6 +628,74 @@ void SetFleetALKModel(bool &valid_model,
   }
 
   /**
+   * @brief Ensure a population has a usable biological size grid.
+   *
+   * @details If a user provides a valid biological size grid, keep it.
+   * If no biological size grid has been provided, build the default grid.
+   * If a user provides an invalid or partially specified grid, report the
+   * problem and invalidate the model.
+   *
+   * @param valid_model Reference to model-validity flag.
+   * @param p Shared pointer to population module.
+   */
+  void EnsurePopulationSizeGrid(
+      bool &valid_model,
+      std::shared_ptr<fims_popdy::Population<Type>> p) {
+    if (p->size_grid.IsConsistent() && p->size_grid.n_bins > 0) {
+      return;
+    }
+
+    const bool size_grid_missing =
+        p->size_grid.n_bins == 0 &&
+        p->size_grid.edges.size() == 0 &&
+        p->size_grid.centers.size() == 0;
+
+    if (size_grid_missing) {
+      try {
+        // Interim built-in biological size-grid fallback.
+        // The long-term default-bin policy is deferred until we can decide on a 
+        // method that the team agrees on; for now this only guarantees a valid
+        // canonical grid so the rest of the size refactor can proceed.
+        p->size_grid =
+            fims_popdy::SizeGridBuilder::BuildRegularGrid(0.0, 100.0, 1.0);
+      } catch (const std::exception &e) {
+        valid_model = false;
+        FIMS_ERROR_LOG(
+            "Failed to initialize default population size grid for population " +
+            fims::to_string(p->id) + ": " + e.what());
+      }
+      return;
+    }
+
+    valid_model = false;
+    FIMS_ERROR_LOG(
+        "Population " + fims::to_string(p->id) +
+        " has an invalid biological size grid. Provide a consistent override "
+        "or leave the grid empty so FIMS can build the default.");
+  }
+
+  /**
+   * @brief Configure the growth-derived size provider for a population.
+   *
+   * @param p Shared pointer to population module.
+   * @param growth_observation Shared pointer to a growth module that can
+   * provide growth-derived observation products.
+   */
+  void ConfigureGrowthDerivedSizeProvider(
+      std::shared_ptr<fims_popdy::Population<Type>> p,
+      std::shared_ptr<fims_popdy::GrowthDerivedObservationBase<Type>>
+          growth_observation) {
+    std::shared_ptr<fims_popdy::GrowthDerivedSizeProvider<Type>> size_provider =
+        std::make_shared<fims_popdy::GrowthDerivedSizeProvider<Type>>();
+
+    size_provider->SetGrowth(growth_observation);
+    size_provider->SetPopulationDimensions(p->n_years, p->n_ages);
+    size_provider->SetPopulationSizeGrid(&(p->size_grid));
+
+    p->size_distribution_provider = size_provider;
+  }
+
+  /**
    * @brief Set pointers to the growth module referenced in the population
    * module.
    *
@@ -668,6 +738,12 @@ void SetFleetALKModel(bool &valid_model,
         // correctly into zero-based internal arrays.
             growth_observation->SetAgeOffset(static_cast<double>(min_age));
           }
+
+          EnsurePopulationSizeGrid(valid_model, p);
+          if (!valid_model) {
+            return;
+          }
+          ConfigureGrowthDerivedSizeProvider(p, growth_observation);
         }
         FIMS_INFO_LOG("Growth model " + fims::to_string(growth_uint) +
                       " successfully set to population " +
