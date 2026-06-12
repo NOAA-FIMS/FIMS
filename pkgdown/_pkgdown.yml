@@ -95,9 +95,9 @@ navbar:
           href: articles/fims-demo-projections.html
         - text: -------
         - text: Diagnostics
-        - text: "diagnostics: likelihood profile"
+        - text: Running a likelihood profile on a FIMS model
           href: articles/likelihood_profile.html
-        - text: "diagnostics: retrospective"
+        - text: Running a retrospective analysis on a FIMS model
           href: articles/retrospective.html
         - text: -------
         - text: Developer
