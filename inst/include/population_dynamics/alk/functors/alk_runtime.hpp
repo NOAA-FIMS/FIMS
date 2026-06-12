@@ -25,10 +25,13 @@ namespace fims_popdy {
  * state.
  *
  * Tries the growth-derived ALK path when the linked population growth object
- * exposes the required observation capability. When that capability exists,
- * the growth-derived path must succeed or the build fails. Fixed age-to-length
- * conversion is only used for growth objects that do not expose the
- * growth-derived observation capability.
+ * exposes the required observation capability. That migrated path depends
+ * on a configured population size provider and a valid population biological
+ * size grid so prepared population age-to-size products can be mapped into
+ * fleet observation bins. When the growth-derived capability exists, that path
+ * must succeed or the build fails. Fixed age-to-length conversion is only used
+ * for growth objects that do not expose the growth-derived observation
+ * capability.
  *
  * @param population Shared pointer to the owning population.
  * @param fleet Shared pointer to the fleet.
@@ -47,7 +50,10 @@ std::shared_ptr<ALKBase<Type>> BuildFleetALK(
           std::dynamic_pointer_cast<GrowthDerivedObservationBase<Type>>(
               population->growth)) {
     std::shared_ptr<ALKBase<Type>> growth_alk =
-        std::make_shared<GrowthDerivedALK<Type>>(fleet, growth_observation);
+        std::make_shared<GrowthDerivedALK<Type>>(
+            fleet,
+            growth_observation,
+            population->size_distribution_provider);
 
     if (growth_alk->IsActive() &&
         growth_alk->PrepareForCurrentState()) {
@@ -76,9 +82,11 @@ std::shared_ptr<ALKBase<Type>> BuildFleetALK(
  * @brief Ensure a fleet has an active ALK before length-based calculations.
  *
  * Reuses the current fleet ALK when it matches the current population growth
- * path and can prepare for the current model state. Otherwise rebuilds the
- * fleet ALK from the current population and fleet state. Throws when the fleet
- * has length bins but no usable ALK path can be constructed.
+ * path and can prepare for the current model state. For the migrated
+ * growth-derived path, this preparation includes both upstream growth products
+ * and linked population size-provider products. Otherwise rebuilds the fleet
+ * ALK from the current population and fleet state. Throws when the fleet has
+ * length bins but no usable ALK path can be constructed.
  *
  * @param population Shared pointer to the owning population.
  * @param fleet Shared pointer to the fleet.
@@ -130,7 +138,8 @@ void EnsureFleetALK(const std::shared_ptr<Population<Type>>& population,
 
   if (growth_observation != nullptr) {
     ss << " This population uses a growth-derived-capable growth object, so "
-       << "the growth-derived ALK path was required and could not be built.";
+       << "the growth-derived ALK path with population size-provider support "
+       << "was required and could not be built or prepared.";
   } else {
     ss << " Provide a valid fixed age-to-length conversion matrix for this "
        << "fleet or use a supported growth-derived-capable growth object.";
