@@ -43,7 +43,7 @@ jobs:
         if: matrix.os == 'ubuntu-latest'
         run: |
           # Pre-allocate 16GB of disk space for the swap file.
-          sudo fallocate -l 16G /swapfile
+          sudo dd if=/dev/zero of=/swapfile bs=1M count=16384 status=progress
           # Restricted permissions are required; swap files must be 
           # readable only by the root user for security.
           sudo chmod 600 /swapfile
