@@ -42,6 +42,8 @@ jobs:
       - name: Create Manual Swap (Linux)
         if: matrix.os == 'ubuntu-latest'
         run: |
+          # Deactivate existing swap if active to avoid "Text file busy"
+          sudo swapoff -a || true
           # Pre-allocate 16GB of disk space for the swap file.
           sudo dd if=/dev/zero of=/swapfile bs=1M count=16384 status=progress
           # Restricted permissions are required; swap files must be 
