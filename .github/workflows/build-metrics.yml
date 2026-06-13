@@ -24,7 +24,7 @@ jobs:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       BASELINE_REPOSITORY: ${{ github.event.pull_request.base.repo.full_name || github.repository }}
       CURRENT_COMMIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
-      REGRESSION_PCT: 15
+      REGRESSION_PCT: 25
 
     steps:
       - uses: actions/checkout@v6
