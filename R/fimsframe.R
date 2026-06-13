@@ -649,6 +649,15 @@ methods::setMethod(
 #' removed from the embedding matrix; when `FALSE`, `construct()` is called
 #' and those sentinel values remain in the matrix.
 #'
+#' Uncertainty propagation follows the same pointer-based pattern as the value
+#' fields. When `uncertainty_name` is supplied, the function extracts a
+#' matching time series (filtered on the same `series_type` and ordered by
+#' `timing`) and passes it to the Rcpp module. The resulting embedding list
+#' will include `embedded_uncertainty` and `target_uncertainty` numeric
+#' vectors laid out identically to `embedded_values` and `target_values`
+#' respectively. When `uncertainty_name` is `NULL` (the default) those fields
+#' are absent from the stored list.
+#'
 #' The returned FIMSFrame is identical to `x` except that `edm_embeddings`
 #' contains one additional element named `embedding_name`.
 #'
@@ -663,6 +672,11 @@ methods::setMethod(
 #' @param drop_missing Logical (default `TRUE`). When `TRUE`, rows containing
 #'   the FIMS missing-value sentinel `-999` are dropped from the embedding
 #'   matrix.
+#' @param uncertainty_name A single string giving the `name` column value for
+#'   an uncertainty series in the data slot (e.g. `"survey1_sd"`), or `NULL`
+#'   (default) to skip uncertainty propagation. The uncertainty series must
+#'   have the same length as the value series after filtering on
+#'   `series_type` and arranging by `timing`.
 #' @param embedding_name A single string used as the key under which the
 #'   result is stored in `edm_embeddings`. Defaults to
 #'   `paste0(series_type, "_", series_name, "_E", E, "_tau", tau)`.
@@ -679,6 +693,7 @@ create_edm_embedding <- function(
     E,
     tau,
     drop_missing = TRUE,
+    uncertainty_name = NULL,
     embedding_name = paste0(series_type, "_", series_name,
                             "_E", E, "_tau", tau)) {
   if (!methods::is(x, "FIMSFrame")) {
@@ -693,6 +708,10 @@ create_edm_embedding <- function(
   if (!is.numeric(E) || length(E) != 1 || E < 1 || E %% 1 != 0) {
     cli::cli_abort("{.var E} must be a positive integer.")
   }
+  if (!is.null(uncertainty_name) &&
+        (!is.character(uncertainty_name) || length(uncertainty_name) != 1)) {
+    cli::cli_abort("{.var uncertainty_name} must be a single string or NULL.")
+  }
   if (!is.numeric(tau) || length(tau) != 1 || tau < 1 || tau %% 1 != 0) {
     cli::cli_abort("{.var tau} must be a positive integer.")
   }
@@ -705,6 +724,31 @@ create_edm_embedding <- function(
   ) |>
     dplyr::arrange(.data[["timing"]]) |>
     dplyr::pull(.data[["value"]])
+
+  # Extract the optional uncertainty series
+  uncertainty_data <- numeric(0)
+  if (!is.null(uncertainty_name)) {
+    uncertainty_data <- dplyr::filter(
+      get_data(x),
+      .data[["type"]] == series_type,
+      .data[["name"]] == uncertainty_name
+    ) |>
+      dplyr::arrange(.data[["timing"]]) |>
+      dplyr::pull(.data[["value"]])
+
+    if (length(uncertainty_data) == 0) {
+      cli::cli_abort(c(
+        "No uncertainty data found for type {.val {series_type}} and name {.val {uncertainty_name}}.",
+        "i" = "Available names: {.val {unique(get_data(x)[[\"name\"]])}}."
+      ))
+    }
+    if (length(uncertainty_data) != length(series_data)) {
+      cli::cli_abort(c(
+        "Uncertainty series length ({length(uncertainty_data)}) does not match ",
+        "value series length ({length(series_data)}) for name {.val {uncertainty_name}}."
+      ))
+    }
+  }
 
   if (length(series_data) == 0) {
     cli::cli_abort(c(
@@ -719,18 +763,37 @@ create_edm_embedding <- function(
   tryCatch(
     {
       if (drop_missing) {
-        edm_obj$construct_drop_missing(
-          as.numeric(series_data),
-          as.integer(E),
-          as.integer(tau),
-          -999.0
-        )
+        if (!is.null(uncertainty_name)) {
+          edm_obj$construct_drop_missing_with_uncertainty(
+            as.numeric(series_data),
+            as.integer(E),
+            as.integer(tau),
+            -999.0,
+            as.numeric(uncertainty_data)
+          )
+        } else {
+          edm_obj$construct_drop_missing(
+            as.numeric(series_data),
+            as.integer(E),
+            as.integer(tau),
+            -999.0
+          )
+        }
       } else {
-        edm_obj$construct(
-          as.numeric(series_data),
-          as.integer(E),
-          as.integer(tau)
-        )
+        if (!is.null(uncertainty_name)) {
+          edm_obj$construct_with_uncertainty(
+            as.numeric(series_data),
+            as.integer(E),
+            as.integer(tau),
+            as.numeric(uncertainty_data)
+          )
+        } else {
+          edm_obj$construct(
+            as.numeric(series_data),
+            as.integer(E),
+            as.integer(tau)
+          )
+        }
       }
     },
     error = function(e) {
@@ -753,6 +816,14 @@ create_edm_embedding <- function(
     embedded_values = edm_obj$embedded_values$toRVector(),
     target_values = edm_obj$target_values$toRVector()
   )
+
+  # Append uncertainty fields only when an uncertainty series was provided
+  if (!is.null(uncertainty_name)) {
+    embedding_result[["embedded_uncertainty"]] <-
+      edm_obj$embedded_uncertainty$toRVector()
+    embedding_result[["target_uncertainty"]] <-
+      edm_obj$target_uncertainty$toRVector()
+  }
 
   # Store in the edm_embeddings slot and return a new FIMSFrame
   existing <- get_edm_embeddings(x)

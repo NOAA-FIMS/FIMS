@@ -59,6 +59,12 @@ class EDMInterfaceBase : public FIMSRcppInterfaceBase {
  * @details Wraps the C++ fims_edm::DelayEmbeddingMatrix and the
  * fims_edm::MakeDelayEmbedding / fims_edm::MakeDelayEmbeddingDropMissing
  * factory functions, exposing them to R through the FIMS Rcpp module system.
+ *
+ * Uncertainty propagation follows the same pointer-based design as the value
+ * fields. When an uncertainty series is supplied:
+ *  - embedded_uncertainty mirrors embedded_values in layout
+ *  - target_uncertainty mirrors target_values
+ * Both are empty when no uncertainty series is provided.
  */
 class DelayEmbeddingInterface : public EDMInterfaceBase {
  public:
@@ -91,6 +97,18 @@ class DelayEmbeddingInterface : public EDMInterfaceBase {
    * from the original series pointers.
    */
   RealVector target_values;
+  /**
+   * @brief The flattened uncertainty matrix, stored row-major. Element
+   * [row * n_cols + col] is sigma_{t - col * tau} for that row.
+   * Empty when no uncertainty series is provided.
+   */
+  RealVector embedded_uncertainty;
+  /**
+   * @brief The target time-point uncertainties for each row (i.e., sigma_t),
+   * dereferenced from the input_uncertainty series pointers.
+   * Empty when no uncertainty series is provided.
+   */
+  RealVector target_uncertainty;
 
   /**
    * @brief The constructor.
@@ -117,7 +135,9 @@ class DelayEmbeddingInterface : public EDMInterfaceBase {
         n_rows(other.n_rows),
         n_cols(other.n_cols),
         embedded_values(other.embedded_values),
-        target_values(other.target_values) {}
+        target_values(other.target_values),
+        embedded_uncertainty(other.embedded_uncertainty),
+        target_uncertainty(other.target_uncertainty) {}
 
   /**
    * @brief The destructor.
@@ -135,7 +155,15 @@ class DelayEmbeddingInterface : public EDMInterfaceBase {
    *
    * @details Calls fims_edm::MakeDelayEmbedding with the provided series,
    * embedding dimension, and time lag. The resulting matrix values and
-   * target indices are stored in the interface fields.
+   * target values are stored in the interface fields.
+   *
+  /**
+   * @brief Construct a delay embedding matrix from a time series vector
+   * (no uncertainty propagation).
+   *
+   * @details Calls fims_edm::MakeDelayEmbedding. The resulting matrix values
+   * and target values are stored in the interface fields. The
+   * embedded_uncertainty and target_uncertainty fields remain empty.
    *
    * @param series An Rcpp::NumericVector representing the univariate time
    * series.
@@ -143,39 +171,97 @@ class DelayEmbeddingInterface : public EDMInterfaceBase {
    * @param tau The time lag (must be > 0).
    */
   void construct(Rcpp::NumericVector series, uint32_t E, uint32_t tau) {
-    // Convert R vector to fims::Vector<double>
     fims::Vector<double> fims_series;
     fims_series.resize(series.size());
     for (R_xlen_t i = 0; i < series.size(); i++) {
       fims_series[i] = series[i];
     }
 
-    // Build delay embedding
     fims_edm::DelayEmbeddingMatrix<double> embedding =
         fims_edm::MakeDelayEmbedding(fims_series, E, tau);
 
-    // Store parameters
     this->embedding_dimension = E;
     this->time_lag = tau;
     this->n_rows = embedding.n_rows;
     this->n_cols = embedding.n_cols;
 
-    // Copy flattened embedded values into RealVector (dereference pointers)
     this->embedded_values.resize(embedding.embedded_values.size());
     for (size_t i = 0; i < embedding.embedded_values.size(); i++) {
       this->embedded_values[i] = *embedding.embedded_values[i];
     }
 
-    // Copy target values into RealVector (dereference pointers)
     this->target_values.resize(embedding.target_values.size());
     for (size_t i = 0; i < embedding.target_values.size(); i++) {
       this->target_values[i] = *embedding.target_values[i];
+    }
+
+    // No uncertainty provided — leave uncertainty fields empty
+    this->embedded_uncertainty.resize(0);
+    this->target_uncertainty.resize(0);
+  }
+
+  /**
+   * @brief Construct a delay embedding matrix from a time series vector,
+   * propagating an accompanying uncertainty series.
+   *
+   * @details Same as construct() but also populates embedded_uncertainty and
+   * target_uncertainty following the same pointer-based layout as the value
+   * fields. @p uncertainty must have the same length as @p series.
+   *
+   * @param series An Rcpp::NumericVector representing the univariate time
+   * series.
+   * @param E The embedding dimension (must be > 0).
+   * @param tau The time lag (must be > 0).
+   * @param uncertainty An Rcpp::NumericVector of uncertainty values (e.g.,
+   * standard deviations) with the same length as @p series.
+   */
+  void construct_with_uncertainty(Rcpp::NumericVector series, uint32_t E,
+                                  uint32_t tau,
+                                  Rcpp::NumericVector uncertainty) {
+    fims::Vector<double> fims_series;
+    fims_series.resize(series.size());
+    for (R_xlen_t i = 0; i < series.size(); i++) {
+      fims_series[i] = series[i];
+    }
+
+    fims::Vector<double> fims_uncertainty;
+    fims_uncertainty.resize(uncertainty.size());
+    for (R_xlen_t i = 0; i < uncertainty.size(); i++) {
+      fims_uncertainty[i] = uncertainty[i];
+    }
+
+    fims_edm::DelayEmbeddingMatrix<double> embedding =
+        fims_edm::MakeDelayEmbedding(fims_series, E, tau, fims_uncertainty);
+
+    this->embedding_dimension = E;
+    this->time_lag = tau;
+    this->n_rows = embedding.n_rows;
+    this->n_cols = embedding.n_cols;
+
+    this->embedded_values.resize(embedding.embedded_values.size());
+    for (size_t i = 0; i < embedding.embedded_values.size(); i++) {
+      this->embedded_values[i] = *embedding.embedded_values[i];
+    }
+
+    this->target_values.resize(embedding.target_values.size());
+    for (size_t i = 0; i < embedding.target_values.size(); i++) {
+      this->target_values[i] = *embedding.target_values[i];
+    }
+
+    this->embedded_uncertainty.resize(embedding.embedded_uncertainty.size());
+    for (size_t i = 0; i < embedding.embedded_uncertainty.size(); i++) {
+      this->embedded_uncertainty[i] = *embedding.embedded_uncertainty[i];
+    }
+
+    this->target_uncertainty.resize(embedding.target_uncertainty.size());
+    for (size_t i = 0; i < embedding.target_uncertainty.size(); i++) {
+      this->target_uncertainty[i] = *embedding.target_uncertainty[i];
     }
   }
 
   /**
    * @brief Construct a delay embedding matrix from a time series, dropping
-   * rows that contain the specified missing value.
+   * rows that contain the specified missing value (no uncertainty propagation).
    *
    * @param series An Rcpp::NumericVector representing the univariate time
    * series.
@@ -186,34 +272,94 @@ class DelayEmbeddingInterface : public EDMInterfaceBase {
    */
   void construct_drop_missing(Rcpp::NumericVector series, uint32_t E,
                               uint32_t tau, double missing_value) {
-    // Convert R vector to fims::Vector<double>
     fims::Vector<double> fims_series;
     fims_series.resize(series.size());
     for (R_xlen_t i = 0; i < series.size(); i++) {
       fims_series[i] = series[i];
     }
 
-    // Build delay embedding, dropping missing values
     fims_edm::DelayEmbeddingMatrix<double> embedding =
         fims_edm::MakeDelayEmbeddingDropMissing(fims_series, E, tau,
                                                 missing_value);
 
-    // Store parameters
     this->embedding_dimension = E;
     this->time_lag = tau;
     this->n_rows = embedding.n_rows;
     this->n_cols = embedding.n_cols;
 
-    // Copy flattened embedded values into RealVector (dereference pointers)
     this->embedded_values.resize(embedding.embedded_values.size());
     for (size_t i = 0; i < embedding.embedded_values.size(); i++) {
       this->embedded_values[i] = *embedding.embedded_values[i];
     }
 
-    // Copy target values into RealVector (dereference pointers)
     this->target_values.resize(embedding.target_values.size());
     for (size_t i = 0; i < embedding.target_values.size(); i++) {
       this->target_values[i] = *embedding.target_values[i];
+    }
+
+    // No uncertainty provided — leave uncertainty fields empty
+    this->embedded_uncertainty.resize(0);
+    this->target_uncertainty.resize(0);
+  }
+
+  /**
+   * @brief Construct a delay embedding matrix from a time series, dropping
+   * rows that contain the specified missing value, and propagating an
+   * accompanying uncertainty series.
+   *
+   * @details Uncertainty rows are dropped alongside their corresponding value
+   * rows. @p uncertainty must have the same length as @p series.
+   *
+   * @param series An Rcpp::NumericVector representing the univariate time
+   * series.
+   * @param E The embedding dimension (must be > 0).
+   * @param tau The time lag (must be > 0).
+   * @param missing_value The sentinel value representing missing data.
+   * @param uncertainty An Rcpp::NumericVector of uncertainty values with the
+   * same length as @p series.
+   */
+  void construct_drop_missing_with_uncertainty(
+      Rcpp::NumericVector series, uint32_t E, uint32_t tau,
+      double missing_value, Rcpp::NumericVector uncertainty) {
+    fims::Vector<double> fims_series;
+    fims_series.resize(series.size());
+    for (R_xlen_t i = 0; i < series.size(); i++) {
+      fims_series[i] = series[i];
+    }
+
+    fims::Vector<double> fims_uncertainty;
+    fims_uncertainty.resize(uncertainty.size());
+    for (R_xlen_t i = 0; i < uncertainty.size(); i++) {
+      fims_uncertainty[i] = uncertainty[i];
+    }
+
+    fims_edm::DelayEmbeddingMatrix<double> embedding =
+        fims_edm::MakeDelayEmbeddingDropMissing(fims_series, E, tau,
+                                                missing_value, fims_uncertainty);
+
+    this->embedding_dimension = E;
+    this->time_lag = tau;
+    this->n_rows = embedding.n_rows;
+    this->n_cols = embedding.n_cols;
+
+    this->embedded_values.resize(embedding.embedded_values.size());
+    for (size_t i = 0; i < embedding.embedded_values.size(); i++) {
+      this->embedded_values[i] = *embedding.embedded_values[i];
+    }
+
+    this->target_values.resize(embedding.target_values.size());
+    for (size_t i = 0; i < embedding.target_values.size(); i++) {
+      this->target_values[i] = *embedding.target_values[i];
+    }
+
+    this->embedded_uncertainty.resize(embedding.embedded_uncertainty.size());
+    for (size_t i = 0; i < embedding.embedded_uncertainty.size(); i++) {
+      this->embedded_uncertainty[i] = *embedding.embedded_uncertainty[i];
+    }
+
+    this->target_uncertainty.resize(embedding.target_uncertainty.size());
+    for (size_t i = 0; i < embedding.target_uncertainty.size(); i++) {
+      this->target_uncertainty[i] = *embedding.target_uncertainty[i];
     }
   }
 
