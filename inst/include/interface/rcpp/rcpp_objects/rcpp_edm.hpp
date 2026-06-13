@@ -151,13 +151,6 @@ class DelayEmbeddingInterface : public EDMInterfaceBase {
   virtual uint32_t get_id() { return this->id; }
 
   /**
-   * @brief Construct a delay embedding matrix from a time series vector.
-   *
-   * @details Calls fims_edm::MakeDelayEmbedding with the provided series,
-   * embedding dimension, and time lag. The resulting matrix values and
-   * target values are stored in the interface fields.
-   *
-  /**
    * @brief Construct a delay embedding matrix from a time series vector
    * (no uncertainty propagation).
    *
