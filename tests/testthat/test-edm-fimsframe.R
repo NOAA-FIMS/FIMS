@@ -146,3 +146,81 @@ test_that("multiple embeddings can be stored in a single FIMSFrame", {
   expect_length(get_edm_embeddings(ff), 2)
   clear()
 })
+test_that("create_edm_embedding() stores uncertainty fields when uncertainty_name is provided", {
+  skip_if_not(
+    tryCatch({ clear(); TRUE }, error = function(e) FALSE),
+    "FIMS module not available"
+  )
+
+  # Build a minimal FIMSFrame-compatible dataset that includes both a value
+  # series ("survey1") and a matching uncertainty series ("survey1_sd").
+  data("data_big", package = "FIMS")
+  data_4_model <- FIMSFrame(data_big)
+
+  # Grab the existing survey1 index rows and fabricate a matching sd series
+  base_data <- get_data(data_4_model) |>
+    dplyr::filter(.data[["type"]] == "index",
+                  .data[["name"]] == "survey1") |>
+    dplyr::arrange(.data[["timing"]])
+
+  sd_rows <- base_data |>
+    dplyr::mutate(
+      name  = "survey1_sd",
+      value = 0.1 * .data[["value"]]
+    )
+
+  extended_data <- dplyr::bind_rows(get_data(data_4_model), sd_rows)
+  data_4_model2 <- FIMSFrame(extended_data)
+
+  ff <- create_edm_embedding(
+    data_4_model2,
+    series_type     = "index",
+    series_name     = "survey1",
+    E               = 3L,
+    tau             = 1L,
+    drop_missing    = TRUE,
+    uncertainty_name = "survey1_sd"
+  )
+
+  emb <- get_edm_embeddings(ff)[[1]]
+
+  #' @description Test that embedded_uncertainty is present and correctly sized when uncertainty_name is given.
+  expect_length(emb[["embedded_uncertainty"]], emb[["n_rows"]] * emb[["n_cols"]])
+  #' @description Test that target_uncertainty is present and correctly sized when uncertainty_name is given.
+  expect_length(emb[["target_uncertainty"]], emb[["n_rows"]])
+
+  # target_uncertainty should equal 0.1 * target_values (proportional)
+  #' @description Test that target_uncertainty values are proportional to target_values.
+  expect_equal(emb[["target_uncertainty"]], 0.1 * emb[["target_values"]],
+               tolerance = 1e-10)
+
+  clear()
+})
+
+test_that("create_edm_embedding() does not store uncertainty fields when uncertainty_name is NULL", {
+  data("data_big", package = "FIMS")
+  data_4_model <- FIMSFrame(data_big)
+
+  skip_if_not(
+    tryCatch({ clear(); TRUE }, error = function(e) FALSE),
+    "FIMS module not available"
+  )
+
+  ff <- create_edm_embedding(
+    data_4_model,
+    series_type  = "index",
+    series_name  = "survey1",
+    E            = 3L,
+    tau          = 1L,
+    drop_missing = TRUE
+  )
+
+  emb <- get_edm_embeddings(ff)[[1]]
+
+  #' @description Test that embedded_uncertainty is absent from the embedding list when no uncertainty_name is supplied.
+  expect_false("embedded_uncertainty" %in% names(emb))
+  #' @description Test that target_uncertainty is absent from the embedding list when no uncertainty_name is supplied.
+  expect_false("target_uncertainty" %in% names(emb))
+
+  clear()
+})

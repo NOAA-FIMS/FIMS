@@ -109,3 +109,78 @@ test_that("rcpp edm handles error cases correctly", {
   clear()
 })
 
+## Uncertainty propagation ----
+test_that("rcpp edm propagates uncertainty vectors when provided", {
+  de <- methods::new(DelayEmbedding)
+
+  series      <- c(10.0, 20.0, 30.0, 40.0, 50.0)
+  uncertainty <- c(0.1,  0.2,  0.3,  0.4,  0.5)
+  E   <- 3L
+  tau <- 1L
+
+  de$construct_with_uncertainty(series, E, tau, uncertainty)
+
+  # Shape is identical to the value embedding
+  #' @description Test that n_rows matches the value embedding when uncertainty is provided.
+  expect_equal(de$n_rows, 3)
+  #' @description Test that n_cols matches the value embedding when uncertainty is provided.
+  expect_equal(de$n_cols, 3)
+
+  # target_uncertainty mirrors target_values in the uncertainty space:
+  # Row 0 target index 2 -> sigma_2 = 0.3
+  # Row 1 target index 3 -> sigma_3 = 0.4
+  # Row 2 target index 4 -> sigma_4 = 0.5
+  #' @description Test that target_uncertainty holds the correct sigma_t values per row.
+  expect_equal(de$target_uncertainty$toRVector(), c(0.3, 0.4, 0.5))
+
+  # embedded_uncertainty row-major layout mirrors embedded_values:
+  # Row 0: [sigma_2, sigma_1, sigma_0] = [0.3, 0.2, 0.1]
+  # Row 1: [sigma_3, sigma_2, sigma_1] = [0.4, 0.3, 0.2]
+  # Row 2: [sigma_4, sigma_3, sigma_2] = [0.5, 0.4, 0.3]
+  #' @description Test that embedded_uncertainty is laid out row-major matching embedded_values.
+  expect_equal(
+    de$embedded_uncertainty$toRVector(),
+    c(0.3, 0.2, 0.1,
+      0.4, 0.3, 0.2,
+      0.5, 0.4, 0.3)
+  )
+
+  clear()
+})
+
+test_that("rcpp edm uncertainty fields are empty when not provided", {
+  de <- methods::new(DelayEmbedding)
+
+  series <- c(10.0, 20.0, 30.0, 40.0, 50.0)
+  de$construct(series, 3L, 1L)
+
+  #' @description Test that embedded_uncertainty is empty when no uncertainty series is passed.
+  expect_equal(length(de$embedded_uncertainty$toRVector()), 0)
+  #' @description Test that target_uncertainty is empty when no uncertainty series is passed.
+  expect_equal(length(de$target_uncertainty$toRVector()), 0)
+
+  clear()
+})
+
+test_that("rcpp edm construct_drop_missing propagates uncertainty correctly", {
+  de <- methods::new(DelayEmbedding)
+
+  # Valid rows after drop: index 2 (x=30) and index 6 (x=70)
+  series2     <- c(10.0, 20.0, 30.0, -999.0, 50.0, 60.0, 70.0)
+  uncertainty <- c(0.1,  0.2,  0.3,   0.4,   0.5,  0.6,  0.7)
+  E           <- 3L
+  tau         <- 1L
+  missing_val <- -999.0
+
+  de$construct_drop_missing_with_uncertainty(series2, E, tau, missing_val, uncertainty)
+
+  #' @description Test that construct_drop_missing retains only valid-row uncertainties.
+  expect_equal(de$n_rows, 2)
+
+  # Row 0 target index 2 -> sigma_2 = 0.3
+  # Row 1 target index 6 -> sigma_6 = 0.7
+  #' @description Test that target_uncertainty holds sigma_t for the retained rows.
+  expect_equal(de$target_uncertainty$toRVector(), c(0.3, 0.7))
+
+  clear()
+})

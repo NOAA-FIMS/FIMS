@@ -28,6 +28,15 @@ namespace fims_edm {
  * Both point into the same underlying input_values vector, so any update to
  * that vector (e.g., during TMB optimization iterations) is automatically
  * reflected here without copying.
+ *
+ * Uncertainty propagation follows the same pointer-based pattern:
+ *  - embedded_uncertainty: pointers into the input_uncertainty series,
+ *    laid out identically to embedded_values
+ *  - target_uncertainty: one pointer per row, pointing to the uncertainty
+ *    at the target time-point (mirrors target_values)
+ *
+ * If no uncertainty series is provided to the factory functions,
+ * embedded_uncertainty and target_uncertainty remain empty.
  */
 template <typename Type>
 struct DelayEmbeddingMatrix {
@@ -45,6 +54,19 @@ struct DelayEmbeddingMatrix {
    * target_values[row] == embedded_values[row * n_cols + 0] (i.e., x_t).
    */
   std::vector<const Type*> target_values;
+  /**
+   * @brief Flattened row-major pointers into the input_uncertainty series.
+   * Laid out identically to embedded_values:
+   * element [row * n_cols + col] points to sigma_{t - col * tau}.
+   * Empty when no uncertainty series is provided.
+   */
+  std::vector<const Type*> embedded_uncertainty;
+  /**
+   * @brief Pointers to the uncertainty at the target time-point for each row.
+   * target_uncertainty[row] points to sigma_t for that row.
+   * Empty when no uncertainty series is provided.
+   */
+  std::vector<const Type*> target_uncertainty;
 
   /**
    * @brief Access an element of the embedding matrix.
@@ -68,11 +90,17 @@ struct DelayEmbeddingMatrix {
  *
  * Both embedded_values and target_values store pointers into @p series so
  * that subsequent modifications to @p series are automatically reflected.
+ *
+ * If @p uncertainty is non-empty (and must be the same length as @p series),
+ * embedded_uncertainty and target_uncertainty are populated with pointers into
+ * @p uncertainty following the same layout. If @p uncertainty is empty, those
+ * fields are left empty.
  */
 template <typename Type>
-DelayEmbeddingMatrix<Type> MakeDelayEmbedding(const fims::Vector<Type>& series,
-                                              size_t embedding_dimension,
-                                              size_t time_lag) {
+DelayEmbeddingMatrix<Type> MakeDelayEmbedding(
+    const fims::Vector<Type>& series, size_t embedding_dimension,
+    size_t time_lag,
+    const fims::Vector<Type>& uncertainty = fims::Vector<Type>()) {
   if (embedding_dimension == 0) {
     throw std::invalid_argument("embedding_dimension must be greater than 0.");
   }
@@ -86,11 +114,22 @@ DelayEmbeddingMatrix<Type> MakeDelayEmbedding(const fims::Vector<Type>& series,
         "series is too short for the requested delay embedding.");
   }
 
+  const bool has_uncertainty = (uncertainty.size() == 0) ? false : true;
+  if (has_uncertainty && uncertainty.size() != series.size()) {
+    throw std::invalid_argument(
+        "uncertainty must be the same length as series.");
+  }
+
   DelayEmbeddingMatrix<Type> embedding;
   embedding.n_rows = series.size() - lag_span;
   embedding.n_cols = embedding_dimension;
   embedding.embedded_values.resize(embedding.n_rows * embedding.n_cols);
   embedding.target_values.resize(embedding.n_rows);
+
+  if (has_uncertainty) {
+    embedding.embedded_uncertainty.resize(embedding.n_rows * embedding.n_cols);
+    embedding.target_uncertainty.resize(embedding.n_rows);
+  }
 
   for (size_t row = 0; row < embedding.n_rows; row++) {
     const size_t target_index = row + lag_span;
@@ -100,6 +139,14 @@ DelayEmbeddingMatrix<Type> MakeDelayEmbedding(const fims::Vector<Type>& series,
       embedding.embedded_values[row * embedding.n_cols + col] =
           &series[target_index - col * time_lag];
     }
+
+    if (has_uncertainty) {
+      embedding.target_uncertainty[row] = &uncertainty[target_index];
+      for (size_t col = 0; col < embedding.n_cols; col++) {
+        embedding.embedded_uncertainty[row * embedding.n_cols + col] =
+            &uncertainty[target_index - col * time_lag];
+      }
+    }
   }
 
   return embedding;
@@ -108,16 +155,23 @@ DelayEmbeddingMatrix<Type> MakeDelayEmbedding(const fims::Vector<Type>& series,
 /**
  * @brief Build a delay embedding matrix and omit rows containing missing
  * values.
+ *
+ * If @p uncertainty is non-empty (same length as @p series), the uncertainty
+ * fields are propagated for the retained rows using the same pointer-based
+ * approach as MakeDelayEmbedding.
  */
 template <typename Type>
 DelayEmbeddingMatrix<Type> MakeDelayEmbeddingDropMissing(
     const fims::Vector<Type>& series, size_t embedding_dimension,
-    size_t time_lag, const Type& missing_value) {
+    size_t time_lag, const Type& missing_value,
+    const fims::Vector<Type>& uncertainty = fims::Vector<Type>()) {
   DelayEmbeddingMatrix<Type> full_embedding =
-      MakeDelayEmbedding(series, embedding_dimension, time_lag);
+      MakeDelayEmbedding(series, embedding_dimension, time_lag, uncertainty);
 
   DelayEmbeddingMatrix<Type> embedding;
   embedding.n_cols = full_embedding.n_cols;
+
+  const bool has_uncertainty = (full_embedding.embedded_uncertainty.size() > 0);
 
   for (size_t row = 0; row < full_embedding.n_rows; row++) {
     bool row_has_missing = false;
@@ -132,6 +186,16 @@ DelayEmbeddingMatrix<Type> MakeDelayEmbeddingDropMissing(
       for (size_t col = 0; col < full_embedding.n_cols; col++) {
         embedding.embedded_values.push_back(
             full_embedding.embedded_values[row * full_embedding.n_cols + col]);
+      }
+
+      if (has_uncertainty) {
+        embedding.target_uncertainty.push_back(
+            full_embedding.target_uncertainty[row]);
+        for (size_t col = 0; col < full_embedding.n_cols; col++) {
+          embedding.embedded_uncertainty.push_back(
+              full_embedding
+                  .embedded_uncertainty[row * full_embedding.n_cols + col]);
+        }
       }
     }
   }
