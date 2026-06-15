@@ -40,7 +40,7 @@
 #'
 #' @export
 #' @keywords diagnostics
-#' 
+#'
 #' @importFrom rlang .data
 #'
 #' @examples

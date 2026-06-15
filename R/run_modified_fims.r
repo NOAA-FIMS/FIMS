@@ -14,7 +14,7 @@
 #' @return FIMS model fitted to the new parameter input value
 #' @export
 #' @keywords diagnostics
-#' 
+#'
 #' @examples
 #' \dontrun{
 #' library(FIMS)
