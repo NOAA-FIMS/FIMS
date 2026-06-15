@@ -41,6 +41,14 @@ reference:
   - has_keyword("fit_fims")
   - is_fims_verbose
 
+- title: Diagnostics
+  desc: Primary functions used when diagnosing a FIMS model.
+  contents:
+  - has_keyword("retrospective")
+  - has_keyword("likelihood")
+  - starts_with("run_modified")
+  - calculate_mohns_rho
+
 - title: Package development
   desc: Primary functions used when developing FIMS package.
   contents:
