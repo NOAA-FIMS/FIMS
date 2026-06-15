@@ -64,6 +64,8 @@
 #'
 #' @importFrom rlang .data
 #'
+#' @keywords diagnostics
+#'
 #' @examples
 #' \dontrun{
 #' library(FIMS)

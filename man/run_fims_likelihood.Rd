@@ -153,3 +153,4 @@ Other diagnostic_functions:
 \code{\link[=run_fims_retrospective]{run_fims_retrospective()}}
 }
 \concept{diagnostic_functions}
+\keyword{diagnostics}

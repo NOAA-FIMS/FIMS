@@ -1,6 +1,6 @@
-#' @title Modify Parameters of a FIMS Model 
-#' 
-#' @description 
+#' @title Modify Parameters of a FIMS Model
+#'
+#' @description
 #' Modify a parameter input and run a FIMS model.
 #' This function is called by run_fims_likelihood()
 #'
@@ -13,8 +13,8 @@
 #'
 #' @return FIMS model fitted to the new parameter input value
 #' @export
-#'
-#'
+#' @keywords diagnostics
+#' 
 #' @examples
 #' \dontrun{
 #'  library(FIMS)
@@ -101,7 +101,7 @@ run_modified_pars_fims <- function(
 }
 
 #' @title Modify data for a FIMS Model
-#' 
+#'
 #' @description
 #' Function to remove a given number of years of data and run FIMS model.
 #' This function is called by run_fims_retrospective()
@@ -111,7 +111,7 @@ run_modified_pars_fims <- function(
 #' @param parameters input parameters used in base FIMS model
 #' @return FIMS model fitted with years of data removed
 #' @export
-#'
+#' @keywords diagnostics
 #'
 #' @examples
 #' \dontrun{
@@ -160,8 +160,7 @@ run_modified_data_fims <- function(years_to_remove = 0, data, parameters) {
       dplyr::filter(
         (.data[["type"]] %in%
           c("landings", "age_to_length_conversion", "weight_at_age")) |
-          .data[["timing"]] <=
-            max_timing - years_to_remove
+          .data[["timing"]] <= max_timing - years_to_remove
       )
   }
   # convert to FIMSFrame format

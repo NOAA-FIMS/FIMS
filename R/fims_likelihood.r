@@ -82,6 +82,8 @@
 #'
 #' @export
 #'
+#' @keywords diagnostics
+#'
 #' @examples
 #' \dontrun{
 #' library(FIMS)

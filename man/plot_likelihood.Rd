@@ -119,3 +119,4 @@ Other plotting_functions:
 }
 \concept{diagnostic_functions}
 \concept{plotting_functions}
+\keyword{diagnostics}

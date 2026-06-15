@@ -39,6 +39,7 @@
 #' 99-110.
 #'
 #' @export
+#' @keywords diagnostics
 #' 
 #' @importFrom rlang .data
 #' 

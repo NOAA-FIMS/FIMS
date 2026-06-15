@@ -119,3 +119,4 @@ Other diagnostic_functions:
 \code{\link[=run_fims_likelihood]{run_fims_likelihood()}}
 }
 \concept{diagnostic_functions}
+\keyword{diagnostics}

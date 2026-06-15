@@ -34,3 +34,4 @@ This function is called by run_fims_retrospective()
  fit <- run_modified_data_fims(years_to_remove = 1, data = data_big, parameters = parameters)
 }
 }
+\keyword{diagnostics}

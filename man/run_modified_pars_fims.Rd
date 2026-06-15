@@ -47,3 +47,4 @@ This function is called by run_fims_likelihood()
    parameters = parameters, data = data_big)
 }
 }
+\keyword{diagnostics}
