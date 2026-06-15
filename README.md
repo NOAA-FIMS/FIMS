@@ -11,9 +11,7 @@ FIMS is an R package for fitting integrated statistical population-dynamics mode
 
 If you are new to FIMS, the best place to start is the <a href="https://noaa-fims.github.io/FIMS/articles/fims-demo.html" target="_blank">"Introducing FIMS"</a> vignette.
 
-<br />
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/NOAA-FIMS/FIMS)
-<br />
 
 ## Installation
 
