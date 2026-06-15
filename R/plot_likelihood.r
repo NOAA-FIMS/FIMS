@@ -127,14 +127,14 @@ plot_likelihood <- function(like_fit, group = "label") {
     dplyr::filter(!is.na(.data$lpdf)) |>
     dplyr::group_by(.data[[colname]], .data[[group]]) |> # grouping by parameter and data type
     dplyr::distinct(.data$lpdf) |>
-    dplyr::summarise(total_like = sum(.data$lpdf, na.rm = TRUE), .groups = "drop")  
+    dplyr::summarize(total_like = sum(.data$lpdf, na.rm = TRUE), .groups = "drop")  
 
   ### add total likelihood across all groups
   total <- like_fit$estimates |>
     dplyr::filter(!is.na(.data$lpdf)) |>
     dplyr::group_by(.data[[colname]]) |>
     dplyr::distinct(.data$lpdf) |>
-    dplyr::summarise(total_like = sum(.data$lpdf, na.rm = TRUE), .groups = "drop") |>
+    dplyr::summarize(total_like = sum(.data$lpdf, na.rm = TRUE), .groups = "drop") |>
     dplyr::mutate(label = "Total") |>
     dplyr::select(.data[[colname]], .data$label, .data$total_like)
 

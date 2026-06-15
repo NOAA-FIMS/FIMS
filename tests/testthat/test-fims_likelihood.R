@@ -59,7 +59,7 @@ test_that("fims_likelihood() works with correct inputs", {
     dplyr::filter(!is.na(lpdf)) |>
     dplyr::group_by(value_log_rzero) |>
     dplyr::distinct(lpdf) |>
-    dplyr::summarise(total_like = sum(lpdf)) |>
+    dplyr::summarize(total_like = sum(lpdf)) |>
     dplyr::mutate(label = "Total") |>
     dplyr::select(value_log_rzero, label, total_like)
 
