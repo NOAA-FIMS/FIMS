@@ -23,28 +23,28 @@ parameters <- data_4_model |>
 
 # Run retrospective analysis for testing
 retro_fit <- run_fims_retrospective(
-  years_to_remove = 0:2, 
-  data = data_big, 
-  parameters = parameters, 
+  years_to_remove = 0:2,
+  data = data_big,
+  parameters = parameters,
   n_cores = 1
 )
 
 ## IO correctness ----
 test_that("calculate_mohns_rho() works with correct inputs", {
   #' @description Test that calculate_mohns_rho() returns a numeric value.
-  
+
   rho_ssb <- calculate_mohns_rho(retro_fit, quantity = "spawning_biomass")
-  
+
   expect_equal(
     object = class(rho_ssb),
     expected = "numeric"
   )
-  
+
   expect_equal(
     object = length(rho_ssb),
     expected = 1
   )
-  
+
   #' @description Test that calculate_mohns_rho() returns expected value for spawning biomass.
   # Based on the retrospective test data, calculate expected rho manually
   # Using values from test-fims_retrospective.R where at year 31:
@@ -52,19 +52,19 @@ test_that("calculate_mohns_rho() works with correct inputs", {
   # For peel 1 (year 32): compare retrospective_peel 1 at year 32 vs retrospective_peel 0 at year 32
   # For peel 2 (year 31): compare retrospective_peel 2 at year 31 vs retrospective_peel 0 at year 31
   # The calculation should be: mean((peel - base) / base) for each peel
-  
+
   expect_true(
     object = is.finite(rho_ssb) && !is.na(rho_ssb)
   )
-  
+
   #' @description Test that calculate_mohns_rho() works with recruitment quantity.
   rho_rec <- calculate_mohns_rho(retro_fit, quantity = "expected_recruitment")
-  
+
   expect_equal(
     object = class(rho_rec),
     expected = "numeric"
   )
-  
+
   expect_true(
     object = is.finite(rho_rec) && !is.na(rho_rec)
   )
@@ -79,23 +79,23 @@ test_that("calculate_mohns_rho() handles edge cases correctly", {
     parameters = parameters,
     n_cores = 1
   )
-  
+
   rho_single <- calculate_mohns_rho(retro_fit_single, quantity = "spawning_biomass")
-  
+
   expect_equal(
     object = class(rho_single),
     expected = "numeric"
   )
-  
+
   expect_equal(
     object = length(rho_single),
     expected = 1
   )
-  
+
   #' @description Test that calculate_mohns_rho() returns consistent results across runs.
   rho_ssb_1 <- calculate_mohns_rho(retro_fit, quantity = "spawning_biomass")
   rho_ssb_2 <- calculate_mohns_rho(retro_fit, quantity = "spawning_biomass")
-  
+
   expect_equal(
     object = rho_ssb_1,
     expected = rho_ssb_2
@@ -112,7 +112,7 @@ test_that("calculate_mohns_rho() returns correct error messages", {
     ),
     regexp = "must be a list"
   )
-  
+
   #' @description Test that calculate_mohns_rho() errors with missing elements in retro_fit.
   expect_error(
     object = calculate_mohns_rho(
@@ -121,7 +121,7 @@ test_that("calculate_mohns_rho() returns correct error messages", {
     ),
     regexp = "must contain 'years_to_remove' and 'estimates' elements"
   )
-  
+
   #' @description Test that calculate_mohns_rho() errors with invalid quantity (not character).
   expect_error(
     object = calculate_mohns_rho(
@@ -130,7 +130,7 @@ test_that("calculate_mohns_rho() returns correct error messages", {
     ),
     regexp = "must be a single character string"
   )
-  
+
   #' @description Test that calculate_mohns_rho() errors with multiple quantities.
   expect_error(
     object = calculate_mohns_rho(
@@ -139,11 +139,11 @@ test_that("calculate_mohns_rho() returns correct error messages", {
     ),
     regexp = "must be a single character string"
   )
-  
+
   #' @description Test that calculate_mohns_rho() errors when first model is not reference (retrospective_peel != 0).
   retro_fit_invalid <- retro_fit
   retro_fit_invalid$years_to_remove <- c(1, 2, 3)
-  
+
   expect_error(
     object = calculate_mohns_rho(
       retro_fit = retro_fit_invalid,
@@ -151,12 +151,13 @@ test_that("calculate_mohns_rho() returns correct error messages", {
     ),
     regexp = "must contain reference year run"
   )
-  
+
   #' @description Test that calculate_mohns_rho() errors with non-existent quantity.
   expect_error(
     object = calculate_mohns_rho(
-      retro_fit = retro_fit, 
-      quantity = "non_existent_quantity"),
+      retro_fit = retro_fit,
+      quantity = "non_existent_quantity"
+    ),
     regexp = "not found in estimates"
   )
 })
@@ -167,7 +168,7 @@ test_that("calculate_mohns_rho() handles warnings appropriately", {
   # Create a modified retro_fit with a missing value
   retro_fit_na <- retro_fit
   retro_fit_na$estimates$estimated[1] <- NA
-  
+
   # Depending on where the NA is, this might produce a warning or still work
   # The function should handle this gracefully
   result <- tryCatch(

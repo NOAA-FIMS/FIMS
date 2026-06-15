@@ -59,10 +59,11 @@ Some things to note about the  `run_fims_retrospective()` function, you can prov
 > NOTE: If left empty, the default for `n_cores` is one less than the number of cores on your machine so this could unexpectedly use up a lot of your computing power. 
 
 ```{r, retro}
-retro_fit <- run_fims_retrospective(years_to_remove = 0:2, 
-              data_4_model, parameters, 
-              n_cores = 1)
-
+retro_fit <- run_fims_retrospective(
+  years_to_remove = 0:2,
+  data_4_model, parameters,
+  n_cores = 1
+)
 ```
 
 ## Mohn's Rho  
@@ -80,28 +81,29 @@ To visualize the results of the retrospective analysis, we can use `plot_retrosp
 
 ```{r}
 # plot the SSB time series from each model
-fig_retrospective_ssb <- plot_retrospective(retro_fit) + 
-ggplot2::labs(x = "Year", y = "Spawning Biomass") +
-ggplot2::guides(fill = ggplot2::guide_legend(title = "Retro Peel"), 
-color = ggplot2::guide_legend(title = "Retro Peel"),
-linetype = ggplot2::guide_legend(title = "Retro Peel"))
+fig_retrospective_ssb <- plot_retrospective(retro_fit) +
+  ggplot2::labs(x = "Year", y = "Spawning Biomass") +
+  ggplot2::guides(
+    fill = ggplot2::guide_legend(title = "Retro Peel"),
+    color = ggplot2::guide_legend(title = "Retro Peel"),
+    linetype = ggplot2::guide_legend(title = "Retro Peel")
+  )
 print(fig_retrospective_ssb)
 ```
 
 We can compare the spawning biomass estimates from the reference model and each peel for the last six years. 
 ```{r}
 retro_fit[["estimates"]] |>
-    dplyr::filter(label == "spawning_biomass") |>
-    dplyr::select(label, year_i, estimated, retrospective_peel) |>
-    tidyr::pivot_wider(names_from = retrospective_peel, values_from = estimated) |>
-    dplyr::rename(
-      "Year" = year_i,
-      "Reference model" = `0`,
-      "Peel 1" = `1`,
-      "Peel 2" = `2`
-    ) |>
-    tail() 
-   
+  dplyr::filter(label == "spawning_biomass") |>
+  dplyr::select(label, year_i, estimated, retrospective_peel) |>
+  tidyr::pivot_wider(names_from = retrospective_peel, values_from = estimated) |>
+  dplyr::rename(
+    "Year" = year_i,
+    "Reference model" = `0`,
+    "Peel 1" = `1`,
+    "Peel 2" = `2`
+  ) |>
+  tail()
 ```
 
 ## Clean up 

@@ -27,7 +27,7 @@
 #'   * `years_to_remove` - Vector of years removed for each peel
 #'   * `estimates` - Data frame with model estimates for each retrospective run
 #' @param quantity A character vector specifying which quantity to plot.
-#'   Currently, the only option is the default, 
+#'   Currently, the only option is the default,
 #'   `"spawning_biomass"`. The values must
 #'   match entries in the `label` column of the estimates data frame.
 #'
@@ -38,7 +38,7 @@
 #' * Different colors and line types for each peel
 #' * Facets by quantity if multiple quantities are specified
 #' * NOAA-themed styling via [stockplotr::theme_noaa()]
-#' 
+#'
 #' The plot is also automatically saved as "retrospective.png".
 #'
 #' @references
@@ -91,40 +91,48 @@
 #' }
 #'
 plot_retrospective <- function(retro_fit, quantity = "spawning_biomass") {
-
   # filter rows in estimates_df to get spawning_biomass
   retro_df <- retro_fit[["estimates"]] |>
-    dplyr::filter(.data$label %in% quantity) |> #right now mortality_F is by year/age, so ignoring it for simplicity
-    #TODO: some summarization to get total annual F values? 
-    dplyr::select(.data$label, .data$year_i, .data$age_i, 
-                  .data$estimated, .data$uncertainty, .data$retrospective_peel) |> 
-    dplyr::mutate(lower_CI = .data$estimated - (1.96 * .data$uncertainty),
-                  upper_CI = .data$estimated + (1.96 * .data$uncertainty),
-                  retrospective_peel = factor(.data$retrospective_peel)) #assuming uncertainty is SE, TODO: check this assumption
+    dplyr::filter(.data$label %in% quantity) |> # right now mortality_F is by year/age, so ignoring it for simplicity
+    # TODO: some summarization to get total annual F values?
+    dplyr::select(
+      .data$label, .data$year_i, .data$age_i,
+      .data$estimated, .data$uncertainty, .data$retrospective_peel
+    ) |>
+    dplyr::mutate(
+      lower_CI = .data$estimated - (1.96 * .data$uncertainty),
+      upper_CI = .data$estimated + (1.96 * .data$uncertainty),
+      retrospective_peel = factor(.data$retrospective_peel)
+    ) # assuming uncertainty is SE, TODO: check this assumption
 
   max_year <- max(retro_df$year_i, na.rm = TRUE)
   retro_df <- retro_df |>
     dplyr::mutate(retrospective_peel_num = as.numeric(as.character(.data$retrospective_peel))) |>
-    dplyr::filter(.data$year_i <= (max_year - .data$retrospective_peel_num)) |> 
+    dplyr::filter(.data$year_i <= (max_year - .data$retrospective_peel_num)) |>
     dplyr::select(-.data$retrospective_peel_num)
 
   retro_plot <- ggplot2::ggplot(data = retro_df, ggplot2::aes(x = .data$year_i)) +
-    ggplot2::geom_ribbon(ggplot2::aes(ymin = .data$lower_CI, #for every line or just the reference line?
-                                      ymax = .data$upper_CI, 
-                                      fill = .data$retrospective_peel), alpha = .25) +   # should this be conditional?
-    ggplot2::geom_line(ggplot2::aes(y = .data$estimated, 
-                                    color = .data$retrospective_peel, 
-                                    linetype = .data$retrospective_peel), linewidth = 1.2) +
+    ggplot2::geom_ribbon(ggplot2::aes(
+      ymin = .data$lower_CI, # for every line or just the reference line?
+      ymax = .data$upper_CI,
+      fill = .data$retrospective_peel
+    ), alpha = .25) + # should this be conditional?
+    ggplot2::geom_line(ggplot2::aes(
+      y = .data$estimated,
+      color = .data$retrospective_peel,
+      linetype = .data$retrospective_peel
+    ), linewidth = 1.2) +
     stockplotr::theme_noaa(discrete = TRUE) +
-    ggplot2::labs(x = "Year", y = tools::toTitleCase(gsub("_", " ", quantity)),
+    ggplot2::labs(
+      x = "Year", y = tools::toTitleCase(gsub("_", " ", quantity)),
       color = "Retrospective Peel",
       fill = "Retrospective Peel",
       linetype = "Retrospective Peel"
     )
 
-  if(length(unique(quantity)) > 1){
-    retro_plot <- retro_plot + 
-      ggplot2::facet_wrap(~.data$label, scales = "free_y", ncol = 1)
+  if (length(unique(quantity)) > 1) {
+    retro_plot <- retro_plot +
+      ggplot2::facet_wrap(~ .data$label, scales = "free_y", ncol = 1)
   }
 
   ggplot2::ggsave("retrospective.png")
