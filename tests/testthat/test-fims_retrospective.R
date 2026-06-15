@@ -25,13 +25,13 @@ parameters <- data_4_model |>
 ## IO correctness ----
 test_that("run_fims_retrospective() works with correct inputs", {
   #' @description Test that run_fims_retrospective(x) returns y.
-  
+
   retro_fit <- run_fims_retrospective(
-    years_to_remove = 0:2, 
-    data = data_big, 
-    parameters = parameters, 
+    years_to_remove = 0:2,
+    data = data_big,
+    parameters = parameters,
     n_cores = 1
-    )
+  )
 
   expect_equal(
     object = names(retro_fit),
@@ -44,12 +44,12 @@ test_that("run_fims_retrospective() works with correct inputs", {
     expected = 3
   )
 
-retro_ssb <- retro_fit[["estimates"]] |>
+  retro_ssb <- retro_fit[["estimates"]] |>
     dplyr::filter(label == "spawning_biomass") |>
     dplyr::select(label, year_i, estimated, retrospective_peel) |>
     tidyr::pivot_wider(names_from = retrospective_peel, values_from = estimated) |>
     dplyr::filter(year_i == 31) |>
-    dplyr::select(-c(1,2)) |>
+    dplyr::select(-c(1, 2)) |>
     as.numeric()
 
   #' @description Test that fims_retrospective(x) returns y.
@@ -58,7 +58,6 @@ retro_ssb <- retro_fit[["estimates"]] |>
     expected = c(1728.686, 1654.160, 1500.182),
     tolerance = .1
   )
-
 })
 
 ## Edge handling ----
@@ -78,7 +77,7 @@ test_that("run_fims_retrospective() handles edge cases correctly", {
     object = retro_fit_zero[["years_to_remove"]],
     expected = 0
   )
-  
+
   #' @description Test that run_fims_retrospective works with n_cores = 1 (sequential).
   retro_fit_seq <- run_fims_retrospective(
     years_to_remove = 0:1,
@@ -104,7 +103,7 @@ test_that("run_fims_retrospective() returns correct error messages", {
     ),
     regexp = "n_cores must be a positive integer"
   )
-  
+
   #' @description Test that run_fims_retrospective errors with invalid n_cores (zero).
   expect_error(
     object = run_fims_retrospective(
@@ -115,7 +114,7 @@ test_that("run_fims_retrospective() returns correct error messages", {
     ),
     regexp = "n_cores must be a positive integer"
   )
-  
+
   #' @description Test that run_fims_retrospective errors with invalid n_cores (negative).
   expect_error(
     object = run_fims_retrospective(
@@ -126,7 +125,7 @@ test_that("run_fims_retrospective() returns correct error messages", {
     ),
     regexp = "n_cores must be a positive integer"
   )
-  
+
   #' @description Test that run_fims_retrospective errors with empty years_to_remove.
   expect_error(
     object = run_fims_retrospective(
@@ -137,7 +136,7 @@ test_that("run_fims_retrospective() returns correct error messages", {
     ),
     regexp = "must have at least one value"
   )
-  
+
   #' @description Test that run_fims_retrospective errors with negative years_to_remove.
   expect_error(
     object = run_fims_retrospective(

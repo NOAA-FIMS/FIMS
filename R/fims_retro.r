@@ -104,63 +104,62 @@
 #' head(retro_fit$estimates)
 #' }
 #'
-
 run_fims_retrospective <- function(
-    years_to_remove, 
-    data, 
-    parameters, 
-    n_cores = NULL) {
+  years_to_remove,
+  data,
+  parameters,
+  n_cores = NULL
+) {
+  # Validate years_to_remove
+  if (length(years_to_remove) == 0) {
+    cli::cli_abort("years_to_remove must have at least one value")
+  }
 
-    # Validate years_to_remove
-    if (length(years_to_remove) == 0) {
-        cli::cli_abort("years_to_remove must have at least one value")
+  if (any(years_to_remove < 0)) {
+    cli::cli_abort("years_to_remove must contain non-negative values")
+  }
+
+  # Set number of cores to use
+  if (is.null(n_cores)) {
+    n_cores_to_use <- parallel::detectCores() - 1
+  } else {
+    # Validate n_cores before conversion
+    if (!is.numeric(n_cores) || n_cores %% 1 != 0 || n_cores <= 0) {
+      cli::cli_abort("n_cores must be a positive integer. Input was {n_cores}")
     }
-    
-    if (any(years_to_remove < 0)) {
-        cli::cli_abort("years_to_remove must contain non-negative values")
-    }
+    n_cores_to_use <- as.integer(n_cores)
+  }
+  dplyr::case_when(
+    n_cores_to_use == 1 ~ future::plan(future::sequential),
+    n_cores_to_use > 1 & Sys.info()["sysname"] == "Windows" ~ future::plan(future::multisession, workers = n_cores_to_use),
+    n_cores_to_use > 1 & Sys.info()["sysname"] != "Windows" ~ future::plan(future::multicore, workers = n_cores_to_use)
+  )
 
-    # Set number of cores to use 
-    if (is.null(n_cores)) {
-        n_cores_to_use <- parallel::detectCores() - 1
-    } else {
-        # Validate n_cores before conversion
-        if (!is.numeric(n_cores) || n_cores %% 1 != 0 || n_cores <= 0) {
-            cli::cli_abort("n_cores must be a positive integer. Input was {n_cores}")
-        }
-        n_cores_to_use <- as.integer(n_cores)
-    }
-    dplyr::case_when (
-        n_cores_to_use == 1 ~ future::plan(future::sequential),
-        n_cores_to_use > 1 & Sys.info()['sysname'] == 'Windows' ~ future::plan(future::multisession, workers = n_cores_to_use),
-        n_cores_to_use > 1 & Sys.info()['sysname'] != 'Windows' ~ future::plan(future::multicore, workers = n_cores_to_use)
-    )
+  if (n_cores_to_use == 1) {
+    cli::cli_alert_info("...Running sequentially on a single core")
+  } else {
+    cli::cli_alert_info("...Running in parallel on {n_cores_to_use} cores")
+  }
+  on.exit(future::plan(future::sequential), add = TRUE)
 
-    if (n_cores_to_use == 1) {
-        cli::cli_alert_info("...Running sequentially on a single core")
-    } else {
-        cli::cli_alert_info("...Running in parallel on {n_cores_to_use} cores")
-    }
-    on.exit(future::plan(future::sequential), add = TRUE)
+  # Run retro analyses in parallel
+  estimates_list <- furrr::future_map(
+    .x = years_to_remove,
+    .f = function(years) {
+      fit <- run_modified_data_fims(
+        years_to_remove = years,
+        data = data,
+        parameters = parameters
+      )
+      FIMS::get_estimates(fit)
+    },
+    .options = furrr::furrr_options(seed = TRUE, globals = TRUE)
+  )
 
-    # Run retro analyses in parallel
-    estimates_list <- furrr::future_map(
-        .x = years_to_remove,
-        .f = function(years){
-            fit <- run_modified_data_fims(
-                years_to_remove = years, 
-                data = data, 
-                parameters = parameters
-            )
-            FIMS::get_estimates(fit)
-        },
-        .options = furrr::furrr_options(seed = TRUE, globals = TRUE)
-    )
+  for (i in seq_along(estimates_list)) {
+    estimates_list[[i]]$retrospective_peel <- years_to_remove[i]
+  }
+  estimates_df <- do.call(rbind, estimates_list)
 
-    for (i in seq_along(estimates_list)) {
-        estimates_list[[i]]$retrospective_peel <- years_to_remove[i]
-    }
-    estimates_df <- do.call(rbind, estimates_list)
-
-    return(list("years_to_remove" = years_to_remove, "estimates" = estimates_df))
+  return(list("years_to_remove" = years_to_remove, "estimates" = estimates_df))
 }

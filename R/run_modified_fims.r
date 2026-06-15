@@ -17,20 +17,21 @@
 #' 
 #' @examples
 #' \dontrun{
-#'  library(FIMS)
+#' library(FIMS)
 #' # Use built-in dataset from FIMS
-#'  data("data_big")
-#'  data_4_model <- FIMSFrame(data_big)
+#' data("data_big")
+#' data_4_model <- FIMSFrame(data_big)
 #' # Create a parameters object
-#'  parameters <- data_4_model |>
-#'  create_default_configurations() |>
-#'  create_default_parameters(data = data_4_model)
+#' parameters <- data_4_model |>
+#'   create_default_configurations() |>
+#'   create_default_parameters(data = data_4_model)
 #' # Fit a FIMS model with 1 year of data removed
-#'  fit <- run_modified_pars_fims(new_value = 12.9,
-#'    parameter_name = "log_rzero",
-#'    parameters = parameters, data = data_big)
+#' fit <- run_modified_pars_fims(
+#'   new_value = 12.9,
+#'   parameter_name = "log_rzero",
+#'   parameters = parameters, data = data_big
+#' )
 #' }
-
 run_modified_pars_fims <- function(
   new_value,
   parameter_name,
@@ -115,18 +116,17 @@ run_modified_pars_fims <- function(
 #'
 #' @examples
 #' \dontrun{
-#'  library(FIMS)
+#' library(FIMS)
 #' # Use built-in dataset from FIMS
-#'  data("data_big")
-#'  data_4_model <- FIMSFrame(data_big)
+#' data("data_big")
+#' data_4_model <- FIMSFrame(data_big)
 #' # Create a parameters object
-#'  parameters <- data_4_model |>
-#'  create_default_configurations() |>
-#'  create_default_parameters(data = data_4_model)
+#' parameters <- data_4_model |>
+#'   create_default_configurations() |>
+#'   create_default_parameters(data = data_4_model)
 #' # Fit a FIMS model with 1 year of data removed
-#'  fit <- run_modified_data_fims(years_to_remove = 1, data = data_big, parameters = parameters)
+#' fit <- run_modified_data_fims(years_to_remove = 1, data = data_big, parameters = parameters)
 #' }
-
 run_modified_data_fims <- function(years_to_remove = 0, data, parameters) {
   # Need to load packages for each worker for furrr functions
   # suppressWarnings({
@@ -171,7 +171,7 @@ run_modified_data_fims <- function(years_to_remove = 0, data, parameters) {
     "running model with {paste(years_to_remove, collapse = ', ')} years of data removed"
   )
 
-  #User supplies parameters from base model
+  # User supplies parameters from base model
   fit <- parameters |>
     FIMS::initialize_fims(data = data_model) |>
     FIMS::fit_fims(optimize = TRUE)

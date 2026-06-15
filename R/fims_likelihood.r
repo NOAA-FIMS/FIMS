@@ -121,7 +121,6 @@
 #' head(like_fit$estimates)
 #' }
 #'
-
 run_fims_likelihood <- function(
   model,
   parameters,
@@ -135,65 +134,64 @@ run_fims_likelihood <- function(
   # TODO: check inputs to make sure they make sense
 ) {
   # checking inputs
-  if(length < 1 | as.integer(length) != length) {
-      cli::cli_abort("Input length should be a positive integer ")
+  if (length < 1 | as.integer(length) != length) {
+    cli::cli_abort("Input length should be a positive integer ")
   }
-  
-  if(length > 50){
+
+  if (length > 50) {
     cli::cli_warn("Input length is {length}, are you sure you want it so large?")
   }
-  
+
   if (min >= max) {
     cli::cli_abort("Input min should be less than max.")
   }
 
-  if(class(model) != "FIMSFit"){
+  if (class(model) != "FIMSFit") {
     cli::cli_abort("Input model needs to be a FIMSFit object.")
   }
   # calculate vector
-  values = seq(min, max, length = length)
-  
+  values <- seq(min, max, length = length)
+
   if (!0 %in% values) {
     cli::cli_warn("Inputs min and max don't span 0. Are you sure this is right?")
   }
 
-  init <- FIMS::get_estimates(model) |> 
-    dplyr::filter(.data[["label"]] == parameter_name) |> 
-    dplyr::pull(.data[["estimated"]]) #NOTE: input and estimated value are slightly different (even though its fixed) input = 13.8155, estimated = 13.857
+  init <- FIMS::get_estimates(model) |>
+    dplyr::filter(.data[["label"]] == parameter_name) |>
+    dplyr::pull(.data[["estimated"]]) # NOTE: input and estimated value are slightly different (even though its fixed) input = 13.8155, estimated = 13.857
 
-    if (!is.null(module_name)) {
-    module_names <- parameters |> 
-      tidyr::unnest(cols = data) |> 
-      dplyr::pull(.data[["module_name"]]) |> 
-      unique()
-      if(!module_name %in% module_names){
-        cli::cli_abort("Input module_name not found in parameters tibble.")
-      }
-    parameter_row <- parameters |> 
+  if (!is.null(module_name)) {
+    module_names <- parameters |>
       tidyr::unnest(cols = data) |>
-      dplyr::filter(.data[["module_name"]] == module_name & .data[["label"]] == parameter_name) 
-
+      dplyr::pull(.data[["module_name"]]) |>
+      unique()
+    if (!module_name %in% module_names) {
+      cli::cli_abort("Input module_name not found in parameters tibble.")
+    }
+    parameter_row <- parameters |>
+      tidyr::unnest(cols = data) |>
+      dplyr::filter(.data[["module_name"]] == module_name & .data[["label"]] == parameter_name)
   } else {
     parameter_row <- parameters |>
-      tidyr::unnest(cols = data) |> 
-      dplyr::filter(.data[["label"]] == parameter_name) 
+      tidyr::unnest(cols = data) |>
+      dplyr::filter(.data[["label"]] == parameter_name)
   }
 
-  if(nrow(parameter_row) == 0){
+  if (nrow(parameter_row) == 0) {
     cli::cli_abort("Input parameter_name did not match any rows in parameter tibble.")
-  }  
-  
-  if(nrow(parameter_row) > 1){
+  }
+
+  if (nrow(parameter_row) > 1) {
     cli::cli_abort("Input parameter_name matched too many rows in parameter tibble: {length(parameter_row)}. Try adding a module_name.")
   }
-  
+
   vec <- values + init
   # report the values
   cli::cli_alert_info(
     "parameter values being profiles over: {paste(vec, collapse = ', ')}"
   )
 
-  # Set number of cores to use 
+  # Set number of cores to use
   if (is.null(n_cores)) {
     n_cores_to_use <- parallel::detectCores() - 1
   } else {
@@ -203,10 +201,10 @@ run_fims_likelihood <- function(
     }
     n_cores_to_use <- as.integer(n_cores)
   }
-  dplyr::case_when (
+  dplyr::case_when(
     n_cores_to_use == 1 ~ future::plan(future::sequential),
-    n_cores_to_use > 1 & Sys.info()['sysname'] == 'Windows' ~ future::plan(future::multisession, workers = n_cores_to_use),
-    n_cores_to_use > 1 & Sys.info()['sysname'] != 'Windows' ~ future::plan(future::multicore, workers = n_cores_to_use)
+    n_cores_to_use > 1 & Sys.info()["sysname"] == "Windows" ~ future::plan(future::multisession, workers = n_cores_to_use),
+    n_cores_to_use > 1 & Sys.info()["sysname"] != "Windows" ~ future::plan(future::multicore, workers = n_cores_to_use)
   )
 
   if (n_cores_to_use == 1) {
@@ -215,7 +213,7 @@ run_fims_likelihood <- function(
     cli::cli_alert_info("...Running in parallel on {n_cores_to_use} cores")
   }
 
-  # Ensure cleanup happens 
+  # Ensure cleanup happens
   on.exit(future::plan(future::sequential), add = TRUE)
 
   # run FIMS in parallel for each of the likelihood profile values
@@ -225,7 +223,7 @@ run_fims_likelihood <- function(
       # Run the model
       fit <- run_modified_pars_fims(
         new_value = value,
-        parameter_name = parameter_name, 
+        parameter_name = parameter_name,
         module_name = module_name,
         parameters = parameters,
         data = data
@@ -233,7 +231,7 @@ run_fims_likelihood <- function(
       # Extract estimates immediately while still in worker
       FIMS::get_estimates(fit)
     },
-    parameter_name = parameter_name, 
+    parameter_name = parameter_name,
     module_name = module_name,
     parameters = parameters,
     data = data,

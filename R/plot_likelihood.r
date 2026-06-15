@@ -108,9 +108,11 @@ plot_likelihood <- function(like_fit, group = "label") {
   if (!"vec" %in% names(like_fit) | !"estimates" %in% names(like_fit)) {
     cli::cli_abort("like_fit needs to be a list returned by `fims_likelihood()` that contains `vec` and `estimates`")
   }
-  
+
   # get column name for parameter being profiled
-  colname <- like_fit$estimates |> names() |> grep(pattern = "value_", value = TRUE)
+  colname <- like_fit$estimates |>
+    names() |>
+    grep(pattern = "value_", value = TRUE)
   if (length(colname) > 1) {
     cli::cli_abort("Function doesn't yet support multiple profile parameters")
   }
@@ -119,17 +121,17 @@ plot_likelihood <- function(like_fit, group = "label") {
       "No column with profile parameter found (column name should contain 'value_')"
     )
   }
-  
+
   # TODO: add column to store the grouping variable(s)
   # could use paste() to combine multiple grouping variables into one column
   # then use that column for grouping below
-  
+
   # summing total likelihood by parameter value and data type, use later for plotting
   by_type <- like_fit$estimates |>
     dplyr::filter(!is.na(.data$lpdf)) |>
     dplyr::group_by(.data[[colname]], .data[[group]]) |> # grouping by parameter and data type
     dplyr::distinct(.data$lpdf) |>
-    dplyr::summarize(total_like = sum(.data$lpdf, na.rm = TRUE), .groups = "drop")  
+    dplyr::summarize(total_like = sum(.data$lpdf, na.rm = TRUE), .groups = "drop")
 
   ### add total likelihood across all groups
   total <- like_fit$estimates |>
@@ -142,7 +144,7 @@ plot_likelihood <- function(like_fit, group = "label") {
 
   # group the data type totals and the overall total and then
   # for each vector of sums, subtract the maximum across within that vector
-  grouped_like <- by_type |>  
+  grouped_like <- by_type |>
     dplyr::bind_rows(total) |>
     dplyr::arrange(.data[[colname]]) |>
     dplyr::group_by(.data[[group]]) |>
@@ -157,19 +159,24 @@ plot_likelihood <- function(like_fit, group = "label") {
   color_values <- c(
     "Total" = "black",
     stats::setNames(
-      viridisLite::viridis(length(other_groups_clean), option = "mako", 
-                          begin = 0.35, end = 0.9),
+      viridisLite::viridis(length(other_groups_clean),
+        option = "mako",
+        begin = 0.35, end = 0.9
+      ),
       other_groups_clean
     )
   )
 
   linetype_values <- c(
-    "Total" = "solid", 
-    stats::setNames(rep(c("dashed", "dotted", "dotdash", "longdash"), 
-                length.out = length(other_groups_clean)), 
-            other_groups_clean)
+    "Total" = "solid",
+    stats::setNames(
+      rep(c("dashed", "dotted", "dotdash", "longdash"),
+        length.out = length(other_groups_clean)
+      ),
+      other_groups_clean
+    )
   )
-  
+
   # plot all the lines
   p1 <- grouped_like |>
     dplyr::mutate(
@@ -179,24 +186,24 @@ plot_likelihood <- function(like_fit, group = "label") {
     ggplot2::geom_line(ggplot2::aes(
       x = .data[[colname]],
       y = .data$total_like_change,
-      colour = .data$group_clean, 
+      colour = .data$group_clean,
       linetype = .data$group_clean
     ), linewidth = 1.2) +
     stockplotr::theme_noaa(discrete = TRUE) +
     ggplot2::scale_color_manual(
       values = color_values,
-      name = "Data Type"  
+      name = "Data Type"
     ) +
     ggplot2::scale_linetype_manual(
       values = linetype_values,
-      name = "Data Type"  
+      name = "Data Type"
     ) +
     ggplot2::labs(
       x = colname |> gsub("value_", "", x = _), # remove "value_" from label
       y = "Change in log-likelihood",
       color = "Data Type"
-    ) 
-  
+    )
+
   ggplot2::ggsave("likelihood.png")
 
   return(p1)
