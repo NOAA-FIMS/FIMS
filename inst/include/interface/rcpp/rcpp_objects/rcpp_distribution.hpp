@@ -220,6 +220,40 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
   virtual ~DnormDistributionsInterface() {}
 
   /**
+   * @brief Create a deep copy with a new distribution ID.
+   */
+  std::shared_ptr<DnormDistributionsInterface> deep_copy() const {
+    std::shared_ptr<DnormDistributionsInterface> copy =
+        std::make_shared<DnormDistributionsInterface>(*this);
+    copy->id_m = DistributionsInterfaceBase::id_g++;
+    copy->key_m =
+        std::make_shared<std::vector<uint32_t>>(*this->key_m);
+    copy->input_type_m = SharedString(this->input_type_m.get());
+    copy->use_mean_m = SharedString(this->use_mean_m.get());
+    copy->interface_observed_data_id_m =
+        SharedInt(this->interface_observed_data_id_m.get());
+    copy->lpdf_value = this->lpdf_value;
+    copy->observed_values =
+        DeepCopyParameterVector(this->observed_values);
+    copy->expected_values =
+        DeepCopyParameterVector(this->expected_values);
+    copy->expected_mean = DeepCopyParameterVector(this->expected_mean);
+    copy->log_sd = DeepCopyParameterVector(this->log_sd);
+    copy->lpdf_vec = DeepCopyRealVector(this->lpdf_vec);
+
+    DistributionsInterfaceBase::live_objects[copy->id_m] = copy;
+    FIMSRcppInterfaceBase::fims_interface_objects.push_back(copy);
+    return copy;
+  }
+
+  /**
+   * @brief Rcpp-facing deep copy wrapper.
+   */
+  DnormDistributionsInterface* deep_copy_rcpp() const {
+    return this->deep_copy().get();
+  }
+
+  /**
    * @brief Gets the ID of the interface base object.
    * @return The ID.
    */
@@ -580,6 +614,39 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
   virtual ~DlnormDistributionsInterface() {}
 
   /**
+   * @brief Create a deep copy with a new distribution ID.
+   */
+  std::shared_ptr<DlnormDistributionsInterface> deep_copy() const {
+    std::shared_ptr<DlnormDistributionsInterface> copy =
+        std::make_shared<DlnormDistributionsInterface>(*this);
+    copy->id_m = DistributionsInterfaceBase::id_g++;
+    copy->key_m =
+        std::make_shared<std::vector<uint32_t>>(*this->key_m);
+    copy->input_type_m = SharedString(this->input_type_m.get());
+    copy->use_mean_m = SharedString(this->use_mean_m.get());
+    copy->interface_observed_data_id_m =
+        SharedInt(this->interface_observed_data_id_m.get());
+    copy->lpdf_value = this->lpdf_value;
+    copy->observed_values =
+        DeepCopyParameterVector(this->observed_values);
+    copy->expected_values =
+        DeepCopyParameterVector(this->expected_values);
+    copy->log_sd = DeepCopyParameterVector(this->log_sd);
+    copy->lpdf_vec = DeepCopyRealVector(this->lpdf_vec);
+
+    DistributionsInterfaceBase::live_objects[copy->id_m] = copy;
+    FIMSRcppInterfaceBase::fims_interface_objects.push_back(copy);
+    return copy;
+  }
+
+  /**
+   * @brief Rcpp-facing deep copy wrapper.
+   */
+  DlnormDistributionsInterface* deep_copy_rcpp() const {
+    return this->deep_copy().get();
+  }
+
+  /**
    * @brief Gets the ID of the interface base object.
    * @return The ID.
    */
@@ -904,6 +971,41 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
    * @brief The destructor.
    */
   virtual ~DmultinomDistributionsInterface() {}
+
+  /**
+   * @brief Create a deep copy with a new distribution ID.
+   */
+  std::shared_ptr<DmultinomDistributionsInterface> deep_copy() const {
+    std::shared_ptr<DmultinomDistributionsInterface> copy =
+        std::make_shared<DmultinomDistributionsInterface>(*this);
+    copy->id_m = DistributionsInterfaceBase::id_g++;
+    copy->key_m =
+        std::make_shared<std::vector<uint32_t>>(*this->key_m);
+    copy->input_type_m = SharedString(this->input_type_m.get());
+    copy->use_mean_m = SharedString(this->use_mean_m.get());
+    copy->interface_observed_data_id_m =
+        SharedInt(this->interface_observed_data_id_m.get());
+    copy->lpdf_value = this->lpdf_value;
+    copy->observed_values =
+        DeepCopyParameterVector(this->observed_values);
+    copy->expected_values =
+        DeepCopyParameterVector(this->expected_values);
+    copy->dims = DeepCopyRealVector(this->dims);
+    copy->lpdf_vec = DeepCopyRealVector(this->lpdf_vec);
+    copy->notes = SharedString(this->notes.get());
+
+    DistributionsInterfaceBase::live_objects[copy->id_m] = copy;
+    FIMSRcppInterfaceBase::fims_interface_objects.push_back(copy);
+    return copy;
+  }
+
+  /**
+   * @brief Rcpp-facing deep copy wrapper.
+   */
+  DmultinomDistributionsInterface* deep_copy_rcpp() const {
+    return this->deep_copy().get();
+  }
+
   /**
    * @brief Gets the ID of the interface base object.
    * @return The ID.

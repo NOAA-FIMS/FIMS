@@ -109,6 +109,29 @@ class LogisticMaturityInterface : public MaturityInterfaceBase {
   virtual ~LogisticMaturityInterface() {}
 
   /**
+   * @brief Create a deep copy with a new maturity ID.
+   */
+  std::shared_ptr<LogisticMaturityInterface> deep_copy() const {
+    std::shared_ptr<LogisticMaturityInterface> copy =
+        std::make_shared<LogisticMaturityInterface>(*this);
+    copy->id = MaturityInterfaceBase::id_g++;
+    copy->inflection_point =
+        DeepCopyParameterVector(this->inflection_point);
+    copy->slope = DeepCopyParameterVector(this->slope);
+
+    MaturityInterfaceBase::live_objects[copy->id] = copy;
+    FIMSRcppInterfaceBase::fims_interface_objects.push_back(copy);
+    return copy;
+  }
+
+  /**
+   * @brief Rcpp-facing deep copy wrapper.
+   */
+  LogisticMaturityInterface* deep_copy_rcpp() const {
+    return this->deep_copy().get();
+  }
+
+  /**
    * @brief Gets the ID of the interface base object.
    * @return The ID.
    */

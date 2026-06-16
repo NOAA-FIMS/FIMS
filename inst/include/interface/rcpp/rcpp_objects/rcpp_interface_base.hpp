@@ -98,6 +98,22 @@ class Parameter {
     initial_value_m = 0;
     id_m = Parameter::id_g++;
   }
+
+  /**
+   * @brief Create a deep copy with a new parameter ID.
+   */
+  std::shared_ptr<Parameter> deep_copy() const {
+    std::shared_ptr<Parameter> copy = std::make_shared<Parameter>();
+    copy->initial_value_m = this->initial_value_m;
+    copy->final_value_m = this->final_value_m;
+    copy->estimation_type_m = SharedString(this->estimation_type_m.get());
+    return copy;
+  }
+
+  /**
+   * @brief Rcpp-facing deep copy wrapper.
+   */
+  Parameter* deep_copy_rcpp() const { return new Parameter(*this->deep_copy()); }
 };
 
 #ifdef FIMS_HEADER_ONLY
@@ -346,6 +362,34 @@ class ParameterVector {
       Rcpp::Rcout << storage_m->at(i) << "  ";
     }
   }
+
+  /**
+   * @brief Create a deep copy with a new ParameterVector ID.
+   */
+  std::shared_ptr<ParameterVector> deep_copy() const {
+    std::shared_ptr<ParameterVector> copy =
+        std::make_shared<ParameterVector>();
+    copy->storage_m = std::make_shared<std::vector<Parameter>>();
+    copy->storage_m->reserve(this->storage_m->size());
+    for (size_t i = 0; i < this->storage_m->size(); i++) {
+      Parameter parameter_copy;
+      const Parameter& parameter = this->storage_m->at(i);
+      parameter_copy.id_m = parameter.id_m;
+      parameter_copy.initial_value_m = parameter.initial_value_m;
+      parameter_copy.final_value_m = parameter.final_value_m;
+      parameter_copy.estimation_type_m =
+          SharedString(parameter.estimation_type_m.get());
+      copy->storage_m->push_back(parameter_copy);
+    }
+    return copy;
+  }
+
+  /**
+   * @brief Rcpp-facing deep copy wrapper.
+   */
+  ParameterVector* deep_copy_rcpp() const {
+    return new ParameterVector(*this->deep_copy());
+  }
 };
 
 #ifdef FIMS_HEADER_ONLY
@@ -570,10 +614,60 @@ class RealVector {
       Rcpp::Rcout << storage_m->at(i) << "  ";
     }
   }
+
+  /**
+   * @brief Create a deep copy with a new RealVector ID.
+   */
+  std::shared_ptr<RealVector> deep_copy() const {
+    std::shared_ptr<RealVector> copy = std::make_shared<RealVector>();
+    copy->storage_m = std::make_shared<std::vector<double>>(*this->storage_m);
+    return copy;
+  }
+
+  /**
+   * @brief Rcpp-facing deep copy wrapper.
+   */
+  RealVector* deep_copy_rcpp() const { return new RealVector(*this->deep_copy()); }
 };
 #ifdef FIMS_HEADER_ONLY
 uint32_t RealVector::id_g = 0;
 #endif
+
+/**
+ * @brief Create a Parameter copy with independent shared members.
+ */
+inline Parameter DeepCopyParameter(const Parameter& other) {
+  Parameter copy;
+  copy.id_m = other.id_m;
+  copy.initial_value_m = other.initial_value_m;
+  copy.final_value_m = other.final_value_m;
+  copy.estimation_type_m = SharedString(other.estimation_type_m.get());
+  return copy;
+}
+
+/**
+ * @brief Create a ParameterVector copy with independent storage.
+ */
+inline ParameterVector DeepCopyParameterVector(const ParameterVector& other) {
+  ParameterVector copy;
+  copy.id_m = other.id_m;
+  copy.storage_m = std::make_shared<std::vector<Parameter>>();
+  copy.storage_m->reserve(other.storage_m->size());
+  for (size_t i = 0; i < other.storage_m->size(); i++) {
+    copy.storage_m->push_back(DeepCopyParameter(other.storage_m->at(i)));
+  }
+  return copy;
+}
+
+/**
+ * @brief Create a RealVector copy with independent storage.
+ */
+inline RealVector DeepCopyRealVector(const RealVector& other) {
+  RealVector copy;
+  copy.id_m = other.id_m;
+  copy.storage_m = std::make_shared<std::vector<double>>(*other.storage_m);
+  return copy;
+}
 
 RCPP_EXPOSED_CLASS(ParameterVector)
 RCPP_EXPOSED_CLASS(RealVector)

@@ -111,6 +111,29 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
   virtual ~LogisticSelectivityInterface() {}
 
   /**
+   * @brief Create a deep copy with a new selectivity ID.
+   */
+  std::shared_ptr<LogisticSelectivityInterface> deep_copy() const {
+    std::shared_ptr<LogisticSelectivityInterface> copy =
+        std::make_shared<LogisticSelectivityInterface>(*this);
+    copy->id = SelectivityInterfaceBase::id_g++;
+    copy->inflection_point =
+        DeepCopyParameterVector(this->inflection_point);
+    copy->slope = DeepCopyParameterVector(this->slope);
+
+    SelectivityInterfaceBase::live_objects[copy->id] = copy;
+    FIMSRcppInterfaceBase::fims_interface_objects.push_back(copy);
+    return copy;
+  }
+
+  /**
+   * @brief Rcpp-facing deep copy wrapper.
+   */
+  LogisticSelectivityInterface* deep_copy_rcpp() const {
+    return this->deep_copy().get();
+  }
+
+  /**
    * @brief Gets the ID of the interface base object.
    * @return The ID.
    */
@@ -327,6 +350,32 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
         slope_desc(other.slope_desc) {}
 
   virtual ~DoubleLogisticSelectivityInterface() {}
+
+  /**
+   * @brief Create a deep copy with a new selectivity ID.
+   */
+  std::shared_ptr<DoubleLogisticSelectivityInterface> deep_copy() const {
+    std::shared_ptr<DoubleLogisticSelectivityInterface> copy =
+        std::make_shared<DoubleLogisticSelectivityInterface>(*this);
+    copy->id = SelectivityInterfaceBase::id_g++;
+    copy->inflection_point_asc =
+        DeepCopyParameterVector(this->inflection_point_asc);
+    copy->slope_asc = DeepCopyParameterVector(this->slope_asc);
+    copy->inflection_point_desc =
+        DeepCopyParameterVector(this->inflection_point_desc);
+    copy->slope_desc = DeepCopyParameterVector(this->slope_desc);
+
+    SelectivityInterfaceBase::live_objects[copy->id] = copy;
+    FIMSRcppInterfaceBase::fims_interface_objects.push_back(copy);
+    return copy;
+  }
+
+  /**
+   * @brief Rcpp-facing deep copy wrapper.
+   */
+  DoubleLogisticSelectivityInterface* deep_copy_rcpp() const {
+    return this->deep_copy().get();
+  }
 
   /** @brief returns the id for the double logistic selectivity interface */
   virtual uint32_t get_id() { return this->id; }

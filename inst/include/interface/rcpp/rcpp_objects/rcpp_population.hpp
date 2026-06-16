@@ -185,6 +185,46 @@ class PopulationInterface : public PopulationInterfaceBase {
   virtual ~PopulationInterface() {}
 
   /**
+   * @brief Create a deep copy with a new population ID.
+   */
+  std::shared_ptr<PopulationInterface> deep_copy() const {
+    std::shared_ptr<PopulationInterface> copy =
+        std::make_shared<PopulationInterface>(*this);
+    copy->id = PopulationInterfaceBase::id_g++;
+    copy->initialize_catch_at_age =
+        SharedBoolean(this->initialize_catch_at_age.get());
+    copy->initialize_surplus_production =
+        SharedBoolean(this->initialize_surplus_production.get());
+    copy->n_ages = SharedInt(this->n_ages.get());
+    copy->n_fleets = SharedInt(this->n_fleets.get());
+    copy->fleet_ids = std::make_shared<std::set<uint32_t>>(*this->fleet_ids);
+    copy->n_years = SharedInt(this->n_years.get());
+    copy->n_lengths = SharedInt(this->n_lengths.get());
+    copy->maturity_id = SharedInt(this->maturity_id.get());
+    copy->growth_id = SharedInt(this->growth_id.get());
+    copy->recruitment_id = SharedInt(this->recruitment_id.get());
+    copy->recruitment_err_id = SharedInt(this->recruitment_err_id.get());
+    copy->log_M = DeepCopyParameterVector(this->log_M);
+    copy->spawning_biomass_ratio =
+        DeepCopyParameterVector(this->spawning_biomass_ratio);
+    copy->log_f_multiplier = DeepCopyParameterVector(this->log_f_multiplier);
+    copy->log_init_naa = DeepCopyParameterVector(this->log_init_naa);
+    copy->ages = DeepCopyRealVector(this->ages);
+    copy->name = SharedString(this->name.get());
+
+    PopulationInterfaceBase::live_objects[copy->id] = copy;
+    FIMSRcppInterfaceBase::fims_interface_objects.push_back(copy);
+    return copy;
+  }
+
+  /**
+   * @brief Rcpp-facing deep copy wrapper.
+   */
+  PopulationInterface* deep_copy_rcpp() const {
+    return this->deep_copy().get();
+  }
+
+  /**
    * @brief Gets the ID of the interface base object.
    * @return The ID.
    */

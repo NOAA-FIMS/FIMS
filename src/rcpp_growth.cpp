@@ -27,5 +27,6 @@ void register_growth(Rcpp::Module& m) {
              "Weights for each age class.")
       .field("n_years", &EWAAGrowthInterface::n_years, "Number of years.")
       .method("get_id", &EWAAGrowthInterface::get_id)
+      .method("deep_copy", &EWAAGrowthInterface::deep_copy_rcpp)
       .method("evaluate", &EWAAGrowthInterface::evaluate);
 }

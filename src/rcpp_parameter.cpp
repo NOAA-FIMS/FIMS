@@ -20,6 +20,7 @@ void register_parameter(Rcpp::Module& m) {
       .field("value", &Parameter::initial_value_m)
       .field("estimated_value", &Parameter::final_value_m)
       .field("id", &Parameter::id_m)
+      .method("deep_copy", &Parameter::deep_copy_rcpp)
       .field("estimation_type", &Parameter::estimation_type_m);
 }
 
@@ -44,6 +45,7 @@ void register_vectors(Rcpp::Module& m) {
       .method("set_all_estimable", &ParameterVector::set_all_estimable)
       .method("set_all_random", &ParameterVector::set_all_random)
       .method("fill", &ParameterVector::fill)
+      .method("deep_copy", &ParameterVector::deep_copy_rcpp)
       .method("get_id", &ParameterVector::get_id);
 
   Rcpp::class_<RealVector>(
@@ -60,5 +62,6 @@ void register_vectors(Rcpp::Module& m) {
       .method("at", &RealVector::at)
       .method("size", &RealVector::size)
       .method("resize", &RealVector::resize)
+      .method("deep_copy", &RealVector::deep_copy_rcpp)
       .method("get_id", &RealVector::get_id);
 }
