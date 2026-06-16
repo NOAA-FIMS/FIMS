@@ -29,6 +29,36 @@ Prepare the test data in the new file or in a separate file if you plan on reusi
 
 Follow the structure of the new test file to write appropriate correctness, edge-handling, and error-handling tests.
 
+### :stopwatch: Add benchmarks for a test
+
+Benchmarks measure performance of selected C++ workloads (for example, a
+population dynamics calculation) using
+[Google Benchmark](https://github.com/google/benchmark). Benchmarks live in
+`tests/google_benchmark/` and are separate from unit tests.
+
+- Call
+  `FIMS:::use_google_benchmark_template(name = "FileName_ClassName_FunctionName")`
+  to
+  create a new simple benchmark file
+  `tests/google_benchmark/benchmark_FileName_ClassName_FunctionName.cpp` and
+  register it in `tests/google_benchmark/CMakeLists.txt`.
+- Template modes:
+  - Simple (default): use when the benchmark can call production code directly
+    without a test fixture, e.g.
+    `FIMS:::use_google_benchmark_template(name = "FileName_ClassName_FunctionName")`.
+  - Fixture: use when the benchmark should reuse a GoogleTest fixture setup and
+    link against gtest, e.g.
+    `FIMS:::use_google_benchmark_template(name = "FileName_ClassName_FunctionName", type = "fixture")`.
+- The generated file includes TODO comments that show where to:
+  - include the appropriate header (simple) or test fixture (fixture mode)
+  - set up any shared state for the benchmark
+  - call the workload you want to time inside the benchmark loop
+- Whenever possible, reuse the same GoogleTest fixture that the corresponding
+  unit test uses so that the benchmark and test exercise the same workload.
+- Add a benchmark only when you care about performance of a specific,
+  well-defined workload (for example, after profiling has identified it as
+  slow, or when guarding against regressions in a critical section of code).
+
 #### :hammer: Helper functions to set up tests
 
 The following :hammer: helper functions are available to assist with writing integration tests in R.
@@ -56,6 +86,12 @@ The following {testthat} functions can be used at the beginning of a test file t
 
 - [`FIMS:::setup_and_run_gtest()`](https://noaa-fims.github.io/FIMS/reference/setup_and_run_gtest.html): Set up integration test data and run the GoogleTest suite.
 - [`FIMS:::run_gtest()`](https://noaa-fims.github.io/FIMS/reference/run_gtest.html): Run the GoogleTest suite.
+- C++ benchmarks are built as separate executables (for example,
+  `benchmark_Population_CatchAtAge_CatchNumbersAtAge`) in
+  `build/tests/google_benchmark/`.
+  After configuring and building with CMake, run a benchmark directly from the
+  command line, e.g.,
+  `./build/tests/google_benchmark/benchmark_Population_CatchAtAge_CatchNumbersAtAge`.
 
 ### R
 
@@ -99,6 +135,32 @@ out <<"number of fleets: "<<n_fleets<<"\n";
 - A call to `base::browser()` can be included in the body of a function to pause execution of a test and allow for interactive debugging.
 - Use `?debug` to learn how to set, unset, or query the debugging flag on a function.
 - Visit the [Debugging Guide](https://support.posit.co/hc/en-us/articles/205612627-Debugging-with-the-RStudio-IDE) for instructions on debugging with the RStudio IDE.
+
+### Long-running or crashing tests
+
+If a test crashes or hangs, it helps to save the output so you can see which test was running last. See the help file for [`LocationReporter`](https://testthat.r-lib.org/reference/LocationReporter.html) from {testthat} to understand how the following line is helpful for C++ code:
+
+```bash
+Rscript -e "devtools::test(reporter = 'location')" > test_log.txt 2>&1
+```
+
+You can also set the following environment variables to for better diagnostics:
+
+```bash
+R_KEEP_PKG_SOURCE=yes R_BACKTRACE_ON_ERROR=full TESTTHAT_PROGRESS=plain \
+  Rscript -e "devtools::test(reporter = 'location')" > test_log.txt 2>&1
+```
+
+For segfaults, running under GDB (which probably will not work on a Windows machine) gives you a native backtrace. If you are on a Windows machine and want good backtrace information, consider [installing WSL](https://nmfs-ost.github.io/on-off-boarding/getting-started.html#software-and-tools).
+
+```bash
+# Linux
+gdb -batch -ex "run" -ex "bt" --args R --vanilla -e "devtools::test()" > backtrace_log.txt
+
+# Windows (with Rtools on PATH)
+export PATH="/c/rtools44/usr/bin:$PATH"
+gdb -batch -ex "run" -ex "bt" --args R --vanilla -e "devtools::test()" > backtrace_log.txt
+```
 
 ### Random numbers
 

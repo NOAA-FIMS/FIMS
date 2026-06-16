@@ -1,0 +1,23 @@
+name: "Spelling Check"
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  spelling:
+    name: Check Spelling
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run CSpell
+        uses: streetsidesoftware/cspell-action@v8
+        with:
+          files: "**/*.{cpp,hpp,h,R,Rmd,md}"
+          incremental_files_only: true
+          config: "cspell.json"

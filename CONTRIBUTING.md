@@ -12,6 +12,12 @@ Please use [GitHub Issues](https://github.com/NOAA-FIMS/FIMS/issues/new?template
 
 ## Contributing code
 
+### Non-code contributions
+
+Not all contributions are code! Writing documentation, teaching, and other activities are also key parts of contributing to software that are much appreciated. For more information about open source contributions, see [the Open Source Guide's How to Contribute page](https://opensource.guide/how-to-contribute/). A good place to start is by looking for open issues with the [good first issue label](https://github.com/NOAA-FIMS/FIMS/contribute). These issues are generally small and well-defined, making them a good starting point for new contributors. We encourage collaborators to feel welcome to contribute in any way they can, and we will do our best to incorporate these contributions into the FIMS projects. Please see the [feature branches](#feature-branches), [pull requests](#pull-requests), and [style guide](#style-guide) sections below for how to make your contributions to FIMS. We thank you in advance for being part of the team. 
+
+Additionally, if you would like to make contributions to the [NOAA-FIMS website](https://noaa-fims.github.io/) (write a blog, etc.), please follow this [contributing guide](https://github.com/NOAA-FIMS/noaa-fims.github.io/blob/main/CONTRIBUTING.md).
+
 ### Adding a new module
 
 If you are adding a new C++ module to FIMS (e.g., a new selectivity function, recruitment model, or other population dynamics component), start with the guide titled [Adding a New C++ Module](vignettes/adding-new-module.Rmd).
@@ -59,7 +65,7 @@ Note that the examples below are for adding a new module to the population dynam
 
 ### Feature branches
 
-Once an issue is approved and prioritized for work, a feature branch off of the dev branch, e.g., `dev-discards`, can be created to address the issue. Feature branches can be made within the repository or on a fork of the repository. When making a fork, be sure to fork all branches not just the default branch because feature branches should only be created off of main if they are a hotfix for the current release, e.g., `fix-pointer`. There are no hard and fast rules for branch names but we tend to use dashes to separate words. Often while working on this new feature branch, there will be updates to the dev branch. These updates must be brought in using `git rebase`. Branches that have merge commits will not be accepted into the code base. Please see the [GitHub documentation for rebasing](https://docs.github.com/en/get-started/using-git/about-git-rebase) for more information.
+Once an issue is approved and prioritized for work, a feature branch off of the main branch, e.g., `parametric-discards`, can be created to address the issue. Feature branches can be made within the repository or on a fork of the repository. There are no hard and fast rules for branch names but we tend to use dashes to separate words. Often while working on this new feature branch, there will be updates to the main branch. These updates must be brought in using `git rebase`. Branches that have merge commits will not be accepted into the code base. Please see the [GitHub documentation for rebasing](https://docs.github.com/en/get-started/using-git/about-git-rebase) for more information.
 
 Along the development process it is important to add tests and ensure that the code is well documented. Below are the standard contributor checks to follow so that the code is ready for a pull request:
 
@@ -69,7 +75,7 @@ Along the development process it is important to add tests and ensure that the c
 * Implement the suite of Google tests using `cmake --build build` and `ctest --test-dir build`. This can also be done using `setup_and_run_gtest()` in R. If there are failing tests, run `ctest --test-dir --rerun-failed --output-on-failure` to re-run the failed tests verbosely.
 * Format C++ code using clang-format version 18.0.0 with Google style: `clang-format -i --style="{BasedOnStyle: Google, SortIncludes: false}" $(find ./inst/include ./src ./tests/gtest -name "*.hpp" -o -name "*.cpp")`. If you are contributing from a fork, the automated formatting workflow will add a comment to your pull request with detailed instructions on how to format your code locally.
 * Run clang tidy to check C++ for common mistakes using TODO: document how to run clang-tidy.
-* Spell check the package using `spelling::spell_check_files(list.files(c("R", "tests", file.path("inst", "include")), recursive = TRUE, full.names = TRUE, pattern = "\\.cpp|\\.hpp|\\.md|\\.R$|\\.Rmd|\\.txt"), ignore = spelling::get_wordlist())`. Remove all the .md files in the vignettes directory and then spell check the package using `spelling::spell_check_package(pkg = ".", use_wordlist = TRUE)`.
+* Spell check the package using [cspell](https://cspell.org/). Install with `npm install -g cspell` and run `cspell "**/*.{cpp,hpp,h,R,Rmd,md}"` from the package root. Add any project-specific terms to `inst/WORDLIST` (used as the cspell dictionary).
 * Build the roxygen documentation using `devtools::document()`. See the [r-lib](https://roxygen2.r-lib.org/) for all available tags and best practices.
 * Implement the suite of testthat tests using `devtools::test()`.
 * Run `styler::style_pkg()` to style R code.
@@ -85,10 +91,6 @@ Once the work is complete, a pull request should be created to bring the changes
 An automated workflow ([pr-format.yml](https://github.com/NOAA-FIMS/FIMS/blob/main/.github/workflows/pr-format.yml)) runs when you open or update a pull request. This workflow checks both C++ and R code formatting. If you are contributing from the main repository, the workflow will automatically create a pull request with formatting changes that need to be merged into your feature branch. If you are contributing from a fork, the workflow will add a comment to your pull request with detailed instructions on how to format your code locally, since the automated workflow cannot push changes to forks.
 
 Versioning follows [semantic versioning](https://semver.org/) to establish the major, minor, and patch number for a release. Often, multiple pull requests are included in a single release, which will be initiated by a member of the FIMS Implementation Team. Release notes for each version can be found in the [release notes](https://github.com/NOAA-FIMS/FIMS/releases).
-
-## Non-code contributions
-
-Not all contributions are code! Writing documentation, teaching, and other activities are also key parts of contributing to software that are much appreciated. For more information about open source contributions, see [the Open Source Guide's How to Contribute page](https://opensource.guide/how-to-contribute/). A good place to start is by looking for open issues with the [good first issue label](https://github.com/NOAA-FIMS/FIMS/contribute). These issues are generally small and well-defined, making them a good starting point for new contributors. We encourage collaborators to feel welcome to contribute in any way they can, and we will do our best to incorporate these contributions into the FIMS projects. We thank you in advance for being part of the team.
 
 ## Style guide
 

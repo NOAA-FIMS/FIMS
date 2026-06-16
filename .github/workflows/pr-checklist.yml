@@ -15,7 +15,7 @@ jobs:
     name: pr-checklist
     steps:
       - name: 'Update PR Description'
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           script: |
             const { data: pullRequest } = await github.rest.pulls.get({
@@ -34,7 +34,6 @@ jobs:
             '- PR reviews are a great way to learn so feel free to share your tips and tricks. However, when suggesting changes to the PR that are optional please include `nit:` (for nitpicking) as the comment type. For example, `nit:` I prefer using a `data.frame()` instead of a `matrix` because ...\n' +
             '- Engage with the developer. Make it clear when the PR is approved by selecting the approved status, and potentially commenting on the PR with something like `This PR is now ready to be merged.`\n\n' +
             '## Checklist\n\n' +
-            '- [ ] The PR requests the appropriate base branch (dev for features and main for hot fixes)\n' +
             '- [ ] The code is well-designed\n' +
             '- [ ] The code is designed well for both users and developers\n' +
             '- [ ] Code coverage remains high' +

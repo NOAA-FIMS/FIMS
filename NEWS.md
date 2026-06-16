@@ -1,3 +1,10 @@
+# FIMS 0.9.3
+
+* Reduce verbose FIMS logging and refine messages
+* Cleans up integration tests after switching log_devs to random effects
+* Revert changes that eliminated compiler warnings because they were
+  causing tests to fail but not R CMD check
+
 # FIMS 0.9.2
 
 * Fixes Rcpp creation of a new Parameter when the input is not valid

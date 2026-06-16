@@ -1,0 +1,27 @@
+{
+  "version": "0.2",
+  "language": "en",
+  "dictionaryDefinitions": [
+    {
+      "name": "fims-wordlist",
+      "path": "./inst/WORDLIST",
+      "addWords": true
+    }
+  ],
+  "dictionaries": [
+    "fims-wordlist",
+    "cpp",
+    "r",
+    "softwareTerms"
+  ],
+  "ignorePaths": [
+    "**/node_modules/**",
+    "*.Rproj",
+    ".github/workflows/**",
+    "build/**",
+    "man/**"
+  ],
+  "ignoreRegExpList": [
+    "/[a-z0-9]{32,}/g"
+  ]
+}

@@ -17,15 +17,12 @@
 // traits for interfacing with TMB
 
 #ifdef TMB_MODEL
-// Need to include Rcpp before TMB
-#define RCPP_NO_SUGAR
-#include <Rcpp.h>
 
 // use isnan macro in math.h instead of TMB's isnan for fixing the r-cmd-check
 // issue
 #include <math.h>
 
-#include <TMB.hpp>
+#include "TMB/TMB.h"
 
 // define REPORT, ADREPORT, and SIMULATE
 #define FIMS_REPORT_F(name, F)                                         \

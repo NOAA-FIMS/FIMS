@@ -44,9 +44,6 @@ test_that("rcpp fleet works with correct inputs", {
   clear()
 })
 
-## Edge handling ----
-# No edge cases to test for this interface.
-
 
 ## Error handling ----
 test_that("rcpp fleet returns correct error messages", {

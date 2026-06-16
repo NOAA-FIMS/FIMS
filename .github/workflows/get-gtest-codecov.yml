@@ -4,11 +4,9 @@ name: get-gtest-codecov
 on:
   pull_request:
     branches:
-      - dev
       - main
   push:
     branches:    
-      - dev
       - main
   workflow_dispatch:
 
@@ -62,7 +60,7 @@ jobs:
         path: coverage.xml
 
     - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v5
+      uses: codecov/codecov-action@v7
       with:
         files: coverage.xml
         token: ${{ secrets.CODECOV_TOKEN }}

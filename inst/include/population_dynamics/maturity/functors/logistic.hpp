@@ -10,8 +10,8 @@
 #ifndef POPULATION_DYNAMICS_MATURITY_LOGISTIC_HPP
 #define POPULATION_DYNAMICS_MATURITY_LOGISTIC_HPP
 
-#include "../../../common/fims_math.hpp"
-#include "../../../common/fims_vector.hpp"
+#include "common/fims_math.hpp"
+#include "common/fims_vector.hpp"
 #include "maturity_base.hpp"
 
 namespace fims_popdy {

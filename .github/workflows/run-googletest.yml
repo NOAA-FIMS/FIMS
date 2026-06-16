@@ -3,6 +3,18 @@ name: run-googletest
 
 on:
   push:
+  pull_request:
+    branches:
+      - main
+    paths-ignore:
+      - .devcontainer
+      - .github
+      - '.gitignore'
+      - '.Rbuildignore'
+      - 'CONTRIBUTING.md'
+      - 'LICENSE'
+      - 'man'
+      - 'README.md'
   workflow_dispatch:
 
 jobs:

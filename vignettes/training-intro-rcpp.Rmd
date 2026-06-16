@@ -12,7 +12,7 @@ vignette: >
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-<!-- The section below creates a collpase/expand all button -->
+<!-- The section below creates a collapse/expand all button -->
 <div id="expand-collapse-buttons" style="margin-bottom: 20px;">
   <button onclick="expandAll()" class="btn btn-primary">Expand All</button>
   <button onclick="collapseAll()" class="btn btn-secondary">Collapse All</button>
@@ -61,6 +61,16 @@ Using {Rcpp} you can compile C++ code using R and never have to interact with an
 
 <details>
 <summary><strong>Example: Inline C++ within R</strong></summary>
+
+```{r, echo = FALSE}
+# cleanup environment for Rcpp::sourceCpp to work
+if (isNamespaceLoaded("TMB")) {
+  devtools::unload(package = "TMB")
+}
+if (isNamespaceLoaded("Rcpp")) {
+  devtools::unload(package = "Rcpp")
+}
+```
 
 ```{r inline}
 library(Rcpp)

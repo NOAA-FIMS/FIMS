@@ -23,7 +23,6 @@
 #include "../population_dynamics/population/population.hpp"
 #include "../population_dynamics/recruitment/recruitment.hpp"
 #include "../population_dynamics/selectivity/selectivity.hpp"
-#include "def.hpp"
 #include "fims_vector.hpp"
 #include "model_object.hpp"
 
@@ -993,7 +992,7 @@ class Information {
 
 template <typename Type>
 std::shared_ptr<Information<Type>> Information<Type>::fims_information =
-    nullptr;  // singleton instance
+    nullptr; /**< static shared pointer to singleton Information object>*/
 
 }  // namespace fims_info
 

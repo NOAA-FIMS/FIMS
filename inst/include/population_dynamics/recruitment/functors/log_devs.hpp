@@ -10,7 +10,7 @@
 #define FIMS_POPULATION_DYNAMICS_RECRUITMENT_LOG_DEVS_HPP
 
 #include "recruitment_base.hpp"
-#include "../../../common/fims_vector.hpp"
+#include "common/fims_vector.hpp"
 
 namespace fims_popdy {
 
@@ -36,7 +36,7 @@ struct LogDevs : public RecruitmentBase<Type> {
            this->recruitment->log_recruit_devs[pos];
   }
 
-  /** Empty return of base class function */
+  /** @copydoc RecruitmentBase::evaluate_mean */
   virtual const Type evaluate_mean(const Type& spawners, const Type& phi_0) {
     return 0;
   }

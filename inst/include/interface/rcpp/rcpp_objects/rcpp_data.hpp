@@ -9,8 +9,8 @@
 #ifndef FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_DATA_HPP
 #define FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_DATA_HPP
 
-#include "../../../common/information.hpp"
 #include "rcpp_interface_base.hpp"
+#include "common/information.hpp"
 
 /**
  * @brief Rcpp interface that serves as the parent class for Rcpp data
@@ -77,12 +77,6 @@ class DataInterfaceBase : public FIMSRcppInterfaceBase {
    */
   virtual bool add_to_fims_tmb() { return true; };
 };
-// static id of the DataInterfaceBase object
-uint32_t DataInterfaceBase::id_g = 1;
-// local id of the DataInterfaceBase object map relating the ID of the
-// DataInterfaceBase to the DataInterfaceBase objects
-std::map<uint32_t, std::shared_ptr<DataInterfaceBase>>
-    DataInterfaceBase::live_objects;
 
 /**
  * @brief  The Rcpp interface for AgeComp to instantiate the object from R:

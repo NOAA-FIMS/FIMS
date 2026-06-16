@@ -5,11 +5,9 @@ on:
   # Trigger when creating a pull request
   pull_request:
     branches:
-      - dev
       - main
   push:
     branches:
-      - dev
       - main
   # This runs at 00:00 UTC every Monday
   schedule:
@@ -76,4 +74,4 @@ jobs:
 
           # The filter looks for files with 'slow' in the name
           devtools::test(filter = "slow")
-          
+

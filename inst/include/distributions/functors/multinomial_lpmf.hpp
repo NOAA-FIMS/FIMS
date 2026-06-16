@@ -12,7 +12,6 @@
 
 #include "density_components_base.hpp"
 #include "../../common/fims_vector.hpp"
-#include "../../common/def.hpp"
 
 namespace fims_distributions {
 /**
@@ -82,9 +81,9 @@ struct MultinomialLPMF : public DensityComponentBase<Type> {
               "MultinomialLPDF: Vector index out of bounds. The dimension of "
               "the "
               "number of rows times the number of columns is of size " +
-              fims::to_string(dims[0] * dims[1]) +
+              std::to_string(dims[0] * dims[1]) +
               " and the expected vector is of size " +
-              fims::to_string(this->data_expected_values->size()));
+              std::to_string(this->data_expected_values->size()));
         }
       }
     } else {
@@ -92,17 +91,17 @@ struct MultinomialLPMF : public DensityComponentBase<Type> {
         throw std::invalid_argument(
             "MultinomialLPDF: Vector index out of bounds. The dimension of the "
             "number of  rows times the number of columns is of size " +
-            fims::to_string(dims[0] * dims[1]) +
+            std::to_string(dims[0] * dims[1]) +
             " and the observed vector is of size " +
-            fims::to_string(this->observed_values.size()));
+            std::to_string(this->observed_values.size()));
       }
       if (this->observed_values.size() != this->expected_values.size()) {
         throw std::invalid_argument(
             "MultinomialLPDF: Vector index out of bounds. The dimension of the "
             "observed vector of size " +
-            fims::to_string(this->observed_values.size()) +
+            std::to_string(this->observed_values.size()) +
             " and the expected vector is of size " +
-            fims::to_string(this->expected_values.size()));
+            std::to_string(this->expected_values.size()));
       }
     }
 

@@ -11,7 +11,7 @@
 #define FIMS_POPULATION_DYNAMICS_RECRUITMENT_SR_BEVERTON_HOLT_HPP
 
 #include "recruitment_base.hpp"
-#include "../../../common/fims_vector.hpp"
+#include "common/fims_vector.hpp"
 
 namespace fims_popdy {
 
@@ -29,7 +29,7 @@ struct SRBevertonHolt : public RecruitmentBase<Type> {
   // Here we define the members that will be used in the Beverton--Holt
   // stock--recruitment function. These members are needed by the Beverton--Holt
   // stock--recruitment function but will not be common to all recruitment
-  // functions like spawners is below.
+  // functions.
   fims::Vector<Type> logit_steep; /**< Transformed value of recruitment
                                   relative to unfished
                                   recruitment at 20 percent of unfished
@@ -39,14 +39,12 @@ struct SRBevertonHolt : public RecruitmentBase<Type> {
 
   virtual ~SRBevertonHolt() {}
 
-  /** @brief Beverton--Holt implementation of the stock--recruitment function.
+  /**
+   * @copydoc RecruitmentBase::evaluate_mean
    *
-   * The Beverton--Holt stock--recruitment implementation:
+   * The Beverton--Holt stock--recruitment relationship is:
    * \f$ \frac{0.8 R_{0} h S_{t-1}}{0.2 R_{0} \phi_{0} (1 - h) + S_{t-1} (h -
    * 0.2)} \f$
-   *
-   * @param spawners A measure of spawning output.
-   * @param phi_0 Number of spawners per recruit of an unfished population
    */
   virtual const Type evaluate_mean(const Type& spawners, const Type& phi_0) {
     Type recruits;

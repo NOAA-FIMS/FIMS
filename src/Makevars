@@ -1,4 +1,18 @@
 CXX_STD = CXX17
-PKG_CXXFLAGS = -DTMB_MODEL  -DTMB_EIGEN_DISABLE_WARNINGS  -DTMBAD_FRAMEWORK
-CXX17STD = -std=c++17 -w
+PKG_CXXFLAGS = -I../inst/include -DTMB_MODEL  -DTMB_EIGEN_DISABLE_WARNINGS  -DTMBAD_FRAMEWORK -w
+MAKEFLAGS= -j2 # Use 2 cores for compilation, adjust as needed
+ifdef R_INSTALL_PKG
+  # Size-reduction flags applied only during R CMD INSTALL / devtools::install().
+  # -flto=auto: link-time optimization recovers dead template instantiations lost
+  #   by splitting into translation units, reducing installed .so size.
+  # -fvisibility=hidden -fvisibility-inlines-hidden: hides internal symbols from
+  #   the dynamic symbol table. Rcpp module entry points must be explicitly marked
+  #   with RcppExport to remain visible (see inst/include/interface/rcpp/fims_modules.hpp).
+  # These flags are intentionally excluded from devtools::load_all() builds to
+  #   preserve debug symbols and avoid hiding symbols needed for interactive development.
+  PKG_CXXFLAGS += -g0 -flto=auto -fvisibility=hidden -fvisibility-inlines-hidden
+  PKG_LIBS = -flto=auto
+  PKG_STRIP = $(STRIP) --strip-debug
+endif
+CXX17STD = -std=c++17
 USE_CXX17 = "yes"

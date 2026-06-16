@@ -9,9 +9,8 @@
 #ifndef FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_DISTRIBUTION_HPP
 #define FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_DISTRIBUTION_HPP
 
-#include "../../../distributions/distributions.hpp"
-#include "../../interface.hpp"
 #include "rcpp_interface_base.hpp"
+#include "../../../distributions/distributions.hpp"
 
 /**
  * @brief Rcpp interface that serves as the parent class for Rcpp distribution
@@ -160,12 +159,6 @@ class DistributionsInterfaceBase : public FIMSRcppInterfaceBase {
    */
   virtual double evaluate() = 0;
 };
-// static id of the DistributionsInterfaceBase object
-uint32_t DistributionsInterfaceBase::id_g = 1;
-// local id of the DistributionsInterfaceBase object map relating the ID of the
-// DistributionsInterfaceBase to the DistributionsInterfaceBase objects
-std::map<uint32_t, std::shared_ptr<DistributionsInterfaceBase>>
-    DistributionsInterfaceBase::live_objects;
 
 /**
  * @brief The Rcpp interface for Dnorm to instantiate from R:
@@ -394,7 +387,7 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
        << ",\n";
     ss << " \"input_type\" : \"" << this->input_type_m << "\",\n";
     ss << " \"density_component\": {\n";
-    ss << "  \"lpdf_value\": " << this->lpdf_value << ",\n";
+    ss << "  \"lpdf_value\": " << sanitize_val(this->lpdf_value) << ",\n";
     ss << "  \"value\":[";
     if (this->lpdf_vec.size() == 0) {
       ss << "],\n";
@@ -734,7 +727,7 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
        << ",\n";
     ss << " \"input_type\" : \"" << this->input_type_m << "\",\n";
     ss << " \"density_component\": {\n";
-    ss << "  \"lpdf_value\": " << this->lpdf_value << ",\n";
+    ss << "  \"lpdf_value\": " << sanitize_val(this->lpdf_value) << ",\n";
     ss << "  \"value\":[";
     if (this->lpdf_vec.size() == 0) {
       ss << "],\n";
@@ -1050,7 +1043,7 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
        << ",\n";
     ss << " \"input_type\" : \"" << this->input_type_m << "\",\n";
     ss << " \"density_component\": {\n";
-    ss << "  \"lpdf_value\": " << this->lpdf_value << ",\n";
+    ss << "  \"lpdf_value\": " << sanitize_val(this->lpdf_value) << ",\n";
     ss << "  \"value\":[";
     if (this->lpdf_vec.size() == 0) {
       ss << "],\n";

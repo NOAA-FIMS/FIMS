@@ -67,11 +67,8 @@ class RecruitmentInterfaceBase : public FIMSRcppInterfaceBase {
    */
   virtual uint32_t get_id() = 0;
 
-  /**
-   * @brief A method for each child recruitment interface object to inherit so
-   * each recruitment option can have an evaluate_mean() function.
-   */
-  virtual double evaluate_mean(double spawners, double ssbzero) = 0;
+  /** @copydoc fims_popdy::RecruitmentBase::evaluate_mean */
+  virtual double evaluate_mean(double spawners, double phi_0) = 0;
 
   /**
    * @brief A method for each child recruitment process interface object to
@@ -80,12 +77,6 @@ class RecruitmentInterfaceBase : public FIMSRcppInterfaceBase {
    */
   virtual double evaluate_process(size_t pos) = 0;
 };
-// static id of the RecruitmentInterfaceBase object
-uint32_t RecruitmentInterfaceBase::id_g = 1;
-// local id of the RecruitmentInterfaceBase object map relating the ID of the
-// RecruitmentInterfaceBase to the RecruitmentInterfaceBase objects
-std::map<uint32_t, std::shared_ptr<RecruitmentInterfaceBase>>
-    RecruitmentInterfaceBase::live_objects;
 
 /**
  * @brief Rcpp interface for Beverton--Holt to instantiate from R:
@@ -180,25 +171,21 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
   }
 
   /**
-   * @brief Evaluate recruitment using the Beverton--Holt stock--recruitment
-   * relationship.
-   * @param spawners Spawning biomass per time step.
-   * @param ssbzero The biomass at unfished levels.
-   * TODO: Change to sbzero if continuing to use acronyms.
+   * @copydoc RecruitmentInterfaceBase::evaluate_mean
    */
-  virtual double evaluate_mean(double spawners, double ssbzero) {
+  virtual double evaluate_mean(double spawners, double phi_0) {
     fims_popdy::SRBevertonHolt<double> BevHolt;
     BevHolt.logit_steep.resize(1);
     BevHolt.logit_steep[0] = this->logit_steep[0].initial_value_m;
     if (this->logit_steep[0].initial_value_m == 1.0) {
-      Rcpp::warning(
+      Rf_warning(
           "Steepness is subject to a logit transformation. "
           "Fixing it at 1.0 is not currently possible.");
     }
     BevHolt.log_rzero.resize(1);
     BevHolt.log_rzero[0] = this->log_rzero[0].initial_value_m;
 
-    return BevHolt.evaluate_mean(spawners, ssbzero);
+    return BevHolt.evaluate_mean(spawners, phi_0);
   }
 
   /**
@@ -473,11 +460,9 @@ class LogDevsRecruitmentInterface : public RecruitmentInterfaceBase {
   virtual uint32_t get_id() { return this->id; }
 
   /**
-   * @brief Evaluate mean - returns empty function for this module.
-   * @param spawners Spawning biomass per time step.
-   * @param ssbzero The biomass at unfished levels.
+   * @copydoc RecruitmentInterfaceBase::evaluate_mean
    */
-  virtual double evaluate_mean(double spawners, double ssbzero) { return 0; }
+  virtual double evaluate_mean(double spawners, double phi_0) { return 0; }
 
   /**
    * @brief Evaluate recruitment process using the Log--Devs approach.
@@ -548,11 +533,9 @@ class LogRRecruitmentInterface : public RecruitmentInterfaceBase {
   virtual uint32_t get_id() { return this->id; }
 
   /**
-   * @brief Evaluate mean - returns empty function for this module.
-   * @param spawners Spawning biomass per time step.
-   * @param ssbzero The biomass at unfished levels.
+   * @copydoc RecruitmentInterfaceBase::evaluate_mean
    */
-  virtual double evaluate_mean(double spawners, double ssbzero) { return 0; }
+  virtual double evaluate_mean(double spawners, double phi_0) { return 0; }
 
   /**
    * @brief Evaluate recruitment process using the Log--R approach.

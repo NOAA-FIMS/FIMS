@@ -10,13 +10,16 @@
 #define FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_MODELS_HPP
 
 #include <set>
-#include "../../../common/def.hpp"
-#include "../../../models/fisheries_models.hpp"
-#include "../../../utilities/fims_json.hpp"
-
+#include "common/def.hpp"
 #include "rcpp_interface_base.hpp"
+#include "../../../models/fisheries_models.hpp"
+#include "common/model.hpp"
+#include "../../../utilities/fims_json.hpp"
 #include "rcpp_population.hpp"
 #include "rcpp_fleet.hpp"
+#include "rcpp_growth.hpp"
+#include "rcpp_distribution.hpp"
+#include "rcpp_data.hpp"
 #include "rcpp_maturity.hpp"
 #include "rcpp_recruitment.hpp"
 #include "rcpp_selectivity.hpp"
@@ -205,12 +208,6 @@ class FisheryModelInterfaceBase : public FIMSRcppInterfaceBase {
     return result;
   }
 };
-// static id of the FleetInterfaceBase object
-uint32_t FisheryModelInterfaceBase::id_g = 1;
-
-// FleetInterfaceBase to the FleetInterfaceBase objects
-std::map<uint32_t, std::shared_ptr<FisheryModelInterfaceBase>>
-    FisheryModelInterfaceBase::live_objects;
 
 /**
  * @brief The CatchAtAgeInterface class is used to interface with the
@@ -728,7 +725,7 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
     ss << "\"FIMS\",";
 #endif
     ss << " \"id\": " << this->get_id() << ",\n";
-    ss << " \"objective_function_value\": " << value << ",\n";
+    ss << " \"objective_function_value\": " << sanitize_val(value) << ",\n";
     ss << "\"growth\":[\n";
     for (module_id_it = growth_ids.begin(); module_id_it != growth_ids.end();
          module_id_it++) {

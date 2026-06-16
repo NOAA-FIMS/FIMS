@@ -115,8 +115,6 @@ navbar:
         - text: coverage (codecov)
           href: https://app.codecov.io/gh/NOAA-FIMS/FIMS
           target: _blank
-        - text: coverage explained
-          href: https://noaa-fims.github.io/FIMS/coverage/codecoverage_explanation.html
         - text: testdown
           href: https://noaa-fims.github.io/FIMS/testdown/index.html
     website:

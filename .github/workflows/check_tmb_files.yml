@@ -1,0 +1,215 @@
+# This workflow watches selected source files in the upstream RTMB repository.
+# FIMS keeps local wrapper/configuration files that are derived from or closely
+# related to RTMB's versions, so upstream changes may require manual review in
+# FIMS. The workflow does not try to merge or apply upstream changes. It only
+# detects that a tracked upstream file changed and records that information in a
+# single long-lived GitHub issue.
+name: Detect RTMB Source Remote Change
+
+on:
+  # Run once per month at 12:00 UTC on the first day of the month. This keeps
+  # the check independent of FIMS pull requests while avoiding daily noise for
+  # upstream files that change infrequently.
+  schedule:
+    - cron: '0 12 1 * *'
+
+  # Allow maintainers to run the check manually from the GitHub Actions UI.
+  # This is useful after changing this workflow, after manually reviewing an
+  # upstream RTMB change, or when debugging hash/issue behavior.
+  workflow_dispatch:
+
+permissions:
+  # Read-only repository access is enough because this workflow no longer
+  # commits hash snapshot files back to the repository.
+  contents: read
+
+  # Required so actions/github-script can create, reopen, and comment on the
+  # single tracking issue used for upstream RTMB source changes.
+  issues: write
+
+jobs:
+  detect-remote-change:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download remote RTMB source files
+        run: |
+          # Download the exact upstream files we want to monitor. These are
+          # written to /tmp because they are temporary inputs for hashing only;
+          # they are not meant to be committed into FIMS.
+          #
+          # curl flags:
+          #   -f: fail if GitHub returns an HTTP error, e.g., 404
+          #   -s: run silently unless there is an error
+          #   -S: still show an error message when -s is used
+          #   -L: follow redirects, which raw.githubusercontent.com may use
+          curl -fsSL \
+            "https://raw.githubusercontent.com/kaskr/RTMB/refs/heads/master/RTMB/src/TMB.h" \
+            -o /tmp/RTMB_TMB.h
+
+          # RTMB/src/config.h is checked separately because FIMS has its own
+          # TMB config header and upstream changes there can require a local
+          # config review even when TMB.h itself did not change.
+          curl -fsSL \
+            "https://raw.githubusercontent.com/kaskr/RTMB/refs/heads/master/RTMB/src/config.h" \
+            -o /tmp/RTMB_config.h
+
+      - id: hash
+        name: Compute remote file hashes
+        run: |
+          # A SHA256 hash is a fingerprint of the file contents. If the upstream
+          # file changes by even one character, its hash changes. The workflow
+          # stores the last-seen hashes in the tracking issue, not in committed
+          # repository files, so the bot does not need to push commits.
+          tmb_sha=$(sha256sum /tmp/RTMB_TMB.h | awk '{print $1}')
+          config_sha=$(sha256sum /tmp/RTMB_config.h | awk '{print $1}')
+
+          # Expose the current upstream hashes as step outputs so the issue step
+          # can compare them against the hashes stored in the tracking issue.
+          echo "tmb_sha=$tmb_sha" >> "$GITHUB_OUTPUT"
+          echo "config_sha=$config_sha" >> "$GITHUB_OUTPUT"
+
+      - name: Create, reopen, or update RTMB tracking issue
+        uses: actions/github-script@v9
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |-
+            // This workflow keeps all state in one GitHub issue instead of
+            // committing hash snapshot files to the repository. The hidden marker
+            // below lets the workflow recover the most recent stored hashes from
+            // the latest workflow-created issue comment.
+            const issueTitle = 'Remote RTMB source files changed';
+            const markerStart = '<!-- rtmb-source-hashes';
+            const markerEnd = '-->';
+            const current = {
+              tmb: '${{ steps.hash.outputs.tmb_sha }}',
+              config: '${{ steps.hash.outputs.config_sha }}'
+            };
+
+            function hashMarker(hashes) {
+              return [
+                markerStart,
+                `TMB_H_SHA=${hashes.tmb}`,
+                `CONFIG_H_SHA=${hashes.config}`,
+                markerEnd
+              ].join('\n');
+            }
+
+            function parseHashes(text) {
+              if (!text) return null;
+              const markerPattern = /<!-- rtmb-source-hashes\s+TMB_H_SHA=([a-fA-F0-9]+)\s+CONFIG_H_SHA=([a-fA-F0-9]+)\s+-->/m;
+              const match = text.match(markerPattern);
+              if (!match) return null;
+              return { tmb: match[1], config: match[2] };
+            }
+
+            function changeSummary(previous, current) {
+              const changes = [];
+              if (!previous || previous.tmb !== current.tmb) {
+                changes.push([
+                  'RTMB/src/TMB.h changed.',
+                  `Previous SHA256: ${previous?.tmb || 'none recorded'}`,
+                  `Current SHA256: ${current.tmb}`
+                ].join('\n'));
+              }
+              if (!previous || previous.config !== current.config) {
+                changes.push([
+                  'RTMB/src/config.h changed.',
+                  `Previous SHA256: ${previous?.config || 'none recorded'}`,
+                  `Current SHA256: ${current.config}`
+                ].join('\n'));
+              }
+              return changes;
+            }
+
+            async function postHashComment(issueNumber, previous, current, intro) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issueNumber,
+                body: [
+                  intro,
+                  '',
+                  ...changeSummary(previous, current),
+                  '',
+                  'Tracked files:',
+                  '- https://raw.githubusercontent.com/kaskr/RTMB/refs/heads/master/RTMB/src/TMB.h',
+                  '- https://raw.githubusercontent.com/kaskr/RTMB/refs/heads/master/RTMB/src/config.h',
+                  '',
+                  hashMarker(current)
+                ].join('\n')
+              });
+            }
+
+            const issues = await github.paginate(github.rest.issues.listForRepo, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'all',
+              per_page: 100
+            });
+
+            const existingIssue = issues.find((issue) =>
+              issue.title === issueTitle && !issue.pull_request
+            );
+
+            // First run: create the single tracking issue and store the initial
+            // hashes in a comment. This establishes the baseline without making
+            // a repository commit.
+            if (!existingIssue) {
+              const { data: issue } = await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: issueTitle,
+                body: [
+                  'This issue tracks upstream RTMB source file changes that may require review in FIMS.',
+                  '',
+                  'Hash updates are recorded as comments here. No repository files are changed by this workflow.'
+                ].join('\n')
+              });
+              await postHashComment(
+                issue.number,
+                null,
+                current,
+                'Initial upstream RTMB source snapshot recorded.'
+              );
+              return;
+            }
+
+            let previous = parseHashes(existingIssue.body);
+
+            // Comments may contain newer hashes than the issue body. Search from
+            // newest to oldest so the first marker found is the latest recorded
+            // workflow state.
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: existingIssue.number,
+              per_page: 100
+            });
+            for (const comment of comments.slice().reverse()) {
+              const parsed = parseHashes(comment.body);
+              if (parsed) {
+                previous = parsed;
+                break;
+              }
+            }
+
+            if (previous && previous.tmb === current.tmb && previous.config === current.config) {
+              core.info('Tracked RTMB source hashes match the latest recorded issue state. No issue update needed.');
+              return;
+            }
+
+            if (existingIssue.state === 'closed') {
+              await github.rest.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: existingIssue.number,
+                state: 'open'
+              });
+            }
+
+            await postHashComment(
+              existingIssue.number,
+              previous,
+              current,
+              'The upstream RTMB source changed. Tracking this update here rather than committing snapshot files to the repository.'
+            );

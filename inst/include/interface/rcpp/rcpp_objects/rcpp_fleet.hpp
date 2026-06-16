@@ -9,9 +9,8 @@
 #ifndef FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_FLEET_HPP
 #define FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_FLEET_HPP
 
-#include "../../../common/def.hpp"
-#include "../../../population_dynamics/fleet/fleet.hpp"
 #include "rcpp_interface_base.hpp"
+#include "../../../population_dynamics/fleet/fleet.hpp"
 
 /**
  * @brief Rcpp interface that serves as the parent class for Rcpp fleet
@@ -61,12 +60,7 @@ class FleetInterfaceBase : public FIMSRcppInterfaceBase {
    */
   virtual uint32_t get_id() = 0;
 };
-// static id of the FleetInterfaceBase object
-uint32_t FleetInterfaceBase::id_g = 1;
-// local id of the FleetInterfaceBase object map relating the ID of the
-// FleetInterfaceBase to the FleetInterfaceBase objects
-std::map<uint32_t, std::shared_ptr<FleetInterfaceBase>>
-    FleetInterfaceBase::live_objects;
+
 /**
  * @brief The Rcpp interface for Fleet to instantiate from R:
  * fleet <- methods::new(Fleet)

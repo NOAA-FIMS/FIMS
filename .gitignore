@@ -44,6 +44,9 @@
 # CMake build files
 /build
 
+# Doxygen html output
+/doxygen/html
+
 # C++ ignore files
 # Prerequisites
 *.d
@@ -88,6 +91,7 @@
 # All log files and json output
 *.log
 *.json
+!cspell.json
 
 #TMB tmp.def file
 src/tmp.def

@@ -137,9 +137,6 @@ trap cleanup EXIT
 
 echo "$R_CODE" > "$R_TEMP_FILE"
 
-# Execute with System Requirements disabled to avoid libnode-dev conflicts
-export PKG_SYSREQS=false
-
 if ! Rscript "$R_TEMP_FILE"; then
     echo "------------------------------------------------------------------"
     echo "!!! ERROR: R Setup failed. See errors above. !!!"
