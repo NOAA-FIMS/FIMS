@@ -20,6 +20,7 @@ void register_data(Rcpp::Module& m) {
                                      "classAgeCompDataInterface.html.")
       .constructor<int, int>()
       .field("age_comp_data", &AgeCompDataInterface::age_comp_data)
+      .method("deep_copy", &AgeCompDataInterface::deep_copy_rcpp)
       .method("get_id", &AgeCompDataInterface::get_id);
 
   Rcpp::class_<LengthCompDataInterface>(
@@ -29,6 +30,7 @@ void register_data(Rcpp::Module& m) {
       "classLengthCompDataInterface.html.")
       .constructor<int, int>()
       .field("length_comp_data", &LengthCompDataInterface::length_comp_data)
+      .method("deep_copy", &LengthCompDataInterface::deep_copy_rcpp)
       .method("get_id", &LengthCompDataInterface::get_id);
 
   Rcpp::class_<LandingsDataInterface>(
@@ -38,6 +40,7 @@ void register_data(Rcpp::Module& m) {
       "classLandingsDataInterface.html.")
       .constructor<int>()
       .field("landings_data", &LandingsDataInterface::landings_data)
+      .method("deep_copy", &LandingsDataInterface::deep_copy_rcpp)
       .method("get_id", &LandingsDataInterface::get_id);
 
   Rcpp::class_<IndexDataInterface>(
@@ -46,5 +49,6 @@ void register_data(Rcpp::Module& m) {
       "https://noaa-fims.github.io/FIMS/doxygen/classIndexDataInterface.html.")
       .constructor<int>()
       .field("index_data", &IndexDataInterface::index_data)
+      .method("deep_copy", &IndexDataInterface::deep_copy_rcpp)
       .method("get_id", &IndexDataInterface::get_id);
 }

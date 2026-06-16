@@ -71,6 +71,7 @@ void register_fleet(Rcpp::Module& m) {
       .field("lengthcomp_expected",
              &FleetInterface::lengthcomp_expected)
       .method("get_id", &FleetInterface::get_id)
+      .method("deep_copy", &FleetInterface::deep_copy_rcpp)
       .method("SetName", &FleetInterface::SetName)
       .method("GetName", &FleetInterface::GetName)
       .method("SetObservedAgeCompDataID",

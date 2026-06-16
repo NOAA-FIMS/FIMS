@@ -27,6 +27,7 @@ void register_selectivity(Rcpp::Module& m) {
              &LogisticSelectivityInterface::inflection_point)
       .field("slope", &LogisticSelectivityInterface::slope)
       .method("get_id", &LogisticSelectivityInterface::get_id)
+      .method("deep_copy", &LogisticSelectivityInterface::deep_copy_rcpp)
       .method("evaluate", &LogisticSelectivityInterface::evaluate);
 
   Rcpp::class_<DoubleLogisticSelectivityInterface>(
@@ -42,5 +43,6 @@ void register_selectivity(Rcpp::Module& m) {
              &DoubleLogisticSelectivityInterface::inflection_point_desc)
       .field("slope_desc", &DoubleLogisticSelectivityInterface::slope_desc)
       .method("get_id", &DoubleLogisticSelectivityInterface::get_id)
+      .method("deep_copy", &DoubleLogisticSelectivityInterface::deep_copy_rcpp)
       .method("evaluate", &DoubleLogisticSelectivityInterface::evaluate);
 }

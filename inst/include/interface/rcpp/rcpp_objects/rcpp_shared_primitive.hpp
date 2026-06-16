@@ -90,6 +90,18 @@ class SharedInt {
   }
 
   /**
+   * @brief Create a copy with independent storage.
+   */
+  std::shared_ptr<SharedInt> deep_copy() const {
+    return std::make_shared<SharedInt>(this->get());
+  }
+
+  /**
+   * @brief Rcpp-facing deep copy wrapper.
+   */
+  SharedInt* deep_copy_rcpp() const { return new SharedInt(this->get()); }
+
+  /**
    * @brief Constructs a new `SharedInt` object by moving resources.
    *
    * Transfers ownership of the shared integer from `other` to the new object.
@@ -854,6 +866,18 @@ class SharedReal {
   }
 
   /**
+   * @brief Create a copy with independent storage.
+   */
+  std::shared_ptr<SharedReal> deep_copy() const {
+    return std::make_shared<SharedReal>(this->get());
+  }
+
+  /**
+   * @brief Rcpp-facing deep copy wrapper.
+   */
+  SharedReal* deep_copy_rcpp() const { return new SharedReal(this->get()); }
+
+  /**
    * @brief Constructs a new `SharedReal` object by moving resources.
    *
    * @details Transfers ownership of the shared integer from `other` to the new
@@ -1577,6 +1601,18 @@ class SharedString {
   }
 
   /**
+   * @brief Create a copy with independent storage.
+   */
+  std::shared_ptr<SharedString> deep_copy() const {
+    return std::make_shared<SharedString>(this->get());
+  }
+
+  /**
+   * @brief Rcpp-facing deep copy wrapper.
+   */
+  SharedString* deep_copy_rcpp() const { return new SharedString(this->get()); }
+
+  /**
    * @brief Constructs a new SharedString object by moving resources.
    *
    * @details Transfers ownership of the shared string from `other` to
@@ -1765,6 +1801,20 @@ class SharedBoolean {
   SharedBoolean& operator=(const bool& other) {
     *value = other;
     return *this;
+  }
+
+  /**
+   * @brief Create a copy with independent storage.
+   */
+  std::shared_ptr<SharedBoolean> deep_copy() const {
+    return std::make_shared<SharedBoolean>(this->get());
+  }
+
+  /**
+   * @brief Rcpp-facing deep copy wrapper.
+   */
+  SharedBoolean* deep_copy_rcpp() const {
+    return new SharedBoolean(this->get());
   }
 
   /**
