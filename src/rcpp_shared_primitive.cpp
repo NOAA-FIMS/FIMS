@@ -18,6 +18,7 @@ void register_shared(Rcpp::Module& m) {
       .constructor()
       .constructor<int>()
       .method("get", &SharedInt::get)
+      .method("deep_copy", &SharedInt::deep_copy_rcpp)
       .method("set", &SharedInt::set);
 
   Rcpp::class_<SharedString>(
@@ -26,6 +27,7 @@ void register_shared(Rcpp::Module& m) {
       .constructor()
       .constructor<std::string>()
       .method("get", &SharedString::get)
+      .method("deep_copy", &SharedString::deep_copy_rcpp)
       .method("set", &SharedString::set);
 
   Rcpp::class_<SharedBoolean>(
@@ -34,6 +36,7 @@ void register_shared(Rcpp::Module& m) {
       .constructor()
       .constructor<bool>()
       .method("get", &SharedBoolean::get)
+      .method("deep_copy", &SharedBoolean::deep_copy_rcpp)
       .method("set", &SharedBoolean::set);
 
   Rcpp::class_<SharedReal>(
@@ -42,5 +45,6 @@ void register_shared(Rcpp::Module& m) {
       .constructor()
       .constructor<double>()
       .method("get", &SharedReal::get)
+      .method("deep_copy", &SharedReal::deep_copy_rcpp)
       .method("set", &SharedReal::set);
 }

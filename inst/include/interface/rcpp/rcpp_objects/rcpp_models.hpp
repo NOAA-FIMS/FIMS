@@ -234,6 +234,28 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
       : FisheryModelInterfaceBase(other) {}
 
   /**
+   * @brief Create a deep copy with a new model ID.
+   */
+  std::shared_ptr<CatchAtAgeInterface> deep_copy() const {
+    std::shared_ptr<CatchAtAgeInterface> copy =
+        std::make_shared<CatchAtAgeInterface>(*this);
+    copy->id = FisheryModelInterfaceBase::id_g++;
+    copy->population_ids =
+        std::make_shared<std::set<uint32_t>>(*this->population_ids);
+
+    FisheryModelInterfaceBase::live_objects[copy->id] = copy;
+    FIMSRcppInterfaceBase::fims_interface_objects.push_back(copy);
+    return copy;
+  }
+
+  /**
+   * @brief Rcpp-facing deep copy wrapper.
+   */
+  CatchAtAgeInterface* deep_copy_rcpp() const {
+    return this->deep_copy().get();
+  }
+
+  /**
    * Method to add a population id to the set of population ids.
    */
   void AddPopulation(uint32_t id) {

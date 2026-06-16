@@ -136,6 +136,33 @@ class AgeCompDataInterface : public DataInterfaceBase {
   virtual ~AgeCompDataInterface() {}
 
   /**
+   * @brief Create a deep copy with a new data ID.
+   */
+  std::shared_ptr<AgeCompDataInterface> deep_copy() const {
+    std::shared_ptr<AgeCompDataInterface> copy =
+        std::make_shared<AgeCompDataInterface>(*this);
+    copy->id = DataInterfaceBase::id_g++;
+    copy->observed_data = Rcpp::clone(this->observed_data);
+    copy->DataInterfaceBase::uncertainty =
+        Rcpp::clone(this->DataInterfaceBase::uncertainty);
+    copy->amax = SharedInt(this->amax.get());
+    copy->ymax = SharedInt(this->ymax.get());
+    copy->age_comp_data = DeepCopyRealVector(this->age_comp_data);
+    copy->uncertainty = DeepCopyRealVector(this->uncertainty);
+
+    DataInterfaceBase::live_objects[copy->id] = copy;
+    FIMSRcppInterfaceBase::fims_interface_objects.push_back(copy);
+    return copy;
+  }
+
+  /**
+   * @brief Rcpp-facing deep copy wrapper.
+   */
+  AgeCompDataInterface* deep_copy_rcpp() const {
+    return this->deep_copy().get();
+  }
+
+  /**
    * @brief Gets the ID of the interface base object.
    * @return The ID.
    */
@@ -269,6 +296,33 @@ class LengthCompDataInterface : public DataInterfaceBase {
   virtual ~LengthCompDataInterface() {}
 
   /**
+   * @brief Create a deep copy with a new data ID.
+   */
+  std::shared_ptr<LengthCompDataInterface> deep_copy() const {
+    std::shared_ptr<LengthCompDataInterface> copy =
+        std::make_shared<LengthCompDataInterface>(*this);
+    copy->id = DataInterfaceBase::id_g++;
+    copy->observed_data = Rcpp::clone(this->observed_data);
+    copy->DataInterfaceBase::uncertainty =
+        Rcpp::clone(this->DataInterfaceBase::uncertainty);
+    copy->lmax = SharedInt(this->lmax.get());
+    copy->ymax = SharedInt(this->ymax.get());
+    copy->length_comp_data = DeepCopyRealVector(this->length_comp_data);
+    copy->uncertainty = DeepCopyRealVector(this->uncertainty);
+
+    DataInterfaceBase::live_objects[copy->id] = copy;
+    FIMSRcppInterfaceBase::fims_interface_objects.push_back(copy);
+    return copy;
+  }
+
+  /**
+   * @brief Rcpp-facing deep copy wrapper.
+   */
+  LengthCompDataInterface* deep_copy_rcpp() const {
+    return this->deep_copy().get();
+  }
+
+  /**
    * @brief Gets the ID of the interface base object.
    * @return The ID.
    */
@@ -387,6 +441,32 @@ class IndexDataInterface : public DataInterfaceBase {
    * @brief The destructor.
    */
   virtual ~IndexDataInterface() {}
+
+  /**
+   * @brief Create a deep copy with a new data ID.
+   */
+  std::shared_ptr<IndexDataInterface> deep_copy() const {
+    std::shared_ptr<IndexDataInterface> copy =
+        std::make_shared<IndexDataInterface>(*this);
+    copy->id = DataInterfaceBase::id_g++;
+    copy->observed_data = Rcpp::clone(this->observed_data);
+    copy->DataInterfaceBase::uncertainty =
+        Rcpp::clone(this->DataInterfaceBase::uncertainty);
+    copy->ymax = SharedInt(this->ymax.get());
+    copy->index_data = DeepCopyRealVector(this->index_data);
+    copy->uncertainty = DeepCopyRealVector(this->uncertainty);
+
+    DataInterfaceBase::live_objects[copy->id] = copy;
+    FIMSRcppInterfaceBase::fims_interface_objects.push_back(copy);
+    return copy;
+  }
+
+  /**
+   * @brief Rcpp-facing deep copy wrapper.
+   */
+  IndexDataInterface* deep_copy_rcpp() const {
+    return this->deep_copy().get();
+  }
 
   /**
    * @brief Gets the ID of the interface base object.
@@ -508,6 +588,32 @@ class LandingsDataInterface : public DataInterfaceBase {
    * @brief The destructor.
    */
   virtual ~LandingsDataInterface() {}
+
+  /**
+   * @brief Create a deep copy with a new data ID.
+   */
+  std::shared_ptr<LandingsDataInterface> deep_copy() const {
+    std::shared_ptr<LandingsDataInterface> copy =
+        std::make_shared<LandingsDataInterface>(*this);
+    copy->id = DataInterfaceBase::id_g++;
+    copy->observed_data = Rcpp::clone(this->observed_data);
+    copy->DataInterfaceBase::uncertainty =
+        Rcpp::clone(this->DataInterfaceBase::uncertainty);
+    copy->ymax = SharedInt(this->ymax.get());
+    copy->landings_data = DeepCopyRealVector(this->landings_data);
+    copy->uncertainty = DeepCopyRealVector(this->uncertainty);
+
+    DataInterfaceBase::live_objects[copy->id] = copy;
+    FIMSRcppInterfaceBase::fims_interface_objects.push_back(copy);
+    return copy;
+  }
+
+  /**
+   * @brief Rcpp-facing deep copy wrapper.
+   */
+  LandingsDataInterface* deep_copy_rcpp() const {
+    return this->deep_copy().get();
+  }
 
   /**
    * @brief Gets the ID of the interface base object.
