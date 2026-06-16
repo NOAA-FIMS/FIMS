@@ -380,6 +380,25 @@ class VariableVector {
       Rcpp::Rcout << storage_m->at(i) << "  ";
     }
   }
+
+  /**
+   * @brief Create a deep copy with a new VariableVector ID.
+   */
+  VariableVector deep_copy() const {
+    VariableVector copy;
+    copy.storage_m = std::make_shared<std::vector<Variable>>();
+    copy.storage_m->reserve(this->storage_m->size());
+    for (size_t i = 0; i < this->storage_m->size(); i++) {
+      Variable variable_copy;
+      const Variable &variable = this->storage_m->at(i);
+      variable_copy.initial_value_m = variable.initial_value_m;
+      variable_copy.final_value_m = variable.final_value_m;
+      variable_copy.estimation_type_m =
+          SharedString(variable.estimation_type_m.get());
+      copy.storage_m->push_back(variable_copy);
+    }
+    return copy;
+  }
 };
 
 #ifdef FIMS_HEADER_ONLY
@@ -613,6 +632,15 @@ class RealVector {
     for (size_t i = 0; i < this->storage_m->size(); i++) {
       Rcpp::Rcout << storage_m->at(i) << "  ";
     }
+  }
+
+  /**
+   * @brief Create a deep copy with a new RealVector ID.
+   */
+  RealVector deep_copy() const {
+    RealVector copy;
+    copy.storage_m = std::make_shared<std::vector<double>>(*this->storage_m);
+    return copy;
   }
 };
 #ifdef FIMS_HEADER_ONLY

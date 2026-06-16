@@ -234,3 +234,22 @@ test_that("rcpp VariableVector supports indexed numeric replacement", {
   expect_equal(distribution$log_sd[2]$value, 20)
   expect_equal(distribution$log_sd[3]$value, 30)
 })
+
+test_that("rcpp VariableVector deep copies have new ids and independent storage", {
+  variable_vector <- methods::new(VariableVector, 2L)
+  variable_vector$fill(2)
+
+  variable_vector_copy <- variable_vector$deep_copy()
+
+  #' @description Test that VariableVector deep copies get a new id and do not share values.
+  expect_false(identical(variable_vector_copy$get_id(), variable_vector$get_id()))
+  expect_equal(variable_vector_copy[1]$value, 2)
+  variable_vector_copy[1]$value <- 20
+  variable_vector_copy[1]$estimation_type$set("fixed_effects")
+  expect_equal(variable_vector[1]$value, 2)
+  expect_equal(variable_vector[1]$estimation_type$get(), "constant")
+  expect_equal(variable_vector_copy[1]$value, 20)
+  expect_equal(variable_vector_copy[1]$estimation_type$get(), "fixed_effects")
+
+  clear()
+})
