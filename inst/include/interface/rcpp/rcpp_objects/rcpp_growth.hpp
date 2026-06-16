@@ -285,4 +285,76 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
 #endif
 };
 
+/**
+ * @brief Rcpp interface for DSEM growth.
+ */
+class DSEMGrowthInterface : public GrowthInterfaceBase {
+public:
+    /** @brief Vector of path coefficients inherited from FIMSObject logic. */
+
+    // beta_z is a list that stores the strength of DSEM connections
+    ParameterVector beta_z;
+
+    // Creates a unique ID for the module and "signs it up" for FIMS's master list
+    DSEMGrowthInterface() : GrowthInterfaceBase() {
+        std::shared_ptr<DSEMGrowthInterface> dsem_growth = 
+            std::make_shared<DSEMGrowthInterface>(*this);
+        FIMSRcppInterfaceBase::fims_interface_objects.push_back(dsem_growth);
+        GrowthInterfaceBase::live_objects[this->id] = dsem_growth;
+    }
+
+    DSEMGrowthInterface(const DSEMGrowthInterface& other)
+        : GrowthInterfaceBase(other), beta_z(other.beta_z) {}
+
+    virtual ~DSEMGrowthInterface() {}
+    virtual uint32_t get_id() { return this->id; }
+    virtual double evaluate(double age) { return 0.0; }
+
+#ifdef TMB_MODEL
+    template <typename Type>
+
+    // The Global GPS (variable_map): This is vital because it allows the DSEM 
+    // mathematical "engine" to find these numbers no matter which module they 
+    // live in (Recruitment, Growth, etc.) to build a master map of the whole system
+    bool add_to_fims_tmb_internal() {
+        std::shared_ptr<fims_info::Information<Type>> info = 
+            fims_info::Information<Type>::GetInstance();
+
+        // Creates a "Math-only" version of your module that is optimized for speed
+        std::shared_ptr<fims_popdy::DSEMGrowth<Type>> growth = 
+            std::make_shared<fims_popdy::DSEMGrowth<Type>>();
+        
+        growth->id = this->id;
+
+        register_beta_z_standardized<Type>(this, growth, info, "beta_z_growth");
+
+        info->growth_models[this->id] = growth;
+        return true;
+    }
+
+    virtual bool add_to_fims_tmb() {
+        this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
+        this->add_to_fims_tmb_internal<TMBAD_FIMS_TYPE>();
+        return true;
+    }
+#endif
+
+    // Takes the final, optimized numbers from the deep C++ math layer and 
+    // copies them back into the R-side objects so they can be accessed with $ 
+    // operator in R and printed in the output.
+    virtual void finalize() {
+        if (this->finalized) return;
+        std::shared_ptr<fims_info::Information<double>> info = 
+            fims_info::Information<double>::GetInstance();
+        auto it = info->growth_models.find(this->id);
+        if (it != info->growth_models.end()) {
+            auto gro = std::dynamic_pointer_cast<fims_popdy::DSEMGrowth<double>>(it->second);
+            for (size_t i = 0; i < this->beta_z.size(); ++i) {
+                this->beta_z[i].final_value_m = gro->beta_z[i];
+            }
+        }
+        this->finalized = true;
+    }
+};
+
 #endif
