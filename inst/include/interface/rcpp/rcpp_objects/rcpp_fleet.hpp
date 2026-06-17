@@ -254,7 +254,9 @@ class FleetInterface : public FleetInterfaceBase {
   /**
    * @brief Rcpp-facing deep copy wrapper.
    */
-  FleetInterface* deep_copy_rcpp() const { return this->deep_copy().get(); }
+  FleetInterface* deep_copy_rcpp() const {
+    return new FleetInterface(*this->deep_copy());
+  }
 
   /**
    * @brief Gets the ID of the interface base object.

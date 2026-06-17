@@ -159,7 +159,7 @@ class AgeCompDataInterface : public DataInterfaceBase {
    * @brief Rcpp-facing deep copy wrapper.
    */
   AgeCompDataInterface* deep_copy_rcpp() const {
-    return this->deep_copy().get();
+    return new AgeCompDataInterface(*this->deep_copy());
   }
 
   /**
@@ -319,7 +319,7 @@ class LengthCompDataInterface : public DataInterfaceBase {
    * @brief Rcpp-facing deep copy wrapper.
    */
   LengthCompDataInterface* deep_copy_rcpp() const {
-    return this->deep_copy().get();
+    return new LengthCompDataInterface(*this->deep_copy());
   }
 
   /**
@@ -465,7 +465,7 @@ class IndexDataInterface : public DataInterfaceBase {
    * @brief Rcpp-facing deep copy wrapper.
    */
   IndexDataInterface* deep_copy_rcpp() const {
-    return this->deep_copy().get();
+    return new IndexDataInterface(*this->deep_copy());
   }
 
   /**
@@ -612,7 +612,7 @@ class LandingsDataInterface : public DataInterfaceBase {
    * @brief Rcpp-facing deep copy wrapper.
    */
   LandingsDataInterface* deep_copy_rcpp() const {
-    return this->deep_copy().get();
+    return new LandingsDataInterface(*this->deep_copy());
   }
 
   /**

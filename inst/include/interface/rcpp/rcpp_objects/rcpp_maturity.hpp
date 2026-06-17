@@ -128,7 +128,7 @@ class LogisticMaturityInterface : public MaturityInterfaceBase {
    * @brief Rcpp-facing deep copy wrapper.
    */
   LogisticMaturityInterface* deep_copy_rcpp() const {
-    return this->deep_copy().get();
+    return new LogisticMaturityInterface(*this->deep_copy());
   }
 
   /**

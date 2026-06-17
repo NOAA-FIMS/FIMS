@@ -185,7 +185,7 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
    * @brief Rcpp-facing deep copy wrapper.
    */
   BevertonHoltRecruitmentInterface* deep_copy_rcpp() const {
-    return this->deep_copy().get();
+    return new BevertonHoltRecruitmentInterface(*this->deep_copy());
   }
 
   /**
@@ -503,7 +503,7 @@ class LogDevsRecruitmentInterface : public RecruitmentInterfaceBase {
    * @brief Rcpp-facing deep copy wrapper.
    */
   LogDevsRecruitmentInterface* deep_copy_rcpp() const {
-    return this->deep_copy().get();
+    return new LogDevsRecruitmentInterface(*this->deep_copy());
   }
 
   /**
@@ -597,7 +597,7 @@ class LogRRecruitmentInterface : public RecruitmentInterfaceBase {
    * @brief Rcpp-facing deep copy wrapper.
    */
   LogRRecruitmentInterface* deep_copy_rcpp() const {
-    return this->deep_copy().get();
+    return new LogRRecruitmentInterface(*this->deep_copy());
   }
 
   /**
