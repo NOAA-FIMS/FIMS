@@ -93,8 +93,7 @@ struct LogNormalLPDF : public DensityComponentBase<Type> {
 #ifdef TMB_MODEL
       if (this->input_type == "data") {
         // if data, check if there are any NA values and skip lpdf calculation
-        // if there are See Deroba and Miller, 2016
-        // (https://doi.org/10.1016/j.fishres.2015.12.002) for the use of
+        // https://doi.org/10.1016/j.fishres.2015.12.002 for the use of
         // lognormal constant
         if (this->get_observed(i) != this->data_observed_values->na_value) {
           this->lpdf_vec[i] =
