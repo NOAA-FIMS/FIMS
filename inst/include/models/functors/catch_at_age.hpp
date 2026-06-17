@@ -1032,13 +1032,43 @@ class CatchAtAge : public FisheryModelBase<Type> {
       const std::shared_ptr<fims_popdy::GrowthDerivedObservationBase<Type>>&
           growth_observation,
       const std::shared_ptr<fims_popdy::Fleet<Type>>& fleet,
-      const  fims::Vector<Type> & alk_row) {
+      const fims::Vector<Type>& alk_row) {
     Type mean_weight = static_cast<Type>(0.0);
     for (size_t l = 0; l < fleet->n_lengths; ++l) {
       mean_weight +=
           alk_row[l] * growth_observation->EvaluateWeightAtLength(fleet->lengths[l]);
     }
     return mean_weight;
+  }
+
+  /**
+   * @brief Build one fleet-specific growth-derived ALK row or fail clearly.
+   *
+   * @param growth_alk Shared pointer to the growth-derived ALK.
+   * @param fleet Shared pointer to the fleet object.
+   * @param year Year index.
+   * @param age Age index.
+   * @param alk_row Output normalized age-to-length probabilities.
+   */
+  void BuildGrowthDerivedALKRowOrThrow(
+      const std::shared_ptr<fims_popdy::GrowthDerivedALK<Type>>& growth_alk,
+      const std::shared_ptr<fims_popdy::Fleet<Type>>& fleet,
+      size_t year,
+      size_t age,
+      fims::Vector<Type>& alk_row) {
+    if (growth_alk == nullptr || !growth_alk->IsActive()) {
+      throw std::runtime_error(
+          "Growth-derived ALK was unavailable while building fleet age-to-length probabilities.");
+    }
+
+    if (!growth_alk->BuildALKRow(year, age, alk_row)) {
+      std::stringstream ss;
+      ss << "Failed to build growth-derived ALK row for fleet id "
+         << fleet->GetId() << ", year " << year
+         << ", age " << age << ".";
+      FIMS_ERROR_LOG(ss.str());
+      throw std::runtime_error(ss.str());
+    }
   }
 
   /**
@@ -1060,20 +1090,8 @@ class CatchAtAge : public FisheryModelBase<Type> {
       const std::shared_ptr<fims_popdy::Fleet<Type>>& fleet,
       size_t year,
       size_t age) {
-    if (growth_alk == nullptr || !growth_alk->IsActive()) {
-      throw std::runtime_error(
-          "Growth-derived ALK was unavailable while computing fleet mean weight-at-age.");
-    }
-
     fims::Vector<Type> alk_row;
-    if (!growth_alk->BuildALKRow(year, age, alk_row)) {
-      std::stringstream ss;
-      ss << "Failed to build growth-derived ALK row for fleet id "
-         << fleet->GetId() << ", year " << year
-         << ", age " << age << ".";
-      FIMS_ERROR_LOG(ss.str());
-      throw std::runtime_error(ss.str());
-    }
+    BuildGrowthDerivedALKRowOrThrow(growth_alk, fleet, year, age, alk_row);
 
     return MeanWeightFromALKRow(growth_alk->growth_observation,
                                 fleet,
@@ -1841,14 +1859,8 @@ class CatchAtAge : public FisheryModelBase<Type> {
                   }
 
                   fims::Vector<Type> alk_row;
-                  if (!growth_alk->BuildALKRow(y, a, alk_row)) {
-                    std::stringstream ss;
-                    ss << "Failed to build growth-derived ALK row for reporting for fleet id "
-                       << fleet->GetId() << ", year " << y
-                       << ", age " << a << ".";
-                    FIMS_ERROR_LOG(ss.str());
-                    throw std::runtime_error(ss.str());
-                  }
+                  BuildGrowthDerivedALKRowOrThrow(
+                      growth_alk, fleet, y, a, alk_row);
 
                   for (size_t l = 0; l < fleet->n_lengths; ++l) {
                     const size_t i_length_age_year =
