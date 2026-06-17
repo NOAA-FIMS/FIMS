@@ -1,6 +1,5 @@
 ---
 title: "Intro to C++"
-author: "Andrea Havron"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Intro to C++}

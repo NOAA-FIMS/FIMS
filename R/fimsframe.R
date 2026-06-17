@@ -29,12 +29,12 @@ utils::globalVariables(c(
 # 3. If we had setter functions for FIMSFrame, you would add or delete the
 #    appropriate setter functions next but we do not. Instead, we want users to
 #    re-run FIMSFrame() when they make any changes to their data, that way all
-#    of the slots will be updated simultaneously. @nathanvaughan-NOAA mentioned
+#    of the slots will be updated simultaneously. Nathan mentioned
 #    during Code club 2024-12-17 that this may be a problem for future use of
 #    FIMSFrame objects, especially when doing MSE or simulation when there is a
 #    large overhead in running FIMSFrame and you just want to change a small,
 #    simple thing in your data and re-run the model. We will cross that bridge
-#    later. @msupernaw also informed us about the ability to lock an R object
+#    later. Matthew also informed us about the ability to lock an R object
 #    so it cannot be altered. See https://rdrr.io/r/base/bindenv.html.
 # 4. Augment the validator functions to ensure that users do not pass
 #    incompatible information to FIMSFrame().
