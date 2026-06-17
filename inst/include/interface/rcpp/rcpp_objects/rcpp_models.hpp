@@ -252,7 +252,7 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
    * @brief Rcpp-facing deep copy wrapper.
    */
   CatchAtAgeInterface* deep_copy_rcpp() const {
-    return this->deep_copy().get();
+    return new CatchAtAgeInterface(*this->deep_copy());
   }
 
   /**

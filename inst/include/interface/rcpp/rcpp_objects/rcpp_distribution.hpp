@@ -250,7 +250,7 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
    * @brief Rcpp-facing deep copy wrapper.
    */
   DnormDistributionsInterface* deep_copy_rcpp() const {
-    return this->deep_copy().get();
+    return new DnormDistributionsInterface(*this->deep_copy());
   }
 
   /**
@@ -643,7 +643,7 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
    * @brief Rcpp-facing deep copy wrapper.
    */
   DlnormDistributionsInterface* deep_copy_rcpp() const {
-    return this->deep_copy().get();
+    return new DlnormDistributionsInterface(*this->deep_copy());
   }
 
   /**
@@ -1003,7 +1003,7 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
    * @brief Rcpp-facing deep copy wrapper.
    */
   DmultinomDistributionsInterface* deep_copy_rcpp() const {
-    return this->deep_copy().get();
+    return new DmultinomDistributionsInterface(*this->deep_copy());
   }
 
   /**
