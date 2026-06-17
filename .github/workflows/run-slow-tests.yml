@@ -40,9 +40,13 @@ jobs:
       - name: Create Manual Swap (Linux)
         if: matrix.os == 'ubuntu-latest'
         run: |
-          # Deactivate existing swap if active to avoid "Text file busy"
+          # GitHub-hosted Ubuntu runners already have an active swap file at
+          # /swapfile. Attempting to modify it while active causes:
+          # "fallocate failed: Text file busy". Deactivate it first.
           sudo swapoff -a || true
-          # Pre-allocate 16GB of disk space for the swap file.
+          # Use dd instead of fallocate because dd works on all filesystems
+          # (including those that don't support fallocate, such as some
+          # network-backed or ephemeral storage used by GitHub runners).
           sudo dd if=/dev/zero of=/swapfile bs=1M count=16384 status=progress
           # Restricted permissions are required; swap files must be 
           # readable only by the root user for security.
