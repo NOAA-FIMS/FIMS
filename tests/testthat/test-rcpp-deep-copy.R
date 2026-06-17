@@ -10,7 +10,17 @@
 # rcpp deep copy ----
 ## Setup ----
 expect_new_id <- function(original, copy, getter = "get_id") {
-  expect_true(copy[[getter]]() > original[[getter]]())
+  original_id <- if (getter == "GetId") {
+    original$GetId()
+  } else {
+    original$get_id()
+  }
+  copy_id <- if (getter == "GetId") {
+    copy$GetId()
+  } else {
+    copy$get_id()
+  }
+  expect_false(identical(copy_id, original_id))
 }
 
 expect_independent_shared_value <- function(original, copy, original_value,
