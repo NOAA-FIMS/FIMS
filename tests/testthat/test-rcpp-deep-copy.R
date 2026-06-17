@@ -46,7 +46,7 @@ expect_independent_parameter <- function(original, copy, original_value,
 
 expect_independent_parameter_vector <- function(original, copy, original_value,
                                                 copy_value) {
-  expect_true(copy$get_id() > original$get_id())
+  expect_new_id(original, copy)
   expect_equal(original[1]$value, original_value)
   expect_equal(copy[1]$value, original_value)
   copy[1]$value <- copy_value
@@ -59,7 +59,7 @@ expect_independent_parameter_vector <- function(original, copy, original_value,
 
 expect_independent_real_vector <- function(original, copy, original_value,
                                            copy_value) {
-  expect_true(copy$get_id() > original$get_id())
+  expect_new_id(original, copy)
   expect_equal(original$get(0), original_value)
   expect_equal(copy$get(0), original_value)
   copy$set(0, copy_value)
@@ -97,7 +97,7 @@ test_that("rcpp parameter and vector deep copies have new ids and independent st
   real_vector_copy <- real_vector$deep_copy()
 
   #' @description Test that Parameter deep copies get a new id and do not share storage.
-  expect_true(parameter_copy$id > parameter$id)
+  expect_false(identical(parameter_copy$id, parameter$id))
   expect_independent_parameter(parameter, parameter_copy, 1, 10)
   #' @description Test that ParameterVector deep copies get a new id and do not share storage.
   expect_independent_parameter_vector(

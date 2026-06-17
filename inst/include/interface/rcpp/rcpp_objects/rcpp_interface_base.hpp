@@ -374,7 +374,6 @@ class ParameterVector {
     for (size_t i = 0; i < this->storage_m->size(); i++) {
       Parameter parameter_copy;
       const Parameter& parameter = this->storage_m->at(i);
-      parameter_copy.id_m = parameter.id_m;
       parameter_copy.initial_value_m = parameter.initial_value_m;
       parameter_copy.final_value_m = parameter.final_value_m;
       parameter_copy.estimation_type_m =
@@ -638,7 +637,6 @@ uint32_t RealVector::id_g = 0;
  */
 inline Parameter DeepCopyParameter(const Parameter& other) {
   Parameter copy;
-  copy.id_m = other.id_m;
   copy.initial_value_m = other.initial_value_m;
   copy.final_value_m = other.final_value_m;
   copy.estimation_type_m = SharedString(other.estimation_type_m.get());
@@ -650,7 +648,6 @@ inline Parameter DeepCopyParameter(const Parameter& other) {
  */
 inline ParameterVector DeepCopyParameterVector(const ParameterVector& other) {
   ParameterVector copy;
-  copy.id_m = other.id_m;
   copy.storage_m = std::make_shared<std::vector<Parameter>>();
   copy.storage_m->reserve(other.storage_m->size());
   for (size_t i = 0; i < other.storage_m->size(); i++) {
@@ -664,7 +661,6 @@ inline ParameterVector DeepCopyParameterVector(const ParameterVector& other) {
  */
 inline RealVector DeepCopyRealVector(const RealVector& other) {
   RealVector copy;
-  copy.id_m = other.id_m;
   copy.storage_m = std::make_shared<std::vector<double>>(*other.storage_m);
   return copy;
 }
