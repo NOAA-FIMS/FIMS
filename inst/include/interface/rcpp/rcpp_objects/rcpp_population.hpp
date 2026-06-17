@@ -320,7 +320,7 @@ class PopulationInterface : public PopulationInterfaceBase {
    * @brief Rcpp-facing deep copy wrapper.
    */
   PopulationInterface* deep_copy_rcpp() const {
-    return this->deep_copy().get();
+    return new PopulationInterface(*this->deep_copy());
   }
 
   /**

@@ -130,7 +130,7 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
    * @brief Rcpp-facing deep copy wrapper.
    */
   LogisticSelectivityInterface* deep_copy_rcpp() const {
-    return this->deep_copy().get();
+    return new LogisticSelectivityInterface(*this->deep_copy());
   }
 
   /**
@@ -374,7 +374,7 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
    * @brief Rcpp-facing deep copy wrapper.
    */
   DoubleLogisticSelectivityInterface* deep_copy_rcpp() const {
-    return this->deep_copy().get();
+    return new DoubleLogisticSelectivityInterface(*this->deep_copy());
   }
 
   /** @brief returns the id for the double logistic selectivity interface */
