@@ -407,7 +407,6 @@ class VariableVector {
     for (size_t i = 0; i < this->storage_m->size(); i++) {
       Variable variable_copy;
       const Variable& variable = this->storage_m->at(i);
-      variable_copy.id_m = variable.id_m;
       variable_copy.initial_value_m = variable.initial_value_m;
       variable_copy.final_value_m = variable.final_value_m;
       variable_copy.estimation_type_m =
@@ -681,7 +680,6 @@ uint32_t RealVector::id_g = 0;
  */
 inline Variable DeepCopyVariable(const Variable& other) {
   Variable copy;
-  copy.id_m = other.id_m;
   copy.initial_value_m = other.initial_value_m;
   copy.final_value_m = other.final_value_m;
   copy.estimation_type_m = SharedString(other.estimation_type_m.get());
@@ -693,7 +691,6 @@ inline Variable DeepCopyVariable(const Variable& other) {
  */
 inline VariableVector DeepCopyVariableVector(const VariableVector& other) {
   VariableVector copy;
-  copy.id_m = other.id_m;
   copy.storage_m = std::make_shared<std::vector<Variable>>();
   copy.storage_m->reserve(other.storage_m->size());
   for (size_t i = 0; i < other.storage_m->size(); i++) {
@@ -707,7 +704,6 @@ inline VariableVector DeepCopyVariableVector(const VariableVector& other) {
  */
 inline RealVector DeepCopyRealVector(const RealVector& other) {
   RealVector copy;
-  copy.id_m = other.id_m;
   copy.storage_m = std::make_shared<std::vector<double>>(*other.storage_m);
   return copy;
 }

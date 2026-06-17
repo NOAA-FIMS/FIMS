@@ -32,8 +32,8 @@ expect_independent_shared_value <- function(original, copy, original_value,
   expect_equal(copy$get(), copy_value)
 }
 
-expect_independent_parameter <- function(original, copy, original_value,
-                                         copy_value) {
+expect_independent_variable <- function(original, copy, original_value,
+                                        copy_value) {
   expect_equal(original$value, original_value)
   expect_equal(copy$value, original_value)
   copy$value <- copy_value
@@ -44,9 +44,9 @@ expect_independent_parameter <- function(original, copy, original_value,
   expect_equal(copy$estimation_type$get(), "fixed_effects")
 }
 
-expect_independent_parameter_vector <- function(original, copy, original_value,
-                                                copy_value) {
-  expect_true(copy$get_id() > original$get_id())
+expect_independent_variable_vector <- function(original, copy, original_value,
+                                               copy_value) {
+  expect_new_id(original, copy)
   expect_equal(original[1]$value, original_value)
   expect_equal(copy[1]$value, original_value)
   copy[1]$value <- copy_value
@@ -59,7 +59,7 @@ expect_independent_parameter_vector <- function(original, copy, original_value,
 
 expect_independent_real_vector <- function(original, copy, original_value,
                                            copy_value) {
-  expect_true(copy$get_id() > original$get_id())
+  expect_new_id(original, copy)
   expect_equal(original$get(0), original_value)
   expect_equal(copy$get(0), original_value)
   copy$set(0, copy_value)
@@ -85,23 +85,23 @@ test_that("rcpp shared primitive deep copies have independent storage", {
   clear()
 })
 
-test_that("rcpp parameter and vector deep copies have new ids and independent storage", {
-  parameter <- methods::new(Parameter, 1)
-  parameter_vector <- methods::new(ParameterVector, 2L)
-  parameter_vector$fill(2)
+test_that("rcpp variable and vector deep copies have new ids and independent storage", {
+  variable <- methods::new(Variable, 1)
+  variable_vector <- methods::new(VariableVector, 2L)
+  variable_vector$fill(2)
   real_vector <- methods::new(RealVector, 2L)
   real_vector$set(0, 3)
 
-  parameter_copy <- parameter$deep_copy()
-  parameter_vector_copy <- parameter_vector$deep_copy()
+  variable_copy <- variable$deep_copy()
+  variable_vector_copy <- variable_vector$deep_copy()
   real_vector_copy <- real_vector$deep_copy()
 
-  #' @description Test that Parameter deep copies get a new id and do not share storage.
-  expect_true(parameter_copy$id > parameter$id)
-  expect_independent_parameter(parameter, parameter_copy, 1, 10)
-  #' @description Test that ParameterVector deep copies get a new id and do not share storage.
-  expect_independent_parameter_vector(
-    parameter_vector, parameter_vector_copy, 2, 20
+  #' @description Test that Variable deep copies get a new id and do not share storage.
+  expect_false(identical(variable_copy$id, variable$id))
+  expect_independent_variable(variable, variable_copy, 1, 10)
+  #' @description Test that VariableVector deep copies get a new id and do not share storage.
+  expect_independent_variable_vector(
+    variable_vector, variable_vector_copy, 2, 20
   )
   #' @description Test that RealVector deep copies get a new id and do not share storage.
   expect_independent_real_vector(real_vector, real_vector_copy, 3, 30)
@@ -147,7 +147,7 @@ test_that("rcpp data interface deep copies get new ids and independent vectors",
   clear()
 })
 
-test_that("rcpp selectivity and maturity deep copies get new ids and independent parameters", {
+test_that("rcpp selectivity and maturity deep copies get new ids and independent variables", {
   logistic_selectivity <- methods::new(LogisticSelectivity)
   double_logistic_selectivity <- methods::new(DoubleLogisticSelectivity)
   maturity <- methods::new(LogisticMaturity)
@@ -160,30 +160,30 @@ test_that("rcpp selectivity and maturity deep copies get new ids and independent
   double_logistic_selectivity_copy <- double_logistic_selectivity$deep_copy()
   maturity_copy <- maturity$deep_copy()
 
-  #' @description Test that LogisticSelectivity deep copies get a new id and do not share parameters.
+  #' @description Test that LogisticSelectivity deep copies get a new id and do not share variables.
   expect_new_id(logistic_selectivity, logistic_selectivity_copy)
-  expect_independent_parameter_vector(
+  expect_independent_variable_vector(
     logistic_selectivity$inflection_point,
     logistic_selectivity_copy$inflection_point,
     1,
     10
   )
-  #' @description Test that DoubleLogisticSelectivity deep copies get a new id and do not share parameters.
+  #' @description Test that DoubleLogisticSelectivity deep copies get a new id and do not share variables.
   expect_new_id(double_logistic_selectivity, double_logistic_selectivity_copy)
-  expect_independent_parameter_vector(
+  expect_independent_variable_vector(
     double_logistic_selectivity$inflection_point_asc,
     double_logistic_selectivity_copy$inflection_point_asc,
     2,
     20
   )
-  #' @description Test that LogisticMaturity deep copies get a new id and do not share parameters.
+  #' @description Test that LogisticMaturity deep copies get a new id and do not share variables.
   expect_new_id(maturity, maturity_copy)
-  expect_independent_parameter_vector(maturity$slope, maturity_copy$slope, 3, 30)
+  expect_independent_variable_vector(maturity$slope, maturity_copy$slope, 3, 30)
 
   clear()
 })
 
-test_that("rcpp recruitment deep copies get new ids and independent parameters", {
+test_that("rcpp recruitment deep copies get new ids and independent variables", {
   recruitment <- methods::new(BevertonHoltRecruitment)
   log_devs <- methods::new(LogDevsRecruitmentProcess)
   log_r <- methods::new(LogRRecruitmentProcess)
@@ -195,13 +195,13 @@ test_that("rcpp recruitment deep copies get new ids and independent parameters",
   log_devs_copy <- log_devs$deep_copy()
   log_r_copy <- log_r$deep_copy()
 
-  #' @description Test that BevertonHoltRecruitment deep copies get a new id and do not share parameters.
+  #' @description Test that BevertonHoltRecruitment deep copies get a new id and do not share variables.
   expect_new_id(recruitment, recruitment_copy)
   expect_equal(recruitment_copy$n_years$get(), 2L)
   recruitment_copy$n_years$set(3L)
   expect_equal(recruitment$n_years$get(), 2L)
   expect_equal(recruitment_copy$n_years$get(), 3L)
-  expect_independent_parameter_vector(
+  expect_independent_variable_vector(
     recruitment$logit_steep, recruitment_copy$logit_steep, 1, 10
   )
   #' @description Test that LogDevsRecruitmentProcess deep copies get a new id.
@@ -238,13 +238,13 @@ test_that("rcpp growth, fleet, population, and model deep copies get new ids", {
   fleet_copy$n_years$set(6L)
   expect_equal(fleet$n_years$get(), 4L)
   expect_equal(fleet_copy$n_years$get(), 6L)
-  expect_independent_parameter_vector(fleet$log_q, fleet_copy$log_q, 2, 20)
+  expect_independent_variable_vector(fleet$log_q, fleet_copy$log_q, 2, 20)
   #' @description Test that Population deep copies get a new id and do not share fields.
   expect_new_id(population, population_copy)
   population_copy$n_years$set(7L)
   expect_equal(population$n_years$get(), 5L)
   expect_equal(population_copy$n_years$get(), 7L)
-  expect_independent_parameter_vector(
+  expect_independent_variable_vector(
     population$log_M, population_copy$log_M, 3, 30
   )
   #' @description Test that CatchAtAge deep copies get a new id.
@@ -253,7 +253,7 @@ test_that("rcpp growth, fleet, population, and model deep copies get new ids", {
   clear()
 })
 
-test_that("rcpp distribution deep copies get new ids and independent parameters", {
+test_that("rcpp distribution deep copies get new ids and independent variables", {
   dnorm <- methods::new(DnormDistribution)
   dlnorm <- methods::new(DlnormDistribution)
   dmultinom <- methods::new(DmultinomDistribution)
@@ -267,17 +267,17 @@ test_that("rcpp distribution deep copies get new ids and independent parameters"
   dlnorm_copy <- dlnorm$deep_copy()
   dmultinom_copy <- dmultinom$deep_copy()
 
-  #' @description Test that DnormDistribution deep copies get a new id and do not share parameters.
+  #' @description Test that DnormDistribution deep copies get a new id and do not share variables.
   expect_new_id(dnorm, dnorm_copy)
-  expect_independent_parameter_vector(
+  expect_independent_variable_vector(
     dnorm$observed_values, dnorm_copy$observed_values, 1, 10
   )
-  expect_independent_parameter_vector(
+  expect_independent_variable_vector(
     dnorm$expected_mean, dnorm_copy$expected_mean, 2, 20
   )
-  #' @description Test that DlnormDistribution deep copies get a new id and do not share parameters.
+  #' @description Test that DlnormDistribution deep copies get a new id and do not share variables.
   expect_new_id(dlnorm, dlnorm_copy)
-  expect_independent_parameter_vector(dlnorm$log_sd, dlnorm_copy$log_sd, 3, 30)
+  expect_independent_variable_vector(dlnorm$log_sd, dlnorm_copy$log_sd, 3, 30)
   #' @description Test that DmultinomDistribution deep copies get a new id and do not share vectors.
   expect_new_id(dmultinom, dmultinom_copy)
   expect_independent_real_vector(dmultinom$dims, dmultinom_copy$dims, 4, 40)
