@@ -1849,8 +1849,6 @@ class CatchAtAge : public FisheryModelBase<Type> {
             for (size_t y = 0; y < fleet->n_years; ++y) {
               for (size_t a = 0; a < fleet->n_ages; ++a) {
                 const size_t i_age_year = y * fleet->n_ages + a;
-                growth_derived_mean_WAA[i_age_year] =
-                    GrowthDerivedFleetMeanWeightAA(fleet, y, a);
 
                 if (this->report_growth_derived_alk_tensor) {
                   if (growth_derived_age_to_length_conversion.size() == 0) {
@@ -1862,6 +1860,11 @@ class CatchAtAge : public FisheryModelBase<Type> {
                   BuildGrowthDerivedALKRowOrThrow(
                       growth_alk, fleet, y, a, alk_row);
 
+                  growth_derived_mean_WAA[i_age_year] =
+                      MeanWeightFromALKRow(growth_alk->growth_observation,
+                                           fleet,
+                                           alk_row);
+
                   for (size_t l = 0; l < fleet->n_lengths; ++l) {
                     const size_t i_length_age_year =
                         y * (fleet->n_ages * fleet->n_lengths) +
@@ -1869,6 +1872,9 @@ class CatchAtAge : public FisheryModelBase<Type> {
                     growth_derived_age_to_length_conversion[i_length_age_year] =
                         alk_row[l];
                   }
+                } else {
+                  growth_derived_mean_WAA[i_age_year] =
+                      GrowthDerivedFleetMeanWeightAA(fleet, y, a);
                 }
               }
             }
