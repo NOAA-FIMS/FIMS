@@ -193,9 +193,12 @@ class ParameterVector {
     if (input_size != size) {
       throw std::invalid_argument(
           "ParameterVector::ParameterVector(Rcpp::NumericVector, size_t): `x` "
-          "length (" + std::to_string(input_size) + ") must equal the "
-          "requested size (" + std::to_string(size) + "). Received length: " +
-          std::to_string(input_size) + ".");
+          "length (" +
+          std::to_string(input_size) +
+          ") must equal the "
+          "requested size (" +
+          std::to_string(size) +
+          "). Received length: " + std::to_string(input_size) + ".");
     } else {
       this->id_m = ParameterVector::id_g++;
       this->storage_m = std::make_shared<std::vector<Parameter>>();
@@ -300,10 +303,12 @@ class ParameterVector {
       const size_t vector_size = this->storage_m->size();
       throw std::invalid_argument(
           "ParameterVector::set_values(): `values` length (" +
-              std::to_string(input_size) + ") must equal the ParameterVector "
-              "size (" + std::to_string(vector_size) + "). Received length: " +
-              std::to_string(input_size) + ". Pass a numeric vector of length " +
-              std::to_string(vector_size) + ".");
+          std::to_string(input_size) +
+          ") must equal the ParameterVector "
+          "size (" +
+          std::to_string(vector_size) + "). Received length: " +
+          std::to_string(input_size) + ". Pass a numeric vector of length " +
+          std::to_string(vector_size) + ".");
     }
     for (size_t i = 0; i < this->storage_m->size(); i++) {
       this->storage_m->at(i).initial_value_m = values[i];
@@ -320,13 +325,18 @@ class ParameterVector {
 
     if (input_size != 1 && input_size != vector_size) {
       throw std::invalid_argument(
-          "ParameterVector::set_estimation_types(): `estimation_types` length (" +
-              std::to_string(input_size) + 
-              ") must be 1 (broadcast) or equal to the ParameterVector size (" +
-              std::to_string(vector_size) + ").\n"
-              "Received length: " + std::to_string(input_size) + ". "
-              "Pass a single estimation type to apply to all elements, or a "
-              "vector of length " + std::to_string(vector_size) + ".");
+          "ParameterVector::set_estimation_types(): `estimation_types` length "
+          "(" +
+          std::to_string(input_size) +
+          ") must be 1 (broadcast) or equal to the ParameterVector size (" +
+          std::to_string(vector_size) +
+          ").\n"
+          "Received length: " +
+          std::to_string(input_size) +
+          ". "
+          "Pass a single estimation type to apply to all elements, or a "
+          "vector of length " +
+          std::to_string(vector_size) + ".");
     }
 
     auto validate_estimation_type = [&](const std::string& est_type) {
@@ -339,8 +349,8 @@ class ParameterVector {
     };
 
     for (size_t i = 0; i < vector_size; i++) {
-      std::string est_type = Rcpp::as<std::string>(
-          estimation_types[input_size == 1 ? 0 : i]);
+      std::string est_type =
+          Rcpp::as<std::string>(estimation_types[input_size == 1 ? 0 : i]);
       validate_estimation_type(est_type);
       this->storage_m->at(i).estimation_type_m.set(est_type);
     }
@@ -451,9 +461,11 @@ class RealVector {
     if (input_size != size) {
       throw std::invalid_argument(
           "RealVector::RealVector(Rcpp::NumericVector, size_t): `x` length (" +
-              std::to_string(input_size) + ") must equal the requested "
-              "size (" + std::to_string(size) + "). Received length: " +
-              std::to_string(input_size) + ".");
+          std::to_string(input_size) +
+          ") must equal the requested "
+          "size (" +
+          std::to_string(size) +
+          "). Received length: " + std::to_string(input_size) + ".");
     }
     this->storage_m->assign(x.begin(), x.end());
   }
