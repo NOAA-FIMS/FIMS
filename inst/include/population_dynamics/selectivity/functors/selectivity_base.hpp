@@ -34,6 +34,7 @@ struct SelectivityBase : public fims_model_object::FIMSObject<Type> {
   SelectivityBase() {
     // increment id of the singleton selectivity class
     this->id = SelectivityBase::id_g++;
+    this->register_self(typeid(*this).name(), this->id); 
   }
 
   virtual ~SelectivityBase() {}

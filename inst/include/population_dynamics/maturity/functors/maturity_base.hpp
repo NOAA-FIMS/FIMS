@@ -33,6 +33,7 @@ struct MaturityBase : public fims_model_object::FIMSObject<Type> {
   MaturityBase() {
     // increment id of the singleton maturity class
     this->id = MaturityBase::id_g++;
+    this->register_self(typeid(*this).name(), this->id); 
   }
 
   /**

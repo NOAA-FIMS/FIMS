@@ -8,6 +8,7 @@
 #ifndef FIMS_INTERFACE_RCPP_INTERFACE_HPP
 #define FIMS_INTERFACE_RCPP_INTERFACE_HPP
 #include "../../common/model.hpp"
+#include "../../common/model_object.hpp"
 #include "../../utilities/fims_json.hpp"
 #include "rcpp_objects/rcpp_data.hpp"
 #include "rcpp_objects/rcpp_distribution.hpp"
@@ -32,6 +33,7 @@ void init_logging() {
   std::signal(SIGILL, &fims::WriteAtExit);
   std::signal(SIGTERM, &fims::WriteAtExit);
 }
+
 
 /**
  * @brief Initialize and construct the FIMS model using TMB.
@@ -329,6 +331,23 @@ void clear() {
   clear_internal<TMBAD_FIMS_TYPE>();
 
   fims::FIMSLog::fims_log->clear();
+
+  // --- AUTOMATED LEAK DIAGNOSTIC PRINT ---
+  if (fims_model_object::FIMSMemoryTracker::total_active_objects > 0) {
+    std::ostringstream msg;
+    msg << "\n⚠️  WARNING: FIMS Memory Leak Detected after clear()!\n";
+    msg << "--------------------------------------------------\n";
+    msg << "The following " << fims_model_object::FIMSMemoryTracker::total_active_objects 
+                << " C++ heap object(s) were NOT destroyed:\n";
+    
+    for (const auto& name : fims_model_object::FIMSMemoryTracker::active_objects) {
+        msg << "  ❌ Leaked: " << name << "\n";
+    }
+    msg << "--------------------------------------------------\n";
+    msg << "Ensure all std::shared_ptrs to these types are being reset.\n\n";
+
+    Rcpp::warning(msg.str());
+  }
 }
 
 /**
