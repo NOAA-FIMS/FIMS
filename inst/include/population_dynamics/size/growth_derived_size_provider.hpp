@@ -29,11 +29,14 @@ class GrowthDerivedSizeProvider : public SizeDistributionProviderBase<Type> {
       std::shared_ptr<GrowthDerivedObservationBase<Type>> growth)
       : growth_source_(growth) {}
 
-  const SizeGrid* TryGetSizeGrid() const override { return population_size_grid_; }
+  const SizeGrid* TryGetSizeGrid() const override {
+    return population_size_grid_;
+  }
 
   void SetPopulationSizeGrid(const SizeGrid* population_size_grid) override {
     population_size_grid_ = population_size_grid;
     size_products_prepared_ = false;
+    plus_group_warning_emitted_ = false;
   }
 
   void SetPopulationDimensions(std::size_t n_years,
@@ -41,6 +44,7 @@ class GrowthDerivedSizeProvider : public SizeDistributionProviderBase<Type> {
     n_years_ = n_years;
     n_ages_ = n_ages;
     size_products_prepared_ = false;
+    plus_group_warning_emitted_ = false;
   }
 
   void PrepareSizeProducts() override {
@@ -51,7 +55,8 @@ class GrowthDerivedSizeProvider : public SizeDistributionProviderBase<Type> {
 
     if (!population_size_grid_->IsConsistent()) {
       throw std::runtime_error(
-          "GrowthDerivedSizeProvider requires a consistent population size grid");
+          "GrowthDerivedSizeProvider requires a consistent population "
+          "size grid");
     }
 
     if (population_size_grid_->n_bins == 0) {
@@ -69,16 +74,24 @@ class GrowthDerivedSizeProvider : public SizeDistributionProviderBase<Type> {
     if (growth_products.n_years != n_years_ ||
         growth_products.n_ages != n_ages_) {
       throw std::runtime_error(
-          "GrowthDerivedSizeProvider growth products do not match configured population dimensions");
+          "GrowthDerivedSizeProvider growth products do not match "
+          "configured population dimensions");
     }
 
     if (growth_products.n_sexes != 1) {
       throw std::runtime_error(
-          "GrowthDerivedSizeProvider currently requires pooled growth products with n_sexes == 1");
+          "GrowthDerivedSizeProvider currently requires pooled growth "
+          "products with n_sexes == 1");
     }
 
-    size_products_.ResizeProbSizeOnly(
-        n_years_, n_ages_, population_size_grid_->n_bins);
+    size_products_.ResizeProbSizeOnly(n_years_,
+                                      n_ages_,
+                                      population_size_grid_->n_bins);
+
+    const Type plus_group_warning_threshold = static_cast<Type>(0.01);
+    bool plus_group_warning_needed = false;
+    std::size_t warning_year_index = 0;
+    std::size_t warning_age_index = 0;
 
     for (std::size_t year_index = 0; year_index < n_years_; ++year_index) {
       for (std::size_t age_index = 0; age_index < n_ages_; ++age_index) {
@@ -103,19 +116,48 @@ class GrowthDerivedSizeProvider : public SizeDistributionProviderBase<Type> {
           size_products_.ProbSize(year_index, age_index, size_bin_index) /=
               safe_row_sum;
         }
+
+        const Type plus_group_prob =
+            size_products_.ProbSize(
+                year_index,
+                age_index,
+                population_size_grid_->n_bins - 1);
+
+        if (!plus_group_warning_needed &&
+            plus_group_prob > plus_group_warning_threshold) {
+          plus_group_warning_needed = true;
+          warning_year_index = year_index;
+          warning_age_index = age_index;
+        }
       }
+    }
+
+    if (plus_group_warning_needed && !plus_group_warning_emitted_) {
+      FIMS_WARNING_LOG(
+          "Growth-derived size preparation placed more than 0.01 "
+          "probability in the terminal biological plus-group bin for at "
+          "least one year-age row. First occurrence was year index " +
+          fims::to_string(warning_year_index) +
+          ", age index " +
+          fims::to_string(warning_age_index) +
+          ". The population biological size grid may need to be widened.");
+      plus_group_warning_emitted_ = true;
     }
 
     size_products_prepared_ = true;
   }
 
-  void InvalidatePreparedSizeProducts() override { size_products_prepared_ = false; }
+  void InvalidatePreparedSizeProducts() override {
+    size_products_prepared_ = false;
+  }
 
-  const Type& MeanLAA(std::size_t year_index, std::size_t age_index) const override {
+  const Type& MeanLAA(std::size_t year_index,
+                      std::size_t age_index) const override {
     return PreparedGrowthProducts().MeanLAA(year_index, age_index, 0);
   }
 
-  const Type& SdLAA(std::size_t year_index, std::size_t age_index) const override {
+  const Type& SdLAA(std::size_t year_index,
+                    std::size_t age_index) const override {
     return PreparedGrowthProducts().SdLAA(year_index, age_index, 0);
   }
 
@@ -134,6 +176,7 @@ class GrowthDerivedSizeProvider : public SizeDistributionProviderBase<Type> {
       std::shared_ptr<GrowthDerivedObservationBase<Type>> growth) {
     growth_source_ = growth;
     size_products_prepared_ = false;
+    plus_group_warning_emitted_ = false;
   }
 
  private:
@@ -143,7 +186,8 @@ class GrowthDerivedSizeProvider : public SizeDistributionProviderBase<Type> {
                              std::size_t size_bin_index) const {
     if (!population_size_grid_ || population_size_grid_->n_bins == 0) {
       throw std::runtime_error(
-          "GrowthDerivedSizeProvider requires a population size grid before computing ProbSize");
+          "GrowthDerivedSizeProvider requires a population size grid "
+          "before computing ProbSize");
     }
 
     const Type mean_laa = growth_products.MeanLAA(year_index, age_index, 0);
@@ -198,6 +242,7 @@ class GrowthDerivedSizeProvider : public SizeDistributionProviderBase<Type> {
   std::size_t n_years_ = 0;
   std::size_t n_ages_ = 0;
   bool size_products_prepared_ = false;
+  bool plus_group_warning_emitted_ = false;
   SizeProducts<Type> size_products_;
 };
 
