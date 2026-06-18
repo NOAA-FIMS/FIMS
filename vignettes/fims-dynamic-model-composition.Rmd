@@ -1,0 +1,434 @@
+---
+title: "Dynamic Model Composition in FIMS: Design Proposal"
+output: github_document
+vignette: >
+  %\VignetteIndexEntry{Dynamic Model Composition in FIMS}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+## Overview
+
+This document describes a proposed refactor of the FIMS model composition
+layer. Currently, FIMS supports two fixed model families — catch-at-age (CAA)
+and surplus production (SP) — selected by instantiating either
+`new(CatchAtAge)` or `new(SurplusProduction)`. The refactor replaces these
+fixed families with a **dynamic composition approach**: users instantiate
+component modules, and the framework automatically determines which
+calculations to run, in what order, and at what dimension based on what has
+been provided.
+
+### Motivation
+
+- **Flexibility**: models beyond CAA and SP are not currently possible
+  (e.g., a growth-only model, or a model combining mortality calculations
+  with a depletion-based index). The dynamic approach supports any
+  combination of calculations whose inputs are satisfied.
+
+- **Efficiency**: both current models loop over all ages and all years
+  unconditionally. The dynamic approach only runs calculations that are
+  actually needed for the configured model.
+
+- **Consistency**: derived quantities (e.g., `mortality_Z`, `biomass`,
+  `expected_index`) are currently initialized in model-type-specific blocks
+  inside `add_to_fims_tmb_internal()`. The refactor treats them uniformly
+  alongside parameters.
+
+---
+
+## Core Design
+
+The refactor introduces three interconnected components:
+
+1. **A computation graph with a forward pass** — determines which
+   calculations to run based on what modules the user has instantiated.
+
+2. **Derived quantities as model variables** — all derived quantities are
+   stored in `variable_map` alongside parameters; users can add priors and
+   flag quantities for reporting using the same interface.
+
+3. **Execution kernels with dimension-aware parameters** — calculations are
+   grouped into loops for efficiency, and each parameter access handles
+   scalar, by-age, by-year, and full age×year dimensions uniformly.
+
+---
+
+## 1. The Computation Graph
+
+### Registry
+
+Every known calculation is registered as a `CalcDescriptor` in a static
+registry. Each descriptor declares:
+
+- `required_inputs`: quantity names that must be available for the
+  calculation to activate.
+- `produced_outputs`: quantity names the calculation adds to the shared
+  derived quantities map.
+- `domain`: the iteration structure (`PER_YEAR_AGE`, `PER_YEAR`, or
+  `SCALAR`).
+- `output_dim_rule`: how to compute the output vector size from model
+  dimensions and input sizes (see Section 3).
+
+```cpp
+// Example registry entries (from forward_pass.hpp)
+{
+  "CalculateMortality",
+  required_inputs:  {"natural_mortality", "fishing_mortality"},
+  produced_outputs: {"mortality_Z"},
+  domain:           PER_YEAR_AGE,
+  output_dim_rule:  BROADCAST_INPUTS   // output size inherits from input dims
+},
+{
+  "CalculateBiomassFromDepletion",   // surplus production path
+  required_inputs:  {"depletion", "carrying_capacity"},
+  produced_outputs: {"biomass"},
+  domain:           PER_YEAR_AGE,
+  output_dim_rule:  PER_YEAR_PLUS_ONE
+},
+```
+
+When multiple entries can produce the same output (e.g., `"biomass"` can
+come from either `CalculateBiomass` via the NAA path or
+`CalculateBiomassFromDepletion` via the SP path), whichever input set is
+satisfied first wins. The other calculation stays dormant.
+
+### Forward Pass
+
+`run_forward_pass()` implements a greedy algorithm over the registry:
+
+1. **Seed** `available` with the quantity names and sizes contributed by the
+   modules the user has instantiated.
+2. **Scan** the registry; activate any calculation whose `required_inputs`
+   are all in `available`.
+3. **Add** the calculation's `produced_outputs` — with resolved sizes — to
+   `available`.
+4. **Repeat** until no new calculation activates.
+
+```
+// CAA model: Population + fishing fleet + survey fleet instantiated
+Seeded:  {natural_mortality, fishing_mortality, initial_numbers_at_age,
+          growth, proportion_mature_at_age, proportion_female,
+          selectivity, catchability}
+
+Round 1: CalculateMortality      activates → adds mortality_Z
+         CalculateNumbersAA      activates → adds numbers_at_age   [fused]
+         CalculateBiomass        activates → adds biomass           [fused]
+         CalculateSpawningBiomass activates → adds spawning_biomass [fused]
+         CalculateIndexNAA       activates → adds expected_index    [fused]
+
+Result:  ONE execution kernel, one for-age { for-year } loop
+
+// SP model: Population with depletion + survey fleet instantiated
+Seeded:  {depletion, carrying_capacity, catchability}
+
+Round 1: CalculateBiomassFromDepletion activates → adds biomass
+         CalculateIndexFromBiomass     activates → adds expected_index [fused]
+
+Result:  ONE execution kernel, no NAA calculations on the TMB tape
+```
+
+The forward pass runs once inside `build()`, before `CreateTMBModel()` is
+called. It is O(C × I) where C is the number of registry entries and I is
+the number of inputs per entry — trivially fast for any realistic registry
+size.
+
+### `build()` replaces explicit model type selection
+
+```r
+# Current approach — user must choose the model family:
+surplus_production <- methods::new(SurplusProduction)
+surplus_production$AddPopulation(population$get_id())
+CreateTMBModel()
+
+# Proposed approach — model type is resolved automatically:
+model <- methods::new(FIMSModel)
+model$AddPopulation(population$get_id())
+model$build()   # runs forward pass, then CreateTMBModel() internally
+```
+
+`build()` infers whether this is a CAA, SP, or custom model from which
+modules are present. Users no longer select a model family explicitly.
+
+---
+
+## 2. Derived Quantities as Model Variables
+
+### Current state
+
+Derived quantities (e.g., `mortality_Z`, `numbers_at_age`, `biomass`) are
+initialized in large model-type-specific blocks inside
+`add_to_fims_tmb_internal()`. `CatchAtAgeInterface` initializes approximately
+15 population and 19 fleet derived quantities; `SurplusProductionInterface`
+initializes approximately 6 population and 4 fleet derived quantities.
+The two lists are completely different.
+
+The root cause: which derived quantities exist is determined by which model
+type was instantiated, rather than by which calculations are active.
+
+### Proposed state
+
+Every derived quantity lives in `variable_map` alongside parameters, with
+`estimation_type = "derived"`. Its size is resolved by `run_forward_pass()`
+using the `DimRule` on each `CalcDescriptor`. The initialization blocks in
+`add_to_fims_tmb_internal()` are replaced by a single generic loop:
+
+```cpp
+// In add_to_fims_tmb_internal<Type>() — same for all model types:
+auto kernels = run_forward_pass(seeded_quantities, n_years, n_ages);
+
+for (const auto& kernel : kernels) {
+  for (const auto& output : kernel.outputs) {
+    // output.name, output.size, output.dims, output.dim_names
+    // are all resolved by the forward pass — no model-type knowledge needed
+    derived_quantities[output.name] = fims::Vector<Type>(output.size);
+    derived_quantities_dim_info[output.name] = DimensionInfo(
+        output.name, output.dims, output.dim_names);
+  }
+}
+```
+
+### User access and output control
+
+All derived quantities are auto-created as `ParameterVector`-like objects
+when their parent module is initialized, with deferred sizing (finalized
+during `build()`). Users interact with them using the same interface as
+parameters:
+
+```r
+population <- new(Population)
+# population$spawning_biomass is auto-created at initialization
+# population$numbers_at_age   is auto-created at initialization
+# etc.
+
+# Add a prior on a derived quantity (same syntax as parameter priors)
+population$spawning_biomass$add_prior(ssb ~ Lognormal(log_mu, sigma))
+
+# Flag a derived quantity for ADREPORT
+# (not all derived quantities need to be reported)
+population$spawning_biomass$set_reported(TRUE)
+population$biomass$set_reported(TRUE)
+# numbers_at_age is intermediate — not flagged, not ADREPORT-ed
+
+model <- methods::new(FIMSModel)
+model$AddPopulation(population$get_id())
+model$build()
+```
+
+Three attributes on every derived quantity, independent of each other:
+
+| Attribute | Default | Purpose |
+|---|---|---|
+| `estimation_type = "derived"` | Always set | Computed by model, not estimated |
+| `should_report` | `FALSE` | Set `TRUE` to include in ADREPORT output |
+| `priors` | Empty | Same prior syntax as parameters; adds density term to objective function |
+
+---
+
+## 3. Execution Kernels and Loop Efficiency
+
+### Dimension rules
+
+Each `CalcDescriptor` carries a `DimRule` specifying how to compute its
+output vector size from model dimensions and input sizes:
+
+| `DimRule` | Output size | Example |
+|---|---|---|
+| `BROADCAST_INPUTS` | broadcast of input sizes | `mortality_Z` inherits from M and Fmort dimensions |
+| `PER_YEAR` | `n_years` | `expected_index` |
+| `PER_YEAR_PLUS_ONE` | `n_years + 1` | `biomass`, `spawning_biomass` |
+| `PER_AGE_YEAR` | `n_ages × n_years` | — |
+| `PER_AGE_YEAR_PLUS_ONE` | `n_ages × (n_years + 1)` | `numbers_at_age` |
+| `SCALAR_OUT` | `1` | `fmsy`, `bmsy`, `msy` |
+
+**Broadcast rules** for `BROADCAST_INPUTS`: scalar (size 1) yields to
+anything; by-age and by-year dimensions combine to full age × year.
+
+```
+Example: M is scalar (size 1), Fmort is by-year (size n_years)
+→ mortality_Z output size = broadcast(1, n_years) = n_years
+```
+
+### Parameter dimension flexibility
+
+All `Calculate*` functions use a `param_index()` utility to handle parameters
+of any dimension uniformly, without the caller needing to know which dimension
+was configured:
+
+```cpp
+// Returns the correct flat index for a parameter of any size
+inline size_t param_index(size_t age, size_t year,
+                          size_t n_years, size_t n_ages,
+                          size_t param_size) {
+  if (param_size == 1)               return 0;           // scalar
+  if (param_size == n_ages)          return age;          // by age
+  if (param_size == n_years)         return year;         // by year
+  /* param_size == n_ages * n_years */ return age * n_years + year; // full
+}
+
+// Usage inside CalculateMortality:
+size_t m_idx = param_index(age, year, ny, na, population->log_M.size());
+dq["mortality_Z"][i] = fims_math::exp(population->log_M[m_idx]);
+```
+
+This means switching `log_M` from scalar to by-age to full age × year
+requires no changes to any calculation function — only the parameter size
+changes, and `param_index` handles it automatically.
+
+### Loop fusion
+
+Consecutive `PER_YEAR_AGE` calculations are fused into one kernel by the
+forward pass, sharing a single `for age { for year { } }` loop. This keeps
+intermediate values in cache between calculations rather than writing and
+re-reading them across separate loop passes.
+
+FIMS uses column-major (age-outer) indexing: `i = age * n_years + year`.
+Iterating in age-outer order processes elements sequentially in memory and
+ensures that the previous cohort's values `(age-1, year-1)` are always
+computed before the current `(age, year)` — satisfying the recurrence
+dependency in `CalculateNumbersAA` without any reordering.
+
+At current FIMS scales (years × ages ≈ thousands of elements), loop fusion
+is a modest efficiency improvement. At future spatial model scales (years ×
+ages × areas ≈ millions of elements), it prevents L2/L3 cache overflow
+between consecutive calculations.
+
+---
+
+## 4. Timing and Population Partitioning
+
+### Timing
+
+Different models calculate recruitment at different points in the year (start
+vs. mid-year after fishing). The design accommodates this by attaching a
+`timing` attribute to each `ExecutionStep`:
+
+```cpp
+struct ExecutionStep {
+  std::function<void(size_t, size_t)> fn;
+  double timing;  // fraction of year: 0.0 = start, 0.5 = mid, 1.0 = end
+};
+```
+
+The execution loop groups steps by timing value. Users specify timing when
+registering components:
+
+```r
+recruitment$timing$set(0.0)   # start of year
+survey_fleet$timing$set(0.5)  # mid-year survey
+```
+
+### Population partitioning
+
+Partitioning (sexes, areas, species) is a parallel development effort based
+on a CASAL2-style design. The computation graph is designed to be compatible
+with this work:
+
+- Each `Calculate*` function corresponds to a CASAL2 "process" — a unit that
+  internally iterates over whichever partition categories it needs.
+- The forward pass resolves which processes run; the processes handle
+  partition iteration internally.
+- The global derived quantities map keys would be extended to include a
+  partition identifier: `map[{partition_id, "numbers_at_age"}]`.
+
+Coordination between the two efforts is needed on one key question: **does
+the partition structure own the derived quantities, or does the global map?**
+This determines whether the computation graph needs to be partition-aware.
+
+---
+
+## 5. Summary: What Changes, What Stays
+
+### What stays unchanged
+
+- `CreateTMBModel()` and all the infrastructure it calls
+  (`Information::CreateModel()`, `SetDataObjects()`, etc.)
+- `add_to_fims_tmb_internal()` for all non-model modules (recruitment,
+  growth, maturity, selectivity, distributions, data)
+- The `Calculate*` method implementations (only their parameter indexing
+  changes to use `param_index`)
+- The TMB objective function and AD tape mechanics
+- The R user interface for all non-model modules
+
+### What changes
+
+| Component | Change |
+|---|---|
+| `CatchAtAgeInterface`, `SurplusProductionInterface` | Collapse into one `FIMSModelInterface` |
+| `add_to_fims_tmb_internal()` in model interface | Replaces hard-coded DQ initialization with generic loop over `KernelDescriptor::outputs` |
+| `new(CatchAtAge)` / `new(SurplusProduction)` | Replaced by `new(FIMSModel)` + `model$build()` |
+| Derived quantity storage | Moves from separate `derived_quantities_map_` into `variable_map` |
+| Parameter access in `Calculate*` | Adds `param_index()` call per parameter access |
+
+### New files
+
+| File | Purpose |
+|---|---|
+| `inst/include/models/forward_pass.hpp` | Registry, `DimRule`, `ResolvedOutput`, `run_forward_pass()` |
+| `inst/include/models/execution_kernel.hpp` | `param_index()`, `ExecutionKernel<Type>`, `Calculate*` functions, `BuildKernel()` |
+
+---
+
+## 6. Complete User Interface Comparison
+
+### Catch-at-age (minimal changes)
+
+```r
+# Current and proposed interfaces are identical up to the last three lines
+
+# ... data, fleet, distribution, recruitment, growth, maturity setup ...
+
+population <- new(Population)
+population$n_years$set(nyears)
+population$n_ages$set(nages)
+population$SetRecruitmentID(recruitment$get_id())
+population$SetGrowthID(growth$get_id())
+population$SetMaturityID(maturity$get_id())
+population$AddFleet(fishing_fleet$get_id())
+population$AddFleet(survey_fleet$get_id())
+
+# Optional: configure derived quantity reporting
+population$spawning_biomass$set_reported(TRUE)
+population$numbers_at_age$set_reported(TRUE)
+fleet$expected_index$set_reported(TRUE)
+
+# Current:
+caa <- methods::new(CatchAtAge)
+caa$AddPopulation(population$get_id())
+CreateTMBModel()
+
+# Proposed (3 lines replaced):
+model <- methods::new(FIMSModel)
+model$AddPopulation(population$get_id())
+model$build()   # runs forward pass, then CreateTMBModel() internally
+```
+
+### Surplus production (minimal changes)
+
+```r
+# ... data, fleet, distribution, depletion setup ...
+
+population <- new(Population)
+population$n_years$set(nyears)
+population$SetDepletionID(production$get_id())
+population$AddFleet(fishing_fleet$get_id())
+population$AddFleet(survey_fleet$get_id())
+
+# Optional: configure reporting
+population$biomass$set_reported(TRUE)
+
+# Current:
+surplus_production <- methods::new(SurplusProduction)
+surplus_production$AddPopulation(population$get_id())
+CreateTMBModel()
+
+# Proposed:
+model <- methods::new(FIMSModel)
+model$AddPopulation(population$get_id())
+model$build()
+```
+
+The forward pass detects that `depletion` and `carrying_capacity` are present
+(from `PTDepletion`) but `natural_mortality` and `fishing_mortality` are not,
+and activates `CalculateBiomassFromDepletion` instead of `CalculateMortality`
++ `CalculateNumbersAA` + `CalculateBiomass`. No NAA calculations appear on
+the TMB tape.
