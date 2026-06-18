@@ -40,6 +40,7 @@ struct DataObject : public fims_model_object::FIMSObject<Type> {
     data.resize(imax);
     uncertainty.resize(imax);
     this->id = DataObject<Type>::id_g++;
+    this->register_self(this->id);
   }
 
   /**
@@ -49,6 +50,7 @@ struct DataObject : public fims_model_object::FIMSObject<Type> {
     data.resize(imax * jmax);
     uncertainty.resize(imax * jmax);
     this->id = DataObject<Type>::id_g++;
+    this->register_self(this->id);
   }
 
   /**
@@ -59,6 +61,7 @@ struct DataObject : public fims_model_object::FIMSObject<Type> {
     data.resize(imax * jmax * kmax);
     uncertainty.resize(imax * jmax * kmax);
     this->id = DataObject<Type>::id_g++;
+    this->register_self(this->id);
   }
 
   /**
@@ -69,6 +72,7 @@ struct DataObject : public fims_model_object::FIMSObject<Type> {
     data.resize(imax * jmax * kmax * lmax);
     uncertainty.resize(imax * jmax * kmax * lmax);
     this->id = DataObject<Type>::id_g++;
+    this->register_self(this->id);
   }
 
   /**
