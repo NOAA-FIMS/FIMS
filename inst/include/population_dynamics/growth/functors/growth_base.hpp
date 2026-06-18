@@ -31,9 +31,9 @@ struct GrowthBase : public fims_model_object::FIMSObject<Type> {
   /**
    * @brief Constructor.
    */
-  GrowthBase() { 
+  GrowthBase() {
     this->id = GrowthBase::id_g++;
-    this->register_self(typeid(*this).name(), this->id); 
+    this->register_self(typeid(*this).name(), this->id);
   }
 
   virtual ~GrowthBase() {}

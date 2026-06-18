@@ -73,9 +73,9 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
   /**
    * @brief Constructor.
    */
-  Fleet() { 
-    this->id = Fleet::id_g++; 
-    this->register_self(typeid(*this).name(), this->id); 
+  Fleet() {
+    this->id = Fleet::id_g++;
+    this->register_self(typeid(*this).name(), this->id);
   }
 
   /**

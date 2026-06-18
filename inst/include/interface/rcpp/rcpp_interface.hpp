@@ -34,7 +34,6 @@ void init_logging() {
   std::signal(SIGTERM, &fims::WriteAtExit);
 }
 
-
 /**
  * @brief Initialize and construct the FIMS model using TMB.
  *
@@ -337,11 +336,13 @@ void clear() {
     std::ostringstream msg;
     msg << "\n⚠️  WARNING: FIMS Memory Leak Detected after clear()!\n";
     msg << "--------------------------------------------------\n";
-    msg << "The following " << fims_model_object::FIMSMemoryTracker::total_active_objects 
-                << " C++ heap object(s) were NOT destroyed:\n";
-    
-    for (const auto& name : fims_model_object::FIMSMemoryTracker::active_objects) {
-        msg << "  ❌ Leaked: " << name << "\n";
+    msg << "The following "
+        << fims_model_object::FIMSMemoryTracker::total_active_objects
+        << " C++ heap object(s) were NOT destroyed:\n";
+
+    for (const auto &name :
+         fims_model_object::FIMSMemoryTracker::active_objects) {
+      msg << "  ❌ Leaked: " << name << "\n";
     }
     msg << "--------------------------------------------------\n";
     msg << "Ensure all std::shared_ptrs to these types are being reset.\n\n";
