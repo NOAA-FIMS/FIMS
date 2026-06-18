@@ -14,7 +14,7 @@
 #include <set>
 #include <string>
 #ifdef __GNUC__
-  #include <cxxabi.h>
+#include <cxxabi.h>
 #endif
 
 #include "fims_vector.hpp"
@@ -35,10 +35,11 @@ struct FIMSMemoryTracker {
    */
 
   static inline std::multiset<std::string> active_objects;
-  
+
   /**
- * @brief Returns readable object type name for Linux and Mac (Windows is readable by default)
- */
+   * @brief Returns readable object type name for Linux and Mac (Windows is
+   * readable by default)
+   */
   static std::string demangle(const char* mangled) {
 #ifdef __GNUC__
     int status;
@@ -51,8 +52,7 @@ struct FIMSMemoryTracker {
 #endif
   }
 
-
-   /**
+  /**
    * @brief Registers a FIMSObject instance with the memory tracker.
    * @details Should be called from the constructor of each concrete FIMS class
    * after setting its id, so that the type name and id are both available.
@@ -81,7 +81,6 @@ struct FIMSMemoryTracker {
  private:
   std::string tracker_key_;
 };
-
 
 /**
  * @brief FIMSObject struct that defines member types and returns the unique id

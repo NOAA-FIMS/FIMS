@@ -169,24 +169,24 @@ class Information {
     this->n_ages = 0;
 
     for (recruitment_models_iterator it = recruitment_models.begin();
-        it != recruitment_models.end(); ++ it) {
-
-      std::shared_ptr<fims_popdy::RecruitmentBase<Type>> recruitment = (*it).second;
-      if(recruitment->process) {
+         it != recruitment_models.end(); ++it) {
+      std::shared_ptr<fims_popdy::RecruitmentBase<Type>> recruitment =
+          (*it).second;
+      if (recruitment->process) {
         recruitment->process.reset();
       }
-      if(recruitment->recruitment) {
+      if (recruitment->recruitment) {
         recruitment->recruitment.reset();
       }
     }
     for (recruitment_process_iterator it = recruitment_process_models.begin();
-        it != recruitment_process_models.end(); ++ it) {
-
-      std::shared_ptr<fims_popdy::RecruitmentBase<Type>> recruitment = (*it).second;
-      if(recruitment->process) {
+         it != recruitment_process_models.end(); ++it) {
+      std::shared_ptr<fims_popdy::RecruitmentBase<Type>> recruitment =
+          (*it).second;
+      if (recruitment->process) {
         recruitment->process.reset();
       }
-      if(recruitment->recruitment) {
+      if (recruitment->recruitment) {
         recruitment->recruitment.reset();
       }
     }
