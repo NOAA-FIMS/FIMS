@@ -631,9 +631,11 @@ void SetFleetALKModel(bool &valid_model,
    * @brief Ensure a population has a usable biological size grid.
    *
    * @details If a user provides a valid biological size grid, keep it.
-   * If no biological size grid has been provided, build the default grid.
-   * If a user provides an invalid or partially specified grid, report the
-   * problem and invalidate the model.
+   * If no biological size grid has been provided, build the built-in default
+   * from resolvable fleet observation-bin geometry, enforce the one-unit
+   * compatibility rule, and warn when the built-in default creates more than
+   * 200 regular bins. If a user provides an invalid or partially specified
+   * grid, report the problem and invalidate the model.
    *
    * @param valid_model Reference to model-validity flag.
    * @param p Shared pointer to population module.
@@ -652,12 +654,72 @@ void SetFleetALKModel(bool &valid_model,
 
     if (size_grid_missing) {
       try {
-        // Interim built-in biological size-grid fallback.
-        // The long-term default-bin policy is deferred until we can decide on a 
-        // method that the team agrees on; for now this only guarantees a valid
-        // canonical grid so the rest of the size refactor can proceed.
+        fims::Vector<fims::Vector<double>> fleet_edges;
+
+        for (std::size_t fleet_index = 0; fleet_index < p->fleets.size();
+             ++fleet_index) {
+          const std::shared_ptr<fims_popdy::Fleet<Type>>& fleet =
+              p->fleets[fleet_index];
+
+          if (fleet == nullptr || fleet->n_lengths == 0) {
+            continue;
+          }
+
+          if (fleet->lengths.size() != fleet->n_lengths) {
+            throw std::runtime_error(
+                "Fleet length-bin centers are not consistent with n_lengths");
+          }
+
+          fims::Vector<double> resolved_edges =
+              fims_popdy::SizeGridBuilder::BuildObservationEdgesFromCenters(
+                  fleet->lengths);
+          fleet_edges.emplace_back(resolved_edges);
+        }
+
+        if (fleet_edges.size() == 0) {
+          throw std::runtime_error(
+              "No resolvable fleet observation-bin geometry was available "
+              "to build the default biological size grid");
+        }
+
+        const double built_in_bin_width = 1.0;
+        const double tolerance =
+            1e-12 * (built_in_bin_width > 1.0 ? built_in_bin_width : 1.0);
+
+        for (std::size_t fleet_index = 0; fleet_index < fleet_edges.size();
+             ++fleet_index) {
+          const fims::Vector<double>& edges = fleet_edges[fleet_index];
+
+          for (std::size_t edge_index = 1; edge_index < edges.size();
+               ++edge_index) {
+            const double fleet_bin_width =
+                edges[edge_index] - edges[edge_index - 1];
+
+            if (fleet_bin_width < built_in_bin_width - tolerance) {
+              throw std::runtime_error(
+                  "Built-in default biological size grid uses one-unit "
+                  "regular bins, but at least one active fleet observation "
+                  "bin is finer than one unit. Provide a biological "
+                  "size-grid override or correct the fleet bin setup.");
+            }
+          }
+        }
+
         p->size_grid =
-            fims_popdy::SizeGridBuilder::BuildRegularGrid(0.0, 100.0, 1.0);
+            fims_popdy::SizeGridBuilder::BuildDefaultFromFleetEdges(
+                fleet_edges);
+        const std::size_t regular_bin_count =
+            p->size_grid.n_bins > 0 ? p->size_grid.n_bins - 1 : 0;
+
+        if (regular_bin_count > 200) {
+          FIMS_WARNING_LOG(
+              "Built-in default biological size grid created more than 200 "
+              "regular bins for population " +
+              fims::to_string(p->id) +
+              ". This may slow model evaluation. Consider providing a "
+              "biological size-grid override if needed.");
+        }
+
       } catch (const std::exception &e) {
         valid_model = false;
         FIMS_ERROR_LOG(
