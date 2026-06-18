@@ -91,6 +91,133 @@ struct SizeGridBuilder {
 
     return BuildFromEdges(edges);
   }
+
+  /**
+   * @brief Build one fleet observation-bin edge vector from stored bin centers.
+   *
+   * For multiple centers, edges are inferred from adjacent midpoints. A single
+   * center is not enough information to infer observation-bin geometry
+   * consistently, so this helper requires at least 2 strictly increasing
+   * centers.
+   *
+   * @param centers Fleet observation-bin centers.
+   * @return Strictly increasing observation-bin edges inferred from the centers.
+   */
+  static fims::Vector<double> BuildObservationEdgesFromCenters(
+      const fims::Vector<double>& centers) {
+    if (centers.size() < 2) {
+      throw std::runtime_error(
+          "SizeGridBuilder requires at least 2 observation-bin centers to build fleet edges");
+    }
+
+    for (std::size_t center_index = 1; center_index < centers.size();
+         ++center_index) {
+      if (!(centers[center_index] > centers[center_index - 1])) {
+        throw std::runtime_error(
+            "SizeGridBuilder requires observation-bin centers to be strictly increasing");
+      }
+    }
+
+    fims::Vector<double> edges;
+    edges.resize(centers.size() + 1);
+
+    edges[0] = centers[0] - 0.5 * (centers[1] - centers[0]);
+
+    for (std::size_t center_index = 0;
+         center_index + 1 < centers.size();
+         ++center_index) {
+      edges[center_index + 1] =
+          0.5 * (centers[center_index] + centers[center_index + 1]);
+    }
+
+    edges[centers.size()] =
+        centers[centers.size() - 1] +
+        0.5 * (centers[centers.size() - 1] - centers[centers.size() - 2]);
+
+    return edges;
+  }
+
+  /**
+   * @brief Build the default population biological size grid from resolved
+   * fleet observation-bin edges.
+   *
+   * The default rule uses the minimum fleet lower edge and maximum fleet upper
+   * edge across the supplied fleet edge vectors to define the supported range.
+   * It then builds fixed-width regular biological bins with built-in width 1.0
+   * in the same size units used by the user-supplied data until that
+   * regular-bin sequence covers the supported range. The built-in width is one
+   * size-data unit, but the resulting biological-bin edges are anchored to the
+   * minimum resolved fleet lower edge and therefore are not required to fall on
+   * integer-valued boundaries. Finally, it appends one additional terminal bin
+   * above the last regular bin so the final biological bin can serve as the
+   * plus-group representation.
+   *
+   * @param fleet_edges Resolved fleet observation-bin edge vectors.
+   * @return Internally consistent default population biological size grid.
+   */
+  static SizeGrid BuildDefaultFromFleetEdges(
+      const fims::Vector<fims::Vector<double>>& fleet_edges) {
+    if (fleet_edges.size() == 0) {
+      throw std::runtime_error(
+          "SizeGridBuilder requires at least 1 fleet edge vector to build the default population size grid");
+    }
+
+    double min_lower_edge = 0.0;
+    double max_upper_edge = 0.0;
+    bool first_fleet = true;
+
+    for (std::size_t fleet_index = 0; fleet_index < fleet_edges.size();
+         ++fleet_index) {
+      const fims::Vector<double>& edges = fleet_edges[fleet_index];
+
+      if (edges.size() < 2) {
+        throw std::runtime_error(
+            "SizeGridBuilder requires each fleet edge vector to contain at least 2 edges");
+      }
+
+      for (std::size_t edge_index = 1; edge_index < edges.size();
+           ++edge_index) {
+        if (!(edges[edge_index] > edges[edge_index - 1])) {
+          throw std::runtime_error(
+              "SizeGridBuilder requires fleet edge vectors to be strictly increasing");
+        }
+      }
+
+      const double fleet_lower_edge = edges[0];
+      const double fleet_upper_edge = edges[edges.size() - 1];
+
+      if (first_fleet) {
+        min_lower_edge = fleet_lower_edge;
+        max_upper_edge = fleet_upper_edge;
+        first_fleet = false;
+      } else {
+        if (fleet_lower_edge < min_lower_edge) {
+          min_lower_edge = fleet_lower_edge;
+        }
+
+        if (fleet_upper_edge > max_upper_edge) {
+          max_upper_edge = fleet_upper_edge;
+        }
+      }
+    }
+
+    const double built_in_bin_width = 1.0;
+    double regular_upper_edge = min_lower_edge;
+    const double span = max_upper_edge - min_lower_edge;
+    const double tolerance = 1e-12 * (span > 1.0 ? span : 1.0);
+
+    while (regular_upper_edge < max_upper_edge - tolerance) {
+      regular_upper_edge += built_in_bin_width;
+    }
+
+    SizeGrid regular_grid =
+        BuildRegularGrid(min_lower_edge, regular_upper_edge, built_in_bin_width);
+
+    fims::Vector<double> default_edges = regular_grid.edges;
+    default_edges.emplace_back(regular_upper_edge + built_in_bin_width);
+
+    return BuildFromEdges(default_edges);
+  }
 };
 
 }  // namespace fims_popdy
