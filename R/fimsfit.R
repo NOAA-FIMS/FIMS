@@ -235,8 +235,7 @@ methods::setMethod(
     obj <- get_obj(x)
     sdreport <- get_sdreport(x)
     opt <- get_opt(x)
-    parameter_names <- get_obj(x)[["par"]] |>
-      names()
+    parameter_names <- names(get_parameter_names(get_obj(x)[["par"]]))
 
     # Reshape the TMB output into a standardized data frame.
     # This serves as the "expected" result to compare against.
@@ -631,7 +630,8 @@ fit_fims <- function(input,
 
   check_mle_convergence(input, obj, opt, maxgrad)
 
-  FIMS::set_fixed(opt[["par"]])
+  expanded_fixed <- obj[["env"]]$parList(opt[["par"]])[["p"]]
+  FIMS::set_fixed(expanded_fixed)
 
   time_sdreport <- NA
   if (get_sd) {
