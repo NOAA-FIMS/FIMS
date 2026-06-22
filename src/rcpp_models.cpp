@@ -127,10 +127,10 @@ void register_fishery_models(Rcpp::Module& m) {
       .method("IsReporting", &CatchAtAgeInterface::IsReporting)
       .method("InitializePopulationDerivedQuantities",
               &CatchAtAgeInterface::InitializePopulationDerivedQuantities)
+      .method("GetPopulationDerivedQuantities",
+              &CatchAtAgeInterface::GetPopulationDerivedQuantities)
       .method("InitializeFleetDerivedQuantities",
               &CatchAtAgeInterface::InitializeFleetDerivedQuantities)
-      .field("population_derived_quantities",
-             &CatchAtAgeInterface::population_derived_quantities)
-      .field("fleet_derived_quantities",
-             &CatchAtAgeInterface::fleet_derived_quantities);
+      .method("GetFleetDerivedQuantities",
+              &CatchAtAgeInterface::GetFleetDerivedQuantities);
 }

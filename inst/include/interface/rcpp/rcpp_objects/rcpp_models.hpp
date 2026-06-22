@@ -9,7 +9,9 @@
 #ifndef FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_MODELS_HPP
 #define FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_MODELS_HPP
 
+#include <map>
 #include <set>
+#include <stdexcept>
 #include "common/def.hpp"
 #include "rcpp_interface_base.hpp"
 #include "../../../models/fisheries_models.hpp"
@@ -375,8 +377,10 @@ class CatchAtAgeFleetDerivedQuantitiesInterface {
  */
 class CatchAtAgeInterface : public FisheryModelInterfaceBase {
  public:
-  CatchAtAgePopulationDerivedQuantitiesInterface population_derived_quantities;
-  CatchAtAgeFleetDerivedQuantitiesInterface fleet_derived_quantities;
+  std::map<uint32_t, CatchAtAgePopulationDerivedQuantitiesInterface>
+      population_derived_quantities;
+  std::map<uint32_t, CatchAtAgeFleetDerivedQuantitiesInterface>
+      fleet_derived_quantities;
 
   /**
    * @brief The constructor.
@@ -403,6 +407,7 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
    */
   void AddPopulation(uint32_t id) {
     this->population_ids->insert(id);
+    this->population_derived_quantities[id];
 
     std::map<uint32_t, std::shared_ptr<PopulationInterfaceBase>>::iterator pit;
     pit = PopulationInterfaceBase::live_objects.find(id);
@@ -418,23 +423,62 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
   /**
    * @brief Initialize Rcpp population derived quantities.
    *
+   * @param population_id The population ID.
    * @param n_years Number of model years.
    * @param n_ages Number of ages.
    */
-  void InitializePopulationDerivedQuantities(size_t n_years, size_t n_ages) {
-    population_derived_quantities.Initialize(n_years, n_ages);
+  void InitializePopulationDerivedQuantities(uint32_t population_id,
+                                             size_t n_years, size_t n_ages) {
+    population_derived_quantities[population_id].Initialize(n_years, n_ages);
+  }
+
+  /**
+   * @brief Get Rcpp population derived quantities for a population ID.
+   *
+   * @param population_id The population ID.
+   * @return CatchAtAgePopulationDerivedQuantitiesInterface&
+   */
+  CatchAtAgePopulationDerivedQuantitiesInterface &
+  GetPopulationDerivedQuantities(uint32_t population_id) {
+    std::map<uint32_t, CatchAtAgePopulationDerivedQuantitiesInterface>::
+        iterator it = population_derived_quantities.find(population_id);
+    if (it == population_derived_quantities.end()) {
+      throw std::out_of_range(
+          "CatchAtAgeInterface::GetPopulationDerivedQuantities: population_id "
+          "not found");
+    }
+    return it->second;
   }
 
   /**
    * @brief Initialize Rcpp fleet derived quantities.
    *
+   * @param fleet_id The fleet ID.
    * @param n_years Number of model years.
    * @param n_ages Number of ages.
    * @param n_lengths Number of lengths.
    */
-  void InitializeFleetDerivedQuantities(size_t n_years, size_t n_ages,
-                                        size_t n_lengths) {
-    fleet_derived_quantities.Initialize(n_years, n_ages, n_lengths);
+  void InitializeFleetDerivedQuantities(uint32_t fleet_id, size_t n_years,
+                                        size_t n_ages, size_t n_lengths) {
+    fleet_derived_quantities[fleet_id].Initialize(n_years, n_ages, n_lengths);
+  }
+
+  /**
+   * @brief Get Rcpp fleet derived quantities for a fleet ID.
+   *
+   * @param fleet_id The fleet ID.
+   * @return CatchAtAgeFleetDerivedQuantitiesInterface&
+   */
+  CatchAtAgeFleetDerivedQuantitiesInterface &GetFleetDerivedQuantities(
+      uint32_t fleet_id) {
+    std::map<uint32_t, CatchAtAgeFleetDerivedQuantitiesInterface>::iterator it =
+        fleet_derived_quantities.find(fleet_id);
+    if (it == fleet_derived_quantities.end()) {
+      throw std::out_of_range(
+          "CatchAtAgeInterface::GetFleetDerivedQuantities: fleet_id not "
+          "found");
+    }
+    return it->second;
   }
 
   /**
