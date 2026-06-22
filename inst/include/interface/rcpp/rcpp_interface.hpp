@@ -474,6 +474,7 @@ void clear() {
   // Parameter and ParameterVector
   Parameter::id_g = 1;
   ParameterVector::id_g = 1;
+  RealVector::id_g = 1;
   // rcpp_data.hpp
   DataInterfaceBase::id_g = 1;
   DataInterfaceBase::live_objects.clear();

@@ -35,6 +35,14 @@ struct LognormalLikelihood : public NormalLikelihood<Type> {
                (residual * residual) / (sigma * sigma)) +
           log_observed;
       this->nll += this->nll_components[i];
+#ifdef TMB_MODEL
+      if (this->simulate_flag) {
+        FIMS_SIMULATE_F(this->of) {
+          this->GetInput(i) =
+              fims_math::exp(rnorm(this->GetExpected(i), sigma));
+        }
+      }
+#endif
     }
     return this->nll;
   }

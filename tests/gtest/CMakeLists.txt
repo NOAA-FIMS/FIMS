@@ -108,6 +108,18 @@ target_link_libraries(fims_math_dinvgamma
 
 gtest_discover_tests(fims_math_dinvgamma)
 
+# test_likelihood_functors.cpp
+add_executable(likelihood_functors
+  test_likelihood_functors.cpp
+)
+
+target_link_libraries(likelihood_functors
+  gtest_main
+  fims_test
+)
+
+gtest_discover_tests(likelihood_functors)
+
 # test_population_dynamics_growth.cpp
 add_executable(population_dynamics_growth
   test_population_dynamics_growth.cpp

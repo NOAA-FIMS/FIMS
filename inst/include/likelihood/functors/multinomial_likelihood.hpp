@@ -69,6 +69,28 @@ struct MultinomialLikelihood : public LikelihoodComponentBase<Type> {
 
       this->nll_components[i] = -log_density;
       this->nll += this->nll_components[i];
+#ifdef TMB_MODEL
+      if (this->simulate_flag) {
+        FIMS_SIMULATE_F(this->of) {
+          Type remaining_count = row_total;
+          Type remaining_probability = static_cast<Type>(1.0);
+          for (size_t j = 0; j < n_cols; j++) {
+            size_t idx = i * n_cols + j;
+            if (j == n_cols - 1) {
+              this->GetInput(idx) = remaining_count;
+            } else {
+              Type conditional_probability =
+                  this->GetExpected(idx) / remaining_probability;
+              Type simulated_value =
+                  rbinom(remaining_count, conditional_probability);
+              this->GetInput(idx) = simulated_value;
+              remaining_count -= simulated_value;
+              remaining_probability -= this->GetExpected(idx);
+            }
+          }
+        }
+      }
+#endif
     }
 
     return this->nll;
