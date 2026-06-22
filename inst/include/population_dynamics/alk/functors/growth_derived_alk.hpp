@@ -21,6 +21,7 @@
 #include "../../growth/growth_model_adapter.hpp"
 #include "../../size/size_distribution_provider_base.hpp"
 #include "../../size/functors/size_bin_mapping.hpp"
+#include "../../size/functors/size_probability_normalization.hpp"
 
 namespace fims_popdy {
 
@@ -75,7 +76,10 @@ struct GrowthDerivedALK : public ALKBase<Type> {
            growth_observation->SupportsGrowthDerivedALK() &&
            fleet_ptr->n_ages > 0 &&
            fleet_ptr->n_lengths > 0 &&
-           fleet_ptr->lengths.size() == fleet_ptr->n_lengths;
+           fleet_ptr->lengths.size() == fleet_ptr->n_lengths &&
+           fleet_ptr->length_bin_edges.size() == fleet_ptr->n_lengths + 1 &&
+           SizeBinMapping::HasStrictlyIncreasingEdges(
+               fleet_ptr->length_bin_edges);
   }
 
   /**
@@ -156,69 +160,19 @@ struct GrowthDerivedALK : public ALKBase<Type> {
 
     fims::Vector<Type> prob_size_row(population_size_grid->n_bins);
 
-    for (std::size_t size_bin_index = 0;
-         size_bin_index < population_size_grid->n_bins;
-         ++size_bin_index) {
-      prob_size_row[size_bin_index] =
-          size_provider_ptr->ProbSize(year_index, age_index, size_bin_index);
+    try {
+      for (std::size_t size_bin_index = 0;
+           size_bin_index < population_size_grid->n_bins;
+           ++size_bin_index) {
+        prob_size_row[size_bin_index] =
+            size_provider_ptr->ProbSize(
+                year_index, age_index, size_bin_index);
+      }
+    } catch (const std::runtime_error&) {
+      return fims::Vector<Type>();
     }
 
     return prob_size_row;
-  }
-
-  /**
-   * @brief Build fleet observation-bin edges from stored fleet bin centers.
-   * @param fleet_ptr Shared pointer to the fleet.
-   * @return Fleet observation-bin edges inferred from fleet bin centers.
-   */
-  fims::Vector<double> BuildFleetObservationEdges(
-      const std::shared_ptr<Fleet<Type>>& fleet_ptr,
-      const SizeGrid& population_size_grid) const {
-    if (fleet_ptr == nullptr ||
-        fleet_ptr->n_lengths == 0 ||
-        fleet_ptr->lengths.size() != fleet_ptr->n_lengths) {
-      return fims::Vector<double>();
-    }
-
-    fims::Vector<double> edges;
-    edges.resize(fleet_ptr->n_lengths + 1);
-
-    if (fleet_ptr->n_lengths == 1) {
-      const double center = static_cast<double>(fleet_ptr->lengths[0]);
-      edges[0] = center - 0.5;
-      edges[1] = center + 0.5;
-
-      edges[0] = std::min(edges[0], population_size_grid.edges[0]);
-      edges[1] = std::max(edges[1],
-                          population_size_grid.edges[population_size_grid.n_bins]);
-
-      return edges;
-    }
-
-    edges[0] = static_cast<double>(fleet_ptr->lengths[0]) -
-               0.5 * static_cast<double>(fleet_ptr->lengths[1] -
-                                         fleet_ptr->lengths[0]);
-
-    for (std::size_t length_bin_index = 0;
-         length_bin_index + 1 < fleet_ptr->n_lengths;
-         ++length_bin_index) {
-      edges[length_bin_index + 1] =
-          0.5 * static_cast<double>(fleet_ptr->lengths[length_bin_index] +
-                                    fleet_ptr->lengths[length_bin_index + 1]);
-    }
-
-    edges[fleet_ptr->n_lengths] =
-        static_cast<double>(fleet_ptr->lengths[fleet_ptr->n_lengths - 1]) +
-        0.5 * static_cast<double>(
-            fleet_ptr->lengths[fleet_ptr->n_lengths - 1] -
-            fleet_ptr->lengths[fleet_ptr->n_lengths - 2]);
-
-    edges[0] = std::min(edges[0], population_size_grid.edges[0]);
-    edges[fleet_ptr->n_lengths] =
-        std::max(edges[fleet_ptr->n_lengths],
-                 population_size_grid.edges[population_size_grid.n_bins]);
-
-    return edges;
   }
 
   /**
@@ -247,6 +201,9 @@ struct GrowthDerivedALK : public ALKBase<Type> {
 
     if (fleet_ptr->n_lengths == 0 ||
         fleet_ptr->lengths.size() != fleet_ptr->n_lengths ||
+        fleet_ptr->length_bin_edges.size() != fleet_ptr->n_lengths + 1 ||
+        !SizeBinMapping::HasStrictlyIncreasingEdges(
+            fleet_ptr->length_bin_edges) ||
         age_index >= fleet_ptr->n_ages) {
       return fims::Vector<Type>();
     }
@@ -257,15 +214,15 @@ struct GrowthDerivedALK : public ALKBase<Type> {
       return fims::Vector<Type>();
     }
 
-    const fims::Vector<double> fleet_edges =
-        BuildFleetObservationEdges(fleet_ptr, *population_size_grid);
-    if (!SizeBinMapping::HasStrictlyIncreasingEdges(fleet_edges)) {
-      return fims::Vector<Type>();
-    }
+    const fims::Vector<double> mapping_fleet_edges =
+        SizeBinMapping::ExpandDestinationEdgesToCoverSourceRange(
+            population_size_grid->edges,
+            fleet_ptr->length_bin_edges);
 
     const fims::Vector<fims::Vector<double>> rebin_weights =
         SizeBinMapping::BuildRebinWeights(
-            population_size_grid->edges, fleet_edges);
+            population_size_grid->edges,
+            mapping_fleet_edges);
 
     fims::Vector<Type> fleet_row =
         SizeBinMapping::ApplyRebinWeights(rebin_weights, population_prob_size);
@@ -278,7 +235,7 @@ struct GrowthDerivedALK : public ALKBase<Type> {
     }
 
     const Type safe_row_sum =
-        fims_math::ad_max(row_sum, static_cast<Type>(1e-12));
+        SizeProbabilityNormalization::SafeDenominator(row_sum);
 
     for (std::size_t length_bin_index = 0;
          length_bin_index < fleet_row.size();

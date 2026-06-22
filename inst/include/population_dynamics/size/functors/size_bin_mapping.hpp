@@ -37,8 +37,9 @@ struct SizeBinMapping {
                              double right_a,
                              double left_b,
                              double right_b) {
-    return std::max(
-        0.0, std::min(right_a, right_b) - std::max(left_a, left_b));
+    return (std::max)(
+        0.0,
+        (std::min)(right_a, right_b) - (std::max)(left_a, left_b));
   }
 
   /**
@@ -129,6 +130,47 @@ struct SizeBinMapping {
     return destination_edges[0] <= source_edges[0] &&
            destination_edges[destination_edges.size() - 1] >=
                source_edges[source_edges.size() - 1];
+  }
+
+  /**
+   * @brief Return explicit mapping edges whose support covers the source range
+   * while preserving the canonical destination bin breaks.
+   * @param source_edges Source-bin edges that must be covered.
+   * @param destination_edges Canonical destination observation-bin edges.
+   * @return Copy of destination edges with only the outer edges widened as
+   * needed to cover the full source-bin range.
+   *
+   * This is an explicit higher-level mapping policy. It does not redefine the
+   * canonical destination geometry itself; it only prepares a temporary edge
+   * vector for geometric translation when destination support is narrower than
+   * source support.
+   */
+  static fims::Vector<double> ExpandDestinationEdgesToCoverSourceRange(
+      const fims::Vector<double>& source_edges,
+      const fims::Vector<double>& destination_edges) {
+    if (!HasStrictlyIncreasingEdges(source_edges) ||
+        !HasStrictlyIncreasingEdges(destination_edges)) {
+      throw std::runtime_error(
+          "SizeBinMapping requires strictly increasing source and "
+          "destination edges");
+    }
+
+    fims::Vector<double> expanded_edges = destination_edges;
+
+    if (expanded_edges[0] > source_edges[0]) {
+      expanded_edges[0] = source_edges[0];
+    }
+
+    const std::size_t last_destination_edge = expanded_edges.size() - 1;
+    const std::size_t last_source_edge = source_edges.size() - 1;
+
+    if (expanded_edges[last_destination_edge] <
+        source_edges[last_source_edge]) {
+      expanded_edges[last_destination_edge] =
+          source_edges[last_source_edge];
+    }
+
+    return expanded_edges;
   }
 
   /**

@@ -1879,6 +1879,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
               }
             }
           }
+        }
 
         growth_derived_age_to_length_conversion_f(fleet_idx) =
             growth_derived_age_to_length_conversion.to_tmb();

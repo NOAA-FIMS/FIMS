@@ -627,15 +627,50 @@ void SetFleetALKModel(bool &valid_model,
     }
   }
 
+  fims::Vector<fims::Vector<double>> PrepareFleetObservationBinEdges(
+      const std::shared_ptr<fims_popdy::Population<Type>>& p) {
+    fims::Vector<fims::Vector<double>> fleet_edges;
+
+    for (std::size_t fleet_index = 0; fleet_index < p->fleets.size();
+         ++fleet_index) {
+      const std::shared_ptr<fims_popdy::Fleet<Type>>& fleet =
+          p->fleets[fleet_index];
+
+      if (fleet == nullptr) {
+        continue;
+      }
+
+      if (fleet->n_lengths == 0) {
+        fleet->length_bin_edges = fims::Vector<double>();
+        continue;
+      }
+
+      if (fleet->lengths.size() != fleet->n_lengths) {
+        throw std::runtime_error(
+            "Fleet length-bin centers are not consistent with n_lengths");
+      }
+
+      fleet->length_bin_edges =
+          fims_popdy::SizeGridBuilder::BuildObservationEdgesFromCenters(
+              fleet->lengths);
+
+      fleet_edges.emplace_back(fleet->length_bin_edges);
+    }
+
+    return fleet_edges;
+  }
+
   /**
    * @brief Ensure a population has a usable biological size grid.
    *
-   * @details If a user provides a valid biological size grid, keep it.
-   * If no biological size grid has been provided, build the built-in default
-   * from resolvable fleet observation-bin geometry, enforce the one-unit
-   * compatibility rule, and warn when the built-in default creates more than
-   * 200 regular bins. If a user provides an invalid or partially specified
-   * grid, report the problem and invalidate the model.
+   * @details Prepare canonical fleet observation-bin geometry from valid fleet
+   * length-bin centers whenever that geometry is available. If a user provides
+   * a valid biological size grid, keep it. If no biological size grid has been
+   * provided, build the built-in default from the prepared fleet
+   * observation-bin geometry, enforce the one-unit compatibility rule, and
+   * warn when the built-in default creates more than 200 regular bins. If a
+   * user provides an invalid or partially specified grid, report the problem
+   * and invalidate the model.
    *
    * @param valid_model Reference to model-validity flag.
    * @param p Shared pointer to population module.
@@ -643,6 +678,18 @@ void SetFleetALKModel(bool &valid_model,
   void EnsurePopulationSizeGrid(
       bool &valid_model,
       std::shared_ptr<fims_popdy::Population<Type>> p) {
+    fims::Vector<fims::Vector<double>> fleet_edges;
+
+    try {
+      fleet_edges = PrepareFleetObservationBinEdges(p);
+    } catch (const std::exception &e) {
+      valid_model = false;
+      FIMS_ERROR_LOG(
+          "Failed to prepare fleet observation-bin geometry for population " +
+          fims::to_string(p->id) + ": " + e.what());
+      return;
+    }
+
     if (p->size_grid.IsConsistent() && p->size_grid.n_bins > 0) {
       return;
     }
@@ -654,27 +701,6 @@ void SetFleetALKModel(bool &valid_model,
 
     if (size_grid_missing) {
       try {
-        fims::Vector<fims::Vector<double>> fleet_edges;
-
-        for (std::size_t fleet_index = 0; fleet_index < p->fleets.size();
-             ++fleet_index) {
-          const std::shared_ptr<fims_popdy::Fleet<Type>>& fleet =
-              p->fleets[fleet_index];
-
-          if (fleet == nullptr || fleet->n_lengths == 0) {
-            continue;
-          }
-
-          if (fleet->lengths.size() != fleet->n_lengths) {
-            throw std::runtime_error(
-                "Fleet length-bin centers are not consistent with n_lengths");
-          }
-
-          fims::Vector<double> resolved_edges =
-              fims_popdy::SizeGridBuilder::BuildObservationEdgesFromCenters(
-                  fleet->lengths);
-          fleet_edges.emplace_back(resolved_edges);
-        }
 
         if (fleet_edges.size() == 0) {
           throw std::runtime_error(

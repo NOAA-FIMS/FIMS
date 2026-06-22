@@ -17,6 +17,7 @@
 #include "size_distribution_provider_base.hpp"
 #include "size_products.hpp"
 #include "../../common/fims_math.hpp"
+#include "functors/size_probability_normalization.hpp"
 
 namespace fims_popdy {
 
@@ -107,8 +108,8 @@ class GrowthDerivedSizeProvider : public SizeDistributionProviderBase<Type> {
           row_sum += bin_prob;
         }
 
-        const Type safe_row_sum = fims_math::ad_max(
-            row_sum, static_cast<Type>(1e-12));
+        const Type safe_row_sum =
+            SizeProbabilityNormalization::SafeDenominator(row_sum);
 
         for (std::size_t size_bin_index = 0;
              size_bin_index < population_size_grid_->n_bins;

@@ -28,11 +28,17 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
   size_t n_years;       /*!< the number of years in the model*/
   size_t n_ages;        /*!< the number of ages in the model*/
   size_t n_lengths;     /*!< the number of observed length bins for this fleet*/
-  fims::Vector<Type> lengths; /*!< Observed length-bin centers for this fleet.
+  fims::Vector<double> lengths; /*!< Observed length-bin centers for this fleet.
 These bins belong to the observation layer and are distinct from any
-population-level biological size grid. They are used by current length-based
-observation paths, including the growth-derived ALK path, to map biological
-size structure into fleet-specific observation bins. */
+population-level biological size grid. The centers are user-supplied bin
+definitions, not the canonical downstream geometry used for mapping. */
+
+  fims::Vector<double>
+      length_bin_edges; /*!< Resolved observation-bin edges for this fleet.
+These edges are fixed observation geometry derived from the user-supplied
+length-bin centers during setup. They remain distinct from the
+population-level biological size grid and serve as the canonical fleet
+observation-bin geometry for downstream size mapping. */
 
   // selectivity
   int fleet_selectivity_id_m = -999; /*!< id of selectivity component*/
