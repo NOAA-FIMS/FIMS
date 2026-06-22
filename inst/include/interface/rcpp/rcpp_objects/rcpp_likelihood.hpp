@@ -210,8 +210,6 @@ class LikelihoodInterfaceBase : public FIMSRcppInterfaceBase {
         this->to_fims_vector_t<Type>(this->observed_values);
     likelihood->expected_values =
         this->to_fims_vector_t<Type>(this->expected_values);
-    likelihood->SetExpected(this->register_or_get_real_vector(
-        &likelihood->expected_values, this->expected_values.id_m));
     likelihood->role = this->parse_role();
 
     std::string input_source = this->input_source_m.get();
@@ -292,6 +290,7 @@ class LikelihoodInterfaceBase : public FIMSRcppInterfaceBase {
   virtual bool set_role(std::string role) {
     this->role_m.set(role);
     this->parse_role();
+    this->sync_live_input_state();
     return true;
   }
 
@@ -303,6 +302,7 @@ class LikelihoodInterfaceBase : public FIMSRcppInterfaceBase {
     this->role_m.set(role);
     this->input_source_m.set("real");
     this->parse_role();
+    this->sync_live_input_state();
     return true;
   }
 
@@ -314,6 +314,7 @@ class LikelihoodInterfaceBase : public FIMSRcppInterfaceBase {
     this->role_m.set(role);
     this->input_source_m.set("parameter");
     this->parse_role();
+    this->sync_live_input_state();
     return true;
   }
 
@@ -321,6 +322,24 @@ class LikelihoodInterfaceBase : public FIMSRcppInterfaceBase {
    * @brief Evaluate the likelihood.
    */
   virtual double evaluate() = 0;
+
+ protected:
+  /**
+   * @brief Keep the live copy used by CreateTMBModel synchronized with R-side
+   * setter calls.
+   */
+  void sync_live_input_state() {
+    for (size_t i = 0; i < LikelihoodInterfaceBase::live_objects.size(); i++) {
+      std::shared_ptr<LikelihoodInterfaceBase> object =
+          LikelihoodInterfaceBase::live_objects[i];
+      if (object->id_m == this->id_m && object.get() != this) {
+        object->real_input = this->real_input;
+        object->parameter_input = this->parameter_input;
+        object->role_m = this->role_m;
+        object->input_source_m = this->input_source_m;
+      }
+    }
+  }
 };
 
 /**
@@ -361,7 +380,6 @@ class NormalLikelihoodInterface : public LikelihoodInterfaceBase {
         std::make_shared<fims_likelihood::NormalLikelihood<Type>>();
     this->template set_common_tmb_values<Type>(likelihood, "normal_likelihood");
     likelihood->log_sd = this->to_fims_vector_t<Type>(this->log_sd);
-    this->register_or_get_real_vector(&likelihood->log_sd, this->log_sd.id_m);
     this->template register_likelihood<Type>(likelihood);
     return true;
   }
@@ -412,7 +430,6 @@ class LognormalLikelihoodInterface : public LikelihoodInterfaceBase {
         std::make_shared<fims_likelihood::LognormalLikelihood<Type>>();
     this->template set_common_tmb_values<Type>(likelihood, "lognormal_likelihood");
     likelihood->log_sd = this->to_fims_vector_t<Type>(this->log_sd);
-    this->register_or_get_real_vector(&likelihood->log_sd, this->log_sd.id_m);
     this->template register_likelihood<Type>(likelihood);
     return true;
   }
@@ -462,7 +479,6 @@ class GammaLikelihoodInterface : public LikelihoodInterfaceBase {
         std::make_shared<fims_likelihood::GammaLikelihood<Type>>();
     this->template set_common_tmb_values<Type>(likelihood, "gamma_likelihood");
     likelihood->log_sd = this->to_fims_vector_t<Type>(this->log_sd);
-    this->register_or_get_real_vector(&likelihood->log_sd, this->log_sd.id_m);
     this->template register_likelihood<Type>(likelihood);
     return true;
   }
@@ -518,10 +534,6 @@ class InvGammaLikelihoodInterface : public LikelihoodInterfaceBase {
     this->template set_common_tmb_values<Type>(likelihood, "invgamma_likelihood");
     likelihood->log_shape = this->to_fims_vector_t<Type>(this->log_shape);
     likelihood->log_scale = this->to_fims_vector_t<Type>(this->log_scale);
-    this->register_or_get_real_vector(&likelihood->log_shape,
-                                      this->log_shape.id_m);
-    this->register_or_get_real_vector(&likelihood->log_scale,
-                                      this->log_scale.id_m);
     this->template register_likelihood<Type>(likelihood);
     return true;
   }

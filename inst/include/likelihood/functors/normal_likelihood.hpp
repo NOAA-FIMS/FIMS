@@ -47,6 +47,13 @@ struct NormalLikelihood : public LikelihoodComponentBase<Type> {
           (log_two_pi + static_cast<Type>(2.0) * log_sigma +
            (residual * residual) / (sigma * sigma));
       this->nll += this->nll_components[i];
+#ifdef TMB_MODEL
+      if (this->simulate_flag) {
+        FIMS_SIMULATE_F(this->of) {
+          this->GetInput(i) = rnorm(this->GetExpected(i), sigma);
+        }
+      }
+#endif
     }
     return this->nll;
   }

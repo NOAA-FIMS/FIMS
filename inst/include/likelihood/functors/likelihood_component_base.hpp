@@ -34,6 +34,11 @@ struct LikelihoodComponentBase {
   LikelihoodRole role = LikelihoodRole::Data;
   Type nll = static_cast<Type>(0.0);
   Type na_value = static_cast<Type>(-999.0);
+  bool simulate_flag = false;
+
+#ifdef TMB_MODEL
+  ::objective_function<Type> *of;
+#endif
 
   virtual ~LikelihoodComponentBase() {}
 

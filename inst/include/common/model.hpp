@@ -168,6 +168,9 @@ class Model {  // may need singleton
          l_it != this->fims_information->likelihood_components.end(); ++l_it) {
       std::shared_ptr<fims_likelihood::LikelihoodComponentBase<Type>> l =
           (*l_it).second;
+#ifdef TMB_MODEL
+      l->of = this->of;
+#endif
       nll_vec[nll_vec_idx] = l->Evaluate();
       jnll += nll_vec[nll_vec_idx];
       n_likelihoods += 1;

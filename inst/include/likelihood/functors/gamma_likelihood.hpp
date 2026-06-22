@@ -35,6 +35,13 @@ struct GammaLikelihood : public NormalLikelihood<Type> {
                          shape * fims_math::log(scale);
       this->nll_components[i] = -log_density;
       this->nll += this->nll_components[i];
+#ifdef TMB_MODEL
+      if (this->simulate_flag) {
+        FIMS_SIMULATE_F(this->of) {
+          this->GetInput(i) = rgamma(shape, scale);
+        }
+      }
+#endif
     }
     return this->nll;
   }

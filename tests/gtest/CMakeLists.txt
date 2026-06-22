@@ -25,6 +25,17 @@ target_link_libraries(fimsMath_fimsMath_exp
 )
 gtest_discover_tests(fimsMath_fimsMath_exp)
 
+# test_likelihood_functors.cpp
+add_executable(likelihood_functors
+  test_likelihood_functors.cpp
+)
+add_as_invoker_manifest(likelihood_functors)
+target_link_libraries(likelihood_functors
+  gtest_main
+  fims_test
+)
+gtest_discover_tests(likelihood_functors)
+
 # test_fimsMath_fimsMath_log.cpp
 add_executable(fimsMath_fimsMath_log
   test_fimsMath_fimsMath_log.cpp
