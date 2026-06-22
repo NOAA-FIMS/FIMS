@@ -185,7 +185,7 @@ TEST(GrowthDerivedSizeProvider,
       120.0);
   growth->SetAgeOffset(1.0);
   growth->Initialize(1, 3, 1);
-ASSERT_NO_THROW(growth->PrepareGrowthProducts());
+  ASSERT_NO_THROW(growth->PrepareGrowthProducts());
 
   fims::Vector<fims::Vector<double>> fleet_edges;
   fleet_edges.emplace_back(
@@ -214,6 +214,116 @@ ASSERT_NO_THROW(growth->PrepareGrowthProducts());
 
     EXPECT_NEAR(row_sum, 1.0, 1e-5);
   }
+}
+
+TEST(GrowthDerivedSizeProvider,
+     PrepareSizeProductsShiftMassWithDifferentMeanGrowth) {
+  const auto lower_growth = MakePreparedGrowth(1.5, 0.4);
+  const auto higher_growth = MakePreparedGrowth(3.5, 0.4);
+  const fims_popdy::SizeGrid grid =
+      fims_popdy::SizeGridBuilder::BuildFromEdges(
+          {0.0, 1.0, 2.0, 3.0, 4.0, 5.0});
+
+  fims_popdy::GrowthDerivedSizeProvider<double> lower_provider(lower_growth);
+  lower_provider.SetPopulationSizeGrid(&grid);
+  lower_provider.SetPopulationDimensions(1, 1);
+  lower_provider.PrepareSizeProducts();
+
+  fims_popdy::GrowthDerivedSizeProvider<double> higher_provider(higher_growth);
+  higher_provider.SetPopulationSizeGrid(&grid);
+  higher_provider.SetPopulationDimensions(1, 1);
+  higher_provider.PrepareSizeProducts();
+
+  double lower_expected_size = 0.0;
+  double higher_expected_size = 0.0;
+  double lower_upper_tail = 0.0;
+  double higher_upper_tail = 0.0;
+
+  for (std::size_t size_bin_index = 0; size_bin_index < grid.n_bins;
+       ++size_bin_index) {
+    const double lower_prob =
+        lower_provider.ProbSize(0, 0, size_bin_index);
+    const double higher_prob =
+        higher_provider.ProbSize(0, 0, size_bin_index);
+
+    lower_expected_size += lower_prob * grid.centers[size_bin_index];
+    higher_expected_size += higher_prob * grid.centers[size_bin_index];
+
+    if (grid.centers[size_bin_index] >= 3.5) {
+      lower_upper_tail += lower_prob;
+      higher_upper_tail += higher_prob;
+    }
+  }
+
+  EXPECT_GT(higher_expected_size, lower_expected_size);
+  EXPECT_GT(higher_upper_tail, lower_upper_tail);
+}
+
+TEST(GrowthDerivedSizeProvider,
+     PrepareSizeProductsShiftMassWithDifferentPreparedGrowthAdapters) {
+  auto lower_growth =
+      std::make_shared<fims_popdy::VonBertalanffyGrowthModelAdapter<double>>();
+  ConfigureAdapter(
+      *lower_growth,
+      225.0,
+      575.0,
+      0.18,
+      1.0,
+      12.0,
+      2.5e-11,
+      3.0,
+      28.0,
+      73.0);
+  lower_growth->SetAgeOffset(1.0);
+  lower_growth->Initialize(1, 1, 1);
+  ASSERT_NO_THROW(lower_growth->PrepareGrowthProducts());
+
+  auto higher_growth =
+      std::make_shared<fims_popdy::VonBertalanffyGrowthModelAdapter<double>>();
+  ConfigureAdapter(
+      *higher_growth,
+      325.0,
+      825.0,
+      0.18,
+      1.0,
+      12.0,
+      2.5e-11,
+      3.0,
+      28.0,
+      73.0);
+  higher_growth->SetAgeOffset(1.0);
+  higher_growth->Initialize(1, 1, 1);
+  ASSERT_NO_THROW(higher_growth->PrepareGrowthProducts());
+
+  const fims_popdy::SizeGrid grid =
+      fims_popdy::SizeGridBuilder::BuildFromEdges(
+          {0.0, 100.0, 200.0, 300.0, 400.0, 500.0, 600.0, 700.0, 800.0, 900.0});
+
+  fims_popdy::GrowthDerivedSizeProvider<double> lower_provider(lower_growth);
+  lower_provider.SetPopulationSizeGrid(&grid);
+  lower_provider.SetPopulationDimensions(1, 1);
+  ASSERT_NO_THROW(lower_provider.PrepareSizeProducts());
+
+  fims_popdy::GrowthDerivedSizeProvider<double> higher_provider(higher_growth);
+  higher_provider.SetPopulationSizeGrid(&grid);
+  higher_provider.SetPopulationDimensions(1, 1);
+  ASSERT_NO_THROW(higher_provider.PrepareSizeProducts());
+
+  double lower_expected_size = 0.0;
+  double higher_expected_size = 0.0;
+
+  for (std::size_t size_bin_index = 0; size_bin_index < grid.n_bins;
+       ++size_bin_index) {
+    const double lower_prob =
+        lower_provider.ProbSize(0, 0, size_bin_index);
+    const double higher_prob =
+        higher_provider.ProbSize(0, 0, size_bin_index);
+
+    lower_expected_size += lower_prob * grid.centers[size_bin_index];
+    higher_expected_size += higher_prob * grid.centers[size_bin_index];
+  }
+
+  EXPECT_GT(higher_expected_size, lower_expected_size);
 }
 
 }  // namespace
