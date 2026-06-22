@@ -10,7 +10,7 @@
  */
 uint32_t Parameter::id_g = 0;
 
-uint32_t ParameterVector::id_g = 0;
+uint32_t VariableVector::id_g = 0;
 
 uint32_t RealVector::id_g = 0;
 

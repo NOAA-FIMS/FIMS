@@ -122,19 +122,19 @@ class PopulationInterface : public PopulationInterfaceBase {
   /**
    * @brief The natural log of the natural mortality for each year.
    */
-  ParameterVector log_M;
+  VariableVector log_M;
   /**
    * @brief The population spawning biomass ratio for each year.
    */
-  ParameterVector spawning_biomass_ratio;
+  VariableVector spawning_biomass_ratio;
   /**
    * @brief Log of the population annual fishing mortality multiplier.
    */
-  ParameterVector log_f_multiplier;
+  VariableVector log_f_multiplier;
   /**
    * @brief The natural log of the initial numbers at age.
    */
-  ParameterVector log_init_naa;
+  VariableVector log_init_naa;
   /**
    * @brief Ages that are modeled in the population, the length of this vector
    * should equal \"n_ages\".
@@ -144,6 +144,36 @@ class PopulationInterface : public PopulationInterfaceBase {
    * @brief The name for the population.
    */
   SharedString name = fims::to_string("NA");
+
+  // Derived quantity VariableVectors
+  /** @brief Total landings weight summed across fleets (n_years). */
+  VariableVector total_landings_weight;
+  /** @brief Total landings numbers summed across fleets (n_years). */
+  VariableVector total_landings_numbers;
+  /** @brief Fishing mortality by year and age (n_years x n_ages). */
+  VariableVector mortality_F;
+  /** @brief Natural mortality by year and age (n_years x n_ages). */
+  VariableVector mortality_M;
+  /** @brief Total mortality by year and age (n_years x n_ages). */
+  VariableVector mortality_Z;
+  /** @brief Numbers at age ((n_years+1) x n_ages). */
+  VariableVector numbers_at_age;
+  /** @brief Unfished numbers at age ((n_years+1) x n_ages). */
+  VariableVector unfished_numbers_at_age;
+  /** @brief Total biomass by year (n_years+1). */
+  VariableVector biomass;
+  /** @brief Spawning biomass by year (n_years+1). */
+  VariableVector spawning_biomass;
+  /** @brief Unfished biomass by year (n_years+1). */
+  VariableVector unfished_biomass;
+  /** @brief Unfished spawning biomass by year (n_years+1). */
+  VariableVector unfished_spawning_biomass;
+  /** @brief Proportion mature at age ((n_years+1) x n_ages). */
+  VariableVector proportion_mature_at_age;
+  /** @brief Expected recruitment by year (n_years+1). */
+  VariableVector expected_recruitment;
+  /** @brief Sum of selectivity across fleets (n_years x n_ages). */
+  VariableVector sum_selectivity;
 
   /**
    * @brief The constructor.
@@ -177,7 +207,21 @@ class PopulationInterface : public PopulationInterfaceBase {
         log_f_multiplier(other.log_f_multiplier),
         log_init_naa(other.log_init_naa),
         ages(other.ages),
-        name(other.name) {}
+        name(other.name),
+        total_landings_weight(other.total_landings_weight),
+        total_landings_numbers(other.total_landings_numbers),
+        mortality_F(other.mortality_F),
+        mortality_M(other.mortality_M),
+        mortality_Z(other.mortality_Z),
+        numbers_at_age(other.numbers_at_age),
+        unfished_numbers_at_age(other.unfished_numbers_at_age),
+        biomass(other.biomass),
+        spawning_biomass(other.spawning_biomass),
+        unfished_biomass(other.unfished_biomass),
+        unfished_spawning_biomass(other.unfished_spawning_biomass),
+        proportion_mature_at_age(other.proportion_mature_at_age),
+        expected_recruitment(other.expected_recruitment),
+        sum_selectivity(other.sum_selectivity) {}
 
   /**
    * @brief The destructor.
@@ -250,39 +294,121 @@ class PopulationInterface : public PopulationInterfaceBase {
 
     it = info->populations.find(this->id);
 
-    std::shared_ptr<fims_popdy::Population<double>> pop =
-        info->populations[this->id];
-    it = info->populations.find(this->id);
     if (it == info->populations.end()) {
       FIMS_WARNING_LOG("Population " + fims::to_string(this->id) +
                        " not found in Information.");
       return;
-    } else {
-      for (size_t i = 0; i < this->log_M.size(); i++) {
-        if (this->log_M[i].estimation_type_m.get() == "constant") {
-          this->log_M[i].final_value_m = this->log_M[i].initial_value_m;
-        } else {
-          this->log_M[i].final_value_m = pop->log_M[i];
-        }
-      }
+    }
 
-      for (size_t i = 0; i < this->log_f_multiplier.size(); i++) {
-        if (this->log_f_multiplier[i].estimation_type_m.get() == "constant") {
-          this->log_f_multiplier[i].final_value_m =
-              this->log_f_multiplier[i].initial_value_m;
-        } else {
-          this->log_f_multiplier[i].final_value_m = pop->log_f_multiplier[i];
-        }
-      }
+    std::shared_ptr<fims_popdy::Population<double>> pop =
+        info->populations[this->id];
 
-      for (size_t i = 0; i < this->log_init_naa.size(); i++) {
-        if (this->log_init_naa[i].estimation_type_m.get() == "constant") {
-          this->log_init_naa[i].final_value_m =
-              this->log_init_naa[i].initial_value_m;
-        } else {
-          this->log_init_naa[i].final_value_m = pop->log_init_naa[i];
-        }
+    for (size_t i = 0; i < this->log_M.size(); i++) {
+      if (this->log_M[i].estimation_type_m.get() == "constant") {
+        this->log_M[i].final_value_m = this->log_M[i].initial_value_m;
+      } else {
+        this->log_M[i].final_value_m = pop->log_M[i];
       }
+    }
+
+    for (size_t i = 0; i < this->log_f_multiplier.size(); i++) {
+      if (this->log_f_multiplier[i].estimation_type_m.get() == "constant") {
+        this->log_f_multiplier[i].final_value_m =
+            this->log_f_multiplier[i].initial_value_m;
+      } else {
+        this->log_f_multiplier[i].final_value_m = pop->log_f_multiplier[i];
+      }
+    }
+
+    for (size_t i = 0; i < this->log_init_naa.size(); i++) {
+      if (this->log_init_naa[i].estimation_type_m.get() == "constant") {
+        this->log_init_naa[i].final_value_m =
+            this->log_init_naa[i].initial_value_m;
+      } else {
+        this->log_init_naa[i].final_value_m = pop->log_init_naa[i];
+      }
+    }
+
+    for (size_t i = 0; i < this->spawning_biomass_ratio.size(); i++) {
+      this->spawning_biomass_ratio[i].final_value_m =
+          pop->spawning_biomass_ratio[i];
+    }
+
+    // Finalize derived quantities
+    this->total_landings_weight.resize(pop->total_landings_weight.size());
+    for (size_t i = 0; i < pop->total_landings_weight.size(); i++) {
+      this->total_landings_weight[i].final_value_m =
+          pop->total_landings_weight[i];
+    }
+
+    this->total_landings_numbers.resize(pop->total_landings_numbers.size());
+    for (size_t i = 0; i < pop->total_landings_numbers.size(); i++) {
+      this->total_landings_numbers[i].final_value_m =
+          pop->total_landings_numbers[i];
+    }
+
+    this->mortality_F.resize(pop->mortality_F.size());
+    for (size_t i = 0; i < pop->mortality_F.size(); i++) {
+      this->mortality_F[i].final_value_m = pop->mortality_F[i];
+    }
+
+    this->mortality_M.resize(pop->mortality_M.size());
+    for (size_t i = 0; i < pop->mortality_M.size(); i++) {
+      this->mortality_M[i].final_value_m = pop->mortality_M[i];
+    }
+
+    this->mortality_Z.resize(pop->mortality_Z.size());
+    for (size_t i = 0; i < pop->mortality_Z.size(); i++) {
+      this->mortality_Z[i].final_value_m = pop->mortality_Z[i];
+    }
+
+    this->numbers_at_age.resize(pop->numbers_at_age.size());
+    for (size_t i = 0; i < pop->numbers_at_age.size(); i++) {
+      this->numbers_at_age[i].final_value_m = pop->numbers_at_age[i];
+    }
+
+    this->unfished_numbers_at_age.resize(pop->unfished_numbers_at_age.size());
+    for (size_t i = 0; i < pop->unfished_numbers_at_age.size(); i++) {
+      this->unfished_numbers_at_age[i].final_value_m =
+          pop->unfished_numbers_at_age[i];
+    }
+
+    this->biomass.resize(pop->biomass.size());
+    for (size_t i = 0; i < pop->biomass.size(); i++) {
+      this->biomass[i].final_value_m = pop->biomass[i];
+    }
+
+    this->spawning_biomass.resize(pop->spawning_biomass.size());
+    for (size_t i = 0; i < pop->spawning_biomass.size(); i++) {
+      this->spawning_biomass[i].final_value_m = pop->spawning_biomass[i];
+    }
+
+    this->unfished_biomass.resize(pop->unfished_biomass.size());
+    for (size_t i = 0; i < pop->unfished_biomass.size(); i++) {
+      this->unfished_biomass[i].final_value_m = pop->unfished_biomass[i];
+    }
+
+    this->unfished_spawning_biomass.resize(
+        pop->unfished_spawning_biomass.size());
+    for (size_t i = 0; i < pop->unfished_spawning_biomass.size(); i++) {
+      this->unfished_spawning_biomass[i].final_value_m =
+          pop->unfished_spawning_biomass[i];
+    }
+
+    this->proportion_mature_at_age.resize(pop->proportion_mature_at_age.size());
+    for (size_t i = 0; i < pop->proportion_mature_at_age.size(); i++) {
+      this->proportion_mature_at_age[i].final_value_m =
+          pop->proportion_mature_at_age[i];
+    }
+
+    this->expected_recruitment.resize(pop->expected_recruitment.size());
+    for (size_t i = 0; i < pop->expected_recruitment.size(); i++) {
+      this->expected_recruitment[i].final_value_m = pop->expected_recruitment[i];
+    }
+
+    this->sum_selectivity.resize(pop->sum_selectivity.size());
+    for (size_t i = 0; i < pop->sum_selectivity.size(); i++) {
+      this->sum_selectivity[i].final_value_m = pop->sum_selectivity[i];
     }
   }
 
@@ -416,6 +542,34 @@ class PopulationInterface : public PopulationInterfaceBase {
     for (size_t i = 0; i < ages.size(); i++) {
       population->ages[i] = this->ages[i];
     }
+
+    // Link derived quantity vectors to variable_map
+    // (these are resized in CatchAtAge::Initialize(); linking the pointer here
+    // is safe because resize does not move the fims::Vector object itself)
+    info->variable_map[this->total_landings_weight.id_m] =
+        &(population)->total_landings_weight;
+    info->variable_map[this->total_landings_numbers.id_m] =
+        &(population)->total_landings_numbers;
+    info->variable_map[this->mortality_F.id_m] = &(population)->mortality_F;
+    info->variable_map[this->mortality_M.id_m] = &(population)->mortality_M;
+    info->variable_map[this->mortality_Z.id_m] = &(population)->mortality_Z;
+    info->variable_map[this->numbers_at_age.id_m] =
+        &(population)->numbers_at_age;
+    info->variable_map[this->unfished_numbers_at_age.id_m] =
+        &(population)->unfished_numbers_at_age;
+    info->variable_map[this->biomass.id_m] = &(population)->biomass;
+    info->variable_map[this->spawning_biomass.id_m] =
+        &(population)->spawning_biomass;
+    info->variable_map[this->unfished_biomass.id_m] =
+        &(population)->unfished_biomass;
+    info->variable_map[this->unfished_spawning_biomass.id_m] =
+        &(population)->unfished_spawning_biomass;
+    info->variable_map[this->proportion_mature_at_age.id_m] =
+        &(population)->proportion_mature_at_age;
+    info->variable_map[this->expected_recruitment.id_m] =
+        &(population)->expected_recruitment;
+    info->variable_map[this->sum_selectivity.id_m] =
+        &(population)->sum_selectivity;
 
     // add to Information
     info->populations[population->id] = population;

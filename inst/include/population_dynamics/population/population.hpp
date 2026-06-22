@@ -46,6 +46,22 @@ annual fishing mortality multipliers to scale total mortality of all fleets*/
   fims::Vector<Type> f_multiplier; /*!< transformed parameter: vector of
 annual fishing mortality multipliers to scale total mortality of all fleets*/
 
+  // Derived quantities
+  fims::Vector<Type> total_landings_weight;     /*!< n_years */
+  fims::Vector<Type> total_landings_numbers;    /*!< n_years */
+  fims::Vector<Type> mortality_F;               /*!< n_years x n_ages */
+  fims::Vector<Type> mortality_M;               /*!< n_years x n_ages */
+  fims::Vector<Type> mortality_Z;               /*!< n_years x n_ages */
+  fims::Vector<Type> numbers_at_age;            /*!< (n_years+1) x n_ages */
+  fims::Vector<Type> unfished_numbers_at_age;   /*!< (n_years+1) x n_ages */
+  fims::Vector<Type> biomass;                   /*!< n_years+1 */
+  fims::Vector<Type> spawning_biomass;          /*!< n_years+1 */
+  fims::Vector<Type> unfished_biomass;          /*!< n_years+1 */
+  fims::Vector<Type> unfished_spawning_biomass; /*!< n_years+1 */
+  fims::Vector<Type> proportion_mature_at_age;  /*!< (n_years+1) x n_ages */
+  fims::Vector<Type> expected_recruitment;      /*!< n_years+1 */
+  fims::Vector<Type> sum_selectivity;           /*!< n_years x n_ages */
+
   fims::Vector<double> ages;  /*!< vector of the ages for referencing*/
   fims::Vector<double> years; /*!< vector of years for referencing*/
 

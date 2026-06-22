@@ -245,9 +245,9 @@ void clear() {
   // rcpp_interface_base.hpp
   FIMSRcppInterfaceBase::fims_interface_objects.clear();
 
-  // Parameter and ParameterVector
+  // Parameter and VariableVector
   Parameter::id_g = 1;
-  ParameterVector::id_g = 1;
+  VariableVector::id_g = 1;
   // rcpp_data.hpp
   DataInterfaceBase::id_g = 1;
   DataInterfaceBase::live_objects.clear();

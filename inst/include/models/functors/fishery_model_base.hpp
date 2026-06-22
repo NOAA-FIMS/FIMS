@@ -20,56 +20,6 @@
 namespace fims_popdy {
 
 /**
- * @brief Structure to hold dimension information for derived quantities.
- */
-struct DimensionInfo {
-  std::string name;                    /*!< name of the derived quantity */
-  int ndims;                           /*!< number of dimensions */
-  fims::Vector<int> dims;              /*!< vector of dimensions */
-  fims::Vector<std::string> dim_names; /*!< vector of dimension names */
-  fims::Vector<double> se_values_m;    /*!< final values of the report vector */
-
-  /**
-   * @brief Default constructor for dimension information.
-   */
-  DimensionInfo() : ndims(0) {}
-
-  /**
-   * @brief Constructor with parameters.
-   * @param name The name of the derived quantity.
-   * @param dims A vector of integers representing the dimensions.
-   * @param dim_names A vector of strings representing the names of the
-   * dimensions.
-   */
-  DimensionInfo(const std::string &name, const fims::Vector<int> &dims,
-                const fims::Vector<std::string> &dim_names)
-      : name(name), ndims(dims.size()), dims(dims), dim_names(dim_names) {}
-
-  /**
-   * Copy constructor
-   */
-  DimensionInfo(const DimensionInfo &other)
-      : name(other.name),
-        ndims(other.dims.size()),
-        dims(other.dims),
-        dim_names(other.dim_names) {}
-
-  /**
-   * @brief Assignment operator for DimensionInfo.
-   */
-  DimensionInfo &operator=(const DimensionInfo &other) {
-    if (this != &other) {
-      name = other.name;
-      ndims = other.ndims;
-      dims = other.dims;
-      dim_names = other.dim_names;
-      se_values_m = other.se_values_m;
-    }
-    return *this;
-  }
-};
-
-/**
  * @brief FisheryModelBase is a base class for fishery models in FIMS.
  *
  */
@@ -113,44 +63,6 @@ class FisheryModelBase : public fims_model_object::FIMSObject<Type> {
                             std::shared_ptr<fims_popdy::Fleet<Type>>>::iterator
       fleet_iterator;
 
-  /**
-   * @brief Type definitions for derived quantities and dimension information
-   * maps.
-   */
-  typedef typename std::map<uint32_t, std::map<std::string, fims::Vector<Type>>>
-      DerivedQuantitiesMap;
-
-  /**
-   * @brief Iterator for the derived quantities map.
-   */
-  typedef typename DerivedQuantitiesMap::iterator DerivedQuantitiesMapIterator;
-
-  /**
-   * @brief Shared pointer for the fleet derived quantities map.
-   */
-  std::shared_ptr<DerivedQuantitiesMap> fleet_derived_quantities;
-
-  /**
-   * @brief Shared pointer for the population derived quantities map.
-   */
-  std::shared_ptr<DerivedQuantitiesMap> population_derived_quantities;
-
-  /**
-   * @brief Type definitions for dimension information maps.
-   */
-  typedef typename std::map<uint32_t, std::map<std::string, DimensionInfo>>
-      DimensionInfoMap;
-
-  /**
-   * @brief Shared pointer for the fleet dimension information map.
-   */
-  std::shared_ptr<DimensionInfoMap> fleet_dimension_info;
-
-  /**
-   * @brief Shared pointer for the population dimension information map.
-   */
-  std::shared_ptr<DimensionInfoMap> population_dimension_info;
-
 #ifdef TMB_MODEL
   ::objective_function<Type> *of;
 #endif
@@ -158,12 +70,7 @@ class FisheryModelBase : public fims_model_object::FIMSObject<Type> {
    * @brief Construct a new Fishery Model Base object.
    *
    */
-  FisheryModelBase() : id(FisheryModelBase::id_g++) {
-    fleet_derived_quantities = std::make_shared<DerivedQuantitiesMap>();
-    population_derived_quantities = std::make_shared<DerivedQuantitiesMap>();
-    fleet_dimension_info = std::make_shared<DimensionInfoMap>();
-    population_dimension_info = std::make_shared<DimensionInfoMap>();
-  }
+  FisheryModelBase() : id(FisheryModelBase::id_g++) {}
 
   /**
    * @brief Construct a new Fishery Model Base object.
@@ -173,171 +80,13 @@ class FisheryModelBase : public fims_model_object::FIMSObject<Type> {
   FisheryModelBase(const FisheryModelBase &other)
       : id(other.id),
         population_ids(other.population_ids),
-        populations(other.populations),
-        fleet_derived_quantities(other.fleet_derived_quantities),
-        population_derived_quantities(other.population_derived_quantities),
-        fleet_dimension_info(other.fleet_dimension_info),
-        population_dimension_info(other.population_dimension_info) {}
+        populations(other.populations) {}
 
   /**
    * @brief Destroy the Fishery Model Base object.
    *
    */
   virtual ~FisheryModelBase() {}
-
-  /**
-   * @brief Get the fleet dimension information.
-   *
-   * @return std::map<uint32_t, std::map<std::string, DimensionInfo>>
-   */
-  std::map<uint32_t, std::map<std::string, DimensionInfo>> &
-  GetFleetDimensionInfo() {
-    return *fleet_dimension_info;
-  }
-
-  /**
-   * @brief Get the population dimension information.
-   *
-   * @return std::map<uint32_t, std::map<std::string, DimensionInfo>>
-   */
-  std::map<uint32_t, std::map<std::string, DimensionInfo>> &
-  GetPopulationDimensionInfo() {
-    return *population_dimension_info;
-  }
-
-  /**
-   * @brief Get the fleet derived quantities.
-   *
-   * @return DerivedQuantitiesMap
-   */
-  DerivedQuantitiesMap &GetFleetDerivedQuantities() {
-    return *fleet_derived_quantities;
-  }
-
-  /**
-   * @brief Get the population derived quantities.
-   *
-   * @return DerivedQuantitiesMap
-   */
-  DerivedQuantitiesMap &GetPopulationDerivedQuantities() {
-    return *population_derived_quantities;
-  }
-
-  /**
-   * @brief Get the fleet derived quantities for a specified fleet.
-   *
-   * @param fleet_id The ID of the fleet.
-   * @return std::map<std::string, fims::Vector<Type>>&
-   */
-  std::map<std::string, fims::Vector<Type>> &GetFleetDerivedQuantities(
-      uint32_t fleet_id) {
-    if (!fleet_derived_quantities) {
-      throw std::runtime_error(
-          "GetFleetDerivedQuantities: fleet_derived_quantities is null");
-    }
-    auto &outer = *fleet_derived_quantities;
-    auto it = outer.find(fleet_id);
-    if (it == outer.end()) {
-      std::stringstream ss;
-
-      ss << "GetFleetDerivedQuantities: fleet_id " << fleet_id
-         << " not found in fleet_derived_quantities";
-      throw std::out_of_range(ss.str());
-    }
-    return it->second;
-  }
-
-  /**
-   * @brief Initialize the derived quantities map for a fleet.
-   *
-   * @details Ensures the derived quantities map for the specified fleet
-   * exists. If not, creates an empty map for the fleet ID.
-   *
-   * @param fleet_id The ID of the fleet to initialize.
-   */
-  void InitializeFleetDerivedQuantities(uint32_t fleet_id) {
-    // Ensure the shared_ptr exists
-    if (!fleet_derived_quantities) {
-      fleet_derived_quantities = std::make_shared<
-          std::map<uint32_t, std::map<std::string, fims::Vector<Type>>>>();
-    }
-
-    auto &outer = *fleet_derived_quantities;
-
-    // Insert only if not already present
-    if (outer.find(fleet_id) == outer.end()) {
-      outer.emplace(fleet_id, std::map<std::string, fims::Vector<Type>>{});
-    }
-  }
-
-  /**
-   * @brief Initialize the derived quantities map for a population.
-   *
-   * @details Ensures the derived quantities map for the specified
-   * population exists. If not, creates an empty map for the population ID.
-   *
-   * @param population_id The ID of the population to initialize.
-   */
-  void InitializePopulationDerivedQuantities(uint32_t population_id) {
-    // Ensure the shared_ptr exists
-    if (!population_derived_quantities) {
-      population_derived_quantities = std::make_shared<
-          std::map<uint32_t, std::map<std::string, fims::Vector<Type>>>>();
-    }
-
-    auto &outer = *population_derived_quantities;
-
-    // Insert only if not already present
-    if (outer.find(population_id) == outer.end()) {
-      outer.emplace(population_id, std::map<std::string, fims::Vector<Type>>{});
-    }
-  }
-
-  /**
-   * @brief Get the population derived quantities for a specified population.
-   *
-   * @param population_id The ID of the population.
-   * @return std::map<std::string, fims::Vector<Type>>&
-   */
-  std::map<std::string, fims::Vector<Type>> &GetPopulationDerivedQuantities(
-      uint32_t population_id) {
-    if (!population_derived_quantities) {
-      throw std::runtime_error(
-          "GetPopulationDerivedQuantities: population_derived_quantities is "
-          "null");
-    }
-    auto &outer = *population_derived_quantities;
-    auto it = outer.find(population_id);
-    if (it == outer.end()) {
-      std::ostringstream ss;
-      ss << "GetPopulationDerivedQuantities: population_id " << population_id
-         << " not found in population_derived_quantities";
-      throw std::out_of_range(ss.str());
-    }
-    return it->second;
-  }
-
-  /**
-   * @brief Get the fleet dimension information for a specified fleet.
-   *
-   * @param fleet_id The ID of the fleet.
-   * @return std::map<std::string, DimensionInfo>
-   */
-  std::map<std::string, DimensionInfo> &GetFleetDimensionInfo(
-      uint32_t fleet_id) {
-    return (*fleet_dimension_info)[fleet_id];
-  }
-
-  /**
-   * @brief Get the population dimension information for a specified population.
-   *
-   * @param population_id The ID of the population.
-   * @return std::map<std::string, DimensionInfo>
-   */
-  std::map<std::string, DimensionInfo> &GetPopulationDimensionInfo(
-      uint32_t population_id) {
-    return (*population_dimension_info)[population_id];
-  }
 
   /**
    * @brief Initialize a model.

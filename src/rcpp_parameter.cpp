@@ -29,22 +29,22 @@ void register_parameter(Rcpp::Module& m) {
  *
  */
 void register_vectors(Rcpp::Module& m) {
-  Rcpp::class_<ParameterVector>(
-      "ParameterVector",
-      "See https://noaa-fims.github.io/FIMS/doxygen/classParameterVector.html.")
+  Rcpp::class_<VariableVector>(
+      "VariableVector",
+      "See https://noaa-fims.github.io/FIMS/doxygen/classVariableVector.html.")
       .constructor()
       .constructor<size_t>()
       .constructor<Rcpp::NumericVector, size_t>()
-      .method("get", &ParameterVector::get)
-      .method("set", &ParameterVector::set)
-      .method("show", &ParameterVector::show)
-      .method("at", &ParameterVector::at)
-      .method("size", &ParameterVector::size)
-      .method("resize", &ParameterVector::resize)
-      .method("set_values", &ParameterVector::set_values)
-      .method("set_estimation_types", &ParameterVector::set_estimation_types)
-      .method("fill", &ParameterVector::fill)
-      .method("get_id", &ParameterVector::get_id);
+      .method("get", &VariableVector::get)
+      .method("set", &VariableVector::set)
+      .method("show", &VariableVector::show)
+      .method("at", &VariableVector::at)
+      .method("size", &VariableVector::size)
+      .method("resize", &VariableVector::resize)
+      .method("set_values", &VariableVector::set_values)
+      .method("set_estimation_types", &VariableVector::set_estimation_types)
+      .method("fill", &VariableVector::fill)
+      .method("get_id", &VariableVector::get_id);
 
   Rcpp::class_<RealVector>(
       "RealVector",

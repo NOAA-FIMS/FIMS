@@ -118,43 +118,73 @@ class FleetInterface : public FleetInterfaceBase {
    * @brief The natural log of the index of abundance scaling parameter
    * for this fleet.
    */
-  ParameterVector log_q;
+  VariableVector log_q;
   /**
    * @brief The vector of the natural log of fishing mortality rates for this
    * fleet.
    */
-  ParameterVector log_Fmort;
+  VariableVector log_Fmort;
   /**
    * @brief The vector of natural log of the expected total landings for
    * the fleet.
    */
-  ParameterVector log_landings_expected;
+  VariableVector log_landings_expected;
   /**
    * @brief The vector of natural log of the expected index of abundance
    * for the fleet.
    */
-  ParameterVector log_index_expected;
+  VariableVector log_index_expected;
   /**
    * @brief The vector of expected landings-at-age in numbers for the fleet.
    */
-  ParameterVector agecomp_expected;
+  VariableVector agecomp_expected;
   /**
    * @brief The vector of expected landings-at-length in numbers for the fleet.
    */
-  ParameterVector lengthcomp_expected;
+  VariableVector lengthcomp_expected;
   /**
    * @brief The vector of expected landings-at-age in numbers for the fleet.
    */
-  ParameterVector agecomp_proportion;
+  VariableVector agecomp_proportion;
   /**
    * @brief The vector of expected landings-at-length in numbers for the fleet.
    */
-  ParameterVector lengthcomp_proportion;
+  VariableVector lengthcomp_proportion;
   /**
    * @brief The vector of conversions to go from age to length, i.e., the
    * age-to-length-conversion matrix.
    */
-  ParameterVector age_to_length_conversion;
+  VariableVector age_to_length_conversion;
+
+  // Derived quantity VariableVectors — landings
+  /** @brief Landings numbers at age (n_years x n_ages). */
+  VariableVector landings_numbers_at_age;
+  /** @brief Landings weight at age (n_years x n_ages). */
+  VariableVector landings_weight_at_age;
+  /** @brief Landings numbers at length (n_years x n_lengths). */
+  VariableVector landings_numbers_at_length;
+  /** @brief Total landings weight by year (n_years). */
+  VariableVector landings_weight;
+  /** @brief Total landings numbers by year (n_years). */
+  VariableVector landings_numbers;
+  /** @brief Expected landings by year (n_years). */
+  VariableVector landings_expected;
+
+  // Derived quantity VariableVectors — index/survey
+  /** @brief Index numbers at age (n_years x n_ages). */
+  VariableVector index_numbers_at_age;
+  /** @brief Index weight at age (n_years x n_ages). */
+  VariableVector index_weight_at_age;
+  /** @brief Index numbers at length (n_years x n_lengths). */
+  VariableVector index_numbers_at_length;
+  /** @brief Total index weight by year (n_years). */
+  VariableVector index_weight;
+  /** @brief Total index numbers by year (n_years). */
+  VariableVector index_numbers;
+  /** @brief Expected index by year (n_years). */
+  VariableVector index_expected;
+  /** @brief Catch index by year (n_years). */
+  VariableVector catch_index;
 
   /**
    * @brief The constructor.
@@ -198,7 +228,20 @@ class FleetInterface : public FleetInterfaceBase {
         lengthcomp_expected(other.lengthcomp_expected),
         agecomp_proportion(other.agecomp_proportion),
         lengthcomp_proportion(other.lengthcomp_proportion),
-        age_to_length_conversion(other.age_to_length_conversion) {}
+        age_to_length_conversion(other.age_to_length_conversion),
+        landings_numbers_at_age(other.landings_numbers_at_age),
+        landings_weight_at_age(other.landings_weight_at_age),
+        landings_numbers_at_length(other.landings_numbers_at_length),
+        landings_weight(other.landings_weight),
+        landings_numbers(other.landings_numbers),
+        landings_expected(other.landings_expected),
+        index_numbers_at_age(other.index_numbers_at_age),
+        index_weight_at_age(other.index_weight_at_age),
+        index_numbers_at_length(other.index_numbers_at_length),
+        index_weight(other.index_weight),
+        index_numbers(other.index_numbers),
+        index_expected(other.index_expected),
+        catch_index(other.catch_index) {}
 
   /**
    * @brief The destructor.
@@ -321,36 +364,142 @@ class FleetInterface : public FleetInterfaceBase {
       FIMS_WARNING_LOG("Fleet " + fims::to_string(this->id) +
                        " not found in Information.");
       return;
-    } else {
-      std::shared_ptr<fims_popdy::Fleet<double>> fleet =
-          std::dynamic_pointer_cast<fims_popdy::Fleet<double>>(it->second);
+    }
 
-      for (size_t i = 0; i < this->log_Fmort.size(); i++) {
-        if (this->log_Fmort[i].estimation_type_m.get() == "constant") {
-          this->log_Fmort[i].final_value_m = this->log_Fmort[i].initial_value_m;
-        } else {
-          this->log_Fmort[i].final_value_m = fleet->log_Fmort[i];
-        }
-      }
+    std::shared_ptr<fims_popdy::Fleet<double>> fleet =
+        std::dynamic_pointer_cast<fims_popdy::Fleet<double>>(it->second);
 
-      for (size_t i = 0; i < this->log_q.size(); i++) {
-        if (this->log_q[i].estimation_type_m.get() == "constant") {
-          this->log_q[i].final_value_m = this->log_q[i].initial_value_m;
-        } else {
-          this->log_q[i].final_value_m = fleet->log_q[i];
-        }
+    for (size_t i = 0; i < this->log_Fmort.size(); i++) {
+      if (this->log_Fmort[i].estimation_type_m.get() == "constant") {
+        this->log_Fmort[i].final_value_m = this->log_Fmort[i].initial_value_m;
+      } else {
+        this->log_Fmort[i].final_value_m = fleet->log_Fmort[i];
       }
+    }
 
-      for (size_t i = 0; i < fleet->age_to_length_conversion.size(); i++) {
-        if (this->age_to_length_conversion[i].estimation_type_m.get() ==
-            "constant") {
-          this->age_to_length_conversion[i].final_value_m =
-              this->age_to_length_conversion[i].initial_value_m;
-        } else {
-          this->age_to_length_conversion[i].final_value_m =
-              fleet->age_to_length_conversion[i];
-        }
+    for (size_t i = 0; i < this->log_q.size(); i++) {
+      if (this->log_q[i].estimation_type_m.get() == "constant") {
+        this->log_q[i].final_value_m = this->log_q[i].initial_value_m;
+      } else {
+        this->log_q[i].final_value_m = fleet->log_q[i];
       }
+    }
+
+    for (size_t i = 0; i < fleet->age_to_length_conversion.size(); i++) {
+      if (this->age_to_length_conversion[i].estimation_type_m.get() ==
+          "constant") {
+        this->age_to_length_conversion[i].final_value_m =
+            this->age_to_length_conversion[i].initial_value_m;
+      } else {
+        this->age_to_length_conversion[i].final_value_m =
+            fleet->age_to_length_conversion[i];
+      }
+    }
+
+    // Finalize derived quantities — landings
+    this->log_landings_expected.resize(fleet->log_landings_expected.size());
+    for (size_t i = 0; i < fleet->log_landings_expected.size(); i++) {
+      this->log_landings_expected[i].final_value_m =
+          fleet->log_landings_expected[i];
+    }
+
+    this->landings_expected.resize(fleet->landings_expected.size());
+    for (size_t i = 0; i < fleet->landings_expected.size(); i++) {
+      this->landings_expected[i].final_value_m = fleet->landings_expected[i];
+    }
+
+    this->landings_numbers_at_age.resize(fleet->landings_numbers_at_age.size());
+    for (size_t i = 0; i < fleet->landings_numbers_at_age.size(); i++) {
+      this->landings_numbers_at_age[i].final_value_m =
+          fleet->landings_numbers_at_age[i];
+    }
+
+    this->landings_weight_at_age.resize(fleet->landings_weight_at_age.size());
+    for (size_t i = 0; i < fleet->landings_weight_at_age.size(); i++) {
+      this->landings_weight_at_age[i].final_value_m =
+          fleet->landings_weight_at_age[i];
+    }
+
+    this->landings_numbers_at_length.resize(
+        fleet->landings_numbers_at_length.size());
+    for (size_t i = 0; i < fleet->landings_numbers_at_length.size(); i++) {
+      this->landings_numbers_at_length[i].final_value_m =
+          fleet->landings_numbers_at_length[i];
+    }
+
+    this->landings_weight.resize(fleet->landings_weight.size());
+    for (size_t i = 0; i < fleet->landings_weight.size(); i++) {
+      this->landings_weight[i].final_value_m = fleet->landings_weight[i];
+    }
+
+    this->landings_numbers.resize(fleet->landings_numbers.size());
+    for (size_t i = 0; i < fleet->landings_numbers.size(); i++) {
+      this->landings_numbers[i].final_value_m = fleet->landings_numbers[i];
+    }
+
+    // Finalize derived quantities — age/length composition
+    this->agecomp_expected.resize(fleet->agecomp_expected.size());
+    for (size_t i = 0; i < fleet->agecomp_expected.size(); i++) {
+      this->agecomp_expected[i].final_value_m = fleet->agecomp_expected[i];
+    }
+
+    this->agecomp_proportion.resize(fleet->agecomp_proportion.size());
+    for (size_t i = 0; i < fleet->agecomp_proportion.size(); i++) {
+      this->agecomp_proportion[i].final_value_m = fleet->agecomp_proportion[i];
+    }
+
+    this->lengthcomp_expected.resize(fleet->lengthcomp_expected.size());
+    for (size_t i = 0; i < fleet->lengthcomp_expected.size(); i++) {
+      this->lengthcomp_expected[i].final_value_m = fleet->lengthcomp_expected[i];
+    }
+
+    this->lengthcomp_proportion.resize(fleet->lengthcomp_proportion.size());
+    for (size_t i = 0; i < fleet->lengthcomp_proportion.size(); i++) {
+      this->lengthcomp_proportion[i].final_value_m =
+          fleet->lengthcomp_proportion[i];
+    }
+
+    // Finalize derived quantities — index/survey
+    this->log_index_expected.resize(fleet->log_index_expected.size());
+    for (size_t i = 0; i < fleet->log_index_expected.size(); i++) {
+      this->log_index_expected[i].final_value_m = fleet->log_index_expected[i];
+    }
+
+    this->index_expected.resize(fleet->index_expected.size());
+    for (size_t i = 0; i < fleet->index_expected.size(); i++) {
+      this->index_expected[i].final_value_m = fleet->index_expected[i];
+    }
+
+    this->index_numbers_at_age.resize(fleet->index_numbers_at_age.size());
+    for (size_t i = 0; i < fleet->index_numbers_at_age.size(); i++) {
+      this->index_numbers_at_age[i].final_value_m =
+          fleet->index_numbers_at_age[i];
+    }
+
+    this->index_weight_at_age.resize(fleet->index_weight_at_age.size());
+    for (size_t i = 0; i < fleet->index_weight_at_age.size(); i++) {
+      this->index_weight_at_age[i].final_value_m = fleet->index_weight_at_age[i];
+    }
+
+    this->index_numbers_at_length.resize(fleet->index_numbers_at_length.size());
+    for (size_t i = 0; i < fleet->index_numbers_at_length.size(); i++) {
+      this->index_numbers_at_length[i].final_value_m =
+          fleet->index_numbers_at_length[i];
+    }
+
+    this->index_weight.resize(fleet->index_weight.size());
+    for (size_t i = 0; i < fleet->index_weight.size(); i++) {
+      this->index_weight[i].final_value_m = fleet->index_weight[i];
+    }
+
+    this->index_numbers.resize(fleet->index_numbers.size());
+    for (size_t i = 0; i < fleet->index_numbers.size(); i++) {
+      this->index_numbers[i].final_value_m = fleet->index_numbers[i];
+    }
+
+    this->catch_index.resize(fleet->catch_index.size());
+    for (size_t i = 0; i < fleet->catch_index.size(); i++) {
+      this->catch_index[i].final_value_m = fleet->catch_index[i];
     }
   }
 
@@ -470,6 +619,40 @@ class FleetInterface : public FleetInterfaceBase {
       info->variable_map[this->age_to_length_conversion.id_m] =
           &(fleet)->age_to_length_conversion;
     }
+
+    // Link all derived quantity vectors to variable_map
+    // (these are resized in CatchAtAge::Initialize(); linking the pointer here
+    // is safe because resize does not move the fims::Vector object itself)
+    info->variable_map[this->log_landings_expected.id_m] =
+        &(fleet)->log_landings_expected;
+    info->variable_map[this->log_index_expected.id_m] =
+        &(fleet)->log_index_expected;
+    info->variable_map[this->agecomp_expected.id_m] = &(fleet)->agecomp_expected;
+    info->variable_map[this->agecomp_proportion.id_m] =
+        &(fleet)->agecomp_proportion;
+    info->variable_map[this->lengthcomp_expected.id_m] =
+        &(fleet)->lengthcomp_expected;
+    info->variable_map[this->lengthcomp_proportion.id_m] =
+        &(fleet)->lengthcomp_proportion;
+    info->variable_map[this->landings_numbers_at_age.id_m] =
+        &(fleet)->landings_numbers_at_age;
+    info->variable_map[this->landings_weight_at_age.id_m] =
+        &(fleet)->landings_weight_at_age;
+    info->variable_map[this->landings_numbers_at_length.id_m] =
+        &(fleet)->landings_numbers_at_length;
+    info->variable_map[this->landings_weight.id_m] = &(fleet)->landings_weight;
+    info->variable_map[this->landings_numbers.id_m] = &(fleet)->landings_numbers;
+    info->variable_map[this->landings_expected.id_m] = &(fleet)->landings_expected;
+    info->variable_map[this->index_numbers_at_age.id_m] =
+        &(fleet)->index_numbers_at_age;
+    info->variable_map[this->index_weight_at_age.id_m] =
+        &(fleet)->index_weight_at_age;
+    info->variable_map[this->index_numbers_at_length.id_m] =
+        &(fleet)->index_numbers_at_length;
+    info->variable_map[this->index_weight.id_m] = &(fleet)->index_weight;
+    info->variable_map[this->index_numbers.id_m] = &(fleet)->index_numbers;
+    info->variable_map[this->index_expected.id_m] = &(fleet)->index_expected;
+    info->variable_map[this->catch_index.id_m] = &(fleet)->catch_index;
 
     // add to Information
     info->fleets[fleet->id] = fleet;
