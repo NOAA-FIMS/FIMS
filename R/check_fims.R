@@ -123,8 +123,10 @@ setup_and_run_gtest <- function(...) {
 #' The following tests FAILED:
 #'           7 - dlognormTest.IntInput (Failed)
 #' Errors while running CTest
-#' Output from these tests are in: C:/github/NOAA-FIMS/FIMS/build/Testing/Temporary/LastTest.log
-#' Use "--rerun-failed --output-on-failure" to re-run the failed cases verbosely.
+#' Output from these tests are in:
+#' C:/github/NOAA-FIMS/FIMS/build/Testing/Temporary/LastTest.log
+#' Use "--rerun-failed --output-on-failure" to re-run the failed cases
+#' verbosely.
 #' ```
 #' @param ... Additional arguments to `ctest --test-dir build` such as
 #'   `"--rerun-failed --output-on-failure"` or `--parallel 16` if you want it to

@@ -48,7 +48,9 @@ utils::globalVariables(c(
 #'         "Logistic" for a "Selectivity" module).}
 #'       \item{\code{distribution_link}:}{The component the distribution module
 #'         links to.}
-#'       \item{\code{distribution_type}:}{The type of distribution (e.g., "Data",
+#'       \item{\code{distribution_type}:}{
+#'         The type of distribution (e.g., "Data", "process").
+#'       }
 #'         "process").}
 #'       \item{\code{distribution}:}{The name of distribution (e.g.,
 #'         "Dlnorm", `Dmultinom`).}
@@ -82,7 +84,10 @@ utils::globalVariables(c(
 #'     by = c("module_name", "fleet_name")
 #'   ) |>
 #'   print()
-create_default_configurations <- function(data, model_family = c("catch_at_age")) {
+create_default_configurations <- function(
+  data,
+  model_family = c("catch_at_age")
+) {
   # Check if the input object is a FIMSFrame, aborting if not.
   if (!inherits(data, "FIMSFrame")) {
     cli::cli_abort(
@@ -98,7 +103,8 @@ create_default_configurations <- function(data, model_family = c("catch_at_age")
   model_family <- match.arg(model_family)
 
   # Extract unique combinations of fleet names and data types from the data.
-  # This forms the basis for determining which modules are needed for each fleet.
+  # This forms the basis for determining which modules are needed
+  # for each fleet.
   unique_fleet_types <- data |>
     get_data() |>
     dplyr::distinct(name, type) |>
@@ -118,7 +124,8 @@ create_default_configurations <- function(data, model_family = c("catch_at_age")
   # Define a template for data modules (comps, landings, index).
   # This specifies the default distribution for each type of data.
   data_config_template <- dplyr::tribble(
-    ~module_name, ~module_type, ~distribution_link, ~distribution_type, ~distribution,
+    ~module_name, ~module_type, ~distribution_link,
+    ~distribution_type, ~distribution,
     "Data", "Landings", "Landings", "Data", "Dlnorm",
     "Data", "Index", "Index", "Data", "Dlnorm",
     "Data", "AgeComp", "AgeComp", "Data", "Dmultinom",
@@ -148,7 +155,8 @@ create_default_configurations <- function(data, model_family = c("catch_at_age")
 
     # Define a template for standard, non-fleet-specific modules.
     other_config <- dplyr::tribble(
-      ~module_name, ~module_type, ~distribution_link, ~distribution_type, ~distribution,
+      ~module_name, ~module_type, ~distribution_link,
+      ~distribution_type, ~distribution,
       "Recruitment", "BevertonHolt", "log_devs", "process", "Dnorm",
       "Growth", "EWAA", NA_character_, NA_character_, NA_character_,
       "Maturity", "Logistic", NA_character_, NA_character_, NA_character_

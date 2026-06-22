@@ -28,7 +28,7 @@ class GrowthDerivedSizeProvider : public SizeDistributionProviderBase<Type> {
 
   explicit GrowthDerivedSizeProvider(
       std::shared_ptr<GrowthDerivedObservationBase<Type>> growth)
-      : growth_source_(growth) {}
+      : growth_observation_(growth) {}
 
   const SizeGrid* TryGetSizeGrid() const override {
     return population_size_grid_;
@@ -51,18 +51,19 @@ class GrowthDerivedSizeProvider : public SizeDistributionProviderBase<Type> {
   void PrepareSizeProducts() override {
     if (!population_size_grid_) {
       throw std::runtime_error(
-          "GrowthDerivedSizeProvider requires a population size grid");
+          "GrowthDerivedSizeProvider requires a population biological size grid");
     }
 
     if (!population_size_grid_->IsConsistent()) {
       throw std::runtime_error(
           "GrowthDerivedSizeProvider requires a consistent population "
-          "size grid");
+          "biological size grid");
     }
 
     if (population_size_grid_->n_bins == 0) {
       throw std::runtime_error(
-          "GrowthDerivedSizeProvider requires at least one size bin");
+          "GrowthDerivedSizeProvider requires a population biological size grid"
+          " with at least one bin");
     }
 
     if (n_years_ == 0 || n_ages_ == 0) {
@@ -175,7 +176,7 @@ class GrowthDerivedSizeProvider : public SizeDistributionProviderBase<Type> {
 
   void SetGrowth(
       std::shared_ptr<GrowthDerivedObservationBase<Type>> growth) {
-    growth_source_ = growth;
+    growth_observation_ = growth;
     size_products_prepared_ = false;
     plus_group_warning_emitted_ = false;
   }
@@ -187,8 +188,8 @@ class GrowthDerivedSizeProvider : public SizeDistributionProviderBase<Type> {
                              std::size_t size_bin_index) const {
     if (!population_size_grid_ || population_size_grid_->n_bins == 0) {
       throw std::runtime_error(
-          "GrowthDerivedSizeProvider requires a population size grid "
-          "before computing ProbSize");
+          "GrowthDerivedSizeProvider requires a population biological size grid"
+          " before computing ProbSize");
     }
 
     const Type mean_laa = growth_products.MeanLAA(year_index, age_index, 0);
@@ -222,13 +223,13 @@ class GrowthDerivedSizeProvider : public SizeDistributionProviderBase<Type> {
   }
 
   const GrowthProducts<Type>& PreparedGrowthProducts() const {
-    if (!growth_source_) {
+    if (!growth_observation_) {
       throw std::runtime_error(
           "GrowthDerivedSizeProvider requires a linked growth object");
     }
 
     const GrowthProducts<Type>* growth_products =
-        growth_source_->TryGetPreparedGrowthProducts();
+        growth_observation_->TryGetPreparedGrowthProducts();
 
     if (!growth_products) {
       throw std::runtime_error(
@@ -238,7 +239,7 @@ class GrowthDerivedSizeProvider : public SizeDistributionProviderBase<Type> {
     return *growth_products;
   }
 
-  std::shared_ptr<GrowthDerivedObservationBase<Type>> growth_source_;
+  std::shared_ptr<GrowthDerivedObservationBase<Type>> growth_observation_;
   const SizeGrid* population_size_grid_ = nullptr;
   std::size_t n_years_ = 0;
   std::size_t n_ages_ = 0;

@@ -31,29 +31,29 @@ namespace fims_popdy {
  */
 template <typename Type>
 struct GrowthDerivedALK : public ALKBase<Type> {
-  std::weak_ptr<Fleet<Type>> fleet; /**< non-owning link to the fleet */
+  std::weak_ptr<Fleet<Type>> fleet_; /**< non-owning link to the fleet */
   std::weak_ptr<SizeDistributionProviderBase<Type>>
-      size_provider; /**< non-owning link to the population size provider */
+      size_provider_; /**< non-owning link to the population size provider */
   std::shared_ptr<GrowthDerivedObservationBase<Type>>
-      growth_observation; /**< growth-derived observation capability */
+      growth_observation_; /**< growth-derived observation capability */
 
   /**
    * @brief Constructor.
-   * @param fleet Shared pointer to the fleet using this ALK.
-   * @param growth_observation Shared pointer to the growth-derived
+   * @param fleet_ Shared pointer to the fleet using this ALK.
+   * @param growth_observation_ Shared pointer to the growth-derived
    * observation capability.
-   * @param size_provider Shared pointer to the population size provider.
+   * @param size_provider_ Shared pointer to the population size provider.
    */
   GrowthDerivedALK(
-      const std::shared_ptr<Fleet<Type>>& fleet,
+      const std::shared_ptr<Fleet<Type>>& fleet_,
       const std::shared_ptr<GrowthDerivedObservationBase<Type>>&
-          growth_observation,
+          growth_observation_,
       const std::shared_ptr<SizeDistributionProviderBase<Type>>&
-          size_provider)
+          size_provider_)
       : ALKBase<Type>(),
-        fleet(fleet),
-        size_provider(size_provider),
-        growth_observation(growth_observation) {}
+        fleet_(fleet_),
+        size_provider_(size_provider_),
+        growth_observation_(growth_observation_) {}
 
   /**
    * @brief Destructor.
@@ -62,18 +62,18 @@ struct GrowthDerivedALK : public ALKBase<Type> {
 
   /**
    * @brief Returns whether this growth-derived ALK is structurally active.
-   * @return True if the linked fleet and growth object are valid and the fleet
-   * has a consistent explicit bin definition.
+   * @return True if the linked fleet, population size provider, and growth
+   * observation are valid and the fleet has consistent observation-bin geometry.
    */
   virtual bool IsActive() const override {
-    std::shared_ptr<Fleet<Type>> fleet_ptr = fleet.lock();
+    std::shared_ptr<Fleet<Type>> fleet_ptr = fleet_.lock();
     std::shared_ptr<SizeDistributionProviderBase<Type>> size_provider_ptr =
-        size_provider.lock();
+        size_provider_.lock();
 
     return fleet_ptr != nullptr &&
            size_provider_ptr != nullptr &&
-           growth_observation != nullptr &&
-           growth_observation->SupportsGrowthDerivedALK() &&
+           growth_observation_ != nullptr &&
+           growth_observation_->SupportsGrowthDerivedALK() &&
            fleet_ptr->n_ages > 0 &&
            fleet_ptr->n_lengths > 0 &&
            fleet_ptr->lengths.size() == fleet_ptr->n_lengths &&
@@ -107,7 +107,7 @@ struct GrowthDerivedALK : public ALKBase<Type> {
 
     const GrowthProducts<Type>* growth_products = TryGetGrowthProducts();
     if (growth_products == nullptr) {
-      growth_observation->PrepareGrowthProducts();
+      growth_observation_->PrepareGrowthProducts();
       growth_products = TryGetGrowthProducts();
     }
 
@@ -131,7 +131,7 @@ struct GrowthDerivedALK : public ALKBase<Type> {
                            size_t age,
                            fims::Vector<Type>& out_row) const override {
     out_row = BuildMappedFleetALKRow(year, age);
-    std::shared_ptr<Fleet<Type>> fleet_ptr = fleet.lock();
+    std::shared_ptr<Fleet<Type>> fleet_ptr = fleet_.lock();
     return fleet_ptr != nullptr && out_row.size() == fleet_ptr->n_lengths;
   }
 
@@ -184,7 +184,7 @@ struct GrowthDerivedALK : public ALKBase<Type> {
    */
   fims::Vector<Type> BuildMappedFleetALKRow(std::size_t year_index,
                                             std::size_t age_index) const {
-    std::shared_ptr<Fleet<Type>> fleet_ptr = fleet.lock();
+    std::shared_ptr<Fleet<Type>> fleet_ptr = fleet_.lock();
     std::shared_ptr<SizeDistributionProviderBase<Type>> size_provider_ptr =
         TryGetSizeProvider();
 
@@ -251,7 +251,7 @@ struct GrowthDerivedALK : public ALKBase<Type> {
    * @return Shared pointer to the size provider, or nullptr if unavailable.
    */
   std::shared_ptr<SizeDistributionProviderBase<Type>> TryGetSizeProvider() const {
-    return size_provider.lock();
+    return size_provider_.lock();
   }
 
   /**
@@ -259,12 +259,12 @@ struct GrowthDerivedALK : public ALKBase<Type> {
    * @return Pointer to prepared growth products, or nullptr if unavailable.
    */
   const GrowthProducts<Type>* TryGetGrowthProducts() const {
-    if (growth_observation == nullptr ||
-        !growth_observation->SupportsGrowthDerivedALK()) {
+    if (growth_observation_ == nullptr ||
+        !growth_observation_->SupportsGrowthDerivedALK()) {
       return nullptr;
     }
 
-    return growth_observation->TryGetPreparedGrowthProducts();
+    return growth_observation_->TryGetPreparedGrowthProducts();
   }
 };
 

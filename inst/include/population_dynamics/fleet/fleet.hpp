@@ -27,8 +27,10 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
   static uint32_t id_g; /*!< reference id for fleet object*/
   size_t n_years;       /*!< the number of years in the model*/
   size_t n_ages;        /*!< the number of ages in the model*/
-  size_t n_lengths;     /*!< the number of observed length bins for this fleet*/
-  fims::Vector<double> lengths; /*!< Observed length-bin centers for this fleet.
+  size_t n_lengths; /*!< the number of fleet observation bins for this
+                         fleet */
+  fims::Vector<double>
+      lengths; /*!< Fleet observation-bin centers for this fleet.
 These bins belong to the observation layer and are distinct from any
 population-level biological size grid. The centers are user-supplied bin
 definitions, not the canonical downstream geometry used for mapping. */
@@ -84,7 +86,8 @@ observation-bin geometry for downstream size mapping. */
       q; /*!< transformed parameter: the catchability of the fleet */
 
   fims::Vector<Type>
-      age_to_length_conversion; /*!< derived age-to-length conversion matrix */
+      age_to_length_conversion; /*!< derived fleet age-to-length conversion
+                                     matrix */
 
   /**
    * @brief Constructor.

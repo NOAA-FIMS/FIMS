@@ -63,8 +63,8 @@ struct SizeBinMapping {
 
   /**
    * @brief Build overlap-based rebinning weights from source bins to destination bins.
-   * @param source_edges Source-bin edges.
-   * @param destination_edges Destination-bin edges.
+   * @param source_edges Population biological size-grid edges.
+   * @param destination_edges Fleet observation-bin edges.
    * @return Matrix of weights stored as [destination_bin][source_bin].
    *
    * This helper performs geometric rebinning only. It requires destination
@@ -115,8 +115,8 @@ struct SizeBinMapping {
 
   /**
    * @brief Check that the destination edges fully cover the source-bin range.
-   * @param source_edges Source-bin edges.
-   * @param destination_edges Destination-bin edges.
+   * @param source_edges Population biological size-grid edges.
+   * @param destination_edges Fleet observation-bin edges.
    * @return True when the destination range contains the full source range.
    */
   static bool DestinationCoversSourceRange(
@@ -135,8 +135,9 @@ struct SizeBinMapping {
   /**
    * @brief Return explicit mapping edges whose support covers the source range
    * while preserving the canonical destination bin breaks.
-   * @param source_edges Source-bin edges that must be covered.
-   * @param destination_edges Canonical destination observation-bin edges.
+   * @param source_edges Population biological size-grid edges that must be
+   * covered.
+   * @param destination_edges Fleet observation-bin edges.
    * @return Copy of destination edges with only the outer edges widened as
    * needed to cover the full source-bin range.
    *
@@ -176,8 +177,8 @@ struct SizeBinMapping {
   /**
    * @brief Apply rebinning weights to a source mass vector.
    * @param weights Overlap weights stored as [destination_bin][source_bin].
-   * @param source_mass Mass on the source bins.
-   * @return Rebinned mass on the destination bins.
+   * @param source_mass Mass on the population biological size bins.
+   * @return Rebinned mass on the fleet observation bins.
    */
   template <typename Type>
   static fims::Vector<Type> ApplyRebinWeights(
