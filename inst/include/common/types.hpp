@@ -96,7 +96,8 @@ fims::Distribution::Label StringToDistributionLabel(const std::string& name) {
     if (name == "Normal")     return fims::Distribution::Label::Normal;
     if (name == "Lognormal")    return fims::Distribution::Label::Lognormal;
     if (name == "Gamma")    return fims::Distribution::Label::Gamma;
-    if (name == "InvGamma") return fims::Distribution::Label::InvGamma;
+    if (name == "InvGamma" || name == "Invgamma")
+      return fims::Distribution::Label::InvGamma;
     throw std::invalid_argument("Unsupported distribution: " + name);
 }
 

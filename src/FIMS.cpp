@@ -16,7 +16,20 @@
 template<class Type>
 Type objective_function<Type>::operator()() {
 
-    DATA_INTEGER(do_mcmc);
+    int do_mcmc = 0;
+    SEXP data_names = Rf_getAttrib(TMB_OBJECTIVE_PTR->data, R_NamesSymbol);
+    if (!Rf_isNull(data_names)) {
+      R_xlen_t data_size = Rf_xlength(data_names);
+      for (R_xlen_t i = 0; i < data_size; i++) {
+        if (std::string(CHAR(STRING_ELT(data_names, i))) == "do_mcmc") {
+          SEXP do_mcmc_data = VECTOR_ELT(TMB_OBJECTIVE_PTR->data, i);
+          if (!Rf_isNull(do_mcmc_data)) {
+            do_mcmc = Rf_asInteger(do_mcmc_data);
+          }
+          break;
+        }
+      }
+    }
 
 
     PARAMETER_VECTOR(p);

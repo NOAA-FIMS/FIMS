@@ -179,7 +179,10 @@ class Model {  // may need singleton
 
 #ifdef TMB_MODEL
 
-    vector<Type> nll_components = nll_vec.to_tmb();
+    vector<Type> nll_components(nll_vec_idx);
+    for (int i = 0; i < nll_vec_idx; i++) {
+      nll_components(i) = nll_vec[i];
+    }
     FIMS_REPORT_F(nll_components, this->of);
     FIMS_REPORT_F(jnll, this->of);
 

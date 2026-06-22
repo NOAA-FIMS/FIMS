@@ -42,22 +42,26 @@ test_that("deterministic MCMC run works with correct inputs", {
 
   #' @description Compare FIMS obs var with correct value
   expect_equal(
-    result[["obj"]][["par"]][1] |> unname(), inits_true[["sigma2_obs"]]
+    result[["obj"]][["par"]][1] |> unname(),
+    inits_true[["sigma2_obs"]] |> sqrt() |> log()
   )
 
   #' @description Compare FIMS growth rate with correct value
   expect_equal(
-    result[["obj"]][["par"]][2] |> unname(), inits_true[["growth_rate"]]
+    result[["obj"]][["par"]][2] |> unname(),
+    inits_true[["growth_rate"]] |> log()
   )
 
   #' @description Compare FIMS carrying capacity with correct value
   expect_equal(
-    result[["obj"]][["par"]][3] |> unname(), inits_true[["carrying_capacity"]]
+    result[["obj"]][["par"]][3] |> unname(),
+    inits_true[["carrying_capacity"]] |> log()
   )
 
   #' @description Compare FIMS depletion var with correct value
   expect_equal(
-    result[["obj"]][["par"]][4] |> unname(), inits_true[["sigma2_depletion"]]
+    result[["obj"]][["par"]][4] |> unname(),
+    inits_true[["sigma2_depletion"]] |> sqrt() |> log()
   )
 
   #' @description Compare FIMS carrying capacity with correct value, use tolerance as value is approximated using marginalization method
@@ -93,9 +97,19 @@ test_that("deterministic MCMC run works with correct inputs", {
       carrying_capacity_prior[2], TRUE
   )
 
+  dinvgamma <- function(x, shape, scale, logscale = TRUE) {
+    ret <- -shape * log(scale) - lgamma(shape) -
+      (shape + 1) * log(x) - 1 / (scale * x)
+    if (logscale) ret else exp(ret)
+  }
+  nll_sigma2_obs <- -dinvgamma(inits_true$sigma2_obs, 1.708603, 116.0921)
+  nll_sigma2_depletion <- -dinvgamma(
+    inits_true$sigma2_depletion, 3.785518, 97.81864
+  )
+
   # depletion nll
   sd_depletion <- inits_true[["sigma2_depletion"]] |> sqrt()
-  nll_depletion <- -dlnorm(inits_true[["depletion"]],
+  nll_depletion <- -dnorm(inits_true[["depletion"]] |> log(),
       result$report$log_depletion_expected |> unlist(),
       sd_depletion, 
       TRUE
@@ -109,7 +123,14 @@ test_that("deterministic MCMC run works with correct inputs", {
   nll_index <- -dnorm(obs, mean, sd, TRUE) |> sum()
 
   #' @description Check that FIMS nll matches expected nlls
-  expect_equal(c(nll_growth_rate, nll_carrying_capacity, nll_index, nll_depletion), 
+  expect_equal(c(
+    nll_growth_rate,
+    nll_carrying_capacity,
+    nll_sigma2_obs,
+    nll_sigma2_depletion,
+    nll_index,
+    nll_depletion
+  ),
     result$report$nll_components)
 
   clear()

@@ -167,10 +167,8 @@ struct DensityComponentBase : public fims_model_object::FIMSObject<Type> {
     if (this->input_type == "random_effects") {
       return (*re).size();
     }
-    // TODO: this handles a scalar prior that is shared across multiple modules
-    // Need to develop this further for time-varying priors. 
     if (this->input_type == "prior") {
-      return priors.size();
+      return transformed_priors.size();
     }
     return observed_values.size();
   }
