@@ -210,11 +210,174 @@ class FisheryModelInterfaceBase : public FIMSRcppInterfaceBase {
 };
 
 /**
+ * @brief Rcpp interface for catch-at-age population derived quantities.
+ *
+ * @details This interface avoids keyed containers so derived quantities can be
+ * exposed to R as explicit RealVector members.
+ */
+class CatchAtAgePopulationDerivedQuantitiesInterface {
+ public:
+  RealVector total_landings_weight;
+  RealVector total_landings_numbers;
+  RealVector mortality_F;
+  RealVector mortality_M;
+  RealVector mortality_Z;
+  RealVector numbers_at_age;
+  RealVector unfished_numbers_at_age;
+  RealVector biomass;
+  RealVector spawning_biomass;
+  RealVector unfished_biomass;
+  RealVector unfished_spawning_biomass;
+  RealVector proportion_mature_at_age;
+  RealVector expected_recruitment;
+  RealVector sum_selectivity;
+
+  /**
+   * @brief Resize all population derived quantities.
+   *
+   * @param n_years Number of model years.
+   * @param n_ages Number of ages.
+   */
+  void Initialize(size_t n_years, size_t n_ages) {
+    total_landings_weight.resize(n_years);
+    total_landings_numbers.resize(n_years);
+    mortality_F.resize(n_years * n_ages);
+    mortality_M.resize(n_years * n_ages);
+    mortality_Z.resize(n_years * n_ages);
+    numbers_at_age.resize((n_years + 1) * n_ages);
+    unfished_numbers_at_age.resize((n_years + 1) * n_ages);
+    biomass.resize(n_years + 1);
+    spawning_biomass.resize(n_years + 1);
+    unfished_biomass.resize(n_years + 1);
+    unfished_spawning_biomass.resize(n_years + 1);
+    proportion_mature_at_age.resize((n_years + 1) * n_ages);
+    expected_recruitment.resize(n_years + 1);
+    sum_selectivity.resize(n_years * n_ages);
+  }
+
+  /**
+   * @brief Reset all population derived quantities to a value.
+   *
+   * @param value Value to assign to all entries.
+   */
+  void Fill(double value = 0.0) {
+    total_landings_weight.fill(value);
+    total_landings_numbers.fill(value);
+    mortality_F.fill(value);
+    mortality_M.fill(value);
+    mortality_Z.fill(value);
+    numbers_at_age.fill(value);
+    unfished_numbers_at_age.fill(value);
+    biomass.fill(value);
+    spawning_biomass.fill(value);
+    unfished_biomass.fill(value);
+    unfished_spawning_biomass.fill(value);
+    proportion_mature_at_age.fill(value);
+    expected_recruitment.fill(value);
+    sum_selectivity.fill(value);
+  }
+};
+
+/**
+ * @brief Rcpp interface for catch-at-age fleet derived quantities.
+ *
+ * @details This interface avoids keyed containers so derived quantities can be
+ * exposed to R as explicit RealVector members.
+ */
+class CatchAtAgeFleetDerivedQuantitiesInterface {
+ public:
+  RealVector landings_numbers_at_age;
+  RealVector landings_weight_at_age;
+  RealVector landings_numbers_at_length;
+  RealVector landings_weight;
+  RealVector landings_numbers;
+  RealVector landings_expected;
+  RealVector log_landings_expected;
+  RealVector agecomp_proportion;
+  RealVector lengthcomp_proportion;
+  RealVector index_numbers_at_age;
+  RealVector index_weight_at_age;
+  RealVector index_numbers_at_length;
+  RealVector index_weight;
+  RealVector index_numbers;
+  RealVector index_expected;
+  RealVector log_index_expected;
+  RealVector catch_index;
+  RealVector expected_catch;
+  RealVector expected_index;
+  RealVector agecomp_expected;
+  RealVector lengthcomp_expected;
+
+  /**
+   * @brief Resize all fleet derived quantities.
+   *
+   * @param n_years Number of model years.
+   * @param n_ages Number of ages.
+   * @param n_lengths Number of lengths.
+   */
+  void Initialize(size_t n_years, size_t n_ages, size_t n_lengths) {
+    landings_numbers_at_age.resize(n_years * n_ages);
+    landings_weight_at_age.resize(n_years * n_ages);
+    landings_numbers_at_length.resize(n_years * n_lengths);
+    landings_weight.resize(n_years);
+    landings_numbers.resize(n_years);
+    landings_expected.resize(n_years);
+    log_landings_expected.resize(n_years);
+    agecomp_proportion.resize(n_years * n_ages);
+    lengthcomp_proportion.resize(n_years * n_lengths);
+    index_numbers_at_age.resize(n_years * n_ages);
+    index_weight_at_age.resize(n_years * n_ages);
+    index_numbers_at_length.resize(n_years * n_lengths);
+    index_weight.resize(n_years);
+    index_numbers.resize(n_years);
+    index_expected.resize(n_years);
+    log_index_expected.resize(n_years);
+    catch_index.resize(n_years);
+    expected_catch.resize(n_years);
+    expected_index.resize(n_years);
+    agecomp_expected.resize(n_years * n_ages);
+    lengthcomp_expected.resize(n_years * n_lengths);
+  }
+
+  /**
+   * @brief Reset all fleet derived quantities to a value.
+   *
+   * @param value Value to assign to all entries.
+   */
+  void Fill(double value = 0.0) {
+    landings_numbers_at_age.fill(value);
+    landings_weight_at_age.fill(value);
+    landings_numbers_at_length.fill(value);
+    landings_weight.fill(value);
+    landings_numbers.fill(value);
+    landings_expected.fill(value);
+    log_landings_expected.fill(value);
+    agecomp_proportion.fill(value);
+    lengthcomp_proportion.fill(value);
+    index_numbers_at_age.fill(value);
+    index_weight_at_age.fill(value);
+    index_numbers_at_length.fill(value);
+    index_weight.fill(value);
+    index_numbers.fill(value);
+    index_expected.fill(value);
+    log_index_expected.fill(value);
+    catch_index.fill(value);
+    expected_catch.fill(value);
+    expected_index.fill(value);
+    agecomp_expected.fill(value);
+    lengthcomp_expected.fill(value);
+  }
+};
+
+/**
  * @brief The CatchAtAgeInterface class is used to interface with the
  * CatchAtAge model. It inherits from the FisheryModelInterfaceBase class.
  */
 class CatchAtAgeInterface : public FisheryModelInterfaceBase {
  public:
+  CatchAtAgePopulationDerivedQuantitiesInterface population_derived_quantities;
+  CatchAtAgeFleetDerivedQuantitiesInterface fleet_derived_quantities;
+
   /**
    * @brief The constructor.
    */
@@ -231,7 +394,9 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
    * @param other
    */
   CatchAtAgeInterface(const CatchAtAgeInterface &other)
-      : FisheryModelInterfaceBase(other) {}
+      : FisheryModelInterfaceBase(other),
+        population_derived_quantities(other.population_derived_quantities),
+        fleet_derived_quantities(other.fleet_derived_quantities) {}
 
   /**
    * Method to add a population id to the set of population ids.
@@ -248,6 +413,28 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
       FIMS_ERROR_LOG("Population with id " + fims::to_string(id) +
                      " not found.");
     }
+  }
+
+  /**
+   * @brief Initialize Rcpp population derived quantities.
+   *
+   * @param n_years Number of model years.
+   * @param n_ages Number of ages.
+   */
+  void InitializePopulationDerivedQuantities(size_t n_years, size_t n_ages) {
+    population_derived_quantities.Initialize(n_years, n_ages);
+  }
+
+  /**
+   * @brief Initialize Rcpp fleet derived quantities.
+   *
+   * @param n_years Number of model years.
+   * @param n_ages Number of ages.
+   * @param n_lengths Number of lengths.
+   */
+  void InitializeFleetDerivedQuantities(size_t n_years, size_t n_ages,
+                                        size_t n_lengths) {
+    fleet_derived_quantities.Initialize(n_years, n_ages, n_lengths);
   }
 
   /**

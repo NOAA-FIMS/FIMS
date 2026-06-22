@@ -4,6 +4,8 @@
 #' @export LogDevsRecruitmentProcess
 #' @export LogRRecruitmentProcess
 #' @export CatchAtAge
+#' @export CatchAtAgeFleetDerivedQuantities
+#' @export CatchAtAgePopulationDerivedQuantities
 #' @export clear
 #' @export CreateTMBModel
 #' @export DlnormDistribution

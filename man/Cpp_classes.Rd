@@ -5,6 +5,8 @@
 \alias{AgeComp}
 \alias{BevertonHoltRecruitment}
 \alias{CatchAtAge}
+\alias{CatchAtAgeFleetDerivedQuantities}
+\alias{CatchAtAgePopulationDerivedQuantities}
 \alias{DlnormDistribution}
 \alias{DmultinomDistribution}
 \alias{DnormDistribution}
@@ -36,6 +38,8 @@ docs.
 \item \href{https://noaa-fims.github.io/FIMS/doxygen/classAgeCompDataInterface.html}{AgeComp}
 \item \href{https://noaa-fims.github.io/FIMS/doxygen/classBevertonHoltRecruitmentInterface.html}{BevertonHoltRecruitment}
 \item \href{https://noaa-fims.github.io/FIMS/doxygen/classCatchAtAgeInterface.html}{CatchAtAge}
+\item \href{https://noaa-fims.github.io/FIMS/doxygen/classCatchAtAgeFleetDerivedQuantitiesInterface.html}{CatchAtAgeFleetDerivedQuantities}
+\item \href{https://noaa-fims.github.io/FIMS/doxygen/classCatchAtAgePopulationDerivedQuantitiesInterface.html}{CatchAtAgePopulationDerivedQuantities}
 \item \href{https://noaa-fims.github.io/FIMS/doxygen/classDlnormDistributionsInterface.html}{DlnormDistribution}
 \item \href{https://noaa-fims.github.io/FIMS/doxygen/classDmultinomDistributionsInterface.html}{DmultinomDistribution}
 \item \href{https://noaa-fims.github.io/FIMS/doxygen/classDnormDistributionsInterface.html}{DnormDistribution}
@@ -62,4 +66,3 @@ docs.
 
 \href{https://noaa-fims.github.io/FIMS/doxygen/}{NOAA-FIMS C++ Documentation}
 }
-
