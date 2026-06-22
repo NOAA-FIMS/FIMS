@@ -324,6 +324,7 @@ void clear() {
 
   FisheryModelInterfaceBase::id_g = 1;
   FisheryModelInterfaceBase::live_objects.clear();
+  CatchAtAgeDerivedQuantitiesIdAllocator::id_g = 1000000000;
 
   clear_internal<TMB_FIMS_REAL_TYPE>();
   clear_internal<TMBAD_FIMS_TYPE>();
