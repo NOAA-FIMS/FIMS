@@ -1093,7 +1093,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
     fims::Vector<Type> alk_row;
     BuildGrowthDerivedALKRowOrThrow(growth_alk, fleet, year, age, alk_row);
 
-    return MeanWeightFromALKRow(growth_alk->growth_observation,
+    return MeanWeightFromALKRow(growth_alk->growth_observation_,
                                 fleet,
                                 alk_row);
   }
@@ -1861,7 +1861,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
                       growth_alk, fleet, y, a, alk_row);
 
                   growth_derived_mean_WAA[i_age_year] =
-                      MeanWeightFromALKRow(growth_alk->growth_observation,
+                      MeanWeightFromALKRow(growth_alk->growth_observation_,
                                            fleet,
                                            alk_row);
 
