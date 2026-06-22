@@ -155,6 +155,18 @@ gtest_discover_tests(info_setup_random_effects)
  )
  gtest_discover_tests(info_setup_priors)
 
+# test_info_size_grid.cpp
+add_executable(info_size_grid
+  test_info_size_grid.cpp
+)
+
+target_link_libraries(info_size_grid
+  gtest_main
+  fims_test
+)
+
+gtest_discover_tests(info_size_grid)
+
 # test_population_dynamics_recruitment_base.cpp
 add_executable(population_dynamics_recruitment_base
 test_population_dynamics_recruitment_base.cpp

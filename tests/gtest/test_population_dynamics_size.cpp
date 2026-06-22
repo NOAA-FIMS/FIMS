@@ -1,6 +1,7 @@
 #include <memory>
 #include <cmath>
 #include "common/fims_math.hpp"
+#include "common/def.hpp"
 
 #include "gtest/gtest.h"
 
@@ -166,6 +167,37 @@ TEST(GrowthDerivedSizeProvider,
   provider.PrepareSizeProducts();
 
   EXPECT_GT(provider.ProbSize(0, 0, grid.n_bins - 1), 0.99);
+}
+
+TEST(GrowthDerivedSizeProvider,
+     PrepareSizeProductsWarnsWhenTerminalPlusGroupBinExceedsThreshold) {
+  fims::FIMSLog::fims_log->clear();
+
+  const auto growth = MakePreparedGrowth(10.0, 0.2);
+  const fims_popdy::SizeGrid grid =
+      fims_popdy::SizeGridBuilder::BuildFromEdges({0.0, 1.0, 2.0, 3.0});
+
+  fims_popdy::GrowthDerivedSizeProvider<double> provider(growth);
+  provider.SetPopulationSizeGrid(&grid);
+  provider.SetPopulationDimensions(1, 1);
+
+  ASSERT_NO_THROW(provider.PrepareSizeProducts());
+
+  EXPECT_GT(fims::FIMSLog::fims_log->get_warning_count(), 0u);
+  EXPECT_NE(
+      fims::FIMSLog::fims_log->get_warnings().find(
+          "terminal biological plus-group bin"),
+      std::string::npos);
+
+  const std::size_t warning_count_after_first_prepare =
+      fims::FIMSLog::fims_log->get_warning_count();
+
+  ASSERT_NO_THROW(provider.PrepareSizeProducts());
+
+  EXPECT_EQ(fims::FIMSLog::fims_log->get_warning_count(),
+            warning_count_after_first_prepare);
+
+  fims::FIMSLog::fims_log->clear();
 }
 
 TEST(GrowthDerivedSizeProvider,
