@@ -644,16 +644,16 @@ RCPP_MODULE(fims) {
       .method("AddPopulation", &CatchAtAgeInterface::AddPopulation)
       .method("InitializePopulationDerivedQuantities",
               &CatchAtAgeInterface::InitializePopulationDerivedQuantities)
+      .method("GetPopulationDerivedQuantities",
+              &CatchAtAgeInterface::GetPopulationDerivedQuantities)
       .method("InitializeFleetDerivedQuantities",
               &CatchAtAgeInterface::InitializeFleetDerivedQuantities)
+      .method("GetFleetDerivedQuantities",
+              &CatchAtAgeInterface::GetFleetDerivedQuantities)
       .method("get_output", &CatchAtAgeInterface::to_json)
       .method("GetId", &CatchAtAgeInterface::get_id)
       .method("DoReporting", &CatchAtAgeInterface::DoReporting)
-      .method("IsReporting", &CatchAtAgeInterface::IsReporting)
-      .field("population_derived_quantities",
-             &CatchAtAgeInterface::population_derived_quantities)
-      .field("fleet_derived_quantities",
-             &CatchAtAgeInterface::fleet_derived_quantities);
+      .method("IsReporting", &CatchAtAgeInterface::IsReporting);
 
   Rcpp::class_<SurplusProductionInterface>(
       "SurplusProduction",
