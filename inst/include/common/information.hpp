@@ -17,6 +17,7 @@
 #include <vector>
 
 #include "../distributions/distributions.hpp"
+#include "../likelihood/likelihood.hpp"
 #include "../models/functors/fishery_model_base.hpp"
 #include "../population_dynamics/fleet/fleet.hpp"
 #include "../population_dynamics/growth/growth.hpp"
@@ -139,6 +140,18 @@ class Information {
       density_components_iterator;
   /**< iterator for distribution objects>*/
 
+  // likelihoods
+  std::map<uint32_t,
+           std::shared_ptr<fims_likelihood::LikelihoodComponentBase<Type>>>
+      likelihood_components; /**< map to link each likelihood component to its
+                                shared location in memory */
+  typedef typename std::map<
+      uint32_t,
+      std::shared_ptr<
+          fims_likelihood::LikelihoodComponentBase<Type>>>::iterator
+      likelihood_components_iterator;
+  /**< iterator for likelihood objects>*/
+
   std::unordered_map<uint32_t,
                      std::shared_ptr<fims_popdy::FisheryModelBase<Type>>>
       models_map; /**<hash map of fishery models, e.g., CAA, GMACS, Spatial,
@@ -220,6 +233,7 @@ VariableMapEntry() {
     this->recruitment_process_models.clear();
     this->selectivity_models.clear();
     this->models_map.clear();
+    this->variable_map.clear();
     this->n_years = 0;
     this->n_ages = 0;
 
@@ -241,6 +255,7 @@ VariableMapEntry() {
       }
     }
     this->density_components.clear();
+    this->likelihood_components.clear();
   }
 
   /**

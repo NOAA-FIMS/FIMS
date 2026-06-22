@@ -13,6 +13,7 @@
 #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_depletion.hpp"
 #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_fleet.hpp"
 #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_growth.hpp"
+#include "../inst/include/interface/rcpp/rcpp_objects/rcpp_likelihood.hpp"
 #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_math.hpp"
 #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_maturity.hpp"
 #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_natural_mortality.hpp"
@@ -32,6 +33,12 @@ RCPP_EXPOSED_CLASS(SharedReal)
 RCPP_EXPOSED_CLASS(SharedBoolean)
 RCPP_EXPOSED_CLASS(CatchAtAgePopulationDerivedQuantitiesInterface)
 RCPP_EXPOSED_CLASS(CatchAtAgeFleetDerivedQuantitiesInterface)
+RCPP_EXPOSED_CLASS(LikelihoodInterfaceBase)
+RCPP_EXPOSED_CLASS(NormalLikelihoodInterface)
+RCPP_EXPOSED_CLASS(LognormalLikelihoodInterface)
+RCPP_EXPOSED_CLASS(GammaLikelihoodInterface)
+RCPP_EXPOSED_CLASS(InvGammaLikelihoodInterface)
+RCPP_EXPOSED_CLASS(MultinomialLikelihoodInterface)
 
 /**
  * @brief Define fims C++ functions and classes exposed in R
@@ -516,7 +523,7 @@ RCPP_MODULE(fims) {
       .field("log_shape", &DinvgammaDistributionsInterface::log_shape)
       .field("log_scale", &DinvgammaDistributionsInterface::log_scale);
 
-   Rcpp::class_<DmultinomDistributionsInterface>(
+  Rcpp::class_<DmultinomDistributionsInterface>(
       "DmultinomDistribution",
       "See "
       "https://noaa-fims.github.io/FIMS/doxygen/"
@@ -534,6 +541,74 @@ RCPP_MODULE(fims) {
       .field("expected_values",
              &DmultinomDistributionsInterface::expected_values)
       .field("dims", &DmultinomDistributionsInterface::dims);
+
+  Rcpp::class_<LikelihoodInterfaceBase>(
+      "LikelihoodBase",
+      "Base class for likelihood component interfaces.")
+      .method("set_role", &LikelihoodInterfaceBase::set_role)
+      .method("set_real_input", &LikelihoodInterfaceBase::set_real_input)
+      .method("set_parameter_input",
+              &LikelihoodInterfaceBase::set_parameter_input)
+      .field("observed_values", &LikelihoodInterfaceBase::observed_values)
+      .field("expected_values", &LikelihoodInterfaceBase::expected_values)
+      .field("real_input", &LikelihoodInterfaceBase::real_input)
+      .field("nll_components", &LikelihoodInterfaceBase::nll_components);
+
+  Rcpp::class_<NormalLikelihoodInterface>(
+      "NormalLikelihood",
+      "See "
+      "https://noaa-fims.github.io/FIMS/doxygen/"
+      "classNormalLikelihoodInterface.html.")
+      .constructor()
+      .derives<LikelihoodInterfaceBase>("LikelihoodBase")
+      .method("get_id", &NormalLikelihoodInterface::get_id)
+      .method("evaluate", &NormalLikelihoodInterface::evaluate)
+      .field("log_sd", &NormalLikelihoodInterface::log_sd);
+
+  Rcpp::class_<LognormalLikelihoodInterface>(
+      "LognormalLikelihood",
+      "See "
+      "https://noaa-fims.github.io/FIMS/doxygen/"
+      "classLognormalLikelihoodInterface.html.")
+      .constructor()
+      .derives<LikelihoodInterfaceBase>("LikelihoodBase")
+      .method("get_id", &LognormalLikelihoodInterface::get_id)
+      .method("evaluate", &LognormalLikelihoodInterface::evaluate)
+      .field("log_sd", &LognormalLikelihoodInterface::log_sd);
+
+  Rcpp::class_<GammaLikelihoodInterface>(
+      "GammaLikelihood",
+      "See "
+      "https://noaa-fims.github.io/FIMS/doxygen/"
+      "classGammaLikelihoodInterface.html.")
+      .constructor()
+      .derives<LikelihoodInterfaceBase>("LikelihoodBase")
+      .method("get_id", &GammaLikelihoodInterface::get_id)
+      .method("evaluate", &GammaLikelihoodInterface::evaluate)
+      .field("log_sd", &GammaLikelihoodInterface::log_sd);
+
+  Rcpp::class_<InvGammaLikelihoodInterface>(
+      "InvGammaLikelihood",
+      "See "
+      "https://noaa-fims.github.io/FIMS/doxygen/"
+      "classInvGammaLikelihoodInterface.html.")
+      .constructor()
+      .derives<LikelihoodInterfaceBase>("LikelihoodBase")
+      .method("get_id", &InvGammaLikelihoodInterface::get_id)
+      .method("evaluate", &InvGammaLikelihoodInterface::evaluate)
+      .field("log_shape", &InvGammaLikelihoodInterface::log_shape)
+      .field("log_scale", &InvGammaLikelihoodInterface::log_scale);
+
+  Rcpp::class_<MultinomialLikelihoodInterface>(
+      "MultinomialLikelihood",
+      "See "
+      "https://noaa-fims.github.io/FIMS/doxygen/"
+      "classMultinomialLikelihoodInterface.html.")
+      .constructor()
+      .derives<LikelihoodInterfaceBase>("LikelihoodBase")
+      .method("get_id", &MultinomialLikelihoodInterface::get_id)
+      .method("evaluate", &MultinomialLikelihoodInterface::evaluate)
+      .field("dims", &MultinomialLikelihoodInterface::dims);
 
   Rcpp::class_<CatchAtAgePopulationDerivedQuantitiesInterface>(
       "CatchAtAgePopulationDerivedQuantities",
