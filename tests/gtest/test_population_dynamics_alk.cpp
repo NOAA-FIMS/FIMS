@@ -1,5 +1,7 @@
 #include <cstddef>
 #include <memory>
+#include <cmath>
+#include <vector>
 
 #include "gtest/gtest.h"
 
@@ -100,22 +102,31 @@ void ConfigureAdapter(
 }
 
 /**
- * @brief Build a fleet with explicit test length bins.
+ * @brief Build a fleet with caller-supplied observation-bin centers.
  */
-std::shared_ptr<fims_popdy::Fleet<double>> MakeFleet() {
+std::shared_ptr<fims_popdy::Fleet<double>> MakeFleet(
+    const std::vector<double>& length_centers) {
   auto fleet = std::make_shared<fims_popdy::Fleet<double>>();
   fleet->n_years = 1;
   fleet->n_ages = 3;
-  fleet->n_lengths = 4;
-  fleet->lengths.resize(4);
-  fleet->lengths[0] = 200.0;
-  fleet->lengths[1] = 300.0;
-  fleet->lengths[2] = 400.0;
-  fleet->lengths[3] = 500.0;
+  fleet->n_lengths = length_centers.size();
+  fleet->lengths.resize(length_centers.size());
+
+  for (std::size_t i = 0; i < length_centers.size(); ++i) {
+    fleet->lengths[i] = length_centers[i];
+  }
+
   fleet->length_bin_edges =
       fims_popdy::SizeGridBuilder::BuildObservationEdgesFromCenters(
           fleet->lengths);
   return fleet;
+}
+
+/**
+ * @brief Build a fleet with explicit test length bins.
+ */
+std::shared_ptr<fims_popdy::Fleet<double>> MakeFleet() {
+  return MakeFleet({200.0, 300.0, 400.0, 500.0});
 }
 
 /**
@@ -468,7 +479,7 @@ TEST(GrowthDerivedALK, PrepareForCurrentStateReusesAlreadyPreparedProducts) {
   EXPECT_EQ(growth->prepare_calls, 1u);
 }
 
-TEST(GrowthDerivedALK, BuildALKRowReturnsNormalizedRow) {
+TEST(GrowthDerivedALK, BuildALKRowReturnsFiniteNonnegativeNormalizedRow) {
   auto fleet = MakeFleet();
 
   auto growth =
@@ -497,6 +508,7 @@ TEST(GrowthDerivedALK, BuildALKRowReturnsNormalizedRow) {
 
   double row_sum = 0.0;
   for (std::size_t i = 0; i < row.size(); ++i) {
+    EXPECT_TRUE(std::isfinite(row[i]));
     EXPECT_GE(row[i], 0.0);
     row_sum += row[i];
   }
@@ -529,6 +541,44 @@ TEST(GrowthDerivedALK, BuildALKRowFailsForOutOfRangeAge) {
   ASSERT_TRUE(alk.IsActive());
   ASSERT_TRUE(alk.PrepareForCurrentState());
   EXPECT_FALSE(alk.BuildALKRow(0, fleet->n_ages, row));
+}
+
+TEST(GrowthDerivedALK, BuildALKRowHandlesDifferentFleetBinLayout) {
+  auto fleet = MakeFleet({150.0, 250.0, 450.0, 700.0});
+
+  auto growth =
+      std::make_shared<fims_popdy::VonBertalanffyGrowthModelAdapter<double>>();
+  ConfigureAdapter(
+      *growth, 275.0, 725.0, 0.18, 1.0, 12.0, 2.5e-11, 3.0, 28.0, 73.0);
+  growth->SetAgeOffset(1.0);
+  growth->Initialize(1, fleet->n_ages, 1);
+
+  const fims_popdy::SizeGrid population_size_grid =
+      MakePopulationSizeGridForFleet(fleet);
+  std::shared_ptr<fims_popdy::SizeDistributionProviderBase<double>>
+      size_provider =
+          MakeConfiguredSizeProvider(
+              growth,
+              &population_size_grid,
+              fleet->n_years,
+              fleet->n_ages);
+
+  fims_popdy::GrowthDerivedALK<double> alk(fleet, growth, size_provider);
+  fims::Vector<double> row;
+
+  ASSERT_TRUE(alk.IsActive());
+  ASSERT_TRUE(alk.PrepareForCurrentState());
+  ASSERT_TRUE(alk.BuildALKRow(0, 1, row));
+  ASSERT_EQ(row.size(), fleet->n_lengths);
+
+  double row_sum = 0.0;
+  for (std::size_t i = 0; i < row.size(); ++i) {
+    EXPECT_TRUE(std::isfinite(row[i]));
+    EXPECT_GE(row[i], 0.0);
+    row_sum += row[i];
+  }
+
+  EXPECT_NEAR(row_sum, 1.0, 1e-5);
 }
 
 }  // namespace
