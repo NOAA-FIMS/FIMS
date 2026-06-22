@@ -14,6 +14,9 @@
 #' @export DoubleLogisticSelectivity
 #' @export EWAAGrowth
 #' @export Fleet
+#' @export GammaLikelihood
+#' @export InvGammaLikelihood
+#' @export LognormalLikelihood
 #' @export set_fixed
 #' @export get_fixed
 #' @export set_random
@@ -34,6 +37,8 @@
 #' @export log_warning
 #' @export LogisticMaturity
 #' @export LogisticSelectivity
+#' @export MultinomialLikelihood
+#' @export NormalLikelihood
 #' @export Parameter
 #' @export ParameterVector
 #' @export Population

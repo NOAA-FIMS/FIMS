@@ -14,6 +14,7 @@
 #include "rcpp_objects/rcpp_fleet.hpp"
 #include "rcpp_objects/rcpp_growth.hpp"
 #include "rcpp_objects/rcpp_interface_base.hpp"
+#include "rcpp_objects/rcpp_likelihood.hpp"
 #include "rcpp_objects/rcpp_maturity.hpp"
 #include "rcpp_objects/rcpp_models.hpp"
 #include "rcpp_objects/rcpp_natural_mortality.hpp"
@@ -321,6 +322,16 @@ void clear() {
 
   DmultinomDistributionsInterface::id_g = 1;
   DmultinomDistributionsInterface::live_objects.clear();
+
+  // rcpp_likelihood.hpp
+  LikelihoodInterfaceBase::id_g = 1;
+  LikelihoodInterfaceBase::live_objects.clear();
+
+  NormalLikelihoodInterface::live_objects.clear();
+  LognormalLikelihoodInterface::live_objects.clear();
+  GammaLikelihoodInterface::live_objects.clear();
+  InvGammaLikelihoodInterface::live_objects.clear();
+  MultinomialLikelihoodInterface::live_objects.clear();
 
   FisheryModelInterfaceBase::id_g = 1;
   FisheryModelInterfaceBase::live_objects.clear();

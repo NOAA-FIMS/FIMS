@@ -68,6 +68,11 @@ void register_fishery_models(Rcpp::Module &m);
  * \param m The Rcpp module to register functions in.
  */
 void register_maturity(Rcpp::Module &m);
+/**
+ * \brief Register the likelihood module.
+ * \param m The Rcpp module to register classes in.
+ */
+void register_likelihood(Rcpp::Module &m);
 
 /**
  * Rcpp module definition for the FIMS framework. This module registers all the
@@ -86,6 +91,7 @@ RcppExport RCPP_MODULE(fims) {
   register_selectivity(m);
   register_growth(m);
   register_distributions(m);
+  register_likelihood(m);
   register_data(m);
   register_fishery_models(m);
 }
