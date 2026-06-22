@@ -5,7 +5,7 @@
 CMakeLists.txt
 tests/gtest
 tests/test_plan
-build
+^build($|/)
 ^codecov\.yml$
 .vscode
 .covrignore
