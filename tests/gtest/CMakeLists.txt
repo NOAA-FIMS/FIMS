@@ -227,6 +227,18 @@ target_link_libraries(population_dynamics_alk
 
 gtest_discover_tests(population_dynamics_alk)
 
+# test_population_dynamics_size.cpp
+add_executable(population_dynamics_size
+  test_population_dynamics_size.cpp
+)
+
+target_link_libraries(population_dynamics_size
+  gtest_main
+  fims_test
+)
+
+gtest_discover_tests(population_dynamics_size)
+
 # test_population_Li.cpp
 add_executable(population_unfished
   test_population_Unfished_Initial.cpp
