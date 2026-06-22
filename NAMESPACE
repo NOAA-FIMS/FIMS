@@ -3,6 +3,8 @@
 export(AgeComp)
 export(BevertonHoltRecruitment)
 export(CatchAtAge)
+export(CatchAtAgeFleetDerivedQuantities)
+export(CatchAtAgePopulationDerivedQuantities)
 export(CreateTMBModel)
 export(DlnormDistribution)
 export(DmultinomDistribution)
