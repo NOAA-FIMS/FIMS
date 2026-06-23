@@ -38,7 +38,6 @@ struct LogNormalLPDF : public DensityComponentBase<Type> {
    * referenced for each instance through the use of
    * \ref fims::Vector::get_force_scalar(size_t) "get_force_scalar()".
    */
-  fims::Vector<Type> log_sd;
 
   /** @brief Constructor.
    */
@@ -60,89 +59,59 @@ struct LogNormalLPDF : public DensityComponentBase<Type> {
    * and \f$\sigma^2\f$ is the variance of \f$\mathrm{ln}(x)\f$.
    */
   virtual const Type evaluate() {
-    // set vector size based on input type (prior, process, or data)
-    size_t n_x = this->get_n_x();
-    // get expected value vector size
-    size_t n_expected = this->get_n_expected();
+    
+    this->distribution_type = "lognormal";
+
+    if (this->dims != NULL) {
+      throw std::invalid_argument(
+          "Dimensions specified for lognormal distribution, 
+          but lognormal distribution is not multivariate. 
+          Remove dimensions to evaluate.");
+    }
+    
+    // extract evaluation vector size based on inputs 
+    size_t n_evals = this->check_input_sizes();
+
     // setup vector for recording the log probability density function values
-    this->lpdf_vec.resize(n_x);
+    this->lpdf_vec.resize(n_evals);
+
     std::fill(this->lpdf_vec.begin(), this->lpdf_vec.end(),
               static_cast<Type>(0));
+    
     this->lpdf = static_cast<Type>(0);
 
-    // Dimension checks
-    // TODO: fix dimension check as expected values no longer used for data
-    if (n_x != n_expected) {
-      if (n_expected == 1) {
-        n_expected = n_x;
-      } else if (n_x > n_expected) {
-        n_x = n_expected;
-      }
-    }
 
-    if (this->log_sd.size() > 1 && n_x != this->log_sd.size()) {
-      throw std::invalid_argument(
-          "LognormalLPDF::Vector index out of bounds. The size of observed "
-          "data does not equal the size of the log_sd vector. The observed "
-          "data vector is of size " +
-          std::to_string(n_x) + " and the log_sd vector is of size " +
-          std::to_string(this->log_sd.size()));
-    }
-
-    for (size_t i = 0; i < n_x; i++) {
+    for (size_t i = 0; i < n_evals; i++) {
 #ifdef TMB_MODEL
-      if (this->input_type == "data") {
-        // if data, check if there are any NA values and skip lpdf calculation
-        // if there are See Deroba and Miller, 2016
-        // (https://doi.org/10.1016/j.fishres.2015.12.002) for the use of
-        // lognormal constant
-        if (this->get_observed(i) != this->data_observed_values->na_value) {
-          this->lpdf_vec[i] =
-              dnorm(log(this->get_observed(i)), this->get_expected(i),
-                    fims_math::exp(log_sd.get_force_scalar(i)), true) -
-              log(this->get_observed(i));
-        } else {
-          this->lpdf_vec[i] = 0;
-        }
-      } else {
-        if (this->input_type == "random_effects") {
-          // if random effects, no lognormal constant needs to be applied
-          this->lpdf_vec[i] =
-              dnorm(log(this->get_observed(i)), this->get_expected(i),
-                    fims_math::exp(log_sd.get_force_scalar(i)), true);
-        } else {
-          this->lpdf_vec[i] =
-              dnorm(log(this->get_observed(i)), this->get_expected(i),
-                    fims_math::exp(log_sd.get_force_scalar(i)), true) -
-              log(this->get_observed(i));
-        }
-      }
-
-      this->lpdf += this->lpdf_vec[i];
       if (this->simulate_flag) {
-        FIMS_SIMULATE_F(this->of) {  // preprocessor definition in interface.hpp
-                                     // this simulates data that is mean biased
-          if (this->input_type == "data") {
-            this->data_observed_values->at(i) = fims_math::exp(
-                rnorm(this->get_expected(i),
-                      fims_math::exp(log_sd.get_force_scalar(i))));
-          }
-          if (this->input_type == "random_effects") {
-            (*this->re)[i] = fims_math::exp(
-                rnorm(this->get_expected(i),
-                      fims_math::exp(log_sd.get_force_scalar(i))));
-          }
-          if (this->input_type == "prior") {
-            (*(this->priors[i]))[0] = fims_math::exp(
-                rnorm(this->get_expected(i),
-                      fims_math::exp(log_sd.get_force_scalar(i))));
-          }
+        FIMS_SIMULATE_F(this->of) { // preprocessor definition in interface.hpp
+                                    // this simulates data that is mean biased
+          (*this->observed_pointer).set_observed(i,
+          fims_math::exp(rnorm(this->get_expected(i), 
+          fims_math::exp(this->get_uncertainty(i)))));
+          
         }
+      }else{
+        // Skip any evaluations with missing values.
+        if (this->get_observed(i) != this->na_value &&
+              this->get_expected(i) != this->na_value &&
+              this->get_uncertainty(i) != this->na_value) {
+                // See Deroba and Miller, 2016
+                // (https://doi.org/10.1016/j.fishres.2015.12.002) for the use of
+                // lognormal constant for bias correction.
+                this->lpdf_vec[i] = this->get_lambda(i) * (
+                dnorm(log(this->get_observed(i)), this->get_expected(i),
+                      fims_math::exp(this->get_uncertainty(i)), true) -
+                log(this->get_observed(i)));
+        } else {
+            this->lpdf_vec[i] = 0;
+        }
+        this->lpdf += this->lpdf_vec[i];
       }
 #endif
     }
 #ifdef TMB_MODEL
-    vector<Type> lognormal_observed_values = this->observed_values.to_tmb();
+    vector<Type> lognormal_observed_values = (*this->observed_pointer).to_tmb();
     //  FIMS_REPORT_F(lognormal_observed_values, this->of);
 #endif
     return (this->lpdf);

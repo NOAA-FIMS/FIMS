@@ -35,16 +35,23 @@ namespace fims_info {
 template <typename Type>
 class Information {
  public:
+  //TODO: look into coverting these to generic dimensions that can be used
+  //across all models instead of having n_years and n_ages explicitly required.
   size_t n_years = 0; /**< number of years >*/
   size_t n_ages = 0;  /**< number of ages>*/
 
   static std::shared_ptr<Information<Type>>
       fims_information;          /**< singleton instance >*/
+  
+      std::vector<Type*> quantities; /**< list of all model quantities >*/
   std::vector<Type*> parameters; /**< list of all estimated parameters >*/
   std::vector<Type*>
       random_effects_parameters; /**< list of all random effects parameters >*/
   std::vector<Type*>
       fixed_effects_parameters; /**< list of all fixed effects parameters >*/
+  
+      std::vector<std::string> quantity_names; /**< list of all quantity names
+                                               estimated in the model */    
   std::vector<std::string> parameter_names; /**< list of all parameter names
                                                estimated in the model */
   std::vector<std::string>
@@ -52,7 +59,7 @@ class Information {
                                the model */
 
   // data objects
-  std::map<uint32_t, std::shared_ptr<fims_data_object::DataObject<Type>>>
+  std::map<uint32_t, std::shared_ptr<fims_variable_object::VariableObject<Type>>>
       data_objects; /**< map that holds data objects >*/
   typedef typename std::map<
       uint32_t, std::shared_ptr<fims_data_object::DataObject<Type>>>::iterator
@@ -169,24 +176,6 @@ class Information {
     this->models_map.clear();
     this->n_years = 0;
     this->n_ages = 0;
-
-    for (density_components_iterator it = density_components.begin();
-         it != density_components.end(); ++it) {
-      std::shared_ptr<fims_distributions::DensityComponentBase<Type>> d =
-          (*it).second;
-      if ((d->priors)[0] != NULL) {
-        d->priors.clear();
-      }
-      if (d->data_expected_values != NULL) {
-        d->data_expected_values->clear();
-      }
-      if (d->re != NULL) {
-        d->re->clear();
-      }
-      if (d->re_expected_values != NULL) {
-        d->re_expected_values->clear();
-      }
-    }
     this->density_components.clear();
   }
 
@@ -202,7 +191,7 @@ class Information {
   std::string State() {
     std::stringstream ss;
     ss << "Information object State:\n";
-    ss << "data_objects: " << this->data_objects.clear();
+    ss << "data_objects: " << this->data_objects.size() << std::endl;
     ss << "populations: " << this->populations.size() << std::endl;
     ss << "fixed_effects_parameters: " << this->fixed_effects_parameters.size()
        << std::endl;
@@ -282,83 +271,60 @@ class Information {
    * @brief Loop over distributions and set links to distribution x value if
    * distribution is a prior type.
    */
-  void SetupPriors() {
+  void SetupLikelihood() {
     for (density_components_iterator it = density_components.begin();
          it != density_components.end(); ++it) {
       std::shared_ptr<fims_distributions::DensityComponentBase<Type>> d =
           (*it).second;
       if (d->input_type == "prior") {
-        FIMS_INFO_LOG("Setup prior for distribution " + fims::to_string(d->id));
-        variable_map_iterator vmit;
-        FIMS_INFO_LOG("Link prior from distribution " + fims::to_string(d->id) +
-                      " to parameter " + fims::to_string(d->key[0]));
-        d->priors.resize(d->key.size());
-        for (size_t i = 0; i < d->key.size(); i++) {
-          FIMS_INFO_LOG("Link prior from distribution " +
-                        fims::to_string(d->id) + " to parameter " +
-                        fims::to_string(d->key[0]));
-          vmit = this->variable_map.find(d->key[i]);
-          d->priors[i] = (*vmit).second;
-        }
-        FIMS_INFO_LOG("Prior size for distribution " + fims::to_string(d->id) +
-                      "is: " + fims::to_string(d->observed_values.size()));
+        FIMS_INFO_LOG("Setup " + d->distribution_type + 
+          " prior for likelihood component " + fims::to_string(d->id));
+      }else if (d->input_type == "data") {
+        FIMS_INFO_LOG("Setup " + d->distribution_type + 
+          " data for likelihood component " + fims::to_string(d->id));
+      }else if (d->input_type == "random_effects") {
+        FIMS_INFO_LOG("Setup " + d->distribution_type + 
+          " random effect for likelihood component " + fims::to_string(d->id));
       }
-    }
-  }
 
-  /**
-   * @brief Loop over distributions and set links to distribution x value if
-   * distribution is a random effects type.
-   */
-  void SetupRandomEffects() {
-    for (density_components_iterator it = this->density_components.begin();
-         it != this->density_components.end(); ++it) {
-      std::shared_ptr<fims_distributions::DensityComponentBase<Type>> d =
-          (*it).second;
-      if (d->input_type == "random_effects") {
-        FIMS_INFO_LOG("Setup random effects for distribution " +
-                      fims::to_string(d->id));
-        variable_map_iterator vmit;
-        FIMS_INFO_LOG("Link random effects from distribution " +
-                      fims::to_string(d->id) + " to derived value " +
-                      fims::to_string(d->key[0]));
-        vmit = this->variable_map.find(d->key[0]);
-        d->re = (*vmit).second;
-        if (d->key.size() == 2) {
-          vmit = this->variable_map.find(d->key[1]);
-          d->re_expected_values = (*vmit).second;
-        } else {
-          d->re_expected_values = &d->expected_values;
-        }
-        FIMS_INFO_LOG("Random effect size for distribution " +
-                      fims::to_string(d->id) +
-                      " is: " + fims::to_string(d->observed_values.size()));
-      }
-    }
-  }
+      variable_map_iterator vmit;
+      
+      if(d->observed_key != NULL){
+        FIMS_INFO_LOG("Linking observed values to pointer id : " + 
+                      fims::to_string(d->observed_key[0]));
 
-  /**
-   * @brief Loop over distributions and set links to distribution expected value
-   * if distribution is a data type.
-   */
-  void SetupData() {
-    for (density_components_iterator it = this->density_components.begin();
-         it != this->density_components.end(); ++it) {
-      std::shared_ptr<fims_distributions::DensityComponentBase<Type>> d =
-          (*it).second;
-      if (d->input_type == "data") {
-        FIMS_INFO_LOG("Setup expected value for data distribution " +
-                      fims::to_string(d->id));
-        variable_map_iterator vmit;
-        FIMS_INFO_LOG("Link expected value from distribution " +
-                      fims::to_string(d->id) + " to derived value " +
-                      fims::to_string(d->key[0]));
-        vmit = this->variable_map.find(d->key[0]);
-        d->data_expected_values = (*vmit).second;
-        FIMS_INFO_LOG(
-            "Expected value size for distribution " + fims::to_string(d->id) +
-            " is: " + fims::to_string((*d->data_expected_values).size()));
+        vmit = this->variable_map.find(d->observed_key[0]);
+          
+        d->observed_pointer = (*vmit).second;
+      }else{
+        FIMS_INFO_LOG("Linking observed values to user input");
       }
+      
+      if(d->expected_key != NULL){
+        FIMS_INFO_LOG("Linking expected values to pointer id : " + 
+                      fims::to_string(d->expected_key[0]));
+
+        vmit = this->variable_map.find(d->expected_key[0]);
+          
+        d->expected_pointer = (*vmit).second;
+      }else{
+        FIMS_INFO_LOG("Linking expected values to user input");
+      }
+
+      if(d->uncertainty_key != NULL){
+        FIMS_INFO_LOG("Linking uncertainty values to pointer id : " + 
+                      fims::to_string(d->uncertainty_key[0]));
+
+        vmit = this->variable_map.find(d->uncertainty_key[0]);
+          
+        d->uncertainty_pointer = (*vmit).second;
+      }else{
+        FIMS_INFO_LOG("Linking uncertainty values to user input");
+      }
+        
+      FIMS_INFO_LOG("Size of likelihood component " + fims::to_string(d->id) +
+                      " is: " + fims::to_string(d->check_input_sizes()));
+      
     }
   }
 
@@ -683,47 +649,6 @@ class Information {
   }
 
   /**
-   * @brief Loop over all density components and set pointers to data objects
-   *
-   * @param &valid_model reference to true/false boolean indicating whether
-   * model is valid.
-   */
-  void SetDataObjects(bool& valid_model) {
-    for (density_components_iterator it = this->density_components.begin();
-         it != this->density_components.end(); ++it) {
-      std::shared_ptr<fims_distributions::DensityComponentBase<Type>> d =
-          (*it).second;
-
-      // set data objects if distribution is a data type
-      if (d->input_type == "data") {
-        if (d->observed_data_id_m != static_cast<Type>(-999)) {
-          uint32_t observed_data_id =
-              static_cast<uint32_t>(d->observed_data_id_m);
-          data_iterator it = this->data_objects.find(observed_data_id);
-
-          if (it != this->data_objects.end()) {
-            d->data_observed_values = (*it).second;
-            FIMS_INFO_LOG("Observed data " + fims::to_string(observed_data_id) +
-                          " successfully set to density component " +
-                          fims::to_string(d->id));
-          } else {
-            valid_model = false;
-            FIMS_ERROR_LOG(
-                "Expected data observations not defined for density "
-                "component " +
-                fims::to_string(d->id) + ", observed data " +
-                fims::to_string(observed_data_id));
-          }
-        } else {
-          valid_model = false;
-          FIMS_ERROR_LOG("No data input for density component" +
-                         fims::to_string(d->id));
-        }
-      }
-    }
-  }
-
-  /**
    * @brief Loop over all populations and set pointers to population objects
    *
    * @param &valid_model reference to true/false boolean indicating whether
@@ -834,9 +759,7 @@ class Information {
     CreateModelingObjects(valid_model);
 
     // setup priors, random effect, and data density components
-    SetupPriors();
-    SetupRandomEffects();
-    SetupData();
+    SetupLikelihood();
 
     if (valid_model) {
       FIMS_INFO_LOG("Model successfully created.");
