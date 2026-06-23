@@ -549,9 +549,17 @@ RCPP_MODULE(fims) {
       .method("set_real_input", &LikelihoodInterfaceBase::set_real_input)
       .method("set_parameter_input",
               &LikelihoodInterfaceBase::set_parameter_input)
+      .method("set_real_expected_input",
+              &LikelihoodInterfaceBase::set_real_expected_input)
+      .method("set_parameter_expected_input",
+              &LikelihoodInterfaceBase::set_parameter_expected_input)
       .field("observed_values", &LikelihoodInterfaceBase::observed_values)
       .field("expected_values", &LikelihoodInterfaceBase::expected_values)
       .field("real_input", &LikelihoodInterfaceBase::real_input)
+      .field("expected_real_input",
+             &LikelihoodInterfaceBase::expected_real_input)
+      .field("expected_parameter_input",
+             &LikelihoodInterfaceBase::expected_parameter_input)
       .field("nll_components", &LikelihoodInterfaceBase::nll_components);
 
   Rcpp::class_<NormalLikelihoodInterface>(

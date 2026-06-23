@@ -20,6 +20,14 @@ FIMS_dmultinom <- function(x, p) {
   return(log_pmf)
 }
 
+set_likelihood_real_vector <- function(x, values) {
+  x$resize(length(values))
+  for (i in seq_along(values)) {
+    x$set(i - 1L, values[i])
+  }
+  invisible(x)
+}
+
 
 # FIMS helper function to run FIMS model without wrappers ----
 #' Set up and run FIMS model without using wrapper functions
@@ -76,7 +84,8 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
                                                 em_input_list,
                                                 estimation_mode = TRUE,
                                                 random_effects = NULL,
-                                                map = list()) {
+                                                map = list(),
+                                                use_likelihood_components = FALSE) {
   # Load operating model data for the current iteration
   om_input <- om_input_list[[iter_id]] # Operating model input for the current iteration
   om_output <- om_output_list[[iter_id]] # Operating model output for the current iteration
@@ -153,29 +162,55 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   fishing_fleet$SetObservedAgeCompDataID(fishing_fleet_age_comp$get_id())
   fishing_fleet$SetObservedLengthCompDataID(fishing_fleet_length_comp$get_id())
 
-  # Set up fishery index data using the lognormal
-  fishing_fleet_landings_distribution <- methods::new(DlnormDistribution)
-  # lognormal observation error transformed on the log scale
-  fishing_fleet_landings_distribution$log_sd$resize(om_input[["nyr"]])
-  for (y in 1:om_input[["nyr"]]) {
-    # Compute lognormal SD from OM coefficient of variation (CV)
-    fishing_fleet_landings_distribution$log_sd[y]$value <- log(sqrt(log(em_input[["cv.L"]][["fleet1"]]^2 + 1)))
+  if (use_likelihood_components) {
+    fishing_fleet_landings_likelihood <- methods::new(LognormalLikelihood)
+    set_likelihood_real_vector(fishing_fleet_landings_likelihood$observed_values, landings)
+    set_likelihood_real_vector(
+      fishing_fleet_landings_likelihood$log_sd,
+      rep(log(sqrt(log(em_input[["cv.L"]][["fleet1"]]^2 + 1))), om_input[["nyr"]])
+    )
+    fishing_fleet_landings_likelihood$set_parameter_expected_input(fishing_fleet$log_landings_expected)
+
+    fishing_fleet_agecomp_likelihood <- methods::new(MultinomialLikelihood)
+    set_likelihood_real_vector(
+      fishing_fleet_agecomp_likelihood$observed_values,
+      c(t(em_input[["L.age.obs"]][["fleet1"]])) * em_input[["n.L"]][["fleet1"]]
+    )
+    set_likelihood_real_vector(fishing_fleet_agecomp_likelihood$dims, c(om_input[["nyr"]], om_input[["nages"]]))
+    fishing_fleet_agecomp_likelihood$set_parameter_expected_input(fishing_fleet$agecomp_proportion)
+
+    fishing_fleet_lengthcomp_likelihood <- methods::new(MultinomialLikelihood)
+    set_likelihood_real_vector(
+      fishing_fleet_lengthcomp_likelihood$observed_values,
+      c(t(em_input[["L.length.obs"]][["fleet1"]])) * em_input[["n.L.lengthcomp"]][["fleet1"]]
+    )
+    set_likelihood_real_vector(fishing_fleet_lengthcomp_likelihood$dims, c(om_input[["nyr"]], om_input[["nlengths"]]))
+    fishing_fleet_lengthcomp_likelihood$set_parameter_expected_input(fishing_fleet$lengthcomp_proportion)
+  } else {
+    # Set up fishery index data using the lognormal
+    fishing_fleet_landings_distribution <- methods::new(DlnormDistribution)
+    # lognormal observation error transformed on the log scale
+    fishing_fleet_landings_distribution$log_sd$resize(om_input[["nyr"]])
+    for (y in 1:om_input[["nyr"]]) {
+      # Compute lognormal SD from OM coefficient of variation (CV)
+      fishing_fleet_landings_distribution$log_sd[y]$value <- log(sqrt(log(em_input[["cv.L"]][["fleet1"]]^2 + 1)))
+    }
+    fishing_fleet_landings_distribution$log_sd$set_all_estimable(FALSE)
+    # Set Data using the IDs from the modules defined above
+    fishing_fleet_landings_distribution$set_observed_data(fishing_fleet$GetObservedLandingsDataID())
+    fishing_fleet_landings_distribution$set_distribution_links("data", fishing_fleet$log_landings_expected$get_id())
+
+    # Set up fishery age composition data using the multinomial
+    fishing_fleet_agecomp_distribution <- methods::new(DmultinomDistribution)
+    fishing_fleet_agecomp_distribution$set_observed_data(fishing_fleet$GetObservedAgeCompDataID())
+    fishing_fleet_agecomp_distribution$set_distribution_links("data", fishing_fleet$agecomp_proportion$get_id())
+
+    # Set up fishery length composition data using the multinomial
+    fishing_fleet_lengthcomp_distribution <- methods::new(DmultinomDistribution)
+    fishing_fleet_lengthcomp_distribution$set_observed_data(fishing_fleet$GetObservedLengthCompDataID())
+    fishing_fleet_lengthcomp_distribution$set_distribution_links("data", fishing_fleet$lengthcomp_proportion$get_id())
+    fishing_fleet_lengthcomp_distribution$set_note("fishing_fleet_lengthcomp_distribution")
   }
-  fishing_fleet_landings_distribution$log_sd$set_all_estimable(FALSE)
-  # Set Data using the IDs from the modules defined above
-  fishing_fleet_landings_distribution$set_observed_data(fishing_fleet$GetObservedLandingsDataID())
-  fishing_fleet_landings_distribution$set_distribution_links("data", fishing_fleet$log_landings_expected$get_id())
-
-  # Set up fishery age composition data using the multinomial
-  fishing_fleet_agecomp_distribution <- methods::new(DmultinomDistribution)
-  fishing_fleet_agecomp_distribution$set_observed_data(fishing_fleet$GetObservedAgeCompDataID())
-  fishing_fleet_agecomp_distribution$set_distribution_links("data", fishing_fleet$agecomp_proportion$get_id())
-
-  # Set up fishery length composition data using the multinomial
-  fishing_fleet_lengthcomp_distribution <- methods::new(DmultinomDistribution)
-  fishing_fleet_lengthcomp_distribution$set_observed_data(fishing_fleet$GetObservedLengthCompDataID())
-  fishing_fleet_lengthcomp_distribution$set_distribution_links("data", fishing_fleet$lengthcomp_proportion$get_id())
-  fishing_fleet_lengthcomp_distribution$set_note("fishing_fleet_lengthcomp_distribution")
   # Set age-to-length conversion matrix
   # TODO: If an age_to_length_conversion matrix is provided, the code below
   # still executes. Consider adding a check in the Rcpp interface to ensure
@@ -245,29 +280,56 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   survey_fleet$SetObservedAgeCompDataID(survey_fleet_age_comp$get_id())
   survey_fleet$SetObservedLengthCompDataID(survey_fleet_length_comp$get_id())
 
-  # Set up survey index data using the lognormal
-  survey_fleet_index_distribution <- methods::new(DlnormDistribution)
+  if (use_likelihood_components) {
+    survey_fleet_index_likelihood <- methods::new(LognormalLikelihood)
+    set_likelihood_real_vector(survey_fleet_index_likelihood$observed_values, survey_index)
+    set_likelihood_real_vector(
+      survey_fleet_index_likelihood$log_sd,
+      rep(log(sqrt(log(em_input[["cv.survey"]][["survey1"]]^2 + 1))), om_input[["nyr"]])
+    )
+    survey_fleet_index_likelihood$set_parameter_expected_input(survey_fleet$log_index_expected)
 
-  # lognormal observation error transformed on the log scale
-  # sd = sqrt(log(cv^2 + 1)), sd is log transformed
-  survey_fleet_index_distribution$log_sd$resize(om_input[["nyr"]])
-  for (y in 1:om_input$nyr) {
-    survey_fleet_index_distribution$log_sd[y]$value <- log(sqrt(log(em_input[["cv.survey"]][["survey1"]]^2 + 1)))
+    survey_fleet_agecomp_likelihood <- methods::new(MultinomialLikelihood)
+    set_likelihood_real_vector(
+      survey_fleet_agecomp_likelihood$observed_values,
+      c(t(em_input[["survey.age.obs"]][["survey1"]])) * em_input[["n.survey"]][["survey1"]]
+    )
+    set_likelihood_real_vector(survey_fleet_agecomp_likelihood$dims, c(om_input[["nyr"]], om_input[["nages"]]))
+    survey_fleet_agecomp_likelihood$set_parameter_expected_input(survey_fleet$agecomp_proportion)
+
+    survey_fleet_lengthcomp_likelihood <- methods::new(MultinomialLikelihood)
+    set_likelihood_real_vector(
+      survey_fleet_lengthcomp_likelihood$observed_values,
+      c(t(survey_lengthcomp)) * em_input[["n.survey.lengthcomp"]][["survey1"]]
+    )
+    set_likelihood_real_vector(survey_fleet_lengthcomp_likelihood$dims, c(om_input[["nyr"]], om_input[["nlengths"]]))
+    survey_fleet_lengthcomp_likelihood$set_parameter_expected_input(survey_fleet$lengthcomp_proportion)
+  } else {
+    # Set up survey index data using the lognormal
+    survey_fleet_index_distribution <- methods::new(DlnormDistribution)
+
+    # lognormal observation error transformed on the log scale
+    # sd = sqrt(log(cv^2 + 1)), sd is log transformed
+    survey_fleet_index_distribution$log_sd$resize(om_input[["nyr"]])
+    for (y in 1:om_input$nyr) {
+      survey_fleet_index_distribution$log_sd[y]$value <- log(sqrt(log(em_input[["cv.survey"]][["survey1"]]^2 + 1)))
+    }
+    survey_fleet_index_distribution$log_sd$set_all_estimable(FALSE)
+    # Set Data using the IDs from the modules defined above
+    survey_fleet_index_distribution$set_observed_data(survey_fleet$GetObservedIndexDataID())
+    survey_fleet_index_distribution$set_distribution_links("data", survey_fleet$log_index_expected$get_id())
+
+    # Age composition distribution
+    survey_fleet_agecomp_distribution <- methods::new(DmultinomDistribution)
+    survey_fleet_agecomp_distribution$set_observed_data(survey_fleet$GetObservedAgeCompDataID())
+    survey_fleet_agecomp_distribution$set_distribution_links("data", survey_fleet$agecomp_proportion$get_id())
+
+    # Length composition distribution
+    survey_fleet_lengthcomp_distribution <- methods::new(DmultinomDistribution)
+    survey_fleet_lengthcomp_distribution$set_observed_data(survey_fleet$GetObservedLengthCompDataID())
+    survey_fleet_lengthcomp_distribution$set_distribution_links("data", survey_fleet$lengthcomp_proportion$get_id())
   }
-  survey_fleet_index_distribution$log_sd$set_all_estimable(FALSE)
-  # Set Data using the IDs from the modules defined above
-  survey_fleet_index_distribution$set_observed_data(survey_fleet$GetObservedIndexDataID())
-  survey_fleet_index_distribution$set_distribution_links("data", survey_fleet$log_index_expected$get_id())
-
-  # Age composition distribution
-  survey_fleet_agecomp_distribution <- methods::new(DmultinomDistribution)
-  survey_fleet_agecomp_distribution$set_observed_data(survey_fleet$GetObservedAgeCompDataID())
-  survey_fleet_agecomp_distribution$set_distribution_links("data", survey_fleet$agecomp_proportion$get_id())
-
-  # Length composition distribution
-  survey_fleet_lengthcomp_distribution <- methods::new(DmultinomDistribution)
-  survey_fleet_lengthcomp_distribution$set_observed_data(survey_fleet$GetObservedLengthCompDataID())
-  survey_fleet_lengthcomp_distribution$set_distribution_links("data", survey_fleet$lengthcomp_proportion$get_id()) # Set age to length conversion matrix
+  # Set age to length conversion matrix
   survey_fleet$age_to_length_conversion$resize(om_input[["nages"]] * om_input[["nlengths"]])
   # TODO: Check that the dimensions of the matrix of age_to_length_conversion matrix
   #       is rows = length() and columns = length()
@@ -360,35 +422,56 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
       survey_fleet_selectivity$inflection_point$slope <- "random_effects"
     }
   }
-  recruitment_distribution <- methods::new(DnormDistribution)
-  # set up logR_sd using the normal log_sd parameter
-  # logR_sd is NOT logged. It needs to enter the model logged b/c the exp() is
-  # taken before the likelihood calculation
-  recruitment_distribution$log_sd$resize(1)
-  recruitment_distribution$log_sd[1]$value <- log(om_input[["logR_sd"]])
+  if (use_likelihood_components) {
+    recruitment_likelihood <- methods::new(NormalLikelihood)
+    set_likelihood_real_vector(recruitment_likelihood$expected_values, 0)
+    set_likelihood_real_vector(recruitment_likelihood$log_sd, log(om_input[["logR_sd"]]))
+
+    if ("recruitment" %in% names(random_effects)) {
+      if (random_effects[["recruitment"]] == "log_devs") {
+        recruitment_likelihood$set_parameter_input(recruitment$log_devs, "random_effects")
+      }
+      if (random_effects[["recruitment"]] == "log_r") {
+        set_likelihood_real_vector(recruitment_likelihood$log_sd, log(1))
+        recruitment_likelihood$set_parameter_input(recruitment$log_r, "random_effects")
+        recruitment_likelihood$set_parameter_expected_input(recruitment$log_expected_recruitment)
+      }
+    }
+
+    if (is.null(random_effects)) {
+      recruitment_likelihood$set_parameter_input(recruitment$log_devs, "random_effects")
+    }
+  } else {
+    recruitment_distribution <- methods::new(DnormDistribution)
+    # set up logR_sd using the normal log_sd parameter
+    # logR_sd is NOT logged. It needs to enter the model logged b/c the exp() is
+    # taken before the likelihood calculation
+    recruitment_distribution$log_sd$resize(1)
+    recruitment_distribution$log_sd[1]$value <- log(om_input[["logR_sd"]])
 
 
-  recruitment_distribution$observed_values$resize(om_input[["nyr"]] - 1)
-  recruitment_distribution$expected_values$resize(om_input[["nyr"]] - 1)
-  for (i in 1:(om_input[["nyr"]] - 1)) {
-    recruitment_distribution$observed_values[i]$value <- 0
-    recruitment_distribution$expected_values[i]$value <- 0
-  }
+    recruitment_distribution$observed_values$resize(om_input[["nyr"]] - 1)
+    recruitment_distribution$expected_values$resize(om_input[["nyr"]] - 1)
+    for (i in 1:(om_input[["nyr"]] - 1)) {
+      recruitment_distribution$observed_values[i]$value <- 0
+      recruitment_distribution$expected_values[i]$value <- 0
+    }
 
-  if ("recruitment" %in% names(random_effects)) {
-    if (random_effects[["recruitment"]] == "log_devs") {
-      recruitment_distribution$log_sd[1]$estimation_type$set("fixed_effects")
+    if ("recruitment" %in% names(random_effects)) {
+      if (random_effects[["recruitment"]] == "log_devs") {
+        recruitment_distribution$log_sd[1]$estimation_type$set("fixed_effects")
+        recruitment_distribution$set_distribution_links("random_effects", recruitment$log_devs$get_id())
+      }
+      if (random_effects[["recruitment"]] == "log_r") {
+        recruitment_distribution$log_sd[1]$value <- log(1)
+        recruitment_distribution$log_sd[1]$estimation_type$set("fixed_effects")
+        recruitment_distribution$set_distribution_links("random_effects", c(recruitment$log_r$get_id(), recruitment$log_expected_recruitment$get_id()))
+      }
+    }
+
+    if (is.null(random_effects)) {
       recruitment_distribution$set_distribution_links("random_effects", recruitment$log_devs$get_id())
     }
-    if (random_effects[["recruitment"]] == "log_r") {
-      recruitment_distribution$log_sd[1]$value <- log(1)
-      recruitment_distribution$log_sd[1]$estimation_type$set("fixed_effects")
-      recruitment_distribution$set_distribution_links("random_effects", c(recruitment$log_r$get_id(), recruitment$log_expected_recruitment$get_id()))
-    }
-  }
-
-  if (is.null(random_effects)) {
-    recruitment_distribution$set_distribution_links("random_effects", recruitment$log_devs$get_id())
   }
 
   # Growth

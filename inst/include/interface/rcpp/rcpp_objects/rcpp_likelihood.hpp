@@ -26,6 +26,7 @@ class LikelihoodInterfaceBase : public FIMSRcppInterfaceBase {
   fims::Vector<double> fims_input_values;
   fims::Vector<double> fims_observed_values;
   fims::Vector<double> fims_expected_values;
+  fims::Vector<double> fims_expected_input_values;
 
   /**
    * @brief Convert an R-facing RealVector to a backend fims::Vector.
@@ -79,9 +80,18 @@ class LikelihoodInterfaceBase : public FIMSRcppInterfaceBase {
       fims_likelihood::LikelihoodComponentBase<double>& likelihood) {
     this->fims_observed_values = this->to_fims_vector(this->observed_values);
     this->fims_expected_values = this->to_fims_vector(this->expected_values);
+    this->fims_expected_input_values =
+        this->to_fims_vector(this->expected_real_input);
 
     likelihood.observed_values = this->fims_observed_values;
     likelihood.expected_values = this->fims_expected_values;
+    if (this->expected_source_m.get() == "real") {
+      likelihood.SetExpected(&this->fims_expected_input_values);
+    } else if (this->expected_source_m.get() == "parameter") {
+      this->fims_expected_input_values =
+          this->to_fims_vector(this->expected_parameter_input);
+      likelihood.SetExpected(&this->fims_expected_input_values);
+    }
 
     std::string input_source = this->input_source_m.get();
     if (input_source == "parameter") {
@@ -210,6 +220,21 @@ class LikelihoodInterfaceBase : public FIMSRcppInterfaceBase {
         this->to_fims_vector_t<Type>(this->observed_values);
     likelihood->expected_values =
         this->to_fims_vector_t<Type>(this->expected_values);
+    std::string expected_source = this->expected_source_m.get();
+    if (expected_source == "real") {
+      likelihood->expected_storage =
+          this->to_fims_vector_t<Type>(this->expected_real_input);
+      likelihood->expected_values_id = this->expected_real_input.id_m;
+      likelihood->use_expected_values_id = true;
+    } else if (expected_source == "parameter") {
+      likelihood->expected_storage =
+          this->to_fims_vector_t<Type>(this->expected_parameter_input);
+      likelihood->expected_values_id = this->expected_parameter_input.id_m;
+      likelihood->use_expected_values_id = true;
+    } else if (expected_source != "local") {
+      throw std::invalid_argument("Unsupported likelihood expected source: " +
+                                  expected_source);
+    }
     likelihood->role = this->parse_role();
 
     std::string input_source = this->input_source_m.get();
@@ -248,10 +273,13 @@ class LikelihoodInterfaceBase : public FIMSRcppInterfaceBase {
   RealVector observed_values;
   RealVector expected_values;
   RealVector real_input;
+  RealVector expected_real_input;
   ParameterVector parameter_input;
+  ParameterVector expected_parameter_input;
   RealVector nll_components;
   SharedString role_m = SharedString("data");
   SharedString input_source_m = SharedString("observed");
+  SharedString expected_source_m = SharedString("local");
   double nll_value = 0.0;
 
   static std::vector<std::shared_ptr<LikelihoodInterfaceBase>> live_objects;
@@ -271,10 +299,13 @@ class LikelihoodInterfaceBase : public FIMSRcppInterfaceBase {
         observed_values(other.observed_values),
         expected_values(other.expected_values),
         real_input(other.real_input),
+        expected_real_input(other.expected_real_input),
         parameter_input(other.parameter_input),
+        expected_parameter_input(other.expected_parameter_input),
         nll_components(other.nll_components),
         role_m(other.role_m),
         input_source_m(other.input_source_m),
+        expected_source_m(other.expected_source_m),
         nll_value(other.nll_value) {}
 
   virtual ~LikelihoodInterfaceBase() {}
@@ -307,6 +338,26 @@ class LikelihoodInterfaceBase : public FIMSRcppInterfaceBase {
   }
 
   /**
+   * @brief Link a RealVector as the likelihood expected value.
+   */
+  virtual bool set_real_expected_input(RealVector expected) {
+    this->expected_real_input = expected;
+    this->expected_source_m.set("real");
+    this->sync_live_input_state();
+    return true;
+  }
+
+  /**
+   * @brief Link a ParameterVector as the likelihood expected value.
+   */
+  virtual bool set_parameter_expected_input(ParameterVector expected) {
+    this->expected_parameter_input = expected;
+    this->expected_source_m.set("parameter");
+    this->sync_live_input_state();
+    return true;
+  }
+
+  /**
    * @brief Link a ParameterVector as the likelihood input.
    */
   virtual bool set_parameter_input(ParameterVector input, std::string role) {
@@ -334,9 +385,12 @@ class LikelihoodInterfaceBase : public FIMSRcppInterfaceBase {
           LikelihoodInterfaceBase::live_objects[i];
       if (object->id_m == this->id_m && object.get() != this) {
         object->real_input = this->real_input;
+        object->expected_real_input = this->expected_real_input;
         object->parameter_input = this->parameter_input;
+        object->expected_parameter_input = this->expected_parameter_input;
         object->role_m = this->role_m;
         object->input_source_m = this->input_source_m;
+        object->expected_source_m = this->expected_source_m;
       }
     }
   }

@@ -22,6 +22,9 @@ All likelihoods derive from `LikelihoodBase` and share these members:
 - `nll_components`: per-observation negative log-likelihood contributions.
 - `set_real_input(input, role)`: links a `RealVector` as the input.
 - `set_parameter_input(input, role)`: links a `ParameterVector` as the input.
+- `set_real_expected_input(expected)`: links a `RealVector` as expected values.
+- `set_parameter_expected_input(expected)`: links a `ParameterVector` as
+  expected values.
 - `set_role(role)`: sets the likelihood role without linking a new input.
 - `evaluate()`: evaluates the likelihood outside the TMB model.
 
@@ -62,6 +65,19 @@ set_real_vector(likelihood$log_sd, log(2))
 likelihood$evaluate()
 likelihood$nll_components$toRVector()
 clear()
+```
+
+## Linked Expected Values
+
+Use `set_real_expected_input()` when observed values are owned by the likelihood
+but expected values are produced by a model or derived quantity.
+
+```r
+likelihood <- methods::new(LognormalLikelihood)
+
+set_real_vector(likelihood$observed_values, observed_landings)
+set_real_vector(likelihood$log_sd, log_sd)
+likelihood$set_parameter_expected_input(fleet$log_landings_expected)
 ```
 
 ## Linked RealVector Input

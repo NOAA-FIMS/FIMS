@@ -183,6 +183,16 @@ class Model {  // may need singleton
          l_it != this->fims_information->likelihood_components.end(); ++l_it) {
       std::shared_ptr<fims_likelihood::LikelihoodComponentBase<Type>> l =
           (*l_it).second;
+      if (l->use_expected_values_id) {
+        typename fims_info::Information<Type>::variable_map_iterator vmit =
+            this->fims_information->variable_map.find(l->expected_values_id);
+        if (vmit == this->fims_information->variable_map.end()) {
+          throw std::invalid_argument(
+              "Model::Evaluate: likelihood expected_values id was not found "
+              "in variable_map.");
+        }
+        l->SetExpected((*vmit).second.variable);
+      }
 #ifdef TMB_MODEL
       l->of = this->of;
 #endif
