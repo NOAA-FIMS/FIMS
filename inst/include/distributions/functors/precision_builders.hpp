@@ -2,6 +2,9 @@
  * @file precision_builders.hpp
  * @brief Assembles sparse precision matrices for multivariate random-effects 
  * models.
+  * @copyright This file is part of the NOAA, National Marine Fisheries Service
+ * Fisheries Integrated Modeling System project. See LICENSE in the source
+ * folder for reuse information.
  */
 
 #ifndef FIMS_DISTRIBUTIONS_PRECISION_BUILDERS_HPP
@@ -15,6 +18,12 @@
 // This prevents errors when running basic C++ unit tests.
 #ifdef TMB_MODEL
 #include <Eigen/Sparse>
+#else
+// Forward declaration allows this template to compile without TMB/Eigen headers
+namespace Eigen {
+    template <typename Scalar, int Options = 0, typename StorageIndex = int>
+    class SparseMatrix;
+}
 #endif
 
 namespace fims_distributions {
@@ -29,12 +38,10 @@ struct PrecisionMatrixBuilderBase {
     virtual ~PrecisionMatrixBuilderBase() {}
 
     /**
-     * @brief A "pure virtual" method that forces every child (e.g., DSEM) 
+     * @brief Pure virtual method that forces every child (e.g., DSEM) 
      * to provide its own specific version of how to build a matrix.
      */
-#ifdef TMB_MODEL
     virtual Eigen::SparseMatrix<Type> BuildPrecisionMatrixSparse() const = 0;
-#endif
 };
 
 /**
@@ -45,7 +52,6 @@ struct PrecisionMatrixBuilderBase {
  */
 template <typename Type>
 struct DSEMPrecisionMatrixBuilder : public PrecisionMatrixBuilderBase<Type> {
-    
     /**
      * @brief A small container (struct) to hold the "story" of one arrow.
      */
@@ -66,11 +72,15 @@ struct DSEMPrecisionMatrixBuilder : public PrecisionMatrixBuilderBase<Type> {
     DSEMPrecisionMatrixBuilder() : PrecisionMatrixBuilderBase<Type>() {}
     virtual ~DSEMPrecisionMatrixBuilder() {}
 
-#ifdef TMB_MODEL
     /**
      * @brief The engine that builds the matrix.
      */
     virtual Eigen::SparseMatrix<Type> BuildPrecisionMatrixSparse() const override {
+        #ifndef TMB_MODEL
+            throw std::invalid_argument(
+                "DSEMPrecisionMatrixBuilder: BuildPrecisionMatrixSparse() requires "
+                "compilation with TMB_MODEL defined.");
+        #else
         // n_k is the total number of "slots" (years multiplied by variables).
         const size_t n_k = this->n_time * this->n_variables;
         
@@ -82,9 +92,11 @@ struct DSEMPrecisionMatrixBuilder : public PrecisionMatrixBuilderBase<Type> {
 
         // 2. Initialize sparse components
         // We create three empty grids that are "sparse"
-        Eigen::SparseMatrix<Type> Rho_kk(n_k, n_k);   // Grid for causal paths (from -> to)
-        Eigen::SparseMatrix<Type> Gamma_kk(n_k, n_k); // Grid for variances (<->)
-        Eigen::SparseMatrix<Type> I_kk(n_k, n_k);     // "Standard" grid (identity)
+        Eigen::SparseMatrix<Type> Rho_kk(static_cast<int>(n_k), static_cast<int>(n_k)); // Grid for causal paths (from -> to)
+        Eigen::SparseMatrix<Type> Gamma_kk(static_cast<int>(n_k), static_cast<int>(n_k)); // Grid for variances (<->)
+        Eigen::SparseMatrix<Type> I_kk(static_cast<int>(n_k), static_cast<int>(n_k)); // "Standard" grid (identity)
+        Rho_kk.setZero();
+        Gamma_kk.setZero();
         I_kk.setIdentity(); // Fill diagonal with 1s
 
         // 3. Translate the "arrows" (RAMPath) into the grids
@@ -104,7 +116,11 @@ struct DSEMPrecisionMatrixBuilder : public PrecisionMatrixBuilderBase<Type> {
             // more, it's a parameter the model is guessing, otherwise, it's a fixed number.
             Type value = this->paths[r].start;
             if (this->paths[r].beta_index >= 1) {
-                size_t b_idx = static_cast<size_t>(this->paths[r].beta_index - 1);
+                const size_t b_idx = static_cast<size_t>(this->paths[r].beta_index - 1);
+                if (b_idx >= this->beta_z.size()) {
+                    throw std::invalid_argument(
+                        "DSEMPrecisionMatrixBuilder: beta_index points past beta_z size.");
+                    }
                 value = this->beta_z[b_idx];
             }
 
@@ -134,8 +150,8 @@ struct DSEMPrecisionMatrixBuilder : public PrecisionMatrixBuilderBase<Type> {
 
         // Assemble the final precision matrix (Q) and send it to the GMRF.
         return IminusRho_kk.transpose() * Vinv_sparse * IminusRho_kk;
-    }
 #endif
+    }
 };
 
 }  // namespace fims_distributions

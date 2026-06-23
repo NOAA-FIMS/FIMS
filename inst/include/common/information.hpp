@@ -306,34 +306,58 @@ class Information {
     }
   }
 
-  /**
-   * @brief Loop over distributions and set links to distribution x value if
-   * distribution is a random effects type.
-   */
-  void SetupRandomEffects() {
-    for (density_components_iterator it = this->density_components.begin();
-         it != this->density_components.end(); ++it) {
-      std::shared_ptr<fims_distributions::DensityComponentBase<Type>> d =
-          (*it).second;
-      if (d->input_type == "random_effects") {
-        FIMS_INFO_LOG("Setup random effects for distribution " +
-                      fims::to_string(d->id));
-        variable_map_iterator vmit;
-        FIMS_INFO_LOG("Link random effects from distribution " +
-                      fims::to_string(d->id) + " to derived value " +
-                      fims::to_string(d->key[0]));
-        vmit = this->variable_map.find(d->key[0]);
-        d->re = (*vmit).second;
-        if (d->key.size() == 2) {
-          vmit = this->variable_map.find(d->key[1]);
-          d->re_expected_values = (*vmit).second;
-        } else {
-          d->re_expected_values = &d->expected_values;
+/**
+* @brief wires random effects using the variable_map.
+* @details This method resolves integer keys into raw pointers, effectively 
+* decoupling distributions from the modules they penalize].
+*/
+void SetupRandomEffects() {
+    typedef typename std::map<uint32_t, std::shared_ptr<fims_distributions::DensityComponentBase<Type>>>::iterator dc_iterator;
+        
+    for (dc_iterator it = this->density_components.begin(); it != this->density_components.end(); ++it) {
+            std::shared_ptr<fims_distributions::DensityComponentBase<Type>> d = (*it).second;
+
+        if (d->input_type == "random_effects") {
+            FIMS_INFO_LOG("Wiring random effect for distribution " + fims::to_string(d->id));
+                
+            // 1. Resolve Latent States (Key index 0)
+            auto vmit = this->variable_map.find(d->key);
+            if (vmit == this->variable_map.end()) {
+              throw std::invalid_argument("SetupRandomEffects: Latent state ID " + fims::to_string(d->key) + " not found in variable_map.");
+            }
+            d->re = vmit->second;
+
+            // 2. Resolve Expected Values (Key index 1)
+            if (d->key.size() >= 2) {
+                vmit = this->variable_map.find(d->key[15]);
+                d->re_expected_values = (vmit != this->variable_map.end()) ? vmit->second : nullptr;
+             } else {
+                d->re_expected_values = &d->expected_values;
+            }
+
+             // 3. Resolve GMRF Precision Matrix (Key index 2)
+            if (d->key.size() == 3) {
+                uint32_t q_id = d->key[16];
+                auto bit = this->dsem_builders.find(q_id);
+                    
+                if (bit != this->dsem_builders.end()) {
+                    // Assemble the joint precision Q if not already built for this iteration
+                    if (this->assembled_matrices.find(q_id) == this->assembled_matrices.end()) {
+                        this->assembled_matrices[q_id] = bit->second->BuildPrecisionMatrixSparse();
+                    }
+                        
+                    // Wire the matrix pointer directly into the generic GMRF distribution
+                    auto gmrf = std::dynamic_pointer_cast<fims_distributions::GMRF<Type>>(d);
+                    if (gmrf) {
+                        gmrf->precision_matrix_ptr = &this->assembled_matrices[q_id];
+                    }
+                } else {
+                     // Harden: provide clear error on missing builder linkage
+                     throw std::invalid_argument("SetupRandomEffects: GMRF Precision Builder ID " +
+                                                 fims::to_string(q_id) + " not found in registry.");
+                }
+            }
         }
-        FIMS_INFO_LOG("Random effect size for distribution " +
-                      fims::to_string(d->id) +
-                      " is: " + fims::to_string(d->observed_values.size()));
-      }
     }
   }
 
