@@ -40,6 +40,20 @@ test_that("NormalLikelihood links RealVector inputs", {
   clear()
 })
 
+test_that("NormalLikelihood links RealVector expected values", {
+  likelihood <- methods::new(NormalLikelihood)
+  expected <- methods::new(RealVector)
+
+  set_real_vector(likelihood$observed_values, 1)
+  set_real_vector(expected, 0)
+  set_real_vector(likelihood$log_sd, 0)
+  likelihood$set_real_expected_input(expected)
+
+  #' @description Test that NormalLikelihood can evaluate linked RealVector expected values.
+  expect_equal(likelihood$evaluate(), -stats::dnorm(1, 0, 1, log = TRUE))
+  clear()
+})
+
 test_that("LognormalLikelihood works with correct inputs", {
   likelihood <- methods::new(LognormalLikelihood)
   observed <- exp(c(1, 2))

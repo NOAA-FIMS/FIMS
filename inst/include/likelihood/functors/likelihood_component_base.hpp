@@ -31,6 +31,8 @@ struct LikelihoodComponentBase {
   fims::Vector<Type> observed_values;
   fims::Vector<Type> expected_values;
   fims::Vector<Type> nll_components;
+  uint32_t expected_values_id = 0;
+  bool use_expected_values_id = false;
   LikelihoodRole role = LikelihoodRole::Data;
   Type nll = static_cast<Type>(0.0);
   Type na_value = static_cast<Type>(-999.0);
