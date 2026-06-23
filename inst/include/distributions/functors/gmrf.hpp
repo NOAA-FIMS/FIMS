@@ -27,11 +27,11 @@ namespace fims_distributions {
 template <typename Type>
 struct GMRF : public DensityComponentBase<Type> {
     /**
-     * @brief The sparse precision matrix (Q) for the GMRF.
-     * @details This matrix is typically assembled by a separate precision 
+     * @brief The pointer to the sparse precision matrix (Q) for the GMRF.
+     * @details The matrix is assembled by a separate precision 
      * builder (e.g., the DSEM builder).
      */
-    Eigen::SparseMatrix<Type> precision_matrix;
+    Eigen::SparseMatrix<Type> precision_matrix_ptr = nullptr;
 
     /** @brief Constructor. */
     GMRF() : DensityComponentBase<Type>() {}
@@ -50,27 +50,32 @@ struct GMRF : public DensityComponentBase<Type> {
     virtual const Type evaluate() {
         const size_t n_x = this->get_n_x();
 
-        // Are the following commented out lines needed?
-        // this->lpdf_vec.resize(n_x); 
-        // std::fill(this->lpdf_vec.begin(), this->lpdf_vec.end(), static_cast<Type>(0));
-        this->lpdf = static_cast<Type>(0);
-
-        // Centering: x - mu because TMB's GMRF expects input centered around a mean of 0.
-        for (size_t i = 0; i < n_x; ++i) {
-        x_centered(static_cast<int>(i)) = this->get_observed(i) - this->get_expected(i);
+        if (this->precision_matrix_ptr == nullptr) {
+            throw std::runtime_error(
+                "GMRF: Precision matrix pointer is null. "
+                "Check GMRF ID and Information::SetupRandomEffects() linkage.");
         }
 
-        // Dimension Check
-        if (static_cast<size_t>(precision_matrix.rows()) != n_x) {
-        throw std::invalid_argument(
-            "GMRF: Precision matrix dimension mismatch. Got rows: " + 
-            std::to_string(precision_matrix.rows()) + " but expected: " + 
-            std::to_string(n_x) + "."
-        );
+        if (static_cast<size_t>(this->precision_matrix_ptr->rows()) != n_x) {
+            throw std::invalid_argument(
+                "GMRF: Dimension mismatch. Precision matrix rows (" + 
+                std::to_string(this->precision_matrix_ptr->rows()) + 
+                ") must match random effect vector size (" + 
+                std::to_string(n_x) + ").");
+        }
+
+        // Centering: x - mu because TMB's GMRF expects input centered around a mean of 0.
+        vector<Type> x_centered(n_x);
+        for (size_t i = 0; i < n_x; ++i) {
+            x_centered(static_cast<int>(i)) = this->get_observed(i) - this->get_expected(i);
         }
 
         // Evaluate TMB GMRF and multiply by -1 to convert from negative log-likelihood to log-likelihood.
-        this->lpdf = -1.0 * density::GMRF(precision_matrix)(x_centered);
+        this->lpdf = -1.0 * density::GMRF(*(this->precision_matrix_ptr))(x_centered);
+
+        // Store the scalar result in a length-1 vector.
+        this->lpdf_vec.resize(1);
+        this->lpdf_vec = this->lpdf;
 
         return this->lpdf;
     }
