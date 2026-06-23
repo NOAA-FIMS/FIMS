@@ -318,17 +318,8 @@ initialize_data_distribution <- function(
     # Using resize() and then assigning value to each element of log_sd directly
     # is correct, as creating a new ParameterVector for log_sd here would
     # trigger an error in integration tests with wrappers.
-    new_module$log_sd$resize(length(sd[["value"]]))
-
-    purrr::walk(
-      seq_along(sd[["value"]]),
-      \(x) new_module[["log_sd"]][x][["value"]] <- log(sd[["value"]][x])
-    )
-
-    purrr::walk(
-      seq_along(sd[["estimation_type"]]),
-      \(x) new_module[["log_sd"]][x][["estimation_type"]]$set(sd[["estimation_type"]][x])
-    )
+    new_module$log_sd[] <- log(sd[["value"]])
+    new_module$log_sd$set_estimation_types(sd[["estimation_type"]])
   }
 
   if (family[["family"]] == "gaussian") {
@@ -336,15 +327,8 @@ initialize_data_distribution <- function(
     new_module <- methods::new(DnormDistribution)
 
     # populate logged standard deviation parameter with log of input
-    purrr::walk(
-      seq_along(sd[["value"]]),
-      \(x) new_module[["log_sd"]][x][["value"]] <- log(sd[["value"]][x])
-    )
-
-    purrr::walk(
-      seq_along(sd[["estimation_type"]]),
-      \(x) new_module[["log_sd"]][x][["estimation_type"]]$set(sd[["estimation_type"]][x])
-    )
+    new_module$log_sd[] <- log(sd[["value"]])
+    new_module$log_sd$set_estimation_types(sd[["estimation_type"]])
   }
 
   if (family[["family"]] == "multinomial") {
@@ -405,24 +389,12 @@ initialize_process_distribution <- function(
     new_module <- methods::new(DlnormDistribution)
 
     # populate logged standard deviation parameter with log of input
-    new_module$log_sd$resize(length(sd[["value"]]))
-    purrr::walk(
-      seq_along(sd[["value"]]),
-      \(x) new_module[["log_sd"]][x][["value"]] <- log(sd[["value"]][x])
-    )
+    new_module$log_sd[] <- log(sd[["value"]])
 
     # setup whether or not sd parameter is estimated
-    if (length(sd[["value"]]) > 1 && length(sd[["estimation_type"]]) == 1) {
-      if (sd[["estimation_type"]] == "constant") {
-        new_module$log_sd$set_all_estimable(FALSE)
-      } else {
-        new_module$log_sd$set_all_estimable(TRUE)
-      }
-    } else {
-      for (i in seq_along(sd[["estimation_type"]])) {
-        new_module$log_sd[i]$estimation_type$set(sd[["estimation_type"]][i])
-      }
-    }
+    et <- sd[["estimation_type"]]
+    et[is.na(et)] <- "constant"
+    new_module$log_sd$set_estimation_types(et)
   }
 
   if (family[["family"]] == "gaussian") {
@@ -436,19 +408,23 @@ initialize_process_distribution <- function(
     }
 
     # setup whether or not sd parameter is estimated
-    if (length(sd[["value"]]) > 1 && length(sd[["estimation_type"]]) == 1) {
-      if (sd[["estimation_type"]] == "constant") {
-        new_module$log_sd$set_all_estimable(FALSE)
-      } else {
-        new_module$log_sd$set_all_estimable(TRUE)
-      }
-    } else {
-      for (i in seq_along(sd[["estimation_type"]])) {
-        new_module$log_sd[i]$estimation_type$set(sd[["estimation_type"]][i])
-      }
-    }
-  }
+    et <- sd[["estimation_type"]]
+    et[is.na(et)] <- "constant"
+    new_module$log_sd$set_estimation_types(et)
 
+    #   if (length(sd[["value"]]) > 1 && length(sd[["estimation_type"]]) == 1) {
+    #     if (sd[["estimation_type"]] == "constant") {
+    #       new_module$log_sd$set_estimation_types(c("constant"))
+    #     } else {
+    #       new_module$log_sd$set_estimation_types(c("fixed_effects"))
+    #     }
+    #   } else {
+    #     for (i in seq_along(sd[["estimation_type"]])) {
+    #       new_module$log_sd[i]$estimation_type$set(sd[["estimation_type"]][i])
+    #     }
+    #   }
+    # }
+  }
 
   n_dim <- length(module$field(par))
 

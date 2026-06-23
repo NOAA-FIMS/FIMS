@@ -205,6 +205,32 @@ test_that("ParameterVector returns correct error messages", {
   #' @description Test that ParameterVector returns an error message when trying to make a vector that has dimensions larger than specified in x.
   expect_error(
     methods::new(ParameterVector, 1:3, 5),
-    "Error in call to ParameterVector"
+    "must equal the requested size"
   )
+})
+
+test_that("rcpp ParameterVector supports indexed numeric replacement", {
+  distribution <- methods::new(DlnormDistribution)
+  distribution$log_sd[] <- 1:10
+
+  #' @description Test that replacing one ParameterVector element with a numeric scalar updates its value.
+  distribution$log_sd[1] <- 8
+  expect_equal(distribution$log_sd[1]$value, 8)
+  expect_equal(
+    vapply(
+      1:length(distribution$log_sd),
+      function(i) distribution$log_sd[i]$value,
+      numeric(1)
+    ),
+    c(8, 2:10)
+  )
+
+  #' @description Test that replacing an explicitly vector-indexed ParameterVector element with a numeric scalar updates its value.
+  distribution$log_sd[c(1)] <- 9
+  expect_equal(distribution$log_sd[1]$value, 9)
+
+  #' @description Test that replacing multiple ParameterVector elements with numeric values updates their values.
+  distribution$log_sd[c(2, 3)] <- c(20, 30)
+  expect_equal(distribution$log_sd[2]$value, 20)
+  expect_equal(distribution$log_sd[3]$value, 30)
 })

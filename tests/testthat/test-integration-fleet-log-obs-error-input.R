@@ -34,7 +34,10 @@ test_that("`log_obs_error scalar` works with correct inputs", {
     dplyr::filter(
       !(fleet_name == "fleet1" & label == "log_sd" & time > 1) |
         is.na(fleet_name == "fleet1" & label == "log_sd" & time > 1)
-    )
+    ) |>
+    dplyr::mutate(estimation_type = ifelse(label == "log_sd",
+      "constant", estimation_type
+    ))
 
   test_fit <- parameters_4_model |>
     initialize_fims(data = data_4_model) |>

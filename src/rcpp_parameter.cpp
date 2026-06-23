@@ -41,8 +41,8 @@ void register_vectors(Rcpp::Module& m) {
       .method("at", &ParameterVector::at)
       .method("size", &ParameterVector::size)
       .method("resize", &ParameterVector::resize)
-      .method("set_all_estimable", &ParameterVector::set_all_estimable)
-      .method("set_all_random", &ParameterVector::set_all_random)
+      .method("set_values", &ParameterVector::set_values)
+      .method("set_estimation_types", &ParameterVector::set_estimation_types)
       .method("fill", &ParameterVector::fill)
       .method("get_id", &ParameterVector::get_id);
 
@@ -54,8 +54,8 @@ void register_vectors(Rcpp::Module& m) {
       .constructor<Rcpp::NumericVector, size_t>()
       .method("get", &RealVector::get)
       .method("set", &RealVector::set)
-      .method("fromRVector", &RealVector::fromRVector)
-      .method("toRVector", &RealVector::toRVector)
+      .method("set_values", &RealVector::set_values)
+      .method("get_values", &RealVector::get_values)
       .method("show", &RealVector::show)
       .method("at", &RealVector::at)
       .method("size", &RealVector::size)

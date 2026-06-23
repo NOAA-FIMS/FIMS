@@ -29,12 +29,12 @@ utils::globalVariables(c(
 # 3. If we had setter functions for FIMSFrame, you would add or delete the
 #    appropriate setter functions next but we do not. Instead, we want users to
 #    re-run FIMSFrame() when they make any changes to their data, that way all
-#    of the slots will be updated simultaneously. @nathanvaughan-NOAA mentioned
+#    of the slots will be updated simultaneously. Nathan mentioned
 #    during Code club 2024-12-17 that this may be a problem for future use of
 #    FIMSFrame objects, especially when doing MSE or simulation when there is a
 #    large overhead in running FIMSFrame and you just want to change a small,
 #    simple thing in your data and re-run the model. We will cross that bridge
-#    later. @msupernaw also informed us about the ability to lock an R object
+#    later. Matthew also informed us about the ability to lock an R object
 #    so it cannot be altered. See https://rdrr.io/r/base/bindenv.html.
 # 4. Augment the validator functions to ensure that users do not pass
 #    incompatible information to FIMSFrame().
@@ -817,16 +817,16 @@ create_edm_embedding <- function(
     drop_missing = drop_missing,
     n_rows = as.integer(edm_obj$n_rows),
     n_cols = as.integer(edm_obj$n_cols),
-    embedded_values = edm_obj$embedded_values$toRVector(),
-    target_values = edm_obj$target_values$toRVector()
+    embedded_values = edm_obj$embedded_values$get_values(),
+    target_values = edm_obj$target_values$get_values()
   )
 
   # Append uncertainty fields only when an uncertainty series was provided
   if (!is.null(uncertainty_name)) {
     embedding_result[["embedded_uncertainty"]] <-
-      edm_obj$embedded_uncertainty$toRVector()
+      edm_obj$embedded_uncertainty$get_values()
     embedding_result[["target_uncertainty"]] <-
-      edm_obj$target_uncertainty$toRVector()
+      edm_obj$target_uncertainty$get_values()
   }
 
   # Store in the edm_embeddings slot and return a new FIMSFrame

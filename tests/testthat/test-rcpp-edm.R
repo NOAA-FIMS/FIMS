@@ -43,7 +43,7 @@ test_that("rcpp edm works with correct inputs", {
   expect_equal(de$n_cols, 3)
 
   #' @description Test target values mapping (actual x_t values, not indices).
-  expect_equal(de$target_values$toRVector(), c(30.0, 40.0, 50.0))
+  expect_equal(de$target_values$get_values(), c(30.0, 40.0, 50.0))
 
   #' @description Test retrieving elements using at() method.
   expect_equal(de$at(0, 0), 30.0)
@@ -88,7 +88,7 @@ test_that("rcpp edm construct_drop_missing works correctly", {
 
   #' @description Test that construct_drop_missing keeps valid windows and maps correct target values.
   expect_equal(de2$n_rows, 2)
-  expect_equal(de2$target_values$toRVector(), c(30.0, 70.0))
+  expect_equal(de2$target_values$get_values(), c(30.0, 70.0))
   expect_equal(de2$at(0, 0), 30.0)
   expect_equal(de2$at(1, 2), 50.0)
 
@@ -131,7 +131,7 @@ test_that("rcpp edm propagates uncertainty vectors when provided", {
   # Row 1 target index 3 -> sigma_3 = 0.4
   # Row 2 target index 4 -> sigma_4 = 0.5
   #' @description Test that target_uncertainty holds the correct sigma_t values per row.
-  expect_equal(de$target_uncertainty$toRVector(), c(0.3, 0.4, 0.5))
+  expect_equal(de$target_uncertainty$get_values(), c(0.3, 0.4, 0.5))
 
   # embedded_uncertainty row-major layout mirrors embedded_values:
   # Row 0: [sigma_2, sigma_1, sigma_0] = [0.3, 0.2, 0.1]
@@ -139,7 +139,7 @@ test_that("rcpp edm propagates uncertainty vectors when provided", {
   # Row 2: [sigma_4, sigma_3, sigma_2] = [0.5, 0.4, 0.3]
   #' @description Test that embedded_uncertainty is laid out row-major matching embedded_values.
   expect_equal(
-    de$embedded_uncertainty$toRVector(),
+    de$embedded_uncertainty$get_values(),
     c(0.3, 0.2, 0.1,
       0.4, 0.3, 0.2,
       0.5, 0.4, 0.3)
@@ -155,9 +155,9 @@ test_that("rcpp edm uncertainty fields are empty when not provided", {
   de$construct(series, 3L, 1L)
 
   #' @description Test that embedded_uncertainty is empty when no uncertainty series is passed.
-  expect_equal(length(de$embedded_uncertainty$toRVector()), 0)
+  expect_equal(length(de$embedded_uncertainty$get_values()), 0)
   #' @description Test that target_uncertainty is empty when no uncertainty series is passed.
-  expect_equal(length(de$target_uncertainty$toRVector()), 0)
+  expect_equal(length(de$target_uncertainty$get_values()), 0)
 
   clear()
 })
@@ -180,7 +180,7 @@ test_that("rcpp edm construct_drop_missing propagates uncertainty correctly", {
   # Row 0 target index 2 -> sigma_2 = 0.3
   # Row 1 target index 6 -> sigma_6 = 0.7
   #' @description Test that target_uncertainty holds sigma_t for the retained rows.
-  expect_equal(de$target_uncertainty$toRVector(), c(0.3, 0.7))
+  expect_equal(de$target_uncertainty$get_values(), c(0.3, 0.7))
 
   clear()
 })
