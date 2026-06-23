@@ -432,3 +432,104 @@ The forward pass detects that `depletion` and `carrying_capacity` are present
 and activates `CalculateBiomassFromDepletion` instead of `CalculateMortality`
 + `CalculateNumbersAA` + `CalculateBiomass`. No NAA calculations appear on
 the TMB tape.
+
+---
+
+## 7. Error Checking
+
+The forward pass provides two complementary validation checks that run
+inside `build()` before `CreateTMBModel()` is called. They operate in
+opposite directions and serve different purposes.
+
+### Bottom-up check: data distributions have model counterparts
+
+`CheckForwardPass()` verifies that every data density component has a
+corresponding expected value produced by the forward pass. If a distribution
+references `expected_age_comp` but no calculation produced it — because,
+for example, selectivity was not registered — this is a hard **error**.
+The model would crash at `SetupData()` when it cannot find the expected
+value in `variable_map`.
+
+```cpp
+bool CheckForwardPass(const std::vector<KernelDescriptor>& kernels) {
+  // Collect all quantity names the forward pass resolved
+  std::set<std::string> produced;
+  for (const auto& kd : kernels)
+    for (const auto& out : kd.outputs)
+      produced.insert(out.name);
+
+  bool valid = true;
+  for (const auto& [id, d] : density_components) {
+    if (d->input_type != "data") continue;
+    // key[0] is the expected-value quantity the distribution references
+    if (!variable_map.count(d->key[0])) {
+      valid = false;
+      FIMS_ERROR_LOG("Density component " + to_string(d->id) +
+                     " references a quantity that was not produced by any "
+                     "active calculation. Check that required modules "
+                     "(selectivity, growth, etc.) are registered.");
+    }
+  }
+  return valid;
+}
+```
+
+This replaces the current `CheckModel()` logic, which hard-codes checks
+like *"if model type is CAA, require selectivity on all fleets."* The
+registry-based check is model-type-agnostic: it reads what the data
+actually needs and verifies the computation graph can supply it.
+
+### Top-down check: computed quantities are used
+
+`WarnUnusedOutputs()` checks the reverse direction — whether any quantity
+produced by the forward pass is **not** referenced by any data distribution.
+This catches configurations where age-structured calculations are active
+but no age composition likelihood is present.
+
+```cpp
+void WarnUnusedOutputs(const std::vector<KernelDescriptor>& kernels) {
+  std::set<uint32_t> referenced_by_data;
+  for (const auto& [id, d] : density_components)
+    if (d->input_type == "data")
+      for (auto key : d->key)
+        referenced_by_data.insert(key);
+
+  for (const auto& kd : kernels) {
+    for (const auto& out : kd.outputs) {
+      uint32_t out_id = quantity_name_to_id.at(out.name);
+      if (!referenced_by_data.count(out_id)) {
+        FIMS_WARNING_LOG(
+            "Derived quantity '" + out.name +
+            "' is computed but is not referenced by any data likelihood. "
+            "If this is an estimation model, verify the model is identifiable.");
+      }
+    }
+  }
+}
+```
+
+This issues a **warning**, not an error. The model still runs. The warning
+is appropriate because there are legitimate reasons to compute a quantity
+without a direct data likelihood:
+
+- Strong priors on age-structure parameters (selectivity-at-age, initial
+  N-at-age) that constrain the model even without age composition data.
+- Simulation or projection runs where estimation is not the goal.
+- The quantity is computed for reporting only (e.g., `spawning_biomass`
+  flagged via `set_reported(TRUE)` but not directly fitted to data).
+
+### What error checking cannot do
+
+Both checks operate on the **structural** properties of the model —
+which calculations are active and which data distributions are connected.
+Neither check can determine whether the model is **statistically
+identifiable**.
+
+
+The registry error checks should be understood as:
+
+| Check | Signal | Meaning |
+|---|---|---|
+| `CheckForwardPass` | **Error** | Structural problem — the model cannot compute what the data needs |
+| `WarnUnusedOutputs` | **Warning** | Potential statistical concern — computed quantity has no data |
+
