@@ -20,8 +20,6 @@ namespace
     {
         this->InitializeCAA();
         catch_at_age_model->Prepare();
-        size_t pop_id = population->GetId();
-        auto& dq = catch_at_age_model->GetPopulationDerivedQuantities(pop_id);
 
         for (int year = 0; year < population->n_years; year++)
         {
@@ -51,13 +49,13 @@ namespace
                         population->fleets[fleet_index]->selectivity->evaluate(
                             population->ages[age]);
                 }
-                EXPECT_LT(abs(dq["mortality_F"][i_age_year] - mortality_F[i_age_year]),
+                EXPECT_LT(abs(population->mortality_F[i_age_year] - mortality_F[i_age_year]),
                           1e-7);
 
                 mortality_Z[i_age_year] =
                     fims_math::exp(population->log_M[i_age_year]) +
-                    dq["mortality_F"][i_age_year];
-                EXPECT_LT(abs(dq["mortality_Z"][i_age_year] - mortality_Z[i_age_year]),
+                    population->mortality_F[i_age_year];
+                EXPECT_LT(abs(population->mortality_Z[i_age_year] - mortality_Z[i_age_year]),
                           1e-7);
             }
         }
@@ -67,9 +65,6 @@ namespace
     // IO correctness
     TEST_F(CAAEvaluateTestFixture, HandlesCorrectInput_CatchAtAge_CalculateInitialNumbersAA)
     {
-        size_t pop_id = population->GetId();
-        auto& dq = catch_at_age_model->GetPopulationDerivedQuantities(pop_id);
-
         std::vector<double> numbers_at_age(n_years * n_ages, 0);
 
         for (int year = 0; year < population->n_years; year++)
@@ -81,7 +76,7 @@ namespace
                 catch_at_age_model->CalculateInitialNumbersAA(population, i_age_year, age);
 
                 numbers_at_age[i_age_year] = fims_math::exp(population->log_init_naa[age]);
-                EXPECT_EQ(dq["numbers_at_age"][i_age_year], numbers_at_age[i_age_year]);
+                EXPECT_EQ(population->numbers_at_age[i_age_year], numbers_at_age[i_age_year]);
             }
         }
     }
@@ -94,9 +89,6 @@ namespace
         std::vector<double> test_unfished_numbers_at_age((n_years + 1) * n_ages, 0);
         std::vector<double> test_unfished_spawning_biomass(n_years + 1, 0);
 
-        size_t pop_id = population->GetId();
-        auto& dq = catch_at_age_model->GetPopulationDerivedQuantities(pop_id);
-
         for (int year = 0; year < (population->n_years + 1); year++)
         {
             for (int age = 0; age < population->n_ages; age++)
@@ -105,7 +97,7 @@ namespace
 
                 if (age == 0)
                 {
-                    dq["unfished_numbers_at_age"][i_age_year] =
+                    population->unfished_numbers_at_age[i_age_year] =
                         fims_math::exp(population->recruitment->log_rzero[0]);
                     test_unfished_numbers_at_age[i_age_year] =
                         fims_math::exp(population->recruitment->log_rzero[0]);
@@ -153,19 +145,19 @@ namespace
                     population, i_age_year, year, age);
 
                 test_unfished_spawning_biomass[year] +=
-                    dq["proportion_mature_at_age"][i_age_year] *
+                    population->proportion_mature_at_age[i_age_year] *
                     population->proportion_female[age] *
                     test_unfished_numbers_at_age[i_age_year] *
                     population->growth->evaluate(year, population->ages[age]);
 
-                EXPECT_EQ(dq["unfished_numbers_at_age"][i_age_year],
+                EXPECT_EQ(population->unfished_numbers_at_age[i_age_year],
                           test_unfished_numbers_at_age[i_age_year]);
-                EXPECT_GT(dq["unfished_numbers_at_age"][i_age_year], 0.0);
+                EXPECT_GT(population->unfished_numbers_at_age[i_age_year], 0.0);
             }
 
-            EXPECT_NEAR(dq["unfished_spawning_biomass"][year],
+            EXPECT_NEAR(population->unfished_spawning_biomass[year],
                         test_unfished_spawning_biomass[year], 1e-7);
-            EXPECT_GT(dq["unfished_spawning_biomass"][year], 0.0);
+            EXPECT_GT(population->unfished_spawning_biomass[year], 0.0);
         }
     }
 }

@@ -28,8 +28,6 @@ namespace
                expect_maturity[i_age_year] = 1.0/(1.0+exp(-(population->ages[age]-inflection_point)*slope));
            }
         }
-        size_t pop_id = population->GetId();
-        auto& dq = catch_at_age_model->GetPopulationDerivedQuantities(pop_id);
-        EXPECT_NEAR(dq["proportion_mature_at_age"][10], expect_maturity[10], 0.0001);
+        EXPECT_NEAR(population->proportion_mature_at_age[10], expect_maturity[10], 0.0001);
    }
 }

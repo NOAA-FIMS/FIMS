@@ -21,29 +21,28 @@ namespace
     {
 
         this->InitializeCAA();
-        for (auto fit = catch_at_age_model->fleets.begin(); 
+        for (auto fit = catch_at_age_model->fleets.begin();
             fit != catch_at_age_model->fleets.end(); ++fit) {
             auto &fleet = (*fit).second;
-            auto& dq = catch_at_age_model->GetFleetDerivedQuantities(fleet->GetId());
-            EXPECT_EQ(dq["landings_numbers_at_age"].size(), n_years * n_ages);
-            EXPECT_EQ(dq["landings_weight_at_age"].size(), n_years * n_ages);
-            EXPECT_EQ(dq["landings_numbers_at_length"].size(), n_years * n_lengths);
-            EXPECT_EQ(dq["landings_weight"].size(), n_years);
-            EXPECT_EQ(dq["landings_numbers"].size(), n_years);
-            EXPECT_EQ(dq["landings_expected"].size(), n_years);
-            EXPECT_EQ(dq["log_landings_expected"].size(), n_years);
-            EXPECT_EQ(dq["agecomp_proportion"].size(), n_years * n_ages);
-            EXPECT_EQ(dq["lengthcomp_proportion"].size(), n_years * n_lengths);
-            EXPECT_EQ(dq["index_numbers_at_age"].size(), n_years * n_ages);
-            EXPECT_EQ(dq["index_numbers_at_length"].size(), n_years * n_lengths);
-            EXPECT_EQ(dq["index_weight"].size(), n_years);
-            EXPECT_EQ(dq["index_numbers"].size(), n_years);
-            EXPECT_EQ(dq["index_expected"].size(), n_years);
-            EXPECT_EQ(dq["log_index_expected"].size(), n_years);
-            EXPECT_EQ(dq["catch_index"].size(), n_years);
-            EXPECT_EQ(dq["expected_catch"].size(), n_years);
-            EXPECT_EQ(dq["agecomp_expected"].size(), n_years * n_ages);
-            EXPECT_EQ(dq["lengthcomp_expected"].size(), n_years * n_lengths);
+            EXPECT_EQ(fleet->landings_numbers_at_age.size(), n_years * n_ages);
+            EXPECT_EQ(fleet->landings_weight_at_age.size(), n_years * n_ages);
+            EXPECT_EQ(fleet->landings_numbers_at_length.size(), n_years * n_lengths);
+            EXPECT_EQ(fleet->landings_weight.size(), n_years);
+            EXPECT_EQ(fleet->landings_numbers.size(), n_years);
+            EXPECT_EQ(fleet->landings_expected.size(), n_years);
+            EXPECT_EQ(fleet->log_landings_expected.size(), n_years);
+            EXPECT_EQ(fleet->agecomp_proportion.size(), n_years * n_ages);
+            EXPECT_EQ(fleet->lengthcomp_proportion.size(), n_years * n_lengths);
+            EXPECT_EQ(fleet->index_numbers_at_age.size(), n_years * n_ages);
+            EXPECT_EQ(fleet->index_weight_at_age.size(), n_years * n_ages);
+            EXPECT_EQ(fleet->index_numbers_at_length.size(), n_years * n_lengths);
+            EXPECT_EQ(fleet->index_weight.size(), n_years);
+            EXPECT_EQ(fleet->index_numbers.size(), n_years);
+            EXPECT_EQ(fleet->index_expected.size(), n_years);
+            EXPECT_EQ(fleet->log_index_expected.size(), n_years);
+            EXPECT_EQ(fleet->catch_index.size(), n_years);
+            EXPECT_EQ(fleet->agecomp_expected.size(), n_years * n_ages);
+            EXPECT_EQ(fleet->lengthcomp_expected.size(), n_years * n_lengths);
             EXPECT_EQ(fleet->Fmort.size(), n_years);
             EXPECT_EQ(fleet->q.size(), 1);
         }
@@ -54,51 +53,48 @@ namespace
         this->InitializeCAA();
         catch_at_age_model->Prepare();
 
-        for (auto fit = catch_at_age_model->fleets.begin(); 
+        for (auto fit = catch_at_age_model->fleets.begin();
             fit != catch_at_age_model->fleets.end(); ++fit) {
             auto &fleet = (*fit).second;
-            auto& dq = catch_at_age_model->GetFleetDerivedQuantities(fleet->GetId());
 
-            EXPECT_EQ(dq["landings_numbers_at_age"], 
+            EXPECT_EQ(fleet->landings_numbers_at_age,
                 fims::Vector(n_years * n_ages, 0.0));
-            EXPECT_EQ(dq["landings_weight_at_age"], 
+            EXPECT_EQ(fleet->landings_weight_at_age,
                 fims::Vector(n_years * n_ages, 0.0));
-            EXPECT_EQ(dq["landings_numbers_at_length"], 
+            EXPECT_EQ(fleet->landings_numbers_at_length,
                 fims::Vector(n_years * n_lengths, 0.0));
-            EXPECT_EQ(dq["landings_weight"], 
+            EXPECT_EQ(fleet->landings_weight,
                 fims::Vector(n_years, 0.0));
-            EXPECT_EQ(dq["landings_numbers"], 
+            EXPECT_EQ(fleet->landings_numbers,
                 fims::Vector(n_years, 0.0));
-            EXPECT_EQ(dq["landings_expected"], 
+            EXPECT_EQ(fleet->landings_expected,
                 fims::Vector(n_years, 0.0));
-            EXPECT_EQ(dq["log_landings_expected"], 
+            EXPECT_EQ(fleet->log_landings_expected,
                 fims::Vector(n_years, 0.0));
-            EXPECT_EQ(dq["agecomp_proportion"], 
+            EXPECT_EQ(fleet->agecomp_proportion,
                 fims::Vector(n_years * n_ages, 0.0));
-            EXPECT_EQ(dq["lengthcomp_proportion"], 
+            EXPECT_EQ(fleet->lengthcomp_proportion,
                 fims::Vector(n_years * n_lengths, 0.0));
-            EXPECT_EQ(dq["index_numbers_at_age"], 
+            EXPECT_EQ(fleet->index_numbers_at_age,
                 fims::Vector(n_years * n_ages, 0.0));
-            EXPECT_EQ(dq["index_numbers_at_length"], 
-                fims::Vector(n_years * n_lengths, 0.0));
-            EXPECT_EQ(dq["index_weight"], 
-                fims::Vector(n_years, 0.0));
-            EXPECT_EQ(dq["index_numbers"], 
-                fims::Vector(n_years, 0.0));
-            EXPECT_EQ(dq["index_expected"], 
-                fims::Vector(n_years, 0.0));
-            EXPECT_EQ(dq["log_index_expected"], 
-                fims::Vector(n_years, 0.0));
-            EXPECT_EQ(dq["catch_index"], 
-                fims::Vector(n_years, 0.0));
-            EXPECT_EQ(dq["expected_catch"], 
-                fims::Vector(n_years, 0.0));
-            EXPECT_EQ(dq["agecomp_expected"], 
+            EXPECT_EQ(fleet->index_weight_at_age,
                 fims::Vector(n_years * n_ages, 0.0));
-            EXPECT_EQ(dq["lengthcomp_expected"], 
+            EXPECT_EQ(fleet->index_numbers_at_length,
                 fims::Vector(n_years * n_lengths, 0.0));
-
-
+            EXPECT_EQ(fleet->index_weight,
+                fims::Vector(n_years, 0.0));
+            EXPECT_EQ(fleet->index_numbers,
+                fims::Vector(n_years, 0.0));
+            EXPECT_EQ(fleet->index_expected,
+                fims::Vector(n_years, 0.0));
+            EXPECT_EQ(fleet->log_index_expected,
+                fims::Vector(n_years, 0.0));
+            EXPECT_EQ(fleet->catch_index,
+                fims::Vector(n_years, 0.0));
+            EXPECT_EQ(fleet->agecomp_expected,
+                fims::Vector(n_years * n_ages, 0.0));
+            EXPECT_EQ(fleet->lengthcomp_expected,
+                fims::Vector(n_years * n_lengths, 0.0));
         }
     }
 } // namespace

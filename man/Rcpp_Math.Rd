@@ -4,11 +4,11 @@
 \alias{Ops,Rcpp_Parameter,Rcpp_Parameter-method}
 \alias{Ops,Rcpp_Parameter,numeric-method}
 \alias{Ops,numeric,Rcpp_Parameter-method}
-\alias{Ops,Rcpp_ParameterVector,Rcpp_ParameterVector-method}
-\alias{Ops,Rcpp_ParameterVector,numeric-method}
+\alias{Ops,Rcpp_VariableVector,Rcpp_VariableVector-method}
+\alias{Ops,Rcpp_VariableVector,numeric-method}
 \alias{Ops,Rcpp_RealVector,numeric-method}
-\alias{Ops,numeric,Rcpp_ParameterVector-method}
-\alias{Math,Rcpp_ParameterVector-method}
+\alias{Ops,numeric,Rcpp_VariableVector-method}
+\alias{Math,Rcpp_VariableVector-method}
 \title{Sets methods for operators under the S4 Generic Group, Ops}
 \usage{
 \S4method{Ops}{Rcpp_Parameter,Rcpp_Parameter}(e1, e2)
@@ -17,21 +17,21 @@
 
 \S4method{Ops}{numeric,Rcpp_Parameter}(e1, e2)
 
-\S4method{Ops}{Rcpp_ParameterVector,Rcpp_ParameterVector}(e1, e2)
+\S4method{Ops}{Rcpp_VariableVector,Rcpp_VariableVector}(e1, e2)
 
-\S4method{Ops}{Rcpp_ParameterVector,numeric}(e1, e2)
+\S4method{Ops}{Rcpp_VariableVector,numeric}(e1, e2)
 
 \S4method{Ops}{Rcpp_RealVector,numeric}(e1, e2)
 
-\S4method{Ops}{numeric,Rcpp_ParameterVector}(e1, e2)
+\S4method{Ops}{numeric,Rcpp_VariableVector}(e1, e2)
 
-\S4method{Math}{Rcpp_ParameterVector}(x)
+\S4method{Math}{Rcpp_VariableVector}(x)
 }
 \arguments{
-\item{e1, e2}{An Rcpp_Parameter or Rcpp_ParameterVector class object or a
+\item{e1, e2}{An Rcpp_Parameter or Rcpp_VariableVector class object or a
 numeric vector or value.}
 
-\item{x}{An Rcpp_ParameterVector class object.}
+\item{x}{An Rcpp_VariableVector class object.}
 }
 \value{
 A numeric or logical value(s) depending on the generic and the length of

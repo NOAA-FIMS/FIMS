@@ -27,19 +27,18 @@ namespace
         std::vector<double> test_SB(n_years + 1, 0);
         std::vector<double> test_B(n_years + 1, 0);
 
-        auto& dq = catch_at_age_model->GetPopulationDerivedQuantities(pop_id);
-        test_SB[year] += dq["numbers_at_age"][i_age_year] *
+        test_SB[year] += population->numbers_at_age[i_age_year] *
             catch_at_age_model->populations[0]->proportion_female[age] *
-            dq["proportion_mature_at_age"][i_age_year] *
+            population->proportion_mature_at_age[i_age_year] *
             catch_at_age_model->populations[0]->growth->evaluate(year, population->ages[age]);
-        test_B[year] += dq["numbers_at_age"][i_age_year] *
+        test_B[year] += population->numbers_at_age[i_age_year] *
                          catch_at_age_model->populations[0]->growth->evaluate(year, population->ages[age]);
 
-        EXPECT_EQ(dq["spawning_biomass"][year], test_SB[year]);
-        EXPECT_GT(dq["spawning_biomass"][year], 0);
+        EXPECT_EQ(population->spawning_biomass[year], test_SB[year]);
+        EXPECT_GT(population->spawning_biomass[year], 0);
 
-        EXPECT_EQ(dq["biomass"][year], test_B[year]);
-        EXPECT_GT(dq["biomass"][year], 0);
+        EXPECT_EQ(population->biomass[year], test_B[year]);
+        EXPECT_GT(population->biomass[year], 0);
     }
 
     // Edge handling
@@ -58,13 +57,12 @@ namespace
 
         std::vector<double> test_SSB(n_years + 1, 0);
 
-        auto& dq = catch_at_age_model->GetPopulationDerivedQuantities(pop_id);
-        test_SSB[n_years] += dq["numbers_at_age"][i_age_year] *
+        test_SSB[n_years] += population->numbers_at_age[i_age_year] *
             catch_at_age_model->populations[0]->proportion_female[age] *
-            dq["proportion_mature_at_age"][i_age_year] *
+            population->proportion_mature_at_age[i_age_year] *
             catch_at_age_model->populations[0]->growth->evaluate(year, population->ages[age]);
 
-        EXPECT_EQ(dq["spawning_biomass"][year], test_SSB[year]);
-        EXPECT_GT(dq["spawning_biomass"][year], 0);
+        EXPECT_EQ(population->spawning_biomass[year], test_SSB[year]);
+        EXPECT_GT(population->spawning_biomass[year], 0);
     }
 }
