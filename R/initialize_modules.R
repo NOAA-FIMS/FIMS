@@ -610,6 +610,8 @@ initialize_comp <- function(data,
 #' clear()
 #' }
 initialize_fims <- function(parameters, data) {
+  # TODO(EDM): Add EDM initialization inputs after the module design is settled.
+
   # Validate parameters input
   if (missing(parameters) || !tibble::is_tibble(parameters)) {
     cli::cli_abort("The {.var parameters} argument must be a tibble.")
@@ -676,9 +678,13 @@ initialize_fims <- function(parameters, data) {
       dplyr::pull(type) |>
       unique()
 
+    # TODO(EDM): Decide whether EDM needs a new data type or can reuse index/recruitment.
+
     data_distribution_names_for_fleet_i <- parameters |>
       dplyr::filter(fleet_name == fleet_names[i] & distribution_type == "Data") |>
       dplyr::pull(module_type)
+
+    # TODO(EDM): Detect any standalone EDM likelihood module from the configuration.
 
     # Initialize landings module if the data type includes "landings" and
     # if "Landings" exists in the data distribution specification
@@ -784,6 +790,8 @@ initialize_fims <- function(parameters, data) {
       )
     }
 
+    # TODO(EDM): Use index data as an early observed time-series test case.
+
     if ("landings" %in% fleet_types &&
       "Landings" %in% data_distribution_names_for_fleet_i) {
       fleet_landings_distribution[[i]] <- initialize_data_distribution(
@@ -827,6 +835,8 @@ initialize_fims <- function(parameters, data) {
     parameters = parameters,
     data = data
   )
+
+  # TODO(EDM): Consider recruitment as a later fisheries-specific EDM target.
 
   recruitment_process_input <- parameters |>
     dplyr::filter(module_name == "Recruitment" & distribution_type == "process" & !is.na(distribution))
@@ -948,11 +958,15 @@ initialize_fims <- function(parameters, data) {
     linked_ids = population_module_ids
   )
 
+  # TODO(EDM): Add EDM module IDs here if EDM becomes population-linked.
+
   # Set-up TMB
   # Hard code to be a catch-at-age model
+  # TODO(EDM): Generalize model-family selection for standalone/linked EDM models.
   fims_model <- methods::new(CatchAtAge)
   fims_model$AddPopulation(population$get_id())
 
+  # TODO(EDM): Register EDM modules and likelihood components before CreateTMBModel().
   CreateTMBModel()
   # Create parameter list from Rcpp modules
   parameter_list <- list(

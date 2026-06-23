@@ -355,6 +355,7 @@ class Information {
                       fims::to_string(d->key[0]));
         vmit = this->variable_map.find(d->key[0]);
         d->data_expected_values = (*vmit).second;
+        // TODO(EDM): Add EDM prediction vectors to variable_map before this link.
         FIMS_INFO_LOG(
             "Expected value size for distribution " + fims::to_string(d->id) +
             " is: " + fims::to_string((*d->data_expected_values).size()));
@@ -836,6 +837,7 @@ class Information {
     // setup priors, random effect, and data density components
     SetupPriors();
     SetupRandomEffects();
+    // TODO(EDM): Register EDM expected values before SetupData().
     SetupData();
 
     if (valid_model) {

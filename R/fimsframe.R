@@ -66,7 +66,12 @@ methods::setClass(
     lengths = "numeric",
     n_lengths = "integer",
     start_year = "integer",
-    end_year = "integer"
+    end_year = "integer",
+    # TODO(EDM): Slot holding a named list of delay-embedding results produced
+    # by create_edm_embedding(). Each element is itself a named list with
+    # fields: series_name, E, tau, drop_missing, n_rows, n_cols, values
+    # (row-major numeric vector), and target_values (numeric vector of x_t per row).
+    edm_embeddings = "list"
   )
 )
 
@@ -270,6 +275,27 @@ methods::setMethod(
   "get_n_lengths",
   "data.frame",
   function(x) FIMSFrame(x)@n_lengths
+)
+
+#' @return
+#' [get_edm_embeddings()] returns a named list of delay-embedding results
+#' stored in the FIMSFrame object. Each element is itself a named list with
+#' fields `series_name`, `E` (embedding dimension), `tau` (time lag),
+#' `drop_missing` (logical), `n_rows`, `n_cols`, `embedded_values` (a numeric
+#' vector of the flattened row-major matrix), and `target_values` (a numeric
+#' vector of the target time-point values x_t for each row).
+#' Returns an empty list when [create_edm_embedding()] has not yet been called.
+#' @export
+#' @rdname get_FIMSFrame
+#' @keywords FIMSFrame
+methods::setGeneric(
+  "get_edm_embeddings",
+  function(x) standardGeneric("get_edm_embeddings")
+)
+#' @rdname get_FIMSFrame
+#' @keywords FIMSFrame
+methods::setMethod(
+  "get_edm_embeddings", "FIMSFrame", function(x) x@edm_embeddings
 )
 
 #' Get a vector of data to be passed to a FIMS module from a FIMSFrame object
@@ -573,6 +599,243 @@ methods::setMethod(
     model_age_to_length_conversion(FIMSFrame(x))
   }
 )
+
+# methods::setMethod: EDM accessors ----
+
+#' @details
+#' ## `model_edm_matrix()`
+#' Returns a numeric matrix (n_rows × E) for a named delay embedding stored
+#' inside the FIMSFrame object. The matrix can be passed directly to an EDM
+#' prediction module. Rows correspond to embedded time points and columns
+#' correspond to the lagged coordinates [x_t, x_{t-tau}, ..., x_{t-(E-1)tau}].
+#'
+#' @param embedding_name A single string matching one of the names in
+#'   [get_edm_embeddings()].
+#' @export
+#' @rdname model_
+#' @keywords FIMSFrame
+methods::setGeneric(
+  "model_edm_matrix",
+  function(x, embedding_name) standardGeneric("model_edm_matrix")
+)
+#' @rdname model_
+#' @keywords FIMSFrame
+methods::setMethod(
+  "model_edm_matrix",
+  "FIMSFrame",
+  function(x, embedding_name) {
+    embeddings <- get_edm_embeddings(x)
+    if (!embedding_name %in% names(embeddings)) {
+      cli::cli_abort(c(
+        "No embedding named {.val {embedding_name}} found in this FIMSFrame.",
+        "i" = "Available embeddings: {.val {names(embeddings)}}.",
+        "i" = "Use {.fn create_edm_embedding} to build one first."
+      ))
+    }
+    emb <- embeddings[[embedding_name]]
+    matrix(emb[["embedded_values"]], nrow = emb[["n_rows"]], ncol = emb[["n_cols"]],
+           byrow = TRUE)
+  }
+)
+
+#' Create a delay embedding and store it inside a FIMSFrame object
+#'
+#' Pulls a univariate time series from the `data` slot of a [FIMSFrame()]
+#' object, constructs the delay embedding matrix using the Rcpp
+#' `DelayEmbedding` module, and returns a **new** FIMSFrame with the result
+#' stored in the `edm_embeddings` slot under `embedding_name`.
+#'
+#' @details
+#' The time series is extracted by filtering `get_data(x)` on `type` and
+#' `name` (fleet / survey name). Values encoded as `-999` are treated as the
+#' FIMS missing-data sentinel. When `drop_missing = TRUE`,
+#' `construct_drop_missing()` is called so that rows containing `-999` are
+#' removed from the embedding matrix; when `FALSE`, `construct()` is called
+#' and those sentinel values remain in the matrix.
+#'
+#' Uncertainty propagation follows the same pointer-based pattern as the value
+#' fields. When `uncertainty_name` is supplied, the function extracts a
+#' matching time series (filtered on the same `series_type` and ordered by
+#' `timing`) and passes it to the Rcpp module. The resulting embedding list
+#' will include `embedded_uncertainty` and `target_uncertainty` numeric
+#' vectors laid out identically to `embedded_values` and `target_values`
+#' respectively. When `uncertainty_name` is `NULL` (the default) those fields
+#' are absent from the stored list.
+#'
+#' The returned FIMSFrame is identical to `x` except that `edm_embeddings`
+#' contains one additional element named `embedding_name`.
+#'
+#' @param x A [FIMSFrame()] object.
+#' @param series_type A single string giving the `type` value to filter on,
+#'   e.g. `"index"` or `"landings"`.
+#' @param series_name A single string giving the `name` (fleet / survey) value
+#'   to filter on, e.g. `"survey1"`.
+#' @param E A positive integer — the embedding dimension (number of lagged
+#'   coordinates per row).
+#' @param tau A positive integer — the time lag between successive coordinates.
+#' @param drop_missing Logical (default `TRUE`). When `TRUE`, rows containing
+#'   the FIMS missing-value sentinel `-999` are dropped from the embedding
+#'   matrix.
+#' @param uncertainty_name A single string giving the `name` column value for
+#'   an uncertainty series in the data slot (e.g. `"survey1_sd"`), or `NULL`
+#'   (default) to skip uncertainty propagation. The uncertainty series must
+#'   have the same length as the value series after filtering on
+#'   `series_type` and arranging by `timing`.
+#' @param embedding_name A single string used as the key under which the
+#'   result is stored in `edm_embeddings`. Defaults to
+#'   `paste0(series_type, "_", series_name, "_E", E, "_tau", tau)`.
+#'
+#' @return A [FIMSFrame()] object identical to `x` with the new embedding
+#'   appended to the `edm_embeddings` slot.
+#'
+#' @export
+#' @keywords FIMSFrame
+create_edm_embedding <- function(
+    x,
+    series_type,
+    series_name,
+    E,
+    tau,
+    drop_missing = TRUE,
+    uncertainty_name = NULL,
+    embedding_name = paste0(series_type, "_", series_name,
+                            "_E", E, "_tau", tau)) {
+  if (!methods::is(x, "FIMSFrame")) {
+    cli::cli_abort("{.var x} must be a {.cls FIMSFrame} object.")
+  }
+  if (!is.character(series_type) || length(series_type) != 1) {
+    cli::cli_abort("{.var series_type} must be a single string.")
+  }
+  if (!is.character(series_name) || length(series_name) != 1) {
+    cli::cli_abort("{.var series_name} must be a single string.")
+  }
+  if (!is.numeric(E) || length(E) != 1 || E < 1 || E %% 1 != 0) {
+    cli::cli_abort("{.var E} must be a positive integer.")
+  }
+  if (!is.null(uncertainty_name) &&
+        (!is.character(uncertainty_name) || length(uncertainty_name) != 1)) {
+    cli::cli_abort("{.var uncertainty_name} must be a single string or NULL.")
+  }
+  if (!is.numeric(tau) || length(tau) != 1 || tau < 1 || tau %% 1 != 0) {
+    cli::cli_abort("{.var tau} must be a positive integer.")
+  }
+
+  # Extract the univariate time series from the data slot
+  series_data <- dplyr::filter(
+    get_data(x),
+    .data[["type"]] == series_type,
+    .data[["name"]] == series_name
+  ) |>
+    dplyr::arrange(.data[["timing"]]) |>
+    dplyr::pull(.data[["value"]])
+
+  # Extract the optional uncertainty series
+  uncertainty_data <- numeric(0)
+  if (!is.null(uncertainty_name)) {
+    uncertainty_data <- dplyr::filter(
+      get_data(x),
+      .data[["type"]] == series_type,
+      .data[["name"]] == uncertainty_name
+    ) |>
+      dplyr::arrange(.data[["timing"]]) |>
+      dplyr::pull(.data[["value"]])
+
+    if (length(uncertainty_data) == 0) {
+      cli::cli_abort(c(
+        "No uncertainty data found for type {.val {series_type}} and name {.val {uncertainty_name}}.",
+        "i" = "Available names: {.val {unique(get_data(x)[[\"name\"]])}}."
+      ))
+    }
+    if (length(uncertainty_data) != length(series_data)) {
+      cli::cli_abort(c(
+        "Uncertainty series length ({length(uncertainty_data)}) does not match ",
+        "value series length ({length(series_data)}) for name {.val {uncertainty_name}}."
+      ))
+    }
+  }
+
+  if (length(series_data) == 0) {
+    cli::cli_abort(c(
+      "No data found for type {.val {series_type}} and name {.val {series_name}}.",
+      "i" = "Available types: {.val {unique(get_data(x)[[\"type\"]])}}.",
+      "i" = "Available names: {.val {unique(get_data(x)[[\"name\"]])}}."
+    ))
+  }
+
+  # Call the Rcpp DelayEmbedding module
+  edm_obj <- methods::new(DelayEmbedding)
+  tryCatch(
+    {
+      if (drop_missing) {
+        if (!is.null(uncertainty_name)) {
+          edm_obj$construct_drop_missing_with_uncertainty(
+            as.numeric(series_data),
+            as.integer(E),
+            as.integer(tau),
+            -999.0,
+            as.numeric(uncertainty_data)
+          )
+        } else {
+          edm_obj$construct_drop_missing(
+            as.numeric(series_data),
+            as.integer(E),
+            as.integer(tau),
+            -999.0
+          )
+        }
+      } else {
+        if (!is.null(uncertainty_name)) {
+          edm_obj$construct_with_uncertainty(
+            as.numeric(series_data),
+            as.integer(E),
+            as.integer(tau),
+            as.numeric(uncertainty_data)
+          )
+        } else {
+          edm_obj$construct(
+            as.numeric(series_data),
+            as.integer(E),
+            as.integer(tau)
+          )
+        }
+      }
+    },
+    error = function(e) {
+      cli::cli_abort(c(
+        "Failed to construct delay embedding.",
+        "i" = conditionMessage(e)
+      ))
+    }
+  )
+
+  # Package the result as a named list
+  embedding_result <- list(
+    series_name = series_name,
+    series_type = series_type,
+    E = as.integer(E),
+    tau = as.integer(tau),
+    drop_missing = drop_missing,
+    n_rows = as.integer(edm_obj$n_rows),
+    n_cols = as.integer(edm_obj$n_cols),
+    embedded_values = edm_obj$embedded_values$get_values(),
+    target_values = edm_obj$target_values$get_values()
+  )
+
+  # Append uncertainty fields only when an uncertainty series was provided
+  if (!is.null(uncertainty_name)) {
+    embedding_result[["embedded_uncertainty"]] <-
+      edm_obj$embedded_uncertainty$get_values()
+    embedding_result[["target_uncertainty"]] <-
+      edm_obj$target_uncertainty$get_values()
+  }
+
+  # Store in the edm_embeddings slot and return a new FIMSFrame
+  existing <- get_edm_embeddings(x)
+  existing[[embedding_name]] <- embedding_result
+  x@edm_embeddings <- existing
+  methods::validObject(x)
+  x
+}
 
 # methods::setMethod: initialize ----
 
@@ -1105,7 +1368,9 @@ FIMSFrame <- function(data) {
     ages = ages,
     n_ages = n_ages,
     lengths = lengths,
-    n_lengths = n_lengths
+    n_lengths = n_lengths,
+    # TODO(EDM): edm_embeddings is populated lazily via create_edm_embedding().
+    edm_embeddings = list()
   )
 }
 
