@@ -14,6 +14,12 @@
 #' fims_help("bevertonholt")
 #' }
 fims_help <- function(query) {
+  # Do not run in non-interactive sessions (e.g., R CMD check)
+  if (!interactive()) {
+    message("fims_help() is designed for interactive use only.")
+    return(invisible(NULL))
+  }
+  target_url <- NULL
   
   doxygen_base_url <- "https://noaa-fims.github.io/FIMS/doxygen/"
   r_base_url <- "https://noaa-fims.github.io/FIMS/" # Adjust to your pkgdown path
@@ -72,11 +78,13 @@ fims_help <- function(query) {
     }
   }
   
-  # --- 4. Render in the Viewer Pane ---
-  viewer_html <- htmltools::browsable(
-    htmltools::tags$iframe(src = target_url, width = "100%", height = "600px", style = "border:none;")
-  )
-  
-  print(viewer_html)
-  invisible(target_url)
+  if (!is.null(target_url)) {
+    # --- 4. Render in the Viewer Pane ---
+    viewer_html <- htmltools::browsable(
+      htmltools::tags$iframe(src = target_url, width = "100%", height = "600px", style = "border:none;")
+    )
+    
+    print(viewer_html)
+    invisible(target_url)
+  }
 }
