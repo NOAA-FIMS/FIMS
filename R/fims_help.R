@@ -2,6 +2,17 @@
 #'
 #' @param query A string representing the function or class to search for.
 #' @export
+#' @examples
+#' \dontrun{
+#' # Search for an R function's documentation in the pkgdown site
+#' fims_help("FIMSFrame")
+#'
+#' # Search for a C++ class's documentation in the Doxygen site
+#' fims_help("FIMSLog")
+#'
+#' # The function also handles partial, case-insensitive matches for C++ entities
+#' fims_help("bevertonholt")
+#' }
 fims_help <- function(query) {
   
   doxygen_base_url <- "https://e-perl-noaa.github.io/FIMS/doxygen/"
@@ -26,21 +37,42 @@ fims_help <- function(query) {
       )
     }
     
-    # 3. Parse the XML and find the matching HTML file
     tag_data <- xml2::read_xml(local_tagfile)
-    xpath_query <- sprintf("//name[text()='%s']/..", query)
-    match_node <- xml2::xml_find_first(tag_data, xpath_query)
     
-    if (length(match_node) == 0 || is.na(match_node)) {
-      message("Exact C++ match not found. Opening Doxygen index...")
-      target_url <- paste0(doxygen_base_url, "index.html")
+    # Extract ALL names from the XML
+    compound_names_nodes <- xml2::xml_find_all(tag_data, "//compound/name")
+    compound_names <- xml2::xml_text(compound_names_nodes)
+    
+    # Extract unique names and find partial, case-insensitive matches
+    unique_names <- unique(compound_names)
+    matched_names <- unique_names[grep(query, unique_names, ignore.case = TRUE)]
+
+    if (length(matched_names) == 0) {
+      message(sprintf("No C++ match found for '%s'.", query))
     } else {
+      # If multiple unique matches exist, let the user know!
+      if (length(matched_names) > 1) {
+        message("Multiple unique C++ matches found:")
+        for (name in matched_names) {
+          message(paste("  -", name))
+        }
+        message(sprintf("\nLoading the first match ('%s'). Refine your query to view others.", matched_names[1]))
+      } else {
+        message(sprintf("Found C++ match: '%s'. Loading...", matched_names[1]))
+      }
+      
+      best_match_name <- matched_names[1]
+      
+      # Now use the exact unique name to find the parent node and extract the filename
+      xpath_query <- sprintf("//compound[name[text()='%s']]", best_match_name)
+      match_node <- xml2::xml_find_first(tag_data, xpath_query)
+      
       filename <- xml2::xml_text(xml2::xml_find_first(match_node, ".//filename"))
       target_url <- paste0(doxygen_base_url, filename)
     }
   }
   
-  # 4. Render in the Viewer Pane
+  # --- 4. Render in the Viewer Pane ---
   viewer_html <- htmltools::browsable(
     htmltools::tags$iframe(src = target_url, width = "100%", height = "600px", style = "border:none;")
   )
