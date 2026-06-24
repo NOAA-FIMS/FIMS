@@ -25,32 +25,12 @@
 
 #include "../../common/fims_vector.hpp"
 #include "delay_embedding.hpp"
+#include "../utilities/edm_distance_weights.hpp"
 
 namespace fims_edm {
 
-/**
- * @brief Compute the squared Euclidean distance between two embedding rows.
- *
- * @details Operates on raw pointer rows (as returned by the flat
- * embedded_values storage in DelayEmbeddingMatrix) rather than on
- * fims::Vector so the loop is visible to TMB's CppAD tracer.
- *
- * @tparam Type Numeric scalar type (double or TMB AD scalar).
- * @param a_row Pointer to the first element of row a (length >= dim).
- * @param b_row Pointer to the first element of row b (length >= dim).
- * @param dim   Number of coordinates per row (embedding dimension E).
- * @return Squared Euclidean distance between the two rows.
- */
-template <typename Type>
-Type SquaredEuclideanDistance(const Type* a_row, const Type* b_row,
-                              size_t dim) {
-  Type dist = Type(0);
-  for (size_t k = 0; k < dim; ++k) {
-    Type diff = a_row[k] - b_row[k];
-    dist += diff * diff;
-  }
-  return dist;
-}
+// SquaredEuclideanDistance, SimplexWeights, SMapWeights, and NormalizeWeights
+// are provided by edm_distance_weights.hpp (included above).
 
 /**
  * @brief Abstract base class for EDM prediction functors.

@@ -4,6 +4,7 @@
  *
  * @details Including this single header brings in:
  *  - DelayEmbeddingMatrix, MakeDelayEmbedding, MakeDelayEmbeddingDropMissing
+ *  - SquaredEuclideanDistance, SimplexWeights, SMapWeights, NormalizeWeights
  *  - EDMPredictorBase (abstract base for all prediction functors)
  *  - SimplexProjection (Sugihara & May, 1990)
  *
@@ -18,6 +19,7 @@
 #define FIMS_EDM_HPP
 
 #include "functors/delay_embedding.hpp"
+#include "utilities/edm_distance_weights.hpp"
 #include "functors/edm_predictor_base.hpp"
 #include "functors/simplex_projection.hpp"
 

@@ -39,6 +39,7 @@
 #include <vector>
 
 #include "../../common/fims_math.hpp"
+#include "../utilities/edm_distance_weights.hpp"
 #include "edm_predictor_base.hpp"
 
 namespace fims_edm {
@@ -100,11 +101,11 @@ struct SimplexProjection : public EDMPredictorBase<Type> {
     }
 
     // -----------------------------------------------------------------------
-    // Step 1 & 2: Compute squared Euclidean distances and track the k nearest
-    // neighbors with a hand-rolled O(n*k) selection. Using raw pointer
-    // indexing into embedded_values so the loop is CppAD-traceable.
+    // Step 1 & 2: Compute squared distances and track the k nearest neighbors
+    // with a hand-rolled O(n*k) partial selection. Using raw pointer indexing
+    // into embedded_values so the loop is CppAD-traceable.
     //
-    // nn_indices[m] = library row index of the m-th slot.
+    // nn_indices[m] = library row index of the m-th nearest-neighbor slot.
     // nn_sq_dist[m] = its squared distance (initialized to +inf).
     // -----------------------------------------------------------------------
     const double kInf = std::numeric_limits<double>::max();
@@ -135,31 +136,21 @@ struct SimplexProjection : public EDMPredictorBase<Type> {
     }
 
     // -----------------------------------------------------------------------
-    // Step 3: Find d_min among selected neighbors, then compute weights.
-    // w_i = exp(- d_i / (d_min + eps))
+    // Step 3: Compute Simplex exponential weights using the shared utility.
+    // w_i = exp(-d_i / (d_min + eps)), then normalize so they sum to 1.
     // -----------------------------------------------------------------------
-    Type d_min = nn_sq_dist[0];
-    for (size_t m = 1; m < k; ++m) {
-      if (nn_sq_dist[m] < d_min) {
-        d_min = nn_sq_dist[m];
-      }
-    }
+    std::vector<Type> weights;
+    SimplexWeights(nn_sq_dist, weights, weight_epsilon);
+    NormalizeWeights(weights);
 
     // -----------------------------------------------------------------------
-    // Step 4: Weighted average of target values.
+    // Step 4: Normalized weighted average of target values.
     // -----------------------------------------------------------------------
-    Type weight_sum = Type(0);
-    Type weighted_target_sum = Type(0);
-
+    Type prediction = Type(0);
     for (size_t m = 0; m < k; ++m) {
-      Type exponent = nn_sq_dist[m] / (d_min + Type(weight_epsilon));
-      Type w = fims_math::exp(-exponent);
-      weight_sum += w;
-      weighted_target_sum +=
-          w * (*this->library->target_values[nn_indices[m]]);
+      prediction += weights[m] * (*this->library->target_values[nn_indices[m]]);
     }
-
-    return weighted_target_sum / weight_sum;
+    return prediction;
   }
 
   /**
