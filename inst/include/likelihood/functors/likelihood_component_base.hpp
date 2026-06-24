@@ -15,12 +15,7 @@
 
 namespace fims_likelihood {
 
-enum class LikelihoodRole {
-  Data,
-  Prior,
-  RandomEffect,
-  Penalty
-};
+enum class LikelihoodRole { Data, Prior, RandomEffect, Penalty };
 
 template <typename Type>
 struct LikelihoodComponentBase {
