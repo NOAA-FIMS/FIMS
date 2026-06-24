@@ -357,6 +357,20 @@ class ParameterVector {
   }
 
   /**
+   * @brief Sets all Parameters in the ParameterVector to fixed or constant.
+   *
+   * @param estimable If true, mark all parameters as fixed effects; otherwise
+   * mark all parameters as constants.
+   */
+  void set_all_estimable(bool estimable) {
+    const std::string estimation_type =
+        estimable ? "fixed_effects" : "constant";
+    for (size_t i = 0; i < this->storage_m->size(); i++) {
+      this->storage_m->at(i).estimation_type_m.set(estimation_type);
+    }
+  }
+
+  /**
    * @brief Sets the value of all Parameters in the ParameterVector to the
    * provided value.
    *

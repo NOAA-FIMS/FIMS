@@ -156,7 +156,7 @@ class LikelihoodInterfaceBase : public FIMSRcppInterfaceBase {
     typename fims_info::Information<Type>::variable_map_iterator vmit =
         info->variable_map.find(this->parameter_input.id_m);
     if (vmit != info->variable_map.end()) {
-      return (*vmit).second.variable;
+      return (*vmit).second;
     }
 
     std::stringstream ss;
@@ -180,10 +180,7 @@ class LikelihoodInterfaceBase : public FIMSRcppInterfaceBase {
     }
 
     info->variable_map[this->parameter_input.id_m] =
-        typename fims_info::Information<Type>::VariableMapEntry(
-            &likelihood->input_storage,
-            *this->parameter_input.input_transformation_m,
-            *this->parameter_input.prior_transformation_m);
+        &likelihood->input_storage;
     return &likelihood->input_storage;
   }
 
@@ -198,14 +195,10 @@ class LikelihoodInterfaceBase : public FIMSRcppInterfaceBase {
     typename fims_info::Information<Type>::variable_map_iterator vmit =
         info->variable_map.find(id);
     if (vmit != info->variable_map.end()) {
-      return (*vmit).second.variable;
+      return (*vmit).second;
     }
 
-    fims::Transformation identity;
-    identity.label = fims::Transformation::Label::identity;
-    info->variable_map[id] =
-        typename fims_info::Information<Type>::VariableMapEntry(
-            values, identity, identity);
+    info->variable_map[id] = values;
     return values;
   }
 

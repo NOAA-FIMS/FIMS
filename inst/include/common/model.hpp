@@ -176,7 +176,7 @@ class Model {  // may need singleton
               "Model::Evaluate: likelihood expected_values id was not found "
               "in variable_map.");
         }
-        l->SetExpected((*vmit).second.variable);
+        l->SetExpected((*vmit).second);
       }
 #ifdef TMB_MODEL
       l->of = this->of;
