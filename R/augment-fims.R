@@ -106,19 +106,19 @@ augment.FIMSFit <- function(x, include_weights = TRUE, ...) {
       dplyr::any_of("uncertainty")
     )
 
-    if (include_weights && "uncertainty" %in% names(out)) {
-      out <- out |>
-        dplyr::mutate(
-          .weight = dplyr::if_else(
-            !is.na(.data$uncertainty) & .data$uncertainty > 0,
-            1 / .data$uncertainty^2,
-            NA_real_
-          )
+  if (include_weights && "uncertainty" %in% names(out)) {
+    out <- out |>
+      dplyr::mutate(
+        .weight = dplyr::if_else(
+          !is.na(.data$uncertainty) & .data$uncertainty > 0,
+          1 / .data$uncertainty^2,
+          NA_real_
         )
-    }
+      )
+  }
 
-    out <- out |> 
-      dplyr::select(-dplyr::any_of("uncertainty"))
+  out <- out |>
+    dplyr::select(-dplyr::any_of("uncertainty"))
 
   out
 }

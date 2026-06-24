@@ -11,12 +11,12 @@ get_fit_stream(x, stream_label = NULL, module_id = NULL, ...)
 \code{augment.FIMSFit()}.}
 
 \item{stream_label}{Character scalar.  The value of the \code{label} column to
-retain, e.g. \code{"landings_expected"}, \code{"index_expected"},
+retain, e.g., \code{"landings_expected"}, \code{"index_expected"},
 \code{"agecomp_expected"}, or \code{"lengthcomp_expected"}.  If \code{NULL} (default),
 no filtering on label is done.}
 
 \item{module_id}{Integer scalar.  The \code{module_id} of the fleet or survey to
-retain (e.g. \code{1} for the first fishing fleet, \code{2} for the first survey in
+retain (e.g., \code{1} for the first fishing fleet, \code{2} for the first survey in
 \code{data_big}).  If \code{NULL} (default), all modules are included.}
 
 \item{...}{Forwarded to \code{augment.FIMSFit()} when \code{x} is a \code{FIMSFit}.}
