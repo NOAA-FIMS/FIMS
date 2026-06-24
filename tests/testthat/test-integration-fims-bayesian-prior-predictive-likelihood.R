@@ -8,14 +8,6 @@ om_input <- om_input_list[[iter_id]]
 om_output <- om_output_list[[iter_id]]
 em_input <- em_input_list[[iter_id]]
 
-set_likelihood_real_vector <- function(x, values) {
-  x$resize(length(values))
-  for (i in seq_along(values)) {
-    x$set(i - 1L, values[i])
-  }
-  invisible(x)
-}
-
 test_that("posterior equals prior with no data using likelihood objects", {
   clear()
   on.exit(clear(), add = TRUE)
@@ -164,25 +156,25 @@ test_that("posterior equals prior with no data using likelihood objects", {
   slope_mean <- mean(c(om_input[["sel_fleet"]][["fleet1"]][["slope.sel1"]], om_input[["sel_survey"]][["survey1"]][["slope.sel1"]]))
   slope_var <- 9
   fishing_slope_prior <- methods::new(NormalLikelihood)
-  set_likelihood_real_vector(fishing_slope_prior$expected_values, slope_mean)
-  set_likelihood_real_vector(fishing_slope_prior$log_sd, log(sqrt(slope_var)))
+  fishing_slope_prior$expected_values[] <- slope_mean
+  fishing_slope_prior$log_sd[] <- log(sqrt(slope_var))
   fishing_slope_prior$set_parameter_input(fishing_fleet_selectivity$slope, "prior")
 
   survey_slope_prior <- methods::new(NormalLikelihood)
-  set_likelihood_real_vector(survey_slope_prior$expected_values, slope_mean)
-  set_likelihood_real_vector(survey_slope_prior$log_sd, log(sqrt(slope_var)))
+  survey_slope_prior$expected_values[] <- slope_mean
+  survey_slope_prior$log_sd[] <- log(sqrt(slope_var))
   survey_slope_prior$set_parameter_input(survey_fleet_selectivity$slope, "prior")
 
   inflection_point_mean <- mean(c(om_input[["sel_fleet"]][["fleet1"]][["A50.sel1"]], om_input[["sel_survey"]][["survey1"]][["A50.sel1"]]))
   inflection_point_var <- 9
   fishing_inflection_point_prior <- methods::new(NormalLikelihood)
-  set_likelihood_real_vector(fishing_inflection_point_prior$expected_values, inflection_point_mean)
-  set_likelihood_real_vector(fishing_inflection_point_prior$log_sd, log(sqrt(inflection_point_var)))
+  fishing_inflection_point_prior$expected_values[] <- inflection_point_mean
+  fishing_inflection_point_prior$log_sd[] <- log(sqrt(inflection_point_var))
   fishing_inflection_point_prior$set_parameter_input(fishing_fleet_selectivity$inflection_point, "prior")
 
   survey_inflection_point_prior <- methods::new(NormalLikelihood)
-  set_likelihood_real_vector(survey_inflection_point_prior$expected_values, inflection_point_mean)
-  set_likelihood_real_vector(survey_inflection_point_prior$log_sd, log(sqrt(inflection_point_var)))
+  survey_inflection_point_prior$expected_values[] <- inflection_point_mean
+  survey_inflection_point_prior$log_sd[] <- log(sqrt(inflection_point_var))
   survey_inflection_point_prior$set_parameter_input(survey_fleet_selectivity$inflection_point, "prior")
 
 

@@ -1,21 +1,13 @@
 # rcpp likelihood ----
 
-set_real_vector <- function(x, values) {
-  x$resize(length(values))
-  for (i in seq_along(values)) {
-    x$set(i - 1L, values[i])
-  }
-  invisible(x)
-}
-
 test_that("NormalLikelihood works with correct inputs", {
   likelihood <- methods::new(NormalLikelihood)
   observed <- c(1, 2)
   expected <- c(0.5, 1.5)
 
-  set_real_vector(likelihood$observed_values, observed)
-  set_real_vector(likelihood$expected_values, expected)
-  set_real_vector(likelihood$log_sd, log(2))
+  likelihood$observed_values[] <- observed
+  likelihood$expected_values[] <- expected
+  likelihood$log_sd[] <- log(2)
 
   #' @description Test that NormalLikelihood evaluates negative log likelihood values.
   expect_equal(
@@ -30,9 +22,9 @@ test_that("NormalLikelihood links RealVector inputs", {
   likelihood <- methods::new(NormalLikelihood)
   input <- methods::new(RealVector)
 
-  set_real_vector(input, 1)
-  set_real_vector(likelihood$expected_values, 0)
-  set_real_vector(likelihood$log_sd, 0)
+  input[] <- 1
+  likelihood$expected_values[] <- 0
+  likelihood$log_sd[] <- 0
   likelihood$set_real_input(input, "prior")
 
   #' @description Test that NormalLikelihood can evaluate a linked RealVector input.
@@ -44,9 +36,9 @@ test_that("NormalLikelihood links RealVector expected values", {
   likelihood <- methods::new(NormalLikelihood)
   expected <- methods::new(RealVector)
 
-  set_real_vector(likelihood$observed_values, 1)
-  set_real_vector(expected, 0)
-  set_real_vector(likelihood$log_sd, 0)
+  likelihood$observed_values[] <- 1
+  expected[] <- 0
+  likelihood$log_sd[] <- 0
   likelihood$set_real_expected_input(expected)
 
   #' @description Test that NormalLikelihood can evaluate linked RealVector expected values.
@@ -59,9 +51,9 @@ test_that("LognormalLikelihood works with correct inputs", {
   observed <- exp(c(1, 2))
   expected <- c(0.5, 1.5)
 
-  set_real_vector(likelihood$observed_values, observed)
-  set_real_vector(likelihood$expected_values, expected)
-  set_real_vector(likelihood$log_sd, log(2))
+  likelihood$observed_values[] <- observed
+  likelihood$expected_values[] <- expected
+  likelihood$log_sd[] <- log(2)
 
   #' @description Test that LognormalLikelihood evaluates negative log likelihood values.
   expect_equal(
@@ -79,9 +71,9 @@ test_that("GammaLikelihood works with correct inputs", {
   shape <- (mean_value / sd_value)^2
   scale <- (sd_value^2) / mean_value
 
-  set_real_vector(likelihood$observed_values, observed)
-  set_real_vector(likelihood$expected_values, mean_value)
-  set_real_vector(likelihood$log_sd, log(sd_value))
+  likelihood$observed_values[] <- observed
+  likelihood$expected_values[] <- mean_value
+  likelihood$log_sd[] <- log(sd_value)
 
   #' @description Test that GammaLikelihood evaluates negative log likelihood values.
   expect_equal(
@@ -99,9 +91,9 @@ test_that("InvGammaLikelihood works with correct inputs", {
   log_density <- -shape * log(scale) - lgamma(shape) -
     (shape + 1) * log(observed) - 1 / (scale * observed)
 
-  set_real_vector(likelihood$observed_values, observed)
-  set_real_vector(likelihood$log_shape, log(shape))
-  set_real_vector(likelihood$log_scale, log(scale))
+  likelihood$observed_values[] <- observed
+  likelihood$log_shape[] <- log(shape)
+  likelihood$log_scale[] <- log(scale)
 
   #' @description Test that InvGammaLikelihood evaluates negative log likelihood values.
   expect_equal(likelihood$evaluate(), -log_density)
@@ -113,9 +105,9 @@ test_that("MultinomialLikelihood works with correct inputs", {
   observed <- c(2, 1, 1)
   probabilities <- c(0.5, 0.25, 0.25)
 
-  set_real_vector(likelihood$observed_values, observed)
-  set_real_vector(likelihood$expected_values, probabilities)
-  set_real_vector(likelihood$dims, c(1, 3))
+  likelihood$observed_values[] <- observed
+  likelihood$expected_values[] <- probabilities
+  likelihood$dims[] <- c(1, 3)
 
   #' @description Test that MultinomialLikelihood evaluates negative log likelihood values.
   expect_equal(

@@ -35,17 +35,15 @@ the FIMS Rcpp module.
 # Setting Values
 
 The likelihood interface uses `RealVector` objects for fixed numeric values.
-The most convenient way to fill a `RealVector` from R is to resize it and then
-set values by zero-based index.
+Use whole-vector replacement to fill `RealVector` and `ParameterVector`
+objects from R.
 
-```{r real-vector-helper}
-set_real_vector <- function(x, values) {
-  x$resize(length(values))
-  for (i in seq_along(values)) {
-    x$set(i - 1L, values[i])
-  }
-  invisible(x)
-}
+```{r vector-replacement, eval = FALSE}
+real_values <- methods::new(RealVector)
+real_values[] <- c(1, 2, 3)
+
+parameter_values <- methods::new(ParameterVector)
+parameter_values[] <- c(1, 2, 3)
 ```
 
 # Direct Evaluation
@@ -59,9 +57,9 @@ library(FIMS)
 
 normal_likelihood <- methods::new(NormalLikelihood)
 
-set_real_vector(normal_likelihood$observed_values, c(1, 2, 3))
-set_real_vector(normal_likelihood$expected_values, c(1.1, 1.9, 3.2))
-set_real_vector(normal_likelihood$log_sd, log(0.5))
+normal_likelihood$observed_values[] <- c(1, 2, 3)
+normal_likelihood$expected_values[] <- c(1.1, 1.9, 3.2)
+normal_likelihood$log_sd[] <- log(0.5)
 
 normal_likelihood$evaluate()
 normal_likelihood$nll_components$toRVector()
@@ -90,11 +88,11 @@ Use `set_real_input()` for a `RealVector` input.
 
 ```{r linked-real-input, eval = FALSE}
 input <- methods::new(RealVector)
-set_real_vector(input, c(0.1, -0.2, 0.3))
+input[] <- c(0.1, -0.2, 0.3)
 
 penalty <- methods::new(NormalLikelihood)
-set_real_vector(penalty$expected_values, 0)
-set_real_vector(penalty$log_sd, log(1))
+penalty$expected_values[] <- 0
+penalty$log_sd[] <- log(1)
 penalty$set_real_input(input, "penalty")
 ```
 
@@ -107,8 +105,8 @@ selectivity$inflection_point[1]$value <- 1.75
 selectivity$inflection_point[1]$estimation_type$set("fixed_effects")
 
 prior <- methods::new(NormalLikelihood)
-set_real_vector(prior$expected_values, 1.75)
-set_real_vector(prior$log_sd, log(3))
+prior$expected_values[] <- 1.75
+prior$log_sd[] <- log(3)
 prior$set_parameter_input(selectivity$inflection_point, "prior")
 ```
 
@@ -132,8 +130,8 @@ Use `set_real_expected_input()` to link a `RealVector` expected value and
 ```{r linked-expected-values, eval = FALSE}
 landings_likelihood <- methods::new(LognormalLikelihood)
 
-set_real_vector(landings_likelihood$observed_values, observed_landings)
-set_real_vector(landings_likelihood$log_sd, log_landings_sd)
+landings_likelihood$observed_values[] <- observed_landings
+landings_likelihood$log_sd[] <- log_landings_sd
 
 landings_likelihood$set_parameter_expected_input(
   fishing_fleet$log_landings_expected
@@ -146,8 +144,8 @@ as flat vectors, and `dims` stores the row and column dimensions.
 ```{r multinomial, eval = FALSE}
 agecomp_likelihood <- methods::new(MultinomialLikelihood)
 
-set_real_vector(agecomp_likelihood$observed_values, agecomp_counts)
-set_real_vector(agecomp_likelihood$dims, c(n_years, n_ages))
+agecomp_likelihood$observed_values[] <- agecomp_counts
+agecomp_likelihood$dims[] <- c(n_years, n_ages)
 
 agecomp_likelihood$set_parameter_expected_input(
   fishing_fleet$agecomp_proportion
@@ -175,8 +173,8 @@ fishing_fleet$SetSelectivityID(fishing_selectivity$get_id())
 fishing_fleet$SetObservedLandingsDataID(fishing_landings$get_id())
 
 landings_likelihood <- methods::new(LognormalLikelihood)
-set_real_vector(landings_likelihood$observed_values, observed_landings)
-set_real_vector(landings_likelihood$log_sd, log_landings_sd)
+landings_likelihood$observed_values[] <- observed_landings
+landings_likelihood$log_sd[] <- log_landings_sd
 
 landings_likelihood$set_parameter_expected_input(
   fishing_fleet$log_landings_expected
@@ -190,8 +188,8 @@ and dimensions are owned by the likelihood.
 ```{r derived-agecomp, eval = FALSE}
 agecomp_likelihood <- methods::new(MultinomialLikelihood)
 
-set_real_vector(agecomp_likelihood$observed_values, agecomp_counts)
-set_real_vector(agecomp_likelihood$dims, c(n_years, n_ages))
+agecomp_likelihood$observed_values[] <- agecomp_counts
+agecomp_likelihood$dims[] <- c(n_years, n_ages)
 
 agecomp_likelihood$set_parameter_expected_input(
   fishing_fleet$agecomp_proportion
@@ -212,8 +210,8 @@ how its input is interpreted by the backend model.
 ```{r recruitment-random-effects, eval = FALSE}
 recruitment_likelihood <- methods::new(NormalLikelihood)
 
-set_real_vector(recruitment_likelihood$expected_values, 0)
-set_real_vector(recruitment_likelihood$log_sd, log(recruitment_sd))
+recruitment_likelihood$expected_values[] <- 0
+recruitment_likelihood$log_sd[] <- log(recruitment_sd)
 
 recruitment_likelihood$set_parameter_input(
   recruitment$log_devs,

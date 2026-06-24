@@ -20,14 +20,6 @@ FIMS_dmultinom <- function(x, p) {
   return(log_pmf)
 }
 
-set_likelihood_real_vector <- function(x, values) {
-  x$resize(length(values))
-  for (i in seq_along(values)) {
-    x$set(i - 1L, values[i])
-  }
-  invisible(x)
-}
-
 
 # FIMS helper function to run FIMS model without wrappers ----
 #' Set up and run FIMS model without using wrapper functions
@@ -152,27 +144,21 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
 
   if (use_likelihood_components) {
     fishing_fleet_landings_likelihood <- methods::new(LognormalLikelihood)
-    set_likelihood_real_vector(fishing_fleet_landings_likelihood$observed_values, landings)
-    set_likelihood_real_vector(
-      fishing_fleet_landings_likelihood$log_sd,
+    fishing_fleet_landings_likelihood$observed_values[] <- landings
+    fishing_fleet_landings_likelihood$log_sd[] <-
       rep(log(sqrt(log(em_input[["cv.L"]][["fleet1"]]^2 + 1))), om_input[["nyr"]])
-    )
     fishing_fleet_landings_likelihood$set_parameter_expected_input(fishing_fleet$log_landings_expected)
 
     fishing_fleet_agecomp_likelihood <- methods::new(MultinomialLikelihood)
-    set_likelihood_real_vector(
-      fishing_fleet_agecomp_likelihood$observed_values,
+    fishing_fleet_agecomp_likelihood$observed_values[] <-
       c(t(em_input[["L.age.obs"]][["fleet1"]])) * em_input[["n.L"]][["fleet1"]]
-    )
-    set_likelihood_real_vector(fishing_fleet_agecomp_likelihood$dims, c(om_input[["nyr"]], om_input[["nages"]]))
+    fishing_fleet_agecomp_likelihood$dims[] <- c(om_input[["nyr"]], om_input[["nages"]])
     fishing_fleet_agecomp_likelihood$set_parameter_expected_input(fishing_fleet$agecomp_proportion)
 
     fishing_fleet_lengthcomp_likelihood <- methods::new(MultinomialLikelihood)
-    set_likelihood_real_vector(
-      fishing_fleet_lengthcomp_likelihood$observed_values,
+    fishing_fleet_lengthcomp_likelihood$observed_values[] <-
       c(t(em_input[["L.length.obs"]][["fleet1"]])) * em_input[["n.L.lengthcomp"]][["fleet1"]]
-    )
-    set_likelihood_real_vector(fishing_fleet_lengthcomp_likelihood$dims, c(om_input[["nyr"]], om_input[["nlengths"]]))
+    fishing_fleet_lengthcomp_likelihood$dims[] <- c(om_input[["nyr"]], om_input[["nlengths"]])
     fishing_fleet_lengthcomp_likelihood$set_parameter_expected_input(fishing_fleet$lengthcomp_proportion)
   } else {
     # Set up fishery index data using the lognormal
@@ -257,27 +243,21 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
 
   if (use_likelihood_components) {
     survey_fleet_index_likelihood <- methods::new(LognormalLikelihood)
-    set_likelihood_real_vector(survey_fleet_index_likelihood$observed_values, survey_index)
-    set_likelihood_real_vector(
-      survey_fleet_index_likelihood$log_sd,
+    survey_fleet_index_likelihood$observed_values[] <- survey_index
+    survey_fleet_index_likelihood$log_sd[] <-
       rep(log(sqrt(log(em_input[["cv.survey"]][["survey1"]]^2 + 1))), om_input[["nyr"]])
-    )
     survey_fleet_index_likelihood$set_parameter_expected_input(survey_fleet$log_index_expected)
 
     survey_fleet_agecomp_likelihood <- methods::new(MultinomialLikelihood)
-    set_likelihood_real_vector(
-      survey_fleet_agecomp_likelihood$observed_values,
+    survey_fleet_agecomp_likelihood$observed_values[] <-
       c(t(em_input[["survey.age.obs"]][["survey1"]])) * em_input[["n.survey"]][["survey1"]]
-    )
-    set_likelihood_real_vector(survey_fleet_agecomp_likelihood$dims, c(om_input[["nyr"]], om_input[["nages"]]))
+    survey_fleet_agecomp_likelihood$dims[] <- c(om_input[["nyr"]], om_input[["nages"]])
     survey_fleet_agecomp_likelihood$set_parameter_expected_input(survey_fleet$agecomp_proportion)
 
     survey_fleet_lengthcomp_likelihood <- methods::new(MultinomialLikelihood)
-    set_likelihood_real_vector(
-      survey_fleet_lengthcomp_likelihood$observed_values,
+    survey_fleet_lengthcomp_likelihood$observed_values[] <-
       c(t(survey_lengthcomp)) * em_input[["n.survey.lengthcomp"]][["survey1"]]
-    )
-    set_likelihood_real_vector(survey_fleet_lengthcomp_likelihood$dims, c(om_input[["nyr"]], om_input[["nlengths"]]))
+    survey_fleet_lengthcomp_likelihood$dims[] <- c(om_input[["nyr"]], om_input[["nlengths"]])
     survey_fleet_lengthcomp_likelihood$set_parameter_expected_input(survey_fleet$lengthcomp_proportion)
   } else {
     # Set up survey index data using the lognormal
@@ -399,15 +379,15 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   }
   if (use_likelihood_components) {
     recruitment_likelihood <- methods::new(NormalLikelihood)
-    set_likelihood_real_vector(recruitment_likelihood$expected_values, 0)
-    set_likelihood_real_vector(recruitment_likelihood$log_sd, log(om_input[["logR_sd"]]))
+    recruitment_likelihood$expected_values[] <- 0
+    recruitment_likelihood$log_sd[] <- log(om_input[["logR_sd"]])
 
     if ("recruitment" %in% names(random_effects)) {
       if (random_effects[["recruitment"]] == "log_devs") {
         recruitment_likelihood$set_parameter_input(recruitment$log_devs, "random_effects")
       }
       if (random_effects[["recruitment"]] == "log_r") {
-        set_likelihood_real_vector(recruitment_likelihood$log_sd, log(1))
+        recruitment_likelihood$log_sd[] <- log(1)
         recruitment_likelihood$set_parameter_input(recruitment$log_r, "random_effects")
         recruitment_likelihood$set_parameter_expected_input(recruitment$log_expected_recruitment)
       }

@@ -35,19 +35,17 @@ Supported roles are:
 - `"random_effect"` or `"random_effects"` or `"re"`
 - `"penalty"`
 
-## R Helper For RealVector Values
+## Setting Vector Values
 
-The Rcpp interface uses `RealVector`, so values are usually filled with a small
-helper:
+The Rcpp interface supports whole-vector replacement for `RealVector` and
+`ParameterVector` objects:
 
 ```r
-set_real_vector <- function(x, values) {
-  x$resize(length(values))
-  for (i in seq_along(values)) {
-    x$set(i - 1L, values[i])
-  }
-  invisible(x)
-}
+real_values <- methods::new(RealVector)
+real_values[] <- c(1, 2, 3)
+
+parameter_values <- methods::new(ParameterVector)
+parameter_values[] <- c(1, 2, 3)
 ```
 
 ## Direct Evaluation
@@ -58,9 +56,9 @@ Direct evaluation uses `observed_values` unless an input has been linked with
 ```r
 likelihood <- methods::new(NormalLikelihood)
 
-set_real_vector(likelihood$observed_values, c(1, 2))
-set_real_vector(likelihood$expected_values, c(0.5, 1.5))
-set_real_vector(likelihood$log_sd, log(2))
+likelihood$observed_values[] <- c(1, 2)
+likelihood$expected_values[] <- c(0.5, 1.5)
+likelihood$log_sd[] <- log(2)
 
 likelihood$evaluate()
 likelihood$nll_components$toRVector()
@@ -75,8 +73,8 @@ but expected values are produced by a model or derived quantity.
 ```r
 likelihood <- methods::new(LognormalLikelihood)
 
-set_real_vector(likelihood$observed_values, observed_landings)
-set_real_vector(likelihood$log_sd, log_sd)
+likelihood$observed_values[] <- observed_landings
+likelihood$log_sd[] <- log_sd
 likelihood$set_parameter_expected_input(fleet$log_landings_expected)
 ```
 
@@ -90,9 +88,9 @@ registered in `Information::variable_map`.
 input <- methods::new(RealVector)
 likelihood <- methods::new(NormalLikelihood)
 
-set_real_vector(input, 1)
-set_real_vector(likelihood$expected_values, 0)
-set_real_vector(likelihood$log_sd, 0)
+input[] <- 1
+likelihood$expected_values[] <- 0
+likelihood$log_sd[] <- 0
 
 likelihood$set_real_input(input, "prior")
 likelihood$evaluate()
@@ -110,8 +108,8 @@ selectivity$slope[1]$value <- 1.5
 selectivity$slope[1]$estimation_type$set("fixed_effects")
 
 prior <- methods::new(NormalLikelihood)
-set_real_vector(prior$expected_values, 1.5)
-set_real_vector(prior$log_sd, log(3))
+prior$expected_values[] <- 1.5
+prior$log_sd[] <- log(3)
 prior$set_parameter_input(selectivity$slope, "prior")
 ```
 
@@ -180,9 +178,9 @@ For one multinomial row:
 
 ```r
 likelihood <- methods::new(MultinomialLikelihood)
-set_real_vector(likelihood$observed_values, c(2, 1, 1))
-set_real_vector(likelihood$expected_values, c(0.5, 0.25, 0.25))
-set_real_vector(likelihood$dims, c(1, 3))
+likelihood$observed_values[] <- c(2, 1, 1)
+likelihood$expected_values[] <- c(0.5, 0.25, 0.25)
+likelihood$dims[] <- c(1, 3)
 likelihood$evaluate()
 clear()
 ```
@@ -227,8 +225,8 @@ quantity as its input:
 
 ```r
 likelihood <- methods::new(LognormalLikelihood)
-set_real_vector(likelihood$expected_values, log_expected_value)
-set_real_vector(likelihood$log_sd, log_sd)
+likelihood$expected_values[] <- log_expected_value
+likelihood$log_sd[] <- log_sd
 likelihood$set_real_input(fleet_derived_quantities$log_index_expected, "data")
 ```
 
