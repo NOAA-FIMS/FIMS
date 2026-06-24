@@ -80,6 +80,17 @@ target_link_libraries(fimsMath_fimsMath_logit
 )
 gtest_discover_tests(fimsMath_fimsMath_logit)
 
+# test_fimsObject_MemoryTracker.cpp
+add_executable(fimsObject_MemoryTracker
+  test_fimsObject_MemoryTracker.cpp
+)
+add_as_invoker_manifest(fimsObject_MemoryTracker)
+target_link_libraries(fimsObject_MemoryTracker
+  gtest_main
+  fims_test
+)
+gtest_discover_tests(fimsObject_MemoryTracker)
+
 # test_growth_EWAAGrowth_evaluate.cpp
 add_executable(growth_EWAAGrowth_evaluate
   test_growth_EWAAGrowth_evaluate.cpp

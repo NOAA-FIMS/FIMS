@@ -49,7 +49,10 @@ struct RecruitmentBase : public fims_model_object::FIMSObject<Type> {
 
   /** @brief Constructor.
    */
-  RecruitmentBase() { this->id = RecruitmentBase::id_g++; }
+  RecruitmentBase() {
+    this->id = RecruitmentBase::id_g++;
+    this->register_self(typeid(*this).name(), this->id);
+  }
 
   virtual ~RecruitmentBase() {}
 
