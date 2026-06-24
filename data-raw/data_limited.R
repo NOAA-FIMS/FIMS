@@ -29,19 +29,19 @@ om_landings[is.na(om_landings)] <- 0
 iter_id <- 1
 
 # using FLR magic to get data out of FLQuant objects
-fishing_fleet_landings <- 
-  iter(om_landings, iter_id) |> 
-   FLCore::window(start = 1951) |>
-   as.data.frame() |>
-   dplyr::select(age, year, season, area, data) |>
-   stats::model.frame(drop = TRUE)
-
-survey_fleet_index <- 
- iter(om_survey_indices, iter_id) |> 
+fishing_fleet_landings <-
+  iter(om_landings, iter_id) |>
   FLCore::window(start = 1951) |>
-  as.data.frame() 
+  as.data.frame() |>
+  dplyr::select(age, year, season, area, data) |>
+  stats::model.frame(drop = TRUE)
+
+survey_fleet_index <-
+  iter(om_survey_indices, iter_id) |>
+  FLCore::window(start = 1951) |>
+  as.data.frame()
 survey_fleet_index$A <- survey_fleet_index$data
-survey_fleet_index <- dplyr::select(survey_fleet_index, age, year, season, area, A) 
+survey_fleet_index <- dplyr::select(survey_fleet_index, age, year, season, area, A)
 
 survey_fleet_index$A <- ifelse(is.na(survey_fleet_index$A), -999, survey_fleet_index$A)
 survey_fleet_index <- stats::model.frame(survey_fleet_index, drop = TRUE)
@@ -104,17 +104,17 @@ tuna_dat <- rbind(
   c(34.6, 30.75),
   c(37.5, 23.36),
   c(25.9, 22.36),
-  c(25.3, 21.91))
-colnames(tuna_dat) <- c('C', 'I')
+  c(25.3, 21.91)
+)
+colnames(tuna_dat) <- c("C", "I")
 tuna_dat <- as.data.frame(tuna_dat)
 tuna_dat$year <- tuna_dat$timing <- 0
 tuna_dat$year <- 1967:1989
-tuna_dat$timing <- 1: nrow(tuna_dat)
+tuna_dat$timing <- 1:nrow(tuna_dat)
 
 # helper to get year to full date
 date_start <- paste0(tuna_dat$year, "-01-01")
 date_end <- paste0(tuna_dat$year, "-12-31")
-
 
 
 # create FIMS surplus production data object
@@ -134,10 +134,8 @@ data_limited_tuna <- data.frame(
   dateend = rep(as.Date(date_end, format = "%Y-%m-%d"), 2),
   value = c(tuna_dat$C, tuna_dat$I),
   unit = rep("t", nrow(tuna_dat), NA),
-  uncertainty = rep(0.1, nrow(tuna_dat)*2)
+  uncertainty = rep(0.1, nrow(tuna_dat) * 2)
 )
 
 # save data_sp
 usethis::use_data(data_limited_tuna, overwrite = TRUE)
-
-

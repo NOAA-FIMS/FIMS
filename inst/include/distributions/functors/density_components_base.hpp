@@ -59,7 +59,7 @@ struct DensityComponentBase : public fims_model_object::FIMSObject<Type> {
 
   /** @brief Pointer to input transformation */
   std::vector<fims::Transformation*> input_transformation;
-  
+
   /** @brief Pointer to prior transformation */
   std::vector<fims::Transformation*> prior_transformation;
 
@@ -88,22 +88,20 @@ struct DensityComponentBase : public fims_model_object::FIMSObject<Type> {
         throw std::runtime_error("No priors defined for this distribution.");
       } else if (priors.size() == 1) {
         this->transformed_priors.resize((*priors[0]).size());
-        this->transformed_priors = 
-          fims_transformations::TransformPrior(*(priors[0]), 
-                                               *(input_transformation[0]), 
-                                               *(prior_transformation[0]));
+        this->transformed_priors = fims_transformations::TransformPrior(
+            *(priors[0]), *(input_transformation[0]),
+            *(prior_transformation[0]));
       } else if (priors.size() > 1) {
         size_t n = priors.size();
         this->transformed_priors.resize(n);
         for (size_t i = 0; i < n; i++) {
-          transformed_priors[i] = 
-            fims_transformations::TransformPrior((*(priors[i]))[0],
-                                                 *(input_transformation[i]),
-                                                 *(prior_transformation[i]));
+          transformed_priors[i] = fims_transformations::TransformPrior(
+              (*(priors[i]))[0], *(input_transformation[i]),
+              *(prior_transformation[i]));
+        }
       }
     }
   }
-}
 
   /**
    * @brief Retrieve one observed value based on `input_type`.

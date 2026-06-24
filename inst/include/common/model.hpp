@@ -107,13 +107,11 @@ class Model {  // may need singleton
       if (d->input_type == "prior") {
         nll_vec[nll_vec_idx] = -d->evaluate();
         if (this->jacobian_flag) {
-          for(size_t i=0; i < d->key.size(); i++) {
-            if ((*(d->input_transformation[i])).label != 
+          for (size_t i = 0; i < d->key.size(); i++) {
+            if ((*(d->input_transformation[i])).label !=
                 (*(d->prior_transformation[i])).label) {
-              nll_vec[nll_vec_idx] += 
-                -fims_transformations::AddLogJacobian(
-                  *(d->priors[i]),
-                  *(d->input_transformation[i]),
+              nll_vec[nll_vec_idx] += -fims_transformations::AddLogJacobian(
+                  *(d->priors[i]), *(d->input_transformation[i]),
                   *(d->prior_transformation[i]));
             }
           }

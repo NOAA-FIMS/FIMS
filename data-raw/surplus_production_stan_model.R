@@ -23,8 +23,9 @@ tuna.dat <- rbind(
   c(34.6, 30.75),
   c(37.5, 23.36),
   c(25.9, 22.36),
-  c(25.3, 21.91))
-colnames(tuna.dat) <- c('C', 'I')
+  c(25.3, 21.91)
+)
+colnames(tuna.dat) <- c("C", "I")
 tuna.dat <- as.data.frame(tuna.dat)
 
 
@@ -35,9 +36,13 @@ stan_data <- list(
   m = 2
 )
 
-inits <- list(depletion=c(0.99,0.98,0.96,0.94,0.92,0.90,0.88,0.86,0.84,0.82,
-0.80,0.78,0.76,0.74,0.72,0.70,0.68,0.66,0.64,0.62,0.60,0.58,0.56,0.56),
-r=0.8, K=200, sigma2 = 1/100, tau2 = 1/100)
+inits <- list(
+  depletion = c(
+    0.99, 0.98, 0.96, 0.94, 0.92, 0.90, 0.88, 0.86, 0.84, 0.82,
+    0.80, 0.78, 0.76, 0.74, 0.72, 0.70, 0.68, 0.66, 0.64, 0.62, 0.60, 0.58, 0.56, 0.56
+  ),
+  r = 0.8, K = 200, sigma2 = 1 / 100, tau2 = 1 / 100
+)
 
 stan_code <- "
 functions {
@@ -182,18 +187,24 @@ generated quantities {
 "
 
 
-fit <- rstan::stan(model_code = stan_code, data = stan_data,
-            warmup = 5000, iter = 30000, chains = 4, 
-        control = list(adapt_delta = 0.99))
+fit <- rstan::stan(
+  model_code = stan_code, data = stan_data,
+  warmup = 5000, iter = 30000, chains = 4,
+  control = list(adapt_delta = 0.99)
+)
 postmle <- as.matrix(fit)[, -ncol(as.matrix(fit))]
 out_par <- apply(postmle, 2, median)
 
 df <- data.frame(label = rep("", 29), median = rep(NA, 29))
-df[,1] <- c("growth_rate", "carrying_capacity", "sigma2_obs", "sigma2_depletion",
-rep("depletion", 24), "q")
+df[, 1] <- c(
+  "growth_rate", "carrying_capacity", "sigma2_obs", "sigma2_depletion",
+  rep("depletion", 24), "q"
+)
 
-df[,2] <- c(out_par[["r"]], out_par[["K"]], out_par[["tau2"]], out_par[["sigma2"]],
-out_par[5:27], out_par[["P_final"]], out_par[["log_q_hat"]] |> exp())
+df[, 2] <- c(
+  out_par[["r"]], out_par[["K"]], out_par[["tau2"]], out_par[["sigma2"]],
+  out_par[5:27], out_par[["P_final"]], out_par[["log_q_hat"]] |> exp()
+)
 
 data_limited_tuna_results <- df
 

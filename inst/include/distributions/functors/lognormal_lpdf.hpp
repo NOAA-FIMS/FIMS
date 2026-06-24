@@ -74,11 +74,11 @@ struct LogNormalLPDF : public DensityComponentBase<Type> {
     // Dimension checks
     if (n_expected > 1 && n_expected != n_x) {
       throw std::invalid_argument(
-        "LogNormalLPDF::Vector index out of bounds. The size of observed "
-            "data does not equal the expected size. The observed data vector "
-            "is of size " +
-            fims::to_string(n_x) +
-            " and the expected size is " + fims::to_string(n_expected));
+          "LogNormalLPDF::Vector index out of bounds. The size of observed "
+          "data does not equal the expected size. The observed data vector "
+          "is of size " +
+          fims::to_string(n_x) + " and the expected size is " +
+          fims::to_string(n_expected));
     }
     if (this->log_sd.size() > 1 && n_x != this->log_sd.size()) {
       throw std::invalid_argument(
@@ -105,7 +105,7 @@ struct LogNormalLPDF : public DensityComponentBase<Type> {
           this->lpdf_vec[i] = 0;
         }
       } else {
-        if(this->get_observed(i) != -999){
+        if (this->get_observed(i) != -999) {
           this->lpdf_vec[i] =
               dnorm(log(this->get_observed(i)), this->get_expected(i),
                     fims_math::exp(log_sd.get_force_scalar(i)), true) -

@@ -97,11 +97,11 @@ bool CreateTMBModel() {
   info0->CheckModel();
 
   info->CreateModel();
-/*
-  // instantiate the model? TODO: Ask Matthew what this does
-  std::shared_ptr<fims_model::Model<TMB_FIMS_REAL_TYPE>> m0 =
-      fims_model::Model<TMB_FIMS_REAL_TYPE>::GetInstance();
-*/
+  /*
+    // instantiate the model? TODO: Ask Matthew what this does
+    std::shared_ptr<fims_model::Model<TMB_FIMS_REAL_TYPE>> m0 =
+        fims_model::Model<TMB_FIMS_REAL_TYPE>::GetInstance();
+  */
   return true;
 }
 
@@ -230,11 +230,13 @@ Rcpp::List get_random_names(Rcpp::List pars) {
 }
 
 /**
- * @brief Classifies an R formula's Left-Hand Side (LHS) and extracts the transformation.
- * * @details This helper function inspects the Abstract Syntax Tree (AST) of the raw 
- * R expression pointer (SEXP) passed from the formula's left-hand side. It maps 
- * recognized R mathematical operations (like `log()`, `exp()`, or exponentiation `^2`) 
- * to their respective domain-specific strongly typed enums defined in the fims namespace.
+ * @brief Classifies an R formula's Left-Hand Side (LHS) and extracts the
+ * transformation.
+ * * @details This helper function inspects the Abstract Syntax Tree (AST) of
+ * the raw R expression pointer (SEXP) passed from the formula's left-hand side.
+ * It maps recognized R mathematical operations (like `log()`, `exp()`, or
+ * exponentiation `^2`) to their respective domain-specific strongly typed enums
+ * defined in the fims namespace.
  * * Supported AST structural mappings include:
  * - \b Symbol (e.g., \code{sd}): Maps to \c Label::identity
  * - \b Language Call (e.g., \code{log(sd)}): Maps to \c Label::log
@@ -243,107 +245,104 @@ Rcpp::List get_random_names(Rcpp::List pars) {
  * - \b Language Call (e.g., \code{sqrt(sd)}): Maps to \c Label::sqrt
  * - \b Infix Exponent (e.g., \code{sd^2}): Maps to \c Label::square
  *
- * @param lhs_raw A raw \code{SEXP} representing the left-hand side node of an R formula.
- * * @throws std::runtime_error (via \code{Rcpp::stop}) if the expression tree structure 
- * is unrecognizable or contains an unmapped transformation function.
+ * @param lhs_raw A raw \code{SEXP} representing the left-hand side node of an R
+ * formula.
+ * * @throws std::runtime_error (via \code{Rcpp::stop}) if the expression tree
+ * structure is unrecognizable or contains an unmapped transformation function.
  * * @return A \code{fims::Transformation::Label} with the enumeration token.
  */
 fims::Transformation classify_and_extract_transformation(SEXP lhs_raw) {
-
   fims::Transformation trans_config;
-    
-    if (Rcpp::is<Rcpp::Symbol>(lhs_raw)) {
-        trans_config.label = fims::Transformation::Label::identity;
-        return trans_config;
-    }
-    
-    if (Rcpp::is<Rcpp::Language>(lhs_raw)) {
-        Rcpp::Language lhs_lang = Rcpp::as<Rcpp::Language>(lhs_raw);
-        Rcpp::CharacterVector op_name = Rcpp::as<Rcpp::CharacterVector>(Rcpp::as<Rcpp::Symbol>(lhs_lang[0]));
-        
-        // Match R operators/functions to your fims::Transformation::Label enums
-        if (op_name[0] == "log") {
-            trans_config.label = fims::Transformation::Label::log;
-            return trans_config;
-        }
-        else if (op_name[0] == "exp") {
-            trans_config.label = fims::Transformation::Label::exp;
-            return trans_config;
-        }
-        else if (op_name[0] == "logit") {
-            trans_config.label = fims::Transformation::Label::logit;
-            // Extract bounds if provided, otherwise default to 0 and 1
-            if (lhs_lang.size() >= 3) {
-                trans_config.args.lower = Rcpp::as<double>(lhs_lang[2]);
-            }
-            if (lhs_lang.size() >= 4) {
-                trans_config.args.upper = Rcpp::as<double>(lhs_lang[3]);
-            }
-            // Validate bounds
-            if (trans_config.args.lower >= trans_config.args.upper) {
-                Rcpp::stop("Logit transformation requires lower < upper.");
-            }
-            return trans_config;
-        }
-        else if (op_name[0] == "sqrt") {
-            trans_config.label = fims::Transformation::Label::sqrt;
-            return trans_config;
-        }
-        else if (op_name[0] == "^") {
-            int power = Rcpp::as<int>(lhs_lang[2]);
-            if (power == 2) {
-                trans_config.label = fims::Transformation::Label::square;
-                return trans_config;
-            }
-        }
-        // Add reciprocal parsing here if you still want to route 1/x variants 
-    }
-    
-    // Fallback/Error state if formula layout isn't supported
-    Rcpp::stop("Unsupported Left-Hand Side (LHS) transformation operator.");
-}
 
+  if (Rcpp::is<Rcpp::Symbol>(lhs_raw)) {
+    trans_config.label = fims::Transformation::Label::identity;
+    return trans_config;
+  }
+
+  if (Rcpp::is<Rcpp::Language>(lhs_raw)) {
+    Rcpp::Language lhs_lang = Rcpp::as<Rcpp::Language>(lhs_raw);
+    Rcpp::CharacterVector op_name =
+        Rcpp::as<Rcpp::CharacterVector>(Rcpp::as<Rcpp::Symbol>(lhs_lang[0]));
+
+    // Match R operators/functions to your fims::Transformation::Label enums
+    if (op_name[0] == "log") {
+      trans_config.label = fims::Transformation::Label::log;
+      return trans_config;
+    } else if (op_name[0] == "exp") {
+      trans_config.label = fims::Transformation::Label::exp;
+      return trans_config;
+    } else if (op_name[0] == "logit") {
+      trans_config.label = fims::Transformation::Label::logit;
+      // Extract bounds if provided, otherwise default to 0 and 1
+      if (lhs_lang.size() >= 3) {
+        trans_config.args.lower = Rcpp::as<double>(lhs_lang[2]);
+      }
+      if (lhs_lang.size() >= 4) {
+        trans_config.args.upper = Rcpp::as<double>(lhs_lang[3]);
+      }
+      // Validate bounds
+      if (trans_config.args.lower >= trans_config.args.upper) {
+        Rcpp::stop("Logit transformation requires lower < upper.");
+      }
+      return trans_config;
+    } else if (op_name[0] == "sqrt") {
+      trans_config.label = fims::Transformation::Label::sqrt;
+      return trans_config;
+    } else if (op_name[0] == "^") {
+      int power = Rcpp::as<int>(lhs_lang[2]);
+      if (power == 2) {
+        trans_config.label = fims::Transformation::Label::square;
+        return trans_config;
+      }
+    }
+    // Add reciprocal parsing here if you still want to route 1/x variants
+  }
+
+  // Fallback/Error state if formula layout isn't supported
+  Rcpp::stop("Unsupported Left-Hand Side (LHS) transformation operator.");
+}
 
 /**
  * @brief A structure to hold the parsed components of a distribution formula.
  */
 struct FormulaComponents {
-    fims::Transformation transformation;
-    fims::Distribution::Label distribution;
-    std::vector<double> hyperparameters;
+  fims::Transformation transformation;
+  fims::Distribution::Label distribution;
+  std::vector<double> hyperparameters;
 };
 
 //' Parse a Distributional Formula
 //'
-//' Parses an R formula specifying a target variable and its prior/likelihood distribution 
-//' along with its parameters (e.g., \code{y ~ dnorm(0, 1)}).
+//' Parses an R formula specifying a target variable and its prior/likelihood
+//distribution ' along with its parameters (e.g., \code{y ~ dnorm(0, 1)}).
 //'
-//' @param f A standard R \code{Formula} object. It must follow the structure 
+//' @param f A standard R \code{Formula} object. It must follow the structure
 //'   \code{variable ~ distribution(param1, param2, ...)}.
 //'
 //' @details
-//' The function unpacks the R formula by treating it as an abstract syntax tree (AST) 
-//' via the \code{Rcpp::Language} class:
-//' \itemize{
-//'   \item \strong{Operator (\code{[0]}):} The tilde (\code{~}) operator.
-//'   \item \strong{LHS (\code{[1]}):} Extracted as a \code{Symbol} and converted to a character vector representing the target variable name.
-//'   \item \strong{RHS (\code{[2]}):} Treated as a nested \code{Language} call where the head (\code{[0]}) is the distribution name, and subsequent elements are the numeric parameters.
-//' }
+//' The function unpacks the R formula by treating it as an abstract syntax tree
+//(AST) ' via the \code{Rcpp::Language} class: ' \itemize{ '   \item
+//\strong{Operator (\code{[0]}):} The tilde (\code{~}) operator. '   \item
+//\strong{LHS (\code{[1]}):} Extracted as a \code{Symbol} and converted to a
+//character vector representing the target variable name. '   \item \strong{RHS
+//(\code{[2]}):} Treated as a nested \code{Language} call where the head
+//(\code{[0]}) is the distribution name, and subsequent elements are the numeric
+//parameters. ' }
 //'
 //' @return A named \code{Rcpp::List} containing three elements:
 //' \itemize{
-//'   \item \code{variable}: A character vector holding the name of the LHS variable.
-//'   \item \code{distribution}: A character vector holding the name of the RHS distribution function.
-//'   \item \code{hyperparameters}: A numeric vector containing the extracted hyperparameter values.
-//' }
+//'   \item \code{variable}: A character vector holding the name of the LHS
+//variable. '   \item \code{distribution}: A character vector holding the name
+//of the RHS distribution function. '   \item \code{hyperparameters}: A numeric
+//vector containing the extracted hyperparameter values. ' }
 FormulaComponents parse_distribution_formula(Rcpp::Formula f) {
-
   // Convert the Formula to a standard standard R language object (Call)
   Rcpp::Language formula = Rcpp::as<Rcpp::Language>(f);
 
   // Parse the formula
   // R formulas are structured as a tree where element 0 is the operator `~`
-  // element 1 is the Left-Hand Side (LHS), and element 2 is the Right-Hand Side (RHS)
+  // element 1 is the Left-Hand Side (LHS), and element 2 is the Right-Hand Side
+  // (RHS)
 
   SEXP lhs_raw = formula[1];
 
@@ -352,40 +351,40 @@ FormulaComponents parse_distribution_formula(Rcpp::Formula f) {
 
   // 2. Parse Right-Hand Side (RHS)
   if (!Rcpp::is<Rcpp::Language>(formula[2])) {
-      Rcpp::stop("Right-Hand Side (RHS) must be a distribution function call.");
+    Rcpp::stop("Right-Hand Side (RHS) must be a distribution function call.");
   }
   Rcpp::Language rhs = Rcpp::as<Rcpp::Language>(formula[2]);
-  
-  // The first element of a function call language object is the function name itself
-  // Convert formula->Symbol->CharacterVector->enum
+
+  // The first element of a function call language object is the function name
+  // itself Convert formula->Symbol->CharacterVector->enum
   Rcpp::Symbol distribution_symbol = Rcpp::as<Rcpp::Symbol>(rhs[0]);
-  Rcpp::CharacterVector distribution_string = Rcpp::as<Rcpp::CharacterVector>(distribution_symbol);
+  Rcpp::CharacterVector distribution_string =
+      Rcpp::as<Rcpp::CharacterVector>(distribution_symbol);
 
   // 3. Extract the numeric parameters from the function arguments
-  int num_args = rhs.size() - 1; // Subtract 1 because element 0 is the function name
+  int num_args =
+      rhs.size() - 1;  // Subtract 1 because element 0 is the function name
   std::vector<double> hyperparameters(num_args);
-  
-  for(int i = 0; i < num_args; ++i) {
+
+  for (int i = 0; i < num_args; ++i) {
     SEXP arg = rhs[i + 1];
     if (Rcpp::is<Rcpp::Language>(arg) || Rcpp::is<Rcpp::Symbol>(arg)) {
-        // Evaluate the expression to get a numeric value
-        Rcpp::Environment base_env = Rcpp::Environment::base_env();
-        SEXP result = Rcpp::Rcpp_eval(arg, base_env);
-        hyperparameters[i] = Rcpp::as<double>(result);
+      // Evaluate the expression to get a numeric value
+      Rcpp::Environment base_env = Rcpp::Environment::base_env();
+      SEXP result = Rcpp::Rcpp_eval(arg, base_env);
+      hyperparameters[i] = Rcpp::as<double>(result);
     } else {
-        hyperparameters[i] = Rcpp::as<double>(arg);
+      hyperparameters[i] = Rcpp::as<double>(arg);
     }
   }
 
-  return FormulaComponents{
-    transform,
-    fims::StringToDistributionLabel(Rcpp::as<std::string>(distribution_string)),
-    hyperparameters
-  };
+  return FormulaComponents{transform,
+                           fims::StringToDistributionLabel(
+                               Rcpp::as<std::string>(distribution_string)),
+                           hyperparameters};
 }
 
 void setup_prior(Rcpp::Formula f, Rcpp::List parameter_vectors) {
-
   Rcpp::IntegerVector ids(parameter_vectors.size());
 
   // Parse formula into components
@@ -398,14 +397,13 @@ void setup_prior(Rcpp::Formula f, Rcpp::List parameter_vectors) {
   // Extract the raw pointer from the XPtr
   for (int i = 0; i < parameter_vectors.size(); i++) {
     ParameterVector pv = Rcpp::as<ParameterVector>(parameter_vectors[i]);
-    
+
     // Modifies shared Transformation object
     *pv.prior_transformation_m = prior_transformation;
     ids[i] = pv.id_m;
   }
-  
-  switch (distribution_name) {
 
+  switch (distribution_name) {
     case fims::Distribution::Label::Normal: {
       auto prior = std::make_shared<DnormDistributionsInterface>();
       prior->expected_values[0].initial_value_m = hyperparameters[0];
@@ -424,7 +422,8 @@ void setup_prior(Rcpp::Formula f, Rcpp::List parameter_vectors) {
 
     case fims::Distribution::Label::Gamma: {
       auto prior = std::make_shared<DgammaDistributionsInterface>();
-      prior->expected_values[0].initial_value_m = fims_math::log(hyperparameters[0]);
+      prior->expected_values[0].initial_value_m =
+          fims_math::log(hyperparameters[0]);
       prior->log_sd[0].initial_value_m = fims_math::log(hyperparameters[1]);
       prior->set_distribution_links("prior", ids);
       break;
@@ -439,13 +438,14 @@ void setup_prior(Rcpp::Formula f, Rcpp::List parameter_vectors) {
     }
 
     default:
-      throw std::invalid_argument("Unsupported distribution type in add_prior.");
+      throw std::invalid_argument(
+          "Unsupported distribution type in add_prior.");
   }
 }
 
-//Define setup_prior_function in ParameterVector class
+// Define setup_prior_function in ParameterVector class
 inline void register_prior_functions() {
-    ParameterVector::setup_prior_function = setup_prior;
+  ParameterVector::setup_prior_function = setup_prior;
 }
 
 void add_shared_prior(Rcpp::Formula f, Rcpp::List parameter_vectors) {

@@ -28,18 +28,15 @@ struct GammaLikelihood : public NormalLikelihood<Type> {
       Type sd = fims_math::exp(this->GetLogSd(i));
       Type shape = (mean / sd) * (mean / sd);
       Type scale = (sd * sd) / mean;
-      Type log_density = (shape - static_cast<Type>(1.0)) *
-                             fims_math::log(input) -
-                         input / scale -
-                         fims_math::lgamma(shape) -
-                         shape * fims_math::log(scale);
+      Type log_density =
+          (shape - static_cast<Type>(1.0)) * fims_math::log(input) -
+          input / scale - fims_math::lgamma(shape) -
+          shape * fims_math::log(scale);
       this->nll_components[i] = -log_density;
       this->nll += this->nll_components[i];
 #ifdef TMB_MODEL
       if (this->simulate_flag) {
-        FIMS_SIMULATE_F(this->of) {
-          this->GetInput(i) = rgamma(shape, scale);
-        }
+        FIMS_SIMULATE_F(this->of) { this->GetInput(i) = rgamma(shape, scale); }
       }
 #endif
     }

@@ -214,7 +214,8 @@ class FleetInterface : public FleetInterfaceBase {
         lengthcomp_proportion(other.lengthcomp_proportion),
         age_to_length_conversion(other.age_to_length_conversion),
         mean_log_q(other.mean_log_q),
-        log_index_to_depletion_carrying_capacity_ratio(other.log_index_to_depletion_carrying_capacity_ratio) {}
+        log_index_to_depletion_carrying_capacity_ratio(
+            other.log_index_to_depletion_carrying_capacity_ratio) {}
 
   /**
    * @brief The destructor.

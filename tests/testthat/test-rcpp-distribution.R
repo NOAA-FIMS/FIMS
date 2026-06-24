@@ -157,9 +157,9 @@ test_that("DgammaDistribution works with correct inputs", {
   sd_val <- 4
   shape_val <- (mean_val / sd_val)^2
   scale_val <- (sd_val^2) / mean_val
-  
+
   y <- stats::rgamma(1, shape = shape_val, scale = scale_val)
-  
+
   # create a fims Rcpp object
   # initialize the Dgamma module
   dgamma_ <- methods::new(DgammaDistribution)
@@ -248,10 +248,10 @@ test_that("DinvgammaDistribution works with correct inputs", {
   # populate class members
   dinvgamma_$observed_values[1]$value <- y
   dinvgamma_$log_shape[1]$value <- log(2)
-  dinvgamma_$log_scale[1]$value <- log(1/2)
+  dinvgamma_$log_scale[1]$value <- log(1 / 2)
   # evaluate the density and compare with R
   #' @description Test that dinvgamma works with a single value input, e.g. a prior on a parameter.
-  expect_equal(dinvgamma_$evaluate(), dinvgamma_r(y, 2, 1/2, TRUE))
+  expect_equal(dinvgamma_$evaluate(), dinvgamma_r(y, 2, 1 / 2, TRUE))
   clear()
 
   # simulate inverse gamma data with vector input
@@ -266,17 +266,15 @@ test_that("DinvgammaDistribution works with correct inputs", {
     \(x) dinvgamma_$observed_values[x]$value <- y[x]
   )
   dinvgamma_$log_shape[1]$value <- log(2)
-  dinvgamma_$log_scale[1]$value <- log(1/2)
+  dinvgamma_$log_scale[1]$value <- log(1 / 2)
   # evaluate the density and compare with R
   #' @description Test that dinvgamma works with a vector of state variables and scalar shape and scale arguments.
-  expect_equal(dinvgamma_$evaluate(), sum(dinvgamma_r(y, 2, 1/2, TRUE)))
+  expect_equal(dinvgamma_$evaluate(), sum(dinvgamma_r(y, 2, 1 / 2, TRUE)))
   clear()
-
 })
 
 
 test_that("DmultinomDistribution works with correct inputs", {
-
   # generate data using R stats:rmultinom
   set.seed(123)
   p <- (1:10) / sum(1:10)
@@ -464,13 +462,13 @@ test_that("DlnormDistribution returns correct outputs for edge cases", {
 })
 
 test_that("DgammaDistribution returns correct outputs for edge cases", {
-   set.seed(123)
-  
+  set.seed(123)
+
   mean_val <- 8
   sd_val <- 4
   shape_val <- (mean_val / sd_val)^2
   scale_val <- (sd_val^2) / mean_val
-  
+
   y <- 0.001
   # create a fims Rcpp object
   # initialize the Dgamma module
@@ -483,7 +481,7 @@ test_that("DgammaDistribution returns correct outputs for edge cases", {
   #' @description Test extreme observed values for dgamma (y <- 0.001) return expected output.
   expect_equal(dgamma_$evaluate(), stats::dgamma(y, shape = shape_val, scale = scale_val, log = TRUE))
   clear()
-  
+
   y <- 1000
   # create a fims Rcpp object
   # initialize the Dgamma module
@@ -513,7 +511,7 @@ test_that("DgammaDistribution returns correct outputs for edge cases", {
   #' @description Test extreme expected values for dgamma (mean = 0.1) return expected output.
   expect_equal(dgamma_$evaluate(), stats::dgamma(y, shape = shape_val, scale = scale_val, log = TRUE))
   clear()
-  
+
   y <- 5
   mean_val <- 1000
   sd_val <- 500
@@ -527,7 +525,7 @@ test_that("DgammaDistribution returns correct outputs for edge cases", {
   dgamma_$expected_values[1]$value <- mean_val
   dgamma_$log_sd[1]$value <- log(sd_val)
   # evaluate the density and compare with R
-    #' @description Test extreme expected values for dgamma (mean = 1000) return expected output.
+  #' @description Test extreme expected values for dgamma (mean = 1000) return expected output.
   expect_equal(dgamma_$evaluate(), stats::dgamma(y, shape = shape_val, scale = scale_val, log = TRUE))
   clear()
 
@@ -547,7 +545,7 @@ test_that("DgammaDistribution returns correct outputs for edge cases", {
   #' @description Test extreme log_sd values for dgamma (log_sd = exp(3)) return expected output.
   expect_equal(dgamma_$evaluate(), stats::dgamma(y, shape = shape_val, scale = scale_val, log = TRUE))
   clear()
-  
+
   y <- 5
   mean_val <- 8
   sd_val <- exp(-3)
@@ -564,7 +562,7 @@ test_that("DgammaDistribution returns correct outputs for edge cases", {
   #' @description Test extreme log_sd values for dgamma (log_sd = exp(-3)) return expected output.
   expect_equal(dgamma_$evaluate(), stats::dgamma(y, shape = shape_val, scale = scale_val, log = TRUE))
   clear()
-  
+
   y <- -1
   mean_val <- 8
   sd_val <- 4
@@ -578,7 +576,7 @@ test_that("DgammaDistribution returns correct outputs for edge cases", {
   #' @description Test that dgamma returns -Inf for negative observed values
   expect_true(is.nan(dgamma_$evaluate()))
   clear()
-  
+
   y <- 0
   dgamma_ <- methods::new(DgammaDistribution)
   # populate class members
@@ -608,9 +606,9 @@ test_that("dinvgamma returns correct outputs for edge cases", {
   dinvgamma_ <- methods::new(DinvgammaDistribution)
   dinvgamma_$observed_values[1]$value <- y
   dinvgamma_$log_shape[1]$value <- log(2)
-  dinvgamma_$log_scale[1]$value <- log(1/2)
+  dinvgamma_$log_scale[1]$value <- log(1 / 2)
   #' @description Test that dinvgamma returns the correct output for a very small x value (1e-4).
-  expect_equal(dinvgamma_$evaluate(), dinvgamma_r(y, 2, 1/2, TRUE))
+  expect_equal(dinvgamma_$evaluate(), dinvgamma_r(y, 2, 1 / 2, TRUE))
   clear()
 
   # test with large x
@@ -618,9 +616,9 @@ test_that("dinvgamma returns correct outputs for edge cases", {
   dinvgamma_ <- methods::new(DinvgammaDistribution)
   dinvgamma_$observed_values[1]$value <- y
   dinvgamma_$log_shape[1]$value <- log(2)
-  dinvgamma_$log_scale[1]$value <- log(1/2)
+  dinvgamma_$log_scale[1]$value <- log(1 / 2)
   #' @description Test that dinvgamma returns the correct output for a very large x value (1e4).
-  expect_equal(dinvgamma_$evaluate(), dinvgamma_r(y, 2, 1/2, TRUE))
+  expect_equal(dinvgamma_$evaluate(), dinvgamma_r(y, 2, 1 / 2, TRUE))
   clear()
 
   # test with x = 0 (should return -Inf)
@@ -628,7 +626,7 @@ test_that("dinvgamma returns correct outputs for edge cases", {
   dinvgamma_ <- methods::new(DinvgammaDistribution)
   dinvgamma_$observed_values[1]$value <- y
   dinvgamma_$log_shape[1]$value <- log(2)
-  dinvgamma_$log_scale[1]$value <- log(1/2)
+  dinvgamma_$log_scale[1]$value <- log(1 / 2)
   #' @description Test that dinvgamma returns NaN when x = 0.
   expect_equal(dinvgamma_$evaluate(), NaN)
   clear()
@@ -641,7 +639,7 @@ test_that("dinvgamma returns correct outputs for edge cases", {
   dinvgamma_$log_scale[1]$value <- log(2)
   #' @description Test that dinvgamma returns the correct output for small shape parameters (1e-4).
   expect_equal(dinvgamma_$evaluate(), dinvgamma_r(y, 1e-4, 2, TRUE))
-  clear() 
+  clear()
 
   y <- 1
   dinvgamma_ <- methods::new(DinvgammaDistribution)
@@ -650,7 +648,7 @@ test_that("dinvgamma returns correct outputs for edge cases", {
   dinvgamma_$log_scale[1]$value <- log(1e-4)
   #' @description Test that dinvgamma returns the correct output for small scale parameters (1e-4).
   expect_equal(dinvgamma_$evaluate(), dinvgamma_r(y, 2, 1e-4, TRUE))
-  clear() 
+  clear()
 
   # test large shape and scale parameters
   y <- 1
@@ -660,20 +658,20 @@ test_that("dinvgamma returns correct outputs for edge cases", {
   dinvgamma_$log_scale[1]$value <- log(2)
   #' @description Test that dinvgamma returns the correct output for large shape parameters (1e4).
   expect_equal(dinvgamma_$evaluate(), dinvgamma_r(y, 1e4, 2, TRUE))
-  clear() 
+  clear()
 
   y <- 1
   dinvgamma_ <- methods::new(DinvgammaDistribution)
-  dinvgamma_$observed_values[1]$value <- y      
+  dinvgamma_$observed_values[1]$value <- y
   dinvgamma_$log_shape[1]$value <- log(2)
   dinvgamma_$log_scale[1]$value <- log(1e4)
   #' @description Test that dinvgamma returns the correct output for large scale parameters (1e4).
   expect_equal(dinvgamma_$evaluate(), dinvgamma_r(y, 2, 1e4, TRUE))
-  clear() 
+  clear()
 })
 
 test_that("DmultinomDistribution returns correct outputs for edge cases", {
-   set.seed(123)
+  set.seed(123)
   # generate data using R stats:rnorm
   p <- c(1, rep(0, 9))
   x_values <- t(stats::rmultinom(1, 1000, p))

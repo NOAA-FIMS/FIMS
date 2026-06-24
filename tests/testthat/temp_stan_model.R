@@ -3,16 +3,16 @@
 # Pella-Tomlinson step
 pella_tomlinson <- function(P0, r, K, m, C) {
   m1 <- m - 1
-  surplus_prod <- r / m1 * P0 * (1 - P0 ^ m1)
+  surplus_prod <- r / m1 * P0 * (1 - P0^m1)
   P1 <- P0 + surplus_prod - C / K
   return(P1)
 }
 
 pt_pmsy <- function(m) {
-  m ^ (-1 / (m - 1))
+  m^(-1 / (m - 1))
 }
 pt_bmsy <- function(K, m) {
-  PMSY <- m ^ (-1 / (m - 1))
+  PMSY <- m^(-1 / (m - 1))
   K * PMSY
 }
 pt_fmsy <- function(r, m) {
@@ -24,7 +24,7 @@ pt_msy <- function(fmsy, bmsy) {
 
 dinvgamma <- function(x, shape, scale, logscale = TRUE) {
   ret <- shape * log(scale) - lgamma(shape) - (shape + 1) * log(x) - scale / x
-  if(logscale) {
+  if (logscale) {
     return(ret)
   } else {
     return(exp(ret))
@@ -179,8 +179,8 @@ generated quantities {
 
 np <- TRUE
 
-if(np == FALSE){
-model_c_isig <- function(par){
+if (np == FALSE) {
+  model_c_isig <- function(par) {
     #### Parameters and reparameterizations ####
     r <- exp(par$log_r)
     K <- exp(par$log_K)
@@ -220,30 +220,30 @@ model_c_isig <- function(par){
     nll_tau2 <- 0
 
     # Priors (as in Stan)
-    nll_r <- -dlnorm(r, meanlog=-1.38, sdlog=1/sqrt(3.845), log=TRUE)
-    nll_K <- -dlnorm(K, meanlog=5.042905, sdlog=1/sqrt(3.7603664), log=TRUE)
+    nll_r <- -dlnorm(r, meanlog = -1.38, sdlog = 1 / sqrt(3.845), log = TRUE)
+    nll_K <- -dlnorm(K, meanlog = 5.042905, sdlog = 1 / sqrt(3.7603664), log = TRUE)
     # nll_sig2 <- -dinvgamma(sigma2, 3.785518, 0.010223, logscale = TRUE)
-    # nll_tau2 <- -dinvgamma(tau2, 1.708603, 0.008613854, logscale = TRUE) 
+    # nll_tau2 <- -dinvgamma(tau2, 1.708603, 0.008613854, logscale = TRUE)
     nll_sig2 <- -dgamma(x = isigma2, shape = 3.785518, rate = 0.010223, log = TRUE) + log(sigma2^2)
     nll_tau2 <- -dgamma(x = itau2, shape = 1.708603, rate = 0.008613854, log = TRUE) + log(tau2^2)
 
     # Process likelihood
-    nll_P <- -sum(dlnorm(P[1:Tlen], meanlog=log(P_med[1:Tlen]), sd=sigma, log=TRUE))
+    nll_P <- -sum(dlnorm(P[1:Tlen], meanlog = log(P_med[1:Tlen]), sd = sigma, log = TRUE))
     # Observation likelihood
-    nll_Z <- -sum(RTMB::dnorm(Z, mean=log_q_hat, sd=tau, log=TRUE))
-    
+    nll_Z <- -sum(RTMB::dnorm(Z, mean = log_q_hat, sd = tau, log = TRUE))
+
     jnll <- nll_r + nll_K + nll_sig2 + nll_tau2 + nll_P + nll_Z
 
-  for (i in 1:(Tlen)) {
-    Biomass[i] = K * P[i]
-  }
+    for (i in 1:(Tlen)) {
+      Biomass[i] <- K * P[i]
+    }
 
 
     # Management values
     PMSY <- pt_pmsy(m)
     BMSY <- K * PMSY
     FMSY <- pt_fmsy(r, m)
-    MSY  <- pt_msy(BMSY, FMSY)
+    MSY <- pt_msy(BMSY, FMSY)
 
     # Report section
     REPORT(nll_r)
@@ -265,12 +265,12 @@ model_c_isig <- function(par){
     REPORT(PMSY)
     REPORT(BMSY)
     REPORT(FMSY)
-    REPORT(MSY) 
+    REPORT(MSY)
 
     return(jnll)
-}
+  }
 
-model_c_sig <- function(par){
+  model_c_sig <- function(par) {
     #### Parameters and reparameterizations ####
     r <- exp(par$log_r)
     K <- exp(par$log_K)
@@ -308,28 +308,28 @@ model_c_sig <- function(par){
     nll_tau2 <- 0
 
     # Priors (as in Stan)
-    nll_r <- -dlnorm(r, meanlog=-1.38, sdlog=1/sqrt(3.845), log=TRUE)
-    nll_K <- -dlnorm(K, meanlog=5.042905, sdlog=1/sqrt(3.7603664), log=TRUE)
+    nll_r <- -dlnorm(r, meanlog = -1.38, sdlog = 1 / sqrt(3.845), log = TRUE)
+    nll_K <- -dlnorm(K, meanlog = 5.042905, sdlog = 1 / sqrt(3.7603664), log = TRUE)
     nll_sig2 <- -dinvgamma(sigma2, 3.785518, 0.010223, logscale = TRUE)
-    nll_tau2 <- -dinvgamma(tau2, 1.708603, 0.008613854, logscale = TRUE) 
+    nll_tau2 <- -dinvgamma(tau2, 1.708603, 0.008613854, logscale = TRUE)
 
     # Process likelihood
-    nll_P <- -sum(dlnorm(P[1:Tlen], meanlog=log(P_med[1:Tlen]), sd=sigma, log=TRUE))
+    nll_P <- -sum(dlnorm(P[1:Tlen], meanlog = log(P_med[1:Tlen]), sd = sigma, log = TRUE))
     # Observation likelihood
-    nll_Z <- -sum(RTMB::dnorm(Z, mean=log_q_hat, sd=tau, log=TRUE))
-    
+    nll_Z <- -sum(RTMB::dnorm(Z, mean = log_q_hat, sd = tau, log = TRUE))
+
     jnll <- nll_r + nll_K + nll_sig2 + nll_tau2 + nll_P + nll_Z
 
-  for (i in 1:(Tlen)) {
-    Biomass[i] = K * P[i]
-  }
+    for (i in 1:(Tlen)) {
+      Biomass[i] <- K * P[i]
+    }
 
 
     # Management values
     PMSY <- pt_pmsy(m)
     BMSY <- K * PMSY
     FMSY <- pt_fmsy(r, m)
-    MSY  <- pt_msy(BMSY, FMSY)
+    MSY <- pt_msy(BMSY, FMSY)
 
     # Report section
     REPORT(nll_r)
@@ -351,12 +351,12 @@ model_c_sig <- function(par){
     REPORT(PMSY)
     REPORT(BMSY)
     REPORT(FMSY)
-    REPORT(MSY) 
+    REPORT(MSY)
 
     return(jnll)
-}
+  }
 
-model_nc_isig = function(par) {
+  model_nc_isig <- function(par) {
     #### Parameters and reparameterizations ####
     r <- exp(par$log_r)
     K <- exp(par$log_K)
@@ -398,27 +398,27 @@ model_nc_isig = function(par) {
     nll_tau2 <- 0
 
     # Priors (as in Stan)
-    nll_r <- -dlnorm(r, meanlog=-1.38, sdlog=1/sqrt(3.845), log=TRUE)
-    nll_K <- -dlnorm(K, meanlog=5.042905, sdlog=1/sqrt(3.7603664), log=TRUE)
+    nll_r <- -dlnorm(r, meanlog = -1.38, sdlog = 1 / sqrt(3.845), log = TRUE)
+    nll_K <- -dlnorm(K, meanlog = 5.042905, sdlog = 1 / sqrt(3.7603664), log = TRUE)
     nll_sig2 <- -dgamma(x = isigma2, shape = 3.785518, rate = 0.010223, log = TRUE) + log(sigma2^2)
     nll_tau2 <- -dgamma(x = itau2, shape = 1.708603, rate = 0.008613854, log = TRUE) + log(tau2^2)
 
     # Process likelihood
     nll_P <- -sum(dnorm(z, 0, 1, TRUE))
     # Observation likelihood
-    nll_Z <- -sum(RTMB::dnorm(Z, mean=log_q_hat, sd=tau, log=TRUE))
-    
+    nll_Z <- -sum(RTMB::dnorm(Z, mean = log_q_hat, sd = tau, log = TRUE))
+
     jnll <- nll_r + nll_K + nll_sig2 + nll_tau2 + nll_P + nll_Z
-  for (i in 1:(Tlen)) {
-    Biomass[i] = K * P[i]
-  }
+    for (i in 1:(Tlen)) {
+      Biomass[i] <- K * P[i]
+    }
 
 
     # Management values
     PMSY <- pt_pmsy(m)
     BMSY <- K * PMSY
     FMSY <- pt_fmsy(r, m)
-    MSY  <- pt_msy(BMSY, FMSY)
+    MSY <- pt_msy(BMSY, FMSY)
 
     # Report section
     REPORT(nll_r)
@@ -440,12 +440,12 @@ model_nc_isig = function(par) {
     REPORT(PMSY)
     REPORT(BMSY)
     REPORT(FMSY)
-    REPORT(MSY) 
+    REPORT(MSY)
 
     return(jnll)
-}
+  }
 
-model_nc_sig = function(par) {
+  model_nc_sig <- function(par) {
     #### Parameters and reparameterizations ####
     r <- exp(par$log_r)
     K <- exp(par$log_K)
@@ -485,27 +485,27 @@ model_nc_sig = function(par) {
     nll_tau2 <- 0
 
     # Priors (as in Stan)
-    nll_r <- -dlnorm(r, meanlog=-1.38, sdlog=1/sqrt(3.845), log=TRUE)
-    nll_K <- -dlnorm(K, meanlog=5.042905, sdlog=1/sqrt(3.7603664), log=TRUE)
+    nll_r <- -dlnorm(r, meanlog = -1.38, sdlog = 1 / sqrt(3.845), log = TRUE)
+    nll_K <- -dlnorm(K, meanlog = 5.042905, sdlog = 1 / sqrt(3.7603664), log = TRUE)
     nll_sig2 <- -dinvgamma(sigma2, 3.785518, 0.010223, logscale = TRUE)
-    nll_tau2 <- -dinvgamma(tau2, 1.708603, 0.008613854, logscale = TRUE) 
+    nll_tau2 <- -dinvgamma(tau2, 1.708603, 0.008613854, logscale = TRUE)
 
     # Process likelihood
     nll_P <- -sum(dnorm(z, 0, 1, TRUE))
     # Observation likelihood
-    nll_Z <- -sum(RTMB::dnorm(Z, mean=log_q_hat, sd=tau, log=TRUE))
-    
+    nll_Z <- -sum(RTMB::dnorm(Z, mean = log_q_hat, sd = tau, log = TRUE))
+
     jnll <- nll_r + nll_K + nll_sig2 + nll_tau2 + nll_P + nll_Z
-  for (i in 1:(Tlen)) {
-    Biomass[i] = K * P[i]
-  }
+    for (i in 1:(Tlen)) {
+      Biomass[i] <- K * P[i]
+    }
 
 
     # Management values
     PMSY <- pt_pmsy(m)
     BMSY <- K * PMSY
     FMSY <- pt_fmsy(r, m)
-    MSY  <- pt_msy(BMSY, FMSY)
+    MSY <- pt_msy(BMSY, FMSY)
 
     # Report section
     REPORT(nll_r)
@@ -527,12 +527,12 @@ model_nc_sig = function(par) {
     REPORT(PMSY)
     REPORT(BMSY)
     REPORT(FMSY)
-    REPORT(MSY) 
+    REPORT(MSY)
 
     return(jnll)
-}
+  }
 
-model_nc_isig_p1 = function(par) {
+  model_nc_isig_p1 <- function(par) {
     #### Parameters and reparameterizations ####
     r <- exp(par$log_r)
     K <- exp(par$log_K)
@@ -548,13 +548,13 @@ model_nc_isig_p1 = function(par) {
     Tlen <- sp_data["T"]$T
 
     #### Transformed parameters ####
-    P_med <- Biomass <- P <- rep(0, (Tlen+1))
+    P_med <- Biomass <- P <- rep(0, (Tlen + 1))
     Z <- rep(0, Tlen)
 
     # Initial depletion and catch
     P_med[1] <- 1
     P[1] <- exp(log(P_med[1]) + sigma * z[1])
-    for (i in 2:(Tlen+1)) {
+    for (i in 2:(Tlen + 1)) {
       P_med[i] <- max(pella_tomlinson(P[i - 1], r, K, m, sp_data$C[i - 1]), 0.001)
       P[i] <- exp(log(P_med[i]) + sigma * z[i])
     }
@@ -574,27 +574,27 @@ model_nc_isig_p1 = function(par) {
     nll_tau2 <- 0
 
     # Priors (as in Stan)
-    nll_r <- -dlnorm(r, meanlog=-1.38, sdlog=1/sqrt(3.845), log=TRUE)
-    nll_K <- -dlnorm(K, meanlog=5.042905, sdlog=1/sqrt(3.7603664), log=TRUE)
+    nll_r <- -dlnorm(r, meanlog = -1.38, sdlog = 1 / sqrt(3.845), log = TRUE)
+    nll_K <- -dlnorm(K, meanlog = 5.042905, sdlog = 1 / sqrt(3.7603664), log = TRUE)
     nll_sig2 <- -dgamma(x = isigma2, shape = 3.785518, rate = 0.010223, log = TRUE) + log(sigma2^2)
     nll_tau2 <- -dgamma(x = itau2, shape = 1.708603, rate = 0.008613854, log = TRUE) + log(tau2^2)
 
     # Process likelihood
     nll_P <- -sum(dnorm(z, 0, 1, TRUE))
     # Observation likelihood
-    nll_Z <- -sum(RTMB::dnorm(Z, mean=log_q_hat, sd=tau, log=TRUE))
-    
+    nll_Z <- -sum(RTMB::dnorm(Z, mean = log_q_hat, sd = tau, log = TRUE))
+
     jnll <- nll_r + nll_K + nll_sig2 + nll_tau2 + nll_P + nll_Z
-  for (i in 1:(Tlen+1)) {
-    Biomass[i] = K * P[i]
-  }
+    for (i in 1:(Tlen + 1)) {
+      Biomass[i] <- K * P[i]
+    }
 
 
     # Management values
     PMSY <- pt_pmsy(m)
     BMSY <- K * PMSY
     FMSY <- pt_fmsy(r, m)
-    MSY  <- pt_msy(BMSY, FMSY)
+    MSY <- pt_msy(BMSY, FMSY)
 
     # Report section
     REPORT(nll_r)
@@ -616,12 +616,12 @@ model_nc_isig_p1 = function(par) {
     REPORT(PMSY)
     REPORT(BMSY)
     REPORT(FMSY)
-    REPORT(MSY) 
+    REPORT(MSY)
 
     return(jnll)
-}
+  }
 
-model_nc_sig_p1 = function(par) {
+  model_nc_sig_p1 <- function(par) {
     #### Parameters and reparameterizations ####
     r <- exp(par$log_r)
     K <- exp(par$log_K)
@@ -635,13 +635,13 @@ model_nc_sig_p1 = function(par) {
     Tlen <- sp_data["T"]$T
 
     #### Transformed parameters ####
-    P_med <- Biomass <- P <- rep(0, (Tlen+1))
+    P_med <- Biomass <- P <- rep(0, (Tlen + 1))
     Z <- rep(0, Tlen)
 
     # Initial depletion and catch
     P_med[1] <- 1
     P[1] <- exp(log(P_med[1]) + sigma * z[1])
-    for (i in 2:(Tlen+1)) {
+    for (i in 2:(Tlen + 1)) {
       P_med[i] <- max(pella_tomlinson(P[i - 1], r, K, m, sp_data$C[i - 1]), 0.001)
       P[i] <- exp(log(P_med[i]) + sigma * z[i])
     }
@@ -661,27 +661,27 @@ model_nc_sig_p1 = function(par) {
     nll_tau2 <- 0
 
     # Priors (as in Stan)
-    nll_r <- -dlnorm(r, meanlog=-1.38, sdlog=1/sqrt(3.845), log=TRUE)
-    nll_K <- -dlnorm(K, meanlog=5.042905, sdlog=1/sqrt(3.7603664), log=TRUE)
+    nll_r <- -dlnorm(r, meanlog = -1.38, sdlog = 1 / sqrt(3.845), log = TRUE)
+    nll_K <- -dlnorm(K, meanlog = 5.042905, sdlog = 1 / sqrt(3.7603664), log = TRUE)
     nll_sig2 <- -dinvgamma(sigma2, 3.785518, 0.010223, logscale = TRUE)
-    nll_tau2 <- -dinvgamma(tau2, 1.708603, 0.008613854, logscale = TRUE) 
+    nll_tau2 <- -dinvgamma(tau2, 1.708603, 0.008613854, logscale = TRUE)
 
     # Process likelihood
     nll_P <- -sum(dnorm(z, 0, 1, TRUE))
     # Observation likelihood
-    nll_Z <- -sum(RTMB::dnorm(Z, mean=log_q_hat, sd=tau, log=TRUE))
-    
+    nll_Z <- -sum(RTMB::dnorm(Z, mean = log_q_hat, sd = tau, log = TRUE))
+
     jnll <- nll_r + nll_K + nll_sig2 + nll_tau2 + nll_P + nll_Z
-  for (i in 1:(Tlen+1)) {
-    Biomass[i] = K * P[i]
-  }
+    for (i in 1:(Tlen + 1)) {
+      Biomass[i] <- K * P[i]
+    }
 
 
     # Management values
     PMSY <- pt_pmsy(m)
     BMSY <- K * PMSY
     FMSY <- pt_fmsy(r, m)
-    MSY  <- pt_msy(BMSY, FMSY)
+    MSY <- pt_msy(BMSY, FMSY)
 
     # Report section
     REPORT(nll_r)
@@ -703,17 +703,17 @@ model_nc_sig_p1 = function(par) {
     REPORT(PMSY)
     REPORT(BMSY)
     REPORT(FMSY)
-    REPORT(MSY) 
+    REPORT(MSY)
 
     return(jnll)
-}
+  }
 }
 
 ################################################################################
 # redo tests with natural parameters
 
-if(np == TRUE){
-model_c_isig <- function(par){
+if (np == TRUE) {
+  model_c_isig <- function(par) {
     #### Parameters and reparameterizations ####
     r <- par$r
     K <- par$K
@@ -753,28 +753,28 @@ model_c_isig <- function(par){
     nll_tau2 <- 0
 
     # Priors (as in Stan)
-    nll_r <- -dlnorm(r, meanlog=-1.38, sdlog=1/sqrt(3.845), log=TRUE)
-    nll_K <- -dlnorm(K, meanlog=5.042905, sdlog=1/sqrt(3.7603664), log=TRUE)
+    nll_r <- -dlnorm(r, meanlog = -1.38, sdlog = 1 / sqrt(3.845), log = TRUE)
+    nll_K <- -dlnorm(K, meanlog = 5.042905, sdlog = 1 / sqrt(3.7603664), log = TRUE)
     nll_sig2 <- -dgamma(x = isigma2, shape = 3.785518, rate = 0.010223, log = TRUE) + log(sigma2^2)
     nll_tau2 <- -dgamma(x = itau2, shape = 1.708603, rate = 0.008613854, log = TRUE) + log(tau2^2)
 
     # Process likelihood
-    nll_P <- -sum(dlnorm(P[1:Tlen], meanlog=log(P_med[1:Tlen]), sd=sigma, log=TRUE))
+    nll_P <- -sum(dlnorm(P[1:Tlen], meanlog = log(P_med[1:Tlen]), sd = sigma, log = TRUE))
     # Observation likelihood
-    nll_Z <- -sum(RTMB::dnorm(Z, mean=log_q_hat, sd=tau, log=TRUE))
-    
+    nll_Z <- -sum(RTMB::dnorm(Z, mean = log_q_hat, sd = tau, log = TRUE))
+
     jnll <- nll_r + nll_K + nll_sig2 + nll_tau2 + nll_P + nll_Z
 
-  for (i in 1:(Tlen)) {
-    Biomass[i] = K * P[i]
-  }
+    for (i in 1:(Tlen)) {
+      Biomass[i] <- K * P[i]
+    }
 
 
     # Management values
     PMSY <- pt_pmsy(m)
     BMSY <- K * PMSY
     FMSY <- pt_fmsy(r, m)
-    MSY  <- pt_msy(BMSY, FMSY)
+    MSY <- pt_msy(BMSY, FMSY)
 
     # Report section
     REPORT(nll_r)
@@ -796,12 +796,12 @@ model_c_isig <- function(par){
     REPORT(PMSY)
     REPORT(BMSY)
     REPORT(FMSY)
-    REPORT(MSY) 
+    REPORT(MSY)
 
     return(jnll)
-}
+  }
 
-model_c_sig <- function(par){
+  model_c_sig <- function(par) {
     #### Parameters and reparameterizations ####
     r <- par$r
     K <- par$K
@@ -839,28 +839,28 @@ model_c_sig <- function(par){
     nll_tau2 <- 0
 
     # Priors (as in Stan)
-    nll_r <- -dlnorm(r, meanlog=-1.38, sdlog=sqrt(3.845), log=TRUE)
-    nll_K <- -dlnorm(K, meanlog=5.042905, sdlog=sqrt(3.7603664), log=TRUE)
+    nll_r <- -dlnorm(r, meanlog = -1.38, sdlog = sqrt(3.845), log = TRUE)
+    nll_K <- -dlnorm(K, meanlog = 5.042905, sdlog = sqrt(3.7603664), log = TRUE)
     nll_sig2 <- -dinvgamma(sigma2, 3.785518, 0.010223, logscale = TRUE)
-    nll_tau2 <- -dinvgamma(tau2, 1.708603, 0.008613854, logscale = TRUE) 
+    nll_tau2 <- -dinvgamma(tau2, 1.708603, 0.008613854, logscale = TRUE)
 
     # Process likelihood
-    nll_P <- -sum(dlnorm(P[1:Tlen], meanlog=log(P_med[1:Tlen]), sd=sigma, log=TRUE))
+    nll_P <- -sum(dlnorm(P[1:Tlen], meanlog = log(P_med[1:Tlen]), sd = sigma, log = TRUE))
     # Observation likelihood
-    nll_Z <- -sum(RTMB::dnorm(Z, mean=log_q_hat, sd=tau, log=TRUE))
-    
+    nll_Z <- -sum(RTMB::dnorm(Z, mean = log_q_hat, sd = tau, log = TRUE))
+
     jnll <- nll_r + nll_K + nll_sig2 + nll_tau2 + nll_P + nll_Z
 
-  for (i in 1:(Tlen)) {
-    Biomass[i] = K * P[i]
-  }
+    for (i in 1:(Tlen)) {
+      Biomass[i] <- K * P[i]
+    }
 
 
     # Management values
     PMSY <- pt_pmsy(m)
     BMSY <- K * PMSY
     FMSY <- pt_fmsy(r, m)
-    MSY  <- pt_msy(BMSY, FMSY)
+    MSY <- pt_msy(BMSY, FMSY)
 
     # Report section
     REPORT(nll_r)
@@ -882,12 +882,12 @@ model_c_sig <- function(par){
     REPORT(PMSY)
     REPORT(BMSY)
     REPORT(FMSY)
-    REPORT(MSY) 
+    REPORT(MSY)
 
     return(jnll)
-}
+  }
 
-model_nc_isig = function(par) {
+  model_nc_isig <- function(par) {
     #### Parameters and reparameterizations ####
     r <- par$r
     K <- par$K
@@ -929,27 +929,27 @@ model_nc_isig = function(par) {
     nll_tau2 <- 0
 
     # Priors (as in Stan)
-    nll_r <- -dlnorm(r, meanlog=-1.38, sdlog=1/sqrt(3.845), log=TRUE)
-    nll_K <- -dlnorm(K, meanlog=5.042905, sdlog=1/sqrt(3.7603664), log=TRUE)
+    nll_r <- -dlnorm(r, meanlog = -1.38, sdlog = 1 / sqrt(3.845), log = TRUE)
+    nll_K <- -dlnorm(K, meanlog = 5.042905, sdlog = 1 / sqrt(3.7603664), log = TRUE)
     nll_sig2 <- -dgamma(x = isigma2, shape = 3.785518, rate = 0.010223, log = TRUE) + log(sigma2^2)
     nll_tau2 <- -dgamma(x = itau2, shape = 1.708603, rate = 0.008613854, log = TRUE) + log(tau2^2)
 
     # Process likelihood
     nll_P <- -sum(dnorm(z, 0, 1, TRUE))
     # Observation likelihood
-    nll_Z <- -sum(RTMB::dnorm(Z, mean=log_q_hat, sd=tau, log=TRUE))
-    
+    nll_Z <- -sum(RTMB::dnorm(Z, mean = log_q_hat, sd = tau, log = TRUE))
+
     jnll <- nll_r + nll_K + nll_sig2 + nll_tau2 + nll_P + nll_Z
-  for (i in 1:(Tlen)) {
-    Biomass[i] = K * P[i]
-  }
+    for (i in 1:(Tlen)) {
+      Biomass[i] <- K * P[i]
+    }
 
 
     # Management values
     PMSY <- pt_pmsy(m)
     BMSY <- K * PMSY
     FMSY <- pt_fmsy(r, m)
-    MSY  <- pt_msy(BMSY, FMSY)
+    MSY <- pt_msy(BMSY, FMSY)
 
     # Report section
     REPORT(nll_r)
@@ -971,12 +971,12 @@ model_nc_isig = function(par) {
     REPORT(PMSY)
     REPORT(BMSY)
     REPORT(FMSY)
-    REPORT(MSY) 
+    REPORT(MSY)
 
     return(jnll)
-}
+  }
 
-model_nc_sig = function(par) {
+  model_nc_sig <- function(par) {
     #### Parameters and reparameterizations ####
     r <- par$r
     K <- par$K
@@ -1016,27 +1016,27 @@ model_nc_sig = function(par) {
     nll_tau2 <- 0
 
     # Priors (as in Stan)
-    nll_r <- -dlnorm(r, meanlog=-1.38, sdlog=1/sqrt(3.845), log=TRUE)
-    nll_K <- -dlnorm(K, meanlog=5.042905, sdlog=1/sqrt(3.7603664), log=TRUE)
+    nll_r <- -dlnorm(r, meanlog = -1.38, sdlog = 1 / sqrt(3.845), log = TRUE)
+    nll_K <- -dlnorm(K, meanlog = 5.042905, sdlog = 1 / sqrt(3.7603664), log = TRUE)
     nll_sig2 <- -dinvgamma(sigma2, 3.785518, 0.010223, logscale = TRUE)
-    nll_tau2 <- -dinvgamma(tau2, 1.708603, 0.008613854, logscale = TRUE) 
+    nll_tau2 <- -dinvgamma(tau2, 1.708603, 0.008613854, logscale = TRUE)
 
     # Process likelihood
     nll_P <- -sum(dnorm(z, 0, 1, TRUE))
     # Observation likelihood
-    nll_Z <- -sum(RTMB::dnorm(Z, mean=log_q_hat, sd=tau, log=TRUE))
-    
+    nll_Z <- -sum(RTMB::dnorm(Z, mean = log_q_hat, sd = tau, log = TRUE))
+
     jnll <- nll_r + nll_K + nll_sig2 + nll_tau2 + nll_P + nll_Z
-  for (i in 1:(Tlen)) {
-    Biomass[i] = K * P[i]
-  }
+    for (i in 1:(Tlen)) {
+      Biomass[i] <- K * P[i]
+    }
 
 
     # Management values
     PMSY <- pt_pmsy(m)
     BMSY <- K * PMSY
     FMSY <- pt_fmsy(r, m)
-    MSY  <- pt_msy(BMSY, FMSY)
+    MSY <- pt_msy(BMSY, FMSY)
 
     # Report section
     REPORT(nll_r)
@@ -1058,12 +1058,12 @@ model_nc_sig = function(par) {
     REPORT(PMSY)
     REPORT(BMSY)
     REPORT(FMSY)
-    REPORT(MSY) 
+    REPORT(MSY)
 
     return(jnll)
-}
+  }
 
-model_nc_isig_p1 = function(par) {
+  model_nc_isig_p1 <- function(par) {
     #### Parameters and reparameterizations ####
     r <- par$r
     K <- par$K
@@ -1079,13 +1079,13 @@ model_nc_isig_p1 = function(par) {
     Tlen <- sp_data["T"]$T
 
     #### Transformed parameters ####
-    P_med <- Biomass <- P <- rep(0, (Tlen+1))
+    P_med <- Biomass <- P <- rep(0, (Tlen + 1))
     Z <- rep(0, Tlen)
 
     # Initial depletion and catch
     P_med[1] <- 1
     P[1] <- exp(log(P_med[1]) + sigma * z[1])
-    for (i in 2:(Tlen+1)) {
+    for (i in 2:(Tlen + 1)) {
       P_med[i] <- max(pella_tomlinson(P[i - 1], r, K, m, sp_data$C[i - 1]), 0.001)
       P[i] <- exp(log(P_med[i]) + sigma * z[i])
     }
@@ -1105,27 +1105,27 @@ model_nc_isig_p1 = function(par) {
     nll_tau2 <- 0
 
     # Priors (as in Stan)
-    nll_r <- -dlnorm(r, meanlog=-1.38, sdlog=1/sqrt(3.845), log=TRUE)
-    nll_K <- -dlnorm(K, meanlog=5.042905, sdlog=1/sqrt(3.7603664), log=TRUE)
+    nll_r <- -dlnorm(r, meanlog = -1.38, sdlog = 1 / sqrt(3.845), log = TRUE)
+    nll_K <- -dlnorm(K, meanlog = 5.042905, sdlog = 1 / sqrt(3.7603664), log = TRUE)
     nll_sig2 <- -dgamma(x = isigma2, shape = 3.785518, rate = 0.010223, log = TRUE) + log(sigma2^2)
     nll_tau2 <- -dgamma(x = itau2, shape = 1.708603, rate = 0.008613854, log = TRUE) + log(tau2^2)
 
     # Process likelihood
     nll_P <- -sum(dnorm(z, 0, 1, TRUE))
     # Observation likelihood
-    nll_Z <- -sum(RTMB::dnorm(Z, mean=log_q_hat, sd=tau, log=TRUE))
-    
+    nll_Z <- -sum(RTMB::dnorm(Z, mean = log_q_hat, sd = tau, log = TRUE))
+
     jnll <- nll_r + nll_K + nll_sig2 + nll_tau2 + nll_P + nll_Z
-  for (i in 1:(Tlen+1)) {
-    Biomass[i] = K * P[i]
-  }
+    for (i in 1:(Tlen + 1)) {
+      Biomass[i] <- K * P[i]
+    }
 
 
     # Management values
     PMSY <- pt_pmsy(m)
     BMSY <- K * PMSY
     FMSY <- pt_fmsy(r, m)
-    MSY  <- pt_msy(BMSY, FMSY)
+    MSY <- pt_msy(BMSY, FMSY)
 
     # Report section
     REPORT(nll_r)
@@ -1147,12 +1147,12 @@ model_nc_isig_p1 = function(par) {
     REPORT(PMSY)
     REPORT(BMSY)
     REPORT(FMSY)
-    REPORT(MSY) 
+    REPORT(MSY)
 
     return(jnll)
-}
+  }
 
-model_nc_sig_p1 = function(par) {
+  model_nc_sig_p1 <- function(par) {
     #### Parameters and reparameterizations ####
     r <- par$r
     K <- par$K
@@ -1166,13 +1166,13 @@ model_nc_sig_p1 = function(par) {
     Tlen <- sp_data["T"]$T
 
     #### Transformed parameters ####
-    P_med <- Biomass <- P <- rep(0, (Tlen+1))
+    P_med <- Biomass <- P <- rep(0, (Tlen + 1))
     Z <- rep(0, Tlen)
 
     # Initial depletion and catch
     P_med[1] <- 1
     P[1] <- exp(log(P_med[1]) + sigma * z[1])
-    for (i in 2:(Tlen+1)) {
+    for (i in 2:(Tlen + 1)) {
       P_med[i] <- max(pella_tomlinson(P[i - 1], r, K, m, sp_data$C[i - 1]), 0.001)
       P[i] <- exp(log(P_med[i]) + sigma * z[i])
     }
@@ -1192,27 +1192,27 @@ model_nc_sig_p1 = function(par) {
     nll_tau2 <- 0
 
     # Priors (as in Stan)
-    nll_r <- -dlnorm(r, meanlog=-1.38, sdlog=1/sqrt(3.845), log=TRUE)
-    nll_K <- -dlnorm(K, meanlog=5.042905, sdlog=1/sqrt(3.7603664), log=TRUE)
+    nll_r <- -dlnorm(r, meanlog = -1.38, sdlog = 1 / sqrt(3.845), log = TRUE)
+    nll_K <- -dlnorm(K, meanlog = 5.042905, sdlog = 1 / sqrt(3.7603664), log = TRUE)
     nll_sig2 <- -dinvgamma(sigma2, 3.785518, 0.010223, logscale = TRUE)
-    nll_tau2 <- -dinvgamma(tau2, 1.708603, 0.008613854, logscale = TRUE) 
+    nll_tau2 <- -dinvgamma(tau2, 1.708603, 0.008613854, logscale = TRUE)
 
     # Process likelihood
     nll_P <- -sum(dnorm(z, 0, 1, TRUE))
     # Observation likelihood
-    nll_Z <- -sum(RTMB::dnorm(Z, mean=log_q_hat, sd=tau, log=TRUE))
-    
+    nll_Z <- -sum(RTMB::dnorm(Z, mean = log_q_hat, sd = tau, log = TRUE))
+
     jnll <- nll_r + nll_K + nll_sig2 + nll_tau2 + nll_P + nll_Z
-  for (i in 1:(Tlen+1)) {
-    Biomass[i] = K * P[i]
-  }
+    for (i in 1:(Tlen + 1)) {
+      Biomass[i] <- K * P[i]
+    }
 
 
     # Management values
     PMSY <- pt_pmsy(m)
     BMSY <- K * PMSY
     FMSY <- pt_fmsy(r, m)
-    MSY  <- pt_msy(BMSY, FMSY)
+    MSY <- pt_msy(BMSY, FMSY)
 
     # Report section
     REPORT(nll_r)
@@ -1234,8 +1234,8 @@ model_nc_sig_p1 = function(par) {
     REPORT(PMSY)
     REPORT(BMSY)
     REPORT(FMSY)
-    REPORT(MSY) 
+    REPORT(MSY)
 
     return(jnll)
-}
+  }
 }

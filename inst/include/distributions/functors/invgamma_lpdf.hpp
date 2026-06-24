@@ -23,8 +23,8 @@ namespace fims_distributions {
  * gamma density calculations. Specifically, when evaluating the inverse Gamma
  * likelihood, observations are passed to `dinvgamma(..., give_log = true)` to
  * obtain log-density values. he shape and scale parameters are estimated
- * directly. 
- * 
+ * directly.
+ *
  * For `data` input, values equal to `na_value` are skipped and
  * contribute zero to the objective. Per-observation contributions are stored
  * in `lpdf_vec`; the summed total is returned by `evaluate()` and stored in
@@ -81,11 +81,11 @@ struct InvGammaLPDF : public DensityComponentBase<Type> {
     // Dimension checks
     if (n_expected > 1 && n_expected != n_x) {
       throw std::invalid_argument(
-        "InvGammaLPDF::Vector index out of bounds. The size of observed "
-            "data does not equal the expected size. The observed data vector "
-            "is of size " +
-            fims::to_string(n_x) +
-            " and the expected size is " + fims::to_string(n_expected));
+          "InvGammaLPDF::Vector index out of bounds. The size of observed "
+          "data does not equal the expected size. The observed data vector "
+          "is of size " +
+          fims::to_string(n_x) + " and the expected size is " +
+          fims::to_string(n_expected));
     }
     if (this->log_shape.size() > 1 && n_x != this->log_shape.size()) {
       throw std::invalid_argument(
@@ -112,20 +112,20 @@ struct InvGammaLPDF : public DensityComponentBase<Type> {
         // if there are
         if (this->get_observed(i) != this->data_observed_values->na_value) {
           this->lpdf_vec[i] = fims_math::dinvgamma(
-              this->get_observed(i), 
+              this->get_observed(i),
               fims_math::exp(this->log_shape.get_force_scalar(i)),
               fims_math::exp(this->log_scale.get_force_scalar(i)), true);
         } else {
           this->lpdf_vec[i] = 0;
         }
       } else {
-        // TODO: hard coded for now but need to address NA values when observed value is derived from data
-        if(this->get_observed(i) != -999){
-            this->lpdf_vec[i] = 
-                fims_math::dinvgamma(this->get_observed(i),
-                                     fims_math::exp(this->log_shape.get_force_scalar(i)),
-                                     fims_math::exp(this->log_scale.get_force_scalar(i)),
-                                     true);
+        // TODO: hard coded for now but need to address NA values when observed
+        // value is derived from data
+        if (this->get_observed(i) != -999) {
+          this->lpdf_vec[i] = fims_math::dinvgamma(
+              this->get_observed(i),
+              fims_math::exp(this->log_shape.get_force_scalar(i)),
+              fims_math::exp(this->log_scale.get_force_scalar(i)), true);
         }
       }
 

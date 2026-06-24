@@ -130,8 +130,8 @@ class DerivedQuantities {
    * @param context A label used in exception messages.
    * @return std::map<std::string, fims::Vector<Type>>&
    */
-  std::map<std::string, fims::Vector<Type>> &Get(
-      uint32_t component_id, const std::string &context) {
+  std::map<std::string, fims::Vector<Type>> &Get(uint32_t component_id,
+                                                 const std::string &context) {
     auto it = values.find(component_id);
     if (it == values.end()) {
       std::ostringstream ss;
@@ -167,8 +167,7 @@ class DerivedQuantities {
            const fims::Vector<std::string> &dim_names) {
     Initialize(component_id);
     values[component_id][name] = value;
-    dimension_info[component_id][name] =
-        DimensionInfo(name, dims, dim_names);
+    dimension_info[component_id][name] = DimensionInfo(name, dims, dim_names);
   }
 
   /**
@@ -288,11 +287,12 @@ class FisheryModelBase : public fims_model_object::FIMSObject<Type> {
    * @param other
    */
   FisheryModelBase(const FisheryModelBase &other)
-        : id(other.id),      
+      : id(other.id),
         population_ids(other.population_ids),
         populations(other.populations),
         fleet_derived_quantities_ptr(other.fleet_derived_quantities_ptr),
-        population_derived_quantities_ptr(other.population_derived_quantities_ptr),
+        population_derived_quantities_ptr(
+            other.population_derived_quantities_ptr),
         fleet_dimension_info(other.fleet_dimension_info),
         population_dimension_info(other.population_dimension_info) {}
 
@@ -404,7 +404,8 @@ class FisheryModelBase : public fims_model_object::FIMSObject<Type> {
       uint32_t population_id) {
     if (!population_derived_quantities_ptr) {
       throw std::runtime_error(
-          "GetPopulationDerivedQuantities: population_derived_quantities_ptr is "
+          "GetPopulationDerivedQuantities: population_derived_quantities_ptr "
+          "is "
           "null");
     }
     return population_derived_quantities_ptr->Get(

@@ -679,262 +679,276 @@ setup_and_run_FIMS_with_wrappers <- function(iter_id,
 }
 
 
+setup_and_run_surplus_production_model <-
+  function(bayesian_mode = FALSE,
+           estimation_mode = TRUE,
+           map = list()) {
+    # TODO: add ability to create FIMSFrame from data_limited_tuna (doesn't work because of age)
+    # data_4_model <- FIMSFrame(data_limited_tuna)
 
-setup_and_run_surplus_production_model <- 
-    function(bayesian_mode = FALSE,
-             estimation_mode = TRUE,
-             map = list()) {
-   
-  # TODO: add ability to create FIMSFrame from data_limited_tuna (doesn't work because of age)
-  # data_4_model <- FIMSFrame(data_limited_tuna)
+    # Setup initial values and priors for the surplus production model parameters
+    # Values from Meyer and Millar 1999, Table 1, with lognormal priors on K and r
+    carrying_capacity_prior <- c(5.042905, sqrt(3.7603664))
+    growth_rate_prior <- c(-1.38, sqrt(3.845))
 
-  # Setup initial values and priors for the surplus production model parameters
-  # Values from Meyer and Millar 1999, Table 1, with lognormal priors on K and r
-  carrying_capacity_prior <- c(5.042905, sqrt(3.7603664))
-  growth_rate_prior <- c(-1.38, sqrt(3.845))
+    inits <- list(
+      depletion = c(
+        0.99, 0.98, 0.96, 0.94, 0.92, 0.90, 0.88, 0.86, 0.84, 0.82,
+        0.80, 0.78, 0.76, 0.74, 0.72, 0.70, 0.68, 0.66, 0.64, 0.62, 0.60, 0.58, 0.56, 0.56
+      ),
+      growth_rate = 0.8, carrying_capacity = 200, sigma2_obs = 0.1,
+      sigma2_depletion = 0.1, q = 0.2
+    )
 
-  inits <- list(depletion=c(0.99,0.98,0.96,0.94,0.92,0.90,0.88,0.86,0.84,0.82,
-      0.80,0.78,0.76,0.74,0.72,0.70,0.68,0.66,0.64,0.62,0.60,0.58,0.56, 0.56),
-      growth_rate = 0.8, carrying_capacity = 200, sigma2_obs = 0.1, 
-      sigma2_depletion = 0.1, q = 0.2)
-
-  inits_true <- list(
+    inits_true <- list(
       depletion = data_limited_tuna_results |>
-      dplyr::filter(label == "depletion") |> dplyr::pull(median),
+        dplyr::filter(label == "depletion") |> dplyr::pull(median),
       growth_rate = data_limited_tuna_results |>
-      dplyr::filter(label == "growth_rate") |> dplyr::pull(median),
+        dplyr::filter(label == "growth_rate") |> dplyr::pull(median),
       carrying_capacity = data_limited_tuna_results |>
-      dplyr::filter(label == "carrying_capacity") |> dplyr::pull(median),
+        dplyr::filter(label == "carrying_capacity") |> dplyr::pull(median),
       sigma2_depletion = data_limited_tuna_results |>
-      dplyr::filter(label == "sigma2_depletion") |> dplyr::pull(median),
+        dplyr::filter(label == "sigma2_depletion") |> dplyr::pull(median),
       sigma2_obs = data_limited_tuna_results |>
-      dplyr::filter(label == "sigma2_obs") |> dplyr::pull(median),
+        dplyr::filter(label == "sigma2_obs") |> dplyr::pull(median),
       q = data_limited_tuna_results |>
-      dplyr::filter(label == "q") |> dplyr::pull(median)
-  )
-
-  clear()
-
-  ## Set-up date
-
-  nyears <- 23
-
-  survey_index <- data_limited_tuna |> dplyr::filter(type == "index")
-  landings <- data_limited_tuna |> dplyr::filter(type == "landings")
-
-  # create index module
-  survey_fleet_index <- methods::new(Index, nyears)
-  purrr::walk(
-    1:nyears,
-    \(x) survey_fleet_index$index_data$set(x - 1, survey_index$value[x])
-  )
- 
-  # create catch module
-  fishing_fleet_landings <- methods::new(Landings, nyears)
-  purrr::walk(
-    1:nyears,
-    \(x) fishing_fleet_landings$landings_data$set(x - 1, landings$value[x])
-  )
-
-  # Survey and Fishery Fleet modules
-  # Initialize the fishing fleet module
-  fishing_fleet <- methods::new(Fleet)
-  # Set number of years
-  fishing_fleet$n_years$set(nyears)
-  fishing_fleet$SetObservedLandingsDataID(fishing_fleet_landings$get_id())
-  survey_fleet <- methods::new(Fleet)
-  survey_fleet$n_years$set(nyears)
-  survey_fleet$SetObservedIndexDataID(survey_fleet_index$get_id())
-
-  ## Set-up biology modules and distributions
-
-  # create surfey_fleet_index distribution
-  survey_fleet_index_distribution <- new(DnormDistribution)
-  
-  # create depletion module
-  production <- new(PTDepletion)
-  # Fix to get Schaefer model
-  production$log_shape[1]$value <- log(2)
-  production$n_years$set(nyears)
-
-  # create production distribution
-  production_distribution <- new(DnormDistribution)
-
-  if(estimation_mode == TRUE){  
-
-    survey_fleet_index_distribution$log_sd[1]$value <- inits$sigma2_obs |> sqrt() |> log()
-    survey_fleet_index_distribution$log_sd[1]$estimation_type$set("fixed_effects")
-
-    production$log_growth_rate[1]$value <- log(inits$growth_rate)
-    production$log_growth_rate[1]$estimation_type$set("fixed_effects")
-    production$log_carrying_capacity[1]$value <- log(inits$carrying_capacity)
-    production$log_carrying_capacity[1]$estimation_type$set("fixed_effects")
-    production$log_init_depletion[1]$value <- 0 # inital depletion ~ 1
-
-    production$log_depletion$resize(nyears+1)
-    for (i in 1:(nyears+1)) {
-      production$log_depletion[i]$value <- log(inits$depletion[i])
-    }
-    
-    production_distribution$log_sd[1]$value <- inits_true$sigma2_depletion |> sqrt() |> log()
-    production_distribution$log_sd[1]$estimation_type$set("fixed_effects")
-    
-    # log_depletion ~ Normal(log_expected_depletion, sd)
-    production_distribution$set_distribution_links(
-      "random_effects",
-      c(production$log_depletion$get_id(), production$log_expected_depletion$get_id())
+        dplyr::filter(label == "q") |> dplyr::pull(median)
     )
 
-    if(bayesian_mode == FALSE){
-      # MLE: estimation mode TRUE, Bayesian mode FALSE
-      production$log_depletion$set_all_random(TRUE)
-    } else {
-      # MCMC: estimation mode TRUE, Bayesian mode TRUE
-      # Add Priors
-      production$log_growth_rate$add_prior(growth_rate ~ Lognormal(-1.38, 1.960867))
-      production$log_carrying_capacity$add_prior(carrying_capacity ~ Lognormal(5.042905, 1.939166))
-      survey_fleet_index_distribution$log_sd$add_prior(sd^2 ~ Invgamma(1.708603, 116.0921))
-      production_distribution$log_sd$add_prior(sd^2 ~ Invgamma(3.785518, 97.81864))
-    }
-  } else {
-    # Deterministic MCMC: estimation mode FALSE so use true values from the OM
-     survey_fleet_index_distribution$log_sd[1]$value <- inits_true$sigma2_obs |> sqrt() |> log()
-    survey_fleet_index_distribution$log_sd[1]$estimation_type$set("fixed_effects")
-    
-    production$log_growth_rate[1]$value <- inits_true$growth_rate |> log()
-    production$log_growth_rate[1]$estimation_type$set("fixed_effects")
-    production$log_carrying_capacity[1]$value <- inits_true$carrying_capacity |> log()
-    production$log_carrying_capacity[1]$estimation_type$set("fixed_effects")
-    production$log_init_depletion[1]$value <- inits_true$depletion[1] |> log()
+    clear()
 
-    production$log_depletion$resize(nyears+1)
-    for (i in 1:(nyears+1)) {
-      production$log_depletion[i]$value <- log(inits_true$depletion[i])
-      production$log_depletion[i]$estimation_type$set("random_effects")
-    }
+    ## Set-up date
 
-    # create production distribution module
+    nyears <- 23
+
+    survey_index <- data_limited_tuna |> dplyr::filter(type == "index")
+    landings <- data_limited_tuna |> dplyr::filter(type == "landings")
+
+    # create index module
+    survey_fleet_index <- methods::new(Index, nyears)
+    purrr::walk(
+      1:nyears,
+      \(x) survey_fleet_index$index_data$set(x - 1, survey_index$value[x])
+    )
+
+    # create catch module
+    fishing_fleet_landings <- methods::new(Landings, nyears)
+    purrr::walk(
+      1:nyears,
+      \(x) fishing_fleet_landings$landings_data$set(x - 1, landings$value[x])
+    )
+
+    # Survey and Fishery Fleet modules
+    # Initialize the fishing fleet module
+    fishing_fleet <- methods::new(Fleet)
+    # Set number of years
+    fishing_fleet$n_years$set(nyears)
+    fishing_fleet$SetObservedLandingsDataID(fishing_fleet_landings$get_id())
+    survey_fleet <- methods::new(Fleet)
+    survey_fleet$n_years$set(nyears)
+    survey_fleet$SetObservedIndexDataID(survey_fleet_index$get_id())
+
+    ## Set-up biology modules and distributions
+
+    # create surfey_fleet_index distribution
+    survey_fleet_index_distribution <- new(DnormDistribution)
+
+    # create depletion module
+    production <- new(PTDepletion)
+    # Fix to get Schaefer model
+    production$log_shape[1]$value <- log(2)
+    production$n_years$set(nyears)
+
+    # create production distribution
     production_distribution <- new(DnormDistribution)
-    production_distribution$log_sd[1]$value <- inits_true$sigma2_depletion |> sqrt() |> log()
-    production_distribution$log_sd[1]$estimation_type$set("fixed_effects")
 
-    # log_depletion ~ Normal(log_expected_depletion, sd)
-    production_distribution$set_distribution_links(
-      "random_effects",
-      c(production$log_depletion$get_id(), production$log_expected_depletion$get_id())
-    )
-    
-    if(bayesian_mode == TRUE){
-      # Deterministic MCMC: estimation mode FALSE so use true values from the OM
-      # Add Priors
-      production$log_growth_rate$add_prior(growth_rate ~ Lognormal(-1.38, 1.960867))
-      production$log_carrying_capacity$add_prior(carrying_capacity ~ Lognormal(5.042905, 1.939166))
-      survey_fleet_index_distribution$log_sd$add_prior(sd^2 ~ Invgamma(1.708603, 116.0921))
-      production_distribution$log_sd$add_prior(sd^2 ~ Invgamma(3.785518, 97.81864))
-    } 
+    if (estimation_mode == TRUE) {
+      survey_fleet_index_distribution$log_sd[1]$value <- inits$sigma2_obs |>
+        sqrt() |>
+        log()
+      survey_fleet_index_distribution$log_sd[1]$estimation_type$set("fixed_effects")
 
-  }
-  
-  # Set Data using the IDs from the modules defined above
-  survey_fleet_index_distribution$set_observed_data(survey_fleet$GetObservedIndexDataID())
-  survey_fleet_index_distribution$set_distribution_links("random_effects", 
-      c(survey_fleet$log_index_to_depletion_carrying_capacity_ratio$get_id(), survey_fleet$mean_log_q$get_id()))
+      production$log_growth_rate[1]$value <- log(inits$growth_rate)
+      production$log_growth_rate[1]$estimation_type$set("fixed_effects")
+      production$log_carrying_capacity[1]$value <- log(inits$carrying_capacity)
+      production$log_carrying_capacity[1]$estimation_type$set("fixed_effects")
+      production$log_init_depletion[1]$value <- 0 # inital depletion ~ 1
 
-  population <- new(Population)
-  population$n_years$set(nyears)
-  population$n_ages$set(1) # only one age in surplus production
-  population$ages$resize(1)
-  population$ages$set(0, 0) # only one age in surplus production
+      production$log_depletion$resize(nyears + 1)
+      for (i in 1:(nyears + 1)) {
+        production$log_depletion[i]$value <- log(inits$depletion[i])
+      }
 
-  population$SetDepletionID(production$get_id())
-  population$AddFleet(fishing_fleet$get_id())
-  population$AddFleet(survey_fleet$get_id())
+      production_distribution$log_sd[1]$value <- inits_true$sigma2_depletion |>
+        sqrt() |>
+        log()
+      production_distribution$log_sd[1]$estimation_type$set("fixed_effects")
 
-  # Set up surplus production model
-  surplus_production <- methods::new(SurplusProduction)
-  surplus_production$AddPopulation(population$get_id())
-
-
-  # create TMB Model
-  # Set-up TMB
-  CreateTMBModel()
-  # Create parameter list from Rcpp modules
-  parameters <- list(
-    p = get_fixed(),
-    re = get_random()
-  )
-
-  obj <- TMB::MakeADFun(
-    data = list(), parameters, DLL = "FIMS",
-    random = "re", 
-    silent = TRUE, map = list()
-  )
-  
-  if(estimation_mode == TRUE) {
-    if(bayesian_mode == TRUE) {
-      fit <- tmbstan::tmbstan(obj, init =  "last.par.best", iter = 8000,
-        lower = c(FIMS:::get_parameter_min_vector(), 
-          FIMS:::get_random_effects_min_vector()), 
-        upper = c(FIMS:::get_parameter_max_vector(), 
-          FIMS:::get_random_effects_max_vector()), 
-        control = list(adapt_delta = 0.99))
-      postmle <- as.matrix(fit)[, -ncol(as.matrix(fit))]
-      ret <- list(
-        parameters = parameters,
-        obj = obj,
-        postmle = postmle
+      # log_depletion ~ Normal(log_expected_depletion, sd)
+      production_distribution$set_distribution_links(
+        "random_effects",
+        c(production$log_depletion$get_id(), production$log_expected_depletion$get_id())
       )
 
+      if (bayesian_mode == FALSE) {
+        # MLE: estimation mode TRUE, Bayesian mode FALSE
+        production$log_depletion$set_all_random(TRUE)
+      } else {
+        # MCMC: estimation mode TRUE, Bayesian mode TRUE
+        # Add Priors
+        production$log_growth_rate$add_prior(growth_rate ~ Lognormal(-1.38, 1.960867))
+        production$log_carrying_capacity$add_prior(carrying_capacity ~ Lognormal(5.042905, 1.939166))
+        survey_fleet_index_distribution$log_sd$add_prior(sd^2 ~ Invgamma(1.708603, 116.0921))
+        production_distribution$log_sd$add_prior(sd^2 ~ Invgamma(3.785518, 97.81864))
+      }
     } else {
-      # Optimization with nlminb
-      opt <- stats::nlminb(obj[["par"]], obj[["fn"]], obj[["gr"]],
-        control = list(eval.max = 10000, iter.max = 10000)
+      # Deterministic MCMC: estimation mode FALSE so use true values from the OM
+      survey_fleet_index_distribution$log_sd[1]$value <- inits_true$sigma2_obs |>
+        sqrt() |>
+        log()
+      survey_fleet_index_distribution$log_sd[1]$estimation_type$set("fixed_effects")
+
+      production$log_growth_rate[1]$value <- inits_true$growth_rate |> log()
+      production$log_growth_rate[1]$estimation_type$set("fixed_effects")
+      production$log_carrying_capacity[1]$value <- inits_true$carrying_capacity |> log()
+      production$log_carrying_capacity[1]$estimation_type$set("fixed_effects")
+      production$log_init_depletion[1]$value <- inits_true$depletion[1] |> log()
+
+      production$log_depletion$resize(nyears + 1)
+      for (i in 1:(nyears + 1)) {
+        production$log_depletion[i]$value <- log(inits_true$depletion[i])
+        production$log_depletion[i]$estimation_type$set("random_effects")
+      }
+
+      # create production distribution module
+      production_distribution <- new(DnormDistribution)
+      production_distribution$log_sd[1]$value <- inits_true$sigma2_depletion |>
+        sqrt() |>
+        log()
+      production_distribution$log_sd[1]$estimation_type$set("fixed_effects")
+
+      # log_depletion ~ Normal(log_expected_depletion, sd)
+      production_distribution$set_distribution_links(
+        "random_effects",
+        c(production$log_depletion$get_id(), production$log_expected_depletion$get_id())
       )
-      for(i in 1:3){
-       opt <- with(
-        obj,
-        nlminb(
-          start = opt[["par"]],
-          objective = fn,
-          gradient = gr,
+
+      if (bayesian_mode == TRUE) {
+        # Deterministic MCMC: estimation mode FALSE so use true values from the OM
+        # Add Priors
+        production$log_growth_rate$add_prior(growth_rate ~ Lognormal(-1.38, 1.960867))
+        production$log_carrying_capacity$add_prior(carrying_capacity ~ Lognormal(5.042905, 1.939166))
+        survey_fleet_index_distribution$log_sd$add_prior(sd^2 ~ Invgamma(1.708603, 116.0921))
+        production_distribution$log_sd$add_prior(sd^2 ~ Invgamma(3.785518, 97.81864))
+      }
+    }
+
+    # Set Data using the IDs from the modules defined above
+    survey_fleet_index_distribution$set_observed_data(survey_fleet$GetObservedIndexDataID())
+    survey_fleet_index_distribution$set_distribution_links(
+      "random_effects",
+      c(survey_fleet$log_index_to_depletion_carrying_capacity_ratio$get_id(), survey_fleet$mean_log_q$get_id())
+    )
+
+    population <- new(Population)
+    population$n_years$set(nyears)
+    population$n_ages$set(1) # only one age in surplus production
+    population$ages$resize(1)
+    population$ages$set(0, 0) # only one age in surplus production
+
+    population$SetDepletionID(production$get_id())
+    population$AddFleet(fishing_fleet$get_id())
+    population$AddFleet(survey_fleet$get_id())
+
+    # Set up surplus production model
+    surplus_production <- methods::new(SurplusProduction)
+    surplus_production$AddPopulation(population$get_id())
+
+
+    # create TMB Model
+    # Set-up TMB
+    CreateTMBModel()
+    # Create parameter list from Rcpp modules
+    parameters <- list(
+      p = get_fixed(),
+      re = get_random()
+    )
+
+    obj <- TMB::MakeADFun(
+      data = list(), parameters, DLL = "FIMS",
+      random = "re",
+      silent = TRUE, map = list()
+    )
+
+    if (estimation_mode == TRUE) {
+      if (bayesian_mode == TRUE) {
+        fit <- tmbstan::tmbstan(obj,
+          init = "last.par.best", iter = 8000,
+          lower = c(
+            FIMS:::get_parameter_min_vector(),
+            FIMS:::get_random_effects_min_vector()
+          ),
+          upper = c(
+            FIMS:::get_parameter_max_vector(),
+            FIMS:::get_random_effects_max_vector()
+          ),
+          control = list(adapt_delta = 0.99)
+        )
+        postmle <- as.matrix(fit)[, -ncol(as.matrix(fit))]
+        ret <- list(
+          parameters = parameters,
+          obj = obj,
+          postmle = postmle
+        )
+      } else {
+        # Optimization with nlminb
+        opt <- stats::nlminb(obj[["par"]], obj[["fn"]], obj[["gr"]],
           control = list(eval.max = 10000, iter.max = 10000)
         )
-      )
-      }
-      
-      # Call report using MLE parameter values, or
-      # the initial values if optimization is skipped
-      report <- obj[["report"]](obj[["env"]][["last.par.best"]])
-      sdr <- TMB::sdreport(obj)
-      sdr_report <- summary(sdr, "report")
-      sdr_fixed <- summary(sdr, "fixed")
-      sdr_random <- summary(sdr, "random")
-      row.names(sdr_fixed) <- names(FIMS:::get_parameter_names(sdr_fixed[, 1]))
-      row.names(sdr_random) <- names(FIMS:::get_random_names(sdr_random[, 1]))
+        for (i in 1:3) {
+          opt <- with(
+            obj,
+            nlminb(
+              start = opt[["par"]],
+              objective = fn,
+              gradient = gr,
+              control = list(eval.max = 10000, iter.max = 10000)
+            )
+          )
+        }
 
-       # Return the results as a list
+        # Call report using MLE parameter values, or
+        # the initial values if optimization is skipped
+        report <- obj[["report"]](obj[["env"]][["last.par.best"]])
+        sdr <- TMB::sdreport(obj)
+        sdr_report <- summary(sdr, "report")
+        sdr_fixed <- summary(sdr, "fixed")
+        sdr_random <- summary(sdr, "random")
+        row.names(sdr_fixed) <- names(FIMS:::get_parameter_names(sdr_fixed[, 1]))
+        row.names(sdr_random) <- names(FIMS:::get_random_names(sdr_random[, 1]))
+
+        # Return the results as a list
+        ret <- list(
+          parameters = parameters,
+          obj = obj,
+          opt = opt,
+          report = report,
+          sdr_report = sdr_report,
+          sdr_fixed = sdr_fixed,
+          sdr_random = sdr_random,
+          sdr = sdr
+        )
+      }
+    } else {
       ret <- list(
         parameters = parameters,
         obj = obj,
-        opt = opt,
-        report = report,
-        sdr_report = sdr_report,
-        sdr_fixed = sdr_fixed,
-        sdr_random = sdr_random,
-        sdr = sdr
+        report = obj[["report"]](obj[["env"]][["last.par.best"]])
       )
     }
-  } else {
-    ret <- list(
-      parameters = parameters,
-      obj = obj,
-      report = obj[["report"]](obj[["env"]][["last.par.best"]])
-    )
+
+    clear()
+
+    # Return the results as a list
+    return(ret)
   }
-
-  clear()
-
-  # Return the results as a list
-  return(ret)
-
-}

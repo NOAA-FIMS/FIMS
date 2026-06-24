@@ -63,8 +63,7 @@ class LikelihoodInterfaceBase : public FIMSRcppInterfaceBase {
     if (role == "prior") {
       return fims_likelihood::LikelihoodRole::Prior;
     }
-    if (role == "random_effect" || role == "random_effects" ||
-        role == "re") {
+    if (role == "random_effect" || role == "random_effects" || role == "re") {
       return fims_likelihood::LikelihoodRole::RandomEffect;
     }
     if (role == "penalty") {
@@ -161,8 +160,7 @@ class LikelihoodInterfaceBase : public FIMSRcppInterfaceBase {
 
     std::stringstream ss;
     for (size_t i = 0; i < this->parameter_input.size(); i++) {
-      if (this->parameter_input[i].estimation_type_m.get() ==
-          "fixed_effects") {
+      if (this->parameter_input[i].estimation_type_m.get() == "fixed_effects") {
         ss.str("");
         ss << component_name << "." << this->id_m << ".input."
            << this->parameter_input[i].id_m;
@@ -213,9 +211,8 @@ class LikelihoodInterfaceBase : public FIMSRcppInterfaceBase {
    * @brief Fill common backend likelihood fields and register linked inputs.
    */
   template <typename Type, typename LikelihoodType>
-  void set_common_tmb_values(
-      std::shared_ptr<LikelihoodType> likelihood,
-      const std::string& component_name) {
+  void set_common_tmb_values(std::shared_ptr<LikelihoodType> likelihood,
+                             const std::string& component_name) {
     likelihood->observed_values =
         this->to_fims_vector_t<Type>(this->observed_values);
     likelihood->expected_values =
@@ -241,16 +238,16 @@ class LikelihoodInterfaceBase : public FIMSRcppInterfaceBase {
     if (input_source == "parameter") {
       likelihood->input_storage =
           this->to_fims_vector_t<Type>(this->parameter_input);
-      likelihood->SetInput(
-          this->template register_parameter_input<Type>(likelihood,
-                                                        component_name),
-          this->parse_role());
-    } else if (input_source == "real") {
-      likelihood->input_storage = this->to_fims_vector_t<Type>(this->real_input);
-      likelihood->SetInput(this->register_or_get_real_vector(
-                               &likelihood->input_storage,
-                               this->real_input.id_m),
+      likelihood->SetInput(this->template register_parameter_input<Type>(
+                               likelihood, component_name),
                            this->parse_role());
+    } else if (input_source == "real") {
+      likelihood->input_storage =
+          this->to_fims_vector_t<Type>(this->real_input);
+      likelihood->SetInput(
+          this->register_or_get_real_vector(&likelihood->input_storage,
+                                            this->real_input.id_m),
+          this->parse_role());
     } else if (input_source != "observed") {
       throw std::invalid_argument("Unsupported likelihood input source: " +
                                   input_source);
@@ -495,7 +492,8 @@ class LognormalLikelihoodInterface : public LikelihoodInterfaceBase {
   bool add_to_fims_tmb_internal() {
     std::shared_ptr<fims_likelihood::LognormalLikelihood<Type>> likelihood =
         std::make_shared<fims_likelihood::LognormalLikelihood<Type>>();
-    this->template set_common_tmb_values<Type>(likelihood, "lognormal_likelihood");
+    this->template set_common_tmb_values<Type>(likelihood,
+                                               "lognormal_likelihood");
     likelihood->log_sd = this->to_fims_vector_t<Type>(this->log_sd);
     this->template register_likelihood<Type>(likelihood);
     return true;
@@ -567,8 +565,7 @@ std::vector<std::shared_ptr<GammaLikelihoodInterface>>
  */
 class InvGammaLikelihoodInterface : public LikelihoodInterfaceBase {
  public:
-  static std::vector<std::shared_ptr<InvGammaLikelihoodInterface>>
-      live_objects;
+  static std::vector<std::shared_ptr<InvGammaLikelihoodInterface>> live_objects;
 
   InvGammaLikelihoodInterface() : LikelihoodInterfaceBase() {
     std::shared_ptr<InvGammaLikelihoodInterface> object =
@@ -599,7 +596,8 @@ class InvGammaLikelihoodInterface : public LikelihoodInterfaceBase {
   bool add_to_fims_tmb_internal() {
     std::shared_ptr<fims_likelihood::InvGammaLikelihood<Type>> likelihood =
         std::make_shared<fims_likelihood::InvGammaLikelihood<Type>>();
-    this->template set_common_tmb_values<Type>(likelihood, "invgamma_likelihood");
+    this->template set_common_tmb_values<Type>(likelihood,
+                                               "invgamma_likelihood");
     likelihood->log_shape = this->to_fims_vector_t<Type>(this->log_shape);
     likelihood->log_scale = this->to_fims_vector_t<Type>(this->log_scale);
     this->template register_likelihood<Type>(likelihood);
@@ -655,7 +653,8 @@ class MultinomialLikelihoodInterface : public LikelihoodInterfaceBase {
   bool add_to_fims_tmb_internal() {
     std::shared_ptr<fims_likelihood::MultinomialLikelihood<Type>> likelihood =
         std::make_shared<fims_likelihood::MultinomialLikelihood<Type>>();
-    this->template set_common_tmb_values<Type>(likelihood, "multinomial_likelihood");
+    this->template set_common_tmb_values<Type>(likelihood,
+                                               "multinomial_likelihood");
     likelihood->dims.resize(this->dims.size());
     for (size_t i = 0; i < this->dims.size(); i++) {
       likelihood->dims[i] = static_cast<size_t>(this->dims[i]);

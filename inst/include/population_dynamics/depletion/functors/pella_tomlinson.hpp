@@ -21,7 +21,6 @@ namespace fims_popdy {
  */
 template <typename Type>
 struct PellaTomlinsonDepletion : public DepletionBase<Type> {
-
   PellaTomlinsonDepletion() : DepletionBase<Type>() {}
 
   virtual ~PellaTomlinsonDepletion() {}
@@ -30,21 +29,19 @@ struct PellaTomlinsonDepletion : public DepletionBase<Type> {
    * @brief Method of the depletion class that implements the
    * Pella--Tomlinson production function for depletion, d at time, t.
    *
-   * \f[ \frac{growth_rate}{shape - 1.0} * d_{t-1} *  (1.0 - d_{t-1}^{shape - 1.0} - Catch_{t-1} /
-   * carrying_capacity) \f]
+   * \f[ \frac{growth_rate}{shape - 1.0} * d_{t-1} *  (1.0 - d_{t-1}^{shape
+   * - 1.0} - Catch_{t-1} / carrying_capacity) \f]
    *
    * @param depletion_ym1 Expected depletion from previous time step.
    * @param catch_ym1 Catch from previous time step.
    */
   virtual const Type evaluate_mean(const Type& depletion_ym1,
                                    const Type& catch_ym1) {
-
     return depletion_ym1 +
            (this->growth_rate[0] / (this->shape[0] - 1.0)) * depletion_ym1 *
                (1.0 - fims_math::pow(depletion_ym1, this->shape[0] - 1.0)) -
            catch_ym1 / this->carrying_capacity[0];
   }
-
 };
 }  // namespace fims_popdy
 

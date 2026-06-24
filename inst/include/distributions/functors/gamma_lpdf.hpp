@@ -47,13 +47,13 @@ struct GammaLPDF : public DensityComponentBase<Type> {
    */
   virtual ~GammaLPDF() {}
 
- /**
+  /**
    * @brief Evaluates the Gamma log probability density function.
    * @details The following equation is Gamma probability density function:
    * \f[
    * f(x) =
    * \frac{1}{\Gamma(\alpha)\theta^{\alpha}}y^{\alpha-1}\mathrm{exp}
-   * \Bigg(-\frac{y}{\theta}\Bigg), \f] where \f$\alpha\theta\f$ is the 
+   * \Bigg(-\frac{y}{\theta}\Bigg), \f] where \f$\alpha\theta\f$ is the
    * mean of the distribution and \f$\alpha\theta^{2}\f$ is the variance.
    */
   virtual const Type evaluate() {
@@ -67,14 +67,14 @@ struct GammaLPDF : public DensityComponentBase<Type> {
               static_cast<Type>(0));
     this->lpdf = static_cast<Type>(0);
 
-     // Dimension checks
+    // Dimension checks
     if (n_expected > 1 && n_expected != n_x) {
       throw std::invalid_argument(
-        "GammaLPDF::Vector index out of bounds. The size of observed "
-            "data does not equal the expected size. The observed data vector "
-            "is of size " +
-            fims::to_string(n_x) +
-            " and the expected size is " + fims::to_string(n_expected));
+          "GammaLPDF::Vector index out of bounds. The size of observed "
+          "data does not equal the expected size. The observed data vector "
+          "is of size " +
+          fims::to_string(n_x) + " and the expected size is " +
+          fims::to_string(n_expected));
     }
 
     if (this->log_sd.size() > 1 && n_x != this->log_sd.size()) {
@@ -88,9 +88,8 @@ struct GammaLPDF : public DensityComponentBase<Type> {
 
     for (size_t i = 0; i < n_x; i++) {
 #ifdef TMB_MODEL
-      // Calculate shape and scale parameters from mean (expected value) and standard deviation
-      // shape = (mean/sd)^2
-      // scale = sd^2/mean
+      // Calculate shape and scale parameters from mean (expected value) and
+      // standard deviation shape = (mean/sd)^2 scale = sd^2/mean
       Type mean_val = this->get_expected(i);
       Type sd_val = fims_math::exp(log_sd.get_force_scalar(i));
       Type shape = (mean_val / sd_val) * (mean_val / sd_val);
@@ -100,33 +99,30 @@ struct GammaLPDF : public DensityComponentBase<Type> {
         // if data, check if there are any NA values and skip lpdf calculation
         // if there are
         if (this->get_observed(i) != this->data_observed_values->na_value) {
-          this->lpdf_vec[i] =
-              dgamma(this->get_observed(i), shape, scale, true);
+          this->lpdf_vec[i] = dgamma(this->get_observed(i), shape, scale, true);
         } else {
           this->lpdf_vec[i] = 0;
         }
         // if not data (i.e. prior or process), use x vector instead of
         // observed_values
       } else {
-        // TODO: hard coded for now but need to address NA values when observed value is derived from data
-        if(this->get_observed(i) != -999){
-          this->lpdf_vec[i] =
-              dgamma(this->get_observed(i), shape, scale, true);
+        // TODO: hard coded for now but need to address NA values when observed
+        // value is derived from data
+        if (this->get_observed(i) != -999) {
+          this->lpdf_vec[i] = dgamma(this->get_observed(i), shape, scale, true);
         }
       }
       this->lpdf += this->lpdf_vec[i];
       if (this->simulate_flag) {
         FIMS_SIMULATE_F(this->of) {
           if (this->input_type == "data") {
-            this->data_observed_values->at(i) =
-                rgamma(shape, scale);
+            this->data_observed_values->at(i) = rgamma(shape, scale);
           }
           if (this->input_type == "random_effects") {
             (*this->re)[i] = rgamma(shape, scale);
           }
           if (this->input_type == "prior") {
-            (*(this->priors[i]))[0] =
-                rgamma(shape, scale);
+            (*(this->priors[i]))[0] = rgamma(shape, scale);
           }
         }
       }

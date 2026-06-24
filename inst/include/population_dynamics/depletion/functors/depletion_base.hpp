@@ -28,38 +28,34 @@ struct DepletionBase : public fims_model_object::FIMSObject<Type> {
   // Assigning each one its own ID is a way to keep track of
   // all the instances of the DepletionBase class.
   static uint32_t
-    id_g; /**< The ID of the instance of the DepletionBase class */
-  fims::Vector<Type> 
-    log_depletion; /**< Transformed depletion input supplied by the user */
+      id_g; /**< The ID of the instance of the DepletionBase class */
   fims::Vector<Type>
-    log_expected_depletion; /**< Log expectation of the depletion process. */
-  fims::Vector<Type> 
-    depletion; /**< The depletion process, back-transformed from 
-                    log_depletion. */
+      log_depletion; /**< Transformed depletion input supplied by the user */
   fims::Vector<Type>
-    log_init_depletion; /*!< Transformed initial depletion supplied by the user*/
+      log_expected_depletion; /**< Log expectation of the depletion process. */
+  fims::Vector<Type> depletion; /**< The depletion process, back-transformed
+                                   from log_depletion. */
+  fims::Vector<Type> log_init_depletion; /*!< Transformed initial depletion
+                                            supplied by the user*/
   fims::Vector<Type>
-    init_depletion; /*!< estimated parameter: initial depletion 
-                        back-transformed from log_init_depletion*/
-  fims::Vector<Type> 
-    log_carrying_capacity; /**< Transformed carrying capacity of the 
-                                population supplied by the user */
-  fims::Vector<Type> 
-    log_growth_rate; /**< Transformed intrinsic growth rate supplied 
-                            by the user. */
-  fims::Vector<Type> 
-    log_shape; /**< Tranformed shape parameter that adjusts the curvature 
-                        of the growth function */
-  fims::Vector<Type> 
-    carrying_capacity; /**< Carrying capacity of the population 
-                            back-transformed from log_carrying_capacity. */
-  fims::Vector<Type> 
-    growth_rate; /**< Intrinsic growth rate back-transformed from 
-                        log_growth_rate. */
-  fims::Vector<Type> 
-    shape; /**< Shape parameter that adjusts the curvature of the growth 
-                function back-transformed from log_shape */
-  
+      init_depletion; /*!< estimated parameter: initial depletion
+                          back-transformed from log_init_depletion*/
+  fims::Vector<Type>
+      log_carrying_capacity;          /**< Transformed carrying capacity of the
+                                           population supplied by the user */
+  fims::Vector<Type> log_growth_rate; /**< Transformed intrinsic growth rate
+                                         supplied by the user. */
+  fims::Vector<Type> log_shape; /**< Tranformed shape parameter that adjusts the
+                                   curvature of the growth function */
+  fims::Vector<Type>
+      carrying_capacity;          /**< Carrying capacity of the population
+                                       back-transformed from log_carrying_capacity. */
+  fims::Vector<Type> growth_rate; /**< Intrinsic growth rate back-transformed
+                                     from log_growth_rate. */
+  fims::Vector<Type>
+      shape; /**< Shape parameter that adjusts the curvature of the growth
+                  function back-transformed from log_shape */
+
   /** @brief Constructor.
    */
   DepletionBase() {
@@ -68,7 +64,6 @@ struct DepletionBase : public fims_model_object::FIMSObject<Type> {
   }
 
   virtual ~DepletionBase() {}
-
 
   /**
    * @brief Calculates the depletion.

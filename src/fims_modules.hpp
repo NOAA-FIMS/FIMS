@@ -99,7 +99,8 @@ RCPP_MODULE(fims) {
       "get_random_names", &get_random_names,
       "See "
       "https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html.");
-  Rcpp::function("add_shared_prior", &setup_prior, 
+  Rcpp::function(
+      "add_shared_prior", &setup_prior,
       "See "
       "https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html.");
   Rcpp::function(
@@ -446,7 +447,8 @@ RCPP_MODULE(fims) {
       "classPellaTomlinsonInterface.html.")
       .constructor()
       .field("log_growth_rate", &PellaTomlinsonInterface::log_growth_rate)
-      .field("log_carrying_capacity", &PellaTomlinsonInterface::log_carrying_capacity)
+      .field("log_carrying_capacity",
+             &PellaTomlinsonInterface::log_carrying_capacity)
       .field("log_shape", &PellaTomlinsonInterface::log_shape)
       .field("log_depletion", &PellaTomlinsonInterface::log_depletion)
       .field("log_init_depletion", &PellaTomlinsonInterface::log_init_depletion)
@@ -491,7 +493,8 @@ RCPP_MODULE(fims) {
       .field("expected_values", &DlnormDistributionsInterface::expected_values)
       .field("log_sd", &DlnormDistributionsInterface::log_sd);
 
-  Rcpp::class_<DgammaDistributionsInterface>("DgammaDistribution",
+  Rcpp::class_<DgammaDistributionsInterface>(
+      "DgammaDistribution",
       "See "
       "https://noaa-fims.github.io/FIMS/doxygen/"
       "classDgammaDistributionsInterface.html.")
@@ -505,8 +508,8 @@ RCPP_MODULE(fims) {
       .field("observed_values", &DgammaDistributionsInterface::observed_values)
       .field("expected_values", &DgammaDistributionsInterface::expected_values)
       .field("log_sd", &DgammaDistributionsInterface::log_sd);
-    
-     Rcpp::class_<DinvgammaDistributionsInterface>(
+
+  Rcpp::class_<DinvgammaDistributionsInterface>(
       "DinvgammaDistribution",
       "See "
       "https://noaa-fims.github.io/FIMS/doxygen/"
@@ -543,8 +546,7 @@ RCPP_MODULE(fims) {
       .field("dims", &DmultinomDistributionsInterface::dims);
 
   Rcpp::class_<LikelihoodInterfaceBase>(
-      "LikelihoodBase",
-      "Base class for likelihood component interfaces.")
+      "LikelihoodBase", "Base class for likelihood component interfaces.")
       .method("set_role", &LikelihoodInterfaceBase::set_role)
       .method("set_real_input", &LikelihoodInterfaceBase::set_real_input)
       .method("set_parameter_input",
@@ -644,20 +646,18 @@ RCPP_MODULE(fims) {
       .field("biomass",
              &CatchAtAgePopulationDerivedQuantitiesInterface::biomass)
       .field("spawning_biomass",
-             &CatchAtAgePopulationDerivedQuantitiesInterface::
-                 spawning_biomass)
+             &CatchAtAgePopulationDerivedQuantitiesInterface::spawning_biomass)
       .field("unfished_biomass",
-             &CatchAtAgePopulationDerivedQuantitiesInterface::
-                 unfished_biomass)
+             &CatchAtAgePopulationDerivedQuantitiesInterface::unfished_biomass)
       .field("unfished_spawning_biomass",
              &CatchAtAgePopulationDerivedQuantitiesInterface::
                  unfished_spawning_biomass)
       .field("proportion_mature_at_age",
              &CatchAtAgePopulationDerivedQuantitiesInterface::
                  proportion_mature_at_age)
-      .field("expected_recruitment",
-             &CatchAtAgePopulationDerivedQuantitiesInterface::
-                 expected_recruitment)
+      .field(
+          "expected_recruitment",
+          &CatchAtAgePopulationDerivedQuantitiesInterface::expected_recruitment)
       .field("sum_selectivity",
              &CatchAtAgePopulationDerivedQuantitiesInterface::sum_selectivity);
 
@@ -668,12 +668,11 @@ RCPP_MODULE(fims) {
       .method("Initialize",
               &CatchAtAgeFleetDerivedQuantitiesInterface::Initialize)
       .method("Fill", &CatchAtAgeFleetDerivedQuantitiesInterface::Fill)
-      .field("landings_numbers_at_age",
-             &CatchAtAgeFleetDerivedQuantitiesInterface::
-                 landings_numbers_at_age)
+      .field(
+          "landings_numbers_at_age",
+          &CatchAtAgeFleetDerivedQuantitiesInterface::landings_numbers_at_age)
       .field("landings_weight_at_age",
-             &CatchAtAgeFleetDerivedQuantitiesInterface::
-                 landings_weight_at_age)
+             &CatchAtAgeFleetDerivedQuantitiesInterface::landings_weight_at_age)
       .field("landings_numbers_at_length",
              &CatchAtAgeFleetDerivedQuantitiesInterface::
                  landings_numbers_at_length)
@@ -684,20 +683,18 @@ RCPP_MODULE(fims) {
       .field("landings_expected",
              &CatchAtAgeFleetDerivedQuantitiesInterface::landings_expected)
       .field("log_landings_expected",
-             &CatchAtAgeFleetDerivedQuantitiesInterface::
-                 log_landings_expected)
+             &CatchAtAgeFleetDerivedQuantitiesInterface::log_landings_expected)
       .field("agecomp_proportion",
              &CatchAtAgeFleetDerivedQuantitiesInterface::agecomp_proportion)
       .field("lengthcomp_proportion",
-             &CatchAtAgeFleetDerivedQuantitiesInterface::
-                 lengthcomp_proportion)
+             &CatchAtAgeFleetDerivedQuantitiesInterface::lengthcomp_proportion)
       .field("index_numbers_at_age",
              &CatchAtAgeFleetDerivedQuantitiesInterface::index_numbers_at_age)
       .field("index_weight_at_age",
              &CatchAtAgeFleetDerivedQuantitiesInterface::index_weight_at_age)
-      .field("index_numbers_at_length",
-             &CatchAtAgeFleetDerivedQuantitiesInterface::
-                 index_numbers_at_length)
+      .field(
+          "index_numbers_at_length",
+          &CatchAtAgeFleetDerivedQuantitiesInterface::index_numbers_at_length)
       .field("index_weight",
              &CatchAtAgeFleetDerivedQuantitiesInterface::index_weight)
       .field("index_numbers",
@@ -739,7 +736,8 @@ RCPP_MODULE(fims) {
   Rcpp::class_<SurplusProductionInterface>(
       "SurplusProduction",
       "See "
-      "https://noaa-fims.github.io/FIMS/doxygen/classSurplusProductionInterface.html.")
+      "https://noaa-fims.github.io/FIMS/doxygen/"
+      "classSurplusProductionInterface.html.")
       .constructor()
       .method("AddPopulation", &SurplusProductionInterface::AddPopulation)
       .method("GetId", &SurplusProductionInterface::get_id)

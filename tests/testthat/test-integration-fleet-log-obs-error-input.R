@@ -149,8 +149,8 @@ test_that("`log_Fmort` returns correct error messages when wrong dimensions", {
       !(fleet_name == "fleet1" & label == "log_Fmort" & time > 4) |
         is.na(fleet_name == "fleet1" & label == "log_Fmort" & time > 4)
     )
-  skip("This test currently fails because the error check in R was removed to allow for a surplus production model.")  
-  #TODO: fix this test with issue #1321
+  skip("This test currently fails because the error check in R was removed to allow for a surplus production model.")
+  # TODO: fix this test with issue #1321
   expect_error(
     {
       test_fit <- parameters_4_model |>
