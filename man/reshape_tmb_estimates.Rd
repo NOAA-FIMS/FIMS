@@ -4,7 +4,13 @@
 \alias{reshape_tmb_estimates}
 \title{Reshape TMB estimates}
 \usage{
-reshape_tmb_estimates(obj, sdreport = NULL, opt = NULL, parameter_names)
+reshape_tmb_estimates(
+  obj,
+  sdreport = NULL,
+  opt = NULL,
+  parameter_names,
+  precomputed_gradient = NULL
+)
 }
 \arguments{
 \item{obj}{An object returned from \code{\link[TMB:MakeADFun]{TMB::MakeADFun()}}.}
@@ -18,6 +24,12 @@ opt is an empty list and is not used in the function.}
 
 \item{parameter_names}{A character vector of parameter names. This is used to
 identify the parameters in the \code{std} object.}
+
+\item{precomputed_gradient}{A numeric vector of pre-computed gradient values
+at the MLE, typically from \code{get_gradient(x)}. When provided, this avoids
+a second call to \code{obj[["gr"]]()}, which would crash after \code{\link[=clear]{clear()}} has
+freed the C++ memory. If \code{NULL} (default), the gradient is computed
+directly from \code{obj[["gr"]](opt[["par"]])}.}
 }
 \value{
 A tibble containing the reshaped estimates (i.e., parameters and

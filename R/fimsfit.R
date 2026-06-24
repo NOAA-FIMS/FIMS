@@ -44,6 +44,7 @@ methods::setClass(
     obj = "list",
     opt = "list",
     max_gradient = "numeric",
+    gradient = "numeric",
     report = "list",
     sdreport = "sdreportOrList",
     number_of_parameters = "integer",
@@ -192,6 +193,19 @@ methods::setGeneric("get_max_gradient", function(x) standardGeneric("get_max_gra
 methods::setMethod("get_max_gradient", "FIMSFit", function(x) x@max_gradient)
 
 #' @return
+#' [get_gradient()] returns the per-parameter gradient vector at the MLE as
+#' stored during fitting. Unlike calling `get_obj(x)[["gr"]](get_opt(x)[["par"]])`
+#' this function is safe to call after [clear()] because it reads
+#' from a stored R vector rather than the compiled C++ objective function.
+#' @export
+#' @rdname get_FIMSFit
+#' @keywords fit_fims
+methods::setGeneric("get_gradient", function(x) standardGeneric("get_gradient"))
+#' @rdname get_FIMSFit
+#' @keywords fit_fims
+methods::setMethod("get_gradient", "FIMSFit", function(x) x@gradient)
+
+#' @return
 #' [get_sdreport()] returns the list from [TMB::sdreport()].
 #' @export
 #' @rdname get_FIMSFit
@@ -244,7 +258,8 @@ methods::setMethod(
       obj = obj,
       sdreport = sdreport,
       opt = opt,
-      parameter_names = parameter_names
+      parameter_names = parameter_names,
+      precomputed_gradient = get_gradient(x)
     ) |>
       add_unique_id()
 
@@ -437,12 +452,19 @@ FIMSFit <- function(
   )
   rm(n_total, n_fixed_effects, n_random_effects)
 
-  # Calculate the maximum gradient
-  max_gradient <- if (length(opt) > 0) {
-    max(abs(obj[["gr"]](opt[["par"]])))
+  # Compute the full per-parameter gradient vector once at construction time.
+  # max_gradient is derived from it so obj$gr() is only ever called here.
+  # Storing gradient_vec in the FIMSFit slot means get_estimates() and the
+  # broom methods (tidy, augment, glance) can read from x@gradient instead of
+  # calling obj$gr() again — which segfaults after clear() frees C++ memory.
+  # as.numeric() is required because TMB's obj$gr() returns a matrix (1×n)
+  # in some call patterns, which would fail the "numeric" slot type check.
+  gradient_vector <- if (length(opt) > 0) {
+    as.numeric(obj[["gr"]](opt[["par"]]))
   } else {
-    NA_real_
+    rep(NA_real_, length(obj[["par"]]))
   }
+  max_gradient <- if (length(opt) > 0) max(abs(gradient_vector)) else NA_real_
 
   # Rename parameters instead of "p"
   parameter_names <- names(get_parameter_names(obj[["par"]]))
@@ -471,6 +493,7 @@ FIMSFit <- function(
     obj = obj,
     opt = opt,
     max_gradient = max_gradient,
+    gradient = gradient_vector,
     report = report,
     sdreport = sdreport,
     number_of_parameters = number_of_parameters,

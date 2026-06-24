@@ -31,7 +31,7 @@ test_that("`is.FIMSFit()` works with correct inputs", {
   )
 
   expected_names <- c(
-    "input", "obj", "opt", "max_gradient", "report", "sdreport",
+    "input", "obj", "opt", "max_gradient", "gradient", "report", "sdreport",
     "number_of_parameters", "timing", "version", "model_output"
   )
   #' @description Test a FIMSFit object has the correct slot names.
