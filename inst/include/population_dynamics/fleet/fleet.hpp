@@ -71,29 +71,29 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
                                                 matrix*/
 
   // Derived quantities — landings
-  fims::Vector<Type> landings_numbers_at_age;   /*!< n_years x n_ages */
-  fims::Vector<Type> landings_weight_at_age;    /*!< n_years x n_ages */
-  fims::Vector<Type> landings_numbers_at_length;/*!< n_years x n_lengths */
-  fims::Vector<Type> landings_weight;           /*!< n_years */
-  fims::Vector<Type> landings_numbers;          /*!< n_years */
-  fims::Vector<Type> landings_expected;         /*!< n_years */
-  fims::Vector<Type> log_landings_expected;     /*!< n_years */
+  fims::Vector<Type> landings_numbers_at_age;    /*!< n_years x n_ages */
+  fims::Vector<Type> landings_weight_at_age;     /*!< n_years x n_ages */
+  fims::Vector<Type> landings_numbers_at_length; /*!< n_years x n_lengths */
+  fims::Vector<Type> landings_weight;            /*!< n_years */
+  fims::Vector<Type> landings_numbers;           /*!< n_years */
+  fims::Vector<Type> landings_expected;          /*!< n_years */
+  fims::Vector<Type> log_landings_expected;      /*!< n_years */
 
   // Derived quantities — age/length composition
-  fims::Vector<Type> agecomp_proportion;        /*!< n_years x n_ages */
-  fims::Vector<Type> lengthcomp_proportion;     /*!< n_years x n_lengths */
-  fims::Vector<Type> agecomp_expected;          /*!< n_years x n_ages */
-  fims::Vector<Type> lengthcomp_expected;       /*!< n_years x n_lengths */
+  fims::Vector<Type> agecomp_proportion;    /*!< n_years x n_ages */
+  fims::Vector<Type> lengthcomp_proportion; /*!< n_years x n_lengths */
+  fims::Vector<Type> agecomp_expected;      /*!< n_years x n_ages */
+  fims::Vector<Type> lengthcomp_expected;   /*!< n_years x n_lengths */
 
   // Derived quantities — index/survey
-  fims::Vector<Type> index_numbers_at_age;      /*!< n_years x n_ages */
-  fims::Vector<Type> index_weight_at_age;       /*!< n_years x n_ages */
-  fims::Vector<Type> index_numbers_at_length;   /*!< n_years x n_lengths */
-  fims::Vector<Type> index_weight;              /*!< n_years */
-  fims::Vector<Type> index_numbers;             /*!< n_years */
-  fims::Vector<Type> index_expected;            /*!< n_years */
-  fims::Vector<Type> log_index_expected;        /*!< n_years */
-  fims::Vector<Type> catch_index;               /*!< n_years */
+  fims::Vector<Type> index_numbers_at_age;    /*!< n_years x n_ages */
+  fims::Vector<Type> index_weight_at_age;     /*!< n_years x n_ages */
+  fims::Vector<Type> index_numbers_at_length; /*!< n_years x n_lengths */
+  fims::Vector<Type> index_weight;            /*!< n_years */
+  fims::Vector<Type> index_numbers;           /*!< n_years */
+  fims::Vector<Type> index_expected;          /*!< n_years */
+  fims::Vector<Type> log_index_expected;      /*!< n_years */
+  fims::Vector<Type> catch_index;             /*!< n_years */
 
   /**
    * @brief Constructor.

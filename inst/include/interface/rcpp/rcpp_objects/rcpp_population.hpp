@@ -403,7 +403,8 @@ class PopulationInterface : public PopulationInterfaceBase {
 
     this->expected_recruitment.resize(pop->expected_recruitment.size());
     for (size_t i = 0; i < pop->expected_recruitment.size(); i++) {
-      this->expected_recruitment[i].final_value_m = pop->expected_recruitment[i];
+      this->expected_recruitment[i].final_value_m =
+          pop->expected_recruitment[i];
     }
 
     this->sum_selectivity.resize(pop->sum_selectivity.size());
