@@ -560,6 +560,10 @@ RCPP_MODULE(fims) {
              &LikelihoodInterfaceBase::expected_real_input)
       .field("expected_parameter_input",
              &LikelihoodInterfaceBase::expected_parameter_input)
+      .field("log_sd", &LikelihoodInterfaceBase::log_sd)
+      .field("log_shape", &LikelihoodInterfaceBase::log_shape)
+      .field("log_scale", &LikelihoodInterfaceBase::log_scale)
+      .field("dims", &LikelihoodInterfaceBase::dims)
       .field("nll_components", &LikelihoodInterfaceBase::nll_components);
 
   Rcpp::class_<NormalLikelihoodInterface>(
@@ -570,8 +574,7 @@ RCPP_MODULE(fims) {
       .constructor()
       .derives<LikelihoodInterfaceBase>("LikelihoodBase")
       .method("get_id", &NormalLikelihoodInterface::get_id)
-      .method("evaluate", &NormalLikelihoodInterface::evaluate)
-      .field("log_sd", &NormalLikelihoodInterface::log_sd);
+      .method("evaluate", &NormalLikelihoodInterface::evaluate);
 
   Rcpp::class_<LognormalLikelihoodInterface>(
       "LognormalLikelihood",
@@ -581,8 +584,7 @@ RCPP_MODULE(fims) {
       .constructor()
       .derives<LikelihoodInterfaceBase>("LikelihoodBase")
       .method("get_id", &LognormalLikelihoodInterface::get_id)
-      .method("evaluate", &LognormalLikelihoodInterface::evaluate)
-      .field("log_sd", &LognormalLikelihoodInterface::log_sd);
+      .method("evaluate", &LognormalLikelihoodInterface::evaluate);
 
   Rcpp::class_<GammaLikelihoodInterface>(
       "GammaLikelihood",
@@ -592,8 +594,7 @@ RCPP_MODULE(fims) {
       .constructor()
       .derives<LikelihoodInterfaceBase>("LikelihoodBase")
       .method("get_id", &GammaLikelihoodInterface::get_id)
-      .method("evaluate", &GammaLikelihoodInterface::evaluate)
-      .field("log_sd", &GammaLikelihoodInterface::log_sd);
+      .method("evaluate", &GammaLikelihoodInterface::evaluate);
 
   Rcpp::class_<InvGammaLikelihoodInterface>(
       "InvGammaLikelihood",
@@ -603,9 +604,7 @@ RCPP_MODULE(fims) {
       .constructor()
       .derives<LikelihoodInterfaceBase>("LikelihoodBase")
       .method("get_id", &InvGammaLikelihoodInterface::get_id)
-      .method("evaluate", &InvGammaLikelihoodInterface::evaluate)
-      .field("log_shape", &InvGammaLikelihoodInterface::log_shape)
-      .field("log_scale", &InvGammaLikelihoodInterface::log_scale);
+      .method("evaluate", &InvGammaLikelihoodInterface::evaluate);
 
   Rcpp::class_<MultinomialLikelihoodInterface>(
       "MultinomialLikelihood",
@@ -615,8 +614,7 @@ RCPP_MODULE(fims) {
       .constructor()
       .derives<LikelihoodInterfaceBase>("LikelihoodBase")
       .method("get_id", &MultinomialLikelihoodInterface::get_id)
-      .method("evaluate", &MultinomialLikelihoodInterface::evaluate)
-      .field("dims", &MultinomialLikelihoodInterface::dims);
+      .method("evaluate", &MultinomialLikelihoodInterface::evaluate);
 
   Rcpp::class_<CatchAtAgePopulationDerivedQuantitiesInterface>(
       "CatchAtAgePopulationDerivedQuantities",
