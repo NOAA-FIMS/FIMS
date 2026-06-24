@@ -15,13 +15,27 @@
 #ifndef DENSITY_COMPONENT_BASE_HPP
 #define DENSITY_COMPONENT_BASE_HPP
 
-#include "../../common/data_object.hpp"
+#include "../../common/variable_object.hpp"
 #include "../../common/model_object.hpp"
 #include "../../interface/interface.hpp"
 #include "../../common/fims_vector.hpp"
 #include "../../common/fims_math.hpp"
 
 namespace fims_distributions {
+
+
+enum class Density_Function {
+    NORMAL,
+    LOGNORMAL,
+    MULTINOMIAL
+};
+
+enum class Likelihood_Kind {
+    DATA,
+    RANDOM_EFFECT,
+    PRIOR,
+    PENALTY
+};
 
 /** @brief Base class for all module_name functors.
  *
@@ -68,16 +82,17 @@ struct DensityComponentBase : public fims_model_object::FIMSObject<Type> {
 
   /**
    * @brief Classification of the input pathway for this distribution object.
+   * Options used by accessor methods are, "data", "random_effects", 
+   *"prior", and "penalty".
+   */
+  Likelihood_Kind likelihood_type;
+
+  /**
+   * @brief Classification of the input pathway for this distribution object.
    * Options used by accessor methods are, "prior", "random_effects", and
    *"data".
    */
-  std::string input_type;
-
-  /**
-   * @brief Likelihood distribution type for this distribution object.
-   * Current options are "normal", "lognormal", and "multinomial".
-   */
-  std::string distribution_type;
+  Density_Function distribution_type;
 
   /** @brief Fixed observed values for the distribution function. */
   fims::Vector<Type> observed_values;
@@ -137,7 +152,6 @@ struct DensityComponentBase : public fims_model_object::FIMSObject<Type> {
    * @brief Retrieve one observed value.
    * @param i Index into the active observed source, e.g., vector or pointer.
    * @return Reference to the selected observed value.
-   * @throws std::runtime_error If input_type is "prior" and priors is empty.
    */
   inline Type& get_observed(size_t i) {
     if(observed_subvector != NULL){
@@ -150,13 +164,26 @@ struct DensityComponentBase : public fims_model_object::FIMSObject<Type> {
   /**
    * @brief Update one observed value.
    * @param i Index into the active observed source, e.g., vector or pointer.
-   * @throws std::runtime_error If input_type is "prior" and priors is empty.
    */
   inline void set_observed(size_t i, Type new_value) {
     if(observed_subvector != NULL){
       (*observed_pointer).get_force_scalar(observed_subvector.get_force_scalar(i)) = new_value;
     }else{
       (*observed_pointer).get_force_scalar(i) = new_value;
+    }
+  }
+
+  /**
+   * @brief Update multiple observed values.
+   * @param i Index into the active observed source, e.g., vector or pointer.
+   */
+  inline void set_observed(fims::Vector<Type> i, fims::Vector<Type> new_value) {
+    for(size_t j = 0; j < i.size(); j++){
+      if(observed_subvector != NULL){
+        (*observed_pointer).get_force_scalar(observed_subvector.get_force_scalar(i.get_force_scalar(j))) = new_value.get_force_scalar(j);
+      }else{
+        (*observed_pointer).get_force_scalar(i.get_force_scalar(j)) = new_value.get_force_scalar(j);
+      }
     }
   }
 
@@ -369,11 +396,180 @@ struct DensityComponentBase : public fims_model_object::FIMSObject<Type> {
   }
 
   virtual ~DensityComponentBase() {}
+  
   /**
    * @brief Evaluate the distribution-specific log-likelihood contribution.
    * @return Total log-likelihood contribution for the active inputs.
    */
-  virtual const Type evaluate() = 0;
+  virtual const Type evaluate() {
+    
+    // extract evaluation vector size based on inputs 
+    size_t n_evals = this->check_input_sizes();
+
+    switch (this->distribution_type) {
+      case Density_Function::LOGNORMAL:
+        if (this->dims != NULL) {
+          throw std::invalid_argument(
+              "Dimensions specified for lognormal distribution, 
+              but lognormal distribution is not multivariate. 
+              Remove dimensions to evaluate.");
+        }
+        break;
+      case Density_Function::NORMAL:
+        if (this->dims != NULL) {
+          throw std::invalid_argument(
+              "Dimensions specified for normal distribution, 
+              but normal distribution is not multivariate. 
+              Remove dimensions to evaluate.");
+        }
+        break;
+      case Density_Function::MULTINOMIAL:
+        if (this->dims.size() != 2) {
+          throw std::invalid_argument(
+              "No dimensions specified for multinomial distribution");
+        }
+        break;
+      default:
+        throw std::invalid_argument(
+            "Distribution type not recognized in evaluate() method.");
+    }
+    
+    if(this->dims == NULL){
+      this->dims.resize(2);
+      // could add an OSA residuls check here to see if dims should be set to 
+      // 1 x n_evals or n_evals x 1
+      this->dims[0] = 1;
+      this->dims[1] = n_evals;
+    }
+
+    // setup vector for recording the log probability density function values
+    this->lpdf_vec.resize(dims[0] * dims[1]);
+
+    std::fill(this->lpdf_vec.begin(), this->lpdf_vec.end(),
+              static_cast<Type>(0));
+    
+    this->lpdf = static_cast<Type>(0);
+
+    size_t lpdf_vec_idx = 0; /**< index for lpdf_vec vector */
+    
+    // Create new observed_values and prob vectors
+    fims::Vector<Type> values_vector_observed;
+    fims::Vector<Type> values_vector_expected;
+    fims::Vector<Type> values_vector_uncertainty;
+    fims::Vector<Type> values_vector_index;
+    fims::Vector<Type> values_vector_lambda;
+
+    bool containsNA;
+    size_t idx;
+    for (size_t i = 0; i < dims[0]; i++) {
+
+      values_vector_observed.reserve(dims[1]);
+      values_vector_expected.reserve(dims[1]);
+      values_vector_uncertainty.reserve(dims[1]);
+      values_vector_index.reserve(dims[1]);
+      values_vector_lambda.reserve(dims[1]);
+
+      containsNA = false;
+
+      for (size_t j = 0; j < dims[1]; j++) {
+        
+        idx = (i * dims[1]) + j;
+        
+        if (this->get_observed(idx) != this->na_value &&
+              this->get_expected(idx) != this->na_value &&
+              this->get_uncertainty(idx) != this->na_value) {
+          if(this->distribution_type == "lognormal"){
+            values_vector_observed.push_back(log(this->get_observed(idx)));
+          }else{
+            values_vector_observed.push_back(this->get_observed(idx));
+          }
+          values_vector_expected.push_back(this->get_expected(idx)); 
+          if(this->distribution_type == "normal" || 
+            this->distribution_type == "lognormal") {
+            values_vector_uncertainty.push_back(
+              fims_math::exp(this->get_uncertainty(idx)));
+          }
+          values_vector_index.push_back(idx);
+          values_vector_lambda.push_back(this->get_lambda(idx));
+        }else{
+          containsNA = true;
+        }
+      }
+
+#ifdef TMB_MODEL
+      if (this->simulate_flag) {
+        switch(this->distribution_type) {
+          case Density_Function::LOGNORMAL:
+            FIMS_SIMULATE_F(this->of) { // preprocessor definition in 
+                                        // interface.hpp this simulates data 
+                                        // that is mean biased
+              (*this->observed_pointer).set_observed(values_vector_index,
+              fims_math::exp(rnorm(values_vector_expected, 
+              values_vector_uncertainty)));
+            }
+            break;
+          case Density_Function::NORMAL:
+            FIMS_SIMULATE_F(this->of) {
+              (*this->observed_pointer).set_observed(values_vector_index,
+              rnorm(values_vector_expected,values_vector_uncertainty));
+            }
+            break;
+          case Density_Function::MULTINOMIAL:
+            FIMS_SIMULATE_F(this->of) { // preprocessor definition in 
+                                        // interface.hpp this simulates data 
+                                        // that is mean biased
+              (*this->observed_pointer).set_observed(values_vector_index,
+              rmultinom(values_vector_expected));
+            }
+            break;
+          default:
+            throw std::invalid_argument(
+                "Distribution type not recognized in evaluate() method.");
+        }
+      }else{
+        switch(this->distribution_type) {
+          case Density_Function::LOGNORMAL:
+            // See Deroba and Miller, 2016
+            // (https://doi.org/10.1016/j.fishres.2015.12.002) for the use of
+            // lognormal constant for bias correction.
+            this->lpdf_vec[values_vector_index] = values_vector_lambda * (
+            dnorm(values_vector_observed.to_tmb(), 
+                  values_vector_expected.to_tmb(),
+                  values_vector_uncertainty.to_tmb(), true) -
+                  values_vector_observed.to_tmb());
+            break;
+          case Density_Function::NORMAL:
+            this->lpdf_vec[values_vector_index] = values_vector_lambda * (
+            dnorm(values_vector_observed.to_tmb(), 
+                  values_vector_expected.to_tmb(),
+                  values_vector_uncertainty.to_tmb(), true));
+            break;
+          case Density_Function::MULTINOMIAL:
+            if(!containsNA) {
+              this->lpdf_vec[values_vector_index] = values_vector_lambda * 
+              (dmultinom(values_vector_observed.to_tmb(),
+                         values_vector_expected.to_tmb(), true));
+            }
+            break;
+          default:
+            throw std::invalid_argument(
+                "Distribution type not recognized in evaluate() method.");
+        }
+        
+        for (size_t j = 0; j < values_vector_index.size(); j++) {
+          this->lpdf += this->lpdf_vec[values_vector_index[j]];
+        }
+      }
+#endif    
+      values_vector_observed.resize(0);
+      values_vector_expected.resize(0);
+      values_vector_uncertainty.resize(0);
+      values_vector_index.resize(0);
+      values_vector_lambda.resize(0);
+    }
+    
+    return (this->lpdf);
+  }
 };
 
 /** @brief Default id of the singleton distribution class

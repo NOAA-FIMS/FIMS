@@ -28,40 +28,91 @@ class DistributionsInterfaceBase : public FIMSRcppInterfaceBase {
   uint32_t id_m;
 
   /**
-   * @brief The type of density input. The options are prior, re, or data.
+   * @brief The total log probability density function value.
    */
-  SharedString input_type_m;
-
-  /**
-   * @brief The type of density input. The options are prior, re, or data.
-   */
-  SharedString distribution_type_m;
+  double lpdf_m = 0;
  
   /**
-   * @brief Vector that records the individual log probability function for each
-   * observation.
+   * @brief Vector that records the individual log probability function 
+   * values for each observation.
    */
-  RealVector lpdf_vec; /**< The vector*/
+  RealVector lpdf_vec_m;
 
   /**
-   * @brief Observed data.
+   * @brief The type of likelihood input. The options are DATA, RANDOM_EFFECT, 
+   * PRIOR, or PENALTY.
    */
-  ParameterVector observed_values;
-  /**
-   * @brief The expected values, which would be the mean of x for this
-   * distribution.
-   */
-  ParameterVector expected_values;
-  /**
-   * @brief The uncertainty values, which would be the log sd for a normal
-   * distribution.
-   */
-  ParameterVector uncertainty_values;
+  SharedString likelihood_type_m; //Also an enum class? Is this ok on R end??
 
   /**
-   * @brief The unique ID for the variable map that points to a fims::Vector.
+   * @brief The distribution function for the likelihood component. 
+   * The options are NORMAL, LOGNORMAL, or MULTINOMIAL.
    */
-  std::shared_ptr<std::vector<uint32_t>> key_m;
+  SharedString distribution_type_m; //Need to make this an enum class maybe??
+
+  /**
+   * @brief Fixed input values to calculate a likelihood of occurance for.
+   */
+  ParameterVector observed_values_m;
+  
+  /**
+   * @brief Key to point the observed value at a data source, parameter, 
+   * or derived model quantity.
+   */
+  ParameterVector observed_key_m;
+  
+  /**
+   * @brief Vector of values to specify a subset of the observed values or 
+   * pointed vector to use in the likelihood calculation.
+   */
+  ParameterVector observed_subvector_m;
+
+  /**
+   * @brief The expected values of the distribution used to calculate 
+   * likelihoods.
+   */
+  ParameterVector expected_values_m;
+  
+  /**
+   * @brief Key to point the expected value at a data source, parameter, 
+   * or derived model quantity.
+   */
+  ParameterVector expected_key_m;
+  
+  /**
+   * @brief Vector of values to specify a subset of the expected values or 
+   * pointed vector to use in the likelihood calculation.
+   */
+  ParameterVector expected_subvector_m;
+
+  /**
+   * @brief The uncertainty values of the distribution used to calculate 
+   * likelihoods.
+   */
+  ParameterVector uncertainty_values_m;
+  
+  /**
+   * @brief Key to point the uncertainty value at a data source, parameter, 
+   * or derived model quantity.
+   */
+  ParameterVector uncertainty_key_m;
+  
+  /**
+   * @brief Vector of values to specify a subset of the uncertainty values or 
+   * pointed vector to use in the likelihood calculation.
+   */
+  ParameterVector uncertainty_subvector_m;
+  
+  /**
+   * @brief Vector of values to weight the likelihood calculation results.
+   */
+  ParameterVector lambda_values_m;
+
+  /**
+   * @brief Dimensions of the value vectors used to subset the likelihood 
+   * calculations needed for multivariate distributions.
+   */
+  ParameterVector dims_m;
   
   /**
    * @brief The map associating the ID of the DistributionsInterfaceBase to the
@@ -71,10 +122,6 @@ class DistributionsInterfaceBase : public FIMSRcppInterfaceBase {
   static std::map<uint32_t, std::shared_ptr<DistributionsInterfaceBase>>
       live_objects;
 
-  /**
-   * @brief The log probability density function value.
-   */
-  double lpdf_value = 0;
 
   /**
    * @brief The constructor.

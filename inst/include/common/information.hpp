@@ -60,10 +60,10 @@ class Information {
 
   // data objects
   std::map<uint32_t, std::shared_ptr<fims_variable_object::VariableObject<Type>>>
-      data_objects; /**< map that holds data objects >*/
+      variable_objects; /**< map that holds data objects >*/
   typedef typename std::map<
-      uint32_t, std::shared_ptr<fims_data_object::DataObject<Type>>>::iterator
-      data_iterator; /**< iterator for the data objects */
+      uint32_t, std::shared_ptr<fims_variable_object::VariableObject<Type>>>::iterator
+      variable_iterator; /**< iterator for the variable objects */
 
   // life history modules
   std::map<uint32_t, std::shared_ptr<fims_popdy::RecruitmentBase<Type>>>

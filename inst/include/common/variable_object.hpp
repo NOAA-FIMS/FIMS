@@ -190,6 +190,6 @@ struct VariableObject : public fims_model_object::FIMSObject<Type> {
 template <typename Type>
 uint32_t DataObject<Type>::id_g = 0;
 
-}  // namespace fims_data_object
+}  // namespace fims_variable_object
 
 #endif
