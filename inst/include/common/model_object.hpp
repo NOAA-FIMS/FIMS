@@ -64,10 +64,9 @@ struct FIMSMemoryTracker {
    */
 
   void register_self(const char* type_name, uint32_t id) {
-  //  std::string key = demangle(type_name) + " [id=" + std::to_string(id) + "]";
-  //  active_objects.insert(key);
-  //  total_active_objects++;
-  //  tracker_key_ = key;  // store for destructor
+    //  std::string key = demangle(type_name) + " [id=" + std::to_string(id) +
+    //  "]"; active_objects.insert(key); total_active_objects++; tracker_key_ =
+    //  key;  // store for destructor
   }
 
   virtual ~FIMSMemoryTracker() {
