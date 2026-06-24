@@ -138,8 +138,7 @@ class Information {
                                 shared location in memory */
   typedef typename std::map<
       uint32_t,
-      std::shared_ptr<
-          fims_likelihood::LikelihoodComponentBase<Type>>>::iterator
+      std::shared_ptr<fims_likelihood::LikelihoodComponentBase<Type>>>::iterator
       likelihood_components_iterator;
   /**< iterator for likelihood objects>*/
 

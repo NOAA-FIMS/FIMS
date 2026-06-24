@@ -270,23 +270,19 @@ class CatchAtAgePopulationDerivedQuantitiesInterface {
     mortality_F.id_m = CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
     mortality_M.id_m = CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
     mortality_Z.id_m = CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
-    numbers_at_age.id_m =
-        CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
+    numbers_at_age.id_m = CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
     unfished_numbers_at_age.id_m =
         CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
     biomass.id_m = CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
-    spawning_biomass.id_m =
-        CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
-    unfished_biomass.id_m =
-        CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
+    spawning_biomass.id_m = CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
+    unfished_biomass.id_m = CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
     unfished_spawning_biomass.id_m =
         CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
     proportion_mature_at_age.id_m =
         CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
     expected_recruitment.id_m =
         CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
-    sum_selectivity.id_m =
-        CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
+    sum_selectivity.id_m = CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
   }
 
   /**
@@ -422,10 +418,8 @@ class CatchAtAgeFleetDerivedQuantitiesInterface {
         CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
     landings_numbers_at_length.id_m =
         CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
-    landings_weight.id_m =
-        CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
-    landings_numbers.id_m =
-        CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
+    landings_weight.id_m = CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
+    landings_numbers.id_m = CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
     landings_expected.id_m =
         CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
     log_landings_expected.id_m =
@@ -446,12 +440,9 @@ class CatchAtAgeFleetDerivedQuantitiesInterface {
     log_index_expected.id_m =
         CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
     catch_index.id_m = CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
-    expected_catch.id_m =
-        CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
-    expected_index.id_m =
-        CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
-    agecomp_expected.id_m =
-        CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
+    expected_catch.id_m = CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
+    expected_index.id_m = CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
+    agecomp_expected.id_m = CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
     lengthcomp_expected.id_m =
         CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
   }
@@ -585,8 +576,7 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
   typedef std::map<uint32_t, CatchAtAgeFleetDerivedQuantitiesInterface>
       FleetDerivedQuantitiesMap;
 
-  std::shared_ptr<PopulationDerivedQuantitiesMap>
-      population_derived_quantities;
+  std::shared_ptr<PopulationDerivedQuantitiesMap> population_derived_quantities;
   std::shared_ptr<FleetDerivedQuantitiesMap> fleet_derived_quantities;
 
   /**
@@ -640,8 +630,7 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
    */
   void InitializePopulationDerivedQuantities(uint32_t population_id,
                                              size_t n_years, size_t n_ages) {
-    (*population_derived_quantities)[population_id].Initialize(n_years,
-                                                               n_ages);
+    (*population_derived_quantities)[population_id].Initialize(n_years, n_ages);
   }
 
   /**
@@ -652,8 +641,8 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
    */
   CatchAtAgePopulationDerivedQuantitiesInterface *
   GetPopulationDerivedQuantities(uint32_t population_id) {
-    std::map<uint32_t, CatchAtAgePopulationDerivedQuantitiesInterface>::
-        iterator it = population_derived_quantities->find(population_id);
+    std::map<uint32_t, CatchAtAgePopulationDerivedQuantitiesInterface>::iterator
+        it = population_derived_quantities->find(population_id);
     if (it == population_derived_quantities->end()) {
       throw std::out_of_range(
           "CatchAtAgeInterface::GetPopulationDerivedQuantities: population_id "
@@ -1702,19 +1691,15 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
 
       derived_quantities["expected_catch"] =
           fims::Vector<Type>(fleet_interface->n_years.get());
-      derived_quantities_dim_info["expected_catch"] =
-          fims_popdy::DimensionInfo(
-              "expected_catch",
-              fims::Vector<int>{(fleet_interface->n_years.get())},
-              fims::Vector<std::string>{"n_years"});
+      derived_quantities_dim_info["expected_catch"] = fims_popdy::DimensionInfo(
+          "expected_catch", fims::Vector<int>{(fleet_interface->n_years.get())},
+          fims::Vector<std::string>{"n_years"});
 
       derived_quantities["expected_index"] =
           fims::Vector<Type>(fleet_interface->n_years.get());
-      derived_quantities_dim_info["expected_index"] =
-          fims_popdy::DimensionInfo(
-              "expected_index",
-              fims::Vector<int>{(fleet_interface->n_years.get())},
-              fims::Vector<std::string>{"n_years"});
+      derived_quantities_dim_info["expected_index"] = fims_popdy::DimensionInfo(
+          "expected_index", fims::Vector<int>{(fleet_interface->n_years.get())},
+          fims::Vector<std::string>{"n_years"});
 
       derived_quantities["agecomp_expected"] = fims::Vector<Type>(
           fleet_interface->n_years.get() * fleet_interface->n_ages.get());
