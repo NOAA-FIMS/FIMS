@@ -22,3 +22,4 @@ fims.log
 ^pkgdown$
 ^assets$
 setup_fims.sh
+^vignettes/fims-demo-surplus_production\.Rmd$
