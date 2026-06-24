@@ -181,6 +181,7 @@ inline const Type pow(const Type &x, const Type &y) {
 template <class Type>
 inline const Type lgamma(const Type &x) {
   // use std::lgamma for double type, look for TMB version of lgamma if AD type
+  using ::lgamma;
   using std::lgamma;
   return lgamma(x);
 }

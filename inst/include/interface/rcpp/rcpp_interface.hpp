@@ -14,6 +14,7 @@
 #include "rcpp_objects/rcpp_fleet.hpp"
 #include "rcpp_objects/rcpp_growth.hpp"
 #include "rcpp_objects/rcpp_interface_base.hpp"
+#include "rcpp_objects/rcpp_likelihood.hpp"
 #include "rcpp_objects/rcpp_maturity.hpp"
 #include "rcpp_objects/rcpp_models.hpp"
 #include "rcpp_objects/rcpp_natural_mortality.hpp"
@@ -248,6 +249,7 @@ void clear() {
   // Parameter and ParameterVector
   Parameter::id_g = 1;
   ParameterVector::id_g = 1;
+  RealVector::id_g = 1;
   // rcpp_data.hpp
   DataInterfaceBase::id_g = 1;
   DataInterfaceBase::live_objects.clear();
@@ -322,8 +324,19 @@ void clear() {
   DmultinomDistributionsInterface::id_g = 1;
   DmultinomDistributionsInterface::live_objects.clear();
 
+  // rcpp_likelihood.hpp
+  LikelihoodInterfaceBase::id_g = 1;
+  LikelihoodInterfaceBase::live_objects.clear();
+
+  NormalLikelihoodInterface::live_objects.clear();
+  LognormalLikelihoodInterface::live_objects.clear();
+  GammaLikelihoodInterface::live_objects.clear();
+  InvGammaLikelihoodInterface::live_objects.clear();
+  MultinomialLikelihoodInterface::live_objects.clear();
+
   FisheryModelInterfaceBase::id_g = 1;
   FisheryModelInterfaceBase::live_objects.clear();
+  CatchAtAgeDerivedQuantitiesIdAllocator::id_g = 1000000000;
 
   clear_internal<TMB_FIMS_REAL_TYPE>();
   clear_internal<TMBAD_FIMS_TYPE>();

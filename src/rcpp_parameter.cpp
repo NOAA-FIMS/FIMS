@@ -43,6 +43,7 @@ void register_vectors(Rcpp::Module& m) {
       .method("resize", &ParameterVector::resize)
       .method("set_values", &ParameterVector::set_values)
       .method("set_estimation_types", &ParameterVector::set_estimation_types)
+      .method("set_all_estimable", &ParameterVector::set_all_estimable)
       .method("fill", &ParameterVector::fill)
       .method("get_id", &ParameterVector::get_id);
 

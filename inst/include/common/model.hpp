@@ -78,7 +78,9 @@ class Model {  // may need singleton
 
     // Create vector for reporting out nll components
     fims::Vector<Type> nll_vec(
-        this->fims_information->density_components.size(), 0.0);
+        this->fims_information->density_components.size() +
+            this->fims_information->likelihood_components.size(),
+        0.0);
 
     for (m_it = this->fims_information->models_map.begin();
          m_it != this->fims_information->models_map.end(); ++m_it) {
@@ -160,11 +162,45 @@ class Model {  // may need singleton
         fims::to_string(n_data) +
         " data likelihoods is: " + fims::to_string(jnll));
 
+    size_t n_likelihoods = 0;
+    typename fims_info::Information<Type>::likelihood_components_iterator l_it;
+    for (l_it = this->fims_information->likelihood_components.begin();
+         l_it != this->fims_information->likelihood_components.end(); ++l_it) {
+      std::shared_ptr<fims_likelihood::LikelihoodComponentBase<Type>> l =
+          (*l_it).second;
+      if (l->use_expected_values_id) {
+        typename fims_info::Information<Type>::variable_map_iterator vmit =
+            this->fims_information->variable_map.find(l->expected_values_id);
+        if (vmit == this->fims_information->variable_map.end()) {
+          throw std::invalid_argument(
+              "Model::Evaluate: likelihood expected_values id was not found "
+              "in variable_map.");
+        }
+        l->SetExpected((*vmit).second);
+      }
+#ifdef TMB_MODEL
+      l->of = this->of;
+#endif
+      nll_vec[nll_vec_idx] = l->Evaluate();
+      jnll += nll_vec[nll_vec_idx];
+      n_likelihoods += 1;
+      nll_vec_idx += 1;
+    }
+
+    FIMS_INFO_LOG(
+        "Model: Finished evaluating likelihood components. The jnll after "
+        "evaluating " +
+        fims::to_string(n_likelihoods) +
+        " likelihood components is: " + fims::to_string(jnll));
+
     // report out nll components
 
 #ifdef TMB_MODEL
 
-    vector<Type> nll_components = nll_vec.to_tmb();
+    vector<Type> nll_components(nll_vec_idx);
+    for (int i = 0; i < nll_vec_idx; i++) {
+      nll_components(i) = nll_vec[i];
+    }
     FIMS_REPORT_F(nll_components, this->of);
     FIMS_REPORT_F(jnll, this->of);
 

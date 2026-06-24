@@ -103,6 +103,14 @@ The following {testthat} functions can be used at the beginning of a test file t
 - [`FIMS:::remove_test_data()`](https://noaa-fims.github.io/FIMS/reference/remove_test_data.html): Remove test data from `tests/testthat/fixtures` to run the tests from fresh if changes in the core code affect FIMS input or output.
 - You can interactively debug C++ code using `TMB::gdbsource()` in RStudio.
 
+### Likelihood Module Procedure
+
+- Add C++ unit tests for likelihood math in `tests/gtest/test_likelihood_functors.cpp` and register the executable in `tests/gtest/CMakeLists.txt`.
+- Add Rcpp module tests in `tests/testthat/test-rcpp-likelihood.R`. These tests should cover construction, `RealVector` field filling, linked inputs, and `evaluate()` values.
+- Run the C++ likelihood tests with `FIMS:::setup_and_run_gtest()` or, after CMake has already configured the build, run the `likelihood_functors` executable through `ctest`.
+- Run the Rcpp likelihood tests with `devtools::test(filter = "rcpp-likelihood")`.
+- Before adding model-level likelihood integration tests, confirm the target model writes the expected backend vector to `Information::variable_map` with the same frontend id used by the likelihood component.
+
 ## :bug: Debug tests
 
 ### C++

@@ -1,0 +1,257 @@
+---
+title: "Using the Likelihood Module"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Using the Likelihood Module}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# Overview
+
+The likelihood module provides explicit likelihood components that can be
+connected to data, model parameters, random effects, derived quantities, or
+penalty terms. It lives alongside the legacy distribution module, but uses a
+more direct object model for linking inputs and expected values.
+
+The available likelihood classes are:
+
+- `NormalLikelihood`
+- `LognormalLikelihood`
+- `GammaLikelihood`
+- `InvGammaLikelihood`
+- `MultinomialLikelihood`
+
+All likelihood classes inherit from `LikelihoodBase` and are exposed through
+the FIMS Rcpp module.
+
+# Setting Values
+
+The likelihood interface uses `RealVector` objects for fixed numeric values.
+Use whole-vector replacement to fill `RealVector` and `ParameterVector`
+objects from R.
+
+```{r vector-replacement, eval = FALSE}
+real_values <- methods::new(RealVector)
+real_values[] <- c(1, 2, 3)
+
+parameter_values <- methods::new(ParameterVector)
+parameter_values[] <- c(1, 2, 3)
+```
+
+# Direct Evaluation
+
+Likelihoods can be evaluated directly from R. Direct evaluation is useful for
+unit tests and for checking that a likelihood has been parameterized correctly
+before adding it to a full model.
+
+```{r direct-normal, eval = FALSE}
+library(FIMS)
+
+normal_likelihood <- methods::new(NormalLikelihood)
+
+normal_likelihood$observed_values[] <- c(1, 2, 3)
+normal_likelihood$expected_values[] <- c(1.1, 1.9, 3.2)
+normal_likelihood$log_sd[] <- log(0.5)
+
+normal_likelihood$evaluate()
+normal_likelihood$nll_components$toRVector()
+
+clear()
+```
+
+The normal likelihood evaluates the negative log likelihood equivalent to:
+
+```{r normal-equivalent, eval = FALSE}
+-sum(stats::dnorm(
+  x = c(1, 2, 3),
+  mean = c(1.1, 1.9, 3.2),
+  sd = exp(log(0.5)),
+  log = TRUE
+))
+```
+
+# Linking Inputs
+
+Likelihood objects can own their observed values directly, or they can link to
+another FIMS vector. Linked inputs are useful when the input is a model
+parameter, a random effect, or a derived quantity created by another module.
+
+Use `set_real_input()` for a `RealVector` input.
+
+```{r linked-real-input, eval = FALSE}
+input <- methods::new(RealVector)
+input[] <- c(0.1, -0.2, 0.3)
+
+penalty <- methods::new(NormalLikelihood)
+penalty$expected_values[] <- 0
+penalty$log_sd[] <- log(1)
+penalty$set_real_input(input, "penalty")
+```
+
+Use `set_parameter_input()` for a `ParameterVector` input. This is the usual
+pattern for priors and random effects.
+
+```{r linked-parameter-input, eval = FALSE}
+selectivity <- methods::new(LogisticSelectivity)
+selectivity$inflection_point[1]$value <- 1.75
+selectivity$inflection_point[1]$estimation_type$set("fixed_effects")
+
+prior <- methods::new(NormalLikelihood)
+prior$expected_values[] <- 1.75
+prior$log_sd[] <- log(3)
+prior$set_parameter_input(selectivity$inflection_point, "prior")
+```
+
+The role argument can be one of:
+
+- `"data"`
+- `"prior"`
+- `"random_effect"`, `"random_effects"`, or `"re"`
+- `"penalty"`
+
+# Linking Expected Values
+
+Expected values can also be owned by the likelihood or linked from another
+module. Linking expected values is important for catch-at-age models because
+expected landings, expected index values, and composition probabilities are
+usually derived quantities.
+
+Use `set_real_expected_input()` to link a `RealVector` expected value and
+`set_parameter_expected_input()` to link a `ParameterVector` expected value.
+
+```{r linked-expected-values, eval = FALSE}
+landings_likelihood <- methods::new(LognormalLikelihood)
+
+landings_likelihood$observed_values[] <- observed_landings
+landings_likelihood$log_sd[] <- log_landings_sd
+
+landings_likelihood$set_parameter_expected_input(
+  fishing_fleet$log_landings_expected
+)
+```
+
+For multinomial likelihoods, `observed_values` and `expected_values` are stored
+as flat vectors, and `dims` stores the row and column dimensions.
+
+```{r multinomial, eval = FALSE}
+agecomp_likelihood <- methods::new(MultinomialLikelihood)
+
+agecomp_likelihood$observed_values[] <- agecomp_counts
+agecomp_likelihood$dims[] <- c(n_years, n_ages)
+
+agecomp_likelihood$set_parameter_expected_input(
+  fishing_fleet$agecomp_proportion
+)
+```
+
+# Derived Quantity Example
+
+In a catch-at-age model, many likelihood expected values are not fixed inputs.
+They are derived during model evaluation after the population and fleet modules
+have been linked. The Rcpp fleet object exposes handles to those derived
+quantities, and `CreateTMBModel()` connects those handles to the backend
+derived vectors through `Information::variable_map`.
+
+For example, the expected log landings for a fishing fleet are calculated by
+the catch-at-age model and stored in the fleet derived quantity
+`log_landings_expected`. The likelihood owns the observed landings and
+observation error, but links its expected values to that derived quantity.
+
+```{r derived-log-landings, eval = FALSE}
+fishing_fleet <- methods::new(Fleet)
+fishing_fleet$n_years$set(n_years)
+fishing_fleet$n_ages$set(n_ages)
+fishing_fleet$SetSelectivityID(fishing_selectivity$get_id())
+fishing_fleet$SetObservedLandingsDataID(fishing_landings$get_id())
+
+landings_likelihood <- methods::new(LognormalLikelihood)
+landings_likelihood$observed_values[] <- observed_landings
+landings_likelihood$log_sd[] <- log_landings_sd
+
+landings_likelihood$set_parameter_expected_input(
+  fishing_fleet$log_landings_expected
+)
+```
+
+The same pattern works for composition likelihoods. Here the expected
+age-composition probabilities are derived by the model, while observed counts
+and dimensions are owned by the likelihood.
+
+```{r derived-agecomp, eval = FALSE}
+agecomp_likelihood <- methods::new(MultinomialLikelihood)
+
+agecomp_likelihood$observed_values[] <- agecomp_counts
+agecomp_likelihood$dims[] <- c(n_years, n_ages)
+
+agecomp_likelihood$set_parameter_expected_input(
+  fishing_fleet$agecomp_proportion
+)
+```
+
+The likelihood can be created before the backend derived vector exists. It
+stores the frontend id from `fishing_fleet$log_landings_expected` or
+`fishing_fleet$agecomp_proportion`; then `CreateTMBModel()` initializes the
+derived quantities and resolves that id to the backend vector.
+
+# Priors And Random Effects
+
+Priors and random effects are represented by ordinary likelihood objects with
+different roles. The role tells FIMS how the component should be reported and
+how its input is interpreted by the backend model.
+
+```{r recruitment-random-effects, eval = FALSE}
+recruitment_likelihood <- methods::new(NormalLikelihood)
+
+recruitment_likelihood$expected_values[] <- 0
+recruitment_likelihood$log_sd[] <- log(recruitment_sd)
+
+recruitment_likelihood$set_parameter_input(
+  recruitment$log_devs,
+  "random_effects"
+)
+```
+
+This pattern keeps priors, random effects, data likelihoods, and penalties in
+one common system. It also avoids duplicating distribution-specific linking
+code across model modules.
+
+# Model Integration
+
+When `CreateTMBModel()` is called, each live likelihood object is added to the
+backend model. Linked frontend vector ids are resolved through the backend
+`Information::variable_map`.
+
+The basic workflow is:
+
+1. Create the model modules and set their parameter values.
+2. Create likelihood objects and link their inputs or expected values.
+3. Call `CreateTMBModel()`.
+4. Use `CreateTMBModelParameterList()` and `CreateTMBModelRandomEffects()` to
+   build the inputs for `TMB::MakeADFun()`.
+
+```{r tmb-workflow, eval = FALSE}
+CreateTMBModel()
+
+parameters <- CreateTMBModelParameterList()
+random_effects <- CreateTMBModelRandomEffects()
+
+obj <- TMB::MakeADFun(
+  data = list(),
+  parameters = parameters,
+  DLL = "FIMS",
+  random = random_effects
+)
+```
+
+Likelihood components are evaluated after the legacy distribution components
+and contribute to the model's joint negative log likelihood. Their
+observation-level contributions are stored in `nll_components`, which can be
+used in tests and reports.

@@ -9,7 +9,10 @@
 #ifndef FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_MODELS_HPP
 #define FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_MODELS_HPP
 
+#include <map>
+#include <memory>
 #include <set>
+#include <stdexcept>
 #include "common/def.hpp"
 #include "rcpp_interface_base.hpp"
 #include "../../../models/fisheries_models.hpp"
@@ -210,15 +213,390 @@ class FisheryModelInterfaceBase : public FIMSRcppInterfaceBase {
 };
 
 /**
+ * @brief ID allocator for Rcpp derived quantities used in variable_map links.
+ *
+ * @details Derived quantity IDs are intentionally separated from
+ * ParameterVector IDs so linking optional derived quantities does not overwrite
+ * model parameter links.
+ */
+class CatchAtAgeDerivedQuantitiesIdAllocator {
+ public:
+  inline static uint32_t id_g = 1000000000;
+
+  /**
+   * @brief Get the next derived quantity ID.
+   *
+   * @return uint32_t
+   */
+  static uint32_t GetNextId() { return id_g++; }
+};
+
+/**
+ * @brief Rcpp interface for catch-at-age population derived quantities.
+ *
+ * @details This interface avoids keyed containers so derived quantities can be
+ * exposed to R as explicit RealVector members.
+ */
+class CatchAtAgePopulationDerivedQuantitiesInterface {
+ public:
+  RealVector total_landings_weight;
+  RealVector total_landings_numbers;
+  RealVector mortality_F;
+  RealVector mortality_M;
+  RealVector mortality_Z;
+  RealVector numbers_at_age;
+  RealVector unfished_numbers_at_age;
+  RealVector biomass;
+  RealVector spawning_biomass;
+  RealVector unfished_biomass;
+  RealVector unfished_spawning_biomass;
+  RealVector proportion_mature_at_age;
+  RealVector expected_recruitment;
+  RealVector sum_selectivity;
+
+  /**
+   * @brief Constructor.
+   */
+  CatchAtAgePopulationDerivedQuantitiesInterface() { AssignVariableMapIds(); }
+
+  /**
+   * @brief Assign IDs that can be used safely in Information::variable_map.
+   */
+  void AssignVariableMapIds() {
+    total_landings_weight.id_m =
+        CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
+    total_landings_numbers.id_m =
+        CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
+    mortality_F.id_m = CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
+    mortality_M.id_m = CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
+    mortality_Z.id_m = CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
+    numbers_at_age.id_m =
+        CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
+    unfished_numbers_at_age.id_m =
+        CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
+    biomass.id_m = CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
+    spawning_biomass.id_m =
+        CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
+    unfished_biomass.id_m =
+        CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
+    unfished_spawning_biomass.id_m =
+        CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
+    proportion_mature_at_age.id_m =
+        CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
+    expected_recruitment.id_m =
+        CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
+    sum_selectivity.id_m =
+        CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
+  }
+
+  /**
+   * @brief Resize all population derived quantities.
+   *
+   * @param n_years Number of model years.
+   * @param n_ages Number of ages.
+   */
+  void Initialize(size_t n_years, size_t n_ages) {
+    total_landings_weight.resize(n_years);
+    total_landings_numbers.resize(n_years);
+    mortality_F.resize(n_years * n_ages);
+    mortality_M.resize(n_years * n_ages);
+    mortality_Z.resize(n_years * n_ages);
+    numbers_at_age.resize((n_years + 1) * n_ages);
+    unfished_numbers_at_age.resize((n_years + 1) * n_ages);
+    biomass.resize(n_years + 1);
+    spawning_biomass.resize(n_years + 1);
+    unfished_biomass.resize(n_years + 1);
+    unfished_spawning_biomass.resize(n_years + 1);
+    proportion_mature_at_age.resize((n_years + 1) * n_ages);
+    expected_recruitment.resize(n_years + 1);
+    sum_selectivity.resize(n_years * n_ages);
+  }
+
+  /**
+   * @brief Reset all population derived quantities to a value.
+   *
+   * @param value Value to assign to all entries.
+   */
+  void Fill(double value = 0.0) {
+    total_landings_weight.fill(value);
+    total_landings_numbers.fill(value);
+    mortality_F.fill(value);
+    mortality_M.fill(value);
+    mortality_Z.fill(value);
+    numbers_at_age.fill(value);
+    unfished_numbers_at_age.fill(value);
+    biomass.fill(value);
+    spawning_biomass.fill(value);
+    unfished_biomass.fill(value);
+    unfished_spawning_biomass.fill(value);
+    proportion_mature_at_age.fill(value);
+    expected_recruitment.fill(value);
+    sum_selectivity.fill(value);
+  }
+
+#ifdef TMB_MODEL
+  /**
+   * @brief Link front-end RealVector IDs to backend derived quantity vectors.
+   *
+   * @param derived_quantities Backend population derived quantities.
+   */
+  template <typename Type>
+  void LinkVariableMap(
+      std::map<std::string, fims::Vector<Type>> &derived_quantities) {
+    std::shared_ptr<fims_info::Information<Type>> info =
+        fims_info::Information<Type>::GetInstance();
+
+    info->variable_map[total_landings_weight.id_m] =
+        &(derived_quantities.at("total_landings_weight"));
+    info->variable_map[total_landings_numbers.id_m] =
+        &(derived_quantities.at("total_landings_numbers"));
+    info->variable_map[mortality_F.id_m] =
+        &(derived_quantities.at("mortality_F"));
+    info->variable_map[mortality_M.id_m] =
+        &(derived_quantities.at("mortality_M"));
+    info->variable_map[mortality_Z.id_m] =
+        &(derived_quantities.at("mortality_Z"));
+    info->variable_map[numbers_at_age.id_m] =
+        &(derived_quantities.at("numbers_at_age"));
+    info->variable_map[unfished_numbers_at_age.id_m] =
+        &(derived_quantities.at("unfished_numbers_at_age"));
+    info->variable_map[biomass.id_m] = &(derived_quantities.at("biomass"));
+    info->variable_map[spawning_biomass.id_m] =
+        &(derived_quantities.at("spawning_biomass"));
+    info->variable_map[unfished_biomass.id_m] =
+        &(derived_quantities.at("unfished_biomass"));
+    info->variable_map[unfished_spawning_biomass.id_m] =
+        &(derived_quantities.at("unfished_spawning_biomass"));
+    info->variable_map[proportion_mature_at_age.id_m] =
+        &(derived_quantities.at("proportion_mature_at_age"));
+    info->variable_map[expected_recruitment.id_m] =
+        &(derived_quantities.at("expected_recruitment"));
+    info->variable_map[sum_selectivity.id_m] =
+        &(derived_quantities.at("sum_selectivity"));
+  }
+#endif
+};
+
+/**
+ * @brief Rcpp interface for catch-at-age fleet derived quantities.
+ *
+ * @details This interface avoids keyed containers so derived quantities can be
+ * exposed to R as explicit RealVector members.
+ */
+class CatchAtAgeFleetDerivedQuantitiesInterface {
+ public:
+  RealVector landings_numbers_at_age;
+  RealVector landings_weight_at_age;
+  RealVector landings_numbers_at_length;
+  RealVector landings_weight;
+  RealVector landings_numbers;
+  RealVector landings_expected;
+  RealVector log_landings_expected;
+  RealVector agecomp_proportion;
+  RealVector lengthcomp_proportion;
+  RealVector index_numbers_at_age;
+  RealVector index_weight_at_age;
+  RealVector index_numbers_at_length;
+  RealVector index_weight;
+  RealVector index_numbers;
+  RealVector index_expected;
+  RealVector log_index_expected;
+  RealVector catch_index;
+  RealVector expected_catch;
+  RealVector expected_index;
+  RealVector agecomp_expected;
+  RealVector lengthcomp_expected;
+
+  /**
+   * @brief Constructor.
+   */
+  CatchAtAgeFleetDerivedQuantitiesInterface() { AssignVariableMapIds(); }
+
+  /**
+   * @brief Assign IDs that can be used safely in Information::variable_map.
+   */
+  void AssignVariableMapIds() {
+    landings_numbers_at_age.id_m =
+        CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
+    landings_weight_at_age.id_m =
+        CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
+    landings_numbers_at_length.id_m =
+        CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
+    landings_weight.id_m =
+        CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
+    landings_numbers.id_m =
+        CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
+    landings_expected.id_m =
+        CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
+    log_landings_expected.id_m =
+        CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
+    agecomp_proportion.id_m =
+        CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
+    lengthcomp_proportion.id_m =
+        CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
+    index_numbers_at_age.id_m =
+        CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
+    index_weight_at_age.id_m =
+        CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
+    index_numbers_at_length.id_m =
+        CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
+    index_weight.id_m = CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
+    index_numbers.id_m = CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
+    index_expected.id_m = CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
+    log_index_expected.id_m =
+        CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
+    catch_index.id_m = CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
+    expected_catch.id_m =
+        CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
+    expected_index.id_m =
+        CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
+    agecomp_expected.id_m =
+        CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
+    lengthcomp_expected.id_m =
+        CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
+  }
+
+  /**
+   * @brief Resize all fleet derived quantities.
+   *
+   * @param n_years Number of model years.
+   * @param n_ages Number of ages.
+   * @param n_lengths Number of lengths.
+   */
+  void Initialize(size_t n_years, size_t n_ages, size_t n_lengths) {
+    landings_numbers_at_age.resize(n_years * n_ages);
+    landings_weight_at_age.resize(n_years * n_ages);
+    landings_numbers_at_length.resize(n_years * n_lengths);
+    landings_weight.resize(n_years);
+    landings_numbers.resize(n_years);
+    landings_expected.resize(n_years);
+    log_landings_expected.resize(n_years);
+    agecomp_proportion.resize(n_years * n_ages);
+    lengthcomp_proportion.resize(n_years * n_lengths);
+    index_numbers_at_age.resize(n_years * n_ages);
+    index_weight_at_age.resize(n_years * n_ages);
+    index_numbers_at_length.resize(n_years * n_lengths);
+    index_weight.resize(n_years);
+    index_numbers.resize(n_years);
+    index_expected.resize(n_years);
+    log_index_expected.resize(n_years);
+    catch_index.resize(n_years);
+    expected_catch.resize(n_years);
+    expected_index.resize(n_years);
+    agecomp_expected.resize(n_years * n_ages);
+    lengthcomp_expected.resize(n_years * n_lengths);
+  }
+
+  /**
+   * @brief Reset all fleet derived quantities to a value.
+   *
+   * @param value Value to assign to all entries.
+   */
+  void Fill(double value = 0.0) {
+    landings_numbers_at_age.fill(value);
+    landings_weight_at_age.fill(value);
+    landings_numbers_at_length.fill(value);
+    landings_weight.fill(value);
+    landings_numbers.fill(value);
+    landings_expected.fill(value);
+    log_landings_expected.fill(value);
+    agecomp_proportion.fill(value);
+    lengthcomp_proportion.fill(value);
+    index_numbers_at_age.fill(value);
+    index_weight_at_age.fill(value);
+    index_numbers_at_length.fill(value);
+    index_weight.fill(value);
+    index_numbers.fill(value);
+    index_expected.fill(value);
+    log_index_expected.fill(value);
+    catch_index.fill(value);
+    expected_catch.fill(value);
+    expected_index.fill(value);
+    agecomp_expected.fill(value);
+    lengthcomp_expected.fill(value);
+  }
+
+#ifdef TMB_MODEL
+  /**
+   * @brief Link front-end RealVector IDs to backend derived quantity vectors.
+   *
+   * @param derived_quantities Backend fleet derived quantities.
+   */
+  template <typename Type>
+  void LinkVariableMap(
+      std::map<std::string, fims::Vector<Type>> &derived_quantities) {
+    std::shared_ptr<fims_info::Information<Type>> info =
+        fims_info::Information<Type>::GetInstance();
+
+    info->variable_map[landings_numbers_at_age.id_m] =
+        &(derived_quantities.at("landings_numbers_at_age"));
+    info->variable_map[landings_weight_at_age.id_m] =
+        &(derived_quantities.at("landings_weight_at_age"));
+    info->variable_map[landings_numbers_at_length.id_m] =
+        &(derived_quantities.at("landings_numbers_at_length"));
+    info->variable_map[landings_weight.id_m] =
+        &(derived_quantities.at("landings_weight"));
+    info->variable_map[landings_numbers.id_m] =
+        &(derived_quantities.at("landings_numbers"));
+    info->variable_map[landings_expected.id_m] =
+        &(derived_quantities.at("landings_expected"));
+    info->variable_map[log_landings_expected.id_m] =
+        &(derived_quantities.at("log_landings_expected"));
+    info->variable_map[agecomp_proportion.id_m] =
+        &(derived_quantities.at("agecomp_proportion"));
+    info->variable_map[lengthcomp_proportion.id_m] =
+        &(derived_quantities.at("lengthcomp_proportion"));
+    info->variable_map[index_numbers_at_age.id_m] =
+        &(derived_quantities.at("index_numbers_at_age"));
+    info->variable_map[index_weight_at_age.id_m] =
+        &(derived_quantities.at("index_weight_at_age"));
+    info->variable_map[index_numbers_at_length.id_m] =
+        &(derived_quantities.at("index_numbers_at_length"));
+    info->variable_map[index_weight.id_m] =
+        &(derived_quantities.at("index_weight"));
+    info->variable_map[index_numbers.id_m] =
+        &(derived_quantities.at("index_numbers"));
+    info->variable_map[index_expected.id_m] =
+        &(derived_quantities.at("index_expected"));
+    info->variable_map[log_index_expected.id_m] =
+        &(derived_quantities.at("log_index_expected"));
+    info->variable_map[catch_index.id_m] =
+        &(derived_quantities.at("catch_index"));
+    info->variable_map[expected_catch.id_m] =
+        &(derived_quantities.at("expected_catch"));
+    info->variable_map[expected_index.id_m] =
+        &(derived_quantities.at("expected_index"));
+    info->variable_map[agecomp_expected.id_m] =
+        &(derived_quantities.at("agecomp_expected"));
+    info->variable_map[lengthcomp_expected.id_m] =
+        &(derived_quantities.at("lengthcomp_expected"));
+  }
+#endif
+};
+
+/**
  * @brief The CatchAtAgeInterface class is used to interface with the
  * CatchAtAge model. It inherits from the FisheryModelInterfaceBase class.
  */
 class CatchAtAgeInterface : public FisheryModelInterfaceBase {
  public:
+  typedef std::map<uint32_t, CatchAtAgePopulationDerivedQuantitiesInterface>
+      PopulationDerivedQuantitiesMap;
+  typedef std::map<uint32_t, CatchAtAgeFleetDerivedQuantitiesInterface>
+      FleetDerivedQuantitiesMap;
+
+  std::shared_ptr<PopulationDerivedQuantitiesMap>
+      population_derived_quantities;
+  std::shared_ptr<FleetDerivedQuantitiesMap> fleet_derived_quantities;
+
   /**
    * @brief The constructor.
    */
   CatchAtAgeInterface() : FisheryModelInterfaceBase() {
+    this->population_derived_quantities =
+        std::make_shared<PopulationDerivedQuantitiesMap>();
+    this->fleet_derived_quantities =
+        std::make_shared<FleetDerivedQuantitiesMap>();
     std::shared_ptr<CatchAtAgeInterface> caa =
         std::make_shared<CatchAtAgeInterface>(*this);
     FIMSRcppInterfaceBase::fims_interface_objects.push_back(caa);
@@ -231,13 +609,16 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
    * @param other
    */
   CatchAtAgeInterface(const CatchAtAgeInterface &other)
-      : FisheryModelInterfaceBase(other) {}
+      : FisheryModelInterfaceBase(other),
+        population_derived_quantities(other.population_derived_quantities),
+        fleet_derived_quantities(other.fleet_derived_quantities) {}
 
   /**
    * Method to add a population id to the set of population ids.
    */
   void AddPopulation(uint32_t id) {
     this->population_ids->insert(id);
+    (*this->population_derived_quantities)[id];
 
     std::map<uint32_t, std::shared_ptr<PopulationInterfaceBase>>::iterator pit;
     pit = PopulationInterfaceBase::live_objects.find(id);
@@ -248,6 +629,69 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
       FIMS_ERROR_LOG("Population with id " + fims::to_string(id) +
                      " not found.");
     }
+  }
+
+  /**
+   * @brief Initialize Rcpp population derived quantities.
+   *
+   * @param population_id The population ID.
+   * @param n_years Number of model years.
+   * @param n_ages Number of ages.
+   */
+  void InitializePopulationDerivedQuantities(uint32_t population_id,
+                                             size_t n_years, size_t n_ages) {
+    (*population_derived_quantities)[population_id].Initialize(n_years,
+                                                               n_ages);
+  }
+
+  /**
+   * @brief Get Rcpp population derived quantities for a population ID.
+   *
+   * @param population_id The population ID.
+   * @return CatchAtAgePopulationDerivedQuantitiesInterface*
+   */
+  CatchAtAgePopulationDerivedQuantitiesInterface *
+  GetPopulationDerivedQuantities(uint32_t population_id) {
+    std::map<uint32_t, CatchAtAgePopulationDerivedQuantitiesInterface>::
+        iterator it = population_derived_quantities->find(population_id);
+    if (it == population_derived_quantities->end()) {
+      throw std::out_of_range(
+          "CatchAtAgeInterface::GetPopulationDerivedQuantities: population_id "
+          "not found");
+    }
+    return &(it->second);
+  }
+
+  /**
+   * @brief Initialize Rcpp fleet derived quantities.
+   *
+   * @param fleet_id The fleet ID.
+   * @param n_years Number of model years.
+   * @param n_ages Number of ages.
+   * @param n_lengths Number of lengths.
+   */
+  void InitializeFleetDerivedQuantities(uint32_t fleet_id, size_t n_years,
+                                        size_t n_ages, size_t n_lengths) {
+    (*fleet_derived_quantities)[fleet_id].Initialize(n_years, n_ages,
+                                                     n_lengths);
+  }
+
+  /**
+   * @brief Get Rcpp fleet derived quantities for a fleet ID.
+   *
+   * @param fleet_id The fleet ID.
+   * @return CatchAtAgeFleetDerivedQuantitiesInterface*
+   */
+  CatchAtAgeFleetDerivedQuantitiesInterface *GetFleetDerivedQuantities(
+      uint32_t fleet_id) {
+    std::map<uint32_t, CatchAtAgeFleetDerivedQuantitiesInterface>::iterator it =
+        fleet_derived_quantities->find(fleet_id);
+    if (it == fleet_derived_quantities->end()) {
+      throw std::out_of_range(
+          "CatchAtAgeInterface::GetFleetDerivedQuantities: fleet_id not "
+          "found");
+    }
+    return &(it->second);
   }
 
   /**
@@ -1087,7 +1531,8 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
                                 population->n_ages.get()},
               fims::Vector<std::string>{"n_years", "n_ages"});
 
-      // replace elements in the variable map
+      (*this->population_derived_quantities)[population->id].LinkVariableMap(
+          derived_quantities);
 
       for (fleet_ids_iterator fit = population->fleet_ids->begin();
            fit != population->fleet_ids->end(); ++fit) {
@@ -1255,6 +1700,22 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
           "catch_index", fims::Vector<int>{(fleet_interface->n_years.get())},
           fims::Vector<std::string>{"n_years"});
 
+      derived_quantities["expected_catch"] =
+          fims::Vector<Type>(fleet_interface->n_years.get());
+      derived_quantities_dim_info["expected_catch"] =
+          fims_popdy::DimensionInfo(
+              "expected_catch",
+              fims::Vector<int>{(fleet_interface->n_years.get())},
+              fims::Vector<std::string>{"n_years"});
+
+      derived_quantities["expected_index"] =
+          fims::Vector<Type>(fleet_interface->n_years.get());
+      derived_quantities_dim_info["expected_index"] =
+          fims_popdy::DimensionInfo(
+              "expected_index",
+              fims::Vector<int>{(fleet_interface->n_years.get())},
+              fims::Vector<std::string>{"n_years"});
+
       derived_quantities["agecomp_expected"] = fims::Vector<Type>(
           fleet_interface->n_years.get() * fleet_interface->n_ages.get());
       derived_quantities_dim_info["agecomp_expected"] =
@@ -1272,6 +1733,9 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
               fims::Vector<int>{(fleet_interface->n_years.get()),
                                 (fleet_interface->n_lengths.get())},
               fims::Vector<std::string>{"n_years", "n_lengths"});
+
+      (*this->fleet_derived_quantities)[fleet_interface->id].LinkVariableMap(
+          derived_quantities);
 
       // replace elements in the variable map
       info->variable_map[fleet_interface->log_landings_expected.id_m] =
