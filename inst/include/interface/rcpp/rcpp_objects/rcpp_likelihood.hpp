@@ -276,6 +276,10 @@ class LikelihoodInterfaceBase : public FIMSRcppInterfaceBase {
   RealVector expected_real_input;
   ParameterVector parameter_input;
   ParameterVector expected_parameter_input;
+  RealVector log_sd;
+  RealVector log_shape;
+  RealVector log_scale;
+  RealVector dims;
   RealVector nll_components;
   SharedString role_m = SharedString("data");
   SharedString input_source_m = SharedString("observed");
@@ -302,6 +306,10 @@ class LikelihoodInterfaceBase : public FIMSRcppInterfaceBase {
         expected_real_input(other.expected_real_input),
         parameter_input(other.parameter_input),
         expected_parameter_input(other.expected_parameter_input),
+        log_sd(other.log_sd),
+        log_shape(other.log_shape),
+        log_scale(other.log_scale),
+        dims(other.dims),
         nll_components(other.nll_components),
         role_m(other.role_m),
         input_source_m(other.input_source_m),
@@ -402,7 +410,6 @@ class LikelihoodInterfaceBase : public FIMSRcppInterfaceBase {
 class NormalLikelihoodInterface : public LikelihoodInterfaceBase {
  public:
   static std::vector<std::shared_ptr<NormalLikelihoodInterface>> live_objects;
-  RealVector log_sd;
 
   NormalLikelihoodInterface() : LikelihoodInterfaceBase() {
     std::shared_ptr<NormalLikelihoodInterface> object =
@@ -413,7 +420,7 @@ class NormalLikelihoodInterface : public LikelihoodInterfaceBase {
   }
 
   NormalLikelihoodInterface(const NormalLikelihoodInterface& other)
-      : LikelihoodInterfaceBase(other), log_sd(other.log_sd) {}
+      : LikelihoodInterfaceBase(other) {}
 
   virtual ~NormalLikelihoodInterface() {}
 
@@ -452,7 +459,6 @@ class LognormalLikelihoodInterface : public LikelihoodInterfaceBase {
  public:
   static std::vector<std::shared_ptr<LognormalLikelihoodInterface>>
       live_objects;
-  RealVector log_sd;
 
   LognormalLikelihoodInterface() : LikelihoodInterfaceBase() {
     std::shared_ptr<LognormalLikelihoodInterface> object =
@@ -463,7 +469,7 @@ class LognormalLikelihoodInterface : public LikelihoodInterfaceBase {
   }
 
   LognormalLikelihoodInterface(const LognormalLikelihoodInterface& other)
-      : LikelihoodInterfaceBase(other), log_sd(other.log_sd) {}
+      : LikelihoodInterfaceBase(other) {}
 
   virtual ~LognormalLikelihoodInterface() {}
 
@@ -501,7 +507,6 @@ class LognormalLikelihoodInterface : public LikelihoodInterfaceBase {
 class GammaLikelihoodInterface : public LikelihoodInterfaceBase {
  public:
   static std::vector<std::shared_ptr<GammaLikelihoodInterface>> live_objects;
-  RealVector log_sd;
 
   GammaLikelihoodInterface() : LikelihoodInterfaceBase() {
     std::shared_ptr<GammaLikelihoodInterface> object =
@@ -512,7 +517,7 @@ class GammaLikelihoodInterface : public LikelihoodInterfaceBase {
   }
 
   GammaLikelihoodInterface(const GammaLikelihoodInterface& other)
-      : LikelihoodInterfaceBase(other), log_sd(other.log_sd) {}
+      : LikelihoodInterfaceBase(other) {}
 
   virtual ~GammaLikelihoodInterface() {}
 
@@ -551,8 +556,6 @@ class InvGammaLikelihoodInterface : public LikelihoodInterfaceBase {
  public:
   static std::vector<std::shared_ptr<InvGammaLikelihoodInterface>>
       live_objects;
-  RealVector log_shape;
-  RealVector log_scale;
 
   InvGammaLikelihoodInterface() : LikelihoodInterfaceBase() {
     std::shared_ptr<InvGammaLikelihoodInterface> object =
@@ -563,9 +566,7 @@ class InvGammaLikelihoodInterface : public LikelihoodInterfaceBase {
   }
 
   InvGammaLikelihoodInterface(const InvGammaLikelihoodInterface& other)
-      : LikelihoodInterfaceBase(other),
-        log_shape(other.log_shape),
-        log_scale(other.log_scale) {}
+      : LikelihoodInterfaceBase(other) {}
 
   virtual ~InvGammaLikelihoodInterface() {}
 
@@ -606,7 +607,6 @@ class MultinomialLikelihoodInterface : public LikelihoodInterfaceBase {
  public:
   static std::vector<std::shared_ptr<MultinomialLikelihoodInterface>>
       live_objects;
-  RealVector dims;
 
   MultinomialLikelihoodInterface() : LikelihoodInterfaceBase() {
     std::shared_ptr<MultinomialLikelihoodInterface> object =
@@ -617,7 +617,7 @@ class MultinomialLikelihoodInterface : public LikelihoodInterfaceBase {
   }
 
   MultinomialLikelihoodInterface(const MultinomialLikelihoodInterface& other)
-      : LikelihoodInterfaceBase(other), dims(other.dims) {}
+      : LikelihoodInterfaceBase(other) {}
 
   virtual ~MultinomialLikelihoodInterface() {}
 
