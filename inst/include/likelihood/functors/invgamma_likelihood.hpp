@@ -44,19 +44,17 @@ struct InvGammaLikelihood : public LikelihoodComponentBase<Type> {
       }
       Type shape = fims_math::exp(GetLogShape(i));
       Type scale = fims_math::exp(GetLogScale(i));
-      Type log_density = -shape * fims_math::log(scale) -
-                         fims_math::lgamma(shape) -
-                         (shape + static_cast<Type>(1.0)) *
-                             fims_math::log(input) -
-                         static_cast<Type>(1.0) / (scale * input);
+      Type log_density =
+          -shape * fims_math::log(scale) - fims_math::lgamma(shape) -
+          (shape + static_cast<Type>(1.0)) * fims_math::log(input) -
+          static_cast<Type>(1.0) / (scale * input);
       this->nll_components[i] = -log_density;
       this->nll += this->nll_components[i];
 #ifdef TMB_MODEL
       if (this->simulate_flag) {
         FIMS_SIMULATE_F(this->of) {
-          this->GetInput(i) =
-              static_cast<Type>(1.0) /
-              rgamma(shape, static_cast<Type>(1.0) / scale);
+          this->GetInput(i) = static_cast<Type>(1.0) /
+                              rgamma(shape, static_cast<Type>(1.0) / scale);
         }
       }
 #endif

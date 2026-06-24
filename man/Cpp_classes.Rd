@@ -13,13 +13,18 @@
 \alias{DoubleLogisticSelectivity}
 \alias{EWAAGrowth}
 \alias{Fleet}
+\alias{GammaLikelihood}
 \alias{Index}
+\alias{InvGammaLikelihood}
 \alias{Landings}
 \alias{LengthComp}
 \alias{LogDevsRecruitmentProcess}
+\alias{LognormalLikelihood}
 \alias{LogRRecruitmentProcess}
 \alias{LogisticMaturity}
 \alias{LogisticSelectivity}
+\alias{MultinomialLikelihood}
+\alias{NormalLikelihood}
 \alias{Parameter}
 \alias{ParameterVector}
 \alias{Population}
@@ -46,13 +51,18 @@ docs.
 \item \href{https://noaa-fims.github.io/FIMS/doxygen/classDoubleLogisticSelectivityInterface.html}{DoubleLogisticSelectivity}
 \item \href{https://noaa-fims.github.io/FIMS/doxygen/classEWAAGrowthInterface.html}{EWAAGrowth}
 \item \href{https://noaa-fims.github.io/FIMS/doxygen/classFleetInterface.html}{Fleet}
+\item \href{https://noaa-fims.github.io/FIMS/doxygen/classGammaLikelihoodInterface.html}{GammaLikelihood}
 \item \href{https://noaa-fims.github.io/FIMS/doxygen/classIndexDataInterface.html}{Index}
+\item \href{https://noaa-fims.github.io/FIMS/doxygen/classInvGammaLikelihoodInterface.html}{InvGammaLikelihood}
 \item \href{https://noaa-fims.github.io/FIMS/doxygen/classLandingsDataInterface.html}{Landings}
 \item \href{https://noaa-fims.github.io/FIMS/doxygen/classLengthCompDataInterface.html}{LengthComp}
 \item \href{https://noaa-fims.github.io/FIMS/doxygen/classLogDevsRecruitmentInterface.html}{LogDevsRecruitmentProcess}
+\item \href{https://noaa-fims.github.io/FIMS/doxygen/classLognormalLikelihoodInterface.html}{LognormalLikelihood}
 \item \href{https://noaa-fims.github.io/FIMS/doxygen/classLogRRecruitmentInterface.html}{LogRRecruitmentProcess}
 \item \href{https://noaa-fims.github.io/FIMS/doxygen/classLogisticMaturityInterface.html}{LogisticMaturity}
 \item \href{https://noaa-fims.github.io/FIMS/doxygen/classLogisticSelectivityInterface.html}{LogisticSelectivity}
+\item \href{https://noaa-fims.github.io/FIMS/doxygen/classMultinomialLikelihoodInterface.html}{MultinomialLikelihood}
+\item \href{https://noaa-fims.github.io/FIMS/doxygen/classNormalLikelihoodInterface.html}{NormalLikelihood}
 \item \href{https://noaa-fims.github.io/FIMS/doxygen/classParameter.html}{Parameter}
 \item \href{https://noaa-fims.github.io/FIMS/doxygen/classParameterVector.html}{ParameterVector}
 \item \href{https://noaa-fims.github.io/FIMS/doxygen/classPopulationInterface.html}{Population}
@@ -66,3 +76,4 @@ docs.
 
 \href{https://noaa-fims.github.io/FIMS/doxygen/}{NOAA-FIMS C++ Documentation}
 }
+
