@@ -81,7 +81,7 @@ get_model_output(x)
 }
 \value{
 \code{\link[=get_input]{get_input()}} returns the list that was used to fit the FIMS model, which
-is the returned object from \code{\link[=create_default_parameters]{create_default_parameters()}}.
+is the returned object from \code{\link[=setup_default_parameters]{setup_default_parameters()}}.
 
 \code{\link[=get_report]{get_report()}} returns the TMB report, where anything that is flagged as
 reportable in the C++ code is returned.
@@ -125,7 +125,7 @@ to access objects stored in the available slots.
 \seealso{
 \itemize{
 \item \code{\link[=fit_fims]{fit_fims()}}
-\item \code{\link[=create_default_parameters]{create_default_parameters()}}
+\item \code{\link[=setup_default_parameters]{setup_default_parameters()}}
 }
 }
 \keyword{fit_fims}

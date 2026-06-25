@@ -106,56 +106,15 @@ You can use the base R function `plot(data_4_model)` to see the data types (e.g.
 plot(data_4_model)
 ```
 
-## Configurations
-
-### `create_default_configurations()`
-
-The `create_default_configurations()` function is designed to generate a set of default configurations for the various components of a FIMS model. This includes configurations for fleets, growth, maturity, and recruitment modules. By leveraging the structure of the input data, the function can automatically set up initial configurations for each module. By passing the data and configurations to `create_default_parameters()` the function can tailor the defaults based on how many fleets there are and what data types exist. For example, if you have three fleets, then `create_default_configurations()` will set up three logistic selectivity modules.
-
-```{r configurations, max.height='100px', attr.output='.numberLines'}
-# Create default configurations based on the data
-default_configurations <- create_default_configurations(data = data_4_model)
-
-default_configurations
-
-# The output is a nested tibble, with details in the `data` column.
-default_configurations_unnested <- default_configurations |>
-  tidyr::unnest(cols = data)
-
-default_configurations_unnested
-```
-
-### Update configurations
-
-The default_configurations are just a starting point. Functions (e.g., `rows_*()`) from `{dplyr}` can be used to modify the default configurations as needed. For example, logistic selectivity for survey1 can be changed to double logistic selectivity.
-```{r updated_configurations, max.height='100px', attr.output='.numberLines'}
-# Update the module_type for survey1's selectivity
-updated_configurations <- default_configurations_unnested |>
-  dplyr::rows_update(
-    y = tibble::tibble(
-      module_name = c("Selectivity"),
-      fleet = c("survey1"),
-      module_type = c("DoubleLogistic")
-    ),
-    by = c("module_name", "fleet")
-  )
-
-updated_configurations
-
-# Nest updated_configurations
-updated_configurations_nested <- updated_configurations |>
-  tidyr::nest(.by = c(model_family, module_name, fleet))
-```
-
 ## Parameters
 
 The parameters that are in the model will depend on which modules are used from the FIMS framework. This combination of modules rather than the use of a control file negates the need for complicated if{} else{} statements in the code.
 
-### `create_default_parameters()`
+### `setup_default_parameters()`
 
 Modules that are available in FIMS are known as reference classes in the C++ code. Each reference class acts as an interface between R and the underlining C++ code that defines FIMS. Several reference classes exist and several more will be created in the future. The beauty of having modules rather than a control file really comes out when more reference classes are created because each reference class can be accessed through R by itself to build up a model rather than needing to modify a control file for future features.
 
-By just passing the configurations and the data to `create_default_parameters()`, the default values for parameters that relate to fleet(s), recruitment, growth, and maturity modules can be created. For example,
+By just passing the data to `setup_default_parameters()`, the default values for parameters that relate to fleet(s), recruitment, growth, and maturity modules can be created. For example,
 
 - "BevertonHolt" for the recruitment module
 - "Dnorm" distribution for recruitment deviations (log_devs)
@@ -163,18 +122,10 @@ By just passing the configurations and the data to `create_default_parameters()`
 - "Logistic" for Maturity module.
 
 ```{r parameters, max.height='100px', attr.output='.numberLines'}
-# Create default parameters based on default_configurations and data
-default_parameters <- create_default_parameters(
-  configurations = default_configurations,
-  data = data_4_model
-)
+# Set up default parameters based on data
+default_parameters <- setup_default_parameters(data = data_4_model)
 
 default_parameters
-
-# Unnest the default_parameters to see the detailed parameters
-default_parameters_unnested <- tidyr::unnest(default_parameters, cols = data)
-
-default_parameters_unnested
 ```
 
 ### Update parameters
@@ -185,7 +136,6 @@ In the code below, `rows_update()` is used to adjust the fishing mortality, sele
 
 ```{r parameters-update}
 parameters_4_model <- default_parameters |>
-  tidyr::unnest(cols = data) |>
   # Update log_Fmort initial values for Fleet1
   dplyr::rows_update(
     tibble::tibble(
@@ -270,7 +220,7 @@ With data and parameters in place, we can now initialize modules using `initiali
 
 ### `initialize_fims()`
 
-The tibble returned by `create_default_parameters()` is just a data frame containing specifications. Nothing has been created in memory as of yet. To actually initialize the modules, `initialize_fims()` needs to be called. This function takes all of the specifications and matches them with the appropriate data to initialize a module and create the pointers to the memory.
+The tibble returned by `setup_default_parameters()` is just a data frame containing specifications. Nothing has been created in memory as of yet. To actually initialize the modules, `initialize_fims()` needs to be called. This function takes all of the specifications and matches them with the appropriate data to initialize a module and create the pointers to the memory.
 
 ### `fit_fims()`
 
@@ -437,7 +387,7 @@ clear()
 The same model can be fit to just the age data, removing the length-composition configurations.
 
 ```{r age}
-# Create default parameters, update with modified values, initialize FIMS,
+# Set up default parameters, update with modified values, initialize FIMS,
 # and fit the model
 age_only_fit <- parameters_4_model |>
   # remove rows that have module_type == LengthComp
@@ -455,7 +405,7 @@ clear()
 The same model can be fit to just the length data, removing the age-composition configurations.
 
 ```{r length}
-# Create default parameters, update with modified values, initialize FIMS,
+# Set up default parameters, update with modified values, initialize FIMS,
 # and fit the model
 length_only_fit <- parameters_4_model |>
   # remove rows that have module_type == AgeComp

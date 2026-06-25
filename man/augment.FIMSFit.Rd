@@ -47,8 +47,7 @@ The returned tibble follows the conventions expected by every
 data("data_big")
 data_4_model <- FIMSFrame(data_big)
 
-fit <- create_default_parameters(
-  configurations = create_default_configurations(data = data_4_model),
+fit <- setup_default_parameters(
   data = data_4_model
 ) |>
   initialize_fims(data = data_4_model) |>

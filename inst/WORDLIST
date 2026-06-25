@@ -44,6 +44,7 @@ DCMAKE
 deqn
 dlognorm
 dmultinorm
+Ddirichlet
 Doering
 dotdash
 dontrun

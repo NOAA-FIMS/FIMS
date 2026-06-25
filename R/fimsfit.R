@@ -118,12 +118,12 @@ methods::setMethod(
 #' @name get_FIMSFit
 #' @seealso
 #' * [fit_fims()]
-#' * [create_default_parameters()]
+#' * [setup_default_parameters()]
 NULL
 
 #' @return
 #' [get_input()] returns the list that was used to fit the FIMS model, which
-#' is the returned object from [create_default_parameters()].
+#' is the returned object from [setup_default_parameters()].
 #' @export
 #' @rdname get_FIMSFit
 #' @keywords fit_fims

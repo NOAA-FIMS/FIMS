@@ -120,8 +120,8 @@ initialize_module <- function(parameters, data, module_name, fleet = NA_characte
 
     data_distribution_names_for_fleet_i <- parameters |>
       dplyr::filter(
-        .data$fleet == !!fleet &
-          .data$distribution_type == "Data"
+        .data$fleet == .env$fleet &
+          .data$distribution_type == "data"
       ) |>
       dplyr::pull(.data$module_type)
     if ("age_to_length_conversion" %in% get_data(data)[["type"]] &&
@@ -367,7 +367,7 @@ initialize_fleet <- function(parameters, data, fleet, linked_ids) {
 
 
   distribution_names_for_fleet <- parameters |>
-    dplyr::filter(.data$fleet == !!fleet & .data$distribution_type == "Data") |>
+    dplyr::filter(.data$fleet == .env$fleet & .data$distribution_type == "data") |>
     dplyr::pull(.data$module_type)
 
   # Link the observed landings data to the fleet module using its associated ID
@@ -585,9 +585,7 @@ initialize_comp <- function(data,
 #' model one needs to instantiate recruitment, growth, and maturity modules and
 #' at least one fleet and population module.
 #'
-#' @param parameters A tibble returned from [create_default_parameters()]. The
-#'   tibble can be nested, i.e., contain a data column, or unnested, i.e.,
-#'   `tidyr::unnest(create_default_parameters(), cols = "data")`. Regardless, it
+#' @param parameters A tibble returned from [setup_default_parameters()]. It
 #'   is the primary source of information for what is initialized. That is, if a
 #'   fleet exists in the data but parameter information for how to specify
 #'   selectivity for that fleet is not provided, then selectivity will not be
@@ -610,8 +608,7 @@ initialize_comp <- function(data,
 #' run [clear()].
 #' @export
 #' @seealso
-#' * [create_default_configurations()]
-#' * [create_default_parameters()]
+#' * [setup_default_parameters()]
 #' * [FIMSFrame()]
 #' * [fit_fims()]
 #' * [clear()]
@@ -621,9 +618,7 @@ initialize_comp <- function(data,
 #' data("data_big", package = "FIMS")
 #' data_4_model <- FIMSFrame(data_big)
 #' # Instantiate modules
-#' parameters_list <- data_4_model |>
-#'   create_default_configurations() |>
-#'   create_default_parameters(data = data_4_model) |>
+#' parameters_list <- setup_default_parameters(data = data_4_model) |>
 #'   initialize_fims(data = data_4_model)
 #' clear()
 #' }
@@ -631,12 +626,6 @@ initialize_fims <- function(parameters, data) {
   # Validate parameters input
   if (missing(parameters) || !tibble::is_tibble(parameters)) {
     cli::cli_abort("The {.var parameters} argument must be a tibble.")
-  }
-
-  # Check if parameters is a nested tibble. If so, unnest parameters
-  if ("data" %in% names(parameters)) {
-    parameters <- parameters |>
-      tidyr::unnest(cols = c(data))
   }
 
   # Check if estimation_type is within "constant", "fixed_effect", "random_effect"
@@ -695,7 +684,7 @@ initialize_fims <- function(parameters, data) {
       unique()
 
     data_distribution_names_for_fleet_i <- parameters |>
-      dplyr::filter(.data$fleet == .env$fleets[i] & .data$distribution_type == "Data") |>
+      dplyr::filter(.data$fleet == .env$fleets[i] & .data$distribution_type == "data") |>
       dplyr::pull(.data$module_type)
 
     # Initialize landings module if the data type includes "landings" and
