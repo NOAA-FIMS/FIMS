@@ -1049,7 +1049,8 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
           this->observed_values[i].final_value_m = dmultinom->get_observed(i);
         }
       }
-      if (dmultinom->distribution_type == fims_distributions::Distribution_Kind::DATA) {
+      if (dmultinom->distribution_type ==
+          fims_distributions::Distribution_Kind::DATA) {
         dims.resize(2);
         dims[0] = dmultinom->dims[0];
         dims[1] = dmultinom->dims[1];

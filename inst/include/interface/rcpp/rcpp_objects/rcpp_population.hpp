@@ -345,7 +345,8 @@ class PopulationInterface : public PopulationInterfaceBase {
     finalize_vv(this->biomass, pop->biomass);
     finalize_vv(this->spawning_biomass, pop->spawning_biomass);
     finalize_vv(this->unfished_biomass, pop->unfished_biomass);
-    finalize_vv(this->unfished_spawning_biomass, pop->unfished_spawning_biomass);
+    finalize_vv(this->unfished_spawning_biomass,
+                pop->unfished_spawning_biomass);
     finalize_vv(this->proportion_mature_at_age, pop->proportion_mature_at_age);
     finalize_vv(this->expected_recruitment, pop->expected_recruitment);
     finalize_vv(this->sum_selectivity, pop->sum_selectivity);

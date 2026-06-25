@@ -73,15 +73,15 @@ struct MultinomialLPMF : public DensityComponentBase<Type> {
     this->prepare_lpdf(n);
     size_t lpdf_vec_idx = 0; /**< index for lpdf_vec vector */
     // Dimension checks
-    if (this->distribution_type == fims_distributions::Distribution_Kind::DATA) {
+    if (this->distribution_type ==
+        fims_distributions::Distribution_Kind::DATA) {
       if (this->expected_ptr->size() > 0) {
         if (n != this->expected_ptr->size()) {
           throw std::invalid_argument(
               this->name() +
               ": Vector index out of bounds. The dimension of "
               "the number of rows times the number of columns is of size " +
-              std::to_string(n) +
-              " and the expected vector is of size " +
+              std::to_string(n) + " and the expected vector is of size " +
               std::to_string(this->expected_ptr->size()));
         }
       }
@@ -91,8 +91,7 @@ struct MultinomialLPMF : public DensityComponentBase<Type> {
             this->name() +
             ": Vector index out of bounds. The dimension of the "
             "number of rows times the number of columns is of size " +
-            std::to_string(n) +
-            " and the observed vector is of size " +
+            std::to_string(n) + " and the observed vector is of size " +
             std::to_string(this->observed_ptr->size()));
       }
       if (this->observed_ptr->size() != this->expected_ptr->size()) {

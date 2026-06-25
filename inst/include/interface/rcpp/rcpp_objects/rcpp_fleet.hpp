@@ -547,7 +547,8 @@ class FleetInterface : public FleetInterfaceBase {
         &(fleet)->log_landings_expected;
     info->variable_map[this->log_index_expected.id_m] =
         &(fleet)->log_index_expected;
-    info->variable_map[this->agecomp_expected.id_m] = &(fleet)->agecomp_expected;
+    info->variable_map[this->agecomp_expected.id_m] =
+        &(fleet)->agecomp_expected;
     info->variable_map[this->agecomp_proportion.id_m] =
         &(fleet)->agecomp_proportion;
     info->variable_map[this->lengthcomp_expected.id_m] =
@@ -561,8 +562,10 @@ class FleetInterface : public FleetInterfaceBase {
     info->variable_map[this->landings_numbers_at_length.id_m] =
         &(fleet)->landings_numbers_at_length;
     info->variable_map[this->landings_weight.id_m] = &(fleet)->landings_weight;
-    info->variable_map[this->landings_numbers.id_m] = &(fleet)->landings_numbers;
-    info->variable_map[this->landings_expected.id_m] = &(fleet)->landings_expected;
+    info->variable_map[this->landings_numbers.id_m] =
+        &(fleet)->landings_numbers;
+    info->variable_map[this->landings_expected.id_m] =
+        &(fleet)->landings_expected;
     info->variable_map[this->index_numbers_at_age.id_m] =
         &(fleet)->index_numbers_at_age;
     info->variable_map[this->index_weight_at_age.id_m] =

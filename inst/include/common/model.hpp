@@ -99,7 +99,8 @@ class Model {  // may need singleton
 #ifdef TMB_MODEL
       d->of = this->of;
 #endif
-      if (d->distribution_type == fims_distributions::Distribution_Kind::PRIOR) {
+      if (d->distribution_type ==
+          fims_distributions::Distribution_Kind::PRIOR) {
         nll_vec[nll_vec_idx] = -d->evaluate();
         jnll += nll_vec[nll_vec_idx];
         n_priors += 1;
