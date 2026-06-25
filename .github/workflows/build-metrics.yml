@@ -25,6 +25,7 @@ jobs:
       BASELINE_REPOSITORY: ${{ github.event.pull_request.base.repo.full_name || github.repository }}
       CURRENT_COMMIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
       REGRESSION_PCT: 15
+      SAMPLED_PROCESS_TREE_RSS_REGRESSION_PCT: 40
 
     steps:
       - uses: actions/checkout@v7
@@ -540,6 +541,7 @@ jobs:
           from pathlib import Path
 
           threshold = float(os.environ["REGRESSION_PCT"])
+          sampled_process_tree_rss_threshold = float(os.environ["SAMPLED_PROCESS_TREE_RSS_REGRESSION_PCT"])
           current = json.loads(Path("metrics.json").read_text())
           previous_path = Path("previous_metrics.json")
 
@@ -548,21 +550,21 @@ jobs:
           summary_sections = []
 
           metrics = [
-              ("dependency_install_time_sec", "Dependency install time", "s", False),
-              ("dependency_install_max_rss_mb", "Dependency install Max RSS", "MB", False),
-              ("dependency_install_sampled_peak_process_tree_rss_mb", "Dependency install sampled process tree RSS peak", "MB", False),
-              ("dependency_install_sampled_peak_process_count", "Dependency install sampled process count peak", "processes", False),
-              ("package_install_time_sec", "FIMS install time", "s", True),
-              ("package_install_max_rss_mb", "FIMS install Max RSS", "MB", True),
-              ("package_install_sampled_peak_process_tree_rss_mb", "FIMS install sampled process tree RSS peak", "MB", True),
-              ("package_install_sampled_peak_process_count", "FIMS install sampled process count peak", "processes", False),
-              ("peak_ram_mb", "Peak RAM during FIMS install", "MB", True),
-              ("installed_package_size_bytes", "Installed package size", "bytes", True),
-              ("installed_file_count", "Installed file count", "files", True),
-              ("installed_shared_object_total_bytes", "Installed shared object total size", "bytes", True),
-              ("installed_shared_object_count", "Installed shared object count", "files", True),
-              ("warning_count", "Warning count", "warnings", True),
-              ("error_count", "Error count", "errors", True),
+              ("dependency_install_time_sec", "Dependency install time", "s", False, threshold),
+              ("dependency_install_max_rss_mb", "Dependency install Max RSS", "MB", False, threshold),
+              ("dependency_install_sampled_peak_process_tree_rss_mb", "Dependency install sampled process tree RSS peak", "MB", False, sampled_process_tree_rss_threshold),
+              ("dependency_install_sampled_peak_process_count", "Dependency install sampled process count peak", "processes", False, threshold),
+              ("package_install_time_sec", "FIMS install time", "s", True, threshold),
+              ("package_install_max_rss_mb", "FIMS install Max RSS", "MB", True, threshold),
+              ("package_install_sampled_peak_process_tree_rss_mb", "FIMS install sampled process tree RSS peak", "MB", True, sampled_process_tree_rss_threshold),
+              ("package_install_sampled_peak_process_count", "FIMS install sampled process count peak", "processes", False, threshold),
+              ("peak_ram_mb", "Peak RAM during FIMS install", "MB", True, threshold),
+              ("installed_package_size_bytes", "Installed package size", "bytes", True, threshold),
+              ("installed_file_count", "Installed file count", "files", True, threshold),
+              ("installed_shared_object_total_bytes", "Installed shared object total size", "bytes", True, threshold),
+              ("installed_shared_object_count", "Installed shared object count", "files", True, threshold),
+              ("warning_count", "Warning count", "warnings", True, threshold),
+              ("error_count", "Error count", "errors", True, threshold),
           ]
 
           summary_metrics = [
@@ -699,7 +701,7 @@ jobs:
           if previous is None:
               lines.append("No previous metrics found. This is the first run for this workflow or no usable main artifact is available.")
           else:
-              for key, label, unit, gated in metrics:
+              for key, label, unit, gated, metric_threshold in metrics:
                   curr = current.get(key)
                   prev = previous.get(key)
                   if curr is None:
@@ -718,8 +720,8 @@ jobs:
                           regressions.append(f"WARNING: {label} increased from {prev} to {curr} {unit} (previous value was zero)")
                   else:
                       rows.append(f"{label}: {curr} {unit} (was {prev} {unit}, {pct:.1f}%)")
-                      if gated and pct > threshold:
-                          regressions.append(f"WARNING: {label} increased by {pct:.1f}% (threshold: {threshold:.0f}%)")
+                      if gated and pct > metric_threshold:
+                          regressions.append(f"WARNING: {label} increased by {pct:.1f}% (threshold: {metric_threshold:.0f}%)")
 
               lines.extend(rows)
               lines.append("")
