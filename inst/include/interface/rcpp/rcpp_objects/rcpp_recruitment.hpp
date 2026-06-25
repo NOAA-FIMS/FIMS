@@ -93,23 +93,23 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
    * population), where the parameter is transformed to constrain it between
    * 0.2 and 1.0.
    */
-  ParameterVector logit_steep;
+  VariableVector logit_steep;
   /**
    * @brief The natural log of recruitment at unfished biomass.
    */
-  ParameterVector log_rzero;
+  VariableVector log_rzero;
   /**
    * @brief The natural log of recruitment deviations.
    */
-  ParameterVector log_devs;
+  VariableVector log_devs;
   /**
    * @brief The recruitment random effect parameter on the natural log scale.
    */
-  ParameterVector log_r;
+  VariableVector log_r;
   /**
    * @brief Expectation of the recruitment process.
    */
-  ParameterVector log_expected_recruitment;
+  VariableVector log_expected_recruitment;
   /**
    * @brief The estimate of the logit transformation of steepness.
    */
