@@ -25,6 +25,11 @@ jobs:
       BASELINE_REPOSITORY: ${{ github.event.pull_request.base.repo.full_name || github.repository }}
       CURRENT_COMMIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
       REGRESSION_PCT: 15
+      # Percent threshold for sampled process-tree RSS regressions; sampled peaks are noisier than /usr/bin/time RSS.
+      SAMPLED_PROCESS_TREE_RSS_REGRESSION_PCT: 40
+    defaults:
+      run:
+        shell: bash
 
     steps:
       - uses: actions/checkout@v7
@@ -87,27 +92,32 @@ jobs:
             } > "${label}_cgroup_memory_values.tsv"
           }
 
-          sample_memory_until_done() {
+          capture_memory_sample() {
             local prefix="$1"
             local command_pid="$2"
             local samples_file="${prefix}_memory_samples.tsv"
+            local timestamp_epoch
+            local process_tree_rss_kb=0
+            local process_count=0
+            local pids
 
-            printf "timestamp_epoch\tprocess_tree_rss_kb\tprocess_count\n" > "$samples_file"
+            timestamp_epoch=$(date +%s)
+
+            pids=$(collect_descendant_pids "$command_pid" | sort -n | uniq | awk '{ pids = pids sep $1; sep = "," } END { print pids }')
+            if [ -n "$pids" ]; then
+              process_tree_rss_kb=$(ps -o rss= -p "$pids" 2>/dev/null | awk '{sum += $1} END {print sum + 0}')
+              process_count=$(printf "%s" "$pids" | awk -F, '{print NF}')
+            fi
+
+            printf "%s\t%s\t%s\n" "$timestamp_epoch" "$process_tree_rss_kb" "$process_count" >> "$samples_file"
+          }
+
+          sample_memory_until_done() {
+            local prefix="$1"
+            local command_pid="$2"
+
             while kill -0 "$command_pid" 2>/dev/null; do
-              local timestamp_epoch
-              local process_tree_rss_kb=0
-              local process_count=0
-              local pids
-
-              timestamp_epoch=$(date +%s)
-
-              pids=$(collect_descendant_pids "$command_pid" | sort -n | uniq | awk '{ pids = pids sep $1; sep = "," } END { print pids }')
-              if [ -n "$pids" ]; then
-                process_tree_rss_kb=$(ps -o rss= -p "$pids" 2>/dev/null | awk '{sum += $1} END {print sum + 0}')
-                process_count=$(printf "%s" "$pids" | awk -F, '{print NF}')
-              fi
-
-              printf "%s\t%s\t%s\n" "$timestamp_epoch" "$process_tree_rss_kb" "$process_count" >> "$samples_file"
+              capture_memory_sample "$prefix" "$command_pid"
               sleep 1
             done
           }
@@ -117,6 +127,7 @@ jobs:
             shift
 
             capture_memory_snapshot "${prefix}_before"
+            printf "timestamp_epoch\tprocess_tree_rss_kb\tprocess_count\n" > "${prefix}_memory_samples.tsv"
 
             /usr/bin/time -v "$@" > >(tee "${prefix}.log") 2>&1 &
             local command_pid=$!
@@ -127,14 +138,15 @@ jobs:
             set +e
             wait "$command_pid"
             local install_status=$?
+            capture_memory_sample "$prefix" "$command_pid"
             kill "$sampler_pid" 2>/dev/null
             wait "$sampler_pid" 2>/dev/null
             set -e
 
             capture_memory_snapshot "${prefix}_after"
 
-            awk -F '\t' 'NR > 1 && max < $2 {max = $2} END {print max + 0}' "${prefix}_memory_samples.tsv" > "${prefix}_sampled_peak_process_tree_rss_kb.txt"
-            awk -F '\t' 'NR > 1 && max < $3 {max = $3} END {print max + 0}' "${prefix}_memory_samples.tsv" > "${prefix}_sampled_peak_process_count.txt"
+            awk -F '\t' 'NR > 1 {val = ($2 + 0); if (val > max) max = val} END {print max + 0}' "${prefix}_memory_samples.tsv" > "${prefix}_sampled_peak_process_tree_rss_kb.txt"
+            awk -F '\t' 'NR > 1 {val = ($3 + 0); if (val > max) max = val} END {print max + 0}' "${prefix}_memory_samples.tsv" > "${prefix}_sampled_peak_process_count.txt"
 
             return "$install_status"
           }
@@ -191,27 +203,32 @@ jobs:
             } > "${label}_cgroup_memory_values.tsv"
           }
 
-          sample_memory_until_done() {
+          capture_memory_sample() {
             local prefix="$1"
             local command_pid="$2"
             local samples_file="${prefix}_memory_samples.tsv"
+            local timestamp_epoch
+            local process_tree_rss_kb=0
+            local process_count=0
+            local pids
 
-            printf "timestamp_epoch\tprocess_tree_rss_kb\tprocess_count\n" > "$samples_file"
+            timestamp_epoch=$(date +%s)
+
+            pids=$(collect_descendant_pids "$command_pid" | sort -n | uniq | awk '{ pids = pids sep $1; sep = "," } END { print pids }')
+            if [ -n "$pids" ]; then
+              process_tree_rss_kb=$(ps -o rss= -p "$pids" 2>/dev/null | awk '{sum += $1} END {print sum + 0}')
+              process_count=$(printf "%s" "$pids" | awk -F, '{print NF}')
+            fi
+
+            printf "%s\t%s\t%s\n" "$timestamp_epoch" "$process_tree_rss_kb" "$process_count" >> "$samples_file"
+          }
+
+          sample_memory_until_done() {
+            local prefix="$1"
+            local command_pid="$2"
+
             while kill -0 "$command_pid" 2>/dev/null; do
-              local timestamp_epoch
-              local process_tree_rss_kb=0
-              local process_count=0
-              local pids
-
-              timestamp_epoch=$(date +%s)
-
-              pids=$(collect_descendant_pids "$command_pid" | sort -n | uniq | awk '{ pids = pids sep $1; sep = "," } END { print pids }')
-              if [ -n "$pids" ]; then
-                process_tree_rss_kb=$(ps -o rss= -p "$pids" 2>/dev/null | awk '{sum += $1} END {print sum + 0}')
-                process_count=$(printf "%s" "$pids" | awk -F, '{print NF}')
-              fi
-
-              printf "%s\t%s\t%s\n" "$timestamp_epoch" "$process_tree_rss_kb" "$process_count" >> "$samples_file"
+              capture_memory_sample "$prefix" "$command_pid"
               sleep 1
             done
           }
@@ -221,6 +238,7 @@ jobs:
             shift
 
             capture_memory_snapshot "${prefix}_before"
+            printf "timestamp_epoch\tprocess_tree_rss_kb\tprocess_count\n" > "${prefix}_memory_samples.tsv"
 
             /usr/bin/time -v "$@" > >(tee "${prefix}.log") 2>&1 &
             local command_pid=$!
@@ -231,14 +249,15 @@ jobs:
             set +e
             wait "$command_pid"
             local install_status=$?
+            capture_memory_sample "$prefix" "$command_pid"
             kill "$sampler_pid" 2>/dev/null
             wait "$sampler_pid" 2>/dev/null
             set -e
 
             capture_memory_snapshot "${prefix}_after"
 
-            awk -F '\t' 'NR > 1 && max < $2 {max = $2} END {print max + 0}' "${prefix}_memory_samples.tsv" > "${prefix}_sampled_peak_process_tree_rss_kb.txt"
-            awk -F '\t' 'NR > 1 && max < $3 {max = $3} END {print max + 0}' "${prefix}_memory_samples.tsv" > "${prefix}_sampled_peak_process_count.txt"
+            awk -F '\t' 'NR > 1 {val = ($2 + 0); if (val > max) max = val} END {print max + 0}' "${prefix}_memory_samples.tsv" > "${prefix}_sampled_peak_process_tree_rss_kb.txt"
+            awk -F '\t' 'NR > 1 {val = ($3 + 0); if (val > max) max = val} END {print max + 0}' "${prefix}_memory_samples.tsv" > "${prefix}_sampled_peak_process_count.txt"
 
             return "$install_status"
           }
@@ -294,11 +313,12 @@ jobs:
               return int(match.group(1)) if match else None
 
           def count_warnings(text):
-              return len(re.findall(r"warning:", text))
+              lines = [line for line in text.splitlines() if not re.search(r"\b[0-9]+ warnings? generated\b", line, re.IGNORECASE)]
+              return sum(bool(re.search(r"(^\s*Warning(?: messages?)?(?: in .*?)?:|\bwarning:)", line, re.IGNORECASE)) for line in lines)
 
           def count_errors(text):
-              lines = [line for line in text.splitlines() if not re.search(r"[0-9]+ error\(s\) generated", line)]
-              return sum("error:" in line for line in lines)
+              lines = [line for line in text.splitlines() if not re.search(r"\b[0-9]+ errors? generated\b|\b[0-9]+ error\(s\) generated\b", line, re.IGNORECASE)]
+              return sum(bool(re.search(r"(^\s*Error(?: in .*?)?:|\berror:)", line, re.IGNORECASE)) for line in lines)
 
           def read_int(path):
               path = Path(path)
@@ -307,15 +327,25 @@ jobs:
               text = path.read_text().strip()
               return int(text) if text else 0
 
+          def read_optional_int(path):
+              path = Path(path)
+              if not path.exists():
+                  return None
+              text = path.read_text().strip()
+              return int(text) if text else None
+
+          def kb_to_mb(value):
+              return round(value / 1024, 2) if value is not None else None
+
           dependency_log = read_text("dependency_install.log")
           package_log = read_text("package_install.log")
 
           dependency_rss_kb = parse_max_rss_kb(dependency_log)
           package_rss_kb = parse_max_rss_kb(package_log)
-          dependency_sampled_peak_process_tree_rss_kb = read_int("dependency_install_sampled_peak_process_tree_rss_kb.txt")
-          dependency_sampled_peak_process_count = read_int("dependency_install_sampled_peak_process_count.txt")
-          package_sampled_peak_process_tree_rss_kb = read_int("package_install_sampled_peak_process_tree_rss_kb.txt")
-          package_sampled_peak_process_count = read_int("package_install_sampled_peak_process_count.txt")
+          dependency_sampled_peak_process_tree_rss_kb = read_optional_int("dependency_install_sampled_peak_process_tree_rss_kb.txt")
+          dependency_sampled_peak_process_count = read_optional_int("dependency_install_sampled_peak_process_count.txt")
+          package_sampled_peak_process_tree_rss_kb = read_optional_int("package_install_sampled_peak_process_tree_rss_kb.txt")
+          package_sampled_peak_process_count = read_optional_int("package_install_sampled_peak_process_count.txt")
 
           shared_objects = {}
           shared_object_path = Path("installed_shared_objects.tsv")
@@ -329,17 +359,17 @@ jobs:
               "timestamp": __import__("datetime").datetime.now(__import__("datetime").timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
               "dependency_install_time_sec": parse_elapsed_seconds(dependency_log),
               "dependency_install_max_rss_kb": dependency_rss_kb,
-              "dependency_install_max_rss_mb": round(dependency_rss_kb / 1024, 2) if dependency_rss_kb is not None else None,
+              "dependency_install_max_rss_mb": kb_to_mb(dependency_rss_kb),
               "dependency_install_sampled_peak_process_tree_rss_kb": dependency_sampled_peak_process_tree_rss_kb,
-              "dependency_install_sampled_peak_process_tree_rss_mb": round(dependency_sampled_peak_process_tree_rss_kb / 1024, 2),
+              "dependency_install_sampled_peak_process_tree_rss_mb": kb_to_mb(dependency_sampled_peak_process_tree_rss_kb),
               "dependency_install_sampled_peak_process_count": dependency_sampled_peak_process_count,
               "package_install_time_sec": parse_elapsed_seconds(package_log),
               "package_install_max_rss_kb": package_rss_kb,
-              "package_install_max_rss_mb": round(package_rss_kb / 1024, 2) if package_rss_kb is not None else None,
+              "package_install_max_rss_mb": kb_to_mb(package_rss_kb),
               "package_install_sampled_peak_process_tree_rss_kb": package_sampled_peak_process_tree_rss_kb,
-              "package_install_sampled_peak_process_tree_rss_mb": round(package_sampled_peak_process_tree_rss_kb / 1024, 2),
+              "package_install_sampled_peak_process_tree_rss_mb": kb_to_mb(package_sampled_peak_process_tree_rss_kb),
               "package_install_sampled_peak_process_count": package_sampled_peak_process_count,
-              "peak_ram_mb": round(package_rss_kb / 1024, 2) if package_rss_kb is not None else None,
+              "peak_ram_mb": kb_to_mb(package_rss_kb),
               "warning_count": count_warnings(package_log),
               "error_count": count_errors(package_log),
               "installed_package_size_bytes": read_int("installed_package_size_bytes.txt"),
@@ -353,36 +383,102 @@ jobs:
           print(Path("metrics.json").read_text())
           EOF
 
-      - name: Download latest main metrics artifact
+      - name: Download baseline metrics artifact
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           echo "Looking for baseline metrics in $BASELINE_REPOSITORY."
 
-          LATEST_MAIN_COMMIT=$(gh api "repos/${BASELINE_REPOSITORY}/commits/main" --jq .sha 2>/dev/null || true)
-          if [ -z "$LATEST_MAIN_COMMIT" ]; then
-            LATEST_MAIN_COMMIT=$(git ls-remote "https://github.com/${BASELINE_REPOSITORY}.git" refs/heads/main | awk '{print $1}')
+          if [ "$GITHUB_EVENT_NAME" = "push" ]; then
+            BASELINE_COMMIT="${{ github.event.before }}"
+            BASELINE_DESCRIPTION="previous main commit"
+          else
+            BASELINE_COMMIT=$(gh api "repos/${BASELINE_REPOSITORY}/commits/main" --jq .sha 2>/dev/null || true)
+            if [ -z "$BASELINE_COMMIT" ]; then
+              BASELINE_COMMIT=$(git ls-remote "https://github.com/${BASELINE_REPOSITORY}.git" refs/heads/main | awk '{print $1}')
+            fi
+            BASELINE_DESCRIPTION="latest main commit"
           fi
-          
-          if [ -z "$LATEST_MAIN_COMMIT" ]; then
-            echo "Could not determine latest main branch commit."
+
+          if [ -z "$BASELINE_COMMIT" ] || [ "$BASELINE_COMMIT" = "0000000000000000000000000000000000000000" ]; then
+            echo "Could not determine baseline commit."
             if [ "$GITHUB_EVENT_NAME" = "pull_request" ]; then exit 1; else exit 0; fi
           fi
 
-          echo "Latest main commit is $LATEST_MAIN_COMMIT."
-          export LATEST_MAIN_COMMIT
+          echo "Baseline is $BASELINE_DESCRIPTION $BASELINE_COMMIT."
+          export BASELINE_COMMIT
 
           build_baseline_metrics_from_main() {
-            echo "Building baseline metrics from latest main commit $LATEST_MAIN_COMMIT."
+            echo "Building baseline metrics from $BASELINE_DESCRIPTION $BASELINE_COMMIT."
             rm -rf baseline-main baseline_package_install.log baseline_installed_shared_objects.tsv
-            git clone --depth 1 --branch main "https://github.com/${BASELINE_REPOSITORY}.git" baseline-main
-            git -C baseline-main checkout "$LATEST_MAIN_COMMIT"
+            git clone --no-checkout --filter=blob:none "https://github.com/${BASELINE_REPOSITORY}.git" baseline-main
+            if ! git -C baseline-main fetch --depth 1 origin "$BASELINE_COMMIT"; then
+              git -C baseline-main fetch origin "$BASELINE_COMMIT" || {
+                echo "Could not fetch baseline commit $BASELINE_COMMIT."
+                return 1
+              }
+            fi
+            git -C baseline-main checkout "$BASELINE_COMMIT"
+
+            collect_descendant_pids() {
+              local parent_pid="$1"
+              local child_pid
+
+              echo "$parent_pid"
+              for child_pid in $(pgrep -P "$parent_pid" 2>/dev/null || true); do
+                collect_descendant_pids "$child_pid"
+              done
+            }
+
+            capture_memory_sample() {
+              local prefix="$1"
+              local command_pid="$2"
+              local samples_file="${prefix}_memory_samples.tsv"
+              local timestamp_epoch
+              local process_tree_rss_kb=0
+              local process_count=0
+              local pids
+
+              timestamp_epoch=$(date +%s)
+
+              pids=$(collect_descendant_pids "$command_pid" | sort -n | uniq | awk '{ pids = pids sep $1; sep = "," } END { print pids }')
+              if [ -n "$pids" ]; then
+                process_tree_rss_kb=$(ps -o rss= -p "$pids" 2>/dev/null | awk '{sum += $1} END {print sum + 0}')
+                process_count=$(printf "%s" "$pids" | awk -F, '{print NF}')
+              fi
+
+              printf "%s\t%s\t%s\n" "$timestamp_epoch" "$process_tree_rss_kb" "$process_count" >> "$samples_file"
+            }
+
+            sample_memory_until_done() {
+              local prefix="$1"
+              local command_pid="$2"
+
+              while kill -0 "$command_pid" 2>/dev/null; do
+                capture_memory_sample "$prefix" "$command_pid"
+                sleep 1
+              done
+            }
 
             set +e
-            /usr/bin/time -v R CMD INSTALL baseline-main > baseline_package_install.log 2>&1
+            printf "timestamp_epoch\tprocess_tree_rss_kb\tprocess_count\n" > baseline_package_install_memory_samples.tsv
+            /usr/bin/time -v R CMD INSTALL baseline-main > baseline_package_install.log 2>&1 &
+            local command_pid=$!
+
+            sample_memory_until_done baseline_package_install "$command_pid" &
+            local sampler_pid=$!
+
+            wait "$command_pid"
             local baseline_status=$?
+            capture_memory_sample baseline_package_install "$command_pid"
+            kill "$sampler_pid" 2>/dev/null
+            wait "$sampler_pid" 2>/dev/null
             set -e
+
+            awk -F '\t' 'NR > 1 {val = ($2 + 0); if (val > max) max = val} END {print max + 0}' baseline_package_install_memory_samples.tsv > baseline_package_install_sampled_peak_process_tree_rss_kb.txt
+            awk -F '\t' 'NR > 1 {val = ($3 + 0); if (val > max) max = val} END {print max + 0}' baseline_package_install_memory_samples.tsv > baseline_package_install_sampled_peak_process_count.txt
+
             if [ "$baseline_status" -ne 0 ]; then
               cat baseline_package_install.log
               echo "Baseline main package install failed."
@@ -430,11 +526,12 @@ jobs:
               return int(match.group(1)) if match else None
 
           def count_warnings(text):
-              return len(re.findall(r"warning:", text))
+              lines = [line for line in text.splitlines() if not re.search(r"\b[0-9]+ warnings? generated\b", line, re.IGNORECASE)]
+              return sum(bool(re.search(r"(^\s*Warning(?: messages?)?(?: in .*?)?:|\bwarning:)", line, re.IGNORECASE)) for line in lines)
 
           def count_errors(text):
-              lines = [line for line in text.splitlines() if not re.search(r"[0-9]+ error\(s\) generated", line)]
-              return sum("error:" in line for line in lines)
+              lines = [line for line in text.splitlines() if not re.search(r"\b[0-9]+ errors? generated\b|\b[0-9]+ error\(s\) generated\b", line, re.IGNORECASE)]
+              return sum(bool(re.search(r"(^\s*Error(?: in .*?)?:|\berror:)", line, re.IGNORECASE)) for line in lines)
 
           def read_int(path):
               path = Path(path)
@@ -443,10 +540,23 @@ jobs:
               text = path.read_text().strip()
               return int(text) if text else 0
 
+          def read_optional_int(path):
+              path = Path(path)
+              if not path.exists():
+                  return None
+              text = path.read_text().strip()
+              return int(text) if text else None
+
+          def kb_to_mb(value):
+              return round(value / 1024, 2) if value is not None else None
+
           current = json.loads(Path("metrics.json").read_text())
           package_log = read_text("baseline_package_install.log")
           package_rss_kb = parse_max_rss_kb(package_log)
-          package_rss_mb = round(package_rss_kb / 1024, 2) if package_rss_kb is not None else None
+          package_rss_mb = kb_to_mb(package_rss_kb)
+          package_sampled_peak_process_tree_rss_kb = read_optional_int("baseline_package_install_sampled_peak_process_tree_rss_kb.txt")
+          package_sampled_peak_process_tree_rss_mb = kb_to_mb(package_sampled_peak_process_tree_rss_kb)
+          package_sampled_peak_process_count = read_optional_int("baseline_package_install_sampled_peak_process_count.txt")
           shared_objects = {}
           shared_object_path = Path("baseline_installed_shared_objects.tsv")
           if shared_object_path.exists():
@@ -455,7 +565,7 @@ jobs:
                   shared_objects[path] = int(size)
 
           previous = {
-              "commit_sha": os.environ["LATEST_MAIN_COMMIT"],
+              "commit_sha": os.environ["BASELINE_COMMIT"],
               "timestamp": current.get("timestamp"),
               "dependency_install_time_sec": current.get("dependency_install_time_sec"),
               "dependency_install_max_rss_kb": current.get("dependency_install_max_rss_kb"),
@@ -466,9 +576,9 @@ jobs:
               "package_install_time_sec": parse_elapsed_seconds(package_log),
               "package_install_max_rss_kb": package_rss_kb,
               "package_install_max_rss_mb": package_rss_mb,
-              "package_install_sampled_peak_process_tree_rss_kb": package_rss_kb or 0,
-              "package_install_sampled_peak_process_tree_rss_mb": package_rss_mb or 0,
-              "package_install_sampled_peak_process_count": 0,
+              "package_install_sampled_peak_process_tree_rss_kb": package_sampled_peak_process_tree_rss_kb,
+              "package_install_sampled_peak_process_tree_rss_mb": package_sampled_peak_process_tree_rss_mb,
+              "package_install_sampled_peak_process_count": package_sampled_peak_process_count,
               "peak_ram_mb": package_rss_mb,
               "warning_count": count_warnings(package_log),
               "error_count": count_errors(package_log),
@@ -485,10 +595,10 @@ jobs:
 
           BASELINE_ARTIFACT_ID=$(gh api \
             "repos/${BASELINE_REPOSITORY}/actions/artifacts?per_page=100" \
-            --jq ".artifacts[] | select(.expired == false and .workflow_run.head_sha == \"$LATEST_MAIN_COMMIT\" and (.name == \"build-metrics-main\" or .name == \"build-metrics-$LATEST_MAIN_COMMIT\")) | .id" | head -1)
+            --jq ".artifacts[] | select(.expired == false and .workflow_run.head_sha == \"$BASELINE_COMMIT\" and (.name == \"build-metrics-main\" or .name == \"build-metrics-$BASELINE_COMMIT\")) | .id" | head -1)
 
           if [ -z "$BASELINE_ARTIFACT_ID" ]; then
-            echo "No build metrics artifact found for latest main commit $LATEST_MAIN_COMMIT."
+            echo "No build metrics artifact found for $BASELINE_DESCRIPTION $BASELINE_COMMIT."
             gh api \
               "repos/${BASELINE_REPOSITORY}/actions/artifacts?per_page=20" \
               --jq '.artifacts[] | "available artifact name=\(.name) id=\(.id) head_sha=\(.workflow_run.head_sha) expired=\(.expired) created_at=\(.created_at)"' || true
@@ -496,7 +606,7 @@ jobs:
           fi
 
           if [ -n "$BASELINE_ARTIFACT_ID" ]; then
-            echo "Downloading build metrics artifact $BASELINE_ARTIFACT_ID for latest main commit $LATEST_MAIN_COMMIT."
+            echo "Downloading build metrics artifact $BASELINE_ARTIFACT_ID for $BASELINE_DESCRIPTION $BASELINE_COMMIT."
             rm -rf baseline-metrics baseline-metrics.zip
             mkdir -p baseline-metrics
 
@@ -516,10 +626,10 @@ jobs:
           Path("previous_metrics.json").write_bytes(metrics_files[0].read_bytes())
           EOF
 
-            echo "Downloaded baseline metrics from main commit $LATEST_MAIN_COMMIT (artifact $BASELINE_ARTIFACT_ID)."
+            echo "Downloaded baseline metrics from $BASELINE_DESCRIPTION $BASELINE_COMMIT (artifact $BASELINE_ARTIFACT_ID)."
           fi
           if [ ! -f previous_metrics.json ]; then
-            echo "No usable build metrics artifact found for latest main commit."
+            echo "No usable build metrics artifact found for $BASELINE_DESCRIPTION."
             if ! build_baseline_metrics_from_main; then if [ "$GITHUB_EVENT_NAME" = "pull_request" ]; then exit 1; else exit 0; fi; fi
           fi
 
@@ -533,6 +643,7 @@ jobs:
           from pathlib import Path
 
           threshold = float(os.environ["REGRESSION_PCT"])
+          sampled_process_tree_rss_threshold = float(os.environ["SAMPLED_PROCESS_TREE_RSS_REGRESSION_PCT"])
           current = json.loads(Path("metrics.json").read_text())
           previous_path = Path("previous_metrics.json")
 
@@ -541,21 +652,21 @@ jobs:
           summary_sections = []
 
           metrics = [
-              ("dependency_install_time_sec", "Dependency install time", "s", False),
-              ("dependency_install_max_rss_mb", "Dependency install Max RSS", "MB", False),
-              ("dependency_install_sampled_peak_process_tree_rss_mb", "Dependency install sampled process tree RSS peak", "MB", False),
-              ("dependency_install_sampled_peak_process_count", "Dependency install sampled process count peak", "processes", False),
-              ("package_install_time_sec", "FIMS install time", "s", True),
-              ("package_install_max_rss_mb", "FIMS install Max RSS", "MB", True),
-              ("package_install_sampled_peak_process_tree_rss_mb", "FIMS install sampled process tree RSS peak", "MB", True),
-              ("package_install_sampled_peak_process_count", "FIMS install sampled process count peak", "processes", False),
-              ("peak_ram_mb", "Peak RAM during FIMS install", "MB", True),
-              ("installed_package_size_bytes", "Installed package size", "bytes", True),
-              ("installed_file_count", "Installed file count", "files", True),
-              ("installed_shared_object_total_bytes", "Installed shared object total size", "bytes", True),
-              ("installed_shared_object_count", "Installed shared object count", "files", True),
-              ("warning_count", "Warning count", "warnings", True),
-              ("error_count", "Error count", "errors", True),
+              ("dependency_install_time_sec", "Dependency install time", "s", False, threshold),
+              ("dependency_install_max_rss_mb", "Dependency install Max RSS", "MB", False, threshold),
+              ("dependency_install_sampled_peak_process_tree_rss_mb", "Dependency install sampled process tree RSS peak", "MB", False, sampled_process_tree_rss_threshold),
+              ("dependency_install_sampled_peak_process_count", "Dependency install sampled process count peak", "processes", False, threshold),
+              ("package_install_time_sec", "FIMS install time", "s", True, threshold),
+              ("package_install_max_rss_mb", "FIMS install Max RSS", "MB", True, threshold),
+              ("package_install_sampled_peak_process_tree_rss_mb", "FIMS install sampled process tree RSS peak", "MB", True, sampled_process_tree_rss_threshold),
+              ("package_install_sampled_peak_process_count", "FIMS install sampled process count peak", "processes", False, threshold),
+              ("peak_ram_mb", "Peak RAM during FIMS install", "MB", True, threshold),
+              ("installed_package_size_bytes", "Installed package size", "bytes", True, threshold),
+              ("installed_file_count", "Installed file count", "files", True, threshold),
+              ("installed_shared_object_total_bytes", "Installed shared object total size", "bytes", True, threshold),
+              ("installed_shared_object_count", "Installed shared object count", "files", True, threshold),
+              ("warning_count", "Warning count", "warnings", True, threshold),
+              ("error_count", "Error count", "errors", True, threshold),
           ]
 
           summary_metrics = [
@@ -692,7 +803,7 @@ jobs:
           if previous is None:
               lines.append("No previous metrics found. This is the first run for this workflow or no usable main artifact is available.")
           else:
-              for key, label, unit, gated in metrics:
+              for key, label, unit, gated, metric_threshold in metrics:
                   curr = current.get(key)
                   prev = previous.get(key)
                   if curr is None:
@@ -711,8 +822,8 @@ jobs:
                           regressions.append(f"WARNING: {label} increased from {prev} to {curr} {unit} (previous value was zero)")
                   else:
                       rows.append(f"{label}: {curr} {unit} (was {prev} {unit}, {pct:.1f}%)")
-                      if gated and pct > threshold:
-                          regressions.append(f"WARNING: {label} increased by {pct:.1f}% (threshold: {threshold:.0f}%)")
+                      if gated and pct > metric_threshold:
+                          regressions.append(f"WARNING: {label} increased by {pct:.1f}% (threshold: {metric_threshold:.0f}%)")
 
               lines.extend(rows)
               lines.append("")
