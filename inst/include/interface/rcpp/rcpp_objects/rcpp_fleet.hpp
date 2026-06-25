@@ -118,43 +118,43 @@ class FleetInterface : public FleetInterfaceBase {
    * @brief The natural log of the index of abundance scaling parameter
    * for this fleet.
    */
-  ParameterVector log_q;
+  VariableVector log_q;
   /**
    * @brief The vector of the natural log of fishing mortality rates for this
    * fleet.
    */
-  ParameterVector log_Fmort;
+  VariableVector log_Fmort;
   /**
    * @brief The vector of natural log of the expected total landings for
    * the fleet.
    */
-  ParameterVector log_landings_expected;
+  VariableVector log_landings_expected;
   /**
    * @brief The vector of natural log of the expected index of abundance
    * for the fleet.
    */
-  ParameterVector log_index_expected;
+  VariableVector log_index_expected;
   /**
    * @brief The vector of expected landings-at-age in numbers for the fleet.
    */
-  ParameterVector agecomp_expected;
+  VariableVector agecomp_expected;
   /**
    * @brief The vector of expected landings-at-length in numbers for the fleet.
    */
-  ParameterVector lengthcomp_expected;
+  VariableVector lengthcomp_expected;
   /**
    * @brief The vector of expected landings-at-age in numbers for the fleet.
    */
-  ParameterVector agecomp_proportion;
+  VariableVector agecomp_proportion;
   /**
    * @brief The vector of expected landings-at-length in numbers for the fleet.
    */
-  ParameterVector lengthcomp_proportion;
+  VariableVector lengthcomp_proportion;
   /**
    * @brief The vector of conversions to go from age to length, i.e., the
    * age-to-length-conversion matrix.
    */
-  ParameterVector age_to_length_conversion;
+  VariableVector age_to_length_conversion;
 
   /**
    * @brief The constructor.

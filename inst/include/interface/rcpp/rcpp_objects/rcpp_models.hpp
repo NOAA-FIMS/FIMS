@@ -213,83 +213,31 @@ class FisheryModelInterfaceBase : public FIMSRcppInterfaceBase {
 };
 
 /**
- * @brief ID allocator for Rcpp derived quantities used in variable_map links.
- *
- * @details Derived quantity IDs are intentionally separated from
- * ParameterVector IDs so linking optional derived quantities does not overwrite
- * model parameter links.
- */
-class CatchAtAgeDerivedQuantitiesIdAllocator {
- public:
-  static uint32_t id_g;
-
-  /**
-   * @brief Get the next derived quantity ID.
-   *
-   * @return uint32_t
-   */
-  static uint32_t GetNextId() { return id_g++; }
-};
-
-uint32_t CatchAtAgeDerivedQuantitiesIdAllocator::id_g = 1000000000;
-
-/**
  * @brief Rcpp interface for catch-at-age population derived quantities.
  *
- * @details This interface avoids keyed containers so derived quantities can be
- * exposed to R as explicit RealVector members.
+ * @details This interface exposes derived quantities to R as explicit VariableVector members.
  */
 class CatchAtAgePopulationDerivedQuantitiesInterface {
  public:
-  RealVector total_landings_weight;
-  RealVector total_landings_numbers;
-  RealVector mortality_F;
-  RealVector mortality_M;
-  RealVector mortality_Z;
-  RealVector numbers_at_age;
-  RealVector unfished_numbers_at_age;
-  RealVector biomass;
-  RealVector spawning_biomass;
-  RealVector unfished_biomass;
-  RealVector unfished_spawning_biomass;
-  RealVector proportion_mature_at_age;
-  RealVector expected_recruitment;
-  RealVector sum_selectivity;
+  VariableVector total_landings_weight;
+  VariableVector total_landings_numbers;
+  VariableVector mortality_F;
+  VariableVector mortality_M;
+  VariableVector mortality_Z;
+  VariableVector numbers_at_age;
+  VariableVector unfished_numbers_at_age;
+  VariableVector biomass;
+  VariableVector spawning_biomass;
+  VariableVector unfished_biomass;
+  VariableVector unfished_spawning_biomass;
+  VariableVector proportion_mature_at_age;
+  VariableVector expected_recruitment;
+  VariableVector sum_selectivity;
 
   /**
    * @brief Constructor.
    */
-  CatchAtAgePopulationDerivedQuantitiesInterface() { AssignVariableMapIds(); }
-
-  /**
-   * @brief Assign IDs that can be used safely in Information::variable_map.
-   */
-  void AssignVariableMapIds() {
-    total_landings_weight.id_m =
-        CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
-    total_landings_numbers.id_m =
-        CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
-    mortality_F.id_m = CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
-    mortality_M.id_m = CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
-    mortality_Z.id_m = CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
-    numbers_at_age.id_m =
-        CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
-    unfished_numbers_at_age.id_m =
-        CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
-    biomass.id_m = CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
-    spawning_biomass.id_m =
-        CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
-    unfished_biomass.id_m =
-        CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
-    unfished_spawning_biomass.id_m =
-        CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
-    proportion_mature_at_age.id_m =
-        CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
-    expected_recruitment.id_m =
-        CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
-    sum_selectivity.id_m =
-        CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
-  }
+  CatchAtAgePopulationDerivedQuantitiesInterface() { }
 
   /**
    * @brief Resize all population derived quantities.
@@ -315,6 +263,7 @@ class CatchAtAgePopulationDerivedQuantitiesInterface {
   }
 
   /**
+   * AMH: doesn't this step need to happen in catch_at_age.hpp?
    * @brief Reset all population derived quantities to a value.
    *
    * @param value Value to assign to all entries.
@@ -336,9 +285,9 @@ class CatchAtAgePopulationDerivedQuantitiesInterface {
     sum_selectivity.fill(value);
   }
 
-#ifdef TMB_MODEL
+#ifdef TMB_MODEL //AMH: why does this need to be in a TMB_MODEL wrapper?
   /**
-   * @brief Link front-end RealVector IDs to backend derived quantity vectors.
+   * @brief Pass derived quantities to variable_map.
    *
    * @param derived_quantities Backend population derived quantities.
    */
@@ -383,81 +332,36 @@ class CatchAtAgePopulationDerivedQuantitiesInterface {
 /**
  * @brief Rcpp interface for catch-at-age fleet derived quantities.
  *
- * @details This interface avoids keyed containers so derived quantities can be
- * exposed to R as explicit RealVector members.
+ * @details This interface exposes derived quantities to R as explicit VariableVector members.
  */
 class CatchAtAgeFleetDerivedQuantitiesInterface {
  public:
-  RealVector landings_numbers_at_age;
-  RealVector landings_weight_at_age;
-  RealVector landings_numbers_at_length;
-  RealVector landings_weight;
-  RealVector landings_numbers;
-  RealVector landings_expected;
-  RealVector log_landings_expected;
-  RealVector agecomp_proportion;
-  RealVector lengthcomp_proportion;
-  RealVector index_numbers_at_age;
-  RealVector index_weight_at_age;
-  RealVector index_numbers_at_length;
-  RealVector index_weight;
-  RealVector index_numbers;
-  RealVector index_expected;
-  RealVector log_index_expected;
-  RealVector catch_index;
-  RealVector expected_catch;
-  RealVector expected_index;
-  RealVector agecomp_expected;
-  RealVector lengthcomp_expected;
+  VariableVector landings_numbers_at_age;
+  VariableVector landings_weight_at_age;
+  VariableVector landings_numbers_at_length;
+  VariableVector landings_weight;
+  VariableVector landings_numbers;
+  VariableVector landings_expected;
+  VariableVector log_landings_expected;
+  VariableVector agecomp_proportion;
+  VariableVector lengthcomp_proportion;
+  VariableVector index_numbers_at_age;
+  VariableVector index_weight_at_age;
+  VariableVector index_numbers_at_length;
+  VariableVector index_weight;
+  VariableVector index_numbers;
+  VariableVector index_expected;
+  VariableVector log_index_expected;
+  VariableVector catch_index;
+  VariableVector expected_catch;
+  VariableVector expected_index;
+  VariableVector agecomp_expected;
+  VariableVector lengthcomp_expected;
 
   /**
    * @brief Constructor.
    */
-  CatchAtAgeFleetDerivedQuantitiesInterface() { AssignVariableMapIds(); }
-
-  /**
-   * @brief Assign IDs that can be used safely in Information::variable_map.
-   */
-  void AssignVariableMapIds() {
-    landings_numbers_at_age.id_m =
-        CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
-    landings_weight_at_age.id_m =
-        CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
-    landings_numbers_at_length.id_m =
-        CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
-    landings_weight.id_m =
-        CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
-    landings_numbers.id_m =
-        CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
-    landings_expected.id_m =
-        CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
-    log_landings_expected.id_m =
-        CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
-    agecomp_proportion.id_m =
-        CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
-    lengthcomp_proportion.id_m =
-        CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
-    index_numbers_at_age.id_m =
-        CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
-    index_weight_at_age.id_m =
-        CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
-    index_numbers_at_length.id_m =
-        CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
-    index_weight.id_m = CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
-    index_numbers.id_m = CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
-    index_expected.id_m = CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
-    log_index_expected.id_m =
-        CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
-    catch_index.id_m = CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
-    expected_catch.id_m =
-        CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
-    expected_index.id_m =
-        CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
-    agecomp_expected.id_m =
-        CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
-    lengthcomp_expected.id_m =
-        CatchAtAgeDerivedQuantitiesIdAllocator::GetNextId();
-  }
+  CatchAtAgeFleetDerivedQuantitiesInterface() {  }
 
   /**
    * @brief Resize all fleet derived quantities.
@@ -491,6 +395,7 @@ class CatchAtAgeFleetDerivedQuantitiesInterface {
   }
 
   /**
+   * AMH: doesn't this step need to happen in catch_at_age.hpp?
    * @brief Reset all fleet derived quantities to a value.
    *
    * @param value Value to assign to all entries.
@@ -519,9 +424,9 @@ class CatchAtAgeFleetDerivedQuantitiesInterface {
     lengthcomp_expected.fill(value);
   }
 
-#ifdef TMB_MODEL
+#ifdef TMB_MODEL//AMH: why does this need to be in a TMB_MODEL wrapper?
   /**
-   * @brief Link front-end RealVector IDs to backend derived quantity vectors.
+   * @brief Pass derived quantities to variable_map.
    *
    * @param derived_quantities Backend fleet derived quantities.
    */

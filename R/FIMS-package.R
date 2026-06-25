@@ -34,8 +34,8 @@
 #' @export log_warning
 #' @export LogisticMaturity
 #' @export LogisticSelectivity
-#' @export Parameter
-#' @export ParameterVector
+#' @export Variable
+#' @export VariableVector
 #' @export Population
 #' @export RealVector
 #' @export set_log_throw_on_error

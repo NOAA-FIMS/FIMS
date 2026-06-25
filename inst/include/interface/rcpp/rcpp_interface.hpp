@@ -245,9 +245,9 @@ void clear() {
   // rcpp_interface_base.hpp
   FIMSRcppInterfaceBase::fims_interface_objects.clear();
 
-  // Parameter and ParameterVector
-  Parameter::id_g = 1;
-  ParameterVector::id_g = 1;
+  // Variable and VariableVector
+  Variable::id_g = 1;
+  VariableVector::id_g = 1;
   // rcpp_data.hpp
   DataInterfaceBase::id_g = 1;
   DataInterfaceBase::live_objects.clear();
@@ -324,7 +324,6 @@ void clear() {
 
   FisheryModelInterfaceBase::id_g = 1;
   FisheryModelInterfaceBase::live_objects.clear();
-  CatchAtAgeDerivedQuantitiesIdAllocator::id_g = 1000000000;
 
   clear_internal<TMB_FIMS_REAL_TYPE>();
   clear_internal<TMBAD_FIMS_TYPE>();

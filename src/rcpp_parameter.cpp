@@ -1,26 +1,26 @@
 /**
- * \file rcpp_parameter.cpp
- * \brief Implementation of Rcpp parameter interfaces for the FIMS framework.
+ * \file rcpp_Variable.cpp
+ * \brief Implementation of Rcpp Variable interfaces for the FIMS framework.
  */
 #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_interface_base.hpp"
 #include <RcppCommon.h>
 #include <Rcpp.h>
 
 /**
- * Function to register parameter classes with the Rcpp module system.
+ * Function to register Variable classes with the Rcpp module system.
  *
  */
-void register_parameter(Rcpp::Module& m) {
-  Rcpp::class_<Parameter>(
-      "Parameter",
-      "See https://noaa-fims.github.io/FIMS/doxygen/classParameter.html.")
+void register_variable(Rcpp::Module& m) {
+  Rcpp::class_<Variable>(
+      "Variable",
+      "See https://noaa-fims.github.io/FIMS/doxygen/classVariable.html.")
       .constructor()
       .constructor<double>()
-      .constructor<Parameter>()
-      .field("value", &Parameter::initial_value_m)
-      .field("estimated_value", &Parameter::final_value_m)
-      .field("id", &Parameter::id_m)
-      .field("estimation_type", &Parameter::estimation_type_m);
+      .constructor<Variable>()
+      .field("value", &Variable::initial_value_m)
+      .field("estimated_value", &Variable::final_value_m)
+      .field("id", &Variable::id_m)
+      .field("estimation_type", &Variable::estimation_type_m);
 }
 
 /**
@@ -29,22 +29,22 @@ void register_parameter(Rcpp::Module& m) {
  *
  */
 void register_vectors(Rcpp::Module& m) {
-  Rcpp::class_<ParameterVector>(
-      "ParameterVector",
-      "See https://noaa-fims.github.io/FIMS/doxygen/classParameterVector.html.")
+  Rcpp::class_<VariableVector>(
+      "VariableVector",
+      "See https://noaa-fims.github.io/FIMS/doxygen/classVariableVector.html.")
       .constructor()
       .constructor<size_t>()
       .constructor<Rcpp::NumericVector, size_t>()
-      .method("get", &ParameterVector::get)
-      .method("set", &ParameterVector::set)
-      .method("show", &ParameterVector::show)
-      .method("at", &ParameterVector::at)
-      .method("size", &ParameterVector::size)
-      .method("resize", &ParameterVector::resize)
-      .method("set_values", &ParameterVector::set_values)
-      .method("set_estimation_types", &ParameterVector::set_estimation_types)
-      .method("fill", &ParameterVector::fill)
-      .method("get_id", &ParameterVector::get_id);
+      .method("get", &VariableVector::get)
+      .method("set", &VariableVector::set)
+      .method("show", &VariableVector::show)
+      .method("at", &VariableVector::at)
+      .method("size", &VariableVector::size)
+      .method("resize", &VariableVector::resize)
+      .method("set_values", &VariableVector::set_values)
+      .method("set_estimation_types", &VariableVector::set_estimation_types)
+      .method("fill", &VariableVector::fill)
+      .method("get_id", &VariableVector::get_id);
 
   Rcpp::class_<RealVector>(
       "RealVector",
