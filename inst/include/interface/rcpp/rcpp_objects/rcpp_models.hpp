@@ -297,33 +297,33 @@ class CatchAtAgePopulationDerivedQuantitiesInterface {
     std::shared_ptr<fims_info::Information<Type>> info =
         fims_info::Information<Type>::GetInstance();
 
-    info->variable_map[total_landings_weight.id_m].variable =
+    info->variable_map[total_landings_weight.id_m] =
         &(derived_quantities.at("total_landings_weight"));
-    info->variable_map[total_landings_numbers.id_m].variable =
+    info->variable_map[total_landings_numbers.id_m] =
         &(derived_quantities.at("total_landings_numbers"));
-    info->variable_map[mortality_F.id_m].variable =
+    info->variable_map[mortality_F.id_m] =
         &(derived_quantities.at("mortality_F"));
-    info->variable_map[mortality_M.id_m].variable =
+    info->variable_map[mortality_M.id_m] =
         &(derived_quantities.at("mortality_M"));
-    info->variable_map[mortality_Z.id_m].variable =
+    info->variable_map[mortality_Z.id_m] =
         &(derived_quantities.at("mortality_Z"));
-    info->variable_map[numbers_at_age.id_m].variable =
+    info->variable_map[numbers_at_age.id_m] =
         &(derived_quantities.at("numbers_at_age"));
-    info->variable_map[unfished_numbers_at_age.id_m].variable =
+    info->variable_map[unfished_numbers_at_age.id_m] =
         &(derived_quantities.at("unfished_numbers_at_age"));
-    info->variable_map[biomass.id_m].variable =
+    info->variable_map[biomass.id_m] =
         &(derived_quantities.at("biomass"));
-    info->variable_map[spawning_biomass.id_m].variable =
+    info->variable_map[spawning_biomass.id_m] =
         &(derived_quantities.at("spawning_biomass"));
-    info->variable_map[unfished_biomass.id_m].variable =
+    info->variable_map[unfished_biomass.id_m] =
         &(derived_quantities.at("unfished_biomass"));
-    info->variable_map[unfished_spawning_biomass.id_m].variable =
+    info->variable_map[unfished_spawning_biomass.id_m] =
         &(derived_quantities.at("unfished_spawning_biomass"));
-    info->variable_map[proportion_mature_at_age.id_m].variable =
+    info->variable_map[proportion_mature_at_age.id_m] =
         &(derived_quantities.at("proportion_mature_at_age"));
-    info->variable_map[expected_recruitment.id_m].variable =
+    info->variable_map[expected_recruitment.id_m] =
         &(derived_quantities.at("expected_recruitment"));
-    info->variable_map[sum_selectivity.id_m].variable =
+    info->variable_map[sum_selectivity.id_m] =
         &(derived_quantities.at("sum_selectivity"));
   }
 #endif
@@ -436,47 +436,47 @@ class CatchAtAgeFleetDerivedQuantitiesInterface {
     std::shared_ptr<fims_info::Information<Type>> info =
         fims_info::Information<Type>::GetInstance();
 
-    info->variable_map[landings_numbers_at_age.id_m].variable =
+    info->variable_map[landings_numbers_at_age.id_m] =
         &(derived_quantities.at("landings_numbers_at_age"));
-    info->variable_map[landings_weight_at_age.id_m].variable =
+    info->variable_map[landings_weight_at_age.id_m] =
         &(derived_quantities.at("landings_weight_at_age"));
-    info->variable_map[landings_numbers_at_length.id_m].variable =
+    info->variable_map[landings_numbers_at_length.id_m] =
         &(derived_quantities.at("landings_numbers_at_length"));
-    info->variable_map[landings_weight.id_m].variable =
+    info->variable_map[landings_weight.id_m] =
         &(derived_quantities.at("landings_weight"));
-    info->variable_map[landings_numbers.id_m].variable =
+    info->variable_map[landings_numbers.id_m] =
         &(derived_quantities.at("landings_numbers"));
-    info->variable_map[landings_expected.id_m].variable =
+    info->variable_map[landings_expected.id_m] =
         &(derived_quantities.at("landings_expected"));
-    info->variable_map[log_landings_expected.id_m].variable =
+    info->variable_map[log_landings_expected.id_m] =
         &(derived_quantities.at("log_landings_expected"));
-    info->variable_map[agecomp_proportion.id_m].variable =
+    info->variable_map[agecomp_proportion.id_m] =
         &(derived_quantities.at("agecomp_proportion"));
-    info->variable_map[lengthcomp_proportion.id_m].variable =
+    info->variable_map[lengthcomp_proportion.id_m] =
         &(derived_quantities.at("lengthcomp_proportion"));
-    info->variable_map[index_numbers_at_age.id_m].variable =
+    info->variable_map[index_numbers_at_age.id_m] =
         &(derived_quantities.at("index_numbers_at_age"));
-    info->variable_map[index_weight_at_age.id_m].variable =
+    info->variable_map[index_weight_at_age.id_m] =
         &(derived_quantities.at("index_weight_at_age"));
-    info->variable_map[index_numbers_at_length.id_m].variable =
+    info->variable_map[index_numbers_at_length.id_m] =
         &(derived_quantities.at("index_numbers_at_length"));
-    info->variable_map[index_weight.id_m].variable =
+    info->variable_map[index_weight.id_m] =
         &(derived_quantities.at("index_weight"));
-    info->variable_map[index_numbers.id_m].variable =
+    info->variable_map[index_numbers.id_m] =
         &(derived_quantities.at("index_numbers"));
-    info->variable_map[index_expected.id_m].variable =
+    info->variable_map[index_expected.id_m] =
         &(derived_quantities.at("index_expected"));
-    info->variable_map[log_index_expected.id_m].variable =
+    info->variable_map[log_index_expected.id_m] =
         &(derived_quantities.at("log_index_expected"));
-    info->variable_map[catch_index.id_m].variable =
+    info->variable_map[catch_index.id_m] =
         &(derived_quantities.at("catch_index"));
-    info->variable_map[expected_catch.id_m].variable =
+    info->variable_map[expected_catch.id_m] =
         &(derived_quantities.at("expected_catch"));
-    info->variable_map[expected_index.id_m].variable =
+    info->variable_map[expected_index.id_m] =
         &(derived_quantities.at("expected_index"));
-    info->variable_map[agecomp_expected.id_m].variable =
+    info->variable_map[agecomp_expected.id_m] =
         &(derived_quantities.at("agecomp_expected"));
-    info->variable_map[lengthcomp_expected.id_m].variable =
+    info->variable_map[lengthcomp_expected.id_m] =
         &(derived_quantities.at("lengthcomp_expected"));
   }
 #endif

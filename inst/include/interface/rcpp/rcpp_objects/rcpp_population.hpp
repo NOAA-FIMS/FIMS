@@ -40,11 +40,6 @@ class PopulationInterfaceBase : public FIMSRcppInterfaceBase {
    */
   SharedBoolean initialize_catch_at_age;
   /**
-   * @brief Initialize the surplus production model.
-   *
-   */
-  SharedBoolean initialize_surplus_production;
-  /**
    * @brief The constructor.
    */
   PopulationInterfaceBase() {
