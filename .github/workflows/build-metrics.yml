@@ -353,31 +353,38 @@ jobs:
           print(Path("metrics.json").read_text())
           EOF
 
-      - name: Download latest main metrics artifact
+      - name: Download baseline metrics artifact
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           echo "Looking for baseline metrics in $BASELINE_REPOSITORY."
 
-          LATEST_MAIN_COMMIT=$(gh api "repos/${BASELINE_REPOSITORY}/commits/main" --jq .sha 2>/dev/null || true)
-          if [ -z "$LATEST_MAIN_COMMIT" ]; then
-            LATEST_MAIN_COMMIT=$(git ls-remote "https://github.com/${BASELINE_REPOSITORY}.git" refs/heads/main | awk '{print $1}')
+          if [ "$GITHUB_EVENT_NAME" = "push" ]; then
+            BASELINE_COMMIT="${{ github.event.before }}"
+            BASELINE_DESCRIPTION="previous main commit"
+          else
+            BASELINE_COMMIT=$(gh api "repos/${BASELINE_REPOSITORY}/commits/main" --jq .sha 2>/dev/null || true)
+            if [ -z "$BASELINE_COMMIT" ]; then
+              BASELINE_COMMIT=$(git ls-remote "https://github.com/${BASELINE_REPOSITORY}.git" refs/heads/main | awk '{print $1}')
+            fi
+            BASELINE_DESCRIPTION="latest main commit"
           fi
-          
-          if [ -z "$LATEST_MAIN_COMMIT" ]; then
-            echo "Could not determine latest main branch commit."
+
+          if [ -z "$BASELINE_COMMIT" ] || [ "$BASELINE_COMMIT" = "0000000000000000000000000000000000000000" ]; then
+            echo "Could not determine baseline commit."
             if [ "$GITHUB_EVENT_NAME" = "pull_request" ]; then exit 1; else exit 0; fi
           fi
 
-          echo "Latest main commit is $LATEST_MAIN_COMMIT."
-          export LATEST_MAIN_COMMIT
+          echo "Baseline is $BASELINE_DESCRIPTION $BASELINE_COMMIT."
+          export BASELINE_COMMIT
 
           build_baseline_metrics_from_main() {
-            echo "Building baseline metrics from latest main commit $LATEST_MAIN_COMMIT."
+            echo "Building baseline metrics from $BASELINE_DESCRIPTION $BASELINE_COMMIT."
             rm -rf baseline-main baseline_package_install.log baseline_installed_shared_objects.tsv
-            git clone --depth 1 --branch main "https://github.com/${BASELINE_REPOSITORY}.git" baseline-main
-            git -C baseline-main checkout "$LATEST_MAIN_COMMIT"
+            git clone --no-checkout --filter=blob:none "https://github.com/${BASELINE_REPOSITORY}.git" baseline-main
+            git -C baseline-main fetch --depth 1 origin "$BASELINE_COMMIT"
+            git -C baseline-main checkout "$BASELINE_COMMIT"
 
             set +e
             /usr/bin/time -v R CMD INSTALL baseline-main > baseline_package_install.log 2>&1
@@ -455,7 +462,7 @@ jobs:
                   shared_objects[path] = int(size)
 
           previous = {
-              "commit_sha": os.environ["LATEST_MAIN_COMMIT"],
+              "commit_sha": os.environ["BASELINE_COMMIT"],
               "timestamp": current.get("timestamp"),
               "dependency_install_time_sec": current.get("dependency_install_time_sec"),
               "dependency_install_max_rss_kb": current.get("dependency_install_max_rss_kb"),
@@ -485,10 +492,10 @@ jobs:
 
           BASELINE_ARTIFACT_ID=$(gh api \
             "repos/${BASELINE_REPOSITORY}/actions/artifacts?per_page=100" \
-            --jq ".artifacts[] | select(.expired == false and .workflow_run.head_sha == \"$LATEST_MAIN_COMMIT\" and (.name == \"build-metrics-main\" or .name == \"build-metrics-$LATEST_MAIN_COMMIT\")) | .id" | head -1)
+            --jq ".artifacts[] | select(.expired == false and .workflow_run.head_sha == \"$BASELINE_COMMIT\" and (.name == \"build-metrics-main\" or .name == \"build-metrics-$BASELINE_COMMIT\")) | .id" | head -1)
 
           if [ -z "$BASELINE_ARTIFACT_ID" ]; then
-            echo "No build metrics artifact found for latest main commit $LATEST_MAIN_COMMIT."
+            echo "No build metrics artifact found for $BASELINE_DESCRIPTION $BASELINE_COMMIT."
             gh api \
               "repos/${BASELINE_REPOSITORY}/actions/artifacts?per_page=20" \
               --jq '.artifacts[] | "available artifact name=\(.name) id=\(.id) head_sha=\(.workflow_run.head_sha) expired=\(.expired) created_at=\(.created_at)"' || true
@@ -496,7 +503,7 @@ jobs:
           fi
 
           if [ -n "$BASELINE_ARTIFACT_ID" ]; then
-            echo "Downloading build metrics artifact $BASELINE_ARTIFACT_ID for latest main commit $LATEST_MAIN_COMMIT."
+            echo "Downloading build metrics artifact $BASELINE_ARTIFACT_ID for $BASELINE_DESCRIPTION $BASELINE_COMMIT."
             rm -rf baseline-metrics baseline-metrics.zip
             mkdir -p baseline-metrics
 
@@ -516,10 +523,10 @@ jobs:
           Path("previous_metrics.json").write_bytes(metrics_files[0].read_bytes())
           EOF
 
-            echo "Downloaded baseline metrics from main commit $LATEST_MAIN_COMMIT (artifact $BASELINE_ARTIFACT_ID)."
+            echo "Downloaded baseline metrics from $BASELINE_DESCRIPTION $BASELINE_COMMIT (artifact $BASELINE_ARTIFACT_ID)."
           fi
           if [ ! -f previous_metrics.json ]; then
-            echo "No usable build metrics artifact found for latest main commit."
+            echo "No usable build metrics artifact found for $BASELINE_DESCRIPTION."
             if ! build_baseline_metrics_from_main; then if [ "$GITHUB_EVENT_NAME" = "pull_request" ]; then exit 1; else exit 0; fi; fi
           fi
 
