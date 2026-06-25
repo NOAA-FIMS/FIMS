@@ -29,7 +29,9 @@ configurations. Unnesting this column reveals:
 "Logistic" for a "Selectivity" module).}
 \item{\code{distribution_link}:}{The component the distribution module
 links to.}
-\item{\code{distribution_type}:}{The type of distribution (e.g., "Data",
+\item{\code{distribution_type}:}{
+The type of distribution (e.g., "Data", "process").
+}
 "process").}
 \item{\code{distribution}:}{The name of distribution (e.g.,
 "Dlnorm", \code{Dmultinom}).}

@@ -33,7 +33,8 @@ gradient. The default is three, leading to four total optimization steps.}
 a list containing the obj and report slot.}
 
 \item{number_of_newton_steps}{The number of Newton steps using the inverse
-Hessian to do after optimization. Not yet implemented.}
+Hessian to do after optimization. Only supported for certain growth
+modules.}
 
 \item{control}{A list of optimizer settings passed to \code{\link[stats:nlminb]{stats::nlminb()}}. The
 the default is a list of length three with \code{eval.max = 1000},
