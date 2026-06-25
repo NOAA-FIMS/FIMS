@@ -661,15 +661,75 @@ void SetFleetALKModel(bool &valid_model,
   }
 
   /**
+   * @brief Enforce that biological size bins are not coarser than overlapping
+   * active fleet observation bins.
+   *
+   * @details This rule applies to both the built-in default biological size
+   * grid and any user-supplied biological size-grid override. The separate
+   * terminal plus-group bin is allowed to remain wider than fleet bins only
+   * when it lies entirely above the fleet-supported range and therefore does
+   * not overlap any active fleet observation bin.
+   *
+   * @param size_grid Population biological size grid to validate.
+   * @param fleet_edges Prepared fleet observation-bin edge vectors.
+   */
+  void EnforcePopulationGridNotCoarserThanFleetBins(
+      const fims_popdy::SizeGrid& size_grid,
+      const fims::Vector<fims::Vector<double>>& fleet_edges) {
+    if (!size_grid.IsConsistent() || size_grid.n_bins == 0 ||
+        fleet_edges.size() == 0) {
+      return;
+    }
+
+    for (std::size_t population_bin_index = 0;
+         population_bin_index < size_grid.n_bins;
+         ++population_bin_index) {
+      const double population_left = size_grid.edges[population_bin_index];
+      const double population_right = size_grid.edges[population_bin_index + 1];
+      const double population_bin_width = population_right - population_left;
+      const double population_tolerance =
+          1e-12 * (population_bin_width > 1.0 ? population_bin_width : 1.0);
+
+      for (std::size_t fleet_index = 0; fleet_index < fleet_edges.size();
+           ++fleet_index) {
+        const fims::Vector<double>& edges = fleet_edges[fleet_index];
+
+        for (std::size_t fleet_bin_index = 1; fleet_bin_index < edges.size();
+             ++fleet_bin_index) {
+          const double fleet_left = edges[fleet_bin_index - 1];
+          const double fleet_right = edges[fleet_bin_index];
+          const double overlap_left = std::max(population_left, fleet_left);
+          const double overlap_right = std::min(population_right, fleet_right);
+
+          if (!(overlap_right > overlap_left)) {
+            continue;
+          }
+
+          const double fleet_bin_width = fleet_right - fleet_left;
+          if (population_bin_width > fleet_bin_width + population_tolerance) {
+            throw std::runtime_error(
+                "Population biological size grid contains at least one bin "
+                "that is coarser than an overlapping active fleet observation "
+                "bin. Provide a finer biological size-grid override or correct "
+                "the fleet bin setup.");
+          }
+        }
+      }
+    }
+  }
+
+  /**
    * @brief Ensure a population has a usable biological size grid.
    *
    * @details Prepare canonical fleet observation-bin geometry from valid fleet
    * length-bin centers whenever that geometry is available. If a user provides
-   * a valid biological size grid, keep it. If no biological size grid has been
+   * a valid biological size grid, keep it only if its bins are not coarser
+   * than any overlapping active fleet observation bins; otherwise, report an
+   * error and invalidate the model. If no biological size grid has been
    * provided, build the built-in default from the prepared fleet
-   * observation-bin geometry, enforce the one-unit compatibility rule, and
-   * warn when the built-in default creates more than 200 regular bins. If a
-   * user provides an invalid or partially specified grid, report the problem
+   * observation-bin geometry, enforce the same fleet-bin compatibility rule,
+   * and warn when the built-in default creates more than 200 regular bins. If
+   * a user provides an invalid or partially specified grid, report the problem
    * and invalidate the model.
    *
    * @param valid_model Reference to model-validity flag.
@@ -691,6 +751,15 @@ void SetFleetALKModel(bool &valid_model,
     }
 
     if (p->size_grid.IsConsistent() && p->size_grid.n_bins > 0) {
+      try {
+        EnforcePopulationGridNotCoarserThanFleetBins(p->size_grid, fleet_edges);
+      } catch (const std::exception &e) {
+        valid_model = false;
+        FIMS_ERROR_LOG(
+            "Population " + fims::to_string(p->id) +
+            " has a biological size grid that is incompatible with active "
+            "fleet observation bins: " + e.what());
+      }
       return;
     }
 
@@ -708,32 +777,10 @@ void SetFleetALKModel(bool &valid_model,
               "to build the default biological size grid");
         }
 
-        const double built_in_bin_width = 1.0;
-        const double tolerance =
-            1e-12 * (built_in_bin_width > 1.0 ? built_in_bin_width : 1.0);
-
-        for (std::size_t fleet_index = 0; fleet_index < fleet_edges.size();
-             ++fleet_index) {
-          const fims::Vector<double>& edges = fleet_edges[fleet_index];
-
-          for (std::size_t edge_index = 1; edge_index < edges.size();
-               ++edge_index) {
-            const double fleet_bin_width =
-                edges[edge_index] - edges[edge_index - 1];
-
-            if (fleet_bin_width < built_in_bin_width - tolerance) {
-              throw std::runtime_error(
-                  "Built-in default biological size grid uses one-unit "
-                  "regular bins, but at least one active fleet observation "
-                  "bin is finer than one unit. Provide a biological "
-                  "size-grid override or correct the fleet bin setup.");
-            }
-          }
-        }
-
         p->size_grid =
             fims_popdy::SizeGridBuilder::BuildDefaultFromFleetEdges(
                 fleet_edges);
+        EnforcePopulationGridNotCoarserThanFleetBins(p->size_grid, fleet_edges);
         const std::size_t regular_bin_count =
             p->size_grid.n_bins > 0 ? p->size_grid.n_bins - 1 : 0;
 

@@ -89,7 +89,7 @@ TEST(InformationSizeGrid,
 }
 
 TEST(InformationSizeGrid,
-     EnsurePopulationSizeGridFailsWhenFleetObservationBinsAreFinerThanOneUnit) {
+     EnsurePopulationSizeGridFailsWhenBuiltInDefaultIsCoarserThanFleetBins) {
   fims::FIMSLog::fims_log->clear();
 
   fims_info::Information<double> info;
@@ -109,8 +109,67 @@ TEST(InformationSizeGrid,
   EXPECT_GT(fims::FIMSLog::fims_log->get_error_count(), error_count_before);
   EXPECT_NE(
       fims::FIMSLog::fims_log->get_errors().find(
-          "at least one active fleet observation bin is finer than one unit"),
+          "coarser than an overlapping active fleet observation bin"),
       std::string::npos);
+
+  fims::FIMSLog::fims_log->clear();
+}
+
+TEST(InformationSizeGrid,
+     EnsurePopulationSizeGridFailsWhenUserOverrideIsCoarserThanFleetBins) {
+  fims::FIMSLog::fims_log->clear();
+
+  fims_info::Information<double> info;
+  bool valid_model = true;
+
+  auto population = MakePopulation();
+  auto fleet = MakeFleetWithCenters({0.5, 1.5, 2.5, 3.5});
+  population->fleets.push_back(fleet);
+  population->n_fleets = population->fleets.size();
+
+  population->size_grid.n_bins = 2;
+  population->size_grid.edges = fims::Vector<double>{0.0, 2.0, 4.0};
+  population->size_grid.centers = fims::Vector<double>{1.0, 3.0};
+
+  const std::size_t error_count_before =
+      fims::FIMSLog::fims_log->get_error_count();
+
+  ASSERT_NO_THROW(info.EnsurePopulationSizeGrid(valid_model, population));
+
+  EXPECT_FALSE(valid_model);
+  EXPECT_GT(fims::FIMSLog::fims_log->get_error_count(), error_count_before);
+  EXPECT_NE(
+      fims::FIMSLog::fims_log->get_errors().find(
+          "coarser than an overlapping active fleet observation bin"),
+      std::string::npos);
+
+  fims::FIMSLog::fims_log->clear();
+}
+
+TEST(InformationSizeGrid,
+     EnsurePopulationSizeGridKeepsUserOverrideWhenItIsNotCoarserThanFleetBins) {
+  fims::FIMSLog::fims_log->clear();
+
+  fims_info::Information<double> info;
+  bool valid_model = true;
+
+  auto population = MakePopulation();
+  auto fleet = MakeFleetWithCenters({0.5, 1.5, 2.5, 3.5});
+  population->fleets.push_back(fleet);
+  population->n_fleets = population->fleets.size();
+
+  population->size_grid.n_bins = 4;
+  population->size_grid.edges = fims::Vector<double>{0.0, 1.0, 2.0, 3.0, 4.0};
+  population->size_grid.centers =
+      fims::Vector<double>{0.5, 1.5, 2.5, 3.5};
+
+  ASSERT_NO_THROW(info.EnsurePopulationSizeGrid(valid_model, population));
+
+  EXPECT_TRUE(valid_model);
+  EXPECT_TRUE(population->size_grid.IsConsistent());
+  EXPECT_EQ(population->size_grid.edges.size(), 5u);
+  EXPECT_DOUBLE_EQ(population->size_grid.edges[0], 0.0);
+  EXPECT_DOUBLE_EQ(population->size_grid.edges[4], 4.0);
 
   fims::FIMSLog::fims_log->clear();
 }
