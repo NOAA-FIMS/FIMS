@@ -44,9 +44,32 @@ jobs:
       - name: Verify FIMS Installation
         shell: Rscript {0}
         run: |
-          # Verify FIMS is loadable and print version
-          if (requireNamespace("FIMS", quietly = TRUE)) {
+          message("R_LIBS_USER: ", Sys.getenv("R_LIBS_USER", unset = "<unset>"))
+          message(".libPaths(): ", paste(.libPaths(), collapse = " | "))
+
+          fims_lib <- Sys.getenv("R_LIBS_USER", unset = NA_character_)
+          if (!is.na(fims_lib) && dir.exists(fims_lib)) {
+            .libPaths(unique(c(fims_lib, .libPaths())))
+            message("Updated .libPaths(): ", paste(.libPaths(), collapse = " | "))
+          }
+
+          installed <- installed.packages()[, "LibPath", drop = TRUE]
+          if ("FIMS" %in% names(installed)) {
+            message("FIMS installed at: ", installed[["FIMS"]])
+          } else {
+            message("FIMS not present in installed.packages().")
+          }
+
+          load_result <- tryCatch(
+            requireNamespace("FIMS", quietly = TRUE),
+            error = function(e) {
+              message("FIMS load error: ", conditionMessage(e))
+              FALSE
+            }
+          )
+
+          if (isTRUE(load_result)) {
             message("SUCCESS: FIMS Version ", packageVersion("FIMS"), " is installed.")
           } else {
-            stop("CRITICAL: FIMS was not found in .libPaths()")
+            stop("CRITICAL: FIMS was not loadable from .libPaths()")
           }
