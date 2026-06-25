@@ -19,7 +19,7 @@
 #' @param om_output A list containing the operating model outputs, including metrics
 #' such as numbers at age, biomass, spawning biomass, fishing mortality, and indices.
 #' @param em_input A list containing the estimation model inputs, including observed
-#' landings, indices, and other relevant data.
+#' catch, indices, and other relevant data.
 #' @param use_fimsfit Logical; if `TRUE`, validates using `fit_fims()` results.
 #'
 #' @return None. The function uses `testthat` functions to perform validations.
@@ -158,13 +158,13 @@ validate_fims <- function(
     )
   }
 
-  # Expected fishery landings and survey index from om_output
+  # Expected fishery catch and survey index from om_output
   # Note: test failed when using em_input with observation errors as expected values
   validate_error(
     expected = c(
       om_output[["L.mt"]][["fleet1"]]
     ),
-    param_name = "landings_expected",
+    param_name = "catch_expected",
     use_fimsfit = use_fimsfit,
     estimates = estimates,
     use_strict_outlier_check = TRUE
@@ -183,13 +183,13 @@ validate_fims <- function(
   #   estimates = estimates
   # )
 
-  # Expected landings number at age
+  # Expected catch number at age
   validate_error(
     expected = c(
       t(om_output[["L.age"]][["fleet1"]]) # ,
       # t(om_output[["survey_age_comp"]][["survey1"]])
     ),
-    param_name = "landings_numbers_at_age",
+    param_name = "catch_numbers_at_age",
     use_fimsfit = use_fimsfit,
     estimates = estimates
   )
@@ -235,7 +235,7 @@ validate_fims <- function(
 #' This function verifies the output of a deterministic run of the FIMS model
 #' against the known operating model (OM) values. It checks various metrics such
 #' as recruitment, fishing mortality, biomass, spawning biomass, and expected
-#' landings.
+#' catch.
 #'
 #' @param report A TMB report where anything that is flagged as reportable in the
 #' C++ code from running `get_report()`.
@@ -246,7 +246,7 @@ validate_fims <- function(
 #' @param om_output A list containing the operating model outputs, including metrics
 #' such as numbers at age, biomass, spawning biomass, fishing mortality, and indices.
 #' @param em_input A list containing the estimation model inputs, including observed
-#' landings, indices, and other relevant data.
+#' catch, indices, and other relevant data.
 #' @param use_fimsfit Logical; if `TRUE`, validates using `fit_fims()` results.
 #'
 #' @return None. The function uses `testthat` functions to perform validations.
@@ -326,54 +326,54 @@ verify_fims_deterministic <- function(
     )
   }
 
-  fims_landings <- report[["landings_expected"]]
-  #' @description Test that the expected landings values from report are equal to the true values.
+  fims_catch <- report[["catch_expected"]]
+  #' @description Test that the expected catch values from report are equal to the true values.
   expect_equal(
-    fims_landings[[1]],
+    fims_catch[[1]],
     om_output[["L.mt"]][["fleet1"]]
   )
 
 
-  # Get relative error in landings
+  # Get relative error in catch
   fims_object_are <- rep(0, length(em_input[["L.obs"]][["fleet1"]]))
   for (i in 1:length(em_input[["L.obs"]][["fleet1"]])) {
-    fims_object_are[i] <- abs(fims_landings[[1]][i] - em_input[["L.obs"]][["fleet1"]][i]) / em_input[["L.obs"]][["fleet1"]][i]
+    fims_object_are[i] <- abs(fims_catch[[1]][i] - em_input[["L.obs"]][["fleet1"]][i]) / em_input[["L.obs"]][["fleet1"]][i]
   }
 
-  #' @description Test that the 95% of relative error in landings is within 2*cv.
+  #' @description Test that the 95% of relative error in catch is within 2*cv.
   expect_lte(sum(fims_object_are > om_input[["cv.L"]][["fleet1"]] * 2.0), length(em_input[["L.obs"]][["fleet1"]]) * 0.05)
 
-  #' @description Test that the expected landings number at age from report are equal to the true values.
+  #' @description Test that the expected catch number at age from report are equal to the true values.
   expect_equal(
-    report[["landings_numbers_at_age"]][[1]],
+    report[["catch_numbers_at_age"]][[1]],
     c(t(om_output[["L.age"]][["fleet1"]]))
   )
 
-  # Expected landings number at age in proportion
+  # Expected catch number at age in proportion
   # QUESTION: Isn't this redundant with the non-proportion test above?
-  fims_landings_naa <- matrix(report[["landings_numbers_at_age"]][[1]][1:(om_input[["nyr"]] * om_input[["nages"]])],
+  fims_catch_naa <- matrix(report[["catch_numbers_at_age"]][[1]][1:(om_input[["nyr"]] * om_input[["nages"]])],
     nrow = om_input[["nyr"]], byrow = TRUE
   )
-  fims_landings_naa_proportion <- fims_landings_naa / rowSums(fims_landings_naa)
-  om_landings_naa_proportion <- om_output[["L.age"]][["fleet1"]] / rowSums(om_output[["L.age"]][["fleet1"]])
+  fims_catch_naa_proportion <- fims_catch_naa / rowSums(fims_catch_naa)
+  om_catch_naa_proportion <- om_output[["L.age"]][["fleet1"]] / rowSums(om_output[["L.age"]][["fleet1"]])
 
-  #' @description Test that the expected landings number at age in proportion from report are equal to the true values.
+  #' @description Test that the expected catch number at age in proportion from report are equal to the true values.
   expect_equal(
-    c(t(fims_landings_naa_proportion)),
-    c(t(om_landings_naa_proportion))
+    c(t(fims_catch_naa_proportion)),
+    c(t(om_catch_naa_proportion))
   )
 
   # Expected survey index.
   fims_index <- report[["index_expected"]]
   # # Using [[2]] because the survey is the 2nd fleet.
-  # landings_waa <- matrix(report[["landings_waa"]][[2]][1:(om_input[["nyr"]] * om_input[["nages"]])],
+  # catch_waa <- matrix(report[["catch_waa"]][[2]][1:(om_input[["nyr"]] * om_input[["nages"]])],
   #   nrow = om_input[["nyr"]], byrow = TRUE
   # )
   # #' @description Test that the expected survey index values from report are equal to the true values.
   # # Using [[2]] because the survey is the 2nd fleet.
   # expect_setequal(
-  #   fims_landings[[2]],
-  #   apply(landings_waa, 1, sum)
+  #   fims_catch[[2]],
+  #   apply(catch_waa, 1, sum)
   # )
 
   #' @description Test that the expected survey index values from report are equal to the true values.
@@ -393,8 +393,8 @@ verify_fims_deterministic <- function(
     length(em_input[["surveyB.obs"]][["survey1"]]) * 0.05
   )
 
-  # Expected landings number at age in proportion
-  fims_cnaa <- matrix(report[["landings_numbers_at_age"]][[2]][1:(om_input[["nyr"]] * om_input[["nages"]])],
+  # Expected catch number at age in proportion
+  fims_cnaa <- matrix(report[["catch_numbers_at_age"]][[2]][1:(om_input[["nyr"]] * om_input[["nages"]])],
     nrow = om_input[["nyr"]], byrow = TRUE
   )
   fims_index_naa <- matrix(report[["index_numbers_at_age"]][[2]][1:(om_input[["nyr"]] * om_input[["nages"]])],
@@ -423,7 +423,7 @@ verify_fims_deterministic <- function(
 #' This function verifies the negative log-likelihood (NLL) of the FIMS model
 #' output against the expected NLL calculated from the operating model (OM)
 #' and estimation model (EM) inputs. It checks the individual components of the
-#' NLL, including recruitment, fishery landings, survey index, age composition,
+#' NLL, including recruitment, fishery catch, survey index, age composition,
 #' and length composition. It only works for deterministic runs.
 #'
 #' @param report A TMB report where anything that is flagged as reportable in the
@@ -433,7 +433,7 @@ verify_fims_deterministic <- function(
 #' @param om_output A list containing the operating model outputs, including metrics
 #' such as numbers at age, biomass, spawning biomass, fishing mortality, and indices.
 #' @param em_input A list containing the estimation model inputs, including observed
-#' landings, indices, and other relevant data.
+#' catch, indices, and other relevant data.
 #'
 #' @return None. The function uses `testthat` functions to perform validations.
 #'
@@ -458,8 +458,8 @@ verify_fims_nll <- function(report,
     om_input[["logR_sd"]], TRUE
   ))
 
-  # fishery landings expected likelihood
-  landings_nll <- landings_nll_fleet <- -sum(dlnorm(
+  # fishery catch expected likelihood
+  catch_nll <- catch_nll_fleet <- -sum(dlnorm(
     em_input[["L.obs"]][["fleet1"]],
     log(om_output[["L.mt"]][["fleet1"]]),
     sqrt(log(em_input[["cv.L"]][["fleet1"]]^2 + 1)), TRUE
@@ -518,12 +518,12 @@ verify_fims_nll <- function(report,
   }
   lengthcomp_nll <- lengthcomp_nll_fleet + lengthcomp_nll_survey
 
-  expected_jnll <- rec_nll + landings_nll + index_nll + age_comp_nll + lengthcomp_nll
+  expected_jnll <- rec_nll + catch_nll + index_nll + age_comp_nll + lengthcomp_nll
   jnll <- report[["jnll"]]
   #' @description Test that the recruitment jnll is equal to the expected jnll.
   expect_equal(report[["nll_components"]][1], rec_nll)
-  #' @description Test that the landings jnll is equal to the expected jnll.
-  expect_equal(report[["nll_components"]][2], landings_nll_fleet)
+  #' @description Test that the catch jnll is equal to the expected jnll.
+  expect_equal(report[["nll_components"]][2], catch_nll_fleet)
   #' @description Test that the fishing fleet age comp jnll is equal to the expected jnll.
   expect_equal(report[["nll_components"]][3], age_comp_nll_fleet)
   #' @description Test that the fishing fleet length comp jnll is equal to the expected jnll.

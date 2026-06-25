@@ -52,10 +52,10 @@ class CAAInitializeTestFixture : public testing::Test {
           this->catch_at_age_model->GetPopulationDerivedQuantities(
               this->catch_at_age_model->populations[p]->GetId());
 
-      derived_quantities["total_landings_weight"] = fims::Vector<double>(
+      derived_quantities["total_catch_weight"] = fims::Vector<double>(
           this->catch_at_age_model->populations[p]->n_years);
 
-      derived_quantities["total_landings_numbers"] = fims::Vector<double>(
+      derived_quantities["total_catch_numbers"] = fims::Vector<double>(
           this->catch_at_age_model->populations[p]->n_years);
 
       derived_quantities["mortality_F"] = fims::Vector<double>(
@@ -131,26 +131,26 @@ class CAAInitializeTestFixture : public testing::Test {
           this->catch_at_age_model->GetFleetDerivedQuantities(fleet->GetId());
 
       // initialize derive quantities
-      // landings
-      derived_quantities["landings_numbers_at_age"] =
+      // catch
+      derived_quantities["catch_numbers_at_age"] =
           fims::Vector<double>(fleet->n_years * fleet->n_ages);
 
-      derived_quantities["landings_weight_at_age"] =
+      derived_quantities["catch_weight_at_age"] =
           fims::Vector<double>(fleet->n_years * fleet->n_ages);
 
-      derived_quantities["landings_numbers_at_length"] =
+      derived_quantities["catch_numbers_at_length"] =
           fims::Vector<double>(fleet->n_years * fleet->n_lengths);
 
-      derived_quantities["landings_weight"] =
+      derived_quantities["catch_weight"] =
           fims::Vector<double>(fleet->n_years);
 
-      derived_quantities["landings_numbers"] =
+      derived_quantities["catch_numbers"] =
           fims::Vector<double>(fleet->n_years);
 
-      derived_quantities["landings_expected"] =
+      derived_quantities["catch_expected"] =
           fims::Vector<double>(fleet->n_years);
 
-      derived_quantities["log_landings_expected"] =
+      derived_quantities["log_catch_expected"] =
           fims::Vector<double>(fleet->n_years);
 
       derived_quantities["agecomp_proportion"] =
@@ -413,10 +413,10 @@ class CAAEvaluateTestFixture : public testing::Test {
           this->catch_at_age_model->GetPopulationDerivedQuantities(
               this->catch_at_age_model->populations[p]->GetId());
 
-      derived_quantities["total_landings_weight"] = fims::Vector<double>(
+      derived_quantities["total_catch_weight"] = fims::Vector<double>(
           this->catch_at_age_model->populations[p]->n_years);
 
-      derived_quantities["total_landings_numbers"] = fims::Vector<double>(
+      derived_quantities["total_catch_numbers"] = fims::Vector<double>(
           this->catch_at_age_model->populations[p]->n_years);
 
       derived_quantities["mortality_F"] = fims::Vector<double>(
@@ -491,26 +491,26 @@ class CAAEvaluateTestFixture : public testing::Test {
           this->catch_at_age_model->GetFleetDerivedQuantities(fleet->GetId());
 
       // initialize derive quantities
-      // landings
-      derived_quantities["landings_numbers_at_age"] =
+      // catch
+      derived_quantities["catch_numbers_at_age"] =
           fims::Vector<double>(fleet->n_years * fleet->n_ages);
 
-      derived_quantities["landings_weight_at_age"] =
+      derived_quantities["catch_weight_at_age"] =
           fims::Vector<double>(fleet->n_years * fleet->n_ages);
 
-      derived_quantities["landings_numbers_at_length"] =
+      derived_quantities["catch_numbers_at_length"] =
           fims::Vector<double>(fleet->n_years * fleet->n_lengths);
 
-      derived_quantities["landings_weight"] =
+      derived_quantities["catch_weight"] =
           fims::Vector<double>(fleet->n_years);
 
-      derived_quantities["landings_numbers"] =
+      derived_quantities["catch_numbers"] =
           fims::Vector<double>(fleet->n_years);
 
-      derived_quantities["landings_expected"] =
+      derived_quantities["catch_expected"] =
           fims::Vector<double>(fleet->n_years);
 
-      derived_quantities["log_landings_expected"] =
+      derived_quantities["log_catch_expected"] =
           fims::Vector<double>(fleet->n_years);
 
       derived_quantities["agecomp_proportion"] =
@@ -709,10 +709,10 @@ class CAAPrepareTestFixture : public testing::Test {
           this->catch_at_age_model->GetPopulationDerivedQuantities(
               this->catch_at_age_model->populations[p]->GetId());
 
-      derived_quantities["total_landings_weight"] = fims::Vector<double>(
+      derived_quantities["total_catch_weight"] = fims::Vector<double>(
           this->catch_at_age_model->populations[p]->n_years);
 
-      derived_quantities["total_landings_numbers"] = fims::Vector<double>(
+      derived_quantities["total_catch_numbers"] = fims::Vector<double>(
           this->catch_at_age_model->populations[p]->n_years);
 
       derived_quantities["mortality_F"] = fims::Vector<double>(
@@ -787,26 +787,26 @@ class CAAPrepareTestFixture : public testing::Test {
           this->catch_at_age_model->GetFleetDerivedQuantities(fleet->GetId());
 
       // initialize derive quantities
-      // landings
-      derived_quantities["landings_numbers_at_age"] =
+      // catch
+      derived_quantities["catch_numbers_at_age"] =
           fims::Vector<double>(fleet->n_years * fleet->n_ages);
 
-      derived_quantities["landings_weight_at_age"] =
+      derived_quantities["catch_weight_at_age"] =
           fims::Vector<double>(fleet->n_years * fleet->n_ages);
 
-      derived_quantities["landings_numbers_at_length"] =
+      derived_quantities["catch_numbers_at_length"] =
           fims::Vector<double>(fleet->n_years * fleet->n_lengths);
 
-      derived_quantities["landings_weight"] =
+      derived_quantities["catch_weight"] =
           fims::Vector<double>(fleet->n_years);
 
-      derived_quantities["landings_numbers"] =
+      derived_quantities["catch_numbers"] =
           fims::Vector<double>(fleet->n_years);
 
-      derived_quantities["landings_expected"] =
+      derived_quantities["catch_expected"] =
           fims::Vector<double>(fleet->n_years);
 
-      derived_quantities["log_landings_expected"] =
+      derived_quantities["log_catch_expected"] =
           fims::Vector<double>(fleet->n_years);
 
       derived_quantities["agecomp_proportion"] =

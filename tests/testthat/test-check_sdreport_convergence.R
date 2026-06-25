@@ -122,14 +122,14 @@ test_that("check_sdreport_convergence() works with correct inputs", {
   out <- NULL
 
   testthat::with_mocked_bindings(
-    FIMSFit = function(input, obj, opt, sdreport, timing) {
+    FIMSFit = function(input, obj, opt, sdreport, run_time) {
       list(
         tag = "mock_fit",
         input = input,
         obj = obj,
         opt = opt,
         sdreport = sdreport,
-        timing = timing
+        run_time = run_time
       )
     },
     print = function(x, ...) invisible(x),

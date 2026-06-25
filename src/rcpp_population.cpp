@@ -34,12 +34,12 @@ void register_population(Rcpp::Module& m) {
       .field("log_init_naa", &PopulationInterface::log_init_naa)
       .field("proportion_female", &PopulationInterface::proportion_female)
       .field("ages", &PopulationInterface::ages)
-      .field("total_landings_weight",
+      .field("total_catch_weight",
              &PopulationInterface::
-                 total_landings_weight)
-      .field("total_landings_numbers",
+                 total_catch_weight)
+      .field("total_catch_numbers",
              &PopulationInterface::
-                 total_landings_numbers)
+                 total_catch_numbers)
       .field("mortality_F",
              &PopulationInterface::mortality_F)
       .field("mortality_M",

@@ -125,7 +125,7 @@ test_that("deterministic test of fims with recruitment re", {
   # Expected catch
   fims_index <- report[["exp_index"]]
   for (i in 1:length(om_output_list[[iter_id]][["L.mt"]][["fleet1"]])) {
-    #' @description Test that the expected landings from FIMS matches the "true" values from the operating model.
+    #' @description Test that the expected catch from FIMS matches the "true" values from the operating model.
     expect_equal(fims_index[[1]][i], om_output_list[[iter_id]][["L.mt"]][["fleet1"]][i])
   }
 
@@ -136,7 +136,7 @@ test_that("deterministic test of fims with recruitment re", {
   }
 
   # Expect 95% of relative error to be within 2*cv
-  #' @description Test that 95% of the relative errors between the expected landings from FIMS and the observed landings are within 2 times the coefficient of variation.
+  #' @description Test that 95% of the relative errors between the expected catch from FIMS and the observed catch are within 2 times the coefficient of variation.
   expect_lte(sum(fims_object_are > om_input_list[[iter_id]][["cv.L"]][["fleet1"]] * 2.0), length(em_input_list[[iter_id]][["L.obs"]][["fleet1"]]) * 0.05)
 
   # Compare expected catch number at age to true values
@@ -364,13 +364,13 @@ test_that("estimation test with recruitment re on logr", {
   )
 
   default_parameters <- fims_data |>
-    create_default_parameters(
+    setup_default_parameters(
       fleets = fleets,
       recruitment = list(
         form = "BevertonHoltRecruitment"
       )
     ) |>
-    create_default_process(
+    setup_default_process(
       data = fims_data,
       module = "recruitment",
       par = "log_r",
@@ -445,7 +445,7 @@ test_that("estimation test with recruitment re on logr", {
   )
 
   default_parameters <- fims_data |>
-    create_default_parameters(
+    setup_default_parameters(
       fleets = list(fleet1 = fleet1, survey1 = survey1),
       recruitment = list(
         form = "BevertonHoltRecruitment"
@@ -453,7 +453,7 @@ test_that("estimation test with recruitment re on logr", {
       growth = list(form = "EWAAGrowth"),
       maturity = list(form = "LogisticMaturity")
     ) |>
-    create_default_process(
+    setup_default_process(
       data = fims_data,
       module = "recruitment",
       par = "log_devs",
@@ -502,9 +502,9 @@ test_that("estimation test with recruitment re on logr", {
   #' @description Test that the `expected_recruitment` from both `fit_log_r` and `fit_log_devs` runs are approximately equal within a tolerance of 0.001.
   expect_equal(fit_log_r@report[["expected_recruitment"]], fit_log_devs@report[["expected_recruitment"]], tolerance = .001)
   #' @description Test that the `time_optimization` from `fit_log_r` is less than or equal to that from `fit_log_devs`.
-  expect_lte(fit_log_r@timing[["time_optimization"]], fit_log_devs@timing[["time_optimization"]])
+  expect_lte(fit_log_r@run_time[["time_optimization"]], fit_log_devs@run_time[["time_optimization"]])
   #' @description Test that the `time_sdreport` from `fit_log_r` is less than or equal to that from `fit_log_devs`.
-  expect_lte(fit_log_r@timing[["time_sdreport"]], fit_log_devs@timing[["time_sdreport"]])
+  expect_lte(fit_log_r@run_time[["time_sdreport"]], fit_log_devs@run_time[["time_sdreport"]])
 
   clear()
 })

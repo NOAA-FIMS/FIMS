@@ -24,7 +24,7 @@
 #' @export get_random
 #' @export inv_logit
 #' @export logit
-#' @export Landings
+#' @export Catch
 #' @export Index
 #' @export LengthComp
 #' @export log_error

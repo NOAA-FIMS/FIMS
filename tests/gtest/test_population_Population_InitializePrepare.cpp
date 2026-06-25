@@ -35,8 +35,8 @@ namespace
        // EXPECT_EQ(dq["weight_at_age"].size(), n_ages);
         EXPECT_EQ(dq["unfished_numbers_at_age"].size(), (n_years + 1) * n_ages);
         EXPECT_EQ(dq["numbers_at_age"].size(), (n_years + 1) * n_ages);
-        EXPECT_EQ(dq["total_landings_weight"].size(), n_years);
-        EXPECT_EQ(dq["total_landings_numbers"].size(), n_years);
+        EXPECT_EQ(dq["total_catch_weight"].size(), n_years);
+        EXPECT_EQ(dq["total_catch_numbers"].size(), n_years);
         EXPECT_EQ(dq["biomass"].size(), (n_years + 1));
         EXPECT_EQ(dq["unfished_biomass"].size(), (n_years + 1));
         EXPECT_EQ(dq["unfished_spawning_biomass"].size(), (n_years + 1));
@@ -54,10 +54,10 @@ namespace
         auto &dq = catch_at_age_model->GetPopulationDerivedQuantities(1);
 
         // vector size type = n_years and vector value = 0
-        EXPECT_EQ(dq["total_landings_weight"],
+        EXPECT_EQ(dq["total_catch_weight"],
             fims::Vector<double>(n_years, 0)
         );
-        EXPECT_EQ(dq["total_landings_numbers"],
+        EXPECT_EQ(dq["total_catch_numbers"],
             fims::Vector<double>(n_years, 0)
         );
         EXPECT_EQ(dq["mortality_F"],

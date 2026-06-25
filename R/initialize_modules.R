@@ -42,8 +42,8 @@ initialize_module <- function(parameters, data, module_name, fleet = NA_characte
     module_fields <- setdiff(module_fields, c(
       "log_f_multiplier",
       "spawning_biomass_ratio",
-      "total_landings_weight",
-      "total_landings_numbers",
+      "total_catch_weight",
+      "total_catch_numbers",
       "mortality_F",
       "mortality_M",
       "mortality_Z",
@@ -92,18 +92,18 @@ initialize_module <- function(parameters, data, module_name, fleet = NA_characte
     # Remove certain fields for the Fleet module
     module_fields <- setdiff(module_fields, c(
       "log_index_expected",
-      "log_landings_expected",
+      "log_catch_expected",
       "index_expected",
-      "landings_expected",
+      "catch_expected",
       "agecomp_expected",
       "agecomp_proportion",
       "observed_index_units",
-      "observed_landings_units",
-      "landings_numbers_at_age",
-      "landings_weight_at_age",
-      "landings_numbers_at_length",
-      "landings_weight",
-      "landings_numbers",
+      "observed_catch_units",
+      "catch_numbers_at_age",
+      "catch_weight_at_age",
+      "catch_numbers_at_length",
+      "catch_weight",
+      "catch_numbers",
       "lengthcomp_proportion",
       "index_numbers_at_age",
       "index_weight_at_age",
@@ -118,14 +118,8 @@ initialize_module <- function(parameters, data, module_name, fleet = NA_characte
       dplyr::pull(.data$type) |>
       unique()
 
-    data_distribution_names_for_fleet_i <- parameters |>
-      dplyr::filter(
-        .data$fleet == !!fleet &
-          .data$distribution_type == "Data"
-      ) |>
-      dplyr::pull(.data$module_type)
     if ("age_to_length_conversion" %in% get_data(data)[["type"]] &&
-      "LengthComp" %in% data_distribution_names_for_fleet_i) {
+      "length_comp" %in% fleet_types) {
       age_to_length_conversion_value <- model_age_to_length_conversion(data)
       # Assign each value to the corresponding position in the parameter vector
       module[["age_to_length_conversion"]][] <- age_to_length_conversion_value
@@ -346,7 +340,7 @@ initialize_selectivity <- function(parameters, data, fleet) {
 #' @inheritParams initialize_module
 #' @param fleet A character. Name of the fleet to initialize.
 #' @param linked_ids A vector. Named vector of linked IDs required for the
-#'  fleet, including IDs for "selectivity", "landings", "index", "age_comp", and "length_comp".
+#'  fleet, including IDs for "selectivity", "catch", "index", "age_comp", and "length_comp".
 #' @return
 #' The initialized fleet module as an object.
 #' @noRd
@@ -365,56 +359,41 @@ initialize_fleet <- function(parameters, data, fleet, linked_ids) {
     dplyr::pull(.data$type) |>
     unique()
 
-
-  distribution_names_for_fleet <- parameters |>
-    dplyr::filter(.data$fleet == !!fleet & .data$distribution_type == "Data") |>
-    dplyr::pull(.data$module_type)
-
-  # Link the observed landings data to the fleet module using its associated ID
-  # if the data type includes "landings" and if "Landings" exists in the
-  # data distribution specification
-  if ("landings" %in% fleet_types &&
-    "Landings" %in% distribution_names_for_fleet) {
-    module$SetObservedLandingsDataID(linked_ids[["landings"]])
+  # Link the observed catch data to the fleet module using its associated ID
+  if ("catch" %in% fleet_types) {
+    module$SetObservedCatchDataID(linked_ids[["catch"]])
   }
 
   # Link the observed index data to the fleet module using its associated ID
-  # if the data type includes "index" and if "Index" exists in the
-  # data distribution specification
-  if ("index" %in% fleet_types &&
-    "Index" %in% distribution_names_for_fleet) {
+  if ("index" %in% fleet_types) {
     module$SetObservedIndexDataID(linked_ids[["index"]])
   }
 
-  # Link the observed age composition data to the fleet module using its
-  # associated ID if the data type includes "age_comp" and if "AgeComp" exists
-  # in the data distribution specification
-  if ("age_comp" %in% fleet_types &&
-    "AgeComp" %in% distribution_names_for_fleet) {
+  # Link the observed age-composition data to the fleet module using its
+  # associated ID
+  if ("age_comp" %in% fleet_types) {
     module$SetObservedAgeCompDataID(linked_ids[["age_comp"]])
   }
 
-  # Link the observed length composition data to the fleet module using its
-  # associated ID if the data type includes "length_comp" and if "LengthComp"
-  # exists in the data distribution specification
-  if ("length_comp" %in% fleet_types &&
-    "LengthComp" %in% distribution_names_for_fleet) {
+  # Link the observed length-composition data to the fleet module using its
+  # associated ID
+  if ("length_comp" %in% fleet_types) {
     module$SetObservedLengthCompDataID(linked_ids[["length_comp"]])
   }
   return(module)
 }
 
-#' Initialize a landings module
+#' Initialize a catch module
 #'
 #' @description
-#' Initializes a landings module based on the provided data and fleet name.
+#' Initializes a catch module based on the provided data and fleet name.
 #' @inheritParams initialize_module
-#' @param fleet A character. Name of the fleet for which the landings
+#' @param fleet A character. Name of the fleet for which the catch
 #'   module is initialized.
 #' @return
-#' The initialized landings module as an object.
+#' The initialized catch module as an object.
 #' @noRd
-initialize_landings <- function(data, fleet) {
+initialize_catch <- function(data, fleet) {
   # Check if the specified fleet exists in the data
   fleet_exists <- fleet %in% get_fleets(data)
   if (!fleet_exists) {
@@ -428,9 +407,9 @@ initialize_landings <- function(data, fleet) {
     dplyr::distinct(.data$type) |>
     dplyr::pull(.data$type)
 
-  if ("landings" %in% fleet_type) {
-    module <- methods::new(Landings, get_n_years(data))
-    module$landings_data[] <- model_landings(data, fleet)
+  if ("catch" %in% fleet_type) {
+    module <- methods::new(Catch, get_n_years(data))
+    module$catch_data[] <- model_catch(data, fleet)
 
     return(module)
   } else {
@@ -539,18 +518,7 @@ initialize_comp <- function(data,
     ))
   }
 
-  model_data <- comp_data *
-    get_data(data) |>
-      dplyr::filter(
-        .data$fleet == .env$fleet,
-        .data$type == comp[["name"]]
-      ) |>
-      dplyr::mutate(
-        valid_n = ifelse(.data$value == -999, 1, .data$uncertainty)
-      ) |>
-      dplyr::pull(.data$valid_n)
-
-  if (length(model_data) != get_n_years(data) * get_function(data)) {
+  if (length(comp_data) != get_n_years(data) * get_function(data)) {
     bad_data_years <- get_data(data) |>
       dplyr::filter(
         .data$fleet == .env$fleet,
@@ -564,12 +532,12 @@ initialize_comp <- function(data,
       "The length of the `{comp[['name']]}`-composition data for fleet
       `{fleet}` does not match the expected dimensions.",
       i = "Expected length: {get_n_years(data) * get_function(data)}",
-      i = "Actual length: {length(model_data)}",
-      i = "Number of -999 values: {sum(model_data == -999)}",
+      i = "Actual length: {length(comp_data)}",
+      i = "Number of -999 values: {sum(comp_data == -999)}",
       i = "Dates with invalid data: {bad_data_years}"
     ))
   }
-  module[[comp[["comp_data_field"]]]][] <- model_data
+  module[[comp[["comp_data_field"]]]][] <- comp_data
 
   return(module)
 }
@@ -585,9 +553,7 @@ initialize_comp <- function(data,
 #' model one needs to instantiate recruitment, growth, and maturity modules and
 #' at least one fleet and population module.
 #'
-#' @param parameters A tibble returned from [create_default_parameters()]. The
-#'   tibble can be nested, i.e., contain a data column, or unnested, i.e.,
-#'   `tidyr::unnest(create_default_parameters(), cols = "data")`. Regardless, it
+#' @param parameters A tibble returned from [setup_default_parameters()]. It
 #'   is the primary source of information for what is initialized. That is, if a
 #'   fleet exists in the data but parameter information for how to specify
 #'   selectivity for that fleet is not provided, then selectivity will not be
@@ -610,8 +576,7 @@ initialize_comp <- function(data,
 #' run [clear()].
 #' @export
 #' @seealso
-#' * [create_default_configurations()]
-#' * [create_default_parameters()]
+#' * [setup_default_parameters()]
 #' * [FIMSFrame()]
 #' * [fit_fims()]
 #' * [clear()]
@@ -621,9 +586,7 @@ initialize_comp <- function(data,
 #' data("data_big", package = "FIMS")
 #' data_4_model <- FIMSFrame(data_big)
 #' # Instantiate modules
-#' parameters_list <- data_4_model |>
-#'   create_default_configurations() |>
-#'   create_default_parameters(data = data_4_model) |>
+#' parameters_list <- setup_default_parameters(data = data_4_model) |>
 #'   initialize_fims(data = data_4_model)
 #' clear()
 #' }
@@ -631,12 +594,6 @@ initialize_fims <- function(parameters, data) {
   # Validate parameters input
   if (missing(parameters) || !tibble::is_tibble(parameters)) {
     cli::cli_abort("The {.var parameters} argument must be a tibble.")
-  }
-
-  # Check if parameters is a nested tibble. If so, unnest parameters
-  if ("data" %in% names(parameters)) {
-    parameters <- parameters |>
-      tidyr::unnest(cols = c(data))
   }
 
   # Check if estimation_type is within "constant", "fixed_effect", "random_effect"
@@ -672,7 +629,7 @@ initialize_fims <- function(parameters, data) {
 
   # Initialize lists to store fleet-related objects
   fleet <- fleet_selectivity <-
-    fleet_landings <- fleet_landings_distribution <-
+    fleet_catch <- fleet_catch_distribution <-
     fleet_index <- fleet_index_distribution <-
     fleet_age_comp <- fleet_agecomp_distribution <-
     fleet_length_comp <- fleet_lengthcomp_distribution <-
@@ -694,31 +651,25 @@ initialize_fims <- function(parameters, data) {
       dplyr::pull(.data$type) |>
       unique()
 
-    data_distribution_names_for_fleet_i <- parameters |>
-      dplyr::filter(.data$fleet == .env$fleets[i] & .data$distribution_type == "Data") |>
-      dplyr::pull(.data$module_type)
-
-    # Initialize landings module if the data type includes "landings" and
-    # if "Landings" exists in the data distribution specification
-    if ("landings" %in% fleet_types &&
-      "Landings" %in% data_distribution_names_for_fleet_i) {
-      # Initialize landings module for the current fleet
-      fleet_landings[[i]] <- initialize_landings(
+    # Initialize catch module if the data type includes "catch" and
+    # if "Catch" exists in the data distribution specification
+    if ("catch" %in% fleet_types) {
+      # Initialize catch module for the current fleet
+      fleet_catch[[i]] <- initialize_catch(
         data = data,
         fleet = fleets[i]
       )
 
-      # Add the module ID for the initialized landings to the list of fleet module IDs
+      # Add the module ID for the initialized catch to the list of fleet module IDs
       fleet_module_ids <- c(
         fleet_module_ids,
-        c(landings = fleet_landings[[i]]$get_id())
+        c(catch = fleet_catch[[i]]$get_id())
       )
     }
 
     # Initialize index module if the data type includes "index" and
     # if "Index" exists in the data distribution specification
-    if ("index" %in% fleet_types &&
-      "Index" %in% data_distribution_names_for_fleet_i) {
+    if ("index" %in% fleet_types) {
       # Initialize index module for the current fleet
       fleet_index[[i]] <- initialize_index(
         data = data,
@@ -734,8 +685,7 @@ initialize_fims <- function(parameters, data) {
 
     # Initialize age composition module if the data type includes "age_comp" and
     # if "AgeComp" exists in the data distribution specification
-    if ("age_comp" %in% fleet_types &&
-      "AgeComp" %in% data_distribution_names_for_fleet_i) {
+    if ("age_comp" %in% fleet_types) {
       # Initialize age composition module for the current fleet
       fleet_age_comp[[i]] <- initialize_comp(
         data = data,
@@ -752,8 +702,7 @@ initialize_fims <- function(parameters, data) {
 
     # Initialize length composition module if the data type includes "length_comp" and
     # if "LengthComp" exists in the data distribution specification
-    if ("length_comp" %in% fleet_types &&
-      "LengthComp" %in% data_distribution_names_for_fleet_i) {
+    if ("length_comp" %in% fleet_types) {
       # Initialize length composition module for the current fleet
       fleet_length_comp[[i]] <- initialize_comp(
         data = data,
@@ -777,67 +726,57 @@ initialize_fims <- function(parameters, data) {
       linked_ids = fleet_module_ids
     )
 
-    if ("index" %in% fleet_types &&
-      "Index" %in% data_distribution_names_for_fleet_i) {
+    if ("index" %in% fleet_types) {
       fleet_index_distribution[[i]] <- initialize_data_distribution(
+        data_type = "index",
         module = fleet[[i]],
         # TODO: need to update family and match options from the distribution
         # column from the parameters tibble
-        family = lognormal(link = "log"),
-        sd = parameters |>
+        uncertainty = get_data(data) |>
           dplyr::filter(
             .data$fleet == .env$fleets[i] &
-              .data$label == "log_sd" &
-              .data$module_type == "Index"
+              .data$type == "index"
           ) |>
-          dplyr::mutate(
-            label = "sd",
-            value = exp(.data$value)
-          ),
-        data_type = "index"
+          dplyr::pull(dplyr::all_of("uncertainty"))
       )
     }
 
-    if ("landings" %in% fleet_types &&
-      "Landings" %in% data_distribution_names_for_fleet_i) {
-      fleet_landings_distribution[[i]] <- initialize_data_distribution(
+    if ("catch" %in% fleet_types) {
+      fleet_catch_distribution[[i]] <- initialize_data_distribution(
         module = fleet[[i]],
-        # TODO: need to update family and match options from the distribution
-        # column from the parameters tibble
-        family = lognormal(link = "log"),
-        sd = parameters |>
+        data_type = "catch",
+        uncertainty = get_data(data) |>
           dplyr::filter(
             .data$fleet == .env$fleets[i] &
-              .data$label == "log_sd" &
-              .data$module_type == "Landings"
+              .data$type == "catch"
           ) |>
-          dplyr::mutate(
-            label = "sd",
-            value = exp(.data$value)
-          ),
-        data_type = "landings"
+          dplyr::pull(dplyr::all_of("uncertainty"))
       )
     }
 
-    if ("age_comp" %in% fleet_types &&
-      "AgeComp" %in% data_distribution_names_for_fleet_i) {
+    if ("age_comp" %in% fleet_types) {
       fleet_agecomp_distribution[[i]] <- initialize_data_distribution(
         module = fleet[[i]],
-        # TODO: need to update family and match options from the distribution
-        # column from the parameters tibble
-        family = multinomial(link = "logit"),
-        data_type = "agecomp"
+        data_type = "age_comp",
+        uncertainty = get_data(data) |>
+          dplyr::filter(
+            .data$fleet == .env$fleets[i] &
+              .data$type == "age_comp"
+          ) |>
+          dplyr::pull(dplyr::all_of("uncertainty"))
       )
     }
 
-    if ("length_comp" %in% fleet_types &&
-      "LengthComp" %in% data_distribution_names_for_fleet_i) {
+    if ("length_comp" %in% fleet_types) {
       fleet_lengthcomp_distribution[[i]] <- initialize_data_distribution(
         module = fleet[[i]],
-        # TODO: need to update family and match options from the distribution
-        # column from the parameters tibble
-        family = multinomial(link = "logit"),
-        data_type = "lengthcomp"
+        data_type = "length_comp",
+        uncertainty = get_data(data) |>
+          dplyr::filter(
+            .data$fleet == .env$fleets[i] &
+              .data$type == "length_comp"
+          ) |>
+          dplyr::pull(dplyr::all_of("uncertainty"))
       )
     }
   }

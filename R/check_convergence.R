@@ -90,7 +90,7 @@ check_mle_convergence <- function(input, obj, opt, maxgrad) {
       obj = obj,
       opt = opt,
       sdreport = list(),
-      timing = c(
+      run_time = c(
         time_optimization = as.difftime(0, units = "secs"),
         time_sdreport = as.difftime(0, units = "secs"),
         time_total = as.difftime(0, units = "secs")
@@ -151,7 +151,7 @@ check_sdreport_convergence <- function(input, obj, opt, sdreport) {
       obj = obj,
       opt = opt,
       sdreport = sdreport,
-      timing = c(
+      run_time = c(
         time_optimization = as.difftime(0, units = "secs"),
         time_sdreport = as.difftime(0, units = "secs"),
         time_total = as.difftime(0, units = "secs")

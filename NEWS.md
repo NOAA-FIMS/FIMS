@@ -1,6 +1,11 @@
 # FIMS 0.10.0
 
-* 
+* Use `setup_default_parameters()` to set up a model
+* Specify uncertainty using a formula with a distribution and arguments
+* Change time to timing in parameter tibble
+* Change value to observed in FIMSFrame
+* Rename `get_timing()` to `get_run_time()`
+* Change landings to catch everywhere (R and C++)
 
 # FIMS 0.9.4
 
@@ -137,7 +142,7 @@
 
 # FIMS 0.4.0
 
-* Allows for CPUE data and landings within a single fleet and changes the
+* Allows for CPUE data and catch within a single fleet and changes the
   composition data to be separate from the catch. If there are catches, 
   compositions are based on F, if you have survey compositions those are scaled
   by q, and you can also have composition data without catch or CPUE and those

@@ -17,7 +17,7 @@ test_that("posterior equals prior with no data", {
 
   # Set up fleet and survey without data distributions
 
-  # Extract fishing fleet landings data (observed) and initialize index module
+  # Extract fishing fleet catch data (observed) and initialize index module
   catch <- em_input[["L.obs"]][["fleet1"]]
   # set fishing fleet catch data, need to set dimensions of data index
   # currently FIMS only has a fleet module that takes index for both survey index and fishery catch

@@ -405,7 +405,7 @@ dimensions_to_tibble <- function(data) {
 #' The log probability density function (lpdf) information is information in
 #' the json that pertains to a distribution, which is often associated with a
 #' data stream. For example, the lognormal distribution can be associated with
-#' landings for a given fleet because those landings might be uncertain.
+#' catch for a given fleet because those catch might be uncertain.
 #'
 #' @details
 #' The raw information, i.e., `data` is a list of unknown dimensions, where the

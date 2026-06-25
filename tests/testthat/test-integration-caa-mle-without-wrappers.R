@@ -134,7 +134,7 @@ test_that("catch-at-age model (estimation MLE without wrappers) returns correct 
   #' @description Test that the maximum gradient is less than or equal to 0.0001 after running FIMS with missing values in survey index observations.
   expect_lte(max_gradient, 0.0001)
 
-  #' @description Test that FIMS runs with only one observation in landings and survey data and the report is not NULL.
+  #' @description Test that FIMS runs with only one observation in catch and survey data and the report is not NULL.
   validate_fims(
     report = result[["report"]],
     estimates = result[["sdr_report"]],
@@ -147,12 +147,12 @@ test_that("catch-at-age model (estimation MLE without wrappers) returns correct 
 })
 
 test_that("catch-at-age model (estimation MLE without wrappers) returns correct outputs for sample size of 1", {
-  # Store the original values of the number of landings observations and
+  # Store the original values of the number of catch observations and
   # survey observations
   n.L_original <- om_input_list[[iter_id]][["n.L"]][["fleet1"]]
   n.survey_original <- om_input_list[[iter_id]][["n.survey"]][["survey1"]]
 
-  # Set the number of landings observations and survey observations to 1
+  # Set the number of catch observations and survey observations to 1
   om_input_list[[iter_id]][["n.L"]][["fleet1"]] <- 1
   om_input_list[[iter_id]][["n.survey"]][["survey1"]] <- 1
 
@@ -166,7 +166,7 @@ test_that("catch-at-age model (estimation MLE without wrappers) returns correct 
     random_effects = c(recruitment = "log_devs")
   )
 
-  #' @description Test that FIMS runs with only one observation in landings and survey data and the report is not NULL.
+  #' @description Test that FIMS runs with only one observation in catch and survey data and the report is not NULL.
   validate_fims(
     report = result[["report"]],
     estimates = result[["sdr_report"]],
@@ -186,12 +186,12 @@ test_that("catch-at-age model (estimation MLE without wrappers) returns correct 
   orig_val <- em_input_list[[iter_id]][["surveyB.obs"]][["survey1"]][na_index]
   em_input_list[[iter_id]][["surveyB.obs"]][["survey1"]][na_index] <- na_value
 
-  # Store the original values of the number of landings observations and
+  # Store the original values of the number of catch observations and
   # survey observations
   n.L_original <- om_input_list[[iter_id]][["n.L"]][["fleet1"]]
   n.survey_original <- om_input_list[[iter_id]][["n.survey"]][["survey1"]]
 
-  # Set the number of landings observations and survey observations to 1
+  # Set the number of catch observations and survey observations to 1
   om_input_list[[iter_id]][["n.L"]][["fleet1"]] <- 1
   om_input_list[[iter_id]][["n.survey"]][["survey1"]] <- 1
 
@@ -205,7 +205,7 @@ test_that("catch-at-age model (estimation MLE without wrappers) returns correct 
     random_effects = c(recruitment = "log_devs")
   )
 
-  #' @description Test that FIMS runs with only one observation in landings and survey data and the report is not NULL.
+  #' @description Test that FIMS runs with only one observation in catch and survey data and the report is not NULL.
   validate_fims(
     report = result[["report"]],
     estimates = result[["sdr_report"]],

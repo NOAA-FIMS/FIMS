@@ -9,29 +9,27 @@ A data frame with 2808 observations of 8
 variables:
 \describe{
 \item{type}{The type of input the row contains. Allowed types include
-age_comp, age_to_length_conversion, index, landings, length_comp, and weight_at_age.}
+age_comp, age_to_length_conversion, index, catch, length_comp, and weight_at_age.}
 \item{fleet}{A character string providing the name of the information
 source that the input was collected from, e.g., \code{"Trawl fishery"} or
 \code{"age_zero_survey"}. Entries can be \code{NA} for information that is not
 fleet/vessel specific.}
 \item{age}{An integer age. Entry can be \code{NA} if information pertains to
-multiple ages, e.g., total landings rather than landings of age-4 fish.
+multiple ages, e.g., total catch rather than catch of age-4 fish.
 In this dataset, ages start at one, therefore recruitment happens at age
 one not age zero.}
 \item{length}{A numeric length. Entry can be \code{NA} if information doesn't
 pertain to length.}
 \item{timing}{The timing, i.e., year the data was collected.}
-\item{value}{The measurement of interest.}
-\item{unit}{A character string specifying the units of \code{value}. Allowed
+\item{observed}{The observed measurement of interest.}
+\item{unit}{A character string specifying the units of \code{observed}. Allowed
 units for each data type are as follows. \code{mt} is used for \code{index},
-\code{landings}, and \code{weight_at_age} data. \code{number} or \code{proportion} are each
+\code{catch}, and \code{weight_at_age} data. \code{number} or \code{proportion} are each
 viable units for the composition data, where the former is the preferred
 unit of measurement.}
-\item{uncertainty}{A real value providing a measurement of uncertainty
-for value. For landings and indices of abundance this should be
-the standard deviation of the logged observations if you are using the
-lognormal distribution to fit your data. For composition data it will
-be your input sample size.
+\item{uncertainty}{A right-handed formula specifying the distributional
+assumptions for the entry in \code{observed}. See \code{\link[=FIMSFrame]{FIMSFrame()}} for more
+information about this column.
 }
 }
 }
@@ -48,5 +46,10 @@ the \code{ASSAMC} package written for the \href{www.github.com/NOAA-FIMS/Age_Str
 The source code to make this dataset is in \code{data-raw/data_big.R} which is on
 GitHub but will not be in your local installation because it is in the
 .Rbuildignore file.
+}
+\seealso{
+\itemize{
+\item \code{\link[=FIMSFrame]{FIMSFrame()}}
+}
 }
 \keyword{datasets}

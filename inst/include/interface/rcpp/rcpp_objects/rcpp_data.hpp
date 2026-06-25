@@ -461,21 +461,21 @@ class IndexDataInterface : public DataInterfaceBase {
 };
 
 /**
- * @brief  The Rcpp interface for Landings to instantiate the object from R:
- * fleet <- methods::new(Landings).
+ * @brief  The Rcpp interface for Catch to instantiate the object from R:
+ * fleet <- methods::new(Catch).
  */
-class LandingsDataInterface : public DataInterfaceBase {
+class CatchDataInterface : public DataInterfaceBase {
  public:
   /**
    * @brief An integer that specifies the second dimension of the data.
    */
   fims_int ymax = 0;
   /**
-   * @brief The vector of landings data that is being passed from R.
+   * @brief The vector of catch data that is being passed from R.
    */
-  RealVector landings_data;
+  RealVector catch_data;
   /**
-   * @brief The vector of landings uncertainty that is being passed from
+   * @brief The vector of catch uncertainty that is being passed from
    * R.
    */
   RealVector uncertainty;
@@ -483,31 +483,31 @@ class LandingsDataInterface : public DataInterfaceBase {
   /**
    * @brief The constructor.
    */
-  LandingsDataInterface(int ymax = 0) : DataInterfaceBase() {
+  CatchDataInterface(int ymax = 0) : DataInterfaceBase() {
     this->ymax = ymax;
-    this->landings_data.resize(ymax);
+    this->catch_data.resize(ymax);
     this->uncertainty.resize(ymax);
     DataInterfaceBase::live_objects[this->id] =
-        std::make_shared<LandingsDataInterface>(*this);
+        std::make_shared<CatchDataInterface>(*this);
     FIMSRcppInterfaceBase::fims_interface_objects.push_back(
         DataInterfaceBase::live_objects[this->id]);
   }
 
   /**
-   * @brief Construct a new Landings Data Interface object
+   * @brief Construct a new Catch Data Interface object
    *
    * @param other
    */
-  LandingsDataInterface(const LandingsDataInterface &other)
+  CatchDataInterface(const CatchDataInterface &other)
       : DataInterfaceBase(other),
         ymax(other.ymax),
-        landings_data(other.landings_data),
+        catch_data(other.catch_data),
         uncertainty(other.uncertainty) {}
 
   /**
    * @brief The destructor.
    */
-  virtual ~LandingsDataInterface() {}
+  virtual ~CatchDataInterface() {}
 
   /**
    * @brief Gets the ID of the interface base object.
@@ -518,7 +518,7 @@ class LandingsDataInterface : public DataInterfaceBase {
   /**
    * @brief Converts the data to json representation for the output.
    * @return A string is returned specifying that the module relates to the
-   * data interface with landings data. It also returns the ID, the rank of 1,
+   * data interface with catch data. It also returns the ID, the rank of 1,
    * the dimensions by printing ymax, followed by the data values themselves.
    * This string is formatted for a json file.
    */
@@ -526,17 +526,17 @@ class LandingsDataInterface : public DataInterfaceBase {
     std::stringstream ss;
 
     ss << "{\n";
-    ss << " \"name\": \"Landings\",\n";
+    ss << " \"name\": \"Catch\",\n";
     ss << " \"id\": " << this->id << ",\n";
     ss << " \"type\": \"data\",\n";
     ss << " \"dimensionality\": {\n";
     ss << "  \"header\": [" << "\"n_years\"" << "],\n";
     ss << "  \"dimensions\": [" << ymax << "]\n},\n";
     ss << " \"value\": [";
-    for (size_t i = 0; i < landings_data.size() - 1; i++) {
-      ss << landings_data[i] << ", ";
+    for (size_t i = 0; i < catch_data.size() - 1; i++) {
+      ss << catch_data[i] << ", ";
     }
-    ss << landings_data[landings_data.size() - 1] << "],\n";
+    ss << catch_data[catch_data.size() - 1] << "],\n";
     ss << "\"uncertainty\": [ ";
     for (size_t i = 0; i < uncertainty.size() - 1; i++) {
       ss << uncertainty[i] << ", ";
@@ -556,7 +556,7 @@ class LandingsDataInterface : public DataInterfaceBase {
     data->id = this->id;
 
     for (int y = 0; y < ymax; y++) {
-      data->at(y) = this->landings_data[y];
+      data->at(y) = this->catch_data[y];
       data->uncertainty[y] = this->uncertainty[y];
     }
 

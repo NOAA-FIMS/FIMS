@@ -26,29 +26,29 @@ void register_fleet(Rcpp::Module& m) {
       .field("n_ages", &FleetInterface::n_ages)
       .field("n_years", &FleetInterface::n_years)
       .field("n_lengths", &FleetInterface::n_lengths)
-      .field("observed_landings_units",
-             &FleetInterface::observed_landings_units)
+      .field("observed_catch_units",
+             &FleetInterface::observed_catch_units)
       .field("observed_index_units", &FleetInterface::observed_index_units)
       .field("log_index_expected", &FleetInterface::log_index_expected)
       .field("age_to_length_conversion",
              &FleetInterface::age_to_length_conversion)
-      .field("landings_numbers_at_age",
+      .field("catch_numbers_at_age",
              &FleetInterface::
-                 landings_numbers_at_age)
-      .field("landings_weight_at_age",
+                 catch_numbers_at_age)
+      .field("catch_weight_at_age",
              &FleetInterface::
-                 landings_weight_at_age)
-      .field("landings_numbers_at_length",
+                 catch_weight_at_age)
+      .field("catch_numbers_at_length",
              &FleetInterface::
-                 landings_numbers_at_length)
-      .field("landings_weight",
-             &FleetInterface::landings_weight)
-      .field("landings_numbers",
-             &FleetInterface::landings_numbers)
-      .field("landings_expected",
-             &FleetInterface::landings_expected)
-      .field("log_landings_expected",
-             &FleetInterface::log_landings_expected)
+                 catch_numbers_at_length)
+      .field("catch_weight",
+             &FleetInterface::catch_weight)
+      .field("catch_numbers",
+             &FleetInterface::catch_numbers)
+      .field("catch_expected",
+             &FleetInterface::catch_expected)
+      .field("log_catch_expected",
+             &FleetInterface::log_catch_expected)
       .field("agecomp_proportion",
              &FleetInterface::agecomp_proportion)
       .field("lengthcomp_proportion",
@@ -83,9 +83,9 @@ void register_fleet(Rcpp::Module& m) {
               &FleetInterface::GetObservedLengthCompDataID)
       .method("SetObservedIndexDataID", &FleetInterface::SetObservedIndexDataID)
       .method("GetObservedIndexDataID", &FleetInterface::GetObservedIndexDataID)
-      .method("SetObservedLandingsDataID",
-              &FleetInterface::SetObservedLandingsDataID)
-      .method("GetObservedLandingsDataID",
-              &FleetInterface::GetObservedLandingsDataID)
+      .method("SetObservedCatchDataID",
+              &FleetInterface::SetObservedCatchDataID)
+      .method("GetObservedCatchDataID",
+              &FleetInterface::GetObservedCatchDataID)
       .method("SetSelectivityID", &FleetInterface::SetSelectivityID);
 }

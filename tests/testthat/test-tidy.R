@@ -15,10 +15,7 @@ fit <- local({
   withr::defer(clear(), envir = parent.env(environment()))
   data("data_big", package = "FIMS")
   data_4_model <- FIMSFrame(data_big)
-  create_default_parameters(
-    configurations = create_default_configurations(data = data_4_model),
-    data = data_4_model
-  ) |>
+  setup_default_parameters(data = data_4_model) |>
     initialize_fims(data = data_4_model) |>
     fit_fims(optimize = TRUE)
 })
@@ -182,14 +179,14 @@ test_that("get_fit_metrics() returns correct error messages", {
 ## IO correctness ----
 test_that("get_fit_stream() works with correct inputs", {
   #' @description Test that FIMS::get_fit_stream(fit, stream_label, module_id) returns only rows matching both filters.
-  result <- FIMS::get_fit_stream(fit, stream_label = "landings_expected", module_id = 1L)
-  expect_true(all(result[["label"]] == "landings_expected"))
+  result <- FIMS::get_fit_stream(fit, stream_label = "catch_expected", module_id = 1L)
+  expect_true(all(result[["label"]] == "catch_expected"))
   expect_true(all(result[["module_id"]] == 1L))
 
   #' @description Test that FIMS::get_fit_stream() accepts a pre-augmented tibble and filters correctly.
   aug <- generics::augment(fit)
-  result_from_aug <- FIMS::get_fit_stream(aug, stream_label = "landings_expected")
-  expect_true(all(result_from_aug[["label"]] == "landings_expected"))
+  result_from_aug <- FIMS::get_fit_stream(aug, stream_label = "catch_expected")
+  expect_true(all(result_from_aug[["label"]] == "catch_expected"))
 
   #' @description Test that FIMS::get_fit_stream(fit) with no filters returns the same tibble as augment(fit).
   expect_equal(

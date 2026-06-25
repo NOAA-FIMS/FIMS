@@ -34,7 +34,7 @@ The returned tibble follows the conventions expected by every
    \code{.truth} \tab Observed data value (maps from \code{observed}) \cr
    \code{.pred} \tab Model-expected value (maps from \code{expected}) \cr
    \code{.weight} \tab Inverse-variance weight from \code{uncertainty} (optional) \cr
-   \code{label} \tab Parameter / quantity label, e.g. \code{"landings_expected"} \cr
+   \code{label} \tab Parameter / quantity label, e.g. \code{"catch_expected"} \cr
    \code{fleet} \tab Fleet identifier (integer) \cr
    \code{module_id} \tab Unique module identifier \cr
    \code{distribution} \tab Likelihood distribution used for this data stream \cr
@@ -47,8 +47,7 @@ The returned tibble follows the conventions expected by every
 data("data_big")
 data_4_model <- FIMSFrame(data_big)
 
-fit <- create_default_parameters(
-  configurations = create_default_configurations(data = data_4_model),
+fit <- setup_default_parameters(
   data = data_4_model
 ) |>
   initialize_fims(data = data_4_model) |>

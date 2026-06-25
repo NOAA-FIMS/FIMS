@@ -22,9 +22,7 @@
 #' data("data_big")
 #' data_4_model <- FIMSFrame(data_big)
 #' # Create a parameters object
-#' parameters <- data_4_model |>
-#'   create_default_configurations() |>
-#'   create_default_parameters(data = data_4_model)
+#' parameters <- setup_default_parameters(data = data_4_model)
 #' # Fit a FIMS model with 1 year of data removed
 #' fit <- run_modified_pars_fims(
 #'   new_value = 12.9,
@@ -121,9 +119,7 @@ run_modified_pars_fims <- function(
 #' data("data_big")
 #' data_4_model <- FIMSFrame(data_big)
 #' # Create a parameters object
-#' parameters <- data_4_model |>
-#'   create_default_configurations() |>
-#'   create_default_parameters(data = data_4_model)
+#' parameters <- setup_default_parameters(data = data_4_model)
 #' # Fit a FIMS model with 1 year of data removed
 #' fit <- run_modified_data_fims(
 #'   years_to_remove = 1,
@@ -141,7 +137,7 @@ run_modified_data_fims <- function(years_to_remove = 0, data, parameters) {
     data_to_use <- data
   }
 
-  # Remove years from data, but leave landings, weight_at_age,
+  # Remove years from data, but leave catch, weight_at_age,
   # and age_to_length_conversion (if present)
   if (years_to_remove == 0) {
     data_mod <- data_to_use
@@ -154,7 +150,7 @@ run_modified_data_fims <- function(years_to_remove = 0, data, parameters) {
     data_mod <- data_to_use |>
       dplyr::filter(
         (.data[["type"]] %in%
-          c("landings", "age_to_length_conversion", "weight_at_age")) |
+          c("catch", "age_to_length_conversion", "weight_at_age")) |
           .data[["timing"]] <= max_timing - years_to_remove
       )
   }

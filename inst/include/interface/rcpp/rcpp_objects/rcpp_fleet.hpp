@@ -79,9 +79,9 @@ class FleetInterface : public FleetInterfaceBase {
    */
   SharedInt interface_observed_index_data_id_m = -999;
   /**
-   * @brief The ID of the observed landings data object.
+   * @brief The ID of the observed catch data object.
    */
-  SharedInt interface_observed_landings_data_id_m = -999;
+  SharedInt interface_observed_catch_data_id_m = -999;
   /**
    * @brief The ID of the selectivity object.
    */
@@ -105,10 +105,10 @@ class FleetInterface : public FleetInterfaceBase {
    */
   SharedInt n_years = 0;
   /**
-   * @brief What units are the observed landings for this fleet measured in.
+   * @brief What units are the observed catch for this fleet measured in.
    * Options are weight or numbers, default is weight.
    */
-  SharedString observed_landings_units = fims::to_string("weight");
+  SharedString observed_catch_units = fims::to_string("weight");
   /**
    * @brief What units is the observed index of abundance for this fleet
    * measured in. Options are weight or numbers, default is weight.
@@ -133,42 +133,42 @@ class FleetInterface : public FleetInterfaceBase {
 
   // Fleet based derived quantities
   /**
-   * @brief Annual landings at age in numbers for a specific fleet.
+   * @brief Annual catch at age in numbers for a specific fleet.
    */
-  VariableVector landings_numbers_at_age;
+  VariableVector catch_numbers_at_age;
   /**
-   * @brief Annual landings at age in weight for a specific fleet.
+   * @brief Annual catch at age in weight for a specific fleet.
    */
-  VariableVector landings_weight_at_age;
+  VariableVector catch_weight_at_age;
   /**
-   * @brief Annual landings at length in numbers for a specific fleet.
+   * @brief Annual catch at length in numbers for a specific fleet.
    */
-  VariableVector landings_numbers_at_length;
+  VariableVector catch_numbers_at_length;
   /**
-   * @brief Total landings in weight for a specific fleet.
+   * @brief Total catch in weight for a specific fleet.
    */
-  VariableVector landings_weight;
+  VariableVector catch_weight;
   /**
-   * @brief Total landings in numbers for a specific fleet.
+   * @brief Total catch in numbers for a specific fleet.
    */
-  VariableVector landings_numbers;
+  VariableVector catch_numbers;
   /**
-   * @brief Total expected landings for a specific fleet, where the units of
+   * @brief Total expected catch for a specific fleet, where the units of
    * the measurement depend on the specified units for that fleet.
    */
-  VariableVector landings_expected;
+  VariableVector catch_expected;
   /**
-   * @brief Log total expected landings for a specific fleet, where the units
+   * @brief Log total expected catch for a specific fleet, where the units
    * of the measurement depend on the specified units for that fleet.
    */
-  VariableVector log_landings_expected;
+  VariableVector log_catch_expected;
   /**
-   * @brief Proportion of total landings by age used to specify the age
+   * @brief Proportion of total catch by age used to specify the age
    * composition.
    */
   VariableVector agecomp_proportion;
   /**
-   * @brief Proportion of total landings by length used to specify the length
+   * @brief Proportion of total catch by length used to specify the length
    * composition.
    */
   VariableVector lengthcomp_proportion;
@@ -236,25 +236,25 @@ class FleetInterface : public FleetInterfaceBase {
             other.interface_observed_lengthcomp_data_id_m),
         interface_observed_index_data_id_m(
             other.interface_observed_index_data_id_m),
-        interface_observed_landings_data_id_m(
-            other.interface_observed_landings_data_id_m),
+        interface_observed_catch_data_id_m(
+            other.interface_observed_catch_data_id_m),
         interface_selectivity_id_m(other.interface_selectivity_id_m),
         name(other.name),
         n_ages(other.n_ages),
         n_lengths(other.n_lengths),
         n_years(other.n_years),
-        observed_landings_units(other.observed_landings_units),
+        observed_catch_units(other.observed_catch_units),
         observed_index_units(other.observed_index_units),
         log_q(other.log_q),
         log_Fmort(other.log_Fmort),
         age_to_length_conversion(other.age_to_length_conversion),
-        landings_numbers_at_age(other.landings_numbers_at_age),
-        landings_weight_at_age(other.landings_weight_at_age),
-        landings_numbers_at_length(other.landings_numbers_at_length),
-        landings_weight(other.landings_weight),
-        landings_numbers(other.landings_numbers),
-        landings_expected(other.landings_expected),
-        log_landings_expected(other.log_landings_expected),
+        catch_numbers_at_age(other.catch_numbers_at_age),
+        catch_weight_at_age(other.catch_weight_at_age),
+        catch_numbers_at_length(other.catch_numbers_at_length),
+        catch_weight(other.catch_weight),
+        catch_numbers(other.catch_numbers),
+        catch_expected(other.catch_expected),
+        log_catch_expected(other.log_catch_expected),
         agecomp_proportion(other.agecomp_proportion),
         lengthcomp_proportion(other.lengthcomp_proportion),
         index_numbers_at_age(other.index_numbers_at_age),
@@ -315,11 +315,11 @@ class FleetInterface : public FleetInterfaceBase {
   }
 
   /**
-   * @brief Set the unique ID for the observed landings data object.
-   * @param observed_landings_data_id Unique ID for the observed data object.
+   * @brief Set the unique ID for the observed catch data object.
+   * @param observed_catch_data_id Unique ID for the observed data object.
    */
-  void SetObservedLandingsDataID(int observed_landings_data_id) {
-    interface_observed_landings_data_id_m.set(observed_landings_data_id);
+  void SetObservedCatchDataID(int observed_catch_data_id) {
+    interface_observed_catch_data_id_m.set(observed_catch_data_id);
   }
   /**
    * @brief Set the unique ID for the selectivity object.
@@ -359,10 +359,10 @@ class FleetInterface : public FleetInterfaceBase {
   }
 
   /**
-   * @brief Get the unique id for the observed landings data object.
+   * @brief Get the unique id for the observed catch data object.
    */
-  int GetObservedLandingsDataID() {
-    return interface_observed_landings_data_id_m.get();
+  int GetObservedCatchDataID() {
+    return interface_observed_catch_data_id_m.get();
   }
   /**
    * @brief Extracts the derived quantities from `Information` to the Rcpp
@@ -438,7 +438,7 @@ class FleetInterface : public FleetInterfaceBase {
     fleet->n_ages = this->n_ages.get();
     fleet->n_lengths = this->n_lengths.get();
     fleet->n_years = this->n_years.get();
-    fleet->observed_landings_units = this->observed_landings_units;
+    fleet->observed_catch_units = this->observed_catch_units;
     fleet->observed_index_units = this->observed_index_units;
 
     fleet->fleet_observed_agecomp_data_id_m =
@@ -449,8 +449,8 @@ class FleetInterface : public FleetInterfaceBase {
 
     fleet->fleet_observed_index_data_id_m =
         interface_observed_index_data_id_m.get();
-    fleet->fleet_observed_landings_data_id_m =
-        interface_observed_landings_data_id_m.get();
+    fleet->fleet_observed_catch_data_id_m =
+        interface_observed_catch_data_id_m.get();
 
     fleet->fleet_selectivity_id_m = interface_selectivity_id_m.get();
 

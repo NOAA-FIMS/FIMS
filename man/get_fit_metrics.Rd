@@ -49,15 +49,14 @@ Extracts observed-vs-expected pairs from a \code{FIMSFit} object via
 By default the metrics are computed over \strong{all} data streams combined.
 Pass one or more column names to \code{group_by} to get per-stream breakdowns
 (e.g., \code{group_by = "label"} gives one row per data-stream label such as
-\code{"landings_expected"}, \code{"age_comp_expected"}, etc.).
+\code{"catch_expected"}, \code{"age_comp_expected"}, etc.).
 }
 \examples{
 \dontrun{
 data("data_big")
 data_4_model <- FIMSFrame(data_big)
 
-fit <- create_default_parameters(
-  configurations = create_default_configurations(data = data_4_model),
+fit <- setup_default_parameters(
   data = data_4_model
 ) |>
   initialize_fims(data = data_4_model) |>
@@ -67,7 +66,7 @@ fit <- create_default_parameters(
 get_fit_metrics(fit)
 
 # Per-data-stream: one row-set per label
-# (e.g. "landings_expected", "index_expected", "age_comp_expected")
+# (e.g. "catch_expected", "index_expected", "age_comp_expected")
 get_fit_metrics(fit, group_by = "label")
 
 # Per-fleet with a custom metric set

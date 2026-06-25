@@ -22,7 +22,7 @@ run_FIMS_projection_scenario <- function(om_input,
                                          om_output,
                                          em_input,
                                          n_projection_years,
-                                         projected_landings,
+                                         projected_catch,
                                          projected_F,
                                          estimate_projected_F,
                                          projected_index,
@@ -30,13 +30,13 @@ run_FIMS_projection_scenario <- function(om_input,
   # Clear any previous FIMS settings
   clear()
 
-  # Extract fishing fleet landings data (observed) and initialize index module
-  landings <- em_input[["L.obs"]][["fleet1"]]
+  # Extract fishing fleet catch data (observed) and initialize index module
+  catch <- em_input[["L.obs"]][["fleet1"]]
 
-  # set fishing fleet landings data, need to set dimensions of data index
-  # currently FIMS only has a fleet module that takes index for both survey index and fishery landings
-  fishing_fleet_landings <- methods::new(Landings, om_input[["nyr"]] + n_projection_years)
-  fishing_fleet_landings$landings_data[] <- c(landings, projected_landings)
+  # set fishing fleet catch data, need to set dimensions of data index
+  # currently FIMS only has a fleet module that takes index for both survey index and fishery catch
+  fishing_fleet_catch <- methods::new(Catch, om_input[["nyr"]] + n_projection_years)
+  fishing_fleet_catch$catch_data[] <- c(catch, projected_catch)
 
   # set fishing fleet age comp data, need to set dimensions of age comps
   # Here the new function initializes the object with length nyr*n_ages
@@ -109,22 +109,22 @@ run_FIMS_projection_scenario <- function(om_input,
   fishing_fleet$log_q[1]$value <- (log(1.0))
   fishing_fleet$log_q[1]$estimation_type$set("constant")
   fishing_fleet$SetSelectivityID(fishing_fleet_selectivity$get_id())
-  fishing_fleet$SetObservedLandingsDataID(fishing_fleet_landings$get_id())
+  fishing_fleet$SetObservedCatchDataID(fishing_fleet_catch$get_id())
   fishing_fleet$SetObservedAgeCompDataID(fishing_fleet_age_comp$get_id())
   fishing_fleet$SetObservedLengthCompDataID(fishing_fleet_length_comp$get_id())
 
   # Set up fishery index data using the lognormal
-  fishing_fleet_landings_distribution <- methods::new(DlnormDistribution)
+  fishing_fleet_catch_distribution <- methods::new(DlnormDistribution)
   # lognormal observation error transformed on the log scale
-  fishing_fleet_landings_distribution$log_sd$resize(om_input[["nyr"]] + n_projection_years)
+  fishing_fleet_catch_distribution$log_sd$resize(om_input[["nyr"]] + n_projection_years)
   for (y in 1:(om_input[["nyr"]] + n_projection_years)) {
     # Compute lognormal SD from OM coefficient of variation (CV)
-    fishing_fleet_landings_distribution$log_sd[y]$value <- (log(sqrt(log(em_input[["cv.L"]][["fleet1"]]^2 + 1))))
+    fishing_fleet_catch_distribution$log_sd[y]$value <- (log(sqrt(log(em_input[["cv.L"]][["fleet1"]]^2 + 1))))
   }
-  fishing_fleet_landings_distribution$log_sd$set_estimation_types(c("constant"))
+  fishing_fleet_catch_distribution$log_sd$set_estimation_types(c("constant"))
   # Set Data using the IDs from the modules defined above
-  fishing_fleet_landings_distribution$set_observed_data(fishing_fleet$GetObservedLandingsDataID())
-  fishing_fleet_landings_distribution$set_distribution_links("data", fishing_fleet$log_landings_expected$get_id())
+  fishing_fleet_catch_distribution$set_observed_data(fishing_fleet$GetObservedCatchDataID())
+  fishing_fleet_catch_distribution$set_distribution_links("data", fishing_fleet$log_catch_expected$get_id())
 
   # Set up fishery age composition data using the multinomial
   fishing_fleet_agecomp_distribution <- methods::new(DmultinomDistribution)
@@ -485,7 +485,7 @@ run_FIMS_projection_scenario <- function(om_input,
 
 ## Run FIMS with no projection years as a control run ##
 n_projection_years <- 0
-projected_landings <- rep(-999, n_projection_years)
+projected_catch <- rep(-999, n_projection_years)
 projected_F <- rep(om_output[["f"]][om_input$nyr], n_projection_years)
 estimate_projected_F <- rep("constant", n_projection_years)
 projected_index <- rep(-999, n_projection_years)
@@ -494,7 +494,7 @@ no_projection_outputs <- run_FIMS_projection_scenario(om_input,
   om_output,
   em_input,
   n_projection_years,
-  projected_landings,
+  projected_catch,
   projected_F,
   estimate_projected_F,
   projected_index,
@@ -504,9 +504,9 @@ no_projection_outputs <- run_FIMS_projection_scenario(om_input,
 sdr_fixed_no_project <- no_projection_outputs[[2]]
 sdr_report_no_project <- no_projection_outputs[[1]]
 
-## Run FIMS with 5 projection years and no landings ##
+## Run FIMS with 5 projection years and no catch ##
 n_projection_years <- 5
-projected_landings <- rep(-999, n_projection_years)
+projected_catch <- rep(-999, n_projection_years)
 projected_F <- rep(om_output[["f"]][om_input$nyr], n_projection_years)
 estimate_projected_F <- rep("constant", n_projection_years)
 projected_index <- rep(-999, n_projection_years)
@@ -515,7 +515,7 @@ projection_outputs <- run_FIMS_projection_scenario(om_input,
   om_output,
   em_input,
   n_projection_years,
-  projected_landings,
+  projected_catch,
   projected_F,
   estimate_projected_F,
   projected_index,
@@ -525,9 +525,9 @@ projection_outputs <- run_FIMS_projection_scenario(om_input,
 sdr_fixed_5_year_project <- projection_outputs[[2]]
 sdr_report_5_year_project <- projection_outputs[[1]]
 
-## Run FIMS with 5 projection years and low future landings ##
+## Run FIMS with 5 projection years and low future catch ##
 n_projection_years <- 5
-projected_landings <- rep(em_input[["L.obs"]][["fleet1"]][om_input$nyr] * 0.5, n_projection_years)
+projected_catch <- rep(em_input[["L.obs"]][["fleet1"]][om_input$nyr] * 0.5, n_projection_years)
 projected_F <- rep(om_output[["f"]][om_input$nyr], n_projection_years)
 estimate_projected_F <- rep("fixed_effects", n_projection_years)
 projected_index <- rep(-999, n_projection_years)
@@ -536,7 +536,7 @@ low_catch_projection_outputs <- run_FIMS_projection_scenario(om_input,
   om_output,
   em_input,
   n_projection_years,
-  projected_landings,
+  projected_catch,
   projected_F,
   estimate_projected_F,
   projected_index,
@@ -545,9 +545,9 @@ low_catch_projection_outputs <- run_FIMS_projection_scenario(om_input,
 
 sdr_fixed_5_year_project_catch_low <- low_catch_projection_outputs[[2]]
 sdr_report_5_year_project_catch_low <- low_catch_projection_outputs[[1]]
-## Run FIMS with 5 projection years and high future landings ##
+## Run FIMS with 5 projection years and high future catch ##
 n_projection_years <- 5
-projected_landings <- rep(em_input[["L.obs"]][["fleet1"]][om_input$nyr] * 2, n_projection_years)
+projected_catch <- rep(em_input[["L.obs"]][["fleet1"]][om_input$nyr] * 2, n_projection_years)
 projected_F <- rep(om_output[["f"]][om_input$nyr], n_projection_years)
 estimate_projected_F <- rep("fixed_effects", n_projection_years)
 projected_index <- rep(-999, n_projection_years)
@@ -556,7 +556,7 @@ high_catch_projection_outputs <- run_FIMS_projection_scenario(om_input,
   om_output,
   em_input,
   n_projection_years,
-  projected_landings,
+  projected_catch,
   projected_F,
   estimate_projected_F,
   projected_index,
@@ -567,7 +567,7 @@ sdr_fixed_5_year_project_catch_high <- high_catch_projection_outputs[[2]]
 sdr_report_5_year_project_catch_high <- high_catch_projection_outputs[[1]]
 ## Run FIMS with 10 projection years and an SSB ratio target ##
 n_projection_years <- 10
-projected_landings <- rep(-999, n_projection_years)
+projected_catch <- rep(-999, n_projection_years)
 projected_F <- rep(om_output[["f"]][om_input$nyr], n_projection_years)
 estimate_projected_F <- rep("constant", n_projection_years)
 projected_index <- rep(-999, n_projection_years)
@@ -578,7 +578,7 @@ ssb_ratio_target_projection_outputs <- run_FIMS_projection_scenario(
   om_output,
   em_input,
   n_projection_years,
-  projected_landings,
+  projected_catch,
   projected_F,
   estimate_projected_F,
   projected_index,

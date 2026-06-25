@@ -73,14 +73,9 @@ fishing_fleet$SetObservedIndexDataID(fishing_fleet_index$get_id())
 fleet_sd <- rep(sqrt(log(em_input$cv.L$fleet1^2 + 1)), om_input$nyr)
 fishing_fleet_index_distribution1 <- initialize_data_distribution(
   module = fishing_fleet,
-  family = lognormal(link = "log"),
-  sd = list(value = fleet_sd, estimation_type = "constant"),
-  data_type = "index"
-)
-fishing_fleet_index_distribution2 <- initialize_data_distribution(
-  module = fishing_fleet,
-  family = stats::gaussian(link = "log"),
-  sd = list(value = fleet_sd[1], estimation_type = "fixed_effects"),
+  uncertainty = glue::glue(
+    "~dlnorm(meanlog = log_index_expected, sdlog = {fleet_sd})"
+  ),
   data_type = "index"
 )
 
@@ -114,7 +109,11 @@ test_that("`initialize_data_distribution()` works with correct inputs", {
   #' @description Test that `initialize_data_distribution()` returns the correct log sd values when scalar.
   expect_equal(
     log(fleet_sd[1]),
-    fishing_fleet_index_distribution2$log_sd[1]$value
+    initialize_data_distribution(
+      fishing_fleet,
+      data_type = "index",
+      glue::glue("~dlnorm(meanlog = log_index_expected, sdlog = {fleet_sd[1]})")
+    )$log_sd[1]$value
   )
 })
 
@@ -199,90 +198,23 @@ test_that("`initialize_process_distribution()` returns correct error messages", 
 
 
 test_that("`initialize_data_distribution()` returns correct error messages", {
-  #' @description Test that error is thrown when `family` and `index` `data_type` don't match in `initialize_data_distribution()`.
-  expect_error(
-    initialize_data_distribution(
-      module = fishing_fleet,
-      family = multinomial(),
-      sd = list(value = fleet_sd, estimation_type = "constant"),
-      data_type = "index"
-    ),
-    "does not allow the family to be"
-  )
-
-  #' @description Test that error is thrown when `family` and `landings` `data_type` don't match in `initialize_data_distribution()`.
-  expect_error(
-    initialize_data_distribution(
-      module = fishing_fleet,
-      family = multinomial(),
-      sd = list(value = fleet_sd, estimation_type = "constant"),
-      data_type = "landings"
-    ),
-    "does not allow the family to be"
-  )
-
-  #' @description Test that error is thrown when `family` and `agecomp` `data_type` don't match in `initialize_data_distribution()`.
-  expect_error(
-    initialize_data_distribution(
-      module = fishing_fleet,
-      family = gaussian(),
-      sd = list(value = fleet_sd, estimation_type = "constant"),
-      data_type = "agecomp"
-    ),
-    "does not allow the family to be"
-  )
-
-  #' @description Test that error is thrown when `family` and `lengthcomp` `data_type` don't match in `initialize_data_distribution()`.
-  expect_error(
-    initialize_data_distribution(
-      module = fishing_fleet,
-      family = lognormal(),
-      sd = list(value = fleet_sd, estimation_type = "constant"),
-      data_type = "lengthcomp"
-    ),
-    "does not allow the family to be"
-  )
-
   #' @description Test that error is thrown when `data_type` is incorrect in `initialize_data_distribution()`.
   expect_error(
     initialize_data_distribution(
       module = fishing_fleet,
-      family = lognormal(),
-      sd = list(value = fleet_sd, estimation_type = "constant"),
-      data_type = "length_comp"
+      uncertainty = "~dmultinom(prob = agecomp_proportion, size = 10)",
+      data_type = "bad_type"
     ),
     "must be one of"
   )
 
-  #' @description Test that error is thrown when `sd` value and `estimation_type` dimensions do not match.
+  #' @description Test that error is thrown when `uncertainty` is missing.
   expect_error(
     initialize_data_distribution(
       module = fishing_fleet,
-      family = multinomial(),
-      sd = list(value = fleet_sd, estimation_type = c("constant", "constant")),
-      data_type = "agecomp"
+      data_type = "age_comp"
     ),
-    "must match if more than one value"
-  )
-
-  #' @description Test that error is thrown when `sd` value is missing.
-  expect_error(
-    initialize_data_distribution(
-      module = fishing_fleet,
-      family = multinomial(),
-      sd = list(estimation_type = "constant"),
-      data_type = "agecomp"
-    ),
-    "need to be present"
-  )
-  #' @description Test that error is thrown when `family` is missing.
-  expect_error(
-    initialize_data_distribution(
-      module = fishing_fleet,
-      sd = list(value = fleet_sd),
-      data_type = "agecomp"
-    ),
-    "is missing from"
+    "argument .*uncertainty.* is missing"
   )
   clear()
 })

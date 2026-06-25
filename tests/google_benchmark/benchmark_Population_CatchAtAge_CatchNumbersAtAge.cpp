@@ -6,7 +6,7 @@
 namespace {
 
 // Benchmark for the workload in test_population_CatchNumbersAtAge.cpp
-// Times: CalculateLandingsNumbersAA + CalculateLandingsWeightAA. Setup reused
+// Times: CalculateCatchNumbersAA + CalculateCatchWeightAA. Setup reused
 // from CAAEvaluateTestFixture.
 struct BenchCAAEvaluate : public CAAEvaluateTestFixture {
   void Init() { SetUp(); }
@@ -17,14 +17,14 @@ struct BenchCAAEvaluate : public CAAEvaluateTestFixture {
     for (size_t fleet_ = 0; fleet_ < population->n_fleets; ++fleet_) {
       auto fleet_id = population->fleets[fleet_]->GetId();
       auto& fdq = catch_at_age_model->GetFleetDerivedQuantities(fleet_id);
-      fdq["landings_numbers_at_age"][i_age_year] = 0.0;
+      fdq["catch_numbers_at_age"][i_age_year] = 0.0;
     }
-    catch_at_age_model->CalculateLandingsNumbersAA(population, i_age_year, year,
+    catch_at_age_model->CalculateCatchNumbersAA(population, i_age_year, year,
                                                    age);
-    catch_at_age_model->CalculateLandingsWeightAA(population, year, age);
+    catch_at_age_model->CalculateCatchWeightAA(population, year, age);
     auto fleet0_id = population->fleets[0]->GetId();
     auto& fdq0 = catch_at_age_model->GetFleetDerivedQuantities(fleet0_id);
-    return fdq0["landings_weight_at_age"][i_age_year];
+    return fdq0["catch_weight_at_age"][i_age_year];
   }
 };
 

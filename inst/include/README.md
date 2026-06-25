@@ -42,7 +42,7 @@ The `TMB.h` file is the main wrapper around TMB's core headers. It supports both
 
 The `config.h` file provides the TMB/RTMB configuration used by FIMS. It enables Rcpp-compatible exception handling for TMB failures, turns on `TMB_SAFEBOUNDS`, selects the `TMBAD_FRAMEWORK`, uses a 64-bit index type (`uint64_t`), and configures thread-safe R support when OpenMP is available.
 
-The `init_tmb.hpp` file handles runtime initialization and registration for the compiled shared object. It provides the `R_init_FIMS` registration callback, supports optional initialization through `FIMS_ONLOAD_INIT_TMB`, and registers TMB C-callables when `TMB_CCALLABLES` is available.
+The `init_tmb.hpp` file handles run-time initialization and registration for the compiled shared object. It provides the `R_init_FIMS` registration callback, supports optional initialization through `FIMS_ONLOAD_INIT_TMB`, and registers TMB C-callables when `TMB_CCALLABLES` is available.
 
 ### inst/include/models/
 

@@ -262,8 +262,8 @@ void clear_impl(bool get_error_msg) {
   LengthCompDataInterface::id_g = 1;
   LengthCompDataInterface::live_objects.clear();
 
-  LandingsDataInterface::id_g = 1;
-  LandingsDataInterface::live_objects.clear();
+  CatchDataInterface::id_g = 1;
+  CatchDataInterface::live_objects.clear();
 
   IndexDataInterface::id_g = 1;
   IndexDataInterface::live_objects.clear();

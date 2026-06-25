@@ -115,8 +115,8 @@ test_that("`fims_frame()` works with the correct inputs", {
   #' @description Test that `get_n_lengths()` retrieves the number of lengths as a single value when you pass it a data frame instead of a FIMSFrame object.
   expect_length(get_n_lengths(data_big), 1)
 
-  #' @description Test that `model_landings()` retrieves landings data as a numeric vector.
-  expect_vector(model_landings(fims_frame, fleet_names), ptype = numeric())
+  #' @description Test that `model_catch()` retrieves catch data as a numeric vector.
+  expect_vector(model_catch(fims_frame, fleet_names), ptype = numeric())
 
   #' @description Test that `model_index()` retrieves index data as a numeric vector.
   expect_vector(model_index(fims_frame, fleet_names), ptype = numeric())
@@ -146,7 +146,7 @@ test_that("`fims_frame()` works with the correct inputs", {
   expect_true(FIMS:::is.FIMSFrame(fims_frame))
 
   #' @description Test that `is.FIMSFrame()` is FALSE when passed a data frame.
-  expect_false(FIMS:::is.FIMSFrame(data_big))
+  expect_error(FIMS:::is.FIMSFrame(data_big))
 
   #' @description Test that `pretty_type()`, an unexported function, returns space separated values with "comp" expanded to "composition".
   expect_equal(
@@ -350,8 +350,8 @@ test_that("`model_*()` works with the correct inputs", {
 
   clear()
 
-  #' @description Test that `model_landings()` retrieves landings data as a numeric vector when passed a data frame rather than a FIMSFrame object.
-  expect_vector(model_landings(data_big, "fleet1"), ptype = numeric())
+  #' @description Test that `model_catch()` retrieves catch data as a numeric vector when passed a data frame rather than a FIMSFrame object.
+  expect_vector(model_catch(data_big, "fleet1"), ptype = numeric())
 
   #' @description Test that `model_index()` retrieves index data as a numeric vector when passed a data frame rather than a FIMSFrame object.
   expect_vector(model_index(data_big, "survey1"), ptype = numeric())
@@ -372,13 +372,13 @@ test_that("`model_*()` returns correct outputs for edge cases", {
   multiple_data <- dplyr::bind_rows(
     data_big,
     dplyr::filter(data_big, type == "age_to_length_conversion", age == 1) |>
-      dplyr::mutate(value = 0.01)
+      dplyr::mutate(observed = 0.01)
   ) |> FIMSFrame()
   expect_warning(model_age_to_length_conversion(multiple_data))
   expect_equal(
     suppressWarnings(model_age_to_length_conversion(multiple_data))[1],
     data_big |> dplyr::filter(age == 1, length == 0, type == "age_to_length_conversion") |>
-      dplyr::pull(value) |>
+      dplyr::pull(observed) |>
       c(0.01) |>
       mean()
   )
@@ -410,9 +410,9 @@ test_that("`model_*()` returns correct error messages", {
     regexp = "unused argument"
   )
 
-  #' @description Test that the `model_landings()` returns an error when a fleet is not supplied.
+  #' @description Test that the `model_catch()` returns an error when a fleet is not supplied.
   expect_error(
-    model_landings(fims_frame),
+    model_catch(fims_frame),
     regexp = "is missing, with no default"
   )
 

@@ -1,6 +1,6 @@
 Package: FIMS
 Title: The Fisheries Integrated Modeling System
-Version: 0.9.4.9000
+Version: 0.10.0
 Authors@R: c(
     person(c("Kelli", "F."), "Johnson", , "kelli.johnson@noaa.gov", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-5149-451X")),
@@ -72,7 +72,7 @@ URL: https://github.com/noaa-fims/fims, https://noaa-fims.github.io,
     https://noaa-fims.github.io/FIMS
 BugReports: https://github.com/noaa-fims/fims/issues
 Depends:
-    R (>= 4.1.0)
+    R (>= 4.2.0)
 Imports:
     cli,
     dplyr,
@@ -88,6 +88,7 @@ Imports:
     Rcpp,
     rlang,
     stats,
+    stockplotr,
     tibble,
     TMB (>= 1.8.0),
     utils,
@@ -104,7 +105,6 @@ Suggests:
     rmarkdown,
     snowfall,
     SparseNUTS,
-    stockplotr,
     styler,
     testthat (>= 3.0.0),
     tidyr,
@@ -122,7 +122,7 @@ Remotes:
 Additional_repositories: 
     https://noaa-fisheries-integrated-toolbox.r-universe.dev
 Config/Rcpp/registration: none
-Config/roxygen2/version: 8.0.0
+Config/roxygen2/version: 8.1.0
 Config/testthat/edition: 3
 Config/testthat/parallel: false
 Encoding: UTF-8
@@ -130,5 +130,4 @@ Language: en-US
 LazyData: true
 NeedsCompilation: yes
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.3
 SystemRequirements: GNU make
