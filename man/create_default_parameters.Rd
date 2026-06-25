@@ -2,17 +2,81 @@
 % Please edit documentation in R/create_default_parameters.R
 \name{create_default_parameters}
 \alias{create_default_parameters}
+\alias{create_default_data_index_landings}
+\alias{create_default_data_composition}
+\alias{create_default_growth}
+\alias{create_default_Population}
+\alias{create_default_selectivity}
+\alias{create_default_fleet}
+\alias{create_default_maturity}
+\alias{create_default_recruitment}
 \title{Create default parameters for a FIMS model}
 \usage{
 create_default_parameters(configurations, data)
+
+create_default_data_index_landings(
+  data,
+  fleet_name,
+  module_type = c("Index", "Landings"),
+  distribution = c("Dlnorm", "Dnorm"),
+  model_family = c("catch_at_age")
+)
+
+create_default_data_composition(
+  data,
+  fleet_name,
+  module_type = c("AgeComp", "LengthComp"),
+  distribution = c("Dmultinom", "Ddirichlet"),
+  model_family = c("catch_at_age")
+)
+
+create_default_growth()
+
+create_default_Population(unnested_configurations, data, log_rzero)
+
+create_default_selectivity(module_type = c("Logistic", "DoubleLogistic"))
+
+create_default_fleet(current_fleet_name, data)
+
+create_default_maturity(
+  data,
+  module_type = c("Logistic"),
+  model_family = c("catch_at_age")
+)
+
+create_default_recruitment(
+  data,
+  module_type = c("BevertonHolt"),
+  distribution = c("Dnorm", NA_character_),
+  model_family = c("catch_at_age")
+)
 }
 \arguments{
 \item{configurations}{A tibble of model configurations. Typically created
 by \code{\link[=create_default_configurations]{create_default_configurations()}}. Users can modify this tibble
 to customize the model structure before using it as input to this function.}
 
-\item{data}{A \code{FIMSFrame} object returned from running \code{\link[=FIMSFrame]{FIMSFrame()}} on
-your long input data.}
+\item{data}{An S4 object. FIMS input data.}
+
+\item{fleet_name}{A character. Name of the fleet.}
+
+\item{module_type}{A string specifying the type of recruitment model. The
+available options are
+BevertonHolt.}
+
+\item{distribution}{A string specifying the distribution for the recruitment process.
+The available options are
+Dnorm, NA.}
+
+\item{model_family}{A string specifying the model family. The available
+options are
+catch_at_age.}
+
+\item{unnested_configurations}{A tibble of model configurations. Typically
+created by the \code{create_default_configurations()}.}
+
+\item{log_rzero}{A numeric value representing the natural log of unexploited
+recruitment.}
 }
 \value{
 A nested \code{tibble} containing information on parameters for your model with
@@ -53,6 +117,22 @@ PascalCase to match the names used in the C++ code.}
 }
 }
 }
+
+A tibble containing default data for the specified fleet, including module
+family, module name, fleet name, module type, label, age, length, time, value,
+estimation type, distribution type, and distribution.
+
+A tibble containing default data for the specified fleet, including module
+family, module name, fleet name, module type, label, age, length, time, value,
+estimation type, distribution type, and distribution.
+
+A tibble containing default growth parameters, including model family, module
+name, module type, label, value, and estimation type.
+
+A tibble of default population parameters, including initial numbers at
+age and natural mortality rate.
+
+A tibble with default parameters for the fleet.
 }
 \description{
 This function generates a tibble with all of the parameters necessary to run
@@ -62,6 +142,30 @@ settings required to build and run the model. You can edit the returned
 tibble if you want to changes things such as initial values to values more
 specific to your population before running your model. For example, the
 default maturity parameters will need modified.
+
+This function creates default data for a Fisheries Integrated Modeling
+System (FIMS) model, specifically for index or landings data. It generates
+a tibble with multiple fields.
+
+This function creates default data for a Fisheries Integrated Modeling
+System (FIMS) model, specifically for age or length composition data. It generates a
+tibble with multiple fields.
+
+This function creates default growth parameters for a Fisheries Integrated
+Modeling System (FIMS) model. It generates a tibble with fields for
+model family, module name, module type, label, value, and estimation type.
+
+This function sets up default parameters for a population module.
+
+This function sets up default parameters for a selectivity module.
+
+This function sets up default parameters for a fleet module. It compiles
+selectivity parameters along with distributions for each type of data that
+are present for the given fleet.
+
+This function sets up default parameters for a maturity module.
+
+This function sets up default parameters for a recruitment module.
 }
 \details{
 The function processes the \code{configurations} tibble, which only contains
@@ -71,6 +175,9 @@ row. For example, if a selectivity for the first fleet is configured as
 \code{"Logistic"}, it takes that single row of input information and returns a
 parameter set with two rows, one for each parameter, \code{"inflection_point"}
 and \code{"slope"}.
+
+The natural log of the initial numbers at age (\code{log_init_naa.value}) is set
+based on unexploited recruitment and natural mortality.
 }
 \examples{
 \dontrun{
@@ -116,6 +223,22 @@ parameters_with_double_logistic <- default_configurations |>
     data = fims_frame
   )
 }
+\dontrun{
+# Load the example dataset and create a FIMS data frame
+data("data_big")
+fims_frame <- FIMSFrame(data_big)
+# Create default data for a specific fleet
+default_data <- create_default_data_index_landings(
+  data = fims_frame,
+  fleet_name = "fleet1",
+  distribution = "Dlnorm",
+  model_family = "catch_at_age"
+) 
+}   
+\dontrun{
+# Create default growth parameters
+default_growth_parameters <- create_default_growth()
+}
 }
 \seealso{
 \itemize{
@@ -123,3 +246,4 @@ parameters_with_double_logistic <- default_configurations |>
 \item \code{\link[=create_default_configurations]{create_default_configurations()}}
 }
 }
+\keyword{create_default_parameters}

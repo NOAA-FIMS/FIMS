@@ -65,7 +65,6 @@ test_that("piped wrappers matches create_default_parameters", {
 
   # Pre-calculate recruitment parameters to extract log_rzero for the population module
   recruitment_temp <- create_default_recruitment(
-    unnested_configurations = unnested_configurations,
     data = data
   )
 
@@ -88,7 +87,6 @@ test_that("piped wrappers matches create_default_parameters", {
     dplyr::bind_rows(recruitment_temp) |>
     dplyr::bind_rows(
       create_default_maturity(
-        unnested_configurations = unnested_configurations,
         data = data
       )
     ) |>
@@ -142,40 +140,30 @@ test_that("`create_default_parameters()` works with edge cases", {
   # Set up a model without a distribution for recruitment, which should lead to
   # `log_devs` having an estimation_type of "constant" and no `log_sd` parameter
   # being created.
-  updated_configurations <- default_configurations |>
-    tidyr::unnest(cols = data) |>
-    dplyr::rows_update(
-      y = tibble::tibble(
-        module_name = "Recruitment",
-        distribution_type = NA_character_,
-        distribution = NA_character_
-      ),
-      by = "module_name"
-    )
-  result <- create_default_parameters(
-    configurations = updated_configurations,
-    data = data
+  recruitment_without_distribution <- create_default_recruitment(
+    data = data,
+    distribution = NA_character_
   )
 
   #' @description Test that `log_sd` has not been set up when distribution is not specified.
+  log_sd_value <- recruitment_without_distribution |>
+    dplyr::filter(label == "log_sd") |>
+    dplyr::pull(value)
+
   expect_equal(
-    result |>
-      tidyr::unnest(cols = data) |>
-      dplyr::filter(module_name == "Recruitment", label == "log_sd") |>
-      dplyr::pull(value),
+    log_sd_value,
     numeric(0)
   )
 
   #' @description Test that the `log_devs` estimation_type is set to "constant" when distribution is not specified.
+  log_devs_value <- recruitment_without_distribution |>
+    dplyr::filter(label == "log_devs") |>
+    dplyr::pull(estimation_type) |>
+    unique()
+  
   expect_equal(
-    result |>
-      tidyr::unnest(cols = data) |>
-      dplyr::filter(module_name == "Recruitment", label == "log_devs") |>
-      dplyr::pull(estimation_type),
-    rep("constant", result |>
-      tidyr::unnest(cols = data) |>
-      dplyr::filter(module_name == "Recruitment", label == "log_devs") |>
-      nrow())
+    log_devs_value,
+    "constant"
   )
 })
 
