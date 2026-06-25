@@ -65,6 +65,8 @@
 #'   }
 #' }
 #' @export
+#' @rdname create_default_parameters
+#' @keywords create_default_parameters
 #' @seealso
 #' * [FIMSFrame()]
 #' * [create_default_configurations()]
@@ -261,7 +263,9 @@ create_default_parameters_template <- function(n_parameters = 1) {
 #' @return
 #' A tibble of default population parameters, including initial numbers at
 #' age and natural mortality rate.
-#' @noRd
+#' @export
+#' @rdname create_default_parameters
+#' @keywords create_default_parameters
 create_default_Population <- function(
   unnested_configurations,
   data,
@@ -383,7 +387,9 @@ create_default_DoubleLogistic <- function(module_name = NA_character_) {
 #' @return
 #' A tibble is returned with the default parameter values for the specified form
 #' of selectivity.
-#' @noRd
+#' @export
+#' @rdname create_default_parameters
+#' @keywords create_default_parameters
 create_default_selectivity <- function(
   form = c("Logistic", "DoubleLogistic")
 ) {
@@ -414,7 +420,9 @@ create_default_selectivity <- function(
 #' @param data An S4 object. FIMS input data.
 #' @return
 #' A tibble with default parameters for the fleet.
-#' @noRd
+#' @export
+#' @rdname create_default_parameters
+#' @keywords create_default_parameters
 create_default_fleet <- function(unnested_configurations,
                                  current_fleet_name,
                                  data) {
@@ -600,7 +608,9 @@ create_default_fleet <- function(unnested_configurations,
 #' `"Logistic"`).
 #' @return
 #' A tibble containing the default maturity parameters.
-#' @noRd
+#' @export
+#' @rdname create_default_parameters
+#' @keywords create_default_parameters
 create_default_maturity <- function(
   unnested_configurations,
   data
@@ -800,7 +810,9 @@ create_default_DlnormDistribution <- function(
 #' @param data An S4 object. FIMS input data.
 #' @return
 #' A tibble with the default parameters for recruitment.
-#' @noRd
+#' @export
+#' @rdname create_default_parameters
+#' @keywords create_default_parameters
 create_default_recruitment <- function(
   unnested_configurations,
   data

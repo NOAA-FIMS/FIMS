@@ -50,6 +50,93 @@ test_that("`create_default_parameters()` works with correct inputs", {
   )
 })
 
+test_that("piped wrappers matches create_default_parameters", {
+  # Unnest configurations (as done internally by create_default_parameters)
+  unnested_configurations <- default_configurations
+  if ("data" %in% names(unnested_configurations)) {
+    unnested_configurations <- tidyr::unnest(unnested_configurations, cols = data)
+  }
+
+  # Extract fleet names
+  fleet_names <- unnested_configurations |>
+    dplyr::pull(fleet_name) |>
+    na.omit() |>
+    unique()
+
+  # Pre-calculate recruitment parameters to extract log_rzero for the population module
+  recruitment_temp <- create_default_recruitment(
+    unnested_configurations = unnested_configurations,
+    data = data
+  )
+
+  log_rzero <- recruitment_temp |>
+    dplyr::filter(label == "log_rzero") |>
+    dplyr::pull(value)
+
+  # Build the parameters tibble incrementally using the native pipe operator (|>)
+  piped_wrappers_result <- purrr::map(
+    fleet_names,
+    function(fleet_name_i) {
+      create_default_fleet(
+        unnested_configurations = unnested_configurations,
+        current_fleet_name = fleet_name_i,
+        data = data
+      )
+    }
+  ) |>
+    dplyr::bind_rows() |>
+    dplyr::bind_rows(recruitment_temp) |>
+    dplyr::bind_rows(
+      create_default_maturity(
+        unnested_configurations = unnested_configurations,
+        data = data
+      )
+    ) |>
+    dplyr::bind_rows(
+      create_default_Population(
+        unnested_configurations = unnested_configurations,
+        data = data,
+        log_rzero = log_rzero
+      )
+    ) |>
+    # Apply final merging and structuring steps as in create_default_parameters()
+    dplyr::full_join(unnested_configurations, by = c("module_name", "fleet_name", "module_type")) |>
+    dplyr::mutate(
+      model_family = dplyr::coalesce(model_family.y, model_family.x),
+      distribution_type = dplyr::coalesce(distribution_type.y, distribution_type.x),
+      distribution = dplyr::coalesce(distribution.y, distribution.x),
+      distribution_type = dplyr::if_else(
+        module_name == "Recruitment" & !label %in% c("log_devs", "log_r", "log_sd"),
+        NA_character_,
+        distribution_type
+      ),
+      distribution = dplyr::if_else(
+        module_name == "Recruitment" & !label %in% c("log_devs", "log_r", "log_sd"),
+        NA_character_,
+        distribution
+      )
+    ) |>
+    dplyr::select(-dplyr::ends_with(c(".x", ".y"))) |>
+    tidyr::fill(model_family, .direction = "downup") |>
+    dplyr::select(model_family, module_name, module_type, dplyr::everything()) |>
+    dplyr::filter(
+      !(is.na(label) & is.na(distribution_type) & is.na(distribution) & module_name != "Growth")
+    ) |>
+    tidyr::nest(.by = c(model_family, module_name, fleet_name))
+
+  # Generate the expected result using the original function
+  expected_result <- create_default_parameters(
+    configurations = default_configurations,
+    data = data
+  )
+
+  #' @description Test that the incrementally built tibble is identical to the output of `create_default_parameters()`.
+  expect_true(identical(
+    piped_wrappers_result,
+    expected_result
+  ))
+  expect_equal(piped_wrappers_result, expected_result)
+})
 ## Edge handling ----
 test_that("`create_default_parameters()` works with edge cases", {
   # Set up a model without a distribution for recruitment, which should lead to
