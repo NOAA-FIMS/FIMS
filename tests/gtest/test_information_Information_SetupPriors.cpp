@@ -55,16 +55,16 @@ namespace
     normal_inflection_point->key.resize(2);
     normal_inflection_point->key[0] = 1;
     normal_inflection_point->key[1] = 3;
-    normal_inflection_point->input_type = "prior";
+    normal_inflection_point->distribution_type = fims_distributions::Distribution_Kind::PRIOR;
     // Set up slope key. Keys 2 and 4 will reference variable map 2 and 4
     lognormal_slope->key.resize(2);
     lognormal_slope->key[0] = 2;
     lognormal_slope->key[1] = 4;
-    lognormal_slope->input_type = "prior";
+    lognormal_slope->distribution_type = fims_distributions::Distribution_Kind::PRIOR;
 
     // Call function that links key ID to variable map pointers given variable map ID
     // This function will set the density component, priors, to the respective parameters
-    info->SetupPriors();
+    info->SetupDistributions();
 
     EXPECT_EQ((*normal_inflection_point->priors[0])[0], selectivity1->inflection_point[0]);
     EXPECT_EQ((*normal_inflection_point->priors[1])[0], selectivity2->inflection_point[0]);

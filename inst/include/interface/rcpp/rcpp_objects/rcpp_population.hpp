@@ -335,81 +335,20 @@ class PopulationInterface : public PopulationInterfaceBase {
     }
 
     // Finalize derived quantities
-    this->total_landings_weight.resize(pop->total_landings_weight.size());
-    for (size_t i = 0; i < pop->total_landings_weight.size(); i++) {
-      this->total_landings_weight[i].final_value_m =
-          pop->total_landings_weight[i];
-    }
-
-    this->total_landings_numbers.resize(pop->total_landings_numbers.size());
-    for (size_t i = 0; i < pop->total_landings_numbers.size(); i++) {
-      this->total_landings_numbers[i].final_value_m =
-          pop->total_landings_numbers[i];
-    }
-
-    this->mortality_F.resize(pop->mortality_F.size());
-    for (size_t i = 0; i < pop->mortality_F.size(); i++) {
-      this->mortality_F[i].final_value_m = pop->mortality_F[i];
-    }
-
-    this->mortality_M.resize(pop->mortality_M.size());
-    for (size_t i = 0; i < pop->mortality_M.size(); i++) {
-      this->mortality_M[i].final_value_m = pop->mortality_M[i];
-    }
-
-    this->mortality_Z.resize(pop->mortality_Z.size());
-    for (size_t i = 0; i < pop->mortality_Z.size(); i++) {
-      this->mortality_Z[i].final_value_m = pop->mortality_Z[i];
-    }
-
-    this->numbers_at_age.resize(pop->numbers_at_age.size());
-    for (size_t i = 0; i < pop->numbers_at_age.size(); i++) {
-      this->numbers_at_age[i].final_value_m = pop->numbers_at_age[i];
-    }
-
-    this->unfished_numbers_at_age.resize(pop->unfished_numbers_at_age.size());
-    for (size_t i = 0; i < pop->unfished_numbers_at_age.size(); i++) {
-      this->unfished_numbers_at_age[i].final_value_m =
-          pop->unfished_numbers_at_age[i];
-    }
-
-    this->biomass.resize(pop->biomass.size());
-    for (size_t i = 0; i < pop->biomass.size(); i++) {
-      this->biomass[i].final_value_m = pop->biomass[i];
-    }
-
-    this->spawning_biomass.resize(pop->spawning_biomass.size());
-    for (size_t i = 0; i < pop->spawning_biomass.size(); i++) {
-      this->spawning_biomass[i].final_value_m = pop->spawning_biomass[i];
-    }
-
-    this->unfished_biomass.resize(pop->unfished_biomass.size());
-    for (size_t i = 0; i < pop->unfished_biomass.size(); i++) {
-      this->unfished_biomass[i].final_value_m = pop->unfished_biomass[i];
-    }
-
-    this->unfished_spawning_biomass.resize(
-        pop->unfished_spawning_biomass.size());
-    for (size_t i = 0; i < pop->unfished_spawning_biomass.size(); i++) {
-      this->unfished_spawning_biomass[i].final_value_m =
-          pop->unfished_spawning_biomass[i];
-    }
-
-    this->proportion_mature_at_age.resize(pop->proportion_mature_at_age.size());
-    for (size_t i = 0; i < pop->proportion_mature_at_age.size(); i++) {
-      this->proportion_mature_at_age[i].final_value_m =
-          pop->proportion_mature_at_age[i];
-    }
-
-    this->expected_recruitment.resize(pop->expected_recruitment.size());
-    for (size_t i = 0; i < pop->expected_recruitment.size(); i++) {
-      this->expected_recruitment[i].final_value_m = pop->expected_recruitment[i];
-    }
-
-    this->sum_selectivity.resize(pop->sum_selectivity.size());
-    for (size_t i = 0; i < pop->sum_selectivity.size(); i++) {
-      this->sum_selectivity[i].final_value_m = pop->sum_selectivity[i];
-    }
+    finalize_vv(this->total_landings_weight, pop->total_landings_weight);
+    finalize_vv(this->total_landings_numbers, pop->total_landings_numbers);
+    finalize_vv(this->mortality_F, pop->mortality_F);
+    finalize_vv(this->mortality_M, pop->mortality_M);
+    finalize_vv(this->mortality_Z, pop->mortality_Z);
+    finalize_vv(this->numbers_at_age, pop->numbers_at_age);
+    finalize_vv(this->unfished_numbers_at_age, pop->unfished_numbers_at_age);
+    finalize_vv(this->biomass, pop->biomass);
+    finalize_vv(this->spawning_biomass, pop->spawning_biomass);
+    finalize_vv(this->unfished_biomass, pop->unfished_biomass);
+    finalize_vv(this->unfished_spawning_biomass, pop->unfished_spawning_biomass);
+    finalize_vv(this->proportion_mature_at_age, pop->proportion_mature_at_age);
+    finalize_vv(this->expected_recruitment, pop->expected_recruitment);
+    finalize_vv(this->sum_selectivity, pop->sum_selectivity);
   }
 
 #ifdef TMB_MODEL

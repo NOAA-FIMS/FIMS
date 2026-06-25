@@ -397,110 +397,30 @@ class FleetInterface : public FleetInterfaceBase {
     }
 
     // Finalize derived quantities — landings
-    this->log_landings_expected.resize(fleet->log_landings_expected.size());
-    for (size_t i = 0; i < fleet->log_landings_expected.size(); i++) {
-      this->log_landings_expected[i].final_value_m =
-          fleet->log_landings_expected[i];
-    }
-
-    this->landings_expected.resize(fleet->landings_expected.size());
-    for (size_t i = 0; i < fleet->landings_expected.size(); i++) {
-      this->landings_expected[i].final_value_m = fleet->landings_expected[i];
-    }
-
-    this->landings_numbers_at_age.resize(fleet->landings_numbers_at_age.size());
-    for (size_t i = 0; i < fleet->landings_numbers_at_age.size(); i++) {
-      this->landings_numbers_at_age[i].final_value_m =
-          fleet->landings_numbers_at_age[i];
-    }
-
-    this->landings_weight_at_age.resize(fleet->landings_weight_at_age.size());
-    for (size_t i = 0; i < fleet->landings_weight_at_age.size(); i++) {
-      this->landings_weight_at_age[i].final_value_m =
-          fleet->landings_weight_at_age[i];
-    }
-
-    this->landings_numbers_at_length.resize(
-        fleet->landings_numbers_at_length.size());
-    for (size_t i = 0; i < fleet->landings_numbers_at_length.size(); i++) {
-      this->landings_numbers_at_length[i].final_value_m =
-          fleet->landings_numbers_at_length[i];
-    }
-
-    this->landings_weight.resize(fleet->landings_weight.size());
-    for (size_t i = 0; i < fleet->landings_weight.size(); i++) {
-      this->landings_weight[i].final_value_m = fleet->landings_weight[i];
-    }
-
-    this->landings_numbers.resize(fleet->landings_numbers.size());
-    for (size_t i = 0; i < fleet->landings_numbers.size(); i++) {
-      this->landings_numbers[i].final_value_m = fleet->landings_numbers[i];
-    }
+    finalize_vv(this->log_landings_expected, fleet->log_landings_expected);
+    finalize_vv(this->landings_expected, fleet->landings_expected);
+    finalize_vv(this->landings_numbers_at_age, fleet->landings_numbers_at_age);
+    finalize_vv(this->landings_weight_at_age, fleet->landings_weight_at_age);
+    finalize_vv(this->landings_numbers_at_length,
+                fleet->landings_numbers_at_length);
+    finalize_vv(this->landings_weight, fleet->landings_weight);
+    finalize_vv(this->landings_numbers, fleet->landings_numbers);
 
     // Finalize derived quantities — age/length composition
-    this->agecomp_expected.resize(fleet->agecomp_expected.size());
-    for (size_t i = 0; i < fleet->agecomp_expected.size(); i++) {
-      this->agecomp_expected[i].final_value_m = fleet->agecomp_expected[i];
-    }
-
-    this->agecomp_proportion.resize(fleet->agecomp_proportion.size());
-    for (size_t i = 0; i < fleet->agecomp_proportion.size(); i++) {
-      this->agecomp_proportion[i].final_value_m = fleet->agecomp_proportion[i];
-    }
-
-    this->lengthcomp_expected.resize(fleet->lengthcomp_expected.size());
-    for (size_t i = 0; i < fleet->lengthcomp_expected.size(); i++) {
-      this->lengthcomp_expected[i].final_value_m = fleet->lengthcomp_expected[i];
-    }
-
-    this->lengthcomp_proportion.resize(fleet->lengthcomp_proportion.size());
-    for (size_t i = 0; i < fleet->lengthcomp_proportion.size(); i++) {
-      this->lengthcomp_proportion[i].final_value_m =
-          fleet->lengthcomp_proportion[i];
-    }
+    finalize_vv(this->agecomp_expected, fleet->agecomp_expected);
+    finalize_vv(this->agecomp_proportion, fleet->agecomp_proportion);
+    finalize_vv(this->lengthcomp_expected, fleet->lengthcomp_expected);
+    finalize_vv(this->lengthcomp_proportion, fleet->lengthcomp_proportion);
 
     // Finalize derived quantities — index/survey
-    this->log_index_expected.resize(fleet->log_index_expected.size());
-    for (size_t i = 0; i < fleet->log_index_expected.size(); i++) {
-      this->log_index_expected[i].final_value_m = fleet->log_index_expected[i];
-    }
-
-    this->index_expected.resize(fleet->index_expected.size());
-    for (size_t i = 0; i < fleet->index_expected.size(); i++) {
-      this->index_expected[i].final_value_m = fleet->index_expected[i];
-    }
-
-    this->index_numbers_at_age.resize(fleet->index_numbers_at_age.size());
-    for (size_t i = 0; i < fleet->index_numbers_at_age.size(); i++) {
-      this->index_numbers_at_age[i].final_value_m =
-          fleet->index_numbers_at_age[i];
-    }
-
-    this->index_weight_at_age.resize(fleet->index_weight_at_age.size());
-    for (size_t i = 0; i < fleet->index_weight_at_age.size(); i++) {
-      this->index_weight_at_age[i].final_value_m = fleet->index_weight_at_age[i];
-    }
-
-    this->index_numbers_at_length.resize(fleet->index_numbers_at_length.size());
-    for (size_t i = 0; i < fleet->index_numbers_at_length.size(); i++) {
-      this->index_numbers_at_length[i].final_value_m =
-          fleet->index_numbers_at_length[i];
-    }
-
-    this->index_weight.resize(fleet->index_weight.size());
-    for (size_t i = 0; i < fleet->index_weight.size(); i++) {
-      this->index_weight[i].final_value_m = fleet->index_weight[i];
-    }
-
-    this->index_numbers.resize(fleet->index_numbers.size());
-    for (size_t i = 0; i < fleet->index_numbers.size(); i++) {
-      this->index_numbers[i].final_value_m = fleet->index_numbers[i];
-    }
-
-    this->catch_index.resize(fleet->catch_index.size());
-    for (size_t i = 0; i < fleet->catch_index.size(); i++) {
-      this->catch_index[i].final_value_m = fleet->catch_index[i];
-    }
+    finalize_vv(this->log_index_expected, fleet->log_index_expected);
+    finalize_vv(this->index_expected, fleet->index_expected);
+    finalize_vv(this->index_numbers_at_age, fleet->index_numbers_at_age);
+    finalize_vv(this->index_weight_at_age, fleet->index_weight_at_age);
+    finalize_vv(this->index_numbers_at_length, fleet->index_numbers_at_length);
+    finalize_vv(this->index_weight, fleet->index_weight);
+    finalize_vv(this->index_numbers, fleet->index_numbers);
+    finalize_vv(this->catch_index, fleet->catch_index);
   }
 
 #ifdef TMB_MODEL

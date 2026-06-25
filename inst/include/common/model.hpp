@@ -99,7 +99,7 @@ class Model {  // may need singleton
 #ifdef TMB_MODEL
       d->of = this->of;
 #endif
-      if (d->input_type == "prior") {
+      if (d->distribution_type == fims_distributions::Distribution_Kind::PRIOR) {
         nll_vec[nll_vec_idx] = -d->evaluate();
         jnll += nll_vec[nll_vec_idx];
         n_priors += 1;
@@ -122,7 +122,8 @@ class Model {  // may need singleton
 #ifdef TMB_MODEL
       d->of = this->of;
 #endif
-      if (d->input_type == "random_effects") {
+      if (d->distribution_type ==
+          fims_distributions::Distribution_Kind::RANDOM_EFFECT) {
         nll_vec[nll_vec_idx] = -d->evaluate();
         jnll += nll_vec[nll_vec_idx];
         n_random_effects += 1;
@@ -146,7 +147,7 @@ class Model {  // may need singleton
       d->of = this->of;
       // d->keep = this->keep;
 #endif
-      if (d->input_type == "data") {
+      if (d->distribution_type == fims_distributions::Distribution_Kind::DATA) {
         nll_vec[nll_vec_idx] = -d->evaluate();
         jnll += nll_vec[nll_vec_idx];
         n_data += 1;

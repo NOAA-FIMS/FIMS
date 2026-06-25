@@ -174,18 +174,13 @@ class Information {
          it != density_components.end(); ++it) {
       std::shared_ptr<fims_distributions::DensityComponentBase<Type>> d =
           (*it).second;
-      if ((d->priors)[0] != NULL) {
+      if (!d->priors.empty()) {
         d->priors.clear();
       }
-      if (d->data_expected_values != NULL) {
-        d->data_expected_values->clear();
-      }
-      if (d->re != NULL) {
-        d->re->clear();
-      }
-      if (d->re_expected_values != NULL) {
-        d->re_expected_values->clear();
-      }
+      d->use_priors_vec = false;
+      d->use_expected_mean = false;
+      d->observed_ptr = &d->observed_values;
+      d->expected_ptr = &d->expected_values;
     }
     this->density_components.clear();
   }
@@ -279,85 +274,95 @@ class Information {
   }
 
   /**
-   * @brief Loop over distributions and set links to distribution x value if
-   * distribution is a prior type.
+   * @brief Wire variable_map pointers for all density components in a single
+   * pass. Replaces the previous SetupPriors / SetupRandomEffects / SetupData
+   * triple, which iterated density_components three times with string
+   * comparisons. The distribution_type enum (set from the R interface) drives
+   * dispatch; model.hpp still controls the evaluation order (priors first,
+   * random effects second, data last) for correct simulation.
    */
-  void SetupPriors() {
-    for (density_components_iterator it = density_components.begin();
-         it != density_components.end(); ++it) {
+  void SetupDistributions() {
+    for (density_components_iterator it = this->density_components.begin();
+         it != this->density_components.end(); ++it) {
       std::shared_ptr<fims_distributions::DensityComponentBase<Type>> d =
           (*it).second;
-      if (d->input_type == "prior") {
-        FIMS_INFO_LOG("Setup prior for distribution " + fims::to_string(d->id));
-        variable_map_iterator vmit;
-        FIMS_INFO_LOG("Link prior from distribution " + fims::to_string(d->id) +
-                      " to parameter " + fims::to_string(d->key[0]));
-        d->priors.resize(d->key.size());
-        for (size_t i = 0; i < d->key.size(); i++) {
-          FIMS_INFO_LOG("Link prior from distribution " +
-                        fims::to_string(d->id) + " to parameter " +
+      variable_map_iterator vmit;
+
+      // Redirect expected_ptr to expected_mean when the user has called
+      // set_distribution_mean() from R (use_expected_mean flag set in
+      // add_to_fims_tmb_internal()).
+      if (d->use_expected_mean) {
+        d->expected_ptr = &d->expected_mean;
+      }
+
+      switch (d->distribution_type) {
+        case fims_distributions::Distribution_Kind::PRIOR:
+          FIMS_INFO_LOG("Setup prior for distribution " +
+                        fims::to_string(d->id));
+          if (d->key.size() == 1) {
+            // Single-parameter prior: point observed_ptr at the parameter vec.
+            vmit = this->variable_map.find(d->key[0]);
+            d->observed_ptr = (*vmit).second;
+            FIMS_INFO_LOG("Link prior from distribution " +
+                          fims::to_string(d->id) + " to parameter " +
+                          fims::to_string(d->key[0]));
+          } else {
+            // Multi-parameter prior: each key maps to a separate parameter
+            // vector; use_priors_vec enables the priors[] path in get_observed.
+            d->use_priors_vec = true;
+            d->priors.resize(d->key.size());
+            for (size_t i = 0; i < d->key.size(); i++) {
+              FIMS_INFO_LOG("Link prior from distribution " +
+                            fims::to_string(d->id) + " to parameter " +
+                            fims::to_string(d->key[i]));
+              vmit = this->variable_map.find(d->key[i]);
+              d->priors[i] = (*vmit).second;
+            }
+          }
+          FIMS_INFO_LOG("Prior size for distribution " +
+                        fims::to_string(d->id) + " is: " +
+                        fims::to_string(d->observed_ptr->size()));
+          break;
+
+        case fims_distributions::Distribution_Kind::RANDOM_EFFECT:
+          FIMS_INFO_LOG("Setup random effects for distribution " +
+                        fims::to_string(d->id));
+          vmit = this->variable_map.find(d->key[0]);
+          d->observed_ptr = (*vmit).second;
+          FIMS_INFO_LOG("Link random effects from distribution " +
+                        fims::to_string(d->id) + " to variable " +
                         fims::to_string(d->key[0]));
-          vmit = this->variable_map.find(d->key[i]);
-          d->priors[i] = (*vmit).second;
-        }
-        FIMS_INFO_LOG("Prior size for distribution " + fims::to_string(d->id) +
-                      "is: " + fims::to_string(d->observed_values.size()));
-      }
-    }
-  }
+          if (!d->use_expected_mean) {
+            if (d->key.size() == 2) {
+              vmit = this->variable_map.find(d->key[1]);
+              d->expected_ptr = (*vmit).second;
+            }
+            // else expected_ptr stays at &expected_values (constructor default)
+          }
+          FIMS_INFO_LOG("Random effect size for distribution " +
+                        fims::to_string(d->id) + " is: " +
+                        fims::to_string(d->observed_ptr->size()));
+          break;
 
-  /**
-   * @brief Loop over distributions and set links to distribution x value if
-   * distribution is a random effects type.
-   */
-  void SetupRandomEffects() {
-    for (density_components_iterator it = this->density_components.begin();
-         it != this->density_components.end(); ++it) {
-      std::shared_ptr<fims_distributions::DensityComponentBase<Type>> d =
-          (*it).second;
-      if (d->input_type == "random_effects") {
-        FIMS_INFO_LOG("Setup random effects for distribution " +
-                      fims::to_string(d->id));
-        variable_map_iterator vmit;
-        FIMS_INFO_LOG("Link random effects from distribution " +
-                      fims::to_string(d->id) + " to derived value " +
-                      fims::to_string(d->key[0]));
-        vmit = this->variable_map.find(d->key[0]);
-        d->re = (*vmit).second;
-        if (d->key.size() == 2) {
-          vmit = this->variable_map.find(d->key[1]);
-          d->re_expected_values = (*vmit).second;
-        } else {
-          d->re_expected_values = &d->expected_values;
-        }
-        FIMS_INFO_LOG("Random effect size for distribution " +
-                      fims::to_string(d->id) +
-                      " is: " + fims::to_string(d->observed_values.size()));
-      }
-    }
-  }
+        case fims_distributions::Distribution_Kind::DATA:
+          FIMS_INFO_LOG("Setup data distribution " + fims::to_string(d->id));
+          d->observed_ptr = &d->data_observed_values->data;
+          if (!d->use_expected_mean) {
+            vmit = this->variable_map.find(d->key[0]);
+            d->expected_ptr = (*vmit).second;
+            FIMS_INFO_LOG("Link expected values from distribution " +
+                          fims::to_string(d->id) + " to variable " +
+                          fims::to_string(d->key[0]));
+          }
+          FIMS_INFO_LOG("Expected value size for distribution " +
+                        fims::to_string(d->id) + " is: " +
+                        fims::to_string(d->expected_ptr->size()));
+          break;
 
-  /**
-   * @brief Loop over distributions and set links to distribution expected value
-   * if distribution is a data type.
-   */
-  void SetupData() {
-    for (density_components_iterator it = this->density_components.begin();
-         it != this->density_components.end(); ++it) {
-      std::shared_ptr<fims_distributions::DensityComponentBase<Type>> d =
-          (*it).second;
-      if (d->input_type == "data") {
-        FIMS_INFO_LOG("Setup expected value for data distribution " +
-                      fims::to_string(d->id));
-        variable_map_iterator vmit;
-        FIMS_INFO_LOG("Link expected value from distribution " +
-                      fims::to_string(d->id) + " to derived value " +
-                      fims::to_string(d->key[0]));
-        vmit = this->variable_map.find(d->key[0]);
-        d->data_expected_values = (*vmit).second;
-        FIMS_INFO_LOG(
-            "Expected value size for distribution " + fims::to_string(d->id) +
-            " is: " + fims::to_string((*d->data_expected_values).size()));
+        case fims_distributions::Distribution_Kind::PENALTY:
+          FIMS_INFO_LOG("Setup penalty for distribution " +
+                        fims::to_string(d->id));
+          break;
       }
     }
   }
@@ -695,7 +700,7 @@ class Information {
           (*it).second;
 
       // set data objects if distribution is a data type
-      if (d->input_type == "data") {
+      if (d->distribution_type == fims_distributions::Distribution_Kind::DATA) {
         if (d->observed_data_id_m != static_cast<Type>(-999)) {
           uint32_t observed_data_id =
               static_cast<uint32_t>(d->observed_data_id_m);
@@ -834,9 +839,7 @@ class Information {
     CreateModelingObjects(valid_model);
 
     // setup priors, random effect, and data density components
-    SetupPriors();
-    SetupRandomEffects();
-    SetupData();
+    SetupDistributions();
 
     if (valid_model) {
       FIMS_INFO_LOG("Model successfully created.");

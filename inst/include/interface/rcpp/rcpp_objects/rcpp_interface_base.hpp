@@ -404,6 +404,23 @@ inline std::ostream& operator<<(std::ostream& out, VariableVector& v) {
 }
 
 /**
+ * @brief Copies values from a model fims::Vector into a VariableVector,
+ * resizing the destination to match the source.
+ * @details Used in finalize() methods to transfer post-optimization derived
+ * quantity values from the C++ model objects back to the Rcpp interface
+ * objects for R access.
+ * @param vv The destination VariableVector (interface side).
+ * @param src The source fims::Vector<double> (model side).
+ */
+inline void finalize_vv(VariableVector& vv,
+                        const fims::Vector<double>& src) {
+  vv.resize(src.size());
+  for (size_t i = 0; i < src.size(); i++) {
+    vv[i].final_value_m = src[i];
+  }
+}
+
+/**
  * @brief An Rcpp interface class that defines the RealVector class.
  *
  * @details An Rcpp interface class that defines the interface between R and

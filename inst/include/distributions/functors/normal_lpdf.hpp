@@ -46,6 +46,8 @@ struct NormalLPDF : public DensityComponentBase<Type> {
    */
   virtual ~NormalLPDF() {}
 
+  virtual std::string name() const override { return "NormalLPDF"; }
+
   /**
    * @brief Evaluates the normal log probability density function.
    * @details The following equation is normal probability density function,
@@ -57,28 +59,13 @@ struct NormalLPDF : public DensityComponentBase<Type> {
    * \f$\sigma^2\f$ is the variance.
    */
   virtual const Type evaluate() {
-    // set vector size based on input type (prior, process, or data)
-    size_t n_x = this->get_n_x();
-    // get expected value vector size
-    size_t n_expected = this->get_n_expected();
-    // setup vector for recording the log probability density function values
-    this->lpdf_vec.resize(n_x);
-    std::fill(this->lpdf_vec.begin(), this->lpdf_vec.end(),
-              static_cast<Type>(0));
-    this->lpdf = static_cast<Type>(0);
-
-    // Dimension checks
-    if (n_x != n_expected) {
-      if (n_expected == 1) {
-        n_expected = n_x;
-      } else if (n_x > n_expected) {
-        n_x = n_expected;
-      }
-    }
+    size_t n_x = this->check_n_x(this->get_n_x());
+    this->prepare_lpdf(n_x);
 
     if (this->log_sd.size() > 1 && n_x != this->log_sd.size()) {
       throw std::invalid_argument(
-          "NormalLPDF::Vector index out of bounds. The size of observed data "
+          this->name() +
+          "::Vector index out of bounds. The size of observed data "
           "does not equal the size of the log_sd vector. The observed data "
           "vector is of size " +
           fims::to_string(n_x) + " and the log_sd vector is of size " +
@@ -87,7 +74,7 @@ struct NormalLPDF : public DensityComponentBase<Type> {
 
     for (size_t i = 0; i < n_x; i++) {
 #ifdef TMB_MODEL
-      if (this->input_type == "data") {
+      if (this->distribution_type == fims_distributions::Distribution_Kind::DATA) {
         // if data, check if there are any NA values and skip lpdf calculation
         // if there are
         if (this->get_observed(i) != this->data_observed_values->na_value) {
@@ -107,19 +94,16 @@ struct NormalLPDF : public DensityComponentBase<Type> {
       this->lpdf += this->lpdf_vec[i];
       if (this->simulate_flag) {
         FIMS_SIMULATE_F(this->of) {
-          if (this->input_type == "data") {
-            this->data_observed_values->at(i) =
-                rnorm(this->get_expected(i),
-                      fims_math::exp(log_sd.get_force_scalar(i)));
-          }
-          if (this->input_type == "random_effects") {
-            (*this->re)[i] = rnorm(this->get_expected(i),
-                                   fims_math::exp(log_sd.get_force_scalar(i)));
-          }
-          if (this->input_type == "prior") {
-            (*(this->priors[i]))[0] =
-                rnorm(this->get_expected(i),
-                      fims_math::exp(log_sd.get_force_scalar(i)));
+          Type sim_val =
+              rnorm(this->get_expected(i),
+                    fims_math::exp(log_sd.get_force_scalar(i)));
+          if (this->distribution_type ==
+              fims_distributions::Distribution_Kind::DATA) {
+            this->data_observed_values->at(i) = sim_val;
+          } else if (this->use_priors_vec) {
+            (*(this->priors[i]))[0] = sim_val;
+          } else {
+            (*this->observed_ptr)[i] = sim_val;
           }
         }
       }

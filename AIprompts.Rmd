@@ -1,0 +1,192 @@
+Our project manager tasked myself and two other developers to complete a refactor that implements two things: 1. Refactor derived quantities so that they can be exposed to the user so users can put priors on them. This refactor should also address the issue that sometimes derived quantities can be estimated as parameters (e.g. numbers_at_age); and 2. The backend for calls to distributions (inst/include/distributions) need to be simplified - there is a lot of repetitive code here, especially with respect to pointers to random effects, priors, and observed values. While in @inst/include/common/model.hpp , these distinctions matter because when data are simulated, they need to be simulated in hierarchical order (priors, random effects, data), this doesn't have to effect internal working of each distribution functor. All three of us came up with different approaches to this refactor. The first refactor (https://github.com/NOAA-FIMS/FIMS/pull/1566/changes) addresses both points. The second one (https://github.com/NOAA-FIMS/FIMS/pull/1570) addresses the first point only and the third PR only addresses the second point (https://github.com/NOAA-FIMS/FIMS/pull/1572). All PRS are breaking tests, which we are not overly concerned about - we are initially trying to come up with the final version to move forward on and work on fixing tests within the new branch. PR #1572 is less fully formed than the other two. The developer wanted to get his main ideas up in a draft PR to be considered. On first pass, could you summarize each PR and discuss the Pros/Cons of each approach. On second pass, could you use this feature branch to pull the ideas together into one formal PR?
+
+To reiterate, we don't need bug reports or fixes for bugs - all three have issues that developers know about. We just want big picture summaries and a proposal for bring the three refactors together into one.
+
+PR Summaries
+PR #1566 — "Green field" likelihood module (addresses both goals)
+Introduces an entirely new fims_likelihood module sitting alongside the existing fims_distributions. Five new likelihood functors (Normal, Lognormal, Gamma, InvGamma, Multinomial) wire to derived quantities via variable_map ID lookups, and a new Rcpp layer exposes four roles: data, prior, random_effect, penalty.
+
+Pros: Clean slate design; derived quantities attach to likelihoods by ID rather than raw pointer; the four-role framework is a nice conceptual API for users.
+
+Cons: Adds code rather than simplifying it — the existing fims_distributions module is left in place and the codebase ends up with two parallel distribution systems. The variable_map ID wiring for derived quantities (goal 1) is the right idea but the implementation is incomplete — the expected-values path crashes. Does not actually simplify the distributions backend (goal 2) for existing code.
+
+PR #1570 — VariableVector refactor (addresses goal 1 only)
+Renames ParameterVector to VariableVector and tears out the parallel DerivedQuantitiesMap / DimensionInfoMap system from FisheryModelBase. Each derived quantity (biomass, numbers_at_age, F, etc.) becomes a named VariableVector member on its respective interface class (PopulationInterface, FleetInterface), registered in variable_map via the same mechanism used for estimated parameters. After optimization, finalize() copies values back to the interface objects for R access.
+
+Pros: Most complete of the three; routing derived quantities through variable_map gives them full prior-attachment capability with no special-casing; significant net deletion of the old map-of-maps system; JSON serialization is simplified.
+
+Cons: Does not touch goal 2. The finalize() pattern (resize + element-wise copy) is repeated identically ~30 times across population and fleet — a one-line helper would collapse that. VariableVector still carries parameter-centric metadata fields that are meaningless for derived quantities.
+
+PR #1572 — Distributions consolidation (addresses goal 2 only, draft)
+The core architectural insight: each distribution functor doesn't need to know whether it's a prior, random effect, or data — that distinction only matters in model.hpp for simulation ordering. Each functor just needs correct pointers to observed values, expected values, and uncertainty. Proposes consolidating SetupPriors / SetupRandomEffects / SetupData in Information into a single SetupLikelihood, replacing the std::string input_type field with a Likelihood_Kind enum, and unifying the pointer-wiring logic on DensityComponentBase.
+
+Pros: The motivating insight is correct and valuable — removing input_type branching from inside each functor is the right move; a unified enum is cleaner than string comparison; consolidating three Setup methods reduces repetition in Information.
+
+Cons: Draft/unfinished; the Rcpp interface layer and fleet data wiring are largely untouched. The role distinction still needs to live somewhere (model.hpp) for simulation order — this PR just proposes moving it out of the individual functors, which is the right call.
+
+Synthesis Proposal
+Take PR #1570 as the base — it is the most complete, makes the cleanest architectural move for goal 1, and has the largest net code reduction.
+
+Layer in PR #1572's concept for goal 2 with three targeted additions:
+
+Replace std::string input_type with a Likelihood_Kind enum on DensityComponentBase. This makes role comparisons in model.hpp into switch-on-enum instead of string comparisons, removes typo risk, and is grep-friendly. The role distinction stays in model.hpp exactly as today — only the representation changes.
+
+Consolidate SetupPriors / SetupRandomEffects / SetupData in Information into a single SetupLikelihoods that iterates density_components once and dispatches on likelihood_type. This is pure simplification with no semantic change.
+
+Add a finalize_vv() helper (from the #1570 critique) to collapse the ~30 identical resize+copy loops into one-liners. This directly addresses the boilerplate concern without changing semantics.
+
+From PR #1566, borrow the four-role vocabulary (data, prior, random_effect, penalty) as the values for the Likelihood_Kind enum — it's a cleaner user-facing taxonomy than the current strings, and it positions the codebase for the penalty/lambda use case without requiring the full #1566 rewrite now.
+
+The result: #1570 handles goal 1 cleanly; the three targeted additions from #1572 handle goal 2 without a full rewrite of the distribution internals or introduction of a parallel module system.
+
+**Can you implement your proposal in this branch: main-likelihood-refactor-combined?**
+
+
+| File | Change |
+|------|--------|
+| `inst/include/interface/rcpp/rcpp_objects/rcpp_interface_base.hpp` | Added `finalize_vv()` helper |
+| `inst/include/interface/rcpp/rcpp_objects/rcpp_population.hpp` | Replaced ~13 resize+copy blocks with `finalize_vv()` calls |
+| `inst/include/interface/rcpp/rcpp_objects/rcpp_fleet.hpp` | Replaced ~17 resize+copy blocks with `finalize_vv()` calls |
+| `inst/include/distributions/functors/density_components_base.hpp` | Added `Likelihood_Kind` enum + `likelihood_kind_from_string()`; replaced `std::string input_type` with `Likelihood_Kind likelihood_type` |
+| `inst/include/distributions/functors/normal_lpdf.hpp` | Enum-based dispatch replacing string comparisons |
+| `inst/include/distributions/functors/lognormal_lpdf.hpp` | Enum-based dispatch replacing string comparisons |
+| `inst/include/distributions/functors/multinomial_lpmf.hpp` | Enum-based dispatch replacing string comparisons |
+| `inst/include/interface/rcpp/rcpp_objects/rcpp_distribution.hpp` | String→enum conversion at Rcpp boundary |
+| `inst/include/common/information.hpp` | `SetupPriors`/`SetupRandomEffects`/`SetupData` → `SetupLikelihoods()` |
+| `inst/include/common/model.hpp` | Enum-based dispatch in evaluation loop |
+| `tests/gtest/test_information_Information_SetupPriors.cpp` | Updated to use `likelihood_type` and `SetupLikelihoods()` |
+| `tests/gtest/test_information_Information_SetupRandomEffects.cpp` | Updated to use `likelihood_type` and `SetupLikelihoods()` |
+
+
+**This is great and really close! One aspect that is missing: PR#1572 and PR#1566 standardize names of values going into density functions. So instead of having  data_observed_values, expected_values, re, re_expected_values, data_expected_values, priors, and observed_values defined in @inst/include/distributions/functors/density_components_base.hpp , these get collapsed down to be consistent regardless of the likelihood type. Can you look through both PR#1572 and PR#1566 and provide a proposal on the best way to implement this change? **
+
+**PR #1566 leaves a lot of legacy code in place while we are deciding on the best architecture moving forward. You will need to look at files in the inst/include/likelihood/functors/likelihood_components_base.hpp to see how the structure was implemented for #1566**
+
+Proposal: Unified pointer fields on DensityComponentBase
+The problem
+The current base class has 8 role-specific fields that all do the same conceptual thing — provide observed values, expected values, and (implicitly) uncertainty — but through different types and access patterns depending on likelihood_type:
+
+Role	Observed source	Expected source
+DATA	data_observed_values->at(i)	(*data_expected_values)[i]
+RANDOM_EFFECT	(*re)[i]	(*re_expected_values)[i]
+PRIOR (single)	(*(priors[0]))[i]	expected_values.get_force_scalar(i)
+PRIOR (multi)	(*(priors[i]))[0]	expected_values.get_force_scalar(i)
+What both PRs propose
+PR #1572 collapses this to three symmetric triplets (value + subvector_index + shared_ptr), where the pointer defaults to local storage but can be repointed by SetupLikelihoods() at any fims::Vector in the variable_map. The subvector index handles the multi-prior gather-across-parameters case. The accessors become branchless — get_observed(i) dereferences observed_pointer unconditionally.
+
+PR #1566 uses two raw pointers (input_values, expected_values_input) with a nullable check — if the pointer is null, fall back to local storage. Cleaner memory semantics (no shared_ptr-from-raw-pointer UB), but uncertainty is left per-subclass and the multi-prior case is not addressed.
+
+Proposed synthesis
+The shared_ptr-from-raw-pointer UB in PR #1572 is the main structural concern. The cleanest fix that captures both PRs' intent:
+
+Replace re, re_expected_values, data_expected_values, and expected_mean with two raw pointers:
+
+
+// Unified observed/expected accessors — set by SetupLikelihoods()
+fims::Vector<Type>* observed_ptr = &this->observed_values;
+fims::Vector<Type>* expected_ptr = &this->expected_values;
+
+// Local storage (unchanged — these are the defaults)
+fims::Vector<Type> observed_values;
+fims::Vector<Type> expected_values;
+
+// DATA-specific: kept only for NA checking and simulation writebacks
+std::shared_ptr<fims_data_object::DataObject<Type>> data_observed_values;
+
+// PRIOR multi-parameter: kept because priors[i] is a separate live pointer
+// per parameter — can't be collapsed to a single fims::Vector without copying
+std::vector<fims::Vector<Type>*> priors;
+SetupLikelihoods() sets the pointers by role:
+
+
+case RANDOM_EFFECT:
+  d->observed_ptr = variable_map[key[0]];
+  d->expected_ptr = (key.size() == 2) ? variable_map[key[1]] : &d->expected_values;
+  break;
+
+case DATA:
+  d->observed_ptr = &d->data_observed_values->data;  // point into DataObject's vector
+  d->expected_ptr = variable_map[key[0]];
+  break;
+
+case PRIOR:
+  if (key.size() == 1) {
+    d->observed_ptr = variable_map[key[0]];  // single parameter
+  }
+  // multi-key: priors[] is still wired as before; get_observed() branches on priors.size()
+  break;
+Accessors become nearly branchless:
+
+
+inline Type& get_observed(size_t i) {
+  // Only branches for the multi-param prior case
+  if (this->likelihood_type == Likelihood_Kind::PRIOR && this->priors.size() > 1) {
+    return (*(this->priors[i]))[0];
+  }
+  return (*observed_ptr)[i];
+}
+
+inline Type& get_expected(size_t i) {
+  // Fully branchless — no likelihood_type check at all
+  return expected_ptr->get_force_scalar(i);
+}
+Individual functors (normal_lpdf.hpp etc.) still reference data_observed_values->na_value directly for NA skipping and data_observed_values->at(i) = ... for simulation — these two DATA-specific uses are kept explicit since they're semantically distinct from generic value access.
+
+Net change
+Remove: re, re_expected_values, data_expected_values, expected_mean (4 fields)
+
+Add: observed_ptr, expected_ptr (2 raw pointers, defaulting to local storage)
+
+Keep: data_observed_values (NA + simulation writebacks), priors (multi-param prior edge case), observed_values, expected_values (local storage / defaults)
+
+get_expected() becomes fully branchless. get_observed() retains one branch only for the multi-param prior case — that pattern is structurally different (it's indexing across separate parameter vectors, not elements of one vector) and can't be collapsed to a single pointer without either copying or adopting PR #1572's subvector approach.
+
+If the team eventually wants to eliminate that last branch, PR #1572's observed_subvector idea is the right tool — it lets you encode "the i-th element means: go to the i-th key's vector and take element 0" — but that's a follow-on refinement rather than blocking this PR.
+
+**We would like to simplify this as much as possible, can you implement this proposal with the addition of PR #1572's observed_subvector?**
+
+
+Here's what was added to complete the observed_subvector Rcpp wiring:
+
+DistributionsInterfaceBase: added Rcpp::IntegerVector observed_subvector_m member (with copy constructor support) and virtual bool set_observed_subvector(Rcpp::IntegerVector idx) — one implementation on the base, inherited by all three distributions
+DnormDistributionsInterface::add_to_fims_tmb_internal(): copies observed_subvector_m → distribution->observed_subvector (casting to size_t)
+DlnormDistributionsInterface::add_to_fims_tmb_internal(): same
+DmultinomDistributionsInterface::add_to_fims_tmb_internal(): same
+From R, a user can now call dist$set_observed_subvector(c(0L, 2L, 4L)) to make the distribution read from indices 0, 2, 4 of the linked parameter vector rather than sequentially.
+
+**By definition, the word likelihood is only used in the cotext of data. This is why FIMS is setup using the term "distributions" instead of "likelihood". Can you refactor all the new references to "likelihood" to "distribution" instead?**
+
+**Can you provide a final summary of changes?**
+
+## Final Summary of Changes — `main-likelihood-refactor-combined`
+
+This branch synthesizes three competing PRs (#1566, #1570, #1572) into a single unified refactor addressing two goals: (1) expose derived quantities to the user so priors can be placed on them, and (2) simplify the distributions backend by collapsing role-specific fields into a consistent interface.
+
+### File change table
+
+| File | What changed |
+|---|---|
+| `inst/include/distributions/functors/density_components_base.hpp` | Added `Distribution_Kind` enum + `distribution_kind_from_string()`; replaced 8 role-specific fields (`re`, `re_expected_values`, `data_expected_values`, `use_mean` string, etc.) with unified `observed_ptr` / `expected_ptr` raw pointers + `observed_subvector` + `use_priors_vec` + `use_expected_mean` bool; added `get_observed()`, `get_expected()`, `get_n_x()`, `get_n_expected()` accessors; added `name()` pure virtual, `prepare_lpdf()`, `check_n_x()` helpers; updated constructor to default-initialize pointers |
+| `inst/include/distributions/functors/normal_lpdf.hpp` | Replaced string `input_type` comparisons with `Distribution_Kind` enum; updated simulate block to write back via `observed_ptr` / `use_priors_vec`; added `name()` override; replaced setup boilerplate with `check_n_x()` + `prepare_lpdf()` |
+| `inst/include/distributions/functors/lognormal_lpdf.hpp` | Same enum + simulate + `name()` + helper changes as normal; removed three-branch simulate in favor of unified `observed_ptr` path |
+| `inst/include/distributions/functors/multinomial_lpmf.hpp` | Replaced `data_expected_values` references with `expected_ptr`; replaced `observed_values` / `expected_values` direct refs in dimension checks with `observed_ptr` / `expected_ptr`; added `name()` override; replaced setup boilerplate with `prepare_lpdf()` and `this->name()` in error strings |
+| `inst/include/common/information.hpp` | Replaced `SetupPriors()`, `SetupRandomEffects()`, `SetupData()` with single `SetupDistributions()` that wires `observed_ptr` and `expected_ptr` based on `distribution_type`; updated `CreateModel()` call site; updated reset loop to clear `priors`, `use_priors_vec`, `use_expected_mean`, and reset unified pointers |
+| `inst/include/common/model.hpp` | Replaced string comparisons (`d->input_type == "prior"` etc.) in the three evaluation loops with `Distribution_Kind` enum comparisons |
+| `inst/include/interface/rcpp/rcpp_objects/rcpp_distribution.hpp` | Added `observed_subvector_m` + `set_observed_subvector()` to `DistributionsInterfaceBase`; converted `distribution->distribution_type` via `distribution_kind_from_string()` in all three `add_to_fims_tmb_internal()` methods; replaced `use_mean` string assignment with `use_expected_mean` bool; wired `observed_subvector_m` into all three `add_to_fims_tmb_internal()` methods |
+| `inst/include/interface/rcpp/rcpp_objects/rcpp_interface_base.hpp` | Added `finalize_vv()` free function to collapse resize+copy boilerplate for derived quantity transfer |
+| `inst/include/interface/rcpp/rcpp_objects/rcpp_fleet.hpp` | Replaced 17 identical resize+copy blocks in `finalize()` with `finalize_vv()` calls |
+| `inst/include/interface/rcpp/rcpp_objects/rcpp_population.hpp` | Replaced 13 identical resize+copy blocks in `finalize()` with `finalize_vv()` calls |
+| `tests/gtest/test_information_Information_SetupPriors.cpp` | Updated `->input_type = "prior"` → `Distribution_Kind::PRIOR`; `SetupPriors()` → `SetupDistributions()` |
+| `tests/gtest/test_information_Information_SetupRandomEffects.cpp` | Updated `->input_type` → `Distribution_Kind::RANDOM_EFFECT`; `SetupRandomEffects()` → `SetupDistributions()`; updated assertions from `->re` / `->re_expected_values` to `->observed_ptr` / `->expected_ptr` |
+
+### Key design decisions
+
+**`Distribution_Kind` enum** — the string (`"data"`, `"prior"`, etc.) lives only at the R/Rcpp boundary. `distribution_kind_from_string()` converts it at the Rcpp interface; all C++ model-layer code uses the enum.
+
+**Unified pointer architecture** — `observed_ptr` and `expected_ptr` are set once by `SetupDistributions()` based on role. All functors call `get_observed(i)` / `get_expected(i)` with no role branching in the hot loop. The `data_observed_values` `DataObject` is retained only for DATA-specific needs (NA checking, 2D access, simulation write-back).
+
+**`observed_subvector`** — from PR #1572. When set, `get_observed(i)` returns `(*observed_ptr)[observed_subvector[i]]`, allowing a distribution to reference a non-contiguous subset of a larger registered vector. Exposed to R via `set_observed_subvector(IntegerVector)`.
+
+**`finalize_vv()`** — from PR #1570. Collapses 30 identical resize+element-copy blocks across `rcpp_fleet.hpp` and `rcpp_population.hpp` into single-line calls.
+
+**Base class helpers** — from PR #1566. `name()` (pure virtual), `prepare_lpdf(n)`, and `check_n_x(n_x)` remove boilerplate that was repeated identically in all three distribution functors.

@@ -71,6 +71,14 @@ class DistributionsInterfaceBase : public FIMSRcppInterfaceBase {
   SharedInt interface_observed_data_id_m = -999;
 
   /**
+   * @brief Optional index-remapping vector. When non-empty, the i-th observed
+   * value used in the likelihood is taken from position observed_subvector_m[i]
+   * of the registered parameter vector rather than position i. Passed to
+   * DensityComponentBase::observed_subvector via add_to_fims_tmb_internal().
+   */
+  Rcpp::IntegerVector observed_subvector_m;
+
+  /**
    * @brief The log probability density function value.
    */
   double lpdf_value = 0;
@@ -95,7 +103,8 @@ class DistributionsInterfaceBase : public FIMSRcppInterfaceBase {
         key_m(other.key_m),
         input_type_m(other.input_type_m),
         use_mean_m(other.use_mean_m),
-        interface_observed_data_id_m(other.interface_observed_data_id_m) {}
+        interface_observed_data_id_m(other.interface_observed_data_id_m),
+        observed_subvector_m(other.observed_subvector_m) {}
 
   /**
    * @brief The destructor.
@@ -152,6 +161,23 @@ class DistributionsInterfaceBase : public FIMSRcppInterfaceBase {
    * object
    */
   virtual bool set_observed_data(int observed_data_id) { return false; }
+
+  /**
+   * @brief Set the index-remapping vector for observed values.
+   *
+   * @details When set, the i-th observed value in the likelihood is taken from
+   * position idx[i] of the registered parameter vector rather than position i.
+   * This allows a single distribution to reference a contiguous subset of a
+   * larger registered vector without copying data.
+   *
+   * @param idx Integer vector of 0-based indices into the registered parameter
+   * vector.
+   * @return true
+   */
+  virtual bool set_observed_subvector(Rcpp::IntegerVector idx) {
+    this->observed_subvector_m = idx;
+    return true;
+  }
 
   /**
    * @brief A method for each child distribution interface object to inherit so
@@ -281,7 +307,7 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
     for (size_t i = 0; i < this->expected_mean.size(); i++) {
       dnorm.expected_mean[i] = this->expected_mean[i].initial_value_m;
     }
-    dnorm.use_mean = this->use_mean_m;
+    dnorm.use_expected_mean = (this->use_mean_m.get() == "yes");
     return dnorm.evaluate();
   }
 
@@ -454,12 +480,18 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
 
     distribution->observed_data_id_m = interface_observed_data_id_m;
     std::stringstream ss;
-    distribution->input_type = this->input_type_m;
+    distribution->distribution_type =
+        fims_distributions::distribution_kind_from_string(this->input_type_m);
     distribution->key.resize(this->key_m->size());
     for (size_t i = 0; i < this->key_m->size(); i++) {
       distribution->key[i] = this->key_m->at(i);
     }
     distribution->id = this->id_m;
+    distribution->observed_subvector.resize(this->observed_subvector_m.size());
+    for (R_xlen_t i = 0; i < this->observed_subvector_m.size(); i++) {
+      distribution->observed_subvector[i] =
+          static_cast<size_t>(this->observed_subvector_m[i]);
+    }
     distribution->observed_values.resize(this->observed_values.size());
     for (size_t i = 0; i < this->observed_values.size(); i++) {
       distribution->observed_values[i] =
@@ -486,7 +518,7 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
     }
     info->variable_map[this->log_sd.id_m] = &(distribution)->log_sd;
 
-    distribution->use_mean = this->use_mean_m.get();
+    distribution->use_expected_mean = (this->use_mean_m.get() == "yes");
     distribution->expected_mean.resize(this->expected_mean.size());
     for (size_t i = 0; i < this->expected_mean.size(); i++) {
       distribution->expected_mean[i] = this->expected_mean[i].initial_value_m;
@@ -794,10 +826,16 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
     distribution->id = this->id_m;
     std::stringstream ss;
     distribution->observed_data_id_m = interface_observed_data_id_m;
-    distribution->input_type = this->input_type_m;
+    distribution->distribution_type =
+        fims_distributions::distribution_kind_from_string(this->input_type_m);
     distribution->key.resize(this->key_m->size());
     for (size_t i = 0; i < this->key_m->size(); i++) {
       distribution->key[i] = this->key_m->at(i);
+    }
+    distribution->observed_subvector.resize(this->observed_subvector_m.size());
+    for (R_xlen_t i = 0; i < this->observed_subvector_m.size(); i++) {
+      distribution->observed_subvector[i] =
+          static_cast<size_t>(this->observed_subvector_m[i]);
     }
     distribution->observed_values.resize(this->observed_values.size());
     for (size_t i = 0; i < this->observed_values.size(); i++) {
@@ -1006,11 +1044,12 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
       for (size_t i = 0; i < this->lpdf_vec.size(); i++) {
         this->lpdf_vec[i] = dmultinom->lpdf_vec[i];
         this->expected_values[i].final_value_m = dmultinom->get_expected(i);
-        if (dmultinom->input_type != "data") {
+        if (dmultinom->distribution_type !=
+            fims_distributions::Distribution_Kind::DATA) {
           this->observed_values[i].final_value_m = dmultinom->get_observed(i);
         }
       }
-      if (dmultinom->input_type == "data") {
+      if (dmultinom->distribution_type == fims_distributions::Distribution_Kind::DATA) {
         dims.resize(2);
         dims[0] = dmultinom->dims[0];
         dims[1] = dmultinom->dims[1];
@@ -1098,10 +1137,16 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
 
     distribution->id = this->id_m;
     distribution->observed_data_id_m = interface_observed_data_id_m;
-    distribution->input_type = this->input_type_m;
+    distribution->distribution_type =
+        fims_distributions::distribution_kind_from_string(this->input_type_m);
     distribution->key.resize(this->key_m->size());
     for (size_t i = 0; i < this->key_m->size(); i++) {
       distribution->key[i] = this->key_m->at(i);
+    }
+    distribution->observed_subvector.resize(this->observed_subvector_m.size());
+    for (R_xlen_t i = 0; i < this->observed_subvector_m.size(); i++) {
+      distribution->observed_subvector[i] =
+          static_cast<size_t>(this->observed_subvector_m[i]);
     }
     distribution->observed_values.resize(this->observed_values.size());
     for (size_t i = 0; i < this->observed_values.size(); i++) {

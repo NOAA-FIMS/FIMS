@@ -48,6 +48,8 @@ struct MultinomialLPMF : public DensityComponentBase<Type> {
    */
   virtual ~MultinomialLPMF() {}
 
+  virtual std::string name() const override { return "MultinomialLPMF"; }
+
   /**
    * @brief Evaluates the multinomial log probability mass function.
    * @details The following equation is the multinomial probability mass
@@ -67,41 +69,39 @@ struct MultinomialLPMF : public DensityComponentBase<Type> {
       dims[1] = this->data_observed_values->get_jmax();
     }
 
-    // setup vector for recording the log probability density function values
-    this->lpdf = static_cast<Type>(0.0); /**< total log probability mass
-                                           contribution of the distribution */
-    this->lpdf_vec.resize(dims[0] * dims[1]);
-    std::fill(this->lpdf_vec.begin(), this->lpdf_vec.end(), 0);
+    size_t n = dims[0] * dims[1];
+    this->prepare_lpdf(n);
     size_t lpdf_vec_idx = 0; /**< index for lpdf_vec vector */
     // Dimension checks
-    if (this->input_type == "data") {
-      if (this->data_expected_values) {
-        if (dims[0] * dims[1] != this->data_expected_values->size()) {
+    if (this->distribution_type == fims_distributions::Distribution_Kind::DATA) {
+      if (this->expected_ptr->size() > 0) {
+        if (n != this->expected_ptr->size()) {
           throw std::invalid_argument(
-              "MultinomialLPDF: Vector index out of bounds. The dimension of "
-              "the "
-              "number of rows times the number of columns is of size " +
-              std::to_string(dims[0] * dims[1]) +
+              this->name() +
+              ": Vector index out of bounds. The dimension of "
+              "the number of rows times the number of columns is of size " +
+              std::to_string(n) +
               " and the expected vector is of size " +
-              std::to_string(this->data_expected_values->size()));
+              std::to_string(this->expected_ptr->size()));
         }
       }
     } else {
-      if (dims[0] * dims[1] != this->observed_values.size()) {
+      if (n != this->observed_ptr->size()) {
         throw std::invalid_argument(
-            "MultinomialLPDF: Vector index out of bounds. The dimension of the "
-            "number of  rows times the number of columns is of size " +
-            std::to_string(dims[0] * dims[1]) +
+            this->name() +
+            ": Vector index out of bounds. The dimension of the "
+            "number of rows times the number of columns is of size " +
+            std::to_string(n) +
             " and the observed vector is of size " +
-            std::to_string(this->observed_values.size()));
+            std::to_string(this->observed_ptr->size()));
       }
-      if (this->observed_values.size() != this->expected_values.size()) {
+      if (this->observed_ptr->size() != this->expected_ptr->size()) {
         throw std::invalid_argument(
-            "MultinomialLPDF: Vector index out of bounds. The dimension of the "
-            "observed vector of size " +
-            std::to_string(this->observed_values.size()) +
+            this->name() +
+            ": Vector index out of bounds. The observed vector of size " +
+            std::to_string(this->observed_ptr->size()) +
             " and the expected vector is of size " +
-            std::to_string(this->expected_values.size()));
+            std::to_string(this->expected_ptr->size()));
       }
     }
 
@@ -117,7 +117,8 @@ struct MultinomialLPMF : public DensityComponentBase<Type> {
 
 #ifdef TMB_MODEL
       for (size_t j = 0; j < dims[1]; j++) {
-        if (this->input_type == "data") {
+        if (this->distribution_type ==
+            fims_distributions::Distribution_Kind::DATA) {
           // if data, check if there are any NA values and skip lpdf calculation
           // for entire row if there are
           if (this->get_observed(static_cast<size_t>(i),
