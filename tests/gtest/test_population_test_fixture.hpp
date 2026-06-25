@@ -106,8 +106,8 @@ class CAAInitializeTestFixture : public testing::Test {
 
       this->catch_at_age_model->populations[p]->proportion_female.resize(
           this->catch_at_age_model->populations[p]->n_ages);
-      for (size_t a = 0;
-           a < this->catch_at_age_model->populations[p]->n_ages; a++) {
+      for (size_t a = 0; a < this->catch_at_age_model->populations[p]->n_ages;
+           a++) {
         this->catch_at_age_model->populations[p]->proportion_female[a] = 0.5;
       }
 
@@ -469,8 +469,8 @@ class CAAEvaluateTestFixture : public testing::Test {
 
       this->catch_at_age_model->populations[p]->proportion_female.resize(
           this->catch_at_age_model->populations[p]->n_ages);
-      for (size_t a = 0;
-           a < this->catch_at_age_model->populations[p]->n_ages; a++) {
+      for (size_t a = 0; a < this->catch_at_age_model->populations[p]->n_ages;
+           a++) {
         this->catch_at_age_model->populations[p]->proportion_female[a] = 0.5;
       }
 
@@ -768,8 +768,8 @@ class CAAPrepareTestFixture : public testing::Test {
 
       this->catch_at_age_model->populations[p]->proportion_female.resize(
           this->catch_at_age_model->populations[p]->n_ages);
-      for (size_t a = 0;
-           a < this->catch_at_age_model->populations[p]->n_ages; a++) {
+      for (size_t a = 0; a < this->catch_at_age_model->populations[p]->n_ages;
+           a++) {
         this->catch_at_age_model->populations[p]->proportion_female[a] = 0.5;
       }
 
