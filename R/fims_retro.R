@@ -31,13 +31,13 @@
 #'   Minimum length is 1
 #' @param data A data frame or FIMSFrame object containing the complete dataset
 #'   used in the base model run. This should include all data types required
-#'   by FIMS (landings, indices, composition data, biological data, etc.)
+#'   by FIMS (landings, indices, composition data, biological data, etc.).
 #' @param parameters A FIMS parameters object created by
-#'   [FIMS::create_default_parameters()], containing the model configuration
-#'   and initial parameter values for the base model
+#'   [setup_default_parameters()], containing the model configuration
+#'   and initial parameter values for the base model.
 #' @param n_cores An integer specifying the number of CPU cores to use for
 #'   parallel processing. If `NULL` (default), uses `parallel::detectCores() - 1`.
-#'   Set to 1 for sequential processing. Must be a positive integer
+#'   Set to 1 for sequential processing. Must be a positive integer.
 #'
 #' @return
 #' A list with two named elements:
@@ -63,7 +63,7 @@
 #' @seealso
 #' * [stockplotr::plot_spawning_biomass()] for visualizing retrospective results
 #' * [calculate_mohns_rho()] for calculating Mohn's rho statistic
-#' * [FIMS::create_default_parameters()] for creating parameter objects
+#' * [setup_default_parameters()] for creating parameter objects
 #'
 #' @family diagnostic_functions
 #'
@@ -82,9 +82,7 @@
 #' data_4_model <- FIMSFrame(data_big)
 #'
 #' # Create a parameters object
-#' parameters <- data_4_model |>
-#'   create_default_configurations() |>
-#'   create_default_parameters(data = data_4_model)
+#' parameters <- setup_default_parameters(data = data_4_model)
 #'
 #' # Run base model
 #' base_model <- parameters |>

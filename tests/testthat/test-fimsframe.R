@@ -146,7 +146,7 @@ test_that("`fims_frame()` works with the correct inputs", {
   expect_true(FIMS:::is.FIMSFrame(fims_frame))
 
   #' @description Test that `is.FIMSFrame()` is FALSE when passed a data frame.
-  expect_false(FIMS:::is.FIMSFrame(data_big))
+  expect_error(FIMS:::is.FIMSFrame(data_big))
 
   #' @description Test that `pretty_type()`, an unexported function, returns space separated values with "comp" expanded to "composition".
   expect_equal(

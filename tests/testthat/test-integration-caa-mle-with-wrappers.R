@@ -216,7 +216,7 @@ test_that("catch-at-age model (estimation MLE with wrappers) works with mixed es
   )
 
   # Force fleet1's Fmort to be constant for the first 10 years.
-  # From years 11–30, the Fmort estimation type is fixed_effects.
+  # From years 11-30, the Fmort estimation type is fixed_effects.
   fit_mixed_estimation_types <- modified_parameters |>
     dplyr::mutate(
       estimation_type = dplyr::if_else(

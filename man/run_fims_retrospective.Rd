@@ -15,15 +15,15 @@ Minimum length is 1}
 
 \item{data}{A data frame or FIMSFrame object containing the complete dataset
 used in the base model run. This should include all data types required
-by FIMS (landings, indices, composition data, biological data, etc.)}
+by FIMS (landings, indices, composition data, biological data, etc.).}
 
 \item{parameters}{A FIMS parameters object created by
-\code{\link[=create_default_parameters]{create_default_parameters()}}, containing the model configuration
-and initial parameter values for the base model}
+\code{\link[=setup_default_parameters]{setup_default_parameters()}}, containing the model configuration
+and initial parameter values for the base model.}
 
 \item{n_cores}{An integer specifying the number of CPU cores to use for
 parallel processing. If \code{NULL} (default), uses \code{parallel::detectCores() - 1}.
-Set to 1 for sequential processing. Must be a positive integer}
+Set to 1 for sequential processing. Must be a positive integer.}
 }
 \value{
 A list with two named elements:
@@ -74,9 +74,7 @@ data("data_big")
 data_4_model <- FIMSFrame(data_big)
 
 # Create a parameters object
-parameters <- data_4_model |>
-  create_default_configurations() |>
-  create_default_parameters(data = data_4_model)
+parameters <- setup_default_parameters(data = data_4_model)
 
 # Run base model
 base_model <- parameters |>
@@ -110,7 +108,7 @@ ICES Journal of Marine Science 72(1): 99-110.
 \itemize{
 \item \code{\link[stockplotr:plot_spawning_biomass]{stockplotr::plot_spawning_biomass()}} for visualizing retrospective results
 \item \code{\link[=calculate_mohns_rho]{calculate_mohns_rho()}} for calculating Mohn's rho statistic
-\item \code{\link[=create_default_parameters]{create_default_parameters()}} for creating parameter objects
+\item \code{\link[=setup_default_parameters]{setup_default_parameters()}} for creating parameter objects
 }
 
 Other diagnostic_functions:
