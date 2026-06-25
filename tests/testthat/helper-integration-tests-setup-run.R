@@ -123,15 +123,11 @@ prepare_test_data <- function() {
   em_input <- em_input_list[[iter_id]]
 
   data_age_length_comp <- FIMSFrame(data_big)
-  default_parameters <- create_default_configurations(
-    data = data_age_length_comp
-  ) |>
-    create_default_parameters(
+  default_parameters <- setup_default_parameters(
       data = data_age_length_comp
     )
 
   modified_parameters <- default_parameters |>
-    tidyr::unnest(cols = data) |>
     # Update log_Fmort input values for Fleet1
     dplyr::rows_update(
       tibble::tibble(
@@ -385,7 +381,7 @@ prepare_test_data <- function() {
   # Define fleet1 and survey1 specifications
 
   # Run FIMS model with the following steps:
-  # * Create default parameters with fleet1 and survey1 specifications
+  # * Set up default parameters with fleet1 and survey1 specifications
   # * Update parameters if any modifications are provided
   # * Initialize FIMS with the provided data (age and length composition with missing values)
   # * Fit the FIMS model with optimization enabled

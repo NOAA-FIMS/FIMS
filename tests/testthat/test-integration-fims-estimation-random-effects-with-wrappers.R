@@ -364,13 +364,13 @@ test_that("estimation test with recruitment re on logr", {
   )
 
   default_parameters <- fims_data |>
-    create_default_parameters(
+    setup_default_parameters(
       fleets = fleets,
       recruitment = list(
         form = "BevertonHoltRecruitment"
       )
     ) |>
-    create_default_process(
+    setup_default_process(
       data = fims_data,
       module = "recruitment",
       par = "log_r",
@@ -445,7 +445,7 @@ test_that("estimation test with recruitment re on logr", {
   )
 
   default_parameters <- fims_data |>
-    create_default_parameters(
+    setup_default_parameters(
       fleets = list(fleet1 = fleet1, survey1 = survey1),
       recruitment = list(
         form = "BevertonHoltRecruitment"
@@ -453,7 +453,7 @@ test_that("estimation test with recruitment re on logr", {
       growth = list(form = "EWAAGrowth"),
       maturity = list(form = "LogisticMaturity")
     ) |>
-    create_default_process(
+    setup_default_process(
       data = fims_data,
       module = "recruitment",
       par = "log_devs",

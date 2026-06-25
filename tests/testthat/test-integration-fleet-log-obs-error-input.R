@@ -18,10 +18,7 @@ data("data_big")
 data_4_model <- FIMSFrame(data_big)
 
 # Create parameters
-default_parameters <- data_4_model |>
-  create_default_configurations() |>
-  create_default_parameters(data = data_4_model)
-
+default_parameters <- setup_default_parameters(data = data_4_model)
 
 ## IO correctness ----
 
@@ -29,7 +26,6 @@ test_that("`log_obs_error scalar` works with correct inputs", {
   #' @description Test that `log_obs_error` works when it is a fixed scalar.
 
   parameters_4_model <- default_parameters |>
-    tidyr::unnest(cols = data) |>
     # remove all but one log_obs_sd initial values for Fleet1
     dplyr::filter(
       !(fleet == "fleet1" & label == "log_sd" & time > 1) |
@@ -98,7 +94,6 @@ test_that("`log_obs_error scalar` works with correct inputs", {
 test_that("`log_sd` returns correct error messages when wrong dimensions", {
   #' @description Test that returns correct error message when log_sd is too short. The error is caught in initialize_modules, not in C++.
   parameters_4_model <- default_parameters |>
-    tidyr::unnest(cols = data) |>
     # change log_sd input length to size 4
     dplyr::filter(
       !(fleet == "fleet1" & label == "log_sd" & time > 4) |
@@ -119,7 +114,6 @@ test_that("`log_sd` returns correct error messages when wrong dimensions", {
   #' @description Test that returns correct error message when log_sd is too long.
   #' The error should be caught in initialize_modules, not in C++.
   parameters_4_model <- default_parameters |>
-    tidyr::unnest(cols = data) |>
     # add an extra log_sd observation
     dplyr::add_row(
       fleet = "fleet1",
@@ -145,7 +139,6 @@ test_that("`log_Fmort` returns correct error messages when wrong dimensions", {
   #' @description Test that returns correct error message when log_Fmort is too short.
   #' The error should be caught in initialize_modules, not in C++.
   parameters_4_model <- default_parameters |>
-    tidyr::unnest(cols = data) |>
     # change log_Fmort input length to size 4
     dplyr::filter(
       !(fleet == "fleet1" & label == "log_Fmort" & time > 4) |
@@ -166,7 +159,6 @@ test_that("`log_Fmort` returns correct error messages when wrong dimensions", {
   #' @description Test that returns correct error message when log_Fmort is too long.
   #' The error should be caught in initialize_modules, not in C++.
   parameters_4_model <- default_parameters |>
-    tidyr::unnest(cols = data) |>
     # add an extra log_Fmort observation
     dplyr::add_row(
       fleet = "fleet1",

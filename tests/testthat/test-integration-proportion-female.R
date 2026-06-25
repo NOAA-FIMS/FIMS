@@ -14,13 +14,10 @@ load(test_path("fixtures", "integration_test_data.RData"))
 data("data_big")
 data_4_model <- FIMSFrame(data_big)
 
-default_parameters <- data_4_model |>
-  create_default_configurations() |>
-  create_default_parameters(data = data_4_model)
+default_parameters <- setup_default_parameters(data = data_4_model)
 
 spawning_biomass_for_prop_female <- function(prop_female) {
   parameters_4_model <- default_parameters |>
-    tidyr::unnest(cols = data) |>
     dplyr::mutate(
       value = dplyr::if_else(label == "proportion_female", prop_female, value)
     )
