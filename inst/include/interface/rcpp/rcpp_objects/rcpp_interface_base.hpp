@@ -412,8 +412,7 @@ inline std::ostream& operator<<(std::ostream& out, VariableVector& v) {
  * @param vv The destination VariableVector (interface side).
  * @param src The source fims::Vector<double> (model side).
  */
-inline void finalize_vv(VariableVector& vv,
-                        const fims::Vector<double>& src) {
+inline void finalize_vv(VariableVector& vv, const fims::Vector<double>& src) {
   vv.resize(src.size());
   for (size_t i = 0; i < src.size(); i++) {
     vv[i].final_value_m = src[i];

@@ -28,12 +28,7 @@ namespace fims_distributions {
  * likelihood. This determines which inputs are active and controls simulation
  * order in model.hpp (priors first, then random effects, then data).
  */
-enum class Distribution_Kind {
-  PRIOR,
-  RANDOM_EFFECT,
-  DATA,
-  PENALTY
-};
+enum class Distribution_Kind { PRIOR, RANDOM_EFFECT, DATA, PENALTY };
 
 /**
  * @brief Converts a string input_type (from the R/Rcpp interface) to a
@@ -126,7 +121,8 @@ struct DensityComponentBase : public fims_model_object::FIMSObject<Type> {
 
   /**
    * @brief When true, expected_ptr is set to &expected_mean by
-   * SetupDistributions(). Set from the Rcpp interface via set_distribution_mean().
+   * SetupDistributions(). Set from the Rcpp interface via
+   * set_distribution_mean().
    */
   bool use_expected_mean = false;
 
@@ -201,9 +197,7 @@ struct DensityComponentBase : public fims_model_object::FIMSObject<Type> {
   /**
    * @brief Get the number of expected values for the active input.
    */
-  inline size_t get_n_expected() {
-    return this->expected_ptr->size();
-  }
+  inline size_t get_n_expected() { return this->expected_ptr->size(); }
   // id_g is the ID of the instance of the DensityComponentBase class.
   // this is like a memory tracker.
   // Assigning each one its own ID is a way to keep track of

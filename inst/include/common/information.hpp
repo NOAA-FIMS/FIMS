@@ -320,8 +320,8 @@ class Information {
             }
           }
           FIMS_INFO_LOG("Prior size for distribution " +
-                        fims::to_string(d->id) + " is: " +
-                        fims::to_string(d->observed_ptr->size()));
+                        fims::to_string(d->id) +
+                        " is: " + fims::to_string(d->observed_ptr->size()));
           break;
 
         case fims_distributions::Distribution_Kind::RANDOM_EFFECT:
@@ -340,8 +340,8 @@ class Information {
             // else expected_ptr stays at &expected_values (constructor default)
           }
           FIMS_INFO_LOG("Random effect size for distribution " +
-                        fims::to_string(d->id) + " is: " +
-                        fims::to_string(d->observed_ptr->size()));
+                        fims::to_string(d->id) +
+                        " is: " + fims::to_string(d->observed_ptr->size()));
           break;
 
         case fims_distributions::Distribution_Kind::DATA:
@@ -355,8 +355,8 @@ class Information {
                           fims::to_string(d->key[0]));
           }
           FIMS_INFO_LOG("Expected value size for distribution " +
-                        fims::to_string(d->id) + " is: " +
-                        fims::to_string(d->expected_ptr->size()));
+                        fims::to_string(d->id) +
+                        " is: " + fims::to_string(d->expected_ptr->size()));
           break;
 
         case fims_distributions::Distribution_Kind::PENALTY:

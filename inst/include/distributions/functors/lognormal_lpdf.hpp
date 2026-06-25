@@ -77,7 +77,8 @@ struct LogNormalLPDF : public DensityComponentBase<Type> {
 
     for (size_t i = 0; i < n_x; i++) {
 #ifdef TMB_MODEL
-      if (this->distribution_type == fims_distributions::Distribution_Kind::DATA) {
+      if (this->distribution_type ==
+          fims_distributions::Distribution_Kind::DATA) {
         // if data, check if there are any NA values and skip lpdf calculation
         // if there are See Deroba and Miller, 2016
         // (https://doi.org/10.1016/j.fishres.2015.12.002) for the use of
@@ -108,9 +109,9 @@ struct LogNormalLPDF : public DensityComponentBase<Type> {
       this->lpdf += this->lpdf_vec[i];
       if (this->simulate_flag) {
         FIMS_SIMULATE_F(this->of) {
-          Type sim_val = fims_math::exp(
-              rnorm(this->get_expected(i),
-                    fims_math::exp(log_sd.get_force_scalar(i))));
+          Type sim_val =
+              fims_math::exp(rnorm(this->get_expected(i),
+                                   fims_math::exp(log_sd.get_force_scalar(i))));
           if (this->distribution_type ==
               fims_distributions::Distribution_Kind::DATA) {
             this->data_observed_values->at(i) = sim_val;

@@ -413,20 +413,50 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
       int na = population_interface->n_ages.get();
       PopulationInterface *pi = population_interface_ptr.get();
       ss << " \"derived_quantities\": [\n";
-      ss << dq_to_json_from_vv("total_landings_weight", "\"n_years\"", {ny}, pi->total_landings_weight) << ",\n";
-      ss << dq_to_json_from_vv("total_landings_numbers", "\"n_years\"", {ny}, pi->total_landings_numbers) << ",\n";
-      ss << dq_to_json_from_vv("mortality_F", "\"n_years\", \"n_ages\"", {ny, na}, pi->mortality_F) << ",\n";
-      ss << dq_to_json_from_vv("mortality_M", "\"n_years\", \"n_ages\"", {ny, na}, pi->mortality_M) << ",\n";
-      ss << dq_to_json_from_vv("mortality_Z", "\"n_years\", \"n_ages\"", {ny, na}, pi->mortality_Z) << ",\n";
-      ss << dq_to_json_from_vv("numbers_at_age", "\"n_years+1\", \"n_ages\"", {ny + 1, na}, pi->numbers_at_age) << ",\n";
-      ss << dq_to_json_from_vv("unfished_numbers_at_age", "\"n_years+1\", \"n_ages\"", {ny + 1, na}, pi->unfished_numbers_at_age) << ",\n";
-      ss << dq_to_json_from_vv("biomass", "\"n_years+1\"", {ny + 1}, pi->biomass) << ",\n";
-      ss << dq_to_json_from_vv("spawning_biomass", "\"n_years+1\"", {ny + 1}, pi->spawning_biomass) << ",\n";
-      ss << dq_to_json_from_vv("unfished_biomass", "\"n_years+1\"", {ny + 1}, pi->unfished_biomass) << ",\n";
-      ss << dq_to_json_from_vv("unfished_spawning_biomass", "\"n_years+1\"", {ny + 1}, pi->unfished_spawning_biomass) << ",\n";
-      ss << dq_to_json_from_vv("proportion_mature_at_age", "\"n_years+1\", \"n_ages\"", {ny + 1, na}, pi->proportion_mature_at_age) << ",\n";
-      ss << dq_to_json_from_vv("expected_recruitment", "\"n_years+1\"", {ny + 1}, pi->expected_recruitment) << ",\n";
-      ss << dq_to_json_from_vv("sum_selectivity", "\"n_years\", \"n_ages\"", {ny, na}, pi->sum_selectivity) << "\n";
+      ss << dq_to_json_from_vv("total_landings_weight", "\"n_years\"", {ny},
+                               pi->total_landings_weight)
+         << ",\n";
+      ss << dq_to_json_from_vv("total_landings_numbers", "\"n_years\"", {ny},
+                               pi->total_landings_numbers)
+         << ",\n";
+      ss << dq_to_json_from_vv("mortality_F", "\"n_years\", \"n_ages\"",
+                               {ny, na}, pi->mortality_F)
+         << ",\n";
+      ss << dq_to_json_from_vv("mortality_M", "\"n_years\", \"n_ages\"",
+                               {ny, na}, pi->mortality_M)
+         << ",\n";
+      ss << dq_to_json_from_vv("mortality_Z", "\"n_years\", \"n_ages\"",
+                               {ny, na}, pi->mortality_Z)
+         << ",\n";
+      ss << dq_to_json_from_vv("numbers_at_age", "\"n_years+1\", \"n_ages\"",
+                               {ny + 1, na}, pi->numbers_at_age)
+         << ",\n";
+      ss << dq_to_json_from_vv("unfished_numbers_at_age",
+                               "\"n_years+1\", \"n_ages\"", {ny + 1, na},
+                               pi->unfished_numbers_at_age)
+         << ",\n";
+      ss << dq_to_json_from_vv("biomass", "\"n_years+1\"", {ny + 1},
+                               pi->biomass)
+         << ",\n";
+      ss << dq_to_json_from_vv("spawning_biomass", "\"n_years+1\"", {ny + 1},
+                               pi->spawning_biomass)
+         << ",\n";
+      ss << dq_to_json_from_vv("unfished_biomass", "\"n_years+1\"", {ny + 1},
+                               pi->unfished_biomass)
+         << ",\n";
+      ss << dq_to_json_from_vv("unfished_spawning_biomass", "\"n_years+1\"",
+                               {ny + 1}, pi->unfished_spawning_biomass)
+         << ",\n";
+      ss << dq_to_json_from_vv("proportion_mature_at_age",
+                               "\"n_years+1\", \"n_ages\"", {ny + 1, na},
+                               pi->proportion_mature_at_age)
+         << ",\n";
+      ss << dq_to_json_from_vv("expected_recruitment", "\"n_years+1\"",
+                               {ny + 1}, pi->expected_recruitment)
+         << ",\n";
+      ss << dq_to_json_from_vv("sum_selectivity", "\"n_years\", \"n_ages\"",
+                               {ny, na}, pi->sum_selectivity)
+         << "\n";
       ss << " ]}\n";
     } else {
       ss << "{\n";
@@ -450,15 +480,16 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
    * @brief Serialize a derived quantity VariableVector to a JSON DQ entry.
    *
    * @param name The name of the derived quantity.
-   * @param dim_header Comma-separated quoted header strings (e.g. "\"n_years\"").
+   * @param dim_header Comma-separated quoted header strings (e.g.
+   * "\"n_years\"").
    * @param dims Sizes for each dimension.
    * @param vv The VariableVector holding the computed values (final_value_m).
    * @return std::string JSON fragment.
    */
   std::string dq_to_json_from_vv(const std::string &name,
-                                  const std::string &dim_header,
-                                  const std::vector<int> &dims,
-                                  VariableVector &vv) {
+                                 const std::string &dim_header,
+                                 const std::vector<int> &dims,
+                                 VariableVector &vv) {
     std::stringstream ss;
     ss << "{\n";
     ss << "\"name\":\"" << name << "\",\n";
@@ -558,25 +589,70 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
       int na = fleet_interface->n_ages.get();
       int nl = fleet_interface->n_lengths.get();
       ss << "], \"derived_quantities\": [\n";
-      ss << dq_to_json_from_vv("landings_numbers_at_age", "\"n_years\", \"n_ages\"", {ny, na}, fleet_interface->landings_numbers_at_age) << ",\n";
-      ss << dq_to_json_from_vv("landings_weight_at_age", "\"n_years\", \"n_ages\"", {ny, na}, fleet_interface->landings_weight_at_age) << ",\n";
-      ss << dq_to_json_from_vv("landings_numbers_at_length", "\"n_years\", \"n_lengths\"", {ny, nl}, fleet_interface->landings_numbers_at_length) << ",\n";
-      ss << dq_to_json_from_vv("landings_weight", "\"n_years\"", {ny}, fleet_interface->landings_weight) << ",\n";
-      ss << dq_to_json_from_vv("landings_numbers", "\"n_years\"", {ny}, fleet_interface->landings_numbers) << ",\n";
-      ss << dq_to_json_from_vv("landings_expected", "\"n_years\"", {ny}, fleet_interface->landings_expected) << ",\n";
-      ss << dq_to_json_from_vv("log_landings_expected", "\"n_years\"", {ny}, fleet_interface->log_landings_expected) << ",\n";
-      ss << dq_to_json_from_vv("agecomp_proportion", "\"n_years\", \"n_ages\"", {ny, na}, fleet_interface->agecomp_proportion) << ",\n";
-      ss << dq_to_json_from_vv("lengthcomp_proportion", "\"n_years\", \"n_lengths\"", {ny, nl}, fleet_interface->lengthcomp_proportion) << ",\n";
-      ss << dq_to_json_from_vv("agecomp_expected", "\"n_years\", \"n_ages\"", {ny, na}, fleet_interface->agecomp_expected) << ",\n";
-      ss << dq_to_json_from_vv("lengthcomp_expected", "\"n_years\", \"n_lengths\"", {ny, nl}, fleet_interface->lengthcomp_expected) << ",\n";
-      ss << dq_to_json_from_vv("index_numbers_at_age", "\"n_years\", \"n_ages\"", {ny, na}, fleet_interface->index_numbers_at_age) << ",\n";
-      ss << dq_to_json_from_vv("index_weight_at_age", "\"n_years\", \"n_ages\"", {ny, na}, fleet_interface->index_weight_at_age) << ",\n";
-      ss << dq_to_json_from_vv("index_numbers_at_length", "\"n_years\", \"n_lengths\"", {ny, nl}, fleet_interface->index_numbers_at_length) << ",\n";
-      ss << dq_to_json_from_vv("index_weight", "\"n_years\"", {ny}, fleet_interface->index_weight) << ",\n";
-      ss << dq_to_json_from_vv("index_numbers", "\"n_years\"", {ny}, fleet_interface->index_numbers) << ",\n";
-      ss << dq_to_json_from_vv("index_expected", "\"n_years\"", {ny}, fleet_interface->index_expected) << ",\n";
-      ss << dq_to_json_from_vv("log_index_expected", "\"n_years\"", {ny}, fleet_interface->log_index_expected) << ",\n";
-      ss << dq_to_json_from_vv("catch_index", "\"n_years\"", {ny}, fleet_interface->catch_index) << "\n";
+      ss << dq_to_json_from_vv("landings_numbers_at_age",
+                               "\"n_years\", \"n_ages\"", {ny, na},
+                               fleet_interface->landings_numbers_at_age)
+         << ",\n";
+      ss << dq_to_json_from_vv("landings_weight_at_age",
+                               "\"n_years\", \"n_ages\"", {ny, na},
+                               fleet_interface->landings_weight_at_age)
+         << ",\n";
+      ss << dq_to_json_from_vv("landings_numbers_at_length",
+                               "\"n_years\", \"n_lengths\"", {ny, nl},
+                               fleet_interface->landings_numbers_at_length)
+         << ",\n";
+      ss << dq_to_json_from_vv("landings_weight", "\"n_years\"", {ny},
+                               fleet_interface->landings_weight)
+         << ",\n";
+      ss << dq_to_json_from_vv("landings_numbers", "\"n_years\"", {ny},
+                               fleet_interface->landings_numbers)
+         << ",\n";
+      ss << dq_to_json_from_vv("landings_expected", "\"n_years\"", {ny},
+                               fleet_interface->landings_expected)
+         << ",\n";
+      ss << dq_to_json_from_vv("log_landings_expected", "\"n_years\"", {ny},
+                               fleet_interface->log_landings_expected)
+         << ",\n";
+      ss << dq_to_json_from_vv("agecomp_proportion", "\"n_years\", \"n_ages\"",
+                               {ny, na}, fleet_interface->agecomp_proportion)
+         << ",\n";
+      ss << dq_to_json_from_vv("lengthcomp_proportion",
+                               "\"n_years\", \"n_lengths\"", {ny, nl},
+                               fleet_interface->lengthcomp_proportion)
+         << ",\n";
+      ss << dq_to_json_from_vv("agecomp_expected", "\"n_years\", \"n_ages\"",
+                               {ny, na}, fleet_interface->agecomp_expected)
+         << ",\n";
+      ss << dq_to_json_from_vv("lengthcomp_expected",
+                               "\"n_years\", \"n_lengths\"", {ny, nl},
+                               fleet_interface->lengthcomp_expected)
+         << ",\n";
+      ss << dq_to_json_from_vv("index_numbers_at_age",
+                               "\"n_years\", \"n_ages\"", {ny, na},
+                               fleet_interface->index_numbers_at_age)
+         << ",\n";
+      ss << dq_to_json_from_vv("index_weight_at_age", "\"n_years\", \"n_ages\"",
+                               {ny, na}, fleet_interface->index_weight_at_age)
+         << ",\n";
+      ss << dq_to_json_from_vv("index_numbers_at_length",
+                               "\"n_years\", \"n_lengths\"", {ny, nl},
+                               fleet_interface->index_numbers_at_length)
+         << ",\n";
+      ss << dq_to_json_from_vv("index_weight", "\"n_years\"", {ny},
+                               fleet_interface->index_weight)
+         << ",\n";
+      ss << dq_to_json_from_vv("index_numbers", "\"n_years\"", {ny},
+                               fleet_interface->index_numbers)
+         << ",\n";
+      ss << dq_to_json_from_vv("index_expected", "\"n_years\"", {ny},
+                               fleet_interface->index_expected)
+         << ",\n";
+      ss << dq_to_json_from_vv("log_index_expected", "\"n_years\"", {ny},
+                               fleet_interface->log_index_expected)
+         << ",\n";
+      ss << dq_to_json_from_vv("catch_index", "\"n_years\"", {ny},
+                               fleet_interface->catch_index)
+         << "\n";
       ss << "]}\n";
     } else {
       ss << "{\n";
