@@ -587,12 +587,12 @@ class CatchAtAge : public FisheryModelBase<Type> {
         (numbers_spr[population->n_ages - 2] *
          fims_math::exp(-population->M[population->n_ages - 2])) /
         (1 - fims_math::exp(-population->M[population->n_ages - 1]));
-    phi_0 += numbers_spr[population->n_ages - 1] *
-             population->proportion_female.get_force_scalar(
-                 population->n_ages - 1) *
-             dq_["proportion_mature_at_age"][population->n_ages - 1] *
-             population->growth->evaluate(
-                 0, population->ages[population->n_ages - 1]);
+    phi_0 +=
+        numbers_spr[population->n_ages - 1] *
+        population->proportion_female.get_force_scalar(population->n_ages - 1) *
+        dq_["proportion_mature_at_age"][population->n_ages - 1] *
+        population->growth->evaluate(0,
+                                     population->ages[population->n_ages - 1]);
 
     return phi_0;
   }
