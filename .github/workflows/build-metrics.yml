@@ -295,11 +295,12 @@ jobs:
               return int(match.group(1)) if match else None
 
           def count_warnings(text):
-              return len(re.findall(r"warning:", text))
+              lines = [line for line in text.splitlines() if not re.search(r"\b[0-9]+ warnings? generated\b", line, re.IGNORECASE)]
+              return sum(bool(re.search(r"\bwarning(?:s| messages?)?\b:?", line, re.IGNORECASE)) for line in lines)
 
           def count_errors(text):
-              lines = [line for line in text.splitlines() if not re.search(r"[0-9]+ error\(s\) generated", line)]
-              return sum("error:" in line for line in lines)
+              lines = [line for line in text.splitlines() if not re.search(r"\b[0-9]+ errors? generated\b|\b[0-9]+ error\(s\) generated\b", line, re.IGNORECASE)]
+              return sum(bool(re.search(r"\berror\b:?", line, re.IGNORECASE)) for line in lines)
 
           def read_int(path):
               path = Path(path)
@@ -387,10 +388,57 @@ jobs:
             git -C baseline-main fetch --depth 1 origin "$BASELINE_COMMIT"
             git -C baseline-main checkout "$BASELINE_COMMIT"
 
+            collect_descendant_pids() {
+              local parent_pid="$1"
+              local child_pid
+
+              echo "$parent_pid"
+              for child_pid in $(pgrep -P "$parent_pid" 2>/dev/null || true); do
+                collect_descendant_pids "$child_pid"
+              done
+            }
+
+            sample_memory_until_done() {
+              local prefix="$1"
+              local command_pid="$2"
+              local samples_file="${prefix}_memory_samples.tsv"
+
+              printf "timestamp_epoch\tprocess_tree_rss_kb\tprocess_count\n" > "$samples_file"
+              while kill -0 "$command_pid" 2>/dev/null; do
+                local timestamp_epoch
+                local process_tree_rss_kb=0
+                local process_count=0
+                local pids
+
+                timestamp_epoch=$(date +%s)
+
+                pids=$(collect_descendant_pids "$command_pid" | sort -n | uniq | awk '{ pids = pids sep $1; sep = "," } END { print pids }')
+                if [ -n "$pids" ]; then
+                  process_tree_rss_kb=$(ps -o rss= -p "$pids" 2>/dev/null | awk '{sum += $1} END {print sum + 0}')
+                  process_count=$(printf "%s" "$pids" | awk -F, '{print NF}')
+                fi
+
+                printf "%s\t%s\t%s\n" "$timestamp_epoch" "$process_tree_rss_kb" "$process_count" >> "$samples_file"
+                sleep 1
+              done
+            }
+
             set +e
-            /usr/bin/time -v R CMD INSTALL baseline-main > baseline_package_install.log 2>&1
+            /usr/bin/time -v R CMD INSTALL baseline-main > baseline_package_install.log 2>&1 &
+            local command_pid=$!
+
+            sample_memory_until_done baseline_package_install "$command_pid" &
+            local sampler_pid=$!
+
+            wait "$command_pid"
             local baseline_status=$?
+            kill "$sampler_pid" 2>/dev/null
+            wait "$sampler_pid" 2>/dev/null
             set -e
+
+            awk -F '\t' 'NR > 1 && max < $2 {max = $2} END {print max + 0}' baseline_package_install_memory_samples.tsv > baseline_package_install_sampled_peak_process_tree_rss_kb.txt
+            awk -F '\t' 'NR > 1 && max < $3 {max = $3} END {print max + 0}' baseline_package_install_memory_samples.tsv > baseline_package_install_sampled_peak_process_count.txt
+
             if [ "$baseline_status" -ne 0 ]; then
               cat baseline_package_install.log
               echo "Baseline main package install failed."
@@ -438,11 +486,12 @@ jobs:
               return int(match.group(1)) if match else None
 
           def count_warnings(text):
-              return len(re.findall(r"warning:", text))
+              lines = [line for line in text.splitlines() if not re.search(r"\b[0-9]+ warnings? generated\b", line, re.IGNORECASE)]
+              return sum(bool(re.search(r"\bwarning(?:s| messages?)?\b:?", line, re.IGNORECASE)) for line in lines)
 
           def count_errors(text):
-              lines = [line for line in text.splitlines() if not re.search(r"[0-9]+ error\(s\) generated", line)]
-              return sum("error:" in line for line in lines)
+              lines = [line for line in text.splitlines() if not re.search(r"\b[0-9]+ errors? generated\b|\b[0-9]+ error\(s\) generated\b", line, re.IGNORECASE)]
+              return sum(bool(re.search(r"\berror\b:?", line, re.IGNORECASE)) for line in lines)
 
           def read_int(path):
               path = Path(path)
@@ -455,6 +504,9 @@ jobs:
           package_log = read_text("baseline_package_install.log")
           package_rss_kb = parse_max_rss_kb(package_log)
           package_rss_mb = round(package_rss_kb / 1024, 2) if package_rss_kb is not None else None
+          package_sampled_peak_process_tree_rss_kb = read_int("baseline_package_install_sampled_peak_process_tree_rss_kb.txt")
+          package_sampled_peak_process_tree_rss_mb = round(package_sampled_peak_process_tree_rss_kb / 1024, 2)
+          package_sampled_peak_process_count = read_int("baseline_package_install_sampled_peak_process_count.txt")
           shared_objects = {}
           shared_object_path = Path("baseline_installed_shared_objects.tsv")
           if shared_object_path.exists():
@@ -474,9 +526,9 @@ jobs:
               "package_install_time_sec": parse_elapsed_seconds(package_log),
               "package_install_max_rss_kb": package_rss_kb,
               "package_install_max_rss_mb": package_rss_mb,
-              "package_install_sampled_peak_process_tree_rss_kb": package_rss_kb or 0,
-              "package_install_sampled_peak_process_tree_rss_mb": package_rss_mb or 0,
-              "package_install_sampled_peak_process_count": 0,
+              "package_install_sampled_peak_process_tree_rss_kb": package_sampled_peak_process_tree_rss_kb,
+              "package_install_sampled_peak_process_tree_rss_mb": package_sampled_peak_process_tree_rss_mb,
+              "package_install_sampled_peak_process_count": package_sampled_peak_process_count,
               "peak_ram_mb": package_rss_mb,
               "warning_count": count_warnings(package_log),
               "error_count": count_errors(package_log),
