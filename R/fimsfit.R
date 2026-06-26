@@ -593,7 +593,7 @@ fit_fims <- function(input,
   maxgrad0 <- maxgrad <- max(abs(obj$gr(opt[["par"]])))
   if (number_of_loops > 0) {
     cli::cli_inform(c(
-      "i" = "Restarting optimizer {number_of_loops} times{?s} to improve
+      "i" = "Restarting optimizer {number_of_loops} time{?s} to improve
             gradient."
     ))
     # control$trace is reset to zero regardless of verbosity because the
