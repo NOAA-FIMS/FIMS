@@ -7,6 +7,20 @@
 
 namespace {
 
+void InitializePartitionedFleetAgeDerivedQuantities(
+    std::map<std::string, fims::Vector<double>> &derived_quantities,
+    size_t n_strata, size_t n_years, size_t n_ages) {
+  const size_t partitioned_age_year_size = n_strata * n_years * n_ages;
+  derived_quantities["landings_numbers_at_age_by_partition"] =
+      fims::Vector<double>(partitioned_age_year_size);
+  derived_quantities["landings_weight_at_age_by_partition"] =
+      fims::Vector<double>(partitioned_age_year_size);
+  derived_quantities["index_numbers_at_age_by_partition"] =
+      fims::Vector<double>(partitioned_age_year_size);
+  derived_quantities["index_weight_at_age_by_partition"] =
+      fims::Vector<double>(partitioned_age_year_size);
+}
+
 // Use test fixture to reuse the same configuration of objects for
 // several different tests. To use a test fixture, derive a class
 // from testing::Test.
@@ -165,6 +179,11 @@ class CAAInitializeTestFixture : public testing::Test {
 
       derived_quantities["index_weight_at_age"] =
           fims::Vector<double>(fleet->n_years * fleet->n_ages);
+
+      InitializePartitionedFleetAgeDerivedQuantities(
+          derived_quantities,
+          fims_popdy::MakeDefaultSexPartitionSpec().n_strata(), fleet->n_years,
+          fleet->n_ages);
 
       derived_quantities["index_numbers_at_length"] =
           fims::Vector<double>(fleet->n_years * fleet->n_lengths);
@@ -526,6 +545,11 @@ class CAAEvaluateTestFixture : public testing::Test {
       derived_quantities["index_weight_at_age"] =
           fims::Vector<double>(fleet->n_years * fleet->n_ages);
 
+      InitializePartitionedFleetAgeDerivedQuantities(
+          derived_quantities,
+          fims_popdy::MakeDefaultSexPartitionSpec().n_strata(), fleet->n_years,
+          fleet->n_ages);
+
       derived_quantities["index_numbers_at_length"] =
           fims::Vector<double>(fleet->n_years * fleet->n_lengths);
 
@@ -821,6 +845,11 @@ class CAAPrepareTestFixture : public testing::Test {
 
       derived_quantities["index_weight_at_age"] =
           fims::Vector<double>(fleet->n_years * fleet->n_ages);
+
+      InitializePartitionedFleetAgeDerivedQuantities(
+          derived_quantities,
+          fims_popdy::MakeDefaultSexPartitionSpec().n_strata(), fleet->n_years,
+          fleet->n_ages);
 
       derived_quantities["index_numbers_at_length"] =
           fims::Vector<double>(fleet->n_years * fleet->n_lengths);

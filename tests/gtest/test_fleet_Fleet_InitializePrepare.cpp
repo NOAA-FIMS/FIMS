@@ -21,12 +21,19 @@ namespace
     {
 
         this->InitializeCAA();
+        const size_t n_strata =
+            fims_popdy::MakeDefaultSexPartitionSpec().n_strata();
+        const size_t partitioned_age_year_size = n_strata * n_years * n_ages;
         for (auto fit = catch_at_age_model->fleets.begin(); 
             fit != catch_at_age_model->fleets.end(); ++fit) {
             auto &fleet = (*fit).second;
             auto& dq = catch_at_age_model->GetFleetDerivedQuantities(fleet->GetId());
             EXPECT_EQ(dq["landings_numbers_at_age"].size(), n_years * n_ages);
             EXPECT_EQ(dq["landings_weight_at_age"].size(), n_years * n_ages);
+            EXPECT_EQ(dq["landings_numbers_at_age_by_partition"].size(),
+                      partitioned_age_year_size);
+            EXPECT_EQ(dq["landings_weight_at_age_by_partition"].size(),
+                      partitioned_age_year_size);
             EXPECT_EQ(dq["landings_numbers_at_length"].size(), n_years * n_lengths);
             EXPECT_EQ(dq["landings_weight"].size(), n_years);
             EXPECT_EQ(dq["landings_numbers"].size(), n_years);
@@ -35,6 +42,10 @@ namespace
             EXPECT_EQ(dq["agecomp_proportion"].size(), n_years * n_ages);
             EXPECT_EQ(dq["lengthcomp_proportion"].size(), n_years * n_lengths);
             EXPECT_EQ(dq["index_numbers_at_age"].size(), n_years * n_ages);
+            EXPECT_EQ(dq["index_numbers_at_age_by_partition"].size(),
+                      partitioned_age_year_size);
+            EXPECT_EQ(dq["index_weight_at_age_by_partition"].size(),
+                      partitioned_age_year_size);
             EXPECT_EQ(dq["index_numbers_at_length"].size(), n_years * n_lengths);
             EXPECT_EQ(dq["index_weight"].size(), n_years);
             EXPECT_EQ(dq["index_numbers"].size(), n_years);
@@ -52,6 +63,9 @@ namespace
     {
         this->InitializeCAA();
         catch_at_age_model->Prepare();
+        const size_t n_strata =
+            fims_popdy::MakeDefaultSexPartitionSpec().n_strata();
+        const size_t partitioned_age_year_size = n_strata * n_years * n_ages;
 
         for (auto fit = catch_at_age_model->fleets.begin(); 
             fit != catch_at_age_model->fleets.end(); ++fit) {
@@ -62,6 +76,10 @@ namespace
                 fims::Vector(n_years * n_ages, 0.0));
             EXPECT_EQ(dq["landings_weight_at_age"], 
                 fims::Vector(n_years * n_ages, 0.0));
+            EXPECT_EQ(dq["landings_numbers_at_age_by_partition"],
+                fims::Vector(partitioned_age_year_size, 0.0));
+            EXPECT_EQ(dq["landings_weight_at_age_by_partition"],
+                fims::Vector(partitioned_age_year_size, 0.0));
             EXPECT_EQ(dq["landings_numbers_at_length"], 
                 fims::Vector(n_years * n_lengths, 0.0));
             EXPECT_EQ(dq["landings_weight"], 
@@ -78,6 +96,10 @@ namespace
                 fims::Vector(n_years * n_lengths, 0.0));
             EXPECT_EQ(dq["index_numbers_at_age"], 
                 fims::Vector(n_years * n_ages, 0.0));
+            EXPECT_EQ(dq["index_numbers_at_age_by_partition"],
+                fims::Vector(partitioned_age_year_size, 0.0));
+            EXPECT_EQ(dq["index_weight_at_age_by_partition"],
+                fims::Vector(partitioned_age_year_size, 0.0));
             EXPECT_EQ(dq["index_numbers_at_length"], 
                 fims::Vector(n_years * n_lengths, 0.0));
             EXPECT_EQ(dq["index_weight"], 
