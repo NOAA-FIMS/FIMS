@@ -200,7 +200,6 @@ stockplotr
 subfolders
 subvector
 syms
-TESTDOWN
 testthat
 tibble
 tibbles
