@@ -101,7 +101,6 @@ initialize_module <- function(parameters, data, module_name, fleet_name = NA_cha
       "agecomp_proportion",
       "observed_index_units",
       "observed_landings_units",
-
       "observed_landings_units",
       "landings_numbers_at_age",
       "landings_weight_at_age",
