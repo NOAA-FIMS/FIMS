@@ -49,6 +49,7 @@ initialize_module <- function(parameters, data, module_name, fleet_name = NA_cha
       "mortality_M",
       "mortality_Z",
       "numbers_at_age",
+      "proportion_female",
       "unfished_numbers_at_age",
       "biomass",
       "spawning_biomass",
@@ -107,12 +108,16 @@ initialize_module <- function(parameters, data, module_name, fleet_name = NA_cha
       "landings_numbers_at_length",
       "landings_weight",
       "landings_numbers",
+      "lengthcomp_proportion",
       "index_numbers_at_age",
       "index_weight_at_age",
       "index_numbers_at_length",
       "index_weight",
       "index_numbers",
-      "catch_index"
+      "catch_index",
+      "expected_catch",
+      "expected_index",
+      "lengthcomp_expected"
     ))
 
     fleet_types <- get_data(data) |>
