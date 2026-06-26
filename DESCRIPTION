@@ -94,11 +94,7 @@ Imports:
 Suggests:
     covr,
     devtools,
-    DT,
-    htmltools,
     knitr,
-    lozen,
-    markdown,
     microbenchmark,
     parallel,
     pkgdown,
@@ -108,7 +104,6 @@ Suggests:
     SparseNUTS,
     stockplotr,
     styler,
-    testdown,
     testthat (>= 3.0.0),
     tidyr,
     usethis,
@@ -121,9 +116,7 @@ VignetteBuilder:
     knitr
 Remotes:
     github::nmfs-ost/stockplotr,
-    github::noaa-afsc/SparseNUTS,
-    github::ThinkR-open/lozen,
-    github::ThinkR-open/testdown
+    github::noaa-afsc/SparseNUTS
 Additional_repositories: 
     https://noaa-fisheries-integrated-toolbox.r-universe.dev
 Config/Rcpp/registration: none
