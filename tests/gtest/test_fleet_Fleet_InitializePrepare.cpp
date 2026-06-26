@@ -18,12 +18,19 @@ namespace {
 // IO correctness
 TEST_F(CAAInitializeTestFixture, HandlesCorrectInput_Fleet_Initialize) {
   this->InitializeCAA();
+  const size_t n_strata =
+      fims_popdy::MakeDefaultSexPartitionSpec().n_strata();
+  const size_t partitioned_age_year_size = n_strata * n_years * n_ages;
   for (auto fit = catch_at_age_model->fleets.begin();
        fit != catch_at_age_model->fleets.end(); ++fit) {
     auto& fleet = (*fit).second;
     auto& dq = catch_at_age_model->GetFleetDerivedQuantities(fleet->GetId());
     EXPECT_EQ(dq["catch_numbers_at_age"].size(), n_years * n_ages);
     EXPECT_EQ(dq["catch_weight_at_age"].size(), n_years * n_ages);
+    EXPECT_EQ(dq["catch_numbers_at_age_by_partition"].size(),
+              partitioned_age_year_size);
+    EXPECT_EQ(dq["catch_weight_at_age_by_partition"].size(),
+              partitioned_age_year_size);
     EXPECT_EQ(dq["catch_numbers_at_length"].size(), n_years * n_lengths);
     EXPECT_EQ(dq["catch_weight"].size(), n_years);
     EXPECT_EQ(dq["catch_numbers"].size(), n_years);
@@ -32,6 +39,10 @@ TEST_F(CAAInitializeTestFixture, HandlesCorrectInput_Fleet_Initialize) {
     EXPECT_EQ(dq["agecomp_proportion"].size(), n_years * n_ages);
     EXPECT_EQ(dq["lengthcomp_proportion"].size(), n_years * n_lengths);
     EXPECT_EQ(dq["index_numbers_at_age"].size(), n_years * n_ages);
+    EXPECT_EQ(dq["index_numbers_at_age_by_partition"].size(),
+              partitioned_age_year_size);
+    EXPECT_EQ(dq["index_weight_at_age_by_partition"].size(),
+              partitioned_age_year_size);
     EXPECT_EQ(dq["index_numbers_at_length"].size(), n_years * n_lengths);
     EXPECT_EQ(dq["index_weight"].size(), n_years);
     EXPECT_EQ(dq["index_numbers"].size(), n_years);
@@ -48,6 +59,9 @@ TEST_F(CAAInitializeTestFixture, HandlesCorrectInput_Fleet_Initialize) {
 TEST_F(CAAPrepareTestFixture, HandlesCorrectInput_Fleet_Initialize) {
   this->InitializeCAA();
   catch_at_age_model->Prepare();
+  const size_t n_strata =
+      fims_popdy::MakeDefaultSexPartitionSpec().n_strata();
+  const size_t partitioned_age_year_size = n_strata * n_years * n_ages;
 
   for (auto fit = catch_at_age_model->fleets.begin();
        fit != catch_at_age_model->fleets.end(); ++fit) {
@@ -56,6 +70,10 @@ TEST_F(CAAPrepareTestFixture, HandlesCorrectInput_Fleet_Initialize) {
 
     EXPECT_EQ(dq["catch_numbers_at_age"], fims::Vector(n_years * n_ages, 0.0));
     EXPECT_EQ(dq["catch_weight_at_age"], fims::Vector(n_years * n_ages, 0.0));
+    EXPECT_EQ(dq["catch_numbers_at_age_by_partition"],
+              fims::Vector(partitioned_age_year_size, 0.0));
+    EXPECT_EQ(dq["catch_weight_at_age_by_partition"],
+              fims::Vector(partitioned_age_year_size, 0.0));
     EXPECT_EQ(dq["catch_numbers_at_length"],
               fims::Vector(n_years * n_lengths, 0.0));
     EXPECT_EQ(dq["catch_weight"], fims::Vector(n_years, 0.0));
@@ -66,6 +84,10 @@ TEST_F(CAAPrepareTestFixture, HandlesCorrectInput_Fleet_Initialize) {
     EXPECT_EQ(dq["lengthcomp_proportion"],
               fims::Vector(n_years * n_lengths, 0.0));
     EXPECT_EQ(dq["index_numbers_at_age"], fims::Vector(n_years * n_ages, 0.0));
+    EXPECT_EQ(dq["index_numbers_at_age_by_partition"],
+              fims::Vector(partitioned_age_year_size, 0.0));
+    EXPECT_EQ(dq["index_weight_at_age_by_partition"],
+              fims::Vector(partitioned_age_year_size, 0.0));
     EXPECT_EQ(dq["index_numbers_at_length"],
               fims::Vector(n_years * n_lengths, 0.0));
     EXPECT_EQ(dq["index_weight"], fims::Vector(n_years, 0.0));
