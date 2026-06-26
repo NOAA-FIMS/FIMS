@@ -41,7 +41,23 @@ initialize_module <- function(parameters, data, module_name, fleet_name = NA_cha
   if (module_class_name == "Population") {
     module_fields <- setdiff(module_fields, c(
       "log_f_multiplier",
-      "spawning_biomass_ratio"
+      "spawning_biomass_ratio",
+      "spawning_biomass_ratio",
+      "total_landings_weight",
+      "total_landings_numbers",
+      "mortality_F",
+      "mortality_M",
+      "mortality_Z",
+      "numbers_at_age",
+      "proportion_female",
+      "unfished_numbers_at_age",
+      "biomass",
+      "spawning_biomass",
+      "unfished_biomass",
+      "unfished_spawning_biomass",
+      "proportion_mature_at_age",
+      "expected_recruitment",
+      "sum_selectivity"
     ))
   }
 
@@ -84,7 +100,24 @@ initialize_module <- function(parameters, data, module_name, fleet_name = NA_cha
       "agecomp_expected",
       "agecomp_proportion",
       "observed_index_units",
-      "observed_landings_units"
+      "observed_landings_units",
+
+      "observed_landings_units",
+      "landings_numbers_at_age",
+      "landings_weight_at_age",
+      "landings_numbers_at_length",
+      "landings_weight",
+      "landings_numbers",
+      "lengthcomp_proportion",
+      "index_numbers_at_age",
+      "index_weight_at_age",
+      "index_numbers_at_length",
+      "index_weight",
+      "index_numbers",
+      "catch_index",
+      "expected_catch",
+      "expected_index",
+      "lengthcomp_expected"
     ))
 
     fleet_types <- get_data(data) |>
