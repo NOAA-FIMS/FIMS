@@ -7,7 +7,7 @@ TEST(PartitionSpec, DefaultSexPartitionHasTwoStrata) {
   fims_popdy::PartitionSpec spec = fims_popdy::MakeDefaultSexPartitionSpec();
   EXPECT_EQ(spec.axes.size(), 1);
   EXPECT_EQ(spec.axes[0].name, "sex");
-  EXPECT_EQ(spec.axes[0].size, 2);
+  EXPECT_EQ(spec.axes[0].size(), 2);
   EXPECT_EQ(spec.axes[0].levels, (std::vector<std::string>{"female", "male"}));
   EXPECT_EQ(spec.n_strata(), 2);
 }
@@ -51,6 +51,7 @@ TEST(IndexLayout, FoldedIndicesMatchYearAgeAndStratum) {
   EXPECT_EQ(layout.i_age_year(1, 2), 6);
   EXPECT_EQ(layout.i_stratum_age_year(0, 1, 2), 6);
   EXPECT_EQ(layout.i_stratum_age_year(1, 1, 2), 18);
+  EXPECT_EQ(layout.n_partitioned_age_year(), 24);
 }
 
 }  // namespace

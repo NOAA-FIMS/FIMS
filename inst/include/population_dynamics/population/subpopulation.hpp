@@ -18,9 +18,10 @@ namespace fims_popdy {
  * @brief One partition axis (e.g. sex with levels female and male).
  */
 struct Axis {
-  std::string name;
-  size_t size = 0;
-  std::vector<std::string> levels;
+  std::string name;              /*!< axis name (e.g. sex) */
+  std::vector<std::string> levels; /*!< level labels for this axis */
+
+  size_t size() const { return levels.size(); }
 };
 
 /**
@@ -28,7 +29,7 @@ struct Axis {
  */
 struct GroupSelector {
   static constexpr int kWildcard = -1;
-  std::vector<int> level;
+  std::vector<int> level; /*!< level index per axis, or kWildcard */
 };
 
 /**
@@ -43,7 +44,7 @@ struct PartitionSpec {
     }
     size_t n = 1;
     for (const Axis &axis : axes) {
-      n *= axis.size;
+      n *= axis.size();
     }
     return n;
   }
@@ -53,7 +54,7 @@ struct PartitionSpec {
     size_t multiplier = 1;
     for (int i = static_cast<int>(axes.size()) - 1; i >= 0; --i) {
       id += levels[i] * multiplier;
-      multiplier *= axes[i].size;
+      multiplier *= axes[i].size();
     }
     return id;
   }
@@ -61,8 +62,8 @@ struct PartitionSpec {
   std::vector<size_t> levels_from_stratum(size_t stratum) const {
     std::vector<size_t> levels(axes.size());
     for (int i = static_cast<int>(axes.size()) - 1; i >= 0; --i) {
-      levels[i] = stratum % axes[i].size;
-      stratum /= axes[i].size;
+      levels[i] = stratum % axes[i].size();
+      stratum /= axes[i].size();
     }
     return levels;
   }
@@ -90,7 +91,7 @@ struct PartitionSpec {
     }
 
     if (group.level[axis_index] == GroupSelector::kWildcard) {
-      for (size_t level = 0; level < axes[axis_index].size; ++level) {
+      for (size_t level = 0; level < axes[axis_index].size(); ++level) {
         (*current_levels)[axis_index] = level;
         expand_group_to_strata_recursive(group, axis_index + 1, current_levels,
                                          strata);
@@ -108,9 +109,9 @@ struct PartitionSpec {
  * @brief Folded indices for pooled and partitioned derived quantities.
  */
 struct IndexLayout {
-  size_t n_strata = 1;
-  size_t n_years = 0;
-  size_t n_ages = 0;
+  size_t n_strata = 1; /*!< number of partition strata */
+  size_t n_years = 0;  /*!< number of years */
+  size_t n_ages = 0;   /*!< number of ages */
 
   size_t i_age_year(size_t year, size_t age) const {
     return year * n_ages + age;
@@ -118,6 +119,10 @@ struct IndexLayout {
 
   size_t i_stratum_age_year(size_t stratum, size_t year, size_t age) const {
     return stratum * (n_years * n_ages) + i_age_year(year, age);
+  }
+
+  size_t n_partitioned_age_year() const {
+    return n_strata * n_years * n_ages;
   }
 };
 
@@ -128,7 +133,6 @@ inline PartitionSpec MakeDefaultSexPartitionSpec() {
   PartitionSpec spec;
   Axis sex_axis;
   sex_axis.name = "sex";
-  sex_axis.size = 2;
   sex_axis.levels = {"female", "male"};
   spec.axes.push_back(std::move(sex_axis));
   return spec;
