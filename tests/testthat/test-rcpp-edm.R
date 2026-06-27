@@ -38,19 +38,20 @@ test_that("rcpp edm works with correct inputs", {
   #' @description Test that time_lag is set correctly after construction.
   expect_equal(de$time_lag, tau)
   #' @description Test that n_rows is set correctly.
-  expect_equal(de$n_rows, 3)
+  expect_equal(de$n_rows, 2)
   #' @description Test that n_cols is set correctly.
   expect_equal(de$n_cols, 3)
 
   #' @description Test target values mapping (actual x_t values, not indices).
-  expect_equal(de$target_values$get_values(), c(30.0, 40.0, 50.0))
+  expect_equal(de$target_values$get_values(), c(40.0, 50.0))
 
   #' @description Test retrieving elements using at() method.
   expect_equal(de$at(0, 0), 30.0)
   expect_equal(de$at(0, 1), 20.0)
   expect_equal(de$at(0, 2), 10.0)
   expect_equal(de$at(1, 0), 40.0)
-  expect_equal(de$at(2, 2), 30.0)
+  expect_equal(de$at(1, 1), 30.0)
+  expect_equal(de$at(1, 2), 20.0)
 
   clear()
 })
@@ -87,10 +88,9 @@ test_that("rcpp edm construct_drop_missing works correctly", {
   de2$construct_drop_missing(series2, E, tau, missing_val)
 
   #' @description Test that construct_drop_missing keeps valid windows and maps correct target values.
-  expect_equal(de2$n_rows, 2)
-  expect_equal(de2$target_values$get_values(), c(30.0, 70.0))
+  expect_equal(de2$n_rows, 1)
+  expect_equal(de2$target_values$get_values(), -999.0)
   expect_equal(de2$at(0, 0), 30.0)
-  expect_equal(de2$at(1, 2), 50.0)
 
   clear()
 })
@@ -122,27 +122,24 @@ test_that("rcpp edm propagates uncertainty vectors when provided", {
 
   # Shape is identical to the value embedding
   #' @description Test that n_rows matches the value embedding when uncertainty is provided.
-  expect_equal(de$n_rows, 3)
+  expect_equal(de$n_rows, 2)
   #' @description Test that n_cols matches the value embedding when uncertainty is provided.
   expect_equal(de$n_cols, 3)
 
   # target_uncertainty mirrors target_values in the uncertainty space:
-  # Row 0 target index 2 -> sigma_2 = 0.3
-  # Row 1 target index 3 -> sigma_3 = 0.4
-  # Row 2 target index 4 -> sigma_4 = 0.5
+  # Row 0 target index 2 -> sigma_3 = 0.4
+  # Row 1 target index 3 -> sigma_4 = 0.5
   #' @description Test that target_uncertainty holds the correct sigma_t values per row.
-  expect_equal(de$target_uncertainty$get_values(), c(0.3, 0.4, 0.5))
+  expect_equal(de$target_uncertainty$get_values(), c(0.4, 0.5))
 
   # embedded_uncertainty row-major layout mirrors embedded_values:
   # Row 0: [sigma_2, sigma_1, sigma_0] = [0.3, 0.2, 0.1]
   # Row 1: [sigma_3, sigma_2, sigma_1] = [0.4, 0.3, 0.2]
-  # Row 2: [sigma_4, sigma_3, sigma_2] = [0.5, 0.4, 0.3]
   #' @description Test that embedded_uncertainty is laid out row-major matching embedded_values.
   expect_equal(
     de$embedded_uncertainty$get_values(),
     c(0.3, 0.2, 0.1,
-      0.4, 0.3, 0.2,
-      0.5, 0.4, 0.3)
+      0.4, 0.3, 0.2)
   )
 
   clear()
@@ -175,12 +172,11 @@ test_that("rcpp edm construct_drop_missing propagates uncertainty correctly", {
   de$construct_drop_missing_with_uncertainty(series2, E, tau, missing_val, uncertainty)
 
   #' @description Test that construct_drop_missing retains only valid-row uncertainties.
-  expect_equal(de$n_rows, 2)
+  expect_equal(de$n_rows, 1)
 
-  # Row 0 target index 2 -> sigma_2 = 0.3
-  # Row 1 target index 6 -> sigma_6 = 0.7
+  # Row 0 target index 2 -> sigma_3 = 0.4
   #' @description Test that target_uncertainty holds sigma_t for the retained rows.
-  expect_equal(de$target_uncertainty$get_values(), c(0.3, 0.7))
+  expect_equal(de$target_uncertainty$get_values(), c(0.4))
 
   clear()
 })

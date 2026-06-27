@@ -272,6 +272,30 @@ target_link_libraries(edm_delay_embedding
 
 gtest_discover_tests(edm_delay_embedding)
 
+# test_edm_simplex_projection.cpp
+add_executable(edm_simplex_projection
+  test_edm_simplex_projection.cpp
+)
+
+target_link_libraries(edm_simplex_projection
+  gtest_main
+  fims_test
+)
+
+gtest_discover_tests(edm_simplex_projection)
+
+# test_edm_smap_projection.cpp
+add_executable(edm_smap_projection
+  test_edm_smap_projection.cpp
+)
+
+target_link_libraries(edm_smap_projection
+  gtest_main
+  fims_test
+)
+
+gtest_discover_tests(edm_smap_projection)
+
 # test_population_CatchAtAge_CalculateUnfishedInitial.cpp
 add_executable(population_CatchAtAge_CalculateUnfishedInitial
   test_population_CatchAtAge_CalculateUnfishedInitial.cpp
