@@ -38,7 +38,7 @@ namespace {
 DelayEmbeddingMatrix<double> MakeLib(const fims::Vector<double>& series,
                                      size_t E, size_t tau = 1,
                                      size_t h = 1) {
-  return MakeDelayEmbedding(series, E, tau, h);
+  return MakeDelayEmbedding(series, E, tau, fims::Vector<double>(), h);
 }
 
 // ---------------------------------------------------------------------------
