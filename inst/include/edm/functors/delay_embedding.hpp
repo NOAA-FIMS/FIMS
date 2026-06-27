@@ -51,7 +51,15 @@ struct DelayEmbeddingMatrix {
   std::vector<const Type*> embedded_values;
   /**
    * @brief Pointers to the target time-point value for each row.
-   * target_values[row] == embedded_values[row * n_cols + 0] (i.e., x_t).
+   *
+   * With the default forecast_horizon = 1 (one-step-ahead):
+   *   target_values[row] = &series[target_index + 1]  (i.e., x_{t+1})
+   *
+   * With forecast_horizon = h:
+   *   target_values[row] = &series[target_index + h]
+   *
+   * This matches the standard EDM formulation where the embedding state
+   * x_t is used to predict x_{t+h} (Sugihara 1994; Esguerra & Munch 2024).
    */
   std::vector<const Type*> target_values;
   /**
@@ -88,18 +96,29 @@ struct DelayEmbeddingMatrix {
  * Rows are ordered by increasing target time. Columns are ordered as
  * x_t, x_{t - tau}, ..., x_{t - (E - 1) tau}.
  *
+ * The target for each row is x_{t + forecast_horizon}.  The default
+ * forecast_horizon = 1 gives the standard one-step-ahead formulation
+ * (predicting x_{t+1} from the embedding state x_t), matching both
+ * Sugihara (1994) and Esguerra & Munch (2024, Section 2.1).
+ *
  * Both embedded_values and target_values store pointers into @p series so
- * that subsequent modifications to @p series are automatically reflected.
+ * that subsequent modifications to @p series are automatically reflected
+ * (e.g., during HMS-map EM iterations that update the latent states).
  *
  * If @p uncertainty is non-empty (and must be the same length as @p series),
  * embedded_uncertainty and target_uncertainty are populated with pointers into
  * @p uncertainty following the same layout. If @p uncertainty is empty, those
  * fields are left empty.
+ *
+ * @throws std::invalid_argument if embedding_dimension or time_lag is 0,
+ *   if the series is too short to accommodate the lag span plus the
+ *   forecast horizon, or if the uncertainty vector has a different length
+ *   from the series.
  */
 template <typename Type>
 DelayEmbeddingMatrix<Type> MakeDelayEmbedding(
     const fims::Vector<Type>& series, size_t embedding_dimension,
-    size_t time_lag,
+    size_t time_lag, size_t forecast_horizon = 1,
     const fims::Vector<Type>& uncertainty = fims::Vector<Type>()) {
   if (embedding_dimension == 0) {
     throw std::invalid_argument("embedding_dimension must be greater than 0.");
@@ -107,9 +126,15 @@ DelayEmbeddingMatrix<Type> MakeDelayEmbedding(
   if (time_lag == 0) {
     throw std::invalid_argument("time_lag must be greater than 0.");
   }
+  if (forecast_horizon == 0) {
+    throw std::invalid_argument("forecast_horizon must be greater than 0.");
+  }
 
   const size_t lag_span = (embedding_dimension - 1) * time_lag;
-  if (series.size() <= lag_span) {
+  // Series must be long enough for the lag span plus the forecast horizon.
+  // Last row has target at index (n - 1 - lag_span + lag_span) + h = n - 1 + h,
+  // which requires series.size() >= lag_span + forecast_horizon + 1.
+  if (series.size() < lag_span + forecast_horizon + 1) {
     throw std::invalid_argument(
         "series is too short for the requested delay embedding.");
   }
@@ -121,7 +146,10 @@ DelayEmbeddingMatrix<Type> MakeDelayEmbedding(
   }
 
   DelayEmbeddingMatrix<Type> embedding;
-  embedding.n_rows = series.size() - lag_span;
+  // n_rows: the last row has target_index = n_rows - 1 + lag_span and its
+  // target pointer is at target_index + forecast_horizon.  That must be
+  // < series.size(), so n_rows = series.size() - lag_span - forecast_horizon.
+  embedding.n_rows = series.size() - lag_span - forecast_horizon;
   embedding.n_cols = embedding_dimension;
   embedding.embedded_values.resize(embedding.n_rows * embedding.n_cols);
   embedding.target_values.resize(embedding.n_rows);
@@ -133,15 +161,17 @@ DelayEmbeddingMatrix<Type> MakeDelayEmbedding(
 
   for (size_t row = 0; row < embedding.n_rows; row++) {
     const size_t target_index = row + lag_span;
-    // target_values[row] points to the x_t value for this row
-    embedding.target_values[row] = &series[target_index];
+    // target_values[row] points to x_{target_index + forecast_horizon},
+    // i.e., the value the model is trained to predict for this row.
+    embedding.target_values[row] = &series[target_index + forecast_horizon];
     for (size_t col = 0; col < embedding.n_cols; col++) {
       embedding.embedded_values[row * embedding.n_cols + col] =
           &series[target_index - col * time_lag];
     }
 
     if (has_uncertainty) {
-      embedding.target_uncertainty[row] = &uncertainty[target_index];
+      embedding.target_uncertainty[row] =
+          &uncertainty[target_index + forecast_horizon];
       for (size_t col = 0; col < embedding.n_cols; col++) {
         embedding.embedded_uncertainty[row * embedding.n_cols + col] =
             &uncertainty[target_index - col * time_lag];
@@ -156,6 +186,9 @@ DelayEmbeddingMatrix<Type> MakeDelayEmbedding(
  * @brief Build a delay embedding matrix and omit rows containing missing
  * values.
  *
+ * Accepts the same @p forecast_horizon parameter as MakeDelayEmbedding()
+ * and forwards it unchanged. See MakeDelayEmbedding() for full documentation.
+ *
  * If @p uncertainty is non-empty (same length as @p series), the uncertainty
  * fields are propagated for the retained rows using the same pointer-based
  * approach as MakeDelayEmbedding.
@@ -163,10 +196,10 @@ DelayEmbeddingMatrix<Type> MakeDelayEmbedding(
 template <typename Type>
 DelayEmbeddingMatrix<Type> MakeDelayEmbeddingDropMissing(
     const fims::Vector<Type>& series, size_t embedding_dimension,
-    size_t time_lag, const Type& missing_value,
+    size_t time_lag, const Type& missing_value, size_t forecast_horizon = 1,
     const fims::Vector<Type>& uncertainty = fims::Vector<Type>()) {
-  DelayEmbeddingMatrix<Type> full_embedding =
-      MakeDelayEmbedding(series, embedding_dimension, time_lag, uncertainty);
+  DelayEmbeddingMatrix<Type> full_embedding = MakeDelayEmbedding(
+      series, embedding_dimension, time_lag, forecast_horizon, uncertainty);
 
   DelayEmbeddingMatrix<Type> embedding;
   embedding.n_cols = full_embedding.n_cols;

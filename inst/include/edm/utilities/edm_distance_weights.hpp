@@ -9,8 +9,13 @@
  *    embedding rows (raw-pointer interface for CppAD compatibility).
  *  - SimplexWeights(): exponential weights normalized by d_min (used by
  *    Simplex Projection, Sugihara & May 1990).
- *  - SMapWeights(): exponential weights normalized by the mean distance and
- *    scaled by theta (used by S-Map, Sugihara 1994).
+ *  - SMapWeights(): exponential or Gaussian weights scaled by theta.
+ *    Kernel choice is controlled by the SMapKernel enum:
+ *      - SMapKernel::kExponential (default): w = exp(-θ * d / d̄)
+ *        Classic formulation from Sugihara (1994) and rEDM.
+ *      - SMapKernel::kGaussian: w = exp(-θ² * (d/D)²)
+ *        Gaussian kernel from Esguerra & Munch (2024); avoids sqrt inside
+ *        the AD tape.
  *  - NormalizeWeights(): in-place normalization so weights sum to 1.
  *
  * ### Design rationale
@@ -35,6 +40,32 @@
 #include "../../common/fims_math.hpp"
 
 namespace fims_edm {
+
+// ---------------------------------------------------------------------------
+// Kernel selector
+// ---------------------------------------------------------------------------
+
+/**
+ * @brief Selects the weighting kernel used by SMapWeights().
+ *
+ * @details Both kernels are controlled by the nonlinearity parameter theta
+ * (θ ≥ 0).  When θ = 0 every row has weight 1 regardless of the kernel
+ * chosen, so the distinction only matters for θ > 0.
+ *
+ * | Value | Formula | Source |
+ * |---|---|---|
+ * | kExponential | w = exp(−θ · d / d̄)  | Sugihara (1994), rEDM |
+ * | kGaussian    | w = exp(−θ² · (d/D)²) | Esguerra & Munch (2024) |
+ *
+ * The Gaussian kernel has slightly fatter tails and avoids a sqrt() call
+ * inside the AD tape (distances are kept squared throughout).
+ * Per Steve Munch (pers. comm.): "the difference in performance is rarely
+ * large; use whatever is easier/faster."
+ */
+enum class SMapKernel {
+  kExponential,  ///< Classic exponential kernel: exp(-θ * d / d̄)
+  kGaussian      ///< Gaussian kernel:             exp(-θ² * (d/D)²)
+};
 
 // ---------------------------------------------------------------------------
 // Distance
@@ -152,30 +183,44 @@ void SimplexWeights(const std::vector<Type>& sq_distances,
 // ---------------------------------------------------------------------------
 
 /**
- * @brief Compute exponential weights for S-Map (Sugihara 1994).
+ * @brief Compute S-Map weights with a user-selectable kernel.
  *
- * @details Implements the S-Map weighting scheme using all library points:
+ * @details Two kernel choices are available via the SMapKernel enum:
+ *
+ * **Exponential** (SMapKernel::kExponential, default — Sugihara 1994 / rEDM):
  * \f[
  *   w_i = \exp\!\Bigl(-\theta \cdot \frac{d_i}{\bar{d}}\Bigr)
  * \f]
- * where \f$\bar{d}\f$ is the mean distance across ALL library rows (not
- * just selected neighbors), and \f$\theta \geq 0\f$ controls nonlinearity:
- *  - \f$\theta = 0\f$: all weights are equal (global linear map).
- *  - Large \f$\theta\f$: only close neighbors contribute (highly local).
+ * where \f$\bar{d}\f$ is the mean squared distance across ALL library rows.
+ *
+ * **Gaussian** (SMapKernel::kGaussian — Esguerra & Munch 2024):
+ * \f[
+ *   w_i = \exp\!\Bigl(-\theta^2 \cdot \Bigl(\frac{d_i}{D}\Bigr)^2\Bigr)
+ * \f]
+ * where \f$D\f$ is the mean squared distance (same denominator, kept squared
+ * to avoid a sqrt() inside the AD tape).
+ *
+ * For \f$\theta = 0\f$ both kernels reduce to \f$w_i = 1\f$ (global OLS).
+ * Per Munch (pers. comm.) the performance difference between kernels is
+ * rarely large; the Gaussian kernel avoids a sqrt() inside the AD tape.
  *
  * Weights are NOT normalized here; call NormalizeWeights() separately.
  *
- * @tparam Type Numeric scalar type.
- * @param sq_distances  Vector of squared Euclidean distances from the query
- *                      point to every library row (length = n_library_rows).
- * @param[out] weights  Output weight vector. Resized to sq_distances.size().
+ * @tparam Type Numeric scalar type (double or TMB AD scalar).
+ * @param sq_distances  Squared Euclidean distances from the query point to
+ *                      every library row (length = n_library_rows).
+ * @param[out] weights  Output weight vector, resized to sq_distances.size().
  * @param theta         Nonlinearity parameter theta >= 0 (default 1.0).
- * @param epsilon       Small constant added to d_mean (default 1e-12).
+ * @param kernel        Kernel choice: SMapKernel::kExponential (default) or
+ *                      SMapKernel::kGaussian.
+ * @param epsilon       Small constant added to the scale denominator to guard
+ *                      against division by zero (default 1e-12).
  * @throws std::invalid_argument if sq_distances is empty or theta < 0.
  */
 template <typename Type>
 void SMapWeights(const std::vector<Type>& sq_distances,
                  std::vector<Type>& weights, double theta = 1.0,
+                 SMapKernel kernel = SMapKernel::kExponential,
                  double epsilon = 1e-12) {
   if (sq_distances.empty()) {
     throw std::invalid_argument("SMapWeights: sq_distances must not be empty.");
@@ -184,7 +229,8 @@ void SMapWeights(const std::vector<Type>& sq_distances,
     throw std::invalid_argument("SMapWeights: theta must be >= 0.");
   }
 
-  // Compute mean distance across all library rows
+  // Compute mean squared distance across all library rows (used by both
+  // kernels as the scale denominator D or d̄).
   Type d_mean = Type(0);
   for (size_t i = 0; i < sq_distances.size(); ++i) {
     d_mean += sq_distances[i];
@@ -193,7 +239,17 @@ void SMapWeights(const std::vector<Type>& sq_distances,
 
   weights.resize(sq_distances.size());
   for (size_t i = 0; i < sq_distances.size(); ++i) {
-    Type exponent = Type(theta) * sq_distances[i] / (d_mean + Type(epsilon));
+    Type exponent;
+    if (kernel == SMapKernel::kGaussian) {
+      // Gaussian kernel: exp(-θ² · (d_i / D)²)
+      // d_i and D are already squared, so (d_i/D)² = d_i²/D².  Keeping
+      // everything in squared-distance units avoids any sqrt() call.
+      Type ratio = sq_distances[i] / (d_mean + Type(epsilon));
+      exponent = Type(theta * theta) * ratio * ratio;
+    } else {
+      // Exponential kernel (default): exp(-θ · d_i / d̄)
+      exponent = Type(theta) * sq_distances[i] / (d_mean + Type(epsilon));
+    }
     weights[i] = fims_math::exp(-exponent);
   }
 }

@@ -27,9 +27,10 @@ TEST(SimplexProjection, DefaultNeighborCountIsZero) {
 // ---------------------------------------------------------------------------
 // Test 2: Exact-match point dominates exponential weighting
 //
-// For the linear series x_t = t (E=1, tau=1, k=2):
-//  - Library rows: embedded={t}, target=t for t=1..5
-//  - Query = {5.0} → exact match to embedded=5.0, d=0
+// For the linear series x_t = t (E=1, tau=1, k=2, h=1):
+//  - Library rows: embedded={t}, target=x_{t+1}=t+1
+//    series={1,2,3,4,5,6} → rows: [1]→2, [2]→3, [3]→4, [4]→5
+//  - Query = {4.0} → exact match to embedded=4, target=5
 //  - d_min = 0 → exponent for exact match = 0 → w=1
 //  - exponent for second neighbor = large → w≈0
 //  - Prediction ≈ target of exact match = 5.0
@@ -37,7 +38,7 @@ TEST(SimplexProjection, DefaultNeighborCountIsZero) {
 TEST(SimplexProjection, ExactMatchDominatesWeighting) {
   fims::Vector<double> series = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0};
   fims_edm::DelayEmbeddingMatrix<double> lib =
-      fims_edm::MakeDelayEmbedding(series, 1, 1);
+      fims_edm::MakeDelayEmbedding(series, 1, 1);  // h=1 default
 
   fims_edm::SimplexProjection<double> sp;
   sp.embedding_dimension = 1;
@@ -45,11 +46,11 @@ TEST(SimplexProjection, ExactMatchDominatesWeighting) {
   sp.n_neighbors = 2;
   sp.library = &lib;
 
-  fims::Vector<double> q = {5.0};
+  // Query matches embedded=4 exactly. Its target is 5 (one step ahead).
+  fims::Vector<double> q = {4.0};
   double pred = sp.predict_one(q);
 
-  // The exact-match row (embedded=5.0, target=5.0) has d=0; its weight
-  // dominates. Prediction should be very close to 5.0.
+  // The exact-match row dominates → prediction ≈ 5.0
   EXPECT_NEAR(pred, 5.0, 1e-6);
 }
 
@@ -102,8 +103,8 @@ TEST(SimplexProjection, PredictFillsOutputVector) {
                                   6.0, 7.0, 8.0, 9.0, 10.0};
 
   fims_edm::DelayEmbeddingMatrix<double> lib =
-      fims_edm::MakeDelayEmbedding(series, 2, 1);
-  ASSERT_EQ(lib.n_rows, 9u);
+      fims_edm::MakeDelayEmbedding(series, 2, 1);  // h=1: n_rows = 10-1-1 = 8
+  ASSERT_EQ(lib.n_rows, 8u);
 
   fims_edm::DelayEmbeddingMatrix<double> test_emb =
       fims_edm::MakeDelayEmbedding(series, 2, 1);
@@ -153,10 +154,10 @@ TEST(SimplexProjection, ThrowsOnQueryDimensionMismatch) {
 // ---------------------------------------------------------------------------
 TEST(SimplexProjection, ThrowsWhenLibraryTooSmall) {
   fims::Vector<double> series = {1.0, 2.0, 3.0, 4.0};
-  // E=2, tau=1 → n_rows = 4 - 1 = 3.
+  // E=2, tau=1, h=1 → n_rows = 4 - 1 - 1 = 2.
   fims_edm::DelayEmbeddingMatrix<double> lib =
       fims_edm::MakeDelayEmbedding(series, 2, 1);
-  ASSERT_EQ(lib.n_rows, 3u);
+  ASSERT_EQ(lib.n_rows, 2u);
 
   fims_edm::SimplexProjection<double> sp;
   sp.embedding_dimension = 2;
