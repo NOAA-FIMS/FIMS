@@ -18,26 +18,34 @@ namespace fims_popdy {
  * @brief One partition axis (e.g. sex with levels female and male).
  */
 struct Axis {
-  std::string name;              /*!< axis name (e.g. sex) */
+  std::string name;                /*!< axis name (e.g. sex) */
   std::vector<std::string> levels; /*!< level labels for this axis */
 
+  /** @brief Number of levels on this axis. */
   size_t size() const { return levels.size(); }
 };
 
 /**
  * @brief Selects one level per axis, or kWildcard for all levels on that axis.
+ *
+ * @details A group is a partial specification (e.g. female only, all sexes).
+ * Use PartitionSpec::expand_group_to_strata() to resolve a group to concrete
+ * stratum indices.
  */
 struct GroupSelector {
-  static constexpr int kWildcard = -1;
-  std::vector<int> level; /*!< level index per axis, or kWildcard */
+  static constexpr int kWildcard = -1; /*!< all levels on an axis */
+  std::vector<int> level;              /*!< level index per axis, or kWildcard */
 };
 
 /**
  * @brief Collection of axes defining strata for a partitioned population.
  */
 struct PartitionSpec {
-  std::vector<Axis> axes;
+  std::vector<Axis> axes; /*!< partition axes (e.g. sex) */
 
+  /**
+   * @brief Total number of strata across all axes.
+   */
   size_t n_strata() const {
     if (axes.empty()) {
       return 1;
@@ -49,6 +57,11 @@ struct PartitionSpec {
     return n;
   }
 
+  /**
+   * @brief Encode one level per axis as a flat stratum index.
+   *
+   * @details The last axis in axes varies fastest.
+   */
   size_t stratum_id(const std::vector<size_t> &levels) const {
     size_t id = 0;
     size_t multiplier = 1;
@@ -59,6 +72,9 @@ struct PartitionSpec {
     return id;
   }
 
+  /**
+   * @brief Decode a flat stratum index to one level per axis.
+   */
   std::vector<size_t> levels_from_stratum(size_t stratum) const {
     std::vector<size_t> levels(axes.size());
     for (int i = static_cast<int>(axes.size()) - 1; i >= 0; --i) {
@@ -68,6 +84,9 @@ struct PartitionSpec {
     return levels;
   }
 
+  /**
+   * @brief Expand a group selector to the matching stratum indices.
+   */
   std::vector<size_t> expand_group_to_strata(const GroupSelector &group) const {
     std::vector<size_t> strata;
     if (axes.empty()) {
@@ -107,20 +126,26 @@ struct PartitionSpec {
 
 /**
  * @brief Folded indices for pooled and partitioned derived quantities.
+ *
+ * @details Pooled quantities use i_age_year(). Partitioned quantities add
+ * stratum as the leading dimension via i_stratum_age_year().
  */
 struct IndexLayout {
   size_t n_strata = 1; /*!< number of partition strata */
   size_t n_years = 0;  /*!< number of years */
   size_t n_ages = 0;   /*!< number of ages */
 
+  /** @brief Folded index for pooled (year, age) derived quantities. */
   size_t i_age_year(size_t year, size_t age) const {
     return year * n_ages + age;
   }
 
+  /** @brief Folded index for partitioned (stratum, year, age) quantities. */
   size_t i_stratum_age_year(size_t stratum, size_t year, size_t age) const {
     return stratum * (n_years * n_ages) + i_age_year(year, age);
   }
 
+  /** @brief Length of a partitioned (stratum, year, age) vector. */
   size_t n_partitioned_age_year() const {
     return n_strata * n_years * n_ages;
   }
