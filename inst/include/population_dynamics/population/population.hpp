@@ -70,6 +70,7 @@ annual fishing mortality multipliers to scale total mortality of all fleets*/
   std::vector<std::shared_ptr<fims_popdy::Fleet<Type>>>
       fleets; /*!< shared pointer to fleet module */
 
+  // partition infrastructure (see subpopulation.hpp)
   PartitionSpec partition_spec; /*!< axes and strata for partitioned structure */
   IndexLayout index_layout;     /*!< folded indices for partitioned quantities */
 

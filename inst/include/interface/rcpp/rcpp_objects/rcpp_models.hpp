@@ -1201,6 +1201,7 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
       info->variable_map[fleet_interface->catch_numbers_at_age.id_m] =
           &derived_quantities["catch_numbers_at_age"];
 
+      // partitioned catch and index at age (storage only; not filled yet)
       derived_quantities["catch_numbers_at_age_by_partition"] =
           fims::Vector<Type>(partitioned_age_year_size);
       derived_quantities_dim_info["catch_numbers_at_age_by_partition"] =

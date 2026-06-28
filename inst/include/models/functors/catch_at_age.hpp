@@ -163,6 +163,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
       this->populations[p]->index_layout.n_strata =
           this->populations[p]->partition_spec.n_strata();
 
+      // partition infrastructure only; evaluation routing deferred
       this->populations[p]->M.resize(this->populations[p]->n_years *
                                      this->populations[p]->n_ages);
 
