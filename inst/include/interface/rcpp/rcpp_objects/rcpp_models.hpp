@@ -1141,6 +1141,7 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
                                 fleet_interface->n_ages.get()},
               fims::Vector<std::string>{"n_years", "n_ages"});
 
+      // partitioned landings and index at age (storage only; not filled yet)
       derived_quantities["landings_numbers_at_age_by_partition"] =
           fims::Vector<Type>(partitioned_age_year_size);
       derived_quantities_dim_info["landings_numbers_at_age_by_partition"] =
