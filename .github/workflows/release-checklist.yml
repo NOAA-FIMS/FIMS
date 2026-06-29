@@ -9,6 +9,7 @@ on:
         type: string
 
 permissions:
+  contents: read
   issues: write
 
 jobs:
@@ -24,9 +25,25 @@ jobs:
           script: |
             const rawVersion = process.env.RELEASE_VERSION.trim();
             const version = rawVersion.replace(/^v/, '');
+            const tagName = `v${version}`;
             const issueTitle = `Prepare for release ${version}`;
             const repositoryUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}`;
             const workflowsUrl = `${repositoryUrl}/actions/workflows`;
+
+            try {
+              await github.rest.git.getRef({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                ref: `tags/${tagName}`
+              });
+              core.setFailed(`Tag ${tagName} already exists. This release checklist should not be created again.`);
+              return;
+            } catch (error) {
+              if (error.status !== 404) {
+                throw error;
+              }
+            }
+
             const issueBody = [
               `## Release checklist for FIMS ${version}`,
               '',
@@ -52,7 +69,7 @@ jobs:
               '',
               '### 3. Review release artifacts',
               '',
-              `- [ ] Review the pkgdown site, which is either available live if all changes are on main or available as an artifact as a byproduct of [call-update-pkgdown](${workflowsUrl}/call-update-pkgdown.yml)` to all PRs to main,
+              `- [ ] Review the pkgdown site, which is either available live if all changes are on main or available as an artifact as a byproduct of [call-update-pkgdown](${workflowsUrl}/call-update-pkgdown.yml) to all PRs to main.`,
               '- [ ] Review rendered reference pages, articles, and Doxygen content for obvious release issues.',
               '- [ ] Review open issues and pull requests for anything that should block the release or be mentioned in the release notes.',
               '',
@@ -71,34 +88,6 @@ jobs:
               '- [ ] Close this issue after confirming the release artifacts are live.',
               ''
             ].join('\n');
-            const issues = await github.paginate(github.rest.issues.listForRepo, {
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              state: 'all',
-              per_page: 100
-            });
-            const existingIssue = issues.find((issue) =>
-              issue.title === issueTitle && !issue.pull_request
-            );
-            if (existingIssue) {
-              const issueData = {
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: existingIssue.number,
-                title: issueTitle,
-                body: issueBody
-              };
-              if (existingIssue.state === 'closed') {
-                await github.rest.issues.update({
-                  ...issueData,
-                  state: 'open'
-                });
-              } else {
-                await github.rest.issues.update(issueData);
-              }
-              core.info(`Updated release checklist issue #${existingIssue.number}.`);
-              return;
-            }
             const { data: issue } = await github.rest.issues.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
