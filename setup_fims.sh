@@ -239,14 +239,16 @@ elif [ "$MACHINE" = "Mac" ]; then
         homebrew/core/cairo homebrew/core/curl homebrew/core/fontconfig \
         homebrew/core/freetype homebrew/core/fribidi homebrew/core/harfbuzz \
         homebrew/core/jpeg-turbo homebrew/core/libgit2 homebrew/core/gettext \
+        homebrew/core/libomp \
         homebrew/core/libpng homebrew/core/libtiff homebrew/core/libxml2 \
         homebrew/core/openssl homebrew/core/pkg-config homebrew/core/poppler
 
     BREW_PREFIX="$(brew --prefix)"
     export PKG_CONFIG_PATH="${BREW_PREFIX}/opt/curl/lib/pkgconfig:${BREW_PREFIX}/opt/gettext/lib/pkgconfig:${BREW_PREFIX}/opt/openssl/lib/pkgconfig:${BREW_PREFIX}/opt/libxml2/lib/pkgconfig:${BREW_PREFIX}/lib/pkgconfig:${PKG_CONFIG_PATH:-}"
-    export LDFLAGS="-L${BREW_PREFIX}/opt/gettext/lib ${LDFLAGS:-}"
-    export CPPFLAGS="-I${BREW_PREFIX}/opt/gettext/include ${CPPFLAGS:-}"
-    export LIBRARY_PATH="${BREW_PREFIX}/opt/gettext/lib:${LIBRARY_PATH:-}"
+    export LDFLAGS="-L${BREW_PREFIX}/opt/libomp/lib -L${BREW_PREFIX}/opt/gettext/lib ${LDFLAGS:-}"
+    export CPPFLAGS="-I${BREW_PREFIX}/opt/libomp/include -I${BREW_PREFIX}/opt/gettext/include ${CPPFLAGS:-}"
+    export LIBRARY_PATH="${BREW_PREFIX}/opt/libomp/lib:${BREW_PREFIX}/opt/gettext/lib:${LIBRARY_PATH:-}"
+    export DYLD_FALLBACK_LIBRARY_PATH="${BREW_PREFIX}/opt/libomp/lib:${DYLD_FALLBACK_LIBRARY_PATH:-}"
     export PATH="${BREW_PREFIX}/opt/curl/bin:${BREW_PREFIX}/opt/gettext/bin:${BREW_PREFIX}/opt/libxml2/bin:${PATH}"
     info "Configured PKG_CONFIG_PATH for Homebrew libraries used by gdtools and related R packages."
 fi
@@ -266,6 +268,7 @@ if [ -n "${GITHUB_ENV:-}" ]; then
         echo "LDFLAGS=$LDFLAGS"
         echo "CPPFLAGS=$CPPFLAGS"
         echo "LIBRARY_PATH=$LIBRARY_PATH"
+        echo "DYLD_FALLBACK_LIBRARY_PATH=$DYLD_FALLBACK_LIBRARY_PATH"
     } >> "$GITHUB_ENV"
 fi
 
@@ -304,10 +307,25 @@ local({
     "R_LIBS_USER",
     unset = "$FIMS_R_LIB"
   )
+  libomp_fallback <- Sys.getenv(
+    "DYLD_FALLBACK_LIBRARY_PATH",
+    unset = ""
+  )
   if (!dir.exists(fims_lib)) {
     dir.create(fims_lib, recursive = TRUE, showWarnings = FALSE)
   }
   .libPaths(unique(c(fims_lib, .libPaths())))
+  if (nzchar(libomp_fallback)) {
+    Sys.setenv(
+      DYLD_FALLBACK_LIBRARY_PATH = libomp_fallback,
+      DYLD_LIBRARY_PATH = libomp_fallback
+    )
+    libomp_candidates <- unique(file.path(strsplit(libomp_fallback, ":", fixed = TRUE)[[1]], "libomp.dylib"))
+    libomp_path <- libomp_candidates[file.exists(libomp_candidates)][1]
+    if (!is.na(libomp_path) && nzchar(libomp_path)) {
+      try(dyn.load(libomp_path, local = FALSE, now = TRUE), silent = TRUE)
+    }
+  }
   options(repos = c(
     NOAA = "$NOAA_REPO",
     CRAN = "$CRAN_REPO"
@@ -336,6 +354,8 @@ else
     cat <<EOT >> "$R_ENVIRON"
 $R_PROFILE_MARKER_START
 R_LIBS_USER="$FIMS_R_LIB"
+DYLD_FALLBACK_LIBRARY_PATH="${DYLD_FALLBACK_LIBRARY_PATH:-}"
+DYLD_LIBRARY_PATH="${DYLD_FALLBACK_LIBRARY_PATH:-}"
 $R_PROFILE_MARKER_END
 EOT
 fi
@@ -402,27 +422,17 @@ missing_from_target <- function(pkgs) {
   setdiff(pkgs, installed)
 }
 
-use_pak <- .Platform[['OS.type']] != 'windows'
-if (!use_pak) {
-  message('>>> Windows detected inside R; skipping {pak} and using install.packages() directly.')
-}
-
-if (use_pak && !requireNamespace('pak', quietly = TRUE)) {
+if (!requireNamespace('pak', quietly = TRUE)) {
   message('>>> Installing helper package pak...')
   install_base('pak')
 }
 
-pak_failed <- FALSE
-if (use_pak && requireNamespace('pak', quietly = TRUE)) {
-  message('>>> Attempting installation via {pak}...')
-  tryCatch({
-    pak::pkg_install(install_targets, lib = target_lib, ask = FALSE, upgrade = FALSE)
-  }, error = function(e) {
-    pak_failed <<- TRUE
-    message('>>> {pak} encountered an issue: ', conditionMessage(e))
-    message('>>> Falling back to install.packages().')
-  })
-}
+tryCatch({
+  pak::pkg_install(install_targets, lib = target_lib, ask = FALSE, upgrade = FALSE)
+}, error = function(e) {
+  message('>>> {pak} encountered an issue: ', conditionMessage(e))
+  message('>>> Falling back to install.packages().')
+})
 
 missing_pkgs <- missing_from_target(install_targets)
 if (length(missing_pkgs) > 0) {
@@ -446,7 +456,7 @@ if (length(final_check) > 0) {
   message('>>> Troubleshooting hints:')
   if (Sys.info()[['sysname']] == 'Darwin') {
     message('>>>   - R packages such as gdtools need cairo, fontconfig, freetype, fribidi, gettext, harfbuzz, and pkg-config.')
-    message('>>>   - Run: brew install cairo fontconfig freetype fribidi gettext harfbuzz pkg-config')
+    message('>>>   - Run: brew install cairo fontconfig freetype fribidi gettext harfbuzz libomp pkg-config')
     message('>>>   - Then rerun setup_fims.sh.')
   } else if (Sys.info()[['sysname']] == 'Linux') {
     message('>>>   - Make sure apt-get installed libcairo2-dev, libfontconfig1-dev, libfreetype6-dev, libfribidi-dev, and libharfbuzz-dev.')
@@ -459,9 +469,6 @@ if (length(final_check) > 0) {
 message('>>> All required R packages successfully verified.')
 message('>>> FIMS version: ', as.character(packageVersion('FIMS')))
 message('>>> Installed at: ', target_lib)
-if (pak_failed) {
-  message('>>> Note: {pak} failed, but the fallback installer completed successfully.')
-}
 "
 
 R_TEMP_FILE="$(mktemp "${TMPDIR:-/tmp}/fims-setup.XXXXXX.R")"
