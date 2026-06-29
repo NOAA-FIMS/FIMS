@@ -26,6 +26,9 @@ Ops(e1, e2)
 # S4 method for class 'Rcpp_ParameterVector,numeric'
 Ops(e1, e2)
 
+# S4 method for class 'Rcpp_RealVector,numeric'
+Ops(e1, e2)
+
 # S4 method for class 'numeric,Rcpp_ParameterVector'
 Ops(e1, e2)
 

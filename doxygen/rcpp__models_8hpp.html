@@ -109,14 +109,6 @@ MathJax.Hub.Config({
                 <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/news/index.html">changelog</a></li>
               </ul>
             </li>
-          <li class="nav-item dropdown">
-            <button class="nav-link dropdown-toggle" type="button" id="dropdown-reports" data-bs-toggle="dropdown"
-                    aria-expanded="false" aria-haspopup="true">reports</button>
-            <ul class="dropdown-menu" aria-labelledby="dropdown-reports">
-              <li><a class="dropdown-item" href="https://app.codecov.io/gh/NOAA-FIMS/FIMS" target="_blank">coverage (codecov)</a></li>
-              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/testdown/index.html">testdown</a></li>
-            </ul>
-          </li>
           <ul class="navbar-nav">
             <li class="nav-item"><a class="external-link nav-link" href="https://noaa-fims.github.io/">fims website</a></li>
             <li class="nav-item">
@@ -228,12 +220,16 @@ $(document).ready(function(){initNavTree('rcpp__models_8hpp.html',''); initResiz
 <p>The Rcpp interface to declare different types of models. Allows for the use of methods::new() in R.  
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &lt;set&gt;</code><br />
-<code>#include &quot;<a class="el" href="def_8hpp_source.html">../../../common/def.hpp</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="def_8hpp_source.html">common/def.hpp</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="rcpp__interface__base_8hpp_source.html">rcpp_interface_base.hpp</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="fisheries__models_8hpp_source.html">../../../models/fisheries_models.hpp</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="model_8hpp_source.html">common/model.hpp</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="fims__json_8hpp_source.html">../../../utilities/fims_json.hpp</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="rcpp__population_8hpp_source.html">rcpp_population.hpp</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="rcpp__fleet_8hpp_source.html">rcpp_fleet.hpp</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="rcpp__growth_8hpp_source.html">rcpp_growth.hpp</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="rcpp__distribution_8hpp_source.html">rcpp_distribution.hpp</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="rcpp__data_8hpp_source.html">rcpp_data.hpp</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="rcpp__maturity_8hpp_source.html">rcpp_maturity.hpp</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="rcpp__recruitment_8hpp_source.html">rcpp_recruitment.hpp</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="rcpp__selectivity_8hpp_source.html">rcpp_selectivity.hpp</a>&quot;</code><br />

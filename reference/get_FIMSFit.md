@@ -33,6 +33,11 @@ get_max_gradient(x)
 # S4 method for class 'FIMSFit'
 get_max_gradient(x)
 
+get_gradient(x)
+
+# S4 method for class 'FIMSFit'
+get_gradient(x)
+
 get_sdreport(x)
 
 # S4 method for class 'FIMSFit'
@@ -90,6 +95,14 @@ minimizer used in
 
 `get_max_gradient()` returns the maximum gradient found when optimizing
 the model.
+
+`get_gradient()` returns the per-parameter gradient vector at the MLE as
+stored during fitting. Unlike calling
+`get_obj(x)[["gr"]](get_opt(x)[["par"]])` this function is safe to call
+after
+[`clear()`](https://NOAA-FIMS.github.io/FIMS/reference/Cpp_functions.md)
+because it reads from a stored R vector rather than the compiled C++
+objective function.
 
 `get_sdreport()` returns the list from
 [`TMB::sdreport()`](https://rdrr.io/pkg/TMB/man/sdreport.html).

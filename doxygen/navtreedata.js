@@ -41,10 +41,14 @@ var NAVTREE =
       [ "inst/include/", "md_inst_2include_2README.html#autotoc_md11", [
         [ "inst/include/common/", "md_inst_2include_2README.html#autotoc_md12", null ],
         [ "inst/include/distributions/", "md_inst_2include_2README.html#autotoc_md13", null ],
-        [ "inst/include/interface/", "md_inst_2include_2README.html#autotoc_md14", null ],
-        [ "inst/include/models/", "md_inst_2include_2README.html#autotoc_md15", null ],
-        [ "inst/include/population_dynamics/", "md_inst_2include_2README.html#autotoc_md16", null ],
-        [ "inst/include/utilities/", "md_inst_2include_2README.html#autotoc_md17", null ]
+        [ "inst/include/interface/", "md_inst_2include_2README.html#autotoc_md14", [
+          [ "inst/include/interface/interface.hpp", "md_inst_2include_2README.html#autotoc_md15", null ],
+          [ "inst/include/interface/rcpp", "md_inst_2include_2README.html#autotoc_md16", null ],
+          [ "inst/include/interface/TMB", "md_inst_2include_2README.html#autotoc_md17", null ]
+        ] ],
+        [ "inst/include/models/", "md_inst_2include_2README.html#autotoc_md18", null ],
+        [ "inst/include/population_dynamics/", "md_inst_2include_2README.html#autotoc_md19", null ],
+        [ "inst/include/utilities/", "md_inst_2include_2README.html#autotoc_md20", null ]
       ] ]
     ] ],
     [ "Namespaces", "namespaces.html", [
@@ -76,12 +80,12 @@ var NAVTREE =
 
 var NAVTREEINDEX =
 [
-"annotated.html",
-"classLogisticMaturityInterface.html#a89b0780b678c15b88ca676caf01dfa04",
-"classSharedString.html#a55dd0becbb7cbba6b45ab555984349ff",
-"classfims__popdy_1_1CatchAtAge.html#ad07ed62aee3a3421b83651cc53958d9b",
-"init_8hpp.html",
-"structfims__popdy_1_1EWAAGrowth.html#a9790142135568ea1e69c6666f44ae090"
+"TMB_8cpp.html",
+"classLogRRecruitmentInterface.html#a3b23a4787cb360d698427a9a817113f7",
+"classSharedReal.html#ac2e94071b205420167310485afad749d",
+"classfims__popdy_1_1CatchAtAge.html#abf6dab88981668c7bf763590fa2ad43d",
+"glossary.html#autotoc_md0",
+"structfims__distributions_1_1MultinomialLPMF.html"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

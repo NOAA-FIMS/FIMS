@@ -24,6 +24,7 @@ var classPopulationInterface =
     [ "n_lengths", "classPopulationInterface.html#a9615845b6d1784f250b4d075589d8b79", null ],
     [ "n_years", "classPopulationInterface.html#a568394717d8996d0d5583b6747879773", null ],
     [ "name", "classPopulationInterface.html#a35eeac59ec9c91677c936c68d292eadc", null ],
+    [ "proportion_female", "classPopulationInterface.html#a0bbc7ab78b540b6348d0bb508ce8ba84", null ],
     [ "recruitment_err_id", "classPopulationInterface.html#a876ce3ce52884649b59f30d7df7ebf91", null ],
     [ "recruitment_id", "classPopulationInterface.html#ac29b9cd4342fce77b72213d7a448bdf6", null ],
     [ "spawning_biomass_ratio", "classPopulationInterface.html#a0d33157a0c157383f07134def687f735", null ]

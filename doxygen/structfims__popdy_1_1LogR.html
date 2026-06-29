@@ -109,14 +109,6 @@ MathJax.Hub.Config({
                 <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/news/index.html">changelog</a></li>
               </ul>
             </li>
-          <li class="nav-item dropdown">
-            <button class="nav-link dropdown-toggle" type="button" id="dropdown-reports" data-bs-toggle="dropdown"
-                    aria-expanded="false" aria-haspopup="true">reports</button>
-            <ul class="dropdown-menu" aria-labelledby="dropdown-reports">
-              <li><a class="dropdown-item" href="https://app.codecov.io/gh/NOAA-FIMS/FIMS" target="_blank">coverage (codecov)</a></li>
-              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/testdown/index.html">testdown</a></li>
-            </ul>
-          </li>
           <ul class="navbar-nav">
             <li class="nav-item"><a class="external-link nav-link" href="https://noaa-fims.github.io/">fims website</a></li>
             <li class="nav-item">
@@ -247,6 +239,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:a0b9d9b3728dc66e879babb02f3088a4d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Log of recruitment approach to adding error to expected recruitment.  <br /></td></tr>
 <tr class="separator:a0b9d9b3728dc66e879babb02f3088a4d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aaa0dc8c7d1e2cef1e7c060e2f93ffdb3" id="r_aaa0dc8c7d1e2cef1e7c060e2f93ffdb3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">virtual</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1LogR.html#aaa0dc8c7d1e2cef1e7c060e2f93ffdb3">evaluate_mean</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">spawners</a>, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">phi_0</a>)</td></tr>
+<tr class="memdesc:aaa0dc8c7d1e2cef1e7c060e2f93ffdb3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluates expected recruitment from the stock&ndash;recruitment relationship before recruitment-process deviations are applied.    <br /></td></tr>
 <tr class="separator:aaa0dc8c7d1e2cef1e7c060e2f93ffdb3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_structfims__popdy_1_1RecruitmentBase"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_structfims__popdy_1_1RecruitmentBase')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="structfims__popdy_1_1RecruitmentBase.html">fims_popdy::RecruitmentBase&lt; Type &gt;</a></td></tr>
 <tr class="memitem:ae0fef4d2bbcdfd8b80936bdf5d0dbe81 inherit pub_methods_structfims__popdy_1_1RecruitmentBase" id="r_ae0fef4d2bbcdfd8b80936bdf5d0dbe81"><td class="memItemLeft" align="right" valign="top">
@@ -343,9 +336,20 @@ template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e34
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Empty return of base class function </p>
 
-<p>Implements <a class="el" href="structfims__popdy_1_1RecruitmentBase.html#a255d211d815eee87714e8f26bb188d5c">fims_popdy::RecruitmentBase&lt; Type &gt;</a>.</p>
+<p>Evaluates expected recruitment from the stock&ndash;recruitment relationship before recruitment-process deviations are applied.   </p>
+<p>Recruitment is evaluated for the first age represented in the input data. For example, if the weight-at-age and age-composition data start at age 1, recruitment is evaluated for age-1 fish rather than age-0 fish. The recruitment age is not set directly by this function; it is determined by the age structure of the input data.</p>
+<p>Recruitment functors that do not define a stock&ndash;recruitment mean return the default value of zero.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">spawners</td><td>Spawning output at the time step being evaluated, such as spawning biomass or another model-specific measure of reproductive output. </td></tr>
+    <tr><td class="paramname">phi_0</td><td>Spawners per recruit at unfished equilibrium, used to scale the stock&ndash;recruitment relationship relative to unfished conditions. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Expected recruitment before recruitment-process deviations or random effects are applied.   </dd></dl>
+
+<p>Implements <a class="el" href="structfims__popdy_1_1RecruitmentBase.html#abcd395d01ccbcbc4d4784ad2a27a923e">fims_popdy::RecruitmentBase&lt; Type &gt;</a>.</p>
 
 </div>
 </div>

@@ -12,7 +12,7 @@ and how to prepare your data for use in a FIMS model using the
 function.
 
 The [FIMS
-cheatsheet](https://github.com/NOAA-FIMS/FIMS/blob/dev/pkgdown/assets/fims-cheatsheet.pdf)
+cheatsheet](https://github.com/NOAA-FIMS/FIMS/tree/main/pkgdown/assets/fims-cheatsheet.pdf)
 includes a quick summary of the input data format.
 
 The help page for the
@@ -108,6 +108,14 @@ data_4_model
     ## tbl_df of class 'FIMSFrame'
 
     ## with the following 'types': age_comp, landings, length_comp, weight_at_age, index, age_to_length_conversion
+
+    ## Found more than one class "tbl_df" in cache; using the first, from namespace 'FIMS'
+
+    ## Also defined by 'tibble'
+
+    ## Found more than one class "tbl_df" in cache; using the first, from namespace 'FIMS'
+
+    ## Also defined by 'tibble'
 
     ## # A tibble: 6 × 8
     ##   type     name     age length timing value unit       uncertainty

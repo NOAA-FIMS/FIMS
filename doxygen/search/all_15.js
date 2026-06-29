@@ -4,5 +4,5 @@ var searchData=
   ['use_5fmean_1',['use_mean',['../structfims__distributions_1_1DensityComponentBase.html#a05e0ce908ecb58f7a24cd519ab6c45b8',1,'fims_distributions::DensityComponentBase']]],
   ['use_5fmean_5fm_2',['use_mean_m',['../classDistributionsInterfaceBase.html#ad3be554775b37d5cb817af2c50e0fc60',1,'DistributionsInterfaceBase']]],
   ['user_3',['user',['../structfims_1_1LogEntry.html#af918075584df32b11182b0406b84fd48',1,'fims::LogEntry']]],
-  ['utilities_4',['inst/include/utilities/',['../md_inst_2include_2README.html#autotoc_md17',1,'']]]
+  ['utilities_4',['inst/include/utilities/',['../md_inst_2include_2README.html#autotoc_md20',1,'']]]
 ];

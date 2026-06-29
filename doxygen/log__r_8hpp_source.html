@@ -109,14 +109,6 @@ MathJax.Hub.Config({
                 <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/news/index.html">changelog</a></li>
               </ul>
             </li>
-          <li class="nav-item dropdown">
-            <button class="nav-link dropdown-toggle" type="button" id="dropdown-reports" data-bs-toggle="dropdown"
-                    aria-expanded="false" aria-haspopup="true">reports</button>
-            <ul class="dropdown-menu" aria-labelledby="dropdown-reports">
-              <li><a class="dropdown-item" href="https://app.codecov.io/gh/NOAA-FIMS/FIMS" target="_blank">coverage (codecov)</a></li>
-              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/testdown/index.html">testdown</a></li>
-            </ul>
-          </li>
           <ul class="navbar-nav">
             <li class="nav-item"><a class="external-link nav-link" href="https://noaa-fims.github.io/">fims website</a></li>
             <li class="nav-item">
@@ -227,7 +219,7 @@ $(document).ready(function(){initNavTree('log__r_8hpp_source.html',''); initResi
 <div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="preprocessor">#define FIMS_POPULATION_DYNAMICS_RECRUITMENT_LOG_R_HPP</span></div>
 <div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span> </div>
 <div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="preprocessor">#include &quot;<a class="code" href="recruitment__base_8hpp.html">recruitment_base.hpp</a>&quot;</span></div>
-<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="preprocessor">#include &quot;../../../common/fims_vector.hpp&quot;</span></div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="preprocessor">#include &quot;<a class="code" href="fims__vector_8hpp.html">common/fims_vector.hpp</a>&quot;</span></div>
 <div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span> </div>
 <div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacefims__popdy.html">fims_popdy</a> {</div>
 <div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span> </div>
@@ -255,14 +247,15 @@ $(document).ready(function(){initNavTree('log__r_8hpp_source.html',''); initResi
 <div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>}  <span class="comment">// namespace fims_popdy</span></div>
 <div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span> </div>
 <div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span><span class="preprocessor">#endif </span><span class="comment">/* FIMS_POPULATION_DYNAMICS_RECRUITMENT_LOG_R_HPP */</span><span class="preprocessor"></span></div>
+<div class="ttc" id="afims__vector_8hpp_html"><div class="ttname"><a href="fims__vector_8hpp.html">fims_vector.hpp</a></div><div class="ttdoc">Establishes the FIMS Vector class.</div></div>
 <div class="ttc" id="anamespacefims__popdy_html"><div class="ttname"><a href="namespacefims__popdy.html">fims_popdy</a></div><div class="ttdoc">The population dynamics of FIMS.</div><div class="ttdef"><b>Definition</b> catch_at_age.hpp:41</div></div>
 <div class="ttc" id="arcpp__interface_8hpp_html_a9f5a235582e7cc0f29e3431fc89ef10d"><div class="ttname"><a href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">clear_internal</a></div><div class="ttdeci">void clear_internal()</div><div class="ttdoc">Clears the internal objects.</div><div class="ttdef"><b>Definition</b> rcpp_interface.hpp:235</div></div>
 <div class="ttc" id="arecruitment__base_8hpp_html"><div class="ttname"><a href="recruitment__base_8hpp.html">recruitment_base.hpp</a></div><div class="ttdoc">Serves as the parent class where recruitment functions are called.</div></div>
 <div class="ttc" id="astructfims__popdy_1_1LogR_html"><div class="ttname"><a href="structfims__popdy_1_1LogR.html">fims_popdy::LogR</a></div><div class="ttdoc">Log Devs class that returns the log of the input added to the log of the recruitment deviations.</div><div class="ttdef"><b>Definition</b> log_r.hpp:21</div></div>
 <div class="ttc" id="astructfims__popdy_1_1LogR_html_a0b9d9b3728dc66e879babb02f3088a4d"><div class="ttname"><a href="structfims__popdy_1_1LogR.html#a0b9d9b3728dc66e879babb02f3088a4d">fims_popdy::LogR::evaluate_process</a></div><div class="ttdeci">virtual const Type evaluate_process(size_t pos)</div><div class="ttdoc">Log of recruitment approach to adding error to expected recruitment.</div><div class="ttdef"><b>Definition</b> log_r.hpp:34</div></div>
-<div class="ttc" id="astructfims__popdy_1_1LogR_html_aaa0dc8c7d1e2cef1e7c060e2f93ffdb3"><div class="ttname"><a href="structfims__popdy_1_1LogR.html#aaa0dc8c7d1e2cef1e7c060e2f93ffdb3">fims_popdy::LogR::evaluate_mean</a></div><div class="ttdeci">virtual const Type evaluate_mean(const Type &amp;spawners, const Type &amp;phi_0)</div><div class="ttdef"><b>Definition</b> log_r.hpp:39</div></div>
-<div class="ttc" id="astructfims__popdy_1_1RecruitmentBase_html"><div class="ttname"><a href="structfims__popdy_1_1RecruitmentBase.html">fims_popdy::RecruitmentBase</a></div><div class="ttdoc">Base class for all recruitment functors.</div><div class="ttdef"><b>Definition</b> recruitment_base.hpp:28</div></div>
-<div class="ttc" id="astructfims__popdy_1_1RecruitmentBase_html_acf427056522e39bbc0d714473c4789ce"><div class="ttname"><a href="structfims__popdy_1_1RecruitmentBase.html#acf427056522e39bbc0d714473c4789ce">fims_popdy::RecruitmentBase::recruitment</a></div><div class="ttdeci">std::shared_ptr&lt; fims_popdy::RecruitmentBase&lt; Type &gt; &gt; recruitment</div><div class="ttdef"><b>Definition</b> recruitment_base.hpp:49</div></div>
+<div class="ttc" id="astructfims__popdy_1_1LogR_html_aaa0dc8c7d1e2cef1e7c060e2f93ffdb3"><div class="ttname"><a href="structfims__popdy_1_1LogR.html#aaa0dc8c7d1e2cef1e7c060e2f93ffdb3">fims_popdy::LogR::evaluate_mean</a></div><div class="ttdeci">virtual const Type evaluate_mean(const Type &amp;spawners, const Type &amp;phi_0)</div><div class="ttdoc">Evaluates expected recruitment from the stock–recruitment relationship before recruitment-process dev...</div><div class="ttdef"><b>Definition</b> log_r.hpp:39</div></div>
+<div class="ttc" id="astructfims__popdy_1_1RecruitmentBase_html"><div class="ttname"><a href="structfims__popdy_1_1RecruitmentBase.html">fims_popdy::RecruitmentBase</a></div><div class="ttdoc">Base class for all recruitment functors.</div><div class="ttdef"><b>Definition</b> recruitment_base.hpp:27</div></div>
+<div class="ttc" id="astructfims__popdy_1_1RecruitmentBase_html_acf427056522e39bbc0d714473c4789ce"><div class="ttname"><a href="structfims__popdy_1_1RecruitmentBase.html#acf427056522e39bbc0d714473c4789ce">fims_popdy::RecruitmentBase::recruitment</a></div><div class="ttdeci">std::shared_ptr&lt; fims_popdy::RecruitmentBase&lt; Type &gt; &gt; recruitment</div><div class="ttdef"><b>Definition</b> recruitment_base.hpp:48</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

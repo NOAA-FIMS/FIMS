@@ -109,14 +109,6 @@ MathJax.Hub.Config({
                 <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/news/index.html">changelog</a></li>
               </ul>
             </li>
-          <li class="nav-item dropdown">
-            <button class="nav-link dropdown-toggle" type="button" id="dropdown-reports" data-bs-toggle="dropdown"
-                    aria-expanded="false" aria-haspopup="true">reports</button>
-            <ul class="dropdown-menu" aria-labelledby="dropdown-reports">
-              <li><a class="dropdown-item" href="https://app.codecov.io/gh/NOAA-FIMS/FIMS" target="_blank">coverage (codecov)</a></li>
-              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/testdown/index.html">testdown</a></li>
-            </ul>
-          </li>
           <ul class="navbar-nav">
             <li class="nav-item"><a class="external-link nav-link" href="https://noaa-fims.github.io/">fims website</a></li>
             <li class="nav-item">
@@ -227,7 +219,7 @@ $(document).ready(function(){initNavTree('rcpp__math_8hpp_source.html',''); init
 <div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="preprocessor">#define FIMS_INTERFACE_RCPP_RCPP_OBJECTS_MATH_HPP</span></div>
 <div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span> </div>
 <div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="preprocessor">#include &quot;<a class="code" href="rcpp__interface__base_8hpp.html">rcpp_interface_base.hpp</a>&quot;</span></div>
-<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="preprocessor">#include &quot;../../../common/fims_math.hpp&quot;</span></div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="preprocessor">#include &quot;<a class="code" href="fims__math_8hpp.html">common/fims_math.hpp</a>&quot;</span></div>
 <div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span> </div>
 <div class="foldopen" id="foldopen00023" data-start="{" data-end="}">
 <div class="line"><a id="l00023" name="l00023"></a><span class="lineno"><a class="line" href="rcpp__math_8hpp.html#a878867e80d467b75259d7ddf9ddad155">   23</a></span><span class="keywordtype">double</span> <a class="code hl_function" href="rcpp__math_8hpp.html#a878867e80d467b75259d7ddf9ddad155">logit_rcpp</a>(<span class="keywordtype">double</span> <a class="code hl_function" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">a</a>, <span class="keywordtype">double</span> <a class="code hl_function" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">b</a>, <span class="keywordtype">double</span> <a class="code hl_function" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">x</a>) {</div>
@@ -242,6 +234,7 @@ $(document).ready(function(){initNavTree('rcpp__math_8hpp_source.html',''); init
 </div>
 <div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span> </div>
 <div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span><span class="preprocessor">#endif</span></div>
+<div class="ttc" id="afims__math_8hpp_html"><div class="ttname"><a href="fims__math_8hpp.html">fims_math.hpp</a></div><div class="ttdoc">A collection of mathematical functions used in FIMS.</div></div>
 <div class="ttc" id="arcpp__interface_8hpp_html_a9f5a235582e7cc0f29e3431fc89ef10d"><div class="ttname"><a href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">clear_internal</a></div><div class="ttdeci">void clear_internal()</div><div class="ttdoc">Clears the internal objects.</div><div class="ttdef"><b>Definition</b> rcpp_interface.hpp:235</div></div>
 <div class="ttc" id="arcpp__interface__base_8hpp_html"><div class="ttname"><a href="rcpp__interface__base_8hpp.html">rcpp_interface_base.hpp</a></div><div class="ttdoc">The Rcpp interface to declare objects that are used ubiquitously throughout the Rcpp interface,...</div></div>
 <div class="ttc" id="arcpp__math_8hpp_html_a0dcf7ea8e6cc6ace6061766f7209b20c"><div class="ttname"><a href="rcpp__math_8hpp.html#a0dcf7ea8e6cc6ace6061766f7209b20c">inv_logit_rcpp</a></div><div class="ttdeci">double inv_logit_rcpp(double a, double b, double logit_x)</div><div class="ttdoc">A rcpp interface to the inverse-logit function.</div><div class="ttdef"><b>Definition</b> rcpp_math.hpp:35</div></div>

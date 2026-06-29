@@ -9,5 +9,5 @@ var searchData=
   ['priors_6',['priors',['../structfims__distributions_1_1DensityComponentBase.html#af0f9cbf31816b7d9a3c30ec6129d099a',1,'fims_distributions::DensityComponentBase']]],
   ['process_7',['process',['../structfims__popdy_1_1RecruitmentBase.html#ab2f2bf3011857f26ae17f8b30809863f',1,'fims_popdy::RecruitmentBase']]],
   ['process_5fid_8',['process_id',['../classRecruitmentInterfaceBase.html#ab533fcbe6e70ffa1f460795a05e2e8f8',1,'RecruitmentInterfaceBase::process_id'],['../structfims__popdy_1_1RecruitmentBase.html#aa7ca260969bb979cf0e954213b5df2c2',1,'fims_popdy::RecruitmentBase::process_id']]],
-  ['proportion_5ffemale_9',['proportion_female',['../structfims__popdy_1_1Population.html#ae47bb5ebf7a3f1b14f69b9cfd7ad8ecf',1,'fims_popdy::Population']]]
+  ['proportion_5ffemale_9',['proportion_female',['../classPopulationInterface.html#a0bbc7ab78b540b6348d0bb508ce8ba84',1,'PopulationInterface::proportion_female'],['../structfims__popdy_1_1Population.html#ae47bb5ebf7a3f1b14f69b9cfd7ad8ecf',1,'fims_popdy::Population::proportion_female']]]
 ];

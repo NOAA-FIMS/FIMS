@@ -109,14 +109,6 @@ MathJax.Hub.Config({
                 <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/news/index.html">changelog</a></li>
               </ul>
             </li>
-          <li class="nav-item dropdown">
-            <button class="nav-link dropdown-toggle" type="button" id="dropdown-reports" data-bs-toggle="dropdown"
-                    aria-expanded="false" aria-haspopup="true">reports</button>
-            <ul class="dropdown-menu" aria-labelledby="dropdown-reports">
-              <li><a class="dropdown-item" href="https://app.codecov.io/gh/NOAA-FIMS/FIMS" target="_blank">coverage (codecov)</a></li>
-              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/testdown/index.html">testdown</a></li>
-            </ul>
-          </li>
           <ul class="navbar-nav">
             <li class="nav-item"><a class="external-link nav-link" href="https://noaa-fims.github.io/">fims website</a></li>
             <li class="nav-item">
@@ -226,7 +218,7 @@ $(document).ready(function(){initNavTree('growth__base_8hpp_source.html',''); in
 <div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="preprocessor">#ifndef POPULATION_DYNAMICS_GROWTH_BASE_HPP</span></div>
 <div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="preprocessor">#define POPULATION_DYNAMICS_GROWTH_BASE_HPP</span></div>
 <div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span> </div>
-<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="preprocessor">#include &quot;../../../common/model_object.hpp&quot;</span></div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="preprocessor">#include &quot;<a class="code" href="model__object_8hpp.html">common/model_object.hpp</a>&quot;</span></div>
 <div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span> </div>
 <div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacefims__popdy.html">fims_popdy</a> {</div>
 <div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span> </div>
@@ -252,9 +244,10 @@ $(document).ready(function(){initNavTree('growth__base_8hpp_source.html',''); in
 <div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>}  <span class="comment">// namespace fims_popdy</span></div>
 <div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span> </div>
 <div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span><span class="preprocessor">#endif </span><span class="comment">/* POPULATION_DYNAMICS_GROWTH_BASE_HPP */</span><span class="preprocessor"></span></div>
+<div class="ttc" id="amodel__object_8hpp_html"><div class="ttname"><a href="model__object_8hpp.html">model_object.hpp</a></div><div class="ttdoc">Definition of the FIMSObject structure.</div></div>
 <div class="ttc" id="anamespacefims__popdy_html"><div class="ttname"><a href="namespacefims__popdy.html">fims_popdy</a></div><div class="ttdoc">The population dynamics of FIMS.</div><div class="ttdef"><b>Definition</b> catch_at_age.hpp:41</div></div>
 <div class="ttc" id="arcpp__interface_8hpp_html_a9f5a235582e7cc0f29e3431fc89ef10d"><div class="ttname"><a href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">clear_internal</a></div><div class="ttdeci">void clear_internal()</div><div class="ttdoc">Clears the internal objects.</div><div class="ttdef"><b>Definition</b> rcpp_interface.hpp:235</div></div>
-<div class="ttc" id="astructfims__model__object_1_1FIMSObject_html"><div class="ttname"><a href="structfims__model__object_1_1FIMSObject.html">fims_model_object::FIMSObject</a></div><div class="ttdoc">FIMSObject struct that defines member types and returns the unique id.</div><div class="ttdef"><b>Definition</b> model_object.hpp:25</div></div>
+<div class="ttc" id="astructfims__model__object_1_1FIMSObject_html"><div class="ttname"><a href="structfims__model__object_1_1FIMSObject.html">fims_model_object::FIMSObject</a></div><div class="ttdoc">FIMSObject struct that defines member types and returns the unique id.</div><div class="ttdef"><b>Definition</b> model_object.hpp:24</div></div>
 <div class="ttc" id="astructfims__popdy_1_1GrowthBase_html"><div class="ttname"><a href="structfims__popdy_1_1GrowthBase.html">fims_popdy::GrowthBase</a></div><div class="ttdoc">Base class for all growth functors.</div><div class="ttdef"><b>Definition</b> growth_base.hpp:24</div></div>
 <div class="ttc" id="astructfims__popdy_1_1GrowthBase_html_a016bebc606785d9be69f454def1b2855"><div class="ttname"><a href="structfims__popdy_1_1GrowthBase.html#a016bebc606785d9be69f454def1b2855">fims_popdy::GrowthBase::id_g</a></div><div class="ttdeci">static uint32_t id_g</div><div class="ttdef"><b>Definition</b> growth_base.hpp:29</div></div>
 <div class="ttc" id="astructfims__popdy_1_1GrowthBase_html_a0352b6934eea814c055d7fdbc81efa14"><div class="ttname"><a href="structfims__popdy_1_1GrowthBase.html#a0352b6934eea814c055d7fdbc81efa14">fims_popdy::GrowthBase::GrowthBase</a></div><div class="ttdeci">GrowthBase()</div><div class="ttdoc">Constructor.</div><div class="ttdef"><b>Definition</b> growth_base.hpp:34</div></div>

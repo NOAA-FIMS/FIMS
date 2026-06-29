@@ -76,7 +76,7 @@
 - **James N. Ianelli**. Contributor.
   [](https://orcid.org/0000-0002-7170-8677)
 
-- **Huihua Lee**. Contributor.
+- **Huihua Lee**. Contributor. [](https://orcid.org/0009-0009-1506-9098)
 
 ## Citation
 

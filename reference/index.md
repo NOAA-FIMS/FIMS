@@ -74,6 +74,7 @@ Primary functions used when setting up or running a FIMS model.
   [`get_obj()`](https://NOAA-FIMS.github.io/FIMS/reference/get_FIMSFit.md)
   [`get_opt()`](https://NOAA-FIMS.github.io/FIMS/reference/get_FIMSFit.md)
   [`get_max_gradient()`](https://NOAA-FIMS.github.io/FIMS/reference/get_FIMSFit.md)
+  [`get_gradient()`](https://NOAA-FIMS.github.io/FIMS/reference/get_FIMSFit.md)
   [`get_sdreport()`](https://NOAA-FIMS.github.io/FIMS/reference/get_FIMSFit.md)
   [`get_estimates()`](https://NOAA-FIMS.github.io/FIMS/reference/get_FIMSFit.md)
   [`get_number_of_parameters()`](https://NOAA-FIMS.github.io/FIMS/reference/get_FIMSFit.md)
@@ -104,6 +105,9 @@ Primary functions used when developing FIMS package.
   : Setup and run the google test suite
 - [`setup_gtest()`](https://NOAA-FIMS.github.io/FIMS/reference/setup_gtest.md)
   : Set up your local environment to run the google tests locally
+- [`use_google_benchmark_template()`](https://NOAA-FIMS.github.io/FIMS/reference/use_google_benchmark_template.md)
+  : Create tests/google_benchmark/benchmark\_\*.cpp and register it in
+  CMakeLists.txt
 - [`use_gtest_template()`](https://NOAA-FIMS.github.io/FIMS/reference/use_gtest_template.md)
   : Create tests/gtest/test\_\*.cpp test file and register it in
   CMakeLists.txt
@@ -162,3 +166,18 @@ Links to the relevant doxygen documentation for the C++ code.
   [`set_random`](https://NOAA-FIMS.github.io/FIMS/reference/Cpp_functions.md)
   [`CreateTMBModel`](https://NOAA-FIMS.github.io/FIMS/reference/Cpp_functions.md)
   : C++ Functions Exported via Rcpp
+
+## Model Tidying and Fit Evaluation
+
+Functions used to extract, tidy, and evaluate model fit results.
+
+- [`augment(`*`<FIMSFit>`*`)`](https://NOAA-FIMS.github.io/FIMS/reference/augment.FIMSFit.md)
+  : Augment a FIMSFit object for use with yardstick
+- [`get_fit_metrics()`](https://NOAA-FIMS.github.io/FIMS/reference/get_fit_metrics.md)
+  : Compute yardstick metrics for a fitted FIMS model
+- [`get_fit_stream()`](https://NOAA-FIMS.github.io/FIMS/reference/get_fit_stream.md)
+  : Extract a single data stream from a FIMSFit augmented tibble
+- [`glance(`*`<FIMSFit>`*`)`](https://NOAA-FIMS.github.io/FIMS/reference/glance.FIMSFit.md)
+  : Glance at a FIMSFit object — one-row model summary
+- [`tidy(`*`<FIMSFit>`*`)`](https://NOAA-FIMS.github.io/FIMS/reference/tidy.FIMSFit.md)
+  : Tidy a FIMSFit object into a parameter-level tibble

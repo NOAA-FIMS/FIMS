@@ -109,14 +109,6 @@ MathJax.Hub.Config({
                 <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/news/index.html">changelog</a></li>
               </ul>
             </li>
-          <li class="nav-item dropdown">
-            <button class="nav-link dropdown-toggle" type="button" id="dropdown-reports" data-bs-toggle="dropdown"
-                    aria-expanded="false" aria-haspopup="true">reports</button>
-            <ul class="dropdown-menu" aria-labelledby="dropdown-reports">
-              <li><a class="dropdown-item" href="https://app.codecov.io/gh/NOAA-FIMS/FIMS" target="_blank">coverage (codecov)</a></li>
-              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/testdown/index.html">testdown</a></li>
-            </ul>
-          </li>
           <ul class="navbar-nav">
             <li class="nav-item"><a class="external-link nav-link" href="https://noaa-fims.github.io/">fims website</a></li>
             <li class="nav-item">
@@ -280,12 +272,14 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a098cdfbbf65f58ee93ffc76090a80e92" id="r_a098cdfbbf65f58ee93ffc76090a80e92"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classParameterVector.html#a098cdfbbf65f58ee93ffc76090a80e92">resize</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a> <a class="el" href="classParameterVector.html#a1bc24e4c8af66ffef1b8aa88bb41a137">size</a>)</td></tr>
 <tr class="memdesc:a098cdfbbf65f58ee93ffc76090a80e92"><td class="mdescLeft">&#160;</td><td class="mdescRight">Resizes a <a class="el" href="classParameterVector.html" title="An Rcpp interface class that defines the ParameterVector class.">ParameterVector</a> to the desired length.  <br /></td></tr>
 <tr class="separator:a098cdfbbf65f58ee93ffc76090a80e92"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af5723210fad2e222c33912e811934f44" id="r_af5723210fad2e222c33912e811934f44"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classParameterVector.html#af5723210fad2e222c33912e811934f44">set_all_estimable</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">estimable</a>)</td></tr>
-<tr class="memdesc:af5723210fad2e222c33912e811934f44"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets all Parameters within a <a class="el" href="classParameterVector.html" title="An Rcpp interface class that defines the ParameterVector class.">ParameterVector</a> as estimable.  <br /></td></tr>
-<tr class="separator:af5723210fad2e222c33912e811934f44"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a074e8b3737ef4fb2dfb3bde9a176e7fd" id="r_a074e8b3737ef4fb2dfb3bde9a176e7fd"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classParameterVector.html#a074e8b3737ef4fb2dfb3bde9a176e7fd">set_all_random</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">random</a>)</td></tr>
-<tr class="memdesc:a074e8b3737ef4fb2dfb3bde9a176e7fd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets all Parameters within a <a class="el" href="classParameterVector.html" title="An Rcpp interface class that defines the ParameterVector class.">ParameterVector</a> as random effects.  <br /></td></tr>
-<tr class="separator:a074e8b3737ef4fb2dfb3bde9a176e7fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab049538cfe94836ff33c33b5e3fa1c0f" id="r_ab049538cfe94836ff33c33b5e3fa1c0f"><td class="memItemLeft" align="right" valign="top"><a id="ab049538cfe94836ff33c33b5e3fa1c0f" name="ab049538cfe94836ff33c33b5e3fa1c0f"></a>
+<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><b>set_values</b> (Rcpp::NumericVector <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">values</a>)</td></tr>
+<tr class="memdesc:ab049538cfe94836ff33c33b5e3fa1c0f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the initial values for all Parameters within a <a class="el" href="classParameterVector.html" title="An Rcpp interface class that defines the ParameterVector class.">ParameterVector</a>. <br /></td></tr>
+<tr class="separator:ab049538cfe94836ff33c33b5e3fa1c0f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3044a98de9c8f7868c2ae3ed117e174a" id="r_a3044a98de9c8f7868c2ae3ed117e174a"><td class="memItemLeft" align="right" valign="top"><a id="a3044a98de9c8f7868c2ae3ed117e174a" name="a3044a98de9c8f7868c2ae3ed117e174a"></a>
+<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><b>set_estimation_types</b> (Rcpp::CharacterVector <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">estimation_types</a>)</td></tr>
+<tr class="memdesc:a3044a98de9c8f7868c2ae3ed117e174a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the estimation type for all Parameters within a <a class="el" href="classParameterVector.html" title="An Rcpp interface class that defines the ParameterVector class.">ParameterVector</a>. <br /></td></tr>
+<tr class="separator:a3044a98de9c8f7868c2ae3ed117e174a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9296d749eab1b882116aca96e07154d5" id="r_a9296d749eab1b882116aca96e07154d5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classParameterVector.html#a9296d749eab1b882116aca96e07154d5">fill</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">double</a> value)</td></tr>
 <tr class="memdesc:a9296d749eab1b882116aca96e07154d5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the value of all Parameters in the <a class="el" href="classParameterVector.html" title="An Rcpp interface class that defines the ParameterVector class.">ParameterVector</a> to the provided value.  <br /></td></tr>
 <tr class="separator:a9296d749eab1b882116aca96e07154d5"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -611,76 +605,9 @@ Static Public Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="af5723210fad2e222c33912e811934f44" name="af5723210fad2e222c33912e811934f44"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af5723210fad2e222c33912e811934f44">&#9670;&#160;</a></span>set_all_estimable()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a> ParameterVector::set_all_estimable </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a>&#160;</td>
-          <td class="paramname"><em>estimable</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Sets all Parameters within a <a class="el" href="classParameterVector.html" title="An Rcpp interface class that defines the ParameterVector class.">ParameterVector</a> as estimable. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">estimable</td><td>A boolean specifying if all Parameters within the <a class="el" href="classParameterVector.html" title="An Rcpp interface class that defines the ParameterVector class.">ParameterVector</a> should be estimated within the model. A value of true leads to all Parameters being estimated. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a id="a074e8b3737ef4fb2dfb3bde9a176e7fd" name="a074e8b3737ef4fb2dfb3bde9a176e7fd"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a074e8b3737ef4fb2dfb3bde9a176e7fd">&#9670;&#160;</a></span>set_all_random()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a> ParameterVector::set_all_random </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a>&#160;</td>
-          <td class="paramname"><em>random</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Sets all Parameters within a <a class="el" href="classParameterVector.html" title="An Rcpp interface class that defines the ParameterVector class.">ParameterVector</a> as random effects. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">random</td><td>A boolean specifying if all Parameters within the <a class="el" href="classParameterVector.html" title="An Rcpp interface class that defines the ParameterVector class.">ParameterVector</a> should be designated as random effects. A value of true leads to all Parameters being random effects. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<hr/>The documentation for this class was generated from the following file:<ul>
+<hr/>The documentation for this class was generated from the following files:<ul>
 <li>inst/include/interface/rcpp/rcpp_objects/<a class="el" href="rcpp__interface__base_8hpp_source.html">rcpp_interface_base.hpp</a></li>
+<li>src/<a class="el" href="rcpp__interface__base_8cpp.html">rcpp_interface_base.cpp</a></li>
 </ul>
 </div><!-- contents -->
 </div><!-- doc-content -->

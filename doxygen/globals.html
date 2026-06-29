@@ -109,14 +109,6 @@ MathJax.Hub.Config({
                 <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/news/index.html">changelog</a></li>
               </ul>
             </li>
-          <li class="nav-item dropdown">
-            <button class="nav-link dropdown-toggle" type="button" id="dropdown-reports" data-bs-toggle="dropdown"
-                    aria-expanded="false" aria-haspopup="true">reports</button>
-            <ul class="dropdown-menu" aria-labelledby="dropdown-reports">
-              <li><a class="dropdown-item" href="https://app.codecov.io/gh/NOAA-FIMS/FIMS" target="_blank">coverage (codecov)</a></li>
-              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/testdown/index.html">testdown</a></li>
-            </ul>
-          </li>
           <ul class="navbar-nav">
             <li class="nav-item"><a class="external-link nav-link" href="https://noaa-fims.github.io/">fims website</a></li>
             <li class="nav-item">
@@ -222,7 +214,8 @@ $(document).ready(function(){initNavTree('globals.html',''); initResizable(); })
 <div class="textblock">Here is a list of all documented file members with links to the documentation:</div>
 
 <h3><a id="index__5F" name="index__5F"></a>- _ -</h3><ul>
-<li>_rcpp_module_boot_fims()&#160;:&#160;<a class="el" href="init_8hpp.html#ab00dfa917c09fa552d226ebbb99e7c21">init.hpp</a></li>
+<li>__attribute__()&#160;:&#160;<a class="el" href="init__tmb_8hpp.html#a96c639830534f129df46f7129a9848af">init_tmb.hpp</a></li>
+<li>_rcpp_module_boot_fims()&#160;:&#160;<a class="el" href="init__tmb_8hpp.html#ab00dfa917c09fa552d226ebbb99e7c21">init_tmb.hpp</a></li>
 </ul>
 
 
@@ -235,6 +228,7 @@ $(document).ready(function(){initNavTree('globals.html',''); initResizable(); })
 <li>clear()&#160;:&#160;<a class="el" href="rcpp__interface_8hpp.html#ac8bb3912a3ce86b15842e79d0b421204">rcpp_interface.hpp</a></li>
 <li>clear_internal()&#160;:&#160;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">rcpp_interface.hpp</a></li>
 <li>CreateTMBModel()&#160;:&#160;<a class="el" href="rcpp__interface_8hpp.html#a1d0c303c2c44fcb296368608a5f2ff1a">rcpp_interface.hpp</a></li>
+<li>CSKIP&#160;:&#160;<a class="el" href="TMB_8h.html#a1ee517ce7b0b2d35d05411d2888c2cd0">TMB.h</a></li>
 </ul>
 
 
@@ -270,6 +264,7 @@ $(document).ready(function(){initNavTree('globals.html',''); initResizable(); })
 
 
 <h3><a id="index_i" name="index_i"></a>- i -</h3><ul>
+<li>IF_TMB_PRECOMPILE&#160;:&#160;<a class="el" href="TMB_8h.html#aa3ddf8dd595d2a42e37ffbb159f0af10">TMB.h</a></li>
 <li>init_logging()&#160;:&#160;<a class="el" href="rcpp__interface_8hpp.html#ad8bf2ebe714bdb6a1e216ed7d9efa7a3">rcpp_interface.hpp</a></li>
 <li>inv_logit_rcpp()&#160;:&#160;<a class="el" href="rcpp__math_8hpp.html#a0dcf7ea8e6cc6ace6061766f7209b20c">rcpp_math.hpp</a></li>
 </ul>
@@ -297,8 +292,19 @@ $(document).ready(function(){initNavTree('globals.html',''); initResizable(); })
 
 
 <h3><a id="index_r" name="index_r"></a>- r -</h3><ul>
-<li>R_init_FIMS()&#160;:&#160;<a class="el" href="init_8hpp.html#add719baf213d3976fb31c220eb9285e0">init.hpp</a></li>
-<li>RCPP_MODULE()&#160;:&#160;<a class="el" href="fims__modules_8hpp.html#a869139fcd54621818b4dfba7a47f89e4">fims_modules.hpp</a></li>
+<li>register_data()&#160;:&#160;<a class="el" href="rcpp__data_8cpp.html#a42633b155364e08f66e421141a6094fe">rcpp_data.cpp</a></li>
+<li>register_distributions()&#160;:&#160;<a class="el" href="rcpp__distribution_8cpp.html#ae8d0a4da7edc84d14351aee560580023">rcpp_distribution.cpp</a></li>
+<li>register_fishery_models()&#160;:&#160;<a class="el" href="rcpp__models_8cpp.html#ab4e3bedc47120961dc7b6f6a836b9dd1">rcpp_models.cpp</a></li>
+<li>register_fleet()&#160;:&#160;<a class="el" href="rcpp__fleet_8cpp.html#a34be2362a4846d2704fd67b440a397c6">rcpp_fleet.cpp</a></li>
+<li>register_functions()&#160;:&#160;<a class="el" href="rcpp__functions_8cpp.html#a33ddb25b30e800b3cbd7ba2201d180d2">rcpp_functions.cpp</a></li>
+<li>register_growth()&#160;:&#160;<a class="el" href="rcpp__growth_8cpp.html#a92b910d0f730346c4a5c2d7bfece24a5">rcpp_growth.cpp</a></li>
+<li>register_maturity()&#160;:&#160;<a class="el" href="rcpp__maturity_8cpp.html#a773a7aa8219bb89dbb2f762c3b55a769">rcpp_maturity.cpp</a></li>
+<li>register_parameter()&#160;:&#160;<a class="el" href="rcpp__parameter_8cpp.html#a06caf19387bb844186093aa04b7d3159">rcpp_parameter.cpp</a></li>
+<li>register_population()&#160;:&#160;<a class="el" href="rcpp__population_8cpp.html#a63e6c7f23783af6ea5728c118203730e">rcpp_population.cpp</a></li>
+<li>register_recruitment()&#160;:&#160;<a class="el" href="rcpp__recruitment_8cpp.html#aceb941db40a811bc39d0bd65e9c230c5">rcpp_recruitment.cpp</a></li>
+<li>register_selectivity()&#160;:&#160;<a class="el" href="rcpp__selectivity_8cpp.html#a3405e23536afe4e0bcac20dd30537767">rcpp_selectivity.cpp</a></li>
+<li>register_shared()&#160;:&#160;<a class="el" href="rcpp__shared__primitive_8cpp.html#a3ac07e427da47af922ccfdf1730d193d">rcpp_shared_primitive.cpp</a></li>
+<li>register_vectors()&#160;:&#160;<a class="el" href="rcpp__parameter_8cpp.html#aedc20697f0e4349d2624d2780dc6673e">rcpp_parameter.cpp</a></li>
 </ul>
 
 
@@ -311,7 +317,14 @@ $(document).ready(function(){initNavTree('globals.html',''); initResizable(); })
 </ul>
 
 
+<h3><a id="index_t" name="index_t"></a>- t -</h3><ul>
+<li>TMB_EXTERN&#160;:&#160;<a class="el" href="TMB_8h.html#a148f6b931612eca11ce455b94b2a498b">TMB.h</a></li>
+<li>TMB_H&#160;:&#160;<a class="el" href="TMB_8h.html#a1c070b5395e09d7be73adfaa64c2c0bb">TMB.h</a></li>
+</ul>
+
+
 <h3><a id="index_w" name="index_w"></a>- w -</h3><ul>
+<li>WITH_LIBTMB&#160;:&#160;<a class="el" href="TMB_8h.html#a284a3c52326ee2f4337f13213cd5e004">TMB.h</a></li>
 <li>write_log()&#160;:&#160;<a class="el" href="rcpp__interface_8hpp.html#ad2abfffed726ee7fcbf89f0ec216fe62">rcpp_interface.hpp</a></li>
 </ul>
 </div><!-- contents -->

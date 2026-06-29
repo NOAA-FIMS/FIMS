@@ -109,14 +109,6 @@ MathJax.Hub.Config({
                 <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/news/index.html">changelog</a></li>
               </ul>
             </li>
-          <li class="nav-item dropdown">
-            <button class="nav-link dropdown-toggle" type="button" id="dropdown-reports" data-bs-toggle="dropdown"
-                    aria-expanded="false" aria-haspopup="true">reports</button>
-            <ul class="dropdown-menu" aria-labelledby="dropdown-reports">
-              <li><a class="dropdown-item" href="https://app.codecov.io/gh/NOAA-FIMS/FIMS" target="_blank">coverage (codecov)</a></li>
-              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/testdown/index.html">testdown</a></li>
-            </ul>
-          </li>
           <ul class="navbar-nav">
             <li class="nav-item"><a class="external-link nav-link" href="https://noaa-fims.github.io/">fims website</a></li>
             <li class="nav-item">
@@ -245,7 +237,7 @@ Inheritance diagram for fims_popdy::SRBevertonHolt&lt; Type &gt;:</div>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:ad668df4ac02082db095bc86068a2c639" id="r_ad668df4ac02082db095bc86068a2c639"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">virtual</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1SRBevertonHolt.html#ad668df4ac02082db095bc86068a2c639">evaluate_mean</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">spawners</a>, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">phi_0</a>)</td></tr>
-<tr class="memdesc:ad668df4ac02082db095bc86068a2c639"><td class="mdescLeft">&#160;</td><td class="mdescRight">Beverton&ndash;Holt implementation of the stock&ndash;recruitment function.  <br /></td></tr>
+<tr class="memdesc:ad668df4ac02082db095bc86068a2c639"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluates expected recruitment from the stock&ndash;recruitment relationship before recruitment-process deviations are applied.    <br /></td></tr>
 <tr class="separator:ad668df4ac02082db095bc86068a2c639"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac1881bd68c7990ff9b0b47904e72a2b6" id="r_ac1881bd68c7990ff9b0b47904e72a2b6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">virtual</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1SRBevertonHolt.html#ac1881bd68c7990ff9b0b47904e72a2b6">evaluate_process</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">pos</a>)</td></tr>
 <tr class="separator:ac1881bd68c7990ff9b0b47904e72a2b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -357,18 +349,21 @@ template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e34
 </table>
 </div><div class="memdoc">
 
-<p>Beverton&ndash;Holt implementation of the stock&ndash;recruitment function. </p>
-<p>The Beverton&ndash;Holt stock&ndash;recruitment implementation:  \( \frac{0.8 R_{0} h S_{t-1}}{0.2 R_{0} \phi_{0} (1 - h) + S_{t-1} (h -
-0.2)} \)</p>
+<p>Evaluates expected recruitment from the stock&ndash;recruitment relationship before recruitment-process deviations are applied.   </p>
+<p>Recruitment is evaluated for the first age represented in the input data. For example, if the weight-at-age and age-composition data start at age 1, recruitment is evaluated for age-1 fish rather than age-0 fish. The recruitment age is not set directly by this function; it is determined by the age structure of the input data.</p>
+<p>Recruitment functors that do not define a stock&ndash;recruitment mean return the default value of zero.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">spawners</td><td>A measure of spawning output. </td></tr>
-    <tr><td class="paramname">phi_0</td><td>Number of spawners per recruit of an unfished population </td></tr>
+    <tr><td class="paramname">spawners</td><td>Spawning output at the time step being evaluated, such as spawning biomass or another model-specific measure of reproductive output. </td></tr>
+    <tr><td class="paramname">phi_0</td><td>Spawners per recruit at unfished equilibrium, used to scale the stock&ndash;recruitment relationship relative to unfished conditions. </td></tr>
   </table>
   </dd>
 </dl>
+<dl class="section return"><dt>Returns</dt><dd>Expected recruitment before recruitment-process deviations or random effects are applied.  </dd></dl>
+<p>The Beverton&ndash;Holt stock&ndash;recruitment relationship is:  \( \frac{0.8 R_{0} h S_{t-1}}{0.2 R_{0} \phi_{0} (1 - h) + S_{t-1} (h -
+0.2)} \) </p>
 
-<p>Implements <a class="el" href="structfims__popdy_1_1RecruitmentBase.html#a255d211d815eee87714e8f26bb188d5c">fims_popdy::RecruitmentBase&lt; Type &gt;</a>.</p>
+<p>Implements <a class="el" href="structfims__popdy_1_1RecruitmentBase.html#abcd395d01ccbcbc4d4784ad2a27a923e">fims_popdy::RecruitmentBase&lt; Type &gt;</a>.</p>
 
 </div>
 </div>

@@ -52,6 +52,10 @@ default_parameters <- create_default_configurations(fims_frame) |>
   FIMS:::create_default_maturity(data = fims_frame)
 
 show(default_parameters)
+#> Found more than one class "tbl_df" in cache; using the first, from namespace 'FIMS'
+#> Also defined by 'tibble'
+#> Found more than one class "tbl_df" in cache; using the first, from namespace 'FIMS'
+#> Also defined by 'tibble'
 #> # A tibble: 2 × 12
 #>   model_family module_name module_type label fleet_name   age length  time value
 #>   <chr>        <chr>       <chr>       <chr> <chr>      <dbl>  <dbl> <int> <dbl>

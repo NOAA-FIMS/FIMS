@@ -12,8 +12,8 @@
 <link rel="icon" sizes="any" href="../favicon.ico">
 <link rel="manifest" href="../site.webmanifest">
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><link href="../extra.css" rel="stylesheet">
 <meta property="og:title" content="Intro to C++">
@@ -28,7 +28,7 @@
     <nav class="navbar navbar-expand-lg fixed-top bg-light" data-bs-theme="light" aria-label="Site navigation"><div class="container">
     <img class="navlogo" src="https://noaa-fims.github.io/images/FIMS_logo3.png" alt="FIMS logo with a fish" width="60" align="left"><a class="navbar-brand me-2" href="../index.html">FIMS</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.3.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -75,13 +75,6 @@
     <li><a class="dropdown-item" href="../news/index.html">Changelog</a></li>
   </ul>
 </li>
-<li class="nav-item dropdown">
-  <button class="nav-link dropdown-toggle" type="button" id="dropdown-reports" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Reports</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-reports">
-<li><a class="external-link dropdown-item" href="https://app.codecov.io/gh/NOAA-FIMS/FIMS" target="_blank">coverage (codecov)</a></li>
-    <li><a class="external-link dropdown-item" href="https://noaa-fims.github.io/FIMS/testdown/index.html">testdown</a></li>
-  </ul>
-</li>
       </ul>
 <ul class="navbar-nav">
 <li class="nav-item"><a class="external-link nav-link" href="https://noaa-fims.github.io/">fims website</a></li>
@@ -102,8 +95,6 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Intro to C++</h1>
-                        <h4 data-toc-skip class="author">Andrea
-Havron</h4>
             
       
       <small class="dont-index">Source: <a href="https://github.com/noaa-fims/fims/blob/main/vignettes/training-intro-cpp.Rmd" class="external-link"><code>vignettes/training-intro-cpp.Rmd</code></a></small>
@@ -115,7 +106,7 @@ Havron</h4>
 <!--
 EP - in general it would be really helpful to have side by side examples of similar things happening in FIMS to whatever basic "hello world" simple type of examples that are in this vignette so that people can immediately see the parallels to the FIMS code and make that connection quickly.
 -->
-<!-- The section below creates a collpase/expand all button -->
+<!-- The section below creates a collapse/expand all button -->
 <div id="expand-collapse-buttons" style="margin-bottom: 20px;">
 <p><button onclick="expandAll()" class="btn btn-primary">Expand
 All</button>
@@ -594,7 +585,7 @@ behavior only need to be made in one place, and all derived classes will
 automatically inherit those updates. This approach also makes it easier
 to extend your code in the future by adding new derived classes that
 benefit from the existing shared features.</p>
-<!-- need example of inheritence in FIMS -->
+<!-- need example of inheritance in FIMS -->
 <p>To refer to members (variables or functions) of the current object,
 <code>this-&gt;</code> is used inside of a class. It is especially
 useful in derived classes to clarify that you are accessing a member
@@ -820,8 +811,8 @@ will explore later.</p>
 <span></span>
 <span><span class="fu">pointer</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## x is equal to the address of y</span></span>
-<span><span class="co">## x is: 0x7fffb5e60204</span></span>
-<span><span class="co">## The address of y is: 0x7fffb5e60204</span></span>
+<span><span class="co">## x is: 0x7ffc365e4234</span></span>
+<span><span class="co">## The address of y is: 0x7ffc365e4234</span></span>
 <span><span class="co">## *x returns the value of y: 3.1459</span></span></code></pre>
 <pre><code><span><span class="co">## [1] 0</span></span></code></pre>
 </details>
@@ -860,8 +851,8 @@ e.g., <code>&amp;y</code>.</p>
 <span><span class="fu">reference</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## x is: 3</span></span>
 <span><span class="co">## y is: 3</span></span>
-<span><span class="co">## The memory address of x is: 0x7fffb5e60204</span></span>
-<span><span class="co">## The memory address of y is: 0x7fffb5e60204</span></span></code></pre>
+<span><span class="co">## The memory address of x is: 0x7ffc365e4234</span></span>
+<span><span class="co">## The memory address of y is: 0x7ffc365e4234</span></span></code></pre>
 <pre><code><span><span class="co">## [1] 0</span></span></code></pre>
 </details>
 </div>
@@ -925,9 +916,9 @@ following example?</p>
 <span></span>
 <span><span class="fu">reassign_pointer</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## c now equals the address of b</span></span>
-<span><span class="co">## &amp;a = 0x7fffb5e60200</span></span>
-<span><span class="co">## &amp;b = 0x7fffb5e60204</span></span>
-<span><span class="co">## c = 0x7fffb5e60204</span></span>
+<span><span class="co">## &amp;a = 0x7ffc365e4230</span></span>
+<span><span class="co">## &amp;b = 0x7ffc365e4234</span></span>
+<span><span class="co">## c = 0x7ffc365e4234</span></span>
 <span><span class="co">## a = 100</span></span>
 <span><span class="co">## b = 10</span></span>
 <span><span class="co">## *c = 10</span></span></code></pre>
@@ -1040,9 +1031,9 @@ automatically deleted.</p>
 <span><span class="fu">shared_pointer</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## ptr1: 42</span></span>
 <span><span class="co">## ptr2: 24</span></span>
-<span><span class="co">## ptr1 = 0x5635ce03a160</span></span>
-<span><span class="co">## ptr2 = 0x5635ce315880</span></span>
-<span><span class="co">## ptr3 = 0x5635ce03a160</span></span></code></pre>
+<span><span class="co">## ptr1 = 0x559ed5e277f0</span></span>
+<span><span class="co">## ptr2 = 0x559ed17fb580</span></span>
+<span><span class="co">## ptr3 = 0x559ed5e277f0</span></span></code></pre>
 <pre><code><span><span class="co">## [1] 0</span></span></code></pre>
 </details>
 </div>

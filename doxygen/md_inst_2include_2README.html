@@ -109,14 +109,6 @@ MathJax.Hub.Config({
                 <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/news/index.html">changelog</a></li>
               </ul>
             </li>
-          <li class="nav-item dropdown">
-            <button class="nav-link dropdown-toggle" type="button" id="dropdown-reports" data-bs-toggle="dropdown"
-                    aria-expanded="false" aria-haspopup="true">reports</button>
-            <ul class="dropdown-menu" aria-labelledby="dropdown-reports">
-              <li><a class="dropdown-item" href="https://app.codecov.io/gh/NOAA-FIMS/FIMS" target="_blank">coverage (codecov)</a></li>
-              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/testdown/index.html">testdown</a></li>
-            </ul>
-          </li>
           <ul class="navbar-nav">
             <li class="nav-item"><a class="external-link nav-link" href="https://noaa-fims.github.io/">fims website</a></li>
             <li class="nav-item">
@@ -225,10 +217,14 @@ $(document).ready(function(){initNavTree('md_inst_2include_2README.html',''); in
 <div class="toc"><h3>Table of Contents</h3>
 <ul><li class="level1"><a href="#autotoc_md11">inst/include/</a><ul><li class="level2"><a href="#autotoc_md12">inst/include/common/</a></li>
 <li class="level2"><a href="#autotoc_md13">inst/include/distributions/</a></li>
-<li class="level2"><a href="#autotoc_md14">inst/include/interface/</a></li>
-<li class="level2"><a href="#autotoc_md15">inst/include/models/</a></li>
-<li class="level2"><a href="#autotoc_md16">inst/include/population_dynamics/</a></li>
-<li class="level2"><a href="#autotoc_md17">inst/include/utilities/</a></li>
+<li class="level2"><a href="#autotoc_md14">inst/include/interface/</a><ul><li class="level3"><a href="#autotoc_md15">inst/include/interface/interface.hpp</a></li>
+<li class="level3"><a href="#autotoc_md16">inst/include/interface/rcpp</a></li>
+<li class="level3"><a href="#autotoc_md17">inst/include/interface/TMB</a></li>
+</ul>
+</li>
+<li class="level2"><a href="#autotoc_md18">inst/include/models/</a></li>
+<li class="level2"><a href="#autotoc_md19">inst/include/population_dynamics/</a></li>
+<li class="level2"><a href="#autotoc_md20">inst/include/utilities/</a></li>
 </ul>
 </li>
 </ul>
@@ -250,18 +246,28 @@ inst/include/distributions/</h2>
 inst/include/interface/</h2>
 <p>This directory contains the Rcpp interface files for the FIMS C++ code. The interface files are responsible for exposing the C++ functionality to R, allowing users to call C++ functions and access C++ classes directly from R. R, while flexible and expressive, can be slow for computationally intensive tasks and lacks direct support for low-level operations. Directly calling C++ from R is non-trivial due to mismatches in data types, memory handling, and function calling conventions. Rcpp addresses these mismatches by providing an abstraction layer that simplifies the interface process, allowing C++ code to be written in a way that's naturally accessible from R. The interface files typically include function definitions, class declarations, and other necessary components to facilitate communication between R and C++. By using the Rcpp package, we can leverage the performance benefits of C++ while still providing a user-friendly interface for R users.</p>
 <p>Typically, Rcpp exposes C++ functions to R using <code>Rcpp::export</code> placed before the C++ function code. This enables automatic wrapper generation and type conversion. Unfortunately, we cannot use this functionality within a TMB model, and thus, the code here may be slightly more complicated than a typical Rcpp interface. Classes are made available via <code>RCPP_MODULE</code>. <code>RCPP_MODULE</code> provides a declarative mechanism to register C++ classes and their members (constructors, methods, fields) so they can be accessed from R via Rcpp modules where class constructors and methods are explicitly bound for R access. For templates, direct export isn't supported, but individual instantiations can be wrapped in type-specific functions.</p>
-<p>At the top level, this directory contains just one file, <code><a class="el" href="interface_8hpp.html" title="An interface to the modeling platforms, e.g., TMB.">interface/interface.hpp</a></code> that contains the main interface definitions. The <code><a class="el" href="rcpp__interface_8hpp.html" title="The Rcpp interface to declare things.">interface/rcpp/rcpp_interface.hpp</a></code> file is a wrapper that allows R to call C++ functions and access C++ classes seamlessly and each of the header files within <code>rcpp_objects</code> must be listed in this file.</p>
-<p>Within the <code>rcpp_objects</code> subdirectory, there are several header files that define the C++ classes and functions that will be exposed to R. Each of these header files corresponds to a specific component or functionality within the FIMS C++ codebase.</p>
-<h2><a class="anchor" id="autotoc_md15"></a>
+<h3><a class="anchor" id="autotoc_md15"></a>
+inst/include/interface/interface.hpp</h3>
+<p>The <code><a class="el" href="interface_8hpp.html" title="An interface to the modeling platforms, e.g., TMB.">interface/interface.hpp</a></code> is the only file in the interface directory and it contains the main interface definitions. The file acts as a wrapper that allows R to call C++ functions and access C++ classes seamlessly. Each of the header files within <code>rcpp_objects</code> must be listed in <code><a class="el" href="interface_8hpp.html" title="An interface to the modeling platforms, e.g., TMB.">interface/interface.hpp</a></code>.</p>
+<h3><a class="anchor" id="autotoc_md16"></a>
+inst/include/interface/rcpp</h3>
+<p>This directory contains the Rcpp module registration layer for FIMS. The files in this directory and its <code>rcpp_objects</code> subdirectory define the C++ wrappers, class bindings, helper functions, and registration declarations that expose FIMS C++ objects to R; they live under <code>inst/include</code> so the declarations are available both to the package source files in <code>src/</code> and to other headers that need to reference the R-facing interface.</p>
+<h3><a class="anchor" id="autotoc_md17"></a>
+inst/include/interface/TMB</h3>
+<p>This directory contains the TMB integration headers used when FIMS is compiled with TMB support. These files keep the TMB-specific include, configuration, and initialization code separate from the rest of the interface so FIMS can build smaller source files instead of one large translation unit that instantiates many TMB and automatic differentiation templates at once.</p>
+<p>The <code><a class="el" href="TMB_8h.html" title="Include this file to extract declarations only.">TMB.h</a></code> file is the main wrapper around TMB's core headers. It supports both TMB library precompilation and normal FIMS source compilation by controlling macros such as <code>WITH_LIBTMB</code>, <code>TMB_PRECOMPILE</code>, <code>CSKIP</code>, <code>IF_TMB_PRECOMPILE</code>, and <code>TMB_EXTERN</code>; this prevents conflicts between TMB's build mode and the code compiled as part of FIMS. This file was copied from the RTMB package, thanks to guidance from Kasper Kristensen.</p>
+<p>The <code><a class="el" href="config_8h_source.html">config.h</a></code> file provides the TMB/RTMB configuration used by FIMS. It enables Rcpp-compatible exception handling for TMB failures, turns on <code>TMB_SAFEBOUNDS</code>, selects the <code>TMBAD_FRAMEWORK</code>, uses a 64-bit index type (<code>uint64_t</code>), and configures thread-safe R support when OpenMP is available.</p>
+<p>The <code><a class="el" href="init__tmb_8hpp.html" title="An interface to dynamically load the functions.">init_tmb.hpp</a></code> file handles runtime initialization and registration for the compiled shared object. It provides the <code>R_init_FIMS</code> registration callback, supports optional initialization through <code>FIMS_ONLOAD_INIT_TMB</code>, and registers TMB C-callables when <code>TMB_CCALLABLES</code> is available.</p>
+<h2><a class="anchor" id="autotoc_md18"></a>
 inst/include/models/</h2>
 <p>This directory contains the header files for different types of population dynamics models. For example, <code><a class="el" href="catch__at__age_8hpp.html" title="Code to specify the catch-at-age model.">catch_at_age.hpp</a></code> is the most widely used model from the suite of available FIMS models. Each available model type uses the overarching base class defined in <code><a class="el" href="fishery__model__base_8hpp.html" title="Defines the base class for all fishery models within the FIMS framework.">functors/fishery_model_base.hpp</a></code>. A new file must be added in <code>functors</code> for each model added to FIMS.</p>
-<h2><a class="anchor" id="autotoc_md16"></a>
+<h2><a class="anchor" id="autotoc_md19"></a>
 inst/include/population_dynamics/</h2>
 <p>This directory contains header files related to the population dynamics specified in FIMS. The population dynamics modules are responsible for modeling the growth, reproduction, and survival of populations over time. It includes classes and functions that define the population structure, life-history traits, and environmental factors that influence population dynamics.</p>
 <p>Each folder in <code>population_dynamics</code> corresponds to a component of the population dynamics model. Given the complexity of the component, the structure in these folders within <code>population_dynamics</code> may differ. At a minimum there will be a .hpp file with the same name as the subfolder, e.g., <code><a class="el" href="fleet_8hpp.html" title="Declare the fleet functor class which is the base class for all fleet functors.">fleet/fleet.hpp</a></code>. This file will include an <code>ifndef</code> directive and <code>#include</code> statements. If the folder is empty other than this file, then the remainder of the file will define the component. If there are additional subdirectories along side the .hpp file, the file will end after the include statements that point to each of the files in the functions folder that sits next to this .hpp file.</p>
 <p>For the latter scenario, where a <code>functor</code> folder exists, inside the <code>functor</code> folder will be a .hpp file with <code>_base</code> attached to the component name, e.g., <code><a class="el" href="maturity__base_8hpp.html" title="Declares the MaturityBase class which is the base class for all maturity functors.">population_dynamics/maturity/functors/maturity_base.hpp</a></code>. This <code>_base.hpp</code> file will define the base class for the module type. The base class should only need a constructor method and a number of methods (e.g., <code>evaluate()</code>) that are not specific to the type of functions available under the subfolders but reused for all objects of that class type. This is important for life-history processes where there is structural uncertainty in the model and users may wish to investigate different forms, e.g., Beverton&ndash;Holt versus Ricker stock&ndash;recruitment relationships. Often, there will only be one functor in the subfolder but there will still be a subfolder structure. This structure is to allow for future expansion of the module type.</p>
 <p>Many times, the files will look very similar to each other such as for logistic maturity and logistic selectivity. In these cases, the files will be identical except for the name of the class and the name of the base class that it references. Both of the files use the same function within <code><a class="el" href="fims__math_8hpp.html" title="A collection of mathematical functions used in FIMS.">fims_math.hpp</a></code> to calculate the logistic function it is only their setup that differs. Therefore, pattern matching can be used to create new files.</p>
-<h2><a class="anchor" id="autotoc_md17"></a>
+<h2><a class="anchor" id="autotoc_md20"></a>
 inst/include/utilities/</h2>
 <p>Currently, this directory contains just a single header file, <code><a class="el" href="fims__json_8hpp.html" title="A simple JSON parsing and generation library.">fims_json.hpp</a></code>. This header file and future header files in this directory are for processes that are not related to the interface, fitting data, or the population dynamics. </p>
 </div></div><!-- contents -->

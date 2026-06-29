@@ -6,7 +6,13 @@ tibble for easier analysis and manipulation.
 ## Usage
 
 ``` r
-reshape_tmb_estimates(obj, sdreport = NULL, opt = NULL, parameter_names)
+reshape_tmb_estimates(
+  obj,
+  sdreport = NULL,
+  opt = NULL,
+  parameter_names,
+  precomputed_gradient = NULL
+)
 ```
 
 ## Arguments
@@ -32,6 +38,15 @@ reshape_tmb_estimates(obj, sdreport = NULL, opt = NULL, parameter_names)
 
   A character vector of parameter names. This is used to identify the
   parameters in the `std` object.
+
+- precomputed_gradient:
+
+  A numeric vector of pre-computed gradient values at the MLE, typically
+  from `get_gradient(x)`. When provided, this avoids a second call to
+  `obj[["gr"]]()`, which would crash after
+  [`clear()`](https://NOAA-FIMS.github.io/FIMS/reference/Cpp_functions.md)
+  has freed the C++ memory. If `NULL` (default), the gradient is
+  computed directly from `obj[["gr"]](opt[["par"]])`.
 
 ## Value
 

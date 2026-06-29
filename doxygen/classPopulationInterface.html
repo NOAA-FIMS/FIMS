@@ -109,14 +109,6 @@ MathJax.Hub.Config({
                 <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/news/index.html">changelog</a></li>
               </ul>
             </li>
-          <li class="nav-item dropdown">
-            <button class="nav-link dropdown-toggle" type="button" id="dropdown-reports" data-bs-toggle="dropdown"
-                    aria-expanded="false" aria-haspopup="true">reports</button>
-            <ul class="dropdown-menu" aria-labelledby="dropdown-reports">
-              <li><a class="dropdown-item" href="https://app.codecov.io/gh/NOAA-FIMS/FIMS" target="_blank">coverage (codecov)</a></li>
-              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/testdown/index.html">testdown</a></li>
-            </ul>
-          </li>
           <ul class="navbar-nav">
             <li class="nav-item"><a class="external-link nav-link" href="https://noaa-fims.github.io/">fims website</a></li>
             <li class="nav-item">
@@ -365,6 +357,9 @@ Public Attributes</h2></td></tr>
 <a class="el" href="classParameterVector.html">ParameterVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>log_init_naa</b></td></tr>
 <tr class="memdesc:a3592fdc543e9839dbee7fa814ca15f7b"><td class="mdescLeft">&#160;</td><td class="mdescRight">The natural log of the initial numbers at age. <br /></td></tr>
 <tr class="separator:a3592fdc543e9839dbee7fa814ca15f7b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0bbc7ab78b540b6348d0bb508ce8ba84" id="r_a0bbc7ab78b540b6348d0bb508ce8ba84"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classParameterVector.html">ParameterVector</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classPopulationInterface.html#a0bbc7ab78b540b6348d0bb508ce8ba84">proportion_female</a></td></tr>
+<tr class="memdesc:a0bbc7ab78b540b6348d0bb508ce8ba84"><td class="mdescLeft">&#160;</td><td class="mdescRight">Proportion of females in the population.  <br /></td></tr>
+<tr class="separator:a0bbc7ab78b540b6348d0bb508ce8ba84"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a72bb9d21b9f124ce5d9fba3020597c84" id="r_a72bb9d21b9f124ce5d9fba3020597c84"><td class="memItemLeft" align="right" valign="top"><a id="a72bb9d21b9f124ce5d9fba3020597c84" name="a72bb9d21b9f124ce5d9fba3020597c84"></a>
 <a class="el" href="classRealVector.html">RealVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>ages</b></td></tr>
 <tr class="memdesc:a72bb9d21b9f124ce5d9fba3020597c84"><td class="mdescLeft">&#160;</td><td class="mdescRight">Ages that are modeled in the population, the length of this vector should equal "n_ages". <br /></td></tr>
@@ -699,6 +694,23 @@ Additional Inherited Members</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>list of fleets that operate on this population. </p>
+
+</div>
+</div>
+<a id="a0bbc7ab78b540b6348d0bb508ce8ba84" name="a0bbc7ab78b540b6348d0bb508ce8ba84"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0bbc7ab78b540b6348d0bb508ce8ba84">&#9670;&#160;</a></span>proportion_female</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classParameterVector.html">ParameterVector</a> PopulationInterface::proportion_female</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Proportion of females in the population. </p>
+<p>Used to calculate spawning biomass and other sex-specific derived quantities. Supplied from R as a single constant (length 1) and applied to all ages during model evaluation. Values should be in [0, 1]. Out-of-range inputs are logged as warnings. </p>
 
 </div>
 </div>

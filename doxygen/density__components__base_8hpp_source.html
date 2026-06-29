@@ -109,14 +109,6 @@ MathJax.Hub.Config({
                 <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/news/index.html">changelog</a></li>
               </ul>
             </li>
-          <li class="nav-item dropdown">
-            <button class="nav-link dropdown-toggle" type="button" id="dropdown-reports" data-bs-toggle="dropdown"
-                    aria-expanded="false" aria-haspopup="true">reports</button>
-            <ul class="dropdown-menu" aria-labelledby="dropdown-reports">
-              <li><a class="dropdown-item" href="https://app.codecov.io/gh/NOAA-FIMS/FIMS" target="_blank">coverage (codecov)</a></li>
-              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/testdown/index.html">testdown</a></li>
-            </ul>
-          </li>
           <ul class="navbar-nav">
             <li class="nav-item"><a class="external-link nav-link" href="https://noaa-fims.github.io/">fims website</a></li>
             <li class="nav-item">
@@ -255,7 +247,7 @@ $(document).ready(function(){initNavTree('density__components__base_8hpp_source.
 <div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span> </div>
 <div class="line"><a id="l00066" name="l00066"></a><span class="lineno"><a class="line" href="structfims__distributions_1_1DensityComponentBase.html#afb97e4ee7b75a1bea37fa7671a3e2498">   66</a></span>  <a class="code hl_class" href="classfims_1_1Vector.html">fims::Vector&lt;Type&gt;</a> <a class="code hl_variable" href="structfims__distributions_1_1DensityComponentBase.html#afb97e4ee7b75a1bea37fa7671a3e2498">expected_mean</a>;</div>
 <div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span> </div>
-<div class="line"><a id="l00072" name="l00072"></a><span class="lineno"><a class="line" href="structfims__distributions_1_1DensityComponentBase.html#a05e0ce908ecb58f7a24cd519ab6c45b8">   72</a></span>  std::string <a class="code hl_variable" href="structfims__distributions_1_1DensityComponentBase.html#a05e0ce908ecb58f7a24cd519ab6c45b8">use_mean</a> = fims::to_string(<span class="stringliteral">&quot;no&quot;</span>);</div>
+<div class="line"><a id="l00072" name="l00072"></a><span class="lineno"><a class="line" href="structfims__distributions_1_1DensityComponentBase.html#a05e0ce908ecb58f7a24cd519ab6c45b8">   72</a></span>  std::string <a class="code hl_variable" href="structfims__distributions_1_1DensityComponentBase.html#a05e0ce908ecb58f7a24cd519ab6c45b8">use_mean</a> = std::string(<span class="stringliteral">&quot;no&quot;</span>);</div>
 <div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span> </div>
 <div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span>  <span class="comment">// std::shared_ptr&lt;DistributionElementObject&lt;Type&gt;&gt; expected;</span></div>
 <div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span>  <span class="comment">// // Expected value of distribution function.</span></div>
@@ -404,7 +396,7 @@ $(document).ready(function(){initNavTree('density__components__base_8hpp_source.
 <div class="ttc" id="astructfims__distributions_1_1DensityComponentBase_html_af0f9cbf31816b7d9a3c30ec6129d099a"><div class="ttname"><a href="structfims__distributions_1_1DensityComponentBase.html#af0f9cbf31816b7d9a3c30ec6129d099a">fims_distributions::DensityComponentBase::priors</a></div><div class="ttdeci">std::vector&lt; fims::Vector&lt; Type &gt; * &gt; priors</div><div class="ttdoc">Vector of pointers where each entry points to a prior parameter.</div><div class="ttdef"><b>Definition</b> density_components_base.hpp:56</div></div>
 <div class="ttc" id="astructfims__distributions_1_1DensityComponentBase_html_afa63be85af143b368f5ea90e36d361da"><div class="ttname"><a href="structfims__distributions_1_1DensityComponentBase.html#afa63be85af143b368f5ea90e36d361da">fims_distributions::DensityComponentBase::get_observed</a></div><div class="ttdeci">Type &amp; get_observed(size_t i, size_t j)</div><div class="ttdoc">Retrieve one observed matrix-like value based on input_type.</div><div class="ttdef"><b>Definition</b> density_components_base.hpp:108</div></div>
 <div class="ttc" id="astructfims__distributions_1_1DensityComponentBase_html_afb97e4ee7b75a1bea37fa7671a3e2498"><div class="ttname"><a href="structfims__distributions_1_1DensityComponentBase.html#afb97e4ee7b75a1bea37fa7671a3e2498">fims_distributions::DensityComponentBase::expected_mean</a></div><div class="ttdeci">fims::Vector&lt; Type &gt; expected_mean</div><div class="ttdoc">The expected mean of the distribution; overrides expected values.</div><div class="ttdef"><b>Definition</b> density_components_base.hpp:66</div></div>
-<div class="ttc" id="astructfims__model__object_1_1FIMSObject_html"><div class="ttname"><a href="structfims__model__object_1_1FIMSObject.html">fims_model_object::FIMSObject</a></div><div class="ttdoc">FIMSObject struct that defines member types and returns the unique id.</div><div class="ttdef"><b>Definition</b> model_object.hpp:25</div></div>
+<div class="ttc" id="astructfims__model__object_1_1FIMSObject_html"><div class="ttname"><a href="structfims__model__object_1_1FIMSObject.html">fims_model_object::FIMSObject</a></div><div class="ttdoc">FIMSObject struct that defines member types and returns the unique id.</div><div class="ttdef"><b>Definition</b> model_object.hpp:24</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

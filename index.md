@@ -1,7 +1,7 @@
 # Overview
 
 [![FIMS status
-badge](https://noaa-fims.r-universe.dev/badges/FIMS)](https://noaa-fims.r-universe.dev/FIMS)
+badge](https://noaa-fisheries-integrated-toolbox.r-universe.dev/badges/FIMS)](https://noaa-fisheries-integrated-toolbox.r-universe.dev/FIMS)
 [![R-CMD-check
 badge](https://github.com/NOAA-FIMS/FIMS/actions/workflows/call-r-cmd-check.yml/badge.svg?branch=main)](https://github.com/NOAA-FIMS/FIMS/actions/workflows/call-r-cmd-check.yml)
 [![Codecov test
@@ -20,6 +20,9 @@ structure. Stay tuned for the addition of even more model types.
 If you are new to FIMS, the best place to start is the [“Introducing
 FIMS”](https://noaa-fims.github.io/FIMS/articles/fims-demo.html)
 vignette.
+
+[![Ask
+DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/NOAA-FIMS/FIMS)
 
 ## Installation
 
@@ -127,27 +130,6 @@ Discussion](https://github.com/orgs/NOAA-FIMS/discussions/801).
 More information can be found on the [NOAA-FIMS
 website](https://noaa-fims.github.io), particularly on [our
 blog](https://noaa-fims.github.io/blog/).
-
-------------------------------------------------------------------------
-
-## Contributors
-
-All contributions to this project are gratefully acknowledged using the
-[`allcontributors` package](https://github.com/ropensci/allcontributors)
-following the [allcontributors](https://allcontributors.org)
-specification. Contributions of any kind are welcome!
-
-### Code
-
-[TABLE]
-
-### Issue Authors
-
-[TABLE]
-
-### Issue Contributors
-
-[TABLE]
 
 ## NOAA Disclaimer
 

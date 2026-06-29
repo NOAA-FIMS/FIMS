@@ -109,14 +109,6 @@ MathJax.Hub.Config({
                 <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/news/index.html">changelog</a></li>
               </ul>
             </li>
-          <li class="nav-item dropdown">
-            <button class="nav-link dropdown-toggle" type="button" id="dropdown-reports" data-bs-toggle="dropdown"
-                    aria-expanded="false" aria-haspopup="true">reports</button>
-            <ul class="dropdown-menu" aria-labelledby="dropdown-reports">
-              <li><a class="dropdown-item" href="https://app.codecov.io/gh/NOAA-FIMS/FIMS" target="_blank">coverage (codecov)</a></li>
-              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/testdown/index.html">testdown</a></li>
-            </ul>
-          </li>
           <ul class="navbar-nav">
             <li class="nav-item"><a class="external-link nav-link" href="https://noaa-fims.github.io/">fims website</a></li>
             <li class="nav-item">
@@ -263,10 +255,10 @@ Public Member Functions</h2></td></tr>
 <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">virtual</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a>&#160;</td><td class="memItemRight" valign="bottom"><b>get_id</b> ()</td></tr>
 <tr class="memdesc:ac0c8f645298395adcdc2f2fb8d107850"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the ID of the <a class="el" href="classRealVector.html" title="An Rcpp interface class that defines the RealVector class.">RealVector</a> object. <br /></td></tr>
 <tr class="separator:ac0c8f645298395adcdc2f2fb8d107850"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af10a68970b31bca3cb35b84c591f4197" id="r_af10a68970b31bca3cb35b84c591f4197"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classRealVector.html#af10a68970b31bca3cb35b84c591f4197">fromRVector</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> Rcpp::NumericVector &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">orig</a>)</td></tr>
-<tr class="separator:af10a68970b31bca3cb35b84c591f4197"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa539dff2c10c08e77d47f6f8cb24fc5a" id="r_aa539dff2c10c08e77d47f6f8cb24fc5a"><td class="memItemLeft" align="right" valign="top">Rcpp::NumericVector&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classRealVector.html#aa539dff2c10c08e77d47f6f8cb24fc5a">toRVector</a> ()</td></tr>
-<tr class="separator:aa539dff2c10c08e77d47f6f8cb24fc5a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab19d6d872198244f96011004ac6c0734" id="r_ab19d6d872198244f96011004ac6c0734"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classRealVector.html#ab19d6d872198244f96011004ac6c0734">set_values</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> Rcpp::NumericVector &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">orig</a>)</td></tr>
+<tr class="separator:ab19d6d872198244f96011004ac6c0734"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a34f189eaa02da9cfae0973546cfe4994" id="r_a34f189eaa02da9cfae0973546cfe4994"><td class="memItemLeft" align="right" valign="top">Rcpp::NumericVector&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classRealVector.html#a34f189eaa02da9cfae0973546cfe4994">get_values</a> ()</td></tr>
+<tr class="separator:a34f189eaa02da9cfae0973546cfe4994"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adbfffaca9dbf119d3e358337f43afbf5" id="r_adbfffaca9dbf119d3e358337f43afbf5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">double</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classRealVector.html#adbfffaca9dbf119d3e358337f43afbf5">operator[]</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">pos</a>)</td></tr>
 <tr class="memdesc:adbfffaca9dbf119d3e358337f43afbf5"><td class="mdescLeft">&#160;</td><td class="mdescRight">The accessor where the first index starts is zero.  <br /></td></tr>
 <tr class="separator:adbfffaca9dbf119d3e358337f43afbf5"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -464,38 +456,6 @@ Static Public Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="af10a68970b31bca3cb35b84c591f4197" name="af10a68970b31bca3cb35b84c591f4197"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af10a68970b31bca3cb35b84c591f4197">&#9670;&#160;</a></span>fromRVector()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a> RealVector::fromRVector </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> Rcpp::NumericVector &amp;&#160;</td>
-          <td class="paramname"><em>orig</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">orig</td><td></td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
 <a id="a0e46c7faa2e62d0aa4f4f793054a183a" name="a0e46c7faa2e62d0aa4f4f793054a183a"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a0e46c7faa2e62d0aa4f4f793054a183a">&#9670;&#160;</a></span>get()</h2>
 
@@ -527,6 +487,32 @@ Static Public Attributes</h2></td></tr>
   </table>
   </dd>
 </dl>
+
+</div>
+</div>
+<a id="a34f189eaa02da9cfae0973546cfe4994" name="a34f189eaa02da9cfae0973546cfe4994"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a34f189eaa02da9cfae0973546cfe4994">&#9670;&#160;</a></span>get_values()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">Rcpp::NumericVector RealVector::get_values </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>Rcpp::NumericVector </dd></dl>
 
 </div>
 </div>
@@ -676,8 +662,8 @@ Static Public Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="aa539dff2c10c08e77d47f6f8cb24fc5a" name="aa539dff2c10c08e77d47f6f8cb24fc5a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa539dff2c10c08e77d47f6f8cb24fc5a">&#9670;&#160;</a></span>toRVector()</h2>
+<a id="ab19d6d872198244f96011004ac6c0734" name="ab19d6d872198244f96011004ac6c0734"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab19d6d872198244f96011004ac6c0734">&#9670;&#160;</a></span>set_values()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -686,9 +672,10 @@ Static Public Attributes</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">Rcpp::NumericVector RealVector::toRVector </td>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a> RealVector::set_values </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> Rcpp::NumericVector &amp;&#160;</td>
+          <td class="paramname"><em>orig</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -698,12 +685,18 @@ Static Public Attributes</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<dl class="section return"><dt>Returns</dt><dd>Rcpp::NumericVector </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">orig</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
-<hr/>The documentation for this class was generated from the following file:<ul>
+<hr/>The documentation for this class was generated from the following files:<ul>
 <li>inst/include/interface/rcpp/rcpp_objects/<a class="el" href="rcpp__interface__base_8hpp_source.html">rcpp_interface_base.hpp</a></li>
+<li>src/<a class="el" href="rcpp__interface__base_8cpp.html">rcpp_interface_base.cpp</a></li>
 </ul>
 </div><!-- contents -->
 </div><!-- doc-content -->

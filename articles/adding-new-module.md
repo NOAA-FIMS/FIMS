@@ -520,8 +520,8 @@ Rcpp::class_<LogisticSelectivityInterface>(
 
 - **R class name**: the first string is the class name users call with
   [`methods::new()`](https://rdrr.io/r/methods/new.html).
-- **Documentation string**: current `dev` code often points to the
-  Doxygen page for the interface class.
+- **Documentation string**: code often points to the Doxygen page for
+  the interface class.
 - **Fields and methods**: these are the parts of the interface that
   become visible in R.
 
@@ -618,7 +618,7 @@ That means a new module type typically needs:
 
 #### 4.3 Keep the full run path in mind
 
-The full user-facing workflow in current `dev` code is:
+The full user-facing workflow in code is:
 
 ``` r
 
@@ -901,8 +901,7 @@ Study these existing modules as templates:
 
 ## Summary
 
-Adding a new module in the current `dev` branch usually means
-coordinating updates across:
+Adding a new module usually means coordinating updates across:
 
 1.  **C++ functors** in `inst/include/`
 2.  **Rcpp interface and TMB registration** in

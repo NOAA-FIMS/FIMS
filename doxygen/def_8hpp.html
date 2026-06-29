@@ -109,14 +109,6 @@ MathJax.Hub.Config({
                 <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/news/index.html">changelog</a></li>
               </ul>
             </li>
-          <li class="nav-item dropdown">
-            <button class="nav-link dropdown-toggle" type="button" id="dropdown-reports" data-bs-toggle="dropdown"
-                    aria-expanded="false" aria-haspopup="true">reports</button>
-            <ul class="dropdown-menu" aria-labelledby="dropdown-reports">
-              <li><a class="dropdown-item" href="https://app.codecov.io/gh/NOAA-FIMS/FIMS" target="_blank">coverage (codecov)</a></li>
-              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/testdown/index.html">testdown</a></li>
-            </ul>
-          </li>
           <ul class="navbar-nav">
             <li class="nav-item"><a class="external-link nav-link" href="https://noaa-fims.github.io/">fims website</a></li>
             <li class="nav-item">
@@ -300,7 +292,7 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line">  <a class="code hl_variable" href="classfims_1_1FIMSLog.html#a942fd5b6d134573af288c0a986831ffd">fims::FIMSLog::fims_log</a>-&gt;error_message(<a class="code hl_function" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">MESSAGE</a>, <a class="code hl_function" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">__LINE__</a>, <a class="code hl_function" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">__FILE__</a>, \</div>
 <div class="line">                                         <a class="code hl_function" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">__PRETTY_FUNCTION__</a>);</div>
-<div class="ttc" id="aclassfims_1_1FIMSLog_html_a942fd5b6d134573af288c0a986831ffd"><div class="ttname"><a href="classfims_1_1FIMSLog.html#a942fd5b6d134573af288c0a986831ffd">fims::FIMSLog::fims_log</a></div><div class="ttdeci">static std::shared_ptr&lt; FIMSLog &gt; fims_log</div><div class="ttdoc">A singleton instance of the log, i.e., where there is only one log. The object is created when the ....</div><div class="ttdef"><b>Definition</b> def.hpp:263</div></div>
+<div class="ttc" id="aclassfims_1_1FIMSLog_html_a942fd5b6d134573af288c0a986831ffd"><div class="ttname"><a href="classfims_1_1FIMSLog.html#a942fd5b6d134573af288c0a986831ffd">fims::FIMSLog::fims_log</a></div><div class="ttdeci">static std::shared_ptr&lt; FIMSLog &gt; fims_log</div><div class="ttdoc">A singleton instance of the log, i.e., where there is only one log. The object is created when the ....</div><div class="ttdef"><b>Definition</b> def.hpp:270</div></div>
 <div class="ttc" id="arcpp__interface_8hpp_html_a9f5a235582e7cc0f29e3431fc89ef10d"><div class="ttname"><a href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">clear_internal</a></div><div class="ttdeci">void clear_internal()</div><div class="ttdoc">Clears the internal objects.</div><div class="ttdef"><b>Definition</b> rcpp_interface.hpp:235</div></div>
 </div><!-- fragment --><p>The logging macro captures <code>MESSAGE</code> plus the call-site metadata (<code>__LINE__</code>, <code>__FILE__</code>, and <code>__PRETTY_FUNCTION__</code>) and forwards those values to <code>error_message</code>. <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -437,6 +429,9 @@ template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e34
 
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a> fims::WriteAtExit </td>
@@ -446,6 +441,11 @@ template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e34
           <td></td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
 <p>Signal handler that records a terminal error and flushes log entries. </p>
