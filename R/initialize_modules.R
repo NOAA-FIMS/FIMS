@@ -115,8 +115,6 @@ initialize_module <- function(parameters, data, module_name, fleet_name = NA_cha
       "index_weight",
       "index_numbers",
       "catch_index",
-      "expected_catch",
-      "expected_index",
       "lengthcomp_expected"
     ))
 

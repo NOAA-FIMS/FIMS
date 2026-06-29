@@ -23,9 +23,6 @@ void register_fishery_models(Rcpp::Module& m) {
       "Catch-at-age population derived quantities exposed as RealVector "
       "members.")
       .constructor()
-      .method("Initialize",
-              &CatchAtAgePopulationDerivedQuantitiesInterface::Initialize)
-      .method("Fill", &CatchAtAgePopulationDerivedQuantitiesInterface::Fill)
       .field("total_landings_weight",
              &CatchAtAgePopulationDerivedQuantitiesInterface::
                  total_landings_weight)
@@ -66,8 +63,6 @@ void register_fishery_models(Rcpp::Module& m) {
       "CatchAtAgeFleetDerivedQuantities",
       "Catch-at-age fleet derived quantities exposed as RealVector members.")
       .constructor()
-      .method("Initialize", &CatchAtAgeFleetDerivedQuantitiesInterface::Initialize)
-      .method("Fill", &CatchAtAgeFleetDerivedQuantitiesInterface::Fill)
       .field("landings_numbers_at_age",
              &CatchAtAgeFleetDerivedQuantitiesInterface::
                  landings_numbers_at_age)
@@ -106,10 +101,6 @@ void register_fishery_models(Rcpp::Module& m) {
              &CatchAtAgeFleetDerivedQuantitiesInterface::log_index_expected)
       .field("catch_index",
              &CatchAtAgeFleetDerivedQuantitiesInterface::catch_index)
-      .field("expected_catch",
-             &CatchAtAgeFleetDerivedQuantitiesInterface::expected_catch)
-      .field("expected_index",
-             &CatchAtAgeFleetDerivedQuantitiesInterface::expected_index)
       .field("agecomp_expected",
              &CatchAtAgeFleetDerivedQuantitiesInterface::agecomp_expected)
       .field("lengthcomp_expected",

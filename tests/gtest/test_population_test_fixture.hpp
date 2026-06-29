@@ -183,12 +183,6 @@ class CAAInitializeTestFixture : public testing::Test {
       //
       derived_quantities["catch_index"] = fims::Vector<double>(fleet->n_years);
 
-      derived_quantities["expected_catch"] =
-          fims::Vector<double>(fleet->n_years);
-
-      derived_quantities["expected_index"] =
-          fims::Vector<double>(fleet->n_years);
-
       derived_quantities["agecomp_expected"] =
           fims::Vector<double>(fleet->n_years * fleet->n_ages);
 
@@ -543,14 +537,7 @@ class CAAEvaluateTestFixture : public testing::Test {
       derived_quantities["log_index_expected"] =
           fims::Vector<double>(fleet->n_years);
 
-      //
       derived_quantities["catch_index"] = fims::Vector<double>(fleet->n_years);
-
-      derived_quantities["expected_catch"] =
-          fims::Vector<double>(fleet->n_years);
-
-      derived_quantities["expected_index"] =
-          fims::Vector<double>(fleet->n_years);
 
       derived_quantities["agecomp_expected"] =
           fims::Vector<double>(fleet->n_years * fleet->n_ages);
@@ -844,12 +831,6 @@ class CAAPrepareTestFixture : public testing::Test {
 
       //
       derived_quantities["catch_index"] = fims::Vector<double>(fleet->n_years);
-
-      derived_quantities["expected_catch"] =
-          fims::Vector<double>(fleet->n_years);
-
-      derived_quantities["expected_index"] =
-          fims::Vector<double>(fleet->n_years);
 
       derived_quantities["agecomp_expected"] =
           fims::Vector<double>(fleet->n_years * fleet->n_ages);

@@ -353,8 +353,6 @@ class CatchAtAgeFleetDerivedQuantitiesInterface {
   VariableVector index_expected;
   VariableVector log_index_expected;
   VariableVector catch_index;
-  VariableVector expected_catch;
-  VariableVector expected_index;
   VariableVector agecomp_expected;
   VariableVector lengthcomp_expected;
 
@@ -388,8 +386,6 @@ class CatchAtAgeFleetDerivedQuantitiesInterface {
     index_expected.resize(n_years);
     log_index_expected.resize(n_years);
     catch_index.resize(n_years);
-    expected_catch.resize(n_years);
-    expected_index.resize(n_years);
     agecomp_expected.resize(n_years * n_ages);
     lengthcomp_expected.resize(n_years * n_lengths);
   }
@@ -418,8 +414,6 @@ class CatchAtAgeFleetDerivedQuantitiesInterface {
     index_expected.fill(value);
     log_index_expected.fill(value);
     catch_index.fill(value);
-    expected_catch.fill(value);
-    expected_index.fill(value);
     agecomp_expected.fill(value);
     lengthcomp_expected.fill(value);
   }
@@ -470,10 +464,6 @@ class CatchAtAgeFleetDerivedQuantitiesInterface {
         &(derived_quantities.at("log_index_expected"));
     info->variable_map[catch_index.id_m] =
         &(derived_quantities.at("catch_index"));
-    info->variable_map[expected_catch.id_m] =
-        &(derived_quantities.at("expected_catch"));
-    info->variable_map[expected_index.id_m] =
-        &(derived_quantities.at("expected_index"));
     info->variable_map[agecomp_expected.id_m] =
         &(derived_quantities.at("agecomp_expected"));
     info->variable_map[lengthcomp_expected.id_m] =
@@ -1624,22 +1614,6 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
       derived_quantities_dim_info["catch_index"] = fims_popdy::DimensionInfo(
           "catch_index", fims::Vector<int>{(fleet_interface->n_years.get())},
           fims::Vector<std::string>{"n_years"});
-
-      derived_quantities["expected_catch"] =
-          fims::Vector<Type>(fleet_interface->n_years.get());
-      derived_quantities_dim_info["expected_catch"] =
-          fims_popdy::DimensionInfo(
-              "expected_catch",
-              fims::Vector<int>{(fleet_interface->n_years.get())},
-              fims::Vector<std::string>{"n_years"});
-
-      derived_quantities["expected_index"] =
-          fims::Vector<Type>(fleet_interface->n_years.get());
-      derived_quantities_dim_info["expected_index"] =
-          fims_popdy::DimensionInfo(
-              "expected_index",
-              fims::Vector<int>{(fleet_interface->n_years.get())},
-              fims::Vector<std::string>{"n_years"});
 
       derived_quantities["agecomp_expected"] = fims::Vector<Type>(
           fleet_interface->n_years.get() * fleet_interface->n_ages.get());
