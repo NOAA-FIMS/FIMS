@@ -375,6 +375,7 @@ dimensions_to_tibble <- function(data) {
   #' and shortens them to a simple indexed form.
   better_names <- unlist(data[["header"]]) |>
     gsub(pattern = "^n_?(.+?)s([-\\+]\\d+)?$", replacement = "\\1_i")
+  better_names[better_names == "n_strata"] <- "stratum_i"
   names(data[["dimensions"]]) <- better_names
   if (length(better_names) == 0) {
     # When the header is NULL
