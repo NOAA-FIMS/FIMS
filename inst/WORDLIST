@@ -16,10 +16,12 @@ Baranov
 basicfsa
 Bertalanffy
 Beverton
+bevertonholt
 Bigg
 bindenv
 Bjarne
 bookdown
+browsable
 byrow
 CALLDEFS
 catchability
@@ -42,6 +44,7 @@ dataframe
 dataframes
 DCMAKE
 deqn
+destfile
 dlognorm
 dmultinorm
 Doering
@@ -73,6 +76,7 @@ googletest
 gtest
 gtests
 hkin
+htmltools
 IBMCPP
 ilist
 INAA
@@ -200,6 +204,7 @@ stockplotr
 subfolders
 subvector
 syms
+tagfile
 TESTDOWN
 testthat
 tibble
