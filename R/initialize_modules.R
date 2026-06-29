@@ -49,7 +49,6 @@ initialize_module <- function(parameters, data, module_name, fleet_name = NA_cha
       "mortality_M",
       "mortality_Z",
       "numbers_at_age",
-      "proportion_female",
       "unfished_numbers_at_age",
       "biomass",
       "spawning_biomass",
