@@ -68,7 +68,7 @@ void register_population(Rcpp::Module& m) {
              &PopulationInterface::
                  expected_recruitment)
       .field("sum_selectivity",
-             &PopulationInterface::sum_selectivity);
+             &PopulationInterface::sum_selectivity)
       .method("SetMaturityID", &PopulationInterface::SetMaturityID)
       .method("SetGrowthID", &PopulationInterface::SetGrowthID)
       .method("SetRecruitmentID", &PopulationInterface::SetRecruitmentID)
