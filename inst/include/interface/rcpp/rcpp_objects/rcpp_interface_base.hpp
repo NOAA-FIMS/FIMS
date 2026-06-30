@@ -246,15 +246,14 @@ class VariableVector {
    * for calling accessing from R.
    * @param pos The position of the VariableVector that you want returned.
    */
-  SEXP at(R_xlen_t pos) {
+  Variable at(R_xlen_t pos) {
     if (static_cast<size_t>(pos) == 0 ||
         static_cast<size_t>(pos) > this->storage_m->size()) {
       throw std::invalid_argument("VariableVector: Index out of range");
       FIMS_ERROR_LOG(fims::to_string(pos) + "!<" +
                      fims::to_string(this->size()));
-      return NULL;
     }
-    return Rcpp::wrap(this->storage_m->at(pos - 1));
+    return this->storage_m->at(pos - 1);
   }
 
   /**
@@ -264,11 +263,11 @@ class VariableVector {
    * you want returned. The first position is one and the last position is
    * the same as the size of the VariableVector.
    */
-  Variable& get(size_t pos) {
+  Variable get(size_t pos) {
     if (pos >= this->storage_m->size()) {
       throw std::invalid_argument("VariableVector: Index out of range");
     }
-    return (this->storage_m->at(pos));
+    return this->storage_m->at(pos);
   }
 
   /**

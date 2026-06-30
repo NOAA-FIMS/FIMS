@@ -329,6 +329,8 @@ class CatchAtAgePopulationDerivedQuantitiesInterface {
 #endif
 };
 
+RCPP_EXPOSED_CLASS(CatchAtAgePopulationDerivedQuantitiesInterface)
+
 /**
  * @brief Rcpp interface for catch-at-age fleet derived quantities.
  *
@@ -472,6 +474,8 @@ class CatchAtAgeFleetDerivedQuantitiesInterface {
 #endif
 };
 
+RCPP_EXPOSED_CLASS(CatchAtAgeFleetDerivedQuantitiesInterface)
+
 /**
  * @brief The CatchAtAgeInterface class is used to interface with the
  * CatchAtAge model. It inherits from the FisheryModelInterfaceBase class.
@@ -546,9 +550,9 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
    * @brief Get Rcpp population derived quantities for a population ID.
    *
    * @param population_id The population ID.
-   * @return CatchAtAgePopulationDerivedQuantitiesInterface&
+   * @return CatchAtAgePopulationDerivedQuantitiesInterface
    */
-  CatchAtAgePopulationDerivedQuantitiesInterface *
+  CatchAtAgePopulationDerivedQuantitiesInterface
   GetPopulationDerivedQuantities(uint32_t population_id) {
     std::map<uint32_t, CatchAtAgePopulationDerivedQuantitiesInterface>::
         iterator it = population_derived_quantities->find(population_id);
@@ -557,7 +561,7 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
           "CatchAtAgeInterface::GetPopulationDerivedQuantities: population_id "
           "not found");
     }
-    return &(it->second);
+    return it->second;
   }
 
   /**
@@ -578,9 +582,9 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
    * @brief Get Rcpp fleet derived quantities for a fleet ID.
    *
    * @param fleet_id The fleet ID.
-   * @return CatchAtAgeFleetDerivedQuantitiesInterface&
+   * @return CatchAtAgeFleetDerivedQuantitiesInterface
    */
-  CatchAtAgeFleetDerivedQuantitiesInterface *GetFleetDerivedQuantities(
+  CatchAtAgeFleetDerivedQuantitiesInterface GetFleetDerivedQuantities(
       uint32_t fleet_id) {
     std::map<uint32_t, CatchAtAgeFleetDerivedQuantitiesInterface>::iterator it =
         fleet_derived_quantities->find(fleet_id);
@@ -589,7 +593,7 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
           "CatchAtAgeInterface::GetFleetDerivedQuantities: fleet_id not "
           "found");
     }
-    return &(it->second);
+    return it->second;
   }
 
   /**
