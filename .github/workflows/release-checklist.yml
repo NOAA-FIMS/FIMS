@@ -22,7 +22,7 @@ jobs:
           script: |
             const rawVersion = core.getInput('release_version', { required: true }).trim();
             const version = rawVersion.replace(/^v/, '');
-            const issueTitle = `Release ${version}`;
+            const issueTitle = `Prepare for release ${version}`;
             const repositoryUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}`;
             const workflowsUrl = `${repositoryUrl}/actions/workflows`;
             const issueBody = [
@@ -43,14 +43,10 @@ jobs:
               '',
               '- [ ] Run `devtools::build()` locally.',
               '- [ ] Run `devtools::check()` locally.',
-              '- [ ] Run `covr::report()` locally if coverage changes need review.',
-              `- [ ] Run [call-calc-coverage](${workflowsUrl}/call-calc-coverage.yml).`,
-              `- [ ] Run [run-devtools-test](${workflowsUrl}/run-devtools-test.yml).`,
-              `- [ ] Run [call-r-cmd-check](${workflowsUrl}/call-r-cmd-check.yml).`,
-              `- [ ] Run [run-googletest](${workflowsUrl}/run-googletest.yml).`,
+              '- [ ] Look at `covr::report()` to ensure all changes are adequately covered with tests, where the goal is to maintain 80 percent package coverage.',
+              `- [ ] Inspect output of [call-r-cmd-check](${workflowsUrl}/call-r-cmd-check.yml) to look at warnings and notes to see if there are any changes needed.`,
               `- [ ] Run [run-slow-tests](${workflowsUrl}/run-slow-tests.yml) for pre-release coverage.`,
               `- [ ] Run [r-universe-test](${workflowsUrl}/r-universe-test.yml) to verify package installation behavior.`,
-              `- [ ] Run [test-user-setup-bash](${workflowsUrl}/test-user-setup-bash.yml) if installation or setup guidance changed, or as a pre-release smoke test.`,
               '',
               '### 3. Review release artifacts',
               '',
