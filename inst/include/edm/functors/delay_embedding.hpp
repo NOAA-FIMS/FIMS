@@ -23,7 +23,8 @@ namespace fims_edm {
  * copying values. This means:
  *  - embedded_values: pointers to the E lagged coordinates per row
  *    [x_t, x_{t-tau}, ..., x_{t-(E-1)tau}]
- *  - target_values: pointers to the target time-point value x_t for each row
+ *  - target_values: pointers to the forecast target x_{t+h} for each row
+ *    (with default forecast_horizon h=1, this is x_{t+1})
  *
  * Both point into the same underlying input_values vector, so any update to
  * that vector (e.g., during TMB optimization iterations) is automatically
@@ -70,8 +71,9 @@ struct DelayEmbeddingMatrix {
    */
   std::vector<const Type*> embedded_uncertainty;
   /**
-   * @brief Pointers to the uncertainty at the target time-point for each row.
-   * target_uncertainty[row] points to sigma_t for that row.
+   * @brief Pointers to the uncertainty at the forecast target time-point for each row.
+   * target_uncertainty[row] points to sigma_{target_index + forecast_horizon},
+   * i.e., the uncertainty at the predicted time step (mirrors target_values).
    * Empty when no uncertainty series is provided.
    */
   std::vector<const Type*> target_uncertainty;

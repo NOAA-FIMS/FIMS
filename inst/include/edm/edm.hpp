@@ -9,7 +9,7 @@
  *  - SimplexProjection (Sugihara & May, 1990)
  *  - SMapProjection (Sugihara, 1994)
  *
- * Additional prediction algorithms (S-map, GP-EDM) will be added here as
+ * Additional prediction algorithms (e.g., GP-EDM) will be added here as
  * further headers are implemented.
  *
  * @copyright This file is part of the NOAA, National Marine Fisheries Service
