@@ -164,7 +164,7 @@ double add(double x, double y) {
 
 ### Vectors
 
-Vectors are a compound type and are available in the standard library, i.e., [`std::vector`](https://cplusplus.com/reference/vector/vector/). Compound types are built from primitive types like `int`. A vector will be compound integer if the vector is composed of integers, compound double if the vector is composed of doubles, and so on. The type of all elements in the vector must be the same and must be declared when the vector is created, e.g., `std::vector<int>`. For example, in FIMS we have a vector of parameter names that we declare as a vector of strings, e.g., `std::vector<std::string> parameter_names` in [`information.hpp`](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/common/information.hpp).
+Vectors are a compound type and are available in the standard library, i.e., [`std::vector`](https://cplusplus.com/reference/vector/vector/). Compound types are built from primitive types like `int`. A vector will be compound integer if the vector is composed of integers, compound double if the vector is composed of doubles, and so on. The type of all elements in the vector must be the same and must be declared when the vector is created, e.g., `std::vector<int>`. For example, in FIMS we have a vector of Variable names that we declare as a vector of strings, e.g., `std::vector<std::string> Variable_names` in [`information.hpp`](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/common/information.hpp).
 
 `std::vector` has a number of member functions (see the [rcpp methods section in the Rcpp vignette](training-intro-rcpp.html#rcpp-methods)) that can be used to operate on a vector. Below are a few member functions of `std::vector` that are commonly used or used within the FIMS code, e.g., we use `resize` quite often. See the [documentation for `std::vector`](https://en.cppreference.com/w/cpp/container/vector) for the full list of member functions.
 
@@ -228,7 +228,7 @@ Type my_add(Type x, Type y){
 
 ### Syntax in FIMS
 
-In templated code, `class` is interchangeable with `typename`, where `typename` is seen as a more modern way the templated code. Additionally, you do not have to use `Type` for the name of the `typename`. You could use a capital T, or many examples use a capital A, e.g., `template <typename A>` instead of `template <class Type>`. Within the FIMS codebase, we exclusively use `class` instead of `typename` and `Type` to declare the type parameter name. You can see several examples of templated code in [`fims_math.hpp`](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/common/fims_math.hpp).
+In templated code, `class` is interchangeable with `typename`, where `typename` is seen as a more modern way the templated code. Additionally, you do not have to use `Type` for the name of the `typename`. You could use a capital T, or many examples use a capital A, e.g., `template <typename A>` instead of `template <class Type>`. Within the FIMS codebase, we exclusively use `class` instead of `typename` and `Type` to declare the type Variable name. You can see several examples of templated code in [`fims_math.hpp`](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/common/fims_math.hpp).
 
 {Rcpp} does not support C++ templating so you cannot create templated code if you plan on compiling it with `Rcpp::cppFunction()` (see the [vignette on {Rcpp}](training-intro-rcpp.html#writing-cpp-functions) for where it does work). Instead, you have to compile the C++ code using the terminal.
 

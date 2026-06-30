@@ -697,7 +697,7 @@ methods::setValidity(
     for (present_type in grep("_comp", present_types, value = TRUE)) {
       test <- object@data |>
         dplyr::filter(.data$type == present_type, .data$value != -999) |>
-        dplyr::group_by(.data$name, .data$timing, .drop = FALSE) |>
+        dplyr::group_by(name, .data$timing, .drop = FALSE) |>
         dplyr::group_map(.keep = TRUE, \(.x, .y) {
           validate_composition_data(.x)
         })
@@ -1021,11 +1021,11 @@ FIMSFrame <- function(data) {
       column = "age",
       types = c("weight_at_age", "age_comp")
     )
-    summary_by_name <- dplyr::count(missing_ages, .data$name, .data$timing) |>
+    summary_by_name <- dplyr::count(missing_ages, name, .data$timing) |>
       dplyr::filter(.data$n != n_ages) |>
       dplyr::summarize(
         timings = paste(.data$timing, collapse = ", "),
-        .by = .data$name
+        .by = name
       )
     if (NROW(summary_by_name) > 0) {
       cli::cli_abort(
@@ -1046,11 +1046,11 @@ FIMSFrame <- function(data) {
       column = "length",
       types = "length_comp"
     )
-    summary_by_name <- dplyr::count(missing_lengths, .data$name, .data$timing) |>
+    summary_by_name <- dplyr::count(missing_lengths, name, .data$timing) |>
       dplyr::filter(.data$n != n_lengths) |>
       dplyr::summarize(
         timings = paste(.data$timing, collapse = ", "),
-        .by = .data$name
+        .by = name
       )
     if (NROW(summary_by_name) > 0) {
       cli::cli_abort(
