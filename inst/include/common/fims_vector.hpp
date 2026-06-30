@@ -26,6 +26,7 @@ namespace fims {
 template <typename Type>
 class Vector {
   std::vector<Type> vec_m;
+  
   /**
    * @brief friend comparison operator. Allows the operator to see private
    * members of fims::Vector<Type>.
@@ -35,6 +36,7 @@ class Vector {
                          const fims::Vector<T> &rhs);
 
  public:
+
   // Member Types
 
   typedef

@@ -176,8 +176,8 @@ class AgeCompDataInterface : public DataInterfaceBase {
 
   template <typename Type>
   bool add_to_fims_tmb_internal() {
-    std::shared_ptr<fims_data_object::DataObject<Type>> age_comp_data =
-        std::make_shared<fims_data_object::DataObject<Type>>(this->ymax,
+    std::shared_ptr<fims_variable_object::VariableObject<Type>> age_comp_data =
+        std::make_shared<fims_variable_object::VariableObject<Type>>(this->ymax,
                                                              this->amax);
 
     age_comp_data->id = this->id;
@@ -308,8 +308,8 @@ class LengthCompDataInterface : public DataInterfaceBase {
 #ifdef TMB_MODEL
   template <typename Type>
   bool add_to_fims_tmb_internal() {
-    std::shared_ptr<fims_data_object::DataObject<Type>> length_comp_data =
-        std::make_shared<fims_data_object::DataObject<Type>>(this->ymax,
+    std::shared_ptr<fims_variable_object::VariableObject<Type>> length_comp_data =
+        std::make_shared<fims_variable_object::VariableObject<Type>>(this->ymax,
                                                              this->lmax);
     length_comp_data->id = this->id;
     for (int y = 0; y < ymax; y++) {
@@ -429,8 +429,8 @@ class IndexDataInterface : public DataInterfaceBase {
 
   template <typename Type>
   bool add_to_fims_tmb_internal() {
-    std::shared_ptr<fims_data_object::DataObject<Type>> data =
-        std::make_shared<fims_data_object::DataObject<Type>>(this->ymax);
+    std::shared_ptr<fims_variable_object::VariableObject<Type>> data =
+        std::make_shared<fims_variable_object::VariableObject<Type>>(this->ymax);
 
     data->id = this->id;
 
@@ -550,8 +550,8 @@ class LandingsDataInterface : public DataInterfaceBase {
 
   template <typename Type>
   bool add_to_fims_tmb_internal() {
-    std::shared_ptr<fims_data_object::DataObject<Type>> data =
-        std::make_shared<fims_data_object::DataObject<Type>>(this->ymax);
+    std::shared_ptr<fims_variable_object::VariableObject<Type>> data =
+        std::make_shared<fims_variable_object::VariableObject<Type>>(this->ymax);
 
     data->id = this->id;
 

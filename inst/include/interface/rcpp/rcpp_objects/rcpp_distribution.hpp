@@ -26,38 +26,94 @@ class DistributionsInterfaceBase : public FIMSRcppInterfaceBase {
    * @brief The local ID of the DistributionsInterfaceBase object.
    */
   uint32_t id_m;
+
   /**
-   * @brief The unique ID for the variable map that points to a fims::Vector.
+   * @brief The total log probability density function value.
    */
-  std::shared_ptr<std::vector<uint32_t>> key_m;
+  double lpdf_m = 0;
+ 
   /**
-   * @brief The type of density input. The options are prior, re, or data.
+   * @brief Vector that records the individual log probability function 
+   * values for each observation.
    */
-  SharedString input_type_m;
+  RealVector lpdf_vec_m;
+
   /**
-   * @brief Control flag indicating whether to use the expected mean in the
-   * distribution calculations.
-   *
-   * This shared string member serves as a boolean flag (i.e., "yes" or "no")
-   * that determines whether the distribution should use the `expected_mean`
-   * vector or other expected values (e.g., from data or random effects) when
-   * computing the expected value in the likelihood calculations.
-   *
-   * When set to "no" (default), the distribution uses expected values based on
-   * the `input_type` setting (data expected values for "data", random effects
-   * expected values for "random_effects", or standard expected values
-   * otherwise).
-   *
-   * When set to "yes" (typically by calling `set_distribution_mean()`), the
-   * distribution overrides the default expected value source and uses the
-   * `expected_mean` vector instead. This is useful for setting a fixed mean
-   * value for the distribution that doesn't depend on other model components.
-   *
-   * @see set_distribution_mean() for the method that sets this flag to "yes".
-   * @see DensityComponentBase::get_expected() in density_components_base.hpp
-   * for the implementation that checks this flag.
+   * @brief The type of likelihood input. The options are DATA, RANDOM_EFFECT, 
+   * PRIOR, or PENALTY.
    */
-  SharedString use_mean_m = fims::to_string("no");
+  SharedString likelihood_type_m; //Also an enum class? Is this ok on R end??
+
+  /**
+   * @brief The distribution function for the likelihood component. 
+   * The options are NORMAL, LOGNORMAL, or MULTINOMIAL.
+   */
+  SharedString distribution_type_m; //Need to make this an enum class maybe??
+
+  /**
+   * @brief Fixed input values to calculate a likelihood of occurance for.
+   */
+  ParameterVector observed_values_m;
+  
+  /**
+   * @brief Key to point the observed value at a data source, parameter, 
+   * or derived model quantity.
+   */
+  ParameterVector observed_key_m;
+  
+  /**
+   * @brief Vector of values to specify a subset of the observed values or 
+   * pointed vector to use in the likelihood calculation.
+   */
+  ParameterVector observed_subvector_m;
+
+  /**
+   * @brief The expected values of the distribution used to calculate 
+   * likelihoods.
+   */
+  ParameterVector expected_values_m;
+  
+  /**
+   * @brief Key to point the expected value at a data source, parameter, 
+   * or derived model quantity.
+   */
+  ParameterVector expected_key_m;
+  
+  /**
+   * @brief Vector of values to specify a subset of the expected values or 
+   * pointed vector to use in the likelihood calculation.
+   */
+  ParameterVector expected_subvector_m;
+
+  /**
+   * @brief The uncertainty values of the distribution used to calculate 
+   * likelihoods.
+   */
+  ParameterVector uncertainty_values_m;
+  
+  /**
+   * @brief Key to point the uncertainty value at a data source, parameter, 
+   * or derived model quantity.
+   */
+  ParameterVector uncertainty_key_m;
+  
+  /**
+   * @brief Vector of values to specify a subset of the uncertainty values or 
+   * pointed vector to use in the likelihood calculation.
+   */
+  ParameterVector uncertainty_subvector_m;
+  
+  /**
+   * @brief Vector of values to weight the likelihood calculation results.
+   */
+  ParameterVector lambda_values_m;
+
+  /**
+   * @brief Dimensions of the value vectors used to subset the likelihood 
+   * calculations needed for multivariate distributions.
+   */
+  ParameterVector dims_m;
+  
   /**
    * @brief The map associating the ID of the DistributionsInterfaceBase to the
      DistributionsInterfaceBase objects. This is a live object, which is an
@@ -65,15 +121,8 @@ class DistributionsInterfaceBase : public FIMSRcppInterfaceBase {
    */
   static std::map<uint32_t, std::shared_ptr<DistributionsInterfaceBase>>
       live_objects;
-  /**
-   * @brief The ID of the observed data object, which is set to -999.
-   */
-  SharedInt interface_observed_data_id_m = -999;
 
-  /**
-   * @brief The log probability density function value.
-   */
-  double lpdf_value = 0;
+
   /**
    * @brief The constructor.
    */
@@ -93,9 +142,7 @@ class DistributionsInterfaceBase : public FIMSRcppInterfaceBase {
   DistributionsInterfaceBase(const DistributionsInterfaceBase &other)
       : id_m(other.id_m),
         key_m(other.key_m),
-        input_type_m(other.input_type_m),
-        use_mean_m(other.use_mean_m),
-        interface_observed_data_id_m(other.interface_observed_data_id_m) {}
+        input_type_m(other.input_type_m) {}
 
   /**
    * @brief The destructor.
@@ -121,31 +168,6 @@ class DistributionsInterfaceBase : public FIMSRcppInterfaceBase {
   }
 
   /**
-   * @brief Set the expected mean value for the distribution.
-   *
-   * This virtual function provides an interface for setting a fixed mean value
-   * for distribution objects. When overridden in derived classes, this method
-   * typically stores the provided mean value as a fixed effect parameter and
-   * marks the distribution to use the mean in its calculations.
-   *
-   * The base class implementation returns false to indicate the operation is
-   * not supported. Derived classes that support mean specification should
-   * override this method to implement the actual functionality.
-   *
-   * @param input_value The numeric value to set as the distribution's expected
-   * mean. This value will be treated as a fixed effect parameter (not
-   * estimated) in derived class implementations.
-   *
-   * @return bool Returns true if the mean was successfully set, false
-   * otherwise. The base class implementation always returns false to indicate
-   * the operation is not supported by default.
-   *
-   * @see DnormDistributionsInterface::set_distribution_mean for an example
-   * implementation that sets the mean as a fixed effect parameter.
-   */
-  virtual bool set_distribution_mean(double input_value) { return false; }
-
-  /**
    * @brief Set the unique ID for the observed data object.
    *
    * @param observed_data_id Unique ID for the Observed Age Comp Data
@@ -166,31 +188,7 @@ class DistributionsInterfaceBase : public FIMSRcppInterfaceBase {
  */
 class DnormDistributionsInterface : public DistributionsInterfaceBase {
  public:
-  /**
-   * @brief Observed data.
-   */
-  VariableVector observed_values;
-  /**
-   * @brief The expected values, which would be the mean of x for this
-   * distribution.
-   */
-  VariableVector expected_values;
-  /**
-   * @brief The expected mean, which would be the mean of x for this
-   * distribution.
-   */
-  VariableVector expected_mean;
-  /**
-   * @brief The uncertainty, which would be the standard deviation of x for the
-   * normal distribution.
-   */
-  VariableVector log_sd;
-  /**
-   * @brief Vector that records the individual log probability function for each
-   * observation.
-   */
-  RealVector lpdf_vec; /**< The vector*/
-
+  
   /**
    * @brief The constructor.
    */
@@ -210,8 +208,7 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
       : DistributionsInterfaceBase(other),
         observed_values(other.observed_values),
         expected_values(other.expected_values),
-        expected_mean(other.expected_mean),
-        log_sd(other.log_sd),
+        uncertainty_values(other.uncertainty_values),
         lpdf_vec(other.lpdf_vec) {}
 
   /**
@@ -231,16 +228,6 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
    */
   virtual bool set_observed_data(int observed_data_id) {
     this->interface_observed_data_id_m.set(observed_data_id);
-    return true;
-  }
-
-  /**
-   * @copydoc DistributionsInterfaceBase::set_distribution_mean
-   */
-  virtual bool set_distribution_mean(double input_value) {
-    this->expected_mean[0].initial_value_m = input_value;
-    this->expected_mean[0].estimation_type_m.set("fixed_effects");
-    this->use_mean_m.set(fims::to_string("yes"));
     return true;
   }
 
@@ -267,21 +254,14 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
     fims_distributions::NormalLPDF<double> dnorm;
     dnorm.observed_values.resize(this->observed_values.size());
     dnorm.expected_values.resize(this->expected_values.size());
-    dnorm.log_sd.resize(this->log_sd.size());
-    dnorm.expected_mean.resize(this->expected_mean.size());
+    dnorm.uncertainty_values.resize(this->uncertainty_values.size());
     for (size_t i = 0; i < this->observed_values.size(); i++) {
       dnorm.observed_values[i] = this->observed_values[i].initial_value_m;
     }
     for (size_t i = 0; i < this->expected_values.size(); i++) {
       dnorm.expected_values[i] = this->expected_values[i].initial_value_m;
     }
-    for (size_t i = 0; i < this->log_sd.size(); i++) {
-      dnorm.log_sd[i] = this->log_sd[i].initial_value_m;
-    }
-    for (size_t i = 0; i < this->expected_mean.size(); i++) {
-      dnorm.expected_mean[i] = this->expected_mean[i].initial_value_m;
-    }
-    dnorm.use_mean = this->use_mean_m;
+    
     return dnorm.evaluate();
   }
 
