@@ -50,6 +50,7 @@ dontrun
 dplyr
 DSEM
 DTMB
+Eigen
 emph
 endcond
 envir
