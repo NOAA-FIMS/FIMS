@@ -215,7 +215,8 @@ class FisheryModelInterfaceBase : public FIMSRcppInterfaceBase {
 /**
  * @brief Rcpp interface for catch-at-age population derived quantities.
  *
- * @details This interface exposes derived quantities to R as explicit VariableVector members.
+ * @details This interface exposes derived quantities to R as explicit
+ * VariableVector members.
  */
 class CatchAtAgePopulationDerivedQuantitiesInterface {
  public:
@@ -237,7 +238,7 @@ class CatchAtAgePopulationDerivedQuantitiesInterface {
   /**
    * @brief Constructor.
    */
-  CatchAtAgePopulationDerivedQuantitiesInterface() { }
+  CatchAtAgePopulationDerivedQuantitiesInterface() {}
 
   /**
    * @brief Resize all population derived quantities.
@@ -285,7 +286,7 @@ class CatchAtAgePopulationDerivedQuantitiesInterface {
     sum_selectivity.fill(value);
   }
 
-#ifdef TMB_MODEL //AMH: why does this need to be in a TMB_MODEL wrapper?
+#ifdef TMB_MODEL  // AMH: why does this need to be in a TMB_MODEL wrapper?
   /**
    * @brief Pass derived quantities to variable_map.
    *
@@ -311,8 +312,7 @@ class CatchAtAgePopulationDerivedQuantitiesInterface {
         &(derived_quantities.at("numbers_at_age"));
     info->variable_map[unfished_numbers_at_age.id_m] =
         &(derived_quantities.at("unfished_numbers_at_age"));
-    info->variable_map[biomass.id_m] =
-        &(derived_quantities.at("biomass"));
+    info->variable_map[biomass.id_m] = &(derived_quantities.at("biomass"));
     info->variable_map[spawning_biomass.id_m] =
         &(derived_quantities.at("spawning_biomass"));
     info->variable_map[unfished_biomass.id_m] =
@@ -334,7 +334,8 @@ RCPP_EXPOSED_CLASS(CatchAtAgePopulationDerivedQuantitiesInterface)
 /**
  * @brief Rcpp interface for catch-at-age fleet derived quantities.
  *
- * @details This interface exposes derived quantities to R as explicit VariableVector members.
+ * @details This interface exposes derived quantities to R as explicit
+ * VariableVector members.
  */
 class CatchAtAgeFleetDerivedQuantitiesInterface {
  public:
@@ -361,7 +362,7 @@ class CatchAtAgeFleetDerivedQuantitiesInterface {
   /**
    * @brief Constructor.
    */
-  CatchAtAgeFleetDerivedQuantitiesInterface() {  }
+  CatchAtAgeFleetDerivedQuantitiesInterface() {}
 
   /**
    * @brief Resize all fleet derived quantities.
@@ -420,7 +421,7 @@ class CatchAtAgeFleetDerivedQuantitiesInterface {
     lengthcomp_expected.fill(value);
   }
 
-#ifdef TMB_MODEL//AMH: why does this need to be in a TMB_MODEL wrapper?
+#ifdef TMB_MODEL  // AMH: why does this need to be in a TMB_MODEL wrapper?
   /**
    * @brief Pass derived quantities to variable_map.
    *
@@ -487,8 +488,7 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
   typedef std::map<uint32_t, CatchAtAgeFleetDerivedQuantitiesInterface>
       FleetDerivedQuantitiesMap;
 
-  std::shared_ptr<PopulationDerivedQuantitiesMap>
-      population_derived_quantities;
+  std::shared_ptr<PopulationDerivedQuantitiesMap> population_derived_quantities;
   std::shared_ptr<FleetDerivedQuantitiesMap> fleet_derived_quantities;
 
   /**
@@ -542,8 +542,7 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
    */
   void InitializePopulationDerivedQuantities(uint32_t population_id,
                                              size_t n_years, size_t n_ages) {
-    (*population_derived_quantities)[population_id].Initialize(n_years,
-                                                               n_ages);
+    (*population_derived_quantities)[population_id].Initialize(n_years, n_ages);
   }
 
   /**
@@ -552,10 +551,10 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
    * @param population_id The population ID.
    * @return CatchAtAgePopulationDerivedQuantitiesInterface
    */
-  CatchAtAgePopulationDerivedQuantitiesInterface
-  GetPopulationDerivedQuantities(uint32_t population_id) {
-    std::map<uint32_t, CatchAtAgePopulationDerivedQuantitiesInterface>::
-        iterator it = population_derived_quantities->find(population_id);
+  CatchAtAgePopulationDerivedQuantitiesInterface GetPopulationDerivedQuantities(
+      uint32_t population_id) {
+    std::map<uint32_t, CatchAtAgePopulationDerivedQuantitiesInterface>::iterator
+        it = population_derived_quantities->find(population_id);
     if (it == population_derived_quantities->end()) {
       throw std::out_of_range(
           "CatchAtAgeInterface::GetPopulationDerivedQuantities: population_id "
