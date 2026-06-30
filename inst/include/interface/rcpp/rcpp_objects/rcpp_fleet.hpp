@@ -247,6 +247,7 @@ class FleetInterface : public FleetInterfaceBase {
         observed_index_units(other.observed_index_units),
         log_q(other.log_q),
         log_Fmort(other.log_Fmort),
+        age_to_length_conversion(other.age_to_length_conversion),
         landings_numbers_at_age(other.landings_numbers_at_age),
         landings_weight_at_age(other.landings_weight_at_age),
         landings_numbers_at_length(other.landings_numbers_at_length),
