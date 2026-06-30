@@ -996,7 +996,7 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
               "total_landings_weight",
               fims::Vector<int>{(int)population_interface->n_years.get()},
               fims::Vector<std::string>{"n_years"});
-      info->variable_map[total_landings_weight.id_m] = &derived_quantities["total_landings_weight"];
+      info->variable_map[population_interface->total_landings_weight.id_m] = &derived_quantities["total_landings_weight"];
 
       derived_quantities["total_landings_numbers"] =
           fims::Vector<Type>(population_interface->n_years.get());
@@ -1006,7 +1006,7 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
               "total_landings_numbers",
               fims::Vector<int>{population_interface->n_years.get()},
               fims::Vector<std::string>{"n_years"});
-      info->variable_map[total_landings_numbers.id_m] = &derived_quantities["total_landings_numbers"];
+      info->variable_map[population_interface->total_landings_numbers.id_m] = &derived_quantities["total_landings_numbers"];
 
 
       derived_quantities["mortality_F"] = fims::Vector<Type>(
@@ -1016,7 +1016,7 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
           fims::Vector<int>{population_interface->n_years.get(),
                             population_interface->n_ages.get()},
           fims::Vector<std::string>{"n_years", "n_ages"});
-      info->variable_map[mortality_F.id_m] = &derived_quantities["mortality_F"];
+      info->variable_map[population_interface->mortality_F.id_m] = &derived_quantities["mortality_F"];
 
 
       derived_quantities["mortality_M"] = fims::Vector<Type>(
@@ -1026,7 +1026,7 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
           fims::Vector<int>{population_interface->n_years.get(),
                             population_interface->n_ages.get()},
           fims::Vector<std::string>{"n_years", "n_ages"});
-      info->variable_map[mortality_M.id_m] = &derived_quantities["mortality_M"];
+      info->variable_map[population_interface->mortality_M.id_m] = &derived_quantities["mortality_M"];
 
       derived_quantities["mortality_Z"] = fims::Vector<Type>(
           population_interface->n_years.get() * population_interface->n_ages.get());
@@ -1035,7 +1035,7 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
           fims::Vector<int>{population_interface->n_years.get(),
                             population_interface->n_ages.get()},
           fims::Vector<std::string>{"n_years", "n_ages"});
-      info->variable_map[mortality_Z.id_m] = &derived_quantities["mortality_Z"];
+      info->variable_map[population_interface->mortality_Z.id_m] = &derived_quantities["mortality_Z"];
 
       derived_quantities["numbers_at_age"] = fims::Vector<Type>(
           (population_interface->n_years.get() + 1) * population_interface->n_ages.get());
@@ -1044,7 +1044,7 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
           fims::Vector<int>{(population_interface->n_years.get() + 1),
                             population_interface->n_ages.get()},
           fims::Vector<std::string>{"n_years+1", "n_ages"});
-      info->variable_map[numbers_at_age.id_m] = &derived_quantities["numbers_at_age"];
+      info->variable_map[population_interface->numbers_at_age.id_m] = &derived_quantities["numbers_at_age"];
 
       derived_quantities["unfished_numbers_at_age"] = fims::Vector<Type>(
           (population_interface->n_years.get() + 1) * population_interface->n_ages.get());
@@ -1054,14 +1054,14 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
               fims::Vector<int>{(population_interface->n_years.get() + 1),
                                 population_interface->n_ages.get()},
               fims::Vector<std::string>{"n_years+1", "n_ages"});
-      info->variable_map[unfished_numbers_at_age.id_m] = &derived_quantities["unfirshed_numbers_at_age"];
+      info->variable_map[population_interface->unfished_numbers_at_age.id_m] = &derived_quantities["unfirshed_numbers_at_age"];
 
       derived_quantities["biomass"] =
           fims::Vector<Type>((population_interface->n_years.get() + 1));
       derived_quantities_dim_info["biomass"] = fims_popdy::DimensionInfo(
           "biomass", fims::Vector<int>{(population_interface->n_years.get() + 1)},
           fims::Vector<std::string>{"n_years+1"});
-      info->variable_map[biomass.id_m] = &derived_quantities["biomass"];
+      info->variable_map[population_interface->biomass.id_m] = &derived_quantities["biomass"];
 
 
       derived_quantities["spawning_biomass"] =
@@ -1071,7 +1071,7 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
               "spawning_biomass",
               fims::Vector<int>{(population_interface->n_years.get() + 1)},
               fims::Vector<std::string>{"n_years+1"});
-      info->variable_map[spawning_biomass.id_m] = &derived_quantities["spawning_biomass"];
+      info->variable_map[population_interface->spawning_biomass.id_m] = &derived_quantities["spawning_biomass"];
 
       derived_quantities["unfished_biomass"] =
           fims::Vector<Type>((population_interface->n_years.get() + 1));
@@ -1080,7 +1080,7 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
               "unfished_biomass",
               fims::Vector<int>{(population_interface->n_years.get() + 1)},
               fims::Vector<std::string>{"n_years+1"});
-      info->variable_map[unfished_biomass.id_m] = &derived_quantities["unfished_biomass"];
+      info->variable_map[population_interface->unfished_biomass.id_m] = &derived_quantities["unfished_biomass"];
 
       derived_quantities["unfished_spawning_biomass"] =
           fims::Vector<Type>((population_interface->n_years.get() + 1));
@@ -1089,7 +1089,7 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
               "unfished_spawning_biomass",
               fims::Vector<int>{(population_interface->n_years.get() + 1)},
               fims::Vector<std::string>{"n_years+1"});
-      info->variable_map[unfished_spawning_biomass.id_m] = &derived_quantities["unfished_spawning_biomass"];
+      info->variable_map[population_interface->unfished_spawning_biomass.id_m] = &derived_quantities["unfished_spawning_biomass"];
 
       derived_quantities["proportion_mature_at_age"] = fims::Vector<Type>(
           (population_interface->n_years.get() + 1) * population_interface->n_ages.get());
@@ -1099,7 +1099,7 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
               fims::Vector<int>{(population_interface->n_years.get() + 1),
                                 population_interface->n_ages.get()},
               fims::Vector<std::string>{"n_years+1", "n_ages"});
-      info->variable_map[proportion_mature_at_age.id_m] = &derived_quantities["proportion_mature_at_age"];
+      info->variable_map[population_interface->proportion_mature_at_age.id_m] = &derived_quantities["proportion_mature_at_age"];
 
       derived_quantities["expected_recruitment"] =
           fims::Vector<Type>((population_interface->n_years.get() + 1));
@@ -1108,7 +1108,7 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
               "expected_recruitment",
               fims::Vector<int>{(population_interface->n_years.get() + 1)},
               fims::Vector<std::string>{"n_years+1"});
-      info->variable_map[expected_recruitment.id_m] = &derived_quantities["expected_recruitment"];
+      info->variable_map[population_interface->expected_recruitment.id_m] = &derived_quantities["expected_recruitment"];
 
       derived_quantities["sum_selectivity"] = fims::Vector<Type>(
           population_interface->n_years.get() * population_interface->n_ages.get());
@@ -1118,7 +1118,7 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
               fims::Vector<int>{population_interface->n_years.get(),
                                 population_interface->n_ages.get()},
               fims::Vector<std::string>{"n_years", "n_ages"});
-      info->variable_map[sum_selectivity.id_m] = &derived_quantities["sum_selectivity"];
+      info->variable_map[population_interface->sum_selectivity.id_m] = &derived_quantities["sum_selectivity"];
 
       // replace elements in the variable map
 
