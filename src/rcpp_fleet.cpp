@@ -30,13 +30,50 @@ void register_fleet(Rcpp::Module& m) {
              &FleetInterface::observed_landings_units)
       .field("observed_index_units", &FleetInterface::observed_index_units)
       .field("log_index_expected", &FleetInterface::log_index_expected)
-      .field("log_landings_expected", &FleetInterface::log_landings_expected)
-      .field("agecomp_expected", &FleetInterface::agecomp_expected)
-      .field("lengthcomp_expected", &FleetInterface::lengthcomp_expected)
-      .field("agecomp_proportion", &FleetInterface::agecomp_proportion)
-      .field("lengthcomp_proportion", &FleetInterface::lengthcomp_proportion)
       .field("age_to_length_conversion",
              &FleetInterface::age_to_length_conversion)
+      .field("landings_numbers_at_age",
+             &CatchAtAgeInterface::
+                 landings_numbers_at_age)
+      .field("landings_weight_at_age",
+             &CatchAtAgeInterface::
+                 landings_weight_at_age)
+      .field("landings_numbers_at_length",
+             &CatchAtAgeInterface::
+                 landings_numbers_at_length)
+      .field("landings_weight",
+             &CatchAtAgeInterface::landings_weight)
+      .field("landings_numbers",
+             &CatchAtAgeInterface::landings_numbers)
+      .field("landings_expected",
+             &CatchAtAgeInterface::landings_expected)
+      .field("log_landings_expected",
+             &CatchAtAgeInterface::log_landings_expected)
+      .field("agecomp_proportion",
+             &CatchAtAgeInterface::agecomp_proportion)
+      .field("lengthcomp_proportion",
+             &CatchAtAgeInterface::lengthcomp_proportion)
+      .field("index_numbers_at_age",
+             &CatchAtAgeInterface::index_numbers_at_age)
+      .field("index_weight_at_age",
+             &CatchAtAgeInterface::index_weight_at_age)
+      .field("index_numbers_at_length",
+             &CatchAtAgeInterface::
+                 index_numbers_at_length)
+      .field("index_weight",
+             &CatchAtAgeInterface::index_weight)
+      .field("index_numbers",
+             &CatchAtAgeInterface::index_numbers)
+      .field("index_expected",
+             &CatchAtAgeInterface::index_expected)
+      .field("log_index_expected",
+             &CatchAtAgeInterface::log_index_expected)
+      .field("catch_index",
+             &CatchAtAgeInterface::catch_index)
+      .field("agecomp_expected",
+             &CatchAtAgeInterface::agecomp_expected)
+      .field("lengthcomp_expected",
+             &CatchAtAgeInterface::lengthcomp_expected)
       .method("get_id", &FleetInterface::get_id)
       .method("SetName", &FleetInterface::SetName)
       .method("GetName", &FleetInterface::GetName)

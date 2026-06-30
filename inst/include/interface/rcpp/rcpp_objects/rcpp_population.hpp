@@ -154,6 +154,79 @@ class PopulationInterface : public PopulationInterfaceBase {
    */
   SharedString name = fims::to_string("NA");
 
+  //Population based derived quantities
+   /**
+  * @brief total annual landings removed from a population by all fleets in 
+  * weight 
+  */
+ ParameterVector total_landings_weight;
+ 
+ /**
+  * @brief total annual landings removed from a population by all fleets in 
+  * numbers 
+  */
+ ParameterVector total_landings_numbers;
+ 
+ /**
+  * @brief total annual fishing mortality a population is subject to
+  */
+ ParameterVector mortality_F;
+ 
+ /**
+  * @brief total annual natural mortality a population is subject to
+  */
+ ParameterVector mortality_M;
+ 
+ /**
+  * @brief total annual mortality a population is subject to
+  */
+ ParameterVector mortality_Z;
+ 
+ /**
+  * @brief Current population composition in numbers at age 
+  */
+ ParameterVector numbers_at_age;
+ 
+ /**
+  * @brief Theoretical population composition in numbers at age if no fishing
+  * had occured
+  */
+ ParameterVector unfished_numbers_at_age;
+ 
+ /**
+  * @brief total weight of all fish in the population
+  */
+ ParameterVector biomass;
+ /**
+  * @brief total weight of mature fish in the population
+  */
+ ParameterVector spawning_biomass;
+ /**
+  * @brief total theoretical weight of all fish in the population if no fishing
+  * had occured
+  */
+ ParameterVector unfished_biomass;
+ /**
+  * @brief total theoretical weight of mature fish in the population if no 
+  * fishing had occured
+  */
+ ParameterVector unfished_spawning_biomass;
+ /**
+  * @brief fraction of all fish at a given age that are sexualy mature at each
+  * age
+  */
+ ParameterVector proportion_mature_at_age;
+ /**
+  * @brief the model expected recruitment each year based on stock recruit 
+  * relationship
+  */
+ ParameterVector expected_recruitment;
+
+ /**
+  * @brief sum of selectivity at age across all fleets for a population
+  */
+ ParameterVector sum_selectivity;
+
   /**
    * @brief The constructor.
    */
@@ -188,8 +261,20 @@ class PopulationInterface : public PopulationInterfaceBase {
         log_f_multiplier(other.log_f_multiplier),
         log_init_naa(other.log_init_naa),
         proportion_female(other.proportion_female),
-        ages(other.ages),
-        name(other.name) {}
+        total_landings_weight(other.total_landings_weight),
+        total_landings_numbers(other.total_landings_numbers),
+        mortality_F(other.mortality_F),
+        mortality_M(other.mortality_M),
+        mortality_Z(other.mortality_Z),
+        numbers_at_age(other.numbers_at_age),
+        unfished_numbers_at_age(other.unfished_numbers_at_age),
+        biomass(other.biomass),
+        spawning_biomass(other.spawning_biomass),
+        unfished_biomass(other.unfished_biomass),
+        unfished_spawning_biomass(other.unfished_spawning_biomass),
+        proportion_mature_at_age(other.proportion_mature_at_age),
+        expected_recruitment(other.expected_recruitment),
+        sum_selectivity(other.sum_selectivity) {}
 
   /**
    * @brief The destructor.
