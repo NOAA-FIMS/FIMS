@@ -1054,7 +1054,7 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
               fims::Vector<int>{(population_interface->n_years.get() + 1),
                                 population_interface->n_ages.get()},
               fims::Vector<std::string>{"n_years+1", "n_ages"});
-      info->variable_map[population_interface->unfished_numbers_at_age.id_m] = &derived_quantities["unfirshed_numbers_at_age"];
+      info->variable_map[population_interface->unfished_numbers_at_age.id_m] = &derived_quantities["unfished_numbers_at_age"];
 
       derived_quantities["biomass"] =
           fims::Vector<Type>((population_interface->n_years.get() + 1));
