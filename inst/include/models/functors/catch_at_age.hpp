@@ -1218,7 +1218,6 @@ class CatchAtAge : public FisheryModelBase<Type> {
       // initialize fleet vectors
       vector<vector<Type>> agecomp_expected_f(n_fleets);
       vector<vector<Type>> agecomp_proportion_f(n_fleets);
-      vector<vector<Type>> catch_index_f(n_fleets);
       vector<vector<Type>> index_expected_f(n_fleets);
       vector<vector<Type>> index_numbers_f(n_fleets);
       vector<vector<Type>> index_numbers_at_age_f(n_fleets);
@@ -1283,7 +1282,6 @@ class CatchAtAge : public FisheryModelBase<Type> {
             derived_quantities["agecomp_expected"].to_tmb();
         agecomp_proportion_f(fleet_idx) =
             derived_quantities["agecomp_proportion"].to_tmb();
-        catch_index_f(fleet_idx) = derived_quantities["catch_index"].to_tmb();
         index_expected_f(fleet_idx) =
             derived_quantities["index_expected"].to_tmb();
         index_numbers_f(fleet_idx) =
@@ -1347,7 +1345,6 @@ class CatchAtAge : public FisheryModelBase<Type> {
 
       vector<Type> agecomp_expected = ADREPORTvector(agecomp_expected_f);
       vector<Type> agecomp_proportion = ADREPORTvector(agecomp_proportion_f);
-      vector<Type> catch_index = ADREPORTvector(catch_index_f);
       vector<Type> index_expected = ADREPORTvector(index_expected_f);
       vector<Type> index_numbers = ADREPORTvector(index_numbers_f);
       vector<Type> index_numbers_at_age =
@@ -1419,7 +1416,6 @@ class CatchAtAge : public FisheryModelBase<Type> {
       // report
       FIMS_REPORT_F_("agecomp_expected", agecomp_expected_f, this->of);
       FIMS_REPORT_F_("agecomp_proportion", agecomp_proportion_f, this->of);
-      FIMS_REPORT_F_("catch_index", catch_index_f, this->of);
       FIMS_REPORT_F_("index_expected", index_expected_f, this->of);
       FIMS_REPORT_F_("index_numbers", index_numbers_f, this->of);
       FIMS_REPORT_F_("index_numbers_at_age", index_numbers_at_age_f, this->of);
@@ -1445,7 +1441,6 @@ class CatchAtAge : public FisheryModelBase<Type> {
       // adreport
       ADREPORT_F(agecomp_expected, this->of);
       ADREPORT_F(agecomp_proportion, this->of);
-      ADREPORT_F(catch_index, this->of);
       ADREPORT_F(index_expected, this->of);
       ADREPORT_F(index_numbers, this->of);
       ADREPORT_F(index_numbers_at_age, this->of);

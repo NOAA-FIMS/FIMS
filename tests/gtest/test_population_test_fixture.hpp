@@ -180,9 +180,6 @@ class CAAInitializeTestFixture : public testing::Test {
       derived_quantities["log_index_expected"] =
           fims::Vector<double>(fleet->n_years);
 
-      //
-      derived_quantities["catch_index"] = fims::Vector<double>(fleet->n_years);
-
       derived_quantities["expected_catch"] =
           fims::Vector<double>(fleet->n_years);
 
@@ -543,9 +540,6 @@ class CAAEvaluateTestFixture : public testing::Test {
       derived_quantities["log_index_expected"] =
           fims::Vector<double>(fleet->n_years);
 
-      //
-      derived_quantities["catch_index"] = fims::Vector<double>(fleet->n_years);
-
       derived_quantities["expected_catch"] =
           fims::Vector<double>(fleet->n_years);
 
@@ -841,9 +835,6 @@ class CAAPrepareTestFixture : public testing::Test {
 
       derived_quantities["log_index_expected"] =
           fims::Vector<double>(fleet->n_years);
-
-      //
-      derived_quantities["catch_index"] = fims::Vector<double>(fleet->n_years);
 
       derived_quantities["expected_catch"] =
           fims::Vector<double>(fleet->n_years);
