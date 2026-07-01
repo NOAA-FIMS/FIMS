@@ -330,35 +330,35 @@
           parameter_id fleet year_i age_i length_i  input observed estimation_type 
                  <int> <chr>  <int> <int>    <int>  <dbl>    <dbl> <chr>           
         1            4 NA         1    NA       NA -4.66        NA fixed_effects   
-        2          287 NA         2    NA       NA -3.60        NA fixed_effects   
-        3          288 NA         3    NA       NA -3.10        NA fixed_effects   
-        4          289 NA         4    NA       NA -2.80        NA fixed_effects   
-        5          290 NA         5    NA       NA -3.02        NA fixed_effects   
-        6          291 NA         6    NA       NA -2.44        NA fixed_effects   
-        7          292 NA         7    NA       NA -2.43        NA fixed_effects   
-        8          293 NA         8    NA       NA -1.68        NA fixed_effects   
-        9          294 NA         9    NA       NA -2.22        NA fixed_effects   
-       10          295 NA        10    NA       NA -2.02        NA fixed_effects   
-       11          296 NA        11    NA       NA -1.89        NA fixed_effects   
-       12          297 NA        12    NA       NA -1.82        NA fixed_effects   
-       13          298 NA        13    NA       NA -2.15        NA fixed_effects   
-       14          299 NA        14    NA       NA -1.78        NA fixed_effects   
-       15          300 NA        15    NA       NA -1.71        NA fixed_effects   
-       16          301 NA        16    NA       NA -1.82        NA fixed_effects   
-       17          302 NA        17    NA       NA -1.16        NA fixed_effects   
-       18          303 NA        18    NA       NA -1.36        NA fixed_effects   
-       19          304 NA        19    NA       NA -1.37        NA fixed_effects   
-       20          305 NA        20    NA       NA -1.38        NA fixed_effects   
-       21          306 NA        21    NA       NA -1.05        NA fixed_effects   
-       22          307 NA        22    NA       NA -1.37        NA fixed_effects   
-       23          308 NA        23    NA       NA -0.871       NA fixed_effects   
-       24          309 NA        24    NA       NA -1.06        NA fixed_effects   
-       25          310 NA        25    NA       NA -1.07        NA fixed_effects   
-       26          311 NA        26    NA       NA -1.16        NA fixed_effects   
-       27          312 NA        27    NA       NA -1.18        NA fixed_effects   
-       28          313 NA        28    NA       NA -0.840       NA fixed_effects   
-       29          314 NA        29    NA       NA -1.11        NA fixed_effects   
-       30          315 NA        30    NA       NA -0.694       NA fixed_effects   
+        2          300 NA         2    NA       NA -3.60        NA fixed_effects   
+        3          301 NA         3    NA       NA -3.10        NA fixed_effects   
+        4          302 NA         4    NA       NA -2.80        NA fixed_effects   
+        5          303 NA         5    NA       NA -3.02        NA fixed_effects   
+        6          304 NA         6    NA       NA -2.44        NA fixed_effects   
+        7          305 NA         7    NA       NA -2.43        NA fixed_effects   
+        8          306 NA         8    NA       NA -1.68        NA fixed_effects   
+        9          307 NA         9    NA       NA -2.22        NA fixed_effects   
+       10          308 NA        10    NA       NA -2.02        NA fixed_effects   
+       11          309 NA        11    NA       NA -1.89        NA fixed_effects   
+       12          310 NA        12    NA       NA -1.82        NA fixed_effects   
+       13          311 NA        13    NA       NA -2.15        NA fixed_effects   
+       14          312 NA        14    NA       NA -1.78        NA fixed_effects   
+       15          313 NA        15    NA       NA -1.71        NA fixed_effects   
+       16          314 NA        16    NA       NA -1.82        NA fixed_effects   
+       17          315 NA        17    NA       NA -1.16        NA fixed_effects   
+       18          316 NA        18    NA       NA -1.36        NA fixed_effects   
+       19          317 NA        19    NA       NA -1.37        NA fixed_effects   
+       20          318 NA        20    NA       NA -1.38        NA fixed_effects   
+       21          319 NA        21    NA       NA -1.05        NA fixed_effects   
+       22          320 NA        22    NA       NA -1.37        NA fixed_effects   
+       23          321 NA        23    NA       NA -0.871       NA fixed_effects   
+       24          322 NA        24    NA       NA -1.06        NA fixed_effects   
+       25          323 NA        25    NA       NA -1.07        NA fixed_effects   
+       26          324 NA        26    NA       NA -1.16        NA fixed_effects   
+       27          325 NA        27    NA       NA -1.18        NA fixed_effects   
+       28          326 NA        28    NA       NA -0.840       NA fixed_effects   
+       29          327 NA        29    NA       NA -1.11        NA fixed_effects   
+       30          328 NA        30    NA       NA -0.694       NA fixed_effects   
        31            3 NA        NA    NA       NA  0           NA constant        
        32           NA NA         1     1       NA NA           14 derived_quantity
        33           NA NA         1     2       NA NA           20 derived_quantity
@@ -1306,35 +1306,35 @@
           parameter_id fleet year_i age_i length_i  input observed estimation_type 
                  <int> <chr>  <int> <int>    <int>  <dbl>    <dbl> <chr>           
         1            4 NA         1    NA       NA -4.66        NA fixed_effects   
-        2          287 NA         2    NA       NA -3.60        NA fixed_effects   
-        3          288 NA         3    NA       NA -3.10        NA fixed_effects   
-        4          289 NA         4    NA       NA -2.80        NA fixed_effects   
-        5          290 NA         5    NA       NA -3.02        NA fixed_effects   
-        6          291 NA         6    NA       NA -2.44        NA fixed_effects   
-        7          292 NA         7    NA       NA -2.43        NA fixed_effects   
-        8          293 NA         8    NA       NA -1.68        NA fixed_effects   
-        9          294 NA         9    NA       NA -2.22        NA fixed_effects   
-       10          295 NA        10    NA       NA -2.02        NA fixed_effects   
-       11          296 NA        11    NA       NA -1.89        NA fixed_effects   
-       12          297 NA        12    NA       NA -1.82        NA fixed_effects   
-       13          298 NA        13    NA       NA -2.15        NA fixed_effects   
-       14          299 NA        14    NA       NA -1.78        NA fixed_effects   
-       15          300 NA        15    NA       NA -1.71        NA fixed_effects   
-       16          301 NA        16    NA       NA -1.82        NA fixed_effects   
-       17          302 NA        17    NA       NA -1.16        NA fixed_effects   
-       18          303 NA        18    NA       NA -1.36        NA fixed_effects   
-       19          304 NA        19    NA       NA -1.37        NA fixed_effects   
-       20          305 NA        20    NA       NA -1.38        NA fixed_effects   
-       21          306 NA        21    NA       NA -1.05        NA fixed_effects   
-       22          307 NA        22    NA       NA -1.37        NA fixed_effects   
-       23          308 NA        23    NA       NA -0.871       NA fixed_effects   
-       24          309 NA        24    NA       NA -1.06        NA fixed_effects   
-       25          310 NA        25    NA       NA -1.07        NA fixed_effects   
-       26          311 NA        26    NA       NA -1.16        NA fixed_effects   
-       27          312 NA        27    NA       NA -1.18        NA fixed_effects   
-       28          313 NA        28    NA       NA -0.840       NA fixed_effects   
-       29          314 NA        29    NA       NA -1.11        NA fixed_effects   
-       30          315 NA        30    NA       NA -0.694       NA fixed_effects   
+        2          300 NA         2    NA       NA -3.60        NA fixed_effects   
+        3          301 NA         3    NA       NA -3.10        NA fixed_effects   
+        4          302 NA         4    NA       NA -2.80        NA fixed_effects   
+        5          303 NA         5    NA       NA -3.02        NA fixed_effects   
+        6          304 NA         6    NA       NA -2.44        NA fixed_effects   
+        7          305 NA         7    NA       NA -2.43        NA fixed_effects   
+        8          306 NA         8    NA       NA -1.68        NA fixed_effects   
+        9          307 NA         9    NA       NA -2.22        NA fixed_effects   
+       10          308 NA        10    NA       NA -2.02        NA fixed_effects   
+       11          309 NA        11    NA       NA -1.89        NA fixed_effects   
+       12          310 NA        12    NA       NA -1.82        NA fixed_effects   
+       13          311 NA        13    NA       NA -2.15        NA fixed_effects   
+       14          312 NA        14    NA       NA -1.78        NA fixed_effects   
+       15          313 NA        15    NA       NA -1.71        NA fixed_effects   
+       16          314 NA        16    NA       NA -1.82        NA fixed_effects   
+       17          315 NA        17    NA       NA -1.16        NA fixed_effects   
+       18          316 NA        18    NA       NA -1.36        NA fixed_effects   
+       19          317 NA        19    NA       NA -1.37        NA fixed_effects   
+       20          318 NA        20    NA       NA -1.38        NA fixed_effects   
+       21          319 NA        21    NA       NA -1.05        NA fixed_effects   
+       22          320 NA        22    NA       NA -1.37        NA fixed_effects   
+       23          321 NA        23    NA       NA -0.871       NA fixed_effects   
+       24          322 NA        24    NA       NA -1.06        NA fixed_effects   
+       25          323 NA        25    NA       NA -1.07        NA fixed_effects   
+       26          324 NA        26    NA       NA -1.16        NA fixed_effects   
+       27          325 NA        27    NA       NA -1.18        NA fixed_effects   
+       28          326 NA        28    NA       NA -0.840       NA fixed_effects   
+       29          327 NA        29    NA       NA -1.11        NA fixed_effects   
+       30          328 NA        30    NA       NA -0.694       NA fixed_effects   
        31            3 NA        NA    NA       NA  0           NA constant        
        32           NA NA         1     1       NA NA           14 derived_quantity
        33           NA NA         1     2       NA NA           20 derived_quantity
