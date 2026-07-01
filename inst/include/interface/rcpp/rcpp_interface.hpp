@@ -332,7 +332,7 @@ void clear_impl(bool get_error_msg) {
   clear_internal<TMBAD_FIMS_TYPE>();
 
   fims::FIMSLog::fims_log->clear();
-  
+
   std::unique_ptr<fims_popdy::LogisticSelectivity<double>> test_obj;
   if (get_error_msg) {
     test_obj = std::make_unique<fims_popdy::LogisticSelectivity<double>>();
@@ -341,7 +341,8 @@ void clear_impl(bool get_error_msg) {
   // --- AUTOMATED DANGLING POINTER DIAGNOSTIC PRINT ---
   if (fims_model_object::FIMSMemoryTracker::total_active_objects > 0) {
     std::ostringstream msg;
-    msg << "\n⚠️  WARNING: FIMS Dangling Pointer or Module Detected after clear()!\n";
+    msg << "\n⚠️  WARNING: FIMS Dangling Pointer or Module Detected after "
+           "clear()!\n";
     msg << "--------------------------------------------------\n";
     msg << "A total of "
         << fims_model_object::FIMSMemoryTracker::total_active_objects
@@ -356,18 +357,14 @@ void clear_impl(bool get_error_msg) {
 /**
  * @brief Clears all FIMS pointers and resets model state.
  */
-void clear() {
-    clear_impl(false);
-}
+void clear() { clear_impl(false); }
 
 /**
  * @brief Test-only variant of clear() that retains a lingering pointer
  * to validate dangling pointer diagnostics.
  * @note Not exposed to users. Use only in tests.
  */
-void clear_test() {
-    clear_impl(true);
-}
+void clear_test() { clear_impl(true); }
 
 /**
  * @brief Gets the log entries as a string in JSON format.
