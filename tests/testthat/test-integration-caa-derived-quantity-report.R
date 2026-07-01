@@ -66,6 +66,12 @@ test_that("CatchAtAge derived quantity report requests get backend uncertainty",
   dimnames(result[["sdr"]][["cov.fixed"]]) <- list(parameter_names, parameter_names)
 
   backend_report_std <- attr(result[["sdr"]], "fims_backend_report")
+  adreport_payload <- attr(result[["sdr"]], "fims_adreport_payload")
+  expect_equal(adreport_payload[["method"]], "fixed")
+  expect_equal(
+    ncol(adreport_payload[["jacobian"]]),
+    length(result[["sdr"]][["par.fixed"]])
+  )
   expect_false(is.null(backend_report_std))
 
   gradient <- as.numeric(result[["obj"]][["gr"]](result[["opt"]][["par"]]))
@@ -113,6 +119,16 @@ test_that("CatchAtAge random-effect derived quantity reports get backend uncerta
   )
 
   backend_report_std <- attr(result[["sdr"]], "fims_backend_report")
+  adreport_payload <- attr(result[["sdr"]], "fims_adreport_payload")
+  expect_equal(adreport_payload[["method"]], "laplace")
+  expect_equal(
+    ncol(adreport_payload[["random_jacobian"]]),
+    length(result[["obj"]][["env"]][["random"]])
+  )
+  expect_equal(
+    nrow(adreport_payload[["random_hessian"]]),
+    length(result[["obj"]][["env"]][["random"]])
+  )
   expect_false(is.null(backend_report_std))
 
   requested_backend <- utils::tail(

@@ -8,6 +8,30 @@
 #include "../inst/include/interface/TMB/tmb_derived_quantity_uncertainty.hpp"
 #include <Rcpp.h>
 
+namespace {
+
+std::vector<double> NumericMatrixToRowMajor(const Rcpp::NumericMatrix& matrix) {
+  std::vector<double> output;
+  output.reserve(static_cast<size_t>(matrix.nrow() * matrix.ncol()));
+  for (int i = 0; i < matrix.nrow(); i++) {
+    for (int j = 0; j < matrix.ncol(); j++) {
+      output.push_back(matrix(i, j));
+    }
+  }
+  return output;
+}
+
+Rcpp::NumericVector DerivedQuantitySEToNumericVector(
+    const fims_report::DerivedQuantityEstimate& output) {
+  Rcpp::NumericVector se(output.se.size());
+  for (size_t i = 0; i < output.se.size(); i++) {
+    se[i] = output.se[i];
+  }
+  return se;
+}
+
+}  // namespace
+
 /**
  * @brief Calculate derived quantity standard errors using the FIMS backend
  * delta-method calculator.
@@ -37,11 +61,7 @@ Rcpp::NumericVector calculate_derived_quantity_se(
   fims_tmb::FixedEffectADReportUncertaintyAdapter adapter;
   fims_report::DerivedQuantityEstimate output = adapter.Calculate(report);
 
-  Rcpp::NumericVector se(output.se.size());
-  for (size_t i = 0; i < output.se.size(); i++) {
-    se[i] = output.se[i];
-  }
-  return se;
+  return DerivedQuantitySEToNumericVector(output);
 }
 
 /**
@@ -87,11 +107,72 @@ Rcpp::NumericVector calculate_derived_quantity_laplace_se(
   fims_tmb::LaplaceADReportUncertaintyAdapter adapter;
   fims_report::DerivedQuantityEstimate output = adapter.Calculate(report);
 
-  Rcpp::NumericVector se(output.se.size());
-  for (size_t i = 0; i < output.se.size(); i++) {
-    se[i] = output.se[i];
+  return DerivedQuantitySEToNumericVector(output);
+}
+
+/**
+ * @brief Calculate derived quantity SEs from a structured ADREPORT payload.
+ *
+ * @param payload Structured payload extracted from TMB ADREPORT output.
+ * @return Rcpp::NumericVector Standard errors.
+ */
+Rcpp::NumericVector calculate_adreport_payload_se(Rcpp::List payload) {
+  if (!payload.containsElementNamed("method")) {
+    Rcpp::stop("payload must contain a method element");
   }
-  return se;
+
+  const std::string method = Rcpp::as<std::string>(payload["method"]);
+  Rcpp::NumericVector estimate = payload["estimate"];
+  Rcpp::NumericMatrix fixed_covariance = payload["fixed_covariance"];
+  const int n_fixed_effects = fixed_covariance.nrow();
+
+  if (method == "laplace") {
+    Rcpp::NumericMatrix adjusted_fixed_jacobian =
+        payload["adjusted_fixed_jacobian"];
+    Rcpp::NumericMatrix random_jacobian = payload["random_jacobian"];
+    Rcpp::NumericMatrix random_covariance = payload["random_covariance"];
+
+    fims_tmb::LaplaceADReport report;
+    report.estimate =
+        fims::Vector<double>(Rcpp::as<std::vector<double>>(estimate));
+    report.adjusted_fixed_jacobian =
+        fims::Vector<double>(NumericMatrixToRowMajor(
+            adjusted_fixed_jacobian));
+    report.fixed_effect_covariance =
+        fims::Vector<double>(NumericMatrixToRowMajor(fixed_covariance));
+    report.random_jacobian =
+        fims::Vector<double>(NumericMatrixToRowMajor(random_jacobian));
+    report.random_effect_covariance =
+        fims::Vector<double>(NumericMatrixToRowMajor(random_covariance));
+    report.n_fixed_effects = static_cast<size_t>(n_fixed_effects);
+    report.n_random_effects = static_cast<size_t>(random_covariance.nrow());
+
+    fims_tmb::LaplaceADReportUncertaintyAdapter adapter;
+    fims_report::DerivedQuantityEstimate output = adapter.Calculate(report);
+    return DerivedQuantitySEToNumericVector(output);
+  }
+
+  Rcpp::NumericMatrix jacobian;
+  if (method == "fixed_after_laplace") {
+    jacobian = Rcpp::as<Rcpp::NumericMatrix>(payload["fixed_jacobian"]);
+  } else if (method == "fixed") {
+    jacobian = Rcpp::as<Rcpp::NumericMatrix>(payload["jacobian"]);
+  } else {
+    Rcpp::stop("Unsupported ADREPORT payload method: %s", method.c_str());
+  }
+
+  fims_tmb::FixedEffectADReport report;
+  report.estimate =
+      fims::Vector<double>(Rcpp::as<std::vector<double>>(estimate));
+  report.jacobian =
+      fims::Vector<double>(NumericMatrixToRowMajor(jacobian));
+  report.fixed_effect_covariance =
+      fims::Vector<double>(NumericMatrixToRowMajor(fixed_covariance));
+  report.n_fixed_effects = static_cast<size_t>(n_fixed_effects);
+
+  fims_tmb::FixedEffectADReportUncertaintyAdapter adapter;
+  fims_report::DerivedQuantityEstimate output = adapter.Calculate(report);
+  return DerivedQuantitySEToNumericVector(output);
 }
 
 /**
@@ -198,4 +279,8 @@ void register_functions(Rcpp::Module &m) {
       &calculate_derived_quantity_laplace_se,
       "Calculate derived quantity standard errors using the FIMS backend "
       "Laplace ADREPORT calculator.");
+  Rcpp::function(
+      "calculate_adreport_payload_se", &calculate_adreport_payload_se,
+      "Calculate derived quantity standard errors from a structured ADREPORT "
+      "payload.");
 }
