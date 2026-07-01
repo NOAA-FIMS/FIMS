@@ -5,6 +5,8 @@
 #' @export LogRRecruitmentProcess
 #' @export CatchAtAge
 #' @export clear
+#' @export calculate_derived_quantity_se
+#' @export calculate_derived_quantity_laplace_se
 #' @export CreateTMBModel
 #' @export DlnormDistribution
 #' @export DmultinomDistribution

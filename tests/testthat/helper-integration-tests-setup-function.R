@@ -76,14 +76,18 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
                                                 em_input_list,
                                                 estimation_mode = TRUE,
                                                 random_effects = NULL,
-                                                map = list()) {
+                                                map = list(),
+                                                derived_quantity_report_requests = NULL,
+                                                preserve_state = FALSE) {
   # Load operating model data for the current iteration
   om_input <- om_input_list[[iter_id]] # Operating model input for the current iteration
   om_output <- om_output_list[[iter_id]] # Operating model output for the current iteration
   em_input <- em_input_list[[iter_id]] # Estimation model input for the current iteration
 
   # Clear any previous FIMS settings
-  clear()
+  if (!preserve_state) {
+    clear()
+  }
 
   # Extract fishing fleet landings data (observed) and initialize index module
   landings <- em_input[["L.obs"]][["fleet1"]]
@@ -405,6 +409,34 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   # Set up catch at age model
   caa <- methods::new(CatchAtAge)
   caa$AddPopulation(population$get_id())
+  if (!is.null(derived_quantity_report_requests)) {
+    for (request in derived_quantity_report_requests) {
+      component_type <- request[["component_type"]]
+      if (identical(component_type, "population")) {
+        component_id <- request[["component_id"]]
+        if (is.null(component_id)) {
+          component_id <- population$get_id()
+        }
+        caa$ReportPopulationDerivedQuantity(
+          component_id,
+          request[["quantity_name"]],
+          request[["report_se"]],
+          request[["report_value"]],
+          request[["report_name"]]
+        )
+      } else if (identical(component_type, "fleet")) {
+        caa$ReportFleetDerivedQuantity(
+          request[["component_id"]],
+          request[["quantity_name"]],
+          request[["report_se"]],
+          request[["report_value"]],
+          request[["report_name"]]
+        )
+      } else {
+        stop("Unsupported derived quantity component_type: ", component_type)
+      }
+    }
+  }
 
   # Set-up TMB
   CreateTMBModel()
@@ -431,11 +463,17 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
     sdr_report <- summary(sdr, "report")
     sdr_fixed <- summary(sdr, "fixed")
     sdr_random <- summary(sdr, "random")
+    derived_quantity_backend_report <- FIMS:::calculate_tmb_adreport_uncertainty(
+      obj = obj,
+      sdreport = sdr
+    )
+    attr(sdr, "fims_backend_report") <- derived_quantity_backend_report
   } else {
     sdr <- list()
     sdr_report <- list()
     sdr_fixed <- matrix(obj[["env"]]$parList()[["p"]], ncol = 1, dimnames = list(NULL, "Estimate"))
     sdr_random <- matrix(obj[["env"]]$parList()[["re"]], ncol = 1, dimnames = list(NULL, "Estimate"))
+    derived_quantity_backend_report <- NULL
   }
   row.names(sdr_fixed) <- names(FIMS:::get_parameter_names(sdr_fixed[, 1]))
   row.names(sdr_random) <- names(FIMS:::get_random_names(sdr_random[, 1]))
@@ -456,7 +494,8 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
     sdr_report = sdr_report,
     sdr_fixed = sdr_fixed,
     sdr_random = sdr_random,
-    sdr = sdr
+    sdr = sdr,
+    derived_quantity_backend_report = derived_quantity_backend_report
   ))
 }
 
