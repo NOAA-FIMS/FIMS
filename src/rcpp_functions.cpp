@@ -48,6 +48,7 @@ void register_functions(Rcpp::Module &m) {
       "clear", clear,
       "See "
       "https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html.");
+  Rcpp::function("clear_test", clear_test, "Test-only variant of clear(). Not part of the public API.");
   Rcpp::function(
       "get_log", get_log,
       "See "

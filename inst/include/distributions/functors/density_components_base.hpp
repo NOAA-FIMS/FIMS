@@ -220,6 +220,7 @@ struct DensityComponentBase : public fims_model_object::FIMSObject<Type> {
     this->priors.resize(1);
     this->priors[0] = NULL;
     this->id = DensityComponentBase::id_g++;
+    this->register_self(this->id);
   }
 
   virtual ~DensityComponentBase() {}
