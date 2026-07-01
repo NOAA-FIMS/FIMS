@@ -463,10 +463,13 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
     sdr_report <- summary(sdr, "report")
     sdr_fixed <- summary(sdr, "fixed")
     sdr_random <- summary(sdr, "random")
-    derived_quantity_backend_report <- FIMS:::calculate_tmb_adreport_uncertainty(
+    adreport_payload <- FIMS:::extract_tmb_adreport_payload(
       obj = obj,
       sdreport = sdr
     )
+    derived_quantity_backend_report <-
+      FIMS:::calculate_tmb_adreport_payload_uncertainty(adreport_payload)
+    attr(sdr, "fims_adreport_payload") <- adreport_payload
     attr(sdr, "fims_backend_report") <- derived_quantity_backend_report
   } else {
     sdr <- list()

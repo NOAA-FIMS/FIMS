@@ -30,7 +30,18 @@ test_that("backend derived quantity SEs match TMB sdreport", {
   TMB::compile(model_file)
   dynlib <- TMB::dynlib(tools::file_path_sans_ext(model_file))
   dyn.load(dynlib)
-  withr::defer(dyn.unload(dynlib))
+  test_env <- environment()
+  withr::defer({
+    rm(
+      list = intersect(
+        c("obj", "sdr", "adreport_obj", "payload"),
+        ls(envir = test_env)
+      ),
+      envir = test_env
+    )
+    invisible(gc())
+    dyn.unload(dynlib)
+  })
 
   obj <- TMB::MakeADFun(
     data = list(),
@@ -76,9 +87,22 @@ test_that("backend derived quantity SEs match TMB sdreport", {
     obj = obj,
     sdreport = sdr
   )
+  payload <- FIMS:::extract_tmb_adreport_payload(
+    obj = obj,
+    sdreport = sdr
+  )
+  payload_se <- calculate_adreport_payload_se(payload)
 
   expect_equal(unname(tmb_se), c(sqrt(40), 5), tolerance = 1e-8)
+  expect_equal(payload$method, "fixed")
+  expect_equal(unname(payload$estimate), unname(estimate), tolerance = 1e-12)
+  expect_equal(
+    unname(as.vector(t(payload$jacobian))),
+    c(1, 2, 2, 1),
+    tolerance = 1e-12
+  )
   expect_equal(unname(backend_se), unname(tmb_se), tolerance = 1e-8)
+  expect_equal(unname(payload_se), unname(tmb_se), tolerance = 1e-8)
   expect_equal(
     unname(backend_summary[, "Estimate"]),
     unname(estimate),
@@ -124,7 +148,15 @@ test_that("backend random-effect derived quantity SEs match TMB sdreport", {
   TMB::compile(model_file)
   dynlib <- TMB::dynlib(tools::file_path_sans_ext(model_file))
   dyn.load(dynlib)
-  withr::defer(dyn.unload(dynlib))
+  test_env <- environment()
+  withr::defer({
+    rm(
+      list = intersect(c("obj", "sdr", "payload"), ls(envir = test_env)),
+      envir = test_env
+    )
+    invisible(gc())
+    dyn.unload(dynlib)
+  })
 
   obj <- TMB::MakeADFun(
     data = list(),
@@ -140,8 +172,18 @@ test_that("backend random-effect derived quantity SEs match TMB sdreport", {
     obj = obj,
     sdreport = sdr
   )
+  payload <- FIMS:::extract_tmb_adreport_payload(
+    obj = obj,
+    sdreport = sdr
+  )
+  payload_se <- calculate_adreport_payload_se(payload)
 
   expect_true(opt$convergence == 0)
+  expect_equal(payload$method, "laplace")
+  expect_equal(ncol(payload$fixed_jacobian), length(sdr$par.fixed))
+  expect_equal(ncol(payload$random_jacobian), length(obj$env$random))
+  expect_equal(nrow(payload$random_hessian), length(obj$env$random))
+  expect_equal(ncol(payload$random_covariance), length(obj$env$random))
   expect_equal(
     unname(backend_summary[, "Estimate"]),
     unname(tmb_report[, "Estimate"]),
@@ -149,6 +191,11 @@ test_that("backend random-effect derived quantity SEs match TMB sdreport", {
   )
   expect_equal(
     unname(backend_summary[, "Std. Error"]),
+    unname(tmb_report[, "Std. Error"]),
+    tolerance = 1e-8
+  )
+  expect_equal(
+    unname(payload_se),
     unname(tmb_report[, "Std. Error"]),
     tolerance = 1e-8
   )
