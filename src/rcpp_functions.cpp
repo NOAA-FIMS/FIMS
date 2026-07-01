@@ -30,6 +30,99 @@ Rcpp::NumericVector DerivedQuantitySEToNumericVector(
   return se;
 }
 
+Rcpp::NumericVector FimsVectorToNumericVector(
+    const fims::Vector<double>& values) {
+  Rcpp::NumericVector output(values.size());
+  for (size_t i = 0; i < values.size(); i++) {
+    output[i] = values[i];
+  }
+  return output;
+}
+
+Rcpp::IntegerVector FimsVectorToIntegerVector(
+    const fims::Vector<int>& values, bool one_based = false) {
+  Rcpp::IntegerVector output(values.size());
+  for (size_t i = 0; i < values.size(); i++) {
+    output[i] = values[i] + (one_based ? 1 : 0);
+  }
+  return output;
+}
+
+Rcpp::NumericMatrix FimsVectorToNumericMatrix(
+    const fims::Vector<double>& values, size_t n_rows, size_t n_cols) {
+  Rcpp::NumericMatrix output(n_rows, n_cols);
+  if (values.size() == 0) {
+    return output;
+  }
+  if (values.size() != n_rows * n_cols) {
+    Rcpp::stop("Cannot convert vector to matrix: dimensions do not match");
+  }
+  for (size_t i = 0; i < n_rows; i++) {
+    for (size_t j = 0; j < n_cols; j++) {
+      output(i, j) = values[(i * n_cols) + j];
+    }
+  }
+  return output;
+}
+
+fims::Vector<int> RandomIndicesFromRcppList(Rcpp::List payload) {
+  fims::Vector<int> output;
+  if (!payload.containsElementNamed("random_indices")) {
+    return output;
+  }
+
+  Rcpp::IntegerVector random_indices = payload["random_indices"];
+  for (int i = 0; i < random_indices.size(); i++) {
+    output.push_back(static_cast<int>(random_indices[i]));
+  }
+  return output;
+}
+
+Rcpp::List ADReportPayloadToRcppList(
+    const fims_tmb::ADReportPayload& payload) {
+  const size_t n_estimates = payload.estimate.size();
+
+  Rcpp::List output = Rcpp::List::create(
+      Rcpp::Named("backend") = "TMB",
+      Rcpp::Named("method") = payload.method,
+      Rcpp::Named("estimate") = FimsVectorToNumericVector(payload.estimate),
+      Rcpp::Named("fixed_covariance") = FimsVectorToNumericMatrix(
+          payload.fixed_effect_covariance, payload.n_fixed_effects,
+          payload.n_fixed_effects),
+      Rcpp::Named("fixed_indices") =
+          FimsVectorToIntegerVector(payload.fixed_indices, true),
+      Rcpp::Named("random_indices") =
+          FimsVectorToIntegerVector(payload.random_indices, true),
+      Rcpp::Named("n_fixed_effects") =
+          static_cast<int>(payload.n_fixed_effects),
+      Rcpp::Named("n_random_effects") =
+          static_cast<int>(payload.n_random_effects));
+
+  if (payload.method == "fixed") {
+    output["jacobian"] = FimsVectorToNumericMatrix(
+        payload.jacobian, n_estimates, payload.n_fixed_effects);
+  } else {
+    output["fixed_jacobian"] = FimsVectorToNumericMatrix(
+        payload.fixed_jacobian, n_estimates, payload.n_fixed_effects);
+    output["random_jacobian"] = FimsVectorToNumericMatrix(
+        payload.random_jacobian, n_estimates, payload.n_random_effects);
+
+    if (payload.method == "laplace") {
+      output["adjusted_fixed_jacobian"] = FimsVectorToNumericMatrix(
+          payload.adjusted_fixed_jacobian, n_estimates,
+          payload.n_fixed_effects);
+      output["random_hessian"] = FimsVectorToNumericMatrix(
+          payload.random_effect_hessian, payload.n_random_effects,
+          payload.n_random_effects);
+      output["random_covariance"] = FimsVectorToNumericMatrix(
+          payload.random_effect_covariance, payload.n_random_effects,
+          payload.n_random_effects);
+    }
+  }
+
+  return output;
+}
+
 fims_tmb::ADReportPayload ADReportPayloadFromRcppList(Rcpp::List payload) {
   if (!payload.containsElementNamed("method")) {
     Rcpp::stop("payload must contain a method element");
@@ -177,6 +270,44 @@ Rcpp::NumericVector calculate_adreport_payload_se(Rcpp::List payload) {
 }
 
 /**
+ * @brief Assemble a structured ADREPORT payload from raw TMB derivative pieces.
+ *
+ * @param payload Raw ADREPORT extraction pieces.
+ * @return Rcpp::List Structured ADREPORT payload.
+ */
+Rcpp::List assemble_adreport_payload(Rcpp::List payload) {
+  fims_tmb::ADReportPayloadExtractionInput input;
+
+  Rcpp::NumericVector estimate = payload["estimate"];
+  Rcpp::NumericMatrix jacobian = payload["jacobian"];
+  Rcpp::NumericMatrix fixed_covariance = payload["fixed_covariance"];
+
+  input.estimate =
+      fims::Vector<double>(Rcpp::as<std::vector<double>>(estimate));
+  input.jacobian = fims::Vector<double>(NumericMatrixToRowMajor(jacobian));
+  input.fixed_effect_covariance =
+      fims::Vector<double>(NumericMatrixToRowMajor(fixed_covariance));
+  input.random_indices = RandomIndicesFromRcppList(payload);
+  input.n_parameters = static_cast<size_t>(jacobian.ncol());
+
+  if (input.random_indices.size() > 0) {
+    Rcpp::NumericMatrix random_hessian = payload["random_hessian"];
+    Rcpp::NumericMatrix fixed_jacobian_adjustment =
+        payload["fixed_jacobian_adjustment"];
+
+    input.random_effect_hessian =
+        fims::Vector<double>(NumericMatrixToRowMajor(random_hessian));
+    input.fixed_jacobian_adjustment =
+        fims::Vector<double>(NumericMatrixToRowMajor(
+            fixed_jacobian_adjustment));
+  }
+
+  fims_tmb::ADReportPayloadExtractor extractor;
+  fims_tmb::ADReportPayload output = extractor.Extract(input);
+  return ADReportPayloadToRcppList(output);
+}
+
+/**
  * Function to register functions with the Rcpp module system.
  *
  */
@@ -284,4 +415,7 @@ void register_functions(Rcpp::Module &m) {
       "calculate_adreport_payload_se", &calculate_adreport_payload_se,
       "Calculate derived quantity standard errors from a structured ADREPORT "
       "payload.");
+  Rcpp::function(
+      "assemble_adreport_payload", &assemble_adreport_payload,
+      "Assemble a structured ADREPORT payload from raw TMB derivative pieces.");
 }

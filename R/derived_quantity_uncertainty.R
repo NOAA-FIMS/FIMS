@@ -70,64 +70,62 @@ extract_tmb_adreport_payload <- function(obj,
     return(NULL)
   }
 
-  payload <- list(
-    backend = "TMB",
-    method = "fixed",
-    estimate = estimate,
-    jacobian = jacobian,
-    fixed_covariance = sdreport[["cov.fixed"]],
-    par = par,
-    par_fixed = par_fixed,
-    random = random,
-    fixed_indices = seq_along(par),
-    n_fixed_effects = length(par_fixed),
-    n_random_effects = 0L
-  )
-
   if (!has_random) {
+    payload <- assemble_adreport_payload(list(
+      estimate = estimate,
+      jacobian = jacobian,
+      fixed_covariance = sdreport[["cov.fixed"]]
+    ))
+    names(payload[["estimate"]]) <- names(estimate)
+    payload[["par"]] <- par
+    payload[["par_fixed"]] <- par_fixed
+    payload[["random"]] <- random
     return(payload)
   }
 
   fixed_indices <- seq_along(par)[-random]
   random_jacobian <- jacobian[, random, drop = FALSE]
-  fixed_jacobian <- jacobian[, fixed_indices, drop = FALSE]
-
-  payload[["method"]] <- "laplace"
-  payload[["fixed_indices"]] <- fixed_indices
-  payload[["fixed_jacobian"]] <- fixed_jacobian
-  payload[["random_jacobian"]] <- random_jacobian
-  payload[["n_random_effects"]] <- length(random)
-
-  if (all(random_jacobian == 0)) {
-    payload[["method"]] <- "fixed_after_laplace"
-    return(payload)
-  }
-
   hessian_random <- obj[["env"]]$spHess(par, random = TRUE)
-  random_covariance <- as.matrix(solve(hessian_random))
-  random_tmp <- as.matrix(solve(hessian_random, t(random_jacobian)))
+  fixed_jacobian_adjustment <- matrix(
+    0,
+    nrow = length(estimate),
+    ncol = length(fixed_indices)
+  )
 
-  model_adgrad <- obj[["env"]][["f"]]
-  model_adgrad(par, order = 0, type = "ADGrad")
-  weight <- rep(0, length(par))
-  reverse_sweep <- function(i) {
-    weight[random] <- random_tmp[, i]
-    -model_adgrad(
-      par,
-      order = 1,
-      type = "ADGrad",
-      rangeweight = weight,
-      doforward = 0
-    )[fixed_indices]
+  if (!all(random_jacobian == 0)) {
+    random_tmp <- as.matrix(solve(hessian_random, t(random_jacobian)))
+    model_adgrad <- obj[["env"]][["f"]]
+    model_adgrad(par, order = 0, type = "ADGrad")
+    weight <- rep(0, length(par))
+    reverse_sweep <- function(i) {
+      weight[random] <- random_tmp[, i]
+      -model_adgrad(
+        par,
+        order = 1,
+        type = "ADGrad",
+        rangeweight = weight,
+        doforward = 0
+      )[fixed_indices]
+    }
+    fixed_jacobian_adjustment <- t(do.call(
+      "cbind",
+      lapply(seq_along(estimate), reverse_sweep)
+    ))
   }
-  adjusted_fixed_jacobian <- t(do.call(
-    "cbind",
-    lapply(seq_along(estimate), reverse_sweep)
-  )) + fixed_jacobian
 
-  payload[["adjusted_fixed_jacobian"]] <- adjusted_fixed_jacobian
-  payload[["random_covariance"]] <- random_covariance
-  payload[["random_hessian"]] <- hessian_random
+  payload <- assemble_adreport_payload(list(
+    estimate = estimate,
+    jacobian = jacobian,
+    fixed_covariance = sdreport[["cov.fixed"]],
+    random_indices = as.integer(random - 1L),
+    random_hessian = as.matrix(hessian_random),
+    fixed_jacobian_adjustment = fixed_jacobian_adjustment
+  ))
+  names(payload[["estimate"]]) <- names(estimate)
+  payload[["par"]] <- par
+  payload[["par_fixed"]] <- par_fixed
+  payload[["random"]] <- random
+  payload[["fixed_indices"]] <- fixed_indices
   payload
 }
 
