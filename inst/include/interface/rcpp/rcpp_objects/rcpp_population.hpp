@@ -122,19 +122,19 @@ class PopulationInterface : public PopulationInterfaceBase {
   /**
    * @brief The natural log of the natural mortality for each year.
    */
-  ParameterVector log_M;
+  VariableVector log_M;
   /**
    * @brief The population spawning biomass ratio for each year.
    */
-  ParameterVector spawning_biomass_ratio;
+  VariableVector spawning_biomass_ratio;
   /**
    * @brief Log of the population annual fishing mortality multiplier.
    */
-  ParameterVector log_f_multiplier;
+  VariableVector log_f_multiplier;
   /**
    * @brief The natural log of the initial numbers at age.
    */
-  ParameterVector log_init_naa;
+  VariableVector log_init_naa;
   /**
    * @brief Proportion of females in the population.
    *
@@ -143,7 +143,7 @@ class PopulationInterface : public PopulationInterfaceBase {
    * to all ages during model evaluation. Values should be in [0, 1].
    * Out-of-range inputs are logged as warnings.
    */
-  ParameterVector proportion_female;
+  VariableVector proportion_female;
   /**
    * @brief Ages that are modeled in the population, the length of this vector
    * should equal \"n_ages\".
@@ -159,73 +159,73 @@ class PopulationInterface : public PopulationInterfaceBase {
   * @brief total annual landings removed from a population by all fleets in 
   * weight 
   */
- ParameterVector total_landings_weight;
+ VariableVector total_landings_weight;
  
  /**
   * @brief total annual landings removed from a population by all fleets in 
   * numbers 
   */
- ParameterVector total_landings_numbers;
+ VariableVector total_landings_numbers;
  
  /**
   * @brief total annual fishing mortality a population is subject to
   */
- ParameterVector mortality_F;
+ VariableVector mortality_F;
  
  /**
   * @brief total annual natural mortality a population is subject to
   */
- ParameterVector mortality_M;
+ VariableVector mortality_M;
  
  /**
   * @brief total annual mortality a population is subject to
   */
- ParameterVector mortality_Z;
+ VariableVector mortality_Z;
  
  /**
   * @brief Current population composition in numbers at age 
   */
- ParameterVector numbers_at_age;
+ VariableVector numbers_at_age;
  
  /**
   * @brief Theoretical population composition in numbers at age if no fishing
   * had occured
   */
- ParameterVector unfished_numbers_at_age;
+ VariableVector unfished_numbers_at_age;
  
  /**
   * @brief total weight of all fish in the population
   */
- ParameterVector biomass;
+ VariableVector biomass;
  /**
   * @brief total weight of mature fish in the population
   */
- ParameterVector spawning_biomass;
+ VariableVector spawning_biomass;
  /**
   * @brief total theoretical weight of all fish in the population if no fishing
   * had occured
   */
- ParameterVector unfished_biomass;
+ VariableVector unfished_biomass;
  /**
   * @brief total theoretical weight of mature fish in the population if no 
   * fishing had occured
   */
- ParameterVector unfished_spawning_biomass;
+ VariableVector unfished_spawning_biomass;
  /**
   * @brief fraction of all fish at a given age that are sexualy mature at each
   * age
   */
- ParameterVector proportion_mature_at_age;
+ VariableVector proportion_mature_at_age;
  /**
   * @brief the model expected recruitment each year based on stock recruit 
   * relationship
   */
- ParameterVector expected_recruitment;
+ VariableVector expected_recruitment;
 
  /**
   * @brief sum of selectivity at age across all fleets for a population
   */
- ParameterVector sum_selectivity;
+ VariableVector sum_selectivity;
 
   /**
    * @brief The constructor.

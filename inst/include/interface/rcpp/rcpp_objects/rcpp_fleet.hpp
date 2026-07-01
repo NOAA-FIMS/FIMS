@@ -118,98 +118,98 @@ class FleetInterface : public FleetInterfaceBase {
    * @brief The natural log of the index of abundance scaling parameter
    * for this fleet.
    */
-  ParameterVector log_q;
+  VariableVector log_q;
   /**
    * @brief The vector of the natural log of fishing mortality rates for this
    * fleet.
    */
-  ParameterVector log_Fmort;
+  VariableVector log_Fmort;
  
   /**
    * @brief The vector of conversions to go from age to length, i.e., the
    * age-to-length-conversion matrix.
    */
-  ParameterVector age_to_length_conversion;
+  VariableVector age_to_length_conversion;
 
   //Fleet based derived quantities
  /**
   * @brief Annual andings at age in numbers for a specific fleet
   */
- ParameterVector landings_numbers_at_age;
+ VariableVector landings_numbers_at_age;
  /**
   * @brief Annual andings at age in weight for a specific fleet
   */
- ParameterVector landings_weight_at_age;
+ VariableVector landings_weight_at_age;
  /**
   * @brief Annual andings at length in numbers for a specific fleet
   */
- ParameterVector landings_numbers_at_length;
+ VariableVector landings_numbers_at_length;
  /**
   * @brief total landings in weight for a specific fleet
   */
- ParameterVector landings_weight;
+ VariableVector landings_weight;
  /**
   * @brief total landings in numbers for a specific fleet
   */
- ParameterVector landings_numbers;
+ VariableVector landings_numbers;
  /**
   * @brief total expected landings for a specific fleet in the units of that
   * fleet either numbers or weight
   */
- ParameterVector landings_expected;
+ VariableVector landings_expected;
  /**
   * @brief log of total expected landings for a specific fleet in the units of 
   * that fleet either numbers or weight
   */
- ParameterVector log_landings_expected;
+ VariableVector log_landings_expected;
  /**
   * @brief proportion of total landings by age to specify the composition
   */
- ParameterVector agecomp_proportion;
+ VariableVector agecomp_proportion;
  /**
   * @brief proportion of total landings by length to specify the composition
   */
- ParameterVector lengthcomp_proportion;
+ VariableVector lengthcomp_proportion;
  /**
   * @brief numbers at age for a fleet index such as survey or cpue
   */
- ParameterVector index_numbers_at_age;
+ VariableVector index_numbers_at_age;
  /**
   * @brief weight at age for a fleet index such as survey or cpue
   */
- ParameterVector index_weight_at_age;
+ VariableVector index_weight_at_age;
  /**
   * @brief numbers at length for a fleet index such as survey or cpue
   */
- ParameterVector index_numbers_at_length;
+ VariableVector index_numbers_at_length;
  /**
   * @brief total weight for a fleet index such as survey or cpue
   */
- ParameterVector index_weight;
+ VariableVector index_weight;
  /**
   * @brief total numbers for a fleet index such as survey or cpue
   */
- ParameterVector index_numbers;
+ VariableVector index_numbers;
  /**
   * @brief expected value for a fleet index in fleet units
   */
- ParameterVector index_expected;
+ VariableVector index_expected;
  /**
   * @brief log of expected value for a fleet index in fleet units
   */
- ParameterVector log_index_expected;
+ VariableVector log_index_expected;
  /**
   * @brief This is an empty nothing burger
   */
- ParameterVector catch_index;
+ VariableVector catch_index;
  /**
   * @brief This is the expected age composition proportions for the fleet
   */
- ParameterVector agecomp_expected;
+ VariableVector agecomp_expected;
  /**
   * @brief This is the expected length composition proportions for the fleet
   */
- ParameterVector lengthcomp_expected;
+ VariableVector lengthcomp_expected;
 
   /**
    * @brief The constructor.

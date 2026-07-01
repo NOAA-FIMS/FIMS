@@ -16,7 +16,7 @@ See the \code{data_big} object in FIMS, e.g., \code{data(data_big, package = "FI
 An object of the S4 class \code{FIMSFrame} class, or one of its child classes, is
 validated and then returned. All objects will at a minimum have a slot
 called \code{data} to store the input data frame. Additional slots are dependent
-on the child class. Use \code{\link[methods:showClass]{methods::showClass()}} to see all available slots.
+on the child class. Use \code{\link[methods:RClassUtils]{methods::showClass()}} to see all available slots.
 }
 \description{
 All constructor functions take a single input and build an object specific

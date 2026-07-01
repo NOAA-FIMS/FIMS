@@ -367,4 +367,4 @@ Rcpp provides several built-in types, such as `Rcpp::NumericVector`, but when yo
 
 ## Modules in FIMS
 
-Within FIMS, we first use `RCPP_EXPOSED_CLASS()` to expose all of our new type classes, e.g., `RCPP_EXPOSED_CLASS(Parameter)` in [`src/fims_modules.hpp`](https://github.com/NOAA-FIMS/FIMS/blob/main/src/fims_modules.hpp). Once all of the type classes are exposed, we then use a single instance of `RCPP_MODULE` to expose the C++ to R in that same file.
+Within FIMS, we first use `RCPP_EXPOSED_CLASS()` to expose all of our new type classes, e.g., `RCPP_EXPOSED_CLASS(Variable)` in [`src/fims_modules.hpp`](https://github.com/NOAA-FIMS/FIMS/blob/main/src/fims_modules.hpp). Once all of the type classes are exposed, we then use a single instance of `RCPP_MODULE` to expose the C++ to R in that same file.

@@ -1,7 +1,7 @@
 /**
  * @file rcpp_interface_base.hpp
  * @brief The Rcpp interface to declare objects that are used ubiquitously
- * throughout the Rcpp interface, e.g., Parameters and ParameterVectors.
+ * throughout the Rcpp interface, e.g., Variables and VariableVectors.
  * @copyright This file is part of the NOAA, National Marine Fisheries Service
  * Fisheries Integrated Modeling System project. See LICENSE in the source
  * folder for reuse information.
@@ -23,27 +23,27 @@
 #include <limits>
 
 /**
- * @brief An Rcpp interface that defines the Parameter class.
+ * @brief An Rcpp interface that defines the Variable class.
  *
  * @details An Rcpp interface class that defines the interface between R and
- * C++ for a parameter type.
+ * C++ for a variable type.
  */
-class Parameter {
+class Variable {
  public:
   /**
-   * @brief The static ID of the Parameter object.
+   * @brief The static ID of the Variable object.
    */
   static uint32_t id_g;
   /**
-   * @brief The local ID of the Parameter object.
+   * @brief The local ID of the Variable object.
    */
   uint32_t id_m;
   /**
-   * @brief The initial value of the parameter.
+   * @brief The initial value of the variable.
    */
   double initial_value_m = 0.0;
   /**
-   * @brief The final value of the parameter.
+   * @brief The final value of the variable.
    */
   double final_value_m = 0.0;
   /**
@@ -53,26 +53,26 @@ class Parameter {
   SharedString estimation_type_m = SharedString("constant");
 
   /**
-   * @brief The constructor for initializing a parameter.
+   * @brief The constructor for initializing a variable.
    */
-  Parameter(double value, std::string estimation_type)
-      : id_m(Parameter::id_g++),
+  Variable(double value, std::string estimation_type)
+      : id_m(Variable::id_g++),
         initial_value_m(value),
         estimation_type_m(estimation_type) {}
 
   /**
-   * @brief The constructor for initializing a parameter.
+   * @brief The constructor for initializing a variable.
    */
-  Parameter(const Parameter& other)
+  Variable(const Variable& other)
       : id_m(other.id_m),
         initial_value_m(other.initial_value_m),
         final_value_m(other.final_value_m),
         estimation_type_m(other.estimation_type_m) {}
 
   /**
-   * @brief The constructor for initializing a parameter.
+   * @brief The constructor for initializing a variable.
    */
-  Parameter& operator=(const Parameter& right) {
+  Variable& operator=(const Variable& right) {
     // Check for self-assignment!
     if (this == &right)  // Same object?
       return *this;      // Yes, so skip assignment, and just return *this.
@@ -83,25 +83,25 @@ class Parameter {
   }
 
   /**
-   * @brief The constructor for initializing a parameter.
+   * @brief The constructor for initializing a variable.
    */
-  Parameter(double value) {
+  Variable(double value) {
     initial_value_m = value;
-    id_m = Parameter::id_g++;
+    id_m = Variable::id_g++;
   }
 
   /**
-   * @brief The constructor for initializing a parameter.
+   * @brief The constructor for initializing a Variable.
    * @details Set value to 0 when there is no input value.
    */
-  Parameter() {
+  Variable() {
     initial_value_m = 0;
-    id_m = Parameter::id_g++;
+    id_m = Variable::id_g++;
   }
 };
 
 #ifdef FIMS_HEADER_ONLY
-uint32_t Parameter::id_g = 0;
+uint32_t Variable::id_g = 0;
 #endif
 
 /**
@@ -118,13 +118,13 @@ inline double sanitize_val(double x) {
 }
 
 /**
- * @brief Output for std::ostream& for a parameter.
+ * @brief Output for std::ostream& for a variable.
  *
  * @param out The stream.
- * @param p A parameter.
+ * @param p A variable.
  * @return std::ostream&
  */
-inline std::ostream& operator<<(std::ostream& out, const Parameter& p) {
+inline std::ostream& operator<<(std::ostream& out, const Variable& p) {
   out << "{\"id\": " << p.id_m
       << ",\n\"value\": " << sanitize_val(p.initial_value_m)
       << ",\n\"estimated_value\": " << sanitize_val(p.final_value_m);
@@ -133,66 +133,66 @@ inline std::ostream& operator<<(std::ostream& out, const Parameter& p) {
   return out;
 }
 
-RCPP_EXPOSED_CLASS(Parameter)
+RCPP_EXPOSED_CLASS(Variable)
 
 /**
- * @brief An Rcpp interface class that defines the ParameterVector class.
+ * @brief An Rcpp interface class that defines the VariableVector class.
  *
  * @details An Rcpp interface class that defines the interface between R and
- * C++ for a parameter vector type.
+ * C++ for a variable vector type.
  */
-class ParameterVector {
+class VariableVector {
  public:
   /**
-   * @brief The static ID of the Parameter object.
+   * @brief The static ID of the Variable object.
    */
   static uint32_t id_g;
   /**
-   * @brief Parameter storage.
+   * @brief Variable storage.
    */
-  std::shared_ptr<std::vector<Parameter>> storage_m;
+  std::shared_ptr<std::vector<Variable>> storage_m;
   /**
-   * @brief The local ID of the Parameter object.
+   * @brief The local ID of the Variable object.
    */
   uint32_t id_m;
 
   /**
    * @brief The constructor.
    */
-  ParameterVector() {
-    this->id_m = ParameterVector::id_g++;
-    this->storage_m = std::make_shared<std::vector<Parameter>>();
+  VariableVector() {
+    this->id_m = VariableVector::id_g++;
+    this->storage_m = std::make_shared<std::vector<Variable>>();
     this->storage_m->resize(1);  // push_back(Rcpp::wrap(p));
   }
 
   /**
    * @brief The constructor.
    */
-  ParameterVector(const ParameterVector& other)
+  VariableVector(const VariableVector& other)
       : storage_m(other.storage_m), id_m(other.id_m) {}
 
   /**
    * @brief The constructor.
    */
-  ParameterVector(size_t size) {
-    this->id_m = ParameterVector::id_g++;
-    this->storage_m = std::make_shared<std::vector<Parameter>>();
+  VariableVector(size_t size) {
+    this->id_m = VariableVector::id_g++;
+    this->storage_m = std::make_shared<std::vector<Variable>>();
     this->storage_m->resize(size);
     for (size_t i = 0; i < size; i++) {
-      storage_m->at(i) = Parameter();
+      storage_m->at(i) = Variable();
     }
   }
 
   /**
-   * @brief The constructor for initializing a parameter vector.
+   * @brief The constructor for initializing a variable vector.
    * @param x A numeric vector.
    * @param size The number of elements to copy over.
    */
-  ParameterVector(Rcpp::NumericVector x, size_t size) {
+  VariableVector(Rcpp::NumericVector x, size_t size) {
     const size_t input_size = static_cast<size_t>(x.size());
     if (input_size != size) {
       throw std::invalid_argument(
-          "ParameterVector::ParameterVector(Rcpp::NumericVector, size_t): `x` "
+          "VariableVector::VariableVector(Rcpp::NumericVector, size_t): `x` "
           "length (" +
           std::to_string(input_size) +
           ") must equal the "
@@ -200,8 +200,8 @@ class ParameterVector {
           std::to_string(size) +
           "). Received length: " + std::to_string(input_size) + ".");
     } else {
-      this->id_m = ParameterVector::id_g++;
-      this->storage_m = std::make_shared<std::vector<Parameter>>();
+      this->id_m = VariableVector::id_g++;
+      this->storage_m = std::make_shared<std::vector<Variable>>();
       // Use std::min to avoid comparing signed and unsigned types
       size_t n = std::min(input_size, size);
       this->storage_m->resize(n);
@@ -212,12 +212,12 @@ class ParameterVector {
   }
 
   /**
-   * @brief The constructor for initializing a parameter vector.
+   * @brief The constructor for initializing a variable vector.
    * @param v A vector of doubles.
    */
-  ParameterVector(const fims::Vector<double>& v) {
-    this->id_m = ParameterVector::id_g++;
-    this->storage_m = std::make_shared<std::vector<Parameter>>();
+  VariableVector(const fims::Vector<double>& v) {
+    this->id_m = VariableVector::id_g++;
+    this->storage_m = std::make_shared<std::vector<Variable>>();
     this->storage_m->resize(v.size());
     for (size_t i = 0; i < v.size(); i++) {
       storage_m->at(i).initial_value_m = v[i];
@@ -225,31 +225,31 @@ class ParameterVector {
   }
 
   /**
-   * @brief Destroy the Parameter Vector object.
+   * @brief Destroy the Variable Vector object.
    *
    */
-  virtual ~ParameterVector() {}
+  virtual ~VariableVector() {}
 
   /**
-   * @brief Gets the ID of the ParameterVector object.
+   * @brief Gets the ID of the VariableVector object.
    */
   virtual uint32_t get_id() { return this->id_m; }
 
   /**
    * @brief The accessor where the first index starts is zero.
-   * @param pos The position of the ParameterVector that you want returned.
+   * @param pos The position of the VariableVector that you want returned.
    */
-  inline Parameter& operator[](size_t pos) { return this->storage_m->at(pos); }
+  inline Variable& operator[](size_t pos) { return this->storage_m->at(pos); }
 
   /**
    * @brief The accessor where the first index starts at one. This function is
    * for calling accessing from R.
-   * @param pos The position of the ParameterVector that you want returned.
+   * @param pos The position of the VariableVector that you want returned.
    */
   SEXP at(R_xlen_t pos) {
     if (static_cast<size_t>(pos) == 0 ||
         static_cast<size_t>(pos) > this->storage_m->size()) {
-      throw std::invalid_argument("ParameterVector: Index out of range");
+      throw std::invalid_argument("VariableVector: Index out of range");
       FIMS_ERROR_LOG(fims::to_string(pos) + "!<" +
                      fims::to_string(this->size()));
       return NULL;
@@ -258,53 +258,53 @@ class ParameterVector {
   }
 
   /**
-   * @brief An internal accessor for calling a position of a ParameterVector
+   * @brief An internal accessor for calling a position of a VariableVector
    * from R.
-   * @param pos An integer specifying the position of the ParameterVector
+   * @param pos An integer specifying the position of the VariableVector
    * you want returned. The first position is one and the last position is
-   * the same as the size of the ParameterVector.
+   * the same as the size of the VariableVector.
    */
-  Parameter& get(size_t pos) {
+  Variable& get(size_t pos) {
     if (pos >= this->storage_m->size()) {
-      throw std::invalid_argument("ParameterVector: Index out of range");
+      throw std::invalid_argument("VariableVector: Index out of range");
     }
     return (this->storage_m->at(pos));
   }
 
   /**
-   * @brief An internal setter for setting a position of a ParameterVector
+   * @brief An internal setter for setting a position of a VariableVector
    * from R.
-   * @param pos An integer specifying the position of the ParameterVector
+   * @param pos An integer specifying the position of the VariableVector
    * you want to set. The first position is one and the last position is the
-   * same as the size of the ParameterVector.
+   * same as the size of the VariableVector.
    * @param p A numeric value specifying the value to set position `pos` to
-   * in the ParameterVector.
+   * in the VariableVector.
    */
-  void set(size_t pos, const Parameter& p) { this->storage_m->at(pos) = p; }
+  void set(size_t pos, const Variable& p) { this->storage_m->at(pos) = p; }
 
   /**
-   * @brief Returns the size of a ParameterVector.
+   * @brief Returns the size of a VariableVector.
    */
   size_t size() { return this->storage_m->size(); }
 
   /**
-   * @brief Resizes a ParameterVector to the desired length.
+   * @brief Resizes a VariableVector to the desired length.
    * @param size An integer specifying the desired length for the
-   * ParameterVector to be resized to.
+   * VariableVector to be resized to.
    */
   void resize(size_t size) { this->storage_m->resize(size); }
 
   /**
-   * @brief Sets the initial values for all Parameters within a ParameterVector.
+   * @brief Sets the initial values for all Variables within a VariableVector.
    */
   void set_values(Rcpp::NumericVector values) {
     if (values.size() != this->storage_m->size()) {
       const size_t input_size = values.size();
       const size_t vector_size = this->storage_m->size();
       throw std::invalid_argument(
-          "ParameterVector::set_values(): `values` length (" +
+          "VariableVector::set_values(): `values` length (" +
           std::to_string(input_size) +
-          ") must equal the ParameterVector "
+          ") must equal the VariableVector "
           "size (" +
           std::to_string(vector_size) + "). Received length: " +
           std::to_string(input_size) + ". Pass a numeric vector of length " +
@@ -316,8 +316,8 @@ class ParameterVector {
   }
 
   /**
-   * @brief Sets the estimation type for all Parameters within a
-   * ParameterVector.
+   * @brief Sets the estimation type for all Variables within a
+   * VariableVector.
    */
   void set_estimation_types(Rcpp::CharacterVector estimation_types) {
     const size_t vector_size = this->storage_m->size();
@@ -325,10 +325,10 @@ class ParameterVector {
 
     if (input_size != 1 && input_size != vector_size) {
       throw std::invalid_argument(
-          "ParameterVector::set_estimation_types(): `estimation_types` length "
+          "VariableVector::set_estimation_types(): `estimation_types` length "
           "(" +
           std::to_string(input_size) +
-          ") must be 1 (broadcast) or equal to the ParameterVector size (" +
+          ") must be 1 (broadcast) or equal to the VariableVector size (" +
           std::to_string(vector_size) +
           ").\n"
           "Received length: " +
@@ -357,11 +357,11 @@ class ParameterVector {
   }
 
   /**
-   * @brief Sets the value of all Parameters in the ParameterVector to the
+   * @brief Sets the value of all Variables in the VariableVector to the
    * provided value.
    *
-   * @param value A double specifying the value to set all Parameters to
-   * within the ParameterVector.
+   * @param value A double specifying the value to set all Variables to
+   * within the VariableVector.
    */
   void fill(double value) {
     for (size_t i = 0; i < this->storage_m->size(); i++) {
@@ -370,7 +370,7 @@ class ParameterVector {
   }
 
   /**
-   * @brief The printing methods for a ParameterVector.
+   * @brief The printing methods for a VariableVector.
    *
    */
   void show() {
@@ -383,17 +383,17 @@ class ParameterVector {
 };
 
 #ifdef FIMS_HEADER_ONLY
-uint32_t ParameterVector::id_g = 0;
+uint32_t VariableVector::id_g = 0;
 #endif
 
 /**
- * @brief Output for std::ostream& for a ParameterVector.
+ * @brief Output for std::ostream& for a VariableVector.
  *
  * @param out The stream.
- * @param v A ParameterVector.
+ * @param v A VariableVector.
  * @return std::ostream&
  */
-inline std::ostream& operator<<(std::ostream& out, ParameterVector& v) {
+inline std::ostream& operator<<(std::ostream& out, VariableVector& v) {
   out << "[";
   size_t size = v.size();
   for (size_t i = 0; i < size - 1; i++) {
@@ -540,7 +540,7 @@ class RealVector {
   /**
    * @brief The accessor where the first index starts at one. This function is
    * for calling accessing from R.
-   * @param pos The position of the ParameterVector that you want returned.
+   * @param pos The position of the VariableVector that you want returned.
    */
   SEXP at(R_xlen_t pos) {
     if (static_cast<size_t>(pos) == 0 ||
@@ -619,7 +619,7 @@ class RealVector {
 uint32_t RealVector::id_g = 0;
 #endif
 
-RCPP_EXPOSED_CLASS(ParameterVector)
+RCPP_EXPOSED_CLASS(VariableVector)
 RCPP_EXPOSED_CLASS(RealVector)
 
 /**
@@ -661,7 +661,7 @@ class FIMSRcppInterfaceBase {
   }
 
   /**
-   * @brief Report the parameter value as a string.
+   * @brief Report the variable value as a string.
    *
    * @param value
    * @return std::string
