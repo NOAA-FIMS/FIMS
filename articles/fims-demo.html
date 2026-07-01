@@ -591,7 +591,7 @@ model. When <code>optimize = TRUE</code>, the model will be fit using
 <span><span class="co">## ✔ Finished optimization</span></span>
 <span><span class="co">## ✔ Finished sdreport</span></span>
 <span><span class="co">## ℹ FIMS model version: 0.9.3.9000</span></span>
-<span><span class="co">## ℹ Total run time was 1.22237 minutes</span></span>
+<span><span class="co">## ℹ Total run time was 1.23039 minutes</span></span>
 <span><span class="co">## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78</span></span>
 <span><span class="co">## ℹ Maximum gradient= 0.00101</span></span>
 <span><span class="co">## ℹ Negative log likelihood (NLL):</span></span>
@@ -620,7 +620,7 @@ documentation</a> for more information.</p>
 <span><span class="va">log_data_frame</span> <span class="op">&lt;-</span> <span class="fu">jsonlite</span><span class="fu">::</span><span class="fu"><a href="https://jeroen.r-universe.dev/jsonlite/reference/fromJSON.html" class="external-link">fromJSON</a></span><span class="op">(</span><span class="va">log_json_string</span><span class="op">)</span></span>
 <span><span class="va">log_data_frame</span><span class="op">[</span><span class="fl">1</span>, <span class="op">]</span></span></code></pre></div>
 <pre><code><span><span class="co">##                  timestamp   level</span></span>
-<span><span class="co">## 1 Mon Jun 29 18:52:14 2026 warning</span></span>
+<span><span class="co">## 1 Wed Jul  1 12:43:58 2026 warning</span></span>
 <span><span class="co">##                                                                   message id</span></span>
 <span><span class="co">## 1 The log_f_multiplier vector is not of size n_years. Filling with zeros.  0</span></span>
 <span><span class="co">##     user                                    wd</span></span>
@@ -644,8 +644,8 @@ documentation</a> for more information.</p>
 <code class="sourceCode R"><span><span class="co"># Subset for just the warnings</span></span>
 <span><span class="va">log_data_frame</span> <span class="op">|&gt;</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">level</span> <span class="op">==</span> <span class="st">"warning"</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##                  timestamp   level</span></span>
-<span><span class="co">## 1 Mon Jun 29 18:52:14 2026 warning</span></span>
-<span><span class="co">## 2 Mon Jun 29 18:52:14 2026 warning</span></span>
+<span><span class="co">## 1 Wed Jul  1 12:43:58 2026 warning</span></span>
+<span><span class="co">## 2 Wed Jul  1 12:43:58 2026 warning</span></span>
 <span><span class="co">##                                                                   message id</span></span>
 <span><span class="co">## 1 The log_f_multiplier vector is not of size n_years. Filling with zeros.  0</span></span>
 <span><span class="co">## 2              Setting spawning_biomass_ratio vector to size n_years + 1.  1</span></span>
@@ -773,7 +773,7 @@ changes due to changes to the initial value.</p>
 <span><span class="co">## ✔ Finished optimization</span></span>
 <span><span class="co">## ✔ Finished sdreport</span></span>
 <span><span class="co">## ℹ FIMS model version: 0.9.3.9000</span></span>
-<span><span class="co">## ℹ Total run time was 1.1942 minutes</span></span>
+<span><span class="co">## ℹ Total run time was 1.20655 minutes</span></span>
 <span><span class="co">## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78</span></span>
 <span><span class="co">## ℹ Maximum gradient= 0.00034</span></span>
 <span><span class="co">## ℹ Negative log likelihood (NLL):</span></span>
@@ -792,7 +792,7 @@ changes due to changes to the initial value.</p>
 <span><span class="co">## ✔ Finished optimization</span></span>
 <span><span class="co">## ✔ Finished sdreport</span></span>
 <span><span class="co">## ℹ FIMS model version: 0.9.3.9000</span></span>
-<span><span class="co">## ℹ Total run time was 1.23195 minutes</span></span>
+<span><span class="co">## ℹ Total run time was 1.24095 minutes</span></span>
 <span><span class="co">## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78</span></span>
 <span><span class="co">## ℹ Maximum gradient= 4e-04</span></span>
 <span><span class="co">## ℹ Negative log likelihood (NLL):</span></span>
@@ -823,7 +823,7 @@ length-composition configurations.</p>
 <span><span class="co">## ℹ Maximum gradient went from 0.00361 to 0.00038 after 3 steps.</span></span>
 <span><span class="co">## ✔ Finished optimization</span></span>
 <span><span class="co">## ✔ Finished sdreport</span></span>
-<span><span class="co">## ℹ FIMS model version: 0.9.3.9000 ℹ Total run time was 11.28396 seconds ℹ Number</span></span>
+<span><span class="co">## ℹ FIMS model version: 0.9.3.9000 ℹ Total run time was 11.45581 seconds ℹ Number</span></span>
 <span><span class="co">## of parameters: fixed_effects=49, random_effects=29, and total=78 ℹ Maximum</span></span>
 <span><span class="co">## gradient= 0.00038 ℹ Negative log likelihood (NLL): • Marginal NLL= 1627.76704 •</span></span>
 <span><span class="co">## Total NLL= 1564.0853 ℹ Terminal SB= 1740.95207</span></span></code></pre>
@@ -851,7 +851,7 @@ age-composition configurations.</p>
 <span><span class="co">## ℹ Maximum gradient went from 0.00715 to 0.00034 after 3 steps.</span></span>
 <span><span class="co">## ✔ Finished optimization</span></span>
 <span><span class="co">## ✔ Finished sdreport</span></span>
-<span><span class="co">## ℹ FIMS model version: 0.9.3.9000 ℹ Total run time was 1.1358 minutes ℹ Number</span></span>
+<span><span class="co">## ℹ FIMS model version: 0.9.3.9000 ℹ Total run time was 1.14835 minutes ℹ Number</span></span>
 <span><span class="co">## of parameters: fixed_effects=49, random_effects=29, and total=78 ℹ Maximum</span></span>
 <span><span class="co">## gradient= 0.00034 ℹ Negative log likelihood (NLL): • Marginal NLL= 1568.32685 •</span></span>
 <span><span class="co">## Total NLL= 1518.62644 ℹ Terminal SB= 1722.35744</span></span></code></pre>
