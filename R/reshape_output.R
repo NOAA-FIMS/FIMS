@@ -229,6 +229,23 @@ reshape_tmb_estimates <- function(obj,
 
   if (length(sdreport) > 0) {
     std <- summary(sdreport)
+    backend_report_std <- attr(sdreport, "fims_backend_report")
+    if (is.null(backend_report_std)) {
+      backend_report_std <- calculate_tmb_adreport_uncertainty(
+        obj = obj,
+        sdreport = sdreport
+      )
+    }
+    if (!is.null(backend_report_std)) {
+      report_nrow <- nrow(backend_report_std)
+      if (report_nrow > 0) {
+        report_rows <- seq.int(
+          from = nrow(std) - report_nrow + 1L,
+          to = nrow(std)
+        )
+        std[report_rows, c("Estimate", "Std. Error")] <- backend_report_std
+      }
+    }
     # Number of rows for derived quantities: based on the difference
     # between the total number of rows in std and the length of parameter_names.
     derived_quantity_nrow <- nrow(std) - length(parameter_names)

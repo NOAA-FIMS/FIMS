@@ -1485,6 +1485,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
         }
         this->of->reportvector.push(res, rvit->first.c_str());
       }
+      this->ReportRequestedDerivedQuantitiesTMB();
     }
 #endif
   }

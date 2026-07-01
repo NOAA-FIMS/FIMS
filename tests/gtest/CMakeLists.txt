@@ -14,6 +14,39 @@ function(add_as_invoker_manifest target)
   endif()
 endfunction()
 
+# test_common_DerivedQuantityReportRegistry.cpp
+add_executable(common_DerivedQuantityReportRegistry
+  test_common_DerivedQuantityReportRegistry.cpp
+)
+add_as_invoker_manifest(common_DerivedQuantityReportRegistry)
+target_link_libraries(common_DerivedQuantityReportRegistry
+  gtest_main
+  fims_test
+)
+gtest_discover_tests(common_DerivedQuantityReportRegistry)
+
+# test_common_DerivedQuantityUncertainty.cpp
+add_executable(common_DerivedQuantityUncertainty
+  test_common_DerivedQuantityUncertainty.cpp
+)
+add_as_invoker_manifest(common_DerivedQuantityUncertainty)
+target_link_libraries(common_DerivedQuantityUncertainty
+  gtest_main
+  fims_test
+)
+gtest_discover_tests(common_DerivedQuantityUncertainty)
+
+# test_TMB_FixedEffectADReportUncertaintyAdapter.cpp
+add_executable(TMB_FixedEffectADReportUncertaintyAdapter
+  test_TMB_FixedEffectADReportUncertaintyAdapter.cpp
+)
+add_as_invoker_manifest(TMB_FixedEffectADReportUncertaintyAdapter)
+target_link_libraries(TMB_FixedEffectADReportUncertaintyAdapter
+  gtest_main
+  fims_test
+)
+gtest_discover_tests(TMB_FixedEffectADReportUncertaintyAdapter)
+
 # test_fimsMath_fimsMath_exp.cpp
 add_executable(fimsMath_fimsMath_exp
   test_fimsMath_fimsMath_exp.cpp

@@ -643,6 +643,10 @@ fit_fims <- function(input,
   if (get_sd) {
     t2 <- Sys.time()
     sdreport <- TMB::sdreport(obj)
+    attr(sdreport, "fims_backend_report") <- calculate_tmb_adreport_uncertainty(
+      obj = obj,
+      sdreport = sdreport
+    )
     cli::cli_inform(c("v" = "Finished sdreport"))
     time_sdreport <- Sys.time() - t2
     check_sdreport_convergence(input, obj, opt, sdreport)
