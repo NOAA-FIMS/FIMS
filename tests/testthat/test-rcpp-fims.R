@@ -13,8 +13,8 @@
 
 ## IO correctness ----
 test_that("Rcpp interface works for modules", {
-  #' @description Test that Rcpp interface works for parameter module.
-  expect_no_error(parameter <- methods::new(Variable, .1))
+  #' @description Test that Rcpp interface works for variable module.
+  expect_no_error(variable <- methods::new(Variable, .1))
 
   #' @description Test that Rcpp interface works for recruitment module.
   expect_no_error(beverton_holt <- methods::new(BevertonHoltRecruitment))
