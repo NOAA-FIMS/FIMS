@@ -332,4 +332,21 @@ TEST(ADReportPayloadExtractor,
   EXPECT_EQ(payload.jacobian[3], 1.0);
 }
 
+// NativeTMBADReportDerivativeProvider
+// Edge handling
+TEST(NativeTMBADReportDerivativeProvider, HandlesEdge_DefaultHasNoHandle) {
+  fims_tmb::NativeTMBADReportDerivativeProvider provider;
+
+  EXPECT_FALSE(provider.HasModelHandle());
+}
+
+// Error handling
+TEST(NativeTMBADReportDerivativeProvider, ThrowsUntilNativeHandleAccessExists) {
+  int model_handle = 1;
+  fims_tmb::NativeTMBADReportDerivativeProvider provider(&model_handle);
+
+  EXPECT_TRUE(provider.HasModelHandle());
+  EXPECT_THROW(provider.GetExtractionInput(), std::logic_error);
+}
+
 }  // namespace

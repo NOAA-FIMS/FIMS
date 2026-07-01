@@ -141,6 +141,46 @@ class StaticADReportDerivativeProvider : public ADReportDerivativeProvider {
 };
 
 /**
+ * @brief Placeholder for a future provider backed by native TMB handles.
+ *
+ * @details TMB currently exposes the pieces used here through the R-facing
+ * MakeADFun/sdreport path. This provider marks the C++ API FIMS will use once
+ * native TMB handle access is available.
+ */
+class NativeTMBADReportDerivativeProvider : public ADReportDerivativeProvider {
+ public:
+  /**
+   * @brief Construct a native TMB provider stub.
+   *
+   * @param model_handle Pointer to a future native TMB model or ADFun handle.
+   */
+  explicit NativeTMBADReportDerivativeProvider(
+      void* model_handle = nullptr)
+      : model_handle_m(model_handle) {}
+
+  /**
+   * @brief Get raw derivative ingredients for ADREPORT payload extraction.
+   *
+   * @return ADReportPayloadExtractionInput Raw derivative pieces.
+   */
+  ADReportPayloadExtractionInput GetExtractionInput() const override {
+    throw std::logic_error(
+        "NativeTMBADReportDerivativeProvider::GetExtractionInput is not "
+        "implemented until native TMB ADREPORT handle access is available");
+  }
+
+  /**
+   * @brief Check whether a native TMB handle was provided.
+   *
+   * @return bool True when a non-null handle is stored.
+   */
+  bool HasModelHandle() const { return model_handle_m != nullptr; }
+
+ private:
+  void* model_handle_m = nullptr;
+};
+
+/**
  * @brief Assemble backend ADREPORT payloads from raw TMB derivative pieces.
  */
 class ADReportPayloadExtractor {
