@@ -95,10 +95,66 @@ struct ADReportPayloadExtractionInput {
 };
 
 /**
+ * @brief Interface for objects that provide ADREPORT derivative ingredients.
+ *
+ * @details The current Rcpp implementation can populate a static provider from
+ * TMB's R-facing API. A future native TMB provider can implement the same
+ * boundary without changing payload extraction or uncertainty calculation.
+ */
+class ADReportDerivativeProvider {
+ public:
+  virtual ~ADReportDerivativeProvider() {}
+
+  /**
+   * @brief Get raw derivative ingredients for ADREPORT payload extraction.
+   *
+   * @return ADReportPayloadExtractionInput Raw derivative pieces.
+   */
+  virtual ADReportPayloadExtractionInput GetExtractionInput() const = 0;
+};
+
+/**
+ * @brief Provider backed by an already assembled derivative bundle.
+ */
+class StaticADReportDerivativeProvider : public ADReportDerivativeProvider {
+ public:
+  /**
+   * @brief Construct a provider from raw extraction input.
+   *
+   * @param input Raw derivative pieces.
+   */
+  explicit StaticADReportDerivativeProvider(
+      const ADReportPayloadExtractionInput& input)
+      : input_m(input) {}
+
+  /**
+   * @brief Get raw derivative ingredients for ADREPORT payload extraction.
+   *
+   * @return ADReportPayloadExtractionInput Raw derivative pieces.
+   */
+  ADReportPayloadExtractionInput GetExtractionInput() const override {
+    return input_m;
+  }
+
+ private:
+  ADReportPayloadExtractionInput input_m;
+};
+
+/**
  * @brief Assemble backend ADREPORT payloads from raw TMB derivative pieces.
  */
 class ADReportPayloadExtractor {
  public:
+  /**
+   * @brief Extract an ADREPORT payload from a derivative provider.
+   *
+   * @param provider ADREPORT derivative provider.
+   * @return ADReportPayload Structured payload for backend uncertainty.
+   */
+  ADReportPayload Extract(const ADReportDerivativeProvider& provider) const {
+    return this->Extract(provider.GetExtractionInput());
+  }
+
   /**
    * @brief Extract fixed and random-effect pieces from raw ADREPORT derivatives.
    *

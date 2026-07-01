@@ -302,8 +302,9 @@ Rcpp::List assemble_adreport_payload(Rcpp::List payload) {
             fixed_jacobian_adjustment));
   }
 
+  fims_tmb::StaticADReportDerivativeProvider provider(input);
   fims_tmb::ADReportPayloadExtractor extractor;
-  fims_tmb::ADReportPayload output = extractor.Extract(input);
+  fims_tmb::ADReportPayload output = extractor.Extract(provider);
   return ADReportPayloadToRcppList(output);
 }
 
