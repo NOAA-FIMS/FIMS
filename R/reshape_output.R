@@ -98,7 +98,7 @@ reshape_json_estimates <- function(model_output) {
     ) |>
     tidyr::unnest(dplyr::all_of("density_component")) |>
     dplyr::select(-dplyr::starts_with("data_")) |>
-    dplyr::group_by(.data$module_id, .data$name) |>
+    dplyr::group_by(.data$module_id, name) |>
     dplyr::mutate(join_by = dplyr::row_number()) |>
     dplyr::ungroup()
 
@@ -118,7 +118,7 @@ reshape_json_estimates <- function(model_output) {
       )
     ) |>
     tidyr::unnest(dplyr::all_of("parameters")) |>
-    dplyr::group_by(.data$module_id, .data$name) |>
+    dplyr::group_by(.data$module_id, name) |>
     dplyr::mutate(join_by = dplyr::row_number()) |>
     dplyr::ungroup() |>
     dplyr::left_join(

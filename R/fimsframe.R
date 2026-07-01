@@ -611,7 +611,7 @@ methods::setMethod(
       dplyr::mutate(
         type = gsub("_", " ", .data$type)
       ) |>
-      dplyr::group_by(.data$name, .data$timing, .data$type) |>
+      dplyr::group_by(name, .data$timing, .data$type) |>
       dplyr::filter(.data$value != -999) |>
       dplyr::summarize(
         no = dplyr::n()
@@ -621,8 +621,8 @@ methods::setMethod(
       data = data_for_plot,
       mapping = ggplot2::aes(
         x = .data$timing,
-        y = .data$name,
-        col = .data$name
+        y = name,
+        col = name
       )
     ) +
       ggplot2::facet_wrap(
@@ -697,7 +697,7 @@ methods::setValidity(
     for (present_type in grep("_comp", present_types, value = TRUE)) {
       test <- object@data |>
         dplyr::filter(.data$type == present_type, .data$value != -999) |>
-        dplyr::group_by(.data$name, .data$timing, .drop = FALSE) |>
+        dplyr::group_by(name, .data$timing, .drop = FALSE) |>
         dplyr::group_map(.keep = TRUE, \(.x, .y) {
           validate_composition_data(.x)
         })
@@ -993,7 +993,7 @@ FIMSFrame <- function(data) {
   # Check that full dimension information is available for weight_at_age
   dplyr::group_by(
     dplyr::filter(data, .data$type == "weight_at_age"),
-    .data$name
+    name
   ) |>
     dplyr::group_split() |>
     purrr::walk(
@@ -1021,11 +1021,11 @@ FIMSFrame <- function(data) {
       column = "age",
       types = c("weight_at_age", "age_comp")
     )
-    summary_by_name <- dplyr::count(missing_ages, .data$name, .data$timing) |>
+    summary_by_name <- dplyr::count(missing_ages, name, .data$timing) |>
       dplyr::filter(.data$n != n_ages) |>
       dplyr::summarize(
         timings = paste(.data$timing, collapse = ", "),
-        .by = .data$name
+        .by = name
       )
     if (NROW(summary_by_name) > 0) {
       cli::cli_abort(
@@ -1046,11 +1046,11 @@ FIMSFrame <- function(data) {
       column = "length",
       types = "length_comp"
     )
-    summary_by_name <- dplyr::count(missing_lengths, .data$name, .data$timing) |>
+    summary_by_name <- dplyr::count(missing_lengths, name, .data$timing) |>
       dplyr::filter(.data$n != n_lengths) |>
       dplyr::summarize(
         timings = paste(.data$timing, collapse = ", "),
-        .by = .data$name
+        .by = name
       )
     if (NROW(summary_by_name) > 0) {
       cli::cli_abort(
@@ -1117,7 +1117,7 @@ create_missing_data <- function(
     rlang::sym(column)
   }
   use_this_data <- data |>
-    dplyr::group_by(.data$type, .data$name)
+    dplyr::group_by(.data$type, name)
   out_data <- if (missing(bins)) {
     # This only pertains to annual data without bins
     use_this_data |>
@@ -1132,7 +1132,7 @@ create_missing_data <- function(
       )
   } else {
     use_this_data |>
-      dplyr::group_by(.data$type, .data$name) |>
+      dplyr::group_by(.data$type, name) |>
       dplyr::filter(.data$type %in% types) |>
       tidyr::expand(
         !!rlang::sym("unit"),

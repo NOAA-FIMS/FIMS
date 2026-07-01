@@ -115,7 +115,7 @@ initialize_module <- function(parameters, data, module_name, fleet_name = NA_cha
     ))
 
     fleet_types <- get_data(data) |>
-      dplyr::filter(.data$name == fleet_name) |>
+      dplyr::filter(name == fleet_name) |>
       dplyr::pull(.data$type) |>
       unique()
 
@@ -359,7 +359,7 @@ initialize_fleet <- function(parameters, data, fleet_name, linked_ids) {
   module$SetSelectivityID(linked_ids[["selectivity"]])
 
   fleet_types <- get_data(data) |>
-    dplyr::filter(.data$name == fleet_name) |>
+    dplyr::filter(name == fleet_name) |>
     dplyr::pull(.data$type) |>
     unique()
 
@@ -421,7 +421,7 @@ initialize_landings <- function(data, fleet_name) {
 
   fleet_type <- dplyr::filter(
     .data = as.data.frame(get_data(data)),
-    .data$name == fleet_name
+    name == fleet_name
   ) |>
     dplyr::distinct(.data$type) |>
     dplyr::pull(.data$type)
@@ -455,7 +455,7 @@ initialize_index <- function(data, fleet_name) {
 
   fleet_type <- dplyr::filter(
     .data = as.data.frame(get_data(data)),
-    .data$name == fleet_name
+    name == fleet_name
   ) |>
     dplyr::distinct(.data$type) |>
     dplyr::pull(.data$type)
@@ -540,7 +540,7 @@ initialize_comp <- function(data,
   model_data <- comp_data *
     get_data(data) |>
       dplyr::filter(
-        .data$name == fleet_name,
+        name == fleet_name,
         .data$type == comp[["name"]]
       ) |>
       dplyr::mutate(
@@ -551,7 +551,7 @@ initialize_comp <- function(data,
   if (length(model_data) != get_n_years(data) * get_function(data)) {
     bad_data_years <- get_data(data) |>
       dplyr::filter(
-        .data$name == fleet_name,
+        name == fleet_name,
         .data$type == comp[["name"]]
       ) |>
       dplyr::count(.data$timing) |>
@@ -688,7 +688,7 @@ initialize_fims <- function(parameters, data) {
     )
 
     fleet_types <- get_data(data) |>
-      dplyr::filter(.data$name == fleet_names[i]) |>
+      dplyr::filter(name == fleet_names[i]) |>
       dplyr::pull(.data$type) |>
       unique()
 

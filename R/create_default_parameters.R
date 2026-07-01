@@ -448,7 +448,7 @@ create_default_fleet <- function(unnested_configurations,
 
   # Get types of data for this fleet from the data object
   data_types_present <- get_data(data) |>
-    dplyr::filter(.data$name == current_fleet_name) |>
+    dplyr::filter(name == current_fleet_name) |>
     dplyr::pull(.data$type) |>
     unique()
 
@@ -461,7 +461,7 @@ create_default_fleet <- function(unnested_configurations,
   if ("index" %in% data_types_present &&
     "Index" %in% distribution_names_for_fleet) {
     fleet_index <- get_data(data) |>
-      dplyr::filter(.data$type == "index" & .data$name == current_fleet_name) |>
+      dplyr::filter(.data$type == "index" & name == current_fleet_name) |>
       dplyr::rename(time = dplyr::all_of("timing"))
 
     q_default <- create_default_parameters_template(n_parameters = 1) |>
@@ -481,7 +481,7 @@ create_default_fleet <- function(unnested_configurations,
       dplyr::pull(.data$distribution)
 
     index_uncertainty <- get_data(data) |>
-      dplyr::filter(.data$name == current_fleet_name, .data$type %in% c("index")) |>
+      dplyr::filter(name == current_fleet_name, .data$type %in% c("index")) |>
       dplyr::arrange(dplyr::desc(.data$type)) |>
       dplyr::pull(.data$uncertainty)
 
@@ -518,7 +518,7 @@ create_default_fleet <- function(unnested_configurations,
   if ("landings" %in% data_types_present &&
     "Landings" %in% distribution_names_for_fleet) {
     fleet_landings <- get_data(data) |>
-      dplyr::filter(.data$type == "landings" & .data$name == current_fleet_name) |>
+      dplyr::filter(.data$type == "landings" & name == current_fleet_name) |>
       dplyr::rename(time = dplyr::all_of("timing"))
 
     log_Fmort_default <- create_default_parameters_template(
@@ -541,7 +541,7 @@ create_default_fleet <- function(unnested_configurations,
       dplyr::pull(.data$distribution)
 
     landings_uncertainty <- get_data(data) |>
-      dplyr::filter(.data$name == current_fleet_name, .data$type %in% c("landings")) |>
+      dplyr::filter(name == current_fleet_name, .data$type %in% c("landings")) |>
       dplyr::arrange(dplyr::desc(.data$type)) |>
       dplyr::pull(.data$uncertainty)
 
@@ -565,7 +565,7 @@ create_default_fleet <- function(unnested_configurations,
       )
   } else {
     fleet_index <- get_data(data) |>
-      dplyr::filter(.data$type == "index" & .data$name == current_fleet_name)
+      dplyr::filter(.data$type == "index" & name == current_fleet_name)
 
     log_Fmort_default <- create_default_parameters_template(
       n_parameters = get_n_years(data)

@@ -116,7 +116,7 @@ create_default_configurations <- function(
   # for determining which modules are needed for each fleet.
   unique_fleet_types <- data |>
     get_data() |>
-    dplyr::distinct(.data$name, .data$type) |>
+    dplyr::distinct(name, .data$type) |>
     # Convert type from snake_case to PascalCase
     dplyr::mutate(module_type = snake_to_pascal(.data$type)) |>
     # Set module_type to NA for weight-at-age and age-to-length-conversion
