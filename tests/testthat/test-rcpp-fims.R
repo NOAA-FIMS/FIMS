@@ -13,8 +13,8 @@
 
 ## IO correctness ----
 test_that("Rcpp interface works for modules", {
-  #' @description Test that Rcpp interface works for parameter module.
-  expect_no_error(parameter <- methods::new(Parameter, .1))
+  #' @description Test that Rcpp interface works for Variable module.
+  expect_no_error(Variable <- methods::new(Variable, .1))
 
   #' @description Test that Rcpp interface works for recruitment module.
   expect_no_error(beverton_holt <- methods::new(BevertonHoltRecruitment))
@@ -52,9 +52,9 @@ test_that("Rcpp interface works for modules", {
 
 ## Error handling ----
 test_that("Rcpp interface returns correct error messages", {
-  #' @description Test that Rcpp Parameter interface returns an error when given incorrect input.
+  #' @description Test that Rcpp Variable interface returns an error when given incorrect input.
   expect_error(
-    methods::new(Parameter, "a"),
+    methods::new(Variable, "a"),
     regexp = "Not compatible with requested type"
   )
   #' @description Test that `BevertonHoltRecruitment` module returns an error when given incorrect input.

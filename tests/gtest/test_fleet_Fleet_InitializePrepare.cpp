@@ -41,7 +41,6 @@ namespace
             EXPECT_EQ(dq["index_expected"].size(), n_years);
             EXPECT_EQ(dq["log_index_expected"].size(), n_years);
             EXPECT_EQ(dq["catch_index"].size(), n_years);
-            EXPECT_EQ(dq["expected_catch"].size(), n_years);
             EXPECT_EQ(dq["agecomp_expected"].size(), n_years * n_ages);
             EXPECT_EQ(dq["lengthcomp_expected"].size(), n_years * n_lengths);
             EXPECT_EQ(fleet->Fmort.size(), n_years);
@@ -90,8 +89,6 @@ namespace
             EXPECT_EQ(dq["log_index_expected"], 
                 fims::Vector(n_years, 0.0));
             EXPECT_EQ(dq["catch_index"], 
-                fims::Vector(n_years, 0.0));
-            EXPECT_EQ(dq["expected_catch"], 
                 fims::Vector(n_years, 0.0));
             EXPECT_EQ(dq["agecomp_expected"], 
                 fims::Vector(n_years * n_ages, 0.0));

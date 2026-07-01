@@ -40,11 +40,6 @@ class PopulationInterfaceBase : public FIMSRcppInterfaceBase {
    */
   SharedBoolean initialize_catch_at_age;
   /**
-   * @brief Initialize the surplus production model.
-   *
-   */
-  SharedBoolean initialize_surplus_production;
-  /**
    * @brief The constructor.
    */
   PopulationInterfaceBase() {
@@ -122,19 +117,19 @@ class PopulationInterface : public PopulationInterfaceBase {
   /**
    * @brief The natural log of the natural mortality for each year.
    */
-  ParameterVector log_M;
+  VariableVector log_M;
   /**
    * @brief The population spawning biomass ratio for each year.
    */
-  ParameterVector spawning_biomass_ratio;
+  VariableVector spawning_biomass_ratio;
   /**
    * @brief Log of the population annual fishing mortality multiplier.
    */
-  ParameterVector log_f_multiplier;
+  VariableVector log_f_multiplier;
   /**
    * @brief The natural log of the initial numbers at age.
    */
-  ParameterVector log_init_naa;
+  VariableVector log_init_naa;
   /**
    * @brief Proportion of females in the population.
    *
@@ -143,7 +138,7 @@ class PopulationInterface : public PopulationInterfaceBase {
    * to all ages during model evaluation. Values should be in [0, 1].
    * Out-of-range inputs are logged as warnings.
    */
-  ParameterVector proportion_female;
+  VariableVector proportion_female;
   /**
    * @brief Ages that are modeled in the population, the length of this vector
    * should equal \"n_ages\".
