@@ -127,4 +127,89 @@ TEST(LaplaceADReportUncertaintyAdapter, ThrowsWhenPayloadIsInvalid) {
   EXPECT_THROW(adapter.Calculate(report), std::invalid_argument);
 }
 
+// ADReportPayloadUncertaintyCalculator
+// IO correctness
+TEST(ADReportPayloadUncertaintyCalculator,
+     HandlesCorrectInput_DispatchesFixedPayload) {
+  fims_tmb::ADReportPayload payload;
+  payload.method = "fixed";
+  payload.request.quantity_name = "derived";
+  payload.request.report_name = "derived";
+  payload.estimate = fims::Vector<double>{-3.0, -1.0};
+  payload.jacobian = fims::Vector<double>{1.0, 2.0, 2.0, 1.0};
+  payload.fixed_effect_covariance =
+      fims::Vector<double>{4.0, 0.0, 0.0, 9.0};
+  payload.n_fixed_effects = 2;
+
+  fims_tmb::ADReportPayloadUncertaintyCalculator calculator;
+  fims_report::DerivedQuantityEstimate estimate = calculator.Calculate(payload);
+
+  EXPECT_EQ(estimate.request.report_name, "derived");
+  EXPECT_EQ(estimate.estimate[0], -3.0);
+  EXPECT_EQ(estimate.estimate[1], -1.0);
+  EXPECT_EQ(estimate.se[0], std::sqrt(40.0));
+  EXPECT_EQ(estimate.se[1], 5.0);
+}
+
+// IO correctness
+TEST(ADReportPayloadUncertaintyCalculator,
+     HandlesCorrectInput_DispatchesFixedAfterLaplacePayload) {
+  fims_tmb::ADReportPayload payload;
+  payload.method = "fixed_after_laplace";
+  payload.request.quantity_name = "derived";
+  payload.request.report_name = "derived";
+  payload.estimate = fims::Vector<double>{-3.0, -1.0};
+  payload.fixed_jacobian = fims::Vector<double>{1.0, 2.0, 2.0, 1.0};
+  payload.fixed_effect_covariance =
+      fims::Vector<double>{4.0, 0.0, 0.0, 9.0};
+  payload.n_fixed_effects = 2;
+
+  fims_tmb::ADReportPayloadUncertaintyCalculator calculator;
+  fims_report::DerivedQuantityEstimate estimate = calculator.Calculate(payload);
+
+  EXPECT_EQ(estimate.request.report_name, "derived");
+  EXPECT_EQ(estimate.se[0], std::sqrt(40.0));
+  EXPECT_EQ(estimate.se[1], 5.0);
+}
+
+// IO correctness
+TEST(ADReportPayloadUncertaintyCalculator,
+     HandlesCorrectInput_DispatchesLaplacePayload) {
+  fims_tmb::ADReportPayload payload;
+  payload.method = "laplace";
+  payload.request.quantity_name = "derived";
+  payload.request.report_name = "derived";
+  payload.estimate = fims::Vector<double>{10.0, 20.0};
+  payload.adjusted_fixed_jacobian =
+      fims::Vector<double>{1.0, 2.0, 0.5, 1.0};
+  payload.fixed_effect_covariance =
+      fims::Vector<double>{4.0, 0.0, 0.0, 9.0};
+  payload.random_jacobian = fims::Vector<double>{3.0, 0.0, 1.0, 2.0};
+  payload.random_effect_covariance =
+      fims::Vector<double>{2.0, 0.5, 0.5, 1.0};
+  payload.n_fixed_effects = 2;
+  payload.n_random_effects = 2;
+
+  fims_tmb::ADReportPayloadUncertaintyCalculator calculator;
+  fims_report::DerivedQuantityEstimate estimate = calculator.Calculate(payload);
+
+  EXPECT_EQ(estimate.request.report_name, "derived");
+  EXPECT_DOUBLE_EQ(estimate.se[0], std::sqrt(58.0));
+  EXPECT_DOUBLE_EQ(estimate.se[1], std::sqrt(18.0));
+}
+
+// Error handling
+TEST(ADReportPayloadUncertaintyCalculator, ThrowsWhenMethodIsUnknown) {
+  fims_tmb::ADReportPayload payload;
+  payload.method = "quadratic";
+  payload.estimate = fims::Vector<double>{1.0};
+  payload.jacobian = fims::Vector<double>{1.0};
+  payload.fixed_effect_covariance = fims::Vector<double>{1.0};
+  payload.n_fixed_effects = 1;
+
+  fims_tmb::ADReportPayloadUncertaintyCalculator calculator;
+
+  EXPECT_THROW(calculator.Calculate(payload), std::invalid_argument);
+}
+
 }  // namespace
