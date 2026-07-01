@@ -49,6 +49,29 @@ struct LaplaceADReport {
 };
 
 /**
+ * @brief Structured ADREPORT payload extracted from a TMB model.
+ *
+ * @details This type is the backend boundary for TMB-derived uncertainty. Rcpp
+ * can translate an R list into this payload today, and a future TMB API
+ * extractor can populate the same payload directly from C++.
+ */
+struct ADReportPayload {
+  std::string method;
+  fims_report::DerivedQuantityReportRequest request;
+  fims::Vector<double> estimate;
+  fims::Vector<double> jacobian;
+  fims::Vector<double> fixed_jacobian;
+  fims::Vector<double> adjusted_fixed_jacobian;
+  fims::Vector<double> fixed_effect_covariance;
+  fims::Vector<double> random_jacobian;
+  fims::Vector<double> random_effect_covariance;
+  fims::Vector<int> dims;
+  fims::Vector<std::string> dim_names;
+  size_t n_fixed_effects = 0;
+  size_t n_random_effects = 0;
+};
+
+/**
  * @brief Adapter from TMB fixed-effect ADREPORT output to FIMS uncertainty.
  */
 class FixedEffectADReportUncertaintyAdapter {
@@ -223,6 +246,59 @@ class LaplaceADReportUncertaintyAdapter {
           "LaplaceADReportUncertaintyAdapter::Validate: random covariance "
           "size is invalid");
     }
+  }
+};
+
+/**
+ * @brief Dispatch ADREPORT payloads to the correct backend uncertainty adapter.
+ */
+class ADReportPayloadUncertaintyCalculator {
+ public:
+  /**
+   * @brief Calculate standard errors from a structured ADREPORT payload.
+   *
+   * @param payload ADREPORT payload.
+   * @return fims_report::DerivedQuantityEstimate Estimate and SEs.
+   */
+  fims_report::DerivedQuantityEstimate Calculate(
+      const ADReportPayload& payload) const {
+    if (payload.method == "laplace") {
+      LaplaceADReport report;
+      report.request = payload.request;
+      report.estimate = payload.estimate;
+      report.adjusted_fixed_jacobian = payload.adjusted_fixed_jacobian;
+      report.fixed_effect_covariance = payload.fixed_effect_covariance;
+      report.random_jacobian = payload.random_jacobian;
+      report.random_effect_covariance = payload.random_effect_covariance;
+      report.dims = payload.dims;
+      report.dim_names = payload.dim_names;
+      report.n_fixed_effects = payload.n_fixed_effects;
+      report.n_random_effects = payload.n_random_effects;
+
+      LaplaceADReportUncertaintyAdapter adapter;
+      return adapter.Calculate(report);
+    }
+
+    FixedEffectADReport report;
+    report.request = payload.request;
+    report.estimate = payload.estimate;
+    if (payload.method == "fixed_after_laplace") {
+      report.jacobian = payload.fixed_jacobian;
+    } else if (payload.method == "fixed") {
+      report.jacobian = payload.jacobian;
+    } else {
+      std::ostringstream ss;
+      ss << "ADReportPayloadUncertaintyCalculator::Calculate: unsupported "
+         << "method '" << payload.method << "'";
+      throw std::invalid_argument(ss.str());
+    }
+    report.fixed_effect_covariance = payload.fixed_effect_covariance;
+    report.dims = payload.dims;
+    report.dim_names = payload.dim_names;
+    report.n_fixed_effects = payload.n_fixed_effects;
+
+    FixedEffectADReportUncertaintyAdapter adapter;
+    return adapter.Calculate(report);
   }
 };
 

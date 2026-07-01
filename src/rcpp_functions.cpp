@@ -30,6 +30,57 @@ Rcpp::NumericVector DerivedQuantitySEToNumericVector(
   return se;
 }
 
+fims_tmb::ADReportPayload ADReportPayloadFromRcppList(Rcpp::List payload) {
+  if (!payload.containsElementNamed("method")) {
+    Rcpp::stop("payload must contain a method element");
+  }
+
+  fims_tmb::ADReportPayload output;
+  output.method = Rcpp::as<std::string>(payload["method"]);
+
+  Rcpp::NumericVector estimate = payload["estimate"];
+  Rcpp::NumericMatrix fixed_covariance = payload["fixed_covariance"];
+  output.estimate =
+      fims::Vector<double>(Rcpp::as<std::vector<double>>(estimate));
+  output.fixed_effect_covariance =
+      fims::Vector<double>(NumericMatrixToRowMajor(fixed_covariance));
+  output.n_fixed_effects = static_cast<size_t>(fixed_covariance.nrow());
+
+  if (output.method == "laplace") {
+    Rcpp::NumericMatrix adjusted_fixed_jacobian =
+        payload["adjusted_fixed_jacobian"];
+    Rcpp::NumericMatrix random_jacobian = payload["random_jacobian"];
+    Rcpp::NumericMatrix random_covariance = payload["random_covariance"];
+
+    output.adjusted_fixed_jacobian =
+        fims::Vector<double>(NumericMatrixToRowMajor(adjusted_fixed_jacobian));
+    output.random_jacobian =
+        fims::Vector<double>(NumericMatrixToRowMajor(random_jacobian));
+    output.random_effect_covariance =
+        fims::Vector<double>(NumericMatrixToRowMajor(random_covariance));
+    output.n_random_effects = static_cast<size_t>(random_covariance.nrow());
+
+    return output;
+  }
+
+  if (output.method == "fixed_after_laplace") {
+    Rcpp::NumericMatrix fixed_jacobian =
+        Rcpp::as<Rcpp::NumericMatrix>(payload["fixed_jacobian"]);
+    output.fixed_jacobian =
+        fims::Vector<double>(NumericMatrixToRowMajor(fixed_jacobian));
+    return output;
+  }
+
+  if (output.method == "fixed") {
+    Rcpp::NumericMatrix jacobian =
+        Rcpp::as<Rcpp::NumericMatrix>(payload["jacobian"]);
+    output.jacobian = fims::Vector<double>(NumericMatrixToRowMajor(jacobian));
+    return output;
+  }
+
+  Rcpp::stop("Unsupported ADREPORT payload method: %s", output.method.c_str());
+}
+
 }  // namespace
 
 /**
@@ -117,61 +168,11 @@ Rcpp::NumericVector calculate_derived_quantity_laplace_se(
  * @return Rcpp::NumericVector Standard errors.
  */
 Rcpp::NumericVector calculate_adreport_payload_se(Rcpp::List payload) {
-  if (!payload.containsElementNamed("method")) {
-    Rcpp::stop("payload must contain a method element");
-  }
-
-  const std::string method = Rcpp::as<std::string>(payload["method"]);
-  Rcpp::NumericVector estimate = payload["estimate"];
-  Rcpp::NumericMatrix fixed_covariance = payload["fixed_covariance"];
-  const int n_fixed_effects = fixed_covariance.nrow();
-
-  if (method == "laplace") {
-    Rcpp::NumericMatrix adjusted_fixed_jacobian =
-        payload["adjusted_fixed_jacobian"];
-    Rcpp::NumericMatrix random_jacobian = payload["random_jacobian"];
-    Rcpp::NumericMatrix random_covariance = payload["random_covariance"];
-
-    fims_tmb::LaplaceADReport report;
-    report.estimate =
-        fims::Vector<double>(Rcpp::as<std::vector<double>>(estimate));
-    report.adjusted_fixed_jacobian =
-        fims::Vector<double>(NumericMatrixToRowMajor(
-            adjusted_fixed_jacobian));
-    report.fixed_effect_covariance =
-        fims::Vector<double>(NumericMatrixToRowMajor(fixed_covariance));
-    report.random_jacobian =
-        fims::Vector<double>(NumericMatrixToRowMajor(random_jacobian));
-    report.random_effect_covariance =
-        fims::Vector<double>(NumericMatrixToRowMajor(random_covariance));
-    report.n_fixed_effects = static_cast<size_t>(n_fixed_effects);
-    report.n_random_effects = static_cast<size_t>(random_covariance.nrow());
-
-    fims_tmb::LaplaceADReportUncertaintyAdapter adapter;
-    fims_report::DerivedQuantityEstimate output = adapter.Calculate(report);
-    return DerivedQuantitySEToNumericVector(output);
-  }
-
-  Rcpp::NumericMatrix jacobian;
-  if (method == "fixed_after_laplace") {
-    jacobian = Rcpp::as<Rcpp::NumericMatrix>(payload["fixed_jacobian"]);
-  } else if (method == "fixed") {
-    jacobian = Rcpp::as<Rcpp::NumericMatrix>(payload["jacobian"]);
-  } else {
-    Rcpp::stop("Unsupported ADREPORT payload method: %s", method.c_str());
-  }
-
-  fims_tmb::FixedEffectADReport report;
-  report.estimate =
-      fims::Vector<double>(Rcpp::as<std::vector<double>>(estimate));
-  report.jacobian =
-      fims::Vector<double>(NumericMatrixToRowMajor(jacobian));
-  report.fixed_effect_covariance =
-      fims::Vector<double>(NumericMatrixToRowMajor(fixed_covariance));
-  report.n_fixed_effects = static_cast<size_t>(n_fixed_effects);
-
-  fims_tmb::FixedEffectADReportUncertaintyAdapter adapter;
-  fims_report::DerivedQuantityEstimate output = adapter.Calculate(report);
+  fims_tmb::ADReportPayload adreport_payload =
+      ADReportPayloadFromRcppList(payload);
+  fims_tmb::ADReportPayloadUncertaintyCalculator calculator;
+  fims_report::DerivedQuantityEstimate output =
+      calculator.Calculate(adreport_payload);
   return DerivedQuantitySEToNumericVector(output);
 }
 
