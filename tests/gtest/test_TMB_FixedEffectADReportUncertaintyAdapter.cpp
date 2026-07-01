@@ -294,4 +294,42 @@ TEST(ADReportPayloadExtractor, ThrowsWhenJacobianDimensionsAreInvalid) {
   EXPECT_THROW(extractor.Extract(input), std::invalid_argument);
 }
 
+// StaticADReportDerivativeProvider
+// IO correctness
+TEST(StaticADReportDerivativeProvider, HandlesCorrectInput_ReturnsDerivativeBundle) {
+  fims_tmb::ADReportPayloadExtractionInput input;
+  input.estimate = fims::Vector<double>{4.0};
+  input.jacobian = fims::Vector<double>{2.0};
+  input.fixed_effect_covariance = fims::Vector<double>{9.0};
+  input.n_parameters = 1;
+
+  fims_tmb::StaticADReportDerivativeProvider provider(input);
+  fims_tmb::ADReportPayloadExtractionInput output =
+      provider.GetExtractionInput();
+
+  EXPECT_EQ(output.estimate[0], 4.0);
+  EXPECT_EQ(output.jacobian[0], 2.0);
+  EXPECT_EQ(output.fixed_effect_covariance[0], 9.0);
+  EXPECT_EQ(output.n_parameters, static_cast<size_t>(1));
+}
+
+// IO correctness
+TEST(ADReportPayloadExtractor,
+     HandlesCorrectInput_AssemblesPayloadFromProvider) {
+  fims_tmb::ADReportPayloadExtractionInput input;
+  input.estimate = fims::Vector<double>{-3.0, -1.0};
+  input.jacobian = fims::Vector<double>{1.0, 2.0, 2.0, 1.0};
+  input.fixed_effect_covariance = fims::Vector<double>{4.0, 0.0, 0.0, 9.0};
+  input.n_parameters = 2;
+
+  fims_tmb::StaticADReportDerivativeProvider provider(input);
+  fims_tmb::ADReportPayloadExtractor extractor;
+  fims_tmb::ADReportPayload payload = extractor.Extract(provider);
+
+  EXPECT_EQ(payload.method, "fixed");
+  EXPECT_EQ(payload.n_fixed_effects, static_cast<size_t>(2));
+  EXPECT_EQ(payload.jacobian[0], 1.0);
+  EXPECT_EQ(payload.jacobian[3], 1.0);
+}
+
 }  // namespace
