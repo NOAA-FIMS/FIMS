@@ -5,6 +5,7 @@
 #' @export LogRRecruitmentProcess
 #' @export CatchAtAge
 #' @export clear
+#' @export assemble_adreport_payload
 #' @export calculate_adreport_payload_se
 #' @export calculate_derived_quantity_se
 #' @export calculate_derived_quantity_laplace_se

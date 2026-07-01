@@ -64,11 +64,287 @@ struct ADReportPayload {
   fims::Vector<double> adjusted_fixed_jacobian;
   fims::Vector<double> fixed_effect_covariance;
   fims::Vector<double> random_jacobian;
+  fims::Vector<double> random_effect_hessian;
   fims::Vector<double> random_effect_covariance;
+  fims::Vector<int> fixed_indices;
+  fims::Vector<int> random_indices;
   fims::Vector<int> dims;
   fims::Vector<std::string> dim_names;
   size_t n_fixed_effects = 0;
   size_t n_random_effects = 0;
+};
+
+/**
+ * @brief Raw ingredients needed to assemble an ADREPORT payload.
+ *
+ * @details Index vectors use zero-based C++ positions. The full Jacobian is
+ * stored row-major with one row per ADREPORT element and one column per full
+ * parameter vector element.
+ */
+struct ADReportPayloadExtractionInput {
+  fims_report::DerivedQuantityReportRequest request;
+  fims::Vector<double> estimate;
+  fims::Vector<double> jacobian;
+  fims::Vector<double> fixed_effect_covariance;
+  fims::Vector<double> random_effect_hessian;
+  fims::Vector<double> fixed_jacobian_adjustment;
+  fims::Vector<int> random_indices;
+  fims::Vector<int> dims;
+  fims::Vector<std::string> dim_names;
+  size_t n_parameters = 0;
+};
+
+/**
+ * @brief Assemble backend ADREPORT payloads from raw TMB derivative pieces.
+ */
+class ADReportPayloadExtractor {
+ public:
+  /**
+   * @brief Extract fixed and random-effect pieces from raw ADREPORT derivatives.
+   *
+   * @param input Raw ADREPORT derivative pieces.
+   * @return ADReportPayload Structured payload for backend uncertainty.
+   */
+  ADReportPayload Extract(const ADReportPayloadExtractionInput& input) const {
+    this->Validate(input);
+
+    ADReportPayload output;
+    output.request = input.request;
+    output.estimate = input.estimate;
+    output.fixed_effect_covariance = input.fixed_effect_covariance;
+    output.dims = input.dims;
+    output.dim_names = input.dim_names;
+
+    if (input.random_indices.size() == 0) {
+      output.method = "fixed";
+      output.jacobian = input.jacobian;
+      output.n_fixed_effects = input.n_parameters;
+      output.n_random_effects = 0;
+      for (size_t i = 0; i < input.n_parameters; i++) {
+        output.fixed_indices.push_back(static_cast<int>(i));
+      }
+      return output;
+    }
+
+    fims::Vector<int> fixed_indices = this->FixedIndices(
+        input.n_parameters, input.random_indices);
+    output.fixed_jacobian = this->SelectColumns(
+        input.jacobian, input.estimate.size(), input.n_parameters,
+        fixed_indices);
+    output.random_jacobian = this->SelectColumns(
+        input.jacobian, input.estimate.size(), input.n_parameters,
+        input.random_indices);
+    output.n_fixed_effects = fixed_indices.size();
+    output.n_random_effects = input.random_indices.size();
+    output.fixed_indices = fixed_indices;
+    output.random_indices = input.random_indices;
+
+    if (this->AllNearZero(output.random_jacobian)) {
+      output.method = "fixed_after_laplace";
+      return output;
+    }
+
+    output.method = "laplace";
+    output.random_effect_hessian = input.random_effect_hessian;
+    output.random_effect_covariance = this->InvertSquareMatrix(
+        input.random_effect_hessian, output.n_random_effects);
+    output.adjusted_fixed_jacobian = output.fixed_jacobian;
+    for (size_t i = 0; i < output.adjusted_fixed_jacobian.size(); i++) {
+      output.adjusted_fixed_jacobian[i] += input.fixed_jacobian_adjustment[i];
+    }
+
+    return output;
+  }
+
+ private:
+  /**
+   * @brief Validate extraction inputs.
+   *
+   * @param input Raw extraction inputs.
+   */
+  void Validate(const ADReportPayloadExtractionInput& input) const {
+    if (input.estimate.size() == 0) {
+      throw std::invalid_argument(
+          "ADReportPayloadExtractor::Validate: estimate cannot be empty");
+    }
+    if (input.n_parameters == 0) {
+      throw std::invalid_argument(
+          "ADReportPayloadExtractor::Validate: n_parameters must be greater "
+          "than zero");
+    }
+    if (input.jacobian.size() != input.estimate.size() * input.n_parameters) {
+      std::ostringstream ss;
+      ss << "ADReportPayloadExtractor::Validate: jacobian size "
+         << input.jacobian.size() << " does not match estimate size "
+         << input.estimate.size() << " times n_parameters "
+         << input.n_parameters;
+      throw std::invalid_argument(ss.str());
+    }
+
+    std::vector<bool> is_random(input.n_parameters, false);
+    for (size_t i = 0; i < input.random_indices.size(); i++) {
+      if (input.random_indices[i] < 0 ||
+          static_cast<size_t>(input.random_indices[i]) >= input.n_parameters) {
+        throw std::invalid_argument(
+            "ADReportPayloadExtractor::Validate: random index is out of "
+            "bounds");
+      }
+      if (is_random[static_cast<size_t>(input.random_indices[i])]) {
+        throw std::invalid_argument(
+            "ADReportPayloadExtractor::Validate: random indices cannot contain "
+            "duplicates");
+      }
+      is_random[static_cast<size_t>(input.random_indices[i])] = true;
+    }
+
+    const size_t n_fixed_effects =
+        input.n_parameters - input.random_indices.size();
+    if (n_fixed_effects == 0) {
+      throw std::invalid_argument(
+          "ADReportPayloadExtractor::Validate: at least one fixed effect is "
+          "required");
+    }
+    if (input.fixed_effect_covariance.size() !=
+        n_fixed_effects * n_fixed_effects) {
+      std::ostringstream ss;
+      ss << "ADReportPayloadExtractor::Validate: fixed covariance size "
+         << input.fixed_effect_covariance.size()
+         << " does not match n_fixed_effects squared "
+         << n_fixed_effects * n_fixed_effects;
+      throw std::invalid_argument(ss.str());
+    }
+
+    if (input.random_indices.size() == 0) {
+      return;
+    }
+
+    if (input.random_effect_hessian.size() !=
+        input.random_indices.size() * input.random_indices.size()) {
+      throw std::invalid_argument(
+          "ADReportPayloadExtractor::Validate: random Hessian size is invalid");
+    }
+    if (input.fixed_jacobian_adjustment.size() !=
+        input.estimate.size() * n_fixed_effects) {
+      throw std::invalid_argument(
+          "ADReportPayloadExtractor::Validate: fixed Jacobian adjustment size "
+          "is invalid");
+    }
+  }
+
+  /**
+   * @brief Get fixed-effect indices as complement of random-effect indices.
+   */
+  fims::Vector<int> FixedIndices(
+      size_t n_parameters, const fims::Vector<int>& random_indices) const {
+    std::vector<bool> is_random(n_parameters, false);
+    for (size_t i = 0; i < random_indices.size(); i++) {
+      is_random[static_cast<size_t>(random_indices[i])] = true;
+    }
+
+    fims::Vector<int> fixed_indices;
+    for (size_t i = 0; i < n_parameters; i++) {
+      if (!is_random[i]) {
+        fixed_indices.push_back(static_cast<int>(i));
+      }
+    }
+    return fixed_indices;
+  }
+
+  /**
+   * @brief Select matrix columns from a row-major matrix.
+   */
+  fims::Vector<double> SelectColumns(
+      const fims::Vector<double>& matrix, size_t n_rows, size_t n_cols,
+      const fims::Vector<int>& columns) const {
+    fims::Vector<double> output;
+    output.reserve(n_rows * columns.size());
+    for (size_t i = 0; i < n_rows; i++) {
+      for (size_t j = 0; j < columns.size(); j++) {
+        output.push_back(
+            static_cast<double>(
+                matrix[(i * n_cols) + static_cast<size_t>(columns[j])]));
+      }
+    }
+    return output;
+  }
+
+  /**
+   * @brief Check whether all values are approximately zero.
+   */
+  bool AllNearZero(const fims::Vector<double>& values) const {
+    for (size_t i = 0; i < values.size(); i++) {
+      if (std::fabs(values[i]) > 1.0e-14) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /**
+   * @brief Invert a dense row-major square matrix.
+   */
+  fims::Vector<double> InvertSquareMatrix(
+      const fims::Vector<double>& matrix, size_t n) const {
+    fims::Vector<double> work(n * 2 * n, 0.0);
+    for (size_t i = 0; i < n; i++) {
+      for (size_t j = 0; j < n; j++) {
+        work[(i * 2 * n) + j] = matrix[(i * n) + j];
+      }
+      work[(i * 2 * n) + n + i] = 1.0;
+    }
+
+    for (size_t pivot_col = 0; pivot_col < n; pivot_col++) {
+      size_t pivot_row = pivot_col;
+      double pivot_abs = std::fabs(work[(pivot_col * 2 * n) + pivot_col]);
+      for (size_t row = pivot_col + 1; row < n; row++) {
+        const double candidate_abs =
+            std::fabs(work[(row * 2 * n) + pivot_col]);
+        if (candidate_abs > pivot_abs) {
+          pivot_abs = candidate_abs;
+          pivot_row = row;
+        }
+      }
+
+      if (pivot_abs <= 1.0e-14) {
+        throw std::runtime_error(
+            "ADReportPayloadExtractor::InvertSquareMatrix: matrix is "
+            "singular");
+      }
+
+      if (pivot_row != pivot_col) {
+        for (size_t col = 0; col < 2 * n; col++) {
+          const double tmp = work[(pivot_col * 2 * n) + col];
+          work[(pivot_col * 2 * n) + col] = work[(pivot_row * 2 * n) + col];
+          work[(pivot_row * 2 * n) + col] = tmp;
+        }
+      }
+
+      const double pivot = work[(pivot_col * 2 * n) + pivot_col];
+      for (size_t col = 0; col < 2 * n; col++) {
+        work[(pivot_col * 2 * n) + col] /= pivot;
+      }
+
+      for (size_t row = 0; row < n; row++) {
+        if (row == pivot_col) {
+          continue;
+        }
+        const double factor = work[(row * 2 * n) + pivot_col];
+        for (size_t col = 0; col < 2 * n; col++) {
+          work[(row * 2 * n) + col] -=
+              factor * work[(pivot_col * 2 * n) + col];
+        }
+      }
+    }
+
+    fims::Vector<double> inverse;
+    inverse.reserve(n * n);
+    for (size_t i = 0; i < n; i++) {
+      for (size_t j = 0; j < n; j++) {
+        inverse.push_back(static_cast<double>(work[(i * 2 * n) + n + j]));
+      }
+    }
+    return inverse;
+  }
 };
 
 /**

@@ -212,4 +212,86 @@ TEST(ADReportPayloadUncertaintyCalculator, ThrowsWhenMethodIsUnknown) {
   EXPECT_THROW(calculator.Calculate(payload), std::invalid_argument);
 }
 
+// ADReportPayloadExtractor
+// IO correctness
+TEST(ADReportPayloadExtractor, HandlesCorrectInput_AssemblesFixedPayload) {
+  fims_tmb::ADReportPayloadExtractionInput input;
+  input.estimate = fims::Vector<double>{-3.0, -1.0};
+  input.jacobian = fims::Vector<double>{1.0, 2.0, 2.0, 1.0};
+  input.fixed_effect_covariance = fims::Vector<double>{4.0, 0.0, 0.0, 9.0};
+  input.n_parameters = 2;
+
+  fims_tmb::ADReportPayloadExtractor extractor;
+  fims_tmb::ADReportPayload payload = extractor.Extract(input);
+
+  EXPECT_EQ(payload.method, "fixed");
+  EXPECT_EQ(payload.n_fixed_effects, static_cast<size_t>(2));
+  EXPECT_EQ(payload.n_random_effects, static_cast<size_t>(0));
+  EXPECT_EQ(payload.fixed_indices[0], 0);
+  EXPECT_EQ(payload.fixed_indices[1], 1);
+  EXPECT_EQ(payload.jacobian[0], 1.0);
+  EXPECT_EQ(payload.jacobian[3], 1.0);
+}
+
+// IO correctness
+TEST(ADReportPayloadExtractor,
+     HandlesCorrectInput_AssemblesFixedAfterLaplacePayload) {
+  fims_tmb::ADReportPayloadExtractionInput input;
+  input.estimate = fims::Vector<double>{-3.0, -1.0};
+  input.jacobian = fims::Vector<double>{1.0, 0.0, 2.0, 0.0};
+  input.fixed_effect_covariance = fims::Vector<double>{4.0};
+  input.random_effect_hessian = fims::Vector<double>{9.0};
+  input.fixed_jacobian_adjustment = fims::Vector<double>{0.0, 0.0};
+  input.random_indices = fims::Vector<int>{1};
+  input.n_parameters = 2;
+
+  fims_tmb::ADReportPayloadExtractor extractor;
+  fims_tmb::ADReportPayload payload = extractor.Extract(input);
+
+  EXPECT_EQ(payload.method, "fixed_after_laplace");
+  EXPECT_EQ(payload.n_fixed_effects, static_cast<size_t>(1));
+  EXPECT_EQ(payload.n_random_effects, static_cast<size_t>(1));
+  EXPECT_EQ(payload.fixed_indices[0], 0);
+  EXPECT_EQ(payload.random_indices[0], 1);
+  EXPECT_EQ(payload.fixed_jacobian[0], 1.0);
+  EXPECT_EQ(payload.fixed_jacobian[1], 2.0);
+}
+
+// IO correctness
+TEST(ADReportPayloadExtractor, HandlesCorrectInput_AssemblesLaplacePayload) {
+  fims_tmb::ADReportPayloadExtractionInput input;
+  input.estimate = fims::Vector<double>{10.0, 20.0};
+  input.jacobian = fims::Vector<double>{1.0, 3.0, 0.5, 2.0};
+  input.fixed_effect_covariance = fims::Vector<double>{4.0};
+  input.random_effect_hessian = fims::Vector<double>{0.5};
+  input.fixed_jacobian_adjustment = fims::Vector<double>{2.0, 0.5};
+  input.random_indices = fims::Vector<int>{1};
+  input.n_parameters = 2;
+
+  fims_tmb::ADReportPayloadExtractor extractor;
+  fims_tmb::ADReportPayload payload = extractor.Extract(input);
+
+  EXPECT_EQ(payload.method, "laplace");
+  EXPECT_EQ(payload.fixed_jacobian[0], 1.0);
+  EXPECT_EQ(payload.fixed_jacobian[1], 0.5);
+  EXPECT_EQ(payload.random_jacobian[0], 3.0);
+  EXPECT_EQ(payload.random_jacobian[1], 2.0);
+  EXPECT_EQ(payload.random_effect_covariance[0], 2.0);
+  EXPECT_EQ(payload.adjusted_fixed_jacobian[0], 3.0);
+  EXPECT_EQ(payload.adjusted_fixed_jacobian[1], 1.0);
+}
+
+// Error handling
+TEST(ADReportPayloadExtractor, ThrowsWhenJacobianDimensionsAreInvalid) {
+  fims_tmb::ADReportPayloadExtractionInput input;
+  input.estimate = fims::Vector<double>{1.0};
+  input.jacobian = fims::Vector<double>{1.0};
+  input.fixed_effect_covariance = fims::Vector<double>{1.0};
+  input.n_parameters = 2;
+
+  fims_tmb::ADReportPayloadExtractor extractor;
+
+  EXPECT_THROW(extractor.Extract(input), std::invalid_argument);
+}
+
 }  // namespace
