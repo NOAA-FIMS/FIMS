@@ -306,7 +306,7 @@ class Information {
     }
   }
 
-  /**
+/**
    * @brief Loop over distributions and set links to distribution x value if
    * distribution is a random effects type.
    */
@@ -329,11 +329,11 @@ class Information {
           d->re_expected_values = (*vmit).second;
         } else {
           d->re_expected_values = &d->expected_values;
-        }
-        FIMS_INFO_LOG("Random effect size for distribution " +
+                }
+                  FIMS_INFO_LOG("Random effect size for distribution " +
                       fims::to_string(d->id) +
                       " is: " + fims::to_string(d->observed_values.size()));
-      }
+      }        
     }
   }
 

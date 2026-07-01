@@ -29,6 +29,14 @@ struct FIMSObject {
   std::vector<Type*>
       fixed_effects_parameters; /**< list of fixed effects parameters */
 
+  /**
+     * @brief Vector of path coefficients for DSEM-based modeling.
+     * @details This allows any module inheriting from FIMSObject (Recruitment, 
+     * Growth, Selectivity, Maturity) to serve as an origin or target in a 
+     * structural equation model.
+     */
+    fims::Vector<Type> beta_z;
+
   virtual ~FIMSObject() {}
 
   /**
