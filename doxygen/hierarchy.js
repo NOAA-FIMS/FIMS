@@ -2,32 +2,34 @@ var hierarchy =
 [
     [ "fims_popdy::DimensionInfo", "structfims__popdy_1_1DimensionInfo.html", null ],
     [ "fims::FIMSLog", "classfims_1_1FIMSLog.html", null ],
-    [ "fims_model_object::FIMSObject< Type >", "structfims__model__object_1_1FIMSObject.html", [
-      [ "fims_data_object::DataObject< Type >", "structfims__data__object_1_1DataObject.html", null ],
-      [ "fims_distributions::DensityComponentBase< Type >", "structfims__distributions_1_1DensityComponentBase.html", [
-        [ "fims_distributions::LogNormalLPDF< Type >", "structfims__distributions_1_1LogNormalLPDF.html", null ],
-        [ "fims_distributions::MultinomialLPMF< Type >", "structfims__distributions_1_1MultinomialLPMF.html", null ],
-        [ "fims_distributions::NormalLPDF< Type >", "structfims__distributions_1_1NormalLPDF.html", null ]
-      ] ],
-      [ "fims_popdy::FisheryModelBase< Type >", "classfims__popdy_1_1FisheryModelBase.html", [
-        [ "fims_popdy::CatchAtAge< Type >", "classfims__popdy_1_1CatchAtAge.html", null ]
-      ] ],
-      [ "fims_popdy::Fleet< Type >", "structfims__popdy_1_1Fleet.html", null ],
-      [ "fims_popdy::GrowthBase< Type >", "structfims__popdy_1_1GrowthBase.html", [
-        [ "fims_popdy::EWAAGrowth< Type >", "structfims__popdy_1_1EWAAGrowth.html", null ]
-      ] ],
-      [ "fims_popdy::MaturityBase< Type >", "structfims__popdy_1_1MaturityBase.html", [
-        [ "fims_popdy::LogisticMaturity< Type >", "structfims__popdy_1_1LogisticMaturity.html", null ]
-      ] ],
-      [ "fims_popdy::Population< Type >", "structfims__popdy_1_1Population.html", null ],
-      [ "fims_popdy::RecruitmentBase< Type >", "structfims__popdy_1_1RecruitmentBase.html", [
-        [ "fims_popdy::LogDevs< Type >", "structfims__popdy_1_1LogDevs.html", null ],
-        [ "fims_popdy::LogR< Type >", "structfims__popdy_1_1LogR.html", null ],
-        [ "fims_popdy::SRBevertonHolt< Type >", "structfims__popdy_1_1SRBevertonHolt.html", null ]
-      ] ],
-      [ "fims_popdy::SelectivityBase< Type >", "structfims__popdy_1_1SelectivityBase.html", [
-        [ "fims_popdy::DoubleLogisticSelectivity< Type >", "structfims__popdy_1_1DoubleLogisticSelectivity.html", null ],
-        [ "fims_popdy::LogisticSelectivity< Type >", "structfims__popdy_1_1LogisticSelectivity.html", null ]
+    [ "fims_model_object::FIMSMemoryTracker", "structfims__model__object_1_1FIMSMemoryTracker.html", [
+      [ "fims_model_object::FIMSObject< Type >", "structfims__model__object_1_1FIMSObject.html", [
+        [ "fims_data_object::DataObject< Type >", "structfims__data__object_1_1DataObject.html", null ],
+        [ "fims_distributions::DensityComponentBase< Type >", "structfims__distributions_1_1DensityComponentBase.html", [
+          [ "fims_distributions::LogNormalLPDF< Type >", "structfims__distributions_1_1LogNormalLPDF.html", null ],
+          [ "fims_distributions::MultinomialLPMF< Type >", "structfims__distributions_1_1MultinomialLPMF.html", null ],
+          [ "fims_distributions::NormalLPDF< Type >", "structfims__distributions_1_1NormalLPDF.html", null ]
+        ] ],
+        [ "fims_popdy::FisheryModelBase< Type >", "classfims__popdy_1_1FisheryModelBase.html", [
+          [ "fims_popdy::CatchAtAge< Type >", "classfims__popdy_1_1CatchAtAge.html", null ]
+        ] ],
+        [ "fims_popdy::Fleet< Type >", "structfims__popdy_1_1Fleet.html", null ],
+        [ "fims_popdy::GrowthBase< Type >", "structfims__popdy_1_1GrowthBase.html", [
+          [ "fims_popdy::EWAAGrowth< Type >", "structfims__popdy_1_1EWAAGrowth.html", null ]
+        ] ],
+        [ "fims_popdy::MaturityBase< Type >", "structfims__popdy_1_1MaturityBase.html", [
+          [ "fims_popdy::LogisticMaturity< Type >", "structfims__popdy_1_1LogisticMaturity.html", null ]
+        ] ],
+        [ "fims_popdy::Population< Type >", "structfims__popdy_1_1Population.html", null ],
+        [ "fims_popdy::RecruitmentBase< Type >", "structfims__popdy_1_1RecruitmentBase.html", [
+          [ "fims_popdy::LogDevs< Type >", "structfims__popdy_1_1LogDevs.html", null ],
+          [ "fims_popdy::LogR< Type >", "structfims__popdy_1_1LogR.html", null ],
+          [ "fims_popdy::SRBevertonHolt< Type >", "structfims__popdy_1_1SRBevertonHolt.html", null ]
+        ] ],
+        [ "fims_popdy::SelectivityBase< Type >", "structfims__popdy_1_1SelectivityBase.html", [
+          [ "fims_popdy::DoubleLogisticSelectivity< Type >", "structfims__popdy_1_1DoubleLogisticSelectivity.html", null ],
+          [ "fims_popdy::LogisticSelectivity< Type >", "structfims__popdy_1_1LogisticSelectivity.html", null ]
+        ] ]
       ] ]
     ] ],
     [ "FIMSRcppInterfaceBase", "classFIMSRcppInterfaceBase.html", [

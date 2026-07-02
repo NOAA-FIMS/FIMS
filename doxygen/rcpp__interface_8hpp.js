@@ -1,6 +1,7 @@
 var rcpp__interface_8hpp =
 [
     [ "clear", "rcpp__interface_8hpp.html#ac8bb3912a3ce86b15842e79d0b421204", null ],
+    [ "clear_impl", "rcpp__interface_8hpp.html#a37b38b15d2747a18aaf5a378aa519bd7", null ],
     [ "clear_internal", "rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d", null ],
     [ "CreateTMBModel", "rcpp__interface_8hpp.html#a1d0c303c2c44fcb296368608a5f2ff1a", null ],
     [ "escapeQuotes", "rcpp__interface_8hpp.html#a14b639ccdb08205804ff4bfef6641f02", null ],
@@ -20,5 +21,6 @@ var rcpp__interface_8hpp =
     [ "set_log_path", "rcpp__interface_8hpp.html#a0b21c940ec97b43420185f5c0cada013", null ],
     [ "set_log_throw_on_error", "rcpp__interface_8hpp.html#a8307f81a8310f0c70a7bf7bc5b4aa5ea", null ],
     [ "set_random_parameters", "rcpp__interface_8hpp.html#a602703ef3357097ff34a6751fd13c3f5", null ],
+    [ "test_clear_with_leak_check", "rcpp__interface_8hpp.html#ad43a5b69234e81e1d7b36b905eeedc67", null ],
     [ "write_log", "rcpp__interface_8hpp.html#ad2abfffed726ee7fcbf89f0ec216fe62", null ]
 ];

@@ -185,7 +185,7 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 </div>
 <script type="text/javascript">
 /* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
-$(document).ready(function(){initNavTree('growth__base_8hpp_source.html',''); initResizable(); });
+$(document).ready(function(){initNavTree('structfims__model__object_1_1FIMSMemoryTracker.html',''); initResizable(); });
 /* @license-end */
 </script>
 <div id="doc-content">
@@ -211,59 +211,96 @@ $(document).ready(function(){initNavTree('growth__base_8hpp_source.html',''); in
 </div>
 
 <div class="header">
-  <div class="headertitle"><div class="title">growth_base.hpp</div></div>
+  <div class="summary">
+<a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pub-static-attribs">Static Public Attributes</a> &#124;
+<a href="structfims__model__object_1_1FIMSMemoryTracker-members.html">List of all members</a>  </div>
+  <div class="headertitle"><div class="title">fims_model_object::FIMSMemoryTracker Struct Reference</div></div>
 </div><!--header-->
 <div class="contents">
-<a href="growth__base_8hpp.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span> </div>
-<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="preprocessor">#ifndef POPULATION_DYNAMICS_GROWTH_BASE_HPP</span></div>
-<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="preprocessor">#define POPULATION_DYNAMICS_GROWTH_BASE_HPP</span></div>
-<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span> </div>
-<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="preprocessor">#include &quot;<a class="code" href="model__object_8hpp.html">common/model_object.hpp</a>&quot;</span></div>
-<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span> </div>
-<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacefims__popdy.html">fims_popdy</a> {</div>
-<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span> </div>
-<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span><span class="keyword">template</span> &lt;<span class="keyword">typename</span> Type&gt;</div>
-<div class="foldopen" id="foldopen00024" data-start="{" data-end="};">
-<div class="line"><a id="l00024" name="l00024"></a><span class="lineno"><a class="line" href="structfims__popdy_1_1GrowthBase.html">   24</a></span><span class="keyword">struct </span><a class="code hl_struct" href="structfims__popdy_1_1GrowthBase.html">GrowthBase</a> : <span class="keyword">public</span> <a class="code hl_struct" href="structfims__model__object_1_1FIMSObject.html">fims_model_object::FIMSObject</a>&lt;Type&gt; {</div>
-<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span>  <span class="comment">// id_g is the ID of the instance of the  growthBase class.</span></div>
-<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>  <span class="comment">// this is like a memory tracker.</span></div>
-<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span>  <span class="comment">// Assigning each one its own ID is a way to keep track of</span></div>
-<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>  <span class="comment">// all the instances of the  growthBase class.</span></div>
-<div class="line"><a id="l00029" name="l00029"></a><span class="lineno"><a class="line" href="structfims__popdy_1_1GrowthBase.html#a016bebc606785d9be69f454def1b2855">   29</a></span>  <span class="keyword">static</span> <a class="code hl_function" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a> <a class="code hl_variable" href="structfims__popdy_1_1GrowthBase.html#a016bebc606785d9be69f454def1b2855">id_g</a>; </div>
-<div class="foldopen" id="foldopen00034" data-start="{" data-end="}">
-<div class="line"><a id="l00034" name="l00034"></a><span class="lineno"><a class="line" href="structfims__popdy_1_1GrowthBase.html#a0352b6934eea814c055d7fdbc81efa14">   34</a></span>  <a class="code hl_function" href="structfims__popdy_1_1GrowthBase.html#a0352b6934eea814c055d7fdbc81efa14">GrowthBase</a>() {</div>
-<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>    this-&gt;<span class="keywordtype">id</span> = <a class="code hl_variable" href="structfims__popdy_1_1GrowthBase.html#a016bebc606785d9be69f454def1b2855">GrowthBase::id_g</a>++;</div>
-<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>    this-&gt;<a class="code hl_function" href="structfims__model__object_1_1FIMSMemoryTracker.html#aa714fd275e924fae47d51824b0e705cc">register_self</a>(this-&gt;<span class="keywordtype">id</span>);</div>
-<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>  }</div>
+
+<p>FIMS struct that tracks object memory for leak detection.  
+ <a href="structfims__model__object_1_1FIMSMemoryTracker.html#details">More...</a></p>
+
+<p><code>#include &lt;<a class="el" href="model__object_8hpp_source.html">model_object.hpp</a>&gt;</code></p>
+<div class="dynheader">
+Inheritance diagram for fims_model_object::FIMSMemoryTracker:</div>
+<div class="dyncontent">
+ <div class="center">
+  <img src="structfims__model__object_1_1FIMSMemoryTracker.png" usemap="#fims_5Fmodel_5Fobject::FIMSMemoryTracker_map" alt=""/>
+  <map id="fims_5Fmodel_5Fobject::FIMSMemoryTracker_map" name="fims_5Fmodel_5Fobject::FIMSMemoryTracker_map">
+<area href="structfims__model__object_1_1FIMSObject.html" title="FIMSObject struct that defines member types and returns the unique id." alt="fims_model_object::FIMSObject&lt; Type &gt;" shape="rect" coords="0,56,299,80"/>
+<area href="structfims__data__object_1_1DataObject.html" alt="fims_data_object::DataObject&lt; Type &gt;" shape="rect" coords="309,112,608,136"/>
+<area href="structfims__distributions_1_1DensityComponentBase.html" title="Base class for all module_name functors." alt="fims_distributions::DensityComponentBase&lt; Type &gt;" shape="rect" coords="309,168,608,192"/>
+<area href="classfims__popdy_1_1FisheryModelBase.html" title="FisheryModelBase is a base class for fishery models in FIMS." alt="fims_popdy::FisheryModelBase&lt; Type &gt;" shape="rect" coords="309,224,608,248"/>
+<area href="structfims__popdy_1_1Fleet.html" title="Base class for all fleets." alt="fims_popdy::Fleet&lt; Type &gt;" shape="rect" coords="309,280,608,304"/>
+<area href="structfims__popdy_1_1GrowthBase.html" title="Base class for all growth functors." alt="fims_popdy::GrowthBase&lt; Type &gt;" shape="rect" coords="309,336,608,360"/>
+<area href="structfims__popdy_1_1MaturityBase.html" title="Base class for all maturity functors." alt="fims_popdy::MaturityBase&lt; Type &gt;" shape="rect" coords="309,392,608,416"/>
+<area href="structfims__popdy_1_1Population.html" title="Population class. Contains subpopulations that are divided into generic partitions (e...." alt="fims_popdy::Population&lt; Type &gt;" shape="rect" coords="309,448,608,472"/>
+<area href="structfims__popdy_1_1RecruitmentBase.html" title="Base class for all recruitment functors." alt="fims_popdy::RecruitmentBase&lt; Type &gt;" shape="rect" coords="309,504,608,528"/>
+<area href="structfims__popdy_1_1SelectivityBase.html" title="Base class for all selectivity functors." alt="fims_popdy::SelectivityBase&lt; Type &gt;" shape="rect" coords="309,560,608,584"/>
+  </map>
+</div></div>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
+Public Member Functions</h2></td></tr>
+<tr class="memitem:aa714fd275e924fae47d51824b0e705cc" id="r_aa714fd275e924fae47d51824b0e705cc"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__model__object_1_1FIMSMemoryTracker.html#aa714fd275e924fae47d51824b0e705cc">register_self</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a> id)</td></tr>
+<tr class="memdesc:aa714fd275e924fae47d51824b0e705cc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Registers a <a class="el" href="structfims__model__object_1_1FIMSObject.html" title="FIMSObject struct that defines member types and returns the unique id.">FIMSObject</a> instance with the memory tracker.  <br /></td></tr>
+<tr class="separator:aa714fd275e924fae47d51824b0e705cc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-static-attribs" name="pub-static-attribs"></a>
+Static Public Attributes</h2></td></tr>
+<tr class="memitem:a65be2ea8b9eede7570b46fcb8c753c5a" id="r_a65be2ea8b9eede7570b46fcb8c753c5a"><td class="memItemLeft" align="right" valign="top"><a id="a65be2ea8b9eede7570b46fcb8c753c5a" name="a65be2ea8b9eede7570b46fcb8c753c5a"></a>
+<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">static</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">int</a>&#160;</td><td class="memItemRight" valign="bottom"><b>total_active_objects</b> = 0</td></tr>
+<tr class="memdesc:a65be2ea8b9eede7570b46fcb8c753c5a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Total number of active <a class="el" href="structfims__model__object_1_1FIMSObject.html" title="FIMSObject struct that defines member types and returns the unique id.">FIMSObject</a> instances currently in memory. <br /></td></tr>
+<tr class="separator:a65be2ea8b9eede7570b46fcb8c753c5a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>FIMS struct that tracks object memory for leak detection. </p>
+</div><h2 class="groupheader">Member Function Documentation</h2>
+<a id="aa714fd275e924fae47d51824b0e705cc" name="aa714fd275e924fae47d51824b0e705cc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa714fd275e924fae47d51824b0e705cc">&#9670;&#160;</a></span>register_self()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a> fims_model_object::FIMSMemoryTracker::register_self </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a>&#160;</td>
+          <td class="paramname"><em>id</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Registers a <a class="el" href="structfims__model__object_1_1FIMSObject.html" title="FIMSObject struct that defines member types and returns the unique id.">FIMSObject</a> instance with the memory tracker. </p>
+<p>Should be called from the constructor of each concrete FIMS class after setting its id, so that the type name and id are both available. Inserts a key of the form "TypeName [id=X]" into active_objects and increments total_active_objects. </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">id</td><td>The unique FIMS object id assigned by the derived class. </td></tr>
+  </table>
+  </dd>
+</dl>
+
 </div>
-<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span> </div>
-<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span>  <span class="keyword">virtual</span> <a class="code hl_struct" href="structfims__popdy_1_1GrowthBase.html">~GrowthBase</a>() {}</div>
-<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span> </div>
-<div class="line"><a id="l00046" name="l00046"></a><span class="lineno"><a class="line" href="structfims__popdy_1_1GrowthBase.html#a955f3f4ab3f30dfa2e6d6f884becfab6">   46</a></span>  <span class="keyword">virtual</span> <span class="keyword">const</span> <a class="code hl_function" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> <a class="code hl_function" href="structfims__popdy_1_1GrowthBase.html#a955f3f4ab3f30dfa2e6d6f884becfab6">evaluate</a>(<span class="keywordtype">int</span> <a class="code hl_function" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">year</a>, <span class="keyword">const</span> <span class="keywordtype">double</span>&amp; <a class="code hl_function" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">a</a>) = 0;</div>
-<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>};</div>
 </div>
-<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span> </div>
-<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span><span class="keyword">template</span> &lt;<span class="keyword">typename</span> Type&gt;</div>
-<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span><a class="code hl_function" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a> <a class="code hl_struct" href="structfims__popdy_1_1GrowthBase.html">GrowthBase&lt;Type&gt;::id_g</a> = 0;</div>
-<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span> </div>
-<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>}  <span class="comment">// namespace fims_popdy</span></div>
-<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span> </div>
-<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span><span class="preprocessor">#endif </span><span class="comment">/* POPULATION_DYNAMICS_GROWTH_BASE_HPP */</span><span class="preprocessor"></span></div>
-<div class="ttc" id="amodel__object_8hpp_html"><div class="ttname"><a href="model__object_8hpp.html">model_object.hpp</a></div><div class="ttdoc">Definition of the FIMSObject structure.</div></div>
-<div class="ttc" id="anamespacefims__popdy_html"><div class="ttname"><a href="namespacefims__popdy.html">fims_popdy</a></div><div class="ttdoc">The population dynamics of FIMS.</div><div class="ttdef"><b>Definition</b> catch_at_age.hpp:41</div></div>
-<div class="ttc" id="arcpp__interface_8hpp_html_a9f5a235582e7cc0f29e3431fc89ef10d"><div class="ttname"><a href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">clear_internal</a></div><div class="ttdeci">void clear_internal()</div><div class="ttdoc">Clears the internal objects.</div><div class="ttdef"><b>Definition</b> rcpp_interface.hpp:236</div></div>
-<div class="ttc" id="astructfims__model__object_1_1FIMSMemoryTracker_html_aa714fd275e924fae47d51824b0e705cc"><div class="ttname"><a href="structfims__model__object_1_1FIMSMemoryTracker.html#aa714fd275e924fae47d51824b0e705cc">fims_model_object::FIMSMemoryTracker::register_self</a></div><div class="ttdeci">void register_self(const uint32_t id)</div><div class="ttdoc">Registers a FIMSObject instance with the memory tracker.</div><div class="ttdef"><b>Definition</b> model_object.hpp:35</div></div>
-<div class="ttc" id="astructfims__model__object_1_1FIMSObject_html"><div class="ttname"><a href="structfims__model__object_1_1FIMSObject.html">fims_model_object::FIMSObject</a></div><div class="ttdoc">FIMSObject struct that defines member types and returns the unique id.</div><div class="ttdef"><b>Definition</b> model_object.hpp:55</div></div>
-<div class="ttc" id="astructfims__popdy_1_1GrowthBase_html"><div class="ttname"><a href="structfims__popdy_1_1GrowthBase.html">fims_popdy::GrowthBase</a></div><div class="ttdoc">Base class for all growth functors.</div><div class="ttdef"><b>Definition</b> growth_base.hpp:24</div></div>
-<div class="ttc" id="astructfims__popdy_1_1GrowthBase_html_a016bebc606785d9be69f454def1b2855"><div class="ttname"><a href="structfims__popdy_1_1GrowthBase.html#a016bebc606785d9be69f454def1b2855">fims_popdy::GrowthBase::id_g</a></div><div class="ttdeci">static uint32_t id_g</div><div class="ttdef"><b>Definition</b> growth_base.hpp:29</div></div>
-<div class="ttc" id="astructfims__popdy_1_1GrowthBase_html_a0352b6934eea814c055d7fdbc81efa14"><div class="ttname"><a href="structfims__popdy_1_1GrowthBase.html#a0352b6934eea814c055d7fdbc81efa14">fims_popdy::GrowthBase::GrowthBase</a></div><div class="ttdeci">GrowthBase()</div><div class="ttdoc">Constructor.</div><div class="ttdef"><b>Definition</b> growth_base.hpp:34</div></div>
-<div class="ttc" id="astructfims__popdy_1_1GrowthBase_html_a955f3f4ab3f30dfa2e6d6f884becfab6"><div class="ttname"><a href="structfims__popdy_1_1GrowthBase.html#a955f3f4ab3f30dfa2e6d6f884becfab6">fims_popdy::GrowthBase::evaluate</a></div><div class="ttdeci">virtual const Type evaluate(int year, const double &amp;a)=0</div><div class="ttdoc">Calculates the growth at the independent variable value.</div></div>
-</div><!-- fragment --></div><!-- contents -->
+<hr/>The documentation for this struct was generated from the following file:<ul>
+<li>inst/include/common/<a class="el" href="model__object_8hpp_source.html">model_object.hpp</a></li>
+</ul>
+</div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="dir_920884c6b3b2f0be94e27d51660adee5.html">inst</a></li><li class="navelem"><a class="el" href="dir_2b5d1a398a9eec011391d543f21db223.html">include</a></li><li class="navelem"><a class="el" href="dir_65a4bdb85444efa1ebe02557c74bf51a.html">population_dynamics</a></li><li class="navelem"><a class="el" href="dir_37bdea9fff2fdc698227d6fda51b8784.html">growth</a></li><li class="navelem"><a class="el" href="dir_ec7d59b9ad424ffe7f0c26e992e91d44.html">functors</a></li><li class="navelem"><a class="el" href="growth__base_8hpp.html">growth_base.hpp</a></li>
+    <li class="navelem"><b>fims_model_object</b></li><li class="navelem"><a class="el" href="structfims__model__object_1_1FIMSMemoryTracker.html">FIMSMemoryTracker</a></li>
     <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.8 </li>
   </ul>
 </div>

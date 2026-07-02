@@ -85,7 +85,7 @@ var NAVTREEINDEX =
 "classSharedReal.html#ac2e94071b205420167310485afad749d",
 "classfims__popdy_1_1CatchAtAge.html#abf6dab88981668c7bf763590fa2ad43d",
 "glossary.html#autotoc_md0",
-"structfims__distributions_1_1MultinomialLPMF.html"
+"structfims__distributions_1_1LogNormalLPDF.html#aea80107bf9db2b49b192f1698b4552c9"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';
