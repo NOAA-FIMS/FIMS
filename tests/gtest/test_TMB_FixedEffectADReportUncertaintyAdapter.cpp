@@ -51,6 +51,22 @@ class FakeNativeTMBADReportHandle : public fims_tmb::NativeTMBADReportHandle {
   }
 };
 
+class FakeLaplaceReverseSweepProvider
+    : public fims_tmb::LaplaceReverseSweepProvider {
+ public:
+  fims::Vector<double> GetFixedEffectReverseSweep(
+      const fims::Vector<double>& weights,
+      const fims::Vector<int>& fixed_indices) const override {
+    if (fixed_indices.size() != 2) {
+      throw std::invalid_argument("expected two fixed indices");
+    }
+    fims::Vector<double> output;
+    output.push_back((10.0 * weights[1]) + weights[3]);
+    output.push_back((-1.0 * weights[1]) + (2.0 * weights[3]));
+    return output;
+  }
+};
+
 // TMBADFunADReportHandle
 // IO correctness
 TEST(TMBADFunADReportHandle, HandlesCorrectInput_ReturnsADFunInput) {
@@ -397,6 +413,47 @@ TEST(StaticADReportDerivativeProvider, HandlesCorrectInput_ReturnsDerivativeBund
   EXPECT_EQ(output.jacobian[0], 2.0);
   EXPECT_EQ(output.fixed_effect_covariance[0], 9.0);
   EXPECT_EQ(output.n_parameters, static_cast<size_t>(1));
+}
+
+// LaplaceFixedJacobianAdjustmentCalculator
+// IO correctness
+TEST(LaplaceFixedJacobianAdjustmentCalculator,
+     HandlesCorrectInput_CalculatesAdjustment) {
+  fims_tmb::LaplaceFixedJacobianAdjustmentCalculator calculator;
+  FakeLaplaceReverseSweepProvider reverse_provider;
+
+  fims::Vector<double> adjustment = calculator.Calculate(
+      fims::Vector<double>{2.0, 0.0, 0.0, 4.0},
+      fims::Vector<double>{2.0, 8.0, 4.0, 12.0},
+      fims::Vector<int>{1, 3},
+      fims::Vector<int>{0, 2},
+      4,
+      2,
+      reverse_provider);
+
+  ASSERT_EQ(adjustment.size(), static_cast<size_t>(4));
+  EXPECT_DOUBLE_EQ(adjustment[0], -12.0);
+  EXPECT_DOUBLE_EQ(adjustment[1], -3.0);
+  EXPECT_DOUBLE_EQ(adjustment[2], -23.0);
+  EXPECT_DOUBLE_EQ(adjustment[3], -4.0);
+}
+
+// Error handling
+TEST(LaplaceFixedJacobianAdjustmentCalculator,
+     ThrowsWhenRandomJacobianSizeIsInvalid) {
+  fims_tmb::LaplaceFixedJacobianAdjustmentCalculator calculator;
+  FakeLaplaceReverseSweepProvider reverse_provider;
+
+  EXPECT_THROW(
+      calculator.Calculate(
+          fims::Vector<double>{2.0},
+          fims::Vector<double>{1.0, 2.0},
+          fims::Vector<int>{1},
+          fims::Vector<int>{0},
+          2,
+          3,
+          reverse_provider),
+      std::invalid_argument);
 }
 
 // IO correctness
