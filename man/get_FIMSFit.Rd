@@ -16,6 +16,10 @@
 \alias{get_gradient,FIMSFit-method}
 \alias{get_sdreport}
 \alias{get_sdreport,FIMSFit-method}
+\alias{get_adreport_payload}
+\alias{get_adreport_payload,FIMSFit-method}
+\alias{get_adreport_uncertainty}
+\alias{get_adreport_uncertainty,FIMSFit-method}
 \alias{get_estimates}
 \alias{get_estimates,FIMSFit-method}
 \alias{get_number_of_parameters}
@@ -55,6 +59,14 @@ get_gradient(x)
 get_sdreport(x)
 
 \S4method{get_sdreport}{FIMSFit}(x)
+
+get_adreport_payload(x)
+
+\S4method{get_adreport_payload}{FIMSFit}(x)
+
+get_adreport_uncertainty(x)
+
+\S4method{get_adreport_uncertainty}{FIMSFit}(x)
 
 get_estimates(x)
 
@@ -100,6 +112,14 @@ this function is safe to call after \code{\link[=clear]{clear()}} because it rea
 from a stored R vector rather than the compiled C++ objective function.
 
 \code{\link[=get_sdreport]{get_sdreport()}} returns the list from \code{\link[TMB:sdreport]{TMB::sdreport()}}.
+
+\code{\link[=get_adreport_payload]{get_adreport_payload()}} returns the structured backend payload used to
+calculate derived-quantity uncertainty from TMB \code{ADREPORT} output, or \code{NULL}
+if no payload is available.
+
+\code{\link[=get_adreport_uncertainty]{get_adreport_uncertainty()}} returns the backend-derived \code{ADREPORT}
+estimate and standard-error matrix, or \code{NULL} if no backend report is
+available.
 
 \code{\link[=get_estimates]{get_estimates()}} returns a tibble of parameter values and their
 uncertainties from a fitted model.

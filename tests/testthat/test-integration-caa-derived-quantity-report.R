@@ -67,14 +67,33 @@ test_that("CatchAtAge derived quantity report requests get backend uncertainty",
 
   backend_report_std <- attr(result[["sdr"]], "fims_backend_report")
   adreport_payload <- attr(result[["sdr"]], "fims_adreport_payload")
+  gradient <- as.numeric(result[["obj"]][["gr"]](result[["opt"]][["par"]]))
+  fit <- methods::new(
+    "FIMSFit",
+    input = list(),
+    obj = result[["obj"]],
+    opt = result[["opt"]],
+    max_gradient = NA_real_,
+    gradient = gradient,
+    report = result[["report"]],
+    sdreport = result[["sdr"]],
+    number_of_parameters = c(fixed_effects = length(parameter_names)),
+    timing = as.difftime(
+      c(time_optimization = 0, time_sdreport = 0, time_total = 0),
+      units = "secs"
+    ),
+    version = utils::packageVersion("FIMS"),
+    model_output = character()
+  )
   expect_equal(adreport_payload[["method"]], "fixed")
+  expect_identical(get_adreport_payload(fit), adreport_payload)
+  expect_identical(get_adreport_uncertainty(fit), backend_report_std)
   expect_equal(
     ncol(adreport_payload[["jacobian"]]),
     length(result[["sdr"]][["par.fixed"]])
   )
   expect_false(is.null(backend_report_std))
 
-  gradient <- as.numeric(result[["obj"]][["gr"]](result[["opt"]][["par"]]))
   estimates <- FIMS:::reshape_tmb_estimates(
     obj = result[["obj"]],
     sdreport = result[["sdr"]],
@@ -120,7 +139,27 @@ test_that("CatchAtAge random-effect derived quantity reports get backend uncerta
 
   backend_report_std <- attr(result[["sdr"]], "fims_backend_report")
   adreport_payload <- attr(result[["sdr"]], "fims_adreport_payload")
+  parameter_names <- names(FIMS:::get_parameter_names(result[["obj"]][["par"]]))
+  fit <- methods::new(
+    "FIMSFit",
+    input = list(),
+    obj = result[["obj"]],
+    opt = result[["opt"]],
+    max_gradient = NA_real_,
+    gradient = as.numeric(result[["obj"]][["gr"]](result[["opt"]][["par"]])),
+    report = result[["report"]],
+    sdreport = result[["sdr"]],
+    number_of_parameters = c(fixed_effects = length(parameter_names)),
+    timing = as.difftime(
+      c(time_optimization = 0, time_sdreport = 0, time_total = 0),
+      units = "secs"
+    ),
+    version = utils::packageVersion("FIMS"),
+    model_output = character()
+  )
   expect_equal(adreport_payload[["method"]], "laplace")
+  expect_identical(get_adreport_payload(fit), adreport_payload)
+  expect_identical(get_adreport_uncertainty(fit), backend_report_std)
   expect_equal(
     ncol(adreport_payload[["random_jacobian"]]),
     length(result[["obj"]][["env"]][["random"]])

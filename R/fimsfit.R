@@ -199,6 +199,34 @@ methods::setGeneric("get_sdreport", function(x) standardGeneric("get_sdreport"))
 methods::setMethod("get_sdreport", "FIMSFit", function(x) x@sdreport)
 
 #' @return
+#' [get_adreport_payload()] returns the structured backend payload used to
+#' calculate derived-quantity uncertainty from TMB `ADREPORT` output, or `NULL`
+#' if no payload is available.
+#' @export
+#' @rdname get_FIMSFit
+#' @keywords fit_fims
+methods::setGeneric("get_adreport_payload", function(x) standardGeneric("get_adreport_payload"))
+#' @rdname get_FIMSFit
+#' @keywords fit_fims
+methods::setMethod("get_adreport_payload", "FIMSFit", function(x) {
+  attr(x@sdreport, "fims_adreport_payload")
+})
+
+#' @return
+#' [get_adreport_uncertainty()] returns the backend-derived `ADREPORT`
+#' estimate and standard-error matrix, or `NULL` if no backend report is
+#' available.
+#' @export
+#' @rdname get_FIMSFit
+#' @keywords fit_fims
+methods::setGeneric("get_adreport_uncertainty", function(x) standardGeneric("get_adreport_uncertainty"))
+#' @rdname get_FIMSFit
+#' @keywords fit_fims
+methods::setMethod("get_adreport_uncertainty", "FIMSFit", function(x) {
+  attr(x@sdreport, "fims_backend_report")
+})
+
+#' @return
 #' [get_estimates()] returns a tibble of parameter values and their
 #' uncertainties from a fitted model.
 #' @export
