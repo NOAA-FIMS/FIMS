@@ -11,6 +11,61 @@
 #' @return A structured list containing ADREPORT payload pieces, or `NULL` when
 #'   extraction is not available for the supplied object.
 #' @noRd
+get_adreport_parameters <- function(adreport_obj, par) {
+  adreport_par <- adreport_obj[["par"]]
+  if (is.null(adreport_par)) {
+    adreport_ptr <- tryCatch(
+      adreport_obj[["env"]][["ADFun"]][["ptr"]],
+      error = function(e) adreport_obj
+    )
+    adreport_par <- attr(adreport_ptr, "par")
+  }
+  if (is.null(adreport_par) || length(adreport_par) == 0) {
+    return(par)
+  }
+  if (length(adreport_par) == length(par)) {
+    adreport_par[] <- par
+    return(adreport_par)
+  }
+
+  par_names <- names(par)
+  adreport_names <- names(adreport_par)
+  if (!is.null(par_names) &&
+      !is.null(adreport_names) &&
+      all(adreport_names %in% par_names)) {
+    adreport_par[] <- par[adreport_names]
+    return(adreport_par)
+  }
+
+  adreport_par
+}
+
+#' Assemble TMB ADREPORT payload from a TMB ADREPORT object
+#'
+#' @param adreport_obj A TMB object created with `ADreport = TRUE`.
+#' @param parameters Parameter vector used to evaluate the ADREPORT tape.
+#' @param fixed_covariance Fixed-effect covariance matrix.
+#' @param random_payload Optional list with random-effect Laplace pieces.
+#'
+#' @return A structured ADREPORT payload list.
+#' @export
+assemble_adreport_payload_from_tmb_adfun <- function(adreport_obj,
+                                                     parameters,
+                                                     fixed_covariance,
+                                                     random_payload = list()) {
+  estimate <- adreport_obj[["fn"]](parameters)
+  jacobian <- adreport_obj[["gr"]](parameters)
+  payload <- c(
+    list(
+      estimate = estimate,
+      jacobian = jacobian,
+      fixed_covariance = fixed_covariance
+    ),
+    random_payload
+  )
+  assemble_adreport_payload(payload)
+}
+
 extract_tmb_adreport_payload <- function(obj,
                                          sdreport,
                                          par_fixed = NULL) {
@@ -54,33 +109,43 @@ extract_tmb_adreport_payload <- function(obj,
     return(NULL)
   }
 
+  adreport_ptr <- tryCatch(
+    adreport_obj[["env"]][["ADFun"]][["ptr"]],
+    error = function(e) NULL
+  )
+  if (is.null(adreport_ptr)) {
+    return(NULL)
+  }
+  adreport_par <- get_adreport_parameters(adreport_obj, par)
+
   estimate <- tryCatch(
-    adreport_obj[["fn"]](par),
+    adreport_obj[["fn"]](adreport_par),
     error = function(e) NULL
   )
   if (is.null(estimate) || length(estimate) == 0) {
     return(NULL)
   }
 
-  jacobian <- tryCatch(
-    adreport_obj[["gr"]](par),
-    error = function(e) NULL
-  )
-  if (is.null(jacobian)) {
-    return(NULL)
-  }
-
   if (!has_random) {
-    payload <- assemble_adreport_payload(list(
-      estimate = estimate,
-      jacobian = jacobian,
-      fixed_covariance = sdreport[["cov.fixed"]]
-    ))
+    payload <- assemble_adreport_payload_from_tmb_adfun(
+      adreport_obj,
+      adreport_par,
+      sdreport[["cov.fixed"]],
+      list()
+    )
     names(payload[["estimate"]]) <- names(estimate)
     payload[["par"]] <- par
     payload[["par_fixed"]] <- par_fixed
     payload[["random"]] <- random
     return(payload)
+  }
+
+  jacobian <- tryCatch(
+    adreport_obj[["gr"]](adreport_par),
+    error = function(e) NULL
+  )
+  if (is.null(jacobian)) {
+    return(NULL)
   }
 
   fixed_indices <- seq_along(par)[-random]
@@ -113,14 +178,16 @@ extract_tmb_adreport_payload <- function(obj,
     ))
   }
 
-  payload <- assemble_adreport_payload(list(
-    estimate = estimate,
-    jacobian = jacobian,
-    fixed_covariance = sdreport[["cov.fixed"]],
-    random_indices = as.integer(random - 1L),
-    random_hessian = as.matrix(hessian_random),
-    fixed_jacobian_adjustment = fixed_jacobian_adjustment
-  ))
+  payload <- assemble_adreport_payload_from_tmb_adfun(
+    adreport_obj,
+    adreport_par,
+    sdreport[["cov.fixed"]],
+    list(
+      random_indices = as.integer(random - 1L),
+      random_hessian = as.matrix(hessian_random),
+      fixed_jacobian_adjustment = fixed_jacobian_adjustment
+    )
+  )
   names(payload[["estimate"]]) <- names(estimate)
   payload[["par"]] <- par
   payload[["par_fixed"]] <- par_fixed

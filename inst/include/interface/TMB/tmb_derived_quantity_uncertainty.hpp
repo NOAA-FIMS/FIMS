@@ -9,6 +9,9 @@
 #define FIMS_INTERFACE_TMB_DERIVED_QUANTITY_UNCERTAINTY_HPP
 
 #include "../../common/derived_quantity_uncertainty.hpp"
+#include <sstream>
+#include <stdexcept>
+#include <vector>
 
 namespace fims_tmb {
 
@@ -141,6 +144,113 @@ class StaticADReportDerivativeProvider : public ADReportDerivativeProvider {
 };
 
 /**
+ * @brief Interface for native TMB objects that can expose ADREPORT derivatives.
+ */
+class NativeTMBADReportHandle {
+ public:
+  virtual ~NativeTMBADReportHandle() {}
+
+  /**
+   * @brief Get raw derivative ingredients from a native TMB object.
+   *
+   * @return ADReportPayloadExtractionInput Raw derivative pieces.
+   */
+  virtual ADReportPayloadExtractionInput GetADReportExtractionInput() const = 0;
+};
+
+/**
+ * @brief Native handle backed by a TMB ADREPORT ADFun-like object.
+ *
+ * @details The AD function is expected to expose `Domain()`, `operator()`, and
+ * `Jacobian()` with row-major Jacobian storage. This matches TMBad ADFun and
+ * mirrors the current R-facing ADREPORT extractor without owning the TMB
+ * function object's lifetime.
+ *
+ * @tparam ADFunType TMB-compatible AD function type.
+ */
+template <class ADFunType>
+class TMBADFunADReportHandle : public NativeTMBADReportHandle {
+ public:
+  /**
+   * @brief Construct an ADREPORT handle from an ADFun-like object.
+   *
+   * @param adreport_function Native ADREPORT function.
+   * @param parameters Full parameter vector used to evaluate the report.
+   * @param fixed_effect_covariance Fixed-effect covariance matrix, row-major.
+   */
+  TMBADFunADReportHandle(
+      ADFunType& adreport_function,
+      const fims::Vector<double>& parameters,
+      const fims::Vector<double>& fixed_effect_covariance)
+      : adreport_function_m(&adreport_function),
+        parameters_m(parameters),
+        fixed_effect_covariance_m(fixed_effect_covariance) {}
+
+  /**
+   * @brief Add random-effect ingredients for Laplace ADREPORT payloads.
+   *
+   * @param random_indices Zero-based random-effect positions.
+   * @param random_effect_hessian Random-effect Hessian matrix, row-major.
+   * @param fixed_jacobian_adjustment Reverse-sweep fixed Jacobian adjustment,
+   * row-major.
+   */
+  void SetRandomEffectInputs(
+      const fims::Vector<int>& random_indices,
+      const fims::Vector<double>& random_effect_hessian,
+      const fims::Vector<double>& fixed_jacobian_adjustment) {
+    random_indices_m = random_indices;
+    random_effect_hessian_m = random_effect_hessian;
+    fixed_jacobian_adjustment_m = fixed_jacobian_adjustment;
+  }
+
+  /**
+   * @brief Get raw derivative ingredients from the native ADREPORT function.
+   *
+   * @return ADReportPayloadExtractionInput Raw derivative pieces.
+   */
+  ADReportPayloadExtractionInput GetADReportExtractionInput()
+      const override {
+    if (adreport_function_m == nullptr) {
+      throw std::invalid_argument(
+          "TMBADFunADReportHandle requires a non-null ADREPORT function");
+    }
+
+    std::vector<double> parameters(parameters_m.size());
+    for (size_t i = 0; i < parameters_m.size(); i++) {
+      parameters[i] = parameters_m[i];
+    }
+    if (parameters.size() != adreport_function_m->Domain()) {
+      std::ostringstream error;
+      error << "TMBADFunADReportHandle parameter vector size ("
+            << parameters.size()
+            << ") does not match ADREPORT function domain ("
+            << adreport_function_m->Domain() << ")";
+      throw std::invalid_argument(error.str());
+    }
+
+    ADReportPayloadExtractionInput input;
+    input.estimate =
+        fims::Vector<double>((*adreport_function_m)(parameters));
+    input.jacobian =
+        fims::Vector<double>(adreport_function_m->Jacobian(parameters));
+    input.fixed_effect_covariance = fixed_effect_covariance_m;
+    input.random_indices = random_indices_m;
+    input.random_effect_hessian = random_effect_hessian_m;
+    input.fixed_jacobian_adjustment = fixed_jacobian_adjustment_m;
+    input.n_parameters = parameters.size();
+    return input;
+  }
+
+ private:
+  ADFunType* adreport_function_m = nullptr;
+  fims::Vector<double> parameters_m;
+  fims::Vector<double> fixed_effect_covariance_m;
+  fims::Vector<int> random_indices_m;
+  fims::Vector<double> random_effect_hessian_m;
+  fims::Vector<double> fixed_jacobian_adjustment_m;
+};
+
+/**
  * @brief Placeholder for a future provider backed by native TMB handles.
  *
  * @details TMB currently exposes the pieces used here through the R-facing
@@ -156,7 +266,16 @@ class NativeTMBADReportDerivativeProvider : public ADReportDerivativeProvider {
    */
   explicit NativeTMBADReportDerivativeProvider(
       void* model_handle = nullptr)
-      : model_handle_m(model_handle) {}
+      : model_handle_m(model_handle), native_handle_m(nullptr) {}
+
+  /**
+   * @brief Construct a native TMB provider from a typed native handle.
+   *
+   * @param native_handle Native object exposing ADREPORT derivative ingredients.
+   */
+  explicit NativeTMBADReportDerivativeProvider(
+      const NativeTMBADReportHandle& native_handle)
+      : model_handle_m(nullptr), native_handle_m(&native_handle) {}
 
   /**
    * @brief Get raw derivative ingredients for ADREPORT payload extraction.
@@ -164,20 +283,41 @@ class NativeTMBADReportDerivativeProvider : public ADReportDerivativeProvider {
    * @return ADReportPayloadExtractionInput Raw derivative pieces.
    */
   ADReportPayloadExtractionInput GetExtractionInput() const override {
+    if (native_handle_m != nullptr) {
+      return native_handle_m->GetADReportExtractionInput();
+    }
+
     throw std::logic_error(
         "NativeTMBADReportDerivativeProvider::GetExtractionInput is not "
         "implemented until native TMB ADREPORT handle access is available");
   }
 
   /**
-   * @brief Check whether a native TMB handle was provided.
+   * @brief Check whether a raw native TMB model handle was provided.
    *
-   * @return bool True when a non-null handle is stored.
+   * @return bool True when a non-null raw model handle is stored.
    */
   bool HasModelHandle() const { return model_handle_m != nullptr; }
 
+  /**
+   * @brief Check whether a typed native handle is stored.
+   *
+   * @return bool True when a typed native handle is available.
+   */
+  bool HasNativeHandle() const { return native_handle_m != nullptr; }
+
+  /**
+   * @brief Check whether any native handle is stored.
+   *
+   * @return bool True when a raw or typed native handle is available.
+   */
+  bool HasAnyHandle() const {
+    return model_handle_m != nullptr || native_handle_m != nullptr;
+  }
+
  private:
   void* model_handle_m = nullptr;
+  const NativeTMBADReportHandle* native_handle_m = nullptr;
 };
 
 /**

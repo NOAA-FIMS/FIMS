@@ -40,9 +40,22 @@ calculation are owned by the FIMS backend.
 : Provider for the current R/TMB path. It simply returns an already assembled
   derivative bundle.
 
+`NativeTMBADReportHandle`
+: Typed C++ contract for native objects that can expose
+  `ADReportPayloadExtractionInput`.
+
+`TMBADFunADReportHandle`
+: Header-only implementation of `NativeTMBADReportHandle` for an ADFun-like
+  ADREPORT object. It evaluates the report values and row-major Jacobian from
+  the native function, carries the fixed-effect covariance, and can pass through
+  random-effect Hessian and fixed-Jacobian adjustment inputs when those have
+  been computed elsewhere.
+
 `NativeTMBADReportDerivativeProvider`
-: Placeholder for the future direct TMB path. It stores a native handle but
-  throws until FIMS has stable access to native TMB ADREPORT internals.
+: Provider for the future direct TMB path. The raw pointer constructor remains a
+  placeholder for low-level TMB handles and throws when evaluated. The typed
+  `NativeTMBADReportHandle` constructor delegates extraction to the native
+  handle and can already feed `ADReportPayloadExtractor`.
 
 `ADReportPayloadExtractor`
 : Splits full Jacobians into fixed and random blocks, computes random
@@ -55,13 +68,15 @@ calculation are owned by the FIMS backend.
 
 ## Future Native TMB Path
 
-The intended replacement path is:
+The intended replacement path is now:
 
-1. Implement `NativeTMBADReportDerivativeProvider::GetExtractionInput()`.
-2. Populate `ADReportPayloadExtractionInput` directly from native TMB handles.
+1. Build or retrieve a native TMB ADREPORT ADFun.
+2. Wrap it in `TMBADFunADReportHandle`.
 3. Keep `ADReportPayloadExtractor` and `ADReportPayloadUncertaintyCalculator`
    unchanged.
-4. Remove R-side derivative assembly only after the native provider can produce
+4. Move the fixed covariance, random Hessian, and reverse-sweep adjustment
+   extraction behind native handle implementations.
+5. Remove R-side derivative assembly only after the native provider can produce
    the same payloads as the static provider.
 
 The native provider should be considered complete only when fixed-effect,
