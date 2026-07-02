@@ -21,6 +21,8 @@
 #' @export get_fixed
 #' @export set_random
 #' @export get_random
+#' @export get_adreport_payload
+#' @export get_adreport_uncertainty
 #' @export get_parameter_names
 #' @export get_random_names
 #' @export get_log
