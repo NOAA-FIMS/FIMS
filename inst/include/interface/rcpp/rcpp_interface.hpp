@@ -8,6 +8,7 @@
 #ifndef FIMS_INTERFACE_RCPP_INTERFACE_HPP
 #define FIMS_INTERFACE_RCPP_INTERFACE_HPP
 #include "../../common/model.hpp"
+#include "../../common/model_object.hpp"
 #include "../../utilities/fims_json.hpp"
 #include "rcpp_objects/rcpp_data.hpp"
 #include "rcpp_objects/rcpp_distribution.hpp"
@@ -239,9 +240,12 @@ void clear_internal() {
 }
 
 /**
- * @brief Clears the vector of independent variables.
+ * @brief Clears all FIMS pointers and resets model state.
+ * @param get_error_msg If true, retains a lingering pointer to trigger
+ * dangling pointer diagnostics. Should only be set to true via
+ * test_clear_with_leak_check().
  */
-void clear() {
+void clear_impl(bool get_error_msg) {
   // rcpp_interface_base.hpp
   FIMSRcppInterfaceBase::fims_interface_objects.clear();
 
@@ -329,7 +333,39 @@ void clear() {
   clear_internal<TMBAD_FIMS_TYPE>();
 
   fims::FIMSLog::fims_log->clear();
+
+  std::unique_ptr<fims_popdy::LogisticSelectivity<double>> test_obj;
+  if (get_error_msg) {
+    test_obj = std::make_unique<fims_popdy::LogisticSelectivity<double>>();
+  }
+
+  // --- AUTOMATED DANGLING POINTER DIAGNOSTIC PRINT ---
+  if (fims_model_object::FIMSMemoryTracker::total_active_objects > 0) {
+    std::ostringstream msg;
+    msg << "\n⚠️  WARNING: FIMS Dangling Pointer or Module Detected after "
+           "clear()!\n";
+    msg << "--------------------------------------------------\n";
+    msg << "A total of "
+        << fims_model_object::FIMSMemoryTracker::total_active_objects
+        << " pointer(s) NOT cleared\n";
+    msg << "--------------------------------------------------\n";
+    msg << "Ensure all pointers are being reset.\n\n";
+
+    Rcpp::warning(msg.str());
+  }
 }
+
+/**
+ * @brief Clears all FIMS pointers and resets model state.
+ */
+void clear() { clear_impl(false); }
+
+/**
+ * @brief Test-only variant of clear() that retains a lingering pointer
+ * to validate dangling pointer diagnostics.
+ * @note Not exposed to users. Use only in tests.
+ */
+void test_clear_with_leak_check() { clear_impl(true); }
 
 /**
  * @brief Gets the log entries as a string in JSON format.
