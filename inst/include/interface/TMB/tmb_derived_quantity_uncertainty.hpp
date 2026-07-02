@@ -321,6 +321,229 @@ class NativeTMBADReportDerivativeProvider : public ADReportDerivativeProvider {
 };
 
 /**
+ * @brief Interface for native reverse sweeps used in Laplace ADREPORT SEs.
+ *
+ * @details Implementations receive a full-parameter-length weight vector with
+ * random-effect weights populated. They return the fixed-effect part of the
+ * reverse sweep, ordered by `fixed_indices`.
+ */
+class LaplaceReverseSweepProvider {
+ public:
+  virtual ~LaplaceReverseSweepProvider() {}
+
+  /**
+   * @brief Get the fixed-effect reverse-sweep result for a weight vector.
+   *
+   * @param weights Full-parameter-length reverse-sweep weights.
+   * @param fixed_indices Zero-based fixed-effect parameter indices.
+   * @return fims::Vector<double> Fixed-effect reverse-sweep values.
+   */
+  virtual fims::Vector<double> GetFixedEffectReverseSweep(
+      const fims::Vector<double>& weights,
+      const fims::Vector<int>& fixed_indices) const = 0;
+};
+
+/**
+ * @brief Calculate the fixed Jacobian adjustment for Laplace ADREPORT payloads.
+ *
+ * @details This mirrors the R-side `reverse_sweep` loop currently used by
+ * `extract_tmb_adreport_payload()`: solve the random-effect Hessian against
+ * the random Jacobian transpose, place the resulting column as random-effect
+ * weights, and negate the fixed-effect reverse-sweep result.
+ */
+class LaplaceFixedJacobianAdjustmentCalculator {
+ public:
+  /**
+   * @brief Calculate a row-major fixed Jacobian adjustment matrix.
+   *
+   * @param random_effect_hessian Row-major random-effect Hessian.
+   * @param random_jacobian Row-major ADREPORT-by-random Jacobian.
+   * @param random_indices Zero-based random-effect parameter indices.
+   * @param fixed_indices Zero-based fixed-effect parameter indices.
+   * @param n_parameters Full parameter vector size.
+   * @param n_estimates Number of ADREPORT elements.
+   * @param reverse_provider Native reverse-sweep provider.
+   * @return fims::Vector<double> Row-major ADREPORT-by-fixed adjustment.
+   */
+  fims::Vector<double> Calculate(
+      const fims::Vector<double>& random_effect_hessian,
+      const fims::Vector<double>& random_jacobian,
+      const fims::Vector<int>& random_indices,
+      const fims::Vector<int>& fixed_indices,
+      size_t n_parameters,
+      size_t n_estimates,
+      const LaplaceReverseSweepProvider& reverse_provider) const {
+    const size_t n_random_effects = random_indices.size();
+    const size_t n_fixed_effects = fixed_indices.size();
+    this->Validate(random_effect_hessian, random_jacobian, random_indices,
+                   fixed_indices, n_parameters, n_estimates);
+
+    fims::Vector<double> inverse_hessian = this->InvertSquareMatrix(
+        random_effect_hessian, n_random_effects);
+    fims::Vector<double> adjustment;
+    adjustment.reserve(n_estimates * n_fixed_effects);
+
+    for (size_t estimate_index = 0; estimate_index < n_estimates;
+         estimate_index++) {
+      fims::Vector<double> weights(n_parameters, 0.0);
+      for (size_t random_row = 0; random_row < n_random_effects;
+           random_row++) {
+        double solved_weight = 0.0;
+        for (size_t random_col = 0; random_col < n_random_effects;
+             random_col++) {
+          solved_weight +=
+              inverse_hessian[(random_row * n_random_effects) + random_col] *
+              random_jacobian[(estimate_index * n_random_effects) +
+                              random_col];
+        }
+        weights[static_cast<size_t>(random_indices[random_row])] =
+            solved_weight;
+      }
+
+      fims::Vector<double> fixed_reverse =
+          reverse_provider.GetFixedEffectReverseSweep(weights, fixed_indices);
+      if (fixed_reverse.size() != n_fixed_effects) {
+        throw std::invalid_argument(
+            "LaplaceFixedJacobianAdjustmentCalculator::Calculate: reverse "
+            "sweep output size does not match fixed-effect count");
+      }
+      for (size_t fixed_index = 0; fixed_index < n_fixed_effects;
+           fixed_index++) {
+        adjustment.push_back(-fixed_reverse[fixed_index]);
+      }
+    }
+
+    return adjustment;
+  }
+
+ private:
+  /**
+   * @brief Validate adjustment inputs.
+   */
+  void Validate(
+      const fims::Vector<double>& random_effect_hessian,
+      const fims::Vector<double>& random_jacobian,
+      const fims::Vector<int>& random_indices,
+      const fims::Vector<int>& fixed_indices,
+      size_t n_parameters,
+      size_t n_estimates) const {
+    if (n_parameters == 0) {
+      throw std::invalid_argument(
+          "LaplaceFixedJacobianAdjustmentCalculator::Validate: n_parameters "
+          "must be greater than zero");
+    }
+    if (n_estimates == 0) {
+      throw std::invalid_argument(
+          "LaplaceFixedJacobianAdjustmentCalculator::Validate: n_estimates "
+          "must be greater than zero");
+    }
+    if (random_indices.size() == 0) {
+      throw std::invalid_argument(
+          "LaplaceFixedJacobianAdjustmentCalculator::Validate: at least one "
+          "random effect is required");
+    }
+    if (fixed_indices.size() == 0) {
+      throw std::invalid_argument(
+          "LaplaceFixedJacobianAdjustmentCalculator::Validate: at least one "
+          "fixed effect is required");
+    }
+    for (size_t i = 0; i < random_indices.size(); i++) {
+      if (random_indices[i] < 0 ||
+          static_cast<size_t>(random_indices[i]) >= n_parameters) {
+        throw std::invalid_argument(
+            "LaplaceFixedJacobianAdjustmentCalculator::Validate: random index "
+            "is out of bounds");
+      }
+    }
+    for (size_t i = 0; i < fixed_indices.size(); i++) {
+      if (fixed_indices[i] < 0 ||
+          static_cast<size_t>(fixed_indices[i]) >= n_parameters) {
+        throw std::invalid_argument(
+            "LaplaceFixedJacobianAdjustmentCalculator::Validate: fixed index "
+            "is out of bounds");
+      }
+    }
+    if (random_effect_hessian.size() !=
+        random_indices.size() * random_indices.size()) {
+      throw std::invalid_argument(
+          "LaplaceFixedJacobianAdjustmentCalculator::Validate: random Hessian "
+          "size is invalid");
+    }
+    if (random_jacobian.size() != n_estimates * random_indices.size()) {
+      throw std::invalid_argument(
+          "LaplaceFixedJacobianAdjustmentCalculator::Validate: random "
+          "Jacobian size is invalid");
+    }
+  }
+
+  /**
+   * @brief Invert a dense row-major square matrix.
+   */
+  fims::Vector<double> InvertSquareMatrix(
+      const fims::Vector<double>& matrix, size_t n) const {
+    fims::Vector<double> work(n * 2 * n, 0.0);
+    for (size_t i = 0; i < n; i++) {
+      for (size_t j = 0; j < n; j++) {
+        work[(i * 2 * n) + j] = matrix[(i * n) + j];
+      }
+      work[(i * 2 * n) + n + i] = 1.0;
+    }
+
+    for (size_t pivot_col = 0; pivot_col < n; pivot_col++) {
+      size_t pivot_row = pivot_col;
+      double pivot_abs = std::fabs(work[(pivot_col * 2 * n) + pivot_col]);
+      for (size_t row = pivot_col + 1; row < n; row++) {
+        const double candidate_abs =
+            std::fabs(work[(row * 2 * n) + pivot_col]);
+        if (candidate_abs > pivot_abs) {
+          pivot_abs = candidate_abs;
+          pivot_row = row;
+        }
+      }
+
+      if (pivot_abs <= 1.0e-14) {
+        throw std::runtime_error(
+            "LaplaceFixedJacobianAdjustmentCalculator::InvertSquareMatrix: "
+            "matrix is singular");
+      }
+
+      if (pivot_row != pivot_col) {
+        for (size_t col = 0; col < 2 * n; col++) {
+          const double tmp = work[(pivot_col * 2 * n) + col];
+          work[(pivot_col * 2 * n) + col] = work[(pivot_row * 2 * n) + col];
+          work[(pivot_row * 2 * n) + col] = tmp;
+        }
+      }
+
+      const double pivot = work[(pivot_col * 2 * n) + pivot_col];
+      for (size_t col = 0; col < 2 * n; col++) {
+        work[(pivot_col * 2 * n) + col] /= pivot;
+      }
+
+      for (size_t row = 0; row < n; row++) {
+        if (row == pivot_col) {
+          continue;
+        }
+        const double factor = work[(row * 2 * n) + pivot_col];
+        for (size_t col = 0; col < 2 * n; col++) {
+          work[(row * 2 * n) + col] -=
+              factor * work[(pivot_col * 2 * n) + col];
+        }
+      }
+    }
+
+    fims::Vector<double> inverse;
+    inverse.reserve(n * n);
+    for (size_t i = 0; i < n; i++) {
+      for (size_t j = 0; j < n; j++) {
+        inverse.push_back(static_cast<double>(work[(i * 2 * n) + n + j]));
+      }
+    }
+    return inverse;
+  }
+};
+
+/**
  * @brief Assemble backend ADREPORT payloads from raw TMB derivative pieces.
  */
 class ADReportPayloadExtractor {
