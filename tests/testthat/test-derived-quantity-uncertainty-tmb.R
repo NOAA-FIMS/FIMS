@@ -27,7 +27,7 @@ test_that("backend derived quantity SEs match TMB sdreport", {
     model_file
   )
 
-  TMB::compile(model_file)
+  TMB::compile(model_file, framework = "TMBad")
   dynlib <- TMB::dynlib(tools::file_path_sans_ext(model_file))
   dyn.load(dynlib)
   test_env <- environment()
@@ -87,6 +87,17 @@ test_that("backend derived quantity SEs match TMB sdreport", {
     obj = obj,
     sdreport = sdr
   )
+  static_payload <- assemble_adreport_payload(list(
+    estimate = estimate,
+    jacobian = jacobian,
+    fixed_covariance = sdr$cov.fixed
+  ))
+  native_payload <- assemble_adreport_payload_from_tmb_adfun(
+    adreport_obj,
+    FIMS:::get_adreport_parameters(adreport_obj, theta_hat),
+    sdr$cov.fixed,
+    list()
+  )
   payload <- FIMS:::extract_tmb_adreport_payload(
     obj = obj,
     sdreport = sdr
@@ -95,6 +106,14 @@ test_that("backend derived quantity SEs match TMB sdreport", {
 
   expect_equal(unname(tmb_se), c(sqrt(40), 5), tolerance = 1e-8)
   expect_equal(payload$method, "fixed")
+  expect_equal(native_payload$method, "fixed")
+  expect_equal(native_payload$estimate, static_payload$estimate)
+  expect_equal(native_payload$jacobian, static_payload$jacobian)
+  expect_equal(
+    native_payload$fixed_covariance,
+    static_payload$fixed_covariance
+  )
+  expect_equal(native_payload$n_fixed_effects, static_payload$n_fixed_effects)
   expect_equal(unname(payload$estimate), unname(estimate), tolerance = 1e-12)
   expect_equal(
     unname(as.vector(t(payload$jacobian))),
@@ -145,13 +164,16 @@ test_that("backend random-effect derived quantity SEs match TMB sdreport", {
     model_file
   )
 
-  TMB::compile(model_file)
+  TMB::compile(model_file, framework = "TMBad")
   dynlib <- TMB::dynlib(tools::file_path_sans_ext(model_file))
   dyn.load(dynlib)
   test_env <- environment()
   withr::defer({
     rm(
-      list = intersect(c("obj", "sdr", "payload"), ls(envir = test_env)),
+      list = intersect(
+        c("obj", "sdr", "adreport_obj", "payload"),
+        ls(envir = test_env)
+      ),
       envir = test_env
     )
     invisible(gc())
@@ -176,10 +198,40 @@ test_that("backend random-effect derived quantity SEs match TMB sdreport", {
     obj = obj,
     sdreport = sdr
   )
+  adreport_obj <- TMB::MakeADFun(
+    data = list(),
+    parameters = list(beta = 0, u = 0),
+    type = "ADFun",
+    ADreport = TRUE,
+    DLL = "derived_quantity_laplace",
+    silent = TRUE
+  )
+  native_payload <- assemble_adreport_payload_from_tmb_adfun(
+    adreport_obj,
+    FIMS:::get_adreport_parameters(
+      adreport_obj,
+      obj$env$last.par.best
+    ),
+    sdr$cov.fixed,
+    list(
+      random_indices = as.integer(obj$env$random - 1L),
+      random_hessian = payload$random_hessian,
+      fixed_jacobian_adjustment =
+        payload$adjusted_fixed_jacobian - payload$fixed_jacobian
+    )
+  )
   payload_se <- calculate_adreport_payload_se(payload)
 
   expect_true(opt$convergence == 0)
   expect_equal(payload$method, "laplace")
+  expect_equal(native_payload$method, "laplace")
+  expect_equal(unname(native_payload$estimate), unname(payload$estimate))
+  expect_equal(native_payload$fixed_jacobian, payload$fixed_jacobian)
+  expect_equal(native_payload$random_jacobian, payload$random_jacobian)
+  expect_equal(
+    native_payload$adjusted_fixed_jacobian,
+    payload$adjusted_fixed_jacobian
+  )
   expect_equal(ncol(payload$fixed_jacobian), length(sdr$par.fixed))
   expect_equal(ncol(payload$random_jacobian), length(obj$env$random))
   expect_equal(nrow(payload$random_hessian), length(obj$env$random))

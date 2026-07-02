@@ -9,8 +9,94 @@
 
 #include "gtest/gtest.h"
 #include "../../inst/include/interface/TMB/tmb_derived_quantity_uncertainty.hpp"
+#include <stdexcept>
+#include <vector>
 
 namespace {
+
+class FakeADFun {
+ public:
+  size_t Domain() const { return static_cast<size_t>(2); }
+
+  std::vector<double> operator()(const std::vector<double>& parameters) {
+    if (parameters.size() != Domain()) {
+      throw std::invalid_argument("parameters size mismatch");
+    }
+    return std::vector<double>{
+        parameters[0] + parameters[1],
+        parameters[0] * parameters[1]};
+  }
+
+  std::vector<double> Jacobian(const std::vector<double>& parameters) {
+    if (parameters.size() != Domain()) {
+      throw std::invalid_argument("parameters size mismatch");
+    }
+    return std::vector<double>{
+        1.0, 1.0,
+        parameters[1], parameters[0]};
+  }
+};
+
+class FakeNativeTMBADReportHandle : public fims_tmb::NativeTMBADReportHandle {
+ public:
+  fims_tmb::ADReportPayloadExtractionInput GetADReportExtractionInput()
+      const override {
+    fims_tmb::ADReportPayloadExtractionInput input;
+    input.estimate = fims::Vector<double>{-3.0, -1.0};
+    input.jacobian = fims::Vector<double>{1.0, 2.0, 2.0, 1.0};
+    input.fixed_effect_covariance =
+        fims::Vector<double>{4.0, 0.0, 0.0, 9.0};
+    input.n_parameters = 2;
+    return input;
+  }
+};
+
+// TMBADFunADReportHandle
+// IO correctness
+TEST(TMBADFunADReportHandle, HandlesCorrectInput_ReturnsADFunInput) {
+  FakeADFun adfun;
+  fims_tmb::TMBADFunADReportHandle<FakeADFun> handle(
+      adfun, fims::Vector<double>{2.0, 3.0},
+      fims::Vector<double>{4.0, 0.0, 0.0, 9.0});
+  fims_tmb::ADReportPayloadExtractionInput input =
+      handle.GetADReportExtractionInput();
+
+  EXPECT_EQ(input.n_parameters, static_cast<size_t>(2));
+  EXPECT_EQ(input.estimate[0], 5.0);
+  EXPECT_EQ(input.estimate[1], 6.0);
+  EXPECT_EQ(input.jacobian[0], 1.0);
+  EXPECT_EQ(input.jacobian[3], 2.0);
+  EXPECT_EQ(input.fixed_effect_covariance[3], 9.0);
+}
+
+// IO correctness
+TEST(TMBADFunADReportHandle,
+     HandlesCorrectInput_ReturnsRandomEffectInputs) {
+  FakeADFun adfun;
+  fims_tmb::TMBADFunADReportHandle<FakeADFun> handle(
+      adfun, fims::Vector<double>{2.0, 3.0},
+      fims::Vector<double>{4.0});
+  handle.SetRandomEffectInputs(
+      fims::Vector<int>{1},
+      fims::Vector<double>{9.0},
+      fims::Vector<double>{-0.5});
+  fims_tmb::ADReportPayloadExtractionInput input =
+      handle.GetADReportExtractionInput();
+
+  EXPECT_EQ(input.random_indices[0], 1);
+  EXPECT_EQ(input.random_effect_hessian[0], 9.0);
+  EXPECT_EQ(input.fixed_jacobian_adjustment[0], -0.5);
+}
+
+// Error handling
+TEST(TMBADFunADReportHandle, ThrowsWhenParameterSizeDoesNotMatchADFunDomain) {
+  FakeADFun adfun;
+  fims_tmb::TMBADFunADReportHandle<FakeADFun> handle(
+      adfun, fims::Vector<double>{2.0},
+      fims::Vector<double>{4.0, 0.0, 0.0, 9.0});
+
+  EXPECT_THROW(handle.GetADReportExtractionInput(), std::invalid_argument);
+}
 
 // FixedEffectADReportUncertaintyAdapter
 // IO correctness
@@ -338,6 +424,8 @@ TEST(NativeTMBADReportDerivativeProvider, HandlesEdge_DefaultHasNoHandle) {
   fims_tmb::NativeTMBADReportDerivativeProvider provider;
 
   EXPECT_FALSE(provider.HasModelHandle());
+  EXPECT_FALSE(provider.HasNativeHandle());
+  EXPECT_FALSE(provider.HasAnyHandle());
 }
 
 // Error handling
@@ -346,7 +434,39 @@ TEST(NativeTMBADReportDerivativeProvider, ThrowsUntilNativeHandleAccessExists) {
   fims_tmb::NativeTMBADReportDerivativeProvider provider(&model_handle);
 
   EXPECT_TRUE(provider.HasModelHandle());
+  EXPECT_FALSE(provider.HasNativeHandle());
+  EXPECT_TRUE(provider.HasAnyHandle());
   EXPECT_THROW(provider.GetExtractionInput(), std::logic_error);
+}
+
+// IO correctness
+TEST(NativeTMBADReportDerivativeProvider,
+     HandlesCorrectInput_ReturnsInputFromNativeHandle) {
+  FakeNativeTMBADReportHandle native_handle;
+  fims_tmb::NativeTMBADReportDerivativeProvider provider(native_handle);
+  fims_tmb::ADReportPayloadExtractionInput input =
+      provider.GetExtractionInput();
+
+  EXPECT_FALSE(provider.HasModelHandle());
+  EXPECT_TRUE(provider.HasNativeHandle());
+  EXPECT_TRUE(provider.HasAnyHandle());
+  EXPECT_EQ(input.estimate[0], -3.0);
+  EXPECT_EQ(input.jacobian[3], 1.0);
+  EXPECT_EQ(input.n_parameters, static_cast<size_t>(2));
+}
+
+// IO correctness
+TEST(ADReportPayloadExtractor,
+     HandlesCorrectInput_AssemblesPayloadFromNativeProvider) {
+  FakeNativeTMBADReportHandle native_handle;
+  fims_tmb::NativeTMBADReportDerivativeProvider provider(native_handle);
+  fims_tmb::ADReportPayloadExtractor extractor;
+  fims_tmb::ADReportPayload payload = extractor.Extract(provider);
+
+  EXPECT_EQ(payload.method, "fixed");
+  EXPECT_EQ(payload.n_fixed_effects, static_cast<size_t>(2));
+  EXPECT_EQ(payload.jacobian[0], 1.0);
+  EXPECT_EQ(payload.jacobian[3], 1.0);
 }
 
 }  // namespace

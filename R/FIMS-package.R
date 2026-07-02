@@ -6,6 +6,7 @@
 #' @export CatchAtAge
 #' @export clear
 #' @export assemble_adreport_payload
+#' @export assemble_adreport_payload_from_tmb_adfun
 #' @export calculate_adreport_payload_se
 #' @export calculate_derived_quantity_se
 #' @export calculate_derived_quantity_laplace_se

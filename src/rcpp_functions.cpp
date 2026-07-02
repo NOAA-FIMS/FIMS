@@ -78,6 +78,16 @@ fims::Vector<int> RandomIndicesFromRcppList(Rcpp::List payload) {
   return output;
 }
 
+Rcpp::List TMBADFunEvaluationControl(int order) {
+  return Rcpp::List::create(
+      Rcpp::Named("order") = order,
+      Rcpp::Named("data_changed") = 0,
+      Rcpp::Named("set_tail") = 0,
+      Rcpp::Named("rangecomponent") = 1,
+      Rcpp::Named("hessiancols") = Rcpp::IntegerVector(),
+      Rcpp::Named("hessianrows") = Rcpp::IntegerVector());
+}
+
 Rcpp::List ADReportPayloadToRcppList(
     const fims_tmb::ADReportPayload& payload) {
   const size_t n_estimates = payload.estimate.size();
@@ -309,6 +319,91 @@ Rcpp::List assemble_adreport_payload(Rcpp::List payload) {
 }
 
 /**
+ * @brief Experimental internal bridge for assembling a structured ADREPORT
+ * payload from a native TMBad ADFun pointer.
+ *
+ * @param adfun_ptr External pointer to a TMBad ADREPORT ADFun.
+ * @param parameters Full parameter vector used to evaluate the report.
+ * @param fixed_covariance Fixed-effect covariance matrix.
+ * @param random_payload Optional list with random_indices, random_hessian, and
+ * fixed_jacobian_adjustment.
+ * @return Rcpp::List Structured ADREPORT payload.
+ */
+Rcpp::List assemble_adreport_payload_from_tmb_adfun_native(
+    SEXP adfun_ptr, Rcpp::NumericVector parameters,
+    Rcpp::NumericMatrix fixed_covariance, Rcpp::List random_payload) {
+#ifdef TMBAD_FRAMEWORK
+  if (TYPEOF(adfun_ptr) != EXTPTRSXP) {
+    Rcpp::stop("adfun_ptr must be an external pointer");
+  }
+
+  void* raw_adfun = R_ExternalPtrAddr(adfun_ptr);
+  if (raw_adfun == nullptr) {
+    Rcpp::stop("adfun_ptr is null");
+  }
+
+  Rcpp::NumericVector estimate;
+  Rcpp::NumericMatrix jacobian;
+  try {
+    estimate = Rcpp::as<Rcpp::NumericVector>(
+        EvalADFunObject(adfun_ptr, parameters, TMBADFunEvaluationControl(0)));
+    jacobian = Rcpp::as<Rcpp::NumericMatrix>(
+        EvalADFunObject(adfun_ptr, parameters, TMBADFunEvaluationControl(1)));
+  } catch (std::exception& e) {
+    Rcpp::stop(
+        "Native ADREPORT extraction failed with parameter length %i: %s",
+        parameters.size(), e.what());
+  }
+
+  fims_tmb::ADReportPayloadExtractionInput input;
+  input.estimate =
+      fims::Vector<double>(Rcpp::as<std::vector<double>>(estimate));
+  input.jacobian =
+      fims::Vector<double>(NumericMatrixToRowMajor(jacobian));
+  input.fixed_effect_covariance =
+      fims::Vector<double>(NumericMatrixToRowMajor(fixed_covariance));
+  input.n_parameters = static_cast<size_t>(jacobian.ncol());
+
+  if (random_payload.size() > 0) {
+    if (!random_payload.containsElementNamed("random_indices") ||
+        !random_payload.containsElementNamed("random_hessian") ||
+        !random_payload.containsElementNamed("fixed_jacobian_adjustment")) {
+      Rcpp::stop(
+          "random_payload must contain random_indices, random_hessian, and "
+          "fixed_jacobian_adjustment");
+    }
+
+    Rcpp::IntegerVector random_indices =
+        random_payload["random_indices"];
+    Rcpp::NumericMatrix random_hessian =
+        random_payload["random_hessian"];
+    Rcpp::NumericMatrix fixed_jacobian_adjustment =
+        random_payload["fixed_jacobian_adjustment"];
+    fims::Vector<int> random_indices_zero_based;
+    for (int i = 0; i < random_indices.size(); i++) {
+      random_indices_zero_based.push_back(
+          static_cast<int>(random_indices[i]));
+    }
+    input.random_indices = random_indices_zero_based;
+    input.random_effect_hessian =
+        fims::Vector<double>(NumericMatrixToRowMajor(random_hessian));
+    input.fixed_jacobian_adjustment =
+        fims::Vector<double>(
+            NumericMatrixToRowMajor(fixed_jacobian_adjustment));
+  }
+
+  fims_tmb::StaticADReportDerivativeProvider provider(input);
+  fims_tmb::ADReportPayloadExtractor extractor;
+  fims_tmb::ADReportPayload output = extractor.Extract(provider);
+  return ADReportPayloadToRcppList(output);
+#else
+  Rcpp::stop(
+      "assemble_adreport_payload_from_tmb_adfun_native requires "
+      "TMBAD_FRAMEWORK");
+#endif
+}
+
+/**
  * Function to register functions with the Rcpp module system.
  *
  */
@@ -419,4 +514,9 @@ void register_functions(Rcpp::Module &m) {
   Rcpp::function(
       "assemble_adreport_payload", &assemble_adreport_payload,
       "Assemble a structured ADREPORT payload from raw TMB derivative pieces.");
+  Rcpp::function(
+      "assemble_adreport_payload_from_tmb_adfun_native",
+      &assemble_adreport_payload_from_tmb_adfun_native,
+      "Internal experimental bridge for assembling a structured ADREPORT "
+      "payload from a native TMBad ADFun external pointer.");
 }
