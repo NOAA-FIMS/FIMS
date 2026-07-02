@@ -5,12 +5,12 @@
  * @details Including this single header brings in:
  *  - DelayEmbeddingMatrix, MakeDelayEmbedding, MakeDelayEmbeddingDropMissing
  *  - SquaredEuclideanDistance, SimplexWeights, SMapWeights, NormalizeWeights
+ *  - GaussianElimination (shared linear algebra utility)
+ *  - ARDKernelElement, BuildCovarianceMatrix, BuildKStarVector (GP kernels)
  *  - EDMPredictorBase (abstract base for all prediction functors)
  *  - SimplexProjection (Sugihara & May, 1990)
  *  - SMapProjection (Sugihara, 1994)
- *
- * Additional prediction algorithms (e.g., GP-EDM) will be added here as
- * further headers are implemented.
+ *  - GPEdmProjection (Munch et al. 2017; Rogers 2023 GPEDM)
  *
  * @copyright This file is part of the NOAA, National Marine Fisheries Service
  * Fisheries Integrated Modeling System project. See LICENSE in the source
@@ -21,8 +21,11 @@
 
 #include "functors/delay_embedding.hpp"
 #include "utilities/edm_distance_weights.hpp"
+#include "utilities/edm_linear_algebra.hpp"
+#include "utilities/edm_kernels.hpp"
 #include "functors/edm_predictor_base.hpp"
 #include "functors/simplex_projection.hpp"
 #include "functors/smap_projection.hpp"
+#include "functors/gp_edm_projection.hpp"
 
 #endif  // FIMS_EDM_HPP
