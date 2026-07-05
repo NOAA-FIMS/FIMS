@@ -9,6 +9,7 @@
 #define FIMS_POPULATION_DYNAMICS_POPULATION_SUBPOPULATION_HPP
 
 #include <cstddef>
+#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -63,11 +64,24 @@ struct PartitionSpec {
    * @details The last axis in axes varies fastest.
    */
   size_t stratum_id(const std::vector<size_t> &levels) const {
+    if (levels.size() != axes.size()) {
+      throw std::invalid_argument(
+          "PartitionSpec::stratum_id: levels vector size " +
+          std::to_string(levels.size()) +
+          " does not match number of axes " + std::to_string(axes.size()));
+    }
     size_t id = 0;
     size_t multiplier = 1;
     for (int i = static_cast<int>(axes.size()) - 1; i >= 0; --i) {
+      const size_t axis_size = axes[i].size();
+      if (levels[i] >= axis_size) {
+        throw std::invalid_argument(
+            "PartitionSpec::stratum_id: level index " +
+            std::to_string(levels[i]) + " out of bounds for axis " +
+            std::to_string(i) + " (size " + std::to_string(axis_size) + ")");
+      }
       id += levels[i] * multiplier;
-      multiplier *= axes[i].size();
+      multiplier *= axis_size;
     }
     return id;
   }
