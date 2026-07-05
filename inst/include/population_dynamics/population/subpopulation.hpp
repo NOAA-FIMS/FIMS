@@ -114,6 +114,26 @@ struct PartitionSpec {
       return strata;
     }
 
+    if (group.level.size() != axes.size()) {
+      throw std::invalid_argument(
+          "PartitionSpec::expand_group_to_strata: group.level size " +
+          std::to_string(group.level.size()) +
+          " does not match number of axes " + std::to_string(axes.size()));
+    }
+    for (size_t i = 0; i < axes.size(); ++i) {
+      if (group.level[i] == GroupSelector::kWildcard) {
+        continue;
+      }
+      if (group.level[i] < 0 ||
+          static_cast<size_t>(group.level[i]) >= axes[i].size()) {
+        throw std::invalid_argument(
+            "PartitionSpec::expand_group_to_strata: level index " +
+            std::to_string(group.level[i]) + " out of bounds for axis " +
+            std::to_string(i) + " (size " + std::to_string(axes[i].size()) +
+            ")");
+      }
+    }
+
     std::vector<size_t> current_levels(axes.size(), 0);
     expand_group_to_strata_recursive(group, 0, &current_levels, &strata);
     return strata;
