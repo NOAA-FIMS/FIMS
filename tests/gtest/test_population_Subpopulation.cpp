@@ -34,6 +34,11 @@ TEST(PartitionSpec, StratumIdRejectsOutOfBoundsLevel) {
   EXPECT_THROW(spec.stratum_id({2}), std::invalid_argument);
 }
 
+TEST(PartitionSpec, LevelsFromStratumRejectsOutOfBoundsStratum) {
+  fims_popdy::PartitionSpec spec = fims_popdy::MakeDefaultSexPartitionSpec();
+  EXPECT_THROW(spec.levels_from_stratum(2), std::invalid_argument);
+}
+
 TEST(PartitionSpec, ExpandGroupToStrataSupportsWildcard) {
   fims_popdy::PartitionSpec spec = fims_popdy::MakeDefaultSexPartitionSpec();
   fims_popdy::GroupSelector all_sexes;
