@@ -57,6 +57,20 @@ TEST(PartitionSpec, ExpandGroupToStrataSelectsSingleStratum) {
             (std::vector<size_t>{0}));
 }
 
+TEST(PartitionSpec, ExpandGroupToStrataRejectsMismatchedGroupSize) {
+  fims_popdy::PartitionSpec spec = fims_popdy::MakeDefaultSexPartitionSpec();
+  fims_popdy::GroupSelector group;
+  group.level = {0, 1};
+  EXPECT_THROW(spec.expand_group_to_strata(group), std::invalid_argument);
+}
+
+TEST(PartitionSpec, ExpandGroupToStrataRejectsOutOfBoundsLevel) {
+  fims_popdy::PartitionSpec spec = fims_popdy::MakeDefaultSexPartitionSpec();
+  fims_popdy::GroupSelector group;
+  group.level = {2};
+  EXPECT_THROW(spec.expand_group_to_strata(group), std::invalid_argument);
+}
+
 TEST(IndexLayout, FoldedIndicesMatchYearAgeAndStratum) {
   fims_popdy::IndexLayout layout;
   layout.n_strata = 2;
