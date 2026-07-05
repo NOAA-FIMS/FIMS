@@ -24,6 +24,16 @@ TEST(PartitionSpec, StratumIdAndLevelsAreInverse) {
   EXPECT_EQ(spec.levels_from_stratum(1), male_level);
 }
 
+TEST(PartitionSpec, StratumIdRejectsMismatchedLevelsSize) {
+  fims_popdy::PartitionSpec spec = fims_popdy::MakeDefaultSexPartitionSpec();
+  EXPECT_THROW(spec.stratum_id({0, 1}), std::invalid_argument);
+}
+
+TEST(PartitionSpec, StratumIdRejectsOutOfBoundsLevel) {
+  fims_popdy::PartitionSpec spec = fims_popdy::MakeDefaultSexPartitionSpec();
+  EXPECT_THROW(spec.stratum_id({2}), std::invalid_argument);
+}
+
 TEST(PartitionSpec, ExpandGroupToStrataSupportsWildcard) {
   fims_popdy::PartitionSpec spec = fims_popdy::MakeDefaultSexPartitionSpec();
   fims_popdy::GroupSelector all_sexes;
