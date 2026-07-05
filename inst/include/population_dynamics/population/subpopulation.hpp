@@ -90,6 +90,12 @@ struct PartitionSpec {
    * @brief Decode a flat stratum index to one level per axis.
    */
   std::vector<size_t> levels_from_stratum(size_t stratum) const {
+    if (stratum >= n_strata()) {
+      throw std::invalid_argument(
+          "PartitionSpec::levels_from_stratum: stratum " +
+          std::to_string(stratum) + " out of bounds (n_strata = " +
+          std::to_string(n_strata()) + ")");
+    }
     std::vector<size_t> levels(axes.size());
     for (int i = static_cast<int>(axes.size()) - 1; i >= 0; --i) {
       levels[i] = stratum % axes[i].size();
