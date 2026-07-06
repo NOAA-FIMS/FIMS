@@ -39,7 +39,7 @@ void register_recruitment(Rcpp::Module &m);
  */
 void register_fleet(Rcpp::Module &m);
 /**
- * \brief Register the parameter module.
+ * \brief Register the variable module.
  * \param m The Rcpp module to register functions in.
  */
 void register_variable(Rcpp::Module &m);
