@@ -974,9 +974,23 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
     for (it = this->population_ids->begin(); it != this->population_ids->end();
          ++it) {
       
+      auto population_interface_it =
+          PopulationInterfaceBase::live_objects.find(*it);
+      if (population_interface_it ==
+          PopulationInterfaceBase::live_objects.end()) {
+        FIMS_ERROR_LOG("Population with id " + fims::to_string(*it) +
+                       " not found in live objects.");
+        continue;
+      }
+
       std::shared_ptr<PopulationInterface> population_interface =
           std::dynamic_pointer_cast<PopulationInterface>(
-              PopulationInterfaceBase::live_objects[(*it)]);
+              population_interface_it->second);
+      if (!population_interface) {
+        FIMS_ERROR_LOG("Population with id " + fims::to_string(*it) +
+                       " not found in live objects.");
+        continue;
+      }
    
       model->InitializePopulationDerivedQuantities(population_interface->id);
       std::map<std::string, fims::Vector<Type>> &derived_quantities =
@@ -1130,9 +1144,21 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
 
     for (fleet_ids_iterator it = fleet_ids.begin(); it != fleet_ids.end();
          ++it) {
+      auto fleet_interface_it = FleetInterfaceBase::live_objects.find(*it);
+      if (fleet_interface_it == FleetInterfaceBase::live_objects.end()) {
+        FIMS_ERROR_LOG("Fleet with id " + fims::to_string(*it) +
+                       " not found in live objects.");
+        continue;
+      }
+
       std::shared_ptr<FleetInterface> fleet_interface =
           std::dynamic_pointer_cast<FleetInterface>(
-              FleetInterfaceBase::live_objects[(*it)]);
+              fleet_interface_it->second);
+      if (!fleet_interface) {
+        FIMS_ERROR_LOG("Fleet with id " + fims::to_string(*it) +
+                       " not found in live objects.");
+        continue;
+      }
       model->InitializeFleetDerivedQuantities(fleet_interface->id);
       std::map<std::string, fims::Vector<Type>> &derived_quantities =
           model->GetFleetDerivedQuantities(fleet_interface->id);
