@@ -124,14 +124,14 @@ class FleetInterface : public FleetInterfaceBase {
    * fleet.
    */
   VariableVector log_Fmort;
- 
+
   /**
    * @brief The vector of conversions to go from age to length, i.e., the
    * age-to-length-conversion matrix.
    */
   VariableVector age_to_length_conversion;
 
-  //Fleet based derived quantities
+  // Fleet based derived quantities
   /**
    * @brief Annual landings at age in numbers for a specific fleet
    */
@@ -144,68 +144,68 @@ class FleetInterface : public FleetInterfaceBase {
    * @brief Annual landings at length in numbers for a specific fleet
    */
   VariableVector landings_numbers_at_length;
- /**
-  * @brief total landings in weight for a specific fleet
-  */
- VariableVector landings_weight;
- /**
-  * @brief total landings in numbers for a specific fleet
-  */
- VariableVector landings_numbers;
- /**
-  * @brief total expected landings for a specific fleet in the units of that
-  * fleet either numbers or weight
-  */
- VariableVector landings_expected;
- /**
-  * @brief log of total expected landings for a specific fleet in the units of 
-  * that fleet either numbers or weight
-  */
- VariableVector log_landings_expected;
- /**
-  * @brief proportion of total landings by age to specify the composition
-  */
- VariableVector agecomp_proportion;
- /**
-  * @brief proportion of total landings by length to specify the composition
-  */
- VariableVector lengthcomp_proportion;
- /**
-  * @brief numbers at age for a fleet index such as survey or cpue
-  */
- VariableVector index_numbers_at_age;
- /**
-  * @brief weight at age for a fleet index such as survey or cpue
-  */
- VariableVector index_weight_at_age;
- /**
-  * @brief numbers at length for a fleet index such as survey or cpue
-  */
- VariableVector index_numbers_at_length;
- /**
-  * @brief total weight for a fleet index such as survey or cpue
-  */
- VariableVector index_weight;
- /**
-  * @brief total numbers for a fleet index such as survey or cpue
-  */
- VariableVector index_numbers;
- /**
-  * @brief expected value for a fleet index in fleet units
-  */
- VariableVector index_expected;
- /**
-  * @brief log of expected value for a fleet index in fleet units
-  */
- VariableVector log_index_expected;
- /**
-  * @brief This is the expected age composition proportions for the fleet
-  */
- VariableVector agecomp_expected;
- /**
-  * @brief This is the expected length composition proportions for the fleet
-  */
- VariableVector lengthcomp_expected;
+  /**
+   * @brief total landings in weight for a specific fleet
+   */
+  VariableVector landings_weight;
+  /**
+   * @brief total landings in numbers for a specific fleet
+   */
+  VariableVector landings_numbers;
+  /**
+   * @brief total expected landings for a specific fleet in the units of that
+   * fleet either numbers or weight
+   */
+  VariableVector landings_expected;
+  /**
+   * @brief log of total expected landings for a specific fleet in the units of
+   * that fleet either numbers or weight
+   */
+  VariableVector log_landings_expected;
+  /**
+   * @brief proportion of total landings by age to specify the composition
+   */
+  VariableVector agecomp_proportion;
+  /**
+   * @brief proportion of total landings by length to specify the composition
+   */
+  VariableVector lengthcomp_proportion;
+  /**
+   * @brief numbers at age for a fleet index such as survey or cpue
+   */
+  VariableVector index_numbers_at_age;
+  /**
+   * @brief weight at age for a fleet index such as survey or cpue
+   */
+  VariableVector index_weight_at_age;
+  /**
+   * @brief numbers at length for a fleet index such as survey or cpue
+   */
+  VariableVector index_numbers_at_length;
+  /**
+   * @brief total weight for a fleet index such as survey or cpue
+   */
+  VariableVector index_weight;
+  /**
+   * @brief total numbers for a fleet index such as survey or cpue
+   */
+  VariableVector index_numbers;
+  /**
+   * @brief expected value for a fleet index in fleet units
+   */
+  VariableVector index_expected;
+  /**
+   * @brief log of expected value for a fleet index in fleet units
+   */
+  VariableVector log_index_expected;
+  /**
+   * @brief This is the expected age composition proportions for the fleet
+   */
+  VariableVector agecomp_expected;
+  /**
+   * @brief This is the expected length composition proportions for the fleet
+   */
+  VariableVector lengthcomp_expected;
 
   /**
    * @brief The constructor.

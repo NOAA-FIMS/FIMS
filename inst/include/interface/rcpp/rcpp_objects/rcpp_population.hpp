@@ -154,60 +154,60 @@ class PopulationInterface : public PopulationInterfaceBase {
    */
   SharedString name = fims::to_string("NA");
 
-  //Population based derived quantities
-   /**
-  * @brief total annual landings removed from a population by all fleets in 
-  * weight 
-  */
- VariableVector total_landings_weight;
- 
- /**
-  * @brief total annual landings removed from a population by all fleets in 
-  * numbers 
-  */
- VariableVector total_landings_numbers;
- 
- /**
-  * @brief total annual fishing mortality a population is subject to
-  */
- VariableVector mortality_F;
- 
- /**
-  * @brief total annual natural mortality a population is subject to
-  */
- VariableVector mortality_M;
- 
- /**
-  * @brief total annual mortality a population is subject to
-  */
- VariableVector mortality_Z;
- 
- /**
-  * @brief Current population composition in numbers at age 
-  */
- VariableVector numbers_at_age;
- 
+  // Population based derived quantities
+  /**
+   * @brief total annual landings removed from a population by all fleets in
+   * weight
+   */
+  VariableVector total_landings_weight;
+
+  /**
+   * @brief total annual landings removed from a population by all fleets in
+   * numbers
+   */
+  VariableVector total_landings_numbers;
+
+  /**
+   * @brief total annual fishing mortality a population is subject to
+   */
+  VariableVector mortality_F;
+
+  /**
+   * @brief total annual natural mortality a population is subject to
+   */
+  VariableVector mortality_M;
+
+  /**
+   * @brief total annual mortality a population is subject to
+   */
+  VariableVector mortality_Z;
+
+  /**
+   * @brief Current population composition in numbers at age
+   */
+  VariableVector numbers_at_age;
+
   /**
    * @brief Theoretical population composition in numbers at age if no fishing
    * had occurred
    */
   VariableVector unfished_numbers_at_age;
- 
- /**
-  * @brief total weight of all fish in the population
-  */
- VariableVector biomass;
- /**
-  * @brief total weight of mature fish in the population
-  */
- VariableVector spawning_biomass;
+
+  /**
+   * @brief total weight of all fish in the population
+   */
+  VariableVector biomass;
+  /**
+   * @brief total weight of mature fish in the population
+   */
+  VariableVector spawning_biomass;
   /**
    * @brief total theoretical weight of all fish in the population if no fishing
    * had occurred
    */
   VariableVector unfished_biomass;
   /**
-   * @brief total theoretical weight of mature fish in the population if no 
+   * @brief total theoretical weight of mature fish in the population if no
    * fishing had occurred
    */
   VariableVector unfished_spawning_biomass;
@@ -216,16 +216,16 @@ class PopulationInterface : public PopulationInterfaceBase {
    * age
    */
   VariableVector proportion_mature_at_age;
- /**
-  * @brief the model expected recruitment each year based on stock recruit 
-  * relationship
-  */
- VariableVector expected_recruitment;
+  /**
+   * @brief the model expected recruitment each year based on stock recruit
+   * relationship
+   */
+  VariableVector expected_recruitment;
 
- /**
-  * @brief sum of selectivity at age across all fleets for a population
-  */
- VariableVector sum_selectivity;
+  /**
+   * @brief sum of selectivity at age across all fleets for a population
+   */
+  VariableVector sum_selectivity;
 
   /**
    * @brief The constructor.
@@ -260,7 +260,7 @@ class PopulationInterface : public PopulationInterfaceBase {
         spawning_biomass_ratio(other.spawning_biomass_ratio),
         log_f_multiplier(other.log_f_multiplier),
         log_init_naa(other.log_init_naa),
-        proportion_female(other.proportion_female),        
+        proportion_female(other.proportion_female),
         ages(other.ages),
         name(other.name),
         total_landings_weight(other.total_landings_weight),
