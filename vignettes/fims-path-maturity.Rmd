@@ -173,11 +173,11 @@ class LogisticMaturityInterface : public MaturityInterfaceBase {
    * @brief The value of the dependent variable at which the response reaches
    * 0.5.
    */
-  Variable inflection_point;
+  VariableVector inflection_point;
   /**
    * @brief The width of the curve at the inflection_point.
    */
-  Variable slope;
+  VariableVector slope;
   ...
 }
 ```
