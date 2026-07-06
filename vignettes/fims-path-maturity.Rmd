@@ -193,14 +193,16 @@ All Rcpp interface classes from FIMS define parameters (e.g., `inflection_point`
 [rcpp_interface.hpp](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/interface/rcpp/rcpp_interface.hpp) file in the directory [inst/include/interface/rcpp](https://github.com/NOAA-FIMS/FIMS/tree/main/inst/include/interface/rcpp). For example,
 
 ```{Rcpp, class.source = "rcppchunk", eval = FALSE}
- Rcpp::class_<Variable>("Variable")
-  .constructor()
-  .constructor<double>()
-  .constructor<Variable>()
-  .field("value", &Variable::value)
-  .field("min", &Variable::min)
-  .field("max", &Variable::max)
-  .field("estimation_type", &Variable::estimation_type);
+Rcpp::class_<Variable>(
+    "Variable",
+    "See https://noaa-fims.github.io/FIMS/doxygen/classVariable.html.")
+    .constructor()
+    .constructor<double>()
+    .constructor<Variable>()
+    .field("value", &Variable::initial_value_m)
+    .field("estimated_value", &Variable::final_value_m)
+    .field("id", &Variable::id_m)
+    .field("estimation_type", &Variable::estimation_type_m);
 ```
 
 Each field (i.e., parameter) from `maturity` (i.e., the maturity module we defined in R) will therefore inherit the four fields defined in the Variable class: `value`, `estimated_value`, `id`, `estimation_type`. That is, two parameter fields and 8 fields within those parameters.
