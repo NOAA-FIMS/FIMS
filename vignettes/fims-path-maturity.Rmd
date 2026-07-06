@@ -203,7 +203,7 @@ All Rcpp interface classes from FIMS define parameters (e.g., `inflection_point`
   .field("estimation_type", &Variable::estimation_type);
 ```
 
-Each field (i.e., parameter) from `maturity` (i.e., the maturity module we defined in R) will therefore inherit the five fields defined in the Variable class: `value`, `min`, `max`, `estimation_type`. That is, two parameter fields and 10 fields within those parameters.
+Each field (i.e., parameter) from `maturity` (i.e., the maturity module we defined in R) will therefore inherit the four fields defined in the Variable class: `value`, `estimated_value`, `id`, `estimation_type`. That is, two parameter fields and 8 fields within those parameters.
 
 ## `fims` namespace
 

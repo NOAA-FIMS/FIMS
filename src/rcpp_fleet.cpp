@@ -66,8 +66,6 @@ void register_fleet(Rcpp::Module& m) {
              &FleetInterface::index_numbers)
       .field("index_expected",
              &FleetInterface::index_expected)
-      .field("log_index_expected",
-             &FleetInterface::log_index_expected)
       .field("agecomp_expected",
              &FleetInterface::agecomp_expected)
       .field("lengthcomp_expected",

@@ -132,18 +132,18 @@ class FleetInterface : public FleetInterfaceBase {
   VariableVector age_to_length_conversion;
 
   //Fleet based derived quantities
- /**
-  * @brief Annual andings at age in numbers for a specific fleet
-  */
- VariableVector landings_numbers_at_age;
- /**
-  * @brief Annual andings at age in weight for a specific fleet
-  */
- VariableVector landings_weight_at_age;
- /**
-  * @brief Annual andings at length in numbers for a specific fleet
-  */
- VariableVector landings_numbers_at_length;
+  /**
+   * @brief Annual landings at age in numbers for a specific fleet
+   */
+  VariableVector landings_numbers_at_age;
+  /**
+   * @brief Annual landings at age in weight for a specific fleet
+   */
+  VariableVector landings_weight_at_age;
+  /**
+   * @brief Annual landings at length in numbers for a specific fleet
+   */
+  VariableVector landings_numbers_at_length;
  /**
   * @brief total landings in weight for a specific fleet
   */

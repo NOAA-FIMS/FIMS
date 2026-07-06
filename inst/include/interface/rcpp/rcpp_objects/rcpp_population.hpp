@@ -187,11 +187,11 @@ class PopulationInterface : public PopulationInterfaceBase {
   */
  VariableVector numbers_at_age;
  
- /**
-  * @brief Theoretical population composition in numbers at age if no fishing
-  * had occured
-  */
- VariableVector unfished_numbers_at_age;
+  /**
+   * @brief Theoretical population composition in numbers at age if no fishing
+   * had occurred
+   */
+  VariableVector unfished_numbers_at_age;
  
  /**
   * @brief total weight of all fish in the population
@@ -201,21 +201,21 @@ class PopulationInterface : public PopulationInterfaceBase {
   * @brief total weight of mature fish in the population
   */
  VariableVector spawning_biomass;
- /**
-  * @brief total theoretical weight of all fish in the population if no fishing
-  * had occured
-  */
- VariableVector unfished_biomass;
- /**
-  * @brief total theoretical weight of mature fish in the population if no 
-  * fishing had occured
-  */
- VariableVector unfished_spawning_biomass;
- /**
-  * @brief fraction of all fish at a given age that are sexualy mature at each
-  * age
-  */
- VariableVector proportion_mature_at_age;
+  /**
+   * @brief total theoretical weight of all fish in the population if no fishing
+   * had occurred
+   */
+  VariableVector unfished_biomass;
+  /**
+   * @brief total theoretical weight of mature fish in the population if no 
+   * fishing had occurred
+   */
+  VariableVector unfished_spawning_biomass;
+  /**
+   * @brief fraction of all fish at a given age that are sexually mature at each
+   * age
+   */
+  VariableVector proportion_mature_at_age;
  /**
   * @brief the model expected recruitment each year based on stock recruit 
   * relationship
