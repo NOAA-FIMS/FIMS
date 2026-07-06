@@ -110,9 +110,9 @@ struct PartitionSpec {
    * @details Split factors are indexed by flat stratum id (length n_strata()).
    * Each entry gives the fraction of a pooled quantity allocated to that
    * stratum when splitting on write. How factors are computed is separate
-   * from this lookup; see SexStratumSplitFactors() for the default sex
-   * partition. User-supplied per-stratum factors can replace the builder
-   * when axis interactions require stratum-level configuration.
+   * from this lookup. For the default sex-only partition, see
+   * SexStratumSplitFactors(); for multi-axis specs or axis interactions,
+   * callers supply a user-defined vector of length n_strata().
    *
    * @param stratum Flat stratum index.
    * @param split_factors One entry per stratum; size must equal n_strata().
@@ -249,12 +249,14 @@ inline int find_axis_index(const PartitionSpec &spec,
 }  // namespace detail
 
 /**
- * @brief Build stratum split factors for a partition that includes a sex axis.
+ * @brief Build stratum split factors for the default sex-only partition.
  *
- * @details Companion to MakeDefaultSexPartitionSpec(). For each stratum, reads
- * the sex level encoded in that stratum (female = 0, male = 1) and assigns
- * proportion_female or (1 - proportion_female). Works for sex-only and
- * multi-axis specs (e.g. sex x area) because assignment is per stratum.
+ * @details Companion to MakeDefaultSexPartitionSpec(). Intended for a single
+ * sex axis (n_strata = 2) where female (level 0) receives proportion_female
+ * and male (level 1) receives (1 - proportion_female). For multi-axis specs
+ * (e.g. sex x area), production use requires user-supplied per-stratum factors
+ * passed directly to stratum_split_factor(); this helper only reads the sex
+ * level from each encoded stratum and does not allocate across other axes.
  *
  * @param spec Partition structure (must include a sex axis).
  * @param proportion_female Value from Population::proportion_female at the
