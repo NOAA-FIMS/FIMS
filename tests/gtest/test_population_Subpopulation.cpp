@@ -71,6 +71,76 @@ TEST(PartitionSpec, ExpandGroupToStrataRejectsOutOfBoundsLevel) {
   EXPECT_THROW(spec.expand_group_to_strata(group), std::invalid_argument);
 }
 
+TEST(PartitionSpec, StratumSplitFactorLooksUpPrecomputedFactors) {
+  fims_popdy::PartitionSpec spec = fims_popdy::MakeDefaultSexPartitionSpec();
+  const std::vector<double> split_factors = {0.3, 0.7};
+
+  EXPECT_DOUBLE_EQ(spec.stratum_split_factor(0, split_factors), 0.3);
+  EXPECT_DOUBLE_EQ(spec.stratum_split_factor(1, split_factors), 0.7);
+}
+
+TEST(PartitionSpec, StratumSplitFactorRejectsMismatchedFactorSize) {
+  fims_popdy::PartitionSpec spec = fims_popdy::MakeDefaultSexPartitionSpec();
+  const std::vector<double> split_factors = {0.5};
+  EXPECT_THROW(spec.stratum_split_factor(0, split_factors), std::invalid_argument);
+}
+
+TEST(PartitionSpec, StratumSplitFactorRejectsOutOfBoundsStratum) {
+  fims_popdy::PartitionSpec spec = fims_popdy::MakeDefaultSexPartitionSpec();
+  const std::vector<double> split_factors = {0.5, 0.5};
+  EXPECT_THROW(spec.stratum_split_factor(2, split_factors),
+               std::invalid_argument);
+}
+
+TEST(SexStratumSplitFactors, DefaultSexPartition) {
+  fims_popdy::PartitionSpec spec = fims_popdy::MakeDefaultSexPartitionSpec();
+  const double p_female = 0.3;
+  const std::vector<double> split_factors =
+      fims_popdy::SexStratumSplitFactors(spec, p_female);
+
+  ASSERT_EQ(split_factors.size(), 2);
+  EXPECT_DOUBLE_EQ(split_factors[0], p_female);
+  EXPECT_DOUBLE_EQ(split_factors[1], 1.0 - p_female);
+  EXPECT_DOUBLE_EQ(spec.stratum_split_factor(0, split_factors), p_female);
+  EXPECT_DOUBLE_EQ(spec.stratum_split_factor(1, split_factors),
+                   1.0 - p_female);
+}
+
+TEST(SexStratumSplitFactors, SexByAreaPartition) {
+  fims_popdy::PartitionSpec spec;
+  fims_popdy::Axis sex_axis;
+  sex_axis.name = "sex";
+  sex_axis.levels = {"female", "male"};
+  fims_popdy::Axis area_axis;
+  area_axis.name = "area";
+  area_axis.levels = {"north", "east", "south", "west"};
+  spec.axes.push_back(std::move(sex_axis));
+  spec.axes.push_back(std::move(area_axis));
+
+  const double p_female = 0.4;
+  const std::vector<double> split_factors =
+      fims_popdy::SexStratumSplitFactors(spec, p_female);
+
+  ASSERT_EQ(split_factors.size(), 8);
+  for (size_t stratum = 0; stratum < 4; ++stratum) {
+    EXPECT_DOUBLE_EQ(split_factors[stratum], p_female);
+  }
+  for (size_t stratum = 4; stratum < 8; ++stratum) {
+    EXPECT_DOUBLE_EQ(split_factors[stratum], 1.0 - p_female);
+  }
+}
+
+TEST(SexStratumSplitFactors, RejectsMissingSexAxis) {
+  fims_popdy::PartitionSpec spec;
+  fims_popdy::Axis area_axis;
+  area_axis.name = "area";
+  area_axis.levels = {"north", "south"};
+  spec.axes.push_back(std::move(area_axis));
+
+  EXPECT_THROW(fims_popdy::SexStratumSplitFactors(spec, 0.5),
+               std::invalid_argument);
+}
+
 TEST(IndexLayout, FoldedIndicesMatchYearAgeAndStratum) {
   fims_popdy::IndexLayout layout;
   layout.n_strata = 2;
