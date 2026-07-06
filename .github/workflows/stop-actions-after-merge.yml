@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Cancel Duplicate Workflow Runs
-        uses: styfle/cancel-workflow-action@0.12.1
+        uses: styfle/cancel-workflow-action@0.13.1
         with:
           # Targets the workflow runs belonging specifically to the merged branch head sha
           workflow_id: all
