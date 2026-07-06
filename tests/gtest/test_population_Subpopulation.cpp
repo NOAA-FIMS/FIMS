@@ -106,7 +106,9 @@ TEST(SexStratumSplitFactors, DefaultSexPartition) {
                    1.0 - p_female);
 }
 
-TEST(SexStratumSplitFactors, SexByAreaPartition) {
+// Verifies sex level is read from each encoded stratum. Not a production
+// split recipe for multi-axis specs; area allocation is user-defined.
+TEST(SexStratumSplitFactors, ReadsSexLevelFromMultiAxisSpec) {
   fims_popdy::PartitionSpec spec;
   fims_popdy::Axis sex_axis;
   sex_axis.name = "sex";
