@@ -616,7 +616,7 @@ class AgeSpecificSelectivityInterface : public SelectivityInterfaceBase {
    /**
    * @brief The number of age bins.
    */
-  SharedInt n_ages = 0;
+  SharedInt n_ages = 1;
    /**
    * @brief Vector of ages.
    */
@@ -624,7 +624,7 @@ class AgeSpecificSelectivityInterface : public SelectivityInterfaceBase {
    /**
    * @brief Minimum observed age
    */
-  SharedInt min_age = 0;
+  SharedInt min_age = 1;
    /**
    * @brief Age-specific selectivity parameter values.
    */
