@@ -69,8 +69,19 @@ test_that("backend derived quantity SEs match TMB sdreport", {
   )
   estimate <- adreport_obj$fn(theta_hat)
   jacobian <- adreport_obj$gr(theta_hat)
+  native_backend_hessian <- FIMS:::calculate_tmb_native_fixed_hessian(
+    obj,
+    theta_hat
+  )
+  backend_hessian <- calculate_fixed_effect_hessian(
+    theta_hat,
+    obj$gr,
+    .Machine$double.eps^(1 / 3)
+  )
 
   expect_equal(unname(estimate), c(-3, -1), tolerance = 1e-12)
+  expect_equal(native_backend_hessian, hessian, tolerance = 1e-12)
+  expect_equal(backend_hessian, hessian, tolerance = 1e-8)
   expect_equal(
     unname(as.vector(t(jacobian))),
     c(1, 2, 2, 1),
@@ -83,6 +94,7 @@ test_that("backend derived quantity SEs match TMB sdreport", {
     covariance = as.vector(t(sdr$cov.fixed)),
     n_parameters = 2
   )
+  backend_fixed_covariance <- calculate_fixed_effect_covariance(hessian)
   backend_summary <- FIMS:::calculate_tmb_adreport_uncertainty(
     obj = obj,
     sdreport = sdr
@@ -105,6 +117,7 @@ test_that("backend derived quantity SEs match TMB sdreport", {
   payload_se <- calculate_adreport_payload_se(payload)
 
   expect_equal(unname(tmb_se), c(sqrt(40), 5), tolerance = 1e-8)
+  expect_equal(backend_fixed_covariance, sdr$cov.fixed)
   expect_equal(payload$method, "fixed")
   expect_equal(native_payload$method, "fixed")
   expect_equal(native_payload$estimate, static_payload$estimate)
@@ -115,6 +128,7 @@ test_that("backend derived quantity SEs match TMB sdreport", {
   )
   expect_equal(native_payload$n_fixed_effects, static_payload$n_fixed_effects)
   expect_equal(unname(payload$estimate), unname(estimate), tolerance = 1e-12)
+  expect_equal(payload$fixed_covariance, sdr$cov.fixed)
   expect_equal(
     unname(as.vector(t(payload$jacobian))),
     c(1, 2, 2, 1),
@@ -134,7 +148,94 @@ test_that("backend derived quantity SEs match TMB sdreport", {
   )
 })
 
-test_that("backend random-effect derived quantity SEs match TMB sdreport", {
+test_that("fixed Hessian helpers fall back safely", {
+  par_fixed <- c(a = 1, b = -2)
+  hessian <- matrix(c(2, 0.5, 0.5, 3), nrow = 2, byrow = TRUE)
+  obj <- list(
+    he = function(x) stop("native Hessian unavailable"),
+    gr = function(x) as.vector(hessian %*% x),
+    fn = function(x) 0.5 * sum(x * as.vector(hessian %*% x))
+  )
+
+  expect_null(
+    FIMS:::calculate_tmb_native_fixed_hessian(
+      list(he = function(x) matrix(1, nrow = 1, ncol = 1)),
+      par_fixed
+    )
+  )
+  expect_equal(
+    FIMS:::calculate_tmb_fixed_hessian(
+      obj = obj,
+      par_fixed = par_fixed,
+      has_random = FALSE
+    ),
+    hessian,
+    tolerance = 1e-8
+  )
+  expect_equal(
+    unname(FIMS:::calculate_tmb_fixed_hessian(
+      obj = list(fn = function(x) 0.5 * sum(x^2), gr = function(x) x),
+      par_fixed = par_fixed,
+      has_random = TRUE
+    )),
+    diag(2),
+    tolerance = 1e-8
+  )
+  expect_equal(
+    unname(FIMS:::calculate_tmb_fixed_hessian(
+      obj = list(
+        env = list(ff = function(x, order = 1) stop("Laplace gradient failed")),
+        fn = function(x) 0.5 * sum(x^2),
+        gr = function(x) x
+      ),
+      par_fixed = par_fixed,
+      has_random = TRUE
+    )),
+    diag(2),
+    tolerance = 1e-8
+  )
+})
+
+test_that("fixed covariance falls back when backend inversion fails", {
+  par_fixed <- c(a = 1, b = 2)
+  sdreport_covariance <- matrix(c(11, 2, 2, 7), nrow = 2, byrow = TRUE)
+  obj <- list(
+    env = list(random = NULL, last.par.best = par_fixed),
+    he = function(x) matrix(c(1, 0, 0, 0), nrow = 2, byrow = TRUE)
+  )
+
+  expect_equal(
+    FIMS:::calculate_tmb_fixed_covariance(
+      obj = obj,
+      sdreport = list(cov.fixed = sdreport_covariance)
+    ),
+    sdreport_covariance
+  )
+})
+
+test_that("random Hessian extraction falls back safely", {
+  random_hessian <- matrix(c(2, 0.25, 0.25, 4), nrow = 2, byrow = TRUE)
+  obj <- list(
+    env = list(
+      random = 2:3,
+      last.par.best = c(beta = 1, u1 = 0.5, u2 = -0.25),
+      f = function(...) stop("ADGrad Hessian unavailable"),
+      spHess = function(par, random = FALSE) {
+        if (random) {
+          return(random_hessian)
+        }
+        stop("full Hessian not needed")
+      }
+    )
+  )
+
+  expect_equal(
+    FIMS:::calculate_tmb_random_hessian(obj),
+    random_hessian
+  )
+})
+
+test_that("native fixed Hessian handles non-diagonal fixed-only models", {
   skip_on_cran()
   skip_if_not_installed("TMB")
 
@@ -143,20 +244,26 @@ test_that("backend random-effect derived quantity SEs match TMB sdreport", {
   setwd(tmp)
   withr::defer(setwd(oldwd))
 
-  model_file <- file.path(tmp, "derived_quantity_laplace.cpp")
+  model_file <- file.path(tmp, "derived_quantity_cross_hessian.cpp")
   writeLines(
     c(
       "#include <TMB.hpp>",
       "template<class Type>",
       "Type objective_function<Type>::operator() () {",
-      "  PARAMETER(beta);",
-      "  PARAMETER_VECTOR(u);",
+      "  PARAMETER_VECTOR(theta);",
+      "  Type d0 = theta(0) - Type(1);",
+      "  Type d1 = theta(1) + Type(2);",
+      "  Type d2 = theta(2) - Type(0.5);",
       "  Type nll = Type(0);",
-      "  nll += Type(0.5) * pow((beta - Type(1)) / Type(2), 2);",
-      "  nll += Type(0.5) * pow((u(0) - beta) / Type(3), 2);",
+      "  nll += Type(0.5) * Type(2.0) * d0 * d0;",
+      "  nll += Type(0.5) * Type(1.5) * d1 * d1;",
+      "  nll += Type(0.5) * Type(3.0) * d2 * d2;",
+      "  nll += Type(0.3) * d0 * d1;",
+      "  nll -= Type(0.2) * d0 * d2;",
+      "  nll += Type(0.4) * d1 * d2;",
       "  vector<Type> derived(2);",
-      "  derived(0) = beta + u(0);",
-      "  derived(1) = beta * beta + u(0);",
+      "  derived(0) = theta(0) + theta(1) - theta(2);",
+      "  derived(1) = theta(0) * theta(2) + Type(2) * theta(1);",
       "  ADREPORT(derived);",
       "  return nll;",
       "}"
@@ -182,7 +289,97 @@ test_that("backend random-effect derived quantity SEs match TMB sdreport", {
 
   obj <- TMB::MakeADFun(
     data = list(),
-    parameters = list(beta = 0, u = 0),
+    parameters = list(theta = c(1, -2, 0.5)),
+    DLL = "derived_quantity_cross_hessian",
+    silent = TRUE
+  )
+  hessian <- matrix(
+    c(2, 0.3, -0.2, 0.3, 1.5, 0.4, -0.2, 0.4, 3),
+    nrow = 3,
+    byrow = TRUE
+  )
+  sdr <- TMB::sdreport(
+    obj,
+    par.fixed = obj$par,
+    hessian.fixed = hessian
+  )
+  payload <- FIMS:::extract_tmb_adreport_payload(obj = obj, sdreport = sdr)
+  backend_summary <- FIMS:::calculate_tmb_adreport_uncertainty(
+    obj = obj,
+    sdreport = sdr
+  )
+  tmb_report <- summary(sdr, "report")
+
+  expect_equal(
+    FIMS:::calculate_tmb_native_fixed_hessian(obj, obj$par),
+    hessian,
+    tolerance = 1e-12
+  )
+  expect_equal(
+    payload$fixed_covariance,
+    solve(hessian),
+    tolerance = 1e-10
+  )
+  expect_equal(payload$method, "fixed")
+  expect_equal(
+    unname(backend_summary[, "Std. Error"]),
+    unname(tmb_report[, "Std. Error"]),
+    tolerance = 1e-8
+  )
+})
+
+test_that("backend random-effect derived quantity SEs match TMB sdreport", {
+  skip_on_cran()
+  skip_if_not_installed("TMB")
+
+  oldwd <- getwd()
+  tmp <- withr::local_tempdir()
+  setwd(tmp)
+  withr::defer(setwd(oldwd))
+
+  model_file <- file.path(tmp, "derived_quantity_laplace.cpp")
+  writeLines(
+    c(
+      "#include <TMB.hpp>",
+      "template<class Type>",
+      "Type objective_function<Type>::operator() () {",
+      "  PARAMETER(beta);",
+      "  PARAMETER_VECTOR(u);",
+      "  Type nll = Type(0);",
+      "  nll += Type(0.5) * pow((beta - Type(1)) / Type(2), 2);",
+      "  nll += Type(0.5) * pow((u(0) - beta) / Type(3), 2);",
+      "  nll += Type(0.5) * pow((u(1) + Type(0.5) * beta) / Type(2), 2);",
+      "  nll += Type(0.05) * (u(0) - beta) *",
+      "    (u(1) + Type(0.5) * beta);",
+      "  vector<Type> derived(2);",
+      "  derived(0) = beta + u(0) + u(1);",
+      "  derived(1) = beta * beta + u(0) - u(1);",
+      "  ADREPORT(derived);",
+      "  return nll;",
+      "}"
+    ),
+    model_file
+  )
+
+  TMB::compile(model_file, framework = "TMBad")
+  dynlib <- TMB::dynlib(tools::file_path_sans_ext(model_file))
+  dyn.load(dynlib)
+  test_env <- environment()
+  withr::defer({
+    rm(
+      list = intersect(
+        c("obj", "sdr", "adreport_obj", "payload"),
+        ls(envir = test_env)
+      ),
+      envir = test_env
+    )
+    invisible(gc())
+    dyn.unload(dynlib)
+  })
+
+  obj <- TMB::MakeADFun(
+    data = list(),
+    parameters = list(beta = 0, u = c(0, 0)),
     random = "u",
     DLL = "derived_quantity_laplace",
     silent = TRUE
@@ -198,9 +395,23 @@ test_that("backend random-effect derived quantity SEs match TMB sdreport", {
     obj = obj,
     sdreport = sdr
   )
+  backend_random_hessian <- FIMS:::calculate_tmb_random_hessian(
+    obj = obj,
+    par = obj$env$last.par.best,
+    random = obj$env$random
+  )
+  backend_fixed_hessian <- FIMS:::calculate_tmb_fixed_hessian(
+    obj = obj,
+    par_fixed = obj$env$last.par.best[-obj$env$random],
+    has_random = TRUE
+  )
+  backend_fixed_covariance <- FIMS:::calculate_tmb_fixed_covariance(
+    obj = obj,
+    sdreport = sdr
+  )
   adreport_obj <- TMB::MakeADFun(
     data = list(),
-    parameters = list(beta = 0, u = 0),
+    parameters = list(beta = 0, u = c(0, 0)),
     type = "ADFun",
     ADreport = TRUE,
     DLL = "derived_quantity_laplace",
@@ -224,6 +435,22 @@ test_that("backend random-effect derived quantity SEs match TMB sdreport", {
 
   expect_true(opt$convergence == 0)
   expect_equal(payload$method, "laplace")
+  expect_equal(
+    backend_random_hessian,
+    as.matrix(obj$env$spHess(obj$env$last.par.best, random = TRUE)),
+    tolerance = 1e-12
+  )
+  expect_equal(
+    unname(backend_fixed_hessian),
+    unname(stats::optimHess(
+      obj$env$last.par.best[-obj$env$random],
+      obj$fn,
+      obj$gr
+    )),
+    tolerance = 1e-8
+  )
+  expect_equal(payload$random_hessian, backend_random_hessian)
+  expect_equal(backend_fixed_covariance, sdr$cov.fixed)
   expect_equal(native_payload$method, "laplace")
   expect_equal(unname(native_payload$estimate), unname(payload$estimate))
   expect_equal(native_payload$fixed_jacobian, payload$fixed_jacobian)
