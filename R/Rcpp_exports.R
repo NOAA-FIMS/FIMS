@@ -46,7 +46,7 @@ NULL
 #' [NOAA-FIMS C++ Documentation](https://noaa-fims.github.io/FIMS/doxygen/)
 #'
 #' @name Cpp_functions
-#' @aliases assemble_adreport_payload assemble_adreport_payload_from_tmb_adfun calculate_adreport_payload_se calculate_derived_quantity_se calculate_derived_quantity_laplace_se clear get_fixed get_log get_log_errors get_log_warnings get_parameter_names get_random get_random_names inv_logit log_error log_info log_warning logit set_fixed set_log_throw_on_error set_random CreateTMBModel
+#' @aliases assemble_adreport_payload assemble_adreport_payload_from_tmb_adfun calculate_adreport_payload_se calculate_derived_quantity_se calculate_derived_quantity_laplace_se calculate_fixed_effect_covariance calculate_fixed_effect_hessian calculate_laplace_fixed_jacobian_adjustment calculate_laplace_fixed_jacobian_adjustment_native clear get_fixed get_log get_log_errors get_log_warnings get_parameter_names get_random get_random_names inv_logit log_error log_info log_warning logit set_fixed set_log_throw_on_error set_random CreateTMBModel
 #'
 #' @details
 #' - [assemble_adreport_payload](https://noaa-fims.github.io/FIMS/doxygen/rcpp__functions_8cpp.html)
@@ -54,6 +54,10 @@ NULL
 #' - [calculate_adreport_payload_se](https://noaa-fims.github.io/FIMS/doxygen/rcpp__functions_8cpp.html)
 #' - [calculate_derived_quantity_se](https://noaa-fims.github.io/FIMS/doxygen/rcpp__functions_8cpp.html)
 #' - [calculate_derived_quantity_laplace_se](https://noaa-fims.github.io/FIMS/doxygen/rcpp__functions_8cpp.html)
+#' - [calculate_fixed_effect_covariance](https://noaa-fims.github.io/FIMS/doxygen/rcpp__functions_8cpp.html)
+#' - [calculate_fixed_effect_hessian](https://noaa-fims.github.io/FIMS/doxygen/rcpp__functions_8cpp.html)
+#' - [calculate_laplace_fixed_jacobian_adjustment](https://noaa-fims.github.io/FIMS/doxygen/rcpp__functions_8cpp.html)
+#' - [calculate_laplace_fixed_jacobian_adjustment_native](https://noaa-fims.github.io/FIMS/doxygen/rcpp__functions_8cpp.html)
 #' - [clear](https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html)
 #' - [get_fixed](https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html)
 #' - [get_log](https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html)

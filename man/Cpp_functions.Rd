@@ -19,6 +19,10 @@
 \alias{set_log_throw_on_error}
 \alias{set_random}
 \alias{CreateTMBModel}
+\alias{calculate_fixed_effect_covariance}
+\alias{calculate_fixed_effect_hessian}
+\alias{calculate_laplace_fixed_jacobian_adjustment}
+\alias{calculate_laplace_fixed_jacobian_adjustment_native}
 \title{C++ Functions Exported via Rcpp}
 \description{
 The following functions are exported from C++ via Rcpp. Their documentation
@@ -44,10 +48,13 @@ C++ docs.
 \item \href{https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html}{set_log_throw_on_error}
 \item \href{https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html}{set_random}
 \item \href{https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html}{CreateTMBModel}
+\item \href{https://noaa-fims.github.io/FIMS/doxygen/rcpp__functions_8cpp.html}{calculate_fixed_effect_covariance}
+\item \href{https://noaa-fims.github.io/FIMS/doxygen/rcpp__functions_8cpp.html}{calculate_fixed_effect_hessian}
+\item \href{https://noaa-fims.github.io/FIMS/doxygen/rcpp__functions_8cpp.html}{calculate_laplace_fixed_jacobian_adjustment}
+\item \href{https://noaa-fims.github.io/FIMS/doxygen/rcpp__functions_8cpp.html}{calculate_laplace_fixed_jacobian_adjustment_native}
 }
 }
 \section{C++ Documentation}{
 
 \href{https://noaa-fims.github.io/FIMS/doxygen/}{NOAA-FIMS C++ Documentation}
 }
-

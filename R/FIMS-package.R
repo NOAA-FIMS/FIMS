@@ -10,6 +10,10 @@
 #' @export calculate_adreport_payload_se
 #' @export calculate_derived_quantity_se
 #' @export calculate_derived_quantity_laplace_se
+#' @export calculate_fixed_effect_covariance
+#' @export calculate_fixed_effect_hessian
+#' @export calculate_laplace_fixed_jacobian_adjustment
+#' @export calculate_laplace_fixed_jacobian_adjustment_native
 #' @export CreateTMBModel
 #' @export DlnormDistribution
 #' @export DmultinomDistribution

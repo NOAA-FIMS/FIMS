@@ -14,13 +14,23 @@ The design intentionally separates four jobs:
 
 ## Current Flow
 
-The current implementation still gets raw derivative pieces from TMB's R-facing
-API:
+The current implementation is a hybrid native/R path:
 
-- ADREPORT values and full Jacobian come from a TMB `ADFun`.
-- Fixed-effect covariance comes from `sdreport`.
-- Random-effect Hessian and reverse-sweep adjustments come from TMB environment
-  helpers.
+- ADREPORT values and full Jacobian are evaluated through the native TMBad
+  `ADFun` external pointer when available, with the R-facing `$fn`/`$gr` path as
+  a fallback.
+- Fixed-effect covariance is calculated by inverting a fixed-effect Hessian in
+  the backend. For fixed-effect-only models, the Hessian is obtained from TMB's
+  native fixed-Hessian path (`obj$he()`), with backend central differencing of
+  the fixed-effect gradient as a fallback. For random-effect models, the
+  Hessian is calculated in the backend by central differencing TMB's Laplace
+  marginal gradient, with the same `optimHess()` path used by `sdreport` as a
+  fallback; `sdreport$cov.fixed` remains a fallback.
+- Random-effect Hessian is extracted from the native ADGrad Hessian block when
+  available, with TMB's sparse Hessian helper as a fallback.
+- Reverse sweeps use the native TMBad `ADGrad` external pointer when available,
+  with the R-facing ADGrad function as a fallback. The Hessian solve and
+  fixed-Jacobian adjustment assembly are owned by the backend calculator.
 
 R passes those raw pieces to `assemble_adreport_payload()`. The Rcpp bridge then
 wraps them in `StaticADReportDerivativeProvider` and calls
