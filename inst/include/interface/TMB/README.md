@@ -20,12 +20,12 @@ The current implementation is a hybrid native/R path:
   `ADFun` external pointer when available, with the R-facing `$fn`/`$gr` path as
   a fallback.
 - Fixed-effect covariance is calculated by inverting a fixed-effect Hessian in
-  the backend. For fixed-effect-only models, the Hessian is obtained from TMB's
-  native fixed-Hessian path (`obj$he()`), with backend central differencing of
-  the fixed-effect gradient as a fallback. For random-effect models, the
-  Hessian is calculated in the backend by central differencing TMB's Laplace
-  marginal gradient, with the same `optimHess()` path used by `sdreport` as a
-  fallback; `sdreport$cov.fixed` remains a fallback.
+  the backend. For fixed-effect-only models, the Hessian is obtained through
+  TMB's model-DLL fixed-Hessian path (`obj$he()`), with backend central
+  differencing of the fixed-effect gradient as a fallback. For random-effect
+  models, the Hessian is calculated in the backend by central differencing
+  TMB's Laplace marginal gradient, with the same `optimHess()` path used by
+  `sdreport` as a fallback; `sdreport$cov.fixed` remains a fallback.
 - Random-effect Hessian is extracted from the native ADGrad Hessian block when
   available, with TMB's sparse Hessian helper as a fallback.
 - Reverse sweeps use the native TMBad `ADGrad` external pointer when available,

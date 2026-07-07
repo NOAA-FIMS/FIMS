@@ -496,6 +496,10 @@ FIMSFit <- function(
   }
 
   model_output <- input[["model"]]$get_output()
+  model_output <- add_adreport_uncertainty_to_model_output(
+    model_output = model_output,
+    sdreport = sdreport
+  )
 
 
   fit <- methods::new(

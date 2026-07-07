@@ -85,8 +85,8 @@ assemble_adreport_payload_from_tmb_adfun <- function(adreport_obj,
   assemble_adreport_payload(payload)
 }
 
-calculate_tmb_native_fixed_hessian <- function(obj,
-                                               par_fixed) {
+calculate_tmb_model_dll_fixed_hessian <- function(obj,
+                                                  par_fixed) {
   hessian_fixed <- tryCatch(
     obj[["he"]](par_fixed),
     error = function(e) NULL
@@ -103,25 +103,30 @@ calculate_tmb_native_fixed_hessian <- function(obj,
   hessian_fixed
 }
 
+calculate_tmb_laplace_fixed_hessian <- function(obj,
+                                                par_fixed) {
+  laplace_gradient <- function(x) {
+    obj[["env"]][["ff"]](x, order = 1)
+  }
+  tryCatch(
+    calculate_fixed_effect_hessian(
+      par_fixed,
+      laplace_gradient,
+      .Machine$double.eps^(1 / 3)
+    ),
+    error = function(e) NULL
+  )
+}
+
 calculate_tmb_fixed_hessian <- function(obj,
                                         par_fixed,
                                         has_random = FALSE) {
   hessian_fixed <- NULL
   if (!has_random) {
-    hessian_fixed <- calculate_tmb_native_fixed_hessian(obj, par_fixed)
+    hessian_fixed <- calculate_tmb_model_dll_fixed_hessian(obj, par_fixed)
   }
   if (is.null(hessian_fixed) && has_random) {
-    laplace_gradient <- function(x) {
-      obj[["env"]][["ff"]](x, order = 1)
-    }
-    hessian_fixed <- tryCatch(
-      calculate_fixed_effect_hessian(
-        par_fixed,
-        laplace_gradient,
-        .Machine$double.eps^(1 / 3)
-      ),
-      error = function(e) NULL
-    )
+    hessian_fixed <- calculate_tmb_laplace_fixed_hessian(obj, par_fixed)
   }
   if (is.null(hessian_fixed) && !has_random) {
     hessian_fixed <- tryCatch(
@@ -435,4 +440,53 @@ calculate_tmb_adreport_uncertainty <- function(obj,
     par_fixed = par_fixed
   )
   calculate_tmb_adreport_payload_uncertainty(payload)
+}
+
+adreport_uncertainty_to_json_reports <- function(adreport_uncertainty) {
+  if (is.null(adreport_uncertainty) || length(adreport_uncertainty) == 0) {
+    return(list())
+  }
+
+  report_names <- rownames(adreport_uncertainty)
+  if (is.null(report_names)) {
+    report_names <- rep("ADREPORT", nrow(adreport_uncertainty))
+  }
+  split_indices <- split(seq_len(nrow(adreport_uncertainty)), report_names)
+
+  unname(lapply(names(split_indices), function(report_name) {
+    rows <- split_indices[[report_name]]
+    list(
+      name = report_name,
+      value = unname(as.numeric(adreport_uncertainty[rows, "Estimate"])),
+      uncertainty = unname(as.numeric(
+        adreport_uncertainty[rows, "Std. Error"]
+      ))
+    )
+  }))
+}
+
+add_adreport_uncertainty_to_model_output <- function(model_output,
+                                                     sdreport) {
+  adreport_uncertainty <- attr(sdreport, "fims_backend_report")
+  reports <- adreport_uncertainty_to_json_reports(adreport_uncertainty)
+  if (length(reports) == 0 || length(model_output) == 0) {
+    return(model_output)
+  }
+
+  model_output_list <- tryCatch(
+    jsonlite::fromJSON(model_output, simplifyVector = FALSE),
+    error = function(e) NULL
+  )
+  if (is.null(model_output_list)) {
+    return(model_output)
+  }
+
+  model_output_list[["reports"]] <- reports
+  jsonlite::toJSON(
+    model_output_list,
+    auto_unbox = TRUE,
+    pretty = TRUE,
+    digits = NA,
+    null = "null"
+  )
 }
