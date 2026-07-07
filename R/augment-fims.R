@@ -83,7 +83,7 @@ augment.FIMSFit <- function(x, include_weights = TRUE, ...) {
   }
 
   # Determine which optional index columns are present in the output
-  # (year_i, age_i, length_i, season_i, …).  These are carried through so
+  # (year_i, age_i, length_i, season_i, etc.). These are carried through so
   # users can group metrics by, e.g., year.
   index_cols <- names(fit_rows)[grepl("_i$", names(fit_rows))]
 
@@ -140,10 +140,10 @@ augment.FIMSFit <- function(x, include_weights = TRUE, ...) {
 #'   `case_weights`) can be included.
 #' @param group_by A character vector of column names in the augmented tibble
 #'   to group by before computing metrics.  Common choices:
-#'   * `"label"`        – one row-set per data-stream label
-#'   * `"fleet"`        – one row-set per fleet
-#'   * `"distribution"` – one row-set per likelihood distribution
-#'   * `c("label", "fleet")` – per label × fleet combination
+#'   * `"label"`        - one row-set per data-stream label
+#'   * `"fleet"`        - one row-set per fleet
+#'   * `"distribution"` - one row-set per likelihood distribution
+#'   * `c("label", "fleet")` - per label x fleet combination
 #'   Defaults to `NULL` (no grouping).
 #' @param weighted Logical (default `FALSE`).  When `TRUE`, inverse-variance
 #'   weights from `uncertainty` are passed to the metric functions via the
@@ -166,7 +166,7 @@ augment.FIMSFit <- function(x, include_weights = TRUE, ...) {
 #'   initialize_fims(data = data_4_model) |>
 #'   fit_fims(optimize = TRUE)
 #'
-#' # Overall RMSE / MAE / R² across all data streams
+#' # Overall RMSE / MAE / R^2 across all data streams
 #' get_fit_metrics(fit)
 #'
 #' # Per-data-stream: one row-set per label
@@ -268,7 +268,7 @@ NULL
 #' @details
 #' In the FIMS output the `fleet` column is `NA` for derived-quantity rows
 #' (which is where all observed/expected pairs live). Use `module_id` instead
-#' to distinguish fleets and surveys — this matches the convention used in the
+#' to distinguish fleets and surveys - this matches the convention used in the
 #' FIMS vignettes, where `module_id == 1` is the first fishing fleet and
 #' `module_id == 2` is the first survey.  To discover which `module_id` values
 #' are present in your fit, inspect `augment(fit)` directly.
@@ -298,7 +298,7 @@ NULL
 #'   initialize_fims(data = data_4_model) |>
 #'   fit_fims(optimize = TRUE)
 #'
-#' # Landings for the fishing fleet (module_id 1) — compute RMSE
+#' # Landings for the fishing fleet (module_id 1) - compute RMSE
 #' get_fit_stream(fit, stream_label = "landings_expected", module_id = 1) |>
 #'   yardstick::rmse(truth = .truth, estimate = .pred)
 #'
