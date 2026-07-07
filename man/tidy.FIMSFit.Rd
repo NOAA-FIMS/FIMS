@@ -22,7 +22,7 @@ biomass and expected data values, or pass all three to get every row.}
 
 \item{conf.int}{Logical (default \code{FALSE}).  When \code{TRUE}, \code{conf.low} and
 \code{conf.high} columns are added using a normal approximation:
-\verb{estimate ± qnorm((1 + conf.level) / 2) * std.error}.}
+\verb{estimate +/- qnorm((1 + conf.level) / 2) * std.error}.}
 
 \item{conf.level}{Numeric (default \code{0.95}).  The confidence level used when
 \code{conf.int = TRUE}.}
@@ -59,10 +59,10 @@ appended so the full context is available for filtering and plotting.
 FIMS distinguishes three \code{estimation_type} values:
 \describe{
 \item{\code{"fixed_effects"}}{Directly optimized parameters (selectivity,
-log_Fmort, log_q, …).}
-\item{\code{"random_effects"}}{Integrated-out random effects (log_devs, …).}
+log_Fmort, log_q, etc.).}
+\item{\code{"random_effects"}}{Integrated-out random effects (log_devs, etc.).}
 \item{\code{"derived_quantity"}}{Model outputs that are not parameters
-(spawning biomass, expected catches, …). Uncertainty here comes from
+(spawning biomass, expected catches, etc.). Uncertainty here comes from
 the delta method via \code{\link[TMB:sdreport]{TMB::sdreport()}}.}
 }
 Pass any subset of these strings to \code{parameters} to control which rows are
