@@ -20,6 +20,8 @@
 \alias{model_age_to_length_conversion}
 \alias{model_age_to_length_conversion,FIMSFrame-method}
 \alias{model_age_to_length_conversion,data.frame-method}
+\alias{model_edm_matrix}
+\alias{model_edm_matrix,FIMSFrame-method}
 \title{Get a vector of data to be passed to a FIMS module from a FIMSFrame object}
 \usage{
 model_landings(x, fleet_name)
@@ -57,6 +59,10 @@ model_age_to_length_conversion(x)
 \S4method{model_age_to_length_conversion}{FIMSFrame}(x)
 
 \S4method{model_age_to_length_conversion}{data.frame}(x)
+
+model_edm_matrix(x, embedding_name)
+
+\S4method{model_edm_matrix}{FIMSFrame}(x, embedding_name)
 }
 \arguments{
 \item{x}{An object returned from \code{\link[=FIMSFrame]{FIMSFrame()}}.}
@@ -64,6 +70,9 @@ model_age_to_length_conversion(x)
 \item{fleet_name}{A string, or vector of strings, specifying the name of the
 fleet(s) of interest that you want landings data for. The strings must
 exactly match strings in the column \code{"name"} of \code{get_data(x)}.}
+
+\item{embedding_name}{A single string matching one of the names in
+\code{\link[=get_edm_embeddings]{get_edm_embeddings()}}.}
 }
 \value{
 All of the \verb{model_*()} functions return vectors of data. Currently, the
@@ -124,6 +133,14 @@ ordered by age and length in the order defined by \code{\link[=FIMSFrame]{FIMSFr
 multiple values are present across a single age and length, they are
 averaged because \code{age_to_length_conversion} data cannot vary across fleets
 or time.
+}
+
+\subsection{\code{model_edm_matrix()}}{
+
+Returns a numeric matrix (n_rows × E) for a named delay embedding stored
+inside the FIMSFrame object. The matrix can be passed directly to an EDM
+prediction module. Rows correspond to embedded time points and columns
+correspond to the lagged coordinates \link{x_t, x_{t-tau}, ..., x_{t-(E-1)tau}}.
 }
 }
 \keyword{FIMSFrame}

@@ -9,7 +9,7 @@ A data frame with 2808 observations of 8
 variables:
 \describe{
 \item{type}{The type of input the row contains. Allowed types include
-age_comp, age_to_length_conversion, index, landings, length_comp, and weight_at_age.}
+age_comp, age_to_length_conversion, edm, index, landings, length_comp, and weight_at_age.}
 \item{name}{A character string providing the name of the information source
 that the input was collected from, e.g., \code{"Trawl fishery"}.}
 \item{age}{An integer age. Entry can be \code{NA} if information pertains to
