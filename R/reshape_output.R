@@ -34,7 +34,7 @@ reshape_json_estimates <- function(model_output) {
     json_list[!names(json_list) %in% c(
       "name", "type", "estimation_framework", "id", "objective_function_value",
       "max_gradient_component", "gradient",
-      "population_ids", "fleet_ids", "log"
+      "population_ids", "fleet_ids", "log", "reports"
     )],
     \(x) tidyr::unnest_wider(tibble::tibble(json = x), dplyr::all_of("json"))
   )
@@ -56,7 +56,7 @@ reshape_json_estimates <- function(model_output) {
         c(
           "name", "type", "estimation_framework", "id",
           "objective_function_value", "populations", "fleets", "data",
-          "density_components", "population_ids", "fleet_ids"
+          "density_components", "population_ids", "fleet_ids", "reports"
         )
     ],
     .f = \(y) dplyr::mutate(

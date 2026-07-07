@@ -69,7 +69,7 @@ test_that("backend derived quantity SEs match TMB sdreport", {
   )
   estimate <- adreport_obj$fn(theta_hat)
   jacobian <- adreport_obj$gr(theta_hat)
-  native_backend_hessian <- FIMS:::calculate_tmb_native_fixed_hessian(
+  model_dll_hessian <- FIMS:::calculate_tmb_model_dll_fixed_hessian(
     obj,
     theta_hat
   )
@@ -80,7 +80,7 @@ test_that("backend derived quantity SEs match TMB sdreport", {
   )
 
   expect_equal(unname(estimate), c(-3, -1), tolerance = 1e-12)
-  expect_equal(native_backend_hessian, hessian, tolerance = 1e-12)
+  expect_equal(model_dll_hessian, hessian, tolerance = 1e-12)
   expect_equal(backend_hessian, hessian, tolerance = 1e-8)
   expect_equal(
     unname(as.vector(t(jacobian))),
@@ -158,7 +158,7 @@ test_that("fixed Hessian helpers fall back safely", {
   )
 
   expect_null(
-    FIMS:::calculate_tmb_native_fixed_hessian(
+    FIMS:::calculate_tmb_model_dll_fixed_hessian(
       list(he = function(x) matrix(1, nrow = 1, ncol = 1)),
       par_fixed
     )
@@ -213,6 +213,35 @@ test_that("fixed covariance falls back when backend inversion fails", {
   )
 })
 
+test_that("ADREPORT uncertainty is added to model JSON reports", {
+  sdreport <- list()
+  backend_report <- cbind(
+    "Estimate" = c(1, 2, 5),
+    "Std. Error" = c(0.1, 0.2, 0.5)
+  )
+  rownames(backend_report) <- c("report_a", "report_a", "report_b")
+  attr(sdreport, "fims_backend_report") <- backend_report
+
+  model_output <- FIMS:::add_adreport_uncertainty_to_model_output(
+    model_output = "{\"name\":\"CatchAtAge\"}",
+    sdreport = sdreport
+  )
+  model_output_list <- jsonlite::fromJSON(
+    model_output,
+    simplifyVector = FALSE
+  )
+
+  expect_length(model_output_list$reports, 2)
+  expect_equal(model_output_list$reports[[1]]$name, "report_a")
+  expect_equal(unlist(model_output_list$reports[[1]]$value), c(1, 2))
+  expect_equal(
+    unlist(model_output_list$reports[[1]]$uncertainty),
+    c(0.1, 0.2)
+  )
+  expect_equal(model_output_list$reports[[2]]$name, "report_b")
+  expect_equal(unlist(model_output_list$reports[[2]]$value), 5)
+})
+
 test_that("random Hessian extraction falls back safely", {
   random_hessian <- matrix(c(2, 0.25, 0.25, 4), nrow = 2, byrow = TRUE)
   obj <- list(
@@ -235,7 +264,7 @@ test_that("random Hessian extraction falls back safely", {
   )
 })
 
-test_that("native fixed Hessian handles non-diagonal fixed-only models", {
+test_that("model-DLL fixed Hessian handles non-diagonal fixed-only models", {
   skip_on_cran()
   skip_if_not_installed("TMB")
 
@@ -311,7 +340,7 @@ test_that("native fixed Hessian handles non-diagonal fixed-only models", {
   tmb_report <- summary(sdr, "report")
 
   expect_equal(
-    FIMS:::calculate_tmb_native_fixed_hessian(obj, obj$par),
+    FIMS:::calculate_tmb_model_dll_fixed_hessian(obj, obj$par),
     hessian,
     tolerance = 1e-12
   )
