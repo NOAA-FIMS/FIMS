@@ -476,7 +476,7 @@ struct GPEdmProjection : public EDMPredictorBase<Type> {
 
     double ytAlpha = 0.0;
     for (size_t i = 0; i < N; ++i) ytAlpha += y[i] * alpha[i];
-    double like = -0.5 * ytAlpha - logdet;
+    double like = -0.5 * ytAlpha - 0.5 * logdet;
 
     // --- Priors (matching GPEDM R package: Rogers 2023, getpriors()) ---
     // phi: half-Normal prior
