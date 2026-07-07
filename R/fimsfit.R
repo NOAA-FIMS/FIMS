@@ -439,8 +439,8 @@ FIMSFit <- function(
   # max_gradient is derived from it so obj$gr() is only ever called here.
   # Storing gradient_vec in the FIMSFit slot means get_estimates() and the
   # broom methods (tidy, augment, glance) can read from x@gradient instead of
-  # calling obj$gr() again — which segfaults after clear() frees C++ memory.
-  # as.numeric() is required because TMB's obj$gr() returns a matrix (1×n)
+  # calling obj$gr() again - which segfaults after clear() frees C++ memory.
+  # as.numeric() is required because TMB's obj$gr() returns a matrix (1xn)
   # in some call patterns, which would fail the "numeric" slot type check.
   gradient_vector <- if (length(opt) > 0) {
     as.numeric(obj[["gr"]](opt[["par"]]))

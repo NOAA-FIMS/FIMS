@@ -23,10 +23,10 @@ Any regression metric that accepts \code{truth} / \code{estimate} (and optionall
 \item{group_by}{A character vector of column names in the augmented tibble
 to group by before computing metrics.  Common choices:
 \itemize{
-\item \code{"label"}        – one row-set per data-stream label
-\item \code{"fleet"}        – one row-set per fleet
-\item \code{"distribution"} – one row-set per likelihood distribution
-\item \code{c("label", "fleet")} – per label × fleet combination
+\item \code{"label"}        - one row-set per data-stream label
+\item \code{"fleet"}        - one row-set per fleet
+\item \code{"distribution"} - one row-set per likelihood distribution
+\item \code{c("label", "fleet")} - per label x fleet combination
 Defaults to \code{NULL} (no grouping).
 }}
 
@@ -63,7 +63,7 @@ fit <- create_default_parameters(
   initialize_fims(data = data_4_model) |>
   fit_fims(optimize = TRUE)
 
-# Overall RMSE / MAE / R² across all data streams
+# Overall RMSE / MAE / R^2 across all data streams
 get_fit_metrics(fit)
 
 # Per-data-stream: one row-set per label

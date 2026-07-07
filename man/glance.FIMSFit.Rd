@@ -2,7 +2,7 @@
 % Please edit documentation in R/tidy-glance-fims.R
 \name{glance.FIMSFit}
 \alias{glance.FIMSFit}
-\title{Glance at a FIMSFit object — one-row model summary}
+\title{Glance at a FIMSFit object - one-row model summary}
 \usage{
 \method{glance}{FIMSFit}(x, ...)
 }

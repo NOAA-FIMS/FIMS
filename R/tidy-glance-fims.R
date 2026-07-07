@@ -22,10 +22,10 @@ generics::augment
 #' FIMS distinguishes three `estimation_type` values:
 #' \describe{
 #'   \item{`"fixed_effects"`}{Directly optimized parameters (selectivity,
-#'     log_Fmort, log_q, …).}
-#'   \item{`"random_effects"`}{Integrated-out random effects (log_devs, …).}
+#'     log_Fmort, log_q, etc.).}
+#'   \item{`"random_effects"`}{Integrated-out random effects (log_devs, etc.).}
 #'   \item{`"derived_quantity"`}{Model outputs that are not parameters
-#'     (spawning biomass, expected catches, …). Uncertainty here comes from
+#'     (spawning biomass, expected catches, etc.). Uncertainty here comes from
 #'     the delta method via [TMB::sdreport()].}
 #' }
 #' Pass any subset of these strings to `parameters` to control which rows are
@@ -46,7 +46,7 @@ generics::augment
 #'   biomass and expected data values, or pass all three to get every row.
 #' @param conf.int Logical (default `FALSE`).  When `TRUE`, `conf.low` and
 #'   `conf.high` columns are added using a normal approximation:
-#'   `estimate ± qnorm((1 + conf.level) / 2) * std.error`.
+#'   `estimate +/- qnorm((1 + conf.level) / 2) * std.error`.
 #' @param conf.level Numeric (default `0.95`).  The confidence level used when
 #'   `conf.int = TRUE`.
 #' @param ... Unused; present for S3 method compatibility.
@@ -153,7 +153,7 @@ tidy.FIMSFit <- function(
   out
 }
 
-#' Glance at a FIMSFit object — one-row model summary
+#' Glance at a FIMSFit object - one-row model summary
 #'
 #' Returns a single-row tibble of model-level diagnostics following the
 #' [generics::glance()] convention.  Standard information-criterion columns
@@ -227,18 +227,18 @@ glance.FIMSFit <- function(x, ...) {
   report <- get_report(x)
   npar <- get_number_of_parameters(x)
 
-  # ── parameter counts ───────────────────────────────────────────────────────
+  # Parameter counts
   npar_fixed <- as.integer(npar[["fixed_effects"]])
   npar_random <- as.integer(npar[["random_effects"]])
 
-  # ── likelihood ────────────────────────────────────────────────────────────
+  # Likelihood
   # opt is an empty list when optimize = FALSE
   optimized <- length(opt) > 0
   marginal_nll <- if (optimized) opt[["objective"]] else NA_real_
   log_lik <- if (optimized) -marginal_nll else NA_real_
   total_nll <- if (!is.null(report[["jnll"]])) report[["jnll"]] else NA_real_
 
-  # ── observations ──────────────────────────────────────────────────────────
+  # Observations
   # Count rows that have both observed and expected values.
   #
   # don't call get_estimates() here. That function calls
