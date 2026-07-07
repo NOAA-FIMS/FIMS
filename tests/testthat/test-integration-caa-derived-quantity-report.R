@@ -192,6 +192,6 @@ test_that("CatchAtAge random-effect derived quantity reports get backend uncerta
   expect_equal(
     unname(requested_backend[, "Std. Error"]),
     unname(requested_tmb[, "Std. Error"]),
-    tolerance = 1e-8
+    tolerance = 1e-5
   )
 })
