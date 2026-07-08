@@ -256,7 +256,7 @@ landings_data <- data.frame(
   # TODO: Should there be a type that are not removed but just noted,
   #       where obviously in this instance they are removed.
   type = "landings",
-  name = names(returned_om[["om_output"]][["L.mt"]])[1],
+  fleet = names(returned_om[["om_output"]][["L.mt"]])[1],
   age = NA, # Not by age in this case, but there is a by age option.
   timing = returned_om[["om_input"]][["year"]],
   value = returned_om[["em_input"]][["L.obs"]][[1]],
@@ -269,7 +269,7 @@ landings_data <- data.frame(
 ###############################################################################
 index_data <- data.frame(
   type = "index",
-  name = names(returned_om[["om_output"]][["survey_index"]])[1],
+  fleet = names(returned_om[["om_output"]][["survey_index"]])[1],
   age = NA, # Not by age in this case, but there is a by age option.
   timing = returned_om[["om_input"]][["year"]],
   value = returned_om[["em_input"]][["surveyB.obs"]][[1]],
@@ -282,14 +282,14 @@ index_data <- data.frame(
 ###############################################################################
 age_data <- rbind(
   data.frame(
-    name = names(returned_om[["em_input"]][["n.L"]]),
+    fleet = names(returned_om[["em_input"]][["n.L"]]),
     returned_om[["em_input"]][["L.age.obs"]][["fleet1"]],
     unit = "proportion",
     uncertainty = returned_om[["em_input"]][["n.L"]][["fleet1"]],
     timing = returned_om[["om_input"]][["year"]]
   ),
   data.frame(
-    name = names(returned_om[["om_output"]][["survey_age_comp"]])[1],
+    fleet = names(returned_om[["om_output"]][["survey_age_comp"]])[1],
     returned_om[["em_input"]][["survey.age.obs"]][[1]],
     unit = "proportion",
     uncertainty = returned_om[["om_input"]][["n.survey"]][["survey1"]],
@@ -316,7 +316,7 @@ timing_fishery <- data.frame(
 )
 weights_fishery <- data.frame(
   type = "weight_at_age",
-  name = names(returned_om[["em_input"]][["n.L"]]),
+  fleet = names(returned_om[["em_input"]][["n.L"]]),
   age = seq_along(returned_om[["om_input"]][["W.kg"]]),
   value = returned_om[["om_input"]][["W.mt"]],
   uncertainty = NA,
@@ -349,7 +349,7 @@ observers <- c("fleet1", "survey1")
 # Create data frame for length at age conversion proportions
 length_age_data <- data.frame(
   type = "age_to_length_conversion",
-  name = NA_character_,
+  fleet = NA_character_,
   age = rep(ages, each = length(len_bins)),
   length = rep(
     len_bins,
@@ -368,7 +368,7 @@ length_age_data <- data.frame(
 # the age composition data
 length_comp_data <- data.frame(
   type = "length_comp",
-  name = sort(rep(observers, length(len_bins) * length(timing_fishery[["timing"]]))),
+  fleet = sort(rep(observers, length(len_bins) * length(timing_fishery[["timing"]]))),
   age = NA,
   length = rep(len_bins, length(timing_fishery[["timing"]]) * length(observers)),
   timing = rep(rep(timing_fishery[["timing"]], each = length(len_bins)), length(observers)),

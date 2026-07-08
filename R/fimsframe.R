@@ -283,9 +283,9 @@ methods::setMethod(
 #' a way to fit length data without estimating growth.
 #'
 #' @inheritParams get_data
-#' @param fleet_name A string, or vector of strings, specifying the name of the
-#'   fleet(s) of interest that you want landings data for. The strings must
-#'   exactly match strings in the column `"name"` of `get_data(x)`.
+#' @param fleet A string, or vector of strings, specifying the name of the
+#'   fleet(s) of interest that you want data for. The strings must
+#'   exactly match strings in the `"fleet"` column of `get_data(x)`.
 #' @return
 #' All of the `model_*()` functions return vectors of data. Currently, the
 #' order of the data is the same order as the data frame because no arranging
@@ -331,17 +331,17 @@ NULL
 #' @keywords FIMSFrame
 methods::setGeneric(
   "model_landings",
-  function(x, fleet_name) standardGeneric("model_landings")
+  function(x, fleet) standardGeneric("model_landings")
 )
 #' @rdname model_
 #' @keywords FIMSFrame
 methods::setMethod(
   "model_landings", "FIMSFrame",
-  function(x, fleet_name) {
+  function(x, fleet) {
     dplyr::filter(
       .data = x@data,
       .data[["type"]] == "landings",
-      .data[["name"]] %in% fleet_name
+      .data[["fleet"]] %in% .env$fleet
     ) |>
       dplyr::pull(.data[["value"]])
   }
@@ -351,7 +351,7 @@ methods::setMethod(
 methods::setMethod(
   "model_landings",
   "data.frame",
-  function(x, fleet_name) model_landings(FIMSFrame(x), fleet_name)
+  function(x, fleet) model_landings(FIMSFrame(x), fleet)
 )
 
 #' @export
@@ -359,17 +359,17 @@ methods::setMethod(
 #' @keywords FIMSFrame
 methods::setGeneric(
   "model_index",
-  function(x, fleet_name) standardGeneric("model_index")
+  function(x, fleet) standardGeneric("model_index")
 )
 #' @rdname model_
 #' @keywords FIMSFrame
 methods::setMethod(
   "model_index", "FIMSFrame",
-  function(x, fleet_name) {
+  function(x, fleet) {
     dplyr::filter(
       .data = x@data,
       .data[["type"]] == "index",
-      .data[["name"]] %in% fleet_name
+      .data[["fleet"]] %in% .env$fleet
     ) |>
       dplyr::pull(.data[["value"]])
   }
@@ -379,7 +379,7 @@ methods::setMethod(
 methods::setMethod(
   "model_index",
   "data.frame",
-  function(x, fleet_name) model_index(FIMSFrame(x), fleet_name)
+  function(x, fleet) model_index(FIMSFrame(x), fleet)
 )
 
 #' @export
@@ -387,17 +387,17 @@ methods::setMethod(
 #' @keywords FIMSFrame
 methods::setGeneric(
   "model_age_comp",
-  function(x, fleet_name) standardGeneric("model_age_comp")
+  function(x, fleet) standardGeneric("model_age_comp")
 )
 #' @rdname model_
 #' @keywords FIMSFrame
 methods::setMethod(
   "model_age_comp", "FIMSFrame",
-  function(x, fleet_name) {
+  function(x, fleet) {
     dplyr::filter(
       .data = x@data,
       .data[["type"]] == "age_comp",
-      .data[["name"]] %in% fleet_name
+      .data[["fleet"]] %in% .env$fleet
     ) |>
       dplyr::pull(.data[["value"]])
   }
@@ -407,7 +407,7 @@ methods::setMethod(
 methods::setMethod(
   "model_age_comp",
   "data.frame",
-  function(x, fleet_name) model_age_comp(FIMSFrame(x), fleet_name)
+  function(x, fleet) model_age_comp(FIMSFrame(x), fleet)
 )
 
 #' @export
@@ -415,14 +415,14 @@ methods::setMethod(
 #' @keywords FIMSFrame
 methods::setGeneric(
   "model_length_comp",
-  function(x, fleet_name) standardGeneric("model_length_comp")
+  function(x, fleet) standardGeneric("model_length_comp")
 )
 #' @rdname model_
 #' @keywords FIMSFrame
 methods::setMethod(
   "model_length_comp",
   "FIMSFrame",
-  function(x, fleet_name) {
+  function(x, fleet) {
     conversion_data <- dplyr::filter(
       .data = x@data,
       .data[["type"]] == "age_to_length_conversion"
@@ -436,7 +436,7 @@ methods::setMethod(
     dplyr::filter(
       .data = x@data,
       .data[["type"]] == "length_comp",
-      .data[["name"]] %in% fleet_name
+      .data[["fleet"]] %in% .env$fleet
     ) |>
       dplyr::pull(.data[["value"]])
   }
@@ -446,7 +446,7 @@ methods::setMethod(
 methods::setMethod(
   "model_length_comp",
   "data.frame",
-  function(x, fleet_name) model_length_comp(FIMSFrame(x), fleet_name)
+  function(x, fleet) model_length_comp(FIMSFrame(x), fleet)
 )
 
 #' @export
@@ -471,8 +471,8 @@ methods::setMethod(
         message = "No weight_at_age data found in FIMSFrame object."
       )
     }
-    fleet_names <- unique(model_data[["name"]])
-    if (length(fleet_names) > 1) {
+    all_fleets <- unique(model_data[["fleet"]])
+    if (length(all_fleets) > 1) {
       cli::cli_warn(c(
         "x" = "Multiple fleets found in weight_at_age data.",
         "i" = "{.fn model_weight_at_age} will average values across fleets."
@@ -611,7 +611,9 @@ methods::setMethod(
       dplyr::mutate(
         type = gsub("_", " ", .data$type)
       ) |>
-      dplyr::group_by(.data$name, .data$timing, .data$type) |>
+      dplyr::group_by(dplyr::across(
+        dplyr::all_of(c("fleet", "timing", "type"))
+      )) |>
       dplyr::filter(.data$value != -999) |>
       dplyr::summarize(
         no = dplyr::n()
@@ -621,8 +623,8 @@ methods::setMethod(
       data = data_for_plot,
       mapping = ggplot2::aes(
         x = .data$timing,
-        y = .data$name,
-        col = .data$name
+        y = .data$fleet,
+        col = .data$fleet
       )
     ) +
       ggplot2::facet_wrap(
@@ -697,7 +699,7 @@ methods::setValidity(
     for (present_type in grep("_comp", present_types, value = TRUE)) {
       test <- object@data |>
         dplyr::filter(.data$type == present_type, .data$value != -999) |>
-        dplyr::group_by(.data$name, .data$timing, .drop = FALSE) |>
+        dplyr::group_by(.data$fleet, .data$timing, .drop = FALSE) |>
         dplyr::group_map(.keep = TRUE, \(.x, .y) {
           validate_composition_data(.x)
         })
@@ -721,8 +723,8 @@ validate_data_colnames <- function(data) {
   if (!"type" %in% the_column_names) {
     errors <- c(errors, "data must contain 'type'")
   }
-  if (!"name" %in% the_column_names) {
-    errors <- c(errors, "data must contain 'name'")
+  if (!"fleet" %in% the_column_names) {
+    errors <- c(errors, "data must contain 'fleet'")
   }
   if (!"timing" %in% the_column_names) {
     errors <- c(errors, "data must contain 'timing'")
@@ -924,7 +926,7 @@ FIMSFrame <- function(data) {
   years <- start_year:end_year
 
   # Get the fleets represented in the data
-  fleets <- unique(na.omit(data[["name"]]))
+  fleets <- unique(na.omit(data[["fleet"]]))
   n_fleets <- length(fleets)
 
   if ("age" %in% colnames(data)) {
@@ -993,7 +995,7 @@ FIMSFrame <- function(data) {
   # Check that full dimension information is available for weight_at_age
   dplyr::group_by(
     dplyr::filter(data, .data$type == "weight_at_age"),
-    .data$name
+    .data[["fleet"]]
   ) |>
     dplyr::group_split() |>
     purrr::walk(
@@ -1021,18 +1023,18 @@ FIMSFrame <- function(data) {
       column = "age",
       types = c("weight_at_age", "age_comp")
     )
-    summary_by_name <- dplyr::count(missing_ages, .data$name, .data$timing) |>
+    summary_by_name <- dplyr::count(missing_ages, .data$fleet, .data$timing) |>
       dplyr::filter(.data$n != n_ages) |>
       dplyr::summarize(
         timings = paste(.data$timing, collapse = ", "),
-        .by = .data$name
+        .by = dplyr::all_of("fleet")
       )
     if (NROW(summary_by_name) > 0) {
       cli::cli_abort(
-        "You cannot have missing age values for a given timing and name
-        combination. Please check your age-composition data for missing
-        ages in the following fleets, {summary_by_name$name},
-        in the following years, {summary_by_name$timings}, respectively."
+        "You cannot have missing age values for a given timing and fleet
+        combination. Please check the age-composition data for missing
+        ages in the following fleets, {summary_by_name$fleet},
+        for the following timings, {summary_by_name$timings}, respectively."
       )
     }
   } else {
@@ -1046,18 +1048,22 @@ FIMSFrame <- function(data) {
       column = "length",
       types = "length_comp"
     )
-    summary_by_name <- dplyr::count(missing_lengths, .data$name, .data$timing) |>
+    summary_by_name <- dplyr::count(
+      missing_lengths,
+      .data$fleet,
+      .data$timing
+    ) |>
       dplyr::filter(.data$n != n_lengths) |>
       dplyr::summarize(
         timings = paste(.data$timing, collapse = ", "),
-        .by = .data$name
+        .by = dplyr::all_of("fleet")
       )
     if (NROW(summary_by_name) > 0) {
       cli::cli_abort(
-        "You cannot have missing length values for a given timing and name
-        combination. Please check your length-composition data for missing
-        lengths in the following fleets, {summary_by_name$name},
-        in the following years, {summary_by_name$timings}, respectively."
+        "You cannot have missing length values for a given timing and fleet
+        combination. Please check the length-composition data for missing
+        lengths in the following fleets, {summary_by_name$fleet},
+        for the following timings, {summary_by_name$timings}, respectively."
       )
     }
   } else {
@@ -1081,7 +1087,7 @@ FIMSFrame <- function(data) {
     missing_lengths
   )
   sort_order <- intersect(
-    c("name", "type", "timing", "age", "length"),
+    c("fleet", "type", "timing", "age", "length"),
     colnames(formatted_data)
   )
   complete_data <- dplyr::full_join(
@@ -1117,7 +1123,7 @@ create_missing_data <- function(
     rlang::sym(column)
   }
   use_this_data <- data |>
-    dplyr::group_by(.data$type, .data$name)
+    dplyr::group_by(.data$type, .data$fleet)
   out_data <- if (missing(bins)) {
     # This only pertains to annual data without bins
     use_this_data |>
@@ -1127,12 +1133,15 @@ create_missing_data <- function(
         !!rlang::sym("timing") := timings
       ) |>
       dplyr::anti_join(
-        y = dplyr::select(use_this_data, dplyr::all_of(c("type", "name", "unit", "timing"))),
-        by = c("type", "name", "unit", "timing")
+        y = dplyr::select(
+          use_this_data,
+          dplyr::all_of(c("type", "fleet", "unit", "timing"))
+        ),
+        by = c("type", "fleet", "unit", "timing")
       )
   } else {
     use_this_data |>
-      dplyr::group_by(.data$type, .data$name) |>
+      dplyr::group_by(.data$type, .data$fleet) |>
       dplyr::filter(.data$type %in% types) |>
       tidyr::expand(
         !!rlang::sym("unit"),
@@ -1142,9 +1151,11 @@ create_missing_data <- function(
       dplyr::anti_join(
         y = dplyr::select(
           use_this_data,
-          dplyr::all_of(c("type", "name", "unit", "timing", rlang::as_string(bin_column)))
+          dplyr::all_of(
+            c("type", "fleet", "unit", "timing", rlang::as_string(bin_column))
+          )
         ),
-        by = c("type", "name", "unit", "timing", rlang::as_string(bin_column))
+        by = c("type", "fleet", "unit", "timing", rlang::as_string(bin_column))
       )
   }
   out_data |>
