@@ -153,7 +153,7 @@ jobs:
 
           run_with_memory_metrics dependency_install Rscript -e 'repos <- c(`noaa-fisheries-integrated-toolbox` = "https://noaa-fisheries-integrated-toolbox.r-universe.dev", CRAN = Sys.getenv("RSPM", "https://packagemanager.posit.co/cran/__linux__/noble/latest")); options(repos = repos); install.packages("remotes"); remotes::install_deps(dependencies = c("Depends", "Imports", "LinkingTo"), upgrade = "never")'
 
-          Rscript -e 'required <- unique(c("cli", "dplyr", "ggplot2", "glue", "jsonlite", "purrr", "Rcpp", "rlang", "scales", "tibble", "TMB", "RcppEigen")); missing <- required[!vapply(required, requireNamespace, logical(1), quietly = TRUE)]; if (length(missing)) { stop("Required packages failed to install: ", paste(missing, collapse = ", ")) }'
+          Rscript -e 'required <- unique(c("cli", "dplyr", "ggplot2", "glue", "jsonlite", "purrr", "Rcpp", "rlang", "tibble", "TMB", "RcppEigen")); missing <- required[!vapply(required, requireNamespace, logical(1), quietly = TRUE)]; if (length(missing)) { stop("Required packages failed to install: ", paste(missing, collapse = ", ")) }'
 
       - name: Install FIMS and capture metrics
         timeout-minutes: 10

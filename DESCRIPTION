@@ -85,7 +85,6 @@ Imports:
     purrr,
     Rcpp,
     rlang,
-    scales,
     stats,
     tibble,
     TMB (>= 1.8.0),
