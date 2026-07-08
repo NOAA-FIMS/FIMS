@@ -220,7 +220,7 @@ test_that("catch-at-age model (estimation MLE with wrappers) works with mixed es
   fit_mixed_estimation_types <- modified_parameters |>
     dplyr::mutate(
       estimation_type = dplyr::if_else(
-        fleet_name == "fleet1" & label == "log_Fmort" & time %in% 1:10,
+        fleet == "fleet1" & label == "log_Fmort" & time %in% 1:10,
         "constant",
         estimation_type
       )

@@ -151,7 +151,7 @@ test_that("`initialize_fims()` returns correct error messages", {
   clear()
 
   parameters_no_fleets <- default_parameters |>
-    dplyr::filter(!(fleet_name %in% c("fleet1", "survey1")))
+    dplyr::filter(!(fleet %in% c("fleet1", "survey1")))
   #' @description Test that `initialize_fims()` fails when no fleets are provided.
   expect_error(
     initialize_fims(parameters = parameters_no_fleets, data = data),
@@ -373,7 +373,7 @@ test_that("`initialize_selectivity()` works with correct inputs", {
   result <- initialize_selectivity(
     parameters = default_parameters,
     data = data,
-    fleet_name = "fleet1"
+    fleet = "fleet1"
   )
   expect_type(result, "S4")
   #' @description Test that `initialize_selectivity()` creates a module with expected methods in the class definition method table.
@@ -395,19 +395,19 @@ test_that("`initialize_fleet()` works with correct inputs", {
   selectivity <- FIMS:::initialize_selectivity(
     parameters = default_parameters,
     data = data,
-    fleet_name = "fleet1"
+    fleet = "fleet1"
   )
   landings <- FIMS:::initialize_landings(
     data = data,
-    fleet_name = "fleet1"
+    fleet = "fleet1"
   )
   age_comp <- FIMS:::initialize_comp(
     data = data,
-    fleet_name = "fleet1"
+    fleet = "fleet1"
   )
   length_comp <- FIMS:::initialize_comp(
     data = data,
-    fleet_name = "fleet1",
+    fleet = "fleet1",
     type = "LengthComp"
   )
   linked_ids <- c(
@@ -421,7 +421,7 @@ test_that("`initialize_fleet()` works with correct inputs", {
   result <- FIMS:::initialize_fleet(
     parameters = default_parameters,
     data = data,
-    fleet_name = "fleet1",
+    fleet = "fleet1",
     linked_ids = linked_ids
   )
   expect_type(result, "S4")
@@ -452,7 +452,7 @@ test_that("`initialize_landings()` works with correct inputs", {
   #' @description Test that `initialize_landings()` returns an S4 object for fleet with landings.
   result <- initialize_landings(
     data = data,
-    fleet_name = "fleet1"
+    fleet = "fleet1"
   )
   expect_type(result, "S4")
   #' @description Test that `initialize_landings()` creates a module with expected methods in the class definition method table.
@@ -469,7 +469,7 @@ test_that("`initialize_landings()` works with correct inputs", {
   expect_null(
     initialize_landings(
       data,
-      fleet_name = "survey1"
+      fleet = "survey1"
     )
   )
   clear()
@@ -477,11 +477,11 @@ test_that("`initialize_landings()` works with correct inputs", {
 
 ## Error handling ----
 test_that("`initialize_landings()` returns correct error messages", {
-  #' @description Test that `initialize_landings()` handles unknown fleet_name correctly.
+  #' @description Test that `initialize_landings()` handles unknown fleet correctly.
   expect_error(
     initialize_landings(
       data = data,
-      fleet_name = "unknown_fleet"
+      fleet = "unknown_fleet"
     ),
     "Fleet `unknown_fleet` not found in the data object."
   )
@@ -494,7 +494,7 @@ test_that("`initialize_index()` works with correct inputs", {
   #' @description Test that `initialize_index()` returns an S4 object for survey with index.
   result <- initialize_index(
     data = data,
-    fleet_name = "survey1"
+    fleet = "survey1"
   )
   expect_type(result, "S4")
   #' @description Test that `initialize_index()` creates a module with expected methods in the class definition method table.
@@ -511,7 +511,7 @@ test_that("`initialize_index()` works with correct inputs", {
   expect_null(
     initialize_index(
       data,
-      fleet_name = "fleet1"
+      fleet = "fleet1"
     )
   )
   clear()
@@ -519,11 +519,11 @@ test_that("`initialize_index()` works with correct inputs", {
 
 ## Error handling ----
 test_that("`initialize_index()` returns correct error messages", {
-  #' @description Test that `initialize_index()` handles unknown fleet_name correctly.
+  #' @description Test that `initialize_index()` handles unknown fleet correctly.
   expect_error(
     initialize_index(
       data = data,
-      fleet_name = "unknown_fleet"
+      fleet = "unknown_fleet"
     ),
     "Fleet `unknown_fleet` not found in the data object."
   )
@@ -535,7 +535,7 @@ test_that("`initialize_index()` returns correct error messages", {
 test_that("`initialize_comp()` works with correct inputs", {
   result <- initialize_comp(
     data = data,
-    fleet_name = "fleet1",
+    fleet = "fleet1",
     type = "AgeComp"
   )
 
@@ -555,7 +555,7 @@ test_that("`initialize_comp()` works with correct inputs", {
     result$age_comp_data$get_values(),
     data |>
       get_data() |>
-      dplyr::filter(type == "age_comp", name == "fleet1") |>
+      dplyr::filter(type == "age_comp", fleet == "fleet1") |>
       dplyr::mutate(out = value * uncertainty) |>
       dplyr::pull(out)
   )
@@ -563,7 +563,7 @@ test_that("`initialize_comp()` works with correct inputs", {
 
   result <- initialize_comp(
     data = data,
-    fleet_name = "fleet1",
+    fleet = "fleet1",
     type = "LengthComp"
   )
   #' @description Test that `initialize_fims()` works with `LengthComp` type and returns an S4 object.
@@ -582,7 +582,7 @@ test_that("`initialize_comp()` works with correct inputs", {
     result$length_comp_data$get_values(),
     data |>
       get_data() |>
-      dplyr::filter(type == "length_comp", name == "fleet1") |>
+      dplyr::filter(type == "length_comp", fleet == "fleet1") |>
       dplyr::mutate(out = value * uncertainty) |>
       dplyr::pull(out)
   )
@@ -627,11 +627,11 @@ test_that("`initialize_fims()` works with edge cases", {
 ## Error handling ----
 
 test_that("`initialize_comp()` returns correct error messages", {
-  #' @description Test that `initialize_comp()` correctly returns error on unknown `fleet_name`.
+  #' @description Test that `initialize_comp()` correctly returns error on unknown `fleet`.
   expect_error(
     initialize_comp(
       data = data,
-      fleet_name = "unknown_fleet",
+      fleet = "unknown_fleet",
       type = "AgeComp"
     ),
     "Fleet `unknown_fleet` not found in the data object."
@@ -642,7 +642,7 @@ test_that("`initialize_comp()` returns correct error messages", {
   expect_error(
     initialize_comp(
       data = data,
-      fleet_name = "fleet1",
+      fleet = "fleet1",
       type = "unknown"
     ),
     "should be one of"
@@ -655,7 +655,7 @@ test_that("`initialize_comp()` returns correct error messages", {
       data = data |>
         get_data() |>
         dplyr::filter(type != "age_comp"),
-      fleet_name = "fleet1",
+      fleet = "fleet1",
       type = "AgeComp"
     ),
     "is unavailable or empty"
@@ -670,7 +670,7 @@ test_that("`initialize_comp()` returns correct error messages", {
   expect_error(
     initialize_comp(
       data = bad_data,
-      fleet_name = "fleet1",
+      fleet = "fleet1",
       type = "AgeComp"
     ),
     "does not match the expected dimensions"
