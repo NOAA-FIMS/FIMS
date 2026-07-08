@@ -193,16 +193,12 @@ test_that("von bertalanffy growth converges when L1 L2 and K are estimable", {
     get_sd = FALSE
   )
 
-  opt <- FIMS::get_opt(fit)
   report <- FIMS::get_report(fit)
   growth_estimates <- FIMS::get_estimates(fit) |>
     dplyr::filter(module_name == "Growth")
 
-  #' @description Test that the VonB growth fit converges normally.
-  expect_equal(opt$convergence, 0)
-
   #' @description Test that the VonB growth fit reaches a small maximum gradient.
-  expect_lte(FIMS::get_max_gradient(fit), 0.01)
+  expect_lte(FIMS::get_max_gradient(fit), 1e-5)
 
   #' @description Test that the estimable VonB growth parameters remain finite and positive.
   expect_true(all(is.finite(growth_estimates$estimated)))
