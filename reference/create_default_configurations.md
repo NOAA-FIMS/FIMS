@@ -50,7 +50,7 @@ A nested `tibble` with the following top-level columns is returned:
   "Recruitment", "Growth", "Maturity"). These entries are always written
   in PascalCase to match the names used in the C++ code.
 
-- `fleet_name`::
+- `fleet`::
 
   The name of the fleet the module applies to. This will be `NA` for
   non-fleet-specific modules like "Recruitment".
@@ -121,20 +121,19 @@ default_configurations_unnest <- default_configurations |>
   tidyr::unnest(cols = data) |>
   print()
 #> # A tibble: 11 × 6
-#>    model_family module_name fleet_name module_type  distribution_type
-#>    <chr>        <chr>       <chr>      <chr>        <chr>            
-#>  1 catch_at_age Data        fleet1     AgeComp      Data             
-#>  2 catch_at_age Data        fleet1     Landings     Data             
-#>  3 catch_at_age Data        fleet1     LengthComp   Data             
-#>  4 catch_at_age Selectivity fleet1     Logistic     NA               
-#>  5 catch_at_age Data        survey1    AgeComp      Data             
-#>  6 catch_at_age Data        survey1    Index        Data             
-#>  7 catch_at_age Data        survey1    LengthComp   Data             
-#>  8 catch_at_age Selectivity survey1    Logistic     NA               
-#>  9 catch_at_age Growth      NA         EWAA         NA               
-#> 10 catch_at_age Maturity    NA         Logistic     NA               
-#> 11 catch_at_age Recruitment NA         BevertonHolt process          
-#> # ℹ 1 more variable: distribution <chr>
+#>    model_family module_name fleet   module_type  distribution_type distribution
+#>    <chr>        <chr>       <chr>   <chr>        <chr>             <chr>       
+#>  1 catch_at_age Data        fleet1  AgeComp      Data              Dmultinom   
+#>  2 catch_at_age Data        fleet1  Landings     Data              Dlnorm      
+#>  3 catch_at_age Data        fleet1  LengthComp   Data              Dmultinom   
+#>  4 catch_at_age Selectivity fleet1  Logistic     NA                NA          
+#>  5 catch_at_age Data        survey1 AgeComp      Data              Dmultinom   
+#>  6 catch_at_age Data        survey1 Index        Data              Dlnorm      
+#>  7 catch_at_age Data        survey1 LengthComp   Data              Dmultinom   
+#>  8 catch_at_age Selectivity survey1 Logistic     NA                NA          
+#>  9 catch_at_age Growth      NA      EWAA         NA                NA          
+#> 10 catch_at_age Maturity    NA      Logistic     NA                NA          
+#> 11 catch_at_age Recruitment NA      BevertonHolt process           Dnorm       
 
 # Use dplyr::rows_update to modify the selectivity specified for fleet1
 # from logistic (the default) to double logistic
@@ -142,25 +141,24 @@ configurations_double_logistic <- default_configurations_unnest |>
   dplyr::rows_update(
     tibble::tibble(
       module_name = "Selectivity",
-      fleet_name = "fleet1",
+      fleet = "fleet1",
       module_type = "DoubleLogistic"
     ),
-    by = c("module_name", "fleet_name")
+    by = c("module_name", "fleet")
   ) |>
   print()
 #> # A tibble: 11 × 6
-#>    model_family module_name fleet_name module_type    distribution_type
-#>    <chr>        <chr>       <chr>      <chr>          <chr>            
-#>  1 catch_at_age Data        fleet1     AgeComp        Data             
-#>  2 catch_at_age Data        fleet1     Landings       Data             
-#>  3 catch_at_age Data        fleet1     LengthComp     Data             
-#>  4 catch_at_age Selectivity fleet1     DoubleLogistic NA               
-#>  5 catch_at_age Data        survey1    AgeComp        Data             
-#>  6 catch_at_age Data        survey1    Index          Data             
-#>  7 catch_at_age Data        survey1    LengthComp     Data             
-#>  8 catch_at_age Selectivity survey1    Logistic       NA               
-#>  9 catch_at_age Growth      NA         EWAA           NA               
-#> 10 catch_at_age Maturity    NA         Logistic       NA               
-#> 11 catch_at_age Recruitment NA         BevertonHolt   process          
-#> # ℹ 1 more variable: distribution <chr>
+#>    model_family module_name fleet   module_type   distribution_type distribution
+#>    <chr>        <chr>       <chr>   <chr>         <chr>             <chr>       
+#>  1 catch_at_age Data        fleet1  AgeComp       Data              Dmultinom   
+#>  2 catch_at_age Data        fleet1  Landings      Data              Dlnorm      
+#>  3 catch_at_age Data        fleet1  LengthComp    Data              Dmultinom   
+#>  4 catch_at_age Selectivity fleet1  DoubleLogist… NA                NA          
+#>  5 catch_at_age Data        survey1 AgeComp       Data              Dmultinom   
+#>  6 catch_at_age Data        survey1 Index         Data              Dlnorm      
+#>  7 catch_at_age Data        survey1 LengthComp    Data              Dmultinom   
+#>  8 catch_at_age Selectivity survey1 Logistic      NA                NA          
+#>  9 catch_at_age Growth      NA      EWAA          NA                NA          
+#> 10 catch_at_age Maturity    NA      Logistic      NA                NA          
+#> 11 catch_at_age Recruitment NA      BevertonHolt  process           Dnorm       
 ```

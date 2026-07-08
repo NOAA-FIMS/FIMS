@@ -57,10 +57,10 @@ show(default_parameters)
 #> Found more than one class "tbl_df" in cache; using the first, from namespace 'FIMS'
 #> Also defined by 'tibble'
 #> # A tibble: 2 × 12
-#>   model_family module_name module_type label fleet_name   age length  time value
-#>   <chr>        <chr>       <chr>       <chr> <chr>      <dbl>  <dbl> <int> <dbl>
-#> 1 NA           Maturity    Logistic    infl… NA            NA     NA    NA     2
-#> 2 NA           Maturity    Logistic    slope NA            NA     NA    NA     1
+#>   model_family module_name module_type label      fleet   age length  time value
+#>   <chr>        <chr>       <chr>       <chr>      <chr> <dbl>  <dbl> <int> <dbl>
+#> 1 NA           Maturity    Logistic    inflectio… NA       NA     NA    NA     2
+#> 2 NA           Maturity    Logistic    slope      NA       NA     NA    NA     1
 #> # ℹ 3 more variables: estimation_type <chr>, distribution_type <chr>,
 #> #   distribution <chr>
 
@@ -78,10 +78,10 @@ parameters <- default_parameters |>
 
 show(parameters)
 #> # A tibble: 2 × 12
-#>   model_family module_name module_type label fleet_name   age length  time value
-#>   <chr>        <chr>       <chr>       <chr> <chr>      <dbl>  <dbl> <int> <dbl>
-#> 1 catch_at_age Maturity    Logistic    infl… NA            NA     NA    NA  2.25
-#> 2 catch_at_age Maturity    Logistic    slope NA            NA     NA    NA  3   
+#>   model_family module_name module_type label      fleet   age length  time value
+#>   <chr>        <chr>       <chr>       <chr>      <chr> <dbl>  <dbl> <int> <dbl>
+#> 1 catch_at_age Maturity    Logistic    inflectio… NA       NA     NA    NA  2.25
+#> 2 catch_at_age Maturity    Logistic    slope      NA       NA     NA    NA  3   
 #> # ℹ 3 more variables: estimation_type <chr>, distribution_type <chr>,
 #> #   distribution <chr>
 

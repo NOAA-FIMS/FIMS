@@ -124,7 +124,7 @@ above.</p>
 <h2 id="data-format">Data format<a class="anchor" aria-label="anchor" href="#data-format"></a>
 </h2>
 <p>The input data for a FIMS model is a single long data frame with the
-following columns: type, name, age, length, timing, value, unit, and
+following columns: type, fleet, age, length, timing, value, unit, and
 uncertainty. Both the single table and long format are in contrast to
 the input format for some legacy stock assessment models where the data
 are provided in multiple tables, each with a different format. The SS3
@@ -194,7 +194,7 @@ overview vignette</a> for more information.</p>
 <pre><code><span><span class="co">## Found more than one class "tbl_df" in cache; using the first, from namespace 'FIMS'</span></span></code></pre>
 <pre><code><span><span class="co">## Also defined by 'tibble'</span></span></code></pre>
 <pre><code><span><span class="co">## # A tibble: 6 × 8</span></span>
-<span><span class="co">##   type     name     age length timing value unit       uncertainty</span></span>
+<span><span class="co">##   type     fleet    age length timing value unit       uncertainty</span></span>
 <span><span class="co">##   &lt;chr&gt;    &lt;chr&gt;  &lt;int&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;            &lt;dbl&gt;</span></span>
 <span><span class="co">## 1 age_comp fleet1     1     NA      1 0.07  proportion         200</span></span>
 <span><span class="co">## 2 age_comp fleet1     2     NA      1 0.1   proportion         200</span></span>
@@ -240,7 +240,7 @@ a small number, like 0.001, so the landings data are fit closely.</p>
 <span><span class="fu">FIMS</span><span class="fu">::</span><span class="va"><a href="../reference/data_big.html">data_big</a></span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">type</span> <span class="op">==</span> <span class="st">"landings"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fl">3</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">##       type   name age length timing    value unit uncertainty</span></span>
+<pre><code><span><span class="co">##       type  fleet age length timing    value unit uncertainty</span></span>
 <span><span class="co">## 1 landings fleet1  NA     NA      1 161.6455   mt  0.00999975</span></span>
 <span><span class="co">## 2 landings fleet1  NA     NA      2 461.0895   mt  0.00999975</span></span>
 <span><span class="co">## 3 landings fleet1  NA     NA      3 747.2900   mt  0.00999975</span></span></code></pre>
@@ -267,7 +267,7 @@ the logged observations.</p>
 <span><span class="fu">FIMS</span><span class="fu">::</span><span class="va"><a href="../reference/data_big.html">data_big</a></span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">type</span> <span class="op">==</span> <span class="st">"index"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fl">3</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">##    type    name age length timing       value unit uncertainty</span></span>
+<pre><code><span><span class="co">##    type   fleet age length timing       value unit uncertainty</span></span>
 <span><span class="co">## 1 index survey1  NA     NA      1 0.006117418   mt   0.1980422</span></span>
 <span><span class="co">## 2 index survey1  NA     NA      2 0.007156588   mt   0.1980422</span></span>
 <span><span class="co">## 3 index survey1  NA     NA      3 0.006553376   mt   0.1980422</span></span></code></pre>
@@ -304,7 +304,7 @@ time step (equal across all ages within that time step).</p>
 <span><span class="fu">FIMS</span><span class="fu">::</span><span class="va"><a href="../reference/data_big.html">data_big</a></span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">type</span> <span class="op">==</span> <span class="st">"age_comp"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fl">3</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">##       type   name age length timing value       unit uncertainty</span></span>
+<pre><code><span><span class="co">##       type  fleet age length timing value       unit uncertainty</span></span>
 <span><span class="co">## 1 age_comp fleet1   1     NA      1 0.070 proportion         200</span></span>
 <span><span class="co">## 2 age_comp fleet1   2     NA      1 0.100 proportion         200</span></span>
 <span><span class="co">## 3 age_comp fleet1   3     NA      1 0.115 proportion         200</span></span></code></pre>
@@ -337,7 +337,7 @@ distribution of each age among those bins is provided by the
 <span><span class="fu">FIMS</span><span class="fu">::</span><span class="va"><a href="../reference/data_big.html">data_big</a></span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">type</span> <span class="op">==</span> <span class="st">"length_comp"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fl">3</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">##          type   name age length timing        value       unit uncertainty</span></span>
+<pre><code><span><span class="co">##          type  fleet age length timing        value       unit uncertainty</span></span>
 <span><span class="co">## 1 length_comp fleet1  NA      0      1 9.238773e-18 proportion         200</span></span>
 <span><span class="co">## 2 length_comp fleet1  NA     50      1 5.892510e-12 proportion         200</span></span>
 <span><span class="co">## 3 length_comp fleet1  NA    100      1 1.610390e-07 proportion         200</span></span></code></pre>
@@ -380,7 +380,7 @@ with name = “fleet1”.</p>
 <span><span class="fu">FIMS</span><span class="fu">::</span><span class="va"><a href="../reference/data_big.html">data_big</a></span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">type</span> <span class="op">==</span> <span class="st">"weight_at_age"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fl">3</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">##            type   name age length timing        value unit uncertainty</span></span>
+<pre><code><span><span class="co">##            type  fleet age length timing        value unit uncertainty</span></span>
 <span><span class="co">## 1 weight_at_age fleet1   1     NA      1 0.0005306555   mt          NA</span></span>
 <span><span class="co">## 2 weight_at_age fleet1   1     NA      2 0.0005306555   mt          NA</span></span>
 <span><span class="co">## 3 weight_at_age fleet1   1     NA      3 0.0005306555   mt          NA</span></span></code></pre>
@@ -388,7 +388,7 @@ with name = “fleet1”.</p>
 <code class="sourceCode R"><span><span class="fu">FIMS</span><span class="fu">::</span><span class="va"><a href="../reference/data_big.html">data_big</a></span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">type</span> <span class="op">==</span> <span class="st">"weight_at_age"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">tail</a></span><span class="op">(</span><span class="fl">3</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">##              type   name age length timing       value unit uncertainty</span></span>
+<pre><code><span><span class="co">##              type  fleet age length timing       value unit uncertainty</span></span>
 <span><span class="co">## 370 weight_at_age fleet1  12     NA     29 0.009636695   mt          NA</span></span>
 <span><span class="co">## 371 weight_at_age fleet1  12     NA     30 0.009636695   mt          NA</span></span>
 <span><span class="co">## 372 weight_at_age fleet1  12     NA     31 0.009636695   mt          NA</span></span></code></pre>
@@ -451,10 +451,10 @@ can omit the age-to-length conversion data as well.</p>
 <span><span class="fu">FIMS</span><span class="fu">::</span><span class="va"><a href="../reference/data_big.html">data_big</a></span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">type</span> <span class="op">==</span> <span class="st">"age_to_length_conversion"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fl">3</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">##                       type name age length timing        value       unit</span></span>
-<span><span class="co">## 1 age_to_length_conversion &lt;NA&gt;   1      0     NA 1.261739e-16 proportion</span></span>
-<span><span class="co">## 2 age_to_length_conversion &lt;NA&gt;   1     50     NA 8.385820e-11 proportion</span></span>
-<span><span class="co">## 3 age_to_length_conversion &lt;NA&gt;   1    100     NA 2.297363e-06 proportion</span></span>
+<pre><code><span><span class="co">##                       type fleet age length timing        value       unit</span></span>
+<span><span class="co">## 1 age_to_length_conversion  &lt;NA&gt;   1      0     NA 1.261739e-16 proportion</span></span>
+<span><span class="co">## 2 age_to_length_conversion  &lt;NA&gt;   1     50     NA 8.385820e-11 proportion</span></span>
+<span><span class="co">## 3 age_to_length_conversion  &lt;NA&gt;   1    100     NA 2.297363e-06 proportion</span></span>
 <span><span class="co">##   uncertainty</span></span>
 <span><span class="co">## 1         200</span></span>
 <span><span class="co">## 2         200</span></span>
@@ -463,10 +463,10 @@ can omit the age-to-length conversion data as well.</p>
 <code class="sourceCode R"><span><span class="fu">FIMS</span><span class="fu">::</span><span class="va"><a href="../reference/data_big.html">data_big</a></span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">type</span> <span class="op">==</span> <span class="st">"age_to_length_conversion"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">tail</a></span><span class="op">(</span><span class="fl">3</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">##                         type name age length timing        value       unit</span></span>
-<span><span class="co">## 274 age_to_length_conversion &lt;NA&gt;  12   1000     NA 8.704578e-05 proportion</span></span>
-<span><span class="co">## 275 age_to_length_conversion &lt;NA&gt;  12   1050     NA 4.607774e-06 proportion</span></span>
-<span><span class="co">## 276 age_to_length_conversion &lt;NA&gt;  12   1100     NA 1.572035e-07 proportion</span></span>
+<pre><code><span><span class="co">##                         type fleet age length timing        value       unit</span></span>
+<span><span class="co">## 274 age_to_length_conversion  &lt;NA&gt;  12   1000     NA 8.704578e-05 proportion</span></span>
+<span><span class="co">## 275 age_to_length_conversion  &lt;NA&gt;  12   1050     NA 4.607774e-06 proportion</span></span>
+<span><span class="co">## 276 age_to_length_conversion  &lt;NA&gt;  12   1100     NA 1.572035e-07 proportion</span></span>
 <span><span class="co">##     uncertainty</span></span>
 <span><span class="co">## 274         200</span></span>
 <span><span class="co">## 275         200</span></span>

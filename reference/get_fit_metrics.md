@@ -39,13 +39,13 @@ get_fit_metrics(
   A character vector of column names in the augmented tibble to group by
   before computing metrics. Common choices:
 
-  - `"label"` – one row-set per data-stream label
+  - `"label"` - one row-set per data-stream label
 
-  - `"fleet"` – one row-set per fleet
+  - `"fleet"` - one row-set per fleet
 
-  - `"distribution"` – one row-set per likelihood distribution
+  - `"distribution"` - one row-set per likelihood distribution
 
-  - `c("label", "fleet")` – per label × fleet combination Defaults to
+  - `c("label", "fleet")` - per label x fleet combination Defaults to
     `NULL` (no grouping).
 
 - weighted:
@@ -93,7 +93,7 @@ fit <- create_default_parameters(
   initialize_fims(data = data_4_model) |>
   fit_fims(optimize = TRUE)
 
-# Overall RMSE / MAE / R² across all data streams
+# Overall RMSE / MAE / R^2 across all data streams
 get_fit_metrics(fit)
 
 # Per-data-stream: one row-set per label

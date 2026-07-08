@@ -108,7 +108,7 @@ biomass and expected data values, or pass all three to get every row.</p></dd>
 <dt id="arg-conf-int">conf.int<a class="anchor" aria-label="anchor" href="#arg-conf-int"></a></dt>
 <dd><p>Logical (default <code>FALSE</code>).  When <code>TRUE</code>, <code>conf.low</code> and
 <code>conf.high</code> columns are added using a normal approximation:
-<code>estimate ± qnorm((1 + conf.level) / 2) * std.error</code>.</p></dd>
+<code>estimate +/- qnorm((1 + conf.level) / 2) * std.error</code>.</p></dd>
 
 
 <dt id="arg-conf-level">conf.level<a class="anchor" aria-label="anchor" href="#arg-conf-level"></a></dt>
@@ -163,14 +163,14 @@ close to zero indicate a well-converged parameter.</p></dd>
 
 <p>FIMS distinguishes three <code>estimation_type</code> values:</p><dl><dt><code>"fixed_effects"</code></dt>
 <dd><p>Directly optimized parameters (selectivity,
-log_Fmort, log_q, …).</p></dd>
+log_Fmort, log_q, etc.).</p></dd>
 
 <dt><code>"random_effects"</code></dt>
-<dd><p>Integrated-out random effects (log_devs, …).</p></dd>
+<dd><p>Integrated-out random effects (log_devs, etc.).</p></dd>
 
 <dt><code>"derived_quantity"</code></dt>
 <dd><p>Model outputs that are not parameters
-(spawning biomass, expected catches, …). Uncertainty here comes from
+(spawning biomass, expected catches, etc.). Uncertainty here comes from
 the delta method via <code><a href="https://rdrr.io/pkg/TMB/man/sdreport.html" class="external-link">TMB::sdreport()</a></code>.</p></dd>
 
 

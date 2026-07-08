@@ -47,7 +47,7 @@ column. See below for more details:
   "Recruitment", "Growth", "Maturity"). These entries are always written
   in PascalCase to match the names used in the C++ code.
 
-- `fleet_name`::
+- `fleet`::
 
   The name of the fleet the module applies to. This will be `NA` for
   non-fleet-specific modules like "Recruitment".
@@ -138,11 +138,11 @@ default_parameters <- create_default_parameters(
 updated_parameters <- default_parameters |>
   dplyr::rows_update(
     tibble::tibble(
-      fleet_name = "survey1",
+      fleet = "survey1",
       label = c("inflection_point", "slope"),
       value = c(1.5, 2)
     ),
-    by = c("fleet_name", "label")
+    by = c("fleet", "label")
   )
 
 # Do the same as above except, model fleet1 with double logistic selectivity
@@ -153,10 +153,10 @@ parameters_with_double_logistic <- default_configurations |>
   dplyr::rows_update(
     tibble::tibble(
       module_name = "Selectivity",
-      fleet_name = "fleet1",
+      fleet = "fleet1",
       module_type = "DoubleLogistic"
     ),
-    by = c("module_name", "fleet_name")
+    by = c("module_name", "fleet")
   ) |>
   create_default_parameters(
     data = fims_frame

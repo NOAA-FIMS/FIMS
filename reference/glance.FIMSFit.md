@@ -1,4 +1,4 @@
-# Glance at a FIMSFit object — one-row model summary
+# Glance at a FIMSFit object - one-row model summary
 
 Returns a single-row tibble of model-level diagnostics following the
 [`generics::glance()`](https://generics.r-lib.org/reference/glance.html)

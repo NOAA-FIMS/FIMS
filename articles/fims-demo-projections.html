@@ -176,7 +176,7 @@ manipulation of the data is needed.</p>
 <span>  <span class="va">data_big</span>,</span>
 <span>  type <span class="op">=</span> <span class="st">"landings"</span>,</span>
 <span>  timing <span class="op">=</span> <span class="fu"><a href="../reference/get_FIMSFrame.html">get_end_year</a></span><span class="op">(</span><span class="va">data_4_model</span><span class="op">)</span> <span class="op">+</span> <span class="va">years_of_projection</span>,</span>
-<span>  name <span class="op">=</span> <span class="st">"fleet1"</span>,</span>
+<span>  fleet <span class="op">=</span> <span class="st">"fleet1"</span>,</span>
 <span>  value <span class="op">=</span> <span class="op">-</span><span class="fl">999</span>,</span>
 <span>  unit <span class="op">=</span> <span class="st">"mt"</span></span>
 <span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -254,7 +254,7 @@ dimensions.</p>
 <span>  <span class="co"># tests/testthat/test-projections-looped.R</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/rows.html" class="external-link">rows_update</a></span><span class="op">(</span></span>
 <span>    <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span></span>
-<span>      fleet_name <span class="op">=</span> <span class="st">"fleet1"</span>,</span>
+<span>      fleet <span class="op">=</span> <span class="st">"fleet1"</span>,</span>
 <span>      label <span class="op">=</span> <span class="st">"log_Fmort"</span>,</span>
 <span>      time <span class="op">=</span> <span class="fu"><a href="../reference/get_FIMSFrame.html">get_start_year</a></span><span class="op">(</span><span class="va">data_4_projections</span><span class="op">)</span><span class="op">:</span></span>
 <span>      <span class="fu"><a href="../reference/get_FIMSFrame.html">get_end_year</a></span><span class="op">(</span><span class="va">data_4_projections</span><span class="op">)</span>,</span>
@@ -272,7 +272,7 @@ dimensions.</p>
 <span>        <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0.499675368</span>, <span class="va">years_of_projection</span><span class="op">)</span></span>
 <span>      <span class="op">)</span><span class="op">)</span></span>
 <span>    <span class="op">)</span>,</span>
-<span>    by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"fleet_name"</span>, <span class="st">"label"</span>, <span class="st">"time"</span><span class="op">)</span></span>
+<span>    by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"fleet"</span>, <span class="st">"label"</span>, <span class="st">"time"</span><span class="op">)</span></span>
 <span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="co"># Fix the projection period log_Fmort to constant</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/rows.html" class="external-link">rows_update</a></span><span class="op">(</span></span>
@@ -287,11 +287,11 @@ dimensions.</p>
 <span>  <span class="co"># Update selectivity parameters and log_q for survey1</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/rows.html" class="external-link">rows_update</a></span><span class="op">(</span></span>
 <span>    <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span></span>
-<span>      fleet_name <span class="op">=</span> <span class="st">"survey1"</span>,</span>
+<span>      fleet <span class="op">=</span> <span class="st">"survey1"</span>,</span>
 <span>      label <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"inflection_point"</span>, <span class="st">"slope"</span>, <span class="st">"log_q"</span><span class="op">)</span>,</span>
 <span>      value <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1.5</span>, <span class="fl">2</span>, <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fl">3.315143e-07</span><span class="op">)</span><span class="op">)</span></span>
 <span>    <span class="op">)</span>,</span>
-<span>    by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"fleet_name"</span>, <span class="st">"label"</span><span class="op">)</span></span>
+<span>    by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"fleet"</span>, <span class="st">"label"</span><span class="op">)</span></span>
 <span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="co"># Update log_devs in the Recruitment module (time steps 2-end)</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/rows.html" class="external-link">rows_update</a></span><span class="op">(</span></span>
@@ -390,7 +390,7 @@ output will be in the same format that users are used to.</p>
 <span><span class="co">## ✔ Finished optimization</span></span>
 <span><span class="co">## ✔ Finished sdreport</span></span>
 <span><span class="co">## ℹ FIMS model version: 0.9.3.9000</span></span>
-<span><span class="co">## ℹ Total run time was 13.97178 seconds</span></span>
+<span><span class="co">## ℹ Total run time was 13.32267 seconds</span></span>
 <span><span class="co">## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78</span></span>
 <span><span class="co">## ℹ Maximum gradient= 0.00022</span></span>
 <span><span class="co">## ℹ Negative log likelihood (NLL):</span></span>

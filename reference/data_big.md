@@ -24,10 +24,12 @@ A data frame with 2808 observations of 8 variables:
   age_to_length_conversion, index, landings, length_comp, and
   weight_at_age.
 
-- name:
+- fleet:
 
   A character string providing the name of the information source that
-  the input was collected from, e.g., `"Trawl fishery"`.
+  the input was collected from, e.g., `"Trawl fishery"` or
+  `"age_zero_survey"`. Entries can be `NA` for information that is not
+  fleet/vessel specific.
 
 - age:
 

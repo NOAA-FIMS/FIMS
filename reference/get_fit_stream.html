@@ -111,7 +111,7 @@ retain (e.g., <code>1</code> for the first fishing fleet, <code>2</code> for the
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>In the FIMS output the <code>fleet</code> column is <code>NA</code> for derived-quantity rows
 (which is where all observed/expected pairs live). Use <code>module_id</code> instead
-to distinguish fleets and surveys — this matches the convention used in the
+to distinguish fleets and surveys - this matches the convention used in the
 FIMS vignettes, where <code>module_id == 1</code> is the first fishing fleet and
 <code>module_id == 2</code> is the first survey.  To discover which <code>module_id</code> values
 are present in your fit, inspect <code>augment(fit)</code> directly.</p>
@@ -130,7 +130,7 @@ are present in your fit, inspect <code>augment(fit)</code> directly.</p>
 <span class="r-in"><span>  <span class="fu"><a href="initialize_fims.html">initialize_fims</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">data_4_model</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="fit_fims.html">fit_fims</a></span><span class="op">(</span>optimize <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Landings for the fishing fleet (module_id 1) — compute RMSE</span></span></span>
+<span class="r-in"><span><span class="co"># Landings for the fishing fleet (module_id 1) - compute RMSE</span></span></span>
 <span class="r-in"><span><span class="fu">get_fit_stream</span><span class="op">(</span><span class="va">fit</span>, stream_label <span class="op">=</span> <span class="st">"landings_expected"</span>, module_id <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
 <span class="r-in"><span>  <span class="fu">yardstick</span><span class="fu">::</span><span class="fu"><a href="https://yardstick.tidymodels.org/reference/rmse.html" class="external-link">rmse</a></span><span class="op">(</span>truth <span class="op">=</span> <span class="va">.truth</span>, estimate <span class="op">=</span> <span class="va">.pred</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>

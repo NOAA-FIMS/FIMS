@@ -178,6 +178,6 @@ Functions used to extract, tidy, and evaluate model fit results.
 - [`get_fit_stream()`](https://NOAA-FIMS.github.io/FIMS/reference/get_fit_stream.md)
   : Extract a single data stream from a FIMSFit augmented tibble
 - [`glance(`*`<FIMSFit>`*`)`](https://NOAA-FIMS.github.io/FIMS/reference/glance.FIMSFit.md)
-  : Glance at a FIMSFit object — one-row model summary
+  : Glance at a FIMSFit object - one-row model summary
 - [`tidy(`*`<FIMSFit>`*`)`](https://NOAA-FIMS.github.io/FIMS/reference/tidy.FIMSFit.md)
   : Tidy a FIMSFit object into a parameter-level tibble

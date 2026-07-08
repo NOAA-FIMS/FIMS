@@ -16,7 +16,7 @@ FIMSFrame(data)
 - data:
 
   A `data.frame` that contains the necessary columns to construct a
-  `FIMSFrame-class` object. Currently, those columns are type, name,
+  `FIMSFrame-class` object. Currently, those columns are type, fleet,
   age, length, timing, value, unit, and uncertainty. See the `data_big`
   object in FIMS, e.g., `data(data_big, package = "FIMS")`.
 

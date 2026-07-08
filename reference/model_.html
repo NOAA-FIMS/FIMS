@@ -83,37 +83,37 @@ indexing.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">model_landings</span><span class="op">(</span><span class="va">x</span>, <span class="va">fleet_name</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">model_landings</span><span class="op">(</span><span class="va">x</span>, <span class="va">fleet</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S4 method for class 'FIMSFrame'</span></span>
-<span><span class="fu">model_landings</span><span class="op">(</span><span class="va">x</span>, <span class="va">fleet_name</span><span class="op">)</span></span>
+<span><span class="fu">model_landings</span><span class="op">(</span><span class="va">x</span>, <span class="va">fleet</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S4 method for class 'data.frame'</span></span>
-<span><span class="fu">model_landings</span><span class="op">(</span><span class="va">x</span>, <span class="va">fleet_name</span><span class="op">)</span></span>
+<span><span class="fu">model_landings</span><span class="op">(</span><span class="va">x</span>, <span class="va">fleet</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">model_index</span><span class="op">(</span><span class="va">x</span>, <span class="va">fleet_name</span><span class="op">)</span></span>
+<span><span class="fu">model_index</span><span class="op">(</span><span class="va">x</span>, <span class="va">fleet</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S4 method for class 'FIMSFrame'</span></span>
-<span><span class="fu">model_index</span><span class="op">(</span><span class="va">x</span>, <span class="va">fleet_name</span><span class="op">)</span></span>
+<span><span class="fu">model_index</span><span class="op">(</span><span class="va">x</span>, <span class="va">fleet</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S4 method for class 'data.frame'</span></span>
-<span><span class="fu">model_index</span><span class="op">(</span><span class="va">x</span>, <span class="va">fleet_name</span><span class="op">)</span></span>
+<span><span class="fu">model_index</span><span class="op">(</span><span class="va">x</span>, <span class="va">fleet</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">model_age_comp</span><span class="op">(</span><span class="va">x</span>, <span class="va">fleet_name</span><span class="op">)</span></span>
+<span><span class="fu">model_age_comp</span><span class="op">(</span><span class="va">x</span>, <span class="va">fleet</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S4 method for class 'FIMSFrame'</span></span>
-<span><span class="fu">model_age_comp</span><span class="op">(</span><span class="va">x</span>, <span class="va">fleet_name</span><span class="op">)</span></span>
+<span><span class="fu">model_age_comp</span><span class="op">(</span><span class="va">x</span>, <span class="va">fleet</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S4 method for class 'data.frame'</span></span>
-<span><span class="fu">model_age_comp</span><span class="op">(</span><span class="va">x</span>, <span class="va">fleet_name</span><span class="op">)</span></span>
+<span><span class="fu">model_age_comp</span><span class="op">(</span><span class="va">x</span>, <span class="va">fleet</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">model_length_comp</span><span class="op">(</span><span class="va">x</span>, <span class="va">fleet_name</span><span class="op">)</span></span>
+<span><span class="fu">model_length_comp</span><span class="op">(</span><span class="va">x</span>, <span class="va">fleet</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S4 method for class 'FIMSFrame'</span></span>
-<span><span class="fu">model_length_comp</span><span class="op">(</span><span class="va">x</span>, <span class="va">fleet_name</span><span class="op">)</span></span>
+<span><span class="fu">model_length_comp</span><span class="op">(</span><span class="va">x</span>, <span class="va">fleet</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S4 method for class 'data.frame'</span></span>
-<span><span class="fu">model_length_comp</span><span class="op">(</span><span class="va">x</span>, <span class="va">fleet_name</span><span class="op">)</span></span>
+<span><span class="fu">model_length_comp</span><span class="op">(</span><span class="va">x</span>, <span class="va">fleet</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">model_weight_at_age</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
 <span></span>
@@ -140,10 +140,10 @@ indexing.</p>
 <dd><p>An object returned from <code><a href="FIMSFrame.html">FIMSFrame()</a></code>.</p></dd>
 
 
-<dt id="arg-fleet-name">fleet_name<a class="anchor" aria-label="anchor" href="#arg-fleet-name"></a></dt>
+<dt id="arg-fleet">fleet<a class="anchor" aria-label="anchor" href="#arg-fleet"></a></dt>
 <dd><p>A string, or vector of strings, specifying the name of the
-fleet(s) of interest that you want landings data for. The strings must
-exactly match strings in the column <code>"name"</code> of <code>get_data(x)</code>.</p></dd>
+fleet(s) of interest that you want data for. The strings must
+exactly match strings in the <code>"fleet"</code> column of <code>get_data(x)</code>.</p></dd>
 
 </dl></div>
     <div class="section level2">

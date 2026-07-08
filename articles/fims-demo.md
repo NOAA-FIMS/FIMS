@@ -142,7 +142,7 @@ methods::show(data_4_model)
     ## Also defined by 'tibble'
 
     ## # A tibble: 6 × 8
-    ##   type     name     age length timing value unit       uncertainty
+    ##   type     fleet    age length timing value unit       uncertainty
     ##   <chr>    <chr>  <int>  <dbl>  <dbl> <dbl> <chr>            <dbl>
     ## 1 age_comp fleet1     1     NA      1 0.07  proportion         200
     ## 2 age_comp fleet1     2     NA      1 0.1   proportion         200
@@ -185,7 +185,7 @@ get_data(data_4_model) |>
 ```
 
     ## # A tibble: 30 × 8
-    ##    type     name     age length timing value unit  uncertainty
+    ##    type     fleet    age length timing value unit  uncertainty
     ##    <chr>    <chr>  <int>  <dbl>  <dbl> <dbl> <chr>       <dbl>
     ##  1 landings fleet1    NA     NA      1  162. mt        0.01000
     ##  2 landings fleet1    NA     NA      2  461. mt        0.01000
@@ -247,15 +247,15 @@ default_configurations
 
 ``` numberSource
 ## # A tibble: 7 × 4
-##   model_family module_name fleet_name data            
-##   <chr>        <chr>       <chr>      <list>          
-## 1 catch_at_age Data        fleet1     <tibble [3 × 3]>
-## 2 catch_at_age Selectivity fleet1     <tibble [1 × 3]>
-## 3 catch_at_age Data        survey1    <tibble [3 × 3]>
-## 4 catch_at_age Selectivity survey1    <tibble [1 × 3]>
-## 5 catch_at_age Growth      <NA>       <tibble [1 × 3]>
-## 6 catch_at_age Maturity    <NA>       <tibble [1 × 3]>
-## 7 catch_at_age Recruitment <NA>       <tibble [1 × 3]>
+##   model_family module_name fleet   data            
+##   <chr>        <chr>       <chr>   <list>          
+## 1 catch_at_age Data        fleet1  <tibble [3 × 3]>
+## 2 catch_at_age Selectivity fleet1  <tibble [1 × 3]>
+## 3 catch_at_age Data        survey1 <tibble [3 × 3]>
+## 4 catch_at_age Selectivity survey1 <tibble [1 × 3]>
+## 5 catch_at_age Growth      <NA>    <tibble [1 × 3]>
+## 6 catch_at_age Maturity    <NA>    <tibble [1 × 3]>
+## 7 catch_at_age Recruitment <NA>    <tibble [1 × 3]>
 ```
 
 ``` r
@@ -269,20 +269,19 @@ default_configurations_unnested
 
 ``` numberSource
 ## # A tibble: 11 × 6
-##    model_family module_name fleet_name module_type  distribution_type
-##    <chr>        <chr>       <chr>      <chr>        <chr>            
-##  1 catch_at_age Data        fleet1     AgeComp      Data             
-##  2 catch_at_age Data        fleet1     Landings     Data             
-##  3 catch_at_age Data        fleet1     LengthComp   Data             
-##  4 catch_at_age Selectivity fleet1     Logistic     <NA>             
-##  5 catch_at_age Data        survey1    AgeComp      Data             
-##  6 catch_at_age Data        survey1    Index        Data             
-##  7 catch_at_age Data        survey1    LengthComp   Data             
-##  8 catch_at_age Selectivity survey1    Logistic     <NA>             
-##  9 catch_at_age Growth      <NA>       EWAA         <NA>             
-## 10 catch_at_age Maturity    <NA>       Logistic     <NA>             
-## 11 catch_at_age Recruitment <NA>       BevertonHolt process          
-## # ℹ 1 more variable: distribution <chr>
+##    model_family module_name fleet   module_type  distribution_type distribution
+##    <chr>        <chr>       <chr>   <chr>        <chr>             <chr>       
+##  1 catch_at_age Data        fleet1  AgeComp      Data              Dmultinom   
+##  2 catch_at_age Data        fleet1  Landings     Data              Dlnorm      
+##  3 catch_at_age Data        fleet1  LengthComp   Data              Dmultinom   
+##  4 catch_at_age Selectivity fleet1  Logistic     <NA>              <NA>        
+##  5 catch_at_age Data        survey1 AgeComp      Data              Dmultinom   
+##  6 catch_at_age Data        survey1 Index        Data              Dlnorm      
+##  7 catch_at_age Data        survey1 LengthComp   Data              Dmultinom   
+##  8 catch_at_age Selectivity survey1 Logistic     <NA>              <NA>        
+##  9 catch_at_age Growth      <NA>    EWAA         <NA>              <NA>        
+## 10 catch_at_age Maturity    <NA>    Logistic     <NA>              <NA>        
+## 11 catch_at_age Recruitment <NA>    BevertonHolt process           Dnorm
 ```
 
 ### Update configurations
@@ -299,10 +298,10 @@ updated_configurations <- default_configurations_unnested |>
   dplyr::rows_update(
     y = tibble::tibble(
       module_name = c("Selectivity"),
-      fleet_name = c("survey1"),
+      fleet = c("survey1"),
       module_type = c("DoubleLogistic")
     ),
-    by = c("module_name", "fleet_name")
+    by = c("module_name", "fleet")
   )
 
 updated_configurations
@@ -310,27 +309,26 @@ updated_configurations
 
 ``` numberSource
 ## # A tibble: 11 × 6
-##    model_family module_name fleet_name module_type    distribution_type
-##    <chr>        <chr>       <chr>      <chr>          <chr>            
-##  1 catch_at_age Data        fleet1     AgeComp        Data             
-##  2 catch_at_age Data        fleet1     Landings       Data             
-##  3 catch_at_age Data        fleet1     LengthComp     Data             
-##  4 catch_at_age Selectivity fleet1     Logistic       <NA>             
-##  5 catch_at_age Data        survey1    AgeComp        Data             
-##  6 catch_at_age Data        survey1    Index          Data             
-##  7 catch_at_age Data        survey1    LengthComp     Data             
-##  8 catch_at_age Selectivity survey1    DoubleLogistic <NA>             
-##  9 catch_at_age Growth      <NA>       EWAA           <NA>             
-## 10 catch_at_age Maturity    <NA>       Logistic       <NA>             
-## 11 catch_at_age Recruitment <NA>       BevertonHolt   process          
-## # ℹ 1 more variable: distribution <chr>
+##    model_family module_name fleet   module_type   distribution_type distribution
+##    <chr>        <chr>       <chr>   <chr>         <chr>             <chr>       
+##  1 catch_at_age Data        fleet1  AgeComp       Data              Dmultinom   
+##  2 catch_at_age Data        fleet1  Landings      Data              Dlnorm      
+##  3 catch_at_age Data        fleet1  LengthComp    Data              Dmultinom   
+##  4 catch_at_age Selectivity fleet1  Logistic      <NA>              <NA>        
+##  5 catch_at_age Data        survey1 AgeComp       Data              Dmultinom   
+##  6 catch_at_age Data        survey1 Index         Data              Dlnorm      
+##  7 catch_at_age Data        survey1 LengthComp    Data              Dmultinom   
+##  8 catch_at_age Selectivity survey1 DoubleLogist… <NA>              <NA>        
+##  9 catch_at_age Growth      <NA>    EWAA          <NA>              <NA>        
+## 10 catch_at_age Maturity    <NA>    Logistic      <NA>              <NA>        
+## 11 catch_at_age Recruitment <NA>    BevertonHolt  process           Dnorm
 ```
 
 ``` r
 
 # Nest updated_configurations
 updated_configurations_nested <- updated_configurations |>
-  tidyr::nest(.by = c(model_family, module_name, fleet_name))
+  tidyr::nest(.by = c(model_family, module_name, fleet))
 ```
 
 ## Parameters
@@ -374,18 +372,18 @@ default_parameters
 
 ``` numberSource
 ## # A tibble: 10 × 4
-##    model_family module_name fleet_name data              
-##    <chr>        <chr>       <chr>      <list>            
-##  1 catch_at_age Selectivity fleet1     <tibble [2 × 9]>  
-##  2 catch_at_age Fleet       fleet1     <tibble [31 × 9]> 
-##  3 catch_at_age Data        fleet1     <tibble [32 × 9]> 
-##  4 catch_at_age Selectivity survey1    <tibble [2 × 9]>  
-##  5 catch_at_age Fleet       survey1    <tibble [31 × 9]> 
-##  6 catch_at_age Data        survey1    <tibble [32 × 9]> 
-##  7 catch_at_age Recruitment <NA>       <tibble [32 × 9]> 
-##  8 catch_at_age Maturity    <NA>       <tibble [2 × 9]>  
-##  9 catch_at_age Population  <NA>       <tibble [373 × 9]>
-## 10 catch_at_age Growth      <NA>       <tibble [1 × 9]>
+##    model_family module_name fleet   data              
+##    <chr>        <chr>       <chr>   <list>            
+##  1 catch_at_age Selectivity fleet1  <tibble [2 × 9]>  
+##  2 catch_at_age Fleet       fleet1  <tibble [31 × 9]> 
+##  3 catch_at_age Data        fleet1  <tibble [32 × 9]> 
+##  4 catch_at_age Selectivity survey1 <tibble [2 × 9]>  
+##  5 catch_at_age Fleet       survey1 <tibble [31 × 9]> 
+##  6 catch_at_age Data        survey1 <tibble [32 × 9]> 
+##  7 catch_at_age Recruitment <NA>    <tibble [32 × 9]> 
+##  8 catch_at_age Maturity    <NA>    <tibble [2 × 9]>  
+##  9 catch_at_age Population  <NA>    <tibble [373 × 9]>
+## 10 catch_at_age Growth      <NA>    <tibble [1 × 9]>
 ```
 
 ``` r
@@ -398,21 +396,21 @@ default_parameters_unnested
 
 ``` numberSource
 ## # A tibble: 538 × 12
-##    model_family module_name fleet_name module_type label        age length  time
-##    <chr>        <chr>       <chr>      <chr>       <chr>      <dbl>  <dbl> <dbl>
-##  1 catch_at_age Selectivity fleet1     Logistic    inflectio…    NA     NA    NA
-##  2 catch_at_age Selectivity fleet1     Logistic    slope         NA     NA    NA
-##  3 catch_at_age Fleet       fleet1     <NA>        log_q         NA     NA    NA
-##  4 catch_at_age Fleet       fleet1     <NA>        log_Fmort     NA     NA     1
-##  5 catch_at_age Fleet       fleet1     <NA>        log_Fmort     NA     NA     2
-##  6 catch_at_age Fleet       fleet1     <NA>        log_Fmort     NA     NA     3
-##  7 catch_at_age Fleet       fleet1     <NA>        log_Fmort     NA     NA     4
-##  8 catch_at_age Fleet       fleet1     <NA>        log_Fmort     NA     NA     5
-##  9 catch_at_age Fleet       fleet1     <NA>        log_Fmort     NA     NA     6
-## 10 catch_at_age Fleet       fleet1     <NA>        log_Fmort     NA     NA     7
+##    model_family module_name fleet  module_type label      age length  time value
+##    <chr>        <chr>       <chr>  <chr>       <chr>    <dbl>  <dbl> <dbl> <dbl>
+##  1 catch_at_age Selectivity fleet1 Logistic    inflect…    NA     NA    NA     2
+##  2 catch_at_age Selectivity fleet1 Logistic    slope       NA     NA    NA     1
+##  3 catch_at_age Fleet       fleet1 <NA>        log_q       NA     NA    NA     0
+##  4 catch_at_age Fleet       fleet1 <NA>        log_Fmo…    NA     NA     1    -3
+##  5 catch_at_age Fleet       fleet1 <NA>        log_Fmo…    NA     NA     2    -3
+##  6 catch_at_age Fleet       fleet1 <NA>        log_Fmo…    NA     NA     3    -3
+##  7 catch_at_age Fleet       fleet1 <NA>        log_Fmo…    NA     NA     4    -3
+##  8 catch_at_age Fleet       fleet1 <NA>        log_Fmo…    NA     NA     5    -3
+##  9 catch_at_age Fleet       fleet1 <NA>        log_Fmo…    NA     NA     6    -3
+## 10 catch_at_age Fleet       fleet1 <NA>        log_Fmo…    NA     NA     7    -3
 ## # ℹ 528 more rows
-## # ℹ 4 more variables: value <dbl>, estimation_type <chr>,
-## #   distribution_type <chr>, distribution <chr>
+## # ℹ 3 more variables: estimation_type <chr>, distribution_type <chr>,
+## #   distribution <chr>
 ```
 
 ### Update parameters
@@ -431,7 +429,7 @@ parameters_4_model <- default_parameters |>
   # Update log_Fmort initial values for Fleet1
   dplyr::rows_update(
     tibble::tibble(
-      fleet_name = "fleet1",
+      fleet = "fleet1",
       label = "log_Fmort",
       time = seq(get_n_years(data_4_model)),
       value = log(c(
@@ -447,16 +445,16 @@ parameters_4_model <- default_parameters |>
         0.431745298, 0.328030899, 0.499675368
       ))
     ),
-    by = c("fleet_name", "label", "time")
+    by = c("fleet", "label", "time")
   ) |>
   # Update selectivity parameters and log_q for survey1
   dplyr::rows_update(
     tibble::tibble(
-      fleet_name = "survey1",
+      fleet = "survey1",
       label = c("inflection_point", "slope", "log_q"),
       value = c(1.5, 2, log(3.315143e-07))
     ),
-    by = c("fleet_name", "label")
+    by = c("fleet", "label")
   ) |>
   # Update log_devs in the Recruitment module (time steps 2-30)
   dplyr::rows_update(
@@ -557,7 +555,7 @@ fit <- parameters_4_model |>
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
     ## ℹ FIMS model version: 0.9.3.9000
-    ## ℹ Total run time was 1.29329 minutes
+    ## ℹ Total run time was 1.21654 minutes
     ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
     ## ℹ Maximum gradient= 0.00101
     ## ℹ Negative log likelihood (NLL):
@@ -594,7 +592,7 @@ log_data_frame[1, ]
 ```
 
     ##                  timestamp   level
-    ## 1 Wed Jul  8 16:27:08 2026 warning
+    ## 1 Wed Jul  8 21:48:04 2026 warning
     ##                                                                   message id
     ## 1 The log_f_multiplier vector is not of size n_years. Filling with zeros.  0
     ##     user                                    wd
@@ -630,8 +628,8 @@ log_data_frame |> dplyr::filter(level == "warning")
 ```
 
     ##                  timestamp   level
-    ## 1 Wed Jul  8 16:27:08 2026 warning
-    ## 2 Wed Jul  8 16:27:08 2026 warning
+    ## 1 Wed Jul  8 21:48:04 2026 warning
+    ## 2 Wed Jul  8 21:48:04 2026 warning
     ##                                                                   message id
     ## 1 The log_f_multiplier vector is not of size n_years. Filling with zeros.  0
     ## 2              Setting spawning_biomass_ratio vector to size n_years + 1.  1
@@ -761,7 +759,7 @@ parameters_high_slope <- parameters_4_model |>
   dplyr::mutate(
     value = dplyr::if_else(
       module_name == "Selectivity" &
-        fleet_name == "survey1" &
+        fleet == "survey1" &
         label == "slope",
       2.5,
       value
@@ -772,7 +770,7 @@ parameters_low_slope <- parameters_4_model |>
   dplyr::mutate(
     value = dplyr::if_else(
       module_name == "Selectivity" &
-        fleet_name == "survey1" &
+        fleet == "survey1" &
         label == "slope",
       1,
       value
@@ -790,7 +788,7 @@ high_slope_fit <- parameters_high_slope |>
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
     ## ℹ FIMS model version: 0.9.3.9000
-    ## ℹ Total run time was 1.26832 minutes
+    ## ℹ Total run time was 1.18924 minutes
     ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
     ## ℹ Maximum gradient= 0.00034
     ## ℹ Negative log likelihood (NLL):
@@ -813,7 +811,7 @@ low_slope_fit <- parameters_low_slope |>
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
     ## ℹ FIMS model version: 0.9.3.9000
-    ## ℹ Total run time was 1.30039 minutes
+    ## ℹ Total run time was 1.22805 minutes
     ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
     ## ℹ Maximum gradient= 4e-04
     ## ℹ Negative log likelihood (NLL):
@@ -850,7 +848,7 @@ age_only_fit <- parameters_4_model |>
     ## ℹ Maximum gradient went from 0.00361 to 0.00038 after 3 steps.
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
-    ## ℹ FIMS model version: 0.9.3.9000 ℹ Total run time was 11.77918 seconds ℹ Number
+    ## ℹ FIMS model version: 0.9.3.9000 ℹ Total run time was 11.34787 seconds ℹ Number
     ## of parameters: fixed_effects=49, random_effects=29, and total=78 ℹ Maximum
     ## gradient= 0.00038 ℹ Negative log likelihood (NLL): • Marginal NLL= 1627.76704 •
     ## Total NLL= 1564.0853 ℹ Terminal SB= 1740.95207
@@ -884,7 +882,7 @@ length_only_fit <- parameters_4_model |>
     ## ℹ Maximum gradient went from 0.00715 to 0.00034 after 3 steps.
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
-    ## ℹ FIMS model version: 0.9.3.9000 ℹ Total run time was 1.19018 minutes ℹ Number
+    ## ℹ FIMS model version: 0.9.3.9000 ℹ Total run time was 1.1375 minutes ℹ Number
     ## of parameters: fixed_effects=49, random_effects=29, and total=78 ℹ Maximum
     ## gradient= 0.00034 ℹ Negative log likelihood (NLL): • Marginal NLL= 1568.32685 •
     ## Total NLL= 1518.62644 ℹ Terminal SB= 1722.35744

@@ -119,7 +119,7 @@ more details:</p><dl><dt><code>model_family</code>:</dt>
 entries are always written in PascalCase to match the names used in the
 C++ code.</p></dd>
 
-<dt><code>fleet_name</code>:</dt>
+<dt><code>fleet</code>:</dt>
 <dd><p>The name of the fleet the module applies to. This
 will be <code>NA</code> for non-fleet-specific modules like "Recruitment".</p></dd>
 
@@ -206,11 +206,11 @@ and <code>"slope"</code>.</p>
 <span class="r-in"><span><span class="va">updated_parameters</span> <span class="op">&lt;-</span> <span class="va">default_parameters</span> <span class="op">|&gt;</span></span></span>
 <span class="r-in"><span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/rows.html" class="external-link">rows_update</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>    <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>      fleet_name <span class="op">=</span> <span class="st">"survey1"</span>,</span></span>
+<span class="r-in"><span>      fleet <span class="op">=</span> <span class="st">"survey1"</span>,</span></span>
 <span class="r-in"><span>      label <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"inflection_point"</span>, <span class="st">"slope"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>      value <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1.5</span>, <span class="fl">2</span><span class="op">)</span></span></span>
 <span class="r-in"><span>    <span class="op">)</span>,</span></span>
-<span class="r-in"><span>    by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"fleet_name"</span>, <span class="st">"label"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"fleet"</span>, <span class="st">"label"</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Do the same as above except, model fleet1 with double logistic selectivity</span></span></span>
@@ -221,10 +221,10 @@ and <code>"slope"</code>.</p>
 <span class="r-in"><span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/rows.html" class="external-link">rows_update</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>    <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>      module_name <span class="op">=</span> <span class="st">"Selectivity"</span>,</span></span>
-<span class="r-in"><span>      fleet_name <span class="op">=</span> <span class="st">"fleet1"</span>,</span></span>
+<span class="r-in"><span>      fleet <span class="op">=</span> <span class="st">"fleet1"</span>,</span></span>
 <span class="r-in"><span>      module_type <span class="op">=</span> <span class="st">"DoubleLogistic"</span></span></span>
 <span class="r-in"><span>    <span class="op">)</span>,</span></span>
-<span class="r-in"><span>    by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"module_name"</span>, <span class="st">"fleet_name"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"module_name"</span>, <span class="st">"fleet"</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span> <span class="op">|&gt;</span></span></span>
 <span class="r-in"><span>  <span class="fu">create_default_parameters</span><span class="op">(</span></span></span>
 <span class="r-in"><span>    data <span class="op">=</span> <span class="va">fims_frame</span></span></span>

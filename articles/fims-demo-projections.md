@@ -85,7 +85,7 @@ data_big_with_extra_year <- dplyr::add_row(
   data_big,
   type = "landings",
   timing = get_end_year(data_4_model) + years_of_projection,
-  name = "fleet1",
+  fleet = "fleet1",
   value = -999,
   unit = "mt"
 ) |>
@@ -167,7 +167,7 @@ parameters_projection <- create_default_parameters(
   # tests/testthat/test-projections-looped.R
   dplyr::rows_update(
     tibble::tibble(
-      fleet_name = "fleet1",
+      fleet = "fleet1",
       label = "log_Fmort",
       time = get_start_year(data_4_projections):
       get_end_year(data_4_projections),
@@ -185,7 +185,7 @@ parameters_projection <- create_default_parameters(
         rep(0.499675368, years_of_projection)
       ))
     ),
-    by = c("fleet_name", "label", "time")
+    by = c("fleet", "label", "time")
   ) |>
   # Fix the projection period log_Fmort to constant
   dplyr::rows_update(
@@ -200,11 +200,11 @@ parameters_projection <- create_default_parameters(
   # Update selectivity parameters and log_q for survey1
   dplyr::rows_update(
     tibble::tibble(
-      fleet_name = "survey1",
+      fleet = "survey1",
       label = c("inflection_point", "slope", "log_q"),
       value = c(1.5, 2, log(3.315143e-07))
     ),
-    by = c("fleet_name", "label")
+    by = c("fleet", "label")
   ) |>
   # Update log_devs in the Recruitment module (time steps 2-end)
   dplyr::rows_update(
@@ -309,7 +309,7 @@ projection_fit <- parameters_projection |>
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
     ## ℹ FIMS model version: 0.9.3.9000
-    ## ℹ Total run time was 13.97178 seconds
+    ## ℹ Total run time was 13.32267 seconds
     ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
     ## ℹ Maximum gradient= 0.00022
     ## ℹ Negative log likelihood (NLL):

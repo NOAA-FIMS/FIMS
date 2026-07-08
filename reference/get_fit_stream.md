@@ -46,7 +46,7 @@ subset of the augmented data.
 
 In the FIMS output the `fleet` column is `NA` for derived-quantity rows
 (which is where all observed/expected pairs live). Use `module_id`
-instead to distinguish fleets and surveys — this matches the convention
+instead to distinguish fleets and surveys - this matches the convention
 used in the FIMS vignettes, where `module_id == 1` is the first fishing
 fleet and `module_id == 2` is the first survey. To discover which
 `module_id` values are present in your fit, inspect `augment(fit)`
@@ -66,7 +66,7 @@ fit <- create_default_parameters(
   initialize_fims(data = data_4_model) |>
   fit_fims(optimize = TRUE)
 
-# Landings for the fishing fleet (module_id 1) — compute RMSE
+# Landings for the fishing fleet (module_id 1) - compute RMSE
 get_fit_stream(fit, stream_label = "landings_expected", module_id = 1) |>
   yardstick::rmse(truth = .truth, estimate = .pred)
 

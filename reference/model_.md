@@ -10,37 +10,37 @@ will have the appropriate indexing.
 ## Usage
 
 ``` r
-model_landings(x, fleet_name)
+model_landings(x, fleet)
 
 # S4 method for class 'FIMSFrame'
-model_landings(x, fleet_name)
+model_landings(x, fleet)
 
 # S4 method for class 'data.frame'
-model_landings(x, fleet_name)
+model_landings(x, fleet)
 
-model_index(x, fleet_name)
+model_index(x, fleet)
 
 # S4 method for class 'FIMSFrame'
-model_index(x, fleet_name)
+model_index(x, fleet)
 
 # S4 method for class 'data.frame'
-model_index(x, fleet_name)
+model_index(x, fleet)
 
-model_age_comp(x, fleet_name)
+model_age_comp(x, fleet)
 
 # S4 method for class 'FIMSFrame'
-model_age_comp(x, fleet_name)
+model_age_comp(x, fleet)
 
 # S4 method for class 'data.frame'
-model_age_comp(x, fleet_name)
+model_age_comp(x, fleet)
 
-model_length_comp(x, fleet_name)
+model_length_comp(x, fleet)
 
 # S4 method for class 'FIMSFrame'
-model_length_comp(x, fleet_name)
+model_length_comp(x, fleet)
 
 # S4 method for class 'data.frame'
-model_length_comp(x, fleet_name)
+model_length_comp(x, fleet)
 
 model_weight_at_age(x)
 
@@ -66,11 +66,11 @@ model_age_to_length_conversion(x)
   An object returned from
   [`FIMSFrame()`](https://NOAA-FIMS.github.io/FIMS/reference/FIMSFrame.md).
 
-- fleet_name:
+- fleet:
 
   A string, or vector of strings, specifying the name of the fleet(s) of
-  interest that you want landings data for. The strings must exactly
-  match strings in the column `"name"` of `get_data(x)`.
+  interest that you want data for. The strings must exactly match
+  strings in the `"fleet"` column of `get_data(x)`.
 
 ## Value
 

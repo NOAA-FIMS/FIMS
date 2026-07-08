@@ -38,7 +38,7 @@ tidy(
 
   Logical (default `FALSE`). When `TRUE`, `conf.low` and `conf.high`
   columns are added using a normal approximation:
-  `estimate ± qnorm((1 + conf.level) / 2) * std.error`.
+  `estimate +/- qnorm((1 + conf.level) / 2) * std.error`.
 
 - conf.level:
 
@@ -104,16 +104,16 @@ FIMS distinguishes three `estimation_type` values:
 
 - `"fixed_effects"`:
 
-  Directly optimized parameters (selectivity, log_Fmort, log_q, …).
+  Directly optimized parameters (selectivity, log_Fmort, log_q, etc.).
 
 - `"random_effects"`:
 
-  Integrated-out random effects (log_devs, …).
+  Integrated-out random effects (log_devs, etc.).
 
 - `"derived_quantity"`:
 
   Model outputs that are not parameters (spawning biomass, expected
-  catches, …). Uncertainty here comes from the delta method via
+  catches, etc.). Uncertainty here comes from the delta method via
   [`TMB::sdreport()`](https://rdrr.io/pkg/TMB/man/sdreport.html).
 
 Pass any subset of these strings to `parameters` to control which rows

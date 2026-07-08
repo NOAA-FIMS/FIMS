@@ -28,7 +28,7 @@ which is covered in the overview vignette linked above.
 ## Data format
 
 The input data for a FIMS model is a single long data frame with the
-following columns: type, name, age, length, timing, value, unit, and
+following columns: type, fleet, age, length, timing, value, unit, and
 uncertainty. Both the single table and long format are in contrast to
 the input format for some legacy stock assessment models where the data
 are provided in multiple tables, each with a different format. The SS3
@@ -118,7 +118,7 @@ data_4_model
     ## Also defined by 'tibble'
 
     ## # A tibble: 6 × 8
-    ##   type     name     age length timing value unit       uncertainty
+    ##   type     fleet    age length timing value unit       uncertainty
     ##   <chr>    <chr>  <int>  <dbl>  <dbl> <dbl> <chr>            <dbl>
     ## 1 age_comp fleet1     1     NA      1 0.07  proportion         200
     ## 2 age_comp fleet1     2     NA      1 0.1   proportion         200
@@ -166,7 +166,7 @@ FIMS::data_big |>
   head(3)
 ```
 
-    ##       type   name age length timing    value unit uncertainty
+    ##       type  fleet age length timing    value unit uncertainty
     ## 1 landings fleet1  NA     NA      1 161.6455   mt  0.00999975
     ## 2 landings fleet1  NA     NA      2 461.0895   mt  0.00999975
     ## 3 landings fleet1  NA     NA      3 747.2900   mt  0.00999975
@@ -201,7 +201,7 @@ FIMS::data_big |>
   head(3)
 ```
 
-    ##    type    name age length timing       value unit uncertainty
+    ##    type   fleet age length timing       value unit uncertainty
     ## 1 index survey1  NA     NA      1 0.006117418   mt   0.1980422
     ## 2 index survey1  NA     NA      2 0.007156588   mt   0.1980422
     ## 3 index survey1  NA     NA      3 0.006553376   mt   0.1980422
@@ -247,7 +247,7 @@ FIMS::data_big |>
   head(3)
 ```
 
-    ##       type   name age length timing value       unit uncertainty
+    ##       type  fleet age length timing value       unit uncertainty
     ## 1 age_comp fleet1   1     NA      1 0.070 proportion         200
     ## 2 age_comp fleet1   2     NA      1 0.100 proportion         200
     ## 3 age_comp fleet1   3     NA      1 0.115 proportion         200
@@ -290,7 +290,7 @@ FIMS::data_big |>
   head(3)
 ```
 
-    ##          type   name age length timing        value       unit uncertainty
+    ##          type  fleet age length timing        value       unit uncertainty
     ## 1 length_comp fleet1  NA      0      1 9.238773e-18 proportion         200
     ## 2 length_comp fleet1  NA     50      1 5.892510e-12 proportion         200
     ## 3 length_comp fleet1  NA    100      1 1.610390e-07 proportion         200
@@ -344,7 +344,7 @@ FIMS::data_big |>
   head(3)
 ```
 
-    ##            type   name age length timing        value unit uncertainty
+    ##            type  fleet age length timing        value unit uncertainty
     ## 1 weight_at_age fleet1   1     NA      1 0.0005306555   mt          NA
     ## 2 weight_at_age fleet1   1     NA      2 0.0005306555   mt          NA
     ## 3 weight_at_age fleet1   1     NA      3 0.0005306555   mt          NA
@@ -356,7 +356,7 @@ FIMS::data_big |>
   tail(3)
 ```
 
-    ##              type   name age length timing       value unit uncertainty
+    ##              type  fleet age length timing       value unit uncertainty
     ## 370 weight_at_age fleet1  12     NA     29 0.009636695   mt          NA
     ## 371 weight_at_age fleet1  12     NA     30 0.009636695   mt          NA
     ## 372 weight_at_age fleet1  12     NA     31 0.009636695   mt          NA
@@ -431,10 +431,10 @@ FIMS::data_big |>
   head(3)
 ```
 
-    ##                       type name age length timing        value       unit
-    ## 1 age_to_length_conversion <NA>   1      0     NA 1.261739e-16 proportion
-    ## 2 age_to_length_conversion <NA>   1     50     NA 8.385820e-11 proportion
-    ## 3 age_to_length_conversion <NA>   1    100     NA 2.297363e-06 proportion
+    ##                       type fleet age length timing        value       unit
+    ## 1 age_to_length_conversion  <NA>   1      0     NA 1.261739e-16 proportion
+    ## 2 age_to_length_conversion  <NA>   1     50     NA 8.385820e-11 proportion
+    ## 3 age_to_length_conversion  <NA>   1    100     NA 2.297363e-06 proportion
     ##   uncertainty
     ## 1         200
     ## 2         200
@@ -447,10 +447,10 @@ FIMS::data_big |>
   tail(3)
 ```
 
-    ##                         type name age length timing        value       unit
-    ## 274 age_to_length_conversion <NA>  12   1000     NA 8.704578e-05 proportion
-    ## 275 age_to_length_conversion <NA>  12   1050     NA 4.607774e-06 proportion
-    ## 276 age_to_length_conversion <NA>  12   1100     NA 1.572035e-07 proportion
+    ##                         type fleet age length timing        value       unit
+    ## 274 age_to_length_conversion  <NA>  12   1000     NA 8.704578e-05 proportion
+    ## 275 age_to_length_conversion  <NA>  12   1050     NA 4.607774e-06 proportion
+    ## 276 age_to_length_conversion  <NA>  12   1100     NA 1.572035e-07 proportion
     ##     uncertainty
     ## 274         200
     ## 275         200

@@ -97,10 +97,10 @@ Any regression metric that accepts <code>truth</code> / <code>estimate</code> (a
 
 <dt id="arg-group-by">group_by<a class="anchor" aria-label="anchor" href="#arg-group-by"></a></dt>
 <dd><p>A character vector of column names in the augmented tibble
-to group by before computing metrics.  Common choices:</p><ul><li><p><code>"label"</code>        – one row-set per data-stream label</p></li>
-<li><p><code>"fleet"</code>        – one row-set per fleet</p></li>
-<li><p><code>"distribution"</code> – one row-set per likelihood distribution</p></li>
-<li><p><code>c("label", "fleet")</code> – per label × fleet combination
+to group by before computing metrics.  Common choices:</p><ul><li><p><code>"label"</code>        - one row-set per data-stream label</p></li>
+<li><p><code>"fleet"</code>        - one row-set per fleet</p></li>
+<li><p><code>"distribution"</code> - one row-set per likelihood distribution</p></li>
+<li><p><code>c("label", "fleet")</code> - per label x fleet combination
 Defaults to <code>NULL</code> (no grouping).</p></li>
 </ul></dd>
 
@@ -146,7 +146,7 @@ Pass one or more column names to <code>group_by</code> to get per-stream breakdo
 <span class="r-in"><span>  <span class="fu"><a href="initialize_fims.html">initialize_fims</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">data_4_model</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="fit_fims.html">fit_fims</a></span><span class="op">(</span>optimize <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Overall RMSE / MAE / R² across all data streams</span></span></span>
+<span class="r-in"><span><span class="co"># Overall RMSE / MAE / R^2 across all data streams</span></span></span>
 <span class="r-in"><span><span class="fu">get_fit_metrics</span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Per-data-stream: one row-set per label</span></span></span>

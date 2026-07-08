@@ -92,7 +92,7 @@ Following the [tidyverse style guide](https://style.tidyverse.org/):
 - **Functions**: snake_case (e.g., `initialize_selectivity`,
   `m_agecomp`)
 - **Classes**: PascalCase (e.g., `LogisticSelectivity`)
-- **Variables**: snake_case (e.g., `fleet_name`, `module_input`)
+- **Variables**: snake_case (e.g., `module_name`, `module_input`)
 
 ### Module-Specific Conventions
 
