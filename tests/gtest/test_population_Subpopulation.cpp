@@ -106,9 +106,7 @@ TEST(SexStratumSplitFactors, DefaultSexPartition) {
                    1.0 - p_female);
 }
 
-// Verifies sex level is read from each encoded stratum. Not a production
-// split recipe for multi-axis specs; area allocation is user-defined.
-TEST(SexStratumSplitFactors, ReadsSexLevelFromMultiAxisSpec) {
+TEST(SexStratumSplitFactors, RejectsMultiAxisPartitionSpec) {
   fims_popdy::PartitionSpec spec;
   fims_popdy::Axis sex_axis;
   sex_axis.name = "sex";
@@ -119,20 +117,11 @@ TEST(SexStratumSplitFactors, ReadsSexLevelFromMultiAxisSpec) {
   spec.axes.push_back(std::move(sex_axis));
   spec.axes.push_back(std::move(area_axis));
 
-  const double p_female = 0.4;
-  const std::vector<double> split_factors =
-      fims_popdy::SexStratumSplitFactors(spec, p_female);
-
-  ASSERT_EQ(split_factors.size(), 8);
-  for (size_t stratum = 0; stratum < 4; ++stratum) {
-    EXPECT_DOUBLE_EQ(split_factors[stratum], p_female);
-  }
-  for (size_t stratum = 4; stratum < 8; ++stratum) {
-    EXPECT_DOUBLE_EQ(split_factors[stratum], 1.0 - p_female);
-  }
+  EXPECT_THROW(fims_popdy::SexStratumSplitFactors(spec, 0.4),
+               std::invalid_argument);
 }
 
-TEST(SexStratumSplitFactors, RejectsMissingSexAxis) {
+TEST(SexStratumSplitFactors, RejectsAreaOnlyPartitionSpec) {
   fims_popdy::PartitionSpec spec;
   fims_popdy::Axis area_axis;
   area_axis.name = "area";
