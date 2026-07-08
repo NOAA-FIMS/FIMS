@@ -18,7 +18,7 @@ if (!file.exists(testthat::test_path("fixtures", "fit_age_length_comp.RDS"))) {
 # Define the expected column names for the estimates tibble
 expected_colnames <- c(
   "module_name", "module_id", "module_type", "label", "type", "type_id",
-  "parameter_id", "fleet", "year_i", "age_i", "length_i",
+  "parameter_id", "fleet", "year_i", "age_i", "stratum_i", "length_i",
   "input", "estimated", "expected", "observed",
   "estimation_type", "uncertainty",
   "distribution", "input_type",
