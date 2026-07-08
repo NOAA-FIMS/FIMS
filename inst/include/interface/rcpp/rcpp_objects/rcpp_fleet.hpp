@@ -118,43 +118,98 @@ class FleetInterface : public FleetInterfaceBase {
    * @brief The natural log of the index of abundance scaling parameter
    * for this fleet.
    */
-  ParameterVector log_q;
+  VariableVector log_q;
   /**
    * @brief The vector of the natural log of fishing mortality rates for this
    * fleet.
    */
-  ParameterVector log_Fmort;
-  /**
-   * @brief The vector of natural log of the expected total landings for
-   * the fleet.
-   */
-  ParameterVector log_landings_expected;
-  /**
-   * @brief The vector of natural log of the expected index of abundance
-   * for the fleet.
-   */
-  ParameterVector log_index_expected;
-  /**
-   * @brief The vector of expected landings-at-age in numbers for the fleet.
-   */
-  ParameterVector agecomp_expected;
-  /**
-   * @brief The vector of expected landings-at-length in numbers for the fleet.
-   */
-  ParameterVector lengthcomp_expected;
-  /**
-   * @brief The vector of expected landings-at-age in numbers for the fleet.
-   */
-  ParameterVector agecomp_proportion;
-  /**
-   * @brief The vector of expected landings-at-length in numbers for the fleet.
-   */
-  ParameterVector lengthcomp_proportion;
+  VariableVector log_Fmort;
+
   /**
    * @brief The vector of conversions to go from age to length, i.e., the
    * age-to-length-conversion matrix.
    */
-  ParameterVector age_to_length_conversion;
+  VariableVector age_to_length_conversion;
+
+  // Fleet based derived quantities
+  /**
+   * @brief Annual landings at age in numbers for a specific fleet.
+   */
+  VariableVector landings_numbers_at_age;
+  /**
+   * @brief Annual landings at age in weight for a specific fleet.
+   */
+  VariableVector landings_weight_at_age;
+  /**
+   * @brief Annual landings at length in numbers for a specific fleet.
+   */
+  VariableVector landings_numbers_at_length;
+  /**
+   * @brief Total landings in weight for a specific fleet.
+   */
+  VariableVector landings_weight;
+  /**
+   * @brief Total landings in numbers for a specific fleet.
+   */
+  VariableVector landings_numbers;
+  /**
+   * @brief Total expected landings for a specific fleet, where the units of
+   * the measurement depend on the specified units for that fleet.
+   */
+  VariableVector landings_expected;
+  /**
+   * @brief Log total expected landings for a specific fleet, where the units
+   * of the measurement depend on the specified units for that fleet.
+   */
+  VariableVector log_landings_expected;
+  /**
+   * @brief Proportion of total landings by age used to specify the age
+   * composition.
+   */
+  VariableVector agecomp_proportion;
+  /**
+   * @brief Proportion of total landings by length used to specify the length
+   * composition.
+   */
+  VariableVector lengthcomp_proportion;
+  /**
+   * @brief Numbers at age for a fleet index such as survey or CPUE.
+   */
+  VariableVector index_numbers_at_age;
+  /**
+   * @brief Weight at age for a fleet index such as survey or CPUE.
+   */
+  VariableVector index_weight_at_age;
+  /**
+   * @brief Numbers at length for a fleet index such as survey or CPUE.
+   */
+  VariableVector index_numbers_at_length;
+  /**
+   * @brief Total weight for a fleet index such as survey or CPUE.
+   */
+  VariableVector index_weight;
+  /**
+   * @brief Total numbers for a fleet index such as survey or CPUE.
+   */
+  VariableVector index_numbers;
+  /**
+   * @brief Expected value for a fleet index, where the units of the
+   * measurement depend on the specified units for that fleet.
+   */
+  VariableVector index_expected;
+  /**
+   * @brief Log expected value for a fleet index, where the units of the
+   * measurement depend on the specified units for that fleet.
+   */
+  VariableVector log_index_expected;
+  /**
+   * @brief Expected age-composition proportions for the fleet.
+   */
+  VariableVector agecomp_expected;
+  /**
+   * @brief Expected length-composition proportions for the fleet.
+   */
+  VariableVector lengthcomp_expected;
 
   /**
    * @brief The constructor.
@@ -192,13 +247,25 @@ class FleetInterface : public FleetInterfaceBase {
         observed_index_units(other.observed_index_units),
         log_q(other.log_q),
         log_Fmort(other.log_Fmort),
+        age_to_length_conversion(other.age_to_length_conversion),
+        landings_numbers_at_age(other.landings_numbers_at_age),
+        landings_weight_at_age(other.landings_weight_at_age),
+        landings_numbers_at_length(other.landings_numbers_at_length),
+        landings_weight(other.landings_weight),
+        landings_numbers(other.landings_numbers),
+        landings_expected(other.landings_expected),
         log_landings_expected(other.log_landings_expected),
-        log_index_expected(other.log_index_expected),
-        agecomp_expected(other.agecomp_expected),
-        lengthcomp_expected(other.lengthcomp_expected),
         agecomp_proportion(other.agecomp_proportion),
         lengthcomp_proportion(other.lengthcomp_proportion),
-        age_to_length_conversion(other.age_to_length_conversion) {}
+        index_numbers_at_age(other.index_numbers_at_age),
+        index_weight_at_age(other.index_weight_at_age),
+        index_numbers_at_length(other.index_numbers_at_length),
+        index_weight(other.index_weight),
+        index_numbers(other.index_numbers),
+        index_expected(other.index_expected),
+        log_index_expected(other.log_index_expected),
+        agecomp_expected(other.agecomp_expected),
+        lengthcomp_expected(other.lengthcomp_expected) {}
 
   /**
    * @brief The destructor.

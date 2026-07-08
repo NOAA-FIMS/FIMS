@@ -12,26 +12,26 @@
 # Load or prepare any necessary data for testing
 
 ## IO correctness ----
-test_that("rcpp ParameterVector works as expected", {
+test_that("rcpp VariableVector works as expected", {
   v_size <- 10
   v1_value <- 1.0
   v2_value <- 2.0
 
   # Test that default constructor works
-  v0 <- methods::new(ParameterVector)
+  v0 <- methods::new(VariableVector)
   #' @description Test that default constructor creates a vector of size 1.
   expect_equal(length(v0), 1)
   #' @description Test that `at()` method works.
   expect_equal(v0$at(1)$value, 0)
 
-  v1 <- methods::new(ParameterVector, v_size)
+  v1 <- methods::new(VariableVector, v_size)
   v1$fill(v1_value)
   for (i in 1:v_size) {
-    #' @description Test that `fill()` and `get()` methods work for `ParameterVector`.
+    #' @description Test that `fill()` and `get()` methods work for `VariableVector`.
     expect_equal(v1$get(i - 1)$value, v1_value)
   }
 
-  v2 <- methods::new(ParameterVector, rep(v2_value, v_size), v_size)
+  v2 <- methods::new(VariableVector, rep(v2_value, v_size), v_size)
   for (i in 1:v_size) {
     #' @description Test that constructor that takes vector and size works.
     expect_equal(v2$get(i - 1)$value, v2_value)
@@ -194,26 +194,26 @@ test_that("rcpp ParameterVector works as expected", {
 # No edge cases to test for this function.
 
 ## Error handling ----
-test_that("ParameterVector returns correct error messages", {
-  v0 <- methods::new(ParameterVector)
+test_that("VariableVector returns correct error messages", {
+  v0 <- methods::new(VariableVector)
   #' @description Test that at method returns expected error.
-  expect_error(v0$at(10)$value, regexp = "ParameterVector: Index out of range")
+  expect_error(v0$at(10)$value, regexp = "VariableVector: Index out of range")
 
   #' @description Test that get method returns expected error.
-  expect_error(v0$get(10)$value, regexp = "ParameterVector: Index out of range")
+  expect_error(v0$get(10)$value, regexp = "VariableVector: Index out of range")
 
-  #' @description Test that ParameterVector returns an error message when trying to make a vector that has dimensions larger than specified in x.
+  #' @description Test that VariableVector returns an error message when trying to make a vector that has dimensions larger than specified in x.
   expect_error(
-    methods::new(ParameterVector, 1:3, 5),
+    methods::new(VariableVector, 1:3, 5),
     "must equal the requested size"
   )
 })
 
-test_that("rcpp ParameterVector supports indexed numeric replacement", {
+test_that("rcpp VariableVector supports indexed numeric replacement", {
   distribution <- methods::new(DlnormDistribution)
   distribution$log_sd[] <- 1:10
 
-  #' @description Test that replacing one ParameterVector element with a numeric scalar updates its value.
+  #' @description Test that replacing one VariableVector element with a numeric scalar updates its value.
   distribution$log_sd[1] <- 8
   expect_equal(distribution$log_sd[1]$value, 8)
   expect_equal(
@@ -225,11 +225,11 @@ test_that("rcpp ParameterVector supports indexed numeric replacement", {
     c(8, 2:10)
   )
 
-  #' @description Test that replacing an explicitly vector-indexed ParameterVector element with a numeric scalar updates its value.
+  #' @description Test that replacing an explicitly vector-indexed VariableVector element with a numeric scalar updates its value.
   distribution$log_sd[c(1)] <- 9
   expect_equal(distribution$log_sd[1]$value, 9)
 
-  #' @description Test that replacing multiple ParameterVector elements with numeric values updates their values.
+  #' @description Test that replacing multiple VariableVector elements with numeric values updates their values.
   distribution$log_sd[c(2, 3)] <- c(20, 30)
   expect_equal(distribution$log_sd[2]$value, 20)
   expect_equal(distribution$log_sd[3]$value, 30)
