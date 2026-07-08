@@ -49,13 +49,13 @@ docs.
 \item \href{https://noaa-fims.github.io/FIMS/doxygen/classLogRRecruitmentInterface.html}{LogRRecruitmentProcess}
 \item \href{https://noaa-fims.github.io/FIMS/doxygen/classLogisticMaturityInterface.html}{LogisticMaturity}
 \item \href{https://noaa-fims.github.io/FIMS/doxygen/classLogisticSelectivityInterface.html}{LogisticSelectivity}
-\item \href{https://noaa-fims.github.io/FIMS/doxygen/classVariable.html}{Variable}
-\item \href{https://noaa-fims.github.io/FIMS/doxygen/classVariableVector.html}{VariableVector}
 \item \href{https://noaa-fims.github.io/FIMS/doxygen/classPopulationInterface.html}{Population}
 \item \href{https://noaa-fims.github.io/FIMS/doxygen/classRealVector.html}{RealVector}
 \item \href{https://noaa-fims.github.io/FIMS/doxygen/classSharedInt.html}{SharedInt}
 \item \href{https://noaa-fims.github.io/FIMS/doxygen/classSharedReal.html}{SharedReal}
 \item \href{https://noaa-fims.github.io/FIMS/doxygen/classSharedString.html}{SharedString}
+\item \href{https://noaa-fims.github.io/FIMS/doxygen/classVariable.html}{Variable}
+\item \href{https://noaa-fims.github.io/FIMS/doxygen/classVariableVector.html}{VariableVector}
 }
 }
 \section{C++ Documentation}{
