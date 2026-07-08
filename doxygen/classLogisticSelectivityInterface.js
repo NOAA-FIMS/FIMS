@@ -7,6 +7,6 @@ var classLogisticSelectivityInterface =
     [ "finalize", "classLogisticSelectivityInterface.html#a2dc07a0b7520cb94533279312ca6a944", null ],
     [ "get_id", "classLogisticSelectivityInterface.html#ab293bd02d59b6672317a3b3b6b979fb3", null ],
     [ "to_json", "classLogisticSelectivityInterface.html#a6868e2168d5ebb91931548e9a3b508bc", null ],
-    [ "inflection_point", "classLogisticSelectivityInterface.html#a561e7e782ff948a2ab666095640b4232", null ],
-    [ "slope", "classLogisticSelectivityInterface.html#ad68100be3ce5eddf84819939c5c7785c", null ]
+    [ "inflection_point", "classLogisticSelectivityInterface.html#acfe913ccf31a10fa3835645b26faccd9", null ],
+    [ "slope", "classLogisticSelectivityInterface.html#a50aaa4e5b7f41ea303fc8051f5fe4e7b", null ]
 ];

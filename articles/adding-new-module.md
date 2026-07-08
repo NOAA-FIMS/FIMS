@@ -300,20 +300,20 @@ model setup, and the object lifecycle used by FIMS.
 Two different vector-like types appear in the module workflow, and they
 serve different purposes:
 
-- **`Parameter`** in
+- **`Variable`** in
   `inst/include/interface/rcpp/rcpp_objects/rcpp_interface_base.hpp`
   stores metadata for a single estimable quantity, including:
   - `initial_value_m`
   - `final_value_m`
   - `estimation_type_m`
   - `id_m`
-- **`ParameterVector`** is the Rcpp-facing container that holds
-  `Parameter` objects and is exposed to R.
+- **`VariableVector`** is the Rcpp-facing container that holds
+  `Variable` objects and is exposed to R.
 - **`fims::Vector<Type>`** is the templated C++ computation container
   used inside the functor implementation.
 
 This distinction matters because the interface class receives
-`ParameterVector` fields from R, then copies only the values into
+`VariableVector` fields from R, then copies only the values into
 `fims::Vector<Type>` objects inside `add_to_fims_tmb_internal()`.
 
 A simple R example from the current selectivity tests looks like this:
@@ -360,8 +360,8 @@ std::map<uint32_t, std::shared_ptr<SelectivityInterfaceBase>>
 
 class LogisticSelectivityInterface : public SelectivityInterfaceBase {
  public:
-  ParameterVector inflection_point;
-  ParameterVector slope;
+  VariableVector inflection_point;
+  VariableVector slope;
 
   LogisticSelectivityInterface() : SelectivityInterfaceBase() {
     SelectivityInterfaceBase::live_objects[this->id] =
@@ -389,8 +389,8 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
 
 - **Base interface class**: manages shared ID behavior and the common
   interface contract.
-- **Concrete interface class**: exposes module-specific
-  `ParameterVector` fields to R.
+- **Concrete interface class**: exposes module-specific `VariableVector`
+  fields to R.
 - **Constructor registration**: the object must be stored in both
   `live_objects` and `fims_interface_objects` so it participates in the
   FIMS lifecycle.
@@ -403,7 +403,7 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
 
 The most important integration work happens in
 `add_to_fims_tmb_internal()`. This is the function that copies values
-out of the R-facing `ParameterVector` objects, registers estimable
+out of the R-facing `VariableVector` objects, registers estimable
 parameters, and stores the C++ object in the `Information` singleton.
 
 ``` cpp
@@ -453,7 +453,7 @@ bool add_to_fims_tmb_internal() {
 
 - **Information singleton lookup**: gives the interface access to the
   shared TMB state for the current type.
-- **Value copy from `ParameterVector` to `fims::Vector<Type>`**: moves
+- **Value copy from `VariableVector` to `fims::Vector<Type>`**: moves
   user-provided parameter values into the computation object.
 - **Parameter-name registration**: ensures output uses stable,
   interpretable names.
@@ -605,7 +605,7 @@ It then populates each field by either:
 
 - setting scalar/shared values such as `n_ages` or `n_years`,
 - filling `RealVector` fields such as `ages` or `weights`, or
-- calling `set_param_vector()` for `ParameterVector` fields.
+- calling `set_param_vector()` for `VariableVector` fields.
 
 That means a new module type typically needs:
 
@@ -767,7 +767,7 @@ whenever your new module changes the documented workflow.
 
 Keep the current distinction clear:
 
-- use **`ParameterVector`** in the Rcpp interface layer,
+- use **`VariableVector`** in the Rcpp interface layer,
 - use **`fims::Vector<Type>`** in the C++ implementation layer.
 
 ``` cpp

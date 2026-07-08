@@ -68,8 +68,6 @@ var annotated_dup =
     [ "LogisticSelectivityInterface", "classLogisticSelectivityInterface.html", "classLogisticSelectivityInterface" ],
     [ "LogRRecruitmentInterface", "classLogRRecruitmentInterface.html", "classLogRRecruitmentInterface" ],
     [ "MaturityInterfaceBase", "classMaturityInterfaceBase.html", "classMaturityInterfaceBase" ],
-    [ "Parameter", "classParameter.html", "classParameter" ],
-    [ "ParameterVector", "classParameterVector.html", "classParameterVector" ],
     [ "PopulationInterface", "classPopulationInterface.html", "classPopulationInterface" ],
     [ "PopulationInterfaceBase", "classPopulationInterfaceBase.html", "classPopulationInterfaceBase" ],
     [ "RealVector", "classRealVector.html", "classRealVector" ],
@@ -78,5 +76,7 @@ var annotated_dup =
     [ "SharedBoolean", "classSharedBoolean.html", "classSharedBoolean" ],
     [ "SharedInt", "classSharedInt.html", "classSharedInt" ],
     [ "SharedReal", "classSharedReal.html", "classSharedReal" ],
-    [ "SharedString", "classSharedString.html", "classSharedString" ]
+    [ "SharedString", "classSharedString.html", "classSharedString" ],
+    [ "Variable", "classVariable.html", "classVariable" ],
+    [ "VariableVector", "classVariableVector.html", "classVariableVector" ]
 ];

@@ -7,6 +7,6 @@ var classLogisticMaturityInterface =
     [ "finalize", "classLogisticMaturityInterface.html#aa714a1ef8cd5d36f545b9e4f5c71aac5", null ],
     [ "get_id", "classLogisticMaturityInterface.html#a9c9ab0ceda4ae98e6335e8a31b6ab6a0", null ],
     [ "to_json", "classLogisticMaturityInterface.html#ad239da2246abb3476ff179540fad8d7c", null ],
-    [ "inflection_point", "classLogisticMaturityInterface.html#a896a2d21435c89d6e97254c40ae08a63", null ],
-    [ "slope", "classLogisticMaturityInterface.html#a70646d633dee4a9a6c8a594cd6832e9e", null ]
+    [ "inflection_point", "classLogisticMaturityInterface.html#a7e2423a68bc131be62928f7c4b10610d", null ],
+    [ "slope", "classLogisticMaturityInterface.html#a45782f0c71077b8a4564950e3b7a0428", null ]
 ];

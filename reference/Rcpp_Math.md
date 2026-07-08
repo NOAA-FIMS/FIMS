@@ -11,28 +11,28 @@ Methods of mathematical functions include trigonometry functions, `abs`,
 ## Usage
 
 ``` r
-# S4 method for class 'Rcpp_Parameter,Rcpp_Parameter'
+# S4 method for class 'Rcpp_Variable,Rcpp_Variable'
 Ops(e1, e2)
 
-# S4 method for class 'Rcpp_Parameter,numeric'
+# S4 method for class 'Rcpp_Variable,numeric'
 Ops(e1, e2)
 
-# S4 method for class 'numeric,Rcpp_Parameter'
+# S4 method for class 'numeric,Rcpp_Variable'
 Ops(e1, e2)
 
-# S4 method for class 'Rcpp_ParameterVector,Rcpp_ParameterVector'
+# S4 method for class 'Rcpp_VariableVector,Rcpp_VariableVector'
 Ops(e1, e2)
 
-# S4 method for class 'Rcpp_ParameterVector,numeric'
+# S4 method for class 'Rcpp_VariableVector,numeric'
 Ops(e1, e2)
 
 # S4 method for class 'Rcpp_RealVector,numeric'
 Ops(e1, e2)
 
-# S4 method for class 'numeric,Rcpp_ParameterVector'
+# S4 method for class 'numeric,Rcpp_VariableVector'
 Ops(e1, e2)
 
-# S4 method for class 'Rcpp_ParameterVector'
+# S4 method for class 'Rcpp_VariableVector'
 Math(x)
 ```
 
@@ -40,12 +40,12 @@ Math(x)
 
 - e1, e2:
 
-  An Rcpp_Parameter or Rcpp_ParameterVector class object or a numeric
+  An Rcpp_Variable or Rcpp_VariableVector class object or a numeric
   vector or value.
 
 - x:
 
-  An Rcpp_ParameterVector class object.
+  An Rcpp_VariableVector class object.
 
 ## Value
 

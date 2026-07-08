@@ -1,4 +1,4 @@
-# Setter for `Rcpp_ParameterVector`
+# Setter for `Rcpp_VariableVector`
 
 In R, indexing starts at one. But, in C++ indexing starts at zero. These
 functions do the translation for you so you can think in R terms.
@@ -12,22 +12,22 @@ Methods of summary functions include `max`, `min`, `range`, `prod`,
 ## Usage
 
 ``` r
-# S4 method for class 'Rcpp_ParameterVector,ANY,ANY,ANY'
+# S4 method for class 'Rcpp_VariableVector,ANY,ANY,ANY'
 x[i, j] <- value
 
-# S4 method for class 'Rcpp_ParameterVector,numeric,ANY,ANY'
+# S4 method for class 'Rcpp_VariableVector,numeric,ANY,ANY'
 x[i]
 
-# S4 method for class 'Rcpp_ParameterVector'
+# S4 method for class 'Rcpp_VariableVector'
 length(x)
 
-# S4 method for class 'Rcpp_ParameterVector'
+# S4 method for class 'Rcpp_VariableVector'
 sum(x)
 
-# S4 method for class 'Rcpp_ParameterVector'
+# S4 method for class 'Rcpp_VariableVector'
 dim(x)
 
-# S4 method for class 'Rcpp_ParameterVector'
+# S4 method for class 'Rcpp_VariableVector'
 Summary(x)
 ```
 
@@ -35,7 +35,7 @@ Summary(x)
 
 - x:
 
-  An Rcpp_ParameterVector class object.
+  An Rcpp_VariableVector class object.
 
 - i:
 
@@ -44,7 +44,7 @@ Summary(x)
 
 - j:
 
-  Not used with `Rcpp_ParameterVector` because it is a vector.
+  Not used with `Rcpp_VariableVector` because it is a vector.
 
 - value:
 

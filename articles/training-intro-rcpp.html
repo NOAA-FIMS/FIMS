@@ -185,7 +185,7 @@ C++ code in <code><a href="https://rdrr.io/pkg/Rcpp/man/cppFunction.html" class=
 <span><span class="co"># after compiling, add works like a regular R function</span></span>
 <span><span class="va">add</span></span></code></pre></div>
 <pre><code><span><span class="co">## function (x, y, z) </span></span>
-<span><span class="co">## .Call(&lt;pointer: 0x7f52b3b36410&gt;, x, y, z)</span></span></code></pre>
+<span><span class="co">## .Call(&lt;pointer: 0x7fe6ee08a3f0&gt;, x, y, z)</span></span></code></pre>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">add</span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">3</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] 6</span></span></code></pre>
@@ -290,9 +290,9 @@ compiled <code>meanC</code> function against the R function
 <span>  <span class="fu">meanC</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Unit: microseconds</span></span>
-<span><span class="co">##      expr     min      lq     mean   median       uq       max neval</span></span>
-<span><span class="co">##   mean(x) 426.266 435.979 441.6390 439.0645 446.6330   525.541   100</span></span>
-<span><span class="co">##  meanC(x) 371.955 372.350 478.3413 372.9555 382.8945 10522.872   100</span></span></code></pre>
+<span><span class="co">##      expr     min       lq     mean   median       uq       max neval</span></span>
+<span><span class="co">##   mean(x) 468.355 491.8845 500.7801 493.4720 502.9005   899.174   100</span></span>
+<span><span class="co">##  meanC(x) 105.477 105.6715 212.4096 106.3725 107.0390 10593.407   100</span></span></code></pre>
 </details>
 </div>
 <div class="section level3">
@@ -570,7 +570,7 @@ functions.</p>
 </h3>
 <p>Within FIMS, we first use <code>RCPP_EXPOSED_CLASS()</code> to expose
 all of our new type classes, e.g.,
-<code>RCPP_EXPOSED_CLASS(Parameter)</code> in <a href="https://github.com/NOAA-FIMS/FIMS/blob/main/src/fims_modules.hpp" class="external-link"><code>src/fims_modules.hpp</code></a>.
+<code>RCPP_EXPOSED_CLASS(Variable)</code> in <a href="https://github.com/NOAA-FIMS/FIMS/blob/main/src/fims_modules.hpp" class="external-link"><code>src/fims_modules.hpp</code></a>.
 Once all of the type classes are exposed, we then use a single instance
 of <code>RCPP_MODULE</code> to expose the C++ to R in that same
 file.</p>
@@ -587,7 +587,7 @@ file.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer>

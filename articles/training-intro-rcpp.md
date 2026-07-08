@@ -64,7 +64,7 @@ add
 ```
 
     ## function (x, y, z) 
-    ## .Call(<pointer: 0x7f52b3b36410>, x, y, z)
+    ## .Call(<pointer: 0x7fe6ee08a3f0>, x, y, z)
 
 ``` r
 
@@ -193,9 +193,9 @@ microbenchmark(
 ```
 
     ## Unit: microseconds
-    ##      expr     min      lq     mean   median       uq       max neval
-    ##   mean(x) 426.266 435.979 441.6390 439.0645 446.6330   525.541   100
-    ##  meanC(x) 371.955 372.350 478.3413 372.9555 382.8945 10522.872   100
+    ##      expr     min       lq     mean   median       uq       max neval
+    ##   mean(x) 468.355 491.8845 500.7801 493.4720 502.9005   899.174   100
+    ##  meanC(x) 105.477 105.6715 212.4096 106.3725 107.0390 10593.407   100
 
 ### C++ in FIMS
 
@@ -468,7 +468,7 @@ and use them as arguments or return values in Rcpp-exposed functions.
 ### Modules in FIMS
 
 Within FIMS, we first use `RCPP_EXPOSED_CLASS()` to expose all of our
-new type classes, e.g., `RCPP_EXPOSED_CLASS(Parameter)` in
+new type classes, e.g., `RCPP_EXPOSED_CLASS(Variable)` in
 [`src/fims_modules.hpp`](https://github.com/NOAA-FIMS/FIMS/blob/main/src/fims_modules.hpp).
 Once all of the type classes are exposed, we then use a single instance
 of `RCPP_MODULE` to expose the C++ to R in that same file.

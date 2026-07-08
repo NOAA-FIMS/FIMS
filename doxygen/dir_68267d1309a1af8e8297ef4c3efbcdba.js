@@ -24,11 +24,11 @@ var dir_68267d1309a1af8e8297ef4c3efbcdba =
     [ "rcpp_maturity.cpp", "rcpp__maturity_8cpp.html", "rcpp__maturity_8cpp" ],
     [ "rcpp_models.cpp", "rcpp__models_8cpp.html", "rcpp__models_8cpp" ],
     [ "rcpp_natural_mortality.cpp", "rcpp__natural__mortality_8cpp.html", null ],
-    [ "rcpp_parameter.cpp", "rcpp__parameter_8cpp.html", "rcpp__parameter_8cpp" ],
     [ "rcpp_population.cpp", "rcpp__population_8cpp.html", "rcpp__population_8cpp" ],
     [ "rcpp_recruitment.cpp", "rcpp__recruitment_8cpp.html", "rcpp__recruitment_8cpp" ],
     [ "rcpp_selectivity.cpp", "rcpp__selectivity_8cpp.html", "rcpp__selectivity_8cpp" ],
     [ "rcpp_shared_primitive.cpp", "rcpp__shared__primitive_8cpp.html", "rcpp__shared__primitive_8cpp" ],
+    [ "rcpp_variable.cpp", "rcpp__variable_8cpp.html", "rcpp__variable_8cpp" ],
     [ "recruitment.cpp", "recruitment_8cpp.html", null ],
     [ "selectivity.cpp", "selectivity_8cpp.html", null ],
     [ "TMB.cpp", "TMB_8cpp.html", null ]

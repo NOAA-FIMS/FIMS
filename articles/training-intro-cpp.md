@@ -164,10 +164,9 @@ be compound integer if the vector is composed of integers, compound
 double if the vector is composed of doubles, and so on. The type of all
 elements in the vector must be the same and must be declared when the
 vector is created, e.g., `std::vector<int>`. For example, in FIMS we
-have a vector of parameter names that we declare as a vector of strings,
-e.g., `std::vector<std::string> parameter_names` in
+have a vector of variable names that we declare as a vector of strings,
+e.g., `std::vector<std::string> variable_names` in
 [`information.hpp`](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/common/information.hpp).
-
 `std::vector` has a number of member functions (see the [rcpp methods
 section in the Rcpp
 vignette](https://NOAA-FIMS.github.io/FIMS/articles/training-intro-rcpp.html#rcpp-methods))
@@ -739,8 +738,8 @@ pointer()
 ```
 
     ## x is equal to the address of y
-    ## x is: 0x7ffe0aab69b4
-    ## The address of y is: 0x7ffe0aab69b4
+    ## x is: 0x7ffe4ac6f2b4
+    ## The address of y is: 0x7ffe4ac6f2b4
     ## *x returns the value of y: 3.1459
 
     ## [1] 0
@@ -781,8 +780,8 @@ reference()
 
     ## x is: 3
     ## y is: 3
-    ## The memory address of x is: 0x7ffe0aab69b4
-    ## The memory address of y is: 0x7ffe0aab69b4
+    ## The memory address of x is: 0x7ffe4ac6f2b4
+    ## The memory address of y is: 0x7ffe4ac6f2b4
 
     ## [1] 0
 
@@ -855,9 +854,9 @@ reassign_pointer()
 ```
 
     ## c now equals the address of b
-    ## &a = 0x7ffe0aab69b0
-    ## &b = 0x7ffe0aab69b4
-    ## c = 0x7ffe0aab69b4
+    ## &a = 0x7ffe4ac6f2b0
+    ## &b = 0x7ffe4ac6f2b4
+    ## c = 0x7ffe4ac6f2b4
     ## a = 100
     ## b = 10
     ## *c = 10
@@ -990,8 +989,8 @@ shared_pointer()
 
     ## ptr1: 42
     ## ptr2: 24
-    ## ptr1 = 0x556f800c72a0
-    ## ptr2 = 0x556f7f645a50
-    ## ptr3 = 0x556f800c72a0
+    ## ptr1 = 0x55d034caf580
+    ## ptr2 = 0x55d035337bb0
+    ## ptr3 = 0x55d034caf580
 
     ## [1] 0

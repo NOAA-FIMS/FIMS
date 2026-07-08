@@ -5,8 +5,8 @@ var classDoubleLogisticSelectivityInterface =
     [ "finalize", "classDoubleLogisticSelectivityInterface.html#ae35e641acb050c1311154539e16ecdf3", null ],
     [ "get_id", "classDoubleLogisticSelectivityInterface.html#a59dc01d2779fd81152156a19dae62fcf", null ],
     [ "to_json", "classDoubleLogisticSelectivityInterface.html#a99e6d2a07db1738ad10e33b7c786a881", null ],
-    [ "inflection_point_asc", "classDoubleLogisticSelectivityInterface.html#a47c30330966f4c4be60d469ff7d01d60", null ],
-    [ "inflection_point_desc", "classDoubleLogisticSelectivityInterface.html#a2a61582c3d83f94ddc17f5ddb01e8e89", null ],
-    [ "slope_asc", "classDoubleLogisticSelectivityInterface.html#a4571cc0b0713c0f9a8c5078dbe5b1033", null ],
-    [ "slope_desc", "classDoubleLogisticSelectivityInterface.html#a11333991775c1771dcdbb80704a90972", null ]
+    [ "inflection_point_asc", "classDoubleLogisticSelectivityInterface.html#a6f9f8a2511237c8aa0f9ff63e5914ff1", null ],
+    [ "inflection_point_desc", "classDoubleLogisticSelectivityInterface.html#a833ad9edbbbdfe656b928918d2baea6b", null ],
+    [ "slope_asc", "classDoubleLogisticSelectivityInterface.html#a6bd8b8957e79398fc0b7657331a67736", null ],
+    [ "slope_desc", "classDoubleLogisticSelectivityInterface.html#a44f546b0fd4b8be36722ec6eefe8f904", null ]
 ];

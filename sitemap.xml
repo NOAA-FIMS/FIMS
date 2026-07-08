@@ -22,8 +22,8 @@
 <url><loc>https://NOAA-FIMS.github.io/FIMS/reference/FIMSFit.html</loc></url>
 <url><loc>https://NOAA-FIMS.github.io/FIMS/reference/FIMSFrame.html</loc></url>
 <url><loc>https://NOAA-FIMS.github.io/FIMS/reference/Rcpp_Math.html</loc></url>
-<url><loc>https://NOAA-FIMS.github.io/FIMS/reference/Rcpp_ParameterVector.html</loc></url>
 <url><loc>https://NOAA-FIMS.github.io/FIMS/reference/Rcpp_RealVector.html</loc></url>
+<url><loc>https://NOAA-FIMS.github.io/FIMS/reference/Rcpp_VariableVector.html</loc></url>
 <url><loc>https://NOAA-FIMS.github.io/FIMS/reference/augment.FIMSFit.html</loc></url>
 <url><loc>https://NOAA-FIMS.github.io/FIMS/reference/create_default_configurations.html</loc></url>
 <url><loc>https://NOAA-FIMS.github.io/FIMS/reference/create_default_parameters.html</loc></url>

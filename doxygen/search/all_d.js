@@ -24,6 +24,9 @@ var searchData=
   ['models_21',['inst/include/models/',['../md_inst_2include_2README.html#autotoc_md18',1,'']]],
   ['models_5fmap_22',['models_map',['../classfims__info_1_1Information.html#a14847edc29ac248e9dcaf194d824112b',1,'fims_info::Information']]],
   ['mortality_23',['Mortality',['../glossary.html#autotoc_md1',1,'']]],
-  ['multinomial_5flpmf_2ehpp_24',['multinomial_lpmf.hpp',['../multinomial__lpmf_8hpp.html',1,'']]],
-  ['multinomiallpmf_25',['multinomiallpmf',['../structfims__distributions_1_1MultinomialLPMF.html',1,'fims_distributions::MultinomialLPMF&lt; Type &gt;'],['../structfims__distributions_1_1MultinomialLPMF.html#ab31b77abbda5863a2d6fd43cefb27b7e',1,'fims_distributions::MultinomialLPMF::MultinomialLPMF()']]]
+  ['mortality_5ff_24',['mortality_F',['../classPopulationInterface.html#a6ad979e425fc51383ea06a2177eed729',1,'PopulationInterface']]],
+  ['mortality_5fm_25',['mortality_M',['../classPopulationInterface.html#a800c5cd1b4922a57876682c171f4befb',1,'PopulationInterface']]],
+  ['mortality_5fz_26',['mortality_Z',['../classPopulationInterface.html#a03096d3a3f4e4f5920a3e8b39c5cab63',1,'PopulationInterface']]],
+  ['multinomial_5flpmf_2ehpp_27',['multinomial_lpmf.hpp',['../multinomial__lpmf_8hpp.html',1,'']]],
+  ['multinomiallpmf_28',['multinomiallpmf',['../structfims__distributions_1_1MultinomialLPMF.html',1,'fims_distributions::MultinomialLPMF&lt; Type &gt;'],['../structfims__distributions_1_1MultinomialLPMF.html#ab31b77abbda5863a2d6fd43cefb27b7e',1,'fims_distributions::MultinomialLPMF::MultinomialLPMF()']]]
 ];

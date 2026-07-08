@@ -1,5 +1,6 @@
 var searchData=
 [
-  ['years_0',['years',['../structfims__popdy_1_1Population.html#aee3ec924970cafa0d544102eaf79c9db',1,'fims_popdy::Population']]],
-  ['ymax_1',['ymax',['../classAgeCompDataInterface.html#ac072cfaa15008250fb4179b478eeab71',1,'AgeCompDataInterface::ymax'],['../classLengthCompDataInterface.html#a37b67ff89cdbdb44b5e33c8b703936cd',1,'LengthCompDataInterface::ymax'],['../classIndexDataInterface.html#a2a5d036232d8031664908e6f2a7ba027',1,'IndexDataInterface::ymax'],['../classLandingsDataInterface.html#ae8d2c28575e5ec9ea4e19f00b616e42b',1,'LandingsDataInterface::ymax']]]
+  ['wd_0',['wd',['../structfims_1_1LogEntry.html#a035f661c2f0a1c9d0b0f50b1ff01c394',1,'fims::LogEntry']]],
+  ['weights_1',['weights',['../classEWAAGrowthInterface.html#ab8265890b9f73d9f75f80c0eb81f561f',1,'EWAAGrowthInterface']]],
+  ['write_5fon_5fexit_2',['write_on_exit',['../classfims_1_1FIMSLog.html#a1f92030e24364caa377ca4ba1174a1be',1,'fims::FIMSLog']]]
 ];

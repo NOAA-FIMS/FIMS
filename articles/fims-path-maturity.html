@@ -313,36 +313,39 @@ parent classes are just used in Rcpp to set the structure.</p>
 <span id="cb7-11"><a href="#cb7-11" tabindex="-1"></a><span class="co">   * </span><span class="an">@brief</span><span class="co"> The value of the dependent variable at which the response reaches</span></span>
 <span id="cb7-12"><a href="#cb7-12" tabindex="-1"></a><span class="co">   * 0.5.</span></span>
 <span id="cb7-13"><a href="#cb7-13" tabindex="-1"></a><span class="co">   */</span></span>
-<span id="cb7-14"><a href="#cb7-14" tabindex="-1"></a>  Parameter inflection_point<span class="op">;</span></span>
+<span id="cb7-14"><a href="#cb7-14" tabindex="-1"></a>  VariableVector inflection_point<span class="op">;</span></span>
 <span id="cb7-15"><a href="#cb7-15" tabindex="-1"></a>  <span class="co">/**</span></span>
 <span id="cb7-16"><a href="#cb7-16" tabindex="-1"></a><span class="co">   * </span><span class="an">@brief</span><span class="co"> The width of the curve at the inflection_point.</span></span>
 <span id="cb7-17"><a href="#cb7-17" tabindex="-1"></a><span class="co">   */</span></span>
-<span id="cb7-18"><a href="#cb7-18" tabindex="-1"></a>  Parameter slope<span class="op">;</span></span>
+<span id="cb7-18"><a href="#cb7-18" tabindex="-1"></a>  VariableVector slope<span class="op">;</span></span>
 <span id="cb7-19"><a href="#cb7-19" tabindex="-1"></a>  <span class="op">...</span></span>
 <span id="cb7-20"><a href="#cb7-20" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
 <p><img src="figures/fims-path-maturity-1.png" class="r-plt" alt="The path of the maturity module from R to LogisticMaturity and LogisticMaturityInterface." width="85%"></p>
 <p>All Rcpp interface classes from FIMS define parameters (e.g.,
 <code>inflection_point</code>, <code>slope</code>) using the
-<code>ParameterVector</code> class defined in <a href="https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/interface/rcpp/rcpp_objects/rcpp_interface_base.hpp" class="external-link">rcpp_interface_base.hpp</a>
+<code>VariableVector</code> class defined in <a href="https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/interface/rcpp/rcpp_objects/rcpp_interface_base.hpp" class="external-link">rcpp_interface_base.hpp</a>
 in the directory <a href="https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/interface/rcpp/rcpp_objects" class="external-link">inst/include/interface/rcpp/rcpp_objects</a>.
-ParameterVectors allow parameters to vary with time. Whereas, the
-Parameter class is only used for time-invariant parameters. The fields
+VariableVectors allow parameters to vary with time. Whereas, the
+Variable class is only used for time-invariant parameters. The fields
 for these classes that are accessible from R are defined in the <a href="https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/interface/rcpp/rcpp_interface.hpp" class="external-link">rcpp_interface.hpp</a>
 file in the directory <a href="https://github.com/NOAA-FIMS/FIMS/tree/main/inst/include/interface/rcpp" class="external-link">inst/include/interface/rcpp</a>.
 For example,</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode cpp rcppchunk"><code class="sourceCode cpp"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a> Rcpp<span class="op">::</span><span class="va">class_</span><span class="op">&lt;</span>Parameter<span class="op">&gt;(</span><span class="st">"Parameter"</span><span class="op">)</span></span>
-<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a>  <span class="op">.</span>constructor<span class="op">()</span></span>
-<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a>  <span class="op">.</span>constructor<span class="op">&lt;</span><span class="dt">double</span><span class="op">&gt;()</span></span>
-<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a>  <span class="op">.</span>constructor<span class="op">&lt;</span>Parameter<span class="op">&gt;()</span></span>
-<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a>  <span class="op">.</span>field<span class="op">(</span><span class="st">"value"</span><span class="op">,</span> <span class="op">&amp;</span>Parameter<span class="op">::</span>value<span class="op">)</span></span>
-<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a>  <span class="op">.</span>field<span class="op">(</span><span class="st">"min"</span><span class="op">,</span> <span class="op">&amp;</span>Parameter<span class="op">::</span>min<span class="op">)</span></span>
-<span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a>  <span class="op">.</span>field<span class="op">(</span><span class="st">"max"</span><span class="op">,</span> <span class="op">&amp;</span>Parameter<span class="op">::</span>max<span class="op">)</span></span>
-<span id="cb8-8"><a href="#cb8-8" tabindex="-1"></a>  <span class="op">.</span>field<span class="op">(</span><span class="st">"estimation_type"</span><span class="op">,</span> <span class="op">&amp;</span>Parameter<span class="op">::</span><span class="dt">estimation_type</span><span class="op">);</span></span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode cpp rcppchunk"><code class="sourceCode cpp"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a>Rcpp<span class="op">::</span><span class="va">class_</span><span class="op">&lt;</span>Variable<span class="op">&gt;(</span></span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a>    <span class="st">"Variable"</span><span class="op">,</span></span>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a>    <span class="st">"See https://noaa-fims.github.io/FIMS/doxygen/classVariable.html."</span><span class="op">)</span></span>
+<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a>    <span class="op">.</span>constructor<span class="op">()</span></span>
+<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a>    <span class="op">.</span>constructor<span class="op">&lt;</span><span class="dt">double</span><span class="op">&gt;()</span></span>
+<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a>    <span class="op">.</span>constructor<span class="op">&lt;</span>Variable<span class="op">&gt;()</span></span>
+<span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a>    <span class="op">.</span>field<span class="op">(</span><span class="st">"value"</span><span class="op">,</span> <span class="op">&amp;</span>Variable<span class="op">::</span>initial_value_m<span class="op">)</span></span>
+<span id="cb8-8"><a href="#cb8-8" tabindex="-1"></a>    <span class="op">.</span>field<span class="op">(</span><span class="st">"estimated_value"</span><span class="op">,</span> <span class="op">&amp;</span>Variable<span class="op">::</span>final_value_m<span class="op">)</span></span>
+<span id="cb8-9"><a href="#cb8-9" tabindex="-1"></a>    <span class="op">.</span>field<span class="op">(</span><span class="st">"id"</span><span class="op">,</span> <span class="op">&amp;</span>Variable<span class="op">::</span>id_m<span class="op">)</span></span>
+<span id="cb8-10"><a href="#cb8-10" tabindex="-1"></a>    <span class="op">.</span>field<span class="op">(</span><span class="st">"estimation_type"</span><span class="op">,</span> <span class="op">&amp;</span>Variable<span class="op">::</span>estimation_type_m<span class="op">);</span></span></code></pre></div>
 <p>Each field (i.e., parameter) from <code>maturity</code> (i.e., the
-maturity module we defined in R) will therefore inherit the five fields
-defined in the Parameter class: <code>value</code>, <code>min</code>,
-<code>max</code>, <code>estimation_type</code>. That is, two parameter
-fields and 10 fields within those parameters.</p>
+maturity module we defined in R) will therefore inherit the four fields
+defined in the Variable class: <code>value</code>,
+<code>estimated_value</code>, <code>id</code>,
+<code>estimation_type</code>. That is, two parameter fields and 8 fields
+within those parameters.</p>
 </div>
 <div class="section level2">
 <h2 id="fims-namespace">
@@ -380,13 +383,13 @@ specific data type definitions. Below is an example of a definition.</p>
 <span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a><span class="pp">#ifdef TMB_MODEL</span></span>
 <span id="cb10-4"><a href="#cb10-4" tabindex="-1"></a><span class="co">/**</span></span>
 <span id="cb10-5"><a href="#cb10-5" tabindex="-1"></a><span class="co"> * </span><span class="an">@brief</span><span class="co"> fims::ModelTraits class that contains the DataVector</span></span>
-<span id="cb10-6"><a href="#cb10-6" tabindex="-1"></a><span class="co"> * and ParameterVector types.</span></span>
+<span id="cb10-6"><a href="#cb10-6" tabindex="-1"></a><span class="co"> * and VariableVector types.</span></span>
 <span id="cb10-7"><a href="#cb10-7" tabindex="-1"></a><span class="co"> */</span></span>
 <span id="cb10-8"><a href="#cb10-8" tabindex="-1"></a><span class="kw">template</span> <span class="op">&lt;</span><span class="kw">typename</span> Type<span class="op">&gt;</span></span>
 <span id="cb10-9"><a href="#cb10-9" tabindex="-1"></a><span class="kw">struct</span> fims<span class="op">::</span>ModelTraits <span class="op">{</span></span>
 <span id="cb10-10"><a href="#cb10-10" tabindex="-1"></a>  <span class="kw">typedef</span> <span class="kw">typename</span> tmbutils<span class="op">::</span>vector<span class="op">&lt;</span>Type<span class="op">&gt;</span> DataVector<span class="op">;</span>       <span class="co">/**&lt; A vector</span></span>
 <span id="cb10-11"><a href="#cb10-11" tabindex="-1"></a><span class="co">        of the data that is differentiable (Type is the TMB/TMBad scalar). */</span></span>
-<span id="cb10-12"><a href="#cb10-12" tabindex="-1"></a>  <span class="kw">typedef</span> <span class="kw">typename</span> tmbutils<span class="op">::</span>vector<span class="op">&lt;</span>Type<span class="op">&gt;</span> ParameterVector<span class="op">;</span>  <span class="co">/**&lt; A vector</span></span>
+<span id="cb10-12"><a href="#cb10-12" tabindex="-1"></a>  <span class="kw">typedef</span> <span class="kw">typename</span> tmbutils<span class="op">::</span>vector<span class="op">&lt;</span>Type<span class="op">&gt;</span> VariableVector<span class="op">;</span>  <span class="co">/**&lt; A vector</span></span>
 <span id="cb10-13"><a href="#cb10-13" tabindex="-1"></a><span class="co">        of the parameters that is differentiable. */</span></span>
 <span id="cb10-14"><a href="#cb10-14" tabindex="-1"></a>  <span class="kw">typedef</span> <span class="kw">typename</span> tmbutils<span class="op">::</span>vector<span class="op">&lt;</span>Type<span class="op">&gt;</span></span>
 <span id="cb10-15"><a href="#cb10-15" tabindex="-1"></a>      EigenVector<span class="op">;</span> <span class="co">/**&lt; A vector as defined in the Eigen namespace in TMB */</span></span>
@@ -878,7 +881,7 @@ calculations.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer>

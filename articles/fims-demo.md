@@ -557,7 +557,7 @@ fit <- parameters_4_model |>
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
     ## ℹ FIMS model version: 0.9.3.9000
-    ## ℹ Total run time was 1.21658 minutes
+    ## ℹ Total run time was 1.29329 minutes
     ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
     ## ℹ Maximum gradient= 0.00101
     ## ℹ Negative log likelihood (NLL):
@@ -594,7 +594,7 @@ log_data_frame[1, ]
 ```
 
     ##                  timestamp   level
-    ## 1 Thu Jul  2 16:12:03 2026 warning
+    ## 1 Wed Jul  8 16:27:08 2026 warning
     ##                                                                   message id
     ## 1 The log_f_multiplier vector is not of size n_years. Filling with zeros.  0
     ##     user                                    wd
@@ -604,7 +604,7 @@ log_data_frame[1, ]
     ##                                                                     routine
     ## 1 bool PopulationInterface::add_to_fims_tmb_internal() [with Type = double]
     ##   line
-    ## 1  353
+    ## 1  440
 
 ``` r
 
@@ -630,8 +630,8 @@ log_data_frame |> dplyr::filter(level == "warning")
 ```
 
     ##                  timestamp   level
-    ## 1 Thu Jul  2 16:12:03 2026 warning
-    ## 2 Thu Jul  2 16:12:03 2026 warning
+    ## 1 Wed Jul  8 16:27:08 2026 warning
+    ## 2 Wed Jul  8 16:27:08 2026 warning
     ##                                                                   message id
     ## 1 The log_f_multiplier vector is not of size n_years. Filling with zeros.  0
     ## 2              Setting spawning_biomass_ratio vector to size n_years + 1.  1
@@ -645,8 +645,8 @@ log_data_frame |> dplyr::filter(level == "warning")
     ## 1 bool PopulationInterface::add_to_fims_tmb_internal() [with Type = double]
     ## 2 bool PopulationInterface::add_to_fims_tmb_internal() [with Type = double]
     ##   line
-    ## 1  353
-    ## 2  369
+    ## 1  440
+    ## 2  456
 
 ``` r
 
@@ -790,7 +790,7 @@ high_slope_fit <- parameters_high_slope |>
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
     ## ℹ FIMS model version: 0.9.3.9000
-    ## ℹ Total run time was 1.19498 minutes
+    ## ℹ Total run time was 1.26832 minutes
     ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
     ## ℹ Maximum gradient= 0.00034
     ## ℹ Negative log likelihood (NLL):
@@ -813,7 +813,7 @@ low_slope_fit <- parameters_low_slope |>
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
     ## ℹ FIMS model version: 0.9.3.9000
-    ## ℹ Total run time was 1.22635 minutes
+    ## ℹ Total run time was 1.30039 minutes
     ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
     ## ℹ Maximum gradient= 4e-04
     ## ℹ Negative log likelihood (NLL):
@@ -850,7 +850,7 @@ age_only_fit <- parameters_4_model |>
     ## ℹ Maximum gradient went from 0.00361 to 0.00038 after 3 steps.
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
-    ## ℹ FIMS model version: 0.9.3.9000 ℹ Total run time was 11.31012 seconds ℹ Number
+    ## ℹ FIMS model version: 0.9.3.9000 ℹ Total run time was 11.77918 seconds ℹ Number
     ## of parameters: fixed_effects=49, random_effects=29, and total=78 ℹ Maximum
     ## gradient= 0.00038 ℹ Negative log likelihood (NLL): • Marginal NLL= 1627.76704 •
     ## Total NLL= 1564.0853 ℹ Terminal SB= 1740.95207
@@ -884,7 +884,7 @@ length_only_fit <- parameters_4_model |>
     ## ℹ Maximum gradient went from 0.00715 to 0.00034 after 3 steps.
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
-    ## ℹ FIMS model version: 0.9.3.9000 ℹ Total run time was 1.1332 minutes ℹ Number
+    ## ℹ FIMS model version: 0.9.3.9000 ℹ Total run time was 1.19018 minutes ℹ Number
     ## of parameters: fixed_effects=49, random_effects=29, and total=78 ℹ Maximum
     ## gradient= 0.00034 ℹ Negative log likelihood (NLL): • Marginal NLL= 1568.32685 •
     ## Total NLL= 1518.62644 ℹ Terminal SB= 1722.35744

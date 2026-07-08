@@ -185,7 +185,7 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 </div>
 <script type="text/javascript">
 /* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
-$(document).ready(function(){initNavTree('rcpp__parameter_8cpp.html',''); initResizable(); });
+$(document).ready(function(){initNavTree('classVariable.html',''); initResizable(); });
 /* @license-end */
 </script>
 <div id="doc-content">
@@ -212,77 +212,134 @@ $(document).ready(function(){initNavTree('rcpp__parameter_8cpp.html',''); initRe
 
 <div class="header">
   <div class="summary">
-<a href="#func-members">Functions</a>  </div>
-  <div class="headertitle"><div class="title">rcpp_parameter.cpp File Reference</div></div>
+<a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pub-attribs">Public Attributes</a> &#124;
+<a href="#pub-static-attribs">Static Public Attributes</a> &#124;
+<a href="classVariable-members.html">List of all members</a>  </div>
+  <div class="headertitle"><div class="title">Variable Class Reference</div></div>
 </div><!--header-->
 <div class="contents">
 
-<p>Implementation of Rcpp parameter interfaces for the FIMS framework.  
-<a href="#details">More...</a></p>
-<div class="textblock"><code>#include &quot;<a class="el" href="rcpp__interface__base_8hpp_source.html">../inst/include/interface/rcpp/rcpp_objects/rcpp_interface_base.hpp</a>&quot;</code><br />
-<code>#include &lt;RcppCommon.h&gt;</code><br />
-<code>#include &lt;Rcpp.h&gt;</code><br />
-</div><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
-Functions</h2></td></tr>
-<tr class="memitem:a06caf19387bb844186093aa04b7d3159" id="r_a06caf19387bb844186093aa04b7d3159"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rcpp__parameter_8cpp.html#a06caf19387bb844186093aa04b7d3159">register_parameter</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Rcpp::Module</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">m</a>)</td></tr>
-<tr class="memdesc:a06caf19387bb844186093aa04b7d3159"><td class="mdescLeft">&#160;</td><td class="mdescRight">Register the parameter module.  <br /></td></tr>
-<tr class="separator:a06caf19387bb844186093aa04b7d3159"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aedc20697f0e4349d2624d2780dc6673e" id="r_aedc20697f0e4349d2624d2780dc6673e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rcpp__parameter_8cpp.html#aedc20697f0e4349d2624d2780dc6673e">register_vectors</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Rcpp::Module</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">m</a>)</td></tr>
-<tr class="memdesc:aedc20697f0e4349d2624d2780dc6673e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Register the vectors module.  <br /></td></tr>
-<tr class="separator:aedc20697f0e4349d2624d2780dc6673e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<p>An Rcpp interface that defines the <a class="el" href="classVariable.html" title="An Rcpp interface that defines the Variable class.">Variable</a> class.  
+ <a href="classVariable.html#details">More...</a></p>
+
+<p><code>#include &lt;<a class="el" href="rcpp__interface__base_8hpp_source.html">rcpp_interface_base.hpp</a>&gt;</code></p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
+Public Member Functions</h2></td></tr>
+<tr class="memitem:a12b448089dd5fa60ae56c6b6c7ca8797" id="r_a12b448089dd5fa60ae56c6b6c7ca8797"><td class="memItemLeft" align="right" valign="top"><a id="a12b448089dd5fa60ae56c6b6c7ca8797" name="a12b448089dd5fa60ae56c6b6c7ca8797"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>Variable</b> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">double</a> value, std::string <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">estimation_type</a>)</td></tr>
+<tr class="memdesc:a12b448089dd5fa60ae56c6b6c7ca8797"><td class="mdescLeft">&#160;</td><td class="mdescRight">The constructor for initializing a variable. <br /></td></tr>
+<tr class="separator:a12b448089dd5fa60ae56c6b6c7ca8797"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9136cadb6b11356f77226a5086d0decf" id="r_a9136cadb6b11356f77226a5086d0decf"><td class="memItemLeft" align="right" valign="top"><a id="a9136cadb6b11356f77226a5086d0decf" name="a9136cadb6b11356f77226a5086d0decf"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>Variable</b> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="classVariable.html">Variable</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">other</a>)</td></tr>
+<tr class="memdesc:a9136cadb6b11356f77226a5086d0decf"><td class="mdescLeft">&#160;</td><td class="mdescRight">The constructor for initializing a variable. <br /></td></tr>
+<tr class="separator:a9136cadb6b11356f77226a5086d0decf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4451ff2aee927bef88cf60ca9cc4937e" id="r_a4451ff2aee927bef88cf60ca9cc4937e"><td class="memItemLeft" align="right" valign="top"><a id="a4451ff2aee927bef88cf60ca9cc4937e" name="a4451ff2aee927bef88cf60ca9cc4937e"></a>
+<a class="el" href="classVariable.html">Variable</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator=</b> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="classVariable.html">Variable</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">right</a>)</td></tr>
+<tr class="memdesc:a4451ff2aee927bef88cf60ca9cc4937e"><td class="mdescLeft">&#160;</td><td class="mdescRight">The constructor for initializing a variable. <br /></td></tr>
+<tr class="separator:a4451ff2aee927bef88cf60ca9cc4937e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae86e2e4ddc51c3ea70e37bd2d3030aad" id="r_ae86e2e4ddc51c3ea70e37bd2d3030aad"><td class="memItemLeft" align="right" valign="top"><a id="ae86e2e4ddc51c3ea70e37bd2d3030aad" name="ae86e2e4ddc51c3ea70e37bd2d3030aad"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>Variable</b> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">double</a> value)</td></tr>
+<tr class="memdesc:ae86e2e4ddc51c3ea70e37bd2d3030aad"><td class="mdescLeft">&#160;</td><td class="mdescRight">The constructor for initializing a variable. <br /></td></tr>
+<tr class="separator:ae86e2e4ddc51c3ea70e37bd2d3030aad"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5716c9dcafcc8cf59a6f6b5dac3ec7a2" id="r_a5716c9dcafcc8cf59a6f6b5dac3ec7a2"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classVariable.html#a5716c9dcafcc8cf59a6f6b5dac3ec7a2">Variable</a> ()</td></tr>
+<tr class="memdesc:a5716c9dcafcc8cf59a6f6b5dac3ec7a2"><td class="mdescLeft">&#160;</td><td class="mdescRight">The constructor for initializing a <a class="el" href="classVariable.html" title="An Rcpp interface that defines the Variable class.">Variable</a>.  <br /></td></tr>
+<tr class="separator:a5716c9dcafcc8cf59a6f6b5dac3ec7a2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
+Public Attributes</h2></td></tr>
+<tr class="memitem:a92652454801ffde85b70b5869c2add0c" id="r_a92652454801ffde85b70b5869c2add0c"><td class="memItemLeft" align="right" valign="top"><a id="a92652454801ffde85b70b5869c2add0c" name="a92652454801ffde85b70b5869c2add0c"></a>
+<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a>&#160;</td><td class="memItemRight" valign="bottom"><b>id_m</b></td></tr>
+<tr class="memdesc:a92652454801ffde85b70b5869c2add0c"><td class="mdescLeft">&#160;</td><td class="mdescRight">The local ID of the <a class="el" href="classVariable.html" title="An Rcpp interface that defines the Variable class.">Variable</a> object. <br /></td></tr>
+<tr class="separator:a92652454801ffde85b70b5869c2add0c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2defcce7886757c2723e8325105c4729" id="r_a2defcce7886757c2723e8325105c4729"><td class="memItemLeft" align="right" valign="top"><a id="a2defcce7886757c2723e8325105c4729" name="a2defcce7886757c2723e8325105c4729"></a>
+<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">double</a>&#160;</td><td class="memItemRight" valign="bottom"><b>initial_value_m</b> = 0.0</td></tr>
+<tr class="memdesc:a2defcce7886757c2723e8325105c4729"><td class="mdescLeft">&#160;</td><td class="mdescRight">The initial value of the variable. <br /></td></tr>
+<tr class="separator:a2defcce7886757c2723e8325105c4729"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9b548527e00ee5acbef2c6bd2034c00b" id="r_a9b548527e00ee5acbef2c6bd2034c00b"><td class="memItemLeft" align="right" valign="top"><a id="a9b548527e00ee5acbef2c6bd2034c00b" name="a9b548527e00ee5acbef2c6bd2034c00b"></a>
+<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">double</a>&#160;</td><td class="memItemRight" valign="bottom"><b>final_value_m</b> = 0.0</td></tr>
+<tr class="memdesc:a9b548527e00ee5acbef2c6bd2034c00b"><td class="mdescLeft">&#160;</td><td class="mdescRight">The final value of the variable. <br /></td></tr>
+<tr class="separator:a9b548527e00ee5acbef2c6bd2034c00b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2404a6a1135e1ac59122ceee01f29bdb" id="r_a2404a6a1135e1ac59122ceee01f29bdb"><td class="memItemLeft" align="right" valign="top"><a id="a2404a6a1135e1ac59122ceee01f29bdb" name="a2404a6a1135e1ac59122ceee01f29bdb"></a>
+<a class="el" href="classSharedString.html">SharedString</a>&#160;</td><td class="memItemRight" valign="bottom"><b>estimation_type_m</b> = <a class="el" href="classSharedString.html">SharedString</a>(&quot;constant&quot;)</td></tr>
+<tr class="memdesc:a2404a6a1135e1ac59122ceee01f29bdb"><td class="mdescLeft">&#160;</td><td class="mdescRight">A string indicating the estimation type. Options are: constant, fixed_effects, or random_effects, where the default is constant. <br /></td></tr>
+<tr class="separator:a2404a6a1135e1ac59122ceee01f29bdb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-static-attribs" name="pub-static-attribs"></a>
+Static Public Attributes</h2></td></tr>
+<tr class="memitem:ad3cac79fa1d55253114f800533acdade" id="r_ad3cac79fa1d55253114f800533acdade"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">static</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classVariable.html#ad3cac79fa1d55253114f800533acdade">id_g</a> = 0</td></tr>
+<tr class="memdesc:ad3cac79fa1d55253114f800533acdade"><td class="mdescLeft">&#160;</td><td class="mdescRight">The static ID of the <a class="el" href="classVariable.html" title="An Rcpp interface that defines the Variable class.">Variable</a> object.  <br /></td></tr>
+<tr class="separator:ad3cac79fa1d55253114f800533acdade"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Implementation of Rcpp parameter interfaces for the FIMS framework. </p>
-</div><h2 class="groupheader">Function Documentation</h2>
-<a id="a06caf19387bb844186093aa04b7d3159" name="a06caf19387bb844186093aa04b7d3159"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a06caf19387bb844186093aa04b7d3159">&#9670;&#160;</a></span>register_parameter()</h2>
+<div class="textblock"><p>An Rcpp interface that defines the <a class="el" href="classVariable.html" title="An Rcpp interface that defines the Variable class.">Variable</a> class. </p>
+<p>An Rcpp interface class that defines the interface between R and C++ for a variable type. </p>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a id="a5716c9dcafcc8cf59a6f6b5dac3ec7a2" name="a5716c9dcafcc8cf59a6f6b5dac3ec7a2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5716c9dcafcc8cf59a6f6b5dac3ec7a2">&#9670;&#160;</a></span>Variable()</h2>
 
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a> register_parameter </td>
+          <td class="memname">Variable::Variable </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Rcpp::Module</a> &amp;&#160;</td>
-          <td class="paramname"><em>m</em></td><td>)</td>
+          <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
-<p>Register the parameter module. </p>
-<p>Function to register parameter classes with the Rcpp module system. </p>
+<p>The constructor for initializing a <a class="el" href="classVariable.html" title="An Rcpp interface that defines the Variable class.">Variable</a>. </p>
+<p>Set value to 0 when there is no input value. </p>
 
 </div>
 </div>
-<a id="aedc20697f0e4349d2624d2780dc6673e" name="aedc20697f0e4349d2624d2780dc6673e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aedc20697f0e4349d2624d2780dc6673e">&#9670;&#160;</a></span>register_vectors()</h2>
+<h2 class="groupheader">Member Data Documentation</h2>
+<a id="ad3cac79fa1d55253114f800533acdade" name="ad3cac79fa1d55253114f800533acdade"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad3cac79fa1d55253114f800533acdade">&#9670;&#160;</a></span>id_g</h2>
 
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a> register_vectors </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Rcpp::Module</a> &amp;&#160;</td>
-          <td class="paramname"><em>m</em></td><td>)</td>
-          <td></td>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a> Variable::id_g = 0</td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
-<p>Register the vectors module. </p>
-<p>Function to register vector classes with the Rcpp module system. </p>
+<p>The static ID of the <a class="el" href="classVariable.html" title="An Rcpp interface that defines the Variable class.">Variable</a> object. </p>
+<p>The unique ID for the variable map that points to a <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>. </p>
 
 </div>
 </div>
+<hr/>The documentation for this class was generated from the following files:<ul>
+<li>inst/include/interface/rcpp/rcpp_objects/<a class="el" href="rcpp__interface__base_8hpp_source.html">rcpp_interface_base.hpp</a></li>
+<li>src/<a class="el" href="rcpp__interface__base_8cpp.html">rcpp_interface_base.cpp</a></li>
+</ul>
 </div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="rcpp__parameter_8cpp.html">rcpp_parameter.cpp</a></li>
+    <li class="navelem"><a class="el" href="classVariable.html">Variable</a></li>
     <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.8 </li>
   </ul>
 </div>

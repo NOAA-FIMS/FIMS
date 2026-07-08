@@ -219,7 +219,7 @@ $(document).ready(function(){initNavTree('rcpp__interface__base_8hpp.html',''); 
 </div><!--header-->
 <div class="contents">
 
-<p>The Rcpp interface to declare objects that are used ubiquitously throughout the Rcpp interface, e.g., Parameters and ParameterVectors.  
+<p>The Rcpp interface to declare objects that are used ubiquitously throughout the Rcpp interface, e.g., Variables and VariableVectors.  
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &lt;RcppCommon.h&gt;</code><br />
 <code>#include &lt;Rcpp.h&gt;</code><br />
@@ -234,11 +234,11 @@ $(document).ready(function(){initNavTree('rcpp__interface__base_8hpp.html',''); 
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="nested-classes" name="nested-classes"></a>
 Classes</h2></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classParameter.html">Parameter</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">An Rcpp interface that defines the <a class="el" href="classParameter.html" title="An Rcpp interface that defines the Parameter class.">Parameter</a> class.  <a href="classParameter.html#details">More...</a><br /></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classVariable.html">Variable</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">An Rcpp interface that defines the <a class="el" href="classVariable.html" title="An Rcpp interface that defines the Variable class.">Variable</a> class.  <a href="classVariable.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classParameterVector.html">ParameterVector</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">An Rcpp interface class that defines the <a class="el" href="classParameterVector.html" title="An Rcpp interface class that defines the ParameterVector class.">ParameterVector</a> class.  <a href="classParameterVector.html#details">More...</a><br /></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classVariableVector.html">VariableVector</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">An Rcpp interface class that defines the <a class="el" href="classVariableVector.html" title="An Rcpp interface class that defines the VariableVector class.">VariableVector</a> class.  <a href="classVariableVector.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classRealVector.html">RealVector</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">An Rcpp interface class that defines the <a class="el" href="classRealVector.html" title="An Rcpp interface class that defines the RealVector class.">RealVector</a> class.  <a href="classRealVector.html#details">More...</a><br /></td></tr>
@@ -252,19 +252,19 @@ Functions</h2></td></tr>
 <tr class="memitem:a18721bca590fa172ea797a55c6ae10e3" id="r_a18721bca590fa172ea797a55c6ae10e3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">double</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rcpp__interface__base_8hpp.html#a18721bca590fa172ea797a55c6ae10e3">sanitize_val</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">double</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">x</a>)</td></tr>
 <tr class="memdesc:a18721bca590fa172ea797a55c6ae10e3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sanitize a double value by replacing NaN or Inf with -999.0.  <br /></td></tr>
 <tr class="separator:a18721bca590fa172ea797a55c6ae10e3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0bd065ea931f82a169ebf53822c29d57" id="r_a0bd065ea931f82a169ebf53822c29d57"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">std::ostream</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rcpp__interface__base_8hpp.html#a0bd065ea931f82a169ebf53822c29d57">operator&lt;&lt;</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">std::ostream</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">out</a>, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="classParameter.html">Parameter</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">p</a>)</td></tr>
-<tr class="memdesc:a0bd065ea931f82a169ebf53822c29d57"><td class="mdescLeft">&#160;</td><td class="mdescRight">Output for std::ostream&amp; for a parameter.  <br /></td></tr>
-<tr class="separator:a0bd065ea931f82a169ebf53822c29d57"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa89b8163b657a51e656e119c1af6153f" id="r_aa89b8163b657a51e656e119c1af6153f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">std::ostream</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rcpp__interface__base_8hpp.html#aa89b8163b657a51e656e119c1af6153f">operator&lt;&lt;</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">std::ostream</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">out</a>, <a class="el" href="classParameterVector.html">ParameterVector</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">v</a>)</td></tr>
-<tr class="memdesc:aa89b8163b657a51e656e119c1af6153f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Output for std::ostream&amp; for a <a class="el" href="classParameterVector.html" title="An Rcpp interface class that defines the ParameterVector class.">ParameterVector</a>.  <br /></td></tr>
-<tr class="separator:aa89b8163b657a51e656e119c1af6153f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2cfd623d3f00b3b109e300421b6b7d8f" id="r_a2cfd623d3f00b3b109e300421b6b7d8f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">std::ostream</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rcpp__interface__base_8hpp.html#a2cfd623d3f00b3b109e300421b6b7d8f">operator&lt;&lt;</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">std::ostream</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">out</a>, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="classVariable.html">Variable</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">p</a>)</td></tr>
+<tr class="memdesc:a2cfd623d3f00b3b109e300421b6b7d8f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Output for std::ostream&amp; for a variable.  <br /></td></tr>
+<tr class="separator:a2cfd623d3f00b3b109e300421b6b7d8f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ada595b87fa82d54242b2472d470437a3" id="r_ada595b87fa82d54242b2472d470437a3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">std::ostream</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rcpp__interface__base_8hpp.html#ada595b87fa82d54242b2472d470437a3">operator&lt;&lt;</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">std::ostream</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">out</a>, <a class="el" href="classVariableVector.html">VariableVector</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">v</a>)</td></tr>
+<tr class="memdesc:ada595b87fa82d54242b2472d470437a3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Output for std::ostream&amp; for a <a class="el" href="classVariableVector.html" title="An Rcpp interface class that defines the VariableVector class.">VariableVector</a>.  <br /></td></tr>
+<tr class="separator:ada595b87fa82d54242b2472d470437a3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>The Rcpp interface to declare objects that are used ubiquitously throughout the Rcpp interface, e.g., Parameters and ParameterVectors. </p>
+<div class="textblock"><p>The Rcpp interface to declare objects that are used ubiquitously throughout the Rcpp interface, e.g., Variables and VariableVectors. </p>
 <dl class="section copyright"><dt>Copyright</dt><dd>This file is part of the NOAA, National Marine Fisheries Service Fisheries Integrated Modeling System project. See LICENSE in the source folder for reuse information. </dd></dl>
 </div><h2 class="groupheader">Function Documentation</h2>
-<a id="a0bd065ea931f82a169ebf53822c29d57" name="a0bd065ea931f82a169ebf53822c29d57"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0bd065ea931f82a169ebf53822c29d57">&#9670;&#160;</a></span>operator&lt;&lt;() <span class="overload">[1/2]</span></h2>
+<a id="a2cfd623d3f00b3b109e300421b6b7d8f" name="a2cfd623d3f00b3b109e300421b6b7d8f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2cfd623d3f00b3b109e300421b6b7d8f">&#9670;&#160;</a></span>operator&lt;&lt;() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -281,7 +281,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="classParameter.html">Parameter</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="classVariable.html">Variable</a> &amp;&#160;</td>
           <td class="paramname"><em>p</em>&#160;</td>
         </tr>
         <tr>
@@ -297,11 +297,11 @@ Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Output for std::ostream&amp; for a parameter. </p>
+<p>Output for std::ostream&amp; for a variable. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">out</td><td>The stream. </td></tr>
-    <tr><td class="paramname">p</td><td>A parameter. </td></tr>
+    <tr><td class="paramname">p</td><td>A variable. </td></tr>
   </table>
   </dd>
 </dl>
@@ -309,8 +309,8 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="aa89b8163b657a51e656e119c1af6153f" name="aa89b8163b657a51e656e119c1af6153f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa89b8163b657a51e656e119c1af6153f">&#9670;&#160;</a></span>operator&lt;&lt;() <span class="overload">[2/2]</span></h2>
+<a id="ada595b87fa82d54242b2472d470437a3" name="ada595b87fa82d54242b2472d470437a3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ada595b87fa82d54242b2472d470437a3">&#9670;&#160;</a></span>operator&lt;&lt;() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -327,7 +327,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="classParameterVector.html">ParameterVector</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="classVariableVector.html">VariableVector</a> &amp;&#160;</td>
           <td class="paramname"><em>v</em>&#160;</td>
         </tr>
         <tr>
@@ -343,11 +343,11 @@ Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Output for std::ostream&amp; for a <a class="el" href="classParameterVector.html" title="An Rcpp interface class that defines the ParameterVector class.">ParameterVector</a>. </p>
+<p>Output for std::ostream&amp; for a <a class="el" href="classVariableVector.html" title="An Rcpp interface class that defines the VariableVector class.">VariableVector</a>. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">out</td><td>The stream. </td></tr>
-    <tr><td class="paramname">v</td><td>A <a class="el" href="classParameterVector.html" title="An Rcpp interface class that defines the ParameterVector class.">ParameterVector</a>. </td></tr>
+    <tr><td class="paramname">v</td><td>A <a class="el" href="classVariableVector.html" title="An Rcpp interface class that defines the VariableVector class.">VariableVector</a>. </td></tr>
   </table>
   </dd>
 </dl>

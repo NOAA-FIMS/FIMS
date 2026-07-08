@@ -287,7 +287,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:a9183d9379777d8be70ab66af1a07f94c inherit pub_methods_classFIMSRcppInterfaceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">A virtual method to inherit to add objects to the TMB model.  <br /></td></tr>
 <tr class="separator:a9183d9379777d8be70ab66af1a07f94c inherit pub_methods_classFIMSRcppInterfaceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a46e0ce655ef707a6c66e863aa4f0b374 inherit pub_methods_classFIMSRcppInterfaceBase" id="r_a46e0ce655ef707a6c66e863aa4f0b374"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFIMSRcppInterfaceBase.html#a46e0ce655ef707a6c66e863aa4f0b374">value_to_string</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">double</a> value)</td></tr>
-<tr class="memdesc:a46e0ce655ef707a6c66e863aa4f0b374 inherit pub_methods_classFIMSRcppInterfaceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Report the parameter value as a string.  <br /></td></tr>
+<tr class="memdesc:a46e0ce655ef707a6c66e863aa4f0b374 inherit pub_methods_classFIMSRcppInterfaceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Report the variable value as a string.  <br /></td></tr>
 <tr class="separator:a46e0ce655ef707a6c66e863aa4f0b374 inherit pub_methods_classFIMSRcppInterfaceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1fa6e0deb883a921fe70b328cdd30fee inherit pub_methods_classFIMSRcppInterfaceBase" id="r_a1fa6e0deb883a921fe70b328cdd30fee"><td class="memItemLeft" align="right" valign="top">
 std::string&#160;</td><td class="memItemRight" valign="bottom"><b>make_dimensions</b> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">start</a>, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a> end, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">rep</a>=1)</td></tr>
@@ -296,14 +296,14 @@ std::string&#160;</td><td class="memItemRight" valign="bottom"><b>make_dimension
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
-<tr class="memitem:a7b5ce66ecb2d70d00f29a195e6bf0dbd" id="r_a7b5ce66ecb2d70d00f29a195e6bf0dbd"><td class="memItemLeft" align="right" valign="top"><a id="a7b5ce66ecb2d70d00f29a195e6bf0dbd" name="a7b5ce66ecb2d70d00f29a195e6bf0dbd"></a>
-<a class="el" href="classParameterVector.html">ParameterVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>observed_values</b></td></tr>
-<tr class="memdesc:a7b5ce66ecb2d70d00f29a195e6bf0dbd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Observed data, which should be a vector of length K of integers. <br /></td></tr>
-<tr class="separator:a7b5ce66ecb2d70d00f29a195e6bf0dbd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a63619adb012ab0dd45742eb125654b06" id="r_a63619adb012ab0dd45742eb125654b06"><td class="memItemLeft" align="right" valign="top"><a id="a63619adb012ab0dd45742eb125654b06" name="a63619adb012ab0dd45742eb125654b06"></a>
-<a class="el" href="classParameterVector.html">ParameterVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>expected_values</b></td></tr>
-<tr class="memdesc:a63619adb012ab0dd45742eb125654b06"><td class="mdescLeft">&#160;</td><td class="mdescRight">The expected values, which should be a vector of length K where each value specifies the probability of class k. Note that, unlike in R, these probabilities must sum to 1.0. <br /></td></tr>
-<tr class="separator:a63619adb012ab0dd45742eb125654b06"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af5b9aeaef115578f20e716fb29d309c5" id="r_af5b9aeaef115578f20e716fb29d309c5"><td class="memItemLeft" align="right" valign="top"><a id="af5b9aeaef115578f20e716fb29d309c5" name="af5b9aeaef115578f20e716fb29d309c5"></a>
+<a class="el" href="classVariableVector.html">VariableVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>observed_values</b></td></tr>
+<tr class="memdesc:af5b9aeaef115578f20e716fb29d309c5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Observed data, which should be a vector of length K of integers. <br /></td></tr>
+<tr class="separator:af5b9aeaef115578f20e716fb29d309c5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa1ca883b25b1bc2a79658d19c840eb22" id="r_aa1ca883b25b1bc2a79658d19c840eb22"><td class="memItemLeft" align="right" valign="top"><a id="aa1ca883b25b1bc2a79658d19c840eb22" name="aa1ca883b25b1bc2a79658d19c840eb22"></a>
+<a class="el" href="classVariableVector.html">VariableVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>expected_values</b></td></tr>
+<tr class="memdesc:aa1ca883b25b1bc2a79658d19c840eb22"><td class="mdescLeft">&#160;</td><td class="mdescRight">The expected values, which should be a vector of length K where each value specifies the probability of class k. Note that, unlike in R, these probabilities must sum to 1.0. <br /></td></tr>
+<tr class="separator:aa1ca883b25b1bc2a79658d19c840eb22"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa8dd20f0a80e26733c7e70ca27fab55d" id="r_aa8dd20f0a80e26733c7e70ca27fab55d"><td class="memItemLeft" align="right" valign="top"><a id="aa8dd20f0a80e26733c7e70ca27fab55d" name="aa8dd20f0a80e26733c7e70ca27fab55d"></a>
 <a class="el" href="classRealVector.html">RealVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>dims</b></td></tr>
 <tr class="memdesc:aa8dd20f0a80e26733c7e70ca27fab55d"><td class="mdescLeft">&#160;</td><td class="mdescRight">The dimensions of the number of rows and columns of the multivariate dataset. <br /></td></tr>

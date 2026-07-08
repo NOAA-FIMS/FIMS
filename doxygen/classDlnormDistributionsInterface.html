@@ -285,7 +285,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:a9183d9379777d8be70ab66af1a07f94c inherit pub_methods_classFIMSRcppInterfaceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">A virtual method to inherit to add objects to the TMB model.  <br /></td></tr>
 <tr class="separator:a9183d9379777d8be70ab66af1a07f94c inherit pub_methods_classFIMSRcppInterfaceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a46e0ce655ef707a6c66e863aa4f0b374 inherit pub_methods_classFIMSRcppInterfaceBase" id="r_a46e0ce655ef707a6c66e863aa4f0b374"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFIMSRcppInterfaceBase.html#a46e0ce655ef707a6c66e863aa4f0b374">value_to_string</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">double</a> value)</td></tr>
-<tr class="memdesc:a46e0ce655ef707a6c66e863aa4f0b374 inherit pub_methods_classFIMSRcppInterfaceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Report the parameter value as a string.  <br /></td></tr>
+<tr class="memdesc:a46e0ce655ef707a6c66e863aa4f0b374 inherit pub_methods_classFIMSRcppInterfaceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Report the variable value as a string.  <br /></td></tr>
 <tr class="separator:a46e0ce655ef707a6c66e863aa4f0b374 inherit pub_methods_classFIMSRcppInterfaceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1fa6e0deb883a921fe70b328cdd30fee inherit pub_methods_classFIMSRcppInterfaceBase" id="r_a1fa6e0deb883a921fe70b328cdd30fee"><td class="memItemLeft" align="right" valign="top">
 std::string&#160;</td><td class="memItemRight" valign="bottom"><b>make_dimensions</b> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">start</a>, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a> end, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">rep</a>=1)</td></tr>
@@ -294,18 +294,18 @@ std::string&#160;</td><td class="memItemRight" valign="bottom"><b>make_dimension
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
-<tr class="memitem:a731a805f4d075d438135d3a4ba4414a4" id="r_a731a805f4d075d438135d3a4ba4414a4"><td class="memItemLeft" align="right" valign="top"><a id="a731a805f4d075d438135d3a4ba4414a4" name="a731a805f4d075d438135d3a4ba4414a4"></a>
-<a class="el" href="classParameterVector.html">ParameterVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>observed_values</b></td></tr>
-<tr class="memdesc:a731a805f4d075d438135d3a4ba4414a4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Observed data. <br /></td></tr>
-<tr class="separator:a731a805f4d075d438135d3a4ba4414a4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a34ff4c41bc72eab179e3a8b617354cba" id="r_a34ff4c41bc72eab179e3a8b617354cba"><td class="memItemLeft" align="right" valign="top"><a id="a34ff4c41bc72eab179e3a8b617354cba" name="a34ff4c41bc72eab179e3a8b617354cba"></a>
-<a class="el" href="classParameterVector.html">ParameterVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>expected_values</b></td></tr>
-<tr class="memdesc:a34ff4c41bc72eab179e3a8b617354cba"><td class="mdescLeft">&#160;</td><td class="mdescRight">The expected values, which would be the mean of log(x) for this distribution. <br /></td></tr>
-<tr class="separator:a34ff4c41bc72eab179e3a8b617354cba"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8491faa65e18ae6abadc989775ae7309" id="r_a8491faa65e18ae6abadc989775ae7309"><td class="memItemLeft" align="right" valign="top"><a id="a8491faa65e18ae6abadc989775ae7309" name="a8491faa65e18ae6abadc989775ae7309"></a>
-<a class="el" href="classParameterVector.html">ParameterVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>log_sd</b></td></tr>
-<tr class="memdesc:a8491faa65e18ae6abadc989775ae7309"><td class="mdescLeft">&#160;</td><td class="mdescRight">The uncertainty, which would be the natural logarithm of the standard deviation (sd) of log(x) for this distribution. The natural log of the standard deviation is necessary because the exponential link function is applied to the log transformed standard deviation to insure standard deviation is positive. <br /></td></tr>
-<tr class="separator:a8491faa65e18ae6abadc989775ae7309"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae6b5b33eeecb1c6d43a4ff8ef8bb87a9" id="r_ae6b5b33eeecb1c6d43a4ff8ef8bb87a9"><td class="memItemLeft" align="right" valign="top"><a id="ae6b5b33eeecb1c6d43a4ff8ef8bb87a9" name="ae6b5b33eeecb1c6d43a4ff8ef8bb87a9"></a>
+<a class="el" href="classVariableVector.html">VariableVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>observed_values</b></td></tr>
+<tr class="memdesc:ae6b5b33eeecb1c6d43a4ff8ef8bb87a9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Observed data. <br /></td></tr>
+<tr class="separator:ae6b5b33eeecb1c6d43a4ff8ef8bb87a9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ace392f6119a847b2d946a1adb97797bd" id="r_ace392f6119a847b2d946a1adb97797bd"><td class="memItemLeft" align="right" valign="top"><a id="ace392f6119a847b2d946a1adb97797bd" name="ace392f6119a847b2d946a1adb97797bd"></a>
+<a class="el" href="classVariableVector.html">VariableVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>expected_values</b></td></tr>
+<tr class="memdesc:ace392f6119a847b2d946a1adb97797bd"><td class="mdescLeft">&#160;</td><td class="mdescRight">The expected values, which would be the mean of log(x) for this distribution. <br /></td></tr>
+<tr class="separator:ace392f6119a847b2d946a1adb97797bd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a46a5727bd7a8eec0bf9aab9aab228a27" id="r_a46a5727bd7a8eec0bf9aab9aab228a27"><td class="memItemLeft" align="right" valign="top"><a id="a46a5727bd7a8eec0bf9aab9aab228a27" name="a46a5727bd7a8eec0bf9aab9aab228a27"></a>
+<a class="el" href="classVariableVector.html">VariableVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>log_sd</b></td></tr>
+<tr class="memdesc:a46a5727bd7a8eec0bf9aab9aab228a27"><td class="mdescLeft">&#160;</td><td class="mdescRight">The uncertainty, which would be the natural logarithm of the standard deviation (sd) of log(x) for this distribution. The natural log of the standard deviation is necessary because the exponential link function is applied to the log transformed standard deviation to insure standard deviation is positive. <br /></td></tr>
+<tr class="separator:a46a5727bd7a8eec0bf9aab9aab228a27"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afd3831940b1df9108e630c5380a678eb" id="r_afd3831940b1df9108e630c5380a678eb"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classRealVector.html">RealVector</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDlnormDistributionsInterface.html#afd3831940b1df9108e630c5380a678eb">lpdf_vec</a></td></tr>
 <tr class="memdesc:afd3831940b1df9108e630c5380a678eb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Vector that records the individual log probability function for each observation.  <br /></td></tr>
 <tr class="separator:afd3831940b1df9108e630c5380a678eb"><td class="memSeparator" colspan="2">&#160;</td></tr>

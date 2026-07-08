@@ -12,10 +12,10 @@ var classBevertonHoltRecruitmentInterface =
     [ "estimated_log_devs", "classBevertonHoltRecruitmentInterface.html#aba2cd8724255cb55b9d341927471bd60", null ],
     [ "estimated_log_rzero", "classBevertonHoltRecruitmentInterface.html#a45acebd04427172c6029ea391f2ffcb2", null ],
     [ "estimated_logit_steep", "classBevertonHoltRecruitmentInterface.html#ad6571c3071fbf8bc78d197180fc5eb2e", null ],
-    [ "log_devs", "classBevertonHoltRecruitmentInterface.html#a17e12fbcc067297e0c04e0c0b06c0226", null ],
-    [ "log_expected_recruitment", "classBevertonHoltRecruitmentInterface.html#afb0dbdf4bf03b40220120f5bf27addb3", null ],
-    [ "log_r", "classBevertonHoltRecruitmentInterface.html#a8ebfb6ef34a93eef9143f181ca3cf7f3", null ],
-    [ "log_rzero", "classBevertonHoltRecruitmentInterface.html#a926b4044a3612a96d7d4a8ad482a0a14", null ],
-    [ "logit_steep", "classBevertonHoltRecruitmentInterface.html#a3bed47b44fe4d76bd83cbe5ab656d5c3", null ],
+    [ "log_devs", "classBevertonHoltRecruitmentInterface.html#a55e66891e6183f44fff2c289302bc258", null ],
+    [ "log_expected_recruitment", "classBevertonHoltRecruitmentInterface.html#a3ce426d2c01f482af0eefa1704057ed6", null ],
+    [ "log_r", "classBevertonHoltRecruitmentInterface.html#abf3052ca00a343eec0faa64cc59a9d30", null ],
+    [ "log_rzero", "classBevertonHoltRecruitmentInterface.html#a16ae04f87bd1268ec695831f7bdc29b5", null ],
+    [ "logit_steep", "classBevertonHoltRecruitmentInterface.html#af5b0eb824202ff412fdc58113b45fbf6", null ],
     [ "n_years", "classBevertonHoltRecruitmentInterface.html#a45c0aa26cd15b8c364a6a0fae7eaee7f", null ]
 ];

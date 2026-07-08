@@ -11,8 +11,8 @@ var classDmultinomDistributionsInterface =
     [ "set_observed_data", "classDmultinomDistributionsInterface.html#a95323ebe970b12b73749d824d61d16ea", null ],
     [ "to_json", "classDmultinomDistributionsInterface.html#ac41624db2ed049445240e0b83793ae21", null ],
     [ "dims", "classDmultinomDistributionsInterface.html#aa8dd20f0a80e26733c7e70ca27fab55d", null ],
-    [ "expected_values", "classDmultinomDistributionsInterface.html#a63619adb012ab0dd45742eb125654b06", null ],
+    [ "expected_values", "classDmultinomDistributionsInterface.html#aa1ca883b25b1bc2a79658d19c840eb22", null ],
     [ "lpdf_vec", "classDmultinomDistributionsInterface.html#aceae16a92080ad46edfbc5062d69792a", null ],
     [ "notes", "classDmultinomDistributionsInterface.html#a126a9417e1c95bd2261ad41fbfdce06e", null ],
-    [ "observed_values", "classDmultinomDistributionsInterface.html#a7b5ce66ecb2d70d00f29a195e6bf0dbd", null ]
+    [ "observed_values", "classDmultinomDistributionsInterface.html#af5b9aeaef115578f20e716fb29d309c5", null ]
 ];

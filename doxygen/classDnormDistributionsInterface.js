@@ -10,9 +10,9 @@ var classDnormDistributionsInterface =
     [ "set_distribution_mean", "classDnormDistributionsInterface.html#abe721b78cee521cf61f350f1523749ec", null ],
     [ "set_observed_data", "classDnormDistributionsInterface.html#ab2234ef63d314d70a9367053042c23a0", null ],
     [ "to_json", "classDnormDistributionsInterface.html#a3ac41c008229d455fc81b9893decd3a7", null ],
-    [ "expected_mean", "classDnormDistributionsInterface.html#a2a9c2c77c88f5130b7bfffc2422e0d63", null ],
-    [ "expected_values", "classDnormDistributionsInterface.html#a52b505e82789482f43f8be3462cf73d0", null ],
-    [ "log_sd", "classDnormDistributionsInterface.html#adaaca1b7c950e10ab4be5ca3ba25e0a6", null ],
+    [ "expected_mean", "classDnormDistributionsInterface.html#afc8f648c917954864387c1b166f6b642", null ],
+    [ "expected_values", "classDnormDistributionsInterface.html#a83747a76a0c51e31700a59a5d437ea64", null ],
+    [ "log_sd", "classDnormDistributionsInterface.html#a9e31f81a55f36794daaf4ba43fe0abb3", null ],
     [ "lpdf_vec", "classDnormDistributionsInterface.html#a4e19322d31fc600f83b3a4fbbb393768", null ],
-    [ "observed_values", "classDnormDistributionsInterface.html#ab3fd79651ea01148c9e231e2a61ecfd5", null ]
+    [ "observed_values", "classDnormDistributionsInterface.html#a57c8c657e79a3ead27cf4c1198692cd8", null ]
 ];

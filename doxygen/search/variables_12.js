@@ -1,7 +1,8 @@
 var searchData=
 [
-  ['uncertainty_0',['uncertainty',['../structfims__data__object_1_1DataObject.html#a2f8a5e4b6a6b203cd1c3539dff660019',1,'fims_data_object::DataObject::uncertainty'],['../classDataInterfaceBase.html#a92113c5294f746f9131970607842bc45',1,'DataInterfaceBase::uncertainty'],['../classAgeCompDataInterface.html#a0581df6d887e1f986485a5ce9dad5127',1,'AgeCompDataInterface::uncertainty'],['../classLengthCompDataInterface.html#a75ca791884cc4c07a9434439a99389ee',1,'LengthCompDataInterface::uncertainty'],['../classIndexDataInterface.html#ab5c23fa0684e53cb39a1293fa7eda105',1,'IndexDataInterface::uncertainty'],['../classLandingsDataInterface.html#a5c5715ca2a7d892c083164cd0fce3877',1,'LandingsDataInterface::uncertainty']]],
-  ['use_5fmean_1',['use_mean',['../structfims__distributions_1_1DensityComponentBase.html#a05e0ce908ecb58f7a24cd519ab6c45b8',1,'fims_distributions::DensityComponentBase']]],
-  ['use_5fmean_5fm_2',['use_mean_m',['../classDistributionsInterfaceBase.html#ad3be554775b37d5cb817af2c50e0fc60',1,'DistributionsInterfaceBase']]],
-  ['user_3',['user',['../structfims_1_1LogEntry.html#af918075584df32b11182b0406b84fd48',1,'fims::LogEntry']]]
+  ['throw_5fon_5ferror_0',['throw_on_error',['../classfims_1_1FIMSLog.html#a26d3d3b190fb352e3c4d8cd03c57397f',1,'fims::FIMSLog']]],
+  ['timestamp_1',['timestamp',['../structfims_1_1LogEntry.html#aecbb278a89207626d3b379f1bce9fffc',1,'fims::LogEntry']]],
+  ['total_5factive_5fobjects_2',['total_active_objects',['../structfims__model__object_1_1FIMSMemoryTracker.html#a65be2ea8b9eede7570b46fcb8c753c5a',1,'fims_model_object::FIMSMemoryTracker']]],
+  ['total_5flandings_5fnumbers_3',['total_landings_numbers',['../classPopulationInterface.html#ae5515b3e5fc336b330dc69b7ec3585c1',1,'PopulationInterface']]],
+  ['total_5flandings_5fweight_4',['total_landings_weight',['../classPopulationInterface.html#af619d04753f4ae6c8d95af7d3233066c',1,'PopulationInterface']]]
 ];

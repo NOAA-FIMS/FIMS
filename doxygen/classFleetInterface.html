@@ -313,7 +313,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:aa97acd77c0c4d2e193c67cd0662d803c inherit pub_methods_classFIMSRcppInterfaceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert the data to json representation for the output.  <br /></td></tr>
 <tr class="separator:aa97acd77c0c4d2e193c67cd0662d803c inherit pub_methods_classFIMSRcppInterfaceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a46e0ce655ef707a6c66e863aa4f0b374 inherit pub_methods_classFIMSRcppInterfaceBase" id="r_a46e0ce655ef707a6c66e863aa4f0b374"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFIMSRcppInterfaceBase.html#a46e0ce655ef707a6c66e863aa4f0b374">value_to_string</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">double</a> value)</td></tr>
-<tr class="memdesc:a46e0ce655ef707a6c66e863aa4f0b374 inherit pub_methods_classFIMSRcppInterfaceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Report the parameter value as a string.  <br /></td></tr>
+<tr class="memdesc:a46e0ce655ef707a6c66e863aa4f0b374 inherit pub_methods_classFIMSRcppInterfaceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Report the variable value as a string.  <br /></td></tr>
 <tr class="separator:a46e0ce655ef707a6c66e863aa4f0b374 inherit pub_methods_classFIMSRcppInterfaceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1fa6e0deb883a921fe70b328cdd30fee inherit pub_methods_classFIMSRcppInterfaceBase" id="r_a1fa6e0deb883a921fe70b328cdd30fee"><td class="memItemLeft" align="right" valign="top">
 std::string&#160;</td><td class="memItemRight" valign="bottom"><b>make_dimensions</b> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">start</a>, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a> end, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">rep</a>=1)</td></tr>
@@ -346,42 +346,90 @@ Public Attributes</h2></td></tr>
 <a class="el" href="classSharedString.html">SharedString</a>&#160;</td><td class="memItemRight" valign="bottom"><b>observed_index_units</b> = <a class="el" href="def_8hpp.html#ad28f97734d58355a40d01801bca1e2bf">fims::to_string</a>(&quot;weight&quot;)</td></tr>
 <tr class="memdesc:adace9cb3a219aee6d248ae4e444b5c11"><td class="mdescLeft">&#160;</td><td class="mdescRight">What units is the observed index of abundance for this fleet measured in. Options are weight or numbers, default is weight. <br /></td></tr>
 <tr class="separator:adace9cb3a219aee6d248ae4e444b5c11"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6cd303d699e4b0fdf9340af4b3126a3a" id="r_a6cd303d699e4b0fdf9340af4b3126a3a"><td class="memItemLeft" align="right" valign="top"><a id="a6cd303d699e4b0fdf9340af4b3126a3a" name="a6cd303d699e4b0fdf9340af4b3126a3a"></a>
-<a class="el" href="classParameterVector.html">ParameterVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>log_q</b></td></tr>
-<tr class="memdesc:a6cd303d699e4b0fdf9340af4b3126a3a"><td class="mdescLeft">&#160;</td><td class="mdescRight">The natural log of the index of abundance scaling parameter for this fleet. <br /></td></tr>
-<tr class="separator:a6cd303d699e4b0fdf9340af4b3126a3a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a848e00d1125012b1072f72160843cd2d" id="r_a848e00d1125012b1072f72160843cd2d"><td class="memItemLeft" align="right" valign="top"><a id="a848e00d1125012b1072f72160843cd2d" name="a848e00d1125012b1072f72160843cd2d"></a>
-<a class="el" href="classParameterVector.html">ParameterVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>log_Fmort</b></td></tr>
-<tr class="memdesc:a848e00d1125012b1072f72160843cd2d"><td class="mdescLeft">&#160;</td><td class="mdescRight">The vector of the natural log of fishing mortality rates for this fleet. <br /></td></tr>
-<tr class="separator:a848e00d1125012b1072f72160843cd2d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4ea2ebd360c633c37666731573489ef1" id="r_a4ea2ebd360c633c37666731573489ef1"><td class="memItemLeft" align="right" valign="top"><a id="a4ea2ebd360c633c37666731573489ef1" name="a4ea2ebd360c633c37666731573489ef1"></a>
-<a class="el" href="classParameterVector.html">ParameterVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>log_landings_expected</b></td></tr>
-<tr class="memdesc:a4ea2ebd360c633c37666731573489ef1"><td class="mdescLeft">&#160;</td><td class="mdescRight">The vector of natural log of the expected total landings for the fleet. <br /></td></tr>
-<tr class="separator:a4ea2ebd360c633c37666731573489ef1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a178ce2f344af25e89f7aaa8a1d349077" id="r_a178ce2f344af25e89f7aaa8a1d349077"><td class="memItemLeft" align="right" valign="top"><a id="a178ce2f344af25e89f7aaa8a1d349077" name="a178ce2f344af25e89f7aaa8a1d349077"></a>
-<a class="el" href="classParameterVector.html">ParameterVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>log_index_expected</b></td></tr>
-<tr class="memdesc:a178ce2f344af25e89f7aaa8a1d349077"><td class="mdescLeft">&#160;</td><td class="mdescRight">The vector of natural log of the expected index of abundance for the fleet. <br /></td></tr>
-<tr class="separator:a178ce2f344af25e89f7aaa8a1d349077"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0749fc3615237bec9f5afcef202b306e" id="r_a0749fc3615237bec9f5afcef202b306e"><td class="memItemLeft" align="right" valign="top"><a id="a0749fc3615237bec9f5afcef202b306e" name="a0749fc3615237bec9f5afcef202b306e"></a>
-<a class="el" href="classParameterVector.html">ParameterVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>agecomp_expected</b></td></tr>
-<tr class="memdesc:a0749fc3615237bec9f5afcef202b306e"><td class="mdescLeft">&#160;</td><td class="mdescRight">The vector of expected landings-at-age in numbers for the fleet. <br /></td></tr>
-<tr class="separator:a0749fc3615237bec9f5afcef202b306e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4f650bbc4f05b893557e31a2abc37f2e" id="r_a4f650bbc4f05b893557e31a2abc37f2e"><td class="memItemLeft" align="right" valign="top"><a id="a4f650bbc4f05b893557e31a2abc37f2e" name="a4f650bbc4f05b893557e31a2abc37f2e"></a>
-<a class="el" href="classParameterVector.html">ParameterVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>lengthcomp_expected</b></td></tr>
-<tr class="memdesc:a4f650bbc4f05b893557e31a2abc37f2e"><td class="mdescLeft">&#160;</td><td class="mdescRight">The vector of expected landings-at-length in numbers for the fleet. <br /></td></tr>
-<tr class="separator:a4f650bbc4f05b893557e31a2abc37f2e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a27af06606822e93d4ca831b5de058ee7" id="r_a27af06606822e93d4ca831b5de058ee7"><td class="memItemLeft" align="right" valign="top"><a id="a27af06606822e93d4ca831b5de058ee7" name="a27af06606822e93d4ca831b5de058ee7"></a>
-<a class="el" href="classParameterVector.html">ParameterVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>agecomp_proportion</b></td></tr>
-<tr class="memdesc:a27af06606822e93d4ca831b5de058ee7"><td class="mdescLeft">&#160;</td><td class="mdescRight">The vector of expected landings-at-age in numbers for the fleet. <br /></td></tr>
-<tr class="separator:a27af06606822e93d4ca831b5de058ee7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af7072b48780ec7245124c965f69672fe" id="r_af7072b48780ec7245124c965f69672fe"><td class="memItemLeft" align="right" valign="top"><a id="af7072b48780ec7245124c965f69672fe" name="af7072b48780ec7245124c965f69672fe"></a>
-<a class="el" href="classParameterVector.html">ParameterVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>lengthcomp_proportion</b></td></tr>
-<tr class="memdesc:af7072b48780ec7245124c965f69672fe"><td class="mdescLeft">&#160;</td><td class="mdescRight">The vector of expected landings-at-length in numbers for the fleet. <br /></td></tr>
-<tr class="separator:af7072b48780ec7245124c965f69672fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0a08ed1016f607eeb1c93d873ecd1cf3" id="r_a0a08ed1016f607eeb1c93d873ecd1cf3"><td class="memItemLeft" align="right" valign="top"><a id="a0a08ed1016f607eeb1c93d873ecd1cf3" name="a0a08ed1016f607eeb1c93d873ecd1cf3"></a>
-<a class="el" href="classParameterVector.html">ParameterVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>age_to_length_conversion</b></td></tr>
-<tr class="memdesc:a0a08ed1016f607eeb1c93d873ecd1cf3"><td class="mdescLeft">&#160;</td><td class="mdescRight">The vector of conversions to go from age to length, i.e., the age-to-length-conversion matrix. <br /></td></tr>
-<tr class="separator:a0a08ed1016f607eeb1c93d873ecd1cf3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa4beac0c6d01d3d36fd029e29e52f87d" id="r_aa4beac0c6d01d3d36fd029e29e52f87d"><td class="memItemLeft" align="right" valign="top"><a id="aa4beac0c6d01d3d36fd029e29e52f87d" name="aa4beac0c6d01d3d36fd029e29e52f87d"></a>
+<a class="el" href="classVariableVector.html">VariableVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>log_q</b></td></tr>
+<tr class="memdesc:aa4beac0c6d01d3d36fd029e29e52f87d"><td class="mdescLeft">&#160;</td><td class="mdescRight">The natural log of the index of abundance scaling parameter for this fleet. <br /></td></tr>
+<tr class="separator:aa4beac0c6d01d3d36fd029e29e52f87d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac052f8d241055089650c3d989ee5578b" id="r_ac052f8d241055089650c3d989ee5578b"><td class="memItemLeft" align="right" valign="top"><a id="ac052f8d241055089650c3d989ee5578b" name="ac052f8d241055089650c3d989ee5578b"></a>
+<a class="el" href="classVariableVector.html">VariableVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>log_Fmort</b></td></tr>
+<tr class="memdesc:ac052f8d241055089650c3d989ee5578b"><td class="mdescLeft">&#160;</td><td class="mdescRight">The vector of the natural log of fishing mortality rates for this fleet. <br /></td></tr>
+<tr class="separator:ac052f8d241055089650c3d989ee5578b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a846dfa86edec8b8a3db754e41bbcfd7c" id="r_a846dfa86edec8b8a3db754e41bbcfd7c"><td class="memItemLeft" align="right" valign="top"><a id="a846dfa86edec8b8a3db754e41bbcfd7c" name="a846dfa86edec8b8a3db754e41bbcfd7c"></a>
+<a class="el" href="classVariableVector.html">VariableVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>age_to_length_conversion</b></td></tr>
+<tr class="memdesc:a846dfa86edec8b8a3db754e41bbcfd7c"><td class="mdescLeft">&#160;</td><td class="mdescRight">The vector of conversions to go from age to length, i.e., the age-to-length-conversion matrix. <br /></td></tr>
+<tr class="separator:a846dfa86edec8b8a3db754e41bbcfd7c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abecbb0674a53e0dab0785e5494336c70" id="r_abecbb0674a53e0dab0785e5494336c70"><td class="memItemLeft" align="right" valign="top"><a id="abecbb0674a53e0dab0785e5494336c70" name="abecbb0674a53e0dab0785e5494336c70"></a>
+<a class="el" href="classVariableVector.html">VariableVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>landings_numbers_at_age</b></td></tr>
+<tr class="memdesc:abecbb0674a53e0dab0785e5494336c70"><td class="mdescLeft">&#160;</td><td class="mdescRight">Annual landings at age in numbers for a specific fleet. <br /></td></tr>
+<tr class="separator:abecbb0674a53e0dab0785e5494336c70"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad834c05ab2c35e2100f33d58991389b8" id="r_ad834c05ab2c35e2100f33d58991389b8"><td class="memItemLeft" align="right" valign="top"><a id="ad834c05ab2c35e2100f33d58991389b8" name="ad834c05ab2c35e2100f33d58991389b8"></a>
+<a class="el" href="classVariableVector.html">VariableVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>landings_weight_at_age</b></td></tr>
+<tr class="memdesc:ad834c05ab2c35e2100f33d58991389b8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Annual landings at age in weight for a specific fleet. <br /></td></tr>
+<tr class="separator:ad834c05ab2c35e2100f33d58991389b8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7181f18292cd42cffcbd80c44e3b049c" id="r_a7181f18292cd42cffcbd80c44e3b049c"><td class="memItemLeft" align="right" valign="top"><a id="a7181f18292cd42cffcbd80c44e3b049c" name="a7181f18292cd42cffcbd80c44e3b049c"></a>
+<a class="el" href="classVariableVector.html">VariableVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>landings_numbers_at_length</b></td></tr>
+<tr class="memdesc:a7181f18292cd42cffcbd80c44e3b049c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Annual landings at length in numbers for a specific fleet. <br /></td></tr>
+<tr class="separator:a7181f18292cd42cffcbd80c44e3b049c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acefe316a39dd2e5fa7a62f60815630d9" id="r_acefe316a39dd2e5fa7a62f60815630d9"><td class="memItemLeft" align="right" valign="top"><a id="acefe316a39dd2e5fa7a62f60815630d9" name="acefe316a39dd2e5fa7a62f60815630d9"></a>
+<a class="el" href="classVariableVector.html">VariableVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>landings_weight</b></td></tr>
+<tr class="memdesc:acefe316a39dd2e5fa7a62f60815630d9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Total landings in weight for a specific fleet. <br /></td></tr>
+<tr class="separator:acefe316a39dd2e5fa7a62f60815630d9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad3fe31fce577ee22325cc8ebc5925c30" id="r_ad3fe31fce577ee22325cc8ebc5925c30"><td class="memItemLeft" align="right" valign="top"><a id="ad3fe31fce577ee22325cc8ebc5925c30" name="ad3fe31fce577ee22325cc8ebc5925c30"></a>
+<a class="el" href="classVariableVector.html">VariableVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>landings_numbers</b></td></tr>
+<tr class="memdesc:ad3fe31fce577ee22325cc8ebc5925c30"><td class="mdescLeft">&#160;</td><td class="mdescRight">Total landings in numbers for a specific fleet. <br /></td></tr>
+<tr class="separator:ad3fe31fce577ee22325cc8ebc5925c30"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0541bfb2aa1e1444f8672a720b4e911d" id="r_a0541bfb2aa1e1444f8672a720b4e911d"><td class="memItemLeft" align="right" valign="top"><a id="a0541bfb2aa1e1444f8672a720b4e911d" name="a0541bfb2aa1e1444f8672a720b4e911d"></a>
+<a class="el" href="classVariableVector.html">VariableVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>landings_expected</b></td></tr>
+<tr class="memdesc:a0541bfb2aa1e1444f8672a720b4e911d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Total expected landings for a specific fleet, where the units of the measurement depend on the specified units for that fleet. <br /></td></tr>
+<tr class="separator:a0541bfb2aa1e1444f8672a720b4e911d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afccd35fc92126d1c4b901410ee8508bb" id="r_afccd35fc92126d1c4b901410ee8508bb"><td class="memItemLeft" align="right" valign="top"><a id="afccd35fc92126d1c4b901410ee8508bb" name="afccd35fc92126d1c4b901410ee8508bb"></a>
+<a class="el" href="classVariableVector.html">VariableVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>log_landings_expected</b></td></tr>
+<tr class="memdesc:afccd35fc92126d1c4b901410ee8508bb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Log total expected landings for a specific fleet, where the units of the measurement depend on the specified units for that fleet. <br /></td></tr>
+<tr class="separator:afccd35fc92126d1c4b901410ee8508bb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a51586d11eba056f7a959dfc1fcc71913" id="r_a51586d11eba056f7a959dfc1fcc71913"><td class="memItemLeft" align="right" valign="top"><a id="a51586d11eba056f7a959dfc1fcc71913" name="a51586d11eba056f7a959dfc1fcc71913"></a>
+<a class="el" href="classVariableVector.html">VariableVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>agecomp_proportion</b></td></tr>
+<tr class="memdesc:a51586d11eba056f7a959dfc1fcc71913"><td class="mdescLeft">&#160;</td><td class="mdescRight">Proportion of total landings by age used to specify the age composition. <br /></td></tr>
+<tr class="separator:a51586d11eba056f7a959dfc1fcc71913"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa333dbd9f456436edfb5faae1981d5d5" id="r_aa333dbd9f456436edfb5faae1981d5d5"><td class="memItemLeft" align="right" valign="top"><a id="aa333dbd9f456436edfb5faae1981d5d5" name="aa333dbd9f456436edfb5faae1981d5d5"></a>
+<a class="el" href="classVariableVector.html">VariableVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>lengthcomp_proportion</b></td></tr>
+<tr class="memdesc:aa333dbd9f456436edfb5faae1981d5d5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Proportion of total landings by length used to specify the length composition. <br /></td></tr>
+<tr class="separator:aa333dbd9f456436edfb5faae1981d5d5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae72b00c1da3f3984621a3bff9f895998" id="r_ae72b00c1da3f3984621a3bff9f895998"><td class="memItemLeft" align="right" valign="top"><a id="ae72b00c1da3f3984621a3bff9f895998" name="ae72b00c1da3f3984621a3bff9f895998"></a>
+<a class="el" href="classVariableVector.html">VariableVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>index_numbers_at_age</b></td></tr>
+<tr class="memdesc:ae72b00c1da3f3984621a3bff9f895998"><td class="mdescLeft">&#160;</td><td class="mdescRight">Numbers at age for a fleet index such as survey or CPUE. <br /></td></tr>
+<tr class="separator:ae72b00c1da3f3984621a3bff9f895998"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aac814ed8b7a04db56cbdfd5cff57d178" id="r_aac814ed8b7a04db56cbdfd5cff57d178"><td class="memItemLeft" align="right" valign="top"><a id="aac814ed8b7a04db56cbdfd5cff57d178" name="aac814ed8b7a04db56cbdfd5cff57d178"></a>
+<a class="el" href="classVariableVector.html">VariableVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>index_weight_at_age</b></td></tr>
+<tr class="memdesc:aac814ed8b7a04db56cbdfd5cff57d178"><td class="mdescLeft">&#160;</td><td class="mdescRight">Weight at age for a fleet index such as survey or CPUE. <br /></td></tr>
+<tr class="separator:aac814ed8b7a04db56cbdfd5cff57d178"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4c5d0233dc5fde42e8af311b6679dc81" id="r_a4c5d0233dc5fde42e8af311b6679dc81"><td class="memItemLeft" align="right" valign="top"><a id="a4c5d0233dc5fde42e8af311b6679dc81" name="a4c5d0233dc5fde42e8af311b6679dc81"></a>
+<a class="el" href="classVariableVector.html">VariableVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>index_numbers_at_length</b></td></tr>
+<tr class="memdesc:a4c5d0233dc5fde42e8af311b6679dc81"><td class="mdescLeft">&#160;</td><td class="mdescRight">Numbers at length for a fleet index such as survey or CPUE. <br /></td></tr>
+<tr class="separator:a4c5d0233dc5fde42e8af311b6679dc81"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaf2c77a1a5cd48b4160e0a4ba47f0154" id="r_aaf2c77a1a5cd48b4160e0a4ba47f0154"><td class="memItemLeft" align="right" valign="top"><a id="aaf2c77a1a5cd48b4160e0a4ba47f0154" name="aaf2c77a1a5cd48b4160e0a4ba47f0154"></a>
+<a class="el" href="classVariableVector.html">VariableVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>index_weight</b></td></tr>
+<tr class="memdesc:aaf2c77a1a5cd48b4160e0a4ba47f0154"><td class="mdescLeft">&#160;</td><td class="mdescRight">Total weight for a fleet index such as survey or CPUE. <br /></td></tr>
+<tr class="separator:aaf2c77a1a5cd48b4160e0a4ba47f0154"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac9bca9600bec005290d8cd91c676de28" id="r_ac9bca9600bec005290d8cd91c676de28"><td class="memItemLeft" align="right" valign="top"><a id="ac9bca9600bec005290d8cd91c676de28" name="ac9bca9600bec005290d8cd91c676de28"></a>
+<a class="el" href="classVariableVector.html">VariableVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>index_numbers</b></td></tr>
+<tr class="memdesc:ac9bca9600bec005290d8cd91c676de28"><td class="mdescLeft">&#160;</td><td class="mdescRight">Total numbers for a fleet index such as survey or CPUE. <br /></td></tr>
+<tr class="separator:ac9bca9600bec005290d8cd91c676de28"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a74b138826fe275c1e991b047e298297f" id="r_a74b138826fe275c1e991b047e298297f"><td class="memItemLeft" align="right" valign="top"><a id="a74b138826fe275c1e991b047e298297f" name="a74b138826fe275c1e991b047e298297f"></a>
+<a class="el" href="classVariableVector.html">VariableVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>index_expected</b></td></tr>
+<tr class="memdesc:a74b138826fe275c1e991b047e298297f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Expected value for a fleet index, where the units of the measurement depend on the specified units for that fleet. <br /></td></tr>
+<tr class="separator:a74b138826fe275c1e991b047e298297f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae96c43083cd53e52dc2408ce9010be2b" id="r_ae96c43083cd53e52dc2408ce9010be2b"><td class="memItemLeft" align="right" valign="top"><a id="ae96c43083cd53e52dc2408ce9010be2b" name="ae96c43083cd53e52dc2408ce9010be2b"></a>
+<a class="el" href="classVariableVector.html">VariableVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>log_index_expected</b></td></tr>
+<tr class="memdesc:ae96c43083cd53e52dc2408ce9010be2b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Log expected value for a fleet index, where the units of the measurement depend on the specified units for that fleet. <br /></td></tr>
+<tr class="separator:ae96c43083cd53e52dc2408ce9010be2b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad3c5fc3cc8182a701a44f533f092b7f0" id="r_ad3c5fc3cc8182a701a44f533f092b7f0"><td class="memItemLeft" align="right" valign="top"><a id="ad3c5fc3cc8182a701a44f533f092b7f0" name="ad3c5fc3cc8182a701a44f533f092b7f0"></a>
+<a class="el" href="classVariableVector.html">VariableVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>agecomp_expected</b></td></tr>
+<tr class="memdesc:ad3c5fc3cc8182a701a44f533f092b7f0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Expected age-composition proportions for the fleet. <br /></td></tr>
+<tr class="separator:ad3c5fc3cc8182a701a44f533f092b7f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a78a5a389279af1dd5210016b0aa2bb1a" id="r_a78a5a389279af1dd5210016b0aa2bb1a"><td class="memItemLeft" align="right" valign="top"><a id="a78a5a389279af1dd5210016b0aa2bb1a" name="a78a5a389279af1dd5210016b0aa2bb1a"></a>
+<a class="el" href="classVariableVector.html">VariableVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>lengthcomp_expected</b></td></tr>
+<tr class="memdesc:a78a5a389279af1dd5210016b0aa2bb1a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Expected length-composition proportions for the fleet. <br /></td></tr>
+<tr class="separator:a78a5a389279af1dd5210016b0aa2bb1a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_attribs_classFleetInterfaceBase"><td colspan="2" onclick="javascript:toggleInherit('pub_attribs_classFleetInterfaceBase')"><img src="closed.png" alt="-"/>&#160;Public Attributes inherited from <a class="el" href="classFleetInterfaceBase.html">FleetInterfaceBase</a></td></tr>
 <tr class="memitem:a65f53edf247ffd853afb80ff0d615494 inherit pub_attribs_classFleetInterfaceBase" id="r_a65f53edf247ffd853afb80ff0d615494"><td class="memItemLeft" align="right" valign="top">
 <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a>&#160;</td><td class="memItemRight" valign="bottom"><b>id</b></td></tr>

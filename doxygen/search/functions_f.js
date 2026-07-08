@@ -11,13 +11,13 @@ var searchData=
   ['register_5ffunctions_8',['register_functions',['../rcpp__functions_8cpp.html#a33ddb25b30e800b3cbd7ba2201d180d2',1,'rcpp_functions.cpp']]],
   ['register_5fgrowth_9',['register_growth',['../rcpp__growth_8cpp.html#a92b910d0f730346c4a5c2d7bfece24a5',1,'rcpp_growth.cpp']]],
   ['register_5fmaturity_10',['register_maturity',['../rcpp__maturity_8cpp.html#a773a7aa8219bb89dbb2f762c3b55a769',1,'rcpp_maturity.cpp']]],
-  ['register_5fparameter_11',['register_parameter',['../rcpp__parameter_8cpp.html#a06caf19387bb844186093aa04b7d3159',1,'rcpp_parameter.cpp']]],
-  ['register_5fpopulation_12',['register_population',['../rcpp__population_8cpp.html#a63e6c7f23783af6ea5728c118203730e',1,'rcpp_population.cpp']]],
-  ['register_5frecruitment_13',['register_recruitment',['../rcpp__recruitment_8cpp.html#aceb941db40a811bc39d0bd65e9c230c5',1,'rcpp_recruitment.cpp']]],
-  ['register_5fselectivity_14',['register_selectivity',['../rcpp__selectivity_8cpp.html#a3405e23536afe4e0bcac20dd30537767',1,'rcpp_selectivity.cpp']]],
-  ['register_5fself_15',['register_self',['../structfims__model__object_1_1FIMSMemoryTracker.html#aa714fd275e924fae47d51824b0e705cc',1,'fims_model_object::FIMSMemoryTracker']]],
-  ['register_5fshared_16',['register_shared',['../rcpp__shared__primitive_8cpp.html#a3ac07e427da47af922ccfdf1730d193d',1,'rcpp_shared_primitive.cpp']]],
-  ['register_5fvectors_17',['register_vectors',['../rcpp__parameter_8cpp.html#aedc20697f0e4349d2624d2780dc6673e',1,'rcpp_parameter.cpp']]],
+  ['register_5fpopulation_11',['register_population',['../rcpp__population_8cpp.html#a63e6c7f23783af6ea5728c118203730e',1,'rcpp_population.cpp']]],
+  ['register_5frecruitment_12',['register_recruitment',['../rcpp__recruitment_8cpp.html#aceb941db40a811bc39d0bd65e9c230c5',1,'rcpp_recruitment.cpp']]],
+  ['register_5fselectivity_13',['register_selectivity',['../rcpp__selectivity_8cpp.html#a3405e23536afe4e0bcac20dd30537767',1,'rcpp_selectivity.cpp']]],
+  ['register_5fself_14',['register_self',['../structfims__model__object_1_1FIMSMemoryTracker.html#aa714fd275e924fae47d51824b0e705cc',1,'fims_model_object::FIMSMemoryTracker']]],
+  ['register_5fshared_15',['register_shared',['../rcpp__shared__primitive_8cpp.html#a3ac07e427da47af922ccfdf1730d193d',1,'rcpp_shared_primitive.cpp']]],
+  ['register_5fvariable_16',['register_variable',['../rcpp__variable_8cpp.html#ad310116ff6a026f894aeb2bdd58557ad',1,'rcpp_variable.cpp']]],
+  ['register_5fvectors_17',['register_vectors',['../rcpp__variable_8cpp.html#aedc20697f0e4349d2624d2780dc6673e',1,'rcpp_variable.cpp']]],
   ['registerparameter_18',['RegisterParameter',['../classfims__info_1_1Information.html#a59f18d95d8425246661e3513cecdc0a2',1,'fims_info::Information']]],
   ['registerparametername_19',['RegisterParameterName',['../classfims__info_1_1Information.html#ad8957d597804821e05f7c710c8ac5d76',1,'fims_info::Information']]],
   ['registerrandomeffect_20',['RegisterRandomEffect',['../classfims__info_1_1Information.html#a638e4deb58e190b72db9fb6225325b79',1,'fims_info::Information']]],
@@ -27,5 +27,5 @@ var searchData=
   ['report_24',['report',['../classfims__popdy_1_1FisheryModelBase.html#abeb7bd84d2c45be018cc41549eeb65d5',1,'fims_popdy::FisheryModelBase::Report()'],['../classfims__popdy_1_1CatchAtAge.html#abf6dab88981668c7bf763590fa2ad43d',1,'fims_popdy::CatchAtAge::Report()']]],
   ['reserve_25',['reserve',['../classfims_1_1Vector.html#a254cc7fdb1dc247fae2216726cc720e7',1,'fims::Vector']]],
   ['resetvector_26',['ResetVector',['../classfims__popdy_1_1FisheryModelBase.html#ab755a0916428375053ade26191ff76a0',1,'fims_popdy::FisheryModelBase']]],
-  ['resize_27',['resize',['../classRealVector.html#a56c89a02cdc713619a20e68563545be8',1,'RealVector::resize()'],['../classParameterVector.html#a098cdfbbf65f58ee93ffc76090a80e92',1,'ParameterVector::resize()'],['../classfims_1_1Vector.html#a971eba3d10861eaabaf2b0252182fed9',1,'fims::Vector::resize()']]]
+  ['resize_27',['resize',['../classRealVector.html#a56c89a02cdc713619a20e68563545be8',1,'RealVector::resize()'],['../classVariableVector.html#a9821ac18f0bab662144c80536f07bfa8',1,'VariableVector::resize()'],['../classfims_1_1Vector.html#a971eba3d10861eaabaf2b0252182fed9',1,'fims::Vector::resize()']]]
 ];

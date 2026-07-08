@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['constrain_5fdeviations_0',['constrain_deviations',['../structfims__popdy_1_1RecruitmentBase.html#a89cb23e1edcad304e74ded6bc97fe220',1,'fims_popdy::RecruitmentBase']]]
+  ['biomass_0',['biomass',['../classPopulationInterface.html#ad5dc97326e962e8a8221c4ce34d67379',1,'PopulationInterface']]]
 ];

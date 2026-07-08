@@ -1,5 +1,5 @@
 pandoc: 3.8.3
-pkgdown: 2.2.0
+pkgdown: 2.2.1
 pkgdown_sha: ~
 articles:
   adding-new-module: adding-new-module.html
@@ -12,7 +12,7 @@ articles:
   RD-re-sparsity: RD-re-sparsity.html
   training-intro-cpp: training-intro-cpp.html
   training-intro-rcpp: training-intro-rcpp.html
-last_built: 2026-07-02T16:11Z
+last_built: 2026-07-08T16:26Z
 urls:
   reference: https://NOAA-FIMS.github.io/FIMS/reference
   article: https://NOAA-FIMS.github.io/FIMS/articles

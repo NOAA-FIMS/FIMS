@@ -38,10 +38,6 @@ detailed usage, see the C++ docs.
 
 - [LogisticSelectivity](https://noaa-fims.github.io/FIMS/doxygen/classLogisticSelectivityInterface.html)
 
-- [Parameter](https://noaa-fims.github.io/FIMS/doxygen/classParameter.html)
-
-- [ParameterVector](https://noaa-fims.github.io/FIMS/doxygen/classParameterVector.html)
-
 - [Population](https://noaa-fims.github.io/FIMS/doxygen/classPopulationInterface.html)
 
 - [RealVector](https://noaa-fims.github.io/FIMS/doxygen/classRealVector.html)
@@ -51,6 +47,10 @@ detailed usage, see the C++ docs.
 - [SharedReal](https://noaa-fims.github.io/FIMS/doxygen/classSharedReal.html)
 
 - [SharedString](https://noaa-fims.github.io/FIMS/doxygen/classSharedString.html)
+
+- [Variable](https://noaa-fims.github.io/FIMS/doxygen/classVariable.html)
+
+- [VariableVector](https://noaa-fims.github.io/FIMS/doxygen/classVariableVector.html)
 
 ## C++ Documentation
 
