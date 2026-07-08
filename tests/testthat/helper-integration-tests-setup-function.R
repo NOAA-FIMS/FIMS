@@ -538,7 +538,7 @@ setup_and_run_FIMS_with_wrappers <- function(iter_id,
     parameters <- parameters |>
       dplyr::mutate(
         value = dplyr::if_else(
-          fleet_name == "survey1" & label == "log_q",
+          fleet == "survey1" & label == "log_q",
           log(1.0),
           value
         )

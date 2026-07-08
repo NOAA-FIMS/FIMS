@@ -14,8 +14,10 @@
 #' \describe{
 #'   \item{type}{The type of input the row contains. Allowed types include
 #'   `r glue::glue_collapse(fims_input_types, sep = ", ", last = ", and ")`.}
-#'   \item{name}{A character string providing the name of the information source
-#'     that the input was collected from, e.g., `"Trawl fishery"`.}
+#'   \item{fleet}{A character string providing the name of the information
+#'     source that the input was collected from, e.g., `"Trawl fishery"` or
+#'     `"age_zero_survey"`. Entries can be `NA` for information that is not
+#'     fleet/vessel specific.}
 #'   \item{age}{An integer age. Entry can be `NA` if information pertains to
 #'     multiple ages, e.g., total landings rather than landings of age-4 fish.
 #'     In this dataset, ages start at one, therefore recruitment happens at age

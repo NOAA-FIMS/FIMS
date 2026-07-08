@@ -28,7 +28,7 @@ test_that("`create_default_parameters()` works with correct inputs", {
   #' @description Test that the main output table has the correct column structure.
   expect_equal(
     colnames(result),
-    c("model_family", "module_name", "fleet_name", "data")
+    c("model_family", "module_name", "fleet", "data")
   )
   #' @description Test that the `data` column is structured to hold nested information.
   expect_true(is.list(result[["data"]]))

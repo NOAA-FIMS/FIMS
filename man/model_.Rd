@@ -63,7 +63,7 @@ model_age_to_length_conversion(x)
 
 \item{fleet_name}{A string, or vector of strings, specifying the name of the
 fleet(s) of interest that you want landings data for. The strings must
-exactly match strings in the column \code{"name"} of \code{get_data(x)}.}
+exactly match strings in the column \code{"fleet"} of \code{get_data(x)}.}
 }
 \value{
 All of the \verb{model_*()} functions return vectors of data. Currently, the

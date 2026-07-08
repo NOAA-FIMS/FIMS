@@ -15,7 +15,7 @@ data_age_length <- FIMSFrame(data_big)
 
 ## IO correctness ----
 test_that("`create_default_configurations()` works with correct inputs", {
-  expected_names <- c("model_family", "module_name", "fleet_name", "data")
+  expected_names <- c("model_family", "module_name", "fleet", "data")
   default_configurations <- create_default_configurations(data_age_length)
 
   #' @description Test that the function creates a configuration table with the expected column structure.
@@ -25,7 +25,7 @@ test_that("`create_default_configurations()` works with correct inputs", {
   )
 
   expected_names_unnested <- c(
-    "model_family", "module_name", "fleet_name", "module_type",
+    "model_family", "module_name", "fleet", "module_type",
     "distribution_type", "distribution"
   )
   default_configurations_unnested <- default_configurations |>
