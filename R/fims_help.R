@@ -26,7 +26,7 @@ fims_help <- function(query) {
   }
   target_url <- NULL
 
-  doxygen_base_url <- "https://noaa-fims.github.io/FIMS/doxygen/"
+  doxygen_base_url <- "https://e-perl-noaa.github.io/FIMS/doxygen/"
   r_base_url <- "https://noaa-fims.github.io/FIMS/" # Adjust to your pkgdown path
 
   # Check native R exports first
