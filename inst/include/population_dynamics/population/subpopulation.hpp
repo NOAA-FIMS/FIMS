@@ -236,14 +236,9 @@ inline PartitionSpec MakeDefaultSexPartitionSpec() {
 
 namespace detail {
 
-inline int find_axis_index(const PartitionSpec &spec,
-                           const std::string &axis_name) {
-  for (size_t i = 0; i < spec.axes.size(); ++i) {
-    if (spec.axes[i].name == axis_name) {
-      return static_cast<int>(i);
-    }
-  }
-  return -1;
+inline bool is_sex_only_partition(const PartitionSpec &spec) {
+  return spec.axes.size() == 1 && spec.axes[0].name == "sex" &&
+         spec.axes[0].size() == 2 && spec.n_strata() == 2;
 }
 
 }  // namespace detail
@@ -251,40 +246,25 @@ inline int find_axis_index(const PartitionSpec &spec,
 /**
  * @brief Build stratum split factors for the default sex-only partition.
  *
- * @details Companion to MakeDefaultSexPartitionSpec(). Intended for a single
- * sex axis (n_strata = 2) where female (level 0) receives proportion_female
- * and male (level 1) receives (1 - proportion_female). For multi-axis specs
- * (e.g. sex x area), production use requires user-supplied per-stratum factors
- * passed directly to stratum_split_factor(); this helper only reads the sex
- * level from each encoded stratum and does not allocate across other axes.
+ * @details Companion to MakeDefaultSexPartitionSpec(). Only valid when spec
+ * has a single sex axis with levels female and male (n_strata = 2). Female
+ * stratum (0) receives proportion_female; male stratum (1) receives
+ * (1 - proportion_female). For any other partition (e.g. sex x area), callers
+ * must supply user-defined per-stratum factors to stratum_split_factor().
  *
- * @param spec Partition structure (must include a sex axis).
+ * @param spec Partition structure (sex-only; see MakeDefaultSexPartitionSpec()).
  * @param proportion_female Value from Population::proportion_female at the
  *        relevant age (and year when time-varying).
  */
 template <typename Type>
 std::vector<Type> SexStratumSplitFactors(const PartitionSpec &spec,
                                          Type proportion_female) {
-  const int sex_axis_index = detail::find_axis_index(spec, "sex");
-  if (sex_axis_index < 0) {
+  if (!detail::is_sex_only_partition(spec)) {
     throw std::invalid_argument(
-        "SexStratumSplitFactors: no sex axis in partition spec");
+        "SexStratumSplitFactors: requires a sex-only partition spec "
+        "(one sex axis with female and male)");
   }
-  std::vector<Type> split_factors(spec.n_strata());
-  for (size_t stratum = 0; stratum < spec.n_strata(); ++stratum) {
-    const size_t sex_level =
-        spec.levels_from_stratum(stratum)[static_cast<size_t>(sex_axis_index)];
-    if (sex_level == 0) {
-      split_factors[stratum] = proportion_female;
-    } else if (sex_level == 1) {
-      split_factors[stratum] = static_cast<Type>(1.0) - proportion_female;
-    } else {
-      throw std::invalid_argument(
-          "SexStratumSplitFactors: unsupported sex level " +
-          std::to_string(sex_level));
-    }
-  }
-  return split_factors;
+  return {proportion_female, static_cast<Type>(1.0) - proportion_female};
 }
 
 }  // namespace fims_popdy
