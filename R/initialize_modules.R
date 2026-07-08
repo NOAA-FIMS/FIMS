@@ -95,7 +95,7 @@ initialize_module <- function(parameters, data, module_name, fleet = NA_characte
     data_distribution_names_for_fleet_i <- parameters |>
       dplyr::filter(
         .data$fleet == !!fleet &
-        .data$distribution_type == "Data"
+          .data$distribution_type == "Data"
       ) |>
       dplyr::pull(.data$module_type)
     if ("age_to_length_conversion" %in% get_data(data)[["type"]] &&
