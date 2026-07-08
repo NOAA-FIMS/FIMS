@@ -47,7 +47,7 @@
 #'     "Data", "Selectivity", "Recruitment", "Growth", "Maturity"). These
 #'     entries are always written in PascalCase to match the names used in the
 #'     C++ code.}
-#'   \item{\code{fleet_name}:}{The name of the fleet the module applies to. This
+#'   \item{\code{fleet}:}{The name of the fleet the module applies to. This
 #'     will be `NA` for non-fleet-specific modules like "Recruitment".}
 #'   \item{\code{data}:}{A list-column containing a `tibble` with detailed
 #'     configurations. Unnesting this column reveals:
@@ -89,10 +89,10 @@
 #'   dplyr::rows_update(
 #'     tibble::tibble(
 #'       module_name = "Selectivity",
-#'       fleet_name = "fleet1",
+#'       fleet = "fleet1",
 #'       module_type = "DoubleLogistic"
 #'     ),
-#'     by = c("module_name", "fleet_name")
+#'     by = c("module_name", "fleet")
 #'   ) |>
 #'   print()
 create_default_configurations <- function(
@@ -116,7 +116,7 @@ create_default_configurations <- function(
   # for determining which modules are needed for each fleet.
   unique_fleet_types <- data |>
     get_data() |>
-    dplyr::distinct(.data$name, .data$type) |>
+    dplyr::distinct(.data$fleet, .data$type) |>
     # Convert type from snake_case to PascalCase
     dplyr::mutate(module_type = snake_to_pascal(.data$type)) |>
     # Set module_type to NA for weight-at-age and age-to-length-conversion
@@ -127,7 +127,6 @@ create_default_configurations <- function(
     )) |>
     # Remove any combinations where the type did not match a known module.
     dplyr::filter(!is.na(.data$module_type)) |>
-    dplyr::rename(fleet_name = dplyr::all_of("name")) |>
     dplyr::select(-dplyr::all_of("type"))
 
   # Define a template for data modules (comps, landings, index).
@@ -155,7 +154,7 @@ create_default_configurations <- function(
     # Create these rows by getting distinct fleet names and joining them
     # with the selectivity template.
     selectivity_config <- unique_fleet_types |>
-      dplyr::distinct(.data$fleet_name) |>
+      dplyr::distinct(.data$fleet) |>
       dplyr::mutate(
         module_name = "Selectivity",
         module_type = "Logistic"
@@ -181,15 +180,15 @@ create_default_configurations <- function(
     # Add model_family column
     dplyr::mutate(model_family = model_family) |>
     # Arrange for readability.
-    dplyr::arrange(.data$fleet_name, .data$module_name) |>
+    dplyr::arrange(.data$fleet, .data$module_name) |>
     # Reorder columns
     dplyr::select(
-      dplyr::all_of(c("model_family", "module_name", "module_type", "fleet_name")),
+      dplyr::all_of(c("model_family", "module_name", "module_type", "fleet")),
       dplyr::everything()
     ) |>
     # Nest the configuration details into a list-column called 'data'.
     # This creates the final, structured output format expected by FIMS.
-    tidyr::nest(.by = c("model_family", "module_name", "fleet_name"))
+    tidyr::nest(.by = c("model_family", "module_name", "fleet"))
 }
 
 #' Convert snake_case strings to PascalCase

@@ -1,4 +1,4 @@
-"","model_family","module_name","fleet_name","module_type","label","age","length","time","value","estimation_type","distribution_type","distribution"
+"","model_family","module_name","fleet","module_type","label","age","length","time","value","estimation_type","distribution_type","distribution"
 "1","catch_at_age","Selectivity","fleet1","Logistic","inflection_point",NA,NA,NA,2,"fixed_effects",NA,NA
 "2","catch_at_age","Selectivity","fleet1","Logistic","slope",NA,NA,NA,1,"fixed_effects",NA,NA
 "3","catch_at_age","Fleet","fleet1",NA,"log_q",NA,NA,NA,0,"constant",NA,NA

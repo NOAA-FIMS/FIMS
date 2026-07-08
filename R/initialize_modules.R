@@ -8,19 +8,19 @@
 #' @param data An S4 object. FIMS input data.
 #' @param module_name A character. Name of the module to initialize (e.g.,
 #'   "Population" or "Fleet").
-#' @param fleet_name A character. Name of the fleet to initialize. If not
+#' @param fleet A character. Name of the fleet to initialize. If not
 #'   specified, the module will be initialized without fleet-specific data.
 #' @return
 #' The initialized module as an object.
 #' @noRd
-initialize_module <- function(parameters, data, module_name, fleet_name = NA_character_) {
+initialize_module <- function(parameters, data, module_name, fleet = NA_character_) {
   module_input <- parameters |>
     # Using !! to unquote the variables
     dplyr::filter(.data$module_name == !!module_name)
 
-  if (!is.na(fleet_name)) {
+  if (!is.na(fleet)) {
     module_input <- module_input |>
-      dplyr::filter(.data$fleet_name == !!fleet_name)
+      dplyr::filter(.data$fleet == !!fleet)
   }
 
   module_class_name <- module_input |>
@@ -114,12 +114,15 @@ initialize_module <- function(parameters, data, module_name, fleet_name = NA_cha
     ))
 
     fleet_types <- get_data(data) |>
-      dplyr::filter(.data$name == fleet_name) |>
+      dplyr::filter(.data$fleet == .env$fleet) |>
       dplyr::pull(.data$type) |>
       unique()
 
     data_distribution_names_for_fleet_i <- parameters |>
-      dplyr::filter(.data$fleet_name == !!fleet_name & .data$distribution_type == "Data") |>
+      dplyr::filter(
+        .data$fleet == !!fleet &
+        .data$distribution_type == "Data"
+      ) |>
       dplyr::pull(.data$module_type)
     if ("age_to_length_conversion" %in% get_data(data)[["type"]] &&
       "LengthComp" %in% data_distribution_names_for_fleet_i) {
@@ -175,7 +178,7 @@ initialize_module <- function(parameters, data, module_name, fleet_name = NA_cha
           "n_ages" = get_n_ages(data),
           "n_fleets" = parameters |>
             dplyr::filter(.data$module_name == "Fleet") |>
-            dplyr::pull(.data$fleet_name) |>
+            dplyr::pull(.data$fleet) |>
             unique() |>
             length(),
           # Or we can use get_n_fleets(data),
@@ -317,17 +320,17 @@ initialize_population <- function(parameters, data, linked_ids) {
 #' decreases from 1 to 0.
 #'
 #' @inheritParams initialize_module
-#' @param fleet_name A character. Name of the fleet to initialize.
+#' @param fleet A character. Name of the fleet to initialize.
 #' @return
 #' The initialized selectivity module as an object.
 #' @noRd
-initialize_selectivity <- function(parameters, data, fleet_name) {
+initialize_selectivity <- function(parameters, data, fleet) {
   module_name <- "Selectivity"
   module <- initialize_module(
     parameters = parameters,
     data = data,
     module_name = module_name,
-    fleet_name = fleet_name
+    fleet = fleet
   )
   return(module)
 }
@@ -341,30 +344,30 @@ initialize_selectivity <- function(parameters, data, fleet_name) {
 #' Initializes a fleet module by setting up its fields. It links selectivity,
 #' index, and age-composition modules.
 #' @inheritParams initialize_module
-#' @param fleet_name A character. Name of the fleet to initialize.
+#' @param fleet A character. Name of the fleet to initialize.
 #' @param linked_ids A vector. Named vector of linked IDs required for the
 #'  fleet, including IDs for "selectivity", "landings", "index", "age_comp", and "length_comp".
 #' @return
 #' The initialized fleet module as an object.
 #' @noRd
-initialize_fleet <- function(parameters, data, fleet_name, linked_ids) {
+initialize_fleet <- function(parameters, data, fleet, linked_ids) {
   module <- initialize_module(
     parameters = parameters,
     data = data,
-    fleet_name = fleet_name,
+    fleet = fleet,
     module_name = "Fleet"
   )
 
   module$SetSelectivityID(linked_ids[["selectivity"]])
 
   fleet_types <- get_data(data) |>
-    dplyr::filter(.data$name == fleet_name) |>
+    dplyr::filter(.data$fleet == .env$fleet) |>
     dplyr::pull(.data$type) |>
     unique()
 
 
   distribution_names_for_fleet <- parameters |>
-    dplyr::filter(.data$fleet_name == !!fleet_name & .data$distribution_type == "Data") |>
+    dplyr::filter(.data$fleet == !!fleet & .data$distribution_type == "Data") |>
     dplyr::pull(.data$module_type)
 
   # Link the observed landings data to the fleet module using its associated ID
@@ -406,28 +409,28 @@ initialize_fleet <- function(parameters, data, fleet_name, linked_ids) {
 #' @description
 #' Initializes a landings module based on the provided data and fleet name.
 #' @inheritParams initialize_module
-#' @param fleet_name A character. Name of the fleet for which the landings
+#' @param fleet A character. Name of the fleet for which the landings
 #'   module is initialized.
 #' @return
 #' The initialized landings module as an object.
 #' @noRd
-initialize_landings <- function(data, fleet_name) {
+initialize_landings <- function(data, fleet) {
   # Check if the specified fleet exists in the data
-  fleet_exists <- fleet_name %in% get_fleets(data)
+  fleet_exists <- fleet %in% get_fleets(data)
   if (!fleet_exists) {
-    cli::cli_abort("Fleet {.var {fleet_name}} not found in the data object.")
+    cli::cli_abort("Fleet {.var {fleet}} not found in the data object.")
   }
 
   fleet_type <- dplyr::filter(
     .data = as.data.frame(get_data(data)),
-    .data$name == fleet_name
+    .data$fleet == .env$fleet
   ) |>
     dplyr::distinct(.data$type) |>
     dplyr::pull(.data$type)
 
   if ("landings" %in% fleet_type) {
     module <- methods::new(Landings, get_n_years(data))
-    module$landings_data[] <- model_landings(data, fleet_name)
+    module$landings_data[] <- model_landings(data, fleet)
 
     return(module)
   } else {
@@ -440,28 +443,28 @@ initialize_landings <- function(data, fleet_name) {
 #' @description
 #' Initializes an index module based on the provided data and fleet name.
 #' @inheritParams initialize_module
-#' @param fleet_name A character. Name of the fleet for which the index module
+#' @param fleet A character. Name of the fleet for which the index module
 #'   is initialized.
 #' @return
 #' The initialized index module as an object.
 #' @noRd
-initialize_index <- function(data, fleet_name) {
+initialize_index <- function(data, fleet) {
   # Check if the specified fleet exists in the data
-  fleet_exists <- fleet_name %in% get_fleets(data)
+  fleet_exists <- fleet %in% get_fleets(data)
   if (!fleet_exists) {
-    cli::cli_abort("Fleet {.var {fleet_name}} not found in the data object.")
+    cli::cli_abort("Fleet {.var {fleet}} not found in the data object.")
   }
 
   fleet_type <- dplyr::filter(
     .data = as.data.frame(get_data(data)),
-    .data$name == fleet_name
+    .data$fleet == .env$fleet
   ) |>
     dplyr::distinct(.data$type) |>
     dplyr::pull(.data$type)
 
   if ("index" %in% fleet_type) {
     module <- methods::new(Index, get_n_years(data))
-    module$index_data[] <- model_index(data, fleet_name)
+    module$index_data[] <- model_index(data, fleet)
 
     return(module)
   } else {
@@ -477,7 +480,7 @@ initialize_index <- function(data, fleet_name) {
 #' a composition module.
 #'
 #' @inheritParams initialize_module
-#' @param fleet_name A character specifying the name of the fleet for which
+#' @param fleet A character specifying the name of the fleet for which
 #'   composition data is initialized.
 #' @param type A character specifying the composition type, where the default
 #'   is `"AgeComp"`. At the moment, one can initialize `"AgeComp"` or
@@ -486,7 +489,7 @@ initialize_index <- function(data, fleet_name) {
 #' The initialized composition module as an object.
 #' @noRd
 initialize_comp <- function(data,
-                            fleet_name,
+                            fleet,
                             type = c("AgeComp", "LengthComp")) {
   # Edit this list if a new type is added
   # Set up the specifics for the given type.
@@ -514,9 +517,9 @@ initialize_comp <- function(data,
   comp <- comp_types[[type]]
 
   # Check if the specified fleet exists in the data
-  fleet_exists <- fleet_name %in% get_fleets(data)
+  fleet_exists <- fleet %in% get_fleets(data)
   if (!fleet_exists) {
-    cli::cli_abort("Fleet {.var {fleet_name}} not found in the data object.")
+    cli::cli_abort("Fleet {.var {fleet}} not found in the data object.")
   }
 
   get_function <- comp[["get_n_function"]]
@@ -527,11 +530,11 @@ initialize_comp <- function(data,
   )
 
   # Validate that the fleet's composition data is available
-  comp_data <- comp[["m_comp"]](data, fleet_name)
+  comp_data <- comp[["m_comp"]](data, fleet)
   pretty_comp_name <- gsub("_comp", "-composition", comp[["name"]])
   if (is.null(comp_data) || length(comp_data) == 0) {
     cli::cli_abort(c(
-      "The {pretty_comp_name} data for fleet {.var {fleet_name}} is
+      "The {pretty_comp_name} data for fleet {.var {fleet}} is
       unavailable or empty."
     ))
   }
@@ -539,7 +542,7 @@ initialize_comp <- function(data,
   model_data <- comp_data *
     get_data(data) |>
       dplyr::filter(
-        .data$name == fleet_name,
+        .data$fleet == .env$fleet,
         .data$type == comp[["name"]]
       ) |>
       dplyr::mutate(
@@ -550,7 +553,7 @@ initialize_comp <- function(data,
   if (length(model_data) != get_n_years(data) * get_function(data)) {
     bad_data_years <- get_data(data) |>
       dplyr::filter(
-        .data$name == fleet_name,
+        .data$fleet == .env$fleet,
         .data$type == comp[["name"]]
       ) |>
       dplyr::count(.data$timing) |>
@@ -559,7 +562,7 @@ initialize_comp <- function(data,
 
     cli::cli_abort(c(
       "The length of the `{comp[['name']]}`-composition data for fleet
-      `{fleet_name}` does not match the expected dimensions.",
+      `{fleet}` does not match the expected dimensions.",
       i = "Expected length: {get_n_years(data) * get_function(data)}",
       i = "Actual length: {length(model_data)}",
       i = "Number of -999 values: {sum(model_data == -999)}",
@@ -656,12 +659,12 @@ initialize_fims <- function(parameters, data) {
   # Clear any previous FIMS settings
   clear()
 
-  fleet_names <- parameters |>
-    dplyr::pull(.data$fleet_name) |>
+  fleets <- parameters |>
+    dplyr::pull(.data$fleet) |>
     unique() |>
     na.omit()
 
-  if (length(fleet_names) == 0) {
+  if (length(fleets) == 0) {
     cli::cli_abort(c(
       "No fleets found in the provided {.var parameters}."
     ))
@@ -673,13 +676,13 @@ initialize_fims <- function(parameters, data) {
     fleet_index <- fleet_index_distribution <-
     fleet_age_comp <- fleet_agecomp_distribution <-
     fleet_length_comp <- fleet_lengthcomp_distribution <-
-    vector("list", length(fleet_names))
+    vector("list", length(fleets))
 
-  for (i in seq_along(fleet_names)) {
+  for (i in seq_along(fleets)) {
     fleet_selectivity[[i]] <- initialize_selectivity(
       parameters = parameters,
       data = data,
-      fleet_name = fleet_names[i]
+      fleet = fleets[i]
     )
 
     fleet_module_ids <- c(
@@ -687,12 +690,12 @@ initialize_fims <- function(parameters, data) {
     )
 
     fleet_types <- get_data(data) |>
-      dplyr::filter(.data$name == fleet_names[i]) |>
+      dplyr::filter(.data$fleet == .env$fleets[i]) |>
       dplyr::pull(.data$type) |>
       unique()
 
     data_distribution_names_for_fleet_i <- parameters |>
-      dplyr::filter(.data$fleet_name == fleet_names[i] & .data$distribution_type == "Data") |>
+      dplyr::filter(.data$fleet == .env$fleets[i] & .data$distribution_type == "Data") |>
       dplyr::pull(.data$module_type)
 
     # Initialize landings module if the data type includes "landings" and
@@ -702,7 +705,7 @@ initialize_fims <- function(parameters, data) {
       # Initialize landings module for the current fleet
       fleet_landings[[i]] <- initialize_landings(
         data = data,
-        fleet_name = fleet_names[i]
+        fleet = fleets[i]
       )
 
       # Add the module ID for the initialized landings to the list of fleet module IDs
@@ -719,7 +722,7 @@ initialize_fims <- function(parameters, data) {
       # Initialize index module for the current fleet
       fleet_index[[i]] <- initialize_index(
         data = data,
-        fleet_name = fleet_names[i]
+        fleet = fleets[i]
       )
 
       # Add the module ID for the initialized index to the list of fleet module IDs
@@ -736,7 +739,7 @@ initialize_fims <- function(parameters, data) {
       # Initialize age composition module for the current fleet
       fleet_age_comp[[i]] <- initialize_comp(
         data = data,
-        fleet_name = fleet_names[i],
+        fleet = fleets[i],
         type = "AgeComp"
       )
 
@@ -754,7 +757,7 @@ initialize_fims <- function(parameters, data) {
       # Initialize length composition module for the current fleet
       fleet_length_comp[[i]] <- initialize_comp(
         data = data,
-        fleet_name = fleet_names[i],
+        fleet = fleets[i],
         type = "LengthComp"
       )
 
@@ -768,14 +771,14 @@ initialize_fims <- function(parameters, data) {
     fleet[[i]] <- initialize_fleet(
       parameters = parameters,
       data = data,
-      fleet_name = fleet_names[i],
+      fleet = fleets[i],
       # TODO: need to remove linked_ids from the function and add module_id to the
       # parameters tibble
       linked_ids = fleet_module_ids
     )
 
     fleet_sd_input <- parameters |>
-      dplyr::filter(.data$fleet_name == fleet_names[i] & .data$label == "log_sd") |>
+      dplyr::filter(.data$fleet == .env$fleets[i] & .data$label == "log_sd") |>
       dplyr::mutate(
         label = "sd",
         value = exp(.data$value)
@@ -783,7 +786,7 @@ initialize_fims <- function(parameters, data) {
 
     if (length(fleet_sd_input) == 0) {
       cli::cli_abort(c(
-        "Missing required inputs for `log_sd` in fleet `{fleet_name}`."
+        "Missing required inputs for `log_sd` in fleet `{fleet}`."
       ))
     }
 
