@@ -32,8 +32,8 @@ test_that("`log_obs_error scalar` works with correct inputs", {
     tidyr::unnest(cols = data) |>
     # remove all but one log_obs_sd initial values for Fleet1
     dplyr::filter(
-      !(fleet_name == "fleet1" & label == "log_sd" & time > 1) |
-        is.na(fleet_name == "fleet1" & label == "log_sd" & time > 1)
+      !(fleet == "fleet1" & label == "log_sd" & time > 1) |
+        is.na(fleet == "fleet1" & label == "log_sd" & time > 1)
     ) |>
     dplyr::mutate(estimation_type = ifelse(label == "log_sd",
       "constant", estimation_type
@@ -47,7 +47,7 @@ test_that("`log_obs_error scalar` works with correct inputs", {
     get_estimates()
 
   log_sd_input <- parameters_4_model |>
-    dplyr::filter(fleet_name == "fleet1" & label == "log_sd") |>
+    dplyr::filter(fleet == "fleet1" & label == "log_sd") |>
     dplyr::select(value)
 
   log_sd_output <- json_estimates |>
@@ -67,7 +67,7 @@ test_that("`log_obs_error scalar` works with correct inputs", {
 
   # turn on estimation for log_sd
   parameters_4_model <- parameters_4_model |>
-    dplyr::mutate(estimation_type = ifelse(fleet_name == "fleet1" &
+    dplyr::mutate(estimation_type = ifelse(fleet == "fleet1" &
       label == "log_sd",
     "fixed_effects", estimation_type
     ))
@@ -79,7 +79,7 @@ test_that("`log_obs_error scalar` works with correct inputs", {
   json_estimates <- reshape_json_estimates(test_fit@model_output)
 
   log_sd_input <- parameters_4_model |>
-    dplyr::filter(fleet_name == "fleet1" & label == "log_sd") |>
+    dplyr::filter(fleet == "fleet1" & label == "log_sd") |>
     dplyr::select(value)
 
   log_sd_output <- json_estimates |>
@@ -101,8 +101,8 @@ test_that("`log_sd` returns correct error messages when wrong dimensions", {
     tidyr::unnest(cols = data) |>
     # change log_sd input length to size 4
     dplyr::filter(
-      !(fleet_name == "fleet1" & label == "log_sd" & time > 4) |
-        is.na(fleet_name == "fleet1" & label == "log_sd" & time > 4)
+      !(fleet == "fleet1" & label == "log_sd" & time > 4) |
+        is.na(fleet == "fleet1" & label == "log_sd" & time > 4)
     )
 
   expect_error(
@@ -122,7 +122,7 @@ test_that("`log_sd` returns correct error messages when wrong dimensions", {
     tidyr::unnest(cols = data) |>
     # add an extra log_sd observation
     dplyr::add_row(
-      fleet_name = "fleet1",
+      fleet = "fleet1",
       label = "log_sd",
       value = -4.61
     )
@@ -148,8 +148,8 @@ test_that("`log_Fmort` returns correct error messages when wrong dimensions", {
     tidyr::unnest(cols = data) |>
     # change log_Fmort input length to size 4
     dplyr::filter(
-      !(fleet_name == "fleet1" & label == "log_Fmort" & time > 4) |
-        is.na(fleet_name == "fleet1" & label == "log_Fmort" & time > 4)
+      !(fleet == "fleet1" & label == "log_Fmort" & time > 4) |
+        is.na(fleet == "fleet1" & label == "log_Fmort" & time > 4)
     )
 
   expect_error(
@@ -169,7 +169,7 @@ test_that("`log_Fmort` returns correct error messages when wrong dimensions", {
     tidyr::unnest(cols = data) |>
     # add an extra log_Fmort observation
     dplyr::add_row(
-      fleet_name = "fleet1",
+      fleet = "fleet1",
       label = "log_Fmort",
       value = -3,
       module_name = "Fleet"

@@ -207,11 +207,11 @@ test_that("fit_fims() errors when optimization fails to converge", {
   parameters_4_model <- parameters |>
     dplyr::rows_update(
       tibble::tibble(
-        fleet_name = "fleet1",
+        fleet = "fleet1",
         label = "log_q",
         estimation_type = "fixed_effects"
       ),
-      by = c("fleet_name", "label")
+      by = c("fleet", "label")
     )
 
   initialized_model <- parameters_4_model |>

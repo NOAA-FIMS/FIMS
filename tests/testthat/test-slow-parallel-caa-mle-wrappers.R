@@ -57,21 +57,21 @@ modified_parameters <- purrr::map(1:sim_num, \(iter_id) {
     # Update log_Fmort input values for Fleet1
     dplyr::rows_update(
       tibble::tibble(
-        fleet_name = "fleet1",
+        fleet = "fleet1",
         label = "log_Fmort",
         time = 1:get_n_years(data_age_length_comp),
         value = log(om_output_list[[iter_id]][["f"]]),
       ),
-      by = c("fleet_name", "label", "time")
+      by = c("fleet", "label", "time")
     ) |>
     # Update selectivity parameters and log_q for survey1
     dplyr::rows_update(
       tibble::tibble(
-        fleet_name = "survey1",
+        fleet = "survey1",
         label = c("inflection_point", "slope", "log_q"),
         value = c(1.5, 2, log(om_output_list[[iter_id]][["survey_q"]][["survey1"]]))
       ),
-      by = c("fleet_name", "label")
+      by = c("fleet", "label")
     ) |>
     # Update log_devs in the Recruitment module (time steps 2–30)
     dplyr::rows_update(

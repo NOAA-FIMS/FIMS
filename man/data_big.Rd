@@ -10,8 +10,10 @@ variables:
 \describe{
 \item{type}{The type of input the row contains. Allowed types include
 age_comp, age_to_length_conversion, index, landings, length_comp, and weight_at_age.}
-\item{name}{A character string providing the name of the information source
-that the input was collected from, e.g., \code{"Trawl fishery"}.}
+\item{fleet}{A character string providing the name of the information
+source that the input was collected from, e.g., \code{"Trawl fishery"} or
+\code{"age_zero_survey"}. Entries can be \code{NA} for information that is not
+fleet/vessel specific.}
 \item{age}{An integer age. Entry can be \code{NA} if information pertains to
 multiple ages, e.g., total landings rather than landings of age-4 fish.
 In this dataset, ages start at one, therefore recruitment happens at age
