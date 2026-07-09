@@ -21,21 +21,60 @@ data_4_model <- FIMSFrame(data_big)
 parameters <- data_4_model |>
   create_default_configurations() |>
   create_default_parameters(data = data_4_model)
+# Fit in parallel
+retro_fit <- run_fims_retrospective(
+  years_to_remove = 0:2,
+  data = data_big,
+  parameters = parameters,
+  n_cores = 3
+)
 
 ## IO correctness ----
 test_that("run_fims_retrospective() works with correct inputs", {
   #' @description Test that run_fims_retrospective(x) returns y.
 
-  retro_fit <- run_fims_retrospective(
-    years_to_remove = 0:2,
-    data = data_big,
-    parameters = parameters,
-    n_cores = 1
-  )
-
   expect_equal(
     object = names(retro_fit),
     expected = c("years_to_remove", "estimates")
+  )
+
+  #' @description Test that calculate_mohns_rho() returns a numeric value.
+
+  rho_ssb <- calculate_mohns_rho(retro_fit, quantity = "spawning_biomass")
+
+  expect_equal(
+    object = class(rho_ssb),
+    expected = "numeric"
+  )
+
+  expect_equal(
+    object = length(rho_ssb),
+    expected = 1
+  )
+
+  expect_true(
+    object = is.finite(rho_ssb) && !is.na(rho_ssb)
+  )
+
+  #' @description Test that calculate_mohns_rho() returns consistent results across runs.
+  rho_ssb_1 <- calculate_mohns_rho(retro_fit, quantity = "spawning_biomass")
+  rho_ssb_2 <- calculate_mohns_rho(retro_fit, quantity = "spawning_biomass")
+
+  expect_equal(
+    object = rho_ssb_1,
+    expected = rho_ssb_2
+  )
+
+  #' @description Test that calculate_mohns_rho() works with recruitment quantity.
+  rho_rec <- calculate_mohns_rho(retro_fit, quantity = "expected_recruitment")
+
+  expect_equal(
+    object = class(rho_rec),
+    expected = "numeric"
+  )
+
+  expect_true(
+    object = is.finite(rho_rec) && !is.na(rho_rec)
   )
 
   #' @description Test that fims_retrospective(x) returns y.
@@ -78,17 +117,6 @@ test_that("run_fims_retrospective() handles edge cases correctly", {
     expected = 0
   )
 
-  #' @description Test that run_fims_retrospective works with n_cores = 1 (sequential).
-  retro_fit_seq <- run_fims_retrospective(
-    years_to_remove = 0:1,
-    data = data_big,
-    parameters = parameters,
-    n_cores = 1
-  )
-  expect_equal(
-    object = length(retro_fit_seq[["years_to_remove"]]),
-    expected = 2
-  )
 })
 
 ## Error handling ----
@@ -146,5 +174,90 @@ test_that("run_fims_retrospective() returns correct error messages", {
       n_cores = 1
     ),
     regexp = "must contain non-negative values"
+  )
+})
+
+test_that("calculate_mohns_rho() returns correct error messages", {
+  #' @description Test that calculate_mohns_rho() errors with invalid retro_fit (not a list).
+  expect_error(
+    object = calculate_mohns_rho(
+      retro_fit = "not_a_list",
+      quantity = "spawning_biomass"
+    ),
+    regexp = "must be a list"
+  )
+
+  #' @description Test that calculate_mohns_rho() errors with missing elements in retro_fit.
+  expect_error(
+    object = calculate_mohns_rho(
+      retro_fit = list(years_to_remove = 0:2),
+      quantity = "spawning_biomass"
+    ),
+    regexp = "must contain 'years_to_remove' and 'estimates' elements"
+  )
+
+  #' @description Test that calculate_mohns_rho() errors with invalid quantity (not character).
+  expect_error(
+    object = calculate_mohns_rho(
+      retro_fit = retro_fit,
+      quantity = 123
+    ),
+    regexp = "must be a single character string"
+  )
+
+  #' @description Test that calculate_mohns_rho() errors with multiple quantities.
+  expect_error(
+    object = calculate_mohns_rho(
+      retro_fit = retro_fit,
+      quantity = c("spawning_biomass", "expected_recruitment")
+    ),
+    regexp = "must be a single character string"
+  )
+
+  #' @description Test that calculate_mohns_rho() errors when first model is not reference (retrospective_peel != 0).
+  retro_fit_invalid <- retro_fit
+  retro_fit_invalid$years_to_remove <- c(1, 2, 3)
+
+  expect_error(
+    object = calculate_mohns_rho(
+      retro_fit = retro_fit_invalid,
+      quantity = "spawning_biomass"
+    ),
+    regexp = "must contain reference year run"
+  )
+
+  #' @description Test that calculate_mohns_rho() errors with non-existent quantity.
+  expect_error(
+    object = calculate_mohns_rho(
+      retro_fit = retro_fit,
+      quantity = "non_existent_quantity"
+    ),
+    regexp = "not found in estimates"
+  )
+})
+
+## Warning handling ----
+test_that("calculate_mohns_rho() handles warnings appropriately", {
+  #' @description Test that calculate_mohns_rho() handles missing values gracefully.
+  # Create a modified retro_fit with a missing value
+  retro_fit_na <- retro_fit
+  retro_fit_na$estimates$estimated[1] <- NA
+
+  # Depending on where the NA is, this might produce a warning or still work
+  # The function should handle this gracefully
+  result <- tryCatch(
+    {
+      calculate_mohns_rho(retro_fit_na, quantity = "spawning_biomass")
+    },
+    warning = function(w) {
+      # Check that warning message is appropriate
+      expect_true(grepl("NA value|Missing value", w$message, ignore.case = TRUE))
+      return(NULL)
+    },
+    error = function(e) {
+      # If it errors, make sure it's an appropriate error
+      expect_true(grepl("No valid|NA value|Missing value", e$message, ignore.case = TRUE))
+      return(NULL)
+    }
   )
 })

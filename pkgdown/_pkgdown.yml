@@ -106,12 +106,8 @@ navbar:
           href: articles/fims-user-setup-guide.html
         - text: Simple projections using FIMS
           href: articles/fims-demo-projections.html
-        - text: -------
-        - text: Diagnostics
-        - text: Running a likelihood profile on a FIMS model
-          href: articles/likelihood_profile.html
-        - text: Running a retrospective analysis on a FIMS model
-          href: articles/retrospective.html
+        - text: Running a diagnostics on a FIMS model
+          href: articles/fims-diagnostics.html
         - text: -------
         - text: Developer
         - text: Adding a New C++ Module
