@@ -326,12 +326,62 @@ TEST(RuntimeALK, GrowthDerivedFleetMeanWeightAAThrowsWithoutFleetGrowthDerivedPa
       std::runtime_error);
 }
 
-TEST(RuntimeALK, PopulationMeanWeightAAThrowsWithoutCanonicalGrowthDerivedFleet) {
+TEST(RuntimeALK, GrowthDerivedFleetMeanWeightAAMatchesALKWeightedBinCenterWeights) {
+  fims_popdy::CatchAtAge<double> model;
+  auto fleet = MakeFleet();
+
+  auto growth =
+      std::make_shared<fims_popdy::VonBertalanffyGrowthModelAdapter<double>>();
+  ConfigureAdapter(
+      *growth, 275.0, 725.0, 0.18, 1.0, 12.0, 2.5e-11, 3.0, 28.0, 73.0);
+  growth->SetAgeOffset(1.0);
+  growth->Initialize(1, fleet->n_ages, 1);
+
+  const fims_popdy::SizeGrid population_size_grid =
+      MakePopulationSizeGridForFleet(fleet);
+  std::shared_ptr<fims_popdy::SizeDistributionProviderBase<double>>
+      size_provider =
+          MakeConfiguredSizeProvider(
+              growth,
+              &population_size_grid,
+              fleet->n_years,
+              fleet->n_ages);
+
+  auto growth_alk =
+      std::make_shared<fims_popdy::GrowthDerivedALK<double>>(
+          fleet,
+          growth,
+          size_provider);
+  ASSERT_TRUE(growth_alk->IsActive());
+  ASSERT_TRUE(growth_alk->PrepareForCurrentState());
+
+  fleet->alk = growth_alk;
+
+  fims::Vector<double> row;
+  ASSERT_TRUE(growth_alk->BuildALKRow(0, 1, row));
+  ASSERT_EQ(row.size(), fleet->n_lengths);
+
+  double expected_mean_weight = 0.0;
+  for (std::size_t i = 0; i < row.size(); ++i) {
+    expected_mean_weight +=
+        row[i] * 2.5e-11 * std::pow(fleet->lengths[i], 3.0);
+  }
+
+  const double observed_mean_weight =
+      model.GrowthDerivedFleetMeanWeightAA(fleet, 0, 1);
+
+  EXPECT_NEAR(observed_mean_weight, expected_mean_weight, 1e-8);
+}
+
+TEST(RuntimeALK, PopulationMeanWeightAAPreparesGrowthProductsWhenNeeded) {
   fims_popdy::CatchAtAge<double> model;
   auto population = std::make_shared<fims_popdy::Population<double>>();
 
   auto growth = std::make_shared<FakeGrowthDerivedObservation>();
   growth->Initialize(1, 3, 1);
+  growth->products.MeanWAA(0, 0, 0) = 1.25;
+  growth->products.MeanWAA(0, 1, 0) = 2.5;
+  growth->products.MeanWAA(0, 2, 0) = 3.75;
 
   population->growth = growth;
   population->n_ages = 3;
@@ -340,9 +390,12 @@ TEST(RuntimeALK, PopulationMeanWeightAAThrowsWithoutCanonicalGrowthDerivedFleet)
   population->ages[1] = 2.0;
   population->ages[2] = 3.0;
 
-  EXPECT_THROW(
-      model.PopulationMeanWeightAA(population, 0, 0),
-      std::runtime_error);
+  EXPECT_EQ(growth->prepare_calls, 0u);
+
+  const double mean_weight = model.PopulationMeanWeightAA(population, 0, 1);
+
+  EXPECT_EQ(growth->prepare_calls, 1u);
+  EXPECT_DOUBLE_EQ(mean_weight, 2.5);
 }
 
 TEST(GrowthDerivedALK, IsInactiveWithoutPreparedFleetObservationGeometry) {

@@ -50,7 +50,7 @@ make_vonb_convergence_context <- function() {
 make_vonb_no_fixed_alk_context <- function() {
   data("data1", package = "FIMS")
   no_fixed_alk_data <- data1 |>
-    dplyr::filter(type != "age-to-length-conversion")
+    dplyr::filter(!(type %in% c("age-to-length-conversion", "length-bin")))
   fims_frame <- FIMS::FIMSFrame(no_fixed_alk_data)
 
   configurations <- FIMS::create_default_configurations(data = fims_frame) |>
@@ -233,35 +233,35 @@ test_that("von bertalanffy growth converges when L1 L2 and K are estimable", {
     1
   )
 
-  #' @description Test that fixed age-to-length conversion remains available while the VonB path still selects growth-derived ALK.
-  expect_gt(length(report[["age_to_length_conversion"]][[1]]), 0)
+  #' @description Test that fixed age-to-length conversion is not carried into the runtime fleet object when the VonB growth-derived path is active.
+  expect_equal(length(report[["age_to_length_conversion"]][[1]]), 0)
 
-  #' @description Test that the fitted fleet reports finite growth-derived mean WAA when the dynamic ALK path is used.
+  #' @description Test that both biological and fleet-mapped mean WAA remain finite on the dynamic VonB path.
+  expect_true(all(is.finite(
+    report[["growth_mean_WAA"]][[1]]
+  )))
   expect_true(all(is.finite(
     report[["growth_derived_mean_WAA"]][[1]]
   )))
-
-  #' @description Test that population-level and fleet-level mean WAA agree for the supported single-fleet VonB path.
   expect_equal(
-    report[["growth_mean_WAA"]][[1]],
-    report[["growth_derived_mean_WAA"]][[1]],
-    tolerance = 1e-8
+    length(report[["growth_mean_WAA"]][[1]]),
+    length(report[["growth_derived_mean_WAA"]][[1]])
   )
 
-  #' @description Test that objective-side index weight-at-age uses the same fleet mean WAA as the derived VonB path.
+  #' @description Test that objective-side index weight-at-age uses the biological population mean WAA on the refactored VonB path.
   fleet_index_numbers_at_age <- report[["index_numbers_at_age"]][[1]]
   fleet_index_weight_at_age <- report[["index_weight_at_age"]][[1]]
-  fleet_derived_mean_waa <- report[["growth_derived_mean_WAA"]][[1]]
+  population_mean_waa <- report[["growth_mean_WAA"]][[1]]
   positive_index_cells <- abs(fleet_index_numbers_at_age) > 0
   expect_true(any(positive_index_cells))
   expect_equal(
     fleet_index_weight_at_age[positive_index_cells] /
       fleet_index_numbers_at_age[positive_index_cells],
-    fleet_derived_mean_waa[positive_index_cells],
+    population_mean_waa[positive_index_cells],
     tolerance = 1e-8
   )
 
-  #' @description Test that objective-side landings weight-at-age uses the same fleet mean WAA as the derived VonB path.
+  #' @description Test that objective-side landings weight-at-age uses the biological population mean WAA on the refactored VonB path.
   fleet_landings_numbers_at_age <- report[["landings_numbers_at_age"]][[1]]
   fleet_landings_weight_at_age <- report[["landings_weight_at_age"]][[1]]
   positive_landings_cells <- abs(fleet_landings_numbers_at_age) > 0
@@ -269,7 +269,7 @@ test_that("von bertalanffy growth converges when L1 L2 and K are estimable", {
   expect_equal(
     fleet_landings_weight_at_age[positive_landings_cells] /
       fleet_landings_numbers_at_age[positive_landings_cells],
-    fleet_derived_mean_waa[positive_landings_cells],
+    population_mean_waa[positive_landings_cells],
     tolerance = 1e-8
   )
 
@@ -405,7 +405,7 @@ test_that("von bertalanffy report defaults to lightweight derived ALK diagnostic
   expect_equal(length(report[["growth_derived_age_to_length_conversion"]][[1]]), 0)
 })
 
-test_that("von bertalanffy uses growth-derived ALK without a fixed age-to-length matrix", {
+test_that("von bertalanffy uses fleet length-comp bins when fixed fleet ALK rows are absent", {
   ctx <- make_vonb_no_fixed_alk_context()
   on.exit({ rm(ctx); gc() }, add = TRUE)
 
@@ -414,14 +414,34 @@ test_that("von bertalanffy uses growth-derived ALK without a fixed age-to-length
     FIMS::fit_fims(optimize = FALSE)
 
   report <- FIMS::get_report(fit)
+  fleet_obj <- FIMS:::initialize_module(
+    parameters = ctx$parameters,
+    data = ctx$data,
+    module_name = "Fleet",
+    fleet_name = "fleet1"
+  )
+  fleet1_lengthcomp_bins <- ctx$data |>
+    FIMS::get_data() |>
+    dplyr::filter(
+      name == "fleet1",
+      type == "length_comp",
+      !is.na(length)
+    ) |>
+    dplyr::pull(length) |>
+    unique() |>
+    sort()
 
-  #' @description Test that the growth-derived ALK path is selected when VonB growth is used without a fixed age-to-length matrix.
+  #' @description Test that the growth-derived ALK path is selected when VonB growth is used without fixed fleet ALK rows.
   expect_equal(report[["growth_derived_alk_used"]][[1]][1], 1)
 
   #' @description Test that no fixed age-to-length conversion matrix is reported when the fleet relies only on the growth-derived ALK path.
   expect_equal(length(report[["age_to_length_conversion"]][[1]]), 0)
 
-  #' @description Test that growth-derived mean WAA is still reported when no fixed age-to-length matrix is supplied.
+  #' @description Test that fleet initialization falls back to the observed length-comp bins when fixed ALK and explicit length-bin rows are absent.
+  expect_equal(fleet_obj$lengths$toRVector(), fleet1_lengthcomp_bins)
+  expect_equal(fleet_obj$n_lengths$get(), length(fleet1_lengthcomp_bins))
+
+  #' @description Test that growth-derived mean WAA is still reported when the fleet relies on the length-comp bin fallback.
   expect_gt(length(report[["growth_derived_mean_WAA"]][[1]]), 0)
 })
 
@@ -515,11 +535,13 @@ test_that("fleet-specific length bins initialize n_lengths consistently", {
 
   lengthcomp1_obj <- FIMS:::initialize_comp(
     data = ctx$data,
+    parameters = ctx$parameters,
     fleet_name = "fleet1",
     type = "LengthComp"
   )
   lengthcomp2_obj <- FIMS:::initialize_comp(
     data = ctx$data,
+    parameters = ctx$parameters,
     fleet_name = "survey1",
     type = "LengthComp"
   )

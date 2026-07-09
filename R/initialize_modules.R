@@ -9,12 +9,18 @@ utils::globalVariables(c(
   "valid_n"
 ))
 
-# Fleet-specific length-bin precedence:
-# 1. A fixed age-to-length-conversion matrix is authoritative for that fleet.
-# 2. Otherwise, explicit `length-bin` rows are authoritative for that fleet.
-# 3. Otherwise, the wrapper falls back to the historical global length vector.
-# The resolved fleet bins are what get passed into the interface/runtime fleet
-# object; `FIMSFrame@lengths` remains only a global summary/fallback.
+# Helpers for resolving fleet-specific observation-bin geometry and
+# determining when length-based fleets should use the growth-derived
+# observation path at initialization time.
+model_uses_growth_derived_alk_path <- function(parameters) {
+  growth_types <- parameters |>
+    dplyr::filter(.data[["module_name"]] == "Growth") |>
+    dplyr::pull(.data[["module_type"]]) |>
+    unique()
+
+  any(growth_types %in% c("VonBertalanffy"))
+}
+
 get_explicit_fleet_length_bins <- function(data, fleet_name) {
   data_input <- get_data(data)
   if (!"length" %in% names(data_input)) {
@@ -31,6 +37,25 @@ get_explicit_fleet_length_bins <- function(data, fleet_name) {
     sort()
 
   explicit_bins[!is.na(explicit_bins)]
+}
+
+get_length_comp_fleet_length_bins <- function(data, fleet_name) {
+  data_input <- get_data(data)
+  if (!"length" %in% names(data_input)) {
+    return(numeric(0))
+  }
+
+  comp_bins <- data_input |>
+    dplyr::filter(
+      .data[["name"]] %in% fleet_name,
+      .data[["type"]] == "length_comp",
+      !is.na(.data[["length"]])
+    ) |>
+    dplyr::pull(.data[["length"]]) |>
+    unique() |>
+    sort()
+
+  comp_bins[!is.na(comp_bins)]
 }
 
 get_fixed_alk_fleet_length_bins <- function(data, fleet_name) {
@@ -52,8 +77,25 @@ get_fixed_alk_fleet_length_bins <- function(data, fleet_name) {
   alk_bins[!is.na(alk_bins)]
 }
 
-get_local_fleet_length_bins <- function(data, fleet_name) {
+get_local_fleet_length_bins <- function(data,
+                                        fleet_name,
+                                        use_growth_derived_path = FALSE) {
   explicit_bins <- get_explicit_fleet_length_bins(data, fleet_name)
+
+  if (use_growth_derived_path) {
+    comp_bins <- get_length_comp_fleet_length_bins(data, fleet_name)
+
+    if (length(explicit_bins) > 0) {
+      return(explicit_bins)
+    }
+
+    if (length(comp_bins) > 0) {
+      return(comp_bins)
+    }
+
+    return(numeric(0))
+  }
+
   alk_bins <- get_fixed_alk_fleet_length_bins(data, fleet_name)
 
   if (length(alk_bins) > 0) {
@@ -74,15 +116,33 @@ get_local_fleet_length_bins <- function(data, fleet_name) {
   numeric(0)
 }
 
-fleet_has_local_length_bins <- function(data, fleet_name) {
-  length(get_local_fleet_length_bins(data, fleet_name)) > 0
+fleet_has_local_length_bins <- function(data,
+                                        fleet_name,
+                                        use_growth_derived_path = FALSE) {
+  length(get_local_fleet_length_bins(
+    data = data,
+    fleet_name = fleet_name,
+    use_growth_derived_path = use_growth_derived_path
+  )) > 0
 }
 
-get_fleet_length_bins <- function(data, fleet_name) {
-  local_bins <- get_local_fleet_length_bins(data, fleet_name)
+get_fleet_length_bins <- function(data,
+                                  fleet_name,
+                                  use_growth_derived_path = FALSE) {
+  local_bins <- get_local_fleet_length_bins(
+    data = data,
+    fleet_name = fleet_name,
+    use_growth_derived_path = use_growth_derived_path
+  )
 
   if (length(local_bins) > 0) {
     return(local_bins)
+  }
+
+  if (use_growth_derived_path) {
+    cli::cli_abort(c(
+      "Fleet `{fleet_name}` uses a growth-derived length-observation path but has no fleet-specific observation-bin definition.",
+      "i" = "Provide explicit `length-bin` rows for the fleet, or supply fleet-specific `length_comp` bins."))
   }
 
   get_lengths(data)
@@ -162,21 +222,30 @@ initialize_module <- function(parameters,
       dplyr::pull(module_type)
 
     has_length_comp <- "LengthComp" %in% data_distribution_names_for_fleet_i
+    uses_growth_derived_path <-
+      has_length_comp && model_uses_growth_derived_alk_path(parameters)
     has_fixed_alk <- "age-to-length-conversion" %in% fleet_types
 
-    if (has_fixed_alk && has_length_comp) {
-      age_to_length_conversion_value <- FIMS::m_age_to_length_conversion(data, fleet_name)
-      module[["age_to_length_conversion"]]$resize(length(age_to_length_conversion_value))
+    if (!uses_growth_derived_path && has_fixed_alk && has_length_comp) {
+      age_to_length_conversion_value <- FIMS::m_age_to_length_conversion(
+        data,
+        fleet_name
+      )
+      module[["age_to_length_conversion"]]$resize(
+        length(age_to_length_conversion_value)
+      )
       purrr::walk(
         seq_along(age_to_length_conversion_value),
-        \(x) module[["age_to_length_conversion"]][x][["value"]] <- age_to_length_conversion_value[x]
+        \(x) module[["age_to_length_conversion"]][x][["value"]] <-
+          age_to_length_conversion_value[x]
       )
 
       module[["age_to_length_conversion"]]$set_all_estimable(FALSE)
       module[["age_to_length_conversion"]]$set_all_random(FALSE)
     } else {
-      # Ensure fleets without a fixed ALK do not carry a default non-empty
-      # age_to_length_conversion vector into the C++ loader.
+      # Fleets using the growth-derived length-observation path, and fleets
+      # without a fixed ALK, should not carry a legacy age-to-length
+      # conversion matrix into the C++ loader.
       module[["age_to_length_conversion"]]$resize(0)
     }
 
@@ -231,10 +300,14 @@ initialize_module <- function(parameters,
             length(),
           # Or we can use get_n_fleets(data),
           "n_lengths" = if (module_class_name == "Fleet" && !is.na(fleet_name)) {
-            length(get_fleet_length_bins(data, fleet_name))
-          } else {
-            get_n_lengths(data)
-          },
+  length(get_fleet_length_bins(
+    data = data,
+    fleet_name = fleet_name,
+    use_growth_derived_path = uses_growth_derived_path
+  ))
+} else {
+  get_n_lengths(data)
+},
           "n_years" = get_n_years(data)
         )
       )
@@ -244,11 +317,15 @@ initialize_module <- function(parameters,
       get_value_function <- switch(field,
         "ages" = get_ages,
         "weights" = m_weight_at_age,
-        "lengths" = if (module_class_name == "Fleet" && !is.na(fleet_name)) {
-          \(data) get_fleet_length_bins(data, fleet_name)
-        } else {
-          get_lengths
-        }
+"lengths" = if (module_class_name == "Fleet" && !is.na(fleet_name)) {
+  \(data) get_fleet_length_bins(
+    data = data,
+    fleet_name = fleet_name,
+    use_growth_derived_path = uses_growth_derived_path
+  )
+} else {
+  get_lengths
+}
       )
       n_values <- switch(field,
         "weights" = get_n_ages(data),
@@ -754,9 +831,10 @@ initialize_index <- function(data, fleet_name) {
 #' The initialized composition module as an object.
 #' @noRd
 initialize_comp <- function(data,
+                            parameters,
                             fleet_name,
                             type = c("AgeComp", "LengthComp")) {
-  # Edit this list if a new type is added
+                              # Edit this list if a new type is added
   # Set up the specifics for the given type.
   comp_types <- list(
     "AgeComp" = list(
@@ -769,9 +847,6 @@ initialize_comp <- function(data,
     "LengthComp" = list(
       "name" = "length_comp",
       "comp_data_field" = "length_comp_data",
-      "get_n_function" = function(data, fleet_name) {
-          length(get_fleet_length_bins(data, fleet_name))
-        },
       "comp_object" = LengthComp,
       "m_comp" = m_lengthcomp
     )
@@ -783,17 +858,23 @@ initialize_comp <- function(data,
   # Select the row in comp_types that matches the user's type selection
   comp <- comp_types[[type]]
 
+  uses_growth_derived_path <-
+    identical(type, "LengthComp") &&
+    model_uses_growth_derived_alk_path(parameters)
   # Check if the specified fleet exists in the data
   fleet_exists <- any(get_data(data)["name"] == fleet_name)
   if (!fleet_exists) {
     cli::cli_abort("Fleet `{fleet_name}` not found in the data object.")
   }
 
-  get_function <- comp[["get_n_function"]]
   expected_n <- if (identical(type, "LengthComp")) {
-    get_function(data, fleet_name)
+    length(get_fleet_length_bins(
+      data = data,
+      fleet_name = fleet_name,
+      use_growth_derived_path = uses_growth_derived_path
+    ))
   } else {
-    get_function(data)
+    get_n_ages(data)
   }
   n_values <- expected_n
   module <- methods::new(
@@ -802,10 +883,18 @@ initialize_comp <- function(data,
     n_values
   )
 
-  # Validate that the fleet's composition data is available
+  # Validate that the fleet's composition data is available.
   comp_data <- comp[["m_comp"]](data, fleet_name)
-  if (identical(type, "LengthComp") && fleet_has_local_length_bins(data, fleet_name)) {
-    comp_bins <- get_local_fleet_length_bins(data, fleet_name)
+  if (identical(type, "LengthComp") && fleet_has_local_length_bins(
+    data = data,
+    fleet_name = fleet_name,
+    use_growth_derived_path = uses_growth_derived_path
+  )) {
+    comp_bins <- get_local_fleet_length_bins(
+      data = data,
+      fleet_name = fleet_name,
+      use_growth_derived_path = uses_growth_derived_path
+    )
 
     # Guard against silently dropping real observations that fall outside the
     # resolved fleet bin definition.
@@ -845,10 +934,10 @@ initialize_comp <- function(data,
       dplyr::arrange(.data[["timing"]], .data[["length_order"]]) |>
       dplyr::pull(value)
   }
+
   if (is.null(comp_data) || length(comp_data) == 0) {
     cli::cli_abort(c(
-      "`{comp[['name']]}`-composition data for fleet `{fleet_name}` is
-      unavailable or empty."
+      "`{comp[['name']]}`-composition data for fleet `{fleet_name}` is unavailable or empty."
     ))
   }
 
@@ -857,8 +946,17 @@ initialize_comp <- function(data,
       name == fleet_name,
       type == comp[["name"]]
     )
-  if (identical(type, "LengthComp") && fleet_has_local_length_bins(data, fleet_name)) {
-    comp_bins <- get_local_fleet_length_bins(data, fleet_name)
+
+  if (identical(type, "LengthComp") && fleet_has_local_length_bins(
+    data = data,
+    fleet_name = fleet_name,
+    use_growth_derived_path = uses_growth_derived_path
+  )) {
+    comp_bins <- get_local_fleet_length_bins(
+      data = data,
+      fleet_name = fleet_name,
+      use_growth_derived_path = uses_growth_derived_path
+    )
     model_uncertainty <- model_uncertainty |>
       dplyr::filter(.data[["length"]] %in% comp_bins) |>
       dplyr::mutate(length_order = match(.data[["length"]], comp_bins)) |>
@@ -1070,6 +1168,7 @@ initialize_fims <- function(parameters, data) {
       # Initialize age composition module for the current fleet
       fleet_age_comp[[i]] <- initialize_comp(
         data = data,
+        parameters = parameters,
         fleet_name = fleet_names[i],
         type = "AgeComp"
       )
@@ -1088,6 +1187,7 @@ initialize_fims <- function(parameters, data) {
       # Initialize length composition module for the current fleet
       fleet_length_comp[[i]] <- initialize_comp(
         data = data,
+        parameters = parameters,
         fleet_name = fleet_names[i],
         type = "LengthComp"
       )

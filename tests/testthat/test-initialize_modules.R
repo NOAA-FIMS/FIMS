@@ -75,6 +75,54 @@ make_no_local_alk_fleet_context <- function() {
   )
 }
 
+make_vonb_no_fixed_alk_fleet_context <- function(drop_length_comp_rows = FALSE,
+                                                 blank_length_comp_lengths = FALSE) {
+  no_fixed_alk_data <- data |>
+    get_data() |>
+    dplyr::filter(
+      !(
+        name == "fleet1" &
+          type %in% c("age-to-length-conversion", "length-bin")
+      )
+    )
+
+  if (drop_length_comp_rows) {
+    no_fixed_alk_data <- no_fixed_alk_data |>
+      dplyr::filter(!(name == "fleet1" & type == "length_comp"))
+  }
+
+  if (blank_length_comp_lengths) {
+    no_fixed_alk_data <- no_fixed_alk_data |>
+      dplyr::mutate(
+        length = dplyr::if_else(
+          name == "fleet1" & type == "length_comp",
+          NA_real_,
+          length
+        )
+      )
+  }
+
+  frame <- FIMS::FIMSFrame(no_fixed_alk_data)
+  parameters <- create_default_configurations(data = frame) |>
+    tidyr::unnest(cols = data) |>
+    dplyr::rows_update(
+      tibble::tibble(
+        module_name = "Growth",
+        module_type = "VonBertalanffy"
+      ),
+      by = c("module_name")
+    ) |>
+    tidyr::nest(.by = c(model_family, module_name, fleet_name)) |>
+    create_default_parameters(data = frame) |>
+    tidyr::unnest(cols = data)
+
+  list(
+    data = frame,
+    parameters = parameters
+  )
+}
+
+
 ## IO correctness ----
 test_that("`initialize_fims()` works with correct inputs", {
   result <- initialize_fims(parameters = default_parameters, data = data)
@@ -88,6 +136,7 @@ test_that("`initialize_fims()` works with correct inputs", {
 
   result <- initialize_comp(
     data = data,
+    parameters = default_parameters,
     fleet_name = "fleet1",
     type = "AgeComp"
   )
@@ -116,6 +165,7 @@ test_that("`initialize_fims()` works with correct inputs", {
 
   result <- initialize_comp(
     data = data,
+    parameters = default_parameters,
     fleet_name = "fleet1",
     type = "LengthComp"
   )
@@ -293,7 +343,7 @@ test_that("`initialize_fims()` works with edge cases", {
   expect_equal(length(init_parm_multiple_types$parameters$p), length(init_parm_default$parameters$p) - 10)
 })
 
-test_that("fleet LengthComp falls back to global bins when no local bins are present", {
+test_that("fleet LengthComp on the fixed path falls back to global bins when no local bins are present", {
   ctx <- make_no_local_alk_fleet_context()
   on.exit({ rm(ctx); gc() }, add = TRUE)
 
@@ -312,6 +362,18 @@ test_that("fleet LengthComp falls back to global bins when no local bins are pre
   expect_equal(fleet_module$n_lengths$get(), length(global_lengths))
   #' @description Test that fleet-level lengths equal the global fallback bins when no local bins exist.
   expect_equal(fleet_module$lengths$toRVector(), global_lengths)
+  clear()
+})
+
+test_that("VonB without LengthComp does not require fleet observation-bin geometry", {
+  ctx <- make_vonb_no_fixed_alk_fleet_context(drop_length_comp_rows = TRUE)
+  on.exit({ rm(ctx); gc() }, add = TRUE)
+
+  #' @description Test that VonB fleets without LengthComp data are not forced onto the growth-derived length-observation path.
+  expect_no_error(
+    init <- initialize_fims(parameters = ctx$parameters, data = ctx$data)
+  )
+  expect_named(init, c("parameters", "model", "metadata"))
   clear()
 })
 
@@ -345,6 +407,7 @@ test_that("`initialize_fims()` returns correct error messages", {
   expect_error(
     initialize_comp(
       data = data,
+      parameters = default_parameters,
       fleet_name = "unknown_fleet",
       type = "AgeComp"
     ),
@@ -356,6 +419,7 @@ test_that("`initialize_fims()` returns correct error messages", {
   expect_error(
     initialize_comp(
       data = data,
+      parameters = default_parameters,
       fleet_name = "fleet1",
       type = "unknown"
     ),
@@ -409,6 +473,7 @@ test_that("`initialize_fims()` returns correct error messages", {
 
   base_lengthcomp <- initialize_comp(
     data = local_bin_frame,
+    parameters = default_parameters,
     fleet_name = "fleet1",
     type = "LengthComp"
   )$length_comp_data$toRVector()
@@ -427,6 +492,7 @@ test_that("`initialize_fims()` returns correct error messages", {
   expect_error(
     initialize_comp(
       data = bad_frame,
+      parameters = default_parameters,
       fleet_name = "fleet1",
       type = "LengthComp"
     ),
@@ -444,6 +510,7 @@ test_that("`initialize_fims()` returns correct error messages", {
   expect_no_error(
     missing_result <- initialize_comp(
       data = missing_frame,
+      parameters = default_parameters,
       fleet_name = "fleet1",
       type = "LengthComp"
     )
@@ -467,14 +534,27 @@ test_that("`initialize_fims()` returns correct error messages", {
   )
   clear()
 
-  ctx <- make_no_local_alk_fleet_context()
-  on.exit({ rm(ctx); gc() }, add = TRUE)
-  #' @description Test that fleets on the fixed path hard-fail when n_lengths > 0 but fixed ALK is empty.
+  ctx <- make_vonb_no_fixed_alk_fleet_context()
+  bad_data <- ctx$data |>
+    FIMS::get_data() |>
+    dplyr::mutate(
+      length = dplyr::if_else(
+        name == "fleet1" & type == "length_comp",
+        NA_real_,
+        length
+      )
+    )
+  bad_frame <- FIMS::FIMSFrame(bad_data)
+  on.exit({ rm(ctx, bad_data, bad_frame); gc() }, add = TRUE)
+  #' @description Test that VonB LengthComp fleets hard-fail when fixed ALK rows, explicit length-bin rows, and usable length-comp bin values are all absent.
   expect_error(
-    ctx$parameters |>
-      initialize_fims(data = ctx$data) |>
-      fit_fims(optimize = FALSE),
-    regexp = "no usable age-to-length conversion path"
+    initialize_module(
+      parameters = ctx$parameters,
+      data = bad_frame,
+      module_name = "Fleet",
+      fleet_name = "fleet1"
+    ),
+    regexp = "growth-derived length-observation path but has no fleet-specific observation-bin definition"
   )
   clear()
 })
