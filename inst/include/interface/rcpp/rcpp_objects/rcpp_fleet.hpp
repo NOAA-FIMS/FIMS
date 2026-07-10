@@ -295,19 +295,16 @@ class FleetInterface : public FleetInterfaceBase {
     copy->n_years = SharedInt(this->n_years.get());
     copy->observed_landings_units =
         SharedString(this->observed_landings_units.get());
-    copy->observed_index_units =
-        SharedString(this->observed_index_units.get());
+    copy->observed_index_units = SharedString(this->observed_index_units.get());
     copy->log_q = DeepCopyVariableVector(this->log_q);
     copy->log_Fmort = DeepCopyVariableVector(this->log_Fmort);
     copy->log_landings_expected =
         DeepCopyVariableVector(this->log_landings_expected);
-    copy->log_index_expected =
-        DeepCopyVariableVector(this->log_index_expected);
+    copy->log_index_expected = DeepCopyVariableVector(this->log_index_expected);
     copy->agecomp_expected = DeepCopyVariableVector(this->agecomp_expected);
     copy->lengthcomp_expected =
         DeepCopyVariableVector(this->lengthcomp_expected);
-    copy->agecomp_proportion =
-        DeepCopyVariableVector(this->agecomp_proportion);
+    copy->agecomp_proportion = DeepCopyVariableVector(this->agecomp_proportion);
     copy->lengthcomp_proportion =
         DeepCopyVariableVector(this->lengthcomp_proportion);
     copy->age_to_length_conversion =
@@ -321,7 +318,7 @@ class FleetInterface : public FleetInterfaceBase {
   /**
    * @brief Rcpp-facing deep copy wrapper.
    */
-  FleetInterface* deep_copy_rcpp() const {
+  FleetInterface *deep_copy_rcpp() const {
     return new FleetInterface(*this->deep_copy());
   }
 

@@ -669,7 +669,9 @@ class RealVector {
   /**
    * @brief Rcpp-facing deep copy wrapper.
    */
-  RealVector* deep_copy_rcpp() const { return new RealVector(*this->deep_copy()); }
+  RealVector* deep_copy_rcpp() const {
+    return new RealVector(*this->deep_copy());
+  }
 };
 #ifdef FIMS_HEADER_ONLY
 uint32_t RealVector::id_g = 0;
