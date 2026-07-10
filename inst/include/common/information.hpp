@@ -23,6 +23,7 @@
 #include "../population_dynamics/population/population.hpp"
 #include "../population_dynamics/recruitment/recruitment.hpp"
 #include "../population_dynamics/selectivity/selectivity.hpp"
+#include "../edm/edm_model.hpp"
 #include "fims_vector.hpp"
 #include "model_object.hpp"
 
@@ -130,6 +131,15 @@ class Information {
       density_components_iterator;
   /**< iterator for distribution objects>*/
 
+  // EDM models
+  std::map<uint32_t, std::shared_ptr<fims_edm::EDMModel<Type>>>
+      edm_models; /**<hash map to link each EDM model object to its shared location in memory*/
+  typedef typename std::map<
+      uint32_t,
+      std::shared_ptr<fims_edm::EDMModel<Type>>>::iterator
+      edm_models_iterator;
+  /**< iterator for EDM model objects>*/
+
   std::unordered_map<uint32_t,
                      std::shared_ptr<fims_popdy::FisheryModelBase<Type>>>
       models_map; /**<hash map of fishery models, e.g., CAA, GMACS, Spatial,
@@ -167,6 +177,7 @@ class Information {
     this->recruitment_process_models.clear();
     this->selectivity_models.clear();
     this->models_map.clear();
+    this->edm_models.clear();
     this->n_years = 0;
     this->n_ages = 0;
 
@@ -342,6 +353,11 @@ class Information {
    * if distribution is a data type.
    */
   void SetupData() {
+    for (edm_models_iterator it = this->edm_models.begin();
+         it != this->edm_models.end(); ++it) {
+      this->variable_map[it->first] = &(it->second->predictions);
+    }
+
     for (density_components_iterator it = this->density_components.begin();
          it != this->density_components.end(); ++it) {
       std::shared_ptr<fims_distributions::DensityComponentBase<Type>> d =
