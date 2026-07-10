@@ -247,7 +247,7 @@ test_that("calculate_mohns_rho() handles warnings appropriately", {
   #' @description Test that calculate_mohns_rho() handles missing values gracefully.
   # Create a modified retro_fit with a missing value
   retro_fit_na <- retro_fit
-  retro_fit_na$estimates$estimated[1] <- NA
+  retro_fit_na[["estimates"]][["estimated"]][1] <- NA
 
   # Depending on where the NA is, this might produce a warning or still work
   # The function should handle this gracefully
@@ -266,4 +266,10 @@ test_that("calculate_mohns_rho() handles warnings appropriately", {
       return(NULL)
     }
   )
+
+  # If no warning/error is raised, verify a valid numeric return.
+  if (!is.null(result)) {
+    expect_true(is.numeric(result))
+    expect_equal(length(result), 1)
+  }
 })
