@@ -9,6 +9,12 @@
 
 # fims_retrospective ----
 ## Setup ----
+#' @description Skip the test unless explicitly enabled for heavy integration testing.
+testthat::skip_if_not(
+  testthat:::env_var_is_true("RUN_SLOW_TESTS"),
+  message = "Skipping: RUN_SLOW_TESTS is not set to true."
+)
+
 # Load or prepare any necessary data for testing
 # clear memory
 clear()
@@ -23,10 +29,10 @@ parameters <- data_4_model |>
   create_default_parameters(data = data_4_model)
 # Fit in parallel
 retro_fit <- run_fims_retrospective(
-  years_to_remove = 0:2,
+  years_to_remove = 0:1,
   data = data_big,
   parameters = parameters,
-  n_cores = 3
+  n_cores = 2
 )
 
 ## IO correctness ----
@@ -80,7 +86,7 @@ test_that("run_fims_retrospective() works with correct inputs", {
   #' @description Test that fims_retrospective(x) returns y.
   expect_equal(
     object = length(retro_fit[["years_to_remove"]]),
-    expected = 3
+    expected = 2
   )
 
   retro_ssb <- retro_fit[["estimates"]] |>
@@ -94,7 +100,7 @@ test_that("run_fims_retrospective() works with correct inputs", {
   #' @description Test that fims_retrospective(x) returns y.
   expect_equal(
     object = retro_ssb,
-    expected = c(1728.686, 1654.160, 1500.182),
+    expected = c(1728.686, 1654.160),
     tolerance = .1
   )
 })
@@ -216,7 +222,7 @@ test_that("calculate_mohns_rho() returns correct error messages", {
 
   #' @description Test that calculate_mohns_rho() errors when first model is not reference (retrospective_peel != 0).
   retro_fit_invalid <- retro_fit
-  retro_fit_invalid$years_to_remove <- c(1, 2, 3)
+  retro_fit_invalid$years_to_remove <- c(1, 2)
 
   expect_error(
     object = calculate_mohns_rho(

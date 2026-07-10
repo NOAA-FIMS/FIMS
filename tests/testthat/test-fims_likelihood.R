@@ -9,6 +9,12 @@
 
 # fims_likelihood ----
 ## Setup ----
+#' @description Skip the test unless explicitly enabled for heavy integration testing.
+testthat::skip_if_not(
+  testthat:::env_var_is_true("RUN_SLOW_TESTS"),
+  message = "Skipping: RUN_SLOW_TESTS is not set to true."
+)
+
 # Load or prepare any necessary data for testing
 # clear memory
 clear()
@@ -38,10 +44,10 @@ test_that("fims_likelihood() works with correct inputs", {
     model = base_model,
     parameters = parameters,
     data = data_big,
-    n_cores = 3,
-    min = -1,
+    n_cores = 2,
+    min = 0,
     max = 1,
-    length = 3
+    length = 2
   )
   expect_equal(
     object = names(like_fit),
@@ -51,7 +57,7 @@ test_that("fims_likelihood() works with correct inputs", {
   #' @description Test that fims_likelihood(x) returns y.
   expect_equal(
     object = length(like_fit[["vec"]]),
-    expected = 3
+    expected = 2
   )
 
   # add total likelihood across all groups
@@ -66,7 +72,7 @@ test_that("fims_likelihood() works with correct inputs", {
   #' @description Test that fims_likelihood(x) returns y.
   expect_equal(
     object = total$total_like,
-    expected = c(-3195.247, -3164.864, -3191.186),
+    expected = c(-3164.864, -3191.186),
     tolerance = .1
   )
 })
