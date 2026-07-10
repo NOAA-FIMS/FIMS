@@ -117,8 +117,7 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
     std::shared_ptr<LogisticSelectivityInterface> copy =
         std::make_shared<LogisticSelectivityInterface>(*this);
     copy->id = SelectivityInterfaceBase::id_g++;
-    copy->inflection_point =
-        DeepCopyVariableVector(this->inflection_point);
+    copy->inflection_point = DeepCopyVariableVector(this->inflection_point);
     copy->slope = DeepCopyVariableVector(this->slope);
 
     SelectivityInterfaceBase::live_objects[copy->id] = copy;
@@ -129,7 +128,7 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
   /**
    * @brief Rcpp-facing deep copy wrapper.
    */
-  LogisticSelectivityInterface* deep_copy_rcpp() const {
+  LogisticSelectivityInterface *deep_copy_rcpp() const {
     return new LogisticSelectivityInterface(*this->deep_copy());
   }
 
@@ -373,7 +372,7 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
   /**
    * @brief Rcpp-facing deep copy wrapper.
    */
-  DoubleLogisticSelectivityInterface* deep_copy_rcpp() const {
+  DoubleLogisticSelectivityInterface *deep_copy_rcpp() const {
     return new DoubleLogisticSelectivityInterface(*this->deep_copy());
   }
 

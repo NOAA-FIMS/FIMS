@@ -115,8 +115,7 @@ class LogisticMaturityInterface : public MaturityInterfaceBase {
     std::shared_ptr<LogisticMaturityInterface> copy =
         std::make_shared<LogisticMaturityInterface>(*this);
     copy->id = MaturityInterfaceBase::id_g++;
-    copy->inflection_point =
-        DeepCopyVariableVector(this->inflection_point);
+    copy->inflection_point = DeepCopyVariableVector(this->inflection_point);
     copy->slope = DeepCopyVariableVector(this->slope);
 
     MaturityInterfaceBase::live_objects[copy->id] = copy;

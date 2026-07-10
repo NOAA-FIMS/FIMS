@@ -226,17 +226,14 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
     std::shared_ptr<DnormDistributionsInterface> copy =
         std::make_shared<DnormDistributionsInterface>(*this);
     copy->id_m = DistributionsInterfaceBase::id_g++;
-    copy->key_m =
-        std::make_shared<std::vector<uint32_t>>(*this->key_m);
+    copy->key_m = std::make_shared<std::vector<uint32_t>>(*this->key_m);
     copy->input_type_m = SharedString(this->input_type_m.get());
     copy->use_mean_m = SharedString(this->use_mean_m.get());
     copy->interface_observed_data_id_m =
         SharedInt(this->interface_observed_data_id_m.get());
     copy->lpdf_value = this->lpdf_value;
-    copy->observed_values =
-        DeepCopyVariableVector(this->observed_values);
-    copy->expected_values =
-        DeepCopyVariableVector(this->expected_values);
+    copy->observed_values = DeepCopyVariableVector(this->observed_values);
+    copy->expected_values = DeepCopyVariableVector(this->expected_values);
     copy->expected_mean = DeepCopyVariableVector(this->expected_mean);
     copy->log_sd = DeepCopyVariableVector(this->log_sd);
     copy->lpdf_vec = DeepCopyRealVector(this->lpdf_vec);
@@ -249,7 +246,7 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
   /**
    * @brief Rcpp-facing deep copy wrapper.
    */
-  DnormDistributionsInterface* deep_copy_rcpp() const {
+  DnormDistributionsInterface *deep_copy_rcpp() const {
     return new DnormDistributionsInterface(*this->deep_copy());
   }
 
@@ -620,17 +617,14 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
     std::shared_ptr<DlnormDistributionsInterface> copy =
         std::make_shared<DlnormDistributionsInterface>(*this);
     copy->id_m = DistributionsInterfaceBase::id_g++;
-    copy->key_m =
-        std::make_shared<std::vector<uint32_t>>(*this->key_m);
+    copy->key_m = std::make_shared<std::vector<uint32_t>>(*this->key_m);
     copy->input_type_m = SharedString(this->input_type_m.get());
     copy->use_mean_m = SharedString(this->use_mean_m.get());
     copy->interface_observed_data_id_m =
         SharedInt(this->interface_observed_data_id_m.get());
     copy->lpdf_value = this->lpdf_value;
-    copy->observed_values =
-        DeepCopyVariableVector(this->observed_values);
-    copy->expected_values =
-        DeepCopyVariableVector(this->expected_values);
+    copy->observed_values = DeepCopyVariableVector(this->observed_values);
+    copy->expected_values = DeepCopyVariableVector(this->expected_values);
     copy->log_sd = DeepCopyVariableVector(this->log_sd);
     copy->lpdf_vec = DeepCopyRealVector(this->lpdf_vec);
 
@@ -642,7 +636,7 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
   /**
    * @brief Rcpp-facing deep copy wrapper.
    */
-  DlnormDistributionsInterface* deep_copy_rcpp() const {
+  DlnormDistributionsInterface *deep_copy_rcpp() const {
     return new DlnormDistributionsInterface(*this->deep_copy());
   }
 
@@ -979,17 +973,14 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
     std::shared_ptr<DmultinomDistributionsInterface> copy =
         std::make_shared<DmultinomDistributionsInterface>(*this);
     copy->id_m = DistributionsInterfaceBase::id_g++;
-    copy->key_m =
-        std::make_shared<std::vector<uint32_t>>(*this->key_m);
+    copy->key_m = std::make_shared<std::vector<uint32_t>>(*this->key_m);
     copy->input_type_m = SharedString(this->input_type_m.get());
     copy->use_mean_m = SharedString(this->use_mean_m.get());
     copy->interface_observed_data_id_m =
         SharedInt(this->interface_observed_data_id_m.get());
     copy->lpdf_value = this->lpdf_value;
-    copy->observed_values =
-        DeepCopyVariableVector(this->observed_values);
-    copy->expected_values =
-        DeepCopyVariableVector(this->expected_values);
+    copy->observed_values = DeepCopyVariableVector(this->observed_values);
+    copy->expected_values = DeepCopyVariableVector(this->expected_values);
     copy->dims = DeepCopyRealVector(this->dims);
     copy->lpdf_vec = DeepCopyRealVector(this->lpdf_vec);
     copy->notes = SharedString(this->notes.get());
@@ -1002,7 +993,7 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
   /**
    * @brief Rcpp-facing deep copy wrapper.
    */
-  DmultinomDistributionsInterface* deep_copy_rcpp() const {
+  DmultinomDistributionsInterface *deep_copy_rcpp() const {
     return new DmultinomDistributionsInterface(*this->deep_copy());
   }
 
