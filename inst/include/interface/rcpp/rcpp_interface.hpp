@@ -256,6 +256,9 @@ void clear_impl(bool get_error_msg) {
   DataInterfaceBase::id_g = 1;
   DataInterfaceBase::live_objects.clear();
 
+  DataInterface::id_g = 1;
+  DataInterface::live_objects.clear();
+
   AgeCompDataInterface::id_g = 1;
   AgeCompDataInterface::live_objects.clear();
 
@@ -316,6 +319,9 @@ void clear_impl(bool get_error_msg) {
   // rcpp_distribution.hpp
   DistributionsInterfaceBase::id_g = 1;
   DistributionsInterfaceBase::live_objects.clear();
+  
+  DistributionsInterface::id_g = 1;
+  DistributionsInterface::live_objects.clear();
 
   DnormDistributionsInterface::id_g = 1;
   DnormDistributionsInterface::live_objects.clear();

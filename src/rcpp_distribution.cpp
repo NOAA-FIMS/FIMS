@@ -17,6 +17,44 @@ std::map<uint32_t, std::shared_ptr<DistributionsInterfaceBase>>
  *
  */
 void register_distributions(Rcpp::Module& m) {
+  Rcpp::class_<DistributionsInterfaceBase>(
+      "DistributionBase",
+      "See "
+      "https://noaa-fims.github.io/FIMS/doxygen/"
+      "classDistributionsInterfaceBase.html.")
+      .constructor()
+      .field("likelihood_type", &DistributionsInterfaceBase::likelihood_type_m)
+      .field("distribution_type", &DistributionsInterfaceBase::distribution_type_m)
+      .field("dims", &DistributionsInterfaceBase::dims_m)
+      .field("observed_values", &DistributionsInterfaceBase::observed_values_m)
+      .field("expected_values", &DistributionsInterfaceBase::expected_values_m)
+      .field("uncertainty_values", &DistributionsInterfaceBase::uncertainty_values_m)
+      .field("observed_key", &DistributionsInterfaceBase::observed_key_m)
+      .field("expected_key", &DistributionsInterfaceBase::expected_key_m)
+      .field("uncertainty_key", &DistributionsInterfaceBase::uncertainty_key_m)
+      .field("observed_subvector", &DistributionsInterfaceBase::observed_subvector_m)
+      .field("expected_subvector", &DistributionsInterfaceBase::expected_subvector_m)
+      .field("uncertainty_subvector", &DistributionsInterfaceBase::uncertainty_subvector_m)
+      .field("lambda_values", &DistributionsInterfaceBase::lambda_values_m)
+      ;
+      
+  Rcpp::class_<DistributionsInterface>(
+      "Distribution",
+      "See "
+      "https://noaa-fims.github.io/FIMS/doxygen/"
+      "classDistributionsInterface.html.")
+      .constructor()
+      .derives<DistributionsInterfaceBase>("DistributionBase")
+      .method("get_id", &DistributionsInterface::get_id)
+      .method("evaluate", &DistributionsInterface::evaluate)
+      .method("set_values",
+              &DistributionsInterface::set_values)
+      .method("set_id_links",
+              &DistributionsInterface::set_id_links)
+      .method("set_subvector_indices",
+              &DistributionsInterface::set_subvector_indices)
+      ;
+
   Rcpp::class_<DnormDistributionsInterface>(
       "DnormDistribution",
       "See "

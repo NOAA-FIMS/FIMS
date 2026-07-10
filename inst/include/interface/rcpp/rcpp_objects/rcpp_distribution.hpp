@@ -26,38 +26,94 @@ class DistributionsInterfaceBase : public FIMSRcppInterfaceBase {
    * @brief The local ID of the DistributionsInterfaceBase object.
    */
   uint32_t id_m;
+
   /**
-   * @brief The unique ID for the variable map that points to a fims::Vector.
+   * @brief The total log probability density function value.
    */
-  std::shared_ptr<std::vector<uint32_t>> key_m;
+  double lpdf_m = 0;
+ 
   /**
-   * @brief The type of density input. The options are prior, re, or data.
+   * @brief Vector that records the individual log probability function 
+   * values for each observation.
    */
-  SharedString input_type_m;
+  RealVector lpdf_vec_m;
+
   /**
-   * @brief Control flag indicating whether to use the expected mean in the
-   * distribution calculations.
-   *
-   * This shared string member serves as a boolean flag (i.e., "yes" or "no")
-   * that determines whether the distribution should use the `expected_mean`
-   * vector or other expected values (e.g., from data or random effects) when
-   * computing the expected value in the likelihood calculations.
-   *
-   * When set to "no" (default), the distribution uses expected values based on
-   * the `input_type` setting (data expected values for "data", random effects
-   * expected values for "random_effects", or standard expected values
-   * otherwise).
-   *
-   * When set to "yes" (typically by calling `set_distribution_mean()`), the
-   * distribution overrides the default expected value source and uses the
-   * `expected_mean` vector instead. This is useful for setting a fixed mean
-   * value for the distribution that doesn't depend on other model components.
-   *
-   * @see set_distribution_mean() for the method that sets this flag to "yes".
-   * @see DensityComponentBase::get_expected() in density_components_base.hpp
-   * for the implementation that checks this flag.
+   * @brief The type of likelihood input. The options are DATA, RANDOM_EFFECT, 
+   * PRIOR, or PENALTY.
    */
-  SharedString use_mean_m = fims::to_string("no");
+  fims_distributions::Likelihood_Kind likelihood_type_m; //Also an enum class? Is this ok on R end??
+
+  /**
+   * @brief The distribution function for the likelihood component. 
+   * The options are NORMAL, LOGNORMAL, or MULTINOMIAL.
+   */
+  fims_distributions::Density_Function distribution_type_m; //Need to make this an enum class maybe??
+
+  /**
+   * @brief Fixed input values to calculate a likelihood of occurance for.
+   */
+  VariableVector observed_values_m;
+  
+  /**
+   * @brief Key to point the observed value at a data source, parameter, 
+   * or derived model quantity.
+   */
+  std::shared_ptr<std::vector<size_t>> observed_key_m;
+  
+  /**
+   * @brief Vector of values to specify a subset of the observed values or 
+   * pointed vector to use in the likelihood calculation.
+   */
+  std::shared_ptr<std::vector<size_t>> observed_subvector_m;
+
+  /**
+   * @brief The expected values of the distribution used to calculate 
+   * likelihoods.
+   */
+  VariableVector expected_values_m;
+  
+  /**
+   * @brief Key to point the expected value at a data source, parameter, 
+   * or derived model quantity.
+   */
+  std::shared_ptr<std::vector<size_t>> expected_key_m;
+  
+  /**
+   * @brief Vector of values to specify a subset of the expected values or 
+   * pointed vector to use in the likelihood calculation.
+   */
+  std::shared_ptr<std::vector<size_t>> expected_subvector_m;
+
+  /**
+   * @brief The uncertainty values of the distribution used to calculate 
+   * likelihoods.
+   */
+  VariableVector uncertainty_values_m;
+  
+  /**
+   * @brief Key to point the uncertainty value at a data source, parameter, 
+   * or derived model quantity.
+   */
+  std::shared_ptr<std::vector<size_t>> uncertainty_key_m;
+  
+  /**
+   * @brief Vector of values to specify a subset of the uncertainty values or 
+   * pointed vector to use in the likelihood calculation.
+   */
+  std::shared_ptr<std::vector<size_t>> uncertainty_subvector_m;
+  
+  /**
+   * @brief Vector of values to weight the likelihood calculation results.
+   */
+  RealVector lambda_values_m;
+
+  /**
+   * @brief Dimensions of the value vectors used to subset the likelihood 
+   * calculations needed for multivariate distributions.
+   */
+  std::shared_ptr<std::vector<size_t>> dims_m;
+  
   /**
    * @brief The map associating the ID of the DistributionsInterfaceBase to the
      DistributionsInterfaceBase objects. This is a live object, which is an
@@ -65,20 +121,19 @@ class DistributionsInterfaceBase : public FIMSRcppInterfaceBase {
    */
   static std::map<uint32_t, std::shared_ptr<DistributionsInterfaceBase>>
       live_objects;
-  /**
-   * @brief The ID of the observed data object, which is set to -999.
-   */
-  SharedInt interface_observed_data_id_m = -999;
 
-  /**
-   * @brief The log probability density function value.
-   */
-  double lpdf_value = 0;
+
   /**
    * @brief The constructor.
    */
   DistributionsInterfaceBase() {
-    this->key_m = std::make_shared<std::vector<uint32_t>>();
+    this->observed_key_m = std::make_shared<std::vector<size_t>>();
+    this->expected_key_m = std::make_shared<std::vector<size_t>>();
+    this->uncertainty_key_m = std::make_shared<std::vector<size_t>>();
+    this->observed_subvector_m = std::make_shared<std::vector<size_t>>();
+    this->expected_subvector_m = std::make_shared<std::vector<size_t>>();
+    this->uncertainty_subvector_m = std::make_shared<std::vector<size_t>>();
+    this->dims_m = std::make_shared<std::vector<size_t>>();
     this->id_m = DistributionsInterfaceBase::id_g++;
     /* Create instance of map: key is id and value is pointer to
     DistributionsInterfaceBase */
@@ -92,10 +147,21 @@ class DistributionsInterfaceBase : public FIMSRcppInterfaceBase {
    */
   DistributionsInterfaceBase(const DistributionsInterfaceBase &other)
       : id_m(other.id_m),
-        key_m(other.key_m),
-        input_type_m(other.input_type_m),
-        use_mean_m(other.use_mean_m),
-        interface_observed_data_id_m(other.interface_observed_data_id_m) {}
+        likelihood_type_m(other.likelihood_type_m),
+        distribution_type_m(other.distribution_type_m),
+        observed_values_m(other.observed_values_m),
+        observed_key_m(other.observed_key_m),
+        observed_subvector_m(other.observed_subvector_m),
+        expected_values_m(other.expected_values_m),
+        expected_key_m(other.expected_key_m),
+        expected_subvector_m(other.expected_subvector_m),
+        uncertainty_values_m(other.uncertainty_values_m),
+        uncertainty_key_m(other.uncertainty_key_m),
+        uncertainty_subvector_m(other.uncertainty_subvector_m),
+        lambda_values_m(other.lambda_values_m),
+        dims_m(other.dims_m),
+        lpdf_vec_m(other.lpdf_vec_m),
+        lpdf_m(other.lpdf_m) {}
 
   /**
    * @brief The destructor.
@@ -121,31 +187,6 @@ class DistributionsInterfaceBase : public FIMSRcppInterfaceBase {
   }
 
   /**
-   * @brief Set the expected mean value for the distribution.
-   *
-   * This virtual function provides an interface for setting a fixed mean value
-   * for distribution objects. When overridden in derived classes, this method
-   * typically stores the provided mean value as a fixed effect parameter and
-   * marks the distribution to use the mean in its calculations.
-   *
-   * The base class implementation returns false to indicate the operation is
-   * not supported. Derived classes that support mean specification should
-   * override this method to implement the actual functionality.
-   *
-   * @param input_value The numeric value to set as the distribution's expected
-   * mean. This value will be treated as a fixed effect parameter (not
-   * estimated) in derived class implementations.
-   *
-   * @return bool Returns true if the mean was successfully set, false
-   * otherwise. The base class implementation always returns false to indicate
-   * the operation is not supported by default.
-   *
-   * @see DnormDistributionsInterface::set_distribution_mean for an example
-   * implementation that sets the mean as a fixed effect parameter.
-   */
-  virtual bool set_distribution_mean(double input_value) { return false; }
-
-  /**
    * @brief Set the unique ID for the observed data object.
    *
    * @param observed_data_id Unique ID for the Observed Age Comp Data
@@ -161,36 +202,443 @@ class DistributionsInterfaceBase : public FIMSRcppInterfaceBase {
 };
 
 /**
+ * @brief The Rcpp interface for adding likelihood components R:
+ * dist_ <- methods::new(Distribution).
+ */
+class DistributionsInterface : public DistributionsInterfaceBase {
+ public:
+  
+  /**
+   * @brief The constructor.
+   */
+  DistributionsInterface(const std::string &likelihood_type, 
+    const std::string &distribution_type) : DistributionsInterfaceBase() {
+
+      
+    DistributionsInterfaceBase::live_objects[this->id_m] =
+        std::make_shared<DistributionsInterface>(*this);
+    FIMSRcppInterfaceBase::fims_interface_objects.push_back(
+        DistributionsInterfaceBase::live_objects[this->id_m]);
+  }
+
+  /**
+   * @brief Construct a new Distributions Interface object
+   *
+   * @param other
+   */
+  DistributionsInterface(const DistributionsInterface &other)
+      : DistributionsInterfaceBase(other) {}
+
+  /**
+   * @brief The destructor.
+   */
+  virtual ~DistributionsInterface() {}
+
+  /**
+   * @brief Gets the ID of the interface base object.
+   * @return The ID.
+   */
+  virtual uint32_t get_id() { return this->id_m; }
+
+  /**
+   * @brief Sets the likelihood type of the distribution object.
+   * @param likelihood_type The likelihood type to set for the distribution object.
+   */
+  virtual void set_likelihood_type(std::string likelihood_type) {
+    if(likelihood_type == "data") {
+      this->likelihood_type_m = fims_distributions::Likelihood_Kind::DATA;
+    }else if(likelihood_type == "random") {
+      this->likelihood_type_m = fims_distributions::Likelihood_Kind::RANDOM_EFFECT;
+    }else if(likelihood_type == "prior") {
+      this->likelihood_type_m = fims_distributions::Likelihood_Kind::PRIOR;
+    }else if(likelihood_type == "penalty") {
+      this->likelihood_type_m = fims_distributions::Likelihood_Kind::PENALTY;
+    }else{
+      Rcpp::stop("Invalid likelihood type: " + likelihood_type + ". Must be one of 'data', 'random', 'prior', 'penalty'.");
+    }
+  }
+
+  /**
+   * @brief Sets the distribution type of the distribution object.
+   * @param distribution_type The distribution type to set for the distribution object.
+   */
+  virtual void set_distribution_type(std::string distribution_type) {
+    if(distribution_type == "normal") {
+      this->distribution_type_m = fims_distributions::Density_Function::NORMAL;
+    }else if(distribution_type == "lognormal") {
+      this->distribution_type_m = fims_distributions::Density_Function::LOGNORMAL;
+    }else if(distribution_type == "multinomial") {
+      this->distribution_type_m = fims_distributions::Density_Function::MULTINOMIAL;
+    }else{
+      Rcpp::stop("Invalid distribution type: " + distribution_type + ". Must be one of 'normal', 'lognormal', 'multinomial'.");
+    }
+  }
+
+
+  /**
+   * @brief Set the values for the likelihood evaluation.
+   * @param observed_values Vector of observed values for likelihood evaluation.
+   * @param expected_values Vector of expected values for likelihood evaluation.
+   * @param uncertainty_values Vector of uncertainty values for likelihood evaluation.
+   */
+
+  virtual bool set_values(Rcpp::Nullable<Rcpp::NumericVector> observed_values = R_NilValue, 
+                          Rcpp::Nullable<Rcpp::NumericVector> expected_values = R_NilValue, 
+                          Rcpp::Nullable<Rcpp::NumericVector> uncertainty_values = R_NilValue) {
+    if(!Rcpp::is_null(observed_values)) {
+      this->observed_values_m.resize(observed_values.get().size());
+      for (size_t i = 0; i < observed_values.get().size(); i++) {
+        this->observed_values_m[i].initial_value_m = observed_values.get()[i];
+      }
+    }
+    if(!Rcpp::is_null(expected_values)) {
+      this->expected_values_m.resize(expected_values.get().size());
+      for (size_t i = 0; i < expected_values.get().size(); i++) {
+        this->expected_values_m[i].initial_value_m = expected_values.get()[i];
+      }
+    }
+    if(!Rcpp::is_null(uncertainty_values)) {
+      this->uncertainty_values_m.resize(uncertainty_values.get().size());
+      for (size_t i = 0; i < uncertainty_values.get().size(); i++) {
+        this->uncertainty_values_m[i].initial_value_m = uncertainty_values.get()[i];
+      }
+    }
+    return true;
+  }
+
+  /**
+   * @brief Set the values for the likelihood evaluation.
+   * @param observed_id Fims variable id link to the observed values for likelihood evaluation.
+   * @param expected_id Fims variable id link to the expected values for likelihood evaluation.
+   * @param uncertainty_id Fims variable id link to the uncertainty values for likelihood evaluation.
+   */
+
+  virtual bool set_id_links(Rcpp::Nullable<int> observed_id = R_NilValue, 
+                            Rcpp::Nullable<int> expected_id = R_NilValue, 
+                            Rcpp::Nullable<int> uncertainty_id = R_NilValue) {
+    if(!Rcpp::is_null(observed_id)) {
+      this->observed_key_m.resize(1);
+      this->observed_key_m[0] = observed_id.get();
+    }
+    if(!Rcpp::is_null(expected_id)) {
+      this->expected_key_m.resize(1);
+      this->expected_key_m[0] = expected_id.get();
+    }
+    if(!Rcpp::is_null(uncertainty_id)) {
+      this->uncertainty_key_m.resize(1);
+      this->uncertainty_key_m[0] = uncertainty_id.get();
+    }
+    return true;
+  }
+
+  /**
+   * @brief Set subvector index for the likelihood evaluation.
+   * @param observed_subvector Index to specify specific observed values from the 
+   * linked vector to include in the likelihood evaluation.
+   * @param expected_subvector Index to specify specific expected values from the 
+   * linked vector to include in the likelihood evaluation.
+   * @param uncertainty_subvector Index to specify specific uncertainty values from the 
+   * linked vector to include in the likelihood evaluation.
+   */
+
+  virtual bool set_subvector_indices(Rcpp::Nullable<Rcpp::IntegerVector> observed_subvector = R_NilValue, 
+                                     Rcpp::Nullable<Rcpp::IntegerVector> expected_subvector = R_NilValue, 
+                                     Rcpp::Nullable<Rcpp::IntegerVector> uncertainty_subvector = R_NilValue) {
+    if(observed_subvector.isNotNull()) {
+      this->observed_subvector_m.resize(observed_subvector.get().size());
+      for(size_t i = 0; i < observed_subvector.get().size(); i++) {
+        this->observed_subvector_m[i] = static_cast<size_t>(observed_subvector.get()[i]); 
+      }
+    }
+    if(expected_subvector.isNotNull()) {
+      this->expected_subvector_m.resize(expected_subvector.get().size());
+      for(size_t i = 0; i < expected_subvector.get().size(); i++) {
+        this->expected_subvector_m[i] = static_cast<size_t>(expected_subvector.get()[i]); 
+      }
+    }
+    if(uncertainty_subvector.isNotNull()) {
+      this->uncertainty_subvector_m.resize(uncertainty_subvector.get().size());
+      for(size_t i = 0; i < uncertainty_subvector.get().size(); i++) {
+        this->uncertainty_subvector_m[i] = static_cast<size_t>(uncertainty_subvector.get()[i]); 
+      }
+    }
+    return true;
+  }
+
+  /**
+   * @brief Evaluate probability density function (pdf). The natural log
+   * of the pdf is returned.
+   * @return The natural log of the probability density function (pdf) is
+   * returned.
+   */
+  virtual double evaluate() {
+
+
+
+    fims_distributions::DensityComponentBase<double> generic_density;
+    if(this->)
+    generic_density.observed_values.resize(this->observed_values_m.size());
+    for (size_t i = 0; i < this->observed_values_m.size(); i++) {
+      generic_density.observed_values[i] = this->observed_values_m[i].initial_value_m;
+    }
+    generic_density.expected_values.resize(this->expected_values_m.size());
+    for (size_t i = 0; i < this->expected_values_m.size(); i++) {
+      generic_density.expected_values[i] = this->expected_values_m[i].initial_value_m;
+    }
+    generic_density.uncertainty_values.resize(this->uncertainty_values_m.size());
+    for (size_t i = 0; i < this->uncertainty_values_m.size(); i++) {
+      generic_density.uncertainty_values[i] = this->uncertainty_values_m[i].initial_value_m;
+    }
+    
+    
+    return generic_density.evaluate();
+  }
+
+  /**
+   * @brief Extracts the derived quantities from `Information` to the Rcpp
+   * object.
+   */
+  virtual void finalize() {
+    if (this->finalized) {
+      // log warning that finalize has been called more than once.
+      FIMS_WARNING_LOG("DnormDistribution  " + fims::to_string(this->id_m) +
+                       " has been finalized already.");
+    }
+
+    this->finalized = true;  // indicate this has been called already
+
+    std::shared_ptr<fims_info::Information<double>> info =
+        fims_info::Information<double>::GetInstance();
+
+    fims_info::Information<double>::density_components_iterator it;
+
+    // search for density component in Information
+    it = info->density_components.find(this->id_m);
+    // if not found, just return
+    if (it == info->density_components.end()) {
+      FIMS_WARNING_LOG("DnormDistribution " + fims::to_string(this->id_m) +
+                       " not found in Information.");
+      return;
+    } else {
+      std::shared_ptr<fims_distributions::NormalLPDF<double>> dnorm =
+          std::dynamic_pointer_cast<fims_distributions::NormalLPDF<double>>(
+              it->second);
+
+      this->lpdf_value = dnorm->lpdf;
+
+      size_t n_x = dnorm->get_n_x();
+
+      // If input log_sd is a scalar, resize to n_x and fill with the scalar
+      // value
+      if (this->log_sd.size() != n_x) {
+        // If log_sd size == 1 (scalar), repeat the entry
+        if (this->log_sd.size() == 1) {
+          auto tmp = this->log_sd[0];  // copy the one log_sd param
+          this->log_sd.resize(n_x);
+          for (size_t i = 0; i < n_x; ++i) {
+            this->log_sd[i] = tmp;  // copies all fields in Param
+          }
+        } else {
+          // Handle error
+          FIMS_WARNING_LOG(
+              "log_sd size does not match number of observations and is not "
+              "scalar.");
+        }
+      }
+      for (size_t i = 0; i < n_x; i++) {
+        if (this->log_sd[i].estimation_type_m.get() == "constant") {
+          this->log_sd[i].final_value_m = this->log_sd[i].initial_value_m;
+        } else {
+          this->log_sd[i].final_value_m = dnorm->log_sd.get_force_scalar(i);
+        }
+      }
+
+      for (size_t i = 0; i < this->expected_mean.size(); i++) {
+        if (this->expected_mean[i].estimation_type_m.get() == "constant") {
+          this->expected_mean[i].final_value_m =
+              this->expected_mean[i].initial_value_m;
+        } else {
+          this->expected_mean[i].final_value_m = dnorm->expected_mean[i];
+        }
+      }
+
+      this->lpdf_vec = RealVector(n_x);
+      if (this->expected_values.size() == 1) {
+        this->expected_values.resize(n_x);
+      }
+      if (this->observed_values.size() == 1) {
+        this->observed_values.resize(n_x);
+      }
+
+      for (size_t i = 0; i < this->lpdf_vec.size(); i++) {
+        this->lpdf_vec[i] = dnorm->lpdf_vec[i];
+        this->expected_values[i].final_value_m = dnorm->get_expected(i);
+        this->observed_values[i].final_value_m = dnorm->get_observed(i);
+      }
+    }
+  }
+
+  /**
+   * @brief Converts the data to json representation for the output.
+   * @return A string is returned specifying that the module relates to the
+   * distribution interface with a normal distribution. It also returns the ID
+   * and the natural log of the probability density function values themselves.
+   * This string is formatted for a json file.
+   */
+  virtual std::string to_json() {
+    std::stringstream ss;
+
+    ss << "{\n";
+    ss << " \"module_name\": \"density\",\n";
+    ss << " \"module_id\": " << this->id_m << ",\n";
+    ss << " \"module_type\": \"normal\",\n";
+    ss << " \"observed_data_id\" : " << this->interface_observed_data_id_m
+       << ",\n";
+    ss << " \"input_type\" : \"" << this->input_type_m << "\",\n";
+    ss << " \"density_component\": {\n";
+    ss << "  \"lpdf_value\": " << sanitize_val(this->lpdf_value) << ",\n";
+    ss << "  \"value\":[";
+    if (this->lpdf_vec.size() == 0) {
+      ss << "],\n";
+    } else {
+      for (size_t i = 0; i < this->lpdf_vec.size() - 1; i++) {
+        ss << this->value_to_string(this->lpdf_vec[i]);
+        ss << ", ";
+      }
+      ss << this->value_to_string(this->lpdf_vec[this->lpdf_vec.size() - 1]);
+
+      ss << "],\n";
+    }
+    ss << "  \"expected_values\":[";
+    if (this->expected_values.size() == 0) {
+      ss << "],\n";
+    } else {
+      for (size_t i = 0; i < this->expected_values.size() - 1; i++) {
+        ss << this->value_to_string(this->expected_values[i].final_value_m)
+           << ", ";
+      }
+      ss << this->value_to_string(
+          this->expected_values[this->expected_values.size() - 1]
+              .final_value_m);
+      ss << "],\n";
+    }
+    ss << "  \"log_sd_values\":[";
+    if (this->log_sd.size() == 0) {
+      ss << "],\n";
+    } else {
+      for (R_xlen_t i = 0; i < static_cast<R_xlen_t>(this->log_sd.size()) - 1;
+           i++) {
+        ss << this->value_to_string(this->log_sd[i].final_value_m) << ", ";
+      }
+      ss << this->value_to_string(
+                this->log_sd[this->log_sd.size() - 1].final_value_m)
+         << "],\n";
+    }
+    ss << "  \"observed_values\":[";
+    if (this->observed_values.size() == 0) {
+      ss << "]\n";
+    } else {
+      for (size_t i = 0; i < this->observed_values.size() - 1; i++) {
+        ss << this->observed_values[i].final_value_m << ", ";
+      }
+      ss << this->observed_values[this->observed_values.size() - 1]
+                .final_value_m
+         << "]\n";
+    }
+    ss << " }}\n";
+    return ss.str();
+  }
+
+#ifdef TMB_MODEL
+
+  template <typename Type>
+  bool add_to_fims_tmb_internal() {
+    std::shared_ptr<fims_info::Information<Type>> info =
+        fims_info::Information<Type>::GetInstance();
+
+    std::shared_ptr<fims_distributions::NormalLPDF<Type>> distribution =
+        std::make_shared<fims_distributions::NormalLPDF<Type>>();
+
+    // interface to data/parameter value
+
+    distribution->observed_data_id_m = interface_observed_data_id_m;
+    std::stringstream ss;
+    distribution->input_type = this->input_type_m;
+    distribution->key.resize(this->key_m->size());
+    for (size_t i = 0; i < this->key_m->size(); i++) {
+      distribution->key[i] = this->key_m->at(i);
+    }
+    distribution->id = this->id_m;
+    distribution->observed_values.resize(this->observed_values.size());
+    for (size_t i = 0; i < this->observed_values.size(); i++) {
+      distribution->observed_values[i] =
+          this->observed_values[i].initial_value_m;
+    }
+    // set relative info
+    distribution->expected_values.resize(this->expected_values.size());
+    for (size_t i = 0; i < this->expected_values.size(); i++) {
+      distribution->expected_values[i] =
+          this->expected_values[i].initial_value_m;
+    }
+    distribution->log_sd.resize(this->log_sd.size());
+    for (size_t i = 0; i < this->log_sd.size(); i++) {
+      distribution->log_sd[i] = this->log_sd[i].initial_value_m;
+      if (this->log_sd[i].estimation_type_m.get() == "fixed_effects") {
+        ss.str("");
+        ss << "dnorm." << this->id_m << ".log_sd." << this->log_sd[i].id_m;
+        info->RegisterParameterName(ss.str());
+        info->RegisterParameter(distribution->log_sd[i]);
+      }
+      if (this->log_sd[i].estimation_type_m.get() == "random_effects") {
+        FIMS_ERROR_LOG("standard deviations cannot be set to random effects");
+      }
+    }
+    info->variable_map[this->log_sd.id_m] = &(distribution)->log_sd;
+
+    distribution->use_mean = this->use_mean_m.get();
+    distribution->expected_mean.resize(this->expected_mean.size());
+    for (size_t i = 0; i < this->expected_mean.size(); i++) {
+      distribution->expected_mean[i] = this->expected_mean[i].initial_value_m;
+      if (this->expected_mean[i].estimation_type_m.get() == "fixed_effects") {
+        ss.str("");
+        ss << "dnorm." << this->id_m << ".expected_mean."
+           << this->expected_mean[i].id_m;
+        info->RegisterParameterName(ss.str());
+        info->RegisterParameter(distribution->expected_mean[i]);
+      }
+      if (this->expected_mean[i].estimation_type_m.get() == "random_effects") {
+        FIMS_ERROR_LOG("expected_mean cannot be set to random effects");
+      }
+    }
+    info->variable_map[this->expected_mean.id_m] =
+        &(distribution)->expected_mean;
+
+    info->density_components[distribution->id] = distribution;
+
+    return true;
+  }
+
+  /**
+   * @brief Adds the parameters to the TMB model.
+   * @return A boolean of true.
+   */
+  virtual bool add_to_fims_tmb() {
+    this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
+    this->add_to_fims_tmb_internal<TMBAD_FIMS_TYPE>();
+
+    return true;
+  }
+
+#endif
+};
+
+/**
  * @brief The Rcpp interface for Dnorm to instantiate from R:
  * dnorm_ <- methods::new(DnormDistribution).
  */
 class DnormDistributionsInterface : public DistributionsInterfaceBase {
  public:
-  /**
-   * @brief Observed data.
-   */
-  VariableVector observed_values;
-  /**
-   * @brief The expected values, which would be the mean of x for this
-   * distribution.
-   */
-  VariableVector expected_values;
-  /**
-   * @brief The expected mean, which would be the mean of x for this
-   * distribution.
-   */
-  VariableVector expected_mean;
-  /**
-   * @brief The uncertainty, which would be the standard deviation of x for the
-   * normal distribution.
-   */
-  VariableVector log_sd;
-  /**
-   * @brief Vector that records the individual log probability function for each
-   * observation.
-   */
-  RealVector lpdf_vec; /**< The vector*/
-
+  
   /**
    * @brief The constructor.
    */
@@ -210,8 +658,7 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
       : DistributionsInterfaceBase(other),
         observed_values(other.observed_values),
         expected_values(other.expected_values),
-        expected_mean(other.expected_mean),
-        log_sd(other.log_sd),
+        uncertainty_values(other.uncertainty_values),
         lpdf_vec(other.lpdf_vec) {}
 
   /**
@@ -231,16 +678,6 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
    */
   virtual bool set_observed_data(int observed_data_id) {
     this->interface_observed_data_id_m.set(observed_data_id);
-    return true;
-  }
-
-  /**
-   * @copydoc DistributionsInterfaceBase::set_distribution_mean
-   */
-  virtual bool set_distribution_mean(double input_value) {
-    this->expected_mean[0].initial_value_m = input_value;
-    this->expected_mean[0].estimation_type_m.set("fixed_effects");
-    this->use_mean_m.set(fims::to_string("yes"));
     return true;
   }
 
@@ -267,21 +704,14 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
     fims_distributions::NormalLPDF<double> dnorm;
     dnorm.observed_values.resize(this->observed_values.size());
     dnorm.expected_values.resize(this->expected_values.size());
-    dnorm.log_sd.resize(this->log_sd.size());
-    dnorm.expected_mean.resize(this->expected_mean.size());
+    dnorm.uncertainty_values.resize(this->uncertainty_values.size());
     for (size_t i = 0; i < this->observed_values.size(); i++) {
       dnorm.observed_values[i] = this->observed_values[i].initial_value_m;
     }
     for (size_t i = 0; i < this->expected_values.size(); i++) {
       dnorm.expected_values[i] = this->expected_values[i].initial_value_m;
     }
-    for (size_t i = 0; i < this->log_sd.size(); i++) {
-      dnorm.log_sd[i] = this->log_sd[i].initial_value_m;
-    }
-    for (size_t i = 0; i < this->expected_mean.size(); i++) {
-      dnorm.expected_mean[i] = this->expected_mean[i].initial_value_m;
-    }
-    dnorm.use_mean = this->use_mean_m;
+    
     return dnorm.evaluate();
   }
 

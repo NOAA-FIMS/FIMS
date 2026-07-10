@@ -190,8 +190,8 @@ public:
                     std::shared_ptr<fims_popdy::Fleet<double> > f = std::make_shared<fims_popdy::Fleet<double> >();
                     f->log_q.resize(1);
                     this->InitializeFleetObject(*f, n_years, n_ages);
-                  //  f->observed_index_data = std::make_shared<fims_data_object::DataObject<double> >(n_years);
-                  //  f->observed_agecomp_data = std::make_shared<fims_data_object::DataObject<double> >(n_years, n_ages);
+                  //  f->observed_index_data = std::make_shared<fims_variable_object::VariableObject<double> >(n_years);
+                  //  f->observed_agecomp_data = std::make_shared<fims_variable_object::VariableObject<double> >(n_years, n_ages);
 
                     std::stringstream strs;
                     strs << "fleet" << i + 1;
@@ -340,8 +340,8 @@ public:
                     std::shared_ptr<fims_popdy::Fleet<double> > s = std::make_shared<fims_popdy::Fleet<double> >();
                     s->log_q.resize(1);
                     this->InitializeFleetObject(*s, n_years, n_ages);
-                 //   s->observed_index_data = std::make_shared<fims_data_object::DataObject<double> >(n_years);
-                  //  s->observed_agecomp_data = std::make_shared<fims_data_object::DataObject<double> >(n_years, n_ages);
+                 //   s->observed_index_data = std::make_shared<fims_variable_object::VariableObject<double> >(n_years);
+                  //  s->observed_agecomp_data = std::make_shared<fims_variable_object::VariableObject<double> >(n_years, n_ages);
 
                     std::stringstream strs;
                     strs << "survey" << i + 1;

@@ -54,6 +54,9 @@ struct FIMSMemoryTracker {
 template <typename Type>
 struct FIMSObject : public FIMSMemoryTracker {
   uint32_t id; /**< unique identifier assigned for all fims objects */
+  
+  //TODO: look into if these are needed here, they don't seem to be used
+  //currently as everything points to the shared information objects.
   std::vector<Type*> parameters; /**< list of estimable parameters */
   std::vector<Type*>
       random_effects_parameters; /**< list of all random effects parameters */

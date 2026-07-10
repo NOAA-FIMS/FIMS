@@ -89,6 +89,29 @@ inline const Type exp(const Type &x) {
 }
 
 /**
+ * @brief The exponential function for a TMB model. The function specifically
+ * uses std::exp, defined in cmath header, instead of ::exp because the
+ * standard library function works with TMBad library, which is designed to
+ * recognize and apply its automatic differentiation capabilities to functions
+ * from the standard library. Also note that this function cannot be tested
+ * using the compilation flag -DTMB_MODEL through CMake and Google Test.
+ * @param x A vector of values to exponentiate. Please use fims_math::exp<double>(x) if
+ * x is an integer.
+ * @return The exponentiated value of x.
+ */
+template <class Type>
+inline const fims::Vector<Type> exp(const fims::Vector<Type> &x) {
+  // use std::exp for double type, look for TMB version of exp if AD type
+  fims::Vector<Type> exp_vector;
+  exp_vector.reserve(x.size());
+  using std::exp;
+  for (size_t i = 0; i < x.size(); i++) {
+    exp_vector.push_back(fims_math::exp(x(i)));
+  }
+  return exp_vector;
+}
+
+/**
  * @brief The natural log function (base e) for a TMB model. The function
  * specifically uses std::log, defined in cmath header, instead of ::log
  * because the standard library function works with TMBad library, which is

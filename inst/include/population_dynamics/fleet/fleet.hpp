@@ -9,7 +9,7 @@
 #ifndef FIMS_POPULATION_DYNAMICS_FLEET_HPP
 #define FIMS_POPULATION_DYNAMICS_FLEET_HPP
 
-#include "../../common/data_object.hpp"
+#include "../../common/variable_object.hpp"
 #include "../../common/fims_vector.hpp"
 #include "../../common/model_object.hpp"
 #include "../../distributions/distributions.hpp"
@@ -35,26 +35,26 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
 
   // landings data
   int fleet_observed_landings_data_id_m = -999; /*!< id of landings data */
-  std::shared_ptr<fims_data_object::DataObject<Type>>
+  std::shared_ptr<fims_variable_object::VariableObject<Type>>
       observed_landings_data; /*!< observed landings data*/
 
   std::string observed_landings_units; /*!< is this fleet landings in weight*/
 
   // index data
   int fleet_observed_index_data_id_m = -999; /*!< id of index data */
-  std::shared_ptr<fims_data_object::DataObject<Type>>
+  std::shared_ptr<fims_variable_object::VariableObject<Type>>
       observed_index_data; /*!< observed index data*/
 
   std::string observed_index_units; /*!< is this fleet index in weight*/
 
   // age comp data
   int fleet_observed_agecomp_data_id_m = -999; /*!< id of age comp data */
-  std::shared_ptr<fims_data_object::DataObject<Type>>
+  std::shared_ptr<fims_variable_object::VariableObject<Type>>
       observed_agecomp_data; /*!< observed agecomp data*/
 
   // length comp data
   int fleet_observed_lengthcomp_data_id_m = -999; /*!< id of length comp data */
-  std::shared_ptr<fims_data_object::DataObject<Type>>
+  std::shared_ptr<fims_variable_object::VariableObject<Type>>
       observed_lengthcomp_data; /*!< observed lengthcomp data*/
 
   // Mortality and catchability

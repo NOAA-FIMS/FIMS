@@ -14,12 +14,31 @@ std::map<uint32_t, std::shared_ptr<DataInterfaceBase>>
  * Function to register data classes with the Rcpp module system.
  */
 void register_data(Rcpp::Module& m) {
+  Rcpp::class_<DataInterfaceBase>("DataBase",
+                                     "See "
+                                     "https://noaa-fims.github.io/FIMS/doxygen/"
+                                     "classDataInterfaceBase.html.")
+      .constructor<>()
+      .field("name", &DataInterfaceBase::name)
+      .field("dims", &DataInterfaceBase::dims)
+      .field("dim_names", &DataInterfaceBase::dim_names)
+      .field("observed_data", &DataInterfaceBase::observed_data)
+      .field("uncertainty", &DataInterfaceBase::uncertainty)
+      .method("get_id", &DataInterfaceBase::get_id);
+      
+  Rcpp::class_<DataInterface>("Data",
+                                     "See "
+                                     "https://noaa-fims.github.io/FIMS/doxygen/"
+                                     "classDataInterface.html.")
+      .constructor<std::string, Rcpp::IntegerVector, Rcpp::StringVector>()
+      .derives<DataInterfaceBase>("DataBase")
+      .method("get_id", &DataInterface::get_id);
+
   Rcpp::class_<AgeCompDataInterface>("AgeComp",
                                      "See "
                                      "https://noaa-fims.github.io/FIMS/doxygen/"
                                      "classAgeCompDataInterface.html.")
       .constructor<int, int>()
-      .field("age_comp_data", &AgeCompDataInterface::age_comp_data)
       .method("get_id", &AgeCompDataInterface::get_id);
 
   Rcpp::class_<LengthCompDataInterface>(
@@ -28,7 +47,7 @@ void register_data(Rcpp::Module& m) {
       "https://noaa-fims.github.io/FIMS/doxygen/"
       "classLengthCompDataInterface.html.")
       .constructor<int, int>()
-      .field("length_comp_data", &LengthCompDataInterface::length_comp_data)
+      .derives<DataInterfaceBase>("DataBase")
       .method("get_id", &LengthCompDataInterface::get_id);
 
   Rcpp::class_<LandingsDataInterface>(
@@ -37,7 +56,7 @@ void register_data(Rcpp::Module& m) {
       "https://noaa-fims.github.io/FIMS/doxygen/"
       "classLandingsDataInterface.html.")
       .constructor<int>()
-      .field("landings_data", &LandingsDataInterface::landings_data)
+      .derives<DataInterfaceBase>("DataBase")
       .method("get_id", &LandingsDataInterface::get_id);
 
   Rcpp::class_<IndexDataInterface>(
@@ -45,6 +64,6 @@ void register_data(Rcpp::Module& m) {
       "See "
       "https://noaa-fims.github.io/FIMS/doxygen/classIndexDataInterface.html.")
       .constructor<int>()
-      .field("index_data", &IndexDataInterface::index_data)
+      .derives<DataInterfaceBase>("DataBase")
       .method("get_id", &IndexDataInterface::get_id);
 }
