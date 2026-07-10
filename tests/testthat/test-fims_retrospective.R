@@ -122,7 +122,6 @@ test_that("run_fims_retrospective() handles edge cases correctly", {
     object = retro_fit_zero[["years_to_remove"]],
     expected = 0
   )
-
 })
 
 ## Error handling ----
