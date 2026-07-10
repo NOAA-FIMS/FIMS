@@ -290,6 +290,18 @@ target_link_libraries(DoubleLogistic_DoubleLogisticSelectivity_Evaluate
 
 gtest_discover_tests(DoubleLogistic_DoubleLogisticSelectivity_Evaluate)
 
+# test_AgeSpecificSelectivity_Evaluate.cpp
+add_executable(AgeSpecificSelectivity_Evaluate
+  test_AgeSpecificSelectivity_Evaluate.cpp
+)
+
+target_link_libraries(AgeSpecificSelectivity_Evaluate
+  gtest_main
+  fims_test
+)
+
+gtest_discover_tests(AgeSpecificSelectivity_Evaluate)
+
 # test_Logistic_LogisticSelectivity_Evaluate.cpp
 add_executable(Logistic_LogisticSelectivity_Evaluate
   test_Logistic_LogisticSelectivity_Evaluate.cpp

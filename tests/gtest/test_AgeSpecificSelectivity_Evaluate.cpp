@@ -13,7 +13,10 @@
 // `LogisticSelectivity` class, include the corresponding header in the test 
 // file `tests/gtest/test_population_dynamics_selectivity_logistic.cpp`:
 // #include "population_dynamics/selectivity/functors/logistic.hpp"
+#include "common/fims_math.hpp"
 #include "population_dynamics/selectivity/functors/age_specific.hpp"
+
+
 // Include additional headers as needed
 // For example, include <iostream> to use `std::cerr` and `std::cout`:
 // #include <iostream>
@@ -26,15 +29,11 @@ namespace
   {
     // consider expanding Google Test by testing a vector with more than one element
     fims_popdy::AgeSpecificSelectivity<double> fishery_selectivity;
-    EXPECT_EQ(fishery_selectivity.min_age, 1.0); // test intended default values
-    EXPECT_EQ(fishery_selectivity.n_ages, 1.0); // test intended default values
 
     fishery_selectivity.logit_sel_at_age.resize(1);
     fishery_selectivity.logit_sel_at_age[0] = 1;
-    fishery_selectivity.min_age.resize(1);
-    fishery_selectivity.min_age[0] = 1;
-    fishery_selectivity.n_ages.resize(1);
-    fishery_selectivity.n_ages[0] = 1;
+    fishery_selectivity.min_age = 1;
+    fishery_selectivity.n_ages = 1;
     double fishery_x = 1.0;
     // 1.0/(1.0+exp(-1)) = 0.7310586
     double expect_fishery = 0.7310586;
@@ -50,10 +49,8 @@ namespace
     fims_popdy::AgeSpecificSelectivity<double> fishery_selectivity;
     fishery_selectivity.logit_sel_at_age.resize(1);
     fishery_selectivity.logit_sel_at_age[0] = 1;
-        fishery_selectivity.min_age.resize(1);
-    fishery_selectivity.min_age[0] = 1;
-    fishery_selectivity.n_ages.resize(1);
-    fishery_selectivity.n_ages[0] = 1;
+    fishery_selectivity.min_age = 1;
+    fishery_selectivity.n_ages = 1;
     // Uses get_force_scalar_wrap internally to have the same logit_sel_at_age 
     // for all 3 values 
     double fishery_x = 1.0;
@@ -69,6 +66,28 @@ namespace
   
   }
 
+    // Edge handling
+  // Test the use of get_force_scalar_wrap across multiple timesteps with single age.
+  TEST(AgeSpecificSelectivity_Evaluate, HandlesThreeAges) {
+    // Setup 
+    // Load or prepare any necessary data for testing
+    fims_popdy::AgeSpecificSelectivity<double> fishery_selectivity;
+    fishery_selectivity.logit_sel_at_age.resize(3);
+    fishery_selectivity.logit_sel_at_age[0] = -1;
+    fishery_selectivity.logit_sel_at_age[1] = 0;
+    fishery_selectivity.logit_sel_at_age[2] = 1;
+    fishery_selectivity.min_age = 1;
+    fishery_selectivity.n_ages = 1;
+    double expected_fishery[3] = {0.2689414, 0.5, 0.7310586};
+    
+    // Test that evaluate(x, pos) returns the expected value at each timestep.
+    for (size_t fishery_x = 1; fishery_x < 4; ++fishery_x) {
+      EXPECT_NEAR(fishery_selectivity.evaluate(fishery_x),
+                  expected_fishery[fishery_x-1], 0.0001);
+    }
+  
+  }
+
   // Edge handling
   // Test the use of get_force_scalar_wrap across multiple ages and timesteps.
   TEST(AgeSpecificSelectivity_Evaluate, HandlesThreeAgesandTimeSteps) {
@@ -79,10 +98,8 @@ namespace
     fishery_selectivity.logit_sel_at_age[0] = -1;
     fishery_selectivity.logit_sel_at_age[1] = 0;
     fishery_selectivity.logit_sel_at_age[2] = 1;
-    fishery_selectivity.min_age.resize(1);
-    fishery_selectivity.min_age[0] = 1;
-    fishery_selectivity.n_ages.resize(1);
-    fishery_selectivity.n_ages[0] = 3;
+    fishery_selectivity.min_age = 1;
+    fishery_selectivity.n_ages = 3;
     // Uses get_force_scalar_wrap internally to have the same logit_sel_at_age 
     // for all 3 timesteps for each age
     // Expected values by age:
@@ -95,7 +112,7 @@ namespace
     for (size_t pos = 0; pos < 3; ++pos) {
       for (size_t fishery_x = 1; fishery_x < 4; ++fishery_x) {
         EXPECT_NEAR(fishery_selectivity.evaluate(fishery_x, pos),
-                    expected_fishery[pos], 0.0001);
+                    expected_fishery[fishery_x-1], 0.0001);
       }
     }
   

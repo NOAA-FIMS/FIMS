@@ -132,3 +132,4 @@ LazyData: true
 NeedsCompilation: yes
 Roxygen: list(markdown = TRUE)
 SystemRequirements: GNU make
+RoxygenNote: 7.3.1

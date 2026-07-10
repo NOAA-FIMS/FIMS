@@ -62,13 +62,19 @@ template <class Type>
 inline const Type lgamma(const Type &x) {
   return std::lgamma(x);
 }
+
+double Value(const double& x){
+  return x;
+}
 #endif
 
 #ifdef TMB_MODEL
 
+
 double Value(const TMBAD_FIMS_TYPE& x){
   return x.Value();
 }
+
 
 double Value(const double& x){
   return x;
