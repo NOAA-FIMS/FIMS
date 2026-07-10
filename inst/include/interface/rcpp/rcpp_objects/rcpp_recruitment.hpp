@@ -54,7 +54,7 @@ class RecruitmentInterfaceBase : public FIMSRcppInterfaceBase {
    *
    * @param other
    */
-  RecruitmentInterfaceBase(const RecruitmentInterfaceBase &other)
+  RecruitmentInterfaceBase(const RecruitmentInterfaceBase& other)
       : id(other.id), process_id(other.process_id) {}
 
   /**
@@ -139,7 +139,7 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
    * @param other The passed object to copy.
    */
   BevertonHoltRecruitmentInterface(
-      const BevertonHoltRecruitmentInterface &other)
+      const BevertonHoltRecruitmentInterface& other)
       : RecruitmentInterfaceBase(other),
         n_years(other.n_years),
         logit_steep(other.logit_steep),
@@ -171,8 +171,7 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
     copy->log_r = DeepCopyVariableVector(this->log_r);
     copy->log_expected_recruitment =
         DeepCopyVariableVector(this->log_expected_recruitment);
-    copy->estimated_logit_steep =
-        SharedReal(this->estimated_logit_steep.get());
+    copy->estimated_logit_steep = SharedReal(this->estimated_logit_steep.get());
     copy->estimated_log_rzero = SharedReal(this->estimated_log_rzero.get());
     copy->estimated_log_devs = DeepCopyRealVector(this->estimated_log_devs);
 

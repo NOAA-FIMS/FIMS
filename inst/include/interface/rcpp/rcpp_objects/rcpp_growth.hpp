@@ -149,7 +149,7 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
   /**
    * @brief Rcpp-facing deep copy wrapper.
    */
-  EWAAGrowthInterface* deep_copy_rcpp() const {
+  EWAAGrowthInterface *deep_copy_rcpp() const {
     return new EWAAGrowthInterface(*this->deep_copy());
   }
 
