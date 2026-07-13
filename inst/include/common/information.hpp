@@ -23,6 +23,10 @@
 #include "../population_dynamics/population/population.hpp"
 #include "../population_dynamics/recruitment/recruitment.hpp"
 #include "../population_dynamics/selectivity/selectivity.hpp"
+#include "../population_dynamics/alk/functors/alk_runtime.hpp"
+#include "../population_dynamics/size/functors/size_grid_builder.hpp"
+#include "../population_dynamics/size/growth_derived_size_provider.hpp"
+#include "def.hpp"
 #include "fims_vector.hpp"
 #include "model_object.hpp"
 
@@ -532,6 +536,41 @@ class Information {
   }
 
   /**
+   * @brief Set the ALK module referenced by the fleet and population modules.
+   *
+   * @param &valid_model reference to true/false boolean indicating whether
+   * model is valid.
+   * @param p shared pointer to population module
+   * @param f shared pointer to fleet module
+   */
+  void SetFleetALKModel(bool &valid_model,
+                        std::shared_ptr<fims_popdy::Population<Type>> p,
+                        std::shared_ptr<fims_popdy::Fleet<Type>> f) {
+    if (p == nullptr || f == nullptr) {
+      valid_model = false;
+      FIMS_ERROR_LOG("Unable to set fleet ALK because the population or fleet "
+                     "pointer was null.");
+      return;
+    }
+
+    f->alk = fims_popdy::BuildFleetALK<Type>(p, f);
+
+    if (f->alk != nullptr && f->alk->IsActive()) {
+      return;
+    }
+
+    if (f->n_lengths > 0) {
+      valid_model = false;
+      FIMS_ERROR_LOG("Fleet " + fims::to_string(f->id) +
+                     " has fleet length observation bins but no usable "
+                     "age-to-length conversion path. Provide fixed "
+                     "age-to-length conversion of size " +
+                     fims::to_string(f->n_ages * f->n_lengths) +
+                     " or use a supported growth-derived ALK path.");
+    }
+  }
+
+  /**
    * @brief Set pointers to the recruitment module referenced in the population
    * module.
    *
@@ -612,6 +651,216 @@ class Information {
   }
 
   /**
+   * @brief Build canonical fleet observation-bin edge vectors from fleet
+   * length_bin centers.
+   *
+   * @param p Shared pointer to population module.
+   * @return Prepared fleet observation-bin edge vectors for active fleets.
+   */
+  fims::Vector<fims::Vector<double>> PrepareFleetObservationBinEdges(
+      const std::shared_ptr<fims_popdy::Population<Type>>& p) {
+    fims::Vector<fims::Vector<double>> fleet_edges;
+
+    for (std::size_t fleet_index = 0; fleet_index < p->fleets.size();
+         ++fleet_index) {
+      const std::shared_ptr<fims_popdy::Fleet<Type>>& fleet =
+          p->fleets[fleet_index];
+
+      if (fleet == nullptr) {
+        continue;
+      }
+
+      if (fleet->n_lengths == 0) {
+        fleet->length_bin_edges = fims::Vector<double>();
+        continue;
+      }
+
+      if (fleet->lengths.size() != fleet->n_lengths) {
+        throw std::runtime_error(
+            "Fleet length_bin centers are not consistent with n_lengths");
+      }
+
+      fleet->length_bin_edges =
+          fims_popdy::SizeGridBuilder::BuildObservationEdgesFromCenters(
+              fleet->lengths);
+
+      fleet_edges.emplace_back(fleet->length_bin_edges);
+    }
+
+    return fleet_edges;
+  }
+
+  /**
+   * @brief Enforce that biological size bins are not coarser than overlapping
+   * active fleet observation bins.
+   *
+   * @details This rule applies to both the built-in default biological size
+   * grid and any user-supplied biological size-grid override. The separate
+   * terminal plus-group bin is allowed to remain wider than fleet bins only
+   * when it lies entirely above the fleet-supported range and therefore does
+   * not overlap any active fleet observation bin.
+   *
+   * @param size_grid Population biological size grid to validate.
+   * @param fleet_edges Prepared fleet observation-bin edge vectors.
+   */
+  void EnforcePopulationGridNotCoarserThanFleetBins(
+      const fims_popdy::SizeGrid& size_grid,
+      const fims::Vector<fims::Vector<double>>& fleet_edges) {
+    if (!size_grid.IsConsistent() || size_grid.n_bins == 0 ||
+        fleet_edges.size() == 0) {
+      return;
+    }
+
+    for (std::size_t population_bin_index = 0;
+         population_bin_index < size_grid.n_bins;
+         ++population_bin_index) {
+      const double population_left = size_grid.edges[population_bin_index];
+      const double population_right = size_grid.edges[population_bin_index + 1];
+      const double population_bin_width = population_right - population_left;
+      const double population_tolerance =
+          1e-12 * (population_bin_width > 1.0 ? population_bin_width : 1.0);
+
+      for (std::size_t fleet_index = 0; fleet_index < fleet_edges.size();
+           ++fleet_index) {
+        const fims::Vector<double>& edges = fleet_edges[fleet_index];
+
+        for (std::size_t fleet_bin_index = 1; fleet_bin_index < edges.size();
+             ++fleet_bin_index) {
+          const double fleet_left = edges[fleet_bin_index - 1];
+          const double fleet_right = edges[fleet_bin_index];
+          const double overlap_left = std::max(population_left, fleet_left);
+          const double overlap_right = std::min(population_right, fleet_right);
+
+          if (!(overlap_right > overlap_left)) {
+            continue;
+          }
+
+          const double fleet_bin_width = fleet_right - fleet_left;
+          if (population_bin_width > fleet_bin_width + population_tolerance) {
+            throw std::runtime_error(
+                "Population biological size grid contains at least one bin "
+                "that is coarser than an overlapping active fleet observation "
+                "bin. Provide a finer biological size-grid override or correct "
+                "the fleet bin setup.");
+          }
+        }
+      }
+    }
+  }
+
+  /**
+   * @brief Ensure a population has a usable biological size grid.
+   *
+   * @details Prepare canonical fleet observation-bin geometry from valid fleet
+   * length_bin centers whenever that geometry is available. If a user provides
+   * a valid biological size grid, keep it only if its bins are not coarser
+   * than any overlapping active fleet observation bins; otherwise, report an
+   * error and invalidate the model. If no biological size grid has been
+   * provided, build the built-in default from the prepared fleet
+   * observation-bin geometry, enforce the same fleet-bin compatibility rule,
+   * and warn when the built-in default creates more than 200 regular bins. If
+   * a user provides an invalid or partially specified grid, report the problem
+   * and invalidate the model.
+   *
+   * @param valid_model Reference to model-validity flag.
+   * @param p Shared pointer to population module.
+   */
+  void EnsurePopulationSizeGrid(
+      bool &valid_model,
+      std::shared_ptr<fims_popdy::Population<Type>> p) {
+    fims::Vector<fims::Vector<double>> fleet_edges;
+
+    try {
+      fleet_edges = PrepareFleetObservationBinEdges(p);
+    } catch (const std::exception &e) {
+      valid_model = false;
+      FIMS_ERROR_LOG(
+          "Failed to prepare fleet observation-bin geometry for population " +
+          fims::to_string(p->id) + ": " + e.what());
+      return;
+    }
+
+    if (p->size_grid.IsConsistent() && p->size_grid.n_bins > 0) {
+      try {
+        EnforcePopulationGridNotCoarserThanFleetBins(p->size_grid, fleet_edges);
+      } catch (const std::exception &e) {
+        valid_model = false;
+        FIMS_ERROR_LOG(
+            "Population " + fims::to_string(p->id) +
+            " has a biological size grid that is incompatible with active "
+            "fleet observation bins: " + e.what());
+      }
+      return;
+    }
+
+    const bool size_grid_missing =
+        p->size_grid.n_bins == 0 &&
+        p->size_grid.edges.size() == 0 &&
+        p->size_grid.centers.size() == 0;
+
+    if (size_grid_missing) {
+      try {
+        if (fleet_edges.size() == 0) {
+          throw std::runtime_error(
+              "No resolvable fleet observation-bin geometry was available "
+              "to build the default biological size grid");
+        }
+
+        p->size_grid =
+            fims_popdy::SizeGridBuilder::BuildDefaultFromFleetEdges(
+                fleet_edges);
+        EnforcePopulationGridNotCoarserThanFleetBins(p->size_grid, fleet_edges);
+
+        const std::size_t regular_bin_count =
+            p->size_grid.n_bins > 0 ? p->size_grid.n_bins - 1 : 0;
+
+        if (regular_bin_count > 200) {
+          FIMS_WARNING_LOG(
+              "Built-in default biological size grid created more than 200 "
+              "regular bins for population " +
+              fims::to_string(p->id) +
+              ". This may slow model evaluation. Consider providing a "
+              "biological size-grid override if needed.");
+        }
+
+      } catch (const std::exception &e) {
+        valid_model = false;
+        FIMS_ERROR_LOG(
+            "Failed to initialize default population size grid for population " +
+            fims::to_string(p->id) + ": " + e.what());
+      }
+      return;
+    }
+
+    valid_model = false;
+    FIMS_ERROR_LOG(
+        "Population " + fims::to_string(p->id) +
+        " has an invalid biological size grid. Provide a consistent override "
+        "or leave the grid empty so FIMS can build the default.");
+  }
+
+  /**
+   * @brief Configure the growth-derived size provider for a population.
+   *
+   * @param p Shared pointer to population module.
+   * @param growth_observation Shared pointer to a growth module that can
+   * provide growth-derived observation products.
+   */
+  void ConfigureGrowthDerivedSizeProvider(
+      std::shared_ptr<fims_popdy::Population<Type>> p,
+      std::shared_ptr<fims_popdy::GrowthDerivedObservationBase<Type>>
+          growth_observation) {
+    std::shared_ptr<fims_popdy::GrowthDerivedSizeProvider<Type>> size_provider =
+        std::make_shared<fims_popdy::GrowthDerivedSizeProvider<Type>>();
+
+    size_provider->SetGrowth(growth_observation);
+    size_provider->SetPopulationDimensions(p->n_years, p->n_ages);
+    size_provider->SetPopulationSizeGrid(&(p->size_grid));
+
+    p->size_distribution_provider = size_provider;
+  }
+
+  /**
    * @brief Set pointers to the growth module referenced in the population
    * module.
    *
@@ -632,6 +881,43 @@ class Information {
         p->growth =
             (*it).second;  // growth defined in population.hpp (the object
         // is called p, growth is within p)
+        if (std::shared_ptr<fims_popdy::GrowthDerivedObservationBase<Type>>
+                growth_observation = std::dynamic_pointer_cast<
+                    fims_popdy::GrowthDerivedObservationBase<Type>>(
+                    p->growth)) {
+          growth_observation->Initialize(p->n_years, p->n_ages, 1);
+
+          if (p->ages.size() > 0) {
+            double min_age = p->ages[0];
+            for (size_t i = 1; i < p->ages.size(); ++i) {
+              if (p->ages[i] < min_age) {
+                min_age = p->ages[i];
+              }
+            }
+            growth_observation->SetAgeOffset(static_cast<double>(min_age));
+          }
+
+          const bool population_has_size_grid_input =
+              p->size_grid.n_bins > 0 ||
+              p->size_grid.edges.size() > 0 ||
+              p->size_grid.centers.size() > 0;
+
+          bool any_length_based_fleet = false;
+          for (std::size_t i = 0; i < p->fleets.size(); ++i) {
+            if (p->fleets[i] != nullptr && p->fleets[i]->n_lengths > 0) {
+              any_length_based_fleet = true;
+              break;
+            }
+          }
+
+          if (population_has_size_grid_input || any_length_based_fleet) {
+            EnsurePopulationSizeGrid(valid_model, p);
+            if (!valid_model) {
+              return;
+            }
+            ConfigureGrowthDerivedSizeProvider(p, growth_observation);
+          }
+        }
         FIMS_INFO_LOG("Growth model " + fims::to_string(growth_uint) +
                       " successfully set to population " +
                       fims::to_string(p->id));
@@ -798,6 +1084,9 @@ class Information {
       SetRecruitmentProcess(valid_model, p);
 
       SetGrowth(valid_model, p);
+      for (size_t i = 0; i < p->fleets.size(); ++i) {
+        SetFleetALKModel(valid_model, p, p->fleets[i]);
+      }
 
       SetMaturity(valid_model, p);
     }

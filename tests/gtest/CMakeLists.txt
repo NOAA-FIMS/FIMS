@@ -102,6 +102,39 @@ target_link_libraries(growth_EWAAGrowth_evaluate
 )
 gtest_discover_tests(growth_EWAAGrowth_evaluate)
 
+# test_growth_von_bertalanffy.cpp
+add_executable(growth_von_bertalanffy
+  test_growth_von_bertalanffy.cpp
+)
+add_as_invoker_manifest(growth_von_bertalanffy)
+target_link_libraries(growth_von_bertalanffy
+  gtest_main
+  fims_test
+)
+gtest_discover_tests(growth_von_bertalanffy)
+
+# test_growth_model.cpp
+add_executable(growth_model
+  test_growth_model.cpp
+)
+add_as_invoker_manifest(growth_model)
+target_link_libraries(growth_model
+  gtest_main
+  fims_test
+)
+gtest_discover_tests(growth_model)
+
+# test_growth_model_adapter.cpp
+add_executable(growth_model_adapter
+  test_growth_model_adapter.cpp
+)
+add_as_invoker_manifest(growth_model_adapter)
+target_link_libraries(growth_model_adapter
+  gtest_main
+  fims_test
+)
+gtest_discover_tests(growth_model_adapter)
+
 # test_information_Information_SetupPriors.cpp
 add_executable(information_Information_SetupPriors
   test_information_Information_SetupPriors.cpp
@@ -123,6 +156,17 @@ target_link_libraries(information_Information_SetupRandomEffects
   fims_test
 )
 gtest_discover_tests(information_Information_SetupRandomEffects)
+
+# test_info_size_grid.cpp
+add_executable(info_size_grid
+  test_info_size_grid.cpp
+)
+add_as_invoker_manifest(info_size_grid)
+target_link_libraries(info_size_grid
+  gtest_main
+  fims_test
+)
+gtest_discover_tests(info_size_grid)
 
 # test_srBevertonHolt_SRBevertonHolt_evaluateMean.cpp
 add_executable(srBevertonHolt_SRBevertonHolt_evaluateMean
@@ -189,6 +233,28 @@ target_link_libraries(population_Population_InitializePrepare
   fims_test
 )
 gtest_discover_tests(population_Population_InitializePrepare)
+
+# test_population_dynamics_alk.cpp
+add_executable(population_dynamics_alk
+  test_population_dynamics_alk.cpp
+)
+add_as_invoker_manifest(population_dynamics_alk)
+target_link_libraries(population_dynamics_alk
+  gtest_main
+  fims_test
+)
+gtest_discover_tests(population_dynamics_alk)
+
+# test_population_dynamics_size.cpp
+add_executable(population_dynamics_size
+  test_population_dynamics_size.cpp
+)
+add_as_invoker_manifest(population_dynamics_size)
+target_link_libraries(population_dynamics_size
+  gtest_main
+  fims_test
+)
+gtest_discover_tests(population_dynamics_size)
 
 # test_population_CatchAtAge_CalculateBiomass.cpp
 add_executable(population_CatchAtAge_CalculateBiomass
