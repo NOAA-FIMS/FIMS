@@ -23,6 +23,7 @@ std::shared_ptr<fims_popdy::Fleet<double>> MakeFleetWithCenters(
   fleet->n_years = 1;
   fleet->n_ages = 1;
   fleet->n_lengths = centers.size();
+  fleet->requires_age_length_mapping = true;
   fleet->lengths.resize(centers.size());
 
   for (std::size_t i = 0; i < centers.size(); ++i) {
@@ -44,6 +45,7 @@ TEST(InformationSizeGrid,
   fleet->n_years = 1;
   fleet->n_ages = 1;
   fleet->n_lengths = 202;
+  fleet->requires_age_length_mapping = true;
   fleet->lengths.resize(202);
 
   for (std::size_t i = 0; i < 202; ++i) {
@@ -216,6 +218,7 @@ TEST(InformationSizeGrid,
   fleet->n_years = 1;
   fleet->n_ages = 1;
   fleet->n_lengths = 3;
+  fleet->requires_age_length_mapping = true;
   fleet->lengths = fims::Vector<double>{1.0, 2.0};
   population->fleets.push_back(fleet);
   population->n_fleets = population->fleets.size();
