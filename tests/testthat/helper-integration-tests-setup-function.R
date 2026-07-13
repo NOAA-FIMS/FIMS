@@ -125,8 +125,9 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   fishing_fleet$n_years$set(om_input[["nyr"]])
   # Set number of age classes
   fishing_fleet$n_ages$set(om_input[["nages"]])
-  # Set number of length bins
+  # Set the number and locations of the fleet observation bins
   fishing_fleet$n_lengths$set(om_input[["nlengths"]])
+  fishing_fleet$lengths[] <- om_input[["lengths"]]
 
   fishing_fleet$log_Fmort$resize(om_input[["nyr"]])
   for (y in 1:om_input$nyr) {
@@ -140,6 +141,7 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   fishing_fleet$SetObservedLandingsDataID(fishing_fleet_landings$get_id())
   fishing_fleet$SetObservedAgeCompDataID(fishing_fleet_age_comp$get_id())
   fishing_fleet$SetObservedLengthCompDataID(fishing_fleet_length_comp$get_id())
+  fishing_fleet$SetRequiresAgeLengthMapping(TRUE)
 
   # Set up fishery index data using the lognormal
   fishing_fleet_landings_distribution <- methods::new(DlnormDistribution)
@@ -207,6 +209,7 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   survey_fleet$n_ages$set(om_input[["nages"]])
   survey_fleet$n_years$set(om_input[["nyr"]])
   survey_fleet$n_lengths$set(om_input[["nlengths"]])
+  survey_fleet$lengths[] <- om_input[["lengths"]]
   survey_fleet$log_Fmort$resize(om_input[["nyr"]])
   for (y in 1:om_input$nyr) {
     # Set very low survey fishing mortality
@@ -219,6 +222,7 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   survey_fleet$SetObservedIndexDataID(survey_fleet_index$get_id())
   survey_fleet$SetObservedAgeCompDataID(survey_fleet_age_comp$get_id())
   survey_fleet$SetObservedLengthCompDataID(survey_fleet_length_comp$get_id())
+  survey_fleet$SetRequiresAgeLengthMapping(TRUE)
 
   # Set up survey index data using the lognormal
   survey_fleet_index_distribution <- methods::new(DlnormDistribution)

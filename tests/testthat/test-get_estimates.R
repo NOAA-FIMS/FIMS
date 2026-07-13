@@ -25,6 +25,13 @@ expected_colnames <- c(
   "lpdf", "likelihood", "log_sd", "log_like_cv", "gradient"
 )
 
+canonicalize_parameter_ids <- function(x) {
+  ids <- unique(x$parameter_id[!is.na(x$parameter_id)])
+  x$parameter_id <- match(x$parameter_id, ids)
+  x
+}
+
+
 test_that("`get_estimates()` works with deterministic run", {
   # Read the RDS file containing the deterministic run results
   deterministic_results <- readRDS(testthat::test_path("fixtures", "deterministic_age_length_comp.RDS"))
@@ -38,11 +45,12 @@ test_that("`get_estimates()` works with deterministic run", {
   #' @description Test that the result values from the model fit have not changed from the accepted version.
   expect_snapshot(
     get_estimates(deterministic_results) |>
+      canonicalize_parameter_ids() |>
       # Remove the estimate, uncertainty, and gradient columns, as they
       # may change between runs
       dplyr::select(
         -estimated, -expected, -uncertainty, -gradient,
-        -likelihood, -log_like_cv, -gradient
+        -likelihood, -log_like_cv
       ) |>
       print(n = 320, width = Inf)
   )
@@ -78,11 +86,12 @@ test_that("`get_estimates()` works with estimation run", {
     # Read the first RDS file, get estimates, and print a snapshot
     readRDS(fit_files[[1]]) |>
       get_estimates() |>
+      canonicalize_parameter_ids() |>
       # Remove the estimated, uncertainty, and gradient columns, as they
       # may change between runs
       dplyr::select(
         -estimated, -expected, -uncertainty, -gradient,
-        -likelihood, -log_like_cv, -gradient
+        -likelihood, -log_like_cv
       ) |>
       print(n = 320, width = Inf)
   )
