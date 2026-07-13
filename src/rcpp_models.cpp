@@ -27,5 +27,7 @@ void register_fishery_models(Rcpp::Module& m) {
       .method("get_output", &CatchAtAgeInterface::to_json)
       .method("GetId", &CatchAtAgeInterface::get_id)
       .method("DoReporting", &CatchAtAgeInterface::DoReporting)
-      .method("IsReporting", &CatchAtAgeInterface::IsReporting);
+      .method("IsReporting", &CatchAtAgeInterface::IsReporting)
+      .method("ReportGrowthDerivedALKTensor",
+              &CatchAtAgeInterface::ReportGrowthDerivedALKTensor);
 }

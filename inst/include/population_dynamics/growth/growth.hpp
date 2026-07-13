@@ -14,5 +14,8 @@
 
 #include "functors/ewaa.hpp"
 #include "functors/growth_base.hpp"
+#include "functors/von_bertalanffy.hpp"
+#include "growth_model_adapter.hpp"
+
 
 #endif /* FIMS_POPULATION_DYNAMICS_GROWTH_HPP */

@@ -423,16 +423,6 @@ methods::setMethod(
   "model_length_comp",
   "FIMSFrame",
   function(x, fleet) {
-    conversion_data <- dplyr::filter(
-      .data = x@data,
-      .data[["type"]] == "age_to_length_conversion"
-    )
-    if (NROW(conversion_data) == 0) {
-      cli::cli_abort(c(
-        "There are no {.var age_to_length_conversion} data present, therefore
-        you cannot fit to {.var length_comp} data."
-      ))
-    }
     dplyr::filter(
       .data = x@data,
       .data[["type"]] == "length_comp",
@@ -544,10 +534,16 @@ methods::setMethod(
       .data = as.data.frame(x@data),
       .data[["type"]] == "age_to_length_conversion"
     )
-    if (NROW(model_data) > get_n_ages(x) * get_n_lengths(x)) {
+    conversion_lengths <- model_data |>
+      dplyr::pull(.data[["length"]]) |>
+      unique() |>
+      stats::na.omit() |>
+      sort()
+
+    if (NROW(model_data) > get_n_ages(x) * length(conversion_lengths)) {
       cli::cli_warn(
         "`age_to_length_conversion` data is time- and fleet-invariant and
-        should consist of {get_n_ages(x) * get_n_lengths(x)} rows not
+        should consist of {get_n_ages(x) * length(conversion_lengths)} rows not
         {NROW(model_data)} rows like what is provided. Data passed to the
         model will be averages over timing and name."
       )
@@ -815,6 +811,69 @@ validate_dimension_of_conversion <- function(data, n_groups, n_timings) {
   }
 }
 
+resolve_fleet_length_bins <- function(data,
+                                      allow_global_conversion_fallback = TRUE) {
+  data_tbl <- tibble::as_tibble(data)
+
+  if (!all(c("fleet", "type", "length") %in% colnames(data_tbl))) {
+    return(list())
+  }
+
+  fleets <- sort(unique(stats::na.omit(data_tbl[["fleet"]])))
+  if (length(fleets) == 0) {
+    return(list())
+  }
+
+  global_conversion_bins <- if (allow_global_conversion_fallback) {
+    data_tbl |>
+      dplyr::filter(
+        .data$type == "age_to_length_conversion",
+        !is.na(.data$length)
+      ) |>
+      dplyr::pull(.data$length) |>
+      unique() |>
+      sort()
+  } else {
+    numeric()
+  }
+
+  out <- stats::setNames(vector("list", length(fleets)), fleets)
+
+  for (fleet_i in fleets) {
+    explicit_bins <- data_tbl |>
+      dplyr::filter(
+        .data$fleet == fleet_i,
+        .data$type == "length_bin",
+        !is.na(.data$length)
+      ) |>
+      dplyr::pull(.data$length) |>
+      unique() |>
+      sort()
+
+    comp_bins <- data_tbl |>
+      dplyr::filter(
+        .data$fleet == fleet_i,
+        .data$type == "length_comp",
+        !is.na(.data$length)
+      ) |>
+      dplyr::pull(.data$length) |>
+      unique() |>
+      sort()
+
+    out[[fleet_i]] <- if (length(explicit_bins) > 0) {
+      explicit_bins
+    } else if (length(comp_bins) > 0) {
+      comp_bins
+    } else if (allow_global_conversion_fallback) {
+      global_conversion_bins
+    } else {
+      numeric()
+    }
+  }
+
+  out
+}
+
 # Constructors ----
 
 # All constructors in this file are documented in 1 roxygen file via @rdname.
@@ -968,10 +1027,9 @@ FIMSFrame <- function(data) {
     if (all(is.na(data[["length"]]))) {
       lengths <- numeric()
     } else {
-      data_for_length_calculations <- dplyr::filter(data, .data$type == "length_comp")
-      lengths <- sort(na.omit(
-        unique(data_for_length_calculations[["length"]])
-      ))
+      resolved_fleet_length_bins <- resolve_fleet_length_bins(data)
+      lengths <- sort(unique(unlist(resolved_fleet_length_bins, use.names = FALSE)))
+
       # Check that the age column exists b/c conversion data depends on it
       if (!"age" %in% colnames(data)) {
         cli::cli_abort(
@@ -980,12 +1038,16 @@ FIMSFrame <- function(data) {
           {.var age_to_length_conversion} type."
         )
       }
-      # Check that age_to_length_conversion data exist once
-      validate_dimension_of_conversion(
-        dplyr::filter(data, .data$type == "age_to_length_conversion"),
-        n_groups = n_ages * length(lengths),
-        n_timings = 1
-      )
+
+      conversion_data <- dplyr::filter(data, .data$type == "age_to_length_conversion")
+      if (NROW(conversion_data) > 0) {
+        conversion_lengths <- sort(na.omit(unique(conversion_data[["length"]])))
+        validate_dimension_of_conversion(
+          conversion_data,
+          n_groups = n_ages * length(conversion_lengths),
+          n_timings = 1
+        )
+      }
     }
   } else {
     lengths <- numeric()
@@ -1041,23 +1103,45 @@ FIMSFrame <- function(data) {
     missing_ages <- missing_time_series[0, ]
   }
   if ("length" %in% colnames(formatted_data)) {
-    missing_lengths <- create_missing_data(
-      data = formatted_data,
-      bins = lengths,
-      timings = years,
-      column = "length",
-      types = "length_comp"
+    fleet_length_bins <- resolve_fleet_length_bins(formatted_data)
+
+    missing_lengths <- purrr::imap_dfr(fleet_length_bins, \(bins, fleet_i) {
+      fleet_length_data <- formatted_data |>
+        dplyr::filter(
+          .data$fleet == fleet_i,
+          .data$type == "length_comp"
+        )
+
+      if (length(bins) == 0 || NROW(fleet_length_data) == 0) {
+        return(formatted_data[0, ])
+      }
+
+      create_missing_data(
+        data = fleet_length_data,
+        bins = bins,
+        timings = years,
+        column = "length",
+        types = "length_comp"
+      )
+    })
+
+    expected_length_counts <- tibble::tibble(
+      fleet = names(fleet_length_bins),
+      expected_n = purrr::map_int(fleet_length_bins, length)
     )
+
     summary_by_name <- dplyr::count(
       missing_lengths,
       .data$fleet,
       .data$timing
     ) |>
-      dplyr::filter(.data$n != n_lengths) |>
+      dplyr::left_join(expected_length_counts, by = "fleet") |>
+      dplyr::filter(.data$n != .data$expected_n) |>
       dplyr::summarize(
         timings = paste(.data$timing, collapse = ", "),
         .by = dplyr::all_of("fleet")
       )
+
     if (NROW(summary_by_name) > 0) {
       cli::cli_abort(
         "You cannot have missing length values for a given timing and fleet

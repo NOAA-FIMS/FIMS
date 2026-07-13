@@ -4,6 +4,7 @@ fims_input_types <- c(
   "index",
   # TODO: change to singular landing
   "landings",
+  "length_bin",
   "length_comp",
   "weight_at_age"
 )

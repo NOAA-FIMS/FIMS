@@ -14,6 +14,7 @@
 #include "../../common/model_object.hpp"
 #include "../../distributions/distributions.hpp"
 #include "../selectivity/selectivity.hpp"
+#include "../alk/functors/alk_base.hpp"
 
 namespace fims_popdy {
 
@@ -24,14 +25,21 @@ namespace fims_popdy {
 template <class Type>
 struct Fleet : public fims_model_object::FIMSObject<Type> {
   static uint32_t id_g; /*!< reference id for fleet object*/
-  size_t n_years;       /*!< the number of years in the model*/
-  size_t n_ages;        /*!< the number of ages in the model*/
-  size_t n_lengths;     /*!< the number of lengths in the model*/
+  size_t n_years; /*!< the number of years in the model*/
+  size_t n_ages;  /*!< the number of ages in the model*/
+  size_t n_lengths; /*!< the number of fleet observation bins for this fleet */
+  fims::Vector<double>
+      lengths; /*!< Fleet observation-bin centers for this fleet. */
+  fims::Vector<double>
+      length_bin_edges; /*!< Resolved observation-bin edges for this fleet. */
 
   // selectivity
   int fleet_selectivity_id_m = -999; /*!< id of selectivity component*/
   std::shared_ptr<SelectivityBase<Type>>
       selectivity; /*!< selectivity component*/
+
+  // age-length key
+  std::shared_ptr<ALKBase<Type>> alk; /*!< fleet-specific age-length key */
 
   // landings data
   int fleet_observed_landings_data_id_m = -999; /*!< id of landings data */
@@ -67,9 +75,8 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
   fims::Vector<Type>
       q; /*!< transformed parameter: the catchability of the fleet */
 
-  fims::Vector<Type> age_to_length_conversion; /*!<derived quantity age to
+  fims::Vector<Type> age_to_length_conversion; /*!< derived quantity age to
                                                 length conversion matrix*/
-
   /**
    * @brief Constructor.
    */
@@ -77,7 +84,6 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
     this->id = Fleet::id_g++;
     this->register_self(this->id);
   }
-
   /**
    * @brief Destructor.
    */

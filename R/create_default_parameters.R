@@ -158,6 +158,12 @@ create_default_parameters <- function(
     data = data
   )
 
+  # Create growth parameters
+  growth_temp <- create_default_growth(
+    unnested_configurations = unnested_configurations,
+    data = data
+  )
+
   # Create population parameters
   # Handle population parameters based on recruitment form
   log_rzero <- recruitment_temp |>
@@ -175,6 +181,7 @@ create_default_parameters <- function(
     fleet_temp,
     recruitment_temp,
     maturity_temp,
+    growth_temp,
     population_temp
   )
 
@@ -212,6 +219,92 @@ create_default_parameters <- function(
       !(is.na(.data$label) & is.na(.data$distribution_type) & is.na(.data$distribution) & .data$module_name != "Growth")
     ) |>
     tidyr::nest(.by = c("model_family", "module_name", "fleet"))
+}
+
+#' Create default growth parameters (VonB only)
+#' @noRd
+create_default_growth <- function(unnested_configurations, data) {
+
+  form <- unnested_configurations |>
+    dplyr::filter(.data$module_name == "Growth") |>
+    dplyr::pull(.data$module_type) |>
+    unique() |>
+    stats::na.omit()
+
+  # TODO: Validate that no more than one non-missing growth module type is
+  # configured. Multiple growth types currently return an empty parameter
+
+  # Only act if VonB is requested
+  if (length(form) == 1 && form == "VonBertalanffy") {
+
+    ages <- get_ages(data)
+    if (length(ages) == 0 || all(is.na(ages))) {
+      reference_age_for_length_1 <- 0
+      n_ages <- get_n_ages(data)
+      reference_age_for_length_2 <- if (n_ages > 0) n_ages - 1 else 0
+    } else {
+      reference_age_for_length_1 <- min(ages, na.rm = TRUE)
+      reference_age_for_length_2 <- max(ages, na.rm = TRUE)
+    }
+
+    # Use interpolation SD anchors as the default VonB variability path.
+    # The delta-method wiring is retained in the backend, but it is not used
+    # in the default setup until it is re-derived for the traditional Von
+    # Bertalanffy parameterization.
+    default <- create_default_parameters_template(n_parameters = 9) |>
+      dplyr::mutate(
+        module_name = "Growth",
+        module_type = "VonBertalanffy",
+        label = c(
+          "length_at_ref_age_1",
+          "length_at_ref_age_2",
+          "growth_coefficient_K",
+          "reference_age_for_length_1",
+          "reference_age_for_length_2",
+          "length_weight_a",
+          "length_weight_b",
+          "length_at_age_sd_at_ref_ages",
+          "length_at_age_sd_at_ref_ages"
+        ),
+        age = c(
+          NA_real_,
+          NA_real_,
+          NA_real_,
+          NA_real_,
+          NA_real_,
+          NA_real_,
+          NA_real_,
+          reference_age_for_length_1,
+          reference_age_for_length_2
+        ),
+        value = c(
+          275,
+          725,
+          0.18,
+          reference_age_for_length_1,
+          reference_age_for_length_2,
+          2.5e-11,
+          3,
+          28,
+          73
+        ),
+        estimation_type = c(
+          "fixed_effects",
+          "fixed_effects",
+          "fixed_effects",
+          "constant",
+          "constant",
+          "constant",
+          "constant",
+          "constant",
+          "constant"
+        )
+      )
+
+    return(default)
+  }
+
+  create_default_parameters_template(n_parameters = 0)
 }
 
 #' Create default parameters for a FIMS model

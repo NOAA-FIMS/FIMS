@@ -26,6 +26,7 @@ void register_fleet(Rcpp::Module& m) {
       .field("n_ages", &FleetInterface::n_ages)
       .field("n_years", &FleetInterface::n_years)
       .field("n_lengths", &FleetInterface::n_lengths)
+      .field("lengths", &FleetInterface::lengths)
       .field("observed_landings_units",
              &FleetInterface::observed_landings_units)
       .field("observed_index_units", &FleetInterface::observed_index_units)
