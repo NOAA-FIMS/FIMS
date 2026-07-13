@@ -462,9 +462,106 @@ initialize_fleet <- function(parameters, data, fleet, linked_ids) {
     dplyr::pull(.data$type) |>
     unique()
 
-  if ("landings" %in% fleet_types &&
-    "Landings" %in% distribution_names_for_fleet) {
-    module$SetObservedLandingsDataID(linked_ids[["landings"]])
+  distribution_names_for_fleet <- parameters |>
+    dplyr::filter(
+      .data$fleet == .env$fleet,
+      .data$distribution_type == "Data"
+    ) |>
+    dplyr::pull(.data$module_type)
+
+  has_growth_derived_support <- any(
+    parameters |>
+      dplyr::filter(.data$module_name == "Growth") |>
+      dplyr::pull(.data$module_type) %in% "VonBertalanffy"
+  )
+
+  has_fixed_alk_support <- any(
+    get_data(data)$type == "age_to_length_conversion"
+  )
+
+  has_length_comp_distribution <- "LengthComp" %in% distribution_names_for_fleet
+
+  use_fixed_alk_path <-
+    !has_growth_derived_support &&
+    has_fixed_alk_support &&
+    has_length_comp_distribution
+  use_growth_derived_path <-
+    has_growth_derived_support && has_length_comp_distribution
+  requires_age_length_mapping <- has_length_comp_distribution
+
+  fleet_length_bins <- resolve_fleet_length_bins(
+    get_data(data),
+    allow_global_conversion_fallback = !use_growth_derived_path
+  )[[fleet]]
+
+  fleet_needs_length_bins <- any(
+    c("length_comp", "age_to_length_conversion") %in% fleet_types
+  )
+
+  if (fleet_needs_length_bins &&
+      (is.null(fleet_length_bins) || length(fleet_length_bins) == 0)) {
+    if (use_growth_derived_path) {
+      cli::cli_abort(c(
+        "Fleet `{fleet}` requires a resolved fleet-specific length-bin layout for the growth-derived VonB path.",
+        "i" = "Provide explicit `length_bin` rows or fleet-specific `length_comp` bins.",
+        "i" = "Fixed `age_to_length_conversion` rows are not used to define fleet observation bins for the active growth-derived ALK path."
+      ))
+    }
+
+    cli::cli_abort(c(
+      "Fleet `{fleet}` requires a resolved fleet-specific length-bin layout.",
+      "i" = "Provide explicit `length_bin` rows, fleet-specific `length_comp` bins, or compatible fixed age-to-length support."
+    ))
+  }
+
+  if (is.null(fleet_length_bins)) {
+    fleet_length_bins <- numeric()
+  }
+
+  module$n_lengths$set(length(fleet_length_bins))
+  module$lengths[] <- fleet_length_bins
+  module$SetRequiresAgeLengthMapping(requires_age_length_mapping)
+
+  module$SetSelectivityID(linked_ids[["selectivity"]])
+
+  if (use_fixed_alk_path) {
+    fixed_alk_data <- get_data(data) |>
+      dplyr::filter(.data$type == "age_to_length_conversion") |>
+      dplyr::group_by(.data$age, .data$length) |>
+      dplyr::summarize(
+        value = mean(as.numeric(.data$value), na.rm = TRUE),
+        .groups = "drop"
+      ) |>
+      dplyr::filter(.data$length %in% fleet_length_bins) |>
+      dplyr::mutate(
+        age_order = match(.data$age, get_ages(data)),
+        length_order = match(.data$length, fleet_length_bins)
+      ) |>
+      dplyr::arrange(.data$age_order, .data$length_order)
+
+    expected_alk_rows <- get_n_ages(data) * length(fleet_length_bins)
+
+    if (nrow(fixed_alk_data) != expected_alk_rows) {
+      cli::cli_abort(c(
+        "Fleet `{fleet}` fixed age-to-length data do not match its resolved fleet bins.",
+        "i" = "Expected {expected_alk_rows} age-length cells from {get_n_ages(data)} ages x {length(fleet_length_bins)} fleet bins.",
+        "i" = "Found {nrow(fixed_alk_data)} matching fixed age-to-length cells after filtering to the fleet bins."
+      ))
+    }
+
+    module$age_to_length_conversion$resize(expected_alk_rows)
+    module$age_to_length_conversion[] <- fixed_alk_data$value
+    module$age_to_length_conversion$set_estimation_types(c("constant"))
+  } else {
+    module$age_to_length_conversion$resize(0)
+  }
+
+  # Link the observed catch data to the fleet module using its associated ID
+  # if the data type includes "catch" and if "Catch" exists in the
+  # data distribution specification.
+  if ("catch" %in% fleet_types &&
+    "Catch" %in% distribution_names_for_fleet) {
+    module$SetObservedCatchDataID(linked_ids[["catch"]])
   }
 
   # Link the observed index data to the fleet module using its associated ID

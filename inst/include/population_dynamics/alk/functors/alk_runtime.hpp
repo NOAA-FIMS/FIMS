@@ -46,6 +46,10 @@ std::shared_ptr<ALKBase<Type>> BuildFleetALK(
     return nullptr;
   }
 
+  if (!fleet->requires_age_length_mapping || fleet->n_lengths == 0) {
+    return nullptr;
+  }
+
   if (std::shared_ptr<GrowthDerivedObservationBase<Type>> growth_observation =
           std::dynamic_pointer_cast<GrowthDerivedObservationBase<Type>>(
               population->growth)) {
@@ -102,7 +106,7 @@ void EnsureFleetALK(const std::shared_ptr<Population<Type>>& population,
     throw std::runtime_error("Population pointer was null while resolving ALK.");
   }
 
-  if (fleet->n_lengths == 0) {
+  if (!fleet->requires_age_length_mapping || fleet->n_lengths == 0) {
     return;
   }
 

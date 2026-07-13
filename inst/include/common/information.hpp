@@ -670,7 +670,7 @@ class Information {
         continue;
       }
 
-      if (fleet->n_lengths == 0) {
+      if (!fleet->requires_age_length_mapping || fleet->n_lengths == 0) {
         fleet->length_bin_edges = fims::Vector<double>();
         continue;
       }
@@ -904,7 +904,9 @@ class Information {
 
           bool any_length_based_fleet = false;
           for (std::size_t i = 0; i < p->fleets.size(); ++i) {
-            if (p->fleets[i] != nullptr && p->fleets[i]->n_lengths > 0) {
+            if (p->fleets[i] != nullptr &&
+                p->fleets[i]->requires_age_length_mapping &&
+                p->fleets[i]->n_lengths > 0) {
               any_length_based_fleet = true;
               break;
             }

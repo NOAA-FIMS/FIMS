@@ -4,6 +4,7 @@
 #include "common/def.hpp"
 
 #include "gtest/gtest.h"
+#include "test_stubs.hpp"
 
 #include "population_dynamics/growth/growth_model_adapter.hpp"
 #include "population_dynamics/size/functors/size_grid_builder.hpp"
