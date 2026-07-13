@@ -5,11 +5,27 @@ on:
   pull_request:
     branches:
       - main
+    paths: &core_paths
+      - 'DESCRIPTION'
+      - 'NAMESPACE'
+      - 'R/**'
+      - 'src/**'
+      - 'tests/**'
+      - 'inst/**'
+      - 'data/**'
+      - 'data-raw/**'
+      - 'vignettes/**'
   push:
     branches:
       - main
+    paths: *core_paths
 
 permissions: {}
+
+# Cancel runs happening simultaneously on the same branch.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   devtools-test:

@@ -6,9 +6,19 @@ on:
   pull_request:
     branches:
       - main
+    paths: &core_paths
+      - 'DESCRIPTION'
+      - 'NAMESPACE'
+      - 'R/**'
+      - 'src/**'
+      - 'tests/**'
+      - 'inst/**'
+      - 'data/**'
+      - 'data-raw/**'
   push:
     branches:
       - main
+    paths: *core_paths
   # This runs at 00:00 UTC every Monday
   schedule:
     - cron: '0 0 * * 1'  
@@ -18,8 +28,14 @@ on:
 # https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/controlling-permissions-for-github_token  
 permissions: {}
 
+# Cancel runs happening simultaneously on the same branch.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   slow-tests:
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
     strategy:
       fail-fast: false
       matrix:
