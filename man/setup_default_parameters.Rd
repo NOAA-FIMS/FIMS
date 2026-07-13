@@ -204,6 +204,7 @@ default_data <- setup_default_data_index_landings(
   data = fims_frame,
   fleet = "fleet1",
   distribution = "Dlnorm"
+)
 }   
 \dontrun{
 # Load the example dataset and create a FIMS data frame

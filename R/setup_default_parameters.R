@@ -299,6 +299,7 @@ setup_default_parameters_template <- function(n_parameters = 1) {
 #'   data = fims_frame,
 #'   fleet = "fleet1",
 #'   distribution = "Dlnorm"
+#' )
 #' }   
 setup_default_data_index_landings <- function(
   data, 

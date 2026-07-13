@@ -13,7 +13,7 @@ data <- FIMS::FIMSFrame(data_big)
 source_row <- get_data(data) |>
   dplyr::filter(.data[["type"]] %in% c("index", "landings")) |>
   dplyr::slice(1)
-fleet <- source_row[["name"]]
+fleet <- source_row[["fleet"]]
 module_type <- FIMS:::snake_to_pascal(source_row[["type"]])
 
 ## IO correctness ----

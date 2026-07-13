@@ -11,7 +11,7 @@
 ## Setup ----
 data <- FIMS::FIMSFrame(data_big)
 fleet <- get_data(data) |>
-  dplyr::pull(.data[["name"]]) |>
+  dplyr::pull(.data[["fleet"]]) |>
   unique() |>
   stats::na.omit() |>
   dplyr::first()
