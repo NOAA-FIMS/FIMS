@@ -32,7 +32,7 @@ jobs:
       GITHUB_PAT: ${{ secrets.PAT }}
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       
       # Current Ubuntu runners lack enough RAM for parallel tests.
       # The step below creates a 16 GB swap file to prevent R processes

@@ -30,17 +30,17 @@
   library.dynam.unload("FIMS", libpath)
 }
 
-if (!methods::isClass("Rcpp_Parameter")) {
+if (!methods::isClass("Rcpp_Variable")) {
   methods::setClass(
-    Class = "Rcpp_Parameter",
+    Class = "Rcpp_Variable",
     representation = methods::representation(.xData = "environment"),
     contains = "envRefClass"
   )
 }
 
-if (!methods::isClass("Rcpp_ParameterVector")) {
+if (!methods::isClass("Rcpp_VariableVector")) {
   methods::setClass(
-    Class = "Rcpp_ParameterVector",
+    Class = "Rcpp_VariableVector",
     representation = methods::representation(.xData = "environment"),
     contains = "envRefClass"
   )
@@ -55,7 +55,7 @@ if (!methods::isClass("Rcpp_RealVector")) {
 }
 
 # Methods for Rcpp
-#' Setter for `Rcpp_ParameterVector`
+#' Setter for `Rcpp_VariableVector`
 #'
 #' In R, indexing starts at one. But, in C++ indexing starts at zero. These
 #' functions do the translation for you so you can think in R terms.
@@ -63,16 +63,16 @@ if (!methods::isClass("Rcpp_RealVector")) {
 #' @param x A numeric vector.
 #' @param i An integer specifying the location in R speak, where indexing
 #'   starts at one, of the vector that you wish to set.
-#' @param j Not used with `Rcpp_ParameterVector` because it is a vector.
+#' @param j Not used with `Rcpp_VariableVector` because it is a vector.
 #' @param value The value you want to set the indexed location to.
 #' @return
 #' For `[<-`, the index `i` of object `x` is set to `value`.
 #' @keywords internal
-#' @rdname Rcpp_ParameterVector
+#' @rdname Rcpp_VariableVector
 methods::setMethod(
   f = "[<-",
   signature = signature(
-    x = "Rcpp_ParameterVector"
+    x = "Rcpp_VariableVector"
   ),
   definition = function(x, i, j, value) {
     if (missing(i)) {
@@ -81,7 +81,7 @@ methods::setMethod(
       x$set_values(value)
     } else {
       # p[i] <- value
-      if (methods::is(value, "Rcpp_Parameter")) {
+      if (methods::is(value, "Rcpp_Variable")) {
         for (index in seq_along(i)) {
           x$set(i[index] - 1, value)
         }
@@ -108,7 +108,7 @@ methods::setMethod(
   }
 )
 
-#' Get information from Rcpp_ParameterVector
+#' Get information from Rcpp_VariableVector
 #'
 #' In R, indexing starts at one. But, in C++ indexing starts at zero. This
 #' function does the translation for you so you can think in R terms.
@@ -119,10 +119,10 @@ methods::setMethod(
 #' @return
 #' For `[`, the index `i` of object `x` is returned.
 #' @keywords internal
-#' @rdname Rcpp_ParameterVector
+#' @rdname Rcpp_VariableVector
 methods::setMethod(
   f = "[",
-  signature = signature(x = "Rcpp_ParameterVector", i = "numeric"),
+  signature = signature(x = "Rcpp_VariableVector", i = "numeric"),
   definition = function(x, i) {
     return(x$get(i - 1))
   }
@@ -160,33 +160,33 @@ methods::setMethod(
 )
 
 
-#' Get the length of an Rcpp_ParameterVector
+#' Get the length of an Rcpp_VariableVector
 #'
 #' @param x A numeric vector.
 #' @return
 #' For `length()`, the length of object `x` is returned as an integer.
 #' @keywords internal
-#' @rdname Rcpp_ParameterVector
+#' @rdname Rcpp_VariableVector
 methods::setMethod(
   f = "length",
-  signature = signature(x = "Rcpp_ParameterVector"),
+  signature = signature(x = "Rcpp_VariableVector"),
   definition = function(x) {
     return(x$size())
   }
 )
 
-#' Get the sum of all entries in an Rcpp_ParameterVector
+#' Get the sum of all entries in an Rcpp_VariableVector
 #'
 #' @param x A numeric vector.
 #' @return
 #' For `sum()`, the sum of object `x` is returned as a numeric value.
 #' @keywords internal
-#' @rdname Rcpp_ParameterVector
+#' @rdname Rcpp_VariableVector
 methods::setMethod(
   f = "sum",
-  signature = signature(x = "Rcpp_ParameterVector"),
+  signature = signature(x = "Rcpp_VariableVector"),
   definition = function(x) {
-    ret <- methods::new(Parameter)
+    ret <- methods::new(Variable)
     tmp <- 0.0
     for (i in 1:x$size()) {
       tmp <- tmp + x[i]$value
@@ -196,17 +196,17 @@ methods::setMethod(
   }
 )
 
-#' Get the dimensions of an Rcpp_ParameterVector
+#' Get the dimensions of an Rcpp_VariableVector
 #'
 #' @param x A numeric vector.
 #' @return
 #' For `dim()`, the dimensions of object `x` is returned as a single integer
 #' because there is only one dimension to return for a vector.
 #' @keywords internal
-#' @rdname Rcpp_ParameterVector
+#' @rdname Rcpp_VariableVector
 methods::setMethod(
   f = "dim",
-  signature = signature(x = "Rcpp_ParameterVector"),
+  signature = signature(x = "Rcpp_VariableVector"),
   definition = function(x) {
     return(x$size())
   }
@@ -218,7 +218,7 @@ methods::setMethod(
 #' Compare (`==`, `>`, `<`, `!=`, `<=`, and `>=`); and
 #' Logic (`&`, `|`).
 #'
-#' @param e1,e2 An Rcpp_Parameter or Rcpp_ParameterVector class object or a
+#' @param e1,e2 An Rcpp_Variable or Rcpp_VariableVector class object or a
 #'   numeric vector or value.
 #' @return
 #' A numeric or logical value(s) depending on the generic and the length of
@@ -228,11 +228,11 @@ methods::setMethod(
 #' @rdname Rcpp_Math
 methods::setMethod(
   "Ops",
-  signature(e1 = "Rcpp_Parameter", e2 = "Rcpp_Parameter"),
+  signature(e1 = "Rcpp_Variable", e2 = "Rcpp_Variable"),
   function(e1, e2) {
     result <- methods::callGeneric(e1$value, e2$value)
     if (.Generic %in% c("+", "-", "*", "/", "^", "%%", "%/%")) {
-      ret <- methods::new(Parameter)
+      ret <- methods::new(Variable)
       ret$value <- result
       return(ret)
     } else {
@@ -244,14 +244,14 @@ methods::setMethod(
 #' @rdname Rcpp_Math
 methods::setMethod(
   "Ops",
-  signature(e1 = "Rcpp_Parameter", e2 = "numeric"),
+  signature(e1 = "Rcpp_Variable", e2 = "numeric"),
   function(e1, e2) {
     if (length(e2) != 1) {
       stop("Call to operator Ops, value not scalar")
     }
     result <- methods::callGeneric(e1$value, e2)
     if (.Generic %in% c("+", "-", "*", "/", "^", "%%", "%/%")) {
-      ret <- methods::new(Parameter)
+      ret <- methods::new(Variable)
       ret$value <- result
       return(ret)
     } else {
@@ -262,14 +262,14 @@ methods::setMethod(
 
 #' @rdname Rcpp_Math
 methods::setMethod(
-  "Ops", signature(e1 = "numeric", e2 = "Rcpp_Parameter"),
+  "Ops", signature(e1 = "numeric", e2 = "Rcpp_Variable"),
   function(e1, e2) {
     if (length(e1) != 1) {
       stop("Call to operator Ops, value not scalar")
     }
     result <- methods::callGeneric(e1, e2$value)
     if (.Generic %in% c("+", "-", "*", "/", "^", "%%", "%/%")) {
-      ret <- methods::new(Parameter)
+      ret <- methods::new(Variable)
       ret$value <- result
       return(ret)
     } else {
@@ -281,12 +281,12 @@ methods::setMethod(
 #' @rdname Rcpp_Math
 methods::setMethod(
   "Ops",
-  signature(e1 = "Rcpp_ParameterVector", e2 = "Rcpp_ParameterVector"),
+  signature(e1 = "Rcpp_VariableVector", e2 = "Rcpp_VariableVector"),
   function(e1, e2) {
     if (e1$size() != e2$size()) {
       stop("Call to operator Ops, vectors not equal length")
     }
-    ret <- methods::new(ParameterVector, e1$size())
+    ret <- methods::new(VariableVector, e1$size())
     for (i in 1:e1$size()) {
       ret[i]$value <- methods::callGeneric(e1[i]$value, e2[i]$value)
     }
@@ -297,11 +297,11 @@ methods::setMethod(
 #' @rdname Rcpp_Math
 methods::setMethod(
   "Ops",
-  signature(e1 = "Rcpp_ParameterVector", e2 = "numeric"),
+  signature(e1 = "Rcpp_VariableVector", e2 = "numeric"),
   function(e1, e2) {
     if (e1$size() != length(e2)) {
       if (length(e2) == 1) {
-        ret <- methods::new(ParameterVector, e1$size())
+        ret <- methods::new(VariableVector, e1$size())
         for (i in 1:e1$size()) {
           ret[i]$value <- methods::callGeneric(e1[i]$value, e2)
         }
@@ -309,7 +309,7 @@ methods::setMethod(
       }
       stop("Call to Ops, vectors not equal length")
     }
-    ret <- methods::new(ParameterVector, e1$size())
+    ret <- methods::new(VariableVector, e1$size())
     for (i in 1:e1$size()) {
       ret[i]$value <- methods::callGeneric(e1[i]$value, e2[i])
     }
@@ -345,11 +345,11 @@ methods::setMethod(
 #' @rdname Rcpp_Math
 methods::setMethod(
   "Ops",
-  signature(e1 = "numeric", e2 = "Rcpp_ParameterVector"),
+  signature(e1 = "numeric", e2 = "Rcpp_VariableVector"),
   function(e1, e2) {
     if (length(e1) != e2$size()) {
       if (length(e1) == 1) {
-        ret <- methods::new(ParameterVector, e2$size())
+        ret <- methods::new(VariableVector, e2$size())
         for (i in 1:e2$size()) {
           ret[i]$value <- methods::callGeneric(e1, e2[i]$value)
         }
@@ -357,7 +357,7 @@ methods::setMethod(
       }
       stop("Call to operator, vectors not equal length")
     }
-    ret <- methods::new(ParameterVector, e2$size())
+    ret <- methods::new(VariableVector, e2$size())
     for (i in 1:e2$size()) {
       ret[i]$value <- methods::callGeneric(e1[i], e2[i]$value)
     }
@@ -365,14 +365,14 @@ methods::setMethod(
   }
 )
 
-#' Sets methods for math functions for Rcpp_ParameterVector
+#' Sets methods for math functions for Rcpp_VariableVector
 #'
 #' Methods of mathematical functions include trigonometry functions, `abs`,
 #' `sign`, `sqrt`, `ceiling`, `floor`, `trunc`, `cummax`, `cumprod`, `cumsum`,
 #' `log`, `log10`, `log2`, `log1p`, `exp`, `expm1`, `gamma`, `lgamma`,
 #' `digamma`, and `trigamma`.
 #'
-#' @param x An Rcpp_ParameterVector class object.
+#' @param x An Rcpp_VariableVector class object.
 #' @return
 #' A vector of numeric values.
 #' @keywords internal
@@ -380,9 +380,9 @@ methods::setMethod(
 #' @rdname Rcpp_Math
 methods::setMethod(
   "Math",
-  signature(x = "Rcpp_ParameterVector"),
+  signature(x = "Rcpp_VariableVector"),
   function(x) {
-    xx <- methods::new(ParameterVector, x$size())
+    xx <- methods::new(VariableVector, x$size())
     for (i in 1:x$size()) {
       xx[i]$value <- methods::callGeneric(x[i]$value)
     }
@@ -390,22 +390,22 @@ methods::setMethod(
   }
 )
 
-#' Set methods for summary functions with an Rcpp_ParameterVector
+#' Set methods for summary functions with an Rcpp_VariableVector
 #'
 #' Methods of summary functions include `max`, `min`, `range`, `prod`, `sum`,
 #' `any`, and `all`.
 #'
-#' @param x An Rcpp_ParameterVector class object.
+#' @param x An Rcpp_VariableVector class object.
 #' @return
 #' `Summary` returns a single or two numeric or logical values.
 #' @export
 #' @keywords internal
-#' @rdname Rcpp_ParameterVector
+#' @rdname Rcpp_VariableVector
 methods::setMethod(
   "Summary",
-  signature(x = "Rcpp_ParameterVector"),
+  signature(x = "Rcpp_VariableVector"),
   function(x) {
-    xx <- methods::new(ParameterVector, x$size())
+    xx <- methods::new(VariableVector, x$size())
     for (i in 1:x$size()) {
       xx[i]$value <- methods::callGeneric(x[i]$value)
     }

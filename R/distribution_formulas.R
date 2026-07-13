@@ -316,7 +316,7 @@ initialize_data_distribution <- function(
 
     # populate logged standard deviation parameter with log of input
     # Using resize() and then assigning value to each element of log_sd directly
-    # is correct, as creating a new ParameterVector for log_sd here would
+    # is correct, as creating a new VariableVector for log_sd here would
     # trigger an error in integration tests with wrappers.
     new_module$log_sd[] <- log(sd[["value"]])
     new_module$log_sd$set_estimation_types(sd[["estimation_type"]])

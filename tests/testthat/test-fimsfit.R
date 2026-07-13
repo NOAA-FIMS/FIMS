@@ -31,7 +31,7 @@ test_that("`is.FIMSFit()` works with correct inputs", {
   )
 
   expected_names <- c(
-    "input", "obj", "opt", "max_gradient", "report", "sdreport",
+    "input", "obj", "opt", "max_gradient", "gradient", "report", "sdreport",
     "number_of_parameters", "timing", "version", "model_output"
   )
   #' @description Test a FIMSFit object has the correct slot names.
@@ -207,11 +207,11 @@ test_that("fit_fims() errors when optimization fails to converge", {
   parameters_4_model <- parameters |>
     dplyr::rows_update(
       tibble::tibble(
-        fleet_name = "fleet1",
+        fleet = "fleet1",
         label = "log_q",
         estimation_type = "fixed_effects"
       ),
-      by = c("fleet_name", "label")
+      by = c("fleet", "label")
     )
 
   initialized_model <- parameters_4_model |>

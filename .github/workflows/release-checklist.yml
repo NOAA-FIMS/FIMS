@@ -1,0 +1,97 @@
+name: Create release checklist issue
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_version:
+        description: Release version to prepare (for example, 0.9.4)
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  create-release-checklist:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create or refresh release checklist issue
+        uses: actions/github-script@v9
+        env:
+          RELEASE_VERSION: ${{ inputs.release_version }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const rawVersion = process.env.RELEASE_VERSION.trim();
+            const version = rawVersion.replace(/^v/, '');
+            const tagName = `v${version}`;
+            const issueTitle = `Prepare for release ${version}`;
+            const repositoryUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}`;
+            const workflowsUrl = `${repositoryUrl}/actions/workflows`;
+
+            try {
+              await github.rest.git.getRef({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                ref: `tags/${tagName}`
+              });
+              core.setFailed(`Tag ${tagName} already exists. This release checklist should not be created again.`);
+              return;
+            } catch (error) {
+              if (error.status !== 404) {
+                throw error;
+              }
+            }
+
+            const issueBody = [
+              `## Release checklist for FIMS ${version}`,
+              '',
+              'This checklist is adapted from `usethis::use_release_issue()` and the',
+              'existing FIMS workflows. Check off only the items that are relevant',
+              'for this release.',
+              '',
+              '### 1. Prepare the release',
+              '',
+              '- [ ] Confirm the release scope and target version using semantic versioning.',
+              `- [ ] Update \`DESCRIPTION\` \`Version:\` to \`${version}\`.`,
+              `- [ ] Update the top heading in \`NEWS.md\` to \`# FIMS ${version}\` and finalize the release notes.`,
+              '- [ ] Confirm any release-critical documentation changes are committed (README, vignettes, pkgdown assets, and user setup guidance as needed).',
+              '',
+              '### 2. Validate the package and workflows',
+              '',
+              '- [ ] Run `devtools::build()` locally.',
+              '- [ ] Run `devtools::check()` locally.',
+              '- [ ] Look at `covr::report()` to ensure all changes are adequately covered with tests, where the goal is to maintain 80 percent package coverage.',
+              `- [ ] Inspect output of [call-r-cmd-check](${workflowsUrl}/call-r-cmd-check.yml) to look at warnings and notes to see if there are any changes needed.`,
+              `- [ ] Run [run-slow-tests](${workflowsUrl}/run-slow-tests.yml) for pre-release coverage.`,
+              `- [ ] Run [r-universe-test](${workflowsUrl}/r-universe-test.yml) to verify package installation behavior.`,
+              '',
+              '### 3. Review release artifacts',
+              '',
+              `- [ ] Review the pkgdown site, which is either available live if all changes are on main or available as an artifact as a byproduct of [call-update-pkgdown](${workflowsUrl}/call-update-pkgdown.yml) to all PRs to main.`,
+              '- [ ] Review rendered reference pages, articles, and Doxygen content for obvious release issues.',
+              '- [ ] Review open issues and pull requests for anything that should block the release or be mentioned in the release notes.',
+              '',
+              '### 4. Publish the release',
+              '',
+              '- [ ] Merge the release-ready changes into `main`.',
+              `- [ ] Create and push the git tag \`v${version}\`.`,
+              '- [ ] Draft the GitHub release from the tag and use the finalized `NEWS.md` section as the release notes.',
+              '- [ ] Confirm the released version is available from the expected downstream artifacts (for example, pkgdown and r-universe).',
+              '',
+              '### 5. Post-release follow-up',
+              '',
+              '- [ ] Bump `DESCRIPTION` to the next development version (for example, `x.y.z.9000`).',
+              '- [ ] Add a new development heading to `NEWS.md` for future changes.',
+              '- [ ] Announce the release to FIMS users and stakeholders as appropriate.',
+              '- [ ] Close this issue after confirming the release artifacts are live.',
+              ''
+            ].join('\n');
+            const { data: issue } = await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: issueTitle,
+              body: issueBody
+            });
+            core.info(`Created release checklist issue #${issue.number}.`);

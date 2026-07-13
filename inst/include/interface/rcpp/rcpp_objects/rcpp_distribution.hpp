@@ -169,22 +169,22 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
   /**
    * @brief Observed data.
    */
-  ParameterVector observed_values;
+  VariableVector observed_values;
   /**
    * @brief The expected values, which would be the mean of x for this
    * distribution.
    */
-  ParameterVector expected_values;
+  VariableVector expected_values;
   /**
    * @brief The expected mean, which would be the mean of x for this
    * distribution.
    */
-  ParameterVector expected_mean;
+  VariableVector expected_mean;
   /**
    * @brief The uncertainty, which would be the standard deviation of x for the
    * normal distribution.
    */
-  ParameterVector log_sd;
+  VariableVector log_sd;
   /**
    * @brief Vector that records the individual log probability function for each
    * observation.
@@ -534,12 +534,12 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
   /**
    * @brief Observed data.
    */
-  ParameterVector observed_values;
+  VariableVector observed_values;
   /**
    * @brief The expected values, which would be the mean of log(x) for this
    * distribution.
    */
-  ParameterVector expected_values;
+  VariableVector expected_values;
   /**
    * @brief The uncertainty, which would be the natural logarithm of the
      standard deviation (sd) of log(x) for this distribution. The natural log
@@ -547,7 +547,7 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
      function is applied to the log transformed standard deviation to insure
      standard deviation is positive.
    */
-  ParameterVector log_sd;
+  VariableVector log_sd;
   /**
    * @brief Vector that records the individual log probability function for each
    * observation.
@@ -855,13 +855,13 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
   /**
    * @brief Observed data, which should be a vector of length K of integers.
    */
-  ParameterVector observed_values;
+  VariableVector observed_values;
   /**
    * @brief The expected values, which should be a vector of length K where
    * each value specifies the probability of class k. Note that, unlike in R,
    * these probabilities must sum to 1.0.
    */
-  ParameterVector expected_values;
+  VariableVector expected_values;
   /**
    * @brief The dimensions of the number of rows and columns of the
    * multivariate dataset.

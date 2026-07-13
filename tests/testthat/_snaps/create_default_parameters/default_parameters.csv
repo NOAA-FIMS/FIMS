@@ -1,4 +1,4 @@
-"","model_family","module_name","fleet_name","module_type","label","age","length","time","value","estimation_type","distribution_type","distribution"
+"","model_family","module_name","fleet","module_type","label","age","length","time","value","estimation_type","distribution_type","distribution"
 "1","catch_at_age","Selectivity","fleet1","Logistic","inflection_point",NA,NA,NA,2,"fixed_effects",NA,NA
 "2","catch_at_age","Selectivity","fleet1","Logistic","slope",NA,NA,NA,1,"fixed_effects",NA,NA
 "3","catch_at_age","Fleet","fleet1",NA,"log_q",NA,NA,NA,0,"constant",NA,NA
@@ -535,4 +535,5 @@
 "534","catch_at_age","Population",NA,NA,"log_init_naa",10,NA,NA,12.0155105579643,"fixed_effects",NA,NA
 "535","catch_at_age","Population",NA,NA,"log_init_naa",11,NA,NA,11.8155105579643,"fixed_effects",NA,NA
 "536","catch_at_age","Population",NA,NA,"log_init_naa",12,NA,NA,13.2249484703984,"fixed_effects",NA,NA
-"537","catch_at_age","Growth",NA,"EWAA",NA,NA,NA,NA,NA,NA,NA,NA
+"537","catch_at_age","Population",NA,NA,"proportion_female",NA,NA,NA,0.5,"constant",NA,NA
+"538","catch_at_age","Growth",NA,"EWAA",NA,NA,NA,NA,NA,NA,NA,NA
