@@ -112,6 +112,7 @@ std::shared_ptr<fims_popdy::Fleet<double>> MakeFleet(
   fleet->n_years = 1;
   fleet->n_ages = 3;
   fleet->n_lengths = length_centers.size();
+  fleet->requires_age_length_mapping = true;
   fleet->lengths.resize(length_centers.size());
 
   for (std::size_t i = 0; i < length_centers.size(); ++i) {
