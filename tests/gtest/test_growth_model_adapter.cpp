@@ -21,7 +21,8 @@ void ConfigureAdapter(fims_popdy::VonBertalanffyGrowthModelAdapter<double>& adap
 
   // Adapter stores positive growth params on log scale.
   adapter.LengthAtRefAge1Vector()[0] = fims_math::log(length_at_ref_age_1);
-  adapter.LengthAtRefAge2Vector()[0] = fims_math::log(length_at_ref_age_2);
+  adapter.LengthAtRefAge2Vector()[0] =
+    fims_math::log(length_at_ref_age_2 - length_at_ref_age_1);
   adapter.GrowthCoefficientKVector()[0] = fims_math::log(growth_coefficient_K);
   adapter.ReferenceAgeForLength1Vector()[0] = reference_age_for_length_1;
   adapter.ReferenceAgeForLength2Vector()[0] = reference_age_for_length_2;

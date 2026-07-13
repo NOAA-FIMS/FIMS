@@ -5,6 +5,7 @@
 
 #include "common/def.hpp"
 #include "common/information.hpp"
+#include "test_stubs.hpp"
 
 namespace {
 
