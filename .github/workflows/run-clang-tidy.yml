@@ -13,13 +13,29 @@ on:
   pull_request:
     branches:
       - main
+    paths: &core_paths
+      - '**/*.c'
+      - '**/*.cc'
+      - '**/*.cpp'
+      - '**/*.cxx'
+      - '**/*.h'
+      - '**/*.hpp'
+      - '.github/workflows/run-clang-tidy.yml'
+      - 'CMakeLists.txt'
   push:
     branches:    
       - main
+    paths: *core_paths
   workflow_dispatch:
+
+# Cancel runs happening simultaneously on the same branch.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   job:
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
     name: run-clang-tidy
     runs-on: ubuntu-latest
     strategy:
