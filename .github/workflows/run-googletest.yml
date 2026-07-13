@@ -3,19 +3,23 @@ name: run-googletest
 
 on:
   push:
+    paths: &core_paths
+      - 'src/**'
+      - 'inst/include/**'
+      - 'tests/google_benchmark/**'
+      - 'tests/gtest/**'
+      - 'tests/integration/**'
+      - 'CMakeLists.txt'
   pull_request:
     branches:
       - main
-    paths-ignore:
-      - .devcontainer
-      - .github
-      - '.gitignore'
-      - '.Rbuildignore'
-      - 'CONTRIBUTING.md'
-      - 'LICENSE'
-      - 'man'
-      - 'README.md'
+    paths: *core_paths
   workflow_dispatch:
+
+# Cancel runs happening simultaneously on the same branch.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:

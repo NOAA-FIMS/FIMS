@@ -6,9 +6,21 @@ on:
   pull_request:
     branches:
       - main
+    paths: &core_paths
+      - 'DESCRIPTION'
+      - 'NAMESPACE'
+      - 'man/**'
+      - 'vignettes/**'
+      - 'inst/**'
+      - 'README.md'
+      - 'pkgdown/**'
+      - '.github/workflows/build-pkgdown.yml'
+      - 'CMakeLists.txt'
+      - 'src/**'
   push:
     branches: 
       - main
+    paths: *core_paths
   workflow_dispatch:
   # below is a trigger for when there are changes to the fims website, it pulls
   # the bootstrap file name from there which occasionally changes
@@ -16,7 +28,6 @@ on:
   # the website for some reason
   repository_dispatch:
     types: [file-updated]
-
 
 jobs:
   call-workflow:

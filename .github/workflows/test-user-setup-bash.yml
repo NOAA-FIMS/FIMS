@@ -1,12 +1,21 @@
 name: Test FIMS User Setup Bash Script
 
 on:
-  pull_request:
+  push:
     branches: 
       - main
-  # Runs the bash script from the main branch every day at midnight UTC
+    paths:
+      - '.github/workflows/test-user-setup-bash.yml'
+      - 'setup_fims.sh'
+      - 'DESCRIPTION'
+      - 'NAMESPACE'
+      - 'R/**'
+      - 'src/**'
+      - 'inst/**'
+      - 'data/**'
+  # Runs the bash script from the main branch every Monday at midnight UTC
   schedule:
-    - cron: '0 0 * * *'  
+    - cron: '0 0 * * 1'
   workflow_dispatch: 
 
 concurrency:
