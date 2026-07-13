@@ -4,7 +4,7 @@
 
 #include "../../inst/include/models/functors/catch_at_age.hpp"
 #include "population/population.hpp"
-
+#include "population_dynamics/alk/functors/fixed_matrix_alk.hpp"
 namespace {
 
 // Use test fixture to reuse the same configuration of objects for
@@ -179,6 +179,9 @@ class CAAInitializeTestFixture : public testing::Test {
       derived_quantities["log_index_expected"] =
           fims::Vector<double>(fleet->n_years);
 
+      //
+      derived_quantities["catch_index"] = fims::Vector<double>(fleet->n_years);
+
       derived_quantities["expected_catch"] =
           fims::Vector<double>(fleet->n_years);
 
@@ -306,6 +309,7 @@ class CAAEvaluateTestFixture : public testing::Test {
             weight_at_age_distribution(generator);
       }
     }
+
     catch_at_age_model->populations[0]->growth = growth;
     // log_M
     double log_M_min = fims_math::log(0.1);
@@ -538,6 +542,9 @@ class CAAEvaluateTestFixture : public testing::Test {
       derived_quantities["log_index_expected"] =
           fims::Vector<double>(fleet->n_years);
 
+      //
+      derived_quantities["catch_index"] = fims::Vector<double>(fleet->n_years);
+
       derived_quantities["expected_catch"] =
           fims::Vector<double>(fleet->n_years);
 
@@ -633,6 +640,7 @@ class CAAPrepareTestFixture : public testing::Test {
       for (int j = 0; j < n_ages * n_lengths; j++) {
         fleet->age_to_length_conversion[j] = alc_distribution(generator);
       }
+      fleet->alk = std::make_shared<fims_popdy::FixedMatrixALK<double>>(fleet);
       auto selectivity =
           std::make_shared<fims_popdy::LogisticSelectivity<double>>();
       selectivity->inflection_point.resize(1);
@@ -680,7 +688,6 @@ class CAAPrepareTestFixture : public testing::Test {
         std::make_shared<fims_popdy::EWAAGrowth<double>>();
     std::uniform_real_distribution<double> weight_at_age_distribution(
         weight_at_age_min, weight_at_age_max);
-
     for (int year = 0; year < n_years + 1; year++) {
       for (int i = 0; i < n_ages; i++) {
         growth->ewaa[year][static_cast<double>(population->ages[i])] =
@@ -832,6 +839,9 @@ class CAAPrepareTestFixture : public testing::Test {
 
       derived_quantities["log_index_expected"] =
           fims::Vector<double>(fleet->n_years);
+
+      //
+      derived_quantities["catch_index"] = fims::Vector<double>(fleet->n_years);
 
       derived_quantities["expected_catch"] =
           fims::Vector<double>(fleet->n_years);
