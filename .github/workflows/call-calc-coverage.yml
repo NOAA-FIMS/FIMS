@@ -5,31 +5,28 @@ on:
   pull_request:
     branches:
       - main
-    paths-ignore:
-      - .devcontainer
-      - .github
-      - '.gitignore'
-      - '.Rbuildignore'
-      - 'CONTRIBUTING.md'
-      - 'LICENSE'
-      - 'man'
-      - 'README.md'
+    paths:
+      - 'R/**'
+      - 'inst/**'
+      - 'src/**'
+      - 'tests/**'
   push:
     branches:
       - main
-    paths-ignore:
-      - .devcontainer
-      - .github
-      - '.gitignore'
-      - '.Rbuildignore'
-      - 'CONTRIBUTING.md'
-      - 'LICENSE'
-      - 'man'
-      - 'README.md'
+    paths:
+      - 'R/**'
+      - 'inst/**'
+      - 'src/**'
+      - 'tests/**'
   workflow_dispatch:
+
+concurrency:
+  group: r-cmd-check-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
  
 jobs:
   call-workflow:
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
     uses: nmfs-ost/ghactions4r/.github/workflows/calc-coverage.yml@main
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}

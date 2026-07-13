@@ -5,13 +5,27 @@ on:
   pull_request:
     branches:
       - main
+    paths: &core_paths
+      - 'inst/**'
+      - 'src/**'
+      - 'CMakeLists.txt'
+      - 'tests/gtest/**'
+      - 'tests/google_benchmark/**'
+      - 'tests/integration/**'
   push:
     branches:    
       - main
+    paths: *core_paths
   workflow_dispatch:
+
+# Cancel runs happening simultaneously on the same branch.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
     runs-on: ubuntu-latest
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
