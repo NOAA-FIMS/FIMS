@@ -163,7 +163,6 @@ make_vonb_model_comparison_context <- function() {
   base_parameters <- readRDS(
     testthat::test_path("fixtures", "parameters_model_comparison_project.RDS")
   ) |>
-    dplyr::rename(fleet = fleet_name) |>
     dplyr::filter(!module_name %in% c("Growth", "Recruitment", "Population"))
 
   current_growth_recruitment <- FIMS::create_default_configurations(data = fims_frame) |>
