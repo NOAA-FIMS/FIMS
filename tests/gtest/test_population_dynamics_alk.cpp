@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "gtest/gtest.h"
+#include "test_stubs.hpp"
 
 #include "common/fims_math.hpp"
 #include "common/fims_vector.hpp"

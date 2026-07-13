@@ -75,6 +75,10 @@ class FleetInterface : public FleetInterfaceBase {
    */
   SharedInt interface_observed_lengthcomp_data_id_m = -999;
   /**
+   * @brief Whether this fleet currently requires age-to-length mapping.
+   */
+  SharedBoolean interface_requires_age_length_mapping = false;
+  /**
    * @brief The ID of the observed index data object.
    */
   SharedInt interface_observed_index_data_id_m = -999;
@@ -238,6 +242,8 @@ class FleetInterface : public FleetInterfaceBase {
             other.interface_observed_agecomp_data_id_m),
         interface_observed_lengthcomp_data_id_m(
             other.interface_observed_lengthcomp_data_id_m),
+        interface_requires_age_length_mapping(
+            other.interface_requires_age_length_mapping),
         interface_observed_index_data_id_m(
             other.interface_observed_index_data_id_m),
         interface_observed_landings_data_id_m(
@@ -312,6 +318,14 @@ class FleetInterface : public FleetInterfaceBase {
   }
 
   /**
+   * @brief Set whether this fleet currently requires age-to-length mapping.
+   * @param requires_age_length_mapping True when a modeled path depends on ALK.
+   */
+  void SetRequiresAgeLengthMapping(bool requires_age_length_mapping) {
+    interface_requires_age_length_mapping.set(requires_age_length_mapping);
+  }
+
+  /**
    * @brief Set the unique ID for the observed index data object.
    * @param observed_index_data_id Unique ID for the observed data object.
    */
@@ -354,6 +368,13 @@ class FleetInterface : public FleetInterfaceBase {
    */
   int GetObservedLengthCompDataID() {
     return interface_observed_lengthcomp_data_id_m.get();
+  }
+
+  /**
+   * @brief Return whether this fleet currently requires age-to-length mapping.
+   */
+  bool GetRequiresAgeLengthMapping() {
+    return interface_requires_age_length_mapping.get();
   }
 
   /**
@@ -451,6 +472,8 @@ class FleetInterface : public FleetInterfaceBase {
 
     fleet->fleet_observed_lengthcomp_data_id_m =
         interface_observed_lengthcomp_data_id_m.get();
+    fleet->requires_age_length_mapping =
+        interface_requires_age_length_mapping.get();
 
     fleet->fleet_observed_index_data_id_m =
         interface_observed_index_data_id_m.get();

@@ -5,6 +5,8 @@
 #include "../../inst/include/models/functors/catch_at_age.hpp"
 #include "population/population.hpp"
 #include "population_dynamics/alk/functors/fixed_matrix_alk.hpp"
+#include "test_stubs.hpp"
+
 namespace {
 
 // Use test fixture to reuse the same configuration of objects for

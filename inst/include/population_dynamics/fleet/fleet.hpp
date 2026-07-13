@@ -40,6 +40,8 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
 
   // age-length key
   std::shared_ptr<ALKBase<Type>> alk; /*!< fleet-specific age-length key */
+  bool requires_age_length_mapping =
+      false; /*!< whether an active modeled path requires ALK-based mapping */
 
   // landings data
   int fleet_observed_landings_data_id_m = -999; /*!< id of landings data */

@@ -490,6 +490,7 @@ initialize_fleet <- function(parameters, data, fleet, linked_ids) {
     has_length_comp_distribution
   use_growth_derived_path <-
     has_growth_derived_support && has_length_comp_distribution
+  requires_age_length_mapping <- has_length_comp_distribution
 
   fleet_length_bins <- resolve_fleet_length_bins(
     get_data(data),
@@ -522,6 +523,7 @@ initialize_fleet <- function(parameters, data, fleet, linked_ids) {
 
   module$n_lengths$set(length(fleet_length_bins))
   module$lengths[] <- fleet_length_bins
+  module$SetRequiresAgeLengthMapping(requires_age_length_mapping)
 
   module$SetSelectivityID(linked_ids[["selectivity"]])
 

@@ -1355,75 +1355,77 @@ class CatchAtAge : public FisheryModelBase<Type> {
 
       std::shared_ptr<fims_popdy::Fleet<Type>> &fleet = (*fit).second;
 
-      if (fleet->n_lengths > 0) {
-        if (fleet->alk == nullptr || !fleet->alk->IsActive()) {
-          std::stringstream ss;
-          ss << "Fleet id " << fleet->GetId()
-             << "no usable age-to-length conversion path";
-          FIMS_ERROR_LOG(ss.str());
-          throw std::runtime_error(ss.str());
+      if (!fleet->requires_age_length_mapping || fleet->n_lengths == 0) {
+        continue;
+      }
+
+      if (fleet->alk == nullptr || !fleet->alk->IsActive()) {
+        std::stringstream ss;
+        ss << "Fleet id " << fleet->GetId()
+           << "no usable age-to-length conversion path";
+        FIMS_ERROR_LOG(ss.str());
+        throw std::runtime_error(ss.str());
+      }
+
+      for (size_t y = 0; y < fleet->n_years; y++) {
+        Type sum = static_cast<Type>(0.0);
+        Type sum_obs = static_cast<Type>(0.0);
+        // robust_add is a small value to add to expected composition
+        // proportions at age to stabilize likelihood calculations
+        // when the expected proportions are close to zero.
+        // Type robust_add = static_cast<Type>(0.0); // 0.0001; zeroed out
+        // before testing sum robust is used to calculate the total sum of
+        // robust additions to ensure that proportions sum to 1. Type
+        // robust_sum = static_cast<Type>(1.0);
+        for (size_t a = 0; a < fleet->n_ages; a++) {
+          size_t i_age_year = y * fleet->n_ages + a;
+          fims::Vector<Type> alk_row;
+          if (!fleet->alk->BuildALKRow(y, a, alk_row)) {
+            std::stringstream ss;
+            ss << "Failed to build ALK row for fleet id "
+               << fleet->GetId() << ", year " << y
+               << ", age " << a << ".";
+            FIMS_ERROR_LOG(ss.str());
+            throw std::runtime_error(ss.str());
+          }
+
+          for (size_t l = 0; l < fleet->n_lengths; l++) {
+            size_t i_length_year = y * fleet->n_lengths + l;
+            const Type age_to_length_prob = alk_row[l];
+            fdq_["lengthcomp_expected"][i_length_year] +=
+                fdq_["agecomp_expected"][i_age_year] * age_to_length_prob;
+
+            fdq_["landings_numbers_at_length"][i_length_year] +=
+                fdq_["landings_numbers_at_age"][i_age_year] *
+                age_to_length_prob;
+
+            fdq_["index_numbers_at_length"][i_length_year] +=
+                fdq_["index_numbers_at_age"][i_age_year] *
+                age_to_length_prob;
+          }
         }
 
-        for (size_t y = 0; y < fleet->n_years; y++) {
-          Type sum = static_cast<Type>(0.0);
-          Type sum_obs = static_cast<Type>(0.0);
-          // robust_add is a small value to add to expected composition
-          // proportions at age to stabilize likelihood calculations
-          // when the expected proportions are close to zero.
-          // Type robust_add = static_cast<Type>(0.0); // 0.0001; zeroed out
-          // before testing sum robust is used to calculate the total sum of
-          // robust additions to ensure that proportions sum to 1. Type
-          // robust_sum = static_cast<Type>(1.0);
-          for (size_t a = 0; a < fleet->n_ages; a++) {
-            size_t i_age_year = y * fleet->n_ages + a;
-            fims::Vector<Type> alk_row;
-            if (!fleet->alk->BuildALKRow(y, a, alk_row)) {
-              std::stringstream ss;
-              ss << "Failed to build ALK row for fleet id "
-                 << fleet->GetId() << ", year " << y
-                 << ", age " << a << ".";
-              FIMS_ERROR_LOG(ss.str());
-              throw std::runtime_error(ss.str());
-            }
+        for (size_t l = 0; l < fleet->n_lengths; l++) {
+          size_t i_length_year = y * fleet->n_lengths + l;
+          sum += fdq_["lengthcomp_expected"][i_length_year];
+          // robust_sum -= robust_add;
 
-            for (size_t l = 0; l < fleet->n_lengths; l++) {
-              size_t i_length_year = y * fleet->n_lengths + l;
-              const Type age_to_length_prob = alk_row[l];
-              fdq_["lengthcomp_expected"][i_length_year] +=
-                  fdq_["agecomp_expected"][i_age_year] * age_to_length_prob;
-
-              fdq_["landings_numbers_at_length"][i_length_year] +=
-                  fdq_["landings_numbers_at_age"][i_age_year] *
-                  age_to_length_prob;
-
-              fdq_["index_numbers_at_length"][i_length_year] +=
-                  fdq_["index_numbers_at_age"][i_age_year] *
-                  age_to_length_prob;
+          if (fleet->fleet_observed_lengthcomp_data_id_m != -999) {
+            if (fleet->observed_lengthcomp_data->at(i_length_year) !=
+                fleet->observed_lengthcomp_data->na_value) {
+              sum_obs += fleet->observed_lengthcomp_data->at(i_length_year);
             }
           }
-
-          for (size_t l = 0; l < fleet->n_lengths; l++) {
-            size_t i_length_year = y * fleet->n_lengths + l;
-            sum += fdq_["lengthcomp_expected"][i_length_year];
-            // robust_sum -= robust_add;
-
-            if (fleet->fleet_observed_lengthcomp_data_id_m != -999) {
-              if (fleet->observed_lengthcomp_data->at(i_length_year) !=
-                  fleet->observed_lengthcomp_data->na_value) {
-                sum_obs += fleet->observed_lengthcomp_data->at(i_length_year);
-              }
-            }
-          }
-          for (size_t l = 0; l < fleet->n_lengths; l++) {
-            size_t i_length_year = y * fleet->n_lengths + l;
-            fdq_["lengthcomp_proportion"][i_length_year] =
-                fdq_["lengthcomp_expected"][i_length_year] / sum;
-            // robust_add + robust_sum *
-            // this->lengthcomp_expected[i_length_year] / sum;
-            if (fleet->fleet_observed_lengthcomp_data_id_m != -999) {
-              fdq_["lengthcomp_expected"][i_length_year] =
-                  fdq_["lengthcomp_proportion"][i_length_year] * sum_obs;
-            }
+        }
+        for (size_t l = 0; l < fleet->n_lengths; l++) {
+          size_t i_length_year = y * fleet->n_lengths + l;
+          fdq_["lengthcomp_proportion"][i_length_year] =
+              fdq_["lengthcomp_expected"][i_length_year] / sum;
+          // robust_add + robust_sum *
+          // this->lengthcomp_expected[i_length_year] / sum;
+          if (fleet->fleet_observed_lengthcomp_data_id_m != -999) {
+            fdq_["lengthcomp_expected"][i_length_year] =
+                fdq_["lengthcomp_proportion"][i_length_year] * sum_obs;
           }
         }
       }

@@ -82,6 +82,10 @@ void register_fleet(Rcpp::Module& m) {
               &FleetInterface::SetObservedLengthCompDataID)
       .method("GetObservedLengthCompDataID",
               &FleetInterface::GetObservedLengthCompDataID)
+      .method("SetRequiresAgeLengthMapping",
+              &FleetInterface::SetRequiresAgeLengthMapping)
+      .method("GetRequiresAgeLengthMapping",
+              &FleetInterface::GetRequiresAgeLengthMapping)
       .method("SetObservedIndexDataID", &FleetInterface::SetObservedIndexDataID)
       .method("GetObservedIndexDataID", &FleetInterface::GetObservedIndexDataID)
       .method("SetObservedLandingsDataID",
