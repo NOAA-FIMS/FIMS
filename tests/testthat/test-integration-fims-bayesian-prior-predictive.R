@@ -53,8 +53,9 @@ test_that("posterior equals prior with no data", {
   fishing_fleet$n_years$set(om_input[["nyr"]])
   # Set number of age classes
   fishing_fleet$n_ages$set(om_input[["nages"]])
-  # Set number of length bins
+  # Set the number and locations of the fleet observation bins
   fishing_fleet$n_lengths$set(om_input[["nlengths"]])
+  fishing_fleet$lengths[] <- om_input[["lengths"]]
 
   fishing_fleet$log_Fmort$resize(om_input[["nyr"]])
   for (y in 1:om_input$nyr) {
@@ -66,6 +67,7 @@ test_that("posterior equals prior with no data", {
   fishing_fleet$SetObservedIndexDataID(fishing_fleet_index$get_id())
   fishing_fleet$SetObservedAgeCompDataID(fishing_fleet_age_comp$get_id())
   fishing_fleet$SetObservedLengthCompDataID(fishing_fleet_length_comp$get_id())
+  fishing_fleet$SetRequiresAgeLengthMapping(TRUE)
 
   # Set age-to-length conversion matrix
   # TODO: If an age_to_length_conversion matrix is provided, the code below
@@ -106,6 +108,7 @@ test_that("posterior equals prior with no data", {
   survey_fleet$n_ages$set(om_input[["nages"]])
   survey_fleet$n_years$set(om_input[["nyr"]])
   survey_fleet$n_lengths$set(om_input[["nlengths"]])
+  survey_fleet$lengths[] <- om_input[["lengths"]]
   survey_fleet$log_Fmort$resize(om_input[["nyr"]])
   for (y in 1:om_input$nyr) {
     # Log-transform OM fishing mortality
@@ -116,6 +119,7 @@ test_that("posterior equals prior with no data", {
   survey_fleet$SetObservedIndexDataID(survey_fleet_index$get_id())
   survey_fleet$SetObservedAgeCompDataID(survey_fleet_age_comp$get_id())
   survey_fleet$SetObservedLengthCompDataID(survey_fleet_length_comp$get_id())
+  survey_fleet$SetRequiresAgeLengthMapping(TRUE)
 
   survey_fleet$age_to_length_conversion$resize(om_input[["nages"]] * om_input[["nlengths"]])
   for (i in 1:(om_input[["nages"]] * om_input[["nlengths"]])) {
