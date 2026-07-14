@@ -256,6 +256,23 @@ Primary functions used when setting up or running a FIMS model.
 - [`is_fims_verbose()`](https://NOAA-FIMS.github.io/FIMS/reference/is_fims_verbose.md)
   : Should FIMS be verbose?
 
+## Diagnostics
+
+Primary functions used when diagnosing a FIMS model.
+
+- [`calculate_mohns_rho()`](https://NOAA-FIMS.github.io/FIMS/reference/calculate_mohns_rho.md)
+  : Calculate Mohn's rho for retrospective analysis
+- [`plot_likelihood()`](https://NOAA-FIMS.github.io/FIMS/reference/plot_likelihood.md)
+  : Plot Likelihood Profile
+- [`run_fims_likelihood()`](https://NOAA-FIMS.github.io/FIMS/reference/run_fims_likelihood.md)
+  : Run Likelihood Profile
+- [`run_fims_retrospective()`](https://NOAA-FIMS.github.io/FIMS/reference/run_fims_retrospective.md)
+  : Run Retrospective Analysis
+- [`run_modified_data_fims()`](https://NOAA-FIMS.github.io/FIMS/reference/run_modified_data_fims.md)
+  : Modify data for a FIMS Model
+- [`run_modified_pars_fims()`](https://NOAA-FIMS.github.io/FIMS/reference/run_modified_pars_fims.md)
+  : Modify Parameters of a FIMS Model
+
 ## Package development
 
 Primary functions used when developing FIMS package.
@@ -359,6 +376,8 @@ Functions used to extract, tidy, and evaluate model fit results.
   FIMS](https://NOAA-FIMS.github.io/FIMS/articles/fims-demo-projections.md):
 - [Introducing the Fisheries Integrated Modeling System
   (FIMS)](https://NOAA-FIMS.github.io/FIMS/articles/fims-demo.md):
+- [Running diagnostics on a FIMS
+  model](https://NOAA-FIMS.github.io/FIMS/articles/fims-diagnostics.md):
 - [Introducing FIMS input
   data](https://NOAA-FIMS.github.io/FIMS/articles/fims-input-data.md):
 - [Introducing the FIMS Logging

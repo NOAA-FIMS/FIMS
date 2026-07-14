@@ -41,10 +41,10 @@ log_data_frame
 ```
 
     ##                  timestamp level
-    ## 1 Wed Jul  8 21:53:31 2026  info
-    ## 2 Wed Jul  8 21:53:31 2026  info
-    ## 3 Wed Jul  8 21:53:31 2026  info
-    ## 4 Wed Jul  8 21:53:31 2026  info
+    ## 1 Tue Jul 14 17:50:58 2026  info
+    ## 2 Tue Jul 14 17:50:58 2026  info
+    ## 3 Tue Jul 14 17:50:58 2026  info
+    ## 4 Tue Jul 14 17:50:58 2026  info
     ##                                                  message id   user
     ## 1 Creating model and checking for required components...  0 runner
     ## 2                            Model successfully created.  1 runner
@@ -109,8 +109,8 @@ jsonlite::fromJSON(get_log())
 ```
 
     ##                  timestamp   level                     message id   user
-    ## 1 Wed Jul  8 21:53:31 2026    info    info entry from R script  0 runner
-    ## 2 Wed Jul  8 21:53:31 2026 warning warning entry from R script  1 runner
+    ## 1 Tue Jul 14 17:50:58 2026    info    info entry from R script  0 runner
+    ## 2 Tue Jul 14 17:50:58 2026 warning warning entry from R script  1 runner
     ##                                      wd
     ## 1 /home/runner/work/FIMS/FIMS/vignettes
     ## 2 /home/runner/work/FIMS/FIMS/vignettes
@@ -176,7 +176,7 @@ ls("package:FIMS") |>
 methods::show(log_error)
 ```
 
-    ## internal C++ function <0x556b9efeb0d0>
+    ## internal C++ function <0x5583a85eff60>
     ##     docstring : See https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html.
     ##     signature : void log_error(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >)
 

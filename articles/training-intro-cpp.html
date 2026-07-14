@@ -53,6 +53,7 @@
     <li><a class="dropdown-item" href="../articles/fims-logging.html">Introducing the FIMS Logging System</a></li>
     <li><a class="dropdown-item" href="../articles/fims-user-setup-guide.html">FIMS User Setup Guide</a></li>
     <li><a class="dropdown-item" href="../articles/fims-demo-projections.html">Simple projections using FIMS</a></li>
+    <li><a class="dropdown-item" href="../articles/fims-diagnostics.html">Running a diagnostics on a FIMS model</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>Developer</h6></li>
     <li><a class="dropdown-item" href="../articles/adding-new-module.html">Adding a New C++ Module</a></li>
@@ -811,8 +812,8 @@ will explore later.</p>
 <span></span>
 <span><span class="fu">pointer</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## x is equal to the address of y</span></span>
-<span><span class="co">## x is: 0x7fffa5945e94</span></span>
-<span><span class="co">## The address of y is: 0x7fffa5945e94</span></span>
+<span><span class="co">## x is: 0x7ffc4f7da774</span></span>
+<span><span class="co">## The address of y is: 0x7ffc4f7da774</span></span>
 <span><span class="co">## *x returns the value of y: 3.1459</span></span></code></pre>
 <pre><code><span><span class="co">## [1] 0</span></span></code></pre>
 </details>
@@ -851,8 +852,8 @@ e.g., <code>&amp;y</code>.</p>
 <span><span class="fu">reference</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## x is: 3</span></span>
 <span><span class="co">## y is: 3</span></span>
-<span><span class="co">## The memory address of x is: 0x7fffa5945e94</span></span>
-<span><span class="co">## The memory address of y is: 0x7fffa5945e94</span></span></code></pre>
+<span><span class="co">## The memory address of x is: 0x7ffc4f7da774</span></span>
+<span><span class="co">## The memory address of y is: 0x7ffc4f7da774</span></span></code></pre>
 <pre><code><span><span class="co">## [1] 0</span></span></code></pre>
 </details>
 </div>
@@ -916,9 +917,9 @@ following example?</p>
 <span></span>
 <span><span class="fu">reassign_pointer</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## c now equals the address of b</span></span>
-<span><span class="co">## &amp;a = 0x7fffa5945e90</span></span>
-<span><span class="co">## &amp;b = 0x7fffa5945e94</span></span>
-<span><span class="co">## c = 0x7fffa5945e94</span></span>
+<span><span class="co">## &amp;a = 0x7ffc4f7da770</span></span>
+<span><span class="co">## &amp;b = 0x7ffc4f7da774</span></span>
+<span><span class="co">## c = 0x7ffc4f7da774</span></span>
 <span><span class="co">## a = 100</span></span>
 <span><span class="co">## b = 10</span></span>
 <span><span class="co">## *c = 10</span></span></code></pre>
@@ -1031,9 +1032,9 @@ automatically deleted.</p>
 <span><span class="fu">shared_pointer</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## ptr1: 42</span></span>
 <span><span class="co">## ptr2: 24</span></span>
-<span><span class="co">## ptr1 = 0x55cbcb542230</span></span>
-<span><span class="co">## ptr2 = 0x55cbc720e890</span></span>
-<span><span class="co">## ptr3 = 0x55cbcb542230</span></span></code></pre>
+<span><span class="co">## ptr1 = 0x5604db08af20</span></span>
+<span><span class="co">## ptr2 = 0x5604d654e260</span></span>
+<span><span class="co">## ptr3 = 0x5604db08af20</span></span></code></pre>
 <pre><code><span><span class="co">## [1] 0</span></span></code></pre>
 </details>
 </div>

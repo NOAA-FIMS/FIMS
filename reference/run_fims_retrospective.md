@@ -1,0 +1,141 @@
+# Run Retrospective Analysis
+
+Performs retrospective analysis by fitting a FIMS model object multiple
+times, each time removing an increasing number of terminal years from
+the data. This diagnostic tool is used to detect retrospective patterns
+or bias in model estimates.
+
+## Usage
+
+``` r
+run_fims_retrospective(years_to_remove, data, parameters, n_cores = NULL)
+```
+
+## Arguments
+
+- years_to_remove:
+
+  A numeric vector specifying the number of terminal years to remove for
+  each retrospective peel. For example, `0:5` creates six model runs:
+  the reference model (0 years removed) and five retrospective peels
+  (1-5 years removed). Must contain non-negative integers. Minimum
+  length is 1
+
+- data:
+
+  A data frame or FIMSFrame object containing the complete dataset used
+  in the base model run. This should include all data types required by
+  FIMS (landings, indices, composition data, biological data, etc.)
+
+- parameters:
+
+  A FIMS parameters object created by
+  [`create_default_parameters()`](https://NOAA-FIMS.github.io/FIMS/reference/create_default_parameters.md),
+  containing the model configuration and initial parameter values for
+  the base model
+
+- n_cores:
+
+  An integer specifying the number of CPU cores to use for parallel
+  processing. If `NULL` (default), uses `parallel::detectCores() - 1`.
+  Set to 1 for sequential processing. Must be a positive integer
+
+## Value
+
+A list with two named elements:
+
+- `years_to_remove` - The input vector of years removed for each peel
+
+- `estimates` - A data frame containing model estimates from all
+  retrospective runs, with the following key columns:
+
+  - `label` - Type of estimate (e.g., "spawning_biomass")
+
+  - `year_i` - Year index for the estimate
+
+  - `age_i` - Age index (if applicable)
+
+  - `estimated` - Point estimate value
+
+  - `uncertainty` - Standard error of the estimate
+
+  - `retrospective_peel` - Number of years removed for this peel
+
+## Details
+
+Run Retrospective Analysis for a FIMS Model
+
+Retrospective analysis involves refitting a model after sequentially
+removing one or more years of data from the end of the time series. This
+helps assess whether the model estimates are stable and whether there is
+a consistent pattern of revision as new data are added. The function
+runs models in parallel for computational efficiency.
+
+The first element of `years_to_remove` should typically be 0 to
+represent the reference model with no data removed. This allows for
+direct comparison of retrospective peels to the base model.
+
+Retrospective patterns can indicate model misspecification, time-varying
+processes not captured by the model, or data quality issues. Mohn's rho,
+calculated by
+[`calculate_mohns_rho()`](https://NOAA-FIMS.github.io/FIMS/reference/calculate_mohns_rho.md),
+provides a summary statistic for retrospective bias.
+
+## References
+
+Mohn, R. 1999. The retrospective problem in sequential population
+analysis: An investigation using cod fishery and simulated data. ICES
+Journal of Marine Science 56: 473-488.
+
+Hurtado-Ferro, F., et al. 2015. Looking in the rear-view mirror: bias
+and retrospective patterns in integrated, age-structured stock
+assessment models. ICES Journal of Marine Science 72(1): 99-110.
+
+## See also
+
+- [`stockplotr::plot_spawning_biomass()`](https://noaa-fisheries-integrated-toolbox.r-universe.dev/stockplotr/reference/plot_spawning_biomass.html)
+  for visualizing retrospective results
+
+- [`calculate_mohns_rho()`](https://NOAA-FIMS.github.io/FIMS/reference/calculate_mohns_rho.md)
+  for calculating Mohn's rho statistic
+
+- [`create_default_parameters()`](https://NOAA-FIMS.github.io/FIMS/reference/create_default_parameters.md)
+  for creating parameter objects
+
+Other diagnostic_functions:
+[`plot_likelihood()`](https://NOAA-FIMS.github.io/FIMS/reference/plot_likelihood.md),
+[`run_fims_likelihood()`](https://NOAA-FIMS.github.io/FIMS/reference/run_fims_likelihood.md)
+
+## Examples
+
+``` r
+if (FALSE) { # \dontrun{
+library(FIMS)
+
+# Use built-in dataset from FIMS
+data("data_big")
+data_4_model <- FIMSFrame(data_big)
+
+# Create a parameters object
+parameters <- data_4_model |>
+  create_default_configurations() |>
+  create_default_parameters(data = data_4_model)
+
+# Run base model
+base_model <- parameters |>
+  initialize_fims(data = data_4_model) |>
+  fit_fims(optimize = TRUE)
+
+# Run retrospective analysis with 5 peels
+retro_fit <- run_fims_retrospective(
+  years_to_remove = 0:5,
+  data = data_big,
+  parameters = parameters,
+  n_cores = 1
+)
+
+# View structure of results
+names(retro_fit)
+head(retro_fit$estimates)
+} # }
+```

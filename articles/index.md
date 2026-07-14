@@ -8,6 +8,8 @@
   FIMS](https://NOAA-FIMS.github.io/FIMS/articles/fims-demo-projections.md):
 - [Introducing the Fisheries Integrated Modeling System
   (FIMS)](https://NOAA-FIMS.github.io/FIMS/articles/fims-demo.md):
+- [Running diagnostics on a FIMS
+  model](https://NOAA-FIMS.github.io/FIMS/articles/fims-diagnostics.md):
 - [Introducing FIMS input
   data](https://NOAA-FIMS.github.io/FIMS/articles/fims-input-data.md):
 - [Introducing the FIMS Logging

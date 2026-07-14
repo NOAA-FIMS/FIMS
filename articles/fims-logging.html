@@ -53,6 +53,7 @@
     <li><a class="dropdown-item" href="../articles/fims-logging.html">Introducing the FIMS Logging System</a></li>
     <li><a class="dropdown-item" href="../articles/fims-user-setup-guide.html">FIMS User Setup Guide</a></li>
     <li><a class="dropdown-item" href="../articles/fims-demo-projections.html">Simple projections using FIMS</a></li>
+    <li><a class="dropdown-item" href="../articles/fims-diagnostics.html">Running a diagnostics on a FIMS model</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>Developer</h6></li>
     <li><a class="dropdown-item" href="../articles/adding-new-module.html">Adding a New C++ Module</a></li>
@@ -138,10 +139,10 @@ the first entry is always the call to this function, e.g.,</p>
 <span><span class="va">log_data_frame</span> <span class="op">&lt;-</span> <span class="fu">jsonlite</span><span class="fu">::</span><span class="fu"><a href="https://jeroen.r-universe.dev/jsonlite/reference/fromJSON.html" class="external-link">fromJSON</a></span><span class="op">(</span><span class="va">log_string</span><span class="op">)</span></span>
 <span><span class="va">log_data_frame</span></span></code></pre></div>
 <pre><code><span><span class="co">##                  timestamp level</span></span>
-<span><span class="co">## 1 Wed Jul  8 21:53:31 2026  info</span></span>
-<span><span class="co">## 2 Wed Jul  8 21:53:31 2026  info</span></span>
-<span><span class="co">## 3 Wed Jul  8 21:53:31 2026  info</span></span>
-<span><span class="co">## 4 Wed Jul  8 21:53:31 2026  info</span></span>
+<span><span class="co">## 1 Tue Jul 14 17:50:58 2026  info</span></span>
+<span><span class="co">## 2 Tue Jul 14 17:50:58 2026  info</span></span>
+<span><span class="co">## 3 Tue Jul 14 17:50:58 2026  info</span></span>
+<span><span class="co">## 4 Tue Jul 14 17:50:58 2026  info</span></span>
 <span><span class="co">##                                                  message id   user</span></span>
 <span><span class="co">## 1 Creating model and checking for required components...  0 runner</span></span>
 <span><span class="co">## 2                            Model successfully created.  1 runner</span></span>
@@ -196,8 +197,8 @@ adding log entries from R.</p>
 <span><span class="fu"><a href="../reference/Cpp_functions.html">log_warning</a></span><span class="op">(</span><span class="st">"warning entry from R script"</span><span class="op">)</span></span>
 <span><span class="fu">jsonlite</span><span class="fu">::</span><span class="fu"><a href="https://jeroen.r-universe.dev/jsonlite/reference/fromJSON.html" class="external-link">fromJSON</a></span><span class="op">(</span><span class="fu"><a href="../reference/Cpp_functions.html">get_log</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##                  timestamp   level                     message id   user</span></span>
-<span><span class="co">## 1 Wed Jul  8 21:53:31 2026    info    info entry from R script  0 runner</span></span>
-<span><span class="co">## 2 Wed Jul  8 21:53:31 2026 warning warning entry from R script  1 runner</span></span>
+<span><span class="co">## 1 Tue Jul 14 17:50:58 2026    info    info entry from R script  0 runner</span></span>
+<span><span class="co">## 2 Tue Jul 14 17:50:58 2026 warning warning entry from R script  1 runner</span></span>
 <span><span class="co">##                                      wd</span></span>
 <span><span class="co">## 1 /home/runner/work/FIMS/FIMS/vignettes</span></span>
 <span><span class="co">## 2 /home/runner/work/FIMS/FIMS/vignettes</span></span>
@@ -239,7 +240,7 @@ users call <code><a href="https://rdrr.io/r/methods/show.html" class="external-l
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Get documentation for log_error</span></span>
 <span><span class="fu">methods</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/methods/show.html" class="external-link">show</a></span><span class="op">(</span><span class="va">log_error</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## internal C++ function &lt;0x556b9efeb0d0&gt;</span></span>
+<pre><code><span><span class="co">## internal C++ function &lt;0x5583a85eff60&gt;</span></span>
 <span><span class="co">##     docstring : See https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html.</span></span>
 <span><span class="co">##     signature : void log_error(std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt;)</span></span></code></pre>
 <p>Another useful option is <code>set_throw_on_error()</code>. If this
