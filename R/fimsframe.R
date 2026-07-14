@@ -811,8 +811,10 @@ validate_dimension_of_conversion <- function(data, n_groups, n_timings) {
   }
 }
 
+# Keep fleet-bin resolution explicit by default. Fixed age-to-length rows are
+# only treated as bin geometry when a caller intentionally opts into that path.
 resolve_fleet_length_bins <- function(data,
-                                      allow_global_conversion_fallback = TRUE) {
+                                      allow_global_conversion_fallback = FALSE) {
   data_tbl <- tibble::as_tibble(data)
 
   if (!all(c("fleet", "type", "length") %in% colnames(data_tbl))) {
