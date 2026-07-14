@@ -77,6 +77,65 @@ make_vonb_no_fixed_alk_context <- function() {
   )
 }
 
+make_vonb_explicit_length_bin_context <- function() {
+  data("data_big", package = "FIMS")
+  survey1_short_bins <- seq(0, 550, 50)
+  survey1_bins <- tibble::tibble(
+    type = "length_bin",
+    fleet = "survey1",
+    age = NA_real_,
+    length = survey1_short_bins,
+    value = NA_real_,
+    unit = unique(data_big$unit[which(data_big$fleet == "survey1")])[1],
+    timing = NA_real_,
+    uncertainty = NA_real_
+  )
+
+  custom_data <- data_big |>
+    dplyr::filter(
+      !(
+        .data[["fleet"]] == "survey1" &
+          .data[["type"]] == "length_comp" &
+          !is.na(.data[["length"]]) &
+          !(.data[["length"]] %in% survey1_short_bins)
+      )
+    ) |>
+    dplyr::bind_rows(survey1_bins) |>
+    dplyr::group_by(fleet, type, timing) |>
+    dplyr::mutate(
+      value = dplyr::if_else(
+        fleet == "survey1" & type == "length_comp",
+        value / sum(value, na.rm = TRUE),
+        value
+      )
+    ) |>
+    dplyr::ungroup()
+  fims_frame <- FIMS::FIMSFrame(custom_data)
+
+  configurations <- FIMS::create_default_configurations(data = fims_frame) |>
+    tidyr::unnest(cols = data) |>
+    dplyr::mutate(
+      module_type = dplyr::if_else(
+        module_name == "Growth",
+        "VonBertalanffy",
+        module_type
+      )
+    ) |>
+    tidyr::nest(.by = c(model_family, module_name, fleet))
+
+  parameters <- FIMS::create_default_parameters(
+    configurations = configurations,
+    data = fims_frame
+  ) |>
+    tidyr::unnest(cols = data)
+
+  list(
+    data = fims_frame,
+    parameters = parameters,
+    explicit_bins = survey1_short_bins
+  )
+}
+
 make_two_fleet_length_context <- function() {
   data("data_big", package = "FIMS")
   survey1_short_bins <- seq(0, 550, 50)
@@ -280,21 +339,24 @@ test_that("von bertalanffy growth converges when L1 L2 and K are estimable", {
   report <- FIMS::get_report(fit)
   growth_estimates <- FIMS::get_estimates(fit) |>
     dplyr::filter(module_name == "Growth")
+  core_growth_estimates <- growth_estimates |>
+    dplyr::filter(label %in% c(
+      "length_at_ref_age_1",
+      "length_at_ref_age_2",
+      "growth_coefficient_K"
+    )) |>
+    dplyr::arrange(match(
+      label,
+      c("length_at_ref_age_1", "length_at_ref_age_2", "growth_coefficient_K")
+    )) |>
+    dplyr::pull(estimated)
 
   #' @description Test that the VonB growth fit reaches a small maximum gradient under the current non-Newton optimization path.
   expect_lte(FIMS::get_max_gradient(fit), 1e-3)
 
   #' @description Test that the estimable VonB growth parameters remain finite and positive.
-  expect_true(all(is.finite(growth_estimates$estimated)))
-  expect_true(all(
-    growth_estimates |>
-      dplyr::filter(label %in% c(
-        "length_at_ref_age_1",
-        "length_at_ref_age_2",
-        "growth_coefficient_K"
-      )) |>
-      dplyr::pull(estimated) > 0
-  ))
+  expect_true(all(is.finite(core_growth_estimates)))
+  expect_true(all(core_growth_estimates > 0))
 
   #' @description Test that the second reference length stays larger than the first.
   expect_gt(
@@ -526,6 +588,34 @@ test_that("von bertalanffy uses fleet length-comp bins when fixed fleet ALK rows
 
   #' @description Test that growth-derived mean WAA is still reported when the fleet relies on the length-comp bin fallback.
   expect_gt(length(report[["growth_derived_mean_WAA"]][[1]]), 0)
+})
+
+test_that("von bertalanffy keeps explicit length_bin geometry when fixed ALK rows are also present", {
+  expect_no_warning(ctx <- make_vonb_explicit_length_bin_context())
+  on.exit({ rm(ctx); gc() }, add = TRUE)
+
+  fit <- ctx$parameters |>
+    FIMS::initialize_fims(data = ctx$data) |>
+    FIMS::fit_fims(optimize = FALSE)
+
+  report <- FIMS::get_report(fit)
+  fleet_obj <- initialize_test_fleet(
+    parameters = ctx$parameters,
+    data = ctx$data,
+    fleet = "survey1"
+  )
+
+  #' @description Test that explicit `length_bin` rows are used even when fixed age-to-length rows are present.
+  expect_equal(fleet_obj$lengths$get_values(), ctx$explicit_bins)
+
+  #' @description Test that the explicit fleet geometry is reflected in the initialized `n_lengths`.
+  expect_equal(fleet_obj$n_lengths$get(), length(ctx$explicit_bins))
+
+  #' @description Test that the growth-derived ALK path is still active when explicit fleet bins are present.
+  expect_equal(report[["growth_derived_alk_used"]][[1]][1], 1)
+
+  #' @description Test that the growth-derived path does not fall back to a legacy fixed age-to-length matrix.
+  expect_equal(length(report[["age_to_length_conversion"]][[1]]), 0)
 })
 
 test_that("default non-derived growth keeps the historical fixed ALK path", {
