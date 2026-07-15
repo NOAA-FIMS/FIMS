@@ -45,7 +45,8 @@ public:
   std::size_t VertexCount() const { return graph_.vertices.size(); }
 
   void Clear() {
-    graph_ = had::ADGraph();
+    graph_.Clear();
+    Activate();
     built_ = false;
     output_var_id_ = 0;
   }

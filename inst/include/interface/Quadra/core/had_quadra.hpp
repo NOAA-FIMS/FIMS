@@ -317,7 +317,23 @@ struct BTree {
 };
 
 struct ADGraph {
-  ADGraph() { g_ADGraph = this; }
+  // Graph construction establishes a nested active-graph scope. Restore the
+  // graph that was active before this one when the scope ends so callers do
+  // not retain a pointer to destroyed stack storage.
+  ADGraph() : previousGraph(g_ADGraph) { g_ADGraph = this; }
+
+  ~ADGraph() {
+    if (g_ADGraph == this) {
+      g_ADGraph = previousGraph;
+    }
+  }
+
+  ADGraph(const ADGraph &) = delete;
+  ADGraph &operator=(const ADGraph &) = delete;
+  ADGraph(ADGraph &&) = delete;
+  ADGraph &operator=(ADGraph &&) = delete;
+
+  ADGraph *previousGraph = nullptr;
 
   inline void Clear() {
     vertices.clear();
