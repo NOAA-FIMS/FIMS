@@ -26,6 +26,5 @@ void register_maturity(Rcpp::Module& m) {
       .field("inflection_point", &LogisticMaturityInterface::inflection_point)
       .field("slope", &LogisticMaturityInterface::slope)
       .method("get_id", &LogisticMaturityInterface::get_id)
-      .method("deep_copy", &LogisticMaturityInterface::deep_copy_rcpp)
       .method("evaluate", &LogisticMaturityInterface::evaluate);
 }

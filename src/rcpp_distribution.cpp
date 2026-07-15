@@ -24,7 +24,6 @@ void register_distributions(Rcpp::Module& m) {
       "classDnormDistributionsInterface.html.")
       .constructor()
       .method("get_id", &DnormDistributionsInterface::get_id)
-      .method("deep_copy", &DnormDistributionsInterface::deep_copy_rcpp)
       .method("evaluate", &DnormDistributionsInterface::evaluate)
       .method("set_observed_data",
               &DnormDistributionsInterface::set_observed_data)
@@ -44,7 +43,6 @@ void register_distributions(Rcpp::Module& m) {
       "classDlnormDistributionsInterface.html.")
       .constructor()
       .method("get_id", &DlnormDistributionsInterface::get_id)
-      .method("deep_copy", &DlnormDistributionsInterface::deep_copy_rcpp)
       .method("evaluate", &DlnormDistributionsInterface::evaluate)
       .method("set_observed_data",
               &DlnormDistributionsInterface::set_observed_data)
@@ -61,7 +59,6 @@ void register_distributions(Rcpp::Module& m) {
       "classDmultinomDistributionsInterface.html.")
       .constructor()
       .method("get_id", &DmultinomDistributionsInterface::get_id)
-      .method("deep_copy", &DmultinomDistributionsInterface::deep_copy_rcpp)
       .method("evaluate", &DmultinomDistributionsInterface::evaluate)
       .method("set_observed_data",
               &DmultinomDistributionsInterface::set_observed_data)

@@ -33,3 +33,17 @@ test_that("Rcpp_RealVector Ops works with numeric operands", {
   expect_equal(real_vector == 2, c(FALSE, TRUE, FALSE, FALSE))
   expect_equal(real_vector == c(1, 5, 3, 4), c(TRUE, FALSE, TRUE, TRUE))
 })
+
+test_that("Rcpp_RealVector deep copies have new ids and independent storage", {
+  real_vector <- methods::new(RealVector, 2L)
+  real_vector$set(0, 3)
+
+  real_vector_copy <- real_vector$deep_copy()
+
+  #' @description Test that RealVector deep copies get a new id and do not share values.
+  expect_false(identical(real_vector_copy$get_id(), real_vector$get_id()))
+  expect_equal(real_vector_copy$get(0), 3)
+  real_vector_copy$set(0, 30)
+  expect_equal(real_vector$get(0), 3)
+  expect_equal(real_vector_copy$get(0), 30)
+})

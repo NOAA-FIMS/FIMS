@@ -30,7 +30,6 @@ void register_recruitment(Rcpp::Module& m) {
              &BevertonHoltRecruitmentInterface::log_expected_recruitment)
       .field("n_years", &BevertonHoltRecruitmentInterface::n_years)
       .method("get_id", &BevertonHoltRecruitmentInterface::get_id)
-      .method("deep_copy", &BevertonHoltRecruitmentInterface::deep_copy_rcpp)
       .method("SetRecruitmentProcessID",
               &BevertonHoltRecruitmentInterface::SetRecruitmentProcessID)
       .method("evaluate_mean",
@@ -43,7 +42,6 @@ void register_recruitment(Rcpp::Module& m) {
       "classLogDevsRecruitmentInterface.html.")
       .constructor()
       .method("get_id", &LogDevsRecruitmentInterface::get_id)
-      .method("deep_copy", &LogDevsRecruitmentInterface::deep_copy_rcpp)
       .method("evaluate_process",
               &LogDevsRecruitmentInterface::evaluate_process);
 
@@ -54,6 +52,5 @@ void register_recruitment(Rcpp::Module& m) {
       "classLogRRecruitmentInterface.html.")
       .constructor()
       .method("get_id", &LogRRecruitmentInterface::get_id)
-      .method("deep_copy", &LogRRecruitmentInterface::deep_copy_rcpp)
       .method("evaluate_process", &LogRRecruitmentInterface::evaluate_process);
 }

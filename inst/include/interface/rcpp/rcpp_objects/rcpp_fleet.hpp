@@ -273,56 +273,6 @@ class FleetInterface : public FleetInterfaceBase {
   virtual ~FleetInterface() {}
 
   /**
-   * @brief Create a deep copy with a new fleet ID.
-   */
-  std::shared_ptr<FleetInterface> deep_copy() const {
-    std::shared_ptr<FleetInterface> copy =
-        std::make_shared<FleetInterface>(*this);
-    copy->id = FleetInterfaceBase::id_g++;
-    copy->interface_observed_agecomp_data_id_m =
-        SharedInt(this->interface_observed_agecomp_data_id_m.get());
-    copy->interface_observed_lengthcomp_data_id_m =
-        SharedInt(this->interface_observed_lengthcomp_data_id_m.get());
-    copy->interface_observed_index_data_id_m =
-        SharedInt(this->interface_observed_index_data_id_m.get());
-    copy->interface_observed_landings_data_id_m =
-        SharedInt(this->interface_observed_landings_data_id_m.get());
-    copy->interface_selectivity_id_m =
-        SharedInt(this->interface_selectivity_id_m.get());
-    copy->name = SharedString(this->name.get());
-    copy->n_ages = SharedInt(this->n_ages.get());
-    copy->n_lengths = SharedInt(this->n_lengths.get());
-    copy->n_years = SharedInt(this->n_years.get());
-    copy->observed_landings_units =
-        SharedString(this->observed_landings_units.get());
-    copy->observed_index_units = SharedString(this->observed_index_units.get());
-    copy->log_q = DeepCopyVariableVector(this->log_q);
-    copy->log_Fmort = DeepCopyVariableVector(this->log_Fmort);
-    copy->log_landings_expected =
-        DeepCopyVariableVector(this->log_landings_expected);
-    copy->log_index_expected = DeepCopyVariableVector(this->log_index_expected);
-    copy->agecomp_expected = DeepCopyVariableVector(this->agecomp_expected);
-    copy->lengthcomp_expected =
-        DeepCopyVariableVector(this->lengthcomp_expected);
-    copy->agecomp_proportion = DeepCopyVariableVector(this->agecomp_proportion);
-    copy->lengthcomp_proportion =
-        DeepCopyVariableVector(this->lengthcomp_proportion);
-    copy->age_to_length_conversion =
-        DeepCopyVariableVector(this->age_to_length_conversion);
-
-    FleetInterfaceBase::live_objects[copy->id] = copy;
-    FIMSRcppInterfaceBase::fims_interface_objects.push_back(copy);
-    return copy;
-  }
-
-  /**
-   * @brief Rcpp-facing deep copy wrapper.
-   */
-  FleetInterface *deep_copy_rcpp() const {
-    return new FleetInterface(*this->deep_copy());
-  }
-
-  /**
    * @brief Gets the ID of the interface base object.
    * @return The ID.
    */
