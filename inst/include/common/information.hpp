@@ -153,6 +153,10 @@ class Information {
    *
    */
   void Clear() {
+    // variable_map stores non-owning pointers into the model containers below.
+    // Drop them before destroying their owners so a subsequent model build
+    // cannot retain and dereference stale entries.
+    this->variable_map.clear();
     this->data_objects.clear();
     this->populations.clear();
     this->fixed_effects_parameters.clear();
