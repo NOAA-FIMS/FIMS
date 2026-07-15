@@ -23,7 +23,6 @@ void register_population(Rcpp::Module& m) {
       "https://noaa-fims.github.io/FIMS/doxygen/classPopulationInterface.html.")
       .constructor()
       .method("get_id", &PopulationInterface::get_id)
-      .method("deep_copy", &PopulationInterface::deep_copy_rcpp)
       .field("n_ages", &PopulationInterface::n_ages)
       .field("n_fleets", &PopulationInterface::n_fleets)
       .field("n_years", &PopulationInterface::n_years)

@@ -20,7 +20,6 @@ void register_variable(Rcpp::Module& m) {
       .field("value", &Variable::initial_value_m)
       .field("estimated_value", &Variable::final_value_m)
       .field("id", &Variable::id_m)
-      .method("deep_copy", &Variable::deep_copy_rcpp)
       .field("estimation_type", &Variable::estimation_type_m);
 }
 

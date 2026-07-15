@@ -54,7 +54,7 @@ class RecruitmentInterfaceBase : public FIMSRcppInterfaceBase {
    *
    * @param other
    */
-  RecruitmentInterfaceBase(const RecruitmentInterfaceBase& other)
+  RecruitmentInterfaceBase(const RecruitmentInterfaceBase &other)
       : id(other.id), process_id(other.process_id) {}
 
   /**
@@ -139,7 +139,7 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
    * @param other The passed object to copy.
    */
   BevertonHoltRecruitmentInterface(
-      const BevertonHoltRecruitmentInterface& other)
+      const BevertonHoltRecruitmentInterface &other)
       : RecruitmentInterfaceBase(other),
         n_years(other.n_years),
         logit_steep(other.logit_steep),
@@ -155,37 +155,6 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
    * @brief The destructor.
    */
   virtual ~BevertonHoltRecruitmentInterface() {}
-
-  /**
-   * @brief Create a deep copy with a new recruitment ID.
-   */
-  std::shared_ptr<BevertonHoltRecruitmentInterface> deep_copy() const {
-    std::shared_ptr<BevertonHoltRecruitmentInterface> copy =
-        std::make_shared<BevertonHoltRecruitmentInterface>(*this);
-    copy->id = RecruitmentInterfaceBase::id_g++;
-    copy->process_id = SharedInt(this->process_id.get());
-    copy->n_years = SharedInt(this->n_years.get());
-    copy->logit_steep = DeepCopyVariableVector(this->logit_steep);
-    copy->log_rzero = DeepCopyVariableVector(this->log_rzero);
-    copy->log_devs = DeepCopyVariableVector(this->log_devs);
-    copy->log_r = DeepCopyVariableVector(this->log_r);
-    copy->log_expected_recruitment =
-        DeepCopyVariableVector(this->log_expected_recruitment);
-    copy->estimated_logit_steep = SharedReal(this->estimated_logit_steep.get());
-    copy->estimated_log_rzero = SharedReal(this->estimated_log_rzero.get());
-    copy->estimated_log_devs = DeepCopyRealVector(this->estimated_log_devs);
-
-    RecruitmentInterfaceBase::live_objects[copy->id] = copy;
-    FIMSRcppInterfaceBase::fims_interface_objects.push_back(copy);
-    return copy;
-  }
-
-  /**
-   * @brief Rcpp-facing deep copy wrapper.
-   */
-  BevertonHoltRecruitmentInterface* deep_copy_rcpp() const {
-    return new BevertonHoltRecruitmentInterface(*this->deep_copy());
-  }
 
   /**
    * @brief Gets the ID of the interface base object.
@@ -485,27 +454,6 @@ class LogDevsRecruitmentInterface : public RecruitmentInterfaceBase {
   virtual ~LogDevsRecruitmentInterface() {}
 
   /**
-   * @brief Create a deep copy with a new recruitment process ID.
-   */
-  std::shared_ptr<LogDevsRecruitmentInterface> deep_copy() const {
-    std::shared_ptr<LogDevsRecruitmentInterface> copy =
-        std::make_shared<LogDevsRecruitmentInterface>(*this);
-    copy->id = RecruitmentInterfaceBase::id_g++;
-    copy->process_id = SharedInt(this->process_id.get());
-
-    RecruitmentInterfaceBase::live_objects[copy->id] = copy;
-    FIMSRcppInterfaceBase::fims_interface_objects.push_back(copy);
-    return copy;
-  }
-
-  /**
-   * @brief Rcpp-facing deep copy wrapper.
-   */
-  LogDevsRecruitmentInterface* deep_copy_rcpp() const {
-    return new LogDevsRecruitmentInterface(*this->deep_copy());
-  }
-
-  /**
    * @brief Gets the ID of the interface base object.
    * @return The ID.
    */
@@ -577,27 +525,6 @@ class LogRRecruitmentInterface : public RecruitmentInterfaceBase {
    * @brief The destructor.
    */
   virtual ~LogRRecruitmentInterface() {}
-
-  /**
-   * @brief Create a deep copy with a new recruitment process ID.
-   */
-  std::shared_ptr<LogRRecruitmentInterface> deep_copy() const {
-    std::shared_ptr<LogRRecruitmentInterface> copy =
-        std::make_shared<LogRRecruitmentInterface>(*this);
-    copy->id = RecruitmentInterfaceBase::id_g++;
-    copy->process_id = SharedInt(this->process_id.get());
-
-    RecruitmentInterfaceBase::live_objects[copy->id] = copy;
-    FIMSRcppInterfaceBase::fims_interface_objects.push_back(copy);
-    return copy;
-  }
-
-  /**
-   * @brief Rcpp-facing deep copy wrapper.
-   */
-  LogRRecruitmentInterface* deep_copy_rcpp() const {
-    return new LogRRecruitmentInterface(*this->deep_copy());
-  }
 
   /**
    * @brief Gets the ID of the interface base object.

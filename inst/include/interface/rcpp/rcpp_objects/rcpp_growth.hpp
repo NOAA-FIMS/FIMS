@@ -128,32 +128,6 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
   virtual ~EWAAGrowthInterface() {}
 
   /**
-   * @brief Create a deep copy with a new growth ID.
-   */
-  std::shared_ptr<EWAAGrowthInterface> deep_copy() const {
-    std::shared_ptr<EWAAGrowthInterface> copy =
-        std::make_shared<EWAAGrowthInterface>(*this);
-    copy->id = GrowthInterfaceBase::id_g++;
-    copy->weights = DeepCopyRealVector(this->weights);
-    copy->ages = DeepCopyRealVector(this->ages);
-    copy->n_years = SharedInt(this->n_years.get());
-    copy->ewaa =
-        std::make_shared<std::map<int, std::map<double, double>>>(*this->ewaa);
-    copy->initialized = this->initialized;
-
-    GrowthInterfaceBase::live_objects[copy->id] = copy;
-    FIMSRcppInterfaceBase::fims_interface_objects.push_back(copy);
-    return copy;
-  }
-
-  /**
-   * @brief Rcpp-facing deep copy wrapper.
-   */
-  EWAAGrowthInterface *deep_copy_rcpp() const {
-    return new EWAAGrowthInterface(*this->deep_copy());
-  }
-
-  /**
    * @brief Gets the ID of the interface base object.
    * @return The ID.
    */
