@@ -6,6 +6,14 @@
 #' @export CatchAtAge
 #' @export clear
 #' @export CreateTMBModel
+#' @export CreateQuadraModel
+#' @export EvaluateQuadraModel
+#' @export EvaluateQuadraLaplaceModel
+#' @export EvaluateQuadraDenseHessian
+#' @export BenchmarkQuadraModel
+#' @export BenchmarkQuadraRestrictedHessian
+#' @export fit_fims_quadra
+#' @export fit_fims_quadra_joint
 #' @export DlnormDistribution
 #' @export DmultinomDistribution
 #' @export DnormDistribution

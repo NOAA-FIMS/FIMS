@@ -19,6 +19,14 @@
 \alias{set_log_throw_on_error}
 \alias{set_random}
 \alias{CreateTMBModel}
+\alias{CreateQuadraModel}
+\alias{EvaluateQuadraModel}
+\alias{EvaluateQuadraLaplaceModel}
+\alias{EvaluateQuadraDenseHessian}
+\alias{BenchmarkQuadraModel}
+\alias{BenchmarkQuadraRestrictedHessian}
+\alias{fit_fims_quadra}
+\alias{fit_fims_quadra_joint}
 \title{C++ Functions Exported via Rcpp}
 \description{
 The following functions are exported from C++ via Rcpp. Their documentation
@@ -44,10 +52,11 @@ C++ docs.
 \item \href{https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html}{set_log_throw_on_error}
 \item \href{https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html}{set_random}
 \item \href{https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html}{CreateTMBModel}
+\item \href{https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html}{CreateQuadraModel}
+\item \href{https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html}{EvaluateQuadraModel}
 }
 }
 \section{C++ Documentation}{
 
 \href{https://noaa-fims.github.io/FIMS/doxygen/}{NOAA-FIMS C++ Documentation}
 }
-

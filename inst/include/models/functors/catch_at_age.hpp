@@ -1478,7 +1478,9 @@ class CatchAtAge : public FisheryModelBase<Type> {
             idx += 1;
           }
         }
-        this->of->reportvector.push(res, rvit->first.c_str());
+        if constexpr (!std::is_same_v<Type, had::AReal>) {
+          this->of->reportvector.push(res, rvit->first.c_str());
+        }
       }
     }
 #endif

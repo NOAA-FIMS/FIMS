@@ -130,6 +130,10 @@ target_include_directories(fims_test
     inst/include/models
     inst/include/population_dynamics
     inst/include/utilities
+    inst/include/interface/Quadra
+    inst/include/interface/Quadra/include
+    inst/include/interface/Quadra/external/eigen
+    inst/include/interface/Quadra/external/LBFGSpp/include
     ${rcpp_SOURCE_DIR}/inst/include
     ${R_HOME}/include
 )
@@ -138,6 +142,7 @@ target_include_directories(fims_test
 target_compile_definitions(fims_test
   INTERFACE
     STD_LIB
+    QUADRA_MODEL
 )
 
 # Add a subdirectory to the build

@@ -551,6 +551,9 @@ class FleetInterface : public FleetInterfaceBase {
   virtual bool add_to_fims_tmb() {
     this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
     this->add_to_fims_tmb_internal<TMBAD_FIMS_TYPE>();
+#ifdef QUADRA_MODEL
+    this->add_to_fims_tmb_internal<QUADRA_FIMS_TYPE>();
+#endif
 
     return true;
   }

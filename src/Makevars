@@ -1,5 +1,8 @@
 CXX_STD = CXX17
-PKG_CXXFLAGS = -I../inst/include -DTMB_MODEL  -DTMB_EIGEN_DISABLE_WARNINGS  -DTMBAD_FRAMEWORK -w
+QUADRA_ROOT = ../inst/include/interface/Quadra
+QUADRA_CPPFLAGS = -I$(QUADRA_ROOT) -I$(QUADRA_ROOT)/include -I$(QUADRA_ROOT)/external/eigen -I$(QUADRA_ROOT)/external/LBFGSpp/include
+PKG_CPPFLAGS = $(QUADRA_CPPFLAGS)
+PKG_CXXFLAGS = -I../inst/include -DTMB_MODEL -DQUADRA_MODEL -DTMB_EIGEN_DISABLE_WARNINGS -DTMBAD_FRAMEWORK -w
 MAKEFLAGS= -j2 # Use 2 cores for compilation, adjust as needed
 ifdef R_INSTALL_PKG
   # Size-reduction flags applied only during R CMD INSTALL / devtools::install().

@@ -16,6 +16,32 @@ void register_functions(Rcpp::Module &m) {
       "CreateTMBModel", &CreateTMBModel,
       "See "
       "https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html.");
+#ifdef QUADRA_MODEL
+  Rcpp::function(
+      "CreateQuadraModel", &CreateQuadraModel,
+      "Construct the configured FIMS model using the Quadra AD backend.");
+  Rcpp::function(
+      "EvaluateQuadraModel", &EvaluateQuadraModel,
+      "Evaluate the joint FIMS objective and gradient using Quadra.");
+  Rcpp::function(
+      "BenchmarkQuadraModel", &BenchmarkQuadraModel,
+      "Time repeated replay of the most recently evaluated Quadra model.");
+  Rcpp::function(
+      "BenchmarkQuadraRestrictedHessian", &BenchmarkQuadraRestrictedHessian,
+      "Compare full and partition-restricted random Hessian propagation.");
+  Rcpp::function(
+      "fit_fims_quadra", &fit_fims_quadra,
+      "Fit the Laplace-profiled FIMS objective with Quadra.");
+  Rcpp::function(
+      "EvaluateQuadraLaplaceModel", &EvaluateQuadraLaplaceModel,
+      "Evaluate the model-aware Quadra Laplace objective and backend.");
+  Rcpp::function(
+      "EvaluateQuadraDenseHessian", &EvaluateQuadraDenseHessian,
+      "Diagnose numerical sparsity in the random-effect Hessian.");
+  Rcpp::function(
+      "fit_fims_quadra_joint", &fit_fims_quadra_joint,
+      "Fit the unprofiled FIMS joint objective with L-BFGS.");
+#endif
   Rcpp::function(
       // TODO: fix the naming mismatch
       "set_fixed", &set_fixed_parameters,

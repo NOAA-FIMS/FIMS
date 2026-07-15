@@ -27,6 +27,16 @@
 
 #include <stdexcept>
 
+#ifdef QUADRA_MODEL
+#include "../interface/Quadra/core/had_quadra.hpp"
+
+namespace had {
+inline std::ostream& operator<<(std::ostream& stream, const AReal& value) {
+  return stream << value.val;
+}
+}  // namespace had
+#endif
+
 #if defined(linux) || defined(__linux) || defined(__linux__)
 #define FIMS_LINUX
 #elif defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) || \
@@ -90,6 +100,15 @@
 // simplify access to singletons
 #define TMB_FIMS_REAL_TYPE double
 #define TMBAD_FIMS_TYPE TMBad::ad_aug
+#endif
+
+#ifdef QUADRA_MODEL
+#define QUADRA_FIMS_TYPE had::AReal
+
+namespace fims_quadra {
+/** Reset the process-wide Quadra tape before constructing an AD model. */
+void reset_tape();
+}
 #endif
 
 /* Dictionary block for shared documentation.

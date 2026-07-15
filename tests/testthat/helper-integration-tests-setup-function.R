@@ -48,6 +48,13 @@ FIMS_dmultinom <- function(x, p) {
 #' will be included on recruitment in the model.
 #' @param map A list used to specify mapping for the `MakeADFun` function from
 #' the TMB package.
+#' @param compare_backends If `TRUE`, evaluate the same full parameter vector
+#' with the TMB and Quadra joint objectives.
+#' @param compare_optimizers If `TRUE`, optimize the same full joint objective
+#' with TMB/nlminb and Quadra/L-BFGS from identical starting values.
+#' @param compare_laplace If `TRUE`, run Quadra's model-aware Laplace fit.
+#' @param benchmark_hessian If `TRUE`, compare unrestricted and restricted
+#' exact Hessian propagation before the model is cleared.
 #'
 #' @return A list containing the following elements:
 #' \itemize{
@@ -76,7 +83,11 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
                                                 em_input_list,
                                                 estimation_mode = TRUE,
                                                 random_effects = NULL,
-                                                map = list()) {
+                                                map = list(),
+                                                compare_backends = FALSE,
+                                                compare_optimizers = FALSE,
+                                                compare_laplace = FALSE,
+                                                benchmark_hessian = FALSE) {
   # Load operating model data for the current iteration
   om_input <- om_input_list[[iter_id]] # Operating model input for the current iteration
   om_output <- om_output_list[[iter_id]] # Operating model output for the current iteration
@@ -415,7 +426,8 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   )
   obj <- TMB::MakeADFun(
     data = list(), parameters, DLL = "FIMS",
-    silent = TRUE, map = map, random = "re"
+    silent = TRUE, map = map,
+    random = if (compare_optimizers) NULL else "re"
   )
 
   # Optimization with nlminb
@@ -444,6 +456,93 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   # the input values if optimization is skipped
   report <- obj[["report"]](obj[["env"]][["last.par.best"]])
 
+  backend_comparison <- NULL
+  if (compare_backends || compare_optimizers || compare_laplace ||
+      benchmark_hessian) {
+    tmb_fit <- NULL
+    tmb_fit_time <- NULL
+    if (compare_optimizers) {
+      tmb_fit_time <- system.time({
+        tmb_fit <- stats::nlminb(
+          start = obj$par,
+          objective = obj$fn,
+          gradient = obj$gr,
+          control = list(iter.max = 500L, eval.max = 1000L)
+        )
+      })[["elapsed"]]
+    }
+    full_parameters <- c(parameters$p, parameters$re)
+    if (compare_optimizers) {
+      tmb_joint_objective <- obj$fn(full_parameters)
+      tmb_joint_gradient <- obj$gr(full_parameters)
+    } else {
+      tmb_joint_objective <- obj$env$f(full_parameters)
+      tmb_joint_gradient <- as.vector(
+        obj$env$f(full_parameters, type = "ADGrad", order = 0)
+      )
+    }
+    quadra_result <- EvaluateQuadraModel(parameters$p, parameters$re)
+    timing_iterations <- quadra_result$timing_iterations
+    # Compare inference-facing hot paths. In optimizer-comparison mode both
+    # engines replay the joint objective; otherwise TMB profiles the configured
+    # random effects through its Laplace objective.
+    tmb_timing <- system.time({
+      for (timing_iteration in seq_len(timing_iterations)) {
+        timing_parameters <- obj$par
+        timing_parameters[[1]] <- timing_parameters[[1]] +
+          if (timing_iteration %% 2L) 1e-8 else -1e-8
+        tmb_replay_value <- obj$fn(timing_parameters)
+      }
+    })[["elapsed"]] / timing_iterations
+    backend_comparison <- list(
+      tmb_joint_objective = unname(tmb_joint_objective),
+      quadra_joint_objective = unname(quadra_result$objective),
+      difference = unname(quadra_result$objective - tmb_joint_objective),
+      tmb_gradient = tmb_joint_gradient,
+      quadra_gradient = quadra_result$gradient,
+      gradient_difference = unname(
+        quadra_result$gradient - tmb_joint_gradient
+      ),
+      tmb_evaluation_time_seconds = unname(tmb_timing),
+      quadra_evaluation_time_seconds = unname(
+        quadra_result$evaluation_time_seconds
+      ),
+      quadra_graph_plan = quadra_result$graph_plan,
+      timing_iterations = timing_iterations
+    )
+
+    if (compare_optimizers) {
+      quadra_fit <- fit_fims_quadra_joint(
+        parameters$p,
+        parameters$re,
+        500L,
+        1e-5
+      )
+      tmb_final_gradient <- obj$gr(tmb_fit$par)
+      backend_comparison$tmb_fit <- list(
+        par = unname(tmb_fit$par),
+        objective = unname(tmb_fit$objective),
+        gradient = unname(tmb_final_gradient),
+        gradient_norm = sqrt(sum(tmb_final_gradient^2)),
+        iterations = unname(tmb_fit$iterations),
+        evaluations = unname(tmb_fit$evaluations),
+        converged = identical(tmb_fit$convergence, 0L),
+        message = tmb_fit$message,
+        elapsed_seconds = unname(tmb_fit_time)
+      )
+      backend_comparison$quadra_fit <- quadra_fit
+    }
+    if (compare_laplace) {
+      backend_comparison$quadra_laplace_evaluation <- EvaluateQuadraLaplaceModel(
+        parameters$p,
+        parameters$re
+      )
+    }
+    if (benchmark_hessian) {
+      backend_comparison$quadra_hessian_benchmark <-
+        BenchmarkQuadraRestrictedHessian(parameters$p, parameters$re)
+    }
+  }
 
   clear()
 
@@ -456,7 +555,8 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
     sdr_report = sdr_report,
     sdr_fixed = sdr_fixed,
     sdr_random = sdr_random,
-    sdr = sdr
+    sdr = sdr,
+    backend_comparison = backend_comparison
   ))
 }
 

@@ -58,6 +58,12 @@ void register_shared(Rcpp::Module &m);
  * \param m The Rcpp module to register functions in.
  */
 void register_functions(Rcpp::Module &m);
+
+/**
+ * \brief Register the Quadra inference backend functions.
+ * \param m The Rcpp module to register functions in.
+ */
+void register_quadra(Rcpp::Module &m);
 /**
  * \brief Register the fishery models module.
  * \param m The Rcpp module to register functions in.
@@ -76,6 +82,7 @@ void register_maturity(Rcpp::Module &m);
 RcppExport RCPP_MODULE(fims) {
   Rcpp::Module m("fims");
   register_functions(m);
+  register_quadra(m);
   register_variable(m);
   register_vectors(m);
   register_shared(m);
