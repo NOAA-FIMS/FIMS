@@ -643,7 +643,7 @@ methods::setMethod(
 #'
 #' @details
 #' The time series is extracted by filtering `get_data(x)` on `type` and
-#' `name` (fleet / survey name). Values encoded as `-999` are treated as the
+#' `fleet` (fleet / survey name). Values encoded as `-999` are treated as the
 #' FIMS missing-data sentinel. When `drop_missing = TRUE`,
 #' `construct_drop_missing()` is called so that rows containing `-999` are
 #' removed from the embedding matrix; when `FALSE`, `construct()` is called
@@ -664,7 +664,7 @@ methods::setMethod(
 #' @param x A [FIMSFrame()] object.
 #' @param series_type A single string giving the `type` value to filter on,
 #'   e.g. `"index"` or `"landings"`.
-#' @param series_name A single string giving the `name` (fleet / survey) value
+#' @param series_name A single string giving the `fleet` (fleet / survey) value
 #'   to filter on, e.g. `"survey1"`.
 #' @param E A positive integer — the embedding dimension (number of lagged
 #'   coordinates per row).
@@ -672,7 +672,7 @@ methods::setMethod(
 #' @param drop_missing Logical (default `TRUE`). When `TRUE`, rows containing
 #'   the FIMS missing-value sentinel `-999` are dropped from the embedding
 #'   matrix.
-#' @param uncertainty_name A single string giving the `name` column value for
+#' @param uncertainty_name A single string giving the `fleet` column value for
 #'   an uncertainty series in the data slot (e.g. `"survey1_sd"`), or `NULL`
 #'   (default) to skip uncertainty propagation. The uncertainty series must
 #'   have the same length as the value series after filtering on
@@ -720,7 +720,7 @@ create_edm_embedding <- function(
   series_data <- dplyr::filter(
     get_data(x),
     .data[["type"]] == series_type,
-    .data[["name"]] == series_name
+    .data[["fleet"]] == series_name
   ) |>
     dplyr::arrange(.data[["timing"]]) |>
     dplyr::pull(.data[["value"]])
@@ -731,15 +731,15 @@ create_edm_embedding <- function(
     uncertainty_data <- dplyr::filter(
       get_data(x),
       .data[["type"]] == series_type,
-      .data[["name"]] == uncertainty_name
+      .data[["fleet"]] == uncertainty_name
     ) |>
       dplyr::arrange(.data[["timing"]]) |>
       dplyr::pull(.data[["value"]])
 
     if (length(uncertainty_data) == 0) {
       cli::cli_abort(c(
-        "No uncertainty data found for type {.val {series_type}} and name {.val {uncertainty_name}}.",
-        "i" = "Available names: {.val {unique(get_data(x)[[\"name\"]])}}."
+        "No uncertainty data found for type {.val {series_type}} and fleet {.val {uncertainty_name}}.",
+        "i" = "Available fleets: {.val {unique(get_data(x)[[\"fleet\"]])}}."
       ))
     }
     if (length(uncertainty_data) != length(series_data)) {

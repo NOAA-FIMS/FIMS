@@ -129,4 +129,3 @@ NeedsCompilation: yes
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3
 SystemRequirements: GNU make
-RoxygenNote: 7.3.3
