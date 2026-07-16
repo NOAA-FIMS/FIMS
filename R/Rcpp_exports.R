@@ -54,6 +54,7 @@ EvaluateQuadraModel <- .fims_backend_unavailable("Quadra")
 EvaluateQuadraLaplaceModel <- .fims_backend_unavailable("Quadra")
 EvaluateQuadraDenseHessian <- .fims_backend_unavailable("Quadra")
 quadra_model_diagnostics <- .fims_backend_unavailable("Quadra")
+quadra_model_diagnostics_md <- .fims_backend_unavailable("Quadra")
 BenchmarkQuadraModel <- .fims_backend_unavailable("Quadra")
 BenchmarkQuadraRestrictedHessian <- .fims_backend_unavailable("Quadra")
 fit_fims_quadra <- .fims_backend_unavailable("Quadra")
@@ -69,7 +70,7 @@ fit_fims_quadra_joint <- .fims_backend_unavailable("Quadra")
 #' [NOAA-FIMS C++ Documentation](https://noaa-fims.github.io/FIMS/doxygen/)
 #'
 #' @name Cpp_functions
-#' @aliases clear get_fixed get_log get_log_errors get_log_warnings get_parameter_names get_random get_random_names inv_logit log_error log_info log_warning logit set_fixed set_log_throw_on_error set_random CreateTMBModel CreateQuadraModel EvaluateQuadraModel EvaluateQuadraLaplaceModel EvaluateQuadraDenseHessian quadra_model_diagnostics BenchmarkQuadraModel BenchmarkQuadraRestrictedHessian fit_fims_quadra fit_fims_quadra_joint
+#' @aliases clear get_fixed get_log get_log_errors get_log_warnings get_parameter_names get_random get_random_names inv_logit log_error log_info log_warning logit set_fixed set_log_throw_on_error set_random CreateTMBModel CreateQuadraModel EvaluateQuadraModel EvaluateQuadraLaplaceModel EvaluateQuadraDenseHessian quadra_model_diagnostics quadra_model_diagnostics_md BenchmarkQuadraModel BenchmarkQuadraRestrictedHessian fit_fims_quadra fit_fims_quadra_joint
 #'
 #' @details
 #' - [clear](https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html)

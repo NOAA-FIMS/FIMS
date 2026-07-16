@@ -123,12 +123,20 @@ test_that("Quadra model diagnostics return functional analysis", {
     length(fit$random)
   )
   expect_true(diagnostics$laplace_structure$positive_definite)
+  expect_true(all(is.finite(diagnostics$optimization$random_gradient)))
   expect_true(diagnostics$parameter_influence$available)
   expect_length(
     diagnostics$parameter_influence$ranking,
     length(fit$random)
   )
   expect_true(is.finite(diagnostics$elapsed_seconds))
+
+  markdown <- quadra_model_diagnostics_md(diagnostics)
+  expect_type(markdown, "character")
+  expect_length(markdown, 1)
+  expect_match(markdown, "# Quadra Model Diagnostics", fixed = TRUE)
+  expect_match(markdown, "## Curvature and Effective Structure", fixed = TRUE)
+  expect_match(markdown, diagnostics$backend$backend, fixed = TRUE)
 })
 
 test_that("Quadra restricted exact Hessian reproduces the TMB Laplace objective", {

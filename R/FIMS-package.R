@@ -11,6 +11,7 @@
 #' @export EvaluateQuadraLaplaceModel
 #' @export EvaluateQuadraDenseHessian
 #' @export quadra_model_diagnostics
+#' @export quadra_model_diagnostics_md
 #' @export BenchmarkQuadraModel
 #' @export BenchmarkQuadraRestrictedHessian
 #' @export fit_fims_quadra

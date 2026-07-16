@@ -1150,9 +1150,9 @@ Rcpp::List quadra_model_diagnostics(Rcpp::NumericVector fixed_values,
   Eigen::VectorXd random_mode = Eigen::Map<Eigen::VectorXd>(
       objective.random_mode_m.data(),
       static_cast<Eigen::Index>(objective.random_mode_m.size()));
-  fims_quadra::FIMSFastDenseLaplaceObjective::ReplayWorkspace workspace(
-      model, objective.fixed_m, objective.random_m, theta, random_mode);
-  const auto joint = workspace.evaluate(theta, random_mode);
+  const auto joint = quadra::evaluate_joint_first_order(
+      model, parameters, theta, random_mode, objective.fixed_m,
+      objective.random_m);
 
   std::vector<std::string> random_names = info->random_effects_names;
   if (random_names.size() != objective.random_mode_m.size())
@@ -1401,6 +1401,178 @@ Rcpp::List quadra_model_diagnostics(Rcpp::NumericVector fixed_values,
           Rcpp::Named("cumulative_share") =
               Rcpp::wrap(report.spectral_structure.cumulative_share)),
       Rcpp::Named("elapsed_seconds") = elapsed);
+}
+
+/** Render a Quadra model-diagnostics list as a Markdown string. */
+std::string quadra_model_diagnostics_md(Rcpp::List diagnostics)
+{
+  const std::vector<std::string> required = {
+      "model_health", "optimization", "laplace_structure", "backend",
+      "uncertainty", "latent_states", "parameter_influence",
+      "correlation_graph", "spectral_structure"};
+  for (const auto &name : required)
+  {
+    if (!diagnostics.containsElementNamed(name.c_str()))
+      Rcpp::stop("Quadra diagnostics are missing the '%s' section.", name);
+  }
+
+  const Rcpp::List health = diagnostics["model_health"];
+  const Rcpp::List optimization = diagnostics["optimization"];
+  const Rcpp::List structure = diagnostics["laplace_structure"];
+  const Rcpp::List backend = diagnostics["backend"];
+  const Rcpp::List uncertainty = diagnostics["uncertainty"];
+  const Rcpp::List latent = diagnostics["latent_states"];
+  const Rcpp::List influence = diagnostics["parameter_influence"];
+  const Rcpp::List graph = diagnostics["correlation_graph"];
+  const Rcpp::List spectrum = diagnostics["spectral_structure"];
+
+  auto text_value = [](const Rcpp::List &x, const char *name) {
+    return Rcpp::as<std::string>(x[name]);
+  };
+  auto number_value = [](const Rcpp::List &x, const char *name) {
+    return Rcpp::as<double>(x[name]);
+  };
+  auto integer_value = [](const Rcpp::List &x, const char *name) {
+    return Rcpp::as<double>(x[name]);
+  };
+  auto logical_label = [](const Rcpp::List &x, const char *name) {
+    return Rcpp::as<bool>(x[name]) ? std::string("yes") : std::string("no");
+  };
+  auto code_text = [](std::string value) {
+    std::replace(value.begin(), value.end(), '`', '\'');
+    return value;
+  };
+
+  double effective_entries_95 = std::numeric_limits<double>::quiet_NaN();
+  double effective_bandwidth_95 = std::numeric_limits<double>::quiet_NaN();
+  const Rcpp::List sparsity = structure["effective_sparsity"];
+  for (R_xlen_t i = 0; i < sparsity.size(); ++i)
+  {
+    const Rcpp::List row = sparsity[i];
+    if (Rcpp::as<std::string>(row["label"]) == "95%")
+      effective_entries_95 = Rcpp::as<double>(row["entries_required"]);
+  }
+  const Rcpp::List bandwidth = structure["effective_bandwidth"];
+  for (R_xlen_t i = 0; i < bandwidth.size(); ++i)
+  {
+    const Rcpp::List row = bandwidth[i];
+    if (Rcpp::as<std::string>(row["label"]) == "95%")
+      effective_bandwidth_95 = Rcpp::as<double>(row["bandwidth"]);
+  }
+
+  std::ostringstream md;
+  md << std::setprecision(6);
+  md << "# Quadra Model Diagnostics\n\n";
+  md << "## Executive Summary\n\n";
+  md << "- **Overall status:** `" << text_value(health, "overall")
+     << "`\n";
+  md << "- **Confidence:** `" << text_value(health, "confidence") << "`\n";
+  md << "- **Optimization quality:** `"
+     << text_value(health, "optimization_quality") << "`\n";
+  md << "- **Gradient quality:** `" << text_value(health, "gradient")
+     << "`\n";
+  md << "- **Curvature:** `" << text_value(health, "curvature") << "`\n";
+  md << "- **Conditioning:** `" << text_value(health, "conditioning")
+     << "`\n\n";
+
+  md << "## Model Health\n\n";
+  md << "| Check | Status |\n|---|---:|\n";
+  md << "| Optimization | `" << text_value(health, "optimization") << "` |\n";
+  md << "| Gradient | `" << text_value(health, "gradient") << "` |\n";
+  md << "| Curvature | `" << text_value(health, "curvature") << "` |\n";
+  md << "| Conditioning | `" << text_value(health, "conditioning") << "` |\n";
+  md << "| Overall | `" << text_value(health, "overall") << "` |\n\n";
+
+  md << "## Optimization\n\n";
+  md << "| Quantity | Value |\n|---|---:|\n";
+  md << "| Laplace objective | `"
+     << number_value(optimization, "laplace_objective") << "` |\n";
+  md << "| Joint objective | `"
+     << number_value(optimization, "joint_objective") << "` |\n";
+  md << "| Fixed gradient norm | `"
+     << number_value(optimization, "fixed_gradient_norm") << "` |\n";
+  md << "| Random gradient norm | `"
+     << number_value(optimization, "random_gradient_norm") << "` |\n";
+  md << "| Maximum-gradient parameter | `"
+     << code_text(text_value(optimization, "max_gradient_parameter"))
+     << "` |\n";
+  md << "| Maximum absolute gradient | `"
+     << number_value(optimization, "max_abs_gradient") << "` |\n";
+  md << "| Diagnostic convergence | `"
+     << logical_label(optimization, "converged") << "` |\n\n";
+
+  md << "## Curvature and Effective Structure\n\n";
+  md << "| Quantity | Value |\n|---|---:|\n";
+  md << "| Random effects | `" << integer_value(structure, "random_effects")
+     << "` |\n";
+  md << "| Positive definite | `"
+     << logical_label(structure, "positive_definite") << "` |\n";
+  md << "| Condition number | `"
+     << number_value(structure, "condition_number") << "` |\n";
+  md << "| Structural density | `"
+     << number_value(structure, "structural_density") << "` |\n";
+  md << "| Structural nonzeros | `"
+     << integer_value(structure, "structural_nonzeros") << "` |\n";
+  md << "| Entries retaining 95% curvature | `" << effective_entries_95
+     << "` |\n";
+  md << "| Bandwidth retaining 95% curvature | `" << effective_bandwidth_95
+     << "` |\n";
+  md << "| Hessian jitter | `" << number_value(structure, "hessian_jitter")
+     << "` |\n\n";
+
+  md << "## Quadra Recommendation\n\n";
+  md << "- **Detected structure:** `" << text_value(backend, "structure")
+     << "`\n";
+  md << "- **Factorization backend:** `" << text_value(backend, "backend")
+     << "`\n";
+  md << "- **Bandwidth:** `" << integer_value(backend, "bandwidth") << "`\n";
+  md << "- **Reason:** " << text_value(backend, "reason") << "\n\n";
+
+  md << "## Uncertainty and Correlation Graph\n\n";
+  md << "- Maximum absolute correlation: `"
+     << number_value(uncertainty, "max_abs_correlation") << "`\n";
+  md << "- Correlation graph nodes / edges: `"
+     << integer_value(graph, "nodes") << " / " << integer_value(graph, "edges")
+     << "`\n";
+  md << "- Connected components: `"
+     << integer_value(graph, "connected_components") << "`\n";
+  md << "- Largest component: `"
+     << integer_value(graph, "largest_component_size") << "`\n";
+  md << "- Maximum-degree parameter: `"
+     << code_text(text_value(graph, "maximum_degree_parameter")) << "`\n\n";
+
+  md << "## Latent States\n\n";
+  md << "- Count: `" << integer_value(latent, "count") << "`\n";
+  md << "- Mean: `" << number_value(latent, "mean") << "`\n";
+  md << "- Standard deviation: `" << number_value(latent, "sd") << "`\n";
+  md << "- Range: `[" << number_value(latent, "minimum") << ", "
+     << number_value(latent, "maximum") << "]`\n\n";
+
+  md << "## Spectral Structure\n\n";
+  md << "- Entropy effective rank: `"
+     << number_value(spectrum, "effective_rank") << "`\n";
+  md << "- Largest eigenvalue share: `"
+     << number_value(spectrum, "largest_eigenvalue_share") << "`\n";
+  md << "- Eigen-directions for 90% curvature: `"
+     << integer_value(spectrum, "eigenvalues_for_90_percent") << "`\n";
+  md << "- Eigen-directions for 95% curvature: `"
+     << integer_value(spectrum, "eigenvalues_for_95_percent") << "`\n\n";
+
+  md << "## Most Influential Random Effects\n\n";
+  md << "| Rank | Parameter | Importance share | SD |\n|---:|---|---:|---:|\n";
+  const Rcpp::List ranking = influence["ranking"];
+  const R_xlen_t ranking_count = std::min<R_xlen_t>(5, ranking.size());
+  for (R_xlen_t i = 0; i < ranking_count; ++i)
+  {
+    const Rcpp::List row = ranking[i];
+    md << "| " << i + 1 << " | `"
+       << code_text(Rcpp::as<std::string>(row["name"])) << "` | `"
+       << Rcpp::as<double>(row["importance_share"]) << "` | `"
+       << Rcpp::as<double>(row["sd"]) << "` |\n";
+  }
+
+  md << "\n---\n\nGenerated by `quadra_model_diagnostics_md()`.\n";
+  return md.str();
 }
 
 /** Fit the Laplace-profiled FIMS objective with Quadra's model-aware path. */

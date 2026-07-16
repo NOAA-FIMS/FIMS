@@ -44,6 +44,9 @@ void register_functions(Rcpp::Module &m) {
       "quadra_model_diagnostics", &quadra_model_diagnostics,
       "Return Quadra functional diagnostics for a configured FIMS model.");
   Rcpp::function(
+      "quadra_model_diagnostics_md", &quadra_model_diagnostics_md,
+      "Render Quadra model diagnostics as a Markdown string.");
+  Rcpp::function(
       "fit_fims_quadra_joint", &fit_fims_quadra_joint,
       "Fit the unprofiled FIMS joint objective with L-BFGS.");
 #endif
