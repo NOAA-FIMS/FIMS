@@ -38,12 +38,12 @@ class PopulationInterfaceBase : public FIMSRcppInterfaceBase {
    * @brief Initialize the catch at age model.
    *
    */
-  SharedBoolean initialize_catch_at_age;
+  bool initialize_catch_at_age = false;
   /**
    * @brief Initialize the surplus production model.
    *
    */
-  SharedBoolean initialize_surplus_production;
+  bool initialize_surplus_production = false;
   /**
    * @brief The constructor.
    */
@@ -82,11 +82,11 @@ class PopulationInterface : public PopulationInterfaceBase {
   /**
    * @brief The number of age bins.
    */
-  SharedInt n_ages = 0;
+  int n_ages = 0;
   /**
    * @brief The number of fleets.
    */
-  SharedInt n_fleets;
+  int n_fleets = 0;
   /**
    * list of fleets that operate on this population.
    */
@@ -98,27 +98,27 @@ class PopulationInterface : public PopulationInterfaceBase {
   /**
    * @brief The number of years.
    */
-  SharedInt n_years;
+  int n_years = 0;
   /**
    * @brief The number of length bins.
    */
-  SharedInt n_lengths;
+  int n_lengths = 0;
   /**
    * @brief The ID of the maturity module.
    */
-  SharedInt maturity_id;
+  int maturity_id = -999;
   /**
    * @brief The ID of the growth module.
    */
-  SharedInt growth_id;
+  int growth_id = -999;
   /**
    * @brief The ID of the recruitment module.
    */
-  SharedInt recruitment_id;
+  int recruitment_id = -999;
   /**
    * @brief The ID of the recruitment process module.
    */
-  SharedInt recruitment_err_id;
+  int recruitment_err_id = -999;
   /**
    * @brief The natural log of the natural mortality for each year.
    */
@@ -152,7 +152,7 @@ class PopulationInterface : public PopulationInterfaceBase {
   /**
    * @brief The name for the population.
    */
-  SharedString name = fims::to_string("NA");
+  std::string name = "NA";
 
   // Population based derived quantities
   /**
@@ -234,49 +234,7 @@ class PopulationInterface : public PopulationInterfaceBase {
     this->proportion_female[0].initial_value_m = static_cast<double>(0.5);
     this->proportion_female[0].estimation_type_m.set("constant");
     this->fleet_ids = std::make_shared<std::set<uint32_t>>();
-    std::shared_ptr<PopulationInterface> population =
-        std::make_shared<PopulationInterface>(*this);
-    FIMSRcppInterfaceBase::fims_interface_objects.push_back(population);
-    PopulationInterfaceBase::live_objects[this->id] = population;
   }
-
-  /**
-   * @brief Construct a new Population Interface object
-   *
-   * @param other
-   */
-  PopulationInterface(const PopulationInterface &other)
-      : PopulationInterfaceBase(other),
-        n_ages(other.n_ages),
-        n_fleets(other.n_fleets),
-        fleet_ids(other.fleet_ids),
-        n_years(other.n_years),
-        n_lengths(other.n_lengths),
-        maturity_id(other.maturity_id),
-        growth_id(other.growth_id),
-        recruitment_id(other.recruitment_id),
-        recruitment_err_id(other.recruitment_id),
-        log_M(other.log_M),
-        spawning_biomass_ratio(other.spawning_biomass_ratio),
-        log_f_multiplier(other.log_f_multiplier),
-        log_init_naa(other.log_init_naa),
-        proportion_female(other.proportion_female),
-        ages(other.ages),
-        name(other.name),
-        total_landings_weight(other.total_landings_weight),
-        total_landings_numbers(other.total_landings_numbers),
-        mortality_F(other.mortality_F),
-        mortality_M(other.mortality_M),
-        mortality_Z(other.mortality_Z),
-        numbers_at_age(other.numbers_at_age),
-        unfished_numbers_at_age(other.unfished_numbers_at_age),
-        biomass(other.biomass),
-        spawning_biomass(other.spawning_biomass),
-        unfished_biomass(other.unfished_biomass),
-        unfished_spawning_biomass(other.unfished_spawning_biomass),
-        proportion_mature_at_age(other.proportion_mature_at_age),
-        expected_recruitment(other.expected_recruitment),
-        sum_selectivity(other.sum_selectivity) {}
 
   /**
    * @brief The destructor.
@@ -293,34 +251,34 @@ class PopulationInterface : public PopulationInterfaceBase {
    * @brief Sets the name of the population.
    * @param name The name to set.
    */
-  void SetName(const std::string &name) { this->name.set(name); }
+  void SetName(const std::string &name) { this->name = name; }
 
   /**
    * @brief Gets the name of the population.
    * @return The name.
    */
-  std::string GetName() const { return this->name.get(); }
+  std::string GetName() const { return this->name; }
 
   /**
    * @brief Sets the unique ID for the Maturity object.
    * @param maturity_id Unique ID for the Maturity object.
    */
   void SetMaturityID(uint32_t maturity_id) {
-    this->maturity_id.set(maturity_id);
+    this->maturity_id = maturity_id;
   }
 
   /**
    * @brief Set the unique ID for the growth object.
    * @param growth_id Unique ID for the growth object.
    */
-  void SetGrowthID(uint32_t growth_id) { this->growth_id.set(growth_id); }
+  void SetGrowthID(uint32_t growth_id) { this->growth_id = growth_id; }
 
   /**
    * @brief Set the unique ID for the recruitment object.
    * @param recruitment_id Unique ID for the recruitment object.
    */
   void SetRecruitmentID(uint32_t recruitment_id) {
-    this->recruitment_id.set(recruitment_id);
+    this->recruitment_id = recruitment_id;
   }
 
   /**
@@ -409,13 +367,13 @@ class PopulationInterface : public PopulationInterfaceBase {
 
     // set relative info
     population->id = this->id;
-    population->n_years = this->n_years.get();
-    population->n_fleets = this->n_fleets.get();
+    population->n_years = this->n_years;
+    population->n_fleets = this->n_fleets;
     // only define ages if n_ages greater than 0
-    if (this->n_ages.get() > 0) {
-      population->n_ages = this->n_ages.get();
-      if (static_cast<size_t>(this->n_ages.get()) == this->ages.size()) {
-        population->ages.resize(this->n_ages.get());
+    if (this->n_ages > 0) {
+      population->n_ages = this->n_ages;
+      if (static_cast<size_t>(this->n_ages) == this->ages.size()) {
+        population->ages.resize(this->n_ages);
       } else {
         throw std::invalid_argument(
             "The size of the ages vector for population " +
@@ -428,19 +386,19 @@ class PopulationInterface : public PopulationInterfaceBase {
       population->fleet_ids.insert(*it);
     }
 
-    population->growth_id = this->growth_id.get();
-    population->recruitment_id = this->recruitment_id.get();
-    population->maturity_id = this->maturity_id.get();
+    population->growth_id = this->growth_id;
+    population->recruitment_id = this->recruitment_id;
+    population->maturity_id = this->maturity_id;
     population->log_M.resize(this->log_M.size());
 
     if (this->log_f_multiplier.size() ==
-        static_cast<size_t>(this->n_years.get())) {
+        static_cast<size_t>(this->n_years)) {
       population->log_f_multiplier.resize(this->log_f_multiplier.size());
     } else {
       FIMS_WARNING_LOG(
           "The log_f_multiplier vector is not of size n_years. Filling with "
           "zeros.");
-      this->log_f_multiplier.resize((this->n_years.get()));
+      this->log_f_multiplier.resize(this->n_years);
       for (size_t i = 0; i < log_f_multiplier.size(); i++) {
         this->log_f_multiplier[i].initial_value_m = static_cast<double>(0.0);
         this->log_f_multiplier[i].estimation_type_m.set("constant");
@@ -449,13 +407,13 @@ class PopulationInterface : public PopulationInterfaceBase {
     }
 
     if (this->spawning_biomass_ratio.size() ==
-        static_cast<size_t>(this->n_years.get() + 1)) {
+        static_cast<size_t>(this->n_years + 1)) {
       population->spawning_biomass_ratio.resize(
           this->spawning_biomass_ratio.size());
     } else {
       FIMS_WARNING_LOG(
           "Setting spawning_biomass_ratio vector to size n_years + 1.");
-      this->spawning_biomass_ratio.resize((this->n_years.get() + 1));
+      this->spawning_biomass_ratio.resize(this->n_years + 1);
       population->spawning_biomass_ratio.resize(
           this->spawning_biomass_ratio.size());
     }
@@ -524,7 +482,7 @@ class PopulationInterface : public PopulationInterfaceBase {
 
     if (this->proportion_female.size() == 1 ||
         this->proportion_female.size() ==
-            static_cast<size_t>(this->n_ages.get())) {
+            static_cast<size_t>(this->n_ages)) {
       population->proportion_female.resize(this->proportion_female.size());
     } else {
       FIMS_WARNING_LOG(

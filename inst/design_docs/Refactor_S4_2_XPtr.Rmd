@@ -1,0 +1,699 @@
+---
+title: "Design Document: FIMS Rcpp Interface Refactor to Rcpp::XPtr"
+author: "FIMS Development Team"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_depth: 3
+    theme: united
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 1. Motivation
+
+The current FIMS architecture relies on S4 Rcpp::Module classes to expose C++ interface
+objects (such as `AgeCompDataInterface` or `PopulationInterface`) directly to R. This
+design introduces two structural problems that compound each other.
+
+### 1.1 The Copy Problem
+
+When `methods::new(Population)` is called in R, Rcpp owns the C++ object's memory through
+its own internal mechanism. A `std::shared_ptr` cannot safely be created pointing at a
+Rcpp-managed object, because Rcpp controls its lifetime. However, `CreateTMBModel()` needs
+to iterate over all interface objects to call `add_to_fims_tmb()` via a registry it owns.
+The solution in the current design is to make a heap copy of every interface object in the
+constructor:
+
+```cpp
+// PopulationInterface constructor — current approach
+PopulationInterface() : PopulationInterfaceBase() {
+    // ...
+    std::shared_ptr<PopulationInterface> population =
+        std::make_shared<PopulationInterface>(*this);  // heap copy
+    FIMSRcppInterfaceBase::fims_interface_objects.push_back(population);
+    PopulationInterfaceBase::live_objects[this->id] = population;
+}
+```
+
+Because these global static collections (variables that are shared across the program and persist for the lifetime of the program) maintain strong `std::shared_ptr` references to
+every object created, their reference counts never drop to zero. Even when an R variable is
+overwritten (e.g., `my_fleet <- NULL`), the underlying C++ memory is never deallocated
+until an explicit manual call to `clear()`. This prevents clean iterative modeling workflows
+(bootstrapping, sensitivity runs, profile likelihood) within a single R session.
+
+### 1.2 The SharedPrimitive Overhead Problem
+
+When users initialize a module (e.g. pop <- methods::new(Population)), a copy gets stored in the registry. When the user later sets
+`pop$n_years <- 30` on the R-side S4 object, this modifies the original Rcpp-managed object
+but not the registry copy. `CreateTMBModel()` would see stale initial values.
+
+The `SharedInt`, `SharedBoolean`, `SharedReal`, and `SharedString` wrapper classes were
+introduced to solve this synchronization problem: by wrapping scalar fields in `shared_ptr`,
+both the original and the registry copy share the same underlying value. Modifying the
+original is automatically seen by the copy.
+
+However, this comes at a significant memory cost. Each `SharedPrimitive` field requires one
+heap allocation for a single scalar. On a 64-bit system, `make_shared<int>(0)` allocates
+approximately 28 bytes (16-byte control block + 4-byte int + alignment padding) for 4 bytes
+of actual data — a 7:1 overhead ratio. `PopulationInterface` alone has 8 `SharedInt`, 2
+`SharedBoolean`, and 1 `SharedString` configuration fields: roughly 11 heap allocations
+before any model data is set. Additionally, every `Variable` element in every
+`VariableVector` carries a `SharedString estimation_type_m`, adding one heap allocation per
+parameter element across the entire model.
+
+The SharedPrimitive types and the constructor copies are symptoms of the same root cause:
+the S4 module system forces a two-object design (Rcpp-owned original + heap registry copy)
+that requires shared ownership of individual fields to stay synchronized.
+
+### 1.3 The Rcpp::XPtr Solution
+
+By transitioning the R-to-C++ boundary to `Rcpp::XPtr<std::shared_ptr<T>>`, both problems
+are eliminated together.
+
+**One object, no copies.** The creator function allocates the C++ object on the heap
+directly and hands ownership to a `shared_ptr`. The XPtr wraps that `shared_ptr`. There is
+no Rcpp-managed original and no registry copy — there is one object. User modifications via
+standalone setter functions go directly to that object.
+
+**SharedPrimitives become unnecessary.** Without a copy to keep synchronized with the
+original, scalar fields can revert to plain C++ types (`int`, `bool`, `double`,
+`std::string`). The `Variable::estimation_type_m` field can become an enum.
+
+**Automated lifecycle management.** When an R variable holding an XPtr is overwritten or
+goes out of scope, R's garbage collector deletes the external pointer wrapper, decrementing
+the `shared_ptr` reference count. Memory is freed without requiring an explicit `clear()`
+call.
+
+---
+
+## 2. Refactoring Steps
+
+### Step 1: Replace `SharedPrimitive` scalar fields with plain C++ types
+
+In every interface class, replace `SharedInt`, `SharedBoolean`, `SharedReal`, and
+`SharedString` fields that hold scalar configuration values with their plain C++ equivalents.
+This is only safe under XPtr because there is no registry copy that needs to remain
+synchronized with user modifications.
+
+```cpp
+// inst/include/interface/rcpp/rcpp_objects/rcpp_population.hpp
+
+// BEFORE — SharedPrimitive fields (one heap allocation each)
+SharedInt n_ages = 0;
+SharedInt n_fleets;
+SharedInt n_years;
+SharedInt n_lengths;
+SharedInt maturity_id;
+SharedInt growth_id;
+SharedInt recruitment_id;
+SharedInt recruitment_err_id;
+SharedString name = fims::to_string("NA");
+
+// AFTER — plain C++ types (no heap allocation per scalar)
+int n_ages = 0;
+int n_fleets = 0;
+int n_years = 0;
+int n_lengths = 0;
+int maturity_id = -1;
+int growth_id = -1;
+int recruitment_id = -1;
+int recruitment_err_id = -1;
+std::string name = "NA";
+```
+
+`VariableVector` retains its `shared_ptr<vector<Variable>>` internal storage because R-side
+access to individual elements relies on shared ownership within the vector. Only standalone
+scalar configuration fields change.
+
+`SharedBoolean` fields in base classes (`initialize_catch_at_age`,
+`initialize_surplus_production`) follow the same pattern — replace with plain `bool`.
+
+### Step 2: Replace `Variable::estimation_type_m` with an enum
+
+Every `Variable` element in every `VariableVector` currently carries a
+`SharedString estimation_type_m`, which heap-allocates one `std::string` per element. The
+field always holds exactly one of three values. Replace it with an enum stored as a single
+byte:
+
+```cpp
+// inst/include/interface/rcpp/rcpp_objects/rcpp_interface_base.hpp
+
+// BEFORE — one heap allocation per Variable element
+class Variable {
+ public:
+  SharedString estimation_type_m = SharedString("constant");
+  // ...
+};
+
+// AFTER — zero heap allocations, 1 byte per Variable element
+enum class EstimationType : uint8_t {
+  constant      = 0,
+  fixed_effects  = 1,
+  random_effects = 2
+};
+
+class Variable {
+ public:
+  EstimationType estimation_type_m = EstimationType::constant;
+  // ...
+};
+```
+
+Update all callers that previously compared strings (e.g.,
+`estimation_type_m.get() == "fixed_effects"`) to use the enum values:
+
+```cpp
+// BEFORE
+if (this->log_M[i].estimation_type_m.get() == "fixed_effects") { ... }
+
+// AFTER
+if (this->log_M[i].estimation_type_m == EstimationType::fixed_effects) { ... }
+```
+
+Update `VariableVector::set_estimation_types()` to accept an
+`Rcpp::CharacterVector` and convert string input to enum internally, preserving the
+existing R-side API.
+
+### Step 3: Remove constructor copies and implement standalone lifecycle functions
+
+Strip `live_objects` map insertions and `fims_interface_objects` push_back calls from all
+interface class constructors. The constructor should perform only pure initialization:
+
+```cpp
+// inst/include/interface/rcpp/rcpp_objects/rcpp_data.hpp
+
+// BEFORE — constructor registers in two global registries
+AgeCompDataInterface(int  = 0, int n_ages = 0) : DataInterfaceBase() {
+    this->n_ages = n_ages;
+    this-> = ;
+    this->age_comp_data.resize(n_ages * );
+    this->uncertainty.resize(n_ages * );
+    DataInterfaceBase::live_objects[this->id] =
+        std::make_shared<AgeCompDataInterface>(*this);
+    FIMSRcppInterfaceBase::fims_interface_objects.push_back(
+        DataInterfaceBase::live_objects[this->id]);
+}
+
+// AFTER — pure initialization only
+AgeCompDataInterface(int  = 0, int n_ages = 0) : DataInterfaceBase() {
+    this->n_ages = n_ages;
+    this-> = ;
+    this->age_comp_data.resize(n_ages * );
+    this->uncertainty.resize(n_ages * );
+}
+```
+
+Implement standalone creator functions in the corresponding `.cpp` source file. Wrap the
+`shared_ptr` (not a raw pointer) inside the XPtr so that the reference count is safely
+decremented by R's garbage collector when the XPtr is collected:
+
+```cpp
+// src/rcpp_data.cpp
+
+using SharedAgeComp = std::shared_ptr<AgeCompDataInterface>;
+
+Rcpp::XPtr<SharedAgeComp> create_age_comp(int , int n_ages) {
+    auto obj = std::make_shared<AgeCompDataInterface>(, n_ages);
+    // Heap-allocate the shared_ptr itself and hand it to the XPtr.
+    // 'true' binds the XPtr to R's garbage collector: when the R variable
+    // is collected, 'delete shared_ptr*' is called, decrementing the ref count.
+    return Rcpp::XPtr<SharedAgeComp>(new SharedAgeComp(obj), true);
+}
+```
+
+Implement standalone setter functions for each field that the user needs to set from R.
+Because there is one object and no copy to synchronize, plain C++ types suffice:
+
+```cpp
+void set_age_comp_values(Rcpp::XPtr<SharedAgeComp> xp,
+                         Rcpp::NumericVector values) {
+    auto& data = (*xp)->age_comp_data;
+    data.resize(values.size());
+    for (int i = 0; i < values.size(); ++i) {
+        data[i] = values[i];
+    }
+}
+```
+
+```cpp
+void set_population_constants(Rcpp::XPtr<SharedPopulation> xp,
+                              int n_ages,
+                              int n_years,
+                              int n_lengths) {
+    (*xp)->n_ages   = n_ages;
+    (*xp)->n_years  = n_years;
+    (*xp)->n_lengths = n_lengths;
+}
+```
+```cpp
+void set_population_parameters(Rcpp::XPtr<SharedPopulation> xp,
+                               Rcpp::NumericVector log_M_values,
+                               Rcpp::NumericVector log_init_naa_values) {
+    // xp returns the Xptr to the shared pointer
+    // *xp returns the shared pointer to the PopulationInterface
+    // **xp returns the PopulationInterface object
+    PopulationInterface& pop = **xp;
+
+    pop.log_M.resize(log_M_values.size());
+    for (int i = 0; i < log_M_values.size(); i++) {
+
+        Variable& v         = pop.log_M.storage_m->at(i);
+        v.initial_value_m   = log_M_values[i];
+        v.estimation_type_m = EstimationType::constant;
+    }
+
+    pop.log_init_naa.resize(log_init_naa_values.size());
+    for (int i = 0; i < log_init_naa_values.size(); i++) {
+        Variable& v         = pop.log_init_naa.storage_m->at(i);
+        v.initial_value_m   = log_init_naa_values[i];
+        v.estimation_type_m = EstimationType::fixed_effects;
+    }
+}
+```
+
+Register these functions inside the existing module registration blocks. Do **not** use
+`// [[Rcpp::exports]]`, as this causes essential TMB callables to be overwritten by
+`Rcpp::compileAttributes()`. Add a trailing underscore to every registered name to prevent
+name collisions with the R wrapper functions defined in Section 4b. Remove the
+`Rcpp::class_<T>` registration for any interface class that has been fully migrated to XPtr:
+
+```cpp
+// src/rcpp_data.cpp
+
+void register_data(Rcpp::Module& m) {
+    // Rcpp::class_<AgeCompDataInterface> removed — users no longer call methods::new()
+    Rcpp::function("create_age_comp_",          &create_age_comp);
+    Rcpp::function("set_age_comp_values_",      &set_age_comp_values);
+    Rcpp::function("set_population_constants_", &set_population_constants);
+    Rcpp::function("set_population_parameters_",&set_population_parameters);
+    // ... repeat for LengthComp, Index, Landings ...
+}
+```
+
+### Step 4: Implement dispatch through a shared base class for `CreateTMBModel()`
+
+`CreateTMBModel()` currently iterates `FIMSRcppInterfaceBase::fims_interface_objects` to
+call `add_to_fims_tmb()` on every registered object. Under XPtr, the C++ global registry
+is removed. This step replaces it with two pieces: a C++ mechanism for calling
+`add_to_fims_tmb()` through a common base class pointer, and an R-side registry that
+automatically tracks objects as they are created so the user does not need to build the list
+by hand.
+
+#### 4a. Why two XPtr types are needed
+
+Each concrete creator function (e.g., `create_age_comp()`, `create_population()`) returns
+an XPtr typed to its specific class — `XPtr<SharedAgeComp>`, `XPtr<SharedPopulation>`, etc.
+These types are all different, so they cannot be stored together in a single list and passed
+to `CreateTMBModel()`.
+
+The solution is a second, less specific XPtr typed to the common base class
+`FIMSRcppInterfaceBase`, which all interface classes inherit from. Because
+`add_to_fims_tmb()` is declared as a `virtual` method on that base class, calling it through
+a base class pointer is sufficient — C++ automatically invokes the correct derived-class
+implementation at runtime. This is what "dispatch through a shared base class" means:
+`CreateTMBModel()` does not need to know whether it is looking at an `AgeCompDataInterface`
+or a `PopulationInterface`; it just calls `add_to_fims_tmb()` and C++ figures out the rest.
+
+The two XPtr types point to the same underlying C++ object in memory. The concrete XPtr is
+what the user works with (setting values, reading results). The base XPtr is only needed
+by `CreateTMBModel()` to make that call. Both XPtrs share ownership of the object via
+`shared_ptr`, so the object stays alive as long as either pointer exists.
+
+**Define the base alias** in `rcpp_interface_base.hpp`:
+
+```cpp
+// inst/include/interface/rcpp/rcpp_objects/rcpp_interface_base.hpp
+using SharedBase = std::shared_ptr<FIMSRcppInterfaceBase>;
+```
+
+**Provide a conversion function for each concrete type.** This function takes the
+concrete XPtr the user already has and returns a second XPtr pointing to the same object
+but typed as the base class. C++ allows this conversion implicitly because
+`AgeCompDataInterface` inherits from `FIMSRcppInterfaceBase` — no special cast syntax
+is needed:
+
+```cpp
+// src/rcpp_data.cpp
+
+// create_age_comp_      — allocates a NEW AgeCompDataInterface object
+// age_comp_to_fims_xptr_ — does NOT create a new object; returns a second pointer
+//                          to the SAME object typed as the base class
+Rcpp::XPtr<SharedBase> age_comp_to_fims_xptr(Rcpp::XPtr<SharedAgeComp> xp) {
+    SharedBase base = *xp;  // implicit conversion: shared_ptr<Derived> -> shared_ptr<Base>
+    return Rcpp::XPtr<SharedBase>(new SharedBase(base), true);
+}
+```
+
+Register both functions inside the existing module registration block, again with trailing
+underscores so the clean names remain available for the R wrappers in Section 4b:
+
+```cpp
+void register_data(Rcpp::Module& m) {
+    Rcpp::function("create_age_comp_",         &create_age_comp);
+    Rcpp::function("set_age_comp_values_",     &set_age_comp_values);
+    Rcpp::function("age_comp_to_fims_xptr_",   &age_comp_to_fims_xptr);
+    // ... repeat for LengthComp, Index, Landings ...
+}
+```
+
+Register `CreateTMBModel` and `clear` the same way in their respective registration blocks:
+
+```cpp
+Rcpp::function("CreateTMBModel_", &CreateTMBModel);
+Rcpp::function("clear_",          &clear_impl);
+```
+```
+
+**Update `CreateTMBModel()` in C++ to accept a list of base XPtrs** and call
+`add_to_fims_tmb()` on each:
+
+```cpp
+// inst/include/interface/rcpp/rcpp_interface.hpp
+
+bool CreateTMBModel(Rcpp::List xptr_list) {
+    init_logging();
+
+    std::shared_ptr<fims_info::Information<TMB_FIMS_REAL_TYPE>> info0 =
+        fims_info::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
+    info0->Clear();
+
+    std::shared_ptr<fims_info::Information<TMBAD_FIMS_TYPE>> info =
+        fims_info::Information<TMBAD_FIMS_TYPE>::GetInstance();
+    info->Clear();
+
+    for (int i = 0; i < xptr_list.size(); i++) {
+        Rcpp::XPtr<SharedBase> xp =
+            Rcpp::as<Rcpp::XPtr<SharedBase>>(xptr_list[i]);
+        (*xp)->add_to_fims_tmb();  // C++ calls the correct derived-class method
+    }
+
+    info0->CreateModel();
+    info0->CheckModel();
+    info->CreateModel();
+
+    std::shared_ptr<fims_model::Model<TMB_FIMS_REAL_TYPE>> m0 =
+        fims_model::Model<TMB_FIMS_REAL_TYPE>::GetInstance();
+
+    return true;
+}
+```
+
+#### 4b. R-side automatic registry (intermediate step before R6)
+
+Rather than requiring the user to manually build the list passed to `CreateTMBModel()` —
+which risks silently omitting a component — an R-side package-level registry can be
+maintained automatically. The registry is a simple list stored inside a private package
+environment (not visible to the user). Thin R wrapper functions around each C++ creator
+call both `create_<type>()` and `<type>_to_fims_xptr()` and add the result to the registry.
+The user-facing `CreateTMBModel()` and `clear()` functions are also R wrappers that operate
+on this registry.
+
+This approach is more reliable than scanning the R environment for XPtr objects, because
+registration happens at the moment of creation — it is not affected by variable names,
+scoping, or objects stored inside lists.
+
+```r
+# R/fims_interface.R
+
+# Private package-level registry — not exported, not user-visible
+.fims_registry <- new.env(parent = emptyenv())
+.fims_registry$objects <- list()
+
+# R wrapper around C++ create_age_comp_:
+# creates the concrete XPtr, converts to base XPtr, registers it, returns concrete XPtr.
+# The trailing underscore on the C++ names (create_age_comp_, age_comp_to_fims_xptr_)
+# avoids collision with these R wrapper functions, which own the clean names.
+create_age_comp <- function(n_years, n_ages) {
+  xp      <- create_age_comp_(n_years, n_ages)   # concrete XPtr — user works with this
+  base_xp <- age_comp_to_fims_xptr_(xp)          # base XPtr — for CreateTMBModel()
+  .fims_registry$objects <- c(.fims_registry$objects,
+                               list(base_xp))     # auto-register
+  xp                                               # return concrete XPtr to user
+}
+
+# Repeat for every module type:
+# create_population(), create_fleet(), create_index(), etc.
+
+# R wrapper around C++ CreateTMBModel_ — uses the registry automatically
+CreateTMBModel <- function() {
+  CreateTMBModel_(.fims_registry$objects)
+}
+
+# clear() resets both the C++ TMB singletons and the R registry
+clear <- function() {
+  clear_()
+  .fims_registry$objects <- list()
+}
+```
+
+With this in place, the user workflow is identical to the current S4 workflow — create
+objects, set values, call `CreateTMBModel()` — with no manual list management required.
+The `clear()` function simplifies on the C++ side to resetting the TMB `Information`
+singletons and `id_g` counters, with the R registry reset handling the bookkeeping that
+`live_objects` and `fims_interface_objects` previously provided.
+
+#### 4c. Model description from the registry
+
+Because the R wrapper functions know the type and configuration of each object at the
+moment of creation, a parallel metadata list can be stored alongside the base XPtrs at no
+additional C++ cost. This metadata enables a `describe_model()` function that prints a
+human-readable summary of the model the user has assembled — useful for verifying that all
+components are present and correctly configured before calling `CreateTMBModel()`.
+
+Extend the registry environment with a `metadata` list, and populate it inside each R
+wrapper function:
+
+```r
+# R/fims_interface.R
+
+.fims_registry <- new.env(parent = emptyenv())
+.fims_registry$objects  <- list()
+.fims_registry$metadata <- list()
+
+create_age_comp <- function(n_years, n_ages) {
+  xp      <- create_age_comp_(n_years, n_ages)
+  base_xp <- age_comp_to_fims_xptr_(xp)
+  .fims_registry$objects  <- c(.fims_registry$objects,  list(base_xp))
+  .fims_registry$metadata <- c(.fims_registry$metadata,
+                                list(list(type   = "AgeComp",
+                                          id     = get_id_(xp),
+                                          n_years = n_years,
+                                          n_ages  = n_ages)))
+  xp
+}
+
+create_population <- function() {
+  xp      <- create_population_()
+  base_xp <- population_to_fims_xptr_(xp)
+  .fims_registry$objects  <- c(.fims_registry$objects,  list(base_xp))
+  .fims_registry$metadata <- c(.fims_registry$metadata,
+                                list(list(type = "Population",
+                                          id   = get_id_(xp))))
+  xp
+}
+
+# Repeat the same pattern for every module type.
+
+# clear() resets both the C++ TMB singletons and the full R registry
+clear <- function() {
+  clear_()
+  .fims_registry$objects  <- list()
+  .fims_registry$metadata <- list()
+}
+```
+
+`describe_model()` iterates the metadata list and prints a summary. Because this function
+operates entirely on the R-side metadata, it requires no C++ changes:
+
+```r
+describe_model <- function() {
+  if (length(.fims_registry$metadata) == 0) {
+    message("No model components have been registered.")
+    return(invisible(NULL))
+  }
+  cat("Model components registered:\n")
+  cat(strrep("-", 40), "\n")
+  for (m in .fims_registry$metadata) {
+    # Build a string of any extra fields beyond type and id
+    extras <- m[!names(m) %in% c("type", "id")]
+    extra_str <- if (length(extras) > 0) {
+      paste(names(extras), unlist(extras), sep = " = ", collapse = ", ")
+    } else ""
+    cat(sprintf("  %-20s id: %d  %s\n", m$type, m$id, extra_str))
+  }
+  cat(strrep("-", 40), "\n")
+  cat(sprintf("Total: %d component(s)\n", length(.fims_registry$metadata)))
+  invisible(.fims_registry$metadata)
+}
+```
+
+Example output after setting up a simple model:
+
+```
+Model components registered:
+----------------------------------------
+  AgeComp              id: 1  n_years = 10, n_ages = 5
+  Index                id: 2  n_years = 10
+  BevertonHoltRecruit  id: 3
+  LogisticSelectivity  id: 4
+  Fleet                id: 5
+  Population           id: 6
+----------------------------------------
+Total: 6 component(s)
+```
+
+`describe_model()` is intended to be called interactively before `CreateTMBModel()` as a
+sanity check. Additional metadata fields — such as linked component IDs (e.g.,
+`recruitment_id`, `selectivity_id`) or parameter dimensions — can be added to each wrapper
+function without modifying any C++ code.
+
+---
+
+## 3. Usage Example
+
+### 3.1 R Workflow with Automatic Registry
+
+With the R-side registry in place (Step 4b), the user workflow closely mirrors the current
+S4 workflow. `CreateTMBModel()` is called with no arguments — the registry built up during
+object creation is used automatically. Note that `$method()` syntax does not work directly
+on raw XPtr objects; all field access goes through standalone setter functions. See
+Section 3.2 for R6 wrappers that restore familiar `$` ergonomics.
+
+```{r eval=FALSE}
+library(FIMS)
+
+# ==================== SETUP ====================
+
+# 1. Create model components.
+#    Each R wrapper calls the C++ creator AND registers the object automatically.
+#    The concrete XPtr is returned for use in setter calls below.
+age_comp <- create_age_comp(n_years = 10, n_ages = 5)
+index    <- create_index(n_years = 10)
+pop      <- create_population()
+growth   <- create_empirical_growth()
+
+# 2. Set values via standalone setter functions
+set_age_comp_values(age_comp, my_age_comp_data)
+set_index_values(index, my_index_data)
+set_population_constants(pop, n_years = 10L, n_ages = 5L, n_length = 0L)
+set_population_growth_id(pop, get_id(growth))
+
+# 3. Build the TMB model — registry is passed automatically, no list needed
+CreateTMBModel()
+
+# fit model...
+
+
+# ==================== ITERATIVE WORKFLOW ====================
+
+# 4. For a second scenario (e.g., a sensitivity run with different data),
+#    update values directly on the existing concrete XPtrs.
+#    The registry already holds base XPtrs pointing to the same underlying C++ objects,
+#    so any change made here is automatically visible when CreateTMBModel() runs again —
+#    no re-registration or clear() needed between scenarios.
+set_age_comp_values(age_comp, new_age_comp_data)   # update age composition data
+set_index_values(index, new_index_data)             # update index data
+set_population_parameters(pop,                      # update parameter starting values
+                          log_M_values       = new_log_M,
+                          log_init_naa_values = new_log_init_naa)
+
+# 5. Rebuild — CreateTMBModel() internally calls fims::Information::Clear() on both
+#    TMB singletons (double and TMBAD types) before re-populating from the registry,
+#    so the previous model run's state is fully reset. The R registry itself is NOT
+#    cleared, which is what allows the same objects to be reused across scenarios.
+CreateTMBModel()
+
+# fit model...
+
+
+# ==================== CLEANUP ====================
+
+# 6. clear() resets the TMB singletons AND the R registry.
+#    Setting R variables to NULL releases the concrete XPtrs;
+#    shared_ptr ref counts drop to 0 on next GC and memory is freed.
+clear()
+age_comp_xp <- NULL
+index_xp    <- NULL
+pop_xp      <- NULL
+gc()
+```
+
+### 3.2 R6 Wrapper Workflow - Future Development, will not be implemented in this issue
+
+R6 classes restore `$` ergonomics by wrapping both the concrete XPtr (for typed field
+access) and the base XPtr (for `CreateTMBModel()` dispatch) inside a single user-facing
+object:
+
+```{r eval=FALSE}
+AgeComp <- R6::R6Class("AgeComp",
+  private = list(
+    .xp      = NULL,
+    .base_xp = NULL
+  ),
+  public = list(
+    initialize = function(n_years, n_ages) {
+      private$.xp      <- create_age_comp_(n_years, n_ages)
+      private$.base_xp <- age_comp_to_fims_xptr_(private$.xp)
+    },
+    set_values = function(values) {
+      set_age_comp_values_(private$.xp, values)
+    },
+    fims_xptr = function() private$.base_xp
+  )
+)
+
+Population <- R6::R6Class("Population",
+  private = list(
+    .xp      = NULL,
+    .base_xp = NULL
+  ),
+  public = list(
+    initialize = function() {
+      private$.xp      <- create_population_()
+      private$.base_xp <- population_to_fims_xptr_(private$.xp)
+    },
+    set_n_years = function(n) set_population_n_years_(private$.xp, n),
+    set_n_ages  = function(n) set_population_n_ages_(private$.xp, n),
+    fims_xptr   = function() private$.base_xp
+  )
+)
+
+# User workflow
+age_comp <- AgeComp$new(n_years = 10, n_ages = 5)
+age_comp$set_values(my_age_comp_data)
+
+pop <- Population$new()
+pop$set_n_years(10L)
+pop$set_n_ages(5L)
+
+# Under R6, CreateTMBModel() can receive explicit base XPtrs from each object,
+# or the R-side registry (Section 4b/4c) can be used here too — both patterns work.
+CreateTMBModel(list(age_comp$fims_xptr(), pop$fims_xptr()))
+```
+
+---
+
+## 4. Memory Impact
+
+The following table summarizes heap allocations eliminated per `PopulationInterface`
+instance by the full refactor. The XPtr approach only realizes these savings when all four
+steps are applied together; a partial migration that retains SharedPrimitives or constructor
+copies will not produce a meaningful reduction.
+
+| Source | Before | After |
+|---|---|---|
+| `SharedInt` configuration fields (8) | 8 heap allocs | 0 |
+| `SharedBoolean` fields (2 in base) | 2 heap allocs | 0 |
+| `SharedString` field (1) | 1 heap alloc | 0 |
+| Constructor registry copy | 1 `make_shared<PopulationInterface>` | 0 |
+| `Variable::estimation_type_m` per element | 1 heap alloc per `Variable` | 0 (enum) |
+| `live_objects` map per class | 1 `std::map` + N entries | removed |
+| `fims_interface_objects` global vector | 1 entry per object | removed |
+
+The `clear()` function simplifies substantially: instead of manually resetting every
+class's `live_objects` map and `id_g` counter, it only needs to reset the TMB `Information`
+singletons and the `id_g` counters — no per-class map iteration required.
