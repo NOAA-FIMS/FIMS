@@ -216,7 +216,7 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
     return ss.str();
   }
 
-#ifdef TMB_MODEL
+#if defined(TMB_MODEL) || defined(QUADRA_MODEL)
 
   template <typename Type>
   bool add_to_fims_tmb_internal() {
@@ -281,8 +281,10 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
    * @return A boolean of true.
    */
   virtual bool add_to_fims_tmb() {
+#ifdef TMB_MODEL
     this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
     this->add_to_fims_tmb_internal<TMBAD_FIMS_TYPE>();
+#endif
 #ifdef QUADRA_MODEL
     this->add_to_fims_tmb_internal<QUADRA_FIMS_TYPE>();
 #endif
@@ -477,7 +479,7 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
     return ss.str();
   }
 
-#ifdef TMB_MODEL
+#if defined(TMB_MODEL) || defined(QUADRA_MODEL)
 
   template <typename Type>
   bool add_to_fims_tmb_internal() {
@@ -594,8 +596,10 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
    * @return A boolean of true.
    */
   virtual bool add_to_fims_tmb() {
+#ifdef TMB_MODEL
     this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
     this->add_to_fims_tmb_internal<TMBAD_FIMS_TYPE>();
+#endif
 #ifdef QUADRA_MODEL
     this->add_to_fims_tmb_internal<QUADRA_FIMS_TYPE>();
 #endif

@@ -16,14 +16,6 @@
 
 // traits for interfacing with TMB
 
-#ifdef TMB_MODEL
-
-// use isnan macro in math.h instead of TMB's isnan for fixing the r-cmd-check
-// issue
-#include <math.h>
-
-#include "TMB/TMB.h"
-
 #ifdef QUADRA_MODEL
 #include "Quadra/math/special_functions.hpp"
 
@@ -33,7 +25,17 @@ inline bool operator!=(const AReal& lhs, const AReal& rhs) {
 }
 inline double asDouble(const AReal& x) { return x.val; }
 }  // namespace had
+#endif
 
+#ifdef TMB_MODEL
+
+// use isnan macro in math.h instead of TMB's isnan for fixing the r-cmd-check
+// issue
+#include <math.h>
+
+#include "TMB/TMB.h"
+
+#ifdef QUADRA_MODEL
 // Compatibility overloads keep TMB's globally visible distribution helpers
 // from capturing Quadra scalar calls when both backends are in one build.
 inline had::AReal dnorm(const had::AReal& x, const had::AReal& mean,

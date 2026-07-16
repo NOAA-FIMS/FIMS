@@ -172,7 +172,7 @@ class AgeCompDataInterface : public DataInterfaceBase {
     return ss.str();
   }
 
-#ifdef TMB_MODEL
+#if defined(TMB_MODEL) || defined(QUADRA_MODEL)
 
   template <typename Type>
   bool add_to_fims_tmb_internal() {
@@ -202,8 +202,10 @@ class AgeCompDataInterface : public DataInterfaceBase {
    * @return A boolean of true.
    */
   virtual bool add_to_fims_tmb() {
+#ifdef TMB_MODEL
     this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
     this->add_to_fims_tmb_internal<TMBAD_FIMS_TYPE>();
+#endif
 #ifdef QUADRA_MODEL
     this->add_to_fims_tmb_internal<QUADRA_FIMS_TYPE>();
 #endif
@@ -308,7 +310,7 @@ class LengthCompDataInterface : public DataInterfaceBase {
     return ss.str();
   }
 
-#ifdef TMB_MODEL
+#if defined(TMB_MODEL) || defined(QUADRA_MODEL)
   template <typename Type>
   bool add_to_fims_tmb_internal() {
     std::shared_ptr<fims_data_object::DataObject<Type>> length_comp_data =
@@ -334,8 +336,10 @@ class LengthCompDataInterface : public DataInterfaceBase {
    * @return A boolean of true.
    */
   virtual bool add_to_fims_tmb() {
+#ifdef TMB_MODEL
     this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
     this->add_to_fims_tmb_internal<TMBAD_FIMS_TYPE>();
+#endif
 #ifdef QUADRA_MODEL
     this->add_to_fims_tmb_internal<QUADRA_FIMS_TYPE>();
 #endif
@@ -431,7 +435,7 @@ class IndexDataInterface : public DataInterfaceBase {
     return ss.str();
   }
 
-#ifdef TMB_MODEL
+#if defined(TMB_MODEL) || defined(QUADRA_MODEL)
 
   template <typename Type>
   bool add_to_fims_tmb_internal() {
@@ -457,8 +461,10 @@ class IndexDataInterface : public DataInterfaceBase {
    * @return A boolean of true.
    */
   virtual bool add_to_fims_tmb() {
+#ifdef TMB_MODEL
     this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
     this->add_to_fims_tmb_internal<TMBAD_FIMS_TYPE>();
+#endif
 #ifdef QUADRA_MODEL
     this->add_to_fims_tmb_internal<QUADRA_FIMS_TYPE>();
 #endif
@@ -555,7 +561,7 @@ class LandingsDataInterface : public DataInterfaceBase {
     return ss.str();
   }
 
-#ifdef TMB_MODEL
+#if defined(TMB_MODEL) || defined(QUADRA_MODEL)
 
   template <typename Type>
   bool add_to_fims_tmb_internal() {
@@ -581,8 +587,10 @@ class LandingsDataInterface : public DataInterfaceBase {
    * @return A boolean of true.
    */
   virtual bool add_to_fims_tmb() {
+#ifdef TMB_MODEL
     this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
     this->add_to_fims_tmb_internal<TMBAD_FIMS_TYPE>();
+#endif
 #ifdef QUADRA_MODEL
     this->add_to_fims_tmb_internal<QUADRA_FIMS_TYPE>();
 #endif

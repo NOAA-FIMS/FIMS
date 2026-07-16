@@ -59,11 +59,13 @@ void register_shared(Rcpp::Module &m);
  */
 void register_functions(Rcpp::Module &m);
 
+#ifdef QUADRA_MODEL
 /**
  * \brief Register the Quadra inference backend functions.
  * \param m The Rcpp module to register functions in.
  */
 void register_quadra(Rcpp::Module &m);
+#endif
 /**
  * \brief Register the fishery models module.
  * \param m The Rcpp module to register functions in.
@@ -79,10 +81,22 @@ void register_maturity(Rcpp::Module &m);
  * Rcpp module definition for the FIMS framework. This module registers all the
  * classes and functions that are exposed to R through Rcpp.
  */
-RcppExport RCPP_MODULE(fims) {
+// RCPP_MODULE expands to multiple declarations. Export its generated boot
+// function explicitly so hidden visibility and LTO cannot discard it. R's
+// attribute_visible macro can be empty on macOS, so spell out the compiler
+// attribute when it is supported.
+#if defined(__GNUC__) || defined(__clang__)
+extern "C" __attribute__((visibility("default"))) SEXP
+RCPP_MODULE_BOOT(fims)();
+#else
+RcppExport SEXP RCPP_MODULE_BOOT(fims)();
+#endif
+RCPP_MODULE(fims) {
   Rcpp::Module m("fims");
   register_functions(m);
+#ifdef QUADRA_MODEL
   register_quadra(m);
+#endif
   register_variable(m);
   register_vectors(m);
   register_shared(m);

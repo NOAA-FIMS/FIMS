@@ -36,6 +36,28 @@
 #' - [VariableVector](https://noaa-fims.github.io/FIMS/doxygen/classVariableVector.html)
 NULL
 
+# Optional backend entry points must exist while the namespace is loaded even
+# when their C++ backend is disabled. Rcpp::loadModule replaces the applicable
+# placeholders with native functions for each compiled backend.
+.fims_backend_unavailable <- function(backend) {
+  force(backend)
+  function(...) {
+    stop(backend, " support was not enabled when FIMS was compiled.",
+      call. = FALSE
+    )
+  }
+}
+
+CreateTMBModel <- .fims_backend_unavailable("TMB")
+CreateQuadraModel <- .fims_backend_unavailable("Quadra")
+EvaluateQuadraModel <- .fims_backend_unavailable("Quadra")
+EvaluateQuadraLaplaceModel <- .fims_backend_unavailable("Quadra")
+EvaluateQuadraDenseHessian <- .fims_backend_unavailable("Quadra")
+BenchmarkQuadraModel <- .fims_backend_unavailable("Quadra")
+BenchmarkQuadraRestrictedHessian <- .fims_backend_unavailable("Quadra")
+fit_fims_quadra <- .fims_backend_unavailable("Quadra")
+fit_fims_quadra_joint <- .fims_backend_unavailable("Quadra")
+
 #' C++ Functions Exported via Rcpp
 #'
 #' The following functions are exported from C++ via Rcpp. Their documentation

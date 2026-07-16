@@ -108,6 +108,8 @@ inline std::ostream& operator<<(std::ostream& stream, const AReal& value) {
 namespace fims_quadra {
 /** Reset the process-wide Quadra tape before constructing an AD model. */
 void reset_tape();
+/** Release all storage owned by the process-wide Quadra tape. */
+void release_tape();
 }
 #endif
 

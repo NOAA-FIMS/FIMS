@@ -12,10 +12,12 @@
  *
  */
 void register_functions(Rcpp::Module &m) {
+#ifdef TMB_MODEL
   Rcpp::function(
       "CreateTMBModel", &CreateTMBModel,
       "See "
       "https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html.");
+#endif
 #ifdef QUADRA_MODEL
   Rcpp::function(
       "CreateQuadraModel", &CreateQuadraModel,

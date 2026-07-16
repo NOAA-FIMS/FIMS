@@ -93,6 +93,15 @@ test_that("Quadra L-BFGS and TMB nlminb reach the same joint optimum", {
   expect_equal(quadra_fit$objective, tmb_fit$objective, tolerance = 1e-5)
   expect_equal(quadra_parameters, tmb_fit$par, tolerance = 1e-3)
   expect_lt(quadra_fit$gradient_norm, tmb_fit$gradient_norm)
+  expect_gt(quadra_fit$compact_tape_vertices, 0)
+  expect_gt(quadra_fit$compact_tape_bytes, 0)
+  expect_true(quadra_fit$full_graph_released)
+  expect_lt(quadra_fit$compact_validation_objective_difference, 1e-10)
+  expect_lt(quadra_fit$compact_validation_gradient_max_difference, 1e-10)
+})
+
+test_that("TMB construction remains valid after compact Quadra fitting", {
+  expect_true(CreateTMBModel())
 })
 
 test_that("Quadra restricted exact Hessian reproduces the TMB Laplace objective", {

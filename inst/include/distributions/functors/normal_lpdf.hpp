@@ -86,25 +86,33 @@ struct NormalLPDF : public DensityComponentBase<Type> {
     }
 
     for (size_t i = 0; i < n_x; i++) {
-#ifdef TMB_MODEL
+#if defined(TMB_MODEL) || defined(QUADRA_MODEL)
       if (this->input_type == "data") {
         // if data, check if there are any NA values and skip lpdf calculation
         // if there are
         if (this->get_observed(i) != this->data_observed_values->na_value) {
-          this->lpdf_vec[i] =
-              dnorm(this->get_observed(i), this->get_expected(i),
-                    fims_math::exp(log_sd.get_force_scalar(i)), true);
+          const Type sd = fims_math::exp(log_sd.get_force_scalar(i));
+          const Type z =
+              (this->get_observed(i) - this->get_expected(i)) / sd;
+          this->lpdf_vec[i] = -static_cast<Type>(0.5) * z * z -
+                              fims_math::log(sd) -
+                              static_cast<Type>(0.91893853320467274178);
         } else {
           this->lpdf_vec[i] = 0;
         }
         // if not data (i.e. prior or process), use x vector instead of
         // observed_values
       } else {
-        this->lpdf_vec[i] =
-            dnorm(this->get_observed(i), this->get_expected(i),
-                  fims_math::exp(log_sd.get_force_scalar(i)), true);
+        const Type sd = fims_math::exp(log_sd.get_force_scalar(i));
+        const Type z =
+            (this->get_observed(i) - this->get_expected(i)) / sd;
+        this->lpdf_vec[i] = -static_cast<Type>(0.5) * z * z -
+                            fims_math::log(sd) -
+                            static_cast<Type>(0.91893853320467274178);
       }
       this->lpdf += this->lpdf_vec[i];
+#endif
+#ifdef TMB_MODEL
       if (this->simulate_flag) {
         FIMS_SIMULATE_F(this->of) {
           if (this->input_type == "data") {

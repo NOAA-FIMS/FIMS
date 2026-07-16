@@ -3,6 +3,10 @@
  * \brief Quadra backend linkage and R interface for the FIMS shared library.
  */
 
+#ifdef QUADRA_MODEL
+
+#include <memory>
+
 #include <Rcpp.h>
 
 #include <quadra/quadra.hpp>
@@ -14,10 +18,28 @@ DECLARE_ADGRAPH()
 namespace fims_quadra {
 
 namespace {
-quadra::TapeContext tape;
+// Shared interface registration can construct Quadra scalar mirrors even when
+// TMB is the first backend requested, so an empty graph must exist as soon as
+// the combined FIMS library is loaded.
+std::unique_ptr<quadra::TapeContext> tape =
+    std::make_unique<quadra::TapeContext>();
 }
 
-void reset_tape() { tape.reset(); }
+void reset_tape() {
+  if (tape) {
+    tape->reset();
+  } else {
+    tape = std::make_unique<quadra::TapeContext>();
+  }
+}
+
+void release_tape() {
+  // Quadra scalar mirrors can be constructed while CreateTMBModel() registers
+  // shared interface objects in a combined build. Free the large graph, but
+  // immediately leave a valid empty graph active for those constructors.
+  tape.reset();
+  tape = std::make_unique<quadra::TapeContext>();
+}
 
 }  // namespace fims_quadra
 
@@ -53,3 +75,5 @@ void register_quadra(Rcpp::Module &m) {
       "quadra_backend_test", &quadra_backend_test,
       "Verify that Quadra automatic differentiation is linked into FIMS.");
 }
+
+#endif  // QUADRA_MODEL
