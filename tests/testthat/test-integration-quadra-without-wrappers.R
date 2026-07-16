@@ -124,6 +124,21 @@ test_that("Quadra model diagnostics return functional analysis", {
   )
   expect_true(diagnostics$laplace_structure$positive_definite)
   expect_true(all(is.finite(diagnostics$optimization$random_gradient)))
+  expect_equal(
+    diagnostics$optimization$joint_gradient,
+    fit$gradient,
+    tolerance = 1e-10
+  )
+  expect_equal(
+    diagnostics$optimization$joint_gradient_norm,
+    sqrt(sum(fit$gradient^2)),
+    tolerance = 1e-10
+  )
+  expect_equal(
+    diagnostics$optimization$max_abs_gradient,
+    max(abs(fit$gradient)),
+    tolerance = 1e-10
+  )
   expect_true(diagnostics$parameter_influence$available)
   expect_length(
     diagnostics$parameter_influence$ranking,

@@ -1112,9 +1112,8 @@ Rcpp::List EvaluateQuadraDenseHessian(Rcpp::NumericVector fixed_values,
 Rcpp::List quadra_model_diagnostics(Rcpp::NumericVector fixed_values,
                                     Rcpp::NumericVector random_values)
 {
-  if (!CreateQuadraModel())
-    Rcpp::stop("Unable to construct Quadra model.");
-
+  const Rcpp::List direct_joint =
+      EvaluateQuadraModel(fixed_values, random_values);
   auto info = fims_info::Information<QUADRA_FIMS_TYPE>::GetInstance();
   if (fixed_values.size() !=
           static_cast<R_xlen_t>(info->fixed_effects_parameters.size()) ||
@@ -1143,16 +1142,28 @@ Rcpp::List quadra_model_diagnostics(Rcpp::NumericVector fixed_values,
   for (R_xlen_t i = 0; i < fixed_values.size(); ++i)
     theta[i] = fixed_values[i];
 
-  Eigen::VectorXd fixed_gradient;
+  Eigen::VectorXd laplace_fixed_gradient;
   const auto start = std::chrono::steady_clock::now();
-  const double laplace_objective = objective(theta, fixed_gradient);
+  const double laplace_objective = objective(theta, laplace_fixed_gradient);
 
-  Eigen::VectorXd random_mode = Eigen::Map<Eigen::VectorXd>(
-      objective.random_mode_m.data(),
-      static_cast<Eigen::Index>(objective.random_mode_m.size()));
-  const auto joint = quadra::evaluate_joint_first_order(
-      model, parameters, theta, random_mode, objective.fixed_m,
-      objective.random_m);
+  const Rcpp::NumericVector fixed_gradient = direct_joint["fixed_gradient"];
+  const Rcpp::NumericVector random_gradient = direct_joint["random_gradient"];
+  const Rcpp::NumericVector joint_gradient = direct_joint["gradient"];
+  const double joint_objective = Rcpp::as<double>(direct_joint["objective"]);
+  double joint_gradient_squared_norm = 0.0;
+  double joint_max_abs_gradient = 0.0;
+  R_xlen_t joint_max_index = 0;
+  for (R_xlen_t i = 0; i < joint_gradient.size(); ++i)
+  {
+    const double value = joint_gradient[i];
+    joint_gradient_squared_norm += value * value;
+    if (std::abs(value) > joint_max_abs_gradient)
+    {
+      joint_max_abs_gradient = std::abs(value);
+      joint_max_index = i;
+    }
+  }
+  const double joint_gradient_norm = std::sqrt(joint_gradient_squared_norm);
 
   std::vector<std::string> random_names = info->random_effects_names;
   if (random_names.size() != objective.random_mode_m.size())
@@ -1163,26 +1174,31 @@ Rcpp::List quadra_model_diagnostics(Rcpp::NumericVector fixed_values,
   }
 
   quadra::FunctionalOptimizationSummary optimization;
-  optimization.objective_value = laplace_objective;
-  optimization.gradient_norm = fixed_gradient.norm();
+  optimization.objective_value = joint_objective;
+  optimization.gradient_norm = joint_gradient_norm;
   optimization.iterations = 0;
-  optimization.converged =
-      (fixed_gradient.size() == 0 ||
-       fixed_gradient.cwiseAbs().maxCoeff() < 1e-2) &&
-      joint.random_gradient.cwiseAbs().maxCoeff() < 1e-5;
+  optimization.converged = joint_max_abs_gradient < 1e-2;
   optimization.message = optimization.converged
                              ? "gradient-based diagnostic passed"
                              : "one or more diagnostic gradients need review";
-  if (fixed_gradient.size() > 0)
+  if (joint_gradient.size() > 0)
   {
-    Eigen::Index max_index = 0;
-    optimization.max_abs_gradient =
-        fixed_gradient.cwiseAbs().maxCoeff(&max_index);
-    optimization.max_gradient_value = fixed_gradient[max_index];
-    optimization.max_gradient_parameter =
-        static_cast<size_t>(max_index) < info->parameter_names.size()
-            ? info->parameter_names[static_cast<size_t>(max_index)]
-            : "fixed_" + std::to_string(max_index + 1);
+    optimization.max_abs_gradient = joint_max_abs_gradient;
+    optimization.max_gradient_value = joint_gradient[joint_max_index];
+    if (joint_max_index < fixed_gradient.size())
+      optimization.max_gradient_parameter =
+          static_cast<size_t>(joint_max_index) < info->parameter_names.size()
+              ? info->parameter_names[static_cast<size_t>(joint_max_index)]
+              : "fixed_" + std::to_string(joint_max_index + 1);
+    else
+    {
+      const size_t random_index = static_cast<size_t>(
+          joint_max_index - fixed_gradient.size());
+      optimization.max_gradient_parameter =
+          random_index < random_names.size()
+              ? random_names[random_index]
+              : "random_" + std::to_string(random_index + 1);
+    }
   }
 
   constexpr double nonzero_tolerance = 1e-8;
@@ -1192,9 +1208,7 @@ Rcpp::List quadra_model_diagnostics(Rcpp::NumericVector fixed_values,
           nonzero_tolerance, random_names, 10);
   report.parameter_geometry = quadra::summarize_parameter_geometry(
       objective.hessian_m,
-      std::vector<double>(joint.random_gradient.data(),
-                          joint.random_gradient.data() +
-                              joint.random_gradient.size()),
+      std::vector<double>(random_gradient.begin(), random_gradient.end()),
       random_names);
 
   const auto health = quadra::diagnostics::evaluate_model_health(
@@ -1278,11 +1292,9 @@ Rcpp::List quadra_model_diagnostics(Rcpp::NumericVector fixed_values,
   const double elapsed = std::chrono::duration<double>(
                              std::chrono::steady_clock::now() - start)
                              .count();
-  Rcpp::NumericVector fixed_gradient_r(
-      fixed_gradient.data(), fixed_gradient.data() + fixed_gradient.size());
-  Rcpp::NumericVector random_gradient_r(
-      joint.random_gradient.data(),
-      joint.random_gradient.data() + joint.random_gradient.size());
+  Rcpp::NumericVector laplace_fixed_gradient_r(
+      laplace_fixed_gradient.data(),
+      laplace_fixed_gradient.data() + laplace_fixed_gradient.size());
   return Rcpp::List::create(
       Rcpp::Named("model_health") = Rcpp::List::create(
           Rcpp::Named("overall") = health.overall,
@@ -1294,13 +1306,23 @@ Rcpp::List quadra_model_diagnostics(Rcpp::NumericVector fixed_values,
           Rcpp::Named("optimization_quality") = health.optimization_quality),
       Rcpp::Named("optimization") = Rcpp::List::create(
           Rcpp::Named("laplace_objective") = laplace_objective,
-          Rcpp::Named("joint_objective") = objective.joint_m,
+          Rcpp::Named("joint_objective") = joint_objective,
           Rcpp::Named("laplace_logdet") = objective.logdet_m,
           Rcpp::Named("laplace_constant") = objective.constant_m,
-          Rcpp::Named("fixed_gradient") = fixed_gradient_r,
-          Rcpp::Named("fixed_gradient_norm") = fixed_gradient.norm(),
-          Rcpp::Named("random_gradient") = random_gradient_r,
-          Rcpp::Named("random_gradient_norm") = joint.random_gradient.norm(),
+          Rcpp::Named("fixed_gradient") = fixed_gradient,
+          Rcpp::Named("fixed_gradient_norm") =
+              std::sqrt(std::inner_product(
+                  fixed_gradient.begin(), fixed_gradient.end(),
+                  fixed_gradient.begin(), 0.0)),
+          Rcpp::Named("random_gradient") = random_gradient,
+          Rcpp::Named("random_gradient_norm") =
+              std::sqrt(std::inner_product(
+                  random_gradient.begin(), random_gradient.end(),
+                  random_gradient.begin(), 0.0)),
+          Rcpp::Named("joint_gradient") = joint_gradient,
+          Rcpp::Named("joint_gradient_norm") = joint_gradient_norm,
+          Rcpp::Named("laplace_profile_fixed_gradient") =
+              laplace_fixed_gradient_r,
           Rcpp::Named("max_gradient_parameter") =
               optimization.max_gradient_parameter,
           Rcpp::Named("max_abs_gradient") = optimization.max_abs_gradient,
@@ -1493,6 +1515,8 @@ std::string quadra_model_diagnostics_md(Rcpp::List diagnostics)
      << number_value(optimization, "fixed_gradient_norm") << "` |\n";
   md << "| Random gradient norm | `"
      << number_value(optimization, "random_gradient_norm") << "` |\n";
+  md << "| Joint gradient norm | `"
+     << number_value(optimization, "joint_gradient_norm") << "` |\n";
   md << "| Maximum-gradient parameter | `"
      << code_text(text_value(optimization, "max_gradient_parameter"))
      << "` |\n";

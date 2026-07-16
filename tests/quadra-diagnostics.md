@@ -2,10 +2,10 @@
 
 ## Executive Summary
 
-- **Overall status:** `REVIEW`
-- **Confidence:** `LOW`
-- **Optimization quality:** `CHECK`
-- **Gradient quality:** `CHECK`
+- **Overall status:** `HEALTHY`
+- **Confidence:** `MODERATE`
+- **Optimization quality:** `GOOD`
+- **Gradient quality:** `PASS`
 - **Curvature:** `PASS`
 - **Conditioning:** `GOOD`
 
@@ -13,11 +13,11 @@
 
 | Check | Status |
 |---|---:|
-| Optimization | `CHECK` |
-| Gradient | `CHECK` |
+| Optimization | `PASS` |
+| Gradient | `PASS` |
 | Curvature | `PASS` |
 | Conditioning | `GOOD` |
-| Overall | `REVIEW` |
+| Overall | `HEALTHY` |
 
 ## Optimization
 
@@ -25,11 +25,12 @@
 |---|---:|
 | Laplace objective | `3231.27` |
 | Joint objective | `3164.83` |
-| Fixed gradient norm | `13.2802` |
-| Random gradient norm | `10.5654` |
-| Maximum-gradient parameter | `Fleet.1.log_Fmort.49` |
-| Maximum absolute gradient | `3.49172` |
-| Diagnostic convergence | `no` |
+| Fixed gradient norm | `0.000422085` |
+| Random gradient norm | `0.000215268` |
+| Joint gradient norm | `0.00047381` |
+| Maximum-gradient parameter | `Selectivity.2.inflection_point.364` |
+| Maximum absolute gradient | `0.000191407` |
+| Diagnostic convergence | `yes` |
 
 ## Curvature and Effective Structure
 
