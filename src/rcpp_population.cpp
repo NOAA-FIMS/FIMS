@@ -12,67 +12,135 @@ std::map<uint32_t, std::shared_ptr<PopulationInterfaceBase>>
     PopulationInterfaceBase::live_objects;
 
 #include <Rcpp.h>
-/**
- * Function to register population classes with the Rcpp module system.
- *
- */
+
+// ── XPtr type alias ──────────────────────────────────────────────────────────
+using SharedPopulation = std::shared_ptr<PopulationInterface>;
+
+// ── Creator ──────────────────────────────────────────────────────────────────
+Rcpp::XPtr<SharedPopulation> create_population_() {
+  auto obj = std::make_shared<PopulationInterface>();
+  return Rcpp::XPtr<SharedPopulation>(new SharedPopulation(obj), true);
+}
+
+// ── Scalar setters ───────────────────────────────────────────────────────────
+void set_population_constants_(Rcpp::XPtr<SharedPopulation> xp,
+                               int n_years, int n_ages, int n_lengths) {
+  (*xp)->n_years   = n_years;
+  (*xp)->n_ages    = n_ages;
+  (*xp)->n_lengths = n_lengths;
+}
+void set_population_process_ids_(Rcpp::XPtr<SharedPopulation> xp,
+                                 int maturity_id        = -999,
+                                 int growth_id          = -999,
+                                 int recruitment_id     = -999,
+                                 int recruitment_err_id = -999) {
+  (*xp)->maturity_id        = maturity_id;
+  (*xp)->growth_id          = growth_id;
+  (*xp)->recruitment_id     = recruitment_id;
+  (*xp)->recruitment_err_id = recruitment_err_id;
+}
+void set_population_name_(Rcpp::XPtr<SharedPopulation> xp,
+                          std::string name) {
+  (*xp)->name = name;
+}
+void add_fleet_to_population_(Rcpp::XPtr<SharedPopulation> xp,
+                              uint32_t fleet_id) {
+  (*xp)->fleet_ids->insert(fleet_id);
+}
+
+// ── VariableVector setters ───────────────────────────────────────────────────
+// Each setter resizes the vector, assigns initial values, and sets estimation
+// types from a character vector (length 1 is recycled across all elements).
+void set_population_log_M_(Rcpp::XPtr<SharedPopulation> xp,
+                           Rcpp::NumericVector values,
+                           Rcpp::CharacterVector estimation_types) {
+  PopulationInterface& pop = **xp;
+  pop.log_M.resize(values.size());
+  for (int i = 0; i < values.size(); i++) {
+    Variable& v = pop.log_M.storage_m->at(i);
+    v.initial_value_m = values[i];
+    v.estimation_type_m.set(
+        Rcpp::as<std::string>(estimation_types[estimation_types.size() == 1 ? 0 : i]));
+  }
+}
+
+void set_population_log_init_naa_(Rcpp::XPtr<SharedPopulation> xp,
+                                  Rcpp::NumericVector values,
+                                  Rcpp::CharacterVector estimation_types) {
+  PopulationInterface& pop = **xp;
+  pop.log_init_naa.resize(values.size());
+  for (int i = 0; i < values.size(); i++) {
+    Variable& v = pop.log_init_naa.storage_m->at(i);
+    v.initial_value_m = values[i];
+    v.estimation_type_m.set(
+        Rcpp::as<std::string>(estimation_types[estimation_types.size() == 1 ? 0 : i]));
+  }
+}
+
+void set_population_log_f_multiplier_(Rcpp::XPtr<SharedPopulation> xp,
+                                      Rcpp::NumericVector values,
+                                      Rcpp::CharacterVector estimation_types) {
+  PopulationInterface& pop = **xp;
+  pop.log_f_multiplier.resize(values.size());
+  for (int i = 0; i < values.size(); i++) {
+    Variable& v = pop.log_f_multiplier.storage_m->at(i);
+    v.initial_value_m = values[i];
+    v.estimation_type_m.set(
+        Rcpp::as<std::string>(estimation_types[estimation_types.size() == 1 ? 0 : i]));
+  }
+}
+
+void set_population_proportion_female_(Rcpp::XPtr<SharedPopulation> xp,
+                                       Rcpp::NumericVector values,
+                                       Rcpp::CharacterVector estimation_types) {
+  PopulationInterface& pop = **xp;
+  pop.proportion_female.resize(values.size());
+  for (int i = 0; i < values.size(); i++) {
+    Variable& v = pop.proportion_female.storage_m->at(i);
+    v.initial_value_m = values[i];
+    v.estimation_type_m.set(
+        Rcpp::as<std::string>(estimation_types[estimation_types.size() == 1 ? 0 : i]));
+  }
+}
+
+void set_population_ages_(Rcpp::XPtr<SharedPopulation> xp,
+                          Rcpp::NumericVector values) {
+  (*xp)->ages.resize(values.size());
+  for (int i = 0; i < values.size(); i++) {
+    (*xp)->ages[i] = values[i];
+  }
+}
+
+// ── ID getter ────────────────────────────────────────────────────────────────
+uint32_t get_population_id_(Rcpp::XPtr<SharedPopulation> xp) {
+  return (*xp)->get_id();
+}
+
+// ── Base-class conversion for CreateTMBModel() ───────────────────────────────
+using SharedBase = std::shared_ptr<FIMSRcppInterfaceBase>;
+
+Rcpp::XPtr<SharedBase> population_to_fims_xptr_(
+    Rcpp::XPtr<SharedPopulation> xp) {
+  SharedBase base = *xp;  // implicit upcast: shared_ptr<Derived> -> shared_ptr<Base>
+  return Rcpp::XPtr<SharedBase>(new SharedBase(base), true);
+}
+
+// ── Module registration ───────────────────────────────────────────────────────
 void register_population(Rcpp::Module& m) {
-  Rcpp::class_<PopulationInterface>(
-      "Population",
-      "See "
-      "https://noaa-fims.github.io/FIMS/doxygen/classPopulationInterface.html.")
-      .constructor()
-      .method("get_id", &PopulationInterface::get_id)
-      .field("n_ages", &PopulationInterface::n_ages)
-      .field("n_fleets", &PopulationInterface::n_fleets)
-      .field("n_years", &PopulationInterface::n_years)
-      .field("n_lengths", &PopulationInterface::n_lengths)
-      .field("log_M", &PopulationInterface::log_M)
-      .field("log_f_multiplier", &PopulationInterface::log_f_multiplier)
-      .field("spawning_biomass_ratio",
-             &PopulationInterface::spawning_biomass_ratio)
-      .field("log_init_naa", &PopulationInterface::log_init_naa)
-      .field("proportion_female", &PopulationInterface::proportion_female)
-      .field("ages", &PopulationInterface::ages)
-      .field("total_landings_weight",
-             &PopulationInterface::
-                 total_landings_weight)
-      .field("total_landings_numbers",
-             &PopulationInterface::
-                 total_landings_numbers)
-      .field("mortality_F",
-             &PopulationInterface::mortality_F)
-      .field("mortality_M",
-             &PopulationInterface::mortality_M)
-      .field("mortality_Z",
-             &PopulationInterface::mortality_Z)
-      .field("numbers_at_age",
-             &PopulationInterface::numbers_at_age)
-      .field("unfished_numbers_at_age",
-             &PopulationInterface::
-                 unfished_numbers_at_age)
-      .field("biomass",
-             &PopulationInterface::biomass)
-      .field("spawning_biomass",
-             &PopulationInterface::
-                 spawning_biomass)
-      .field("unfished_biomass",
-             &PopulationInterface::unfished_biomass)
-      .field("unfished_spawning_biomass",
-             &PopulationInterface::
-                 unfished_spawning_biomass)
-      .field("proportion_mature_at_age",
-             &PopulationInterface::
-                 proportion_mature_at_age)
-      .field("expected_recruitment",
-             &PopulationInterface::
-                 expected_recruitment)
-      .field("sum_selectivity",
-             &PopulationInterface::sum_selectivity)
-      .method("SetMaturityID", &PopulationInterface::SetMaturityID)
-      .method("SetGrowthID", &PopulationInterface::SetGrowthID)
-      .method("SetRecruitmentID", &PopulationInterface::SetRecruitmentID)
-      .method("AddFleet", &PopulationInterface::AddFleet)
-      .method("SetName", &PopulationInterface::SetName)
-      .method("GetName", &PopulationInterface::GetName);
+  // XPtr creator, setters, and conversion — trailing underscores prevent name
+  // collision with the R wrapper functions that own the clean names (Section 4b
+  // of the design doc).
+  Rcpp::function("create_population_",              &create_population_);
+  Rcpp::function("set_population_constants_",        &set_population_constants_);
+  Rcpp::function("set_population_process_ids_",      &set_population_process_ids_);
+  Rcpp::function("set_population_name_",            &set_population_name_);
+  Rcpp::function("add_fleet_to_population_",        &add_fleet_to_population_);
+  Rcpp::function("set_population_log_M_",           &set_population_log_M_);
+  Rcpp::function("set_population_log_init_naa_",    &set_population_log_init_naa_);
+  Rcpp::function("set_population_log_f_multiplier_",&set_population_log_f_multiplier_);
+  Rcpp::function("set_population_proportion_female_",
+                                                    &set_population_proportion_female_);
+  Rcpp::function("set_population_ages_",            &set_population_ages_);
+  Rcpp::function("get_population_id_",              &get_population_id_);
+  Rcpp::function("population_to_fims_xptr_",        &population_to_fims_xptr_);
 }
