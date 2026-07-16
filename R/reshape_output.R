@@ -1,20 +1,4 @@
 # This file contains many functions to reshape output from get_output()
-# To remove the NOTE `no visible binding for global variable`
-utils::globalVariables(c(
-  "data", "data_id", "data_ids", "data_type",
-  "delete_me",
-  "density_component",
-  "derived_quantities", "dimensionality",
-  "fleet",
-  "join_by", "json",
-  "input_type",
-  "label", "label_splits", "likelihood", "log_sd_values",
-  "module_name", "module_id", "module_type",
-  "observed_data_id", "observed_values",
-  "parameter_min", "parameter_max",
-  "parameters",
-  "population"
-))
 
 #' Reshape JSON estimates
 #'
@@ -33,13 +17,10 @@ reshape_json_estimates <- function(model_output) {
     dplyr::left_join(x,
       y = dplyr::filter(
         density_tibble,
-        input_type == "random_effects"
+        .data$input_type == "random_effects"
       ) |>
         dplyr::select(
-          -module_name,
-          -module_id,
-          -module_type,
-          -observed_data_id
+          -dplyr::all_of(c("module_name", "module_id", "module_type", "observed_data_id"))
         ),
       by = c(
         "estimation_type" = "input_type",
@@ -55,7 +36,7 @@ reshape_json_estimates <- function(model_output) {
       "max_gradient_component", "gradient",
       "population_ids", "fleet_ids", "log"
     )],
-    \(x) tidyr::unnest_wider(tibble::tibble(json = x), json)
+    \(x) tidyr::unnest_wider(tibble::tibble(json = x), dplyr::all_of("json"))
   )
 
 
@@ -64,9 +45,9 @@ reshape_json_estimates <- function(model_output) {
   #       parameter values, which is fragile
   density_information <- read_list[["density_components"]] |>
     dplyr::mutate(
-      density_component = purrr::map(density_component, density_to_tibble)
+      density_component = purrr::map(.data$density_component, density_to_tibble)
     ) |>
-    tidyr::unnest(density_component)
+    tidyr::unnest(dplyr::all_of("density_component"))
 
   # Process the module parameters
   module_information <- purrr::map_df(
@@ -81,63 +62,63 @@ reshape_json_estimates <- function(model_output) {
     .f = \(y) dplyr::mutate(
       y,
       parameters = purrr::map(
-        parameters,
+        .data$parameters,
         \(x) purrr::map_df(x, dimension_folded_to_tibble)
       )
     )
   ) |>
-    tidyr::unnest(parameters) |>
+    tidyr::unnest(dplyr::all_of("parameters")) |>
     join_density_information(density_information)
 
   # Process the fleet-level information
   fleet_density_data <- read_list[["fleets"]] |>
-    dplyr::select(module_id, data_ids) |>
+    dplyr::select(dplyr::all_of(c("module_id", "data_ids"))) |>
     dplyr::mutate(
       data_ids = purrr::map(
-        data_ids,
+        .data$data_ids,
         \(y) tibble::enframe(unlist(y), name = "data_type", value = "data_id")
       )
     ) |>
-    tidyr::unnest(data_ids) |>
-    dplyr::filter(data_id != -999) |>
+    tidyr::unnest(dplyr::all_of("data_ids")) |>
+    dplyr::filter(.data$data_id != -999) |>
     dplyr::mutate(
-      name = paste(data_type, "expected", sep = "_")
+      name = paste(.data$data_type, "expected", sep = "_")
     ) |>
     dplyr::left_join(
       y = read_list[["density_components"]] |>
         dplyr::filter(
-          observed_data_id != -999
+          .data$observed_data_id != -999
         ) |>
         dplyr::rename(distribution = "module_type") |>
         dplyr::select(-dplyr::starts_with("module")),
       by = c("data_id" = "observed_data_id")
     ) |>
     dplyr::mutate(
-      density_component = purrr::map(density_component, density_to_tibble)
+      density_component = purrr::map(.data$density_component, density_to_tibble)
     ) |>
-    tidyr::unnest(density_component) |>
+    tidyr::unnest(dplyr::all_of("density_component")) |>
     dplyr::select(-dplyr::starts_with("data_")) |>
-    dplyr::group_by(module_id, name) |>
+    dplyr::group_by(.data$module_id, .data$name) |>
     dplyr::mutate(join_by = dplyr::row_number()) |>
     dplyr::ungroup()
 
   fleet_information <- read_list[["fleets"]] |>
     tidyr::pivot_longer(
-      cols = c(parameters, derived_quantities),
+      cols = dplyr::all_of(c("parameters", "derived_quantities")),
       names_to = "delete_me",
       values_to = "parameters"
     ) |>
-    dplyr::select(-delete_me, -data_ids) |>
+    dplyr::select(-dplyr::all_of(c("delete_me", "data_ids"))) |>
     # Remove column ids that are not currently needed
     dplyr::select(-dplyr::matches("^n.+s$")) |>
     dplyr::mutate(
       parameters = purrr::map(
-        parameters,
+        .data$parameters,
         \(x) purrr::map_df(x, dimension_folded_to_tibble)
       )
     ) |>
-    tidyr::unnest(parameters) |>
-    dplyr::group_by(module_id, name) |>
+    tidyr::unnest(dplyr::all_of("parameters")) |>
+    dplyr::group_by(.data$module_id, .data$name) |>
     dplyr::mutate(join_by = dplyr::row_number()) |>
     dplyr::ungroup() |>
     dplyr::left_join(
@@ -145,33 +126,33 @@ reshape_json_estimates <- function(model_output) {
       by = c("module_id", "name", "join_by"),
       suffix = c("", "_density")
     ) |>
-    dplyr::select(-join_by)
+    dplyr::select(-dplyr::all_of("join_by"))
 
   # Process the data components
   # TODO: Data component needs actual uncertainty instead of 0
   data_information <- read_list[["data"]] |>
     dplyr::mutate(
-      dimensionality = purrr::map(dimensionality, \(x) dimensions_to_tibble(x))
+      dimensionality = purrr::map(.data$dimensionality, \(x) dimensions_to_tibble(x))
     ) |>
-    tidyr::unnest(c(dimensionality, value, uncertainty)) |>
-    dplyr::mutate(value = unlist(value), uncertainty = unlist(uncertainty))
+    tidyr::unnest(dplyr::all_of(c("dimensionality", "value", "uncertainty"))) |>
+    dplyr::mutate(value = unlist(.data$value), uncertainty = unlist(.data$uncertainty))
 
   # Process the population data
   population_information <- read_list[["populations"]] |>
     tidyr::pivot_longer(
-      cols = c(parameters, derived_quantities),
+      cols = dplyr::all_of(c("parameters", "derived_quantities")),
       names_to = "delete_me",
       values_to = "parameters"
     ) |>
     # TODO: Think about these ids when we have more than one population
-    dplyr::select(-delete_me, -dplyr::ends_with("_id"), -population) |>
+    dplyr::select(-dplyr::all_of("delete_me"), -dplyr::ends_with("_id"), -dplyr::all_of("population")) |>
     dplyr::mutate(
       parameters = purrr::map(
-        parameters,
+        .data$parameters,
         \(x) purrr::map_df(x, dimension_folded_to_tibble)
       )
     ) |>
-    tidyr::unnest(parameters) |>
+    tidyr::unnest(dplyr::all_of("parameters")) |>
     join_density_information(density_information)
 
   # TODO: Change some column names
@@ -182,18 +163,17 @@ reshape_json_estimates <- function(model_output) {
     population_information
   ) |>
     dplyr::select(
-      module_name, module_id, module_type,
-      "label" = name,
-      type, type_id, "parameter_id" = id,
-      fleet, dplyr::ends_with("_i"),
-      "input" = value,
+      dplyr::all_of(c("module_name", "module_id", "module_type")),
+      "label" = dplyr::all_of("name"),
+      dplyr::all_of(c("type", "type_id")), "parameter_id" = dplyr::all_of("id"),
+      dplyr::all_of("fleet"), dplyr::ends_with("_i"),
+      "input" = dplyr::all_of("value"),
       estimated = "estimated_value",
       "expected" = expected_values,
       "observed" = observed_values,
-      estimation_type,
-      distribution,
-      input_type, lpdf = "lpdf_value", likelihood,
-      "log_sd" = log_sd_values,
+      dplyr::all_of(c("estimation_type", "distribution", "input_type")),
+      lpdf = "lpdf_value", dplyr::all_of("likelihood"),
+      "log_sd" = dplyr::all_of("log_sd_values"),
       dplyr::everything()
     )
 }
@@ -212,12 +192,18 @@ reshape_json_estimates <- function(model_output) {
 #'   opt is an empty list and is not used in the function.
 #' @param parameter_names A character vector of parameter names. This is used to
 #'   identify the parameters in the `std` object.
+#' @param precomputed_gradient A numeric vector of pre-computed gradient values
+#'   at the MLE, typically from `get_gradient(x)`. When provided, this avoids
+#'   a second call to `obj[["gr"]]()`, which would crash after [clear()] has
+#'   freed the C++ memory. If `NULL` (default), the gradient is computed
+#'   directly from `obj[["gr"]](opt[["par"]])`.
 #' @return A tibble containing the reshaped estimates (i.e., parameters and
 #' derived quantities).
 reshape_tmb_estimates <- function(obj,
                                   sdreport = NULL,
                                   opt = NULL,
-                                  parameter_names) {
+                                  parameter_names,
+                                  precomputed_gradient = NULL) {
   # Outline for the estimates table
   estimates_outline <- tibble::tibble(
     # The FIMS Rcpp module
@@ -260,7 +246,13 @@ reshape_tmb_estimates <- function(obj,
           rep(NA_real_, derived_quantity_nrow)
         ),
         gradient = c(
-          obj[["gr"]](opt[["par"]]),
+          if (!is.null(precomputed_gradient)) {
+            precomputed_gradient
+          } else if (length(opt) > 0) {
+            obj[["gr"]](opt[["par"]])
+          } else {
+            rep(NA_real_, length(parameter_names))
+          },
           rep(NA_real_, derived_quantity_nrow)
         )
       )
@@ -275,19 +267,19 @@ reshape_tmb_estimates <- function(obj,
 
   estimates <- estimates |>
     # Split labels and extract module, id, label, and parameter id
-    dplyr::mutate(label_splits = strsplit(label, split = "\\.")) |>
+    dplyr::mutate(label_splits = strsplit(.data$label, split = "\\.")) |>
     dplyr::rowwise() |>
     # TODO: the code could be simplified using tidyr::separate_wider_*().
     # However, doing so would require avoiding pre-specification of these columns
     # in the estimates_outline tibble. Consider updating the code if we decide
     # not to create the `estimates_outline` tibble in advance.
     dplyr::mutate(
-      module_name = ifelse(length(label_splits) > 1, label_splits[[1]], NA_character_),
-      module_id = ifelse(length(label_splits) > 1, as.integer(label_splits[[2]]), NA_integer_),
-      label = ifelse(length(label_splits) > 1, label_splits[[3]], label),
-      parameter_id = ifelse(length(label_splits) > 1, as.integer(label_splits[[4]]), NA_integer_)
+      module_name = ifelse(length(.data$label_splits) > 1, .data$label_splits[[1]], NA_character_),
+      module_id = ifelse(length(.data$label_splits) > 1, as.integer(.data$label_splits[[2]]), NA_integer_),
+      label = ifelse(length(.data$label_splits) > 1, .data$label_splits[[3]], .data$label),
+      parameter_id = ifelse(length(.data$label_splits) > 1, as.integer(.data$label_splits[[4]]), NA_integer_)
     ) |>
-    dplyr::select(-label_splits) |>
+    dplyr::select(-dplyr::all_of("label_splits")) |>
     dplyr::ungroup()
 }
 
@@ -332,8 +324,8 @@ dimension_folded_to_tibble <- function(section) {
         type = section[["type"]]
       ) |>
       dplyr::bind_cols(
-        tibble::tibble(data = section[["values"]]) |>
-          tidyr::unnest_wider(data)
+        tibble::tibble(.value_data = section[["values"]]) |>
+          tidyr::unnest_wider(dplyr::all_of(".value_data"))
       )
   } else {
     temp |>
@@ -478,5 +470,5 @@ density_to_tibble <- function(data) {
   data |>
     tibble::as_tibble() |>
     tidyr::unnest(dplyr::contains("value")) |>
-    dplyr::rename(likelihood = value)
+    dplyr::rename(likelihood = dplyr::all_of("value"))
 }

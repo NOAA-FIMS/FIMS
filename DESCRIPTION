@@ -76,6 +76,7 @@ Depends:
 Imports:
     cli,
     dplyr,
+    generics (>= 0.1.3),
     ggplot2,
     glue,
     graphics,
@@ -84,19 +85,15 @@ Imports:
     purrr,
     Rcpp,
     rlang,
-    scales,
     stats,
     tibble,
     TMB (>= 1.8.0),
-    utils
+    utils,
+    yardstick (>= 1.3.0)
 Suggests:
     covr,
     devtools,
-    DT,
-    htmltools,
     knitr,
-    lozen,
-    markdown,
     microbenchmark,
     parallel,
     pkgdown,
@@ -106,7 +103,6 @@ Suggests:
     SparseNUTS,
     stockplotr,
     styler,
-    testdown,
     testthat (>= 3.0.0),
     tidyr,
     usethis,
@@ -119,9 +115,7 @@ VignetteBuilder:
     knitr
 Remotes:
     github::nmfs-ost/stockplotr,
-    github::noaa-afsc/SparseNUTS,
-    github::ThinkR-open/lozen,
-    github::ThinkR-open/testdown
+    github::noaa-afsc/SparseNUTS
 Additional_repositories: 
     https://noaa-fisheries-integrated-toolbox.r-universe.dev
 Config/Rcpp/registration: none
@@ -133,4 +127,5 @@ Language: en-US
 LazyData: true
 NeedsCompilation: yes
 Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.3
 SystemRequirements: GNU make

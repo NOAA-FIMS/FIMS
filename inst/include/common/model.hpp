@@ -86,6 +86,7 @@ class Model {  // may need singleton
       std::shared_ptr<fims_popdy::FisheryModelBase<Type>> m = (*m_it).second;
       m->Prepare();
       m->Evaluate();
+      // TODO(EDM): Compute EDM predictions before evaluating data likelihoods.
     }
 
     // Compute EDM predictions before evaluating data likelihoods.

@@ -250,7 +250,7 @@ test_that("`FIMSFrame()` returns correct error messages", {
     capture_messages(FIMSFrame(
       dplyr::filter(data_big, !(age == 3 & type == "age_comp" & timing == 2))
     )),
-    regexp = "Please check your age-composition data for missing ages"
+    regexp = "Please check the age-composition data for missing ages"
   )
 
   #' @description Test that `FIMSFrame` validators pick up on a missing length in length-composition data.
@@ -258,7 +258,7 @@ test_that("`FIMSFrame()` returns correct error messages", {
     capture_messages(FIMSFrame(
       dplyr::filter(data_big, !(length == 100 & type == "length_comp" & timing == 3))
     )),
-    regexp = "Please check your length-composition data for missing lengths"
+    regexp = "Please check the length-composition data for missing lengths"
   )
 
   #' @description Test that `FIMSFrame()` errors when age data are non-integers.
@@ -307,16 +307,16 @@ fleet_names_age_comp <- dplyr::filter(
   .data = as.data.frame(get_data(fims_frame)),
   type == "age_comp"
 ) |>
-  dplyr::distinct(name) |>
-  dplyr::pull(name)
+  dplyr::distinct(fleet) |>
+  dplyr::pull(fleet)
 n_age_comp <- length(fleet_names_age_comp)
 
 fleet_names_index <- dplyr::filter(
   .data = as.data.frame(get_data(fims_frame)),
   type == "index"
 ) |>
-  dplyr::distinct(name) |>
-  dplyr::pull(name)
+  dplyr::distinct(fleet) |>
+  dplyr::pull(fleet)
 n_index <- length(fleet_names_index)
 
 ## IO correctness ----

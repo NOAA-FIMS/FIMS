@@ -1,9 +1,3 @@
-# To remove the WARNING
-# no visible binding for global variable
-utils::globalVariables(c(
-  "everything", "fleet_name"
-))
-
 #' Create a default FIMS configuration tibble
 #'
 #' @description
@@ -53,7 +47,7 @@ utils::globalVariables(c(
 #'     "Data", "Selectivity", "Recruitment", "Growth", "Maturity"). These
 #'     entries are always written in PascalCase to match the names used in the
 #'     C++ code.}
-#'   \item{\code{fleet_name}:}{The name of the fleet the module applies to. This
+#'   \item{\code{fleet}:}{The name of the fleet the module applies to. This
 #'     will be `NA` for non-fleet-specific modules like "Recruitment".}
 #'   \item{\code{data}:}{A list-column containing a `tibble` with detailed
 #'     configurations. Unnesting this column reveals:
@@ -95,10 +89,10 @@ utils::globalVariables(c(
 #'   dplyr::rows_update(
 #'     tibble::tibble(
 #'       module_name = "Selectivity",
-#'       fleet_name = "fleet1",
+#'       fleet = "fleet1",
 #'       module_type = "DoubleLogistic"
 #'     ),
-#'     by = c("module_name", "fleet_name")
+#'     by = c("module_name", "fleet")
 #'   ) |>
 #'   print()
 create_default_configurations <- function(
@@ -122,19 +116,18 @@ create_default_configurations <- function(
   # for determining which modules are needed for each fleet.
   unique_fleet_types <- data |>
     get_data() |>
-    dplyr::distinct(name, type) |>
+    dplyr::distinct(.data$fleet, .data$type) |>
     # Convert type from snake_case to PascalCase
-    dplyr::mutate(module_type = snake_to_pascal(type)) |>
+    dplyr::mutate(module_type = snake_to_pascal(.data$type)) |>
     # Set module_type to NA for weight-at-age and age-to-length-conversion
     dplyr::mutate(module_type = dplyr::case_when(
-      type == "weight_at_age" ~ NA_character_,
-      type == "age_to_length_conversion" ~ NA_character_,
-      TRUE ~ module_type
+      .data$type == "weight_at_age" ~ NA_character_,
+      .data$type == "age_to_length_conversion" ~ NA_character_,
+      TRUE ~ .data$module_type
     )) |>
     # Remove any combinations where the type did not match a known module.
-    dplyr::filter(!is.na(module_type)) |>
-    dplyr::rename(fleet_name = name) |>
-    dplyr::select(-type)
+    dplyr::filter(!is.na(.data$module_type)) |>
+    dplyr::select(-dplyr::all_of("type"))
 
   # Define a template for data modules (comps, landings, index).
   # This specifies the default distribution for each type of data.
@@ -161,7 +154,7 @@ create_default_configurations <- function(
     # Create these rows by getting distinct fleet names and joining them
     # with the selectivity template.
     selectivity_config <- unique_fleet_types |>
-      dplyr::distinct(fleet_name) |>
+      dplyr::distinct(.data$fleet) |>
       dplyr::mutate(
         module_name = "Selectivity",
         module_type = "Logistic"
@@ -187,14 +180,15 @@ create_default_configurations <- function(
     # Add model_family column
     dplyr::mutate(model_family = model_family) |>
     # Arrange for readability.
-    dplyr::arrange(fleet_name, module_name) |>
+    dplyr::arrange(.data$fleet, .data$module_name) |>
     # Reorder columns
     dplyr::select(
-      model_family, module_name, module_type, fleet_name, everything()
+      dplyr::all_of(c("model_family", "module_name", "module_type", "fleet")),
+      dplyr::everything()
     ) |>
     # Nest the configuration details into a list-column called 'data'.
     # This creates the final, structured output format expected by FIMS.
-    tidyr::nest(.by = c(model_family, module_name, fleet_name))
+    tidyr::nest(.by = c("model_family", "module_name", "fleet"))
 }
 
 #' Convert snake_case strings to PascalCase

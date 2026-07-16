@@ -1,10 +1,7 @@
-# Tests R-universe builds for pull requests to main.
+# Tests R-universe builds when manually dispatched.
 name: Test R-universe
 
 on:
-  pull_request:
-    branches:
-      - main
   workflow_dispatch:
 
 permissions:

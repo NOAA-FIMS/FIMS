@@ -22,29 +22,29 @@
 \alias{model_age_to_length_conversion,data.frame-method}
 \title{Get a vector of data to be passed to a FIMS module from a FIMSFrame object}
 \usage{
-model_landings(x, fleet_name)
+model_landings(x, fleet)
 
-\S4method{model_landings}{FIMSFrame}(x, fleet_name)
+\S4method{model_landings}{FIMSFrame}(x, fleet)
 
-\S4method{model_landings}{data.frame}(x, fleet_name)
+\S4method{model_landings}{data.frame}(x, fleet)
 
-model_index(x, fleet_name)
+model_index(x, fleet)
 
-\S4method{model_index}{FIMSFrame}(x, fleet_name)
+\S4method{model_index}{FIMSFrame}(x, fleet)
 
-\S4method{model_index}{data.frame}(x, fleet_name)
+\S4method{model_index}{data.frame}(x, fleet)
 
-model_age_comp(x, fleet_name)
+model_age_comp(x, fleet)
 
-\S4method{model_age_comp}{FIMSFrame}(x, fleet_name)
+\S4method{model_age_comp}{FIMSFrame}(x, fleet)
 
-\S4method{model_age_comp}{data.frame}(x, fleet_name)
+\S4method{model_age_comp}{data.frame}(x, fleet)
 
-model_length_comp(x, fleet_name)
+model_length_comp(x, fleet)
 
-\S4method{model_length_comp}{FIMSFrame}(x, fleet_name)
+\S4method{model_length_comp}{FIMSFrame}(x, fleet)
 
-\S4method{model_length_comp}{data.frame}(x, fleet_name)
+\S4method{model_length_comp}{data.frame}(x, fleet)
 
 model_weight_at_age(x)
 
@@ -61,9 +61,9 @@ model_age_to_length_conversion(x)
 \arguments{
 \item{x}{An object returned from \code{\link[=FIMSFrame]{FIMSFrame()}}.}
 
-\item{fleet_name}{A string, or vector of strings, specifying the name of the
-fleet(s) of interest that you want landings data for. The strings must
-exactly match strings in the column \code{"name"} of \code{get_data(x)}.}
+\item{fleet}{A string, or vector of strings, specifying the name of the
+fleet(s) of interest that you want data for. The strings must
+exactly match strings in the \code{"fleet"} column of \code{get_data(x)}.}
 }
 \value{
 All of the \verb{model_*()} functions return vectors of data. Currently, the

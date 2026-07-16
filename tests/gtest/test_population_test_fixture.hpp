@@ -106,6 +106,10 @@ class CAAInitializeTestFixture : public testing::Test {
 
       this->catch_at_age_model->populations[p]->proportion_female.resize(
           this->catch_at_age_model->populations[p]->n_ages);
+      for (size_t a = 0; a < this->catch_at_age_model->populations[p]->n_ages;
+           a++) {
+        this->catch_at_age_model->populations[p]->proportion_female[a] = 0.5;
+      }
 
       this->catch_at_age_model->populations[p]->spawning_biomass_ratio.resize(
           this->catch_at_age_model->populations[p]->n_years + 1);
@@ -175,9 +179,6 @@ class CAAInitializeTestFixture : public testing::Test {
 
       derived_quantities["log_index_expected"] =
           fims::Vector<double>(fleet->n_years);
-
-      //
-      derived_quantities["catch_index"] = fims::Vector<double>(fleet->n_years);
 
       derived_quantities["expected_catch"] =
           fims::Vector<double>(fleet->n_years);
@@ -341,9 +342,10 @@ class CAAEvaluateTestFixture : public testing::Test {
     double prop_female_max = 0.9;
     std::uniform_real_distribution<double> prop_female_distribution(
         prop_female_min, prop_female_max);
+    double prop_female = prop_female_distribution(generator);
+    catch_at_age_model->populations[0]->proportion_female.resize(n_ages);
     for (int i = 0; i < n_ages; i++) {
-      catch_at_age_model->populations[0]->proportion_female[i] =
-          prop_female_distribution(generator);
+      catch_at_age_model->populations[0]->proportion_female[i] = prop_female;
     }
 
     // numbers_at_age
@@ -464,6 +466,10 @@ class CAAEvaluateTestFixture : public testing::Test {
 
       this->catch_at_age_model->populations[p]->proportion_female.resize(
           this->catch_at_age_model->populations[p]->n_ages);
+      for (size_t a = 0; a < this->catch_at_age_model->populations[p]->n_ages;
+           a++) {
+        this->catch_at_age_model->populations[p]->proportion_female[a] = 0.5;
+      }
 
       this->catch_at_age_model->populations[p]->spawning_biomass_ratio.resize(
           this->catch_at_age_model->populations[p]->n_years + 1);
@@ -533,9 +539,6 @@ class CAAEvaluateTestFixture : public testing::Test {
 
       derived_quantities["log_index_expected"] =
           fims::Vector<double>(fleet->n_years);
-
-      //
-      derived_quantities["catch_index"] = fims::Vector<double>(fleet->n_years);
 
       derived_quantities["expected_catch"] =
           fims::Vector<double>(fleet->n_years);
@@ -759,6 +762,10 @@ class CAAPrepareTestFixture : public testing::Test {
 
       this->catch_at_age_model->populations[p]->proportion_female.resize(
           this->catch_at_age_model->populations[p]->n_ages);
+      for (size_t a = 0; a < this->catch_at_age_model->populations[p]->n_ages;
+           a++) {
+        this->catch_at_age_model->populations[p]->proportion_female[a] = 0.5;
+      }
 
       this->catch_at_age_model->populations[p]->spawning_biomass_ratio.resize(
           this->catch_at_age_model->populations[p]->n_years + 1);
@@ -828,9 +835,6 @@ class CAAPrepareTestFixture : public testing::Test {
 
       derived_quantities["log_index_expected"] =
           fims::Vector<double>(fleet->n_years);
-
-      //
-      derived_quantities["catch_index"] = fims::Vector<double>(fleet->n_years);
 
       derived_quantities["expected_catch"] =
           fims::Vector<double>(fleet->n_years);

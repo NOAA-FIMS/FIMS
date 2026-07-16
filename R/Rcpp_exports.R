@@ -8,13 +8,12 @@
 #' [NOAA-FIMS C++ Documentation](https://noaa-fims.github.io/FIMS/doxygen/)
 #'
 #' @name Cpp_classes
-#' @aliases AgeComp BevertonHoltRecruitment CatchAtAge DelayEmbedding DlnormDistribution DmultinomDistribution DnormDistribution DoubleLogisticSelectivity EWAAGrowth Fleet Index Landings LengthComp LogDevsRecruitmentProcess LogRRecruitmentProcess LogisticMaturity LogisticSelectivity Parameter ParameterVector Population RealVector SharedInt SharedReal SharedString
+#' @aliases AgeComp BevertonHoltRecruitment CatchAtAge DlnormDistribution DmultinomDistribution DnormDistribution DoubleLogisticSelectivity EWAAGrowth Fleet Index Landings LengthComp LogDevsRecruitmentProcess LogRRecruitmentProcess LogisticMaturity LogisticSelectivity Variable VariableVector Population RealVector SharedInt SharedReal SharedString
 #'
 #' @details
 #' - [AgeComp](https://noaa-fims.github.io/FIMS/doxygen/classAgeCompDataInterface.html)
 #' - [BevertonHoltRecruitment](https://noaa-fims.github.io/FIMS/doxygen/classBevertonHoltRecruitmentInterface.html)
 #' - [CatchAtAge](https://noaa-fims.github.io/FIMS/doxygen/classCatchAtAgeInterface.html)
-#' - [DelayEmbedding](https://noaa-fims.github.io/FIMS/doxygen/classDelayEmbeddingInterface.html)
 #' - [DlnormDistribution](https://noaa-fims.github.io/FIMS/doxygen/classDlnormDistributionsInterface.html)
 #' - [DmultinomDistribution](https://noaa-fims.github.io/FIMS/doxygen/classDmultinomDistributionsInterface.html)
 #' - [DnormDistribution](https://noaa-fims.github.io/FIMS/doxygen/classDnormDistributionsInterface.html)
@@ -28,13 +27,13 @@
 #' - [LogRRecruitmentProcess](https://noaa-fims.github.io/FIMS/doxygen/classLogRRecruitmentInterface.html)
 #' - [LogisticMaturity](https://noaa-fims.github.io/FIMS/doxygen/classLogisticMaturityInterface.html)
 #' - [LogisticSelectivity](https://noaa-fims.github.io/FIMS/doxygen/classLogisticSelectivityInterface.html)
-#' - [Parameter](https://noaa-fims.github.io/FIMS/doxygen/classParameter.html)
-#' - [ParameterVector](https://noaa-fims.github.io/FIMS/doxygen/classParameterVector.html)
 #' - [Population](https://noaa-fims.github.io/FIMS/doxygen/classPopulationInterface.html)
 #' - [RealVector](https://noaa-fims.github.io/FIMS/doxygen/classRealVector.html)
 #' - [SharedInt](https://noaa-fims.github.io/FIMS/doxygen/classSharedInt.html)
 #' - [SharedReal](https://noaa-fims.github.io/FIMS/doxygen/classSharedReal.html)
 #' - [SharedString](https://noaa-fims.github.io/FIMS/doxygen/classSharedString.html)
+#' - [Variable](https://noaa-fims.github.io/FIMS/doxygen/classVariable.html)
+#' - [VariableVector](https://noaa-fims.github.io/FIMS/doxygen/classVariableVector.html)
 NULL
 
 #' C++ Functions Exported via Rcpp

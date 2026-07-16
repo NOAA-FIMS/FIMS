@@ -1,20 +1,3 @@
-# To remove the NOTE
-# no visible binding for global variable
-utils::globalVariables(c(
-  "parameter_id", "module_name", "module_id", "label",
-  "estimate", "estimate.x", "estimate.y",
-  "initial", "initial.x", "initial.y",
-  "derived_quantity_id",
-  "distribution", "gradient",
-  "log_like_cv",
-  "module_type", "n", "type_id", "values",
-  "module_name.x", "module_name.y",
-  "module_id.x", "module_id.y",
-  "module_id_init",
-  "module_type.x", "module_type.y",
-  "unique_id"
-))
-
 # Developers: ----
 
 # This file defines the parent class of FIMSFit and its potential children. The
@@ -44,6 +27,7 @@ methods::setClass(
     obj = "list",
     opt = "list",
     max_gradient = "numeric",
+    gradient = "numeric",
     report = "list",
     sdreport = "sdreportOrList",
     number_of_parameters = "integer",
@@ -192,6 +176,19 @@ methods::setGeneric("get_max_gradient", function(x) standardGeneric("get_max_gra
 methods::setMethod("get_max_gradient", "FIMSFit", function(x) x@max_gradient)
 
 #' @return
+#' [get_gradient()] returns the per-parameter gradient vector at the MLE as
+#' stored during fitting. Unlike calling `get_obj(x)[["gr"]](get_opt(x)[["par"]])`
+#' this function is safe to call after [clear()] because it reads
+#' from a stored R vector rather than the compiled C++ objective function.
+#' @export
+#' @rdname get_FIMSFit
+#' @keywords fit_fims
+methods::setGeneric("get_gradient", function(x) standardGeneric("get_gradient"))
+#' @rdname get_FIMSFit
+#' @keywords fit_fims
+methods::setMethod("get_gradient", "FIMSFit", function(x) x@gradient)
+
+#' @return
 #' [get_sdreport()] returns the list from [TMB::sdreport()].
 #' @export
 #' @rdname get_FIMSFit
@@ -216,14 +213,14 @@ methods::setMethod(
   function(x) {
     # Helper function
     add_unique_id <- function(data) {
-      dplyr::group_by(data, label) |>
+      dplyr::group_by(data, .data$label) |>
         dplyr::mutate(
           unique_id = paste(
-            label,
+            .data$label,
             dplyr::if_else(
-              is.na(parameter_id),
+              is.na(.data$parameter_id),
               seq_len(dplyr::n()),
-              parameter_id
+              .data$parameter_id
             ),
             sep = "_"
           )
@@ -244,7 +241,8 @@ methods::setMethod(
       obj = obj,
       sdreport = sdreport,
       opt = opt,
-      parameter_names = parameter_names
+      parameter_names = parameter_names,
+      precomputed_gradient = get_gradient(x)
     ) |>
       add_unique_id()
 
@@ -259,11 +257,11 @@ methods::setMethod(
       # There are more rows in json_estimates than tmb_estimates
       x = json_output,
       y = tmb_output |>
-        dplyr::select(unique_id, uncertainty, log_like_cv, gradient),
+        dplyr::select(dplyr::all_of(c("unique_id", "uncertainty", "log_like_cv", "gradient"))),
       by = c("unique_id")
     ) |>
-      dplyr::select(-unique_id) |>
-      dplyr::relocate(uncertainty, .after = estimation_type)
+      dplyr::select(-dplyr::all_of("unique_id")) |>
+      dplyr::relocate(dplyr::all_of("uncertainty"), .after = dplyr::all_of("estimation_type"))
   }
 )
 
@@ -437,12 +435,19 @@ FIMSFit <- function(
   )
   rm(n_total, n_fixed_effects, n_random_effects)
 
-  # Calculate the maximum gradient
-  max_gradient <- if (length(opt) > 0) {
-    max(abs(obj[["gr"]](opt[["par"]])))
+  # Compute the full per-parameter gradient vector once at construction time.
+  # max_gradient is derived from it so obj$gr() is only ever called here.
+  # Storing gradient_vec in the FIMSFit slot means get_estimates() and the
+  # broom methods (tidy, augment, glance) can read from x@gradient instead of
+  # calling obj$gr() again - which segfaults after clear() frees C++ memory.
+  # as.numeric() is required because TMB's obj$gr() returns a matrix (1xn)
+  # in some call patterns, which would fail the "numeric" slot type check.
+  gradient_vector <- if (length(opt) > 0) {
+    as.numeric(obj[["gr"]](opt[["par"]]))
   } else {
-    NA_real_
+    rep(NA_real_, length(obj[["par"]]))
   }
+  max_gradient <- if (length(opt) > 0) max(abs(gradient_vector)) else NA_real_
 
   # Rename parameters instead of "p"
   parameter_names <- names(get_parameter_names(obj[["par"]]))
@@ -471,6 +476,7 @@ FIMSFit <- function(
     obj = obj,
     opt = opt,
     max_gradient = max_gradient,
+    gradient = gradient_vector,
     report = report,
     sdreport = sdreport,
     number_of_parameters = number_of_parameters,
@@ -590,7 +596,7 @@ fit_fims <- function(input,
   maxgrad0 <- maxgrad <- max(abs(obj$gr(opt[["par"]])))
   if (number_of_loops > 0) {
     cli::cli_inform(c(
-      "i" = "Restarting optimizer {number_of_loops} times{?s} to improve
+      "i" = "Restarting optimizer {number_of_loops} time{?s} to improve
             gradient."
     ))
     # control$trace is reset to zero regardless of verbosity because the

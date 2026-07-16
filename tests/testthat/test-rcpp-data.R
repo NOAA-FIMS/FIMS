@@ -17,16 +17,16 @@ fleet_names_age_comp <- dplyr::filter(
   .data = as.data.frame(get_data(fims_frame)),
   type == "age_comp"
 ) |>
-  dplyr::distinct(name) |>
-  dplyr::pull(name)
+  dplyr::distinct(fleet) |>
+  dplyr::pull(fleet)
 n_age_comp <- length(fleet_names_age_comp)
 
 fleet_names_index <- dplyr::filter(
   .data = as.data.frame(get_data(fims_frame)),
   type == "index"
 ) |>
-  dplyr::distinct(name) |>
-  dplyr::pull(name)
+  dplyr::distinct(fleet) |>
+  dplyr::pull(fleet)
 n_index <- length(fleet_names_index)
 
 ## IO correctness ----
