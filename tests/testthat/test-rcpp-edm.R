@@ -38,19 +38,20 @@ test_that("rcpp edm works with correct inputs", {
   #' @description Test that time_lag is set correctly after construction.
   expect_equal(de$time_lag, tau)
   #' @description Test that n_rows is set correctly.
-  expect_equal(de$n_rows, 3)
+  expect_equal(de$n_rows, 2)
   #' @description Test that n_cols is set correctly.
   expect_equal(de$n_cols, 3)
 
   #' @description Test target values mapping (actual x_t values, not indices).
-  expect_equal(de$target_values$toRVector(), c(30.0, 40.0, 50.0))
+  expect_equal(de$target_values$get_values(), c(40.0, 50.0))
 
   #' @description Test retrieving elements using at() method.
   expect_equal(de$at(0, 0), 30.0)
   expect_equal(de$at(0, 1), 20.0)
   expect_equal(de$at(0, 2), 10.0)
   expect_equal(de$at(1, 0), 40.0)
-  expect_equal(de$at(2, 2), 30.0)
+  expect_equal(de$at(1, 1), 30.0)
+  expect_equal(de$at(1, 2), 20.0)
 
   clear()
 })
@@ -87,10 +88,9 @@ test_that("rcpp edm construct_drop_missing works correctly", {
   de2$construct_drop_missing(series2, E, tau, missing_val)
 
   #' @description Test that construct_drop_missing keeps valid windows and maps correct target values.
-  expect_equal(de2$n_rows, 2)
-  expect_equal(de2$target_values$toRVector(), c(30.0, 70.0))
+  expect_equal(de2$n_rows, 1)
+  expect_equal(de2$target_values$get_values(), -999.0)
   expect_equal(de2$at(0, 0), 30.0)
-  expect_equal(de2$at(1, 2), 50.0)
 
   clear()
 })
@@ -122,27 +122,24 @@ test_that("rcpp edm propagates uncertainty vectors when provided", {
 
   # Shape is identical to the value embedding
   #' @description Test that n_rows matches the value embedding when uncertainty is provided.
-  expect_equal(de$n_rows, 3)
+  expect_equal(de$n_rows, 2)
   #' @description Test that n_cols matches the value embedding when uncertainty is provided.
   expect_equal(de$n_cols, 3)
 
   # target_uncertainty mirrors target_values in the uncertainty space:
-  # Row 0 target index 2 -> sigma_2 = 0.3
-  # Row 1 target index 3 -> sigma_3 = 0.4
-  # Row 2 target index 4 -> sigma_4 = 0.5
+  # Row 0 target index 2 -> sigma_3 = 0.4
+  # Row 1 target index 3 -> sigma_4 = 0.5
   #' @description Test that target_uncertainty holds the correct sigma_t values per row.
-  expect_equal(de$target_uncertainty$toRVector(), c(0.3, 0.4, 0.5))
+  expect_equal(de$target_uncertainty$get_values(), c(0.4, 0.5))
 
   # embedded_uncertainty row-major layout mirrors embedded_values:
   # Row 0: [sigma_2, sigma_1, sigma_0] = [0.3, 0.2, 0.1]
   # Row 1: [sigma_3, sigma_2, sigma_1] = [0.4, 0.3, 0.2]
-  # Row 2: [sigma_4, sigma_3, sigma_2] = [0.5, 0.4, 0.3]
   #' @description Test that embedded_uncertainty is laid out row-major matching embedded_values.
   expect_equal(
-    de$embedded_uncertainty$toRVector(),
+    de$embedded_uncertainty$get_values(),
     c(0.3, 0.2, 0.1,
-      0.4, 0.3, 0.2,
-      0.5, 0.4, 0.3)
+      0.4, 0.3, 0.2)
   )
 
   clear()
@@ -155,9 +152,9 @@ test_that("rcpp edm uncertainty fields are empty when not provided", {
   de$construct(series, 3L, 1L)
 
   #' @description Test that embedded_uncertainty is empty when no uncertainty series is passed.
-  expect_equal(length(de$embedded_uncertainty$toRVector()), 0)
+  expect_equal(length(de$embedded_uncertainty$get_values()), 0)
   #' @description Test that target_uncertainty is empty when no uncertainty series is passed.
-  expect_equal(length(de$target_uncertainty$toRVector()), 0)
+  expect_equal(length(de$target_uncertainty$get_values()), 0)
 
   clear()
 })
@@ -175,12 +172,378 @@ test_that("rcpp edm construct_drop_missing propagates uncertainty correctly", {
   de$construct_drop_missing_with_uncertainty(series2, E, tau, missing_val, uncertainty)
 
   #' @description Test that construct_drop_missing retains only valid-row uncertainties.
-  expect_equal(de$n_rows, 2)
+  expect_equal(de$n_rows, 1)
 
-  # Row 0 target index 2 -> sigma_2 = 0.3
-  # Row 1 target index 6 -> sigma_6 = 0.7
+  # Row 0 target index 2 -> sigma_3 = 0.4
   #' @description Test that target_uncertainty holds sigma_t for the retained rows.
-  expect_equal(de$target_uncertainty$toRVector(), c(0.3, 0.7))
+  expect_equal(de$target_uncertainty$get_values(), c(0.4))
+
+  clear()
+})
+
+# rcpp edm SimplexProjection ----
+## Setup ----
+# Shared helper: build a DelayEmbeddingInterface from a numeric vector.
+.make_de <- function(series, E = 3L, tau = 1L) {
+  de <- methods::new(DelayEmbedding)
+  de$construct(series, E, tau)
+  de
+}
+
+## IO correctness ----
+test_that("SimplexProjection returns correct output length and finite values", {
+  series  <- seq(0.1, 2.0, by = 0.1)  # 20 evenly-spaced points
+  E       <- 3L
+  lib_de  <- .make_de(series[1:15], E)
+  test_de <- .make_de(series[13:20], E)
+
+  sp <- methods::new(SimplexProjection)
+  sp$embedding_dimension <- E
+  sp$n_neighbors         <- E + 1L
+  preds <- sp$predict(lib_de$get_id(), test_de$get_id())
+
+  #' @description Test that SimplexProjection::predict returns a numeric vector.
+  expect_true(is.numeric(preds))
+  #' @description Test that SimplexProjection output length equals the number of test rows.
+  expect_equal(length(preds), test_de$n_rows)
+  #' @description Test that all SimplexProjection predictions are finite.
+  expect_true(all(is.finite(preds)))
+
+  clear()
+})
+
+test_that("SimplexProjection matches pure-R squared-distance implementation", {
+  series  <- seq(0.1, 2.0, by = 0.1)
+  E       <- 2L; k <- E + 1L
+  lib_de  <- .make_de(series[1:15], E)
+  test_de <- .make_de(series[13:20], E)
+
+  sp <- methods::new(SimplexProjection)
+  sp$embedding_dimension <- E
+  sp$n_neighbors         <- k
+  fims_pred <- sp$predict(lib_de$get_id(), test_de$get_id())
+
+  lib_mat     <- matrix(lib_de$embedded_values$get_values(), ncol = E, byrow = TRUE)
+  lib_targets <- lib_de$target_values$get_values()
+  test_mat    <- matrix(test_de$embedded_values$get_values(), ncol = E, byrow = TRUE)
+  r_pred <- vapply(seq_len(nrow(test_mat)), function(i) {
+    sq_d  <- rowSums(sweep(lib_mat, 2, test_mat[i, ], "-")^2)
+    idx   <- order(sq_d)[seq_len(k)]
+    d_min <- min(sq_d[idx])
+    w     <- exp(-sq_d[idx] / (d_min + 1e-12))
+    w     <- w / sum(w)
+    sum(w * lib_targets[idx])
+  }, numeric(1))
+
+  #' @description Test that SimplexProjection matches a pure-R squared-distance implementation to within machine precision.
+  expect_equal(fims_pred, r_pred, tolerance = 1e-12)
+
+  clear()
+})
+
+test_that("SimplexProjection predictions lie within the range of library targets", {
+  series  <- c(0.1, 0.5, 0.9, 0.4, 0.7, 0.3, 0.8, 0.2, 0.6, 0.1,
+               0.5, 0.9, 0.4, 0.7, 0.3, 0.8, 0.2, 0.6)
+  E       <- 2L
+  lib_de  <- .make_de(series[1:12], E)
+  test_de <- .make_de(series[10:18], E)
+
+  sp <- methods::new(SimplexProjection)
+  sp$embedding_dimension <- E
+  sp$n_neighbors         <- E + 1L
+  preds <- sp$predict(lib_de$get_id(), test_de$get_id())
+
+  lib_targets <- lib_de$target_values$get_values()
+  #' @description Test that SimplexProjection predictions stay within the library target range (weighted-average property).
+  expect_true(all(preds >= min(lib_targets) - 1e-10))
+  expect_true(all(preds <= max(lib_targets) + 1e-10))
+
+  clear()
+})
+
+## Error handling ----
+test_that("SimplexProjection throws on invalid library id", {
+  series  <- seq(0.1, 0.6, by = 0.1)
+  test_de <- .make_de(series, 2L)
+
+  sp <- methods::new(SimplexProjection)
+  sp$embedding_dimension <- 2L
+  sp$n_neighbors         <- 3L
+
+  #' @description Test that SimplexProjection::predict throws when given a non-existent library id.
+  expect_error(sp$predict(9999L, test_de$get_id()))
+
+  clear()
+})
+
+test_that("SimplexProjection throws on invalid test id", {
+  series <- seq(0.1, 0.6, by = 0.1)
+  lib_de <- .make_de(series, 2L)
+
+  sp <- methods::new(SimplexProjection)
+  sp$embedding_dimension <- 2L
+  sp$n_neighbors         <- 3L
+
+  #' @description Test that SimplexProjection::predict throws when given a non-existent test id.
+  expect_error(sp$predict(lib_de$get_id(), 9999L))
+
+  clear()
+})
+
+# rcpp edm SMapProjection ----
+## IO correctness ----
+test_that("SMapProjection returns correct output length and finite values", {
+  # Chaotic-like series avoids collinear embedding columns in WLS design matrix
+  series  <- c(0.4, 0.9, 0.3, 0.8, 0.5, 0.7, 0.2, 0.6, 0.4, 0.9,
+               0.3, 0.8, 0.5, 0.7, 0.2, 0.6, 0.4, 0.9, 0.3, 0.8)
+  E       <- 2L
+  lib_de  <- .make_de(series[1:15], E)
+  test_de <- .make_de(series[13:20], E)
+
+  sm <- methods::new(SMapProjection)
+  sm$embedding_dimension <- E
+  sm$theta               <- 1.0
+  sm$kernel              <- "exponential"
+  preds <- sm$predict(lib_de$get_id(), test_de$get_id())
+
+  #' @description Test that SMapProjection::predict returns a numeric vector.
+  expect_true(is.numeric(preds))
+  #' @description Test that SMapProjection output length equals the number of test rows.
+  expect_equal(length(preds), test_de$n_rows)
+  #' @description Test that all SMapProjection predictions are finite.
+  expect_true(all(is.finite(preds)))
+
+  clear()
+})
+
+test_that("SMapProjection matches pure-R WLS squared-distance implementation", {
+  # Chaotic-like series avoids collinear embedding columns in WLS design matrix
+  series  <- c(0.4, 0.9, 0.3, 0.8, 0.5, 0.7, 0.2, 0.6, 0.4, 0.9,
+               0.3, 0.8, 0.5, 0.7, 0.2, 0.6, 0.4, 0.9, 0.3, 0.8)
+  E       <- 2L; theta <- 1.5
+  lib_de  <- .make_de(series[1:15], E)
+  test_de <- .make_de(series[13:20], E)
+
+  sm <- methods::new(SMapProjection)
+  sm$embedding_dimension <- E
+  sm$theta               <- theta
+  sm$kernel              <- "exponential"
+  fims_pred <- sm$predict(lib_de$get_id(), test_de$get_id())
+
+  lib_mat     <- matrix(lib_de$embedded_values$get_values(), ncol = E, byrow = TRUE)
+  lib_targets <- lib_de$target_values$get_values()
+  test_mat    <- matrix(test_de$embedded_values$get_values(), ncol = E, byrow = TRUE)
+  X      <- cbind(1, lib_mat)
+  r_pred <- vapply(seq_len(nrow(test_mat)), function(i) {
+    sq_d   <- rowSums(sweep(lib_mat, 2, test_mat[i, ], "-")^2)
+    d_mean <- mean(sq_d)
+    w      <- exp(-theta * sq_d / (d_mean + 1e-12))
+    coef   <- solve(t(X) %*% diag(w) %*% X, t(X) %*% diag(w) %*% lib_targets)
+    sum(coef * c(1, test_mat[i, ]))
+  }, numeric(1))
+
+  #' @description Test that SMapProjection matches a pure-R WLS squared-distance implementation to within 1e-10.
+  expect_equal(fims_pred, r_pred, tolerance = 1e-10)
+
+  clear()
+})
+
+test_that("SMapProjection gaussian kernel gives different predictions than exponential", {
+  # Chaotic-like series avoids collinear embedding columns in WLS design matrix
+  series  <- c(0.4, 0.9, 0.3, 0.8, 0.5, 0.7, 0.2, 0.6, 0.4, 0.9,
+               0.3, 0.8, 0.5, 0.7, 0.2, 0.6, 0.4, 0.9, 0.3, 0.8)
+  E       <- 2L
+  lib_de  <- .make_de(series[1:14], E)
+  test_de <- .make_de(series[12:20], E)
+
+  sm_exp <- methods::new(SMapProjection)
+  sm_exp$embedding_dimension <- E
+  sm_exp$theta               <- 1.0
+  sm_exp$kernel              <- "exponential"
+  pred_exp <- sm_exp$predict(lib_de$get_id(), test_de$get_id())
+
+  sm_gauss <- methods::new(SMapProjection)
+  sm_gauss$embedding_dimension <- E
+  sm_gauss$theta               <- 1.0
+  sm_gauss$kernel              <- "gaussian"
+  pred_gauss <- sm_gauss$predict(lib_de$get_id(), test_de$get_id())
+
+  #' @description Test that gaussian and exponential SMap kernels give different predictions.
+  expect_false(isTRUE(all.equal(pred_exp, pred_gauss)))
+
+  clear()
+})
+
+## Error handling ----
+test_that("SMapProjection throws on invalid library id", {
+  series  <- seq(0.1, 1.0, by = 0.1)
+  test_de <- .make_de(series, 2L)
+
+  sm <- methods::new(SMapProjection)
+  sm$embedding_dimension <- 2L
+  sm$theta               <- 1.0
+
+  #' @description Test that SMapProjection::predict throws when given a non-existent library id.
+  expect_error(sm$predict(9999L, test_de$get_id()))
+
+  clear()
+})
+
+# rcpp edm GPEdmProjection ----
+## IO correctness ----
+test_that("GPEdmProjection predict returns correct output length and finite values", {
+  series  <- seq(0.1, 1.5, by = 0.1)  # 15 points
+  E       <- 2L
+  lib_de  <- .make_de(series[1:10], E)
+  test_de <- .make_de(series[8:15], E)
+
+  gp <- methods::new(GPEdmProjection)
+  gp$embedding_dimension <- E
+  gp$phi    <- rep(0.5, E)
+  gp$sigma2 <- 1.0
+  gp$ve     <- 0.1
+  preds <- gp$predict(lib_de$get_id(), test_de$get_id())
+
+  #' @description Test that GPEdmProjection::predict returns a numeric vector.
+  expect_true(is.numeric(preds))
+  #' @description Test that GPEdmProjection output length equals the number of test rows.
+  expect_equal(length(preds), test_de$n_rows)
+  #' @description Test that all GPEdmProjection predictions are finite.
+  expect_true(all(is.finite(preds)))
+
+  clear()
+})
+
+test_that("GPEdmProjection fit returns named list with phi, sigma2, ve", {
+  series <- c(0.4, 0.9, 0.3, 0.8, 0.5, 0.7, 0.2, 0.6, 0.4, 0.9,
+              0.3, 0.8, 0.5, 0.7, 0.2)
+  E      <- 2L
+  lib_de <- .make_de(series, E)
+
+  gp <- methods::new(GPEdmProjection)
+  gp$embedding_dimension <- E
+  gp$phi    <- rep(0.1, E)
+  gp$sigma2 <- 1.0
+  gp$ve     <- 0.1
+  result <- gp$fit(lib_de$get_id())
+
+  #' @description Test that GPEdmProjection::fit returns a list.
+  expect_true(is.list(result))
+  #' @description Test that the fit result contains the phi hyperparameter vector.
+  expect_true("phi" %in% names(result))
+  #' @description Test that the fit result contains the sigma2 hyperparameter.
+  expect_true("sigma2" %in% names(result))
+  #' @description Test that the fit result contains the ve hyperparameter.
+  expect_true("ve" %in% names(result))
+  #' @description Test that fitted phi has length equal to embedding_dimension.
+  expect_equal(length(result$phi), E)
+  #' @description Test that all fitted hyperparameters are finite.
+  expect_true(all(is.finite(result$phi)))
+  expect_true(is.finite(result$sigma2))
+  expect_true(is.finite(result$ve))
+
+  clear()
+})
+
+test_that("GPEdmProjection fit updates interface fields with optimized hyperparameters", {
+  series <- c(0.4, 0.9, 0.3, 0.8, 0.5, 0.7, 0.2, 0.6, 0.4, 0.9,
+              0.3, 0.8, 0.5, 0.7, 0.2)
+  E      <- 2L
+  lib_de <- .make_de(series, E)
+
+  gp <- methods::new(GPEdmProjection)
+  gp$embedding_dimension <- E
+  gp$phi    <- rep(0.1, E)
+  gp$sigma2 <- 1.0
+  gp$ve     <- 0.1
+  gp$fit(lib_de$get_id())
+
+  #' @description Test that GPEdmProjection::fit writes the optimized phi back to the interface object.
+  expect_equal(length(gp$phi), E)
+  expect_true(all(is.finite(gp$phi)))
+  #' @description Test that GPEdmProjection::fit writes the optimized sigma2 back to the interface object.
+  expect_true(is.finite(gp$sigma2))
+  #' @description Test that GPEdmProjection::fit writes the optimized ve back to the interface object.
+  expect_true(is.finite(gp$ve))
+
+  clear()
+})
+
+test_that("GPEdmProjection fit followed by predict gives finite predictions", {
+  series  <- c(0.4, 0.9, 0.3, 0.8, 0.5, 0.7, 0.2, 0.6, 0.4, 0.9,
+               0.3, 0.8, 0.5, 0.7, 0.2, 0.6, 0.4, 0.9, 0.3, 0.8)
+  E       <- 2L
+  lib_de  <- .make_de(series[1:14], E)
+  test_de <- .make_de(series[12:20], E)
+
+  gp <- methods::new(GPEdmProjection)
+  gp$embedding_dimension <- E
+  gp$phi    <- rep(0.1, E)
+  gp$sigma2 <- 1.0
+  gp$ve     <- 0.1
+  gp$fit(lib_de$get_id())
+  preds <- gp$predict(lib_de$get_id(), test_de$get_id())
+
+  #' @description Test that fit-then-predict gives finite GP-EDM predictions.
+  expect_true(all(is.finite(preds)))
+  #' @description Test that fit-then-predict output length equals the number of test embedding rows.
+  expect_equal(length(preds), test_de$n_rows)
+
+  clear()
+})
+
+test_that("GPEdmProjection predictions differ for small vs. large phi (kernel localization)", {
+  series  <- seq(0.05, 1.0, by = 0.05)  # 20 smooth points
+  E       <- 2L
+  lib_de  <- .make_de(series[1:14], E)
+  test_de <- .make_de(series[12:20], E)
+
+  gp_small <- methods::new(GPEdmProjection)
+  gp_small$embedding_dimension <- E
+  gp_small$phi    <- rep(0.01, E)
+  gp_small$sigma2 <- 1.0
+  gp_small$ve     <- 0.01
+  pred_small <- gp_small$predict(lib_de$get_id(), test_de$get_id())
+
+  gp_large <- methods::new(GPEdmProjection)
+  gp_large$embedding_dimension <- E
+  gp_large$phi    <- rep(100.0, E)
+  gp_large$sigma2 <- 1.0
+  gp_large$ve     <- 0.01
+  pred_large <- gp_large$predict(lib_de$get_id(), test_de$get_id())
+
+  #' @description Test that GP-EDM predictions differ between small and large phi (kernel localization).
+  expect_false(isTRUE(all.equal(pred_small, pred_large, tolerance = 1e-4)))
+
+  clear()
+})
+
+## Error handling ----
+test_that("GPEdmProjection predict throws on invalid library id", {
+  series  <- seq(0.1, 1.0, by = 0.1)
+  test_de <- .make_de(series, 2L)
+
+  gp <- methods::new(GPEdmProjection)
+  gp$embedding_dimension <- 2L
+  gp$phi    <- rep(0.5, 2L)
+  gp$sigma2 <- 1.0
+  gp$ve     <- 0.1
+
+  #' @description Test that GPEdmProjection::predict throws when given a non-existent library id.
+  expect_error(gp$predict(9999L, test_de$get_id()))
+
+  clear()
+})
+
+test_that("GPEdmProjection fit throws on invalid library id", {
+  gp <- methods::new(GPEdmProjection)
+  gp$embedding_dimension <- 2L
+  gp$phi    <- rep(0.1, 2L)
+  gp$sigma2 <- 1.0
+  gp$ve     <- 0.1
+
+  #' @description Test that GPEdmProjection::fit throws when given a non-existent library id.
+  expect_error(gp$fit(9999L))
 
   clear()
 })

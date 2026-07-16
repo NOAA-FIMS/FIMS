@@ -32,4 +32,3 @@
 #include "edm_model.hpp"
 
 #endif  // FIMS_EDM_HPP
-
