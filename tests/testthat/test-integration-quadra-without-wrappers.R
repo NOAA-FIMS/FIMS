@@ -104,6 +104,33 @@ test_that("TMB construction remains valid after compact Quadra fitting", {
   expect_true(CreateTMBModel())
 })
 
+test_that("Quadra model diagnostics return functional analysis", {
+  fit <- result_quadra_fit_comparison$backend_comparison$quadra_fit
+  diagnostics <- quadra_model_diagnostics(fit$par, fit$random)
+
+  expect_named(
+    diagnostics,
+    c(
+      "model_health", "optimization", "laplace_structure", "backend",
+      "uncertainty", "latent_states", "parameter_influence",
+      "correlation_graph", "parameter_geometry", "spectral_structure",
+      "elapsed_seconds"
+    )
+  )
+  expect_true(diagnostics$model_health$overall %in% c("HEALTHY", "REVIEW"))
+  expect_equal(
+    diagnostics$laplace_structure$random_effects,
+    length(fit$random)
+  )
+  expect_true(diagnostics$laplace_structure$positive_definite)
+  expect_true(diagnostics$parameter_influence$available)
+  expect_length(
+    diagnostics$parameter_influence$ranking,
+    length(fit$random)
+  )
+  expect_true(is.finite(diagnostics$elapsed_seconds))
+})
+
 test_that("Quadra restricted exact Hessian reproduces the TMB Laplace objective", {
   comparison <- result_quadra_laplace_comparison$backend_comparison
   quadra_laplace <- comparison$quadra_laplace_evaluation

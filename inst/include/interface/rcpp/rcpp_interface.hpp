@@ -31,6 +31,8 @@
 #include "../Quadra/core/optimizer.hpp"
 #include "../Quadra/core/autodiff/laplace_graph_plan.hpp"
 #include "../Quadra/core/autodiff/compact_first_order_tape.hpp"
+#include "../Quadra/core/diagnostics/functional_analysis.hpp"
+#include "../Quadra/core/laplace/functional_analysis_report.hpp"
 
 namespace fims_quadra
 {
@@ -1103,6 +1105,301 @@ Rcpp::List EvaluateQuadraDenseHessian(Rcpp::NumericVector fixed_values,
           Rcpp::Named("reason") = objective.backend_m.reason,
           Rcpp::Named("relative_tolerance") =
               objective.pattern_relative_tolerance_m),
+      Rcpp::Named("elapsed_seconds") = elapsed);
+}
+
+/** Return Quadra's functional model diagnostics for the supplied parameters. */
+Rcpp::List quadra_model_diagnostics(Rcpp::NumericVector fixed_values,
+                                    Rcpp::NumericVector random_values)
+{
+  if (!CreateQuadraModel())
+    Rcpp::stop("Unable to construct Quadra model.");
+
+  auto info = fims_info::Information<QUADRA_FIMS_TYPE>::GetInstance();
+  if (fixed_values.size() !=
+          static_cast<R_xlen_t>(info->fixed_effects_parameters.size()) ||
+      random_values.size() !=
+          static_cast<R_xlen_t>(info->random_effects_parameters.size()))
+  {
+    Rcpp::stop("Quadra diagnostic parameter counts do not match the model.");
+  }
+  if (random_values.size() == 0)
+    Rcpp::stop("Quadra model diagnostics require random effects.");
+
+  fims_quadra::FIMSLaplaceModelAdapter model(info);
+  quadra::ParameterVector parameters;
+  for (R_xlen_t i = 0; i < fixed_values.size(); ++i)
+    parameters.add(quadra::Parameter("fixed_" + std::to_string(i + 1),
+                                     fixed_values[i]));
+  for (R_xlen_t i = 0; i < random_values.size(); ++i)
+    parameters.add(quadra::Parameter(
+        "random_" + std::to_string(i + 1), random_values[i],
+        quadra::ParameterTransform::Identity, true, 0));
+
+  fims_quadra::FIMSFastDenseLaplaceObjective objective(
+      model, parameters,
+      std::vector<double>(random_values.begin(), random_values.end()), false);
+  Eigen::VectorXd theta(fixed_values.size());
+  for (R_xlen_t i = 0; i < fixed_values.size(); ++i)
+    theta[i] = fixed_values[i];
+
+  Eigen::VectorXd fixed_gradient;
+  const auto start = std::chrono::steady_clock::now();
+  const double laplace_objective = objective(theta, fixed_gradient);
+
+  Eigen::VectorXd random_mode = Eigen::Map<Eigen::VectorXd>(
+      objective.random_mode_m.data(),
+      static_cast<Eigen::Index>(objective.random_mode_m.size()));
+  fims_quadra::FIMSFastDenseLaplaceObjective::ReplayWorkspace workspace(
+      model, objective.fixed_m, objective.random_m, theta, random_mode);
+  const auto joint = workspace.evaluate(theta, random_mode);
+
+  std::vector<std::string> random_names = info->random_effects_names;
+  if (random_names.size() != objective.random_mode_m.size())
+  {
+    random_names.clear();
+    for (size_t i = 0; i < objective.random_mode_m.size(); ++i)
+      random_names.push_back("random_" + std::to_string(i + 1));
+  }
+
+  quadra::FunctionalOptimizationSummary optimization;
+  optimization.objective_value = laplace_objective;
+  optimization.gradient_norm = fixed_gradient.norm();
+  optimization.iterations = 0;
+  optimization.converged =
+      (fixed_gradient.size() == 0 ||
+       fixed_gradient.cwiseAbs().maxCoeff() < 1e-2) &&
+      joint.random_gradient.cwiseAbs().maxCoeff() < 1e-5;
+  optimization.message = optimization.converged
+                             ? "gradient-based diagnostic passed"
+                             : "one or more diagnostic gradients need review";
+  if (fixed_gradient.size() > 0)
+  {
+    Eigen::Index max_index = 0;
+    optimization.max_abs_gradient =
+        fixed_gradient.cwiseAbs().maxCoeff(&max_index);
+    optimization.max_gradient_value = fixed_gradient[max_index];
+    optimization.max_gradient_parameter =
+        static_cast<size_t>(max_index) < info->parameter_names.size()
+            ? info->parameter_names[static_cast<size_t>(max_index)]
+            : "fixed_" + std::to_string(max_index + 1);
+  }
+
+  constexpr double nonzero_tolerance = 1e-8;
+  quadra::FunctionalAnalysisReport report =
+      quadra::make_functional_analysis_report(
+          optimization, objective.hessian_m, objective.random_mode_m,
+          nonzero_tolerance, random_names, 10);
+  report.parameter_geometry = quadra::summarize_parameter_geometry(
+      objective.hessian_m,
+      std::vector<double>(joint.random_gradient.data(),
+                          joint.random_gradient.data() +
+                              joint.random_gradient.size()),
+      random_names);
+
+  const auto health = quadra::diagnostics::evaluate_model_health(
+      optimization.converged ? "yes" : "no",
+      std::to_string(optimization.gradient_norm),
+      report.laplace_structure.positive_definite ? "yes" : "no",
+      std::to_string(report.laplace_structure.condition_number_abs));
+
+  Rcpp::List effective_sparsity(report.laplace_structure.effective_sparsity.size());
+  for (size_t i = 0; i < report.laplace_structure.effective_sparsity.size(); ++i)
+  {
+    const auto &row = report.laplace_structure.effective_sparsity[i];
+    effective_sparsity[i] = Rcpp::List::create(
+        Rcpp::Named("curvature_retained") = row.curvature_retained,
+        Rcpp::Named("label") = row.label,
+        Rcpp::Named("entries_required") = row.entries_required,
+        Rcpp::Named("entry_share") = row.entry_share,
+        Rcpp::Named("compression_vs_structural") =
+            row.compression_vs_structural);
+  }
+
+  Rcpp::List effective_bandwidth(
+      report.laplace_structure.effective_bandwidth.size());
+  for (size_t i = 0; i < report.laplace_structure.effective_bandwidth.size(); ++i)
+  {
+    const auto &row = report.laplace_structure.effective_bandwidth[i];
+    effective_bandwidth[i] = Rcpp::List::create(
+        Rcpp::Named("curvature_retained") = row.curvature_retained,
+        Rcpp::Named("label") = row.label,
+        Rcpp::Named("bandwidth") = row.bandwidth,
+        Rcpp::Named("entry_count_if_banded") = row.entry_count_if_banded,
+        Rcpp::Named("entry_share_if_banded") = row.entry_share_if_banded);
+  }
+
+  Rcpp::List influence(report.parameter_influence.variance_rows.size());
+  for (size_t i = 0; i < report.parameter_influence.variance_rows.size(); ++i)
+  {
+    const auto &row = report.parameter_influence.variance_rows[i];
+    influence[i] = Rcpp::List::create(
+        Rcpp::Named("index") = row.index + 1,
+        Rcpp::Named("name") = row.name,
+        Rcpp::Named("variance") = row.variance,
+        Rcpp::Named("sd") = row.sd,
+        Rcpp::Named("variance_share") = row.variance_share,
+        Rcpp::Named("correlation_centrality") = row.correlation_centrality,
+        Rcpp::Named("curvature_diagonal") = row.curvature_diagonal,
+        Rcpp::Named("curvature_column_norm") = row.curvature_column_norm,
+        Rcpp::Named("importance_score") = row.importance_score,
+        Rcpp::Named("importance_share") = row.importance_share);
+  }
+
+  Rcpp::List top_correlations(
+      report.parameter_influence.top_correlation_rows.size());
+  for (size_t i = 0;
+       i < report.parameter_influence.top_correlation_rows.size(); ++i)
+  {
+    const auto &row = report.parameter_influence.top_correlation_rows[i];
+    top_correlations[i] = Rcpp::List::create(
+        Rcpp::Named("i") = row.i + 1,
+        Rcpp::Named("j") = row.j + 1,
+        Rcpp::Named("name_i") = row.name_i,
+        Rcpp::Named("name_j") = row.name_j,
+        Rcpp::Named("correlation") = row.correlation,
+        Rcpp::Named("abs_correlation") = row.abs_correlation);
+  }
+
+  Rcpp::List geometry(report.parameter_geometry.rows.size());
+  for (size_t i = 0; i < report.parameter_geometry.rows.size(); ++i)
+  {
+    const auto &row = report.parameter_geometry.rows[i];
+    geometry[i] = Rcpp::List::create(
+        Rcpp::Named("index") = row.index + 1,
+        Rcpp::Named("name") = row.name,
+        Rcpp::Named("gradient") = row.gradient,
+        Rcpp::Named("abs_gradient") = row.abs_gradient,
+        Rcpp::Named("curvature_diagonal") = row.curvature_diagonal,
+        Rcpp::Named("curvature_column_norm") = row.curvature_column_norm,
+        Rcpp::Named("curvature_share") = row.curvature_share);
+  }
+
+  const double elapsed = std::chrono::duration<double>(
+                             std::chrono::steady_clock::now() - start)
+                             .count();
+  Rcpp::NumericVector fixed_gradient_r(
+      fixed_gradient.data(), fixed_gradient.data() + fixed_gradient.size());
+  Rcpp::NumericVector random_gradient_r(
+      joint.random_gradient.data(),
+      joint.random_gradient.data() + joint.random_gradient.size());
+  return Rcpp::List::create(
+      Rcpp::Named("model_health") = Rcpp::List::create(
+          Rcpp::Named("overall") = health.overall,
+          Rcpp::Named("confidence") = health.confidence,
+          Rcpp::Named("optimization") = health.optimization,
+          Rcpp::Named("gradient") = health.gradient,
+          Rcpp::Named("curvature") = health.curvature,
+          Rcpp::Named("conditioning") = health.conditioning,
+          Rcpp::Named("optimization_quality") = health.optimization_quality),
+      Rcpp::Named("optimization") = Rcpp::List::create(
+          Rcpp::Named("laplace_objective") = laplace_objective,
+          Rcpp::Named("joint_objective") = objective.joint_m,
+          Rcpp::Named("laplace_logdet") = objective.logdet_m,
+          Rcpp::Named("laplace_constant") = objective.constant_m,
+          Rcpp::Named("fixed_gradient") = fixed_gradient_r,
+          Rcpp::Named("fixed_gradient_norm") = fixed_gradient.norm(),
+          Rcpp::Named("random_gradient") = random_gradient_r,
+          Rcpp::Named("random_gradient_norm") = joint.random_gradient.norm(),
+          Rcpp::Named("max_gradient_parameter") =
+              optimization.max_gradient_parameter,
+          Rcpp::Named("max_abs_gradient") = optimization.max_abs_gradient,
+          Rcpp::Named("converged") = optimization.converged,
+          Rcpp::Named("message") = optimization.message),
+      Rcpp::Named("laplace_structure") = Rcpp::List::create(
+          Rcpp::Named("random_effects") = report.laplace_structure.random_effects,
+          Rcpp::Named("total_entries") = report.laplace_structure.total_entries,
+          Rcpp::Named("structural_nonzeros") =
+              report.laplace_structure.structural_nonzeros,
+          Rcpp::Named("structural_density") =
+              report.laplace_structure.structural_density,
+          Rcpp::Named("nonzero_tolerance") = nonzero_tolerance,
+          Rcpp::Named("max_abs_entry") = report.laplace_structure.max_abs_entry,
+          Rcpp::Named("positive_definite") =
+              report.laplace_structure.positive_definite,
+          Rcpp::Named("min_eigenvalue") = report.laplace_structure.min_eigenvalue,
+          Rcpp::Named("max_eigenvalue") = report.laplace_structure.max_eigenvalue,
+          Rcpp::Named("condition_number") =
+              report.laplace_structure.condition_number_abs,
+          Rcpp::Named("hessian_jitter") = objective.hessian_jitter_m,
+          Rcpp::Named("effective_sparsity") = effective_sparsity,
+          Rcpp::Named("effective_bandwidth") = effective_bandwidth),
+      Rcpp::Named("backend") = Rcpp::List::create(
+          Rcpp::Named("backend") =
+              quadra::laplace::ToString(objective.backend_m.backend),
+          Rcpp::Named("structure") =
+              quadra::laplace::ToString(objective.backend_m.structure),
+          Rcpp::Named("nnz") = objective.backend_m.nnz,
+          Rcpp::Named("fill_ratio") = objective.backend_m.fill_ratio,
+          Rcpp::Named("bandwidth") = objective.backend_m.bandwidth,
+          Rcpp::Named("reason") = objective.backend_m.reason),
+      Rcpp::Named("uncertainty") = Rcpp::List::create(
+          Rcpp::Named("covariance_available") =
+              report.uncertainty.covariance_available,
+          Rcpp::Named("correlation_available") =
+              report.uncertainty.correlation_available,
+          Rcpp::Named("min_variance") = report.uncertainty.min_variance,
+          Rcpp::Named("max_variance") = report.uncertainty.max_variance,
+          Rcpp::Named("max_abs_correlation") =
+              report.uncertainty.max_abs_correlation,
+          Rcpp::Named("correlations_abs_gt_0_5") =
+              report.uncertainty.corr_abs_gt_0_5,
+          Rcpp::Named("correlations_abs_gt_0_8") =
+              report.uncertainty.corr_abs_gt_0_8,
+          Rcpp::Named("correlations_abs_gt_0_9") =
+              report.uncertainty.corr_abs_gt_0_9),
+      Rcpp::Named("latent_states") = Rcpp::List::create(
+          Rcpp::Named("mode") = Rcpp::wrap(objective.random_mode_m),
+          Rcpp::Named("count") = report.latent_states.count,
+          Rcpp::Named("mean") = report.latent_states.mean,
+          Rcpp::Named("sd") = report.latent_states.sd,
+          Rcpp::Named("minimum") = report.latent_states.min_value,
+          Rcpp::Named("maximum") = report.latent_states.max_value,
+          Rcpp::Named("l2_norm") = report.latent_states.l2_norm),
+      Rcpp::Named("parameter_influence") = Rcpp::List::create(
+          Rcpp::Named("available") = report.parameter_influence.available,
+          Rcpp::Named("ranking") = influence,
+          Rcpp::Named("top_correlations") = top_correlations),
+      Rcpp::Named("correlation_graph") = Rcpp::List::create(
+          Rcpp::Named("available") = report.correlation_graph.available,
+          Rcpp::Named("threshold") =
+              report.correlation_graph.abs_correlation_threshold,
+          Rcpp::Named("nodes") = report.correlation_graph.node_count,
+          Rcpp::Named("edges") = report.correlation_graph.edge_count,
+          Rcpp::Named("average_degree") =
+              report.correlation_graph.average_degree,
+          Rcpp::Named("maximum_degree") =
+              report.correlation_graph.maximum_degree,
+          Rcpp::Named("maximum_degree_parameter") =
+              report.correlation_graph.maximum_degree_name,
+          Rcpp::Named("connected_components") =
+              report.correlation_graph.connected_components,
+          Rcpp::Named("largest_component_size") =
+              report.correlation_graph.largest_component_size,
+          Rcpp::Named("diameter") = report.correlation_graph.graph_diameter),
+      Rcpp::Named("parameter_geometry") = Rcpp::List::create(
+          Rcpp::Named("available") = report.parameter_geometry.available,
+          Rcpp::Named("dominant_parameter") =
+              report.parameter_geometry.dominant_parameter,
+          Rcpp::Named("rows") = geometry),
+      Rcpp::Named("spectral_structure") = Rcpp::List::create(
+          Rcpp::Named("available") = report.spectral_structure.available,
+          Rcpp::Named("effective_rank") =
+              report.spectral_structure.effective_rank_entropy,
+          Rcpp::Named("largest_eigenvalue_share") =
+              report.spectral_structure.largest_eigen_share,
+          Rcpp::Named("eigenvalues_for_50_percent") =
+              report.spectral_structure.eigen_count_for_50,
+          Rcpp::Named("eigenvalues_for_90_percent") =
+              report.spectral_structure.eigen_count_for_90,
+          Rcpp::Named("eigenvalues_for_95_percent") =
+              report.spectral_structure.eigen_count_for_95,
+          Rcpp::Named("eigenvalues_for_99_percent") =
+              report.spectral_structure.eigen_count_for_99,
+          Rcpp::Named("eigenvalues") =
+              Rcpp::wrap(report.spectral_structure.eigenvalues_desc),
+          Rcpp::Named("cumulative_share") =
+              Rcpp::wrap(report.spectral_structure.cumulative_share)),
       Rcpp::Named("elapsed_seconds") = elapsed);
 }
 
