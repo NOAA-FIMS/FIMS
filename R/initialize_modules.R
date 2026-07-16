@@ -704,6 +704,8 @@ initialize_fims <- function(parameters, data) {
 
     # TODO(EDM): Detect any standalone EDM likelihood module from the configuration.
 
+    # TODO(EDM): Detect any standalone EDM likelihood module from the configuration.
+
     # Initialize landings module if the data type includes "landings" and
     # if "Landings" exists in the data distribution specification
     if ("landings" %in% fleet_types &&
