@@ -46,7 +46,6 @@ The code below uses the built-in data within FIMS and sets up a simple catch-at-
 data("data_big")
 # Prepare the package data for being used in a FIMS model
 data_4_model <- FIMSFrame(data_big)
-
 ```
 
 ## Projections

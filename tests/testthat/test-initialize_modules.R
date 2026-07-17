@@ -186,7 +186,7 @@ test_that("`initialize_fims()` returns correct error messages", {
           data = data,
           distribution = NA_character_,
         )
-      ) 
+      )
     missing_recruitment_distribution_error <-
       missing_recruitment_distribution |>
       dplyr::rows_update(

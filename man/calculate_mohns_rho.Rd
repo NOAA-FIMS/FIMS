@@ -44,9 +44,7 @@ data("data_big")
 # Prepare data for FIMS model
 data_4_model <- FIMSFrame(data_big)
 # Create parameters
-parameters <- data_4_model |>
-  create_default_configurations() |>
-  create_default_parameters(data = data_4_model)
+parameters <- setup_default_parameters(data = data_4_model)
 
 # Run retrospective analysis
 retro_fit <- run_fims_retrospective(
