@@ -91,6 +91,24 @@ class Variable {
   }
 
   /**
+   * @brief The constructor for initializing a Variable from a numeric R value.
+   * @details Validates input type within this TU so Rcpp::stop() is caught by
+   * END_RCPP in the same shared library, avoiding cross-TU exception
+   * propagation that would occur with .constructor<double>().
+   */
+  Variable(SEXP value) {
+    if (TYPEOF(value) != REALSXP || Rf_xlength(value) != 1) {
+      Rcpp::stop("Not compatible with requested type");
+    }
+    double val = REAL(value)[0];
+    if (!std::isfinite(val)) {
+      Rcpp::stop("Not compatible with requested type");
+    }
+    initial_value_m = val;
+    id_m = Variable::id_g++;
+  }
+
+  /**
    * @brief The constructor for initializing a Variable.
    * @details Set value to 0 when there is no input value.
    */
