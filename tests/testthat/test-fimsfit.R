@@ -143,19 +143,19 @@ test_that("fit_fims() errors when optimization fails to converge", {
         estimation_type = "constant"
       ),
       by = c("module_name", "label")
-    ) |>
-    dplyr::rows_update(
-      tibble::tibble(
-        module_type = "Landings",
-        label = "log_sd",
-        time = 1:get_n_years(data_age_comp),
-        value = 10
-      ),
-      by = c("module_type", "label", "time")
     )
 
   initialized_model <- parameters_4_model |>
-    initialize_fims(data = data_age_comp)
+    initialize_fims(data = get_data(data_age_comp) |>
+      dplyr::rows_update(
+        tibble::tibble(
+          fleet = "fleet1",
+          type = "landings",
+          uncertainty = 10,
+        ),
+        by = c("fleet", "type")
+      ) |>
+      FIMSFrame())
 
   #' @description Test that fit_fims() throws an informative warning when parameter SE values are too large.
   expect_warning(

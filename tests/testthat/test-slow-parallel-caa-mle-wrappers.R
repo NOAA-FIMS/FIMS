@@ -67,7 +67,7 @@ modified_parameters <- purrr::map(1:sim_num, \(iter_id) {
       ),
       by = c("fleet", "label")
     ) |>
-    # Update log_devs in the Recruitment module (time steps 2–30)
+    # Update log_devs in the Recruitment module (time steps 2-30)
     dplyr::rows_update(
       tibble::tibble(
         label = "log_devs",

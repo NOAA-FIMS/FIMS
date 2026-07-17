@@ -18,24 +18,24 @@ run_fims_likelihood(
 }
 \arguments{
 \item{model}{A FIMSFit object returned by \code{\link[=fit_fims]{fit_fims()}}. Used to extract
-the estimated value of the parameter being profiled}
+the estimated value of the parameter being profiled.}
 
 \item{parameters}{A FIMS parameters object created by
-\code{\link[=create_default_parameters]{create_default_parameters()}}, containing the model configuration
-and initial parameter values}
+\code{\link[=setup_default_parameters]{setup_default_parameters()}}, containing the model configuration
+and initial parameter values,}
 
 \item{data}{A data frame, tibble, or FIMSFrame object containing the model
-data. This should include all data types required by FIMS}
+data. This should include all data types required by FIMS.}
 
 \item{module_name}{A character string specifying the module containing the
 parameter to profile. Default is \code{NULL}. Required when the parameter name
 exists in multiple modules (e.g., multiple fleets). Examples include
-\code{"fleet1"}, \code{"survey1"}, or \code{"recruitment"}}
+\code{"fleet1"}, \code{"survey1"}, or \code{"recruitment"}.}
 
 \item{parameter_name}{A character string specifying the parameter to profile.
 Default is \code{"log_rzero"}. Must match a parameter name in the FIMS model.
 Common options include \code{"log_rzero"}, \code{"log_sigma_recruit"}, \code{"logit_steep"},
-or selectivity parameters}
+or selectivity parameters.}
 
 \item{n_cores}{An integer specifying the number of CPU cores to use for
 parallel processing. If \code{NULL} (default), uses \code{parallel::detectCores() - 1}.
@@ -104,9 +104,7 @@ data("data_big")
 data_4_model <- FIMSFrame(data_big)
 
 # Create a parameters object
-parameters <- data_4_model |>
-  create_default_configurations() |>
-  create_default_parameters(data = data_4_model)
+parameters <- setup_default_parameters(data = data_4_model)
 
 # Run the base model with optimization
 base_model <- parameters |>
@@ -144,7 +142,7 @@ fisheries stock assessment. Fisheries Research 142: 61-74.
 \itemize{
 \item \code{\link[=plot_likelihood]{plot_likelihood()}} for visualizing likelihood profiles
 \item \code{\link[=fit_fims]{fit_fims()}} for fitting FIMS models
-\item \code{\link[=create_default_parameters]{create_default_parameters()}} for creating parameter objects
+\item \code{\link[=setup_default_parameters]{setup_default_parameters()}} for creating parameter objects
 }
 
 Other diagnostic_functions:

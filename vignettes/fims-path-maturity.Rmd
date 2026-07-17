@@ -117,10 +117,10 @@ log_init_naa <- FIMS:::setup_default_log_init_naa(
 )
 
 population <- FIMS::setup_default_Population(
-    data = fims_frame,
-    log_M = log_m,
-    log_init_naa = log_init_naa
-  ) |>
+  data = fims_frame,
+  log_M = log_m,
+  log_init_naa = log_init_naa
+) |>
   dplyr::bind_rows(parameters) |>
   FIMS:::initialize_population(
     data = fims_frame,
@@ -389,10 +389,10 @@ log_init_naa <- FIMS:::setup_default_log_init_naa(
 )
 
 population <- FIMS::setup_default_Population(
-    data = fims_frame,
-    log_M = log_m,
-    log_init_naa = log_init_naa
-  ) |>
+  data = fims_frame,
+  log_M = log_m,
+  log_init_naa = log_init_naa
+) |>
   dplyr::bind_rows(parameters) |>
   FIMS:::initialize_population(
     data = fims_frame,

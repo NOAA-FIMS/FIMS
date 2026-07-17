@@ -387,14 +387,10 @@ clear()
 The same model can be fit to just the age data, removing the length-composition configurations.
 
 ```{r age}
-# Set up default parameters, update with modified values, initialize FIMS,
 # and fit the model
 age_only_fit <- parameters_4_model |>
-  # remove rows that have module_type == LengthComp
-  dplyr::rows_delete(
-    y = tibble::tibble(module_type = "LengthComp")
-  ) |>
-  initialize_fims(data = data_4_model) |>
+  initialize_fims(data = get_data(data_4_model) |>
+    dplyr::filter(!type %in% c("length_comp", "age_to_length_conversion"))) |>
   fit_fims(optimize = TRUE)
 
 clear()
@@ -405,14 +401,9 @@ clear()
 The same model can be fit to just the length data, removing the age-composition configurations.
 
 ```{r length}
-# Set up default parameters, update with modified values, initialize FIMS,
-# and fit the model
 length_only_fit <- parameters_4_model |>
-  # remove rows that have module_type == AgeComp
-  dplyr::rows_delete(
-    y = tibble::tibble(module_type = "AgeComp")
-  ) |>
-  initialize_fims(data = data_4_model) |>
+  initialize_fims(data = get_data(data_4_model) |>
+    dplyr::filter(!type %in% c("age_comp"))) |>
   fit_fims(optimize = TRUE)
 clear()
 ```

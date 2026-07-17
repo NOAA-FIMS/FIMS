@@ -47,25 +47,7 @@ test_that("`setup_default_parameters()` works with correct inputs", {
 })
 
 test_that("modular pipeline matches `setup_default_parameters()`", {
-  
   fleet1_name <- "fleet1"
-  fleet1_landings_defaults <- setup_default_data_index_landings(
-    data = data,
-    fleet = fleet1_name,
-    module_type = "Landings"
-  )
-
-  fleet1_agecomp_defaults <- setup_default_data_composition(
-    data = data,
-    fleet = fleet1_name,
-    module_type = "AgeComp"
-  )
-
-  fleet1_lengthcomp_defaults <- setup_default_data_composition(
-    data = data,
-    fleet = fleet1_name,
-    module_type = "LengthComp"
-  )
 
   fleet1_selectivity_defaults <- setup_default_selectivity(
     data = data,
@@ -78,23 +60,6 @@ test_that("modular pipeline matches `setup_default_parameters()`", {
   )
 
   survey1_name <- "survey1"
-  survey1_index_defaults <- setup_default_data_index_landings(
-    data = data,
-    fleet = survey1_name,
-    module_type = "Index"
-  )
-
-  survey1_agecomp_defaults <- setup_default_data_composition(
-    data = data,
-    fleet = survey1_name,
-    module_type = "AgeComp"
-  )
-
-  survey1_lengthcomp_defaults <- setup_default_data_composition(
-    data = data,
-    fleet = survey1_name,
-    module_type = "LengthComp"
-  )
 
   survey1_selectivity_defaults <- setup_default_selectivity(
     data = data,
@@ -122,14 +87,8 @@ test_that("modular pipeline matches `setup_default_parameters()`", {
   )
 
   modular_result <- dplyr::bind_rows(
-    fleet1_landings_defaults,
-    fleet1_agecomp_defaults,
-    fleet1_lengthcomp_defaults,
     fleet1_selectivity_defaults,
     fleet1_fleet_defaults,
-    survey1_index_defaults,
-    survey1_agecomp_defaults,
-    survey1_lengthcomp_defaults,
     survey1_selectivity_defaults,
     survey1_fleet_defaults,
     recruitment_defaults,
@@ -143,7 +102,7 @@ test_that("modular pipeline matches `setup_default_parameters()`", {
   #' @description Test that the modular pipeline output is identical to `setup_default_parameters()`.
   expect_equal(
     modular_result |>
-      dplyr::arrange(dplyr::across(dplyr::everything())), 
+      dplyr::arrange(dplyr::across(dplyr::everything())),
     expected_result |>
       dplyr::arrange(dplyr::across(dplyr::everything()))
   )
@@ -157,60 +116,6 @@ test_that("modular pipeline with `purrr` matches `setup_default_parameters()`", 
     dplyr::pull(.data[["fleet"]]) |>
     na.omit() |>
     unique()
-  
-  data_index_landings_defaults <- purrr::map(
-    fleets,
-    function(fleet_i) {
-      module_types <- model_data |>
-        dplyr::filter(
-          .data[["fleet"]] == fleet_i,
-          .data[["type"]] %in% c("index", "landings")
-        ) |>
-        dplyr::pull(.data[["type"]]) |>
-        unique() |>
-        snake_to_pascal()
-
-      purrr::map(
-        module_types,
-        function(module_type_i) {
-          setup_default_data_index_landings(
-            data = data,
-            fleet = fleet_i,
-            module_type = module_type_i
-          )
-        }
-      ) |>
-        dplyr::bind_rows()
-    }
-  ) |>
-    dplyr::bind_rows()
-
-  data_composition_defaults <- purrr::map(
-    fleets,
-    function(fleet_i) {
-      module_types <- model_data |>
-        dplyr::filter(
-          .data[["fleet"]] == fleet_i,
-          .data[["type"]] %in% c("age_comp", "length_comp")
-        ) |>
-        dplyr::pull(.data[["type"]]) |>
-        unique() |>
-        snake_to_pascal()
-
-      purrr::map(
-        module_types,
-        function(module_type_i) {
-          setup_default_data_composition(
-            data = data,
-            fleet = fleet_i,
-            module_type = module_type_i
-          )
-        }
-      ) |>
-        dplyr::bind_rows()
-    }
-  ) |>
-    dplyr::bind_rows()
 
   fleet_defaults <- purrr::map(
     fleets,
@@ -257,8 +162,6 @@ test_that("modular pipeline with `purrr` matches `setup_default_parameters()`", 
     )
 
   modular_result <- dplyr::bind_rows(
-    data_index_landings_defaults,
-    data_composition_defaults,
     selectivity_defaults,
     fleet_defaults,
     recruitment_defaults,

@@ -29,7 +29,7 @@ test_that("`setup_default_recruitment()` works with edge cases", {
 
   #' @description Test that `log_sd` is absent when process distribution is not used.
   expect_false("log_sd" %in% result[["label"]])
-  
+
 
   #' @description Test that `log_devs` estimation_type switches to constant when no process distribution is used.
   expect_equal(

@@ -48,7 +48,7 @@ Note that the examples below are for adding a new module to the population dynam
 - [ ] Register the class in `src/fims_modules.hpp`.
 - [ ] Export the class in `R/FIMS-package.R` and run `devtools::document()`.
 - [ ] Update `R/create_default_configurations.R` if the new module type should appear in the default configuration workflow.
-- [ ] Update `R/create_default_parameters.R` so default values and estimation types are generated correctly.
+- [ ] Update `R/setup_default_parameters.R` so default values and estimation types are generated correctly.
 - [ ] Update `R/initialize_modules.R` and `initialize_fims()` if the module needs explicit initialization or linking behavior.
 
 **Testing**

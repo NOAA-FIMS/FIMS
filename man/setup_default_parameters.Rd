@@ -2,8 +2,6 @@
 % Please edit documentation in R/setup_default_parameters.R
 \name{setup_default_parameters}
 \alias{setup_default_parameters}
-\alias{setup_default_data_index_landings}
-\alias{setup_default_data_composition}
 \alias{setup_default_growth}
 \alias{setup_default_Population}
 \alias{setup_default_selectivity}
@@ -13,20 +11,6 @@
 \title{Set up default parameters for a FIMS model}
 \usage{
 setup_default_parameters(data)
-
-setup_default_data_index_landings(
-  data,
-  fleet,
-  module_type = c("Index", "Landings"),
-  distribution = c("Dlnorm", "Dnorm")
-)
-
-setup_default_data_composition(
-  data,
-  fleet,
-  module_type = c("AgeComp", "LengthComp"),
-  distribution = c("Dmultinom", "Ddirichlet")
-)
 
 setup_default_growth(module_type = c("EWAA"))
 
@@ -56,15 +40,9 @@ setup_default_recruitment(
 \arguments{
 \item{data}{An S4 object. FIMS input data.}
 
-\item{fleet}{A character. Name of the fleet.}
-
 \item{module_type}{A string specifying the type of recruitment model. The
 available options are
 BevertonHolt.}
-
-\item{distribution}{A string specifying the distribution for the recruitment process.
-The available options are
-Dnorm, NA.}
 
 \item{log_M}{A numeric value or vector (length equal to the number of ages *
 number of years) specifying the log natural mortality rate. Default is \code{log(0.2)}.}
@@ -74,6 +52,12 @@ ages) specifying the log initial numbers at age. Default is \code{NA_real_}.}
 
 \item{proportion_female}{A numeric value between 0 and 1 specifying the
 proportion of females. Default is \code{0.5}.}
+
+\item{fleet}{A character. Name of the fleet.}
+
+\item{distribution}{A string specifying the distribution for the recruitment process.
+The available options are
+Dnorm, NA.}
 }
 \value{
 A \code{tibble} containing default parameter values and metadata for your model.
@@ -103,14 +87,6 @@ random effect but it does not fit to data, e.g., recruitment deviation.}
 in PascalCase to match the names used in the C++ code.}
 }
 
-A tibble containing default data for the specified fleet, including module
-name, fleet name, module type, label, age, length, time, value,
-estimation type, distribution type, and distribution.
-
-A tibble containing default data for the specified fleet, including module
-name, fleet name, module type, label, age, length, time, value,
-estimation type, distribution type, and distribution.
-
 A tibble containing default growth parameters, including module
 name, module type, label, value, and estimation type.
 
@@ -127,14 +103,6 @@ FIMS model from a \code{\link[=FIMSFrame]{FIMSFrame()}} input object. The return
 default initial values and estimation settings for each configured module.
 You can modify the returned tibble before fitting a model (for example,
 updating maturity and selectivity parameter values).
-
-This function creates default data for a Fisheries Integrated Modeling
-System (FIMS) model, specifically for index or landings data. It generates
-a tibble with multiple fields.
-
-This function creates default data for a Fisheries Integrated Modeling
-System (FIMS) model, specifically for age or length composition data. It generates a
-tibble with multiple fields.
 
 This function creates default growth parameters for a Fisheries Integrated
 Modeling System (FIMS) model. It generates a tibble with fields for
@@ -194,28 +162,6 @@ parameters_with_double_logistic <- updated_parameters |>
       module_type = "DoubleLogistic"
     )
   )
-}
-\dontrun{
-# Load the example dataset and create a FIMS data frame
-data("data_big")
-fims_frame <- FIMSFrame(data_big)
-# Set up default data for a specific fleet
-default_data <- setup_default_data_index_landings(
-  data = fims_frame,
-  fleet = "fleet1",
-  distribution = "Dlnorm"
-)
-}   
-\dontrun{
-# Load the example dataset and create a FIMS data frame
-data("data_big")
-fims_frame <- FIMSFrame(data_big)
-# Set up default data for a specific fleet
-default_data_agecomp <- setup_default_data_composition(
-  data = fims_frame,
-  fleet = "fleet1",
-  module_type = "AgeComp",
-  distribution = "Dmultinom"
 }
 \dontrun{
 # Set up default growth parameters
