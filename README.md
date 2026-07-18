@@ -51,12 +51,8 @@ library(FIMS)
 data("data_big")
 # Prepare data for FIMS model
 data_4_model <- FIMSFrame(data_big)
-
-# Create parameters
-parameters <- setup_default_parameters(data = data_4_model)
-
 # Run the  model with optimization
-fit <- parameters |>
+fit <- setup_default_parameters(data = data_4_model) |>
   initialize_fims(data = data_4_model) |>
   fit_fims(optimize = TRUE)
 # Clear memory post-run
