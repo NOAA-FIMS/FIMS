@@ -63,7 +63,7 @@ class Variable {
   /**
    * @brief The constructor for initializing a variable.
    */
-  Variable(const Variable& other)
+  Variable(const Variable &other)
       : id_m(other.id_m),
         initial_value_m(other.initial_value_m),
         final_value_m(other.final_value_m),
@@ -72,7 +72,7 @@ class Variable {
   /**
    * @brief The constructor for initializing a variable.
    */
-  Variable& operator=(const Variable& right) {
+  Variable &operator=(const Variable &right) {
     // Check for self-assignment!
     if (this == &right)  // Same object?
       return *this;      // Yes, so skip assignment, and just return *this.
@@ -124,7 +124,7 @@ inline double sanitize_val(double x) {
  * @param p A variable.
  * @return std::ostream&
  */
-inline std::ostream& operator<<(std::ostream& out, const Variable& p) {
+inline std::ostream &operator<<(std::ostream &out, const Variable &p) {
   out << "{\"id\": " << p.id_m
       << ",\n\"value\": " << sanitize_val(p.initial_value_m)
       << ",\n\"estimated_value\": " << sanitize_val(p.final_value_m);
@@ -168,7 +168,7 @@ class VariableVector {
   /**
    * @brief The constructor.
    */
-  VariableVector(const VariableVector& other)
+  VariableVector(const VariableVector &other)
       : storage_m(other.storage_m), id_m(other.id_m) {}
 
   /**
@@ -215,7 +215,7 @@ class VariableVector {
    * @brief The constructor for initializing a variable vector.
    * @param v A vector of doubles.
    */
-  VariableVector(const fims::Vector<double>& v) {
+  VariableVector(const fims::Vector<double> &v) {
     this->id_m = VariableVector::id_g++;
     this->storage_m = std::make_shared<std::vector<Variable>>();
     this->storage_m->resize(v.size());
@@ -239,7 +239,7 @@ class VariableVector {
    * @brief The accessor where the first index starts is zero.
    * @param pos The position of the VariableVector that you want returned.
    */
-  inline Variable& operator[](size_t pos) { return this->storage_m->at(pos); }
+  inline Variable &operator[](size_t pos) { return this->storage_m->at(pos); }
 
   /**
    * @brief The accessor where the first index starts at one. This function is
@@ -264,7 +264,7 @@ class VariableVector {
    * you want returned. The first position is one and the last position is
    * the same as the size of the VariableVector.
    */
-  Variable& get(size_t pos) {
+  Variable &get(size_t pos) {
     if (pos >= this->storage_m->size()) {
       throw std::invalid_argument("VariableVector: Index out of range");
     }
@@ -280,7 +280,7 @@ class VariableVector {
    * @param p A numeric value specifying the value to set position `pos` to
    * in the VariableVector.
    */
-  void set(size_t pos, const Variable& p) { this->storage_m->at(pos) = p; }
+  void set(size_t pos, const Variable &p) { this->storage_m->at(pos) = p; }
 
   /**
    * @brief Returns the size of a VariableVector.
@@ -339,7 +339,7 @@ class VariableVector {
           std::to_string(vector_size) + ".");
     }
 
-    auto validate_estimation_type = [&](const std::string& est_type) {
+    auto validate_estimation_type = [&](const std::string &est_type) {
       if (est_type != "constant" && est_type != "fixed_effects" &&
           est_type != "random_effects") {
         throw std::invalid_argument(
@@ -380,6 +380,25 @@ class VariableVector {
       Rcpp::Rcout << storage_m->at(i) << "  ";
     }
   }
+
+  /**
+   * @brief Create a deep copy with a new VariableVector ID.
+   */
+  VariableVector deep_copy() const {
+    VariableVector copy;
+    copy.storage_m = std::make_shared<std::vector<Variable>>();
+    copy.storage_m->reserve(this->storage_m->size());
+    for (size_t i = 0; i < this->storage_m->size(); i++) {
+      Variable variable_copy;
+      const Variable &variable = this->storage_m->at(i);
+      variable_copy.initial_value_m = variable.initial_value_m;
+      variable_copy.final_value_m = variable.final_value_m;
+      variable_copy.estimation_type_m =
+          SharedString(variable.estimation_type_m.get());
+      copy.storage_m->push_back(variable_copy);
+    }
+    return copy;
+  }
 };
 
 #ifdef FIMS_HEADER_ONLY
@@ -393,7 +412,7 @@ uint32_t VariableVector::id_g = 0;
  * @param v A VariableVector.
  * @return std::ostream&
  */
-inline std::ostream& operator<<(std::ostream& out, VariableVector& v) {
+inline std::ostream &operator<<(std::ostream &out, VariableVector &v) {
   out << "[";
   size_t size = v.size();
   for (size_t i = 0; i < size - 1; i++) {
@@ -437,7 +456,7 @@ class RealVector {
   /**
    * @brief The constructor.
    */
-  RealVector(const RealVector& other)
+  RealVector(const RealVector &other)
       : storage_m(other.storage_m), id_m(other.id_m) {}
 
   /**
@@ -474,7 +493,7 @@ class RealVector {
    * @brief The constructor for initializing a real vector.
    * @param v A vector of doubles.
    */
-  RealVector(const fims::Vector<double>& v) {
+  RealVector(const fims::Vector<double> &v) {
     this->id_m = RealVector::id_g++;
     this->storage_m = std::make_shared<std::vector<double>>();
     this->storage_m->resize(v.size());
@@ -495,7 +514,7 @@ class RealVector {
    * @param v
    * @return RealVector&
    */
-  RealVector& operator=(const Rcpp::NumericVector& v) {
+  RealVector &operator=(const Rcpp::NumericVector &v) {
     this->storage_m->assign(v.begin(), v.end());
     return *this;
   }
@@ -510,7 +529,7 @@ class RealVector {
    *
    * @param orig
    */
-  void set_values(const Rcpp::NumericVector& orig) {
+  void set_values(const Rcpp::NumericVector &orig) {
     this->storage_m->resize(orig.size());
     for (size_t i = 0; i < this->storage_m->size(); i++) {
       this->storage_m->at(i) = orig[i];
@@ -535,7 +554,7 @@ class RealVector {
    * @brief The accessor where the first index starts is zero.
    * @param pos The position of the RealVector that you want returned.
    */
-  inline double& operator[](size_t pos) { return this->storage_m->at(pos); }
+  inline double &operator[](size_t pos) { return this->storage_m->at(pos); }
 
   /**
    * @brief The accessor where the first index starts at one. This function is
@@ -560,7 +579,7 @@ class RealVector {
    * you want returned. The first position is one and the last position is
    * the same as the size of the RealVector.
    */
-  double& get(size_t pos) {
+  double &get(size_t pos) {
     if (pos >= this->storage_m->size()) {
       throw std::invalid_argument("RealVector: Index out of range");
     }
@@ -576,7 +595,7 @@ class RealVector {
    * @param p A numeric value specifying the value to set position `pos` to
    * in the RealVector.
    */
-  void set(size_t pos, const double& p) { this->storage_m->at(pos) = p; }
+  void set(size_t pos, const double &p) { this->storage_m->at(pos) = p; }
 
   /**
    * @brief Returns the size of a RealVector.
@@ -613,6 +632,15 @@ class RealVector {
     for (size_t i = 0; i < this->storage_m->size(); i++) {
       Rcpp::Rcout << storage_m->at(i) << "  ";
     }
+  }
+
+  /**
+   * @brief Create a deep copy with a new RealVector ID.
+   */
+  RealVector deep_copy() const {
+    RealVector copy;
+    copy.storage_m = std::make_shared<std::vector<double>>(*this->storage_m);
+    return copy;
   }
 };
 #ifdef FIMS_HEADER_ONLY
