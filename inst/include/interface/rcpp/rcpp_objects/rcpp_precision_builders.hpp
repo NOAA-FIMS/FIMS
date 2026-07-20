@@ -14,7 +14,7 @@ public:
     static uint32_t id_g;
     uint32_t id;
     
-    /** @brief The RAM specification matrix passed from R [Plan]. */
+    /** @brief The RAM specification matrix passed from R. */
     Rcpp::IntegerMatrix ram_matrix; 
     /** @brief Vector of path coefficients (beta_z). */
     ParameterVector beta_z;
@@ -43,6 +43,11 @@ public:
         // Instantiate the builder
         std::shared_ptr<fims_distributions::DSEMPrecisionMatrixBuilder<Type>> builder = 
             std::make_shared<fims_distributions::DSEMPrecisionMatrixBuilder<Type>>();
+
+        std::shared_ptr<fims_distributions::GMRF<Type>> gmrf = 
+            std::make_shared<fims_distributions::GMRF<Type>>();    
+
+        gmrf->precision_matrix_ptr = builder;    
         
         builder->n_time = this->n_time;
         builder->n_variables = this->n_variables;
@@ -76,7 +81,7 @@ public:
         }
 
         // Register builder in Information Map (to be accessed by GMRF distribution)
-        info->dsem_builders[this->id] = builder; 
+        info->precision_builders[this->id] = builder; 
         
         return true;
     }
@@ -91,8 +96,8 @@ public:
         if (this->finalized) return;
         std::shared_ptr<fims_info::Information<double>> info =
             fims_info::Information<double>::GetInstance();
-        auto it = info->dsem_builders.find(this->id);
-        if (it != info->dsem_builders.end()) {
+        auto it = info->precision_builders.find(this->id);
+        if (it != info->precision_builders.end()) {
             auto builder = std::dynamic_pointer_cast<fims_distributions::DSEMPrecisionMatrixBuilder<double>>(it->second);
             for (size_t i = 0; i < this->beta_z.size(); ++i) {
                 this->beta_z[i].final_value_m = builder->beta_z[i];
