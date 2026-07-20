@@ -16,9 +16,8 @@
  * @brief Rcpp interface that serves as the parent class for Rcpp fleet
  * interfaces. This type should be inherited and not called from R directly.
  */
-class FleetInterfaceBase : public FIMSRcppInterfaceBase
-{
-public:
+class FleetInterfaceBase : public FIMSRcppInterfaceBase {
+ public:
   /**
    * @brief The static id of the FleetInterfaceBase object.
    */
@@ -37,8 +36,7 @@ public:
   /**
    * @brief The constructor.
    */
-  FleetInterfaceBase()
-  {
+  FleetInterfaceBase() {
     this->id = FleetInterfaceBase::id_g++;
     /* Create instance of map: key is id and value is pointer to
     FleetInterfaceBase */
@@ -67,8 +65,7 @@ public:
  * @brief The Rcpp interface for Fleet to instantiate from R:
  * fleet <- methods::new(Fleet)
  */
-class FleetInterface : public FleetInterfaceBase
-{
+class FleetInterface : public FleetInterfaceBase {
   /**
    * @brief The ID of the observed age-composition data object.
    */
@@ -90,7 +87,7 @@ class FleetInterface : public FleetInterfaceBase
    */
   SharedInt interface_selectivity_id_m = -999;
 
-public:
+ public:
   /**
    * @brief The name of the fleet.
    */
@@ -217,8 +214,7 @@ public:
   /**
    * @brief The constructor.
    */
-  FleetInterface() : FleetInterfaceBase()
-  {
+  FleetInterface() : FleetInterfaceBase() {
     std::shared_ptr<FleetInterface> fleet =
         std::make_shared<FleetInterface>(*this);
     FIMSRcppInterfaceBase::fims_interface_objects.push_back(fleet);
@@ -298,11 +294,9 @@ public:
    * @brief Set the unique ID for the observed age-composition data object.
    * @param observed_agecomp_data_id Unique ID for the observed data object.
    */
-  void SetObservedAgeCompDataID(SEXP observed_agecomp_data_id)
-  {
+  void SetObservedAgeCompDataID(SEXP observed_agecomp_data_id) {
     if (!Rf_isNumeric(observed_agecomp_data_id) ||
-        Rf_length(observed_agecomp_data_id) != 1)
-    {
+        Rf_length(observed_agecomp_data_id) != 1) {
       throw std::invalid_argument(
           "SetObservedAgeCompDataID expects a numeric scalar.");
     }
@@ -314,11 +308,9 @@ public:
    * @brief Set the unique ID for the observed length-composition data object.
    * @param observed_lengthcomp_data_id Unique ID for the observed data object.
    */
-  void SetObservedLengthCompDataID(SEXP observed_lengthcomp_data_id)
-  {
+  void SetObservedLengthCompDataID(SEXP observed_lengthcomp_data_id) {
     if (!Rf_isNumeric(observed_lengthcomp_data_id) ||
-        Rf_length(observed_lengthcomp_data_id) != 1)
-    {
+        Rf_length(observed_lengthcomp_data_id) != 1) {
       throw std::invalid_argument(
           "SetObservedLengthCompDataID expects a numeric scalar.");
     }
@@ -330,11 +322,9 @@ public:
    * @brief Set the unique ID for the observed index data object.
    * @param observed_index_data_id Unique ID for the observed data object.
    */
-  void SetObservedIndexDataID(SEXP observed_index_data_id)
-  {
+  void SetObservedIndexDataID(SEXP observed_index_data_id) {
     if (!Rf_isNumeric(observed_index_data_id) ||
-        Rf_length(observed_index_data_id) != 1)
-    {
+        Rf_length(observed_index_data_id) != 1) {
       throw std::invalid_argument(
           "SetObservedIndexDataID expects a numeric scalar.");
     }
@@ -346,11 +336,9 @@ public:
    * @brief Set the unique ID for the observed landings data object.
    * @param observed_landings_data_id Unique ID for the observed data object.
    */
-  void SetObservedLandingsDataID(SEXP observed_landings_data_id)
-  {
+  void SetObservedLandingsDataID(SEXP observed_landings_data_id) {
     if (!Rf_isNumeric(observed_landings_data_id) ||
-        Rf_length(observed_landings_data_id) != 1)
-    {
+        Rf_length(observed_landings_data_id) != 1) {
       throw std::invalid_argument(
           "SetObservedLandingsDataID expects a numeric scalar.");
     }
@@ -361,10 +349,8 @@ public:
    * @brief Set the unique ID for the selectivity object.
    * @param selectivity_id Unique ID for the observed object.
    */
-  void SetSelectivityID(SEXP selectivity_id)
-  {
-    if (!Rf_isNumeric(selectivity_id) || Rf_length(selectivity_id) != 1)
-    {
+  void SetSelectivityID(SEXP selectivity_id) {
+    if (!Rf_isNumeric(selectivity_id) || Rf_length(selectivity_id) != 1) {
       throw std::invalid_argument("SetSelectivityID expects a numeric scalar.");
     }
     interface_selectivity_id_m.set(Rcpp::as<int>(selectivity_id));
@@ -380,8 +366,7 @@ public:
   /**
    * @brief Get the unique ID for the observed age-composition data object.
    */
-  int GetObservedAgeCompDataID()
-  {
+  int GetObservedAgeCompDataID() {
     return interface_observed_agecomp_data_id_m.get();
   }
 
@@ -389,40 +374,35 @@ public:
    * @brief Get the unique ID for the observed length-composition data
    * object.
    */
-  int GetObservedLengthCompDataID()
-  {
+  int GetObservedLengthCompDataID() {
     return interface_observed_lengthcomp_data_id_m.get();
   }
 
   /**
    * @brief Get the unique id for the observed index data object.
    */
-  int GetObservedIndexDataID()
-  {
+  int GetObservedIndexDataID() {
     return interface_observed_index_data_id_m.get();
   }
 
   /**
    * @brief Get the unique id for the observed landings data object.
    */
-  int GetObservedLandingsDataID()
-  {
+  int GetObservedLandingsDataID() {
     return interface_observed_landings_data_id_m.get();
   }
   /**
    * @brief Extracts the derived quantities from `Information` to the Rcpp
    * object.
    */
-  virtual void finalize()
-  {
-    if (this->finalized)
-    {
+  virtual void finalize() {
+    if (this->finalized) {
       // log warning that finalize has been called more than once.
       FIMS_WARNING_LOG("Fleet " + fims::to_string(this->id) +
                        " has been finalized already.");
     }
 
-    this->finalized = true; // indicate this has been called already
+    this->finalized = true;  // indicate this has been called already
 
     std::shared_ptr<fims_info::Information<double>> info =
         fims_info::Information<double>::GetInstance();
@@ -431,51 +411,36 @@ public:
 
     it = info->fleets.find(this->id);
 
-    if (it == info->fleets.end())
-    {
+    if (it == info->fleets.end()) {
       FIMS_WARNING_LOG("Fleet " + fims::to_string(this->id) +
                        " not found in Information.");
       return;
-    }
-    else
-    {
+    } else {
       std::shared_ptr<fims_popdy::Fleet<double>> fleet =
           std::dynamic_pointer_cast<fims_popdy::Fleet<double>>(it->second);
 
-      for (size_t i = 0; i < this->log_Fmort.size(); i++)
-      {
-        if (this->log_Fmort[i].estimation_type.get() == "constant")
-        {
+      for (size_t i = 0; i < this->log_Fmort.size(); i++) {
+        if (this->log_Fmort[i].estimation_type.get() == "constant") {
           this->log_Fmort[i].estimated_value = this->log_Fmort[i].value;
-        }
-        else
-        {
+        } else {
           this->log_Fmort[i].estimated_value = fleet->log_Fmort[i];
         }
       }
 
-      for (size_t i = 0; i < this->log_q.size(); i++)
-      {
-        if (this->log_q[i].estimation_type.get() == "constant")
-        {
+      for (size_t i = 0; i < this->log_q.size(); i++) {
+        if (this->log_q[i].estimation_type.get() == "constant") {
           this->log_q[i].estimated_value = this->log_q[i].value;
-        }
-        else
-        {
+        } else {
           this->log_q[i].estimated_value = fleet->log_q[i];
         }
       }
 
-      for (size_t i = 0; i < fleet->age_to_length_conversion.size(); i++)
-      {
+      for (size_t i = 0; i < fleet->age_to_length_conversion.size(); i++) {
         if (this->age_to_length_conversion[i].estimation_type.get() ==
-            "constant")
-        {
+            "constant") {
           this->age_to_length_conversion[i].estimated_value =
               this->age_to_length_conversion[i].value;
-        }
-        else
-        {
+        } else {
           this->age_to_length_conversion[i].estimated_value =
               fleet->age_to_length_conversion[i];
         }
@@ -486,8 +451,7 @@ public:
 #ifdef TMB_MODEL
 
   template <typename Type>
-  bool add_to_fims_tmb_internal()
-  {
+  bool add_to_fims_tmb_internal() {
     std::shared_ptr<fims_info::Information<Type>> info =
         fims_info::Information<Type>::GetInstance();
 
@@ -518,19 +482,16 @@ public:
     fleet->fleet_selectivity_id_m = interface_selectivity_id_m.get();
 
     fleet->log_q.resize(this->log_q.size());
-    for (size_t i = 0; i < this->log_q.size(); i++)
-    {
+    for (size_t i = 0; i < this->log_q.size(); i++) {
       fleet->log_q[i] = this->log_q[i].value;
 
-      if (this->log_q[i].estimation_type.get() == "fixed_effects")
-      {
+      if (this->log_q[i].estimation_type.get() == "fixed_effects") {
         ss.str("");
         ss << "Fleet." << this->id << ".log_q." << this->log_q[i].id;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(fleet->log_q[i]);
       }
-      if (this->log_q[i].estimation_type.get() == "random_effects")
-      {
+      if (this->log_q[i].estimation_type.get() == "random_effects") {
         ss.str("");
         ss << "Fleet." << this->id << ".log_q." << this->log_q[i].id;
         info->RegisterRandomEffectName(ss.str());
@@ -538,8 +499,7 @@ public:
       }
     }
 
-    if (this->log_Fmort.size() != static_cast<size_t>(this->n_years.get()))
-    {
+    if (this->log_Fmort.size() != static_cast<size_t>(this->n_years.get())) {
       FIMS_ERROR_LOG("The size of `log_Fmort` does not match `n_years`: " +
                      fims::to_string(this->log_Fmort.size()) +
                      " != " + fims::to_string(this->n_years.get()));
@@ -551,19 +511,16 @@ public:
           fims::to_string(this->n_years.get()));
     }
     fleet->log_Fmort.resize(static_cast<size_t>(this->log_Fmort.size()));
-    for (size_t i = 0; i < log_Fmort.size(); i++)
-    {
+    for (size_t i = 0; i < log_Fmort.size(); i++) {
       fleet->log_Fmort[i] = this->log_Fmort[i].value;
 
-      if (this->log_Fmort[i].estimation_type.get() == "fixed_effects")
-      {
+      if (this->log_Fmort[i].estimation_type.get() == "fixed_effects") {
         ss.str("");
         ss << "Fleet." << this->id << ".log_Fmort." << this->log_Fmort[i].id;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(fleet->log_Fmort[i]);
       }
-      if (this->log_Fmort[i].estimation_type.get() == "random_effects")
-      {
+      if (this->log_Fmort[i].estimation_type.get() == "random_effects") {
         ss.str("");
         ss << "Fleet." << this->id << ".log_Fmort." << this->log_Fmort[i].id;
         info->RegisterRandomEffectName(ss.str());
@@ -573,28 +530,24 @@ public:
     // add to variable_map
     info->variable_map[this->log_Fmort.id] = &(fleet)->log_Fmort;
 
-    if (this->n_lengths.get() > 0)
-    {
+    if (this->n_lengths.get() > 0) {
       fleet->age_to_length_conversion.resize(
           this->age_to_length_conversion.size());
 
       if (this->age_to_length_conversion.size() !=
-          static_cast<size_t>(this->n_ages.get() * this->n_lengths.get()))
-      {
+          static_cast<size_t>(this->n_ages.get() * this->n_lengths.get())) {
         FIMS_ERROR_LOG(
             "age_to_length_conversion don't match, " +
             fims::to_string(this->age_to_length_conversion.size()) + " != " +
             fims::to_string((this->n_ages.get() * this->n_lengths.get())));
       }
 
-      for (size_t i = 0; i < fleet->age_to_length_conversion.size(); i++)
-      {
+      for (size_t i = 0; i < fleet->age_to_length_conversion.size(); i++) {
         fleet->age_to_length_conversion[i] =
             this->age_to_length_conversion[i].value;
 
         if (this->age_to_length_conversion[i].estimation_type.get() ==
-            "fixed_effects")
-        {
+            "fixed_effects") {
           ss.str("");
           ss << "Fleet." << this->id << ".age_to_length_conversion."
              << this->age_to_length_conversion[i].id;
@@ -602,8 +555,7 @@ public:
           info->RegisterParameter(fleet->age_to_length_conversion[i]);
         }
         if (this->age_to_length_conversion[i].estimation_type.get() ==
-            "random_effects")
-        {
+            "random_effects") {
           FIMS_ERROR_LOG(
               "age_to_length_conversion cannot be set to random effects");
         }
@@ -623,8 +575,7 @@ public:
    * @brief Adds the parameters to the TMB model.
    * @return A boolean of true.
    */
-  virtual bool add_to_fims_tmb()
-  {
+  virtual bool add_to_fims_tmb() {
     this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
     this->add_to_fims_tmb_internal<TMBAD_FIMS_TYPE>();
 
