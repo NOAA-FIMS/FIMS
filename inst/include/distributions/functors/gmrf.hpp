@@ -32,7 +32,7 @@ struct GMRF : public DensityComponentBase<Type> {
      * @details The matrix is assembled by a separate precision 
      * builder (e.g., the DSEM builder).
      */
-    Eigen::SparseMatrix<Type> precision_matrix_ptr = nullptr;
+    std::shared_ptr<Eigen::SparseMatrix<Type>> precision_matrix_ptr = nullptr;
 
     /** @brief Constructor. */
     GMRF() : DensityComponentBase<Type>() {}
@@ -57,10 +57,10 @@ struct GMRF : public DensityComponentBase<Type> {
                 "Check GMRF ID and Information::SetupRandomEffects() linkage.");
         }
 
-        if (static_cast<size_t>(this->precision_matrix_ptr->rows()) != n_x) {
+        if (static_cast<size_t>(*(this->precision_matrix_ptr->rows())) != n_x) {
             throw std::invalid_argument(
                 "GMRF: Dimension mismatch. Precision matrix rows (" + 
-                std::to_string(this->precision_matrix_ptr->rows()) + 
+                std::to_string(*(this->precision_matrix_ptr->rows())) + 
                 ") must match random effect vector size (" + 
                 std::to_string(n_x) + ").");
         }
@@ -73,6 +73,11 @@ struct GMRF : public DensityComponentBase<Type> {
         for (size_t i = 0; i < n_x; ++i) {
             x_centered_std.emplace_back(this->get_observed(i) - this->get_expected(i));
         }
+
+        // TODO: Link get_observed and get_expected to different parameters/derived quantities in the model
+        // this will happen in the information.hpp file similar to SetupData() and will need a info->variable_map in
+        // rcpp_dsem.hpp - this will be harder to do because we have to link up the x vector with multiple parameters
+        // and how to get the ordering correct for this.
 
         // Evaluate TMB GMRF and multiply by -1 to convert from negative log-likelihood to log-likelihood.
         this->lpdf = -1.0 * density::GMRF(*(this->precision_matrix_ptr))(Eigen::Map<const vector<Type>>(x_centered_std.data(), n_x));

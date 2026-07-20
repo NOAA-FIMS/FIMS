@@ -130,14 +130,6 @@ class Information {
       density_components_iterator;
   /**< iterator for distribution objects>*/
 
-  std::map<uint32_t,
-           std::shared_ptr<fims_distributions::PrecisionMatrixBuilderBase<Type>>>
-      dsem_builders; /**< Map of DSEM precision matrix builders. */
-  typedef typename std::map<
-      uint32_t,
-      std::shared_ptr<fims_distributions::PrecisionMatrixBuilderBase<Type>>>::iterator
-      dsem_builder_iterator; /**< Iterator for DSEM builders. */
-
   std::unordered_map<uint32_t,
                      std::shared_ptr<fims_popdy::FisheryModelBase<Type>>>
       models_map; /**<hash map of fishery models, e.g., CAA, GMACS, Spatial,
