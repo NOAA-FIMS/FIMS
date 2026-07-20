@@ -42,9 +42,9 @@ struct GMRF : public DensityComponentBase<Type> {
     /**
      * @brief Evaluates the GMRF log probability density function.
      * @details The evaluation follows: 
-     * \f[ \log(f(x)) = -\frac{1}{2} (x - \mu)^T Q (x - \mu) + \frac{1}{2} \log|Q| \f]
+     * \f[ \log(f(x)) = -\frac{1}{2} (x - \mu)^T Q (x - \mu) + \frac{1}{2} \log|Q| -\frac{n}{2} \log(2\pi) \f]
      * where \f$x\f$ is the vector of latent states, \f$\mu\f$ is the mean, 
-     * and \f$Q\f$ is the precision matrix.
+     * \f$Q\f$ is the precision matrix, and \f$n\f$ is the dimension of \f$x\f$.
      * @return The calculated log-probability density.
      */ 
     virtual const Type evaluate() {
