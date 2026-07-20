@@ -29,6 +29,9 @@ on:
   repository_dispatch:
     types: [file-updated]
 
+permissions:
+  contents: write
+
 jobs:
   call-workflow:
     if: github.repository == 'NOAA-FIMS/FIMS'

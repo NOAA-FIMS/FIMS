@@ -20,6 +20,9 @@ on:
       - 'tests/**'
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 concurrency:
   group: r-cmd-check-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
