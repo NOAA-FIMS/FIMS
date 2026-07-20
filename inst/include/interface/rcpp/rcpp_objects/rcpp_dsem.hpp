@@ -7,7 +7,7 @@
 /**
  * @brief Rcpp interface for the Dynamic Structural Equation Model (DSEM).
  * @details Manages the RAM matrix and metadata used to assemble the joint 
- * precision matrix Q [Plan].
+ * precision matrix Q.
  */
 class DSEMInterface : public FIMSRcppInterfaceBase {
 public:

@@ -66,9 +66,9 @@ struct GMRF : public DensityComponentBase<Type> {
         }
 
         // Centering: x - mu. TMB's GMRF expects input centered around a mean of 0.
-        // To improve performance, we build a std::vector using emplace_back to avoid
+        // To improve performance, we build a fims::Vector using emplace_back to avoid
         // default-constructing and then reassigning every element.
-        std::vector<Type> x_centered_std;
+        fims::Vector<Type> x_centered_std;
         x_centered_std.reserve(n_x);
         for (size_t i = 0; i < n_x; ++i) {
             x_centered_std.emplace_back(this->get_observed(i) - this->get_expected(i));
