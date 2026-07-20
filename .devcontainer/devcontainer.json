@@ -27,7 +27,9 @@
     // get an session going (opens on a port, that you can open as a 
     // separate browser window).
     // more details: https://github.com/rocker-org/devcontainer-features/blob/main/src/rstudio-server/README.md
-    "ghcr.io/rocker-org/devcontainer-features/rstudio-server:0": {}
+    "ghcr.io/rocker-org/devcontainer-features/rstudio-server:0": {
+      "version": "2026.07.0+139"
+    }
   },
   // // if we want quarto cli
   // more info: https://github.com/rocker-org/devcontainer-features/blob/main/src/quarto-cli/README.md
