@@ -94,12 +94,14 @@ struct DSEMPrecisionMatrixBuilder : public PrecisionMatrixBuilderBase<Type> {
         // We create three empty grids that are "sparse"
         Eigen::SparseMatrix<Type> Rho_kk(static_cast<int>(n_k), static_cast<int>(n_k)); // Grid for causal paths (from -> to)
         Eigen::SparseMatrix<Type> Gamma_kk(static_cast<int>(n_k), static_cast<int>(n_k)); // Grid for variances (<->)
-        Eigen::SparseMatrix<Type> I_kk(static_cast<int>(n_k), static_cast<int>(n_k)); // "Standard" grid (identity)
-        Rho_kk.setZero();
-        Gamma_kk.setZero();
+        Eigen::SparseMatrix<Type> I_kk(static_cast<int>(n_k), static_cast<int>(n_k));     // "Standard" grid (identity)
         I_kk.setIdentity(); // Fill diagonal with 1s
 
-        // 3. Translate the "arrows" (RAMPath) into the grids
+       // 3. Translate the "arrows" (RAMPath) into triplet lists for efficient sparse matrix construction.
+        std::vector<Eigen::Triplet<Type>> rho_triplets;
+        std::vector<Eigen::Triplet<Type>> gamma_triplets;
+        rho_triplets.reserve(this->paths.size());
+        gamma_triplets.reserve(this->paths.size());
         for (size_t r = 0; r < this->paths.size(); ++r) {
             // C++ starts counting at 0, but R starts at 1, so we subtract 1.
             const int from = this->paths[r].from - 1; 
@@ -124,13 +126,16 @@ struct DSEMPrecisionMatrixBuilder : public PrecisionMatrixBuilderBase<Type> {
                 value = this->beta_z[b_idx];
             }
 
-            // Poke the "strength" into the correct grid slot based on arrow type.
+            // Add the "strength" to the correct triplet list based on arrow type.
             if (this->paths[r].type == 1) {
-                Rho_kk.coeffRef(from, to) = value; // Direct path effect
+                rho_triplets.emplace_back(from, to, value);
             } else if (this->paths[r].type == 2) {
-                Gamma_kk.coeffRef(from, to) = value; // Noise/Variance component
+                gamma_triplets.emplace_back(from, to, value);
             }
         }
+
+        Rho_kk.setFromTriplets(rho_triplets.begin(), rho_triplets.end());
+        Gamma_kk.setFromTriplets(gamma_triplets.begin(), gamma_triplets.end());
 
         // 4. The final math formula to calculate how likely the data is.
         // We are building: Q = (I - P)^T * V^-1 * (I - P)
