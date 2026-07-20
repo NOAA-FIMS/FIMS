@@ -65,7 +65,7 @@ struct DSEMPrecisionMatrixBuilder : public PrecisionMatrixBuilderBase<Type> {
     // The dimensions of the "grid" of numbers
     size_t n_time = 0;          /**< Total years in the model */
     size_t n_variables = 0;     /**< Total things being modeled (e.g., species + temperature) */
-    std::vector<RAMPath> paths; /**< A list of every arrow drawn by the user */
+    fims::Vector<RAMPath> paths; /**< A list of every arrow drawn by the user */
     fims::Vector<Type> beta_z;  /**< The numeric strengths of those arrows */
 
     DSEMPrecisionMatrixBuilder() : PrecisionMatrixBuilderBase<Type>() {}
@@ -97,8 +97,8 @@ struct DSEMPrecisionMatrixBuilder : public PrecisionMatrixBuilderBase<Type> {
         I_kk.setIdentity(); // Fill diagonal with 1s
 
        // 3. Translate the "arrows" (RAMPath) into triplet lists for efficient sparse matrix construction.
-        std::vector<Eigen::Triplet<Type>> rho_triplets;
-        std::vector<Eigen::Triplet<Type>> gamma_triplets;
+        fims::Vector<Eigen::Triplet<Type>> rho_triplets;
+        fims::Vector<Eigen::Triplet<Type>> gamma_triplets;
         rho_triplets.reserve(this->paths.size());
         gamma_triplets.reserve(this->paths.size());
         for (size_t r = 0; r < this->paths.size(); ++r) {
