@@ -130,6 +130,14 @@ class Information {
       density_components_iterator;
   /**< iterator for distribution objects>*/
 
+  std::map<uint32_t,
+           std::shared_ptr<fims_distributions::PrecisionMatrixBuilderBase<Type>>>
+      dsem_builders; /**< Map of DSEM precision matrix builders. */
+  typedef typename std::map<
+      uint32_t,
+      std::shared_ptr<fims_distributions::PrecisionMatrixBuilderBase<Type>>>::iterator
+      dsem_builder_iterator; /**< Iterator for DSEM builders. */
+
   std::unordered_map<uint32_t,
                      std::shared_ptr<fims_popdy::FisheryModelBase<Type>>>
       models_map; /**<hash map of fishery models, e.g., CAA, GMACS, Spatial,
@@ -164,6 +172,7 @@ class Information {
     this->random_effects_names.clear();
     this->random_effects_parameters.clear();
     this->selectivity_models.clear();
+    this->dsem_builders.clear();
     this->models_map.clear();
     this->n_years = 0;
     this->n_ages = 0;
@@ -247,6 +256,7 @@ class Information {
        << this->recruitment_process_models.size() << std::endl;
     ss << "selectivity_models: " << this->selectivity_models.size()
        << std::endl;
+    ss << "dsem_builders: " << this->dsem_builders.size() << std::endl;
     ss << "models_map: " << this->models_map.size() << std::endl;
     ss << "n_years: " << this->n_years << std::endl;
     ss << "n_ages: " << this->n_ages << std::endl;
