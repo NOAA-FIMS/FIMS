@@ -13,6 +13,7 @@
 
 #include "density_components_base.hpp"
 #include "../../common/fims_vector.hpp"
+#include <vector>
 #include "../../common/def.hpp"
 
 namespace fims_distributions {
@@ -64,14 +65,17 @@ struct GMRF : public DensityComponentBase<Type> {
                 std::to_string(n_x) + ").");
         }
 
-        // Centering: x - mu because TMB's GMRF expects input centered around a mean of 0.
-        vector<Type> x_centered(n_x);
+        // Centering: x - mu. TMB's GMRF expects input centered around a mean of 0.
+        // To improve performance, we build a std::vector using emplace_back to avoid
+        // default-constructing and then reassigning every element.
+        std::vector<Type> x_centered_std;
+        x_centered_std.reserve(n_x);
         for (size_t i = 0; i < n_x; ++i) {
-            x_centered(static_cast<int>(i)) = this->get_observed(i) - this->get_expected(i);
+            x_centered_std.emplace_back(this->get_observed(i) - this->get_expected(i));
         }
 
         // Evaluate TMB GMRF and multiply by -1 to convert from negative log-likelihood to log-likelihood.
-        this->lpdf = -1.0 * density::GMRF(*(this->precision_matrix_ptr))(x_centered);
+        this->lpdf = -1.0 * density::GMRF(*(this->precision_matrix_ptr))(Eigen::Map<const vector<Type>>(x_centered_std.data(), n_x));
 
         // Store the scalar result in a length-1 vector.
         this->lpdf_vec.resize(1);
