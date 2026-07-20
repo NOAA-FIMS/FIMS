@@ -52,6 +52,8 @@ FIMS_dmultinom <- function(x, p) {
 #' with the TMB and Quadra joint objectives.
 #' @param compare_optimizers If `TRUE`, optimize the same full joint objective
 #' with TMB/nlminb and Quadra/L-BFGS from identical starting values.
+#' @param quadra_gradient_tolerance Absolute gradient-norm tolerance used by
+#' Quadra/L-BFGS when `compare_optimizers` is `TRUE`.
 #' @param compare_laplace If `TRUE`, run Quadra's model-aware Laplace fit.
 #' @param benchmark_hessian If `TRUE`, compare unrestricted and restricted
 #' exact Hessian propagation before the model is cleared.
@@ -86,6 +88,7 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
                                                 map = list(),
                                                 compare_backends = FALSE,
                                                 compare_optimizers = FALSE,
+                                                quadra_gradient_tolerance = 1e-5,
                                                 compare_laplace = FALSE,
                                                 benchmark_hessian = FALSE) {
   # Load operating model data for the current iteration
@@ -508,6 +511,7 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
         quadra_result$evaluation_time_seconds
       ),
       quadra_graph_plan = quadra_result$graph_plan,
+      quadra_graph_memory = quadra_result$graph_memory,
       timing_iterations = timing_iterations
     )
 
@@ -516,7 +520,7 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
         parameters$p,
         parameters$re,
         500L,
-        1e-5
+        quadra_gradient_tolerance
       )
       tmb_final_gradient <- obj$gr(tmb_fit$par)
       backend_comparison$tmb_fit <- list(

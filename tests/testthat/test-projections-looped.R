@@ -26,7 +26,9 @@ run_FIMS_projection_scenario <- function(om_input,
                                          projected_F,
                                          estimate_projected_F,
                                          projected_index,
-                                         ssb_ratio_target = NULL) {
+                                         ssb_ratio_target = NULL,
+                                         backend_benchmark_iterations = 0L,
+                                         backend_benchmark_replays = 100L) {
   # Clear any previous FIMS settings
   clear()
 
@@ -451,6 +453,50 @@ run_FIMS_projection_scenario <- function(om_input,
     silent = TRUE, map = map, random = "re"
   )
 
+  if (backend_benchmark_iterations > 0L) {
+    quadra_result <- EvaluateQuadraModel(parameters$p, parameters$re)
+    full_parameters <- c(parameters$p, parameters$re)
+    tmb_joint_objective <- obj$env$f(full_parameters)
+
+    invisible(obj$env$f(full_parameters))
+    invisible(BenchmarkQuadraModel(5L))
+
+    tmb_times <- numeric(backend_benchmark_iterations)
+    for (iteration in seq_len(backend_benchmark_iterations)) {
+      start <- proc.time()[["elapsed"]]
+      for (replay in seq_len(backend_benchmark_replays)) {
+        timing_parameters <- full_parameters
+        timing_parameters[[1]] <- timing_parameters[[1]] +
+          if ((iteration + replay) %% 2L) 1e-8 else -1e-8
+        invisible(obj$env$f(timing_parameters))
+      }
+      tmb_times[[iteration]] <-
+        (proc.time()[["elapsed"]] - start) / backend_benchmark_replays
+    }
+    quadra_times <- colMeans(matrix(
+      BenchmarkQuadraModel(
+        backend_benchmark_iterations * backend_benchmark_replays
+      ),
+      nrow = backend_benchmark_replays
+    ))
+
+    benchmark <- list(
+      projection_years = n_projection_years,
+      fixed_effects = length(parameters$p),
+      random_effects = length(parameters$re),
+      tmb_joint_objective = unname(tmb_joint_objective),
+      quadra_joint_objective = unname(quadra_result$objective),
+      objective_difference = unname(
+        quadra_result$objective - tmb_joint_objective
+      ),
+      tmb_joint_times = tmb_times,
+      quadra_joint_times = quadra_times,
+      quadra_graph_memory = quadra_result$graph_memory
+    )
+    clear()
+    return(list(backend_benchmark = benchmark))
+  }
+
   # Optimization with nlminb
 
   opt <- stats::nlminb(obj[["par"]], obj[["fn"]], obj[["gr"]],
@@ -482,6 +528,8 @@ run_FIMS_projection_scenario <- function(om_input,
 }
 
 ## Section 3: Setup comparison scenario runs
+
+if (!identical(Sys.getenv("FIMS_PROJECTION_HELPER_ONLY"), "true")) {
 
 ## Run FIMS with no projection years as a control run ##
 n_projection_years <- 0
@@ -692,3 +740,4 @@ test_that("projections with spawning biomass ratio target achieve same estimates
   #' @description Test that the maximum parameter standard deviation estimate difference between a low catch projection run and no projection run is less than 10%.
   expect_lt(ssb_ratio_target_error, 0.1)
 })
+}

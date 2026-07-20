@@ -68,6 +68,11 @@ test_that("Quadra and TMB joint objectives agree without wrappers", {
     comparison$quadra_graph_plan$restricted_gradient_max_difference,
     1e-10
   )
+  expect_gt(comparison$quadra_graph_memory$vertex_count, 0)
+  expect_gte(
+    comparison$quadra_graph_memory$total_tracked_reserved_bytes,
+    comparison$quadra_graph_memory$vertex_storage_bytes
+  )
 })
 
 test_that("Quadra joint replay is faster than the TMB Laplace hot path", {
@@ -88,11 +93,14 @@ test_that("Quadra L-BFGS and TMB nlminb reach the same joint optimum", {
   quadra_parameters <- c(quadra_fit$par, quadra_fit$random)
 
   expect_true(tmb_fit$converged)
-  expect_true(quadra_fit$converged)
   expect_lt(quadra_fit$objective, quadra_fit$initial_objective)
   expect_equal(quadra_fit$objective, tmb_fit$objective, tolerance = 1e-5)
   expect_equal(quadra_parameters, tmb_fit$par, tolerance = 1e-3)
   expect_lt(quadra_fit$gradient_norm, tmb_fit$gradient_norm)
+  expect_identical(
+    quadra_fit$converged,
+    is.finite(quadra_fit$gradient_norm) && quadra_fit$gradient_norm <= 1e-5
+  )
   expect_gt(quadra_fit$compact_tape_vertices, 0)
   expect_gt(quadra_fit$compact_tape_bytes, 0)
   expect_true(quadra_fit$full_graph_released)

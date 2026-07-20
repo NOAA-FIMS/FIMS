@@ -140,16 +140,24 @@ make benchmark-state-space
 
 ## Quadra vs TMB comparison scaffold
 
-Quadra benchmark:
+FIMS projection scaling benchmark:
 
 ```bash
-make benchmark-quadra-tmb-random-intercept-quadra
+Rscript benchmarks/compare-tmb-quadra-projections.R \
+  50 0,5,10,25 100
 ```
 
-TMB benchmark:
+The arguments are samples per horizon, comma-separated projection horizons,
+and warmed replays per sample. The benchmark compares matched TMB and Quadra
+joint-objective replay, verifies objective parity, and reports Quadra AD-graph
+vertices and tracked reserved memory. Model construction, gradients,
+optimization, Laplace profiling, and reporting are excluded from both timing
+paths. A `quadra_speed_ratio` greater than one means Quadra is faster.
+
+Catch-at-age benchmark without projection years:
 
 ```bash
-make benchmark-quadra-tmb-random-intercept-tmb
+Rscript benchmarks/compare-tmb-quadra-without-wrappers.R 100
 ```
 
 ---
@@ -207,7 +215,9 @@ during the V1 development cycle.
 
 ## Benchmark studies
 
-- [Projection memory scaling study](benchmarks/studies/projection_memory_scaling.md): evaluates memory and runtime scaling for long-horizon latent-state projection workloads using a structure-aware Laplace runtime.
+- The FIMS projection benchmark is maintained at
+  `benchmarks/compare-tmb-quadra-projections.R` and uses the package's current
+  catch-at-age projection fixture.
 
 <!-- QUADRA_BENCHMARK_STUDIES_END -->
 

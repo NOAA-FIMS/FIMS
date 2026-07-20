@@ -66,32 +66,23 @@ public:
   void ResetAdjoints() {
     Activate();
 
+    std::fill(graph_.vertexWDotBatch.begin(), graph_.vertexWDotBatch.end(),
+              had::Real(0.0));
+    std::fill(graph_.vertexSoWDotBatch.begin(),
+              graph_.vertexSoWDotBatch.end(), had::Real(0.0));
+    std::fill(graph_.vertexDotBatch.begin(), graph_.vertexDotBatch.end(),
+              had::Real(0.0));
+    std::fill(graph_.edge1DwBatch.begin(), graph_.edge1DwBatch.end(),
+              had::Real(0.0));
+    std::fill(graph_.edge2DwBatch.begin(), graph_.edge2DwBatch.end(),
+              had::Real(0.0));
+
     for (auto &vertex : graph_.vertices) {
       vertex.w = had::Real(0.0);
       vertex.wDot = had::Real(0.0);
       vertex.soWDot = had::Real(0.0);
       vertex.dot = had::Real(0.0);
 
-      if (!vertex.wDotBatch.empty()) {
-        std::fill(vertex.wDotBatch.begin(), vertex.wDotBatch.end(),
-                  had::Real(0.0));
-      }
-      if (!vertex.soWDotBatch.empty()) {
-        std::fill(vertex.soWDotBatch.begin(), vertex.soWDotBatch.end(),
-                  had::Real(0.0));
-      }
-      if (!vertex.dotBatch.empty()) {
-        std::fill(vertex.dotBatch.begin(), vertex.dotBatch.end(),
-                  had::Real(0.0));
-      }
-      if (!vertex.e1.dwBatch.empty()) {
-        std::fill(vertex.e1.dwBatch.begin(), vertex.e1.dwBatch.end(),
-                  had::Real(0.0));
-      }
-      if (!vertex.e2.dwBatch.empty()) {
-        std::fill(vertex.e2.dwBatch.begin(), vertex.e2.dwBatch.end(),
-                  had::Real(0.0));
-      }
     }
 
     if (graph_.soEdges.size() < graph_.vertices.size()) {

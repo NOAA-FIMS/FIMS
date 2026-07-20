@@ -557,6 +557,7 @@ std::vector<double> solve_random_effects_laplace(
   LBFGSpp::LBFGSParam<double> inner_options;
   inner_options.max_iterations = 200;
   inner_options.epsilon = tol;
+  inner_options.epsilon_rel = 0.0;
   inner_options.m = 10;
   inner_options.max_linesearch = 30;
   LBFGSpp::LBFGSSolver<double> inner_solver(inner_options);

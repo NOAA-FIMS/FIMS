@@ -332,3 +332,14 @@ target_link_libraries(def_FIMSLog_clear
   fims_test
 )
 gtest_discover_tests(def_FIMSLog_clear)
+
+# test_quadra_batch_workspace.cpp
+add_executable(quadra_batch_workspace
+  test_quadra_batch_workspace.cpp
+)
+add_as_invoker_manifest(quadra_batch_workspace)
+target_link_libraries(quadra_batch_workspace
+  gtest_main
+  fims_test
+)
+gtest_discover_tests(quadra_batch_workspace)

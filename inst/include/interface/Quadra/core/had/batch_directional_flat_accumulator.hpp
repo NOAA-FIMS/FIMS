@@ -54,6 +54,9 @@ public:
 
   std::size_t directions() const { return n_directions_; }
   std::size_t slots() const { return n_slots_; }
+  std::size_t ReservedBytes() const {
+    return values_.capacity() * sizeof(double);
+  }
 
   double &operator()(std::size_t direction, std::size_t slot) {
     return values_[Index(direction, slot)];

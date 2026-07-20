@@ -72,6 +72,35 @@ namespace fims_quadra
     }
   }
 
+  inline Rcpp::List graph_memory_statistics(const had::ADGraph &graph)
+  {
+    const had::ADGraphMemoryStatistics memory =
+        had::MeasureADGraphMemory(graph);
+    return Rcpp::List::create(
+        Rcpp::Named("vertex_count") = memory.vertex_count,
+        Rcpp::Named("vertex_capacity") = memory.vertex_capacity,
+        Rcpp::Named("graph_object_bytes") = memory.graph_object_bytes,
+        Rcpp::Named("vertex_storage_bytes") = memory.vertex_storage_bytes,
+        Rcpp::Named("vertex_batch_payload_bytes") =
+            memory.vertex_batch_payload_bytes,
+        Rcpp::Named("second_order_tree_count") =
+            memory.second_order_tree_count,
+        Rcpp::Named("second_order_tree_storage_bytes") =
+            memory.second_order_tree_storage_bytes,
+        Rcpp::Named("second_order_node_count") =
+            memory.second_order_node_count,
+        Rcpp::Named("second_order_node_capacity") =
+            memory.second_order_node_capacity,
+        Rcpp::Named("second_order_node_storage_bytes") =
+            memory.second_order_node_storage_bytes,
+        Rcpp::Named("dense_second_order_storage_bytes") =
+            memory.dense_second_order_storage_bytes,
+        Rcpp::Named("slot_workspace_storage_bytes") =
+            memory.slot_workspace_storage_bytes,
+        Rcpp::Named("total_tracked_reserved_bytes") =
+            memory.total_tracked_reserved_bytes);
+  }
+
   class FIMSJointLBFGSObjective
   {
   public:
@@ -343,6 +372,7 @@ namespace fims_quadra
       LBFGSpp::LBFGSParam<double> mode_options;
       mode_options.max_iterations = 200;
       mode_options.epsilon = 1e-8;
+      mode_options.epsilon_rel = 0.0;
       mode_options.m = 10;
       mode_options.max_linesearch = 30;
       LBFGSpp::LBFGSSolver<double> mode_solver(mode_options);
@@ -714,7 +744,9 @@ Rcpp::List EvaluateQuadraModel(Rcpp::NumericVector fixed_values,
           Rcpp::Named("laplace_active_vertices") =
               graph_plan.laplace_active_count(),
           Rcpp::Named("restricted_gradient_max_difference") =
-              restricted_gradient_max_difference));
+              restricted_gradient_max_difference),
+      Rcpp::Named("graph_memory") =
+          fims_quadra::graph_memory_statistics(*had::g_ADGraph));
 }
 
 /** Benchmark repeated forward replay of the most recently evaluated model. */
@@ -821,7 +853,9 @@ Rcpp::List BenchmarkQuadraRestrictedHessian(
           full_mixed.cwiseAbs().maxCoeff(),
       Rcpp::Named("total_vertices") = plan.vertex_count(),
       Rcpp::Named("random_active_vertices") = plan.random_active_count(),
-      Rcpp::Named("laplace_active_vertices") = plan.laplace_active_count());
+      Rcpp::Named("laplace_active_vertices") = plan.laplace_active_count(),
+      Rcpp::Named("graph_memory") =
+          fims_quadra::graph_memory_statistics(*had::g_ADGraph));
 }
 
 /** Fit the FIMS joint objective without Laplace profiling. */
@@ -896,6 +930,7 @@ Rcpp::List fit_fims_quadra_joint(Rcpp::NumericVector fixed_values,
   LBFGSpp::LBFGSParam<double> options;
   options.max_iterations = max_iterations;
   options.epsilon = gradient_tolerance;
+  options.epsilon_rel = 0.0;
   options.m = 20;
   options.max_linesearch = 50;
   LBFGSpp::LBFGSSolver<double> optimizer(options);
@@ -908,8 +943,7 @@ Rcpp::List fit_fims_quadra_joint(Rcpp::NumericVector fixed_values,
   try
   {
     iterations = optimizer.minimize(objective, values, final_objective);
-    converged = true;
-    message = "L-BFGS converged";
+    message = "L-BFGS stopped";
   }
   catch (const std::exception &error)
   {
@@ -922,7 +956,12 @@ Rcpp::List fit_fims_quadra_joint(Rcpp::NumericVector fixed_values,
   Eigen::VectorXd final_gradient;
   final_objective = objective(values, final_gradient);
   const double gradient_norm = final_gradient.norm();
-  converged = converged || gradient_norm <= gradient_tolerance;
+  converged = std::isfinite(gradient_norm) &&
+              gradient_norm <= gradient_tolerance;
+  if (converged)
+    message = "L-BFGS converged to requested gradient tolerance";
+  else if (message == "L-BFGS stopped")
+    message = "L-BFGS stopped before requested gradient tolerance";
 
   Rcpp::NumericVector fixed_estimates(fixed_values.size());
   Rcpp::NumericVector random_estimates(random_values.size());
@@ -1732,6 +1771,7 @@ Rcpp::List fit_fims_quadra(Rcpp::NumericVector fixed_values,
   LBFGSpp::LBFGSParam<double> optimizer_options;
   optimizer_options.max_iterations = max_iterations;
   optimizer_options.epsilon = gradient_tolerance;
+  optimizer_options.epsilon_rel = 0.0;
   optimizer_options.m = 20;
   optimizer_options.max_linesearch = 15;
   optimizer_options.max_step = 0.1;

@@ -27,6 +27,15 @@ public:
 
   std::size_t size() const { return edges_.size(); }
 
+  // The unordered-map node allocation is implementation-defined. This
+  // estimate covers its bucket array and stored key/value payload, plus the
+  // exact reserved edge-vector payload.
+  std::size_t EstimatedReservedBytes() const {
+    return slots_.bucket_count() * sizeof(void *) +
+           slots_.size() * sizeof(std::pair<const std::uint64_t, std::size_t>) +
+           edges_.capacity() * sizeof(Edge);
+  }
+
   const std::vector<Edge> &edges() const { return edges_; }
 
   std::size_t GetOrCreate(VertexId a, VertexId b) {
