@@ -22,13 +22,6 @@
     "ghcr.io/rocker-org/devcontainer-features/r-packages:1": {
       "packages": "covr,dplyr,devtools,ggplot2,graphics,jsonlite,github::noaa-afsc/SparseNUTS,methods,Rcpp,RcppEigen,scales,snowfall,TMB,tibble,tidyr,usethis",
       "installSystemRequirements": true
-    },
-    // option to run rstudio. you can type rserver into the command line to
-    // get an session going (opens on a port, that you can open as a 
-    // separate browser window).
-    // more details: https://github.com/rocker-org/devcontainer-features/blob/main/src/rstudio-server/README.md
-    "ghcr.io/rocker-org/devcontainer-features/rstudio-server:0": {
-      "version": "2026.07.0+139"
     }
   },
   // // if we want quarto cli
