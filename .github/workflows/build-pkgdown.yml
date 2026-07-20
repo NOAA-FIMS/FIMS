@@ -2,16 +2,34 @@
 # Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
 on:
   workflow_call:
-    inputs:
-      is_main_push:
-        type: boolean
-        default: false
+  pull_request:
+    branches:
+      - main
+    paths: &core_paths
+      - 'DESCRIPTION'
+      - 'NAMESPACE'
+      - 'man/**'
+      - 'vignettes/**'
+      - 'inst/**'
+      - 'README.md'
+      - 'pkgdown/**'
+      - '.github/workflows/build-pkgdown.yml'
+      - 'CMakeLists.txt'
+      - 'src/**'
+  push:
+    branches:
+      - main
+    paths: *core_paths
+  workflow_dispatch:
+  # below is a trigger for when there are changes to the fims website, it pulls
+  # the bootstrap file name from there which occasionally changes
+  # file in that repo, which change whenever a significant change is made to
+  # the website for some reason
+  repository_dispatch:
+    types: [file-updated]
 
 name: build-pkgdown
 
-# no permissions are needed by the default github token for this workflow to 
-# run, so don't pass any.
-# https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/controlling-permissions-for-github_token
 permissions:
   contents: write
 
@@ -43,8 +61,6 @@ jobs:
 
       - name: build pkgdown
         env:
-          # Pass GHA inputs to the R script as environment variables
-          INPUT_CODE_COVERAGE: ${{ inputs.build_code_coverage }}
           R_KEEP_PKG_SOURCE: "yes"
           TESTTHAT_PROGRESS: "plain"
           R_BACKTRACE_ON_ERROR: "full"
@@ -78,10 +94,9 @@ jobs:
           path: docs/
   
       - name: Deploy package
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && github.repository == 'NOAA-FIMS/FIMS'
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           # This is the folder we built in the "build pkgdown" step
           publish_dir: ./docs
-     
