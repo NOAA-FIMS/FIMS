@@ -16,8 +16,6 @@ public:
     
     /** @brief The RAM specification matrix passed from R [Plan]. */
     Rcpp::IntegerMatrix ram_matrix; 
-    /** @brief Fixed starting values for paths when not estimating. */
-    Rcpp::NumericVector ram_start_values;
     /** @brief Vector of path coefficients (beta_z). */
     ParameterVector beta_z;
     
@@ -74,7 +72,6 @@ public:
             path.from = ram_matrix(r, 1);       // Origin
             path.to = ram_matrix(r, 2);         // Target
             path.beta_index = ram_matrix(r, 3); // Index into beta_z
-            path.start = static_cast<Type>(ram_start_values[r]);
             builder->paths.push_back(path);
         }
 
