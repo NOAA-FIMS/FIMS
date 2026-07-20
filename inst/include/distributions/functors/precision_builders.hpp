@@ -59,8 +59,7 @@ struct DSEMPrecisionMatrixBuilder : public PrecisionMatrixBuilderBase<Type> {
         int type = 0;         /**< 1 = A path effect (Rho), 2 = Variance (Gamma) */
         int from = 0;         /**< The variable the arrow starts from */
         int to = 0;           /**< The variable the arrow points to */
-        int beta_index = 0;   /**< Which parameter in beta_z to use for this arrow */
-        Type start = Type(0); /**< A fixed value to use if we aren't estimating this arrow */
+        int beta_index = 0;   /**< 1-based index into beta_z for this arrow's coefficient. */
     };
 
     // The dimensions of the "grid" of numbers
@@ -114,17 +113,13 @@ struct DSEMPrecisionMatrixBuilder : public PrecisionMatrixBuilderBase<Type> {
                     "DSEMPrecisionMatrixBuilder: RAM indices out of bounds.");
             }
 
-            // Determine the "strength" of this arrow. If beta_index is 1 or 
-            // more, it's a parameter the model is guessing, otherwise, it's a fixed number.
-            Type value = this->paths[r].start;
-            if (this->paths[r].beta_index >= 1) {
-                const size_t b_idx = static_cast<size_t>(this->paths[r].beta_index - 1);
-                if (b_idx >= this->beta_z.size()) {
-                    throw std::invalid_argument(
-                        "DSEMPrecisionMatrixBuilder: beta_index points past beta_z size.");
-                    }
-                value = this->beta_z[b_idx];
+            // Get the path coefficient from beta_z using the 1-based index.
+            const int b_idx = this->paths[r].beta_index - 1;
+            if (b_idx < 0 || static_cast<size_t>(b_idx) >= this->beta_z.size()) {
+                throw std::invalid_argument(
+                    "DSEMPrecisionMatrixBuilder: beta_index out of bounds for beta_z.");
             }
+            Type value = this->beta_z[b_idx];
 
             // Add the "strength" to the correct triplet list based on arrow type.
             if (this->paths[r].type == 1) {
