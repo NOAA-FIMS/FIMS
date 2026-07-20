@@ -220,3 +220,5 @@ test_that("catch-at-age model (estimation MLE without wrappers) returns correct 
 })
 ## Error handling ----
 # No built-in errors to test.
+
+clear()

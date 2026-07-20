@@ -21,6 +21,11 @@ test_that("Rcpp interface works for modules", {
   #' @description Test that `get_id()` method works for `BevertonHoltRecruitment` module.
   expect_equal(beverton_holt$get_id(), 1)
 
+  #' @description Test that Rcpp interface works for the `CatchAtAge` module.
+  expect_no_error(catch_at_age <- methods::new(CatchAtAge))
+  #' @description Test that `get_id()` method works for the `CatchAtAge` module.
+  expect_equal(catch_at_age$get_id(), 1)
+
   #' @description Test that Rcpp interface works for selectivity module.
   expect_no_error(logistic_selectivity <- methods::new(LogisticSelectivity))
   logistic_selectivity$slope[1]$value <- .7
@@ -55,7 +60,7 @@ test_that("Rcpp interface returns correct error messages", {
   #' @description Test that Rcpp Variable interface returns an error when given incorrect input.
   expect_error(
     methods::new(Variable, "a"),
-    regexp = "Not compatible with requested type"
+    regexp = "Variable expects a numeric scalar"
   )
   #' @description Test that `BevertonHoltRecruitment` module returns an error when given incorrect input.
   expect_error(
@@ -71,6 +76,11 @@ test_that("Rcpp interface returns correct error messages", {
   expect_error(
     methods::new(EWAAGrowth, "a"),
     regexp = "no valid constructor available for the argument list"
+  )
+  #' @description Test that `CatchAtAge$get_output()` returns an informative error when called before the model is initialized.
+  expect_error(
+    methods::new(CatchAtAge)$get_output(),
+    regexp = "requires at least one population|Call AddPopulation\\(\\) and CreateTMBModel\\(\\)"
   )
   clear()
 })

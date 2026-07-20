@@ -25,7 +25,8 @@
 /**
  * Initializes the logging system, setting all signal handling.
  */
-void init_logging() {
+void init_logging()
+{
   std::signal(SIGSEGV, &fims::WriteAtExit);
   std::signal(SIGINT, &fims::WriteAtExit);
   std::signal(SIGABRT, &fims::WriteAtExit);
@@ -72,7 +73,8 @@ void init_logging() {
  * @return A boolean is returned, where true indicates that the model was
  * successfully created.
  */
-bool CreateTMBModel() {
+bool CreateTMBModel()
+{
   init_logging();
 
   // clear first
@@ -86,7 +88,8 @@ bool CreateTMBModel() {
   info->Clear();
 
   for (size_t i = 0; i < FIMSRcppInterfaceBase::fims_interface_objects.size();
-       i++) {
+       i++)
+  {
     FIMSRcppInterfaceBase::fims_interface_objects[i]->add_to_fims_tmb();
   }
 
@@ -107,14 +110,14 @@ bool CreateTMBModel() {
   [details_set_x_parameters]
   Updates the internal parameter values for the model base of type
   TMB_FIMS_REAL_TYPE. It is typically called before finalize() or
-  @ref CatchAtAgeInterface::to_json "`get_output()`" to ensure the correct
+  @ref CatchAtAgeInterface::get_output "`get_output()`" to ensure the correct
   values are used because TMB doesn't always keep the updated parameters in
   the "double" version of the tape. So we need to update those first.
   \n\n
   Usage example in R:
   \code{.R}
-  set_fixed_parameters(c(1, 2, 3))
-  set_random_parameters(c(1, 2, 3))
+  set_fixed(c(1, 2, 3))
+  set_random(c(1, 2, 3))
   catch_at_age$get_output()
   \endcode
   [details_set_x_parameters]
@@ -129,14 +132,16 @@ bool CreateTMBModel() {
  * @brief Update fixed parameters in the tape, so the output is correct.
  * @details @snippet{doc} this details_set_x_parameters
  * @snippet{doc} this param_par
- * @see set_random_parameters()
+ * @see set_random()
  */
-void set_fixed_parameters(Rcpp::NumericVector par) {
+void set_fixed(Rcpp::NumericVector par)
+{
   // base model
   std::shared_ptr<fims_info::Information<TMB_FIMS_REAL_TYPE>> info0 =
       fims_info::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
 
-  for (size_t i = 0; i < info0->fixed_effects_parameters.size(); i++) {
+  for (size_t i = 0; i < info0->fixed_effects_parameters.size(); i++)
+  {
     *info0->fixed_effects_parameters[i] = par[i];
   }
 }
@@ -146,14 +151,16 @@ void set_fixed_parameters(Rcpp::NumericVector par) {
  *
  * @return Rcpp::NumericVector
  */
-Rcpp::NumericVector get_fixed_parameters_vector() {
+Rcpp::NumericVector get_fixed()
+{
   // base model
   std::shared_ptr<fims_info::Information<TMB_FIMS_REAL_TYPE>> info0 =
       fims_info::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
 
   Rcpp::NumericVector p;
 
-  for (size_t i = 0; i < info0->fixed_effects_parameters.size(); i++) {
+  for (size_t i = 0; i < info0->fixed_effects_parameters.size(); i++)
+  {
     p.push_back(*info0->fixed_effects_parameters[i]);
   }
 
@@ -164,14 +171,16 @@ Rcpp::NumericVector get_fixed_parameters_vector() {
  * @brief Update random effect parameters in the tape, so the output is correct.
  * @details @snippet{doc} this details_set_x_parameters
  * @snippet{doc} this param_par
- * @see set_fixed_parameters()
+ * @see set_fixed()
  */
-void set_random_parameters(Rcpp::NumericVector par) {
+void set_random(Rcpp::NumericVector par)
+{
   // base model
   std::shared_ptr<fims_info::Information<TMB_FIMS_REAL_TYPE>> info0 =
       fims_info::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
 
-  for (size_t i = 0; i < info0->random_effects_parameters.size(); i++) {
+  for (size_t i = 0; i < info0->random_effects_parameters.size(); i++)
+  {
     *info0->random_effects_parameters[i] = par[i];
   }
 }
@@ -181,14 +190,16 @@ void set_random_parameters(Rcpp::NumericVector par) {
  *
  * @return Rcpp::NumericVector
  */
-Rcpp::NumericVector get_random_parameters_vector() {
+Rcpp::NumericVector get_random()
+{
   // base model
   std::shared_ptr<fims_info::Information<TMB_FIMS_REAL_TYPE>> d0 =
       fims_info::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
 
   Rcpp::NumericVector p;
 
-  for (size_t i = 0; i < d0->random_effects_parameters.size(); i++) {
+  for (size_t i = 0; i < d0->random_effects_parameters.size(); i++)
+  {
     p.push_back(*d0->random_effects_parameters[i]);
   }
 
@@ -201,7 +212,8 @@ Rcpp::NumericVector get_random_parameters_vector() {
  * @param pars
  * @return Rcpp::List
  */
-Rcpp::List get_parameter_names(Rcpp::List pars) {
+Rcpp::List get_parameter_names(Rcpp::List pars)
+{
   // base model
   std::shared_ptr<fims_info::Information<TMB_FIMS_REAL_TYPE>> d0 =
       fims_info::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
@@ -217,7 +229,8 @@ Rcpp::List get_parameter_names(Rcpp::List pars) {
  * @param pars
  * @return Rcpp::List
  */
-Rcpp::List get_random_names(Rcpp::List pars) {
+Rcpp::List get_random_names(Rcpp::List pars)
+{
   // base model
   std::shared_ptr<fims_info::Information<TMB_FIMS_REAL_TYPE>> d0 =
       fims_info::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
@@ -233,7 +246,8 @@ Rcpp::List get_random_names(Rcpp::List pars) {
  * @tparam Type
  */
 template <typename Type>
-void clear_internal() {
+void clear_internal()
+{
   std::shared_ptr<fims_info::Information<Type>> d0 =
       fims_info::Information<Type>::GetInstance();
   d0->Clear();
@@ -245,7 +259,8 @@ void clear_internal() {
  * dangling pointer diagnostics. Should only be set to true via
  * test_clear_with_leak_check().
  */
-void clear_impl(bool get_error_msg) {
+void clear_impl(bool get_error_msg)
+{
   // rcpp_interface_base.hpp
   FIMSRcppInterfaceBase::fims_interface_objects.clear();
 
@@ -335,12 +350,14 @@ void clear_impl(bool get_error_msg) {
   fims::FIMSLog::fims_log->clear();
 
   std::unique_ptr<fims_popdy::LogisticSelectivity<double>> test_obj;
-  if (get_error_msg) {
+  if (get_error_msg)
+  {
     test_obj = std::make_unique<fims_popdy::LogisticSelectivity<double>>();
   }
 
   // --- AUTOMATED DANGLING POINTER DIAGNOSTIC PRINT ---
-  if (fims_model_object::FIMSMemoryTracker::total_active_objects > 0) {
+  if (fims_model_object::FIMSMemoryTracker::total_active_objects > 0)
+  {
     std::ostringstream msg;
     msg << "\n⚠️  WARNING: FIMS Dangling Pointer or Module Detected after "
            "clear()!\n";
@@ -380,7 +397,8 @@ std::string get_log_errors() { return fims::FIMSLog::fims_log->get_errors(); }
 /**
  * @brief Gets the warning entries from the log as a string in JSON format.
  */
-std::string get_log_warnings() {
+std::string get_log_warnings()
+{
   return fims::FIMSLog::fims_log->get_warnings();
 }
 
@@ -397,21 +415,24 @@ void write_log(bool write) { fims::FIMSLog::fims_log->write_on_exit = write; }
 /**
  * @brief Sets the path for the log file to be written to.
  */
-void set_log_path(const std::string &path) {
+void set_log_path(const std::string &path)
+{
   fims::FIMSLog::fims_log->set_path(path);
 }
 
 /**
  * @brief If true, throws a runtime exception when an error is logged.
  */
-void set_log_throw_on_error(bool throw_on_error) {
+void set_log_throw_on_error(bool throw_on_error)
+{
   fims::FIMSLog::fims_log->throw_on_error = throw_on_error;
 }
 
 /**
  * @brief Adds an info entry to the log from the R environment.
  */
-void log_info(std::string log_entry) {
+void log_info(std::string log_entry)
+{
   fims::FIMSLog::fims_log->info_message(log_entry, -1, "R_env",
                                         "R_script_entry");
 }
@@ -419,7 +440,8 @@ void log_info(std::string log_entry) {
 /**
  * @brief Adds a warning entry to the log from the R environment.
  */
-void log_warning(std::string log_entry) {
+void log_warning(std::string log_entry)
+{
   fims::FIMSLog::fims_log->warning_message(log_entry, -1, "R_env",
                                            "R_script_entry");
 }
@@ -430,17 +452,19 @@ void log_warning(std::string log_entry) {
  * @param input A string.
  * @return std::string
  */
-std::string escapeQuotes(const std::string &input) {
+std::string escapeQuotes(const std::string &input)
+{
   std::string result = input;
   std::string search = "\"";
   std::string replace = "\\\"";
 
   // Find each occurrence of `"` and replace it with `\"`
   size_t pos = result.find(search);
-  while (pos != std::string::npos) {
+  while (pos != std::string::npos)
+  {
     result.replace(pos, search.size(), replace);
     pos = result.find(search,
-                      pos + replace.size());  // Move past the replaced position
+                      pos + replace.size()); // Move past the replaced position
   }
   return result;
 }
@@ -448,7 +472,8 @@ std::string escapeQuotes(const std::string &input) {
 /**
  * @brief Adds a error entry to the log from the R environment.
  */
-void log_error(std::string log_entry) {
+void log_error(std::string log_entry)
+{
   std::stringstream ss;
   ss << "capture.output(traceback(4))";
   SEXP expression, result;
@@ -456,7 +481,8 @@ void log_error(std::string log_entry) {
 
   PROTECT(expression = R_ParseVector(Rf_mkString(ss.str().c_str()), 1, &status,
                                      R_NilValue));
-  if (status != PARSE_OK) {
+  if (status != PARSE_OK)
+  {
     Rcpp::Rcout << "Error parsing expression" << std::endl;
     UNPROTECT(1);
   }
@@ -466,14 +492,15 @@ void log_error(std::string log_entry) {
   UNPROTECT(2);
   std::stringstream ss_ret;
   ss_ret << "traceback: ";
-  for (int j = 0; j < LENGTH(result); j++) {
+  for (int j = 0; j < LENGTH(result); j++)
+  {
     std::string str(CHAR(STRING_ELT(result, j)));
     ss_ret << escapeQuotes(str) << "\\n";
   }
 
   std::string ret =
-      ss_ret.str();  //"find error";//Rcpp::as<std::string>(result);
+      ss_ret.str(); //"find error";//Rcpp::as<std::string>(result);
 
   fims::FIMSLog::fims_log->error_message(log_entry, -1, "R_env", ret.c_str());
 }
-#endif  // FIMS_INTERFACE_RCPP_INTERFACE_HPP
+#endif // FIMS_INTERFACE_RCPP_INTERFACE_HPP

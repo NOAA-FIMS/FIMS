@@ -16,8 +16,9 @@
  * @brief Rcpp interface that serves as the parent class for Rcpp population
  * interfaces. This type should be inherited and not called from R directly.
  */
-class PopulationInterfaceBase : public FIMSRcppInterfaceBase {
- public:
+class PopulationInterfaceBase : public FIMSRcppInterfaceBase
+{
+public:
   /**
    * @brief The static id of the PopulationInterfaceBase object.
    */
@@ -47,7 +48,8 @@ class PopulationInterfaceBase : public FIMSRcppInterfaceBase {
   /**
    * @brief The constructor.
    */
-  PopulationInterfaceBase() {
+  PopulationInterfaceBase()
+  {
     this->id = PopulationInterfaceBase::id_g++;
     /* Create instance of map: key is id and value is pointer to
     PopulationInterfaceBase */
@@ -77,8 +79,9 @@ class PopulationInterfaceBase : public FIMSRcppInterfaceBase {
  * @brief Rcpp interface for a new Population to instantiate from R:
  * population <- methods::new(population)
  */
-class PopulationInterface : public PopulationInterfaceBase {
- public:
+class PopulationInterface : public PopulationInterfaceBase
+{
+public:
   /**
    * @brief The number of age bins.
    */
@@ -230,9 +233,10 @@ class PopulationInterface : public PopulationInterfaceBase {
   /**
    * @brief The constructor.
    */
-  PopulationInterface() : PopulationInterfaceBase() {
-    this->proportion_female[0].initial_value_m = static_cast<double>(0.5);
-    this->proportion_female[0].estimation_type_m.set("constant");
+  PopulationInterface() : PopulationInterfaceBase()
+  {
+    this->proportion_female[0].value = static_cast<double>(0.5);
+    this->proportion_female[0].estimation_type.set("constant");
     this->fleet_ids = std::make_shared<std::set<uint32_t>>();
     std::shared_ptr<PopulationInterface> population =
         std::make_shared<PopulationInterface>(*this);
@@ -305,7 +309,8 @@ class PopulationInterface : public PopulationInterfaceBase {
    * @brief Sets the unique ID for the Maturity object.
    * @param maturity_id Unique ID for the Maturity object.
    */
-  void SetMaturityID(uint32_t maturity_id) {
+  void SetMaturityID(uint32_t maturity_id)
+  {
     this->maturity_id.set(maturity_id);
   }
 
@@ -319,7 +324,8 @@ class PopulationInterface : public PopulationInterfaceBase {
    * @brief Set the unique ID for the recruitment object.
    * @param recruitment_id Unique ID for the recruitment object.
    */
-  void SetRecruitmentID(uint32_t recruitment_id) {
+  void SetRecruitmentID(uint32_t recruitment_id)
+  {
     this->recruitment_id.set(recruitment_id);
   }
 
@@ -333,14 +339,16 @@ class PopulationInterface : public PopulationInterfaceBase {
    * @brief Extracts derived quantities back to the Rcpp interface object from
    * the Information object.
    */
-  virtual void finalize() {
-    if (this->finalized) {
+  virtual void finalize()
+  {
+    if (this->finalized)
+    {
       // log warning that finalize has been called more than once.
       FIMS_WARNING_LOG("Population " + fims::to_string(this->id) +
                        " has been finalized already.");
     }
 
-    this->finalized = true;  // indicate this has been called already
+    this->finalized = true; // indicate this has been called already
 
     std::shared_ptr<fims_info::Information<double>> info =
         fims_info::Information<double>::GetInstance();
@@ -352,43 +360,62 @@ class PopulationInterface : public PopulationInterfaceBase {
     std::shared_ptr<fims_popdy::Population<double>> pop =
         info->populations[this->id];
     it = info->populations.find(this->id);
-    if (it == info->populations.end()) {
+    if (it == info->populations.end())
+    {
       FIMS_WARNING_LOG("Population " + fims::to_string(this->id) +
                        " not found in Information.");
       return;
-    } else {
-      for (size_t i = 0; i < this->log_M.size(); i++) {
-        if (this->log_M[i].estimation_type_m.get() == "constant") {
-          this->log_M[i].final_value_m = this->log_M[i].initial_value_m;
-        } else {
-          this->log_M[i].final_value_m = pop->log_M[i];
+    }
+    else
+    {
+      for (size_t i = 0; i < this->log_M.size(); i++)
+      {
+        if (this->log_M[i].estimation_type.get() == "constant")
+        {
+          this->log_M[i].estimated_value = this->log_M[i].value;
+        }
+        else
+        {
+          this->log_M[i].estimated_value = pop->log_M[i];
         }
       }
 
-      for (size_t i = 0; i < this->log_f_multiplier.size(); i++) {
-        if (this->log_f_multiplier[i].estimation_type_m.get() == "constant") {
-          this->log_f_multiplier[i].final_value_m =
-              this->log_f_multiplier[i].initial_value_m;
-        } else {
-          this->log_f_multiplier[i].final_value_m = pop->log_f_multiplier[i];
+      for (size_t i = 0; i < this->log_f_multiplier.size(); i++)
+      {
+        if (this->log_f_multiplier[i].estimation_type.get() == "constant")
+        {
+          this->log_f_multiplier[i].estimated_value =
+              this->log_f_multiplier[i].value;
+        }
+        else
+        {
+          this->log_f_multiplier[i].estimated_value = pop->log_f_multiplier[i];
         }
       }
 
-      for (size_t i = 0; i < this->log_init_naa.size(); i++) {
-        if (this->log_init_naa[i].estimation_type_m.get() == "constant") {
-          this->log_init_naa[i].final_value_m =
-              this->log_init_naa[i].initial_value_m;
-        } else {
-          this->log_init_naa[i].final_value_m = pop->log_init_naa[i];
+      for (size_t i = 0; i < this->log_init_naa.size(); i++)
+      {
+        if (this->log_init_naa[i].estimation_type.get() == "constant")
+        {
+          this->log_init_naa[i].estimated_value =
+              this->log_init_naa[i].value;
+        }
+        else
+        {
+          this->log_init_naa[i].estimated_value = pop->log_init_naa[i];
         }
       }
 
-      for (size_t i = 0; i < this->proportion_female.size(); i++) {
-        if (this->proportion_female[i].estimation_type_m.get() == "constant") {
-          this->proportion_female[i].final_value_m =
-              this->proportion_female[i].initial_value_m;
-        } else {
-          this->proportion_female[i].final_value_m =
+      for (size_t i = 0; i < this->proportion_female.size(); i++)
+      {
+        if (this->proportion_female[i].estimation_type.get() == "constant")
+        {
+          this->proportion_female[i].estimated_value =
+              this->proportion_female[i].value;
+        }
+        else
+        {
+          this->proportion_female[i].estimated_value =
               pop->proportion_female.get_force_scalar(i);
         }
       }
@@ -398,7 +425,8 @@ class PopulationInterface : public PopulationInterfaceBase {
 #ifdef TMB_MODEL
 
   template <typename Type>
-  bool add_to_fims_tmb_internal() {
+  bool add_to_fims_tmb_internal()
+  {
     std::shared_ptr<fims_info::Information<Type>> info =
         fims_info::Information<Type>::GetInstance();
 
@@ -412,11 +440,15 @@ class PopulationInterface : public PopulationInterfaceBase {
     population->n_years = this->n_years.get();
     population->n_fleets = this->n_fleets.get();
     // only define ages if n_ages greater than 0
-    if (this->n_ages.get() > 0) {
+    if (this->n_ages.get() > 0)
+    {
       population->n_ages = this->n_ages.get();
-      if (static_cast<size_t>(this->n_ages.get()) == this->ages.size()) {
+      if (static_cast<size_t>(this->n_ages.get()) == this->ages.size())
+      {
         population->ages.resize(this->n_ages.get());
-      } else {
+      }
+      else
+      {
         throw std::invalid_argument(
             "The size of the ages vector for population " +
             fims::to_string(this->id) + " is not equal to n_ages.");
@@ -424,7 +456,8 @@ class PopulationInterface : public PopulationInterfaceBase {
     }
 
     fleet_ids_iterator it;
-    for (it = this->fleet_ids->begin(); it != this->fleet_ids->end(); it++) {
+    for (it = this->fleet_ids->begin(); it != this->fleet_ids->end(); it++)
+    {
       population->fleet_ids.insert(*it);
     }
 
@@ -434,139 +467,163 @@ class PopulationInterface : public PopulationInterfaceBase {
     population->log_M.resize(this->log_M.size());
 
     if (this->log_f_multiplier.size() ==
-        static_cast<size_t>(this->n_years.get())) {
+        static_cast<size_t>(this->n_years.get()))
+    {
       population->log_f_multiplier.resize(this->log_f_multiplier.size());
-    } else {
+    }
+    else
+    {
       FIMS_WARNING_LOG(
           "The log_f_multiplier vector is not of size n_years. Filling with "
           "zeros.");
       this->log_f_multiplier.resize((this->n_years.get()));
-      for (size_t i = 0; i < log_f_multiplier.size(); i++) {
-        this->log_f_multiplier[i].initial_value_m = static_cast<double>(0.0);
-        this->log_f_multiplier[i].estimation_type_m.set("constant");
+      for (size_t i = 0; i < log_f_multiplier.size(); i++)
+      {
+        this->log_f_multiplier[i].value = static_cast<double>(0.0);
+        this->log_f_multiplier[i].estimation_type.set("constant");
       }
       population->log_f_multiplier.resize(this->log_f_multiplier.size());
     }
 
     if (this->spawning_biomass_ratio.size() ==
-        static_cast<size_t>(this->n_years.get() + 1)) {
+        static_cast<size_t>(this->n_years.get() + 1))
+    {
       population->spawning_biomass_ratio.resize(
           this->spawning_biomass_ratio.size());
-    } else {
+    }
+    else
+    {
       FIMS_WARNING_LOG(
           "Setting spawning_biomass_ratio vector to size n_years + 1.");
       this->spawning_biomass_ratio.resize((this->n_years.get() + 1));
       population->spawning_biomass_ratio.resize(
           this->spawning_biomass_ratio.size());
     }
-    info->variable_map[this->spawning_biomass_ratio.id_m] =
+    info->variable_map[this->spawning_biomass_ratio.id] =
         &(population)->spawning_biomass_ratio;
 
     population->log_init_naa.resize(this->log_init_naa.size());
-    for (size_t i = 0; i < log_M.size(); i++) {
-      population->log_M[i] = this->log_M[i].initial_value_m;
-      if (this->log_M[i].estimation_type_m.get() == "fixed_effects") {
+    for (size_t i = 0; i < log_M.size(); i++)
+    {
+      population->log_M[i] = this->log_M[i].value;
+      if (this->log_M[i].estimation_type.get() == "fixed_effects")
+      {
         ss.str("");
-        ss << "Population." << this->id << ".log_M." << this->log_M[i].id_m;
+        ss << "Population." << this->id << ".log_M." << this->log_M[i].id;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(population->log_M[i]);
       }
-      if (this->log_M[i].estimation_type_m.get() == "random_effects") {
+      if (this->log_M[i].estimation_type.get() == "random_effects")
+      {
         ss.str("");
-        ss << "Population." << this->id << ".log_M." << this->log_M[i].id_m;
+        ss << "Population." << this->id << ".log_M." << this->log_M[i].id;
         info->RegisterRandomEffectName(ss.str());
         info->RegisterRandomEffect(population->log_M[i]);
       }
     }
-    info->variable_map[this->log_M.id_m] = &(population)->log_M;
+    info->variable_map[this->log_M.id] = &(population)->log_M;
 
-    for (size_t i = 0; i < log_f_multiplier.size(); i++) {
+    for (size_t i = 0; i < log_f_multiplier.size(); i++)
+    {
       population->log_f_multiplier[i] =
-          this->log_f_multiplier[i].initial_value_m;
-      if (this->log_f_multiplier[i].estimation_type_m.get() ==
-          "fixed_effects") {
+          this->log_f_multiplier[i].value;
+      if (this->log_f_multiplier[i].estimation_type.get() ==
+          "fixed_effects")
+      {
         ss.str("");
         ss << "Population." << this->id << ".log_f_multiplier."
-           << this->log_f_multiplier[i].id_m;
+           << this->log_f_multiplier[i].id;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(population->log_f_multiplier[i]);
       }
-      if (this->log_f_multiplier[i].estimation_type_m.get() ==
-          "random_effects") {
+      if (this->log_f_multiplier[i].estimation_type.get() ==
+          "random_effects")
+      {
         ss.str("");
         ss << "Population." << this->id << ".log_f_multiplier."
-           << this->log_f_multiplier[i].id_m;
+           << this->log_f_multiplier[i].id;
         info->RegisterRandomEffectName(ss.str());
         info->RegisterRandomEffect(population->log_f_multiplier[i]);
       }
     }
-    info->variable_map[this->log_f_multiplier.id_m] =
+    info->variable_map[this->log_f_multiplier.id] =
         &(population)->log_f_multiplier;
 
-    for (size_t i = 0; i < log_init_naa.size(); i++) {
-      population->log_init_naa[i] = this->log_init_naa[i].initial_value_m;
-      if (this->log_init_naa[i].estimation_type_m.get() == "fixed_effects") {
+    for (size_t i = 0; i < log_init_naa.size(); i++)
+    {
+      population->log_init_naa[i] = this->log_init_naa[i].value;
+      if (this->log_init_naa[i].estimation_type.get() == "fixed_effects")
+      {
         ss.str("");
         ss << "Population." << this->id << ".log_init_naa."
-           << this->log_init_naa[i].id_m;
+           << this->log_init_naa[i].id;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(population->log_init_naa[i]);
       }
-      if (this->log_init_naa[i].estimation_type_m.get() == "random_effects") {
+      if (this->log_init_naa[i].estimation_type.get() == "random_effects")
+      {
         ss.str("");
         ss << "Population." << this->id << ".log_init_naa."
-           << this->log_init_naa[i].id_m;
+           << this->log_init_naa[i].id;
         info->RegisterRandomEffectName(ss.str());
         info->RegisterRandomEffect(population->log_init_naa[i]);
       }
     }
-    info->variable_map[this->log_init_naa.id_m] = &(population)->log_init_naa;
+    info->variable_map[this->log_init_naa.id] = &(population)->log_init_naa;
 
     if (this->proportion_female.size() == 1 ||
         this->proportion_female.size() ==
-            static_cast<size_t>(this->n_ages.get())) {
+            static_cast<size_t>(this->n_ages.get()))
+    {
       population->proportion_female.resize(this->proportion_female.size());
-    } else {
+    }
+    else
+    {
       FIMS_WARNING_LOG(
           "The proportion_female vector is not of size 1 or n_ages. Filling "
           "with 0.5.");
       this->proportion_female.resize(1);
-      this->proportion_female[0].initial_value_m = static_cast<double>(0.5);
-      this->proportion_female[0].estimation_type_m.set("constant");
+      this->proportion_female[0].value = static_cast<double>(0.5);
+      this->proportion_female[0].estimation_type.set("constant");
       population->proportion_female.resize(this->proportion_female.size());
     }
 
-    for (size_t i = 0; i < this->proportion_female.size(); i++) {
-      if (this->proportion_female[i].initial_value_m < 0.0 ||
-          this->proportion_female[i].initial_value_m > 1.0) {
+    for (size_t i = 0; i < this->proportion_female.size(); i++)
+    {
+      if (this->proportion_female[i].value < 0.0 ||
+          this->proportion_female[i].value > 1.0)
+      {
         FIMS_WARNING_LOG(
             "proportion_female should be in [0, 1]; got " +
-            fims::to_string(this->proportion_female[i].initial_value_m) +
+            fims::to_string(this->proportion_female[i].value) +
             " at index " + fims::to_string(i) + ".");
       }
       population->proportion_female[i] =
-          this->proportion_female[i].initial_value_m;
-      if (this->proportion_female[i].estimation_type_m.get() ==
-          "fixed_effects") {
+          this->proportion_female[i].value;
+      if (this->proportion_female[i].estimation_type.get() ==
+          "fixed_effects")
+      {
         ss.str("");
         ss << "Population." << this->id << ".proportion_female."
-           << this->proportion_female[i].id_m;
+           << this->proportion_female[i].id;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(population->proportion_female[i]);
       }
-      if (this->proportion_female[i].estimation_type_m.get() ==
-          "random_effects") {
+      if (this->proportion_female[i].estimation_type.get() ==
+          "random_effects")
+      {
         ss.str("");
         ss << "Population." << this->id << ".proportion_female."
-           << this->proportion_female[i].id_m;
+           << this->proportion_female[i].id;
         info->RegisterRandomEffectName(ss.str());
         info->RegisterRandomEffect(population->proportion_female[i]);
       }
     }
-    info->variable_map[this->proportion_female.id_m] =
+    info->variable_map[this->proportion_female.id] =
         &(population)->proportion_female;
 
-    for (size_t i = 0; i < ages.size(); i++) {
+    for (size_t i = 0; i < ages.size(); i++)
+    {
       population->ages[i] = this->ages[i];
     }
 
@@ -580,7 +637,8 @@ class PopulationInterface : public PopulationInterfaceBase {
    * @brief Adds the parameters to the TMB model.
    * @return A boolean of true.
    */
-  virtual bool add_to_fims_tmb() {
+  virtual bool add_to_fims_tmb()
+  {
     this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
     this->add_to_fims_tmb_internal<TMBAD_FIMS_TYPE>();
 
