@@ -76,12 +76,15 @@ test_that("modular pipeline matches `setup_default_parameters()`", {
   growth_defaults <- setup_default_growth()
 
   log_m <- log(0.2)
+  log_rzero <- recruitment_defaults |>
+    dplyr::filter(.data[["label"]] == "log_rzero") |>
+    dplyr::pull(.data[["value"]])
   population_defaults <- setup_default_Population(
     data = data,
     log_M = log_m,
     log_init_naa = setup_default_log_init_naa(
-      data = data,
-      recruitment_defaults = recruitment_defaults,
+      n_ages = get_n_ages(data),
+      log_rzero = log_rzero,
       log_m = log_m
     )
   )
@@ -138,9 +141,12 @@ test_that("modular pipeline with `purrr` matches `setup_default_parameters()`", 
   growth_defaults <- setup_default_growth()
 
   log_m <- log(0.2)
+  log_rzero <- recruitment_defaults |>
+    dplyr::filter(.data[["label"]] == "log_rzero") |>
+    dplyr::pull(.data[["value"]])
   log_init_naa <- setup_default_log_init_naa(
-    data = data,
-    recruitment_defaults = recruitment_defaults,
+    n_ages = get_n_ages(data),
+    log_rzero = log_rzero,
     log_m = log_m
   )
 

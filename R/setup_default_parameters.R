@@ -3,16 +3,23 @@
 #' Set up default parameters for a FIMS model
 #'
 #' @description
-#' This function generates a tibble with default parameters needed to run a
-#' FIMS model from a [FIMSFrame()] input object. The returned tibble includes
-#' default initial values and estimation settings for each configured module.
-#' You can modify the returned tibble before fitting a model (for example,
-#' updating maturity and selectivity parameter values).
+#' Initializing a FIMS model, i.e., `initialize_fims()` requires a `FIMSFrame`
+#' object and a tibble of parameters. The parameter tibble can be automatically
+#' generated using this function or by building up your own tibble from
+#' helper functions used within this function. The resulting tibble will have
+#' all of the necessary parameters, specific to your data, to run a FIMS
+#' model.
 #'
 #' @details
 #' The function builds module-specific defaults by calling helper
 #' functions for data, fleet, selectivity, recruitment, maturity, growth, and
 #' population components, then combines those defaults into one tibble.
+#' You can modify the returned tibble before fitting a model (for example,
+#' updating maturity and selectivity parameter values).
+#'
+#' To create the default initial numbers at age, this function uses the defaults
+#' from `setup_default_Population()` and `setup_default_recruitment()`, which
+#' are passed to `setup_default_init_naa()` to calculate initial numbers at age.
 #'
 #' @param data A `FIMSFrame` object returned from running [FIMSFrame()] on
 #'   your long input data.
@@ -48,6 +55,7 @@
 #' @keywords setup_default_parameters
 #' @seealso
 #' * [FIMSFrame()]
+#' * [initialize_fims()]
 #' @examples
 #' \dontrun{
 #' # Load the example dataset and create a FIMS data frame
@@ -81,21 +89,13 @@
 #'     )
 #'   )
 #' }
-setup_default_parameters <- function(
-  data
-) {
-  assert_is_fims_frame(data)
+setup_default_parameters <- function(data) {
+  is.FIMSFrame(data)
 
-  # Cache input data once to avoid repeated extraction in map() loops.
-  model_data <- get_data(data)
-
-  fleets <- model_data |>
-    dplyr::pull(.data$fleet) |>
-    na.omit() |>
-    unique()
+  fleets <- get_fleets(data)
 
   # Create fleet parameters
-  fleet_defaults <- purrr::map(
+  fleet_defaults <- purrr::map_df(
     fleets,
     function(fleet_i) {
       setup_default_fleet(
@@ -103,9 +103,7 @@ setup_default_parameters <- function(
         fleet = fleet_i
       )
     }
-  ) |>
-    # bind_rows now directly takes the list of tibbles from map()
-    dplyr::bind_rows()
+  )
 
   # Create selectivity parameters
   selectivity_defaults <- purrr::map(
@@ -127,22 +125,33 @@ setup_default_parameters <- function(
 
   # Create growth parameters
   growth_defaults <- setup_default_growth()
-
+  
+  population_defaults <- setup_default_Population(data = data)
   # Calculate initial numbers at age based on log_rzero and M_value
   # Set natural mortality rate
-  log_M <- log(0.2)
+  log_m <- population_defaults |>
+    dplyr::filter(.data[["label"]] == "log_M") |>
+    dplyr::pull(.data[["value"]]) |>
+    unique()
+  log_rzero <- recruitment_defaults |>
+    dplyr::filter(.data[["label"]] == "log_rzero") |>
+    dplyr::pull(.data[["value"]])
   log_init_naa <- setup_default_log_init_naa(
-    data = data,
-    recruitment_defaults = recruitment_defaults,
-    log_m = log_M
+    n_ages = get_n_ages(data),
+    log_rzero = log_rzero,
+    log_m = log_m
   )
 
   # Create population parameters
-  population_defaults <- setup_default_Population(
-    data = data,
-    log_M = log_M,
-    log_init_naa = log_init_naa
-  )
+  population_defaults <- population_defaults |>
+    dplyr::rows_update(
+      tibble::tibble(
+        label = "log_init_naa",
+        age = get_ages(data),
+        value = log_init_naa
+      ),
+      by = c("label", "age")
+    )
 
   # Compile defaults
   default_parameters <- dplyr::bind_rows(
@@ -160,37 +169,50 @@ setup_default_parameters <- function(
 #' @description
 #' Helper used by [setup_default_parameters()] to compute `log_init_naa` from
 #' recruitment defaults and a natural mortality value.
-#' @param data A `FIMSFrame` object.
-#' @param recruitment_defaults A tibble returned by [setup_default_recruitment()].
+#' @param n_ages An integer specifying the number of ages in the population. Can be obtained from [get_n_ages()].
+#' @param log_rzero A scalar natural-log unfished recruitment value. Can be obtained from the recruitment defaults tibble.
 #' @param log_m A scalar natural-log mortality value.
-#' @return A numeric vector of log initial numbers-at-age.
+#' @return A numeric vector of log initial numbers-at-age. See \code{\link{setup_default_parameters}}
+#' for full column descriptions.
 #' @noRd
+#' @examples
+#' \dontrun{
+#' # Load the example dataset and create a FIMS data frame
+#' data("data_big")
+#' fims_frame <- FIMSFrame(data_big)
+#' # Set up default recruitment parameters
+#' recruitment_defaults <- setup_default_recruitment(data = fims_frame)
+#' # Extract log_rzero from recruitment defaults
+#' log_rzero <- recruitment_defaults |>
+#'   dplyr::filter(.data[["label"]] == "log_rzero") |>
+#'   dplyr::pull(.data[["value"]])
+#' # Set up default initial numbers-at-age on the log scale
+#' log_init_naa <- FIMS:::setup_default_log_init_naa(
+#'   n_ages = get_n_ages(fims_frame),
+#'   log_rzero = log_rzero,
+#'   log_m = log(0.2)
+#' )
 setup_default_log_init_naa <- function(
-  data,
-  recruitment_defaults,
+  n_ages,
+  log_rzero,
   log_m = log(0.2)
 ) {
-  log_rzero <- recruitment_defaults |>
-    dplyr::filter(.data[["label"]] == "log_rzero") |>
-    dplyr::pull(.data[["value"]])
-
-  init_naa <- exp(log_rzero) * exp(-(get_ages(data) - 1) * exp(log_m))
-  n_ages <- get_n_ages(data)
+  init_naa <- exp(log_rzero) * exp(-(0:(n_ages - 1)) * exp(log_m))
   init_naa[n_ages] <- init_naa[n_ages] / exp(log_m)
 
   log(init_naa)
 }
 
-#' Set up default parameters for a FIMS model
+#' Set up a template for default parameters for a FIMS model
+#'
 #' @description
 #' This function creates a template for default parameters used in a Fisheries
-#' Integrated Modeling System (FIMS) model. The template includes fields for
-#' module name, module type, label, fleet name, population name, age, length,
-#' time, value, estimation type, distribution type, and distribution.
+#' Integrated Modeling System (FIMS) model. 
 #' @param n_parameters An integer specifying the number of parameters in the
 #' template.
 #' @return
-#' A tibble template for a FIMS model.
+#' A tibble template for a FIMS model. See \code{\link{setup_default_parameters}}
+#' for full column descriptions.
 #' @noRd
 #' @examples
 #' FIMS:::setup_default_parameters_template(n_parameters = 3)
@@ -220,8 +242,8 @@ setup_default_parameters_template <- function(n_parameters = 1) {
 #' @param module_type A character string specifying the type of growth module. The
 #' default is `"EWAA"`.
 #' @return
-#' A tibble containing default growth parameters, including module
-#' name, module type, label, value, and estimation type.
+#' A tibble containing default growth parameters. See \code{\link{setup_default_parameters}}
+#' for full column descriptions.
 #' @export
 #' @rdname setup_default_parameters
 #' @keywords setup_default_parameters
@@ -254,7 +276,6 @@ setup_default_growth <- function(
 #' log natural mortality rate, log initial numbers at age, and proportion of
 #' females. The function performs input checks to ensure that the provided
 #' arguments are valid.
-#' @param data An S4 object. FIMS input data.
 #' @param log_M A numeric value or vector (length equal to the number of ages *
 #' number of years) specifying the log natural mortality rate. Default is `log(0.2)`.
 #' @param log_init_naa A numeric value or vector (length equal to the number of
@@ -268,6 +289,10 @@ setup_default_growth <- function(
 #' @export
 #' @rdname setup_default_parameters
 #' @keywords setup_default_parameters
+#' @examples
+#' \dontrun{
+#' default_population_parameters <- setup_default_Population(data = FIMSFrame(data_big))
+#' }
 setup_default_Population <- function(
   data,
   log_M = log(0.2),
@@ -275,7 +300,7 @@ setup_default_Population <- function(
   proportion_female = 0.5
 ) {
   # Input checks
-  assert_is_fims_frame(data)
+  is.FIMSFrame(data)
 
   # Extract necessary values from data
   n_years <- get_n_years(data)
@@ -313,6 +338,15 @@ setup_default_Population <- function(
     cli::cli_abort(local_bullets)
   }
 
+  # If log_init_naa is NA, print a message to the user and advise them to set it
+  # using dplyr::rows_update() or dplyr::mutate() before running the model
+  if (any(is.na(log_init_naa))) {
+    cli::cli_alert_info(c(
+      "i" = "The {.var log_init_naa} parameter is set to {.val NA}.",
+      "i" = "Please set the initial numbers at age using {.code dplyr::rows_update()} or {.code dplyr::mutate()} before running the model."
+    ))
+  }
+
   # Create a list of default parameters
   default <- setup_default_parameters_template(
     n_parameters = n_years * n_ages
@@ -339,17 +373,6 @@ setup_default_Population <- function(
     dplyr::mutate(
       module_name = "Population"
     )
-
-  # If log_init_naa is NA, print a message to the user and advise them to set it
-  # using dplyr::rows_update() or dplyr::mutate() before running the model
-  if (any(is.na(log_init_naa))) {
-    cli::cli_alert_info(c(
-      "i" = "The {.var log_init_naa} parameter is set to {.val NA}.",
-      "i" = "Please set the initial numbers at age using {.code dplyr::rows_update()} or {.code dplyr::mutate()} before running the model."
-    ))
-  }
-
-  return(default)
 }
 
 #' Set up default logistic parameters
@@ -359,8 +382,12 @@ setup_default_Population <- function(
 #' two specified parameters, the inflection point and slope.
 #' @return
 #' A tibble containing the default logistic parameters, with inflection_point
-#' and slope values and their estimation status.
+#' and slope values and their estimation type.
 #' @noRd
+#' @examples
+#' \dontrun{
+#' default_logistic_parameters <- FIMS:::setup_default_Logistic()
+#' }
 setup_default_Logistic <- function() {
   # Create a template for default parameters
   default <- setup_default_parameters_template(n_parameters = 2) |>
@@ -382,8 +409,12 @@ setup_default_Logistic <- function() {
 #' @return
 #' A tibble containing the default double logistic parameters,
 #' inflection_point_asc, slope_asc, inflection_point_desc, and slope_desc
-#' values and their estimation status.
+#' values and their estimation type.
 #' @noRd
+#' @examples
+#' \dontrun{
+#' default_double_logistic_parameters <- FIMS:::setup_default_DoubleLogistic()
+#' }
 setup_default_DoubleLogistic <- function() {
   default <- setup_default_parameters_template(n_parameters = 4) |>
     dplyr::mutate(
@@ -411,19 +442,27 @@ setup_default_DoubleLogistic <- function() {
 #'   and the default is
 #'   `r toString(eval(formals(setup_default_selectivity)[["module_type"]])[1])`.
 #' @inherit setup_default_parameters
-#' @return A tibble containing the default selectivity parameters.
+#' @return A tibble containing the default selectivity parameters. See \code{\link{setup_default_parameters}}
+#' for full column descriptions.
 #' @export
 #' @rdname setup_default_parameters
 #' @keywords setup_default_parameters
+#' @examples
+#' \dontrun{
+#' default_selectivity_parameters <- FIMS:::setup_default_selectivity(
+#'   data = FIMSFrame(data_big),
+#'   fleet = "fleet1",
+#'   module_type = "Logistic"
+#' )
+#' }
 setup_default_selectivity <- function(
   data,
   fleet,
   module_type = c("Logistic", "DoubleLogistic")
 ) {
   # Input checks
-  assert_is_fims_frame(data)
-  assert_single_fleet(fleet)
-  assert_fleet_in_data(data, fleet)
+  is.FIMSFrame(data)
+  is.fleet.in.data(data, fleet)
 
   module_type <- rlang::arg_match(module_type)
   # NOTE: All new forms of selectivity must be placed in the vector of default
@@ -442,25 +481,34 @@ setup_default_selectivity <- function(
 #' Set up default fleet parameters
 #'
 #' @description
-#' This function sets up default parameters for a fleet module. It compiles
-#' selectivity parameters along with distributions for each type of data that
-#' are present for the given fleet.
+#' This function sets up default parameters for a fleet module, including natural log of
+#' catchability coefficients (log_q) and fishing mortality (log_Fmort) for fleets. 
+#' For fishing fleets, log_q is set to an estimation type of "constant" with a
+#' default value of 0, while log_Fmort is set to "fixed_effects". For survey
+#' fleets, log_q is set to "fixed_effects" and log_Fmort is set to "constant"
+#' with a default value of -200.
 #'
-#' @param data An S4 object. FIMS input data.
 #' @param fleet A character. Name of the fleet.
 #' @inherit setup_default_parameters
-#' @return A tibble containing the default fleet parameters.
+#' @return A tibble containing the default fleet parameters. See \code{\link{setup_default_parameters}}
+#' for full column descriptions.
 #' @export
 #' @rdname setup_default_parameters
 #' @keywords setup_default_parameters
+#' @examples
+#' \dontrun{
+#' default_fleet_parameters <- setup_default_fleet(
+#'   data = FIMSFrame(data_big),
+#'   fleet = "fleet1"
+#' )
+#' }
 setup_default_fleet <- function(
   data,
   fleet
 ) {
   # Input checks
-  assert_is_fims_frame(data)
-  assert_single_fleet(fleet)
-  assert_fleet_in_data(data, fleet)
+  is.FIMSFrame(data)
+  is.fleet.in.data(data, fleet)
 
   # Extract fleet's type
   fleet_types <- get_data(data) |>
@@ -508,19 +556,29 @@ setup_default_fleet <- function(
 #' @param data An S4 object. FIMS input data.
 #' @param module_type A string specifying the type of maturity module. The
 #'   available options are `r toString(eval(formals(setup_default_maturity)[["module_type"]]))`.
-#' @inherit setup_default_parameters return
+#' @inherit setup_default_parameters 
+#' @return
+#' A tibble containing default maturity parameters. See \code{\link{setup_default_parameters}}
+#' for full column descriptions.
 #' @export
 #' @rdname setup_default_parameters
 #' @keywords setup_default_parameters
+#' @examples
+#' \dontrun{
+#' default_maturity_parameters <- setup_default_maturity(
+#'   data = FIMSFrame(data_big),
+#'   module_type = "Logistic"
+#' )
+#' }
 setup_default_maturity <- function(
   data,
   module_type = c("Logistic")
 ) {
   # Input checks
-  assert_is_fims_frame(data)
+  is.FIMSFrame(data)
   module_type <- rlang::arg_match(module_type)
 
-  # NOTE: All new module_type of maturity must be placed in the vector of default
+  # Developer note: All new module_type of maturity must be placed in the vector of default
   # arguments for `module_type` and their methods but be placed below in the call to
   # `switch`
   default <- switch(module_type,
@@ -544,19 +602,25 @@ setup_default_maturity <- function(
 #' the logit transformation of the slope of the stock--recruitment curve to
 #' keep it between zero and one, and the time series of stock--recruitment
 #' deviations on the natural log scale.
-#' @param data An S4 object. FIMS input data.
-#' @param distribution A string specifying the distribution type for the stock--recruitment
-#'   deviations. The default is `NA_character_`, which means that the stock--recruitment
-#'   deviations are not estimated.
+#' @param distribution A string specifying the distribution for the stock--recruitment
+#'   deviations. The default is `Dnorm`.
 #' @inherit setup_default_parameters
 #' @return
-#' A tibble containing default recruitment parameters.
+#' A tibble containing default recruitment parameters. See \code{\link{setup_default_parameters}}
+#' for full column descriptions.
 #' @noRd
+#' @examples
+#' \dontrun{
+#' default_recruitment_parameters <- FIMS:::setup_default_BevertonHoltRecruitment(
+#'   data = FIMSFrame(data_big),
+#'   distribution = "Dnorm"
+#' )
+#' }
 setup_default_BevertonHoltRecruitment <- function(
   data,
-  distribution = NA_character_
+  distribution = c("Dnorm")
 ) {
-  assert_is_fims_frame(data)
+  is.FIMSFrame(data)
 
   # Set up default parameters for Beverton--Holt recruitment
   log_rzero <- setup_default_parameters_template(
@@ -619,7 +683,6 @@ setup_default_BevertonHoltRecruitment <- function(
 #' normal distribution, i.e., `DnormDistribution`, module.
 #' @param value A real number that is passed to `log_sd`. The default value is
 #'   `0.1`.
-#' @param data An S4 object. FIMS input data.
 #' @param input_type A string specifying the input type. The available options
 #'   are
 #'   `r toString(formals(setup_default_DnormDistribution)[["input_type"]])`.
@@ -634,7 +697,7 @@ setup_default_DnormDistribution <- function(
   input_type = c("data", "process", "prior")
 ) {
   # Input checks
-  assert_is_fims_frame(data)
+  is.FIMSFrame(data)
   input_type <- rlang::arg_match(input_type)
 
   # Set up default parameters
@@ -657,7 +720,6 @@ setup_default_DnormDistribution <- function(
 #' This function sets up default parameters to calculate the density of a
 #' log-normal distribution, i.e., `DlnormDistribution`, module.
 #' @param value Default value for `log_sd`.
-#' @param data An S4 object. FIMS input data.
 #' @param input_type A string specifying the input type. The available options
 #'   are
 #'   `r toString(formals(setup_default_DlnormDistribution)[["input_type"]])`.
@@ -672,7 +734,7 @@ setup_default_DlnormDistribution <- function(
   input_type = c("data", "process", "prior")
 ) {
   # Input checks
-  assert_is_fims_frame(data)
+  is.FIMSFrame(data)
   # TODO: Determine if value can be a vector?
   if (!is.numeric(value) || any(value <= 0, na.rm = TRUE)) {
     cli::cli_abort(c(
@@ -706,17 +768,27 @@ setup_default_DlnormDistribution <- function(
 #' @description
 #' This function sets up default parameters for a recruitment module.
 #'
-#' @param data An S4 object. FIMS input data.
 #' @param module_type A string specifying the type of recruitment model. The
 #'   available options are
 #'   `r toString(eval(formals(setup_default_recruitment)[["module_type"]]))`.
 #' @param distribution A string specifying the distribution for the recruitment process.
 #'   The available options are
 #'   `r toString(eval(formals(setup_default_recruitment)[["distribution"]]))`.
-#' @inherit setup_default_parameters return
+#' @inherit setup_default_parameters 
+#' @return
+#' A tibble containing default recruitment parameters. See \code{\link{setup_default_parameters}}
+#' for full column descriptions.
 #' @export
 #' @rdname setup_default_parameters
 #' @keywords setup_default_parameters
+#' @examples
+#' \dontrun{
+#' default_recruitment_parameters <- setup_default_recruitment(
+#'   data = FIMSFrame(data_big),
+#'   module_type = "BevertonHolt",
+#'   distribution = "Dnorm"
+#' )
+#' }
 setup_default_recruitment <- function(
   data,
   module_type = c("BevertonHolt"),
@@ -725,7 +797,7 @@ setup_default_recruitment <- function(
   # Input checks
   # TODO: extend this code when there is more than one form of recruitment
   #       (i.e., multiple populations)
-  assert_is_fims_frame(data)
+  is.FIMSFrame(data)
   module_type <- rlang::arg_match(module_type)
   distribution <- rlang::arg_match(distribution)
 

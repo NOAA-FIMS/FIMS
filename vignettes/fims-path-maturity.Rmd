@@ -109,18 +109,28 @@ To run a FIMS model, more modules than just a maturity module need to be linked 
 # Initialize the population module and link the maturity module
 # The IDs of the growth and recruitment modules are pseudo code and don't exist
 recruitment_defaults <- FIMS::setup_default_recruitment(data = fims_frame)
-log_m <- log(0.2)
+log_rzero <- recruitment_defaults |>
+  dplyr::filter(.data[["label"]] == "log_rzero") |>
+  dplyr::pull(.data[["value"]])
+
+population_defaults <- FIMS::setup_default_Population(
+  data = fims_frame
+)
 log_init_naa <- FIMS:::setup_default_log_init_naa(
-  data = fims_frame,
-  recruitment_defaults = recruitment_defaults,
-  log_m = log_m
+  n_ages = get_n_ages(fims_frame),
+  log_rzero = log_rzero,
+  log_m = log(0.2)
 )
 
-population <- FIMS::setup_default_Population(
-  data = fims_frame,
-  log_M = log_m,
-  log_init_naa = log_init_naa
-) |>
+population <- population_defaults |>
+  dplyr::rows_update(
+    tibble::tibble(
+      label = "log_init_naa",
+      age = get_ages(fims_frame),
+      value = log_init_naa
+    ),
+    by = c("label", "age")
+  ) |>
   dplyr::bind_rows(parameters) |>
   FIMS:::initialize_population(
     data = fims_frame,

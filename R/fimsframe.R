@@ -597,6 +597,7 @@ methods::setMethod(
 #' }
 #'
 #' @importFrom graphics plot
+#' @importFrom stockplotr theme_noaa
 #' @method plot FIMSFrame
 #' @rdname plot
 #' @aliases plot,FIMSFrame,missing-method
@@ -671,7 +672,35 @@ methods::setMethod(
 )
 
 is.FIMSFrame <- function(x) {
-  inherits(x, "FIMSFrame")
+  # Check if x is a FIMSFrame object
+  if (!inherits(x, "FIMSFrame")) {
+    cli::cli_abort(c(
+      "i" = "{.var x} should be a {.cls FIMSFrame} object.",
+      "x" = "{.var x} is a {.cls {class(x)}} object."
+    ))
+  }
+  # returns TRUE if x is a FIMSFrame object
+  invisible(TRUE)
+}
+
+# Validate fleet input and confirm it exists in the data.
+is.fleet.in.data <- function(data, fleet) {
+  if (!is.character(fleet) || length(fleet) != 1 || is.na(fleet)) {
+    cli::cli_abort(c(
+      "x" = "{.var fleet} must be a single non-missing character string.",
+      "i" = "{.var fleet} is of class {.cls {class(fleet)}} and has length {length(fleet)}."
+    ))
+  }
+
+  fleets <- get_fleets(data)
+  if (!fleet %in% fleets) {
+    cli::cli_abort(c(
+      "x" = "{.var fleet} is not present in the {.var data}.",
+      "i" = "Available fleet names are: {.val {fleets}}."
+    ))
+  }
+
+  invisible(TRUE)
 }
 
 # methods::setValidity ----
