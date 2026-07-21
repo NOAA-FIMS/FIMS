@@ -432,7 +432,7 @@ class DistributionsInterface : public DistributionsInterfaceBase {
           std::dynamic_pointer_cast<fims_distributions::DensityComponentBase<double>>(
               it->second);
 
-      this->lpdf_value = dgeneric->lpdf;
+      this->lpdf_m = dgeneric->lpdf;
 
       size_t n_x = static_cast<size_t>(dgeneric->check_input_sizes());
 
@@ -446,12 +446,12 @@ class DistributionsInterface : public DistributionsInterfaceBase {
           auto tmp = (*dgeneric->observed_pointer).at(0); 
           for (size_t i = 0; i < n_x; ++i) {
             this->observed_values_m[i].estimation_type_m = std::string("derived"); 
-            this->observed_values_m[i].final_value_m = tmp[0]; 
+            this->observed_values_m[i].final_value_m = tmp; 
           }
         }else if ((*dgeneric->observed_pointer).size() == n_x) {
           for (size_t i = 0; i < n_x; ++i) {
             this->observed_values_m[i].estimation_type_m = std::string("derived"); 
-            this->observed_values_m[i].final_value_m = (*dgeneric->observed_pointer).at(i)[0]; 
+            this->observed_values_m[i].final_value_m = (*dgeneric->observed_pointer).at(i); 
           }
         } else {
           FIMS_WARNING_LOG(
@@ -488,12 +488,12 @@ class DistributionsInterface : public DistributionsInterfaceBase {
           auto tmp = (*dgeneric->expected_pointer).at(0); 
           for (size_t i = 0; i < n_x; ++i) {
             this->expected_values_m[i].estimation_type_m = std::string("derived"); 
-            this->expected_values_m[i].final_value_m = tmp[0]; 
+            this->expected_values_m[i].final_value_m = tmp; 
           }
         }else if ((*dgeneric->expected_pointer).size() == n_x) {
           for (size_t i = 0; i < n_x; ++i) {
             this->expected_values_m[i].estimation_type_m = std::string("derived"); 
-            this->expected_values_m[i].final_value_m = (*dgeneric->expected_pointer).at(i)[0]; 
+            this->expected_values_m[i].final_value_m = (*dgeneric->expected_pointer).at(i); 
           }
         } else {
           FIMS_WARNING_LOG(
@@ -530,12 +530,12 @@ class DistributionsInterface : public DistributionsInterfaceBase {
           auto tmp = (*dgeneric->uncertainty_pointer).at(0); 
           for (size_t i = 0; i < n_x; ++i) {
             this->uncertainty_values_m[i].estimation_type_m = std::string("derived"); 
-            this->uncertainty_values_m[i].final_value_m = tmp[0]; 
+            this->uncertainty_values_m[i].final_value_m = tmp; 
           }
         }else if ((*dgeneric->uncertainty_pointer).size() == n_x) {
           for (size_t i = 0; i < n_x; ++i) {
             this->uncertainty_values_m[i].estimation_type_m = std::string("derived"); 
-            this->uncertainty_values_m[i].final_value_m = (*dgeneric->uncertainty_pointer).at(i)[0]; 
+            this->uncertainty_values_m[i].final_value_m = (*dgeneric->uncertainty_pointer).at(i); 
           }
         } else {
           FIMS_WARNING_LOG(
@@ -563,7 +563,7 @@ class DistributionsInterface : public DistributionsInterfaceBase {
       }
 
       this->lpdf_vec_m = RealVector(n_x);
-      for (size_t i = 0; i < this->lpdf_vec.size(); i++) {
+      for (size_t i = 0; i < this->lpdf_vec_m.size(); i++) {
         this->lpdf_vec_m[i] = dgeneric->lpdf_vec[i];
       }
     }
@@ -582,59 +582,60 @@ class DistributionsInterface : public DistributionsInterfaceBase {
     ss << "{\n";
     ss << " \"module_name\": \"density\",\n";
     ss << " \"module_id\": " << this->id_m << ",\n";
-    ss << " \"module_type\": \"normal\",\n";
-    ss << " \"observed_data_id\" : " << this->interface_observed_data_id_m
-       << ",\n";
+    ss << " \"module_type\": \"generic\",\n";
     ss << " \"input_type\" : \"" << this->input_type_m << "\",\n";
     ss << " \"density_component\": {\n";
-    ss << "  \"lpdf_value\": " << sanitize_val(this->lpdf_value) << ",\n";
+    ss << "  \"lpdf_value\": " << sanitize_val(this->lpdf_m) << ",\n";
     ss << "  \"value\":[";
-    if (this->lpdf_vec.size() == 0) {
+    if (this->lpdf_vec_m.size() == 0) {
       ss << "],\n";
     } else {
-      for (size_t i = 0; i < this->lpdf_vec.size() - 1; i++) {
-        ss << this->value_to_string(this->lpdf_vec[i]);
+      for (size_t i = 0; i < this->lpdf_vec_m.size() - 1; i++) {
+        ss << this->value_to_string(this->lpdf_vec_m[i]);
         ss << ", ";
       }
-      ss << this->value_to_string(this->lpdf_vec[this->lpdf_vec.size() - 1]);
+      ss << this->value_to_string(this->lpdf_vec_m[this->lpdf_vec_m.size() - 1]);
 
       ss << "],\n";
     }
-    ss << "  \"expected_values\":[";
-    if (this->expected_values.size() == 0) {
+    ss << "  \"observed_values\":[";
+    if (this->observed_values_m.size() == 0) {
       ss << "],\n";
     } else {
-      for (size_t i = 0; i < this->expected_values.size() - 1; i++) {
-        ss << this->value_to_string(this->expected_values[i].final_value_m)
+      for (size_t i = 0; i < this->observed_values_m.size() - 1; i++) {
+        ss << this->value_to_string(this->observed_values_m[i].final_value_m)
            << ", ";
       }
       ss << this->value_to_string(
-          this->expected_values[this->expected_values.size() - 1]
+          this->observed_values_m[this->observed_values_m.size() - 1]
               .final_value_m);
       ss << "],\n";
     }
-    ss << "  \"log_sd_values\":[";
-    if (this->log_sd.size() == 0) {
+    ss << "  \"expected_values\":[";
+    if (this->expected_values_m.size() == 0) {
       ss << "],\n";
     } else {
-      for (R_xlen_t i = 0; i < static_cast<R_xlen_t>(this->log_sd.size()) - 1;
-           i++) {
-        ss << this->value_to_string(this->log_sd[i].final_value_m) << ", ";
+      for (size_t i = 0; i < this->expected_values_m.size() - 1; i++) {
+        ss << this->value_to_string(this->expected_values_m[i].final_value_m)
+           << ", ";
       }
       ss << this->value_to_string(
-                this->log_sd[this->log_sd.size() - 1].final_value_m)
-         << "],\n";
+          this->expected_values_m[this->expected_values_m.size() - 1]
+              .final_value_m);
+      ss << "],\n";
     }
-    ss << "  \"observed_values\":[";
-    if (this->observed_values.size() == 0) {
-      ss << "]\n";
+    ss << "  \"uncertainty_values\":[";
+    if (this->uncertainty_values_m.size() == 0) {
+      ss << "],\n";
     } else {
-      for (size_t i = 0; i < this->observed_values.size() - 1; i++) {
-        ss << this->observed_values[i].final_value_m << ", ";
+      for (size_t i = 0; i < this->uncertainty_values_m.size() - 1; i++) {
+        ss << this->value_to_string(this->uncertainty_values_m[i].final_value_m)
+           << ", ";
       }
-      ss << this->observed_values[this->observed_values.size() - 1]
-                .final_value_m
-         << "]\n";
+      ss << this->value_to_string(
+          this->uncertainty_values_m[this->uncertainty_values_m.size() - 1]
+              .final_value_m);
+      ss << "],\n";
     }
     ss << " }}\n";
     return ss.str();
@@ -647,12 +648,11 @@ class DistributionsInterface : public DistributionsInterfaceBase {
     std::shared_ptr<fims_info::Information<Type>> info =
         fims_info::Information<Type>::GetInstance();
 
-    std::shared_ptr<fims_distributions::NormalLPDF<Type>> distribution =
-        std::make_shared<fims_distributions::NormalLPDF<Type>>();
+    std::shared_ptr<fims_distributions::DensityComponentBase<Type>> distribution =
+        std::make_shared<fims_distributions::DensityComponentBase<Type>>();
 
     // interface to data/parameter value
 
-    distribution->observed_data_id_m = interface_observed_data_id_m;
     std::stringstream ss;
     distribution->input_type = this->input_type_m;
     distribution->key.resize(this->key_m->size());
@@ -903,9 +903,7 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
     ss << "{\n";
     ss << " \"module_name\": \"density\",\n";
     ss << " \"module_id\": " << this->id_m << ",\n";
-    ss << " \"module_type\": \"normal\",\n";
-    ss << " \"observed_data_id\" : " << this->interface_observed_data_id_m
-       << ",\n";
+    ss << " \"module_type\": \"generic\",\n";
     ss << " \"input_type\" : \"" << this->input_type_m << "\",\n";
     ss << " \"density_component\": {\n";
     ss << "  \"lpdf_value\": " << sanitize_val(this->lpdf_value) << ",\n";
@@ -921,41 +919,43 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
 
       ss << "],\n";
     }
-    ss << "  \"expected_values\":[";
-    if (this->expected_values.size() == 0) {
+    ss << "  \"observed_values\":[";
+    if (this->observed_values_m.size() == 0) {
       ss << "],\n";
     } else {
-      for (size_t i = 0; i < this->expected_values.size() - 1; i++) {
-        ss << this->value_to_string(this->expected_values[i].final_value_m)
+      for (size_t i = 0; i < this->observed_values_m.size() - 1; i++) {
+        ss << this->value_to_string(this->observed_values_m[i].final_value_m)
            << ", ";
       }
       ss << this->value_to_string(
-          this->expected_values[this->expected_values.size() - 1]
+          this->observed_values_m[this->observed_values_m.size() - 1]
               .final_value_m);
       ss << "],\n";
     }
-    ss << "  \"log_sd_values\":[";
-    if (this->log_sd.size() == 0) {
+    ss << "  \"expected_values\":[";
+    if (this->expected_values_m.size() == 0) {
       ss << "],\n";
     } else {
-      for (R_xlen_t i = 0; i < static_cast<R_xlen_t>(this->log_sd.size()) - 1;
-           i++) {
-        ss << this->value_to_string(this->log_sd[i].final_value_m) << ", ";
+      for (size_t i = 0; i < this->expected_values_m.size() - 1; i++) {
+        ss << this->value_to_string(this->expected_values_m[i].final_value_m)
+           << ", ";
       }
       ss << this->value_to_string(
-                this->log_sd[this->log_sd.size() - 1].final_value_m)
-         << "],\n";
+          this->expected_values_m[this->expected_values_m.size() - 1]
+              .final_value_m);
+      ss << "],\n";
     }
-    ss << "  \"observed_values\":[";
-    if (this->observed_values.size() == 0) {
-      ss << "]\n";
+    ss << "  \"uncertainty_values\":[";
+    if (this->uncertainty_values_m.size() == 0) {
+      ss << "],\n";
     } else {
-      for (size_t i = 0; i < this->observed_values.size() - 1; i++) {
-        ss << this->observed_values[i].final_value_m << ", ";
+      for (R_xlen_t i = 0; i < static_cast<R_xlen_t>(this->uncertainty_values_m.size()) - 1;
+           i++) {
+        ss << this->value_to_string(this->uncertainty_values_m[i].final_value_m) << ", ";
       }
-      ss << this->observed_values[this->observed_values.size() - 1]
-                .final_value_m
-         << "]\n";
+      ss << this->value_to_string(
+                this->uncertainty_values_m[this->uncertainty_values_m.size() - 1].final_value_m)
+         << "],\n";
     }
     ss << " }}\n";
     return ss.str();
