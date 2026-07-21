@@ -20,12 +20,8 @@
 namespace {
 
 // Benchmark for {{{ class_name }}}::{{{ function_name }}}
-static void BM_ {
-  {
-    { class_name }
-  }
-}
-_{{{function_name}}}(benchmark::State& state) {
+// clang-format off
+static void BM_{{{ class_name }}}_{{{ function_name }}}(benchmark::State& state) {
   // TODO: Create representative inputs outside the loop.
   // auto x = ...;
 
@@ -36,10 +32,7 @@ _{{{function_name}}}(benchmark::State& state) {
     benchmark::DoNotOptimize(state.iterations());
   }
 }
-BENCHMARK(BM_ {
-  {
-    { class_name }
-  }
-} _{{{function_name}}});
+BENCHMARK(BM_{{{ class_name }}}_{{{ function_name }}});
+// clang-format on
 
 }  // namespace

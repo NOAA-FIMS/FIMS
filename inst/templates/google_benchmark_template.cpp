@@ -42,12 +42,8 @@ struct BenchFixture {
 };
 
 // Benchmark for {{{ class_name }}}::{{{ function_name }}}
-static void BM_ {
-  {
-    { class_name }
-  }
-}
-_{{{function_name}}}(benchmark::State& state) {
+// clang-format off
+static void BM_{{{ class_name }}}_{{{ function_name }}}(benchmark::State& state) {
   BenchFixture fx;
   fx.Init();
 
@@ -59,10 +55,7 @@ _{{{function_name}}}(benchmark::State& state) {
     benchmark::DoNotOptimize(fx);
   }
 }
-BENCHMARK(BM_ {
-  {
-    { class_name }
-  }
-} _{{{function_name}}});
+BENCHMARK(BM_{{{ class_name }}}_{{{ function_name }}});
+// clang-format on
 
 }  // namespace
