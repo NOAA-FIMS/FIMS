@@ -320,19 +320,19 @@ class DistributionsInterface : public DistributionsInterfaceBase {
                             Rcpp::Nullable<int> expected_id = R_NilValue, 
                             Rcpp::Nullable<int> uncertainty_id = R_NilValue) {
     if(observed_id!= R_NilValue) {
-      int observed_id(observed_id);
-      this->observed_key_m.resize(1);
-      this->observed_key_m[0] = observed_id[0];
+      int observed_id_value(observed_id);
+      this->observed_key_m->resize(1);
+      this->observed_key_m->at(0) = observed_id_value;
     }
     if(expected_id!= R_NilValue) {
-      int expected_id(expected_id);
-      this->expected_key_m.resize(1);
-      this->expected_key_m[0] = expected_id[0];
+      int expected_id_value(expected_id);
+      this->expected_key_m->resize(1);
+      this->expected_key_m->at(0) = expected_id_value;
     }
     if(uncertainty_id!= R_NilValue) {
-      int uncertainty_id(uncertainty_id);
-      this->uncertainty_key_m.resize(1);
-      this->uncertainty_key_m[0] = uncertainty_id[0];
+      int uncertainty_id_value(uncertainty_id);
+      this->uncertainty_key_m->resize(1);
+      this->uncertainty_key_m->at(0) = uncertainty_id_value;
     }
     return true;
   }
@@ -409,7 +409,7 @@ class DistributionsInterface : public DistributionsInterfaceBase {
   virtual void finalize() {
     if (this->finalized) {
       // log warning that finalize has been called more than once.
-      FIMS_WARNING_LOG("DnormDistribution  " + fims::to_string(this->id_m) +
+      FIMS_WARNING_LOG("DistributionInterface  " + fims::to_string(this->id_m) +
                        " has been finalized already.");
     }
 
@@ -424,64 +424,147 @@ class DistributionsInterface : public DistributionsInterfaceBase {
     it = info->density_components.find(this->id_m);
     // if not found, just return
     if (it == info->density_components.end()) {
-      FIMS_WARNING_LOG("DnormDistribution " + fims::to_string(this->id_m) +
+      FIMS_WARNING_LOG("DistributionInterface " + fims::to_string(this->id_m) +
                        " not found in Information.");
       return;
     } else {
-      std::shared_ptr<fims_distributions::NormalLPDF<double>> dnorm =
-          std::dynamic_pointer_cast<fims_distributions::NormalLPDF<double>>(
+      std::shared_ptr<fims_distributions::DensityComponentBase<double>> dgeneric =
+          std::dynamic_pointer_cast<fims_distributions::DensityComponentBase<double>>(
               it->second);
 
-      this->lpdf_value = dnorm->lpdf;
+      this->lpdf_value = dgeneric->lpdf;
 
-      size_t n_x = dnorm->get_n_x();
+      size_t n_x = static_cast<size_t>(dgeneric->check_input_sizes());
 
-      // If input log_sd is a scalar, resize to n_x and fill with the scalar
+      // If input observed is a scalar, resize to n_x and fill with the scalar
       // value
-      if (this->log_sd.size() != n_x) {
-        // If log_sd size == 1 (scalar), repeat the entry
-        if (this->log_sd.size() == 1) {
-          auto tmp = this->log_sd[0];  // copy the one log_sd param
-          this->log_sd.resize(n_x);
+      if (this->observed_values_m.size() == 0) {
+        this->observed_values_m.resize(n_x);
+        if ((*dgeneric->observed_pointer).size() == 1) {
+          // If input pointer is a scalar, resize to n_x and fill with the scalar
+          // value
+          auto tmp = (*dgeneric->observed_pointer).at(0); 
           for (size_t i = 0; i < n_x; ++i) {
-            this->log_sd[i] = tmp;  // copies all fields in Param
+            this->observed_values_m[i].estimation_type_m = std::string("derived"); 
+            this->observed_values_m[i].final_value_m = tmp[0]; 
+          }
+        }else if ((*dgeneric->observed_pointer).size() == n_x) {
+          for (size_t i = 0; i < n_x; ++i) {
+            this->observed_values_m[i].estimation_type_m = std::string("derived"); 
+            this->observed_values_m[i].final_value_m = (*dgeneric->observed_pointer).at(i)[0]; 
           }
         } else {
-          // Handle error
           FIMS_WARNING_LOG(
-              "log_sd size does not match number of observations and is not "
+              "observed_pointer size does not match number of observations and is not "
               "scalar.");
         }
-      }
-      for (size_t i = 0; i < n_x; i++) {
-        if (this->log_sd[i].estimation_type_m.get() == "constant") {
-          this->log_sd[i].final_value_m = this->log_sd[i].initial_value_m;
-        } else {
-          this->log_sd[i].final_value_m = dnorm->log_sd.get_force_scalar(i);
+      }else if (this->observed_values_m.size() == 1) {
+        // If input uncertainty is a scalar, resize to n_x and fill with the scalar
+        // value
+        auto tmp = this->observed_values_m[0];  // copy the one observed value
+        this->observed_values_m.resize(n_x);
+        for (size_t i = 0; i < n_x; ++i) {
+          this->observed_values_m[i] = tmp;  // copies all fields in Param
+          if (this->observed_values_m[i].estimation_type_m.get() == "constant") {
+            this->observed_values_m[i].final_value_m = this->observed_values_m[i].initial_value_m;
+          } else {
+            this->observed_values_m[i].final_value_m = dgeneric->observed_values.get_force_scalar(i);
+          }
         }
+      }else if (this->observed_values_m.size() != n_x){
+          // Handle error
+          FIMS_WARNING_LOG(
+              "observed_values size does not match number of observations and is not "
+              "scalar.");
       }
 
-      for (size_t i = 0; i < this->expected_mean.size(); i++) {
-        if (this->expected_mean[i].estimation_type_m.get() == "constant") {
-          this->expected_mean[i].final_value_m =
-              this->expected_mean[i].initial_value_m;
+      // If input expected is a scalar, resize to n_x and fill with the scalar
+      // value
+      if (this->expected_values_m.size() == 0) {
+        this->expected_values_m.resize(n_x);
+        if ((*dgeneric->expected_pointer).size() == 1) {
+          // If input pointer is a scalar, resize to n_x and fill with the scalar
+          // value
+          auto tmp = (*dgeneric->expected_pointer).at(0); 
+          for (size_t i = 0; i < n_x; ++i) {
+            this->expected_values_m[i].estimation_type_m = std::string("derived"); 
+            this->expected_values_m[i].final_value_m = tmp[0]; 
+          }
+        }else if ((*dgeneric->expected_pointer).size() == n_x) {
+          for (size_t i = 0; i < n_x; ++i) {
+            this->expected_values_m[i].estimation_type_m = std::string("derived"); 
+            this->expected_values_m[i].final_value_m = (*dgeneric->expected_pointer).at(i)[0]; 
+          }
         } else {
-          this->expected_mean[i].final_value_m = dnorm->expected_mean[i];
+          FIMS_WARNING_LOG(
+              "expected_pointer size does not match number of observations and is not "
+              "scalar.");
         }
+      }else if (this->expected_values_m.size() == 1) {
+        // If input expected is a scalar, resize to n_x and fill with the scalar
+        // value
+        auto tmp = this->expected_values_m[0];  // copy the one expected param
+        this->expected_values_m.resize(n_x);
+        for (size_t i = 0; i < n_x; ++i) {
+          this->expected_values_m[i] = tmp;  // copies all fields in Param
+          if (this->expected_values_m[i].estimation_type_m.get() == "constant") {
+            this->expected_values_m[i].final_value_m = this->expected_values_m[i].initial_value_m;
+          } else {
+            this->expected_values_m[i].final_value_m = dgeneric->expected_values.get_force_scalar(i);
+          }
+        }
+      }else if (this->expected_values_m.size() != n_x){
+          // Handle error
+          FIMS_WARNING_LOG(
+              "expected_values size does not match number of observations and is not "
+              "scalar.");
       }
 
-      this->lpdf_vec = RealVector(n_x);
-      if (this->expected_values.size() == 1) {
-        this->expected_values.resize(n_x);
-      }
-      if (this->observed_values.size() == 1) {
-        this->observed_values.resize(n_x);
+      // If input uncertainty is a scalar, resize to n_x and fill with the scalar
+      // value
+      if (this->uncertainty_values_m.size() == 0) {
+        this->uncertainty_values_m.resize(n_x);
+        if ((*dgeneric->uncertainty_pointer).size() == 1) {
+          // If input pointer is a scalar, resize to n_x and fill with the scalar
+          // value
+          auto tmp = (*dgeneric->uncertainty_pointer).at(0); 
+          for (size_t i = 0; i < n_x; ++i) {
+            this->uncertainty_values_m[i].estimation_type_m = std::string("derived"); 
+            this->uncertainty_values_m[i].final_value_m = tmp[0]; 
+          }
+        }else if ((*dgeneric->uncertainty_pointer).size() == n_x) {
+          for (size_t i = 0; i < n_x; ++i) {
+            this->uncertainty_values_m[i].estimation_type_m = std::string("derived"); 
+            this->uncertainty_values_m[i].final_value_m = (*dgeneric->uncertainty_pointer).at(i)[0]; 
+          }
+        } else {
+          FIMS_WARNING_LOG(
+              "uncertainty_pointer size does not match number of observations and is not "
+              "scalar.");
+        }
+      }else if (this->uncertainty_values_m.size() == 1) {
+        // If input uncertainty is a scalar, resize to n_x and fill with the scalar
+        // value
+        auto tmp = this->uncertainty_values_m[0];  // copy the one uncertainty param
+        this->uncertainty_values_m.resize(n_x);
+        for (size_t i = 0; i < n_x; ++i) {
+          this->uncertainty_values_m[i] = tmp;  // copies all fields in Param
+          if (this->uncertainty_values_m[i].estimation_type_m.get() == "constant") {
+            this->uncertainty_values_m[i].final_value_m = this->uncertainty_values_m[i].initial_value_m;
+          } else {
+            this->uncertainty_values_m[i].final_value_m = dgeneric->uncertainty_values.get_force_scalar(i);
+          }
+        }
+      }else if (this->uncertainty_values_m.size() != n_x){
+          // Handle error
+          FIMS_WARNING_LOG(
+              "uncertainty_values size does not match number of observations and is not "
+              "scalar.");
       }
 
+      this->lpdf_vec_m = RealVector(n_x);
       for (size_t i = 0; i < this->lpdf_vec.size(); i++) {
-        this->lpdf_vec[i] = dnorm->lpdf_vec[i];
-        this->expected_values[i].final_value_m = dnorm->get_expected(i);
-        this->observed_values[i].final_value_m = dnorm->get_observed(i);
+        this->lpdf_vec_m[i] = dgeneric->lpdf_vec[i];
       }
     }
   }

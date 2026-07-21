@@ -48,7 +48,7 @@ class Variable {
   double final_value_m = 0.0;
   /**
    * @brief A string indicating the estimation type. Options are: constant,
-   * fixed_effects, or random_effects, where the default is constant.
+   * fixed_effects, random_effects, or derived where the default is constant.
    */
   SharedString estimation_type_m = SharedString("constant");
 

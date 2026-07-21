@@ -396,9 +396,9 @@ struct DensityComponentBase : public fims_model_object::FIMSObject<Type> {
   DensityComponentBase() {
     this->id = DensityComponentBase::id_g++;
     this->register_self(this->id);
-    observed_pointer = std::make_shared<fims::Vector<Type>>(observed_values);
-    expected_pointer = std::make_shared<fims::Vector<Type>>(expected_values);
-    uncertainty_pointer = std::make_shared<fims::Vector<Type>>(uncertainty_values);
+    this->observed_pointer = std::make_shared<fims::Vector<Type>>(this->observed_values);
+    this->expected_pointer = std::make_shared<fims::Vector<Type>>(this->expected_values);
+    this->uncertainty_pointer = std::make_shared<fims::Vector<Type>>(this->uncertainty_values);
   }
 
   virtual ~DensityComponentBase() {}
