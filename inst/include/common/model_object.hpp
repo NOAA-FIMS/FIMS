@@ -14,7 +14,8 @@
 
 #include "fims_vector.hpp"
 
-namespace fims_model_object {
+namespace fims {
+namespace model_object {
 
 /**
  * @brief FIMS struct that tracks object memory for leak detection
@@ -54,10 +55,10 @@ struct FIMSMemoryTracker {
 template <typename Type>
 struct FIMSObject : public FIMSMemoryTracker {
   uint32_t id; /**< unique identifier assigned for all fims objects */
-  std::vector<Type*> parameters; /**< list of estimable parameters */
-  std::vector<Type*>
+  std::vector<Type *> parameters; /**< list of estimable parameters */
+  std::vector<Type *>
       random_effects_parameters; /**< list of all random effects parameters */
-  std::vector<Type*>
+  std::vector<Type *>
       fixed_effects_parameters; /**< list of fixed effects parameters */
 
   FIMSObject() {}
@@ -86,6 +87,7 @@ struct FIMSObject : public FIMSMemoryTracker {
   }
 };
 
-}  // namespace fims_model_object
+}  // namespace model_object
+}  // namespace fims
 
 #endif /* FIMS_COMMON_MODEL_OBJECT_HPP */

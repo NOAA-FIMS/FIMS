@@ -120,7 +120,7 @@ class LogisticMaturityInterface : public MaturityInterfaceBase {
    * size in maturity).
    */
   virtual double evaluate(double x) {
-    fims_popdy::LogisticMaturity<double> LogisticMat;
+    fims::popdy::LogisticMaturity<double> LogisticMat;
     LogisticMat.inflection_point.resize(1);
     LogisticMat.inflection_point[0] = this->inflection_point[0].initial_value_m;
     LogisticMat.slope.resize(1);
@@ -141,10 +141,10 @@ class LogisticMaturityInterface : public MaturityInterfaceBase {
 
     this->finalized = true;  // indicate this has been called already
 
-    std::shared_ptr<fims_info::Information<double>> info =
-        fims_info::Information<double>::GetInstance();
+    std::shared_ptr<fims::info::Information<double>> info =
+        fims::info::Information<double>::GetInstance();
 
-    fims_info::Information<double>::maturity_models_iterator it;
+    fims::info::Information<double>::maturity_models_iterator it;
 
     // search for maturity in Information
     it = info->maturity_models.find(this->id);
@@ -154,8 +154,8 @@ class LogisticMaturityInterface : public MaturityInterfaceBase {
                        " not found in Information.");
       return;
     } else {
-      std::shared_ptr<fims_popdy::LogisticMaturity<double>> mat =
-          std::dynamic_pointer_cast<fims_popdy::LogisticMaturity<double>>(
+      std::shared_ptr<fims::popdy::LogisticMaturity<double>> mat =
+          std::dynamic_pointer_cast<fims::popdy::LogisticMaturity<double>>(
               it->second);
 
       for (size_t i = 0; i < inflection_point.size(); i++) {
@@ -217,11 +217,11 @@ class LogisticMaturityInterface : public MaturityInterfaceBase {
 
   template <typename Type>
   bool add_to_fims_tmb_internal() {
-    std::shared_ptr<fims_info::Information<Type>> info =
-        fims_info::Information<Type>::GetInstance();
+    std::shared_ptr<fims::info::Information<Type>> info =
+        fims::info::Information<Type>::GetInstance();
 
-    std::shared_ptr<fims_popdy::LogisticMaturity<Type>> maturity =
-        std::make_shared<fims_popdy::LogisticMaturity<Type>>();
+    std::shared_ptr<fims::popdy::LogisticMaturity<Type>> maturity =
+        std::make_shared<fims::popdy::LogisticMaturity<Type>>();
 
     // set relative info
     maturity->id = this->id;

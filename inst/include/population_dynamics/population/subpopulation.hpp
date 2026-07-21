@@ -8,7 +8,8 @@
 #ifndef FIMS_POPULATION_DYNAMICS_POPULATION_SUBPOPULATION_HPP
 #define FIMS_POPULATION_DYNAMICS_POPULATION_SUBPOPULATION_HPP
 
-namespace fims_popdy {
+namespace fims {
+namespace popdy {
 
 /**
  * Subpopulation class. This class represents a generic partition
@@ -17,6 +18,7 @@ namespace fims_popdy {
 template <typename Type>
 class Subpopulation {};
 
-}  // namespace fims_popdy
+}  // namespace popdy
+}  // namespace fims
 
 #endif /* FIMS_POPULATION_DYNAMICS_POPULATION_SUBPOPULATION_HPP */

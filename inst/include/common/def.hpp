@@ -167,7 +167,7 @@ struct LogEntry {
    * @details Example: "virtual bool
    * LogisticSelectivityInterface::add_to_fims_tmb()". For templated functions,
    * type information is reported in square brackets, for example: "bool
-   * fims_info::Information<Type>::CreateModel() [with Type = double]".
+   * fims::info::Information<Type>::CreateModel() [with Type = double]".
    */
   std::string routine;
   /**
@@ -231,11 +231,11 @@ class FIMSLog {
     }
 
 #elif defined(FIMS_LINUX) || defined(FIMS_MACOS) || defined(FIMS_BSD)
-    const char* user_env = getenv("USER");
+    const char *user_env = getenv("USER");
     if (user_env) return std::string(user_env);
 
     uid_t uid = getuid();
-    struct passwd* pw = getpwuid(uid);
+    struct passwd *pw = getpwuid(uid);
     if (pw && pw->pw_name) {
       return std::string(pw->pw_name);
     } else {
@@ -296,12 +296,12 @@ class FIMSLog {
    * @return std::filesystem::path
    */
   std::filesystem::path getAbsolutePathWithoutDotDot(
-      const std::filesystem::path& relativePath) {
+      const std::filesystem::path &relativePath) {
     std::filesystem::path absolutePath =
         std::filesystem::absolute(relativePath);
 
     std::filesystem::path result;
-    for (const auto& part : absolutePath) {
+    for (const auto &part : absolutePath) {
       if (part == "..") {
         if (!result.empty()) {
           result = result.parent_path();
@@ -345,8 +345,8 @@ class FIMSLog {
    * @see error_message()
    * @see warning_message()
    */
-  void info_message(std::string str, int line, const char* file,
-                    const char* func) {
+  void info_message(std::string str, int line, const char *file,
+                    const char *func) {
     std::filesystem::path relativePath = file;
     std::filesystem::path absolutePath =
         getAbsolutePathWithoutDotDot(relativePath);
@@ -376,8 +376,8 @@ class FIMSLog {
    * @see info_message()
    * @see warning_message()
    */
-  void error_message(std::string str, int line, const char* file,
-                     const char* func) {
+  void error_message(std::string str, int line, const char *file,
+                     const char *func) {
     this->error_count++;
     std::filesystem::path relativePath = file;
     std::filesystem::path absolutePath =
@@ -415,8 +415,8 @@ class FIMSLog {
    * @see error_message()
    * @see info_message()
    */
-  void warning_message(std::string str, int line, const char* file,
-                       const char* func) {
+  void warning_message(std::string str, int line, const char *file,
+                       const char *func) {
     this->warning_count++;
     std::filesystem::path relativePath = file;
     std::filesystem::path absolutePath =

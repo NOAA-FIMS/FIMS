@@ -13,7 +13,8 @@
 #include "density_components_base.hpp"
 #include "../../common/fims_vector.hpp"
 
-namespace fims_distributions {
+namespace fims {
+namespace distributions {
 /**
  * @copybrief lognormal_lpdf.hpp
  *
@@ -98,7 +99,7 @@ struct LogNormalLPDF : public DensityComponentBase<Type> {
         if (this->get_observed(i) != this->data_observed_values->na_value) {
           this->lpdf_vec[i] =
               dnorm(log(this->get_observed(i)), this->get_expected(i),
-                    fims_math::exp(log_sd.get_force_scalar(i)), true) -
+                    fims::math::exp(log_sd.get_force_scalar(i)), true) -
               log(this->get_observed(i));
         } else {
           this->lpdf_vec[i] = 0;
@@ -108,11 +109,11 @@ struct LogNormalLPDF : public DensityComponentBase<Type> {
           // if random effects, no lognormal constant needs to be applied
           this->lpdf_vec[i] =
               dnorm(log(this->get_observed(i)), this->get_expected(i),
-                    fims_math::exp(log_sd.get_force_scalar(i)), true);
+                    fims::math::exp(log_sd.get_force_scalar(i)), true);
         } else {
           this->lpdf_vec[i] =
               dnorm(log(this->get_observed(i)), this->get_expected(i),
-                    fims_math::exp(log_sd.get_force_scalar(i)), true) -
+                    fims::math::exp(log_sd.get_force_scalar(i)), true) -
               log(this->get_observed(i));
         }
       }
@@ -120,21 +121,21 @@ struct LogNormalLPDF : public DensityComponentBase<Type> {
       this->lpdf += this->lpdf_vec[i];
       if (this->simulate_flag) {
         FIMS_SIMULATE_F(this->of) {  // preprocessor definition in interface.hpp
-                                     // this simulates data that is mean biased
+          // this simulates data that is mean biased
           if (this->input_type == "data") {
-            this->data_observed_values->at(i) = fims_math::exp(
+            this->data_observed_values->at(i) = fims::math::exp(
                 rnorm(this->get_expected(i),
-                      fims_math::exp(log_sd.get_force_scalar(i))));
+                      fims::math::exp(log_sd.get_force_scalar(i))));
           }
           if (this->input_type == "random_effects") {
-            (*this->re)[i] = fims_math::exp(
+            (*this->re)[i] = fims::math::exp(
                 rnorm(this->get_expected(i),
-                      fims_math::exp(log_sd.get_force_scalar(i))));
+                      fims::math::exp(log_sd.get_force_scalar(i))));
           }
           if (this->input_type == "prior") {
-            (*(this->priors[i]))[0] = fims_math::exp(
+            (*(this->priors[i]))[0] = fims::math::exp(
                 rnorm(this->get_expected(i),
-                      fims_math::exp(log_sd.get_force_scalar(i))));
+                      fims::math::exp(log_sd.get_force_scalar(i))));
           }
         }
       }
@@ -147,5 +148,6 @@ struct LogNormalLPDF : public DensityComponentBase<Type> {
     return (this->lpdf);
   }
 };
-}  // namespace fims_distributions
+}  // namespace distributions
+}  // namespace fims
 #endif

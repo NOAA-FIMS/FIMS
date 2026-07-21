@@ -33,43 +33,25 @@ void register_fleet(Rcpp::Module& m) {
       .field("age_to_length_conversion",
              &FleetInterface::age_to_length_conversion)
       .field("landings_numbers_at_age",
-             &FleetInterface::
-                 landings_numbers_at_age)
-      .field("landings_weight_at_age",
-             &FleetInterface::
-                 landings_weight_at_age)
+             &FleetInterface::landings_numbers_at_age)
+      .field("landings_weight_at_age", &FleetInterface::landings_weight_at_age)
       .field("landings_numbers_at_length",
-             &FleetInterface::
-                 landings_numbers_at_length)
-      .field("landings_weight",
-             &FleetInterface::landings_weight)
-      .field("landings_numbers",
-             &FleetInterface::landings_numbers)
-      .field("landings_expected",
-             &FleetInterface::landings_expected)
-      .field("log_landings_expected",
-             &FleetInterface::log_landings_expected)
-      .field("agecomp_proportion",
-             &FleetInterface::agecomp_proportion)
-      .field("lengthcomp_proportion",
-             &FleetInterface::lengthcomp_proportion)
-      .field("index_numbers_at_age",
-             &FleetInterface::index_numbers_at_age)
-      .field("index_weight_at_age",
-             &FleetInterface::index_weight_at_age)
+             &FleetInterface::landings_numbers_at_length)
+      .field("landings_weight", &FleetInterface::landings_weight)
+      .field("landings_numbers", &FleetInterface::landings_numbers)
+      .field("landings_expected", &FleetInterface::landings_expected)
+      .field("log_landings_expected", &FleetInterface::log_landings_expected)
+      .field("agecomp_proportion", &FleetInterface::agecomp_proportion)
+      .field("lengthcomp_proportion", &FleetInterface::lengthcomp_proportion)
+      .field("index_numbers_at_age", &FleetInterface::index_numbers_at_age)
+      .field("index_weight_at_age", &FleetInterface::index_weight_at_age)
       .field("index_numbers_at_length",
-             &FleetInterface::
-                 index_numbers_at_length)
-      .field("index_weight",
-             &FleetInterface::index_weight)
-      .field("index_numbers",
-             &FleetInterface::index_numbers)
-      .field("index_expected",
-             &FleetInterface::index_expected)
-      .field("agecomp_expected",
-             &FleetInterface::agecomp_expected)
-      .field("lengthcomp_expected",
-             &FleetInterface::lengthcomp_expected)
+             &FleetInterface::index_numbers_at_length)
+      .field("index_weight", &FleetInterface::index_weight)
+      .field("index_numbers", &FleetInterface::index_numbers)
+      .field("index_expected", &FleetInterface::index_expected)
+      .field("agecomp_expected", &FleetInterface::agecomp_expected)
+      .field("lengthcomp_expected", &FleetInterface::lengthcomp_expected)
       .method("get_id", &FleetInterface::get_id)
       .method("SetName", &FleetInterface::SetName)
       .method("GetName", &FleetInterface::GetName)

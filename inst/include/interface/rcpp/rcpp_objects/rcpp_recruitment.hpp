@@ -67,7 +67,7 @@ class RecruitmentInterfaceBase : public FIMSRcppInterfaceBase {
    */
   virtual uint32_t get_id() = 0;
 
-  /** @copydoc fims_popdy::RecruitmentBase::evaluate_mean */
+  /** @copydoc fims::popdy::RecruitmentBase::evaluate_mean */
   virtual double evaluate_mean(double spawners, double phi_0) = 0;
 
   /**
@@ -174,7 +174,7 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
    * @copydoc RecruitmentInterfaceBase::evaluate_mean
    */
   virtual double evaluate_mean(double spawners, double phi_0) {
-    fims_popdy::SRBevertonHolt<double> BevHolt;
+    fims::popdy::SRBevertonHolt<double> BevHolt;
     BevHolt.logit_steep.resize(1);
     BevHolt.logit_steep[0] = this->logit_steep[0].initial_value_m;
     if (this->logit_steep[0].initial_value_m == 1.0) {
@@ -208,10 +208,10 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
 
     this->finalized = true;  // indicate this has been called already
 
-    std::shared_ptr<fims_info::Information<double>> info =
-        fims_info::Information<double>::GetInstance();
+    std::shared_ptr<fims::info::Information<double>> info =
+        fims::info::Information<double>::GetInstance();
 
-    fims_info::Information<double>::recruitment_models_iterator it;
+    fims::info::Information<double>::recruitment_models_iterator it;
 
     it = info->recruitment_models.find(this->id);
 
@@ -221,8 +221,8 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
                        " not found in Information.");
       return;
     } else {
-      std::shared_ptr<fims_popdy::SRBevertonHolt<double>> recr =
-          std::dynamic_pointer_cast<fims_popdy::SRBevertonHolt<double>>(
+      std::shared_ptr<fims::popdy::SRBevertonHolt<double>> recr =
+          std::dynamic_pointer_cast<fims::popdy::SRBevertonHolt<double>>(
               it->second);
 
       for (size_t i = 0; i < this->logit_steep.size(); i++) {
@@ -309,11 +309,11 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
 
   template <typename Type>
   bool add_to_fims_tmb_internal() {
-    std::shared_ptr<fims_info::Information<Type>> info =
-        fims_info::Information<Type>::GetInstance();
+    std::shared_ptr<fims::info::Information<Type>> info =
+        fims::info::Information<Type>::GetInstance();
 
-    std::shared_ptr<fims_popdy::SRBevertonHolt<Type>> recruitment =
-        std::make_shared<fims_popdy::SRBevertonHolt<Type>>();
+    std::shared_ptr<fims::popdy::SRBevertonHolt<Type>> recruitment =
+        std::make_shared<fims::popdy::SRBevertonHolt<Type>>();
 
     std::stringstream ss;
 
@@ -469,7 +469,7 @@ class LogDevsRecruitmentInterface : public RecruitmentInterfaceBase {
    * @param pos Position index, e.g., which year.
    */
   virtual double evaluate_process(size_t pos) {
-    fims_popdy::LogDevs<double> LogDevs;
+    fims::popdy::LogDevs<double> LogDevs;
 
     return LogDevs.evaluate_process(pos);
   }
@@ -478,11 +478,11 @@ class LogDevsRecruitmentInterface : public RecruitmentInterfaceBase {
 
   template <typename Type>
   bool add_to_fims_tmb_internal() {
-    std::shared_ptr<fims_info::Information<Type>> info =
-        fims_info::Information<Type>::GetInstance();
+    std::shared_ptr<fims::info::Information<Type>> info =
+        fims::info::Information<Type>::GetInstance();
 
-    std::shared_ptr<fims_popdy::LogDevs<Type>> recruitment_process =
-        std::make_shared<fims_popdy::LogDevs<Type>>();
+    std::shared_ptr<fims::popdy::LogDevs<Type>> recruitment_process =
+        std::make_shared<fims::popdy::LogDevs<Type>>();
 
     recruitment_process->id = this->id;
 
@@ -542,7 +542,7 @@ class LogRRecruitmentInterface : public RecruitmentInterfaceBase {
    * @param pos Position index, e.g., which year.
    */
   virtual double evaluate_process(size_t pos) {
-    fims_popdy::LogR<double> LogR;
+    fims::popdy::LogR<double> LogR;
 
     return LogR.evaluate_process(pos);
   }
@@ -551,11 +551,11 @@ class LogRRecruitmentInterface : public RecruitmentInterfaceBase {
 
   template <typename Type>
   bool add_to_fims_tmb_internal() {
-    std::shared_ptr<fims_info::Information<Type>> info =
-        fims_info::Information<Type>::GetInstance();
+    std::shared_ptr<fims::info::Information<Type>> info =
+        fims::info::Information<Type>::GetInstance();
 
-    std::shared_ptr<fims_popdy::LogR<Type>> recruitment_process =
-        std::make_shared<fims_popdy::LogR<Type>>();
+    std::shared_ptr<fims::popdy::LogR<Type>> recruitment_process =
+        std::make_shared<fims::popdy::LogR<Type>>();
 
     recruitment_process->id = this->id;
 

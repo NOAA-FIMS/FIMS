@@ -17,7 +17,8 @@
  * @brief The population dynamics of FIMS.
  *
  */
-namespace fims_popdy {
+namespace fims {
+namespace popdy {
 
 /**
  * @brief Structure to hold dimension information for derived quantities.
@@ -74,7 +75,7 @@ struct DimensionInfo {
  *
  */
 template <typename Type>
-class FisheryModelBase : public fims_model_object::FIMSObject<Type> {
+class FisheryModelBase : public fims::model_object::FIMSObject<Type> {
   static uint32_t id_g; /*!< global id where unique id is drawn from for fishery
                            model object*/
   uint32_t id; /*!< unique identifier assigned for fishery model object */
@@ -98,19 +99,19 @@ class FisheryModelBase : public fims_model_object::FIMSObject<Type> {
    * @brief A vector of populations in the fishery model.
    *
    */
-  std::vector<std::shared_ptr<fims_popdy::Population<Type>>> populations;
+  std::vector<std::shared_ptr<fims::popdy::Population<Type>>> populations;
   /**
    * @brief A map of fleets in the fishery model, indexed by fleet id.
    * Unique instances to eliminate duplicate initialization.
    *
    */
-  std::map<uint32_t, std::shared_ptr<fims_popdy::Fleet<Type>>> fleets;
+  std::map<uint32_t, std::shared_ptr<fims::popdy::Fleet<Type>>> fleets;
   /**
    * @brief Fleet-based iterator.
    *
    */
   typedef typename std::map<uint32_t,
-                            std::shared_ptr<fims_popdy::Fleet<Type>>>::iterator
+                            std::shared_ptr<fims::popdy::Fleet<Type>>>::iterator
       fleet_iterator;
 
   /**
@@ -385,5 +386,6 @@ class FisheryModelBase : public fims_model_object::FIMSObject<Type> {
 template <typename Type>
 uint32_t FisheryModelBase<Type>::id_g = 0;
 
-}  // namespace fims_popdy
+}  // namespace popdy
+}  // namespace fims
 #endif

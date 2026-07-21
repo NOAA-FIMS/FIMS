@@ -196,7 +196,7 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
    * @details This can be called from R using ewaagrowth.evaluate(age).
    */
   virtual double evaluate(double age) {
-    fims_popdy::EWAAGrowth<double> EWAAGrowth;
+    fims::popdy::EWAAGrowth<double> EWAAGrowth;
 
     // Build the EWAA map once from R inputs the first time evaluate() is
     // called.
@@ -255,11 +255,11 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
 
   template <typename Type>
   bool add_to_fims_tmb_internal() {
-    std::shared_ptr<fims_info::Information<Type>> info =
-        fims_info::Information<Type>::GetInstance();
+    std::shared_ptr<fims::info::Information<Type>> info =
+        fims::info::Information<Type>::GetInstance();
 
-    std::shared_ptr<fims_popdy::EWAAGrowth<Type>> ewaa_growth =
-        std::make_shared<fims_popdy::EWAAGrowth<Type>>();
+    std::shared_ptr<fims::popdy::EWAAGrowth<Type>> ewaa_growth =
+        std::make_shared<fims::popdy::EWAAGrowth<Type>>();
 
     // set relative info
     ewaa_growth->id = this->id;

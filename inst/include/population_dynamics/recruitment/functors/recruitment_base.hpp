@@ -12,11 +12,12 @@
 
 #include <cmath>  // for using std::pow and M_PI
 
-#include "common/fims_math.hpp"  // for using fims_math::log()
+#include "common/fims_math.hpp"  // for using fims::math::log()
 #include "common/fims_vector.hpp"
 #include "common/model_object.hpp"
 
-namespace fims_popdy {
+namespace fims {
+namespace popdy {
 
 /** @brief Base class for all recruitment functors.
  *
@@ -24,7 +25,7 @@ namespace fims_popdy {
  *
  */
 template <class Type>
-struct RecruitmentBase : public fims_model_object::FIMSObject<Type> {
+struct RecruitmentBase : public fims::model_object::FIMSObject<Type> {
   static uint32_t id_g; /**< reference id for recruitment object*/
 
   fims::Vector<Type> log_recruit_devs; /*!< A vector of the natural log of
@@ -42,9 +43,9 @@ struct RecruitmentBase : public fims_model_object::FIMSObject<Type> {
                                   deviations are estimated or not */
 
   int process_id = -999; /*!< id of recruitment process model object*/
-  std::shared_ptr<fims_popdy::RecruitmentBase<Type>>
+  std::shared_ptr<fims::popdy::RecruitmentBase<Type>>
       process; /*!< shared pointer to recruitment processmodule */
-  std::shared_ptr<fims_popdy::RecruitmentBase<Type>>
+  std::shared_ptr<fims::popdy::RecruitmentBase<Type>>
       recruitment; /*!< shared pointer to recruitment module */
 
   /** @brief Constructor.
@@ -119,6 +120,7 @@ struct RecruitmentBase : public fims_model_object::FIMSObject<Type> {
 
 template <class Type>
 uint32_t RecruitmentBase<Type>::id_g = 0;
-}  // namespace fims_popdy
+}  // namespace popdy
+}  // namespace fims
 
 #endif /* FIMS_POPULATION_DYNAMICS_RECRUITMENT_BASE_HPP */

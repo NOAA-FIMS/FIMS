@@ -14,11 +14,12 @@
 #include "common/fims_vector.hpp"
 #include "maturity_base.hpp"
 
-namespace fims_popdy {
+namespace fims {
+namespace popdy {
 
 /**
  *  @brief LogisticMaturity class that returns the logistic function value
- * from fims_math.
+ * from fims::math.
  */
 template <typename Type>
 struct LogisticMaturity : public MaturityBase<Type> {
@@ -41,7 +42,7 @@ interest (x); e.g. age at which 50 percent of the fish are mature */
    */
 
   virtual const Type evaluate(const Type& x) {
-    return fims_math::logistic<Type>(inflection_point[0], slope[0], x);
+    return fims::math::logistic<Type>(inflection_point[0], slope[0], x);
   }
 
   /**
@@ -55,11 +56,12 @@ interest (x); e.g. age at which 50 percent of the fish are mature */
    * @param pos Position index, e.g., which year.
    */
   virtual const Type evaluate(const Type& x, size_t pos) {
-    return fims_math::logistic<Type>(inflection_point.get_force_scalar(pos),
-                                     slope.get_force_scalar(pos), x);
+    return fims::math::logistic<Type>(inflection_point.get_force_scalar(pos),
+                                      slope.get_force_scalar(pos), x);
   }
 };
 
-}  // namespace fims_popdy
+}  // namespace popdy
+}  // namespace fims
 
 #endif /* POPULATION_DYNAMICS_MATURITY_LOGISTIC_HPP */

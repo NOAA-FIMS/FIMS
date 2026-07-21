@@ -17,13 +17,14 @@
 #include "../interface/interface.hpp"
 #include "fims_vector.hpp"
 
-namespace fims_math {
+namespace fims {
+namespace math {
 #ifdef STD_LIB
 
 /**
  * @brief The exponential function.
  *
- * @param x value to exponentiate. Please use fims_math::exp<double>(x) if x is
+ * @param x value to exponentiate. Please use fims::math::exp<double>(x) if x is
  * an integer.
  * @return the exponentiated value
  */
@@ -34,7 +35,7 @@ inline const Type exp(const Type &x) {
 
 /**
  * @brief The natural log function (base e)
- * @param x the value to take the log of. Please use fims_math::log<double>(x)
+ * @param x the value to take the log of. Please use fims::math::log<double>(x)
  * if x is an integer.
  * @return
  */
@@ -77,7 +78,7 @@ inline const Type lgamma(const Type &x) {
  * recognize and apply its automatic differentiation capabilities to functions
  * from the standard library. Also note that this function cannot be tested
  * using the compilation flag -DTMB_MODEL through CMake and Google Test.
- * @param x The value to exponentiate. Please use fims_math::exp<double>(x) if
+ * @param x The value to exponentiate. Please use fims::math::exp<double>(x) if
  * x is an integer.
  * @return The exponentiated value of x.
  */
@@ -96,7 +97,7 @@ inline const Type exp(const Type &x) {
  * to functions from the standard library. Also note that this function cannot
  * be tested using the compilation flag -DTMB_MODEL through CMake and Google
  * Test.
- * @param x The value to log. Please use fims_math::log<double>(x) if x is an
+ * @param x The value to log. Please use fims::math::log<double>(x) if x is an
  * integer.
  * @return The natural log of x.
  */
@@ -116,7 +117,7 @@ inline const Type log(const Type &x) {
  * be tested using the compilation flag -DTMB_MODEL through CMake and Google
  * Test.
  * @param x The value to take the cosine of. Please use
- * fims_math::cos<double>(x) if x is an integer.
+ * fims::math::cos<double>(x) if x is an integer.
  * @return The cosine of the angle x.
  */
 template <class Type>
@@ -134,7 +135,7 @@ inline const Type cos(const Type &x) {
  * from the standard library. Also note that this function cannot be tested
  * using the compilation flag -DTMB_MODEL through CMake and Google Test.
  * @param x The value to take the square root of. Please use
- * fims_math::sqrt<double>(x) if x is an integer.
+ * fims::math::sqrt<double>(x) if x is an integer.
  * @return The square root of x.
  */
 template <class Type>
@@ -152,7 +153,7 @@ inline const Type sqrt(const Type &x) {
  * standard library. Also note that this function cannot be tested using the
  * compilation flag -DTMB_MODEL through CMake and Google Test.
  * @param x The value to take the power of. Please use
- * fims_math::pow<double>(x) if x is an integer.
+ * fims::math::pow<double>(x) if x is an integer.
  * @param y The exponent to raise x to.
  * @return The power of x.
  */
@@ -173,7 +174,7 @@ inline const Type pow(const Type &x, const Type &y) {
  * note that this function cannot be tested using the compilation flag
  * -DTMB_MODEL through CMake and Google Test.
  * @param x The value to take the natural logarithm of the absolute value of
- * the gamma function of. Please use fims_math::lgamma<double>(x) if x is an
+ * the gamma function of. Please use fims::math::lgamma<double>(x) if x is an
  * integer.
  * @return The natural logarithm of the absolute value of the gamma function of
  * x.
@@ -224,7 +225,7 @@ inline const Type logistic(const Type &inflection_point, const Type &slope,
  */
 template <class Type>
 inline const Type logit(const Type &a, const Type &b, const Type &x) {
-  return -fims_math::log(b - x) + fims_math::log(x - a);
+  return -fims::math::log(b - x) + fims::math::log(x - a);
 }
 
 /**
@@ -239,7 +240,7 @@ inline const Type logit(const Type &a, const Type &b, const Type &x) {
  */
 template <class Type>
 inline const Type inv_logit(const Type &a, const Type &b, const Type &logit_x) {
-  return a + (b - a) / (static_cast<Type>(1.0) + fims_math::exp(-logit_x));
+  return a + (b - a) / (static_cast<Type>(1.0) + fims::math::exp(-logit_x));
 }
 
 /**
@@ -298,8 +299,8 @@ const Type ad_fabs(const Type &x, Type C = 1e-5) {
  *
  * Returns the minimum between a and b in a continuous manner using:
  *
- * (a + b - fims_math::ad_fabs(a - b))*.5;
- * Reference: \ref fims_math::ad_fabs()
+ * (a + b - fims::math::ad_fabs(a - b))*.5;
+ * Reference: \ref fims::math::ad_fabs()
  *
  * This is an approximation with minimal error.
  *
@@ -311,14 +312,14 @@ const Type ad_fabs(const Type &x, Type C = 1e-5) {
 
 template <typename Type>
 inline const Type ad_min(const Type &a, const Type &b, Type C = 1e-5) {
-  return (a + b - fims_math::ad_fabs(a - b, C)) * static_cast<Type>(0.5);
+  return (a + b - fims::math::ad_fabs(a - b, C)) * static_cast<Type>(0.5);
 }
 
 /**
  * Returns the maximum between a and b in a continuous manner using:
  *
- * (a + b + fims_math::ad_fabs(a - b)) *.5;
- * Reference: \ref fims_math::ad_fabs()
+ * (a + b + fims::math::ad_fabs(a - b)) *.5;
+ * Reference: \ref fims::math::ad_fabs()
  * This is an approximation with minimal error.
  *
  * @param a
@@ -328,7 +329,7 @@ inline const Type ad_min(const Type &a, const Type &b, Type C = 1e-5) {
  */
 template <typename Type>
 inline const Type ad_max(const Type &a, const Type &b, Type C = 1e-5) {
-  return (a + b + fims_math::ad_fabs(a - b, C)) * static_cast<Type>(.5);
+  return (a + b + fims::math::ad_fabs(a - b, C)) * static_cast<Type>(.5);
 }
 
 /**
@@ -365,6 +366,7 @@ T sum(const fims::Vector<T> &v) {
   return ret;
 }
 
-}  // namespace fims_math
+}  // namespace math
+}  // namespace fims
 
 #endif /* FIMS_MATH_HPP */

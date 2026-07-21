@@ -14,7 +14,8 @@
 
 #include "growth_base.hpp"
 
-namespace fims_popdy {
+namespace fims {
+namespace popdy {
 
 /**
  *  @brief EWAAGrowth class that returns the EWAA function value.
@@ -45,5 +46,6 @@ struct EWAAGrowth : public GrowthBase<Type> {
     return this->ewaa[year][a];
   }
 };
-}  // namespace fims_popdy
+}  // namespace popdy
+}  // namespace fims
 #endif /* POPULATION_DYNAMICS_GROWTH_EWAA_HPP */

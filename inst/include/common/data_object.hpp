@@ -16,13 +16,14 @@
 #include "model_object.hpp"
 #include "fims_vector.hpp"
 
-namespace fims_data_object {
+namespace fims {
+namespace data_object {
 
 /**
  * Container to hold user supplied data.
  */
 template <typename Type>
-struct DataObject : public fims_model_object::FIMSObject<Type> {
+struct DataObject : public fims::model_object::FIMSObject<Type> {
   static uint32_t id_g;                    /**< id of the Data Object >*/
   fims::Vector<Type> data;                 /**< vector of the data >*/
   fims::Vector<Type> uncertainty;          /**< vector of the data >*/
@@ -88,7 +89,7 @@ struct DataObject : public fims_model_object::FIMSObject<Type> {
    * @param i dimension of 1d data set
    * @return the reference to the value of the vector at position i
    */
-  inline Type& at(size_t i) {
+  inline Type &at(size_t i) {
     if (i >= this->data.size()) {
       throw std::overflow_error("DataObject error:i index out of bounds");
     }
@@ -112,7 +113,7 @@ struct DataObject : public fims_model_object::FIMSObject<Type> {
    * @param j 2nd dimension of 2d data set
    * @return the reference to the value of the matrix at position i, j
    */
-  inline Type& at(size_t i, size_t j) {
+  inline Type &at(size_t i, size_t j) {
     if ((i * jmax + j) >= this->data.size()) {
       throw std::overflow_error("DataObject error: index out of bounds");
     }
@@ -138,7 +139,7 @@ struct DataObject : public fims_model_object::FIMSObject<Type> {
    * @param k 3rd dimension of 3d data set
    * @return the reference to the value of the array at position i, j, k
    */
-  inline Type& at(size_t i, size_t j, size_t k) {
+  inline Type &at(size_t i, size_t j, size_t k) {
     if ((i * jmax * kmax + j * kmax + k) >= this->data.size()) {
       throw std::overflow_error("DataObject error: index out of bounds");
     }
@@ -166,7 +167,7 @@ struct DataObject : public fims_model_object::FIMSObject<Type> {
    * @param l 4th dimension of 4d data set
    * @return the reference to the value of the array at position i, j, k, l
    */
-  inline Type& at(size_t i, size_t j, size_t k, size_t l) {
+  inline Type &at(size_t i, size_t j, size_t k, size_t l) {
     if ((i * jmax * kmax * lmax + j * kmax * lmax + k * lmax + l) >=
         this->data.size()) {
       throw std::overflow_error("DataObject error: index out of bounds");
@@ -213,6 +214,7 @@ struct DataObject : public fims_model_object::FIMSObject<Type> {
 template <typename Type>
 uint32_t DataObject<Type>::id_g = 0;
 
-}  // namespace fims_data_object
+}  // namespace data_object
+}  // namespace fims
 
 #endif

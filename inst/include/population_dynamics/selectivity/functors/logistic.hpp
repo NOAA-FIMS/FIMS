@@ -1,7 +1,7 @@
 /**
  * @file logistic.hpp
  * @brief Declares the LogisticSelectivity class which implements the logistic
- * function from fims_math in the selectivity module.
+ * function from fims::math in the selectivity module.
  * @copyright This file is part of the NOAA, National Marine Fisheries Service
  * Fisheries Integrated Modeling System project. See LICENSE in the source
  * folder for reuse information.
@@ -13,11 +13,12 @@
 #include "common/fims_vector.hpp"
 #include "selectivity_base.hpp"
 
-namespace fims_popdy {
+namespace fims {
+namespace popdy {
 
 /**
  *  @brief LogisticSelectivity class that returns the logistic function value
- * from fims_math.
+ * from fims::math.
  *
  * The logistic selectivity function can produce either an ascending or
  * descending curve based on the sign of the slope parameter. A positive slope
@@ -54,7 +55,7 @@ struct LogisticSelectivity : public SelectivityBase<Type> {
    * size in selectivity).
    */
   virtual const Type evaluate(const Type &x) {
-    return fims_math::logistic<Type>(inflection_point[0], slope[0], x);
+    return fims::math::logistic<Type>(inflection_point[0], slope[0], x);
   }
 
   /**
@@ -64,11 +65,12 @@ struct LogisticSelectivity : public SelectivityBase<Type> {
    * have time-varying selectivity.
    */
   virtual const Type evaluate(const Type &x, size_t pos) {
-    return fims_math::logistic<Type>(inflection_point.get_force_scalar(pos),
-                                     slope.get_force_scalar(pos), x);
+    return fims::math::logistic<Type>(inflection_point.get_force_scalar(pos),
+                                      slope.get_force_scalar(pos), x);
   }
 };
 
-}  // namespace fims_popdy
+}  // namespace popdy
+}  // namespace fims
 
 #endif /* POPULATION_DYNAMICS_SELECTIVITY_LOGISTIC_HPP */

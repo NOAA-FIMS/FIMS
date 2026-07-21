@@ -377,10 +377,10 @@ class FleetInterface : public FleetInterfaceBase {
 
     this->finalized = true;  // indicate this has been called already
 
-    std::shared_ptr<fims_info::Information<double>> info =
-        fims_info::Information<double>::GetInstance();
+    std::shared_ptr<fims::info::Information<double>> info =
+        fims::info::Information<double>::GetInstance();
 
-    fims_info::Information<double>::fleet_iterator it;
+    fims::info::Information<double>::fleet_iterator it;
 
     it = info->fleets.find(this->id);
 
@@ -389,8 +389,8 @@ class FleetInterface : public FleetInterfaceBase {
                        " not found in Information.");
       return;
     } else {
-      std::shared_ptr<fims_popdy::Fleet<double>> fleet =
-          std::dynamic_pointer_cast<fims_popdy::Fleet<double>>(it->second);
+      std::shared_ptr<fims::popdy::Fleet<double>> fleet =
+          std::dynamic_pointer_cast<fims::popdy::Fleet<double>>(it->second);
 
       for (size_t i = 0; i < this->log_Fmort.size(); i++) {
         if (this->log_Fmort[i].estimation_type_m.get() == "constant") {
@@ -425,11 +425,11 @@ class FleetInterface : public FleetInterfaceBase {
 
   template <typename Type>
   bool add_to_fims_tmb_internal() {
-    std::shared_ptr<fims_info::Information<Type>> info =
-        fims_info::Information<Type>::GetInstance();
+    std::shared_ptr<fims::info::Information<Type>> info =
+        fims::info::Information<Type>::GetInstance();
 
-    std::shared_ptr<fims_popdy::Fleet<Type>> fleet =
-        std::make_shared<fims_popdy::Fleet<Type>>();
+    std::shared_ptr<fims::popdy::Fleet<Type>> fleet =
+        std::make_shared<fims::popdy::Fleet<Type>>();
 
     std::stringstream ss;
 

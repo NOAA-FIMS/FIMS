@@ -44,17 +44,17 @@ void init_logging() {
  * - The logging system is initialized and any existing model structures are
  *   cleared, ensuring a clean slate for a new model.
  * - It resets and prepares the main model information objects
- *   (fims_info::Information singletons), ensuring all internal data and
+ *   (fims::info::Information singletons), ensuring all internal data and
  *   settings are cleared and ready for a new model run. This step is essential
  *   for both initializing the model structure and avoiding conflicts from
  *   previous runs.
  * - It iterates over all registered FIMS interface objects and adds them to
  *   the TMB model context.
  * - After all of the objects are registered, it calls
- *   fims_info::Information::CreateModel() and
- *   fims_info::Information::CheckModel() on the base fims_info::Information
+ *   fims::info::Information::CreateModel() and
+ *   fims::info::Information::CheckModel() on the base fims::info::Information
  *   object.
- * - It instantiates the singleton fims_model::Model object which represents
+ * - It instantiates the singleton fims::model::Model object which represents
  *   the constructed TMB model.
  *
  * Typically the average user does not interact with this function because it
@@ -62,10 +62,10 @@ void init_logging() {
  * "https://noaa-fims.github.io/FIMS/reference/initialize_fims.html">`initialize_fims`</a>.
  *
  * @see init_logging()
- * @see fims_info::Information::Clear()
- * @see fims_info::Information::CreateModel()
- * @see fims_info::Information::CheckModel()
- * @see fims_info::Information::GetInstance()
+ * @see fims::info::Information::Clear()
+ * @see fims::info::Information::CreateModel()
+ * @see fims::info::Information::CheckModel()
+ * @see fims::info::Information::GetInstance()
  * @see <a href =
  * "https://noaa-fims.github.io/FIMS/reference/initialize_fims.html"
  * target="_blank">`initialize_fims()`</a>
@@ -77,12 +77,12 @@ bool CreateTMBModel() {
 
   // clear first
   //  base model
-  std::shared_ptr<fims_info::Information<TMB_FIMS_REAL_TYPE>> info0 =
-      fims_info::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
+  std::shared_ptr<fims::info::Information<TMB_FIMS_REAL_TYPE>> info0 =
+      fims::info::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
   info0->Clear();
 
-  std::shared_ptr<fims_info::Information<TMBAD_FIMS_TYPE>> info =
-      fims_info::Information<TMBAD_FIMS_TYPE>::GetInstance();
+  std::shared_ptr<fims::info::Information<TMBAD_FIMS_TYPE>> info =
+      fims::info::Information<TMBAD_FIMS_TYPE>::GetInstance();
   info->Clear();
 
   for (size_t i = 0; i < FIMSRcppInterfaceBase::fims_interface_objects.size();
@@ -97,8 +97,8 @@ bool CreateTMBModel() {
   info->CreateModel();
 
   // instantiate the model? TODO: Ask Matthew what this does
-  std::shared_ptr<fims_model::Model<TMB_FIMS_REAL_TYPE>> m0 =
-      fims_model::Model<TMB_FIMS_REAL_TYPE>::GetInstance();
+  std::shared_ptr<fims::model::Model<TMB_FIMS_REAL_TYPE>> m0 =
+      fims::model::Model<TMB_FIMS_REAL_TYPE>::GetInstance();
 
   return true;
 }
@@ -133,8 +133,8 @@ bool CreateTMBModel() {
  */
 void set_fixed_parameters(Rcpp::NumericVector par) {
   // base model
-  std::shared_ptr<fims_info::Information<TMB_FIMS_REAL_TYPE>> info0 =
-      fims_info::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
+  std::shared_ptr<fims::info::Information<TMB_FIMS_REAL_TYPE>> info0 =
+      fims::info::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
 
   for (size_t i = 0; i < info0->fixed_effects_parameters.size(); i++) {
     *info0->fixed_effects_parameters[i] = par[i];
@@ -148,8 +148,8 @@ void set_fixed_parameters(Rcpp::NumericVector par) {
  */
 Rcpp::NumericVector get_fixed_parameters_vector() {
   // base model
-  std::shared_ptr<fims_info::Information<TMB_FIMS_REAL_TYPE>> info0 =
-      fims_info::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
+  std::shared_ptr<fims::info::Information<TMB_FIMS_REAL_TYPE>> info0 =
+      fims::info::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
 
   Rcpp::NumericVector p;
 
@@ -168,8 +168,8 @@ Rcpp::NumericVector get_fixed_parameters_vector() {
  */
 void set_random_parameters(Rcpp::NumericVector par) {
   // base model
-  std::shared_ptr<fims_info::Information<TMB_FIMS_REAL_TYPE>> info0 =
-      fims_info::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
+  std::shared_ptr<fims::info::Information<TMB_FIMS_REAL_TYPE>> info0 =
+      fims::info::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
 
   for (size_t i = 0; i < info0->random_effects_parameters.size(); i++) {
     *info0->random_effects_parameters[i] = par[i];
@@ -183,8 +183,8 @@ void set_random_parameters(Rcpp::NumericVector par) {
  */
 Rcpp::NumericVector get_random_parameters_vector() {
   // base model
-  std::shared_ptr<fims_info::Information<TMB_FIMS_REAL_TYPE>> d0 =
-      fims_info::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
+  std::shared_ptr<fims::info::Information<TMB_FIMS_REAL_TYPE>> d0 =
+      fims::info::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
 
   Rcpp::NumericVector p;
 
@@ -203,8 +203,8 @@ Rcpp::NumericVector get_random_parameters_vector() {
  */
 Rcpp::List get_parameter_names(Rcpp::List pars) {
   // base model
-  std::shared_ptr<fims_info::Information<TMB_FIMS_REAL_TYPE>> d0 =
-      fims_info::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
+  std::shared_ptr<fims::info::Information<TMB_FIMS_REAL_TYPE>> d0 =
+      fims::info::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
 
   pars.attr("names") = d0->parameter_names;
 
@@ -219,8 +219,8 @@ Rcpp::List get_parameter_names(Rcpp::List pars) {
  */
 Rcpp::List get_random_names(Rcpp::List pars) {
   // base model
-  std::shared_ptr<fims_info::Information<TMB_FIMS_REAL_TYPE>> d0 =
-      fims_info::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
+  std::shared_ptr<fims::info::Information<TMB_FIMS_REAL_TYPE>> d0 =
+      fims::info::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
 
   pars.attr("names") = d0->random_effects_names;
 
@@ -234,8 +234,8 @@ Rcpp::List get_random_names(Rcpp::List pars) {
  */
 template <typename Type>
 void clear_internal() {
-  std::shared_ptr<fims_info::Information<Type>> d0 =
-      fims_info::Information<Type>::GetInstance();
+  std::shared_ptr<fims::info::Information<Type>> d0 =
+      fims::info::Information<Type>::GetInstance();
   d0->Clear();
 }
 
@@ -334,19 +334,19 @@ void clear_impl(bool get_error_msg) {
 
   fims::FIMSLog::fims_log->clear();
 
-  std::unique_ptr<fims_popdy::LogisticSelectivity<double>> test_obj;
+  std::unique_ptr<fims::popdy::LogisticSelectivity<double>> test_obj;
   if (get_error_msg) {
-    test_obj = std::make_unique<fims_popdy::LogisticSelectivity<double>>();
+    test_obj = std::make_unique<fims::popdy::LogisticSelectivity<double>>();
   }
 
   // --- AUTOMATED DANGLING POINTER DIAGNOSTIC PRINT ---
-  if (fims_model_object::FIMSMemoryTracker::total_active_objects > 0) {
+  if (fims::model_object::FIMSMemoryTracker::total_active_objects > 0) {
     std::ostringstream msg;
     msg << "\n⚠️  WARNING: FIMS Dangling Pointer or Module Detected after "
            "clear()!\n";
     msg << "--------------------------------------------------\n";
     msg << "A total of "
-        << fims_model_object::FIMSMemoryTracker::total_active_objects
+        << fims::model_object::FIMSMemoryTracker::total_active_objects
         << " pointer(s) NOT cleared\n";
     msg << "--------------------------------------------------\n";
     msg << "Ensure all pointers are being reset.\n\n";

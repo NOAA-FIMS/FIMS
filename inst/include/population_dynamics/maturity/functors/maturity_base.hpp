@@ -13,7 +13,8 @@
 
 #include "common/model_object.hpp"
 
-namespace fims_popdy {
+namespace fims {
+namespace popdy {
 
 /** @brief Base class for all maturity functors.
  *
@@ -21,7 +22,7 @@ namespace fims_popdy {
  */
 
 template <typename Type>
-struct MaturityBase : public fims_model_object::FIMSObject<Type> {
+struct MaturityBase : public fims::model_object::FIMSObject<Type> {
   // id_g is the ID of the instance of the MaturityBase class.
   // this is like a memory tracker.
   // Assigning each one its own ID is a way to keep track of
@@ -55,6 +56,7 @@ struct MaturityBase : public fims_model_object::FIMSObject<Type> {
 template <typename Type>
 uint32_t MaturityBase<Type>::id_g = 0;
 
-}  // namespace fims_popdy
+}  // namespace popdy
+}  // namespace fims
 
 #endif /* POPULATION_DYNAMICS_MATURITY_BASE_HPP */

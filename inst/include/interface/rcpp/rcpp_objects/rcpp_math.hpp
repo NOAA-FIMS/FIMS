@@ -21,7 +21,7 @@
  * @return A double in real space rather than the bounded space.
  */
 double logit_rcpp(double a, double b, double x) {
-  return fims_math::logit<double>(a, b, x);
+  return fims::math::logit<double>(a, b, x);
 }
 
 /**
@@ -33,7 +33,7 @@ double logit_rcpp(double a, double b, double x) {
  * @return A double in the bounded space rather than real space.
  */
 double inv_logit_rcpp(double a, double b, double logit_x) {
-  return fims_math::inv_logit<double>(a, b, logit_x);
+  return fims::math::inv_logit<double>(a, b, logit_x);
 }
 
 #endif

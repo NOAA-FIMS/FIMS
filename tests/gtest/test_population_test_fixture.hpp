@@ -19,15 +19,15 @@ class CAAInitializeTestFixture : public testing::Test {
   // a lowercase u) is spelled
   // correctly.
   void SetUp() override {
-    population = std::make_shared<fims_popdy::Population<double>>();
-    catch_at_age_model = std::make_shared<fims_popdy::CatchAtAge<double>>();
+    population = std::make_shared<fims::popdy::Population<double>>();
+    catch_at_age_model = std::make_shared<fims::popdy::CatchAtAge<double>>();
     population->id_g = id_g;
     population->n_years = n_years;
     population->n_ages = n_ages;
     population->n_fleets = n_fleets;
 
     for (int i = 0; i < n_fleets; i++) {
-      auto fleet = std::make_shared<fims_popdy::Fleet<double>>();
+      auto fleet = std::make_shared<fims::popdy::Fleet<double>>();
       fleet->n_years = n_years;
       fleet->n_ages = n_ages;
       fleet->n_lengths = n_lengths;
@@ -43,7 +43,7 @@ class CAAInitializeTestFixture : public testing::Test {
    * @brief Initialize CatchAtAge model derived quantities and population/fleet
    */
   void InitializeCAA() {
-    typedef fims_popdy::CatchAtAge<double>::fleet_iterator fleet_iterator;
+    typedef fims::popdy::CatchAtAge<double>::fleet_iterator fleet_iterator;
 
     for (size_t p = 0; p < this->catch_at_age_model->populations.size(); p++) {
       this->catch_at_age_model->InitializePopulationDerivedQuantities(
@@ -124,7 +124,7 @@ class CAAInitializeTestFixture : public testing::Test {
 
     for (fleet_iterator fit = this->catch_at_age_model->fleets.begin();
          fit != this->catch_at_age_model->fleets.end(); ++fit) {
-      std::shared_ptr<fims_popdy::Fleet<double>> &fleet = (*fit).second;
+      std::shared_ptr<fims::popdy::Fleet<double>> &fleet = (*fit).second;
       this->catch_at_age_model->InitializeFleetDerivedQuantities(
           fleet->GetId());
       std::map<std::string, fims::Vector<double>> &derived_quantities =
@@ -207,8 +207,8 @@ class CAAInitializeTestFixture : public testing::Test {
   // run. It needs to be defined if there is clearup work to
   // do. Otherwise, it does not need to be provided.
   virtual void TearDown() override {}
-  std::shared_ptr<fims_popdy::Population<double>> population;
-  std::shared_ptr<fims_popdy::CatchAtAge<double>> catch_at_age_model;
+  std::shared_ptr<fims::popdy::Population<double>> population;
+  std::shared_ptr<fims::popdy::CatchAtAge<double>> catch_at_age_model;
 
   // Use default values from the Li et al., 2021
   // https://github.com/NOAA-FIMS/Age_Structured_Stock_Assessment_Model_Comparison/blob/main/R/save_initial_input.R
@@ -222,8 +222,8 @@ class CAAInitializeTestFixture : public testing::Test {
 class CAAEvaluateTestFixture : public testing::Test {
  protected:
   // Declare population here as a member, and initialize it in SetUp
-  std::shared_ptr<fims_popdy::Population<double>> population;
-  std::shared_ptr<fims_popdy::CatchAtAge<double>>
+  std::shared_ptr<fims::popdy::Population<double>> population;
+  std::shared_ptr<fims::popdy::CatchAtAge<double>>
       catch_at_age_model;  // New member for the model
 
   void SetUp() override {
@@ -233,31 +233,31 @@ class CAAEvaluateTestFixture : public testing::Test {
     std::default_random_engine generator(seed);
 
     // Initialize the population directly
-    population = std::make_shared<fims_popdy::Population<double>>();
+    population = std::make_shared<fims::popdy::Population<double>>();
     population->id_g = id_g;
     population->n_years = n_years;
     population->n_ages = n_ages;
     population->n_fleets = n_fleets;
 
     // Initialize CatchAtAge model
-    catch_at_age_model = std::make_shared<fims_popdy::CatchAtAge<double>>();
+    catch_at_age_model = std::make_shared<fims::popdy::CatchAtAge<double>>();
 
     // Setup fleet parameters needed for catch_at_age model->Prepare()
     // log_Fmort
-    double log_Fmort_min = fims_math::log(0.1);
-    double log_Fmort_max = fims_math::log(2.3);
+    double log_Fmort_min = fims::math::log(0.1);
+    double log_Fmort_max = fims::math::log(2.3);
     std::uniform_real_distribution<double> log_Fmort_distribution(
         log_Fmort_min, log_Fmort_max);
 
     // log_q
-    double log_q_min = fims_math::log(0.1);
-    double log_q_max = fims_math::log(1);
+    double log_q_min = fims::math::log(0.1);
+    double log_q_max = fims::math::log(1);
     std::uniform_real_distribution<double> log_q_distribution(log_q_min,
                                                               log_q_max);
 
     // Initialize fleet parameters needed for catch_at_age model->Prepare()
     for (int i = 0; i < n_fleets; i++) {
-      auto fleet = std::make_shared<fims_popdy::Fleet<double>>();
+      auto fleet = std::make_shared<fims::popdy::Fleet<double>>();
       fleet->n_years = n_years;
       fleet->n_ages = n_ages;
       fleet->n_lengths = n_lengths;
@@ -268,7 +268,7 @@ class CAAEvaluateTestFixture : public testing::Test {
         fleet->log_Fmort[year] = log_Fmort_distribution(generator);
       }
       auto selectivity =
-          std::make_shared<fims_popdy::LogisticSelectivity<double>>();
+          std::make_shared<fims::popdy::LogisticSelectivity<double>>();
       selectivity->inflection_point.resize(1);
       selectivity->inflection_point[0] = 7;
       selectivity->slope.resize(1);
@@ -297,8 +297,8 @@ class CAAEvaluateTestFixture : public testing::Test {
     // weight_at_age
     double weight_at_age_min = 0.5;
     double weight_at_age_max = 12.0;
-    std::shared_ptr<fims_popdy::EWAAGrowth<double>> growth =
-        std::make_shared<fims_popdy::EWAAGrowth<double>>();
+    std::shared_ptr<fims::popdy::EWAAGrowth<double>> growth =
+        std::make_shared<fims::popdy::EWAAGrowth<double>>();
     std::uniform_real_distribution<double> weight_at_age_distribution(
         weight_at_age_min, weight_at_age_max);
     for (int year = 0; year < n_years + 1; year++) {
@@ -309,8 +309,8 @@ class CAAEvaluateTestFixture : public testing::Test {
     }
     catch_at_age_model->populations[0]->growth = growth;
     // log_M
-    double log_M_min = fims_math::log(0.1);
-    double log_M_max = fims_math::log(0.3);
+    double log_M_min = fims::math::log(0.1);
+    double log_M_max = fims::math::log(0.3);
     std::uniform_real_distribution<double> log_M_distribution(log_M_min,
                                                               log_M_max);
     for (int i = 0; i < n_years * n_ages; i++) {
@@ -349,8 +349,8 @@ class CAAEvaluateTestFixture : public testing::Test {
     }
 
     // numbers_at_age
-    double numbers_at_age_min = fims_math::exp(10.0);
-    double numbers_at_age_max = fims_math::exp(12.0);
+    double numbers_at_age_min = fims::math::exp(10.0);
+    double numbers_at_age_max = fims::math::exp(12.0);
     std::uniform_real_distribution<double> numbers_at_age_distribution(
         numbers_at_age_min, numbers_at_age_max);
     std::map<std::string, fims::Vector<double>> &pop_dq =
@@ -359,21 +359,21 @@ class CAAEvaluateTestFixture : public testing::Test {
       pop_dq["numbers_at_age"][i] = numbers_at_age_distribution(generator);
     }
 
-    auto maturity = std::make_shared<fims_popdy::LogisticMaturity<double>>();
+    auto maturity = std::make_shared<fims::popdy::LogisticMaturity<double>>();
     maturity->inflection_point.resize(1);
     maturity->inflection_point[0] = 6;
     maturity->slope.resize(1);
     maturity->slope[0] = 0.15;
     catch_at_age_model->populations[0]->maturity = maturity;
 
-    auto recruitment = std::make_shared<fims_popdy::SRBevertonHolt<double>>();
-    auto log_devs = std::make_shared<fims_popdy::LogDevs<double>>();
+    auto recruitment = std::make_shared<fims::popdy::SRBevertonHolt<double>>();
+    auto log_devs = std::make_shared<fims::popdy::LogDevs<double>>();
     recruitment->process = log_devs;
     recruitment->process->recruitment = recruitment;
     recruitment->logit_steep.resize(1);
     recruitment->log_rzero.resize(1);
-    recruitment->logit_steep[0] = fims_math::logit(0.2, 1.0, 0.75);
-    recruitment->log_rzero[0] = fims_math::log(1000000.0);
+    recruitment->logit_steep[0] = fims::math::logit(0.2, 1.0, 0.75);
+    recruitment->log_rzero[0] = fims::math::log(1000000.0);
     /*the log_recruit_dev vector does not include a value for year == 0
     and is of length n_years - 1 where the first position of the vector
     corresponds to the second year of the time series.*/
@@ -401,7 +401,7 @@ class CAAEvaluateTestFixture : public testing::Test {
    * @brief Initialize CatchAtAge model derived quantities and population/fleet
    */
   void InitializeCAA() {
-    typedef fims_popdy::CatchAtAge<double>::fleet_iterator fleet_iterator;
+    typedef fims::popdy::CatchAtAge<double>::fleet_iterator fleet_iterator;
 
     //       // The following are initialized in the rcpp interface: ages,
     //       log_init_naa,
@@ -484,7 +484,7 @@ class CAAEvaluateTestFixture : public testing::Test {
 
     for (fleet_iterator fit = this->catch_at_age_model->fleets.begin();
          fit != this->catch_at_age_model->fleets.end(); ++fit) {
-      std::shared_ptr<fims_popdy::Fleet<double>> &fleet = (*fit).second;
+      std::shared_ptr<fims::popdy::Fleet<double>> &fleet = (*fit).second;
       this->catch_at_age_model->InitializeFleetDerivedQuantities(
           fleet->GetId());
       std::map<std::string, fims::Vector<double>> &derived_quantities =
@@ -579,10 +579,10 @@ class CAAEvaluateTestFixture : public testing::Test {
 
 class CAAPrepareTestFixture : public testing::Test {
  protected:
-  std::shared_ptr<fims_popdy::Population<double>> population;
-  std::shared_ptr<fims_popdy::CatchAtAge<double>> catch_at_age_model;
+  std::shared_ptr<fims::popdy::Population<double>> population;
+  std::shared_ptr<fims::popdy::CatchAtAge<double>> catch_at_age_model;
   void SetUp() override {
-    population = std::make_shared<fims_popdy::Population<double>>();
+    population = std::make_shared<fims::popdy::Population<double>>();
     population->id_g = id_g;
     population->n_years = n_years;
     population->n_ages = n_ages;
@@ -593,23 +593,23 @@ class CAAPrepareTestFixture : public testing::Test {
     std::default_random_engine generator(seed);
 
     // Declare CatchAtAge model
-    catch_at_age_model = std::make_shared<fims_popdy::CatchAtAge<double>>();
+    catch_at_age_model = std::make_shared<fims::popdy::CatchAtAge<double>>();
 
     // log_Fmort
-    double log_Fmort_min = fims_math::log(0.1);
-    double log_Fmort_max = fims_math::log(2.3);
+    double log_Fmort_min = fims::math::log(0.1);
+    double log_Fmort_max = fims::math::log(2.3);
     std::uniform_real_distribution<double> log_Fmort_distribution(
         log_Fmort_min, log_Fmort_max);
 
-    // age_to_length_conversiondouble log_Fmort_min = fims_math::log(0.1);
+    // age_to_length_conversiondouble log_Fmort_min = fims::math::log(0.1);
     double age_to_length_conversion_min = 0.0;
     double age_to_length_conversion_max = 1.0;
     std::uniform_real_distribution<double> alc_distribution(
         age_to_length_conversion_min, age_to_length_conversion_max);
 
     // log_q
-    double log_q_min = fims_math::log(0.1);
-    double log_q_max = fims_math::log(1);
+    double log_q_min = fims::math::log(0.1);
+    double log_q_max = fims::math::log(1);
     std::uniform_real_distribution<double> log_q_distribution(log_q_min,
                                                               log_q_max);
 
@@ -620,7 +620,7 @@ class CAAPrepareTestFixture : public testing::Test {
     // (std::vector<std::shared_ptr<fims::Fleet<double> > > fleets;)
 
     for (int i = 0; i < n_fleets; i++) {
-      auto fleet = std::make_shared<fims_popdy::Fleet<double>>();
+      auto fleet = std::make_shared<fims::popdy::Fleet<double>>();
 
       fleet->n_lengths = n_lengths;
       fleet->n_ages = n_ages;
@@ -636,7 +636,7 @@ class CAAPrepareTestFixture : public testing::Test {
         fleet->age_to_length_conversion[j] = alc_distribution(generator);
       }
       auto selectivity =
-          std::make_shared<fims_popdy::LogisticSelectivity<double>>();
+          std::make_shared<fims::popdy::LogisticSelectivity<double>>();
       selectivity->inflection_point.resize(1);
       selectivity->inflection_point[0] = 7;
       selectivity->slope.resize(1);
@@ -658,8 +658,8 @@ class CAAPrepareTestFixture : public testing::Test {
     this->InitializeCAA();
 
     // log_M
-    double log_M_min = fims_math::log(0.1);
-    double log_M_max = fims_math::log(0.3);
+    double log_M_min = fims::math::log(0.1);
+    double log_M_max = fims::math::log(0.3);
     std::uniform_real_distribution<double> log_M_distribution(log_M_min,
                                                               log_M_max);
     catch_at_age_model->populations[0]->log_M.resize(n_years * n_ages);
@@ -678,8 +678,8 @@ class CAAPrepareTestFixture : public testing::Test {
     double weight_at_age_min = 0.5;
     double weight_at_age_max = 12.0;
 
-    std::shared_ptr<fims_popdy::EWAAGrowth<double>> growth =
-        std::make_shared<fims_popdy::EWAAGrowth<double>>();
+    std::shared_ptr<fims::popdy::EWAAGrowth<double>> growth =
+        std::make_shared<fims::popdy::EWAAGrowth<double>>();
     std::uniform_real_distribution<double> weight_at_age_distribution(
         weight_at_age_min, weight_at_age_max);
 
@@ -697,7 +697,7 @@ class CAAPrepareTestFixture : public testing::Test {
    * @brief Initialize CatchAtAge model derived quantities and population/fleet
    */
   void InitializeCAA() {
-    typedef fims_popdy::CatchAtAge<double>::fleet_iterator fleet_iterator;
+    typedef fims::popdy::CatchAtAge<double>::fleet_iterator fleet_iterator;
 
     //       // The following are initialized in the rcpp interface: ages,
     //       log_init_naa,
@@ -780,7 +780,7 @@ class CAAPrepareTestFixture : public testing::Test {
 
     for (fleet_iterator fit = this->catch_at_age_model->fleets.begin();
          fit != this->catch_at_age_model->fleets.end(); ++fit) {
-      std::shared_ptr<fims_popdy::Fleet<double>> &fleet = (*fit).second;
+      std::shared_ptr<fims::popdy::Fleet<double>> &fleet = (*fit).second;
       this->catch_at_age_model->InitializeFleetDerivedQuantities(
           fleet->GetId());
       std::map<std::string, fims::Vector<double>> &derived_quantities =
@@ -861,7 +861,7 @@ class CAAPrepareTestFixture : public testing::Test {
 
   virtual void TearDown() override {}
 
-  fims_popdy::Population<double> pop;
+  fims::popdy::Population<double> pop;
   int id_g = 0;
   int n_years = 30;
   int n_ages = 12;

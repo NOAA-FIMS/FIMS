@@ -13,7 +13,8 @@
 
 #include "common/model_object.hpp"
 
-namespace fims_popdy {
+namespace fims {
+namespace popdy {
 
 /** @brief Base class for all selectivity functors.
  *
@@ -21,7 +22,7 @@ namespace fims_popdy {
  */
 
 template <typename Type>
-struct SelectivityBase : public fims_model_object::FIMSObject<Type> {
+struct SelectivityBase : public fims::model_object::FIMSObject<Type> {
   // id_g is the ID of the instance of the SelectivityBase class.
   // this is like a memory tracker.
   // Assigning each one its own ID is a way to keep track of
@@ -59,6 +60,7 @@ struct SelectivityBase : public fims_model_object::FIMSObject<Type> {
 template <typename Type>
 uint32_t SelectivityBase<Type>::id_g = 0;
 
-}  // namespace fims_popdy
+}  // namespace popdy
+}  // namespace fims
 
 #endif /* POPULATION_DYNAMICS_SELECTIVITY_BASE_HPP */

@@ -14,7 +14,8 @@
 
 #include "information.hpp"
 
-namespace fims_model {
+namespace fims {
+namespace model {
 
 /**
  * @brief Model class. FIMS objective function.
@@ -24,7 +25,7 @@ class Model {  // may need singleton
  public:
   static std::shared_ptr<Model<Type>>
       fims_model; /**< Create a shared fims_model as a pointer to Model*/
-  std::shared_ptr<fims_info::Information<Type>>
+  std::shared_ptr<fims::info::Information<Type>>
       fims_information; /**< Create a shared fims_information as a pointer to
                          Information*/
 
@@ -53,9 +54,9 @@ class Model {  // may need singleton
    */
   static std::shared_ptr<Model<Type>> GetInstance() {
     if (Model<Type>::fims_model == nullptr) {
-      Model<Type>::fims_model = std::make_shared<fims_model::Model<Type>>();
+      Model<Type>::fims_model = std::make_shared<fims::model::Model<Type>>();
       Model<Type>::fims_model->fims_information =
-          fims_info::Information<Type>::GetInstance();
+          fims::info::Information<Type>::GetInstance();
     }
     return Model<Type>::fims_model;
   }
@@ -66,7 +67,7 @@ class Model {  // may need singleton
   const Type Evaluate() {
     // jnll = negative-log-likelihood (the objective function)
     Type jnll = static_cast<Type>(0.0);
-    typename fims_info::Information<Type>::model_map_iterator m_it;
+    typename fims::info::Information<Type>::model_map_iterator m_it;
     // Check if fims_information is set
     if (this->fims_information == nullptr) {
       FIMS_ERROR_LOG(
@@ -83,18 +84,18 @@ class Model {  // may need singleton
     for (m_it = this->fims_information->models_map.begin();
          m_it != this->fims_information->models_map.end(); ++m_it) {
       //(*m_it).second points to the Model module
-      std::shared_ptr<fims_popdy::FisheryModelBase<Type>> m = (*m_it).second;
+      std::shared_ptr<fims::popdy::FisheryModelBase<Type>> m = (*m_it).second;
       m->Prepare();
       m->Evaluate();
     }
 
     // Loop over densities and evaluate joint negative log densities for priors
-    typename fims_info::Information<Type>::density_components_iterator d_it;
+    typename fims::info::Information<Type>::density_components_iterator d_it;
     int nll_vec_idx = 0;
     size_t n_priors = 0;
     for (d_it = this->fims_information->density_components.begin();
          d_it != this->fims_information->density_components.end(); ++d_it) {
-      std::shared_ptr<fims_distributions::DensityComponentBase<Type>> d =
+      std::shared_ptr<fims::distributions::DensityComponentBase<Type>> d =
           (*d_it).second;
 #ifdef TMB_MODEL
       d->of = this->of;
@@ -117,7 +118,7 @@ class Model {  // may need singleton
     size_t n_random_effects = 0;
     for (d_it = this->fims_information->density_components.begin();
          d_it != this->fims_information->density_components.end(); ++d_it) {
-      std::shared_ptr<fims_distributions::DensityComponentBase<Type>> d =
+      std::shared_ptr<fims::distributions::DensityComponentBase<Type>> d =
           (*d_it).second;
 #ifdef TMB_MODEL
       d->of = this->of;
@@ -140,7 +141,7 @@ class Model {  // may need singleton
     int n_data = 0;
     for (d_it = this->fims_information->density_components.begin();
          d_it != this->fims_information->density_components.end(); ++d_it) {
-      std::shared_ptr<fims_distributions::DensityComponentBase<Type>> d =
+      std::shared_ptr<fims::distributions::DensityComponentBase<Type>> d =
           (*d_it).second;
 #ifdef TMB_MODEL
       d->of = this->of;
@@ -174,7 +175,7 @@ class Model {  // may need singleton
     for (m_it = this->fims_information->models_map.begin();
          m_it != this->fims_information->models_map.end(); ++m_it) {
       //(*m_it).second points to the Model module
-      std::shared_ptr<fims_popdy::FisheryModelBase<Type>> m = (*m_it).second;
+      std::shared_ptr<fims::popdy::FisheryModelBase<Type>> m = (*m_it).second;
       m->of = this->of;  // link to TMB objective function
       m->Report();
     }
@@ -187,6 +188,7 @@ class Model {  // may need singleton
 template <typename Type>
 std::shared_ptr<Model<Type>> Model<Type>::fims_model =
     nullptr;  // singleton instance
-}  // namespace fims_model
+}  // namespace model
+}  // namespace fims
 
 #endif /* FIMS_COMMON_MODEL_HPP */

@@ -14,7 +14,8 @@
 #include "../../common/def.hpp"
 #include "density_components_base.hpp"
 #include "../../common/fims_vector.hpp"
-namespace fims_distributions {
+namespace fims {
+namespace distributions {
 /**
  * @copybrief normal_lpdf.hpp
  *
@@ -93,7 +94,7 @@ struct NormalLPDF : public DensityComponentBase<Type> {
         if (this->get_observed(i) != this->data_observed_values->na_value) {
           this->lpdf_vec[i] =
               dnorm(this->get_observed(i), this->get_expected(i),
-                    fims_math::exp(log_sd.get_force_scalar(i)), true);
+                    fims::math::exp(log_sd.get_force_scalar(i)), true);
         } else {
           this->lpdf_vec[i] = 0;
         }
@@ -102,7 +103,7 @@ struct NormalLPDF : public DensityComponentBase<Type> {
       } else {
         this->lpdf_vec[i] =
             dnorm(this->get_observed(i), this->get_expected(i),
-                  fims_math::exp(log_sd.get_force_scalar(i)), true);
+                  fims::math::exp(log_sd.get_force_scalar(i)), true);
       }
       this->lpdf += this->lpdf_vec[i];
       if (this->simulate_flag) {
@@ -110,16 +111,16 @@ struct NormalLPDF : public DensityComponentBase<Type> {
           if (this->input_type == "data") {
             this->data_observed_values->at(i) =
                 rnorm(this->get_expected(i),
-                      fims_math::exp(log_sd.get_force_scalar(i)));
+                      fims::math::exp(log_sd.get_force_scalar(i)));
           }
           if (this->input_type == "random_effects") {
             (*this->re)[i] = rnorm(this->get_expected(i),
-                                   fims_math::exp(log_sd.get_force_scalar(i)));
+                                   fims::math::exp(log_sd.get_force_scalar(i)));
           }
           if (this->input_type == "prior") {
             (*(this->priors[i]))[0] =
                 rnorm(this->get_expected(i),
-                      fims_math::exp(log_sd.get_force_scalar(i)));
+                      fims::math::exp(log_sd.get_force_scalar(i)));
           }
         }
       }
@@ -140,5 +141,6 @@ struct NormalLPDF : public DensityComponentBase<Type> {
   }
 };
 
-}  // namespace fims_distributions
+}  // namespace distributions
+}  // namespace fims
 #endif

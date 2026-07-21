@@ -1,6 +1,6 @@
 /**
  * @file sr_beverton_holt.hpp
- * @brief Calls the Beverton--Holt stock--recruitment function from fims_math
+ * @brief Calls the Beverton--Holt stock--recruitment function from fims::math
  * and does the calculation.
  * @details This function inherits from recruitment base.
  * @copyright This file is part of the NOAA, National Marine Fisheries Service
@@ -13,10 +13,11 @@
 #include "recruitment_base.hpp"
 #include "common/fims_vector.hpp"
 
-namespace fims_popdy {
+namespace fims {
+namespace popdy {
 
 /** @brief BevertonHolt class that returns the Beverton--Holt
- * stock--recruitment from fims_math.
+ * stock--recruitment from fims::math.
  *
  * See the @ref glossary for definitions of mathematical symbols used below.
  *
@@ -54,8 +55,8 @@ struct SRBevertonHolt : public RecruitmentBase<Type> {
     Type rzero;
 
     // Transform input parameters
-    steep = fims_math::inv_logit(steep_lo, steep_hi, this->logit_steep[0]);
-    rzero = fims_math::exp(this->log_rzero[0]);
+    steep = fims::math::inv_logit(steep_lo, steep_hi, this->logit_steep[0]);
+    rzero = fims::math::exp(this->log_rzero[0]);
 
     recruits = (static_cast<Type>(0.8) * rzero * steep * spawners) /
                (static_cast<Type>(0.2) * phi_0 * rzero *
@@ -71,6 +72,7 @@ struct SRBevertonHolt : public RecruitmentBase<Type> {
   virtual const Type evaluate_process(size_t pos) { return 0; }
 };
 
-}  // namespace fims_popdy
+}  // namespace popdy
+}  // namespace fims
 
 #endif /* FIMS_POPULATION_DYNAMICS_RECRUITMENT_SR_BEVERTON_HOLT_HPP */

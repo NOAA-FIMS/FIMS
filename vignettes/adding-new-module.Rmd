@@ -80,7 +80,8 @@ FIMS follows consistent naming conventions to maintain code readability and orga
 Following the [Google C++ Style Guide](https://google.github.io/styleguide/cppguide.html):
 
 - **Classes**: PascalCase (e.g., `LogisticSelectivity`, `BevertonHoltRecruitment`)
-- **Namespaces**: snake_case (e.g., `fims_popdy`, `fims_info`)
+- **Namespaces**: nested under `fims`, with snake_case components (e.g.,
+  `fims::popdy`, `fims::info`)
 - **Member variables**: snake_case with no trailing underscore for public members (e.g., `inflection_point`, `log_devs`)
 - **Methods/Functions**: PascalCase for interface methods, snake_case for internal functions
 - **Template parameters**: Use `typename Type` (not `class T`)
@@ -144,7 +145,8 @@ If you are adding a new module in the population dynamics, start with a base cla
 #ifndef POPULATION_DYNAMICS_SELECTIVITY_BASE_HPP
 #define POPULATION_DYNAMICS_SELECTIVITY_BASE_HPP
 
-namespace fims_popdy {
+namespace fims {
+namespace popdy {
 
 template <typename Type>
 struct SelectivityBase {
@@ -156,7 +158,8 @@ struct SelectivityBase {
   virtual const Type evaluate(const Type &x) = 0;
 };
 
-}  // namespace fims_popdy
+}  // namespace popdy
+}  // namespace fims
 
 #endif
 ```
@@ -183,7 +186,8 @@ Add the model-specific class in `inst/include/population_dynamics/[category]/fun
 #include "../../../common/fims_vector.hpp"
 #include "selectivity_base.hpp"
 
-namespace fims_popdy {
+namespace fims {
+namespace popdy {
 
 template <typename Type>
 struct LogisticSelectivity : public SelectivityBase<Type> {
@@ -194,16 +198,17 @@ struct LogisticSelectivity : public SelectivityBase<Type> {
   virtual ~LogisticSelectivity() {}
 
   virtual const Type evaluate(const Type &x) {
-    return fims_math::logistic<Type>(inflection_point[0], slope[0], x);
+    return fims::math::logistic<Type>(inflection_point[0], slope[0], x);
   }
 
   virtual const Type evaluate(const Type &x, size_t pos) {
-    return fims_math::logistic<Type>(inflection_point.get_force_scalar(pos),
+    return fims::math::logistic<Type>(inflection_point.get_force_scalar(pos),
                                      slope.get_force_scalar(pos), x);
   }
 };
 
-}  // namespace fims_popdy
+}  // namespace popdy
+}  // namespace fims
 
 #endif
 ```
@@ -317,7 +322,7 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
   virtual uint32_t get_id() { return this->id; }
 
   virtual double evaluate(double x) {
-    fims_popdy::LogisticSelectivity<double> logistic_sel;
+    fims::popdy::LogisticSelectivity<double> logistic_sel;
     logistic_sel.inflection_point.resize(1);
     logistic_sel.inflection_point[0] = this->inflection_point[0].initial_value_m;
     logistic_sel.slope.resize(1);
@@ -344,11 +349,11 @@ The most important integration work happens in `add_to_fims_tmb_internal()`. Thi
 ```cpp
 template <typename Type>
 bool add_to_fims_tmb_internal() {
-  std::shared_ptr<fims_info::Information<Type>> info =
-      fims_info::Information<Type>::GetInstance();
+  std::shared_ptr<fims::info::Information<Type>> info =
+      fims::info::Information<Type>::GetInstance();
 
-  std::shared_ptr<fims_popdy::LogisticSelectivity<Type>> selectivity =
-      std::make_shared<fims_popdy::LogisticSelectivity<Type>>();
+  std::shared_ptr<fims::popdy::LogisticSelectivity<Type>> selectivity =
+      std::make_shared<fims::popdy::LogisticSelectivity<Type>>();
 
   std::stringstream ss;
   selectivity->id = this->id;
@@ -662,9 +667,9 @@ info->variable_map[this->param.id_m] = &(module_obj)->param;
 
 ## Namespace organization
 
-- Use `fims_popdy` for population-dynamics modules.
-- Use `fims_info` for shared information and TMB integration.
-- Use `fims_math` for mathematical helper functions.
+- Use `fims::popdy` for population-dynamics modules.
+- Use `fims::info` for shared information and TMB integration.
+- Use `fims::math` for mathematical helper functions.
 - Use `fims` for common utilities.
 
 # Troubleshooting

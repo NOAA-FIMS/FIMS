@@ -13,7 +13,8 @@
 #include "density_components_base.hpp"
 #include "../../common/fims_vector.hpp"
 
-namespace fims_distributions {
+namespace fims {
+namespace distributions {
 /**
  * @copybrief multinomial_lpmf.hpp
  *
@@ -176,5 +177,6 @@ if (this->simulate_flag)
     return (this->lpdf);
   }
 };
-}  // namespace fims_distributions
+}  // namespace distributions
+}  // namespace fims
 #endif

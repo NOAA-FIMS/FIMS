@@ -15,14 +15,15 @@
 #include "../../interface/interface.hpp"
 #include "../maturity/maturity.hpp"
 
-namespace fims_popdy {
+namespace fims {
+namespace popdy {
 
 /**
  * @brief Population class. Contains subpopulations
  * that are divided into generic partitions (e.g., sex, area).
  */
 template <typename Type>
-struct Population : public fims_model_object::FIMSObject<Type> {
+struct Population : public fims::model_object::FIMSObject<Type> {
   static uint32_t id_g; /*!< reference id for population object*/
   size_t n_years;       /*!< total number of years in the fishery*/
   size_t n_ages;        /*!< total number of ages in the population*/
@@ -51,22 +52,22 @@ annual fishing mortality multipliers to scale total mortality of all fleets*/
 
   /// recruitment
   int recruitment_id = -999; /*!< id of recruitment model object*/
-  std::shared_ptr<fims_popdy::RecruitmentBase<Type>>
+  std::shared_ptr<fims::popdy::RecruitmentBase<Type>>
       recruitment; /*!< shared pointer to recruitment module */
 
   // growth
   int growth_id = -999; /*!< id of growth model object*/
-  std::shared_ptr<fims_popdy::GrowthBase<Type>>
+  std::shared_ptr<fims::popdy::GrowthBase<Type>>
       growth; /*!< shared pointer to growth module */
 
   // maturity
   int maturity_id = -999; /*!< id of maturity model object*/
-  std::shared_ptr<fims_popdy::MaturityBase<Type>>
+  std::shared_ptr<fims::popdy::MaturityBase<Type>>
       maturity; /*!< shared pointer to maturity module */
 
   // fleet
   std::set<uint32_t> fleet_ids; /*!< id of fleet model object*/
-  std::vector<std::shared_ptr<fims_popdy::Fleet<Type>>>
+  std::vector<std::shared_ptr<fims::popdy::Fleet<Type>>>
       fleets; /*!< shared pointer to fleet module */
 
   /**
@@ -80,6 +81,7 @@ annual fishing mortality multipliers to scale total mortality of all fleets*/
 template <class Type>
 uint32_t Population<Type>::id_g = 0;
 
-}  // namespace fims_popdy
+}  // namespace popdy
+}  // namespace fims
 
 #endif /* FIMS_POPULATION_DYNAMICS_POPULATION_HPP */

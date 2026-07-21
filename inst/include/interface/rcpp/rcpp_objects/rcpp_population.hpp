@@ -342,14 +342,14 @@ class PopulationInterface : public PopulationInterfaceBase {
 
     this->finalized = true;  // indicate this has been called already
 
-    std::shared_ptr<fims_info::Information<double>> info =
-        fims_info::Information<double>::GetInstance();
+    std::shared_ptr<fims::info::Information<double>> info =
+        fims::info::Information<double>::GetInstance();
 
-    fims_info::Information<double>::population_iterator it;
+    fims::info::Information<double>::population_iterator it;
 
     it = info->populations.find(this->id);
 
-    std::shared_ptr<fims_popdy::Population<double>> pop =
+    std::shared_ptr<fims::popdy::Population<double>> pop =
         info->populations[this->id];
     it = info->populations.find(this->id);
     if (it == info->populations.end()) {
@@ -399,11 +399,11 @@ class PopulationInterface : public PopulationInterfaceBase {
 
   template <typename Type>
   bool add_to_fims_tmb_internal() {
-    std::shared_ptr<fims_info::Information<Type>> info =
-        fims_info::Information<Type>::GetInstance();
+    std::shared_ptr<fims::info::Information<Type>> info =
+        fims::info::Information<Type>::GetInstance();
 
-    std::shared_ptr<fims_popdy::Population<Type>> population =
-        std::make_shared<fims_popdy::Population<Type>>();
+    std::shared_ptr<fims::popdy::Population<Type>> population =
+        std::make_shared<fims::popdy::Population<Type>>();
 
     std::stringstream ss;
 

@@ -217,7 +217,7 @@ namespace fims{
 
 }
 ```
-is considered to be a part of the `fims` namespace. C++ classes written within the `fims` namespace can be accessed within the C++ code base using `fims_popdy::`.
+is considered to be a part of the `fims` namespace. C++ classes written within the `fims` namespace can be accessed within the C++ code base using `fims::popdy::`.
 
 There are some exceptions where `{TMB}` specific code is referenced within the `fims` namespace. In these cases, code is written within an `#ifdef TMB_MODEL` wrapper, which means the code is only defined if `{TMB}` is being used. Given the addition of a new platform, e.g., stan, a new wrapper could be added to define platform specific code for these sections.
 
@@ -241,6 +241,7 @@ struct fims::ModelTraits {
       EigenVector; /**< A vector as defined in the Eigen namespace in TMB */
 };
 #endif /* TMB_MODEL */
+}  // namespace popdy
 }  // namespace fims
 
 //not developed yet
@@ -253,18 +254,18 @@ struct fims::ModelTraits {
 
 Each Rcpp interface object includes an `add_to_fims_tmb()` function. There are two shared pointers set up within this function, one to link each Rcpp interface object (e.g., `LogisticMaturityInterface`) to the `Information` class in the `fims` namespace defined in [inst/include/common/information.hpp](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/common/information.hpp) and one to link to the matching class in the `fims` namespace. In our maturity example, this would be the `LogisticMaturity` class in the `fims` namespace defined in [inst/include/population_dynamics/maturity/functors/logistic.hpp](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/population_dynamics/maturity/functors/logistic.hpp).
 
-Within rcpp_maturity.hpp, there is a link to the `fims_info::Information` class to register maturity parameters and specify whether or not they are random effects. We do this by setting up two pointers in the interface, info that points to information, and maturity that points to the logistic maturity module.
+Within rcpp_maturity.hpp, there is a link to the `fims::info::Information` class to register maturity parameters and specify whether or not they are random effects. We do this by setting up two pointers in the interface, info that points to information, and maturity that points to the logistic maturity module.
 
 ```{Rcpp, class.source = "rcppchunk", eval = FALSE}
 // file: rcpp_maturity.hpp
 
-// info is a shared pointer that points to fims_info::Information
-std::shared_ptr<fims_info::Information<TMB_FIMS_REAL_TYPE> > info =
-        fims_info::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
+// info is a shared pointer that points to fims::info::Information
+std::shared_ptr<fims::info::Information<TMB_FIMS_REAL_TYPE> > info =
+        fims::info::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
  if (this->inflection_point.estimation_type == "random_effects") {
         /*
-         if inflection_point is a random effect, 
-         the inflection_point value from LogisticMaturityInterface (maturity->inflection_point) 
+         if inflection_point is a random effect,
+         the inflection_point value from LogisticMaturityInterface (maturity->inflection_point)
          is passed to the Information member function RegisterRandomEffect
         */
         info->RegisterRandomEffect(maturity->inflection_point);
@@ -279,28 +280,28 @@ std::shared_ptr<fims_info::Information<TMB_FIMS_REAL_TYPE> > info =
   }
 ```
 
-Linking to the `fims_popdy::LogisticMaturity` class allows the code to link the values input from R to the values used in the estimation of parameters when fitting data to a model. Below is an example of the link for maturity.
+Linking to the `fims::popdy::LogisticMaturity` class allows the code to link the values input from R to the values used in the estimation of parameters when fitting data to a model. Below is an example of the link for maturity.
 
 ```{Rcpp, class.source = "rcppchunk", eval = FALSE}
 // file: rcpp_maturity.hpp
 
-// maturity is a shared pointer that points to fims_popdy::LogisticMaturity
-std::shared_ptr<fims_popdy::LogisticMaturity<TMB_FIMS_REAL_TYPE> > maturity =
-  std::make_shared<fims_popdy::LogisticMaturity<TMB_FIMS_REAL_TYPE> >();
- 
+// maturity is a shared pointer that points to fims::popdy::LogisticMaturity
+std::shared_ptr<fims::popdy::LogisticMaturity<TMB_FIMS_REAL_TYPE> > maturity =
+  std::make_shared<fims::popdy::LogisticMaturity<TMB_FIMS_REAL_TYPE> >();
+
 // the inflection_point value from LogisticMaturity (maturity->inflection_point)
 // equals the inflection_point value from LogisticMaturityInterface
 // (this->inflection_point.value)
 maturity->inflection_point = this->inflection_point.value;
 ```
 
-We can also link these two pointers together so that the **fims_info::Information** class links up with the **fims_popdy::LogisticMaturity**, but more details on this later.
+We can also link these two pointers together so that the **fims::info::Information** class links up with the **fims::popdy::LogisticMaturity**, but more details on this later.
 ```{Rcpp, class.source = "rcppchunk", eval = FALSE}
 // file: rcpp_maturity.hpp
 
-// the maturity_models pointer from Information that matches the 
-// id of the fims_popdy::LogisticMaturity class is equal to the pointer 
-// to fims_popdy::LogisticMaturity 
+// the maturity_models pointer from Information that matches the
+// id of the fims::popdy::LogisticMaturity class is equal to the pointer
+// to fims::popdy::LogisticMaturity
 info->maturity_models[maturity->id] = maturity;
 ```
 
@@ -314,16 +315,17 @@ The `add_to_fims_tmb` function repeats `add_to_fims_tmb_internal` four times to 
 knitr::include_graphics("figures/fims-path-maturity-2.png")
 ```
 
-## `fims_popdy::LogisticMaturity` class
+## `fims::popdy::LogisticMaturity` class
 
 The `LogisticMaturity` class in the `fims` namespace defined in [inst/include/population_dynamics/maturity/functors/logistic.hpp](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/population_dynamics/maturity/functors/logistic.hpp) has an `evaluate` method (i.e., function) that takes an input, *x* and returns the output from a logistic function (defined in [inst/include/common/fims_math.hpp](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/common/fims_math.hpp)) using the class members `inflection_point` and `slope` values. Other modules that use the logistic function use the same function in fims_math.hpp, e.g., logistic selectivity, and thus, the logistic equation is only defined once within the source code but used for multiple modules.
 
 ```{Rcpp,  class.source = "fimschunk", eval = FALSE}
-namespace fims_popdy {
+namespace fims {
+namespace popdy {
 
 /**
  * @brief LogisticMaturity class that returns the logistic function value
- * from fims_math.
+ * from fims::math.
  */
 template <typename Type>
 struct LogisticMaturity : public MaturityBase<Type> {
@@ -342,10 +344,11 @@ struct LogisticMaturity : public MaturityBase<Type> {
    * size at maturity).
    */
   virtual const Type evaluate(const Type& x) {
-    return fims_math::logistic<Type>(inflection_point, slope, x);
+    return fims::math::logistic<Type>(inflection_point, slope, x);
   }
 };
 
+}  // namespace popdy
 }  // namespace fims
 ```
 
@@ -368,7 +371,7 @@ The `Population` class defined in [inst/include/population_dynamics/population/p
 // id of the maturity model object
 int maturity_id = -999;
 // shared pointer to the maturity module
-std::shared_ptr<fims_popdy::MaturityBase<Type>> maturity;
+std::shared_ptr<fims::popdy::MaturityBase<Type>> maturity;
 ```
 
 The `maturity_id` was set from R using the `SetMaturity()` method from the `PopulationInterface` class, which as a reminder is done internally within `FIMS::initialize_population` but can also be done by hand with `SetMaturity`. Where both options are shown, again, below.
@@ -395,7 +398,8 @@ Notice above that population by default declares a pointer of type `MaturityBase
 
 ```{Rcpp,  class.source = "fimschunk", eval = FALSE}
 // file: inst/include/population_dynamics/maturity/functors/maturity_base.hpp
-namespace fims_popdy {
+namespace fims {
+namespace popdy {
 
 /**
  * @brief Base class for all maturity functors.
@@ -403,7 +407,7 @@ namespace fims_popdy {
  */
 
 template <typename Type>
-struct MaturityBase : public fims_model_object::FIMSObject<Type> {
+struct MaturityBase : public fims::model_object::FIMSObject<Type> {
   // id_g is the ID of the instance of the MaturityBase class.
   // this is like a memory tracker.
   // Assigning each one its own ID is a way to keep track of
@@ -426,10 +430,11 @@ struct MaturityBase : public fims_model_object::FIMSObject<Type> {
   virtual const Type evaluate(const Type& x) = 0;
 };
 
-}
+}  // namespace popdy
+}  // namespace fims
 ```
 
-The evaluate function is a [virtual C++ function](https://www.geeksforgeeks.org/virtual-function-cpp/), which means the function can be overwritten by functions of the same name from a child class. This structure keeps the maturity module in population generic. We don't need any conditional statements to loop over all possible maturity formulations within population. We only need to add a new child maturity class with an Rcpp interface and we can automatically call it from population. There is a trade-off here. We are creating a nested hierarchical structure that makes the code base harder to read. In exchange, we're creating code with a lower [cyclomatic complexity](https://en.wikipedia.org/wiki/Cyclomatic_complexity), that is, there will only ever be one independent path from the user to the `maturity->evaluate()` call in population, regardless of how many maturity functions are added to FIMS. Code with lower cyclomatic complexity is easier to test, maintain, and extend.  
+The evaluate function is a [virtual C++ function](https://www.geeksforgeeks.org/virtual-function-cpp/), which means the function can be overwritten by functions of the same name from a child class. This structure keeps the maturity module in population generic. We don't need any conditional statements to loop over all possible maturity formulations within population. We only need to add a new child maturity class with an Rcpp interface and we can automatically call it from population. There is a trade-off here. We are creating a nested hierarchical structure that makes the code base harder to read. In exchange, we're creating code with a lower [cyclomatic complexity](https://en.wikipedia.org/wiki/Cyclomatic_complexity), that is, there will only ever be one independent path from the user to the `maturity->evaluate()` call in population, regardless of how many maturity functions are added to FIMS. Code with lower cyclomatic complexity is easier to test, maintain, and extend.
 
 Once we have set up the shared pointer, we can access maturity from within population.
 ```{Rcpp,  class.source = "fimschunk", eval = FALSE}
@@ -469,16 +474,16 @@ This *information* is managed in FIMS through the `Information` class in [inst/i
 // uint32_t is an unsigned integer (always positive)
 // The first component of the map is a uint32_t which will be used to hold the
 // ID. The second component of the map is the shared pointer, maturity_models,
-// that points to fims_popdy::MaturityBase
+// that points to fims::popdy::MaturityBase
 
 // hash map to link each object to its shared location in memory
-std::map<uint32_t, std::shared_ptr<fims_popdy::MaturityBase<Type> > >
+std::map<uint32_t, std::shared_ptr<fims::popdy::MaturityBase<Type> > >
   maturity_models;
 
 // Next we set up the iterator, which will be used to loop over all
 // defined maturity modules
-typedef typename std::map<uint32_t, 
-                          std::shared_ptr<fims_popdy::MaturityBase<Type> > >::iterator
+typedef typename std::map<uint32_t,
+                          std::shared_ptr<fims::popdy::MaturityBase<Type> > >::iterator
   maturity_models_iterator;
 ```
 
@@ -496,8 +501,8 @@ Next, let's revisit the line of code that was written in the Rcpp `LogisticMatur
 // file: rcpp_maturity.hpp
 
 // the maturity_models pointer from Information that matches the id of the
-// fims_popdy::LogisticMaturity class is equal to the pointer to
-// fims_popdy::LogisticMaturity
+// fims::popdy::LogisticMaturity class is equal to the pointer to
+// fims::popdy::LogisticMaturity
 info->maturity_models[maturity->id] = maturity;
 ```
 
@@ -510,15 +515,15 @@ info->maturity_models[maturity->id] = maturity;
 knitr::include_graphics("figures/fims-path-maturity-6.png")
 ```
 
-Now we need to pass this pointer to the maturity pointer in population so that `population->maturity` points to the `LogisticMaturity` module instead of `MaturityBase`. First we set up a map in `Information` that points to `Population`. 
+Now we need to pass this pointer to the maturity pointer in population so that `population->maturity` points to the `LogisticMaturity` module instead of `MaturityBase`. First we set up a map in `Information` that points to `Population`.
 ```{Rcpp,  class.source = "infochunk", eval = FALSE}
 // file: inst/include/common/information.hpp
 
 // hash map to link each object to its shared location in
                       memory
-std::map<uint32_t, std::shared_ptr<fims_popdy::Population<Type> > > populations;
+std::map<uint32_t, std::shared_ptr<fims::popdy::Population<Type> > > populations;
   typedef typename std::map<uint32_t,
-                            std::shared_ptr<fims_popdy::Population<Type> > >::iterator
+                            std::shared_ptr<fims::popdy::Population<Type> > >::iterator
     population_iterator;
 // iterator for population objects
 ```
@@ -532,22 +537,22 @@ std::map<uint32_t, std::shared_ptr<fims_popdy::Population<Type> > > populations;
 knitr::include_graphics("figures/fims-path-maturity-7.png")
 ```
 
-Populations are looped through with a new shared pointer, `p`, to reference the individual population of interest.  
+Populations are looped through with a new shared pointer, `p`, to reference the individual population of interest.
 
 ```{Rcpp,  class.source = "infochunk", eval = FALSE}
 // file: inst/include/common/information.hpp
 for (population_iterator it = this->populations.begin();
      it != this->populations.end(); ++it) {
-  std::shared_ptr<fims_popdy::Population<Type> > p = (*it).second;
+  std::shared_ptr<fims::popdy::Population<Type> > p = (*it).second;
   ...
 }
 ```
 
-In this code chunk, `(*it)` refers to a single population in the `populations` map. The second element of the map is the pointer, so `p = (*it).second` means the pointer is being set to a single population to equal the pointer to `populations` in the map. 
+In this code chunk, `(*it)` refers to a single population in the `populations` map. The second element of the map is the pointer, so `p = (*it).second` means the pointer is being set to a single population to equal the pointer to `populations` in the map.
 
 Within this population loop, the `maturity` pointer in `population` is linked to the `maturity` pointer in information, passing on the information that we want to use the `LogisticMaturity` class.
 
-```{Rcpp,  class.source = "infochunk", eval = FALSE}  
+```{Rcpp,  class.source = "infochunk", eval = FALSE}
 // file: inst/include/common/information.hpp
   // set maturity
   if (p->maturity_id != -999) {
@@ -635,13 +640,13 @@ information <- list(
   maturity = list(id = NULL, pointer = "MaturityBase")
 )
 
-# std::map<uint32_t, std::shared_ptr<fims_popdy::MaturityBase<Type> > > maturity_models;
-# std::map<uint32_t, std::shared_ptr<fims_popdy::Population<Type> > > populations;
+# std::map<uint32_t, std::shared_ptr<fims::popdy::MaturityBase<Type> > > maturity_models;
+# std::map<uint32_t, std::shared_ptr<fims::popdy::Population<Type> > > populations;
 ```
-  
+
 Pointers are used to link Information to each respective module.
 
-```{r}          
+```{r}
 information$populations[[1]] <- list(id = 1, pointer = population_modules[[1]])
 information$populations[[2]] <- list(id = 2, pointer = population_modules[[2]])
 information$populations[[3]] <- list(id = 3, pointer = population_modules[[3]])
@@ -665,7 +670,7 @@ for (it in 1:length(population_modules)) {
   #      it != this->populations.end(); ++it) {
 
   p <- information$populations[[it]][2]
-  # std::shared_ptr<fims_popdy::Population<Type> > p = (*it).second;
+  # std::shared_ptr<fims::popdy::Population<Type> > p = (*it).second;
 
   maturity_uint <- p$pointer$maturity_id
   # uint32_t maturity_uint = static_cast<uint32_t>(p->maturity_id);

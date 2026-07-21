@@ -3,15 +3,14 @@
 #include "data_object.hpp"
 
 TEST(FIMSMemoryTracker, DetectsLeakedObject) {
-  fims_model_object::FIMSMemoryTracker::total_active_objects = 0;
+  fims::model_object::FIMSMemoryTracker::total_active_objects = 0;
 
-  std::shared_ptr<fims_data_object::DataObject<double>> leak =
-      std::make_shared<fims_data_object::DataObject<double>>(1);
+  std::shared_ptr<fims::data_object::DataObject<double>> leak =
+      std::make_shared<fims::data_object::DataObject<double>>(1);
 
-  EXPECT_EQ(fims_model_object::FIMSMemoryTracker::total_active_objects, 1);
+  EXPECT_EQ(fims::model_object::FIMSMemoryTracker::total_active_objects, 1);
 
   leak.reset();  // release it
 
-  EXPECT_EQ(fims_model_object::FIMSMemoryTracker::total_active_objects, 0);
+  EXPECT_EQ(fims::model_object::FIMSMemoryTracker::total_active_objects, 0);
 }
-

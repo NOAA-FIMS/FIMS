@@ -176,9 +176,9 @@ class AgeCompDataInterface : public DataInterfaceBase {
 
   template <typename Type>
   bool add_to_fims_tmb_internal() {
-    std::shared_ptr<fims_data_object::DataObject<Type>> age_comp_data =
-        std::make_shared<fims_data_object::DataObject<Type>>(this->ymax,
-                                                             this->amax);
+    std::shared_ptr<fims::data_object::DataObject<Type>> age_comp_data =
+        std::make_shared<fims::data_object::DataObject<Type>>(this->ymax,
+                                                              this->amax);
 
     age_comp_data->id = this->id;
     for (int y = 0; y < ymax; y++) {
@@ -189,8 +189,8 @@ class AgeCompDataInterface : public DataInterfaceBase {
       }
     }
 
-    std::shared_ptr<fims_info::Information<Type>> info =
-        fims_info::Information<Type>::GetInstance();
+    std::shared_ptr<fims::info::Information<Type>> info =
+        fims::info::Information<Type>::GetInstance();
 
     info->data_objects[this->id] = age_comp_data;
 
@@ -308,9 +308,9 @@ class LengthCompDataInterface : public DataInterfaceBase {
 #ifdef TMB_MODEL
   template <typename Type>
   bool add_to_fims_tmb_internal() {
-    std::shared_ptr<fims_data_object::DataObject<Type>> length_comp_data =
-        std::make_shared<fims_data_object::DataObject<Type>>(this->ymax,
-                                                             this->lmax);
+    std::shared_ptr<fims::data_object::DataObject<Type>> length_comp_data =
+        std::make_shared<fims::data_object::DataObject<Type>>(this->ymax,
+                                                              this->lmax);
     length_comp_data->id = this->id;
     for (int y = 0; y < ymax; y++) {
       for (int l = 0; l < lmax; l++) {
@@ -320,8 +320,8 @@ class LengthCompDataInterface : public DataInterfaceBase {
             this->uncertainty[i_length_year];
       }
     }
-    std::shared_ptr<fims_info::Information<Type>> info =
-        fims_info::Information<Type>::GetInstance();
+    std::shared_ptr<fims::info::Information<Type>> info =
+        fims::info::Information<Type>::GetInstance();
     info->data_objects[this->id] = length_comp_data;
     return true;
   }
@@ -429,8 +429,8 @@ class IndexDataInterface : public DataInterfaceBase {
 
   template <typename Type>
   bool add_to_fims_tmb_internal() {
-    std::shared_ptr<fims_data_object::DataObject<Type>> data =
-        std::make_shared<fims_data_object::DataObject<Type>>(this->ymax);
+    std::shared_ptr<fims::data_object::DataObject<Type>> data =
+        std::make_shared<fims::data_object::DataObject<Type>>(this->ymax);
 
     data->id = this->id;
 
@@ -439,8 +439,8 @@ class IndexDataInterface : public DataInterfaceBase {
       data->uncertainty[y] = this->uncertainty[y];
     }
 
-    std::shared_ptr<fims_info::Information<Type>> info =
-        fims_info::Information<Type>::GetInstance();
+    std::shared_ptr<fims::info::Information<Type>> info =
+        fims::info::Information<Type>::GetInstance();
 
     info->data_objects[this->id] = data;
     return true;
@@ -550,8 +550,8 @@ class LandingsDataInterface : public DataInterfaceBase {
 
   template <typename Type>
   bool add_to_fims_tmb_internal() {
-    std::shared_ptr<fims_data_object::DataObject<Type>> data =
-        std::make_shared<fims_data_object::DataObject<Type>>(this->ymax);
+    std::shared_ptr<fims::data_object::DataObject<Type>> data =
+        std::make_shared<fims::data_object::DataObject<Type>>(this->ymax);
 
     data->id = this->id;
 
@@ -560,8 +560,8 @@ class LandingsDataInterface : public DataInterfaceBase {
       data->uncertainty[y] = this->uncertainty[y];
     }
 
-    std::shared_ptr<fims_info::Information<Type>> info =
-        fims_info::Information<Type>::GetInstance();
+    std::shared_ptr<fims::info::Information<Type>> info =
+        fims::info::Information<Type>::GetInstance();
 
     info->data_objects[this->id] = data;
     return true;

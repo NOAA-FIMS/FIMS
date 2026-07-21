@@ -12,7 +12,8 @@
 #include "recruitment_base.hpp"
 #include "common/fims_vector.hpp"
 
-namespace fims_popdy {
+namespace fims {
+namespace popdy {
 
 /** @brief Log Devs class that returns the log of the input added to the log of
  * the recruitment deviations.
@@ -42,6 +43,7 @@ struct LogDevs : public RecruitmentBase<Type> {
   }
 };
 
-}  // namespace fims_popdy
+}  // namespace popdy
+}  // namespace fims
 
 #endif /* FIMS_POPULATION_DYNAMICS_RECRUITMENT_LOG_DEVS_HPP */

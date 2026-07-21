@@ -264,7 +264,7 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
    * returned.
    */
   virtual double evaluate() {
-    fims_distributions::NormalLPDF<double> dnorm;
+    fims::distributions::NormalLPDF<double> dnorm;
     dnorm.observed_values.resize(this->observed_values.size());
     dnorm.expected_values.resize(this->expected_values.size());
     dnorm.log_sd.resize(this->log_sd.size());
@@ -298,10 +298,10 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
 
     this->finalized = true;  // indicate this has been called already
 
-    std::shared_ptr<fims_info::Information<double>> info =
-        fims_info::Information<double>::GetInstance();
+    std::shared_ptr<fims::info::Information<double>> info =
+        fims::info::Information<double>::GetInstance();
 
-    fims_info::Information<double>::density_components_iterator it;
+    fims::info::Information<double>::density_components_iterator it;
 
     // search for density component in Information
     it = info->density_components.find(this->id_m);
@@ -311,8 +311,8 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
                        " not found in Information.");
       return;
     } else {
-      std::shared_ptr<fims_distributions::NormalLPDF<double>> dnorm =
-          std::dynamic_pointer_cast<fims_distributions::NormalLPDF<double>>(
+      std::shared_ptr<fims::distributions::NormalLPDF<double>> dnorm =
+          std::dynamic_pointer_cast<fims::distributions::NormalLPDF<double>>(
               it->second);
 
       this->lpdf_value = dnorm->lpdf;
@@ -444,11 +444,11 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
 
   template <typename Type>
   bool add_to_fims_tmb_internal() {
-    std::shared_ptr<fims_info::Information<Type>> info =
-        fims_info::Information<Type>::GetInstance();
+    std::shared_ptr<fims::info::Information<Type>> info =
+        fims::info::Information<Type>::GetInstance();
 
-    std::shared_ptr<fims_distributions::NormalLPDF<Type>> distribution =
-        std::make_shared<fims_distributions::NormalLPDF<Type>>();
+    std::shared_ptr<fims::distributions::NormalLPDF<Type>> distribution =
+        std::make_shared<fims::distributions::NormalLPDF<Type>>();
 
     // interface to data/parameter value
 
@@ -619,7 +619,7 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
    * returned.
    */
   virtual double evaluate() {
-    fims_distributions::LogNormalLPDF<double> dlnorm;
+    fims::distributions::LogNormalLPDF<double> dlnorm;
     dlnorm.observed_values.resize(this->observed_values.size());
     dlnorm.expected_values.resize(this->expected_values.size());
     dlnorm.log_sd.resize(this->log_sd.size());
@@ -649,10 +649,10 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
 
     this->finalized = true;  // indicate this has been called already
 
-    std::shared_ptr<fims_info::Information<double>> info =
-        fims_info::Information<double>::GetInstance();
+    std::shared_ptr<fims::info::Information<double>> info =
+        fims::info::Information<double>::GetInstance();
 
-    fims_info::Information<double>::density_components_iterator it;
+    fims::info::Information<double>::density_components_iterator it;
 
     // search for density component in Information
     it = info->density_components.find(this->id_m);
@@ -662,8 +662,8 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
                        " not found in Information.");
       return;
     } else {
-      std::shared_ptr<fims_distributions::LogNormalLPDF<double>> dlnorm =
-          std::dynamic_pointer_cast<fims_distributions::LogNormalLPDF<double>>(
+      std::shared_ptr<fims::distributions::LogNormalLPDF<double>> dlnorm =
+          std::dynamic_pointer_cast<fims::distributions::LogNormalLPDF<double>>(
               it->second);
 
       this->lpdf_value = dlnorm->lpdf;
@@ -784,11 +784,11 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
 
   template <typename Type>
   bool add_to_fims_tmb_internal() {
-    std::shared_ptr<fims_info::Information<Type>> info =
-        fims_info::Information<Type>::GetInstance();
+    std::shared_ptr<fims::info::Information<Type>> info =
+        fims::info::Information<Type>::GetInstance();
 
-    std::shared_ptr<fims_distributions::LogNormalLPDF<Type>> distribution =
-        std::make_shared<fims_distributions::LogNormalLPDF<Type>>();
+    std::shared_ptr<fims::distributions::LogNormalLPDF<Type>> distribution =
+        std::make_shared<fims::distributions::LogNormalLPDF<Type>>();
 
     // set relative info
     distribution->id = this->id_m;
@@ -950,7 +950,7 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
    * @return double
    */
   virtual double evaluate() {
-    fims_distributions::MultinomialLPMF<double> dmultinom;
+    fims::distributions::MultinomialLPMF<double> dmultinom;
     // Declare TMBVector in this scope
     dmultinom.observed_values.resize(this->observed_values.size());
     dmultinom.expected_values.resize(this->expected_values.size());
@@ -976,10 +976,10 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
 
     this->finalized = true;  // indicate this has been called already
 
-    std::shared_ptr<fims_info::Information<double>> info =
-        fims_info::Information<double>::GetInstance();
+    std::shared_ptr<fims::info::Information<double>> info =
+        fims::info::Information<double>::GetInstance();
 
-    fims_info::Information<double>::density_components_iterator it;
+    fims::info::Information<double>::density_components_iterator it;
 
     // search for density component in Information
     it = info->density_components.find(this->id_m);
@@ -989,9 +989,9 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
                        " not found in Information.");
       return;
     } else {
-      std::shared_ptr<fims_distributions::MultinomialLPMF<double>> dmultinom =
+      std::shared_ptr<fims::distributions::MultinomialLPMF<double>> dmultinom =
           std::dynamic_pointer_cast<
-              fims_distributions::MultinomialLPMF<double>>(it->second);
+              fims::distributions::MultinomialLPMF<double>>(it->second);
 
       this->lpdf_value = dmultinom->lpdf;
 
@@ -1090,11 +1090,11 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
 
   template <typename Type>
   bool add_to_fims_tmb_internal() {
-    std::shared_ptr<fims_info::Information<Type>> info =
-        fims_info::Information<Type>::GetInstance();
+    std::shared_ptr<fims::info::Information<Type>> info =
+        fims::info::Information<Type>::GetInstance();
 
-    std::shared_ptr<fims_distributions::MultinomialLPMF<Type>> distribution =
-        std::make_shared<fims_distributions::MultinomialLPMF<Type>>();
+    std::shared_ptr<fims::distributions::MultinomialLPMF<Type>> distribution =
+        std::make_shared<fims::distributions::MultinomialLPMF<Type>>();
 
     distribution->id = this->id_m;
     distribution->observed_data_id_m = interface_observed_data_id_m;

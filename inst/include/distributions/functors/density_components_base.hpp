@@ -21,7 +21,8 @@
 #include "../../common/fims_vector.hpp"
 #include "../../common/fims_math.hpp"
 
-namespace fims_distributions {
+namespace fims {
+namespace distributions {
 
 /** @brief Base class for all module_name functors.
  *
@@ -29,7 +30,7 @@ namespace fims_distributions {
  *
  */
 template <typename Type>
-struct DensityComponentBase : public fims_model_object::FIMSObject<Type> {
+struct DensityComponentBase : public fims::model_object::FIMSObject<Type> {
   /**
    * @brief Classification of the input pathway for this distribution object.
    * Options used by accessor methods are, "prior", "random_effects", and
@@ -38,22 +39,22 @@ struct DensityComponentBase : public fims_model_object::FIMSObject<Type> {
   std::string input_type;
 
   /** @brief Observed data. */
-  std::shared_ptr<fims_data_object::DataObject<Type>> data_observed_values;
+  std::shared_ptr<fims::data_object::DataObject<Type>> data_observed_values;
 
   /** @brief Expected value vector for prior-based pathways. */
   fims::Vector<Type> expected_values;
 
   /** @brief Pointer to random effects vector. */
-  fims::Vector<Type>* re = NULL;
+  fims::Vector<Type> *re = NULL;
 
   /** @brief Expected value vector for random-effects pathways. */
-  fims::Vector<Type>* re_expected_values = NULL;
+  fims::Vector<Type> *re_expected_values = NULL;
 
   /** @brief Expected value vector for data pathways. */
-  fims::Vector<Type>* data_expected_values = NULL;
+  fims::Vector<Type> *data_expected_values = NULL;
 
   /** @brief Vector of pointers where each entry points to a prior parameter. */
-  std::vector<fims::Vector<Type>*> priors;
+  std::vector<fims::Vector<Type> *> priors;
 
   /**
    * @brief Input value of distribution function for priors or random effects.
@@ -80,7 +81,7 @@ struct DensityComponentBase : public fims_model_object::FIMSObject<Type> {
    * @return Reference to the selected observed value.
    * @throws std::runtime_error If input_type is "prior" and priors is empty.
    */
-  inline Type& get_observed(size_t i) {
+  inline Type &get_observed(size_t i) {
     if (this->input_type == "data") {
       return data_observed_values->at(i);
     }
@@ -105,7 +106,7 @@ struct DensityComponentBase : public fims_model_object::FIMSObject<Type> {
    * @param j Column index.
    * @return Reference to the selected observed value.
    */
-  inline Type& get_observed(size_t i, size_t j) {
+  inline Type &get_observed(size_t i, size_t j) {
     if (this->input_type == "data") {
       return data_observed_values->at(i, j);
     }
@@ -119,7 +120,7 @@ struct DensityComponentBase : public fims_model_object::FIMSObject<Type> {
    * @details If `use_mean == "yes"`, `expected_mean` overrides other expected
    * vectors and is accessed via scalar/vector semantics.
    */
-  inline Type& get_expected(size_t i) {
+  inline Type &get_expected(size_t i) {
     if (this->input_type == "data") {
       return (*data_expected_values)[i];
     } else if (this->use_mean == "yes") {
@@ -208,7 +209,7 @@ struct DensityComponentBase : public fims_model_object::FIMSObject<Type> {
   /**
    * @brief Pointer to the TMB objective function.
    */
-  ::objective_function<Type>* of;
+  ::objective_function<Type> *of;
 #endif
 
   /**
@@ -236,6 +237,7 @@ struct DensityComponentBase : public fims_model_object::FIMSObject<Type> {
 template <typename Type>
 uint32_t DensityComponentBase<Type>::id_g = 0;
 
-}  // namespace fims_distributions
+}  // namespace distributions
+}  // namespace fims
 
 #endif /* DENSITY_COMPONENT_BASE_HPP */

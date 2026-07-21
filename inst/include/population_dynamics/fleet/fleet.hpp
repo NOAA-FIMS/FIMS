@@ -15,14 +15,15 @@
 #include "../../distributions/distributions.hpp"
 #include "../selectivity/selectivity.hpp"
 
-namespace fims_popdy {
+namespace fims {
+namespace popdy {
 
 /** @brief Base class for all fleets.
  *
  * @tparam Type The type of the fleet object.
  */
 template <class Type>
-struct Fleet : public fims_model_object::FIMSObject<Type> {
+struct Fleet : public fims::model_object::FIMSObject<Type> {
   static uint32_t id_g; /*!< reference id for fleet object*/
   size_t n_years;       /*!< the number of years in the model*/
   size_t n_ages;        /*!< the number of ages in the model*/
@@ -35,26 +36,26 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
 
   // landings data
   int fleet_observed_landings_data_id_m = -999; /*!< id of landings data */
-  std::shared_ptr<fims_data_object::DataObject<Type>>
+  std::shared_ptr<fims::data_object::DataObject<Type>>
       observed_landings_data; /*!< observed landings data*/
 
   std::string observed_landings_units; /*!< is this fleet landings in weight*/
 
   // index data
   int fleet_observed_index_data_id_m = -999; /*!< id of index data */
-  std::shared_ptr<fims_data_object::DataObject<Type>>
+  std::shared_ptr<fims::data_object::DataObject<Type>>
       observed_index_data; /*!< observed index data*/
 
   std::string observed_index_units; /*!< is this fleet index in weight*/
 
   // age comp data
   int fleet_observed_agecomp_data_id_m = -999; /*!< id of age comp data */
-  std::shared_ptr<fims_data_object::DataObject<Type>>
+  std::shared_ptr<fims::data_object::DataObject<Type>>
       observed_agecomp_data; /*!< observed agecomp data*/
 
   // length comp data
   int fleet_observed_lengthcomp_data_id_m = -999; /*!< id of length comp data */
-  std::shared_ptr<fims_data_object::DataObject<Type>>
+  std::shared_ptr<fims::data_object::DataObject<Type>>
       observed_lengthcomp_data; /*!< observed lengthcomp data*/
 
   // Mortality and catchability
@@ -91,14 +92,14 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
    */
   void Prepare() {
     // for(size_t fleet_ = 0; fleet_ <= this->n_fleets; fleet_++) {
-    // this -> Fmort[fleet_] = fims_math::exp(this -> log_Fmort[fleet_]);
+    // this -> Fmort[fleet_] = fims::math::exp(this -> log_Fmort[fleet_]);
 
     for (size_t i = 0; i < this->log_q.size(); i++) {
-      this->q[i] = fims_math::exp(this->log_q[i]);
+      this->q[i] = fims::math::exp(this->log_q[i]);
     }
 
     for (size_t year = 0; year < this->n_years; year++) {
-      this->Fmort[year] = fims_math::exp(this->log_Fmort[year]);
+      this->Fmort[year] = fims::math::exp(this->log_Fmort[year]);
     }
   }
 };
@@ -107,6 +108,7 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
 template <class Type>
 uint32_t Fleet<Type>::id_g = 0;
 
-}  // end namespace fims_popdy
+}  // namespace popdy
+}  // namespace fims
 
 #endif /* FIMS_POPULATION_DYNAMICS_FLEET_HPP */

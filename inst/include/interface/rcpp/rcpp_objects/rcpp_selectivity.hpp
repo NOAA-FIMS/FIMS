@@ -122,7 +122,7 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
    * size in selectivity).
    */
   virtual double evaluate(double x) {
-    fims_popdy::LogisticSelectivity<double> LogisticSel;
+    fims::popdy::LogisticSelectivity<double> LogisticSel;
     LogisticSel.inflection_point.resize(1);
     LogisticSel.inflection_point[0] = this->inflection_point[0].initial_value_m;
     LogisticSel.slope.resize(1);
@@ -143,10 +143,10 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
 
     this->finalized = true;  // indicate this has been called already
 
-    std::shared_ptr<fims_info::Information<double>> info =
-        fims_info::Information<double>::GetInstance();
+    std::shared_ptr<fims::info::Information<double>> info =
+        fims::info::Information<double>::GetInstance();
 
-    fims_info::Information<double>::selectivity_models_iterator it;
+    fims::info::Information<double>::selectivity_models_iterator it;
 
     // search for maturity in Information
     it = info->selectivity_models.find(this->id);
@@ -156,8 +156,8 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
                        " not found in Information.");
       return;
     } else {
-      std::shared_ptr<fims_popdy::LogisticSelectivity<double>> sel =
-          std::dynamic_pointer_cast<fims_popdy::LogisticSelectivity<double>>(
+      std::shared_ptr<fims::popdy::LogisticSelectivity<double>> sel =
+          std::dynamic_pointer_cast<fims::popdy::LogisticSelectivity<double>>(
               it->second);
 
       for (size_t i = 0; i < inflection_point.size(); i++) {
@@ -220,11 +220,11 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
 
   template <typename Type>
   bool add_to_fims_tmb_internal() {
-    std::shared_ptr<fims_info::Information<Type>> info =
-        fims_info::Information<Type>::GetInstance();
+    std::shared_ptr<fims::info::Information<Type>> info =
+        fims::info::Information<Type>::GetInstance();
 
-    std::shared_ptr<fims_popdy::LogisticSelectivity<Type>> selectivity =
-        std::make_shared<fims_popdy::LogisticSelectivity<Type>>();
+    std::shared_ptr<fims::popdy::LogisticSelectivity<Type>> selectivity =
+        std::make_shared<fims::popdy::LogisticSelectivity<Type>>();
     std::stringstream ss;
     // set relative info
     selectivity->id = this->id;
@@ -336,7 +336,7 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
    * size in selectivity).
    */
   virtual double evaluate(double x) {
-    fims_popdy::DoubleLogisticSelectivity<double> DoubleLogisticSel;
+    fims::popdy::DoubleLogisticSelectivity<double> DoubleLogisticSel;
     DoubleLogisticSel.inflection_point_asc.resize(1);
     DoubleLogisticSel.inflection_point_asc[0] =
         this->inflection_point_asc[0].initial_value_m;
@@ -363,10 +363,10 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
 
     this->finalized = true;  // indicate this has been called already
 
-    std::shared_ptr<fims_info::Information<double>> info =
-        fims_info::Information<double>::GetInstance();
+    std::shared_ptr<fims::info::Information<double>> info =
+        fims::info::Information<double>::GetInstance();
 
-    fims_info::Information<double>::selectivity_models_iterator it;
+    fims::info::Information<double>::selectivity_models_iterator it;
 
     // search for maturity in Information
     it = info->selectivity_models.find(this->id);
@@ -377,9 +377,9 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
                        " not found in Information.");
       return;
     } else {
-      std::shared_ptr<fims_popdy::DoubleLogisticSelectivity<double>> sel =
+      std::shared_ptr<fims::popdy::DoubleLogisticSelectivity<double>> sel =
           std::dynamic_pointer_cast<
-              fims_popdy::DoubleLogisticSelectivity<double>>(it->second);
+              fims::popdy::DoubleLogisticSelectivity<double>>(it->second);
 
       for (size_t i = 0; i < inflection_point_asc.size(); i++) {
         if (this->inflection_point_asc[i].estimation_type_m.get() ==
@@ -478,11 +478,11 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
 
   template <typename Type>
   bool add_to_fims_tmb_internal() {
-    std::shared_ptr<fims_info::Information<Type>> info =
-        fims_info::Information<Type>::GetInstance();
+    std::shared_ptr<fims::info::Information<Type>> info =
+        fims::info::Information<Type>::GetInstance();
 
-    std::shared_ptr<fims_popdy::DoubleLogisticSelectivity<Type>> selectivity =
-        std::make_shared<fims_popdy::DoubleLogisticSelectivity<Type>>();
+    std::shared_ptr<fims::popdy::DoubleLogisticSelectivity<Type>> selectivity =
+        std::make_shared<fims::popdy::DoubleLogisticSelectivity<Type>>();
 
     std::stringstream ss;
     // set relative info

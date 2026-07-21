@@ -1,7 +1,7 @@
 /**
  * @file double_logistic.hpp
  * @brief Declares the DoubleLogisticSelectivity class which implements the
- * logistic function from fims_math in the selectivity module.
+ * logistic function from fims::math in the selectivity module.
  * @copyright This file is part of the NOAA, National Marine Fisheries Service
  * Fisheries Integrated Modeling System project. See LICENSE in the source
  * folder for reuse information.
@@ -13,11 +13,12 @@
 #include "common/fims_vector.hpp"
 #include "selectivity_base.hpp"
 
-namespace fims_popdy {
+namespace fims {
+namespace popdy {
 
 /**
  * @brief DoubleLogisticSelectivity class that returns the double logistic
- * function value from fims_math.
+ * function value from fims::math.
  */
 template <typename Type>
 struct DoubleLogisticSelectivity : public SelectivityBase<Type> {
@@ -50,7 +51,7 @@ struct DoubleLogisticSelectivity : public SelectivityBase<Type> {
    * age or size in selectivity).
    */
   virtual const Type evaluate(const Type& x) {
-    return fims_math::double_logistic<Type>(
+    return fims::math::double_logistic<Type>(
         inflection_point_asc[0], slope_asc[0], inflection_point_desc[0],
         slope_desc[0], x);
   }
@@ -70,7 +71,7 @@ struct DoubleLogisticSelectivity : public SelectivityBase<Type> {
    * have time-varying selectivity.
    */
   virtual const Type evaluate(const Type& x, size_t pos) {
-    return fims_math::double_logistic<Type>(
+    return fims::math::double_logistic<Type>(
         inflection_point_asc.get_force_scalar(pos),
         slope_asc.get_force_scalar(pos),
         inflection_point_desc.get_force_scalar(pos),
@@ -78,6 +79,7 @@ struct DoubleLogisticSelectivity : public SelectivityBase<Type> {
   }
 };
 
-}  // namespace fims_popdy
+}  // namespace popdy
+}  // namespace fims
 
 #endif /* POPULATION_DYNAMICS_SELECTIVITY_DOUBLE_LOGISTIC_HPP */
