@@ -27,6 +27,6 @@ concurrency:
 jobs:
   call-workflow:
     if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
-    uses: nmfs-ost/ghactions4r/.github/workflows/calc-coverage.yml@main
+    uses: nmfs-ost/ghactions4r/.github/workflows/calc-coverage.yml@calc-coverage-dont-run-forks
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}

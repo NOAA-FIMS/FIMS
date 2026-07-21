@@ -37,15 +37,15 @@ TEST(GMRF, HandlesCorrectInput) {
   gmrf.expected_values[1] = 0.1;
 
   // Use a simple precision matrix Q = [[2, -1], [-1, 2]]
-  Eigen::SparseMatrix<double> Q(n_x, n_x);
-  std::vector<Eigen::Triplet<double>> triplets;
-  triplets.push_back(Eigen::Triplet<double>(0, 0, 2.0));
-  triplets.push_back(Eigen::Triplet<double>(0, 1, -1.0));
-  triplets.push_back(Eigen::Triplet<double>(1, 0, -1.0));
-  triplets.push_back(Eigen::Triplet<double>(1, 1, 2.0));
-  Q.setFromTriplets(triplets.begin(), triplets.end());
+  auto Q = std::make_shared<Eigen::SparseMatrix<double>>(n_x, n_x);
+  fims:Vector<Eigen::Triplet<double>> triplets;
+  triplets.emplace_back(0, 0, 2.0);
+  triplets.emplace_back(0, 1, -1.0);
+  triplets.emplace_back(1, 0, -1.0);
+  triplets.emplace_back(1, 1, 2.0);
+  Q->setFromTriplets(triplets.begin(), triplets.end());
 
-  gmrf.precision_matrix_ptr = &Q;
+  gmrf.precision_matrix_ptr = Q;
 
   // 2. Define expected output
   // lpdf = -0.5 * (x-mu)^T * Q * (x-mu) + 0.5 * log|Q| - N*log(sqrt(2*pi))
@@ -78,15 +78,15 @@ TEST(GMRF, HandlesZeroCenteredEdgeCase) {
   gmrf.expected_values[0] = 0.1;
   gmrf.expected_values[1] = 0.1;
 
-  Eigen::SparseMatrix<double> Q(n_x, n_x);
-  std::vector<Eigen::Triplet<double>> triplets;
-  triplets.push_back(Eigen::Triplet<double>(0, 0, 2.0));
-  triplets.push_back(Eigen::Triplet<double>(0, 1, -1.0));
-  triplets.push_back(Eigen::Triplet<double>(1, 0, -1.0));
-  triplets.push_back(Eigen::Triplet<double>(1, 1, 2.0));
-  Q.setFromTriplets(triplets.begin(), triplets.end());
+  auto Q = std::make_shared<Eigen::SparseMatrix<double>>(n_x, n_x);
+  fims:Vector<Eigen::Triplet<double>> triplets;
+  triplets.emplace_back(0, 0, 2.0);
+  triplets.emplace_back(0, 1, -1.0);
+  triplets.emplace_back(1, 0, -1.0);
+  triplets.emplace_back(1, 1, 2.0);
+  Q->setFromTriplets(triplets.begin(), triplets.end());
 
-  gmrf.precision_matrix_ptr = &Q;
+  gmrf.precision_matrix_ptr = Q;
 
   // Expected output when x_centered is zero
   // lpdf = 0 + 0.5 * log|Q| - N*log(sqrt(2*pi))
@@ -110,9 +110,9 @@ TEST(GMRF, HandlesScalarInput) {
   gmrf.expected_values[0] = 1.0;
 
   // Q = [[4.0]], which corresponds to variance = 1/4, sd = 0.5
-  Eigen::SparseMatrix<double> Q(n_x, n_x);
-  Q.insert(0, 0) = 4.0;
-  gmrf.precision_matrix_ptr = &Q;
+  auto Q = std::make_shared<Eigen::SparseMatrix<double>>(n_x, n_x);
+  Q->insert(0, 0) = 4.0;
+  gmrf.precision_matrix_ptr = Q;
 
   // Expected lpdf is the same as dnorm(1.5, 1.0, 0.5, log = TRUE)
   // lpdf = -0.5 * (x-mu)^T*Q*(x-mu) + 0.5*log|Q| - N*log(sqrt(2*pi))
@@ -133,8 +133,8 @@ TEST(GMRF, HandlesZeroDimensionalInput) {
   gmrf.observed_values.resize(n_x);
   gmrf.expected_values.resize(n_x);
 
-  Eigen::SparseMatrix<double> Q(n_x, n_x);
-  gmrf.precision_matrix_ptr = &Q;
+  auto Q = std::make_shared<Eigen::SparseMatrix<double>>(n_x, n_x);
+  gmrf.precision_matrix_ptr = Q;
 
   // Expected lpdf for an empty model is 0.
   double expected_lpdf = 0.0;
@@ -166,8 +166,8 @@ TEST(GMRF, ThrowsOnDimensionMismatch) {
   fims_distributions::GMRF<double> gmrf;
   const size_t n_x = 2;
   gmrf.observed_values.resize(n_x);
-  Eigen::SparseMatrix<double> Q_wrong_size(n_x + 1, n_x + 1);
-  gmrf.precision_matrix_ptr = &Q_wrong_size;
+  auto Q_wrong_size = std::make_shared<Eigen::SparseMatrix<double>>(n_x + 1, n_x + 1);
+  gmrf.precision_matrix_ptr = Q_wrong_size;
   EXPECT_THROW(gmrf.evaluate(), std::invalid_argument);
 }
 
@@ -178,14 +178,14 @@ TEST(GMRF, ThrowsOnNonPositiveDefiniteMatrix) {
   const size_t n_x = 2;
   gmrf.observed_values.resize(n_x);
   gmrf.expected_values.resize(n_x);
-  Eigen::SparseMatrix<double> Q_not_pos_def(n_x, n_x);
-  std::vector<Eigen::Triplet<double>> triplets;
-  triplets.push_back(Eigen::Triplet<double>(0, 0, 1.0));
-  triplets.push_back(Eigen::Triplet<double>(0, 1, 2.0));
-  triplets.push_back(Eigen::Triplet<double>(1, 0, 2.0));
-  triplets.push_back(Eigen::Triplet<double>(1, 1, 1.0));
-  Q_not_pos_def.setFromTriplets(triplets.begin(), triplets.end());
-  gmrf.precision_matrix_ptr = &Q_not_pos_def;
+  auto Q_not_pos_def = std::make_shared<Eigen::SparseMatrix<double>>(n_x, n_x);
+  fims:Vector<Eigen::Triplet<double>> triplets;
+  triplets.emplace_back(0, 0, 1.0);
+  triplets.emplace_back(0, 1, 2.0);
+  triplets.emplace_back(1, 0, 2.0);
+  triplets.emplace_back(1, 1, 1.0);
+  Q_not_pos_def->setFromTriplets(triplets.begin(), triplets.end());
+  gmrf.precision_matrix_ptr = Q_not_pos_def;
   // We expect any exception because the exact type depends on the TMB library.
   EXPECT_ANY_THROW(gmrf.evaluate());
 }
