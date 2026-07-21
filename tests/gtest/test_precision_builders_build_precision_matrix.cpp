@@ -43,8 +43,8 @@ TEST(DSEMPrecisionBuilder, HandlesCorrectInput) {
   var_path2.to = 2;
   var_path2.beta_index = 2;
 
-  builder.paths.push_back(var_path1);
-  builder.paths.push_back(var_path2);
+  builder.paths.emplace_back(var_path1);
+  builder.paths.emplace_back(var_path2);
 
   // Strengths of the arrows (standard deviations)
   builder.beta_z.resize(2);
@@ -69,11 +69,7 @@ TEST(DSEMPrecisionBuilder, HandlesCorrectInput) {
   // 4. Assert that the actual output matches the expected output
   ASSERT_EQ(actual_Q_dense.rows(), n_k);
   ASSERT_EQ(actual_Q_dense.cols(), n_k);
-  for (size_t i = 0; i < n_k; ++i) {
-    for (size_t j = 0; j < n_k; ++j) {
-      EXPECT_NEAR(actual_Q_dense(i, j), expected_Q_dense(i, j), 0.0001);
-    }
-  }
+  EXPECT_TRUE(actual_Q_dense.isApprox(expected_Q_dense, 0.0001));
 }
 
 TEST(DSEMPrecisionBuilder, HandlesAutoregressivePath) {
@@ -95,16 +91,16 @@ TEST(DSEMPrecisionBuilder, HandlesAutoregressivePath) {
   // Path 1: Causal link from state 1 to state 2
   fims_distributions::DSEMPrecisionMatrixBuilder<double>::RAMPath ar_path;
   ar_path.type = 1; ar_path.from = 1; ar_path.to = 2; ar_path.beta_index = 1;
-  builder.paths.push_back(ar_path);
+  builder.paths.emplace_back(ar_path);
 
   // Path 2 & 3: Variance for each state's innovation
   fims_distributions::DSEMPrecisionMatrixBuilder<double>::RAMPath var_path1;
   var_path1.type = 2; var_path1.from = 1; var_path1.to = 1; var_path1.beta_index = 2;
-  builder.paths.push_back(var_path1);
+  builder.paths.emplace_back(var_path1);
 
   fims_distributions::DSEMPrecisionMatrixBuilder<double>::RAMPath var_path2;
   var_path2.type = 2; var_path2.from = 2; var_path2.to = 2; var_path2.beta_index = 3;
-  builder.paths.push_back(var_path2);
+  builder.paths.emplace_back(var_path2);
 
   // 2. Define expected precision matrix Q = (I-Rho)^T * V^-1 * (I-Rho)
   // Q = [[1/sd1^2 + rho^2/sd2^2, -rho/sd2^2], [-rho/sd2^2, 1/sd2^2]]
@@ -116,10 +112,7 @@ TEST(DSEMPrecisionBuilder, HandlesAutoregressivePath) {
 
   // 3. Call the function and compare
   Eigen::MatrixXd actual_Q = builder.BuildPrecisionMatrixSparse().toDense();
-  EXPECT_NEAR(actual_Q(0, 0), expected_Q(0, 0), 1e-9);
-  EXPECT_NEAR(actual_Q(0, 1), expected_Q(0, 1), 1e-9);
-  EXPECT_NEAR(actual_Q(1, 0), expected_Q(1, 0), 1e-9);
-  EXPECT_NEAR(actual_Q(1, 1), expected_Q(1, 1), 1e-9);
+  EXPECT_TRUE(actual_Q.isApprox(expected_Q, 1e-9));
 }
 
 // Edge Handling
@@ -134,7 +127,7 @@ TEST(DSEMPrecisionBuilder, HandlesSingleState) {
   path.from = 1;
   path.to = 1;
   path.beta_index = 1;
-  builder.paths.push_back(path);
+  builder.paths.emplace_back(path);
 
   builder.beta_z.resize(1);
   double sd = 2.0;
@@ -168,7 +161,7 @@ TEST(DSEMPrecisionBuilder, ThrowsOnOutOfBoundsRAMIndices) {
   bad_path.from = 2;  // Invalid, since n_k is 1 (indices are 1-based)
   bad_path.to = 1;
   bad_path.beta_index = 1;
-  builder.paths.push_back(bad_path);
+  builder.paths.emplace_back(bad_path);
   builder.beta_z.resize(1);
   builder.beta_z[0] = 0.5;
   EXPECT_THROW(builder.BuildPrecisionMatrixSparse(), std::invalid_argument);
@@ -186,7 +179,7 @@ TEST(DSEMPrecisionBuilder, ThrowsOnOutOfBoundsBetaIndex) {
   bad_path.from = 1;
   bad_path.to = 1;
   bad_path.beta_index = 2;  // Invalid, beta_z only has size 1
-  builder.paths.push_back(bad_path);
+  builder.paths.emplace_back(bad_path);
   builder.beta_z.resize(1);
   EXPECT_THROW(builder.BuildPrecisionMatrixSparse(), std::invalid_argument);
 }
@@ -202,7 +195,7 @@ TEST(DSEMPrecisionBuilder, ThrowsOnSingularCovariance) {
   // making the V matrix singular.
   fims_distributions::DSEMPrecisionMatrixBuilder<double>::RAMPath var_path;
   var_path.type = 2; var_path.from = 1; var_path.to = 1; var_path.beta_index = 1;
-  builder.paths.push_back(var_path);
+  builder.paths.emplace_back(var_path);
   builder.beta_z.resize(1);
   builder.beta_z[0] = 1.0;
 
