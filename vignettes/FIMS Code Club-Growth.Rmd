@@ -1,0 +1,1031 @@
+---
+title: "FIMS Path: Growth (VonBertalanffy)"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{FIMS Path: Growth (VonBertalanffy)}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{css, echo=FALSE}
+.rchunk {
+  border: solid #2e75b6;
+}
+.rcppchunk {
+  border: solid #c55a11;
+}
+.fimschunk {
+  border: solid #548235;
+}
+.infochunk {
+  border: solid #262626;
+}
+```
+
+<style type="text/css">
+code span.co{
+  color: #8c8c8c;
+}
+</style>
+
+This vignette walks through the new Von Bertalanffy growth pathway in FIMS.
+It is intended to help explain the changes that make growth an active and
+estimable part of the model, run the new pathway using the standard FIMS
+workflow, and inspect the outputs needed to confirm that the branch is working
+as expected.
+
+The first example uses `data_big` so the new growth pathway can be explored
+within a familiar FIMS model setup. The main worked example then uses generated
+data with a wider age range and known growth values. This makes it easier to
+estimate the growth curve, compare fitted results with the known truth, and
+explore how changes to growth inputs affect the model.
+
+The Von Bertalanffy model uses the familiar Stock Synthesis 3 two reference-age
+parameterization. The growth curve is defined by length at two reference ages
+and the growth coefficient `K`. In the examples, the following three parameters
+are estimated:
+- `length_at_ref_age_1`
+- `length_at_ref_age_2`
+- `growth_coefficient_K`
+
+FIMS uses the fitted growth curve and supplied variability in length-at-age to
+prepare mean length-at-age, standard deviation of length-at-age, and mean
+weight-at-age. These results then feed into the shared population size system
+and the growth-derived age-to-length conversion used by the length-based fleet
+calculations.
+
+This vignette uses the interpolation-based variability pathway, which supplies
+standard deviation at the two reference ages through
+`length_at_age_sd_at_ref_ages`.
+
+Along the way, the vignette highlights outputs and settings that reviewers can
+change to explore the implementation and check that the growth-derived pathway
+is behaving as expected.
+
+> Note: The main worked example uses the interpolation-based variability path
+> by supplying `length_at_age_sd_at_ref_ages`. The delta-method path is
+> wired into FIMS, but it is not used here because it depends on
+> the traditional Von Bertalanffy parameterization, which is not yet available.
+
+## Brief `data_big` Setup
+
+The first example uses `data_big` to show where the Von Bertalanffy growth fits
+into the standard FIMS workflow. The same sequence used in other FIMS vignettes
+to prepare the data, configurations, create the parameter table, initialize the
+model, fit it, and inspect the results.
+
+`data_big` includes historical fixed `age_to_length_conversion` rows. They do
+not need to be removed for this example. Once the Growth module is changed to
+`VonBertalanffy`, FIMS infers the growth-derived ALK path from the Growth
+configuration and available data instead of asking users to choose it manually.
+For that path, explicit `length_bin` rows define the fleet observation bins when
+present. If `length_bin` rows are absent, fleet-specific `length_comp` bins can
+serve as compatibility observation geometry. Fixed `age_to_length_conversion`
+rows are used only for the fixed ALK path and do not define fleet observation
+bins for the growth-derived ALK path.
+
+```{r}
+#| warning: false
+#| message: false
+# Load the packages used in the example.
+library(FIMS)
+library(dplyr)
+library(tidyr)
+
+# Clear objects left in C++ memory by earlier FIMS runs.
+FIMS::clear()
+
+# Load FIMS example data and prepare the FIMSFrame.
+ data("data_big")
+fims_frame <- FIMS::FIMSFrame(data_big)
+
+# Start from the default model configurations and replace the default
+# empirical weight-at-age growth module with Von Bertalanffy growth.
+configurations <- FIMS::create_default_configurations(data = fims_frame) |>
+  tidyr::unnest(cols = data) |>
+  dplyr::mutate(
+    module_type = dplyr::if_else(
+      module_name == "Growth",
+      "VonBertalanffy",
+      module_type
+    )
+  ) |>
+  tidyr::nest(.by = c(model_family, module_name, fleet))
+
+# Create the parameter table for the updated configuration.
+# The three core VonB curve parameters are estimable by default.
+parameters <- FIMS::create_default_parameters(
+  configurations = configurations,
+  data = fims_frame
+) |>
+  tidyr::unnest(cols = data)
+
+# Inspect the default growth inputs and their estimation settings.
+parameters |>
+  dplyr::filter(module_name == "Growth") |>
+  dplyr::select(label, age, value, estimation_type)
+```
+
+The default Von Bertalanffy parameter table makes
+`length_at_ref_age_1`, `length_at_ref_age_2`, and
+`growth_coefficient_K` estimable. The reference ages, length-weight
+parameters, and interpolation-based standard-deviation inputs remain fixed.
+
+Selecting `VonBertalanffy` produces an estimable growth setup through the
+standard configuration and parameter workflow without requiring users to make
+extra manual edits to the growth parameter table.
+
+```{r}
+# Initialize the complete FIMS model.
+input <- parameters |>
+  FIMS::initialize_fims(data = fims_frame)
+
+# Request the full realized growth-derived ALK tensor for inspection.
+input$model$ReportGrowthDerivedALKTensor(TRUE)
+
+# Fit the model
+fit <- FIMS::fit_fims(
+  input = input,
+  optimize = TRUE,
+  number_of_loops = 5,
+  get_sd = FALSE
+)
+
+# Keep the Growth-module estimates from the fitted model.
+growth_estimates <- FIMS::get_estimates(fit) |>
+  dplyr::filter(module_name == "Growth")
+
+# Inspect the three estimable Von Bertalanffy curve parameters.
+growth_estimates |>
+  dplyr::filter(
+    label %in% c(
+      "length_at_ref_age_1",
+      "length_at_ref_age_2",
+      "growth_coefficient_K"
+    )
+  ) |>
+  dplyr::select(label, input, estimated, estimation_type)
+
+# Check optimizer convergence and the maximum absolute gradient.
+
+FIMS::get_opt(fit)$convergence
+FIMS::get_max_gradient(fit)
+```
+
+For a successful branch check, the three estimated parameters should remain
+finite and positive, the estimated second reference length should be greater
+than the first, and the maximum gradient should be small.
+
+
+```{r}
+# Pull the report here because these diagnostics are only available there.
+report <- FIMS::get_report(fit)
+
+# A value of 1 indicates that the fleet used the growth-derived ALK.
+report[["growth_derived_alk_used"]][[1]]
+
+# A length of 0 indicates that no fixed ALK matrix is stored.
+length(report[["age_to_length_conversion"]][[1]])
+
+# These prepared growth products should contain finite values.
+
+# This is the sdLAA, one value per year x age combination.
+report[["growth_sd_LAA"]][[1]]
+
+# This is the mean WAA, one value per year x age combination.
+report[["growth_mean_WAA"]][[1]]
+
+# This is the fleet-mapped mean WAA that the fleet path uses.
+report[["growth_derived_mean_WAA"]][[1]]
+```
+
+## Main Example: Estimable VonB With Generated Data
+
+This example uses generated data with ages 1-30 and "known" growth parameters.
+The wider age range makes the shape of the fitted curve easier to inspect than
+in the previous `data_big` example. Because the values used to generate the
+data are retained, you can compare the estimated parameters and prepared
+growth products with a "known truth".
+
+### Build a Compact Generated Data Set
+
+The helper below creates one population, one fleet, and two model years. Two
+years are used so the generated data form a complete catch-at-age model while
+remaining small enough for interactive branch testing.
+
+The generated data include:
+- age-composition proportions
+- length-composition proportions
+- weight-at-age values
+- a landings observation
+- explicit fleet length-bin rows
+- the true mean length-at-age and standard deviation of length-at-age
+
+It also generates a small set of noisy length-at-age observations for the
+comparison plot. Those plotting observations are retained separately and are
+not passed to FIMS as model inputs.
+
+```{r}
+#| warning: false
+#| message: false
+library(FIMS)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+
+# Define the SS3-style two-reference-age Von Bertalanffy equation used to
+# generate the "known" growth truth for this example.
+vonb_two_reference_age <- function(
+    age,
+    length_at_ref_age_1,
+    length_at_ref_age_2,
+    growth_coefficient_K,
+    reference_age_for_length_1,
+    reference_age_for_length_2) {
+  # Normalizes the curve so it is anchored to both reference-age lengths.
+  denominator <- 1 - exp(
+    -growth_coefficient_K *
+      (reference_age_for_length_2 - reference_age_for_length_1)
+  )
+
+  # Predict mean length at age using the same curve shape FIMS estimates.
+  length_at_ref_age_1 +
+    (length_at_ref_age_2 - length_at_ref_age_1) *
+      (
+        1 - exp(
+          -growth_coefficient_K *
+            (age - reference_age_for_length_1)
+        )
+      ) / denominator
+}
+
+# Calculate the asymptotic length implied by the two-reference-age form.
+vonb_implied_linf <- function(
+    length_at_ref_age_1,
+    length_at_ref_age_2,
+    growth_coefficient_K,
+    reference_age_for_length_1,
+    reference_age_for_length_2) {
+  length_at_ref_age_1 +
+    (length_at_ref_age_2 - length_at_ref_age_1) /
+      (
+        1 - exp(
+          -growth_coefficient_K *
+            (reference_age_for_length_2 - reference_age_for_length_1)
+        )
+      )
+}
+
+# Build a compact generated data set with one population and one fleet.
+# FIMS fits the model later; this function only creates the example data.
+make_vonb_demo_data <- function(
+    ages = 1:30,
+    lengths = seq(0, 1400, 50),
+    years = 1:2,
+    fleet = "fleet_demo",
+    sample_size = 300,
+    length_at_ref_age_1 = 180,
+    length_at_ref_age_2 = 850,
+    growth_coefficient_K = 0.18,
+    reference_age_for_length_1 = 1,
+    reference_age_for_length_2 = 12,
+    length_weight_a = 2.5e-11,
+    length_weight_b = 3,
+    sd_at_ref_ages = c(30, 73)) {
+  # Calculate the "true" growth products used to generate the example.
+  true_curve <- tibble::tibble(
+    age = ages,
+    true_mean_length = vonb_two_reference_age(
+      age = ages,
+      length_at_ref_age_1 = length_at_ref_age_1,
+      length_at_ref_age_2 = length_at_ref_age_2,
+      growth_coefficient_K = growth_coefficient_K,
+      reference_age_for_length_1 = reference_age_for_length_1,
+      reference_age_for_length_2 = reference_age_for_length_2
+    ),
+    true_sd_length = stats::approx(
+      x = c(
+        reference_age_for_length_1,
+        reference_age_for_length_2
+      ),
+      y = sd_at_ref_ages,
+      xout = ages,
+      rule = 2
+    )$y
+  ) |>
+    dplyr::mutate(
+      true_weight_at_age =
+        length_weight_a * true_mean_length^length_weight_b
+    )
+
+  # Derive the implied Linf from the known two-reference-age growth parameters.
+  # Linf is not estimated directly here; it is used only as a truth reference.
+  true_linf <- vonb_implied_linf(
+    length_at_ref_age_1 = length_at_ref_age_1,
+    length_at_ref_age_2 = length_at_ref_age_2,
+    growth_coefficient_K = growth_coefficient_K,
+    reference_age_for_length_1 = reference_age_for_length_1,
+    reference_age_for_length_2 = reference_age_for_length_2
+  )
+
+  # Use a declining age distribution for the generated population.
+  age_weights <- exp(-0.18 * (ages - min(ages)))
+  age_probabilities <- age_weights / sum(age_weights)
+
+  # Create age-composition observations for each modeled year and age.
+  # The same known age distribution is repeated across years so the generated
+  # data give the model age-structure information without adding extra
+  # year-specific variation.
+  age_comp_rows <- tidyr::expand_grid(
+    timing = years,
+    age = ages
+  ) |>
+    dplyr::mutate(
+      type = "age_comp",
+      fleet = fleet,
+      length = NA_real_,
+      value = age_probabilities[match(age, ages)],
+      unit = "proportion",
+      uncertainty = sample_size
+    ) |>
+    dplyr::select(
+      type,
+      fleet,
+      age,
+      length,
+      timing,
+      value,
+      unit,
+      uncertainty
+    )
+
+  # Calculate the probability of each modeled length conditional on age.
+  age_length_probabilities <- tidyr::expand_grid(
+    age = ages,
+    length = lengths
+  ) |>
+    dplyr::left_join(true_curve, by = "age") |>
+    dplyr::group_by(age) |>
+    dplyr::mutate(
+      conditional_probability = stats::dnorm(
+        x = length,
+        mean = true_mean_length,
+        sd = true_sd_length
+      ),
+      conditional_probability =
+        conditional_probability / sum(conditional_probability)
+    ) |>
+    dplyr::ungroup()
+
+  # Marginalize across ages to create the fleet length composition.
+  length_comp_rows <- age_length_probabilities |>
+    dplyr::mutate(
+      age_probability = age_probabilities[match(age, ages)]
+    ) |>
+    dplyr::group_by(length) |>
+    dplyr::summarise(
+      value = sum(age_probability * conditional_probability),
+      .groups = "drop"
+    ) |>
+    tidyr::crossing(timing = years) |>
+    dplyr::mutate(
+      type = "length_comp",
+      fleet = fleet,
+      age = NA_real_,
+      unit = "proportion",
+      uncertainty = sample_size
+    ) |>
+    dplyr::select(
+      type,
+      fleet,
+      age,
+      length,
+      timing,
+      value,
+      unit,
+      uncertainty
+    )
+
+  # Use the known growth curve to create weight-at-age inputs.
+  # These values give the generated example a truth-based weight-at-age source
+  # that can be compared with the growth-derived WAA reported after fitting.
+  weight_at_age_rows <- true_curve |>
+    dplyr::transmute(
+      type = "weight_at_age",
+      fleet = fleet,
+      age = age,
+      length = NA_real_,
+      timing = min(years),
+      value = true_weight_at_age,
+      unit = "mt",
+      uncertainty = NA_real_
+    )
+
+  # Add simple landings observations for each modeled year.
+  # These keep the generated model connected to a fleet-level catch component
+  landings_rows <- tibble::tibble(
+    type = "landings",
+    fleet = fleet,
+    age = NA_real_,
+    length = NA_real_,
+    timing = years,
+    value = rep(2500, length(years)),
+    unit = "mt",
+    uncertainty = 0.2
+  )
+
+  # Make the fleet observation geometry explicit so it can be modified.
+  length_bin_rows <- tibble::tibble(
+    type = "length_bin",
+    fleet = fleet,
+    age = NA_real_,
+    length = lengths,
+    timing = NA_real_,
+    value = NA_real_,
+    unit = "proportion",
+    uncertainty = NA_real_
+  )
+
+  # Combine all generated row types into one long FIMS input table.
+  # The resulting table contains the fleet observations, weight-at-age inputs,
+  # and length-bin geometry used to build the example FIMSFrame.
+  raw_data <- dplyr::bind_rows(
+    landings_rows,
+    age_comp_rows,
+    length_comp_rows,
+    weight_at_age_rows,
+    length_bin_rows
+  )
+
+  # Create separate noisy observations for plotting only.
+  observed_laa <- true_curve |>
+    dplyr::mutate(
+      observed_length = stats::rnorm(
+        n = dplyr::n(),
+        mean = true_mean_length,
+        sd = true_sd_length / sqrt(15)
+      )
+    ) |>
+    dplyr::select(
+      age,
+      true_mean_length,
+      true_sd_length,
+      observed_length
+    )
+
+  # Return both the FIMS-ready data object and the known-truth pieces used for
+  # later checks and plots. Keeping these together makes each scenario easy to
+  # rerun with different growth or bin settings.
+  list(
+    frame = FIMS::FIMSFrame(raw_data),
+    raw_data = raw_data,
+    ages = ages,
+    lengths = lengths,
+    years = years,
+    true_curve = true_curve,
+    observed_laa = observed_laa,
+    true_linf = true_linf,
+    true_parameters = tibble::tibble(
+      label = c(
+        "length_at_ref_age_1",
+        "length_at_ref_age_2",
+        "growth_coefficient_K",
+        "reference_age_for_length_1",
+        "reference_age_for_length_2"
+      ),
+      true_value = c(
+        length_at_ref_age_1,
+        length_at_ref_age_2,
+        growth_coefficient_K,
+        reference_age_for_length_1,
+        reference_age_for_length_2
+      )
+    )
+  )
+}
+
+# Set the seed so the generated observed length-at-age values are reproducible.
+set.seed(1908)
+
+# Build the generated VonB example data
+demo <- make_vonb_demo_data()
+
+# Inspect the data types and modeled ranges before configuring the model.
+methods::show(demo$frame)
+demo$true_parameters
+demo$true_linf
+```
+
+The explicit `length_bin` rows make the fleet observation geometry easy to
+locate and modify during branch testing. You can change the spacing or
+range in `lengths` and rerun the example to examine how fleet geometry is
+carried into the growth-derived pathway.
+
+### Configure the Von Bertalanffy Model
+
+The generated data use the same standard configuration and parameter workflow
+as the `data_big` example. Changing the Growth module to
+`VonBertalanffy` causes `create_default_parameters()` to create the required
+reference ages, interpolation-based variability inputs, and estimable curve
+parameters.
+
+By default, the reference ages are set from the minimum and maximum ages in the
+`FIMSFrame`. This example overrides the second reference age to 12 so that the
+modeled ages beyond age 12 show the fitted curve approaching its implied
+asymptote.
+
+```{r}
+# Clear C++ objects created by the previous example.
+FIMS::clear()
+
+# Identify the three estimable VonB curve parameters used for comparisons,
+# plots, and checks throughout the generated-data example.
+core_growth_labels <- c(
+  "length_at_ref_age_1",
+  "length_at_ref_age_2",
+  "growth_coefficient_K"
+)
+
+# Replace the default empirical weight-at-age module with VonB growth.
+configurations <- FIMS::create_default_configurations(data = demo$frame) |>
+  tidyr::unnest(cols = data) |>
+  dplyr::mutate(
+    module_type = dplyr::if_else(
+      module_name == "Growth",
+      "VonBertalanffy",
+      module_type
+    )
+  ) |>
+  tidyr::nest(.by = c(model_family, module_name, fleet))
+
+# Create the complete model parameter table.
+parameters <- FIMS::create_default_parameters(
+  configurations = configurations,
+  data = demo$frame
+) |>
+  tidyr::unnest(cols = data)
+```
+
+The three core curve parameters are already `"fixed_effects"`. The example
+changes their initial values so the optimizer does not begin at the values used
+to generate the data.
+
+```{r}
+# Pull out the default VonB interpolation SD rows.
+growth_sd_rows <- parameters |>
+  dplyr::filter(
+    module_name == "Growth",
+    label == "length_at_age_sd_at_ref_ages"
+  ) |>
+  dplyr::mutate(
+    # Move the interpolation ages to the demo reference ages.
+    age = c(1, 12),
+    # Match the generated-truth SD values for this example.
+    value = c(30, 73)
+  )
+
+# Replace the defaults with the demo settings.
+parameters <- parameters |>
+  dplyr::filter(
+    !(module_name == "Growth" &
+        label == "length_at_age_sd_at_ref_ages")
+  ) |>
+  dplyr::bind_rows(growth_sd_rows) |>
+  dplyr::rows_update(
+    tibble::tibble(
+      module_name = "Growth",
+      label = c(
+        "length_at_ref_age_1",
+        "length_at_ref_age_2",
+        "growth_coefficient_K",
+        "reference_age_for_length_1",
+        "reference_age_for_length_2"
+      ),
+      value = c(150, 800, 0.22, 1, 12)
+    ),
+    by = c("module_name", "label")
+  )
+
+# Review the Growth configuration before initializing the model.
+parameters |>
+  dplyr::filter(module_name == "Growth") |>
+  dplyr::arrange(label, age) |>
+  dplyr::select(label, age, value, estimation_type)
+```
+
+You can change the three starting values and rerun the fit to examine
+whether the model reaches the same solution. The two SD-anchor values can also
+be changed to explore how assumed variability in length-at-age affects the
+growth-derived age-to-length probabilities.
+
+### Fit the Model
+
+Initialize and fit the model using the prepared parameter table. The report
+flag requests the complete realized growth-derived ALK tensor, which is used
+later to inspect the handoff from growth to fleet length bins.
+
+```{r}
+# Build the FIMS input from the prepared demo frame and parameters.
+input <- parameters |>
+  FIMS::initialize_fims(data = demo$frame)
+
+# Ask FIMS to include the growth-derived ALK tensor in the report
+# so we can inspect it.
+input$model$ReportGrowthDerivedALKTensor(TRUE)
+
+# Fit the VonB demo
+fit <- FIMS::fit_fims(
+  input = input,
+  optimize = TRUE,
+  number_of_loops = 5,
+  number_of_newton_steps = 0,
+  get_sd = FALSE
+)
+
+# Keep only the core VonB growth estimates.
+growth_estimates <- FIMS::get_estimates(fit) |>
+  dplyr::filter(
+    module_name == "Growth",
+    label %in% core_growth_labels
+  )
+```
+
+Compare the starting values and estimates with the known parameters used to
+generate the data:
+
+```{r}
+# Compare the fitted growth values against the generated truth
+growth_comparison <- growth_estimates |>
+  dplyr::select(label, input, estimated) |>
+  dplyr::left_join(
+    demo$true_parameters |>
+      dplyr::filter(label %in% core_growth_labels),
+    by = "label"
+  )
+
+# Show the side-by-side comparison for the core VonB parameters.
+growth_comparison
+```
+
+Check both the optimizer convergence code and the maximum gradient:
+
+```{r}
+tibble::tibble(
+  convergence = FIMS::get_opt(fit)$convergence,
+  max_gradient = FIMS::get_max_gradient(fit)
+)
+```
+
+A convergence code of `0` indicates normal optimizer convergence. The maximum
+gradient should also be small. These diagnostics should be considered
+together with whether the estimated growth parameters are biologically valid
+and reasonably close to the known values.
+
+### Plot the Observed and Predicted Growth Curve
+
+The fitted FIMS report is defined on the modeled ages, but the plotting grid is
+extended beyond the modeled ages to show the implied Von Bertalanffy asymptote.
+The extended estimated curve is calculated from the fitted parameters and is
+for visualization only.
+
+```{r growth-curve-plot}
+#| warning: false
+#| message: false
+#| fig.width: 9
+#| fig.height: 6
+#| fig.cap: >
+#|   Observed lengths-at-age, the true Von Bertalanffy curve used to generate
+#|   the data, and the fitted Von Bertalanffy curve from FIMS.
+#| fig.alt: >
+#|   Point and line plot comparing generated observed lengths-at-age with the
+#|   true and fitted Von Bertalanffy growth curves, with the plotting range
+#|   extended to show the implied asymptote.
+
+# Pull true parameter values into one row.
+true_growth_values <- demo$true_parameters |>
+  tidyr::pivot_wider(
+    names_from = label,
+    values_from = true_value
+  )
+
+# Pull estimated curve parameters into one row.
+estimated_growth_values <- growth_estimates |>
+  dplyr::select(label, estimated) |>
+  tidyr::pivot_wider(
+    names_from = label,
+    values_from = estimated
+  )
+
+# Pull the reference ages used by the fitted model.
+growth_reference_ages <- parameters |>
+  dplyr::filter(
+    module_name == "Growth",
+    label %in% c(
+      "reference_age_for_length_1",
+      "reference_age_for_length_2"
+    )
+  ) |>
+  dplyr::select(label, value) |>
+  tidyr::pivot_wider(
+    names_from = label,
+    values_from = value
+  )
+
+# Extend the plotting grid beyond the modeled ages so the asymptote is visible.
+plot_ages <- seq(
+  from = min(demo$ages),
+  to = 50,
+  by = 0.25
+)
+
+true_plot_curve <- tibble::tibble(
+  age = plot_ages,
+  mean_length = vonb_two_reference_age(
+    age = plot_ages,
+    length_at_ref_age_1 = true_growth_values$length_at_ref_age_1,
+    length_at_ref_age_2 = true_growth_values$length_at_ref_age_2,
+    growth_coefficient_K = true_growth_values$growth_coefficient_K,
+    reference_age_for_length_1 =
+      true_growth_values$reference_age_for_length_1,
+    reference_age_for_length_2 =
+      true_growth_values$reference_age_for_length_2
+  ),
+  curve = "True curve",
+  series = "True curve"
+)
+
+estimated_plot_curve <- tibble::tibble(
+  age = plot_ages,
+  mean_length = vonb_two_reference_age(
+    age = plot_ages,
+    length_at_ref_age_1 = estimated_growth_values$length_at_ref_age_1,
+    length_at_ref_age_2 = estimated_growth_values$length_at_ref_age_2,
+    growth_coefficient_K = estimated_growth_values$growth_coefficient_K,
+    reference_age_for_length_1 =
+      growth_reference_ages$reference_age_for_length_1,
+    reference_age_for_length_2 =
+      growth_reference_ages$reference_age_for_length_2
+  ),
+  curve = "Estimated curve",
+  series = "Estimated curve"
+)
+
+curve_lines <- dplyr::bind_rows(
+  true_plot_curve,
+  estimated_plot_curve
+)
+
+# Keep a model-age prediction table for residuals.
+predicted_curve <- tibble::tibble(
+  age = demo$ages,
+  predicted_mean_length = vonb_two_reference_age(
+    age = demo$ages,
+    length_at_ref_age_1 = estimated_growth_values$length_at_ref_age_1,
+    length_at_ref_age_2 = estimated_growth_values$length_at_ref_age_2,
+    growth_coefficient_K = estimated_growth_values$growth_coefficient_K,
+    reference_age_for_length_1 =
+      growth_reference_ages$reference_age_for_length_1,
+    reference_age_for_length_2 =
+      growth_reference_ages$reference_age_for_length_2
+  )
+)
+
+curve_plot_data <- demo$observed_laa |>
+  dplyr::left_join(predicted_curve, by = "age") |>
+  dplyr::mutate(series = "Generated observations")
+
+true_linf_line <- tibble::tibble(
+  yintercept = demo$true_linf,
+  series = "True Linf"
+)
+
+ggplot2::ggplot() +
+  ggplot2::geom_point(
+    data = curve_plot_data,
+    ggplot2::aes(x = age, y = observed_length, colour = series),
+    size = 2
+  ) +
+  ggplot2::geom_line(
+    data = curve_lines,
+    ggplot2::aes(x = age, y = mean_length, colour = series),
+    linewidth = 1
+  ) +
+  ggplot2::geom_hline(
+    data = true_linf_line,
+    ggplot2::aes(yintercept = yintercept, colour = series),
+    linetype = "dotted",
+    linewidth = 0.8
+  ) +
+  ggplot2::scale_colour_manual(
+    name = NULL,
+    breaks = c(
+      "Generated observations",
+      "Estimated curve",
+      "True curve",
+      "True Linf"
+    ),
+    values = c(
+      "Generated observations" = "black",
+      "Estimated curve" = "#0072B2",
+      "True curve" = "#D55E00",
+      "True Linf" = "gray50"
+    )
+  ) +
+  ggplot2::labs(
+    title = "Observed and predicted VonB growth curve",
+    x = "Age",
+    y = "Length"
+  ) +
+  stockplotr::theme_noaa()
+```
+
+The estimated curve should follow the generated truth closely when the fit
+converges and the length-composition information is informative. Large
+departures are useful for debugging because they can point to growth starting
+values, length-composition information, or downstream length-bin behavior.
+
+### Plot Residuals
+
+Here, the residual is the generated observed length minus the fitted mean
+length-at-age from `get_estimates()`. This is not a truth-vs-fit check; it is
+just a visual check that the fitted curve tracks the demo observations.
+
+```{r growth-residual-plot}
+#| warning: false
+#| message: false
+#| fig.width: 8
+#| fig.height: 8
+#| fig.cap: >
+#|   Residual plot showing observed minus predicted length-at-age for the
+#|   generated Von Bertalanffy example.
+#| fig.alt: >
+#|   Residual plot with age on the x-axis and observed minus predicted length
+#|   on the y-axis for the generated Von Bertalanffy example.
+
+# Build residuals from the fitted VonB curve
+residual_plot_data <- demo$observed_laa |>
+  dplyr::left_join(predicted_curve, by = "age") |>
+  dplyr::mutate(
+    residual = observed_length - predicted_mean_length
+  )
+
+ggplot2::ggplot(residual_plot_data, ggplot2::aes(x = age, y = residual)) +
+  ggplot2::geom_hline(yintercept = 0, linetype = "dotted") +
+  ggplot2::geom_point(size = 2) +
+  ggplot2::labs(
+    title = "Length-at-age residuals",
+    x = "Age",
+    y = "Observed minus predicted length"
+  ) +
+  stockplotr::theme_noaa()
+```
+
+These residuals are not a formal model diagnostic because the observed lengths
+were created only for plotting. They are still useful for a branch-level check
+because they make it easy to see whether the fitted curve is tracking the
+known growth pattern.
+
+### One Light Downstream Check of the Shared Size Path
+
+The final plot is not meant to duplicate the test suite. It shows one visible
+downstream object from the migrated pathway: a realized growth-derived
+age-to-length row for a representative age.
+
+```{r growth-size-handoff-plot}
+#| warning: false
+#| message: false
+#| fig.width: 8
+#| fig.height: 8
+#| fig.cap: >
+#|   One realized growth-derived age-to-length row, showing how the fitted
+#|   growth curve is mapped into fleet observation-bin probabilities.
+#| fig.alt: >
+#|   Bar plot of one realized growth-derived age-to-length row across fleet
+#|   observation-bin centers for a representative age.
+
+# Pull the report here because the realized ALK tensor and path flags are
+# only available there.
+report <- FIMS::get_report(fit)
+
+# View the ages in the demo object to understand the age range.
+demo$ages
+
+# Pick a representative age/year slice so we can show one realized ALK row.
+# `ceiling(length(demo$ages) / 2)` picks the middle modeled age, rounding up
+# when there are an even number of ages.
+representative_age <- demo$ages[ceiling(length(demo$ages) / 2)]
+representative_year <- demo$years[1]
+
+# Pull the full realized growth-derived ALK tensor from the report.
+realized_alk <- report[["growth_derived_age_to_length_conversion"]][[1]]
+
+# Reshape the flattened tensor into length x age x year form for slicing.
+realized_alk_array <- array(
+  realized_alk,
+  dim = c(
+    length(demo$lengths),
+    length(demo$ages),
+    length(demo$years)
+  )
+)
+
+# Extract one age-year row so the probability mass across fleet bins is easy to read.
+downstream_check <- tibble::tibble(
+  length = demo$lengths,
+  probability = realized_alk_array[
+    ,
+    match(representative_age, demo$ages),
+    match(representative_year, demo$years)
+  ]
+)
+
+# Plot the realized ALK row as probabilities over the fleet observation bins.
+ggplot2::ggplot(
+  downstream_check,
+  ggplot2::aes(x = length, y = probability)
+) +
+  ggplot2::geom_col() +
+  ggplot2::labs(
+    title = paste(
+      "Realized growth-derived ALK row at age",
+      representative_age,
+      "in year",
+      representative_year
+    ),
+    x = "Fleet observation bin",
+    y = "Probability"
+  ) +
+  stockplotr::theme_noaa()
+```
+
+The probabilities in the plotted row should sum to one:
+
+```{r}
+sum(downstream_check$probability)
+```
+
+For a quick non-graphical check, the report flag should also be `1` when the
+derived path is being used:
+
+```{r}
+report[["growth_derived_alk_used"]][[1]][1]
+```
+
+The fixed historical age-to-length matrix should not be present on the active
+growth-derived path:
+
+```{r}
+length(report[["age_to_length_conversion"]][[1]])
+```
+
+## Architecture Path
+
+This branch changed more than "turning on growth estimation". The Growth
+module now prepares growth products, including mean length-at-age, standard
+deviation of length-at-age, and mean weight-at-age. But the larger change is
+that these products now move through the new size subsystem before they are
+used by fleets.
+
+The size subsystem separates population biology from fleet observation
+biology. Growth defines the biological size structure of the population. Those
+growth products are then used to build `ProbSize`, the probability that a fish
+of a given year and age falls into a particular population size bin. The
+growth-derived age-to-length pathway then maps those population size
+probabilities onto the fleet observation bins used by the length-composition
+data.
+The biological size grid remains separate from fleet observation bins, and
+user-specified size grids are preserved when provided; FIMS only builds a
+default grid when needed.
+
+Conceptually, the path is:
+
+```text
+estimated VonB growth parameters
+        |
+        v
+mean length-at-age and SD length-at-age
+        |
+        v
+population size probabilities
+        |
+        v
+fleet observation-bin probabilities
+        |
+        v
+length-composition and landings calculations
+```
+
+## Next Steps
+
+This vignette shows the baseline Von Bertalanffy growth-derived pathway. A
+companion vignette, `Things To Try With Von Bertalanffy Growth.rmd`, walks through
+small changes that can be made to the generated example to see how growth
+starting values, fleet length bins, length-at-age variability, reference ages,
+report settings, and downstream model outputs respond.

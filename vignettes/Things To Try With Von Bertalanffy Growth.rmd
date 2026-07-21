@@ -1,0 +1,1598 @@
+---
+title: "Things To Try With Von Bertalanffy Growth"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Things To Try With Von Bertalanffy Growth}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+## Purpose
+
+This vignette walks through small changes to the Von Bertalanffy growth example.
+Each section changes one part of the setup, reruns the full model, and saves the
+outputs for comparison.
+
+The goal is to show how growth inputs move through the full model workflow.
+
+The examples focus on:
+
+- starting values for estimable growth parameters,
+- fleet length-bin spacing,
+- length-at-age variability,
+- the second reference age in the two-reference-age growth curve,
+- reporting the full realized growth-derived ALK tensor,
+- downstream outputs that respond to the growth-derived pathway.
+
+
+## Shared Setup
+
+This companion vignette uses the same generated-data helper functions as the
+main Von Bertalanffy growth vignette.
+
+It assumes these helper functions have already been defined earlier in the
+session:
+
+- `make_vonb_demo_data()`
+- `vonb_two_reference_age()`
+- `vonb_implied_linf()`
+
+If you want to knit this file on its own, copy those helper definitions into
+this vignette before the setup chunk below.
+
+```{r setup}
+library(FIMS)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(stockplotr)
+
+core_growth_labels <- c(
+  "length_at_ref_age_1",
+  "length_at_ref_age_2",
+  "growth_coefficient_K"
+)
+```
+
+## Bring Your Own Growth Data
+
+### What users can do right now
+
+Right now, the Von Bertalanffy growth parameters can be informed by your fleet
+length-composition data.
+
+In this workflow, users do not yet pass a separate table of raw age-length
+observations into a direct growth likelihood. Instead, growth is estimated as
+part of the full model while the model tries to match the length-composition
+data and the rest of the assessment inputs.
+
+### What to bring
+
+If you want to estimate Von Bertalanffy growth with your own data, the most
+important pieces are:
+
+- `length_comp` rows for the fleets and years you want the growth path to help explain,
+- `length_bin` rows if you want to control the fleet observation bins explicitly,
+- `weight_at_age` rows because the current FIMS user path still requires them,
+- the usual supporting data for the rest of the model, such as landings, index,
+  and age compositions when those are part of the assessment.
+
+### If you start from raw age-length samples
+
+If your starting point is a raw table of fish ages and lengths, a simple
+workflow is:
+
+1. summarize those observations into fleet-year `length_comp` inputs,
+2. use the raw age-length data outside FIMS to choose reasonable starting
+   values for the growth curve and the SD-at-age anchors,
+3. fit the full FIMS model with `Growth = "VonBertalanffy"` and review the
+   fitted growth estimates.
+
+### Minimal setup pattern
+
+```{r byog-growth-template, eval = FALSE}
+my_frame <- FIMS::FIMSFrame(my_long_data)
+
+my_configurations <- FIMS::create_default_configurations(data = my_frame) |>
+  tidyr::unnest(cols = data) |>
+  dplyr::mutate(
+    module_type = dplyr::if_else(
+      module_name == "Growth",
+      "VonBertalanffy",
+      module_type
+    )
+  ) |>
+  tidyr::nest(.by = c(model_family, module_name, fleet))
+
+my_parameters <- FIMS::create_default_parameters(
+  configurations = my_configurations,
+  data = my_frame
+) |>
+  tidyr::unnest(cols = data)
+
+# Then update the key Growth values to match your stock as closely as you can:
+# - length_at_ref_age_1
+# - length_at_ref_age_2
+# - growth_coefficient_K
+# - reference_age_for_length_1
+# - reference_age_for_length_2
+# - length_at_age_sd_at_ref_ages
+```
+
+### What this means for the examples below
+
+The examples in this vignette are generated-data checks, but the same basic
+workflow is what a user would follow with real data: prepare the long FIMS
+table, switch Growth to `VonBertalanffy`, set reasonable starting values, and
+then see how the fitted growth results respond.
+
+## Baseline Reference Run
+
+### What this run does
+
+The baseline run uses the generated data and model settings from the main
+Von Bertalanffy growth vignette. The sections that follow change one piece of
+this setup at a time.
+
+### Run the baseline model
+
+```{r baseline-run}
+# Start fresh.
+FIMS::clear()
+
+# Create the generated data using the baseline settings.
+baseline_demo <- make_vonb_demo_data()
+
+# Replace the default empirical weight-at-age Growth module with
+# Von Bertalanffy growth.
+baseline_configurations <- FIMS::create_default_configurations(
+  data = baseline_demo$frame
+) |>
+  tidyr::unnest(cols = data) |>
+  dplyr::mutate(
+    module_type = dplyr::if_else(
+      module_name == "Growth",
+      "VonBertalanffy",
+      module_type
+    )
+  ) |>
+  tidyr::nest(.by = c(model_family, module_name, fleet))
+
+# Create the parameter table.
+baseline_parameters <- FIMS::create_default_parameters(
+  configurations = baseline_configurations,
+  data = baseline_demo$frame
+) |>
+  tidyr::unnest(cols = data)
+
+# Pull out the default VonB SD anchor rows.
+baseline_growth_sd_rows <- baseline_parameters |>
+  dplyr::filter(
+    module_name == "Growth",
+    label == "length_at_age_sd_at_ref_ages"
+  ) |>
+  dplyr::mutate(
+    # Move the interpolation anchors to the ages used in this demo.
+    age = c(1, 12),
+    # Match the generated-truth SD values for the example.
+    value = c(30, 73)
+  )
+
+# Replace the generic defaults with the demo-specific growth settings.
+baseline_parameters <- baseline_parameters |>
+  dplyr::filter(
+    !(module_name == "Growth" &
+        label == "length_at_age_sd_at_ref_ages")
+  ) |>
+  dplyr::bind_rows(baseline_growth_sd_rows) |>
+  dplyr::rows_update(
+    tibble::tibble(
+      module_name = "Growth",
+      label = c(
+        "length_at_ref_age_1",
+        "length_at_ref_age_2",
+        "growth_coefficient_K",
+        "reference_age_for_length_1",
+        "reference_age_for_length_2"
+      ),
+      value = c(150, 800, 0.22, 1, 12)
+    ),
+    by = c("module_name", "label")
+  )
+
+# Initialize and fit the model.
+baseline_input <- baseline_parameters |>
+  FIMS::initialize_fims(data = baseline_demo$frame)
+
+# Request the full realized ALK tensor for the comparison plots.
+baseline_input$model$ReportGrowthDerivedALKTensor(TRUE)
+
+baseline_fit <- FIMS::fit_fims(
+  input = baseline_input,
+  optimize = TRUE,
+  number_of_loops = 5,
+  number_of_newton_steps = 0,
+  get_sd = FALSE
+)
+
+baseline_growth_estimates <- FIMS::get_estimates(baseline_fit) |>
+  dplyr::filter(
+    module_name == "Growth",
+    label %in% core_growth_labels
+  )
+
+# Pull the report only after the fitted growth estimates are in hand.
+baseline_report <- FIMS::get_report(baseline_fit)
+
+baseline_growth_comparison <- baseline_growth_estimates |>
+  dplyr::select(label, input, estimated) |>
+  dplyr::left_join(
+    baseline_demo$true_parameters |>
+      dplyr::filter(label %in% core_growth_labels),
+    by = "label"
+  )
+
+baseline_growth_comparison
+
+baseline_diagnostics <- tibble::tibble(
+  scenario = "baseline",
+  convergence = FIMS::get_opt(baseline_fit)$convergence,
+  max_gradient = FIMS::get_max_gradient(baseline_fit)
+)
+
+baseline_diagnostics
+```
+
+## Try 1: Change Growth Starting Values
+
+### What this changes
+
+This run changes only the starting values for the three estimable
+Von Bertalanffy growth parameters.
+
+### Why this matters
+
+If the growth parameters are connected to the objective and the data are
+informative, the model should move away from the changed starting values and
+toward the generated truth.
+
+### Run the model
+
+```{r try-1-starting-values}
+FIMS::clear()
+
+starting_values_demo <- make_vonb_demo_data()
+
+starting_values_configurations <- FIMS::create_default_configurations(
+  data = starting_values_demo$frame
+) |>
+  tidyr::unnest(cols = data) |>
+  dplyr::mutate(
+    module_type = dplyr::if_else(
+      module_name == "Growth",
+      "VonBertalanffy",
+      module_type
+    )
+  ) |>
+  tidyr::nest(.by = c(model_family, module_name, fleet))
+
+starting_values_parameters <- FIMS::create_default_parameters(
+  configurations = starting_values_configurations,
+  data = starting_values_demo$frame
+) |>
+  tidyr::unnest(cols = data)
+
+starting_values_growth_sd_rows <- starting_values_parameters |>
+  dplyr::filter(
+    module_name == "Growth",
+    label == "length_at_age_sd_at_ref_ages"
+  ) |>
+  dplyr::mutate(
+    age = c(1, 12),
+    value = c(30, 73)
+  )
+
+# CHANGED: starting values are farther from the generated truth.
+starting_values_parameters <- starting_values_parameters |>
+  dplyr::filter(
+    !(module_name == "Growth" &
+        label == "length_at_age_sd_at_ref_ages")
+  ) |>
+  dplyr::bind_rows(starting_values_growth_sd_rows) |>
+  dplyr::rows_update(
+    tibble::tibble(
+      module_name = "Growth",
+      label = c(
+        "length_at_ref_age_1",
+        "length_at_ref_age_2",
+        "growth_coefficient_K",
+        "reference_age_for_length_1",
+        "reference_age_for_length_2"
+      ),
+      value = c(100, 700, 0.35, 1, 12)
+    ),
+    by = c("module_name", "label")
+  )
+
+starting_values_input <- starting_values_parameters |>
+  FIMS::initialize_fims(data = starting_values_demo$frame)
+
+starting_values_input$model$ReportGrowthDerivedALKTensor(TRUE)
+
+starting_values_fit <- FIMS::fit_fims(
+  input = starting_values_input,
+  optimize = TRUE,
+  number_of_loops = 5,
+  number_of_newton_steps = 0,
+  get_sd = FALSE
+)
+
+starting_values_growth_estimates <- FIMS::get_estimates(starting_values_fit) |>
+  dplyr::filter(
+    module_name == "Growth",
+    label %in% core_growth_labels
+  )
+
+# Pull the report only after the fitted growth estimates are in hand.
+starting_values_report <- FIMS::get_report(starting_values_fit)
+
+starting_values_growth_comparison <- starting_values_growth_estimates |>
+  dplyr::select(label, input, estimated) |>
+  dplyr::left_join(
+    starting_values_demo$true_parameters |>
+      dplyr::filter(label %in% core_growth_labels),
+    by = "label"
+  )
+
+starting_values_growth_comparison
+
+starting_values_diagnostics <- tibble::tibble(
+  scenario = "changed starting values",
+  convergence = FIMS::get_opt(starting_values_fit)$convergence,
+  max_gradient = FIMS::get_max_gradient(starting_values_fit)
+)
+
+starting_values_diagnostics
+```
+
+### What should happen
+
+The `input` column should show the changed starting values. The estimated
+values should move toward the generated truth.
+
+## Try 2: Change Fleet Length Bins
+
+### What this changes
+
+This run changes the fleet observation-bin spacing from 50 to 25.
+
+### Why this matters
+
+The mean growth curve should be similar, but the realized growth-derived ALK
+should be mapped onto a finer fleet observation grid.
+
+### Run the model
+
+```{r try-2-finer-length-bins}
+FIMS::clear()
+
+# CHANGED: use a finer fleet observation-bin grid.
+finer_bins_demo <- make_vonb_demo_data(
+  lengths = seq(0, 1400, 25)
+)
+
+finer_bins_configurations <- FIMS::create_default_configurations(
+  data = finer_bins_demo$frame
+) |>
+  tidyr::unnest(cols = data) |>
+  dplyr::mutate(
+    module_type = dplyr::if_else(
+      module_name == "Growth",
+      "VonBertalanffy",
+      module_type
+    )
+  ) |>
+  tidyr::nest(.by = c(model_family, module_name, fleet))
+
+finer_bins_parameters <- FIMS::create_default_parameters(
+  configurations = finer_bins_configurations,
+  data = finer_bins_demo$frame
+) |>
+  tidyr::unnest(cols = data)
+
+finer_bins_growth_sd_rows <- finer_bins_parameters |>
+  dplyr::filter(
+    module_name == "Growth",
+    label == "length_at_age_sd_at_ref_ages"
+  ) |>
+  dplyr::mutate(
+    age = c(1, 12),
+    value = c(30, 73)
+  )
+
+finer_bins_parameters <- finer_bins_parameters |>
+  dplyr::filter(
+    !(module_name == "Growth" &
+        label == "length_at_age_sd_at_ref_ages")
+  ) |>
+  dplyr::bind_rows(finer_bins_growth_sd_rows) |>
+  dplyr::rows_update(
+    tibble::tibble(
+      module_name = "Growth",
+      label = c(
+        "length_at_ref_age_1",
+        "length_at_ref_age_2",
+        "growth_coefficient_K",
+        "reference_age_for_length_1",
+        "reference_age_for_length_2"
+      ),
+      value = c(150, 800, 0.22, 1, 12)
+    ),
+    by = c("module_name", "label")
+  )
+
+finer_bins_input <- finer_bins_parameters |>
+  FIMS::initialize_fims(data = finer_bins_demo$frame)
+
+finer_bins_input$model$ReportGrowthDerivedALKTensor(TRUE)
+
+finer_bins_fit <- FIMS::fit_fims(
+  input = finer_bins_input,
+  optimize = TRUE,
+  number_of_loops = 5,
+  number_of_newton_steps = 0,
+  get_sd = FALSE
+)
+
+finer_bins_growth_estimates <- FIMS::get_estimates(finer_bins_fit) |>
+  dplyr::filter(
+    module_name == "Growth",
+    label %in% core_growth_labels
+  )
+
+# Pull the report only after the fitted growth estimates are in hand.
+finer_bins_report <- FIMS::get_report(finer_bins_fit)
+
+finer_bins_growth_comparison <- finer_bins_growth_estimates |>
+  dplyr::select(label, input, estimated) |>
+  dplyr::left_join(
+    finer_bins_demo$true_parameters |>
+      dplyr::filter(label %in% core_growth_labels),
+    by = "label"
+  )
+
+finer_bins_growth_comparison
+
+finer_bins_diagnostics <- tibble::tibble(
+  scenario = "finer fleet bins",
+  convergence = FIMS::get_opt(finer_bins_fit)$convergence,
+  max_gradient = FIMS::get_max_gradient(finer_bins_fit)
+)
+
+finer_bins_diagnostics
+```
+
+### What should happen
+
+The fitted growth curve should remain close to the generated truth. The ALK
+comparison plots later in the vignette should show probability mapped onto
+narrower length bins.
+
+## Try 2b: Keep the Biological Size Grid Separate
+
+### What this changes
+
+This small check does not change the growth fit. It makes the user-facing grid
+input more concrete by showing how the finer-bin example above enters FIMS
+through explicit `length_bin` rows.
+
+### Why this matters
+
+Fleet observation bins are the piece a user controls directly. The biological
+size grid used inside the growth-derived path is a separate population-side
+object that FIMS checks against that fleet geometry.
+
+### Run the check
+
+```{r try-2b-size-grid-contract}
+# The finer-bin example above is already a user-supplied grid example.
+# The `lengths` argument passed to `make_vonb_demo_data()` becomes explicit
+# `length_bin` rows in the FIMS input.
+requested_user_grid <- finer_bins_demo$lengths
+
+user_grid_from_rows <- finer_bins_demo$raw_data |>
+  dplyr::filter(type == "length_bin") |>
+  dplyr::pull(length) |>
+  unique() |>
+  sort()
+
+resolved_grid_from_frame <- FIMS::get_lengths(finer_bins_demo$frame)
+
+tibble::tibble(
+  check = c(
+    "explicit length_bin rows match the requested grid",
+    "FIMS keeps the user-supplied fleet grid",
+    "growth-derived ALK reporting still uses the path"
+  ),
+  result = c(
+    isTRUE(all.equal(user_grid_from_rows, requested_user_grid)),
+    isTRUE(all.equal(resolved_grid_from_frame, requested_user_grid)),
+    length(finer_bins_report[["growth_derived_age_to_length_conversion"]][[1]]) > 0
+  )
+)
+
+tibble::tibble(
+  source = c("requested user grid", "resolved grid in FIMSFrame"),
+  n_bins = c(length(requested_user_grid), length(resolved_grid_from_frame)),
+  first_bin = c(min(requested_user_grid), min(resolved_grid_from_frame)),
+  last_bin = c(max(requested_user_grid), max(resolved_grid_from_frame))
+)
+```
+
+### What should happen
+
+The first table should return `TRUE` in all three rows. The second table should
+show that the grid the user supplied in the finer-bin example is the same grid
+FIMS carries forward in the data object. This is the user-facing grid input,
+while the population-side biological grid remains a separate internal part of
+the growth-derived path.
+
+## Try 3: Change Length-at-Age Variability
+
+### What this changes
+
+This run increases the SD-at-age anchors used by the interpolation-based
+variability pathway.
+
+### Why this matters
+
+The mean growth curve and the variability around length-at-age are different
+pieces of the growth pathway. The mean curve may remain similar, while the ALK
+spreads probability across more length bins.
+
+### Run the model
+
+```{r try-3-wider-sd}
+FIMS::clear()
+
+# CHANGED: generate data with wider SD length-at-age.
+wider_sd_demo <- make_vonb_demo_data(
+  sd_at_ref_ages = c(45, 110)
+)
+
+wider_sd_configurations <- FIMS::create_default_configurations(
+  data = wider_sd_demo$frame
+) |>
+  tidyr::unnest(cols = data) |>
+  dplyr::mutate(
+    module_type = dplyr::if_else(
+      module_name == "Growth",
+      "VonBertalanffy",
+      module_type
+    )
+  ) |>
+  tidyr::nest(.by = c(model_family, module_name, fleet))
+
+wider_sd_parameters <- FIMS::create_default_parameters(
+  configurations = wider_sd_configurations,
+  data = wider_sd_demo$frame
+) |>
+  tidyr::unnest(cols = data)
+
+# CHANGED: use matching wider SD anchors in the model.
+wider_sd_growth_sd_rows <- wider_sd_parameters |>
+  dplyr::filter(
+    module_name == "Growth",
+    label == "length_at_age_sd_at_ref_ages"
+  ) |>
+  dplyr::mutate(
+    age = c(1, 12),
+    value = c(45, 110)
+  )
+
+wider_sd_parameters <- wider_sd_parameters |>
+  dplyr::filter(
+    !(module_name == "Growth" &
+        label == "length_at_age_sd_at_ref_ages")
+  ) |>
+  dplyr::bind_rows(wider_sd_growth_sd_rows) |>
+  dplyr::rows_update(
+    tibble::tibble(
+      module_name = "Growth",
+      label = c(
+        "length_at_ref_age_1",
+        "length_at_ref_age_2",
+        "growth_coefficient_K",
+        "reference_age_for_length_1",
+        "reference_age_for_length_2"
+      ),
+      value = c(150, 800, 0.22, 1, 12)
+    ),
+    by = c("module_name", "label")
+  )
+
+wider_sd_input <- wider_sd_parameters |>
+  FIMS::initialize_fims(data = wider_sd_demo$frame)
+
+wider_sd_input$model$ReportGrowthDerivedALKTensor(TRUE)
+
+wider_sd_fit <- FIMS::fit_fims(
+  input = wider_sd_input,
+  optimize = TRUE,
+  number_of_loops = 5,
+  number_of_newton_steps = 0,
+  get_sd = FALSE
+)
+
+wider_sd_growth_estimates <- FIMS::get_estimates(wider_sd_fit) |>
+  dplyr::filter(
+    module_name == "Growth",
+    label %in% core_growth_labels
+  )
+
+# Pull the report
+wider_sd_report <- FIMS::get_report(wider_sd_fit)
+
+wider_sd_growth_comparison <- wider_sd_growth_estimates |>
+  dplyr::select(label, input, estimated) |>
+  dplyr::left_join(
+    wider_sd_demo$true_parameters |>
+      dplyr::filter(label %in% core_growth_labels),
+    by = "label"
+  )
+
+wider_sd_growth_comparison
+
+wider_sd_diagnostics <- tibble::tibble(
+  scenario = "wider SD",
+  convergence = FIMS::get_opt(wider_sd_fit)$convergence,
+  max_gradient = FIMS::get_max_gradient(wider_sd_fit)
+)
+
+wider_sd_diagnostics
+```
+
+### What should happen
+
+The fitted mean growth curve should remain close to the generated truth. The
+ALK plots should show probability spread across more length bins.
+
+## Try 4: Change the Second Reference Age
+
+### What this changes
+
+This run moves the second reference age from 12 to 15 and changes the generated
+length at that reference age.
+
+### Why this matters
+
+`length_at_ref_age_2` is the length at the second reference age. It is not
+`Linf`.
+
+### Run the model
+
+```{r try-4-second-reference-age}
+FIMS::clear()
+
+# CHANGED: move the second reference age from 12 to 15.
+second_ref_demo <- make_vonb_demo_data(
+  reference_age_for_length_2 = 15,
+  length_at_ref_age_2 = 900,
+  sd_at_ref_ages = c(30, 85)
+)
+
+second_ref_configurations <- FIMS::create_default_configurations(
+  data = second_ref_demo$frame
+) |>
+  tidyr::unnest(cols = data) |>
+  dplyr::mutate(
+    module_type = dplyr::if_else(
+      module_name == "Growth",
+      "VonBertalanffy",
+      module_type
+    )
+  ) |>
+  tidyr::nest(.by = c(model_family, module_name, fleet))
+
+second_ref_parameters <- FIMS::create_default_parameters(
+  configurations = second_ref_configurations,
+  data = second_ref_demo$frame
+) |>
+  tidyr::unnest(cols = data)
+
+# CHANGED: move the second SD anchor to age 15.
+second_ref_growth_sd_rows <- second_ref_parameters |>
+  dplyr::filter(
+    module_name == "Growth",
+    label == "length_at_age_sd_at_ref_ages"
+  ) |>
+  dplyr::mutate(
+    age = c(1, 15),
+    value = c(30, 85)
+  )
+
+# CHANGED: set the model's second reference age to 15.
+second_ref_parameters <- second_ref_parameters |>
+  dplyr::filter(
+    !(module_name == "Growth" &
+        label == "length_at_age_sd_at_ref_ages")
+  ) |>
+  dplyr::bind_rows(second_ref_growth_sd_rows) |>
+  dplyr::rows_update(
+    tibble::tibble(
+      module_name = "Growth",
+      label = c(
+        "length_at_ref_age_1",
+        "length_at_ref_age_2",
+        "growth_coefficient_K",
+        "reference_age_for_length_1",
+        "reference_age_for_length_2"
+      ),
+      value = c(150, 850, 0.22, 1, 15)
+    ),
+    by = c("module_name", "label")
+  )
+
+second_ref_input <- second_ref_parameters |>
+  FIMS::initialize_fims(data = second_ref_demo$frame)
+
+second_ref_input$model$ReportGrowthDerivedALKTensor(TRUE)
+
+second_ref_fit <- FIMS::fit_fims(
+  input = second_ref_input,
+  optimize = TRUE,
+  number_of_loops = 5,
+  number_of_newton_steps = 0,
+  get_sd = FALSE
+)
+
+second_ref_growth_estimates <- FIMS::get_estimates(second_ref_fit) |>
+  dplyr::filter(
+    module_name == "Growth",
+    label %in% core_growth_labels
+  )
+
+# Pull the report
+second_ref_report <- FIMS::get_report(second_ref_fit)
+
+second_ref_growth_comparison <- second_ref_growth_estimates |>
+  dplyr::select(label, input, estimated) |>
+  dplyr::left_join(
+    second_ref_demo$true_parameters |>
+      dplyr::filter(label %in% core_growth_labels),
+    by = "label"
+  )
+
+second_ref_growth_comparison
+
+second_ref_diagnostics <- tibble::tibble(
+  scenario = "second reference age 15",
+  convergence = FIMS::get_opt(second_ref_fit)$convergence,
+  max_gradient = FIMS::get_max_gradient(second_ref_fit)
+)
+
+second_ref_diagnostics
+```
+
+### What should happen
+
+The fitted second reference length should be close to the generated length at
+age 15. The implied asymptote should still be above that reference length.
+
+## Try 5: Turn Off the Full ALK Report
+
+### What this changes
+
+This run uses the same growth-derived pathway, but does not request the full
+realized ALK tensor in the report.
+
+### Why this matters
+
+Using the growth-derived ALK pathway and reporting the full realized ALK tensor
+are separate choices. This run is useful for showing that the model can use the
+derived path without materializing the full tensor for inspection.
+
+### Run the model
+
+```{r try-5-alk-report-off}
+FIMS::clear()
+
+alk_report_off_demo <- make_vonb_demo_data()
+
+alk_report_off_configurations <- FIMS::create_default_configurations(
+  data = alk_report_off_demo$frame
+) |>
+  tidyr::unnest(cols = data) |>
+  dplyr::mutate(
+    module_type = dplyr::if_else(
+      module_name == "Growth",
+      "VonBertalanffy",
+      module_type
+    )
+  ) |>
+  tidyr::nest(.by = c(model_family, module_name, fleet))
+
+alk_report_off_parameters <- FIMS::create_default_parameters(
+  configurations = alk_report_off_configurations,
+  data = alk_report_off_demo$frame
+) |>
+  tidyr::unnest(cols = data)
+
+alk_report_off_growth_sd_rows <- alk_report_off_parameters |>
+  dplyr::filter(
+    module_name == "Growth",
+    label == "length_at_age_sd_at_ref_ages"
+  ) |>
+  dplyr::mutate(
+    age = c(1, 12),
+    value = c(30, 73)
+  )
+
+alk_report_off_parameters <- alk_report_off_parameters |>
+  dplyr::filter(
+    !(module_name == "Growth" &
+        label == "length_at_age_sd_at_ref_ages")
+  ) |>
+  dplyr::bind_rows(alk_report_off_growth_sd_rows) |>
+  dplyr::rows_update(
+    tibble::tibble(
+      module_name = "Growth",
+      label = c(
+        "length_at_ref_age_1",
+        "length_at_ref_age_2",
+        "growth_coefficient_K",
+        "reference_age_for_length_1",
+        "reference_age_for_length_2"
+      ),
+      value = c(150, 800, 0.22, 1, 12)
+    ),
+    by = c("module_name", "label")
+  )
+
+alk_report_off_input <- alk_report_off_parameters |>
+  FIMS::initialize_fims(data = alk_report_off_demo$frame)
+
+# CHANGED: do not request the full realized ALK tensor.
+# alk_report_off_input$model$ReportGrowthDerivedALKTensor(TRUE)
+
+alk_report_off_fit <- FIMS::fit_fims(
+  input = alk_report_off_input,
+  optimize = TRUE,
+  number_of_loops = 5,
+  number_of_newton_steps = 0,
+  get_sd = FALSE
+)
+
+alk_report_off_growth_estimates <- FIMS::get_estimates(alk_report_off_fit) |>
+  dplyr::filter(
+    module_name == "Growth",
+    label %in% core_growth_labels
+  )
+
+# Pull the report only after the fitted growth estimates are in hand.
+alk_report_off_report <- FIMS::get_report(alk_report_off_fit)
+
+alk_report_off_growth_comparison <- alk_report_off_growth_estimates |>
+  dplyr::select(label, input, estimated) |>
+  dplyr::left_join(
+    alk_report_off_demo$true_parameters |>
+      dplyr::filter(label %in% core_growth_labels),
+    by = "label"
+  )
+
+alk_report_off_growth_comparison
+
+alk_report_off_diagnostics <- tibble::tibble(
+  scenario = "ALK report off",
+  convergence = FIMS::get_opt(alk_report_off_fit)$convergence,
+  max_gradient = FIMS::get_max_gradient(alk_report_off_fit)
+)
+
+alk_report_off_diagnostics
+
+# The model can still use the derived pathway, but the full tensor is not
+# materialized in the report.
+alk_report_off_realized_alk <-
+  alk_report_off_report[["growth_derived_age_to_length_conversion"]][[1]]
+
+tibble::tibble(
+  realized_alk_length = length(alk_report_off_realized_alk)
+)
+```
+
+### What should happen
+
+The fitted growth values should still be close to the generated truth. The full
+`growth_derived_age_to_length_conversion` object should have length zero because
+the tensor was not requested for reporting.
+
+## Compare Growth Estimates Across Runs
+
+```{r compare-growth-estimates}
+growth_parameter_comparison <- dplyr::bind_rows(
+  baseline_growth_comparison |>
+    dplyr::mutate(scenario = "baseline"),
+  starting_values_growth_comparison |>
+    dplyr::mutate(scenario = "changed starting values"),
+  finer_bins_growth_comparison |>
+    dplyr::mutate(scenario = "finer fleet bins"),
+  wider_sd_growth_comparison |>
+    dplyr::mutate(scenario = "wider SD"),
+  second_ref_growth_comparison |>
+    dplyr::mutate(scenario = "second reference age 15"),
+  alk_report_off_growth_comparison |>
+    dplyr::mutate(scenario = "ALK report off")
+) |>
+  dplyr::select(scenario, label, input, estimated, true_value)
+
+growth_parameter_comparison
+
+dplyr::bind_rows(
+  baseline_diagnostics,
+  starting_values_diagnostics,
+  finer_bins_diagnostics,
+  wider_sd_diagnostics,
+  second_ref_diagnostics,
+  alk_report_off_diagnostics
+)
+```
+
+## Compare Estimated Growth Curves Across Runs
+
+```{r prepare-growth-curve-comparison}
+#| fig.width: 9
+#| fig.height: 6
+plot_ages <- seq(1, 50, by = 0.25)
+
+baseline_estimated_values <- baseline_growth_estimates |>
+  dplyr::select(label, estimated) |>
+  tidyr::pivot_wider(names_from = label, values_from = estimated)
+
+starting_values_estimated_values <- starting_values_growth_estimates |>
+  dplyr::select(label, estimated) |>
+  tidyr::pivot_wider(names_from = label, values_from = estimated)
+
+finer_bins_estimated_values <- finer_bins_growth_estimates |>
+  dplyr::select(label, estimated) |>
+  tidyr::pivot_wider(names_from = label, values_from = estimated)
+
+wider_sd_estimated_values <- wider_sd_growth_estimates |>
+  dplyr::select(label, estimated) |>
+  tidyr::pivot_wider(names_from = label, values_from = estimated)
+
+second_ref_estimated_values <- second_ref_growth_estimates |>
+  dplyr::select(label, estimated) |>
+  tidyr::pivot_wider(names_from = label, values_from = estimated)
+
+alk_report_off_estimated_values <- alk_report_off_growth_estimates |>
+  dplyr::select(label, estimated) |>
+  tidyr::pivot_wider(names_from = label, values_from = estimated)
+
+growth_curve_comparison <- dplyr::bind_rows(
+  tibble::tibble(
+    scenario = "baseline",
+    age = plot_ages,
+    mean_length = vonb_two_reference_age(
+      age = plot_ages,
+      length_at_ref_age_1 = baseline_estimated_values$length_at_ref_age_1,
+      length_at_ref_age_2 = baseline_estimated_values$length_at_ref_age_2,
+      growth_coefficient_K = baseline_estimated_values$growth_coefficient_K,
+      reference_age_for_length_1 = 1,
+      reference_age_for_length_2 = 12
+    )
+  ),
+  tibble::tibble(
+    scenario = "changed starting values",
+    age = plot_ages,
+    mean_length = vonb_two_reference_age(
+      age = plot_ages,
+      length_at_ref_age_1 =
+        starting_values_estimated_values$length_at_ref_age_1,
+      length_at_ref_age_2 =
+        starting_values_estimated_values$length_at_ref_age_2,
+      growth_coefficient_K =
+        starting_values_estimated_values$growth_coefficient_K,
+      reference_age_for_length_1 = 1,
+      reference_age_for_length_2 = 12
+    )
+  ),
+  tibble::tibble(
+    scenario = "finer fleet bins",
+    age = plot_ages,
+    mean_length = vonb_two_reference_age(
+      age = plot_ages,
+      length_at_ref_age_1 =
+        finer_bins_estimated_values$length_at_ref_age_1,
+      length_at_ref_age_2 =
+        finer_bins_estimated_values$length_at_ref_age_2,
+      growth_coefficient_K =
+        finer_bins_estimated_values$growth_coefficient_K,
+      reference_age_for_length_1 = 1,
+      reference_age_for_length_2 = 12
+    )
+  ),
+  tibble::tibble(
+    scenario = "wider SD",
+    age = plot_ages,
+    mean_length = vonb_two_reference_age(
+      age = plot_ages,
+      length_at_ref_age_1 = wider_sd_estimated_values$length_at_ref_age_1,
+      length_at_ref_age_2 = wider_sd_estimated_values$length_at_ref_age_2,
+      growth_coefficient_K = wider_sd_estimated_values$growth_coefficient_K,
+      reference_age_for_length_1 = 1,
+      reference_age_for_length_2 = 12
+    )
+  ),
+  tibble::tibble(
+    scenario = "second reference age 15",
+    age = plot_ages,
+    mean_length = vonb_two_reference_age(
+      age = plot_ages,
+      length_at_ref_age_1 = second_ref_estimated_values$length_at_ref_age_1,
+      length_at_ref_age_2 = second_ref_estimated_values$length_at_ref_age_2,
+      growth_coefficient_K = second_ref_estimated_values$growth_coefficient_K,
+      reference_age_for_length_1 = 1,
+      reference_age_for_length_2 = 15
+    )
+  ),
+  tibble::tibble(
+    scenario = "ALK report off",
+    age = plot_ages,
+    mean_length = vonb_two_reference_age(
+      age = plot_ages,
+      length_at_ref_age_1 =
+        alk_report_off_estimated_values$length_at_ref_age_1,
+      length_at_ref_age_2 =
+        alk_report_off_estimated_values$length_at_ref_age_2,
+      growth_coefficient_K =
+        alk_report_off_estimated_values$growth_coefficient_K,
+      reference_age_for_length_1 = 1,
+      reference_age_for_length_2 = 12
+    )
+  )
+)
+```
+
+```{r plot-growth-curve-comparison, fig.alt = "Estimated Von Bertalanffy growth curves across scenarios."}
+#| fig.width: 9
+#| fig.height: 6
+ggplot2::ggplot(
+  growth_curve_comparison,
+  ggplot2::aes(
+    x = age,
+    y = mean_length,
+    color = scenario,
+    linetype = scenario
+  )
+) +
+  ggplot2::geom_line(linewidth = 1) +
+  ggplot2::labs(
+    title = "Estimated VonB growth curves across scenarios",
+    x = "Age",
+    y = "Mean length",
+    color = NULL,
+    linetype = NULL
+  ) +
+  stockplotr::theme_noaa()
+```
+
+## Compare Growth-Derived Weight-at-Age
+
+```{r compare-growth-derived-waa}
+growth_waa_comparison <- dplyr::bind_rows(
+  tibble::tibble(
+    scenario = "baseline",
+    year = rep(baseline_demo$years, each = length(baseline_demo$ages)),
+    age = rep(baseline_demo$ages, times = length(baseline_demo$years)),
+    growth_derived_mean_WAA =
+      baseline_report[["growth_derived_mean_WAA"]][[1]]
+  ),
+  tibble::tibble(
+    scenario = "changed starting values",
+    year = rep(
+      starting_values_demo$years,
+      each = length(starting_values_demo$ages)
+    ),
+    age = rep(
+      starting_values_demo$ages,
+      times = length(starting_values_demo$years)
+    ),
+    growth_derived_mean_WAA =
+      starting_values_report[["growth_derived_mean_WAA"]][[1]]
+  ),
+  tibble::tibble(
+    scenario = "finer fleet bins",
+    year = rep(finer_bins_demo$years, each = length(finer_bins_demo$ages)),
+    age = rep(finer_bins_demo$ages, times = length(finer_bins_demo$years)),
+    growth_derived_mean_WAA =
+      finer_bins_report[["growth_derived_mean_WAA"]][[1]]
+  ),
+  tibble::tibble(
+    scenario = "wider SD",
+    year = rep(wider_sd_demo$years, each = length(wider_sd_demo$ages)),
+    age = rep(wider_sd_demo$ages, times = length(wider_sd_demo$years)),
+    growth_derived_mean_WAA =
+      wider_sd_report[["growth_derived_mean_WAA"]][[1]]
+  ),
+  tibble::tibble(
+    scenario = "second reference age 15",
+    year = rep(second_ref_demo$years, each = length(second_ref_demo$ages)),
+    age = rep(second_ref_demo$ages, times = length(second_ref_demo$years)),
+    growth_derived_mean_WAA =
+      second_ref_report[["growth_derived_mean_WAA"]][[1]]
+  ),
+  tibble::tibble(
+    scenario = "ALK report off",
+    year = rep(
+      alk_report_off_demo$years,
+      each = length(alk_report_off_demo$ages)
+    ),
+    age = rep(
+      alk_report_off_demo$ages,
+      times = length(alk_report_off_demo$years)
+    ),
+    growth_derived_mean_WAA =
+      alk_report_off_report[["growth_derived_mean_WAA"]][[1]]
+  )
+)
+```
+
+```{r plot-growth-derived-waa, fig.alt = "Growth-derived mean weight-at-age across scenarios."}
+#| fig.width: 9
+#| fig.height: 6
+ggplot2::ggplot(
+  growth_waa_comparison,
+  ggplot2::aes(
+    x = age,
+    y = growth_derived_mean_WAA,
+    color = scenario,
+    linetype = scenario
+  )
+) +
+  ggplot2::geom_line(linewidth = 1) +
+  ggplot2::facet_wrap(~ year) +
+  ggplot2::labs(
+    title = "Growth-derived mean weight-at-age across scenarios",
+    x = "Age",
+    y = "Mean weight-at-age",
+    color = NULL,
+    linetype = NULL
+  ) +
+  stockplotr::theme_noaa()
+```
+
+## Compare Whole-Model Outputs Across Runs
+
+These plots use values from the report object. They are whole-model outputs,
+so they are useful for seeing how changes move through the model, but they are
+not one-to-one tests of the Growth module alone.
+
+### Compare Expected Landings
+
+```{r plot-landings-across-runs, fig.alt = "Expected landings across growth scenarios."}
+#| fig.width: 9
+#| fig.height: 6
+landings_comparison <- dplyr::bind_rows(
+  tibble::tibble(
+    scenario = "baseline",
+    year = baseline_demo$years,
+    landings_expected =
+      baseline_report[["landings_expected"]][[1]]
+  ),
+  tibble::tibble(
+    scenario = "changed starting values",
+    year = starting_values_demo$years,
+    landings_expected =
+      starting_values_report[["landings_expected"]][[1]]
+  ),
+  tibble::tibble(
+    scenario = "finer fleet bins",
+    year = finer_bins_demo$years,
+    landings_expected =
+      finer_bins_report[["landings_expected"]][[1]]
+  ),
+  tibble::tibble(
+    scenario = "wider SD",
+    year = wider_sd_demo$years,
+    landings_expected =
+      wider_sd_report[["landings_expected"]][[1]]
+  ),
+  tibble::tibble(
+    scenario = "second reference age 15",
+    year = second_ref_demo$years,
+    landings_expected =
+      second_ref_report[["landings_expected"]][[1]]
+  ),
+  tibble::tibble(
+    scenario = "ALK report off",
+    year = alk_report_off_demo$years,
+    landings_expected =
+      alk_report_off_report[["landings_expected"]][[1]]
+  )
+)
+
+landings_target <- baseline_demo$raw_data |>
+  dplyr::filter(type == "landings") |>
+  dplyr::pull(value) |>
+  dplyr::first()
+
+landings_plot_limits <- range(
+  c(
+    landings_comparison$landings_expected,
+    landings_target - 0.5,
+    landings_target + 0.5
+  )
+)
+
+ggplot2::ggplot(
+  landings_comparison,
+  ggplot2::aes(
+    x = year,
+    y = landings_expected,
+    color = scenario,
+    linetype = scenario
+  )
+) +
+  ggplot2::geom_hline(
+    yintercept = landings_target,
+    color = "grey40",
+    linetype = "dotted"
+  ) +
+  ggplot2::geom_line(linewidth = 1) +
+  ggplot2::geom_point() +
+  ggplot2::coord_cartesian(ylim = landings_plot_limits) +
+  ggplot2::labs(
+    title = "Expected landings across growth scenarios",
+    x = "Year",
+    y = "Expected landings",
+    color = NULL,
+    linetype = NULL
+  ) +
+  stockplotr::theme_noaa()
+```
+
+### Compare Index Weight
+
+```{r plot-index-weight-across-runs, fig.alt = "Index weight across growth scenarios."}
+#| fig.width: 9
+#| fig.height: 6
+index_weight_comparison <- dplyr::bind_rows(
+  tibble::tibble(
+    scenario = "baseline",
+    year = baseline_demo$years,
+    index_weight =
+      baseline_report[["index_weight"]][[1]]
+  ),
+  tibble::tibble(
+    scenario = "changed starting values",
+    year = starting_values_demo$years,
+    index_weight =
+      starting_values_report[["index_weight"]][[1]]
+  ),
+  tibble::tibble(
+    scenario = "finer fleet bins",
+    year = finer_bins_demo$years,
+    index_weight =
+      finer_bins_report[["index_weight"]][[1]]
+  ),
+  tibble::tibble(
+    scenario = "wider SD",
+    year = wider_sd_demo$years,
+    index_weight =
+      wider_sd_report[["index_weight"]][[1]]
+  ),
+  tibble::tibble(
+    scenario = "second reference age 15",
+    year = second_ref_demo$years,
+    index_weight =
+      second_ref_report[["index_weight"]][[1]]
+  ),
+  tibble::tibble(
+    scenario = "ALK report off",
+    year = alk_report_off_demo$years,
+    index_weight =
+      alk_report_off_report[["index_weight"]][[1]]
+  )
+)
+
+ggplot2::ggplot(
+  index_weight_comparison,
+  ggplot2::aes(
+    x = year,
+    y = index_weight,
+    color = scenario,
+    linetype = scenario
+  )
+) +
+  ggplot2::geom_line(linewidth = 1) +
+  ggplot2::geom_point() +
+  ggplot2::labs(
+    title = "Index weight across growth scenarios",
+    x = "Year",
+    y = "Index weight",
+    color = NULL,
+    linetype = NULL
+  ) +
+  stockplotr::theme_noaa()
+```
+
+### Compare Mean Fishing Mortality by Year
+
+```{r plot-mean-f-across-runs, fig.alt = "Mean fishing mortality across growth scenarios."}
+#| fig.width: 9
+#| fig.height: 6
+baseline_mortality_F <- matrix(
+  baseline_report[["mortality_F"]][[1]],
+  nrow = length(baseline_demo$ages),
+  ncol = length(baseline_demo$years)
+)
+
+starting_values_mortality_F <- matrix(
+  starting_values_report[["mortality_F"]][[1]],
+  nrow = length(starting_values_demo$ages),
+  ncol = length(starting_values_demo$years)
+)
+
+finer_bins_mortality_F <- matrix(
+  finer_bins_report[["mortality_F"]][[1]],
+  nrow = length(finer_bins_demo$ages),
+  ncol = length(finer_bins_demo$years)
+)
+
+wider_sd_mortality_F <- matrix(
+  wider_sd_report[["mortality_F"]][[1]],
+  nrow = length(wider_sd_demo$ages),
+  ncol = length(wider_sd_demo$years)
+)
+
+second_ref_mortality_F <- matrix(
+  second_ref_report[["mortality_F"]][[1]],
+  nrow = length(second_ref_demo$ages),
+  ncol = length(second_ref_demo$years)
+)
+
+alk_report_off_mortality_F <- matrix(
+  alk_report_off_report[["mortality_F"]][[1]],
+  nrow = length(alk_report_off_demo$ages),
+  ncol = length(alk_report_off_demo$years)
+)
+
+mean_f_comparison <- dplyr::bind_rows(
+  tibble::tibble(
+    scenario = "baseline",
+    year = baseline_demo$years,
+    mean_F = colMeans(baseline_mortality_F)
+  ),
+  tibble::tibble(
+    scenario = "changed starting values",
+    year = starting_values_demo$years,
+    mean_F = colMeans(starting_values_mortality_F)
+  ),
+  tibble::tibble(
+    scenario = "finer fleet bins",
+    year = finer_bins_demo$years,
+    mean_F = colMeans(finer_bins_mortality_F)
+  ),
+  tibble::tibble(
+    scenario = "wider SD",
+    year = wider_sd_demo$years,
+    mean_F = colMeans(wider_sd_mortality_F)
+  ),
+  tibble::tibble(
+    scenario = "second reference age 15",
+    year = second_ref_demo$years,
+    mean_F = colMeans(second_ref_mortality_F)
+  ),
+  tibble::tibble(
+    scenario = "ALK report off",
+    year = alk_report_off_demo$years,
+    mean_F = colMeans(alk_report_off_mortality_F)
+  )
+)
+
+ggplot2::ggplot(
+  mean_f_comparison,
+  ggplot2::aes(
+    x = year,
+    y = mean_F,
+    color = scenario,
+    linetype = scenario
+  )
+) +
+  ggplot2::geom_line(linewidth = 1) +
+  ggplot2::geom_point() +
+  ggplot2::labs(
+    title = "Mean fishing mortality across growth scenarios",
+    x = "Year",
+    y = "Mean fishing mortality across ages",
+    color = NULL,
+    linetype = NULL
+  ) +
+  stockplotr::theme_noaa()
+```
+
+### Compare Spawning-Biomass Proxy
+
+This generated example does not need to rely on an exported `spawning_biomass`
+output. Instead, this plot calculates a simple spawning-biomass proxy from
+numbers-at-age, growth-derived mean weight-at-age, and proportion mature-at-age.
+
+```{r plot-spawning-biomass-proxy-across-runs, fig.alt = "Spawning biomass proxy across growth scenarios."}
+# Use only the modeled years that match the WAA vector.
+#| fig.width: 9
+#| fig.height: 6
+baseline_numbers_matrix <- matrix(
+  baseline_report[["numbers_at_age"]][[1]],
+  nrow = length(baseline_demo$ages)
+)[, seq_along(baseline_demo$years)]
+
+baseline_waa_matrix <- matrix(
+  baseline_report[["growth_derived_mean_WAA"]][[1]],
+  nrow = length(baseline_demo$ages),
+  ncol = length(baseline_demo$years)
+)
+
+baseline_maturity_matrix <- matrix(
+  baseline_report[["proportion_mature_at_age"]][[1]],
+  nrow = length(baseline_demo$ages)
+)[, seq_along(baseline_demo$years)]
+
+starting_values_numbers_matrix <- matrix(
+  starting_values_report[["numbers_at_age"]][[1]],
+  nrow = length(starting_values_demo$ages)
+)[, seq_along(starting_values_demo$years)]
+
+starting_values_waa_matrix <- matrix(
+  starting_values_report[["growth_derived_mean_WAA"]][[1]],
+  nrow = length(starting_values_demo$ages),
+  ncol = length(starting_values_demo$years)
+)
+
+starting_values_maturity_matrix <- matrix(
+  starting_values_report[["proportion_mature_at_age"]][[1]],
+  nrow = length(starting_values_demo$ages)
+)[, seq_along(starting_values_demo$years)]
+
+finer_bins_numbers_matrix <- matrix(
+  finer_bins_report[["numbers_at_age"]][[1]],
+  nrow = length(finer_bins_demo$ages)
+)[, seq_along(finer_bins_demo$years)]
+
+finer_bins_waa_matrix <- matrix(
+  finer_bins_report[["growth_derived_mean_WAA"]][[1]],
+  nrow = length(finer_bins_demo$ages),
+  ncol = length(finer_bins_demo$years)
+)
+
+finer_bins_maturity_matrix <- matrix(
+  finer_bins_report[["proportion_mature_at_age"]][[1]],
+  nrow = length(finer_bins_demo$ages)
+)[, seq_along(finer_bins_demo$years)]
+
+wider_sd_numbers_matrix <- matrix(
+  wider_sd_report[["numbers_at_age"]][[1]],
+  nrow = length(wider_sd_demo$ages)
+)[, seq_along(wider_sd_demo$years)]
+
+wider_sd_waa_matrix <- matrix(
+  wider_sd_report[["growth_derived_mean_WAA"]][[1]],
+  nrow = length(wider_sd_demo$ages),
+  ncol = length(wider_sd_demo$years)
+)
+
+wider_sd_maturity_matrix <- matrix(
+  wider_sd_report[["proportion_mature_at_age"]][[1]],
+  nrow = length(wider_sd_demo$ages)
+)[, seq_along(wider_sd_demo$years)]
+
+second_ref_numbers_matrix <- matrix(
+  second_ref_report[["numbers_at_age"]][[1]],
+  nrow = length(second_ref_demo$ages)
+)[, seq_along(second_ref_demo$years)]
+
+second_ref_waa_matrix <- matrix(
+  second_ref_report[["growth_derived_mean_WAA"]][[1]],
+  nrow = length(second_ref_demo$ages),
+  ncol = length(second_ref_demo$years)
+)
+
+second_ref_maturity_matrix <- matrix(
+  second_ref_report[["proportion_mature_at_age"]][[1]],
+  nrow = length(second_ref_demo$ages)
+)[, seq_along(second_ref_demo$years)]
+
+alk_report_off_numbers_matrix <- matrix(
+  alk_report_off_report[["numbers_at_age"]][[1]],
+  nrow = length(alk_report_off_demo$ages)
+)[, seq_along(alk_report_off_demo$years)]
+
+alk_report_off_waa_matrix <- matrix(
+  alk_report_off_report[["growth_derived_mean_WAA"]][[1]],
+  nrow = length(alk_report_off_demo$ages),
+  ncol = length(alk_report_off_demo$years)
+)
+
+alk_report_off_maturity_matrix <- matrix(
+  alk_report_off_report[["proportion_mature_at_age"]][[1]],
+  nrow = length(alk_report_off_demo$ages)
+)[, seq_along(alk_report_off_demo$years)]
+
+spawning_biomass_proxy_comparison <- dplyr::bind_rows(
+  tibble::tibble(
+    scenario = "baseline",
+    year = baseline_demo$years,
+    spawning_biomass_proxy = colSums(
+      baseline_numbers_matrix *
+        baseline_waa_matrix *
+        baseline_maturity_matrix
+    )
+  ),
+  tibble::tibble(
+    scenario = "changed starting values",
+    year = starting_values_demo$years,
+    spawning_biomass_proxy = colSums(
+      starting_values_numbers_matrix *
+        starting_values_waa_matrix *
+        starting_values_maturity_matrix
+    )
+  ),
+  tibble::tibble(
+    scenario = "finer fleet bins",
+    year = finer_bins_demo$years,
+    spawning_biomass_proxy = colSums(
+      finer_bins_numbers_matrix *
+        finer_bins_waa_matrix *
+        finer_bins_maturity_matrix
+    )
+  ),
+  tibble::tibble(
+    scenario = "wider SD",
+    year = wider_sd_demo$years,
+    spawning_biomass_proxy = colSums(
+      wider_sd_numbers_matrix *
+        wider_sd_waa_matrix *
+        wider_sd_maturity_matrix
+    )
+  ),
+  tibble::tibble(
+    scenario = "second reference age 15",
+    year = second_ref_demo$years,
+    spawning_biomass_proxy = colSums(
+      second_ref_numbers_matrix *
+        second_ref_waa_matrix *
+        second_ref_maturity_matrix
+    )
+  ),
+  tibble::tibble(
+    scenario = "ALK report off",
+    year = alk_report_off_demo$years,
+    spawning_biomass_proxy = colSums(
+      alk_report_off_numbers_matrix *
+        alk_report_off_waa_matrix *
+        alk_report_off_maturity_matrix
+    )
+  )
+)
+```
+
+```{r spawning-biomass-proxy-comparison-plot, fig.alt = "Spawning biomass proxy across growth scenarios.", fig.width = 9, fig.height = 6}
+ggplot2::ggplot(
+  spawning_biomass_proxy_comparison,
+  ggplot2::aes(
+    x = year,
+    y = spawning_biomass_proxy,
+    color = scenario,
+    linetype = scenario
+  )
+) +
+  ggplot2::geom_line(linewidth = 1) +
+  ggplot2::geom_point() +
+  ggplot2::labs(
+    title = "Spawning biomass proxy across growth scenarios",
+    x = "Year",
+    y = "Numbers-at-age x WAA x maturity",
+    color = NULL,
+    linetype = NULL
+  ) +
+  stockplotr::theme_noaa()
+```
