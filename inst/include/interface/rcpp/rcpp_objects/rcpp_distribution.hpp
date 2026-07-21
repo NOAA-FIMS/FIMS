@@ -285,22 +285,22 @@ class DistributionsInterface : public DistributionsInterfaceBase {
   virtual bool set_values(Rcpp::Nullable<Rcpp::NumericVector> observed_values = R_NilValue, 
                           Rcpp::Nullable<Rcpp::NumericVector> expected_values = R_NilValue, 
                           Rcpp::Nullable<Rcpp::NumericVector> uncertainty_values = R_NilValue) {
-    if(!Rcpp::is_null(observed_values)) {
-      this->observed_values_m.resize(observed_values.get().size());
-      for (size_t i = 0; i < observed_values.get().size(); i++) {
-        this->observed_values_m[i].initial_value_m = observed_values.get()[i];
+    if(observed_values!= R_NilValue) {
+      this->observed_values_m.resize(observed_values.size());
+      for (size_t i = 0; i < observed_values.size(); i++) {
+        this->observed_values_m[i].initial_value_m = observed_values[i];
       }
     }
-    if(!Rcpp::is_null(expected_values)) {
-      this->expected_values_m.resize(expected_values.get().size());
-      for (size_t i = 0; i < expected_values.get().size(); i++) {
-        this->expected_values_m[i].initial_value_m = expected_values.get()[i];
+    if(expected_values!= R_NilValue) {
+      this->expected_values_m.resize(expected_values.size());
+      for (size_t i = 0; i < expected_values.size(); i++) {
+        this->expected_values_m[i].initial_value_m = expected_values[i];
       }
     }
-    if(!Rcpp::is_null(uncertainty_values)) {
-      this->uncertainty_values_m.resize(uncertainty_values.get().size());
-      for (size_t i = 0; i < uncertainty_values.get().size(); i++) {
-        this->uncertainty_values_m[i].initial_value_m = uncertainty_values.get()[i];
+    if(uncertainty_values!= R_NilValue) {
+      this->uncertainty_values_m.resize(uncertainty_values.size());
+      for (size_t i = 0; i < uncertainty_values.size(); i++) {
+        this->uncertainty_values_m[i].initial_value_m = uncertainty_values[i];
       }
     }
     return true;
@@ -316,17 +316,17 @@ class DistributionsInterface : public DistributionsInterfaceBase {
   virtual bool set_id_links(Rcpp::Nullable<int> observed_id = R_NilValue, 
                             Rcpp::Nullable<int> expected_id = R_NilValue, 
                             Rcpp::Nullable<int> uncertainty_id = R_NilValue) {
-    if(!Rcpp::is_null(observed_id)) {
+    if(observed_id!= R_NilValue) {
       this->observed_key_m.resize(1);
-      this->observed_key_m[0] = observed_id.get();
+      this->observed_key_m[0] = observed_id[0];
     }
-    if(!Rcpp::is_null(expected_id)) {
+    if(expected_id!= R_NilValue) {
       this->expected_key_m.resize(1);
-      this->expected_key_m[0] = expected_id.get();
+      this->expected_key_m[0] = expected_id[0];
     }
-    if(!Rcpp::is_null(uncertainty_id)) {
+    if(uncertainty_id!= R_NilValue) {
       this->uncertainty_key_m.resize(1);
-      this->uncertainty_key_m[0] = uncertainty_id.get();
+      this->uncertainty_key_m[0] = uncertainty_id[0];
     }
     return true;
   }
@@ -344,22 +344,22 @@ class DistributionsInterface : public DistributionsInterfaceBase {
   virtual bool set_subvector_indices(Rcpp::Nullable<Rcpp::IntegerVector> observed_subvector = R_NilValue, 
                                      Rcpp::Nullable<Rcpp::IntegerVector> expected_subvector = R_NilValue, 
                                      Rcpp::Nullable<Rcpp::IntegerVector> uncertainty_subvector = R_NilValue) {
-    if(observed_subvector.isNotNull()) {
-      this->observed_subvector_m.resize(observed_subvector.get().size());
-      for(size_t i = 0; i < observed_subvector.get().size(); i++) {
-        this->observed_subvector_m[i] = static_cast<size_t>(observed_subvector.get()[i]); 
+    if(observed_subvector!= R_NilValue) {
+      this->observed_subvector_m.resize(observed_subvector.size());
+      for(size_t i = 0; i < observed_subvector.size(); i++) {
+        this->observed_subvector_m[i] = static_cast<size_t>(observed_subvector[i]); 
       }
     }
-    if(expected_subvector.isNotNull()) {
-      this->expected_subvector_m.resize(expected_subvector.get().size());
-      for(size_t i = 0; i < expected_subvector.get().size(); i++) {
-        this->expected_subvector_m[i] = static_cast<size_t>(expected_subvector.get()[i]); 
+    if(expected_subvector!= R_NilValue) {
+      this->expected_subvector_m.resize(expected_subvector.size());
+      for(size_t i = 0; i < expected_subvector.size(); i++) {
+        this->expected_subvector_m[i] = static_cast<size_t>(expected_subvector[i]); 
       }
     }
-    if(uncertainty_subvector.isNotNull()) {
-      this->uncertainty_subvector_m.resize(uncertainty_subvector.get().size());
-      for(size_t i = 0; i < uncertainty_subvector.get().size(); i++) {
-        this->uncertainty_subvector_m[i] = static_cast<size_t>(uncertainty_subvector.get()[i]); 
+    if(uncertainty_subvector!= R_NilValue) {
+      this->uncertainty_subvector_m.resize(uncertainty_subvector.size());
+      for(size_t i = 0; i < uncertainty_subvector.size(); i++) {
+        this->uncertainty_subvector_m[i] = static_cast<size_t>(uncertainty_subvector[i]); 
       }
     }
     return true;

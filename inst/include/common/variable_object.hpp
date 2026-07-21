@@ -114,7 +114,7 @@ struct VariableObject : public fims_model_object::FIMSObject<Type> {
    * @param location scalar location of value to retrieve.
    * @return the value of the variable at location
    */
-  inline const Type operator()(uint32_t location) { 
+  inline Type& operator()(uint32_t location) { 
     if(location >= this->values.size()) {
       throw std::invalid_argument("VariableObject error: location index out of bounds");
     }
@@ -126,7 +126,7 @@ struct VariableObject : public fims_model_object::FIMSObject<Type> {
    * @param location location index of value to retrieve. Vector of length equal to the number of dimensions, where each element is the index along that dimension.
    * @return the value of the variable at location
    */
-  inline const Type operator()(std::vector<size_t> location) {
+  inline Type& operator()(std::vector<size_t> location) {
     if(location.size() != this->ndims) {
       throw std::invalid_argument("VariableObject error: location vector length does not match number of dimensions");
     }
