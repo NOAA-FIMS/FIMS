@@ -286,18 +286,21 @@ class DistributionsInterface : public DistributionsInterfaceBase {
                           Rcpp::Nullable<Rcpp::NumericVector> expected_values = R_NilValue, 
                           Rcpp::Nullable<Rcpp::NumericVector> uncertainty_values = R_NilValue) {
     if(observed_values!= R_NilValue) {
+      Rcpp::NumericVector observed_values(observed_values);
       this->observed_values_m.resize(observed_values.size());
       for (size_t i = 0; i < observed_values.size(); i++) {
         this->observed_values_m[i].initial_value_m = observed_values[i];
       }
     }
     if(expected_values!= R_NilValue) {
+      Rcpp::NumericVector expected_values(expected_values);
       this->expected_values_m.resize(expected_values.size());
       for (size_t i = 0; i < expected_values.size(); i++) {
         this->expected_values_m[i].initial_value_m = expected_values[i];
       }
     }
     if(uncertainty_values!= R_NilValue) {
+      Rcpp::NumericVector uncertainty_values(uncertainty_values);
       this->uncertainty_values_m.resize(uncertainty_values.size());
       for (size_t i = 0; i < uncertainty_values.size(); i++) {
         this->uncertainty_values_m[i].initial_value_m = uncertainty_values[i];
@@ -317,14 +320,17 @@ class DistributionsInterface : public DistributionsInterfaceBase {
                             Rcpp::Nullable<int> expected_id = R_NilValue, 
                             Rcpp::Nullable<int> uncertainty_id = R_NilValue) {
     if(observed_id!= R_NilValue) {
+      int observed_id(observed_id);
       this->observed_key_m.resize(1);
       this->observed_key_m[0] = observed_id[0];
     }
     if(expected_id!= R_NilValue) {
+      int expected_id(expected_id);
       this->expected_key_m.resize(1);
       this->expected_key_m[0] = expected_id[0];
     }
     if(uncertainty_id!= R_NilValue) {
+      int uncertainty_id(uncertainty_id);
       this->uncertainty_key_m.resize(1);
       this->uncertainty_key_m[0] = uncertainty_id[0];
     }
@@ -345,21 +351,24 @@ class DistributionsInterface : public DistributionsInterfaceBase {
                                      Rcpp::Nullable<Rcpp::IntegerVector> expected_subvector = R_NilValue, 
                                      Rcpp::Nullable<Rcpp::IntegerVector> uncertainty_subvector = R_NilValue) {
     if(observed_subvector!= R_NilValue) {
-      this->observed_subvector_m.resize(observed_subvector.size());
+      Rcpp::IntegerVector observed_subvector(observed_subvector);
+      this->observed_subvector_m->resize(observed_subvector.size());
       for(size_t i = 0; i < observed_subvector.size(); i++) {
-        this->observed_subvector_m[i] = static_cast<size_t>(observed_subvector[i]); 
+        this->observed_subvector_m->at(i) = static_cast<size_t>(observed_subvector[i]);
       }
     }
     if(expected_subvector!= R_NilValue) {
-      this->expected_subvector_m.resize(expected_subvector.size());
+      Rcpp::IntegerVector expected_subvector(expected_subvector);
+      this->expected_subvector_m->resize(expected_subvector.size());
       for(size_t i = 0; i < expected_subvector.size(); i++) {
-        this->expected_subvector_m[i] = static_cast<size_t>(expected_subvector[i]); 
+        this->expected_subvector_m->at(i) = static_cast<size_t>(expected_subvector[i]); 
       }
     }
     if(uncertainty_subvector!= R_NilValue) {
-      this->uncertainty_subvector_m.resize(uncertainty_subvector.size());
+      Rcpp::IntegerVector uncertainty_subvector(uncertainty_subvector);
+      this->uncertainty_subvector_m->resize(uncertainty_subvector.size());
       for(size_t i = 0; i < uncertainty_subvector.size(); i++) {
-        this->uncertainty_subvector_m[i] = static_cast<size_t>(uncertainty_subvector[i]); 
+        this->uncertainty_subvector_m->at(i) = static_cast<size_t>(uncertainty_subvector[i]); 
       }
     }
     return true;
@@ -376,7 +385,6 @@ class DistributionsInterface : public DistributionsInterfaceBase {
 
 
     fims_distributions::DensityComponentBase<double> generic_density;
-    if(this->)
     generic_density.observed_values.resize(this->observed_values_m.size());
     for (size_t i = 0; i < this->observed_values_m.size(); i++) {
       generic_density.observed_values[i] = this->observed_values_m[i].initial_value_m;
