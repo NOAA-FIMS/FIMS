@@ -17,7 +17,7 @@ on.exit(rm(fims_frame), add = TRUE)
 # Initialize an EWAAGrowth object
 clear()
 ewaa_growth <- methods::new(EWAAGrowth)
-ewaa_growth$n_years$set(get_n_years(fims_frame))
+ewaa_growth$n_years <- get_n_years(fims_frame)
 # Assign age data to the EWAAGrowth object
 ages <- get_ages(fims_frame)
 ewaa_growth$ages[] <- ages
@@ -52,7 +52,7 @@ clear()
 test_that("EWAAGrowth evaluate() doesn't work when missing weights", {
   # Initialize an EWAAGrowth object
   ewaa_growth <- methods::new(EWAAGrowth)
-  ewaa_growth$n_years$set(get_n_years(fims_frame))
+  ewaa_growth$n_years <- get_n_years(fims_frame)
   # Assign age data to the EWAAGrowth object
   ewaa_growth$ages[] <- ages
 
@@ -66,7 +66,7 @@ test_that("EWAAGrowth evaluate() doesn't work when missing weights", {
 test_that("EWAAGrowth evaluate() returns expected error for mismatched input lengths", {
   # Initialize an EWAAGrowth object
   ewaa_growth <- methods::new(EWAAGrowth)
-  ewaa_growth$n_years$set(get_n_years(fims_frame))
+  ewaa_growth$n_years <- get_n_years(fims_frame)
   # Assign age data and intentionally mismatch the length of ages and weights
   age_vector_long <- c(get_ages(fims_frame), 13)
   ewaa_growth$ages$resize(length(age_vector_long))
