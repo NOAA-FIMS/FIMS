@@ -787,8 +787,8 @@ initialize_fims <- function(parameters, data) {
         sd = parameters |>
           dplyr::filter(
             .data$fleet == .env$fleets[i] &
-            .data$label == "log_sd" &
-            .data$module_type == "Index"
+              .data$label == "log_sd" &
+              .data$module_type == "Index"
           ) |>
           dplyr::mutate(
             label = "sd",
@@ -808,8 +808,8 @@ initialize_fims <- function(parameters, data) {
         sd = parameters |>
           dplyr::filter(
             .data$fleet == .env$fleets[i] &
-            .data$label == "log_sd" &
-            .data$module_type == "Landings"
+              .data$label == "log_sd" &
+              .data$module_type == "Landings"
           ) |>
           dplyr::mutate(
             label = "sd",
