@@ -15,10 +15,7 @@ fit <- local({
   withr::defer(clear(), envir = parent.env(environment()))
   data("data_big", package = "FIMS")
   data_4_model <- FIMSFrame(data_big)
-  create_default_parameters(
-    configurations = create_default_configurations(data = data_4_model),
-    data = data_4_model
-  ) |>
+  setup_default_parameters(data = data_4_model) |>
     initialize_fims(data = data_4_model) |>
     fit_fims(optimize = TRUE)
 })

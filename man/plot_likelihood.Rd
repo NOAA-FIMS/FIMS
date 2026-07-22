@@ -68,9 +68,7 @@ data("data_big")
 data_4_model <- FIMSFrame(data_big)
 
 # Create parameters object
-parameters <- data_4_model |>
-  create_default_configurations() |>
-  create_default_parameters(data = data_4_model)
+parameters <- setup_default_parameters(data = data_4_model)
 
 # Run base model
 base_model <- parameters |>

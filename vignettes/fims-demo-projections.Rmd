@@ -46,9 +46,6 @@ The code below uses the built-in data within FIMS and sets up a simple catch-at-
 data("data_big")
 # Prepare the package data for being used in a FIMS model
 data_4_model <- FIMSFrame(data_big)
-
-# Create default model configurations based on the data
-default_configurations <- create_default_configurations(data = data_4_model)
 ```
 
 ## Projections
@@ -125,16 +122,12 @@ data_4_projections <- data_big_with_extra_year |>
 
 The default configuration from a model without projections can be used as the default configuration. After the parameter configuration is created it must be manipulated to alter the default parameters for things like selectivity, fishing mortality, etc. We believe that it is easier to alter default configurations rather than creating your own from scratch. So, much of what is done below for projections was also done in the [introductory vignette](fims-demo.html).
 
-The major difference below compared to a model without projections is that the recruitment deviations for the projection period are fixed at zero. Because the new data object has all years, `FIMS::create_default_parameters()` will ensure that all time-series parameters, e.g., natural mortality, have the correct dimensions.
+The major difference below compared to a model without projections is that the recruitment deviations for the projection period are fixed at zero. Because the new data object has all years, `FIMS::setup_default_parameters()` will ensure that all time-series parameters, e.g., natural mortality, have the correct dimensions.
 
 ```{r projection-model}
 # Take the default configuration with the new data to create some default
 # parameters that we alter to make the model behave a little better
-parameters_projection <- create_default_parameters(
-  configurations = default_configurations,
-  data = data_4_projections
-) |>
-  tidyr::unnest(cols = data) |>
+parameters_projection <- setup_default_parameters(data = data_4_projections) |>
   # Update log_Fmort initial values for Fleet1
   # Project the population forward with the terminal year mortality values.
   # More advanced approaches are included in

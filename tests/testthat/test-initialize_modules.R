@@ -11,9 +11,7 @@
 
 data <- FIMS::FIMSFrame(data_big)
 
-default_parameters <- create_default_configurations(data = data) |>
-  create_default_parameters(data = data) |>
-  tidyr::unnest(cols = data)
+default_parameters <- setup_default_parameters(data = data)
 
 ## IO correctness ----
 test_that("`initialize_fims()` works with correct inputs", {
@@ -27,8 +25,7 @@ test_that("`initialize_fims()` works with correct inputs", {
   #' @description Test that `initialize_fims()` returns a list when it is provided parameters that are nested.
   expect_type(
     initialize_fims(
-      parameters = create_default_configurations(data = data) |>
-        create_default_parameters(data = data),
+      parameters = setup_default_parameters(data = data),
       data = data
     ),
     "list"
@@ -81,17 +78,14 @@ test_that("`initialize_fims()` works with edge cases", {
   )
   clear()
 
-  missing_recruitment_distribution <- create_default_configurations(data = data) |>
-    tidyr::unnest(cols = data) |>
-    dplyr::rows_update(
-      y = tibble::tibble(
-        module_name = "Recruitment",
-        distribution_type = NA_character_,
+  missing_recruitment_distribution <- setup_default_parameters(data = data) |>
+    dplyr::filter(module_name != "Recruitment") |>
+    dplyr::bind_rows(
+      setup_default_recruitment(
+        data = data,
         distribution = NA_character_
-      ),
-      by = "module_name"
-    ) |>
-    create_default_parameters(data = data)
+      )
+    )
   init_parm_missing_distribution <- initialize_fims(
     parameters = missing_recruitment_distribution,
     data = data
@@ -185,20 +179,16 @@ test_that("`initialize_fims()` returns correct error messages", {
 
   ## Error handling ----
   test_that("`initialize_recruitment()` returns correct error messages", {
-    missing_recruitment_distribution <- create_default_configurations(data = data) |>
-      tidyr::unnest(cols = data) |>
-      dplyr::rows_update(
-        y = tibble::tibble(
-          module_name = "Recruitment",
-          distribution_type = NA_character_,
-          distribution = NA_character_
-        ),
-        by = "module_name"
-      ) |>
-      create_default_parameters(data = data)
+    missing_recruitment_distribution <- default_parameters |>
+      dplyr::filter(module_name != "Recruitment") |>
+      dplyr::bind_rows(
+        setup_default_recruitment(
+          data = data,
+          distribution = NA_character_,
+        )
+      )
     missing_recruitment_distribution_error <-
       missing_recruitment_distribution |>
-      tidyr::unnest(cols = data) |>
       dplyr::rows_update(
         y = tibble::tibble(
           module_name = "Recruitment",

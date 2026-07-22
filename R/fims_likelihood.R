@@ -26,20 +26,20 @@
 #' to distinguish between multiple instances of the same parameter type.
 #'
 #' @param model A FIMSFit object returned by [FIMS::fit_fims()]. Used to extract
-#'   the estimated value of the parameter being profiled
+#'   the estimated value of the parameter being profiled.
 #' @param parameters A FIMS parameters object created by
-#'   [FIMS::create_default_parameters()], containing the model configuration
-#'   and initial parameter values
+#'   [setup_default_parameters()], containing the model configuration
+#'   and initial parameter values,
 #' @param data A data frame, tibble, or FIMSFrame object containing the model
-#'   data. This should include all data types required by FIMS
+#'   data. This should include all data types required by FIMS.
 #' @param module_name A character string specifying the module containing the
 #'   parameter to profile. Default is `NULL`. Required when the parameter name
 #'   exists in multiple modules (e.g., multiple fleets). Examples include
-#'   `"fleet1"`, `"survey1"`, or `"recruitment"`
+#'   `"fleet1"`, `"survey1"`, or `"recruitment"`.
 #' @param parameter_name A character string specifying the parameter to profile.
 #'   Default is `"log_rzero"`. Must match a parameter name in the FIMS model.
 #'   Common options include `"log_rzero"`, `"log_sigma_recruit"`, `"logit_steep"`,
-#'   or selectivity parameters
+#'   or selectivity parameters.
 #' @param n_cores An integer specifying the number of CPU cores to use for
 #'   parallel processing. If `NULL` (default), uses `parallel::detectCores() - 1`.
 #'   Set to 1 for sequential processing. Must be a positive integer
@@ -75,8 +75,8 @@
 #'
 #' @seealso
 #' * [plot_likelihood()] for visualizing likelihood profiles
-#' * [FIMS::fit_fims()] for fitting FIMS models
-#' * [FIMS::create_default_parameters()] for creating parameter objects
+#' * [fit_fims()] for fitting FIMS models
+#' * [setup_default_parameters()] for creating parameter objects
 #'
 #' @family diagnostic_functions
 #'
@@ -93,9 +93,7 @@
 #' data_4_model <- FIMSFrame(data_big)
 #'
 #' # Create a parameters object
-#' parameters <- data_4_model |>
-#'   create_default_configurations() |>
-#'   create_default_parameters(data = data_4_model)
+#' parameters <- setup_default_parameters(data = data_4_model)
 #'
 #' # Run the base model with optimization
 #' base_model <- parameters |>
@@ -162,18 +160,15 @@ run_fims_likelihood <- function(
 
   if (!is.null(module_name)) {
     module_names <- parameters |>
-      tidyr::unnest(cols = data) |>
       dplyr::pull(.data[["module_name"]]) |>
       unique()
     if (!module_name %in% module_names) {
       cli::cli_abort("Input module_name not found in parameters tibble.")
     }
     parameter_row <- parameters |>
-      tidyr::unnest(cols = data) |>
       dplyr::filter(.data[["module_name"]] == module_name & .data[["label"]] == parameter_name)
   } else {
     parameter_row <- parameters |>
-      tidyr::unnest(cols = data) |>
       dplyr::filter(.data[["label"]] == parameter_name)
   }
 

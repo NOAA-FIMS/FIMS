@@ -458,29 +458,28 @@ Then run `devtools::document()`.
 
 ## Step 4: Connect the module to the current R workflow
 
-The R wrapper functions use a two-stage workflow before `initialize_fims()` constructs the TMB-ready objects:
+The R wrapper functions use `setup_default_parameters()` before `initialize_fims()` constructs the TMB-ready objects:
 
-1. **`create_default_configurations()`** creates the configuration tibble that declares which module family and module type should be used.
-2. **`create_default_parameters()`** turns those configurations into the parameter tibble that `initialize_module()` reads.
+1. **`setup_default_parameters()`** sets up a parameter tibble that `initialize_module()` reads.
 
 ### 4.1 Update the configuration and default-parameter path
 
 **Relevant files**
 
-- [R/create_default_configurations.R](../R/create_default_configurations.R)
-- [R/create_default_parameters.R](../R/create_default_parameters.R)
+- [R/setup_default_parameters.R](../R/setup_default_parameters.R)
 
 If you add a new module type that users should be able to request by default, update:
 
-- the configuration templates in `create_default_configurations()`, and/or
-- the default-parameter helpers used by `create_default_parameters()`.
+- the default-parameter helpers used by `setup_default_parameters()`.
 
 In the current code, top-level default parameter creation is routed through helpers such as:
 
-- `create_default_fleet()`
-- `create_default_recruitment()`
-- `create_default_maturity()`
-- `create_default_Population()`
+- `setup_default_fleet()`
+- `setup_default_selectivity()`
+- `setup_default_recruitment()`
+- `setup_default_maturity()`
+- `setup_default_growth()`
+- `setup_default_Population()`
 
 For a new selectivity or data-module option, you will often update an existing helper rather than add a brand new top-level function.
 
@@ -522,9 +521,7 @@ That means a new module type typically needs:
 The full user-facing workflow in code is:
 
 ```r
-parameters <- data_4_model |>
-  create_default_configurations() |>
-  create_default_parameters(data = data_4_model)
+parameters <- setup_default_parameters(data = data_4_model)
 
 input <- parameters |>
   initialize_fims(data = data_4_model)
@@ -603,8 +600,7 @@ When adding a new module or a new module type, you will usually touch several la
 - [ ] `inst/include/interface/rcpp/rcpp_objects/rcpp_[category].hpp` for the Rcpp interface and TMB registration
 - [ ] `src/fims_modules.hpp` to expose the class to R
 - [ ] `R/FIMS-package.R` to export the class
-- [ ] `R/create_default_configurations.R` if the new module type should appear in the default configuration
-- [ ] `R/create_default_parameters.R` so default values and estimation settings are generated correctly
+- [ ] `R/setup_default_parameters.R` so default values and estimation settings are generated correctly
 - [ ] `R/initialize_modules.R` if the module needs special initialization or linking behavior
 - [ ] tests in `tests/gtest/` and/or `tests/testthat/`
 
@@ -713,8 +709,7 @@ Study these existing modules as templates:
 - **Maturity**: [inst/include/population_dynamics/maturity/](../inst/include/population_dynamics/maturity/)
 - **Recruitment**: [inst/include/population_dynamics/recruitment/](../inst/include/population_dynamics/recruitment/)
 - **R parameter workflow**:
-  - [R/create_default_configurations.R](../R/create_default_configurations.R)
-  - [R/create_default_parameters.R](../R/create_default_parameters.R)
+  - [R/setup_default_parameters.R](../R/setup_default_parameters.R)
   - [R/initialize_modules.R](../R/initialize_modules.R)
 
 ## Documentation resources
@@ -734,7 +729,7 @@ Adding a new module usually means coordinating updates across:
 1. **C++ functors** in `inst/include/`
 2. **Rcpp interface and TMB registration** in `inst/include/interface/rcpp/rcpp_objects/`
 3. **R exposure** in `src/fims_modules.hpp` and `R/FIMS-package.R`
-4. **R configuration, parameter, and initialization workflow** in `R/create_default_configurations.R`, `R/create_default_parameters.R`, and `R/initialize_modules.R`
+4. **R parameter and initialization workflow** in `R/setup_default_parameters.R` and `R/initialize_modules.R`
 5. **Tests and documentation** that explain and validate the new behavior
 
 Keeping those layers synchronized is the best way to avoid the outdated template problem that motivated this guide in the first place.
