@@ -17,15 +17,16 @@ std::map<uint32_t, std::shared_ptr<FisheryModelInterfaceBase>>
  * Function to register fishery model classes with the Rcpp module system.
  *
  */
-void register_fishery_models(Rcpp::Module& m) {
-  Rcpp::class_<CatchAtAgeInterface>(
-      "CatchAtAge",
-      "See "
-      "https://noaa-fims.github.io/FIMS/doxygen/classCatchAtAgeInterface.html.")
-      .constructor()
-      .method("AddPopulation", &CatchAtAgeInterface::AddPopulation)
-      .method("get_output", &CatchAtAgeInterface::to_json)
-      .method("GetId", &CatchAtAgeInterface::get_id)
-      .method("DoReporting", &CatchAtAgeInterface::DoReporting)
-      .method("IsReporting", &CatchAtAgeInterface::IsReporting);
+void register_fishery_models(Rcpp::Module &m)
+{
+    Rcpp::class_<CatchAtAgeInterface>(
+        "CatchAtAge",
+        "See "
+        "https://noaa-fims.github.io/FIMS/doxygen/classCatchAtAgeInterface.html.")
+        .constructor()
+        .method("AddPopulation", &CatchAtAgeInterface::AddPopulation)
+        .method("get_output", &CatchAtAgeInterface::get_output)
+        .method("get_id", &CatchAtAgeInterface::get_id)
+        .method("DoReporting", &CatchAtAgeInterface::DoReporting)
+        .method("IsReporting", &CatchAtAgeInterface::IsReporting);
 }

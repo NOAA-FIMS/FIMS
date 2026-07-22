@@ -294,39 +294,66 @@ class FleetInterface : public FleetInterfaceBase {
    * @brief Set the unique ID for the observed age-composition data object.
    * @param observed_agecomp_data_id Unique ID for the observed data object.
    */
-  void SetObservedAgeCompDataID(int observed_agecomp_data_id) {
-    interface_observed_agecomp_data_id_m.set(observed_agecomp_data_id);
+  void SetObservedAgeCompDataID(SEXP observed_agecomp_data_id) {
+    if (!Rf_isNumeric(observed_agecomp_data_id) ||
+        Rf_length(observed_agecomp_data_id) != 1) {
+      throw std::invalid_argument(
+          "SetObservedAgeCompDataID expects a numeric scalar.");
+    }
+    interface_observed_agecomp_data_id_m.set(
+        Rcpp::as<int>(observed_agecomp_data_id));
   }
 
   /**
    * @brief Set the unique ID for the observed length-composition data object.
    * @param observed_lengthcomp_data_id Unique ID for the observed data object.
    */
-  void SetObservedLengthCompDataID(int observed_lengthcomp_data_id) {
-    interface_observed_lengthcomp_data_id_m.set(observed_lengthcomp_data_id);
+  void SetObservedLengthCompDataID(SEXP observed_lengthcomp_data_id) {
+    if (!Rf_isNumeric(observed_lengthcomp_data_id) ||
+        Rf_length(observed_lengthcomp_data_id) != 1) {
+      throw std::invalid_argument(
+          "SetObservedLengthCompDataID expects a numeric scalar.");
+    }
+    interface_observed_lengthcomp_data_id_m.set(
+        Rcpp::as<int>(observed_lengthcomp_data_id));
   }
 
   /**
    * @brief Set the unique ID for the observed index data object.
    * @param observed_index_data_id Unique ID for the observed data object.
    */
-  void SetObservedIndexDataID(int observed_index_data_id) {
-    interface_observed_index_data_id_m.set(observed_index_data_id);
+  void SetObservedIndexDataID(SEXP observed_index_data_id) {
+    if (!Rf_isNumeric(observed_index_data_id) ||
+        Rf_length(observed_index_data_id) != 1) {
+      throw std::invalid_argument(
+          "SetObservedIndexDataID expects a numeric scalar.");
+    }
+    interface_observed_index_data_id_m.set(
+        Rcpp::as<int>(observed_index_data_id));
   }
 
   /**
    * @brief Set the unique ID for the observed landings data object.
    * @param observed_landings_data_id Unique ID for the observed data object.
    */
-  void SetObservedLandingsDataID(int observed_landings_data_id) {
-    interface_observed_landings_data_id_m.set(observed_landings_data_id);
+  void SetObservedLandingsDataID(SEXP observed_landings_data_id) {
+    if (!Rf_isNumeric(observed_landings_data_id) ||
+        Rf_length(observed_landings_data_id) != 1) {
+      throw std::invalid_argument(
+          "SetObservedLandingsDataID expects a numeric scalar.");
+    }
+    interface_observed_landings_data_id_m.set(
+        Rcpp::as<int>(observed_landings_data_id));
   }
   /**
    * @brief Set the unique ID for the selectivity object.
    * @param selectivity_id Unique ID for the observed object.
    */
-  void SetSelectivityID(int selectivity_id) {
-    interface_selectivity_id_m.set(selectivity_id);
+  void SetSelectivityID(SEXP selectivity_id) {
+    if (!Rf_isNumeric(selectivity_id) || Rf_length(selectivity_id) != 1) {
+      throw std::invalid_argument("SetSelectivityID expects a numeric scalar.");
+    }
+    interface_selectivity_id_m.set(Rcpp::as<int>(selectivity_id));
   }
 
   /**
@@ -393,28 +420,28 @@ class FleetInterface : public FleetInterfaceBase {
           std::dynamic_pointer_cast<fims_popdy::Fleet<double>>(it->second);
 
       for (size_t i = 0; i < this->log_Fmort.size(); i++) {
-        if (this->log_Fmort[i].estimation_type_m.get() == "constant") {
-          this->log_Fmort[i].final_value_m = this->log_Fmort[i].initial_value_m;
+        if (this->log_Fmort[i].estimation_type.get() == "constant") {
+          this->log_Fmort[i].estimated_value = this->log_Fmort[i].value;
         } else {
-          this->log_Fmort[i].final_value_m = fleet->log_Fmort[i];
+          this->log_Fmort[i].estimated_value = fleet->log_Fmort[i];
         }
       }
 
       for (size_t i = 0; i < this->log_q.size(); i++) {
-        if (this->log_q[i].estimation_type_m.get() == "constant") {
-          this->log_q[i].final_value_m = this->log_q[i].initial_value_m;
+        if (this->log_q[i].estimation_type.get() == "constant") {
+          this->log_q[i].estimated_value = this->log_q[i].value;
         } else {
-          this->log_q[i].final_value_m = fleet->log_q[i];
+          this->log_q[i].estimated_value = fleet->log_q[i];
         }
       }
 
       for (size_t i = 0; i < fleet->age_to_length_conversion.size(); i++) {
-        if (this->age_to_length_conversion[i].estimation_type_m.get() ==
+        if (this->age_to_length_conversion[i].estimation_type.get() ==
             "constant") {
-          this->age_to_length_conversion[i].final_value_m =
-              this->age_to_length_conversion[i].initial_value_m;
+          this->age_to_length_conversion[i].estimated_value =
+              this->age_to_length_conversion[i].value;
         } else {
-          this->age_to_length_conversion[i].final_value_m =
+          this->age_to_length_conversion[i].estimated_value =
               fleet->age_to_length_conversion[i];
         }
       }
@@ -456,17 +483,17 @@ class FleetInterface : public FleetInterfaceBase {
 
     fleet->log_q.resize(this->log_q.size());
     for (size_t i = 0; i < this->log_q.size(); i++) {
-      fleet->log_q[i] = this->log_q[i].initial_value_m;
+      fleet->log_q[i] = this->log_q[i].value;
 
-      if (this->log_q[i].estimation_type_m.get() == "fixed_effects") {
+      if (this->log_q[i].estimation_type.get() == "fixed_effects") {
         ss.str("");
-        ss << "Fleet." << this->id << ".log_q." << this->log_q[i].id_m;
+        ss << "Fleet." << this->id << ".log_q." << this->log_q[i].id;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(fleet->log_q[i]);
       }
-      if (this->log_q[i].estimation_type_m.get() == "random_effects") {
+      if (this->log_q[i].estimation_type.get() == "random_effects") {
         ss.str("");
-        ss << "Fleet." << this->id << ".log_q." << this->log_q[i].id_m;
+        ss << "Fleet." << this->id << ".log_q." << this->log_q[i].id;
         info->RegisterRandomEffectName(ss.str());
         info->RegisterRandomEffect(fleet->log_q[i]);
       }
@@ -485,23 +512,23 @@ class FleetInterface : public FleetInterfaceBase {
     }
     fleet->log_Fmort.resize(static_cast<size_t>(this->log_Fmort.size()));
     for (size_t i = 0; i < log_Fmort.size(); i++) {
-      fleet->log_Fmort[i] = this->log_Fmort[i].initial_value_m;
+      fleet->log_Fmort[i] = this->log_Fmort[i].value;
 
-      if (this->log_Fmort[i].estimation_type_m.get() == "fixed_effects") {
+      if (this->log_Fmort[i].estimation_type.get() == "fixed_effects") {
         ss.str("");
-        ss << "Fleet." << this->id << ".log_Fmort." << this->log_Fmort[i].id_m;
+        ss << "Fleet." << this->id << ".log_Fmort." << this->log_Fmort[i].id;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(fleet->log_Fmort[i]);
       }
-      if (this->log_Fmort[i].estimation_type_m.get() == "random_effects") {
+      if (this->log_Fmort[i].estimation_type.get() == "random_effects") {
         ss.str("");
-        ss << "Fleet." << this->id << ".log_Fmort." << this->log_Fmort[i].id_m;
+        ss << "Fleet." << this->id << ".log_Fmort." << this->log_Fmort[i].id;
         info->RegisterRandomEffectName(ss.str());
         info->RegisterRandomEffect(fleet->log_Fmort[i]);
       }
     }
     // add to variable_map
-    info->variable_map[this->log_Fmort.id_m] = &(fleet)->log_Fmort;
+    info->variable_map[this->log_Fmort.id] = &(fleet)->log_Fmort;
 
     if (this->n_lengths.get() > 0) {
       fleet->age_to_length_conversion.resize(
@@ -517,24 +544,24 @@ class FleetInterface : public FleetInterfaceBase {
 
       for (size_t i = 0; i < fleet->age_to_length_conversion.size(); i++) {
         fleet->age_to_length_conversion[i] =
-            this->age_to_length_conversion[i].initial_value_m;
+            this->age_to_length_conversion[i].value;
 
-        if (this->age_to_length_conversion[i].estimation_type_m.get() ==
+        if (this->age_to_length_conversion[i].estimation_type.get() ==
             "fixed_effects") {
           ss.str("");
           ss << "Fleet." << this->id << ".age_to_length_conversion."
-             << this->age_to_length_conversion[i].id_m;
+             << this->age_to_length_conversion[i].id;
           info->RegisterParameterName(ss.str());
           info->RegisterParameter(fleet->age_to_length_conversion[i]);
         }
-        if (this->age_to_length_conversion[i].estimation_type_m.get() ==
+        if (this->age_to_length_conversion[i].estimation_type.get() ==
             "random_effects") {
           FIMS_ERROR_LOG(
               "age_to_length_conversion cannot be set to random effects");
         }
       }
 
-      info->variable_map[this->age_to_length_conversion.id_m] =
+      info->variable_map[this->age_to_length_conversion.id] =
           &(fleet)->age_to_length_conversion;
     }
 

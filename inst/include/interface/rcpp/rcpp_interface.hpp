@@ -107,14 +107,14 @@ bool CreateTMBModel() {
   [details_set_x_parameters]
   Updates the internal parameter values for the model base of type
   TMB_FIMS_REAL_TYPE. It is typically called before finalize() or
-  @ref CatchAtAgeInterface::to_json "`get_output()`" to ensure the correct
+  @ref CatchAtAgeInterface::get_output "`get_output()`" to ensure the correct
   values are used because TMB doesn't always keep the updated parameters in
   the "double" version of the tape. So we need to update those first.
   \n\n
   Usage example in R:
   \code{.R}
-  set_fixed_parameters(c(1, 2, 3))
-  set_random_parameters(c(1, 2, 3))
+  set_fixed(c(1, 2, 3))
+  set_random(c(1, 2, 3))
   catch_at_age$get_output()
   \endcode
   [details_set_x_parameters]
@@ -129,9 +129,9 @@ bool CreateTMBModel() {
  * @brief Update fixed parameters in the tape, so the output is correct.
  * @details @snippet{doc} this details_set_x_parameters
  * @snippet{doc} this param_par
- * @see set_random_parameters()
+ * @see set_random()
  */
-void set_fixed_parameters(Rcpp::NumericVector par) {
+void set_fixed(Rcpp::NumericVector par) {
   // base model
   std::shared_ptr<fims_info::Information<TMB_FIMS_REAL_TYPE>> info0 =
       fims_info::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
@@ -146,7 +146,7 @@ void set_fixed_parameters(Rcpp::NumericVector par) {
  *
  * @return Rcpp::NumericVector
  */
-Rcpp::NumericVector get_fixed_parameters_vector() {
+Rcpp::NumericVector get_fixed() {
   // base model
   std::shared_ptr<fims_info::Information<TMB_FIMS_REAL_TYPE>> info0 =
       fims_info::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
@@ -164,9 +164,9 @@ Rcpp::NumericVector get_fixed_parameters_vector() {
  * @brief Update random effect parameters in the tape, so the output is correct.
  * @details @snippet{doc} this details_set_x_parameters
  * @snippet{doc} this param_par
- * @see set_fixed_parameters()
+ * @see set_fixed()
  */
-void set_random_parameters(Rcpp::NumericVector par) {
+void set_random(Rcpp::NumericVector par) {
   // base model
   std::shared_ptr<fims_info::Information<TMB_FIMS_REAL_TYPE>> info0 =
       fims_info::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
@@ -181,7 +181,7 @@ void set_random_parameters(Rcpp::NumericVector par) {
  *
  * @return Rcpp::NumericVector
  */
-Rcpp::NumericVector get_random_parameters_vector() {
+Rcpp::NumericVector get_random() {
   // base model
   std::shared_ptr<fims_info::Information<TMB_FIMS_REAL_TYPE>> d0 =
       fims_info::Information<TMB_FIMS_REAL_TYPE>::GetInstance();

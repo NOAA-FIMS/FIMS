@@ -25,7 +25,7 @@ class DistributionsInterfaceBase : public FIMSRcppInterfaceBase {
   /**
    * @brief The local ID of the DistributionsInterfaceBase object.
    */
-  uint32_t id_m;
+  uint32_t id;
   /**
    * @brief The unique ID for the variable map that points to a fims::Vector.
    */
@@ -79,10 +79,10 @@ class DistributionsInterfaceBase : public FIMSRcppInterfaceBase {
    */
   DistributionsInterfaceBase() {
     this->key_m = std::make_shared<std::vector<uint32_t>>();
-    this->id_m = DistributionsInterfaceBase::id_g++;
+    this->id = DistributionsInterfaceBase::id_g++;
     /* Create instance of map: key is id and value is pointer to
     DistributionsInterfaceBase */
-    // DistributionsInterfaceBase::live_objects[this->id_m] = this;
+    // DistributionsInterfaceBase::live_objects[this->id] = this;
   }
 
   /**
@@ -91,7 +91,7 @@ class DistributionsInterfaceBase : public FIMSRcppInterfaceBase {
    * @param other
    */
   DistributionsInterfaceBase(const DistributionsInterfaceBase &other)
-      : id_m(other.id_m),
+      : id(other.id),
         key_m(other.key_m),
         input_type_m(other.input_type_m),
         use_mean_m(other.use_mean_m),
@@ -195,10 +195,10 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
    * @brief The constructor.
    */
   DnormDistributionsInterface() : DistributionsInterfaceBase() {
-    DistributionsInterfaceBase::live_objects[this->id_m] =
+    DistributionsInterfaceBase::live_objects[this->id] =
         std::make_shared<DnormDistributionsInterface>(*this);
     FIMSRcppInterfaceBase::fims_interface_objects.push_back(
-        DistributionsInterfaceBase::live_objects[this->id_m]);
+        DistributionsInterfaceBase::live_objects[this->id]);
   }
 
   /**
@@ -223,7 +223,7 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
    * @brief Gets the ID of the interface base object.
    * @return The ID.
    */
-  virtual uint32_t get_id() { return this->id_m; }
+  virtual uint32_t get_id() { return this->id; }
 
   /**
    * @brief Set the unique ID for the observed data object.
@@ -238,8 +238,8 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
    * @copydoc DistributionsInterfaceBase::set_distribution_mean
    */
   virtual bool set_distribution_mean(double input_value) {
-    this->expected_mean[0].initial_value_m = input_value;
-    this->expected_mean[0].estimation_type_m.set("fixed_effects");
+    this->expected_mean[0].value = input_value;
+    this->expected_mean[0].estimation_type.set("fixed_effects");
     this->use_mean_m.set(fims::to_string("yes"));
     return true;
   }
@@ -270,16 +270,16 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
     dnorm.log_sd.resize(this->log_sd.size());
     dnorm.expected_mean.resize(this->expected_mean.size());
     for (size_t i = 0; i < this->observed_values.size(); i++) {
-      dnorm.observed_values[i] = this->observed_values[i].initial_value_m;
+      dnorm.observed_values[i] = this->observed_values[i].value;
     }
     for (size_t i = 0; i < this->expected_values.size(); i++) {
-      dnorm.expected_values[i] = this->expected_values[i].initial_value_m;
+      dnorm.expected_values[i] = this->expected_values[i].value;
     }
     for (size_t i = 0; i < this->log_sd.size(); i++) {
-      dnorm.log_sd[i] = this->log_sd[i].initial_value_m;
+      dnorm.log_sd[i] = this->log_sd[i].value;
     }
     for (size_t i = 0; i < this->expected_mean.size(); i++) {
-      dnorm.expected_mean[i] = this->expected_mean[i].initial_value_m;
+      dnorm.expected_mean[i] = this->expected_mean[i].value;
     }
     dnorm.use_mean = this->use_mean_m;
     return dnorm.evaluate();
@@ -292,7 +292,7 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
   virtual void finalize() {
     if (this->finalized) {
       // log warning that finalize has been called more than once.
-      FIMS_WARNING_LOG("DnormDistribution  " + fims::to_string(this->id_m) +
+      FIMS_WARNING_LOG("DnormDistribution  " + fims::to_string(this->id) +
                        " has been finalized already.");
     }
 
@@ -304,10 +304,10 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
     fims_info::Information<double>::density_components_iterator it;
 
     // search for density component in Information
-    it = info->density_components.find(this->id_m);
+    it = info->density_components.find(this->id);
     // if not found, just return
     if (it == info->density_components.end()) {
-      FIMS_WARNING_LOG("DnormDistribution " + fims::to_string(this->id_m) +
+      FIMS_WARNING_LOG("DnormDistribution " + fims::to_string(this->id) +
                        " not found in Information.");
       return;
     } else {
@@ -337,19 +337,18 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
         }
       }
       for (size_t i = 0; i < n_x; i++) {
-        if (this->log_sd[i].estimation_type_m.get() == "constant") {
-          this->log_sd[i].final_value_m = this->log_sd[i].initial_value_m;
+        if (this->log_sd[i].estimation_type.get() == "constant") {
+          this->log_sd[i].estimated_value = this->log_sd[i].value;
         } else {
-          this->log_sd[i].final_value_m = dnorm->log_sd.get_force_scalar(i);
+          this->log_sd[i].estimated_value = dnorm->log_sd.get_force_scalar(i);
         }
       }
 
       for (size_t i = 0; i < this->expected_mean.size(); i++) {
-        if (this->expected_mean[i].estimation_type_m.get() == "constant") {
-          this->expected_mean[i].final_value_m =
-              this->expected_mean[i].initial_value_m;
+        if (this->expected_mean[i].estimation_type.get() == "constant") {
+          this->expected_mean[i].estimated_value = this->expected_mean[i].value;
         } else {
-          this->expected_mean[i].final_value_m = dnorm->expected_mean[i];
+          this->expected_mean[i].estimated_value = dnorm->expected_mean[i];
         }
       }
 
@@ -363,8 +362,8 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
 
       for (size_t i = 0; i < this->lpdf_vec.size(); i++) {
         this->lpdf_vec[i] = dnorm->lpdf_vec[i];
-        this->expected_values[i].final_value_m = dnorm->get_expected(i);
-        this->observed_values[i].final_value_m = dnorm->get_observed(i);
+        this->expected_values[i].estimated_value = dnorm->get_expected(i);
+        this->observed_values[i].estimated_value = dnorm->get_observed(i);
       }
     }
   }
@@ -381,7 +380,7 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
 
     ss << "{\n";
     ss << " \"module_name\": \"density\",\n";
-    ss << " \"module_id\": " << this->id_m << ",\n";
+    ss << " \"module_id\": " << this->id << ",\n";
     ss << " \"module_type\": \"normal\",\n";
     ss << " \"observed_data_id\" : " << this->interface_observed_data_id_m
        << ",\n";
@@ -405,12 +404,12 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
       ss << "],\n";
     } else {
       for (size_t i = 0; i < this->expected_values.size() - 1; i++) {
-        ss << this->value_to_string(this->expected_values[i].final_value_m)
+        ss << this->value_to_string(this->expected_values[i].estimated_value)
            << ", ";
       }
       ss << this->value_to_string(
           this->expected_values[this->expected_values.size() - 1]
-              .final_value_m);
+              .estimated_value);
       ss << "],\n";
     }
     ss << "  \"log_sd_values\":[";
@@ -419,10 +418,10 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
     } else {
       for (R_xlen_t i = 0; i < static_cast<R_xlen_t>(this->log_sd.size()) - 1;
            i++) {
-        ss << this->value_to_string(this->log_sd[i].final_value_m) << ", ";
+        ss << this->value_to_string(this->log_sd[i].estimated_value) << ", ";
       }
       ss << this->value_to_string(
-                this->log_sd[this->log_sd.size() - 1].final_value_m)
+                this->log_sd[this->log_sd.size() - 1].estimated_value)
          << "],\n";
     }
     ss << "  \"observed_values\":[";
@@ -430,10 +429,10 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
       ss << "]\n";
     } else {
       for (size_t i = 0; i < this->observed_values.size() - 1; i++) {
-        ss << this->observed_values[i].final_value_m << ", ";
+        ss << this->observed_values[i].estimated_value << ", ";
       }
       ss << this->observed_values[this->observed_values.size() - 1]
-                .final_value_m
+                .estimated_value
          << "]\n";
     }
     ss << " }}\n";
@@ -459,50 +458,47 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
     for (size_t i = 0; i < this->key_m->size(); i++) {
       distribution->key[i] = this->key_m->at(i);
     }
-    distribution->id = this->id_m;
+    distribution->id = this->id;
     distribution->observed_values.resize(this->observed_values.size());
     for (size_t i = 0; i < this->observed_values.size(); i++) {
-      distribution->observed_values[i] =
-          this->observed_values[i].initial_value_m;
+      distribution->observed_values[i] = this->observed_values[i].value;
     }
     // set relative info
     distribution->expected_values.resize(this->expected_values.size());
     for (size_t i = 0; i < this->expected_values.size(); i++) {
-      distribution->expected_values[i] =
-          this->expected_values[i].initial_value_m;
+      distribution->expected_values[i] = this->expected_values[i].value;
     }
     distribution->log_sd.resize(this->log_sd.size());
     for (size_t i = 0; i < this->log_sd.size(); i++) {
-      distribution->log_sd[i] = this->log_sd[i].initial_value_m;
-      if (this->log_sd[i].estimation_type_m.get() == "fixed_effects") {
+      distribution->log_sd[i] = this->log_sd[i].value;
+      if (this->log_sd[i].estimation_type.get() == "fixed_effects") {
         ss.str("");
-        ss << "dnorm." << this->id_m << ".log_sd." << this->log_sd[i].id_m;
+        ss << "dnorm." << this->id << ".log_sd." << this->log_sd[i].id;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(distribution->log_sd[i]);
       }
-      if (this->log_sd[i].estimation_type_m.get() == "random_effects") {
+      if (this->log_sd[i].estimation_type.get() == "random_effects") {
         FIMS_ERROR_LOG("standard deviations cannot be set to random effects");
       }
     }
-    info->variable_map[this->log_sd.id_m] = &(distribution)->log_sd;
+    info->variable_map[this->log_sd.id] = &(distribution)->log_sd;
 
     distribution->use_mean = this->use_mean_m.get();
     distribution->expected_mean.resize(this->expected_mean.size());
     for (size_t i = 0; i < this->expected_mean.size(); i++) {
-      distribution->expected_mean[i] = this->expected_mean[i].initial_value_m;
-      if (this->expected_mean[i].estimation_type_m.get() == "fixed_effects") {
+      distribution->expected_mean[i] = this->expected_mean[i].value;
+      if (this->expected_mean[i].estimation_type.get() == "fixed_effects") {
         ss.str("");
-        ss << "dnorm." << this->id_m << ".expected_mean."
-           << this->expected_mean[i].id_m;
+        ss << "dnorm." << this->id << ".expected_mean."
+           << this->expected_mean[i].id;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(distribution->expected_mean[i]);
       }
-      if (this->expected_mean[i].estimation_type_m.get() == "random_effects") {
+      if (this->expected_mean[i].estimation_type.get() == "random_effects") {
         FIMS_ERROR_LOG("expected_mean cannot be set to random effects");
       }
     }
-    info->variable_map[this->expected_mean.id_m] =
-        &(distribution)->expected_mean;
+    info->variable_map[this->expected_mean.id] = &(distribution)->expected_mean;
 
     info->density_components[distribution->id] = distribution;
 
@@ -556,10 +552,10 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
    * @brief The constructor.
    */
   DlnormDistributionsInterface() : DistributionsInterfaceBase() {
-    DistributionsInterfaceBase::live_objects[this->id_m] =
+    DistributionsInterfaceBase::live_objects[this->id] =
         std::make_shared<DlnormDistributionsInterface>(*this);
     FIMSRcppInterfaceBase::fims_interface_objects.push_back(
-        DistributionsInterfaceBase::live_objects[this->id_m]);
+        DistributionsInterfaceBase::live_objects[this->id]);
   }
 
   /**
@@ -583,7 +579,7 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
    * @brief Gets the ID of the interface base object.
    * @return The ID.
    */
-  virtual uint32_t get_id() { return this->id_m; }
+  virtual uint32_t get_id() { return this->id; }
 
   /**
    * @brief Set the unique ID for the observed data object.
@@ -625,13 +621,13 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
     dlnorm.log_sd.resize(this->log_sd.size());
     // dlnorm.input_type = "prior";
     for (size_t i = 0; i < this->observed_values.size(); i++) {
-      dlnorm.observed_values[i] = this->observed_values[i].initial_value_m;
+      dlnorm.observed_values[i] = this->observed_values[i].value;
     }
     for (size_t i = 0; i < this->expected_values.size(); i++) {
-      dlnorm.expected_values[i] = this->expected_values[i].initial_value_m;
+      dlnorm.expected_values[i] = this->expected_values[i].value;
     }
     for (size_t i = 0; i < this->log_sd.size(); i++) {
-      dlnorm.log_sd[i] = this->log_sd[i].initial_value_m;
+      dlnorm.log_sd[i] = this->log_sd[i].value;
     }
     return dlnorm.evaluate();
   }
@@ -643,7 +639,7 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
   virtual void finalize() {
     if (this->finalized) {
       // log warning that finalize has been called more than once.
-      FIMS_WARNING_LOG("LogNormalLPDF  " + fims::to_string(this->id_m) +
+      FIMS_WARNING_LOG("LogNormalLPDF  " + fims::to_string(this->id) +
                        " has been finalized already.");
     }
 
@@ -655,10 +651,10 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
     fims_info::Information<double>::density_components_iterator it;
 
     // search for density component in Information
-    it = info->density_components.find(this->id_m);
+    it = info->density_components.find(this->id);
     // if not found, just return
     if (it == info->density_components.end()) {
-      FIMS_WARNING_LOG("LogNormalLPDF " + fims::to_string(this->id_m) +
+      FIMS_WARNING_LOG("LogNormalLPDF " + fims::to_string(this->id) +
                        " not found in Information.");
       return;
     } else {
@@ -687,10 +683,10 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
       }
 
       for (size_t i = 0; i < n_x; i++) {
-        if (this->log_sd[i].estimation_type_m.get() == "constant") {
-          this->log_sd[i].final_value_m = this->log_sd[i].initial_value_m;
+        if (this->log_sd[i].estimation_type.get() == "constant") {
+          this->log_sd[i].estimated_value = this->log_sd[i].value;
         } else {
-          this->log_sd[i].final_value_m = dlnorm->log_sd.get_force_scalar(i);
+          this->log_sd[i].estimated_value = dlnorm->log_sd.get_force_scalar(i);
         }
       }
 
@@ -703,8 +699,8 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
       }
       for (size_t i = 0; i < this->lpdf_vec.size(); i++) {
         this->lpdf_vec[i] = dlnorm->lpdf_vec[i];
-        this->expected_values[i].final_value_m = dlnorm->get_expected(i);
-        this->observed_values[i].final_value_m = dlnorm->get_observed(i);
+        this->expected_values[i].estimated_value = dlnorm->get_expected(i);
+        this->observed_values[i].estimated_value = dlnorm->get_observed(i);
       }
     }
   }
@@ -721,7 +717,7 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
 
     ss << "{\n";
     ss << " \"module_name\": \"density\",\n";
-    ss << " \"module_id\": " << this->id_m << ",\n";
+    ss << " \"module_id\": " << this->id << ",\n";
     ss << " \"module_type\": \"log_normal\",\n";
     ss << " \"observed_data_id\" : " << this->interface_observed_data_id_m
        << ",\n";
@@ -744,12 +740,12 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
       ss << "],\n";
     } else {
       for (size_t i = 0; i < this->expected_values.size() - 1; i++) {
-        ss << this->value_to_string(this->expected_values[i].final_value_m)
+        ss << this->value_to_string(this->expected_values[i].estimated_value)
            << ", ";
       }
       ss << this->value_to_string(
           this->expected_values[this->expected_values.size() - 1]
-              .final_value_m);
+              .estimated_value);
 
       ss << "],\n";
     }
@@ -759,10 +755,10 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
     } else {
       for (R_xlen_t i = 0; i < static_cast<R_xlen_t>(this->log_sd.size()) - 1;
            i++) {
-        ss << this->value_to_string(this->log_sd[i].final_value_m) << ", ";
+        ss << this->value_to_string(this->log_sd[i].estimated_value) << ", ";
       }
       ss << this->value_to_string(
-                this->log_sd[this->log_sd.size() - 1].final_value_m)
+                this->log_sd[this->log_sd.size() - 1].estimated_value)
          << "],\n";
     }
     ss << "  \"observed_values\":[";
@@ -770,10 +766,10 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
       ss << "]\n";
     } else {
       for (size_t i = 0; i < this->observed_values.size() - 1; i++) {
-        ss << this->observed_values[i].final_value_m << ", ";
+        ss << this->observed_values[i].estimated_value << ", ";
       }
       ss << this->observed_values[this->observed_values.size() - 1]
-                .final_value_m
+                .estimated_value
          << "]\n";
     }
     ss << " }}\n";
@@ -791,7 +787,7 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
         std::make_shared<fims_distributions::LogNormalLPDF<Type>>();
 
     // set relative info
-    distribution->id = this->id_m;
+    distribution->id = this->id;
     std::stringstream ss;
     distribution->observed_data_id_m = interface_observed_data_id_m;
     distribution->input_type = this->input_type_m;
@@ -801,29 +797,27 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
     }
     distribution->observed_values.resize(this->observed_values.size());
     for (size_t i = 0; i < this->observed_values.size(); i++) {
-      distribution->observed_values[i] =
-          this->observed_values[i].initial_value_m;
+      distribution->observed_values[i] = this->observed_values[i].value;
     }
     // set relative info
     distribution->expected_values.resize(this->expected_values.size());
     for (size_t i = 0; i < this->expected_values.size(); i++) {
-      distribution->expected_values[i] =
-          this->expected_values[i].initial_value_m;
+      distribution->expected_values[i] = this->expected_values[i].value;
     }
     distribution->log_sd.resize(this->log_sd.size());
     for (size_t i = 0; i < this->log_sd.size(); i++) {
-      distribution->log_sd[i] = this->log_sd[i].initial_value_m;
-      if (this->log_sd[i].estimation_type_m.get() == "fixed_effects") {
+      distribution->log_sd[i] = this->log_sd[i].value;
+      if (this->log_sd[i].estimation_type.get() == "fixed_effects") {
         ss.str("");
-        ss << "dlnorm." << this->id_m << ".log_sd." << this->log_sd[i].id_m;
+        ss << "dlnorm." << this->id << ".log_sd." << this->log_sd[i].id;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(distribution->log_sd[i]);
       }
-      if (this->log_sd[i].estimation_type_m.get() == "random_effects") {
+      if (this->log_sd[i].estimation_type.get() == "random_effects") {
         FIMS_ERROR_LOG("standard deviations cannot be set to random effects");
       }
     }
-    info->variable_map[this->log_sd.id_m] = &(distribution)->log_sd;
+    info->variable_map[this->log_sd.id] = &(distribution)->log_sd;
 
     info->density_components[distribution->id] = distribution;
 
@@ -881,10 +875,10 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
    * @brief The constructor.
    */
   DmultinomDistributionsInterface() : DistributionsInterfaceBase() {
-    DistributionsInterfaceBase::live_objects[this->id_m] =
+    DistributionsInterfaceBase::live_objects[this->id] =
         std::make_shared<DmultinomDistributionsInterface>(*this);
     FIMSRcppInterfaceBase::fims_interface_objects.push_back(
-        DistributionsInterfaceBase::live_objects[this->id_m]);
+        DistributionsInterfaceBase::live_objects[this->id]);
   }
 
   /**
@@ -908,7 +902,7 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
    * @brief Gets the ID of the interface base object.
    * @return The ID.
    */
-  virtual uint32_t get_id() { return this->id_m; }
+  virtual uint32_t get_id() { return this->id; }
 
   /**
    * @brief Set the unique ID for the observed data object.
@@ -955,10 +949,10 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
     dmultinom.observed_values.resize(this->observed_values.size());
     dmultinom.expected_values.resize(this->expected_values.size());
     for (size_t i = 0; i < observed_values.size(); i++) {
-      dmultinom.observed_values[i] = this->observed_values[i].initial_value_m;
+      dmultinom.observed_values[i] = this->observed_values[i].value;
     }
     for (size_t i = 0; i < expected_values.size(); i++) {
-      dmultinom.expected_values[i] = this->expected_values[i].initial_value_m;
+      dmultinom.expected_values[i] = this->expected_values[i].value;
     }
     dmultinom.dims.resize(2);
     dmultinom.dims[0] = this->dims[0];
@@ -969,8 +963,7 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
   void finalize() {
     if (this->finalized) {
       // log warning that finalize has been called more than once.
-      FIMS_WARNING_LOG("DmultinomDistributions  " +
-                       fims::to_string(this->id_m) +
+      FIMS_WARNING_LOG("DmultinomDistributions  " + fims::to_string(this->id) +
                        " has been finalized already.");
     }
 
@@ -982,10 +975,10 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
     fims_info::Information<double>::density_components_iterator it;
 
     // search for density component in Information
-    it = info->density_components.find(this->id_m);
+    it = info->density_components.find(this->id);
     // if not found, just return
     if (it == info->density_components.end()) {
-      FIMS_WARNING_LOG("DmultinomDistributions " + fims::to_string(this->id_m) +
+      FIMS_WARNING_LOG("DmultinomDistributions " + fims::to_string(this->id) +
                        " not found in Information.");
       return;
     } else {
@@ -1005,9 +998,9 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
       }
       for (size_t i = 0; i < this->lpdf_vec.size(); i++) {
         this->lpdf_vec[i] = dmultinom->lpdf_vec[i];
-        this->expected_values[i].final_value_m = dmultinom->get_expected(i);
+        this->expected_values[i].estimated_value = dmultinom->get_expected(i);
         if (dmultinom->input_type != "data") {
-          this->observed_values[i].final_value_m = dmultinom->get_observed(i);
+          this->observed_values[i].estimated_value = dmultinom->get_observed(i);
         }
       }
       if (dmultinom->input_type == "data") {
@@ -1017,8 +1010,9 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
         for (size_t i = 0; i < dims[0]; i++) {
           for (size_t j = 0; j < dims[1]; j++) {
             size_t idx = (i * dims[1]) + j;
-            this->observed_values[idx].final_value_m = dmultinom->get_observed(
-                static_cast<size_t>(i), static_cast<size_t>(j));
+            this->observed_values[idx].estimated_value =
+                dmultinom->get_observed(static_cast<size_t>(i),
+                                        static_cast<size_t>(j));
           }
         }
       }
@@ -1037,7 +1031,7 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
 
     ss << "{\n";
     ss << " \"module_name\": \"density\",\n";
-    ss << " \"module_id\": " << this->id_m << ",\n";
+    ss << " \"module_id\": " << this->id << ",\n";
     ss << " \"module_type\": \"multinomial\",\n";
     ss << "\"observed_data_id\" : " << this->interface_observed_data_id_m
        << ",\n";
@@ -1061,12 +1055,12 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
       ss << "],\n";
     } else {
       for (size_t i = 0; i < this->expected_values.size() - 1; i++) {
-        ss << this->value_to_string(this->expected_values[i].final_value_m)
+        ss << this->value_to_string(this->expected_values[i].estimated_value)
            << ", ";
       }
       ss << this->value_to_string(
           this->expected_values[this->expected_values.size() - 1]
-              .final_value_m);
+              .estimated_value);
 
       ss << "],\n";
     }
@@ -1076,10 +1070,10 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
       ss << "]\n";
     } else {
       for (size_t i = 0; i < this->observed_values.size() - 1; i++) {
-        ss << this->observed_values[i].final_value_m << ", ";
+        ss << this->observed_values[i].estimated_value << ", ";
       }
       ss << this->observed_values[this->observed_values.size() - 1]
-                .final_value_m
+                .estimated_value
          << "]\n";
     }
     ss << " }}\n";
@@ -1096,7 +1090,7 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
     std::shared_ptr<fims_distributions::MultinomialLPMF<Type>> distribution =
         std::make_shared<fims_distributions::MultinomialLPMF<Type>>();
 
-    distribution->id = this->id_m;
+    distribution->id = this->id;
     distribution->observed_data_id_m = interface_observed_data_id_m;
     distribution->input_type = this->input_type_m;
     distribution->key.resize(this->key_m->size());
@@ -1105,14 +1099,12 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
     }
     distribution->observed_values.resize(this->observed_values.size());
     for (size_t i = 0; i < this->observed_values.size(); i++) {
-      distribution->observed_values[i] =
-          this->observed_values[i].initial_value_m;
+      distribution->observed_values[i] = this->observed_values[i].value;
     }
     // set relative info
     distribution->expected_values.resize(this->expected_values.size());
     for (size_t i = 0; i < this->expected_values.size(); i++) {
-      distribution->expected_values[i] =
-          this->expected_values[i].initial_value_m;
+      distribution->expected_values[i] = this->expected_values[i].value;
     }
 
     info->density_components[distribution->id] = distribution;

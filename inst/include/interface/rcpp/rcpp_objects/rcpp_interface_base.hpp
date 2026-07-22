@@ -8,15 +8,6 @@
  */
 #ifndef FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_INTERFACE_BASE_HPP
 #define FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_INTERFACE_BASE_HPP
-
-#ifndef RCPP_NO_SUGAR
-#define RCPP_NO_SUGAR
-#endif
-#include <RcppCommon.h>
-#include <Rcpp.h>
-#include <map>
-#include <vector>
-
 #include "common/information.hpp"
 #include "../../interface.hpp"
 #include "rcpp_shared_primitive.hpp"
@@ -37,48 +28,55 @@ class Variable {
   /**
    * @brief The local ID of the Variable object.
    */
-  uint32_t id_m;
+  uint32_t id;
   /**
    * @brief The initial value of the variable.
    */
-  double initial_value_m = 0.0;
+  double value = 0.0;
   /**
    * @brief The final value of the variable.
    */
-  double final_value_m = 0.0;
+  double estimated_value = 0.0;
   /**
    * @brief A string indicating the estimation type. Options are: constant,
    * fixed_effects, or random_effects, where the default is constant.
    */
-  SharedString estimation_type_m = SharedString("constant");
+  SharedString estimation_type = SharedString("constant");
 
   /**
    * @brief The constructor for initializing a variable.
    */
   Variable(double value, std::string estimation_type)
-      : id_m(Variable::id_g++),
-        initial_value_m(value),
-        estimation_type_m(estimation_type) {}
+      : id(Variable::id_g++), value(value), estimation_type(estimation_type) {}
+
+  /**
+   * @brief Reject character input passed through the Rcpp module layer.
+   */
+  Variable(const std::string &invalid_value) {
+    throw std::invalid_argument(
+        "Variable expects a numeric scalar; received character input: '" +
+        invalid_value + "'.");
+  }
 
   /**
    * @brief The constructor for initializing a variable.
    */
-  Variable(const Variable& other)
-      : id_m(other.id_m),
-        initial_value_m(other.initial_value_m),
-        final_value_m(other.final_value_m),
-        estimation_type_m(other.estimation_type_m) {}
+  Variable(const Variable &other)
+      : id(other.id),
+        value(other.value),
+        estimated_value(other.estimated_value),
+        estimation_type(other.estimation_type) {}
 
   /**
    * @brief The constructor for initializing a variable.
    */
-  Variable& operator=(const Variable& right) {
+  Variable &operator=(const Variable &right) {
     // Check for self-assignment!
     if (this == &right)  // Same object?
       return *this;      // Yes, so skip assignment, and just return *this.
-    this->id_m = right.id_m;
-    this->initial_value_m = right.initial_value_m;
-    this->estimation_type_m = right.estimation_type_m;
+    this->id = right.id;
+    this->value = right.value;
+    this->estimation_type = right.estimation_type;
     return *this;
   }
 
@@ -86,8 +84,21 @@ class Variable {
    * @brief The constructor for initializing a variable.
    */
   Variable(double value) {
-    initial_value_m = value;
-    id_m = Variable::id_g++;
+    this->value = value;
+    this->id = Variable::id_g++;
+  }
+
+  /**
+   * @brief Construct a Variable from an R object with explicit type checks.
+   */
+  Variable(SEXP input) {
+    this->id = Variable::id_g++;
+
+    if (!Rf_isNumeric(input) || Rf_length(input) != 1) {
+      throw std::invalid_argument("Variable expects a numeric scalar.");
+    }
+
+    this->value = Rcpp::as<double>(input);
   }
 
   /**
@@ -95,8 +106,8 @@ class Variable {
    * @details Set value to 0 when there is no input value.
    */
   Variable() {
-    initial_value_m = 0;
-    id_m = Variable::id_g++;
+    this->value = 0;
+    this->id = Variable::id_g++;
   }
 };
 
@@ -124,11 +135,10 @@ inline double sanitize_val(double x) {
  * @param p A variable.
  * @return std::ostream&
  */
-inline std::ostream& operator<<(std::ostream& out, const Variable& p) {
-  out << "{\"id\": " << p.id_m
-      << ",\n\"value\": " << sanitize_val(p.initial_value_m)
-      << ",\n\"estimated_value\": " << sanitize_val(p.final_value_m);
-  out << ",\n\"estimation_type\": \"" << p.estimation_type_m << "\"\n}";
+inline std::ostream &operator<<(std::ostream &out, const Variable &p) {
+  out << "{\"id\": " << p.id << ",\n\"value\": " << sanitize_val(p.value)
+      << ",\n\"estimated_value\": " << sanitize_val(p.estimated_value);
+  out << ",\n\"estimation_type\": \"" << p.estimation_type << "\"\n}";
 
   return out;
 }
@@ -154,13 +164,13 @@ class VariableVector {
   /**
    * @brief The local ID of the Variable object.
    */
-  uint32_t id_m;
+  uint32_t id;
 
   /**
    * @brief The constructor.
    */
   VariableVector() {
-    this->id_m = VariableVector::id_g++;
+    this->id = VariableVector::id_g++;
     this->storage_m = std::make_shared<std::vector<Variable>>();
     this->storage_m->resize(1);  // push_back(Rcpp::wrap(p));
   }
@@ -168,14 +178,14 @@ class VariableVector {
   /**
    * @brief The constructor.
    */
-  VariableVector(const VariableVector& other)
-      : storage_m(other.storage_m), id_m(other.id_m) {}
+  VariableVector(const VariableVector &other)
+      : storage_m(other.storage_m), id(other.id) {}
 
   /**
    * @brief The constructor.
    */
   VariableVector(size_t size) {
-    this->id_m = VariableVector::id_g++;
+    this->id = VariableVector::id_g++;
     this->storage_m = std::make_shared<std::vector<Variable>>();
     this->storage_m->resize(size);
     for (size_t i = 0; i < size; i++) {
@@ -200,13 +210,13 @@ class VariableVector {
           std::to_string(size) +
           "). Received length: " + std::to_string(input_size) + ".");
     } else {
-      this->id_m = VariableVector::id_g++;
+      this->id = VariableVector::id_g++;
       this->storage_m = std::make_shared<std::vector<Variable>>();
       // Use std::min to avoid comparing signed and unsigned types
       size_t n = std::min(input_size, size);
       this->storage_m->resize(n);
       for (size_t i = 0; i < n; i++) {
-        storage_m->at(i).initial_value_m = x[i];
+        storage_m->at(i).value = x[i];
       }
     }
   }
@@ -215,12 +225,12 @@ class VariableVector {
    * @brief The constructor for initializing a variable vector.
    * @param v A vector of doubles.
    */
-  VariableVector(const fims::Vector<double>& v) {
-    this->id_m = VariableVector::id_g++;
+  VariableVector(const fims::Vector<double> &v) {
+    this->id = VariableVector::id_g++;
     this->storage_m = std::make_shared<std::vector<Variable>>();
     this->storage_m->resize(v.size());
     for (size_t i = 0; i < v.size(); i++) {
-      storage_m->at(i).initial_value_m = v[i];
+      storage_m->at(i).value = v[i];
     }
   }
 
@@ -233,13 +243,13 @@ class VariableVector {
   /**
    * @brief Gets the ID of the VariableVector object.
    */
-  virtual uint32_t get_id() { return this->id_m; }
+  virtual uint32_t get_id() { return this->id; }
 
   /**
    * @brief The accessor where the first index starts is zero.
    * @param pos The position of the VariableVector that you want returned.
    */
-  inline Variable& operator[](size_t pos) { return this->storage_m->at(pos); }
+  inline Variable &operator[](size_t pos) { return this->storage_m->at(pos); }
 
   /**
    * @brief The accessor where the first index starts at one. This function is
@@ -264,7 +274,7 @@ class VariableVector {
    * you want returned. The first position is one and the last position is
    * the same as the size of the VariableVector.
    */
-  Variable& get(size_t pos) {
+  Variable &get(size_t pos) {
     if (pos >= this->storage_m->size()) {
       throw std::invalid_argument("VariableVector: Index out of range");
     }
@@ -280,7 +290,7 @@ class VariableVector {
    * @param p A numeric value specifying the value to set position `pos` to
    * in the VariableVector.
    */
-  void set(size_t pos, const Variable& p) { this->storage_m->at(pos) = p; }
+  void set(size_t pos, const Variable &p) { this->storage_m->at(pos) = p; }
 
   /**
    * @brief Returns the size of a VariableVector.
@@ -311,7 +321,7 @@ class VariableVector {
           std::to_string(vector_size) + ".");
     }
     for (size_t i = 0; i < this->storage_m->size(); i++) {
-      this->storage_m->at(i).initial_value_m = values[i];
+      this->storage_m->at(i).value = values[i];
     }
   }
 
@@ -339,7 +349,7 @@ class VariableVector {
           std::to_string(vector_size) + ".");
     }
 
-    auto validate_estimation_type = [&](const std::string& est_type) {
+    auto validate_estimation_type = [&](const std::string &est_type) {
       if (est_type != "constant" && est_type != "fixed_effects" &&
           est_type != "random_effects") {
         throw std::invalid_argument(
@@ -352,7 +362,7 @@ class VariableVector {
       std::string est_type =
           Rcpp::as<std::string>(estimation_types[input_size == 1 ? 0 : i]);
       validate_estimation_type(est_type);
-      this->storage_m->at(i).estimation_type_m.set(est_type);
+      this->storage_m->at(i).estimation_type.set(est_type);
     }
   }
 
@@ -365,7 +375,7 @@ class VariableVector {
    */
   void fill(double value) {
     for (size_t i = 0; i < this->storage_m->size(); i++) {
-      storage_m->at(i).initial_value_m = value;
+      storage_m->at(i).value = value;
     }
   }
 
@@ -393,7 +403,7 @@ uint32_t VariableVector::id_g = 0;
  * @param v A VariableVector.
  * @return std::ostream&
  */
-inline std::ostream& operator<<(std::ostream& out, VariableVector& v) {
+inline std::ostream &operator<<(std::ostream &out, VariableVector &v) {
   out << "[";
   size_t size = v.size();
   for (size_t i = 0; i < size - 1; i++) {
@@ -423,13 +433,13 @@ class RealVector {
   /**
    * @brief The local ID of the RealVector object.
    */
-  uint32_t id_m;
+  uint32_t id;
 
   /**
    * @brief The constructor.
    */
   RealVector() {
-    this->id_m = RealVector::id_g++;
+    this->id = RealVector::id_g++;
     this->storage_m = std::make_shared<std::vector<double>>();
     this->storage_m->resize(1);
   }
@@ -437,14 +447,14 @@ class RealVector {
   /**
    * @brief The constructor.
    */
-  RealVector(const RealVector& other)
-      : storage_m(other.storage_m), id_m(other.id_m) {}
+  RealVector(const RealVector &other)
+      : storage_m(other.storage_m), id(other.id) {}
 
   /**
    * @brief The constructor.
    */
   RealVector(size_t size) {
-    this->id_m = RealVector::id_g++;
+    this->id = RealVector::id_g++;
     this->storage_m = std::make_shared<std::vector<double>>();
     this->storage_m->resize(size);
   }
@@ -455,7 +465,7 @@ class RealVector {
    * @param size The number of elements to copy over.
    */
   RealVector(Rcpp::NumericVector x, size_t size) {
-    this->id_m = RealVector::id_g++;
+    this->id = RealVector::id_g++;
     this->storage_m = std::make_shared<std::vector<double>>();
     const size_t input_size = static_cast<size_t>(x.size());
     if (input_size != size) {
@@ -474,8 +484,8 @@ class RealVector {
    * @brief The constructor for initializing a real vector.
    * @param v A vector of doubles.
    */
-  RealVector(const fims::Vector<double>& v) {
-    this->id_m = RealVector::id_g++;
+  RealVector(const fims::Vector<double> &v) {
+    this->id = RealVector::id_g++;
     this->storage_m = std::make_shared<std::vector<double>>();
     this->storage_m->resize(v.size());
     for (size_t i = 0; i < v.size(); i++) {
@@ -495,7 +505,7 @@ class RealVector {
    * @param v
    * @return RealVector&
    */
-  RealVector& operator=(const Rcpp::NumericVector& v) {
+  RealVector &operator=(const Rcpp::NumericVector &v) {
     this->storage_m->assign(v.begin(), v.end());
     return *this;
   }
@@ -503,14 +513,14 @@ class RealVector {
   /**
    * @brief Gets the ID of the RealVector object.
    */
-  virtual uint32_t get_id() { return this->id_m; }
+  virtual uint32_t get_id() { return this->id; }
 
   /**
    * @brief
    *
    * @param orig
    */
-  void set_values(const Rcpp::NumericVector& orig) {
+  void set_values(const Rcpp::NumericVector &orig) {
     this->storage_m->resize(orig.size());
     for (size_t i = 0; i < this->storage_m->size(); i++) {
       this->storage_m->at(i) = orig[i];
@@ -535,7 +545,7 @@ class RealVector {
    * @brief The accessor where the first index starts is zero.
    * @param pos The position of the RealVector that you want returned.
    */
-  inline double& operator[](size_t pos) { return this->storage_m->at(pos); }
+  inline double &operator[](size_t pos) { return this->storage_m->at(pos); }
 
   /**
    * @brief The accessor where the first index starts at one. This function is
@@ -560,7 +570,7 @@ class RealVector {
    * you want returned. The first position is one and the last position is
    * the same as the size of the RealVector.
    */
-  double& get(size_t pos) {
+  double &get(size_t pos) {
     if (pos >= this->storage_m->size()) {
       throw std::invalid_argument("RealVector: Index out of range");
     }
@@ -576,7 +586,7 @@ class RealVector {
    * @param p A numeric value specifying the value to set position `pos` to
    * in the RealVector.
    */
-  void set(size_t pos, const double& p) { this->storage_m->at(pos) = p; }
+  void set(size_t pos, const double &p) { this->storage_m->at(pos) = p; }
 
   /**
    * @brief Returns the size of a RealVector.

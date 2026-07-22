@@ -49,7 +49,7 @@ class MaturityInterfaceBase : public FIMSRcppInterfaceBase {
    *
    * @param other
    */
-  MaturityInterfaceBase(const MaturityInterfaceBase& other) : id(other.id) {}
+  MaturityInterfaceBase(const MaturityInterfaceBase &other) : id(other.id) {}
 
   /**
    * @brief The destructor.
@@ -98,7 +98,7 @@ class LogisticMaturityInterface : public MaturityInterfaceBase {
    *
    * @param other
    */
-  LogisticMaturityInterface(const LogisticMaturityInterface& other)
+  LogisticMaturityInterface(const LogisticMaturityInterface &other)
       : MaturityInterfaceBase(other),
         inflection_point(other.inflection_point),
         slope(other.slope) {}
@@ -122,9 +122,9 @@ class LogisticMaturityInterface : public MaturityInterfaceBase {
   virtual double evaluate(double x) {
     fims_popdy::LogisticMaturity<double> LogisticMat;
     LogisticMat.inflection_point.resize(1);
-    LogisticMat.inflection_point[0] = this->inflection_point[0].initial_value_m;
+    LogisticMat.inflection_point[0] = this->inflection_point[0].value;
     LogisticMat.slope.resize(1);
-    LogisticMat.slope[0] = this->slope[0].initial_value_m;
+    LogisticMat.slope[0] = this->slope[0].value;
     return LogisticMat.evaluate(x);
   }
 
@@ -159,19 +159,19 @@ class LogisticMaturityInterface : public MaturityInterfaceBase {
               it->second);
 
       for (size_t i = 0; i < inflection_point.size(); i++) {
-        if (this->inflection_point[i].estimation_type_m.get() == "constant") {
-          this->inflection_point[i].final_value_m =
-              this->inflection_point[i].initial_value_m;
+        if (this->inflection_point[i].estimation_type.get() == "constant") {
+          this->inflection_point[i].estimated_value =
+              this->inflection_point[i].value;
         } else {
-          this->inflection_point[i].final_value_m = mat->inflection_point[i];
+          this->inflection_point[i].estimated_value = mat->inflection_point[i];
         }
       }
 
       for (size_t i = 0; i < slope.size(); i++) {
-        if (this->slope[i].estimation_type_m.get() == "constant") {
-          this->slope[i].final_value_m = this->slope[i].initial_value_m;
+        if (this->slope[i].estimation_type.get() == "constant") {
+          this->slope[i].estimated_value = this->slope[i].value;
         } else {
-          this->slope[i].final_value_m = mat->slope[i];
+          this->slope[i].estimated_value = mat->slope[i];
         }
       }
     }
@@ -192,7 +192,7 @@ class LogisticMaturityInterface : public MaturityInterfaceBase {
 
     ss << " \"parameters\": [\n{\n";
     ss << "   \"name\": \"inflection_point\",\n";
-    ss << "   \"id\":" << this->inflection_point.id_m << ",\n";
+    ss << "   \"id\":" << this->inflection_point.id << ",\n";
     ss << "   \"type\": \"vector\",\n";
     ss << " \"dimensionality\": {\n";
     ss << "  \"header\": [null],\n";
@@ -201,7 +201,7 @@ class LogisticMaturityInterface : public MaturityInterfaceBase {
 
     ss << "{\n";
     ss << "   \"name\": \"slope\",\n";
-    ss << "   \"id\":" << this->slope.id_m << ",\n";
+    ss << "   \"id\":" << this->slope.id << ",\n";
     ss << "   \"type\": \"vector\",\n";
     ss << " \"dimensionality\": {\n";
     ss << "  \"header\": [null],\n";
@@ -228,20 +228,18 @@ class LogisticMaturityInterface : public MaturityInterfaceBase {
     std::stringstream ss;
     maturity->inflection_point.resize(this->inflection_point.size());
     for (size_t i = 0; i < this->inflection_point.size(); i++) {
-      maturity->inflection_point[i] = this->inflection_point[i].initial_value_m;
-      if (this->inflection_point[i].estimation_type_m.get() ==
-          "fixed_effects") {
+      maturity->inflection_point[i] = this->inflection_point[i].value;
+      if (this->inflection_point[i].estimation_type.get() == "fixed_effects") {
         ss.str("");
         ss << "Maturity." << this->id << ".inflection_point."
-           << this->inflection_point[i].id_m;
+           << this->inflection_point[i].id;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(maturity->inflection_point[i]);
       }
-      if (this->inflection_point[i].estimation_type_m.get() ==
-          "random_effects") {
+      if (this->inflection_point[i].estimation_type.get() == "random_effects") {
         ss.str("");
         ss << "Maturity." << this->id << ".inflection_point."
-           << this->inflection_point[i].id_m;
+           << this->inflection_point[i].id;
         info->RegisterRandomEffectName(ss.str());
         info->RegisterRandomEffect(maturity->inflection_point[i]);
       }
@@ -249,16 +247,16 @@ class LogisticMaturityInterface : public MaturityInterfaceBase {
 
     maturity->slope.resize(this->slope.size());
     for (size_t i = 0; i < this->slope.size(); i++) {
-      maturity->slope[i] = this->slope[i].initial_value_m;
-      if (this->slope[i].estimation_type_m.get() == "fixed_effects") {
+      maturity->slope[i] = this->slope[i].value;
+      if (this->slope[i].estimation_type.get() == "fixed_effects") {
         ss.str("");
-        ss << "Maturity." << this->id << ".slope." << this->slope[i].id_m;
+        ss << "Maturity." << this->id << ".slope." << this->slope[i].id;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(maturity->slope[i]);
       }
-      if (this->slope[i].estimation_type_m.get() == "random_effects") {
+      if (this->slope[i].estimation_type.get() == "random_effects") {
         ss.str("");
-        ss << "Maturity." << this->id << ".slope." << this->slope[i].id_m;
+        ss << "Maturity." << this->id << ".slope." << this->slope[i].id;
         info->RegisterRandomEffect(maturity->slope[i]);
         info->RegisterRandomEffectName(ss.str());
       }

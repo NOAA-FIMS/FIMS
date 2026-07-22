@@ -77,13 +77,12 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
                                                 estimation_mode = TRUE,
                                                 random_effects = NULL,
                                                 map = list()) {
+  clear()
+
   # Load operating model data for the current iteration
   om_input <- om_input_list[[iter_id]] # Operating model input for the current iteration
   om_output <- om_output_list[[iter_id]] # Operating model output for the current iteration
   em_input <- em_input_list[[iter_id]] # Estimation model input for the current iteration
-
-  # Clear any previous FIMS settings
-  clear()
 
   # Extract fishing fleet landings data (observed) and initialize index module
   landings <- em_input[["L.obs"]][["fleet1"]]
@@ -444,9 +443,6 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   # the input values if optimization is skipped
   report <- obj[["report"]](obj[["env"]][["last.par.best"]])
 
-
-  clear()
-
   # Return the results as a list
   return(list(
     parameters = parameters,
@@ -516,13 +512,12 @@ setup_and_run_FIMS_with_wrappers <- function(iter_id,
                                              random_effects = FALSE,
                                              modified_parameters,
                                              map = list()) {
+  clear()
+
   # Load operating model data for the current iteration
   om_input <- om_input_list[[iter_id]]
   om_output <- om_output_list[[iter_id]]
   em_input <- em_input_list[[iter_id]]
-
-  # Clear any previous FIMS settings
-  clear()
 
   data <- FIMS::FIMSFrame(data_big)
   if (tibble::is_tibble(modified_parameters)) {
@@ -552,7 +547,6 @@ setup_and_run_FIMS_with_wrappers <- function(iter_id,
 
   fit <- fit_fims(input = parameter_list, optimize = estimation_mode)
 
-  clear()
   # Return the results as a list
   return(fit)
 }
