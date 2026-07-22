@@ -140,7 +140,7 @@ struct DensityComponentBase : public fims_model_object::FIMSObject<Type> {
   std::vector<uint32_t> uncertainty_key;
 
   /** @brief Vector of lambda values to weight nll contributions. */
-  fims::Vector<Type> lambda_values = 1;
+  fims::Vector<Type> lambda_values;
 
   /** @brief Vector of dimension sizes to structure the distribution. */
   fims::Vector<size_t> dims;

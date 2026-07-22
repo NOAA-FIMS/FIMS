@@ -582,8 +582,26 @@ class DistributionsInterface : public DistributionsInterfaceBase {
     ss << "{\n";
     ss << " \"module_name\": \"density\",\n";
     ss << " \"module_id\": " << this->id_m << ",\n";
-    ss << " \"module_type\": \"generic\",\n";
-    ss << " \"input_type\" : \"" << this->input_type_m << "\",\n";
+    if(likelihood_type_m == fims_distributions::Likelihood_Kind::DATA) {
+      ss << " \"likelihood_type\" : \"data\",\n";
+    }else if(likelihood_type_m == fims_distributions::Likelihood_Kind::RANDOM_EFFECT) {
+      ss << " \"likelihood_type\" : \"random_effect\",\n";
+    }else if(likelihood_type_m == fims_distributions::Likelihood_Kind::PRIOR) {
+      ss << " \"likelihood_type\" : \"prior\",\n";
+    }else if(likelihood_type_m == fims_distributions::Likelihood_Kind::PENALTY) {
+      ss << " \"likelihood_type\" : \"penalty\",\n";
+    }else{
+      ss << " \"likelihood_type\" : \"unknown\",\n";
+    }
+    if(distribution_type_m == fims_distributions::Density_Function::NORMAL) {
+      ss << " \"distribution_type\" : \"normal\",\n";
+    }else if(distribution_type_m == fims_distributions::Density_Function::LOGNORMAL) {
+      ss << " \"distribution_type\" : \"lognormal\",\n";
+    }else if(distribution_type_m == fims_distributions::Density_Function::MULTINOMIAL) {
+      ss << " \"distribution_type\" : \"multinomial\",\n";
+    }else{
+      ss << " \"distribution_type\" : \"unknown\",\n";
+    }
     ss << " \"density_component\": {\n";
     ss << "  \"lpdf_value\": " << sanitize_val(this->lpdf_m) << ",\n";
     ss << "  \"value\":[";
@@ -654,56 +672,112 @@ class DistributionsInterface : public DistributionsInterfaceBase {
     // interface to data/parameter value
 
     std::stringstream ss;
-    distribution->input_type = this->input_type_m;
-    distribution->key.resize(this->key_m->size());
-    for (size_t i = 0; i < this->key_m->size(); i++) {
-      distribution->key[i] = this->key_m->at(i);
-    }
     distribution->id = this->id_m;
-    distribution->observed_values.resize(this->observed_values.size());
-    for (size_t i = 0; i < this->observed_values.size(); i++) {
+    distribution->likelihood_type = this->likelihood_type_m;
+    distribution->distribution_type = this->distribution_type_m;
+
+    distribution->observed_key.resize(this->observed_key_m->size());
+    for (size_t i = 0; i < this->observed_key_m->size(); i++) {
+      distribution->observed_key[i] = this->observed_key_m->at(i);
+    }
+    distribution->expected_key.resize(this->expected_key_m->size());
+    for (size_t i = 0; i < this->expected_key_m->size(); i++) {
+      distribution->expected_key[i] = this->expected_key_m->at(i);
+    }
+    distribution->uncertainty_key.resize(this->uncertainty_key_m->size());
+    for (size_t i = 0; i < this->uncertainty_key_m->size(); i++) {
+      distribution->uncertainty_key[i] = this->uncertainty_key_m->at(i);
+    }
+
+    distribution->observed_values.resize(this->observed_values_m.size());
+    for (size_t i = 0; i < this->observed_values_m.size(); i++) {
       distribution->observed_values[i] =
-          this->observed_values[i].initial_value_m;
+          this->observed_values_m[i].initial_value_m;
+      
+      if (this->observed_values_m[i].estimation_type_m.get() == "fixed_effects") {
+        ss.str("");
+        ss << "dnorm." << this->id_m << ".observed_values." << this->observed_values_m[i].id_m;
+        info->RegisterParameterName(ss.str());
+        info->RegisterParameter(distribution->observed_values[i]);
+      }else if (this->observed_values_m[i].estimation_type_m.get() == "random_effects") {
+        //TODO: Need to extract distribution type as string to replace dnorm in name
+        ss.str("");
+        ss << "dnorm." << this->id_m << ".observed_values." << this->observed_values_m[i].id_m;
+        info->RegisterRandomEffectName(ss.str());
+        info->RegisterRandomEffect(distribution->observed_values[i]);
+      }
     }
-    // set relative info
-    distribution->expected_values.resize(this->expected_values.size());
-    for (size_t i = 0; i < this->expected_values.size(); i++) {
+    info->variable_map[this->observed_values_m.id_m] = &(distribution)->observed_values;
+
+    distribution->expected_values.resize(this->expected_values_m.size());
+    for (size_t i = 0; i < this->expected_values_m.size(); i++) {
       distribution->expected_values[i] =
-          this->expected_values[i].initial_value_m;
-    }
-    distribution->log_sd.resize(this->log_sd.size());
-    for (size_t i = 0; i < this->log_sd.size(); i++) {
-      distribution->log_sd[i] = this->log_sd[i].initial_value_m;
-      if (this->log_sd[i].estimation_type_m.get() == "fixed_effects") {
+          this->expected_values_m[i].initial_value_m;
+          
+      if (this->expected_values_m[i].estimation_type_m.get() == "fixed_effects") {
         ss.str("");
-        ss << "dnorm." << this->id_m << ".log_sd." << this->log_sd[i].id_m;
+        ss << "dnorm." << this->id_m << ".expected_values." << this->expected_values_m[i].id_m;
         info->RegisterParameterName(ss.str());
-        info->RegisterParameter(distribution->log_sd[i]);
-      }
-      if (this->log_sd[i].estimation_type_m.get() == "random_effects") {
-        FIMS_ERROR_LOG("standard deviations cannot be set to random effects");
-      }
-    }
-    info->variable_map[this->log_sd.id_m] = &(distribution)->log_sd;
-
-    distribution->use_mean = this->use_mean_m.get();
-    distribution->expected_mean.resize(this->expected_mean.size());
-    for (size_t i = 0; i < this->expected_mean.size(); i++) {
-      distribution->expected_mean[i] = this->expected_mean[i].initial_value_m;
-      if (this->expected_mean[i].estimation_type_m.get() == "fixed_effects") {
+        info->RegisterParameter(distribution->expected_values[i]);
+      }else if (this->expected_values_m[i].estimation_type_m.get() == "random_effects") {
+        //TODO: Need to extract distribution type as string to replace dnorm in name
         ss.str("");
-        ss << "dnorm." << this->id_m << ".expected_mean."
-           << this->expected_mean[i].id_m;
-        info->RegisterParameterName(ss.str());
-        info->RegisterParameter(distribution->expected_mean[i]);
-      }
-      if (this->expected_mean[i].estimation_type_m.get() == "random_effects") {
-        FIMS_ERROR_LOG("expected_mean cannot be set to random effects");
+        ss << "dnorm." << this->id_m << ".expected_values." << this->expected_values_m[i].id_m;
+        info->RegisterRandomEffectName(ss.str());
+        info->RegisterRandomEffect(distribution->expected_values[i]);
       }
     }
-    info->variable_map[this->expected_mean.id_m] =
-        &(distribution)->expected_mean;
+    info->variable_map[this->expected_values_m.id_m] = &(distribution)->expected_values;
 
+    distribution->uncertainty_values.resize(this->uncertainty_values_m.size());
+    for (size_t i = 0; i < this->uncertainty_values_m.size(); i++) {
+      distribution->uncertainty_values[i] =
+          this->uncertainty_values_m[i].initial_value_m;
+          
+      if (this->uncertainty_values_m[i].estimation_type_m.get() == "fixed_effects") {
+        ss.str("");
+        ss << "dnorm." << this->id_m << ".uncertainty_values." << this->uncertainty_values_m[i].id_m;
+        info->RegisterParameterName(ss.str());
+        info->RegisterParameter(distribution->uncertainty_values[i]);
+      }else if (this->uncertainty_values_m[i].estimation_type_m.get() == "random_effects") {
+         FIMS_ERROR_LOG("uncertainty values cannot be set to random effects");
+      }
+    }
+    info->variable_map[this->uncertainty_values_m.id_m] = &(distribution)->uncertainty_values;
+
+    distribution->observed_subvector.resize(this->observed_subvector_m.size());
+    for (size_t i = 0; i < this->observed_subvector_m.size(); i++) {
+      distribution->observed_subvector[i] =
+          this->observed_subvector_m[i].initial_value_m;
+    }
+    distribution->expected_subvector.resize(this->expected_subvector_m.size());
+    for (size_t i = 0; i < this->expected_subvector_m.size(); i++) {
+      distribution->expected_subvector[i] =
+          this->expected_subvector_m[i].initial_value_m;
+    }
+    distribution->uncertainty_subvector.resize(this->uncertainty_subvector_m.size());
+    for (size_t i = 0; i < this->uncertainty_subvector_m.size(); i++) {
+      distribution->uncertainty_subvector[i] =
+          this->uncertainty_subvector_m[i].initial_value_m;
+    }
+    
+    if(this->lambda_values_m.size() > 0) {
+      distribution->lambda_values.resize(this->lambda_values_m.size());
+      for (size_t i = 0; i < this->lambda_values_m.size(); i++) {
+        distribution->lambda_values[i] = this->lambda_values_m[i];
+      }
+    } else {
+      distribution->lambda_values.resize(1);
+      distribution->lambda_values[0] = 1.0;
+    }
+    
+    if(this->dims_m.size() > 0) {
+      distribution->dims.resize(this->dims_m.size());
+      for (size_t i = 0; i < this->dims_m.size(); i++) {
+        distribution->dims[i] = this->dims_m[i];
+      }
+    }
+    
     info->density_components[distribution->id] = distribution;
 
     return true;
