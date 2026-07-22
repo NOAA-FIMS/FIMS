@@ -243,7 +243,7 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
     pit = PopulationInterfaceBase::live_objects.find(id);
     if (pit != PopulationInterfaceBase::live_objects.end()) {
       std::shared_ptr<PopulationInterfaceBase> &pop = (*pit).second;
-      pop->initialize_catch_at_age.set(true);
+      pop->initialize_catch_at_age = true;
     } else {
       FIMS_ERROR_LOG("Population with id " + fims::to_string(id) +
                      " not found.");
@@ -363,8 +363,8 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
       ss << " \"type\": \"vector\",\n";
       ss << " \"dimensionality\": {\n";
       ss << "  \"header\": [" << "\"n_years\", \"n_ages\"" << "],\n";
-      ss << "  \"dimensions\": [" << population_interface->n_years.get() << ", "
-         << population_interface->n_ages.get() << "]\n},\n";
+      ss << "  \"dimensions\": [" << population_interface->n_years << ", "
+         << population_interface->n_ages << "]\n},\n";
       ss << " \"values\": " << population_interface->log_M << "\n\n";
       ss << "},\n";
 
@@ -378,7 +378,7 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
       ss << " \"type\": \"vector\",\n";
       ss << " \"dimensionality\": {\n";
       ss << "  \"header\": [" << "\"n_years\"" << "],\n";
-      ss << "  \"dimensions\": [" << population_interface->n_years.get()
+      ss << "  \"dimensions\": [" << population_interface->n_years
          << "]\n},\n";
       ss << " \"values\": " << population_interface->log_f_multiplier << "\n\n";
       ss << "},\n";
@@ -394,7 +394,7 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
       ss << " \"type\": \"vector\",\n";
       ss << " \"dimensionality\": {\n";
       ss << "  \"header\": [" << "\"n_years\"" << "],\n";
-      ss << "  \"dimensions\": [" << (population_interface->n_years.get() + 1)
+      ss << "  \"dimensions\": [" << (population_interface->n_years + 1)
          << "]\n},\n";
       ss << " \"values\": " << population_interface->spawning_biomass_ratio
          << "\n\n";
@@ -409,7 +409,7 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
       ss << "  \"type\": \"vector\",\n";
       ss << " \"dimensionality\": {\n";
       ss << "  \"header\": [" << "\"n_ages\"" << "],\n";
-      ss << "  \"dimensions\": [" << population_interface->n_ages.get()
+      ss << "  \"dimensions\": [" << population_interface->n_ages
          << "]\n},\n";
 
       ss << "  \"values\":" << population_interface->log_init_naa << "\n";
@@ -614,9 +614,9 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
       ss << " \"module_name\": \"Fleet\",\n";
       ss << " \"fleet\": \"" << fleet_interface->name << "\",\n";
       ss << " \"module_id\": " << fleet_interface->id << ",\n";
-      ss << " \"n_ages\": " << fleet_interface->n_ages.get() << ",\n";
-      ss << " \"n_years\": " << fleet_interface->n_years.get() << ",\n";
-      ss << " \"n_lengths\": " << fleet_interface->n_lengths.get() << ",\n";
+      ss << " \"n_ages\": " << fleet_interface->n_ages << ",\n";
+      ss << " \"n_years\": " << fleet_interface->n_years << ",\n";
+      ss << " \"n_lengths\": " << fleet_interface->n_lengths << ",\n";
       ss << "\"data_ids\" : [\n";
       ss << "{\"agecomp\": " << fleet_interface->GetObservedAgeCompDataID()
          << "},\n";
@@ -638,7 +638,7 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
       ss << " \"type\": \"vector\",\n";
       ss << " \"dimensionality\": {\n";
       ss << "  \"header\": [\"" << "n_years" << "\"],\n";
-      ss << "  \"dimensions\": [" << fleet_interface->n_years.get()
+      ss << "  \"dimensions\": [" << fleet_interface->n_years
          << "]\n},\n";
       ss << " \"values\": " << fleet_interface->log_Fmort << "},\n";
 
@@ -692,9 +692,9 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
           std::dynamic_pointer_cast<PopulationInterface>(
               PopulationInterfaceBase::live_objects[*pit]);
       if (population_interface) {
-        recruitment_ids.insert(population_interface->recruitment_id.get());
-        growth_ids.insert(population_interface->growth_id.get());
-        maturity_ids.insert(population_interface->maturity_id.get());
+        recruitment_ids.insert(population_interface->recruitment_id);
+        growth_ids.insert(population_interface->growth_id);
+        maturity_ids.insert(population_interface->maturity_id);
 
         for (fids = population_interface->fleet_ids->begin();
              fids != population_interface->fleet_ids->end(); fids++) {
@@ -1001,152 +1001,152 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
       std::stringstream ss;
 
       derived_quantities["total_catch_weight"] =
-          fims::Vector<Type>(population_interface->n_years.get());
+          fims::Vector<Type>(population_interface->n_years);
 
       derived_quantities_dim_info["total_catch_weight"] =
           fims_popdy::DimensionInfo(
               "total_catch_weight",
-              fims::Vector<int>{(int)population_interface->n_years.get()},
+              fims::Vector<int>{(int)population_interface->n_years},
               fims::Vector<std::string>{"n_years"});
       info->variable_map[population_interface->total_catch_weight.id_m] =
           &derived_quantities["total_catch_weight"];
 
       derived_quantities["total_catch_numbers"] =
-          fims::Vector<Type>(population_interface->n_years.get());
+          fims::Vector<Type>(population_interface->n_years);
 
       derived_quantities_dim_info["total_catch_numbers"] =
           fims_popdy::DimensionInfo(
               "total_catch_numbers",
-              fims::Vector<int>{population_interface->n_years.get()},
+              fims::Vector<int>{population_interface->n_years},
               fims::Vector<std::string>{"n_years"});
       info->variable_map[population_interface->total_catch_numbers.id_m] =
           &derived_quantities["total_catch_numbers"];
 
       derived_quantities["mortality_F"] =
-          fims::Vector<Type>(population_interface->n_years.get() *
-                             population_interface->n_ages.get());
+          fims::Vector<Type>(population_interface->n_years *
+                             population_interface->n_ages);
       derived_quantities_dim_info["mortality_F"] = fims_popdy::DimensionInfo(
           "mortality_F",
-          fims::Vector<int>{population_interface->n_years.get(),
-                            population_interface->n_ages.get()},
+          fims::Vector<int>{population_interface->n_years,
+                            population_interface->n_ages},
           fims::Vector<std::string>{"n_years", "n_ages"});
       info->variable_map[population_interface->mortality_F.id_m] =
           &derived_quantities["mortality_F"];
 
       derived_quantities["mortality_M"] =
-          fims::Vector<Type>(population_interface->n_years.get() *
-                             population_interface->n_ages.get());
+          fims::Vector<Type>(population_interface->n_years *
+                             population_interface->n_ages);
       derived_quantities_dim_info["mortality_M"] = fims_popdy::DimensionInfo(
           "mortality_M",
-          fims::Vector<int>{population_interface->n_years.get(),
-                            population_interface->n_ages.get()},
+          fims::Vector<int>{population_interface->n_years,
+                            population_interface->n_ages},
           fims::Vector<std::string>{"n_years", "n_ages"});
       info->variable_map[population_interface->mortality_M.id_m] =
           &derived_quantities["mortality_M"];
 
       derived_quantities["mortality_Z"] =
-          fims::Vector<Type>(population_interface->n_years.get() *
-                             population_interface->n_ages.get());
+          fims::Vector<Type>(population_interface->n_years *
+                             population_interface->n_ages);
       derived_quantities_dim_info["mortality_Z"] = fims_popdy::DimensionInfo(
           "mortality_Z",
-          fims::Vector<int>{population_interface->n_years.get(),
-                            population_interface->n_ages.get()},
+          fims::Vector<int>{population_interface->n_years,
+                            population_interface->n_ages},
           fims::Vector<std::string>{"n_years", "n_ages"});
       info->variable_map[population_interface->mortality_Z.id_m] =
           &derived_quantities["mortality_Z"];
 
       derived_quantities["numbers_at_age"] =
-          fims::Vector<Type>((population_interface->n_years.get() + 1) *
-                             population_interface->n_ages.get());
+          fims::Vector<Type>((population_interface->n_years + 1) *
+                             population_interface->n_ages);
       derived_quantities_dim_info["numbers_at_age"] = fims_popdy::DimensionInfo(
           "numbers_at_age",
-          fims::Vector<int>{(population_interface->n_years.get() + 1),
-                            population_interface->n_ages.get()},
+          fims::Vector<int>{(population_interface->n_years + 1),
+                            population_interface->n_ages},
           fims::Vector<std::string>{"n_years+1", "n_ages"});
       info->variable_map[population_interface->numbers_at_age.id_m] =
           &derived_quantities["numbers_at_age"];
 
       derived_quantities["unfished_numbers_at_age"] =
-          fims::Vector<Type>((population_interface->n_years.get() + 1) *
-                             population_interface->n_ages.get());
+          fims::Vector<Type>((population_interface->n_years + 1) *
+                             population_interface->n_ages);
       derived_quantities_dim_info["unfished_numbers_at_age"] =
           fims_popdy::DimensionInfo(
               "unfished_numbers_at_age",
-              fims::Vector<int>{(population_interface->n_years.get() + 1),
-                                population_interface->n_ages.get()},
+              fims::Vector<int>{(population_interface->n_years + 1),
+                                population_interface->n_ages},
               fims::Vector<std::string>{"n_years+1", "n_ages"});
       info->variable_map[population_interface->unfished_numbers_at_age.id_m] =
           &derived_quantities["unfished_numbers_at_age"];
 
       derived_quantities["biomass"] =
-          fims::Vector<Type>((population_interface->n_years.get() + 1));
+          fims::Vector<Type>((population_interface->n_years + 1));
       derived_quantities_dim_info["biomass"] = fims_popdy::DimensionInfo(
           "biomass",
-          fims::Vector<int>{(population_interface->n_years.get() + 1)},
+          fims::Vector<int>{(population_interface->n_years + 1)},
           fims::Vector<std::string>{"n_years+1"});
       info->variable_map[population_interface->biomass.id_m] =
           &derived_quantities["biomass"];
 
       derived_quantities["spawning_biomass"] =
-          fims::Vector<Type>((population_interface->n_years.get() + 1));
+          fims::Vector<Type>((population_interface->n_years + 1));
       derived_quantities_dim_info["spawning_biomass"] =
           fims_popdy::DimensionInfo(
               "spawning_biomass",
-              fims::Vector<int>{(population_interface->n_years.get() + 1)},
+              fims::Vector<int>{(population_interface->n_years + 1)},
               fims::Vector<std::string>{"n_years+1"});
       info->variable_map[population_interface->spawning_biomass.id_m] =
           &derived_quantities["spawning_biomass"];
 
       derived_quantities["unfished_biomass"] =
-          fims::Vector<Type>((population_interface->n_years.get() + 1));
+          fims::Vector<Type>((population_interface->n_years + 1));
       derived_quantities_dim_info["unfished_biomass"] =
           fims_popdy::DimensionInfo(
               "unfished_biomass",
-              fims::Vector<int>{(population_interface->n_years.get() + 1)},
+              fims::Vector<int>{(population_interface->n_years + 1)},
               fims::Vector<std::string>{"n_years+1"});
       info->variable_map[population_interface->unfished_biomass.id_m] =
           &derived_quantities["unfished_biomass"];
 
       derived_quantities["unfished_spawning_biomass"] =
-          fims::Vector<Type>((population_interface->n_years.get() + 1));
+          fims::Vector<Type>((population_interface->n_years + 1));
       derived_quantities_dim_info["unfished_spawning_biomass"] =
           fims_popdy::DimensionInfo(
               "unfished_spawning_biomass",
-              fims::Vector<int>{(population_interface->n_years.get() + 1)},
+              fims::Vector<int>{(population_interface->n_years + 1)},
               fims::Vector<std::string>{"n_years+1"});
       info->variable_map[population_interface->unfished_spawning_biomass.id_m] =
           &derived_quantities["unfished_spawning_biomass"];
 
       derived_quantities["proportion_mature_at_age"] =
-          fims::Vector<Type>((population_interface->n_years.get() + 1) *
-                             population_interface->n_ages.get());
+          fims::Vector<Type>((population_interface->n_years + 1) *
+                             population_interface->n_ages);
       derived_quantities_dim_info["proportion_mature_at_age"] =
           fims_popdy::DimensionInfo(
               "proportion_mature_at_age",
-              fims::Vector<int>{(population_interface->n_years.get() + 1),
-                                population_interface->n_ages.get()},
+              fims::Vector<int>{(population_interface->n_years + 1),
+                                population_interface->n_ages},
               fims::Vector<std::string>{"n_years+1", "n_ages"});
       info->variable_map[population_interface->proportion_mature_at_age.id_m] =
           &derived_quantities["proportion_mature_at_age"];
 
       derived_quantities["expected_recruitment"] =
-          fims::Vector<Type>((population_interface->n_years.get() + 1));
+          fims::Vector<Type>((population_interface->n_years + 1));
       derived_quantities_dim_info["expected_recruitment"] =
           fims_popdy::DimensionInfo(
               "expected_recruitment",
-              fims::Vector<int>{(population_interface->n_years.get() + 1)},
+              fims::Vector<int>{(population_interface->n_years + 1)},
               fims::Vector<std::string>{"n_years+1"});
       info->variable_map[population_interface->expected_recruitment.id_m] =
           &derived_quantities["expected_recruitment"];
 
       derived_quantities["sum_selectivity"] =
-          fims::Vector<Type>(population_interface->n_years.get() *
-                             population_interface->n_ages.get());
+          fims::Vector<Type>(population_interface->n_years *
+                             population_interface->n_ages);
       derived_quantities_dim_info["sum_selectivity"] =
           fims_popdy::DimensionInfo(
               "sum_selectivity",
-              fims::Vector<int>{population_interface->n_years.get(),
-                                population_interface->n_ages.get()},
+              fims::Vector<int>{population_interface->n_years,
+                                population_interface->n_ages},
               fims::Vector<std::string>{"n_years", "n_ages"});
       info->variable_map[population_interface->sum_selectivity.id_m] =
           &derived_quantities["sum_selectivity"];
@@ -1186,180 +1186,186 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
       // initialize derive quantities
       // catch
       derived_quantities["catch_numbers_at_age"] = fims::Vector<Type>(
-          fleet_interface->n_years.get() * fleet_interface->n_ages.get());
+          fleet_interface->n_years * fleet_interface->n_ages);
       derived_quantities_dim_info["catch_numbers_at_age"] =
           fims_popdy::DimensionInfo(
               "catch_numbers_at_age",
-              fims::Vector<int>{(fleet_interface->n_years.get()),
-                                fleet_interface->n_ages.get()},
+              fims::Vector<int>{(fleet_interface->n_years),
+                                fleet_interface->n_ages},
               fims::Vector<std::string>{"n_years", "n_ages"});
       info->variable_map[fleet_interface->catch_numbers_at_age.id_m] =
           &derived_quantities["catch_numbers_at_age"];
 
       derived_quantities["catch_weight_at_age"] = fims::Vector<Type>(
-          fleet_interface->n_years.get() * fleet_interface->n_ages.get());
+          fleet_interface->n_years * fleet_interface->n_ages);
       derived_quantities_dim_info["catch_weight_at_age"] =
           fims_popdy::DimensionInfo(
               "catch_weight_at_age",
-              fims::Vector<int>{(fleet_interface->n_years.get()),
-                                fleet_interface->n_ages.get()},
+              fims::Vector<int>{(fleet_interface->n_years),
+                                fleet_interface->n_ages},
               fims::Vector<std::string>{"n_years", "n_ages"});
       info->variable_map[fleet_interface->catch_weight_at_age.id_m] =
           &derived_quantities["catch_weight_at_age"];
 
       derived_quantities["catch_numbers_at_length"] = fims::Vector<Type>(
-          fleet_interface->n_years.get() * fleet_interface->n_lengths.get());
+          fleet_interface->n_years * fleet_interface->n_lengths);
       derived_quantities_dim_info["catch_numbers_at_length"] =
           fims_popdy::DimensionInfo(
               "catch_numbers_at_length",
-              fims::Vector<int>{(fleet_interface->n_years.get()),
-                                fleet_interface->n_lengths.get()},
+              fims::Vector<int>{(fleet_interface->n_years),
+                                fleet_interface->n_lengths},
               fims::Vector<std::string>{"n_years", "n_lengths"});
       info->variable_map[fleet_interface->catch_numbers_at_length.id_m] =
           &derived_quantities["catch_numbers_at_length"];
 
       derived_quantities["catch_weight"] =
-          fims::Vector<Type>(fleet_interface->n_years.get());
-      derived_quantities_dim_info["catch_weight"] = fims_popdy::DimensionInfo(
-          "catch_weight", fims::Vector<int>{(fleet_interface->n_years.get())},
-          fims::Vector<std::string>{"n_years"});
+          fims::Vector<Type>(fleet_interface->n_years);
+      derived_quantities_dim_info["catch_weight"] =
+          fims_popdy::DimensionInfo(
+              "catch_weight",
+              fims::Vector<int>{(fleet_interface->n_years)},
+              fims::Vector<std::string>{"n_years"});
       info->variable_map[fleet_interface->catch_weight.id_m] =
           &derived_quantities["catch_weight"];
 
       derived_quantities["catch_numbers"] =
-          fims::Vector<Type>(fleet_interface->n_years.get());
-      derived_quantities_dim_info["catch_numbers"] = fims_popdy::DimensionInfo(
-          "catch_numbers", fims::Vector<int>{(fleet_interface->n_years.get())},
-          fims::Vector<std::string>{"n_years"});
+          fims::Vector<Type>(fleet_interface->n_years);
+      derived_quantities_dim_info["catch_numbers"] =
+          fims_popdy::DimensionInfo(
+              "catch_numbers",
+              fims::Vector<int>{(fleet_interface->n_years)},
+              fims::Vector<std::string>{"n_years"});
       info->variable_map[fleet_interface->catch_numbers.id_m] =
           &derived_quantities["catch_numbers"];
 
       derived_quantities["catch_expected"] =
-          fims::Vector<Type>(fleet_interface->n_years.get());
-      derived_quantities_dim_info["catch_expected"] = fims_popdy::DimensionInfo(
-          "catch_expected", fims::Vector<int>{(fleet_interface->n_years.get())},
-          fims::Vector<std::string>{"n_years"});
+          fims::Vector<Type>(fleet_interface->n_years);
+      derived_quantities_dim_info["catch_expected"] =
+          fims_popdy::DimensionInfo(
+              "catch_expected",
+              fims::Vector<int>{(fleet_interface->n_years)},
+              fims::Vector<std::string>{"n_years"});
       info->variable_map[fleet_interface->catch_expected.id_m] =
           &derived_quantities["catch_expected"];
 
       derived_quantities["log_catch_expected"] =
-          fims::Vector<Type>(fleet_interface->n_years.get());
+          fims::Vector<Type>(fleet_interface->n_years);
       derived_quantities_dim_info["log_catch_expected"] =
           fims_popdy::DimensionInfo(
               "log_catch_expected",
-              fims::Vector<int>{(fleet_interface->n_years.get())},
+              fims::Vector<int>{(fleet_interface->n_years)},
               fims::Vector<std::string>{"n_years"});
       info->variable_map[fleet_interface->log_catch_expected.id_m] =
           &derived_quantities["log_catch_expected"];
 
       derived_quantities["agecomp_proportion"] = fims::Vector<Type>(
-          fleet_interface->n_years.get() * fleet_interface->n_ages.get());
+          fleet_interface->n_years * fleet_interface->n_ages);
       derived_quantities_dim_info["agecomp_proportion"] =
           fims_popdy::DimensionInfo(
               "agecomp_proportion",
-              fims::Vector<int>{(fleet_interface->n_years.get()),
-                                fleet_interface->n_ages.get()},
+              fims::Vector<int>{(fleet_interface->n_years),
+                                fleet_interface->n_ages},
               fims::Vector<std::string>{"n_years", "n_ages"});
       info->variable_map[fleet_interface->agecomp_proportion.id_m] =
           &derived_quantities["agecomp_proportion"];
 
       derived_quantities["lengthcomp_proportion"] = fims::Vector<Type>(
-          fleet_interface->n_years.get() * fleet_interface->n_lengths.get());
+          fleet_interface->n_years * fleet_interface->n_lengths);
       derived_quantities_dim_info["lengthcomp_proportion"] =
           fims_popdy::DimensionInfo(
               "lengthcomp_proportion",
-              fims::Vector<int>{(fleet_interface->n_years.get()),
-                                fleet_interface->n_lengths.get()},
+              fims::Vector<int>{(fleet_interface->n_years),
+                                fleet_interface->n_lengths},
               fims::Vector<std::string>{"n_years", "n_lengths"});
       info->variable_map[fleet_interface->lengthcomp_proportion.id_m] =
           &derived_quantities["lengthcomp_proportion"];
 
       // index
       derived_quantities["index_numbers_at_age"] = fims::Vector<Type>(
-          fleet_interface->n_years.get() * fleet_interface->n_ages.get());
+          fleet_interface->n_years * fleet_interface->n_ages);
       derived_quantities_dim_info["index_numbers_at_age"] =
           fims_popdy::DimensionInfo(
               "index_numbers_at_age",
-              fims::Vector<int>{(fleet_interface->n_years.get()),
-                                fleet_interface->n_ages.get()},
+              fims::Vector<int>{(fleet_interface->n_years),
+                                fleet_interface->n_ages},
               fims::Vector<std::string>{"n_years", "n_ages"});
       info->variable_map[fleet_interface->index_numbers_at_age.id_m] =
           &derived_quantities["index_numbers_at_age"];
 
       derived_quantities["index_weight_at_age"] = fims::Vector<Type>(
-          fleet_interface->n_years.get() * fleet_interface->n_ages.get());
+          fleet_interface->n_years * fleet_interface->n_ages);
       derived_quantities_dim_info["index_weight_at_age"] =
           fims_popdy::DimensionInfo(
               "index_weight_at_age",
-              fims::Vector<int>{(fleet_interface->n_years.get()),
-                                fleet_interface->n_ages.get()},
+              fims::Vector<int>{(fleet_interface->n_years),
+                                fleet_interface->n_ages},
               fims::Vector<std::string>{"n_years", "n_ages"});
       info->variable_map[fleet_interface->index_weight_at_age.id_m] =
           &derived_quantities["index_weight_at_age"];
 
       derived_quantities["index_numbers_at_length"] = fims::Vector<Type>(
-          fleet_interface->n_years.get() * fleet_interface->n_lengths.get());
+          fleet_interface->n_years * fleet_interface->n_lengths);
       derived_quantities_dim_info["index_numbers_at_length"] =
           fims_popdy::DimensionInfo(
               "index_numbers_at_length",
-              fims::Vector<int>{(fleet_interface->n_years.get()),
-                                fleet_interface->n_lengths.get()},
+              fims::Vector<int>{(fleet_interface->n_years),
+                                fleet_interface->n_lengths},
               fims::Vector<std::string>{"n_years", "n_lengths"});
       info->variable_map[fleet_interface->index_numbers_at_length.id_m] =
           &derived_quantities["index_numbers_at_length"];
 
       derived_quantities["index_weight"] =
-          fims::Vector<Type>(fleet_interface->n_years.get());
+          fims::Vector<Type>(fleet_interface->n_years);
       derived_quantities_dim_info["index_weight"] = fims_popdy::DimensionInfo(
-          "index_weight", fims::Vector<int>{(fleet_interface->n_years.get())},
+          "index_weight", fims::Vector<int>{(fleet_interface->n_years)},
           fims::Vector<std::string>{"n_years"});
       info->variable_map[fleet_interface->index_weight.id_m] =
           &derived_quantities["index_weight"];
 
       derived_quantities["index_numbers"] =
-          fims::Vector<Type>(fleet_interface->n_years.get());
+          fims::Vector<Type>(fleet_interface->n_years);
       derived_quantities_dim_info["index_numbers"] = fims_popdy::DimensionInfo(
-          "index_numbers", fims::Vector<int>{(fleet_interface->n_years.get())},
+          "index_numbers", fims::Vector<int>{(fleet_interface->n_years)},
           fims::Vector<std::string>{"n_years"});
       info->variable_map[fleet_interface->index_numbers.id_m] =
           &derived_quantities["index_numbers"];
 
       derived_quantities["index_expected"] =
-          fims::Vector<Type>(fleet_interface->n_years.get());
+          fims::Vector<Type>(fleet_interface->n_years);
       derived_quantities_dim_info["index_expected"] = fims_popdy::DimensionInfo(
-          "index_expected", fims::Vector<int>{(fleet_interface->n_years.get())},
+          "index_expected", fims::Vector<int>{(fleet_interface->n_years)},
           fims::Vector<std::string>{"n_years"});
       info->variable_map[fleet_interface->index_expected.id_m] =
           &derived_quantities["index_expected"];
 
       derived_quantities["log_index_expected"] =
-          fims::Vector<Type>(fleet_interface->n_years.get());
+          fims::Vector<Type>(fleet_interface->n_years);
       derived_quantities_dim_info["log_index_expected"] =
           fims_popdy::DimensionInfo(
               "log_index_expected",
-              fims::Vector<int>{(fleet_interface->n_years.get())},
+              fims::Vector<int>{(fleet_interface->n_years)},
               fims::Vector<std::string>{"n_years"});
       info->variable_map[fleet_interface->log_index_expected.id_m] =
           &derived_quantities["log_index_expected"];
 
       derived_quantities["agecomp_expected"] = fims::Vector<Type>(
-          fleet_interface->n_years.get() * fleet_interface->n_ages.get());
+          fleet_interface->n_years * fleet_interface->n_ages);
       derived_quantities_dim_info["agecomp_expected"] =
           fims_popdy::DimensionInfo(
               "agecomp_expected",
-              fims::Vector<int>{(fleet_interface->n_years.get()),
-                                (fleet_interface->n_ages.get())},
+              fims::Vector<int>{(fleet_interface->n_years),
+                                (fleet_interface->n_ages)},
               fims::Vector<std::string>{"n_years", "n_ages"});
       info->variable_map[fleet_interface->agecomp_expected.id_m] =
           &derived_quantities["agecomp_expected"];
 
       derived_quantities["lengthcomp_expected"] = fims::Vector<Type>(
-          fleet_interface->n_years.get() * fleet_interface->n_lengths.get());
+          fleet_interface->n_years * fleet_interface->n_lengths);
       derived_quantities_dim_info["lengthcomp_expected"] =
           fims_popdy::DimensionInfo(
               "lengthcomp_expected",
-              fims::Vector<int>{(fleet_interface->n_years.get()),
-                                (fleet_interface->n_lengths.get())},
+              fims::Vector<int>{(fleet_interface->n_years),
+                                (fleet_interface->n_lengths)},
               fims::Vector<std::string>{"n_years", "n_lengths"});
       info->variable_map[fleet_interface->lengthcomp_expected.id_m] =
           &derived_quantities["lengthcomp_expected"];
