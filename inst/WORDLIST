@@ -48,7 +48,9 @@ Doering
 dotdash
 dontrun
 dplyr
+DSEM
 DTMB
+Eigen
 emph
 endcond
 envir
@@ -72,6 +74,7 @@ geeksforgeeks
 ggplot
 ggtitle
 GMACS
+GMRF
 googletest
 gtest
 gtests
@@ -165,6 +168,7 @@ QNXNTO
 qobj
 rapidjson
 Rbuildignore
+RCEATTLE
 Rcerr
 rchunk
 rcmdcheck
@@ -230,6 +234,7 @@ unif
 UNLEN
 unserialization
 usethis
+Vinv
 Venzon
 viridis
 vmit

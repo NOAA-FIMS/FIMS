@@ -164,6 +164,7 @@ class Information {
     this->random_effects_names.clear();
     this->random_effects_parameters.clear();
     this->selectivity_models.clear();
+    this->dsem_builders.clear();
     this->models_map.clear();
     this->n_years = 0;
     this->n_ages = 0;
@@ -247,6 +248,7 @@ class Information {
        << this->recruitment_process_models.size() << std::endl;
     ss << "selectivity_models: " << this->selectivity_models.size()
        << std::endl;
+    ss << "dsem_builders: " << this->dsem_builders.size() << std::endl;
     ss << "models_map: " << this->models_map.size() << std::endl;
     ss << "n_years: " << this->n_years << std::endl;
     ss << "n_ages: " << this->n_ages << std::endl;
@@ -332,7 +334,7 @@ class Information {
     }
   }
 
-  /**
+/**
    * @brief Loop over distributions and set links to distribution x value if
    * distribution is a random effects type.
    */
@@ -355,11 +357,11 @@ class Information {
           d->re_expected_values = (*vmit).second;
         } else {
           d->re_expected_values = &d->expected_values;
-        }
-        FIMS_INFO_LOG("Random effect size for distribution " +
+                }
+                  FIMS_INFO_LOG("Random effect size for distribution " +
                       fims::to_string(d->id) +
                       " is: " + fims::to_string(d->observed_values.size()));
-      }
+      }        
     }
   }
 
