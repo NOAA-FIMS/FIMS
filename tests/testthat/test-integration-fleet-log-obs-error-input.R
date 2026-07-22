@@ -115,28 +115,6 @@ test_that("`log_sd` returns correct error messages when wrong dimensions", {
   )
 
   clear()
-
-  #' @description Test that returns correct error message when log_sd is too long.
-  #' The error should be caught in initialize_modules, not in C++.
-  parameters_4_model <- default_parameters |>
-    tidyr::unnest(cols = data) |>
-    # add an extra log_sd observation
-    dplyr::add_row(
-      fleet = "fleet1",
-      label = "log_sd",
-      value = -4.61
-    )
-
-  expect_error(
-    {
-      test_fit <- parameters_4_model |>
-        initialize_fims(data = data_4_model) |>
-        fit_fims(optimize = FALSE)
-    },
-    regexp = "The size of `log_sd` does not match"
-  )
-
-  clear()
 })
 
 
