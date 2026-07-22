@@ -777,19 +777,6 @@ initialize_fims <- function(parameters, data) {
       linked_ids = fleet_module_ids
     )
 
-    fleet_sd_input <- parameters |>
-      dplyr::filter(.data$fleet == .env$fleets[i] & .data$label == "log_sd") |>
-      dplyr::mutate(
-        label = "sd",
-        value = exp(.data$value)
-      )
-
-    if (length(fleet_sd_input) == 0) {
-      cli::cli_abort(c(
-        "Missing required inputs for `log_sd` in fleet `{fleet}`."
-      ))
-    }
-
     if ("index" %in% fleet_types &&
       "Index" %in% data_distribution_names_for_fleet_i) {
       fleet_index_distribution[[i]] <- initialize_data_distribution(
@@ -797,7 +784,16 @@ initialize_fims <- function(parameters, data) {
         # TODO: need to update family and match options from the distribution
         # column from the parameters tibble
         family = lognormal(link = "log"),
-        sd = fleet_sd_input,
+        sd = parameters |>
+          dplyr::filter(
+            .data$fleet == .env$fleets[i] &
+            .data$label == "log_sd" &
+            .data$module_type == "Index"
+          ) |>
+          dplyr::mutate(
+            label = "sd",
+            value = exp(.data$value)
+          ),
         data_type = "index"
       )
     }
@@ -809,7 +805,16 @@ initialize_fims <- function(parameters, data) {
         # TODO: need to update family and match options from the distribution
         # column from the parameters tibble
         family = lognormal(link = "log"),
-        sd = fleet_sd_input,
+        sd = parameters |>
+          dplyr::filter(
+            .data$fleet == .env$fleets[i] &
+            .data$label == "log_sd" &
+            .data$module_type == "Landings"
+          ) |>
+          dplyr::mutate(
+            label = "sd",
+            value = exp(.data$value)
+          ),
         data_type = "landings"
       )
     }
