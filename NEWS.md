@@ -1,3 +1,17 @@
+# FIMS 0.9.4
+
+* Adds likelihood profiles and retrospective diagnostic tools
+* Adds priors on derived quantities
+* Adds tidy output with yardstick
+* Uses .data and .env for dplyr instead of globalVariable()
+* Uses translational units to decrease RAM during compile
+* Expose proportion_female as a scalar that can be set
+* Fixes sanitizing values for JSON
+* Fixes naming of phi_0
+* Fixes inability to initialize a fleet with index and catch
+* Breaking change: "name" to "fleet" in FIMSFrame
+* Breaking change: "fleet_name" to "fleet" in output from `get_estimates()`
+
 # FIMS 0.9.3
 
 * Reduce verbose FIMS logging and refine messages
