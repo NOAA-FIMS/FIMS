@@ -30,6 +30,9 @@ test_that("rcpp recruitment interface works with correct inputs", {
     object = recruitment$get_id(),
     expected = 1
   )
+  #' @description Test that the scalar recruitment year count can be assigned directly through the Rcpp field binding.
+  recruitment$n_years <- 4
+  expect_equal(recruitment$n_years, 4)
   #' @description Test that the logit_steep value is 0.78845736.
   expect_equal(
     object = recruitment$logit_steep[1]$value,
