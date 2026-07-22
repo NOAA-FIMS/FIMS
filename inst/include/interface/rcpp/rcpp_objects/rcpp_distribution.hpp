@@ -33,7 +33,7 @@ class DistributionsInterfaceBase : public FIMSRcppInterfaceBase {
   /**
    * @brief The type of density input. The options are prior, re, or data.
    */
-  SharedString input_type_m;
+  std::string input_type_m;
   /**
    * @brief Control flag indicating whether to use the expected mean in the
    * distribution calculations.
@@ -57,7 +57,7 @@ class DistributionsInterfaceBase : public FIMSRcppInterfaceBase {
    * @see DensityComponentBase::get_expected() in density_components_base.hpp
    * for the implementation that checks this flag.
    */
-  SharedString use_mean_m = fims::to_string("no");
+  std::string use_mean_m = "no";
   /**
    * @brief The map associating the ID of the DistributionsInterfaceBase to the
      DistributionsInterfaceBase objects. This is a live object, which is an
@@ -68,7 +68,7 @@ class DistributionsInterfaceBase : public FIMSRcppInterfaceBase {
   /**
    * @brief The ID of the observed data object, which is set to -999.
    */
-  SharedInt interface_observed_data_id_m = -999;
+  int interface_observed_data_id_m = -999;
 
   /**
    * @brief The log probability density function value.
@@ -230,7 +230,7 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
    * @param observed_data_id Unique ID for the observed data object.
    */
   virtual bool set_observed_data(int observed_data_id) {
-    this->interface_observed_data_id_m.set(observed_data_id);
+    this->interface_observed_data_id_m = observed_data_id;
     return true;
   }
 
@@ -240,7 +240,7 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
   virtual bool set_distribution_mean(double input_value) {
     this->expected_mean[0].initial_value_m = input_value;
     this->expected_mean[0].estimation_type_m.set("fixed_effects");
-    this->use_mean_m.set(fims::to_string("yes"));
+    this->use_mean_m = "yes";
     return true;
   }
 
@@ -249,7 +249,7 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
    */
   virtual bool set_distribution_links(std::string input_type,
                                       Rcpp::IntegerVector ids) {
-    this->input_type_m.set(input_type);
+    this->input_type_m = input_type;
     this->key_m->resize(ids.size());
     for (R_xlen_t i = 0; i < ids.size(); i++) {
       this->key_m->at(i) = ids[i];
@@ -486,7 +486,7 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
     }
     info->variable_map[this->log_sd.id_m] = &(distribution)->log_sd;
 
-    distribution->use_mean = this->use_mean_m.get();
+    distribution->use_mean = this->use_mean_m;
     distribution->expected_mean.resize(this->expected_mean.size());
     for (size_t i = 0; i < this->expected_mean.size(); i++) {
       distribution->expected_mean[i] = this->expected_mean[i].initial_value_m;
@@ -590,7 +590,7 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
    * @param observed_data_id Unique ID for the observed data object.
    */
   virtual bool set_observed_data(int observed_data_id) {
-    this->interface_observed_data_id_m.set(observed_data_id);
+    this->interface_observed_data_id_m = observed_data_id;
     return true;
   }
 
@@ -604,7 +604,7 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
    */
   virtual bool set_distribution_links(std::string input_type,
                                       Rcpp::IntegerVector ids) {
-    this->input_type_m.set(input_type);
+    this->input_type_m = input_type;
     this->key_m->resize(ids.size());
     for (R_xlen_t i = 0; i < ids.size(); i++) {
       this->key_m->at(i) = ids[i];
@@ -875,7 +875,7 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
    * @brief TODO: document this.
    *
    */
-  SharedString notes;
+  std::string notes;
 
   /**
    * @brief The constructor.
@@ -915,7 +915,7 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
    * @param observed_data_id Unique ID for the observed data object.
    */
   virtual bool set_observed_data(int observed_data_id) {
-    this->interface_observed_data_id_m.set(observed_data_id);
+    this->interface_observed_data_id_m = observed_data_id;
     return true;
   }
 
@@ -929,7 +929,7 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
    */
   virtual bool set_distribution_links(std::string input_type,
                                       Rcpp::IntegerVector ids) {
-    this->input_type_m.set(input_type);
+    this->input_type_m = input_type;
     this->key_m->resize(ids.size());
     for (R_xlen_t i = 0; i < ids.size(); i++) {
       this->key_m->at(i) = ids[i];
@@ -942,7 +942,7 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
    *
    * @param note
    */
-  void set_note(std::string note) { this->notes.set(note); }
+  void set_note(std::string note) { this->notes = note; }
 
   /**
    * @brief

@@ -69,29 +69,29 @@ class FleetInterface : public FleetInterfaceBase {
   /**
    * @brief The ID of the observed age-composition data object.
    */
-  SharedInt interface_observed_agecomp_data_id_m = -999;
+  int interface_observed_agecomp_data_id_m = -999;
   /**
    * @brief The ID of the observed length-composition data object.
    */
-  SharedInt interface_observed_lengthcomp_data_id_m = -999;
+  int interface_observed_lengthcomp_data_id_m = -999;
   /**
    * @brief The ID of the observed index data object.
    */
-  SharedInt interface_observed_index_data_id_m = -999;
+  int interface_observed_index_data_id_m = -999;
   /**
    * @brief The ID of the observed landings data object.
    */
-  SharedInt interface_observed_landings_data_id_m = -999;
+  int interface_observed_landings_data_id_m = -999;
   /**
    * @brief The ID of the selectivity object.
    */
-  SharedInt interface_selectivity_id_m = -999;
+  int interface_selectivity_id_m = -999;
 
  public:
   /**
    * @brief The name of the fleet.
    */
-  SharedString name = fims::to_string("NA");
+  std::string name = "NA";
   /**
    * @brief The number of age bins in the fleet data.
    */
@@ -108,12 +108,12 @@ class FleetInterface : public FleetInterfaceBase {
    * @brief What units are the observed landings for this fleet measured in.
    * Options are weight or numbers, default is weight.
    */
-  SharedString observed_landings_units = fims::to_string("weight");
+  std::string observed_landings_units = "weight";
   /**
    * @brief What units is the observed index of abundance for this fleet
    * measured in. Options are weight or numbers, default is weight.
    */
-  SharedString observed_index_units = fims::to_string("weight");
+  std::string observed_index_units = "weight";
   /**
    * @brief The natural log of the index of abundance scaling parameter
    * for this fleet.
@@ -282,20 +282,20 @@ class FleetInterface : public FleetInterfaceBase {
    * @brief Sets the name of the fleet.
    * @param name The name to set.
    */
-  void SetName(const std::string &name) { this->name.set(name); }
+  void SetName(const std::string &name) { this->name = name; }
 
   /**
    * @brief Gets the name of the fleet.
    * @return The name.
    */
-  std::string GetName() const { return this->name.get(); }
+  std::string GetName() const { return this->name; }
 
   /**
    * @brief Set the unique ID for the observed age-composition data object.
    * @param observed_agecomp_data_id Unique ID for the observed data object.
    */
   void SetObservedAgeCompDataID(int observed_agecomp_data_id) {
-    interface_observed_agecomp_data_id_m.set(observed_agecomp_data_id);
+    interface_observed_agecomp_data_id_m = observed_agecomp_data_id;
   }
 
   /**
@@ -303,7 +303,7 @@ class FleetInterface : public FleetInterfaceBase {
    * @param observed_lengthcomp_data_id Unique ID for the observed data object.
    */
   void SetObservedLengthCompDataID(int observed_lengthcomp_data_id) {
-    interface_observed_lengthcomp_data_id_m.set(observed_lengthcomp_data_id);
+    interface_observed_lengthcomp_data_id_m = observed_lengthcomp_data_id;
   }
 
   /**
@@ -311,7 +311,7 @@ class FleetInterface : public FleetInterfaceBase {
    * @param observed_index_data_id Unique ID for the observed data object.
    */
   void SetObservedIndexDataID(int observed_index_data_id) {
-    interface_observed_index_data_id_m.set(observed_index_data_id);
+    interface_observed_index_data_id_m = observed_index_data_id;
   }
 
   /**
@@ -319,14 +319,14 @@ class FleetInterface : public FleetInterfaceBase {
    * @param observed_landings_data_id Unique ID for the observed data object.
    */
   void SetObservedLandingsDataID(int observed_landings_data_id) {
-    interface_observed_landings_data_id_m.set(observed_landings_data_id);
+    interface_observed_landings_data_id_m = observed_landings_data_id;
   }
   /**
    * @brief Set the unique ID for the selectivity object.
    * @param selectivity_id Unique ID for the observed object.
    */
   void SetSelectivityID(int selectivity_id) {
-    interface_selectivity_id_m.set(selectivity_id);
+    interface_selectivity_id_m = selectivity_id;
   }
 
   /**
@@ -334,13 +334,13 @@ class FleetInterface : public FleetInterfaceBase {
    *
    * @return uint32_t
    */
-  uint32_t GetSelectivityID() { return interface_selectivity_id_m.get(); }
+  int GetSelectivityID() { return interface_selectivity_id_m; }
 
   /**
    * @brief Get the unique ID for the observed age-composition data object.
    */
   int GetObservedAgeCompDataID() {
-    return interface_observed_agecomp_data_id_m.get();
+    return interface_observed_agecomp_data_id_m;
   }
 
   /**
@@ -348,21 +348,21 @@ class FleetInterface : public FleetInterfaceBase {
    * object.
    */
   int GetObservedLengthCompDataID() {
-    return interface_observed_lengthcomp_data_id_m.get();
+    return interface_observed_lengthcomp_data_id_m;
   }
 
   /**
    * @brief Get the unique id for the observed index data object.
    */
   int GetObservedIndexDataID() {
-    return interface_observed_index_data_id_m.get();
+    return interface_observed_index_data_id_m;
   }
 
   /**
    * @brief Get the unique id for the observed landings data object.
    */
   int GetObservedLandingsDataID() {
-    return interface_observed_landings_data_id_m.get();
+    return interface_observed_landings_data_id_m;
   }
   /**
    * @brief Extracts the derived quantities from `Information` to the Rcpp
@@ -442,17 +442,17 @@ class FleetInterface : public FleetInterfaceBase {
     fleet->observed_index_units = this->observed_index_units;
 
     fleet->fleet_observed_agecomp_data_id_m =
-        interface_observed_agecomp_data_id_m.get();
+        interface_observed_agecomp_data_id_m;
 
     fleet->fleet_observed_lengthcomp_data_id_m =
-        interface_observed_lengthcomp_data_id_m.get();
+        interface_observed_lengthcomp_data_id_m;
 
     fleet->fleet_observed_index_data_id_m =
-        interface_observed_index_data_id_m.get();
+        interface_observed_index_data_id_m;
     fleet->fleet_observed_landings_data_id_m =
-        interface_observed_landings_data_id_m.get();
+        interface_observed_landings_data_id_m;
 
-    fleet->fleet_selectivity_id_m = interface_selectivity_id_m.get();
+    fleet->fleet_selectivity_id_m = interface_selectivity_id_m;
 
     fleet->log_q.resize(this->log_q.size());
     for (size_t i = 0; i < this->log_q.size(); i++) {

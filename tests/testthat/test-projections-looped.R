@@ -259,7 +259,7 @@ run_FIMS_projection_scenario <- function(om_input,
   # set up logit_steep
   recruitment$logit_steep[1]$value <- (-log(1.0 - om_input[["h"]]) + log(om_input[["h"]] - 0.2))
   recruitment$logit_steep[1]$estimation_type$set("constant")
-  recruitment$n_years$set(om_input[["nyr"]] + n_projection_years)
+  recruitment$n_years <- om_input[["nyr"]] + n_projection_years
 
   # turn on estimation of deviations
   # recruit deviations should enter the model in normal space.
@@ -306,7 +306,7 @@ run_FIMS_projection_scenario <- function(om_input,
 
   # Growth
   ewaa_growth <- methods::new(EWAAGrowth)
-  ewaa_growth$n_years$set(om_input[["nyr"]] + n_projection_years)
+  ewaa_growth$n_years <- om_input[["nyr"]] + n_projection_years
   ewaa_growth$ages[] <- om_input[["ages"]]
   ewaa_growth$weights[] <- om_input[["W.mt"]]
 

@@ -77,7 +77,7 @@ test_that("`get_random()` works with correct inputs", {
   recruitment$log_rzero[1]$value <- log(r0)
   recruitment$log_rzero[1]$estimation_type$set("random_effects")
   # recruitment$n_years needs to be greater than 0 to avoid a CreateTMBModel() error
-  recruitment$n_years$set(1)
+  recruitment$n_years <- 1
   rec_parm <- c(-log(1.0 - h) + log(h - 0.2), log(r0))
 
   CreateTMBModel()

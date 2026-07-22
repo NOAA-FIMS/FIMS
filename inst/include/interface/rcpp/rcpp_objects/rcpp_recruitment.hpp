@@ -30,7 +30,7 @@ class RecruitmentInterfaceBase : public FIMSRcppInterfaceBase {
   /**
    * @brief The process id of the RecruitmentInterfaceBase object.
    */
-  SharedInt process_id = -999;
+  int process_id = -999;
   /**
    * @brief The map associating the IDs of RecruitmentInterfaceBase to the
    * objects. This is a live object, which is an object that has been created
@@ -87,7 +87,7 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
   /**
    * @brief The number of years.
    */
-  SharedInt n_years;
+  int n_years = 0;
   /**
    * @brief The logistic transformation of steepness (h; productivity of the
    * population), where the parameter is transformed to constrain it between
@@ -167,7 +167,7 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
    * @param process_id Unique ID for the recruitment process object.
    */
   void SetRecruitmentProcessID(uint32_t process_id) {
-    this->process_id.set(process_id);
+    this->process_id = process_id;
   }
 
   /**
@@ -319,7 +319,7 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
 
     // set relative info
     recruitment->id = this->id;
-    recruitment->process_id = this->process_id.get();
+    recruitment->process_id = this->process_id;
     // set logit_steep
     recruitment->logit_steep.resize(this->logit_steep.size());
     for (size_t i = 0; i < this->logit_steep.size(); i++) {
@@ -407,8 +407,8 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
 
     info->variable_map[this->log_r.id_m] = &(recruitment)->log_r;
     // set log_expected_recruitment
-    recruitment->log_expected_recruitment.resize(this->n_years.get() - 1);
-    for (size_t i = 0; i < static_cast<size_t>(this->n_years.get() - 1); i++) {
+    recruitment->log_expected_recruitment.resize(this->n_years - 1);
+    for (size_t i = 0; i < static_cast<size_t>(this->n_years - 1); i++) {
       recruitment->log_expected_recruitment[i] = 0;
     }
     info->variable_map[this->log_expected_recruitment.id_m] =
