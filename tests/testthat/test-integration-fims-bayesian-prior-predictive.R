@@ -160,12 +160,12 @@ test_that("posterior equals prior with no data", {
   for (y in 1:(om_input[["nyr"]] - 1)) {
     recruitment$log_devs[y]$value <- om_input[["logR.resid"]][y + 1]
   }
-  recruitment$n_years$set(om_input[["nyr"]])
+  recruitment$n_years <- om_input[["nyr"]]
   recruitment$SetRecruitmentProcessID(recruitment_process$get_id())
 
   # Growth
   ewaa_growth <- methods::new(EWAAGrowth)
-  ewaa_growth$n_years$set(om_input[["nyr"]])
+  ewaa_growth$n_years <- om_input[["nyr"]]
   ewaa_growth$ages[] <- om_input[["ages"]]
   ewaa_growth$weights[] <- c(t(om_input[["W.mt"]]))
 

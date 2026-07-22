@@ -281,7 +281,7 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   # set up logit_steep
   recruitment$logit_steep[1]$value <- -log(1.0 - om_input[["h"]]) + log(om_input[["h"]] - 0.2)
   recruitment$logit_steep[1]$estimation_type$set("constant")
-  recruitment$n_years$set(om_input[["nyr"]])
+  recruitment$n_years <- om_input[["nyr"]]
 
   # turn on estimation of deviations
   # recruit deviations should enter the model in normal space.
@@ -367,7 +367,7 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
 
   # Growth
   ewaa_growth <- methods::new(EWAAGrowth)
-  ewaa_growth$n_years$set(om_input[["nyr"]])
+  ewaa_growth$n_years <- om_input[["nyr"]]
   ewaa_growth$ages[] <- om_input[["ages"]]
   ewaa_growth$weights[] <- c(t(om_input[["W.mt"]]))
 
