@@ -14,6 +14,11 @@ TEST_F(CAAInitializeTestFixture, InitializeSetsDefaultSexPartition) {
   EXPECT_EQ(population->index_layout.n_strata, 2);
   EXPECT_EQ(population->index_layout.i_stratum_age_year(1, 0, 0),
             n_years * n_ages);
+
+  EXPECT_TRUE(population->partition_demand.is_pooled());
+  EXPECT_TRUE(fims_popdy::RequestedStrata(population->partition_spec,
+                                          population->partition_demand)
+                  .empty());
 }
 
 }  // namespace

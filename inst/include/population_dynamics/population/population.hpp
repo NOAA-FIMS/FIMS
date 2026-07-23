@@ -73,6 +73,8 @@ annual fishing mortality multipliers to scale total mortality of all fleets*/
   // partition infrastructure (see subpopulation.hpp)
   PartitionSpec partition_spec; /*!< axes and strata for partitioned structure */
   IndexLayout index_layout;     /*!< folded indices for partitioned quantities */
+  PartitionDemand partition_demand =
+      MakePooledPartitionDemand(); /*!< which strata to materialize; empty = pooled */
 
   /**
    * @brief Constructor.

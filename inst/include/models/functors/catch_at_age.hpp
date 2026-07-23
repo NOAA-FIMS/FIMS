@@ -158,6 +158,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
       }
 
       this->populations[p]->partition_spec = MakeDefaultSexPartitionSpec();
+      this->populations[p]->partition_demand = MakePooledPartitionDemand();
       this->populations[p]->index_layout.n_years = this->populations[p]->n_years;
       this->populations[p]->index_layout.n_ages = this->populations[p]->n_ages;
       this->populations[p]->index_layout.n_strata =
