@@ -87,7 +87,7 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
    * @brief An integer specifying the number of years.
    *
    */
-  SharedInt n_years;
+  int n_years = 0;
   /**
    * @brief A map of empirical weight-at-age values allowing multiple modules to
    * access and modify the weights without copying values between modules.
@@ -142,13 +142,13 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
    */
   inline std::map<int, std::map<double, double>> make_map(RealVector ages,
                                                           RealVector weights,
-                                                          SharedInt n_years) {
+                                                          int n_years) {
     std::map<int, std::map<double, double>> mymap;
-    const size_t n_years_plus_one = static_cast<size_t>(n_years.get() + 1);
+    const size_t n_years_plus_one = static_cast<size_t>(n_years + 1);
 
     // Reject invalid year counts because map keys are expected to include
     // at least one model year.
-    if (n_years.get() < 1) {
+    if (n_years < 1) {
       Rcpp::stop("EWAA Error:: n_years must be at least 1");
     }
 
@@ -169,7 +169,7 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
           "calculations. weights size: " +
           std::to_string(weights.size()) +
           " ages size: " + std::to_string(ages.size()) +
-          " n_years: " + std::to_string(n_years.get()));
+          " n_years: " + std::to_string(n_years));
     } else if (weights.size() == ages.size()) {
       // One age-specific vector was provided, so replicate the same
       // weight-at-age values for every year key (0 through n_years).
@@ -229,7 +229,7 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
     ss << " \"type\": \"vector\",\n";
     ss << " \"dimensionality\": {\n";
     ss << "  \"header\": [\"n_years+1\",\"n_ages\"],\n";
-    ss << "  \"dimensions\": [" << this->n_years.get() + 1 << ","
+    ss << "  \"dimensions\": [" << this->n_years + 1 << ","
        << this->ages.size() << "]\n},\n";
 
     ss << " \"values\": [\n";

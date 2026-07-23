@@ -36,6 +36,16 @@ test_that("rcpp fleet works with correct inputs", {
   #' @description Test that getting the age-composition ID works within the fleet module.
   expect_equal(fleet1$GetObservedAgeCompDataID(), 1)
 
+  #' @description Test that setting and getting the fleet name continue to work when the scalar field is stored directly.
+  expect_silent(fleet1$SetName("fleet one"))
+  expect_equal(fleet1$GetName(), "fleet one")
+
+  #' @description Test that observed units can be assigned directly through the Rcpp field bindings.
+  fleet1$observed_landings_units <- "numbers"
+  fleet1$observed_index_units <- "numbers"
+  expect_equal(fleet1$observed_landings_units, "numbers")
+  expect_equal(fleet1$observed_index_units, "numbers")
+
   #' @description Test that setting the index ID works within the fleet module.
   expect_silent(fleet1$SetObservedIndexDataID(1))
   #' @description Test that getting the index ID works within the fleet module.
