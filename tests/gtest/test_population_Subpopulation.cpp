@@ -3,6 +3,110 @@
 
 namespace {
 
+TEST(PartitionDemand, DefaultIsPooled) {
+  fims_popdy::PartitionDemand demand = fims_popdy::MakePooledPartitionDemand();
+  EXPECT_TRUE(demand.is_pooled());
+  EXPECT_TRUE(demand.selections.empty());
+}
+
+TEST(PartitionDemand, SexOnlyFemaleResolvesToSingleStratum) {
+  fims_popdy::PartitionSpec spec = fims_popdy::MakeDefaultSexPartitionSpec();
+  fims_popdy::PartitionDemand demand =
+      fims_popdy::MakeSexPartitionDemand({"female"});
+
+  EXPECT_FALSE(demand.is_pooled());
+  fims_popdy::GroupSelector group =
+      fims_popdy::MakeGroupSelectorFromDemand(spec, demand);
+  EXPECT_EQ(group.level, (std::vector<int>{0}));
+  EXPECT_EQ(fims_popdy::RequestedStrata(spec, demand),
+            (std::vector<size_t>{0}));
+}
+
+TEST(PartitionDemand, SexOnlyMaleResolvesToSingleStratum) {
+  fims_popdy::PartitionSpec spec = fims_popdy::MakeDefaultSexPartitionSpec();
+  fims_popdy::PartitionDemand demand =
+      fims_popdy::MakeSexPartitionDemand({"male"});
+
+  EXPECT_EQ(fims_popdy::RequestedStrata(spec, demand),
+            (std::vector<size_t>{1}));
+}
+
+TEST(PartitionDemand, SexOnlyBothLevelsBecomesWildcard) {
+  fims_popdy::PartitionSpec spec = fims_popdy::MakeDefaultSexPartitionSpec();
+  fims_popdy::PartitionDemand demand =
+      fims_popdy::MakeSexPartitionDemand({"female", "male"});
+
+  fims_popdy::GroupSelector group =
+      fims_popdy::MakeGroupSelectorFromDemand(spec, demand);
+  EXPECT_EQ(group.level, (std::vector<int>{fims_popdy::GroupSelector::kWildcard}));
+  EXPECT_EQ(fims_popdy::RequestedStrata(spec, demand),
+            (std::vector<size_t>{0, 1}));
+}
+
+TEST(PartitionDemand, StarTokenIsWildcard) {
+  fims_popdy::PartitionSpec spec = fims_popdy::MakeDefaultSexPartitionSpec();
+  fims_popdy::PartitionDemand demand =
+      fims_popdy::MakeSexPartitionDemand({"*"});
+
+  fims_popdy::GroupSelector group =
+      fims_popdy::MakeGroupSelectorFromDemand(spec, demand);
+  EXPECT_EQ(group.level, (std::vector<int>{fims_popdy::GroupSelector::kWildcard}));
+}
+
+TEST(PartitionDemand, PooledRequestedStrataIsEmpty) {
+  fims_popdy::PartitionSpec spec = fims_popdy::MakeDefaultSexPartitionSpec();
+  fims_popdy::PartitionDemand demand = fims_popdy::MakePooledPartitionDemand();
+
+  EXPECT_TRUE(fims_popdy::RequestedStrata(spec, demand).empty());
+  EXPECT_THROW(fims_popdy::MakeGroupSelectorFromDemand(spec, demand),
+               std::invalid_argument);
+}
+
+TEST(PartitionDemand, RejectsUnknownAxis) {
+  fims_popdy::PartitionSpec spec = fims_popdy::MakeDefaultSexPartitionSpec();
+  fims_popdy::PartitionDemand demand;
+  fims_popdy::AxisLevelSelection selection;
+  selection.axis_name = "area";
+  selection.level_names = {"north"};
+  demand.selections.push_back(std::move(selection));
+
+  EXPECT_THROW(fims_popdy::MakeGroupSelectorFromDemand(spec, demand),
+               std::invalid_argument);
+}
+
+TEST(PartitionDemand, RejectsUnknownLevel) {
+  fims_popdy::PartitionSpec spec = fims_popdy::MakeDefaultSexPartitionSpec();
+  fims_popdy::PartitionDemand demand =
+      fims_popdy::MakeSexPartitionDemand({"unknown"});
+
+  EXPECT_THROW(fims_popdy::MakeGroupSelectorFromDemand(spec, demand),
+               std::invalid_argument);
+}
+
+TEST(PartitionDemand, OmittedAxisIsWildcardOnMultiAxisSpec) {
+  fims_popdy::PartitionSpec spec;
+  fims_popdy::Axis sex_axis;
+  sex_axis.name = "sex";
+  sex_axis.levels = {"female", "male"};
+  fims_popdy::Axis area_axis;
+  area_axis.name = "area";
+  area_axis.levels = {"north", "south"};
+  spec.axes.push_back(std::move(sex_axis));
+  spec.axes.push_back(std::move(area_axis));
+
+  // list(sex = "female") with area omitted => all areas for female
+  fims_popdy::PartitionDemand demand =
+      fims_popdy::MakeSexPartitionDemand({"female"});
+  fims_popdy::GroupSelector group =
+      fims_popdy::MakeGroupSelectorFromDemand(spec, demand);
+
+  EXPECT_EQ(group.level.size(), 2);
+  EXPECT_EQ(group.level[0], 0);
+  EXPECT_EQ(group.level[1], fims_popdy::GroupSelector::kWildcard);
+  EXPECT_EQ(fims_popdy::RequestedStrata(spec, demand),
+            (std::vector<size_t>{0, 1}));
+}
+
 TEST(PartitionSpec, DefaultSexPartitionHasTwoStrata) {
   fims_popdy::PartitionSpec spec = fims_popdy::MakeDefaultSexPartitionSpec();
   EXPECT_EQ(spec.axes.size(), 1);
