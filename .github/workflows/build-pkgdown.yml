@@ -97,7 +97,7 @@ jobs:
           path: docs/
   
       - name: Deploy package
-        if: github.repository == 'NOAA-FIMS/FIMS' && github.event_name == 'push' && github.ref == 'refs/heads/main'
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
