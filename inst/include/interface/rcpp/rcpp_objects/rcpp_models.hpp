@@ -1211,6 +1211,9 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
                                 fleet_interface->n_years.get(),
                                 fleet_interface->n_ages.get()},
               fims::Vector<std::string>{"n_strata", "n_years", "n_ages"});
+      info->variable_map
+          [fleet_interface->catch_numbers_at_age_by_partition.id_m] =
+          &derived_quantities["catch_numbers_at_age_by_partition"];
 
       derived_quantities["catch_weight_at_age"] = fims::Vector<Type>(
           fleet_interface->n_years.get() * fleet_interface->n_ages.get());
@@ -1232,6 +1235,9 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
                                 fleet_interface->n_years.get(),
                                 fleet_interface->n_ages.get()},
               fims::Vector<std::string>{"n_strata", "n_years", "n_ages"});
+      info->variable_map
+          [fleet_interface->catch_weight_at_age_by_partition.id_m] =
+          &derived_quantities["catch_weight_at_age_by_partition"];
 
       derived_quantities["catch_numbers_at_length"] = fims::Vector<Type>(
           fleet_interface->n_years.get() * fleet_interface->n_lengths.get());
@@ -1321,6 +1327,9 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
                                 fleet_interface->n_years.get(),
                                 fleet_interface->n_ages.get()},
               fims::Vector<std::string>{"n_strata", "n_years", "n_ages"});
+      info->variable_map
+          [fleet_interface->index_numbers_at_age_by_partition.id_m] =
+          &derived_quantities["index_numbers_at_age_by_partition"];
 
       derived_quantities["index_weight_at_age"] = fims::Vector<Type>(
           fleet_interface->n_years.get() * fleet_interface->n_ages.get());
@@ -1330,6 +1339,8 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
               fims::Vector<int>{(fleet_interface->n_years.get()),
                                 fleet_interface->n_ages.get()},
               fims::Vector<std::string>{"n_years", "n_ages"});
+      info->variable_map[fleet_interface->index_weight_at_age.id_m] =
+          &derived_quantities["index_weight_at_age"];
 
       derived_quantities["index_weight_at_age_by_partition"] =
           fims::Vector<Type>(partitioned_age_year_size);
@@ -1340,8 +1351,9 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
                                 fleet_interface->n_years.get(),
                                 fleet_interface->n_ages.get()},
               fims::Vector<std::string>{"n_strata", "n_years", "n_ages"});
-      info->variable_map[fleet_interface->index_weight_at_age.id_m] =
-          &derived_quantities["index_weight_at_age"];
+      info->variable_map
+          [fleet_interface->index_weight_at_age_by_partition.id_m] =
+          &derived_quantities["index_weight_at_age_by_partition"];
 
       derived_quantities["index_numbers_at_length"] = fims::Vector<Type>(
           fleet_interface->n_years.get() * fleet_interface->n_lengths.get());

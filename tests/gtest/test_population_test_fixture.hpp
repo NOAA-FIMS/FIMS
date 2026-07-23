@@ -11,9 +11,9 @@ void InitializePartitionedFleetAgeDerivedQuantities(
     std::map<std::string, fims::Vector<double>> &derived_quantities,
     size_t n_strata, size_t n_years, size_t n_ages) {
   const size_t partitioned_age_year_size = n_strata * n_years * n_ages;
-  derived_quantities["landings_numbers_at_age_by_partition"] =
+  derived_quantities["catch_numbers_at_age_by_partition"] =
       fims::Vector<double>(partitioned_age_year_size);
-  derived_quantities["landings_weight_at_age_by_partition"] =
+  derived_quantities["catch_weight_at_age_by_partition"] =
       fims::Vector<double>(partitioned_age_year_size);
   derived_quantities["index_numbers_at_age_by_partition"] =
       fims::Vector<double>(partitioned_age_year_size);
