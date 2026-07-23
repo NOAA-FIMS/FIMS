@@ -39,6 +39,55 @@ struct GroupSelector {
 };
 
 /**
+ * @brief Named level selection for one partition axis.
+ *
+ * @details Corresponds to one entry in a user-facing list such as
+ * list(sex = "female") or list(sex = c("female", "male")). Level names must
+ * match Axis::levels. A single "*" means all levels on that axis (wildcard).
+ */
+struct AxisLevelSelection {
+  std::string axis_name;                 /*!< axis name (e.g. "sex") */
+  std::vector<std::string> level_names; /*!< requested level labels */
+};
+
+/**
+ * @brief User demand for which partition strata to materialize in output.
+ *
+ * @details Empty selections means pooled output only (no partitioned write) —
+ * the backward-compatible default. Non-empty selections are a named list of
+ * axis filters, e.g. {sex → female}. Omitted axes are treated as wildcards
+ * when resolving to a GroupSelector. This shape extends to multi-axis demand
+ * later (e.g. sex + area) without changing the internal GroupSelector path.
+ */
+struct PartitionDemand {
+  std::vector<AxisLevelSelection> selections; /*!< empty => pooled */
+
+  /** @brief True when no partitioned strata are requested. */
+  bool is_pooled() const { return selections.empty(); }
+};
+
+/**
+ * @brief Default pooled demand (no partitioned output).
+ */
+inline PartitionDemand MakePooledPartitionDemand() { return PartitionDemand{}; }
+
+/**
+ * @brief Convenience builder for sex-only demand (Model 1).
+ *
+ * @param level_names Level labels on the sex axis, e.g. {"female"} or
+ *        {"female", "male"}.
+ */
+inline PartitionDemand MakeSexPartitionDemand(
+    const std::vector<std::string> &level_names) {
+  PartitionDemand demand;
+  AxisLevelSelection selection;
+  selection.axis_name = "sex";
+  selection.level_names = level_names;
+  demand.selections.push_back(std::move(selection));
+  return demand;
+}
+
+/**
  * @brief Collection of axes defining strata for a partitioned population.
  */
 struct PartitionSpec {
@@ -241,7 +290,131 @@ inline bool is_sex_only_partition(const PartitionSpec &spec) {
          spec.axes[0].size() == 2 && spec.n_strata() == 2;
 }
 
+inline int find_axis_index(const PartitionSpec &spec,
+                           const std::string &axis_name) {
+  for (size_t i = 0; i < spec.axes.size(); ++i) {
+    if (spec.axes[i].name == axis_name) {
+      return static_cast<int>(i);
+    }
+  }
+  return -1;
+}
+
+inline int find_level_index(const Axis &axis, const std::string &level_name) {
+  for (size_t i = 0; i < axis.levels.size(); ++i) {
+    if (axis.levels[i] == level_name) {
+      return static_cast<int>(i);
+    }
+  }
+  return -1;
+}
+
+inline bool selection_covers_all_levels(
+    const Axis &axis, const std::vector<std::string> &level_names) {
+  if (level_names.size() != axis.size()) {
+    return false;
+  }
+  std::vector<bool> seen(axis.size(), false);
+  for (const std::string &name : level_names) {
+    const int index = find_level_index(axis, name);
+    if (index < 0 || seen[static_cast<size_t>(index)]) {
+      return false;
+    }
+    seen[static_cast<size_t>(index)] = true;
+  }
+  return true;
+}
+
 }  // namespace detail
+
+/**
+ * @brief Resolve a named PartitionDemand into a GroupSelector.
+ *
+ * @details Empty (pooled) demand has no GroupSelector — call is_pooled()
+ * first. Omitted axes become wildcards. A single level name pins that level.
+ * Selecting all levels on an axis (or "*") becomes a wildcard. Partial
+ * multi-level subsets on one axis are not supported yet (GroupSelector only
+ * stores one fixed level or wildcard per axis).
+ */
+inline GroupSelector MakeGroupSelectorFromDemand(
+    const PartitionSpec &spec, const PartitionDemand &demand) {
+  if (demand.is_pooled()) {
+    throw std::invalid_argument(
+        "MakeGroupSelectorFromDemand: demand is pooled (empty selections)");
+  }
+  if (spec.axes.empty()) {
+    throw std::invalid_argument(
+        "MakeGroupSelectorFromDemand: partition spec has no axes");
+  }
+
+  for (const AxisLevelSelection &selection : demand.selections) {
+    if (detail::find_axis_index(spec, selection.axis_name) < 0) {
+      throw std::invalid_argument(
+          "MakeGroupSelectorFromDemand: unknown axis \"" +
+          selection.axis_name + "\"");
+    }
+  }
+
+  GroupSelector group;
+  group.level.assign(spec.axes.size(), GroupSelector::kWildcard);
+
+  for (size_t axis_index = 0; axis_index < spec.axes.size(); ++axis_index) {
+    const Axis &axis = spec.axes[axis_index];
+    const AxisLevelSelection *selection = nullptr;
+    for (const AxisLevelSelection &candidate : demand.selections) {
+      if (candidate.axis_name == axis.name) {
+        selection = &candidate;
+        break;
+      }
+    }
+    if (selection == nullptr) {
+      continue;  // omitted axis => wildcard
+    }
+    if (selection->level_names.empty()) {
+      throw std::invalid_argument(
+          "MakeGroupSelectorFromDemand: level_names empty for axis \"" +
+          axis.name + "\"");
+    }
+    if (selection->level_names.size() == 1 &&
+        selection->level_names[0] == "*") {
+      group.level[axis_index] = GroupSelector::kWildcard;
+      continue;
+    }
+    if (detail::selection_covers_all_levels(axis, selection->level_names)) {
+      group.level[axis_index] = GroupSelector::kWildcard;
+      continue;
+    }
+    if (selection->level_names.size() != 1) {
+      throw std::invalid_argument(
+          "MakeGroupSelectorFromDemand: partial multi-level subsets are not "
+          "supported yet for axis \"" +
+          axis.name + "\"");
+    }
+    const int level_index =
+        detail::find_level_index(axis, selection->level_names[0]);
+    if (level_index < 0) {
+      throw std::invalid_argument(
+          "MakeGroupSelectorFromDemand: unknown level \"" +
+          selection->level_names[0] + "\" for axis \"" + axis.name + "\"");
+    }
+    group.level[axis_index] = level_index;
+  }
+  return group;
+}
+
+/**
+ * @brief Stratum indices requested by a PartitionDemand.
+ *
+ * @details Pooled demand returns an empty vector. Otherwise resolves demand to
+ * a GroupSelector and expands it via PartitionSpec::expand_group_to_strata().
+ */
+inline std::vector<size_t> RequestedStrata(const PartitionSpec &spec,
+                                           const PartitionDemand &demand) {
+  if (demand.is_pooled()) {
+    return {};
+  }
+  return spec.expand_group_to_strata(MakeGroupSelectorFromDemand(spec, demand));
+}
 
 /**
  * @brief Build stratum split factors for the default sex-only partition.
