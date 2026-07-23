@@ -243,7 +243,7 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
     pit = PopulationInterfaceBase::live_objects.find(id);
     if (pit != PopulationInterfaceBase::live_objects.end()) {
       std::shared_ptr<PopulationInterfaceBase> &pop = (*pit).second;
-      pop->initialize_catch_at_age.set(true);
+      pop->initialize_catch_at_age = true;
     } else {
       FIMS_ERROR_LOG("Population with id " + fims::to_string(id) +
                      " not found.");
@@ -692,9 +692,9 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
           std::dynamic_pointer_cast<PopulationInterface>(
               PopulationInterfaceBase::live_objects[*pit]);
       if (population_interface) {
-        recruitment_ids.insert(population_interface->recruitment_id.get());
-        growth_ids.insert(population_interface->growth_id.get());
-        maturity_ids.insert(population_interface->maturity_id.get());
+        recruitment_ids.insert(population_interface->recruitment_id);
+        growth_ids.insert(population_interface->growth_id);
+        maturity_ids.insert(population_interface->maturity_id);
 
         for (fids = population_interface->fleet_ids->begin();
              fids != population_interface->fleet_ids->end(); fids++) {
