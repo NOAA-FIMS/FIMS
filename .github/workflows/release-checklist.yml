@@ -69,7 +69,7 @@ jobs:
               '',
               '### 3. Review release artifacts',
               '',
-              `- [ ] Review the pkgdown site, which is either available live if all changes are on main or available as an artifact as a byproduct of [call-update-pkgdown](${workflowsUrl}/call-update-pkgdown.yml) to all PRs to main.`,
+              `- [ ] Review the pkgdown site, which is either available live if all changes are on main or available as an artifact as a byproduct of [build-pkgdown](${workflowsUrl}/build-pkgdown.yml) to all PRs to main.`,
               '- [ ] Review rendered reference pages, articles, and Doxygen content for obvious release issues.',
               '- [ ] Review open issues and pull requests for anything that should block the release or be mentioned in the release notes.',
               '',
