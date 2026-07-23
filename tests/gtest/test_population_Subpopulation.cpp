@@ -248,4 +248,84 @@ TEST(IndexLayout, FoldedIndicesMatchYearAgeAndStratum) {
   EXPECT_EQ(layout.n_partitioned_age_year(), 24);
 }
 
+TEST(WritePartitionedQuantityAtAge, PooledDemandIsNoOp) {
+  fims_popdy::PartitionSpec spec = fims_popdy::MakeDefaultSexPartitionSpec();
+  fims_popdy::IndexLayout layout;
+  layout.n_strata = spec.n_strata();
+  layout.n_years = 2;
+  layout.n_ages = 3;
+  std::vector<double> partitioned(layout.n_partitioned_age_year(), 0.0);
+
+  fims_popdy::WritePartitionedQuantityAtAge(
+      partitioned, 10.0, spec, layout, fims_popdy::MakePooledPartitionDemand(),
+      0.3, 1, 2);
+
+  EXPECT_EQ(partitioned, std::vector<double>(layout.n_partitioned_age_year(), 0.0));
+}
+
+TEST(WritePartitionedQuantityAtAge, FemaleOnlyWritesFemaleStratum) {
+  fims_popdy::PartitionSpec spec = fims_popdy::MakeDefaultSexPartitionSpec();
+  fims_popdy::IndexLayout layout;
+  layout.n_strata = spec.n_strata();
+  layout.n_years = 2;
+  layout.n_ages = 3;
+  std::vector<double> partitioned(layout.n_partitioned_age_year(), 0.0);
+  const double pooled = 10.0;
+  const double p_female = 0.3;
+  const size_t year = 1;
+  const size_t age = 2;
+
+  fims_popdy::WritePartitionedQuantityAtAge(
+      partitioned, pooled, spec, layout,
+      fims_popdy::MakeSexPartitionDemand({"female"}), p_female, year, age);
+
+  EXPECT_DOUBLE_EQ(partitioned[layout.i_stratum_age_year(0, year, age)],
+                   pooled * p_female);
+  EXPECT_DOUBLE_EQ(partitioned[layout.i_stratum_age_year(1, year, age)], 0.0);
+}
+
+TEST(WritePartitionedQuantityAtAge, MaleOnlyWritesMaleStratum) {
+  fims_popdy::PartitionSpec spec = fims_popdy::MakeDefaultSexPartitionSpec();
+  fims_popdy::IndexLayout layout;
+  layout.n_strata = spec.n_strata();
+  layout.n_years = 2;
+  layout.n_ages = 3;
+  std::vector<double> partitioned(layout.n_partitioned_age_year(), 0.0);
+  const double pooled = 10.0;
+  const double p_female = 0.3;
+  const size_t year = 1;
+  const size_t age = 2;
+
+  fims_popdy::WritePartitionedQuantityAtAge(
+      partitioned, pooled, spec, layout,
+      fims_popdy::MakeSexPartitionDemand({"male"}), p_female, year, age);
+
+  EXPECT_DOUBLE_EQ(partitioned[layout.i_stratum_age_year(0, year, age)], 0.0);
+  EXPECT_DOUBLE_EQ(partitioned[layout.i_stratum_age_year(1, year, age)],
+                   pooled * (1.0 - p_female));
+}
+
+TEST(WritePartitionedQuantityAtAge, BothSexesWritesBothStrata) {
+  fims_popdy::PartitionSpec spec = fims_popdy::MakeDefaultSexPartitionSpec();
+  fims_popdy::IndexLayout layout;
+  layout.n_strata = spec.n_strata();
+  layout.n_years = 2;
+  layout.n_ages = 3;
+  std::vector<double> partitioned(layout.n_partitioned_age_year(), 0.0);
+  const double pooled = 10.0;
+  const double p_female = 0.4;
+  const size_t year = 0;
+  const size_t age = 1;
+
+  fims_popdy::WritePartitionedQuantityAtAge(
+      partitioned, pooled, spec, layout,
+      fims_popdy::MakeSexPartitionDemand({"female", "male"}), p_female, year,
+      age);
+
+  EXPECT_DOUBLE_EQ(partitioned[layout.i_stratum_age_year(0, year, age)],
+                   pooled * p_female);
+  EXPECT_DOUBLE_EQ(partitioned[layout.i_stratum_age_year(1, year, age)],
+                   pooled * (1.0 - p_female));
+}
+
 }  // namespace

@@ -440,6 +440,52 @@ std::vector<Type> SexStratumSplitFactors(const PartitionSpec &spec,
   return {proportion_female, static_cast<Type>(1.0) - proportion_female};
 }
 
+/**
+ * @brief Split a pooled at-age value into requested partition strata.
+ *
+ * @details No-op when demand is pooled (RequestedStrata is empty). For
+ * non-pooled demand on the default sex partition, builds split factors from
+ * proportion_female_at_age and adds pooled_value * factor into partitioned
+ * storage at i_stratum_age_year for each requested stratum only.
+ *
+ * @tparam Type Numeric type (e.g. double or AD type).
+ * @tparam PartitionedVector Vector-like type supporting size() and operator[].
+ * @param partitioned Storage sized n_strata * n_years * n_ages.
+ * @param pooled_value Pooled quantity at (year, age).
+ * @param spec Partition structure (sex-only for current split factors).
+ * @param layout Index layout matching partitioned storage.
+ * @param demand Which strata to write.
+ * @param proportion_female_at_age Population proportion_female at this age.
+ * @param year Year index.
+ * @param age Age index.
+ */
+template <typename Type, typename PartitionedVector>
+void WritePartitionedQuantityAtAge(PartitionedVector &partitioned,
+                                   Type pooled_value,
+                                   const PartitionSpec &spec,
+                                   const IndexLayout &layout,
+                                   const PartitionDemand &demand,
+                                   Type proportion_female_at_age, size_t year,
+                                   size_t age) {
+  const std::vector<size_t> strata = RequestedStrata(spec, demand);
+  if (strata.empty()) {
+    return;
+  }
+  const std::vector<Type> split_factors =
+      SexStratumSplitFactors(spec, proportion_female_at_age);
+  for (size_t stratum : strata) {
+    const size_t index = layout.i_stratum_age_year(stratum, year, age);
+    if (index >= partitioned.size()) {
+      throw std::invalid_argument(
+          "WritePartitionedQuantityAtAge: folded index " +
+          std::to_string(index) + " out of bounds (size " +
+          std::to_string(partitioned.size()) + ")");
+    }
+    partitioned[index] +=
+        pooled_value * spec.stratum_split_factor(stratum, split_factors);
+  }
+}
+
 }  // namespace fims_popdy
 
 #endif /* FIMS_POPULATION_DYNAMICS_POPULATION_SUBPOPULATION_HPP */
