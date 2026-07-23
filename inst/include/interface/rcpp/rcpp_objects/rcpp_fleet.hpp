@@ -137,9 +137,17 @@ class FleetInterface : public FleetInterfaceBase {
    */
   VariableVector landings_numbers_at_age;
   /**
+   * @brief Annual landings at age in numbers by partition stratum.
+   */
+  VariableVector landings_numbers_at_age_by_partition;
+  /**
    * @brief Annual landings at age in weight for a specific fleet.
    */
   VariableVector landings_weight_at_age;
+  /**
+   * @brief Annual landings at age in weight by partition stratum.
+   */
+  VariableVector landings_weight_at_age_by_partition;
   /**
    * @brief Annual landings at length in numbers for a specific fleet.
    */
@@ -177,9 +185,17 @@ class FleetInterface : public FleetInterfaceBase {
    */
   VariableVector index_numbers_at_age;
   /**
+   * @brief Numbers at age by partition stratum for a fleet index.
+   */
+  VariableVector index_numbers_at_age_by_partition;
+  /**
    * @brief Weight at age for a fleet index such as survey or CPUE.
    */
   VariableVector index_weight_at_age;
+  /**
+   * @brief Weight at age by partition stratum for a fleet index.
+   */
+  VariableVector index_weight_at_age_by_partition;
   /**
    * @brief Numbers at length for a fleet index such as survey or CPUE.
    */
@@ -249,7 +265,11 @@ class FleetInterface : public FleetInterfaceBase {
         log_Fmort(other.log_Fmort),
         age_to_length_conversion(other.age_to_length_conversion),
         landings_numbers_at_age(other.landings_numbers_at_age),
+        landings_numbers_at_age_by_partition(
+            other.landings_numbers_at_age_by_partition),
         landings_weight_at_age(other.landings_weight_at_age),
+        landings_weight_at_age_by_partition(
+            other.landings_weight_at_age_by_partition),
         landings_numbers_at_length(other.landings_numbers_at_length),
         landings_weight(other.landings_weight),
         landings_numbers(other.landings_numbers),
@@ -258,7 +278,10 @@ class FleetInterface : public FleetInterfaceBase {
         agecomp_proportion(other.agecomp_proportion),
         lengthcomp_proportion(other.lengthcomp_proportion),
         index_numbers_at_age(other.index_numbers_at_age),
+        index_numbers_at_age_by_partition(
+            other.index_numbers_at_age_by_partition),
         index_weight_at_age(other.index_weight_at_age),
+        index_weight_at_age_by_partition(other.index_weight_at_age_by_partition),
         index_numbers_at_length(other.index_numbers_at_length),
         index_weight(other.index_weight),
         index_numbers(other.index_numbers),
