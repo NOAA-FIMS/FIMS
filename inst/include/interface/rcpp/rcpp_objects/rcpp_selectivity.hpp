@@ -671,7 +671,14 @@ class AgeSpecificSelectivityInterface : public SelectivityInterfaceBase {
   virtual double evaluate(double x) { 
     fims_popdy::AgeSpecificSelectivity<double> AgeSpecificSel;
     AgeSpecificSel.n_ages = this->n_ages.get();
-    AgeSpecificSel.min_age = *std::min_element(this->ages.storage_m->begin(), this->ages.storage_m->end());
+    if (this->ages.size() > 0) {
+      AgeSpecificSel.min_age = static_cast<size_t>(
+          *std::min_element(this->ages.storage_m->begin(),
+                            this->ages.storage_m->end()));
+    } else {
+      AgeSpecificSel.min_age = static_cast<size_t>(this->min_age.get());
+    }
+    AgeSpecificSel.logit_sel_at_age.resize(this->logit_sel_at_age.size());
     for (size_t i = 0; i < this->logit_sel_at_age.size(); i++) {
       AgeSpecificSel.logit_sel_at_age[i] = this->logit_sel_at_age[i].initial_value_m;
     } 
