@@ -107,6 +107,8 @@ test_that("rcpp age specific selectivity works with correct inputs", {
   selectivity1$logit_sel_at_age$resize(1)
   selectivity1$logit_sel_at_age[1]$value <- 1
   selectivity1$logit_sel_at_age[1]$estimation_type$set("fixed_effects")
+  selectivity1$ages$resize(1)
+  selectivity1$ages$set(0, 1)
   selectivity1$min_age$set(1.0)
   selectivity1$n_ages$set(1.0)
 
@@ -119,11 +121,13 @@ test_that("rcpp age specific selectivity works with correct inputs", {
   # TBD: Indexing doesn't work with this test - need to follow-up to see if that's fine
     # Note: Can't add 'pos' time to tests for other selectivity types, so maybe there's limitations to this evaluate() call
   ##' @description Test that `evaluate()` works for `AgeSpecificSelectivity`.
-  #expect_equal(
-  #  selectivity1$evaluate(1.0),
-  #  1.0 / (1.0 + exp(-1.0)), # inverse logit equation
-  #  tolerance = 0.0000001
-  #)
+  expect_equal(
+    selectivity1$evaluate(1.0),
+    1.0 / (1.0 + exp(-1.0)), # inverse logit equation
+    tolerance = 0.0000001
+  )
+  #' @description Test that out-of-range ages throw an informative error.
+  expect_error(selectivity1$evaluate(10), "out of bounds")
 
   # TBD: test the performance of indexing with multiple ages (n_ages=3) and alternate minimum age (min_age=2)
   # selectivity$min_age[1]$value <- 2
@@ -140,6 +144,8 @@ test_that("rcpp age specific selectivity works with correct inputs", {
   selectivity2$logit_sel_at_age$resize(1)
   selectivity2$logit_sel_at_age[1]$value <- 1
   selectivity2$logit_sel_at_age[1]$estimation_type$set("random_effects")
+  selectivity2$ages$resize(1)
+  selectivity2$ages$set(0, 1)
   selectivity2$min_age$set(1)
   selectivity2$n_ages$set(1)
 
