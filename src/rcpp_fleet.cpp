@@ -35,9 +35,13 @@ void register_fleet(Rcpp::Module& m) {
       .field("landings_numbers_at_age",
              &FleetInterface::
                  landings_numbers_at_age)
+      .field("landings_numbers_at_age_by_partition",
+             &FleetInterface::landings_numbers_at_age_by_partition)
       .field("landings_weight_at_age",
              &FleetInterface::
                  landings_weight_at_age)
+      .field("landings_weight_at_age_by_partition",
+             &FleetInterface::landings_weight_at_age_by_partition)
       .field("landings_numbers_at_length",
              &FleetInterface::
                  landings_numbers_at_length)
@@ -55,8 +59,12 @@ void register_fleet(Rcpp::Module& m) {
              &FleetInterface::lengthcomp_proportion)
       .field("index_numbers_at_age",
              &FleetInterface::index_numbers_at_age)
+      .field("index_numbers_at_age_by_partition",
+             &FleetInterface::index_numbers_at_age_by_partition)
       .field("index_weight_at_age",
              &FleetInterface::index_weight_at_age)
+      .field("index_weight_at_age_by_partition",
+             &FleetInterface::index_weight_at_age_by_partition)
       .field("index_numbers_at_length",
              &FleetInterface::
                  index_numbers_at_length)

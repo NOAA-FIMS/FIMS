@@ -14,6 +14,7 @@
 #include "../recruitment/recruitment.hpp"
 #include "../../interface/interface.hpp"
 #include "../maturity/maturity.hpp"
+#include "subpopulation.hpp"
 
 namespace fims_popdy {
 
@@ -68,6 +69,10 @@ annual fishing mortality multipliers to scale total mortality of all fleets*/
   std::set<uint32_t> fleet_ids; /*!< id of fleet model object*/
   std::vector<std::shared_ptr<fims_popdy::Fleet<Type>>>
       fleets; /*!< shared pointer to fleet module */
+
+  // partition infrastructure (see subpopulation.hpp)
+  PartitionSpec partition_spec; /*!< axes and strata for partitioned structure */
+  IndexLayout index_layout;     /*!< folded indices for partitioned quantities */
 
   /**
    * @brief Constructor.
