@@ -125,7 +125,7 @@ setup_default_parameters <- function(data) {
 
   # Create growth parameters
   growth_defaults <- setup_default_growth()
-  
+
   population_defaults <- setup_default_Population(data = data)
   # Calculate initial numbers at age based on log_rzero and M_value
   # Set natural mortality rate
@@ -192,6 +192,7 @@ setup_default_parameters <- function(data) {
 #'   log_rzero = log_rzero,
 #'   log_m = log(0.2)
 #' )
+#' }
 setup_default_log_init_naa <- function(
   n_ages,
   log_rzero,
@@ -207,7 +208,7 @@ setup_default_log_init_naa <- function(
 #'
 #' @description
 #' This function creates a template for default parameters used in a Fisheries
-#' Integrated Modeling System (FIMS) model. 
+#' Integrated Modeling System (FIMS) model.
 #' @param n_parameters An integer specifying the number of parameters in the
 #' template.
 #' @return
@@ -482,7 +483,7 @@ setup_default_selectivity <- function(
 #'
 #' @description
 #' This function sets up default parameters for a fleet module, including natural log of
-#' catchability coefficients (log_q) and fishing mortality (log_Fmort) for fleets. 
+#' catchability coefficients (log_q) and fishing mortality (log_Fmort) for fleets.
 #' For fishing fleets, log_q is set to an estimation type of "constant" with a
 #' default value of 0, while log_Fmort is set to "fixed_effects". For survey
 #' fleets, log_q is set to "fixed_effects" and log_Fmort is set to "constant"
@@ -556,7 +557,7 @@ setup_default_fleet <- function(
 #' @param data An S4 object. FIMS input data.
 #' @param module_type A string specifying the type of maturity module. The
 #'   available options are `r toString(eval(formals(setup_default_maturity)[["module_type"]]))`.
-#' @inherit setup_default_parameters 
+#' @inherit setup_default_parameters
 #' @return
 #' A tibble containing default maturity parameters. See \code{\link{setup_default_parameters}}
 #' for full column descriptions.
@@ -774,7 +775,7 @@ setup_default_DlnormDistribution <- function(
 #' @param distribution A string specifying the distribution for the recruitment process.
 #'   The available options are
 #'   `r toString(eval(formals(setup_default_recruitment)[["distribution"]]))`.
-#' @inherit setup_default_parameters 
+#' @inherit setup_default_parameters
 #' @return
 #' A tibble containing default recruitment parameters. See \code{\link{setup_default_parameters}}
 #' for full column descriptions.
