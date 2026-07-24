@@ -9,7 +9,7 @@
 
 # fims_frame ----
 ## Setup ----
-data("data_big", "fims_input_types", package = "FIMS")
+data_big <- FIMS::data_big
 fims_frame <- FIMS::FIMSFrame(data_big)
 
 # A helper function that creates a figure from code
@@ -299,7 +299,6 @@ test_that("`FIMSFrame()` returns correct error messages", {
 
 # model_* ----
 ## Setup ----
-fims_frame <- FIMS::FIMSFrame(data_big)
 n_years <- get_n_years(fims_frame)
 n_ages <- get_n_ages(fims_frame)
 
@@ -439,31 +438,9 @@ test_that("`model_*()` returns correct error messages", {
 ## Setup ----
 # Load the test data from an RDS file containing model fits.
 # List all RDS files in the fixtures directory that match the pattern "fit*_.RDS"
-if (!file.exists(testthat::test_path("fixtures", "data_age_comp.RDS"))) {
-  prepare_test_data()
-}
-
-data_files <- list.files(
-  path = testthat::test_path("fixtures"),
-  pattern = "^data.*\\.RDS$",
-  full.names = TRUE
-)
-
 ## IO correctness ----
 test_that("`get_n_fleets()` works with correct inputs", {
-  # Function to read the RDS file and get input
-  check_input <- function(data_file) {
-    data <- readRDS(data_file)
-    n_fleets <- get_n_fleets(data)
-    #' @description Test that `get_n_fleets()` returns correct number of fleets.
-    expect_equal(
-      object = n_fleets,
-      expected = 2
-    )
-  }
-
-  # Use purrr::map to apply the function to each file
-  result <- purrr::map(data_files, check_input)
+  expect_equal(get_n_fleets(fims_frame), 2)
 })
 
 ## Edge handling ----

@@ -278,7 +278,7 @@ The list returned from `initialize_fims()` can be passed to the parameter of `fi
 
 ### Example
 
-```{r fit, max.height='100px', attr.output='.numberLines', eval=TRUE}
+```{r fit, max.height='100px', attr.output='.numberLines', eval=FALSE}
 # Run the model without optimization to help ensure a viable model
 test_fit <- parameters_4_model |>
   initialize_fims(data = data_4_model) |>
@@ -290,11 +290,19 @@ fit <- parameters_4_model |>
   fit_fims(optimize = TRUE)
 ```
 
+```{r load-precomputed-fit, echo=FALSE}
+# Load the pre-computed objects saved in package data
+data("fit_without_optimization_big", "fit_with_optimization_big", package = "FIMS")
+
+test_fit <- fit_without_optimization_big
+fit <- fit_with_optimization_big
+```
+
 ### Logging system
 
 You can look at the log file in R or write it to the disk but you must run `get_log()` before you run clear to obtain information about the model because clear removes everything from memory, including the log. `get_log()` returns the log information as a string. This string can be manipulated into a data frame using `jsonlite::fromJSON()`. There are three logging levels, "info", "warning", and "error". The log below will not have any error messages but if you were to have error messages and you want to know immediately upon the first error that there are problems, you can run `set_log_throw_on_error(TRUE)` prior to running your model. See the vignette on [FIMS logging](fims-logging.html) or the [doxygen documentation](https://noaa-fims.github.io/FIMS/doxygen/classfims_1_1FIMSLog.html) for more information.
 
-```{r example-log, eval = TRUE}
+```{r example-log, eval = FALSE}
 log_json_string <- get_log()
 log_data_frame <- jsonlite::fromJSON(log_json_string)
 log_data_frame[1, ]
@@ -309,10 +317,22 @@ clear()
 
 The results can be plotted with either base R, {ggplot2}, or {stockplotr}. Where, we recommend using {stockplotr} where possible.
 
-```{r fit-output}
+```{r fit-output, eval = FALSE}
 # Temporary manipulation to the returned estimates to get them
 # to work with stockplotr
 output <- get_estimates(fit) |>
+  dplyr::mutate(
+    uncertainty_label = "se",
+    year = year_i,
+    estimate = estimated
+  )
+```
+
+```{r load-precomputed-estimates, echo=FALSE}
+# Load the pre-computed objects saved in package data
+data("estimates_with_optimization_big", package = "FIMS")
+
+output <- estimates_with_optimization_big |>
   dplyr::mutate(
     uncertainty_label = "se",
     year = year_i,

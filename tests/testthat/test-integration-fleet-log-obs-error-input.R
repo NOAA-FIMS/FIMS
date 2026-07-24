@@ -7,6 +7,12 @@
 #' one lines, that will be used in the bookdown report of the results from
 #' {testthat}. This line can be more than 80 characters.
 
+#' @description Skip the test unless explicitly enabled for heavy integration testing.
+testthat::skip_if_not(
+  testthat:::env_var_is_true("RUN_SLOW_TESTS"),
+  message = "Skipping: RUN_SLOW_TESTS is not set to true."
+)
+
 # Fmort and log_sd dimension check ----
 ## setup ----
 # Load dataset and set up model for tests

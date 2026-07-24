@@ -10,42 +10,42 @@
 # get_opt ----
 ## Setup ----
 # Load or prepare any necessary data for testing
-if (!file.exists(testthat::test_path("fixtures", "fit_age_length_comp.RDS"))) {
-  prepare_test_data()
-}
+fit_with_optimization_big <- FIMS::fit_with_optimization_big
+fit_without_optimization_big <- FIMS::fit_without_optimization_big
+
+expected_names <- c(
+  "par", "objective", "convergence",
+  "iterations", "evaluations", "message"
+)
+
 ## IO correctness ----
-test_that("`get_opt()` works with correct inputs", {
-  # Load the test data from an RDS file containing model fits.
-  # List all RDS files in the fixtures directory that match the pattern "fit*_.RDS"
-  fit_files <- list.files(
-    path = testthat::test_path("fixtures"),
-    pattern = "^fit.*\\.RDS$",
-    full.names = TRUE
+test_that("`get_opt()` works with fit_with_optimization_big", {
+  opt_with_optimization <- get_opt(fit_with_optimization_big)
+  #' @description Test that `get_opt()` returns correct output for the `opt` slot.
+  expect_equal(
+    object = opt_with_optimization,
+    expected = fit_with_optimization_big@opt
   )
 
-  expected_names <- c(
-    "par", "objective", "convergence",
-    "iterations", "evaluations", "message"
+  #' @description Test that `get_opt()` returns correct names for the `opt` slot.
+  expect_equal(
+    object = names(opt_with_optimization),
+    expected = expected_names
+  )
+})
+
+test_that("`get_opt()` works with fit_without_optimization_big", {
+  opt_without_optimization <- get_opt(fit_without_optimization_big)
+  #' @description Test that `get_opt()` returns correct output for the `opt` slot.
+  expect_equal(
+    object = opt_without_optimization,
+    expected = fit_without_optimization_big@opt
   )
 
-  # Function to read the RDS file and get input
-  check_opt <- function(fit_file) {
-    fit_data <- readRDS(fit_file)
-    opt <- get_opt(fit_data)
-    #' @description Test that `get_opt()` returns correct output for the `opt` slot.
-    expect_equal(
-      object = opt,
-      expected = fit_data@opt
-    )
-    #' @description Test that `get_opt()` returns correct names for the `opt` slot.
-    expect_equal(
-      object = names(opt),
-      expected = expected_names
-    )
-  }
-
-  # Use purrr::map to apply the function to each file
-  result <- purrr::map(fit_files, check_opt)
+  #' @description Test that `get_opt()` returns NULL for the `opt` slot when optimization is not performed.
+  expect_true(
+    object = is.list(opt_without_optimization) && length(opt_without_optimization) == 0
+  )
 })
 
 ## Edge handling ----

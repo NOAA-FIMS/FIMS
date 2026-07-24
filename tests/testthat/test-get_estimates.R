@@ -10,9 +10,8 @@
 # get_estimates ----
 ## Setup ----
 # Load or prepare any necessary data for testing
-if (!file.exists(testthat::test_path("fixtures", "fit_age_length_comp.RDS"))) {
-  prepare_test_data()
-}
+estimates_with_optimization_big <- FIMS::estimates_with_optimization_big
+estimates_without_optimization_big <- FIMS::estimates_without_optimization_big
 
 ## IO correctness ----
 # Define the expected column names for the estimates tibble
@@ -26,9 +25,7 @@ expected_colnames <- c(
 )
 
 test_that("`get_estimates()` works with deterministic run", {
-  # Read the RDS file containing the deterministic run results
-  deterministic_results <- readRDS(testthat::test_path("fixtures", "deterministic_age_length_comp.RDS"))
-  deterministic_colnames <- get_estimates(deterministic_results) |> colnames()
+  deterministic_colnames <- colnames(estimates_without_optimization_big)
   #' @description Test that `get_estimates()` returns correct colnames from a deterministic run.
   expect_equal(
     object = deterministic_colnames,
@@ -37,7 +34,7 @@ test_that("`get_estimates()` works with deterministic run", {
 
   #' @description Test that the result values from the model fit have not changed from the accepted version.
   expect_snapshot(
-    get_estimates(deterministic_results) |>
+    estimates_without_optimization_big |>
       # Remove the estimate, uncertainty, and gradient columns, as they
       # may change between runs
       dplyr::select(
@@ -49,35 +46,17 @@ test_that("`get_estimates()` works with deterministic run", {
 })
 
 test_that("`get_estimates()` works with estimation run", {
-  # Load the test data from an RDS file containing model fits.
-  # List all RDS files in the fixtures directory that match the pattern "fit*_.RDS"
-  fit_files <- list.files(
-    path = testthat::test_path("fixtures"),
-    pattern = "^fit.*\\.RDS$",
-    full.names = TRUE
+  get_estimates_colnames <- colnames(estimates_with_optimization_big)
+  #' @description Test that `get_estimates()` returns correct colnames from an estimation run.
+  expect_equal(
+    object = get_estimates_colnames,
+    expected = expected_colnames
   )
-
-  # Function to read the RDS file, get estimates, and check column names
-  check_estimates_colnames <- function(fit_file) {
-    fit_data <- readRDS(fit_file)
-    estimates <- get_estimates(fit_data)
-    estimates_colnames <- colnames(estimates)
-
-    #' @description Test that `get_estimates()` returns correct colnames from a estimation run.
-    expect_equal(
-      object = estimates_colnames,
-      expected = expected_colnames
-    )
-  }
-
-  # Use purrr::map to apply the function to each file
-  result <- purrr::map(fit_files, check_estimates_colnames)
 
   #' @description Test that the result values from the model fit have not changed from the accepted version.
   expect_snapshot(
     # Read the first RDS file, get estimates, and print a snapshot
-    readRDS(fit_files[[1]]) |>
-      get_estimates() |>
+    estimates_with_optimization_big |>
       # Remove the estimated, uncertainty, and gradient columns, as they
       # may change between runs
       dplyr::select(
