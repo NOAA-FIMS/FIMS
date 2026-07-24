@@ -10,18 +10,16 @@
 # tidy ----
 
 ## Setup ----
-fit <- local({
-  clear()
-  withr::defer(clear(), envir = parent.env(environment()))
-  data("data_big", package = "FIMS")
-  data_4_model <- FIMSFrame(data_big)
-  create_default_parameters(
-    configurations = create_default_configurations(data = data_4_model),
-    data = data_4_model
-  ) |>
-    initialize_fims(data = data_4_model) |>
-    fit_fims(optimize = TRUE)
-})
+fit <- FIMS::fit_with_optimization_big
+estimates_with_optimization_big <- FIMS::estimates_with_optimization_big
+# generics::tidy() expects an object of class FIMSFit and internally calls
+# get_estimates(). The saved fit object is a FIMSFit object but missing covariance
+# matrix (to reduce file size) and get_estimates() will error. Here we mock
+# get_estimates() to return the saved estimates_with_optimization_big object so
+# that generics::tidy() can run.
+testthat::local_mocked_bindings(
+  get_estimates = function(x) estimates_with_optimization_big
+)
 
 ## IO correctness ----
 test_that("tidy() works with correct inputs", {
@@ -209,3 +207,4 @@ test_that("get_fit_stream() returns correct outputs for edge cases", {
 
 ## Error handling ----
 # No built-in errors or warnings for FIMS::get_fit_stream().
+
