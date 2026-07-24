@@ -40,7 +40,16 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-    name: ${{ matrix.os }}
+        # Adds the split test categories to the matrix
+        test_type:
+          - slow
+          - integration-caa
+          - integration-fims-bayesian
+          - integration-fims-estimation-random-effects
+          - integration-fleet
+          - integration-proportion
+
+    name: ${{ matrix.os }} (${{ matrix.test_type }})
     runs-on: ${{ matrix.os }}
     
     env:
@@ -85,6 +94,8 @@ jobs:
           needs: check
 
       - name: Run Slow Tests Only
+        env:
+          TEST_FILTER: ${{ matrix.test_type }}
         shell: Rscript {0}
         run: |
           # Windows-specific fix for the "files too big" error
@@ -92,6 +103,7 @@ jobs:
             withr::local_options(pkg.build_extra_flags = FALSE)
           }
 
-          # The filter looks for files with 'slow' in the name
-          devtools::test(filter = "slow")
+          filter_pattern <- Sys.getenv("TEST_FILTER")
+          message(paste("Running test suite matching filter:", filter_pattern))
 
+          devtools::test(filter = filter_pattern)

@@ -10,44 +10,50 @@
 # get_number_of_parameters ----
 ## Setup ----
 # Load or prepare any necessary data for testing
-if (!file.exists(testthat::test_path("fixtures", "fit_age_length_comp.RDS"))) {
-  prepare_test_data()
-}
+fit_with_optimization_big <- FIMS::fit_with_optimization_big
+fit_without_optimization_big <- FIMS::fit_without_optimization_big
+
 ## IO correctness ----
-test_that("`get_number_of_parameters()` works with correct inputs", {
-  # Load the test data from an RDS file containing model fits.
-  # List all RDS files in the fixtures directory that match the pattern "fit*_.RDS"
-  fit_files <- list.files(
-    path = testthat::test_path("fixtures"),
-    pattern = "^fit.*\\.RDS$",
-    full.names = TRUE
+test_that("`get_number_of_parameters()` works with fit_with_optimization_big", {
+  expected_n_total <- length(fit_with_optimization_big@obj[["env"]][["last.par.best"]])
+  expected_n_fixed_effects <- length(fit_with_optimization_big@obj[["par"]])
+  expected_n_random_effects <- length(fit_with_optimization_big@obj[["env"]]$parList()[["re"]])
+  number_of_parameters <- get_number_of_parameters(fit_with_optimization_big)
+  expected_vector <- c(
+    fixed_effects = expected_n_fixed_effects,
+    random_effects = expected_n_random_effects
   )
+  #' @description Test that `get_number_of_parameters()` returns correct output for the `number_of_parameters` slot.
+  expect_equal(
+    object = number_of_parameters,
+    expected = fit_with_optimization_big@number_of_parameters
+  )
+  #' @description Test that `get_number_of_parameters()` returns correct names for the `number_of_parameters` slot.
+  expect_equal(
+    object = number_of_parameters,
+    expected = expected_vector
+  )
+})
 
-  # Function to read the RDS file and get input
-  check_number_of_parameters <- function(fit_file) {
-    fit_data <- readRDS(fit_file)
-    expected_n_total <- length(fit_data@obj[["env"]][["last.par.best"]])
-    expected_n_fixed_effects <- length(fit_data@obj[["par"]])
-    expected_n_random_effects <- length(fit_data@obj[["env"]]$parList()[["re"]])
-    number_of_parameters <- get_number_of_parameters(fit_data)
-    expected_vector <- c(
-      fixed_effects = expected_n_fixed_effects,
-      random_effects = expected_n_random_effects
-    )
-    #' @description Test that `get_number_of_parameters()` returns correct output for the `number_of_parameters` slot.
-    expect_equal(
-      object = number_of_parameters,
-      expected = fit_data@number_of_parameters
-    )
-    #' @description Test that `get_number_of_parameters()` returns correct names for the `number_of_parameters` slot.
-    expect_equal(
-      object = number_of_parameters,
-      expected = expected_vector
-    )
-  }
-
-  # Use purrr::map to apply the function to each file
-  result <- purrr::map(fit_files, check_number_of_parameters)
+test_that("`get_number_of_parameters()` works with fit_without_optimization_big", {
+  expected_n_total <- length(fit_without_optimization_big@obj[["env"]][["last.par.best"]])
+  expected_n_fixed_effects <- length(fit_without_optimization_big@obj[["par"]])
+  expected_n_random_effects <- length(fit_without_optimization_big@obj[["env"]]$parList()[["re"]])
+  number_of_parameters <- get_number_of_parameters(fit_without_optimization_big)
+  expected_vector <- c(
+    fixed_effects = expected_n_fixed_effects,
+    random_effects = expected_n_random_effects
+  )
+  #' @description Test that `get_number_of_parameters()` returns correct output for the `number_of_parameters` slot.
+  expect_equal(
+    object = number_of_parameters,
+    expected = fit_without_optimization_big@number_of_parameters
+  )
+  #' @description Test that `get_number_of_parameters()` returns correct names for the `number_of_parameters` slot.
+  expect_equal(
+    object = number_of_parameters,
+    expected = expected_vector
+  )
 })
 
 ## Edge handling ----

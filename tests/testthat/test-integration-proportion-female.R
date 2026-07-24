@@ -8,6 +8,12 @@
 #' {testthat}. This line can be more than 80 characters.
 
 # integration_proportion_female ----
+#' @description Skip the test unless explicitly enabled for heavy integration testing.
+testthat::skip_if_not(
+  testthat:::env_var_is_true("RUN_SLOW_TESTS"),
+  message = "Skipping: RUN_SLOW_TESTS is not set to true."
+)
+
 ## Setup ----
 load(test_path("fixtures", "integration_test_data.RData"))
 

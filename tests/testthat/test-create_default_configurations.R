@@ -52,57 +52,49 @@ test_that("`create_default_configurations()` works with correct inputs", {
 })
 
 ## Edge handling ----
-# Please remove/comment out the test template below if no edge cases are being tested.
-test_that("`create_default_configurations()` returns correct outputs for edge cases", {
-  # Load the test data from an RDS file containing model fits.
-  if (!file.exists(testthat::test_path("fixtures", "data_length_comp.RDS"))) {
-    prepare_test_data()
-  }
+test_that("`create_default_configurations()` handles edge-case inputs", {
+  default_configurations_unnested <- create_default_configurations(data_age_length) |>
+    tidyr::unnest(cols = data)
 
-  # List all RDS files in the fixtures directory that match the pattern "data*_.RDS"
-  data_files <- list.files(
-    path = testthat::test_path("fixtures"),
-    pattern = "^data.*\\.RDS$",
-    full.names = TRUE
+  reordered_data <- data_big |>
+    dplyr::arrange(dplyr::desc(.data$timing), .data$fleet, .data$type, .data$age, .data$length)
+  reordered_frame <- FIMSFrame(reordered_data)
+  reordered_configurations <- create_default_configurations(reordered_frame) |>
+    tidyr::unnest(cols = data)
+
+  #' @description Test that reordering input rows does not change the generated module configuration table.
+  expect_equal(
+    object = reordered_configurations,
+    expected = default_configurations_unnested
   )
 
-  # Function to read the RDS file, get fits, and check column names
-  check_colnames <- function(data_file) {
-    data <- readRDS(data_file)
-    configurations <- create_default_configurations(data) |>
-      tidyr::unnest(cols = data)
-    expected_names <- colnames(configurations)
-    #' @description Test that configurations for various special data cases have the correct column structure.
-    expect_equal(
-      object = colnames(configurations),
-      expected = expected_names
+  mock_additional_fleet <- data_big |>
+    dplyr::filter(
+      .data$fleet == "fleet1",
+      .data$type %in% c("landings", "age_comp", "length_comp")
+    ) |>
+    dplyr::mutate(fleet = "fleet_mock")
+
+  mock_data <- dplyr::bind_rows(data_big, mock_additional_fleet)
+  mock_frame <- FIMSFrame(mock_data)
+  mock_configurations <- create_default_configurations(mock_frame) |>
+    tidyr::unnest(cols = data)
+
+  #' @description Test that adding a new fleet with supported data types adds fleet-specific data and selectivity modules.
+  expect_true(
+    any(
+      mock_configurations[["module_name"]] == "Selectivity" &
+        mock_configurations[["fleet"]] == "fleet_mock"
     )
+  )
 
-    if (data_file == testthat::test_path("fixtures", "data_age_comp_na.RDS")) {
-      module_types <- configurations |>
-        dplyr::pull(module_type) |>
-        unique()
-      #' @description Test that for data containing only age information, the `AgeComp` module is correctly included.
-      expect_true("AgeComp" %in% module_types)
-
-      #' @description Test that for data containing only age information, the `LengthComp` module is correctly excluded.
-      expect_true(!("LengthComp" %in% module_types))
-    }
-
-    if (data_file == testthat::test_path("fixtures", "data_length_comp_na.RDS")) {
-      module_types <- configurations |>
-        dplyr::pull(module_type) |>
-        unique()
-      #' @description Test that for data containing only length information, the `LengthComp` module is correctly included.
-      expect_true("LengthComp" %in% module_types)
-
-      #' @description Test that for data containing only length information, the `AgeComp` module is correctly excluded.
-      expect_true(!("AgeComp" %in% module_types))
-    }
-  }
-
-  # Use purrr::map to apply the function to each file
-  result <- purrr::map(data_files, check_colnames)
+  #' @description Test that adding a new fleet with supported data types creates only the expected fleet-specific data module types.
+  expect_setequal(
+    object = mock_configurations |>
+      dplyr::filter(.data$fleet == "fleet_mock", .data$module_name == "Data") |>
+      dplyr::pull(.data$module_type),
+    expected = c("Landings", "AgeComp", "LengthComp")
+  )
 })
 
 ## Error handling ----

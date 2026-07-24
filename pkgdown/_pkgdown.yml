@@ -25,7 +25,7 @@ reference:
   desc: >
       Example dataset used in FIMS demonstrations and examples.
   contents:
-  - data_big
+  - ends_with("_big")
   - fims_input_types
 
 - title: Run FIMS

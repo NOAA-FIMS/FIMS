@@ -10,6 +10,11 @@
 # reshape_json_estimates ----
 ## Setup ----
 # Load or prepare any necessary data for testing
+#' @description Skip the test unless explicitly enabled for heavy integration testing.
+testthat::skip_if_not(
+  testthat:::env_var_is_true("RUN_SLOW_TESTS"),
+  message = "Skipping: RUN_SLOW_TESTS is not set to true."
+)
 if (!file.exists(testthat::test_path("fixtures", "fit_age_length_comp.RDS"))) {
   prepare_test_data()
 }
