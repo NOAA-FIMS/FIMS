@@ -59,11 +59,13 @@
 #include <limits>
 #include <stdexcept>
 #include <vector>
+#include <Eigen/Dense>
 
 #include "../../common/fims_math.hpp"
 #include "../utilities/edm_kernels.hpp"
 #include "../utilities/edm_linear_algebra.hpp"
 #include "edm_predictor_base.hpp"
+
 
 namespace fims_edm {
 
@@ -225,8 +227,9 @@ struct GPEdmProjection : public EDMPredictorBase<Type> {
       // --- Rprop step ---
       std::vector<double> parst_new(np);
       for (size_t k = 0; k < np; ++k) {
-        parst_new[k] = parst[k] - sign_d(res.grad[k]) * delta[k];
+        parst_new[k] = parst[k] - fims_math::sign(res.grad[k]) * delta[k];
       }
+
 
       LogPosteriorResult res_new = compute_log_posterior_grad(
           parst_new, y, D, N, E, kVeMin, kVeMax, kS2Min, kS2Max);
@@ -295,9 +298,24 @@ struct GPEdmProjection : public EDMPredictorBase<Type> {
       y[i] = *(this->library->target_values[i]);
     }
 
-    // --- Solve Sigma * alpha = y (alpha overwrites y) ---
-    GaussianElimination<Type>(Sigma, y, N);
+    // --- Solve Sigma * alpha = y (alpha overwrites y) via Cholesky (Eigen::LDLT) ---
+    Eigen::Matrix<Type, Eigen::Dynamic, Eigen::Dynamic> Sigma_mat(N, N);
+    for (size_t i = 0; i < N; ++i) {
+      for (size_t j = 0; j < N; ++j) {
+        Sigma_mat(i, j) = Sigma[i * N + j];
+      }
+    }
+    Eigen::Matrix<Type, Eigen::Dynamic, 1> y_mat(N);
+    for (size_t i = 0; i < N; ++i) {
+      y_mat(i) = y[i];
+    }
+    Eigen::LDLT<Eigen::Matrix<Type, Eigen::Dynamic, Eigen::Dynamic>> ldlt(Sigma_mat);
+    Eigen::Matrix<Type, Eigen::Dynamic, 1> alpha = ldlt.solve(y_mat).eval();
+    for (size_t i = 0; i < N; ++i) {
+      y[i] = alpha(i);
+    }
     // y now holds alpha = Sigma^{-1} y_targets
+
 
     // --- Build k_star: covariance between query and every library row ---
     std::vector<Type> k_star;
@@ -362,13 +380,9 @@ struct GPEdmProjection : public EDMPredictorBase<Type> {
 
   /** @brief Inverse logit: maps real line back to (lo, hi). */
   static double logit_inverse(double t, double lo, double hi) {
-    return (hi - lo) / (1.0 + std::exp(-t)) + lo;
+    return (hi - lo) / (1.0 + fims_math::exp(-t)) + lo;
   }
 
-  /** @brief Sign function returning -1, 0, or +1 as a double. */
-  static double sign_d(double x) {
-    return (x > 0.0) ? 1.0 : ((x < 0.0) ? -1.0 : 0.0);
-  }
 
   /**
    * @brief Evaluate the negative log posterior and its gradient.
@@ -428,55 +442,42 @@ struct GPEdmProjection : public EDMPredictorBase<Type> {
       Sigma_d[i * N + i] += ve_cur;
     }
 
-    // --- Solve Sigma * alpha = y via Gaussian elimination ---
-    std::vector<double> alpha = y;
-    std::vector<double> Sigma_copy = Sigma_d;
-    GaussianElimination<double>(Sigma_copy, alpha, N);
-    // alpha = Sigma^{-1} y
-
-    // --- Log likelihood: -0.5 y'alpha - 0.5 log|Sigma| ---
-    // Recompute Sigma to get its inverse (solve N identity columns)
-    std::vector<double> iKVs(N * N, 0.0);
-    for (size_t col = 0; col < N; ++col) {
-      std::vector<double> e_col(N, 0.0);
-      e_col[col] = 1.0;
-      std::vector<double> Sigma_tmp = Sigma_d;
-      GaussianElimination<double>(Sigma_tmp, e_col, N);
-      for (size_t row = 0; row < N; ++row) iKVs[row * N + col] = e_col[row];
-    }
-
-    // Log determinant via triangular factor diagonal
-    // (approximate: sum log|diag| of upper triangle from elimination)
-    // We use: log|Sigma| = sum_i log(U[i,i]) from GE
-    // Recompute to get diagonal of U
-    double logdet = 0.0;
-    {
-      std::vector<double> S2 = Sigma_d;
-      std::vector<double> b2(N, 0.0);
-      b2[0] = 1.0;  // dummy rhs
-      // forward elimination only to get U diagonal
-      for (size_t col = 0; col < N; ++col) {
-        // find max pivot
-        size_t prow = col;
-        double mval = 0.0;
-        for (size_t r = col; r < N; ++r) {
-          double v = std::abs(S2[r * N + col]);
-          if (v > mval) { mval = v; prow = r; }
-        }
-        if (prow != col) {
-          for (size_t j = 0; j < N; ++j) std::swap(S2[col * N + j], S2[prow * N + j]);
-        }
-        logdet += std::log(std::abs(S2[col * N + col]) + 1e-300);
-        for (size_t r = col + 1; r < N; ++r) {
-          double f = S2[r * N + col] / S2[col * N + col];
-          for (size_t j = col; j < N; ++j) S2[r * N + j] -= f * S2[col * N + j];
-        }
+    // --- Solve Sigma * alpha = y and compute logdet & iKVs via Eigen::LDLT ---
+    Eigen::MatrixXd Sigma_mat(N, N);
+    for (size_t i = 0; i < N; ++i) {
+      for (size_t j = 0; j < N; ++j) {
+        Sigma_mat(i, j) = Sigma_d[i * N + j];
       }
     }
+    Eigen::VectorXd y_eig(N);
+    for (size_t i = 0; i < N; ++i) {
+      y_eig(i) = y[i];
+    }
+
+    Eigen::LDLT<Eigen::MatrixXd> ldlt(Sigma_mat);
+    Eigen::VectorXd alpha_eig = ldlt.solve(y_eig).eval();
+    std::vector<double> alpha(N);
+    for (size_t i = 0; i < N; ++i) {
+      alpha[i] = alpha_eig(i);
+    }
+
+    // Inverse matrix iKVs = Sigma^{-1}
+    Eigen::MatrixXd I_mat = Eigen::MatrixXd::Identity(N, N);
+    Eigen::MatrixXd iKVs_mat = ldlt.solve(I_mat).eval();
+    std::vector<double> iKVs(N * N, 0.0);
+    for (size_t i = 0; i < N; ++i) {
+      for (size_t j = 0; j < N; ++j) {
+        iKVs[i * N + j] = iKVs_mat(i, j);
+      }
+    }
+
+    // Log determinant from LDLT vectorD
+    double logdet = ldlt.vectorD().array().abs().log().sum();
 
     double ytAlpha = 0.0;
     for (size_t i = 0; i < N; ++i) ytAlpha += y[i] * alpha[i];
     double like = -0.5 * ytAlpha - 0.5 * logdet;
+
 
     // --- Priors (matching GPEDM R package: Rogers 2023, getpriors()) ---
     // phi: half-Normal prior

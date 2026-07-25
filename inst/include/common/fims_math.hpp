@@ -164,6 +164,24 @@ inline const Type pow(const Type &x, const Type &y) {
 }
 
 /**
+ * @brief The sign function returning -1, 0, or +1. Uses CppAD::sign under TMB_MODEL.
+ * @param x The value to check the sign of.
+ * @return -1 if x < 0, +1 if x > 0, 0 if x == 0.
+ */
+template <class Type>
+inline const Type sign(const Type &x) {
+#ifdef TMB_MODEL
+  return CppAD::sign(x);
+#else
+  return (x > static_cast<Type>(0))
+             ? static_cast<Type>(1)
+             : ((x < static_cast<Type>(0)) ? static_cast<Type>(-1)
+                                           : static_cast<Type>(0));
+#endif
+}
+
+
+/**
  * @brief Computes the natural logarithm of the absolute value of the [gamma
  * function](https://en.wikipedia.org/wiki/Gamma_function) of x for a TMB
  * model. The function specifically uses std::lgamma, defined in cmath header,
