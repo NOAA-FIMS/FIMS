@@ -70,7 +70,7 @@ model_edm_matrix(x, embedding_name)
 \item{fleet}{A string, or vector of strings, specifying the name of the
 fleet(s) of interest that you want data for. The strings must
 exactly match strings in the \code{"fleet"} column of \code{get_data(x)}.}
-  
+
 \item{embedding_name}{A single string matching one of the names in
 \code{\link[=get_edm_embeddings]{get_edm_embeddings()}}.}
 }

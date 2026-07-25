@@ -70,6 +70,17 @@ struct EDMModel : public fims_model_object::FIMSObject<Type> {
    */
   DelayEmbeddingMatrix<Type> test_matrix;
 
+  // Backing storage for delay embedding pointers (filled from Rcpp interface)
+  std::vector<Type> library_embedded_values_storage;
+  std::vector<Type> library_target_values_storage;
+  std::vector<Type> library_embedded_uncertainty_storage;
+  std::vector<Type> library_target_uncertainty_storage;
+
+  std::vector<Type> test_embedded_values_storage;
+  std::vector<Type> test_target_values_storage;
+  std::vector<Type> test_embedded_uncertainty_storage;
+  std::vector<Type> test_target_uncertainty_storage;
+
   /**
    * @brief Prediction output vector.
    *
@@ -142,7 +153,6 @@ struct EDMModel : public fims_model_object::FIMSObject<Type> {
       pred.library = &library_matrix;
       pred.embedding_dimension = this->embedding_dimension;
       pred.n_neighbors = static_cast<int>(this->n_neighbors);
-      pred.forecast_horizon = this->forecast_horizon;
       pred.predict(test_matrix);
 
       predictions.resize(pred.predictions.size());
@@ -160,7 +170,6 @@ struct EDMModel : public fims_model_object::FIMSObject<Type> {
       } else {
         pred.kernel = SMapKernel::kExponential;
       }
-      pred.forecast_horizon = this->forecast_horizon;
       pred.predict(test_matrix);
 
       predictions.resize(pred.predictions.size());

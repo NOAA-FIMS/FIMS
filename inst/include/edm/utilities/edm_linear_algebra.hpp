@@ -52,7 +52,7 @@ void GaussianElimination(std::vector<Type>& A, std::vector<Type>& b,
     double max_val = 0.0;
     for (size_t row = col; row < n; ++row) {
       // Cast to double for pivot comparison only (not in AD trace).
-      double val = static_cast<double>(A[row * n + col]);
+      double val = asDouble(A[row * n + col]);
       if (val < 0.0) val = -val;
       if (val > max_val) {
         max_val = val;

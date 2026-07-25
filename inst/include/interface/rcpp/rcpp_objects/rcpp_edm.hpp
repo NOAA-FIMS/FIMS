@@ -13,6 +13,36 @@
 #include "rcpp_interface_base.hpp"
 
 /**
+ * @class SharedDouble
+ * @brief A class that provides shared ownership of a double value.
+ */
+class SharedDouble {
+ private:
+  std::shared_ptr<double> value;
+
+ public:
+  SharedDouble() : value(std::make_shared<double>(0.0)) {}
+  SharedDouble(double val) : value(std::make_shared<double>(val)) {}
+  SharedDouble(const SharedDouble& other) : value(other.value) {}
+  SharedDouble& operator=(const SharedDouble& other) {
+    if (this != &other) {
+      value = other.value;
+    }
+    return *this;
+  }
+  SharedDouble& operator=(const double& other) {
+    *value = other;
+    return *this;
+  }
+  operator double() const { return *value; }
+  double get() const { return *value; }
+  void set(double val) { *value = val; }
+};
+
+RCPP_EXPOSED_CLASS(SharedDouble)
+
+
+/**
  * @brief Rcpp interface that serves as the parent class for Rcpp EDM
  * interfaces. This type should be inherited and not called from R directly.
  */
@@ -72,21 +102,21 @@ class DelayEmbeddingInterface : public EDMInterfaceBase {
    * @brief The embedding dimension (E), i.e., the number of lagged
    * coordinates per row.
    */
-  uint32_t embedding_dimension;
+  SharedInt embedding_dimension;
   /**
    * @brief The time lag (tau) between successive coordinates in the
    * embedding.
    */
-  uint32_t time_lag;
+  SharedInt time_lag;
   /**
    * @brief The number of rows in the constructed delay embedding matrix.
    */
-  uint32_t n_rows;
+  SharedInt n_rows;
   /**
    * @brief The number of columns in the constructed delay embedding matrix
    * (equal to embedding_dimension).
    */
-  uint32_t n_cols;
+  SharedInt n_cols;
   /**
    * @brief The flattened delay embedding matrix, stored row-major. Element
    * [row * n_cols + col] is the value of x_{t - col * tau} for that row.
@@ -109,6 +139,15 @@ class DelayEmbeddingInterface : public EDMInterfaceBase {
    * Empty when no uncertainty series is provided.
    */
   RealVector target_uncertainty;
+
+  int get_embedding_dimension() const { return this->embedding_dimension.get(); }
+  void set_embedding_dimension(int val) { this->embedding_dimension.set(val); }
+  int get_time_lag() const { return this->time_lag.get(); }
+  void set_time_lag(int val) { this->time_lag.set(val); }
+  int get_n_rows() const { return this->n_rows.get(); }
+  void set_n_rows(int val) { this->n_rows.set(val); }
+  int get_n_cols() const { return this->n_cols.get(); }
+  void set_n_cols(int val) { this->n_cols.set(val); }
 
   /**
    * @brief The constructor.
@@ -364,11 +403,11 @@ class DelayEmbeddingInterface : public EDMInterfaceBase {
    * @return The value at (row, col) in the embedding matrix.
    */
   double at(uint32_t row, uint32_t col) {
-    if (row >= this->n_rows || col >= this->n_cols) {
+    if (row >= (uint32_t)(int)this->n_rows || col >= (uint32_t)(int)this->n_cols) {
       throw std::invalid_argument(
           "DelayEmbeddingInterface::at() index out of bounds.");
     }
-    return this->embedded_values[row * this->n_cols + col];
+    return this->embedded_values[row * (int)this->n_cols + col];
   }
 
   /**
@@ -468,6 +507,111 @@ inline fims_edm::DelayEmbeddingMatrix<double> to_matrix(DelayEmbeddingInterface*
 }
 
 /**
+ * @brief Helper to populate EDMModel matrices from DelayEmbeddingInterface.
+ */
+template <typename Type>
+void populate_edm_model_matrices(
+    DelayEmbeddingInterface* de_lib,
+    DelayEmbeddingInterface* de_test,
+    std::shared_ptr<fims_edm::EDMModel<Type>>& model) {
+  
+  // 1. Library Matrix
+  model->library_matrix.n_rows = de_lib->target_values.storage_m->size();
+  model->library_matrix.n_cols = model->library_matrix.n_rows > 0 
+      ? (de_lib->embedded_values.storage_m->size() / model->library_matrix.n_rows) : 0;
+
+  // Copy values to backing storage
+  model->library_embedded_values_storage.resize(de_lib->embedded_values.storage_m->size());
+  for (size_t i = 0; i < de_lib->embedded_values.storage_m->size(); i++) {
+    model->library_embedded_values_storage[i] = Type((*de_lib->embedded_values.storage_m)[i]);
+  }
+  model->library_target_values_storage.resize(de_lib->target_values.storage_m->size());
+  for (size_t i = 0; i < de_lib->target_values.storage_m->size(); i++) {
+    model->library_target_values_storage[i] = Type((*de_lib->target_values.storage_m)[i]);
+  }
+
+  // Set pointers in library_matrix to point to backing storage
+  model->library_matrix.embedded_values.resize(model->library_embedded_values_storage.size());
+  for (size_t i = 0; i < model->library_embedded_values_storage.size(); i++) {
+    model->library_matrix.embedded_values[i] = &(model->library_embedded_values_storage[i]);
+  }
+  model->library_matrix.target_values.resize(model->library_target_values_storage.size());
+  for (size_t i = 0; i < model->library_target_values_storage.size(); i++) {
+    model->library_matrix.target_values[i] = &(model->library_target_values_storage[i]);
+  }
+
+  // Handle library uncertainty if present
+  if (de_lib->embedded_uncertainty.storage_m && de_lib->embedded_uncertainty.storage_m->size() > 0) {
+    model->library_embedded_uncertainty_storage.resize(de_lib->embedded_uncertainty.storage_m->size());
+    for (size_t i = 0; i < de_lib->embedded_uncertainty.storage_m->size(); i++) {
+      model->library_embedded_uncertainty_storage[i] = Type((*de_lib->embedded_uncertainty.storage_m)[i]);
+    }
+    model->library_matrix.embedded_uncertainty.resize(model->library_embedded_uncertainty_storage.size());
+    for (size_t i = 0; i < model->library_embedded_uncertainty_storage.size(); i++) {
+      model->library_matrix.embedded_uncertainty[i] = &(model->library_embedded_uncertainty_storage[i]);
+    }
+  }
+  if (de_lib->target_uncertainty.storage_m && de_lib->target_uncertainty.storage_m->size() > 0) {
+    model->library_target_uncertainty_storage.resize(de_lib->target_uncertainty.storage_m->size());
+    for (size_t i = 0; i < de_lib->target_uncertainty.storage_m->size(); i++) {
+      model->library_target_uncertainty_storage[i] = Type((*de_lib->target_uncertainty.storage_m)[i]);
+    }
+    model->library_matrix.target_uncertainty.resize(model->library_target_uncertainty_storage.size());
+    for (size_t i = 0; i < model->library_target_uncertainty_storage.size(); i++) {
+      model->library_matrix.target_uncertainty[i] = &(model->library_target_uncertainty_storage[i]);
+    }
+  }
+
+  // 2. Test Matrix
+  model->test_matrix.n_rows = de_test->target_values.storage_m->size();
+  model->test_matrix.n_cols = model->test_matrix.n_rows > 0 
+      ? (de_test->embedded_values.storage_m->size() / model->test_matrix.n_rows) : 0;
+
+  // Copy values to backing storage
+  model->test_embedded_values_storage.resize(de_test->embedded_values.storage_m->size());
+  for (size_t i = 0; i < de_test->embedded_values.storage_m->size(); i++) {
+    model->test_embedded_values_storage[i] = Type((*de_test->embedded_values.storage_m)[i]);
+  }
+  model->test_target_values_storage.resize(de_test->target_values.storage_m->size());
+  for (size_t i = 0; i < de_test->target_values.storage_m->size(); i++) {
+    model->test_target_values_storage[i] = Type((*de_test->target_values.storage_m)[i]);
+  }
+
+  // Set pointers in test_matrix to point to backing storage
+  model->test_matrix.embedded_values.resize(model->test_embedded_values_storage.size());
+  for (size_t i = 0; i < model->test_embedded_values_storage.size(); i++) {
+    model->test_matrix.embedded_values[i] = &(model->test_embedded_values_storage[i]);
+  }
+  model->test_matrix.target_values.resize(model->test_target_values_storage.size());
+  for (size_t i = 0; i < model->test_target_values_storage.size(); i++) {
+    model->test_matrix.target_values[i] = &(model->test_target_values_storage[i]);
+  }
+
+  // Handle test uncertainty if present
+  if (de_test->embedded_uncertainty.storage_m && de_test->embedded_uncertainty.storage_m->size() > 0) {
+    model->test_embedded_uncertainty_storage.resize(de_test->embedded_uncertainty.storage_m->size());
+    for (size_t i = 0; i < de_test->embedded_uncertainty.storage_m->size(); i++) {
+      model->test_embedded_uncertainty_storage[i] = Type((*de_test->embedded_uncertainty.storage_m)[i]);
+    }
+    model->test_matrix.embedded_uncertainty.resize(model->test_embedded_uncertainty_storage.size());
+    for (size_t i = 0; i < model->test_embedded_uncertainty_storage.size(); i++) {
+      model->test_matrix.embedded_uncertainty[i] = &(model->test_embedded_uncertainty_storage[i]);
+    }
+  }
+  if (de_test->target_uncertainty.storage_m && de_test->target_uncertainty.storage_m->size() > 0) {
+    model->test_target_uncertainty_storage.resize(de_test->target_uncertainty.storage_m->size());
+    for (size_t i = 0; i < de_test->target_uncertainty.storage_m->size(); i++) {
+      model->test_target_uncertainty_storage[i] = Type((*de_test->target_uncertainty.storage_m)[i]);
+    }
+    model->test_matrix.target_uncertainty.resize(model->test_target_uncertainty_storage.size());
+    for (size_t i = 0; i < model->test_target_uncertainty_storage.size(); i++) {
+      model->test_matrix.target_uncertainty[i] = &(model->test_target_uncertainty_storage[i]);
+    }
+  }
+}
+
+
+/**
  * @brief Rcpp interface for Simplex projection.
  */
 class SimplexProjectionInterface : public EDMInterfaceBase {
@@ -475,11 +619,38 @@ class SimplexProjectionInterface : public EDMInterfaceBase {
   /**
    * @brief The embedding dimension (E).
    */
-  uint32_t embedding_dimension;
+  SharedInt embedding_dimension;
   /**
    * @brief The number of neighbors (k).
    */
-  int32_t n_neighbors;
+  SharedInt n_neighbors;
+  /**
+   * @brief The library delay embedding ID.
+   */
+  SharedInt lib_de_id = 0;
+  /**
+   * @brief The test delay embedding ID.
+   */
+  SharedInt test_de_id = 0;
+  /**
+   * @brief The forecast horizon.
+   */
+  SharedInt forecast_horizon = 1;
+  /**
+   * @brief Prediction output vector.
+   */
+  RealVector predictions;
+
+  int get_embedding_dimension() const { return this->embedding_dimension.get(); }
+  void set_embedding_dimension(int val) { this->embedding_dimension.set(val); }
+  int get_n_neighbors() const { return this->n_neighbors.get(); }
+  void set_n_neighbors(int val) { this->n_neighbors.set(val); }
+  int get_lib_de_id() const { return this->lib_de_id.get(); }
+  void set_lib_de_id(int val) { this->lib_de_id.set(val); }
+  int get_test_de_id() const { return this->test_de_id.get(); }
+  void set_test_de_id(int val) { this->test_de_id.set(val); }
+  int get_forecast_horizon() const { return this->forecast_horizon.get(); }
+  void set_forecast_horizon(int val) { this->forecast_horizon.set(val); }
 
   /**
    * @brief The constructor.
@@ -497,7 +668,11 @@ class SimplexProjectionInterface : public EDMInterfaceBase {
   SimplexProjectionInterface(const SimplexProjectionInterface& other)
       : EDMInterfaceBase(other),
         embedding_dimension(other.embedding_dimension),
-        n_neighbors(other.n_neighbors) {}
+        n_neighbors(other.n_neighbors),
+        lib_de_id(other.lib_de_id),
+        test_de_id(other.test_de_id),
+        forecast_horizon(other.forecast_horizon),
+        predictions(other.predictions) {}
 
   /**
    * @brief The destructor.
@@ -550,8 +725,23 @@ class SimplexProjectionInterface : public EDMInterfaceBase {
    * @brief Finalizes the interface object.
    */
   virtual void finalize() {
+    if (this->finalized) {
+      FIMS_WARNING_LOG("SimplexProjection " + fims::to_string(this->id) +
+                       " has been finalized already.");
+    }
     this->finalized = true;
+
+    typedef typename fims_info::Information<double>::edm_models_iterator it_type;
+    it_type it = fims_info::Information<double>::GetInstance()->edm_models.find(this->id);
+    if (it != fims_info::Information<double>::GetInstance()->edm_models.end()) {
+      size_t n_preds = it->second->predictions.size();
+      this->predictions.resize(n_preds);
+      for (size_t i = 0; i < n_preds; ++i) {
+        this->predictions[i] = it->second->predictions[i];
+      }
+    }
   }
+
 
   /**
    * @brief Converts to JSON representation.
@@ -567,6 +757,45 @@ class SimplexProjectionInterface : public EDMInterfaceBase {
     ss << "}";
     return ss.str();
   }
+
+#ifdef TMB_MODEL
+  template <typename Type>
+  bool add_to_fims_tmb_internal() {
+    std::shared_ptr<fims_edm::EDMModel<Type>> model =
+        std::make_shared<fims_edm::EDMModel<Type>>();
+    model->id = this->id;
+    model->predictor_type = "simplex";
+    model->embedding_dimension = this->embedding_dimension;
+    model->n_neighbors = this->n_neighbors;
+    model->forecast_horizon = this->forecast_horizon;
+
+    auto it_lib = EDMInterfaceBase::live_objects.find(this->lib_de_id);
+    auto it_test = EDMInterfaceBase::live_objects.find(this->test_de_id);
+    if (it_lib == EDMInterfaceBase::live_objects.end() ||
+        it_test == EDMInterfaceBase::live_objects.end()) {
+      FIMS_ERROR_LOG("SimplexProjectionInterface: invalid lib_de_id or test_de_id.");
+      return false;
+    }
+
+    DelayEmbeddingInterface* lib = dynamic_cast<DelayEmbeddingInterface*>(it_lib->second.get());
+    DelayEmbeddingInterface* test = dynamic_cast<DelayEmbeddingInterface*>(it_test->second.get());
+    if (!lib || !test) {
+      FIMS_ERROR_LOG("SimplexProjectionInterface: objects are not DelayEmbeddingInterface.");
+      return false;
+    }
+
+    populate_edm_model_matrices<Type>(lib, test, model);
+
+    fims_info::Information<Type>::GetInstance()->edm_models[this->id] = model;
+    return true;
+  }
+
+  virtual bool add_to_fims_tmb() {
+    this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
+    this->add_to_fims_tmb_internal<TMBAD_FIMS_TYPE>();
+    return true;
+  }
+#endif
 };
 
 /**
@@ -577,15 +806,44 @@ class SMapProjectionInterface : public EDMInterfaceBase {
   /**
    * @brief The embedding dimension (E).
    */
-  uint32_t embedding_dimension;
+  SharedInt embedding_dimension;
   /**
    * @brief The S-Map localization parameter (theta).
    */
-  double theta;
+  SharedDouble theta;
   /**
    * @brief The S-Map weighting kernel (exponential or gaussian).
    */
-  std::string kernel;
+  SharedString kernel;
+  /**
+   * @brief The library delay embedding ID.
+   */
+  SharedInt lib_de_id = 0;
+  /**
+   * @brief The test delay embedding ID.
+   */
+  SharedInt test_de_id = 0;
+  /**
+   * @brief The forecast horizon.
+   */
+  SharedInt forecast_horizon = 1;
+  /**
+   * @brief Prediction output vector.
+   */
+  RealVector predictions;
+
+  int get_embedding_dimension() const { return this->embedding_dimension.get(); }
+  void set_embedding_dimension(int val) { this->embedding_dimension.set(val); }
+  double get_theta() const { return this->theta.get(); }
+  void set_theta(double val) { this->theta.set(val); }
+  std::string get_kernel() const { return this->kernel.get(); }
+  void set_kernel(std::string val) { this->kernel.set(val); }
+  int get_lib_de_id() const { return this->lib_de_id.get(); }
+  void set_lib_de_id(int val) { this->lib_de_id.set(val); }
+  int get_test_de_id() const { return this->test_de_id.get(); }
+  void set_test_de_id(int val) { this->test_de_id.set(val); }
+  int get_forecast_horizon() const { return this->forecast_horizon.get(); }
+  void set_forecast_horizon(int val) { this->forecast_horizon.set(val); }
 
   /**
    * @brief The constructor.
@@ -604,7 +862,11 @@ class SMapProjectionInterface : public EDMInterfaceBase {
       : EDMInterfaceBase(other),
         embedding_dimension(other.embedding_dimension),
         theta(other.theta),
-        kernel(other.kernel) {}
+        kernel(other.kernel),
+        lib_de_id(other.lib_de_id),
+        test_de_id(other.test_de_id),
+        forecast_horizon(other.forecast_horizon),
+        predictions(other.predictions) {}
 
   /**
    * @brief The destructor.
@@ -643,7 +905,7 @@ class SMapProjectionInterface : public EDMInterfaceBase {
     sm.library = &lib_matrix;
     sm.embedding_dimension = this->embedding_dimension;
     sm.theta = this->theta;
-    if (this->kernel == "gaussian") {
+    if (this->kernel.get() == "gaussian") {
       sm.kernel = fims_edm::SMapKernel::kGaussian;
     } else {
       sm.kernel = fims_edm::SMapKernel::kExponential;
@@ -662,7 +924,22 @@ class SMapProjectionInterface : public EDMInterfaceBase {
    * @brief Finalizes the interface object.
    */
   virtual void finalize() {
+    if (this->finalized) {
+      FIMS_WARNING_LOG("SMapProjection " + fims::to_string(this->id) +
+                       " has been finalized already.");
+    }
     this->finalized = true;
+
+    // Pull prediction results from Information<double>
+    typedef typename fims_info::Information<double>::edm_models_iterator it_type;
+    it_type it = fims_info::Information<double>::GetInstance()->edm_models.find(this->id);
+    if (it != fims_info::Information<double>::GetInstance()->edm_models.end()) {
+      size_t n_preds = it->second->predictions.size();
+      this->predictions.resize(n_preds);
+      for (size_t i = 0; i < n_preds; ++i) {
+        this->predictions[i] = it->second->predictions[i];
+      }
+    }
   }
 
   /**
@@ -680,6 +957,46 @@ class SMapProjectionInterface : public EDMInterfaceBase {
     ss << "}";
     return ss.str();
   }
+
+#ifdef TMB_MODEL
+  template <typename Type>
+  bool add_to_fims_tmb_internal() {
+    std::shared_ptr<fims_edm::EDMModel<Type>> model =
+        std::make_shared<fims_edm::EDMModel<Type>>();
+    model->id = this->id;
+    model->predictor_type = "smap";
+    model->embedding_dimension = this->embedding_dimension;
+    model->theta = this->theta;
+    model->kernel = this->kernel;
+    model->forecast_horizon = this->forecast_horizon;
+
+    auto it_lib = EDMInterfaceBase::live_objects.find(this->lib_de_id);
+    auto it_test = EDMInterfaceBase::live_objects.find(this->test_de_id);
+    if (it_lib == EDMInterfaceBase::live_objects.end() ||
+        it_test == EDMInterfaceBase::live_objects.end()) {
+      FIMS_ERROR_LOG("SMapProjectionInterface: invalid lib_de_id or test_de_id.");
+      return false;
+    }
+
+    DelayEmbeddingInterface* lib = dynamic_cast<DelayEmbeddingInterface*>(it_lib->second.get());
+    DelayEmbeddingInterface* test = dynamic_cast<DelayEmbeddingInterface*>(it_test->second.get());
+    if (!lib || !test) {
+      FIMS_ERROR_LOG("SMapProjectionInterface: objects are not DelayEmbeddingInterface.");
+      return false;
+    }
+
+    populate_edm_model_matrices<Type>(lib, test, model);
+
+    fims_info::Information<Type>::GetInstance()->edm_models[this->id] = model;
+    return true;
+  }
+
+  virtual bool add_to_fims_tmb() {
+    this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
+    this->add_to_fims_tmb_internal<TMBAD_FIMS_TYPE>();
+    return true;
+  }
+#endif
 };
 
 /**
@@ -690,7 +1007,7 @@ class GPEdmProjectionInterface : public EDMInterfaceBase {
   /**
    * @brief The embedding dimension (E).
    */
-  uint32_t embedding_dimension;
+  SharedInt embedding_dimension;
   /**
    * @brief The ARD length-scale parameters (phi).
    */
@@ -698,11 +1015,40 @@ class GPEdmProjectionInterface : public EDMInterfaceBase {
   /**
    * @brief The signal variance parameter (sigma2).
    */
-  double sigma2;
+  SharedDouble sigma2;
   /**
    * @brief The observation noise variance/nugget parameter (ve).
    */
-  double ve;
+  SharedDouble ve;
+  /**
+   * @brief The library delay embedding ID.
+   */
+  SharedInt lib_de_id = 0;
+  /**
+   * @brief The test delay embedding ID.
+   */
+  SharedInt test_de_id = 0;
+  /**
+   * @brief The forecast horizon.
+   */
+  SharedInt forecast_horizon = 1;
+  /**
+   * @brief Prediction output vector.
+   */
+  RealVector predictions;
+
+  int get_embedding_dimension() const { return this->embedding_dimension.get(); }
+  void set_embedding_dimension(int val) { this->embedding_dimension.set(val); }
+  double get_sigma2() const { return this->sigma2.get(); }
+  void set_sigma2(double val) { this->sigma2.set(val); }
+  double get_ve() const { return this->ve.get(); }
+  void set_ve(double val) { this->ve.set(val); }
+  int get_lib_de_id() const { return this->lib_de_id.get(); }
+  void set_lib_de_id(int val) { this->lib_de_id.set(val); }
+  int get_test_de_id() const { return this->test_de_id.get(); }
+  void set_test_de_id(int val) { this->test_de_id.set(val); }
+  int get_forecast_horizon() const { return this->forecast_horizon.get(); }
+  void set_forecast_horizon(int val) { this->forecast_horizon.set(val); }
 
   /**
    * @brief The constructor.
@@ -722,7 +1068,11 @@ class GPEdmProjectionInterface : public EDMInterfaceBase {
         embedding_dimension(other.embedding_dimension),
         phi(other.phi),
         sigma2(other.sigma2),
-        ve(other.ve) {}
+        ve(other.ve),
+        lib_de_id(other.lib_de_id),
+        test_de_id(other.test_de_id),
+        forecast_horizon(other.forecast_horizon),
+        predictions(other.predictions) {}
 
   /**
    * @brief The destructor.
@@ -774,8 +1124,8 @@ class GPEdmProjectionInterface : public EDMInterfaceBase {
 
     return Rcpp::List::create(
         Rcpp::Named("phi") = this->phi,
-        Rcpp::Named("sigma2") = this->sigma2,
-        Rcpp::Named("ve") = this->ve
+        Rcpp::Named("sigma2") = this->sigma2.get(),
+        Rcpp::Named("ve") = this->ve.get()
     );
   }
 
@@ -829,7 +1179,22 @@ class GPEdmProjectionInterface : public EDMInterfaceBase {
    * @brief Finalizes the interface object.
    */
   virtual void finalize() {
+    if (this->finalized) {
+      FIMS_WARNING_LOG("GPEdmProjection " + fims::to_string(this->id) +
+                       " has been finalized already.");
+    }
     this->finalized = true;
+
+    // Pull prediction results from Information<double>
+    typedef typename fims_info::Information<double>::edm_models_iterator it_type;
+    it_type it = fims_info::Information<double>::GetInstance()->edm_models.find(this->id);
+    if (it != fims_info::Information<double>::GetInstance()->edm_models.end()) {
+      size_t n_preds = it->second->predictions.size();
+      this->predictions.resize(n_preds);
+      for (size_t i = 0; i < n_preds; ++i) {
+        this->predictions[i] = it->second->predictions[i];
+      }
+    }
   }
 
   /**
@@ -847,6 +1212,55 @@ class GPEdmProjectionInterface : public EDMInterfaceBase {
     ss << "}";
     return ss.str();
   }
+
+#ifdef TMB_MODEL
+  template <typename Type>
+  bool add_to_fims_tmb_internal() {
+    std::shared_ptr<fims_edm::EDMModel<Type>> model =
+        std::make_shared<fims_edm::EDMModel<Type>>();
+    model->id = this->id;
+    model->predictor_type = "gp_edm";
+    model->embedding_dimension = this->embedding_dimension;
+    model->sigma2 = this->sigma2;
+    model->ve = this->ve;
+    model->forecast_horizon = this->forecast_horizon;
+
+    if (this->phi.size() > 0) {
+      model->phi.resize(this->phi.size());
+      for (int i = 0; i < this->phi.size(); ++i) {
+        model->phi[i] = this->phi[i];
+      }
+    } else {
+      model->phi.assign(this->embedding_dimension, 0.1);
+    }
+
+    auto it_lib = EDMInterfaceBase::live_objects.find(this->lib_de_id);
+    auto it_test = EDMInterfaceBase::live_objects.find(this->test_de_id);
+    if (it_lib == EDMInterfaceBase::live_objects.end() ||
+        it_test == EDMInterfaceBase::live_objects.end()) {
+      FIMS_ERROR_LOG("GPEdmProjectionInterface: invalid lib_de_id or test_de_id.");
+      return false;
+    }
+
+    DelayEmbeddingInterface* lib = dynamic_cast<DelayEmbeddingInterface*>(it_lib->second.get());
+    DelayEmbeddingInterface* test = dynamic_cast<DelayEmbeddingInterface*>(it_test->second.get());
+    if (!lib || !test) {
+      FIMS_ERROR_LOG("GPEdmProjectionInterface: objects are not DelayEmbeddingInterface.");
+      return false;
+    }
+
+    populate_edm_model_matrices<Type>(lib, test, model);
+
+    fims_info::Information<Type>::GetInstance()->edm_models[this->id] = model;
+    return true;
+  }
+
+  virtual bool add_to_fims_tmb() {
+    this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
+    this->add_to_fims_tmb_internal<TMBAD_FIMS_TYPE>();
+    return true;
+  }
+#endif
 };
 
 #endif
