@@ -62,6 +62,19 @@ template <class Type>
 inline const Type lgamma(const Type &x) {
   return std::lgamma(x);
 }
+
+/**
+ * @brief The sign function returning -1, 0, or +1.
+ * @param x The value to check the sign of.
+ * @return -1 if x < 0, +1 if x > 0, 0 if x == 0.
+ */
+template <class Type>
+inline const Type sign(const Type &x) {
+  return (x > static_cast<Type>(0))
+             ? static_cast<Type>(1)
+             : ((x < static_cast<Type>(0)) ? static_cast<Type>(-1)
+                                           : static_cast<Type>(0));
+}
 #endif
 
 #ifdef TMB_MODEL
@@ -170,14 +183,7 @@ inline const Type pow(const Type &x, const Type &y) {
  */
 template <class Type>
 inline const Type sign(const Type &x) {
-#ifdef TMB_MODEL
   return CppAD::sign(x);
-#else
-  return (x > static_cast<Type>(0))
-             ? static_cast<Type>(1)
-             : ((x < static_cast<Type>(0)) ? static_cast<Type>(-1)
-                                           : static_cast<Type>(0));
-#endif
 }
 
 
