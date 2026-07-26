@@ -28,6 +28,7 @@ TEST(MVNormLPDF, BivariateStandardNormalLogDensity) {
   mvnorm.expected_values[1] = 0.0;
 
   mvnorm.input_type = "prior";
+  mvnorm.priors.clear();
   mvnorm.priors.push_back(&(mvnorm.observed_values));
 
   double lpdf = mvnorm.evaluate();
@@ -57,6 +58,7 @@ TEST(MVNormLPDF, CorrelatedBivariateNormalLogDensity) {
   mvnorm.expected_values[1] = 0.0;
 
   mvnorm.input_type = "prior";
+  mvnorm.priors.clear();
   mvnorm.priors.push_back(&(mvnorm.observed_values));
 
   double lpdf = mvnorm.evaluate();

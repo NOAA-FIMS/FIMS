@@ -85,10 +85,13 @@ struct MVNormLPDF : public DensityComponentBase<Type> {
     density::MVNORM_t<Type> mvnorm_density(Sigma);
     Eigen::Matrix<Type, Eigen::Dynamic, 1> residual(k_dim);
     for (size_t i = 0; i < k_dim; ++i) {
-      Type exp_val = (this->expected_values.size() > i)
+      Type obs = (this->input_type == "prior" && this->priors.size() == 1)
+                     ? (*(this->priors[0]))[i]
+                     : this->get_observed(i);
+      Type exp_val = (this->expected_values.size() > 0)
                          ? this->get_expected(i)
                          : static_cast<Type>(0);
-      residual(i) = this->get_observed(i) - exp_val;
+      residual(i) = obs - exp_val;
     }
     // MVNORM_t returns negative log likelihood
     this->lpdf_vec[0] = -mvnorm_density(residual);
@@ -104,10 +107,13 @@ struct MVNormLPDF : public DensityComponentBase<Type> {
 
     Eigen::Matrix<Type, Eigen::Dynamic, 1> res(k_dim);
     for (size_t i = 0; i < k_dim; ++i) {
-      Type exp_val = (this->expected_values.size() > i)
+      Type obs = (this->input_type == "prior" && this->priors.size() == 1)
+                     ? (*(this->priors[0]))[i]
+                     : this->get_observed(i);
+      Type exp_val = (this->expected_values.size() > 0)
                          ? this->get_expected(i)
                          : static_cast<Type>(0);
-      res(i) = this->get_observed(i) - exp_val;
+      res(i) = obs - exp_val;
     }
 
     Eigen::LDLT<Eigen::Matrix<Type, Eigen::Dynamic, Eigen::Dynamic>> ldlt(Sigma);

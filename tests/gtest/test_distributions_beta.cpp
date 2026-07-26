@@ -23,6 +23,7 @@ TEST(BetaLPDF, StandardUniformBetaLogDensity) {
   beta.expected_values[0] = 0.0;
 
   beta.input_type = "prior";
+  beta.priors.clear();
   beta.priors.push_back(&(beta.observed_values));
 
   double lpdf = beta.evaluate();
@@ -42,6 +43,7 @@ TEST(BetaLPDF, SymmetricBetaLogDensity) {
   beta.expected_values[0] = 0.0;
 
   beta.input_type = "prior";
+  beta.priors.clear();
   beta.priors.push_back(&(beta.observed_values));
 
   double lpdf = beta.evaluate();
@@ -63,6 +65,7 @@ TEST(BetaLPDF, ScaledBetaLogDensity) {
   beta.expected_values[0] = 0.0;
 
   beta.input_type = "prior";
+  beta.priors.clear();
   beta.priors.push_back(&(beta.observed_values));
 
   double lpdf = beta.evaluate();
