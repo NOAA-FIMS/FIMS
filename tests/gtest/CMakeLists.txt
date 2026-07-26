@@ -384,3 +384,26 @@ target_link_libraries(def_FIMSLog_clear
   fims_test
 )
 gtest_discover_tests(def_FIMSLog_clear)
+
+# test_distributions_mvnorm.cpp
+add_executable(distributions_mvnorm
+  test_distributions_mvnorm.cpp
+)
+add_as_invoker_manifest(distributions_mvnorm)
+target_link_libraries(distributions_mvnorm
+  gtest_main
+  fims_test
+)
+gtest_discover_tests(distributions_mvnorm)
+
+# test_distributions_beta.cpp
+add_executable(distributions_beta
+  test_distributions_beta.cpp
+)
+add_as_invoker_manifest(distributions_beta)
+target_link_libraries(distributions_beta
+  gtest_main
+  fims_test
+)
+gtest_discover_tests(distributions_beta)
+
