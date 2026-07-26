@@ -63,7 +63,8 @@ struct BetaLPDF : public DensityComponentBase<Type> {
    * @return Summed log probability density value.
    */
   virtual const Type evaluate() {
-    size_t n_x = this->get_n_x();
+    size_t n_x = (this->observed_values.size() > 0) ? this->observed_values.size()
+                                                   : this->get_n_x();
 
     this->lpdf_vec.resize(n_x);
     std::fill(this->lpdf_vec.begin(), this->lpdf_vec.end(), static_cast<Type>(0));
