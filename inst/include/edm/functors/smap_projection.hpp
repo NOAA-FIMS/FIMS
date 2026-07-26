@@ -69,8 +69,6 @@
 
 namespace fims_edm {
 
-// GaussianElimination<Type> is provided by edm_linear_algebra.hpp (included above).
-
 // ---------------------------------------------------------------------------
 // SMapProjection
 // ---------------------------------------------------------------------------
