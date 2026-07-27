@@ -49,7 +49,54 @@ namespace
             EXPECT_GT(dq_fleet["index_weight"][year], 0);
             EXPECT_GT(index_expected[index_yf], 0);
             EXPECT_EQ(index_expected[index_yf], dq_fleet["index_weight"][year]);
+            // Default pooled demand leaves partitioned index untouched.
+            EXPECT_EQ(dq_fleet["index_numbers_at_age_by_partition"],
+                      fims::Vector(
+                          dq_fleet["index_numbers_at_age_by_partition"].size(),
+                          0.0));
+            EXPECT_EQ(dq_fleet["index_weight_at_age_by_partition"],
+                      fims::Vector(
+                          dq_fleet["index_weight_at_age_by_partition"].size(),
+                          0.0));
 
+        }
+    }
+
+    // Female demand splits pooled index into the female stratum only.
+    TEST_F(CAAEvaluateTestFixture, FemaleDemandWritesIndexByPartition)
+    {
+        population->partition_spec = fims_popdy::MakeDefaultSexPartitionSpec();
+        population->index_layout.n_strata = population->partition_spec.n_strata();
+        population->index_layout.n_years = population->n_years;
+        population->index_layout.n_ages = population->n_ages;
+        population->partition_demand =
+            fims_popdy::MakeSexPartitionDemand({"female"});
+        const double p_female =
+            population->proportion_female.get_force_scalar(age);
+
+        catch_at_age_model->CalculateIndexNumbersAA(population, i_age_year, year,
+                                                    age);
+        catch_at_age_model->CalculateIndexWeightAA(population, year, age);
+
+        for (size_t fleet_ = 0; fleet_ < population->n_fleets; fleet_++) {
+            uint32_t fleet_id = population->fleets[fleet_]->GetId();
+            auto &dq_fleet =
+                catch_at_age_model->GetFleetDerivedQuantities(fleet_id);
+            const size_t female_idx =
+                population->index_layout.i_stratum_age_year(0, year, age);
+            const size_t male_idx =
+                population->index_layout.i_stratum_age_year(1, year, age);
+
+            EXPECT_DOUBLE_EQ(
+                dq_fleet["index_numbers_at_age_by_partition"][female_idx],
+                dq_fleet["index_numbers_at_age"][i_age_year] * p_female);
+            EXPECT_DOUBLE_EQ(
+                dq_fleet["index_numbers_at_age_by_partition"][male_idx], 0.0);
+            EXPECT_DOUBLE_EQ(
+                dq_fleet["index_weight_at_age_by_partition"][female_idx],
+                dq_fleet["index_weight_at_age"][i_age_year] * p_female);
+            EXPECT_DOUBLE_EQ(
+                dq_fleet["index_weight_at_age_by_partition"][male_idx], 0.0);
         }
     }
 }

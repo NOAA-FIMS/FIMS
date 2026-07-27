@@ -65,7 +65,55 @@ namespace
             // test value
           EXPECT_EQ(dq_fleet["catch_numbers_at_age"][i_age_year], test_catch_naa[i_age_yearf]);
           EXPECT_EQ(dq_fleet["catch_weight_at_age"][i_age_year], test_catch_waa[i_age_yearf]);
+          // Default pooled demand leaves partitioned catch untouched.
+          EXPECT_EQ(dq_fleet["catch_numbers_at_age_by_partition"],
+                    fims::Vector(
+                        dq_fleet["catch_numbers_at_age_by_partition"].size(),
+                        0.0));
+          EXPECT_EQ(dq_fleet["catch_weight_at_age_by_partition"],
+                    fims::Vector(
+                        dq_fleet["catch_weight_at_age_by_partition"].size(),
+                        0.0));
 
+        }
+    }
+
+    // Female demand splits pooled catch into the female stratum only.
+    TEST_F(CAAEvaluateTestFixture, FemaleDemandWritesCatchByPartition)
+    {
+        population->partition_spec = fims_popdy::MakeDefaultSexPartitionSpec();
+        population->index_layout.n_strata = population->partition_spec.n_strata();
+        population->index_layout.n_years = population->n_years;
+        population->index_layout.n_ages = population->n_ages;
+        population->partition_demand =
+            fims_popdy::MakeSexPartitionDemand({"female"});
+        const double p_female =
+            population->proportion_female.get_force_scalar(age);
+
+        catch_at_age_model->CalculateCatchNumbersAA(population, i_age_year,
+                                                    year, age);
+        catch_at_age_model->CalculateCatchWeightAA(population, year, age);
+
+        for (size_t fleet_index = 0; fleet_index < population->n_fleets;
+             fleet_index++) {
+            uint32_t fleet_id = population->fleets[fleet_index]->GetId();
+            auto &dq_fleet =
+                catch_at_age_model->GetFleetDerivedQuantities(fleet_id);
+            const size_t female_idx =
+                population->index_layout.i_stratum_age_year(0, year, age);
+            const size_t male_idx =
+                population->index_layout.i_stratum_age_year(1, year, age);
+
+            EXPECT_DOUBLE_EQ(
+                dq_fleet["catch_numbers_at_age_by_partition"][female_idx],
+                dq_fleet["catch_numbers_at_age"][i_age_year] * p_female);
+            EXPECT_DOUBLE_EQ(
+                dq_fleet["catch_numbers_at_age_by_partition"][male_idx], 0.0);
+            EXPECT_DOUBLE_EQ(
+                dq_fleet["catch_weight_at_age_by_partition"][female_idx],
+                dq_fleet["catch_weight_at_age"][i_age_year] * p_female);
+            EXPECT_DOUBLE_EQ(
+                dq_fleet["catch_weight_at_age_by_partition"][male_idx], 0.0);
         }
     }
 }

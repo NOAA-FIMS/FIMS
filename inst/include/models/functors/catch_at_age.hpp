@@ -164,7 +164,6 @@ class CatchAtAge : public FisheryModelBase<Type> {
       this->populations[p]->index_layout.n_strata =
           this->populations[p]->partition_spec.n_strata();
 
-      // partition infrastructure only; evaluation routing deferred
       this->populations[p]->M.resize(this->populations[p]->n_years *
                                      this->populations[p]->n_ages);
 
@@ -740,9 +739,14 @@ class CatchAtAge : public FisheryModelBase<Type> {
       std::map<std::string, fims::Vector<Type>> &fdq_ =
           this->GetFleetDerivedQuantities(population->fleets[fleet_]->GetId());
 
-      fdq_["catch_weight_at_age"][i_age_year] =
-          fdq_["catch_numbers_at_age"][i_age_year] *
-          population->growth->evaluate(year, population->ages[age]);
+      Type catch_waa = fdq_["catch_numbers_at_age"][i_age_year] *
+                       population->growth->evaluate(year, population->ages[age]);
+      fdq_["catch_weight_at_age"][i_age_year] = catch_waa;
+      fims_popdy::WritePartitionedQuantityAtAge(
+          fdq_["catch_weight_at_age_by_partition"], catch_waa,
+          population->partition_spec, population->index_layout,
+          population->partition_demand,
+          population->proportion_female.get_force_scalar(age), year, age);
     }
   }
 
@@ -774,13 +778,19 @@ class CatchAtAge : public FisheryModelBase<Type> {
           this->GetFleetDerivedQuantities(population->fleets[fleet_]->GetId());
 
       // Baranov Catch Equation
-      fdq_["catch_numbers_at_age"][i_age_year] +=
+      Type catch_naa =
           (population->fleets[fleet_]->Fmort[year] *
            population->f_multiplier[year] *
            population->fleets[fleet_]->selectivity->evaluate(
                population->ages[age], year)) /
           pdq_["mortality_Z"][i_age_year] * pdq_["numbers_at_age"][i_age_year] *
           (1 - fims_math::exp(-(pdq_["mortality_Z"][i_age_year])));
+      fdq_["catch_numbers_at_age"][i_age_year] += catch_naa;
+      fims_popdy::WritePartitionedQuantityAtAge(
+          fdq_["catch_numbers_at_age_by_partition"], catch_naa,
+          population->partition_spec, population->index_layout,
+          population->partition_demand,
+          population->proportion_female.get_force_scalar(age), year, age);
     }
   }
 
@@ -842,11 +852,17 @@ class CatchAtAge : public FisheryModelBase<Type> {
       std::map<std::string, fims::Vector<Type>> &fdq_ =
           this->GetFleetDerivedQuantities(population->fleets[fleet_]->GetId());
 
-      fdq_["index_numbers_at_age"][i_age_year] +=
+      Type index_naa =
           (population->fleets[fleet_]->q.get_force_scalar(year) *
            population->fleets[fleet_]->selectivity->evaluate(
                population->ages[age], year)) *
           pdq_["numbers_at_age"][i_age_year];
+      fdq_["index_numbers_at_age"][i_age_year] += index_naa;
+      fims_popdy::WritePartitionedQuantityAtAge(
+          fdq_["index_numbers_at_age_by_partition"], index_naa,
+          population->partition_spec, population->index_layout,
+          population->partition_demand,
+          population->proportion_female.get_force_scalar(age), year, age);
     }
   }
 
@@ -872,9 +888,14 @@ class CatchAtAge : public FisheryModelBase<Type> {
       std::map<std::string, fims::Vector<Type>> &fdq_ =
           this->GetFleetDerivedQuantities(population->fleets[fleet_]->GetId());
 
-      fdq_["index_weight_at_age"][i_age_year] =
-          fdq_["index_numbers_at_age"][i_age_year] *
-          population->growth->evaluate(year, population->ages[age]);
+      Type index_waa = fdq_["index_numbers_at_age"][i_age_year] *
+                       population->growth->evaluate(year, population->ages[age]);
+      fdq_["index_weight_at_age"][i_age_year] = index_waa;
+      fims_popdy::WritePartitionedQuantityAtAge(
+          fdq_["index_weight_at_age_by_partition"], index_waa,
+          population->partition_spec, population->index_layout,
+          population->partition_demand,
+          population->proportion_female.get_force_scalar(age), year, age);
     }
   }
 
