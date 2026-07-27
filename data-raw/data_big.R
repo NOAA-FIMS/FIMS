@@ -261,7 +261,11 @@ landings_data <- data.frame(
   timing = returned_om[["om_input"]][["year"]],
   value = returned_om[["em_input"]][["L.obs"]][[1]],
   unit = "mt", # metric tons
-  uncertainty = cv_2_sd(returned_om[["em_input"]][["cv.L"]][[1]])
+  uncertainty = paste(
+    "~ dlnorm(meanlog = log_landings_expected, sdlog = ",
+    cv_2_sd(returned_om[["em_input"]][["cv.L"]][[1]]),
+    ")"
+  )
 )
 
 ###############################################################################
@@ -274,7 +278,11 @@ index_data <- data.frame(
   timing = returned_om[["om_input"]][["year"]],
   value = returned_om[["em_input"]][["surveyB.obs"]][[1]],
   unit = "mt",
-  uncertainty = cv_2_sd(returned_om[["em_input"]][["cv.survey"]][[1]])
+  uncertainty = paste(
+    "~ dlnorm(meanlog = log_index_expected, sdlog = ",
+    cv_2_sd(returned_om[["em_input"]][["cv.survey"]][[1]]),
+    ")"
+  )
 )
 
 ###############################################################################
@@ -285,14 +293,22 @@ age_data <- rbind(
     fleet = names(returned_om[["em_input"]][["n.L"]]),
     returned_om[["em_input"]][["L.age.obs"]][["fleet1"]],
     unit = "proportion",
-    uncertainty = returned_om[["em_input"]][["n.L"]][["fleet1"]],
+    uncertainty = paste(
+      "~ dmultinom(prob = agecomp_proportion, size = ",
+      returned_om[["em_input"]][["n.L"]][["fleet1"]],
+      ")"
+    ),
     timing = returned_om[["om_input"]][["year"]]
   ),
   data.frame(
     fleet = names(returned_om[["om_output"]][["survey_age_comp"]])[1],
     returned_om[["em_input"]][["survey.age.obs"]][[1]],
     unit = "proportion",
-    uncertainty = returned_om[["om_input"]][["n.survey"]][["survey1"]],
+    uncertainty = paste(
+      "~ dmultinom(prob = agecomp_proportion, size = ",
+      returned_om[["om_input"]][["n.survey"]][["survey1"]],
+      ")"
+    ),
     timing = returned_om[["om_input"]][["year"]]
   )
 ) |>
@@ -358,10 +374,7 @@ length_age_data <- data.frame(
   timing = NA_integer_,
   value = c(t(returned_om[["em_input"]][["age_to_length_conversion"]])),
   unit = "proportion",
-  uncertainty = c(
-    em_input[["n.L.lengthcomp"]][["fleet1"]],
-    em_input[["n.survey.lengthcomp"]][["survey1"]]
-  )
+  uncertainty = NA_character_
 )
 
 # Create a length-composition data frame that will be filled by transforming
@@ -377,12 +390,16 @@ length_comp_data <- data.frame(
     c(t(returned_om[["em_input"]][["survey.length.obs"]][["survey1"]]))
   ),
   unit = "proportion",
-  uncertainty = rep(
-    c(
-      em_input[["n.L.lengthcomp"]][["fleet1"]],
-      em_input[["n.survey.lengthcomp"]][["survey1"]]
+  uncertainty = paste(
+    "~ dmultinom(prob = lengthcomp_proportion, size = ",
+    rep(
+      c(
+        em_input[["n.L.lengthcomp"]][["fleet1"]],
+        em_input[["n.survey.lengthcomp"]][["survey1"]]
+      ),
+      length(len_bins) * length(timing_fishery[["timing"]])
     ),
-    length(len_bins) * length(timing_fishery[["timing"]])
+    ")"
   )
 )
 

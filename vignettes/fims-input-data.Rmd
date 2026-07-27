@@ -96,14 +96,28 @@ FIMS::data_big |>
 # time series plot of index data
 FIMS::data_big |>
   dplyr::filter(type == "index") |>
-  ggplot(aes(x = timing, y = value)) +
-  geom_point() +
-  geom_pointrange(aes(
-    ymin = qlnorm(p = 0.025, meanlog = log(value), sdlog = uncertainty),
-    ymax = qlnorm(p = 0.975, meanlog = log(value), sdlog = uncertainty)
+  ggplot2::ggplot(ggplot2::aes(x = timing, y = value)) +
+  ggplot2::geom_point() +
+  ggplot2::geom_pointrange(ggplot2::aes(
+    ymin = stats::qlnorm(
+      p = 0.025,
+      meanlog = log(value),
+      sdlog = purrr::map_dbl(
+        purrr::map(uncertainty, FIMS:::parse_data_distribution),
+        list("sdlog")
+      )
+    ),
+    ymax = stats::qlnorm(
+      p = 0.975,
+      meanlog = log(value),
+      sdlog = purrr::map_dbl(
+        purrr::map(uncertainty, FIMS:::parse_data_distribution),
+        list("sdlog")
+      )
+    )
   )) +
-  geom_hline(yintercept = 0) +
-  ggtitle("Index time series in data_big example data set")
+  ggplot2::geom_hline(yintercept = 0) +
+  ggplot2::ggtitle("Index time series in data_big example data set")
 ```
 
 ## Age compositions (`type == "age_comp"`)

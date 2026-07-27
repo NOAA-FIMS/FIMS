@@ -518,18 +518,7 @@ initialize_comp <- function(data,
     ))
   }
 
-  model_data <- comp_data *
-    get_data(data) |>
-      dplyr::filter(
-        .data$fleet == .env$fleet,
-        .data$type == comp[["name"]]
-      ) |>
-      dplyr::mutate(
-        valid_n = ifelse(.data$value == -999, 1, .data$uncertainty)
-      ) |>
-      dplyr::pull(.data$valid_n)
-
-  if (length(model_data) != get_n_years(data) * get_function(data)) {
+  if (length(comp_data) != get_n_years(data) * get_function(data)) {
     bad_data_years <- get_data(data) |>
       dplyr::filter(
         .data$fleet == .env$fleet,
@@ -543,12 +532,12 @@ initialize_comp <- function(data,
       "The length of the `{comp[['name']]}`-composition data for fleet
       `{fleet}` does not match the expected dimensions.",
       i = "Expected length: {get_n_years(data) * get_function(data)}",
-      i = "Actual length: {length(model_data)}",
-      i = "Number of -999 values: {sum(model_data == -999)}",
+      i = "Actual length: {length(comp_data)}",
+      i = "Number of -999 values: {sum(comp_data == -999)}",
       i = "Dates with invalid data: {bad_data_years}"
     ))
   }
-  module[[comp[["comp_data_field"]]]][] <- model_data
+  module[[comp[["comp_data_field"]]]][] <- comp_data
 
   return(module)
 }
@@ -739,61 +728,55 @@ initialize_fims <- function(parameters, data) {
 
     if ("index" %in% fleet_types) {
       fleet_index_distribution[[i]] <- initialize_data_distribution(
+        data_type = "index",
         module = fleet[[i]],
         # TODO: need to update family and match options from the distribution
         # column from the parameters tibble
-        family = lognormal(link = "log"),
-        sd = get_data(data) |>
+        uncertainty = get_data(data) |>
           dplyr::filter(
             .data$fleet == .env$fleets[i] &
               .data$type == "index"
           ) |>
-          dplyr::select(-value) |>
-          dplyr::mutate(
-            estimation_type = "constant",
-            value = .data$uncertainty
-          ),
-        data_type = "index"
+          dplyr::pull(dplyr::all_of("uncertainty"))
       )
     }
 
     if ("landings" %in% fleet_types) {
       fleet_landings_distribution[[i]] <- initialize_data_distribution(
         module = fleet[[i]],
-        # TODO: need to update family and match options from the distribution
-        # column from the parameters tibble
-        family = lognormal(link = "log"),
-        sd = get_data(data) |>
+        data_type = "landings",
+        uncertainty = get_data(data) |>
           dplyr::filter(
             .data$fleet == .env$fleets[i] &
               .data$type == "landings"
           ) |>
-          dplyr::select(-value) |>
-          dplyr::mutate(
-            estimation_type = "constant",
-            value = .data$uncertainty
-          ),
-        data_type = "landings"
+          dplyr::pull(dplyr::all_of("uncertainty"))
       )
     }
 
     if ("age_comp" %in% fleet_types) {
       fleet_agecomp_distribution[[i]] <- initialize_data_distribution(
         module = fleet[[i]],
-        # TODO: need to update family and match options from the distribution
-        # column from the parameters tibble
-        family = multinomial(link = "logit"),
-        data_type = "agecomp"
+        data_type = "age_comp",
+        uncertainty = get_data(data) |>
+          dplyr::filter(
+            .data$fleet == .env$fleets[i] &
+              .data$type == "age_comp"
+          ) |>
+          dplyr::pull(dplyr::all_of("uncertainty"))
       )
     }
 
     if ("length_comp" %in% fleet_types) {
       fleet_lengthcomp_distribution[[i]] <- initialize_data_distribution(
         module = fleet[[i]],
-        # TODO: need to update family and match options from the distribution
-        # column from the parameters tibble
-        family = multinomial(link = "logit"),
-        data_type = "lengthcomp"
+        data_type = "length_comp",
+        uncertainty = get_data(data) |>
+          dplyr::filter(
+            .data$fleet == .env$fleets[i] &
+              .data$type == "length_comp"
+          ) |>
+          dplyr::pull(dplyr::all_of("uncertainty"))
       )
     }
   }

@@ -25,26 +25,10 @@ check_distribution_validity <- function(args) {
   # Separate objects from args
   family <- args[["family"]]
   sd <- args[["sd"]]
-  # Optional argument data_type
-  data_type <- args[["data_type"]]
   check_present <- purrr::map_vec(list("family" = family, "sd" = sd), is.null)
 
-  # Set up global rules
-  # FIXME: Move this to a data item in the package so it can be used everywhere
-  # Could do a call to all data objects in the package and get unique types that
-  # are available
-  data_type_names <- c("landings", "index", "agecomp", "lengthcomp")
-  if (is.null(data_type)) {
-    available_distributions <- c("lognormal", "gaussian")
-  } else {
-    available_distributions <- switch(
-      EXPR = ifelse(grepl("comp", data_type), "composition", data_type),
-      "landings" = c("lognormal", "gaussian"),
-      "index" = c("lognormal", "gaussian"),
-      "composition" = c("multinomial"),
-      "unavailable data type"
-    )
-  }
+  # Only process distributions are currently validated here.
+  available_distributions <- c("lognormal", "gaussian")
   elements_of_sd <- c("value", "estimation_type")
 
   # Start a bulleted list of errors and add to it in each if statement
@@ -71,34 +55,14 @@ check_distribution_validity <- function(args) {
              e.g., `family = gaussian()`, instead of {class(family)}."
     )
   } else {
-    if (
-      !(family[["family"]] %in% available_distributions) ||
-        "unavailable data type" %in% available_distributions
-    ) {
-      ifelse_type <- ifelse(
-        is.null(data_type),
-        "distribution",
-        paste(data_type, "data")
-      )
+    family_name <- family[["family"]]
+    if (!(family_name %in% available_distributions)) {
       abort_bullets <- c(
         abort_bullets,
         "x" = "FIMS currently does not allow the family to be
-              {.code {family[['family']]}}.",
-        "i" = "The families available for this {ifelse_type} are
+              {.code {family_name}}.",
+        "i" = "The families available for process distributions are
               {.code {available_distributions}}."
-      )
-    }
-  }
-
-  # Checks related to the type of data
-  if (!is.null(data_type)) {
-    if (!(data_type %in% data_type_names)) {
-      abort_bullets <- c(
-        abort_bullets,
-        "x" = "The specified {.var data_type} of {.var {data_type}} is not
-               available.",
-        "i" = "Allowed values for {.var data_type} are
-               {.code {data_type_names}}."
       )
     }
   }
@@ -139,77 +103,12 @@ check_distribution_validity <- function(args) {
     }
   }
 
-  # Check dimensions for data distributions: sd must be either length 1 (scalar)
-  # or match data length when data_type is landings or index
-  if (!is.null(data_type) && !is.null(args[["module"]])) {
-    module <- args[["module"]]
-    if (data_type == "landings" | data_type == "index") {
-      n_obs <- module$n_years$get()
-
-      if (length(sd[["value"]]) > 1 && length(sd[["value"]]) != n_obs) {
-        abort_bullets <- c(
-          abort_bullets,
-          "x" = "The size of {.var log_sd} does not match the size of observed data for {data_type}.",
-          "i" = "The {.var log_sd} vector is of size {length(sd[['value']])}.",
-          "i" = "The observed {data_type} data vector is of size {n_obs}.",
-          "i" = "Either provide a single {.var log_sd} value (scalar) or a vector matching the data length."
-        )
-      }
-    }
-  }
-
   # Return error messages if more than just the default is present
   if (length(abort_bullets) == 1) {
     invisible(TRUE)
   } else {
     cli::cli_abort(abort_bullets)
   }
-}
-
-#' Return name of expected value
-#'
-#' The combination of data type, family, and link lead to a specific name for
-#' the expected value within the code base. This function looks at the
-#' combination of these three objects and specifies the appropriate string for
-#' its name going forward.
-#' @inheritParams initialize_data_distribution
-#' @noRd
-#' @return
-#' A string specifying the name of the expected value.
-#'
-get_expected_name <- function(family, data_type) {
-  # TODO: Think about if the name of the expected value should change based on
-  # the link or if it should stay the same? Keeping track of different names in
-  # the code base might be too complex for the output as well
-  family_string <- family[["family"]]
-  link_string <- family[["link"]]
-  expected_name <- dplyr::case_when(
-    data_type == "landings" &&
-      grepl("lognormal|gaussian", family_string) &&
-      link_string == "log" ~ "log_landings_expected",
-    data_type == "landings" &&
-      grepl("lognormal|gaussian", family_string) &&
-      link_string == "identity" ~ "landings_expected",
-    data_type == "index" &&
-      grepl("lognormal|gaussian", family_string) &&
-      link_string == "log" ~ "log_index_expected",
-    data_type == "index" &&
-      grepl("lognormal|gaussian", family_string) &&
-      link_string == "identity" ~ "index_expected",
-    grepl("agecomp", data_type) ~ "agecomp_proportion",
-    grepl("lengthcomp", data_type) ~ "lengthcomp_proportion",
-  )
-  # Check combination of entries was okay and led to valid name
-  if (is.na(expected_name)) {
-    cli::cli_abort(c(
-      "x" = "The combination of data type, family, and link are incompatible in
-             some way.",
-      "i" = "{.var data_type} is {.var {data_type}}.",
-      "i" = "The family is {.var {family_string}}.",
-      "i" = "The link is {.var {link_string}}."
-    ))
-  }
-  return(expected_name)
 }
 
 #' Set up a new distribution for a data type or a process
@@ -223,26 +122,14 @@ get_expected_name <- function(family, data_type) {
 #' `initialize_process_distribution()`.
 #' @param module An identifier to a C++ fleet module that is linked to the data
 #'   of interest.
-#' @param family A description of the error distribution and link function to
-#'   be used in the model. The argument takes a family class, e.g.,
-#'   `stats::gaussian(link = "identity")`.
-#' @param sd A list of length two. The first entry is named `"value"` and it
-#'   stores the initial values (scalar or vector) for the relevant standard
-#'   deviations. The default is `value = 1`. The second entry is named
-#'  `"estimation_type"` and it stores a vector of booleans (default =
-#'   "constant") is a string indicating whether or not standard deviation is
-#'   estimated as a fixed effect or held constant. If `"value"` is a vector and
-#'   `"estimation_type"` is a scalar, the single value specified
-#'   `"estimation_type"` value will be repeated to match the length of `value`.
-#'   Otherwise, the dimensions of the two must match.
 #' @param data_type A string specifying the type of data that the
 #'   distribution will be fit to. Allowable types include
 #'   `r glue::glue_collapse(sprintf('"%s"', eval(formals(initialize_data_distribution)[["data_type"]])), sep = ", ", last = ", and ")`
 #'   and the default is
 #'   `r eval(formals(initialize_data_distribution)[["data_type"]])[1]`.
-#' @param par A string specifying the parameter name the distribution applies
-#'   to. Parameters must be members of the specified module. Use
-#'   `methods::show(module)` to obtain names of parameters within the module.
+#' @param uncertainty A vector of strings specifying formulas for each data
+#'   point. See [FIMSFrame()] for more information on what the formula should
+#'   look like.
 #' @return
 #' A reference class. is returned. Use [methods::show()] to view the various
 #' Rcpp class fields, methods, and documentation.
@@ -255,12 +142,11 @@ get_expected_name <- function(family, data_type) {
 #' # Create a new fleet module
 #' fleet <- methods::new(Fleet)
 #' # Create a distribution for the fleet module
+#' sd_log <- rep(sqrt(log(0.01^2 + 1)), n_years)
 #' fleet_distribution <- initialize_data_distribution(
 #'   module = fishing_fleet,
-#'   family = lognormal(link = "log"),
-#'   sd = list(
-#'     value = rep(sqrt(log(0.01^2 + 1)), n_years),
-#'     estimation_type = rep("constant", n_years) # Can be a single "constant"
+#'   uncertainty = glue::glue(
+#'     "~dlnorm(meanlog = log_index_expected, sdlog = {sd_log})"
 #'   ),
 #'   data_type = "index"
 #' )
@@ -280,78 +166,47 @@ get_expected_name <- function(family, data_type) {
 #' }
 initialize_data_distribution <- function(
   module,
-  family = NULL,
-  # Create a tibble with value and estimation_type column for sd
-  sd = tibble::tibble(
-    value = 1,
-    estimation_type = "constant"
-  ),
-  # FIXME: Move this argument to second to match where par is in
-  # initialize_process_distribution
-  data_type = c("landings", "index", "agecomp", "lengthcomp")
+  data_type = c("landings", "index", "age_comp", "length_comp"),
+  uncertainty
 ) {
   data_type <- rlang::arg_match(data_type)
-  # FIXME: Make the available families a data object
-  # Could also make the matrix of distributions available per type as a
-  # data frame where the check could use the stored object.
-
-  # validity check on user input
-  args <- list(
-    family = family,
-    sd = sd,
-    data_type = data_type,
-    module = module
-  )
-  check_distribution_validity(args)
-
-  # assign name of observed data based on data_type
-  obs_id_name <- glue::glue("observed_{data_type}_data_id")
+  uncertainty_split <- purrr::map(
+    .x = as.list(uncertainty),
+    .f = parse_data_distribution
+  ) |>
+    transpose_data_distribution()
 
   # Set up distribution based on `family` argument`
-  if (family[["family"]] == "lognormal") {
-    # create new Rcpp module
-    new_module <- methods::new(DlnormDistribution)
-
-    # populate logged standard deviation parameter with log of input
-    # Using resize() and then assigning value to each element of log_sd directly
-    # is correct, as creating a new VariableVector for log_sd here would
-    # trigger an error in integration tests with wrappers.
-    new_module$log_sd[] <- log(sd[["value"]])
-    new_module$log_sd$set_estimation_types(sd[["estimation_type"]])
-  }
-
-  if (family[["family"]] == "gaussian") {
-    # create new Rcpp module
-    new_module <- methods::new(DnormDistribution)
-
-    # populate logged standard deviation parameter with log of input
-    new_module$log_sd[] <- log(sd[["value"]])
-    new_module$log_sd$set_estimation_types(sd[["estimation_type"]])
-  }
-
-  if (family[["family"]] == "multinomial") {
-    # create new Rcpp module
-    new_module <- methods::new(DmultinomDistribution)
+  new_module <- methods::new(get(
+    gsub("^d(.+)$", "D\\1Distribution", uncertainty_split[["family"]][[1]])
+  ))
+  if ("log_sd" %in% names(new_module)) {
+    new_module$log_sd[] <- log(
+      unlist(uncertainty_split[[grep("sd", names(uncertainty_split))]])
+    )
+    new_module$log_sd$set_estimation_types("constant")
   }
 
   # setup link to observed data
-  if (data_type == "landings") {
-    new_module$set_observed_data(module$GetObservedLandingsDataID())
+  data_id_name <- glue::glue("GetObserved{snake_to_pascal(data_type)}DataID")
+  getter_function <- tryCatch(
+    do.call("$", list(module, data_id_name)),
+    error = function(e) NULL
+  )
+  if (is.null(getter_function)) {
+    cli::cli_abort(c(
+      x = "Could not find observed data name, {.code {data_id_name}} in the
+      module",
+      i = "Check {.var data_type} and the module class.",
+      i = "Options in the module are {grep('Get', names(module), value = TRUE)}"
+    ))
   }
-  if (data_type == "index") {
-    new_module$set_observed_data(module$GetObservedIndexDataID())
-  }
-  if (data_type == "agecomp") {
-    new_module$set_observed_data(module$GetObservedAgeCompDataID())
-  }
-  if (data_type == "lengthcomp") {
-    new_module$set_observed_data(module$GetObservedLengthCompDataID())
-  }
-
-  # set name of expected values
-  expected <- get_expected_name(family, data_type)
+  new_module$set_observed_data(getter_function())
   # setup link to expected values
-  new_module$set_distribution_links("data", module$field(expected)$get_id())
+  new_module$set_distribution_links(
+    "data",
+    module$field(uncertainty_split[["link"]][[1]])$get_id()
+  )
 
   return(new_module)
 }

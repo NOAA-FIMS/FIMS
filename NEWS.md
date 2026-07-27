@@ -1,6 +1,7 @@
 # FIMS 0.10.0
 
-* 
+* Use setup_default_parameters() to set up a model
+* Specify uncertainty using a formula with a distribution and arguments
 
 # FIMS 0.9.4
 
