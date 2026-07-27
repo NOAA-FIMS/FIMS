@@ -27,11 +27,9 @@ units for each data type are as follows. \code{mt} is used for \code{index},
 \code{landings}, and \code{weight_at_age} data. \code{number} or \code{proportion} are each
 viable units for the composition data, where the former is the preferred
 unit of measurement.}
-\item{uncertainty}{A real value providing a measurement of uncertainty
-for value. For landings and indices of abundance this should be
-the standard deviation of the logged observations if you are using the
-lognormal distribution to fit your data. For composition data it will
-be your input sample size.
+\item{uncertainty}{A right-handed formula specifying the distributional
+assumptions for the entry in \code{value}. See \code{\link[=FIMSFrame]{FIMSFrame()}} for more
+information about this column.
 }
 }
 }
@@ -48,5 +46,10 @@ the \code{ASSAMC} package written for the \href{www.github.com/NOAA-FIMS/Age_Str
 The source code to make this dataset is in \code{data-raw/data_big.R} which is on
 GitHub but will not be in your local installation because it is in the
 .Rbuildignore file.
+}
+\seealso{
+\itemize{
+\item \code{\link[=FIMSFrame]{FIMSFrame()}}
+}
 }
 \keyword{datasets}
