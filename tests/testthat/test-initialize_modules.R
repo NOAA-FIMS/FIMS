@@ -546,7 +546,13 @@ test_that("`initialize_comp()` works with correct inputs", {
     data |>
       get_data() |>
       dplyr::filter(type == "age_comp", fleet == "fleet1") |>
-      dplyr::mutate(out = value * uncertainty) |>
+      dplyr::mutate(
+        out = value * purrr::map_dbl(
+          purrr::map(.f = parse_data_distribution, .x = .data$uncertainty),
+          list("size"),
+          .default = NA_real_
+        )
+      ) |>
       dplyr::pull(out)
   )
   clear()
@@ -573,7 +579,11 @@ test_that("`initialize_comp()` works with correct inputs", {
     data |>
       get_data() |>
       dplyr::filter(type == "length_comp", fleet == "fleet1") |>
-      dplyr::mutate(out = value * uncertainty) |>
+      dplyr::mutate(out = value * purrr::map_dbl(
+        purrr::map(.f = parse_data_distribution, .x = .data$uncertainty),
+        list("size"),
+        .default = NA_real_
+      )) |>
       dplyr::pull(out)
   )
   clear()

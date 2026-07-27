@@ -100,17 +100,22 @@ data_4_projections <- data_big_with_extra_year |>
   dplyr::mutate(
     uncertainty = ifelse(
       type %in% c("landings") & value == -999,
-      0.00999975,
+      "~ dlnorm(meanlog = log_landings_expected, sdlog = 0.00999975)",
       uncertainty
     ),
     uncertainty = ifelse(
       type %in% c("index") & value == -999,
-      0.19804220,
+      "~ dlnorm(meanlog = log_index_expected, sdlog = 0.19804220)",
       uncertainty
     ),
     uncertainty = ifelse(
-      type %in% c("age_comp", "length_comp") & value == -999,
-      0,
+      type == "age_comp" & value == -999,
+      "~ dmultinom(prob = agecomp_proportion, size = 0)",
+      uncertainty
+    ),
+    uncertainty = ifelse(
+      type == "length_comp" & value == -999,
+      "~ dmultinom(prob = lengthcomp_proportion, size = 0)",
       uncertainty
     )
   ) |>

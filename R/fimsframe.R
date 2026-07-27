@@ -399,7 +399,23 @@ methods::setMethod(
       .data[["type"]] == "age_comp",
       .data[["fleet"]] %in% .env$fleet
     ) |>
-      dplyr::pull(.data[["value"]])
+      dplyr::mutate(
+        sample_size = ifelse(
+          .data$value == -999,
+          1,
+          purrr::map_dbl(
+            purrr::map(.f = parse_data_distribution, .x = .data$uncertainty),
+            list("size"),
+            .default = NA_real_
+          )
+        ),
+        probabilities = ifelse(
+          .data$unit == "number",
+          .data$value,
+          .data$value * .data$sample_size
+        )
+      ) |>
+      dplyr::pull(.data[["probabilities"]])
   }
 )
 #' @rdname model_
@@ -438,7 +454,23 @@ methods::setMethod(
       .data[["type"]] == "length_comp",
       .data[["fleet"]] %in% .env$fleet
     ) |>
-      dplyr::pull(.data[["value"]])
+      dplyr::mutate(
+        sample_size = ifelse(
+          .data$value == -999,
+          1,
+          purrr::map_dbl(
+            purrr::map(.f = parse_data_distribution, .x = .data$uncertainty),
+            list("size"),
+            .default = NA_real_
+          )
+        ),
+        probabilities = ifelse(
+          .data$unit == "number",
+          .data$value,
+          .data$value * .data$sample_size
+        )
+      ) |>
+      dplyr::pull(.data[["probabilities"]])
   }
 )
 #' @rdname model_
@@ -858,7 +890,8 @@ validate_dimension_of_conversion <- function(data, n_groups, n_timings) {
 #' @details
 #' ## data
 #' The input data are both sorted (see the section below on sorting) and
-#' expanded before returning them in the data slot.
+#' expanded to include -999 values for all missing rows before returning them
+#' in the data slot.
 #' ### Ages
 #' Currently, ages must be integers, i.e., FIMS cannot accommodate numeric ages
 #' like age 1.5 but we hope that this is something that we will be able to
@@ -870,6 +903,28 @@ validate_dimension_of_conversion <- function(data, n_groups, n_timings) {
 #' age in the model. For example, you cannot bin fish into bins that span
 #' multiple years, you must have age-2, age-3, and age-4 not just age-2 and
 #' age-4 fish in your composition data.
+#' ### Uncertainty
+#' Uncertainty information for your data contains information for fitting the
+#' model and for creating bootstrapped data sets. Right-handed formulas are used
+#' to specify the distribution your data is assumed to follow, the derived
+#' quantity in the model that the data is assumed to represent, and parameters
+#' associated with the assumed distribution. For example, landings data can be
+#' distributed using a normal or lognormal distribution and if you use a
+#' normal distribution the value is assumed to represent `landings_expected` but
+#' if you use a lognormal distribution the value is assumed to represent
+#' `log_landings_expected`. Therefore, for the former you would specify
+#' `"~dnorm(mean = landings_expected, sd = 0.01)"` and for the later you would
+#' specify `"~dlnorm(meanlog = log_landings_expected, sdlog = 0.01)"`. Where,
+#' the input value for sd or sdlog is the standard deviation of the mean value
+#' or standard deviation of the log of the mean value, respectively. The
+#' distribution names and argument names match the names used in R. Use
+#' [args()], e.g., `args(dnorm)`, to get information on the argument names that
+#' are required for your distribution. And, use `?distributions` to get a list
+#' of distributions that have density functions in base R. To get information on
+#' available derived quantities to set the central tendency of the distribution
+#' to, you can create a fleet object and inspect the available names, e.g.,
+#' `names(methods::new(Fleet))`, or you can navigate to the Public Attributes
+#' section of the doxygen documentation for Fleet by running `?Fleet`.
 #' ### Sorting
 #' It is important that the order of the rows in the data are correct but it is
 #' not expected that the user will do this. Instead, the returned data are

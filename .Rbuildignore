@@ -2,6 +2,7 @@
 ^\.Rproj\.user$
 ^\.github$
 ^\.history$
+^\.agents$
 CMakeLists.txt
 tests/gtest
 tests/test_plan

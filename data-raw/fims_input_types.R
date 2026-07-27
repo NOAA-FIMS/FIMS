@@ -1,5 +1,5 @@
 fims_input_types <- c(
-  "age_comp",
+  "AgeComp",
   "age_to_length_conversion",
   "index",
   # TODO: change to singular landing

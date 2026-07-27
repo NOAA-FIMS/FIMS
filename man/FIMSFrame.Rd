@@ -28,7 +28,8 @@ needed for different types of models.
 \subsection{data}{
 
 The input data are both sorted (see the section below on sorting) and
-expanded before returning them in the data slot.
+expanded to include -999 values for all missing rows before returning them
+in the data slot.
 \subsection{Ages}{
 
 Currently, ages must be integers, i.e., FIMS cannot accommodate numeric ages
@@ -41,6 +42,31 @@ must have composition entries for every integer between your first and last
 age in the model. For example, you cannot bin fish into bins that span
 multiple years, you must have age-2, age-3, and age-4 not just age-2 and
 age-4 fish in your composition data.
+}
+
+\subsection{Uncertainty}{
+
+Uncertainty information for your data contains information for fitting the
+model and for creating bootstrapped data sets. Right-handed formulas are used
+to specify the distribution your data is assumed to follow, the derived
+quantity in the model that the data is assumed to represent, and parameters
+associated with the assumed distribution. For example, landings data can be
+distributed using a normal or lognormal distribution and if you use a
+normal distribution the value is assumed to represent \code{landings_expected} but
+if you use a lognormal distribution the value is assumed to represent
+\code{log_landings_expected}. Therefore, for the former you would specify
+\code{"~dnorm(mean = landings_expected, sd = 0.01)"} and for the later you would
+specify \code{"~dlnorm(meanlog = log_landings_expected, sdlog = 0.01)"}. Where,
+the input value for sd or sdlog is the standard deviation of the mean value
+or standard deviation of the log of the mean value, respectively. The
+distribution names and argument names match the names used in R. Use
+\code{\link[=args]{args()}}, e.g., \code{args(dnorm)}, to get information on the argument names that
+are required for your distribution. And, use \code{?distributions} to get a list
+of distributions that have density functions in base R. To get information on
+available derived quantities to set the central tendency of the distribution
+to, you can create a fleet object and inspect the available names, e.g.,
+\code{names(methods::new(Fleet))}, or you can navigate to the Public Attributes
+section of the doxygen documentation for Fleet by running \code{?Fleet}.
 }
 
 \subsection{Sorting}{

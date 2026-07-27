@@ -151,7 +151,7 @@ test_that("fit_fims() errors when optimization fails to converge", {
         tibble::tibble(
           fleet = "fleet1",
           type = "landings",
-          uncertainty = 10,
+          uncertainty = "~dlnorm(meanlog=log_landings_expected, sdlog = 10)",
         ),
         by = c("fleet", "type")
       ) |>

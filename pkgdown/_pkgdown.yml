@@ -23,10 +23,11 @@ template:
 reference:
 - title: Data
   desc: >
-      Example dataset used in FIMS demonstrations and examples.
+      Example datasets used in demonstrations and other package data.
   contents:
   - data_big
   - fims_input_types
+  - fims_distributions
 
 - title: Run FIMS
   desc: Primary functions used when setting up or running a FIMS model.

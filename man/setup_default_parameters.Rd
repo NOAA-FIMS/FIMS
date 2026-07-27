@@ -45,6 +45,12 @@ generated using this function or by building up your own tibble from
 helper functions used within this function. The resulting tibble will have
 all of the necessary parameters, specific to your data, to run a FIMS
 model.
+Initializing a FIMS model, i.e., \code{initialize_fims()} requires a \code{FIMSFrame}
+object and a tibble of parameters. The parameter tibble can be automatically
+generated using this function or by building up your own tibble from
+helper functions used within this function. The resulting tibble will have
+all of the necessary parameters, specific to your data, to run a FIMS
+model.
 }
 \details{
 The function builds module-specific defaults by calling helper
