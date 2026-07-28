@@ -9,7 +9,7 @@
 #ifndef FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_EDM_HPP
 #define FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_EDM_HPP
 
-#include "../../../edm/functors/delay_embedding.hpp"
+#include "../../../edm/edm.hpp"
 #include "rcpp_interface_base.hpp"
 
 /**
@@ -425,6 +425,428 @@ class DelayEmbeddingInterface : public EDMInterfaceBase {
   }
 
 #endif
+};
+
+/**
+ * @brief Helper to map RealVector memory from DelayEmbeddingInterface to a transient
+ * fims_edm::DelayEmbeddingMatrix<double> representation for functors.
+ */
+inline fims_edm::DelayEmbeddingMatrix<double> to_matrix(DelayEmbeddingInterface* de) {
+  fims_edm::DelayEmbeddingMatrix<double> mat;
+  mat.n_rows = de->target_values.size();
+  mat.n_cols = mat.n_rows > 0 ? (de->embedded_values.size() / mat.n_rows) : 0;
+
+  if (de->embedded_values.size() > 0 && de->embedded_values.storage_m) {
+    mat.embedded_values.resize(de->embedded_values.size());
+    for (size_t i = 0; i < de->embedded_values.size(); i++) {
+      mat.embedded_values[i] = &((*de->embedded_values.storage_m)[i]);
+    }
+  }
+
+  if (de->target_values.size() > 0 && de->target_values.storage_m) {
+    mat.target_values.resize(de->target_values.size());
+    for (size_t i = 0; i < de->target_values.size(); i++) {
+      mat.target_values[i] = &((*de->target_values.storage_m)[i]);
+    }
+  }
+
+  if (de->embedded_uncertainty.size() > 0 && de->embedded_uncertainty.storage_m) {
+    mat.embedded_uncertainty.resize(de->embedded_uncertainty.size());
+    for (size_t i = 0; i < de->embedded_uncertainty.size(); i++) {
+      mat.embedded_uncertainty[i] = &((*de->embedded_uncertainty.storage_m)[i]);
+    }
+  }
+
+  if (de->target_uncertainty.size() > 0 && de->target_uncertainty.storage_m) {
+    mat.target_uncertainty.resize(de->target_uncertainty.size());
+    for (size_t i = 0; i < de->target_uncertainty.size(); i++) {
+      mat.target_uncertainty[i] = &((*de->target_uncertainty.storage_m)[i]);
+    }
+  }
+
+  return mat;
+}
+
+/**
+ * @brief Rcpp interface for Simplex projection.
+ */
+class SimplexProjectionInterface : public EDMInterfaceBase {
+ public:
+  /**
+   * @brief The embedding dimension (E).
+   */
+  uint32_t embedding_dimension;
+  /**
+   * @brief The number of neighbors (k).
+   */
+  int32_t n_neighbors;
+
+  /**
+   * @brief The constructor.
+   */
+  SimplexProjectionInterface() : EDMInterfaceBase(), embedding_dimension(0), n_neighbors(0) {
+    EDMInterfaceBase::live_objects[this->id] =
+        std::make_shared<SimplexProjectionInterface>(*this);
+    FIMSRcppInterfaceBase::fims_interface_objects.push_back(
+        EDMInterfaceBase::live_objects[this->id]);
+  }
+
+  /**
+   * @brief Copy constructor.
+   */
+  SimplexProjectionInterface(const SimplexProjectionInterface& other)
+      : EDMInterfaceBase(other),
+        embedding_dimension(other.embedding_dimension),
+        n_neighbors(other.n_neighbors) {}
+
+  /**
+   * @brief The destructor.
+   */
+  virtual ~SimplexProjectionInterface() {}
+
+  /**
+   * @brief Get the ID of the object.
+   */
+  virtual uint32_t get_id() { return this->id; }
+
+  /**
+   * @brief Predict the values using Simplex projection.
+   * @param lib_id The ID of the library delay embedding.
+   * @param test_id The ID of the test delay embedding.
+   * @return A vector of predictions.
+   */
+  Rcpp::NumericVector predict(uint32_t lib_id, uint32_t test_id) {
+    auto it_lib = EDMInterfaceBase::live_objects.find(lib_id);
+    auto it_test = EDMInterfaceBase::live_objects.find(test_id);
+    if (it_lib == EDMInterfaceBase::live_objects.end() ||
+        it_test == EDMInterfaceBase::live_objects.end()) {
+      throw std::invalid_argument("SimplexProjectionInterface::predict: invalid lib_id or test_id.");
+    }
+
+    DelayEmbeddingInterface* lib = dynamic_cast<DelayEmbeddingInterface*>(it_lib->second.get());
+    DelayEmbeddingInterface* test = dynamic_cast<DelayEmbeddingInterface*>(it_test->second.get());
+    if (!lib || !test) {
+      throw std::invalid_argument("SimplexProjectionInterface::predict: live objects are not of type DelayEmbeddingInterface.");
+    }
+
+    fims_edm::DelayEmbeddingMatrix<double> lib_matrix = to_matrix(lib);
+    fims_edm::DelayEmbeddingMatrix<double> test_matrix = to_matrix(test);
+
+    fims_edm::SimplexProjection<double> sp;
+    sp.library = &lib_matrix;
+    sp.embedding_dimension = this->embedding_dimension;
+    sp.n_neighbors = this->n_neighbors;
+
+    sp.predict(test_matrix);
+
+    Rcpp::NumericVector ret(sp.predictions.size());
+    for (size_t i = 0; i < sp.predictions.size(); ++i) {
+      ret[i] = sp.predictions[i];
+    }
+    return ret;
+  }
+
+  /**
+   * @brief Finalizes the interface object.
+   */
+  virtual void finalize() {
+    this->finalized = true;
+  }
+
+  /**
+   * @brief Converts to JSON representation.
+   */
+  virtual std::string to_json() {
+    std::stringstream ss;
+    ss << "{\n";
+    ss << " \"module_name\": \"EDM\",\n";
+    ss << " \"module_type\": \"SimplexProjection\",\n";
+    ss << " \"module_id\": " << this->id << ",\n";
+    ss << " \"embedding_dimension\": " << this->embedding_dimension << ",\n";
+    ss << " \"n_neighbors\": " << this->n_neighbors << "\n";
+    ss << "}";
+    return ss.str();
+  }
+};
+
+/**
+ * @brief Rcpp interface for S-Map projection.
+ */
+class SMapProjectionInterface : public EDMInterfaceBase {
+ public:
+  /**
+   * @brief The embedding dimension (E).
+   */
+  uint32_t embedding_dimension;
+  /**
+   * @brief The S-Map localization parameter (theta).
+   */
+  double theta;
+  /**
+   * @brief The S-Map weighting kernel (exponential or gaussian).
+   */
+  std::string kernel;
+
+  /**
+   * @brief The constructor.
+   */
+  SMapProjectionInterface() : EDMInterfaceBase(), embedding_dimension(0), theta(1.0), kernel("exponential") {
+    EDMInterfaceBase::live_objects[this->id] =
+        std::make_shared<SMapProjectionInterface>(*this);
+    FIMSRcppInterfaceBase::fims_interface_objects.push_back(
+        EDMInterfaceBase::live_objects[this->id]);
+  }
+
+  /**
+   * @brief Copy constructor.
+   */
+  SMapProjectionInterface(const SMapProjectionInterface& other)
+      : EDMInterfaceBase(other),
+        embedding_dimension(other.embedding_dimension),
+        theta(other.theta),
+        kernel(other.kernel) {}
+
+  /**
+   * @brief The destructor.
+   */
+  virtual ~SMapProjectionInterface() {}
+
+  /**
+   * @brief Get the ID of the object.
+   */
+  virtual uint32_t get_id() { return this->id; }
+
+  /**
+   * @brief Predict the values using S-Map projection.
+   * @param lib_id The ID of the library delay embedding.
+   * @param test_id The ID of the test delay embedding.
+   * @return A vector of predictions.
+   */
+  Rcpp::NumericVector predict(uint32_t lib_id, uint32_t test_id) {
+    auto it_lib = EDMInterfaceBase::live_objects.find(lib_id);
+    auto it_test = EDMInterfaceBase::live_objects.find(test_id);
+    if (it_lib == EDMInterfaceBase::live_objects.end() ||
+        it_test == EDMInterfaceBase::live_objects.end()) {
+      throw std::invalid_argument("SMapProjectionInterface::predict: invalid lib_id or test_id.");
+    }
+
+    DelayEmbeddingInterface* lib = dynamic_cast<DelayEmbeddingInterface*>(it_lib->second.get());
+    DelayEmbeddingInterface* test = dynamic_cast<DelayEmbeddingInterface*>(it_test->second.get());
+    if (!lib || !test) {
+      throw std::invalid_argument("SMapProjectionInterface::predict: live objects are not of type DelayEmbeddingInterface.");
+    }
+
+    fims_edm::DelayEmbeddingMatrix<double> lib_matrix = to_matrix(lib);
+    fims_edm::DelayEmbeddingMatrix<double> test_matrix = to_matrix(test);
+
+    fims_edm::SMapProjection<double> sm;
+    sm.library = &lib_matrix;
+    sm.embedding_dimension = this->embedding_dimension;
+    sm.theta = this->theta;
+    if (this->kernel == "gaussian") {
+      sm.kernel = fims_edm::SMapKernel::kGaussian;
+    } else {
+      sm.kernel = fims_edm::SMapKernel::kExponential;
+    }
+
+    sm.predict(test_matrix);
+
+    Rcpp::NumericVector ret(sm.predictions.size());
+    for (size_t i = 0; i < sm.predictions.size(); ++i) {
+      ret[i] = sm.predictions[i];
+    }
+    return ret;
+  }
+
+  /**
+   * @brief Finalizes the interface object.
+   */
+  virtual void finalize() {
+    this->finalized = true;
+  }
+
+  /**
+   * @brief Converts to JSON representation.
+   */
+  virtual std::string to_json() {
+    std::stringstream ss;
+    ss << "{\n";
+    ss << " \"module_name\": \"EDM\",\n";
+    ss << " \"module_type\": \"SMapProjection\",\n";
+    ss << " \"module_id\": " << this->id << ",\n";
+    ss << " \"embedding_dimension\": " << this->embedding_dimension << ",\n";
+    ss << " \"theta\": " << this->theta << ",\n";
+    ss << " \"kernel\": \"" << this->kernel << "\"\n";
+    ss << "}";
+    return ss.str();
+  }
+};
+
+/**
+ * @brief Rcpp interface for GP-EDM projection.
+ */
+class GPEdmProjectionInterface : public EDMInterfaceBase {
+ public:
+  /**
+   * @brief The embedding dimension (E).
+   */
+  uint32_t embedding_dimension;
+  /**
+   * @brief The ARD length-scale parameters (phi).
+   */
+  Rcpp::NumericVector phi;
+  /**
+   * @brief The signal variance parameter (sigma2).
+   */
+  double sigma2;
+  /**
+   * @brief The observation noise variance/nugget parameter (ve).
+   */
+  double ve;
+
+  /**
+   * @brief The constructor.
+   */
+  GPEdmProjectionInterface() : EDMInterfaceBase(), embedding_dimension(0), sigma2(1.0), ve(0.1) {
+    EDMInterfaceBase::live_objects[this->id] =
+        std::make_shared<GPEdmProjectionInterface>(*this);
+    FIMSRcppInterfaceBase::fims_interface_objects.push_back(
+        EDMInterfaceBase::live_objects[this->id]);
+  }
+
+  /**
+   * @brief Copy constructor.
+   */
+  GPEdmProjectionInterface(const GPEdmProjectionInterface& other)
+      : EDMInterfaceBase(other),
+        embedding_dimension(other.embedding_dimension),
+        phi(other.phi),
+        sigma2(other.sigma2),
+        ve(other.ve) {}
+
+  /**
+   * @brief The destructor.
+   */
+  virtual ~GPEdmProjectionInterface() {}
+
+  /**
+   * @brief Get the ID of the object.
+   */
+  virtual uint32_t get_id() { return this->id; }
+
+  /**
+   * @brief Fits the optimized hyperparameters for GP-EDM.
+   * @param lib_id The ID of the library delay embedding.
+   * @return A list of optimized parameters.
+   */
+  Rcpp::List fit(uint32_t lib_id) {
+    auto it_lib = EDMInterfaceBase::live_objects.find(lib_id);
+    if (it_lib == EDMInterfaceBase::live_objects.end()) {
+      throw std::invalid_argument("GPEdmProjectionInterface::fit: invalid lib_id.");
+    }
+
+    DelayEmbeddingInterface* lib = dynamic_cast<DelayEmbeddingInterface*>(it_lib->second.get());
+    if (!lib) {
+      throw std::invalid_argument("GPEdmProjectionInterface::fit: live object is not of type DelayEmbeddingInterface.");
+    }
+    fims_edm::DelayEmbeddingMatrix<double> lib_matrix = to_matrix(lib);
+
+    fims_edm::GPEdmProjection<double> gp;
+    gp.library = &lib_matrix;
+    gp.embedding_dimension = this->embedding_dimension;
+    gp.sigma2 = this->sigma2;
+    gp.ve = this->ve;
+    if (this->phi.size() > 0) {
+      gp.phi.resize(this->phi.size());
+      for (int i = 0; i < this->phi.size(); ++i) {
+        gp.phi[i] = this->phi[i];
+      }
+    }
+
+    gp.fit();
+
+    this->sigma2 = gp.sigma2;
+    this->ve = gp.ve;
+    this->phi = Rcpp::NumericVector(gp.phi.size());
+    for (size_t i = 0; i < gp.phi.size(); ++i) {
+      this->phi[i] = gp.phi[i];
+    }
+
+    return Rcpp::List::create(
+        Rcpp::Named("phi") = this->phi,
+        Rcpp::Named("sigma2") = this->sigma2,
+        Rcpp::Named("ve") = this->ve
+    );
+  }
+
+  /**
+   * @brief Predict the values using GP-EDM projection.
+   * @param lib_id The ID of the library delay embedding.
+   * @param test_id The ID of the test delay embedding.
+   * @return A vector of predictions.
+   */
+  Rcpp::NumericVector predict(uint32_t lib_id, uint32_t test_id) {
+    auto it_lib = EDMInterfaceBase::live_objects.find(lib_id);
+    auto it_test = EDMInterfaceBase::live_objects.find(test_id);
+    if (it_lib == EDMInterfaceBase::live_objects.end() ||
+        it_test == EDMInterfaceBase::live_objects.end()) {
+      throw std::invalid_argument("GPEdmProjectionInterface::predict: invalid lib_id or test_id.");
+    }
+
+    DelayEmbeddingInterface* lib = dynamic_cast<DelayEmbeddingInterface*>(it_lib->second.get());
+    DelayEmbeddingInterface* test = dynamic_cast<DelayEmbeddingInterface*>(it_test->second.get());
+    if (!lib || !test) {
+      throw std::invalid_argument("GPEdmProjectionInterface::predict: live objects are not of type DelayEmbeddingInterface.");
+    }
+
+    fims_edm::DelayEmbeddingMatrix<double> lib_matrix = to_matrix(lib);
+    fims_edm::DelayEmbeddingMatrix<double> test_matrix = to_matrix(test);
+
+    fims_edm::GPEdmProjection<double> gp;
+    gp.library = &lib_matrix;
+    gp.embedding_dimension = this->embedding_dimension;
+    gp.sigma2 = this->sigma2;
+    gp.ve = this->ve;
+    if (this->phi.size() > 0) {
+      gp.phi.resize(this->phi.size());
+      for (int i = 0; i < this->phi.size(); ++i) {
+        gp.phi[i] = this->phi[i];
+      }
+    } else {
+      gp.phi.assign(this->embedding_dimension, 0.1);
+    }
+
+    gp.predict(test_matrix);
+
+    Rcpp::NumericVector ret(gp.predictions.size());
+    for (size_t i = 0; i < gp.predictions.size(); ++i) {
+      ret[i] = gp.predictions[i];
+    }
+    return ret;
+  }
+
+  /**
+   * @brief Finalizes the interface object.
+   */
+  virtual void finalize() {
+    this->finalized = true;
+  }
+
+  /**
+   * @brief Converts to JSON representation.
+   */
+  virtual std::string to_json() {
+    std::stringstream ss;
+    ss << "{\n";
+    ss << " \"module_name\": \"EDM\",\n";
+    ss << " \"module_type\": \"GPEdmProjection\",\n";
+    ss << " \"module_id\": " << this->id << ",\n";
+    ss << " \"embedding_dimension\": " << this->embedding_dimension << ",\n";
+    ss << " \"sigma2\": " << this->sigma2 << ",\n";
+    ss << " \"ve\": " << this->ve << "\n";
+    ss << "}";
+    return ss.str();
+  }
 };
 
 #endif

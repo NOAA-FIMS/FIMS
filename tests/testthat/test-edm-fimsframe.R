@@ -160,12 +160,12 @@ test_that("create_edm_embedding() stores uncertainty fields when uncertainty_nam
   # Grab the existing survey1 index rows and fabricate a matching sd series
   base_data <- get_data(data_4_model) |>
     dplyr::filter(.data[["type"]] == "index",
-                  .data[["name"]] == "survey1") |>
+                  .data[["fleet"]] == "survey1") |>
     dplyr::arrange(.data[["timing"]])
 
   sd_rows <- base_data |>
     dplyr::mutate(
-      name  = "survey1_sd",
+      fleet = "survey1_sd",
       value = 0.1 * .data[["value"]]
     )
 

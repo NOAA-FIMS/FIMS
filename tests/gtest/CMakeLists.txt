@@ -283,6 +283,42 @@ target_link_libraries(edm_delay_embedding
 
 gtest_discover_tests(edm_delay_embedding)
 
+# test_edm_simplex_projection.cpp
+add_executable(edm_simplex_projection
+  test_edm_simplex_projection.cpp
+)
+
+target_link_libraries(edm_simplex_projection
+  gtest_main
+  fims_test
+)
+
+gtest_discover_tests(edm_simplex_projection)
+
+# test_edm_smap_projection.cpp
+add_executable(edm_smap_projection
+  test_edm_smap_projection.cpp
+)
+
+target_link_libraries(edm_smap_projection
+  gtest_main
+  fims_test
+)
+
+gtest_discover_tests(edm_smap_projection)
+
+# test_edm_gp_projection.cpp
+add_executable(edm_gp_projection
+  test_edm_gp_projection.cpp
+)
+
+target_link_libraries(edm_gp_projection
+  gtest_main
+  fims_test
+)
+
+gtest_discover_tests(edm_gp_projection)
+
 # test_population_CatchAtAge_CalculateUnfishedInitial.cpp
 add_executable(population_CatchAtAge_CalculateUnfishedInitial
   test_population_CatchAtAge_CalculateUnfishedInitial.cpp
@@ -348,3 +384,26 @@ target_link_libraries(def_FIMSLog_clear
   fims_test
 )
 gtest_discover_tests(def_FIMSLog_clear)
+
+# test_distributions_mvnorm.cpp
+add_executable(distributions_mvnorm
+  test_distributions_mvnorm.cpp
+)
+add_as_invoker_manifest(distributions_mvnorm)
+target_link_libraries(distributions_mvnorm
+  gtest_main
+  fims_test
+)
+gtest_discover_tests(distributions_mvnorm)
+
+# test_distributions_beta.cpp
+add_executable(distributions_beta
+  test_distributions_beta.cpp
+)
+add_as_invoker_manifest(distributions_beta)
+target_link_libraries(distributions_beta
+  gtest_main
+  fims_test
+)
+gtest_discover_tests(distributions_beta)
+

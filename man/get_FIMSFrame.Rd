@@ -32,6 +32,8 @@
 \alias{get_n_lengths}
 \alias{get_n_lengths,FIMSFrame-method}
 \alias{get_n_lengths,data.frame-method}
+\alias{get_edm_embeddings}
+\alias{get_edm_embeddings,FIMSFrame-method}
 \title{Get a slot in a FIMSFrame object}
 \usage{
 get_data(x)
@@ -93,6 +95,10 @@ get_n_lengths(x)
 \S4method{get_n_lengths}{FIMSFrame}(x)
 
 \S4method{get_n_lengths}{data.frame}(x)
+
+get_edm_embeddings(x)
+
+\S4method{get_edm_embeddings}{FIMSFrame}(x)
 }
 \arguments{
 \item{x}{An object returned from \code{\link[=FIMSFrame]{FIMSFrame()}}.}
@@ -127,6 +133,14 @@ the model.
 
 \code{\link[=get_n_lengths]{get_n_lengths()}} returns an integer specifying the number of length bins
 used in the model.
+
+\code{\link[=get_edm_embeddings]{get_edm_embeddings()}} returns a named list of delay-embedding results
+stored in the FIMSFrame object. Each element is itself a named list with
+fields \code{series_name}, \code{E} (embedding dimension), \code{tau} (time lag),
+\code{drop_missing} (logical), \code{n_rows}, \code{n_cols}, \code{embedded_values} (a numeric
+vector of the flattened row-major matrix), and \code{target_values} (a numeric
+vector of the target time-point values x_t for each row).
+Returns an empty list when \code{\link[=create_edm_embedding]{create_edm_embedding()}} has not yet been called.
 }
 \description{
 There is an accessor function for each slot in the S4 class \code{FIMSFrame},
