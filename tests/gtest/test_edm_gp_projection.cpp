@@ -369,8 +369,8 @@ TEST(GPEdmProjection, LogisticMapPredictionInRange) {
 // ---------------------------------------------------------------------------
 
 TEST(GPEdmProjection, SMapStillWorksAfterRefactor) {
-  // Regression test: SMapProjection now uses GaussianElimination from the
-  // shared edm_linear_algebra.hpp. Verify it still produces correct output.
+  // Regression test: SMapProjection now uses Eigen::LDLT for Cholesky decomposition.
+  // Verify it still produces correct output.
   auto s = logistic_map(30);
   const size_t E = 2;
   fims_edm::DelayEmbeddingMatrix<double> emb =
@@ -387,3 +387,26 @@ TEST(GPEdmProjection, SMapStillWorksAfterRefactor) {
     EXPECT_TRUE(std::isfinite(smap.predictions[i]));
   }
 }
+
+TEST(GPEdmProjection, IllConditionedNearZeroNuggetHandledByLDLT) {
+  // Steve Munch / Andrea review: verify near-zero nugget (ve ~ 0) handles
+  // potential PSD / near-singular matrix using Eigen::LDLT without throwing or NaN.
+  auto s = logistic_map(30);
+  const size_t E = 2;
+  fims_edm::DelayEmbeddingMatrix<double> emb =
+      fims_edm::MakeDelayEmbedding(s, E, /*tau=*/1);
+
+  fims_edm::GPEdmProjection<double> gp;
+  gp.library             = &emb;
+  gp.embedding_dimension = E;
+  gp.phi                 = std::vector<double>(E, 100.0); // large phi
+  gp.ve                  = 1e-6;                          // near-zero nugget
+
+  EXPECT_NO_THROW({
+    gp.predict(emb);
+    for (size_t i = 0; i < gp.predictions.size(); ++i) {
+      EXPECT_TRUE(std::isfinite(gp.predictions[i]));
+    }
+  });
+}
+

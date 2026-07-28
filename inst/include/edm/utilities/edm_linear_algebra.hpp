@@ -2,14 +2,9 @@
  * @file edm_linear_algebra.hpp
  * @brief Shared linear algebra utilities for EDM prediction algorithms.
  *
- * @details Currently provides:
- *  - GaussianElimination<Type>: solves A x = b in-place via partial-pivot
- *    Gaussian elimination. Used by SMapProjection and GPEdmProjection.
- *
- * All routines are templated on the numeric scalar type so they work with
- * both plain double and TMB AD scalars (CppAD). Index arithmetic and pivot
- * selection use double casts to keep the AD tape free of non-differentiable
- * branches.
+ * @details Linear solves across EDM functors (SMapProjection and GPEdmProjection)
+ * are standardized on Eigen::LDLT Cholesky factorization for numerical stability
+ * and differentiable linear algebra.
  *
  * @copyright This file is part of the NOAA, National Marine Fisheries Service
  * Fisheries Integrated Modeling System project. See LICENSE in the source
@@ -17,10 +12,6 @@
  */
 #ifndef FIMS_EDM_LINEAR_ALGEBRA_HPP
 #define FIMS_EDM_LINEAR_ALGEBRA_HPP
-
-#include <cstddef>
-#include <stdexcept>
-#include <vector>
 
 namespace fims_edm {
 
@@ -97,6 +88,8 @@ void GaussianElimination(std::vector<Type>& A, std::vector<Type>& b,
     b[i] = (b[i] - sum) / A[i * n + i];
   }
 }
+// Linear algebra for EDM predictors (S-Map, GP-EDM) uses Eigen::LDLT directly
+// for matrix factorization and solving linear systems.
 
 }  // namespace fims_edm
 
