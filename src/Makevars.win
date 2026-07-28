@@ -1,7 +1,7 @@
 CXX_STD = CXX17
 PKG_CXXFLAGS = -I../inst/include -DTMB_MODEL  -DTMB_EIGEN_DISABLE_WARNINGS -DTMBAD_FRAMEWORK -w
 MAKEFLAGS= -j2 # Use 2 cores for compilation, adjust as needed
-ifdef R_INSTALL_PKG
+ifndef DEVTOOLS_LOAD
   # Size-reduction flags applied only during R CMD INSTALL / devtools::install().
   # -flto=auto: link-time optimization recovers dead template instantiations lost
   #   by splitting into translation units, reducing installed .so size.
