@@ -181,6 +181,8 @@ class AgeCompDataInterface : public DataInterfaceBase {
                                                              this->amax);
 
     age_comp_data->id = this->id;
+    std::string data_name = "age_comp_data";
+    age_comp_data->data.set_variable_name(data_name);
     for (int y = 0; y < ymax; y++) {
       for (int a = 0; a < amax; a++) {
         int i_age_year = y * amax + a;
@@ -312,6 +314,8 @@ class LengthCompDataInterface : public DataInterfaceBase {
         std::make_shared<fims_data_object::DataObject<Type>>(this->ymax,
                                                              this->lmax);
     length_comp_data->id = this->id;
+    std::string data_name = "length_comp_data";
+    length_comp_data->data.set_variable_name(data_name);
     for (int y = 0; y < ymax; y++) {
       for (int l = 0; l < lmax; l++) {
         int i_length_year = y * lmax + l;
@@ -433,6 +437,8 @@ class IndexDataInterface : public DataInterfaceBase {
         std::make_shared<fims_data_object::DataObject<Type>>(this->ymax);
 
     data->id = this->id;
+    std::string data_name = "index_data";
+    data->data.set_variable_name(data_name);
 
     for (int y = 0; y < ymax; y++) {
       data->at(y) = this->index_data[y];
@@ -554,6 +560,8 @@ class LandingsDataInterface : public DataInterfaceBase {
         std::make_shared<fims_data_object::DataObject<Type>>(this->ymax);
 
     data->id = this->id;
+    std::string data_name = "landings_data";
+    data->data.set_variable_name(data_name);
 
     for (int y = 0; y < ymax; y++) {
       data->at(y) = this->landings_data[y];

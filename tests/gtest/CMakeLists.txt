@@ -91,6 +91,17 @@ target_link_libraries(fimsObject_MemoryTracker
 )
 gtest_discover_tests(fimsObject_MemoryTracker)
 
+# test_fimsVector_Operator.cpp
+add_executable(fimsVector_Operator
+  test_fimsVector_Operator.cpp
+)
+add_as_invoker_manifest(fimsVector_Operator)
+target_link_libraries(fimsVector_Operator
+  gtest_main
+  fims_test
+)
+gtest_discover_tests(fimsVector_Operator)
+
 # test_growth_EWAAGrowth_evaluate.cpp
 add_executable(growth_EWAAGrowth_evaluate
   test_growth_EWAAGrowth_evaluate.cpp

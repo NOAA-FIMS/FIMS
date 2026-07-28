@@ -431,8 +431,10 @@ class PopulationInterface : public PopulationInterfaceBase {
     population->growth_id = this->growth_id.get();
     population->recruitment_id = this->recruitment_id.get();
     population->maturity_id = this->maturity_id.get();
-    population->log_M.resize(this->log_M.size());
 
+    ss.str("");
+    ss << "Population." << this->id << ".log_f_multiplier";
+    population->log_f_multiplier.set_variable_name(ss.str());
     if (this->log_f_multiplier.size() ==
         static_cast<size_t>(this->n_years.get())) {
       population->log_f_multiplier.resize(this->log_f_multiplier.size());
@@ -447,6 +449,24 @@ class PopulationInterface : public PopulationInterfaceBase {
       }
       population->log_f_multiplier.resize(this->log_f_multiplier.size());
     }
+    for (size_t i = 0; i < log_f_multiplier.size(); i++) {
+      population->log_f_multiplier[i] =
+          this->log_f_multiplier[i].initial_value_m;
+      ss << "." << this->log_f_multiplier[i].id_m;
+      if (this->log_f_multiplier[i].estimation_type_m.get() ==
+          "fixed_effects") {
+        info->RegisterParameterName(ss.str());
+        info->RegisterParameter(population->log_f_multiplier[i]);
+      }
+      if (this->log_f_multiplier[i].estimation_type_m.get() ==
+          "random_effects") {
+        info->RegisterRandomEffectName(ss.str());
+        info->RegisterRandomEffect(population->log_f_multiplier[i]);
+      }
+    }
+    info->variable_map[this->log_f_multiplier.id_m] =
+        &(population)->log_f_multiplier;
+    
 
     if (this->spawning_biomass_ratio.size() ==
         static_cast<size_t>(this->n_years.get() + 1)) {
@@ -459,63 +479,44 @@ class PopulationInterface : public PopulationInterfaceBase {
       population->spawning_biomass_ratio.resize(
           this->spawning_biomass_ratio.size());
     }
+    ss.str("");
+    ss << "Population." << this->id << ".spawning_biomass_ratio";
+    population->spawning_biomass_ratio.set_variable_name(ss.str());
     info->variable_map[this->spawning_biomass_ratio.id_m] =
         &(population)->spawning_biomass_ratio;
 
-    population->log_init_naa.resize(this->log_init_naa.size());
+    ss.str("");
+    ss << "Population." << this->id << ".log_M";
+    population->log_M.set_variable_name(ss.str());
+    population->log_M.resize(this->log_M.size());
     for (size_t i = 0; i < log_M.size(); i++) {
       population->log_M[i] = this->log_M[i].initial_value_m;
+      ss << "." << this->log_M[i].id_m;
       if (this->log_M[i].estimation_type_m.get() == "fixed_effects") {
-        ss.str("");
-        ss << "Population." << this->id << ".log_M." << this->log_M[i].id_m;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(population->log_M[i]);
       }
       if (this->log_M[i].estimation_type_m.get() == "random_effects") {
-        ss.str("");
-        ss << "Population." << this->id << ".log_M." << this->log_M[i].id_m;
         info->RegisterRandomEffectName(ss.str());
         info->RegisterRandomEffect(population->log_M[i]);
       }
     }
     info->variable_map[this->log_M.id_m] = &(population)->log_M;
 
-    for (size_t i = 0; i < log_f_multiplier.size(); i++) {
-      population->log_f_multiplier[i] =
-          this->log_f_multiplier[i].initial_value_m;
-      if (this->log_f_multiplier[i].estimation_type_m.get() ==
-          "fixed_effects") {
-        ss.str("");
-        ss << "Population." << this->id << ".log_f_multiplier."
-           << this->log_f_multiplier[i].id_m;
-        info->RegisterParameterName(ss.str());
-        info->RegisterParameter(population->log_f_multiplier[i]);
-      }
-      if (this->log_f_multiplier[i].estimation_type_m.get() ==
-          "random_effects") {
-        ss.str("");
-        ss << "Population." << this->id << ".log_f_multiplier."
-           << this->log_f_multiplier[i].id_m;
-        info->RegisterRandomEffectName(ss.str());
-        info->RegisterRandomEffect(population->log_f_multiplier[i]);
-      }
-    }
-    info->variable_map[this->log_f_multiplier.id_m] =
-        &(population)->log_f_multiplier;
 
+
+    ss.str("");
+    ss << "Population." << this->id << ".log_init_naa";
+    population->log_init_naa.set_variable_name(ss.str());
+    population->log_init_naa.resize(this->log_init_naa.size());
     for (size_t i = 0; i < log_init_naa.size(); i++) {
       population->log_init_naa[i] = this->log_init_naa[i].initial_value_m;
+      ss << "." << this->log_init_naa[i].id_m;
       if (this->log_init_naa[i].estimation_type_m.get() == "fixed_effects") {
-        ss.str("");
-        ss << "Population." << this->id << ".log_init_naa."
-           << this->log_init_naa[i].id_m;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(population->log_init_naa[i]);
       }
       if (this->log_init_naa[i].estimation_type_m.get() == "random_effects") {
-        ss.str("");
-        ss << "Population." << this->id << ".log_init_naa."
-           << this->log_init_naa[i].id_m;
         info->RegisterRandomEffectName(ss.str());
         info->RegisterRandomEffect(population->log_init_naa[i]);
       }
@@ -536,6 +537,9 @@ class PopulationInterface : public PopulationInterfaceBase {
       population->proportion_female.resize(this->proportion_female.size());
     }
 
+    ss.str("");
+    ss << "Population." << this->id << ".proportion_female";
+    population->proportion_female.set_variable_name(ss.str());
     for (size_t i = 0; i < this->proportion_female.size(); i++) {
       if (this->proportion_female[i].initial_value_m < 0.0 ||
           this->proportion_female[i].initial_value_m > 1.0) {
@@ -546,19 +550,14 @@ class PopulationInterface : public PopulationInterfaceBase {
       }
       population->proportion_female[i] =
           this->proportion_female[i].initial_value_m;
+      ss << "." << this->proportion_female[i].id_m;
       if (this->proportion_female[i].estimation_type_m.get() ==
           "fixed_effects") {
-        ss.str("");
-        ss << "Population." << this->id << ".proportion_female."
-           << this->proportion_female[i].id_m;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(population->proportion_female[i]);
       }
       if (this->proportion_female[i].estimation_type_m.get() ==
           "random_effects") {
-        ss.str("");
-        ss << "Population." << this->id << ".proportion_female."
-           << this->proportion_female[i].id_m;
         info->RegisterRandomEffectName(ss.str());
         info->RegisterRandomEffect(population->proportion_female[i]);
       }
