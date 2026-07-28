@@ -390,7 +390,7 @@ class VariableVector {
     copy.storage_m->reserve(this->storage_m->size());
     for (size_t i = 0; i < this->storage_m->size(); i++) {
       Variable variable_copy;
-      const Variable &variable = this->storage_m->at(i);
+      const Variable& variable = this->storage_m->at(i);
       variable_copy.initial_value_m = variable.initial_value_m;
       variable_copy.final_value_m = variable.final_value_m;
       variable_copy.estimation_type_m =
