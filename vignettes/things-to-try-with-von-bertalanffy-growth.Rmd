@@ -7,11 +7,23 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  eval = FALSE
+)
+```
+
 ## Purpose
 
 This vignette walks through small changes to the Von Bertalanffy growth example.
 Each section changes one part of the setup, reruns the full model, and saves the
 outputs for comparison.
+
+The code chunks are shown for interactive exploration but are not evaluated
+during package vignette builds. The examples rerun multiple FIMS models and are
+intended for manual branch diagnostics rather than automated package checks.
 
 The goal is to show how growth inputs move through the full model workflow.
 
