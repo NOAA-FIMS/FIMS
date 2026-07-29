@@ -70,7 +70,7 @@ model_edm_matrix(x, embedding_name)
 \item{fleet}{A string, or vector of strings, specifying the name of the
 fleet(s) of interest that you want data for. The strings must
 exactly match strings in the \code{"fleet"} column of \code{get_data(x)}.}
-  
+
 \item{embedding_name}{A single string matching one of the names in
 \code{\link[=get_edm_embeddings]{get_edm_embeddings()}}.}
 }
@@ -140,7 +140,7 @@ or time.
 Returns a numeric matrix (n_rows × E) for a named delay embedding stored
 inside the FIMSFrame object. The matrix can be passed directly to an EDM
 prediction module. Rows correspond to embedded time points and columns
-correspond to the lagged coordinates \link{x_t, x_{t-tau}, ..., x_{t-(E-1)tau}}.
+correspond to the lagged coordinates \verb{x_t, x_\{t-tau\}, ..., x_\{t-(E-1)tau\}}.
 }
 }
 \keyword{FIMSFrame}

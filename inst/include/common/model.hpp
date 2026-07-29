@@ -89,6 +89,13 @@ class Model {  // may need singleton
       // TODO(EDM): Compute EDM predictions before evaluating data likelihoods.
     }
 
+    // Compute EDM predictions before evaluating data likelihoods.
+    for (typename fims_info::Information<Type>::edm_models_iterator e_it =
+             this->fims_information->edm_models.begin();
+         e_it != this->fims_information->edm_models.end(); ++e_it) {
+      e_it->second->Evaluate();
+    }
+
     // Loop over densities and evaluate joint negative log densities for priors
     typename fims_info::Information<Type>::density_components_iterator d_it;
     int nll_vec_idx = 0;
@@ -169,6 +176,14 @@ class Model {  // may need singleton
     vector<Type> nll_components = nll_vec.to_tmb();
     FIMS_REPORT_F(nll_components, this->of);
     FIMS_REPORT_F(jnll, this->of);
+
+    // report out EDM models
+    for (typename fims_info::Information<Type>::edm_models_iterator e_it =
+             this->fims_information->edm_models.begin();
+         e_it != this->fims_information->edm_models.end(); ++e_it) {
+      vector<Type> edm_preds_tmb = e_it->second->predictions.to_tmb();
+      FIMS_REPORT_F(edm_preds_tmb, this->of);
+    }
 
 #endif
 

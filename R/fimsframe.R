@@ -603,7 +603,7 @@ methods::setMethod(
 #' Returns a numeric matrix (n_rows × E) for a named delay embedding stored
 #' inside the FIMSFrame object. The matrix can be passed directly to an EDM
 #' prediction module. Rows correspond to embedded time points and columns
-#' correspond to the lagged coordinates [x_t, x_{t-tau}, ..., x_{t-(E-1)tau}].
+#' correspond to the lagged coordinates `x_t, x_{t-tau}, ..., x_{t-(E-1)tau}`.
 #'
 #' @param embedding_name A single string matching one of the names in
 #'   [get_edm_embeddings()].
