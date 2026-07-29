@@ -193,7 +193,7 @@ run_fims_likelihood <- function(
 
   # Set number of cores to use
   if (is.null(n_cores)) {
-    n_cores_to_use <- parallel::detectCores() - 1
+    n_cores_to_use <- max(1L, parallel::detectCores() - 1L)
   } else {
     # Validate n_cores before conversion
     if (!is.numeric(n_cores) || n_cores %% 1 != 0 || n_cores <= 0) {
@@ -201,11 +201,7 @@ run_fims_likelihood <- function(
     }
     n_cores_to_use <- as.integer(n_cores)
   }
-  dplyr::case_when(
-    n_cores_to_use == 1 ~ future::plan(future::sequential),
-    n_cores_to_use > 1 & Sys.info()["sysname"] == "Windows" ~ future::plan(future::multisession, workers = n_cores_to_use),
-    n_cores_to_use > 1 & Sys.info()["sysname"] != "Windows" ~ future::plan(future::multicore, workers = n_cores_to_use)
-  )
+  previous_plan <- set_diagnostic_future_plan(n_cores_to_use)
 
   if (n_cores_to_use == 1) {
     cli::cli_alert_info("...Running sequentially on a single core")
@@ -214,7 +210,7 @@ run_fims_likelihood <- function(
   }
 
   # Ensure cleanup happens
-  on.exit(future::plan(future::sequential), add = TRUE)
+  on.exit(future::plan(previous_plan), add = TRUE)
 
   # run FIMS in parallel for each of the likelihood profile values
   estimates_list <- furrr::future_map(
