@@ -50,7 +50,7 @@ clear()
 
 ## Likelihood profile
 
-Once we have a model that is fit, we can run a likelihood profile to see the impact of each data type on a given parameter. In this example, we will test the impact on R~0~ but any value can be tested by changing the `parameter_name` argument. *Note: The parameter name must match what it is called in the `label` column of the `parameters` tibble.* An optional input is the `module_name` the parameter is associated with. However, as long as there is only one parameter with that name, `module_name` can be left NULL. `run_fims_likelihood()` function takes a fitted FIMS model, finds the MLE estimate for the parameter being profiled over (in this case R~0~), and profiles over a vector of values based on the `min`, `max`, and `length` user inputs. In the example below, it will profile over 5 values that range from the `MLE value - 1` to the `MLE value + 1`. If you are running many models at once, it can be computationally more efficient to use multiple cores. To do this, change the `n_cores` argument to as many as you want/can use. *NOTE: If left empty, the default for `n_cores` is one less than the number of cores on your machine so this could unexpectedly use up a lot of your computing power. For rendered documents such as this vignette, use `n_cores = 1` to avoid nested worker processes during rendering.*
+Once we have a model that is fit, we can run a likelihood profile to see the impact of each data type on a given parameter. In this example, we will test the impact on R~0~ but any value can be tested by changing the `parameter_name` argument. *Note: The parameter name must match what it is called in the `label` column of the `parameters` tibble.* An optional input is the `module_name` the parameter is associated with. However, as long as there is only one parameter with that name, `module_name` can be left NULL. `run_fims_likelihood()` function takes a fitted FIMS model, finds the MLE estimate for the parameter being profiled over (in this case R~0~), and profiles over a vector of values based on the `min`, `max`, and `length` user inputs. In the example below, it will profile over 5 values that range from the `MLE value - 1` to the `MLE value + 1`. If you are running many models at once, it can be computationally more efficient to use multiple cores. To do this, change the `n_cores` argument to as many as you want/can use. *NOTE: If left empty, the default for `n_cores` is one less than the number of cores on your machine so this could unexpectedly use up a lot of your computing power. For rendered documents such as this vignette, keep the outer session on `future::sequential` and set `n_cores` explicitly; diagnostics will then use a safe `multisession` backend when `n_cores > 1`.*
 
 ```{r like_profile}
 #| message: false
@@ -61,7 +61,7 @@ like_fit <- run_fims_likelihood(
   parameters = parameters,
   parameter_name = "log_rzero",
   data = data_big,
-  n_cores = 1,
+  n_cores = 2,
   min = -1,
   max = 1,
   length = 3
@@ -104,7 +104,7 @@ $$\rho = \frac{1}{n} \sum_{i=1}^{n} \frac{x_{p,y} - x_{base,y}}{x_{base,y}}$$
 
 where $n$ is the number of retrospective peels, $x_{p, y}$ is the estimated value (e.g., spawning biomass, fishing mortality, etc.) from peel $p$ at its terminal year $y$, and $x_{base,y}$ is the value from the reference model, $base$, at that same year $y$.
 
-Some things to note about `run_fims_retrospective()` is that you can provide data that is already a `FIMSFrame` object or you can give it one that is not. In the example below, we are using the `FIMSFrame` data object (`data_4_model`) created above. Additionally, it expects a vector of positive values of `years_to_remove` from the base model, starting from 0. If you are running many peels, it may be more efficient to use multiple cores, which can be specified with the `n_cores` argument. 
+Some things to note about `run_fims_retrospective()` is that you can provide data that is already a `FIMSFrame` object or you can give it one that is not. In the example below, we are using the `FIMSFrame` data object (`data_4_model`) created above. Additionally, it expects a vector of positive values of `years_to_remove` from the base model, starting from 0. If you are running many peels, it may be more efficient to use multiple cores, which can be specified with the `n_cores` argument. In rendered documents, this can still be done safely by keeping the outer future plan sequential and setting `n_cores` explicitly.
 
 > NOTE: If left empty, the default for `n_cores` is one less than the number of cores on your machine so this could unexpectedly use up a lot of your computing power. 
 
@@ -113,7 +113,7 @@ retro_fit <- run_fims_retrospective(
   years_to_remove = 0:2,
   data_4_model,
   parameters,
-  n_cores = 1
+  n_cores = 2
 )
 ```
 
