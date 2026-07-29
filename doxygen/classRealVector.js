@@ -7,6 +7,7 @@ var classRealVector =
     [ "RealVector", "classRealVector.html#ae0957dfa0de31a0c820730fd50821ff0", null ],
     [ "~RealVector", "classRealVector.html#a22d7d0d15cf8e641a3d9d2d7d93e77f7", null ],
     [ "at", "classRealVector.html#ad373336678a162fd01be6b0623b347d1", null ],
+    [ "deep_copy", "classRealVector.html#ac8fb98238b4472966459813fb8fedb9e", null ],
     [ "fill", "classRealVector.html#a90c21e5db9c0004200652892364cc523", null ],
     [ "get", "classRealVector.html#a0e46c7faa2e62d0aa4f4f793054a183a", null ],
     [ "get_id", "classRealVector.html#ac0c8f645298395adcdc2f2fb8d107850", null ],

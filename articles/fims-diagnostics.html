@@ -28,7 +28,7 @@
     <nav class="navbar navbar-expand-lg fixed-top bg-light" data-bs-theme="light" aria-label="Site navigation"><div class="container">
     <img class="navlogo" src="https://noaa-fims.github.io/images/FIMS_logo3.png" alt="FIMS logo with a fish" width="60" align="left"><a class="navbar-brand me-2" href="../index.html">FIMS</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.3.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.4</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -107,7 +107,7 @@
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/noaa-fims/fims" class="external-link">FIMS</a></span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/packageDescription.html" class="external-link">packageVersion</a></span><span class="op">(</span><span class="st">"FIMS"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] '0.9.3.9000'</span></span>
+<span><span class="co">#&gt; [1] '0.9.4'</span></span>
 <span><span class="fu"><a href="../reference/Cpp_functions.html">clear</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <div class="section level2">
 <h2 id="set-up-fims-model">Set up FIMS model<a class="anchor" aria-label="anchor" href="#set-up-fims-model"></a>
@@ -136,17 +136,17 @@ of default parameters.</p>
 <span>  <span class="fu"><a href="../reference/fit_fims.html">fit_fims</a></span><span class="op">(</span>optimize <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Starting optimization ...</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Restarting optimizer 3 times to improve gradient.</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Maximum gradient went from <span style="color: #0000BB;">0.00165</span> to <span style="color: #0000BB;">0.00031</span> after 3 steps.</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Maximum gradient went from <span style="color: #0000BB;">0.005</span> to <span style="color: #0000BB;">0.00038</span> after 3 steps.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Finished optimization</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Finished sdreport</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> FIMS model version: <span style="color: #0000BB;">0.9.3.9000</span></span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Total run time was <span style="color: #0000BB;">1.33833</span> minutes</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> FIMS model version: <span style="color: #0000BB;">0.9.4</span></span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Total run time was <span style="color: #0000BB;">21.67752</span> seconds</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Number of parameters: fixed_effects=49, random_effects=29, and total=78</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Maximum gradient= <span style="color: #0000BB;">0.00031</span></span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Maximum gradient= <span style="color: #0000BB;">0.00038</span></span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Negative log likelihood (NLL):</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> Marginal NLL= <span style="color: #0000BB;">3231.28735</span></span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> Total NLL= <span style="color: #0000BB;">3164.86339</span></span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Terminal SB= <span style="color: #0000BB;">1728.68508</span></span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Terminal SB= <span style="color: #0000BB;">1728.69146</span></span></span>
 <span></span>
 <span><span class="co"># Clear memory post-run</span></span>
 <span><span class="fu"><a href="../reference/Cpp_functions.html">clear</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
@@ -276,47 +276,47 @@ up a lot of your computing power.</p>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> running model with 0 years of data removed</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Starting optimization ...</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Restarting optimizer 3 times to improve gradient.</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Maximum gradient went from <span style="color: #0000BB;">0.00165</span> to <span style="color: #0000BB;">0.00031</span> after 3 steps.</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Maximum gradient went from <span style="color: #0000BB;">0.005</span> to <span style="color: #0000BB;">0.00038</span> after 3 steps.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Finished optimization</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Finished sdreport</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> FIMS model version: <span style="color: #0000BB;">0.9.3.9000</span></span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Total run time was <span style="color: #0000BB;">1.35588</span> minutes</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> FIMS model version: <span style="color: #0000BB;">0.9.4</span></span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Total run time was <span style="color: #0000BB;">21.54016</span> seconds</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Number of parameters: fixed_effects=49, random_effects=29, and total=78</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Maximum gradient= <span style="color: #0000BB;">0.00031</span></span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Maximum gradient= <span style="color: #0000BB;">0.00038</span></span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Negative log likelihood (NLL):</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> Marginal NLL= <span style="color: #0000BB;">3231.28735</span></span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> Total NLL= <span style="color: #0000BB;">3164.86339</span></span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Terminal SB= <span style="color: #0000BB;">1728.68508</span></span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Terminal SB= <span style="color: #0000BB;">1728.69146</span></span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> running model with 1 years of data removed</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Starting optimization ...</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Restarting optimizer 3 times to improve gradient.</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Maximum gradient went from <span style="color: #0000BB;">0.00638</span> to <span style="color: #0000BB;">0.00025</span> after 3 steps.</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Maximum gradient went from <span style="color: #0000BB;">0.00564</span> to <span style="color: #0000BB;">0.00067</span> after 3 steps.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Finished optimization</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Finished sdreport</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> FIMS model version: <span style="color: #0000BB;">0.9.3.9000</span></span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Total run time was <span style="color: #0000BB;">1.40308</span> minutes</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> FIMS model version: <span style="color: #0000BB;">0.9.4</span></span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Total run time was <span style="color: #0000BB;">22.72033</span> seconds</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Number of parameters: fixed_effects=49, random_effects=29, and total=78</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Maximum gradient= <span style="color: #0000BB;">0.00025</span></span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Maximum gradient= <span style="color: #0000BB;">0.00067</span></span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Negative log likelihood (NLL):</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> Marginal NLL= <span style="color: #0000BB;">3132.00827</span></span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> Total NLL= <span style="color: #0000BB;">3066.98892</span></span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Terminal SB= <span style="color: #0000BB;">1654.148</span></span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Terminal SB= <span style="color: #0000BB;">1654.15652</span></span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> running model with 2 years of data removed</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Starting optimization ...</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Restarting optimizer 3 times to improve gradient.</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Maximum gradient went from <span style="color: #0000BB;">0.00164</span> to <span style="color: #0000BB;">0.00173</span> after 3 steps.</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Maximum gradient went from <span style="color: #0000BB;">0.00597</span> to <span style="color: #0000BB;">0.00035</span> after 3 steps.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Finished optimization</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Finished sdreport</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> FIMS model version: <span style="color: #0000BB;">0.9.3.9000</span></span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Total run time was <span style="color: #0000BB;">1.41354</span> minutes</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> FIMS model version: <span style="color: #0000BB;">0.9.4</span></span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Total run time was <span style="color: #0000BB;">20.03127</span> seconds</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Number of parameters: fixed_effects=49, random_effects=29, and total=78</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Maximum gradient= <span style="color: #0000BB;">0.00173</span></span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Maximum gradient= <span style="color: #0000BB;">0.00035</span></span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Negative log likelihood (NLL):</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> Marginal NLL= <span style="color: #0000BB;">3036.85438</span></span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> Total NLL= <span style="color: #0000BB;">2973.27387</span></span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Terminal SB= <span style="color: #0000BB;">1500.13192</span></span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Terminal SB= <span style="color: #0000BB;">1500.1442</span></span></span></code></pre></div>
 <div class="section level3">
 <h3 id="mohns-rho">Mohn’s Rho<a class="anchor" aria-label="anchor" href="#mohns-rho"></a>
 </h3>

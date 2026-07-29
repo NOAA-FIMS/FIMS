@@ -7,6 +7,7 @@ var classVariableVector =
     [ "VariableVector", "classVariableVector.html#a7d6046802922bd7791c79bf5cc21c700", null ],
     [ "~VariableVector", "classVariableVector.html#aaf0ca76adb1f231ea85621e56648d07b", null ],
     [ "at", "classVariableVector.html#a475626f4640f673170e9b07a795d5db1", null ],
+    [ "deep_copy", "classVariableVector.html#a284ba7857de53b26817e8dae71bb57f0", null ],
     [ "fill", "classVariableVector.html#aac260485d27a019776204400cc274664", null ],
     [ "get", "classVariableVector.html#a34e560c7ae7ae2e4b9d87363134b0a44", null ],
     [ "get_id", "classVariableVector.html#a8fdbf7cc7aa03e1ee6de48837fa5253a", null ],

@@ -1,5 +1,7 @@
 var NAVTREEINDEX6 =
 {
+"structfims__popdy_1_1RecruitmentBase.html#ab2f2bf3011857f26ae17f8b30809863f":[3,0,6,13,11],
+"structfims__popdy_1_1RecruitmentBase.html#ab2f2bf3011857f26ae17f8b30809863f":[2,0,0,13,11],
 "structfims__popdy_1_1RecruitmentBase.html#abcd395d01ccbcbc4d4784ad2a27a923e":[2,0,0,13,1],
 "structfims__popdy_1_1RecruitmentBase.html#abcd395d01ccbcbc4d4784ad2a27a923e":[3,0,6,13,1],
 "structfims__popdy_1_1RecruitmentBase.html#acf427056522e39bbc0d714473c4789ce":[3,0,6,13,13],
