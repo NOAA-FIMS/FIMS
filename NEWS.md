@@ -1,3 +1,7 @@
+# FIMS 0.10.0
+
+* 
+
 # FIMS 0.9.4
 
 * Adds likelihood profiles and retrospective diagnostic tools
