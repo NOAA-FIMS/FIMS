@@ -298,4 +298,29 @@ TEST(SMapProjection, ForecastHorizonTwoGivesDifferentTargetThanOne) {
   EXPECT_NE(*lib_h1.target_values[0], *lib_h2.target_values[0]);
 }
 
+// ===========================================================================
+// Test 13: Extreme theta (ill-conditioned matrix) handled by Eigen::LDLT.
+//          Steve Munch / Andrea review: verify LDLT least-squares fallback.
+// ===========================================================================
+TEST(SMapProjection, IllConditionedExtremeThetaHandledByLDLT) {
+  auto series = LogisticMap(0.2, 3.9, 35);
+  auto lib = MakeLib(series, 3);
+
+  SMapProjection<double> smap;
+  smap.library = &lib;
+  smap.embedding_dimension = 3;
+  smap.theta = 1000.0;  // Extremely large theta
+
+  size_t last = lib.n_rows - 1;
+  fims::Vector<double> q(3);
+  for (size_t j = 0; j < 3; ++j) q[j] = lib.at(last, j);
+
+  EXPECT_NO_THROW({
+    double pred = smap.predict_one(q);
+    EXPECT_FALSE(std::isnan(pred));
+    EXPECT_FALSE(std::isinf(pred));
+  });
+}
+
 }  // namespace
+

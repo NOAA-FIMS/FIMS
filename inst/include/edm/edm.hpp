@@ -5,7 +5,7 @@
  * @details Including this single header brings in:
  *  - DelayEmbeddingMatrix, MakeDelayEmbedding, MakeDelayEmbeddingDropMissing
  *  - SquaredEuclideanDistance, SimplexWeights, SMapWeights, NormalizeWeights
- *  - GaussianElimination (shared linear algebra utility)
+ *  - Eigen::LDLT (shared linear algebra factorization)
  *  - ARDKernelElement, BuildCovarianceMatrix, BuildKStarVector (GP kernels)
  *  - EDMPredictorBase (abstract base for all prediction functors)
  *  - SimplexProjection (Sugihara & May, 1990)

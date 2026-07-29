@@ -61,14 +61,13 @@
 #include <cstddef>
 #include <stdexcept>
 #include <vector>
+#include <Eigen/Dense>
 
 #include "../utilities/edm_distance_weights.hpp"
 #include "../utilities/edm_linear_algebra.hpp"
 #include "edm_predictor_base.hpp"
 
 namespace fims_edm {
-
-// GaussianElimination<Type> is provided by edm_linear_algebra.hpp (included above).
 
 // ---------------------------------------------------------------------------
 // SMapProjection
@@ -196,10 +195,25 @@ struct SMapProjection : public EDMPredictorBase<Type> {
     }
 
     // -----------------------------------------------------------------------
-    // Step 4: Solve A β = b via Gaussian elimination (in-place).
+    // Step 4: Solve A β = b via Cholesky decomposition (Eigen::LDLT).
     // On exit b_vec holds the solution β.
     // -----------------------------------------------------------------------
-    GaussianElimination(A, b_vec, p);
+    Eigen::Matrix<Type, Eigen::Dynamic, Eigen::Dynamic> A_mat(p, p);
+    for (size_t i = 0; i < p; ++i) {
+      for (size_t j = 0; j < p; ++j) {
+        A_mat(i, j) = A[i * p + j];
+      }
+    }
+    Eigen::Matrix<Type, Eigen::Dynamic, 1> b_mat(p);
+    for (size_t i = 0; i < p; ++i) {
+      b_mat(i) = b_vec[i];
+    }
+
+    Eigen::LDLT<Eigen::Matrix<Type, Eigen::Dynamic, Eigen::Dynamic>> ldlt(A_mat);
+    Eigen::Matrix<Type, Eigen::Dynamic, 1> sol = ldlt.solve(b_mat).eval();
+    for (size_t i = 0; i < p; ++i) {
+      b_vec[i] = sol(i);
+    }
 
     // -----------------------------------------------------------------------
     // Step 5: Predict ŷ = [1, q[0], ..., q[E-1]] · β
