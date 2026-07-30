@@ -53,10 +53,10 @@ test_that("Rcpp interface works for modules", {
 ## Error handling ----
 test_that("Rcpp interface returns correct error messages", {
   #' @description Test that Rcpp Variable interface returns an error when given incorrect input.
-  # expect_error(
-  #   methods::new(Variable, "a"),
-  #   regexp = "Not compatible with requested type"
-  # )
+  expect_error(
+    methods::new(Variable, "a"),
+    regexp = "Not compatible with requested type"
+  )
   #' @description Test that `BevertonHoltRecruitment` module returns an error when given incorrect input.
   expect_error(
     methods::new(BevertonHoltRecruitment, "a"),
