@@ -74,18 +74,19 @@ void register_fleet(Rcpp::Module& m) {
       .method("SetName", &FleetInterface::SetName)
       .method("GetName", &FleetInterface::GetName)
       .method("SetObservedAgeCompDataID",
-              &FleetInterface::SetObservedAgeCompDataID)
+             &FleetInterface::SetObservedAgeCompDataIDSEXP)
       .method("GetObservedAgeCompDataID",
               &FleetInterface::GetObservedAgeCompDataID)
       .method("SetObservedLengthCompDataID",
-              &FleetInterface::SetObservedLengthCompDataID)
+             &FleetInterface::SetObservedLengthCompDataIDSEXP)
       .method("GetObservedLengthCompDataID",
               &FleetInterface::GetObservedLengthCompDataID)
-      .method("SetObservedIndexDataID", &FleetInterface::SetObservedIndexDataID)
+      .method("SetObservedIndexDataID",
+             &FleetInterface::SetObservedIndexDataIDSEXP)
       .method("GetObservedIndexDataID", &FleetInterface::GetObservedIndexDataID)
       .method("SetObservedLandingsDataID",
-              &FleetInterface::SetObservedLandingsDataID)
+             &FleetInterface::SetObservedLandingsDataIDSEXP)
       .method("GetObservedLandingsDataID",
               &FleetInterface::GetObservedLandingsDataID)
-      .method("SetSelectivityID", &FleetInterface::SetSelectivityID);
+      .method("SetSelectivityID", &FleetInterface::SetSelectivityIDSEXP);
 }

@@ -15,7 +15,7 @@ void register_variable(Rcpp::Module& m) {
       "Variable",
       "See https://noaa-fims.github.io/FIMS/doxygen/classVariable.html.")
       .constructor()
-      .constructor<double>()
+      .constructor<SEXP>()
       .constructor<Variable>()
       .field("value", &Variable::initial_value_m)
       .field("estimated_value", &Variable::final_value_m)

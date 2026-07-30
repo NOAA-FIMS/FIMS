@@ -14,6 +14,7 @@
 #endif
 #include <RcppCommon.h>
 #include <Rcpp.h>
+#include <cmath>
 #include <map>
 #include <vector>
 
@@ -21,6 +22,58 @@
 #include "../../interface.hpp"
 #include "rcpp_shared_primitive.hpp"
 #include <limits>
+
+inline std::string get_sexp_type_name(SEXP value) {
+  return Rf_type2char(TYPEOF(value));
+}
+
+inline void stop_type_mismatch(SEXP value, const char* target_type) {
+  Rcpp::stop(
+      "Not compatible with requested type: [type=%s; target=%s].",
+      get_sexp_type_name(value).c_str(), target_type);
+}
+
+inline double as_module_double(SEXP value) {
+  if (Rf_length(value) != 1) {
+    Rcpp::stop("Expected a numeric scalar.");
+  }
+
+  switch (TYPEOF(value)) {
+    case INTSXP:
+    case REALSXP:
+      return Rcpp::as<double>(value);
+    default:
+      stop_type_mismatch(value, "double");
+  }
+
+  return 0.0;
+}
+
+inline int as_module_int(SEXP value) {
+  if (Rf_length(value) != 1) {
+    Rcpp::stop("Expected an integer scalar.");
+  }
+
+  switch (TYPEOF(value)) {
+    case INTSXP:
+      return Rcpp::as<int>(value);
+    case REALSXP: {
+      double numeric_value = Rcpp::as<double>(value);
+      if (!std::isfinite(numeric_value) ||
+          std::floor(numeric_value) != numeric_value ||
+          numeric_value < std::numeric_limits<int>::min() ||
+          numeric_value > std::numeric_limits<int>::max()) {
+        Rcpp::stop("Expected an integer scalar.");
+      }
+
+      return static_cast<int>(numeric_value);
+    }
+    default:
+      stop_type_mismatch(value, "integer");
+  }
+
+  return 0;
+}
 
 /**
  * @brief An Rcpp interface that defines the Variable class.
@@ -59,6 +112,11 @@ class Variable {
       : id_m(Variable::id_g++),
         initial_value_m(value),
         estimation_type_m(estimation_type) {}
+
+  /**
+   * @brief The constructor for initializing a variable from an R object.
+   */
+  Variable(SEXP value) : Variable(as_module_double(value)) {}
 
   /**
    * @brief The constructor for initializing a variable.

@@ -299,11 +299,28 @@ class FleetInterface : public FleetInterfaceBase {
   }
 
   /**
+   * @brief Set the unique ID for the observed age-composition data object.
+   * @param observed_agecomp_data_id R object containing the unique ID.
+   */
+  void SetObservedAgeCompDataIDSEXP(SEXP observed_agecomp_data_id) {
+    this->SetObservedAgeCompDataID(as_module_int(observed_agecomp_data_id));
+  }
+
+  /**
    * @brief Set the unique ID for the observed length-composition data object.
    * @param observed_lengthcomp_data_id Unique ID for the observed data object.
    */
   void SetObservedLengthCompDataID(int observed_lengthcomp_data_id) {
     interface_observed_lengthcomp_data_id_m.set(observed_lengthcomp_data_id);
+  }
+
+  /**
+   * @brief Set the unique ID for the observed length-composition data object.
+   * @param observed_lengthcomp_data_id R object containing the unique ID.
+   */
+  void SetObservedLengthCompDataIDSEXP(SEXP observed_lengthcomp_data_id) {
+    this->SetObservedLengthCompDataID(
+        as_module_int(observed_lengthcomp_data_id));
   }
 
   /**
@@ -315,11 +332,28 @@ class FleetInterface : public FleetInterfaceBase {
   }
 
   /**
+   * @brief Set the unique ID for the observed index data object.
+   * @param observed_index_data_id R object containing the unique ID.
+   */
+  void SetObservedIndexDataIDSEXP(SEXP observed_index_data_id) {
+    this->SetObservedIndexDataID(as_module_int(observed_index_data_id));
+  }
+
+  /**
    * @brief Set the unique ID for the observed landings data object.
    * @param observed_landings_data_id Unique ID for the observed data object.
    */
   void SetObservedLandingsDataID(int observed_landings_data_id) {
     interface_observed_landings_data_id_m.set(observed_landings_data_id);
+  }
+
+  /**
+   * @brief Set the unique ID for the observed landings data object.
+   * @param observed_landings_data_id R object containing the unique ID.
+   */
+  void SetObservedLandingsDataIDSEXP(SEXP observed_landings_data_id) {
+    this->SetObservedLandingsDataID(
+        as_module_int(observed_landings_data_id));
   }
   /**
    * @brief Set the unique ID for the selectivity object.
@@ -327,6 +361,14 @@ class FleetInterface : public FleetInterfaceBase {
    */
   void SetSelectivityID(int selectivity_id) {
     interface_selectivity_id_m.set(selectivity_id);
+  }
+
+  /**
+   * @brief Set the unique ID for the selectivity object.
+   * @param selectivity_id R object containing the unique ID.
+   */
+  void SetSelectivityIDSEXP(SEXP selectivity_id) {
+    this->SetSelectivityID(as_module_int(selectivity_id));
   }
 
   /**
