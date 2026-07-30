@@ -48,6 +48,33 @@ test_that("Rcpp interface works for modules", {
   clear()
 })
 
+test_that("Rcpp module serialization appears in model output", {
+  #' @description Test that model output JSON contains key Rcpp module names, exercising to_json paths.
+  frame <- FIMS::FIMSFrame(FIMS::data_big)
+  initialized_model <- create_default_configurations(frame) |>
+    create_default_parameters(data = frame) |>
+    initialize_fims(data = frame)
+
+  fit <- fit_fims(
+    input = initialized_model,
+    optimize = FALSE,
+    get_sd = FALSE
+  )
+  model_output <- get_model_output(fit)
+
+  expect_true(grepl('"module_name"\\s*:\\s*"Fleet"', model_output, perl = TRUE))
+  expect_true(grepl('"module_name"\\s*:\\s*"Population"', model_output, perl = TRUE))
+  expect_true(grepl('"module_name"\\s*:\\s*"Recruitment"', model_output, perl = TRUE))
+
+  # At least one of each of these module families should be present.
+  expect_true(grepl('"name": "AgeComp"', model_output, fixed = TRUE))
+  expect_true(grepl('"name": "LengthComp"', model_output, fixed = TRUE))
+  expect_true(grepl('"name": "Index"', model_output, fixed = TRUE))
+  expect_true(grepl('"name": "Landings"', model_output, fixed = TRUE))
+
+  clear()
+})
+
 ## Edge handling ----
 
 ## Error handling ----

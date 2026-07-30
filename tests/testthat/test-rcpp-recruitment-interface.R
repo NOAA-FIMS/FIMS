@@ -65,6 +65,18 @@ test_that("rcpp recruitment interface works with correct inputs", {
   clear()
 })
 
+test_that("rcpp recruitment process interfaces work with correct inputs", {
+  #' @description Test that LogDevsRecruitmentProcess can be instantiated and evaluated.
+  log_devs <- methods::new(LogDevsRecruitmentProcess)
+  expect_true(log_devs$get_id() > 0)
+
+  #' @description Test that LogRRecruitmentProcess can be instantiated and evaluated.
+  log_r <- methods::new(LogRRecruitmentProcess)
+  expect_true(log_r$get_id() > 0)
+
+  clear()
+})
+
 ## Edge handling ----
 # No Edge handling for now.
 

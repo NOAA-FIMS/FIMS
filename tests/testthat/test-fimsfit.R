@@ -49,6 +49,75 @@ test_that("`is.FIMSFit()` works with fit without optimization", {
   )
 })
 
+test_that("FIMSFit accessors and show() work on optimized fits", {
+  #' @description Test all FIMSFit accessors and show() to improve branch coverage in fimsfit.R.
+  # show() is used by users exploring fitted objects interactively.
+  expect_no_error(show(fit_with_optimization_big))
+
+  # Accessors are the public API for slots, so keep checks explicit.
+  expect_equal(get_input(fit_with_optimization_big), fit_with_optimization_big@input)
+  expect_equal(get_obj(fit_with_optimization_big), fit_with_optimization_big@obj)
+  expect_equal(get_opt(fit_with_optimization_big), fit_with_optimization_big@opt)
+  expect_equal(get_report(fit_with_optimization_big), fit_with_optimization_big@report)
+  expect_equal(get_sdreport(fit_with_optimization_big), fit_with_optimization_big@sdreport)
+  expect_equal(get_max_gradient(fit_with_optimization_big), fit_with_optimization_big@max_gradient)
+  expect_equal(get_gradient(fit_with_optimization_big), fit_with_optimization_big@gradient)
+  expect_equal(
+    get_number_of_parameters(fit_with_optimization_big),
+    fit_with_optimization_big@number_of_parameters
+  )
+  expect_equal(get_timing(fit_with_optimization_big), fit_with_optimization_big@timing)
+  expect_equal(get_version(fit_with_optimization_big), fit_with_optimization_big@version)
+  expect_equal(
+    get_model_output(fit_with_optimization_big),
+    fit_with_optimization_big@model_output
+  )
+})
+
+test_that("stored gradient remains available after clear()", {
+  #' @description Test get_gradient() remains safe after clear() by reading the stored gradient slot.
+  # Save the gradient before clear() to verify the stored slot is used later.
+  expected_gradient <- get_gradient(fit_with_optimization_big)
+  # clear() frees C++ side state; this test confirms R-side cached values persist.
+  clear()
+  expect_equal(get_gradient(fit_with_optimization_big), expected_gradient)
+})
+
+test_that("get_estimates() handles missing parameter_id values", {
+  #' @description Test get_estimates() path where parameter_id can be NA and unique IDs are backfilled.
+  # Mock TMB-side output with repeated labels and missing parameter IDs.
+  mock_tmb <- tibble::tibble(
+    label = c("alpha", "alpha", "beta"),
+    parameter_id = c(NA_real_, NA_real_, 3),
+    uncertainty = c(0.1, 0.2, 0.3),
+    log_like_cv = c(1, 2, 3),
+    gradient = c(0.01, 0.02, 0.03)
+  )
+  # Mock JSON-side output with matching rows so the join path is exercised.
+  mock_json <- tibble::tibble(
+    label = c("alpha", "alpha", "beta"),
+    parameter_id = c(NA_real_, NA_real_, 3),
+    estimation_type = c("fixed_effects", "fixed_effects", "constant"),
+    value = c(10, 20, 30)
+  )
+
+  # Mock only the expensive reshaping helpers to keep this a pure unit test.
+  result <- testthat::with_mocked_bindings(
+    {
+      get_estimates(fit_with_optimization_big)
+    },
+    reshape_tmb_estimates = function(...) mock_tmb,
+    reshape_json_estimates = function(...) mock_json,
+    .package = "FIMS"
+  )
+
+  # unique_id is internal and should be removed before returning to users.
+  expect_true(tibble::is_tibble(result))
+  expect_true("uncertainty" %in% names(result))
+  expect_false("unique_id" %in% names(result))
+  expect_equal(nrow(result), 3)
+})
+
 ## Edge handling ----
 test_that("`is.FIMSFit()` returns correct outputs for edge cases", {
   #' @description Test that `is.FIMSFit("not_a_FIMSFit")` returns FALSE.
@@ -265,4 +334,73 @@ test_that("fit_fims() errors when optimization fails to converge", {
   )
 
   clear()
+})
+
+test_that("try_nlminb() handles normal, soft-fail, and hard-fail paths", {
+  #' @description Test try_nlminb() returns an optimizer object on success and NULL on failure paths.
+  # Quadratic objective gives a stable optimizer success case.
+  mock_object_ok <- list(
+    fn = function(par) sum(par^2),
+    gr = function(par) 2 * par
+  )
+
+  ok_result <- FIMS:::try_nlminb(
+    object = mock_object_ok,
+    control_list = list(trace = 0),
+    starting_values = c(1, -1)
+  )
+  expect_type(ok_result, "list")
+  expect_true(is.finite(ok_result[["objective"]]))
+
+  # Non-finite objective should trigger soft-fail handling and return NULL.
+  mock_object_inf <- list(
+    fn = function(par) Inf,
+    gr = function(par) rep(0, length(par))
+  )
+  expect_warning(
+    inf_result <- FIMS:::try_nlminb(
+      object = mock_object_inf,
+      control_list = list(trace = 0),
+      starting_values = c(0)
+    ),
+    regexp = "non-finite"
+  )
+  expect_null(inf_result)
+
+  # Hard errors in fn should be caught by tryCatch and converted to NULL.
+  mock_object_error <- list(
+    fn = function(par) stop("forced failure"),
+    gr = function(par) rep(0, length(par))
+  )
+  expect_no_error(
+    error_result <- FIMS:::try_nlminb(
+      object = mock_object_error,
+      control_list = list(trace = 0),
+      starting_values = c(0)
+    )
+  )
+  expect_null(error_result)
+})
+
+test_that("return_failed_nlminb() returns standardized fallback structure", {
+  #' @description Test return_failed_nlminb() returns timing and optimizer fields with non-converged status.
+  # Minimal object shape required by the fallback helper.
+  mock_object <- list(par = c(a = 1, b = 2))
+  expect_warning(
+    failed <- FIMS:::return_failed_nlminb(mock_object),
+    regexp = "did not lead to a converged model"
+  )
+
+  expect_equal(names(failed), c("timing", "opt"))
+  expect_equal(
+    names(failed[["timing"]]),
+    c("time_optimization", "time_sdreport", "time_total")
+  )
+  expect_equal(
+    names(failed[["opt"]]),
+    c("par", "objective", "convergence", "message")
+  )
+  # Convergence = 1L and objective = NA are the key failure markers.
+  expect_equal(failed[["opt"]][["convergence"]], 1L)
+  expect_true(is.na(failed[["opt"]][["objective"]]))
 })

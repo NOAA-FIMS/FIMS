@@ -86,6 +86,20 @@ test_that("rcpp population interface works with correct inputs", {
     )
   }
 
+  #' @description Test that SetName/GetName round trip correctly for Population.
+  expect_silent(population$SetName("test_population"))
+  expect_equal(population$GetName(), "test_population")
+
+  #' @description Test that linking module IDs and fleet IDs in Population is silent.
+  maturity <- methods::new(LogisticMaturity)
+  growth <- methods::new(EWAAGrowth)
+  recruitment <- methods::new(BevertonHoltRecruitment)
+  fleet <- methods::new(Fleet)
+  expect_silent(population$SetMaturityID(maturity$get_id()))
+  expect_silent(population$SetGrowthID(growth$get_id()))
+  expect_silent(population$SetRecruitmentID(recruitment$get_id()))
+  expect_silent(population$AddFleet(fleet$get_id()))
+
   clear()
 })
 

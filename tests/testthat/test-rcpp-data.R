@@ -12,6 +12,7 @@
 fims_frame <- FIMS::FIMSFrame(data_big)
 n_years <- get_n_years(fims_frame)
 n_ages <- get_n_ages(fims_frame)
+n_lengths <- get_n_lengths(fims_frame)
 
 fleet_names_age_comp <- dplyr::filter(
   .data = as.data.frame(get_data(fims_frame)),
@@ -29,6 +30,22 @@ fleet_names_index <- dplyr::filter(
   dplyr::pull(fleet)
 n_index <- length(fleet_names_index)
 
+fleet_names_length_comp <- dplyr::filter(
+  .data = as.data.frame(get_data(fims_frame)),
+  type == "length_comp"
+) |>
+  dplyr::distinct(fleet) |>
+  dplyr::pull(fleet)
+n_length_comp <- length(fleet_names_length_comp)
+
+fleet_names_landings <- dplyr::filter(
+  .data = as.data.frame(get_data(fims_frame)),
+  type == "landings"
+) |>
+  dplyr::distinct(fleet) |>
+  dplyr::pull(fleet)
+n_landings <- length(fleet_names_landings)
+
 ## IO correctness ----
 test_that("rcpp data works with correct inputs", {
   index_dat <- vector(mode = "list", length = n_index)
@@ -38,8 +55,10 @@ test_that("rcpp data works with correct inputs", {
     index <- Index
     index_dat[[fleet_names_index[index_i]]] <- methods::new(index, n_years)
     #' @description Test that adding index data to a model is possible.
-    expect_silent(index_dat[[fleet_names_index[index_i]]] <-
-      model_index(fims_frame, fleet_names_index[index_i]))
+    expect_silent(
+      index_dat[[fleet_names_index[index_i]]]$index_data[] <-
+        model_index(fims_frame, fleet_names_index[index_i])
+    )
   }
 
   clear()
@@ -56,10 +75,96 @@ test_that("rcpp data works with correct inputs", {
   }
 
   clear()
+
+  length_comp_dat <- vector(mode = "list", length = n_length_comp)
+  names(length_comp_dat) <- fleet_names_length_comp
+
+  for (fleet_f in 1:n_length_comp) {
+    length_comp_dat[[fleet_names_length_comp[fleet_f]]] <-
+      methods::new(LengthComp, n_years, n_lengths)
+    #' @description Test that adding length-composition data to a model is possible.
+    expect_silent(
+      length_comp_dat[[fleet_names_length_comp[fleet_f]]]$length_comp_data[] <-
+        c(t(model_length_comp(fims_frame, fleet_names_length_comp[fleet_f])))
+    )
+  }
+
+  clear()
+
+  landings_dat <- vector(mode = "list", length = n_landings)
+  names(landings_dat) <- fleet_names_landings
+
+  for (fleet_f in 1:n_landings) {
+    landings_dat[[fleet_names_landings[fleet_f]]] <-
+      methods::new(Landings, n_years)
+    #' @description Test that adding landings data to a model is possible.
+    expect_silent(
+      landings_dat[[fleet_names_landings[fleet_f]]]$landings_data[] <-
+        model_landings(fims_frame, fleet_names_landings[fleet_f])
+    )
+  }
+
+  clear()
 })
 
 ## Edge handling ----
-# No edge cases to test.
+test_that("rcpp data interfaces provide ids and expected dimensions", {
+  #' @description Test that each data interface can be instantiated and has a positive unique ID.
+  age_comp <- methods::new(AgeComp, n_years, n_ages)
+  length_comp <- methods::new(LengthComp, n_years, n_lengths)
+  index <- methods::new(Index, n_years)
+  landings <- methods::new(Landings, n_years)
+
+  ids <- c(
+    age_comp$get_id(),
+    length_comp$get_id(),
+    index$get_id(),
+    landings$get_id()
+  )
+  expect_true(all(ids > 0))
+  expect_equal(length(unique(ids)), 4)
+
+  #' @description Test that vector sizes match constructor dimensions.
+  expect_equal(age_comp$age_comp_data$size(), n_years * n_ages)
+  expect_equal(length_comp$length_comp_data$size(), n_years * n_lengths)
+  expect_equal(index$index_data$size(), n_years)
+  expect_equal(landings$landings_data$size(), n_years)
+
+  clear()
+})
+
+test_that("model output json includes data module names", {
+  #' @description Test that model output includes serialized data modules, indirectly exercising data to_json paths.
+  initialized_model <- create_default_configurations(fims_frame) |>
+    create_default_parameters(data = fims_frame) |>
+    initialize_fims(data = fims_frame)
+
+  fit <- fit_fims(
+    input = initialized_model,
+    optimize = FALSE,
+    get_sd = FALSE
+  )
+  model_output <- get_model_output(fit)
+
+  types_present <- as.data.frame(get_data(fims_frame)) |>
+    dplyr::distinct(type) |>
+    dplyr::pull(type)
+
+  if ("age_comp" %in% types_present) {
+    expect_true(grepl('"name": "AgeComp"', model_output, fixed = TRUE))
+  }
+  if ("length_comp" %in% types_present) {
+    expect_true(grepl('"name": "LengthComp"', model_output, fixed = TRUE))
+  }
+  if ("index" %in% types_present) {
+    expect_true(grepl('"name": "Index"', model_output, fixed = TRUE))
+  }
+  if ("landings" %in% types_present) {
+    expect_true(grepl('"name": "Landings"', model_output, fixed = TRUE))
+  }
+
+  clear()
+})
 
 ## Error handling ----
 # No built-in errors to test.

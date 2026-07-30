@@ -56,5 +56,11 @@ test_that("rcpp fleet returns correct error messages", {
   expect_error(fleet1$SetObservedLengthCompDataID("id"))
   #' @description Test that the rcpp fleet interface returns an error when given a string as an index ID rather than an integer.
   expect_error(fleet1$SetObservedIndexDataID("id"))
+  #' @description Test that the rcpp fleet interface returns an error when index ID is a non-integer numeric value.
+  expect_error(fleet1$SetObservedIndexDataID(1.5), regexp = "Expected an integer scalar")
+  #' @description Test that the rcpp fleet interface returns an error when index ID input has length > 1.
+  expect_error(fleet1$SetObservedIndexDataID(c(1, 2)), regexp = "Expected an integer scalar")
+  #' @description Test that the rcpp fleet interface returns an error when the ID is non-finite.
+  expect_error(fleet1$SetSelectivityID(Inf), regexp = "Expected an integer scalar")
   clear()
 })

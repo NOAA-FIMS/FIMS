@@ -131,6 +131,36 @@ test_that("rcpp distribution works with correct inputs", {
   clear()
 })
 
+test_that("rcpp distribution link and observed-data setters work", {
+  #' @description Test distribution ID getters and setter/linker methods for normal and lognormal interfaces.
+  dnorm_ <- methods::new(DnormDistribution)
+  dlnorm_ <- methods::new(DlnormDistribution)
+  dmultinom_ <- methods::new(DmultinomDistribution)
+
+  expect_true(dnorm_$get_id() > 0)
+  expect_true(dlnorm_$get_id() > 0)
+  expect_true(dmultinom_$get_id() > 0)
+
+  expect_true(dnorm_$set_observed_data(1L))
+  expect_true(dnorm_$set_distribution_links("data", as.integer(c(1, 2, 3))))
+  expect_true(dnorm_$set_distribution_mean(0.25))
+
+  dnorm_$observed_values[] <- c(1, 1, 1)
+  dnorm_$expected_values[] <- c(0, 0, 0)
+  dnorm_$log_sd[] <- c(0, 0, 0)
+  #' @description Test that evaluate still works after set_distribution_mean() is used.
+  expect_true(is.finite(dnorm_$evaluate()))
+
+  expect_true(dlnorm_$set_observed_data(2L))
+  expect_true(dlnorm_$set_distribution_links("data", as.integer(c(10, 11))))
+
+  expect_true(dmultinom_$set_observed_data(3L))
+  expect_true(dmultinom_$set_distribution_links("data", as.integer(c(20, 21, 22))))
+  expect_no_error(dmultinom_$set_note("unit-test note"))
+
+  clear()
+})
+
 ## Edge handling ----
 
 test_that("rcpp_distribution returns correct outputs for edge cases", {
