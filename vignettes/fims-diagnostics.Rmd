@@ -60,7 +60,7 @@ like_fit <- run_fims_likelihood(
   parameters = parameters,
   parameter_name = "log_rzero",
   data = data_big,
-  n_cores = 3,
+  n_cores = 1,
   min = -1,
   max = 1,
   length = 3
