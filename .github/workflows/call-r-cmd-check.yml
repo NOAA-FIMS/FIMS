@@ -23,4 +23,7 @@ jobs:
     uses: nmfs-ost/ghactions4r/.github/workflows/r-cmd-check.yml@main
     with: 
       gha_timeout_minutes: 100
-      
+      additional_args_ubuntu: |
+        echo "R_FUTURE_PLAN=sequential" >> $GITHUB_ENV
+        echo "R_PARALLELLY_FORK_ENABLE=false" >> $GITHUB_ENV
+        echo "_R_CHECK_LIMIT_CORES_=TRUE" >> $GITHUB_ENV
