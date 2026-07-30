@@ -299,11 +299,29 @@ class FleetInterface : public FleetInterfaceBase {
   }
 
   /**
+   * @brief R-facing wrapper that validates and sets age-comp data ID.
+   * @details Keeps R input validation at the module boundary and forwards
+   * to the existing integer setter.
+   */
+  void SetObservedAgeCompDataIDSEXP(SEXP observed_agecomp_data_id) {
+    SetObservedAgeCompDataID(as_module_int(observed_agecomp_data_id));
+  }
+
+  /**
    * @brief Set the unique ID for the observed length-composition data object.
    * @param observed_lengthcomp_data_id Unique ID for the observed data object.
    */
   void SetObservedLengthCompDataID(int observed_lengthcomp_data_id) {
     interface_observed_lengthcomp_data_id_m.set(observed_lengthcomp_data_id);
+  }
+
+  /**
+   * @brief R-facing wrapper that validates and sets length-comp data ID.
+   * @details Keeps R input validation at the module boundary and forwards
+   * to the existing integer setter.
+   */
+  void SetObservedLengthCompDataIDSEXP(SEXP observed_lengthcomp_data_id) {
+    SetObservedLengthCompDataID(as_module_int(observed_lengthcomp_data_id));
   }
 
   /**
@@ -315,11 +333,29 @@ class FleetInterface : public FleetInterfaceBase {
   }
 
   /**
+   * @brief R-facing wrapper that validates and sets index data ID.
+   * @details Keeps R input validation at the module boundary and forwards
+   * to the existing integer setter.
+   */
+  void SetObservedIndexDataIDSEXP(SEXP observed_index_data_id) {
+    SetObservedIndexDataID(as_module_int(observed_index_data_id));
+  }
+
+  /**
    * @brief Set the unique ID for the observed landings data object.
    * @param observed_landings_data_id Unique ID for the observed data object.
    */
   void SetObservedLandingsDataID(int observed_landings_data_id) {
     interface_observed_landings_data_id_m.set(observed_landings_data_id);
+  }
+
+  /**
+   * @brief R-facing wrapper that validates and sets landings data ID.
+   * @details Keeps R input validation at the module boundary and forwards
+   * to the existing integer setter.
+   */
+  void SetObservedLandingsDataIDSEXP(SEXP observed_landings_data_id) {
+    SetObservedLandingsDataID(as_module_int(observed_landings_data_id));
   }
   /**
    * @brief Set the unique ID for the selectivity object.
@@ -327,6 +363,15 @@ class FleetInterface : public FleetInterfaceBase {
    */
   void SetSelectivityID(int selectivity_id) {
     interface_selectivity_id_m.set(selectivity_id);
+  }
+
+  /**
+   * @brief R-facing wrapper that validates and sets selectivity ID.
+   * @details Keeps R input validation at the module boundary and forwards
+   * to the existing integer setter.
+   */
+  void SetSelectivityIDSEXP(SEXP selectivity_id) {
+    SetSelectivityID(as_module_int(selectivity_id));
   }
 
   /**

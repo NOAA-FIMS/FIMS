@@ -73,19 +73,22 @@ void register_fleet(Rcpp::Module& m) {
       .method("get_id", &FleetInterface::get_id)
       .method("SetName", &FleetInterface::SetName)
       .method("GetName", &FleetInterface::GetName)
+      // Bind R-facing setters to SEXP wrappers so IDs are validated before
+      // conversion and then forwarded to the original int setters.
       .method("SetObservedAgeCompDataID",
-              &FleetInterface::SetObservedAgeCompDataID)
+             &FleetInterface::SetObservedAgeCompDataIDSEXP)
       .method("GetObservedAgeCompDataID",
               &FleetInterface::GetObservedAgeCompDataID)
       .method("SetObservedLengthCompDataID",
-              &FleetInterface::SetObservedLengthCompDataID)
+             &FleetInterface::SetObservedLengthCompDataIDSEXP)
       .method("GetObservedLengthCompDataID",
               &FleetInterface::GetObservedLengthCompDataID)
-      .method("SetObservedIndexDataID", &FleetInterface::SetObservedIndexDataID)
+      .method("SetObservedIndexDataID",
+             &FleetInterface::SetObservedIndexDataIDSEXP)
       .method("GetObservedIndexDataID", &FleetInterface::GetObservedIndexDataID)
       .method("SetObservedLandingsDataID",
-              &FleetInterface::SetObservedLandingsDataID)
+             &FleetInterface::SetObservedLandingsDataIDSEXP)
       .method("GetObservedLandingsDataID",
               &FleetInterface::GetObservedLandingsDataID)
-      .method("SetSelectivityID", &FleetInterface::SetSelectivityID);
+      .method("SetSelectivityID", &FleetInterface::SetSelectivityIDSEXP);
 }

@@ -20,7 +20,83 @@
 #include "common/information.hpp"
 #include "../../interface.hpp"
 #include "rcpp_shared_primitive.hpp"
+#include <cmath>
 #include <limits>
+
+/**
+ * @brief Convert a scalar SEXP to double with module-safe validation.
+ *
+ * @details Accepts integer or double scalars of length 1. Rejects NA, NaN,
+ * Inf, unsupported SEXPTYPEs, and non-scalar vectors.
+ */
+inline double as_module_double(SEXP value) {
+  // Rcpp modules can pass arbitrary SEXP values; require a true scalar first.
+  if (Rf_xlength(value) != 1) {
+    Rcpp::stop("Not compatible with requested type");
+  }
+
+  switch (TYPEOF(value)) {
+    case REALSXP: {
+      double out = REAL(value)[0];
+      // Reject NA/NaN/Inf to avoid undefined downstream numeric behavior.
+      if (!std::isfinite(out)) {
+        Rcpp::stop("Not compatible with requested type");
+      }
+      return out;
+    }
+    case INTSXP: {
+      int out = INTEGER(value)[0];
+      if (out == NA_INTEGER) {
+        Rcpp::stop("Not compatible with requested type");
+      }
+      return static_cast<double>(out);
+    }
+    default:
+      Rcpp::stop("Not compatible with requested type");
+  }
+}
+
+/**
+ * @brief Convert a scalar SEXP to int with module-safe validation.
+ *
+ * @details Accepts integer scalars directly, or double scalars when finite,
+ * integral-valued, and within the representable int32 range.
+ */
+inline int as_module_int(SEXP value) {
+  // Fleet setter IDs must be scalar-like from R before conversion.
+  if (Rf_xlength(value) != 1) {
+    Rcpp::stop("Not compatible with requested type");
+  }
+
+  switch (TYPEOF(value)) {
+    case INTSXP: {
+      int out = INTEGER(value)[0];
+      if (out == NA_INTEGER) {
+        Rcpp::stop("Not compatible with requested type");
+      }
+      return out;
+    }
+    case REALSXP: {
+      double out = REAL(value)[0];
+      // Only finite integer-valued doubles are accepted on this path.
+      if (!std::isfinite(out)) {
+        Rcpp::stop("Not compatible with requested type");
+      }
+      // Reject fractional values such as 1.5 that cannot represent IDs.
+      if (std::floor(out) != out) {
+        Rcpp::stop("Not compatible with requested type");
+      }
+      // Protect against narrowing overflow when converting to int.
+      if (out < static_cast<double>(std::numeric_limits<int>::min()) ||
+          out > static_cast<double>(std::numeric_limits<int>::max())) {
+        Rcpp::stop("Not compatible with requested type");
+      }
+      return static_cast<int>(out);
+    }
+    default:
+      Rcpp::stop("Not compatible with requested type");
+  }
+}
 
 /**
  * @brief An Rcpp interface that defines the Variable class.
@@ -97,14 +173,7 @@ class Variable {
    * propagation that would occur with .constructor<double>().
    */
   Variable(SEXP value) {
-    if (TYPEOF(value) != REALSXP || Rf_xlength(value) != 1) {
-      Rcpp::stop("Not compatible with requested type");
-    }
-    double val = REAL(value)[0];
-    if (!std::isfinite(val)) {
-      Rcpp::stop("Not compatible with requested type");
-    }
-    initial_value_m = val;
+    initial_value_m = as_module_double(value);
     id_m = Variable::id_g++;
   }
 
