@@ -147,9 +147,9 @@ fisheries stock assessment. Fisheries Research 142: 61-74.
 \item \code{\link[=create_default_parameters]{create_default_parameters()}} for creating parameter objects
 }
 
-Other diagnostic_functions: 
-\code{\link{plot_likelihood}()},
-\code{\link{run_fims_retrospective}()}
+Other diagnostic_functions:
+\code{\link[=plot_likelihood]{plot_likelihood()}},
+\code{\link[=run_fims_retrospective]{run_fims_retrospective()}}
 }
 \concept{diagnostic_functions}
 \keyword{diagnostics}

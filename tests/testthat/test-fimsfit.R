@@ -68,13 +68,12 @@ test_that("`is.FIMSFit()` returns correct outputs for edge cases", {
   fit_with_optimization_big@timing[["time_total"]] <- 61 # 60+1
   #' @description Test that `print(FIMSFit)` returns no error when the total time is more than a minute.
   expect_no_error(print(fit_with_optimization_big))
-  
+
   #' @description Test that `fit_without_optimization_big` has a total time of 0 seconds.
   expect_equal(
     object = fit_without_optimization_big@timing[["time_total"]],
     expected = 0
   )
-
 })
 
 ## Error handling ----

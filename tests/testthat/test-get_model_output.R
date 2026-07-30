@@ -29,7 +29,7 @@ test_that("`get_model_output()` works with correct inputs", {
     object = names(json_list_with_optimization),
     expected = expected_names
   )
-  
+
   model_output_without_optimization <- get_model_output(fit_without_optimization_big)
   json_list_without_optimization <- jsonlite::fromJSON(model_output_without_optimization, simplifyVector = FALSE)
   #' @description Test that `get_model_output(fit_without_optimization_big)` returns correct names for the `model_output` slot.
