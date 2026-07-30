@@ -17,7 +17,7 @@ iter_id <- 1
 
 ## IO correctness ----
 test_that("catch-at-age model (deterministic MLE with wrappers) works with correct inputs", {
-  # Load the test data 
+  # Load the test data
   deterministic_age_length_comp <- FIMS::fit_without_optimization_big
 
   #' @description Test that the output from FIMS deterministic run matches the model comparison project OM values.

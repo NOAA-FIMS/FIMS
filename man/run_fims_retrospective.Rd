@@ -113,9 +113,9 @@ ICES Journal of Marine Science 72(1): 99-110.
 \item \code{\link[=create_default_parameters]{create_default_parameters()}} for creating parameter objects
 }
 
-Other diagnostic_functions: 
-\code{\link{plot_likelihood}()},
-\code{\link{run_fims_likelihood}()}
+Other diagnostic_functions:
+\code{\link[=plot_likelihood]{plot_likelihood()}},
+\code{\link[=run_fims_likelihood]{run_fims_likelihood()}}
 }
 \concept{diagnostic_functions}
 \keyword{diagnostics}

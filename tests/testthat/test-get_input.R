@@ -21,20 +21,20 @@ test_that("`get_input()` works with correct inputs", {
     object = input_with_optimization,
     expected = fit_with_optimization_big@input
   )
-  
+
   #' @description Test that `get_input()` returns correct names for the `input` slot.
   expect_equal(
     object = names(input_with_optimization),
     expected = c("parameters", "model")
   )
-  
+
   #' @description Test that `get_input()` returns correct values for the `input` slot.
   input_without_optimization <- get_input(fit_without_optimization_big)
   expect_equal(
     object = input_without_optimization,
     expected = fit_without_optimization_big@input
   )
- 
+
   #' @description Test that `get_input()` returns correct names for the `input` slot.
   expect_equal(
     object = names(input_without_optimization),

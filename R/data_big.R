@@ -42,13 +42,13 @@
 "data_big"
 
 #' FIMS parameters tibble
-#' 
+#'
 #' A tibble containing the parameters needed to run an age-structured stock
 #' assessment model in FIMS. This data was generated using the `ASSAMC` package
 #' written for the [model comparison project](www.github.com/NOAA-FIMS/Age_Structured_Stock_Assessment_Model_Comparison).
 #' The source code to make this dataset is in `data-raw/parameters_.R` which is
 #' on GitHub but will not be in your local installation because it is in the .Rbuildignore file.
-#' 
+#'
 #' @format
 #' A tibble with `r NROW(parameters_big)` observations of `r NCOL(parameters_big)` variables:
 #' \describe{
@@ -89,12 +89,12 @@
 "parameters_big"
 
 #' FIMS fit
-#' 
+#'
 #' An object of class `FIMSFit`, where the structure is the same
 #' regardless if `optimize = TRUE` or not. Uncertainty information is only
 #' included in the `estimates` slot if `get_sd = TRUE`.
-#' 
-#' @format 
+#'
+#' @format
 #' An object of class `FIMSFit` with the following slots:
 #' `r paste(slotNames(fit_with_optimization_big), collapse = ", ")`
 #' @rdname fit_with_optimization_big

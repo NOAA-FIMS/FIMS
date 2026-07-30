@@ -19,7 +19,7 @@ expected_names <- c(
 )
 
 ## IO correctness ----
-test_that("`get_obj()` works with fit_with_optimization_big", {  
+test_that("`get_obj()` works with fit_with_optimization_big", {
   obj <- get_obj(fit_with_optimization_big)
 
   #' @description Test that `get_obj()` returns correct output for the `obj` slot.
@@ -35,7 +35,7 @@ test_that("`get_obj()` works with fit_with_optimization_big", {
   )
 })
 
-test_that("`get_obj()` works with fit_without_optimization_big", {  
+test_that("`get_obj()` works with fit_without_optimization_big", {
   obj <- get_obj(fit_without_optimization_big)
 
   #' @description Test that `get_obj()` returns correct output for the `obj` slot.

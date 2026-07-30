@@ -17,7 +17,6 @@ expected_version <- utils::packageVersion("FIMS")
 
 ## IO correctness ----
 test_that("`get_version()` works with fit_with_optimization_big", {
-  
   version_with_optimization <- get_version(fit_with_optimization_big)
   #' @description Test that `get_version()` returns correct output for the `version` slot.
   expect_equal(
@@ -32,7 +31,6 @@ test_that("`get_version()` works with fit_with_optimization_big", {
 })
 
 test_that("`get_version()` works with fit_without_optimization_big", {
-  
   version_without_optimization <- get_version(fit_without_optimization_big)
   #' @description Test that `get_version()` returns correct output for the `version` slot.
   expect_equal(

@@ -207,4 +207,3 @@ test_that("get_fit_stream() returns correct outputs for edge cases", {
 
 ## Error handling ----
 # No built-in errors or warnings for FIMS::get_fit_stream().
-
