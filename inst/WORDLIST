@@ -79,6 +79,7 @@ Hilborn
 hkin
 Hurtado
 IBMCPP
+INTSXP
 ilist
 INAA
 infochunk
@@ -166,6 +167,7 @@ qobj
 rapidjson
 Rbuildignore
 Rcerr
+REALSXP
 rchunk
 rcmdcheck
 rcmdcheckgooglebenchmarkfixture
@@ -240,6 +242,7 @@ withr
 Wmacro
 WORDLIST
 Wunused
+xlength
 xlab
 yearf
 yearm
