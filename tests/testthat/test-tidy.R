@@ -18,7 +18,8 @@ estimates_with_optimization_big <- FIMS::estimates_with_optimization_big
 # get_estimates() to return the saved estimates_with_optimization_big object so
 # that generics::tidy() can run.
 testthat::local_mocked_bindings(
-  get_estimates = function(x) estimates_with_optimization_big
+  get_estimates = function(x) estimates_with_optimization_big,
+  .env = asNamespace("FIMS")
 )
 
 ## IO correctness ----

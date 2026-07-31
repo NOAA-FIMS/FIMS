@@ -45,7 +45,7 @@ test_that("`get_timing()` works with correct inputs without optimization", {
     object = names(timing_without_optimization),
     expected = "time_total"
   )
-  #' @description Test that `get_timing()` returns > 0 values for the `timing` slot.
+  #' @description Test that `get_timing()` returns 0 seconds for the `timing` slot when optimization is not performed.
   expect_true(object = all(timing_without_optimization == 0))
 })
 

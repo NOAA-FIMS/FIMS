@@ -1,4 +1,4 @@
-# `get_estimates()` works with deterministic run
+# precomputed estimates_without_optimization_big has expected structure
 
     Code
       print(dplyr::select(estimates_without_optimization_big, -estimated, -expected,

@@ -76,7 +76,7 @@ The following {testthat} functions can be used at the beginning of a test file t
 
 - Add [`testthat::skip_on_ci()`](https://testthat.r-lib.org/reference/skip.html) at the beginning of a test file to skip it during continuous integration runs.
 - Add [`testthat::skip_on_covr()`](https://testthat.r-lib.org/reference/skip.html) at the beginning of a test file to skip it during coverage calculation.
-- Add ['testthat::skip_if_not(testthat:::env_var_is_true("RUN_SLOW_TESTS"), message = "Skipping: RUN_SLOW_TESTS is not set to true.")'] at the beginning of a test file to skip it unless the environment variable `RUN_SLOW_TESTS` is set to true. This is useful for integration tests that take a long time to run and are not needed for every test run locally. The slow tests will be run on GitHub Actions when submitting a pull request to the main branch. If you need to run the slow tests locally, set the environment variable `RUN_SLOW_TESTS` to true before running the tests, e.g., `Sys.setenv(RUN_SLOW_TESTS = "true")` in R.
+- Add `testthat::skip_if_not(testthat:::env_var_is_true("RUN_SLOW_TESTS"), message = "Skipping: RUN_SLOW_TESTS is not set to true.")` at the beginning of a test file to skip it unless the environment variable `RUN_SLOW_TESTS` is set to true. This is useful for integration tests that take a long time to run and are not needed for every test run locally. The slow tests will be run on GitHub Actions when submitting a pull request to the main branch. If you need to run the slow tests locally, set the environment variable `RUN_SLOW_TESTS` to true before running the tests, e.g., `Sys.setenv(RUN_SLOW_TESTS = "true")` in R.
 
 #### :mute: Suppressing messages
 

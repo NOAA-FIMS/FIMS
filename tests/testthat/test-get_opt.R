@@ -42,7 +42,7 @@ test_that("`get_opt()` works with fit_without_optimization_big", {
     expected = fit_without_optimization_big@opt
   )
 
-  #' @description Test that `get_opt()` returns NULL for the `opt` slot when optimization is not performed.
+  #' @description Test that `get_opt()` returns an empty list for the `opt` slot when optimization is not performed.
   expect_true(
     object = is.list(opt_without_optimization) && length(opt_without_optimization) == 0
   )

@@ -24,7 +24,7 @@ expected_colnames <- c(
   "lpdf", "likelihood", "log_sd", "log_like_cv", "gradient"
 )
 
-test_that("`get_estimates()` works with deterministic run", {
+test_that("precomputed estimates_without_optimization_big has expected structure", {
   deterministic_colnames <- colnames(estimates_without_optimization_big)
   #' @description Test that `get_estimates()` returns correct colnames from a deterministic run.
   expect_equal(
