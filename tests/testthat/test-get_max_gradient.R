@@ -10,37 +10,34 @@
 # get_max_gradient ----
 ## Setup ----
 # Load or prepare any necessary data for testing
-if (!file.exists(testthat::test_path("fixtures", "fit_age_length_comp.RDS"))) {
-  prepare_test_data()
-}
+fit_with_optimization_big <- FIMS::fit_with_optimization_big
+fit_without_optimization_big <- FIMS::fit_without_optimization_big
+
 ## IO correctness ----
 test_that("`get_max_gradient()` works with correct inputs", {
-  # Load the test data from an RDS file containing model fits.
-  # List all RDS files in the fixtures directory that match the pattern "fit*_.RDS"
-  fit_files <- list.files(
-    path = testthat::test_path("fixtures"),
-    pattern = "^fit.*\\.RDS$",
-    full.names = TRUE
+  max_gradient_with_optimization <- get_max_gradient(fit_with_optimization_big)
+  #' @description Test that `get_max_gradient()` returns correct output for the `max_gradient` slot.
+  expect_equal(
+    object = max_gradient_with_optimization,
+    expected = fit_with_optimization_big@max_gradient
   )
 
-  # Function to read the RDS file and get max gradient
-  check_max_gradient <- function(fit_file) {
-    fit_data <- readRDS(fit_file)
-    max_gradient <- get_max_gradient(fit_data)
-    #' @description Test that `get_max_gradient()` returns correct output for the `max_gradient` slot.
-    expect_equal(
-      object = max_gradient,
-      expected = fit_data@max_gradient
-    )
+  #' @description Test that `get_max_gradient()` returns a numeric value.
+  expect_true(
+    object = is.numeric(max_gradient_with_optimization)
+  )
 
-    #' @description Test that `get_max_gradient()` returns a numeric value.
-    expect_true(
-      object = is.numeric(max_gradient)
-    )
-  }
+  max_gradient_without_optimization <- get_max_gradient(fit_without_optimization_big)
+  #' @description Test that `get_max_gradient()` returns correct output for the `max_gradient` slot.
+  expect_equal(
+    object = max_gradient_without_optimization,
+    expected = fit_without_optimization_big@max_gradient
+  )
 
-  # Use purrr::map to apply the function to each file
-  result <- purrr::map(fit_files, check_max_gradient)
+  #' @description Test that `get_max_gradient()` returns NA.
+  expect_true(
+    object = is.na(max_gradient_without_optimization)
+  )
 })
 
 ## Edge handling ----

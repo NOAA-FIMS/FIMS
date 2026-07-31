@@ -10,43 +10,43 @@
 # get_timing ----
 ## Setup ----
 # Load or prepare any necessary data for testing
-if (!file.exists(testthat::test_path("fixtures", "fit_age_length_comp.RDS"))) {
-  prepare_test_data()
-}
+fit_with_optimization_big <- FIMS::fit_with_optimization_big
+fit_without_optimization_big <- FIMS::fit_without_optimization_big
+
 ## IO correctness ----
 test_that("`get_timing()` works with correct inputs", {
-  # Load the test data from an RDS file containing model fits.
-  # List all RDS files in the fixtures directory that match the pattern "fit*_.RDS"
-  fit_files <- list.files(
-    path = testthat::test_path("fixtures"),
-    pattern = "^fit.*\\.RDS$",
-    full.names = TRUE
-  )
-
   expected_names <- c(
     "time_optimization", "time_sdreport", "time_total"
   )
+  timing_with_optimization <- get_timing(fit_with_optimization_big)
+  #' @description Test that `get_timing()` returns correct output for the `timing` slot.
+  expect_equal(
+    object = timing_with_optimization,
+    expected = fit_with_optimization_big@timing
+  )
+  #' @description Test that `get_timing()` returns correct names for the `timing` slot.
+  expect_equal(
+    object = names(timing_with_optimization),
+    expected = expected_names
+  )
+  #' @description Test that `get_timing()` returns > 0 values for the `timing` slot.
+  expect_true(object = all(timing_with_optimization > 0))
+})
 
-  # Function to read the RDS file and get input
-  check_timing <- function(fit_file) {
-    fit_data <- readRDS(fit_file)
-    timing <- get_timing(fit_data)
-    #' @description Test that `get_timing()` returns correct output for the `timing` slot.
-    expect_equal(
-      object = timing,
-      expected = fit_data@timing
-    )
-    #' @description Test that `get_timing()` returns correct names for the `timing` slot.
-    expect_equal(
-      object = names(timing),
-      expected = expected_names
-    )
-    #' @description Test that `get_timing()` returns > 0 values for the `timing` slot.
-    expect_true(object = all(timing > 0))
-  }
-
-  # Use purrr::map to apply the function to each file
-  result <- purrr::map(fit_files, check_timing)
+test_that("`get_timing()` works with correct inputs without optimization", {
+  timing_without_optimization <- get_timing(fit_without_optimization_big)
+  #' @description Test that `get_timing()` returns correct output for the `timing` slot.
+  expect_equal(
+    object = timing_without_optimization,
+    expected = fit_without_optimization_big@timing
+  )
+  #' @description Test that `get_timing()` returns correct names for the `timing` slot.
+  expect_equal(
+    object = names(timing_without_optimization),
+    expected = "time_total"
+  )
+  #' @description Test that `get_timing()` returns 0 seconds for the `timing` slot when optimization is not performed.
+  expect_true(object = all(timing_without_optimization == 0))
 })
 
 ## Edge handling ----

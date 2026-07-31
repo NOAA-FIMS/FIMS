@@ -1,8 +1,9 @@
-# `get_estimates()` works with deterministic run
+# precomputed estimates_without_optimization_big has expected structure
 
     Code
-      print(dplyr::select(get_estimates(deterministic_results), -estimated, -expected,
-      -uncertainty, -gradient, -likelihood, -log_like_cv, -gradient), n = 320, width = Inf)
+      print(dplyr::select(estimates_without_optimization_big, -estimated, -expected,
+        -uncertainty, -gradient, -likelihood, -log_like_cv, -gradient), n = 320,
+      width = Inf)
     Output
       # A tibble: 13,996 x 18
           module_name module_id module_type label            type   type_id
@@ -976,8 +977,8 @@
 # `get_estimates()` works with estimation run
 
     Code
-      print(dplyr::select(get_estimates(readRDS(fit_files[[1]])), -estimated,
-      -expected, -uncertainty, -gradient, -likelihood, -log_like_cv, -gradient), n = 320,
+      print(dplyr::select(estimates_with_optimization_big, -estimated, -expected,
+        -uncertainty, -gradient, -likelihood, -log_like_cv, -gradient), n = 320,
       width = Inf)
     Output
       # A tibble: 13,996 x 18

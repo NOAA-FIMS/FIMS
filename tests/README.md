@@ -24,6 +24,7 @@ Prepare the test data in the new file or in a separate file if you plan on reusi
   }
   ```
 - Use pre-existing integration data, e.g., `tests/testthat/fixtures/integration_test_data_components.RData` and `tests/testthat/fixtures/integration_test_data.RData`, by loading them within the `setup` section, e.g., `load(testthat::test_path("fixtures", "integration_test_data.RData"))` or within `prepare_test_data()`, where these data objects can be updated by running `R/data_big.R`.
+- Use pre-existing package data, e.g., `FIMS::data_big`, `FIMS::parameters_big`, `FIMS::fit_with_optimization_big`, and `FIMS::estimates_with_optimization_big`, by loading them within the `setup` section, e.g., `data("data_big", package = "FIMS")`. If those data objects need to be updated because of changes in the core code, run `R/data_big.R` to update them.
 
 ### :pencil: Edit the code in the new test file
 
@@ -75,6 +76,7 @@ The following {testthat} functions can be used at the beginning of a test file t
 
 - Add [`testthat::skip_on_ci()`](https://testthat.r-lib.org/reference/skip.html) at the beginning of a test file to skip it during continuous integration runs.
 - Add [`testthat::skip_on_covr()`](https://testthat.r-lib.org/reference/skip.html) at the beginning of a test file to skip it during coverage calculation.
+- Add `testthat::skip_if_not(testthat:::env_var_is_true("RUN_SLOW_TESTS"), message = "Skipping: RUN_SLOW_TESTS is not set to true.")` at the beginning of a test file to skip it unless the environment variable `RUN_SLOW_TESTS` is set to true. This is useful for integration tests that take a long time to run and are not needed for every test run locally. The slow tests will be run on GitHub Actions when submitting a pull request to the main branch. If you need to run the slow tests locally, set the environment variable `RUN_SLOW_TESTS` to true before running the tests, e.g., `Sys.setenv(RUN_SLOW_TESTS = "true")` in R.
 
 #### :mute: Suppressing messages
 

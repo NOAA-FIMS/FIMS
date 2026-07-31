@@ -10,39 +10,38 @@
 # get_version ----
 ## Setup ----
 # Load or prepare any necessary data for testing
-if (!file.exists(testthat::test_path("fixtures", "fit_age_length_comp.RDS"))) {
-  prepare_test_data()
-}
+fit_with_optimization_big <- FIMS::fit_with_optimization_big
+fit_without_optimization_big <- FIMS::fit_without_optimization_big
+
+expected_version <- utils::packageVersion("FIMS")
+
 ## IO correctness ----
-test_that("`get_version()` works with correct inputs", {
-  # Load the test data from an RDS file containing model fits.
-  # List all RDS files in the fixtures directory that match the pattern "fit*_.RDS"
-  fit_files <- list.files(
-    path = testthat::test_path("fixtures"),
-    pattern = "^fit.*\\.RDS$",
-    full.names = TRUE
+test_that("`get_version()` works with fit_with_optimization_big", {
+  version_with_optimization <- get_version(fit_with_optimization_big)
+  #' @description Test that `get_version()` returns correct output for the `version` slot.
+  expect_equal(
+    object = version_with_optimization,
+    expected = fit_with_optimization_big@version
   )
+  #' @description Test that `get_version()` returns correct version.
+  expect_equal(
+    object = version_with_optimization,
+    expected = expected_version
+  )
+})
 
-  expected_version <- utils::packageVersion("FIMS")
-
-  # Function to read the RDS file and get input
-  check_version <- function(fit_file) {
-    fit_data <- readRDS(fit_file)
-    version <- get_version(fit_data)
-    #' @description Test that `get_version()` returns correct output for the `version` slot.
-    expect_equal(
-      object = version,
-      expected = fit_data@version
-    )
-    #' @description Test that `get_version()` returns correct version.
-    expect_equal(
-      object = version,
-      expected = expected_version
-    )
-  }
-
-  # Use purrr::map to apply the function to each file
-  result <- purrr::map(fit_files, check_version)
+test_that("`get_version()` works with fit_without_optimization_big", {
+  version_without_optimization <- get_version(fit_without_optimization_big)
+  #' @description Test that `get_version()` returns correct output for the `version` slot.
+  expect_equal(
+    object = version_without_optimization,
+    expected = fit_without_optimization_big@version
+  )
+  #' @description Test that `get_version()` returns correct version.
+  expect_equal(
+    object = version_without_optimization,
+    expected = expected_version
+  )
 })
 
 ## Edge handling ----
