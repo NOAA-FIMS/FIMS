@@ -54,7 +54,7 @@ test_that("rcpp recruitment interface works with correct inputs", {
 
 
   #' @description Test that the log_devs are set correctly.
-  for (i in 1:length(log_devs)) {
+  for (i in seq_along(log_devs)) {
     expect_equal(
       object = recruitment$log_devs[i]$value,
       expected = log_devs[i]
@@ -73,6 +73,49 @@ test_that("rcpp recruitment process interfaces work with correct inputs", {
   #' @description Test that LogRRecruitmentProcess can be instantiated and evaluated.
   log_r <- methods::new(LogRRecruitmentProcess)
   expect_true(log_r$get_id() > 0)
+
+  clear()
+})
+
+test_that("log recruitment deviations process scales expected recruitment by exp(delta)", {
+  clear()
+
+  frame <- FIMSFrame(data_big)
+  parameters <- create_default_configurations(frame) |>
+    create_default_parameters(data = frame) |>
+    tidyr::unnest(cols = data)
+
+  target_time <- 10
+  delta <- 0.4
+
+  baseline_fit <- parameters |>
+    initialize_fims(data = frame) |>
+    fit_fims(optimize = FALSE, get_sd = FALSE)
+  baseline_recruitment <- get_report(baseline_fit)[["expected_recruitment"]][[1]]
+
+  modified_parameters <- parameters
+  target_row <- which(
+    modified_parameters$module_name == "Recruitment" &
+      modified_parameters$label == "log_devs" &
+      modified_parameters$time == target_time
+  )
+
+  expect_length(target_row, 1)
+
+  modified_parameters$value[target_row] <-
+    modified_parameters$value[target_row] + delta
+
+  modified_fit <- modified_parameters |>
+    initialize_fims(data = frame) |>
+    fit_fims(optimize = FALSE, get_sd = FALSE)
+  modified_recruitment <- get_report(modified_fit)[["expected_recruitment"]][[1]]
+
+  #' @description Test that adding `delta` to one `log_devs` value multiplies expected recruitment at that year by `exp(delta)`.
+  expect_equal(
+    object = modified_recruitment[target_time] / baseline_recruitment[target_time],
+    expected = exp(delta),
+    tolerance = 1e-6
+  )
 
   clear()
 })

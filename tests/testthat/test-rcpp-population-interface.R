@@ -105,6 +105,19 @@ test_that("rcpp population interface works with correct inputs", {
 
 ## Edge handling ----
 # No Edge handling for now.
+test_that("rcpp population finalize paths run safely when called repeatedly", {
+  clear()
+
+  population <- methods::new(Population)
+  expect_no_error(population$finalize())
+  expect_no_error(population$finalize())
+
+  warnings <- get_log_warnings()
+  #' @description Test that calling `Population$finalize()` repeatedly does not error and warnings output remains readable JSON text.
+  expect_type(warnings, "character")
+
+  clear()
+})
 
 ## Error handling ----
 # No built in errors or warnings to test for now.

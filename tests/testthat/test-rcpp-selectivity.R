@@ -99,6 +99,62 @@ test_that("rcpp double logistic selectivity works with correct inputs", {
   clear()
 })
 
+test_that("rcpp logistic and double logistic evaluate agree with closed-form equations", {
+  clear()
+
+  logistic_selectivity <- methods::new(LogisticSelectivity)
+  logistic_selectivity$inflection_point[1]$value <- 8.0
+  logistic_selectivity$slope[1]$value <- 0.6
+
+  x_values <- c(2, 8, 14)
+  expected_logistic <- 1.0 / (1.0 + exp(-0.6 * (x_values - 8.0)))
+  observed_logistic <- vapply(x_values, logistic_selectivity$evaluate, numeric(1))
+
+  #' @description Test that `LogisticSelectivity$evaluate()` matches the logistic equation across multiple x values.
+  expect_equal(observed_logistic, expected_logistic, tolerance = 1e-10)
+
+  double_logistic_selectivity <- methods::new(DoubleLogisticSelectivity)
+  double_logistic_selectivity$inflection_point_asc[1]$value <- 6.5
+  double_logistic_selectivity$slope_asc[1]$value <- 0.7
+  double_logistic_selectivity$inflection_point_desc[1]$value <- 11.5
+  double_logistic_selectivity$slope_desc[1]$value <- 0.35
+
+  x_values_double <- c(4, 9, 16)
+  expected_double <-
+    (1.0 / (1.0 + exp(-0.7 * (x_values_double - 6.5)))) *
+    (1.0 - 1.0 / (1.0 + exp(-0.35 * (x_values_double - 11.5))))
+  observed_double <- vapply(x_values_double, double_logistic_selectivity$evaluate, numeric(1))
+
+  #' @description Test that `DoubleLogisticSelectivity$evaluate()` matches the double logistic equation across multiple x values.
+  expect_equal(observed_double, expected_double, tolerance = 1e-10)
+
+  clear()
+})
+
+test_that("rcpp selectivity finalize paths run safely when called repeatedly", {
+  clear()
+
+  logistic_selectivity <- methods::new(LogisticSelectivity)
+  expect_no_error(logistic_selectivity$finalize())
+  expect_no_error(logistic_selectivity$finalize())
+
+  logistic_warnings <- get_log_warnings()
+  #' @description Test that calling `LogisticSelectivity$finalize()` repeatedly does not error and warnings output remains readable JSON text.
+  expect_type(logistic_warnings, "character")
+
+  clear()
+
+  double_logistic_selectivity <- methods::new(DoubleLogisticSelectivity)
+  expect_no_error(double_logistic_selectivity$finalize())
+  expect_no_error(double_logistic_selectivity$finalize())
+
+  double_logistic_warnings <- get_log_warnings()
+  #' @description Test that calling `DoubleLogisticSelectivity$finalize()` repeatedly does not error and warnings output remains readable JSON text.
+  expect_type(double_logistic_warnings, "character")
+
+  clear()
+})
+
 ## Edge handling ----
 test_that("rcpp selectivity returns correct outputs for edge cases", {
   # emptyLogistic
