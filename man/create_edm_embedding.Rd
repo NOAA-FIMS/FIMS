@@ -21,7 +21,11 @@ create_edm_embedding(
 \item{series_type}{A single string giving the \code{type} value to filter on,
 e.g. \code{"index"} or \code{"landings"}.}
 
+<<<<<<< HEAD
 \item{series_name}{A single string giving the \code{fleet} (fleet / survey) value
+=======
+\item{series_name}{A single string giving the \code{name} (fleet / survey) value
+>>>>>>> 5fde931e (feat(edm): add skeleton R interface with fit_edm() and edm_forecast() stubs)
 to filter on, e.g. \code{"survey1"}.}
 
 \item{E}{A positive integer — the embedding dimension (number of lagged
@@ -33,7 +37,11 @@ coordinates per row).}
 the FIMS missing-value sentinel \code{-999} are dropped from the embedding
 matrix.}
 
+<<<<<<< HEAD
 \item{uncertainty_name}{A single string giving the \code{fleet} column value for
+=======
+\item{uncertainty_name}{A single string giving the \code{name} column value for
+>>>>>>> 5fde931e (feat(edm): add skeleton R interface with fit_edm() and edm_forecast() stubs)
 an uncertainty series in the data slot (e.g. \code{"survey1_sd"}), or \code{NULL}
 (default) to skip uncertainty propagation. The uncertainty series must
 have the same length as the value series after filtering on
@@ -55,7 +63,11 @@ stored in the \code{edm_embeddings} slot under \code{embedding_name}.
 }
 \details{
 The time series is extracted by filtering \code{get_data(x)} on \code{type} and
+<<<<<<< HEAD
 \code{fleet} (fleet / survey name). Values encoded as \code{-999} are treated as the
+=======
+\code{name} (fleet / survey name). Values encoded as \code{-999} are treated as the
+>>>>>>> 5fde931e (feat(edm): add skeleton R interface with fit_edm() and edm_forecast() stubs)
 FIMS missing-data sentinel. When \code{drop_missing = TRUE},
 \code{construct_drop_missing()} is called so that rows containing \code{-999} are
 removed from the embedding matrix; when \code{FALSE}, \code{construct()} is called
