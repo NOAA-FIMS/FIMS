@@ -596,6 +596,10 @@ initialize_comp <- function(data,
 #'   [FIMSFrame()]. Passing the data is required because initialization of the
 #'   modules requires passing the data and information regarding the uncertainty
 #'   of that data, i.e., input sample sizes for the multinomial distribution.
+#' @param derived_quantity_reports Optional data frame or tibble with
+#'   id-based derived quantity report requests. Required columns are
+#'   `component_type`, `component_id`, and `quantity_name`. Optional columns are
+#'   `report_se`, `report_value`, and `report_name`.
 #' @return
 #' A list is returned with two elements, `parameters` and `model`. The list can
 #' be passed to the `input` argument of [fit_fims()] to fit the model. The first
@@ -627,7 +631,9 @@ initialize_comp <- function(data,
 #'   initialize_fims(data = data_4_model)
 #' clear()
 #' }
-initialize_fims <- function(parameters, data) {
+initialize_fims <- function(parameters,
+                            data,
+                            derived_quantity_reports = NULL) {
   # Validate parameters input
   if (missing(parameters) || !tibble::is_tibble(parameters)) {
     cli::cli_abort("The {.var parameters} argument must be a tibble.")
@@ -975,6 +981,14 @@ initialize_fims <- function(parameters, data) {
   # Hard code to be a catch-at-age model
   fims_model <- methods::new(CatchAtAge)
   fims_model$AddPopulation(population$get_id())
+
+  if (!is.null(derived_quantity_reports)) {
+    set_derived_quantity_reports(
+      model = fims_model,
+      derived_quantity_reports = derived_quantity_reports,
+      clear_existing = TRUE
+    )
+  }
 
   CreateTMBModel()
   # Create parameter list from Rcpp modules

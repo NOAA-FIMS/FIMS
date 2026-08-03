@@ -14,6 +14,9 @@
 #' @export calculate_fixed_effect_hessian
 #' @export calculate_laplace_fixed_jacobian_adjustment
 #' @export calculate_laplace_fixed_jacobian_adjustment_native
+#' @export InitializeTMBFunction
+#' @export GetInitializedTMBFunction
+#' @export ClearInitializedTMBFunction
 #' @export CreateTMBModel
 #' @export DlnormDistribution
 #' @export DmultinomDistribution
@@ -22,6 +25,7 @@
 #' @export EWAAGrowth
 #' @export Fleet
 #' @export set_fixed
+#' @export set_derived_quantity_reports
 #' @export get_fixed
 #' @export set_random
 #' @export get_random

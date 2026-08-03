@@ -31,13 +31,28 @@ get_adreport_parameters <- function(adreport_obj, par) {
   par_names <- names(par)
   adreport_names <- names(adreport_par)
   if (!is.null(par_names) &&
-      !is.null(adreport_names) &&
-      all(adreport_names %in% par_names)) {
+    !is.null(adreport_names) &&
+    all(adreport_names %in% par_names)) {
     adreport_par[] <- par[adreport_names]
     return(adreport_par)
   }
 
   adreport_par
+}
+
+initialize_tmb_function <- function(make_adfun_args) {
+  initialized_obj <- tryCatch(
+    InitializeTMBFunction(make_adfun_args),
+    error = function(e) NULL
+  )
+  if (!is.null(initialized_obj)) {
+    return(initialized_obj)
+  }
+
+  tryCatch(
+    do.call(TMB::MakeADFun, make_adfun_args),
+    error = function(e) NULL
+  )
 }
 
 #' Assemble TMB ADREPORT payload from a TMB ADREPORT object
@@ -118,12 +133,63 @@ calculate_tmb_laplace_fixed_hessian <- function(obj,
   )
 }
 
+calculate_tmb_intern_laplace_fixed_hessian <- function(obj,
+                                                       par_fixed) {
+  random <- obj[["env"]][["random"]]
+  if (is.null(random) || length(random) == 0) {
+    return(NULL)
+  }
+
+  intern_args <- list(
+    data = obj[["env"]][["data"]],
+    parameters = obj[["env"]][["parameters"]],
+    random = random,
+    type = c("ADFun", "Fun", "ADGrad"),
+    intern = TRUE,
+    DLL = as.character(obj[["env"]][["DLL"]][[1]]),
+    silent = obj[["env"]][["silent"]]
+  )
+  if (!is.null(obj[["env"]][["map"]])) {
+    intern_args[["map"]] <- obj[["env"]][["map"]]
+  }
+  if (!is.null(obj[["env"]][["inner.control"]])) {
+    intern_args[["inner.control"]] <- obj[["env"]][["inner.control"]]
+  }
+
+  intern_obj <- initialize_tmb_function(intern_args)
+  if (is.null(intern_obj)) {
+    return(NULL)
+  }
+
+  hessian_fixed <- tryCatch(
+    intern_obj[["env"]][["f"]](
+      par_fixed,
+      type = "ADGrad",
+      order = 1
+    ),
+    error = function(e) NULL
+  )
+  if (is.null(hessian_fixed)) {
+    return(NULL)
+  }
+
+  hessian_fixed <- as.matrix(hessian_fixed)
+  if (!identical(dim(hessian_fixed), rep(length(par_fixed), 2))) {
+    return(NULL)
+  }
+
+  hessian_fixed
+}
+
 calculate_tmb_fixed_hessian <- function(obj,
                                         par_fixed,
                                         has_random = FALSE) {
   hessian_fixed <- NULL
   if (!has_random) {
     hessian_fixed <- calculate_tmb_model_dll_fixed_hessian(obj, par_fixed)
+  }
+  if (is.null(hessian_fixed) && has_random) {
+    hessian_fixed <- calculate_tmb_intern_laplace_fixed_hessian(obj, par_fixed)
   }
   if (is.null(hessian_fixed) && has_random) {
     hessian_fixed <- calculate_tmb_laplace_fixed_hessian(obj, par_fixed)
@@ -215,7 +281,7 @@ calculate_tmb_random_hessian <- function(obj,
     error = function(e) NULL
   )
   if (!is.null(hessian_random) &&
-      identical(dim(hessian_random), rep(length(random), 2))) {
+    identical(dim(hessian_random), rep(length(random), 2))) {
     return(hessian_random)
   }
 
@@ -224,7 +290,7 @@ calculate_tmb_random_hessian <- function(obj,
     error = function(e) NULL
   )
   if (!is.null(hessian_random) &&
-      identical(dim(hessian_random), rep(length(random), 2))) {
+    identical(dim(hessian_random), rep(length(random), 2))) {
     return(hessian_random)
   }
 
@@ -270,10 +336,7 @@ extract_tmb_adreport_payload <- function(obj,
     adreport_args[["map"]] <- obj[["env"]][["map"]]
   }
 
-  adreport_obj <- tryCatch(
-    do.call(TMB::MakeADFun, adreport_args),
-    error = function(e) NULL
-  )
+  adreport_obj <- initialize_tmb_function(adreport_args)
   if (is.null(adreport_obj)) {
     return(NULL)
   }

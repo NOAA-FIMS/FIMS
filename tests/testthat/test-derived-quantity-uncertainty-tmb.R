@@ -59,14 +59,15 @@ test_that("backend derived quantity SEs match TMB sdreport", {
   )
   tmb_se <- summary(sdr, "report")[, "Std. Error"]
 
-  adreport_obj <- TMB::MakeADFun(
+  adreport_obj <- InitializeTMBFunction(list(
     data = list(),
     parameters = list(theta = c(1, -2)),
     type = "ADFun",
     ADreport = TRUE,
     DLL = "derived_quantity_delta",
     silent = TRUE
-  )
+  ))
+  expect_true(is.list(adreport_obj))
   estimate <- adreport_obj$fn(theta_hat)
   jacobian <- adreport_obj$gr(theta_hat)
   model_dll_hessian <- FIMS:::calculate_tmb_model_dll_fixed_hessian(

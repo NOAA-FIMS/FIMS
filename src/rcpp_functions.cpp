@@ -10,321 +10,458 @@
 #include <cmath>
 #include <limits>
 
-namespace {
+namespace
+{
 
-std::vector<double> NumericMatrixToRowMajor(const Rcpp::NumericMatrix& matrix) {
-  std::vector<double> output;
-  output.reserve(static_cast<size_t>(matrix.nrow() * matrix.ncol()));
-  for (int i = 0; i < matrix.nrow(); i++) {
-    for (int j = 0; j < matrix.ncol(); j++) {
-      output.push_back(matrix(i, j));
+  SEXP g_initialized_tmb_function = R_NilValue;
+  bool g_initialized_tmb_function_is_preserved = false;
+
+  void SetInitializedTMBFunction(SEXP tmb_function)
+  {
+    if (g_initialized_tmb_function_is_preserved &&
+        g_initialized_tmb_function != R_NilValue)
+    {
+      R_ReleaseObject(g_initialized_tmb_function);
+    }
+
+    g_initialized_tmb_function = tmb_function;
+    if (g_initialized_tmb_function != R_NilValue)
+    {
+      R_PreserveObject(g_initialized_tmb_function);
+      g_initialized_tmb_function_is_preserved = true;
+    }
+    else
+    {
+      g_initialized_tmb_function_is_preserved = false;
     }
   }
-  return output;
-}
 
-Rcpp::NumericVector DerivedQuantitySEToNumericVector(
-    const fims_report::DerivedQuantityEstimate& output) {
-  Rcpp::NumericVector se(output.se.size());
-  for (size_t i = 0; i < output.se.size(); i++) {
-    se[i] = output.se[i];
-  }
-  return se;
-}
-
-Rcpp::NumericVector FimsVectorToNumericVector(
-    const fims::Vector<double>& values) {
-  Rcpp::NumericVector output(values.size());
-  for (size_t i = 0; i < values.size(); i++) {
-    output[i] = values[i];
-  }
-  return output;
-}
-
-Rcpp::IntegerVector FimsVectorToIntegerVector(
-    const fims::Vector<int>& values, bool one_based = false) {
-  Rcpp::IntegerVector output(values.size());
-  for (size_t i = 0; i < values.size(); i++) {
-    output[i] = values[i] + (one_based ? 1 : 0);
-  }
-  return output;
-}
-
-Rcpp::NumericMatrix FimsVectorToNumericMatrix(
-    const fims::Vector<double>& values, size_t n_rows, size_t n_cols) {
-  Rcpp::NumericMatrix output(n_rows, n_cols);
-  if (values.size() == 0) {
-    return output;
-  }
-  if (values.size() != n_rows * n_cols) {
-    Rcpp::stop("Cannot convert vector to matrix: dimensions do not match");
-  }
-  for (size_t i = 0; i < n_rows; i++) {
-    for (size_t j = 0; j < n_cols; j++) {
-      output(i, j) = values[(i * n_cols) + j];
-    }
-  }
-  return output;
-}
-
-fims::Vector<double> InvertSquareMatrix(
-    const fims::Vector<double>& matrix, size_t n,
-    const std::string& caller_name) {
-  if (matrix.size() != n * n) {
-    Rcpp::stop("%s: matrix size does not match dimensions",
-               caller_name.c_str());
+  void ClearInitializedTMBFunctionCache()
+  {
+    SetInitializedTMBFunction(R_NilValue);
   }
 
-  fims::Vector<double> work(n * 2 * n, 0.0);
-  for (size_t i = 0; i < n; i++) {
-    for (size_t j = 0; j < n; j++) {
-      work[(i * 2 * n) + j] = matrix[(i * n) + j];
-    }
-    work[(i * 2 * n) + n + i] = 1.0;
-  }
-
-  for (size_t pivot_col = 0; pivot_col < n; pivot_col++) {
-    size_t pivot_row = pivot_col;
-    double pivot_abs = std::fabs(work[(pivot_col * 2 * n) + pivot_col]);
-    for (size_t row = pivot_col + 1; row < n; row++) {
-      const double candidate_abs =
-          std::fabs(work[(row * 2 * n) + pivot_col]);
-      if (candidate_abs > pivot_abs) {
-        pivot_abs = candidate_abs;
-        pivot_row = row;
+  std::vector<double> NumericMatrixToRowMajor(const Rcpp::NumericMatrix &matrix)
+  {
+    std::vector<double> output;
+    output.reserve(static_cast<size_t>(matrix.nrow() * matrix.ncol()));
+    for (int i = 0; i < matrix.nrow(); i++)
+    {
+      for (int j = 0; j < matrix.ncol(); j++)
+      {
+        output.push_back(matrix(i, j));
       }
     }
-
-    if (pivot_abs <= 1.0e-14) {
-      Rcpp::stop("%s: matrix is singular", caller_name.c_str());
-    }
-
-    if (pivot_row != pivot_col) {
-      for (size_t col = 0; col < 2 * n; col++) {
-        const double tmp = work[(pivot_col * 2 * n) + col];
-        work[(pivot_col * 2 * n) + col] =
-            work[(pivot_row * 2 * n) + col];
-        work[(pivot_row * 2 * n) + col] = tmp;
-      }
-    }
-
-    const double pivot = work[(pivot_col * 2 * n) + pivot_col];
-    for (size_t col = 0; col < 2 * n; col++) {
-      work[(pivot_col * 2 * n) + col] /= pivot;
-    }
-
-    for (size_t row = 0; row < n; row++) {
-      if (row == pivot_col) {
-        continue;
-      }
-      const double factor = work[(row * 2 * n) + pivot_col];
-      for (size_t col = 0; col < 2 * n; col++) {
-        work[(row * 2 * n) + col] -=
-            factor * work[(pivot_col * 2 * n) + col];
-      }
-    }
-  }
-
-  fims::Vector<double> inverse;
-  inverse.reserve(n * n);
-  for (size_t i = 0; i < n; i++) {
-    for (size_t j = 0; j < n; j++) {
-      inverse.push_back(static_cast<double>(work[(i * 2 * n) + n + j]));
-    }
-  }
-  return inverse;
-}
-
-fims::Vector<int> RandomIndicesFromRcppList(Rcpp::List payload) {
-  fims::Vector<int> output;
-  if (!payload.containsElementNamed("random_indices")) {
     return output;
   }
 
-  Rcpp::IntegerVector random_indices = payload["random_indices"];
-  for (int i = 0; i < random_indices.size(); i++) {
-    output.push_back(static_cast<int>(random_indices[i]));
-  }
-  return output;
-}
-
-Rcpp::List TMBADFunEvaluationControl(int order) {
-  return Rcpp::List::create(
-      Rcpp::Named("order") = order,
-      Rcpp::Named("data_changed") = 0,
-      Rcpp::Named("set_tail") = 0,
-      Rcpp::Named("rangecomponent") = 1,
-      Rcpp::Named("hessiancols") = Rcpp::IntegerVector(),
-      Rcpp::Named("hessianrows") = Rcpp::IntegerVector(),
-      Rcpp::Named("sparsitypattern") = 0,
-      Rcpp::Named("dumpstack") = 0);
-}
-
-Rcpp::List TMBADFunReverseSweepControl(
-    const fims::Vector<double>& weights) {
-  return Rcpp::List::create(
-      Rcpp::Named("order") = 1,
-      Rcpp::Named("data_changed") = 0,
-      Rcpp::Named("set_tail") = 0,
-      Rcpp::Named("rangecomponent") = 1,
-      Rcpp::Named("hessiancols") = Rcpp::IntegerVector(),
-      Rcpp::Named("hessianrows") = Rcpp::IntegerVector(),
-      Rcpp::Named("rangeweight") = FimsVectorToNumericVector(weights),
-      Rcpp::Named("doforward") = 0);
-}
-
-Rcpp::List ADReportPayloadToRcppList(
-    const fims_tmb::ADReportPayload& payload) {
-  const size_t n_estimates = payload.estimate.size();
-
-  Rcpp::List output = Rcpp::List::create(
-      Rcpp::Named("backend") = "TMB",
-      Rcpp::Named("method") = payload.method,
-      Rcpp::Named("estimate") = FimsVectorToNumericVector(payload.estimate),
-      Rcpp::Named("fixed_covariance") = FimsVectorToNumericMatrix(
-          payload.fixed_effect_covariance, payload.n_fixed_effects,
-          payload.n_fixed_effects),
-      Rcpp::Named("fixed_indices") =
-          FimsVectorToIntegerVector(payload.fixed_indices, true),
-      Rcpp::Named("random_indices") =
-          FimsVectorToIntegerVector(payload.random_indices, true),
-      Rcpp::Named("n_fixed_effects") =
-          static_cast<int>(payload.n_fixed_effects),
-      Rcpp::Named("n_random_effects") =
-          static_cast<int>(payload.n_random_effects));
-
-  if (payload.method == "fixed") {
-    output["jacobian"] = FimsVectorToNumericMatrix(
-        payload.jacobian, n_estimates, payload.n_fixed_effects);
-  } else {
-    output["fixed_jacobian"] = FimsVectorToNumericMatrix(
-        payload.fixed_jacobian, n_estimates, payload.n_fixed_effects);
-    output["random_jacobian"] = FimsVectorToNumericMatrix(
-        payload.random_jacobian, n_estimates, payload.n_random_effects);
-
-    if (payload.method == "laplace") {
-      output["adjusted_fixed_jacobian"] = FimsVectorToNumericMatrix(
-          payload.adjusted_fixed_jacobian, n_estimates,
-          payload.n_fixed_effects);
-      output["random_hessian"] = FimsVectorToNumericMatrix(
-          payload.random_effect_hessian, payload.n_random_effects,
-          payload.n_random_effects);
-      output["random_covariance"] = FimsVectorToNumericMatrix(
-          payload.random_effect_covariance, payload.n_random_effects,
-          payload.n_random_effects);
+  Rcpp::NumericVector DerivedQuantitySEToNumericVector(
+      const fims_report::DerivedQuantityEstimate &output)
+  {
+    Rcpp::NumericVector se(output.se.size());
+    for (size_t i = 0; i < output.se.size(); i++)
+    {
+      se[i] = output.se[i];
     }
+    return se;
   }
 
-  return output;
-}
-
-class RFunctionLaplaceReverseSweepProvider
-    : public fims_tmb::LaplaceReverseSweepProvider {
- public:
-  explicit RFunctionLaplaceReverseSweepProvider(
-      Rcpp::Function reverse_sweep_function)
-      : reverse_sweep_function_m(reverse_sweep_function) {}
-
-  fims::Vector<double> GetFixedEffectReverseSweep(
-      const fims::Vector<double>& weights,
-      const fims::Vector<int>& fixed_indices) const override {
-    Rcpp::NumericVector r_weights = FimsVectorToNumericVector(weights);
-    Rcpp::IntegerVector r_fixed_indices =
-        FimsVectorToIntegerVector(fixed_indices, true);
-    Rcpp::NumericVector fixed_reverse =
-        reverse_sweep_function_m(r_weights, r_fixed_indices);
-    return fims::Vector<double>(
-        Rcpp::as<std::vector<double>>(fixed_reverse));
+  Rcpp::NumericVector FimsVectorToNumericVector(
+      const fims::Vector<double> &values)
+  {
+    Rcpp::NumericVector output(values.size());
+    for (size_t i = 0; i < values.size(); i++)
+    {
+      output[i] = values[i];
+    }
+    return output;
   }
 
- private:
-  Rcpp::Function reverse_sweep_function_m;
-};
+  Rcpp::IntegerVector FimsVectorToIntegerVector(
+      const fims::Vector<int> &values, bool one_based = false)
+  {
+    Rcpp::IntegerVector output(values.size());
+    for (size_t i = 0; i < values.size(); i++)
+    {
+      output[i] = values[i] + (one_based ? 1 : 0);
+    }
+    return output;
+  }
 
-class TMBADFunLaplaceReverseSweepProvider
-    : public fims_tmb::LaplaceReverseSweepProvider {
- public:
-  TMBADFunLaplaceReverseSweepProvider(
-      SEXP adgrad_ptr, Rcpp::NumericVector parameters)
-      : adgrad_ptr_m(adgrad_ptr), parameters_m(parameters) {}
+  Rcpp::NumericMatrix FimsVectorToNumericMatrix(
+      const fims::Vector<double> &values, size_t n_rows, size_t n_cols)
+  {
+    Rcpp::NumericMatrix output(n_rows, n_cols);
+    if (values.size() == 0)
+    {
+      return output;
+    }
+    if (values.size() != n_rows * n_cols)
+    {
+      Rcpp::stop("Cannot convert vector to matrix: dimensions do not match");
+    }
+    for (size_t i = 0; i < n_rows; i++)
+    {
+      for (size_t j = 0; j < n_cols; j++)
+      {
+        output(i, j) = values[(i * n_cols) + j];
+      }
+    }
+    return output;
+  }
 
-  fims::Vector<double> GetFixedEffectReverseSweep(
-      const fims::Vector<double>& weights,
-      const fims::Vector<int>& fixed_indices) const override {
+  fims::Vector<double> InvertSquareMatrix(
+      const fims::Vector<double> &matrix, size_t n,
+      const std::string &caller_name)
+  {
+    if (matrix.size() != n * n)
+    {
+      Rcpp::stop("%s: matrix size does not match dimensions",
+                 caller_name.c_str());
+    }
+
+    fims::Vector<double> work(n * 2 * n, 0.0);
+    for (size_t i = 0; i < n; i++)
+    {
+      for (size_t j = 0; j < n; j++)
+      {
+        work[(i * 2 * n) + j] = matrix[(i * n) + j];
+      }
+      work[(i * 2 * n) + n + i] = 1.0;
+    }
+
+    for (size_t pivot_col = 0; pivot_col < n; pivot_col++)
+    {
+      size_t pivot_row = pivot_col;
+      double pivot_abs = std::fabs(work[(pivot_col * 2 * n) + pivot_col]);
+      for (size_t row = pivot_col + 1; row < n; row++)
+      {
+        const double candidate_abs =
+            std::fabs(work[(row * 2 * n) + pivot_col]);
+        if (candidate_abs > pivot_abs)
+        {
+          pivot_abs = candidate_abs;
+          pivot_row = row;
+        }
+      }
+
+      if (pivot_abs <= 1.0e-14)
+      {
+        Rcpp::stop("%s: matrix is singular", caller_name.c_str());
+      }
+
+      if (pivot_row != pivot_col)
+      {
+        for (size_t col = 0; col < 2 * n; col++)
+        {
+          const double tmp = work[(pivot_col * 2 * n) + col];
+          work[(pivot_col * 2 * n) + col] =
+              work[(pivot_row * 2 * n) + col];
+          work[(pivot_row * 2 * n) + col] = tmp;
+        }
+      }
+
+      const double pivot = work[(pivot_col * 2 * n) + pivot_col];
+      for (size_t col = 0; col < 2 * n; col++)
+      {
+        work[(pivot_col * 2 * n) + col] /= pivot;
+      }
+
+      for (size_t row = 0; row < n; row++)
+      {
+        if (row == pivot_col)
+        {
+          continue;
+        }
+        const double factor = work[(row * 2 * n) + pivot_col];
+        for (size_t col = 0; col < 2 * n; col++)
+        {
+          work[(row * 2 * n) + col] -=
+              factor * work[(pivot_col * 2 * n) + col];
+        }
+      }
+    }
+
+    fims::Vector<double> inverse;
+    inverse.reserve(n * n);
+    for (size_t i = 0; i < n; i++)
+    {
+      for (size_t j = 0; j < n; j++)
+      {
+        inverse.push_back(static_cast<double>(work[(i * 2 * n) + n + j]));
+      }
+    }
+    return inverse;
+  }
+
+  fims::Vector<int> RandomIndicesFromRcppList(Rcpp::List payload)
+  {
+    fims::Vector<int> output;
+    if (!payload.containsElementNamed("random_indices"))
+    {
+      return output;
+    }
+
+    Rcpp::IntegerVector random_indices = payload["random_indices"];
+    for (int i = 0; i < random_indices.size(); i++)
+    {
+      output.push_back(static_cast<int>(random_indices[i]));
+    }
+    return output;
+  }
+
+  Rcpp::List TMBADFunEvaluationControl(int order)
+  {
+    return Rcpp::List::create(
+        Rcpp::Named("order") = order,
+        Rcpp::Named("data_changed") = 0,
+        Rcpp::Named("set_tail") = 0,
+        Rcpp::Named("rangecomponent") = 1,
+        Rcpp::Named("hessiancols") = Rcpp::IntegerVector(),
+        Rcpp::Named("hessianrows") = Rcpp::IntegerVector(),
+        Rcpp::Named("sparsitypattern") = 0,
+        Rcpp::Named("dumpstack") = 0);
+  }
+
+  Rcpp::List TMBADFunReverseSweepControl(
+      const fims::Vector<double> &weights)
+  {
+    return Rcpp::List::create(
+        Rcpp::Named("order") = 1,
+        Rcpp::Named("data_changed") = 0,
+        Rcpp::Named("set_tail") = 0,
+        Rcpp::Named("rangecomponent") = 1,
+        Rcpp::Named("hessiancols") = Rcpp::IntegerVector(),
+        Rcpp::Named("hessianrows") = Rcpp::IntegerVector(),
+        Rcpp::Named("rangeweight") = FimsVectorToNumericVector(weights),
+        Rcpp::Named("doforward") = 0);
+  }
+
+  Rcpp::List ADReportPayloadToRcppList(
+      const fims_tmb::ADReportPayload &payload)
+  {
+    const size_t n_estimates = payload.estimate.size();
+
+    Rcpp::List output = Rcpp::List::create(
+        Rcpp::Named("backend") = "TMB",
+        Rcpp::Named("method") = payload.method,
+        Rcpp::Named("estimate") = FimsVectorToNumericVector(payload.estimate),
+        Rcpp::Named("fixed_covariance") = FimsVectorToNumericMatrix(
+            payload.fixed_effect_covariance, payload.n_fixed_effects,
+            payload.n_fixed_effects),
+        Rcpp::Named("fixed_indices") =
+            FimsVectorToIntegerVector(payload.fixed_indices, true),
+        Rcpp::Named("random_indices") =
+            FimsVectorToIntegerVector(payload.random_indices, true),
+        Rcpp::Named("n_fixed_effects") =
+            static_cast<int>(payload.n_fixed_effects),
+        Rcpp::Named("n_random_effects") =
+            static_cast<int>(payload.n_random_effects));
+
+    if (payload.method == "fixed")
+    {
+      output["jacobian"] = FimsVectorToNumericMatrix(
+          payload.jacobian, n_estimates, payload.n_fixed_effects);
+    }
+    else
+    {
+      output["fixed_jacobian"] = FimsVectorToNumericMatrix(
+          payload.fixed_jacobian, n_estimates, payload.n_fixed_effects);
+      output["random_jacobian"] = FimsVectorToNumericMatrix(
+          payload.random_jacobian, n_estimates, payload.n_random_effects);
+
+      if (payload.method == "laplace")
+      {
+        output["adjusted_fixed_jacobian"] = FimsVectorToNumericMatrix(
+            payload.adjusted_fixed_jacobian, n_estimates,
+            payload.n_fixed_effects);
+        output["random_hessian"] = FimsVectorToNumericMatrix(
+            payload.random_effect_hessian, payload.n_random_effects,
+            payload.n_random_effects);
+        output["random_covariance"] = FimsVectorToNumericMatrix(
+            payload.random_effect_covariance, payload.n_random_effects,
+            payload.n_random_effects);
+      }
+    }
+
+    return output;
+  }
+
+  class RFunctionLaplaceReverseSweepProvider
+      : public fims_tmb::LaplaceReverseSweepProvider
+  {
+  public:
+    explicit RFunctionLaplaceReverseSweepProvider(
+        Rcpp::Function reverse_sweep_function)
+        : reverse_sweep_function_m(reverse_sweep_function) {}
+
+    fims::Vector<double> GetFixedEffectReverseSweep(
+        const fims::Vector<double> &weights,
+        const fims::Vector<int> &fixed_indices) const override
+    {
+      Rcpp::NumericVector r_weights = FimsVectorToNumericVector(weights);
+      Rcpp::IntegerVector r_fixed_indices =
+          FimsVectorToIntegerVector(fixed_indices, true);
+      Rcpp::NumericVector fixed_reverse =
+          reverse_sweep_function_m(r_weights, r_fixed_indices);
+      return fims::Vector<double>(
+          Rcpp::as<std::vector<double>>(fixed_reverse));
+    }
+
+  private:
+    Rcpp::Function reverse_sweep_function_m;
+  };
+
+  class TMBADFunLaplaceReverseSweepProvider
+      : public fims_tmb::LaplaceReverseSweepProvider
+  {
+  public:
+    TMBADFunLaplaceReverseSweepProvider(
+        SEXP adgrad_ptr, Rcpp::NumericVector parameters)
+        : adgrad_ptr_m(adgrad_ptr), parameters_m(parameters) {}
+
+    fims::Vector<double> GetFixedEffectReverseSweep(
+        const fims::Vector<double> &weights,
+        const fims::Vector<int> &fixed_indices) const override
+    {
 #ifdef TMBAD_FRAMEWORK
-    Rcpp::NumericVector full_reverse = Rcpp::as<Rcpp::NumericVector>(
-        EvalADFunObject(adgrad_ptr_m, parameters_m,
-                        TMBADFunReverseSweepControl(weights)));
-    fims::Vector<double> output;
-    output.reserve(fixed_indices.size());
-    for (size_t i = 0; i < fixed_indices.size(); i++) {
-      output.push_back(static_cast<double>(
-          full_reverse[static_cast<size_t>(fixed_indices[i])]));
-    }
-    return output;
+      Rcpp::NumericVector full_reverse = Rcpp::as<Rcpp::NumericVector>(
+          EvalADFunObject(adgrad_ptr_m, parameters_m,
+                          TMBADFunReverseSweepControl(weights)));
+      fims::Vector<double> output;
+      output.reserve(fixed_indices.size());
+      for (size_t i = 0; i < fixed_indices.size(); i++)
+      {
+        output.push_back(static_cast<double>(
+            full_reverse[static_cast<size_t>(fixed_indices[i])]));
+      }
+      return output;
 #else
-    throw std::logic_error(
-        "TMBADFunLaplaceReverseSweepProvider requires TMBAD_FRAMEWORK");
+      throw std::logic_error(
+          "TMBADFunLaplaceReverseSweepProvider requires TMBAD_FRAMEWORK");
 #endif
+    }
+
+  private:
+    SEXP adgrad_ptr_m;
+    Rcpp::NumericVector parameters_m;
+  };
+
+  fims_tmb::ADReportPayload ADReportPayloadFromRcppList(Rcpp::List payload)
+  {
+    if (!payload.containsElementNamed("method"))
+    {
+      Rcpp::stop("payload must contain a method element");
+    }
+
+    fims_tmb::ADReportPayload output;
+    output.method = Rcpp::as<std::string>(payload["method"]);
+
+    Rcpp::NumericVector estimate = payload["estimate"];
+    Rcpp::NumericMatrix fixed_covariance = payload["fixed_covariance"];
+    output.estimate =
+        fims::Vector<double>(Rcpp::as<std::vector<double>>(estimate));
+    output.fixed_effect_covariance =
+        fims::Vector<double>(NumericMatrixToRowMajor(fixed_covariance));
+    output.n_fixed_effects = static_cast<size_t>(fixed_covariance.nrow());
+
+    if (output.method == "laplace")
+    {
+      Rcpp::NumericMatrix adjusted_fixed_jacobian =
+          payload["adjusted_fixed_jacobian"];
+      Rcpp::NumericMatrix random_jacobian = payload["random_jacobian"];
+      Rcpp::NumericMatrix random_covariance = payload["random_covariance"];
+
+      output.adjusted_fixed_jacobian =
+          fims::Vector<double>(NumericMatrixToRowMajor(adjusted_fixed_jacobian));
+      output.random_jacobian =
+          fims::Vector<double>(NumericMatrixToRowMajor(random_jacobian));
+      output.random_effect_covariance =
+          fims::Vector<double>(NumericMatrixToRowMajor(random_covariance));
+      output.n_random_effects = static_cast<size_t>(random_covariance.nrow());
+
+      return output;
+    }
+
+    if (output.method == "fixed_after_laplace")
+    {
+      Rcpp::NumericMatrix fixed_jacobian =
+          Rcpp::as<Rcpp::NumericMatrix>(payload["fixed_jacobian"]);
+      output.fixed_jacobian =
+          fims::Vector<double>(NumericMatrixToRowMajor(fixed_jacobian));
+      return output;
+    }
+
+    if (output.method == "fixed")
+    {
+      Rcpp::NumericMatrix jacobian =
+          Rcpp::as<Rcpp::NumericMatrix>(payload["jacobian"]);
+      output.jacobian = fims::Vector<double>(NumericMatrixToRowMajor(jacobian));
+      return output;
+    }
+
+    Rcpp::stop("Unsupported ADREPORT payload method: %s", output.method.c_str());
   }
 
- private:
-  SEXP adgrad_ptr_m;
-  Rcpp::NumericVector parameters_m;
-};
+} // namespace
 
-fims_tmb::ADReportPayload ADReportPayloadFromRcppList(Rcpp::List payload) {
-  if (!payload.containsElementNamed("method")) {
-    Rcpp::stop("payload must contain a method element");
+/**
+ * @brief Create and cache a TMB objective function from C++.
+ *
+ * @details This function calls `TMB::MakeADFun()` through Rcpp, stores the
+ * returned object in a preserved backend cache, and returns the same object to
+ * R.
+ *
+ * @param make_adfun_args Arguments to `TMB::MakeADFun()`.
+ * @return Rcpp::List A list object returned by `TMB::MakeADFun()`.
+ */
+Rcpp::List InitializeTMBFunction(Rcpp::List make_adfun_args)
+{
+  if (!make_adfun_args.containsElementNamed("data") ||
+      !make_adfun_args.containsElementNamed("parameters") ||
+      !make_adfun_args.containsElementNamed("DLL"))
+  {
+    Rcpp::stop(
+        "InitializeTMBFunction requires MakeADFun arguments: data, "
+        "parameters, and DLL");
   }
 
-  fims_tmb::ADReportPayload output;
-  output.method = Rcpp::as<std::string>(payload["method"]);
+  Rcpp::Environment base_namespace = Rcpp::Environment::base_env();
+  Rcpp::Environment tmb_namespace = Rcpp::Environment::namespace_env("TMB");
+  Rcpp::Function do_call = base_namespace["do.call"];
+  Rcpp::Function make_adfun = tmb_namespace["MakeADFun"];
 
-  Rcpp::NumericVector estimate = payload["estimate"];
-  Rcpp::NumericMatrix fixed_covariance = payload["fixed_covariance"];
-  output.estimate =
-      fims::Vector<double>(Rcpp::as<std::vector<double>>(estimate));
-  output.fixed_effect_covariance =
-      fims::Vector<double>(NumericMatrixToRowMajor(fixed_covariance));
-  output.n_fixed_effects = static_cast<size_t>(fixed_covariance.nrow());
-
-  if (output.method == "laplace") {
-    Rcpp::NumericMatrix adjusted_fixed_jacobian =
-        payload["adjusted_fixed_jacobian"];
-    Rcpp::NumericMatrix random_jacobian = payload["random_jacobian"];
-    Rcpp::NumericMatrix random_covariance = payload["random_covariance"];
-
-    output.adjusted_fixed_jacobian =
-        fims::Vector<double>(NumericMatrixToRowMajor(adjusted_fixed_jacobian));
-    output.random_jacobian =
-        fims::Vector<double>(NumericMatrixToRowMajor(random_jacobian));
-    output.random_effect_covariance =
-        fims::Vector<double>(NumericMatrixToRowMajor(random_covariance));
-    output.n_random_effects = static_cast<size_t>(random_covariance.nrow());
-
-    return output;
+  SEXP tmb_function_sexp = do_call(make_adfun, make_adfun_args);
+  if (TYPEOF(tmb_function_sexp) != VECSXP)
+  {
+    Rcpp::stop("InitializeTMBFunction expected MakeADFun to return a list");
   }
 
-  if (output.method == "fixed_after_laplace") {
-    Rcpp::NumericMatrix fixed_jacobian =
-        Rcpp::as<Rcpp::NumericMatrix>(payload["fixed_jacobian"]);
-    output.fixed_jacobian =
-        fims::Vector<double>(NumericMatrixToRowMajor(fixed_jacobian));
-    return output;
-  }
-
-  if (output.method == "fixed") {
-    Rcpp::NumericMatrix jacobian =
-        Rcpp::as<Rcpp::NumericMatrix>(payload["jacobian"]);
-    output.jacobian = fims::Vector<double>(NumericMatrixToRowMajor(jacobian));
-    return output;
-  }
-
-  Rcpp::stop("Unsupported ADREPORT payload method: %s", output.method.c_str());
+  SetInitializedTMBFunction(tmb_function_sexp);
+  return Rcpp::as<Rcpp::List>(tmb_function_sexp);
 }
 
-}  // namespace
+/**
+ * @brief Return the cached TMB function object created by InitializeTMBFunction.
+ *
+ * @return SEXP Cached TMB object or NULL when nothing is cached.
+ */
+SEXP GetInitializedTMBFunction()
+{
+  if (g_initialized_tmb_function == R_NilValue)
+  {
+    return R_NilValue;
+  }
+  return g_initialized_tmb_function;
+}
+
+/**
+ * @brief Clear the cached TMB function object.
+ */
+void ClearInitializedTMBFunction()
+{
+  ClearInitializedTMBFunctionCache();
+}
 
 /**
  * @brief Calculate derived quantity standard errors using the FIMS backend
@@ -338,8 +475,10 @@ fims_tmb::ADReportPayload ADReportPayloadFromRcppList(Rcpp::List payload) {
  */
 Rcpp::NumericVector calculate_derived_quantity_se(
     Rcpp::NumericVector estimate, Rcpp::NumericVector jacobian,
-    Rcpp::NumericVector covariance, int n_parameters) {
-  if (n_parameters < 1) {
+    Rcpp::NumericVector covariance, int n_parameters)
+{
+  if (n_parameters < 1)
+  {
     Rcpp::stop("n_parameters must be greater than zero");
   }
 
@@ -375,11 +514,14 @@ Rcpp::NumericVector calculate_derived_quantity_laplace_se(
     Rcpp::NumericVector estimate, Rcpp::NumericVector adjusted_fixed_jacobian,
     Rcpp::NumericVector fixed_covariance, Rcpp::NumericVector random_jacobian,
     Rcpp::NumericVector random_covariance, int n_fixed_effects,
-    int n_random_effects) {
-  if (n_fixed_effects < 1) {
+    int n_random_effects)
+{
+  if (n_fixed_effects < 1)
+  {
     Rcpp::stop("n_fixed_effects must be greater than zero");
   }
-  if (n_random_effects < 1) {
+  if (n_random_effects < 1)
+  {
     Rcpp::stop("n_random_effects must be greater than zero");
   }
 
@@ -411,11 +553,14 @@ Rcpp::NumericVector calculate_derived_quantity_laplace_se(
  * @return Rcpp::NumericMatrix Fixed-effect covariance matrix.
  */
 Rcpp::NumericMatrix calculate_fixed_effect_covariance(
-    Rcpp::NumericMatrix hessian) {
-  if (hessian.nrow() != hessian.ncol()) {
+    Rcpp::NumericMatrix hessian)
+{
+  if (hessian.nrow() != hessian.ncol())
+  {
     Rcpp::stop("hessian must be square");
   }
-  if (hessian.nrow() == 0) {
+  if (hessian.nrow() == 0)
+  {
     return Rcpp::NumericMatrix(0, 0);
   }
 
@@ -439,11 +584,14 @@ Rcpp::NumericMatrix calculate_fixed_effect_covariance(
 Rcpp::NumericMatrix calculate_fixed_effect_hessian(
     Rcpp::NumericVector parameters, Rcpp::Function gradient_function,
     double relative_step = std::pow(std::numeric_limits<double>::epsilon(),
-                                    1.0 / 3.0)) {
-  if (parameters.size() == 0) {
+                                    1.0 / 3.0))
+{
+  if (parameters.size() == 0)
+  {
     return Rcpp::NumericMatrix(0, 0);
   }
-  if (relative_step <= 0.0) {
+  if (relative_step <= 0.0)
+  {
     Rcpp::stop("relative_step must be positive");
   }
 
@@ -452,7 +600,8 @@ Rcpp::NumericMatrix calculate_fixed_effect_hessian(
   Rcpp::NumericVector forward_parameters = Rcpp::clone(parameters);
   Rcpp::NumericVector backward_parameters = Rcpp::clone(parameters);
 
-  for (int col = 0; col < n_parameters; col++) {
+  for (int col = 0; col < n_parameters; col++)
+  {
     const double step =
         relative_step * (std::fabs(parameters[col]) + 1.0);
     forward_parameters[col] = parameters[col] + step;
@@ -463,13 +612,15 @@ Rcpp::NumericMatrix calculate_fixed_effect_hessian(
     Rcpp::NumericVector backward_gradient =
         gradient_function(backward_parameters);
     if (forward_gradient.size() != n_parameters ||
-        backward_gradient.size() != n_parameters) {
+        backward_gradient.size() != n_parameters)
+    {
       Rcpp::stop(
           "calculate_fixed_effect_hessian: gradient size does not match "
           "parameter size");
     }
 
-    for (int row = 0; row < n_parameters; row++) {
+    for (int row = 0; row < n_parameters; row++)
+    {
       hessian(row, col) =
           (forward_gradient[row] - backward_gradient[row]) / (2.0 * step);
     }
@@ -478,8 +629,10 @@ Rcpp::NumericMatrix calculate_fixed_effect_hessian(
     backward_parameters[col] = parameters[col];
   }
 
-  for (int row = 0; row < n_parameters; row++) {
-    for (int col = row + 1; col < n_parameters; col++) {
+  for (int row = 0; row < n_parameters; row++)
+  {
+    for (int col = row + 1; col < n_parameters; col++)
+    {
       const double symmetric_value =
           0.5 * (hessian(row, col) + hessian(col, row));
       hessian(row, col) = symmetric_value;
@@ -507,18 +660,22 @@ Rcpp::NumericMatrix calculate_fixed_effect_hessian(
 Rcpp::NumericMatrix calculate_laplace_fixed_jacobian_adjustment(
     Rcpp::NumericMatrix random_hessian, Rcpp::NumericMatrix random_jacobian,
     Rcpp::IntegerVector random_indices, Rcpp::IntegerVector fixed_indices,
-    int n_parameters, Rcpp::Function reverse_sweep_function) {
-  if (n_parameters < 1) {
+    int n_parameters, Rcpp::Function reverse_sweep_function)
+{
+  if (n_parameters < 1)
+  {
     Rcpp::stop("n_parameters must be greater than zero");
   }
 
   fims::Vector<int> random_indices_zero_based;
-  for (int i = 0; i < random_indices.size(); i++) {
+  for (int i = 0; i < random_indices.size(); i++)
+  {
     random_indices_zero_based.push_back(
         static_cast<int>(random_indices[i]));
   }
   fims::Vector<int> fixed_indices_zero_based;
-  for (int i = 0; i < fixed_indices.size(); i++) {
+  for (int i = 0; i < fixed_indices.size(); i++)
+  {
     fixed_indices_zero_based.push_back(static_cast<int>(fixed_indices[i]));
   }
 
@@ -554,21 +711,26 @@ Rcpp::NumericMatrix calculate_laplace_fixed_jacobian_adjustment(
 Rcpp::NumericMatrix calculate_laplace_fixed_jacobian_adjustment_native(
     Rcpp::NumericMatrix random_hessian, Rcpp::NumericMatrix random_jacobian,
     Rcpp::IntegerVector random_indices, Rcpp::IntegerVector fixed_indices,
-    Rcpp::NumericVector parameters, SEXP adgrad_ptr) {
-  if (TYPEOF(adgrad_ptr) != EXTPTRSXP) {
+    Rcpp::NumericVector parameters, SEXP adgrad_ptr)
+{
+  if (TYPEOF(adgrad_ptr) != EXTPTRSXP)
+  {
     Rcpp::stop("adgrad_ptr must be an external pointer");
   }
-  if (R_ExternalPtrAddr(adgrad_ptr) == nullptr) {
+  if (R_ExternalPtrAddr(adgrad_ptr) == nullptr)
+  {
     Rcpp::stop("adgrad_ptr is null");
   }
 
   fims::Vector<int> random_indices_zero_based;
-  for (int i = 0; i < random_indices.size(); i++) {
+  for (int i = 0; i < random_indices.size(); i++)
+  {
     random_indices_zero_based.push_back(
         static_cast<int>(random_indices[i]));
   }
   fims::Vector<int> fixed_indices_zero_based;
-  for (int i = 0; i < fixed_indices.size(); i++) {
+  for (int i = 0; i < fixed_indices.size(); i++)
+  {
     fixed_indices_zero_based.push_back(static_cast<int>(fixed_indices[i]));
   }
 
@@ -593,7 +755,8 @@ Rcpp::NumericMatrix calculate_laplace_fixed_jacobian_adjustment_native(
  * @param payload Structured payload extracted from TMB ADREPORT output.
  * @return Rcpp::NumericVector Standard errors.
  */
-Rcpp::NumericVector calculate_adreport_payload_se(Rcpp::List payload) {
+Rcpp::NumericVector calculate_adreport_payload_se(Rcpp::List payload)
+{
   fims_tmb::ADReportPayload adreport_payload =
       ADReportPayloadFromRcppList(payload);
   fims_tmb::ADReportPayloadUncertaintyCalculator calculator;
@@ -608,7 +771,8 @@ Rcpp::NumericVector calculate_adreport_payload_se(Rcpp::List payload) {
  * @param payload Raw ADREPORT extraction pieces.
  * @return Rcpp::List Structured ADREPORT payload.
  */
-Rcpp::List assemble_adreport_payload(Rcpp::List payload) {
+Rcpp::List assemble_adreport_payload(Rcpp::List payload)
+{
   fims_tmb::ADReportPayloadExtractionInput input;
 
   Rcpp::NumericVector estimate = payload["estimate"];
@@ -623,7 +787,8 @@ Rcpp::List assemble_adreport_payload(Rcpp::List payload) {
   input.random_indices = RandomIndicesFromRcppList(payload);
   input.n_parameters = static_cast<size_t>(jacobian.ncol());
 
-  if (input.random_indices.size() > 0) {
+  if (input.random_indices.size() > 0)
+  {
     Rcpp::NumericMatrix random_hessian = payload["random_hessian"];
     Rcpp::NumericMatrix fixed_jacobian_adjustment =
         payload["fixed_jacobian_adjustment"];
@@ -654,25 +819,31 @@ Rcpp::List assemble_adreport_payload(Rcpp::List payload) {
  */
 Rcpp::List assemble_adreport_payload_from_tmb_adfun_native(
     SEXP adfun_ptr, Rcpp::NumericVector parameters,
-    Rcpp::NumericMatrix fixed_covariance, Rcpp::List random_payload) {
+    Rcpp::NumericMatrix fixed_covariance, Rcpp::List random_payload)
+{
 #ifdef TMBAD_FRAMEWORK
-  if (TYPEOF(adfun_ptr) != EXTPTRSXP) {
+  if (TYPEOF(adfun_ptr) != EXTPTRSXP)
+  {
     Rcpp::stop("adfun_ptr must be an external pointer");
   }
 
-  void* raw_adfun = R_ExternalPtrAddr(adfun_ptr);
-  if (raw_adfun == nullptr) {
+  void *raw_adfun = R_ExternalPtrAddr(adfun_ptr);
+  if (raw_adfun == nullptr)
+  {
     Rcpp::stop("adfun_ptr is null");
   }
 
   Rcpp::NumericVector estimate;
   Rcpp::NumericMatrix jacobian;
-  try {
+  try
+  {
     estimate = Rcpp::as<Rcpp::NumericVector>(
         EvalADFunObject(adfun_ptr, parameters, TMBADFunEvaluationControl(0)));
     jacobian = Rcpp::as<Rcpp::NumericMatrix>(
         EvalADFunObject(adfun_ptr, parameters, TMBADFunEvaluationControl(1)));
-  } catch (std::exception& e) {
+  }
+  catch (std::exception &e)
+  {
     Rcpp::stop(
         "Native ADREPORT extraction failed with parameter length %i: %s",
         parameters.size(), e.what());
@@ -687,10 +858,12 @@ Rcpp::List assemble_adreport_payload_from_tmb_adfun_native(
       fims::Vector<double>(NumericMatrixToRowMajor(fixed_covariance));
   input.n_parameters = static_cast<size_t>(jacobian.ncol());
 
-  if (random_payload.size() > 0) {
+  if (random_payload.size() > 0)
+  {
     if (!random_payload.containsElementNamed("random_indices") ||
         !random_payload.containsElementNamed("random_hessian") ||
-        !random_payload.containsElementNamed("fixed_jacobian_adjustment")) {
+        !random_payload.containsElementNamed("fixed_jacobian_adjustment"))
+    {
       Rcpp::stop(
           "random_payload must contain random_indices, random_hessian, and "
           "fixed_jacobian_adjustment");
@@ -703,7 +876,8 @@ Rcpp::List assemble_adreport_payload_from_tmb_adfun_native(
     Rcpp::NumericMatrix fixed_jacobian_adjustment =
         random_payload["fixed_jacobian_adjustment"];
     fims::Vector<int> random_indices_zero_based;
-    for (int i = 0; i < random_indices.size(); i++) {
+    for (int i = 0; i < random_indices.size(); i++)
+    {
       random_indices_zero_based.push_back(
           static_cast<int>(random_indices[i]));
     }
@@ -730,11 +904,22 @@ Rcpp::List assemble_adreport_payload_from_tmb_adfun_native(
  * Function to register functions with the Rcpp module system.
  *
  */
-void register_functions(Rcpp::Module &m) {
+void register_functions(Rcpp::Module &m)
+{
   Rcpp::function(
       "CreateTMBModel", &CreateTMBModel,
       "See "
       "https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html.");
+  Rcpp::function(
+      "InitializeTMBFunction", &InitializeTMBFunction,
+      "Create and cache a TMB objective function object from MakeADFun "
+      "arguments.");
+  Rcpp::function(
+      "GetInitializedTMBFunction", &GetInitializedTMBFunction,
+      "Get the cached TMB objective function object.");
+  Rcpp::function(
+      "ClearInitializedTMBFunction", &ClearInitializedTMBFunction,
+      "Clear the cached TMB objective function object.");
   Rcpp::function(
       // TODO: fix the naming mismatch
       "set_fixed", &set_fixed_parameters,
