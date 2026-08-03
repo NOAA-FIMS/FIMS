@@ -227,6 +227,7 @@ test_that("ADREPORT uncertainty is added to model JSON reports", {
     model_output = "{\"name\":\"CatchAtAge\"}",
     sdreport = sdreport
   )
+  expect_identical(class(model_output), "character")
   model_output_list <- jsonlite::fromJSON(
     model_output,
     simplifyVector = FALSE

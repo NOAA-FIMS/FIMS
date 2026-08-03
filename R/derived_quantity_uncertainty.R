@@ -545,11 +545,12 @@ add_adreport_uncertainty_to_model_output <- function(model_output,
   }
 
   model_output_list[["reports"]] <- reports
-  jsonlite::toJSON(
+  model_output_json <- jsonlite::toJSON(
     model_output_list,
     auto_unbox = TRUE,
     pretty = TRUE,
     digits = NA,
     null = "null"
   )
+  as.character(model_output_json)
 }
