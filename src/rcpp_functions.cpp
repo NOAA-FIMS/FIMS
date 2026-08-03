@@ -16,7 +16,7 @@ namespace
   SEXP g_initialized_tmb_function = R_NilValue;
   bool g_initialized_tmb_function_is_preserved = false;
 
-  void SetInitializedTMBFunction(SEXP tmb_function)
+  void CacheInitializedTMBFunction(SEXP tmb_function)
   {
     if (g_initialized_tmb_function_is_preserved &&
         g_initialized_tmb_function != R_NilValue)
@@ -38,7 +38,22 @@ namespace
 
   void ClearInitializedTMBFunctionCache()
   {
-    SetInitializedTMBFunction(R_NilValue);
+    CacheInitializedTMBFunction(R_NilValue);
+  }
+
+  void *RequireExternalPointer(SEXP pointer, const char *pointer_name)
+  {
+    if (TYPEOF(pointer) != EXTPTRSXP)
+    {
+      Rcpp::stop("%s must be an external pointer", pointer_name);
+    }
+
+    void *address = R_ExternalPtrAddr(pointer);
+    if (address == nullptr)
+    {
+      Rcpp::stop("%s is null", pointer_name);
+    }
+    return address;
   }
 
   std::vector<double> NumericMatrixToRowMajor(const Rcpp::NumericMatrix &matrix)
@@ -437,12 +452,45 @@ Rcpp::List InitializeTMBFunction(Rcpp::List make_adfun_args)
     Rcpp::stop("InitializeTMBFunction expected MakeADFun to return a list");
   }
 
-  SetInitializedTMBFunction(tmb_function_sexp);
+  CacheInitializedTMBFunction(tmb_function_sexp);
   return Rcpp::as<Rcpp::List>(tmb_function_sexp);
 }
 
 /**
- * @brief Return the cached TMB function object created by InitializeTMBFunction.
+ * @brief Cache an existing TMB objective function created by MakeADFun.
+ *
+ * @param tmb_function A list object returned by `TMB::MakeADFun()`.
+ * @return SEXP The cached TMB objective function object.
+ */
+SEXP SetInitializedTMBFunction(SEXP tmb_function)
+{
+  if (TYPEOF(tmb_function) != VECSXP)
+  {
+    Rcpp::stop(
+        "SetInitializedTMBFunction requires a list returned by MakeADFun");
+  }
+
+  Rcpp::List tmb_function_list(tmb_function);
+  if (!tmb_function_list.containsElementNamed("env"))
+  {
+    Rcpp::stop(
+        "SetInitializedTMBFunction requires a MakeADFun object with an "
+        "environment in its env element");
+  }
+  SEXP tmb_environment = tmb_function_list["env"];
+  if (TYPEOF(tmb_environment) != ENVSXP)
+  {
+    Rcpp::stop(
+        "SetInitializedTMBFunction requires a MakeADFun object with an "
+        "environment in its env element");
+  }
+
+  CacheInitializedTMBFunction(tmb_function);
+  return tmb_function;
+}
+
+/**
+ * @brief Return the cached TMB function object.
  *
  * @return SEXP Cached TMB object or NULL when nothing is cached.
  */
@@ -713,14 +761,7 @@ Rcpp::NumericMatrix calculate_laplace_fixed_jacobian_adjustment_native(
     Rcpp::IntegerVector random_indices, Rcpp::IntegerVector fixed_indices,
     Rcpp::NumericVector parameters, SEXP adgrad_ptr)
 {
-  if (TYPEOF(adgrad_ptr) != EXTPTRSXP)
-  {
-    Rcpp::stop("adgrad_ptr must be an external pointer");
-  }
-  if (R_ExternalPtrAddr(adgrad_ptr) == nullptr)
-  {
-    Rcpp::stop("adgrad_ptr is null");
-  }
+  RequireExternalPointer(adgrad_ptr, "adgrad_ptr");
 
   fims::Vector<int> random_indices_zero_based;
   for (int i = 0; i < random_indices.size(); i++)
@@ -822,16 +863,7 @@ Rcpp::List assemble_adreport_payload_from_tmb_adfun_native(
     Rcpp::NumericMatrix fixed_covariance, Rcpp::List random_payload)
 {
 #ifdef TMBAD_FRAMEWORK
-  if (TYPEOF(adfun_ptr) != EXTPTRSXP)
-  {
-    Rcpp::stop("adfun_ptr must be an external pointer");
-  }
-
-  void *raw_adfun = R_ExternalPtrAddr(adfun_ptr);
-  if (raw_adfun == nullptr)
-  {
-    Rcpp::stop("adfun_ptr is null");
-  }
+  RequireExternalPointer(adfun_ptr, "adfun_ptr");
 
   Rcpp::NumericVector estimate;
   Rcpp::NumericMatrix jacobian;
@@ -914,6 +946,9 @@ void register_functions(Rcpp::Module &m)
       "InitializeTMBFunction", &InitializeTMBFunction,
       "Create and cache a TMB objective function object from MakeADFun "
       "arguments.");
+  Rcpp::function(
+      "SetInitializedTMBFunction", &SetInitializedTMBFunction,
+      "Cache an existing TMB objective function object returned by MakeADFun.");
   Rcpp::function(
       "GetInitializedTMBFunction", &GetInitializedTMBFunction,
       "Get the cached TMB objective function object.");

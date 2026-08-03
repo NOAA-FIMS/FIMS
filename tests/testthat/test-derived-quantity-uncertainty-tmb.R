@@ -32,9 +32,12 @@ test_that("backend derived quantity SEs match TMB sdreport", {
   dyn.load(dynlib)
   test_env <- environment()
   withr::defer({
+    ClearInitializedTMBFunction()
     rm(
       list = intersect(
-        c("obj", "sdr", "adreport_obj", "payload"),
+        c(
+          "obj", "sdr", "adreport_obj", "direct_adreport_obj", "payload"
+        ),
         ls(envir = test_env)
       ),
       envir = test_env
@@ -68,6 +71,25 @@ test_that("backend derived quantity SEs match TMB sdreport", {
     silent = TRUE
   ))
   expect_true(is.list(adreport_obj))
+  expect_identical(GetInitializedTMBFunction(), adreport_obj)
+
+  direct_adreport_obj <- TMB::MakeADFun(
+    data = list(),
+    parameters = list(theta = c(1, -2)),
+    type = "ADFun",
+    ADreport = TRUE,
+    DLL = "derived_quantity_delta",
+    silent = TRUE
+  )
+  expect_identical(
+    SetInitializedTMBFunction(direct_adreport_obj),
+    direct_adreport_obj
+  )
+  expect_identical(GetInitializedTMBFunction(), direct_adreport_obj)
+  ClearInitializedTMBFunction()
+  expect_null(GetInitializedTMBFunction())
+  SetInitializedTMBFunction(adreport_obj)
+
   estimate <- adreport_obj$fn(theta_hat)
   jacobian <- adreport_obj$gr(theta_hat)
   model_dll_hessian <- FIMS:::calculate_tmb_model_dll_fixed_hessian(
@@ -146,6 +168,30 @@ test_that("backend derived quantity SEs match TMB sdreport", {
     unname(backend_summary[, "Std. Error"]),
     unname(tmb_se),
     tolerance = 1e-8
+  )
+})
+
+test_that("TMB function cache and native pointer inputs are validated", {
+  withr::defer(ClearInitializedTMBFunction())
+
+  expect_error(
+    SetInitializedTMBFunction(NULL),
+    "requires a list returned by MakeADFun"
+  )
+  expect_error(
+    SetInitializedTMBFunction(list()),
+    "environment in its env element"
+  )
+  expect_error(
+    calculate_laplace_fixed_jacobian_adjustment_native(
+      random_hessian = matrix(numeric(), 0, 0),
+      random_jacobian = matrix(numeric(), 0, 0),
+      random_indices = integer(),
+      fixed_indices = integer(),
+      parameters = numeric(),
+      adgrad_ptr = methods::new("externalptr")
+    ),
+    "adgrad_ptr is null"
   )
 })
 

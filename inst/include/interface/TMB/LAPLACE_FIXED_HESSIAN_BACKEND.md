@@ -219,8 +219,12 @@ Implementation details:
 - `InitializeTMBFunction()` calls `TMB::MakeADFun()` from C++ via Rcpp.
 - The returned SEXP/list is preserved in a native cache to keep the handle
   available for backend routines.
+- `SetInitializedTMBFunction()` caches an object created directly by
+  `TMB::MakeADFun()`.
 - `GetInitializedTMBFunction()` and `ClearInitializedTMBFunction()` expose the
   cached object lifecycle.
+- Native routines that consume TMB external pointers reject both non-pointer
+  inputs and cleared external pointers before attempting evaluation.
 
 This does not yet expose native internal-Laplace fixed-Hessian evaluation from
 TMB itself, but it gives the backend stable access to initialized TMB objects

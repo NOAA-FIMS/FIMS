@@ -15,6 +15,7 @@
 #' @export calculate_laplace_fixed_jacobian_adjustment
 #' @export calculate_laplace_fixed_jacobian_adjustment_native
 #' @export InitializeTMBFunction
+#' @export SetInitializedTMBFunction
 #' @export GetInitializedTMBFunction
 #' @export ClearInitializedTMBFunction
 #' @export CreateTMBModel
