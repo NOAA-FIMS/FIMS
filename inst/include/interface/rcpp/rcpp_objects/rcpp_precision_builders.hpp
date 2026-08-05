@@ -1,5 +1,5 @@
-#ifndef FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_DSEM_HPP
-#define FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_DSEM_HPP
+#ifndef FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_PRECISION_BUILDERS_HPP
+#define FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_PRECISION_BUILDERS_HPP
 
 #include "rcpp_interface_base.hpp"
 #include "../../../distributions/functors/precision_builders.hpp"
@@ -17,10 +17,12 @@ public:
     /** @brief The RAM specification matrix passed from R. */
     Rcpp::IntegerMatrix ram_matrix; 
     /** @brief Vector of path coefficients (beta_z). */
-    ParameterVector beta_z;
+    VariableVector beta_z;
     
-    size_t n_time = 0;      /**< Total years */
-    size_t n_variables = 0; /**< Total variables (e.g., recruitment, temp) */
+    /** @brief Total years */
+    size_t n_time = 0;
+    /** @brief Total variables (e.g., recruitment, temp) */
+    size_t n_variables = 0;
 
     DSEMInterface() {
         this->id = DSEMInterface::id_g++;
@@ -48,7 +50,9 @@ public:
             std::make_shared<fims_distributions::GMRF<Type>>();    
 
         gmrf->precision_matrix_ptr = builder;    
-        
+        gmrf->distribution_type = "random_effects";
+        info->density_components[gmrf->id] = gmrf;
+
         builder->n_time = this->n_time;
         builder->n_variables = this->n_variables;
         
@@ -70,7 +74,7 @@ public:
             }
         }
 
-        // Copy the RAM matrix into structured RAMPath objects [Plan]
+        // Copy the RAM matrix into structured RAMPath objects
         for (int r = 0; r < ram_matrix.nrow(); ++r) {
             typename fims_distributions::DSEMPrecisionMatrixBuilder<Type>::RAMPath path;
             path.type = ram_matrix(r, 0);       // Rho vs Gamma

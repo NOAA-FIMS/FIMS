@@ -32,7 +32,11 @@ struct GMRF : public DensityComponentBase<Type> {
      * @details The matrix is assembled by a separate precision 
      * builder (e.g., the DSEM builder).
      */
-    std::shared_ptr<Eigen::SparseMatrix<Type>> precision_matrix_ptr = nullptr;
+
+    std::shared_ptr<fims_distributions::PrecisionMatrixBuilderBase<Type>> precision_matrix_ptr = nullptr;
+
+    // IS THIS WHERE THIS GOES?
+    Eigen::SparseMatrix<Type> Q = precision_matrix_ptr->BuildPrecisionMatrixSparse();
 
     /** @brief Constructor. */
     GMRF() : DensityComponentBase<Type>() {}
@@ -80,7 +84,7 @@ struct GMRF : public DensityComponentBase<Type> {
         // and how to get the ordering correct for this.
 
         // Evaluate TMB GMRF and multiply by -1 to convert from negative log-likelihood to log-likelihood.
-        this->lpdf = -1.0 * density::GMRF(*(this->precision_matrix_ptr))(Eigen::Map<const vector<Type>>(x_centered_std.data(), n_x));
+        this->lpdf = -1.0 * density::GMRF(Q)(Eigen::Map<const vector<Type>>(x_centered_std.data(), n_x));
 
         // Store the scalar result in a length-1 vector.
         this->lpdf_vec.resize(1);
