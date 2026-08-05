@@ -2,6 +2,15 @@
  * @file precision_builders.hpp
  * @brief Assembles sparse precision matrices for multivariate random-effects 
  * models.
+ * 
+ * A precision matrix (often denoted as Q) is simply the inverse of a 
+ * covariance matrix. When you have many variables that might 
+ * be correlated, doing math with the precision matrix is often much faster 
+ * than using the covariance matrix directly. "Sparse" means the matrix is 
+ * mostly zeros, and we use special tools (like the Eigen library) to only 
+ * store and calculate the non-zero parts, saving memory and time (sdmTMB also 
+ * does this).
+ *
   * @copyright This file is part of the NOAA, National Marine Fisheries Service
  * Fisheries Integrated Modeling System project. See LICENSE in the source
  * folder for reuse information.
@@ -46,6 +55,14 @@ struct PrecisionMatrixBuilderBase {
     virtual Eigen::SparseMatrix<Type> BuildPrecisionMatrixSparse() const = 0;
 
     // Optional mean offset. Defaults to a zero vector.
+    // Needed in DSEM but not needed in a spatial model
+
+    /**
+     * @brief n_k is the total number of "slots" (years multiplied by variables)
+     */
+    
+     //TO DO: Follow up on what n_k is to better explain what this function below is doing
+
     virtual Eigen::Matrix<Type, Eigen::Dynamic, 1> GetMeanOffset(
         size_t n_k) const {
         return Eigen::Matrix<Type, Eigen::Dynamic, 1>::Zero(n_k);
@@ -90,6 +107,11 @@ struct DSEMPrecisionMatrixBuilder : public PrecisionMatrixBuilderBase<Type> {
 
     /**
      * @brief The engine that builds the matrix, choosing the optimal strategy.
+     * 
+     * If there are paths (arrows) that link variances/covariances across different 
+     * years, we have to use a slower, more general method (`BuildQ_FullInversion`).
+     * If all variances are contained within their own specific years, we can use 
+     * a much faster shortcut (`BuildQ_BlockInversion`).
      */
     virtual Eigen::SparseMatrix<Type> BuildPrecisionMatrixSparse() const override {
         #ifndef TMB_MODEL
@@ -97,7 +119,7 @@ struct DSEMPrecisionMatrixBuilder : public PrecisionMatrixBuilderBase<Type> {
                 "DSEMPrecisionMatrixBuilder: BuildPrecisionMatrixSparse() requires "
                 "compilation with TMB_MODEL defined.");
         #else
-            bool has_cross_year_cov = false;
+            bool has_cross_year_cor = false;
             // Pre-scan paths to determine the optimal inversion strategy
             for (size_t r = 0; r < this->paths.size(); ++r) {
                 if (this->paths[r].type == 2) {
@@ -105,13 +127,13 @@ struct DSEMPrecisionMatrixBuilder : public PrecisionMatrixBuilderBase<Type> {
                     size_t path_t_to = (this->paths[r].to - 1) / this->n_variables;
 
                     if (path_t_from != path_t_to) {
-                        has_cross_year_cov = true;
+                        has_cross_year_cor = true;
                         break;  // Stop scanning as soon as we find one
                     }
                 }
             }
 
-            if (has_cross_year_cov) {
+            if (has_cross_year_cor) {
                 // Fallback: Slower, but mathematically robust for complex time linkages
                 return BuildQ_FullInversion();
             } else {
@@ -121,6 +143,16 @@ struct DSEMPrecisionMatrixBuilder : public PrecisionMatrixBuilderBase<Type> {
         #endif
     }
 
+    /**
+     * @brief Calculates the mean offset across all variables and time steps.
+     * 
+     * In DSEM, variables can have an initial starting value (`delta0_j`). 
+     * As time moves forward, causal paths (arrows) from the past push these values 
+     * around, and causal paths within the same year also interact. This function 
+     * calculates the final expected mean value for every variable in every year.
+     * 
+     * @param n_k Total number of nodes (n_time * n_variables).
+     */
     virtual Eigen::Matrix<Type, Eigen::Dynamic, 1> GetMeanOffset(
         size_t n_k) const override {
         #ifndef TMB_MODEL
@@ -213,10 +245,19 @@ struct DSEMPrecisionMatrixBuilder : public PrecisionMatrixBuilderBase<Type> {
         #endif
     }
 
+    // Private means that the code can only be used for this class
    private:
     /**
      * @brief Builds Q using block inversion; fast but requires no cross-year
      * covariance.
+     * 
+     * The math here is Q = (I - P)^T * V^-1 * (I - P).
+     * P (or Rho) is a matrix of the causal arrows.
+     * V is the variance/covariance matrix. We actually build a loading matrix 
+     * Gamma, where V = Gamma * Gamma^T, ensuring V is always mathematically valid 
+     * (positive definite). 
+     * Because variances don't cross years, V is "block diagonal", meaning we can 
+     * invert it one year at a time, which is incredibly fast!
      */
     Eigen::SparseMatrix<Type> BuildQ_BlockInversion() const {
         #ifdef TMB_MODEL
@@ -232,12 +273,21 @@ struct DSEMPrecisionMatrixBuilder : public PrecisionMatrixBuilderBase<Type> {
             I_kk.setIdentity();
 
             // 3. Translate the "arrows" (RAMPath) into triplet lists for efficient sparse matrix construction.
+            // A Triplet is just a set of three numbers: (row_index, column_index, value).
+            // It's the standard way to build sparse matrices because you just list all the 
+            // non-zero spots, and the computer handles organizing them into a matrix format.
             fims::Vector<Eigen::Triplet<Type>> rho_triplets;
             fims::Vector<Eigen::Triplet<Type>> vinv_triplets;
             rho_triplets.reserve(this->paths.size());
             vinv_triplets.reserve(this->n_time * this->n_variables * this->n_variables);
 
-            // 4. Build Rho (Directed Paths)
+            // 4. Build Rho (P - Directed Paths) matrix
+            // This builds the 'P' matrix in the equation Q = (I - P)^T * V^-1 * (I - P).
+            // In this equation, the (I - P) part is mathematically isolating the 
+            // "unexplained" noise or residuals of the system. 
+            // It takes the actual values of the variables, subtracts the effects
+            // that variables have on each other (P), and leaves behind the 
+            // base innovations (the pure random errors).
             for (size_t r = 0; r < this->paths.size(); ++r) {
                 if (this->paths[r].type == 1) { // Directed path (Rho)
                     const int from_global = this->paths[r].from - 1; 
@@ -258,12 +308,17 @@ struct DSEMPrecisionMatrixBuilder : public PrecisionMatrixBuilderBase<Type> {
             }
         
             // 5. Build V_inv via Block Inversion
+            // We loop through each year (t), build a small matrix (Gamma) for just that year,
+            // multiply it by its transpose to get V, invert that small block, and save 
+            // those values into the main triplet list. This avoids trying to invert a 
+            // massive V matrix all at once.
+            //
             // This assumes global indices are generated as: 
             // global_index = (time_step * n_variables) + variable_index.
             // If your R data is vectorized column-major (time inside, variables outside),
             // adjust the division and modulo math below accordingly.
             for (size_t t = 0; t < this->n_time; ++t) {
-                Eigen::Matrix<Type, Eigen::Dynamic, Eigen::Dynamic> V_block =
+                Eigen::Matrix<Type, Eigen::Dynamic, Eigen::Dynamic> gamma_block =
                     Eigen::Matrix<Type, Eigen::Dynamic, Eigen::Dynamic>::Zero(
                         this->n_variables, this->n_variables);
                 bool has_variance_for_block = false;
@@ -281,19 +336,16 @@ struct DSEMPrecisionMatrixBuilder : public PrecisionMatrixBuilderBase<Type> {
                             const int b_idx = this->paths[r].beta_index - 1;
                             Type value = this->beta_z[b_idx];
 
-                            if (from_local == to_local) {
-                                V_block(from_local, to_local) = value * value;
-                            } else {
-                                V_block(from_local, to_local) = value;
-                                V_block(to_local, from_local) = value;
-                            }
+                            // Populate the loading matrix Gamma for the block
+                            gamma_block(to_local, from_local) = value;
                         }
                     }
                 }
             
                 // Invert the dense block and map it back to the global sparse format
                 if (has_variance_for_block) {
-                    Eigen::Matrix<Type, Eigen::Dynamic, Eigen::Dynamic> Vinv_block = V_block.inverse();
+                    Eigen::Matrix<Type, Eigen::Dynamic, Eigen::Dynamic> Vinv_block = 
+                        (gamma_block * gamma_block.transpose()).inverse();
                     
                     for (size_t i = 0; i < this->n_variables; ++i) {
                         for (size_t j = 0; j < this->n_variables; ++j) {
@@ -308,6 +360,8 @@ struct DSEMPrecisionMatrixBuilder : public PrecisionMatrixBuilderBase<Type> {
             }
 
         // 6. Final Sparse Matrix Assembly
+        // Turn the lists of triplets into actual sparse matrices.
+        // Then do the final math: (I - P)^T * V^-1 * (I - P)
         Eigen::SparseMatrix<Type> Rho_kk(static_cast<int>(n_k), static_cast<int>(n_k));
         Rho_kk.setFromTriplets(rho_triplets.begin(), rho_triplets.end());
         Eigen::SparseMatrix<Type> Vinv_sparse(static_cast<int>(n_k),
@@ -324,6 +378,11 @@ struct DSEMPrecisionMatrixBuilder : public PrecisionMatrixBuilderBase<Type> {
     // Calculate Q = (I - P)^T * V^-1 * (I - P)
     /**
      * @brief Builds Q using full matrix inversion; general but slower.
+     * 
+     * This does the same math: Q = (I - P)^T * V^-1 * (I - P).
+     * However, because variances might cross between years, we can't cheat by 
+     * doing it one year at a time. We have to build the entire global Gamma 
+     * matrix, multiply it to get V, and invert the whole thing.
      */
     Eigen::SparseMatrix<Type> BuildQ_FullInversion() const {
         #ifdef TMB_MODEL
@@ -349,7 +408,7 @@ struct DSEMPrecisionMatrixBuilder : public PrecisionMatrixBuilderBase<Type> {
                         "DSEMPrecisionMatrixBuilder: RAM indices out of bounds.");
                 }
                 const int b_idx = this->paths[r].beta_index - 1;
-                if (b_idx < 0 || static_caste<size_t>(b_idx) >= this->beta_z.size()) {
+                if (b_idx < 0 || static_cast<size_t>(b_idx) >= this->beta_z.size()) {
                     throw std::invalid_argument(
                         "DSEMPrecisionMatrixBuilder: beta_index out of bounds for beta_z.");
                 }
@@ -360,7 +419,9 @@ struct DSEMPrecisionMatrixBuilder : public PrecisionMatrixBuilderBase<Type> {
                                          static_cast<int>(n_k));
         Rho_kk.setFromTriplets(rho_triplets.begin(), rho_triplets.end());
 
-        Eigen::Matrix<Type, Eigen::Dynamic, Eigen::Dynamic> V_dense =
+        // Build gamma_kk (Cholesky factor / Loading matrix)
+        // The code reads the arrows representing uncertainty/noise (type == 2) and builds gamma_kk
+        Eigen::Matrix<Type, Eigen::Dynamic, Eigen::Dynamic> gamma_kk =
             Eigen::Matrix<Type, Eigen::Dynamic, Eigen::Dynamic>::Zero(n_k, n_k);
         for (size_t r = 0; r < this->paths.size(); ++r) {
             if (this->paths[r].type == 2) {
@@ -369,17 +430,16 @@ struct DSEMPrecisionMatrixBuilder : public PrecisionMatrixBuilderBase<Type> {
                 const int b_idx = this->paths[r].beta_index - 1;
                 Type value = this->beta_z[b_idx];
 
-                if (from_global == to_global) {
-                    V_dense(from_global, to_global) = value * value;
-                } else {
-                    V_dense(from_global, to_global) = value;
-                    V_dense(to_global, from_global) = value;
-                }
+                // Populate the loading matrix Gamma
+                gamma_kk(to_global, from_global) = value;
             }
         }
 
+        // This is all basically magic math via a trick called the Cholesky 
+        // decomposition which ensures that the covariance matrix 
+        // V = gamma_kk * gamma_kk^T is always positive definite.
         Eigen::Matrix<Type, Eigen::Dynamic, Eigen::Dynamic> Vinv_dense =
-            V_dense.inverse();
+            (gamma_kk * gamma_kk.transpose()).inverse();
         Eigen::SparseMatrix<Type> Vinv_sparse = Vinv_dense.sparseView();
 
         Eigen::SparseMatrix<Type> IminusRho_kk = I_kk - Rho_kk;

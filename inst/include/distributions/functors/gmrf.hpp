@@ -35,8 +35,6 @@ struct GMRF : public DensityComponentBase<Type> {
 
     std::shared_ptr<fims_distributions::PrecisionMatrixBuilderBase<Type>> precision_matrix_ptr = nullptr;
 
-    // IS THIS WHERE THIS GOES?
-    Eigen::SparseMatrix<Type> Q = precision_matrix_ptr->BuildPrecisionMatrixSparse();
 
     /** @brief Constructor. */
     GMRF() : DensityComponentBase<Type>() {}
@@ -68,6 +66,9 @@ struct GMRF : public DensityComponentBase<Type> {
                 ") must match random effect vector size (" + 
                 std::to_string(n_x) + ").");
         }
+
+        // Calls precision matrix builder to build Q
+        Eigen::SparseMatrix<Type> Q = precision_matrix_ptr->BuildPrecisionMatrixSparse();
 
         // Centering: x - mu. TMB's GMRF expects input centered around a mean of 0.
         // To improve performance, we build a fims::Vector using emplace_back to avoid
