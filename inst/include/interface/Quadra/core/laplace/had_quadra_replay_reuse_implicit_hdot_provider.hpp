@@ -39,14 +39,14 @@ inline void seed_had_quadra_implicit_direction(
   for (int k = 0; k < theta_dim; ++k) {
     const double d = (k == theta_index) ? 1.0 : 0.0;
     x[static_cast<size_t>(k)].dot = d;
-    graph.vertices[x[static_cast<size_t>(k)].varId].dot = d;
+    had::VertexDot(graph, x[static_cast<size_t>(k)].varId) = d;
   }
 
   for (int r = 0; r < random_dim; ++r) {
     const int idx = theta_dim + r;
     const double d = du_dtheta(r, theta_index);
     x[static_cast<size_t>(idx)].dot = d;
-    graph.vertices[x[static_cast<size_t>(idx)].varId].dot = d;
+    had::VertexDot(graph, x[static_cast<size_t>(idx)].varId) = d;
   }
 }
 
@@ -124,13 +124,13 @@ public:
     for (int j = 0; j < theta_dim_; ++j) {
       x.emplace_back(theta[j]);
       x.back().dot = 0.0;
-      graph.vertices[x.back().varId].dot = 0.0;
+      had::VertexDot(graph, x.back().varId) = 0.0;
     }
 
     for (int i = 0; i < random_dim_; ++i) {
       x.emplace_back(uhat[i]);
       x.back().dot = 0.0;
-      graph.vertices[x.back().varId].dot = 0.0;
+      had::VertexDot(graph, x.back().varId) = 0.0;
     }
 
     // Replay objective once.

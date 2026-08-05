@@ -16,9 +16,9 @@ namespace quadra {
 // source of truth for Hessian and Laplace work, while joint optimization uses
 // only the fields required for objective and gradient evaluation.
 class CompactFirstOrderTape {
- public:
-  void Build(const had::ADGraph& graph,
-             const std::vector<had::VertexId>& parameter_vertices,
+public:
+  void Build(const had::ADGraph &graph,
+             const std::vector<had::VertexId> &parameter_vertices,
              had::VertexId objective_vertex) {
     const std::size_t n = graph.vertices.size();
     if (objective_vertex >= n) {
@@ -38,7 +38,7 @@ class CompactFirstOrderTape {
     arity_.resize(n);
 
     for (std::size_t i = 0; i < n; ++i) {
-      const auto& vertex = graph.vertices[i];
+      const auto &vertex = graph.vertices[i];
       if (vertex.op == had::OpCode::Independent &&
           (vertex.e1.to != i || vertex.e2.to != i)) {
         throw std::runtime_error(
@@ -56,7 +56,8 @@ class CompactFirstOrderTape {
 
     for (const auto vertex : parameter_vertices_) {
       if (vertex >= n) {
-        throw std::out_of_range("Compact tape parameter vertex is out of range.");
+        throw std::out_of_range(
+            "Compact tape parameter vertex is out of range.");
       }
     }
   }
@@ -75,7 +76,7 @@ class CompactFirstOrderTape {
            arity_.capacity() * sizeof(std::uint8_t);
   }
 
-  double Evaluate(const Eigen::VectorXd& values, Eigen::VectorXd& gradient) {
+  double Evaluate(const Eigen::VectorXd &values, Eigen::VectorXd &gradient) {
     if (static_cast<std::size_t>(values.size()) != parameter_vertices_.size()) {
       throw std::invalid_argument("Compact tape parameter length mismatch.");
     }
@@ -91,18 +92,18 @@ class CompactFirstOrderTape {
     return primal_[objective_vertex_];
   }
 
- private:
+private:
   static std::uint8_t Arity(had::OpCode opcode) {
     switch (opcode) {
-      case had::OpCode::Independent:
-        return 0;
-      case had::OpCode::Add:
-      case had::OpCode::Subtract:
-      case had::OpCode::Multiply:
-      case had::OpCode::Divide:
-        return 2;
-      default:
-        return 1;
+    case had::OpCode::Independent:
+      return 0;
+    case had::OpCode::Add:
+    case had::OpCode::Subtract:
+    case had::OpCode::Multiply:
+    case had::OpCode::Divide:
+      return 2;
+    default:
+      return 1;
     }
   }
 
@@ -111,70 +112,68 @@ class CompactFirstOrderTape {
       const auto left = left_[i];
       const auto right = right_[i];
       switch (opcode_[i]) {
-        case had::OpCode::Independent:
-          break;
-        case had::OpCode::Add:
-          primal_[i] = primal_[left] + primal_[right];
-          weight_left_[i] = 1.0;
-          weight_right_[i] = 1.0;
-          break;
-        case had::OpCode::AddConstant:
-          primal_[i] = primal_[left] + constant_[i];
-          weight_left_[i] = 1.0;
-          break;
-        case had::OpCode::Subtract:
-          primal_[i] = primal_[left] - primal_[right];
-          weight_left_[i] = 1.0;
-          weight_right_[i] = -1.0;
-          break;
-        case had::OpCode::SubtractConstant:
-          primal_[i] = primal_[left] - constant_[i];
-          weight_left_[i] = 1.0;
-          break;
-        case had::OpCode::ConstantSubtract:
-          primal_[i] = constant_[i] - primal_[left];
-          weight_left_[i] = -1.0;
-          break;
-        case had::OpCode::Multiply:
-          primal_[i] = primal_[left] * primal_[right];
-          weight_left_[i] = primal_[right];
-          weight_right_[i] = primal_[left];
-          break;
-        case had::OpCode::MultiplyConstant:
-          primal_[i] = primal_[left] * constant_[i];
-          weight_left_[i] = constant_[i];
-          break;
-        case had::OpCode::Divide:
-          primal_[i] = primal_[left] / primal_[right];
-          weight_left_[i] = 1.0 / primal_[right];
-          weight_right_[i] =
-              -primal_[left] / (primal_[right] * primal_[right]);
-          break;
-        case had::OpCode::DivideConstant:
-          primal_[i] = primal_[left] / constant_[i];
-          weight_left_[i] = 1.0 / constant_[i];
-          break;
-        case had::OpCode::ConstantDivide:
-          primal_[i] = constant_[i] / primal_[left];
-          weight_left_[i] =
-              -constant_[i] / (primal_[left] * primal_[left]);
-          break;
-        case had::OpCode::Exp:
-          primal_[i] = std::exp(primal_[left]);
-          weight_left_[i] = primal_[i];
-          break;
-        case had::OpCode::Log:
-          primal_[i] = std::log(primal_[left]);
-          weight_left_[i] = 1.0 / primal_[left];
-          break;
-        case had::OpCode::Sqrt:
-          primal_[i] = std::sqrt(primal_[left]);
-          weight_left_[i] = 0.5 / primal_[i];
-          break;
-        case had::OpCode::Negate:
-          primal_[i] = -primal_[left];
-          weight_left_[i] = -1.0;
-          break;
+      case had::OpCode::Independent:
+        break;
+      case had::OpCode::Add:
+        primal_[i] = primal_[left] + primal_[right];
+        weight_left_[i] = 1.0;
+        weight_right_[i] = 1.0;
+        break;
+      case had::OpCode::AddConstant:
+        primal_[i] = primal_[left] + constant_[i];
+        weight_left_[i] = 1.0;
+        break;
+      case had::OpCode::Subtract:
+        primal_[i] = primal_[left] - primal_[right];
+        weight_left_[i] = 1.0;
+        weight_right_[i] = -1.0;
+        break;
+      case had::OpCode::SubtractConstant:
+        primal_[i] = primal_[left] - constant_[i];
+        weight_left_[i] = 1.0;
+        break;
+      case had::OpCode::ConstantSubtract:
+        primal_[i] = constant_[i] - primal_[left];
+        weight_left_[i] = -1.0;
+        break;
+      case had::OpCode::Multiply:
+        primal_[i] = primal_[left] * primal_[right];
+        weight_left_[i] = primal_[right];
+        weight_right_[i] = primal_[left];
+        break;
+      case had::OpCode::MultiplyConstant:
+        primal_[i] = primal_[left] * constant_[i];
+        weight_left_[i] = constant_[i];
+        break;
+      case had::OpCode::Divide:
+        primal_[i] = primal_[left] / primal_[right];
+        weight_left_[i] = 1.0 / primal_[right];
+        weight_right_[i] = -primal_[left] / (primal_[right] * primal_[right]);
+        break;
+      case had::OpCode::DivideConstant:
+        primal_[i] = primal_[left] / constant_[i];
+        weight_left_[i] = 1.0 / constant_[i];
+        break;
+      case had::OpCode::ConstantDivide:
+        primal_[i] = constant_[i] / primal_[left];
+        weight_left_[i] = -constant_[i] / (primal_[left] * primal_[left]);
+        break;
+      case had::OpCode::Exp:
+        primal_[i] = std::exp(primal_[left]);
+        weight_left_[i] = primal_[i];
+        break;
+      case had::OpCode::Log:
+        primal_[i] = std::log(primal_[left]);
+        weight_left_[i] = 1.0 / primal_[left];
+        break;
+      case had::OpCode::Sqrt:
+        primal_[i] = std::sqrt(primal_[left]);
+        weight_left_[i] = 0.5 / primal_[i];
+        break;
+      case had::OpCode::Negate:
+        primal_[i] = -primal_[left];
+        weight_left_[i] = -1.0;
+        break;
       }
     }
   }
@@ -184,7 +183,8 @@ class CompactFirstOrderTape {
     adjoint_[objective_vertex_] = 1.0;
     for (std::size_t i = primal_.size(); i-- > 0;) {
       const auto arity = arity_[i];
-      if (arity == 0) continue;
+      if (arity == 0)
+        continue;
       const double adjoint = adjoint_[i];
       adjoint_[left_[i]] += adjoint * weight_left_[i];
       if (arity == 2) {
@@ -206,4 +206,4 @@ class CompactFirstOrderTape {
   had::VertexId objective_vertex_ = 0;
 };
 
-}  // namespace quadra
+} // namespace quadra

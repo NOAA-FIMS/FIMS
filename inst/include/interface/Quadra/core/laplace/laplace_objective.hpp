@@ -8,14 +8,18 @@
 
 #include <Eigen/SparseCholesky>
 
-#include "random_effect_newton.hpp"
 #include "laplace_backend_factory.hpp"
+#include "persistent_structured_runtime.hpp"
+#include "random_effect_newton.hpp"
 
 namespace quadra {
 
 struct LaplaceObjectiveOptions {
   RandomEffectNewtonOptions newton_m;
   bool include_constant_m = true;
+  bool validate_reusable_tape_m = true;
+  bool collect_reports_m = true;
+  bool compute_mixed_derivatives_m = true;
   double logdet_jitter_m = 0.0;
 };
 
@@ -40,7 +44,12 @@ struct LaplaceObjectiveResult {
 
   Eigen::SparseMatrix<double> hessian_random_m;
   std::vector<double> gradient_random_m;
+  std::vector<double> gradient_fixed_joint_m;
+  Eigen::MatrixXd mixed_hessian_m;
   std::vector<ReportValue> reports_m;
+  laplace::BackendRecommendation backend_m;
+  bool structure_detected_m = false;
+  bool tape_rebuilt_m = false;
 };
 
 inline Eigen::SparseMatrix<double>
@@ -75,8 +84,7 @@ inline double sparse_ldlt_logdet(const Eigen::SparseMatrix<double> &H,
     auto backend = laplace::CreateLaplaceBackendForHessian(H);
     backend->factorize(H);
     ok = backend->is_spd() && std::isfinite(backend->logdet());
-    return ok ? backend->logdet()
-              : std::numeric_limits<double>::quiet_NaN();
+    return ok ? backend->logdet() : std::numeric_limits<double>::quiet_NaN();
   } catch (...) {
     return std::numeric_limits<double>::quiet_NaN();
   }
@@ -117,15 +125,28 @@ inline LaplaceObjectiveResult evaluate_laplace_objective(
   result.message_m = newton.message_m;
   result.hessian_random_m = newton.hessian_random_m;
   result.gradient_random_m = newton.gradient_random_m;
+  result.gradient_fixed_joint_m = newton.gradient_fixed_m;
+  result.mixed_hessian_m = newton.mixed_hessian_m;
   result.reports_m = newton.reports_m;
   result.n_random_m = static_cast<int>(partition.random_indices_m.size());
+  result.backend_m = newton.backend_m;
 
   Eigen::SparseMatrix<double> H_for_logdet =
       laplace_objective_add_diagonal_jitter(result.hessian_random_m,
                                             options.logdet_jitter_m);
 
   bool logdet_ok = false;
-  const double logdet = sparse_ldlt_logdet(H_for_logdet, logdet_ok);
+  double logdet = std::numeric_limits<double>::quiet_NaN();
+  try {
+    laplace::PersistentStructuredLaplaceRuntime structured_runtime;
+    const auto structured = structured_runtime.evaluate(H_for_logdet);
+    logdet = structured.logdet;
+    result.backend_m = structured.recommendation;
+    result.structure_detected_m = structured.detected_structure;
+    logdet_ok = std::isfinite(logdet);
+  } catch (...) {
+    logdet = sparse_ldlt_logdet(H_for_logdet, logdet_ok);
+  }
 
   result.logdet_ok_m = logdet_ok;
   result.log_det_hessian_m = logdet;

@@ -93,6 +93,11 @@
 *.json
 !cspell.json
 
+# Projection study process artifacts and intermediate result tables
+benchmarks/fims-demo-projection-study*-artifacts/
+benchmarks/fims-demo-projection-study*.csv
+!benchmarks/fims-demo-projection-study-laplace-o3-1-30.csv
+
 #TMB tmp.def file
 src/tmp.def
 

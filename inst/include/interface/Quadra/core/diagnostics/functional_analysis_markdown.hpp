@@ -6,6 +6,7 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+#include <vector>
 
 namespace quadra {
 namespace diagnostics {
@@ -33,6 +34,35 @@ inline std::string csv_get_value(const std::string &csv_path,
   }
 
   return "";
+}
+
+struct SpectralCsvRow {
+  std::string rank;
+  std::string eigenvalue;
+  std::string cumulative_share;
+};
+
+inline std::vector<SpectralCsvRow>
+csv_get_spectral_rows(const std::string &csv_path) {
+  std::ifstream in(csv_path);
+  std::string line;
+  std::vector<SpectralCsvRow> rows;
+  while (std::getline(in, line)) {
+    std::stringstream ss(line);
+    std::string section, metric, rank, value, extra;
+    std::getline(ss, section, ',');
+    std::getline(ss, metric, ',');
+    std::getline(ss, rank, ',');
+    std::getline(ss, value, ',');
+    std::getline(ss, extra, ',');
+    if (section != "spectral_eigenvalue" || metric != "eigenvalue")
+      continue;
+    const std::string prefix = "cumulative_share=";
+    rows.push_back({rank, value,
+                    extra.rfind(prefix, 0) == 0 ? extra.substr(prefix.size())
+                                                : std::string()});
+  }
+  return rows;
 }
 
 struct MarkdownReportConfig {
@@ -68,11 +98,41 @@ write_functional_analysis_markdown(const MarkdownReportConfig &config) {
       csv_get_value(functional_csv_path, "min_eigenvalue");
   const std::string max_eigen =
       csv_get_value(functional_csv_path, "max_eigenvalue");
+  const std::string detected_structure =
+      csv_get_value(functional_csv_path, "detected_structure");
+  const std::string selected_backend =
+      csv_get_value(functional_csv_path, "selected_backend");
+  const std::string solver_recommendation =
+      csv_get_value(functional_csv_path, "solver_recommendation");
+  const std::string selected_bandwidth =
+      csv_get_value(functional_csv_path, "bandwidth");
+  const std::string expected_complexity =
+      csv_get_value(functional_csv_path, "expected_complexity");
+  const std::string symbolic_reuse =
+      csv_get_value(functional_csv_path, "supports_symbolic_reuse");
+  const std::string selection_reason =
+      csv_get_value(functional_csv_path, "selection_reason");
 
   const std::string largest_eigen_share =
       csv_get_value(functional_csv_path, "largest_eigen_share");
+  const std::string positive_eigen_count =
+      csv_get_value(functional_csv_path, "positive_eigen_count");
+  const std::string near_zero_eigen_count =
+      csv_get_value(functional_csv_path, "near_zero_eigen_count");
+  const std::string negative_eigen_count =
+      csv_get_value(functional_csv_path, "negative_eigen_count");
   const std::string effective_rank =
       csv_get_value(functional_csv_path, "effective_rank_entropy");
+  const std::string normalized_entropy =
+      csv_get_value(functional_csv_path, "normalized_spectral_entropy");
+  const std::string participation_ratio =
+      csv_get_value(functional_csv_path, "participation_ratio");
+  const std::string stable_rank =
+      csv_get_value(functional_csv_path, "stable_rank");
+  const std::string leading_gap =
+      csv_get_value(functional_csv_path, "leading_spectral_gap_ratio");
+  const std::vector<SpectralCsvRow> spectral_rows =
+      csv_get_spectral_rows(functional_csv_path);
   const std::string eigen_90 =
       csv_get_value(functional_csv_path, "eigen_count_for_90%");
   const std::string eigen_95 =
@@ -129,6 +189,8 @@ write_functional_analysis_markdown(const MarkdownReportConfig &config) {
      << "`, gradient norm = `" << grad_norm << "`.\n";
   md << "- **Curvature health:** positive definite = `" << pd
      << "`, condition number = `" << condition << "`.\n";
+  md << "- **Quadra factorization:** structure = `" << detected_structure
+     << "`, backend = `" << selected_backend << "`.\n";
   md << "- **Latent structure:** `" << random_effects
      << "` random effects were estimated.\n";
   md << "- **Symbolic vs numerical structure:** structural density = `"
@@ -185,14 +247,40 @@ write_functional_analysis_markdown(const MarkdownReportConfig &config) {
   md << "- Minimum eigenvalue: `" << min_eigen << "`\n";
   md << "- Maximum eigenvalue: `" << max_eigen << "`\n\n";
 
+  md << "## Quadra Backend Selection\n\n";
+  md << "| Quantity | Selection |\n";
+  md << "|---|---|\n";
+  md << "| Detected Hessian structure | `" << detected_structure << "` |\n";
+  md << "| Factorization backend | `" << selected_backend << "` |\n";
+  md << "| Random-effect solver | `" << solver_recommendation << "` |\n";
+  md << "| Bandwidth | `" << selected_bandwidth << "` |\n";
+  md << "| Expected complexity | `" << expected_complexity << "` |\n";
+  md << "| Symbolic reuse supported | `" << symbolic_reuse << "` |\n";
+  md << "| Selection reason | " << selection_reason << " |\n\n";
+
   md << "## Spectral Structure\n\n";
   md << "- Largest eigenvalue share: `" << largest_eigen_share << "`\n";
+  md << "- Hessian inertia (positive / near-zero / negative): `"
+     << positive_eigen_count << " / " << near_zero_eigen_count << " / "
+     << negative_eigen_count << "`\n";
   md << "- Entropy effective rank: `" << effective_rank << "`\n";
+  md << "- Normalized spectral entropy: `" << normalized_entropy << "`\n";
+  md << "- Participation ratio: `" << participation_ratio << "`\n";
+  md << "- Stable rank: `" << stable_rank << "`\n";
+  md << "- Leading spectral-gap ratio: `" << leading_gap << "`\n";
   md << "- Eigenvectors needed for 90% curvature: `" << eigen_90 << "`\n";
   md << "- Eigenvectors needed for 95% curvature: `" << eigen_95 << "`\n\n";
   md << "**Interpretation:** curvature is distributed across many latent-state "
         "directions rather than being dominated by one or two modes. That is a "
         "good sign for numerical stability.\n\n";
+  md << "### Full Eigenvalue Spectrum\n\n";
+  md << "| Rank | Eigenvalue | Cumulative curvature share |\n";
+  md << "|---:|---:|---:|\n";
+  for (const auto &row : spectral_rows) {
+    md << "| `" << row.rank << "` | `" << row.eigenvalue << "` | `"
+       << row.cumulative_share << "` |\n";
+  }
+  md << "\n";
 
   md << "## Effective Structure\n\n";
   md << "- Structural density: `" << density << "`\n";

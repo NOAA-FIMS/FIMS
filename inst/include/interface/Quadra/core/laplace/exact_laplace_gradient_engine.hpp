@@ -21,6 +21,10 @@ struct ExactLaplaceGradientEngineOptions {
   // If true, discover active directions at construction.
   // If false, all fixed-effect directions are treated active.
   bool discover_active_directions = true;
+
+  // Persistent Hdot tapes used by the public exact evaluator. Zero selects
+  // automatically from the active-direction count and hardware concurrency.
+  int hdot_workers = 0;
 };
 
 // Production-facing exact Laplace gradient engine.
@@ -99,31 +103,10 @@ private:
                const Eigen::VectorXd &discovery_theta,
                const Eigen::VectorXd &discovery_uhat,
                const ExactLaplaceGradientEngineOptions &options) {
-    if (options.discover_active_directions) {
-      return make_auto_replay_cached_laplace_gradient_context(
-          combined_objective, theta_dim, random_dim, pattern, discovery_theta,
-          discovery_uhat, options.active_direction_discovery_tol,
-          options.hdot_drop_tol);
-    }
-
-    // If discovery is disabled, conservatively mark all directions active.
-    std::vector<int> all_active;
-    all_active.reserve(static_cast<size_t>(theta_dim));
-    for (int j = 0; j < theta_dim; ++j) {
-      all_active.push_back(j);
-    }
-
-    // Reuse the same context implementation by setting discovery tolerance
-    // to zero and using a fake discovery point. Since the current context
-    // discovers internally, this conservative branch is reserved for future
-    // extension. For now, falling back to discovery is safer than carrying
-    // duplicate context logic.
-    //
-    // This preserves API compatibility while avoiding silent incorrectness.
     return make_auto_replay_cached_laplace_gradient_context(
         combined_objective, theta_dim, random_dim, pattern, discovery_theta,
         discovery_uhat, options.active_direction_discovery_tol,
-        options.hdot_drop_tol);
+        options.hdot_drop_tol, options.discover_active_directions);
   }
 };
 

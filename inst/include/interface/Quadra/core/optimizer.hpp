@@ -556,8 +556,7 @@ template <typename Model>
 OptResult
 optimize_lbfgs(Model &model, ParameterVector &params,
                const LaplaceOptions &options = default_laplace_options(),
-               int max_iterations = 100,
-               double gradient_tolerance = 1.0e-4) {
+               int max_iterations = 100, double gradient_tolerance = 1.0e-4) {
   using namespace LBFGSpp;
   using namespace Eigen;
 
@@ -630,8 +629,7 @@ optimize_lbfgs(Model &model, ParameterVector &params,
                 << quadra_final_fixed_grad_norm << std::endl;
       std::cout << "  requested gradient tolerance: " << std::scientific
                 << param.epsilon << std::defaultfloat << std::endl;
-      std::cout << "  configured max-iteration field: "
-                << param.max_iterations
+      std::cout << "  configured max-iteration field: " << param.max_iterations
                 << " (LBFGSpp max_iterations)" << std::endl;
       std::cout << "  requested tolerance met: "
                 << (quadra_requested_tol_met ? "yes" : "no") << std::endl;

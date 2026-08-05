@@ -9,10 +9,10 @@
 #include <Eigen/Sparse>
 #include <Eigen/SparseCholesky>
 
+#include "../autodiff/laplace_graph_plan.hpp"
 #include "laplace_objective.hpp"
 #include "random_effect_hessian.hpp"
 #include "sparse_factorization_cache.hpp"
-#include "../autodiff/laplace_graph_plan.hpp"
 
 namespace quadra {
 

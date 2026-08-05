@@ -3,6 +3,7 @@
 
 #include <Eigen/Dense>
 
+#include <algorithm>
 #include <cmath>
 #include <limits>
 #include <string>
@@ -14,8 +15,13 @@ struct FixedEffectCovarianceResult {
   Eigen::MatrixXd hessian_m;
   Eigen::MatrixXd covariance_m;
   Eigen::MatrixXd correlation_m;
+  Eigen::VectorXd eigenvalues_m;
+  Eigen::VectorXd steps_m;
 
   bool success_m = false;
+  bool positive_definite_m = false;
+  double condition_number_m = std::numeric_limits<double>::infinity();
+  double eigenvalue_threshold_m = std::numeric_limits<double>::quiet_NaN();
   std::string message_m;
 };
 
@@ -50,6 +56,88 @@ covariance_to_correlation(const Eigen::MatrixXd &covariance) {
   }
 
   return correlation;
+}
+
+template <typename Gradient>
+FixedEffectCovarianceResult estimate_fixed_effect_covariance_from_gradient(
+    Gradient &gradient, const std::vector<double> &theta_hat,
+    double relative_step = std::cbrt(std::numeric_limits<double>::epsilon()),
+    double eigen_tolerance =
+        std::sqrt(std::numeric_limits<double>::epsilon())) {
+  FixedEffectCovarianceResult result;
+  const Eigen::Index n = static_cast<Eigen::Index>(theta_hat.size());
+  result.hessian_m = Eigen::MatrixXd::Zero(n, n);
+  result.covariance_m = Eigen::MatrixXd::Zero(n, n);
+  result.correlation_m = Eigen::MatrixXd::Zero(n, n);
+  result.steps_m = Eigen::VectorXd::Zero(n);
+
+  if (n == 0 || !(relative_step > 0.0) || !std::isfinite(relative_step)) {
+    result.message_m = "Invalid fixed effects or finite-difference step.";
+    return result;
+  }
+
+  for (Eigen::Index j = 0; j < n; ++j) {
+    double step = relative_step * std::max(1.0, std::abs(theta_hat[j]));
+    std::vector<double> plus = theta_hat;
+    std::vector<double> minus = theta_hat;
+    plus[static_cast<size_t>(j)] += step;
+    minus[static_cast<size_t>(j)] -= step;
+    std::vector<double> gradient_plus = gradient(plus);
+    std::vector<double> gradient_minus = gradient(minus);
+    if (gradient_plus.size() != static_cast<size_t>(n) ||
+        gradient_minus.size() != static_cast<size_t>(n)) {
+      result.message_m = "Gradient dimension does not match fixed effects.";
+      return result;
+    }
+    for (Eigen::Index i = 0; i < n; ++i) {
+      if (!std::isfinite(gradient_plus[static_cast<size_t>(i)]) ||
+          !std::isfinite(gradient_minus[static_cast<size_t>(i)])) {
+        result.message_m =
+            "Gradient became non-finite while estimating the Hessian.";
+        return result;
+      }
+      result.hessian_m(i, j) = (gradient_plus[static_cast<size_t>(i)] -
+                                gradient_minus[static_cast<size_t>(i)]) /
+                               (2.0 * step);
+    }
+    result.steps_m[j] = step;
+  }
+
+  result.hessian_m = 0.5 * (result.hessian_m + result.hessian_m.transpose());
+  Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> eigen(result.hessian_m);
+  if (eigen.info() != Eigen::Success) {
+    result.message_m = "Eigendecomposition of fixed Hessian failed.";
+    return result;
+  }
+  result.eigenvalues_m = eigen.eigenvalues();
+  const double scale =
+      std::max(1.0, result.eigenvalues_m.cwiseAbs().maxCoeff());
+  result.eigenvalue_threshold_m = eigen_tolerance * scale;
+  result.positive_definite_m =
+      result.eigenvalues_m.minCoeff() > result.eigenvalue_threshold_m;
+  if (!result.positive_definite_m) {
+    result.message_m = "Fixed-effect Hessian is not positive definite.";
+    return result;
+  }
+  result.condition_number_m =
+      result.eigenvalues_m.maxCoeff() / result.eigenvalues_m.minCoeff();
+
+  Eigen::LLT<Eigen::MatrixXd> llt(result.hessian_m);
+  if (llt.info() != Eigen::Success) {
+    result.message_m = "Cholesky factorization of fixed Hessian failed.";
+    return result;
+  }
+  result.covariance_m = llt.solve(Eigen::MatrixXd::Identity(n, n));
+  result.covariance_m =
+      0.5 * (result.covariance_m + result.covariance_m.transpose());
+  if (!matrix_all_finite(result.covariance_m)) {
+    result.message_m = "Estimated covariance contains non-finite values.";
+    return result;
+  }
+  result.correlation_m = covariance_to_correlation(result.covariance_m);
+  result.success_m = true;
+  result.message_m = "Fixed-effect covariance estimated from exact gradients.";
+  return result;
 }
 
 template <typename Objective>

@@ -139,6 +139,21 @@ struct ADScope {
     had::PropagateAdjoint();
   }
 
+  void backward_first_order(const had::AReal &loss) {
+    had::ZeroAdjoints(graph);
+    had::SetAdjoint(loss, 1.0);
+    for (had::VertexId id =
+             static_cast<had::VertexId>(graph.vertices.size() - 1);
+         id > 0; --id) {
+      had::ADVertex &vertex = graph.vertices[id];
+      const had::Real adjoint = vertex.w;
+      if (vertex.e1.to != id)
+        graph.vertices[vertex.e1.to].w += adjoint * vertex.e1.w;
+      if (vertex.e2.to != id)
+        graph.vertices[vertex.e2.to].w += adjoint * vertex.e2.w;
+    }
+  }
+
   double grad(const had::AReal &x) const { return had::GetAdjoint(x); }
 
   double hess(const had::AReal &x, const had::AReal &y) const {

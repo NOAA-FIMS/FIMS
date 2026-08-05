@@ -33,7 +33,16 @@ public:
     values_.assign(n_directions_ * n_slots_, 0.0);
   }
 
-  void Clear() { std::fill(values_.begin(), values_.end(), 0.0); }
+  void Clear() {
+#if defined(QUADRA_ENABLE_SIMD) && defined(__clang__)
+#pragma clang loop vectorize(enable) interleave(enable)
+#elif defined(QUADRA_ENABLE_SIMD) && defined(__GNUC__)
+#pragma GCC ivdep
+#endif
+    for (std::size_t i = 0; i < values_.size(); ++i) {
+      values_[i] = 0.0;
+    }
+  }
 
   void EnsureSlotsPreserve(std::size_t n_slots) {
     if (n_slots <= n_slots_) {

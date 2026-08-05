@@ -47,6 +47,9 @@ ad_delta_method_vector(Functor &&f, const std::vector<double> &theta_hat,
   try {
     had::ADGraph graph;
     had::g_ADGraph = &graph;
+    struct GraphReset {
+      ~GraphReset() { had::g_ADGraph = nullptr; }
+    } graph_reset;
 
     std::vector<quadra::AD> theta_ad;
     theta_ad.reserve(theta_hat.size());

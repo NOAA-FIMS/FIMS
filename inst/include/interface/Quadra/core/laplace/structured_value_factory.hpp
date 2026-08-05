@@ -238,11 +238,8 @@ update_structured_values_from_hessian(StructuredValues &values,
 
   case LaplaceBackendKind::SparseLDLT:
   case LaplaceBackendKind::DenseLDLT:
-    if (!std::holds_alternative<SparseMatrixValues>(values)) {
-      values = SparseMatrixValues();
-    }
-    std::get<SparseMatrixValues>(values).H = H;
-    return;
+    throw std::invalid_argument(
+        "Native structured value update does not accept generic matrices");
   }
 
   throw std::invalid_argument("Unknown backend recommendation");

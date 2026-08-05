@@ -51,7 +51,6 @@ public:
   ExactGradientWorkspace(ExactGradientWorkspace &&) = delete;
   ExactGradientWorkspace &operator=(ExactGradientWorkspace &&) = delete;
 
-
   template <class Builder>
   had::AReal Build(Builder &&builder, std::vector<had::AReal> *fixed_effects,
                    std::vector<had::AReal> *random_effects) {

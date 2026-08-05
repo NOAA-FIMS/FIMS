@@ -17,5 +17,8 @@ ifdef R_INSTALL_PKG
   PKG_LIBS = -flto=auto
   PKG_STRIP = $(STRIP) --strip-debug
 endif
-CXX17STD = -std=c++17
+# R's platform CXX17FLAGS otherwise append -O2 after package flags, making
+# PKG_CXXFLAGS=-O3 ineffective. Override the language-specific flags so the
+# final optimization option on every C++17 compile is unambiguously -O3.
+override CXX17FLAGS = -O3
 USE_CXX17 = "yes"

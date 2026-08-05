@@ -1,11 +1,13 @@
 #pragma once
 
+#include "sparse_factorization_cache.hpp"
 #include "structure_detector.hpp"
 #include "structured_logdet.hpp"
 #include "structured_value_factory.hpp"
 
 #include <Eigen/Sparse>
 
+#include <cmath>
 #include <stdexcept>
 
 namespace quadra {
@@ -17,25 +19,49 @@ struct PersistentStructuredRuntimeState {
   BackendRecommendation recommendation;
   StructuredValues values;
   StructuredLogDetResult last_logdet;
+  BandedLDLTWorkspace banded_workspace;
+  ::quadra::SparseLDLTFactorizationCache sparse_ldlt_workspace;
+
+  double compute_logdet() {
+    if (std::holds_alternative<BandedValues>(values)) {
+      return logdet_banded_values_ldlt(std::get<BandedValues>(values),
+                                       banded_workspace);
+    }
+    if (std::holds_alternative<SparseMatrixValues>(values) &&
+        recommendation.backend == LaplaceBackendKind::SparseLDLT) {
+      sparse_ldlt_workspace.factorize(std::get<SparseMatrixValues>(values).H);
+      return sparse_ldlt_workspace.logdet();
+    }
+    return logdet_structured_values(values);
+  }
 
   void clear() {
     initialized = false;
     recommendation = BackendRecommendation();
     values = DiagonalValues();
     last_logdet = StructuredLogDetResult();
+    banded_workspace.clear();
+    sparse_ldlt_workspace.reset();
   }
 
   void update_from_hessian(const Eigen::SparseMatrix<double> &H,
                            const BackendRecommendation &rec) {
     recommendation = rec;
-    update_structured_values_from_hessian(values, H, recommendation);
+    if (recommendation.backend == LaplaceBackendKind::SparseLDLT ||
+        recommendation.backend == LaplaceBackendKind::DenseLDLT) {
+      if (!std::holds_alternative<SparseMatrixValues>(values))
+        values = SparseMatrixValues();
+      std::get<SparseMatrixValues>(values).H = H;
+    } else {
+      update_structured_values_from_hessian(values, H, recommendation);
+    }
 
     last_logdet.structure = recommendation.structure;
     last_logdet.backend = recommendation.backend;
     last_logdet.bandwidth = recommendation.bandwidth;
     last_logdet.rows = static_cast<int>(H.rows());
     last_logdet.nnz = static_cast<int>(H.nonZeros());
-    last_logdet.logdet = logdet_structured_values(values);
+    last_logdet.logdet = compute_logdet();
 
     initialized = true;
   }
@@ -53,14 +79,21 @@ struct PersistentStructuredRuntimeState {
                                "values_only used before initialization");
     }
 
-    values = extract_structured_values(H, recommendation);
+    if (recommendation.backend == LaplaceBackendKind::SparseLDLT ||
+        recommendation.backend == LaplaceBackendKind::DenseLDLT) {
+      if (!std::holds_alternative<SparseMatrixValues>(values))
+        values = SparseMatrixValues();
+      std::get<SparseMatrixValues>(values).H = H;
+    } else {
+      update_structured_values_from_hessian(values, H, recommendation);
+    }
 
     last_logdet.structure = recommendation.structure;
     last_logdet.backend = recommendation.backend;
     last_logdet.bandwidth = recommendation.bandwidth;
     last_logdet.rows = static_cast<int>(H.rows());
     last_logdet.nnz = static_cast<int>(H.nonZeros());
-    last_logdet.logdet = logdet_structured_values(values);
+    last_logdet.logdet = compute_logdet();
   }
 
   void update_direct(const DiagonalValues &new_values) {
@@ -134,7 +167,7 @@ struct PersistentStructuredRuntimeState {
     last_logdet.bandwidth = recommendation.bandwidth;
     last_logdet.rows = static_cast<int>(new_values.diag.size());
     last_logdet.nnz = static_cast<int>(new_values.diag.size());
-    last_logdet.logdet = logdet_structured_values(values);
+    last_logdet.logdet = compute_logdet();
 
     initialized = true;
   }
@@ -150,7 +183,7 @@ struct PersistentStructuredRuntimeState {
     last_logdet.rows = static_cast<int>(new_values.diag.size());
     last_logdet.nnz = static_cast<int>(new_values.diag.size()) +
                       2 * static_cast<int>(new_values.offdiag.size());
-    last_logdet.logdet = logdet_structured_values(values);
+    last_logdet.logdet = compute_logdet();
 
     initialized = true;
   }
@@ -171,7 +204,7 @@ struct PersistentStructuredRuntimeState {
     last_logdet.rows = static_cast<int>(new_values.diag.size());
     last_logdet.nnz =
         static_cast<int>(new_values.diag.size()) + 2 * offdiag_nnz;
-    last_logdet.logdet = logdet_structured_values(values);
+    last_logdet.logdet = compute_logdet();
 
     initialized = true;
   }
@@ -224,7 +257,7 @@ public:
     PersistentStructuredLaplaceResult out;
     out.initialized_before_call = state_.initialized;
 
-    if (!state_.initialized) {
+    if (!state_.initialized || !current_backend_supports(H)) {
       state_.update_from_hessian(H, options_);
       out.detected_structure = true;
     } else {
@@ -250,6 +283,41 @@ public:
   const StructureDetectorOptions &options() const { return options_; }
 
 private:
+  bool current_backend_supports(const Eigen::SparseMatrix<double> &H) const {
+    const BackendRecommendation &rec = state_.recommendation;
+    if (H.rows() != rec.random_size || H.cols() != rec.random_size) {
+      return false;
+    }
+
+    int supported_bandwidth = -1;
+    switch (rec.backend) {
+    case LaplaceBackendKind::Diagonal:
+      supported_bandwidth = 0;
+      break;
+    case LaplaceBackendKind::Tridiagonal:
+      supported_bandwidth = 1;
+      break;
+    case LaplaceBackendKind::Banded:
+      supported_bandwidth = rec.bandwidth;
+      break;
+    case LaplaceBackendKind::SparseLDLT:
+    case LaplaceBackendKind::DenseLDLT:
+      return true;
+    }
+
+    const double zero_tol = options_.structure_options.zero_tol;
+    for (int outer = 0; outer < H.outerSize(); ++outer) {
+      for (Eigen::SparseMatrix<double>::InnerIterator entry(H, outer); entry;
+           ++entry) {
+        if (std::abs(entry.value()) > zero_tol &&
+            std::abs(entry.row() - entry.col()) > supported_bandwidth) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
   StructureDetectorOptions options_;
   PersistentStructuredRuntimeState state_;
 };

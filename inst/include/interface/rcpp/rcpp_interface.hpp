@@ -33,6 +33,10 @@
 #include "../Quadra/core/autodiff/compact_first_order_tape.hpp"
 #include "../Quadra/core/diagnostics/functional_analysis.hpp"
 #include "../Quadra/core/laplace/functional_analysis_report.hpp"
+#include "../Quadra/include/quadra/stats/laplace.hpp"
+
+/** Reconstruct all Quadra-typed FIMS objects on the currently active graph. */
+bool RebuildQuadraModelOnActiveGraph();
 
 namespace fims_quadra
 {
@@ -138,11 +142,21 @@ namespace fims_quadra
 
     std::shared_ptr<fims_info::Information<QUADRA_FIMS_TYPE>> info_m;
     std::vector<ScalarSnapshot> scalars_m;
+    had::ADGraph *bound_graph_m = nullptr;
 
     explicit FIMSLaplaceModelAdapter(
-        std::shared_ptr<fims_info::Information<QUADRA_FIMS_TYPE>> info)
+        std::shared_ptr<fims_info::Information<QUADRA_FIMS_TYPE>> info,
+        bool rebuild_on_first_evaluation = false)
         : info_m(std::move(info))
     {
+      bound_graph_m = rebuild_on_first_evaluation ? nullptr : had::g_ADGraph;
+      if (!rebuild_on_first_evaluation)
+        refresh_scalars();
+    }
+
+    void refresh_scalars()
+    {
+      scalars_m.clear();
       std::unordered_set<QUADRA_FIMS_TYPE *> seen;
       for (auto &entry : info_m->variable_map)
       {
@@ -164,28 +178,50 @@ namespace fims_quadra
     Type evaluate(const std::vector<Type> &parameters,
                   quadra::ModelReportContext &)
     {
-      static_assert(std::is_same_v<Type, QUADRA_FIMS_TYPE>,
-                    "FIMS Quadra adapter requires Quadra AD scalars");
+      static_assert(std::is_same_v<Type, double> ||
+                        std::is_same_v<Type, QUADRA_FIMS_TYPE>,
+                    "FIMS Quadra adapter supports double and Quadra AD");
+      if (bound_graph_m != had::g_ADGraph)
+      {
+        if (!RebuildQuadraModelOnActiveGraph())
+          throw std::runtime_error(
+              "Unable to rebuild the Quadra FIMS model on the active tape");
+        info_m = fims_info::Information<QUADRA_FIMS_TYPE>::GetInstance();
+        bound_graph_m = had::g_ADGraph;
+        refresh_scalars();
+      }
       const size_t expected = info_m->fixed_effects_parameters.size() +
                               info_m->random_effects_parameters.size();
       if (parameters.size() != expected)
       {
         throw std::invalid_argument("FIMS Quadra parameter length mismatch");
       }
-      for (const auto &snapshot : scalars_m)
+      // FIMS currently owns a Quadra-AD specialization of the model. For a
+      // primal-only request, evaluate that specialization on a disposable
+      // graph and return its value; never append report evaluation vertices to
+      // the reusable derivative tape owned by Quadra's Laplace evaluator.
+      auto assign_parameters = [&]() {
+        for (const auto &snapshot : scalars_m)
+          *snapshot.scalar_m = QUADRA_FIMS_TYPE(snapshot.value_m);
+        size_t index = 0;
+        for (auto *parameter : info_m->fixed_effects_parameters)
+          *parameter = QUADRA_FIMS_TYPE(parameters[index++]);
+        for (auto *parameter : info_m->random_effects_parameters)
+          *parameter = QUADRA_FIMS_TYPE(parameters[index++]);
+      };
+      if constexpr (std::is_same_v<Type, double>)
       {
-        *snapshot.scalar_m = Type(snapshot.value_m);
+        // ADGraph restores the previously active tape when it leaves scope.
+        had::ADGraph primal_graph;
+        assign_parameters();
+        return quadra::value_of(
+            fims_model::Model<QUADRA_FIMS_TYPE>::GetInstance()->Evaluate());
       }
-      size_t index = 0;
-      for (auto *parameter : info_m->fixed_effects_parameters)
+      else
       {
-        *parameter = parameters[index++];
+        assign_parameters();
+        return fims_model::Model<QUADRA_FIMS_TYPE>::GetInstance()->Evaluate();
       }
-      for (auto *parameter : info_m->random_effects_parameters)
-      {
-        *parameter = parameters[index++];
-      }
-      return fims_model::Model<QUADRA_FIMS_TYPE>::GetInstance()->Evaluate();
     }
 
     template <typename Type>
@@ -600,12 +636,11 @@ bool CreateTMBModel()
  * @return True when the Quadra model was successfully constructed.
  */
 
-bool CreateQuadraModel()
+bool RebuildQuadraModelOnActiveGraph()
 {
   bool valid = true;
 #ifdef QUADRA_MODEL
   init_logging();
-  fims_quadra::reset_tape();
 
   std::shared_ptr<fims_info::Information<QUADRA_FIMS_TYPE>> info =
       fims_info::Information<QUADRA_FIMS_TYPE>::GetInstance();
@@ -623,6 +658,12 @@ bool CreateQuadraModel()
 #endif
 
   return valid;
+}
+
+bool CreateQuadraModel()
+{
+  fims_quadra::reset_tape();
+  return RebuildQuadraModelOnActiveGraph();
 }
 
 /**
@@ -1000,18 +1041,9 @@ Rcpp::List fit_fims_quadra_joint(Rcpp::NumericVector fixed_values,
 Rcpp::List EvaluateQuadraLaplaceModel(Rcpp::NumericVector fixed_values,
                                       Rcpp::NumericVector random_values)
 {
-  if (!CreateQuadraModel())
-  {
-    Rcpp::stop("Unable to construct the Quadra FIMS model.");
-  }
   auto info = fims_info::Information<QUADRA_FIMS_TYPE>::GetInstance();
   std::vector<double> theta(fixed_values.begin(), fixed_values.end());
   std::vector<double> random(random_values.begin(), random_values.end());
-  if (theta.size() != info->fixed_effects_parameters.size() ||
-      random.size() != info->random_effects_parameters.size())
-  {
-    Rcpp::stop("Quadra parameter count does not match the FIMS model.");
-  }
   quadra::ParameterPartition partition;
   partition.fixed_indices_m.resize(theta.size());
   std::iota(partition.fixed_indices_m.begin(),
@@ -1019,21 +1051,34 @@ Rcpp::List EvaluateQuadraLaplaceModel(Rcpp::NumericVector fixed_values,
   partition.random_indices_m.resize(random.size());
   std::iota(partition.random_indices_m.begin(),
             partition.random_indices_m.end(), theta.size());
-  fims_quadra::FIMSLaplaceModelAdapter model(info);
+  // Record FIMS directly on the reusable Laplace graph. Constructing a
+  // process-wide model first would create and immediately discard a duplicate
+  // graph containing the same model.
+  fims_quadra::FIMSLaplaceModelAdapter model(info, true);
   quadra::LaplaceObjectiveOptions options;
   options.newton_m.max_iterations_m = 50;
   options.newton_m.gradient_tolerance_m = 1e-8;
   // Near the random-effect mode the Armijo decrease can fall below double
   // precision before the unscaled gradient reaches its absolute tolerance.
   options.newton_m.step_tolerance_m = 1e-6;
+  // The FIMS model is rebuilt on the evaluator's active graph, so its topology
+  // is fixed for the lifetime of this tape. Avoid direct-value validation and
+  // report collection, both of which would rebuild the full model on temporary
+  // graphs and dominate this small dense problem.
+  options.validate_reusable_tape_m = false;
+  options.collect_reports_m = false;
+  options.compute_mixed_derivatives_m = false;
   const auto start = std::chrono::steady_clock::now();
-  auto result = quadra::evaluate_laplace_objective(
-      model, theta, random, partition, options);
+  // Use Quadra's public, stateful statistical Laplace surface. In addition to
+  // selecting the structured factorization backend, this routes evaluations
+  // through the reusable random-effect tape used by the RESparsity work.
+  quadra::stats::LaplaceEvaluator<fims_quadra::FIMSLaplaceModelAdapter>
+      evaluator(model, random, partition, options);
+  auto result = evaluator.evaluate(theta);
   const double elapsed_seconds = std::chrono::duration<double>(
                                      std::chrono::steady_clock::now() - start)
                                      .count();
-  quadra::laplace::StructureDetector detector;
-  const auto backend = detector.Analyze(result.hessian_random_m);
+  const auto &backend = result.backend_m;
   return Rcpp::List::create(
       Rcpp::Named("objective") = result.laplace_objective_m,
       Rcpp::Named("joint_objective") = result.joint_objective_m,
@@ -1045,6 +1090,8 @@ Rcpp::List EvaluateQuadraLaplaceModel(Rcpp::NumericVector fixed_values,
       Rcpp::Named("converged") = result.converged_m,
       Rcpp::Named("message") = result.message_m,
       Rcpp::Named("logdet_ok") = result.logdet_ok_m,
+      Rcpp::Named("tape_rebuilt") = result.tape_rebuilt_m,
+      Rcpp::Named("tape_rebuild_count") = evaluator.tape_rebuild_count(),
       Rcpp::Named("elapsed_seconds") = elapsed_seconds,
       Rcpp::Named("factorization") = Rcpp::List::create(
           Rcpp::Named("backend") = quadra::laplace::ToString(backend.backend),
@@ -1680,6 +1727,10 @@ Rcpp::List fit_fims_quadra_finite_difference(
   options.gradient_m.use_central_difference_m = true;
   options.gradient_m.objective_m.newton_m.max_iterations_m = 50;
   options.gradient_m.objective_m.newton_m.gradient_tolerance_m = 1e-8;
+  // FIMS random modes can reach a numerically stationary step before their
+  // unscaled gradient reaches 1e-8. Match EvaluateQuadraLaplaceModel so
+  // finite-difference perturbations are accepted consistently.
+  options.gradient_m.objective_m.newton_m.step_tolerance_m = 1e-6;
 
   const auto start = std::chrono::steady_clock::now();
   quadra::LaplaceLBFGSResult result =
@@ -1836,6 +1887,7 @@ Rcpp::List fit_fims_quadra(Rcpp::NumericVector fixed_values,
               objective.pattern_relative_tolerance_m,
           Rcpp::Named("pattern_reused") = objective.evaluations_m > 1));
 }
+
 #endif
 
 /* Dictionary block for shared documentation.

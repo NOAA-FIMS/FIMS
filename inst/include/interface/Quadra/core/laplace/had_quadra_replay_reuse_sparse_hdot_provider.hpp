@@ -18,24 +18,15 @@ namespace laplace {
 // Reset graph state needed before each directional reverse sweep while keeping
 // the already-replayed graph topology and objective variable alive.
 inline void reset_had_quadra_directional_reverse_state(had::ADGraph &graph) {
+  graph.EnsureScalarDirectionalStorage();
   // Zero first-order adjoints and directional first-order adjoints.
-  for (auto &v : graph.vertices) {
-    v.w = had::Real(0.0);
-    v.wDot = had::Real(0.0);
+  for (size_t i = 0; i < graph.vertices.size(); ++i) {
+    graph.vertices[i].w = had::Real(0.0);
+    graph.scalarDirectional[i].wDot = had::Real(0.0);
   }
-
-  // Clear Hessian and directional-Hessian accumulators. PropagateAdjoint-
-  // Directional also clears/resizes these, but doing it explicitly here makes
-  // the reuse contract clear and robust across future had_quadra changes.
-  for (auto &e : graph.soEdges) {
-    e.Clear();
-  }
-  for (auto &e : graph.soEdgesDot) {
-    e.Clear();
-  }
-
-  graph.selfSoEdges.assign(graph.vertices.size(), had::Real(0.0));
-  graph.selfSoEdgesDot.assign(graph.vertices.size(), had::Real(0.0));
+  // PropagateAdjointDirectional owns the Hessian-tree reset. Clearing those
+  // potentially large sparse trees here as well would duplicate a full pass
+  // for every fixed-effect direction.
 }
 
 // Set primal tangent direction on both AReal handles and graph vertices.
@@ -55,55 +46,57 @@ inline void seed_had_quadra_direction(std::vector<had::AReal> &x,
   for (int k = 0; k < n; ++k) {
     const double d = (k == theta_index) ? 1.0 : 0.0;
     x[static_cast<size_t>(k)].dot = d;
-    graph.vertices[x[static_cast<size_t>(k)].varId].dot = d;
+    had::VertexDot(graph, x[static_cast<size_t>(k)].varId) = d;
   }
 }
 
 inline void retangent_had_quadra_graph(had::ADGraph &graph) {
   using had::OpCode;
   using had::Real;
+  graph.EnsureScalarDirectionalStorage();
 
   auto vertex_dot = [&](had::VertexId id) -> Real {
-    return graph.vertices[id].dot;
+    return graph.scalarDirectional[id].dot;
   };
 
   for (had::VertexId vid = 1;
        vid < static_cast<had::VertexId>(graph.vertices.size()); ++vid) {
     had::ADVertex &v = graph.vertices[vid];
+    had::ADScalarDirectionalVertex &directional = graph.scalarDirectional[vid];
 
     if (v.op == OpCode::Independent) {
       continue;
     }
 
-    v.e1.dw = Real(0.0);
-    v.e2.dw = Real(0.0);
-    v.soWDot = Real(0.0);
+    directional.e1Dw = Real(0.0);
+    directional.e2Dw = Real(0.0);
+    directional.soWDot = Real(0.0);
 
     const Real c = v.constant;
 
     switch (v.op) {
     case OpCode::Add: {
-      v.dot = vertex_dot(v.left) + vertex_dot(v.right);
+      directional.dot = vertex_dot(v.left) + vertex_dot(v.right);
       break;
     }
 
     case OpCode::AddConstant: {
-      v.dot = vertex_dot(v.left);
+      directional.dot = vertex_dot(v.left);
       break;
     }
 
     case OpCode::Subtract: {
-      v.dot = vertex_dot(v.left) - vertex_dot(v.right);
+      directional.dot = vertex_dot(v.left) - vertex_dot(v.right);
       break;
     }
 
     case OpCode::SubtractConstant: {
-      v.dot = vertex_dot(v.left);
+      directional.dot = vertex_dot(v.left);
       break;
     }
 
     case OpCode::ConstantSubtract: {
-      v.dot = -vertex_dot(v.left);
+      directional.dot = -vertex_dot(v.left);
       break;
     }
 
@@ -113,20 +106,19 @@ inline void retangent_had_quadra_graph(had::ADGraph &graph) {
       const Real ld = vertex_dot(v.left);
       const Real rd = vertex_dot(v.right);
 
-      v.dot = ld * rp + lp * rd;
-      v.e1.dw = rd;
-      v.e2.dw = ld;
-      v.soWDot = Real(0.0);
+      directional.dot = ld * rp + lp * rd;
+      directional.e1Dw = rd;
+      directional.e2Dw = ld;
       break;
     }
 
     case OpCode::MultiplyConstant: {
-      v.dot = c * vertex_dot(v.left);
+      directional.dot = c * vertex_dot(v.left);
       break;
     }
 
     case OpCode::DivideConstant: {
-      v.dot = vertex_dot(v.left) / c;
+      directional.dot = vertex_dot(v.left) / c;
       break;
     }
 
@@ -137,9 +129,9 @@ inline void retangent_had_quadra_graph(had::ADGraph &graph) {
       const Real f2 = Real(2.0) * c / (xp * xp * xp);
       const Real f3 = Real(-6.0) * c / (xp * xp * xp * xp);
 
-      v.dot = v.e1.w * xd;
-      v.e1.dw = f2 * xd;
-      v.soWDot = f3 * xd;
+      directional.dot = v.e1.w * xd;
+      directional.e1Dw = f2 * xd;
+      directional.soWDot = f3 * xd;
       break;
     }
 
@@ -149,10 +141,10 @@ inline void retangent_had_quadra_graph(had::ADGraph &graph) {
       const Real ad = vertex_dot(v.left);
       const Real bd = vertex_dot(v.right);
 
-      v.dot = (ad * b - a * bd) / (b * b);
-      v.e1.dw = -bd / (b * b);
-      v.e2.dw = -ad / (b * b) + Real(2.0) * a * bd / (b * b * b);
-      v.soWDot = Real(2.0) * bd / (b * b * b);
+      directional.dot = (ad * b - a * bd) / (b * b);
+      directional.e1Dw = -bd / (b * b);
+      directional.e2Dw = -ad / (b * b) + Real(2.0) * a * bd / (b * b * b);
+      directional.soWDot = Real(2.0) * bd / (b * b * b);
       break;
     }
 
@@ -160,9 +152,9 @@ inline void retangent_had_quadra_graph(had::ADGraph &graph) {
       const Real xd = vertex_dot(v.left);
       const Real fp = std::exp(graph.vertices[v.left].primal);
 
-      v.dot = fp * xd;
-      v.e1.dw = fp * xd;
-      v.soWDot = fp * xd;
+      directional.dot = fp * xd;
+      directional.e1Dw = fp * xd;
+      directional.soWDot = fp * xd;
       break;
     }
 
@@ -174,9 +166,9 @@ inline void retangent_had_quadra_graph(had::ADGraph &graph) {
       const Real f2 = -Real(1.0) / (xp * xp);
       const Real f3 = Real(2.0) / (xp * xp * xp);
 
-      v.dot = f1 * xd;
-      v.e1.dw = f2 * xd;
-      v.soWDot = f3 * xd;
+      directional.dot = f1 * xd;
+      directional.e1Dw = f2 * xd;
+      directional.soWDot = f3 * xd;
       break;
     }
 
@@ -189,14 +181,14 @@ inline void retangent_had_quadra_graph(had::ADGraph &graph) {
       const Real f2 = -Real(0.25) / (xp * sqrt_x);
       const Real f3 = Real(0.375) / (xp * xp * sqrt_x);
 
-      v.dot = f1 * xd;
-      v.e1.dw = f2 * xd;
-      v.soWDot = f3 * xd;
+      directional.dot = f1 * xd;
+      directional.e1Dw = f2 * xd;
+      directional.soWDot = f3 * xd;
       break;
     }
 
     case OpCode::Negate: {
-      v.dot = -vertex_dot(v.left);
+      directional.dot = -vertex_dot(v.left);
       break;
     }
 
@@ -275,13 +267,13 @@ public:
     for (int j = 0; j < theta_dim_; ++j) {
       x.emplace_back(theta[j]);
       x.back().dot = 0.0;
-      graph.vertices[x.back().varId].dot = 0.0;
+      had::VertexDot(graph, x.back().varId) = 0.0;
     }
 
     for (int i = 0; i < random_dim_; ++i) {
       x.emplace_back(uhat[i]);
       x.back().dot = 0.0;
-      graph.vertices[x.back().varId].dot = 0.0;
+      had::VertexDot(graph, x.back().varId) = 0.0;
     }
 
     // Replay objective once.

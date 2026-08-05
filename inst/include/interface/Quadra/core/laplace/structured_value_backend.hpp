@@ -33,6 +33,19 @@ struct BandedValues {
   std::vector<Eigen::VectorXd> lower_bands;
 };
 
+struct BandedLDLTWorkspace {
+  std::vector<double> factor;
+
+  void clear() {
+    factor.clear();
+    factor.shrink_to_fit();
+  }
+
+  std::size_t capacity_bytes() const {
+    return factor.capacity() * sizeof(double);
+  }
+};
+
 inline double logdet_diagonal_values(const DiagonalValues &H) {
   double logdet = 0.0;
   for (int i = 0; i < H.diag.size(); ++i) {
@@ -121,7 +134,8 @@ inline double logdet_sparse_matrix_values_ldlt(const SparseMatrixValues &H) {
   return logdet;
 }
 
-inline double logdet_banded_values_ldlt(const BandedValues &H) {
+inline double logdet_banded_values_ldlt(const BandedValues &H,
+                                        BandedLDLTWorkspace &workspace) {
   const int n = static_cast<int>(H.diag.size());
   if (n == 0)
     return 0.0;
@@ -146,7 +160,11 @@ inline double logdet_banded_values_ldlt(const BandedValues &H) {
 
   const int bw = std::min(H.bandwidth, std::max(0, n - 1));
   const int stride = bw + 1;
-  std::vector<double> work(static_cast<std::size_t>(n * stride), 0.0);
+  const std::size_t required =
+      static_cast<std::size_t>(n) * static_cast<std::size_t>(stride);
+  workspace.factor.resize(required);
+  std::fill(workspace.factor.begin(), workspace.factor.end(), 0.0);
+  std::vector<double> &work = workspace.factor;
 
   auto at = [&](const int i, const int j) -> double & {
     return work[static_cast<std::size_t>(i * stride + (i - j))];
@@ -201,6 +219,11 @@ inline double logdet_banded_values_ldlt(const BandedValues &H) {
   }
 
   return logdet;
+}
+
+inline double logdet_banded_values_ldlt(const BandedValues &H) {
+  BandedLDLTWorkspace workspace;
+  return logdet_banded_values_ldlt(H, workspace);
 }
 
 inline Eigen::SparseMatrix<double>

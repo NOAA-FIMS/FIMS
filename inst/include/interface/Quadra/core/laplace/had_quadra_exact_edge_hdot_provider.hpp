@@ -72,13 +72,13 @@ public:
       x.emplace_back(theta[j]);
       const double d = (j == theta_index) ? 1.0 : 0.0;
       x.back().dot = d;
-      graph.vertices[x.back().varId].dot = d;
+      had::VertexDot(graph, x.back().varId) = d;
     }
 
     for (int i = 0; i < random_dim_; ++i) {
       x.emplace_back(uhat[i]);
       x.back().dot = 0.0;
-      graph.vertices[x.back().varId].dot = 0.0;
+      had::VertexDot(graph, x.back().varId) = 0.0;
     }
 
     had::AReal y = combined_objective_(x);

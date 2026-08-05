@@ -5,5 +5,6 @@
 #include "io.hpp"
 #include "laplace.hpp"
 #include "model.hpp"
+#include "stats.hpp"
 
 #endif
