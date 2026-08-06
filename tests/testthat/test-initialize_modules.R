@@ -81,7 +81,7 @@ test_that("`initialize_fims()` works with edge cases", {
   missing_recruitment_distribution <- setup_default_parameters(data = data) |>
     dplyr::filter(module_name != "Recruitment") |>
     dplyr::bind_rows(
-      setup_default_recruitment(
+      setup_default_Recruitment(
         data = data,
         distribution = NA_character_
       )
@@ -182,7 +182,7 @@ test_that("`initialize_fims()` returns correct error messages", {
     missing_recruitment_distribution <- default_parameters |>
       dplyr::filter(module_name != "Recruitment") |>
       dplyr::bind_rows(
-        setup_default_recruitment(
+        setup_default_Recruitment(
           data = data,
           distribution = NA_character_,
         )

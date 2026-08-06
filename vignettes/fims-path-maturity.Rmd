@@ -65,7 +65,7 @@ data("data_big")
 fims_frame <- FIMSFrame(data_big)
 
 # Set up default maturity parameters
-default_parameters <- FIMS::setup_default_maturity(data = fims_frame)
+default_parameters <- FIMS::setup_default_Maturity(data = fims_frame)
 
 show(default_parameters)
 
@@ -108,7 +108,7 @@ To run a FIMS model, more modules than just a maturity module need to be linked 
 ```{r population,  class.source = "rchunk", eval = FALSE}
 # Initialize the population module and link the maturity module
 # The IDs of the growth and recruitment modules are pseudo code and don't exist
-recruitment_defaults <- FIMS::setup_default_recruitment(data = fims_frame)
+recruitment_defaults <- FIMS::setup_default_Recruitment(data = fims_frame)
 log_rzero <- recruitment_defaults |>
   dplyr::filter(.data[["label"]] == "log_rzero") |>
   dplyr::pull(.data[["value"]])
@@ -390,7 +390,7 @@ std::shared_ptr<fims_popdy::MaturityBase<Type>> maturity;
 The `maturity_id` was set from R using the `SetMaturity()` method from the `PopulationInterface` class, which as a reminder is done internally within `FIMS::initialize_population` but can also be done by hand with `SetMaturity`. Where both options are shown, again, below.
 ```{r,  class.source = "rchunk", eval = FALSE}
 # Helper function
-recruitment_defaults <- FIMS::setup_default_recruitment(data = fims_frame)
+recruitment_defaults <- FIMS::setup_default_Recruitment(data = fims_frame)
 log_m <- log(0.2)
 log_init_naa <- FIMS:::setup_default_log_init_naa(
   data = fims_frame,

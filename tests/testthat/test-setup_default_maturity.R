@@ -7,13 +7,13 @@
 #' one lines, that will be used in the bookdown report of the results from
 #' {testthat}. This line can be more than 80 characters.
 
-# setup_default_maturity ----
+# setup_default_Maturity ----
 ## Setup ----
 data <- FIMS::FIMSFrame(data_big)
 
 ## IO correctness ----
-test_that("`setup_default_maturity()` works with correct inputs", {
-  result <- setup_default_maturity(data = data)
+test_that("`setup_default_Maturity()` works with correct inputs", {
+  result <- setup_default_Maturity(data = data)
 
   #' @description Test that maturity defaults use logistic form and constant estimation.
   expect_s3_class(result, "tbl_df")
@@ -29,10 +29,10 @@ test_that("`setup_default_maturity()` works with correct inputs", {
 # No additional edge cases to test.
 
 ## Error handling ----
-test_that("`setup_default_maturity()` returns correct error messages", {
+test_that("`setup_default_Maturity()` returns correct error messages", {
   #' @description Test that invalid `data` class returns expected error.
   expect_error(
-    object = setup_default_maturity(data = "not_a_fimsframe"),
+    object = setup_default_Maturity(data = "not_a_fimsframe"),
     regexp = "FIMSFrame"
   )
 

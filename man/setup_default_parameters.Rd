@@ -2,17 +2,17 @@
 % Please edit documentation in R/setup_default_parameters.R
 \name{setup_default_parameters}
 \alias{setup_default_parameters}
-\alias{setup_default_growth}
+\alias{setup_default_Growth}
 \alias{setup_default_Population}
-\alias{setup_default_selectivity}
-\alias{setup_default_fleet}
-\alias{setup_default_maturity}
-\alias{setup_default_recruitment}
+\alias{setup_default_Selectivity}
+\alias{setup_default_Fleet}
+\alias{setup_default_Maturity}
+\alias{setup_default_Recruitment}
 \title{Set up default parameters for a FIMS model}
 \usage{
 setup_default_parameters(data)
 
-setup_default_growth(module_type = c("EWAA"))
+setup_default_Growth(module_type = c("EWAA"))
 
 setup_default_Population(
   data,
@@ -21,17 +21,17 @@ setup_default_Population(
   proportion_female = 0.5
 )
 
-setup_default_selectivity(
+setup_default_Selectivity(
   data,
   fleet,
   module_type = c("Logistic", "DoubleLogistic")
 )
 
-setup_default_fleet(data, fleet)
+setup_default_Fleet(data, fleet)
 
-setup_default_maturity(data, module_type = c("Logistic"))
+setup_default_Maturity(data, module_type = c("Logistic"))
 
-setup_default_recruitment(
+setup_default_Recruitment(
   data,
   module_type = c("BevertonHolt"),
   distribution = c("Dnorm", NA_character_)
@@ -140,7 +140,7 @@ You can modify the returned tibble before fitting a model (for example,
 updating maturity and selectivity parameter values).
 
 To create the default initial numbers at age, this function uses the defaults
-from \code{setup_default_Population()} and \code{setup_default_recruitment()}, which
+from \code{setup_default_Population()} and \code{setup_default_Recruitment()}, which
 are passed to \code{setup_default_init_naa()} to calculate initial numbers at age.
 
 The function creates a tibble of default population configurations, including
@@ -174,7 +174,7 @@ updated_parameters <- default_parameters |>
 parameters_with_double_logistic <- updated_parameters |>
   dplyr::filter(!(fleet == "fleet1" & module_name == "Selectivity")) |>
   dplyr::bind_rows(
-    setup_default_selectivity(
+    setup_default_Selectivity(
       data = fims_frame,
       fleet = "fleet1",
       module_type = "DoubleLogistic"
@@ -183,32 +183,32 @@ parameters_with_double_logistic <- updated_parameters |>
 }
 \dontrun{
 # Set up default growth parameters
-default_growth_parameters <- setup_default_growth()
+default_growth_parameters <- setup_default_Growth()
 }
 \dontrun{
 default_population_parameters <- setup_default_Population(data = FIMSFrame(data_big))
 }
 \dontrun{
-default_selectivity_parameters <- FIMS:::setup_default_selectivity(
+default_selectivity_parameters <- FIMS:::setup_default_Selectivity(
   data = FIMSFrame(data_big),
   fleet = "fleet1",
   module_type = "Logistic"
 )
 }
 \dontrun{
-default_fleet_parameters <- setup_default_fleet(
+default_fleet_parameters <- setup_default_Fleet(
   data = FIMSFrame(data_big),
   fleet = "fleet1"
 )
 }
 \dontrun{
-default_maturity_parameters <- setup_default_maturity(
+default_maturity_parameters <- setup_default_Maturity(
   data = FIMSFrame(data_big),
   module_type = "Logistic"
 )
 }
 \dontrun{
-default_recruitment_parameters <- setup_default_recruitment(
+default_recruitment_parameters <- setup_default_Recruitment(
   data = FIMSFrame(data_big),
   module_type = "BevertonHolt",
   distribution = "Dnorm"

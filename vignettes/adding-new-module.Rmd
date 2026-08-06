@@ -474,11 +474,11 @@ If you add a new module type that users should be able to request by default, up
 
 In the current code, top-level default parameter creation is routed through helpers such as:
 
-- `setup_default_fleet()`
-- `setup_default_selectivity()`
-- `setup_default_recruitment()`
-- `setup_default_maturity()`
-- `setup_default_growth()`
+- `setup_default_Fleet()`
+- `setup_default_Selectivity()`
+- `setup_default_Recruitment()`
+- `setup_default_Maturity()`
+- `setup_default_Growth()`
 - `setup_default_Population()`
 
 For a new selectivity or data-module option, you will often update an existing helper rather than add a brand new top-level function.

@@ -7,7 +7,7 @@
 #' one lines, that will be used in the bookdown report of the results from
 #' {testthat}. This line can be more than 80 characters.
 
-# setup_default_fleet ----
+# setup_default_Fleet ----
 ## Setup ----
 data <- FIMS::FIMSFrame(data_big)
 fleet <- get_data(data) |>
@@ -17,8 +17,8 @@ fleet <- get_data(data) |>
   dplyr::first()
 
 ## IO correctness ----
-test_that("`setup_default_fleet()` works with correct inputs", {
-  result <- setup_default_fleet(data = data, fleet = fleet)
+test_that("`setup_default_Fleet()` works with correct inputs", {
+  result <- setup_default_Fleet(data = data, fleet = fleet)
 
   #' @description Test that fleet defaults include both q and yearly Fmort labels.
   expect_s3_class(result, "tbl_df")
@@ -31,8 +31,8 @@ test_that("`setup_default_fleet()` works with correct inputs", {
 })
 
 ## Edge handling ----
-test_that("`setup_default_fleet()` works with edge cases", {
-  result <- setup_default_fleet(data = data, fleet = fleet)
+test_that("`setup_default_Fleet()` works with edge cases", {
+  result <- setup_default_Fleet(data = data, fleet = fleet)
 
   #' @description Test that fleet defaults contain no module_type values for fleet-level parameters.
   expect_true(all(is.na(result[["module_type"]])))
@@ -41,10 +41,10 @@ test_that("`setup_default_fleet()` works with edge cases", {
 })
 
 ## Error handling ----
-test_that("`setup_default_fleet()` returns correct error messages", {
+test_that("`setup_default_Fleet()` returns correct error messages", {
   #' @description Test that unknown fleet names return expected error.
   expect_error(
-    object = setup_default_fleet(data = data, fleet = "not_a_fleet"),
+    object = setup_default_Fleet(data = data, fleet = "not_a_fleet"),
     regexp = "Available fleet names"
   )
 

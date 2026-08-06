@@ -684,7 +684,7 @@ is.FIMSFrame <- function(x) {
 }
 
 # Validate fleet input and confirm it exists in the data.
-is.fleet.in.data <- function(data, fleet) {
+assert_presence_of_fleet <- function(data, fleet) {
   if (!is.character(fleet) || length(fleet) != 1 || is.na(fleet)) {
     cli::cli_abort(c(
       "x" = "{.var fleet} must be a single non-missing character string.",
