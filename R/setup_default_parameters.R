@@ -18,7 +18,7 @@
 #' updating maturity and selectivity parameter values).
 #'
 #' To create the default initial numbers at age, this function uses the defaults
-#' from `setup_default_Population()` and `setup_default_recruitment()`, which
+#' from `setup_default_Population()` and `setup_default_Recruitment()`, which
 #' are passed to `setup_default_init_naa()` to calculate initial numbers at age.
 #'
 #' @param data A `FIMSFrame` object returned from running [FIMSFrame()] on
@@ -82,7 +82,7 @@
 #' parameters_with_double_logistic <- updated_parameters |>
 #'   dplyr::filter(!(fleet == "fleet1" & module_name == "Selectivity")) |>
 #'   dplyr::bind_rows(
-#'     setup_default_selectivity(
+#'     setup_default_Selectivity(
 #'       data = fims_frame,
 #'       fleet = "fleet1",
 #'       module_type = "DoubleLogistic"
@@ -98,7 +98,7 @@ setup_default_parameters <- function(data) {
   fleet_defaults <- purrr::map_df(
     fleets,
     function(fleet_i) {
-      setup_default_fleet(
+      setup_default_Fleet(
         data = data,
         fleet = fleet_i
       )
@@ -109,7 +109,7 @@ setup_default_parameters <- function(data) {
   selectivity_defaults <- purrr::map(
     fleets,
     function(fleet_i) {
-      setup_default_selectivity(
+      setup_default_Selectivity(
         data = data,
         fleet = fleet_i
       )
@@ -118,13 +118,13 @@ setup_default_parameters <- function(data) {
     dplyr::bind_rows()
 
   # Create recruitment parameters
-  recruitment_defaults <- setup_default_recruitment(data = data)
+  recruitment_defaults <- setup_default_Recruitment(data = data)
 
   # Create maturity parameters
-  maturity_defaults <- setup_default_maturity(data = data)
+  maturity_defaults <- setup_default_Maturity(data = data)
 
   # Create growth parameters
-  growth_defaults <- setup_default_growth()
+  growth_defaults <- setup_default_Growth()
 
   population_defaults <- setup_default_Population(data = data)
   # Calculate initial numbers at age based on log_rzero and M_value
@@ -181,7 +181,7 @@ setup_default_parameters <- function(data) {
 #' data("data_big")
 #' fims_frame <- FIMSFrame(data_big)
 #' # Set up default recruitment parameters
-#' recruitment_defaults <- setup_default_recruitment(data = fims_frame)
+#' recruitment_defaults <- setup_default_Recruitment(data = fims_frame)
 #' # Extract log_rzero from recruitment defaults
 #' log_rzero <- recruitment_defaults |>
 #'   dplyr::filter(.data[["label"]] == "log_rzero") |>
@@ -251,9 +251,9 @@ setup_default_parameters_template <- function(n_parameters = 1) {
 #' @examples
 #' \dontrun{
 #' # Set up default growth parameters
-#' default_growth_parameters <- setup_default_growth()
+#' default_growth_parameters <- setup_default_Growth()
 #' }
-setup_default_growth <- function(
+setup_default_Growth <- function(
   module_type = c("EWAA")
 ) {
   # Input check
@@ -342,10 +342,9 @@ setup_default_Population <- function(
   # If log_init_naa is NA, print a message to the user and advise them to set it
   # using dplyr::rows_update() or dplyr::mutate() before running the model
   if (any(is.na(log_init_naa))) {
-    cli::cli_alert_info(c(
-      "i" = "The {.var log_init_naa} parameter is set to {.val NA}.",
-      "i" = "Please set the initial numbers at age using {.code dplyr::rows_update()} or {.code dplyr::mutate()} before running the model."
-    ))
+    cli::cli_alert_info(
+      "The {.var log_init_naa} parameter is set to {.val NA}.\nPlease set the initial numbers at age using {.code dplyr::rows_update()} or {.code dplyr::mutate()} before running the model."
+    )
   }
 
   # Create a list of default parameters
@@ -439,9 +438,9 @@ setup_default_DoubleLogistic <- function() {
 #' @param fleet A string specifying the name of the fleet for which selectivity
 #'   parameters are being created.
 #' @param module_type A string specifying the desired form of selectivity. Allowable
-#'   forms include `r toString(eval(formals(setup_default_selectivity)[["module_type"]]))`
+#'   forms include `r toString(eval(formals(setup_default_Selectivity)[["module_type"]]))`
 #'   and the default is
-#'   `r toString(eval(formals(setup_default_selectivity)[["module_type"]])[1])`.
+#'   `r toString(eval(formals(setup_default_Selectivity)[["module_type"]])[1])`.
 #' @inherit setup_default_parameters
 #' @return A tibble containing the default selectivity parameters. See \code{\link{setup_default_parameters}}
 #' for full column descriptions.
@@ -450,20 +449,20 @@ setup_default_DoubleLogistic <- function() {
 #' @keywords setup_default_parameters
 #' @examples
 #' \dontrun{
-#' default_selectivity_parameters <- FIMS:::setup_default_selectivity(
+#' default_selectivity_parameters <- FIMS:::setup_default_Selectivity(
 #'   data = FIMSFrame(data_big),
 #'   fleet = "fleet1",
 #'   module_type = "Logistic"
 #' )
 #' }
-setup_default_selectivity <- function(
+setup_default_Selectivity <- function(
   data,
   fleet,
   module_type = c("Logistic", "DoubleLogistic")
 ) {
   # Input checks
   is.FIMSFrame(data)
-  is.fleet.in.data(data, fleet)
+  assert_presence_of_fleet(data, fleet)
 
   module_type <- rlang::arg_match(module_type)
   # NOTE: All new forms of selectivity must be placed in the vector of default
@@ -498,18 +497,18 @@ setup_default_selectivity <- function(
 #' @keywords setup_default_parameters
 #' @examples
 #' \dontrun{
-#' default_fleet_parameters <- setup_default_fleet(
+#' default_fleet_parameters <- setup_default_Fleet(
 #'   data = FIMSFrame(data_big),
 #'   fleet = "fleet1"
 #' )
 #' }
-setup_default_fleet <- function(
+setup_default_Fleet <- function(
   data,
   fleet
 ) {
   # Input checks
   is.FIMSFrame(data)
-  is.fleet.in.data(data, fleet)
+  assert_presence_of_fleet(data, fleet)
 
   # Extract fleet's type
   fleet_types <- get_data(data) |>
@@ -556,7 +555,7 @@ setup_default_fleet <- function(
 #' This function sets up default parameters for a maturity module.
 #' @param data An S4 object. FIMS input data.
 #' @param module_type A string specifying the type of maturity module. The
-#'   available options are `r toString(eval(formals(setup_default_maturity)[["module_type"]]))`.
+#'   available options are `r toString(eval(formals(setup_default_Maturity)[["module_type"]]))`.
 #' @inherit setup_default_parameters
 #' @return
 #' A tibble containing default maturity parameters. See \code{\link{setup_default_parameters}}
@@ -566,12 +565,12 @@ setup_default_fleet <- function(
 #' @keywords setup_default_parameters
 #' @examples
 #' \dontrun{
-#' default_maturity_parameters <- setup_default_maturity(
+#' default_maturity_parameters <- setup_default_Maturity(
 #'   data = FIMSFrame(data_big),
 #'   module_type = "Logistic"
 #' )
 #' }
-setup_default_maturity <- function(
+setup_default_Maturity <- function(
   data,
   module_type = c("Logistic")
 ) {
@@ -771,10 +770,10 @@ setup_default_DlnormDistribution <- function(
 #'
 #' @param module_type A string specifying the type of recruitment model. The
 #'   available options are
-#'   `r toString(eval(formals(setup_default_recruitment)[["module_type"]]))`.
+#'   `r toString(eval(formals(setup_default_Recruitment)[["module_type"]]))`.
 #' @param distribution A string specifying the distribution for the recruitment process.
 #'   The available options are
-#'   `r toString(eval(formals(setup_default_recruitment)[["distribution"]]))`.
+#'   `r toString(eval(formals(setup_default_Recruitment)[["distribution"]]))`.
 #' @inherit setup_default_parameters
 #' @return
 #' A tibble containing default recruitment parameters. See \code{\link{setup_default_parameters}}
@@ -784,13 +783,13 @@ setup_default_DlnormDistribution <- function(
 #' @keywords setup_default_parameters
 #' @examples
 #' \dontrun{
-#' default_recruitment_parameters <- setup_default_recruitment(
+#' default_recruitment_parameters <- setup_default_Recruitment(
 #'   data = FIMSFrame(data_big),
 #'   module_type = "BevertonHolt",
 #'   distribution = "Dnorm"
 #' )
 #' }
-setup_default_recruitment <- function(
+setup_default_Recruitment <- function(
   data,
   module_type = c("BevertonHolt"),
   distribution = c("Dnorm", NA_character_)

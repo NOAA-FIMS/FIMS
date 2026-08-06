@@ -49,31 +49,31 @@ test_that("`setup_default_parameters()` works with correct inputs", {
 test_that("modular pipeline matches `setup_default_parameters()`", {
   fleet1_name <- "fleet1"
 
-  fleet1_selectivity_defaults <- setup_default_selectivity(
+  fleet1_selectivity_defaults <- setup_default_Selectivity(
     data = data,
     fleet = fleet1_name
   )
 
-  fleet1_fleet_defaults <- setup_default_fleet(
+  fleet1_fleet_defaults <- setup_default_Fleet(
     data = data,
     fleet = fleet1_name
   )
 
   survey1_name <- "survey1"
 
-  survey1_selectivity_defaults <- setup_default_selectivity(
+  survey1_selectivity_defaults <- setup_default_Selectivity(
     data = data,
     fleet = survey1_name
   )
 
-  survey1_fleet_defaults <- setup_default_fleet(
+  survey1_fleet_defaults <- setup_default_Fleet(
     data = data,
     fleet = survey1_name
   )
 
-  recruitment_defaults <- setup_default_recruitment(data = data)
-  maturity_defaults <- setup_default_maturity(data = data)
-  growth_defaults <- setup_default_growth()
+  recruitment_defaults <- setup_default_Recruitment(data = data)
+  maturity_defaults <- setup_default_Maturity(data = data)
+  growth_defaults <- setup_default_Growth()
 
   log_m <- log(0.2)
   log_rzero <- recruitment_defaults |>
@@ -123,7 +123,7 @@ test_that("modular pipeline with `purrr` matches `setup_default_parameters()`", 
   fleet_defaults <- purrr::map(
     fleets,
     function(fleet_i) {
-      setup_default_fleet(data = data, fleet = fleet_i)
+      setup_default_Fleet(data = data, fleet = fleet_i)
     }
   ) |>
     dplyr::bind_rows()
@@ -131,14 +131,14 @@ test_that("modular pipeline with `purrr` matches `setup_default_parameters()`", 
   selectivity_defaults <- purrr::map(
     fleets,
     function(fleet_i) {
-      setup_default_selectivity(data = data, fleet = fleet_i)
+      setup_default_Selectivity(data = data, fleet = fleet_i)
     }
   ) |>
     dplyr::bind_rows()
 
-  recruitment_defaults <- setup_default_recruitment(data = data)
-  maturity_defaults <- setup_default_maturity(data = data)
-  growth_defaults <- setup_default_growth()
+  recruitment_defaults <- setup_default_Recruitment(data = data)
+  maturity_defaults <- setup_default_Maturity(data = data)
+  growth_defaults <- setup_default_Growth()
 
   log_m <- log(0.2)
   log_rzero <- recruitment_defaults |>
@@ -187,7 +187,7 @@ test_that("modular pipeline with `purrr` matches `setup_default_parameters()`", 
 
 ## Edge handling ----
 test_that("`setup_default_parameters()` works with edge cases", {
-  recruitment_without_distribution <- setup_default_recruitment(
+  recruitment_without_distribution <- setup_default_Recruitment(
     data = data,
     distribution = NA_character_
   )

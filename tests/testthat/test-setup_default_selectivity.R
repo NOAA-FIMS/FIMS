@@ -7,7 +7,7 @@
 #' one lines, that will be used in the bookdown report of the results from
 #' {testthat}. This line can be more than 80 characters.
 
-# setup_default_selectivity ----
+# setup_default_Selectivity ----
 ## Setup ----
 data <- FIMS::FIMSFrame(data_big)
 fleet <- get_data(data) |>
@@ -17,8 +17,8 @@ fleet <- get_data(data) |>
   dplyr::first()
 
 ## IO correctness ----
-test_that("`setup_default_selectivity()` works with correct inputs", {
-  result <- setup_default_selectivity(data = data, fleet = fleet)
+test_that("`setup_default_Selectivity()` works with correct inputs", {
+  result <- setup_default_Selectivity(data = data, fleet = fleet)
 
   #' @description Test that default selectivity is logistic with two parameters.
   expect_s3_class(result, "tbl_df")
@@ -29,8 +29,8 @@ test_that("`setup_default_selectivity()` works with correct inputs", {
 })
 
 ## Edge handling ----
-test_that("`setup_default_selectivity()` works with edge cases", {
-  result <- setup_default_selectivity(
+test_that("`setup_default_Selectivity()` works with edge cases", {
+  result <- setup_default_Selectivity(
     data = data,
     fleet = fleet,
     module_type = "DoubleLogistic"
@@ -43,10 +43,10 @@ test_that("`setup_default_selectivity()` works with edge cases", {
 })
 
 ## Error handling ----
-test_that("`setup_default_selectivity()` returns correct error messages", {
+test_that("`setup_default_Selectivity()` returns correct error messages", {
   #' @description Test that unknown fleet names return expected error.
   expect_error(
-    object = setup_default_selectivity(data = data, fleet = "not_a_fleet"),
+    object = setup_default_Selectivity(data = data, fleet = "not_a_fleet"),
     regexp = "Available fleet names"
   )
 

@@ -7,13 +7,13 @@
 #' one lines, that will be used in the bookdown report of the results from
 #' {testthat}. This line can be more than 80 characters.
 
-# setup_default_recruitment ----
+# setup_default_Recruitment ----
 ## Setup ----
 data <- FIMS::FIMSFrame(data_big)
 
 ## IO correctness ----
-test_that("`setup_default_recruitment()` works with correct inputs", {
-  result <- setup_default_recruitment(data = data)
+test_that("`setup_default_Recruitment()` works with correct inputs", {
+  result <- setup_default_Recruitment(data = data)
 
   #' @description Test that recruitment defaults include recruitment module rows and process log_sd.
   expect_true(tibble::is_tibble(result))
@@ -24,8 +24,8 @@ test_that("`setup_default_recruitment()` works with correct inputs", {
 })
 
 ## Edge handling ----
-test_that("`setup_default_recruitment()` works with edge cases", {
-  result <- setup_default_recruitment(data = data, distribution = NA_character_)
+test_that("`setup_default_Recruitment()` works with edge cases", {
+  result <- setup_default_Recruitment(data = data, distribution = NA_character_)
 
   #' @description Test that `log_sd` is absent when process distribution is not used.
   expect_false("log_sd" %in% result[["label"]])
@@ -53,10 +53,10 @@ test_that("`setup_default_recruitment()` works with edge cases", {
 })
 
 ## Error handling ----
-test_that("`setup_default_recruitment()` returns correct error messages", {
+test_that("`setup_default_Recruitment()` returns correct error messages", {
   #' @description Test that invalid `data` class returns expected error.
   expect_error(
-    object = setup_default_recruitment(data = "not_a_fimsframe"),
+    object = setup_default_Recruitment(data = "not_a_fimsframe"),
     regexp = "FIMSFrame"
   )
 

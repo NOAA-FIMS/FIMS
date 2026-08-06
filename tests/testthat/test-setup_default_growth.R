@@ -7,13 +7,13 @@
 #' one lines, that will be used in the bookdown report of the results from
 #' {testthat}. This line can be more than 80 characters.
 
-# setup_default_growth ----
+# setup_default_Growth ----
 ## Setup ----
 # No setup required.
 
 ## IO correctness ----
-test_that("`setup_default_growth()` works with correct inputs", {
-  result <- setup_default_growth()
+test_that("`setup_default_Growth()` works with correct inputs", {
+  result <- setup_default_Growth()
 
   #' @description Test that output is a one-row tibble for Growth/EWAA defaults.
   expect_s3_class(result, "tbl_df")
@@ -29,10 +29,10 @@ test_that("`setup_default_growth()` works with correct inputs", {
 # No edge cases to test.
 
 ## Error handling ----
-test_that("`setup_default_growth()` returns correct error messages", {
+test_that("`setup_default_Growth()` returns correct error messages", {
   #' @description Test that unsupported module_type returns expected error.
   expect_error(
-    object = setup_default_growth(module_type = "invalid"),
+    object = setup_default_Growth(module_type = "invalid"),
     regexp = "must be one of"
   )
 
