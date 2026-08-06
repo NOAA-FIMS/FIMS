@@ -11,7 +11,7 @@ multinomial(link = "logit")
 }
 \arguments{
 \item{link}{A string specifying the model link function. For example,
-\code{"identity"} or \code{"log"} are appropriate names for the \code{\link[stats:family]{stats::gaussian()}}
+\code{"identity"} or \code{"log"} are appropriate names for the \code{\link[stats:gaussian]{stats::gaussian()}}
 distribution. \code{"log"} and \code{"logit"} are the defaults for the lognormal and
 the multinomial, respectively.}
 }
@@ -36,7 +36,7 @@ a_family[["link"]]
 \seealso{
 \itemize{
 \item \code{\link[stats:family]{stats::family()}}
-\item \code{\link[stats:family]{stats::gaussian()}}
+\item \code{\link[stats:gaussian]{stats::gaussian()}}
 \item \code{\link[stats:glm]{stats::glm()}}
 \item \code{\link[stats:power]{stats::power()}}
 \item \code{\link[stats:make.link]{stats::make.link()}}

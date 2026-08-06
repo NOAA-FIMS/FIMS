@@ -155,8 +155,7 @@ test_that("fit_fims() errors when optimization fails to converge", {
         ),
         by = c("fleet", "type")
       ) |>
-      FIMSFrame()
-    )
+      FIMSFrame())
 
   #' @description Test that fit_fims() throws an informative warning when parameter SE values are too large.
   expect_warning(

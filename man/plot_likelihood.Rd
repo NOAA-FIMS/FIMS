@@ -107,9 +107,9 @@ Models with Data. Princeton University Press.
 \item \code{\link[=run_fims_likelihood]{run_fims_likelihood()}} for running likelihood profile analysis
 }
 
-Other diagnostic_functions: 
-\code{\link{run_fims_likelihood}()},
-\code{\link{run_fims_retrospective}()}
+Other diagnostic_functions:
+\code{\link[=run_fims_likelihood]{run_fims_likelihood()}},
+\code{\link[=run_fims_retrospective]{run_fims_retrospective()}}
 }
 \concept{diagnostic_functions}
 \concept{plotting_functions}
