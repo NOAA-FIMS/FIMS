@@ -189,7 +189,8 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
    * @brief Vector that records the individual log probability function for each
    * observation.
    */
-  RealVector lpdf_vec; /**< The vector*/
+  /** @brief The vector */
+  RealVector lpdf_vec;
 
   /**
    * @brief The constructor.
@@ -550,7 +551,8 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
    * @brief Vector that records the individual log probability function for each
    * observation.
    */
-  RealVector lpdf_vec; /**< The vector */
+  /** @brief The vector */
+  RealVector lpdf_vec;
 
   /**
    * @brief The constructor.
@@ -869,7 +871,8 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
    * @brief Vector that records the individual log probability function for each
    * observation.
    */
-  RealVector lpdf_vec; /**< The vector */
+  /** @brief The vector */
+  RealVector lpdf_vec;
 
   /**
    * @brief TODO: document this.
@@ -1126,6 +1129,123 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
     return true;
   }
 
+#endif
+};
+
+/**
+ * @brief The Rcpp interface for GMRF to instantiate from R.
+ * @details This object is not intended for direct user interaction but is
+ * created and managed by the `dsem()` helper function.
+ */
+class GMRFDistributionsInterface : public DistributionsInterfaceBase {
+ public:
+  /** @brief The ID of the precision matrix builder to use. */
+  SharedInt precision_builder_id;
+
+  /**
+   * @brief The constructor.
+   */
+  GMRFDistributionsInterface() : DistributionsInterfaceBase() {
+    DistributionsInterfaceBase::live_objects[this->id_m] =
+        std::make_shared<GMRFDistributionsInterface>(*this);
+    FIMSRcppInterfaceBase::fims_interface_objects.push_back(
+        DistributionsInterfaceBase::live_objects[this->id_m]);
+  }
+
+  /**
+   * @brief The destructor.
+   */
+  virtual ~GMRFDistributionsInterface() {}
+
+  /**
+   * @brief Gets the ID of the interface base object.
+   * @return The ID.
+   */
+  virtual uint32_t get_id() { return this->id_m; }
+
+  /**
+   * @brief Sets the ID of the precision matrix builder.
+   * @param builder_id The unique ID of the precision builder object (e.g., a
+   * DSEMInterface).
+   */
+  void set_precision_builder_id(int builder_id) {
+    this->precision_builder_id.set(builder_id);
+  }
+
+  /**
+   * @copydoc DistributionsInterfaceBase::set_distribution_links
+   */
+  virtual bool set_distribution_links(std::string input_type,
+                                      Rcpp::IntegerVector ids) {
+    this->input_type_m.set(input_type);
+    this->key_m->resize(ids.size());
+    for (R_xlen_t i = 0; i < ids.size(); i++) {
+      this->key_m->at(i) = ids[i];
+    }
+    return true;
+  }
+
+  /**
+   * @brief Not implemented for GMRF.
+   */
+  virtual double evaluate() { return 0.0; }
+
+  /**
+   * @brief Extracts the final log-likelihood value.
+   */
+  virtual void finalize() {
+    if (this->finalized) return;
+    this->finalized = true;
+
+    std::shared_ptr<fims_info::Information<double>> info =
+        fims_info::Information<double>::GetInstance();
+
+    auto it = info->density_components.find(this->id_m);
+    if (it != info->density_components.end()) {
+      this->lpdf_value = it->second->lpdf;
+    }
+  }
+
+#ifdef TMB_MODEL
+  template <typename Type>
+  bool add_to_fims_tmb_internal() {
+    std::shared_ptr<fims_info::Information<Type>> info =
+        fims_info::Information<Type>::GetInstance();
+
+    // 1. Create the GMRF functor instance
+    std::shared_ptr<fims_distributions::GMRF<Type>> gmrf =
+        std::make_shared<fims_distributions::GMRF<Type>>();
+
+    // 2. Link to the random effects vector
+    gmrf->id = this->id_m;
+    gmrf->input_type = this->input_type_m.get();
+    gmrf->key.resize(this->key_m->size());
+    for (size_t i = 0; i < this->key_m->size(); i++) {
+      gmrf->key[i] = this->key_m->at(i);
+    }
+
+    // 3. Find the builder, build the precision matrix, and link it
+    auto builder_it =
+        info->precision_builders.find(this->precision_builder_id.get());
+    if (builder_it == info->precision_builders.end()) {
+      throw std::runtime_error(
+          "GMRFDistributionsInterface: Precision builder with ID " +
+          std::to_string(this->precision_builder_id.get()) + " not found.");
+    }
+    auto builder = builder_it->second;
+    gmrf->precision_matrix_ptr = builder;
+
+    // 4. Register the configured GMRF functor as a density component
+    info->density_components[gmrf->id] = gmrf;
+
+    return true;
+  }
+
+  virtual bool add_to_fims_tmb() {
+    this->add_to_fims_tmb_internal<double>();
+    this->add_to_fims_tmb_internal<TMBad::ad_aug>();
+    return true;
+  }
 #endif
 };
 

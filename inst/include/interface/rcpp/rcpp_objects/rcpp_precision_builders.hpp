@@ -46,13 +46,6 @@ public:
         std::shared_ptr<fims_distributions::DSEMPrecisionMatrixBuilder<Type>> builder = 
             std::make_shared<fims_distributions::DSEMPrecisionMatrixBuilder<Type>>();
 
-        std::shared_ptr<fims_distributions::GMRF<Type>> gmrf = 
-            std::make_shared<fims_distributions::GMRF<Type>>();    
-
-        gmrf->precision_matrix_ptr = builder;    
-        gmrf->distribution_type = "random_effects";
-        info->density_components[gmrf->id] = gmrf;
-
         builder->n_time = this->n_time;
         builder->n_variables = this->n_variables;
         
