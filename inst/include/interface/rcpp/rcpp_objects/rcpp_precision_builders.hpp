@@ -84,8 +84,8 @@ public:
     }
 
     virtual bool add_to_fims_tmb() {
-        this->add_to_fims_tmb_internal<double>();
-        this->add_to_fims_tmb_internal<TMBad::ad_aug>();
+        this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
+        this->add_to_fims_tmb_internal<TMBAD_FIMS_TYPE>();
         return true;
     }
 

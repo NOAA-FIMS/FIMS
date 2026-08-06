@@ -130,6 +130,16 @@ class Information {
       density_components_iterator;
   /**< iterator for distribution objects>*/
 
+  std::map<uint32_t,
+           std::shared_ptr<fims_distributions::PrecisionMatrixBuilderBase<Type>>>
+      precision_builders; /**<hash map to link each precision matrix builder to
+                            its shared location in memory*/
+  typedef typename std::map<
+      uint32_t,
+      std::shared_ptr<fims_distributions::PrecisionMatrixBuilderBase<Type>>>::iterator
+      precision_builders_iterator;
+  /**< iterator for precision builders>*/
+
   std::unordered_map<uint32_t,
                      std::shared_ptr<fims_popdy::FisheryModelBase<Type>>>
       models_map; /**<hash map of fishery models, e.g., CAA, GMACS, Spatial,
@@ -164,7 +174,7 @@ class Information {
     this->random_effects_names.clear();
     this->random_effects_parameters.clear();
     this->selectivity_models.clear();
-    this->dsem_builders.clear();
+    this->precision_builders.clear();
     this->models_map.clear();
     this->n_years = 0;
     this->n_ages = 0;
