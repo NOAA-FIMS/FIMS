@@ -1203,6 +1203,11 @@ class GMRFDistributionsInterface : public DistributionsInterfaceBase {
     auto it = info->density_components.find(this->id_m);
     if (it != info->density_components.end()) {
       this->lpdf_value = it->second->lpdf;
+      std::shared_ptr<fims_distributions::GMRF<double>> gmrf =
+          std::dynamic_pointer_cast<fims_distributions::GMRF<double>>(it->second);
+      if (gmrf) {
+        this->lpdf_value = gmrf->lpdf;
+      }
     }
   }
 
@@ -1242,8 +1247,8 @@ class GMRFDistributionsInterface : public DistributionsInterfaceBase {
   }
 
   virtual bool add_to_fims_tmb() {
-    this->add_to_fims_tmb_internal<double>();
-    this->add_to_fims_tmb_internal<TMBad::ad_aug>();
+    this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
+    this->add_to_fims_tmb_internal<TMBAD_FIMS_TYPE>();
     return true;
   }
 #endif
