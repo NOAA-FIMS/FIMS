@@ -30,6 +30,20 @@ T iid_normal_nll(const std::vector<T> &x, const T &mean, const T &sd) {
   return -iid_normal_logpdf(x, mean, sd);
 }
 
+template <typename T>
+T dirichlet_multinomial_logpmf(const std::vector<int> &x,
+                               const std::vector<T> &weight,
+                               const T &concentration) {
+  return quadra::ddirichlet_multinomial_robust(x, weight, concentration, true);
+}
+
+template <typename T>
+T dirichlet_multinomial_nll(const std::vector<int> &x,
+                            const std::vector<T> &weight,
+                            const T &concentration) {
+  return -dirichlet_multinomial_logpmf(x, weight, concentration);
+}
+
 } // namespace stats
 } // namespace quadra
 
