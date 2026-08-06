@@ -19,10 +19,6 @@
 #ifndef FIMS_DISTRIBUTIONS_PRECISION_BUILDERS_HPP
 #define FIMS_DISTRIBUTIONS_PRECISION_BUILDERS_HPP
 
-#include "../../common/def.hpp"
-#include "../../common/fims_vector.hpp"
-#include "../../common/fims_math.hpp"
-
 // Only include Eigen's sparse math if compiling for TMB.
 // This prevents errors when running basic C++ unit tests.
 #ifdef TMB_MODEL
@@ -68,6 +64,14 @@ struct PrecisionMatrixBuilderBase {
         return Eigen::Matrix<Type, Eigen::Dynamic, 1>::Zero(n_k);
     }
 };
+
+}  // namespace fims_distributions
+
+#include "../../common/def.hpp"
+#include "../../common/fims_vector.hpp"
+#include "../../common/fims_math.hpp"
+
+namespace fims_distributions {
 
 /**
  * @details This class handles the math for "arrow-and-lag" models (the RAM). DSEM is 
