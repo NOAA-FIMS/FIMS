@@ -9,7 +9,7 @@ FIMSFit(
   obj,
   opt = list(),
   sdreport = list(),
-  timing = c(time_total = as.difftime(0, units = "secs")),
+  run_time = c(time_total = as.difftime(0, units = "secs")),
   version = utils::packageVersion("FIMS")
 )
 }
@@ -24,7 +24,7 @@ FIMSFit(
 \item{sdreport}{An object of the \code{sdreport} class as returned from
 \code{\link[TMB:sdreport]{TMB::sdreport()}}.}
 
-\item{timing}{A vector of at least length one, where all entries are of the
+\item{run_time}{A vector of at least length one, where all entries are of the
 \code{timediff} class and at least one is named "time_total". This information
 is available in \code{\link[=fit_fims]{fit_fims()}} and added to this argument internally but if
 you are a power user you can calculate the time it took to run your model
@@ -58,7 +58,7 @@ A list containing the model report from \code{obj[["report"]]()}.
 An object with the \code{sdreport} class containing the output from
 \code{TMB::sdreport(obj)}.
 }
-\item{\code{timing}:}{
+\item{\code{run_time}:}{
 The length of time it took to run the model if it was optimized.
 }
 \item{\code{version}:}{

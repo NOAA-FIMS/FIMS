@@ -141,7 +141,7 @@ parameters_projection <- setup_default_parameters(data = data_4_projections) |>
     tibble::tibble(
       fleet = "fleet1",
       label = "log_Fmort",
-      time = get_start_year(data_4_projections):
+      timing = get_start_year(data_4_projections):
       get_end_year(data_4_projections),
       value = log(c(
         0.009459165, 0.027288858, 0.045063639,
@@ -157,17 +157,17 @@ parameters_projection <- setup_default_parameters(data = data_4_projections) |>
         rep(0.499675368, years_of_projection)
       ))
     ),
-    by = c("fleet", "label", "time")
+    by = c("fleet", "label", "timing")
   ) |>
   # Fix the projection period log_Fmort to constant
   dplyr::rows_update(
     tibble::tibble(
       label = "log_Fmort",
-      time = (get_end_year(data_4_projections) - years_of_projection + 1):
+      timing = (get_end_year(data_4_projections) - years_of_projection + 1):
       get_end_year(data_4_projections),
       estimation_type = rep("constant", years_of_projection)
     ),
-    by = c("label", "time")
+    by = c("label", "timing")
   ) |>
   # Update selectivity parameters and log_q for survey1
   dplyr::rows_update(
@@ -178,11 +178,11 @@ parameters_projection <- setup_default_parameters(data = data_4_projections) |>
     ),
     by = c("fleet", "label")
   ) |>
-  # Update log_devs in the Recruitment module (time steps 2-end)
+  # Update log_devs in the Recruitment module (timing steps 2-end)
   dplyr::rows_update(
     tibble::tibble(
       label = "log_devs",
-      time = (get_start_year(data_4_projections) + 1):
+      timing = (get_start_year(data_4_projections) + 1):
       get_end_year(data_4_projections),
       value = c(
         0.43787763, -0.13299042, -0.43251973, 0.64861200, 0.50640852,
@@ -196,19 +196,19 @@ parameters_projection <- setup_default_parameters(data = data_4_projections) |>
       ),
       estimation_type = "random_effects"
     ),
-    by = c("label", "time")
+    by = c("label", "timing")
   ) |>
   # Fix the projection log recruitment deviations at zero
   dplyr::rows_update(
     tibble::tibble(
       label = "log_devs",
-      time = (get_end_year(data_4_projections) - years_of_projection + 1):
+      timing = (get_end_year(data_4_projections) - years_of_projection + 1):
       get_end_year(data_4_projections),
       estimation_type = rep("constant", years_of_projection),
       distribution_type = rep(NA, years_of_projection),
       distribution = rep(NA, years_of_projection)
     ),
-    by = c("label", "time")
+    by = c("label", "timing")
   ) |>
   # Update log_sd for log_devs in the Recruitment module
   dplyr::rows_update(

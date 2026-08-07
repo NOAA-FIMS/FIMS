@@ -195,7 +195,7 @@ tidy.FIMSFit <- function(
 #'     extracted from the TMB report. Returns a list-column when multiple
 #'     populations are present.}
 #'   \item{`fims_version`}{The version of FIMS used to fit the model.}
-#'   \item{`runtime_secs`}{Total wall-clock time of the fit in seconds.}
+#'   \item{`run_time`}{Total wall-clock time of the fit in seconds.}
 #' }
 #'
 #' @examples
@@ -272,8 +272,8 @@ glance.FIMSFit <- function(x, ...) {
   }
 
   # run time
-  timing <- get_timing(x)
-  runtime_secs <- as.numeric(timing[["time_total"]], units = "secs")
+  run_time <- get_run_time(x)
+  run_time <- as.numeric(run_time[["time_total"]], units = "secs")
 
   tibble::tibble(
     logLik       = log_lik,
@@ -288,6 +288,6 @@ glance.FIMSFit <- function(x, ...) {
     converged    = converged,
     terminal_ssb = terminal_ssb,
     fims_version = as.character(get_version(x)),
-    runtime_secs = runtime_secs
+    run_time     = run_time
   )
 }

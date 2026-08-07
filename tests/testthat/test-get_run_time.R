@@ -7,14 +7,14 @@
 #' one lines, that will be used in the bookdown report of the results from
 #' {testthat}. This line can be more than 80 characters.
 
-# get_timing ----
+# get_run_time ----
 ## Setup ----
 # Load or prepare any necessary data for testing
 if (!file.exists(testthat::test_path("fixtures", "fit_age_length_comp.RDS"))) {
   prepare_test_data()
 }
 ## IO correctness ----
-test_that("`get_timing()` works with correct inputs", {
+test_that("`get_run_time()` works with correct inputs", {
   # Load the test data from an RDS file containing model fits.
   # List all RDS files in the fixtures directory that match the pattern "fit*_.RDS"
   fit_files <- list.files(
@@ -28,32 +28,32 @@ test_that("`get_timing()` works with correct inputs", {
   )
 
   # Function to read the RDS file and get input
-  check_timing <- function(fit_file) {
+  check_run_time <- function(fit_file) {
     fit_data <- readRDS(fit_file)
-    timing <- get_timing(fit_data)
-    #' @description Test that `get_timing()` returns correct output for the `timing` slot.
+    run_time <- get_run_time(fit_data)
+    #' @description Test that `get_run_time()` returns correct output for the `run_time` slot.
     expect_equal(
-      object = timing,
-      expected = fit_data@timing
+      object = run_time,
+      expected = fit_data@run_time
     )
-    #' @description Test that `get_timing()` returns correct names for the `timing` slot.
+    #' @description Test that `get_run_time()` returns correct names for the `run_time` slot.
     expect_equal(
-      object = names(timing),
+      object = names(run_time),
       expected = expected_names
     )
-    #' @description Test that `get_timing()` returns > 0 values for the `timing` slot.
-    expect_true(object = all(timing > 0))
+    #' @description Test that `get_run_time()` returns > 0 values for the `run_time` slot.
+    expect_true(object = all(run_time > 0))
   }
 
   # Use purrr::map to apply the function to each file
-  result <- purrr::map(fit_files, check_timing)
+  result <- purrr::map(fit_files, check_run_time)
 })
 
 ## Edge handling ----
-test_that("`get_timing()` returns correct outputs for edge cases", {
-  #' @description Test that `get_timing()` returns an error when given invalid input.
+test_that("`get_run_time()` returns correct outputs for edge cases", {
+  #' @description Test that `get_run_time()` returns an error when given invalid input.
   expect_error(
-    object = get_timing("invalid_input")
+    object = get_run_time("invalid_input")
   )
 })
 
