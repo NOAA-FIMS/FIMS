@@ -38,7 +38,7 @@ class DistributionsInterfaceBase : public FIMSRcppInterfaceBase {
    * @brief Control flag indicating whether to use the expected mean in the
    * distribution calculations.
    *
-   * This shared string member serves as a boolean flag (i.e., "yes" or "no")
+   * This string member serves as a boolean flag (i.e., "yes" or "no")
    * that determines whether the distribution should use the `expected_mean`
    * vector or other expected values (e.g., from data or random effects) when
    * computing the expected value in the likelihood calculations.
