@@ -519,7 +519,7 @@ class FleetInterface : public FleetInterfaceBase {
       for (size_t i = 0; i < fleet->age_to_length_conversion.size(); i++) {
         fleet->age_to_length_conversion[i] =
             this->age_to_length_conversion[i].initial_value_m;
-         ss << "." << this->age_to_length_conversion[i].id_m;
+        ss << "." << this->age_to_length_conversion[i].id_m;
         if (this->age_to_length_conversion[i].estimation_type_m.get() ==
             "fixed_effects") {
           info->RegisterParameterName(ss.str());

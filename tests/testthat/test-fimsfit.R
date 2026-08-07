@@ -254,7 +254,6 @@ test_that("fit_fims() errors when optimization fails to converge", {
 })
 
 test_that("fit_fims() produces informative error when throwing a fims::Vector bounding error", {
-
   #' @description Test that fit_fims() throws an informative error when variable bounds are not set up correctly
   data("data_big", package = "FIMS")
   data_4_model <- FIMSFrame(data_big)
@@ -277,5 +276,4 @@ test_that("fit_fims() produces informative error when throwing a fims::Vector bo
     regexp = "fims::Vector out of bounds for Population.1.log_init_naa: index 12 >= size 11"
   )
   clear()
-
 })
