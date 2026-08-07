@@ -9,9 +9,9 @@
 #define FIMS_VECTOR_HPP
 
 #include "../interface/interface.hpp"
-#include <iomanip>
 #include <ostream>
 #include <string>
+#include <iomanip>
 
 namespace fims {
 
