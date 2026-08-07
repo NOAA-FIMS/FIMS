@@ -95,15 +95,15 @@ class FleetInterface : public FleetInterfaceBase {
   /**
    * @brief The number of age bins in the fleet data.
    */
-  SharedInt n_ages = 0;
+  int n_ages = 0;
   /**
    * @brief The number of length bins in the fleet data.
    */
-  SharedInt n_lengths = 0;
+  int n_lengths = 0;
   /**
    * @brief The number of years in the fleet data.
    */
-  SharedInt n_years = 0;
+  int n_years = 0;
   /**
    * @brief What units are the observed landings for this fleet measured in.
    * Options are weight or numbers, default is weight.
@@ -435,9 +435,9 @@ class FleetInterface : public FleetInterfaceBase {
 
     // set relative info
     fleet->id = this->id;
-    fleet->n_ages = this->n_ages.get();
-    fleet->n_lengths = this->n_lengths.get();
-    fleet->n_years = this->n_years.get();
+    fleet->n_ages = this->n_ages;
+    fleet->n_lengths = this->n_lengths;
+    fleet->n_years = this->n_years;
     fleet->observed_landings_units = this->observed_landings_units;
     fleet->observed_index_units = this->observed_index_units;
 
@@ -472,16 +472,16 @@ class FleetInterface : public FleetInterfaceBase {
       }
     }
 
-    if (this->log_Fmort.size() != static_cast<size_t>(this->n_years.get())) {
+    if (this->log_Fmort.size() != static_cast<size_t>(this->n_years)) {
       FIMS_ERROR_LOG("The size of `log_Fmort` does not match `n_years`: " +
                      fims::to_string(this->log_Fmort.size()) +
-                     " != " + fims::to_string(this->n_years.get()));
+                     " != " + fims::to_string(this->n_years));
       throw std::invalid_argument(
           "Fleet log_Fmort size mismatch."
           "Fleet log_Fmort is of size " +
           fims::to_string(this->log_Fmort.size()) +
           " and the number of years is " +
-          fims::to_string(this->n_years.get()));
+          fims::to_string(this->n_years));
     }
     fleet->log_Fmort.resize(static_cast<size_t>(this->log_Fmort.size()));
     for (size_t i = 0; i < log_Fmort.size(); i++) {
@@ -503,16 +503,16 @@ class FleetInterface : public FleetInterfaceBase {
     // add to variable_map
     info->variable_map[this->log_Fmort.id_m] = &(fleet)->log_Fmort;
 
-    if (this->n_lengths.get() > 0) {
+    if (this->n_lengths > 0) {
       fleet->age_to_length_conversion.resize(
           this->age_to_length_conversion.size());
 
       if (this->age_to_length_conversion.size() !=
-          static_cast<size_t>(this->n_ages.get() * this->n_lengths.get())) {
+          static_cast<size_t>(this->n_ages * this->n_lengths)) {
         FIMS_ERROR_LOG(
             "age_to_length_conversion don't match, " +
             fims::to_string(this->age_to_length_conversion.size()) + " != " +
-            fims::to_string((this->n_ages.get() * this->n_lengths.get())));
+            fims::to_string((this->n_ages * this->n_lengths)));
       }
 
       for (size_t i = 0; i < fleet->age_to_length_conversion.size(); i++) {
