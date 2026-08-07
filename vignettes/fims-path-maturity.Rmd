@@ -98,9 +98,9 @@ library(FIMS)
 maturity <- methods::new(LogisticMaturity)
 # Populate the maturity module with parameter values.
 maturity$inflection_point[1]$value <- 10
-maturity$inflection_point[1]$estimation_type$set("constant")
+maturity$inflection_point[1]$set_estimation_status("assumed_known")
 maturity$slope[1]$value <- 0.2
-maturity$slope[1]$estimation_type$set("constant")
+maturity$slope[1]$set_estimation_status("assumed_known")
 ```
 
 To run a FIMS model, more modules than just a maturity module need to be linked to a population module. But, this example only includes a maturity module so the code below is just pseudo code showing how to link a maturity module to a population module. The code below assumes that growth and recruitment modules, i.e., modules 2 and 3, have already been set up.
@@ -218,10 +218,10 @@ Rcpp::class_<Variable>(
     .field("value", &Variable::initial_value_m)
     .field("estimated_value", &Variable::final_value_m)
     .field("id", &Variable::id_m)
-    .field("estimation_type", &Variable::estimation_type_m);
+    .field("estimation_status", &Variable::estimation_status_m);
 ```
 
-Each field (i.e., parameter) from `maturity` (i.e., the maturity module we defined in R) will therefore inherit the four fields defined in the Variable class: `value`, `estimated_value`, `id`, `estimation_type`. That is, two parameter fields and 8 fields within those parameters.
+Each field (i.e., parameter) from `maturity` (i.e., the maturity module we defined in R) will therefore inherit the four fields defined in the Variable class: `value`, `estimated_value`, `id`, `estimation_status`. That is, two parameter fields and 8 fields within those parameters.
 
 ## `fims` namespace
 
@@ -277,15 +277,15 @@ Within rcpp_maturity.hpp, there is a link to the `fims_info::Information` class 
 // info is a shared pointer that points to fims_info::Information
 std::shared_ptr<fims_info::Information<TMB_FIMS_REAL_TYPE> > info =
         fims_info::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
- if (this->inflection_point.estimation_type == "random_effects") {
+ if (this->inflection_point.estimation_status == "random_effects") {
         /*
-         if inflection_point is a random effect, 
-         the inflection_point value from LogisticMaturityInterface (maturity->inflection_point) 
+         if inflection_point is a random effect,
+         the inflection_point value from LogisticMaturityInterface (maturity->inflection_point)
          is passed to the Information member function RegisterRandomEffect
         */
         info->RegisterRandomEffect(maturity->inflection_point);
   }
-  if (this->inflection_point.estimation_type == "fixed_effects") {
+  if (this->inflection_point.estimation_status == "fixed_effects") {
         /*
          if inflection_point is estimated as a fixed_effect,
          the inflection_point value from LogisticMaturityInterface (maturity->inflection_point)
@@ -303,7 +303,7 @@ Linking to the `fims_popdy::LogisticMaturity` class allows the code to link the 
 // maturity is a shared pointer that points to fims_popdy::LogisticMaturity
 std::shared_ptr<fims_popdy::LogisticMaturity<TMB_FIMS_REAL_TYPE> > maturity =
   std::make_shared<fims_popdy::LogisticMaturity<TMB_FIMS_REAL_TYPE> >();
- 
+
 // the inflection_point value from LogisticMaturity (maturity->inflection_point)
 // equals the inflection_point value from LogisticMaturityInterface
 // (this->inflection_point.value)
@@ -314,9 +314,9 @@ We can also link these two pointers together so that the **fims_info::Informatio
 ```{Rcpp, class.source = "rcppchunk", eval = FALSE}
 // file: rcpp_maturity.hpp
 
-// the maturity_models pointer from Information that matches the 
-// id of the fims_popdy::LogisticMaturity class is equal to the pointer 
-// to fims_popdy::LogisticMaturity 
+// the maturity_models pointer from Information that matches the
+// id of the fims_popdy::LogisticMaturity class is equal to the pointer
+// to fims_popdy::LogisticMaturity
 info->maturity_models[maturity->id] = maturity;
 ```
 
@@ -454,7 +454,7 @@ struct MaturityBase : public fims_model_object::FIMSObject<Type> {
 }
 ```
 
-The evaluate function is a [virtual C++ function](https://www.geeksforgeeks.org/virtual-function-cpp/), which means the function can be overwritten by functions of the same name from a child class. This structure keeps the maturity module in population generic. We don't need any conditional statements to loop over all possible maturity formulations within population. We only need to add a new child maturity class with an Rcpp interface and we can automatically call it from population. There is a trade-off here. We are creating a nested hierarchical structure that makes the code base harder to read. In exchange, we're creating code with a lower [cyclomatic complexity](https://en.wikipedia.org/wiki/Cyclomatic_complexity), that is, there will only ever be one independent path from the user to the `maturity->evaluate()` call in population, regardless of how many maturity functions are added to FIMS. Code with lower cyclomatic complexity is easier to test, maintain, and extend.  
+The evaluate function is a [virtual C++ function](https://www.geeksforgeeks.org/virtual-function-cpp/), which means the function can be overwritten by functions of the same name from a child class. This structure keeps the maturity module in population generic. We don't need any conditional statements to loop over all possible maturity formulations within population. We only need to add a new child maturity class with an Rcpp interface and we can automatically call it from population. There is a trade-off here. We are creating a nested hierarchical structure that makes the code base harder to read. In exchange, we're creating code with a lower [cyclomatic complexity](https://en.wikipedia.org/wiki/Cyclomatic_complexity), that is, there will only ever be one independent path from the user to the `maturity->evaluate()` call in population, regardless of how many maturity functions are added to FIMS. Code with lower cyclomatic complexity is easier to test, maintain, and extend.
 
 Once we have set up the shared pointer, we can access maturity from within population.
 ```{Rcpp,  class.source = "fimschunk", eval = FALSE}
@@ -502,7 +502,7 @@ std::map<uint32_t, std::shared_ptr<fims_popdy::MaturityBase<Type> > >
 
 // Next we set up the iterator, which will be used to loop over all
 // defined maturity modules
-typedef typename std::map<uint32_t, 
+typedef typename std::map<uint32_t,
                           std::shared_ptr<fims_popdy::MaturityBase<Type> > >::iterator
   maturity_models_iterator;
 ```
@@ -535,7 +535,7 @@ info->maturity_models[maturity->id] = maturity;
 knitr::include_graphics("figures/fims-path-maturity-6.png")
 ```
 
-Now we need to pass this pointer to the maturity pointer in population so that `population->maturity` points to the `LogisticMaturity` module instead of `MaturityBase`. First we set up a map in `Information` that points to `Population`. 
+Now we need to pass this pointer to the maturity pointer in population so that `population->maturity` points to the `LogisticMaturity` module instead of `MaturityBase`. First we set up a map in `Information` that points to `Population`.
 ```{Rcpp,  class.source = "infochunk", eval = FALSE}
 // file: inst/include/common/information.hpp
 
@@ -557,7 +557,7 @@ std::map<uint32_t, std::shared_ptr<fims_popdy::Population<Type> > > populations;
 knitr::include_graphics("figures/fims-path-maturity-7.png")
 ```
 
-Populations are looped through with a new shared pointer, `p`, to reference the individual population of interest.  
+Populations are looped through with a new shared pointer, `p`, to reference the individual population of interest.
 
 ```{Rcpp,  class.source = "infochunk", eval = FALSE}
 // file: inst/include/common/information.hpp
@@ -568,11 +568,11 @@ for (population_iterator it = this->populations.begin();
 }
 ```
 
-In this code chunk, `(*it)` refers to a single population in the `populations` map. The second element of the map is the pointer, so `p = (*it).second` means the pointer is being set to a single population to equal the pointer to `populations` in the map. 
+In this code chunk, `(*it)` refers to a single population in the `populations` map. The second element of the map is the pointer, so `p = (*it).second` means the pointer is being set to a single population to equal the pointer to `populations` in the map.
 
 Within this population loop, the `maturity` pointer in `population` is linked to the `maturity` pointer in information, passing on the information that we want to use the `LogisticMaturity` class.
 
-```{Rcpp,  class.source = "infochunk", eval = FALSE}  
+```{Rcpp,  class.source = "infochunk", eval = FALSE}
 // file: inst/include/common/information.hpp
   // set maturity
   if (p->maturity_id != -999) {
@@ -663,10 +663,10 @@ information <- list(
 # std::map<uint32_t, std::shared_ptr<fims_popdy::MaturityBase<Type> > > maturity_models;
 # std::map<uint32_t, std::shared_ptr<fims_popdy::Population<Type> > > populations;
 ```
-  
+
 Pointers are used to link Information to each respective module.
 
-```{r}          
+```{r}
 information$populations[[1]] <- list(id = 1, pointer = population_modules[[1]])
 information$populations[[2]] <- list(id = 2, pointer = population_modules[[2]])
 information$populations[[3]] <- list(id = 3, pointer = population_modules[[3]])

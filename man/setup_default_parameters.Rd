@@ -28,7 +28,7 @@ in PascalCase to match the names used in the C++ code.}
 \item{\code{length}:}{The length bin the parameter applies to.}
 \item{\code{timing}:}{The timing step (year) the parameter applies to.}
 \item{\code{value}:}{The initial value of the parameter.}
-\item{\code{estimation_type}:}{The estimation type (e.g., "constant",
+\item{\code{estimation_status}:}{The estimation status (e.g., "assumed_known",
 "fixed_effects", "random_effects").}
 \item{\code{distribution_type}:}{The type of distribution (e.g., "data",
 "process"), where a process distribution can refer to a fixed effect or a

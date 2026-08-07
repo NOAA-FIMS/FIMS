@@ -113,11 +113,11 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   fishing_fleet_selectivity$inflection_point[1]$value <- om_input[["sel_fleet"]][["fleet1"]][["A50.sel1"]]
 
   # turn on estimation of inflection_point
-  fishing_fleet_selectivity$inflection_point[1]$estimation_type$set("fixed_effects")
+  fishing_fleet_selectivity$inflection_point[1]$set_estimation_status("fixed_effects")
   fishing_fleet_selectivity$slope[1]$value <- om_input[["sel_fleet"]][["fleet1"]][["slope.sel1"]]
 
   # turn on estimation of slope
-  fishing_fleet_selectivity$slope[1]$estimation_type$set("fixed_effects")
+  fishing_fleet_selectivity$slope[1]$set_estimation_status("fixed_effects")
 
   # Initialize the fishing fleet module
   fishing_fleet <- methods::new(Fleet)
@@ -133,9 +133,9 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
     # Log-transform OM fishing mortality
     fishing_fleet$log_Fmort[y]$value <- log(om_output[["f"]][y])
   }
-  fishing_fleet$log_Fmort$set_estimation_types(c("fixed_effects"))
+  fishing_fleet$log_Fmort$set_estimation_status(c("fixed_effects"))
   fishing_fleet$log_q[1]$value <- log(1.0)
-  fishing_fleet$log_q[1]$estimation_type$set("constant")
+  fishing_fleet$log_q[1]$set_estimation_status("assumed_known")
   fishing_fleet$SetSelectivityID(fishing_fleet_selectivity$get_id())
   fishing_fleet$SetObservedCatchDataID(fishing_fleet_catch$get_id())
   fishing_fleet$SetObservedAgeCompDataID(fishing_fleet_age_comp$get_id())
@@ -149,7 +149,7 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
     # Compute lognormal SD from OM coefficient of variation (CV)
     fishing_fleet_catch_distribution$log_sd[y]$value <- log(sqrt(log(em_input[["cv.L"]][["fleet1"]]^2 + 1)))
   }
-  fishing_fleet_catch_distribution$log_sd$set_estimation_types(c("constant"))
+  fishing_fleet_catch_distribution$log_sd$set_estimation_status(c("assumed_known"))
   # Set Data using the IDs from the modules defined above
   fishing_fleet_catch_distribution$set_observed_data(fishing_fleet$GetObservedCatchDataID())
   fishing_fleet_catch_distribution$set_distribution_links("data", fishing_fleet$log_catch_expected$get_id())
@@ -174,7 +174,7 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   }
 
   # Turn off estimation for length-at-age
-  fishing_fleet$age_to_length_conversion$set_estimation_types(c("constant"))
+  fishing_fleet$age_to_length_conversion$set_estimation_status(c("assumed_known"))
 
   # Repeat similar setup for the survey fleet (e.g., index, age comp, and length comp)
   # This includes initializing logistic selectivity, observed data modules, and distribution links.
@@ -197,11 +197,11 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   survey_fleet_selectivity$inflection_point[1]$value <- om_input[["sel_survey"]][["survey1"]][["A50.sel1"]]
 
   # turn on estimation of inflection_point
-  survey_fleet_selectivity$inflection_point[1]$estimation_type$set("fixed_effects")
+  survey_fleet_selectivity$inflection_point[1]$set_estimation_status("fixed_effects")
   survey_fleet_selectivity$slope[1]$value <- om_input[["sel_survey"]][["survey1"]][["slope.sel1"]]
 
   # turn on estimation of slope
-  survey_fleet_selectivity$slope[1]$estimation_type$set("fixed_effects")
+  survey_fleet_selectivity$slope[1]$set_estimation_status("fixed_effects")
 
   survey_fleet <- methods::new(Fleet)
   survey_fleet$n_ages$set(om_input[["nages"]])
@@ -212,9 +212,9 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
     # Set very low survey fishing mortality
     survey_fleet$log_Fmort[y]$value <- -200
   }
-  survey_fleet$log_Fmort$set_estimation_types(c("constant"))
+  survey_fleet$log_Fmort$set_estimation_status(c("assumed_known"))
   survey_fleet$log_q[1]$value <- log(om_output[["survey_q"]][["survey1"]])
-  survey_fleet$log_q[1]$estimation_type$set("fixed_effects")
+  survey_fleet$log_q[1]$set_estimation_status("fixed_effects")
   survey_fleet$SetSelectivityID(survey_fleet_selectivity$get_id())
   survey_fleet$SetObservedIndexDataID(survey_fleet_index$get_id())
   survey_fleet$SetObservedAgeCompDataID(survey_fleet_age_comp$get_id())
@@ -229,7 +229,7 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   for (y in 1:om_input$nyr) {
     survey_fleet_index_distribution$log_sd[y]$value <- log(sqrt(log(em_input[["cv.survey"]][["survey1"]]^2 + 1)))
   }
-  survey_fleet_index_distribution$log_sd$set_estimation_types(c("constant"))
+  survey_fleet_index_distribution$log_sd$set_estimation_status(c("assumed_known"))
   # Set Data using the IDs from the modules defined above
   survey_fleet_index_distribution$set_observed_data(survey_fleet$GetObservedIndexDataID())
   survey_fleet_index_distribution$set_distribution_links("data", survey_fleet$log_index_expected$get_id())
@@ -255,7 +255,7 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
     survey_fleet$age_to_length_conversion[i]$value <- c(t(em_input[["age_to_length_conversion"]]))[i]
   }
   # Turn off estimation for length-at-age
-  survey_fleet$age_to_length_conversion$set_estimation_types(c("constant"))
+  survey_fleet$age_to_length_conversion$set_estimation_status(c("assumed_known"))
 
 
   # Recruitment
@@ -270,17 +270,17 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   recruitment$SetRecruitmentProcessID(recruitment_process$get_id())
 
   # NOTE: in first set of parameters below (for recruitment),
-  # $estimation_type (default is "constant")
+  # $estimation_status (default is "assumed_known")
   # is defined even if it matches the defaults in order to provide an example
   # of how that is done. Other sections of the code below leave defaults in
   # place as appropriate.
 
   # set up log_rzero (equilibrium recruitment)
   recruitment$log_rzero[1]$value <- log(om_input[["R0"]])
-  recruitment$log_rzero[1]$estimation_type$set("fixed_effects")
+  recruitment$log_rzero[1]$set_estimation_status("fixed_effects")
   # set up logit_steep
   recruitment$logit_steep[1]$value <- -log(1.0 - om_input[["h"]]) + log(om_input[["h"]] - 0.2)
-  recruitment$logit_steep[1]$estimation_type$set("constant")
+  recruitment$logit_steep[1]$set_estimation_status("assumed_known")
   recruitment$n_years <- om_input[["nyr"]]
 
   # turn on estimation of deviations
@@ -297,7 +297,7 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   }
   if ("recruitment" %in% names(random_effects)) {
     if (random_effects[["recruitment"]] == "log_devs") {
-      recruitment$log_devs$set_estimation_types(c("random_effects"))
+      recruitment$log_devs$set_estimation_status(c("random_effects"))
     }
     if (random_effects[["recruitment"]] == "log_r") {
       recruitment$log_r$resize(om_input[["nyr"]] - 1)
@@ -311,27 +311,27 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
         } else {
           recruitment$log_r[y]$value <- 0
         }
-        recruitment$log_r$set_estimation_types(c("random_effects"))
+        recruitment$log_r$set_estimation_status(c("random_effects"))
       }
     }
     if (is.null(random_effects)) {
-      recruitment$log_devs$set_estimation_types(c("fixed_effects"))
+      recruitment$log_devs$set_estimation_status(c("fixed_effects"))
     }
   }
 
   if ("selectivity" %in% names(random_effects)) {
     if (random_effects[["selectivity"]] == "log_devs") {
-      fishing_fleet_selectivity$log_devs$set_estimation_types(c("random_effects"))
-      survey_fleet_selectivity$log_devs$set_estimation_types(c("random_effects"))
+      fishing_fleet_selectivity$log_devs$set_estimation_status(c("random_effects"))
+      survey_fleet_selectivity$log_devs$set_estimation_status(c("random_effects"))
     }
     if (random_effects[["selectivity"]] == "log_sel") {
-      fishing_fleet_selectivity$log_sel$set_estimation_types(c("random_effects"))
-      survey_fleet_selectivity$log_sel$set_estimation_types(c("random_effects"))
+      fishing_fleet_selectivity$log_sel$set_estimation_status(c("random_effects"))
+      survey_fleet_selectivity$log_sel$set_estimation_status(c("random_effects"))
     }
     if (random_effects[["selectivity"]] == "pars") {
-      fishing_fleet_selectivity$inflection_point$estimation_type$set("random_effects")
+      fishing_fleet_selectivity$inflection_point$set_estimation_status("random_effects")
       fishing_fleet_selectivity$inflection_point$slope <- "random_effects"
-      survey_fleet_selectivity$inflection_point$estimation_type$set("random_effects")
+      survey_fleet_selectivity$inflection_point$set_estimation_status("random_effects")
       survey_fleet_selectivity$inflection_point$slope <- "random_effects"
     }
   }
@@ -351,12 +351,12 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
 
   if ("recruitment" %in% names(random_effects)) {
     if (random_effects[["recruitment"]] == "log_devs") {
-      recruitment_distribution$log_sd[1]$estimation_type$set("fixed_effects")
+      recruitment_distribution$log_sd[1]$set_estimation_status("fixed_effects")
       recruitment_distribution$set_distribution_links("random_effects", recruitment$log_devs$get_id())
     }
     if (random_effects[["recruitment"]] == "log_r") {
       recruitment_distribution$log_sd[1]$value <- log(1)
-      recruitment_distribution$log_sd[1]$estimation_type$set("fixed_effects")
+      recruitment_distribution$log_sd[1]$set_estimation_status("fixed_effects")
       recruitment_distribution$set_distribution_links("random_effects", c(recruitment$log_r$get_id(), recruitment$log_expected_recruitment$get_id()))
     }
   }
@@ -375,9 +375,9 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   # Maturity
   maturity <- methods::new(LogisticMaturity)
   maturity$inflection_point[1]$value <- om_input[["A50.mat"]]
-  maturity$inflection_point[1]$estimation_type$set("constant")
+  maturity$inflection_point[1]$set_estimation_status("assumed_known")
   maturity$slope[1]$value <- om_input[["slope.mat"]]
-  maturity$slope[1]$estimation_type$set("constant")
+  maturity$slope[1]$set_estimation_status("assumed_known")
 
   # Population
   population <- methods::new(Population)
@@ -385,12 +385,12 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   for (i in 1:(om_input[["nyr"]] * om_input[["nages"]])) {
     population$log_M[i]$value <- log(om_input[["M.age"]][1])
   }
-  population$log_M$set_estimation_types(c("constant"))
+  population$log_M$set_estimation_status(c("assumed_known"))
   population$log_init_naa$resize(om_input[["nages"]])
   for (i in 1:om_input$nages) {
     population$log_init_naa[i]$value <- log(om_output[["N.age"]][1, i])
   }
-  population$log_init_naa$set_estimation_types(c("fixed_effects"))
+  population$log_init_naa$set_estimation_status(c("fixed_effects"))
   population$n_ages$set(om_input[["nages"]])
   population$ages[] <- om_input[["ages"]]
 

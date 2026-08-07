@@ -203,7 +203,7 @@ validate_fims <- function(
         !is.na(input),
         !is.na(estimated),
         !is.na(uncertainty),
-        estimation_type == "fixed_effects"
+        estimation_status == "fixed_effects"
       ) |>
       # Restore the "true" log_q value for testing
       dplyr::mutate(

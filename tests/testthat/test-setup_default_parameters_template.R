@@ -22,7 +22,7 @@ test_that("`setup_default_parameters_template()` works with correct inputs", {
   #' @description Test that output contains expected columns.
   expect_true(all(c(
     "module_name", "fleet", "module_type", "label",
-    "age", "length", "timing", "value", "estimation_type",
+    "age", "length", "timing", "value", "estimation_status",
     "distribution_type", "distribution"
   ) %in% names(result)))
 })
@@ -35,7 +35,7 @@ test_that("`setup_default_parameters_template()` works with edge cases", {
   expect_equal(nrow(result), 0)
   expect_true(all(c(
     "module_name", "fleet", "module_type", "label",
-    "age", "length", "timing", "value", "estimation_type",
+    "age", "length", "timing", "value", "estimation_status",
     "distribution_type", "distribution"
   ) %in% names(result)))
 })

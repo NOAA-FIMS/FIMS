@@ -102,7 +102,7 @@ get_n_lengths(x)
 a FIMS model in a long format. The tibble will potentially have the
 following columns depending if it fits to ages and lengths or just one of
 them:
-type, fleet, age, length, timing, observed, unit, and uncertainty.
+\verb{r glue::glue_collapse(colnames(data_big), sep = ", ", last = ", and ")}.
 
 \code{\link[=get_fleets]{get_fleets()}} returns a vector of strings containing the fleet names.
 

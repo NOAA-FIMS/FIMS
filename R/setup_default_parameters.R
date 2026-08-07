@@ -47,7 +47,7 @@
 #'   \item{\code{length}:}{The length bin the parameter applies to.}
 #'   \item{\code{timing}:}{The timing step (year) the parameter applies to.}
 #'   \item{\code{value}:}{The initial value of the parameter.}
-#'   \item{\code{estimation_type}:}{The estimation type (e.g., "constant",
+#'   \item{\code{estimation_status}:}{The estimation status (e.g., "assumed_known",
 #'     "fixed_effects", "random_effects").}
 #'   \item{\code{distribution_type}:}{The type of distribution (e.g., "data",
 #'     "process"), where a process distribution can refer to a fixed effect or a
@@ -261,7 +261,7 @@ setup_default_parameters_template <- function(n_parameters = 1) {
     length = NA_real_,
     timing = NA_integer_,
     value = NA_real_,
-    estimation_type = NA_character_,
+    estimation_status = NA_character_,
     distribution_type = NA_character_,
     distribution = NA_character_
   ) |>
@@ -273,7 +273,7 @@ setup_default_parameters_template <- function(n_parameters = 1) {
 #' @description
 #' This function creates default growth parameters for a Fisheries Integrated
 #' Modeling System (FIMS) model. It generates a tibble with fields for
-#' module name, module type, label, value, and estimation type.
+#' module name, module type, label, value, and estimation status.
 #' @param module_type A character string specifying the type of growth module. The
 #' default is `"EWAA"`.
 #' @return
@@ -388,24 +388,24 @@ setup_default_Population <- function(
   default <- setup_default_parameters_template(
     n_parameters = n_years * n_ages
   ) |>
-    # Add the module type, label, value, and estimation type
+    # Add the module type, label, value, and estimation status
     dplyr::mutate(
       label = "log_M",
       value = .env$log_M,
       age = rep(ages, n_years),
       timing = rep(years, each = n_ages),
-      estimation_type = "constant"
+      estimation_status = "assumed_known"
     ) |>
     dplyr::add_row(
       label = "log_init_naa",
       age = get_ages(data),
       value = .env$log_init_naa,
-      estimation_type = "fixed_effects"
+      estimation_status = "fixed_effects"
     ) |>
     dplyr::add_row(
       label = "proportion_female",
       value = .env$proportion_female,
-      estimation_type = "constant"
+      estimation_status = "assumed_known"
     ) |>
     dplyr::mutate(
       module_name = "Population"
@@ -419,7 +419,7 @@ setup_default_Population <- function(
 #' two specified parameters, the inflection point and slope.
 #' @return
 #' A tibble containing the default logistic parameters, with inflection_point
-#' and slope values and their estimation type. See \code{\link{setup_default_parameters}}
+#' and slope values and their estimation status. See \code{\link{setup_default_parameters}}
 #' for full column descriptions.
 #' @noRd
 #' @seealso
@@ -431,12 +431,12 @@ setup_default_Population <- function(
 setup_default_Logistic <- function() {
   # Create a template for default parameters
   default <- setup_default_parameters_template(n_parameters = 2) |>
-    # Add the module type, label, value, and estimation type
+    # Add the module type, label, value, and estimation status
     dplyr::mutate(
       module_type = "Logistic",
       label = c("inflection_point", "slope"),
       value = c(2, 1),
-      estimation_type = "fixed_effects"
+      estimation_status = "fixed_effects"
     )
 }
 
@@ -449,7 +449,7 @@ setup_default_Logistic <- function() {
 #' @return
 #' A tibble containing the default double logistic parameters,
 #' inflection_point_asc, slope_asc, inflection_point_desc, and slope_desc
-#' values and their estimation type. See \code{\link{setup_default_parameters}}
+#' values and their estimation status. See \code{\link{setup_default_parameters}}
 #' for full column descriptions.
 #' @seealso
 #' * [setup_default_parameters()]
@@ -470,7 +470,7 @@ setup_default_DoubleLogistic <- function() {
       ),
       # TODO: Determine if inflection_point_desc should really be 4?
       value = c(2, 1, 4, 1),
-      estimation_type = "fixed_effects"
+      estimation_status = "fixed_effects"
     )
 }
 
@@ -528,9 +528,9 @@ setup_default_Selectivity <- function(
 #' @description
 #' This function sets up default parameters for a fleet module, including natural log of
 #' catchability coefficients (log_q) and fishing mortality (log_Fmort) for fleets.
-#' For fishing fleets, log_q is set to an estimation type of "constant" with a
+#' For fishing fleets, log_q is set to an estimation status of "assumed_known" with a
 #' default value of 0, while log_Fmort is set to "fixed_effects". For survey
-#' fleets, log_q is set to "fixed_effects" and log_Fmort is set to "constant"
+#' fleets, log_q is set to "fixed_effects" and log_Fmort is set to "assumed_known"
 #' with a default value of -200.
 #'
 #' @param fleet A character. Name of the fleet.
@@ -573,7 +573,7 @@ setup_default_Fleet <- function(
       fleet = .env$fleet,
       label = "log_q",
       value = 0,
-      estimation_type = if (has_catch) "constant" else "fixed_effects"
+      estimation_status = if (has_catch) "assumed_known" else "fixed_effects"
     )
 
   # Set up default parameters for fishing mortality
@@ -586,7 +586,7 @@ setup_default_Fleet <- function(
       label = "log_Fmort",
       timing = get_start_year(data):get_end_year(data),
       value = if (has_index) -200 else -3,
-      estimation_type = if (has_index) "constant" else "fixed_effects"
+      estimation_status = if (has_index) "assumed_known" else "fixed_effects"
     )
   # Compile all default parameters into a single list
   default <- dplyr::bind_rows(
@@ -631,11 +631,11 @@ setup_default_Maturity <- function(
     "Logistic" = setup_default_Logistic()
   ) |>
     # We don't have an option to input maturity data into FIMS, so the maturity
-    # parameters aren't really estimable. The parameters should be constant for
+    # parameters aren't really estimable. The parameters should be assumed_known for
     # now. See more details from
     # https://github.com/orgs/NOAA-FIMS/discussions/944.
     dplyr::mutate(
-      estimation_type = "constant",
+      estimation_status = "assumed_known",
       module_name = "Maturity"
     )
 }
@@ -677,7 +677,7 @@ setup_default_BevertonHoltRecruitment <- function(
     dplyr::mutate(
       label = "log_rzero",
       value = log(1e+06),
-      estimation_type = "fixed_effects"
+      estimation_status = "fixed_effects"
     )
   logit_steep <- setup_default_parameters_template(
     n_parameters = 1
@@ -685,7 +685,7 @@ setup_default_BevertonHoltRecruitment <- function(
     dplyr::mutate(
       label = "logit_steep",
       value = -log(1.0 - 0.75) + log(0.75 - 0.2),
-      estimation_type = "constant"
+      estimation_status = "assumed_known"
     )
 
   log_devs <- setup_default_parameters_template(
@@ -696,7 +696,7 @@ setup_default_BevertonHoltRecruitment <- function(
       label = "log_devs",
       value = 0.0,
       timing = (get_start_year(data) + 1):get_end_year(data),
-      estimation_type = "random_effects",
+      estimation_status = "random_effects",
       distribution_type = "process",
       distribution = .env$distribution
     )
@@ -706,7 +706,7 @@ setup_default_BevertonHoltRecruitment <- function(
         tibble::tibble(
           label = "log_devs",
           timing = (get_start_year(data) + 1):get_end_year(data),
-          estimation_type = "constant",
+          estimation_status = "assumed_known",
           distribution_type = NA_character_
         ),
         by = c("label", "timing")
@@ -759,7 +759,7 @@ setup_default_DnormDistribution <- function(
     dplyr::mutate(
       label = "log_sd",
       value = !!value,
-      estimation_type = "constant",
+      estimation_status = "assumed_known",
       distribution_type = input_type,
       distribution = "Dnorm"
     )
@@ -811,7 +811,7 @@ setup_default_DlnormDistribution <- function(
 
   default <- default |>
     dplyr::mutate(
-      estimation_type = "constant",
+      estimation_status = "assumed_known",
       distribution_type = input_type,
       distribution = "Dlnorm"
     )
@@ -879,7 +879,7 @@ setup_default_Recruitment <- function(
       dplyr::rows_update(
         tibble::tibble(
           label = "log_sd",
-          estimation_type = "fixed_effects"
+          estimation_status = "fixed_effects"
         ),
         by = "label"
       )
