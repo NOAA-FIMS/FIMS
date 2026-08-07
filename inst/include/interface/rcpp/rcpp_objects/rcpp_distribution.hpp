@@ -468,7 +468,7 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
       distribution->observed_values[i] =
           this->observed_values[i].initial_value_m;
     }
-    
+
     // set relative info
     ss.str("");
     ss << "dnorm." << this->id_m << ".expected_values";

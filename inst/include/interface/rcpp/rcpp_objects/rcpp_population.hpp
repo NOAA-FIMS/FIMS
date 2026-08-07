@@ -466,7 +466,6 @@ class PopulationInterface : public PopulationInterfaceBase {
     }
     info->variable_map[this->log_f_multiplier.id_m] =
         &(population)->log_f_multiplier;
-    
 
     if (this->spawning_biomass_ratio.size() ==
         static_cast<size_t>(this->n_years.get() + 1)) {
@@ -502,8 +501,6 @@ class PopulationInterface : public PopulationInterfaceBase {
       }
     }
     info->variable_map[this->log_M.id_m] = &(population)->log_M;
-
-
 
     ss.str("");
     ss << "Population." << this->id << ".log_init_naa";

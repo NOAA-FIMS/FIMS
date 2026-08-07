@@ -998,9 +998,10 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
           &derived_quantities_dim_info =
               model->GetPopulationDimensionInfo(population_interface->id);
 
-        auto set_population_dq_name = [&](const std::string &name) {
+      auto set_population_dq_name = [&](const std::string &name) {
         derived_quantities[name].set_variable_name(
-          "Population." + fims::to_string(population_interface->id) + "." + name);
+            "Population." + fims::to_string(population_interface->id) + "." +
+            name);
       };
 
       derived_quantities["total_landings_weight"] =
@@ -1201,7 +1202,7 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
               model->GetFleetDimensionInfo(fleet_interface->id);
       auto set_fleet_dq_name = [&](const std::string &name) {
         derived_quantities[name].set_variable_name(
-        "Fleet." + fims::to_string(fleet_interface->id) + "." + name);
+            "Fleet." + fims::to_string(fleet_interface->id) + "." + name);
       };
 
       // initialize derive quantities

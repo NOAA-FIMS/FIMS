@@ -346,7 +346,7 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
     recruitment->log_rzero.resize(this->log_rzero.size());
     for (size_t i = 0; i < this->log_rzero.size(); i++) {
       recruitment->log_rzero[i] = this->log_rzero[i].initial_value_m;
-      ss << "."  << this->log_rzero[i].id_m;
+      ss << "." << this->log_rzero[i].id_m;
       if (this->log_rzero[i].estimation_type_m.get() == "fixed_effects") {
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(recruitment->log_rzero[i]);

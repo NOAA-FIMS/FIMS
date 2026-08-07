@@ -492,7 +492,9 @@ class Vector {
   /**
    * @brief Sets the variable name for the vector.
    */
-  void set_variable_name(const std::string &name) { this->variable_name_m = name; }
+  void set_variable_name(const std::string &name) {
+    this->variable_name_m = name;
+  }
 
  private:
   std::string get_out_of_bounds_error_message(size_t pos) const {
@@ -505,8 +507,9 @@ class Vector {
     return error_msg;
   }
 
-  std::string tag_m; /*!< The tag for the vector. */
-  std::string variable_name_m; /*!< The name of the variable represented by the vector. */
+  std::string tag_m;           /*!< The tag for the vector. */
+  std::string variable_name_m; /*!< The name of the variable represented by the
+                                  vector. */
 };  // end fims::Vector class
 
 /**
