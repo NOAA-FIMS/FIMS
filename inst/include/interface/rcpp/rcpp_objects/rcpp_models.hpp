@@ -1315,7 +1315,7 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
           &derived_quantities["index_numbers_at_length"];
 
       derived_quantities["index_weight"] =
-          fims::Vector<Type>(fleet_interface->n_years;
+          fims::Vector<Type>(fleet_interface->n_years);
       derived_quantities_dim_info["index_weight"] = fims_popdy::DimensionInfo(
           "index_weight", fims::Vector<int>{(fleet_interface->n_years)},
           fims::Vector<std::string>{"n_years"});
