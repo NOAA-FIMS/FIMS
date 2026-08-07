@@ -20,8 +20,8 @@
 \alias{get_estimates,FIMSFit-method}
 \alias{get_number_of_parameters}
 \alias{get_number_of_parameters,FIMSFit-method}
-\alias{get_timing}
-\alias{get_timing,FIMSFit-method}
+\alias{get_run_time}
+\alias{get_run_time,FIMSFit-method}
 \alias{get_version}
 \alias{get_version,FIMSFit-method}
 \alias{get_model_output}
@@ -64,9 +64,9 @@ get_number_of_parameters(x)
 
 \S4method{get_number_of_parameters}{FIMSFit}(x)
 
-get_timing(x)
+get_run_time(x)
 
-\S4method{get_timing}{FIMSFit}(x)
+\S4method{get_run_time}{FIMSFit}(x)
 
 get_version(x)
 
@@ -108,7 +108,7 @@ uncertainties from a fitted model.
 number of fixed-effect parameters and the number of random-effect parameters
 in the model.
 
-\code{\link[=get_timing]{get_timing()}} returns the amount of time it took to run the model in
+\code{\link[=get_run_time]{get_run_time()}} returns the amount of time it took to run the model in
 seconds as a \code{difftime} object.
 
 \code{\link[=get_version]{get_version()}} returns the \code{package_version} of FIMS that was used to fit

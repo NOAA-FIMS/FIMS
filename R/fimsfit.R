@@ -31,7 +31,7 @@ methods::setClass(
     report = "list",
     sdreport = "sdreportOrList",
     number_of_parameters = "integer",
-    timing = "difftime",
+    run_time = "difftime",
     version = "package_version",
     model_output = "character"
   )
@@ -59,7 +59,7 @@ methods::setMethod(
   f = "print",
   signature = "FIMSFit",
   definition = function(x) {
-    rt <- as.numeric(x@timing[["time_total"]], units = "secs")
+    rt <- as.numeric(x@run_time[["time_total"]], units = "secs")
     ru <- "seconds"
     if (rt > 60 * 60 * 24) {
       rt <- rt / (60 * 60 * 24)
@@ -285,15 +285,15 @@ methods::setMethod(
 )
 
 #' @return
-#' [get_timing()] returns the amount of time it took to run the model in
+#' [get_run_time()] returns the amount of time it took to run the model in
 #' seconds as a `difftime` object.
 #' @export
 #' @rdname get_FIMSFit
 #' @keywords fit_fims
-methods::setGeneric("get_timing", function(x) standardGeneric("get_timing"))
+methods::setGeneric("get_run_time", function(x) standardGeneric("get_run_time"))
 #' @rdname get_FIMSFit
 #' @keywords fit_fims
-methods::setMethod("get_timing", "FIMSFit", function(x) x@timing)
+methods::setMethod("get_run_time", "FIMSFit", function(x) x@run_time)
 
 #' @return
 #' [get_version()] returns the `package_version` of FIMS that was used to fit
@@ -370,7 +370,7 @@ is.FIMSFit <- function(x) {
 #'   [stats::nlminb()], used to fit a TMB model.
 #' @param sdreport An object of the `sdreport` class as returned from
 #'   [TMB::sdreport()].
-#' @param timing A vector of at least length one, where all entries are of the
+#' @param run_time A vector of at least length one, where all entries are of the
 #'   `timediff` class and at least one is named "time_total". This information
 #'   is available in [fit_fims()] and added to this argument internally but if
 #'   you are a power user you can calculate the time it took to run your model
@@ -403,7 +403,7 @@ is.FIMSFit <- function(x) {
 #'       An object with the `sdreport` class containing the output from
 #'       `TMB::sdreport(obj)`.
 #'     }
-#'     \item{\code{timing}:}{
+#'     \item{\code{run_time}:}{
 #'       The length of time it took to run the model if it was optimized.
 #'     }
 #'     \item{\code{version}:}{
@@ -422,7 +422,7 @@ FIMSFit <- function(
   obj,
   opt = list(),
   sdreport = list(),
-  timing = c("time_total" = as.difftime(0, units = "secs")),
+  run_time = c("time_total" = as.difftime(0, units = "secs")),
   version = utils::packageVersion("FIMS")
 ) {
   # Determine the number of parameters
@@ -480,7 +480,7 @@ FIMSFit <- function(
     report = report,
     sdreport = sdreport,
     number_of_parameters = number_of_parameters,
-    timing = timing,
+    run_time = run_time,
     version = version,
     model_output = model_output
   )
@@ -562,7 +562,7 @@ fit_fims <- function(input,
     initial_fit <- FIMSFit(
       input = input,
       obj = obj,
-      timing = c("time_total" = as.difftime(0, units = "secs"))
+      run_time = c("time_total" = as.difftime(0, units = "secs"))
     )
     return(initial_fit)
   }
@@ -585,7 +585,7 @@ fit_fims <- function(input,
       obj = obj,
       opt = failed_nlminb_object[["opt"]],
       sdreport = list(),
-      timing = failed_nlminb_object[["timing"]]
+      run_time = failed_nlminb_object[["run_time"]]
     )
     return(failed_fit)
   }
@@ -619,7 +619,7 @@ fit_fims <- function(input,
           obj = obj,
           opt = failed_nlminb_object[["opt"]],
           sdreport = list(),
-          timing = failed_nlminb_object[["timing"]]
+          run_time = failed_nlminb_object[["run_time"]]
         )
         return(failed_fit)
       }
@@ -651,7 +651,7 @@ fit_fims <- function(input,
     time_sdreport <- as.difftime(0, units = "secs")
   }
 
-  timing <- c(
+  run_time <- c(
     time_optimization = time_optimization,
     time_sdreport = time_sdreport,
     time_total = Sys.time() - t0
@@ -661,7 +661,7 @@ fit_fims <- function(input,
     obj = obj,
     opt = opt,
     sdreport = sdreport,
-    timing = timing
+    run_time = run_time
   )
   print(fit)
   if (!is.null(filename)) {
@@ -739,7 +739,7 @@ return_failed_nlminb <- function(object) {
   # Construct a fallback optimizer result with consistent structure, i.e.,
   # convergence = 1L indicates non-convergence
   return(list(
-    timing = c(
+    run_time = c(
       time_optimization = as.difftime(0, units = "secs"),
       time_sdreport = as.difftime(0, units = "secs"),
       time_total = as.difftime(0, units = "secs")

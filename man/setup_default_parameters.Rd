@@ -26,7 +26,7 @@ in PascalCase to match the names used in the C++ code.}
 \item{\code{label}:}{The parameter name (e.g., "inflection_point").}
 \item{\code{age}:}{The age the parameter applies to.}
 \item{\code{length}:}{The length bin the parameter applies to.}
-\item{\code{time}:}{The time step (year) the parameter applies to.}
+\item{\code{timing}:}{The timing step (year) the parameter applies to.}
 \item{\code{value}:}{The initial value of the parameter.}
 \item{\code{estimation_type}:}{The estimation type (e.g., "constant",
 "fixed_effects", "random_effects").}

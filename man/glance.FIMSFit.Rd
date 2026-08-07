@@ -34,7 +34,7 @@ below 0.001 are generally considered well-converged.}
 extracted from the TMB report. Returns a list-column when multiple
 populations are present.}
 \item{\code{fims_version}}{The version of FIMS used to fit the model.}
-\item{\code{runtime_secs}}{Total wall-clock time of the fit in seconds.}
+\item{\code{run_time}}{Total wall-clock time of the fit in seconds.}
 }
 }
 \description{

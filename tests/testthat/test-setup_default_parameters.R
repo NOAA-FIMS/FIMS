@@ -23,7 +23,7 @@ test_that("`setup_default_parameters()` works with correct inputs", {
     colnames(result),
     c(
       "module_name", "fleet", "module_type", "label",
-      "age", "length", "time", "value", "estimation_type",
+      "age", "length", "timing", "value", "estimation_type",
       "distribution_type", "distribution"
     )
   )

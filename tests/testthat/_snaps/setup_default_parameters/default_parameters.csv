@@ -1,4 +1,4 @@
-"","module_name","fleet","module_type","label","age","length","time","value","estimation_type","distribution_type","distribution"
+"","module_name","fleet","module_type","label","age","length","timing","value","estimation_type","distribution_type","distribution"
 "1","Selectivity","fleet1","Logistic","inflection_point",NA,NA,NA,2,"fixed_effects",NA,NA
 "2","Selectivity","fleet1","Logistic","slope",NA,NA,NA,1,"fixed_effects",NA,NA
 "3","Selectivity","survey1","Logistic","inflection_point",NA,NA,NA,2,"fixed_effects",NA,NA

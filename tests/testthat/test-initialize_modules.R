@@ -41,17 +41,17 @@ test_that("`initialize_fims()` works with edge cases", {
     # to constant
     dplyr::mutate(
       estimation_type = dplyr::if_else(
-        time <= 11,
+        timing <= 11,
         "constant",
         estimation_type
       ),
       distribution_type = dplyr::if_else(
-        time <= 11,
+        timing <= 11,
         NA_character_,
         distribution_type
       ),
       distribution = dplyr::if_else(
-        time <= 11,
+        timing <= 11,
         NA_character_,
         distribution
       )
@@ -193,10 +193,10 @@ test_that("`initialize_fims()` returns correct error messages", {
         y = tibble::tibble(
           module_name = "Recruitment",
           label = "log_devs",
-          time = 2:get_n_years(data),
+          timing = 2:get_n_years(data),
           estimation_type = "random_effects"
         ),
-        by = c("module_name", "label", "time")
+        by = c("module_name", "label", "timing")
       )
 
     #' @description Test that `initialize_fims()` returns correct error with distribution estimation type mismatch.
@@ -213,10 +213,10 @@ test_that("`initialize_fims()` returns correct error messages", {
         y = tibble::tibble(
           module_name = "Recruitment",
           label = "log_devs",
-          time = 2:get_n_years(data),
+          timing = 2:get_n_years(data),
           estimation_type = "constant"
         ),
-        by = c("module_name", "label", "time")
+        by = c("module_name", "label", "timing")
       )
 
     #' @description Test that `initialize_recruitment()` handles missing distribution for recruitment correctly.
@@ -597,17 +597,17 @@ test_that("`initialize_fims()` works with edge cases", {
     # to constant
     dplyr::mutate(
       estimation_type = dplyr::if_else(
-        time <= 11,
+        timing <= 11,
         "constant",
         estimation_type
       ),
       distribution_type = dplyr::if_else(
-        time <= 11,
+        timing <= 11,
         NA_character_,
         distribution_type
       ),
       distribution = dplyr::if_else(
-        time <= 11,
+        timing <= 11,
         NA_character_,
         distribution
       )
