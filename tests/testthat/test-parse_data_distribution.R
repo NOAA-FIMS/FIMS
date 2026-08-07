@@ -39,8 +39,8 @@ test_that("`parse_data_distribution()` works with correct inputs", {
 
   #' @description Test that calls and single-element expressions are accepted without first converting them to strings.
   expect_equal(
-    parse_data_distribution(quote(~dnorm(mean = index_expected, sd = 1))),
-    parse_data_distribution(expression(~dnorm(mean = index_expected, sd = 1)))
+    parse_data_distribution(quote(~ dnorm(mean = index_expected, sd = 1))),
+    parse_data_distribution(expression(~ dnorm(mean = index_expected, sd = 1)))
   )
 })
 
