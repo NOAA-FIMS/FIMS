@@ -15,7 +15,7 @@
 \arguments{
 \item{x}{A \code{FIMSFit} object returned from \code{\link[=fit_fims]{fit_fims()}}.}
 
-\item{parameters}{Character vector controlling which \code{estimation_type}
+\item{parameters}{Character vector controlling which \code{estimation_status}
 values to include.  Defaults to \code{c("fixed_effects", "random_effects")}.
 Pass \code{"derived_quantity"} to include derived quantities such as spawning
 biomass and expected data values, or pass all three to get every row.}
@@ -41,7 +41,7 @@ A \code{\link[tibble:tibble]{tibble::tibble()}} with columns:
 \code{conf.int = TRUE}).}
 \item{\code{module_name}}{Name of the FIMS module (e.g. \code{"Selectivity"}).}
 \item{\code{module_id}}{Integer module identifier.}
-\item{\code{estimation_type}}{One of \code{"fixed_effects"}, \code{"random_effects"},
+\item{\code{estimation_status}}{One of \code{"fixed_effects"}, \code{"random_effects"},
 or \code{"derived_quantity"}.}
 \item{\code{gradient}}{Gradient of the log-likelihood at the MLE. Values
 close to zero indicate a well-converged parameter.}
@@ -51,12 +51,12 @@ close to zero indicate a well-converged parameter.}
 Returns one row per estimated parameter following the
 \code{\link[generics:tidy]{generics::tidy()}} convention.  Standard columns (\code{term}, \code{estimate},
 \code{std.error}, \code{statistic}, \code{p.value}) are always present; FIMS-specific
-columns (\code{module_name}, \code{module_id}, \code{estimation_type}, \code{gradient}) are
+columns (\code{module_name}, \code{module_id}, \code{estimation_status}, \code{gradient}) are
 appended so the full context is available for filtering and plotting.
 }
 \section{Parameter types}{
 
-FIMS distinguishes three \code{estimation_type} values:
+FIMS distinguishes three \code{estimation_status} values:
 \describe{
 \item{\code{"fixed_effects"}}{Directly optimized parameters (selectivity,
 log_Fmort, log_q, etc.).}

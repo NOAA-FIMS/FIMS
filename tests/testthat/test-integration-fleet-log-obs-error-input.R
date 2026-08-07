@@ -35,8 +35,8 @@ test_that("`log_obs_error scalar` works with correct inputs", {
       !(fleet == "fleet1" & label == "log_sd" & time > 1) |
         is.na(fleet == "fleet1" & label == "log_sd" & time > 1)
     ) |>
-    dplyr::mutate(estimation_type = ifelse(label == "log_sd",
-      "constant", estimation_type
+    dplyr::mutate(estimation_status = ifelse(label == "log_sd",
+      "assumed_known", estimation_status
     ))
 
   test_fit <- parameters_4_model |>
@@ -67,9 +67,9 @@ test_that("`log_obs_error scalar` works with correct inputs", {
 
   # turn on estimation for log_sd
   parameters_4_model <- parameters_4_model |>
-    dplyr::mutate(estimation_type = ifelse(fleet == "fleet1" &
+    dplyr::mutate(estimation_status = ifelse(fleet == "fleet1" &
       label == "log_sd",
-    "fixed_effects", estimation_type
+    "fixed_effects", estimation_status
     ))
 
   test_fit <- parameters_4_model |>

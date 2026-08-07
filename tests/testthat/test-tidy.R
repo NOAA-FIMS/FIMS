@@ -28,11 +28,11 @@ test_that("tidy() works with correct inputs", {
   #' @description Test that generics::tidy(fit) returns a tibble with expected broom and FIMS columns.
   expect_true(all(c(
     "term", "estimate", "std.error", "statistic", "p.value",
-    "module_name", "module_id", "estimation_type"
+    "module_name", "module_id", "estimation_status"
   ) %in% names(generics::tidy(fit))))
 
   #' @description Test that generics::tidy(fit) defaults to fixed and random effects rows only.
-  expect_true(all(generics::tidy(fit)[["estimation_type"]] %in%
+  expect_true(all(generics::tidy(fit)[["estimation_status"]] %in%
     c("fixed_effects", "random_effects")))
 
   #' @description Test that generics::tidy(fit) statistic equals estimate divided by std.error.
@@ -54,10 +54,10 @@ test_that("tidy() returns correct outputs for edge cases", {
 
 ## Error handling ----
 test_that("tidy() returns correct error messages", {
-  #' @description Test that generics::tidy(fit, parameters = "invalid") returns an error about unknown estimation type.
+  #' @description Test that generics::tidy(fit, parameters = "invalid") returns an error about unknown estimation status.
   expect_error(
     object = generics::tidy(fit, parameters = "invalid"),
-    regexp = "unknown estimation type"
+    regexp = "unknown estimation status"
   )
 })
 

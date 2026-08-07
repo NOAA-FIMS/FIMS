@@ -52,8 +52,8 @@
 #'       \item{\code{time}:}{The time step (i.e., year) the parameter applies
 #'         to.}
 #'       \item{\code{value}:}{The initial value of the parameter.}
-#'       \item{\code{estimation_type}:}{The type of estimation (e.g.,
-#'         "constant", "fixed_effects", "random_effects").}
+#'       \item{\code{estimation_status}:}{The type of estimation (e.g.,
+#'         "assumed_known", "fixed_effects", "random_effects").}
 #'       \item{\code{distribution_type}:}{The type of distribution (e.g.,
 #'         "Data", "process"), where a process distribution can refer to a
 #'         fixed effect or a random effect but it does not fit to data, e.g.,
@@ -219,7 +219,7 @@ create_default_parameters <- function(
 #' This function creates a template for default parameters used in a Fisheries
 #' Integrated Modeling System (FIMS) model. The template includes fields for
 #' module name, module type, label, fleet name, population name, age, length,
-#' time, value, estimation type, distribution type, and distribution.
+#' time, value, estimation status, distribution type, and distribution.
 #' @param n_parameters An integer specifying the number of parameters in the
 #' template.
 #' @return
@@ -238,7 +238,7 @@ create_default_parameters_template <- function(n_parameters = 1) {
     length = NA_real_,
     time = NA_integer_,
     value = NA_real_,
-    estimation_type = NA_character_,
+    estimation_status = NA_character_,
     distribution_type = NA_character_,
     distribution = NA_character_
   ) |>
@@ -299,24 +299,24 @@ create_default_Population <- function(
   default <- create_default_parameters_template(
     n_parameters = n_years * n_ages
   ) |>
-    # Add the module type, label, value, and estimation type
+    # Add the module type, label, value, and estimation status
     dplyr::mutate(
       label = "log_M",
       value = log(M_value),
       age = rep(ages, n_years),
       time = rep(years, each = n_ages),
-      estimation_type = "constant"
+      estimation_status = "assumed_known"
     ) |>
     dplyr::add_row(
       label = "log_init_naa",
       age = get_ages(data),
       value = log(init_naa),
-      estimation_type = "fixed_effects"
+      estimation_status = "fixed_effects"
     ) |>
     dplyr::add_row(
       label = "proportion_female",
       value = 0.5,
-      estimation_type = "constant"
+      estimation_status = "assumed_known"
     ) |>
     dplyr::mutate(
       module_name = "Population"
@@ -335,12 +335,12 @@ create_default_Population <- function(
 create_default_Logistic <- function() {
   # Create a template for default parameters
   default <- create_default_parameters_template(n_parameters = 2) |>
-    # Add the module type, label, value, and estimation type
+    # Add the module type, label, value, and estimation status
     dplyr::mutate(
       module_type = "Logistic",
       label = c("inflection_point", "slope"),
       value = c(2, 1),
-      estimation_type = "fixed_effects"
+      estimation_status = "fixed_effects"
     )
 }
 
@@ -368,7 +368,7 @@ create_default_DoubleLogistic <- function(module_name = NA_character_) {
       ),
       # TODO: Determine if inflection_point_desc should really be 4?
       value = c(2, 1, 4, 1),
-      estimation_type = "fixed_effects"
+      estimation_status = "fixed_effects"
     )
 }
 
@@ -470,7 +470,7 @@ create_default_fleet <- function(unnested_configurations,
         label = "log_q",
         fleet = current_fleet,
         value = 0,
-        estimation_type = "fixed_effects"
+        estimation_status = "fixed_effects"
       )
 
     index_distribution <- unnested_configurations |>
@@ -510,7 +510,7 @@ create_default_fleet <- function(unnested_configurations,
         label = "log_q",
         fleet = current_fleet,
         value = 0,
-        estimation_type = "constant"
+        estimation_status = "assumed_known"
       )
     index_distribution_default <- NULL
   }
@@ -530,7 +530,7 @@ create_default_fleet <- function(unnested_configurations,
         fleet = current_fleet,
         time = get_start_year(data):get_end_year(data),
         value = -3,
-        estimation_type = "fixed_effects"
+        estimation_status = "fixed_effects"
       )
 
     landings_distribution <- unnested_configurations |>
@@ -576,7 +576,7 @@ create_default_fleet <- function(unnested_configurations,
         fleet = current_fleet,
         time = get_start_year(data):get_end_year(data),
         value = -200,
-        estimation_type = "constant"
+        estimation_status = "assumed_known"
       )
 
     landings_distribution_default <- NULL
@@ -624,11 +624,11 @@ create_default_maturity <- function(
     "Logistic" = create_default_Logistic()
   ) |>
     # We don't have an option to input maturity data into FIMS, so the maturity
-    # parameters aren't really estimable. The parameters should be constant for
+    # parameters aren't really estimable. The parameters should be assumed_known for
     # now. See more details from
     # https://github.com/orgs/NOAA-FIMS/discussions/944.
     dplyr::mutate(
-      estimation_type = "constant",
+      estimation_status = "assumed_known",
       module_name = "Maturity"
     )
 }
@@ -658,7 +658,7 @@ create_default_BevertonHoltRecruitment <- function(
     dplyr::mutate(
       label = "log_rzero",
       value = log(1e+06),
-      estimation_type = "fixed_effects"
+      estimation_status = "fixed_effects"
     )
   logit_steep <- create_default_parameters_template(
     n_parameters = 1
@@ -666,7 +666,7 @@ create_default_BevertonHoltRecruitment <- function(
     dplyr::mutate(
       label = "logit_steep",
       value = -log(1.0 - 0.75) + log(0.75 - 0.2),
-      estimation_type = "constant"
+      estimation_status = "assumed_known"
     )
 
   log_devs <- create_default_parameters_template(
@@ -677,7 +677,7 @@ create_default_BevertonHoltRecruitment <- function(
       label = "log_devs",
       value = 0.0,
       time = (get_start_year(data) + 1):get_end_year(data),
-      estimation_type = "random_effects"
+      estimation_status = "random_effects"
     )
   if (is.na(distribution)) {
     log_devs <- log_devs |>
@@ -685,7 +685,7 @@ create_default_BevertonHoltRecruitment <- function(
         tibble::tibble(
           label = "log_devs",
           time = (get_start_year(data) + 1):get_end_year(data),
-          estimation_type = "constant"
+          estimation_status = "assumed_known"
         ),
         by = c("label", "time")
       )
@@ -734,7 +734,7 @@ create_default_DnormDistribution <- function(
     dplyr::mutate(
       label = "log_sd",
       value = !!value,
-      estimation_type = "constant",
+      estimation_status = "assumed_known",
       distribution_type = input_type,
       distribution = "Dnorm"
     )
@@ -783,7 +783,7 @@ create_default_DlnormDistribution <- function(
 
   default <- default |>
     dplyr::mutate(
-      estimation_type = "constant",
+      estimation_status = "assumed_known",
       distribution_type = input_type,
       distribution = "Dlnorm"
     )
@@ -862,7 +862,7 @@ create_default_recruitment <- function(
       distribution_default |> dplyr::rows_update(
         tibble::tibble(
           label = "log_sd",
-          estimation_type = "fixed_effects"
+          estimation_status = "fixed_effects"
         ),
         by = "label"
       )

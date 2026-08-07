@@ -39,7 +39,7 @@ test_that("`create_default_parameters()` works with correct inputs", {
     colnames(result[["data"]][[1]]),
     c(
       "module_type", "label", "age", "length", "time",
-      "value", "estimation_type", "distribution_type", "distribution"
+      "value", "estimation_status", "distribution_type", "distribution"
     )
   )
   #' @description Test that the generated parameter values have not changed from the accepted snapshot.
@@ -53,7 +53,7 @@ test_that("`create_default_parameters()` works with correct inputs", {
 ## Edge handling ----
 test_that("`create_default_parameters()` works with edge cases", {
   # Set up a model without a distribution for recruitment, which should lead to
-  # `log_devs` having an estimation_type of "constant" and no `log_sd` parameter
+  # `log_devs` having an estimation_status of "assumed_known" and no `log_sd` parameter
   # being created.
   updated_configurations <- default_configurations |>
     tidyr::unnest(cols = data) |>
@@ -79,13 +79,13 @@ test_that("`create_default_parameters()` works with edge cases", {
     numeric(0)
   )
 
-  #' @description Test that the `log_devs` estimation_type is set to "constant" when distribution is not specified.
+  #' @description Test that the `log_devs` estimation_status is set to "assumed_known" when distribution is not specified.
   expect_equal(
     result |>
       tidyr::unnest(cols = data) |>
       dplyr::filter(module_name == "Recruitment", label == "log_devs") |>
-      dplyr::pull(estimation_type),
-    rep("constant", result |>
+      dplyr::pull(estimation_status),
+    rep("assumed_known", result |>
       tidyr::unnest(cols = data) |>
       dplyr::filter(module_name == "Recruitment", label == "log_devs") |>
       nrow())

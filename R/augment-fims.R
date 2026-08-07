@@ -91,7 +91,7 @@ augment.FIMSFit <- function(x, include_weights = TRUE, ...) {
   meta_cols <- intersect(
     c(
       "label", "module_id", "module_type", "fleet", "distribution",
-      "estimation_type", index_cols
+      "estimation_status", index_cols
     ),
     names(fit_rows)
   )

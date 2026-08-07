@@ -41,8 +41,8 @@ written in PascalCase to match the names used in the C++ code.}
 \item{\code{time}:}{The time step (i.e., year) the parameter applies
 to.}
 \item{\code{value}:}{The initial value of the parameter.}
-\item{\code{estimation_type}:}{The type of estimation (e.g.,
-"constant", "fixed_effects", "random_effects").}
+\item{\code{estimation_status}:}{The type of estimation (e.g.,
+"assumed_known", "fixed_effects", "random_effects").}
 \item{\code{distribution_type}:}{The type of distribution (e.g.,
 "Data", "process"), where a process distribution can refer to a
 fixed effect or a random effect but it does not fit to data, e.g.,

@@ -264,10 +264,10 @@ prepare_test_data <- function() {
   ## Estimation run with age comp only using wrappers ----
   modified_parameters_fixed_effects <- modified_parameters |>
     dplyr::mutate(
-      estimation_type = dplyr::if_else(
+      estimation_status = dplyr::if_else(
         label == "log_devs" & module_type == "BevertonHolt",
         "fixed_effects",
-        estimation_type
+        estimation_status
       )
     ) |>
     # Update log_sd for log_devs in the Recruitment module
@@ -279,7 +279,7 @@ prepare_test_data <- function() {
       tibble::tibble(
         module_name = "Recruitment",
         label = "log_sd",
-        estimation_type = "constant",
+        estimation_status = "assumed_known",
         value = log(om_input_list[[iter_id]][["logR_sd"]])
       ),
       by = c("module_name", "label")

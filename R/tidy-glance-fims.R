@@ -15,11 +15,11 @@ generics::augment
 #' Returns one row per estimated parameter following the
 #' [generics::tidy()] convention.  Standard columns (`term`, `estimate`,
 #' `std.error`, `statistic`, `p.value`) are always present; FIMS-specific
-#' columns (`module_name`, `module_id`, `estimation_type`, `gradient`) are
+#' columns (`module_name`, `module_id`, `estimation_status`, `gradient`) are
 #' appended so the full context is available for filtering and plotting.
 #'
 #' @section Parameter types:
-#' FIMS distinguishes three `estimation_type` values:
+#' FIMS distinguishes three `estimation_status` values:
 #' \describe{
 #'   \item{`"fixed_effects"`}{Directly optimized parameters (selectivity,
 #'     log_Fmort, log_q, etc.).}
@@ -40,7 +40,7 @@ generics::augment
 #' quantities.
 #'
 #' @param x A `FIMSFit` object returned from [fit_fims()].
-#' @param parameters Character vector controlling which `estimation_type`
+#' @param parameters Character vector controlling which `estimation_status`
 #'   values to include.  Defaults to `c("fixed_effects", "random_effects")`.
 #'   Pass `"derived_quantity"` to include derived quantities such as spawning
 #'   biomass and expected data values, or pass all three to get every row.
@@ -62,7 +62,7 @@ generics::augment
 #'     `conf.int = TRUE`).}
 #'   \item{`module_name`}{Name of the FIMS module (e.g. `"Selectivity"`).}
 #'   \item{`module_id`}{Integer module identifier.}
-#'   \item{`estimation_type`}{One of `"fixed_effects"`, `"random_effects"`,
+#'   \item{`estimation_status`}{One of `"fixed_effects"`, `"random_effects"`,
 #'     or `"derived_quantity"`.}
 #'   \item{`gradient`}{Gradient of the log-likelihood at the MLE. Values
 #'     close to zero indicate a well-converged parameter.}
@@ -103,7 +103,7 @@ tidy.FIMSFit <- function(
   bad <- setdiff(parameters, valid_types)
   if (length(bad) > 0) {
     cli::cli_abort(c(
-      "{.arg parameters} contains unknown estimation type{?s}: {.val {bad}}.",
+      "{.arg parameters} contains unknown estimation status{?s}: {.val {bad}}.",
       "i" = "Valid values are: {.val {valid_types}}."
     ))
   }
@@ -120,13 +120,13 @@ tidy.FIMSFit <- function(
   meta_cols <- intersect(
     c(
       "module_name", "module_id", "module_type", "fleet",
-      "estimation_type", "gradient"
+      "estimation_status", "gradient"
     ),
     names(estimates)
   )
 
   out <- estimates |>
-    dplyr::filter(.data$estimation_type %in% parameters) |>
+    dplyr::filter(.data$estimation_status %in% parameters) |>
     dplyr::select(
       term      = "label",
       estimate  = "estimated",
