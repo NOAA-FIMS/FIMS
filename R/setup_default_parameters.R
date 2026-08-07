@@ -51,7 +51,6 @@
 #'     in PascalCase to match the names used in the C++ code.}
 #' }
 #' @export
-#' @rdname setup_default_parameters
 #' @keywords setup_default_parameters
 #' @seealso
 #' * [FIMSFrame()]
@@ -189,6 +188,8 @@ setup_default_parameters <- function(data) {
 #' @param log_m A scalar natural-log mortality value.
 #' @return A numeric vector of log initial numbers-at-age. See \code{\link{setup_default_parameters}}
 #' for full column descriptions.
+#' @seealso
+#' * [setup_default_parameters()]
 #' @noRd
 #' @examples
 #' \dontrun{
@@ -229,6 +230,8 @@ setup_default_log_init_naa <- function(
 #' @return
 #' A tibble template for a FIMS model. See \code{\link{setup_default_parameters}}
 #' for full column descriptions.
+#' @seealso
+#' * [setup_default_parameters()]
 #' @noRd
 #' @examples
 #' FIMS:::setup_default_parameters_template(n_parameters = 3)
@@ -261,8 +264,9 @@ setup_default_parameters_template <- function(n_parameters = 1) {
 #' A tibble containing default growth parameters. See \code{\link{setup_default_parameters}}
 #' for full column descriptions.
 #' @export
-#' @rdname setup_default_parameters
 #' @keywords setup_default_parameters
+#' @seealso
+#' * [setup_default_parameters()]
 #' @examples
 #' \dontrun{
 #' # Set up default growth parameters
@@ -301,9 +305,11 @@ setup_default_Growth <- function(
 #' @inheritParams setup_default_parameters
 #' @return
 #' A tibble of default population configurations, including initial numbers at
-#' age, natural mortality rate, and proportion of females.
+#' age, natural mortality rate, and proportion of females. See \code{\link{setup_default_parameters}}
+#' for full column descriptions.
 #' @export
-#' @rdname setup_default_parameters
+#' @seealso
+#' * [setup_default_parameters()]
 #' @keywords setup_default_parameters
 #' @examples
 #' \dontrun{
@@ -397,8 +403,11 @@ setup_default_Population <- function(
 #' two specified parameters, the inflection point and slope.
 #' @return
 #' A tibble containing the default logistic parameters, with inflection_point
-#' and slope values and their estimation type.
+#' and slope values and their estimation type. See \code{\link{setup_default_parameters}}
+#' for full column descriptions.
 #' @noRd
+#' @seealso
+#' * [setup_default_parameters()]
 #' @examples
 #' \dontrun{
 #' default_logistic_parameters <- FIMS:::setup_default_Logistic()
@@ -424,7 +433,10 @@ setup_default_Logistic <- function() {
 #' @return
 #' A tibble containing the default double logistic parameters,
 #' inflection_point_asc, slope_asc, inflection_point_desc, and slope_desc
-#' values and their estimation type.
+#' values and their estimation type. See \code{\link{setup_default_parameters}}
+#' for full column descriptions.
+#' @seealso
+#' * [setup_default_parameters()]
 #' @noRd
 #' @examples
 #' \dontrun{
@@ -456,12 +468,14 @@ setup_default_DoubleLogistic <- function() {
 #'   forms include `r toString(eval(formals(setup_default_Selectivity)[["module_type"]]))`
 #'   and the default is
 #'   `r toString(eval(formals(setup_default_Selectivity)[["module_type"]])[1])`.
+#' See \code{\link{setup_default_parameters}} for full column descriptions.
 #' @inherit setup_default_parameters
 #' @return A tibble containing the default selectivity parameters. See \code{\link{setup_default_parameters}}
 #' for full column descriptions.
 #' @export
-#' @rdname setup_default_parameters
 #' @keywords setup_default_parameters
+#' @seealso
+#' * [setup_default_parameters()]
 #' @examples
 #' \dontrun{
 #' default_selectivity_parameters <- FIMS:::setup_default_Selectivity(
@@ -508,7 +522,8 @@ setup_default_Selectivity <- function(
 #' @return A tibble containing the default fleet parameters. See \code{\link{setup_default_parameters}}
 #' for full column descriptions.
 #' @export
-#' @rdname setup_default_parameters
+#' @seealso
+#' * [setup_default_parameters()]
 #' @keywords setup_default_parameters
 #' @examples
 #' \dontrun{
@@ -568,7 +583,6 @@ setup_default_Fleet <- function(
 #'
 #' @description
 #' This function sets up default parameters for a maturity module.
-#' @param data An S4 object. FIMS input data.
 #' @param module_type A string specifying the type of maturity module. The
 #'   available options are `r toString(eval(formals(setup_default_Maturity)[["module_type"]]))`.
 #' @inherit setup_default_parameters
@@ -576,8 +590,9 @@ setup_default_Fleet <- function(
 #' A tibble containing default maturity parameters. See \code{\link{setup_default_parameters}}
 #' for full column descriptions.
 #' @export
-#' @rdname setup_default_parameters
 #' @keywords setup_default_parameters
+#' @seealso
+#' * [setup_default_parameters()]
 #' @examples
 #' \dontrun{
 #' default_maturity_parameters <- setup_default_Maturity(
@@ -623,6 +638,8 @@ setup_default_Maturity <- function(
 #' @return
 #' A tibble containing default recruitment parameters. See \code{\link{setup_default_parameters}}
 #' for full column descriptions.
+#' @seealso
+#' * [setup_default_parameters()]
 #' @noRd
 #' @examples
 #' \dontrun{
@@ -705,6 +722,9 @@ setup_default_BevertonHoltRecruitment <- function(
 #'   `r toString(formals(setup_default_DnormDistribution)[["input_type"]][1])`.
 #' @inherit setup_default_parameters
 #' @return A tibble containing the default DnormDistribution parameters.
+#' See \code{\link{setup_default_parameters}} for full column descriptions.
+#' @seealso
+#' * [setup_default_parameters()]
 #' @noRd
 setup_default_DnormDistribution <- function(
   value = 0.1,
@@ -742,6 +762,9 @@ setup_default_DnormDistribution <- function(
 #'   `r toString(formals(setup_default_DlnormDistribution)[["input_type"]][1])`.
 #' @inherit setup_default_parameters
 #' @return A tibble containing the default DlnormDistribution parameters.
+#' See \code{\link{setup_default_parameters}} for full column descriptions.
+#' @seealso
+#' * [setup_default_parameters()]
 #' @noRd
 setup_default_DlnormDistribution <- function(
   value = 0.1,
@@ -794,8 +817,9 @@ setup_default_DlnormDistribution <- function(
 #' A tibble containing default recruitment parameters. See \code{\link{setup_default_parameters}}
 #' for full column descriptions.
 #' @export
-#' @rdname setup_default_parameters
 #' @keywords setup_default_parameters
+#' @seealso
+#' * [setup_default_parameters()]
 #' @examples
 #' \dontrun{
 #' default_recruitment_parameters <- setup_default_Recruitment(

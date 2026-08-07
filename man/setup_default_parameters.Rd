@@ -2,62 +2,13 @@
 % Please edit documentation in R/setup_default_parameters.R
 \name{setup_default_parameters}
 \alias{setup_default_parameters}
-\alias{setup_default_Growth}
-\alias{setup_default_Population}
-\alias{setup_default_Selectivity}
-\alias{setup_default_Fleet}
-\alias{setup_default_Maturity}
-\alias{setup_default_Recruitment}
 \title{Set up default parameters for a FIMS model}
 \usage{
 setup_default_parameters(data)
-
-setup_default_Growth(module_type = c("EWAA"))
-
-setup_default_Population(
-  data,
-  log_M = log(0.2),
-  log_init_naa = NA_real_,
-  proportion_female = 0.5
-)
-
-setup_default_Selectivity(
-  data,
-  fleet,
-  module_type = c("Logistic", "DoubleLogistic")
-)
-
-setup_default_Fleet(data, fleet)
-
-setup_default_Maturity(data, module_type = c("Logistic"))
-
-setup_default_Recruitment(
-  data,
-  module_type = c("BevertonHolt"),
-  distribution = c("Dnorm", NA_character_)
-)
 }
 \arguments{
-\item{data}{An S4 object. FIMS input data.}
-
-\item{module_type}{A string specifying the type of recruitment model. The
-available options are
-BevertonHolt.}
-
-\item{log_M}{A numeric value or vector (length equal to the number of ages *
-number of years) specifying the log natural mortality rate. Default is \code{log(0.2)}.}
-
-\item{log_init_naa}{A numeric value or vector (length equal to the number of
-ages) specifying the log initial numbers at age. Default is \code{NA_real_}.}
-
-\item{proportion_female}{A numeric value between 0 and 1 specifying the
-proportion of females. Default is \code{0.5}.}
-
-\item{fleet}{A character. Name of the fleet.}
-
-\item{distribution}{A string specifying the distribution for the recruitment process.
-The available options are
-Dnorm, NA.}
+\item{data}{A \code{FIMSFrame} object returned from running \code{\link[=FIMSFrame]{FIMSFrame()}} on
+your long input data.}
 }
 \value{
 A \code{tibble} containing default parameter values and metadata for your model.
@@ -86,24 +37,6 @@ random effect but it does not fit to data, e.g., recruitment deviation.}
 "Dmultinom"). This column will always be written
 in PascalCase to match the names used in the C++ code.}
 }
-
-A tibble containing default growth parameters. See \code{\link{setup_default_parameters}}
-for full column descriptions.
-
-A tibble of default population configurations, including initial numbers at
-age, natural mortality rate, and proportion of females.
-
-A tibble containing the default selectivity parameters. See \code{\link{setup_default_parameters}}
-for full column descriptions.
-
-A tibble containing the default fleet parameters. See \code{\link{setup_default_parameters}}
-for full column descriptions.
-
-A tibble containing default maturity parameters. See \code{\link{setup_default_parameters}}
-for full column descriptions.
-
-A tibble containing default recruitment parameters. See \code{\link{setup_default_parameters}}
-for full column descriptions.
 }
 \description{
 Initializing a FIMS model, i.e., \code{initialize_fims()} requires a \code{FIMSFrame}
@@ -112,25 +45,6 @@ generated using this function or by building up your own tibble from
 helper functions used within this function. The resulting tibble will have
 all of the necessary parameters, specific to your data, to run a FIMS
 model.
-
-This function creates default growth parameters for a Fisheries Integrated
-Modeling System (FIMS) model. It generates a tibble with fields for
-module name, module type, label, value, and estimation type.
-
-This function sets up default parameters for a population module.
-
-This function sets up default parameters for a selectivity module.
-
-This function sets up default parameters for a fleet module, including natural log of
-catchability coefficients (log_q) and fishing mortality (log_Fmort) for fleets.
-For fishing fleets, log_q is set to an estimation type of "constant" with a
-default value of 0, while log_Fmort is set to "fixed_effects". For survey
-fleets, log_q is set to "fixed_effects" and log_Fmort is set to "constant"
-with a default value of -200.
-
-This function sets up default parameters for a maturity module.
-
-This function sets up default parameters for a recruitment module.
 }
 \details{
 The function builds module-specific defaults by calling helper
@@ -142,11 +56,6 @@ updating maturity and selectivity parameter values).
 To create the default initial numbers at age, this function uses the defaults
 from \code{setup_default_Population()} and \code{setup_default_Recruitment()}, which
 are passed to \code{setup_default_init_naa()} to calculate initial numbers at age.
-
-The function creates a tibble of default population configurations, including
-log natural mortality rate, log initial numbers at age, and proportion of
-females. The function performs input checks to ensure that the provided
-arguments are valid.
 }
 \examples{
 \dontrun{
@@ -180,39 +89,6 @@ parameters_with_double_logistic <- updated_parameters |>
       module_type = "DoubleLogistic"
     )
   )
-}
-\dontrun{
-# Set up default growth parameters
-default_growth_parameters <- setup_default_Growth()
-}
-\dontrun{
-default_population_parameters <- setup_default_Population(data = FIMSFrame(data_big))
-}
-\dontrun{
-default_selectivity_parameters <- FIMS:::setup_default_Selectivity(
-  data = FIMSFrame(data_big),
-  fleet = "fleet1",
-  module_type = "Logistic"
-)
-}
-\dontrun{
-default_fleet_parameters <- setup_default_Fleet(
-  data = FIMSFrame(data_big),
-  fleet = "fleet1"
-)
-}
-\dontrun{
-default_maturity_parameters <- setup_default_Maturity(
-  data = FIMSFrame(data_big),
-  module_type = "Logistic"
-)
-}
-\dontrun{
-default_recruitment_parameters <- setup_default_Recruitment(
-  data = FIMSFrame(data_big),
-  module_type = "BevertonHolt",
-  distribution = "Dnorm"
-)
 }
 }
 \seealso{
