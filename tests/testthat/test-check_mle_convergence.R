@@ -25,14 +25,14 @@ make_mock_mle_opt <- function(convergence = 0, message = NULL, par = numeric()) 
   )
 }
 
-mock_fimsfit <- function(input, obj, opt, sdreport, timing) {
+mock_fimsfit <- function(input, obj, opt, sdreport, run_time) {
   list(
     tag = "mock_fit",
     input = input,
     obj = obj,
     opt = opt,
     sdreport = sdreport,
-    timing = timing
+    run_time = run_time
   )
 }
 

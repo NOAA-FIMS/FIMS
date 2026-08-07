@@ -141,7 +141,7 @@ parameters_4_model <- default_parameters |>
     tibble::tibble(
       fleet = "fleet1",
       label = "log_Fmort",
-      time = seq(get_n_years(data_4_model)),
+      timing = seq(get_n_years(data_4_model)),
       value = log(c(
         0.009459165, 0.027288858, 0.045063639,
         0.061017825, 0.048600752, 0.087420554,
@@ -155,7 +155,7 @@ parameters_4_model <- default_parameters |>
         0.431745298, 0.328030899, 0.499675368
       ))
     ),
-    by = c("fleet", "label", "time")
+    by = c("fleet", "label", "timing")
   ) |>
   # Update selectivity parameters and log_q for survey1
   dplyr::rows_update(
@@ -166,11 +166,11 @@ parameters_4_model <- default_parameters |>
     ),
     by = c("fleet", "label")
   ) |>
-  # Update log_devs in the Recruitment module (time steps 2-30)
+  # Update log_devs in the Recruitment module (timing steps 2-30)
   dplyr::rows_update(
     tibble::tibble(
       label = "log_devs",
-      time = 2:get_n_years(data_4_model),
+      timing = 2:get_n_years(data_4_model),
       value = c(
         0.43787763, -0.13299042, -0.43251973, 0.64861200, 0.50640852,
         -0.06958319, 0.30246260, -0.08257384, 0.20740372, 0.15289604,
@@ -180,7 +180,7 @@ parameters_4_model <- default_parameters |>
         -0.19556523, 0.20094360, 0.37248740, -0.07163145
       )
     ),
-    by = c("label", "time")
+    by = c("label", "timing")
   ) |>
   # Update log_sd for log_devs in the Recruitment module
   dplyr::rows_update(

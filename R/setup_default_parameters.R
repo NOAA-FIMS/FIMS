@@ -45,7 +45,7 @@
 #'   \item{\code{label}:}{The parameter name (e.g., "inflection_point").}
 #'   \item{\code{age}:}{The age the parameter applies to.}
 #'   \item{\code{length}:}{The length bin the parameter applies to.}
-#'   \item{\code{time}:}{The time step (year) the parameter applies to.}
+#'   \item{\code{timing}:}{The timing step (year) the parameter applies to.}
 #'   \item{\code{value}:}{The initial value of the parameter.}
 #'   \item{\code{estimation_type}:}{The estimation type (e.g., "constant",
 #'     "fixed_effects", "random_effects").}
@@ -249,7 +249,7 @@ setup_default_parameters_template <- function(n_parameters = 1) {
     label = NA_character_,
     age = NA_real_,
     length = NA_real_,
-    time = NA_integer_,
+    timing = NA_integer_,
     value = NA_real_,
     estimation_type = NA_character_,
     distribution_type = NA_character_,
@@ -383,7 +383,7 @@ setup_default_Population <- function(
       label = "log_M",
       value = .env$log_M,
       age = rep(ages, n_years),
-      time = rep(years, each = n_ages),
+      timing = rep(years, each = n_ages),
       estimation_type = "constant"
     ) |>
     dplyr::add_row(
@@ -574,7 +574,7 @@ setup_default_Fleet <- function(
       module_name = "Fleet",
       fleet = .env$fleet,
       label = "log_Fmort",
-      time = get_start_year(data):get_end_year(data),
+      timing = get_start_year(data):get_end_year(data),
       value = if (has_index) -200 else -3,
       estimation_type = if (has_index) "constant" else "fixed_effects"
     )
@@ -685,7 +685,7 @@ setup_default_BevertonHoltRecruitment <- function(
       # TODO: should this be log_recruit_dev to match output?
       label = "log_devs",
       value = 0.0,
-      time = (get_start_year(data) + 1):get_end_year(data),
+      timing = (get_start_year(data) + 1):get_end_year(data),
       estimation_type = "random_effects",
       distribution_type = "process",
       distribution = .env$distribution
@@ -695,11 +695,11 @@ setup_default_BevertonHoltRecruitment <- function(
       dplyr::rows_update(
         tibble::tibble(
           label = "log_devs",
-          time = (get_start_year(data) + 1):get_end_year(data),
+          timing = (get_start_year(data) + 1):get_end_year(data),
           estimation_type = "constant",
           distribution_type = NA_character_
         ),
-        by = c("label", "time")
+        by = c("label", "timing")
       )
   }
 

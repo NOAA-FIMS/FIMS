@@ -133,10 +133,10 @@ prepare_test_data <- function() {
       tibble::tibble(
         fleet = "fleet1",
         label = "log_Fmort",
-        time = 1:get_n_years(data_age_length_comp),
+        timing = 1:get_n_years(data_age_length_comp),
         value = log(om_output_list[[iter_id]][["f"]]),
       ),
-      by = c("fleet", "label", "time")
+      by = c("fleet", "label", "timing")
     ) |>
     # Update selectivity parameters and log_q for survey1
     dplyr::rows_update(
@@ -147,14 +147,14 @@ prepare_test_data <- function() {
       ),
       by = c("fleet", "label")
     ) |>
-    # Update log_devs in the Recruitment module (time steps 2-30)
+    # Update log_devs in the Recruitment module (timing steps 2-30)
     dplyr::rows_update(
       tibble::tibble(
         label = "log_devs",
-        time = 2:get_n_years(data_age_length_comp),
+        timing = 2:get_n_years(data_age_length_comp),
         value = om_input_list[[iter_id]][["logR.resid"]][-1]
       ),
-      by = c("label", "time")
+      by = c("label", "timing")
     ) |>
     # Update log_sd for log_devs in the Recruitment module
     # Note: logR_sd is the standard deviation on the natural scale of the

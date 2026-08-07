@@ -502,9 +502,9 @@ test_that("estimation test with recruitment re on logr", {
   #' @description Test that the `expected_recruitment` from both `fit_log_r` and `fit_log_devs` runs are approximately equal within a tolerance of 0.001.
   expect_equal(fit_log_r@report[["expected_recruitment"]], fit_log_devs@report[["expected_recruitment"]], tolerance = .001)
   #' @description Test that the `time_optimization` from `fit_log_r` is less than or equal to that from `fit_log_devs`.
-  expect_lte(fit_log_r@timing[["time_optimization"]], fit_log_devs@timing[["time_optimization"]])
+  expect_lte(fit_log_r@run_time[["time_optimization"]], fit_log_devs@run_time[["time_optimization"]])
   #' @description Test that the `time_sdreport` from `fit_log_r` is less than or equal to that from `fit_log_devs`.
-  expect_lte(fit_log_r@timing[["time_sdreport"]], fit_log_devs@timing[["time_sdreport"]])
+  expect_lte(fit_log_r@run_time[["time_sdreport"]], fit_log_devs@run_time[["time_sdreport"]])
 
   clear()
 })

@@ -20,7 +20,7 @@ Following statistical best practices, FIMS incorporates the use of random effect
 
 To quantify the magnitude of this penalty we investigate the performance and optimization time of a simple random effects model under equivalent sparse vs dense parameterizations. For this example we utilize two simple proxy models; an auto regressive AR1 function and a simple stock assessment model based on [babySAM](https://github.com/fishfollower/SAM/tree/master/stockassessment). These proxies should reflect the relative performance gains expected in the real-world correlated time-varying processes modeled in stock assessments such as recruitment. Each of these time-series models can be parameterized as a dense matrix, representing the traditional parameter deviations as a random-effects approach, or as a sparse matrix, as would be achieved by directly estimating annual parameter values as random effects.
 
-These two approaches are anticipated to produce mathematically equivalent results while differing in their computational overhead. Confirming this equivalency and quantifying the runtime improvement will provide support for the change in approach relative to previous assessment models.
+These two approaches are anticipated to produce mathematically equivalent results while differing in their computational overhead. Confirming this equivalency and quantifying the run-time improvement will provide support for the change in approach relative to previous assessment models.
 
 ## Methods
 
