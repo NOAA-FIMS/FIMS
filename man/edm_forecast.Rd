@@ -4,32 +4,44 @@
 \alias{edm_forecast}
 \title{Generate forecasts from a fitted EDM model}
 \usage{
-edm_forecast(fit, n_ahead = 1L, ...)
+edm_forecast(fit, data, n_ahead = 1L, ...)
 }
 \arguments{
 \item{fit}{An \linkS4class{EDMFit} object returned by \code{\link[=fit_edm]{fit_edm()}}.}
 
+\item{data}{The \code{\link[=FIMSFrame]{FIMSFrame()}} object that was passed to \code{\link[=fit_edm]{fit_edm()}}.
+Required to reconstruct the time series for building forecast query points.}
+
 \item{n_ahead}{Positive integer. Number of time steps to forecast ahead.
 Default is \code{1}.}
 
-\item{...}{Additional arguments passed to underlying prediction methods.}
+\item{...}{Additional arguments (reserved for future use).}
 }
 \value{
-A tibble with columns:
+A \code{\link[tibble:tibble]{tibble::tibble()}} with columns:
 \describe{
-\item{time}{Forecast time index.}
+\item{step}{Integer forecast horizon (1 to \code{n_ahead}).}
+\item{time}{Forecast time index (last observed time + step).}
 \item{forecast}{Point forecast value.}
-\item{se}{Standard error of the forecast (if available).}
+\item{se}{Standard error. Currently \code{NA} for all methods; GP posterior
+variance will be added in a future release.}
 }
 }
 \description{
 Generates out-of-sample empirical forecasts from a fitted \linkS4class{EDMFit}
-object returned by \code{\link[=fit_edm]{fit_edm()}}.
+object returned by \code{\link[=fit_edm]{fit_edm()}}. For multi-step forecasting (\code{n_ahead > 1}),
+each predicted value is iteratively appended to the series and used as the
+query state for the next step.
 }
 \examples{
 \dontrun{
-fit <- fit_edm(ff, method = "smap", embedding_name = "fishery1_landings")
-forecasts <- edm_forecast(fit, n_ahead = 5)
+data("data_big")
+ff <- FIMSFrame(data_big)
+ff <- create_edm_embedding(ff, series_type = "landings", series_name = "fleet1",
+                           E = 3L, tau = 1L)
+fit <- fit_edm(ff, method = "simplex")
+forecasts <- edm_forecast(fit, ff, n_ahead = 5)
+print(forecasts)
 }
 }
 \seealso{

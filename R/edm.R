@@ -416,35 +416,159 @@ fit_edm <- function(data,
   )
 }
 
-# edm_forecast -----------------------------------------------------------
-
 #' Generate forecasts from a fitted EDM model
 #'
 #' @description
 #' Generates out-of-sample empirical forecasts from a fitted [EDMFit-class]
-#' object returned by [fit_edm()].
+#' object returned by [fit_edm()]. For multi-step forecasting (`n_ahead > 1`),
+#' each predicted value is iteratively appended to the series and used as the
+#' query state for the next step.
 #'
 #' @param fit An [EDMFit-class] object returned by [fit_edm()].
+#' @param data The [FIMSFrame()] object that was passed to [fit_edm()].
+#'   Required to reconstruct the time series for building forecast query points.
 #' @param n_ahead Positive integer. Number of time steps to forecast ahead.
 #'   Default is `1`.
-#' @param ... Additional arguments passed to underlying prediction methods.
+#' @param ... Additional arguments (reserved for future use).
 #'
-#' @return A tibble with columns:
+#' @return A [tibble::tibble()] with columns:
 #'   \describe{
-#'     \item{time}{Forecast time index.}
+#'     \item{step}{Integer forecast horizon (1 to `n_ahead`).}
+#'     \item{time}{Forecast time index (last observed time + step).}
 #'     \item{forecast}{Point forecast value.}
-#'     \item{se}{Standard error of the forecast (if available).}
+#'     \item{se}{Standard error. Currently `NA` for all methods; GP posterior
+#'       variance will be added in a future release.}
 #'   }
 #'
 #' @seealso [fit_edm()], [EDMFit-class]
 #' @export
 #' @examples
 #' \dontrun{
-#' fit <- fit_edm(ff, method = "smap", embedding_name = "fishery1_landings")
-#' forecasts <- edm_forecast(fit, n_ahead = 5)
+#' data("data_big")
+#' ff <- FIMSFrame(data_big)
+#' ff <- create_edm_embedding(ff, series_type = "landings", series_name = "fleet1",
+#'                            E = 3L, tau = 1L)
+#' fit <- fit_edm(ff, method = "simplex")
+#' forecasts <- edm_forecast(fit, ff, n_ahead = 5)
+#' print(forecasts)
 #' }
-edm_forecast <- function(fit, n_ahead = 1L, ...) {
-  stopifnot(is.EDMFit(fit))
-  # TODO: Implement forecast generation from EDMFit object (Commit 4)
-  stop("edm_forecast() is not yet implemented. Coming in Phase 4 (GSoC 2026).")
+edm_forecast <- function(fit, data, n_ahead = 1L, ...) {
+
+  # --- Input validation ---------------------------------------------------
+  if (!is.EDMFit(fit)) {
+    cli::cli_abort(
+      "{.arg fit} must be an {.cls EDMFit} object returned by {.fn fit_edm}."
+    )
+  }
+  if (!methods::is(data, "FIMSFrame")) {
+    cli::cli_abort("{.arg data} must be a {.cls FIMSFrame} object.")
+  }
+  n_ahead <- as.integer(n_ahead)
+  if (n_ahead < 1L) {
+    cli::cli_abort("{.arg n_ahead} must be a positive integer, got {n_ahead}.")
+  }
+
+  # --- Resolve embedding metadata -----------------------------------------
+  embedding_name <- get_embedding_name(fit)
+  embeddings     <- get_edm_embeddings(data)
+
+  if (!embedding_name %in% names(embeddings)) {
+    cli::cli_abort(c(
+      "Embedding {.val {embedding_name}} not found in {.arg data}.",
+      "i" = "Was {.arg data} the same {.cls FIMSFrame} passed to {.fn fit_edm}?"
+    ))
+  }
+
+  emb      <- embeddings[[embedding_name]]
+  E_used   <- fit@embedding_dimension
+  tau_used <- fit@time_lag
+  method   <- get_method(fit)
+  params   <- get_parameters(fit)
+
+  # --- Re-extract the original time series --------------------------------
+  series_tbl <- dplyr::filter(
+    get_data(data),
+    .data[["type"]]  == emb$series_type,
+    .data[["fleet"]] == emb$series_name
+  ) |>
+    dplyr::arrange(.data[["timing"]])
+
+  full_series <- series_tbl$value
+  last_time   <- max(series_tbl$timing)
+
+  # --- Rebuild library DelayEmbedding -------------------------------------
+  lib_de <- methods::new(DelayEmbedding)
+  if (isTRUE(emb$drop_missing)) {
+    lib_de$construct_drop_missing(
+      as.numeric(full_series),
+      as.integer(E_used),
+      as.integer(tau_used),
+      -999.0
+    )
+  } else {
+    lib_de$construct(
+      as.numeric(full_series),
+      as.integer(E_used),
+      as.integer(tau_used)
+    )
+  }
+  lib_id <- lib_de$get_id()
+
+  # Helper: predict one step ahead using the last row of test_de
+  .predict_last <- function(test_series) {
+    test_de <- methods::new(DelayEmbedding)
+    test_de$construct(as.numeric(test_series), as.integer(E_used), as.integer(tau_used))
+    if (test_de$n_rows == 0L) {
+      cli::cli_abort(c(
+        "Cannot build a test query from the extended series.",
+        "i" = "Series length {length(test_series)} is too short for E={E_used}, tau={tau_used}."
+      ))
+    }
+    test_id <- test_de$get_id()
+    preds <- switch(method,
+      simplex = {
+        sp <- methods::new(SimplexProjection)
+        sp$embedding_dimension <- as.integer(E_used)
+        sp$n_neighbors         <- as.integer(params[["n_neighbors"]])
+        sp$predict(lib_id, test_id)
+      },
+      smap = {
+        sm <- methods::new(SMapProjection)
+        sm$embedding_dimension <- as.integer(E_used)
+        sm$theta               <- as.numeric(params[["theta"]])
+        sm$kernel              <- "exponential"
+        sm$predict(lib_id, test_id)
+      },
+      gp = {
+        gp <- methods::new(GPEdmProjection)
+        gp$embedding_dimension <- as.integer(E_used)
+        gp$phi                 <- as.numeric(params[["phi"]])
+        gp$sigma2              <- as.numeric(params[["sigma2"]])
+        gp$ve                  <- as.numeric(params[["ve"]])
+        gp$predict(lib_id, test_id)
+      }
+    )
+    # Return the LAST prediction (the most recent query state)
+    utils::tail(preds, 1L)
+  }
+
+  # --- Iterative multi-step forecasting -----------------------------------
+  # Each step: take the last prediction, append it to the extended series,
+  # rebuild the test embedding, and predict again.
+  extended_series <- as.numeric(full_series)
+  forecasts       <- numeric(n_ahead)
+
+  for (h in seq_len(n_ahead)) {
+    forecasts[h]    <- .predict_last(extended_series)
+    extended_series <- c(extended_series, forecasts[h])
+  }
+
+  # --- Return tidy tibble -------------------------------------------------
+  tibble::tibble(
+    step     = seq_len(n_ahead),
+    time     = last_time + seq_len(n_ahead),
+    forecast = forecasts,
+    se       = NA_real_
+  )
 }
+
