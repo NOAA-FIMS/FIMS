@@ -7,7 +7,7 @@
 edm_forecast(fit, n_ahead = 1L, ...)
 }
 \arguments{
-\item{fit}{An \code{EDMFit} object returned by \code{\link[=fit_edm]{fit_edm()}}.}
+\item{fit}{An \linkS4class{EDMFit} object returned by \code{\link[=fit_edm]{fit_edm()}}.}
 
 \item{n_ahead}{Positive integer. Number of time steps to forecast ahead.
 Default is \code{1}.}
@@ -23,8 +23,8 @@ A tibble with columns:
 }
 }
 \description{
-Generates out-of-sample empirical forecasts from a fitted \code{EDMFit} object
-returned by \code{\link[=fit_edm]{fit_edm()}}.
+Generates out-of-sample empirical forecasts from a fitted \linkS4class{EDMFit}
+object returned by \code{\link[=fit_edm]{fit_edm()}}.
 }
 \examples{
 \dontrun{
@@ -33,5 +33,5 @@ forecasts <- edm_forecast(fit, n_ahead = 5)
 }
 }
 \seealso{
-\code{\link[=fit_edm]{fit_edm()}}
+\code{\link[=fit_edm]{fit_edm()}}, \linkS4class{EDMFit}
 }

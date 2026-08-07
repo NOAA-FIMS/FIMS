@@ -46,18 +46,13 @@ Default is \code{1}.}
 \item{...}{Additional arguments passed to the underlying EDM C++ interface.}
 }
 \value{
-An object of class \code{EDMFit} containing:
-\describe{
-\item{method}{The EDM method used.}
-\item{predictions}{Numeric vector of one-step-ahead predictions.}
-\item{embedding}{The \code{DelayEmbeddingMatrix} used for fitting.}
-\item{parameters}{List of method-specific hyperparameters.}
-}
+An object of class \linkS4class{EDMFit}.
 }
 \description{
 High-level interface for fitting an Empirical Dynamic Modeling (EDM)
 prediction model to a univariate or multivariate time series stored in a
-\code{FIMSFrame} object. Supports Simplex Projection, S-Map, and GP-EDM methods.
+\code{\link[=FIMSFrame]{FIMSFrame()}} object. Supports Simplex Projection, S-Map, and GP-EDM
+methods.
 }
 \examples{
 \dontrun{
@@ -65,6 +60,7 @@ data("data_big")
 ff <- FIMSFrame(data_big)
 ff <- create_edm_embedding(ff, type = "landings", fleet = "fishery1", E = 3, tau = 1)
 fit <- fit_edm(ff, method = "simplex", embedding_name = "fishery1_landings")
+print(fit)
 }
 }
 \seealso{
