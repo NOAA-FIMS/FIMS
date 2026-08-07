@@ -287,9 +287,133 @@ fit_edm <- function(data,
                     forecast_horizon = 1L,
                     ...) {
   method <- match.arg(method)
-  stopifnot(inherits(data, "FIMSFrame"))
-  # TODO: Implement method dispatch to C++ EDM interfaces (Commit 3)
-  stop("fit_edm() is not yet implemented. Coming in Phase 4 (GSoC 2026).")
+
+  # --- Input validation ---------------------------------------------------
+  if (!methods::is(data, "FIMSFrame")) {
+    cli::cli_abort("{.arg data} must be a {.cls FIMSFrame} object.")
+  }
+
+  # --- Resolve embedding --------------------------------------------------
+  embeddings <- get_edm_embeddings(data)
+  if (length(embeddings) == 0L) {
+    cli::cli_abort(c(
+      "No delay embeddings found in {.arg data}.",
+      "i" = "Use {.fn create_edm_embedding} to build one first."
+    ))
+  }
+
+  if (is.null(embedding_name)) {
+    embedding_name <- names(embeddings)[[1L]]
+    cli::cli_inform(
+      "Using first available embedding: {.val {embedding_name}}"
+    )
+  }
+
+  if (!embedding_name %in% names(embeddings)) {
+    cli::cli_abort(c(
+      "Embedding {.val {embedding_name}} not found in {.arg data}.",
+      "i" = "Available embeddings: {.val {names(embeddings)}}."
+    ))
+  }
+
+  emb    <- embeddings[[embedding_name]]
+  E_used   <- emb$E
+  tau_used <- emb$tau
+
+  # --- Reconstruct Rcpp DelayEmbedding from the stored series -------------
+  # Re-extract the original series so the Rcpp object holds live pointers.
+  series_data <- dplyr::filter(
+    get_data(data),
+    .data[["type"]]  == emb$series_type,
+    .data[["fleet"]] == emb$series_name
+  ) |>
+    dplyr::arrange(.data[["timing"]]) |>
+    dplyr::pull(.data[["value"]])
+
+  lib_de <- methods::new(DelayEmbedding)
+  if (isTRUE(emb$drop_missing)) {
+    lib_de$construct_drop_missing(
+      as.numeric(series_data),
+      as.integer(E_used),
+      as.integer(tau_used),
+      -999.0
+    )
+  } else {
+    lib_de$construct(
+      as.numeric(series_data),
+      as.integer(E_used),
+      as.integer(tau_used)
+    )
+  }
+
+  n_lib <- lib_de$n_rows
+
+  if (n_lib < 2L) {
+    cli::cli_abort(c(
+      "Library has fewer than 2 rows after constructing the delay embedding.",
+      "i" = "Check that {.arg data} has enough observations for E={E_used}, tau={tau_used}."
+    ))
+  }
+
+  # --- Dispatch to Rcpp predictor -----------------------------------------
+  # In-library prediction: library == test (same DelayEmbedding id).
+  lib_id <- lib_de$get_id()
+
+  result <- switch(method,
+
+    simplex = {
+      k <- if (as.integer(n_neighbors) == 0L) {
+        as.integer(E_used + 1L)
+      } else {
+        as.integer(n_neighbors)
+      }
+      sp <- methods::new(SimplexProjection)
+      sp$embedding_dimension <- as.integer(E_used)
+      sp$n_neighbors         <- k
+      preds  <- sp$predict(lib_id, lib_id)
+      params <- list(n_neighbors = k)
+      list(predictions = preds, parameters = params)
+    },
+
+    smap = {
+      sm <- methods::new(SMapProjection)
+      sm$embedding_dimension <- as.integer(E_used)
+      sm$theta               <- as.numeric(theta)
+      sm$kernel              <- "exponential"
+      preds  <- sm$predict(lib_id, lib_id)
+      params <- list(theta = as.numeric(theta), kernel = "exponential")
+      list(predictions = preds, parameters = params)
+    },
+
+    gp = {
+      gp <- methods::new(GPEdmProjection)
+      gp$embedding_dimension <- as.integer(E_used)
+      gp$phi                 <- rep(0.5, E_used)
+      gp$sigma2              <- 1.0
+      gp$ve                  <- 0.1
+      fitted <- gp$fit(lib_id)          # optimises phi, sigma2, ve in-place
+      preds  <- gp$predict(lib_id, lib_id)
+      params <- list(
+        phi    = fitted$phi,
+        sigma2 = fitted$sigma2,
+        ve     = fitted$ve
+      )
+      list(predictions = preds, parameters = params)
+    }
+  )
+
+  # --- Construct and return EDMFit ----------------------------------------
+  methods::new(
+    "EDMFit",
+    method             = method,
+    predictions        = as.numeric(result$predictions),
+    embedding_name     = embedding_name,
+    embedding_dimension = as.integer(E_used),
+    time_lag           = as.integer(tau_used),
+    n_library          = as.integer(n_lib),
+    parameters         = result$parameters,
+    version            = utils::packageVersion("FIMS")
+  )
 }
 
 # edm_forecast -----------------------------------------------------------
