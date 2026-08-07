@@ -133,14 +133,14 @@ setup_default_parameters <- function(data) {
       message_text <- conditionMessage(message_condition)
       is_log_init_naa_message <-
         grepl("log_init_naa", message_text, fixed = TRUE) &&
-        grepl("Please set the initial numbers at age", message_text, fixed = TRUE)
+          grepl("Please set the initial numbers at age", message_text, fixed = TRUE)
 
       if (is_log_init_naa_message) {
         invokeRestart("muffleMessage")
       }
     }
   )
-  
+
   # Calculate initial numbers at age based on log_rzero and M_value
   # Set natural mortality rate
   log_m <- population_defaults |>
