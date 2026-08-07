@@ -83,7 +83,7 @@ run_modified_pars_fims <- function(
 
   # Update value
   parameter_row[["value"]] <- new_value
-  parameter_row[["estimation_type"]] <- "constant"
+  parameter_row[["estimation_status"]] <- "assumed_known"
   parameters_mod <- parameters_to_use |>
     dplyr::rows_update(
       parameter_row,

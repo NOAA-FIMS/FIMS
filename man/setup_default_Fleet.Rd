@@ -19,9 +19,9 @@ for full column descriptions.
 \description{
 This function sets up default parameters for a fleet module, including natural log of
 catchability coefficients (log_q) and fishing mortality (log_Fmort) for fleets.
-For fishing fleets, log_q is set to an estimation type of "constant" with a
+For fishing fleets, log_q is set to an estimation status of "assumed_known" with a
 default value of 0, while log_Fmort is set to "fixed_effects". For survey
-fleets, log_q is set to "fixed_effects" and log_Fmort is set to "constant"
+fleets, log_q is set to "fixed_effects" and log_Fmort is set to "assumed_known"
 with a default value of -200.
 }
 \details{

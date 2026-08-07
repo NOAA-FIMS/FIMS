@@ -124,7 +124,7 @@ initialize_module <- function(parameters, data, module_name, fleet = NA_characte
       # Assign each value to the corresponding position in the parameter vector
       module[["age_to_length_conversion"]][] <- age_to_length_conversion_value
       # Set the estimation information for the entire parameter vector
-      module[["age_to_length_conversion"]]$set_estimation_types(c("constant"))
+      module[["age_to_length_conversion"]]$set_estimation_status(c("assumed_known"))
     } else {
       module_fields <- setdiff(module_fields, c(
         # Right now we can also remove n_lengths because the default is 0
@@ -596,20 +596,20 @@ initialize_fims <- function(parameters, data) {
     cli::cli_abort("The {.var parameters} argument must be a tibble.")
   }
 
-  # Check if estimation_type is within "constant", "fixed_effect", "random_effect"
-  # Validates supported estimation types to avoid errors later when
+  # Check if estimation_status is within "assumed_known", "fixed_effect", "random_effect"
+  # Validates supported estimation status to avoid errors later when
   #
-  valid_estimation_types <- c("constant", "fixed_effects", "random_effects")
-  invalid_estimation_types <- parameters |>
-    dplyr::filter(!.data$estimation_type %in% valid_estimation_types) |>
-    dplyr::pull(.data$estimation_type) |>
+  valid_estimation_status <- c("assumed_known", "fixed_effects", "random_effects")
+  invalid_estimation_status <- parameters |>
+    dplyr::filter(!.data$estimation_status %in% valid_estimation_status) |>
+    dplyr::pull(.data$estimation_status) |>
     unique() |>
     na.omit()
 
-  if (length(invalid_estimation_types) > 0) {
+  if (length(invalid_estimation_status) > 0) {
     cli::cli_abort(c(
-      "The `estimation_type` must be one of: {valid_estimation_types}.",
-      i = "Invalid values found: {invalid_estimation_types}."
+      "The `estimation_status` must be one of: {valid_estimation_status}.",
+      i = "Invalid values found: {invalid_estimation_status}."
     ))
   }
 
@@ -798,7 +798,7 @@ initialize_fims <- function(parameters, data) {
     process_par_name <- process_par |>
       dplyr::pull(.data$label) |>
       unique()
-    if (any(process_par[["estimation_type"]] != "constant")) {
+    if (any(process_par[["estimation_status"]] != "assumed_known")) {
       cli::cli_abort(c(
         x = "Missing required inputs for recruitment process random or
         fixed effects.",
@@ -808,9 +808,9 @@ initialize_fims <- function(parameters, data) {
         error:",
         i = "1. Set a distribution and distribution_type for the Recruitment
         {.var module_name} in configurations tibble.",
-        i = "2. Set the estimation_type for the recruitment
+        i = "2. Set the estimation_status for the recruitment
         {.var {process_par_name}} variable in the parameter tibble to
-        {.var constant}."
+        {.var assumed_known}."
       ))
     }
     # TODO: need to revisit initialize_process_structure and add R tests
@@ -834,7 +834,7 @@ initialize_fims <- function(parameters, data) {
         i = "Implement either one of the following options to resolve this
         error:",
         i = "1. Add parameter, {.var log_devs} or {.var log_r}, for the
-        recruitment process in the parameters tibble with an estimation_type of
+        recruitment process in the parameters tibble with an estimation_status of
         random_effects or fixed_effects.",
         i = "2. Set the distribution for the Recruitment distribution and
         distribution_type to {.var NA} in the configurations tibble."
@@ -842,18 +842,18 @@ initialize_fims <- function(parameters, data) {
     }
 
     if (any(recruitment_process_input |> dplyr::filter(.data$label != "log_sd") |>
-      dplyr::pull(.data$estimation_type) == "constant")) {
+      dplyr::pull(.data$estimation_status) == "assumed_known")) {
       cli::cli_abort(c(
         x = "Missing required inputs for recruitment process random or
         fixed effects.",
-        i = "The estimation type for {.var {par}} is constant, but there is a
+        i = "The estimation status for {.var {par}} is assumed_known, but there is a
         distribution specified for the Recruitment {.var module_name} in the
         configurations tibble.",
         i = "Implement either one of the following options to resolve this
         error:",
         i = "1. Set the distribution for the Recruitment distribution and
         distribution_type to {.var NA} in the configurations tibble.",
-        i = "2. Set the estimation_type for the recruitment {.var {par}} in the
+        i = "2. Set the estimation_status for the recruitment {.var {par}} in the
         parameter tibble to {.var random_effects} or {.var fixed_effects}."
       ))
     }
@@ -970,14 +970,14 @@ set_param_vector <- function(field, module, module_input, module_class_name) {
     dplyr::filter(.data$label == field) |>
     dplyr::pull(.data$value)
 
-  field_estimation_type <- module_input |>
+  field_estimation_status <- module_input |>
     dplyr::filter(.data$label == field) |>
-    dplyr::pull(.data$estimation_type)
+    dplyr::pull(.data$estimation_status)
 
   # Check if both value and estimation information are present
-  if (length(field_value) == 0 || length(field_estimation_type) == 0) {
+  if (length(field_value) == 0 || length(field_estimation_status) == 0) {
     cli::cli_abort(c(
-      "Missing value or estimation_type information for field {.var {field}} in
+      "Missing value or estimation_status information for field {.var {field}} in
       module {.var {module_class_name}}."
     ))
   }
@@ -987,6 +987,6 @@ set_param_vector <- function(field, module, module_input, module_class_name) {
   # Assign each value to the corresponding position in the parameter vector
   for (i in seq_along(field_value)) {
     module[[field]][i][["value"]] <- field_value[i]
-    module[[field]][i][["estimation_type"]]$set(field_estimation_type[i])
+    module[[field]][i][["estimation_status"]]$set(field_estimation_status[i])
   }
 }

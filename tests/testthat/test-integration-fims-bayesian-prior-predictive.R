@@ -41,10 +41,10 @@ test_that("posterior equals prior with no data", {
   fishing_fleet_selectivity <- methods::new(LogisticSelectivity)
   fishing_fleet_selectivity$inflection_point[1]$value <- om_input[["sel_fleet"]][["fleet1"]][["A50.sel1"]]
   # turn on estimation of inflection_point
-  fishing_fleet_selectivity$inflection_point[1]$estimation_type$set("fixed_effects")
+  fishing_fleet_selectivity$inflection_point[1]$set_estimation_status("fixed_effects")
   fishing_fleet_selectivity$slope[1]$value <- om_input[["sel_fleet"]][["fleet1"]][["slope.sel1"]]
   # turn on estimation of slope
-  fishing_fleet_selectivity$slope[1]$estimation_type$set("fixed_effects")
+  fishing_fleet_selectivity$slope[1]$set_estimation_status("fixed_effects")
 
   # Initialize the fishing fleet module
   # Initialize the fishing fleet module
@@ -97,10 +97,10 @@ test_that("posterior equals prior with no data", {
   survey_fleet_selectivity <- methods::new(LogisticSelectivity)
   survey_fleet_selectivity$inflection_point[1]$value <- om_input[["sel_survey"]][["survey1"]][["A50.sel1"]]
   # turn on estimation of inflection_point
-  survey_fleet_selectivity$inflection_point[1]$estimation_type$set("fixed_effects")
+  survey_fleet_selectivity$inflection_point[1]$set_estimation_status("fixed_effects")
   survey_fleet_selectivity$slope[1]$value <- om_input[["sel_survey"]][["survey1"]][["slope.sel1"]]
   # turn on estimation of slope
-  survey_fleet_selectivity$slope[1]$estimation_type$set("fixed_effects")
+  survey_fleet_selectivity$slope[1]$set_estimation_status("fixed_effects")
 
   survey_fleet <- methods::new(Fleet)
   survey_fleet$n_ages$set(om_input[["nages"]])
@@ -148,8 +148,8 @@ test_that("posterior equals prior with no data", {
   recruitment <- methods::new(BevertonHoltRecruitment)
   recruitment_process <- new(LogDevsRecruitmentProcess)
 
-  # set up recruitment parameters and fix as constant (default)
-  # do not set up a recruitment distribution as devs will be held constant
+  # set up recruitment parameters and fix as assumed_known (default)
+  # do not set up a recruitment distribution as devs will be assumed known
   # set up log_rzero (equilibrium recruitment)
   recruitment$log_rzero[1]$value <- log(om_input[["R0"]])
   # set up logit_steep
@@ -173,9 +173,9 @@ test_that("posterior equals prior with no data", {
   # Maturity
   maturity <- methods::new(LogisticMaturity)
   maturity$inflection_point[1]$value <- om_input[["A50.mat"]]
-  maturity$inflection_point[1]$estimation_type$set("constant")
+  maturity$inflection_point[1]$set_estimation_status("assumed_known")
   maturity$slope[1]$value <- om_input[["slope.mat"]]
-  maturity$slope[1]$estimation_type$set("constant")
+  maturity$slope[1]$set_estimation_status("assumed_known")
 
   # Population
   population <- methods::new(Population)

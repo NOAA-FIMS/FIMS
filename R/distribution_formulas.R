@@ -26,10 +26,10 @@ check_distribution_validity <- function(args) {
   family <- args[["family"]]
   sd <- args[["sd"]]
   check_present <- purrr::map_vec(list("family" = family, "sd" = sd), is.null)
-
+  
   # Only process distributions are currently validated here.
   available_distributions <- c("lognormal", "gaussian")
-  elements_of_sd <- c("value", "estimation_type")
+  elements_of_sd <- c("value", "estimation_status")
 
   # Start a bulleted list of errors and add to it in each if statement
   abort_bullets <- c(
@@ -87,17 +87,17 @@ check_distribution_validity <- function(args) {
       )
     }
     if (
-      length(sd[["estimation_type"]]) > 1 &&
-        length(sd[["value"]]) != length(sd[["estimation_type"]])
+      length(sd[["estimation_status"]]) > 1 &&
+        length(sd[["value"]]) != length(sd[["estimation_status"]])
     ) {
       sd_length <- length(sd[["value"]])
-      est_length <- length(sd[["estimation_type"]])
+      est_length <- length(sd[["estimation_status"]])
       abort_bullets <- c(
         abort_bullets,
-        "x" = "The sizes of {.var value} and {.var estimation_type} within {.var sd}
+        "x" = "The sizes of {.var value} and {.var estimation_status} within {.var sd}
                must match if more than one value is specified for the latter.",
         "i" = "The length of {.var sd[['value']]} is {.code {sd_length}}.",
-        "i" = "The length of {.var sd[['estimation_type']]} is
+        "i" = "The length of {.var sd[['estimation_status']]} is
                {.code {est_length}}."
       )
     }
@@ -175,7 +175,7 @@ initialize_data_distribution <- function(
     new_module$log_sd[] <- log(
       unlist(uncertainty_split[[ancillary_parameter]], use.names = FALSE)
     )
-    new_module$log_sd$set_estimation_types("constant")
+    new_module$log_sd$set_estimation_status("assumed_known")
   }
 
   # setup link to observed data
@@ -216,11 +216,11 @@ initialize_data_distribution <- function(
 #' @param sd A list of length two. The first entry is named `"value"` and it
 #'   stores the initial values (scalar or vector) for the relevant standard
 #'   deviations. The default is `value = 1`. The second entry is named
-#'  `"estimation_type"` and it stores a vector of booleans (default =
-#'   "constant") is a string indicating whether or not standard deviation is
-#'   estimated as a fixed effect or held constant. If `"value"` is a vector and
-#'   `"estimation_type"` is a scalar, the single value specified
-#'   `"estimation_type"` value will be repeated to match the length of `value`.
+#'  `"estimation_status"` and it stores a vector of booleans (default =
+#'   "assumed_known") is a string indicating whether or not standard deviation is
+#'   estimated as a fixed effect or assumed known. If `"value"` is a vector and
+#'   `"estimation_status"` is a scalar, the single value specified
+#'   `"estimation_status"` value will be repeated to match the length of `value`.
 #'   Otherwise, the dimensions of the two must match.
 #' @param par A string specifying the parameter name the distribution applies
 #'   to. Parameters must be members of the specified module. Use
@@ -244,7 +244,7 @@ initialize_data_distribution <- function(
 #'   module = recruitment,
 #'   par = "log_devs",
 #'   family = gaussian(),
-#'   sd = list(value = 0.4, estimation_type = "constant")
+#'   sd = list(value = 0.4, estimation_status = "assumed_known")
 #' )
 #' }
 initialize_process_distribution <- function(
@@ -253,7 +253,7 @@ initialize_process_distribution <- function(
   family = NULL,
   sd = tibble::tibble(
     value = 1,
-    estimation_type = "fixed_effects"
+    estimation_status = "fixed_effects"
   )
 ) {
   # validity check on user input
@@ -277,9 +277,9 @@ initialize_process_distribution <- function(
     new_module$log_sd[] <- log(sd[["value"]])
 
     # setup whether or not sd parameter is estimated
-    et <- sd[["estimation_type"]]
-    et[is.na(et)] <- "constant"
-    new_module$log_sd$set_estimation_types(et)
+    et <- sd[["estimation_status"]]
+    et[is.na(et)] <- "assumed_known"
+    new_module$log_sd$set_estimation_status(et)
   }
 
   if (family[["family"]] == "gaussian") {
@@ -293,19 +293,19 @@ initialize_process_distribution <- function(
     }
 
     # setup whether or not sd parameter is estimated
-    et <- sd[["estimation_type"]]
-    et[is.na(et)] <- "constant"
-    new_module$log_sd$set_estimation_types(et)
+    et <- sd[["estimation_status"]]
+    et[is.na(et)] <- "assumed_known"
+    new_module$log_sd$set_estimation_status(et)
 
-    #   if (length(sd[["value"]]) > 1 && length(sd[["estimation_type"]]) == 1) {
-    #     if (sd[["estimation_type"]] == "constant") {
-    #       new_module$log_sd$set_estimation_types(c("constant"))
+    #   if (length(sd[["value"]]) > 1 && length(sd[["estimation_status"]]) == 1) {
+    #     if (sd[["estimation_status"]] == "assumed_known") {
+    #       new_module$log_sd$set_estimation_status(c("assumed_known"))
     #     } else {
-    #       new_module$log_sd$set_estimation_types(c("fixed_effects"))
+    #       new_module$log_sd$set_estimation_status(c("fixed_effects"))
     #     }
     #   } else {
-    #     for (i in seq_along(sd[["estimation_type"]])) {
-    #       new_module$log_sd[i]$estimation_type$set(sd[["estimation_type"]][i])
+    #     for (i in seq_along(sd[["estimation_status"]])) {
+    #       new_module$log_sd[i]$set_estimation_status(sd[["estimation_status"]][i])
     #     }
     #   }
     # }

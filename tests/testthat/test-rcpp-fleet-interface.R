@@ -41,9 +41,9 @@ test_that("rcpp fleet works with correct inputs", {
   expect_equal(fleet1$GetName(), "fleet one")
 
   #' @description Test that observed units can be assigned directly through the Rcpp field bindings.
-  fleet1$observed_landings_units <- "numbers"
+  fleet1$observed_catch_units <- "numbers"
   fleet1$observed_index_units <- "numbers"
-  expect_equal(fleet1$observed_landings_units, "numbers")
+  expect_equal(fleet1$observed_catch_units, "numbers")
   expect_equal(fleet1$observed_index_units, "numbers")
 
   #' @description Test that setting the index ID works within the fleet module.

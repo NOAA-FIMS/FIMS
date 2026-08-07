@@ -44,12 +44,12 @@ test_that("catch-at-age model (deterministic MLE with wrappers) works with corre
 
   parameters <- readRDS(testthat::test_path("fixtures", "parameters_model_comparison_project.RDS"))
   number_fixed_effects <- parameters |>
-    dplyr::filter(estimation_type == "fixed_effects") |>
-    dplyr::pull(estimation_type) |>
+    dplyr::filter(estimation_status == "fixed_effects") |>
+    dplyr::pull(estimation_status) |>
     length()
   number_random_effects <- parameters |>
-    dplyr::filter(estimation_type == "random_effects") |>
-    dplyr::pull(estimation_type) |>
+    dplyr::filter(estimation_status == "random_effects") |>
+    dplyr::pull(estimation_status) |>
     length()
 
   #' @description Test that the number of fixed parameters are correct.
@@ -82,12 +82,12 @@ test_that("catch-at-age model (deterministic MLE with wrappers) recruitment devs
 
   parameters <- readRDS(testthat::test_path("fixtures", "parameters_model_comparison_project_fixed_effects.RDS"))
   number_fixed_effects <- parameters |>
-    dplyr::filter(estimation_type == "fixed_effects") |>
-    dplyr::pull(estimation_type) |>
+    dplyr::filter(estimation_status == "fixed_effects") |>
+    dplyr::pull(estimation_status) |>
     length()
   number_random_effects <- parameters |>
-    dplyr::filter(estimation_type == "random_effects") |>
-    dplyr::pull(estimation_type) |>
+    dplyr::filter(estimation_status == "random_effects") |>
+    dplyr::pull(estimation_status) |>
     length()
 
   #' @description Test that the number of fixed parameters are correct.
@@ -207,7 +207,7 @@ test_that("catch-at-age model (estimation MLE with wrappers) works with age and 
   )
 })
 
-test_that("catch-at-age model (estimation MLE with wrappers) works with mixed estimation types", {
+test_that("catch-at-age model (estimation MLE with wrappers) works with mixed estimation status", {
   # Load setup data
   data_age_comp <- readRDS(testthat::test_path("fixtures", "data_age_comp.RDS"))
 
@@ -215,25 +215,25 @@ test_that("catch-at-age model (estimation MLE with wrappers) works with mixed es
     testthat::test_path("fixtures", "parameters_model_comparison_project.RDS")
   )
 
-  # Force fleet1's Fmort to be constant for the first 10 years.
-  # From years 11-30, the Fmort estimation type is fixed_effects.
-  fit_mixed_estimation_types <- modified_parameters |>
+  # Force fleet1's Fmort to be assumed_known for the first 10 years.
+  # From years 11–30, the Fmort estimation status is fixed_effects.
+  fit_mixed_estimation_status <- modified_parameters |>
     dplyr::mutate(
-      estimation_type = dplyr::if_else(
+      estimation_status = dplyr::if_else(
         fleet == "fleet1" & label == "log_Fmort" & timing %in% 1:10,
-        "constant",
-        estimation_type
+        "assumed_known",
+        estimation_status
       )
     ) |>
     initialize_fims(data = data_age_comp) |>
     fit_fims(optimize = TRUE)
   clear()
 
-  mixed_output <- get_estimates(fit_mixed_estimation_types) |>
+  mixed_output <- get_estimates(fit_mixed_estimation_status) |>
     dplyr::filter(label == "log_Fmort", module_id == 1)
-  #' @description Test that there are 10 years of constant fishing mortality values and 20 years of fixed effects for the fishing fleet.
+  #' @description Test that there are 10 years of assumed_known fishing mortality values and 20 years of fixed effects for the fishing fleet.
   expect_equal(
-    dplyr::pull(dplyr::count(mixed_output, estimation_type)),
+    dplyr::pull(dplyr::count(mixed_output, estimation_status)),
     c(10, 20)
   )
   #' @description Test that there are 20 years of estimates with standard errors because they are estimated as fixed effects.
@@ -242,10 +242,10 @@ test_that("catch-at-age model (estimation MLE with wrappers) works with mixed es
     10
   )
 
-  #' @description Test that the output from FIMS matches the model comparison project OM values when Fmort estimation types are mixed.
+  #' @description Test that the output from FIMS matches the model comparison project OM values when Fmort estimation status is mixed.
   validate_fims(
-    report = get_report(fit_mixed_estimation_types),
-    estimates = get_estimates(fit_mixed_estimation_types),
+    report = get_report(fit_mixed_estimation_status),
+    estimates = get_estimates(fit_mixed_estimation_status),
     om_input = om_input_list[[iter_id]],
     om_output = om_output_list[[iter_id]],
     em_input = em_input_list[[iter_id]],
@@ -261,10 +261,10 @@ test_that("catch-at-age model (estimation MLE with wrappers) returns an error wh
   parameters <- readRDS(
     testthat::test_path("fixtures", "parameters_model_comparison_project.RDS")
   )
-  # Set all non-NA estimation types to "constant" and initialize the model
+  # Set all non-NA estimation status to "assumed_known" and initialize the model
   initialized_model <- parameters |>
     dplyr::rows_update(
-      # log_devs has a special error when set to constant
+      # log_devs has a special error when set to assumed_known
       y = tibble::tibble(
         label = "log_devs",
         timing = 2:get_n_years(data_age_length_comp),
@@ -284,10 +284,10 @@ test_that("catch-at-age model (estimation MLE with wrappers) returns an error wh
       by = c("module_name", "label")
     ) |>
     dplyr::mutate(
-      estimation_type = dplyr::if_else(
-        !is.na(estimation_type),
-        "constant",
-        estimation_type
+      estimation_status = dplyr::if_else(
+        !is.na(estimation_status),
+        "assumed_known",
+        estimation_status
       )
     ) |>
     initialize_fims(
@@ -330,18 +330,18 @@ test_that("catch-at-age model (estimation MLE with wrappers) returns an error wh
   parameters <- readRDS(
     testthat::test_path("fixtures", "parameters_model_comparison_project.RDS")
   )
-  # Set log_devs constant but leave in Recruitment distribution parameters.
+  # Set log_devs assumed_known but leave in Recruitment distribution parameters.
   initialized_parameters <- parameters |>
     dplyr::rows_update(
       y = tibble::tibble(
         label = "log_devs",
         timing = 2:get_n_years(data_age_length_comp),
-        estimation_type = "constant"
+        estimation_status = "assumed_known"
       ),
       by = c("label", "timing")
     )
 
-  #' @description Test that FIMS returns an error when log_devs are constant but Recruitment expects a distribution process.
+  #' @description Test that FIMS returns an error when log_devs are assumed_known but Recruitment expects a distribution process.
   expect_error(
     object = initialized_parameters |>
       initialize_fims(

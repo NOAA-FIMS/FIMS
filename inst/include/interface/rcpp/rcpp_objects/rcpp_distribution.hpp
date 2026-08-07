@@ -239,7 +239,7 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
    */
   virtual bool set_distribution_mean(double input_value) {
     this->expected_mean[0].initial_value_m = input_value;
-    this->expected_mean[0].estimation_type_m.set("fixed_effects");
+    this->expected_mean[0].estimation_status_m = fims_enum::EstimationStatus::kFixedEffects;
     this->use_mean_m = "yes";
     return true;
   }
@@ -337,20 +337,13 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
         }
       }
       for (size_t i = 0; i < n_x; i++) {
-        if (this->log_sd[i].estimation_type_m.get() == "constant") {
-          this->log_sd[i].final_value_m = this->log_sd[i].initial_value_m;
-        } else {
-          this->log_sd[i].final_value_m = dnorm->log_sd.get_force_scalar(i);
-        }
+        set_final_value_by_estimation_status(this->log_sd[i],
+                                             dnorm->log_sd.get_force_scalar(i));
       }
 
       for (size_t i = 0; i < this->expected_mean.size(); i++) {
-        if (this->expected_mean[i].estimation_type_m.get() == "constant") {
-          this->expected_mean[i].final_value_m =
-              this->expected_mean[i].initial_value_m;
-        } else {
-          this->expected_mean[i].final_value_m = dnorm->expected_mean[i];
-        }
+        set_final_value_by_estimation_status(this->expected_mean[i],
+                                             dnorm->expected_mean[i]);
       }
 
       this->lpdf_vec = RealVector(n_x);
@@ -474,15 +467,11 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
     distribution->log_sd.resize(this->log_sd.size());
     for (size_t i = 0; i < this->log_sd.size(); i++) {
       distribution->log_sd[i] = this->log_sd[i].initial_value_m;
-      if (this->log_sd[i].estimation_type_m.get() == "fixed_effects") {
-        ss.str("");
-        ss << "dnorm." << this->id_m << ".log_sd." << this->log_sd[i].id_m;
-        info->RegisterParameterName(ss.str());
-        info->RegisterParameter(distribution->log_sd[i]);
-      }
-      if (this->log_sd[i].estimation_type_m.get() == "random_effects") {
-        FIMS_ERROR_LOG("standard deviations cannot be set to random effects");
-      }
+      ss.str("");
+      ss << "dnorm." << this->id_m << ".log_sd." << this->log_sd[i].id_m;
+      register_parameter_if_estimable(
+          distribution->log_sd[i], this->log_sd[i].estimation_status_m,
+          ss.str(), false);
     }
     info->variable_map[this->log_sd.id_m] = &(distribution)->log_sd;
 
@@ -490,19 +479,14 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
     distribution->expected_mean.resize(this->expected_mean.size());
     for (size_t i = 0; i < this->expected_mean.size(); i++) {
       distribution->expected_mean[i] = this->expected_mean[i].initial_value_m;
-      if (this->expected_mean[i].estimation_type_m.get() == "fixed_effects") {
-        ss.str("");
-        ss << "dnorm." << this->id_m << ".expected_mean."
-           << this->expected_mean[i].id_m;
-        info->RegisterParameterName(ss.str());
-        info->RegisterParameter(distribution->expected_mean[i]);
-      }
-      if (this->expected_mean[i].estimation_type_m.get() == "random_effects") {
-        FIMS_ERROR_LOG("expected_mean cannot be set to random effects");
-      }
+      ss.str("");
+      ss << "dnorm." << this->id_m << ".expected_mean."
+         << this->expected_mean[i].id_m;
+      register_parameter_if_estimable(
+          distribution->expected_mean[i],
+          this->expected_mean[i].estimation_status_m, ss.str(), false);
     }
-    info->variable_map[this->expected_mean.id_m] =
-        &(distribution)->expected_mean;
+    info->variable_map[this->expected_mean.id_m] = &(distribution)->expected_mean;
 
     info->density_components[distribution->id] = distribution;
 
@@ -687,11 +671,8 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
       }
 
       for (size_t i = 0; i < n_x; i++) {
-        if (this->log_sd[i].estimation_type_m.get() == "constant") {
-          this->log_sd[i].final_value_m = this->log_sd[i].initial_value_m;
-        } else {
-          this->log_sd[i].final_value_m = dlnorm->log_sd.get_force_scalar(i);
-        }
+        set_final_value_by_estimation_status(this->log_sd[i],
+                                             dlnorm->log_sd.get_force_scalar(i));
       }
 
       this->lpdf_vec = RealVector(n_x);
@@ -813,15 +794,11 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
     distribution->log_sd.resize(this->log_sd.size());
     for (size_t i = 0; i < this->log_sd.size(); i++) {
       distribution->log_sd[i] = this->log_sd[i].initial_value_m;
-      if (this->log_sd[i].estimation_type_m.get() == "fixed_effects") {
-        ss.str("");
-        ss << "dlnorm." << this->id_m << ".log_sd." << this->log_sd[i].id_m;
-        info->RegisterParameterName(ss.str());
-        info->RegisterParameter(distribution->log_sd[i]);
-      }
-      if (this->log_sd[i].estimation_type_m.get() == "random_effects") {
-        FIMS_ERROR_LOG("standard deviations cannot be set to random effects");
-      }
+      ss.str("");
+      ss << "dlnorm." << this->id_m << ".log_sd." << this->log_sd[i].id_m;
+      register_parameter_if_estimable(
+          distribution->log_sd[i], this->log_sd[i].estimation_status_m,
+          ss.str(), false);
     }
     info->variable_map[this->log_sd.id_m] = &(distribution)->log_sd;
 
