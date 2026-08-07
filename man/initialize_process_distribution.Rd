@@ -9,7 +9,7 @@ initialize_process_distribution(
   module,
   par,
   family = NULL,
-  sd = tibble::tibble(value = 1, estimation_type = "fixed_effects")
+  sd = tibble::tibble(value = 1, estimation_status = "fixed_effects")
 )
 
 initialize_process_structure(module, par)
@@ -29,11 +29,11 @@ be used in the model. The argument takes a family class, e.g.,
 \item{sd}{A list of length two. The first entry is named \code{"value"} and it
 stores the initial values (scalar or vector) for the relevant standard
 deviations. The default is \code{value = 1}. The second entry is named
-\code{"estimation_type"} and it stores a vector of booleans (default =
-"constant") is a string indicating whether or not standard deviation is
-estimated as a fixed effect or held constant. If \code{"value"} is a vector and
-\code{"estimation_type"} is a scalar, the single value specified
-\code{"estimation_type"} value will be repeated to match the length of \code{value}.
+\code{"estimation_status"} and it stores a vector of booleans (default =
+"assumed_known") is a string indicating whether or not standard deviation is
+estimated as a fixed effect or assumed known. If \code{"value"} is a vector and
+\code{"estimation_status"} is a scalar, the single value specified
+\code{"estimation_status"} value will be repeated to match the length of \code{value}.
 Otherwise, the dimensions of the two must match.}
 }
 \value{
@@ -58,7 +58,7 @@ recruitment_distribution <- initialize_process_distribution(
   module = recruitment,
   par = "log_devs",
   family = gaussian(),
-  sd = list(value = 0.4, estimation_type = "constant")
+  sd = list(value = 0.4, estimation_status = "assumed_known")
 )
 }
 }

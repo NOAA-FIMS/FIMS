@@ -22,7 +22,7 @@ test_that("rcpp population interface works with correct inputs", {
 
   population$log_init_naa[] <- rep(0, n_ages)
 
-  population$log_init_naa$set_estimation_types(c("fixed_effects"))
+  population$log_init_naa$set_estimation_status(c("fixed_effects"))
   population$n_ages$set(n_ages)
   population$ages[] <- seq(1, n_ages)
   population$n_fleets$set(2)
@@ -43,7 +43,7 @@ test_that("rcpp population interface works with correct inputs", {
     )
     #' @description Test that the log_M values are not estimated.
     expect_equal(
-      object = population$log_M[i]$estimation_type$get(), "constant"
+      object = population$log_M[i]$get_estimation_status(), "assumed_known"
     )
   }
 
@@ -55,12 +55,12 @@ test_that("rcpp population interface works with correct inputs", {
     )
     #' @description Test that the log_init_naa values are estimated.
     expect_equal(
-      object = population$log_init_naa[i]$estimation_type$get(), "fixed_effects"
+      object = population$log_init_naa[i]$get_estimation_status(), "fixed_effects"
     )
   }
 
-  population$log_init_naa$set_estimation_types(c("constant"))
-  population$log_M$set_estimation_types(c("fixed_effects"))
+  population$log_init_naa$set_estimation_status(c("assumed_known"))
+  population$log_M$set_estimation_status(c("fixed_effects"))
 
   for (i in 1:(n_years * n_ages)) {
     #' @description Test that the log_M values are all -1.
@@ -70,7 +70,7 @@ test_that("rcpp population interface works with correct inputs", {
     )
     #' @description Test that the log_M values are now estimated.
     expect_equal(
-      object = population$log_M[i]$estimation_type$get(), "fixed_effects"
+      object = population$log_M[i]$get_estimation_status(), "fixed_effects"
     )
   }
 
@@ -82,7 +82,7 @@ test_that("rcpp population interface works with correct inputs", {
     )
     #' @description Test that the log_init_naa values not estimated.
     expect_equal(
-      object = population$log_init_naa[i]$estimation_type$get(), "constant"
+      object = population$log_init_naa[i]$get_estimation_status(), "assumed_known"
     )
   }
 

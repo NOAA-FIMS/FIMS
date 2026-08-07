@@ -22,9 +22,6 @@
 \alias{VariableVector}
 \alias{Population}
 \alias{RealVector}
-\alias{SharedInt}
-\alias{SharedReal}
-\alias{SharedString}
 \title{C++ Classes Exported via Rcpp}
 \description{
 The following classes are exported from C++ via Rcpp. Their documentation is
@@ -51,9 +48,6 @@ docs.
 \item \href{https://noaa-fims.github.io/FIMS/doxygen/classLogisticSelectivityInterface.html}{LogisticSelectivity}
 \item \href{https://noaa-fims.github.io/FIMS/doxygen/classPopulationInterface.html}{Population}
 \item \href{https://noaa-fims.github.io/FIMS/doxygen/classRealVector.html}{RealVector}
-\item \href{https://noaa-fims.github.io/FIMS/doxygen/classSharedInt.html}{SharedInt}
-\item \href{https://noaa-fims.github.io/FIMS/doxygen/classSharedReal.html}{SharedReal}
-\item \href{https://noaa-fims.github.io/FIMS/doxygen/classSharedString.html}{SharedString}
 \item \href{https://noaa-fims.github.io/FIMS/doxygen/classVariable.html}{Variable}
 \item \href{https://noaa-fims.github.io/FIMS/doxygen/classVariableVector.html}{VariableVector}
 }
@@ -62,4 +56,3 @@ docs.
 
 \href{https://noaa-fims.github.io/FIMS/doxygen/}{NOAA-FIMS C++ Documentation}
 }
-

@@ -53,53 +53,53 @@ void add_fleet_to_population_(Rcpp::XPtr<SharedPopulation> xp,
 // types from a character vector (length 1 is recycled across all elements).
 void set_population_log_M_(Rcpp::XPtr<SharedPopulation> xp,
                            Rcpp::NumericVector values,
-                           Rcpp::CharacterVector estimation_types) {
+                           Rcpp::CharacterVector estimation_status) {
   PopulationInterface& pop = **xp;
   pop.log_M.resize(values.size());
   for (int i = 0; i < values.size(); i++) {
     Variable& v = pop.log_M.storage_m->at(i);
     v.initial_value_m = values[i];
-    v.estimation_type_m.set(
-        Rcpp::as<std::string>(estimation_types[estimation_types.size() == 1 ? 0 : i]));
+    v.estimation_status_m = EstimationStatusFromString(
+        Rcpp::as<std::string>(estimation_status[estimation_status.size() == 1 ? 0 : i]));
   }
 }
 
 void set_population_log_init_naa_(Rcpp::XPtr<SharedPopulation> xp,
                                   Rcpp::NumericVector values,
-                                  Rcpp::CharacterVector estimation_types) {
+                                  Rcpp::CharacterVector estimation_status) {
   PopulationInterface& pop = **xp;
   pop.log_init_naa.resize(values.size());
   for (int i = 0; i < values.size(); i++) {
     Variable& v = pop.log_init_naa.storage_m->at(i);
     v.initial_value_m = values[i];
-    v.estimation_type_m.set(
-        Rcpp::as<std::string>(estimation_types[estimation_types.size() == 1 ? 0 : i]));
+    v.estimation_status_m = EstimationStatusFromString(
+        Rcpp::as<std::string>(estimation_status[estimation_status.size() == 1 ? 0 : i]));
   }
 }
 
 void set_population_log_f_multiplier_(Rcpp::XPtr<SharedPopulation> xp,
                                       Rcpp::NumericVector values,
-                                      Rcpp::CharacterVector estimation_types) {
+                                      Rcpp::CharacterVector estimation_status) {
   PopulationInterface& pop = **xp;
   pop.log_f_multiplier.resize(values.size());
   for (int i = 0; i < values.size(); i++) {
     Variable& v = pop.log_f_multiplier.storage_m->at(i);
     v.initial_value_m = values[i];
-    v.estimation_type_m.set(
-        Rcpp::as<std::string>(estimation_types[estimation_types.size() == 1 ? 0 : i]));
+    v.estimation_status_m = EstimationStatusFromString(
+        Rcpp::as<std::string>(estimation_status[estimation_status.size() == 1 ? 0 : i]));
   }
 }
 
 void set_population_proportion_female_(Rcpp::XPtr<SharedPopulation> xp,
                                        Rcpp::NumericVector values,
-                                       Rcpp::CharacterVector estimation_types) {
+                                       Rcpp::CharacterVector estimation_status) {
   PopulationInterface& pop = **xp;
   pop.proportion_female.resize(values.size());
   for (int i = 0; i < values.size(); i++) {
     Variable& v = pop.proportion_female.storage_m->at(i);
     v.initial_value_m = values[i];
-    v.estimation_type_m.set(
-        Rcpp::as<std::string>(estimation_types[estimation_types.size() == 1 ? 0 : i]));
+    v.estimation_status_m = EstimationStatusFromString(
+        Rcpp::as<std::string>(estimation_status[estimation_status.size() == 1 ? 0 : i]));
   }
 }
 

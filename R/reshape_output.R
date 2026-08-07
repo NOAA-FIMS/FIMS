@@ -23,7 +23,7 @@ reshape_json_estimates <- function(model_output) {
           -dplyr::all_of(c("module_name", "module_id", "module_type", "observed_data_id"))
         ),
       by = c(
-        "estimation_type" = "input_type",
+        "estimation_status" = "input_type",
         "estimated_value" = "observed_values"
       )
     )
@@ -171,7 +171,7 @@ reshape_json_estimates <- function(model_output) {
       estimated = "estimated_value",
       "expected" = expected_values,
       "observed" = observed_values,
-      dplyr::all_of(c("estimation_type", "distribution", "input_type")),
+      dplyr::all_of(c("estimation_status", "distribution", "input_type")),
       lpdf = "lpdf_value", dplyr::all_of("likelihood"),
       "log_sd" = dplyr::all_of("log_sd_values"),
       dplyr::everything()
@@ -331,7 +331,7 @@ dimension_folded_to_tibble <- function(section) {
     temp |>
       dplyr::bind_cols(
         estimated_value = unlist(section[["value"]]),
-        estimation_type = "derived_quantity"
+        estimation_status = "derived_quantity"
       )
   }
 }

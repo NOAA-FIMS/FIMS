@@ -49,11 +49,6 @@ void register_variable(Rcpp::Module &m);
  */
 void register_vectors(Rcpp::Module &m);
 /**
- * \brief Register the shared module.
- * \param m The Rcpp module to register functions in.
- */
-void register_shared(Rcpp::Module &m);
-/**
  * \brief Register the functions module.
  * \param m The Rcpp module to register functions in.
  */
@@ -78,7 +73,6 @@ RcppExport RCPP_MODULE(fims) {
   register_functions(m);
   register_variable(m);
   register_vectors(m);
-  register_shared(m);
   register_recruitment(m);
   register_maturity(m);
   register_fleet(m);

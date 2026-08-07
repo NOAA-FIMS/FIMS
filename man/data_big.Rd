@@ -5,11 +5,11 @@
 \alias{data_big}
 \title{FIMS input data frame}
 \format{
-A data frame with 2808 observations of 8
+A data frame with \verb{r NROW(data_big)} observations of \verb{r NCOL(data_big)}
 variables:
 \describe{
 \item{type}{The type of input the row contains. Allowed types include
-age_comp, age_to_length_conversion, index, catch, length_comp, and weight_at_age.}
+\verb{r glue::glue_collapse(fims_input_types, sep = ", ", last = ", and ")}.}
 \item{fleet}{A character string providing the name of the information
 source that the input was collected from, e.g., \code{"Trawl fishery"} or
 \code{"age_zero_survey"}. Entries can be \code{NA} for information that is not

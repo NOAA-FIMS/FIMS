@@ -88,12 +88,12 @@ class AgeCompDataInterface : public DataInterfaceBase {
    * @brief The first dimension of the data, which relates to the number of age
    * bins.
    */
-  fims_int amax = 0;
+  int amax = 0;
   /**
    * @brief The second dimension of the data, which relates to the number of
    * time steps or years.
    */
-  fims_int ymax = 0;
+  int ymax = 0;
   /**
    * @brief The vector of age-composition data that is being passed from R.
    */
@@ -221,12 +221,12 @@ class LengthCompDataInterface : public DataInterfaceBase {
    * @brief The first dimension of the data, which relates to the number of
    * length bins.
    */
-  fims_int lmax = 0;
+  int lmax = 0;
   /**
    * @brief The second dimension of the data, which relates to the number of
    * time steps or years.
    */
-  fims_int ymax = 0;
+  int ymax = 0;
   /**
    * @brief The vector of length-composition data that is being passed from R.
    */
@@ -348,7 +348,7 @@ class IndexDataInterface : public DataInterfaceBase {
   /**
    * @brief An integer that specifies the second dimension of the data.
    */
-  fims_int ymax = 0;
+  int ymax = 0;
   /**
    * @brief The vector of index data that is being passed from R.
    */
@@ -469,7 +469,7 @@ class CatchDataInterface : public DataInterfaceBase {
   /**
    * @brief An integer that specifies the second dimension of the data.
    */
-  fims_int ymax = 0;
+  int ymax = 0;
   /**
    * @brief The vector of catch data that is being passed from R.
    */
