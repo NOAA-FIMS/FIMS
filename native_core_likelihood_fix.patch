@@ -1,0 +1,238 @@
+--- a/src/call_model.cpp
++++ b/src/call_model.cpp
+@@ -566,6 +566,158 @@
+         fims_popdy::SelectivityBase<Type>::id_g = 0;
+     }
+ 
++    /**
++     * @brief Ensure a CatchAtAge shell and its derived-quantity maps exist
++     * without finalizing Information::CreateModel().
++     *
++     * Native likelihood components need stable references to the same model
++     * derived-quantity vectors used by the objective. Rcpp creates and links
++     * its data/distributions before CreateTMBModel(); this helper provides the
++     * corresponding native pre-assembly state while deliberately postponing
++     * Information::CreateModel() until fims_call_create_model().
++     */
++    template <typename Type>
++    void prepare_backend_model_shell_internal()
++    {
++        std::shared_ptr<fims_info::Information<Type>> info =
++            fims_info::Information<Type>::GetInstance();
++
++        if (info->populations.empty())
++        {
++            Rf_error("No populations are registered. Create at least one population before building likelihood components.");
++        }
++
++        reconcile_native_population_layout<Type>(info);
++
++        if (info->models_map.empty())
++        {
++            std::shared_ptr<fims_popdy::CatchAtAge<Type>> model =
++                std::make_shared<fims_popdy::CatchAtAge<Type>>();
++
++            for (auto population_it = info->populations.begin();
++                 population_it != info->populations.end();
++                 ++population_it)
++            {
++                if (population_it->second == nullptr)
++                {
++                    continue;
++                }
++
++                model->AddPopulation(population_it->first);
++                model->InitializePopulationDerivedQuantities(population_it->first);
++
++                std::map<std::string, fims::Vector<Type>> &population_dq =
++                    model->GetPopulationDerivedQuantities(population_it->first);
++                assign_population_derived_vectors<Type>(
++                    population_dq,
++                    population_it->second->n_years,
++                    population_it->second->n_ages);
++
++                for (auto fleet_id_it = population_it->second->fleet_ids.begin();
++                     fleet_id_it != population_it->second->fleet_ids.end();
++                     ++fleet_id_it)
++                {
++                    auto fleet_it = info->fleets.find(*fleet_id_it);
++                    if (fleet_it == info->fleets.end() || fleet_it->second == nullptr)
++                    {
++                        Rf_error("Population %u references missing fleet %u.",
++                                 static_cast<unsigned int>(population_it->first),
++                                 static_cast<unsigned int>(*fleet_id_it));
++                    }
++
++                    std::shared_ptr<fims_popdy::Fleet<Type>> fleet = fleet_it->second;
++                    fleet->n_years = population_it->second->n_years;
++                    fleet->n_ages = population_it->second->n_ages;
++                    if (fleet->n_ages > 0 &&
++                        fleet->age_to_length_conversion.size() > 0 &&
++                        fleet->age_to_length_conversion.size() % fleet->n_ages == 0)
++                    {
++                        fleet->n_lengths =
++                            fleet->age_to_length_conversion.size() / fleet->n_ages;
++                    }
++
++                    model->InitializeFleetDerivedQuantities(*fleet_id_it);
++                    std::map<std::string, fims::Vector<Type>> &fleet_dq =
++                        model->GetFleetDerivedQuantities(*fleet_id_it);
++                    assign_fleet_derived_vectors<Type>(
++                        fleet_dq,
++                        fleet->n_years,
++                        fleet->n_ages,
++                        fleet->n_lengths);
++                }
++            }
++
++            info->models_map[1] = model;
++        }
++        else
++        {
++            // A shell already exists. Refresh dimensions/maps without calling
++            // Information::CreateModel(); std::map node addresses remain stable,
++            // so likelihood pointers to the vector objects remain valid.
++            for (auto model_it = info->models_map.begin();
++                 model_it != info->models_map.end();
++                 ++model_it)
++            {
++                std::shared_ptr<fims_popdy::FisheryModelBase<Type>> model =
++                    model_it->second;
++                if (model == nullptr)
++                {
++                    continue;
++                }
++
++                for (auto population_it = info->populations.begin();
++                     population_it != info->populations.end();
++                     ++population_it)
++                {
++                    if (population_it->second == nullptr)
++                    {
++                        continue;
++                    }
++
++                    model->AddPopulation(population_it->first);
++                    model->InitializePopulationDerivedQuantities(population_it->first);
++                    std::map<std::string, fims::Vector<Type>> &population_dq =
++                        model->GetPopulationDerivedQuantities(population_it->first);
++                    assign_population_derived_vectors<Type>(
++                        population_dq,
++                        population_it->second->n_years,
++                        population_it->second->n_ages);
++
++                    for (auto fleet_id_it = population_it->second->fleet_ids.begin();
++                         fleet_id_it != population_it->second->fleet_ids.end();
++                         ++fleet_id_it)
++                    {
++                        auto fleet_it = info->fleets.find(*fleet_id_it);
++                        if (fleet_it == info->fleets.end() || fleet_it->second == nullptr)
++                        {
++                            continue;
++                        }
++
++                        std::shared_ptr<fims_popdy::Fleet<Type>> fleet = fleet_it->second;
++                        fleet->n_years = population_it->second->n_years;
++                        fleet->n_ages = population_it->second->n_ages;
++                        if (fleet->n_ages > 0 &&
++                            fleet->age_to_length_conversion.size() > 0 &&
++                            fleet->age_to_length_conversion.size() % fleet->n_ages == 0)
++                        {
++                            fleet->n_lengths =
++                                fleet->age_to_length_conversion.size() / fleet->n_ages;
++                        }
++
++                        model->InitializeFleetDerivedQuantities(*fleet_id_it);
++                        std::map<std::string, fims::Vector<Type>> &fleet_dq =
++                            model->GetFleetDerivedQuantities(*fleet_id_it);
++                        assign_fleet_derived_vectors<Type>(
++                            fleet_dq,
++                            fleet->n_years,
++                            fleet->n_ages,
++                            fleet->n_lengths);
++                    }
++                }
++            }
++        }
++    }
++
+     template <typename Type>
+     bool create_backend_model_internal()
+     {
+@@ -735,11 +887,6 @@
+         uint32_t fleet_id,
+         const std::string &derived_name)
+     {
+-        if (info->models_map.empty())
+-        {
+-            Rf_error("No model is registered. Call fims_call_create_model() before building likelihood components.");
+-        }
+-
+         std::shared_ptr<fims_popdy::FisheryModelBase<Type>> model =
+             info->models_map.begin()->second;
+         if (model == nullptr)
+@@ -821,15 +968,17 @@
+ 
+         std::shared_ptr<fims_distributions::NormalLPDF<Type>> distribution =
+             std::make_shared<fims_distributions::NormalLPDF<Type>>();
+-        distribution->input_type = "process";
+-        distribution->observed_values.resize(values->size());
++
++        // Match the Rcpp DnormDistribution link:
++        // set_distribution_links("random_effects", recruitment$log_devs$id)
++        distribution->input_type = "random_effects";
++        distribution->re = values;
++        distribution->expected_values.resize(values->size());
+         for (size_t index = 0; index < values->size(); ++index)
+         {
+-            distribution->observed_values[index] = (*values)[index];
+-        }
+-        distribution->use_mean = "yes";
+-        distribution->expected_mean.resize(1);
+-        distribution->expected_mean[0] = static_cast<Type>(0.0);
++            distribution->expected_values[index] = static_cast<Type>(0.0);
++        }
++        distribution->re_expected_values = &(distribution->expected_values);
+         distribution->log_sd.resize(1);
+         distribution->log_sd[0] = static_cast<Type>(std::log(sd));
+ 
+@@ -889,6 +1038,11 @@
+     {
+         std::shared_ptr<fims_info::Information<Type>> info =
+             fims_info::Information<Type>::GetInstance();
++
++        // Match the Rcpp lifecycle: create data/distributions and their links
++        // before final Information::CreateModel() assembly. This creates only
++        // the CatchAtAge shell and derived-quantity storage required for links.
++        prepare_backend_model_shell_internal<Type>();
+ 
+         std::shared_ptr<fims_popdy::Fleet<Type>> fishing_fleet =
+             require_fleet<Type>(info, fishing_fleet_id, "fishing_fleet_id");
+--- a/inst/include/common/information.hpp
++++ b/inst/include/common/information.hpp
+@@ -342,6 +342,13 @@
+       std::shared_ptr<fims_distributions::DensityComponentBase<Type>> d =
+           (*it).second;
+       if (d->input_type == "random_effects") {
++        // Native .Call components may be linked directly before final model
++        // assembly. Preserve those links when no Rcpp variable-map key was
++        // supplied.
++        if (d->key.empty() && d->re != nullptr &&
++            d->re_expected_values != nullptr) {
++          continue;
++        }
+         FIMS_INFO_LOG("Setup random effects for distribution " +
+                       fims::to_string(d->id));
+         variable_map_iterator vmit;
+@@ -373,6 +380,11 @@
+       std::shared_ptr<fims_distributions::DensityComponentBase<Type>> d =
+           (*it).second;
+       if (d->input_type == "data") {
++        // Native .Call likelihoods can carry a direct pointer to the model's
++        // derived quantity. Rcpp components instead provide a variable-map key.
++        if (d->key.empty() && d->data_expected_values != nullptr) {
++          continue;
++        }
+         FIMS_INFO_LOG("Setup expected value for data distribution " +
+                       fims::to_string(d->id));
+         variable_map_iterator vmit;

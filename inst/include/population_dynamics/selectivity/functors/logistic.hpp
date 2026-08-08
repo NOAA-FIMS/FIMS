@@ -13,62 +13,69 @@
 #include "common/fims_vector.hpp"
 #include "selectivity_base.hpp"
 
-namespace fims_popdy {
-
-/**
- *  @brief LogisticSelectivity class that returns the logistic function value
- * from fims_math.
- *
- * The logistic selectivity function can produce either an ascending or
- * descending curve based on the sign of the slope parameter. A positive slope
- * creates an ascending logistic curve (selectivity increases from 0 to 1 with
- * increasing x), while a negative slope creates a descending logistic curve
- * (selectivity decreases from 1 to 0 with increasing x).
- */
-template <typename Type>
-struct LogisticSelectivity : public SelectivityBase<Type> {
-  fims::Vector<Type>
-      inflection_point;     /**< 50% quantile of the value of the quantity of
-  interest (x); e.g. age at which 50% of the fish are selected */
-  fims::Vector<Type> slope; /**<scalar multiplier of difference between quantity
-            of interest value (x) and inflection_point. Positive values create
-            an ascending curve (0 to 1), negative values create a descending
-            curve (1 to 0). */
-
-  LogisticSelectivity() : SelectivityBase<Type>() {}
-
-  virtual ~LogisticSelectivity() {}
+namespace fims_popdy
+{
 
   /**
-   * @brief Method of the logistic selectivity class that implements the
-   * logistic function from FIMS math.
+   *  @brief LogisticSelectivity class that returns the logistic function value
+   * from fims_math.
    *
-   * \f[ \frac{1.0}{ 1.0 + exp(-1.0 * slope (x - inflection\_point))} \f]
-   *
-   * The selectivity curve can be either ascending or descending depending on
-   * the sign of the slope parameter:
-   * - Positive slope: ascending curve (selectivity increases from 0 to 1)
-   * - Negative slope: descending curve (selectivity decreases from 1 to 0)
-   *
-   * @param x  The independent variable in the logistic function (e.g., age or
-   * size in selectivity).
+   * The logistic selectivity function can produce either an ascending or
+   * descending curve based on the sign of the slope parameter. A positive slope
+   * creates an ascending logistic curve (selectivity increases from 0 to 1 with
+   * increasing x), while a negative slope creates a descending logistic curve
+   * (selectivity decreases from 1 to 0 with increasing x).
    */
-  virtual const Type evaluate(const Type &x) {
-    return fims_math::logistic<Type>(inflection_point[0], slope[0], x);
-  }
+  template <typename Type>
+  struct LogisticSelectivity : public SelectivityBase<Type>
+  {
+    fims::Vector<Type>
+        inflection_point;     /**< 50% quantile of the value of the quantity of
+    interest (x); e.g. age at which 50% of the fish are selected */
+    fims::Vector<Type> slope; /**<scalar multiplier of difference between quantity
+              of interest value (x) and inflection_point. Positive values create
+              an ascending curve (0 to 1), negative values create a descending
+              curve (1 to 0). */
 
-  /**
-   * @copydoc LogisticSelectivity::evaluate(const Type &x)
-   * @param pos Position index, e.g., which year. If the index is out of bounds
-   * then it returns the first element, which would be the case when you do not
-   * have time-varying selectivity.
-   */
-  virtual const Type evaluate(const Type &x, size_t pos) {
-    return fims_math::logistic<Type>(inflection_point.get_force_scalar(pos),
-                                     slope.get_force_scalar(pos), x);
-  }
-};
+    LogisticSelectivity() : SelectivityBase<Type>() {}
 
-}  // namespace fims_popdy
+    virtual ~LogisticSelectivity() {}
+
+    /**
+     * @brief Method of the logistic selectivity class that implements the
+     * logistic function from FIMS math.
+     *
+     * \f[ \frac{1.0}{ 1.0 + exp(-1.0 * slope (x - inflection\_point))} \f]
+     *
+     * The selectivity curve can be either ascending or descending depending on
+     * the sign of the slope parameter:
+     * - Positive slope: ascending curve (selectivity increases from 0 to 1)
+     * - Negative slope: descending curve (selectivity decreases from 1 to 0)
+     *
+     * @param x  The independent variable in the logistic function (e.g., age or
+     * size in selectivity).
+     */
+    virtual const Type evaluate(const Type &x)
+    {
+      return fims_math::logistic<Type>(inflection_point[0],
+                                       fims_math::exp<Type>(slope[0]), x);
+    }
+
+    /**
+     * @copydoc LogisticSelectivity::evaluate(const Type &x)
+     * @param pos Position index, e.g., which year. If the index is out of bounds
+     * then it returns the first element, which would be the case when you do not
+     * have time-varying selectivity.
+     */
+    virtual const Type evaluate(const Type &x, size_t pos)
+    {
+      return fims_math::logistic<Type>(inflection_point.get_force_scalar(pos),
+                                       fims_math::exp<Type>(
+                                           slope.get_force_scalar(pos)),
+                                       x);
+    }
+  };
+
+} // namespace fims_popdy
 
 #endif /* POPULATION_DYNAMICS_SELECTIVITY_LOGISTIC_HPP */

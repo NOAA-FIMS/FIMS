@@ -342,6 +342,13 @@ class Information {
       std::shared_ptr<fims_distributions::DensityComponentBase<Type>> d =
           (*it).second;
       if (d->input_type == "random_effects") {
+        // Native .Call components may be linked directly before final model
+        // assembly. Preserve those links when no Rcpp variable-map key was
+        // supplied.
+        if (d->key.empty() && d->re != nullptr &&
+            d->re_expected_values != nullptr) {
+          continue;
+        }
         FIMS_INFO_LOG("Setup random effects for distribution " +
                       fims::to_string(d->id));
         variable_map_iterator vmit;
@@ -373,6 +380,11 @@ class Information {
       std::shared_ptr<fims_distributions::DensityComponentBase<Type>> d =
           (*it).second;
       if (d->input_type == "data") {
+        // Native .Call likelihoods can carry a direct pointer to the model's
+        // derived quantity. Rcpp components instead provide a variable-map key.
+        if (d->key.empty() && d->data_expected_values != nullptr) {
+          continue;
+        }
         FIMS_INFO_LOG("Setup expected value for data distribution " +
                       fims::to_string(d->id));
         variable_map_iterator vmit;

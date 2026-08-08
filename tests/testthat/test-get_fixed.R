@@ -55,7 +55,7 @@ test_that("`get_fixed()` works with correct inputs", {
   sel_parm <- c(
     fish_selex$inflection_point_asc[1]$value,
     fish_selex$inflection_point_desc[1]$value,
-    fish_selex$slope_desc[1]$value
+    log(fish_selex$slope_desc[1]$value)
   )
   #' @description Test that the correct number of parameters are returned for a double logistic selectivity curve.
   expect_equal(get_fixed(), sel_parm)
@@ -66,7 +66,7 @@ test_that("`get_fixed()` works with correct inputs", {
   selectivity$inflection_point[1]$estimation_type$set("fixed_effects")
   selectivity$slope[1]$value <- 0.5
   selectivity$slope[1]$estimation_type$set("fixed_effects")
-  sel_parm <- c(selectivity$inflection_point[1]$value, selectivity$slope[1]$value)
+  sel_parm <- c(selectivity$inflection_point[1]$value, log(selectivity$slope[1]$value))
   recruitment <- methods::new(BevertonHoltRecruitment)
   h <- 0.75
   r0 <- 1000000.0

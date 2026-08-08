@@ -1,0 +1,247 @@
+--- a/src/call_model.cpp
++++ b/src/call_model.cpp
+@@ -165,10 +165,14 @@
+                 }
+                 resize_with_recycled_last<Type>(fleet->Fmort, n_years,
+                                                 static_cast<Type>(0.0));
+-                if (fleet->log_q.size() != n_years)
++                // Catchability may be scalar (constant through time) or
++                // year-specific. Preserve the parameter dimensionality supplied
++                // by the interface; Fleet::q.get_force_scalar(year) handles the
++                // scalar broadcast during model evaluation.
++                if (fleet->log_q.size() != 1 && fleet->log_q.size() != n_years)
+                 {
+                     Rf_error(
+-                        "Fleet %u has log_q size %zu but expected n_years=%zu. "
++                        "Fleet %u has log_q size %zu but expected 1 or n_years=%zu. "
+                         "Refusing to resize estimable vectors after parameter registration.",
+                         static_cast<unsigned int>(fleet->GetId()),
+                         fleet->log_q.size(),
+@@ -566,6 +570,158 @@
+         fims_popdy::SelectivityBase<Type>::id_g = 0;
+     }
+ 
++    /**
++     * @brief Ensure a CatchAtAge shell and its derived-quantity maps exist
++     * without finalizing Information::CreateModel().
++     *
++     * Native likelihood components need stable references to the same model
++     * derived-quantity vectors used by the objective. Rcpp creates and links
++     * its data/distributions before CreateTMBModel(); this helper provides the
++     * corresponding native pre-assembly state while deliberately postponing
++     * Information::CreateModel() until fims_call_create_model().
++     */
++    template <typename Type>
++    void prepare_backend_model_shell_internal()
++    {
++        std::shared_ptr<fims_info::Information<Type>> info =
++            fims_info::Information<Type>::GetInstance();
++
++        if (info->populations.empty())
++        {
++            Rf_error("No populations are registered. Create at least one population before building likelihood components.");
++        }
++
++        reconcile_native_population_layout<Type>(info);
++
++        if (info->models_map.empty())
++        {
++            std::shared_ptr<fims_popdy::CatchAtAge<Type>> model =
++                std::make_shared<fims_popdy::CatchAtAge<Type>>();
++
++            for (auto population_it = info->populations.begin();
++                 population_it != info->populations.end();
++                 ++population_it)
++            {
++                if (population_it->second == nullptr)
++                {
++                    continue;
++                }
++
++                model->AddPopulation(population_it->first);
++                model->InitializePopulationDerivedQuantities(population_it->first);
++
++                std::map<std::string, fims::Vector<Type>> &population_dq =
++                    model->GetPopulationDerivedQuantities(population_it->first);
++                assign_population_derived_vectors<Type>(
++                    population_dq,
++                    population_it->second->n_years,
++                    population_it->second->n_ages);
++
++                for (auto fleet_id_it = population_it->second->fleet_ids.begin();
++                     fleet_id_it != population_it->second->fleet_ids.end();
++                     ++fleet_id_it)
++                {
++                    auto fleet_it = info->fleets.find(*fleet_id_it);
++                    if (fleet_it == info->fleets.end() || fleet_it->second == nullptr)
++                    {
++                        Rf_error("Population %u references missing fleet %u.",
++                                 static_cast<unsigned int>(population_it->first),
++                                 static_cast<unsigned int>(*fleet_id_it));
++                    }
++
++                    std::shared_ptr<fims_popdy::Fleet<Type>> fleet = fleet_it->second;
++                    fleet->n_years = population_it->second->n_years;
++                    fleet->n_ages = population_it->second->n_ages;
++                    if (fleet->n_ages > 0 &&
++                        fleet->age_to_length_conversion.size() > 0 &&
++                        fleet->age_to_length_conversion.size() % fleet->n_ages == 0)
++                    {
++                        fleet->n_lengths =
++                            fleet->age_to_length_conversion.size() / fleet->n_ages;
++                    }
++
++                    model->InitializeFleetDerivedQuantities(*fleet_id_it);
++                    std::map<std::string, fims::Vector<Type>> &fleet_dq =
++                        model->GetFleetDerivedQuantities(*fleet_id_it);
++                    assign_fleet_derived_vectors<Type>(
++                        fleet_dq,
++                        fleet->n_years,
++                        fleet->n_ages,
++                        fleet->n_lengths);
++                }
++            }
++
++            info->models_map[1] = model;
++        }
++        else
++        {
++            // A shell already exists. Refresh dimensions/maps without calling
++            // Information::CreateModel(); std::map node addresses remain stable,
++            // so likelihood pointers to the vector objects remain valid.
++            for (auto model_it = info->models_map.begin();
++                 model_it != info->models_map.end();
++                 ++model_it)
++            {
++                std::shared_ptr<fims_popdy::FisheryModelBase<Type>> model =
++                    model_it->second;
++                if (model == nullptr)
++                {
++                    continue;
++                }
++
++                for (auto population_it = info->populations.begin();
++                     population_it != info->populations.end();
++                     ++population_it)
++                {
++                    if (population_it->second == nullptr)
++                    {
++                        continue;
++                    }
++
++                    model->AddPopulation(population_it->first);
++                    model->InitializePopulationDerivedQuantities(population_it->first);
++                    std::map<std::string, fims::Vector<Type>> &population_dq =
++                        model->GetPopulationDerivedQuantities(population_it->first);
++                    assign_population_derived_vectors<Type>(
++                        population_dq,
++                        population_it->second->n_years,
++                        population_it->second->n_ages);
++
++                    for (auto fleet_id_it = population_it->second->fleet_ids.begin();
++                         fleet_id_it != population_it->second->fleet_ids.end();
++                         ++fleet_id_it)
++                    {
++                        auto fleet_it = info->fleets.find(*fleet_id_it);
++                        if (fleet_it == info->fleets.end() || fleet_it->second == nullptr)
++                        {
++                            continue;
++                        }
++
++                        std::shared_ptr<fims_popdy::Fleet<Type>> fleet = fleet_it->second;
++                        fleet->n_years = population_it->second->n_years;
++                        fleet->n_ages = population_it->second->n_ages;
++                        if (fleet->n_ages > 0 &&
++                            fleet->age_to_length_conversion.size() > 0 &&
++                            fleet->age_to_length_conversion.size() % fleet->n_ages == 0)
++                        {
++                            fleet->n_lengths =
++                                fleet->age_to_length_conversion.size() / fleet->n_ages;
++                        }
++
++                        model->InitializeFleetDerivedQuantities(*fleet_id_it);
++                        std::map<std::string, fims::Vector<Type>> &fleet_dq =
++                            model->GetFleetDerivedQuantities(*fleet_id_it);
++                        assign_fleet_derived_vectors<Type>(
++                            fleet_dq,
++                            fleet->n_years,
++                            fleet->n_ages,
++                            fleet->n_lengths);
++                    }
++                }
++            }
++        }
++    }
++
+     template <typename Type>
+     bool create_backend_model_internal()
+     {
+@@ -735,11 +891,6 @@
+         uint32_t fleet_id,
+         const std::string &derived_name)
+     {
+-        if (info->models_map.empty())
+-        {
+-            Rf_error("No model is registered. Call fims_call_create_model() before building likelihood components.");
+-        }
+-
+         std::shared_ptr<fims_popdy::FisheryModelBase<Type>> model =
+             info->models_map.begin()->second;
+         if (model == nullptr)
+@@ -889,6 +1040,11 @@
+     {
+         std::shared_ptr<fims_info::Information<Type>> info =
+             fims_info::Information<Type>::GetInstance();
++
++        // Match the Rcpp lifecycle: create data/distributions and their links
++        // before final Information::CreateModel() assembly. This creates only
++        // the CatchAtAge shell and derived-quantity storage required for links.
++        prepare_backend_model_shell_internal<Type>();
+ 
+         std::shared_ptr<fims_popdy::Fleet<Type>> fishing_fleet =
+             require_fleet<Type>(info, fishing_fleet_id, "fishing_fleet_id");
+--- a/tests/tmb_call_from_rcpp_v2.R
++++ b/tests/tmb_call_from_rcpp_v2.R
+@@ -173,25 +173,10 @@
+ )
+ 
+ # -----------------------------------------------------------------------------
+-# Register the native model container.
+-#
+-# This native call must happen before likelihood construction because
+-# fims_call_build_default_likelihood() attaches data/distributions to the
+-# registered model. It is therefore not lifecycle-equivalent to the final
+-# Rcpp CreateTMBModel() call, despite the similar name.
+-# -----------------------------------------------------------------------------
+-create_model_result <- .Call(
+-    "fims_call_create_model",
+-    PACKAGE = "FIMS"
+-)
+-
+-# -----------------------------------------------------------------------------
+ # Data + distributions + links
+ #
+-# Numerically, this builder should mirror the objects and links created in
+-# tmb_Rcpp.R. In particular, verify that it applies exactly these transforms:
+-#   landings/index: log_sd = log(sqrt(log(cv^2 + 1)))
+-#   recruitment:    log_sd = log(logR_sd)
++# Match tmb_Rcpp.R: likelihood components and links are established before the
++# final model-assembly call.
+ # -----------------------------------------------------------------------------
+ likelihood_result <- .Call(
+     "fims_call_build_default_likelihood",
+@@ -209,6 +194,14 @@
+     nyr,
+     nages,
+     nlengths,
++    PACKAGE = "FIMS"
++)
++
++# -----------------------------------------------------------------------------
++# Final model assembly -- lifecycle-equivalent target for CreateTMBModel().
++# -----------------------------------------------------------------------------
++create_model_result <- .Call(
++    "fims_call_create_model",
+     PACKAGE = "FIMS"
+ )
+ 
