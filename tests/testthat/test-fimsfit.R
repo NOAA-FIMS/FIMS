@@ -252,3 +252,28 @@ test_that("fit_fims() errors when optimization fails to converge", {
 
   clear()
 })
+
+test_that("fit_fims() produces informative error when throwing a fims::Vector bounding error", {
+  #' @description Test that fit_fims() throws an informative error when variable bounds are not set up correctly
+  data("data_big", package = "FIMS")
+  data_4_model <- FIMSFrame(data_big)
+  # Create parameters
+  initialized_model <- create_default_configurations(data_4_model) |>
+    create_default_parameters(data = data_4_model) |>
+    tidyr::unnest(cols = data) |>
+    dplyr::rows_delete(
+      tibble::tibble(
+        module_name = "Population",
+        label = c("log_init_naa"),
+        age = 1
+      ),
+      by = c("module_name", "label", "age")
+    ) |>
+    initialize_fims(data = data_4_model)
+
+  expect_error(
+    object = fit_fims(initialized_model, optimize = TRUE),
+    regexp = "fims::Vector out of bounds for Population.1.log_init_naa: index 12 >= size 11"
+  )
+  clear()
+})

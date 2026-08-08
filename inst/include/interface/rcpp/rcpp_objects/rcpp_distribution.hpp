@@ -460,17 +460,28 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
       distribution->key[i] = this->key_m->at(i);
     }
     distribution->id = this->id_m;
+    ss.str("");
+    ss << "dnorm." << this->id_m << ".observed_values";
+    distribution->observed_values.set_variable_name(ss.str());
     distribution->observed_values.resize(this->observed_values.size());
     for (size_t i = 0; i < this->observed_values.size(); i++) {
       distribution->observed_values[i] =
           this->observed_values[i].initial_value_m;
     }
+
     // set relative info
+    ss.str("");
+    ss << "dnorm." << this->id_m << ".expected_values";
+    distribution->expected_values.set_variable_name(ss.str());
     distribution->expected_values.resize(this->expected_values.size());
     for (size_t i = 0; i < this->expected_values.size(); i++) {
       distribution->expected_values[i] =
           this->expected_values[i].initial_value_m;
     }
+
+    ss.str("");
+    ss << "dnorm." << this->id_m << ".log_sd";
+    distribution->log_sd.set_variable_name(ss.str());
     distribution->log_sd.resize(this->log_sd.size());
     for (size_t i = 0; i < this->log_sd.size(); i++) {
       distribution->log_sd[i] = this->log_sd[i].initial_value_m;
@@ -487,13 +498,14 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
     info->variable_map[this->log_sd.id_m] = &(distribution)->log_sd;
 
     distribution->use_mean = this->use_mean_m.get();
+    ss.str("");
+    ss << "dnorm." << this->id_m << ".expected_mean";
+    distribution->expected_mean.set_variable_name(ss.str());
     distribution->expected_mean.resize(this->expected_mean.size());
     for (size_t i = 0; i < this->expected_mean.size(); i++) {
       distribution->expected_mean[i] = this->expected_mean[i].initial_value_m;
       if (this->expected_mean[i].estimation_type_m.get() == "fixed_effects") {
-        ss.str("");
-        ss << "dnorm." << this->id_m << ".expected_mean."
-           << this->expected_mean[i].id_m;
+        ss << "." << this->expected_mean[i].id_m;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(distribution->expected_mean[i]);
       }
@@ -799,17 +811,26 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
     for (size_t i = 0; i < this->key_m->size(); i++) {
       distribution->key[i] = this->key_m->at(i);
     }
+    ss.str("");
+    ss << "dlnorm." << this->id_m << ".observed_values";
+    distribution->observed_values.set_variable_name(ss.str());
     distribution->observed_values.resize(this->observed_values.size());
     for (size_t i = 0; i < this->observed_values.size(); i++) {
       distribution->observed_values[i] =
           this->observed_values[i].initial_value_m;
     }
     // set relative info
+    ss.str("");
+    ss << "dlnorm." << this->id_m << ".expected_values";
+    distribution->expected_values.set_variable_name(ss.str());
     distribution->expected_values.resize(this->expected_values.size());
     for (size_t i = 0; i < this->expected_values.size(); i++) {
       distribution->expected_values[i] =
           this->expected_values[i].initial_value_m;
     }
+    ss.str("");
+    ss << "dlnorm." << this->id_m << ".log_sd";
+    distribution->log_sd.set_variable_name(ss.str());
     distribution->log_sd.resize(this->log_sd.size());
     for (size_t i = 0; i < this->log_sd.size(); i++) {
       distribution->log_sd[i] = this->log_sd[i].initial_value_m;
@@ -1095,7 +1116,7 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
 
     std::shared_ptr<fims_distributions::MultinomialLPMF<Type>> distribution =
         std::make_shared<fims_distributions::MultinomialLPMF<Type>>();
-
+    std::stringstream ss;
     distribution->id = this->id_m;
     distribution->observed_data_id_m = interface_observed_data_id_m;
     distribution->input_type = this->input_type_m;
@@ -1103,12 +1124,18 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
     for (size_t i = 0; i < this->key_m->size(); i++) {
       distribution->key[i] = this->key_m->at(i);
     }
+    ss.str("");
+    ss << "dmultinom." << this->id_m << ".observed_values";
+    distribution->observed_values.set_variable_name(ss.str());
     distribution->observed_values.resize(this->observed_values.size());
     for (size_t i = 0; i < this->observed_values.size(); i++) {
       distribution->observed_values[i] =
           this->observed_values[i].initial_value_m;
     }
     // set relative info
+    ss.str("");
+    ss << "dmultinom." << this->id_m << ".expected_values";
+    distribution->expected_values.set_variable_name(ss.str());
     distribution->expected_values.resize(this->expected_values.size());
     for (size_t i = 0; i < this->expected_values.size(); i++) {
       distribution->expected_values[i] =

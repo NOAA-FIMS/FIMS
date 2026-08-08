@@ -101,11 +101,15 @@ exportMethods(plot)
 import(methods)
 import(stats)
 importFrom(TMB,MakeADFun)
-importFrom(generics,augment)
-importFrom(generics,glance)
-importFrom(generics,tidy)
+importFrom(generics,
+  augment,
+  glance,
+  tidy
+)
 importFrom(graphics,plot)
-importFrom(rlang,":=")
-importFrom(rlang,.data)
-importFrom(rlang,.env)
+importFrom(rlang,
+  ":=",
+  .data,
+  .env
+)
 useDynLib(FIMS, .registration = TRUE)

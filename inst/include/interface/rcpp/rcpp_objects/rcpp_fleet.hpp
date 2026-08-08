@@ -454,19 +454,18 @@ class FleetInterface : public FleetInterfaceBase {
 
     fleet->fleet_selectivity_id_m = interface_selectivity_id_m.get();
 
+    ss.str("");
+    ss << "Fleet." << this->id << ".log_q";
+    fleet->log_q.set_variable_name(ss.str());
     fleet->log_q.resize(this->log_q.size());
     for (size_t i = 0; i < this->log_q.size(); i++) {
       fleet->log_q[i] = this->log_q[i].initial_value_m;
-
+      ss << "." << this->log_q[i].id_m;
       if (this->log_q[i].estimation_type_m.get() == "fixed_effects") {
-        ss.str("");
-        ss << "Fleet." << this->id << ".log_q." << this->log_q[i].id_m;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(fleet->log_q[i]);
       }
       if (this->log_q[i].estimation_type_m.get() == "random_effects") {
-        ss.str("");
-        ss << "Fleet." << this->id << ".log_q." << this->log_q[i].id_m;
         info->RegisterRandomEffectName(ss.str());
         info->RegisterRandomEffect(fleet->log_q[i]);
       }
@@ -484,18 +483,17 @@ class FleetInterface : public FleetInterfaceBase {
           fims::to_string(this->n_years.get()));
     }
     fleet->log_Fmort.resize(static_cast<size_t>(this->log_Fmort.size()));
+    ss.str("");
+    ss << "Fleet." << this->id << ".log_Fmort";
+    fleet->log_Fmort.set_variable_name(ss.str());
     for (size_t i = 0; i < log_Fmort.size(); i++) {
       fleet->log_Fmort[i] = this->log_Fmort[i].initial_value_m;
-
+      ss << "." << this->log_Fmort[i].id_m;
       if (this->log_Fmort[i].estimation_type_m.get() == "fixed_effects") {
-        ss.str("");
-        ss << "Fleet." << this->id << ".log_Fmort." << this->log_Fmort[i].id_m;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(fleet->log_Fmort[i]);
       }
       if (this->log_Fmort[i].estimation_type_m.get() == "random_effects") {
-        ss.str("");
-        ss << "Fleet." << this->id << ".log_Fmort." << this->log_Fmort[i].id_m;
         info->RegisterRandomEffectName(ss.str());
         info->RegisterRandomEffect(fleet->log_Fmort[i]);
       }
@@ -504,6 +502,9 @@ class FleetInterface : public FleetInterfaceBase {
     info->variable_map[this->log_Fmort.id_m] = &(fleet)->log_Fmort;
 
     if (this->n_lengths.get() > 0) {
+      ss.str("");
+      ss << "Fleet." << this->id << ".age_to_length_conversion";
+      fleet->age_to_length_conversion.set_variable_name(ss.str());
       fleet->age_to_length_conversion.resize(
           this->age_to_length_conversion.size());
 
@@ -518,12 +519,9 @@ class FleetInterface : public FleetInterfaceBase {
       for (size_t i = 0; i < fleet->age_to_length_conversion.size(); i++) {
         fleet->age_to_length_conversion[i] =
             this->age_to_length_conversion[i].initial_value_m;
-
+        ss << "." << this->age_to_length_conversion[i].id_m;
         if (this->age_to_length_conversion[i].estimation_type_m.get() ==
             "fixed_effects") {
-          ss.str("");
-          ss << "Fleet." << this->id << ".age_to_length_conversion."
-             << this->age_to_length_conversion[i].id_m;
           info->RegisterParameterName(ss.str());
           info->RegisterParameter(fleet->age_to_length_conversion[i]);
         }

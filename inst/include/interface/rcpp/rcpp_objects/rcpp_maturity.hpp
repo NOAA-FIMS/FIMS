@@ -226,39 +226,37 @@ class LogisticMaturityInterface : public MaturityInterfaceBase {
     // set relative info
     maturity->id = this->id;
     std::stringstream ss;
+    ss.str("");
+    ss << "Maturity." << this->id << ".inflection_point";
+    maturity->inflection_point.set_variable_name(ss.str());
     maturity->inflection_point.resize(this->inflection_point.size());
     for (size_t i = 0; i < this->inflection_point.size(); i++) {
       maturity->inflection_point[i] = this->inflection_point[i].initial_value_m;
+      ss << "." << this->inflection_point[i].id_m;
       if (this->inflection_point[i].estimation_type_m.get() ==
           "fixed_effects") {
-        ss.str("");
-        ss << "Maturity." << this->id << ".inflection_point."
-           << this->inflection_point[i].id_m;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(maturity->inflection_point[i]);
       }
       if (this->inflection_point[i].estimation_type_m.get() ==
           "random_effects") {
-        ss.str("");
-        ss << "Maturity." << this->id << ".inflection_point."
-           << this->inflection_point[i].id_m;
         info->RegisterRandomEffectName(ss.str());
         info->RegisterRandomEffect(maturity->inflection_point[i]);
       }
     }
 
+    ss.str("");
+    ss << "Maturity." << this->id << ".slope";
+    maturity->slope.set_variable_name(ss.str());
     maturity->slope.resize(this->slope.size());
     for (size_t i = 0; i < this->slope.size(); i++) {
       maturity->slope[i] = this->slope[i].initial_value_m;
+      ss << "." << this->slope[i].id_m;
       if (this->slope[i].estimation_type_m.get() == "fixed_effects") {
-        ss.str("");
-        ss << "Maturity." << this->id << ".slope." << this->slope[i].id_m;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(maturity->slope[i]);
       }
       if (this->slope[i].estimation_type_m.get() == "random_effects") {
-        ss.str("");
-        ss << "Maturity." << this->id << ".slope." << this->slope[i].id_m;
         info->RegisterRandomEffect(maturity->slope[i]);
         info->RegisterRandomEffectName(ss.str());
       }

@@ -10,6 +10,7 @@
 
 #include "../interface/interface.hpp"
 #include <ostream>
+#include <string>
 #include <iomanip>
 
 namespace fims {
@@ -82,6 +83,8 @@ class Vector {
     for (size_t i = 0; i < this->vec_m.size(); i++) {
       this->vec_m[i] = other[i];
     }
+    this->tag_m = other.tag_m;
+    this->variable_name_m = other.variable_name_m;
   }
 
   /**
@@ -142,7 +145,7 @@ class Vector {
    */
   inline Type &operator[](size_t pos) {
     if (pos >= this->size()) {
-      throw std::invalid_argument("fims::Vector out of bounds");
+      throw std::invalid_argument(this->get_out_of_bounds_error_message(pos));
     }
     return this->vec_m[pos];
   }
@@ -153,7 +156,7 @@ class Vector {
    */
   inline const Type &operator[](size_t n) const {
     if (n >= this->size()) {
-      throw std::invalid_argument("fims::Vector out of bounds");
+      throw std::invalid_argument(this->get_out_of_bounds_error_message(n));
     }
     return this->vec_m[n];
   }
@@ -480,8 +483,33 @@ class Vector {
    */
   void set_tag(const std::string &tag) { this->tag_m = tag; }
 
+  /**
+   * @brief Gets the variable name for the vector.
+   * @return The variable name.
+   */
+  std::string get_variable_name() const { return this->variable_name_m; }
+
+  /**
+   * @brief Sets the variable name for the vector.
+   */
+  void set_variable_name(const std::string &name) {
+    this->variable_name_m = name;
+  }
+
  private:
-  std::string tag_m; /*!< The tag for the vector. */
+  std::string get_out_of_bounds_error_message(size_t pos) const {
+    std::string error_msg = "fims::Vector out of bounds";
+    if (!this->variable_name_m.empty()) {
+      error_msg += " for " + this->variable_name_m;
+    }
+    error_msg += ": index " + std::to_string(pos + 1) + " >= size " +
+                 std::to_string(this->size());
+    return error_msg;
+  }
+
+  std::string tag_m;           /*!< The tag for the vector. */
+  std::string variable_name_m; /*!< The name of the variable represented by the
+                                  vector. */
 };  // end fims::Vector class
 
 /**
