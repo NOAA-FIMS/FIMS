@@ -12,6 +12,10 @@ fit_edm(
   tau = 1L,
   theta = 1,
   n_neighbors = 0L,
+  auto_select = FALSE,
+  gp_phi_init = NULL,
+  gp_sigma2_init = 1,
+  gp_ve_init = 0.1,
   forecast_horizon = 1L,
   ...
 )
@@ -38,7 +42,22 @@ weight nearby library points more strongly. Only used when
 
 \item{n_neighbors}{Positive integer. Number of nearest neighbors for
 Simplex Projection. Defaults to \code{E + 1} when set to \code{0}.
-Only used when \code{method = "simplex"}. Default is \code{0}.}
+Only used when \code{method = "simplex"}. Ignored when \code{auto_select = TRUE}.
+Default is \code{0}.}
+
+\item{auto_select}{Logical. When \code{TRUE} and \code{method = "simplex"}, calls
+\code{\link[=select_n_neighbors]{select_n_neighbors()}} internally to choose the \code{n_neighbors} value that
+maximises in-library Pearson correlation (\eqn{\rho}). Default is \code{FALSE}.}
+
+\item{gp_phi_init}{Numeric vector of length \code{E}. Initial ARD inverse
+length-scale values for GP-EDM. Defaults to \code{rep(0.5, E)}. Only used
+when \code{method = "gp"}.}
+
+\item{gp_sigma2_init}{Positive numeric. Initial signal variance for GP-EDM.
+Default is \code{1.0}. Only used when \code{method = "gp"}.}
+
+\item{gp_ve_init}{Positive numeric. Initial process noise variance for
+GP-EDM. Default is \code{0.1}. Only used when \code{method = "gp"}.}
 
 \item{forecast_horizon}{Positive integer. Number of steps ahead to forecast.
 Default is \code{1}.}
@@ -58,11 +77,16 @@ methods.
 \dontrun{
 data("data_big")
 ff <- FIMSFrame(data_big)
-ff <- create_edm_embedding(ff, type = "landings", fleet = "fishery1", E = 3, tau = 1)
-fit <- fit_edm(ff, method = "simplex", embedding_name = "fishery1_landings")
+ff <- create_edm_embedding(ff, series_type = "landings", series_name = "fleet1",
+                           E = 3L, tau = 1L)
+# Auto-select optimal n_neighbors via cross-validation
+fit <- fit_edm(ff, method = "simplex", auto_select = TRUE)
+# GP-EDM with custom initial hyperparameters
+fit_gp <- fit_edm(ff, method = "gp", gp_sigma2_init = 2.0, gp_ve_init = 0.05)
 print(fit)
 }
 }
 \seealso{
-\code{\link[=edm_forecast]{edm_forecast()}}, \code{\link[=create_edm_embedding]{create_edm_embedding()}}, \code{\link[=FIMSFrame]{FIMSFrame()}}
+\code{\link[=edm_forecast]{edm_forecast()}}, \code{\link[=select_n_neighbors]{select_n_neighbors()}}, \code{\link[=create_edm_embedding]{create_edm_embedding()}},
+\code{\link[=FIMSFrame]{FIMSFrame()}}
 }
