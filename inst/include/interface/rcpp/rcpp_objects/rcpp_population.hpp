@@ -145,6 +145,17 @@ class PopulationInterface : public PopulationInterfaceBase {
    */
   VariableVector proportion_female;
   /**
+   * @brief Which partition strata to materialize in derived quantities.
+   *
+   * @details Mirrors Population::partition_demand. Empty selections mean
+   * pooled output only (backward-compatible default). Non-empty selections
+   * are named axis filters, e.g. axis \"sex\" with level \"female\". R will
+   * set this via a list-shaped API in a later step; until then the default
+   * remains pooled.
+   */
+  fims_popdy::PartitionDemand partition_demand =
+      fims_popdy::MakePooledPartitionDemand();
+  /**
    * @brief Ages that are modeled in the population, the length of this vector
    * should equal \"n_ages\".
    */
@@ -261,6 +272,7 @@ class PopulationInterface : public PopulationInterfaceBase {
         log_f_multiplier(other.log_f_multiplier),
         log_init_naa(other.log_init_naa),
         proportion_female(other.proportion_female),
+        partition_demand(other.partition_demand),
         ages(other.ages),
         name(other.name),
         total_catch_weight(other.total_catch_weight),
