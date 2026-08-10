@@ -14,6 +14,17 @@ function(add_as_invoker_manifest target)
   endif()
 endfunction()
 
+# test_native_NativeRegistries.cpp
+add_executable(native_NativeRegistries
+  test_native_NativeRegistries.cpp
+)
+add_as_invoker_manifest(native_NativeRegistries)
+target_link_libraries(native_NativeRegistries
+  gtest_main
+  fims_test
+)
+gtest_discover_tests(native_NativeRegistries)
+
 # test_fimsMath_fimsMath_exp.cpp
 add_executable(fimsMath_fimsMath_exp
   test_fimsMath_fimsMath_exp.cpp
