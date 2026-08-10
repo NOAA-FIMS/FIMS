@@ -3,12 +3,27 @@
 \alias{recruitment_beverton_holt_create}
 \title{Create a Beverton-Holt recruitment backend object through the native .Call interface}
 \usage{
-recruitment_beverton_holt_create(logit_steep, log_rzero)
+recruitment_beverton_holt_create(
+  logit_steep,
+  log_rzero,
+  log_devs = numeric(),
+  logit_steep_estimation_type = "constant",
+  log_rzero_estimation_type = "constant",
+  log_devs_estimation_type = "constant"
+)
 }
 \arguments{
 \item{logit_steep}{Numeric scalar or vector used when creating the backend object.}
 
 \item{log_rzero}{Numeric scalar or vector used when creating the backend object.}
+
+\item{log_devs}{Optional numeric vector of log recruitment deviations.}
+
+\item{logit_steep_estimation_type}{Estimation type code(s) for \code{logit_steep}.}
+
+\item{log_rzero_estimation_type}{Estimation type code(s) for \code{log_rzero}.}
+
+\item{log_devs_estimation_type}{Estimation type code(s) for \code{log_devs}.}
 }
 \value{
 An integer handle for the created backend object.
