@@ -206,7 +206,7 @@ reshape_tmb_estimates <- function(obj,
                                   precomputed_gradient = NULL) {
   # Outline for the estimates table
   estimates_outline <- tibble::tibble(
-    # The FIMS Rcpp module
+    # The FIMS model output
     module_name = character(),
     # The unique ID of the module
     module_id = integer(),
@@ -421,7 +421,7 @@ dimensions_to_tibble <- function(data) {
 #' exact same length as the other elements. There is an internal check in the
 #' function for this consistency.
 #'
-#' The code that writes this json information is stored in `inst/include/interface/rcpp/rcpp_objects/rcpp_distribution.hpp`.
+#' The distribution metadata are written by the native model interface.
 #' @param data A list of `density_components` from the json output that is a
 #'   list of lists. The first element of the list will be `lpdf_value`, a
 #'   single entry that stores the log probability density function value. The

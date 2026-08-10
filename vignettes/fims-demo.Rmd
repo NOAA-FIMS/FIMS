@@ -298,7 +298,7 @@ fit <- parameters_4_model |>
 
 ### Logging system
 
-The former Rcpp interface exposed the C++ log through `get_log()`. That accessor
+The former class-based interface exposed the C++ log through `get_log()`. That accessor
 is not yet exposed by the native interface. Errors and warnings raised during
 native model construction are still propagated as ordinary R conditions.
 Native log retrieval will be documented here when its `.Call` wrapper is added.

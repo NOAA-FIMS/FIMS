@@ -112,14 +112,6 @@ navbar:
         - text: Developer
         - text: Adding a New C++ Module
           href: articles/adding-new-module.html
-        - text: FIMS Path - Maturity
-          href: articles/fims-path-maturity.html
-        - text: -------
-        - text: C++ Training
-        - text: Intro to C++
-          href: articles/training-intro-cpp.html
-        - text: Intro to Rcpp
-          href: articles/training-intro-rcpp.html
         - text: -------
         - text: Research and Development
         - text: RE Sparsity

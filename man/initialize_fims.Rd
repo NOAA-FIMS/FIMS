@@ -17,6 +17,6 @@ A list containing TMB parameters and native model metadata.
 }
 \description{
 Builds the currently supported catch-at-age model without constructing any
-Rcpp module objects. Native object IDs are retained in the returned model
+C++ interface objects. Native object IDs are retained in the returned model
 metadata for diagnostics.
 }

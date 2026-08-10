@@ -592,7 +592,7 @@ namespace
      * without finalizing Information::CreateModel().
      *
      * Native likelihood components need stable references to the same model
-     * derived-quantity vectors used by the objective. Rcpp creates and links
+     * derived-quantity vectors used by the objective. The interface creates and links
      * its data/distributions before CreateTMBModel(); this helper provides the
      * corresponding native pre-assembly state while deliberately postponing
      * Information::CreateModel() until fims_call_create_model().
@@ -993,7 +993,7 @@ namespace
         std::shared_ptr<fims_distributions::NormalLPDF<Type>> distribution =
             std::make_shared<fims_distributions::NormalLPDF<Type>>();
 
-        // Match the Rcpp DnormDistribution link:
+        // Configure the normal-distribution link:
         //
         //   set_distribution_links("random_effects", recruitment$log_devs$id)
         //
@@ -1080,7 +1080,7 @@ namespace
         std::shared_ptr<fims_info::Information<Type>> info =
             fims_info::Information<Type>::GetInstance();
 
-        // Match the Rcpp lifecycle: create data/distributions and their links
+        // Create data, distributions, and their links
         // before final Information::CreateModel() assembly. This creates only
         // the CatchAtAge shell and derived-quantity storage required for links.
         prepare_backend_model_shell_internal<Type>();

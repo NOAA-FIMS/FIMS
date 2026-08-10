@@ -84,7 +84,7 @@
 #' Initialize a FIMS model through the native interface
 #'
 #' Builds the currently supported catch-at-age model without constructing any
-#' Rcpp module objects. Native object IDs are retained in the returned model
+#' C++ interface objects. Native object IDs are retained in the returned model
 #' metadata for diagnostics.
 #'
 #' @param parameters A parameter tibble returned by

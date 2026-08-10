@@ -85,7 +85,6 @@ Imports:
     jsonlite,
     methods,
     purrr,
-    Rcpp,
     rlang,
     stats,
     tibble,
@@ -111,7 +110,6 @@ Suggests:
     usethis,
     withr
 LinkingTo:
-    Rcpp,
     RcppEigen,
     TMB
 VignetteBuilder:
@@ -121,7 +119,6 @@ Remotes:
     github::noaa-afsc/SparseNUTS
 Additional_repositories: 
     https://noaa-fisheries-integrated-toolbox.r-universe.dev
-Config/Rcpp/registration: none
 Config/roxygen2/version: 8.0.0
 Config/testthat/edition: 3
 Config/testthat/parallel: false

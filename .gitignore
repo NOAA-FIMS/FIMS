@@ -104,6 +104,12 @@ tests/testthat/fixtures/data*.RDS
 tests/testthat/fixtures/parameters*.RDS
 tests/testthat/fixtures/deterministic*.RDS
 
+# Local interface benchmarks and testthat failure captures
+tests/loop*.R
+tests/loop*.Ry
+tests/rss_loop_*.csv
+tests/testthat/_problems/
+
 #vignettes
 inst/doc
 /doc/

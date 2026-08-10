@@ -25,7 +25,7 @@ Copilot should treat the existing codebase, especially the `tests/` directory, a
 
 - Follow the existing initialization and configuration patterns used in model classes, for example: `Population`, `Fleet`, integration helpers, etc.
 - Do not restructure model setup logic unless explicitly required.
-- Maintain consistency between C++ logic and the Rcpp interface.
+- Maintain consistency between C++ logic and the registered native R interface.
 - Do not modify public interfaces without updating related tests and documentation.
 
 ## C++ Testing – Google Test

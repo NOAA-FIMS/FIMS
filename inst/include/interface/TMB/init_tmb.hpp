@@ -9,7 +9,10 @@
 #define SRC_INIT_HPP
 
 #include <stdlib.h>
-#include <Rcpp.h>
+#ifndef R_NO_REMAP
+#define R_NO_REMAP
+#endif
+#include <Rinternals.h>
 #include <R_ext/Rdynload.h>
 
 #include "../call/fleet.hpp"
@@ -22,10 +25,9 @@
 
 #ifdef FIMS_ONLOAD_INIT_TMB
 /**
- * @brief Function to register functions with the Rcpp module system.
+ * @brief Function to initialize the TMB C callables.
  *
- * This function is called when the Rcpp module is loaded, and it registers
- * all of the TMB C callables.
+ * This function is called after the shared library is loaded.
  */
 extern "C" SEXP fims_post_load_init_tmb()
 {
@@ -40,13 +42,6 @@ extern "C" SEXP fims_post_load_init_tmb()
 
 extern "C"
 {
-
-  /**
-   * @brief TODO: Handles the initialization of the fims rcpp module.
-   *
-   * @return SEXP
-   */
-  SEXP _rcpp_module_boot_fims();
 
   /**
    * @brief Callback definition to load the FIMS module.
@@ -94,7 +89,6 @@ extern "C"
       {"fims_call_information_get_parameter_names",
        (DL_FUNC)&fims_call_information_get_parameter_names, 0},
       TMB_CALLDEFS,
-      {"_rcpp_module_boot_fims", (DL_FUNC)&_rcpp_module_boot_fims, 0},
       {NULL, NULL, 0}};
 
   /**
