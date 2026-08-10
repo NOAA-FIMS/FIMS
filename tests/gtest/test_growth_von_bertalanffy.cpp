@@ -96,9 +96,10 @@ namespace
     EXPECT_NEAR(
         W_half, vb.length_weight_a * std::pow(3.0, vb.length_weight_b), 1e-12);
 
-    // The log-length gradient should also follow the early-age ramp below A1.
-    // At age 0.5, mean length is 3 and dL/dL1 is 0.5, so
-    // dlog(L)/dL1 = 0.5 / 3 = 1 / 6.
+    // The log-length gradient follows the early-age ramp below A1.
+    // At age 0.5, mean length is 3 and dL/dL1 is 0.5. The implementation uses
+    // the same smooth safety floor as other log-length calculations, so compute
+    // the expected value with that same safe mean length.
     double d_log_laa_d_l1 = 0.0;
     double d_log_laa_d_l2 = 0.0;
     double d_log_laa_d_k = 0.0;
@@ -106,12 +107,16 @@ namespace
     vb.log_length_at_age_gradient(
         0.5, d_log_laa_d_l1, d_log_laa_d_l2, d_log_laa_d_k);
 
-    EXPECT_NEAR(d_log_laa_d_l1, 1.0 / vb.length_at_ref_age_1, 1e-12);
+    const double ratio_half = 0.5 / vb.reference_age_for_length_1;
+    const double mean_length_half = vb.length_at_ref_age_1 * ratio_half;
+    const double mean_length_half_safe =
+        fims_math::ad_max(mean_length_half, 1e-8);
+
+    EXPECT_NEAR(d_log_laa_d_l1, ratio_half / mean_length_half_safe, 1e-12);
     EXPECT_NEAR(d_log_laa_d_l2, 0.0, 1e-12);
     EXPECT_NEAR(d_log_laa_d_k, 0.0, 1e-12);
 
-    // On the log scale, the derivative with respect to log(L1) should be 1
-    // because the ramp below A1 is proportional to L1.
+    // On the log scale, multiply the natural-scale derivative by L1.
     double d_log_laa_d_log_l1 = 0.0;
     double d_log_laa_d_log_l2 = 0.0;
     double d_log_laa_d_log_k = 0.0;
@@ -122,7 +127,10 @@ namespace
         d_log_laa_d_log_l2,
         d_log_laa_d_log_k);
 
-    EXPECT_NEAR(d_log_laa_d_log_l1, 1.0, 1e-12);
+    EXPECT_NEAR(
+        d_log_laa_d_log_l1,
+        vb.length_at_ref_age_1 * ratio_half / mean_length_half_safe,
+        1e-12);
     EXPECT_NEAR(d_log_laa_d_log_l2, 0.0, 1e-12);
     EXPECT_NEAR(d_log_laa_d_log_k, 0.0, 1e-12);
   }
