@@ -108,6 +108,7 @@ tests/testthat/fixtures/deterministic*.RDS
 tests/loop*.R
 tests/loop*.Ry
 tests/rss_loop_*.csv
+tests/tmb_call*.R
 tests/testthat/_problems/
 
 #vignettes
