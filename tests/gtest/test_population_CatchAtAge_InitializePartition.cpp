@@ -21,4 +21,20 @@ TEST_F(CAAInitializeTestFixture, InitializeSetsDefaultSexPartition) {
                   .empty());
 }
 
+// Initialize must not wipe demand set before model init (e.g. from R via
+// add_to_fims_tmb). Default remains pooled when unset.
+TEST_F(CAAInitializeTestFixture, InitializePreservesPartitionDemand) {
+  auto &population = catch_at_age_model->populations[0];
+  population->partition_demand =
+      fims_popdy::MakeSexPartitionDemand({"female"});
+
+  catch_at_age_model->Initialize();
+
+  EXPECT_FALSE(population->partition_demand.is_pooled());
+  const std::vector<size_t> strata = fims_popdy::RequestedStrata(
+      population->partition_spec, population->partition_demand);
+  ASSERT_EQ(strata.size(), 1);
+  EXPECT_EQ(strata[0], 0);
+}
+
 }  // namespace
