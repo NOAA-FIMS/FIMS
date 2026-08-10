@@ -107,7 +107,7 @@ struct VonBertalanffyGrowth : public GrowthBase<Type> {
       // For early ages, avoid back-extrapolating the curved growth equation.
       // This no-seasons ramp goes from length 0 at age 0 to L1 at A1;
       // seasonal growth may need a different transition in the future.
-      const Type age_nonnegative = fims_math::ad_max(age, Type(0.0));
+      const Type age_nonnegative = age <= Type(0.0) ? Type(0.0) : age;
       return length_at_ref_age_1 * age_nonnegative /
              reference_age_for_length_1;
     }
@@ -156,7 +156,7 @@ struct VonBertalanffyGrowth : public GrowthBase<Type> {
 
     if (reference_age_for_length_1 > Type(0.0) &&
         age < reference_age_for_length_1) {
-      const Type age_nonnegative = fims_math::ad_max(age, Type(0.0));
+      const Type age_nonnegative = age <= Type(0.0) ? Type(0.0) : age;
       const Type ratio = age_nonnegative / reference_age_for_length_1;
       const Type mean_length = length_at_ref_age_1 * ratio;
       const Type mean_length_safe = fims_math::ad_max(
