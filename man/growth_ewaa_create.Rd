@@ -3,7 +3,12 @@
 \alias{growth_ewaa_create}
 \title{Create an EWAA growth backend object through the native .Call interface}
 \usage{
-growth_ewaa_create(ages, weights, n_years)
+growth_ewaa_create(
+  ages,
+  weights,
+  n_years,
+  weights_estimation_type = "constant"
+)
 }
 \arguments{
 \item{ages}{Numeric vector of ages.}
@@ -11,6 +16,8 @@ growth_ewaa_create(ages, weights, n_years)
 \item{weights}{Numeric vector of weights at age.}
 
 \item{n_years}{Integer number of modeled years.}
+
+\item{weights_estimation_type}{Estimation type code(s) for \code{weights}.}
 }
 \value{
 An integer handle for the created backend object.

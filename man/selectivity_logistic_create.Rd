@@ -3,12 +3,25 @@
 \alias{selectivity_logistic_create}
 \title{Create a logistic selectivity backend object through the native .Call interface}
 \usage{
-selectivity_logistic_create(inflection_point, slope)
+selectivity_logistic_create(
+  inflection_point,
+  slope,
+  inflection_point_estimation_type = "constant",
+  slope_estimation_type = "constant"
+)
 }
 \arguments{
 \item{inflection_point}{Numeric scalar or vector matching the eventual evaluation length.}
 
 \item{slope}{Positive numeric scalar or vector matching the eventual evaluation length. Values are stored internally as log-slopes before evaluation.}
+
+\item{inflection_point_estimation_type}{Estimation type code(s) for
+\code{inflection_point}. Accepts \code{"constant"}, \code{"fixed_effects"},
+\code{"random_effects"}, or integer codes 0, 1, 2.}
+
+\item{slope_estimation_type}{Estimation type code(s) for \code{slope}.
+Accepts \code{"constant"}, \code{"fixed_effects"},
+\code{"random_effects"}, or integer codes 0, 1, 2.}
 }
 \value{
 An integer handle for the created backend object.

@@ -3,12 +3,22 @@
 \alias{maturity_logistic_create}
 \title{Create a logistic maturity backend object through the native .Call interface}
 \usage{
-maturity_logistic_create(inflection_point, slope)
+maturity_logistic_create(
+  inflection_point,
+  slope,
+  inflection_point_estimation_type = "constant",
+  slope_estimation_type = "constant"
+)
 }
 \arguments{
 \item{inflection_point}{Numeric scalar or vector used when creating the backend object.}
 
 \item{slope}{Numeric scalar or vector used when creating the backend object.}
+
+\item{inflection_point_estimation_type}{Estimation type code(s) for
+\code{inflection_point}.}
+
+\item{slope_estimation_type}{Estimation type code(s) for \code{slope}.}
 }
 \value{
 An integer handle for the created backend object.

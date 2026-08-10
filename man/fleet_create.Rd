@@ -3,7 +3,14 @@
 \alias{fleet_create}
 \title{Create a fleet backend object through the native .Call interface}
 \usage{
-fleet_create(log_fmort, log_q, selectivity_id = NA_integer_)
+fleet_create(
+  log_fmort,
+  log_q,
+  selectivity_id = NA_integer_,
+  age_to_length_conversion = numeric(),
+  log_fmort_estimation_type = "constant",
+  log_q_estimation_type = "constant"
+)
 }
 \arguments{
 \item{log_fmort}{Numeric scalar or vector of yearly log fishing mortality.}
@@ -11,6 +18,13 @@ fleet_create(log_fmort, log_q, selectivity_id = NA_integer_)
 \item{log_q}{Numeric scalar or vector of yearly log catchability.}
 
 \item{selectivity_id}{Optional integer selectivity handle to link to the fleet.}
+
+\item{age_to_length_conversion}{Optional numeric vector containing the
+flattened age-to-length conversion matrix.}
+
+\item{log_fmort_estimation_type}{Estimation type code(s) for \code{log_fmort}.}
+
+\item{log_q_estimation_type}{Estimation type code(s) for \code{log_q}.}
 }
 \value{
 An integer handle for the created backend object.

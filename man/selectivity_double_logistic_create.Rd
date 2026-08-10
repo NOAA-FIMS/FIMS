@@ -7,7 +7,11 @@ selectivity_double_logistic_create(
   inflection_point_asc,
   slope_asc,
   inflection_point_desc,
-  slope_desc
+  slope_desc,
+  inflection_point_asc_estimation_type = "constant",
+  slope_asc_estimation_type = "constant",
+  inflection_point_desc_estimation_type = "constant",
+  slope_desc_estimation_type = "constant"
 )
 }
 \arguments{
@@ -18,6 +22,22 @@ selectivity_double_logistic_create(
 \item{inflection_point_desc}{Numeric scalar or vector used when creating the backend object.}
 
 \item{slope_desc}{Positive numeric scalar or vector used when creating the backend object. Values are stored internally as log-slopes before evaluation.}
+
+\item{inflection_point_asc_estimation_type}{Estimation type code(s) for
+\code{inflection_point_asc}. Accepts \code{"constant"},
+\code{"fixed_effects"}, \code{"random_effects"}, or integer codes 0, 1, 2.}
+
+\item{slope_asc_estimation_type}{Estimation type code(s) for
+\code{slope_asc}. Accepts \code{"constant"}, \code{"fixed_effects"},
+\code{"random_effects"}, or integer codes 0, 1, 2.}
+
+\item{inflection_point_desc_estimation_type}{Estimation type code(s) for
+\code{inflection_point_desc}. Accepts \code{"constant"},
+\code{"fixed_effects"}, \code{"random_effects"}, or integer codes 0, 1, 2.}
+
+\item{slope_desc_estimation_type}{Estimation type code(s) for
+\code{slope_desc}. Accepts \code{"constant"}, \code{"fixed_effects"},
+\code{"random_effects"}, or integer codes 0, 1, 2.}
 }
 \value{
 An integer handle for the created backend object.

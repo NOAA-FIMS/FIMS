@@ -7,6 +7,9 @@ population_create(
   log_m,
   log_f_multiplier,
   log_init_naa,
+  log_m_estimation_type = "constant",
+  log_f_multiplier_estimation_type = "constant",
+  log_init_naa_estimation_type = "constant",
   maturity_id = NA_integer_,
   growth_id = NA_integer_,
   recruitment_id = NA_integer_,
@@ -19,6 +22,14 @@ population_create(
 \item{log_f_multiplier}{Numeric scalar or vector of yearly log fishing multipliers.}
 
 \item{log_init_naa}{Numeric vector of log initial numbers at age.}
+
+\item{log_m_estimation_type}{Estimation type code(s) for \code{log_m}.}
+
+\item{log_f_multiplier_estimation_type}{Estimation type code(s) for
+\code{log_f_multiplier}.}
+
+\item{log_init_naa_estimation_type}{Estimation type code(s) for
+\code{log_init_naa}.}
 
 \item{maturity_id}{Optional integer maturity handle.}
 

@@ -3,7 +3,12 @@
 \alias{fleet_prepare}
 \title{Prepare fleet transformed values through the native .Call interface}
 \usage{
-fleet_prepare(log_fmort, log_q, selectivity_id = NA_integer_)
+fleet_prepare(
+  log_fmort,
+  log_q,
+  selectivity_id = NA_integer_,
+  age_to_length_conversion = numeric()
+)
 }
 \arguments{
 \item{log_fmort}{Numeric scalar or vector of yearly log fishing mortality.}
@@ -11,6 +16,9 @@ fleet_prepare(log_fmort, log_q, selectivity_id = NA_integer_)
 \item{log_q}{Numeric scalar or vector of yearly log catchability.}
 
 \item{selectivity_id}{Optional integer selectivity handle to link to the fleet.}
+
+\item{age_to_length_conversion}{Optional numeric vector containing the
+flattened age-to-length conversion matrix.}
 }
 \value{
 A named list with transformed vectors \code{Fmort} and \code{q}.
