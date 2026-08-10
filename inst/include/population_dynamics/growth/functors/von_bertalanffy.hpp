@@ -102,9 +102,19 @@ struct VonBertalanffyGrowth : public GrowthBase<Type> {
   Type length_at_age(const Type& age) const {
     ValidateLengthParameters();
 
+    if (reference_age_for_length_1 > Type(0.0) &&
+        age < reference_age_for_length_1) {
+      // For early ages, avoid back-extrapolating the curved growth equation.
+      // This no-seasons ramp goes from length 0 at age 0 to L1 at A1;
+      // seasonal growth may need a different transition in the future.
+      const Type age_nonnegative = fims_math::ad_max(age, Type(0.0));
+      return length_at_ref_age_1 * age_nonnegative /
+             reference_age_for_length_1;
+    }
+
     const Type denom = Type(1.0) -
         fims_math::exp(-growth_coefficient_K * (reference_age_for_length_2 -
-                                              reference_age_for_length_1));
+                                                reference_age_for_length_1));
     // AD-safe floor to avoid divide-by-zero/NaN when denominator is tiny.
     const Type denom_safe = fims_math::ad_max(
         fims_math::ad_fabs(denom), static_cast<Type>(1e-8));
@@ -143,6 +153,20 @@ struct VonBertalanffyGrowth : public GrowthBase<Type> {
                                   Type& d_log_laa_d_l2,
                                   Type& d_log_laa_d_k) const {
     ValidateLengthParameters();
+
+    if (reference_age_for_length_1 > Type(0.0) &&
+        age < reference_age_for_length_1) {
+      const Type age_nonnegative = fims_math::ad_max(age, Type(0.0));
+      const Type ratio = age_nonnegative / reference_age_for_length_1;
+      const Type mean_length = length_at_ref_age_1 * ratio;
+      const Type mean_length_safe = fims_math::ad_max(
+          mean_length, static_cast<Type>(1e-8));
+
+      d_log_laa_d_l1 = ratio / mean_length_safe;
+      d_log_laa_d_l2 = Type(0.0);
+      d_log_laa_d_k = Type(0.0);
+      return;
+    }
 
     const Type age_delta_1 = age - reference_age_for_length_1;
     const Type age_delta_2 =
