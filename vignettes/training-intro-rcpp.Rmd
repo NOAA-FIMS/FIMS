@@ -185,7 +185,15 @@ microbenchmark(
 
 ## C++ in FIMS
 
-In FIMS, most of the C++ code is organized into several header files that are stored in the [`inst/include/`](https://github.com/NOAA-FIMS/FIMS/tree/main/inst/include) directory. These files include the definitions of Rcpp modules and interfaces (in inst/include/interface/rcpp/*) that make C++ classes and functions accessible from R.
+FIMS previously exposed its runtime model classes through Rcpp modules. The
+current R-facing model interface uses registered native `.Call` routines. Rcpp
+is still used within the package build and remains useful background for C++/R
+interoperability, but new FIMS runtime wrappers belong in
+`inst/include/interface/call/` with implementations in `src/call_*.cpp`.
+
+In FIMS, most C++ code is organized into headers under
+[`inst/include/`](https://github.com/NOAA-FIMS/FIMS/tree/main/inst/include).
+Native interface declarations and registries live in `inst/include/interface/call/`.
 
 A single C++ source file (i.e., [src/FIMS.cpp](https://github.com/NOAA-FIMS/FIMS/blob/main/src/FIMS.cpp)) lists all of the header files and serves as their main entry point for compilation. The build process is managed by the [`src/Makevars` file](https://github.com/NOAA-FIMS/FIMS/blob/main/src/Makevars) (and [`src/Makevars.win`](https://github.com/NOAA-FIMS/FIMS/blob/main/src/Makevars.win) for Windows machines), which sets the necessary compiler and linker flags for R to compile the C++ code into a shared library (DLL or SO). This shared library is automatically loaded by R when users call `library(FIMS)`, allowing R users to call high-performance C++ code without needing to use `Rcpp::sourceCpp()` manually.
 

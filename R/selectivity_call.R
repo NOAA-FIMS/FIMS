@@ -35,6 +35,14 @@ selectivity_logistic_create <- function(inflection_point,
 #' @return A numeric vector of logistic selectivity values.
 #' @export
 selectivity_logistic <- function(x, inflection_point, slope) {
+    valid_lengths <- c(1L, length(x))
+    if (!(length(inflection_point) %in% valid_lengths) ||
+        !(length(slope) %in% valid_lengths)) {
+        stop(
+            "Selectivity parameters must have length 1 or match the length of `x`.",
+            call. = FALSE
+        )
+    }
     selectivity_id <- selectivity_logistic_create(inflection_point, slope)
 
     .Call(
@@ -104,6 +112,18 @@ selectivity_double_logistic <- function(x,
                                         slope_asc,
                                         inflection_point_desc,
                                         slope_desc) {
+    parameter_lengths <- lengths(list(
+        inflection_point_asc,
+        slope_asc,
+        inflection_point_desc,
+        slope_desc
+    ))
+    if (any(!(parameter_lengths %in% c(1L, length(x))))) {
+        stop(
+            "Selectivity parameters must have length 1 or match the length of `x`.",
+            call. = FALSE
+        )
+    }
     selectivity_id <- selectivity_double_logistic_create(
         inflection_point_asc,
         slope_asc,

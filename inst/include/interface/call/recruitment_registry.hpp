@@ -65,6 +65,8 @@ public:
         return info_;
     }
 
+    void Clear() { beverton_holt_objects_.clear(); }
+
 private:
 public:
     NativeRecruitmentRegistry()

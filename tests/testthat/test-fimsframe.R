@@ -321,34 +321,21 @@ n_index <- length(fleet_names_index)
 
 ## IO correctness ----
 test_that("`model_*()` works with the correct inputs", {
-  index_dat <- vector(mode = "list", length = n_index)
-  names(index_dat) <- fleet_names_index
-
   for (index_i in 1:n_index) {
-    index <- Index
-    index_dat[[fleet_names_index[index_i]]] <- methods::new(index, n_years)
     #' @description Test that `model_index()` works with correct inputs.
-    expect_silent(
-      index_dat[[fleet_names_index[index_i]]] <-
-        model_index(fims_frame, fleet_names_index[index_i])
+    expect_vector(
+      model_index(fims_frame, fleet_names_index[index_i]),
+      ptype = numeric()
     )
   }
-
-  clear()
-
-  age_comp_dat <- vector(mode = "list", length = n_age_comp)
-  names(age_comp_dat) <- fleet_names_age_comp
 
   for (fleet_f in 1:n_age_comp) {
-    age_comp_dat[[fleet_names_age_comp[fleet_f]]] <- methods::new(AgeComp, n_years, n_ages)
     #' @description Test that `model_age_comp()` works with correct inputs.
-    age_comp_dat[[fleet_names_age_comp[fleet_f]]]$age_comp_data[] <- model_age_comp(fims_frame, fleet_names_age_comp[fleet_f])
-    expect_silent(
-      age_comp_dat[[fleet_names_age_comp[fleet_f]]]$age_comp_data[] <- model_age_comp(fims_frame, fleet_names_age_comp[fleet_f])
+    expect_vector(
+      model_age_comp(fims_frame, fleet_names_age_comp[fleet_f]),
+      ptype = numeric()
     )
   }
-
-  clear()
 
   #' @description Test that `model_landings()` retrieves landings data as a numeric vector when passed a data frame rather than a FIMSFrame object.
   expect_vector(model_landings(data_big, "fleet1"), ptype = numeric())

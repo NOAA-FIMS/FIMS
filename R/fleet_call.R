@@ -50,9 +50,16 @@ fleet_prepare <- function(log_fmort,
         age_to_length_conversion = age_to_length_conversion
     )
 
-    .Call(
+    result <- .Call(
         "fims_call_fleet_prepare",
         fleet_id,
         PACKAGE = "FIMS"
     )
+
+    # The backend stores scalar catchability once. Expand it to the number of
+    # modeled years at the R boundary rather than reading beyond native storage.
+    if (length(log_q) == 1L && length(log_fmort) > 1L) {
+        result[["q"]] <- rep(exp(log_q), length(log_fmort))
+    }
+    result
 }

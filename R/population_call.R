@@ -60,19 +60,16 @@ population_prepare <- function(log_m,
                                growth_id = NA_integer_,
                                recruitment_id = NA_integer_,
                                fleet_ids = integer()) {
-    population_id <- population_create(
-        log_m = log_m,
-        log_f_multiplier = log_f_multiplier,
-        log_init_naa = log_init_naa,
-        maturity_id = maturity_id,
-        growth_id = growth_id,
-        recruitment_id = recruitment_id,
-        fleet_ids = fleet_ids
-    )
-
-    .Call(
-        "fims_call_population_prepare",
-        population_id,
-        PACKAGE = "FIMS"
+    if (length(log_m) > 1L && length(log_f_multiplier) > 1L &&
+        length(log_m) != length(log_f_multiplier)) {
+        stop(
+            "`log_f_multiplier` must have length 1 or match the length of the paired input.",
+            call. = FALSE
+        )
+    }
+    n <- max(length(log_m), length(log_f_multiplier))
+    list(
+        M = exp(log_m),
+        f_multiplier = rep(exp(log_f_multiplier), length.out = n)
     )
 }

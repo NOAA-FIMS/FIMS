@@ -56,6 +56,8 @@ public:
         return info_;
     }
 
+    void Clear() { live_objects_.clear(); }
+
 private:
 public:
     NativeGrowthRegistry() : info_(fims_info::Information<Type>::GetInstance()) {}

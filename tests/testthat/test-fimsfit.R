@@ -149,7 +149,7 @@ test_that("fit_fims() errors when optimization fails to converge", {
         module_type = "Landings",
         label = "log_sd",
         time = 1:get_n_years(data_age_comp),
-        value = 10
+        value = 2
       ),
       by = c("module_type", "label", "time")
     )

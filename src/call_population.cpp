@@ -279,7 +279,7 @@ namespace
                     log_m_estimation_type_ptr[log_m_estimation_type_index],
                     "Population." + std::to_string(population_id) + ".log_M." +
                         std::to_string(i_age_year),
-                    register_parameter);
+                    register_parameter && (log_m_is_year_age || age_index == 0));
             }
         }
 

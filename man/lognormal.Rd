@@ -2,44 +2,16 @@
 % Please edit documentation in R/distribution_formulas.R
 \name{lognormal}
 \alias{lognormal}
-\alias{multinomial}
-\title{Distributions not available in the stats package}
+\title{Lognormal distribution family}
 \usage{
 lognormal(link = "log")
-
-multinomial(link = "logit")
 }
 \arguments{
-\item{link}{A string specifying the model link function. For example,
-\code{"identity"} or \code{"log"} are appropriate names for the \code{\link[stats:gaussian]{stats::gaussian()}}
-distribution. \code{"log"} and \code{"logit"} are the defaults for the lognormal and
-the multinomial, respectively.}
+\item{link}{Link function. The native interface currently supports \code{"log"}.}
 }
 \value{
-An object of class \code{family} (which has a concise print method). This
-particular family has a truncated length compared to other distributions in
-\code{\link[stats:family]{stats::family()}}.
-\item{family}{character: the family name.}
-\item{link}{character: the link name.}
+A family descriptor used when creating FIMS configurations.
 }
 \description{
-Family objects provide a convenient way to specify the details of the models
-used by functions such as \code{\link[stats:glm]{stats::glm()}}. These functions within this
-package are not available within the stats package but are designed in a
-similar manner.
+Lognormal distribution family
 }
-\examples{
-a_family <- multinomial()
-a_family[["family"]]
-a_family[["link"]]
-}
-\seealso{
-\itemize{
-\item \code{\link[stats:family]{stats::family()}}
-\item \code{\link[stats:gaussian]{stats::gaussian()}}
-\item \code{\link[stats:glm]{stats::glm()}}
-\item \code{\link[stats:power]{stats::power()}}
-\item \code{\link[stats:make.link]{stats::make.link()}}
-}
-}
-\keyword{distribution}

@@ -23,6 +23,7 @@ extern "C" SEXP fims_call_build_default_likelihood(
     SEXP survey_age_comp_sexp,
     SEXP survey_length_comp_sexp,
     SEXP recruitment_log_sd_sexp,
+    SEXP recruitment_log_sd_estimation_type_sexp,
     SEXP n_years_sexp,
     SEXP n_ages_sexp,
     SEXP n_lengths_sexp);

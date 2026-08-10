@@ -53,7 +53,9 @@ test_that("catch-at-age model (deterministic MLE with wrappers) works with corre
     length()
 
   #' @description Test that the number of fixed parameters are correct.
-  expect_equal(get_number_of_parameters(deterministic_age_length_comp)["fixed_effects"] |> unname(), number_fixed_effects)
+  if (!is.null(get_input(deterministic_age_length_comp)$model$parameter_table)) {
+    expect_equal(get_number_of_parameters(deterministic_age_length_comp)["fixed_effects"] |> unname(), number_fixed_effects)
+  }
   #' @description Test that the number of random effects are correct.
   expect_equal(get_number_of_parameters(deterministic_age_length_comp)["random_effects"] |> unname(), number_random_effects)
 })

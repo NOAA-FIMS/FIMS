@@ -8,7 +8,7 @@ vignette: >
 ---
 
 ```{r fims, warning=FALSE, message=FALSE, include = FALSE}
-# automatically loads fims Rcpp module
+# loads the FIMS native library
 library(FIMS)
 
 # clear memory
@@ -29,10 +29,11 @@ and signal handling), see the following resources:
 * The source file: [inst/include/common/def.hpp](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/common/def.hpp)
 * The [documentation](https://noaa-fims.github.io/FIMS/doxygen/classfims_1_1FIMSLog.html) for the same header
 
-The log is initiated when `CreateTMBModel()` is run, where the first entry is always the call to this function, e.g.,
+Model assembly can be triggered directly with `native_create_model()`. In normal
+use, `initialize_fims()` performs this step as part of constructing the model.
 
 ```{r example-one-line}
-empty_model <- CreateTMBModel()
+empty_model <- native_create_model()
 log_string <- get_log()
 log_data_frame <- jsonlite::fromJSON(log_string)
 log_data_frame
@@ -40,7 +41,10 @@ log_data_frame
 clear()
 ```
 
-This particular log entry originates from the use of `FIMS_INFO_LOG()` inside of `CreateTMBModel()`, see [inst/include/interface/rcpp/rcpp_interface.hpp](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/interface/rcpp/rcpp_interface.hpp). In the example, the entry for the "level" column is `"info"` because `FIMS_INFO_LOG()` was called, whereas if `FIMS_WARNING_LOG()` was called instead, then the "level" entry would be `"warning"`. The log entry also specifies the C++ file where the log entry originated from. Additionally, the "routine" and "line" columns specify the function and line, respectively, within the file that led to the creation of the log entry.
+This entry originates in the native model assembly code in
+[`src/call_model.cpp`](https://github.com/NOAA-FIMS/FIMS/blob/main/src/call_model.cpp).
+The `level`, `file`, `routine`, and `line` fields identify the severity and C++
+location that produced each entry.
 
 See the [introduction to FIMS vignette](fims-demo.html) for a log of a complete model run.
 

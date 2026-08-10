@@ -61,6 +61,12 @@ public:
         return info_;
     }
 
+    void Clear()
+    {
+        live_objects_.clear();
+        double_logistic_objects_.clear();
+    }
+
     std::shared_ptr<fims_popdy::DoubleLogisticSelectivity<Type>>
     CreateDoubleLogisticSelectivity(uint32_t id)
     {

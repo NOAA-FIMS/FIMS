@@ -246,8 +246,15 @@ glance.FIMSFit <- function(x, ...) {
   # function can segfault after clear() has freed the C++ memory.
   # reshape_json_estimates() only parses the stored JSON string (x@model_output)
   # and is safe to call at any time.
-  json_estimates <- reshape_json_estimates(get_model_output(x))
-  nobs <- sum(!is.na(json_estimates[["observed"]]) & !is.na(json_estimates[["expected"]]))
+  output_estimates <- if (is.list(get_input(x)[["model"]])) {
+    get_estimates(x)
+  } else {
+    reshape_json_estimates(get_model_output(x))
+  }
+  nobs <- sum(
+    !is.na(output_estimates[["observed"]]) &
+      !is.na(output_estimates[["expected"]])
+  )
 
   # information criteria
   aic <- if (optimized) 2 * npar_fixed - 2 * log_lik else NA_real_

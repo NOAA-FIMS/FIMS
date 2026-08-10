@@ -18,6 +18,13 @@ knitr::opts_chunk$set(
 
 This guide provides comprehensive instructions for adding a new C++ module to the Fisheries Integrated Modeling System (FIMS). The FIMS architecture is complex, involving C++ implementation, R interface layers, and TMB integration. This guide walks through all necessary steps and files that need to be modified.
 
+> **Native-interface transition:** Runtime R integration now uses registered
+> `.Call` routines and native registries. The early architecture and directory
+> guidance below reflects that interface. Later Rcpp-specific examples are
+> retained temporarily as historical implementation notes and should not be
+> copied for new modules; new modules should follow the corresponding files in
+> `inst/include/interface/call/`, `src/call_*.cpp`, and `R/*_call.R`.
+
 ## Who Should Use This Guide
 
 This guide is intended for:
@@ -31,7 +38,7 @@ This guide is intended for:
 Before starting, ensure you have:
 
 - Familiarity with C++ and template programming
-- Understanding of the R/C++ interface via Rcpp
+- Understanding of R's native `.Call` interface and `SEXP` conversion
 - Basic knowledge of TMB (Template Model Builder)
 - Development environment set up as described in [CONTRIBUTING.md](../CONTRIBUTING.md)
 
@@ -40,9 +47,9 @@ Before starting, ensure you have:
 FIMS follows a modular architecture with clear separation between:
 
 1. **C++ Implementation Layer** (`inst/include/`): Core mathematical and computational logic
-2. **R Interface Layer** (`inst/include/interface/rcpp/`): Bridges C++ and R
+2. **R Interface Layer** (`inst/include/interface/call/`): Declares native entry points and registries
 3. **R Wrapper Layer** (`R/`): R functions for initialization and data management
-4. **Module Registration** (`src/`): Exposes modules to R via Rcpp
+4. **Routine Registration** (`inst/include/interface/TMB/init_tmb.hpp`): Registers native routines with R
 
 ## Directory Structure
 

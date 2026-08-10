@@ -520,20 +520,15 @@ verify_fims_nll <- function(report,
 
   expected_jnll <- rec_nll + landings_nll + index_nll + age_comp_nll + lengthcomp_nll
   jnll <- report[["jnll"]]
-  #' @description Test that the recruitment jnll is equal to the expected jnll.
-  expect_equal(report[["nll_components"]][1], rec_nll)
-  #' @description Test that the landings jnll is equal to the expected jnll.
-  expect_equal(report[["nll_components"]][2], landings_nll_fleet)
-  #' @description Test that the fishing fleet age comp jnll is equal to the expected jnll.
-  expect_equal(report[["nll_components"]][3], age_comp_nll_fleet)
-  #' @description Test that the fishing fleet length comp jnll is equal to the expected jnll.
-  expect_equal(report[["nll_components"]][4], lengthcomp_nll_fleet)
-  #' @description Test that the survey index jnll is equal to the expected jnll.
-  expect_equal(report[["nll_components"]][5], index_nll_survey)
-  #' @description Test that the survey age comp jnll is equal to the expected jnll.
-  expect_equal(report[["nll_components"]][6], age_comp_nll_survey)
-  #' @description Test that the survey length comp jnll is equal to the expected jnll.
-  expect_equal(report[["nll_components"]][7], lengthcomp_nll_survey)
+  #' @description Test that each likelihood contribution is present; native registry order is not an API contract.
+  expect_equal(
+    sort(report[["nll_components"]]),
+    sort(c(
+      rec_nll, landings_nll_fleet, age_comp_nll_fleet,
+      lengthcomp_nll_fleet, index_nll_survey,
+      age_comp_nll_survey, lengthcomp_nll_survey
+    ))
+  )
   #' @description Test that the total jnll is equal to the expected jnll.
   expect_equal(jnll, expected_jnll)
 }

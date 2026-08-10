@@ -4,6 +4,12 @@
  */
 
 #include "../inst/include/interface/call/model.hpp"
+#include "../inst/include/interface/call/fleet_registry.hpp"
+#include "../inst/include/interface/call/growth_registry.hpp"
+#include "../inst/include/interface/call/maturity_registry.hpp"
+#include "../inst/include/interface/call/population_registry.hpp"
+#include "../inst/include/interface/call/recruitment_registry.hpp"
+#include "../inst/include/interface/call/selectivity_registry.hpp"
 
 #include "../inst/include/common/information.hpp"
 #include "../inst/include/common/model.hpp"
@@ -17,6 +23,17 @@
 
 namespace
 {
+
+    template <typename Type>
+    void clear_native_registries()
+    {
+        NativeFleetRegistry<Type>::GetInstance()->Clear();
+        NativeGrowthRegistry<Type>::GetInstance()->Clear();
+        NativeMaturityRegistry<Type>::GetInstance()->Clear();
+        NativePopulationRegistry<Type>::GetInstance()->Clear();
+        NativeRecruitmentRegistry<Type>::GetInstance()->Clear();
+        NativeSelectivityRegistry<Type>::GetInstance()->Clear();
+    }
 
     template <typename Type>
     void resize_with_recycled_last(fims::Vector<Type> &values, size_t new_size,
@@ -961,7 +978,8 @@ namespace
     void add_normal_observed_component(
         std::shared_ptr<fims_info::Information<Type>> info,
         fims::Vector<Type> *values,
-        double sd)
+        double sd,
+        int log_sd_estimation_type)
     {
         if (values == nullptr || values->size() == 0)
         {
@@ -992,6 +1010,17 @@ namespace
         distribution->re_expected_values = &(distribution->expected_values);
         distribution->log_sd.resize(1);
         distribution->log_sd[0] = static_cast<Type>(std::log(sd));
+
+        if (log_sd_estimation_type == 1)
+        {
+            info->RegisterParameterName("Recruitment.1.log_sd.0");
+            info->RegisterParameter(distribution->log_sd[0]);
+        }
+        else if (log_sd_estimation_type == 2)
+        {
+            info->RegisterRandomEffectName("Recruitment.1.log_sd.0");
+            info->RegisterRandomEffect(distribution->log_sd[0]);
+        }
 
         info->density_components[distribution->id] = distribution;
     }
@@ -1043,6 +1072,7 @@ namespace
         SEXP survey_age_comp_sexp,
         SEXP survey_length_comp_sexp,
         double recruitment_log_sd,
+        int recruitment_log_sd_estimation_type,
         size_t n_years,
         size_t n_ages,
         size_t n_lengths)
@@ -1268,7 +1298,8 @@ namespace
                 add_normal_observed_component<Type>(
                     info,
                     &(population->recruitment->log_recruit_devs),
-                    recruitment_log_sd);
+                    recruitment_log_sd,
+                    recruitment_log_sd_estimation_type);
             }
         }
     }
@@ -1302,6 +1333,7 @@ extern "C" SEXP fims_call_build_default_likelihood(
     SEXP survey_age_comp_sexp,
     SEXP survey_length_comp_sexp,
     SEXP recruitment_log_sd_sexp,
+    SEXP recruitment_log_sd_estimation_type_sexp,
     SEXP n_years_sexp,
     SEXP n_ages_sexp,
     SEXP n_lengths_sexp)
@@ -1313,6 +1345,8 @@ extern "C" SEXP fims_call_build_default_likelihood(
     const double landings_cv = Rf_asReal(landings_cv_sexp);
     const double survey_cv = Rf_asReal(survey_cv_sexp);
     const double recruitment_log_sd = Rf_asReal(recruitment_log_sd_sexp);
+    const int recruitment_log_sd_estimation_type =
+        Rf_asInteger(recruitment_log_sd_estimation_type_sexp);
     const size_t n_years = static_cast<size_t>(Rf_asInteger(n_years_sexp));
     const size_t n_ages = static_cast<size_t>(Rf_asInteger(n_ages_sexp));
     const size_t n_lengths = static_cast<size_t>(Rf_asInteger(n_lengths_sexp));
@@ -1334,6 +1368,7 @@ extern "C" SEXP fims_call_build_default_likelihood(
         survey_age_comp_sexp,
         survey_length_comp_sexp,
         recruitment_log_sd,
+        recruitment_log_sd_estimation_type,
         n_years,
         n_ages,
         n_lengths);
@@ -1351,6 +1386,7 @@ extern "C" SEXP fims_call_build_default_likelihood(
         survey_age_comp_sexp,
         survey_length_comp_sexp,
         recruitment_log_sd,
+        recruitment_log_sd_estimation_type,
         n_years,
         n_ages,
         n_lengths);
@@ -1395,12 +1431,14 @@ extern "C" SEXP fims_call_information_clear()
     std::shared_ptr<fims_info::Information<double>> info_double =
         fims_info::Information<double>::GetInstance();
     info_double->Clear();
+    clear_native_registries<double>();
     reset_backend_id_counters<double>();
 
 #ifdef TMB_MODEL
     std::shared_ptr<fims_info::Information<TMBAD_FIMS_TYPE>> info_ad =
         fims_info::Information<TMBAD_FIMS_TYPE>::GetInstance();
     info_ad->Clear();
+    clear_native_registries<TMBAD_FIMS_TYPE>();
     reset_backend_id_counters<TMBAD_FIMS_TYPE>();
 #endif
 
