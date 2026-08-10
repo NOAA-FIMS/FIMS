@@ -405,6 +405,11 @@ initialize_population <- function(parameters, data, linked_ids) {
     module$AddFleet(linked_ids[[i]])
   }
 
+  # Partition demand defaults to pooled (empty). To request sex-specific
+  # catch/index at age, call module$SetPartitionDemand(...) after this
+  # returns, e.g. list(sex = "female"). There is no create_default_parameters
+  # entry yet; high-level FIMSFrame wiring is deferred.
+
   return(module)
 }
 

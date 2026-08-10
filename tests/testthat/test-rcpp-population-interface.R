@@ -89,8 +89,44 @@ test_that("rcpp population interface works with correct inputs", {
   clear()
 })
 
+test_that("rcpp population SetPartitionDemand round-trips named lists", {
+  population <- methods::new(Population)
+
+  #' @description Test that default partition demand is an empty (pooled) list.
+  expect_equal(population$GetPartitionDemand(), list())
+
+  #' @description Test that female-only demand round-trips through Set/Get.
+  expect_silent(population$SetPartitionDemand(list(sex = "female")))
+  expect_equal(population$GetPartitionDemand(), list(sex = "female"))
+
+  #' @description Test that both-sexes demand round-trips through Set/Get.
+  expect_silent(
+    population$SetPartitionDemand(list(sex = c("female", "male")))
+  )
+  expect_equal(
+    population$GetPartitionDemand(),
+    list(sex = c("female", "male"))
+  )
+
+  #' @description Test that NULL resets partition demand to pooled.
+  expect_silent(population$SetPartitionDemand(NULL))
+  expect_equal(population$GetPartitionDemand(), list())
+
+  clear()
+})
+
 ## Edge handling ----
 # No Edge handling for now.
 
 ## Error handling ----
-# No built in errors or warnings to test for now.
+test_that("rcpp population SetPartitionDemand rejects invalid lists", {
+  population <- methods::new(Population)
+
+  #' @description Test that an unnamed demand list errors.
+  expect_error(
+    population$SetPartitionDemand(list("female")),
+    regexp = "must be named"
+  )
+
+  clear()
+})
