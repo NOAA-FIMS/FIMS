@@ -83,6 +83,51 @@ TEST(PartitionDemand, RejectsUnknownLevel) {
                std::invalid_argument);
 }
 
+TEST(ValidatePartitionDemand, PooledIsNoOp) {
+  fims_popdy::PartitionSpec spec = fims_popdy::MakeDefaultSexPartitionSpec();
+  EXPECT_NO_THROW(fims_popdy::ValidatePartitionDemand(
+      spec, fims_popdy::MakePooledPartitionDemand()));
+}
+
+TEST(ValidatePartitionDemand, AcceptsKnownSexLevel) {
+  fims_popdy::PartitionSpec spec = fims_popdy::MakeDefaultSexPartitionSpec();
+  EXPECT_NO_THROW(fims_popdy::ValidatePartitionDemand(
+      spec, fims_popdy::MakeSexPartitionDemand({"female"})));
+}
+
+TEST(ValidatePartitionDemand, RejectsUnknownAxisWithKnownList) {
+  fims_popdy::PartitionSpec spec = fims_popdy::MakeDefaultSexPartitionSpec();
+  fims_popdy::PartitionDemand demand;
+  fims_popdy::AxisLevelSelection selection;
+  selection.axis_name = "area";
+  selection.level_names = {"north"};
+  demand.selections.push_back(std::move(selection));
+
+  try {
+    fims_popdy::ValidatePartitionDemand(spec, demand);
+    FAIL() << "Expected std::invalid_argument";
+  } catch (const std::invalid_argument &e) {
+    const std::string message(e.what());
+    EXPECT_NE(message.find("unknown axis \"area\""), std::string::npos);
+    EXPECT_NE(message.find("known axes: sex"), std::string::npos);
+  }
+}
+
+TEST(ValidatePartitionDemand, RejectsUnknownLevelWithKnownList) {
+  fims_popdy::PartitionSpec spec = fims_popdy::MakeDefaultSexPartitionSpec();
+  fims_popdy::PartitionDemand demand =
+      fims_popdy::MakeSexPartitionDemand({"femle"});
+
+  try {
+    fims_popdy::ValidatePartitionDemand(spec, demand);
+    FAIL() << "Expected std::invalid_argument";
+  } catch (const std::invalid_argument &e) {
+    const std::string message(e.what());
+    EXPECT_NE(message.find("unknown level \"femle\""), std::string::npos);
+    EXPECT_NE(message.find("known levels: female, male"), std::string::npos);
+  }
+}
+
 TEST(PartitionDemand, OmittedAxisIsWildcardOnMultiAxisSpec) {
   fims_popdy::PartitionSpec spec;
   fims_popdy::Axis sex_axis;

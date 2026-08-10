@@ -37,4 +37,13 @@ TEST_F(CAAInitializeTestFixture, InitializePreservesPartitionDemand) {
   EXPECT_EQ(strata[0], 0);
 }
 
+// Bad demand fails at Initialize with a clear error (before Evaluate).
+TEST_F(CAAInitializeTestFixture, InitializeRejectsUnknownDemandLevel) {
+  auto &population = catch_at_age_model->populations[0];
+  population->partition_demand =
+      fims_popdy::MakeSexPartitionDemand({"femle"});
+
+  EXPECT_THROW(catch_at_age_model->Initialize(), std::invalid_argument);
+}
+
 }  // namespace

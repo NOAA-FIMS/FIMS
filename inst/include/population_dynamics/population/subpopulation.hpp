@@ -417,6 +417,71 @@ inline std::vector<size_t> RequestedStrata(const PartitionSpec &spec,
 }
 
 /**
+ * @brief Validate PartitionDemand axis and level names against a PartitionSpec.
+ *
+ * @details No-op for pooled (empty) demand. Otherwise checks that every
+ * requested axis exists on the spec and every level label is known (or "*").
+ * Throws std::invalid_argument with messages that list known names to help
+ * users fix R-side list(sex = ...) configuration.
+ */
+inline void ValidatePartitionDemand(const PartitionSpec &spec,
+                                    const PartitionDemand &demand) {
+  if (demand.is_pooled()) {
+    return;
+  }
+  if (spec.axes.empty()) {
+    throw std::invalid_argument(
+        "Invalid partition_demand: partition spec has no axes");
+  }
+
+  auto join_names = [](const std::vector<std::string> &names) {
+    std::string out;
+    for (size_t i = 0; i < names.size(); ++i) {
+      if (i > 0) {
+        out += ", ";
+      }
+      out += names[i];
+    }
+    return out;
+  };
+
+  std::vector<std::string> known_axes;
+  known_axes.reserve(spec.axes.size());
+  for (const Axis &axis : spec.axes) {
+    known_axes.push_back(axis.name);
+  }
+
+  for (const AxisLevelSelection &selection : demand.selections) {
+    const int axis_index = detail::find_axis_index(spec, selection.axis_name);
+    if (axis_index < 0) {
+      throw std::invalid_argument(
+          "Invalid partition_demand: unknown axis \"" + selection.axis_name +
+          "\"; known axes: " + join_names(known_axes));
+    }
+    if (selection.level_names.empty()) {
+      throw std::invalid_argument(
+          "Invalid partition_demand: level vector for axis \"" +
+          selection.axis_name + "\" must be non-empty");
+    }
+    const Axis &axis = spec.axes[static_cast<size_t>(axis_index)];
+    for (const std::string &level_name : selection.level_names) {
+      if (level_name == "*") {
+        continue;
+      }
+      if (detail::find_level_index(axis, level_name) < 0) {
+        throw std::invalid_argument(
+            "Invalid partition_demand: unknown level \"" + level_name +
+            "\" for axis \"" + axis.name +
+            "\"; known levels: " + join_names(axis.levels));
+      }
+    }
+    // Reuse MakeGroupSelectorFromDemand for remaining rules (e.g. partial
+    // multi-level subsets not yet supported).
+  }
+  MakeGroupSelectorFromDemand(spec, demand);
+}
+
+/**
  * @brief Sex split policy: build per-stratum weights from proportion_female.
  *
  * @details Companion to MakeDefaultSexPartitionSpec(). Only valid when spec
