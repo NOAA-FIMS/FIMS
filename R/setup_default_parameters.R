@@ -151,7 +151,7 @@ setup_default_parameters <- function(data) {
   # Set natural mortality rate
   log_M <- population_defaults |>
     dplyr::filter(
-      .data[["label"]] == "log_M", 
+      .data[["label"]] == "log_M",
       .data[["timing"]] == get_start_year(data)
     ) |>
     dplyr::pull(.data[["value"]])
