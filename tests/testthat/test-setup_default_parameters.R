@@ -75,17 +75,17 @@ test_that("modular pipeline matches `setup_default_parameters()`", {
   maturity_defaults <- setup_default_Maturity(data = data)
   growth_defaults <- setup_default_Growth()
 
-  log_m <- log(0.2)
+  log_M <- log(0.2)
   log_rzero <- recruitment_defaults |>
     dplyr::filter(.data[["label"]] == "log_rzero") |>
     dplyr::pull(.data[["value"]])
   population_defaults <- setup_default_Population(
     data = data,
-    log_M = log_m,
-    log_init_naa = setup_default_log_init_naa(
+    log_M = log_M,
+    log_init_naa = FIMS:::setup_default_log_init_naa(
       n_ages = get_n_ages(data),
       log_rzero = log_rzero,
-      log_m = log_m
+      log_M = log_M
     )
   )
 
@@ -140,19 +140,19 @@ test_that("modular pipeline with `purrr` matches `setup_default_parameters()`", 
   maturity_defaults <- setup_default_Maturity(data = data)
   growth_defaults <- setup_default_Growth()
 
-  log_m <- log(0.2)
+  log_M <- log(0.2)
   log_rzero <- recruitment_defaults |>
     dplyr::filter(.data[["label"]] == "log_rzero") |>
     dplyr::pull(.data[["value"]])
-  log_init_naa <- setup_default_log_init_naa(
+  log_init_naa <- FIMS:::setup_default_log_init_naa(
     n_ages = get_n_ages(data),
     log_rzero = log_rzero,
-    log_m = log_m
+    log_M = log_M
   )
 
   population_defaults <- setup_default_Population(
     data = data,
-    log_M = log_m,
+    log_M = log_M,
     log_init_naa = log_init_naa
   )
 
@@ -218,12 +218,55 @@ test_that("`setup_default_parameters()` works with edge cases", {
   clear()
 })
 
+test_that("`setup_default_log_init_naa()` handles scalar and vector `log_M`", {
+  n_ages <- get_n_ages(data)
+  log_rzero <- log(1e+06)
+
+  scalar_result <- FIMS:::setup_default_log_init_naa(
+    n_ages = n_ages,
+    log_rzero = log_rzero,
+    log_M = log(0.2)
+  )
+
+  vector_log_M <- log(seq(0.15, 0.15 + (n_ages - 1) * 0.01, by = 0.01))
+  vector_result <- FIMS:::setup_default_log_init_naa(
+    n_ages = n_ages,
+    log_rzero = log_rzero,
+    log_M = vector_log_M
+  )
+
+  expected_m <- exp(vector_log_M)
+  expected_vector <- log_rzero - c(0, cumsum(expected_m))[seq_len(n_ages)]
+  expected_vector[n_ages] <- expected_vector[n_ages] - log(expected_m[n_ages])
+
+  #' @description Test that scalar log_M still returns one value per age.
+  expect_length(scalar_result, n_ages)
+  #' @description Test that vector log_M produces expected age-specific log_init_naa values.
+  expect_equal(vector_result, expected_vector)
+
+  clear()
+})
+
 ## Error handling ----
 test_that("`setup_default_parameters()` returns correct error messages", {
   #' @description Test that invalid `data` class triggers an informative error.
   expect_error(
     object = setup_default_parameters(data = "not_a_fimsframe"),
     regexp = "FIMSFrame"
+  )
+
+  clear()
+})
+
+test_that("`setup_default_log_init_naa()` returns correct error messages", {
+  #' @description Test that invalid log_M length triggers an informative error.
+  expect_error(
+    object = FIMS:::setup_default_log_init_naa(
+      n_ages = get_n_ages(data),
+      log_rzero = log(1e+06),
+      log_M = c(log(0.2), log(0.3))
+    ),
+    regexp = "log_M.*single numeric value.*length equal to n_ages"
   )
 
   clear()

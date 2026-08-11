@@ -119,7 +119,7 @@ population_defaults <- FIMS::setup_default_Population(
 log_init_naa <- FIMS:::setup_default_log_init_naa(
   n_ages = get_n_ages(fims_frame),
   log_rzero = log_rzero,
-  log_m = log(0.2)
+  log_M = log(0.2)
 )
 
 population <- population_defaults |>
@@ -391,16 +391,16 @@ The `maturity_id` was set from R using the `SetMaturity()` method from the `Popu
 ```{r,  class.source = "rchunk", eval = FALSE}
 # Helper function
 recruitment_defaults <- FIMS::setup_default_Recruitment(data = fims_frame)
-log_m <- log(0.2)
+log_M <- log(0.2)
 log_init_naa <- FIMS:::setup_default_log_init_naa(
   data = fims_frame,
   recruitment_defaults = recruitment_defaults,
-  log_m = log_m
+  log_M = log_M
 )
 
 population <- FIMS::setup_default_Population(
   data = fims_frame,
-  log_M = log_m,
+  log_M = log_M,
   log_init_naa = log_init_naa
 ) |>
   dplyr::bind_rows(parameters) |>

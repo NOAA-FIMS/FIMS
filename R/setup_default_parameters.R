@@ -149,17 +149,20 @@ setup_default_parameters <- function(data) {
 
   # Calculate initial numbers at age based on log_rzero and M_value
   # Set natural mortality rate
-  log_m <- population_defaults |>
-    dplyr::filter(.data[["label"]] == "log_M") |>
-    dplyr::pull(.data[["value"]]) |>
-    unique()
+  log_M <- population_defaults |>
+    dplyr::filter(
+      .data[["label"]] == "log_M", 
+      .data[["timing"]] == get_start_year(data)
+    ) |>
+    dplyr::pull(.data[["value"]])
+
   log_rzero <- recruitment_defaults |>
     dplyr::filter(.data[["label"]] == "log_rzero") |>
     dplyr::pull(.data[["value"]])
   log_init_naa <- setup_default_log_init_naa(
     n_ages = get_n_ages(data),
     log_rzero = log_rzero,
-    log_m = log_m
+    log_M = log_M
   )
 
   # Create population parameters
@@ -191,7 +194,7 @@ setup_default_parameters <- function(data) {
 #' recruitment defaults and a natural mortality value.
 #' @param n_ages An integer specifying the number of ages in the population. Can be obtained from [get_n_ages()].
 #' @param log_rzero A scalar natural-log unfished recruitment value. Can be obtained from the recruitment defaults tibble.
-#' @param log_m A scalar natural-log mortality value.
+#' @param log_M A scalar natural-log mortality value or a vector of natural-log mortality values of length `n_ages`.
 #' @return A numeric vector of log initial numbers-at-age. See \code{\link{setup_default_parameters}}
 #' for full column descriptions.
 #' @seealso
@@ -212,18 +215,25 @@ setup_default_parameters <- function(data) {
 #' log_init_naa <- FIMS:::setup_default_log_init_naa(
 #'   n_ages = get_n_ages(fims_frame),
 #'   log_rzero = log_rzero,
-#'   log_m = log(0.2)
+#'   log_M = log(0.2)
 #' )
 #' }
 setup_default_log_init_naa <- function(
   n_ages,
   log_rzero,
-  log_m = log(0.2)
+  log_M = log(0.2)
 ) {
-  init_naa <- exp(log_rzero) * exp(-(0:(n_ages - 1)) * exp(log_m))
-  init_naa[n_ages] <- init_naa[n_ages] / exp(log_m)
+  assert_numeric_length(
+    x = log_M,
+    x_name = "log_M",
+    valid_lengths = c(1, n_ages),
+    requirement = "a single numeric value or a vector of length equal to n_ages"
+  )
 
-  log(init_naa)
+  m <- rep(exp(log_M), length.out = n_ages)
+  log_init_naa <- log_rzero - c(0, cumsum(m))[seq_len(n_ages)]
+  log_init_naa[n_ages] <- log_init_naa[n_ages] - log(m[n_ages])
+  log_init_naa
 }
 
 #' Set up a template for default parameters for a FIMS model
