@@ -86,11 +86,12 @@ struct GMRF : public DensityComponentBase<Type> {
         // and how to get the ordering correct for this.
 
         // Evaluate TMB GMRF and multiply by -1 to convert from negative log-likelihood to log-likelihood.
-        this->lpdf = -1.0 * density::GMRF(Q)(Eigen::Map<const vector<Type>>(x_centered_std.data(), n_x));
+        auto x_tmb = x_centered_std.to_tmb();
+        this->lpdf = -1.0 * density::GMRF(Q)(x_tmb);
 
         // Store the scalar result in a length-1 vector.
         this->lpdf_vec.resize(1);
-        this->lpdf_vec = this->lpdf;
+        this->lpdf_vec[0] = this->lpdf;
 
         return this->lpdf;
     }
