@@ -12,7 +12,7 @@
 #define FIMS_DISTRIBUTIONS_GMRF_HPP
 
 #include "density_components_base.hpp"
-#include "precision_builders.hpp"
+#include "distributions/functors/precision_builders.hpp"
 #include "../../common/fims_vector.hpp"
 #include <vector>
 #include "../../common/def.hpp"
