@@ -1,8 +1,8 @@
 ---
-title: "FIMS Path: Growth (VonBertalanffy)"
+title: "FIMS Code Club: Growth"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{FIMS Path: Growth (VonBertalanffy)}
+  %\VignetteIndexEntry{FIMS Code Club: Growth}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
