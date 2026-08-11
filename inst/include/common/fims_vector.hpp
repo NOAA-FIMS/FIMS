@@ -354,7 +354,12 @@ class Vector {
   /**
    * @brief Adds an element to the end.
    */
-  inline void push_back(const Type &&value) { this->vec_m.push_back(value); }
+  inline void push_back(const Type &value) { this->vec_m.push_back(value); }
+
+  /**
+   * @brief Adds an element to the end using move semantics.
+   */
+  inline void push_back(Type &&value) { this->vec_m.push_back(std::move(value)); }
 
   /**
    * @brief Constructs an element in-place at the end.

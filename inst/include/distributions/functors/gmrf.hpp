@@ -12,6 +12,7 @@
 #define FIMS_DISTRIBUTIONS_GMRF_HPP
 
 #include "density_components_base.hpp"
+#include "precision_builders.hpp"
 #include "../../common/fims_vector.hpp"
 #include <vector>
 #include "../../common/def.hpp"
@@ -59,10 +60,10 @@ struct GMRF : public DensityComponentBase<Type> {
                 "Check GMRF ID and Information::SetupRandomEffects() linkage.");
         }
 
-        if (static_cast<size_t>(*(this->precision_matrix_ptr->rows())) != n_x) {
+        if (this->precision_matrix_ptr->rows() != n_x) {
             throw std::invalid_argument(
                 "GMRF: Dimension mismatch. Precision matrix rows (" + 
-                std::to_string(*(this->precision_matrix_ptr->rows())) + 
+                std::to_string(this->precision_matrix_ptr->rows()) + 
                 ") must match random effect vector size (" + 
                 std::to_string(n_x) + ").");
         }

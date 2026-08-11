@@ -116,7 +116,7 @@ public:
             path.from = ram_matrix(r, 1);       // Origin
             path.to = ram_matrix(r, 2);         // Target
             path.beta_index = ram_matrix(r, 3); // Index into beta_z
-            builder->paths.push_back(path);
+            builder->paths.emplace_back(path);
         }
 
         // Register builder in Information Map (to be accessed by GMRF distribution)

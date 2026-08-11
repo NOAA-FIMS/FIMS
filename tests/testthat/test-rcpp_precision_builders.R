@@ -14,8 +14,8 @@ test_that("DSEMInterface can be created and configured", {
 
   # 2. IO Correctness
   # Test that the DSEMInterface object can be created
-  dsem_interface <- new(DSEMInterface)
-  testthat::expect_s4_class(dsem_interface, "Rcpp_DSEMInterface")
+  dsem_interface <- new(DSEM)
+  testthat::expect_s4_class(dsem_interface, "Rcpp_DSEM")
 
   # Test that properties can be set
   dsem_interface$n_time <- 2
@@ -53,7 +53,7 @@ test_that("DSEMInterface can be created and configured", {
 
 test_that("DSEMInterface handles edge cases", {
   # Description: Test the DSEMInterface with minimal dimensions.
-  dsem_interface <- new(DSEMInterface)
+  dsem_interface <- new(DSEM)
 
   # Test with a single state (1 time step, 1 variable)
   dsem_interface$n_time <- 1

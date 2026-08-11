@@ -17,6 +17,8 @@
 #include <vector>
 
 #include "../distributions/distributions.hpp"
+#include "../distributions/functors/gmrf.hpp"
+#include "../distributions/functors/precision_builders.hpp"
 #include "../models/functors/fishery_model_base.hpp"
 #include "../population_dynamics/fleet/fleet.hpp"
 #include "../population_dynamics/growth/growth.hpp"
@@ -130,6 +132,16 @@ class Information {
       density_components_iterator;
   /**< iterator for distribution objects>*/
 
+  std::map<
+      uint32_t,
+      std::shared_ptr<fims_distributions::PrecisionMatrixBuilderBase<Type>>>
+      precision_builders; /**< map of sparse precision-matrix builders keyed by interface id */
+  typedef typename std::map<
+      uint32_t,
+      std::shared_ptr<fims_distributions::PrecisionMatrixBuilderBase<Type>>>::iterator
+      precision_builders_iterator;
+  /**< iterator for precision-builder objects>*/
+
   std::unordered_map<uint32_t,
                      std::shared_ptr<fims_popdy::FisheryModelBase<Type>>>
       models_map; /**<hash map of fishery models, e.g., CAA, GMACS, Spatial,
@@ -214,6 +226,7 @@ class Information {
       }
     }
     this->density_components.clear();
+    this->precision_builders.clear();
   }
 
   /**
@@ -350,12 +363,30 @@ class Information {
                       fims::to_string(d->key[0]));
         vmit = this->variable_map.find(d->key[0]);
         d->re = (*vmit).second;
-        if (d->key.size() == 2) {
+
+        std::shared_ptr<fims_distributions::GMRF<Type>> gmrf =
+            std::dynamic_pointer_cast<fims_distributions::GMRF<Type>>(d);
+        if (gmrf) {
+          d->expected_values.resize(d->re->size());
+          d->re_expected_values = &d->expected_values;
+          if (d->key.size() >= 2) {
+            precision_builders_iterator pbit =
+                this->precision_builders.find(d->key[1]);
+            if (pbit != this->precision_builders.end()) {
+              gmrf->precision_matrix_ptr = pbit->second;
+            } else {
+              FIMS_ERROR_LOG("Expected precision builder not defined for random-effects distribution " +
+                             fims::to_string(d->id) + ", builder id " +
+                             fims::to_string(d->key[1]));
+            }
+          }
+        } else if (d->key.size() == 2) {
           vmit = this->variable_map.find(d->key[1]);
           d->re_expected_values = (*vmit).second;
         } else {
           d->re_expected_values = &d->expected_values;
         }
+
         FIMS_INFO_LOG("Random effect size for distribution " +
                       fims::to_string(d->id) +
                       " is: " + fims::to_string(d->observed_values.size()));

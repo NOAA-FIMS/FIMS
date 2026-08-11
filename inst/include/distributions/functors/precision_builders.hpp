@@ -50,6 +50,16 @@ struct PrecisionMatrixBuilderBase {
     // Builds the precision matrix Q
     virtual Eigen::SparseMatrix<Type> BuildPrecisionMatrixSparse() const = 0;
 
+    /**
+     * @brief Return the number of rows in the implied precision matrix.
+     */
+    virtual size_t rows() const = 0;
+
+    /**
+     * @brief Return the number of columns in the implied precision matrix.
+     */
+    virtual size_t cols() const = 0;
+
     // Optional mean offset. Defaults to a zero vector.
     // Needed in DSEM but not needed in a spatial model
 
@@ -108,6 +118,14 @@ struct DSEMPrecisionMatrixBuilder : public PrecisionMatrixBuilderBase<Type> {
 
     DSEMPrecisionMatrixBuilder() : PrecisionMatrixBuilderBase<Type>() {}
     virtual ~DSEMPrecisionMatrixBuilder() {}
+
+    virtual size_t rows() const override {
+        return this->n_time * this->n_variables;
+    }
+
+    virtual size_t cols() const override {
+        return this->n_time * this->n_variables;
+    }
 
     /**
      * @brief The engine that builds the matrix, choosing the optimal strategy.

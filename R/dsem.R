@@ -23,7 +23,7 @@
 #' @export
 dsem <- function(random_effects, ram, parameters, n_variables) {
   # 1. Create the DSEM precision builder interface
-  dsem_builder <- new(DSEMInterface)
+  dsem_builder <- new(DSEM)
 
   # 2. Configure the builder
   # Ensure n_time is an integer
