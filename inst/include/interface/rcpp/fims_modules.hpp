@@ -34,6 +34,11 @@ void register_data(Rcpp::Module &m);
  */
 void register_recruitment(Rcpp::Module &m);
 /**
+ * \brief Register the precision builder module.
+ * \param m The Rcpp module to register functions in.
+ */
+void register_precision_builders(Rcpp::Module &m);
+/**
  * \brief Register the fleet module.
  * \param m The Rcpp module to register functions in.
  */
@@ -80,6 +85,7 @@ RcppExport RCPP_MODULE(fims) {
   register_vectors(m);
   register_shared(m);
   register_recruitment(m);
+  register_precision_builders(m);
   register_maturity(m);
   register_fleet(m);
   register_population(m);

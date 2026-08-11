@@ -66,8 +66,7 @@ TEST(GMRF, HandlesCorrectInput) {
 
 // Edge handling
 TEST(GMRF, HandlesZeroCenteredEdgeCase) {
-  // Description: Test GMRF::evaluate() when the random effects are equal to
-  // their mean.
+  // Test GMRF::evaluate() when the random effects are equal to their mean.
   fims_distributions::GMRF<double> gmrf;
 
   const size_t n_x = 2;
@@ -88,7 +87,7 @@ TEST(GMRF, HandlesZeroCenteredEdgeCase) {
 
   gmrf.precision_matrix_ptr = Q;
 
-  // Expected output when x_centered is zero
+  // Expected output when x_centered is zero.
   // lpdf = 0 + 0.5 * log|Q| - N*log(sqrt(2*pi))
   double log_det_Q = std::log(3.0);
   double expected_lpdf =
@@ -99,8 +98,8 @@ TEST(GMRF, HandlesZeroCenteredEdgeCase) {
 }
 
 TEST(GMRF, HandlesScalarInput) {
-  // Description: Test GMRF::evaluate() with a 1x1 precision matrix, which
-  // should be equivalent to a simple normal distribution.
+  // Test GMRF::evaluate() with a 1x1 precision matrix, which should be 
+  // equivalent to a simple normal distribution.
   fims_distributions::GMRF<double> gmrf;
 
   const size_t n_x = 1;
@@ -125,8 +124,8 @@ TEST(GMRF, HandlesScalarInput) {
 }
 
 TEST(GMRF, HandlesZeroDimensionalInput) {
-  // Description: Test GMRF::evaluate() with a 0-dimensional input. The
-  // log-likelihood of an empty model should be zero.
+  // Test GMRF::evaluate() with a 0-dimensional input. The log-likelihood of an 
+  // empty model should be zero.
   fims_distributions::GMRF<double> gmrf;
 
   const size_t n_x = 0;
@@ -151,8 +150,8 @@ TEST(GMRF, HandlesZeroDimensionalInput) {
 
 // Error Handling
 TEST(GMRF, ThrowsOnNullPrecisionMatrix) {
-  // Description: Test that evaluate() throws a runtime_error if the precision
-  // matrix pointer is null.
+  // Test that evaluate() throws a runtime_error if the precision matrix 
+  // pointer is null.
   fims_distributions::GMRF<double> gmrf;
   const size_t n_x = 2;
   gmrf.observed_values.resize(n_x);
@@ -161,8 +160,8 @@ TEST(GMRF, ThrowsOnNullPrecisionMatrix) {
 }
 
 TEST(GMRF, ThrowsOnDimensionMismatch) {
-  // Description: Test that evaluate() throws an invalid_argument if the matrix
-  // and vector dimensions do not match.
+  // Test that evaluate() throws an invalid_argument if the matrix and vector 
+  // dimensions do not match.
   fims_distributions::GMRF<double> gmrf;
   const size_t n_x = 2;
   gmrf.observed_values.resize(n_x);
@@ -172,8 +171,8 @@ TEST(GMRF, ThrowsOnDimensionMismatch) {
 }
 
 TEST(GMRF, ThrowsOnNonPositiveDefiniteMatrix) {
-  // Description: Test that evaluate() fails when given a non-positive-definite
-  // precision matrix, as TMB's underlying Cholesky decomposition will fail.
+  // Test that evaluate() fails when given a non-positive-definite precision 
+  // matrix, as TMB's underlying Cholesky decomposition will fail.
   fims_distributions::GMRF<double> gmrf;
   const size_t n_x = 2;
   gmrf.observed_values.resize(n_x);

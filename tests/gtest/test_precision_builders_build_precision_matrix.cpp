@@ -22,9 +22,10 @@ namespace {
 
 // Test suite for precision_builders.hpp
 // IO Correctness
-TEST(DSEMPrecisionBuilder, HandlesJimThorsonAR1Example) {
-  // Description: A simplified, understandable test mirroring a basic AR(1)
-  // time-series model where the value of something this year depends directly on it's value last year
+TEST(DSEMPrecisionBuilder, HandlesAR1Example) {
+  // A simplified, understandable test mirroring a basic AR(1) time-series 
+  // model where the value of something this year depends directly on it's 
+  // value last year.
   // Model: x_t = rho * x_{t-1} + e_t, where e_t ~ N(0, sd^2)
   fims_distributions::DSEMPrecisionMatrixBuilder<double> builder;
 
@@ -64,9 +65,11 @@ TEST(DSEMPrecisionBuilder, HandlesJimThorsonAR1Example) {
 
   // 2. Define the expected structure of Q
   // A precision matrix (Q) is the inverse of a covariance matrix.
-  // It is often much faster to compute with precision matrices when things only affect their immediate neighbors.
-  // For this 3-year process, Q is "tridiagonal", meaning it only has numbers on the main diagonal 
-  // and right next to it, because Year 1 doesn't directly affect Year 3 (only indirectly through Year 2).
+  // It is often much faster to compute with precision matrices when things 
+  // only affect their immediate neighbors. For this 3-year process, Q is 
+  // "tri-diagonal", meaning it only has numbers on the main diagonal and right 
+  // next to it, because Year 1 doesn't directly affect Year 3 (only indirectly 
+  // through Year 2).
   // Q = (1/sd^2) * [ 1 + rho^2,      -rho,         0 ]
   //                [      -rho, 1 + rho^2,      -rho ]
   //                [         0,      -rho,         1 ]
@@ -88,11 +91,11 @@ TEST(DSEMPrecisionBuilder, HandlesJimThorsonAR1Example) {
 
 // IO Correctness
 TEST(DSEMPrecisionBuilder, HandlesCorrectInput) {
-  // Description: Test DSEMPrecisionMatrixBuilder::BuildPrecisionMatrixSparse()
-  // with a simple model of two independent states.
-  // Imagine measuring two completely unrelated things (like
-  // rainfall and stock price). They don't affect each other, so their
-  // precision matrix should just be a simple diagonal line showing their individual uncertainties.
+  // Test DSEMPrecisionMatrixBuilder::BuildPrecisionMatrixSparse() with a 
+  // simple model of two independent states. Imagine measuring two completely 
+  // unrelated things (like rainfall and stock price). They don't affect each 
+  // other, so their precision matrix should just be a simple diagonal line 
+  // showing their individual uncertainties.
   fims_distributions::DSEMPrecisionMatrixBuilder<double> builder;
 
   // 1. Set up your input parameters
@@ -143,11 +146,11 @@ TEST(DSEMPrecisionBuilder, HandlesCorrectInput) {
 }
 
 TEST(DSEMPrecisionBuilder, HandlesAutoregressivePath) {
-  // Description: Test the builder with a simple AR(1)-like model to ensure
-  // that causal paths (type=1) are handled correctly.
-  // This tests a simple chain reaction where State 1 directly
-  // causes State 2. We want to make sure the math correctly subtracts the effect
-  // of State 1 from State 2 to properly isolate the pure random noise left over.
+  // Test the builder with a simple AR(1)-like model to ensure that causal 
+  // paths (type=1) are handled correctly. This tests a simple chain reaction 
+  // where State 1 directly causes State 2. We want to make sure the math 
+  // correctly subtracts the effect of State 1 from State 2 to properly isolate 
+  // the pure random noise left over.
   fims_distributions::DSEMPrecisionMatrixBuilder<double> builder;
 
   // 1. Set up a 2-state model: x2 = rho*x1 + eps2; x1 = eps1
@@ -189,12 +192,12 @@ TEST(DSEMPrecisionBuilder, HandlesAutoregressivePath) {
 }
 
 TEST(DSEMPrecisionBuilder, HandlesCovariancePath) {
-  // Description: Test the builder with a contemporaneous covariance path
-  // to ensure block inversion is working correctly for non-diagonal blocks.
-  // This tests two variables measured at the exact same time
-  // that share some underlying connection (covariance). Because they happen at
-  // the same time and don't cross into other years, the math can take a fast 
-  // shortcut ("block inversion") to solve it.
+  // Test the builder with a contemporaneous covariance path to ensure block 
+  // inversion is working correctly for non-diagonal blocks.This tests two 
+  // variables measured at the exact same time that share some underlying 
+  // connection (covariance). Because they happen at the same time and don't 
+  // cross into other years, the math can take a fast shortcut ("block 
+  // inversion") to solve it.
   fims_distributions::DSEMPrecisionMatrixBuilder<double> builder;
 
   // 1. Set up a 1-time, 2-variable model: (x1, x2) with covariance
@@ -237,11 +240,10 @@ TEST(DSEMPrecisionBuilder, HandlesCovariancePath) {
   EXPECT_TRUE(actual_Q.isApprox(expected_Q, 1e-9));
 }
 
-// Edge Handling
+// Edge Case Handling
 TEST(DSEMPrecisionBuilder, HandlesSingleState) {
-  // Description: Test with a single state (n_k = 1).
-  // Testing the absolute simplest possible scenario: 
-  // 1 variable, 1 time step, no connections to anything else.
+  // Test with a single state (n_k = 1). Testing the absolute simplest possible 
+  // scenario: 1 variable, 1 time step, no connections to anything else.
   fims_distributions::DSEMPrecisionMatrixBuilder<double> builder;
   builder.n_time = 1;
   builder.n_variables = 1;
@@ -267,9 +269,9 @@ TEST(DSEMPrecisionBuilder, HandlesSingleState) {
 
 // Error Handling
 TEST(DSEMPrecisionBuilder, ThrowsOnZeroDimensions) {
-  // Description: Test that builder throws an exception if n_k = 0.
-  // If we tell the builder there are 0 time steps or 0 variables,
-  // it doesn't have anything to build a matrix for, so it should stop and give an error.
+  // Test that builder throws an exception if n_k = 0. If we tell the builder 
+  // there are 0 time steps or 0 variables, it doesn't have anything to build a 
+  // matrix for, so it should stop and give an error.
   fims_distributions::DSEMPrecisionMatrixBuilder<double> builder;
   builder.n_time = 0;
   builder.n_variables = 1;
@@ -277,10 +279,9 @@ TEST(DSEMPrecisionBuilder, ThrowsOnZeroDimensions) {
 }
 
 TEST(DSEMPrecisionBuilder, ThrowsOnOutOfBoundsRAMIndices) {
-  // Description: Test that builder throws an exception if RAM path indices
-  // are out of bounds.
-  // If we only have 1 state total, but we try to draw an arrow 
-  // coming from a 2nd state, that's impossible. The code should catch this bad input.
+  // Test that builder throws exception if RAM path indices are out of bounds.
+  // If we only have 1 state total, but we try to draw an arrow coming from a 
+  // 2nd state, that's impossible. The code should catch this bad input.
   fims_distributions::DSEMPrecisionMatrixBuilder<double> builder;
   builder.n_time = 1;
   builder.n_variables = 1;  // n_k = 1
@@ -296,10 +297,9 @@ TEST(DSEMPrecisionBuilder, ThrowsOnOutOfBoundsRAMIndices) {
 }
 
 TEST(DSEMPrecisionBuilder, ThrowsOnOutOfBoundsBetaIndex) {
-  // Description: Test that builder throws an exception if a beta_index is
-  // out of bounds for the beta_z vector.
-  // If we say an arrow's strength is the 2nd number in our 
-  // list of parameters, but we only gave the code a list of 1 parameter, 
+  // Test that the builder throws an exception if a beta_index is out of bounds 
+  // for the beta_z vector. If we say an arrow's strength is the 2nd number in 
+  // our list of parameters, but we only gave the code a list of 1 parameter, 
   // the code should catch this mismatch and error out.
   fims_distributions::DSEMPrecisionMatrixBuilder<double> builder;
   builder.n_time = 1;
@@ -316,12 +316,11 @@ TEST(DSEMPrecisionBuilder, ThrowsOnOutOfBoundsBetaIndex) {
 }
 
 TEST(DSEMPrecisionBuilder, ThrowsOnSingularCovariance) {
-  // Description: Test that the builder fails when the covariance matrix (V)
-  // is singular (i.e., not invertible), which occurs if a variable has no
-  // variance path.
-  // Every variable needs some level of uncertainty (variance) defined.
-  // If we leave it out, the math attempts to divide by zero, which is impossible.
-  // The code should safely fail and let us know instead of crashing mysteriously.
+  // Test that the builder fails when the covariance matrix (V) is singular 
+  // (i.e., not invertible), which occurs if a variable has no variance path. 
+  // Every variable needs some level of uncertainty (variance) defined. If we 
+  // leave it out, the math attempts to divide by zero, which is impossible. 
+  // The code should safely fail and let us know.
   fims_distributions::DSEMPrecisionMatrixBuilder<double> builder;
   builder.n_time = 2;
   builder.n_variables = 1; // n_k = 2

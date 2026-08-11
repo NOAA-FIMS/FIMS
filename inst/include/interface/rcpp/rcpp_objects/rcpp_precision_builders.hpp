@@ -11,26 +11,68 @@
  */
 class DSEMInterface : public FIMSRcppInterfaceBase {
 public:
+    /** @brief Global id counter used to assign unique interface ids. */
     static uint32_t id_g;
+
+    /** @brief Live DSEM interface objects indexed by ID. */
+    static std::map<uint32_t, std::shared_ptr<DSEMInterface>> live_objects;
+
+    /** @brief Unique id for this interface instance. */
     uint32_t id;
     
     /** @brief The RAM specification matrix passed from R. */
     Rcpp::IntegerMatrix ram_matrix; 
+
     /** @brief Vector of path coefficients (beta_z). */
     VariableVector beta_z;
     
     /** @brief Total years */
     size_t n_time = 0;
+
     /** @brief Total variables (e.g., recruitment, temp) */
     size_t n_variables = 0;
 
-    DSEMInterface() {
+    /**
+     * @brief Constructor.
+     * @details The object is created first, then registered explicitly by
+     * calling register_object() to avoid copying the object into the registry 
+     * during construction.
+     */
+     DSEMInterface() {
         this->id = DSEMInterface::id_g++;
-        FIMSRcppInterfaceBase::fims_interface_objects.push_back(
-            std::make_shared<DSEMInterface>(*this));
+     }
+
+    /**
+     * @brief Construct a new DSEMInterface object from another.
+     * @param other Source object.
+     */
+    DSEMInterface(const DSEMInterface& other)
+        : FIMSRcppInterfaceBase(other),
+          id(other.id),
+          ram_matrix(other.ram_matrix),
+          beta_z(other.beta_z),
+          n_time(other.n_time),
+          n_variables(other.n_variables) {}
+
+    /**
+     * @brief Destructor.
+     */
+    virtual ~DSEMInterface() {}
+
+    /**
+     * @brief Register this object in the global live object map and interface list.
+     * @return True on success.
+     */
+    void register_self(std::shared_ptr<DSEMInterface> self) {
+        DSEMInterface::live_objects[this->id] = self;
+        FIMSRcppInterfaceBase::fims_interface_objects.push_back(self);
     }
 
-    virtual ~DSEMInterface() {}
+    
+    /**
+     * @brief Get the unique identifier for this interface instance.
+     * @return Interface id.
+     */
     virtual uint32_t get_id() { return this->id; }
 
 #ifdef TMB_MODEL
@@ -79,16 +121,22 @@ public:
 
         // Register builder in Information Map (to be accessed by GMRF distribution)
         info->precision_builders[this->id] = builder; 
-        
         return true;
     }
 
+    /**
+     * @brief Adds the object to the TMB model.
+     * @return True on success.
+     */
     virtual bool add_to_fims_tmb() {
         this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
         this->add_to_fims_tmb_internal<TMBAD_FIMS_TYPE>();
         return true;
     }
 
+    /**
+     * @brief Copy optimized values back to the R-facing object.
+     */
     virtual void finalize() {
         if (this->finalized) return;
         std::shared_ptr<fims_info::Information<double>> info =
@@ -106,4 +154,6 @@ public:
 };
 
 uint32_t DSEMInterface::id_g = 1;
+std::map<uint32_t, std::shared_ptr<DSEMInterface>> DSEMInterface::live_objects;
+
 #endif 
