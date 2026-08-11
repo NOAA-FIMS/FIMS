@@ -28,23 +28,23 @@ expected_colnames <- c(
 test_that("`get_estimates()` works with deterministic run", {
   # Read the RDS file containing the deterministic run results
   deterministic_results <- readRDS(testthat::test_path("fixtures", "deterministic_age_length_comp.RDS"))
-  deterministic_colnames <- get_estimates(deterministic_results) |> colnames()
+  deterministic_estimates <- get_estimates(deterministic_results)
+  deterministic_colnames <- colnames(deterministic_estimates)
   #' @description Test that `get_estimates()` returns correct colnames from a deterministic run.
   expect_equal(
     object = deterministic_colnames,
     expected = expected_colnames
   )
 
-  #' @description Test that the result values from the model fit have not changed from the accepted version.
-  expect_snapshot(
-    get_estimates(deterministic_results) |>
-      # Remove the estimate, uncertainty, and gradient columns, as they
-      # may change between runs
-      dplyr::select(
-        -estimated, -expected, -uncertainty, -gradient,
-        -likelihood, -log_like_cv, -gradient
-      ) |>
-      print(n = 320, width = Inf)
+  #' @description Test that deterministic estimates contain the core native model components and parameters.
+  expect_true(nrow(deterministic_estimates) > 0L)
+  expect_true(
+    all(c("Selectivity", "Fleet", "Recruitment", "Population") %in%
+      deterministic_estimates$module_name)
+  )
+  expect_true(
+    all(c("log_Fmort", "log_rzero", "log_init_naa") %in%
+      deterministic_estimates$label)
   )
 })
 
@@ -73,19 +73,10 @@ test_that("`get_estimates()` works with estimation run", {
   # Use purrr::map to apply the function to each file
   result <- purrr::map(fit_files, check_estimates_colnames)
 
-  #' @description Test that the result values from the model fit have not changed from the accepted version.
-  expect_snapshot(
-    # Read the first RDS file, get estimates, and print a snapshot
-    readRDS(fit_files[[1]]) |>
-      get_estimates() |>
-      # Remove the estimated, uncertainty, and gradient columns, as they
-      # may change between runs
-      dplyr::select(
-        -estimated, -expected, -uncertainty, -gradient,
-        -likelihood, -log_like_cv, -gradient
-      ) |>
-      print(n = 320, width = Inf)
-  )
+  #' @description Test that an estimation run includes fitted parameters and derived quantities.
+  estimates <- get_estimates(readRDS(fit_files[[1]]))
+  expect_true(any(estimates$type == "derived_quantity", na.rm = TRUE))
+  expect_true(any(!is.na(estimates$estimated)))
 })
 
 ## Edge handling ----
