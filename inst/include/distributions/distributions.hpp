@@ -10,8 +10,6 @@
  */
 #ifndef FIMS_DISTRIBUTIONS_HPP
 #define FIMS_DISTRIBUTIONS_HPP
-#ifndef FIMS_DISTRIBUTIONS_HPP
-#define FIMS_DISTRIBUTIONS_HPP
 
 #include "functors/density_components_base.hpp"
 #include "functors/lognormal_lpdf.hpp"
