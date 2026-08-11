@@ -61,9 +61,9 @@ public:
 
     /**
      * @brief Register this object in the global live object map and interface list.
-     * @return True on success.
      */
-    void register_self(std::shared_ptr<DSEMInterface> self) {
+    void register_self() {
+        auto self = std::shared_ptr<DSEMInterface>(this, [](DSEMInterface*) {});
         DSEMInterface::live_objects[this->id] = self;
         FIMSRcppInterfaceBase::fims_interface_objects.push_back(self);
     }
@@ -153,7 +153,5 @@ public:
 #endif
 };
 
-uint32_t DSEMInterface::id_g = 1;
-std::map<uint32_t, std::shared_ptr<DSEMInterface>> DSEMInterface::live_objects;
 
 #endif 

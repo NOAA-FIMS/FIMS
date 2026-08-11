@@ -41,7 +41,7 @@ dsem <- function(random_effects, ram, parameters, n_variables) {
   dsem_builder$beta_z$set_estimation_types(parameters$estimation_type)
 
   # Register the builder so initialize_fims() can discover it.
-  dsem_builder$register_self(dsem_builder)
+  dsem_builder$register_self()
 
   # 3. Create the GMRF distribution interface
   gmrf_dist <- new(GMRFDistributionsInterface)
