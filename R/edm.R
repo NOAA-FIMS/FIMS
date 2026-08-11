@@ -235,6 +235,280 @@ methods::setMethod(
 #' @keywords fit_edm
 is.EDMFit <- function(x) methods::is(x, "EDMFit")
 
+# create_multivariate_edm_embedding --------------------------------------
+
+#' Build a multivariate delay embedding from multiple time series
+#'
+#' @description
+#' Constructs a joint delay-embedding matrix from two or more time series
+#' stored in a [FIMSFrame()] object and appends the result to the
+#' `edm_embeddings` slot under `embedding_name`.
+#'
+#' Each series contributes `E` lagged columns, so the total embedding width
+#' is `n_series * E`. For `k` series `x_1, ..., x_k`, row `t` of the matrix
+#' is:
+#' \deqn{[x_1(t),\, x_2(t),\, \ldots,\, x_k(t),\, x_1(t-\tau),\, \ldots,\,
+#'        x_k(t-(E-1)\tau)]}
+#'
+#' The target vector is taken from the series identified by `target_series`.
+#'
+#' @details
+#' **Fitting limitation**: The resulting embedding is stored as a pure R
+#' numeric matrix. Full multivariate predictor support (passing this matrix
+#' to the C++ Simplex / S-Map / GP functors) requires a
+#' `construct_multivariate()` Rcpp method not yet exposed in the current
+#' C++ layer. Calling [fit_edm()] on a multivariate embedding will raise an
+#' informative error until that extension is merged. The matrix is immediately
+#' useful for diagnostics, visualisation, and Convergent Cross Mapping (CCM)
+#' via `model_edm_matrix_multivariate()`.
+#'
+#' @param x A [FIMSFrame()] object.
+#' @param series_specs A named list of series specifications. Each element
+#'   must be a list with two character strings: `series_type` and
+#'   `series_name`, e.g.
+#'   `list(catch = list(series_type = "landings", series_name = "fleet1"),
+#'         index = list(series_type = "index",    series_name = "survey1"))`.
+#'   All series must have the same number of observations after filtering.
+#' @param E Positive integer. Number of time lags per series.
+#' @param tau Positive integer. Time lag step.
+#' @param target_series A single string matching one of the names in
+#'   `series_specs`. Identifies which series provides the target (one-step
+#'   ahead) values. Defaults to the first series.
+#' @param drop_missing Logical. When `TRUE`, rows containing the FIMS
+#'   missing-value sentinel `-999` in any series are dropped. Default `TRUE`.
+#' @param embedding_name A single string used as the storage key in
+#'   `edm_embeddings`. Defaults to
+#'   `paste0("mv_E", E, "_tau", tau, "_", paste(names(series_specs), collapse = "_"))`.
+#'
+#' @return A [FIMSFrame()] object identical to `x` with the new multivariate
+#'   embedding appended to the `edm_embeddings` slot.
+#'
+#' @seealso [create_edm_embedding()], [model_edm_matrix_multivariate()],
+#'   [fit_edm()]
+#' @export
+#' @examples
+#' \dontrun{
+#' data("data_big")
+#' ff <- FIMSFrame(data_big)
+#' ff <- create_multivariate_edm_embedding(
+#'   ff,
+#'   series_specs = list(
+#'     catch  = list(series_type = "landings", series_name = "fleet1"),
+#'     index  = list(series_type = "index",    series_name = "survey1")
+#'   ),
+#'   E = 3L, tau = 1L,
+#'   target_series = "catch"
+#' )
+#' mat <- model_edm_matrix_multivariate(ff, "mv_E3_tau1_catch_index")
+#' }
+create_multivariate_edm_embedding <- function(
+    x,
+    series_specs,
+    E,
+    tau,
+    target_series = names(series_specs)[[1L]],
+    drop_missing  = TRUE,
+    embedding_name = NULL) {
+
+  # --- Input validation ---------------------------------------------------
+  if (!methods::is(x, "FIMSFrame")) {
+    cli::cli_abort("{.arg x} must be a {.cls FIMSFrame} object.")
+  }
+  if (!is.list(series_specs) || length(series_specs) < 2L) {
+    cli::cli_abort(
+      "{.arg series_specs} must be a named list of at least 2 series specs."
+    )
+  }
+  if (is.null(names(series_specs)) || any(names(series_specs) == "")) {
+    cli::cli_abort("Every element of {.arg series_specs} must be named.")
+  }
+  if (!is.numeric(E) || length(E) != 1L || E < 1L || E %% 1 != 0) {
+    cli::cli_abort("{.arg E} must be a positive integer.")
+  }
+  if (!is.numeric(tau) || length(tau) != 1L || tau < 1L || tau %% 1 != 0) {
+    cli::cli_abort("{.arg tau} must be a positive integer.")
+  }
+  if (!target_series %in% names(series_specs)) {
+    cli::cli_abort(c(
+      "{.arg target_series} {.val {target_series}} not found in {.arg series_specs}.",
+      "i" = "Available series: {.val {names(series_specs)}}."
+    ))
+  }
+
+  E   <- as.integer(E)
+  tau <- as.integer(tau)
+  k   <- length(series_specs)
+
+  # --- Extract and align all series ---------------------------------------
+  series_list <- lapply(series_specs, function(spec) {
+    dplyr::filter(
+      get_data(x),
+      .data[["type"]]  == spec$series_type,
+      .data[["fleet"]] == spec$series_name
+    ) |>
+      dplyr::arrange(.data[["timing"]]) |>
+      dplyr::pull(.data[["value"]])
+  })
+
+  lengths <- vapply(series_list, length, integer(1L))
+  if (length(unique(lengths)) != 1L) {
+    cli::cli_abort(c(
+      "All series must have the same length after filtering.",
+      "i" = "Lengths found: {paste(names(series_specs), lengths, sep = '=', collapse = ', ')}."
+    ))
+  }
+  if (lengths[[1L]] == 0L) {
+    cli::cli_abort("No data found for at least one series in {.arg series_specs}.")
+  }
+
+  n <- lengths[[1L]]
+
+  # --- Optionally drop rows containing -999 in any series ----------------
+  mat_full <- do.call(cbind, series_list)   # n × k numeric matrix
+  if (isTRUE(drop_missing)) {
+    keep <- apply(mat_full, 1L, function(row) !any(row == -999))
+    mat_full <- mat_full[keep, , drop = FALSE]
+    n <- nrow(mat_full)
+  }
+
+  # --- Build joint delay-embedding matrix --------------------------------
+  # n_rows_out = n - (E-1)*tau - 1  (need one extra for the target)
+  n_rows_out <- n - as.integer((E - 1L) * tau) - 1L
+  if (n_rows_out < 1L) {
+    cli::cli_abort(c(
+      "Series too short to build even one embedding row.",
+      "i" = "Need at least {(E - 1L) * tau + 2L} observations, have {n}."
+    ))
+  }
+  n_cols_out <- k * E
+
+  emb_matrix     <- matrix(NA_real_, nrow = n_rows_out, ncol = n_cols_out)
+  target_vec     <- numeric(n_rows_out)
+  target_idx_r   <- which(names(series_specs) == target_series)
+
+  # Column naming: s1_lag0, s2_lag0, ..., s1_lag1, ...
+  col_names <- character(n_cols_out)
+  for (lag in seq_len(E) - 1L) {
+    for (s in seq_len(k)) {
+      col_names[[lag * k + s]] <- paste0(names(series_specs)[[s]], "_lag", lag)
+    }
+  }
+  colnames(emb_matrix) <- col_names
+
+  # t_row indexes the row of mat_full corresponding to the "current" time
+  # t_row ranges from (E-1)*tau + 1 to n - 1 (0-indexed internally)
+  start_t <- as.integer((E - 1L) * tau) + 1L   # 1-indexed in R
+  for (row_i in seq_len(n_rows_out)) {
+    t_now <- start_t + row_i - 1L
+    col_i <- 0L
+    for (lag in seq_len(E) - 1L) {
+      t_lag <- t_now - as.integer(lag * tau)
+      for (s in seq_len(k)) {
+        col_i <- col_i + 1L
+        emb_matrix[row_i, col_i] <- mat_full[t_lag, s]
+      }
+    }
+    target_vec[[row_i]] <- mat_full[t_now + 1L, target_idx_r]
+  }
+
+  # --- Default embedding name --------------------------------------------
+  if (is.null(embedding_name)) {
+    embedding_name <- paste0(
+      "mv_E", E, "_tau", tau, "_",
+      paste(names(series_specs), collapse = "_")
+    )
+  }
+
+  # --- Package and store result ------------------------------------------
+  embedding_result <- list(
+    multivariate   = TRUE,
+    n_series       = k,
+    series_specs   = series_specs,
+    target_series  = target_series,
+    E              = E,
+    tau            = tau,
+    drop_missing   = isTRUE(drop_missing),
+    n_rows         = as.integer(n_rows_out),
+    n_cols         = as.integer(n_cols_out),
+    embedded_matrix = emb_matrix,
+    target_values  = target_vec
+  )
+
+  existing <- get_edm_embeddings(x)
+  existing[[embedding_name]] <- embedding_result
+  x@edm_embeddings <- existing
+  methods::validObject(x)
+  x
+}
+
+# model_edm_matrix_multivariate ------------------------------------------
+
+#' Retrieve a multivariate delay-embedding matrix from a FIMSFrame
+#'
+#' @description
+#' Returns the joint embedding matrix stored by
+#' [create_multivariate_edm_embedding()] as a named numeric matrix, with
+#' an additional `target` column appended for convenience.
+#'
+#' @param x A [FIMSFrame()] object containing a multivariate delay embedding.
+#' @param embedding_name A single string matching a multivariate embedding in
+#'   `x`. If `NULL`, the first multivariate embedding is used.
+#' @param include_target Logical. When `TRUE` (default), a `target` column
+#'   containing the one-step-ahead target values is appended to the matrix.
+#'
+#' @return A numeric matrix with `n_rows` rows and `n_series * E` (or
+#'   `n_series * E + 1`) columns. Row and column names are set.
+#'
+#' @seealso [create_multivariate_edm_embedding()]
+#' @export
+#' @examples
+#' \dontrun{
+#' mat <- model_edm_matrix_multivariate(ff, "mv_E3_tau1_catch_index")
+#' head(mat)
+#' }
+model_edm_matrix_multivariate <- function(x,
+                                          embedding_name = NULL,
+                                          include_target = TRUE) {
+  if (!methods::is(x, "FIMSFrame")) {
+    cli::cli_abort("{.arg x} must be a {.cls FIMSFrame} object.")
+  }
+
+  embeddings <- get_edm_embeddings(x)
+  mv_names   <- Filter(function(nm) isTRUE(embeddings[[nm]][["multivariate"]]),
+                       names(embeddings))
+
+  if (length(mv_names) == 0L) {
+    cli::cli_abort(c(
+      "No multivariate embeddings found in {.arg x}.",
+      "i" = "Use {.fn create_multivariate_edm_embedding} to build one first."
+    ))
+  }
+
+  if (is.null(embedding_name)) {
+    embedding_name <- mv_names[[1L]]
+  }
+  if (!embedding_name %in% names(embeddings)) {
+    cli::cli_abort(c(
+      "Embedding {.val {embedding_name}} not found.",
+      "i" = "Available multivariate embeddings: {.val {mv_names}}."
+    ))
+  }
+  if (!isTRUE(embeddings[[embedding_name]][["multivariate"]])) {
+    cli::cli_abort(c(
+      "{.val {embedding_name}} is a univariate embedding.",
+      "i" = "Use {.fn model_edm_matrix} for univariate embeddings."
+    ))
+  }
+
+  emb <- embeddings[[embedding_name]]
+  mat <- emb$embedded_matrix
+
+  if (isTRUE(include_target)) {
+    mat <- cbind(mat, target = emb$target_values)
+  }
+  mat
+}
+
 # select_n_neighbors ----------------------------------------------------
 
 #' Select the optimal number of nearest neighbours for Simplex Projection
@@ -470,6 +744,20 @@ fit_edm <- function(data,
   emb    <- embeddings[[embedding_name]]
   E_used   <- emb$E
   tau_used <- emb$tau
+
+  # Guard: multivariate embeddings require C++ construct_multivariate() support
+  # which will be added in the next phase. Raise a clear, actionable error.
+  if (isTRUE(emb$multivariate)) {
+    cli::cli_abort(c(
+      "Fitting EDM models on multivariate embeddings is not yet supported.",
+      "i" = paste0(
+        "{.val {embedding_name}} is a multivariate embedding ",
+        "({emb$n_series} series \u00d7 E={emb$E})."
+      ),
+      "i" = "Use {.fn model_edm_matrix_multivariate} to access the embedding matrix for diagnostics.",
+      "i" = "Full multivariate predictor support requires {.fn construct_multivariate} in the C++ layer (planned for the next phase)."
+    ))
+  }
 
   # --- Reconstruct Rcpp DelayEmbedding from the stored series -------------
   # Re-extract the original series so the Rcpp object holds live pointers.
