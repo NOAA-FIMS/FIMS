@@ -357,13 +357,25 @@ class Vector {
   inline void push_back(const Type &value) { this->vec_m.push_back(value); }
 
   /**
-   * @brief Adds an element to the end using move semantics.
-   */
+  * @brief Adds a copy of an element to the end of the vector.
+  * 
+  * @details This function takes a read-only reference to an object and 
+  * safely copies its data into the internal container. 
+  * 
+  * @param value The element to be copied and appended.
+  */
   inline void push_back(Type &&value) { this->vec_m.push_back(std::move(value)); }
 
   /**
-   * @brief Constructs an element in-place at the end.
-   */
+  * @brief Moves an element to the end of the vector.
+  * 
+  * @details This function takes a temporary object (rvalue) and transfers 
+  * its internal data directly into the container to avoid an expensive copy. 
+  * Note: The original `value` object is left in a valid but unspecified state 
+  * after this operation.
+  * 
+  * @param value The temporary element whose contents will be moved and appended.
+  */
   template <class... Args>
   void emplace_back(Args &&...args) {
     this->vec_m.emplace_back(std::forward<Args>(args)...);

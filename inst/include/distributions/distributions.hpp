@@ -11,7 +11,6 @@
 #ifndef FIMS_DISTRIBUTIONS_HPP
 #define FIMS_DISTRIBUTIONS_HPP
 
-#include "distributions/functors/density_components_base.hpp"
 #include "distributions/functors/lognormal_lpdf.hpp"
 #include "distributions/functors/multinomial_lpmf.hpp"
 #include "distributions/functors/normal_lpdf.hpp"

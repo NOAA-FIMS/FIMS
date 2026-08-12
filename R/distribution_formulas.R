@@ -247,6 +247,87 @@ initialize_data_distribution <- function(
 #'   sd = list(value = 0.4, estimation_type = "constant")
 #' )
 #' }
+initialize_data_distribution <- function(
+  module,
+  family = NULL,
+  # Create a tibble with value and estimation_type column for sd
+  sd = tibble::tibble(
+    value = 1,
+    estimation_type = "constant"
+  ),
+  # FIXME: Move this argument to second to match where par is in
+  # initialize_process_distribution
+  data_type = c("landings", "index", "agecomp", "lengthcomp")
+) {
+  data_type <- rlang::arg_match(data_type)
+  # FIXME: Make the available families a data object
+  # Could also make the matrix of distributions available per type as a
+  # data frame where the check could use the stored object.
+
+  # validity check on user input
+  args <- list(
+    family = family,
+    sd = sd,
+    data_type = data_type,
+    module = module
+  )
+  check_distribution_validity(args)
+
+  # assign name of observed data based on data_type
+  obs_id_name <- glue::glue("observed_{data_type}_data_id")
+
+  # Set up distribution based on `family` argument`
+  if (family[["family"]] == "lognormal") {
+    # create new Rcpp module
+    new_module <- methods::new(DlnormDistribution)
+
+    # populate logged standard deviation parameter with log of input
+    # Using resize() and then assigning value to each element of log_sd directly
+    # is correct, as creating a new VariableVector for log_sd here would
+    # trigger an error in integration tests with wrappers.
+    new_module$log_sd[] <- log(sd[["value"]])
+    new_module$log_sd$set_estimation_types(sd[["estimation_type"]])
+  }
+
+  if (family[["family"]] == "gaussian") {
+    # create new Rcpp module
+    new_module <- methods::new(DnormDistribution)
+
+    # populate logged standard deviation parameter with log of input
+    new_module$log_sd[] <- log(sd[["value"]])
+    new_module$log_sd$set_estimation_types(sd[["estimation_type"]])
+  }
+
+  if (family[["family"]] == "multinomial") {
+    # create new Rcpp module
+    new_module <- methods::new(DmultinomDistribution)
+  }
+
+  # setup link to observed data
+  if (data_type == "landings") {
+    new_module$set_observed_data(module$GetObservedLandingsDataID())
+  }
+  if (data_type == "index") {
+    new_module$set_observed_data(module$GetObservedIndexDataID())
+  }
+  if (data_type == "agecomp") {
+    new_module$set_observed_data(module$GetObservedAgeCompDataID())
+  }
+  if (data_type == "lengthcomp") {
+    new_module$set_observed_data(module$GetObservedLengthCompDataID())
+  }
+
+  # set name of expected values
+  expected <- get_expected_name(family, data_type)
+  # setup link to expected values
+  new_module$set_distribution_links("data", expected_id = module$field(expected)$get_id())
+
+  return(new_module)
+}
+
+#' @rdname initialize_data_distribution
+#' @keywords distribution
+#' @export
 initialize_process_distribution <- function(
   module,
   par,
@@ -328,15 +409,13 @@ initialize_process_distribution <- function(
   if (is.null(expected)) {
     new_module$set_distribution_links(
       "random_effects",
-      module$field(par)$get_id()
+      observed_id = module$field(par)$get_id()
     )
   } else {
     new_module$set_distribution_links(
       "random_effects",
-      c(
-        module$field(par)$get_id(),
-        module$field(expected)$get_id()
-      )
+      observed_id = module$field(par)$get_id(),
+      expected_id = module$field(expected)$get_id()
     )
   }
 

@@ -49,6 +49,9 @@ struct DensityComponentBase : public fims_model_object::FIMSObject<Type> {
   /** @brief Expected value vector for random-effects pathways. */
   fims::Vector<Type>* re_expected_values = NULL;
 
+  /** @brief Uncertainty vector for random-effects pathways. */
+  fims::Vector<Type>* uncertainty = NULL;
+
   /** @brief Expected value vector for data pathways. */
   fims::Vector<Type>* data_expected_values = NULL;
 
@@ -199,10 +202,16 @@ struct DensityComponentBase : public fims_model_object::FIMSObject<Type> {
    */
   bool simulate_flag = false;
 
+  struct DistributionKey {
+    uint32_t observed_id;
+    std::vector<uint32_t> expected_id;
+    uint32_t uncertainty_id = static_cast<uint32_t>(-999);
+  };
+
   /**
    * @brief Unique ID for variable map that points to a fims::Vector.
    */
-  std::vector<uint32_t> key;
+  DistributionKey key;
 
 #ifdef TMB_MODEL
   /**

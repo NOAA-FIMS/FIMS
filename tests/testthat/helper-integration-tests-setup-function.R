@@ -152,17 +152,17 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   fishing_fleet_catch_distribution$log_sd$set_estimation_types(c("constant"))
   # Set Data using the IDs from the modules defined above
   fishing_fleet_catch_distribution$set_observed_data(fishing_fleet$GetObservedCatchDataID())
-  fishing_fleet_catch_distribution$set_distribution_links("data", fishing_fleet$log_catch_expected$get_id())
+  fishing_fleet_catch_distribution$set_distribution_links("data", expected_id = fishing_fleet$log_catch_expected$get_id())
 
   # Set up fishery age composition data using the multinomial
   fishing_fleet_agecomp_distribution <- methods::new(DmultinomDistribution)
   fishing_fleet_agecomp_distribution$set_observed_data(fishing_fleet$GetObservedAgeCompDataID())
-  fishing_fleet_agecomp_distribution$set_distribution_links("data", fishing_fleet$agecomp_proportion$get_id())
+  fishing_fleet_agecomp_distribution$set_distribution_links("data", expected_id = fishing_fleet$agecomp_proportion$get_id())
 
   # Set up fishery length composition data using the multinomial
   fishing_fleet_lengthcomp_distribution <- methods::new(DmultinomDistribution)
   fishing_fleet_lengthcomp_distribution$set_observed_data(fishing_fleet$GetObservedLengthCompDataID())
-  fishing_fleet_lengthcomp_distribution$set_distribution_links("data", fishing_fleet$lengthcomp_proportion$get_id())
+  fishing_fleet_lengthcomp_distribution$set_distribution_links("data", expected_id = fishing_fleet$lengthcomp_proportion$get_id())
   fishing_fleet_lengthcomp_distribution$set_note("fishing_fleet_lengthcomp_distribution")
   # Set age-to-length conversion matrix
   # TODO: If an age_to_length_conversion matrix is provided, the code below
@@ -242,7 +242,7 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   # Length composition distribution
   survey_fleet_lengthcomp_distribution <- methods::new(DmultinomDistribution)
   survey_fleet_lengthcomp_distribution$set_observed_data(survey_fleet$GetObservedLengthCompDataID())
-  survey_fleet_lengthcomp_distribution$set_distribution_links("data", survey_fleet$lengthcomp_proportion$get_id()) # Set age to length conversion matrix
+  survey_fleet_lengthcomp_distribution$set_distribution_links("data", expected_id = survey_fleet$lengthcomp_proportion$get_id()) # Set age to length conversion matrix
   survey_fleet$age_to_length_conversion$resize(om_input[["nages"]] * om_input[["nlengths"]])
   # TODO: Check that the dimensions of the matrix of age_to_length_conversion matrix
   #       is rows = length() and columns = length()
@@ -357,12 +357,12 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
     if (random_effects[["recruitment"]] == "log_r") {
       recruitment_distribution$log_sd[1]$value <- log(1)
       recruitment_distribution$log_sd[1]$estimation_type$set("fixed_effects")
-      recruitment_distribution$set_distribution_links("random_effects", c(recruitment$log_r$get_id(), recruitment$log_expected_recruitment$get_id()))
+      recruitment_distribution$set_distribution_links("random_effects", observed_id = recruitment$log_r$get_id(), expected_id = recruitment$log_expected_recruitment$get_id())
     }
   }
 
   if (is.null(random_effects)) {
-    recruitment_distribution$set_distribution_links("random_effects", recruitment$log_devs$get_id())
+    recruitment_distribution$set_distribution_links("random_effects", observed_id = recruitment$log_devs$get_id())
   }
 
   # Growth

@@ -124,17 +124,17 @@ run_FIMS_projection_scenario <- function(om_input,
   fishing_fleet_catch_distribution$log_sd$set_estimation_types(c("constant"))
   # Set Data using the IDs from the modules defined above
   fishing_fleet_catch_distribution$set_observed_data(fishing_fleet$GetObservedCatchDataID())
-  fishing_fleet_catch_distribution$set_distribution_links("data", fishing_fleet$log_catch_expected$get_id())
+  fishing_fleet_catch_distribution$set_distribution_links("data", expected_id = fishing_fleet$log_catch_expected$get_id())
 
   # Set up fishery age composition data using the multinomial
   fishing_fleet_agecomp_distribution <- methods::new(DmultinomDistribution)
   fishing_fleet_agecomp_distribution$set_observed_data(fishing_fleet$GetObservedAgeCompDataID())
-  fishing_fleet_agecomp_distribution$set_distribution_links("data", fishing_fleet$agecomp_proportion$get_id())
+  fishing_fleet_agecomp_distribution$set_distribution_links("data", expected_id = fishing_fleet$agecomp_proportion$get_id())
 
   # Set up fishery length composition data using the multinomial
   fishing_fleet_lengthcomp_distribution <- methods::new(DmultinomDistribution)
   fishing_fleet_lengthcomp_distribution$set_observed_data(fishing_fleet$GetObservedLengthCompDataID())
-  fishing_fleet_lengthcomp_distribution$set_distribution_links("data", fishing_fleet$lengthcomp_proportion$get_id())
+  fishing_fleet_lengthcomp_distribution$set_distribution_links("data", expected_id = fishing_fleet$lengthcomp_proportion$get_id())
   fishing_fleet_lengthcomp_distribution$set_note("fishing_fleet_lengthcomp_distribution")
   # Set age-to-length conversion matrix
   fishing_fleet$age_to_length_conversion$resize(om_input[["nages"]] * om_input[["nlengths"]])
@@ -212,17 +212,17 @@ run_FIMS_projection_scenario <- function(om_input,
   survey_fleet_index_distribution$log_sd$set_estimation_types(c("constant"))
   # Set Data using the IDs from the modules defined above
   survey_fleet_index_distribution$set_observed_data(survey_fleet$GetObservedIndexDataID())
-  survey_fleet_index_distribution$set_distribution_links("data", survey_fleet$log_index_expected$get_id())
+  survey_fleet_index_distribution$set_distribution_links("data", expected_id = survey_fleet$log_index_expected$get_id())
 
   # Age composition distribution
   survey_fleet_agecomp_distribution <- methods::new(DmultinomDistribution)
   survey_fleet_agecomp_distribution$set_observed_data(survey_fleet$GetObservedAgeCompDataID())
-  survey_fleet_agecomp_distribution$set_distribution_links("data", survey_fleet$agecomp_proportion$get_id())
+  survey_fleet_agecomp_distribution$set_distribution_links("data", expected_id = survey_fleet$agecomp_proportion$get_id())
 
   # Length composition distribution
   survey_fleet_lengthcomp_distribution <- methods::new(DmultinomDistribution)
   survey_fleet_lengthcomp_distribution$set_observed_data(survey_fleet$GetObservedLengthCompDataID())
-  survey_fleet_lengthcomp_distribution$set_distribution_links("data", survey_fleet$lengthcomp_proportion$get_id()) # Set age to length conversion matrix
+  survey_fleet_lengthcomp_distribution$set_distribution_links("data", expected_id = survey_fleet$lengthcomp_proportion$get_id()) # Set age to length conversion matrix
   survey_fleet$age_to_length_conversion$resize(om_input[["nages"]] * om_input[["nlengths"]])
   # TODO: Check that the dimensions of the matrix of age_to_length_conversion matrix
   #       is rows = length() and columns = length()
@@ -302,7 +302,7 @@ run_FIMS_projection_scenario <- function(om_input,
   }
 
   recruitment_distribution$log_sd[1]$estimation_type$set("fixed_effects")
-  recruitment_distribution$set_distribution_links("random_effects", recruitment$log_devs$get_id())
+  recruitment_distribution$set_distribution_links("random_effects", observed_id = recruitment$log_devs$get_id())
 
   # Growth
   ewaa_growth <- methods::new(EWAAGrowth)
@@ -404,7 +404,7 @@ run_FIMS_projection_scenario <- function(om_input,
         F_mult_distribution$log_sd[i]$value <- -5
         F_mult_distribution$log_sd[i]$estimation_type$set("constant")
       }
-      F_mult_distribution$set_distribution_links("random_effects", population$log_f_multiplier$get_id())
+      F_mult_distribution$set_distribution_links("random_effects", observed_id = population$log_f_multiplier$get_id())
     }
 
     # Setup projection prior target

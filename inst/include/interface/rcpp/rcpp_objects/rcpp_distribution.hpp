@@ -29,7 +29,7 @@ class DistributionsInterfaceBase : public FIMSRcppInterfaceBase {
   /**
    * @brief The unique ID for the variable map that points to a fims::Vector.
    */
-  std::shared_ptr<std::vector<uint32_t>> key_m;
+  std::shared_ptr<DistributionKey> key_m;
   /**
    * @brief The type of density input. The options are prior, re, or data.
    */
@@ -78,7 +78,7 @@ class DistributionsInterfaceBase : public FIMSRcppInterfaceBase {
    * @brief The constructor.
    */
   DistributionsInterfaceBase() {
-    this->key_m = std::make_shared<std::vector<uint32_t>>();
+    this->key_m = std::make_shared<DistributionKey>();
     this->id_m = DistributionsInterfaceBase::id_g++;
     /* Create instance of map: key is id and value is pointer to
     DistributionsInterfaceBase */
@@ -112,12 +112,19 @@ class DistributionsInterfaceBase : public FIMSRcppInterfaceBase {
    *
    * @param input_type String that sets whether the distribution type is for
    * priors, random effects, or data.
-   * @param ids Vector of unique ids for each linked parameter(s), derived
-   * value(s), or observed data vector.
+   * @param observed_id Unique ID for the observed data object.
+   * @param expected_id Unique ID for the expected value object.
+   * @param uncertainty_id Unique ID for the uncertainty object.
    */
   virtual bool set_distribution_links(std::string input_type,
-                                      Rcpp::IntegerVector ids) {
-    return false;
+                                      uint32_t observed_id,
+                                      uint32_t expected_id,
+                                      uint32_t uncertainty_id) {
+    this->input_type_m.set(input_type);
+    this->key_m->observed_id = observed_id;
+    this->key_m->expected_id = expected_id;
+    this->key_m->uncertainty_id = uncertainty_id;
+    return true;
   }
 
   /**
@@ -245,18 +252,6 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
     return true;
   }
 
-  /**
-   * @copydoc DistributionsInterfaceBase::set_distribution_links
-   */
-  virtual bool set_distribution_links(std::string input_type,
-                                      Rcpp::IntegerVector ids) {
-    this->input_type_m.set(input_type);
-    this->key_m->resize(ids.size());
-    for (R_xlen_t i = 0; i < ids.size(); i++) {
-      this->key_m->at(i) = ids[i];
-    }
-    return true;
-  }
 
   /**
    * @brief Evaluate normal probability density function (pdf). The natural log
@@ -596,23 +591,6 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
     return true;
   }
 
-  /**
-   * @brief Sets pointers for data observations, random effects, or priors.
-   *
-   * @param input_type String that sets whether the distribution type is for
-   * priors, random effects, or data.
-   * @param ids Vector of unique ids for each linked parameter(s), derived
-   * value(s), or observed data vector.
-   */
-  virtual bool set_distribution_links(std::string input_type,
-                                      Rcpp::IntegerVector ids) {
-    this->input_type_m.set(input_type);
-    this->key_m->resize(ids.size());
-    for (R_xlen_t i = 0; i < ids.size(); i++) {
-      this->key_m->at(i) = ids[i];
-    }
-    return true;
-  }
 
   /**
    * @brief Evaluate lognormal probability density function (pdf). The natural
@@ -850,139 +828,6 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
  * @brief The Rcpp interface for Dmultinom to instantiate from R:
  * dmultinom_ <- methods::new(DmultinomDistribution).
  */
-class GMRFDistributionsInterface : public DistributionsInterfaceBase {
- public:
-  static uint32_t id_g;
-  static std::map<uint32_t, std::shared_ptr<GMRFDistributionsInterface>>
-      live_objects;
-
-  SharedInt precision_builder_id_m = -999;
-  RealVector lpdf_vec;
-
-  GMRFDistributionsInterface() : DistributionsInterfaceBase() {
-    GMRFDistributionsInterface::live_objects[this->id_m] =
-        std::make_shared<GMRFDistributionsInterface>(*this);
-    FIMSRcppInterfaceBase::fims_interface_objects.push_back(
-        GMRFDistributionsInterface::live_objects[this->id_m]);
-  }
-
-  GMRFDistributionsInterface(const GMRFDistributionsInterface &other)
-      : DistributionsInterfaceBase(other),
-        precision_builder_id_m(other.precision_builder_id_m),
-        lpdf_vec(other.lpdf_vec) {}
-
-  virtual ~GMRFDistributionsInterface() {}
-
-  virtual uint32_t get_id() { return this->id_m; }
-
-  virtual bool set_distribution_links(std::string input_type,
-                                      Rcpp::IntegerVector ids) {
-    this->input_type_m.set(input_type);
-    this->key_m->clear();
-    this->key_m->reserve(ids.size() + 1);
-    for (R_xlen_t i = 0; i < ids.size(); i++) {
-      this->key_m->push_back(ids[i]);
-    }
-    this->key_m->push_back(this->precision_builder_id_m.get());
-    return true;
-  }
-
-  bool set_precision_builder_id(int precision_builder_id) {
-    this->precision_builder_id_m.set(precision_builder_id);
-    if (this->key_m->empty()) {
-      this->key_m->push_back(static_cast<uint32_t>(precision_builder_id));
-    } else if (this->key_m->size() == 1) {
-      this->key_m->push_back(static_cast<uint32_t>(precision_builder_id));
-    } else {
-      this->key_m->back() = static_cast<uint32_t>(precision_builder_id);
-    }
-    return true;
-  }
-
-  virtual double evaluate() {
-    fims_distributions::GMRF<double> gmrf;
-    gmrf.input_type = this->input_type_m.get();
-    gmrf.key.resize(this->key_m->size());
-    for (size_t i = 0; i < this->key_m->size(); ++i) {
-      gmrf.key[i] = this->key_m->at(i);
-    }
-    if (gmrf.input_type == "random_effects" && this->key_m->size() > 0) {
-      auto info = fims_info::Information<double>::GetInstance();
-      auto vmit = info->variable_map.find(this->key_m->at(0));
-      if (vmit != info->variable_map.end()) {
-        gmrf.re = (*vmit).second;
-        gmrf.expected_values.resize(gmrf.re->size());
-      }
-      gmrf.re_expected_values = &gmrf.expected_values;
-      auto pbit = info->precision_builders.find(this->precision_builder_id_m.get());
-      if (pbit != info->precision_builders.end()) {
-        gmrf.precision_matrix_ptr = pbit->second;
-      }
-    }
-    return gmrf.evaluate();
-  }
-
-#ifdef TMB_MODEL
-  template <typename Type>
-  bool add_to_fims_tmb_internal() {
-    std::shared_ptr<fims_info::Information<Type>> info =
-        fims_info::Information<Type>::GetInstance();
-
-    std::shared_ptr<fims_distributions::GMRF<Type>> distribution =
-        std::make_shared<fims_distributions::GMRF<Type>>();
-
-    distribution->id = this->id_m;
-    distribution->input_type = this->input_type_m;
-    distribution->key.resize(this->key_m->size());
-    for (size_t i = 0; i < this->key_m->size(); i++) {
-      distribution->key[i] = this->key_m->at(i);
-    }
-
-    info->density_components[distribution->id] = distribution;
-    return true;
-  }
-
-  virtual bool add_to_fims_tmb() {
-    this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
-    this->add_to_fims_tmb_internal<TMBAD_FIMS_TYPE>();
-    return true;
-  }
-#endif
-
-  virtual void finalize() {
-    if (this->finalized) {
-      FIMS_WARNING_LOG("GMRFDistributionsInterface " +
-                       fims::to_string(this->id_m) +
-                       " has been finalized already.");
-      return;
-    }
-
-    this->finalized = true;
-    std::shared_ptr<fims_info::Information<double>> info =
-        fims_info::Information<double>::GetInstance();
-    auto it = info->density_components.find(this->id_m);
-    if (it == info->density_components.end()) {
-      FIMS_WARNING_LOG("GMRFDistributionsInterface " +
-                       fims::to_string(this->id_m) +
-                       " not found in Information.");
-      return;
-    }
-
-    std::shared_ptr<fims_distributions::GMRF<double>> gmrf =
-        std::dynamic_pointer_cast<fims_distributions::GMRF<double>>(it->second);
-    this->lpdf_value = gmrf->lpdf;
-    size_t n_x = gmrf->get_n_x();
-    this->lpdf_vec = RealVector(n_x == 0 ? 1 : n_x);
-    if (n_x == 0) {
-      this->lpdf_vec[0] = this->lpdf_value;
-      return;
-    }
-    for (size_t i = 0; i < n_x; ++i) {
-      this->lpdf_vec[i] = gmrf->lpdf_vec.get_force_scalar(i);
-    }
-  }
-};
-
 class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
  public:
   /**
@@ -1055,23 +900,6 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
     return true;
   }
 
-  /**
-   * @brief Sets pointers for data observations, random effects, or priors.
-   *
-   * @param input_type String that sets whether the distribution type is for
-   * priors, random effects, or data.
-   * @param ids Vector of unique ids for each linked parameter(s), derived
-   * value(s), or observed data vector.
-   */
-  virtual bool set_distribution_links(std::string input_type,
-                                      Rcpp::IntegerVector ids) {
-    this->input_type_m.set(input_type);
-    this->key_m->resize(ids.size());
-    for (R_xlen_t i = 0; i < ids.size(); i++) {
-      this->key_m->at(i) = ids[i];
-    }
-    return true;
-  }
 
   /**
    * @brief Set the note object

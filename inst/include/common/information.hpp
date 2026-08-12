@@ -224,6 +224,9 @@ class Information {
       if (d->re_expected_values) {
         d->re_expected_values->clear();
       }
+      if (d->uncertainty) {
+        d->uncertainty->clear();
+      }
     }
     this->density_components.clear();
     this->precision_builders.clear();
@@ -351,44 +354,50 @@ class Information {
    */
   void SetupRandomEffects() {
     for (density_components_iterator it = this->density_components.begin();
-         it != this->density_components.end(); ++it) {
-      std::shared_ptr<fims_distributions::DensityComponentBase<Type>> d =
-          (*it).second;
-      if (d->input_type == "random_effects") {
-        FIMS_INFO_LOG("Setup random effects for distribution " +
-                      fims::to_string(d->id));
-        variable_map_iterator vmit;
-        FIMS_INFO_LOG("Link random effects from distribution " +
-                      fims::to_string(d->id) + " to derived value " +
-                      fims::to_string(d->key[0]));
-        vmit = this->variable_map.find(d->key[0]);
-        d->re = (*vmit).second;
+        it != this->density_components.end(); ++it) {
+      std::shared_ptr<fims_distributions::DensityComponentBase<Type>> d = (*it).second;
 
-        std::shared_ptr<fims_distributions::GMRF<Type>> gmrf =
-            std::dynamic_pointer_cast<fims_distributions::GMRF<Type>>(d);
-        if (gmrf) {
-          d->expected_values.resize(d->re->size());
-          d->re_expected_values = &d->expected_values;
-          if (d->key.size() >= 2) {
-            precision_builders_iterator pbit =
-                this->precision_builders.find(d->key[1]);
-            if (pbit != this->precision_builders.end()) {
-              gmrf->precision_matrix_ptr = pbit->second;
-            } else {
-              FIMS_ERROR_LOG("Expected precision builder not defined for random-effects distribution " +
-                             fims::to_string(d->id) + ", builder id " +
-                             fims::to_string(d->key[1]));
-            }
-          }
-        } else if (d->key.size() == 2) {
-          vmit = this->variable_map.find(d->key[1]);
-          d->re_expected_values = (*vmit).second;
+      if (d->input_type == "random_effects") {
+        FIMS_INFO_LOG("Setup random effects for distribution " + fims::to_string(d->id));
+        variable_map_iterator vmit;
+
+        // 1. Link the observed random effect vector
+        FIMS_INFO_LOG("Link random effects from distribution " + fims::to_string(d->id) +
+                      " to derived value " + fims::to_string(d->key.observed_id));
+        vmit = this->variable_map.find(d->key.observed_id);
+        if (vmit != this->variable_map.end()) {
+          d->re = (*vmit).second;
         } else {
+          FIMS_ERROR_LOG("Observed ID not found in variable map for distribution " + fims::to_string(d->id));
+        }
+
+        // 2. Link or initialize the expected values
+        if (d->key.expected_id.has_value()) {
+          vmit = this->variable_map.find(d->key.expected_id.value());
+          if (vmit != this->variable_map.end()) {
+            d->re_expected_values = (*vmit).second;
+          } else {
+            FIMS_ERROR_LOG("Expected ID not found in variable map for distribution " + fims::to_string(d->id));
+          }
+        } else {
+          // Fallback if no expected ID is provided (maintains the previous GMRF resizing behavior)
+          if (d->re) {
+            d->expected_values.resize(d->re->size());
+          }
           d->re_expected_values = &d->expected_values;
         }
 
-        FIMS_INFO_LOG("Random effect size for distribution " +
-                      fims::to_string(d->id) +
+        // 3. Link the uncertainty (this now generically handles the GMRF precision builder pointer)
+        if (d->key.uncertainty_id.has_value()) {
+          vmit = this->variable_map.find(d->key.uncertainty_id.value());
+          if (vmit != this->variable_map.end()) {
+            d->uncertainty = (*vmit).second;
+          } else {
+            FIMS_ERROR_LOG("Uncertainty ID not found in variable map for distribution " + fims::to_string(d->id));
+          }
+        }
+
+        FIMS_INFO_LOG("Random effect size for distribution " + fims::to_string(d->id) +
                       " is: " + fims::to_string(d->observed_values.size()));
       }
     }
