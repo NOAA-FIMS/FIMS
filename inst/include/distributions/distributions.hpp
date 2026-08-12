@@ -11,10 +11,11 @@
 #ifndef FIMS_DISTRIBUTIONS_HPP
 #define FIMS_DISTRIBUTIONS_HPP
 
-#include "distributions/functors/lognormal_lpdf.hpp"
-#include "distributions/functors/multinomial_lpmf.hpp"
-#include "distributions/functors/normal_lpdf.hpp"
-#include "distributions/functors/precision_builders.hpp"
-#include "distributions/functors/gmrf.hpp"
+#include "functors/density_components_base.hpp"
+#include "functors/lognormal_lpdf.hpp"
+#include "functors/multinomial_lpmf.hpp"
+#include "functors/normal_lpdf.hpp"
+#include "functors/precision_builders.hpp"
+#include "functors/gmrf.hpp"
 
 #endif /* FIMS_DISTRIBUTIONS_HPP */
