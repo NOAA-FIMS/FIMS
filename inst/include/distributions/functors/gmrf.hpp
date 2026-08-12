@@ -46,9 +46,10 @@ struct GMRF : public DensityComponentBase<Type> {
     /**
      * @brief Evaluates the GMRF log probability density function.
      * @details The evaluation follows: 
-     * \f[ \log(f(x)) = -\frac{1}{2} (x - \mu)^T Q (x - \mu) + \frac{1}{2} \log|Q| -N\log(\sqrt(2\pi)) \f]
+     * \f[ \log(f(x)) = -\frac{1}{2} (x - (\mu + \text{offset}))^T Q (x - (\mu + \text{offset})) + \frac{1}{2} \log|Q| -N\log(\sqrt(2\pi)) \f]
      * where \f$x\f$ is the vector of latent states, \f$\mu\f$ is the mean, 
-     * \f$Q\f$ is the precision matrix, and \f$n\f$ is the dimension of \f$x\f$.
+     * \text{offset} is the mean vector from the DSEM builder, \f$Q\f$ is the precision matrix, 
+     * and \f$n\f$ is the dimension of \f$x\f$.
      * @return The calculated log-probability density.
      */ 
     virtual const Type evaluate() {
@@ -71,13 +72,24 @@ struct GMRF : public DensityComponentBase<Type> {
         // Calls precision matrix builder to build Q
         Eigen::SparseMatrix<Type> Q = precision_matrix_ptr->BuildPrecisionMatrixSparse();
 
-        // Centering: x - mu. TMB's GMRF expects input centered around a mean of 0.
+        /**
+        * @brief Incorporate Mean Offset.
+        * @details Fetches the vector returned by GetMeanOffset(). This is essential 
+        * for propagating initial condition offsets (delta0) and stationary 
+        * means through the SAR process.
+        */
+        Eigen::Matrix<Type, Eigen::Dynamic, 1> mean_offset = 
+            precision_matrix_ptr->GetMeanOffset(n_x);
+
+        // Centering: observed - (expected + structural_offset)
+        // TMB's GMRF expects input centered around a mean of 0.
         // To improve performance, we build a fims::Vector using emplace_back to avoid
         // default-constructing and then reassigning every element.
         fims::Vector<Type> x_centered_std;
         x_centered_std.reserve(n_x);
         for (size_t i = 0; i < n_x; ++i) {
-            x_centered_std.emplace_back(this->get_observed(i) - this->get_expected(i));
+            // Subtract both the standard module expected value and the structural DSEM offset.
+            x_centered_std.emplace_back(this->get_observed(i) - this->get_expected(i) - mean_offset(i));
         }
 
         // TODO: Link get_observed and get_expected to different parameters/derived quantities in the model
