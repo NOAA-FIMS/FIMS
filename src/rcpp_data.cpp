@@ -31,14 +31,14 @@ void register_data(Rcpp::Module& m) {
       .field("length_comp_data", &LengthCompDataInterface::length_comp_data)
       .method("get_id", &LengthCompDataInterface::get_id);
 
-  Rcpp::class_<LandingsDataInterface>(
-      "Landings",
+  Rcpp::class_<CatchDataInterface>(
+      "Catch",
       "See "
       "https://noaa-fims.github.io/FIMS/doxygen/"
-      "classLandingsDataInterface.html.")
+      "classCatchDataInterface.html.")
       .constructor<int>()
-      .field("landings_data", &LandingsDataInterface::landings_data)
-      .method("get_id", &LandingsDataInterface::get_id);
+      .field("catch_data", &CatchDataInterface::catch_data)
+      .method("get_id", &CatchDataInterface::get_id);
 
   Rcpp::class_<IndexDataInterface>(
       "Index",

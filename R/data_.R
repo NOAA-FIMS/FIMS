@@ -19,24 +19,24 @@
 #'     `"age_zero_survey"`. Entries can be `NA` for information that is not
 #'     fleet/vessel specific.}
 #'   \item{age}{An integer age. Entry can be `NA` if information pertains to
-#'     multiple ages, e.g., total landings rather than landings of age-4 fish.
+#'     multiple ages, e.g., total catch rather than catch of age-4 fish.
 #'     In this dataset, ages start at one, therefore recruitment happens at age
 #'     one not age zero.}
 #'   \item{length}{A numeric length. Entry can be `NA` if information doesn't
 #'     pertain to length.}
 #'   \item{timing}{The timing, i.e., year the data was collected.}
-#'   \item{value}{The measurement of interest.}
-#'   \item{unit}{A character string specifying the units of `value`. Allowed
+#'   \item{observed}{The observed measurement of interest.}
+#'   \item{unit}{A character string specifying the units of `observed`. Allowed
 #'     units for each data type are as follows. `mt` is used for `index`,
-#'     `landings`, and `weight_at_age` data. `number` or `proportion` are each
+#'     `catch`, and `weight_at_age` data. `number` or `proportion` are each
 #'     viable units for the composition data, where the former is the preferred
 #'     unit of measurement.}
-#'   \item{uncertainty}{A real value providing a measurement of uncertainty
-#'     for value. For landings and indices of abundance this should be
-#'     the standard deviation of the logged observations if you are using the
-#'     lognormal distribution to fit your data. For composition data it will
-#'     be your input sample size.
+#'   \item{uncertainty}{A right-handed formula specifying the distributional
+#'     assumptions for the entry in `observed`. See [FIMSFrame()] for more
+#'     information about this column.
 #' }
 #' }
 #' @source \url{www.github.com/NOAA-FIMS/Age_Structured_Stock_Assessment_Model_Comparison}
+#' @seealso
+#' * [FIMSFrame()]
 "data_big"

@@ -296,8 +296,8 @@ methods::setMethod(
 NULL
 
 #' @details
-#' ## `model_landings()`
-#' Returns a numeric vector of landings data (type `"landings"`) for the
+#' ## `model_catch()`
+#' Returns a numeric vector of catch data (type `"catch"`) for the
 #' specified fleet(s).
 #'
 #' ## `model_index()`
@@ -314,44 +314,44 @@ NULL
 #' conversion data are present in the `FIMSFrame` object.
 #'
 #' ## `model_weight_at_age()`
-#' Returns a numeric vector of weight-at-age values (type `"weight_at_age"`),
-#' ordered by age and year (plus one additional year) and using `-999` to
-#' indicate missing values. When multiple fleets are present, values are
-#' averaged across fleets.
+#' Returns a numeric vector of weight-at-age observations (type
+#' `"weight_at_age"`), ordered by age and year (plus one additional year) and
+#' using `-999` to indicate missing observations When multiple fleets are
+#' present, values are averaged across fleets.
 #'
 #' ## `model_age_to_length_conversion()`
-#' Returns a numeric vector of age-to-length conversion values. Values are
-#' ordered by age and length in the order defined by [FIMSFrame()]. When
-#' multiple values are present across a single age and length, they are
-#' averaged because `age_to_length_conversion` data cannot vary across fleets
-#' or time.
+#' Returns a numeric vector of age-to-length conversion observations.
+#' Observations are ordered by age and length in the order defined by
+#' [FIMSFrame()]. When multiple observations are present across a single age
+#' and length, they are averaged because `age_to_length_conversion` data cannot
+#' vary across fleets or time.
 #'
 #' @export
 #' @rdname model_
 #' @keywords FIMSFrame
 methods::setGeneric(
-  "model_landings",
-  function(x, fleet) standardGeneric("model_landings")
+  "model_catch",
+  function(x, fleet) standardGeneric("model_catch")
 )
 #' @rdname model_
 #' @keywords FIMSFrame
 methods::setMethod(
-  "model_landings", "FIMSFrame",
+  "model_catch", "FIMSFrame",
   function(x, fleet) {
     dplyr::filter(
       .data = x@data,
-      .data[["type"]] == "landings",
+      .data[["type"]] == "catch",
       .data[["fleet"]] %in% .env$fleet
     ) |>
-      dplyr::pull(.data[["value"]])
+      dplyr::pull(.data[["observed"]])
   }
 )
 #' @rdname model_
 #' @keywords FIMSFrame
 methods::setMethod(
-  "model_landings",
+  "model_catch",
   "data.frame",
-  function(x, fleet) model_landings(FIMSFrame(x), fleet)
+  function(x, fleet) model_catch(FIMSFrame(x), fleet)
 )
 
 #' @export
@@ -371,7 +371,7 @@ methods::setMethod(
       .data[["type"]] == "index",
       .data[["fleet"]] %in% .env$fleet
     ) |>
-      dplyr::pull(.data[["value"]])
+      dplyr::pull(.data[["observed"]])
   }
 )
 #' @rdname model_
@@ -399,7 +399,22 @@ methods::setMethod(
       .data[["type"]] == "age_comp",
       .data[["fleet"]] %in% .env$fleet
     ) |>
-      dplyr::pull(.data[["value"]])
+      dplyr::mutate(
+        sample_size = ifelse(
+          .data$observed == -999,
+          1,
+          unlist(
+            parse_data_distribution(.data$uncertainty)$size,
+            use.names = FALSE
+          )
+        ),
+        probabilities = ifelse(
+          .data$unit == "number",
+          .data$observed,
+          .data$observed * .data$sample_size
+        )
+      ) |>
+      dplyr::pull(.data[["probabilities"]])
   }
 )
 #' @rdname model_
@@ -438,7 +453,22 @@ methods::setMethod(
       .data[["type"]] == "length_comp",
       .data[["fleet"]] %in% .env$fleet
     ) |>
-      dplyr::pull(.data[["value"]])
+      dplyr::mutate(
+        sample_size = ifelse(
+          .data$observed == -999,
+          1,
+          unlist(
+            parse_data_distribution(.data$uncertainty)$size,
+            use.names = FALSE
+          )
+        ),
+        probabilities = ifelse(
+          .data$unit == "number",
+          .data$observed,
+          .data$observed * .data$sample_size
+        )
+      ) |>
+      dplyr::pull(.data[["probabilities"]])
   }
 )
 #' @rdname model_
@@ -475,7 +505,7 @@ methods::setMethod(
     if (length(all_fleets) > 1) {
       cli::cli_warn(c(
         "x" = "Multiple fleets found in weight_at_age data.",
-        "i" = "{.fn model_weight_at_age} will average values across fleets."
+        "i" = "{.fn model_weight_at_age} averages observations across fleets."
       ))
       model_data <- dplyr::group_by(
         .data = model_data,
@@ -483,17 +513,17 @@ methods::setMethod(
         .data[["age"]]
       ) |>
         dplyr::mutate(
-          value = ifelse(.data[["value"]] == -999, NA, .data[["value"]])
+          observed = ifelse(.data[["observed"]] == -999, NA, .data[["observed"]])
         ) |>
         dplyr::summarize(
-          value = mean(.data[["value"]], na.rm = TRUE)
+          observed = mean(.data[["observed"]], na.rm = TRUE)
         ) |>
         dplyr::mutate(
-          value = ifelse(is.nan(.data[["value"]]), -999, .data[["value"]])
+          observed = ifelse(is.nan(.data[["observed"]]), -999, .data[["observed"]])
         )
     }
     # Create time-series vector if only available by age
-    n_rows <- NROW(dplyr::filter(model_data, .data$value != -999))
+    n_rows <- NROW(dplyr::filter(model_data, .data$observed != -999))
     n_rows_needed <- get_n_ages(x) * (get_n_years(x) + 1)
     if (n_rows < n_rows_needed) {
       if (n_rows == get_n_ages(x)) {
@@ -502,7 +532,7 @@ methods::setMethod(
             # Adds a year for terminal year + 1 because to calculate
             # spawning biomass after fishing in terminal year
             get_n_years(x) + 1,
-            dplyr::filter(model_data, .data$value != -999),
+            dplyr::filter(model_data, .data$observed != -999),
             simplify = FALSE
           )
         )
@@ -514,7 +544,7 @@ methods::setMethod(
       }
     }
     model_data |>
-      dplyr::pull(.data[["value"]])
+      dplyr::pull(.data[["observed"]])
   }
 )
 #' @rdname model_
@@ -549,15 +579,15 @@ methods::setMethod(
         "`age_to_length_conversion` data is time- and fleet-invariant and
         should consist of {get_n_ages(x) * get_n_lengths(x)} rows not
         {NROW(model_data)} rows like what is provided. Data passed to the
-        model will be averages over timing and name."
+        model will be averaged over timing and name."
       )
     }
     model_data |>
       dplyr::group_by(.data[["age"]], .data[["length"]]) |>
       dplyr::summarize(
-        mean_value = mean(as.numeric(.data[["value"]]), na.rm = TRUE)
+        mean_observed = mean(as.numeric(.data[["observed"]]), na.rm = TRUE)
       ) |>
-      dplyr::pull(as.numeric(.data[["mean_value"]]))
+      dplyr::pull(as.numeric(.data[["mean_observed"]]))
   }
 )
 #' @rdname model_
@@ -597,6 +627,7 @@ methods::setMethod(
 #' }
 #'
 #' @importFrom graphics plot
+#' @importFrom stockplotr theme_noaa
 #' @method plot FIMSFrame
 #' @rdname plot
 #' @aliases plot,FIMSFrame,missing-method
@@ -614,7 +645,7 @@ methods::setMethod(
       dplyr::group_by(dplyr::across(
         dplyr::all_of(c("fleet", "timing", "type"))
       )) |>
-      dplyr::filter(.data$value != -999) |>
+      dplyr::filter(.data$observed != -999) |>
       dplyr::summarize(
         no = dplyr::n()
       ) |>
@@ -671,7 +702,35 @@ methods::setMethod(
 )
 
 is.FIMSFrame <- function(x) {
-  inherits(x, "FIMSFrame")
+  # Check if x is a FIMSFrame object
+  if (!inherits(x, "FIMSFrame")) {
+    cli::cli_abort(c(
+      "i" = "{.var x} should be a {.cls FIMSFrame} object.",
+      "x" = "{.var x} is a {.cls {class(x)}} object."
+    ))
+  }
+  # returns TRUE if x is a FIMSFrame object
+  invisible(TRUE)
+}
+
+# Validate fleet input and confirm it exists in the data.
+assert_presence_of_fleet <- function(data, fleet) {
+  if (!is.character(fleet) || length(fleet) != 1 || is.na(fleet)) {
+    cli::cli_abort(c(
+      "x" = "{.var fleet} must be a single non-missing character string.",
+      "i" = "{.var fleet} is of class {.cls {class(fleet)}} and has length {length(fleet)}."
+    ))
+  }
+
+  fleets <- get_fleets(data)
+  if (!fleet %in% fleets) {
+    cli::cli_abort(c(
+      "x" = "{.var fleet} is not present in the {.var data}.",
+      "i" = "Available fleet names are: {.val {fleets}}."
+    ))
+  }
+
+  invisible(TRUE)
 }
 
 # methods::setValidity ----
@@ -698,7 +757,7 @@ methods::setValidity(
     # Ensure composition data sum to 1.0 per group if units are proportions
     for (present_type in grep("_comp", present_types, value = TRUE)) {
       test <- object@data |>
-        dplyr::filter(.data$type == present_type, .data$value != -999) |>
+        dplyr::filter(.data$type == present_type, .data$observed != -999) |>
         dplyr::group_by(.data$fleet, .data$timing, .drop = FALSE) |>
         dplyr::group_map(.keep = TRUE, \(.x, .y) {
           validate_composition_data(.x)
@@ -729,8 +788,8 @@ validate_data_colnames <- function(data) {
   if (!"timing" %in% the_column_names) {
     errors <- c(errors, "data must contain 'timing'")
   }
-  if (!"value" %in% the_column_names) {
-    errors <- c(errors, "data must contain 'value'")
+  if (!"observed" %in% the_column_names) {
+    errors <- c(errors, "data must contain 'observed'")
   }
   if (!"unit" %in% the_column_names) {
     errors <- c(errors, "data must contain 'unit'")
@@ -743,7 +802,7 @@ validate_data_colnames <- function(data) {
 
 validate_composition_data <- function(data) {
   composition_type <- pretty_type(unique(data[["type"]]))
-  if (all(data[["value"]] == -999)) {
+  if (all(data[["observed"]] == -999)) {
     return(0)
   }
   groupings <- names(data)[
@@ -762,11 +821,11 @@ validate_composition_data <- function(data) {
       "x" = "There should only be one unit per grouping, units are {units}."
     )
   }
-  sum_of_value <- sum(data[["value"]])
-  if (all(units == "proportion") && abs(sum_of_value - 1.0) > 1e-8) {
+  sum_of_observed <- sum(data[["observed"]])
+  if (all(units == "proportion") && abs(sum_of_observed - 1.0) > 1e-3) {
     errors <- c(
       errors,
-      "x" = "The sum is equal to {sum_of_value}, not 1.0."
+      "x" = "The sum is equal to {sum_of_observed}, not 1.0."
     )
   }
   if (length(errors) > 0) {
@@ -783,7 +842,7 @@ validate_composition_data <- function(data) {
 }
 
 validate_dimension_of_conversion <- function(data, n_groups, n_timings) {
-  good_data <- dplyr::filter(data, .data$value != -999)
+  good_data <- dplyr::filter(data, .data$observed != -999)
   good_type <- unique(data[["type"]])
   if (length(good_type) > 1) {
     cli::cli_abort("Only one type of data can exist in {.var data}.")
@@ -829,7 +888,8 @@ validate_dimension_of_conversion <- function(data, n_groups, n_timings) {
 #' @details
 #' ## data
 #' The input data are both sorted (see the section below on sorting) and
-#' expanded before returning them in the data slot.
+#' expanded to include -999 observations for all missing rows before returning
+#' them in the data slot.
 #' ### Ages
 #' Currently, ages must be integers, i.e., FIMS cannot accommodate numeric ages
 #' like age 1.5 but we hope that this is something that we will be able to
@@ -841,23 +901,45 @@ validate_dimension_of_conversion <- function(data, n_groups, n_timings) {
 #' age in the model. For example, you cannot bin fish into bins that span
 #' multiple years, you must have age-2, age-3, and age-4 not just age-2 and
 #' age-4 fish in your composition data.
+#' ### Uncertainty
+#' Uncertainty information for your data contains information for fitting the
+#' model and for creating bootstrapped data sets. Right-handed formulas are
+#' used to specify the distribution your data is assumed to follow, the derived
+#' quantity in the model that the data is assumed to represent, and parameters
+#' associated with the assumed distribution. For example, catch data can be
+#' distributed using a normal or lognormal distribution and if you use a normal
+#' distribution the observation is assumed to represent `catch_expected` but if
+#' you use a lognormal distribution the observation is assumed to represent
+#' `log_catch_expected`. Therefore, for the former you would specify
+#' `"~dnorm(mean = catch_expected, sd = 0.01)"` and for the later you would
+#' specify `"~dlnorm(meanlog = log_catch_expected, sdlog = 0.01)"`. Where, the
+#' input value for sd or sdlog is the standard deviation of the mean or
+#' standard deviation of the log of the mean, respectively. The distribution
+#' names and argument names match the names used in R. Use [args()], e.g.,
+#' `args(dnorm)`, to get information on the argument names that are required
+#' for your distribution. And, use `?distributions` to get a list of
+#' distributions that have density functions in base R. To get information on
+#' available derived quantities to set the central tendency of the distribution
+#' to, you can create a fleet object and inspect the available names, e.g.,
+#' `names(methods::new(Fleet))`, or you can navigate to the Public Attributes
+#' section of the doxygen documentation for Fleet by running `?Fleet`.
 #' ### Sorting
 #' It is important that the order of the rows in the data are correct but it is
 #' not expected that the user will do this. Instead, the returned data are
 #' sorted using [dplyr::arrange()] before placing them in the data slot. Data
 #' are first sorted by data type, placing all `weight_at_age` data next to
-#' other `weight_at_age` data and all landings data next to landings data.
+#' other `weight_at_age` data and all catch data next to catch data.
 #' Thus, `age_comp` data will come first because their type is "age" and "a" is
 #' first in the alphabet. All other types will follow according to their order
 #' in the alphabet.
 #' Next, within each type, data are organized by fleet. So, `age_comp`
 #' information for fleet1 will come before survey1. Next, all data within type
 #' and fleet are arranged by timing, e.g., by year. That is the end of the
-#' sorting for time series data like landings and indices. The biological data
+#' sorting for time series data like catch and indices. The biological data
 #' are further sorted by bin. Thus, `age_comp` information will be arranged as
 #' follows:
 #'
-#' | type     | name     | timing  | age  | value  |
+#' | type     | name     | timing  | age  | observed  |
 #' |:-------- |:--------:|:-------:|:----:|-------:|
 #' | age_comp | fleet1   | 2022    | 1    | 0.3    |
 #' | age_comp | fleet1   | 2022    | 2    | 0.7    |
@@ -1117,7 +1199,7 @@ create_missing_data <- function(
   bins,
   timings,
   column,
-  types = c("landings", "index")
+  types = c("catch", "index")
 ) {
   bin_column <- if (!missing(column)) {
     rlang::sym(column)
@@ -1160,7 +1242,7 @@ create_missing_data <- function(
   }
   out_data |>
     dplyr::mutate(
-      value = -999
+      observed = -999
     ) |>
     dplyr::ungroup()
 }

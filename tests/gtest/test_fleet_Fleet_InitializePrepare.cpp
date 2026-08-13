@@ -25,13 +25,13 @@ namespace
             fit != catch_at_age_model->fleets.end(); ++fit) {
             auto &fleet = (*fit).second;
             auto& dq = catch_at_age_model->GetFleetDerivedQuantities(fleet->GetId());
-            EXPECT_EQ(dq["landings_numbers_at_age"].size(), n_years * n_ages);
-            EXPECT_EQ(dq["landings_weight_at_age"].size(), n_years * n_ages);
-            EXPECT_EQ(dq["landings_numbers_at_length"].size(), n_years * n_lengths);
-            EXPECT_EQ(dq["landings_weight"].size(), n_years);
-            EXPECT_EQ(dq["landings_numbers"].size(), n_years);
-            EXPECT_EQ(dq["landings_expected"].size(), n_years);
-            EXPECT_EQ(dq["log_landings_expected"].size(), n_years);
+            EXPECT_EQ(dq["catch_numbers_at_age"].size(), n_years * n_ages);
+            EXPECT_EQ(dq["catch_weight_at_age"].size(), n_years * n_ages);
+            EXPECT_EQ(dq["catch_numbers_at_length"].size(), n_years * n_lengths);
+            EXPECT_EQ(dq["catch_weight"].size(), n_years);
+            EXPECT_EQ(dq["catch_numbers"].size(), n_years);
+            EXPECT_EQ(dq["catch_expected"].size(), n_years);
+            EXPECT_EQ(dq["log_catch_expected"].size(), n_years);
             EXPECT_EQ(dq["agecomp_proportion"].size(), n_years * n_ages);
             EXPECT_EQ(dq["lengthcomp_proportion"].size(), n_years * n_lengths);
             EXPECT_EQ(dq["index_numbers_at_age"].size(), n_years * n_ages);
@@ -58,19 +58,19 @@ namespace
             auto &fleet = (*fit).second;
             auto& dq = catch_at_age_model->GetFleetDerivedQuantities(fleet->GetId());
 
-            EXPECT_EQ(dq["landings_numbers_at_age"], 
+            EXPECT_EQ(dq["catch_numbers_at_age"], 
                 fims::Vector(n_years * n_ages, 0.0));
-            EXPECT_EQ(dq["landings_weight_at_age"], 
+            EXPECT_EQ(dq["catch_weight_at_age"], 
                 fims::Vector(n_years * n_ages, 0.0));
-            EXPECT_EQ(dq["landings_numbers_at_length"], 
+            EXPECT_EQ(dq["catch_numbers_at_length"], 
                 fims::Vector(n_years * n_lengths, 0.0));
-            EXPECT_EQ(dq["landings_weight"], 
+            EXPECT_EQ(dq["catch_weight"], 
                 fims::Vector(n_years, 0.0));
-            EXPECT_EQ(dq["landings_numbers"], 
+            EXPECT_EQ(dq["catch_numbers"], 
                 fims::Vector(n_years, 0.0));
-            EXPECT_EQ(dq["landings_expected"], 
+            EXPECT_EQ(dq["catch_expected"], 
                 fims::Vector(n_years, 0.0));
-            EXPECT_EQ(dq["log_landings_expected"], 
+            EXPECT_EQ(dq["log_catch_expected"], 
                 fims::Vector(n_years, 0.0));
             EXPECT_EQ(dq["agecomp_proportion"], 
                 fims::Vector(n_years * n_ages, 0.0));

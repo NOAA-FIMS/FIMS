@@ -2,8 +2,7 @@ fims_input_types <- c(
   "age_comp",
   "age_to_length_conversion",
   "index",
-  # TODO: change to singular landing
-  "landings",
+  "catch",
   "length_comp",
   "weight_at_age"
 )

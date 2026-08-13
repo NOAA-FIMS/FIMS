@@ -13,7 +13,7 @@
 #' | `.truth`      | Observed data value (maps from `observed`)                |
 #' | `.pred`       | Model-expected value (maps from `expected`)               |
 #' | `.weight`     | Inverse-variance weight from `uncertainty` (optional)     |
-#' | `label`       | Parameter / quantity label, e.g. `"landings_expected"`    |
+#' | `label`       | Parameter / quantity label, e.g. `"catch_expected"`    |
 #' | `fleet`       | Fleet identifier (integer)                                |
 #' | `module_id`   | Unique module identifier                                  |
 #' | `distribution`| Likelihood distribution used for this data stream         |
@@ -36,8 +36,7 @@
 #' data("data_big")
 #' data_4_model <- FIMSFrame(data_big)
 #'
-#' fit <- create_default_parameters(
-#'   configurations = create_default_configurations(data = data_4_model),
+#' fit <- setup_default_parameters(
 #'   data = data_4_model
 #' ) |>
 #'   initialize_fims(data = data_4_model) |>
@@ -131,7 +130,7 @@ augment.FIMSFit <- function(x, include_weights = TRUE, ...) {
 #' By default the metrics are computed over **all** data streams combined.
 #' Pass one or more column names to `group_by` to get per-stream breakdowns
 #' (e.g., `group_by = "label"` gives one row per data-stream label such as
-#' `"landings_expected"`, `"age_comp_expected"`, etc.).
+#' `"catch_expected"`, `"age_comp_expected"`, etc.).
 #'
 #' @param x A `FIMSFit` object returned from [fit_fims()].
 #' @param metrics A [yardstick::metric_set()].  Defaults to
@@ -159,8 +158,7 @@ augment.FIMSFit <- function(x, include_weights = TRUE, ...) {
 #' data("data_big")
 #' data_4_model <- FIMSFrame(data_big)
 #'
-#' fit <- create_default_parameters(
-#'   configurations = create_default_configurations(data = data_4_model),
+#' fit <- setup_default_parameters(
 #'   data = data_4_model
 #' ) |>
 #'   initialize_fims(data = data_4_model) |>
@@ -170,7 +168,7 @@ augment.FIMSFit <- function(x, include_weights = TRUE, ...) {
 #' get_fit_metrics(fit)
 #'
 #' # Per-data-stream: one row-set per label
-#' # (e.g. "landings_expected", "index_expected", "age_comp_expected")
+#' # (e.g. "catch_expected", "index_expected", "age_comp_expected")
 #' get_fit_metrics(fit, group_by = "label")
 #'
 #' # Per-fleet with a custom metric set
@@ -261,7 +259,7 @@ NULL
 
 #' Extract a single data stream from a FIMSFit augmented tibble
 #'
-#' Convenience filter to pull out one specific data stream (e.g. the landings
+#' Convenience filter to pull out one specific data stream (e.g. the catch
 #' for a given module) so you can pass it directly to any yardstick metric or
 #' plot it.
 #'
@@ -276,7 +274,7 @@ NULL
 #' @param x A `FIMSFit` object **or** an already-augmented tibble from
 #'   `augment.FIMSFit()`.
 #' @param stream_label Character scalar.  The value of the `label` column to
-#'   retain, e.g., `"landings_expected"`, `"index_expected"`,
+#'   retain, e.g., `"catch_expected"`, `"index_expected"`,
 #'   `"agecomp_expected"`, or `"lengthcomp_expected"`.  If `NULL` (default),
 #'   no filtering on label is done.
 #' @param module_id Integer scalar.  The `module_id` of the fleet or survey to
@@ -291,21 +289,20 @@ NULL
 #' data("data_big")
 #' data_4_model <- FIMSFrame(data_big)
 #'
-#' fit <- create_default_parameters(
-#'   configurations = create_default_configurations(data = data_4_model),
+#' fit <- setup_default_parameters(
 #'   data = data_4_model
 #' ) |>
 #'   initialize_fims(data = data_4_model) |>
 #'   fit_fims(optimize = TRUE)
 #'
-#' # Landings for the fishing fleet (module_id 1) - compute RMSE
-#' get_fit_stream(fit, stream_label = "landings_expected", module_id = 1) |>
+#' # Catch for the fishing fleet (module_id 1) - compute RMSE
+#' get_fit_stream(fit, stream_label = "catch_expected", module_id = 1) |>
 #'   yardstick::rmse(truth = .truth, estimate = .pred)
 #'
 #' # Survey index stream (module_id 2 in the data_big example)
 #' get_fit_stream(fit, stream_label = "index_expected", module_id = 2)
 #'
-#' # All streams for fleet 1 (landings + age comp + length comp)
+#' # All streams for fleet 1 (catch + age comp + length comp)
 #' get_fit_stream(fit, module_id = 1)
 #' }
 #' @export

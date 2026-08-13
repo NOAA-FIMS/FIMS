@@ -11,9 +11,7 @@
 
 data <- FIMS::FIMSFrame(data_big)
 
-default_parameters <- create_default_configurations(data = data) |>
-  create_default_parameters(data = data) |>
-  tidyr::unnest(cols = data)
+default_parameters <- setup_default_parameters(data = data)
 
 ## IO correctness ----
 test_that("`initialize_fims()` works with correct inputs", {
@@ -27,8 +25,7 @@ test_that("`initialize_fims()` works with correct inputs", {
   #' @description Test that `initialize_fims()` returns a list when it is provided parameters that are nested.
   expect_type(
     initialize_fims(
-      parameters = create_default_configurations(data = data) |>
-        create_default_parameters(data = data),
+      parameters = setup_default_parameters(data = data),
       data = data
     ),
     "list"
@@ -44,17 +41,17 @@ test_that("`initialize_fims()` works with edge cases", {
     # to constant
     dplyr::mutate(
       estimation_type = dplyr::if_else(
-        time <= 11,
+        timing <= 11,
         "constant",
         estimation_type
       ),
       distribution_type = dplyr::if_else(
-        time <= 11,
+        timing <= 11,
         NA_character_,
         distribution_type
       ),
       distribution = dplyr::if_else(
-        time <= 11,
+        timing <= 11,
         NA_character_,
         distribution
       )
@@ -81,17 +78,14 @@ test_that("`initialize_fims()` works with edge cases", {
   )
   clear()
 
-  missing_recruitment_distribution <- create_default_configurations(data = data) |>
-    tidyr::unnest(cols = data) |>
-    dplyr::rows_update(
-      y = tibble::tibble(
-        module_name = "Recruitment",
-        distribution_type = NA_character_,
+  missing_recruitment_distribution <- setup_default_parameters(data = data) |>
+    dplyr::filter(module_name != "Recruitment") |>
+    dplyr::bind_rows(
+      setup_default_Recruitment(
+        data = data,
         distribution = NA_character_
-      ),
-      by = "module_name"
-    ) |>
-    create_default_parameters(data = data)
+      )
+    )
   init_parm_missing_distribution <- initialize_fims(
     parameters = missing_recruitment_distribution,
     data = data
@@ -185,28 +179,24 @@ test_that("`initialize_fims()` returns correct error messages", {
 
   ## Error handling ----
   test_that("`initialize_recruitment()` returns correct error messages", {
-    missing_recruitment_distribution <- create_default_configurations(data = data) |>
-      tidyr::unnest(cols = data) |>
-      dplyr::rows_update(
-        y = tibble::tibble(
-          module_name = "Recruitment",
-          distribution_type = NA_character_,
-          distribution = NA_character_
-        ),
-        by = "module_name"
-      ) |>
-      create_default_parameters(data = data)
+    missing_recruitment_distribution <- default_parameters |>
+      dplyr::filter(module_name != "Recruitment") |>
+      dplyr::bind_rows(
+        setup_default_Recruitment(
+          data = data,
+          distribution = NA_character_,
+        )
+      )
     missing_recruitment_distribution_error <-
       missing_recruitment_distribution |>
-      tidyr::unnest(cols = data) |>
       dplyr::rows_update(
         y = tibble::tibble(
           module_name = "Recruitment",
           label = "log_devs",
-          time = 2:get_n_years(data),
+          timing = 2:get_n_years(data),
           estimation_type = "random_effects"
         ),
-        by = c("module_name", "label", "time")
+        by = c("module_name", "label", "timing")
       )
 
     #' @description Test that `initialize_fims()` returns correct error with distribution estimation type mismatch.
@@ -223,10 +213,10 @@ test_that("`initialize_fims()` returns correct error messages", {
         y = tibble::tibble(
           module_name = "Recruitment",
           label = "log_devs",
-          time = 2:get_n_years(data),
+          timing = 2:get_n_years(data),
           estimation_type = "constant"
         ),
-        by = c("module_name", "label", "time")
+        by = c("module_name", "label", "timing")
       )
 
     #' @description Test that `initialize_recruitment()` handles missing distribution for recruitment correctly.
@@ -397,7 +387,7 @@ test_that("`initialize_fleet()` works with correct inputs", {
     data = data,
     fleet = "fleet1"
   )
-  landings <- FIMS:::initialize_landings(
+  catch <- FIMS:::initialize_catch(
     data = data,
     fleet = "fleet1"
   )
@@ -412,7 +402,7 @@ test_that("`initialize_fleet()` works with correct inputs", {
   )
   linked_ids <- c(
     selectivity = selectivity$get_id(),
-    landings = landings$get_id(),
+    catch = catch$get_id(),
     age_comp = age_comp$get_id(),
     length_comp = length_comp$get_id()
   )
@@ -433,29 +423,29 @@ test_that("`initialize_fleet()` works with correct inputs", {
       "get_id",
       "SetSelectivityID",
       "SetObservedLengthCompDataID",
-      "SetObservedLandingsDataID",
+      "SetObservedCatchDataID",
       "SetObservedIndexDataID",
       "SetObservedAgeCompDataID",
       "SetName",
       "GetObservedLengthCompDataID",
       "GetObservedAgeCompDataID",
       "GetObservedIndexDataID",
-      "GetObservedLandingsDataID"
+      "GetObservedCatchDataID"
     ) %in% names(result$.refClassDef@refMethods)
   ))
   clear()
 })
 
-# test_initialize_landings ----
+# test_initialize_catch ----
 ## IO correctness ----
-test_that("`initialize_landings()` works with correct inputs", {
-  #' @description Test that `initialize_landings()` returns an S4 object for fleet with landings.
-  result <- initialize_landings(
+test_that("`initialize_catch()` works with correct inputs", {
+  #' @description Test that `initialize_catch()` returns an S4 object for fleet with catch.
+  result <- initialize_catch(
     data = data,
     fleet = "fleet1"
   )
   expect_type(result, "S4")
-  #' @description Test that `initialize_landings()` creates a module with expected methods in the class definition method table.
+  #' @description Test that `initialize_catch()` creates a module with expected methods in the class definition method table.
   expect_true(all(
     c(
       "initialize",
@@ -463,11 +453,11 @@ test_that("`initialize_landings()` works with correct inputs", {
       "get_id"
     ) %in% names(result$.refClassDef@refMethods)
   ))
-  #' @description Test that `initialize_landings()` module contains landings_data field.
-  expect_true("landings_data" %in% names(result))
-  #' @description Test that `initialize_landings()` returns `NULL` if there are no landings for the fleet.
+  #' @description Test that `initialize_catch()` module contains catch_data field.
+  expect_true("catch_data" %in% names(result))
+  #' @description Test that `initialize_catch()` returns `NULL` if there are no catch for the fleet.
   expect_null(
-    initialize_landings(
+    initialize_catch(
       data,
       fleet = "survey1"
     )
@@ -476,10 +466,10 @@ test_that("`initialize_landings()` works with correct inputs", {
 })
 
 ## Error handling ----
-test_that("`initialize_landings()` returns correct error messages", {
-  #' @description Test that `initialize_landings()` handles unknown fleet correctly.
+test_that("`initialize_catch()` returns correct error messages", {
+  #' @description Test that `initialize_catch()` handles unknown fleet correctly.
   expect_error(
-    initialize_landings(
+    initialize_catch(
       data = data,
       fleet = "unknown_fleet"
     ),
@@ -507,7 +497,7 @@ test_that("`initialize_index()` works with correct inputs", {
   ))
   #' @description Test that `initialize_index()` module contains index_data field.
   expect_true("index_data" %in% names(result))
-  #' @description Test that `initialize_index()` returns `NULL` if there are no landings for the fleet.
+  #' @description Test that `initialize_index()` returns `NULL` if there are no catch for the fleet.
   expect_null(
     initialize_index(
       data,
@@ -556,7 +546,12 @@ test_that("`initialize_comp()` works with correct inputs", {
     data |>
       get_data() |>
       dplyr::filter(type == "age_comp", fleet == "fleet1") |>
-      dplyr::mutate(out = value * uncertainty) |>
+      dplyr::mutate(
+        out = observed * unlist(
+          parse_data_distribution(.data$uncertainty)$size,
+          use.names = FALSE
+        )
+      ) |>
       dplyr::pull(out)
   )
   clear()
@@ -583,7 +578,10 @@ test_that("`initialize_comp()` works with correct inputs", {
     data |>
       get_data() |>
       dplyr::filter(type == "length_comp", fleet == "fleet1") |>
-      dplyr::mutate(out = value * uncertainty) |>
+      dplyr::mutate(out = observed * unlist(
+        parse_data_distribution(.data$uncertainty)$size,
+        use.names = FALSE
+      )) |>
       dplyr::pull(out)
   )
   clear()
@@ -597,17 +595,17 @@ test_that("`initialize_fims()` works with edge cases", {
     # to constant
     dplyr::mutate(
       estimation_type = dplyr::if_else(
-        time <= 11,
+        timing <= 11,
         "constant",
         estimation_type
       ),
       distribution_type = dplyr::if_else(
-        time <= 11,
+        timing <= 11,
         NA_character_,
         distribution_type
       ),
       distribution = dplyr::if_else(
-        time <= 11,
+        timing <= 11,
         NA_character_,
         distribution
       )

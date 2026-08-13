@@ -32,7 +32,7 @@ test_that("`is.FIMSFit()` works with correct inputs", {
 
   expected_names <- c(
     "input", "obj", "opt", "max_gradient", "gradient", "report", "sdreport",
-    "number_of_parameters", "timing", "version", "model_output"
+    "number_of_parameters", "run_time", "version", "model_output"
   )
   #' @description Test a FIMSFit object has the correct slot names.
   expect_equal(
@@ -46,19 +46,19 @@ test_that("`is.FIMSFit()` returns correct outputs for edge cases", {
   #' @description Test that `is.FIMSFit("not_a_FIMSFit")` returns FALSE.
   expect_false(is.FIMSFit("not_a_FIMSFit"))
 
-  # Modify the total time to be more than a day
-  fit_age_length_comp@timing[["time_total"]] <- 86401 # 60*60*24+1
-  #' @description Test that `print(FIMSFit)` returns no error when the total time is more than a day.
+  # Modify the total run_time to be more than a day
+  fit_age_length_comp@run_time[["time_total"]] <- 86401 # 60*60*24+1
+  #' @description Test that `print(FIMSFit)` returns no error when the total run_time is more than a day.
   expect_no_error(print(fit_age_length_comp))
 
-  # Modify the total time to be more than a hour
-  fit_age_length_comp@timing[["time_total"]] <- 3601 # 60*60+1
-  #' @description Test that `print(FIMSFit)` returns no error when the total time is more than an hour.
+  # Modify the total run_time to be more than a hour
+  fit_age_length_comp@run_time[["time_total"]] <- 3601 # 60*60+1
+  #' @description Test that `print(FIMSFit)` returns no error when the total run_time is more than an hour.
   expect_no_error(print(fit_age_length_comp))
 
-  # Modify the total time to be more than a minute
-  fit_age_length_comp@timing[["time_total"]] <- 61 # 60+1
-  #' @description Test that `print(FIMSFit)` returns no error when the total time is more than a minute.
+  # Modify the total run_time to be more than a minute
+  fit_age_length_comp@run_time[["time_total"]] <- 61 # 60+1
+  #' @description Test that `print(FIMSFit)` returns no error when the total run_time is more than a minute.
   expect_no_error(print(fit_age_length_comp))
 })
 
@@ -126,15 +126,15 @@ test_that("fit_fims() errors when optimization fails to converge", {
 
   clear()
 
-  # Fix Landings sd at high value in penalized likelihood model to cause high standard errors
+  # Fix Catch sd at high value in penalized likelihood model to cause high standard errors
   parameters_4_model <- parameters |>
     dplyr::rows_update(
       tibble::tibble(
         label = "log_devs",
-        time = 2:get_n_years(data_age_comp),
+        timing = 2:get_n_years(data_age_comp),
         estimation_type = "fixed_effects"
       ),
-      by = c("label", "time")
+      by = c("label", "timing")
     ) |>
     dplyr::rows_update(
       tibble::tibble(
@@ -143,19 +143,19 @@ test_that("fit_fims() errors when optimization fails to converge", {
         estimation_type = "constant"
       ),
       by = c("module_name", "label")
-    ) |>
-    dplyr::rows_update(
-      tibble::tibble(
-        module_type = "Landings",
-        label = "log_sd",
-        time = 1:get_n_years(data_age_comp),
-        value = 10
-      ),
-      by = c("module_type", "label", "time")
     )
 
   initialized_model <- parameters_4_model |>
-    initialize_fims(data = data_age_comp)
+    initialize_fims(data = get_data(data_age_comp) |>
+      dplyr::rows_update(
+        tibble::tibble(
+          fleet = "fleet1",
+          type = "catch",
+          uncertainty = "~dlnorm(meanlog=log_catch_expected, sdlog = 10)",
+        ),
+        by = c("fleet", "type")
+      ) |>
+      FIMSFrame())
 
   #' @description Test that fit_fims() throws an informative warning when parameter SE values are too large.
   expect_warning(
@@ -170,10 +170,10 @@ test_that("fit_fims() errors when optimization fails to converge", {
     dplyr::rows_update(
       tibble::tibble(
         label = "log_devs",
-        time = 2:get_n_years(data_age_comp),
+        timing = 2:get_n_years(data_age_comp),
         estimation_type = "fixed_effects"
       ),
-      by = c("label", "time")
+      by = c("label", "timing")
     ) |>
     dplyr::rows_update(
       tibble::tibble(
@@ -186,10 +186,10 @@ test_that("fit_fims() errors when optimization fails to converge", {
     dplyr::rows_update(
       tibble::tibble(
         label = "log_M",
-        time = 1,
+        timing = 1,
         estimation_type = "fixed_effects"
       ),
-      by = c("label", "time")
+      by = c("label", "timing")
     )
 
   initialized_model <- parameters_4_model |>
@@ -227,9 +227,7 @@ test_that("fit_fims() errors when optimization fails to converge", {
   data("data_big", package = "FIMS")
   data_4_model <- FIMSFrame(data_big)
   # Create parameters
-  initialized_poor_model <- create_default_configurations(data_4_model) |>
-    create_default_parameters(data = data_4_model) |>
-    tidyr::unnest(cols = data) |>
+  initialized_poor_model <- setup_default_parameters(data = data_4_model) |>
     dplyr::rows_update(
       tibble::tibble(
         module_name = "Population",

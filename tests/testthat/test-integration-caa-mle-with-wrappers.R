@@ -216,11 +216,11 @@ test_that("catch-at-age model (estimation MLE with wrappers) works with mixed es
   )
 
   # Force fleet1's Fmort to be constant for the first 10 years.
-  # From years 11–30, the Fmort estimation type is fixed_effects.
+  # From years 11-30, the Fmort estimation type is fixed_effects.
   fit_mixed_estimation_types <- modified_parameters |>
     dplyr::mutate(
       estimation_type = dplyr::if_else(
-        fleet == "fleet1" & label == "log_Fmort" & time %in% 1:10,
+        fleet == "fleet1" & label == "log_Fmort" & timing %in% 1:10,
         "constant",
         estimation_type
       )
@@ -267,11 +267,11 @@ test_that("catch-at-age model (estimation MLE with wrappers) returns an error wh
       # log_devs has a special error when set to constant
       y = tibble::tibble(
         label = "log_devs",
-        time = 2:get_n_years(data_age_length_comp),
+        timing = 2:get_n_years(data_age_length_comp),
         distribution_type = NA_character_,
         distribution = NA_character_,
       ),
-      by = c("label", "time")
+      by = c("label", "timing")
     ) |>
     dplyr::rows_update(
       # log_sd has a special error when there isn't a log_devs or log_r parameter set
@@ -335,10 +335,10 @@ test_that("catch-at-age model (estimation MLE with wrappers) returns an error wh
     dplyr::rows_update(
       y = tibble::tibble(
         label = "log_devs",
-        time = 2:get_n_years(data_age_length_comp),
+        timing = 2:get_n_years(data_age_length_comp),
         estimation_type = "constant"
       ),
-      by = c("label", "time")
+      by = c("label", "timing")
     )
 
   #' @description Test that FIMS returns an error when log_devs are constant but Recruitment expects a distribution process.

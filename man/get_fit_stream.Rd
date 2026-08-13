@@ -11,7 +11,7 @@ get_fit_stream(x, stream_label = NULL, module_id = NULL, ...)
 \code{augment.FIMSFit()}.}
 
 \item{stream_label}{Character scalar.  The value of the \code{label} column to
-retain, e.g., \code{"landings_expected"}, \code{"index_expected"},
+retain, e.g., \code{"catch_expected"}, \code{"index_expected"},
 \code{"agecomp_expected"}, or \code{"lengthcomp_expected"}.  If \code{NULL} (default),
 no filtering on label is done.}
 
@@ -25,7 +25,7 @@ retain (e.g., \code{1} for the first fishing fleet, \code{2} for the first surve
 A \code{\link[tibble:tibble]{tibble::tibble()}} subset of the augmented data.
 }
 \description{
-Convenience filter to pull out one specific data stream (e.g. the landings
+Convenience filter to pull out one specific data stream (e.g. the catch
 for a given module) so you can pass it directly to any yardstick metric or
 plot it.
 }
@@ -42,21 +42,20 @@ are present in your fit, inspect \code{augment(fit)} directly.
 data("data_big")
 data_4_model <- FIMSFrame(data_big)
 
-fit <- create_default_parameters(
-  configurations = create_default_configurations(data = data_4_model),
+fit <- setup_default_parameters(
   data = data_4_model
 ) |>
   initialize_fims(data = data_4_model) |>
   fit_fims(optimize = TRUE)
 
-# Landings for the fishing fleet (module_id 1) - compute RMSE
-get_fit_stream(fit, stream_label = "landings_expected", module_id = 1) |>
+# Catch for the fishing fleet (module_id 1) - compute RMSE
+get_fit_stream(fit, stream_label = "catch_expected", module_id = 1) |>
   yardstick::rmse(truth = .truth, estimate = .pred)
 
 # Survey index stream (module_id 2 in the data_big example)
 get_fit_stream(fit, stream_label = "index_expected", module_id = 2)
 
-# All streams for fleet 1 (landings + age comp + length comp)
+# All streams for fleet 1 (catch + age comp + length comp)
 get_fit_stream(fit, module_id = 1)
 }
 }

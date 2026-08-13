@@ -44,25 +44,19 @@ sim_num <- 4
 # then map through the simulation iterations to apply iteration-specific
 # values from the operating model.
 data_age_length_comp <- FIMSFrame(data_big)
-default_parameters <- create_default_configurations(
-  data = data_age_length_comp
-) |>
-  create_default_parameters(
-    data = data_age_length_comp
-  )
+default_parameters <- setup_default_parameters(data = data_age_length_comp)
 
 modified_parameters <- purrr::map(1:sim_num, \(iter_id) {
   default_parameters |>
-    tidyr::unnest(cols = data) |>
     # Update log_Fmort input values for Fleet1
     dplyr::rows_update(
       tibble::tibble(
         fleet = "fleet1",
         label = "log_Fmort",
-        time = 1:get_n_years(data_age_length_comp),
+        timing = 1:get_n_years(data_age_length_comp),
         value = log(om_output_list[[iter_id]][["f"]]),
       ),
-      by = c("fleet", "label", "time")
+      by = c("fleet", "label", "timing")
     ) |>
     # Update selectivity parameters and log_q for survey1
     dplyr::rows_update(
@@ -73,14 +67,14 @@ modified_parameters <- purrr::map(1:sim_num, \(iter_id) {
       ),
       by = c("fleet", "label")
     ) |>
-    # Update log_devs in the Recruitment module (time steps 2–30)
+    # Update log_devs in the Recruitment module (timing steps 2-30)
     dplyr::rows_update(
       tibble::tibble(
         label = "log_devs",
-        time = 2:get_n_years(data_age_length_comp),
+        timing = 2:get_n_years(data_age_length_comp),
         value = om_input_list[[iter_id]][["logR.resid"]][-1]
       ),
-      by = c("label", "time")
+      by = c("label", "timing")
     ) |>
     # Update log_sd for log_devs in the Recruitment module
     dplyr::rows_update(

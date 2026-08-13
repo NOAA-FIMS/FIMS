@@ -33,12 +33,12 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
   std::shared_ptr<SelectivityBase<Type>>
       selectivity; /*!< selectivity component*/
 
-  // landings data
-  int fleet_observed_landings_data_id_m = -999; /*!< id of landings data */
+  // catch data
+  int fleet_observed_catch_data_id_m = -999; /*!< id of catch data */
   std::shared_ptr<fims_data_object::DataObject<Type>>
-      observed_landings_data; /*!< observed landings data*/
+      observed_catch_data; /*!< observed catch data*/
 
-  std::string observed_landings_units; /*!< is this fleet landings in weight*/
+  std::string observed_catch_units; /*!< is this fleet catch in weight*/
 
   // index data
   int fleet_observed_index_data_id_m = -999; /*!< id of index data */

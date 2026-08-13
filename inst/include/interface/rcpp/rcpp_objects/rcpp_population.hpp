@@ -156,16 +156,16 @@ class PopulationInterface : public PopulationInterfaceBase {
 
   // Population based derived quantities
   /**
-   * @brief Total annual landings removed from a population by all fleets in
+   * @brief Total annual catch removed from a population by all fleets in
    * weight.
    */
-  VariableVector total_landings_weight;
+  VariableVector total_catch_weight;
 
   /**
-   * @brief Total annual landings removed from a population by all fleets in
+   * @brief Total annual catch removed from a population by all fleets in
    * numbers.
    */
-  VariableVector total_landings_numbers;
+  VariableVector total_catch_numbers;
 
   /**
    * @brief Total annual fishing mortality a population is subject to.
@@ -263,8 +263,8 @@ class PopulationInterface : public PopulationInterfaceBase {
         proportion_female(other.proportion_female),
         ages(other.ages),
         name(other.name),
-        total_landings_weight(other.total_landings_weight),
-        total_landings_numbers(other.total_landings_numbers),
+        total_catch_weight(other.total_catch_weight),
+        total_catch_numbers(other.total_catch_numbers),
         mortality_F(other.mortality_F),
         mortality_M(other.mortality_M),
         mortality_Z(other.mortality_Z),

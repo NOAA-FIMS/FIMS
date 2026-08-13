@@ -12,7 +12,7 @@
 \alias{EWAAGrowth}
 \alias{Fleet}
 \alias{Index}
-\alias{Landings}
+\alias{Catch}
 \alias{LengthComp}
 \alias{LogDevsRecruitmentProcess}
 \alias{LogRRecruitmentProcess}
@@ -43,7 +43,7 @@ docs.
 \item \href{https://noaa-fims.github.io/FIMS/doxygen/classEWAAGrowthInterface.html}{EWAAGrowth}
 \item \href{https://noaa-fims.github.io/FIMS/doxygen/classFleetInterface.html}{Fleet}
 \item \href{https://noaa-fims.github.io/FIMS/doxygen/classIndexDataInterface.html}{Index}
-\item \href{https://noaa-fims.github.io/FIMS/doxygen/classLandingsDataInterface.html}{Landings}
+\item \href{https://noaa-fims.github.io/FIMS/doxygen/classCatchDataInterface.html}{Catch}
 \item \href{https://noaa-fims.github.io/FIMS/doxygen/classLengthCompDataInterface.html}{LengthComp}
 \item \href{https://noaa-fims.github.io/FIMS/doxygen/classLogDevsRecruitmentInterface.html}{LogDevsRecruitmentProcess}
 \item \href{https://noaa-fims.github.io/FIMS/doxygen/classLogRRecruitmentInterface.html}{LogRRecruitmentProcess}

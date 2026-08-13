@@ -7,9 +7,7 @@
 initialize_fims(parameters, data)
 }
 \arguments{
-\item{parameters}{A tibble returned from \code{\link[=create_default_parameters]{create_default_parameters()}}. The
-tibble can be nested, i.e., contain a data column, or unnested, i.e.,
-\code{tidyr::unnest(create_default_parameters(), cols = "data")}. Regardless, it
+\item{parameters}{A tibble returned from \code{\link[=setup_default_parameters]{setup_default_parameters()}}. It
 is the primary source of information for what is initialized. That is, if a
 fleet exists in the data but parameter information for how to specify
 selectivity for that fleet is not provided, then selectivity will not be
@@ -48,17 +46,14 @@ at least one fleet and population module.
 data("data_big", package = "FIMS")
 data_4_model <- FIMSFrame(data_big)
 # Instantiate modules
-parameters_list <- data_4_model |>
-  create_default_configurations() |>
-  create_default_parameters(data = data_4_model) |>
+parameters_list <- setup_default_parameters(data = data_4_model) |>
   initialize_fims(data = data_4_model)
 clear()
 }
 }
 \seealso{
 \itemize{
-\item \code{\link[=create_default_configurations]{create_default_configurations()}}
-\item \code{\link[=create_default_parameters]{create_default_parameters()}}
+\item \code{\link[=setup_default_parameters]{setup_default_parameters()}}
 \item \code{\link[=FIMSFrame]{FIMSFrame()}}
 \item \code{\link[=fit_fims]{fit_fims()}}
 \item \code{\link[=clear]{clear()}}

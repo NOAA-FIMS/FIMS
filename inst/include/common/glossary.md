@@ -41,7 +41,7 @@ Definitions of mathematical symbols used in FIMS equations.
 
 - \f$w_a\f$ — Weight at age \f$a\f$ (mt)
 
-## Catch and Landings
+## Catch
 
 - \f$C_{f,a,y}\f$ — Catch in numbers for fleet \f$f\f$ at age \f$a\f$ in year \f$y\f$
 - \f$CW_{f,y}\f$ — Catch weight for fleet \f$f\f$ in year \f$y\f$ (mt)

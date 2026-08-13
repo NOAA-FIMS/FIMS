@@ -2,9 +2,9 @@
 % Please edit documentation in R/fimsframe.R
 \name{model_}
 \alias{model_}
-\alias{model_landings}
-\alias{model_landings,FIMSFrame-method}
-\alias{model_landings,data.frame-method}
+\alias{model_catch}
+\alias{model_catch,FIMSFrame-method}
+\alias{model_catch,data.frame-method}
 \alias{model_index}
 \alias{model_index,FIMSFrame-method}
 \alias{model_index,data.frame-method}
@@ -22,11 +22,11 @@
 \alias{model_age_to_length_conversion,data.frame-method}
 \title{Get a vector of data to be passed to a FIMS module from a FIMSFrame object}
 \usage{
-model_landings(x, fleet)
+model_catch(x, fleet)
 
-\S4method{model_landings}{FIMSFrame}(x, fleet)
+\S4method{model_catch}{FIMSFrame}(x, fleet)
 
-\S4method{model_landings}{data.frame}(x, fleet)
+\S4method{model_catch}{data.frame}(x, fleet)
 
 model_index(x, fleet)
 
@@ -84,9 +84,9 @@ indexing.
 length "l", are used to convert lengths (input data) to ages (modeled) as
 a way to fit length data without estimating growth.
 
-\subsection{\code{model_landings()}}{
+\subsection{\code{model_catch()}}{
 
-Returns a numeric vector of landings data (type \code{"landings"}) for the
+Returns a numeric vector of catch data (type \code{"catch"}) for the
 specified fleet(s).
 }
 
@@ -111,19 +111,19 @@ conversion data are present in the \code{FIMSFrame} object.
 
 \subsection{\code{model_weight_at_age()}}{
 
-Returns a numeric vector of weight-at-age values (type \code{"weight_at_age"}),
-ordered by age and year (plus one additional year) and using \code{-999} to
-indicate missing values. When multiple fleets are present, values are
-averaged across fleets.
+Returns a numeric vector of weight-at-age observations (type
+\code{"weight_at_age"}), ordered by age and year (plus one additional year) and
+using \code{-999} to indicate missing observations When multiple fleets are
+present, values are averaged across fleets.
 }
 
 \subsection{\code{model_age_to_length_conversion()}}{
 
-Returns a numeric vector of age-to-length conversion values. Values are
-ordered by age and length in the order defined by \code{\link[=FIMSFrame]{FIMSFrame()}}. When
-multiple values are present across a single age and length, they are
-averaged because \code{age_to_length_conversion} data cannot vary across fleets
-or time.
+Returns a numeric vector of age-to-length conversion observations.
+Observations are ordered by age and length in the order defined by
+\code{\link[=FIMSFrame]{FIMSFrame()}}. When multiple observations are present across a single age
+and length, they are averaged because \code{age_to_length_conversion} data cannot
+vary across fleets or time.
 }
 }
 \keyword{FIMSFrame}

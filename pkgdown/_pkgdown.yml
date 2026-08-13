@@ -23,10 +23,11 @@ template:
 reference:
 - title: Data
   desc: >
-      Example dataset used in FIMS demonstrations and examples.
+      Example datasets used in demonstrations and other package data.
   contents:
   - data_big
   - fims_input_types
+  - fims_distributions
 
 - title: Run FIMS
   desc: Primary functions used when setting up or running a FIMS model.
@@ -35,7 +36,7 @@ reference:
   - "plot,FIMSFrame,missing-method"
   - starts_with("get_FIMSFrame")
   - starts_with("model_")
-  - starts_with("create_default_")
+  - starts_with("setup_default_")
   - has_keyword("distribution")
   - starts_with("initialize_")
   - has_keyword("fit_fims")

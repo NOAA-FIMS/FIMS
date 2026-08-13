@@ -14,17 +14,17 @@
 namespace
 {
 
-    // CatchAtAge_CalculateLandings
+    // CatchAtAge_CalculateCatch
     // IO correctness
-    TEST_F(CAAEvaluateTestFixture, HandlesCorrectInput_CatchAtAge_CalculateLandings)
+    TEST_F(CAAEvaluateTestFixture, HandlesCorrectInput_CatchAtAge_CalculateCatch)
     {
 
-        std::vector<double> landings_expected(n_years * n_fleets, 0);
-        // calculate landings numbers at age in population module
-         catch_at_age_model->CalculateLandingsNumbersAA(population, i_age_year, year, age);
+        std::vector<double> catch_expected(n_years * n_fleets, 0);
+        // calculate catch numbers at age in population module
+         catch_at_age_model->CalculateCatchNumbersAA(population, i_age_year, year, age);
 
-        catch_at_age_model->CalculateLandingsWeightAA(population, year, age);
-        catch_at_age_model->CalculateLandings(population, year, age);
+        catch_at_age_model->CalculateCatchWeightAA(population, year, age);
+        catch_at_age_model->CalculateCatch(population, year, age);
 
         for (int fleet_ = 0; fleet_ < population->n_fleets; fleet_++)
         {
@@ -32,9 +32,9 @@ namespace
             uint32_t fleet_id = population->fleets[fleet_]->GetId();
             auto& dq_fleet = catch_at_age_model->GetFleetDerivedQuantities(fleet_id);
 
-            landings_expected[index_yf] += dq_fleet["landings_weight_at_age"][i_age_year];
+            catch_expected[index_yf] += dq_fleet["catch_weight_at_age"][i_age_year];
 
-            EXPECT_EQ(landings_expected[index_yf], dq_fleet["landings_weight"][year]);
+            EXPECT_EQ(catch_expected[index_yf], dq_fleet["catch_weight"][year]);
         }
     }
 }

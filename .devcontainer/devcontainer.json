@@ -20,7 +20,7 @@
       "updatePackages": true
     },
     "ghcr.io/rocker-org/devcontainer-features/r-packages:1": {
-      "packages": "covr,dplyr,devtools,ggplot2,graphics,jsonlite,github::noaa-afsc/SparseNUTS,methods,Rcpp,RcppEigen,scales,snowfall,TMB,tibble,tidyr,usethis",
+      "packages": "covr,dplyr,devtools,furrr,ggplot2,graphics,jsonlite,github::noaa-afsc/SparseNUTS,methods,Rcpp,RcppEigen,scales,snowfall,TMB,tibble,tidyr,usethis,yardstick",
       "installSystemRequirements": true
     }
   },
@@ -30,6 +30,7 @@
   // },
   // Use 'forwardPorts' to make a list of ports inside the container available locally.
   // "forwardPorts": [],
+  "updateContentCommand": "Rscript -e 'options(repos = c(NOAA = \"https://noaa-fisheries-integrated-toolbox.r-universe.dev\", CRAN = \"https://cloud.r-project.org\")); pak::pak(\"nmfs-ost/stockplotr\")' || (echo '' && echo '>>> WARNING: {stockplotr} installation failed due to dependency issues! <<<' && echo 'The devcontainer has built successfully anyway. Once the editor opens, please open an R terminal and attempt to install it manually using pak::pak(\"nmfs-ost/stockplotr\").' && echo '')"
   // Use 'postCreateCommand' to run commands after the container is created.
   "postCreateCommand": "echo 'options(repos = c(CRAN = \"https://cloud.r-project.org\"))' | sudo sh -c 'cat - >>\"${R_HOME}/etc/Rprofile.site\"'",
   // Configure tool-specific properties.

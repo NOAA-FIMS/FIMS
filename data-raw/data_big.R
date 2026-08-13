@@ -183,7 +183,7 @@ for (iter in 1:sim_num) {
   for (i in seq_along(om_input[["year"]])) {
     for (j in seq_along(len_bins)) {
       for (k in seq_along(om_input[["ages"]])) {
-        # Calculate numbers and landings at length for each fleet and survey
+        # Calculate numbers and catch at length for each fleet and survey
         om_output[["N.length"]][i, j] <- om_output[["N.length"]][i, j] +
           age_to_length_conversion[k, j] *
             om_output[["N.age"]][i, k]
@@ -250,18 +250,22 @@ returned_om <- list(
 )
 
 ###############################################################################
-# Landings
+# Catch
 ###############################################################################
-landings_data <- data.frame(
+catch_data <- data.frame(
   # TODO: Should there be a type that are not removed but just noted,
   #       where obviously in this instance they are removed.
-  type = "landings",
+  type = "catch",
   fleet = names(returned_om[["om_output"]][["L.mt"]])[1],
   age = NA, # Not by age in this case, but there is a by age option.
   timing = returned_om[["om_input"]][["year"]],
-  value = returned_om[["em_input"]][["L.obs"]][[1]],
+  observed = returned_om[["em_input"]][["L.obs"]][[1]],
   unit = "mt", # metric tons
-  uncertainty = cv_2_sd(returned_om[["em_input"]][["cv.L"]][[1]])
+  uncertainty = paste(
+    "~ dlnorm(meanlog = log_catch_expected, sdlog = ",
+    cv_2_sd(returned_om[["em_input"]][["cv.L"]][[1]]),
+    ")"
+  )
 )
 
 ###############################################################################
@@ -272,9 +276,13 @@ index_data <- data.frame(
   fleet = names(returned_om[["om_output"]][["survey_index"]])[1],
   age = NA, # Not by age in this case, but there is a by age option.
   timing = returned_om[["om_input"]][["year"]],
-  value = returned_om[["em_input"]][["surveyB.obs"]][[1]],
+  observed = returned_om[["em_input"]][["surveyB.obs"]][[1]],
   unit = "mt",
-  uncertainty = cv_2_sd(returned_om[["em_input"]][["cv.survey"]][[1]])
+  uncertainty = paste(
+    "~ dlnorm(meanlog = log_index_expected, sdlog = ",
+    cv_2_sd(returned_om[["em_input"]][["cv.survey"]][[1]]),
+    ")"
+  )
 )
 
 ###############################################################################
@@ -285,14 +293,22 @@ age_data <- rbind(
     fleet = names(returned_om[["em_input"]][["n.L"]]),
     returned_om[["em_input"]][["L.age.obs"]][["fleet1"]],
     unit = "proportion",
-    uncertainty = returned_om[["em_input"]][["n.L"]][["fleet1"]],
+    uncertainty = paste(
+      "~ dmultinom(prob = agecomp_proportion, size = ",
+      returned_om[["em_input"]][["n.L"]][["fleet1"]],
+      ")"
+    ),
     timing = returned_om[["om_input"]][["year"]]
   ),
   data.frame(
     fleet = names(returned_om[["om_output"]][["survey_age_comp"]])[1],
     returned_om[["em_input"]][["survey.age.obs"]][[1]],
     unit = "proportion",
-    uncertainty = returned_om[["om_input"]][["n.survey"]][["survey1"]],
+    uncertainty = paste(
+      "~ dmultinom(prob = agecomp_proportion, size = ",
+      returned_om[["om_input"]][["n.survey"]][["survey1"]],
+      ")"
+    ),
     timing = returned_om[["om_input"]][["year"]]
   )
 ) |>
@@ -303,7 +319,7 @@ age_data <- rbind(
     cols = dplyr::starts_with("X"),
     names_prefix = "X",
     names_to = "age",
-    values_to = "value",
+    values_to = "observed",
     # Convert the "age" column from strings to integers
     names_transform = list(age = as.integer)
   )
@@ -318,7 +334,7 @@ weights_fishery <- data.frame(
   type = "weight_at_age",
   fleet = names(returned_om[["em_input"]][["n.L"]]),
   age = seq_along(returned_om[["om_input"]][["W.kg"]]),
-  value = returned_om[["om_input"]][["W.mt"]],
+  observed = returned_om[["om_input"]][["W.mt"]],
   uncertainty = NA,
   unit = "mt"
 )
@@ -337,7 +353,7 @@ weight_at_age_data <- merge(
 # {FIMS} data
 ###############################################################################
 # Add new column for length values and set to NA for all milestone 1 data
-data_big <- rbind(landings_data, index_data, age_data, weight_at_age_data) |>
+data_big <- rbind(catch_data, index_data, age_data, weight_at_age_data) |>
   dplyr::mutate(
     length = NA,
     .after = "age"
@@ -356,12 +372,9 @@ length_age_data <- data.frame(
     length(ages)
   ),
   timing = NA_integer_,
-  value = c(t(returned_om[["em_input"]][["age_to_length_conversion"]])),
+  observed = c(t(returned_om[["em_input"]][["age_to_length_conversion"]])),
   unit = "proportion",
-  uncertainty = c(
-    em_input[["n.L.lengthcomp"]][["fleet1"]],
-    em_input[["n.survey.lengthcomp"]][["survey1"]]
-  )
+  uncertainty = NA_character_
 )
 
 # Create a length-composition data frame that will be filled by transforming
@@ -372,23 +385,27 @@ length_comp_data <- data.frame(
   age = NA,
   length = rep(len_bins, length(timing_fishery[["timing"]]) * length(observers)),
   timing = rep(rep(timing_fishery[["timing"]], each = length(len_bins)), length(observers)),
-  value = c(
+  observed = c(
     c(t(returned_om[["em_input"]][["L.length.obs"]][["fleet1"]])),
     c(t(returned_om[["em_input"]][["survey.length.obs"]][["survey1"]]))
   ),
   unit = "proportion",
-  uncertainty = rep(
-    c(
-      em_input[["n.L.lengthcomp"]][["fleet1"]],
-      em_input[["n.survey.lengthcomp"]][["survey1"]]
+  uncertainty = paste(
+    "~ dmultinom(prob = lengthcomp_proportion, size = ",
+    rep(
+      c(
+        em_input[["n.L.lengthcomp"]][["fleet1"]],
+        em_input[["n.survey.lengthcomp"]][["survey1"]]
+      ),
+      length(len_bins) * length(timing_fishery[["timing"]])
     ),
-    length(len_bins) * length(timing_fishery[["timing"]])
+    ")"
   )
 )
 
 # Save individual dataframes to a single file for {testthat} integration tests
 save(
-  landings_data,
+  catch_data,
   index_data,
   age_data,
   weight_at_age_data,
