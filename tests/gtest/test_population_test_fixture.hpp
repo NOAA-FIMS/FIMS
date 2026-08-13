@@ -141,8 +141,7 @@ class CAAInitializeTestFixture : public testing::Test {
       derived_quantities["catch_numbers_at_length"] =
           fims::Vector<double>(fleet->n_years * fleet->n_lengths);
 
-      derived_quantities["catch_weight"] =
-          fims::Vector<double>(fleet->n_years);
+      derived_quantities["catch_weight"] = fims::Vector<double>(fleet->n_years);
 
       derived_quantities["catch_numbers"] =
           fims::Vector<double>(fleet->n_years);
@@ -501,8 +500,7 @@ class CAAEvaluateTestFixture : public testing::Test {
       derived_quantities["catch_numbers_at_length"] =
           fims::Vector<double>(fleet->n_years * fleet->n_lengths);
 
-      derived_quantities["catch_weight"] =
-          fims::Vector<double>(fleet->n_years);
+      derived_quantities["catch_weight"] = fims::Vector<double>(fleet->n_years);
 
       derived_quantities["catch_numbers"] =
           fims::Vector<double>(fleet->n_years);
@@ -797,8 +795,7 @@ class CAAPrepareTestFixture : public testing::Test {
       derived_quantities["catch_numbers_at_length"] =
           fims::Vector<double>(fleet->n_years * fleet->n_lengths);
 
-      derived_quantities["catch_weight"] =
-          fims::Vector<double>(fleet->n_years);
+      derived_quantities["catch_weight"] = fims::Vector<double>(fleet->n_years);
 
       derived_quantities["catch_numbers"] =
           fims::Vector<double>(fleet->n_years);
