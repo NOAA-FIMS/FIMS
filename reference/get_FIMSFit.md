@@ -53,10 +53,10 @@ get_number_of_parameters(x)
 # S4 method for class 'FIMSFit'
 get_number_of_parameters(x)
 
-get_timing(x)
+get_run_time(x)
 
 # S4 method for class 'FIMSFit'
-get_timing(x)
+get_run_time(x)
 
 get_version(x)
 
@@ -80,7 +80,7 @@ get_model_output(x)
 
 `get_input()` returns the list that was used to fit the FIMS model,
 which is the returned object from
-[`create_default_parameters()`](https://NOAA-FIMS.github.io/FIMS/reference/create_default_parameters.md).
+[`setup_default_parameters()`](https://NOAA-FIMS.github.io/FIMS/reference/setup_default_parameters.md).
 
 `get_report()` returns the TMB report, where anything that is flagged as
 reportable in the C++ code is returned.
@@ -114,7 +114,7 @@ uncertainties from a fitted model.
 number of fixed-effect parameters and the number of random-effect
 parameters in the model.
 
-`get_timing()` returns the amount of time it took to run the model in
+`get_run_time()` returns the amount of time it took to run the model in
 seconds as a `difftime` object.
 
 `get_version()` returns the `package_version` of FIMS that was used to
@@ -126,4 +126,4 @@ fit the model.
 
 - [`fit_fims()`](https://NOAA-FIMS.github.io/FIMS/reference/fit_fims.md)
 
-- [`create_default_parameters()`](https://NOAA-FIMS.github.io/FIMS/reference/create_default_parameters.md)
+- [`setup_default_parameters()`](https://NOAA-FIMS.github.io/FIMS/reference/setup_default_parameters.md)

@@ -31,7 +31,7 @@
     <nav class="navbar navbar-expand-lg fixed-top bg-light" data-bs-theme="light" aria-label="Site navigation"><div class="container">
     <img class="navlogo" src="https://noaa-fims.github.io/images/FIMS_logo3.png" alt="FIMS logo with a fish" width="60" align="left"><a class="navbar-brand me-2" href="index.html">FIMS</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.4.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.10.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -137,14 +137,8 @@ A comprehensive list of all the tools needed to build, test, and document FIMS c
 <span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"data_big"</span><span class="op">)</span></span>
 <span><span class="co"># Prepare data for FIMS model</span></span>
 <span><span class="va">data_4_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/FIMSFrame.html">FIMSFrame</a></span><span class="op">(</span><span class="va">data_big</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Create parameters</span></span>
-<span><span class="va">parameters</span> <span class="op">&lt;-</span> <span class="va">data_4_model</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="reference/create_default_configurations.html">create_default_configurations</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="reference/create_default_parameters.html">create_default_parameters</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">data_4_model</span><span class="op">)</span></span>
-<span></span>
 <span><span class="co"># Run the  model with optimization</span></span>
-<span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="va">parameters</span> <span class="op">|&gt;</span></span>
+<span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/setup_default_parameters.html">setup_default_parameters</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">data_4_model</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="reference/initialize_fims.html">initialize_fims</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">data_4_model</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="reference/fit_fims.html">fit_fims</a></span><span class="op">(</span>optimize <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="co"># Clear memory post-run</span></span>

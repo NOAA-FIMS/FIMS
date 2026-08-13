@@ -46,44 +46,39 @@ data("data_big")
 # See ?FIMSFrame for more information.
 fims_frame <- FIMSFrame(data_big)
 
-# Create default maturity parameters using internal function
-default_parameters <- create_default_configurations(fims_frame) |>
-  tidyr::unnest(cols = data) |>
-  FIMS:::create_default_maturity(data = fims_frame)
+# Set up default maturity parameters
+default_parameters <- FIMS::setup_default_Maturity(data = fims_frame)
 
 show(default_parameters)
 #> Found more than one class "tbl_df" in cache; using the first, from namespace 'FIMS'
 #> Also defined by 'tibble'
 #> Found more than one class "tbl_df" in cache; using the first, from namespace 'FIMS'
 #> Also defined by 'tibble'
-#> # A tibble: 2 × 12
-#>   model_family module_name module_type label      fleet   age length  time value
-#>   <chr>        <chr>       <chr>       <chr>      <chr> <dbl>  <dbl> <int> <dbl>
-#> 1 NA           Maturity    Logistic    inflectio… NA       NA     NA    NA     2
-#> 2 NA           Maturity    Logistic    slope      NA       NA     NA    NA     1
-#> # ℹ 3 more variables: estimation_type <chr>, distribution_type <chr>,
-#> #   distribution <chr>
+#> # A tibble: 2 × 11
+#>   module_name fleet module_type label    age length timing value estimation_type
+#>   <chr>       <chr> <chr>       <chr>  <dbl>  <dbl>  <int> <dbl> <chr>          
+#> 1 Maturity    NA    Logistic    infle…    NA     NA     NA     2 constant       
+#> 2 Maturity    NA    Logistic    slope     NA     NA     NA     1 constant       
+#> # ℹ 2 more variables: distribution_type <chr>, distribution <chr>
 
 # The default maturity parameters can be updated
 parameters <- default_parameters |>
   dplyr::rows_update(
     tibble::tibble(
-      model_family = "catch_at_age",
       module_name = "Maturity",
       label = c("inflection_point", "slope"),
-      value = c(2.25, 3),
+      value = c(2.25, 3)
     ),
     by = c("module_name", "label")
   )
 
 show(parameters)
-#> # A tibble: 2 × 12
-#>   model_family module_name module_type label      fleet   age length  time value
-#>   <chr>        <chr>       <chr>       <chr>      <chr> <dbl>  <dbl> <int> <dbl>
-#> 1 catch_at_age Maturity    Logistic    inflectio… NA       NA     NA    NA  2.25
-#> 2 catch_at_age Maturity    Logistic    slope      NA       NA     NA    NA  3   
-#> # ℹ 3 more variables: estimation_type <chr>, distribution_type <chr>,
-#> #   distribution <chr>
+#> # A tibble: 2 × 11
+#>   module_name fleet module_type label    age length timing value estimation_type
+#>   <chr>       <chr> <chr>       <chr>  <dbl>  <dbl>  <int> <dbl> <chr>          
+#> 1 Maturity    NA    Logistic    infle…    NA     NA     NA  2.25 constant       
+#> 2 Maturity    NA    Logistic    slope     NA     NA     NA  3    constant       
+#> # ℹ 2 more variables: distribution_type <chr>, distribution <chr>
 
 # Initialize maturity module based on the list of parameters
 maturity <- FIMS:::initialize_maturity(
@@ -120,10 +115,29 @@ been set up.
 
 # Initialize the population module and link the maturity module
 # The IDs of the growth and recruitment modules are pseudo code and don't exist
-population <- create_default_configurations(fims_frame) |>
-  tidyr::unnest(cols = data) |>
-  FIMS:::create_default_Population(data = fims_frame, log_rzero = log(1000000)) |>
-  dplyr::mutate(model_family = "catch_at_age") |>
+recruitment_defaults <- FIMS::setup_default_Recruitment(data = fims_frame)
+log_rzero <- recruitment_defaults |>
+  dplyr::filter(.data[["label"]] == "log_rzero") |>
+  dplyr::pull(.data[["value"]])
+
+population_defaults <- FIMS::setup_default_Population(
+  data = fims_frame
+)
+log_init_naa <- FIMS:::setup_default_log_init_naa(
+  n_ages = get_n_ages(fims_frame),
+  log_rzero = log_rzero,
+  log_M = log(0.2)
+)
+
+population <- population_defaults |>
+  dplyr::rows_update(
+    tibble::tibble(
+      label = "log_init_naa",
+      age = get_ages(fims_frame),
+      value = log_init_naa
+    ),
+    by = c("label", "age")
+  ) |>
   dplyr::bind_rows(parameters) |>
   FIMS:::initialize_population(
     data = fims_frame,
@@ -487,10 +501,19 @@ within `FIMS::initialize_population` but can also be done by hand with
 ``` r
 
 # Helper function
-population <- create_default_configurations(fims_frame) |>
-  tidyr::unnest(cols = data) |>
-  FIMS:::create_default_Population(data = fims_frame, log_rzero = log(1000000)) |>
-  dplyr::mutate(model_family = "catch_at_age") |>
+recruitment_defaults <- FIMS::setup_default_Recruitment(data = fims_frame)
+log_M <- log(0.2)
+log_init_naa <- FIMS:::setup_default_log_init_naa(
+  data = fims_frame,
+  recruitment_defaults = recruitment_defaults,
+  log_M = log_M
+)
+
+population <- FIMS::setup_default_Population(
+  data = fims_frame,
+  log_M = log_M,
+  log_init_naa = log_init_naa
+) |>
   dplyr::bind_rows(parameters) |>
   FIMS:::initialize_population(
     data = fims_frame,

@@ -539,40 +539,36 @@ Then run
 
 ### Step 4: Connect the module to the current R workflow
 
-The R wrapper functions use a two-stage workflow before
+The R wrapper functions use
+[`setup_default_parameters()`](https://NOAA-FIMS.github.io/FIMS/reference/setup_default_parameters.md)
+before
 [`initialize_fims()`](https://NOAA-FIMS.github.io/FIMS/reference/initialize_fims.md)
 constructs the TMB-ready objects:
 
-1.  **[`create_default_configurations()`](https://NOAA-FIMS.github.io/FIMS/reference/create_default_configurations.md)**
-    creates the configuration tibble that declares which module family
-    and module type should be used.
-2.  **[`create_default_parameters()`](https://NOAA-FIMS.github.io/FIMS/reference/create_default_parameters.md)**
-    turns those configurations into the parameter tibble that
-    `initialize_module()` reads.
+1.  **[`setup_default_parameters()`](https://NOAA-FIMS.github.io/FIMS/reference/setup_default_parameters.md)**
+    sets up a parameter tibble that `initialize_module()` reads.
 
 #### 4.1 Update the configuration and default-parameter path
 
 **Relevant files**
 
-- [R/create_default_configurations.R](https://NOAA-FIMS.github.io/FIMS/R/create_default_configurations.R)
-- [R/create_default_parameters.R](https://NOAA-FIMS.github.io/FIMS/R/create_default_parameters.R)
+- [R/setup_default_parameters.R](https://NOAA-FIMS.github.io/FIMS/R/setup_default_parameters.R)
 
 If you add a new module type that users should be able to request by
 default, update:
 
-- the configuration templates in
-  [`create_default_configurations()`](https://NOAA-FIMS.github.io/FIMS/reference/create_default_configurations.md),
-  and/or
 - the default-parameter helpers used by
-  [`create_default_parameters()`](https://NOAA-FIMS.github.io/FIMS/reference/create_default_parameters.md).
+  [`setup_default_parameters()`](https://NOAA-FIMS.github.io/FIMS/reference/setup_default_parameters.md).
 
 In the current code, top-level default parameter creation is routed
 through helpers such as:
 
-- `create_default_fleet()`
-- `create_default_recruitment()`
-- `create_default_maturity()`
-- `create_default_Population()`
+- [`setup_default_Fleet()`](https://NOAA-FIMS.github.io/FIMS/reference/setup_default_Fleet.md)
+- [`setup_default_Selectivity()`](https://NOAA-FIMS.github.io/FIMS/reference/setup_default_Selectivity.md)
+- [`setup_default_Recruitment()`](https://NOAA-FIMS.github.io/FIMS/reference/setup_default_Recruitment.md)
+- [`setup_default_Maturity()`](https://NOAA-FIMS.github.io/FIMS/reference/setup_default_Maturity.md)
+- [`setup_default_Growth()`](https://NOAA-FIMS.github.io/FIMS/reference/setup_default_Growth.md)
+- [`setup_default_Population()`](https://NOAA-FIMS.github.io/FIMS/reference/setup_default_Population.md)
 
 For a new selectivity or data-module option, you will often update an
 existing helper rather than add a brand new top-level function.
@@ -622,9 +618,7 @@ The full user-facing workflow in code is:
 
 ``` r
 
-parameters <- data_4_model |>
-  create_default_configurations() |>
-  create_default_parameters(data = data_4_model)
+parameters <- setup_default_parameters(data = data_4_model)
 
 input <- parameters |>
   initialize_fims(data = data_4_model)
@@ -743,11 +737,8 @@ Rcpp interface and TMB registration
 
 `R/FIMS-package.R` to export the class
 
-`R/create_default_configurations.R` if the new module type should appear
-in the default configuration
-
-`R/create_default_parameters.R` so default values and estimation
-settings are generated correctly
+`R/setup_default_parameters.R` so default values and estimation settings
+are generated correctly
 
 `R/initialize_modules.R` if the module needs special initialization or
 linking behavior
@@ -880,8 +871,7 @@ Study these existing modules as templates:
 - **Recruitment**:
   [inst/include/population_dynamics/recruitment/](https://NOAA-FIMS.github.io/FIMS/inst/include/population_dynamics/recruitment/)
 - **R parameter workflow**:
-  - [R/create_default_configurations.R](https://NOAA-FIMS.github.io/FIMS/R/create_default_configurations.R)
-  - [R/create_default_parameters.R](https://NOAA-FIMS.github.io/FIMS/R/create_default_parameters.R)
+  - [R/setup_default_parameters.R](https://NOAA-FIMS.github.io/FIMS/R/setup_default_parameters.R)
   - [R/initialize_modules.R](https://NOAA-FIMS.github.io/FIMS/R/initialize_modules.R)
 
 ### Documentation resources
@@ -907,9 +897,8 @@ Adding a new module usually means coordinating updates across:
 2.  **Rcpp interface and TMB registration** in
     `inst/include/interface/rcpp/rcpp_objects/`
 3.  **R exposure** in `src/fims_modules.hpp` and `R/FIMS-package.R`
-4.  **R configuration, parameter, and initialization workflow** in
-    `R/create_default_configurations.R`,
-    `R/create_default_parameters.R`, and `R/initialize_modules.R`
+4.  **R parameter and initialization workflow** in
+    `R/setup_default_parameters.R` and `R/initialize_modules.R`
 5.  **Tests and documentation** that explain and validate the new
     behavior
 

@@ -14,7 +14,7 @@ FIMSFit(
   obj,
   opt = list(),
   sdreport = list(),
-  timing = c(time_total = as.difftime(0, units = "secs")),
+  run_time = c(time_total = as.difftime(0, units = "secs")),
   version = utils::packageVersion("FIMS")
 )
 ```
@@ -42,7 +42,7 @@ FIMSFit(
   An object of the `sdreport` class as returned from
   [`TMB::sdreport()`](https://rdrr.io/pkg/TMB/man/sdreport.html).
 
-- timing:
+- run_time:
 
   A vector of at least length one, where all entries are of the
   `timediff` class and at least one is named "time_total". This
@@ -92,7 +92,7 @@ have the following slots:
   An object with the `sdreport` class containing the output from
   `TMB::sdreport(obj)`.
 
-- `timing`::
+- `run_time`::
 
   The length of time it took to run the model if it was optimized.
 

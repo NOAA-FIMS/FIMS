@@ -37,8 +37,8 @@ var classPopulationInterface =
     [ "spawning_biomass", "classPopulationInterface.html#a540415258a4ff06850352c9ac1015410", null ],
     [ "spawning_biomass_ratio", "classPopulationInterface.html#a83d11bfdf0a046650117f5537fef08d3", null ],
     [ "sum_selectivity", "classPopulationInterface.html#a97223beeb3c8a8531ad8215cb224431e", null ],
-    [ "total_landings_numbers", "classPopulationInterface.html#ae5515b3e5fc336b330dc69b7ec3585c1", null ],
-    [ "total_landings_weight", "classPopulationInterface.html#af619d04753f4ae6c8d95af7d3233066c", null ],
+    [ "total_catch_numbers", "classPopulationInterface.html#a6aa1f707b4be582d894fed7b1ca75ec1", null ],
+    [ "total_catch_weight", "classPopulationInterface.html#ad52dec6945385780ce27d5ffc7952150", null ],
     [ "unfished_biomass", "classPopulationInterface.html#a60c7b19f4c37e9c09865101649a7984c", null ],
     [ "unfished_numbers_at_age", "classPopulationInterface.html#a4f2e3d264833b7ad72f922fde3c3fcbc", null ],
     [ "unfished_spawning_biomass", "classPopulationInterface.html#a4258bc6f1082714420c7bb93a14949ac", null ]

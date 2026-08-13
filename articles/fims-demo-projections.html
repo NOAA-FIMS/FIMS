@@ -28,7 +28,7 @@
     <nav class="navbar navbar-expand-lg fixed-top bg-light" data-bs-theme="light" aria-label="Site navigation"><div class="container">
     <img class="navlogo" src="https://noaa-fims.github.io/images/FIMS_logo3.png" alt="FIMS logo with a fish" width="60" align="left"><a class="navbar-brand me-2" href="../index.html">FIMS</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.4.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.10.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -142,10 +142,7 @@ vignette</a>.</p>
 <code class="sourceCode R"><span><span class="co"># Bring the package data into your environment</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"data_big"</span><span class="op">)</span></span>
 <span><span class="co"># Prepare the package data for being used in a FIMS model</span></span>
-<span><span class="va">data_4_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/FIMSFrame.html">FIMSFrame</a></span><span class="op">(</span><span class="va">data_big</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Create default model configurations based on the data</span></span>
-<span><span class="va">default_configurations</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/create_default_configurations.html">create_default_configurations</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">data_4_model</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">data_4_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/FIMSFrame.html">FIMSFrame</a></span><span class="op">(</span><span class="va">data_big</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="projections">Projections<a class="anchor" aria-label="anchor" href="#projections"></a>
@@ -164,21 +161,21 @@ or biomass at maximum sustainable yield.</p>
 projections by extending the terminal year. Second,
 <code><a href="../reference/FIMSFrame.html">FIMS::FIMSFrame()</a></code> will fill in missing years of data for
 each data type based on your new maximum year in your data. These
-missing years use a value of -999 for each data type but users must
-provide the uncertainty level associated with the missing data because
-by default it will be filled with <code>NA</code>.</p>
+missing years use a observation of -999 for each data type but users
+must provide the uncertainty level associated with the missing data
+because by default it will be filled with <code>NA</code>.</p>
 <p>In the future, we will integrate more of the process below coded
 below into wrapper functions but as of FIMS version 0.8.0 some
 manipulation of the data is needed.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Add a single row of landings to the original data for the maximum year you</span></span>
+<code class="sourceCode R"><span><span class="co"># Add a single row of catch to the original data for the maximum year you</span></span>
 <span><span class="co"># want to project to</span></span>
 <span><span class="va">data_big_with_extra_year</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/add_row.html" class="external-link">add_row</a></span><span class="op">(</span></span>
 <span>  <span class="va">data_big</span>,</span>
-<span>  type <span class="op">=</span> <span class="st">"landings"</span>,</span>
+<span>  type <span class="op">=</span> <span class="st">"catch"</span>,</span>
 <span>  timing <span class="op">=</span> <span class="fu"><a href="../reference/get_FIMSFrame.html">get_end_year</a></span><span class="op">(</span><span class="va">data_4_model</span><span class="op">)</span> <span class="op">+</span> <span class="va">years_of_projection</span>,</span>
 <span>  fleet <span class="op">=</span> <span class="st">"fleet1"</span>,</span>
-<span>  value <span class="op">=</span> <span class="op">-</span><span class="fl">999</span>,</span>
+<span>  observed <span class="op">=</span> <span class="op">-</span><span class="fl">999</span>,</span>
 <span>  unit <span class="op">=</span> <span class="st">"mt"</span></span>
 <span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span></span>
@@ -207,18 +204,23 @@ manipulation of the data is needed.</p>
 <span>  <span class="co"># specifications</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
 <span>    uncertainty <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span></span>
-<span>      <span class="va">type</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"landings"</span><span class="op">)</span> <span class="op">&amp;</span> <span class="va">value</span> <span class="op">==</span> <span class="op">-</span><span class="fl">999</span>,</span>
-<span>      <span class="fl">0.00999975</span>,</span>
+<span>      <span class="va">type</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"catch"</span><span class="op">)</span> <span class="op">&amp;</span> <span class="va">observed</span> <span class="op">==</span> <span class="op">-</span><span class="fl">999</span>,</span>
+<span>      <span class="st">"~ dlnorm(meanlog = log_catch_expected, sdlog = 0.00999975)"</span>,</span>
 <span>      <span class="va">uncertainty</span></span>
 <span>    <span class="op">)</span>,</span>
 <span>    uncertainty <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span></span>
-<span>      <span class="va">type</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"index"</span><span class="op">)</span> <span class="op">&amp;</span> <span class="va">value</span> <span class="op">==</span> <span class="op">-</span><span class="fl">999</span>,</span>
-<span>      <span class="fl">0.19804220</span>,</span>
+<span>      <span class="va">type</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"index"</span><span class="op">)</span> <span class="op">&amp;</span> <span class="va">observed</span> <span class="op">==</span> <span class="op">-</span><span class="fl">999</span>,</span>
+<span>      <span class="st">"~ dlnorm(meanlog = log_index_expected, sdlog = 0.19804220)"</span>,</span>
 <span>      <span class="va">uncertainty</span></span>
 <span>    <span class="op">)</span>,</span>
 <span>    uncertainty <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span></span>
-<span>      <span class="va">type</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"age_comp"</span>, <span class="st">"length_comp"</span><span class="op">)</span> <span class="op">&amp;</span> <span class="va">value</span> <span class="op">==</span> <span class="op">-</span><span class="fl">999</span>,</span>
-<span>      <span class="fl">0</span>,</span>
+<span>      <span class="va">type</span> <span class="op">==</span> <span class="st">"age_comp"</span> <span class="op">&amp;</span> <span class="va">observed</span> <span class="op">==</span> <span class="op">-</span><span class="fl">999</span>,</span>
+<span>      <span class="st">"~ dmultinom(prob = agecomp_proportion, size = 0)"</span>,</span>
+<span>      <span class="va">uncertainty</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    uncertainty <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span></span>
+<span>      <span class="va">type</span> <span class="op">==</span> <span class="st">"length_comp"</span> <span class="op">&amp;</span> <span class="va">observed</span> <span class="op">==</span> <span class="op">-</span><span class="fl">999</span>,</span>
+<span>      <span class="st">"~ dmultinom(prob = lengthcomp_proportion, size = 0)"</span>,</span>
 <span>      <span class="va">uncertainty</span></span>
 <span>    <span class="op">)</span></span>
 <span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -238,17 +240,13 @@ done in the <a href="fims-demo.html">introductory vignette</a>.</p>
 <p>The major difference below compared to a model without projections is
 that the recruitment deviations for the projection period are fixed at
 zero. Because the new data object has all years,
-<code><a href="../reference/create_default_parameters.html">FIMS::create_default_parameters()</a></code> will ensure that all
+<code><a href="../reference/setup_default_parameters.html">FIMS::setup_default_parameters()</a></code> will ensure that all
 time-series parameters, e.g., natural mortality, have the correct
 dimensions.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Take the default configuration with the new data to create some default</span></span>
 <span><span class="co"># parameters that we alter to make the model behave a little better</span></span>
-<span><span class="va">parameters_projection</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/create_default_parameters.html">create_default_parameters</a></span><span class="op">(</span></span>
-<span>  configurations <span class="op">=</span> <span class="va">default_configurations</span>,</span>
-<span>  data <span class="op">=</span> <span class="va">data_4_projections</span></span>
-<span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">tidyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyr.tidyverse.org/reference/unnest.html" class="external-link">unnest</a></span><span class="op">(</span>cols <span class="op">=</span> <span class="va">data</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span><span class="va">parameters_projection</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/setup_default_parameters.html">setup_default_parameters</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">data_4_projections</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="co"># Update log_Fmort initial values for Fleet1</span></span>
 <span>  <span class="co"># Project the population forward with the terminal year mortality values.</span></span>
 <span>  <span class="co"># More advanced approaches are included in</span></span>
@@ -257,7 +255,7 @@ dimensions.</p>
 <span>    <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span></span>
 <span>      fleet <span class="op">=</span> <span class="st">"fleet1"</span>,</span>
 <span>      label <span class="op">=</span> <span class="st">"log_Fmort"</span>,</span>
-<span>      time <span class="op">=</span> <span class="fu"><a href="../reference/get_FIMSFrame.html">get_start_year</a></span><span class="op">(</span><span class="va">data_4_projections</span><span class="op">)</span><span class="op">:</span></span>
+<span>      timing <span class="op">=</span> <span class="fu"><a href="../reference/get_FIMSFrame.html">get_start_year</a></span><span class="op">(</span><span class="va">data_4_projections</span><span class="op">)</span><span class="op">:</span></span>
 <span>      <span class="fu"><a href="../reference/get_FIMSFrame.html">get_end_year</a></span><span class="op">(</span><span class="va">data_4_projections</span><span class="op">)</span>,</span>
 <span>      value <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
 <span>        <span class="fl">0.009459165</span>, <span class="fl">0.027288858</span>, <span class="fl">0.045063639</span>,</span>
@@ -273,17 +271,17 @@ dimensions.</p>
 <span>        <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0.499675368</span>, <span class="va">years_of_projection</span><span class="op">)</span></span>
 <span>      <span class="op">)</span><span class="op">)</span></span>
 <span>    <span class="op">)</span>,</span>
-<span>    by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"fleet"</span>, <span class="st">"label"</span>, <span class="st">"time"</span><span class="op">)</span></span>
+<span>    by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"fleet"</span>, <span class="st">"label"</span>, <span class="st">"timing"</span><span class="op">)</span></span>
 <span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="co"># Fix the projection period log_Fmort to constant</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/rows.html" class="external-link">rows_update</a></span><span class="op">(</span></span>
 <span>    <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span></span>
 <span>      label <span class="op">=</span> <span class="st">"log_Fmort"</span>,</span>
-<span>      time <span class="op">=</span> <span class="op">(</span><span class="fu"><a href="../reference/get_FIMSFrame.html">get_end_year</a></span><span class="op">(</span><span class="va">data_4_projections</span><span class="op">)</span> <span class="op">-</span> <span class="va">years_of_projection</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span><span class="op">:</span></span>
+<span>      timing <span class="op">=</span> <span class="op">(</span><span class="fu"><a href="../reference/get_FIMSFrame.html">get_end_year</a></span><span class="op">(</span><span class="va">data_4_projections</span><span class="op">)</span> <span class="op">-</span> <span class="va">years_of_projection</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span><span class="op">:</span></span>
 <span>      <span class="fu"><a href="../reference/get_FIMSFrame.html">get_end_year</a></span><span class="op">(</span><span class="va">data_4_projections</span><span class="op">)</span>,</span>
 <span>      estimation_type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"constant"</span>, <span class="va">years_of_projection</span><span class="op">)</span></span>
 <span>    <span class="op">)</span>,</span>
-<span>    by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"label"</span>, <span class="st">"time"</span><span class="op">)</span></span>
+<span>    by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"label"</span>, <span class="st">"timing"</span><span class="op">)</span></span>
 <span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="co"># Update selectivity parameters and log_q for survey1</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/rows.html" class="external-link">rows_update</a></span><span class="op">(</span></span>
@@ -294,11 +292,11 @@ dimensions.</p>
 <span>    <span class="op">)</span>,</span>
 <span>    by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"fleet"</span>, <span class="st">"label"</span><span class="op">)</span></span>
 <span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="co"># Update log_devs in the Recruitment module (time steps 2-end)</span></span>
+<span>  <span class="co"># Update log_devs in the Recruitment module (timing steps 2-end)</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/rows.html" class="external-link">rows_update</a></span><span class="op">(</span></span>
 <span>    <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span></span>
 <span>      label <span class="op">=</span> <span class="st">"log_devs"</span>,</span>
-<span>      time <span class="op">=</span> <span class="op">(</span><span class="fu"><a href="../reference/get_FIMSFrame.html">get_start_year</a></span><span class="op">(</span><span class="va">data_4_projections</span><span class="op">)</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span><span class="op">:</span></span>
+<span>      timing <span class="op">=</span> <span class="op">(</span><span class="fu"><a href="../reference/get_FIMSFrame.html">get_start_year</a></span><span class="op">(</span><span class="va">data_4_projections</span><span class="op">)</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span><span class="op">:</span></span>
 <span>      <span class="fu"><a href="../reference/get_FIMSFrame.html">get_end_year</a></span><span class="op">(</span><span class="va">data_4_projections</span><span class="op">)</span>,</span>
 <span>      value <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
 <span>        <span class="fl">0.43787763</span>, <span class="op">-</span><span class="fl">0.13299042</span>, <span class="op">-</span><span class="fl">0.43251973</span>, <span class="fl">0.64861200</span>, <span class="fl">0.50640852</span>,</span>
@@ -312,19 +310,19 @@ dimensions.</p>
 <span>      <span class="op">)</span>,</span>
 <span>      estimation_type <span class="op">=</span> <span class="st">"random_effects"</span></span>
 <span>    <span class="op">)</span>,</span>
-<span>    by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"label"</span>, <span class="st">"time"</span><span class="op">)</span></span>
+<span>    by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"label"</span>, <span class="st">"timing"</span><span class="op">)</span></span>
 <span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="co"># Fix the projection log recruitment deviations at zero</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/rows.html" class="external-link">rows_update</a></span><span class="op">(</span></span>
 <span>    <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span></span>
 <span>      label <span class="op">=</span> <span class="st">"log_devs"</span>,</span>
-<span>      time <span class="op">=</span> <span class="op">(</span><span class="fu"><a href="../reference/get_FIMSFrame.html">get_end_year</a></span><span class="op">(</span><span class="va">data_4_projections</span><span class="op">)</span> <span class="op">-</span> <span class="va">years_of_projection</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span><span class="op">:</span></span>
+<span>      timing <span class="op">=</span> <span class="op">(</span><span class="fu"><a href="../reference/get_FIMSFrame.html">get_end_year</a></span><span class="op">(</span><span class="va">data_4_projections</span><span class="op">)</span> <span class="op">-</span> <span class="va">years_of_projection</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span><span class="op">:</span></span>
 <span>      <span class="fu"><a href="../reference/get_FIMSFrame.html">get_end_year</a></span><span class="op">(</span><span class="va">data_4_projections</span><span class="op">)</span>,</span>
 <span>      estimation_type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"constant"</span>, <span class="va">years_of_projection</span><span class="op">)</span>,</span>
 <span>      distribution_type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="cn">NA</span>, <span class="va">years_of_projection</span><span class="op">)</span>,</span>
 <span>      distribution <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="cn">NA</span>, <span class="va">years_of_projection</span><span class="op">)</span></span>
 <span>    <span class="op">)</span>,</span>
-<span>    by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"label"</span>, <span class="st">"time"</span><span class="op">)</span></span>
+<span>    by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"label"</span>, <span class="st">"timing"</span><span class="op">)</span></span>
 <span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="co"># Update log_sd for log_devs in the Recruitment module</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/rows.html" class="external-link">rows_update</a></span><span class="op">(</span></span>
@@ -387,17 +385,17 @@ output will be in the same format that users are used to.</p>
 <span>  <span class="fu"><a href="../reference/fit_fims.html">fit_fims</a></span><span class="op">(</span>optimize <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## ✔ Starting optimization ...</span></span>
 <span><span class="co">## ℹ Restarting optimizer 3 times to improve gradient.</span></span>
-<span><span class="co">## ℹ Maximum gradient went from 0.00316 to 0.00022 after 3 steps.</span></span>
+<span><span class="co">## ℹ Maximum gradient went from 0.00222 to 0.00019 after 3 steps.</span></span>
 <span><span class="co">## ✔ Finished optimization</span></span>
 <span><span class="co">## ✔ Finished sdreport</span></span>
-<span><span class="co">## ℹ FIMS model version: 0.9.4.9000</span></span>
-<span><span class="co">## ℹ Total run time was 13.44177 seconds</span></span>
+<span><span class="co">## ℹ FIMS model version: 0.10.0</span></span>
+<span><span class="co">## ℹ Total run time was 7.10212 seconds</span></span>
 <span><span class="co">## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78</span></span>
-<span><span class="co">## ℹ Maximum gradient= 0.00022</span></span>
+<span><span class="co">## ℹ Maximum gradient= 0.00019</span></span>
 <span><span class="co">## ℹ Negative log likelihood (NLL):</span></span>
 <span><span class="co">## • Marginal NLL= 1624.68892</span></span>
 <span><span class="co">## • Total NLL= 1560.83065</span></span>
-<span><span class="co">## ℹ Terminal SB= 993.45041</span></span></code></pre>
+<span><span class="co">## ℹ Terminal SB= 993.45014</span></span></code></pre>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/Cpp_functions.html">clear</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 </div>
@@ -421,13 +419,7 @@ comparison.</p>
 <span>      <span class="op">)</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Warning: Unknown or uninitialised column: `era`.</span></span></code></pre>
-<pre><code><span><span class="co">## Warning in max(dat$year[dat$era == "time"], na.rm = TRUE): no non-missing</span></span>
-<span><span class="co">## arguments to max; returning -Inf</span></span></code></pre>
-<pre><code><span><span class="co">## Warning: Removed 1 row containing missing values or values outside the scale range</span></span>
-<span><span class="co">## (`geom_hline()`).</span></span></code></pre>
-<pre><code><span><span class="co">## Warning: Removed 1 row containing missing values or values outside the scale range</span></span>
-<span><span class="co">## (`geom_text()`).</span></span></code></pre>
+<pre><code><span><span class="co">## ! biomass_msy not found for age</span></span></code></pre>
 <p><img src="fims-demo-projections_files/figure-html/fit-plot-projections-1.png" class="r-plt" alt="Plot of spawning biomass for projection model." width="700"></p>
 </div>
 </div>

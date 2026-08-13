@@ -26,7 +26,7 @@ detailed usage, see the C++ docs.
 
 - [Index](https://noaa-fims.github.io/FIMS/doxygen/classIndexDataInterface.html)
 
-- [Landings](https://noaa-fims.github.io/FIMS/doxygen/classLandingsDataInterface.html)
+- [Catch](https://noaa-fims.github.io/FIMS/doxygen/classCatchDataInterface.html)
 
 - [LengthComp](https://noaa-fims.github.io/FIMS/doxygen/classLengthCompDataInterface.html)
 

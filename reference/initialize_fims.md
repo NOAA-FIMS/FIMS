@@ -19,13 +19,11 @@ initialize_fims(parameters, data)
 - parameters:
 
   A tibble returned from
-  [`create_default_parameters()`](https://NOAA-FIMS.github.io/FIMS/reference/create_default_parameters.md).
-  The tibble can be nested, i.e., contain a data column, or unnested,
-  i.e., `tidyr::unnest(create_default_parameters(), cols = "data")`.
-  Regardless, it is the primary source of information for what is
-  initialized. That is, if a fleet exists in the data but parameter
-  information for how to specify selectivity for that fleet is not
-  provided, then selectivity will not be initialized for that fleet.
+  [`setup_default_parameters()`](https://NOAA-FIMS.github.io/FIMS/reference/setup_default_parameters.md).
+  It is the primary source of information for what is initialized. That
+  is, if a fleet exists in the data but parameter information for how to
+  specify selectivity for that fleet is not provided, then selectivity
+  will not be initialized for that fleet.
 
 - data:
 
@@ -53,9 +51,7 @@ model, you should run
 
 ## See also
 
-- [`create_default_configurations()`](https://NOAA-FIMS.github.io/FIMS/reference/create_default_configurations.md)
-
-- [`create_default_parameters()`](https://NOAA-FIMS.github.io/FIMS/reference/create_default_parameters.md)
+- [`setup_default_parameters()`](https://NOAA-FIMS.github.io/FIMS/reference/setup_default_parameters.md)
 
 - [`FIMSFrame()`](https://NOAA-FIMS.github.io/FIMS/reference/FIMSFrame.md)
 
@@ -71,9 +67,7 @@ if (FALSE) { # \dontrun{
 data("data_big", package = "FIMS")
 data_4_model <- FIMSFrame(data_big)
 # Instantiate modules
-parameters_list <- data_4_model |>
-  create_default_configurations() |>
-  create_default_parameters(data = data_4_model) |>
+parameters_list <- setup_default_parameters(data = data_4_model) |>
   initialize_fims(data = data_4_model)
 clear()
 } # }

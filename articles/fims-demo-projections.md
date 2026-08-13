@@ -45,9 +45,6 @@ vignette](https://NOAA-FIMS.github.io/FIMS/articles/fims-demo.md).
 data("data_big")
 # Prepare the package data for being used in a FIMS model
 data_4_model <- FIMSFrame(data_big)
-
-# Create default model configurations based on the data
-default_configurations <- create_default_configurations(data = data_4_model)
 ```
 
 ## Projections
@@ -69,9 +66,10 @@ Below, we show how you can update your data to include 10 years of
 projections by extending the terminal year. Second,
 [`FIMS::FIMSFrame()`](https://NOAA-FIMS.github.io/FIMS/reference/FIMSFrame.md)
 will fill in missing years of data for each data type based on your new
-maximum year in your data. These missing years use a value of -999 for
-each data type but users must provide the uncertainty level associated
-with the missing data because by default it will be filled with `NA`.
+maximum year in your data. These missing years use a observation of -999
+for each data type but users must provide the uncertainty level
+associated with the missing data because by default it will be filled
+with `NA`.
 
 In the future, we will integrate more of the process below coded below
 into wrapper functions but as of FIMS version 0.8.0 some manipulation of
@@ -79,14 +77,14 @@ the data is needed.
 
 ``` r
 
-# Add a single row of landings to the original data for the maximum year you
+# Add a single row of catch to the original data for the maximum year you
 # want to project to
 data_big_with_extra_year <- dplyr::add_row(
   data_big,
-  type = "landings",
+  type = "catch",
   timing = get_end_year(data_4_model) + years_of_projection,
   fleet = "fleet1",
-  value = -999,
+  observed = -999,
   unit = "mt"
 ) |>
   dplyr::filter(
@@ -115,18 +113,23 @@ data_4_projections <- data_big_with_extra_year |>
   # specifications
   dplyr::mutate(
     uncertainty = ifelse(
-      type %in% c("landings") & value == -999,
-      0.00999975,
+      type %in% c("catch") & observed == -999,
+      "~ dlnorm(meanlog = log_catch_expected, sdlog = 0.00999975)",
       uncertainty
     ),
     uncertainty = ifelse(
-      type %in% c("index") & value == -999,
-      0.19804220,
+      type %in% c("index") & observed == -999,
+      "~ dlnorm(meanlog = log_index_expected, sdlog = 0.19804220)",
       uncertainty
     ),
     uncertainty = ifelse(
-      type %in% c("age_comp", "length_comp") & value == -999,
-      0,
+      type == "age_comp" & observed == -999,
+      "~ dmultinom(prob = agecomp_proportion, size = 0)",
+      uncertainty
+    ),
+    uncertainty = ifelse(
+      type == "length_comp" & observed == -999,
+      "~ dmultinom(prob = lengthcomp_proportion, size = 0)",
       uncertainty
     )
   ) |>
@@ -148,7 +151,7 @@ vignette](https://NOAA-FIMS.github.io/FIMS/articles/fims-demo.md).
 The major difference below compared to a model without projections is
 that the recruitment deviations for the projection period are fixed at
 zero. Because the new data object has all years,
-[`FIMS::create_default_parameters()`](https://NOAA-FIMS.github.io/FIMS/reference/create_default_parameters.md)
+[`FIMS::setup_default_parameters()`](https://NOAA-FIMS.github.io/FIMS/reference/setup_default_parameters.md)
 will ensure that all time-series parameters, e.g., natural mortality,
 have the correct dimensions.
 
@@ -156,11 +159,7 @@ have the correct dimensions.
 
 # Take the default configuration with the new data to create some default
 # parameters that we alter to make the model behave a little better
-parameters_projection <- create_default_parameters(
-  configurations = default_configurations,
-  data = data_4_projections
-) |>
-  tidyr::unnest(cols = data) |>
+parameters_projection <- setup_default_parameters(data = data_4_projections) |>
   # Update log_Fmort initial values for Fleet1
   # Project the population forward with the terminal year mortality values.
   # More advanced approaches are included in
@@ -169,7 +168,7 @@ parameters_projection <- create_default_parameters(
     tibble::tibble(
       fleet = "fleet1",
       label = "log_Fmort",
-      time = get_start_year(data_4_projections):
+      timing = get_start_year(data_4_projections):
       get_end_year(data_4_projections),
       value = log(c(
         0.009459165, 0.027288858, 0.045063639,
@@ -185,17 +184,17 @@ parameters_projection <- create_default_parameters(
         rep(0.499675368, years_of_projection)
       ))
     ),
-    by = c("fleet", "label", "time")
+    by = c("fleet", "label", "timing")
   ) |>
   # Fix the projection period log_Fmort to constant
   dplyr::rows_update(
     tibble::tibble(
       label = "log_Fmort",
-      time = (get_end_year(data_4_projections) - years_of_projection + 1):
+      timing = (get_end_year(data_4_projections) - years_of_projection + 1):
       get_end_year(data_4_projections),
       estimation_type = rep("constant", years_of_projection)
     ),
-    by = c("label", "time")
+    by = c("label", "timing")
   ) |>
   # Update selectivity parameters and log_q for survey1
   dplyr::rows_update(
@@ -206,11 +205,11 @@ parameters_projection <- create_default_parameters(
     ),
     by = c("fleet", "label")
   ) |>
-  # Update log_devs in the Recruitment module (time steps 2-end)
+  # Update log_devs in the Recruitment module (timing steps 2-end)
   dplyr::rows_update(
     tibble::tibble(
       label = "log_devs",
-      time = (get_start_year(data_4_projections) + 1):
+      timing = (get_start_year(data_4_projections) + 1):
       get_end_year(data_4_projections),
       value = c(
         0.43787763, -0.13299042, -0.43251973, 0.64861200, 0.50640852,
@@ -224,19 +223,19 @@ parameters_projection <- create_default_parameters(
       ),
       estimation_type = "random_effects"
     ),
-    by = c("label", "time")
+    by = c("label", "timing")
   ) |>
   # Fix the projection log recruitment deviations at zero
   dplyr::rows_update(
     tibble::tibble(
       label = "log_devs",
-      time = (get_end_year(data_4_projections) - years_of_projection + 1):
+      timing = (get_end_year(data_4_projections) - years_of_projection + 1):
       get_end_year(data_4_projections),
       estimation_type = rep("constant", years_of_projection),
       distribution_type = rep(NA, years_of_projection),
       distribution = rep(NA, years_of_projection)
     ),
-    by = c("label", "time")
+    by = c("label", "timing")
   ) |>
   # Update log_sd for log_devs in the Recruitment module
   dplyr::rows_update(
@@ -305,17 +304,17 @@ projection_fit <- parameters_projection |>
 
     ## ✔ Starting optimization ...
     ## ℹ Restarting optimizer 3 times to improve gradient.
-    ## ℹ Maximum gradient went from 0.00316 to 0.00022 after 3 steps.
+    ## ℹ Maximum gradient went from 0.00222 to 0.00019 after 3 steps.
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
-    ## ℹ FIMS model version: 0.9.4.9000
-    ## ℹ Total run time was 13.44177 seconds
+    ## ℹ FIMS model version: 0.10.0
+    ## ℹ Total run time was 7.10212 seconds
     ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
-    ## ℹ Maximum gradient= 0.00022
+    ## ℹ Maximum gradient= 0.00019
     ## ℹ Negative log likelihood (NLL):
     ## • Marginal NLL= 1624.68892
     ## • Total NLL= 1560.83065
-    ## ℹ Terminal SB= 993.45041
+    ## ℹ Terminal SB= 993.45014
 
 ``` r
 
@@ -346,16 +345,7 @@ stockplotr::plot_biomass(
 )
 ```
 
-    ## Warning: Unknown or uninitialised column: `era`.
-
-    ## Warning in max(dat$year[dat$era == "time"], na.rm = TRUE): no non-missing
-    ## arguments to max; returning -Inf
-
-    ## Warning: Removed 1 row containing missing values or values outside the scale range
-    ## (`geom_hline()`).
-
-    ## Warning: Removed 1 row containing missing values or values outside the scale range
-    ## (`geom_text()`).
+    ## ! biomass_msy not found for age
 
 ![Plot of spawning biomass for projection
 model.](fims-demo-projections_files/figure-html/fit-plot-projections-1.png)

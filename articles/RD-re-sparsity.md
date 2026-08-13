@@ -45,8 +45,8 @@ effects.
 
 These two approaches are anticipated to produce mathematically
 equivalent results while differing in their computational overhead.
-Confirming this equivalency and quantifying the runtime improvement will
-provide support for the change in approach relative to previous
+Confirming this equivalency and quantifying the run-time improvement
+will provide support for the change in approach relative to previous
 assessment models.
 
 ## Methods

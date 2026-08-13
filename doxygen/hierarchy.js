@@ -35,8 +35,8 @@ var hierarchy =
     [ "FIMSRcppInterfaceBase", "classFIMSRcppInterfaceBase.html", [
       [ "DataInterfaceBase", "classDataInterfaceBase.html", [
         [ "AgeCompDataInterface", "classAgeCompDataInterface.html", null ],
+        [ "CatchDataInterface", "classCatchDataInterface.html", null ],
         [ "IndexDataInterface", "classIndexDataInterface.html", null ],
-        [ "LandingsDataInterface", "classLandingsDataInterface.html", null ],
         [ "LengthCompDataInterface", "classLengthCompDataInterface.html", null ]
       ] ],
       [ "DistributionsInterfaceBase", "classDistributionsInterfaceBase.html", [

@@ -286,9 +286,9 @@ Public Member Functions</h2></td></tr>
 <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><b>SetupData</b> ()</td></tr>
 <tr class="memdesc:adacf560208a607b69e46d503f76fec14"><td class="mdescLeft">&#160;</td><td class="mdescRight">Loop over distributions and set links to distribution expected value if distribution is a data type. <br /></td></tr>
 <tr class="separator:adacf560208a607b69e46d503f76fec14"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1b5343821495e628e1cf91f1d4316a9c" id="r_a1b5343821495e628e1cf91f1d4316a9c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__info_1_1Information.html#a1b5343821495e628e1cf91f1d4316a9c">SetFleetLandingsData</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">valid_model</a>, std::shared_ptr&lt; <a class="el" href="structfims__popdy_1_1Fleet.html">fims_popdy::Fleet</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">f</a>)</td></tr>
-<tr class="memdesc:a1b5343821495e628e1cf91f1d4316a9c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set pointers to landings data in the fleet module.  <br /></td></tr>
-<tr class="separator:a1b5343821495e628e1cf91f1d4316a9c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac56888bad213856fb8b3211315d70ba8" id="r_ac56888bad213856fb8b3211315d70ba8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__info_1_1Information.html#ac56888bad213856fb8b3211315d70ba8">SetFleetCatchData</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">valid_model</a>, std::shared_ptr&lt; <a class="el" href="structfims__popdy_1_1Fleet.html">fims_popdy::Fleet</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">f</a>)</td></tr>
+<tr class="memdesc:ac56888bad213856fb8b3211315d70ba8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set pointers to catch data in the fleet module.  <br /></td></tr>
+<tr class="separator:ac56888bad213856fb8b3211315d70ba8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a21cdc88c62adecae565dc8d092445c3b" id="r_a21cdc88c62adecae565dc8d092445c3b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__info_1_1Information.html#a21cdc88c62adecae565dc8d092445c3b">SetFleetIndexData</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a> &amp;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">valid_model</a>, std::shared_ptr&lt; <a class="el" href="structfims__popdy_1_1Fleet.html">fims_popdy::Fleet</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">f</a>)</td></tr>
 <tr class="memdesc:a21cdc88c62adecae565dc8d092445c3b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set pointers to index data in the fleet module.  <br /></td></tr>
 <tr class="separator:a21cdc88c62adecae565dc8d092445c3b"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -1135,6 +1135,53 @@ template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e34
 
 </div>
 </div>
+<a id="ac56888bad213856fb8b3211315d70ba8" name="ac56888bad213856fb8b3211315d70ba8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac56888bad213856fb8b3211315d70ba8">&#9670;&#160;</a></span>SetFleetCatchData()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a> <a class="el" href="classfims__info_1_1Information.html">fims_info::Information</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::SetFleetCatchData </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a> &amp;&#160;</td>
+          <td class="paramname"><em>valid_model</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::shared_ptr&lt; <a class="el" href="structfims__popdy_1_1Fleet.html">fims_popdy::Fleet</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt;&#160;</td>
+          <td class="paramname"><em>f</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Set pointers to catch data in the fleet module. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">&amp;valid_model</td><td>reference to true/false boolean indicating whether model is valid. </td></tr>
+    <tr><td class="paramname">f</td><td>shared pointer to fleet module </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a id="a21cdc88c62adecae565dc8d092445c3b" name="a21cdc88c62adecae565dc8d092445c3b"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a21cdc88c62adecae565dc8d092445c3b">&#9670;&#160;</a></span>SetFleetIndexData()</h2>
 
@@ -1172,53 +1219,6 @@ template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e34
 </div><div class="memdoc">
 
 <p>Set pointers to index data in the fleet module. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">&amp;valid_model</td><td>reference to true/false boolean indicating whether model is valid. </td></tr>
-    <tr><td class="paramname">f</td><td>shared pointer to fleet module </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a id="a1b5343821495e628e1cf91f1d4316a9c" name="a1b5343821495e628e1cf91f1d4316a9c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1b5343821495e628e1cf91f1d4316a9c">&#9670;&#160;</a></span>SetFleetLandingsData()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a> <a class="el" href="classfims__info_1_1Information.html">fims_info::Information</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::SetFleetLandingsData </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a> &amp;&#160;</td>
-          <td class="paramname"><em>valid_model</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">std::shared_ptr&lt; <a class="el" href="structfims__popdy_1_1Fleet.html">fims_popdy::Fleet</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt;&#160;</td>
-          <td class="paramname"><em>f</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Set pointers to landings data in the fleet module. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">&amp;valid_model</td><td>reference to true/false boolean indicating whether model is valid. </td></tr>

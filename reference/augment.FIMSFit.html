@@ -12,7 +12,7 @@ rows without data observations are automatically dropped."><meta property="og:im
     <nav class="navbar navbar-expand-lg fixed-top bg-light" data-bs-theme="light" aria-label="Site navigation"><div class="container">
     <img class="navlogo" src="https://noaa-fims.github.io/images/FIMS_logo3.png" alt="FIMS logo with a fish" width="60" align="left"><a class="navbar-brand me-2" href="../index.html">FIMS</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.4.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.10.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -110,7 +110,7 @@ and optional <code>.weight</code>, plus grouping-metadata columns.</p>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>The returned tibble follows the conventions expected by every
-<code><a href="https://yardstick.tidymodels.org/reference/metric_set.html" class="external-link">yardstick::metric_set()</a></code> metric function:</p><table class="table table"><tr><td>Column</td><td>Role</td></tr><tr><td><code>.truth</code></td><td>Observed data value (maps from <code>observed</code>)</td></tr><tr><td><code>.pred</code></td><td>Model-expected value (maps from <code>expected</code>)</td></tr><tr><td><code>.weight</code></td><td>Inverse-variance weight from <code>uncertainty</code> (optional)</td></tr><tr><td><code>label</code></td><td>Parameter / quantity label, e.g. <code>"landings_expected"</code></td></tr><tr><td><code>fleet</code></td><td>Fleet identifier (integer)</td></tr><tr><td><code>module_id</code></td><td>Unique module identifier</td></tr><tr><td><code>distribution</code></td><td>Likelihood distribution used for this data stream</td></tr><tr><td><code>year_i</code></td><td>Year index (present when available in the estimates)</td></tr><tr><td><code>age_i</code></td><td>Age index  (present when available in the estimates)</td></tr></table></div>
+<code><a href="https://yardstick.tidymodels.org/reference/metric_set.html" class="external-link">yardstick::metric_set()</a></code> metric function:</p><table class="table table"><tr><td>Column</td><td>Role</td></tr><tr><td><code>.truth</code></td><td>Observed data value (maps from <code>observed</code>)</td></tr><tr><td><code>.pred</code></td><td>Model-expected value (maps from <code>expected</code>)</td></tr><tr><td><code>.weight</code></td><td>Inverse-variance weight from <code>uncertainty</code> (optional)</td></tr><tr><td><code>label</code></td><td>Parameter / quantity label, e.g. <code>"catch_expected"</code></td></tr><tr><td><code>fleet</code></td><td>Fleet identifier (integer)</td></tr><tr><td><code>module_id</code></td><td>Unique module identifier</td></tr><tr><td><code>distribution</code></td><td>Likelihood distribution used for this data stream</td></tr><tr><td><code>year_i</code></td><td>Year index (present when available in the estimates)</td></tr><tr><td><code>age_i</code></td><td>Age index  (present when available in the estimates)</td></tr></table></div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p><code><a href="get_fit_metrics.html">get_fit_metrics()</a></code>, <code><a href="get_FIMSFit.html">get_estimates()</a></code>, <code><a href="https://yardstick.tidymodels.org/reference/metrics.html" class="external-link">yardstick::metrics()</a></code></p></div>
@@ -122,8 +122,7 @@ and optional <code>.weight</code>, plus grouping-metadata columns.</p>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"data_big"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">data_4_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="FIMSFrame.html">FIMSFrame</a></span><span class="op">(</span><span class="va">data_big</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="create_default_parameters.html">create_default_parameters</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>  configurations <span class="op">=</span> <span class="fu"><a href="create_default_configurations.html">create_default_configurations</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">data_4_model</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="setup_default_parameters.html">setup_default_parameters</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>  data <span class="op">=</span> <span class="va">data_4_model</span></span></span>
 <span class="r-in"><span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="initialize_fims.html">initialize_fims</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">data_4_model</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>

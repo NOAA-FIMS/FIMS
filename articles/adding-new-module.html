@@ -28,7 +28,7 @@
     <nav class="navbar navbar-expand-lg fixed-top bg-light" data-bs-theme="light" aria-label="Site navigation"><div class="container">
     <img class="navlogo" src="https://noaa-fims.github.io/images/FIMS_logo3.png" alt="FIMS logo with a fish" width="60" align="left"><a class="navbar-brand me-2" href="../index.html">FIMS</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.4.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.10.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -738,41 +738,36 @@ namespace:</p>
 <div class="section level3">
 <h3 id="step-4-connect-the-module-to-the-current-r-workflow">Step 4: Connect the module to the current R workflow<a class="anchor" aria-label="anchor" href="#step-4-connect-the-module-to-the-current-r-workflow"></a>
 </h3>
-<p>The R wrapper functions use a two-stage workflow before
-<code><a href="../reference/initialize_fims.html">initialize_fims()</a></code> constructs the TMB-ready objects:</p>
+<p>The R wrapper functions use <code><a href="../reference/setup_default_parameters.html">setup_default_parameters()</a></code>
+before <code><a href="../reference/initialize_fims.html">initialize_fims()</a></code> constructs the TMB-ready
+objects:</p>
 <ol style="list-style-type: decimal">
 <li>
-<strong><code><a href="../reference/create_default_configurations.html">create_default_configurations()</a></code></strong>
-creates the configuration tibble that declares which module family and
-module type should be used.</li>
-<li>
-<strong><code><a href="../reference/create_default_parameters.html">create_default_parameters()</a></code></strong> turns
-those configurations into the parameter tibble that
-<code>initialize_module()</code> reads.</li>
+<strong><code><a href="../reference/setup_default_parameters.html">setup_default_parameters()</a></code></strong> sets up a
+parameter tibble that <code>initialize_module()</code> reads.</li>
 </ol>
 <div class="section level4">
 <h4 id="update-the-configuration-and-default-parameter-path">4.1 Update the configuration and default-parameter path<a class="anchor" aria-label="anchor" href="#update-the-configuration-and-default-parameter-path"></a>
 </h4>
 <p><strong>Relevant files</strong></p>
 <ul>
-<li><a href="../R/create_default_configurations.R">R/create_default_configurations.R</a></li>
-<li><a href="../R/create_default_parameters.R">R/create_default_parameters.R</a></li>
+<li><a href="../R/setup_default_parameters.R">R/setup_default_parameters.R</a></li>
 </ul>
 <p>If you add a new module type that users should be able to request by
 default, update:</p>
 <ul>
-<li>the configuration templates in
-<code><a href="../reference/create_default_configurations.html">create_default_configurations()</a></code>, and/or</li>
 <li>the default-parameter helpers used by
-<code><a href="../reference/create_default_parameters.html">create_default_parameters()</a></code>.</li>
+<code><a href="../reference/setup_default_parameters.html">setup_default_parameters()</a></code>.</li>
 </ul>
 <p>In the current code, top-level default parameter creation is routed
 through helpers such as:</p>
 <ul>
-<li><code>create_default_fleet()</code></li>
-<li><code>create_default_recruitment()</code></li>
-<li><code>create_default_maturity()</code></li>
-<li><code>create_default_Population()</code></li>
+<li><code><a href="../reference/setup_default_Fleet.html">setup_default_Fleet()</a></code></li>
+<li><code><a href="../reference/setup_default_Selectivity.html">setup_default_Selectivity()</a></code></li>
+<li><code><a href="../reference/setup_default_Recruitment.html">setup_default_Recruitment()</a></code></li>
+<li><code><a href="../reference/setup_default_Maturity.html">setup_default_Maturity()</a></code></li>
+<li><code><a href="../reference/setup_default_Growth.html">setup_default_Growth()</a></code></li>
+<li><code><a href="../reference/setup_default_Population.html">setup_default_Population()</a></code></li>
 </ul>
 <p>For a new selectivity or data-module option, you will often update an
 existing helper rather than add a brand new top-level function.</p>
@@ -820,9 +815,7 @@ new module needs explicit linking to other modules.</li>
 </h4>
 <p>The full user-facing workflow in code is:</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">parameters</span> <span class="op">&lt;-</span> <span class="va">data_4_model</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="../reference/create_default_configurations.html">create_default_configurations</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="../reference/create_default_parameters.html">create_default_parameters</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">data_4_model</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">parameters</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/setup_default_parameters.html">setup_default_parameters</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">data_4_model</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">input</span> <span class="op">&lt;-</span> <span class="va">parameters</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/initialize_fims.html">initialize_fims</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">data_4_model</span><span class="op">)</span></span></code></pre></div>
@@ -954,9 +947,7 @@ for the Rcpp interface and TMB registration</label></li>
 expose the class to R</label></li>
 <li><label><input type="checkbox"><code>R/FIMS-package.R</code> to
 export the class</label></li>
-<li><label><input type="checkbox"><code>R/create_default_configurations.R</code> if the
-new module type should appear in the default configuration</label></li>
-<li><label><input type="checkbox"><code>R/create_default_parameters.R</code> so default
+<li><label><input type="checkbox"><code>R/setup_default_parameters.R</code> so default
 values and estimation settings are generated correctly</label></li>
 <li><label><input type="checkbox"><code>R/initialize_modules.R</code>
 if the module needs special initialization or linking
@@ -1113,8 +1104,7 @@ with a minimal reproducible example.</li>
 <li>
 <strong>R parameter workflow</strong>:
 <ul>
-<li><a href="../R/create_default_configurations.R">R/create_default_configurations.R</a></li>
-<li><a href="../R/create_default_parameters.R">R/create_default_parameters.R</a></li>
+<li><a href="../R/setup_default_parameters.R">R/setup_default_parameters.R</a></li>
 <li><a href="../R/initialize_modules.R">R/initialize_modules.R</a></li>
 </ul>
 </li>
@@ -1155,9 +1145,8 @@ Documentation</a></li>
 <code>R/FIMS-package.R</code>
 </li>
 <li>
-<strong>R configuration, parameter, and initialization
-workflow</strong> in <code>R/create_default_configurations.R</code>,
-<code>R/create_default_parameters.R</code>, and
+<strong>R parameter and initialization workflow</strong> in
+<code>R/setup_default_parameters.R</code> and
 <code>R/initialize_modules.R</code>
 </li>
 <li>

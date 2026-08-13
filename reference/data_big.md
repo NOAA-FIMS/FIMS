@@ -21,7 +21,7 @@ A data frame with 2808 observations of 8 variables:
 - type:
 
   The type of input the row contains. Allowed types include age_comp,
-  age_to_length_conversion, index, landings, length_comp, and
+  age_to_length_conversion, index, catch, length_comp, and
   weight_at_age.
 
 - fleet:
@@ -34,7 +34,7 @@ A data frame with 2808 observations of 8 variables:
 - age:
 
   An integer age. Entry can be `NA` if information pertains to multiple
-  ages, e.g., total landings rather than landings of age-4 fish. In this
+  ages, e.g., total catch rather than catch of age-4 fish. In this
   dataset, ages start at one, therefore recruitment happens at age one
   not age zero.
 
@@ -47,26 +47,29 @@ A data frame with 2808 observations of 8 variables:
 
   The timing, i.e., year the data was collected.
 
-- value:
+- observed:
 
-  The measurement of interest.
+  The observed measurement of interest.
 
 - unit:
 
-  A character string specifying the units of `value`. Allowed units for
-  each data type are as follows. `mt` is used for `index`, `landings`,
+  A character string specifying the units of `observed`. Allowed units
+  for each data type are as follows. `mt` is used for `index`, `catch`,
   and `weight_at_age` data. `number` or `proportion` are each viable
   units for the composition data, where the former is the preferred unit
   of measurement.
 
 - uncertainty:
 
-  A real value providing a measurement of uncertainty for value. For
-  landings and indices of abundance this should be the standard
-  deviation of the logged observations if you are using the lognormal
-  distribution to fit your data. For composition data it will be your
-  input sample size.
+  A right-handed formula specifying the distributional assumptions for
+  the entry in `observed`. See
+  [`FIMSFrame()`](https://NOAA-FIMS.github.io/FIMS/reference/FIMSFrame.md)
+  for more information about this column.
 
 ## Source
 
 [www.github.com/NOAA-FIMS/Age_Structured_Stock_Assessment_Model_Comparison](https://NOAA-FIMS.github.io/FIMS/reference/www.github.com/NOAA-FIMS/Age_Structured_Stock_Assessment_Model_Comparison)
+
+## See also
+
+- [`FIMSFrame()`](https://NOAA-FIMS.github.io/FIMS/reference/FIMSFrame.md)

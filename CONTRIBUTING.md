@@ -118,7 +118,7 @@ Export the class in `R/FIMS-package.R` and run
 Update `R/create_default_configurations.R` if the new module type should
 appear in the default configuration workflow.
 
-Update `R/create_default_parameters.R` so default values and estimation
+Update `R/setup_default_parameters.R` so default values and estimation
 types are generated correctly.
 
 Update `R/initialize_modules.R` and

@@ -16,7 +16,7 @@ indexing."><meta property="og:image" content="https://NOAA-FIMS.github.io/FIMS/l
     <nav class="navbar navbar-expand-lg fixed-top bg-light" data-bs-theme="light" aria-label="Site navigation"><div class="container">
     <img class="navlogo" src="https://noaa-fims.github.io/images/FIMS_logo3.png" alt="FIMS logo with a fish" width="60" align="left"><a class="navbar-brand me-2" href="../index.html">FIMS</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.4.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.10.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -84,13 +84,13 @@ indexing.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">model_landings</span><span class="op">(</span><span class="va">x</span>, <span class="va">fleet</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">model_catch</span><span class="op">(</span><span class="va">x</span>, <span class="va">fleet</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S4 method for class 'FIMSFrame'</span></span>
-<span><span class="fu">model_landings</span><span class="op">(</span><span class="va">x</span>, <span class="va">fleet</span><span class="op">)</span></span>
+<span><span class="fu">model_catch</span><span class="op">(</span><span class="va">x</span>, <span class="va">fleet</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S4 method for class 'data.frame'</span></span>
-<span><span class="fu">model_landings</span><span class="op">(</span><span class="va">x</span>, <span class="va">fleet</span><span class="op">)</span></span>
+<span><span class="fu">model_catch</span><span class="op">(</span><span class="va">x</span>, <span class="va">fleet</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">model_index</span><span class="op">(</span><span class="va">x</span>, <span class="va">fleet</span><span class="op">)</span></span>
 <span></span>
@@ -160,10 +160,10 @@ column.</p>
 length "l", are used to convert lengths (input data) to ages (modeled) as
 a way to fit length data without estimating growth.</p>
 <div class="section">
-<h3 id="model-landings-"><code>model_landings()</code><a class="anchor" aria-label="anchor" href="#model-landings-"></a></h3>
+<h3 id="model-catch-"><code>model_catch()</code><a class="anchor" aria-label="anchor" href="#model-catch-"></a></h3>
 
 
-<p>Returns a numeric vector of landings data (type <code>"landings"</code>) for the
+<p>Returns a numeric vector of catch data (type <code>"catch"</code>) for the
 specified fleet(s).</p>
 </div>
 
@@ -196,21 +196,21 @@ conversion data are present in the <code>FIMSFrame</code> object.</p>
 <h3 id="model-weight-at-age-"><code>model_weight_at_age()</code><a class="anchor" aria-label="anchor" href="#model-weight-at-age-"></a></h3>
 
 
-<p>Returns a numeric vector of weight-at-age values (type <code>"weight_at_age"</code>),
-ordered by age and year (plus one additional year) and using <code>-999</code> to
-indicate missing values. When multiple fleets are present, values are
-averaged across fleets.</p>
+<p>Returns a numeric vector of weight-at-age observations (type
+<code>"weight_at_age"</code>), ordered by age and year (plus one additional year) and
+using <code>-999</code> to indicate missing observations When multiple fleets are
+present, values are averaged across fleets.</p>
 </div>
 
 <div class="section">
 <h3 id="model-age-to-length-conversion-"><code>model_age_to_length_conversion()</code><a class="anchor" aria-label="anchor" href="#model-age-to-length-conversion-"></a></h3>
 
 
-<p>Returns a numeric vector of age-to-length conversion values. Values are
-ordered by age and length in the order defined by <code><a href="FIMSFrame.html">FIMSFrame()</a></code>. When
-multiple values are present across a single age and length, they are
-averaged because <code>age_to_length_conversion</code> data cannot vary across fleets
-or time.</p>
+<p>Returns a numeric vector of age-to-length conversion observations.
+Observations are ordered by age and length in the order defined by
+<code><a href="FIMSFrame.html">FIMSFrame()</a></code>. When multiple observations are present across a single age
+and length, they are averaged because <code>age_to_length_conversion</code> data cannot
+vary across fleets or time.</p>
 </div>
 
     </div>

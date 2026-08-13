@@ -57,10 +57,10 @@ Plot Likelihood Profile Results
 
 The function generates line plots showing how the log-likelihood changes
 relative to its maximum value as a parameter is varied. Each data
-component (e.g., landings, index, age composition) is shown as a
-separate line, along with the total likelihood across all components.
-This reveals which data sources provide information about the parameter
-and whether there are conflicting signals.
+component (e.g., catch, index, age composition) is shown as a separate
+line, along with the total likelihood across all components. This
+reveals which data sources provide information about the parameter and
+whether there are conflicting signals.
 
 The y-axis shows the change in log-likelihood from the maximum
 (best-fit) value. A parabolic shape indicates a well-identified
@@ -102,9 +102,7 @@ data("data_big")
 data_4_model <- FIMSFrame(data_big)
 
 # Create parameters object
-parameters <- data_4_model |>
-  create_default_configurations() |>
-  create_default_parameters(data = data_4_model)
+parameters <- setup_default_parameters(data = data_4_model)
 
 # Run base model
 base_model <- parameters |>

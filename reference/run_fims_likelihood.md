@@ -27,32 +27,32 @@ run_fims_likelihood(
 
   A FIMSFit object returned by
   [`fit_fims()`](https://NOAA-FIMS.github.io/FIMS/reference/fit_fims.md).
-  Used to extract the estimated value of the parameter being profiled
+  Used to extract the estimated value of the parameter being profiled.
 
 - parameters:
 
   A FIMS parameters object created by
-  [`create_default_parameters()`](https://NOAA-FIMS.github.io/FIMS/reference/create_default_parameters.md),
-  containing the model configuration and initial parameter values
+  [`setup_default_parameters()`](https://NOAA-FIMS.github.io/FIMS/reference/setup_default_parameters.md),
+  containing the model configuration and initial parameter values,
 
 - data:
 
   A data frame, tibble, or FIMSFrame object containing the model data.
-  This should include all data types required by FIMS
+  This should include all data types required by FIMS.
 
 - module_name:
 
   A character string specifying the module containing the parameter to
   profile. Default is `NULL`. Required when the parameter name exists in
   multiple modules (e.g., multiple fleets). Examples include `"fleet1"`,
-  `"survey1"`, or `"recruitment"`
+  `"survey1"`, or `"recruitment"`.
 
 - parameter_name:
 
   A character string specifying the parameter to profile. Default is
   `"log_rzero"`. Must match a parameter name in the FIMS model. Common
   options include `"log_rzero"`, `"log_sigma_recruit"`, `"logit_steep"`,
-  or selectivity parameters
+  or selectivity parameters.
 
 - n_cores:
 
@@ -142,7 +142,7 @@ fisheries stock assessment. Fisheries Research 142: 61-74.
 - [`fit_fims()`](https://NOAA-FIMS.github.io/FIMS/reference/fit_fims.md)
   for fitting FIMS models
 
-- [`create_default_parameters()`](https://NOAA-FIMS.github.io/FIMS/reference/create_default_parameters.md)
+- [`setup_default_parameters()`](https://NOAA-FIMS.github.io/FIMS/reference/setup_default_parameters.md)
   for creating parameter objects
 
 Other diagnostic_functions:
@@ -160,9 +160,7 @@ data("data_big")
 data_4_model <- FIMSFrame(data_big)
 
 # Create a parameters object
-parameters <- data_4_model |>
-  create_default_configurations() |>
-  create_default_parameters(data = data_4_model)
+parameters <- setup_default_parameters(data = data_4_model)
 
 # Run the base model with optimization
 base_model <- parameters |>

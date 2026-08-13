@@ -28,7 +28,7 @@
     <nav class="navbar navbar-expand-lg fixed-top bg-light" data-bs-theme="light" aria-label="Site navigation"><div class="container">
     <img class="navlogo" src="https://noaa-fims.github.io/images/FIMS_logo3.png" alt="FIMS logo with a fish" width="60" align="left"><a class="navbar-brand me-2" href="../index.html">FIMS</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.4.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.10.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -213,20 +213,20 @@ tibble can be accessed using <code><a href="../reference/get_FIMSFrame.html">get
 <code class="sourceCode R"><span><span class="co"># Use show() to see what is stored in the FIMSFrame S4 class</span></span>
 <span><span class="fu">methods</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/methods/show.html" class="external-link">show</a></span><span class="op">(</span><span class="va">data_4_model</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## tbl_df of class 'FIMSFrame'</span></span></code></pre>
-<pre><code><span><span class="co">## with the following 'types': age_comp, landings, length_comp, weight_at_age, index, age_to_length_conversion</span></span></code></pre>
+<pre><code><span><span class="co">## with the following 'types': age_comp, catch, length_comp, weight_at_age, index, age_to_length_conversion</span></span></code></pre>
 <pre><code><span><span class="co">## Found more than one class "tbl_df" in cache; using the first, from namespace 'FIMS'</span></span></code></pre>
 <pre><code><span><span class="co">## Also defined by 'tibble'</span></span></code></pre>
 <pre><code><span><span class="co">## Found more than one class "tbl_df" in cache; using the first, from namespace 'FIMS'</span></span></code></pre>
 <pre><code><span><span class="co">## Also defined by 'tibble'</span></span></code></pre>
 <pre><code><span><span class="co">## # A tibble: 6 × 8</span></span>
-<span><span class="co">##   type     fleet    age length timing value unit       uncertainty</span></span>
-<span><span class="co">##   &lt;chr&gt;    &lt;chr&gt;  &lt;int&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;            &lt;dbl&gt;</span></span>
-<span><span class="co">## 1 age_comp fleet1     1     NA      1 0.07  proportion         200</span></span>
-<span><span class="co">## 2 age_comp fleet1     2     NA      1 0.1   proportion         200</span></span>
-<span><span class="co">## 3 age_comp fleet1     3     NA      1 0.115 proportion         200</span></span>
-<span><span class="co">## 4 age_comp fleet1     4     NA      1 0.15  proportion         200</span></span>
-<span><span class="co">## 5 age_comp fleet1     5     NA      1 0.1   proportion         200</span></span>
-<span><span class="co">## 6 age_comp fleet1     6     NA      1 0.05  proportion         200</span></span>
+<span><span class="co">##   type     fleet    age length timing observed unit       uncertainty           </span></span>
+<span><span class="co">##   &lt;chr&gt;    &lt;chr&gt;  &lt;int&gt;  &lt;dbl&gt;  &lt;dbl&gt;    &lt;dbl&gt; &lt;chr&gt;      &lt;chr&gt;                 </span></span>
+<span><span class="co">## 1 age_comp fleet1     1     NA      1    0.07  proportion ~ dmultinom(prob = ag…</span></span>
+<span><span class="co">## 2 age_comp fleet1     2     NA      1    0.1   proportion ~ dmultinom(prob = ag…</span></span>
+<span><span class="co">## 3 age_comp fleet1     3     NA      1    0.115 proportion ~ dmultinom(prob = ag…</span></span>
+<span><span class="co">## 4 age_comp fleet1     4     NA      1    0.15  proportion ~ dmultinom(prob = ag…</span></span>
+<span><span class="co">## 5 age_comp fleet1     5     NA      1    0.1   proportion ~ dmultinom(prob = ag…</span></span>
+<span><span class="co">## 6 age_comp fleet1     6     NA      1    0.05  proportion ~ dmultinom(prob = ag…</span></span>
 <span><span class="co">## additional slots include the following:fleets:</span></span>
 <span><span class="co">## [1] "fleet1"  "survey1"</span></span>
 <span><span class="co">## n_years:</span></span>
@@ -250,135 +250,40 @@ tibble can be accessed using <code><a href="../reference/get_FIMSFrame.html">get
 <span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">data_4_model</span>, max.level <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Formal class 'FIMSFrame' [package "FIMS"] with 9 slots</span></span></code></pre>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Use dplyr to subset the data for just the landings</span></span>
+<code class="sourceCode R"><span><span class="co"># Use dplyr to subset the data for just the catch</span></span>
 <span><span class="fu"><a href="../reference/get_FIMSFrame.html">get_data</a></span><span class="op">(</span><span class="va">data_4_model</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">type</span> <span class="op">==</span> <span class="st">"landings"</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">type</span> <span class="op">==</span> <span class="st">"catch"</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## # A tibble: 30 × 8</span></span>
-<span><span class="co">##    type     fleet    age length timing value unit  uncertainty</span></span>
-<span><span class="co">##    &lt;chr&gt;    &lt;chr&gt;  &lt;int&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;       &lt;dbl&gt;</span></span>
-<span><span class="co">##  1 landings fleet1    NA     NA      1  162. mt        0.01000</span></span>
-<span><span class="co">##  2 landings fleet1    NA     NA      2  461. mt        0.01000</span></span>
-<span><span class="co">##  3 landings fleet1    NA     NA      3  747. mt        0.01000</span></span>
-<span><span class="co">##  4 landings fleet1    NA     NA      4  997. mt        0.01000</span></span>
-<span><span class="co">##  5 landings fleet1    NA     NA      5  768. mt        0.01000</span></span>
-<span><span class="co">##  6 landings fleet1    NA     NA      6 1344. mt        0.01000</span></span>
-<span><span class="co">##  7 landings fleet1    NA     NA      7 1319. mt        0.01000</span></span>
-<span><span class="co">##  8 landings fleet1    NA     NA      8 2598. mt        0.01000</span></span>
-<span><span class="co">##  9 landings fleet1    NA     NA      9 1426. mt        0.01000</span></span>
-<span><span class="co">## 10 landings fleet1    NA     NA     10 1644. mt        0.01000</span></span>
+<span><span class="co">##    type  fleet    age length timing observed unit  uncertainty                  </span></span>
+<span><span class="co">##    &lt;chr&gt; &lt;chr&gt;  &lt;int&gt;  &lt;dbl&gt;  &lt;dbl&gt;    &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt;                        </span></span>
+<span><span class="co">##  1 catch fleet1    NA     NA      1     162. mt    ~ dlnorm(meanlog = log_catch…</span></span>
+<span><span class="co">##  2 catch fleet1    NA     NA      2     461. mt    ~ dlnorm(meanlog = log_catch…</span></span>
+<span><span class="co">##  3 catch fleet1    NA     NA      3     747. mt    ~ dlnorm(meanlog = log_catch…</span></span>
+<span><span class="co">##  4 catch fleet1    NA     NA      4     997. mt    ~ dlnorm(meanlog = log_catch…</span></span>
+<span><span class="co">##  5 catch fleet1    NA     NA      5     768. mt    ~ dlnorm(meanlog = log_catch…</span></span>
+<span><span class="co">##  6 catch fleet1    NA     NA      6    1344. mt    ~ dlnorm(meanlog = log_catch…</span></span>
+<span><span class="co">##  7 catch fleet1    NA     NA      7    1319. mt    ~ dlnorm(meanlog = log_catch…</span></span>
+<span><span class="co">##  8 catch fleet1    NA     NA      8    2598. mt    ~ dlnorm(meanlog = log_catch…</span></span>
+<span><span class="co">##  9 catch fleet1    NA     NA      9    1426. mt    ~ dlnorm(meanlog = log_catch…</span></span>
+<span><span class="co">## 10 catch fleet1    NA     NA     10    1644. mt    ~ dlnorm(meanlog = log_catch…</span></span>
 <span><span class="co">## # ℹ 20 more rows</span></span></code></pre>
 <p>The data contains the following fleets:</p>
 <ul>
 <li>A single fishery fleet with age- and length-composition,
-weight-at-age, and landings data</li>
+weight-at-age, and catch data</li>
 <li>A single survey with age- and length-composition and index data</li>
 </ul>
 <p>You can use the base R function <code>plot(data_4_model)</code> to
-see the data types (e.g., landings, length composition, age composition,
+see the data types (e.g., catch, length composition, age composition,
 etc.) in the <code>data_4_model</code> object by fleet.</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">data_4_model</span><span class="op">)</span></span></code></pre></div>
 <div class="figure">
-<img src="fims-demo_files/figure-html/FIMSFrame-plot-1.png" class="r-plt" alt="Landings are increasing over time and the index is decreasing over time.
+<img src="fims-demo_files/figure-html/FIMSFrame-plot-1.png" class="r-plt" alt="Catch are increasing over time and the index is decreasing over time.
 " width="700"><p class="caption">
 FIMS input values by type (panels) and fleet (colors).
 </p>
 </div>
-</div>
-</div>
-<div class="section level2">
-<h2 id="configurations">Configurations<a class="anchor" aria-label="anchor" href="#configurations"></a>
-</h2>
-<div class="section level3">
-<h3 id="create_default_configurations">
-<code>create_default_configurations()</code><a class="anchor" aria-label="anchor" href="#create_default_configurations"></a>
-</h3>
-<p>The <code><a href="../reference/create_default_configurations.html">create_default_configurations()</a></code> function is designed
-to generate a set of default configurations for the various components
-of a FIMS model. This includes configurations for fleets, growth,
-maturity, and recruitment modules. By leveraging the structure of the
-input data, the function can automatically set up initial configurations
-for each module. By passing the data and configurations to
-<code><a href="../reference/create_default_parameters.html">create_default_parameters()</a></code> the function can tailor the
-defaults based on how many fleets there are and what data types exist.
-For example, if you have three fleets, then
-<code><a href="../reference/create_default_configurations.html">create_default_configurations()</a></code> will set up three logistic
-selectivity modules.</p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Create default configurations based on the data</span></span>
-<span><span class="va">default_configurations</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/create_default_configurations.html">create_default_configurations</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">data_4_model</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">default_configurations</span></span></code></pre></div>
-<div class="sourceCode" id="cb19"><pre class="sourceCode numberSource numberLines"><code class="sourceCode"><span id="cb19-1"><a href="#cb19-1"></a>## # A tibble: 7 × 4</span>
-<span id="cb19-2"><a href="#cb19-2"></a>##   model_family module_name fleet   data            </span>
-<span id="cb19-3"><a href="#cb19-3"></a>##   &lt;chr&gt;        &lt;chr&gt;       &lt;chr&gt;   &lt;list&gt;          </span>
-<span id="cb19-4"><a href="#cb19-4"></a>## 1 catch_at_age Data        fleet1  &lt;tibble [3 × 3]&gt;</span>
-<span id="cb19-5"><a href="#cb19-5"></a>## 2 catch_at_age Selectivity fleet1  &lt;tibble [1 × 3]&gt;</span>
-<span id="cb19-6"><a href="#cb19-6"></a>## 3 catch_at_age Data        survey1 &lt;tibble [3 × 3]&gt;</span>
-<span id="cb19-7"><a href="#cb19-7"></a>## 4 catch_at_age Selectivity survey1 &lt;tibble [1 × 3]&gt;</span>
-<span id="cb19-8"><a href="#cb19-8"></a>## 5 catch_at_age Growth      &lt;NA&gt;    &lt;tibble [1 × 3]&gt;</span>
-<span id="cb19-9"><a href="#cb19-9"></a>## 6 catch_at_age Maturity    &lt;NA&gt;    &lt;tibble [1 × 3]&gt;</span>
-<span id="cb19-10"><a href="#cb19-10"></a>## 7 catch_at_age Recruitment &lt;NA&gt;    &lt;tibble [1 × 3]&gt;</span></code></pre></div>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># The output is a nested tibble, with details in the `data` column.</span></span>
-<span><span class="va">default_configurations_unnested</span> <span class="op">&lt;-</span> <span class="va">default_configurations</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">tidyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyr.tidyverse.org/reference/unnest.html" class="external-link">unnest</a></span><span class="op">(</span>cols <span class="op">=</span> <span class="va">data</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">default_configurations_unnested</span></span></code></pre></div>
-<div class="sourceCode" id="cb21"><pre class="sourceCode numberSource numberLines"><code class="sourceCode"><span id="cb21-1"><a href="#cb21-1"></a>## # A tibble: 11 × 6</span>
-<span id="cb21-2"><a href="#cb21-2"></a>##    model_family module_name fleet   module_type  distribution_type distribution</span>
-<span id="cb21-3"><a href="#cb21-3"></a>##    &lt;chr&gt;        &lt;chr&gt;       &lt;chr&gt;   &lt;chr&gt;        &lt;chr&gt;             &lt;chr&gt;       </span>
-<span id="cb21-4"><a href="#cb21-4"></a>##  1 catch_at_age Data        fleet1  AgeComp      Data              Dmultinom   </span>
-<span id="cb21-5"><a href="#cb21-5"></a>##  2 catch_at_age Data        fleet1  Landings     Data              Dlnorm      </span>
-<span id="cb21-6"><a href="#cb21-6"></a>##  3 catch_at_age Data        fleet1  LengthComp   Data              Dmultinom   </span>
-<span id="cb21-7"><a href="#cb21-7"></a>##  4 catch_at_age Selectivity fleet1  Logistic     &lt;NA&gt;              &lt;NA&gt;        </span>
-<span id="cb21-8"><a href="#cb21-8"></a>##  5 catch_at_age Data        survey1 AgeComp      Data              Dmultinom   </span>
-<span id="cb21-9"><a href="#cb21-9"></a>##  6 catch_at_age Data        survey1 Index        Data              Dlnorm      </span>
-<span id="cb21-10"><a href="#cb21-10"></a>##  7 catch_at_age Data        survey1 LengthComp   Data              Dmultinom   </span>
-<span id="cb21-11"><a href="#cb21-11"></a>##  8 catch_at_age Selectivity survey1 Logistic     &lt;NA&gt;              &lt;NA&gt;        </span>
-<span id="cb21-12"><a href="#cb21-12"></a>##  9 catch_at_age Growth      &lt;NA&gt;    EWAA         &lt;NA&gt;              &lt;NA&gt;        </span>
-<span id="cb21-13"><a href="#cb21-13"></a>## 10 catch_at_age Maturity    &lt;NA&gt;    Logistic     &lt;NA&gt;              &lt;NA&gt;        </span>
-<span id="cb21-14"><a href="#cb21-14"></a>## 11 catch_at_age Recruitment &lt;NA&gt;    BevertonHolt process           Dnorm</span></code></pre></div>
-</div>
-<div class="section level3">
-<h3 id="update-configurations">Update configurations<a class="anchor" aria-label="anchor" href="#update-configurations"></a>
-</h3>
-<p>The default_configurations are just a starting point. Functions
-(e.g., <code>rows_*()</code>) from <a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a> can be used to
-modify the default configurations as needed. For example, logistic
-selectivity for survey1 can be changed to double logistic
-selectivity.</p>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Update the module_type for survey1's selectivity</span></span>
-<span><span class="va">updated_configurations</span> <span class="op">&lt;-</span> <span class="va">default_configurations_unnested</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/rows.html" class="external-link">rows_update</a></span><span class="op">(</span></span>
-<span>    y <span class="op">=</span> <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span></span>
-<span>      module_name <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Selectivity"</span><span class="op">)</span>,</span>
-<span>      fleet <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"survey1"</span><span class="op">)</span>,</span>
-<span>      module_type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"DoubleLogistic"</span><span class="op">)</span></span>
-<span>    <span class="op">)</span>,</span>
-<span>    by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"module_name"</span>, <span class="st">"fleet"</span><span class="op">)</span></span>
-<span>  <span class="op">)</span></span>
-<span></span>
-<span><span class="va">updated_configurations</span></span></code></pre></div>
-<div class="sourceCode" id="cb23"><pre class="sourceCode numberSource numberLines"><code class="sourceCode"><span id="cb23-1"><a href="#cb23-1"></a>## # A tibble: 11 × 6</span>
-<span id="cb23-2"><a href="#cb23-2"></a>##    model_family module_name fleet   module_type   distribution_type distribution</span>
-<span id="cb23-3"><a href="#cb23-3"></a>##    &lt;chr&gt;        &lt;chr&gt;       &lt;chr&gt;   &lt;chr&gt;         &lt;chr&gt;             &lt;chr&gt;       </span>
-<span id="cb23-4"><a href="#cb23-4"></a>##  1 catch_at_age Data        fleet1  AgeComp       Data              Dmultinom   </span>
-<span id="cb23-5"><a href="#cb23-5"></a>##  2 catch_at_age Data        fleet1  Landings      Data              Dlnorm      </span>
-<span id="cb23-6"><a href="#cb23-6"></a>##  3 catch_at_age Data        fleet1  LengthComp    Data              Dmultinom   </span>
-<span id="cb23-7"><a href="#cb23-7"></a>##  4 catch_at_age Selectivity fleet1  Logistic      &lt;NA&gt;              &lt;NA&gt;        </span>
-<span id="cb23-8"><a href="#cb23-8"></a>##  5 catch_at_age Data        survey1 AgeComp       Data              Dmultinom   </span>
-<span id="cb23-9"><a href="#cb23-9"></a>##  6 catch_at_age Data        survey1 Index         Data              Dlnorm      </span>
-<span id="cb23-10"><a href="#cb23-10"></a>##  7 catch_at_age Data        survey1 LengthComp    Data              Dmultinom   </span>
-<span id="cb23-11"><a href="#cb23-11"></a>##  8 catch_at_age Selectivity survey1 DoubleLogist… &lt;NA&gt;              &lt;NA&gt;        </span>
-<span id="cb23-12"><a href="#cb23-12"></a>##  9 catch_at_age Growth      &lt;NA&gt;    EWAA          &lt;NA&gt;              &lt;NA&gt;        </span>
-<span id="cb23-13"><a href="#cb23-13"></a>## 10 catch_at_age Maturity    &lt;NA&gt;    Logistic      &lt;NA&gt;              &lt;NA&gt;        </span>
-<span id="cb23-14"><a href="#cb23-14"></a>## 11 catch_at_age Recruitment &lt;NA&gt;    BevertonHolt  process           Dnorm</span></code></pre></div>
-<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Nest updated_configurations</span></span>
-<span><span class="va">updated_configurations_nested</span> <span class="op">&lt;-</span> <span class="va">updated_configurations</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">tidyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyr.tidyverse.org/reference/nest.html" class="external-link">nest</a></span><span class="op">(</span>.by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">model_family</span>, <span class="va">module_name</span>, <span class="va">fleet</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -389,8 +294,8 @@ used from the FIMS framework. This combination of modules rather than
 the use of a control file negates the need for complicated if{} else{}
 statements in the code.</p>
 <div class="section level3">
-<h3 id="create_default_parameters">
-<code>create_default_parameters()</code><a class="anchor" aria-label="anchor" href="#create_default_parameters"></a>
+<h3 id="setup_default_parameters">
+<code>setup_default_parameters()</code><a class="anchor" aria-label="anchor" href="#setup_default_parameters"></a>
 </h3>
 <p>Modules that are available in FIMS are known as reference classes in
 the C++ code. Each reference class acts as an interface between R and
@@ -400,58 +305,35 @@ having modules rather than a control file really comes out when more
 reference classes are created because each reference class can be
 accessed through R by itself to build up a model rather than needing to
 modify a control file for future features.</p>
-<p>By just passing the configurations and the data to
-<code><a href="../reference/create_default_parameters.html">create_default_parameters()</a></code>, the default values for
-parameters that relate to fleet(s), recruitment, growth, and maturity
-modules can be created. For example,</p>
+<p>By just passing the data to <code><a href="../reference/setup_default_parameters.html">setup_default_parameters()</a></code>,
+the default values for parameters that relate to fleet(s), recruitment,
+growth, and maturity modules can be created. For example,</p>
 <ul>
 <li>“BevertonHolt” for the recruitment module</li>
 <li>“Dnorm” distribution for recruitment deviations (log_devs)</li>
 <li>“EWAA” for the Growth module, and</li>
 <li>“Logistic” for Maturity module.</li>
 </ul>
-<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Create default parameters based on default_configurations and data</span></span>
-<span><span class="va">default_parameters</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/create_default_parameters.html">create_default_parameters</a></span><span class="op">(</span></span>
-<span>  configurations <span class="op">=</span> <span class="va">default_configurations</span>,</span>
-<span>  data <span class="op">=</span> <span class="va">data_4_model</span></span>
-<span><span class="op">)</span></span>
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Set up default parameters based on data</span></span>
+<span><span class="va">default_parameters</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/setup_default_parameters.html">setup_default_parameters</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">data_4_model</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">default_parameters</span></span></code></pre></div>
-<div class="sourceCode" id="cb26"><pre class="sourceCode numberSource numberLines"><code class="sourceCode"><span id="cb26-1"><a href="#cb26-1"></a>## # A tibble: 10 × 4</span>
-<span id="cb26-2"><a href="#cb26-2"></a>##    model_family module_name fleet   data              </span>
-<span id="cb26-3"><a href="#cb26-3"></a>##    &lt;chr&gt;        &lt;chr&gt;       &lt;chr&gt;   &lt;list&gt;            </span>
-<span id="cb26-4"><a href="#cb26-4"></a>##  1 catch_at_age Selectivity fleet1  &lt;tibble [2 × 9]&gt;  </span>
-<span id="cb26-5"><a href="#cb26-5"></a>##  2 catch_at_age Fleet       fleet1  &lt;tibble [31 × 9]&gt; </span>
-<span id="cb26-6"><a href="#cb26-6"></a>##  3 catch_at_age Data        fleet1  &lt;tibble [32 × 9]&gt; </span>
-<span id="cb26-7"><a href="#cb26-7"></a>##  4 catch_at_age Selectivity survey1 &lt;tibble [2 × 9]&gt;  </span>
-<span id="cb26-8"><a href="#cb26-8"></a>##  5 catch_at_age Fleet       survey1 &lt;tibble [31 × 9]&gt; </span>
-<span id="cb26-9"><a href="#cb26-9"></a>##  6 catch_at_age Data        survey1 &lt;tibble [32 × 9]&gt; </span>
-<span id="cb26-10"><a href="#cb26-10"></a>##  7 catch_at_age Recruitment &lt;NA&gt;    &lt;tibble [32 × 9]&gt; </span>
-<span id="cb26-11"><a href="#cb26-11"></a>##  8 catch_at_age Maturity    &lt;NA&gt;    &lt;tibble [2 × 9]&gt;  </span>
-<span id="cb26-12"><a href="#cb26-12"></a>##  9 catch_at_age Population  &lt;NA&gt;    &lt;tibble [373 × 9]&gt;</span>
-<span id="cb26-13"><a href="#cb26-13"></a>## 10 catch_at_age Growth      &lt;NA&gt;    &lt;tibble [1 × 9]&gt;</span></code></pre></div>
-<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Unnest the default_parameters to see the detailed parameters</span></span>
-<span><span class="va">default_parameters_unnested</span> <span class="op">&lt;-</span> <span class="fu">tidyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyr.tidyverse.org/reference/unnest.html" class="external-link">unnest</a></span><span class="op">(</span><span class="va">default_parameters</span>, cols <span class="op">=</span> <span class="va">data</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">default_parameters_unnested</span></span></code></pre></div>
-<div class="sourceCode" id="cb28"><pre class="sourceCode numberSource numberLines"><code class="sourceCode"><span id="cb28-1"><a href="#cb28-1"></a>## # A tibble: 538 × 12</span>
-<span id="cb28-2"><a href="#cb28-2"></a>##    model_family module_name fleet  module_type label      age length  time value</span>
-<span id="cb28-3"><a href="#cb28-3"></a>##    &lt;chr&gt;        &lt;chr&gt;       &lt;chr&gt;  &lt;chr&gt;       &lt;chr&gt;    &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;</span>
-<span id="cb28-4"><a href="#cb28-4"></a>##  1 catch_at_age Selectivity fleet1 Logistic    inflect…    NA     NA    NA     2</span>
-<span id="cb28-5"><a href="#cb28-5"></a>##  2 catch_at_age Selectivity fleet1 Logistic    slope       NA     NA    NA     1</span>
-<span id="cb28-6"><a href="#cb28-6"></a>##  3 catch_at_age Fleet       fleet1 &lt;NA&gt;        log_q       NA     NA    NA     0</span>
-<span id="cb28-7"><a href="#cb28-7"></a>##  4 catch_at_age Fleet       fleet1 &lt;NA&gt;        log_Fmo…    NA     NA     1    -3</span>
-<span id="cb28-8"><a href="#cb28-8"></a>##  5 catch_at_age Fleet       fleet1 &lt;NA&gt;        log_Fmo…    NA     NA     2    -3</span>
-<span id="cb28-9"><a href="#cb28-9"></a>##  6 catch_at_age Fleet       fleet1 &lt;NA&gt;        log_Fmo…    NA     NA     3    -3</span>
-<span id="cb28-10"><a href="#cb28-10"></a>##  7 catch_at_age Fleet       fleet1 &lt;NA&gt;        log_Fmo…    NA     NA     4    -3</span>
-<span id="cb28-11"><a href="#cb28-11"></a>##  8 catch_at_age Fleet       fleet1 &lt;NA&gt;        log_Fmo…    NA     NA     5    -3</span>
-<span id="cb28-12"><a href="#cb28-12"></a>##  9 catch_at_age Fleet       fleet1 &lt;NA&gt;        log_Fmo…    NA     NA     6    -3</span>
-<span id="cb28-13"><a href="#cb28-13"></a>## 10 catch_at_age Fleet       fleet1 &lt;NA&gt;        log_Fmo…    NA     NA     7    -3</span>
-<span id="cb28-14"><a href="#cb28-14"></a>## # ℹ 528 more rows</span>
-<span id="cb28-15"><a href="#cb28-15"></a>## # ℹ 3 more variables: estimation_type &lt;chr&gt;, distribution_type &lt;chr&gt;,</span>
-<span id="cb28-16"><a href="#cb28-16"></a>## #   distribution &lt;chr&gt;</span></code></pre></div>
+<div class="sourceCode" id="cb19"><pre class="sourceCode numberSource numberLines"><code class="sourceCode"><span id="cb19-1"><a href="#cb19-1"></a>## # A tibble: 474 × 11</span>
+<span id="cb19-2"><a href="#cb19-2"></a>##    module_name fleet module_type label   age length timing value estimation_type</span>
+<span id="cb19-3"><a href="#cb19-3"></a>##    &lt;chr&gt;       &lt;chr&gt; &lt;chr&gt;       &lt;chr&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;int&gt; &lt;dbl&gt; &lt;chr&gt;          </span>
+<span id="cb19-4"><a href="#cb19-4"></a>##  1 Selectivity flee… Logistic    infl…    NA     NA     NA     2 fixed_effects  </span>
+<span id="cb19-5"><a href="#cb19-5"></a>##  2 Selectivity flee… Logistic    slope    NA     NA     NA     1 fixed_effects  </span>
+<span id="cb19-6"><a href="#cb19-6"></a>##  3 Selectivity surv… Logistic    infl…    NA     NA     NA     2 fixed_effects  </span>
+<span id="cb19-7"><a href="#cb19-7"></a>##  4 Selectivity surv… Logistic    slope    NA     NA     NA     1 fixed_effects  </span>
+<span id="cb19-8"><a href="#cb19-8"></a>##  5 Fleet       flee… &lt;NA&gt;        log_q    NA     NA     NA     0 constant       </span>
+<span id="cb19-9"><a href="#cb19-9"></a>##  6 Fleet       flee… &lt;NA&gt;        log_…    NA     NA      1    -3 fixed_effects  </span>
+<span id="cb19-10"><a href="#cb19-10"></a>##  7 Fleet       flee… &lt;NA&gt;        log_…    NA     NA      2    -3 fixed_effects  </span>
+<span id="cb19-11"><a href="#cb19-11"></a>##  8 Fleet       flee… &lt;NA&gt;        log_…    NA     NA      3    -3 fixed_effects  </span>
+<span id="cb19-12"><a href="#cb19-12"></a>##  9 Fleet       flee… &lt;NA&gt;        log_…    NA     NA      4    -3 fixed_effects  </span>
+<span id="cb19-13"><a href="#cb19-13"></a>## 10 Fleet       flee… &lt;NA&gt;        log_…    NA     NA      5    -3 fixed_effects  </span>
+<span id="cb19-14"><a href="#cb19-14"></a>## # ℹ 464 more rows</span>
+<span id="cb19-15"><a href="#cb19-15"></a>## # ℹ 2 more variables: distribution_type &lt;chr&gt;, distribution &lt;chr&gt;</span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="update-parameters">Update parameters<a class="anchor" aria-label="anchor" href="#update-parameters"></a>
@@ -461,15 +343,14 @@ be used to update the default parameters as needed.</p>
 <p>In the code below, <code>rows_update()</code> is used to adjust the
 fishing mortality, selectivity, maturity, and population parameters from
 their default values.</p>
-<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">parameters_4_model</span> <span class="op">&lt;-</span> <span class="va">default_parameters</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">tidyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyr.tidyverse.org/reference/unnest.html" class="external-link">unnest</a></span><span class="op">(</span>cols <span class="op">=</span> <span class="va">data</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="co"># Update log_Fmort initial values for Fleet1</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/rows.html" class="external-link">rows_update</a></span><span class="op">(</span></span>
 <span>    <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span></span>
 <span>      fleet <span class="op">=</span> <span class="st">"fleet1"</span>,</span>
 <span>      label <span class="op">=</span> <span class="st">"log_Fmort"</span>,</span>
-<span>      time <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fu"><a href="../reference/get_FIMSFrame.html">get_n_years</a></span><span class="op">(</span><span class="va">data_4_model</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>      timing <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fu"><a href="../reference/get_FIMSFrame.html">get_n_years</a></span><span class="op">(</span><span class="va">data_4_model</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>      value <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
 <span>        <span class="fl">0.009459165</span>, <span class="fl">0.027288858</span>, <span class="fl">0.045063639</span>,</span>
 <span>        <span class="fl">0.061017825</span>, <span class="fl">0.048600752</span>, <span class="fl">0.087420554</span>,</span>
@@ -483,7 +364,7 @@ their default values.</p>
 <span>        <span class="fl">0.431745298</span>, <span class="fl">0.328030899</span>, <span class="fl">0.499675368</span></span>
 <span>      <span class="op">)</span><span class="op">)</span></span>
 <span>    <span class="op">)</span>,</span>
-<span>    by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"fleet"</span>, <span class="st">"label"</span>, <span class="st">"time"</span><span class="op">)</span></span>
+<span>    by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"fleet"</span>, <span class="st">"label"</span>, <span class="st">"timing"</span><span class="op">)</span></span>
 <span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="co"># Update selectivity parameters and log_q for survey1</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/rows.html" class="external-link">rows_update</a></span><span class="op">(</span></span>
@@ -494,11 +375,11 @@ their default values.</p>
 <span>    <span class="op">)</span>,</span>
 <span>    by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"fleet"</span>, <span class="st">"label"</span><span class="op">)</span></span>
 <span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="co"># Update log_devs in the Recruitment module (time steps 2-30)</span></span>
+<span>  <span class="co"># Update log_devs in the Recruitment module (timing steps 2-30)</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/rows.html" class="external-link">rows_update</a></span><span class="op">(</span></span>
 <span>    <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span></span>
 <span>      label <span class="op">=</span> <span class="st">"log_devs"</span>,</span>
-<span>      time <span class="op">=</span> <span class="fl">2</span><span class="op">:</span><span class="fu"><a href="../reference/get_FIMSFrame.html">get_n_years</a></span><span class="op">(</span><span class="va">data_4_model</span><span class="op">)</span>,</span>
+<span>      timing <span class="op">=</span> <span class="fl">2</span><span class="op">:</span><span class="fu"><a href="../reference/get_FIMSFrame.html">get_n_years</a></span><span class="op">(</span><span class="va">data_4_model</span><span class="op">)</span>,</span>
 <span>      value <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
 <span>        <span class="fl">0.43787763</span>, <span class="op">-</span><span class="fl">0.13299042</span>, <span class="op">-</span><span class="fl">0.43251973</span>, <span class="fl">0.64861200</span>, <span class="fl">0.50640852</span>,</span>
 <span>        <span class="op">-</span><span class="fl">0.06958319</span>, <span class="fl">0.30246260</span>, <span class="op">-</span><span class="fl">0.08257384</span>, <span class="fl">0.20740372</span>, <span class="fl">0.15289604</span>,</span>
@@ -508,7 +389,7 @@ their default values.</p>
 <span>        <span class="op">-</span><span class="fl">0.19556523</span>, <span class="fl">0.20094360</span>, <span class="fl">0.37248740</span>, <span class="op">-</span><span class="fl">0.07163145</span></span>
 <span>      <span class="op">)</span></span>
 <span>    <span class="op">)</span>,</span>
-<span>    by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"label"</span>, <span class="st">"time"</span><span class="op">)</span></span>
+<span>    by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"label"</span>, <span class="st">"timing"</span><span class="op">)</span></span>
 <span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="co"># Update log_sd for log_devs in the Recruitment module</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/rows.html" class="external-link">rows_update</a></span><span class="op">(</span></span>
@@ -552,7 +433,7 @@ using <code><a href="../reference/initialize_fims.html">initialize_fims()</a></c
 <h3 id="initialize_fims">
 <code>initialize_fims()</code><a class="anchor" aria-label="anchor" href="#initialize_fims"></a>
 </h3>
-<p>The tibble returned by <code><a href="../reference/create_default_parameters.html">create_default_parameters()</a></code> is
+<p>The tibble returned by <code><a href="../reference/setup_default_parameters.html">setup_default_parameters()</a></code> is
 just a data frame containing specifications. Nothing has been created in
 memory as of yet. To actually initialize the modules,
 <code><a href="../reference/initialize_fims.html">initialize_fims()</a></code> needs to be called. This function takes
@@ -574,7 +455,7 @@ model. When <code>optimize = TRUE</code>, the model will be fit using
 <div class="section level3">
 <h3 id="example">Example<a class="anchor" aria-label="anchor" href="#example"></a>
 </h3>
-<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Run the model without optimization to help ensure a viable model</span></span>
 <span><span class="va">test_fit</span> <span class="op">&lt;-</span> <span class="va">parameters_4_model</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/initialize_fims.html">initialize_fims</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">data_4_model</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -586,17 +467,17 @@ model. When <code>optimize = TRUE</code>, the model will be fit using
 <span>  <span class="fu"><a href="../reference/fit_fims.html">fit_fims</a></span><span class="op">(</span>optimize <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## ✔ Starting optimization ...</span></span>
 <span><span class="co">## ℹ Restarting optimizer 3 times to improve gradient.</span></span>
-<span><span class="co">## ℹ Maximum gradient went from 0.00941 to 0.00101 after 3 steps.</span></span>
+<span><span class="co">## ℹ Maximum gradient went from 0.00483 to 0.00066 after 3 steps.</span></span>
 <span><span class="co">## ✔ Finished optimization</span></span>
 <span><span class="co">## ✔ Finished sdreport</span></span>
-<span><span class="co">## ℹ FIMS model version: 0.9.4.9000</span></span>
-<span><span class="co">## ℹ Total run time was 1.28079 minutes</span></span>
+<span><span class="co">## ℹ FIMS model version: 0.10.0</span></span>
+<span><span class="co">## ℹ Total run time was 33.28329 seconds</span></span>
 <span><span class="co">## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78</span></span>
-<span><span class="co">## ℹ Maximum gradient= 0.00101</span></span>
+<span><span class="co">## ℹ Maximum gradient= 0.00066</span></span>
 <span><span class="co">## ℹ Negative log likelihood (NLL):</span></span>
 <span><span class="co">## • Marginal NLL= 3231.25994</span></span>
 <span><span class="co">## • Total NLL= 3164.83637</span></span>
-<span><span class="co">## ℹ Terminal SB= 1791.58311</span></span></code></pre>
+<span><span class="co">## ℹ Terminal SB= 1791.58536</span></span></code></pre>
 </div>
 <div class="section level3">
 <h3 id="logging-system">Logging system<a class="anchor" aria-label="anchor" href="#logging-system"></a>
@@ -614,12 +495,12 @@ run <code>set_log_throw_on_error(TRUE)</code> prior to running your
 model. See the vignette on <a href="fims-logging.html">FIMS logging</a>
 or the <a href="https://noaa-fims.github.io/FIMS/doxygen/classfims_1_1FIMSLog.html" class="external-link">doxygen
 documentation</a> for more information.</p>
-<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">log_json_string</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/Cpp_functions.html">get_log</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">log_data_frame</span> <span class="op">&lt;-</span> <span class="fu">jsonlite</span><span class="fu">::</span><span class="fu"><a href="https://jeroen.r-universe.dev/jsonlite/reference/fromJSON.html" class="external-link">fromJSON</a></span><span class="op">(</span><span class="va">log_json_string</span><span class="op">)</span></span>
 <span><span class="va">log_data_frame</span><span class="op">[</span><span class="fl">1</span>, <span class="op">]</span></span></code></pre></div>
 <pre><code><span><span class="co">##                  timestamp   level</span></span>
-<span><span class="co">## 1 Fri Jul 31 16:10:09 2026 warning</span></span>
+<span><span class="co">## 1 Thu Aug 13 17:52:32 2026 warning</span></span>
 <span><span class="co">##                                                                   message id</span></span>
 <span><span class="co">## 1 The log_f_multiplier vector is not of size n_years. Filling with zeros.  0</span></span>
 <span><span class="co">##     user                                    wd</span></span>
@@ -630,21 +511,21 @@ documentation</a> for more information.</p>
 <span><span class="co">## 1 bool PopulationInterface::add_to_fims_tmb_internal() [with Type = double]</span></span>
 <span><span class="co">##   line</span></span>
 <span><span class="co">## 1  440</span></span></code></pre>
-<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">log_data_frame</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] 127   9</span></span></code></pre>
-<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Print how many log entries there are of each type</span></span>
 <span><span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html" class="external-link">count</a></span><span class="op">(</span><span class="va">log_data_frame</span>, <span class="va">level</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##     level   n</span></span>
 <span><span class="co">## 1    info 125</span></span>
 <span><span class="co">## 2 warning   2</span></span></code></pre>
-<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Subset for just the warnings</span></span>
 <span><span class="va">log_data_frame</span> <span class="op">|&gt;</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">level</span> <span class="op">==</span> <span class="st">"warning"</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##                  timestamp   level</span></span>
-<span><span class="co">## 1 Fri Jul 31 16:10:09 2026 warning</span></span>
-<span><span class="co">## 2 Fri Jul 31 16:10:09 2026 warning</span></span>
+<span><span class="co">## 1 Thu Aug 13 17:52:32 2026 warning</span></span>
+<span><span class="co">## 2 Thu Aug 13 17:52:32 2026 warning</span></span>
 <span><span class="co">##                                                                   message id</span></span>
 <span><span class="co">## 1 The log_f_multiplier vector is not of size n_years. Filling with zeros.  0</span></span>
 <span><span class="co">## 2              Setting spawning_biomass_ratio vector to size n_years + 1.  1</span></span>
@@ -660,11 +541,11 @@ documentation</a> for more information.</p>
 <span><span class="co">##   line</span></span>
 <span><span class="co">## 1  440</span></span>
 <span><span class="co">## 2  456</span></span></code></pre>
-<div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/Cpp_functions.html">clear</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p>The results can be plotted with either base R, {ggplot2}, or
 {stockplotr}. Where, we recommend using {stockplotr} where possible.</p>
-<div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Temporary manipulation to the returned estimates to get them</span></span>
 <span><span class="co"># to work with stockplotr</span></span>
 <span><span class="va">output</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_FIMSFit.html">get_estimates</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -673,13 +554,13 @@ documentation</a> for more information.</p>
 <span>    year <span class="op">=</span> <span class="va">year_i</span>,</span>
 <span>    estimate <span class="op">=</span> <span class="va">estimated</span></span>
 <span>  <span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb42"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">stockplotr</span><span class="fu">::</span><span class="fu"><a href="https://noaa-fisheries-integrated-toolbox.r-universe.dev/stockplotr/reference/plot_spawning_biomass.html" class="external-link">plot_spawning_biomass</a></span><span class="op">(</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">output</span>, <span class="va">label</span> <span class="op">==</span> <span class="st">"spawning_biomass"</span><span class="op">)</span></span>
 <span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">stockplotr</span><span class="fu">::</span><span class="fu"><a href="https://noaa-fisheries-integrated-toolbox.r-universe.dev/stockplotr/reference/theme_noaa.html" class="external-link">theme_noaa</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p><img src="fims-demo_files/figure-html/fit-plot-spawning-biomass-1.png" class="r-plt" alt="Plot of spawning biomass." width="700"></p>
-<div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">stockplotr</span><span class="fu">::</span><span class="fu"><a href="https://noaa-fisheries-integrated-toolbox.r-universe.dev/stockplotr/reference/plot_timeseries.html" class="external-link">plot_timeseries</a></span><span class="op">(</span></span>
 <span>  <span class="fu">stockplotr</span><span class="fu">::</span><span class="fu"><a href="https://noaa-fisheries-integrated-toolbox.r-universe.dev/stockplotr/reference/filter_data.html" class="external-link">filter_data</a></span><span class="op">(</span></span>
 <span>    <span class="va">output</span> <span class="op">|&gt;</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">module_id</span> <span class="op">==</span> <span class="fl">1</span><span class="op">)</span>,</span>
@@ -695,7 +576,7 @@ documentation</a> for more information.</p>
 <pre><code><span><span class="co">## ℹ If estimates were log-transformed, please update the y axis label for accuracy.</span></span></code></pre>
 <pre><code><span><span class="co">## ℹ Example: log(natural log of Fishing Mortality)</span></span></code></pre>
 <p><img src="fims-demo_files/figure-html/fit-plot-log-fishing-mortality-1.png" class="r-plt" alt="Plot of log fishing mortality." width="700"></p>
-<div class="sourceCode" id="cb47"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">stockplotr</span><span class="fu">::</span><span class="fu"><a href="https://noaa-fisheries-integrated-toolbox.r-universe.dev/stockplotr/reference/plot_timeseries.html" class="external-link">plot_timeseries</a></span><span class="op">(</span></span>
 <span>  <span class="fu">stockplotr</span><span class="fu">::</span><span class="fu"><a href="https://noaa-fisheries-integrated-toolbox.r-universe.dev/stockplotr/reference/filter_data.html" class="external-link">filter_data</a></span><span class="op">(</span></span>
 <span>    <span class="va">output</span> <span class="op">|&gt;</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">module_id</span> <span class="op">==</span> <span class="fl">2</span><span class="op">)</span>,</span>
@@ -716,19 +597,19 @@ documentation</a> for more information.</p>
 <span>  <span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">stockplotr</span><span class="fu">::</span><span class="fu"><a href="https://noaa-fisheries-integrated-toolbox.r-universe.dev/stockplotr/reference/theme_noaa.html" class="external-link">theme_noaa</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p><img src="fims-demo_files/figure-html/fit-plot-index-of-abundance-1.png" class="r-plt" alt="Plot of estimated index of abundance versus observed values." width="700"></p>
-<div class="sourceCode" id="cb48"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">stockplotr</span><span class="fu">::</span><span class="fu"><a href="https://noaa-fisheries-integrated-toolbox.r-universe.dev/stockplotr/reference/plot_timeseries.html" class="external-link">plot_timeseries</a></span><span class="op">(</span></span>
 <span>  <span class="fu">stockplotr</span><span class="fu">::</span><span class="fu"><a href="https://noaa-fisheries-integrated-toolbox.r-universe.dev/stockplotr/reference/filter_data.html" class="external-link">filter_data</a></span><span class="op">(</span></span>
 <span>    <span class="va">output</span> <span class="op">|&gt;</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">module_id</span> <span class="op">==</span> <span class="fl">1</span><span class="op">)</span>,</span>
-<span>    label_name <span class="op">=</span> <span class="st">"^landings_expected$"</span>,</span>
+<span>    label_name <span class="op">=</span> <span class="st">"^catch_expected$"</span>,</span>
 <span>    geom <span class="op">=</span> <span class="st">"line"</span></span>
 <span>  <span class="op">)</span>,</span>
 <span>  x <span class="op">=</span> <span class="st">"year"</span>,</span>
 <span>  y <span class="op">=</span> <span class="st">"estimate"</span>,</span>
-<span>  ylab <span class="op">=</span> <span class="st">"Expected Landings (mt)"</span></span>
+<span>  ylab <span class="op">=</span> <span class="st">"Expected Catch (mt)"</span></span>
 <span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">stockplotr</span><span class="fu">::</span><span class="fu"><a href="https://noaa-fisheries-integrated-toolbox.r-universe.dev/stockplotr/reference/theme_noaa.html" class="external-link">theme_noaa</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><img src="fims-demo_files/figure-html/fit-plot-landings-1.png" class="r-plt" alt="Plot of estimated landings." width="700"></p>
+<p><img src="fims-demo_files/figure-html/fit-plot-catch-1.png" class="r-plt" alt="Plot of estimated catch." width="700"></p>
 </div>
 <div class="section level3">
 <h3 id="sensitivities">Sensitivities<a class="anchor" aria-label="anchor" href="#sensitivities"></a>
@@ -742,7 +623,7 @@ that is used to fit the model.</p>
 <p>For example, one could change the initial value used for the slope of
 the logistic curve for the survey to see if the terminal estimate
 changes due to changes to the initial value.</p>
-<div class="sourceCode" id="cb49"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">parameters_high_slope</span> <span class="op">&lt;-</span> <span class="va">parameters_4_model</span> <span class="op">|&gt;</span></span>
 <span>  <span class="co"># Update the slope value of the logistic selectivity for the survey</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
@@ -771,18 +652,18 @@ changes due to changes to the initial value.</p>
 <span>  <span class="fu"><a href="../reference/fit_fims.html">fit_fims</a></span><span class="op">(</span>optimize <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## ✔ Starting optimization ...</span></span>
 <span><span class="co">## ℹ Restarting optimizer 3 times to improve gradient.</span></span>
-<span><span class="co">## ℹ Maximum gradient went from 0.00616 to 0.00034 after 3 steps.</span></span>
+<span><span class="co">## ℹ Maximum gradient went from 0.00445 to 0.00039 after 3 steps.</span></span>
 <span><span class="co">## ✔ Finished optimization</span></span>
 <span><span class="co">## ✔ Finished sdreport</span></span>
-<span><span class="co">## ℹ FIMS model version: 0.9.4.9000</span></span>
-<span><span class="co">## ℹ Total run time was 1.25388 minutes</span></span>
+<span><span class="co">## ℹ FIMS model version: 0.10.0</span></span>
+<span><span class="co">## ℹ Total run time was 31.36378 seconds</span></span>
 <span><span class="co">## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78</span></span>
-<span><span class="co">## ℹ Maximum gradient= 0.00034</span></span>
+<span><span class="co">## ℹ Maximum gradient= 0.00039</span></span>
 <span><span class="co">## ℹ Negative log likelihood (NLL):</span></span>
 <span><span class="co">## • Marginal NLL= 3231.25994</span></span>
 <span><span class="co">## • Total NLL= 3164.83637</span></span>
-<span><span class="co">## ℹ Terminal SB= 1791.58318</span></span></code></pre>
-<div class="sourceCode" id="cb51"><pre class="downlit sourceCode r">
+<span><span class="co">## ℹ Terminal SB= 1791.58529</span></span></code></pre>
+<div class="sourceCode" id="cb42"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/Cpp_functions.html">clear</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">low_slope_fit</span> <span class="op">&lt;-</span> <span class="va">parameters_low_slope</span> <span class="op">|&gt;</span></span>
@@ -790,18 +671,18 @@ changes due to changes to the initial value.</p>
 <span>  <span class="fu"><a href="../reference/fit_fims.html">fit_fims</a></span><span class="op">(</span>optimize <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## ✔ Starting optimization ...</span></span>
 <span><span class="co">## ℹ Restarting optimizer 3 times to improve gradient.</span></span>
-<span><span class="co">## ℹ Maximum gradient went from 0.00308 to 4e-04 after 3 steps.</span></span>
+<span><span class="co">## ℹ Maximum gradient went from 0.00395 to 3e-04 after 3 steps.</span></span>
 <span><span class="co">## ✔ Finished optimization</span></span>
 <span><span class="co">## ✔ Finished sdreport</span></span>
-<span><span class="co">## ℹ FIMS model version: 0.9.4.9000</span></span>
-<span><span class="co">## ℹ Total run time was 1.29003 minutes</span></span>
+<span><span class="co">## ℹ FIMS model version: 0.10.0</span></span>
+<span><span class="co">## ℹ Total run time was 32.73451 seconds</span></span>
 <span><span class="co">## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78</span></span>
-<span><span class="co">## ℹ Maximum gradient= 4e-04</span></span>
+<span><span class="co">## ℹ Maximum gradient= 3e-04</span></span>
 <span><span class="co">## ℹ Negative log likelihood (NLL):</span></span>
 <span><span class="co">## • Marginal NLL= 3231.25994</span></span>
 <span><span class="co">## • Total NLL= 3164.83637</span></span>
-<span><span class="co">## ℹ Terminal SB= 1791.58128</span></span></code></pre>
-<div class="sourceCode" id="cb53"><pre class="downlit sourceCode r">
+<span><span class="co">## ℹ Terminal SB= 1791.58564</span></span></code></pre>
+<div class="sourceCode" id="cb44"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/Cpp_functions.html">clear</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level4">
@@ -809,27 +690,46 @@ changes due to changes to the initial value.</p>
 </h4>
 <p>The same model can be fit to just the age data, removing the
 length-composition configurations.</p>
-<div class="sourceCode" id="cb54"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Create default parameters, update with modified values, initialize FIMS,</span></span>
-<span><span class="co"># and fit the model</span></span>
+<div class="sourceCode" id="cb45"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># and fit the model</span></span>
 <span><span class="va">age_only_fit</span> <span class="op">&lt;-</span> <span class="va">parameters_4_model</span> <span class="op">|&gt;</span></span>
-<span>  <span class="co"># remove rows that have module_type == LengthComp</span></span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/rows.html" class="external-link">rows_delete</a></span><span class="op">(</span></span>
-<span>    y <span class="op">=</span> <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span>module_type <span class="op">=</span> <span class="st">"LengthComp"</span><span class="op">)</span></span>
-<span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="../reference/initialize_fims.html">initialize_fims</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">data_4_model</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="../reference/initialize_fims.html">initialize_fims</a></span><span class="op">(</span>data <span class="op">=</span> <span class="fu"><a href="../reference/get_FIMSFrame.html">get_data</a></span><span class="op">(</span><span class="va">data_4_model</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="op">!</span><span class="va">type</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"length_comp"</span>, <span class="st">"age_to_length_conversion"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/fit_fims.html">fit_fims</a></span><span class="op">(</span>optimize <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Matching, by = "module_type"</span></span>
-<span><span class="co">## ✔ Starting optimization ...</span></span>
+<pre><code><span><span class="co">## Found more than one class "tbl_df" in cache; using the first, from namespace 'FIMS'</span></span></code></pre>
+<pre><code><span><span class="co">## Also defined by 'tibble'</span></span></code></pre>
+<pre><code><span><span class="co">## Found more than one class "tbl_df" in cache; using the first, from namespace 'FIMS'</span></span></code></pre>
+<pre><code><span><span class="co">## Also defined by 'tibble'</span></span></code></pre>
+<pre><code><span><span class="co">## Found more than one class "tbl_df" in cache; using the first, from namespace 'FIMS'</span></span></code></pre>
+<pre><code><span><span class="co">## Also defined by 'tibble'</span></span></code></pre>
+<pre><code><span><span class="co">## Found more than one class "tbl_df" in cache; using the first, from namespace 'FIMS'</span></span></code></pre>
+<pre><code><span><span class="co">## Also defined by 'tibble'</span></span></code></pre>
+<pre><code><span><span class="co">## Found more than one class "tbl_df" in cache; using the first, from namespace 'FIMS'</span></span></code></pre>
+<pre><code><span><span class="co">## Also defined by 'tibble'</span></span></code></pre>
+<pre><code><span><span class="co">## Found more than one class "tbl_df" in cache; using the first, from namespace 'FIMS'</span></span></code></pre>
+<pre><code><span><span class="co">## Also defined by 'tibble'</span></span></code></pre>
+<pre><code><span><span class="co">## Found more than one class "tbl_df" in cache; using the first, from namespace 'FIMS'</span></span></code></pre>
+<pre><code><span><span class="co">## Also defined by 'tibble'</span></span></code></pre>
+<pre><code><span><span class="co">## Found more than one class "tbl_df" in cache; using the first, from namespace 'FIMS'</span></span></code></pre>
+<pre><code><span><span class="co">## Also defined by 'tibble'</span></span></code></pre>
+<pre><code><span><span class="co">## Found more than one class "tbl_df" in cache; using the first, from namespace 'FIMS'</span></span></code></pre>
+<pre><code><span><span class="co">## Also defined by 'tibble'</span></span></code></pre>
+<pre><code><span><span class="co">## Found more than one class "tbl_df" in cache; using the first, from namespace 'FIMS'</span></span></code></pre>
+<pre><code><span><span class="co">## Also defined by 'tibble'</span></span></code></pre>
+<pre><code><span><span class="co">## ✔ Starting optimization ...</span></span>
 <span><span class="co">## ℹ Restarting optimizer 3 times to improve gradient.</span></span>
-<span><span class="co">## ℹ Maximum gradient went from 0.00361 to 0.00038 after 3 steps.</span></span>
+<span><span class="co">## ℹ Maximum gradient went from 0.00197 to 0.00048 after 3 steps.</span></span>
 <span><span class="co">## ✔ Finished optimization</span></span>
 <span><span class="co">## ✔ Finished sdreport</span></span>
-<span><span class="co">## ℹ FIMS model version: 0.9.4.9000 ℹ Total run time was 11.56105 seconds ℹ Number</span></span>
-<span><span class="co">## of parameters: fixed_effects=49, random_effects=29, and total=78 ℹ Maximum</span></span>
-<span><span class="co">## gradient= 0.00038 ℹ Negative log likelihood (NLL): • Marginal NLL= 1627.76704 •</span></span>
-<span><span class="co">## Total NLL= 1564.0853 ℹ Terminal SB= 1740.95207</span></span></code></pre>
-<div class="sourceCode" id="cb56"><pre class="downlit sourceCode r">
+<span><span class="co">## ℹ FIMS model version: 0.10.0</span></span>
+<span><span class="co">## ℹ Total run time was 5.61868 seconds</span></span>
+<span><span class="co">## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78</span></span>
+<span><span class="co">## ℹ Maximum gradient= 0.00048</span></span>
+<span><span class="co">## ℹ Negative log likelihood (NLL):</span></span>
+<span><span class="co">## • Marginal NLL= 1627.76704</span></span>
+<span><span class="co">## • Total NLL= 1564.08529</span></span>
+<span><span class="co">## ℹ Terminal SB= 1740.95</span></span></code></pre>
+<div class="sourceCode" id="cb67"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/Cpp_functions.html">clear</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level4">
@@ -837,29 +737,31 @@ length-composition configurations.</p>
 </h4>
 <p>The same model can be fit to just the length data, removing the
 age-composition configurations.</p>
-<div class="sourceCode" id="cb57"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Create default parameters, update with modified values, initialize FIMS,</span></span>
-<span><span class="co"># and fit the model</span></span>
-<span><span class="va">length_only_fit</span> <span class="op">&lt;-</span> <span class="va">parameters_4_model</span> <span class="op">|&gt;</span></span>
-<span>  <span class="co"># remove rows that have module_type == AgeComp</span></span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/rows.html" class="external-link">rows_delete</a></span><span class="op">(</span></span>
-<span>    y <span class="op">=</span> <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span>module_type <span class="op">=</span> <span class="st">"AgeComp"</span><span class="op">)</span></span>
-<span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="../reference/initialize_fims.html">initialize_fims</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">data_4_model</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<div class="sourceCode" id="cb68"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">length_only_fit</span> <span class="op">&lt;-</span> <span class="va">parameters_4_model</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="../reference/initialize_fims.html">initialize_fims</a></span><span class="op">(</span>data <span class="op">=</span> <span class="fu"><a href="../reference/get_FIMSFrame.html">get_data</a></span><span class="op">(</span><span class="va">data_4_model</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="op">!</span><span class="va">type</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"age_comp"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/fit_fims.html">fit_fims</a></span><span class="op">(</span>optimize <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Matching, by = "module_type"</span></span>
-<span><span class="co">## ✔ Starting optimization ...</span></span>
+<pre><code><span><span class="co">## Found more than one class "tbl_df" in cache; using the first, from namespace 'FIMS'</span></span></code></pre>
+<pre><code><span><span class="co">## Also defined by 'tibble'</span></span></code></pre>
+<pre><code><span><span class="co">## Found more than one class "tbl_df" in cache; using the first, from namespace 'FIMS'</span></span></code></pre>
+<pre><code><span><span class="co">## Also defined by 'tibble'</span></span></code></pre>
+<pre><code><span><span class="co">## ✔ Starting optimization ...</span></span>
 <span><span class="co">## ℹ Restarting optimizer 3 times to improve gradient.</span></span>
-<span><span class="co">## ℹ Maximum gradient went from 0.00715 to 0.00034 after 3 steps.</span></span>
+<span><span class="co">## ℹ Maximum gradient went from 0.01308 to 0.00027 after 3 steps.</span></span>
 <span><span class="co">## ✔ Finished optimization</span></span>
 <span><span class="co">## ✔ Finished sdreport</span></span>
-<span><span class="co">## ℹ FIMS model version: 0.9.4.9000 ℹ Total run time was 1.18411 minutes ℹ Number</span></span>
-<span><span class="co">## of parameters: fixed_effects=49, random_effects=29, and total=78 ℹ Maximum</span></span>
-<span><span class="co">## gradient= 0.00034 ℹ Negative log likelihood (NLL): • Marginal NLL= 1568.32685 •</span></span>
-<span><span class="co">## Total NLL= 1518.62644 ℹ Terminal SB= 1722.35744</span></span></code></pre>
-<div class="sourceCode" id="cb59"><pre class="downlit sourceCode r">
+<span><span class="co">## ℹ FIMS model version: 0.10.0</span></span>
+<span><span class="co">## ℹ Total run time was 30.84736 seconds</span></span>
+<span><span class="co">## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78</span></span>
+<span><span class="co">## ℹ Maximum gradient= 0.00027</span></span>
+<span><span class="co">## ℹ Negative log likelihood (NLL):</span></span>
+<span><span class="co">## • Marginal NLL= 1568.32685</span></span>
+<span><span class="co">## • Total NLL= 1518.62644</span></span>
+<span><span class="co">## ℹ Terminal SB= 1722.35982</span></span></code></pre>
+<div class="sourceCode" id="cb74"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/Cpp_functions.html">clear</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb60"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb75"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">stockplotr</span><span class="fu">::</span><span class="fu"><a href="https://noaa-fisheries-integrated-toolbox.r-universe.dev/stockplotr/reference/plot_biomass.html" class="external-link">plot_biomass</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>    <span class="st">"age"</span> <span class="op">=</span> <span class="fu"><a href="../reference/get_FIMSFit.html">get_estimates</a></span><span class="op">(</span><span class="va">age_only_fit</span><span class="op">)</span> <span class="op">|&gt;</span></span>

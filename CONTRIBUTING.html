@@ -6,7 +6,7 @@
     <nav class="navbar navbar-expand-lg fixed-top bg-light" data-bs-theme="light" aria-label="Site navigation"><div class="container">
     <img class="navlogo" src="https://noaa-fims.github.io/images/FIMS_logo3.png" alt="FIMS logo with a fish" width="60" align="left"><a class="navbar-brand me-2" href="index.html">FIMS</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.4.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.10.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -103,7 +103,7 @@
 <ul class="task-list"><li><label><input type="checkbox">Register the class in <code>src/fims_modules.hpp</code>.</label></li>
 <li><label><input type="checkbox">Export the class in <code>R/FIMS-package.R</code> and run <code><a href="https://devtools.r-lib.org/reference/document.html" class="external-link">devtools::document()</a></code>.</label></li>
 <li><label><input type="checkbox">Update <code>R/create_default_configurations.R</code> if the new module type should appear in the default configuration workflow.</label></li>
-<li><label><input type="checkbox">Update <code>R/create_default_parameters.R</code> so default values and estimation types are generated correctly.</label></li>
+<li><label><input type="checkbox">Update <code>R/setup_default_parameters.R</code> so default values and estimation types are generated correctly.</label></li>
 <li><label><input type="checkbox">Update <code>R/initialize_modules.R</code> and <code><a href="reference/initialize_fims.html">initialize_fims()</a></code> if the module needs explicit initialization or linking behavior.</label></li>
 </ul><p><strong>Testing</strong></p>
 <ul class="task-list"><li><label><input type="checkbox">Add or update C++ gtests to validate the underlying math and logic.</label></li>

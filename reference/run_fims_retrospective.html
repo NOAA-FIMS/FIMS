@@ -12,7 +12,7 @@ model estimates."><meta property="og:image" content="https://NOAA-FIMS.github.io
     <nav class="navbar navbar-expand-lg fixed-top bg-light" data-bs-theme="light" aria-label="Site navigation"><div class="container">
     <img class="navlogo" src="https://noaa-fims.github.io/images/FIMS_logo3.png" alt="FIMS logo with a fish" width="60" align="left"><a class="navbar-brand me-2" href="../index.html">FIMS</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.4.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.10.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -96,19 +96,19 @@ Minimum length is 1</p></dd>
 <dt id="arg-data">data<a class="anchor" aria-label="anchor" href="#arg-data"></a></dt>
 <dd><p>A data frame or FIMSFrame object containing the complete dataset
 used in the base model run. This should include all data types required
-by FIMS (landings, indices, composition data, biological data, etc.)</p></dd>
+by FIMS (catch, indices, composition data, biological data, etc.).</p></dd>
 
 
 <dt id="arg-parameters">parameters<a class="anchor" aria-label="anchor" href="#arg-parameters"></a></dt>
 <dd><p>A FIMS parameters object created by
-<code><a href="create_default_parameters.html">create_default_parameters()</a></code>, containing the model configuration
-and initial parameter values for the base model</p></dd>
+<code><a href="setup_default_parameters.html">setup_default_parameters()</a></code>, containing the model configuration
+and initial parameter values for the base model.</p></dd>
 
 
 <dt id="arg-n-cores">n_cores<a class="anchor" aria-label="anchor" href="#arg-n-cores"></a></dt>
 <dd><p>An integer specifying the number of CPU cores to use for
 parallel processing. If <code>NULL</code> (default), uses <code>parallel::detectCores() - 1</code>.
-Set to 1 for sequential processing. Must be a positive integer</p></dd>
+Set to 1 for sequential processing. Must be a positive integer.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -153,7 +153,7 @@ ICES Journal of Marine Science 72(1): 99-110.</p>
     <div class="dont-index">
 <ul><li><p><code><a href="https://noaa-fisheries-integrated-toolbox.r-universe.dev/stockplotr/reference/plot_spawning_biomass.html" class="external-link">stockplotr::plot_spawning_biomass()</a></code> for visualizing retrospective results</p></li>
 <li><p><code><a href="calculate_mohns_rho.html">calculate_mohns_rho()</a></code> for calculating Mohn's rho statistic</p></li>
-<li><p><code><a href="create_default_parameters.html">create_default_parameters()</a></code> for creating parameter objects</p></li>
+<li><p><code><a href="setup_default_parameters.html">setup_default_parameters()</a></code> for creating parameter objects</p></li>
 </ul><p>Other diagnostic_functions:
 <code><a href="plot_likelihood.html">plot_likelihood()</a></code>,
 <code><a href="run_fims_likelihood.html">run_fims_likelihood()</a></code></p></div>
@@ -169,9 +169,7 @@ ICES Journal of Marine Science 72(1): 99-110.</p>
 <span class="r-in"><span><span class="va">data_4_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="FIMSFrame.html">FIMSFrame</a></span><span class="op">(</span><span class="va">data_big</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Create a parameters object</span></span></span>
-<span class="r-in"><span><span class="va">parameters</span> <span class="op">&lt;-</span> <span class="va">data_4_model</span> <span class="op">|&gt;</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="create_default_configurations.html">create_default_configurations</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="create_default_parameters.html">create_default_parameters</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">data_4_model</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">parameters</span> <span class="op">&lt;-</span> <span class="fu"><a href="setup_default_parameters.html">setup_default_parameters</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">data_4_model</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Run base model</span></span></span>
 <span class="r-in"><span><span class="va">base_model</span> <span class="op">&lt;-</span> <span class="va">parameters</span> <span class="op">|&gt;</span></span></span>

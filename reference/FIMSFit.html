@@ -10,7 +10,7 @@ user if they have used their own bespoke code to fit a FIMS model."><meta proper
     <nav class="navbar navbar-expand-lg fixed-top bg-light" data-bs-theme="light" aria-label="Site navigation"><div class="container">
     <img class="navlogo" src="https://noaa-fims.github.io/images/FIMS_logo3.png" alt="FIMS logo with a fish" width="60" align="left"><a class="navbar-brand me-2" href="../index.html">FIMS</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.4.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.10.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -80,7 +80,7 @@ user if they have used their own bespoke code to fit a FIMS model.</p>
 <span>  <span class="va">obj</span>,</span>
 <span>  opt <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  sdreport <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
-<span>  timing <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>time_total <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/difftime.html" class="external-link">as.difftime</a></span><span class="op">(</span><span class="fl">0</span>, units <span class="op">=</span> <span class="st">"secs"</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  run_time <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>time_total <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/difftime.html" class="external-link">as.difftime</a></span><span class="op">(</span><span class="fl">0</span>, units <span class="op">=</span> <span class="st">"secs"</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>  version <span class="op">=</span> <span class="fu">utils</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/utils/packageDescription.html" class="external-link">packageVersion</a></span><span class="op">(</span><span class="st">"FIMS"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -107,7 +107,7 @@ user if they have used their own bespoke code to fit a FIMS model.</p>
 <code><a href="https://rdrr.io/pkg/TMB/man/sdreport.html" class="external-link">TMB::sdreport()</a></code>.</p></dd>
 
 
-<dt id="arg-timing">timing<a class="anchor" aria-label="anchor" href="#arg-timing"></a></dt>
+<dt id="arg-run-time">run_time<a class="anchor" aria-label="anchor" href="#arg-run-time"></a></dt>
 <dd><p>A vector of at least length one, where all entries are of the
 <code>timediff</code> class and at least one is named "time_total". This information
 is available in <code><a href="fit_fims.html">fit_fims()</a></code> and added to this argument internally but if
@@ -144,7 +144,7 @@ following slots:</p><dl><dt><code>input</code>:</dt>
 <dd><p>An object with the <code>sdreport</code> class containing the output from
 <code>TMB::sdreport(obj)</code>.</p></dd>
 
-<dt><code>timing</code>:</dt>
+<dt><code>run_time</code>:</dt>
 <dd><p>The length of time it took to run the model if it was optimized.</p></dd>
 
 <dt><code>version</code>:</dt>

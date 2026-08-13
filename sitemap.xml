@@ -27,9 +27,8 @@
 <url><loc>https://NOAA-FIMS.github.io/FIMS/reference/Rcpp_VariableVector.html</loc></url>
 <url><loc>https://NOAA-FIMS.github.io/FIMS/reference/augment.FIMSFit.html</loc></url>
 <url><loc>https://NOAA-FIMS.github.io/FIMS/reference/calculate_mohns_rho.html</loc></url>
-<url><loc>https://NOAA-FIMS.github.io/FIMS/reference/create_default_configurations.html</loc></url>
-<url><loc>https://NOAA-FIMS.github.io/FIMS/reference/create_default_parameters.html</loc></url>
 <url><loc>https://NOAA-FIMS.github.io/FIMS/reference/data_big.html</loc></url>
+<url><loc>https://NOAA-FIMS.github.io/FIMS/reference/fims_distributions.html</loc></url>
 <url><loc>https://NOAA-FIMS.github.io/FIMS/reference/fims_input_types.html</loc></url>
 <url><loc>https://NOAA-FIMS.github.io/FIMS/reference/fit_fims.html</loc></url>
 <url><loc>https://NOAA-FIMS.github.io/FIMS/reference/get_FIMSFit.html</loc></url>
@@ -40,10 +39,12 @@
 <url><loc>https://NOAA-FIMS.github.io/FIMS/reference/index.html</loc></url>
 <url><loc>https://NOAA-FIMS.github.io/FIMS/reference/initialize_data_distribution.html</loc></url>
 <url><loc>https://NOAA-FIMS.github.io/FIMS/reference/initialize_fims.html</loc></url>
+<url><loc>https://NOAA-FIMS.github.io/FIMS/reference/initialize_process_distribution.html</loc></url>
 <url><loc>https://NOAA-FIMS.github.io/FIMS/reference/is.FIMSFit.html</loc></url>
 <url><loc>https://NOAA-FIMS.github.io/FIMS/reference/is_fims_verbose.html</loc></url>
 <url><loc>https://NOAA-FIMS.github.io/FIMS/reference/lognormal.html</loc></url>
 <url><loc>https://NOAA-FIMS.github.io/FIMS/reference/model_.html</loc></url>
+<url><loc>https://NOAA-FIMS.github.io/FIMS/reference/parse_data_distribution.html</loc></url>
 <url><loc>https://NOAA-FIMS.github.io/FIMS/reference/plot.html</loc></url>
 <url><loc>https://NOAA-FIMS.github.io/FIMS/reference/plot_likelihood.html</loc></url>
 <url><loc>https://NOAA-FIMS.github.io/FIMS/reference/reexports.html</loc></url>
@@ -58,6 +59,13 @@
 <url><loc>https://NOAA-FIMS.github.io/FIMS/reference/run_r_integration_tests.html</loc></url>
 <url><loc>https://NOAA-FIMS.github.io/FIMS/reference/run_r_unit_tests.html</loc></url>
 <url><loc>https://NOAA-FIMS.github.io/FIMS/reference/setup_and_run_gtest.html</loc></url>
+<url><loc>https://NOAA-FIMS.github.io/FIMS/reference/setup_default_Fleet.html</loc></url>
+<url><loc>https://NOAA-FIMS.github.io/FIMS/reference/setup_default_Growth.html</loc></url>
+<url><loc>https://NOAA-FIMS.github.io/FIMS/reference/setup_default_Maturity.html</loc></url>
+<url><loc>https://NOAA-FIMS.github.io/FIMS/reference/setup_default_Population.html</loc></url>
+<url><loc>https://NOAA-FIMS.github.io/FIMS/reference/setup_default_Recruitment.html</loc></url>
+<url><loc>https://NOAA-FIMS.github.io/FIMS/reference/setup_default_Selectivity.html</loc></url>
+<url><loc>https://NOAA-FIMS.github.io/FIMS/reference/setup_default_parameters.html</loc></url>
 <url><loc>https://NOAA-FIMS.github.io/FIMS/reference/setup_gtest.html</loc></url>
 <url><loc>https://NOAA-FIMS.github.io/FIMS/reference/tidy.FIMSFit.html</loc></url>
 <url><loc>https://NOAA-FIMS.github.io/FIMS/reference/use_google_benchmark_template.html</loc></url>

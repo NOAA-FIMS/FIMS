@@ -12,7 +12,7 @@ potential local minima in the likelihood surface."><meta property="og:image" con
     <nav class="navbar navbar-expand-lg fixed-top bg-light" data-bs-theme="light" aria-label="Site navigation"><div class="container">
     <img class="navlogo" src="https://noaa-fims.github.io/images/FIMS_logo3.png" alt="FIMS logo with a fish" width="60" align="left"><a class="navbar-brand me-2" href="../index.html">FIMS</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.4.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.10.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -97,32 +97,32 @@ potential local minima in the likelihood surface.</p>
 
 <dl><dt id="arg-model">model<a class="anchor" aria-label="anchor" href="#arg-model"></a></dt>
 <dd><p>A FIMSFit object returned by <code><a href="fit_fims.html">fit_fims()</a></code>. Used to extract
-the estimated value of the parameter being profiled</p></dd>
+the estimated value of the parameter being profiled.</p></dd>
 
 
 <dt id="arg-parameters">parameters<a class="anchor" aria-label="anchor" href="#arg-parameters"></a></dt>
 <dd><p>A FIMS parameters object created by
-<code><a href="create_default_parameters.html">create_default_parameters()</a></code>, containing the model configuration
-and initial parameter values</p></dd>
+<code><a href="setup_default_parameters.html">setup_default_parameters()</a></code>, containing the model configuration
+and initial parameter values,</p></dd>
 
 
 <dt id="arg-data">data<a class="anchor" aria-label="anchor" href="#arg-data"></a></dt>
 <dd><p>A data frame, tibble, or FIMSFrame object containing the model
-data. This should include all data types required by FIMS</p></dd>
+data. This should include all data types required by FIMS.</p></dd>
 
 
 <dt id="arg-module-name">module_name<a class="anchor" aria-label="anchor" href="#arg-module-name"></a></dt>
 <dd><p>A character string specifying the module containing the
 parameter to profile. Default is <code>NULL</code>. Required when the parameter name
 exists in multiple modules (e.g., multiple fleets). Examples include
-<code>"fleet1"</code>, <code>"survey1"</code>, or <code>"recruitment"</code></p></dd>
+<code>"fleet1"</code>, <code>"survey1"</code>, or <code>"recruitment"</code>.</p></dd>
 
 
 <dt id="arg-parameter-name">parameter_name<a class="anchor" aria-label="anchor" href="#arg-parameter-name"></a></dt>
 <dd><p>A character string specifying the parameter to profile.
 Default is <code>"log_rzero"</code>. Must match a parameter name in the FIMS model.
 Common options include <code>"log_rzero"</code>, <code>"log_sigma_recruit"</code>, <code>"logit_steep"</code>,
-or selectivity parameters</p></dd>
+or selectivity parameters.</p></dd>
 
 
 <dt id="arg-n-cores">n_cores<a class="anchor" aria-label="anchor" href="#arg-n-cores"></a></dt>
@@ -191,7 +191,7 @@ fisheries stock assessment. Fisheries Research 142: 61-74.</p>
     <div class="dont-index">
 <ul><li><p><code><a href="plot_likelihood.html">plot_likelihood()</a></code> for visualizing likelihood profiles</p></li>
 <li><p><code><a href="fit_fims.html">fit_fims()</a></code> for fitting FIMS models</p></li>
-<li><p><code><a href="create_default_parameters.html">create_default_parameters()</a></code> for creating parameter objects</p></li>
+<li><p><code><a href="setup_default_parameters.html">setup_default_parameters()</a></code> for creating parameter objects</p></li>
 </ul><p>Other diagnostic_functions:
 <code><a href="plot_likelihood.html">plot_likelihood()</a></code>,
 <code><a href="run_fims_retrospective.html">run_fims_retrospective()</a></code></p></div>
@@ -207,9 +207,7 @@ fisheries stock assessment. Fisheries Research 142: 61-74.</p>
 <span class="r-in"><span><span class="va">data_4_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="FIMSFrame.html">FIMSFrame</a></span><span class="op">(</span><span class="va">data_big</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Create a parameters object</span></span></span>
-<span class="r-in"><span><span class="va">parameters</span> <span class="op">&lt;-</span> <span class="va">data_4_model</span> <span class="op">|&gt;</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="create_default_configurations.html">create_default_configurations</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="create_default_parameters.html">create_default_parameters</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">data_4_model</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">parameters</span> <span class="op">&lt;-</span> <span class="fu"><a href="setup_default_parameters.html">setup_default_parameters</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">data_4_model</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Run the base model with optimization</span></span></span>
 <span class="r-in"><span><span class="va">base_model</span> <span class="op">&lt;-</span> <span class="va">parameters</span> <span class="op">|&gt;</span></span></span>

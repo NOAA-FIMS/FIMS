@@ -6,7 +6,7 @@
     <nav class="navbar navbar-expand-lg fixed-top bg-light" data-bs-theme="light" aria-label="Site navigation"><div class="container">
     <img class="navlogo" src="https://noaa-fims.github.io/images/FIMS_logo3.png" alt="FIMS logo with a fish" width="60" align="left"><a class="navbar-brand me-2" href="../index.html">FIMS</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.4.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.10.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -64,8 +64,14 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.10.0" id="fims-0100">FIMS 0.10.0<a class="anchor" aria-label="anchor" href="#fims-0100"></a></h2>
-<ul><li>
-</li></ul></div>
+<ul><li>Use <code><a href="../reference/setup_default_parameters.html">setup_default_parameters()</a></code> to set up a model</li>
+<li>Specify uncertainty using a formula with a distribution and arguments</li>
+<li>Change time to timing in parameter tibble</li>
+<li>Change value to observed in FIMSFrame</li>
+<li>Rename <code>get_timing()</code> to <code><a href="../reference/get_FIMSFit.html">get_run_time()</a></code>
+</li>
+<li>Change landings to catch everywhere (R and C++)</li>
+</ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.9.4" id="fims-094">FIMS 0.9.4<a class="anchor" aria-label="anchor" href="#fims-094"></a></h2>
 <ul><li>Adds likelihood profiles and retrospective diagnostic tools</li>
@@ -184,7 +190,7 @@
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.4.0" id="fims-040">FIMS 0.4.0<a class="anchor" aria-label="anchor" href="#fims-040"></a></h2>
-<ul><li>Allows for CPUE data and landings within a single fleet and changes the composition data to be separate from the catch. If there are catches, compositions are based on F, if you have survey compositions those are scaled by q, and you can also have composition data without catch or CPUE and those match the population.</li>
+<ul><li>Allows for CPUE data and catch within a single fleet and changes the composition data to be separate from the catch. If there are catches, compositions are based on F, if you have survey compositions those are scaled by q, and you can also have composition data without catch or CPUE and those match the population.</li>
 <li>Fixes bug in <code>finalize()</code> where variables were going out of scope by using a shared pointer and RealVector, which allows for estimates tibble to return more. Output is integrated between json and TMB using <code><a href="../reference/reshape_tmb_estimates.html">reshape_tmb_estimates()</a></code>, <code><a href="../reference/reshape_json_estimates.html">reshape_json_estimates()</a></code>, and <code>reshape_json_derived_quantities()</code>. ParameterVector are now set using <code>resize()</code> and <code><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">purrr::walk()</a></code> rather than <code><a href="https://rdrr.io/r/methods/new.html" class="external-link">methods::new()</a></code>.</li>
 <li>Increases code coverage
 <ul><li>Restructures R tests using <code><a href="../reference/use_testthat_template.html">use_testthat_template()</a></code>

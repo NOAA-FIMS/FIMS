@@ -131,7 +131,7 @@ methods::show(data_4_model)
 
     ## tbl_df of class 'FIMSFrame'
 
-    ## with the following 'types': age_comp, landings, length_comp, weight_at_age, index, age_to_length_conversion
+    ## with the following 'types': age_comp, catch, length_comp, weight_at_age, index, age_to_length_conversion
 
     ## Found more than one class "tbl_df" in cache; using the first, from namespace 'FIMS'
 
@@ -142,14 +142,14 @@ methods::show(data_4_model)
     ## Also defined by 'tibble'
 
     ## # A tibble: 6 × 8
-    ##   type     fleet    age length timing value unit       uncertainty
-    ##   <chr>    <chr>  <int>  <dbl>  <dbl> <dbl> <chr>            <dbl>
-    ## 1 age_comp fleet1     1     NA      1 0.07  proportion         200
-    ## 2 age_comp fleet1     2     NA      1 0.1   proportion         200
-    ## 3 age_comp fleet1     3     NA      1 0.115 proportion         200
-    ## 4 age_comp fleet1     4     NA      1 0.15  proportion         200
-    ## 5 age_comp fleet1     5     NA      1 0.1   proportion         200
-    ## 6 age_comp fleet1     6     NA      1 0.05  proportion         200
+    ##   type     fleet    age length timing observed unit       uncertainty           
+    ##   <chr>    <chr>  <int>  <dbl>  <dbl>    <dbl> <chr>      <chr>                 
+    ## 1 age_comp fleet1     1     NA      1    0.07  proportion ~ dmultinom(prob = ag…
+    ## 2 age_comp fleet1     2     NA      1    0.1   proportion ~ dmultinom(prob = ag…
+    ## 3 age_comp fleet1     3     NA      1    0.115 proportion ~ dmultinom(prob = ag…
+    ## 4 age_comp fleet1     4     NA      1    0.15  proportion ~ dmultinom(prob = ag…
+    ## 5 age_comp fleet1     5     NA      1    0.1   proportion ~ dmultinom(prob = ag…
+    ## 6 age_comp fleet1     6     NA      1    0.05  proportion ~ dmultinom(prob = ag…
     ## additional slots include the following:fleets:
     ## [1] "fleet1"  "survey1"
     ## n_years:
@@ -179,34 +179,34 @@ str(data_4_model, max.level = 1)
 
 ``` r
 
-# Use dplyr to subset the data for just the landings
+# Use dplyr to subset the data for just the catch
 get_data(data_4_model) |>
-  dplyr::filter(type == "landings")
+  dplyr::filter(type == "catch")
 ```
 
     ## # A tibble: 30 × 8
-    ##    type     fleet    age length timing value unit  uncertainty
-    ##    <chr>    <chr>  <int>  <dbl>  <dbl> <dbl> <chr>       <dbl>
-    ##  1 landings fleet1    NA     NA      1  162. mt        0.01000
-    ##  2 landings fleet1    NA     NA      2  461. mt        0.01000
-    ##  3 landings fleet1    NA     NA      3  747. mt        0.01000
-    ##  4 landings fleet1    NA     NA      4  997. mt        0.01000
-    ##  5 landings fleet1    NA     NA      5  768. mt        0.01000
-    ##  6 landings fleet1    NA     NA      6 1344. mt        0.01000
-    ##  7 landings fleet1    NA     NA      7 1319. mt        0.01000
-    ##  8 landings fleet1    NA     NA      8 2598. mt        0.01000
-    ##  9 landings fleet1    NA     NA      9 1426. mt        0.01000
-    ## 10 landings fleet1    NA     NA     10 1644. mt        0.01000
+    ##    type  fleet    age length timing observed unit  uncertainty                  
+    ##    <chr> <chr>  <int>  <dbl>  <dbl>    <dbl> <chr> <chr>                        
+    ##  1 catch fleet1    NA     NA      1     162. mt    ~ dlnorm(meanlog = log_catch…
+    ##  2 catch fleet1    NA     NA      2     461. mt    ~ dlnorm(meanlog = log_catch…
+    ##  3 catch fleet1    NA     NA      3     747. mt    ~ dlnorm(meanlog = log_catch…
+    ##  4 catch fleet1    NA     NA      4     997. mt    ~ dlnorm(meanlog = log_catch…
+    ##  5 catch fleet1    NA     NA      5     768. mt    ~ dlnorm(meanlog = log_catch…
+    ##  6 catch fleet1    NA     NA      6    1344. mt    ~ dlnorm(meanlog = log_catch…
+    ##  7 catch fleet1    NA     NA      7    1319. mt    ~ dlnorm(meanlog = log_catch…
+    ##  8 catch fleet1    NA     NA      8    2598. mt    ~ dlnorm(meanlog = log_catch…
+    ##  9 catch fleet1    NA     NA      9    1426. mt    ~ dlnorm(meanlog = log_catch…
+    ## 10 catch fleet1    NA     NA     10    1644. mt    ~ dlnorm(meanlog = log_catch…
     ## # ℹ 20 more rows
 
 The data contains the following fleets:
 
 - A single fishery fleet with age- and length-composition,
-  weight-at-age, and landings data
+  weight-at-age, and catch data
 - A single survey with age- and length-composition and index data
 
 You can use the base R function `plot(data_4_model)` to see the data
-types (e.g., landings, length composition, age composition, etc.) in the
+types (e.g., catch, length composition, age composition, etc.) in the
 `data_4_model` object by fleet.
 
 ``` r
@@ -214,122 +214,10 @@ types (e.g., landings, length composition, age composition, etc.) in the
 plot(data_4_model)
 ```
 
-![Landings are increasing over time and the index is decreasing over
-time. ](fims-demo_files/figure-html/FIMSFrame-plot-1.png)
+![Catch are increasing over time and the index is decreasing over time.
+](fims-demo_files/figure-html/FIMSFrame-plot-1.png)
 
 FIMS input values by type (panels) and fleet (colors).
-
-## Configurations
-
-### `create_default_configurations()`
-
-The
-[`create_default_configurations()`](https://NOAA-FIMS.github.io/FIMS/reference/create_default_configurations.md)
-function is designed to generate a set of default configurations for the
-various components of a FIMS model. This includes configurations for
-fleets, growth, maturity, and recruitment modules. By leveraging the
-structure of the input data, the function can automatically set up
-initial configurations for each module. By passing the data and
-configurations to
-[`create_default_parameters()`](https://NOAA-FIMS.github.io/FIMS/reference/create_default_parameters.md)
-the function can tailor the defaults based on how many fleets there are
-and what data types exist. For example, if you have three fleets, then
-[`create_default_configurations()`](https://NOAA-FIMS.github.io/FIMS/reference/create_default_configurations.md)
-will set up three logistic selectivity modules.
-
-``` r
-
-# Create default configurations based on the data
-default_configurations <- create_default_configurations(data = data_4_model)
-
-default_configurations
-```
-
-``` numberSource
-## # A tibble: 7 × 4
-##   model_family module_name fleet   data            
-##   <chr>        <chr>       <chr>   <list>          
-## 1 catch_at_age Data        fleet1  <tibble [3 × 3]>
-## 2 catch_at_age Selectivity fleet1  <tibble [1 × 3]>
-## 3 catch_at_age Data        survey1 <tibble [3 × 3]>
-## 4 catch_at_age Selectivity survey1 <tibble [1 × 3]>
-## 5 catch_at_age Growth      <NA>    <tibble [1 × 3]>
-## 6 catch_at_age Maturity    <NA>    <tibble [1 × 3]>
-## 7 catch_at_age Recruitment <NA>    <tibble [1 × 3]>
-```
-
-``` r
-
-# The output is a nested tibble, with details in the `data` column.
-default_configurations_unnested <- default_configurations |>
-  tidyr::unnest(cols = data)
-
-default_configurations_unnested
-```
-
-``` numberSource
-## # A tibble: 11 × 6
-##    model_family module_name fleet   module_type  distribution_type distribution
-##    <chr>        <chr>       <chr>   <chr>        <chr>             <chr>       
-##  1 catch_at_age Data        fleet1  AgeComp      Data              Dmultinom   
-##  2 catch_at_age Data        fleet1  Landings     Data              Dlnorm      
-##  3 catch_at_age Data        fleet1  LengthComp   Data              Dmultinom   
-##  4 catch_at_age Selectivity fleet1  Logistic     <NA>              <NA>        
-##  5 catch_at_age Data        survey1 AgeComp      Data              Dmultinom   
-##  6 catch_at_age Data        survey1 Index        Data              Dlnorm      
-##  7 catch_at_age Data        survey1 LengthComp   Data              Dmultinom   
-##  8 catch_at_age Selectivity survey1 Logistic     <NA>              <NA>        
-##  9 catch_at_age Growth      <NA>    EWAA         <NA>              <NA>        
-## 10 catch_at_age Maturity    <NA>    Logistic     <NA>              <NA>        
-## 11 catch_at_age Recruitment <NA>    BevertonHolt process           Dnorm
-```
-
-### Update configurations
-
-The default_configurations are just a starting point. Functions (e.g.,
-`rows_*()`) from [dplyr](https://dplyr.tidyverse.org) can be used to
-modify the default configurations as needed. For example, logistic
-selectivity for survey1 can be changed to double logistic selectivity.
-
-``` r
-
-# Update the module_type for survey1's selectivity
-updated_configurations <- default_configurations_unnested |>
-  dplyr::rows_update(
-    y = tibble::tibble(
-      module_name = c("Selectivity"),
-      fleet = c("survey1"),
-      module_type = c("DoubleLogistic")
-    ),
-    by = c("module_name", "fleet")
-  )
-
-updated_configurations
-```
-
-``` numberSource
-## # A tibble: 11 × 6
-##    model_family module_name fleet   module_type   distribution_type distribution
-##    <chr>        <chr>       <chr>   <chr>         <chr>             <chr>       
-##  1 catch_at_age Data        fleet1  AgeComp       Data              Dmultinom   
-##  2 catch_at_age Data        fleet1  Landings      Data              Dlnorm      
-##  3 catch_at_age Data        fleet1  LengthComp    Data              Dmultinom   
-##  4 catch_at_age Selectivity fleet1  Logistic      <NA>              <NA>        
-##  5 catch_at_age Data        survey1 AgeComp       Data              Dmultinom   
-##  6 catch_at_age Data        survey1 Index         Data              Dlnorm      
-##  7 catch_at_age Data        survey1 LengthComp    Data              Dmultinom   
-##  8 catch_at_age Selectivity survey1 DoubleLogist… <NA>              <NA>        
-##  9 catch_at_age Growth      <NA>    EWAA          <NA>              <NA>        
-## 10 catch_at_age Maturity    <NA>    Logistic      <NA>              <NA>        
-## 11 catch_at_age Recruitment <NA>    BevertonHolt  process           Dnorm
-```
-
-``` r
-
-# Nest updated_configurations
-updated_configurations_nested <- updated_configurations |>
-  tidyr::nest(.by = c(model_family, module_name, fleet))
-```
 
 ## Parameters
 
@@ -338,7 +226,7 @@ used from the FIMS framework. This combination of modules rather than
 the use of a control file negates the need for complicated if{} else{}
 statements in the code.
 
-### `create_default_parameters()`
+### `setup_default_parameters()`
 
 Modules that are available in FIMS are known as reference classes in the
 C++ code. Each reference class acts as an interface between R and the
@@ -349,8 +237,8 @@ classes are created because each reference class can be accessed through
 R by itself to build up a model rather than needing to modify a control
 file for future features.
 
-By just passing the configurations and the data to
-[`create_default_parameters()`](https://NOAA-FIMS.github.io/FIMS/reference/create_default_parameters.md),
+By just passing the data to
+[`setup_default_parameters()`](https://NOAA-FIMS.github.io/FIMS/reference/setup_default_parameters.md),
 the default values for parameters that relate to fleet(s), recruitment,
 growth, and maturity modules can be created. For example,
 
@@ -361,56 +249,28 @@ growth, and maturity modules can be created. For example,
 
 ``` r
 
-# Create default parameters based on default_configurations and data
-default_parameters <- create_default_parameters(
-  configurations = default_configurations,
-  data = data_4_model
-)
+# Set up default parameters based on data
+default_parameters <- setup_default_parameters(data = data_4_model)
 
 default_parameters
 ```
 
 ``` numberSource
-## # A tibble: 10 × 4
-##    model_family module_name fleet   data              
-##    <chr>        <chr>       <chr>   <list>            
-##  1 catch_at_age Selectivity fleet1  <tibble [2 × 9]>  
-##  2 catch_at_age Fleet       fleet1  <tibble [31 × 9]> 
-##  3 catch_at_age Data        fleet1  <tibble [32 × 9]> 
-##  4 catch_at_age Selectivity survey1 <tibble [2 × 9]>  
-##  5 catch_at_age Fleet       survey1 <tibble [31 × 9]> 
-##  6 catch_at_age Data        survey1 <tibble [32 × 9]> 
-##  7 catch_at_age Recruitment <NA>    <tibble [32 × 9]> 
-##  8 catch_at_age Maturity    <NA>    <tibble [2 × 9]>  
-##  9 catch_at_age Population  <NA>    <tibble [373 × 9]>
-## 10 catch_at_age Growth      <NA>    <tibble [1 × 9]>
-```
-
-``` r
-
-# Unnest the default_parameters to see the detailed parameters
-default_parameters_unnested <- tidyr::unnest(default_parameters, cols = data)
-
-default_parameters_unnested
-```
-
-``` numberSource
-## # A tibble: 538 × 12
-##    model_family module_name fleet  module_type label      age length  time value
-##    <chr>        <chr>       <chr>  <chr>       <chr>    <dbl>  <dbl> <dbl> <dbl>
-##  1 catch_at_age Selectivity fleet1 Logistic    inflect…    NA     NA    NA     2
-##  2 catch_at_age Selectivity fleet1 Logistic    slope       NA     NA    NA     1
-##  3 catch_at_age Fleet       fleet1 <NA>        log_q       NA     NA    NA     0
-##  4 catch_at_age Fleet       fleet1 <NA>        log_Fmo…    NA     NA     1    -3
-##  5 catch_at_age Fleet       fleet1 <NA>        log_Fmo…    NA     NA     2    -3
-##  6 catch_at_age Fleet       fleet1 <NA>        log_Fmo…    NA     NA     3    -3
-##  7 catch_at_age Fleet       fleet1 <NA>        log_Fmo…    NA     NA     4    -3
-##  8 catch_at_age Fleet       fleet1 <NA>        log_Fmo…    NA     NA     5    -3
-##  9 catch_at_age Fleet       fleet1 <NA>        log_Fmo…    NA     NA     6    -3
-## 10 catch_at_age Fleet       fleet1 <NA>        log_Fmo…    NA     NA     7    -3
-## # ℹ 528 more rows
-## # ℹ 3 more variables: estimation_type <chr>, distribution_type <chr>,
-## #   distribution <chr>
+## # A tibble: 474 × 11
+##    module_name fleet module_type label   age length timing value estimation_type
+##    <chr>       <chr> <chr>       <chr> <dbl>  <dbl>  <int> <dbl> <chr>          
+##  1 Selectivity flee… Logistic    infl…    NA     NA     NA     2 fixed_effects  
+##  2 Selectivity flee… Logistic    slope    NA     NA     NA     1 fixed_effects  
+##  3 Selectivity surv… Logistic    infl…    NA     NA     NA     2 fixed_effects  
+##  4 Selectivity surv… Logistic    slope    NA     NA     NA     1 fixed_effects  
+##  5 Fleet       flee… <NA>        log_q    NA     NA     NA     0 constant       
+##  6 Fleet       flee… <NA>        log_…    NA     NA      1    -3 fixed_effects  
+##  7 Fleet       flee… <NA>        log_…    NA     NA      2    -3 fixed_effects  
+##  8 Fleet       flee… <NA>        log_…    NA     NA      3    -3 fixed_effects  
+##  9 Fleet       flee… <NA>        log_…    NA     NA      4    -3 fixed_effects  
+## 10 Fleet       flee… <NA>        log_…    NA     NA      5    -3 fixed_effects  
+## # ℹ 464 more rows
+## # ℹ 2 more variables: distribution_type <chr>, distribution <chr>
 ```
 
 ### Update parameters
@@ -425,13 +285,12 @@ default values.
 ``` r
 
 parameters_4_model <- default_parameters |>
-  tidyr::unnest(cols = data) |>
   # Update log_Fmort initial values for Fleet1
   dplyr::rows_update(
     tibble::tibble(
       fleet = "fleet1",
       label = "log_Fmort",
-      time = seq(get_n_years(data_4_model)),
+      timing = seq(get_n_years(data_4_model)),
       value = log(c(
         0.009459165, 0.027288858, 0.045063639,
         0.061017825, 0.048600752, 0.087420554,
@@ -445,7 +304,7 @@ parameters_4_model <- default_parameters |>
         0.431745298, 0.328030899, 0.499675368
       ))
     ),
-    by = c("fleet", "label", "time")
+    by = c("fleet", "label", "timing")
   ) |>
   # Update selectivity parameters and log_q for survey1
   dplyr::rows_update(
@@ -456,11 +315,11 @@ parameters_4_model <- default_parameters |>
     ),
     by = c("fleet", "label")
   ) |>
-  # Update log_devs in the Recruitment module (time steps 2-30)
+  # Update log_devs in the Recruitment module (timing steps 2-30)
   dplyr::rows_update(
     tibble::tibble(
       label = "log_devs",
-      time = 2:get_n_years(data_4_model),
+      timing = 2:get_n_years(data_4_model),
       value = c(
         0.43787763, -0.13299042, -0.43251973, 0.64861200, 0.50640852,
         -0.06958319, 0.30246260, -0.08257384, 0.20740372, 0.15289604,
@@ -470,7 +329,7 @@ parameters_4_model <- default_parameters |>
         -0.19556523, 0.20094360, 0.37248740, -0.07163145
       )
     ),
-    by = c("label", "time")
+    by = c("label", "timing")
   ) |>
   # Update log_sd for log_devs in the Recruitment module
   dplyr::rows_update(
@@ -514,7 +373,7 @@ and fit the model using
 ### `initialize_fims()`
 
 The tibble returned by
-[`create_default_parameters()`](https://NOAA-FIMS.github.io/FIMS/reference/create_default_parameters.md)
+[`setup_default_parameters()`](https://NOAA-FIMS.github.io/FIMS/reference/setup_default_parameters.md)
 is just a data frame containing specifications. Nothing has been created
 in memory as of yet. To actually initialize the modules,
 [`initialize_fims()`](https://NOAA-FIMS.github.io/FIMS/reference/initialize_fims.md)
@@ -551,17 +410,17 @@ fit <- parameters_4_model |>
 
     ## ✔ Starting optimization ...
     ## ℹ Restarting optimizer 3 times to improve gradient.
-    ## ℹ Maximum gradient went from 0.00941 to 0.00101 after 3 steps.
+    ## ℹ Maximum gradient went from 0.00483 to 0.00066 after 3 steps.
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
-    ## ℹ FIMS model version: 0.9.4.9000
-    ## ℹ Total run time was 1.28079 minutes
+    ## ℹ FIMS model version: 0.10.0
+    ## ℹ Total run time was 33.28329 seconds
     ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
-    ## ℹ Maximum gradient= 0.00101
+    ## ℹ Maximum gradient= 0.00066
     ## ℹ Negative log likelihood (NLL):
     ## • Marginal NLL= 3231.25994
     ## • Total NLL= 3164.83637
-    ## ℹ Terminal SB= 1791.58311
+    ## ℹ Terminal SB= 1791.58536
 
 ### Logging system
 
@@ -592,7 +451,7 @@ log_data_frame[1, ]
 ```
 
     ##                  timestamp   level
-    ## 1 Fri Jul 31 16:10:09 2026 warning
+    ## 1 Thu Aug 13 17:52:32 2026 warning
     ##                                                                   message id
     ## 1 The log_f_multiplier vector is not of size n_years. Filling with zeros.  0
     ##     user                                    wd
@@ -628,8 +487,8 @@ log_data_frame |> dplyr::filter(level == "warning")
 ```
 
     ##                  timestamp   level
-    ## 1 Fri Jul 31 16:10:09 2026 warning
-    ## 2 Fri Jul 31 16:10:09 2026 warning
+    ## 1 Thu Aug 13 17:52:32 2026 warning
+    ## 2 Thu Aug 13 17:52:32 2026 warning
     ##                                                                   message id
     ## 1 The log_f_multiplier vector is not of size n_years. Filling with zeros.  0
     ## 2              Setting spawning_biomass_ratio vector to size n_years + 1.  1
@@ -732,18 +591,18 @@ values.](fims-demo_files/figure-html/fit-plot-index-of-abundance-1.png)
 stockplotr::plot_timeseries(
   stockplotr::filter_data(
     output |> dplyr::filter(module_id == 1),
-    label_name = "^landings_expected$",
+    label_name = "^catch_expected$",
     geom = "line"
   ),
   x = "year",
   y = "estimate",
-  ylab = "Expected Landings (mt)"
+  ylab = "Expected Catch (mt)"
 ) +
   stockplotr::theme_noaa()
 ```
 
 ![Plot of estimated
-landings.](fims-demo_files/figure-html/fit-plot-landings-1.png)
+catch.](fims-demo_files/figure-html/fit-plot-catch-1.png)
 
 ### Sensitivities
 
@@ -790,17 +649,17 @@ high_slope_fit <- parameters_high_slope |>
 
     ## ✔ Starting optimization ...
     ## ℹ Restarting optimizer 3 times to improve gradient.
-    ## ℹ Maximum gradient went from 0.00616 to 0.00034 after 3 steps.
+    ## ℹ Maximum gradient went from 0.00445 to 0.00039 after 3 steps.
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
-    ## ℹ FIMS model version: 0.9.4.9000
-    ## ℹ Total run time was 1.25388 minutes
+    ## ℹ FIMS model version: 0.10.0
+    ## ℹ Total run time was 31.36378 seconds
     ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
-    ## ℹ Maximum gradient= 0.00034
+    ## ℹ Maximum gradient= 0.00039
     ## ℹ Negative log likelihood (NLL):
     ## • Marginal NLL= 3231.25994
     ## • Total NLL= 3164.83637
-    ## ℹ Terminal SB= 1791.58318
+    ## ℹ Terminal SB= 1791.58529
 
 ``` r
 
@@ -813,17 +672,17 @@ low_slope_fit <- parameters_low_slope |>
 
     ## ✔ Starting optimization ...
     ## ℹ Restarting optimizer 3 times to improve gradient.
-    ## ℹ Maximum gradient went from 0.00308 to 4e-04 after 3 steps.
+    ## ℹ Maximum gradient went from 0.00395 to 3e-04 after 3 steps.
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
-    ## ℹ FIMS model version: 0.9.4.9000
-    ## ℹ Total run time was 1.29003 minutes
+    ## ℹ FIMS model version: 0.10.0
+    ## ℹ Total run time was 32.73451 seconds
     ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
-    ## ℹ Maximum gradient= 4e-04
+    ## ℹ Maximum gradient= 3e-04
     ## ℹ Negative log likelihood (NLL):
     ## • Marginal NLL= 3231.25994
     ## • Total NLL= 3164.83637
-    ## ℹ Terminal SB= 1791.58128
+    ## ℹ Terminal SB= 1791.58564
 
 ``` r
 
@@ -837,27 +696,66 @@ length-composition configurations.
 
 ``` r
 
-# Create default parameters, update with modified values, initialize FIMS,
 # and fit the model
 age_only_fit <- parameters_4_model |>
-  # remove rows that have module_type == LengthComp
-  dplyr::rows_delete(
-    y = tibble::tibble(module_type = "LengthComp")
-  ) |>
-  initialize_fims(data = data_4_model) |>
+  initialize_fims(data = get_data(data_4_model) |>
+    dplyr::filter(!type %in% c("length_comp", "age_to_length_conversion"))) |>
   fit_fims(optimize = TRUE)
 ```
 
-    ## Matching, by = "module_type"
+    ## Found more than one class "tbl_df" in cache; using the first, from namespace 'FIMS'
+
+    ## Also defined by 'tibble'
+
+    ## Found more than one class "tbl_df" in cache; using the first, from namespace 'FIMS'
+
+    ## Also defined by 'tibble'
+
+    ## Found more than one class "tbl_df" in cache; using the first, from namespace 'FIMS'
+
+    ## Also defined by 'tibble'
+
+    ## Found more than one class "tbl_df" in cache; using the first, from namespace 'FIMS'
+
+    ## Also defined by 'tibble'
+
+    ## Found more than one class "tbl_df" in cache; using the first, from namespace 'FIMS'
+
+    ## Also defined by 'tibble'
+
+    ## Found more than one class "tbl_df" in cache; using the first, from namespace 'FIMS'
+
+    ## Also defined by 'tibble'
+
+    ## Found more than one class "tbl_df" in cache; using the first, from namespace 'FIMS'
+
+    ## Also defined by 'tibble'
+
+    ## Found more than one class "tbl_df" in cache; using the first, from namespace 'FIMS'
+
+    ## Also defined by 'tibble'
+
+    ## Found more than one class "tbl_df" in cache; using the first, from namespace 'FIMS'
+
+    ## Also defined by 'tibble'
+
+    ## Found more than one class "tbl_df" in cache; using the first, from namespace 'FIMS'
+
+    ## Also defined by 'tibble'
+
     ## ✔ Starting optimization ...
     ## ℹ Restarting optimizer 3 times to improve gradient.
-    ## ℹ Maximum gradient went from 0.00361 to 0.00038 after 3 steps.
+    ## ℹ Maximum gradient went from 0.00197 to 0.00048 after 3 steps.
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
-    ## ℹ FIMS model version: 0.9.4.9000 ℹ Total run time was 11.56105 seconds ℹ Number
-    ## of parameters: fixed_effects=49, random_effects=29, and total=78 ℹ Maximum
-    ## gradient= 0.00038 ℹ Negative log likelihood (NLL): • Marginal NLL= 1627.76704 •
-    ## Total NLL= 1564.0853 ℹ Terminal SB= 1740.95207
+    ## ℹ FIMS model version: 0.10.0
+    ## ℹ Total run time was 5.61868 seconds
+    ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
+    ## ℹ Maximum gradient= 0.00048
+    ## ℹ Negative log likelihood (NLL):
+    ## • Marginal NLL= 1627.76704
+    ## • Total NLL= 1564.08529
+    ## ℹ Terminal SB= 1740.95
 
 ``` r
 
@@ -871,27 +769,33 @@ age-composition configurations.
 
 ``` r
 
-# Create default parameters, update with modified values, initialize FIMS,
-# and fit the model
 length_only_fit <- parameters_4_model |>
-  # remove rows that have module_type == AgeComp
-  dplyr::rows_delete(
-    y = tibble::tibble(module_type = "AgeComp")
-  ) |>
-  initialize_fims(data = data_4_model) |>
+  initialize_fims(data = get_data(data_4_model) |>
+    dplyr::filter(!type %in% c("age_comp"))) |>
   fit_fims(optimize = TRUE)
 ```
 
-    ## Matching, by = "module_type"
+    ## Found more than one class "tbl_df" in cache; using the first, from namespace 'FIMS'
+
+    ## Also defined by 'tibble'
+
+    ## Found more than one class "tbl_df" in cache; using the first, from namespace 'FIMS'
+
+    ## Also defined by 'tibble'
+
     ## ✔ Starting optimization ...
     ## ℹ Restarting optimizer 3 times to improve gradient.
-    ## ℹ Maximum gradient went from 0.00715 to 0.00034 after 3 steps.
+    ## ℹ Maximum gradient went from 0.01308 to 0.00027 after 3 steps.
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
-    ## ℹ FIMS model version: 0.9.4.9000 ℹ Total run time was 1.18411 minutes ℹ Number
-    ## of parameters: fixed_effects=49, random_effects=29, and total=78 ℹ Maximum
-    ## gradient= 0.00034 ℹ Negative log likelihood (NLL): • Marginal NLL= 1568.32685 •
-    ## Total NLL= 1518.62644 ℹ Terminal SB= 1722.35744
+    ## ℹ FIMS model version: 0.10.0
+    ## ℹ Total run time was 30.84736 seconds
+    ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
+    ## ℹ Maximum gradient= 0.00027
+    ## ℹ Negative log likelihood (NLL):
+    ## • Marginal NLL= 1568.32685
+    ## • Total NLL= 1518.62644
+    ## ℹ Terminal SB= 1722.35982
 
 ``` r
 

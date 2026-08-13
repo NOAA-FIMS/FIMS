@@ -12,7 +12,7 @@ assess parameter identifiability and uncertainty."><meta property="og:image" con
     <nav class="navbar navbar-expand-lg fixed-top bg-light" data-bs-theme="light" aria-label="Site navigation"><div class="container">
     <img class="navlogo" src="https://noaa-fims.github.io/images/FIMS_logo3.png" alt="FIMS logo with a fish" width="60" align="left"><a class="navbar-brand me-2" href="../index.html">FIMS</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.4.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.10.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -115,7 +115,7 @@ column name(s) in the estimates data frame</p></dd>
     <p>Plot Likelihood Profile Results</p>
 <p>The function generates line plots showing how the log-likelihood changes
 relative to its maximum value as a parameter is varied. Each data component
-(e.g., landings, index, age composition) is shown as a separate line, along
+(e.g., catch, index, age composition) is shown as a separate line, along
 with the total likelihood across all components. This reveals which data
 sources provide information about the parameter and whether there are
 conflicting signals.</p>
@@ -154,9 +154,7 @@ Models with Data. Princeton University Press.</p>
 <span class="r-in"><span><span class="va">data_4_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="FIMSFrame.html">FIMSFrame</a></span><span class="op">(</span><span class="va">data_big</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Create parameters object</span></span></span>
-<span class="r-in"><span><span class="va">parameters</span> <span class="op">&lt;-</span> <span class="va">data_4_model</span> <span class="op">|&gt;</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="create_default_configurations.html">create_default_configurations</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="create_default_parameters.html">create_default_parameters</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">data_4_model</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">parameters</span> <span class="op">&lt;-</span> <span class="fu"><a href="setup_default_parameters.html">setup_default_parameters</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">data_4_model</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Run base model</span></span></span>
 <span class="r-in"><span><span class="va">base_model</span> <span class="op">&lt;-</span> <span class="va">parameters</span> <span class="op">|&gt;</span></span></span>

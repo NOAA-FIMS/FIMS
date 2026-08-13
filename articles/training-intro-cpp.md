@@ -361,7 +361,7 @@ pointer to the object (e.g., `MyClass* m = new MyClass();`). In modern
 C++ and in FIMS, it is common to use shared pointers (`std::shared_ptr`)
 to manage memory automatically and safely share ownership of objects
 across different parts of the program. If you are not yet familiar with
-pointers or dynamic memory allocation, do not worry—these concepts are
+pointers or dynamic memory allocation, do not worry — these concepts are
 explained in detail in the [Pointers and References
 section](#pointers-and-references) below.
 
@@ -738,8 +738,8 @@ pointer()
 ```
 
     ## x is equal to the address of y
-    ## x is: 0x7ffef9622a24
-    ## The address of y is: 0x7ffef9622a24
+    ## x is: 0x7ffdbec65254
+    ## The address of y is: 0x7ffdbec65254
     ## *x returns the value of y: 3.1459
 
     ## [1] 0
@@ -780,8 +780,8 @@ reference()
 
     ## x is: 3
     ## y is: 3
-    ## The memory address of x is: 0x7ffef9622a24
-    ## The memory address of y is: 0x7ffef9622a24
+    ## The memory address of x is: 0x7ffdbec65254
+    ## The memory address of y is: 0x7ffdbec65254
 
     ## [1] 0
 
@@ -854,9 +854,9 @@ reassign_pointer()
 ```
 
     ## c now equals the address of b
-    ## &a = 0x7ffef9622a20
-    ## &b = 0x7ffef9622a24
-    ## c = 0x7ffef9622a24
+    ## &a = 0x7ffdbec65250
+    ## &b = 0x7ffdbec65254
+    ## c = 0x7ffdbec65254
     ## a = 100
     ## b = 10
     ## *c = 10
@@ -989,8 +989,8 @@ shared_pointer()
 
     ## ptr1: 42
     ## ptr2: 24
-    ## ptr1 = 0x562acd5933e0
-    ## ptr2 = 0x562ad113cf40
-    ## ptr3 = 0x562acd5933e0
+    ## ptr1 = 0x56426c711410
+    ## ptr2 = 0x56426c71f3c0
+    ## ptr3 = 0x56426c711410
 
     ## [1] 0

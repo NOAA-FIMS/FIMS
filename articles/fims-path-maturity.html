@@ -28,7 +28,7 @@
     <nav class="navbar navbar-expand-lg fixed-top bg-light" data-bs-theme="light" aria-label="Site navigation"><div class="container">
     <img class="navlogo" src="https://noaa-fims.github.io/images/FIMS_logo3.png" alt="FIMS logo with a fish" width="60" align="left"><a class="navbar-brand me-2" href="../index.html">FIMS</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.4.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.10.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -165,44 +165,39 @@ wrapper function.</p>
 <span><span class="co"># See ?FIMSFrame for more information.</span></span>
 <span><span class="va">fims_frame</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/FIMSFrame.html">FIMSFrame</a></span><span class="op">(</span><span class="va">data_big</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Create default maturity parameters using internal function</span></span>
-<span><span class="va">default_parameters</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/create_default_configurations.html">create_default_configurations</a></span><span class="op">(</span><span class="va">fims_frame</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">tidyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyr.tidyverse.org/reference/unnest.html" class="external-link">unnest</a></span><span class="op">(</span>cols <span class="op">=</span> <span class="va">data</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">FIMS</span><span class="fu">:::</span><span class="fu">create_default_maturity</span><span class="op">(</span>data <span class="op">=</span> <span class="va">fims_frame</span><span class="op">)</span></span>
+<span><span class="co"># Set up default maturity parameters</span></span>
+<span><span class="va">default_parameters</span> <span class="op">&lt;-</span> <span class="fu">FIMS</span><span class="fu">::</span><span class="fu"><a href="../reference/setup_default_Maturity.html">setup_default_Maturity</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">fims_frame</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">show</span><span class="op">(</span><span class="va">default_parameters</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Found more than one class "tbl_df" in cache; using the first, from namespace 'FIMS'</span></span>
 <span><span class="co">#&gt; Also defined by 'tibble'</span></span>
 <span><span class="co">#&gt; Found more than one class "tbl_df" in cache; using the first, from namespace 'FIMS'</span></span>
 <span><span class="co">#&gt; Also defined by 'tibble'</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 12</span></span></span>
-<span><span class="co">#&gt;   model_family module_name module_type label      fleet   age length  time value</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> <span style="color: #BB0000;">NA</span>           Maturity    Logistic    inflectio… <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>     <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>     2</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> <span style="color: #BB0000;">NA</span>           Maturity    Logistic    slope      <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>     <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>     1</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 3 more variables: estimation_type &lt;chr&gt;, distribution_type &lt;chr&gt;,</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;">#   distribution &lt;chr&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 11</span></span></span>
+<span><span class="co">#&gt;   module_name fleet module_type label    age length timing value estimation_type</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>          </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> Maturity    <span style="color: #BB0000;">NA</span>    Logistic    infle…    <span style="color: #BB0000;">NA</span>     <span style="color: #BB0000;">NA</span>     <span style="color: #BB0000;">NA</span>     2 constant       </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> Maturity    <span style="color: #BB0000;">NA</span>    Logistic    slope     <span style="color: #BB0000;">NA</span>     <span style="color: #BB0000;">NA</span>     <span style="color: #BB0000;">NA</span>     1 constant       </span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 2 more variables: distribution_type &lt;chr&gt;, distribution &lt;chr&gt;</span></span></span>
 <span></span>
 <span><span class="co"># The default maturity parameters can be updated</span></span>
 <span><span class="va">parameters</span> <span class="op">&lt;-</span> <span class="va">default_parameters</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/rows.html" class="external-link">rows_update</a></span><span class="op">(</span></span>
 <span>    <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span></span>
-<span>      model_family <span class="op">=</span> <span class="st">"catch_at_age"</span>,</span>
 <span>      module_name <span class="op">=</span> <span class="st">"Maturity"</span>,</span>
 <span>      label <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"inflection_point"</span>, <span class="st">"slope"</span><span class="op">)</span>,</span>
-<span>      value <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2.25</span>, <span class="fl">3</span><span class="op">)</span>,</span>
+<span>      value <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2.25</span>, <span class="fl">3</span><span class="op">)</span></span>
 <span>    <span class="op">)</span>,</span>
 <span>    by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"module_name"</span>, <span class="st">"label"</span><span class="op">)</span></span>
 <span>  <span class="op">)</span></span>
 <span></span>
 <span><span class="fu">show</span><span class="op">(</span><span class="va">parameters</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 12</span></span></span>
-<span><span class="co">#&gt;   model_family module_name module_type label      fleet   age length  time value</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> catch_at_age Maturity    Logistic    inflectio… <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>     <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>  2.25</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> catch_at_age Maturity    Logistic    slope      <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>     <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>  3   </span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 3 more variables: estimation_type &lt;chr&gt;, distribution_type &lt;chr&gt;,</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;">#   distribution &lt;chr&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 11</span></span></span>
+<span><span class="co">#&gt;   module_name fleet module_type label    age length timing value estimation_type</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>          </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> Maturity    <span style="color: #BB0000;">NA</span>    Logistic    infle…    <span style="color: #BB0000;">NA</span>     <span style="color: #BB0000;">NA</span>     <span style="color: #BB0000;">NA</span>  2.25 constant       </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> Maturity    <span style="color: #BB0000;">NA</span>    Logistic    slope     <span style="color: #BB0000;">NA</span>     <span style="color: #BB0000;">NA</span>     <span style="color: #BB0000;">NA</span>  3    constant       </span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 2 more variables: distribution_type &lt;chr&gt;, distribution &lt;chr&gt;</span></span></span>
 <span></span>
 <span><span class="co"># Initialize maturity module based on the list of parameters</span></span>
 <span><span class="va">maturity</span> <span class="op">&lt;-</span> <span class="fu">FIMS</span><span class="fu">:::</span><span class="fu">initialize_maturity</span><span class="op">(</span></span>
@@ -231,10 +226,29 @@ been set up.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Initialize the population module and link the maturity module</span></span>
 <span><span class="co"># The IDs of the growth and recruitment modules are pseudo code and don't exist</span></span>
-<span><span class="va">population</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/create_default_configurations.html">create_default_configurations</a></span><span class="op">(</span><span class="va">fims_frame</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">tidyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyr.tidyverse.org/reference/unnest.html" class="external-link">unnest</a></span><span class="op">(</span>cols <span class="op">=</span> <span class="va">data</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">FIMS</span><span class="fu">:::</span><span class="fu">create_default_Population</span><span class="op">(</span>data <span class="op">=</span> <span class="va">fims_frame</span>, log_rzero <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fl">1000000</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>model_family <span class="op">=</span> <span class="st">"catch_at_age"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span><span class="va">recruitment_defaults</span> <span class="op">&lt;-</span> <span class="fu">FIMS</span><span class="fu">::</span><span class="fu"><a href="../reference/setup_default_Recruitment.html">setup_default_Recruitment</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">fims_frame</span><span class="op">)</span></span>
+<span><span class="va">log_rzero</span> <span class="op">&lt;-</span> <span class="va">recruitment_defaults</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">.data</span><span class="op">[[</span><span class="st">"label"</span><span class="op">]</span><span class="op">]</span> <span class="op">==</span> <span class="st">"log_rzero"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html" class="external-link">pull</a></span><span class="op">(</span><span class="va">.data</span><span class="op">[[</span><span class="st">"value"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">population_defaults</span> <span class="op">&lt;-</span> <span class="fu">FIMS</span><span class="fu">::</span><span class="fu"><a href="../reference/setup_default_Population.html">setup_default_Population</a></span><span class="op">(</span></span>
+<span>  data <span class="op">=</span> <span class="va">fims_frame</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">log_init_naa</span> <span class="op">&lt;-</span> <span class="fu">FIMS</span><span class="fu">:::</span><span class="fu">setup_default_log_init_naa</span><span class="op">(</span></span>
+<span>  n_ages <span class="op">=</span> <span class="fu"><a href="../reference/get_FIMSFrame.html">get_n_ages</a></span><span class="op">(</span><span class="va">fims_frame</span><span class="op">)</span>,</span>
+<span>  log_rzero <span class="op">=</span> <span class="va">log_rzero</span>,</span>
+<span>  log_M <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fl">0.2</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">population</span> <span class="op">&lt;-</span> <span class="va">population_defaults</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/rows.html" class="external-link">rows_update</a></span><span class="op">(</span></span>
+<span>    <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span></span>
+<span>      label <span class="op">=</span> <span class="st">"log_init_naa"</span>,</span>
+<span>      age <span class="op">=</span> <span class="fu"><a href="../reference/get_FIMSFrame.html">get_ages</a></span><span class="op">(</span><span class="va">fims_frame</span><span class="op">)</span>,</span>
+<span>      value <span class="op">=</span> <span class="va">log_init_naa</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"label"</span>, <span class="st">"age"</span><span class="op">)</span></span>
+<span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind_rows.html" class="external-link">bind_rows</a></span><span class="op">(</span><span class="va">parameters</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">FIMS</span><span class="fu">:::</span><span class="fu">initialize_population</span><span class="op">(</span></span>
 <span>    data <span class="op">=</span> <span class="va">fims_frame</span>,</span>
@@ -541,10 +555,19 @@ be done by hand with <code>SetMaturity</code>. Where both options are
 shown, again, below.</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Helper function</span></span>
-<span><span class="va">population</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/create_default_configurations.html">create_default_configurations</a></span><span class="op">(</span><span class="va">fims_frame</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">tidyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyr.tidyverse.org/reference/unnest.html" class="external-link">unnest</a></span><span class="op">(</span>cols <span class="op">=</span> <span class="va">data</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">FIMS</span><span class="fu">:::</span><span class="fu">create_default_Population</span><span class="op">(</span>data <span class="op">=</span> <span class="va">fims_frame</span>, log_rzero <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fl">1000000</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>model_family <span class="op">=</span> <span class="st">"catch_at_age"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span><span class="va">recruitment_defaults</span> <span class="op">&lt;-</span> <span class="fu">FIMS</span><span class="fu">::</span><span class="fu"><a href="../reference/setup_default_Recruitment.html">setup_default_Recruitment</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">fims_frame</span><span class="op">)</span></span>
+<span><span class="va">log_M</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fl">0.2</span><span class="op">)</span></span>
+<span><span class="va">log_init_naa</span> <span class="op">&lt;-</span> <span class="fu">FIMS</span><span class="fu">:::</span><span class="fu">setup_default_log_init_naa</span><span class="op">(</span></span>
+<span>  data <span class="op">=</span> <span class="va">fims_frame</span>,</span>
+<span>  recruitment_defaults <span class="op">=</span> <span class="va">recruitment_defaults</span>,</span>
+<span>  log_M <span class="op">=</span> <span class="va">log_M</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">population</span> <span class="op">&lt;-</span> <span class="fu">FIMS</span><span class="fu">::</span><span class="fu"><a href="../reference/setup_default_Population.html">setup_default_Population</a></span><span class="op">(</span></span>
+<span>  data <span class="op">=</span> <span class="va">fims_frame</span>,</span>
+<span>  log_M <span class="op">=</span> <span class="va">log_M</span>,</span>
+<span>  log_init_naa <span class="op">=</span> <span class="va">log_init_naa</span></span>
+<span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind_rows.html" class="external-link">bind_rows</a></span><span class="op">(</span><span class="va">parameters</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">FIMS</span><span class="fu">:::</span><span class="fu">initialize_population</span><span class="op">(</span></span>
 <span>    data <span class="op">=</span> <span class="va">fims_frame</span>,</span>

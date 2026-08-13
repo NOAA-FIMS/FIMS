@@ -10,13 +10,13 @@ will have the appropriate indexing.
 ## Usage
 
 ``` r
-model_landings(x, fleet)
+model_catch(x, fleet)
 
 # S4 method for class 'FIMSFrame'
-model_landings(x, fleet)
+model_catch(x, fleet)
 
 # S4 method for class 'data.frame'
-model_landings(x, fleet)
+model_catch(x, fleet)
 
 model_index(x, fleet)
 
@@ -86,9 +86,9 @@ and the function just extracts the appropriate column.
 are length "l", are used to convert lengths (input data) to ages
 (modeled) as a way to fit length data without estimating growth.
 
-### `model_landings()`
+### `model_catch()`
 
-Returns a numeric vector of landings data (type `"landings"`) for the
+Returns a numeric vector of catch data (type `"catch"`) for the
 specified fleet(s).
 
 ### `model_index()`
@@ -109,16 +109,16 @@ age-to-length conversion data are present in the `FIMSFrame` object.
 
 ### `model_weight_at_age()`
 
-Returns a numeric vector of weight-at-age values (type
+Returns a numeric vector of weight-at-age observations (type
 `"weight_at_age"`), ordered by age and year (plus one additional year)
-and using `-999` to indicate missing values. When multiple fleets are
-present, values are averaged across fleets.
+and using `-999` to indicate missing observations When multiple fleets
+are present, values are averaged across fleets.
 
 ### `model_age_to_length_conversion()`
 
-Returns a numeric vector of age-to-length conversion values. Values are
-ordered by age and length in the order defined by
+Returns a numeric vector of age-to-length conversion observations.
+Observations are ordered by age and length in the order defined by
 [`FIMSFrame()`](https://NOAA-FIMS.github.io/FIMS/reference/FIMSFrame.md).
-When multiple values are present across a single age and length, they
-are averaged because `age_to_length_conversion` data cannot vary across
-fleets or time.
+When multiple observations are present across a single age and length,
+they are averaged because `age_to_length_conversion` data cannot vary
+across fleets or time.

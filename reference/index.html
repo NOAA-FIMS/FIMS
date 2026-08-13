@@ -6,7 +6,7 @@
     <nav class="navbar navbar-expand-lg fixed-top bg-light" data-bs-theme="light" aria-label="Site navigation"><div class="container">
     <img class="navlogo" src="https://noaa-fims.github.io/images/FIMS_logo3.png" alt="FIMS logo with a fish" width="60" align="left"><a class="navbar-brand me-2" href="../index.html">FIMS</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.4.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.10.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -64,7 +64,7 @@
     <div class="section level2">
       <h2 id="data">Data<a class="anchor" aria-label="anchor" href="#data"></a></h2>
 
-      <div class="section-desc"><p>Example dataset used in FIMS demonstrations and examples.</p></div>
+      <div class="section-desc"><p>Example datasets used in demonstrations and other package data.</p></div>
 
       <dl></dl></div><div class="section level2">
 
@@ -84,6 +84,13 @@
 
         </dt>
         <dd>Vector of acceptable FIMS input types</dd>
+
+        <dt>
+
+          <code><a href="fims_distributions.html">fims_distributions</a></code>
+
+        </dt>
+        <dd>Distribution parameter lookup table</dd>
       </dl></div><div class="section level2">
       <h2 id="run-fims">Run FIMS<a class="anchor" aria-label="anchor" href="#run-fims"></a></h2>
 
@@ -117,31 +124,73 @@
 
         <dt>
 
-          <code><a href="model_.html">model_landings()</a></code> <code><a href="model_.html">model_index()</a></code> <code><a href="model_.html">model_age_comp()</a></code> <code><a href="model_.html">model_length_comp()</a></code> <code><a href="model_.html">model_weight_at_age()</a></code> <code><a href="model_.html">model_age_to_length_conversion()</a></code>
+          <code><a href="model_.html">model_catch()</a></code> <code><a href="model_.html">model_index()</a></code> <code><a href="model_.html">model_age_comp()</a></code> <code><a href="model_.html">model_length_comp()</a></code> <code><a href="model_.html">model_weight_at_age()</a></code> <code><a href="model_.html">model_age_to_length_conversion()</a></code>
 
         </dt>
         <dd>Get a vector of data to be passed to a FIMS module from a FIMSFrame object</dd>
 
         <dt>
 
-          <code><a href="create_default_configurations.html">create_default_configurations()</a></code>
+          <code><a href="setup_default_Fleet.html">setup_default_Fleet()</a></code>
 
         </dt>
-        <dd>Create a default FIMS configuration tibble</dd>
+        <dd>Set up default fleet parameters</dd>
 
         <dt>
 
-          <code><a href="create_default_parameters.html">create_default_parameters()</a></code>
+          <code><a href="setup_default_Growth.html">setup_default_Growth()</a></code>
 
         </dt>
-        <dd>Create default parameters for a FIMS model</dd>
+        <dd>Set up default growth parameters</dd>
 
         <dt>
 
-          <code><a href="initialize_data_distribution.html">initialize_data_distribution()</a></code> <code><a href="initialize_data_distribution.html">initialize_process_distribution()</a></code> <code><a href="initialize_data_distribution.html">initialize_process_structure()</a></code>
+          <code><a href="setup_default_Maturity.html">setup_default_Maturity()</a></code>
 
         </dt>
-        <dd>Set up a new distribution for a data type or a process</dd>
+        <dd>Set up default maturity parameters</dd>
+
+        <dt>
+
+          <code><a href="setup_default_Population.html">setup_default_Population()</a></code>
+
+        </dt>
+        <dd>Set up default population parameters</dd>
+
+        <dt>
+
+          <code><a href="setup_default_Recruitment.html">setup_default_Recruitment()</a></code>
+
+        </dt>
+        <dd>Set up default recruitment parameters</dd>
+
+        <dt>
+
+          <code><a href="setup_default_Selectivity.html">setup_default_Selectivity()</a></code>
+
+        </dt>
+        <dd>Set up default selectivity parameters</dd>
+
+        <dt>
+
+          <code><a href="setup_default_parameters.html">setup_default_parameters()</a></code>
+
+        </dt>
+        <dd>Set up default parameters for a FIMS model</dd>
+
+        <dt>
+
+          <code><a href="initialize_data_distribution.html">initialize_data_distribution()</a></code>
+
+        </dt>
+        <dd>Set up a new distribution for a data type</dd>
+
+        <dt>
+
+          <code><a href="initialize_process_distribution.html">initialize_process_distribution()</a></code> <code><a href="initialize_process_distribution.html">initialize_process_structure()</a></code>
+
+        </dt>
+        <dd>Set up a new distribution for a process</dd>
 
         <dt>
 
@@ -173,7 +222,7 @@
 
         <dt>
 
-          <code><a href="get_FIMSFit.html">get_input()</a></code> <code><a href="get_FIMSFit.html">get_report()</a></code> <code><a href="get_FIMSFit.html">get_obj()</a></code> <code><a href="get_FIMSFit.html">get_opt()</a></code> <code><a href="get_FIMSFit.html">get_max_gradient()</a></code> <code><a href="get_FIMSFit.html">get_gradient()</a></code> <code><a href="get_FIMSFit.html">get_sdreport()</a></code> <code><a href="get_FIMSFit.html">get_estimates()</a></code> <code><a href="get_FIMSFit.html">get_number_of_parameters()</a></code> <code><a href="get_FIMSFit.html">get_timing()</a></code> <code><a href="get_FIMSFit.html">get_version()</a></code> <code><a href="get_FIMSFit.html">get_model_output()</a></code>
+          <code><a href="get_FIMSFit.html">get_input()</a></code> <code><a href="get_FIMSFit.html">get_report()</a></code> <code><a href="get_FIMSFit.html">get_obj()</a></code> <code><a href="get_FIMSFit.html">get_opt()</a></code> <code><a href="get_FIMSFit.html">get_max_gradient()</a></code> <code><a href="get_FIMSFit.html">get_gradient()</a></code> <code><a href="get_FIMSFit.html">get_sdreport()</a></code> <code><a href="get_FIMSFit.html">get_estimates()</a></code> <code><a href="get_FIMSFit.html">get_number_of_parameters()</a></code> <code><a href="get_FIMSFit.html">get_run_time()</a></code> <code><a href="get_FIMSFit.html">get_version()</a></code> <code><a href="get_FIMSFit.html">get_model_output()</a></code>
 
         </dt>
         <dd>Get a slot in a FIMSFit object</dd>
@@ -340,7 +389,7 @@
 
       <dl><dt>
 
-          <code><a href="Cpp_classes.html">Cpp_classes</a></code> <code><a href="Cpp_classes.html">AgeComp</a></code> <code><a href="Cpp_classes.html">BevertonHoltRecruitment</a></code> <code><a href="Cpp_classes.html">CatchAtAge</a></code> <code><a href="Cpp_classes.html">DlnormDistribution</a></code> <code><a href="Cpp_classes.html">DmultinomDistribution</a></code> <code><a href="Cpp_classes.html">DnormDistribution</a></code> <code><a href="Cpp_classes.html">DoubleLogisticSelectivity</a></code> <code><a href="Cpp_classes.html">EWAAGrowth</a></code> <code><a href="Cpp_classes.html">Fleet</a></code> <code><a href="Cpp_classes.html">Index</a></code> <code><a href="Cpp_classes.html">Landings</a></code> <code><a href="Cpp_classes.html">LengthComp</a></code> <code><a href="Cpp_classes.html">LogDevsRecruitmentProcess</a></code> <code><a href="Cpp_classes.html">LogRRecruitmentProcess</a></code> <code><a href="Cpp_classes.html">LogisticMaturity</a></code> <code><a href="Cpp_classes.html">LogisticSelectivity</a></code> <code><a href="Cpp_classes.html">Variable</a></code> <code><a href="Cpp_classes.html">VariableVector</a></code> <code><a href="Cpp_classes.html">Population</a></code> <code><a href="Cpp_classes.html">RealVector</a></code> <code><a href="Cpp_classes.html">SharedInt</a></code> <code><a href="Cpp_classes.html">SharedReal</a></code> <code><a href="Cpp_classes.html">SharedString</a></code>
+          <code><a href="Cpp_classes.html">Cpp_classes</a></code> <code><a href="Cpp_classes.html">AgeComp</a></code> <code><a href="Cpp_classes.html">BevertonHoltRecruitment</a></code> <code><a href="Cpp_classes.html">CatchAtAge</a></code> <code><a href="Cpp_classes.html">DlnormDistribution</a></code> <code><a href="Cpp_classes.html">DmultinomDistribution</a></code> <code><a href="Cpp_classes.html">DnormDistribution</a></code> <code><a href="Cpp_classes.html">DoubleLogisticSelectivity</a></code> <code><a href="Cpp_classes.html">EWAAGrowth</a></code> <code><a href="Cpp_classes.html">Fleet</a></code> <code><a href="Cpp_classes.html">Index</a></code> <code><a href="Cpp_classes.html">Catch</a></code> <code><a href="Cpp_classes.html">LengthComp</a></code> <code><a href="Cpp_classes.html">LogDevsRecruitmentProcess</a></code> <code><a href="Cpp_classes.html">LogRRecruitmentProcess</a></code> <code><a href="Cpp_classes.html">LogisticMaturity</a></code> <code><a href="Cpp_classes.html">LogisticSelectivity</a></code> <code><a href="Cpp_classes.html">Variable</a></code> <code><a href="Cpp_classes.html">VariableVector</a></code> <code><a href="Cpp_classes.html">Population</a></code> <code><a href="Cpp_classes.html">RealVector</a></code> <code><a href="Cpp_classes.html">SharedInt</a></code> <code><a href="Cpp_classes.html">SharedReal</a></code> <code><a href="Cpp_classes.html">SharedString</a></code>
 
         </dt>
         <dd>C++ Classes Exported via Rcpp</dd>

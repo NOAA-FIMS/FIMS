@@ -96,14 +96,8 @@ library(FIMS)
 data("data_big")
 # Prepare data for FIMS model
 data_4_model <- FIMSFrame(data_big)
-
-# Create parameters
-parameters <- data_4_model |>
-  create_default_configurations() |>
-  create_default_parameters(data = data_4_model)
-
 # Run the  model with optimization
-fit <- parameters |>
+fit <- setup_default_parameters(data = data_4_model) |>
   initialize_fims(data = data_4_model) |>
   fit_fims(optimize = TRUE)
 # Clear memory post-run
@@ -169,12 +163,14 @@ Fisheries](https://www.fisheries.noaa.gov/)
 
 ## Data
 
-Example dataset used in FIMS demonstrations and examples.
+Example datasets used in demonstrations and other package data.
 
 - [`data_big`](https://NOAA-FIMS.github.io/FIMS/reference/data_big.md) :
   FIMS input data frame
 - [`fims_input_types`](https://NOAA-FIMS.github.io/FIMS/reference/fims_input_types.md)
   : Vector of acceptable FIMS input types
+- [`fims_distributions`](https://NOAA-FIMS.github.io/FIMS/reference/fims_distributions.md)
+  : Distribution parameter lookup table
 
 ## Run FIMS
 
@@ -202,7 +198,7 @@ Primary functions used when setting up or running a FIMS model.
   [`get_n_lengths()`](https://NOAA-FIMS.github.io/FIMS/reference/get_FIMSFrame.md)
   : Get a slot in a FIMSFrame object
 
-- [`model_landings()`](https://NOAA-FIMS.github.io/FIMS/reference/model_.md)
+- [`model_catch()`](https://NOAA-FIMS.github.io/FIMS/reference/model_.md)
   [`model_index()`](https://NOAA-FIMS.github.io/FIMS/reference/model_.md)
   [`model_age_comp()`](https://NOAA-FIMS.github.io/FIMS/reference/model_.md)
   [`model_length_comp()`](https://NOAA-FIMS.github.io/FIMS/reference/model_.md)
@@ -211,16 +207,33 @@ Primary functions used when setting up or running a FIMS model.
   : Get a vector of data to be passed to a FIMS module from a FIMSFrame
   object
 
-- [`create_default_configurations()`](https://NOAA-FIMS.github.io/FIMS/reference/create_default_configurations.md)
-  : Create a default FIMS configuration tibble
+- [`setup_default_Fleet()`](https://NOAA-FIMS.github.io/FIMS/reference/setup_default_Fleet.md)
+  : Set up default fleet parameters
 
-- [`create_default_parameters()`](https://NOAA-FIMS.github.io/FIMS/reference/create_default_parameters.md)
-  : Create default parameters for a FIMS model
+- [`setup_default_Growth()`](https://NOAA-FIMS.github.io/FIMS/reference/setup_default_Growth.md)
+  : Set up default growth parameters
+
+- [`setup_default_Maturity()`](https://NOAA-FIMS.github.io/FIMS/reference/setup_default_Maturity.md)
+  : Set up default maturity parameters
+
+- [`setup_default_Population()`](https://NOAA-FIMS.github.io/FIMS/reference/setup_default_Population.md)
+  : Set up default population parameters
+
+- [`setup_default_Recruitment()`](https://NOAA-FIMS.github.io/FIMS/reference/setup_default_Recruitment.md)
+  : Set up default recruitment parameters
+
+- [`setup_default_Selectivity()`](https://NOAA-FIMS.github.io/FIMS/reference/setup_default_Selectivity.md)
+  : Set up default selectivity parameters
+
+- [`setup_default_parameters()`](https://NOAA-FIMS.github.io/FIMS/reference/setup_default_parameters.md)
+  : Set up default parameters for a FIMS model
 
 - [`initialize_data_distribution()`](https://NOAA-FIMS.github.io/FIMS/reference/initialize_data_distribution.md)
-  [`initialize_process_distribution()`](https://NOAA-FIMS.github.io/FIMS/reference/initialize_data_distribution.md)
-  [`initialize_process_structure()`](https://NOAA-FIMS.github.io/FIMS/reference/initialize_data_distribution.md)
-  : Set up a new distribution for a data type or a process
+  : Set up a new distribution for a data type
+
+- [`initialize_process_distribution()`](https://NOAA-FIMS.github.io/FIMS/reference/initialize_process_distribution.md)
+  [`initialize_process_structure()`](https://NOAA-FIMS.github.io/FIMS/reference/initialize_process_distribution.md)
+  : Set up a new distribution for a process
 
 - [`lognormal()`](https://NOAA-FIMS.github.io/FIMS/reference/lognormal.md)
   [`multinomial()`](https://NOAA-FIMS.github.io/FIMS/reference/lognormal.md)
@@ -245,7 +258,7 @@ Primary functions used when setting up or running a FIMS model.
   [`get_sdreport()`](https://NOAA-FIMS.github.io/FIMS/reference/get_FIMSFit.md)
   [`get_estimates()`](https://NOAA-FIMS.github.io/FIMS/reference/get_FIMSFit.md)
   [`get_number_of_parameters()`](https://NOAA-FIMS.github.io/FIMS/reference/get_FIMSFit.md)
-  [`get_timing()`](https://NOAA-FIMS.github.io/FIMS/reference/get_FIMSFit.md)
+  [`get_run_time()`](https://NOAA-FIMS.github.io/FIMS/reference/get_FIMSFit.md)
   [`get_version()`](https://NOAA-FIMS.github.io/FIMS/reference/get_FIMSFit.md)
   [`get_model_output()`](https://NOAA-FIMS.github.io/FIMS/reference/get_FIMSFit.md)
   : Get a slot in a FIMSFit object
@@ -317,7 +330,7 @@ Links to the relevant doxygen documentation for the C++ code.
   [`EWAAGrowth`](https://NOAA-FIMS.github.io/FIMS/reference/Cpp_classes.md)
   [`Fleet`](https://NOAA-FIMS.github.io/FIMS/reference/Cpp_classes.md)
   [`Index`](https://NOAA-FIMS.github.io/FIMS/reference/Cpp_classes.md)
-  [`Landings`](https://NOAA-FIMS.github.io/FIMS/reference/Cpp_classes.md)
+  [`Catch`](https://NOAA-FIMS.github.io/FIMS/reference/Cpp_classes.md)
   [`LengthComp`](https://NOAA-FIMS.github.io/FIMS/reference/Cpp_classes.md)
   [`LogDevsRecruitmentProcess`](https://NOAA-FIMS.github.io/FIMS/reference/Cpp_classes.md)
   [`LogRRecruitmentProcess`](https://NOAA-FIMS.github.io/FIMS/reference/Cpp_classes.md)

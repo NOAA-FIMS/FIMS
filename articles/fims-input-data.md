@@ -28,7 +28,7 @@ which is covered in the overview vignette linked above.
 ## Data format
 
 The input data for a FIMS model is a single long data frame with the
-following columns: type, fleet, age, length, timing, value, unit, and
+following columns: type, fleet, age, length, timing, observed, unit, and
 uncertainty. Both the single table and long format are in contrast to
 the input format for some legacy stock assessment models where the data
 are provided in multiple tables, each with a different format. The SS3
@@ -36,9 +36,9 @@ data file, for instance, has separate tables for catch, indices, age
 compositions, length compositions, with wide tables for the composition
 data (each age or length bin has a different column). The use of a
 single, long table for data input used by FIMS makes it easier to
-summarize and filter the data across data types (e.g., by fleet, time
-step, age, etc.), as well as being better suited to the widely-used
-tidyverse collection of packages in R.
+summarize and filter the data across data types (e.g., by fleet, timing,
+age, etc.), as well as being better suited to the widely-used tidyverse
+collection of packages in R.
 
 Two drawbacks of the long format are (1) some information is duplicated,
 and (2) the long format is harder to read and understand by looking at
@@ -47,7 +47,7 @@ working on functions to summarize, visualize, and check for errors in
 the input data.
 
 The currently available values for the `type` column are “age_comp”,
-“age_to_length_conversion”, “index”, “landings”, “length_comp”, and
+“age_to_length_conversion”, “index”, “catch”, “length_comp”, and
 “weight_at_age”. The “weight_at_age” and “age_to_length_conversion”
 types are not currently treated as data in the sense that they are not
 included in the likelihood, just used within the population dynamics
@@ -107,7 +107,7 @@ data_4_model
 
     ## tbl_df of class 'FIMSFrame'
 
-    ## with the following 'types': age_comp, landings, length_comp, weight_at_age, index, age_to_length_conversion
+    ## with the following 'types': age_comp, catch, length_comp, weight_at_age, index, age_to_length_conversion
 
     ## Found more than one class "tbl_df" in cache; using the first, from namespace 'FIMS'
 
@@ -118,14 +118,14 @@ data_4_model
     ## Also defined by 'tibble'
 
     ## # A tibble: 6 × 8
-    ##   type     fleet    age length timing value unit       uncertainty
-    ##   <chr>    <chr>  <int>  <dbl>  <dbl> <dbl> <chr>            <dbl>
-    ## 1 age_comp fleet1     1     NA      1 0.07  proportion         200
-    ## 2 age_comp fleet1     2     NA      1 0.1   proportion         200
-    ## 3 age_comp fleet1     3     NA      1 0.115 proportion         200
-    ## 4 age_comp fleet1     4     NA      1 0.15  proportion         200
-    ## 5 age_comp fleet1     5     NA      1 0.1   proportion         200
-    ## 6 age_comp fleet1     6     NA      1 0.05  proportion         200
+    ##   type     fleet    age length timing observed unit       uncertainty           
+    ##   <chr>    <chr>  <int>  <dbl>  <dbl>    <dbl> <chr>      <chr>                 
+    ## 1 age_comp fleet1     1     NA      1    0.07  proportion ~ dmultinom(prob = ag…
+    ## 2 age_comp fleet1     2     NA      1    0.1   proportion ~ dmultinom(prob = ag…
+    ## 3 age_comp fleet1     3     NA      1    0.115 proportion ~ dmultinom(prob = ag…
+    ## 4 age_comp fleet1     4     NA      1    0.15  proportion ~ dmultinom(prob = ag…
+    ## 5 age_comp fleet1     5     NA      1    0.1   proportion ~ dmultinom(prob = ag…
+    ## 6 age_comp fleet1     6     NA      1    0.05  proportion ~ dmultinom(prob = ag…
     ## additional slots include the following:fleets:
     ## [1] "fleet1"  "survey1"
     ## n_years:
@@ -144,52 +144,56 @@ data_4_model
     ## end_year:
     ## [1] 30
 
-## Landings (`type == "landings"`)
+## Catch (`type == "catch"`)
 
-The landings data type contains the total catch in weight for each time
+The catch data type contains the total catch in weight for each time
 step. FIMS does not yet include the option to model discards internally,
-so “landings” should account for all catch. The landings are not
-associated with an age or length so those columns should only contain
-`NA` values. The `unit` column should currently always be `mt`. The
-`uncertainty` column should be the standard deviation of the logged
-observations if you are using the lognormal distribution to fit your
-data. `log_Fmort` parameters for each fleet and time step with catch can
-be estimated to fit the model to the landings data, informed by the
-uncertainty values. Common practice is to set the uncertainty to a small
-number, like 0.001, so the landings data are fit closely.
+so “catch” should account for all catch. The catch are not associated
+with an age or length so those columns should only contain `NA` values.
+The `unit` column should currently always be `mt`. The `uncertainty`
+column should be the standard deviation of the logged observations if
+you are using the lognormal distribution to fit your data. `log_Fmort`
+parameters for each fleet and time step with catch can be estimated to
+fit the model to the catch data, informed by the uncertainty values.
+Common practice is to set the uncertainty to a small number, like 0.001,
+so the catch data are fit closely.
 
 ``` r
 
-# first three rows of the landings data
+# first three rows of the catch data
 FIMS::data_big |>
-  dplyr::filter(type == "landings") |>
+  dplyr::filter(type == "catch") |>
   head(3)
 ```
 
-    ##       type  fleet age length timing    value unit uncertainty
-    ## 1 landings fleet1  NA     NA      1 161.6455   mt  0.00999975
-    ## 2 landings fleet1  NA     NA      2 461.0895   mt  0.00999975
-    ## 3 landings fleet1  NA     NA      3 747.2900   mt  0.00999975
+    ##    type  fleet age length timing observed unit
+    ## 1 catch fleet1  NA     NA      1 161.6455   mt
+    ## 2 catch fleet1  NA     NA      2 461.0895   mt
+    ## 3 catch fleet1  NA     NA      3 747.2900   mt
+    ##                                                             uncertainty
+    ## 1 ~ dlnorm(meanlog = log_catch_expected, sdlog =  0.00999975001354021 )
+    ## 2 ~ dlnorm(meanlog = log_catch_expected, sdlog =  0.00999975001354021 )
+    ## 3 ~ dlnorm(meanlog = log_catch_expected, sdlog =  0.00999975001354021 )
 
 ``` r
 
-# time series plot of landings data
+# time series plot of catch data
 library(ggplot2)
 FIMS::data_big |>
-  dplyr::filter(type == "landings") |>
-  ggplot(aes(x = timing, y = value)) +
+  dplyr::filter(type == "catch") |>
+  ggplot(aes(x = timing, y = observed)) +
   geom_bar(stat = "identity") +
-  ggtitle("Landings time series in data_big example data set")
+  ggtitle("Catch time series in data_big example data set")
 ```
 
-![Barplot shows an increase in landings over the timing values 1 to 8,
-then noisy but stable values until the final bar at timing equals
-30.](fims-input-data_files/figure-html/data_big-landings-plot-1.png)
+![Barplot shows an increase in catch over the timing values 1 to 8, then
+noisy but stable values until the final bar at timing equals
+30.](fims-input-data_files/figure-html/data_big-catch-plot-1.png)
 
 ## Indices (`type == "index"`)
 
 The index data type contains the relative or absolute abundance index
-for each time step. The inputs are similar to landings, in having `NA`
+for each time step. The inputs are similar to catch, in having `NA`
 values for age and length, `mt` for `unit`, and index uncertainty as the
 standard deviation of the logged observations.
 
@@ -201,24 +205,42 @@ FIMS::data_big |>
   head(3)
 ```
 
-    ##    type   fleet age length timing       value unit uncertainty
-    ## 1 index survey1  NA     NA      1 0.006117418   mt   0.1980422
-    ## 2 index survey1  NA     NA      2 0.007156588   mt   0.1980422
-    ## 3 index survey1  NA     NA      3 0.006553376   mt   0.1980422
+    ##    type   fleet age length timing    observed unit
+    ## 1 index survey1  NA     NA      1 0.006117418   mt
+    ## 2 index survey1  NA     NA      2 0.007156588   mt
+    ## 3 index survey1  NA     NA      3 0.006553376   mt
+    ##                                                           uncertainty
+    ## 1 ~ dlnorm(meanlog = log_index_expected, sdlog =  0.198042200435365 )
+    ## 2 ~ dlnorm(meanlog = log_index_expected, sdlog =  0.198042200435365 )
+    ## 3 ~ dlnorm(meanlog = log_index_expected, sdlog =  0.198042200435365 )
 
 ``` r
 
 # time series plot of index data
 FIMS::data_big |>
   dplyr::filter(type == "index") |>
-  ggplot(aes(x = timing, y = value)) +
-  geom_point() +
-  geom_pointrange(aes(
-    ymin = qlnorm(p = 0.025, meanlog = log(value), sdlog = uncertainty),
-    ymax = qlnorm(p = 0.975, meanlog = log(value), sdlog = uncertainty)
+  ggplot2::ggplot(ggplot2::aes(x = timing, y = observed)) +
+  ggplot2::geom_point() +
+  ggplot2::geom_pointrange(ggplot2::aes(
+    ymin = stats::qlnorm(
+      p = 0.025,
+      meanlog = log(observed),
+      sdlog = unlist(
+        FIMS:::parse_data_distribution(uncertainty)$sdlog,
+        use.names = FALSE
+      )
+    ),
+    ymax = stats::qlnorm(
+      p = 0.975,
+      meanlog = log(observed),
+      sdlog = unlist(
+        FIMS:::parse_data_distribution(uncertainty)$sdlog,
+        use.names = FALSE
+      )
+    )
   )) +
-  geom_hline(yintercept = 0) +
-  ggtitle("Index time series in data_big example data set")
+  ggplot2::geom_hline(yintercept = 0) +
+  ggplot2::ggtitle("Index time series in data_big example data set")
 ```
 
 ![Points with uncertainty shows a steadily decreasing index over time
@@ -231,13 +253,13 @@ The age-composition data type contains the age distribution of a fleet
 for a time step. The `age` column contains integer ages defining the age
 bins. While standard FIMS models typically assume age bins start at
 zero, the data_big example currently uses ages ranging from 1–12, and
-thus, recruitment will be age-1 fish not age-0 fish. The `value` column
-contains either the number or the proportion of the catch or survey in
-each age bin. The `unit` column should be either “number” or
-“proportion”. If “proportion” is used, the values are checked at a later
-step to confirm that they sum to 1.0. The `uncertainty` column should be
-the input sample size for the time step (equal across all ages within
-that time step).
+thus, recruitment will be age-1 fish not age-0 fish. The `observed`
+column contains either the number or the proportion of the catch or
+survey in each age bin. The `unit` column should be either “number” or
+“proportion”. If “proportion” is used, the observations are checked at a
+later step to confirm that they sum to 1.0. The `uncertainty` column
+should be the input sample size for the time step (equal across all ages
+within that time step).
 
 ``` r
 
@@ -247,10 +269,14 @@ FIMS::data_big |>
   head(3)
 ```
 
-    ##       type  fleet age length timing value       unit uncertainty
-    ## 1 age_comp fleet1   1     NA      1 0.070 proportion         200
-    ## 2 age_comp fleet1   2     NA      1 0.100 proportion         200
-    ## 3 age_comp fleet1   3     NA      1 0.115 proportion         200
+    ##       type  fleet age length timing observed       unit
+    ## 1 age_comp fleet1   1     NA      1    0.070 proportion
+    ## 2 age_comp fleet1   2     NA      1    0.100 proportion
+    ## 3 age_comp fleet1   3     NA      1    0.115 proportion
+    ##                                            uncertainty
+    ## 1 ~ dmultinom(prob = agecomp_proportion, size =  200 )
+    ## 2 ~ dmultinom(prob = agecomp_proportion, size =  200 )
+    ## 3 ~ dmultinom(prob = agecomp_proportion, size =  200 )
 
 ``` r
 
@@ -258,7 +284,7 @@ FIMS::data_big |>
 FIMS::data_big |>
   dplyr::filter(type == "age_comp") |>
   ggplot2::ggplot(
-    ggplot2::aes(x = age, y = value)
+    ggplot2::aes(x = age, y = observed)
   ) +
   ggplot2::geom_bar(stat = "identity") +
   ggplot2::xlab("Age") +
@@ -290,10 +316,14 @@ FIMS::data_big |>
   head(3)
 ```
 
-    ##          type  fleet age length timing        value       unit uncertainty
-    ## 1 length_comp fleet1  NA      0      1 9.238773e-18 proportion         200
-    ## 2 length_comp fleet1  NA     50      1 5.892510e-12 proportion         200
-    ## 3 length_comp fleet1  NA    100      1 1.610390e-07 proportion         200
+    ##          type  fleet age length timing     observed       unit
+    ## 1 length_comp fleet1  NA      0      1 9.238773e-18 proportion
+    ## 2 length_comp fleet1  NA     50      1 5.892510e-12 proportion
+    ## 3 length_comp fleet1  NA    100      1 1.610390e-07 proportion
+    ##                                               uncertainty
+    ## 1 ~ dmultinom(prob = lengthcomp_proportion, size =  200 )
+    ## 2 ~ dmultinom(prob = lengthcomp_proportion, size =  200 )
+    ## 3 ~ dmultinom(prob = lengthcomp_proportion, size =  200 )
 
 ``` r
 
@@ -301,7 +331,7 @@ FIMS::data_big |>
 FIMS::data_big |>
   dplyr::filter(type == "length_comp") |>
   ggplot2::ggplot(
-    ggplot2::aes(x = length, y = value)
+    ggplot2::aes(x = length, y = observed)
   ) +
   ggplot2::geom_bar(stat = "identity") +
   ggplot2::xlab("Length") +
@@ -324,17 +354,17 @@ dynamics. The `unit` column should be `mt` and the uncertainty should be
 Two key features of the weight-at-age data are
 
 1.  these data are required for the one additional time step (final
-    value for timing + 1), and
-2.  the values are currently shared among fleets and throughout the
-    dynamics (so only need to be provided once).
+    observation for timing + 1), and
+2.  the observations are currently shared among fleets and throughout
+    the dynamics (so only need to be provided once).
 
-The final timing + 1 values are required because FIMS reports spawning
-biomass at the beginning of the year for every year, including the year
-after the last catches are removed from the population.
+The final timing + 1 observations are required because FIMS reports
+spawning biomass at the beginning of the year for every year, including
+the year after the last catches are removed from the population.
 
-The weight-at-age values for the `data_big` are identical across time
-steps, and are provided for timing = 1 to 31 and associated with name =
-“fleet1”.
+The weight-at-age observations for the `data_big` are identical across
+time steps, and are provided for timing = 1 to 31 and associated with
+name = “fleet1”.
 
 ``` r
 
@@ -344,10 +374,10 @@ FIMS::data_big |>
   head(3)
 ```
 
-    ##            type  fleet age length timing        value unit uncertainty
-    ## 1 weight_at_age fleet1   1     NA      1 0.0005306555   mt          NA
-    ## 2 weight_at_age fleet1   1     NA      2 0.0005306555   mt          NA
-    ## 3 weight_at_age fleet1   1     NA      3 0.0005306555   mt          NA
+    ##            type  fleet age length timing     observed unit uncertainty
+    ## 1 weight_at_age fleet1   1     NA      1 0.0005306555   mt        <NA>
+    ## 2 weight_at_age fleet1   1     NA      2 0.0005306555   mt        <NA>
+    ## 3 weight_at_age fleet1   1     NA      3 0.0005306555   mt        <NA>
 
 ``` r
 
@@ -356,18 +386,18 @@ FIMS::data_big |>
   tail(3)
 ```
 
-    ##              type  fleet age length timing       value unit uncertainty
-    ## 370 weight_at_age fleet1  12     NA     29 0.009636695   mt          NA
-    ## 371 weight_at_age fleet1  12     NA     30 0.009636695   mt          NA
-    ## 372 weight_at_age fleet1  12     NA     31 0.009636695   mt          NA
+    ##              type  fleet age length timing    observed unit uncertainty
+    ## 370 weight_at_age fleet1  12     NA     29 0.009636695   mt        <NA>
+    ## 371 weight_at_age fleet1  12     NA     30 0.009636695   mt        <NA>
+    ## 372 weight_at_age fleet1  12     NA     31 0.009636695   mt        <NA>
 
 ``` r
 
-# check that the values are identical across time steps within each age
+# check that the observations are identical across time steps within each age
 FIMS::data_big |>
   dplyr::filter(type == "weight_at_age") |>
   dplyr::group_by(age) |>
-  dplyr::summarize(n_distinct = dplyr::n_distinct(value))
+  dplyr::summarize(n_distinct = dplyr::n_distinct(observed))
 ```
 
     ## # A tibble: 12 × 2
@@ -388,11 +418,11 @@ FIMS::data_big |>
 
 ``` r
 
-# plot of weight-at-age values by time step
+# plot of weight-at-age by time step
 FIMS::data_big |>
   dplyr::filter(type == "weight_at_age") |>
   ggplot2::ggplot(
-    ggplot2::aes(x = age, y = value)
+    ggplot2::aes(x = age, y = observed)
   ) +
   ggplot2::geom_line(color = "blue") +
   ggplot2::xlab("Age") +
@@ -400,20 +430,20 @@ FIMS::data_big |>
   ggplot2::facet_wrap(~timing) +
   ggplot2::scale_x_continuous(breaks = get_ages(data_4_model)) +
   geom_hline(yintercept = 0) +
-  ggtitle("Weight-at-age values by time step in data_big example data set")
+  ggtitle("Weight-at-age by time step in data_big example data set")
 ```
 
 ![Line plot showing weight at age showing identical monotonically
-increasing weight-at-age values ages that are the same across time
+increasing weight-at-age observations ages that are the same across time
 steps.](fims-input-data_files/figure-html/data_big-weight_at_age-plot-1.png)
 
 ## Age-to-length conversion (`type == "age_to_length_conversion"`)
 
 The age-to-length conversion data type contains the distribution of
 lengths for each age. The `age` and `length` columns contain all the
-combinations of age and length bins, and the `value` column contains the
-proportion of fish at each age that are in each length bin. The `unit`
-column should be “proportion”. A single set of the age-to-length
+combinations of age and length bins, and the `observed` column contains
+the proportion of fish at each age that are in each length bin. The
+`unit` column should be “proportion”. A single set of the age-to-length
 conversion data is required, rather than separate copies for each fleet
 (name) or time step. The age-to-length conversion data are not currently
 included in the likelihood but are used to convert numbers at age to
@@ -431,14 +461,14 @@ FIMS::data_big |>
   head(3)
 ```
 
-    ##                       type fleet age length timing        value       unit
+    ##                       type fleet age length timing     observed       unit
     ## 1 age_to_length_conversion  <NA>   1      0     NA 1.261739e-16 proportion
     ## 2 age_to_length_conversion  <NA>   1     50     NA 8.385820e-11 proportion
     ## 3 age_to_length_conversion  <NA>   1    100     NA 2.297363e-06 proportion
     ##   uncertainty
-    ## 1         200
-    ## 2         200
-    ## 3         200
+    ## 1        <NA>
+    ## 2        <NA>
+    ## 3        <NA>
 
 ``` r
 
@@ -447,14 +477,14 @@ FIMS::data_big |>
   tail(3)
 ```
 
-    ##                         type fleet age length timing        value       unit
+    ##                         type fleet age length timing     observed       unit
     ## 274 age_to_length_conversion  <NA>  12   1000     NA 8.704578e-05 proportion
     ## 275 age_to_length_conversion  <NA>  12   1050     NA 4.607774e-06 proportion
     ## 276 age_to_length_conversion  <NA>  12   1100     NA 1.572035e-07 proportion
     ##     uncertainty
-    ## 274         200
-    ## 275         200
-    ## 276         200
+    ## 274        <NA>
+    ## 275        <NA>
+    ## 276        <NA>
 
 ``` r
 
@@ -476,14 +506,14 @@ length(unique(na.omit(FIMS::data_big$age))) * length(unique(na.omit(FIMS::data_b
 
 ``` r
 
-# plot of age-to-length conversion values for the data_big example data set
+# plot of age-to-length conversion observations for the data_big example data set
 FIMS::data_big |>
   dplyr::filter(type == "age_to_length_conversion") |>
   ggplot2::ggplot(
     ggplot2::aes(
       x = age,
       y = length,
-      size = value
+      size = observed
     )
   ) +
   ggplot2::geom_point(color = gray(0, alpha = 0.3)) +
@@ -492,7 +522,7 @@ FIMS::data_big |>
   ggplot2::ylab("Length (mm)") +
   ggplot2::scale_x_continuous(breaks = get_ages(data_4_model)) +
   geom_hline(yintercept = 0) +
-  ggtitle("Age-to-length conversion values for the data_big example data set")
+  ggtitle("Age-to-length conversion for the data_big example data set")
 ```
 
 ![Scatter plot showing the age-to-length conversion with point size
