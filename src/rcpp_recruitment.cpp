@@ -11,11 +11,69 @@ uint32_t RecruitmentInterfaceBase::id_g = 1;
 std::map<uint32_t, std::shared_ptr<RecruitmentInterfaceBase>>
     RecruitmentInterfaceBase::live_objects;
 
+using SharedBevertonHoltRecruitment =
+    std::shared_ptr<BevertonHoltRecruitmentInterface>;
+using SharedLogDevsRecruitmentProcess =
+    std::shared_ptr<LogDevsRecruitmentInterface>;
+using SharedLogRRecruitmentProcess =
+    std::shared_ptr<LogRRecruitmentInterface>;
+using SharedBase = std::shared_ptr<FIMSRcppInterfaceBase>;
+
+Rcpp::XPtr<SharedBevertonHoltRecruitment> create_beverton_holt_recruitment_() {
+  auto obj = std::make_shared<BevertonHoltRecruitmentInterface>();
+  return Rcpp::XPtr<SharedBevertonHoltRecruitment>(
+      new SharedBevertonHoltRecruitment(obj), true);
+}
+
+Rcpp::XPtr<SharedLogDevsRecruitmentProcess>
+create_log_devs_recruitment_process_() {
+  auto obj = std::make_shared<LogDevsRecruitmentInterface>();
+  return Rcpp::XPtr<SharedLogDevsRecruitmentProcess>(
+      new SharedLogDevsRecruitmentProcess(obj), true);
+}
+
+Rcpp::XPtr<SharedLogRRecruitmentProcess> create_log_r_recruitment_process_() {
+  auto obj = std::make_shared<LogRRecruitmentInterface>();
+  return Rcpp::XPtr<SharedLogRRecruitmentProcess>(
+      new SharedLogRRecruitmentProcess(obj), true);
+}
+
+Rcpp::XPtr<SharedBase> beverton_holt_recruitment_to_fims_xptr_(
+    Rcpp::XPtr<SharedBevertonHoltRecruitment> xp) {
+  SharedBase base = *xp;
+  return Rcpp::XPtr<SharedBase>(new SharedBase(base), true);
+}
+
+Rcpp::XPtr<SharedBase> log_devs_recruitment_process_to_fims_xptr_(
+    Rcpp::XPtr<SharedLogDevsRecruitmentProcess> xp) {
+  SharedBase base = *xp;
+  return Rcpp::XPtr<SharedBase>(new SharedBase(base), true);
+}
+
+Rcpp::XPtr<SharedBase> log_r_recruitment_process_to_fims_xptr_(
+    Rcpp::XPtr<SharedLogRRecruitmentProcess> xp) {
+  SharedBase base = *xp;
+  return Rcpp::XPtr<SharedBase>(new SharedBase(base), true);
+}
+
 /**
  * Function to register recruitment classes with the Rcpp module system.
  *
  */
 void register_recruitment(Rcpp::Module& m) {
+  Rcpp::function("create_beverton_holt_recruitment_",
+                 &create_beverton_holt_recruitment_);
+  Rcpp::function("beverton_holt_recruitment_to_fims_xptr_",
+                 &beverton_holt_recruitment_to_fims_xptr_);
+  Rcpp::function("create_log_devs_recruitment_process_",
+                 &create_log_devs_recruitment_process_);
+  Rcpp::function("log_devs_recruitment_process_to_fims_xptr_",
+                 &log_devs_recruitment_process_to_fims_xptr_);
+  Rcpp::function("create_log_r_recruitment_process_",
+                 &create_log_r_recruitment_process_);
+  Rcpp::function("log_r_recruitment_process_to_fims_xptr_",
+                 &log_r_recruitment_process_to_fims_xptr_);
+
   Rcpp::class_<BevertonHoltRecruitmentInterface>(
       "BevertonHoltRecruitment",
       "See "

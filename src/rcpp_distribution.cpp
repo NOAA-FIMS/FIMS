@@ -12,11 +12,64 @@ std::map<uint32_t, std::shared_ptr<DistributionsInterfaceBase>>
     DistributionsInterfaceBase::live_objects;
 
 #include <Rcpp.h>
+
+using SharedDnormDistribution = std::shared_ptr<DnormDistributionsInterface>;
+using SharedDlnormDistribution = std::shared_ptr<DlnormDistributionsInterface>;
+using SharedDmultinomDistribution =
+    std::shared_ptr<DmultinomDistributionsInterface>;
+using SharedBase = std::shared_ptr<FIMSRcppInterfaceBase>;
+
+Rcpp::XPtr<SharedDnormDistribution> create_dnorm_distribution_() {
+  auto obj = std::make_shared<DnormDistributionsInterface>();
+  return Rcpp::XPtr<SharedDnormDistribution>(
+      new SharedDnormDistribution(obj), true);
+}
+
+Rcpp::XPtr<SharedDlnormDistribution> create_dlnorm_distribution_() {
+  auto obj = std::make_shared<DlnormDistributionsInterface>();
+  return Rcpp::XPtr<SharedDlnormDistribution>(
+      new SharedDlnormDistribution(obj), true);
+}
+
+Rcpp::XPtr<SharedDmultinomDistribution> create_dmultinom_distribution_() {
+  auto obj = std::make_shared<DmultinomDistributionsInterface>();
+  return Rcpp::XPtr<SharedDmultinomDistribution>(
+      new SharedDmultinomDistribution(obj), true);
+}
+
+Rcpp::XPtr<SharedBase> dnorm_distribution_to_fims_xptr_(
+    Rcpp::XPtr<SharedDnormDistribution> xp) {
+  SharedBase base = *xp;
+  return Rcpp::XPtr<SharedBase>(new SharedBase(base), true);
+}
+
+Rcpp::XPtr<SharedBase> dlnorm_distribution_to_fims_xptr_(
+    Rcpp::XPtr<SharedDlnormDistribution> xp) {
+  SharedBase base = *xp;
+  return Rcpp::XPtr<SharedBase>(new SharedBase(base), true);
+}
+
+Rcpp::XPtr<SharedBase> dmultinom_distribution_to_fims_xptr_(
+    Rcpp::XPtr<SharedDmultinomDistribution> xp) {
+  SharedBase base = *xp;
+  return Rcpp::XPtr<SharedBase>(new SharedBase(base), true);
+}
 /**
  * Function to register distribution classes with the Rcpp module system.
  *
  */
 void register_distributions(Rcpp::Module& m) {
+  Rcpp::function("create_dnorm_distribution_", &create_dnorm_distribution_);
+  Rcpp::function("dnorm_distribution_to_fims_xptr_",
+                 &dnorm_distribution_to_fims_xptr_);
+  Rcpp::function("create_dlnorm_distribution_", &create_dlnorm_distribution_);
+  Rcpp::function("dlnorm_distribution_to_fims_xptr_",
+                 &dlnorm_distribution_to_fims_xptr_);
+  Rcpp::function("create_dmultinom_distribution_",
+                 &create_dmultinom_distribution_);
+  Rcpp::function("dmultinom_distribution_to_fims_xptr_",
+                 &dmultinom_distribution_to_fims_xptr_);
+
   Rcpp::class_<DnormDistributionsInterface>(
       "DnormDistribution",
       "See "
