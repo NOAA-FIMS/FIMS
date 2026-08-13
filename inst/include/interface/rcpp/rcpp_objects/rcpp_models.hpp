@@ -1220,31 +1220,25 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
 
       derived_quantities["catch_weight"] =
           fims::Vector<Type>(fleet_interface->n_years.get());
-      derived_quantities_dim_info["catch_weight"] =
-          fims_popdy::DimensionInfo(
-              "catch_weight",
-              fims::Vector<int>{(fleet_interface->n_years.get())},
-              fims::Vector<std::string>{"n_years"});
+      derived_quantities_dim_info["catch_weight"] = fims_popdy::DimensionInfo(
+          "catch_weight", fims::Vector<int>{(fleet_interface->n_years.get())},
+          fims::Vector<std::string>{"n_years"});
       info->variable_map[fleet_interface->catch_weight.id_m] =
           &derived_quantities["catch_weight"];
 
       derived_quantities["catch_numbers"] =
           fims::Vector<Type>(fleet_interface->n_years.get());
-      derived_quantities_dim_info["catch_numbers"] =
-          fims_popdy::DimensionInfo(
-              "catch_numbers",
-              fims::Vector<int>{(fleet_interface->n_years.get())},
-              fims::Vector<std::string>{"n_years"});
+      derived_quantities_dim_info["catch_numbers"] = fims_popdy::DimensionInfo(
+          "catch_numbers", fims::Vector<int>{(fleet_interface->n_years.get())},
+          fims::Vector<std::string>{"n_years"});
       info->variable_map[fleet_interface->catch_numbers.id_m] =
           &derived_quantities["catch_numbers"];
 
       derived_quantities["catch_expected"] =
           fims::Vector<Type>(fleet_interface->n_years.get());
-      derived_quantities_dim_info["catch_expected"] =
-          fims_popdy::DimensionInfo(
-              "catch_expected",
-              fims::Vector<int>{(fleet_interface->n_years.get())},
-              fims::Vector<std::string>{"n_years"});
+      derived_quantities_dim_info["catch_expected"] = fims_popdy::DimensionInfo(
+          "catch_expected", fims::Vector<int>{(fleet_interface->n_years.get())},
+          fims::Vector<std::string>{"n_years"});
       info->variable_map[fleet_interface->catch_expected.id_m] =
           &derived_quantities["catch_expected"];
 

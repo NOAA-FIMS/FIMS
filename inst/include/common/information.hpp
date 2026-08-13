@@ -396,7 +396,7 @@ class Information {
    * @param f shared pointer to fleet module
    */
   void SetFleetCatchData(bool& valid_model,
-                            std::shared_ptr<fims_popdy::Fleet<Type>> f) {
+                         std::shared_ptr<fims_popdy::Fleet<Type>> f) {
     if (f->fleet_observed_catch_data_id_m != static_cast<Type>(-999)) {
       uint32_t observed_catch_id =
           static_cast<uint32_t>(f->fleet_observed_catch_data_id_m);

@@ -687,9 +687,8 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * @snippet{doc} this param_year
    * @snippet{doc} this param_age
    */
-  void CalculateCatch(
-      std::shared_ptr<fims_popdy::Population<Type>> &population, size_t year,
-      size_t age) {
+  void CalculateCatch(std::shared_ptr<fims_popdy::Population<Type>> &population,
+                      size_t year, size_t age) {
     std::map<std::string, fims::Vector<Type>> &pdq_ =
         this->GetPopulationDerivedQuantities(population->GetId());
 
@@ -701,14 +700,12 @@ class CatchAtAge : public FisheryModelBase<Type> {
       pdq_["total_catch_weight"][year] +=
           fdq_["catch_weight_at_age"][i_age_year];
 
-      fdq_["catch_weight"][year] +=
-          fdq_["catch_weight_at_age"][i_age_year];
+      fdq_["catch_weight"][year] += fdq_["catch_weight_at_age"][i_age_year];
 
       pdq_["total_catch_numbers"][year] +=
           fdq_["catch_numbers_at_age"][i_age_year];
 
-      fdq_["catch_numbers"][year] +=
-          fdq_["catch_numbers_at_age"][i_age_year];
+      fdq_["catch_numbers"][year] += fdq_["catch_numbers_at_age"][i_age_year];
     }
   }
 
@@ -1301,8 +1298,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
             derived_quantities["catch_numbers_at_age"].to_tmb();
         catch_numbers_at_length_f(fleet_idx) =
             derived_quantities["catch_numbers_at_length"].to_tmb();
-        catch_weight_f(fleet_idx) =
-            derived_quantities["catch_weight"].to_tmb();
+        catch_weight_f(fleet_idx) = derived_quantities["catch_weight"].to_tmb();
         catch_weight_at_age_f(fleet_idx) =
             derived_quantities["catch_weight_at_age"].to_tmb();
         // length_comp_expected_f(fleet_idx) =
@@ -1331,10 +1327,8 @@ class CatchAtAge : public FisheryModelBase<Type> {
           ADREPORTvector(proportion_mature_at_age_p);
       vector<Type> spawning_biomass = ADREPORTvector(spawning_biomass_p);
       vector<Type> sum_selectivity = ADREPORTvector(sum_selectivity_p);
-      vector<Type> total_catch_numbers =
-          ADREPORTvector(total_catch_numbers_p);
-      vector<Type> total_catch_weight =
-          ADREPORTvector(total_catch_weight_p);
+      vector<Type> total_catch_numbers = ADREPORTvector(total_catch_numbers_p);
+      vector<Type> total_catch_weight = ADREPORTvector(total_catch_weight_p);
       vector<Type> unfished_biomass = ADREPORTvector(unfished_biomass_p);
       vector<Type> unfished_numbers_at_age =
           ADREPORTvector(unfished_numbers_at_age_p);
@@ -1360,8 +1354,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
       vector<Type> catch_numbers_at_length =
           ADREPORTvector(catch_numbers_at_length_f);
       vector<Type> catch_weight = ADREPORTvector(catch_weight_f);
-      vector<Type> catch_weight_at_age =
-          ADREPORTvector(catch_weight_at_age_f);
+      vector<Type> catch_weight_at_age = ADREPORTvector(catch_weight_at_age_f);
       // vector<Type> length_comp_expected =
       // ADREPORTvector(length_comp_expected_f); vector<Type>
       // length_comp_proportion = ADREPORTvector(length_comp_proportion_f);
@@ -1369,8 +1362,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
       vector<Type> lengthcomp_proportion =
           ADREPORTvector(lengthcomp_proportion_f);
       vector<Type> log_index_expected = ADREPORTvector(log_index_expected_f);
-      vector<Type> log_catch_expected =
-          ADREPORTvector(log_catch_expected_f);
+      vector<Type> log_catch_expected = ADREPORTvector(log_catch_expected_f);
       // populations
       // report
       FIMS_REPORT_F_("biomass", biomass_p, this->of);
@@ -1383,10 +1375,8 @@ class CatchAtAge : public FisheryModelBase<Type> {
                      this->of);
       FIMS_REPORT_F_("spawning_biomass", spawning_biomass_p, this->of);
       FIMS_REPORT_F_("sum_selectivity", sum_selectivity_p, this->of);
-      FIMS_REPORT_F_("total_catch_numbers", total_catch_numbers_p,
-                     this->of);
-      FIMS_REPORT_F_("total_catch_weight", total_catch_weight_p,
-                     this->of);
+      FIMS_REPORT_F_("total_catch_numbers", total_catch_numbers_p, this->of);
+      FIMS_REPORT_F_("total_catch_weight", total_catch_weight_p, this->of);
       FIMS_REPORT_F_("unfished_biomass", unfished_biomass_p, this->of);
       FIMS_REPORT_F_("unfished_numbers_at_age", unfished_numbers_at_age_p,
                      this->of);
@@ -1425,19 +1415,16 @@ class CatchAtAge : public FisheryModelBase<Type> {
       FIMS_REPORT_F_("index_weight_at_age", index_weight_at_age_f, this->of);
       FIMS_REPORT_F_("catch_expected", catch_expected_f, this->of);
       FIMS_REPORT_F_("catch_numbers", catch_numbers_f, this->of);
-      FIMS_REPORT_F_("catch_numbers_at_age", catch_numbers_at_age_f,
-                     this->of);
+      FIMS_REPORT_F_("catch_numbers_at_age", catch_numbers_at_age_f, this->of);
       FIMS_REPORT_F_("catch_numbers_at_length", catch_numbers_at_length_f,
                      this->of);
       FIMS_REPORT_F_("catch_weight", catch_weight_f, this->of);
-      FIMS_REPORT_F_("catch_weight_at_age", catch_weight_at_age_f,
-                     this->of);
+      FIMS_REPORT_F_("catch_weight_at_age", catch_weight_at_age_f, this->of);
       FIMS_REPORT_F_("lengthcomp_expected", lengthcomp_expected_f, this->of);
       FIMS_REPORT_F_("lengthcomp_proportion", lengthcomp_proportion_f,
                      this->of);
       FIMS_REPORT_F_("log_index_expected", log_index_expected_f, this->of);
-      FIMS_REPORT_F_("log_catch_expected", log_catch_expected_f,
-                     this->of);
+      FIMS_REPORT_F_("log_catch_expected", log_catch_expected_f, this->of);
       // adreport
       ADREPORT_F(agecomp_expected, this->of);
       ADREPORT_F(agecomp_proportion, this->of);
