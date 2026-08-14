@@ -106,28 +106,13 @@ FIMS::clear()
  data("data_big")
 fims_frame <- FIMS::FIMSFrame(data_big)
 
-# Start from the default model configurations and replace the default
-# empirical weight-at-age growth module with Von Bertalanffy growth.
-configurations <- FIMS::create_default_configurations(data = fims_frame) |>
-  tidyr::unnest(cols = data) |>
-  dplyr::mutate(
-    module_type = dplyr::if_else(
-      module_name == "Growth",
-      "VonBertalanffy",
-      module_type
-    )
-  ) |>
-  tidyr::nest(.by = c(model_family, module_name, fleet))
-
-# Create the parameter table for the updated configuration.
+# Create the parameter table with VonB Growth defaults.
 # The three core VonB curve parameters are estimable by default.
-parameters <- FIMS::create_default_parameters(
-  configurations = configurations,
-  data = fims_frame
-) |>
-  tidyr::unnest(cols = data)
+parameters <- FIMS::setup_default_parameters(
+  data = fims_frame,
+  growth_module_type = "VonBertalanffy"
+)
 
-# Inspect the default growth inputs and their estimation settings.
 parameters |>
   dplyr::filter(module_name == "Growth") |>
   dplyr::select(label, age, value, estimation_type)
@@ -224,7 +209,7 @@ The generated data include:
 - age-composition proportions
 - length-composition proportions
 - weight-at-age values
-- a landings observation
+- a catch observation
 - explicit fleet length-bin rows
 - the true mean length-at-age and standard deviation of length-at-age
 
@@ -428,10 +413,10 @@ make_vonb_demo_data <- function(
       uncertainty = NA_real_
     )
 
-  # Add simple landings observations for each modeled year.
-  # These keep the generated model connected to a fleet-level catch component
-  landings_rows <- tibble::tibble(
-    type = "landings",
+  # Add simple catch observations for each modeled year.
+  # These keep the generated model connected to a fleet-level catch component.
+  catch_rows <- tibble::tibble(
+    type = "catch",
     fleet = fleet,
     age = NA_real_,
     length = NA_real_,
@@ -457,7 +442,7 @@ make_vonb_demo_data <- function(
   # The resulting table contains the fleet observations, weight-at-age inputs,
   # and length-bin geometry used to build the example FIMSFrame.
   raw_data <- dplyr::bind_rows(
-    landings_rows,
+    catch_rows,
     age_comp_rows,
     length_comp_rows,
     weight_at_age_rows,
@@ -530,11 +515,10 @@ carried into the growth-derived pathway.
 
 ### Configure the Von Bertalanffy Model
 
-The generated data use the same standard configuration and parameter workflow
-as the `data_big` example. Changing the Growth module to
-`VonBertalanffy` causes `create_default_parameters()` to create the required
-reference ages, interpolation-based variability inputs, and estimable curve
-parameters.
+The generated data use the same standard parameter workflow as the `data_big`
+example. Calling `setup_default_parameters()` with
+`growth_module_type = "VonBertalanffy"` creates the required reference ages,
+interpolation-based variability inputs, and estimable curve parameters.
 
 By default, the reference ages are set from the minimum and maximum ages in the
 `FIMSFrame`. This example overrides the second reference age to 12 so that the
@@ -553,24 +537,12 @@ core_growth_labels <- c(
   "growth_coefficient_K"
 )
 
-# Replace the default empirical weight-at-age module with VonB growth.
-configurations <- FIMS::create_default_configurations(data = demo$frame) |>
-  tidyr::unnest(cols = data) |>
-  dplyr::mutate(
-    module_type = dplyr::if_else(
-      module_name == "Growth",
-      "VonBertalanffy",
-      module_type
-    )
-  ) |>
-  tidyr::nest(.by = c(model_family, module_name, fleet))
-
 # Create the complete model parameter table.
-parameters <- FIMS::create_default_parameters(
-  configurations = configurations,
-  data = demo$frame
-) |>
-  tidyr::unnest(cols = data)
+# Create the complete model parameter table with VonB Growth defaults.
+parameters <- FIMS::setup_default_parameters(
+  data = demo$frame,
+  growth_module_type = "VonBertalanffy"
+)
 ```
 
 The three core curve parameters are already `"fixed_effects"`. The example
@@ -1019,7 +991,7 @@ population size probabilities
 fleet observation-bin probabilities
         |
         v
-length-composition and landings calculations
+length-composition and catch calculations
 ```
 
 ## Next Steps

@@ -4,11 +4,18 @@
 \alias{setup_default_parameters}
 \title{Set up default parameters for a FIMS model}
 \usage{
-setup_default_parameters(data)
+setup_default_parameters(
+  data,
+  growth_module_type = c("EWAA", "VonBertalanffy")
+)
 }
 \arguments{
 \item{data}{A \code{FIMSFrame} object returned from running \code{\link[=FIMSFrame]{FIMSFrame()}} on
 your long input data.}
+
+\item{growth_module_type}{A character string specifying which Growth module
+defaults to use. The default is \code{"EWAA"}. Use \code{"VonBertalanffy"} to
+create Von Bertalanffy Growth defaults for the growth-derived ALK pathway.}
 }
 \value{
 A \code{tibble} containing default parameter values and metadata for your model.

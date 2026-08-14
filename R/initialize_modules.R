@@ -285,7 +285,7 @@ initialize_growth <- function(parameters, data) {
       cli::cli_abort(c(
         "VonBertalanffy growth requires reference-age inputs.",
         "i" = "Missing labels: {toString(missing_reference_labels)}",
-        "i" = "Use {.fn create_default_parameters} or supply both reference ages explicitly."
+        "i" = "Use {.fn setup_default_Growth} or supply both reference ages explicitly."
       ))
     }
 
@@ -461,13 +461,6 @@ initialize_fleet <- function(parameters, data, fleet, linked_ids) {
     dplyr::pull(.data$type) |>
     unique()
 
-  distribution_names_for_fleet <- parameters |>
-    dplyr::filter(
-      .data$fleet == .env$fleet,
-      .data$distribution_type == "Data"
-    ) |>
-    dplyr::pull(.data$module_type)
-
   has_growth_derived_support <- any(
     parameters |>
       dplyr::filter(.data$module_name == "Growth") |>
@@ -478,15 +471,15 @@ initialize_fleet <- function(parameters, data, fleet, linked_ids) {
     get_data(data)$type == "age_to_length_conversion"
   )
 
-  has_length_comp_distribution <- "LengthComp" %in% distribution_names_for_fleet
+  has_length_comp_data <- "length_comp" %in% fleet_types
 
   use_fixed_alk_path <-
     !has_growth_derived_support &&
     has_fixed_alk_support &&
-    has_length_comp_distribution
+    has_length_comp_data
   use_growth_derived_path <-
-    has_growth_derived_support && has_length_comp_distribution
-  requires_age_length_mapping <- has_length_comp_distribution
+    has_growth_derived_support && has_length_comp_data
+  requires_age_length_mapping <- has_length_comp_data
 
   fleet_length_bins <- resolve_fleet_length_bins(
     get_data(data),
@@ -555,11 +548,8 @@ initialize_fleet <- function(parameters, data, fleet, linked_ids) {
     module$age_to_length_conversion$resize(0)
   }
 
-  # Link the observed catch data to the fleet module using its associated ID
-  # if the data type includes "catch" and if "Catch" exists in the
-  # data distribution specification.
-  if ("catch" %in% fleet_types &&
-    "Catch" %in% distribution_names_for_fleet) {
+  # Link the observed catch data to the fleet module using its associated ID.
+  if ("catch" %in% fleet_types) {
     module$SetObservedCatchDataID(linked_ids[["catch"]])
   }
 
