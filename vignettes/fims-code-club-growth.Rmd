@@ -338,9 +338,9 @@ make_vonb_demo_data <- function(
       length = NA_real_,
       observed = age_probabilities[match(age, ages)],
       unit = "proportion",
-      uncertainty = glue::glue(
+      uncertainty = as.character(glue::glue(
         "~dmultinom(prob = agecomp_proportion, size = {sample_size})"
-      )
+      ))
     ) |>
     dplyr::select(
       type,
@@ -387,9 +387,9 @@ make_vonb_demo_data <- function(
       fleet = fleet,
       age = NA_real_,
       unit = "proportion",
-      uncertainty = glue::glue(
+      uncertainty = as.character(glue::glue(
         "~dmultinom(prob = lengthcomp_proportion, size = {sample_size})"
-      )
+      ))
     ) |>
     dplyr::select(
       type,
@@ -414,7 +414,7 @@ make_vonb_demo_data <- function(
       timing = min(years),
       observed = true_weight_at_age,
       unit = "mt",
-      uncertainty = NA_real_
+      uncertainty = NA_character_
     )
 
   # Add simple catch observations for each modeled year.
@@ -427,7 +427,7 @@ make_vonb_demo_data <- function(
     timing = years,
     observed = rep(2500, length(years)),
     unit = "mt",
-    uncertainty = 0.2
+    uncertainty = "~dlnorm(meanlog = log_catch_expected, sdlog = 0.2)"
   )
 
   # Make the fleet observation geometry explicit so it can be modified.
@@ -439,7 +439,7 @@ make_vonb_demo_data <- function(
     timing = NA_real_,
     observed = NA_real_,
     unit = "proportion",
-    uncertainty = NA_real_
+    uncertainty = NA_character_
   )
 
   # Combine all generated row types into one long FIMS input table.
