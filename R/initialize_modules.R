@@ -521,7 +521,7 @@ initialize_fleet <- function(parameters, data, fleet, linked_ids) {
       dplyr::filter(.data$type == "age_to_length_conversion") |>
       dplyr::group_by(.data$age, .data$length) |>
       dplyr::summarize(
-        value = mean(as.numeric(.data$value), na.rm = TRUE),
+        value = mean(as.numeric(.data$observed), na.rm = TRUE),
         .groups = "drop"
       ) |>
       dplyr::filter(.data$length %in% fleet_length_bins) |>
@@ -752,7 +752,7 @@ initialize_comp <- function(data,
       )
 
     out_of_bin_non_missing <- out_of_bin_length_rows |>
-      dplyr::filter(!is.na(.data$value), .data$value != -999)
+      dplyr::filter(!is.na(.data$observed), .data$observed != -999)
 
     if (nrow(out_of_bin_non_missing) > 0) {
       out_of_bin_lengths <- out_of_bin_non_missing |>
@@ -782,7 +782,22 @@ initialize_comp <- function(data,
       ) |>
       dplyr::mutate(length_order = match(.data$length, fleet_length_bins)) |>
       dplyr::arrange(.data$timing, .data$length_order) |>
-      dplyr::pull(.data$value)
+      dplyr::mutate(
+        sample_size = ifelse(
+          .data$observed == -999,
+          1,
+          unlist(
+            parse_data_distribution(.data$uncertainty)$size,
+            use.names = FALSE
+          )
+        ),
+        probabilities = ifelse(
+          .data$unit == "number",
+          .data$observed,
+          .data$observed * .data$sample_size
+        )
+      ) |>
+      dplyr::pull(.data$probabilities)
 
     model_uncertainty <- model_uncertainty |>
       dplyr::filter(.data$length %in% fleet_length_bins) |>
@@ -790,12 +805,7 @@ initialize_comp <- function(data,
       dplyr::arrange(.data$timing, .data$length_order)
   }
 
-  model_data <- comp_data *
-    model_uncertainty |>
-      dplyr::mutate(
-        valid_n = ifelse(.data$value == -999, 1, .data$uncertainty)
-      ) |>
-      dplyr::pull(.data$valid_n)
+  model_data <- comp_data
 
   if (length(model_data) != get_n_years(data) * expected_n) {
     bad_data_years <- model_uncertainty |>
