@@ -1,3 +1,7 @@
+# FIMS 0.11.0
+
+*
+
 # FIMS 0.10.0
 
 * Use `setup_default_parameters()` to set up a model
