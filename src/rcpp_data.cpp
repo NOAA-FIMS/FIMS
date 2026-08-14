@@ -36,6 +36,56 @@ Rcpp::XPtr<SharedIndex> create_index_(int ymax = 0) {
   return Rcpp::XPtr<SharedIndex>(new SharedIndex(obj), true);
 }
 
+void set_age_comp_data_(Rcpp::XPtr<SharedAgeComp> xp,
+                        Rcpp::NumericVector values) {
+  (*xp)->age_comp_data.set_values(values);
+}
+
+void set_age_comp_uncertainty_(Rcpp::XPtr<SharedAgeComp> xp,
+                               Rcpp::NumericVector values) {
+  (*xp)->uncertainty.set_values(values);
+}
+
+void set_length_comp_data_(Rcpp::XPtr<SharedLengthComp> xp,
+                           Rcpp::NumericVector values) {
+  (*xp)->length_comp_data.set_values(values);
+}
+
+void set_length_comp_uncertainty_(Rcpp::XPtr<SharedLengthComp> xp,
+                                  Rcpp::NumericVector values) {
+  (*xp)->uncertainty.set_values(values);
+}
+
+void set_catch_data_(Rcpp::XPtr<SharedCatch> xp, Rcpp::NumericVector values) {
+  (*xp)->catch_data.set_values(values);
+}
+
+void set_catch_uncertainty_(Rcpp::XPtr<SharedCatch> xp,
+                            Rcpp::NumericVector values) {
+  (*xp)->uncertainty.set_values(values);
+}
+
+void set_index_data_(Rcpp::XPtr<SharedIndex> xp, Rcpp::NumericVector values) {
+  (*xp)->index_data.set_values(values);
+}
+
+void set_index_uncertainty_(Rcpp::XPtr<SharedIndex> xp,
+                            Rcpp::NumericVector values) {
+  (*xp)->uncertainty.set_values(values);
+}
+
+uint32_t get_age_comp_id_(Rcpp::XPtr<SharedAgeComp> xp) {
+  return (*xp)->get_id();
+}
+
+uint32_t get_length_comp_id_(Rcpp::XPtr<SharedLengthComp> xp) {
+  return (*xp)->get_id();
+}
+
+uint32_t get_catch_id_(Rcpp::XPtr<SharedCatch> xp) { return (*xp)->get_id(); }
+
+uint32_t get_index_id_(Rcpp::XPtr<SharedIndex> xp) { return (*xp)->get_id(); }
+
 Rcpp::XPtr<SharedBase> age_comp_to_fims_xptr_(Rcpp::XPtr<SharedAgeComp> xp) {
   SharedBase base = *xp;
   return Rcpp::XPtr<SharedBase>(new SharedBase(base), true);
@@ -62,45 +112,23 @@ Rcpp::XPtr<SharedBase> index_to_fims_xptr_(Rcpp::XPtr<SharedIndex> xp) {
  */
 void register_data(Rcpp::Module& m) {
   Rcpp::function("create_age_comp_", &create_age_comp_);
+  Rcpp::function("set_age_comp_data_", &set_age_comp_data_);
+  Rcpp::function("set_age_comp_uncertainty_", &set_age_comp_uncertainty_);
+  Rcpp::function("get_age_comp_id_", &get_age_comp_id_);
   Rcpp::function("age_comp_to_fims_xptr_", &age_comp_to_fims_xptr_);
   Rcpp::function("create_length_comp_", &create_length_comp_);
+  Rcpp::function("set_length_comp_data_", &set_length_comp_data_);
+  Rcpp::function("set_length_comp_uncertainty_", &set_length_comp_uncertainty_);
+  Rcpp::function("get_length_comp_id_", &get_length_comp_id_);
   Rcpp::function("length_comp_to_fims_xptr_", &length_comp_to_fims_xptr_);
   Rcpp::function("create_catch_", &create_catch_);
+  Rcpp::function("set_catch_data_", &set_catch_data_);
+  Rcpp::function("set_catch_uncertainty_", &set_catch_uncertainty_);
+  Rcpp::function("get_catch_id_", &get_catch_id_);
   Rcpp::function("catch_to_fims_xptr_", &catch_to_fims_xptr_);
   Rcpp::function("create_index_", &create_index_);
+  Rcpp::function("set_index_data_", &set_index_data_);
+  Rcpp::function("set_index_uncertainty_", &set_index_uncertainty_);
+  Rcpp::function("get_index_id_", &get_index_id_);
   Rcpp::function("index_to_fims_xptr_", &index_to_fims_xptr_);
-
-  Rcpp::class_<AgeCompDataInterface>("AgeComp",
-                                     "See "
-                                     "https://noaa-fims.github.io/FIMS/doxygen/"
-                                     "classAgeCompDataInterface.html.")
-      .constructor<int, int>()
-      .field("age_comp_data", &AgeCompDataInterface::age_comp_data)
-      .method("get_id", &AgeCompDataInterface::get_id);
-
-  Rcpp::class_<LengthCompDataInterface>(
-      "LengthComp",
-      "See "
-      "https://noaa-fims.github.io/FIMS/doxygen/"
-      "classLengthCompDataInterface.html.")
-      .constructor<int, int>()
-      .field("length_comp_data", &LengthCompDataInterface::length_comp_data)
-      .method("get_id", &LengthCompDataInterface::get_id);
-
-  Rcpp::class_<CatchDataInterface>(
-      "Catch",
-      "See "
-      "https://noaa-fims.github.io/FIMS/doxygen/"
-      "classCatchDataInterface.html.")
-      .constructor<int>()
-      .field("catch_data", &CatchDataInterface::catch_data)
-      .method("get_id", &CatchDataInterface::get_id);
-
-  Rcpp::class_<IndexDataInterface>(
-      "Index",
-      "See "
-      "https://noaa-fims.github.io/FIMS/doxygen/classIndexDataInterface.html.")
-      .constructor<int>()
-      .field("index_data", &IndexDataInterface::index_data)
-      .method("get_id", &IndexDataInterface::get_id);
 }

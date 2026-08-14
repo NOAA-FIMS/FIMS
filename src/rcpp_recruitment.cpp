@@ -15,8 +15,7 @@ using SharedBevertonHoltRecruitment =
     std::shared_ptr<BevertonHoltRecruitmentInterface>;
 using SharedLogDevsRecruitmentProcess =
     std::shared_ptr<LogDevsRecruitmentInterface>;
-using SharedLogRRecruitmentProcess =
-    std::shared_ptr<LogRRecruitmentInterface>;
+using SharedLogRRecruitmentProcess = std::shared_ptr<LogRRecruitmentInterface>;
 using SharedBase = std::shared_ptr<FIMSRcppInterfaceBase>;
 
 Rcpp::XPtr<SharedBevertonHoltRecruitment> create_beverton_holt_recruitment_() {
@@ -36,6 +35,63 @@ Rcpp::XPtr<SharedLogRRecruitmentProcess> create_log_r_recruitment_process_() {
   auto obj = std::make_shared<LogRRecruitmentInterface>();
   return Rcpp::XPtr<SharedLogRRecruitmentProcess>(
       new SharedLogRRecruitmentProcess(obj), true);
+}
+
+void set_beverton_holt_n_years_(Rcpp::XPtr<SharedBevertonHoltRecruitment> xp,
+                                int n_years) {
+  (*xp)->n_years = n_years;
+}
+
+void set_beverton_holt_process_id_(Rcpp::XPtr<SharedBevertonHoltRecruitment> xp,
+                                   int process_id) {
+  (*xp)->SetRecruitmentProcessID(process_id);
+}
+
+void set_beverton_holt_logit_steep_(
+    Rcpp::XPtr<SharedBevertonHoltRecruitment> xp, Rcpp::NumericVector values,
+    Rcpp::CharacterVector estimation_status) {
+  (*xp)->logit_steep.resize(values.size());
+  (*xp)->logit_steep.set_values(values);
+  (*xp)->logit_steep.set_estimation_status(estimation_status);
+}
+
+void set_beverton_holt_log_rzero_(Rcpp::XPtr<SharedBevertonHoltRecruitment> xp,
+                                  Rcpp::NumericVector values,
+                                  Rcpp::CharacterVector estimation_status) {
+  (*xp)->log_rzero.resize(values.size());
+  (*xp)->log_rzero.set_values(values);
+  (*xp)->log_rzero.set_estimation_status(estimation_status);
+}
+
+void set_beverton_holt_log_devs_(Rcpp::XPtr<SharedBevertonHoltRecruitment> xp,
+                                 Rcpp::NumericVector values,
+                                 Rcpp::CharacterVector estimation_status) {
+  (*xp)->log_devs.resize(values.size());
+  (*xp)->log_devs.set_values(values);
+  (*xp)->log_devs.set_estimation_status(estimation_status);
+}
+
+void set_beverton_holt_log_r_(Rcpp::XPtr<SharedBevertonHoltRecruitment> xp,
+                              Rcpp::NumericVector values,
+                              Rcpp::CharacterVector estimation_status) {
+  (*xp)->log_r.resize(values.size());
+  (*xp)->log_r.set_values(values);
+  (*xp)->log_r.set_estimation_status(estimation_status);
+}
+
+uint32_t get_beverton_holt_recruitment_id_(
+    Rcpp::XPtr<SharedBevertonHoltRecruitment> xp) {
+  return (*xp)->get_id();
+}
+
+uint32_t get_log_devs_recruitment_process_id_(
+    Rcpp::XPtr<SharedLogDevsRecruitmentProcess> xp) {
+  return (*xp)->get_id();
+}
+
+uint32_t get_log_r_recruitment_process_id_(
+    Rcpp::XPtr<SharedLogRRecruitmentProcess> xp) {
+  return (*xp)->get_id();
 }
 
 Rcpp::XPtr<SharedBase> beverton_holt_recruitment_to_fims_xptr_(
@@ -63,52 +119,28 @@ Rcpp::XPtr<SharedBase> log_r_recruitment_process_to_fims_xptr_(
 void register_recruitment(Rcpp::Module& m) {
   Rcpp::function("create_beverton_holt_recruitment_",
                  &create_beverton_holt_recruitment_);
+  Rcpp::function("set_beverton_holt_n_years_", &set_beverton_holt_n_years_);
+  Rcpp::function("set_beverton_holt_process_id_",
+                 &set_beverton_holt_process_id_);
+  Rcpp::function("set_beverton_holt_logit_steep_",
+                 &set_beverton_holt_logit_steep_);
+  Rcpp::function("set_beverton_holt_log_rzero_", &set_beverton_holt_log_rzero_);
+  Rcpp::function("set_beverton_holt_log_devs_", &set_beverton_holt_log_devs_);
+  Rcpp::function("set_beverton_holt_log_r_", &set_beverton_holt_log_r_);
+  Rcpp::function("get_beverton_holt_recruitment_id_",
+                 &get_beverton_holt_recruitment_id_);
   Rcpp::function("beverton_holt_recruitment_to_fims_xptr_",
                  &beverton_holt_recruitment_to_fims_xptr_);
   Rcpp::function("create_log_devs_recruitment_process_",
                  &create_log_devs_recruitment_process_);
+  Rcpp::function("get_log_devs_recruitment_process_id_",
+                 &get_log_devs_recruitment_process_id_);
   Rcpp::function("log_devs_recruitment_process_to_fims_xptr_",
                  &log_devs_recruitment_process_to_fims_xptr_);
   Rcpp::function("create_log_r_recruitment_process_",
                  &create_log_r_recruitment_process_);
+  Rcpp::function("get_log_r_recruitment_process_id_",
+                 &get_log_r_recruitment_process_id_);
   Rcpp::function("log_r_recruitment_process_to_fims_xptr_",
                  &log_r_recruitment_process_to_fims_xptr_);
-
-  Rcpp::class_<BevertonHoltRecruitmentInterface>(
-      "BevertonHoltRecruitment",
-      "See "
-      "https://noaa-fims.github.io/FIMS/doxygen/"
-      "classBevertonHoltRecruitmentInterface.html.")
-      .constructor()
-      .field("logit_steep", &BevertonHoltRecruitmentInterface::logit_steep)
-      .field("log_rzero", &BevertonHoltRecruitmentInterface::log_rzero)
-      .field("log_devs", &BevertonHoltRecruitmentInterface::log_devs)
-      .field("log_r", &BevertonHoltRecruitmentInterface::log_r)
-      .field("log_expected_recruitment",
-             &BevertonHoltRecruitmentInterface::log_expected_recruitment)
-      .field("n_years", &BevertonHoltRecruitmentInterface::n_years)
-      .method("get_id", &BevertonHoltRecruitmentInterface::get_id)
-      .method("SetRecruitmentProcessID",
-              &BevertonHoltRecruitmentInterface::SetRecruitmentProcessID)
-      .method("evaluate_mean",
-              &BevertonHoltRecruitmentInterface::evaluate_mean);
-
-  Rcpp::class_<LogDevsRecruitmentInterface>(
-      "LogDevsRecruitmentProcess",
-      "See "
-      "https://noaa-fims.github.io/FIMS/doxygen/"
-      "classLogDevsRecruitmentInterface.html.")
-      .constructor()
-      .method("get_id", &LogDevsRecruitmentInterface::get_id)
-      .method("evaluate_process",
-              &LogDevsRecruitmentInterface::evaluate_process);
-
-  Rcpp::class_<LogRRecruitmentInterface>(
-      "LogRRecruitmentProcess",
-      "See "
-      "https://noaa-fims.github.io/FIMS/doxygen/"
-      "classLogRRecruitmentInterface.html.")
-      .constructor()
-      .method("get_id", &LogRRecruitmentInterface::get_id)
-      .method("evaluate_process", &LogRRecruitmentInterface::evaluate_process);
 }

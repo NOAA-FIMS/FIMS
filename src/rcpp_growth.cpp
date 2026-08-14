@@ -20,6 +20,19 @@ Rcpp::XPtr<SharedEWAAGrowth> create_ewaa_growth_() {
   return Rcpp::XPtr<SharedEWAAGrowth>(new SharedEWAAGrowth(obj), true);
 }
 
+void set_ewaa_growth_data_(Rcpp::XPtr<SharedEWAAGrowth> xp,
+                           Rcpp::NumericVector ages,
+                           Rcpp::NumericVector weights, int n_years) {
+  (*xp)->ages.set_values(ages);
+  (*xp)->weights.set_values(weights);
+  (*xp)->n_years = n_years;
+  (*xp)->initialized = false;
+}
+
+uint32_t get_ewaa_growth_id_(Rcpp::XPtr<SharedEWAAGrowth> xp) {
+  return (*xp)->get_id();
+}
+
 Rcpp::XPtr<SharedBase> ewaa_growth_to_fims_xptr_(
     Rcpp::XPtr<SharedEWAAGrowth> xp) {
   SharedBase base = *xp;
@@ -32,17 +45,7 @@ Rcpp::XPtr<SharedBase> ewaa_growth_to_fims_xptr_(
  */
 void register_growth(Rcpp::Module& m) {
   Rcpp::function("create_ewaa_growth_", &create_ewaa_growth_);
+  Rcpp::function("set_ewaa_growth_data_", &set_ewaa_growth_data_);
+  Rcpp::function("get_ewaa_growth_id_", &get_ewaa_growth_id_);
   Rcpp::function("ewaa_growth_to_fims_xptr_", &ewaa_growth_to_fims_xptr_);
-
-  Rcpp::class_<EWAAGrowthInterface>(
-      "EWAAGrowth",
-      "See "
-      "https://noaa-fims.github.io/FIMS/doxygen/classEWAAGrowthInterface.html.")
-      .constructor()
-      .field("ages", &EWAAGrowthInterface::ages, "Ages for each age class.")
-      .field("weights", &EWAAGrowthInterface::weights,
-             "Weights for each age class.")
-      .field("n_years", &EWAAGrowthInterface::n_years, "Number of years.")
-      .method("get_id", &EWAAGrowthInterface::get_id)
-      .method("evaluate", &EWAAGrowthInterface::evaluate);
 }

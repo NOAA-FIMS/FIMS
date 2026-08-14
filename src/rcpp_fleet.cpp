@@ -20,6 +20,64 @@ Rcpp::XPtr<SharedFleet> create_fleet_() {
   return Rcpp::XPtr<SharedFleet>(new SharedFleet(obj), true);
 }
 
+void set_fleet_dimensions_(Rcpp::XPtr<SharedFleet> xp, int n_years, int n_ages,
+                           int n_lengths) {
+  (*xp)->n_years = n_years;
+  (*xp)->n_ages = n_ages;
+  (*xp)->n_lengths = n_lengths;
+}
+
+void set_fleet_name_(Rcpp::XPtr<SharedFleet> xp, std::string name) {
+  (*xp)->SetName(name);
+}
+
+void set_fleet_units_(Rcpp::XPtr<SharedFleet> xp,
+                      std::string observed_catch_units,
+                      std::string observed_index_units) {
+  (*xp)->observed_catch_units = observed_catch_units;
+  (*xp)->observed_index_units = observed_index_units;
+}
+
+void set_fleet_data_ids_(Rcpp::XPtr<SharedFleet> xp,
+                         int observed_age_comp_data_id = -999,
+                         int observed_length_comp_data_id = -999,
+                         int observed_index_data_id = -999,
+                         int observed_catch_data_id = -999) {
+  (*xp)->SetObservedAgeCompDataID(observed_age_comp_data_id);
+  (*xp)->SetObservedLengthCompDataID(observed_length_comp_data_id);
+  (*xp)->SetObservedIndexDataID(observed_index_data_id);
+  (*xp)->SetObservedCatchDataID(observed_catch_data_id);
+}
+
+void set_fleet_selectivity_id_(Rcpp::XPtr<SharedFleet> xp, int selectivity_id) {
+  (*xp)->SetSelectivityID(selectivity_id);
+}
+
+void set_fleet_log_q_(Rcpp::XPtr<SharedFleet> xp, Rcpp::NumericVector values,
+                      Rcpp::CharacterVector estimation_status) {
+  (*xp)->log_q.resize(values.size());
+  (*xp)->log_q.set_values(values);
+  (*xp)->log_q.set_estimation_status(estimation_status);
+}
+
+void set_fleet_log_Fmort_(Rcpp::XPtr<SharedFleet> xp,
+                          Rcpp::NumericVector values,
+                          Rcpp::CharacterVector estimation_status) {
+  (*xp)->log_Fmort.resize(values.size());
+  (*xp)->log_Fmort.set_values(values);
+  (*xp)->log_Fmort.set_estimation_status(estimation_status);
+}
+
+void set_fleet_age_to_length_conversion_(
+    Rcpp::XPtr<SharedFleet> xp, Rcpp::NumericVector values,
+    Rcpp::CharacterVector estimation_status) {
+  (*xp)->age_to_length_conversion.resize(values.size());
+  (*xp)->age_to_length_conversion.set_values(values);
+  (*xp)->age_to_length_conversion.set_estimation_status(estimation_status);
+}
+
+uint32_t get_fleet_id_(Rcpp::XPtr<SharedFleet> xp) { return (*xp)->get_id(); }
+
 Rcpp::XPtr<SharedBase> fleet_to_fims_xptr_(Rcpp::XPtr<SharedFleet> xp) {
   SharedBase base = *xp;
   return Rcpp::XPtr<SharedBase>(new SharedBase(base), true);
@@ -31,60 +89,15 @@ Rcpp::XPtr<SharedBase> fleet_to_fims_xptr_(Rcpp::XPtr<SharedFleet> xp) {
  */
 void register_fleet(Rcpp::Module& m) {
   Rcpp::function("create_fleet_", &create_fleet_);
+  Rcpp::function("set_fleet_dimensions_", &set_fleet_dimensions_);
+  Rcpp::function("set_fleet_name_", &set_fleet_name_);
+  Rcpp::function("set_fleet_units_", &set_fleet_units_);
+  Rcpp::function("set_fleet_data_ids_", &set_fleet_data_ids_);
+  Rcpp::function("set_fleet_selectivity_id_", &set_fleet_selectivity_id_);
+  Rcpp::function("set_fleet_log_q_", &set_fleet_log_q_);
+  Rcpp::function("set_fleet_log_Fmort_", &set_fleet_log_Fmort_);
+  Rcpp::function("set_fleet_age_to_length_conversion_",
+                 &set_fleet_age_to_length_conversion_);
+  Rcpp::function("get_fleet_id_", &get_fleet_id_);
   Rcpp::function("fleet_to_fims_xptr_", &fleet_to_fims_xptr_);
-
-  Rcpp::class_<FleetInterface>(
-      "Fleet",
-      "See https://noaa-fims.github.io/FIMS/doxygen/classFleetInterface.html.")
-      .constructor()
-      .field("log_q", &FleetInterface::log_q)
-      .field("log_Fmort", &FleetInterface::log_Fmort)
-      .field("n_ages", &FleetInterface::n_ages)
-      .field("n_years", &FleetInterface::n_years)
-      .field("n_lengths", &FleetInterface::n_lengths)
-      .field("observed_catch_units",
-             &FleetInterface::observed_catch_units)
-      .field("observed_index_units", &FleetInterface::observed_index_units)
-      .field("log_index_expected", &FleetInterface::log_index_expected)
-      .field("age_to_length_conversion",
-             &FleetInterface::age_to_length_conversion)
-      .field("catch_numbers_at_age",
-             &FleetInterface::catch_numbers_at_age)
-      .field("catch_weight_at_age",
-             &FleetInterface::catch_weight_at_age)
-      .field("catch_numbers_at_length",
-             &FleetInterface::catch_numbers_at_length)
-      .field("catch_weight", &FleetInterface::catch_weight)
-      .field("catch_numbers", &FleetInterface::catch_numbers)
-      .field("catch_expected", &FleetInterface::catch_expected)
-      .field("log_catch_expected", &FleetInterface::log_catch_expected)
-      .field("agecomp_proportion", &FleetInterface::agecomp_proportion)
-      .field("lengthcomp_proportion", &FleetInterface::lengthcomp_proportion)
-      .field("index_numbers_at_age", &FleetInterface::index_numbers_at_age)
-      .field("index_weight_at_age", &FleetInterface::index_weight_at_age)
-      .field("index_numbers_at_length",
-             &FleetInterface::index_numbers_at_length)
-      .field("index_weight", &FleetInterface::index_weight)
-      .field("index_numbers", &FleetInterface::index_numbers)
-      .field("index_expected", &FleetInterface::index_expected)
-      .field("agecomp_expected", &FleetInterface::agecomp_expected)
-      .field("lengthcomp_expected", &FleetInterface::lengthcomp_expected)
-      .method("get_id", &FleetInterface::get_id)
-      .method("SetName", &FleetInterface::SetName)
-      .method("GetName", &FleetInterface::GetName)
-      .method("SetObservedAgeCompDataID",
-              &FleetInterface::SetObservedAgeCompDataID)
-      .method("GetObservedAgeCompDataID",
-              &FleetInterface::GetObservedAgeCompDataID)
-      .method("SetObservedLengthCompDataID",
-              &FleetInterface::SetObservedLengthCompDataID)
-      .method("GetObservedLengthCompDataID",
-              &FleetInterface::GetObservedLengthCompDataID)
-      .method("SetObservedIndexDataID", &FleetInterface::SetObservedIndexDataID)
-      .method("GetObservedIndexDataID", &FleetInterface::GetObservedIndexDataID)
-      .method("SetObservedCatchDataID",
-              &FleetInterface::SetObservedCatchDataID)
-      .method("GetObservedCatchDataID",
-              &FleetInterface::GetObservedCatchDataID)
-      .method("SetSelectivityID", &FleetInterface::SetSelectivityID);
 }

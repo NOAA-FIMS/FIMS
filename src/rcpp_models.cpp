@@ -14,11 +14,35 @@ std::map<uint32_t, std::shared_ptr<FisheryModelInterfaceBase>>
 #include <Rcpp.h>
 
 using SharedCatchAtAge = std::shared_ptr<CatchAtAgeInterface>;
+using SharedPopulation = std::shared_ptr<PopulationInterface>;
 using SharedBase = std::shared_ptr<FIMSRcppInterfaceBase>;
 
 Rcpp::XPtr<SharedCatchAtAge> create_catch_at_age_() {
   auto obj = std::make_shared<CatchAtAgeInterface>();
   return Rcpp::XPtr<SharedCatchAtAge>(new SharedCatchAtAge(obj), true);
+}
+
+void add_population_to_catch_at_age_(
+    Rcpp::XPtr<SharedCatchAtAge> catch_at_age_xp,
+    Rcpp::XPtr<SharedPopulation> population_xp) {
+  (*catch_at_age_xp)->population_ids->insert((*population_xp)->get_id());
+  (*population_xp)->initialize_catch_at_age = true;
+}
+
+std::string get_catch_at_age_output_(Rcpp::XPtr<SharedCatchAtAge> xp) {
+  return (*xp)->to_json();
+}
+
+uint32_t get_catch_at_age_id_(Rcpp::XPtr<SharedCatchAtAge> xp) {
+  return (*xp)->get_id();
+}
+
+void set_catch_at_age_reporting_(Rcpp::XPtr<SharedCatchAtAge> xp, bool report) {
+  (*xp)->DoReporting(report);
+}
+
+bool get_catch_at_age_reporting_(Rcpp::XPtr<SharedCatchAtAge> xp) {
+  return (*xp)->IsReporting();
 }
 
 Rcpp::XPtr<SharedBase> catch_at_age_to_fims_xptr_(
@@ -33,16 +57,11 @@ Rcpp::XPtr<SharedBase> catch_at_age_to_fims_xptr_(
  */
 void register_fishery_models(Rcpp::Module& m) {
   Rcpp::function("create_catch_at_age_", &create_catch_at_age_);
+  Rcpp::function("add_population_to_catch_at_age_",
+                 &add_population_to_catch_at_age_);
+  Rcpp::function("get_catch_at_age_output_", &get_catch_at_age_output_);
+  Rcpp::function("get_catch_at_age_id_", &get_catch_at_age_id_);
+  Rcpp::function("set_catch_at_age_reporting_", &set_catch_at_age_reporting_);
+  Rcpp::function("get_catch_at_age_reporting_", &get_catch_at_age_reporting_);
   Rcpp::function("catch_at_age_to_fims_xptr_", &catch_at_age_to_fims_xptr_);
-
-  Rcpp::class_<CatchAtAgeInterface>(
-      "CatchAtAge",
-      "See "
-      "https://noaa-fims.github.io/FIMS/doxygen/classCatchAtAgeInterface.html.")
-      .constructor()
-      .method("AddPopulation", &CatchAtAgeInterface::AddPopulation)
-      .method("get_output", &CatchAtAgeInterface::to_json)
-      .method("GetId", &CatchAtAgeInterface::get_id)
-      .method("DoReporting", &CatchAtAgeInterface::DoReporting)
-      .method("IsReporting", &CatchAtAgeInterface::IsReporting);
 }

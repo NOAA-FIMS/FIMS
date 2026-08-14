@@ -17,8 +17,28 @@ using SharedBase = std::shared_ptr<FIMSRcppInterfaceBase>;
 
 Rcpp::XPtr<SharedLogisticMaturity> create_logistic_maturity_() {
   auto obj = std::make_shared<LogisticMaturityInterface>();
-  return Rcpp::XPtr<SharedLogisticMaturity>(
-      new SharedLogisticMaturity(obj), true);
+  return Rcpp::XPtr<SharedLogisticMaturity>(new SharedLogisticMaturity(obj),
+                                            true);
+}
+
+void set_logistic_maturity_inflection_point_(
+    Rcpp::XPtr<SharedLogisticMaturity> xp, Rcpp::NumericVector values,
+    Rcpp::CharacterVector estimation_status) {
+  (*xp)->inflection_point.resize(values.size());
+  (*xp)->inflection_point.set_values(values);
+  (*xp)->inflection_point.set_estimation_status(estimation_status);
+}
+
+void set_logistic_maturity_slope_(Rcpp::XPtr<SharedLogisticMaturity> xp,
+                                  Rcpp::NumericVector values,
+                                  Rcpp::CharacterVector estimation_status) {
+  (*xp)->slope.resize(values.size());
+  (*xp)->slope.set_values(values);
+  (*xp)->slope.set_estimation_status(estimation_status);
+}
+
+uint32_t get_logistic_maturity_id_(Rcpp::XPtr<SharedLogisticMaturity> xp) {
+  return (*xp)->get_id();
 }
 
 Rcpp::XPtr<SharedBase> logistic_maturity_to_fims_xptr_(
@@ -33,17 +53,10 @@ Rcpp::XPtr<SharedBase> logistic_maturity_to_fims_xptr_(
  */
 void register_maturity(Rcpp::Module& m) {
   Rcpp::function("create_logistic_maturity_", &create_logistic_maturity_);
+  Rcpp::function("set_logistic_maturity_inflection_point_",
+                 &set_logistic_maturity_inflection_point_);
+  Rcpp::function("set_logistic_maturity_slope_", &set_logistic_maturity_slope_);
+  Rcpp::function("get_logistic_maturity_id_", &get_logistic_maturity_id_);
   Rcpp::function("logistic_maturity_to_fims_xptr_",
                  &logistic_maturity_to_fims_xptr_);
-
-  Rcpp::class_<LogisticMaturityInterface>(
-      "LogisticMaturity",
-      "See "
-      "https://noaa-fims.github.io/FIMS/doxygen/"
-      "classLogisticMaturityInterface.html.")
-      .constructor()
-      .field("inflection_point", &LogisticMaturityInterface::inflection_point)
-      .field("slope", &LogisticMaturityInterface::slope)
-      .method("get_id", &LogisticMaturityInterface::get_id)
-      .method("evaluate", &LogisticMaturityInterface::evaluate);
 }
