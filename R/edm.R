@@ -509,6 +509,159 @@ model_edm_matrix_multivariate <- function(x,
   mat
 }
 
+# select_embedding_dimension ---------------------------------------------
+
+#' Select the optimal embedding dimension for Simplex Projection
+#'
+#' @description
+#' Evaluates Simplex Projection prediction skill across a range of embedding
+#' dimensions `E` using in-library (self-prediction) assessment. For each
+#' candidate `E` value a delay embedding is constructed and Simplex Projection
+#' is run with `n_neighbors = E + 1`. The Pearson correlation (\eqn{\rho})
+#' and RMSE are computed between predictions and target values, and the `E`
+#' that maximises \eqn{\rho} is flagged as optimal.
+#'
+#' This function is typically the **first step** in a univariate EDM workflow,
+#' run before [create_edm_embedding()] and [select_n_neighbors()].
+#'
+#' @param data A [FIMSFrame()] object.
+#' @param series_type A single string giving the `type` column value to filter
+#'   on, e.g. `"landings"` or `"index"`.
+#' @param series_name A single string giving the `fleet` column value to filter
+#'   on, e.g. `"fleet1"` or `"survey1"`.
+#' @param tau Positive integer. Time lag between successive coordinates.
+#'   Default is `1`.
+#' @param E_min Positive integer. Minimum embedding dimension to evaluate.
+#'   Default is `1`.
+#' @param E_max Positive integer. Maximum embedding dimension to evaluate.
+#'   Default is `10`.
+#' @param drop_missing Logical. When `TRUE` (default), rows containing the FIMS
+#'   missing-value sentinel `-999` are dropped before constructing the
+#'   embedding.
+#'
+#' @return A [tibble::tibble()] with one row per candidate `E` value and
+#'   columns:
+#'   \describe{
+#'     \item{E}{Candidate embedding dimension.}
+#'     \item{rho}{Pearson correlation between in-library predictions and
+#'       targets.}
+#'     \item{rmse}{Root-mean-square prediction error.}
+#'     \item{optimal}{Logical. `TRUE` for the `E` that maximises `rho`.}
+#'   }
+#'
+#' @seealso [select_n_neighbors()], [create_edm_embedding()], [fit_edm()]
+#' @export
+#' @examples
+#' \dontrun{
+#' data("data_big")
+#' ff  <- FIMSFrame(data_big)
+#' edim <- select_embedding_dimension(ff, series_type = "landings",
+#'                                     series_name = "fleet1")
+#' print(edim)
+#' optimal_E <- edim$E[edim$optimal]
+#' ff <- create_edm_embedding(ff, series_type = "landings",
+#'                            series_name = "fleet1",
+#'                            E = optimal_E, tau = 1L)
+#' }
+select_embedding_dimension <- function(data,
+                                       series_type,
+                                       series_name,
+                                       tau       = 1L,
+                                       E_min     = 1L,
+                                       E_max     = 10L,
+                                       drop_missing = TRUE) {
+
+  # --- Input validation ---------------------------------------------------
+  if (!methods::is(data, "FIMSFrame")) {
+    cli::cli_abort("{.arg data} must be a {.cls FIMSFrame} object.")
+  }
+  if (!is.character(series_type) || length(series_type) != 1L) {
+    cli::cli_abort("{.arg series_type} must be a single string.")
+  }
+  if (!is.character(series_name) || length(series_name) != 1L) {
+    cli::cli_abort("{.arg series_name} must be a single string.")
+  }
+  tau   <- as.integer(tau)
+  E_min <- as.integer(E_min)
+  E_max <- as.integer(E_max)
+  if (E_min < 1L) cli::cli_abort("{.arg E_min} must be >= 1.")
+  if (E_max < E_min) cli::cli_abort("{.arg E_max} must be >= {.arg E_min}.")
+
+  # --- Extract the time series once ---------------------------------------
+  series_data <- dplyr::filter(
+    get_data(data),
+    .data[["type"]]  == series_type,
+    .data[["fleet"]] == series_name
+  ) |>
+    dplyr::arrange(.data[["timing"]]) |>
+    dplyr::pull(.data[["value"]])
+
+  if (length(series_data) == 0L) {
+    cli::cli_abort(c(
+      "No data found for type {.val {series_type}} and fleet {.val {series_name}}.",
+      "i" = "Available types: {.val {unique(get_data(data)[[\"type\"]])}}."
+    ))
+  }
+
+  E_seq    <- seq.int(E_min, E_max)
+  rho_vec  <- numeric(length(E_seq))
+  rmse_vec <- numeric(length(E_seq))
+
+  for (i in seq_along(E_seq)) {
+    E_try <- E_seq[[i]]
+
+    # Build DelayEmbedding for this E
+    de <- methods::new(DelayEmbedding)
+    tryCatch(
+      {
+        if (isTRUE(drop_missing)) {
+          de$construct_drop_missing(
+            as.numeric(series_data), as.integer(E_try), as.integer(tau), -999.0
+          )
+        } else {
+          de$construct(
+            as.numeric(series_data), as.integer(E_try), as.integer(tau)
+          )
+        }
+      },
+      error = function(e) {
+        cli::cli_abort(c(
+          "Failed to build embedding for E={E_try}.",
+          "i" = conditionMessage(e)
+        ))
+      }
+    )
+
+    if (de$n_rows < 2L) {
+      # Not enough rows to predict — skip with NA
+      rho_vec[[i]]  <- NA_real_
+      rmse_vec[[i]] <- NA_real_
+      next
+    }
+
+    target_vals <- de$target_values$get_values()
+    lib_id      <- de$get_id()
+
+    sp <- methods::new(SimplexProjection)
+    sp$embedding_dimension <- as.integer(E_try)
+    sp$n_neighbors         <- as.integer(E_try + 1L)
+    preds <- sp$predict(lib_id, lib_id)
+
+    rho_vec[[i]]  <- stats::cor(preds, target_vals, use = "complete.obs")
+    rmse_vec[[i]] <- sqrt(mean((preds - target_vals)^2, na.rm = TRUE))
+  }
+
+  # Ignore NA rows when finding the best E
+  best_idx <- which.max(ifelse(is.na(rho_vec), -Inf, rho_vec))
+
+  tibble::tibble(
+    E       = E_seq,
+    rho     = rho_vec,
+    rmse    = rmse_vec,
+    optimal = seq_along(E_seq) == best_idx
+  )
+}
+
 # select_n_neighbors ----------------------------------------------------
 
 #' Select the optimal number of nearest neighbours for Simplex Projection
@@ -1034,3 +1187,85 @@ edm_forecast <- function(fit, data, n_ahead = 1L, ...) {
   )
 }
 
+# edm_skill --------------------------------------------------------------
+
+#' Compute in-library prediction skill for a fitted EDM model
+#'
+#' @description
+#' Computes standard prediction skill metrics by comparing the in-library
+#' predictions stored in an [EDMFit-class] object against the corresponding
+#' observed target values retrieved from the originating [FIMSFrame()].
+#'
+#' Three metrics are returned:
+#' * **rho** — Pearson correlation between predictions and observations.
+#' * **rmse** — Root-mean-square error.
+#' * **mae** — Mean absolute error.
+#'
+#' @param fit An [EDMFit-class] object returned by [fit_edm()].
+#' @param data The [FIMSFrame()] object that was passed to [fit_edm()]. Must
+#'   contain the named embedding referenced by `fit`.
+#'
+#' @return A [tibble::tibble()] with one row and columns `rho`, `rmse`,
+#'   `mae`, `n` (number of prediction-observation pairs used), `method`,
+#'   and `embedding_name`.
+#'
+#' @seealso [fit_edm()], [edm_forecast()], [select_n_neighbors()]
+#' @export
+#' @examples
+#' \dontrun{
+#' data("data_big")
+#' ff  <- FIMSFrame(data_big)
+#' ff  <- create_edm_embedding(ff, series_type = "landings",
+#'                              series_name = "fleet1", E = 3L, tau = 1L)
+#' fit <- fit_edm(ff, method = "simplex")
+#' edm_skill(fit, ff)
+#' }
+edm_skill <- function(fit, data) {
+
+  # --- Input validation ---------------------------------------------------
+  if (!is.EDMFit(fit)) {
+    cli::cli_abort(
+      "{.arg fit} must be an {.cls EDMFit} object returned by {.fn fit_edm}."
+    )
+  }
+  if (!methods::is(data, "FIMSFrame")) {
+    cli::cli_abort("{.arg data} must be a {.cls FIMSFrame} object.")
+  }
+
+  # --- Retrieve target values from the stored embedding -------------------
+  embedding_name <- get_embedding_name(fit)
+  embeddings     <- get_edm_embeddings(data)
+
+  if (!embedding_name %in% names(embeddings)) {
+    cli::cli_abort(c(
+      "Embedding {.val {embedding_name}} not found in {.arg data}.",
+      "i" = "Was {.arg data} the same {.cls FIMSFrame} passed to {.fn fit_edm}?"
+    ))
+  }
+
+  emb         <- embeddings[[embedding_name]]
+  target_vals <- as.numeric(emb$target_values)
+  predictions <- as.numeric(get_predictions(fit))
+
+  n <- length(predictions)
+  if (n != length(target_vals)) {
+    cli::cli_abort(c(
+      "Length mismatch: {n} predictions vs {length(target_vals)} target values.",
+      "i" = "Was {.arg data} modified after {.fn fit_edm} was called?"
+    ))
+  }
+
+  # --- Compute metrics ----------------------------------------------------
+  rho  <- stats::cor(predictions, target_vals, use = "complete.obs")
+  rmse <- sqrt(mean((predictions - target_vals)^2, na.rm = TRUE))
+  mae  <- mean(abs(predictions - target_vals), na.rm = TRUE)
+
+  tibble::tibble(
+    rho            = rho,
+    rmse           = rmse,
+    mae            = mae,
+    n              = n,
+    method         = get_method(fit),
+    embedding_name = embedding_name
+  )
+}
