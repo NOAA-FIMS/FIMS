@@ -45,6 +45,13 @@ class GrowthInterfaceBase : public FIMSRcppInterfaceBase {
   }
 
   /**
+   * @brief Construct a new Growth Interface Base object
+   *
+   * @param other
+   */
+  GrowthInterfaceBase(const GrowthInterfaceBase &other) : id(other.id) {}
+
+  /**
    * @brief The destructor.
    */
   virtual ~GrowthInterfaceBase() {}
@@ -96,7 +103,24 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
    */
   EWAAGrowthInterface() : GrowthInterfaceBase() {
     this->ewaa = std::make_shared<std::map<int, std::map<double, double>>>();
+    GrowthInterfaceBase::live_objects[this->id] =
+        std::make_shared<EWAAGrowthInterface>(*this);
+    FIMSRcppInterfaceBase::fims_interface_objects.push_back(
+        std::make_shared<EWAAGrowthInterface>(*this));
   }
+
+  /**
+   * @brief Construct a new EWAAGrowthInterface object
+   *
+   * @param other
+   */
+  EWAAGrowthInterface(const EWAAGrowthInterface &other)
+      : GrowthInterfaceBase(other),
+        weights(other.weights),
+        ages(other.ages),
+        n_years(other.n_years),
+        ewaa(other.ewaa),
+        initialized(other.initialized) {}
 
   /**
    * @brief The destructor.

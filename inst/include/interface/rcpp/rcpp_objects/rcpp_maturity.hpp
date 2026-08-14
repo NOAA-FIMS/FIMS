@@ -45,6 +45,13 @@ class MaturityInterfaceBase : public FIMSRcppInterfaceBase {
   }
 
   /**
+   * @brief Construct a new Maturity Interface Base object
+   *
+   * @param other
+   */
+  MaturityInterfaceBase(const MaturityInterfaceBase& other) : id(other.id) {}
+
+  /**
    * @brief The destructor.
    */
   virtual ~MaturityInterfaceBase() {}
@@ -79,7 +86,22 @@ class LogisticMaturityInterface : public MaturityInterfaceBase {
   /**
    * @brief The constructor.
    */
-  LogisticMaturityInterface() : MaturityInterfaceBase() {}
+  LogisticMaturityInterface() : MaturityInterfaceBase() {
+    MaturityInterfaceBase::live_objects[this->id] =
+        std::make_shared<LogisticMaturityInterface>(*this);
+    FIMSRcppInterfaceBase::fims_interface_objects.push_back(
+        MaturityInterfaceBase::live_objects[this->id]);
+  }
+
+  /**
+   * @brief Construct a new Logistic Maturity Interface object
+   *
+   * @param other
+   */
+  LogisticMaturityInterface(const LogisticMaturityInterface& other)
+      : MaturityInterfaceBase(other),
+        inflection_point(other.inflection_point),
+        slope(other.slope) {}
 
   /**
    * @brief The destructor.

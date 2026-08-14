@@ -53,6 +53,16 @@ class DataInterfaceBase : public FIMSRcppInterfaceBase {
   }
 
   /**
+   * @brief Construct a new Data Interface Base object
+   *
+   * @param other
+   */
+  DataInterfaceBase(const DataInterfaceBase &other)
+      : observed_data(other.observed_data),
+        uncertainty(other.uncertainty),
+        id(other.id) {}
+
+  /**
    * @brief The destructor.
    */
   virtual ~DataInterfaceBase() {}
@@ -102,7 +112,23 @@ class AgeCompDataInterface : public DataInterfaceBase {
     this->ymax = ymax;
     this->age_comp_data.resize(amax * ymax);
     this->uncertainty.resize(amax * ymax);
+    DataInterfaceBase::live_objects[this->id] =
+        std::make_shared<AgeCompDataInterface>(*this);
+    FIMSRcppInterfaceBase::fims_interface_objects.push_back(
+        DataInterfaceBase::live_objects[this->id]);
   }
+
+  /**
+   * @brief Construct a new Age Comp Data Interface object
+   *
+   * @param other
+   */
+  AgeCompDataInterface(const AgeCompDataInterface &other)
+      : DataInterfaceBase(other),
+        amax(other.amax),
+        ymax(other.ymax),
+        age_comp_data(other.age_comp_data),
+        uncertainty(other.uncertainty) {}
 
   /**
    * @brief The destructor.
@@ -219,7 +245,23 @@ class LengthCompDataInterface : public DataInterfaceBase {
     this->ymax = ymax;
     this->length_comp_data.resize(lmax * ymax);
     this->uncertainty.resize(lmax * ymax);
+    DataInterfaceBase::live_objects[this->id] =
+        std::make_shared<LengthCompDataInterface>(*this);
+    FIMSRcppInterfaceBase::fims_interface_objects.push_back(
+        DataInterfaceBase::live_objects[this->id]);
   }
+
+  /**
+   * @brief Construct a new Length Comp Data Interface object
+   *
+   * @param other
+   */
+  LengthCompDataInterface(const LengthCompDataInterface &other)
+      : DataInterfaceBase(other),
+        lmax(other.lmax),
+        ymax(other.ymax),
+        length_comp_data(other.length_comp_data),
+        uncertainty(other.uncertainty) {}
 
   /**
    * @brief The destructor.
@@ -324,7 +366,22 @@ class IndexDataInterface : public DataInterfaceBase {
     this->ymax = ymax;
     this->index_data.resize(ymax);
     this->uncertainty.resize(ymax);
+    DataInterfaceBase::live_objects[this->id] =
+        std::make_shared<IndexDataInterface>(*this);
+    FIMSRcppInterfaceBase::fims_interface_objects.push_back(
+        DataInterfaceBase::live_objects[this->id]);
   }
+
+  /**
+   * @brief Construct a new Index Data Interface object
+   *
+   * @param other
+   */
+  IndexDataInterface(const IndexDataInterface &other)
+      : DataInterfaceBase(other),
+        ymax(other.ymax),
+        index_data(other.index_data),
+        uncertainty(other.uncertainty) {}
 
   /**
    * @brief The destructor.
@@ -430,7 +487,22 @@ class CatchDataInterface : public DataInterfaceBase {
     this->ymax = ymax;
     this->catch_data.resize(ymax);
     this->uncertainty.resize(ymax);
+    DataInterfaceBase::live_objects[this->id] =
+        std::make_shared<CatchDataInterface>(*this);
+    FIMSRcppInterfaceBase::fims_interface_objects.push_back(
+        DataInterfaceBase::live_objects[this->id]);
   }
+
+  /**
+   * @brief Construct a new Catch Data Interface object
+   *
+   * @param other
+   */
+  CatchDataInterface(const CatchDataInterface &other)
+      : DataInterfaceBase(other),
+        ymax(other.ymax),
+        catch_data(other.catch_data),
+        uncertainty(other.uncertainty) {}
 
   /**
    * @brief The destructor.

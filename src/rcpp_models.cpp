@@ -13,28 +13,11 @@ std::map<uint32_t, std::shared_ptr<FisheryModelInterfaceBase>>
 
 #include <Rcpp.h>
 
-using SharedCatchAtAge = std::shared_ptr<CatchAtAgeInterface>;
-using SharedBase = std::shared_ptr<FIMSRcppInterfaceBase>;
-
-Rcpp::XPtr<SharedCatchAtAge> create_catch_at_age_() {
-  auto obj = std::make_shared<CatchAtAgeInterface>();
-  return Rcpp::XPtr<SharedCatchAtAge>(new SharedCatchAtAge(obj), true);
-}
-
-Rcpp::XPtr<SharedBase> catch_at_age_to_fims_xptr_(
-    Rcpp::XPtr<SharedCatchAtAge> xp) {
-  SharedBase base = *xp;
-  return Rcpp::XPtr<SharedBase>(new SharedBase(base), true);
-}
-
 /**
  * Function to register fishery model classes with the Rcpp module system.
  *
  */
 void register_fishery_models(Rcpp::Module& m) {
-  Rcpp::function("create_catch_at_age_", &create_catch_at_age_);
-  Rcpp::function("catch_at_age_to_fims_xptr_", &catch_at_age_to_fims_xptr_);
-
   Rcpp::class_<CatchAtAgeInterface>(
       "CatchAtAge",
       "See "

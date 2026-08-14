@@ -86,6 +86,18 @@ class DistributionsInterfaceBase : public FIMSRcppInterfaceBase {
   }
 
   /**
+   * @brief Construct a new Distributions Interface Base object
+   *
+   * @param other
+   */
+  DistributionsInterfaceBase(const DistributionsInterfaceBase &other)
+      : id_m(other.id_m),
+        key_m(other.key_m),
+        input_type_m(other.input_type_m),
+        use_mean_m(other.use_mean_m),
+        interface_observed_data_id_m(other.interface_observed_data_id_m) {}
+
+  /**
    * @brief The destructor.
    */
   virtual ~DistributionsInterfaceBase() {}
@@ -182,7 +194,25 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
   /**
    * @brief The constructor.
    */
-  DnormDistributionsInterface() : DistributionsInterfaceBase() {}
+  DnormDistributionsInterface() : DistributionsInterfaceBase() {
+    DistributionsInterfaceBase::live_objects[this->id_m] =
+        std::make_shared<DnormDistributionsInterface>(*this);
+    FIMSRcppInterfaceBase::fims_interface_objects.push_back(
+        DistributionsInterfaceBase::live_objects[this->id_m]);
+  }
+
+  /**
+   * @brief Construct a new Dnorm Distributions Interface object
+   *
+   * @param other
+   */
+  DnormDistributionsInterface(const DnormDistributionsInterface &other)
+      : DistributionsInterfaceBase(other),
+        observed_values(other.observed_values),
+        expected_values(other.expected_values),
+        expected_mean(other.expected_mean),
+        log_sd(other.log_sd),
+        lpdf_vec(other.lpdf_vec) {}
 
   /**
    * @brief The destructor.
@@ -509,7 +539,24 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
   /**
    * @brief The constructor.
    */
-  DlnormDistributionsInterface() : DistributionsInterfaceBase() {}
+  DlnormDistributionsInterface() : DistributionsInterfaceBase() {
+    DistributionsInterfaceBase::live_objects[this->id_m] =
+        std::make_shared<DlnormDistributionsInterface>(*this);
+    FIMSRcppInterfaceBase::fims_interface_objects.push_back(
+        DistributionsInterfaceBase::live_objects[this->id_m]);
+  }
+
+  /**
+   * @brief Construct a new Dlnorm Distributions Interface object
+   *
+   * @param other
+   */
+  DlnormDistributionsInterface(const DlnormDistributionsInterface &other)
+      : DistributionsInterfaceBase(other),
+        observed_values(other.observed_values),
+        expected_values(other.expected_values),
+        log_sd(other.log_sd),
+        lpdf_vec(other.lpdf_vec) {}
 
   /**
    * @brief The destructor.
@@ -810,7 +857,25 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
   /**
    * @brief The constructor.
    */
-  DmultinomDistributionsInterface() : DistributionsInterfaceBase() {}
+  DmultinomDistributionsInterface() : DistributionsInterfaceBase() {
+    DistributionsInterfaceBase::live_objects[this->id_m] =
+        std::make_shared<DmultinomDistributionsInterface>(*this);
+    FIMSRcppInterfaceBase::fims_interface_objects.push_back(
+        DistributionsInterfaceBase::live_objects[this->id_m]);
+  }
+
+  /**
+   * @brief Construct a new Dmultinom Distributions Interface object
+   *
+   * @param other
+   */
+  DmultinomDistributionsInterface(const DmultinomDistributionsInterface &other)
+      : DistributionsInterfaceBase(other),
+        observed_values(other.observed_values),
+        expected_values(other.expected_values),
+        dims(other.dims),
+        lpdf_vec(other.lpdf_vec),
+        notes(other.notes) {}
 
   /**
    * @brief The destructor.
