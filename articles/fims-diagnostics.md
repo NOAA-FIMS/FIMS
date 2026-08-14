@@ -4,7 +4,7 @@
 
 library(FIMS)
 packageVersion("FIMS")
-#> [1] '0.10.0'
+#> [1] '0.10.0.9000'
 clear()
 ```
 
@@ -38,8 +38,8 @@ base_model <- parameters |>
 #> ℹ Maximum gradient went from 0.00451 to 0.00032 after 3 steps.
 #> ✔ Finished optimization
 #> ✔ Finished sdreport
-#> ℹ FIMS model version: 0.10.0
-#> ℹ Total run time was 35.36059 seconds
+#> ℹ FIMS model version: 0.10.0.9000
+#> ℹ Total run time was 35.49456 seconds
 #> ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
 #> ℹ Maximum gradient= 0.00032
 #> ℹ Negative log likelihood (NLL):
@@ -186,8 +186,8 @@ retro_fit <- run_fims_retrospective(
 #> ℹ Maximum gradient went from 0.00451 to 0.00032 after 3 steps.
 #> ✔ Finished optimization
 #> ✔ Finished sdreport
-#> ℹ FIMS model version: 0.10.0
-#> ℹ Total run time was 34.85804 seconds
+#> ℹ FIMS model version: 0.10.0.9000
+#> ℹ Total run time was 34.57632 seconds
 #> ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
 #> ℹ Maximum gradient= 0.00032
 #> ℹ Negative log likelihood (NLL):
@@ -201,8 +201,8 @@ retro_fit <- run_fims_retrospective(
 #> ℹ Maximum gradient went from 0.01099 to 0.00027 after 3 steps.
 #> ✔ Finished optimization
 #> ✔ Finished sdreport
-#> ℹ FIMS model version: 0.10.0
-#> ℹ Total run time was 34.91308 seconds
+#> ℹ FIMS model version: 0.10.0.9000
+#> ℹ Total run time was 34.36988 seconds
 #> ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
 #> ℹ Maximum gradient= 0.00027
 #> ℹ Negative log likelihood (NLL):
@@ -216,8 +216,8 @@ retro_fit <- run_fims_retrospective(
 #> ℹ Maximum gradient went from 0.00232 to 9e-05 after 3 steps.
 #> ✔ Finished optimization
 #> ✔ Finished sdreport
-#> ℹ FIMS model version: 0.10.0
-#> ℹ Total run time was 35.03913 seconds
+#> ℹ FIMS model version: 0.10.0.9000
+#> ℹ Total run time was 34.96973 seconds
 #> ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
 #> ℹ Maximum gradient= 9e-05
 #> ℹ Negative log likelihood (NLL):
