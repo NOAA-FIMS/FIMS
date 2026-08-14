@@ -336,7 +336,7 @@ make_vonb_demo_data <- function(
       type = "age_comp",
       fleet = fleet,
       length = NA_real_,
-      value = age_probabilities[match(age, ages)],
+      observed = age_probabilities[match(age, ages)],
       unit = "proportion",
       uncertainty = sample_size
     ) |>
@@ -346,7 +346,7 @@ make_vonb_demo_data <- function(
       age,
       length,
       timing,
-      value,
+      observed,
       unit,
       uncertainty
     )
@@ -376,7 +376,7 @@ make_vonb_demo_data <- function(
     ) |>
     dplyr::group_by(length) |>
     dplyr::summarise(
-      value = sum(age_probability * conditional_probability),
+      observed = sum(age_probability * conditional_probability),
       .groups = "drop"
     ) |>
     tidyr::crossing(timing = years) |>
@@ -393,7 +393,7 @@ make_vonb_demo_data <- function(
       age,
       length,
       timing,
-      value,
+      observed,
       unit,
       uncertainty
     )
@@ -408,7 +408,7 @@ make_vonb_demo_data <- function(
       age = age,
       length = NA_real_,
       timing = min(years),
-      value = true_weight_at_age,
+      observed = true_weight_at_age,
       unit = "mt",
       uncertainty = NA_real_
     )
@@ -421,7 +421,7 @@ make_vonb_demo_data <- function(
     age = NA_real_,
     length = NA_real_,
     timing = years,
-    value = rep(2500, length(years)),
+    observed = rep(2500, length(years)),
     unit = "mt",
     uncertainty = 0.2
   )
@@ -433,7 +433,7 @@ make_vonb_demo_data <- function(
     age = NA_real_,
     length = lengths,
     timing = NA_real_,
-    value = NA_real_,
+    observed = NA_real_,
     unit = "proportion",
     uncertainty = NA_real_
   )
