@@ -45,14 +45,6 @@ class SelectivityInterfaceBase : public FIMSRcppInterfaceBase {
   }
 
   /**
-   * @brief Construct a new Selectivity Interface Base object
-   *
-   * @param other
-   */
-  SelectivityInterfaceBase(const SelectivityInterfaceBase &other)
-      : id(other.id) {}
-
-  /**
    * @brief The destructor.
    */
   virtual ~SelectivityInterfaceBase() {}
@@ -88,22 +80,7 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
   /**
    * @brief The constructor.
    */
-  LogisticSelectivityInterface() : SelectivityInterfaceBase() {
-    SelectivityInterfaceBase::live_objects[this->id] =
-        std::make_shared<LogisticSelectivityInterface>(*this);
-    FIMSRcppInterfaceBase::fims_interface_objects.push_back(
-        SelectivityInterfaceBase::live_objects[this->id]);
-  }
-
-  /**
-   * @brief Construct a new Logistic Selectivity Interface object
-   *
-   * @param other
-   */
-  LogisticSelectivityInterface(const LogisticSelectivityInterface &other)
-      : SelectivityInterfaceBase(other),
-        inflection_point(other.inflection_point),
-        slope(other.slope) {}
+  LogisticSelectivityInterface() : SelectivityInterfaceBase() {}
 
   /**
    * @brief The destructor.
@@ -280,25 +257,7 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
   VariableVector
       slope_desc; /**< the width of the curve at the inflection_point */
 
-  DoubleLogisticSelectivityInterface() : SelectivityInterfaceBase() {
-    SelectivityInterfaceBase::live_objects[this->id] =
-        std::make_shared<DoubleLogisticSelectivityInterface>(*this);
-    FIMSRcppInterfaceBase::fims_interface_objects.push_back(
-        SelectivityInterfaceBase::live_objects[this->id]);
-  }
-
-  /**
-   * @brief Construct a new Double Logistic Selectivity Interface object
-   *
-   * @param other
-   */
-  DoubleLogisticSelectivityInterface(
-      const DoubleLogisticSelectivityInterface &other)
-      : SelectivityInterfaceBase(other),
-        inflection_point_asc(other.inflection_point_asc),
-        slope_asc(other.slope_asc),
-        inflection_point_desc(other.inflection_point_desc),
-        slope_desc(other.slope_desc) {}
+  DoubleLogisticSelectivityInterface() : SelectivityInterfaceBase() {}
 
   virtual ~DoubleLogisticSelectivityInterface() {}
 

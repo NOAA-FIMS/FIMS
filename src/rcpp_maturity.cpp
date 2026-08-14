@@ -12,11 +12,30 @@ std::map<uint32_t, std::shared_ptr<MaturityInterfaceBase>>
 
 #include <Rcpp.h>
 
+using SharedLogisticMaturity = std::shared_ptr<LogisticMaturityInterface>;
+using SharedBase = std::shared_ptr<FIMSRcppInterfaceBase>;
+
+Rcpp::XPtr<SharedLogisticMaturity> create_logistic_maturity_() {
+  auto obj = std::make_shared<LogisticMaturityInterface>();
+  return Rcpp::XPtr<SharedLogisticMaturity>(
+      new SharedLogisticMaturity(obj), true);
+}
+
+Rcpp::XPtr<SharedBase> logistic_maturity_to_fims_xptr_(
+    Rcpp::XPtr<SharedLogisticMaturity> xp) {
+  SharedBase base = *xp;
+  return Rcpp::XPtr<SharedBase>(new SharedBase(base), true);
+}
+
 /**
  * Function to register maturity classes with the Rcpp module system.
  *
  */
 void register_maturity(Rcpp::Module& m) {
+  Rcpp::function("create_logistic_maturity_", &create_logistic_maturity_);
+  Rcpp::function("logistic_maturity_to_fims_xptr_",
+                 &logistic_maturity_to_fims_xptr_);
+
   Rcpp::class_<LogisticMaturityInterface>(
       "LogisticMaturity",
       "See "

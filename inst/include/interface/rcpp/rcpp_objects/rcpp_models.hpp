@@ -73,14 +73,6 @@ class FisheryModelInterfaceBase : public FIMSRcppInterfaceBase {
   }
 
   /**
-   * @brief Construct a new Data Interface Base object
-   *
-   * @param other
-   */
-  FisheryModelInterfaceBase(const FisheryModelInterfaceBase &other)
-      : population_ids(other.population_ids), id(other.id) {}
-
-  /**
    * @brief The destructor.
    */
   virtual ~FisheryModelInterfaceBase() {}
@@ -218,20 +210,7 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
   /**
    * @brief The constructor.
    */
-  CatchAtAgeInterface() : FisheryModelInterfaceBase() {
-    std::shared_ptr<CatchAtAgeInterface> caa =
-        std::make_shared<CatchAtAgeInterface>(*this);
-    FIMSRcppInterfaceBase::fims_interface_objects.push_back(caa);
-    FisheryModelInterfaceBase::live_objects[this->id] = caa;
-  }
-
-  /**
-   * @brief Construct a new Catch At Age Interface object
-   *
-   * @param other
-   */
-  CatchAtAgeInterface(const CatchAtAgeInterface &other)
-      : FisheryModelInterfaceBase(other) {}
+  CatchAtAgeInterface() : FisheryModelInterfaceBase() {}
 
   /**
    * Method to add a population id to the set of population ids.
