@@ -338,7 +338,9 @@ make_vonb_demo_data <- function(
       length = NA_real_,
       observed = age_probabilities[match(age, ages)],
       unit = "proportion",
-      uncertainty = sample_size
+      uncertainty = glue::glue(
+        "~dmultinom(prob = agecomp_proportion, size = {sample_size})"
+      )
     ) |>
     dplyr::select(
       type,
@@ -385,7 +387,9 @@ make_vonb_demo_data <- function(
       fleet = fleet,
       age = NA_real_,
       unit = "proportion",
-      uncertainty = sample_size
+      uncertainty = glue::glue(
+        "~dmultinom(prob = lengthcomp_proportion, size = {sample_size})"
+      )
     ) |>
     dplyr::select(
       type,
