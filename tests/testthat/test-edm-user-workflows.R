@@ -295,3 +295,188 @@ test_that("select_n_neighbors() errors for unknown embedding_name", {
     regexp = "not found"
   )
 })
+
+# select_embedding_dimension() ----
+## IO correctness ----
+
+test_that("select_embedding_dimension() returns a tibble with correct columns", {
+  #' @description select_embedding_dimension() returns a tibble with E, rho, rmse, optimal.
+  edim <- select_embedding_dimension(local_ff, series_type = "landings",
+                                     series_name = "fleet1")
+  expect_s3_class(edim, "tbl_df")
+  expect_named(edim, c("E", "rho", "rmse", "optimal"))
+})
+
+test_that("select_embedding_dimension() default sweep covers E=1 to 10", {
+  #' @description Default E_min=1 and E_max=10 produce 10 rows.
+  edim <- select_embedding_dimension(local_ff, series_type = "landings",
+                                     series_name = "fleet1")
+  expect_equal(nrow(edim), 10L)
+  expect_equal(min(edim$E), 1L)
+  expect_equal(max(edim$E), 10L)
+})
+
+test_that("select_embedding_dimension() has exactly one optimal row", {
+  #' @description Exactly one row in the result has optimal=TRUE.
+  edim <- select_embedding_dimension(local_ff, series_type = "landings",
+                                     series_name = "fleet1")
+  expect_equal(sum(edim$optimal), 1L)
+})
+
+test_that("select_embedding_dimension() optimal row maximises rho", {
+  #' @description The optimal row has the highest rho value in the sweep.
+  edim <- select_embedding_dimension(local_ff, series_type = "landings",
+                                     series_name = "fleet1")
+  expect_equal(edim$E[edim$optimal],
+               edim$E[which.max(edim$rho)])
+})
+
+test_that("select_embedding_dimension() rho values are in [-1, 1]", {
+  #' @description All non-NA rho values from the sweep are valid Pearson correlations.
+  edim <- select_embedding_dimension(local_ff, series_type = "landings",
+                                     series_name = "fleet1")
+  finite_rho <- edim$rho[!is.na(edim$rho)]
+  expect_true(all(finite_rho >= -1 & finite_rho <= 1))
+})
+
+test_that("select_embedding_dimension() rmse values are non-negative", {
+  #' @description All non-NA RMSE values from the sweep are non-negative.
+  edim <- select_embedding_dimension(local_ff, series_type = "landings",
+                                     series_name = "fleet1")
+  finite_rmse <- edim$rmse[!is.na(edim$rmse)]
+  expect_true(all(finite_rmse >= 0))
+})
+
+test_that("select_embedding_dimension() respects E_min and E_max", {
+  #' @description E_min and E_max bound the sweep range and row count.
+  edim <- select_embedding_dimension(local_ff, series_type = "landings",
+                                     series_name = "fleet1",
+                                     E_min = 2L, E_max = 6L)
+  expect_equal(nrow(edim), 5L)
+  expect_equal(min(edim$E), 2L)
+  expect_equal(max(edim$E), 6L)
+})
+
+test_that("select_embedding_dimension() E column is integer", {
+  #' @description The E column in the output tibble is integer-typed.
+  edim <- select_embedding_dimension(local_ff, series_type = "landings",
+                                     series_name = "fleet1")
+  expect_type(edim$E, "integer")
+})
+
+## Error handling ----
+
+test_that("select_embedding_dimension() errors when data is not a FIMSFrame", {
+  #' @description select_embedding_dimension() throws an error if data is not a FIMSFrame.
+  expect_error(
+    select_embedding_dimension(list(), "landings", "fleet1"),
+    regexp = "FIMSFrame"
+  )
+})
+
+test_that("select_embedding_dimension() errors when E_max < E_min", {
+  #' @description select_embedding_dimension() throws an error when E_max is less than E_min.
+  expect_error(
+    select_embedding_dimension(local_ff, "landings", "fleet1",
+                               E_min = 5L, E_max = 2L),
+    regexp = "E_max"
+  )
+})
+
+test_that("select_embedding_dimension() errors for unknown series", {
+  #' @description select_embedding_dimension() throws an error for series not found in data.
+  expect_error(
+    select_embedding_dimension(local_ff, "landings", "no_such_fleet"),
+    regexp = "No data found"
+  )
+})
+
+# edm_skill() ----
+## IO correctness ----
+
+test_that("edm_skill() returns a one-row tibble with correct columns", {
+  #' @description edm_skill() returns a tibble with columns rho, rmse, mae, n, method, embedding_name.
+  fit  <- fit_edm(local_ff, method = "simplex")
+  sk   <- edm_skill(fit, local_ff)
+  expect_s3_class(sk, "tbl_df")
+  expect_equal(nrow(sk), 1L)
+  expect_named(sk, c("rho", "rmse", "mae", "n", "method", "embedding_name"))
+})
+
+test_that("edm_skill() rho is a valid Pearson correlation", {
+  #' @description edm_skill() rho lies in [-1, 1] for all three methods.
+  for (m in c("simplex", "smap", "gp")) {
+    fit <- fit_edm(local_ff, method = m)
+    sk  <- edm_skill(fit, local_ff)
+    expect_true(sk$rho >= -1 & sk$rho <= 1, info = paste("method:", m))
+  }
+})
+
+test_that("edm_skill() rmse is non-negative", {
+  #' @description edm_skill() rmse is non-negative for all methods.
+  for (m in c("simplex", "smap", "gp")) {
+    fit <- fit_edm(local_ff, method = m)
+    sk  <- edm_skill(fit, local_ff)
+    expect_true(sk$rmse >= 0, info = paste("method:", m))
+  }
+})
+
+test_that("edm_skill() mae is non-negative", {
+  #' @description edm_skill() mae is non-negative for all methods.
+  for (m in c("simplex", "smap", "gp")) {
+    fit <- fit_edm(local_ff, method = m)
+    sk  <- edm_skill(fit, local_ff)
+    expect_true(sk$mae >= 0, info = paste("method:", m))
+  }
+})
+
+test_that("edm_skill() n matches number of predictions", {
+  #' @description edm_skill() n equals the length of predictions in the EDMFit object.
+  fit <- fit_edm(local_ff, method = "simplex")
+  sk  <- edm_skill(fit, local_ff)
+  expect_equal(sk$n, length(get_predictions(fit)))
+})
+
+test_that("edm_skill() method column matches fit method", {
+  #' @description edm_skill() method column matches the method stored in the EDMFit.
+  for (m in c("simplex", "smap", "gp")) {
+    fit <- fit_edm(local_ff, method = m)
+    sk  <- edm_skill(fit, local_ff)
+    expect_equal(sk$method, m)
+  }
+})
+
+test_that("edm_skill() embedding_name column matches fit embedding_name", {
+  #' @description edm_skill() embedding_name column matches the slot in EDMFit.
+  fit <- fit_edm(local_ff, method = "simplex")
+  sk  <- edm_skill(fit, local_ff)
+  expect_equal(sk$embedding_name, get_embedding_name(fit))
+})
+
+test_that("edm_skill() simplex rmse is zero for perfect in-library self-prediction", {
+  #' @description Simplex in-library rmse should be ~0 when predictions perfectly track targets.
+  fit <- fit_edm(local_ff, method = "simplex")
+  sk  <- edm_skill(fit, local_ff)
+  expect_lt(sk$rmse, 1e-6)
+})
+
+## Error handling ----
+
+test_that("edm_skill() errors when fit is not an EDMFit", {
+  #' @description edm_skill() throws an error if fit is not an EDMFit object.
+  expect_error(edm_skill(list(), local_ff), regexp = "EDMFit")
+})
+
+test_that("edm_skill() errors when data is not a FIMSFrame", {
+  #' @description edm_skill() throws an error if data is not a FIMSFrame object.
+  fit <- fit_edm(local_ff, method = "simplex")
+  expect_error(edm_skill(fit, list()), regexp = "FIMSFrame")
+})
+
+test_that("edm_skill() errors when embedding not found in data", {
+  #' @description edm_skill() errors when the FIMSFrame does not contain the fitted embedding.
+  fit <- fit_edm(local_ff, method = "simplex")
+  data("data_big", package = "FIMS")
+  empty_ff <- FIMSFrame(data_big)
+  expect_error(edm_skill(fit, empty_ff), regexp = "not found")
+})

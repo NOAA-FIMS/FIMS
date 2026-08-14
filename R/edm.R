@@ -1269,3 +1269,125 @@ edm_skill <- function(fit, data) {
     embedding_name = embedding_name
   )
 }
+
+# autoplot.EDMFit --------------------------------------------------------
+
+#' Create a ggplot2 diagnostic plot for a fitted EDM model
+#'
+#' @description
+#' Produces a two-panel ggplot2 diagnostic for an [EDMFit-class] object:
+#'
+#' * **Left panel**: time-series overlay of in-library predictions
+#'   (dashed) against observed target values (solid).
+#' * **Right panel**: scatter plot of predicted vs observed values with a
+#'   1:1 reference line and a linear fit. The Pearson correlation ρ is
+#'   annotated in the panel title.
+#'
+#' @param object An [EDMFit-class] object returned by [fit_edm()].
+#' @param data The [FIMSFrame()] object used to fit the model. Must contain
+#'   the embedding referenced by `object`.
+#' @param ... Additional arguments passed to [ggplot2::theme()].
+#'
+#' @return A `ggplot` object (patchwork layout with two panels). The plot
+#'   can be further modified with ggplot2 functions.
+#'
+#' @seealso [fit_edm()], [edm_skill()]
+#' @export
+#' @examples
+#' \dontrun{
+#' data("data_big")
+#' ff  <- FIMSFrame(data_big)
+#' ff  <- create_edm_embedding(ff, "landings", "fleet1", E = 3L, tau = 1L)
+#' fit <- fit_edm(ff, method = "simplex")
+#' autoplot(fit, ff)
+#' }
+autoplot.EDMFit <- function(object, data, ...) {
+
+  if (!is.EDMFit(object)) {
+    cli::cli_abort(
+      "{.arg object} must be an {.cls EDMFit} returned by {.fn fit_edm}."
+    )
+  }
+  if (!methods::is(data, "FIMSFrame")) {
+    cli::cli_abort("{.arg data} must be a {.cls FIMSFrame} object.")
+  }
+
+  # Retrieve target values and predictions
+  embedding_name <- get_embedding_name(object)
+  embeddings     <- get_edm_embeddings(data)
+
+  if (!embedding_name %in% names(embeddings)) {
+    cli::cli_abort(c(
+      "Embedding {.val {embedding_name}} not found in {.arg data}.",
+      "i" = "Was {.arg data} the same {.cls FIMSFrame} passed to {.fn fit_edm}?"
+    ))
+  }
+
+  emb         <- embeddings[[embedding_name]]
+  target_vals <- as.numeric(emb$target_values)
+  preds       <- as.numeric(get_predictions(object))
+  n_pts       <- length(preds)
+  method_lbl  <- toupper(get_method(object))
+  rho_val     <- round(stats::cor(preds, target_vals, use = "complete.obs"), 3)
+
+  # Build a tidy data frame for plotting
+  plot_df <- data.frame(
+    index    = seq_len(n_pts),
+    observed = target_vals,
+    predicted = preds
+  )
+
+  # Panel 1: time-series overlay
+  p1 <- ggplot2::ggplot(plot_df, ggplot2::aes(x = .data[["index"]])) +
+    ggplot2::geom_line(
+      ggplot2::aes(y = .data[["observed"]], colour = "Observed"),
+      linewidth = 0.9
+    ) +
+    ggplot2::geom_line(
+      ggplot2::aes(y = .data[["predicted"]], colour = "Predicted"),
+      linetype = "dashed", linewidth = 0.9
+    ) +
+    ggplot2::scale_colour_manual(
+      name   = NULL,
+      values = c(Observed = "grey30", Predicted = "steelblue")
+    ) +
+    ggplot2::labs(
+      title = paste0(method_lbl, " \u2014 in-library predictions vs observations"),
+      x     = "Library index",
+      y     = "Value"
+    ) +
+    ggplot2::theme_minimal() +
+    ggplot2::theme(legend.position = "top", ...)
+
+  # Panel 2: predicted vs observed scatter
+  lims <- range(c(target_vals, preds), na.rm = TRUE)
+  p2 <- ggplot2::ggplot(plot_df,
+                        ggplot2::aes(x = .data[["observed"]],
+                                     y = .data[["predicted"]])) +
+    ggplot2::geom_abline(slope = 1, intercept = 0,
+                         colour = "grey60", linetype = "dashed") +
+    ggplot2::geom_point(colour = "steelblue", alpha = 0.7, size = 2) +
+    ggplot2::geom_smooth(method = "lm", formula = y ~ x,
+                         se = FALSE, colour = "firebrick",
+                         linewidth = 0.8) +
+    ggplot2::coord_fixed(xlim = lims, ylim = lims) +
+    ggplot2::labs(
+      title = paste0("Predicted vs observed  (\u03c1 = ", rho_val, ")"),
+      x     = "Observed",
+      y     = "Predicted"
+    ) +
+    ggplot2::theme_minimal() +
+    ggplot2::theme(...)
+
+  # Combine with patchwork if available, else print side-by-side message
+  if (requireNamespace("patchwork", quietly = TRUE)) {
+    p1 + p2
+  } else {
+    cli::cli_inform(c(
+      "i" = "Install {.pkg patchwork} for a combined two-panel layout.",
+      "i" = "Returning the time-series panel. Access scatter via {.code attr(p, 'scatter')}."
+    ))
+    attr(p1, "scatter") <- p2
+    p1
+  }
+}
