@@ -4,7 +4,7 @@
 \alias{autoplot.EDMFit}
 \title{Create a ggplot2 diagnostic plot for a fitted EDM model}
 \usage{
-autoplot.EDMFit(object, data, ...)
+\method{autoplot}{EDMFit}(object, data, ...)
 }
 \arguments{
 \item{object}{An \linkS4class{EDMFit} object returned by \code{\link[=fit_edm]{fit_edm()}}.}

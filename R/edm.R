@@ -1292,6 +1292,8 @@ edm_skill <- function(fit, data) {
 #'   can be further modified with ggplot2 functions.
 #'
 #' @seealso [fit_edm()], [edm_skill()]
+#' @importFrom ggplot2 autoplot
+#' @method autoplot EDMFit
 #' @export
 #' @examples
 #' \dontrun{
@@ -1390,4 +1392,154 @@ autoplot.EDMFit <- function(object, data, ...) {
     attr(p1, "scatter") <- p2
     p1
   }
+}
+
+# edm_compare ------------------------------------------------------------
+
+#' Fit and compare multiple EDM methods on the same embedding
+#'
+#' @description
+#' Convenience wrapper that fits Simplex Projection, S-Map, and/or GP-EDM on
+#' a shared delay embedding and returns a ranked comparison of in-library
+#' prediction skill. Under the hood it calls [fit_edm()] and [edm_skill()]
+#' for each requested method and binds the results into a single tibble,
+#' sorted by descending Pearson correlation.
+#'
+#' @param data A [FIMSFrame()] object containing at least one delay embedding
+#'   built with [create_edm_embedding()].
+#' @param embedding_name A single string naming the embedding to use. If
+#'   `NULL` (default), the first embedding in `data` is used.
+#' @param methods Character vector of methods to compare. Any subset of
+#'   `c("simplex", "smap", "gp")`. Default is all three.
+#' @param simplex_args Named list of additional arguments forwarded to
+#'   [fit_edm()] when `method = "simplex"`. Common options:
+#'   `auto_select`, `n_neighbors`.
+#' @param smap_args Named list of additional arguments forwarded to
+#'   [fit_edm()] when `method = "smap"`. Common options: `theta`.
+#' @param gp_args Named list of additional arguments forwarded to
+#'   [fit_edm()] when `method = "gp"`. Common options: `gp_sigma2_init`,
+#'   `gp_ve_init`, `gp_phi_init`.
+#'
+#' @return A [tibble::tibble()] with one row per method and columns:
+#'   \describe{
+#'     \item{method}{EDM algorithm name.}
+#'     \item{rho}{Pearson correlation between in-library predictions and
+#'       target values.}
+#'     \item{rmse}{Root-mean-square error.}
+#'     \item{mae}{Mean absolute error.}
+#'     \item{n}{Number of library points.}
+#'     \item{best}{Logical. `TRUE` for the method with the highest `rho`.}
+#'     \item{embedding_name}{The embedding used.}
+#'   }
+#'   Rows are sorted by `rho` descending.
+#'
+#' @seealso [fit_edm()], [edm_skill()], [select_embedding_dimension()],
+#'   [select_n_neighbors()]
+#' @export
+#' @examples
+#' \dontrun{
+#' data("data_big")
+#' ff <- FIMSFrame(data_big)
+#' ff <- create_edm_embedding(ff, series_type = "landings",
+#'                            series_name = "fleet1", E = 3L, tau = 1L)
+#'
+#' edm_compare(ff)
+#' edm_compare(ff, methods = c("simplex", "smap"),
+#'             simplex_args = list(auto_select = TRUE),
+#'             smap_args    = list(theta = 2.0))
+#' }
+edm_compare <- function(data,
+                        embedding_name = NULL,
+                        methods        = c("simplex", "smap", "gp"),
+                        simplex_args   = list(),
+                        smap_args      = list(),
+                        gp_args        = list()) {
+
+  # --- Input validation ---------------------------------------------------
+  if (!methods::is(data, "FIMSFrame")) {
+    cli::cli_abort("{.arg data} must be a {.cls FIMSFrame} object.")
+  }
+
+  valid_methods <- c("simplex", "smap", "gp")
+  bad <- setdiff(methods, valid_methods)
+  if (length(bad) > 0L) {
+    cli::cli_abort(c(
+      "Unknown method{?s}: {.val {bad}}.",
+      "i" = "Valid methods: {.val {valid_methods}}."
+    ))
+  }
+  if (length(methods) == 0L) {
+    cli::cli_abort("{.arg methods} must contain at least one method.")
+  }
+
+  embeddings <- get_edm_embeddings(data)
+  if (length(embeddings) == 0L) {
+    cli::cli_abort(c(
+      "No delay embeddings found in {.arg data}.",
+      "i" = "Use {.fn create_edm_embedding} to build one first."
+    ))
+  }
+
+  if (is.null(embedding_name)) {
+    # Prefer the first univariate embedding
+    uni_names <- Filter(
+      function(nm) !isTRUE(embeddings[[nm]][["multivariate"]]),
+      names(embeddings)
+    )
+    if (length(uni_names) == 0L) {
+      cli::cli_abort(c(
+        "No univariate embeddings found in {.arg data}.",
+        "i" = "{.fn edm_compare} requires a univariate embedding from {.fn create_edm_embedding}."
+      ))
+    }
+    embedding_name <- uni_names[[1L]]
+  }
+
+  if (!embedding_name %in% names(embeddings)) {
+    cli::cli_abort(c(
+      "Embedding {.val {embedding_name}} not found in {.arg data}.",
+      "i" = "Available embeddings: {.val {names(embeddings)}}."
+    ))
+  }
+
+  # --- Fit each method and collect skill ----------------------------------
+  args_map <- list(simplex = simplex_args, smap = smap_args, gp = gp_args)
+
+  skill_rows <- lapply(methods, function(m) {
+    extra <- args_map[[m]]
+    fit_call <- c(
+      list(data = data, method = m, embedding_name = embedding_name),
+      extra
+    )
+    fit <- tryCatch(
+      do.call(fit_edm, fit_call),
+      error = function(e) {
+        cli::cli_warn(c(
+          "Skipping method {.val {m}}: fit failed.",
+          "i" = conditionMessage(e)
+        ))
+        return(NULL)
+      }
+    )
+    if (is.null(fit)) return(NULL)
+    edm_skill(fit, data)
+  })
+
+  # Drop any NULL rows (failed methods)
+  skill_rows <- Filter(Negate(is.null), skill_rows)
+
+  if (length(skill_rows) == 0L) {
+    cli::cli_abort("All methods failed. Check your embedding and method arguments.")
+  }
+
+  result <- dplyr::bind_rows(skill_rows)
+
+  # Flag the best method and sort
+  result <- dplyr::mutate(
+    result,
+    best = .data[["rho"]] == max(.data[["rho"]], na.rm = TRUE)
+  ) |>
+    dplyr::arrange(dplyr::desc(.data[["rho"]]))
+
+  result
 }

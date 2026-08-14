@@ -480,3 +480,81 @@ test_that("edm_skill() errors when embedding not found in data", {
   empty_ff <- FIMSFrame(data_big)
   expect_error(edm_skill(fit, empty_ff), regexp = "not found")
 })
+
+# autoplot.EDMFit() ----
+## IO correctness ----
+
+test_that("autoplot.EDMFit() returns a ggplot object", {
+  #' @description autoplot.EDMFit() returns a ggplot object (or patchwork).
+  fit <- fit_edm(local_ff, method = "simplex")
+  p <- ggplot2::autoplot(fit, local_ff)
+  expect_true(inherits(p, "ggplot") || inherits(p, "patchwork"))
+})
+
+## Error handling ----
+
+test_that("autoplot.EDMFit() errors when object is not an EDMFit", {
+  #' @description autoplot.EDMFit() throws an error if object is not an EDMFit.
+  expect_error(autoplot.EDMFit(list(), local_ff), regexp = "EDMFit")
+})
+
+test_that("autoplot.EDMFit() errors when data is not a FIMSFrame", {
+  #' @description autoplot.EDMFit() throws an error if data is not a FIMSFrame.
+  fit <- fit_edm(local_ff, method = "simplex")
+  expect_error(autoplot.EDMFit(fit, list()), regexp = "FIMSFrame")
+})
+
+test_that("autoplot.EDMFit() errors when embedding is missing from data", {
+  #' @description autoplot.EDMFit() throws an error if embedding is not found in data.
+  fit <- fit_edm(local_ff, method = "simplex")
+  data("data_big", package = "FIMS")
+  empty_ff <- FIMSFrame(data_big)
+  expect_error(autoplot.EDMFit(fit, empty_ff), regexp = "not found")
+})
+
+# edm_compare() ----
+## IO correctness ----
+
+test_that("edm_compare() returns a tibble comparing requested methods", {
+  #' @description edm_compare() fits multiple methods and returns a ranked skill tibble.
+  cmp <- edm_compare(local_ff)
+  expect_s3_class(cmp, "tbl_df")
+  expect_named(cmp, c("rho", "rmse", "mae", "n", "method", "embedding_name", "best"))
+  expect_equal(nrow(cmp), 3L)
+  expect_equal(sum(cmp$best), 1L)
+})
+
+test_that("edm_compare() respects custom methods and arguments", {
+  #' @description edm_compare() runs only specified methods and passes custom arguments.
+  cmp <- edm_compare(
+    local_ff,
+    methods = c("simplex", "smap"),
+    simplex_args = list(auto_select = TRUE),
+    smap_args = list(theta = 2.0)
+  )
+  expect_equal(nrow(cmp), 2L)
+  expect_true(all(cmp$method %in% c("simplex", "smap")))
+})
+
+## Error handling ----
+
+test_that("edm_compare() errors when data is not a FIMSFrame", {
+  #' @description edm_compare() throws an error if data is not a FIMSFrame object.
+  expect_error(edm_compare(list()), regexp = "FIMSFrame")
+})
+
+test_that("edm_compare() errors for unknown methods", {
+  #' @description edm_compare() throws an error if invalid method names are given.
+  expect_error(edm_compare(local_ff, methods = c("invalid_method")), regexp = "Unknown method")
+})
+
+test_that("edm_compare() errors when methods vector is empty", {
+  #' @description edm_compare() throws an error if methods vector is empty.
+  expect_error(edm_compare(local_ff, methods = character(0)), regexp = "at least one method")
+})
+
+test_that("edm_compare() errors when embedding is missing", {
+  #' @description edm_compare() throws an error if requested embedding_name is not found.
+  expect_error(edm_compare(local_ff, embedding_name = "nonexistent"), regexp = "not found")
+})
+
