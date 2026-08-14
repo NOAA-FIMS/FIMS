@@ -9,38 +9,18 @@
 
 # VonB growth convergence ----
 ## Setup ----
+make_vonb_parameters <- function(fims_frame) {
+  FIMS::setup_default_parameters(
+    data = fims_frame,
+    growth_module_type = "VonBertalanffy"
+  )
+}
+
 make_vonb_convergence_context <- function() {
   data("data_big", package = "FIMS")
   fims_frame <- FIMS::FIMSFrame(data_big)
 
-  configurations <- FIMS::create_default_configurations(data = fims_frame) |>
-    tidyr::unnest(cols = data) |>
-    dplyr::mutate(
-      module_type = dplyr::if_else(
-        module_name == "Growth",
-        "VonBertalanffy",
-        module_type
-      )
-    ) |>
-    tidyr::nest(.by = c(model_family, module_name, fleet))
-
-  parameters <- FIMS::create_default_parameters(
-    configurations = configurations,
-    data = fims_frame
-  ) |>
-    tidyr::unnest(cols = data) |>
-    dplyr::mutate(
-      estimation_type = dplyr::case_when(
-        module_name == "Growth" &
-          label %in% c(
-            "length_at_ref_age_1",
-            "length_at_ref_age_2",
-            "growth_coefficient_K"
-          ) ~ "fixed_effects",
-        module_name == "Growth" ~ "constant",
-        TRUE ~ estimation_type
-      )
-    )
+  parameters <- make_vonb_parameters(fims_frame)
 
   list(
     data = fims_frame,
@@ -54,22 +34,7 @@ make_vonb_no_fixed_alk_context <- function() {
     dplyr::filter(type != "age_to_length_conversion")
   fims_frame <- FIMS::FIMSFrame(no_fixed_alk_data)
 
-  configurations <- FIMS::create_default_configurations(data = fims_frame) |>
-    tidyr::unnest(cols = data) |>
-    dplyr::mutate(
-      module_type = dplyr::if_else(
-        module_name == "Growth",
-        "VonBertalanffy",
-        module_type
-      )
-    ) |>
-    tidyr::nest(.by = c(model_family, module_name, fleet))
-
-  parameters <- FIMS::create_default_parameters(
-    configurations = configurations,
-    data = fims_frame
-  ) |>
-    tidyr::unnest(cols = data)
+  parameters <- make_vonb_parameters(fims_frame)
 
   list(
     data = fims_frame,
@@ -112,22 +77,7 @@ make_vonb_explicit_length_bin_context <- function() {
     dplyr::ungroup()
   fims_frame <- FIMS::FIMSFrame(custom_data)
 
-  configurations <- FIMS::create_default_configurations(data = fims_frame) |>
-    tidyr::unnest(cols = data) |>
-    dplyr::mutate(
-      module_type = dplyr::if_else(
-        module_name == "Growth",
-        "VonBertalanffy",
-        module_type
-      )
-    ) |>
-    tidyr::nest(.by = c(model_family, module_name, fleet))
-
-  parameters <- FIMS::create_default_parameters(
-    configurations = configurations,
-    data = fims_frame
-  ) |>
-    tidyr::unnest(cols = data)
+  parameters <- make_vonb_parameters(fims_frame)
 
   list(
     data = fims_frame,
@@ -177,22 +127,7 @@ make_two_fleet_length_context <- function() {
     dplyr::ungroup()
   fims_frame <- FIMS::FIMSFrame(custom_data)
 
-  configurations <- FIMS::create_default_configurations(data = fims_frame) |>
-    tidyr::unnest(cols = data) |>
-    dplyr::mutate(
-      module_type = dplyr::if_else(
-        module_name == "Growth",
-        "VonBertalanffy",
-        module_type
-      )
-    ) |>
-    tidyr::nest(.by = c(model_family, module_name, fleet))
-
-  parameters <- FIMS::create_default_parameters(
-    configurations = configurations,
-    data = fims_frame
-  ) |>
-    tidyr::unnest(cols = data)
+  parameters <- make_vonb_parameters(fims_frame)
 
   list(
     data = fims_frame,
@@ -204,9 +139,7 @@ make_default_growth_fixed_alk_context <- function() {
   data("data_big", package = "FIMS")
   fims_frame <- FIMS::FIMSFrame(data_big)
 
-  parameters <- FIMS::create_default_configurations(data = fims_frame) |>
-    FIMS::create_default_parameters(data = fims_frame) |>
-    tidyr::unnest(cols = data)
+  parameters <- FIMS::setup_default_parameters(data = fims_frame)
 
   list(
     data = fims_frame,
@@ -218,36 +151,17 @@ make_vonb_model_comparison_context <- function() {
   data("data_big", package = "FIMS")
   fims_frame <- FIMS::FIMSFrame(data_big)
 
-  # Keep the older fixture for non-recruitment, non-growth modules only.
+  # Keep the older fixture for non-recruitment, non-growth, non-population
+  # structural parameters only. Drop old Data rows because current main uses
+  # parsed uncertainty strings rather than Data rows in the parameter table.
   base_parameters <- readRDS(
     testthat::test_path("fixtures", "parameters_model_comparison_project.RDS")
   ) |>
-    dplyr::filter(!module_name %in% c("Growth", "Recruitment", "Population"))
+    dplyr::filter(
+      !module_name %in% c("Data", "Growth", "Recruitment", "Population")
+    )
 
-  current_growth_recruitment <- FIMS::create_default_configurations(data = fims_frame) |>
-    tidyr::unnest(cols = data) |>
-    dplyr::mutate(
-      module_type = dplyr::if_else(
-        module_name == "Growth",
-        "VonBertalanffy",
-        module_type
-      )
-    ) |>
-    tidyr::nest(.by = c(model_family, module_name, fleet)) |>
-    FIMS::create_default_parameters(data = fims_frame) |>
-    tidyr::unnest(cols = data) |>
-    dplyr::mutate(
-      estimation_type = dplyr::case_when(
-        module_name == "Growth" &
-          label %in% c(
-            "length_at_ref_age_1",
-            "length_at_ref_age_2",
-            "growth_coefficient_K"
-          ) ~ "fixed_effects",
-        module_name == "Growth" ~ "constant",
-        TRUE ~ estimation_type
-      )
-    ) |>
+  current_growth_recruitment <- make_vonb_parameters(fims_frame) |>
     dplyr::filter(module_name %in% c("Growth", "Recruitment", "Population"))
 
   list(
@@ -272,40 +186,31 @@ initialize_test_fleet <- function(parameters, data, fleet) {
     dplyr::pull(.data$type) |>
     unique()
 
-  data_distribution_names_for_fleet <- parameters |>
-    dplyr::filter(
-      .data$fleet == .env$fleet,
-      .data$distribution_type == "Data"
-    ) |>
-    dplyr::pull(.data$module_type)
-
-  if ("landings" %in% fleet_types &&
-      "Landings" %in% data_distribution_names_for_fleet) {
-    landings <- FIMS:::initialize_landings(data = data, fleet = fleet)
-    linked_ids <- c(linked_ids, landings = landings$get_id())
+  if ("catch" %in% fleet_types) {
+    catch <- FIMS:::initialize_catch(data = data, fleet = fleet)
+    linked_ids <- c(linked_ids, catch = catch$get_id())
   }
 
-  if ("index" %in% fleet_types &&
-      "Index" %in% data_distribution_names_for_fleet) {
+  if ("index" %in% fleet_types) {
     index <- FIMS:::initialize_index(data = data, fleet = fleet)
     linked_ids <- c(linked_ids, index = index$get_id())
   }
 
-  if ("age_comp" %in% fleet_types &&
-      "AgeComp" %in% data_distribution_names_for_fleet) {
+  if ("age_comp" %in% fleet_types) {
     age_comp <- FIMS:::initialize_comp(
       data = data,
       fleet = fleet,
+      parameters = parameters,
       type = "AgeComp"
     )
     linked_ids <- c(linked_ids, age_comp = age_comp$get_id())
   }
 
-  if ("length_comp" %in% fleet_types &&
-      "LengthComp" %in% data_distribution_names_for_fleet) {
+  if ("length_comp" %in% fleet_types) {
     length_comp <- FIMS:::initialize_comp(
       data = data,
       fleet = fleet,
+      parameters = parameters,
       type = "LengthComp"
     )
     linked_ids <- c(linked_ids, length_comp = length_comp$get_id())
@@ -410,15 +315,15 @@ test_that("von bertalanffy growth converges when L1 L2 and K are estimable", {
     tolerance = 1e-8
   )
 
-  #' @description Test that objective-side landings weight_at_age uses the biological population mean WAA on the refactored VonB path.
-  fleet_landings_numbers_at_age <- report[["landings_numbers_at_age"]][[1]]
-  fleet_landings_weight_at_age <- report[["landings_weight_at_age"]][[1]]
-  positive_landings_cells <- abs(fleet_landings_numbers_at_age) > 0
-  expect_true(any(positive_landings_cells))
+  #' @description Test that objective-side catch weight_at_age uses the biological population mean WAA on the refactored VonB path.
+  fleet_catch_numbers_at_age <- report[["catch_numbers_at_age"]][[1]]
+  fleet_catch_weight_at_age <- report[["catch_weight_at_age"]][[1]]
+  positive_catch_cells <- abs(fleet_catch_numbers_at_age) > 0
+  expect_true(any(positive_catch_cells))
   expect_equal(
-    fleet_landings_weight_at_age[positive_landings_cells] /
-      fleet_landings_numbers_at_age[positive_landings_cells],
-    population_mean_waa[positive_landings_cells],
+    fleet_catch_weight_at_age[positive_catch_cells] /
+      fleet_catch_numbers_at_age[positive_catch_cells],
+    population_mean_waa[positive_catch_cells],
     tolerance = 1e-8
   )
 

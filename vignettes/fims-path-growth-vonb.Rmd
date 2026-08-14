@@ -57,15 +57,12 @@ library(FIMS)
 data("data_big")
 fims_frame <- FIMSFrame(data_big)
 
-# Switch Growth to VonBertalanffy
-config <- create_default_configurations(data = fims_frame) |>
-  tidyr::unnest(cols = data)
-config$module_type[config$module_name == "Growth"] <- "VonBertalanffy"
-config <- tidyr::nest(config, .by = c(model_family, module_name, fleet_name))
-
-# Create default parameters (Growth defaults live here)
-params <- create_default_parameters(configurations = config, data = fims_frame) |>
-  tidyr::unnest(cols = data)
+# Create default parameters, then replace the default empirical
+# weight-at-age Growth row with VonB Growth rows.
+params <- setup_default_parameters(
+  data = fims_frame,
+  growth_module_type = "VonBertalanffy"
+)
 
 # Optional: override Growth values
 params <- dplyr::rows_update(
@@ -84,7 +81,7 @@ params <- dplyr::rows_update(
 growth <- FIMS:::initialize_growth(parameters = params, data = fims_frame)
 ```
 
-The defaults for growth parameters (including `reference_age_for_length_1`, `reference_age_for_length_2`, and `length_at_age_sd_at_ref_ages`) are created in `R/create_default_parameters.R`. Missing reference ages are treated as an error during initialization so defaults remain centralized.
+The defaults for growth parameters (including `reference_age_for_length_1`, `reference_age_for_length_2`, and `length_at_age_sd_at_ref_ages`) are created by `setup_default_Growth()` in `R/setup_default_parameters.R`. Missing reference ages are treated as an error during initialization so defaults remain centralized.
 
 ## Rcpp Interface
 

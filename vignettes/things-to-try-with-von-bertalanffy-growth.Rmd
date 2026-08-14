@@ -64,6 +64,7 @@ core_growth_labels <- c(
   "length_at_ref_age_2",
   "growth_coefficient_K"
 )
+
 ```
 
 ## Bring Your Own Growth Data
@@ -86,7 +87,7 @@ important pieces are:
 - `length_comp` rows for the fleets and years you want the growth path to help explain,
 - `length_bin` rows if you want to control the fleet observation bins explicitly,
 - `weight_at_age` rows because the current FIMS user path still requires them,
-- the usual supporting data for the rest of the model, such as landings, index,
+- the usual supporting data for the rest of the model, such as catch, index,
   and age compositions when those are part of the assessment.
 
 ### If you start from raw age-length samples
@@ -105,22 +106,10 @@ workflow is:
 ```{r byog-growth-template, eval = FALSE}
 my_frame <- FIMS::FIMSFrame(my_long_data)
 
-my_configurations <- FIMS::create_default_configurations(data = my_frame) |>
-  tidyr::unnest(cols = data) |>
-  dplyr::mutate(
-    module_type = dplyr::if_else(
-      module_name == "Growth",
-      "VonBertalanffy",
-      module_type
-    )
-  ) |>
-  tidyr::nest(.by = c(model_family, module_name, fleet))
-
-my_parameters <- FIMS::create_default_parameters(
-  configurations = my_configurations,
-  data = my_frame
-) |>
-  tidyr::unnest(cols = data)
+my_parameters <- FIMS::setup_default_parameters(
+  data = my_frame,
+  growth_module_type = "VonBertalanffy"
+)
 
 # Then update the key Growth values to match your stock as closely as you can:
 # - length_at_ref_age_1
@@ -156,26 +145,11 @@ FIMS::clear()
 baseline_demo <- make_vonb_demo_data()
 
 # Replace the default empirical weight-at-age Growth module with
-# Von Bertalanffy growth.
-baseline_configurations <- FIMS::create_default_configurations(
-  data = baseline_demo$frame
-) |>
-  tidyr::unnest(cols = data) |>
-  dplyr::mutate(
-    module_type = dplyr::if_else(
-      module_name == "Growth",
-      "VonBertalanffy",
-      module_type
-    )
-  ) |>
-  tidyr::nest(.by = c(model_family, module_name, fleet))
-
-# Create the parameter table.
-baseline_parameters <- FIMS::create_default_parameters(
-  configurations = baseline_configurations,
-  data = baseline_demo$frame
-) |>
-  tidyr::unnest(cols = data)
+# Create the parameter table with VonB Growth defaults.
+baseline_parameters <- FIMS::setup_default_parameters(
+  data = baseline_demo$frame,
+  growth_module_type = "VonBertalanffy"
+)
 
 # Pull out the default VonB SD anchor rows.
 baseline_growth_sd_rows <- baseline_parameters |>
@@ -275,24 +249,10 @@ FIMS::clear()
 
 starting_values_demo <- make_vonb_demo_data()
 
-starting_values_configurations <- FIMS::create_default_configurations(
-  data = starting_values_demo$frame
-) |>
-  tidyr::unnest(cols = data) |>
-  dplyr::mutate(
-    module_type = dplyr::if_else(
-      module_name == "Growth",
-      "VonBertalanffy",
-      module_type
-    )
-  ) |>
-  tidyr::nest(.by = c(model_family, module_name, fleet))
-
-starting_values_parameters <- FIMS::create_default_parameters(
-  configurations = starting_values_configurations,
-  data = starting_values_demo$frame
-) |>
-  tidyr::unnest(cols = data)
+starting_values_parameters <- FIMS::setup_default_parameters(
+  data = starting_values_demo$frame,
+  growth_module_type = "VonBertalanffy"
+)
 
 starting_values_growth_sd_rows <- starting_values_parameters |>
   dplyr::filter(
@@ -393,24 +353,10 @@ finer_bins_demo <- make_vonb_demo_data(
   lengths = seq(0, 1400, 25)
 )
 
-finer_bins_configurations <- FIMS::create_default_configurations(
-  data = finer_bins_demo$frame
-) |>
-  tidyr::unnest(cols = data) |>
-  dplyr::mutate(
-    module_type = dplyr::if_else(
-      module_name == "Growth",
-      "VonBertalanffy",
-      module_type
-    )
-  ) |>
-  tidyr::nest(.by = c(model_family, module_name, fleet))
-
-finer_bins_parameters <- FIMS::create_default_parameters(
-  configurations = finer_bins_configurations,
-  data = finer_bins_demo$frame
-) |>
-  tidyr::unnest(cols = data)
+finer_bins_parameters <- FIMS::setup_default_parameters(
+  data = finer_bins_demo$frame,
+  growth_module_type = "VonBertalanffy"
+)
 
 finer_bins_growth_sd_rows <- finer_bins_parameters |>
   dplyr::filter(
@@ -572,24 +518,10 @@ wider_sd_demo <- make_vonb_demo_data(
   sd_at_ref_ages = c(45, 110)
 )
 
-wider_sd_configurations <- FIMS::create_default_configurations(
-  data = wider_sd_demo$frame
-) |>
-  tidyr::unnest(cols = data) |>
-  dplyr::mutate(
-    module_type = dplyr::if_else(
-      module_name == "Growth",
-      "VonBertalanffy",
-      module_type
-    )
-  ) |>
-  tidyr::nest(.by = c(model_family, module_name, fleet))
-
-wider_sd_parameters <- FIMS::create_default_parameters(
-  configurations = wider_sd_configurations,
-  data = wider_sd_demo$frame
-) |>
-  tidyr::unnest(cols = data)
+wider_sd_parameters <- FIMS::setup_default_parameters(
+  data = wider_sd_demo$frame,
+  growth_module_type = "VonBertalanffy"
+)
 
 # CHANGED: use matching wider SD anchors in the model.
 wider_sd_growth_sd_rows <- wider_sd_parameters |>
@@ -693,24 +625,10 @@ second_ref_demo <- make_vonb_demo_data(
   sd_at_ref_ages = c(30, 85)
 )
 
-second_ref_configurations <- FIMS::create_default_configurations(
-  data = second_ref_demo$frame
-) |>
-  tidyr::unnest(cols = data) |>
-  dplyr::mutate(
-    module_type = dplyr::if_else(
-      module_name == "Growth",
-      "VonBertalanffy",
-      module_type
-    )
-  ) |>
-  tidyr::nest(.by = c(model_family, module_name, fleet))
-
-second_ref_parameters <- FIMS::create_default_parameters(
-  configurations = second_ref_configurations,
-  data = second_ref_demo$frame
-) |>
-  tidyr::unnest(cols = data)
+second_ref_parameters <- FIMS::setup_default_parameters(
+  data = second_ref_demo$frame,
+  growth_module_type = "VonBertalanffy"
+)
 
 # CHANGED: move the second SD anchor to age 15.
 second_ref_growth_sd_rows <- second_ref_parameters |>
@@ -811,24 +729,10 @@ FIMS::clear()
 
 alk_report_off_demo <- make_vonb_demo_data()
 
-alk_report_off_configurations <- FIMS::create_default_configurations(
-  data = alk_report_off_demo$frame
-) |>
-  tidyr::unnest(cols = data) |>
-  dplyr::mutate(
-    module_type = dplyr::if_else(
-      module_name == "Growth",
-      "VonBertalanffy",
-      module_type
-    )
-  ) |>
-  tidyr::nest(.by = c(model_family, module_name, fleet))
-
-alk_report_off_parameters <- FIMS::create_default_parameters(
-  configurations = alk_report_off_configurations,
-  data = alk_report_off_demo$frame
-) |>
-  tidyr::unnest(cols = data)
+alk_report_off_parameters <- FIMS::setup_default_parameters(
+  data = alk_report_off_demo$frame,
+  growth_module_type = "VonBertalanffy"
+)
 
 alk_report_off_growth_sd_rows <- alk_report_off_parameters |>
   dplyr::filter(
@@ -1179,84 +1083,84 @@ These plots use values from the report object. They are whole-model outputs,
 so they are useful for seeing how changes move through the model, but they are
 not one-to-one tests of the Growth module alone.
 
-### Compare Expected Landings
+### Compare Expected Catch
 
-```{r plot-landings-across-runs, fig.alt = "Expected landings across growth scenarios."}
+```{r plot-catch-across-runs, fig.alt = "Expected catch across growth scenarios."}
 #| fig.width: 9
 #| fig.height: 6
-landings_comparison <- dplyr::bind_rows(
+catch_comparison <- dplyr::bind_rows(
   tibble::tibble(
     scenario = "baseline",
     year = baseline_demo$years,
-    landings_expected =
-      baseline_report[["landings_expected"]][[1]]
+    catch_expected =
+      baseline_report[["catch_expected"]][[1]]
   ),
   tibble::tibble(
     scenario = "changed starting values",
     year = starting_values_demo$years,
-    landings_expected =
-      starting_values_report[["landings_expected"]][[1]]
+    catch_expected =
+      starting_values_report[["catch_expected"]][[1]]
   ),
   tibble::tibble(
     scenario = "finer fleet bins",
     year = finer_bins_demo$years,
-    landings_expected =
-      finer_bins_report[["landings_expected"]][[1]]
+    catch_expected =
+      finer_bins_report[["catch_expected"]][[1]]
   ),
   tibble::tibble(
     scenario = "wider SD",
     year = wider_sd_demo$years,
-    landings_expected =
-      wider_sd_report[["landings_expected"]][[1]]
+    catch_expected =
+      wider_sd_report[["catch_expected"]][[1]]
   ),
   tibble::tibble(
     scenario = "second reference age 15",
     year = second_ref_demo$years,
-    landings_expected =
-      second_ref_report[["landings_expected"]][[1]]
+    catch_expected =
+      second_ref_report[["catch_expected"]][[1]]
   ),
   tibble::tibble(
     scenario = "ALK report off",
     year = alk_report_off_demo$years,
-    landings_expected =
-      alk_report_off_report[["landings_expected"]][[1]]
+    catch_expected =
+      alk_report_off_report[["catch_expected"]][[1]]
   )
 )
 
-landings_target <- baseline_demo$raw_data |>
-  dplyr::filter(type == "landings") |>
+catch_target <- baseline_demo$raw_data |>
+  dplyr::filter(type == "catch") |>
   dplyr::pull(value) |>
   dplyr::first()
 
-landings_plot_limits <- range(
+catch_plot_limits <- range(
   c(
-    landings_comparison$landings_expected,
-    landings_target - 0.5,
-    landings_target + 0.5
+    catch_comparison$catch_expected,
+    catch_target - 0.5,
+    catch_target + 0.5
   )
 )
 
 ggplot2::ggplot(
-  landings_comparison,
+  catch_comparison,
   ggplot2::aes(
     x = year,
-    y = landings_expected,
+    y = catch_expected,
     color = scenario,
     linetype = scenario
   )
 ) +
   ggplot2::geom_hline(
-    yintercept = landings_target,
+    yintercept = catch_target,
     color = "grey40",
     linetype = "dotted"
   ) +
   ggplot2::geom_line(linewidth = 1) +
   ggplot2::geom_point() +
-  ggplot2::coord_cartesian(ylim = landings_plot_limits) +
+  ggplot2::coord_cartesian(ylim = catch_plot_limits) +
   ggplot2::labs(
-    title = "Expected landings across growth scenarios",
+    title = "Expected catch across growth scenarios",
     x = "Year",
-    y = "Expected landings",
+    y = "Expected catch",
     color = NULL,
     linetype = NULL
   ) +

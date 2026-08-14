@@ -29,6 +29,9 @@
 #'
 #' @param data A `FIMSFrame` object returned from running [FIMSFrame()] on
 #'   your long input data.
+#' @param growth_module_type A character string specifying which Growth module
+#'   defaults to use. The default is `"EWAA"`. Use `"VonBertalanffy"` to
+#'   create Von Bertalanffy Growth defaults for the growth-derived ALK pathway.
 #' @return
 #' A `tibble` containing default parameter values and metadata for your model.
 #' Key columns are listed below:
@@ -94,8 +97,12 @@
 #'     )
 #'   )
 #' }
-setup_default_parameters <- function(data) {
+setup_default_parameters <- function(
+  data,
+  growth_module_type = c("EWAA", "VonBertalanffy")
+) {
   is.FIMSFrame(data)
+  growth_module_type <- rlang::arg_match(growth_module_type)
 
   fleets <- get_fleets(data)
 
@@ -129,7 +136,10 @@ setup_default_parameters <- function(data) {
   maturity_defaults <- setup_default_Maturity(data = data)
 
   # Create growth parameters
-  growth_defaults <- setup_default_Growth()
+  growth_defaults <- setup_default_Growth(
+    data = data,
+    module_type = growth_module_type
+  )
 
   # Suppress the known informational alert about log_init_naa being NA here,
   # because this function computes and sets log_init_naa immediately below.
@@ -274,8 +284,10 @@ setup_default_parameters_template <- function(n_parameters = 1) {
 #' This function creates default growth parameters for a Fisheries Integrated
 #' Modeling System (FIMS) model. It generates a tibble with fields for
 #' module name, module type, label, value, and estimation type.
-#' @param module_type A character string specifying the type of growth module. The
-#' default is `"EWAA"`.
+#' @param data A `FIMSFrame` object returned from running [FIMSFrame()] on
+#'   your long input data. Required when `module_type = "VonBertalanffy"`.
+#' @param module_type A character string specifying the type of growth module.
+#'   The default is `"EWAA"`.
 #' @return
 #' A tibble containing default growth parameters. See \code{\link{setup_default_parameters}}
 #' for full column descriptions.
@@ -289,18 +301,98 @@ setup_default_parameters_template <- function(n_parameters = 1) {
 #' default_growth_parameters <- setup_default_Growth()
 #' }
 setup_default_Growth <- function(
-  module_type = c("EWAA")
+  data = NULL,
+  module_type = c("EWAA", "VonBertalanffy")
 ) {
   # Input check
   module_type <- rlang::arg_match(module_type)
 
-  default <- setup_default_parameters_template(
-    n_parameters = 1
-  ) |>
+  if (identical(module_type, "EWAA")) {
+    default <- setup_default_parameters_template(
+      n_parameters = 1
+    ) |>
+      dplyr::mutate(
+        module_name = "Growth",
+        module_type = .env$module_type
+      )
+
+    return(default)
+  }
+
+  if (is.null(data)) {
+    cli::cli_abort(c(
+      "{.fn setup_default_Growth} requires {.var data} when {.code module_type = \"VonBertalanffy\"}.",
+      "i" = "VonBertalanffy defaults use the model ages to choose reference ages."
+    ))
+  }
+
+  is.FIMSFrame(data)
+
+  ages <- get_ages(data)
+  if (length(ages) == 0 || all(is.na(ages))) {
+    reference_age_for_length_1 <- 0
+    n_ages <- get_n_ages(data)
+    reference_age_for_length_2 <- if (n_ages > 0) n_ages - 1 else 0
+  } else {
+    reference_age_for_length_1 <- min(ages, na.rm = TRUE)
+    reference_age_for_length_2 <- max(ages, na.rm = TRUE)
+  }
+
+  # Use interpolation SD anchors as the default VonB variability path.
+  # The delta-method wiring is retained in the backend, but it is not used
+  # in the default setup until it is re-derived for the traditional Von
+  # Bertalanffy parameterization.
+  default <- setup_default_parameters_template(n_parameters = 9) |>
     dplyr::mutate(
       module_name = "Growth",
-      module_type = .env$module_type
+      module_type = "VonBertalanffy",
+      label = c(
+        "length_at_ref_age_1",
+        "length_at_ref_age_2",
+        "growth_coefficient_K",
+        "reference_age_for_length_1",
+        "reference_age_for_length_2",
+        "length_weight_a",
+        "length_weight_b",
+        "length_at_age_sd_at_ref_ages",
+        "length_at_age_sd_at_ref_ages"
+      ),
+      age = c(
+        NA_real_,
+        NA_real_,
+        NA_real_,
+        NA_real_,
+        NA_real_,
+        NA_real_,
+        NA_real_,
+        reference_age_for_length_1,
+        reference_age_for_length_2
+      ),
+      value = c(
+        275,
+        725,
+        0.18,
+        reference_age_for_length_1,
+        reference_age_for_length_2,
+        2.5e-11,
+        3,
+        28,
+        73
+      ),
+      estimation_type = c(
+        "fixed_effects",
+        "fixed_effects",
+        "fixed_effects",
+        "constant",
+        "constant",
+        "constant",
+        "constant",
+        "constant",
+        "constant"
+      )
     )
+
+  return(default)
 }
 
 #' Set up default population parameters
