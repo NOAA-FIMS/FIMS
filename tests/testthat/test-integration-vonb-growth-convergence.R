@@ -50,10 +50,10 @@ make_vonb_explicit_length_bin_context <- function() {
     fleet = "survey1",
     age = NA_real_,
     length = survey1_short_bins,
-    value = NA_real_,
+    observed = NA_real_,
     unit = unique(data_big$unit[which(data_big$fleet == "survey1")])[1],
     timing = NA_real_,
-    uncertainty = NA_real_
+    uncertainty = NA_character_
   )
 
   custom_data <- data_big |>
@@ -68,10 +68,10 @@ make_vonb_explicit_length_bin_context <- function() {
     dplyr::bind_rows(survey1_bins) |>
     dplyr::group_by(fleet, type, timing) |>
     dplyr::mutate(
-      value = dplyr::if_else(
+      observed = dplyr::if_else(
         fleet == "survey1" & type == "length_comp",
-        value / sum(value, na.rm = TRUE),
-        value
+        observed / sum(observed, na.rm = TRUE),
+        observed
       )
     ) |>
     dplyr::ungroup()
@@ -94,10 +94,10 @@ make_two_fleet_length_context <- function() {
     fleet = "survey1",
     age = NA_real_,
     length = survey1_short_bins,
-    value = NA_real_,
+    observed = NA_real_,
     unit = unique(data_big$unit[which(data_big$fleet == "survey1")])[1],
     timing = NA_real_,
-    uncertainty = NA_real_
+    uncertainty = NA_character_
   )
 
   custom_data <- data_big |>
@@ -118,10 +118,10 @@ make_two_fleet_length_context <- function() {
     dplyr::bind_rows(survey1_bins) |>
     dplyr::group_by(fleet, type, timing) |>
     dplyr::mutate(
-      value = dplyr::if_else(
+      observed = dplyr::if_else(
         fleet == "survey1" & type == "length_comp",
-        value / sum(value, na.rm = TRUE),
-        value
+        observed / sum(observed, na.rm = TRUE),
+        observed
       )
     ) |>
     dplyr::ungroup()
@@ -636,9 +636,24 @@ test_that("fleet-specific length bins initialize n_lengths consistently", {
     ctx$data |>
       FIMS::get_data() |>
       dplyr::filter(type == "length_comp", fleet == "fleet1") |>
-      dplyr::mutate(out = dplyr::if_else(is.na(value * uncertainty), -999, value * uncertainty)) |>
+      dplyr::mutate(
+        sample_size = dplyr::if_else(
+          observed == -999,
+          1,
+          unlist(
+            FIMS:::parse_data_distribution(uncertainty)$size,
+            use.names = FALSE
+          )
+        ),
+        out = dplyr::if_else(
+          unit == "number",
+          observed,
+          observed * sample_size
+        )
+      ) |>
       dplyr::pull(out)
   )
+
   expect_equal(
     lengthcomp2_obj$length_comp_data$get_values(),
     ctx$data |>
@@ -648,11 +663,25 @@ test_that("fleet-specific length bins initialize n_lengths consistently", {
         fleet == "survey1",
         length %in% fleet_short_lengths
       ) |>
-      dplyr::mutate(out = dplyr::if_else(is.na(value * uncertainty), -999, value * uncertainty)) |>
+      dplyr::mutate(
+        sample_size = dplyr::if_else(
+          observed == -999,
+          1,
+          unlist(
+            FIMS:::parse_data_distribution(uncertainty)$size,
+            use.names = FALSE
+          )
+        ),
+        out = dplyr::if_else(
+          unit == "number",
+          observed,
+          observed * sample_size
+        )
+      ) |>
       dplyr::pull(out)
   )
-})
 
+})
 ## Edge handling ----
 # No edge cases to test.
 
