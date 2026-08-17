@@ -27,6 +27,10 @@ extern "C" SEXP fims_call_build_default_likelihood(
     SEXP n_years_sexp,
     SEXP n_ages_sexp,
     SEXP n_lengths_sexp);
+extern "C" SEXP fims_call_add_prior(
+    SEXP module_sexp, SEXP object_id_sexp, SEXP parameter_sexp,
+    SEXP distribution_sexp, SEXP mean_sexp, SEXP log_sd_sexp,
+    SEXP mean_estimation_type_sexp, SEXP log_sd_estimation_type_sexp);
 extern "C" SEXP fims_call_information_model_counts();
 extern "C" SEXP fims_call_information_clear();
 extern "C" SEXP fims_call_information_get_fixed();

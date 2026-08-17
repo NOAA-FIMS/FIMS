@@ -314,6 +314,12 @@ class Information {
       std::shared_ptr<fims_distributions::DensityComponentBase<Type>> d =
           (*it).second;
       if (d->input_type == "prior") {
+        // Native priors are linked directly to their parameter vectors. The
+        // legacy interface instead supplied variable-map keys that must be
+        // resolved here.
+        if (d->key.empty() && !d->priors.empty() && d->priors[0] != NULL) {
+          continue;
+        }
         FIMS_INFO_LOG("Setup prior for distribution " + fims::to_string(d->id));
         variable_map_iterator vmit;
         FIMS_INFO_LOG("Link prior from distribution " + fims::to_string(d->id) +

@@ -74,6 +74,61 @@ native_build_default_likelihood <- function(
   )
 }
 
+#' Add a prior to a native FIMS parameter
+#'
+#' Adds a normal or lognormal prior to an entire native parameter vector. A
+#' scalar `mean` or `log_sd` is recycled across the vector; alternatively each
+#' may have the same length as the target parameter. Prior hyperparameters can
+#' be constants or fixed effects.
+#'
+#' @param module Native module name: `"Fleet"`, `"Population"`,
+#'   `"Recruitment"`, `"Maturity"`, or `"Selectivity"`.
+#' @param object_id Integer handle returned when the native module was created.
+#' @param parameter Name of the parameter vector within the module.
+#' @param distribution Either `"normal"` (or `"Dnorm"`) or `"lognormal"`
+#'   (or `"Dlnorm"`).
+#' @param mean Numeric prior mean. For a lognormal prior this is the mean on the
+#'   log scale.
+#' @param log_sd Numeric natural logarithm of the prior standard deviation.
+#' @param mean_estimation_type,log_sd_estimation_type Whether each prior
+#'   hyperparameter is `"constant"` or `"fixed_effects"`.
+#' @return `TRUE` invisibly when the prior is registered.
+#' @export
+native_add_prior <- function(
+  module,
+  object_id,
+  parameter,
+  distribution = c("normal", "lognormal", "Dnorm", "Dlnorm"),
+  mean = 0,
+  log_sd = 0,
+  mean_estimation_type = "constant",
+  log_sd_estimation_type = "constant"
+) {
+  distribution <- match.arg(distribution)
+  distribution <- switch(distribution,
+    Dnorm = "normal",
+    Dlnorm = "lognormal",
+    distribution
+  )
+  result <- .Call(
+    "fims_call_add_prior",
+    as.character(module),
+    as.integer(object_id),
+    as.character(parameter),
+    distribution,
+    as.numeric(mean),
+    as.numeric(log_sd),
+    as.integer(.map_estimation_type_code(mean_estimation_type)),
+    as.integer(.map_estimation_type_code(log_sd_estimation_type)),
+    PACKAGE = "FIMS"
+  )
+  invisible(result)
+}
+
+#' @rdname native_add_prior
+#' @export
+add_prior <- native_add_prior
+
 #' Read registered native FIMS parameters
 #'
 #' @return A numeric vector in native registration order.
