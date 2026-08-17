@@ -139,6 +139,7 @@ nlls
 NMFS
 nmfspalette
 NOAA
+normalcdf
 nrecruits
 nsaw
 nsurveys
@@ -177,6 +178,7 @@ rcppchunk
 rdname
 rdrr
 Rdynload
+rebinning
 recr
 recruitments
 reportvector
@@ -233,6 +235,7 @@ usethis
 Venzon
 viridis
 vmit
+vonb
 Weverything
 Wextra
 widehat
