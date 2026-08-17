@@ -1,0 +1,295 @@
+---
+title: "Empirical Dynamic Modeling (EDM) Workflow in FIMS"
+output: github_document
+vignette: >
+  %\VignetteIndexEntry{Empirical Dynamic Modeling (EDM) Workflow in FIMS}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, eval = FALSE)
+withr::local_options(list(
+  cli.num_colors   = 1,
+  crayon.enabled   = FALSE,
+  pillar.subtle    = FALSE
+))
+```
+
+## Overview
+
+Empirical Dynamic Modeling (EDM) is a nonparametric framework for analyzing
+nonlinear dynamical systems from time series data. Unlike parametric stock
+assessment models, EDM makes no assumptions about functional forms — it
+reconstructs the attractor geometry of the underlying system directly from
+lagged coordinates of the observed time series (Takens' theorem).
+
+FIMS implements three EDM prediction algorithms through a high-level R
+interface backed by C++ functors:
+
+| Method | Function | Best suited for |
+|--------|----------|----------------|
+| **Simplex Projection** | `fit_edm(method = "simplex")` | Identifying embedding dimension, nonlinearity testing |
+| **S-Map** | `fit_edm(method = "smap")` | Quantifying nonlinearity strength, state-dependent coefficients |
+| **GP-EDM** | `fit_edm(method = "gp")` | Probabilistic prediction, uncertainty quantification |
+
+This vignette walks through the complete univariate EDM workflow — from
+embedding dimension selection to multi-step forecasting — using the built-in
+`data_big` dataset.
+
+## Setup
+
+```{r library}
+library(FIMS)
+library(ggplot2)
+
+data("data_big")
+ff <- FIMSFrame(data_big)
+```
+
+## Step 1 — Select the Embedding Dimension E
+
+The first step in any EDM analysis is finding the optimal embedding dimension
+`E`. `select_embedding_dimension()` sweeps `E` from `E_min` to `E_max`,
+runs Simplex Projection with `n_neighbors = E + 1` for each candidate, and
+returns the Pearson correlation (ρ) and RMSE between in-library predictions
+and observations.
+
+```{r select-E}
+edim <- select_embedding_dimension(
+  ff,
+  series_type = "landings",
+  series_name = "fleet1",
+  E_min = 1L,
+  E_max = 10L
+)
+print(edim)
+
+optimal_E <- edim$E[edim$optimal]
+cat("Optimal E:", optimal_E, "\n")
+```
+
+```{r plot-E, fig.alt="Prediction skill vs embedding dimension E"}
+ggplot(edim, aes(x = E, y = rho, colour = optimal)) +
+  geom_line(colour = "grey60") +
+  geom_point(size = 3) +
+  scale_colour_manual(values = c("FALSE" = "steelblue", "TRUE" = "firebrick")) +
+  labs(title = "Simplex prediction skill vs embedding dimension",
+       x = "Embedding dimension (E)", y = expression(rho)) +
+  theme_minimal() +
+  theme(legend.position = "none")
+```
+
+## Step 2 — Build the Delay Embedding
+
+Once the optimal `E` is identified, use `create_edm_embedding()` to store the
+delay-embedding matrix inside the `FIMSFrame`. This is required before calling
+`select_n_neighbors()` or `fit_edm()`.
+
+```{r create-embedding}
+ff <- create_edm_embedding(
+  ff,
+  series_type = "landings",
+  series_name = "fleet1",
+  E           = optimal_E,
+  tau         = 1L
+)
+
+# Inspect the stored embedding
+get_edm_embeddings(ff) |> names()
+```
+
+## Step 3 — Select Nearest Neighbours (Simplex only)
+
+For Simplex Projection, the number of nearest neighbours `n_neighbors`
+controls the degree of local averaging. `select_n_neighbors()` evaluates
+`k = E+1` to `k = min(n_library/2, E+10)` and identifies the best value.
+
+```{r select-k}
+skill_k <- select_n_neighbors(ff)
+print(skill_k)
+
+optimal_k <- skill_k$n_neighbors[skill_k$optimal]
+cat("Optimal n_neighbors:", optimal_k, "\n")
+```
+
+```{r plot-k, fig.alt="Prediction skill vs number of nearest neighbours"}
+ggplot(skill_k, aes(x = n_neighbors, y = rho, colour = optimal)) +
+  geom_line(colour = "grey60") +
+  geom_point(size = 3) +
+  scale_colour_manual(values = c("FALSE" = "steelblue", "TRUE" = "firebrick")) +
+  labs(title = "Simplex prediction skill vs n_neighbors",
+       x = "Number of nearest neighbours (k)", y = expression(rho)) +
+  theme_minimal() +
+  theme(legend.position = "none")
+```
+
+Alternatively, `fit_edm()` can auto-select `n_neighbors` internally by
+setting `auto_select = TRUE`.
+
+## Step 4 — Fit an EDM Model
+
+### Simplex Projection
+
+```{r fit-simplex}
+fit_s <- fit_edm(
+  ff,
+  method      = "simplex",
+  n_neighbors = optimal_k
+)
+print(fit_s)
+```
+
+### S-Map
+
+S-Map includes a nonlinearity parameter `theta`. Larger `theta` values weight
+library points closer to the query state more heavily. A `theta` near zero
+approximates a linear AR model.
+
+```{r fit-smap}
+fit_m <- fit_edm(
+  ff,
+  method = "smap",
+  theta  = 2.0
+)
+print(fit_m)
+```
+
+### GP-EDM
+
+GP-EDM fits a Gaussian process to the delay-embedding manifold, using MAP
+optimisation to learn ARD inverse length-scales `phi`, signal variance
+`sigma2`, and process noise `ve`. User-supplied initial values allow control
+over the optimisation starting point.
+
+```{r fit-gp}
+fit_g <- fit_edm(
+  ff,
+  method         = "gp",
+  gp_sigma2_init = 1.0,
+  gp_ve_init     = 0.1
+)
+print(fit_g)
+
+# Fitted GP hyperparameters
+get_parameters(fit_g)[c("phi", "sigma2", "ve")]
+```
+
+## Step 5 — Evaluate Prediction Skill
+
+`edm_skill()` computes ρ, RMSE, and MAE for any fitted `EDMFit` object
+against the stored target values in the `FIMSFrame`.
+
+```{r skill-compare}
+skill_s <- edm_skill(fit_s, ff)
+skill_m <- edm_skill(fit_m, ff)
+skill_g <- edm_skill(fit_g, ff)
+
+skill_tbl <- dplyr::bind_rows(skill_s, skill_m, skill_g)
+print(skill_tbl)
+```
+
+```{r plot-skill, fig.alt="In-library prediction skill comparison across EDM methods"}
+ggplot(skill_tbl, aes(x = method, y = rho, fill = method)) +
+  geom_col(width = 0.5, show.legend = FALSE) +
+  scale_fill_manual(values = c(
+    simplex = "steelblue", smap = "darkorange", gp = "forestgreen"
+  )) +
+  labs(title = "In-library prediction skill by EDM method",
+       x = "Method", y = expression(rho)) +
+  ylim(0, 1) +
+  theme_minimal()
+```
+
+## Step 6 — Generate Forecasts
+
+`edm_forecast()` generates out-of-sample empirical forecasts from any fitted
+`EDMFit` object. For `n_ahead > 1`, each predicted value is iteratively
+appended to the series and used as the query state for the next step.
+
+```{r forecast}
+fc_s <- edm_forecast(fit_s, ff, n_ahead = 5L)
+fc_m <- edm_forecast(fit_m, ff, n_ahead = 5L)
+fc_g <- edm_forecast(fit_g, ff, n_ahead = 5L)
+
+forecasts <- dplyr::bind_rows(
+  dplyr::mutate(fc_s, method = "simplex"),
+  dplyr::mutate(fc_m, method = "smap"),
+  dplyr::mutate(fc_g, method = "gp")
+)
+print(forecasts)
+```
+
+```{r plot-forecast, fig.alt="Five-step ahead EDM forecasts from three methods"}
+# Observed landings series
+obs <- dplyr::filter(get_data(ff),
+                     type == "landings", fleet == "fleet1") |>
+  dplyr::arrange(timing) |>
+  dplyr::select(time = timing, value)
+
+ggplot() +
+  geom_line(data = obs, aes(x = time, y = value), colour = "grey40") +
+  geom_point(data = obs, aes(x = time, y = value), colour = "grey40") +
+  geom_line(data = forecasts,
+            aes(x = time, y = forecast, colour = method, group = method),
+            linetype = "dashed", linewidth = 1) +
+  geom_point(data = forecasts,
+             aes(x = time, y = forecast, colour = method), size = 2) +
+  scale_colour_manual(values = c(
+    simplex = "steelblue", smap = "darkorange", gp = "forestgreen"
+  )) +
+  labs(title = "Landings: observed series and 5-step EDM forecasts",
+       x = "Year", y = "Landings", colour = "Method") +
+  theme_minimal()
+```
+
+## Multivariate Embedding (Preview)
+
+When multiple time series are available, `create_multivariate_edm_embedding()`
+builds a joint k×E delay-embedding matrix. This is useful for visualising
+cross-variable relationships and will support multivariate prediction in a
+future FIMS release once the C++ `construct_multivariate()` interface is
+merged.
+
+```{r multivariate}
+ff_mv <- create_multivariate_edm_embedding(
+  ff,
+  series_specs = list(
+    catch = list(series_type = "landings", series_name = "fleet1"),
+    index = list(series_type = "index",    series_name = "survey1")
+  ),
+  E             = optimal_E,
+  tau           = 1L,
+  target_series = "catch"
+)
+
+# Retrieve as a named matrix
+mat <- model_edm_matrix_multivariate(ff_mv, include_target = TRUE)
+head(mat)
+```
+
+## Summary
+
+The table below shows the complete set of EDM functions added in Phase 4 of
+the GSoC 2026 EDM integration, together with their roles in the workflow.
+
+| Function | Role |
+|----------|------|
+| `select_embedding_dimension()` | Find optimal `E` via Simplex sweep |
+| `create_edm_embedding()` | Build and store univariate delay embedding |
+| `select_n_neighbors()` | Find optimal `k` for Simplex via in-library CV |
+| `fit_edm()` | Fit Simplex, S-Map, or GP-EDM model |
+| `edm_skill()` | Compute ρ, RMSE, MAE for a fitted model |
+| `edm_forecast()` | Generate iterative multi-step out-of-sample forecasts |
+| `create_multivariate_edm_embedding()` | Build joint k×E embedding from multiple series |
+| `model_edm_matrix_multivariate()` | Retrieve multivariate embedding matrix |
+
+## References
+
+* Sugihara, G. & May, R. (1990). Nonlinear forecasting as a way of
+  distinguishing chaos from measurement error in time series. *Nature*,
+  344, 734–741.
+* Sugihara, G. et al. (2012). Detecting Causality in Complex Ecosystems.
+  *Science*, 338(6106), 496–500.
+* Ye, H. et al. (2015). Equation-free mechanistic ecosystem forecasting
+  using empirical dynamic modeling. *PNAS*, 112(13), E1569–E1576.
