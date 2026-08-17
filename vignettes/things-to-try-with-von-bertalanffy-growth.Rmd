@@ -103,7 +103,7 @@ workflow is:
 
 ### Minimal setup pattern
 
-```{r byog-growth-template, eval = FALSE}
+```{r own-growth-template, eval = FALSE}
 my_frame <- FIMS::FIMSFrame(my_long_data)
 
 my_parameters <- FIMS::setup_default_parameters(

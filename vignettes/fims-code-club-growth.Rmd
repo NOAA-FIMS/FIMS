@@ -377,7 +377,7 @@ make_vonb_demo_data <- function(
       age_probability = age_probabilities[match(age, ages)]
     ) |>
     dplyr::group_by(length) |>
-    dplyr::summarise(
+    dplyr::summarize(
       observed = sum(age_probability * conditional_probability),
       .groups = "drop"
     ) |>
