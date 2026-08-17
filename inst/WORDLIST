@@ -178,6 +178,7 @@ rcppchunk
 rdname
 rdrr
 Rdynload
+rebinned
 rebinning
 recr
 recruitments
@@ -243,8 +244,10 @@ withr
 Wmacro
 WORDLIST
 Wunused
+xout
 xlab
 yearf
 yearm
 yintercept
 ylab
+ylim
