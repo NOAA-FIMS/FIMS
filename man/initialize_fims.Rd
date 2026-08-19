@@ -19,14 +19,46 @@ modules requires passing the data and information regarding the uncertainty
 of that data, i.e., input sample sizes for the multinomial distribution.}
 }
 \value{
-A list is returned with two elements, \code{parameters} and \code{model}. The list can
-be passed to the \code{input} argument of \code{\link[=fit_fims]{fit_fims()}} to fit the model. The first
-element of the list can also be passed to the \code{parameters} argument of
-\code{\link[TMB:MakeADFun]{TMB::MakeADFun()}} if you wish to have more control over the model-fitting
-process.
-The model element of the returned list stores the instantiated C++ model
-module, e.g., the results of \code{methods::new(CatchAtAge)} for a catch-at-age
-model.
+A named list with exactly two top-level elements:
+\itemize{
+\item \code{parameters}: A named list of numeric starting-value vectors for TMB:
+\itemize{
+\item \code{p}: Fixed-effect values returned by \code{get_fixed()}.
+\item \code{re}: Random-effect values returned by \code{get_random()}. This vector is
+empty if the model has no random effects.
+}
+
+These vectors follow the initialized C++ parameter order, not necessarily
+the row order of the input \code{parameters} tibble. They contain values on the
+model's estimation scale (for example, log scale for log parameters).
+Parameters with \code{estimation_type = "constant"} are stored in the modules,
+not in these vectors. This nested list is not the input tibble.
+\item \code{model}: The instantiated C++ model module. Currently this is the
+catch-at-age model created with \code{methods::new(CatchAtAge)}.
+}
+
+The structure is:
+\preformatted{list(
+  parameters = list(
+    p = get_fixed(),
+    re = get_random()
+  ),
+  model = fims_model
+)
+}
+
+If the returned list is assigned to \code{initialized}, pass the entire list as
+\code{fit_fims(input = initialized)}. For manual fitting, pass only
+\code{initialized[["parameters"]]} to the \code{parameters} argument of
+\code{\link[TMB:MakeADFun]{TMB::MakeADFun()}}, with \code{random = "re"} and \code{DLL = "FIMS"}.
+The top-level name must be \code{parameters}, not \code{parameter_list}.
+
+No \code{map} element is returned. To map parameters when using \code{\link[=fit_fims]{fit_fims()}}, add
+\code{initialized[["map"]]} as a top-level named list of factors with entries
+\code{p} and/or \code{re}. Each factor must match the length and order of its
+corresponding vector in \code{initialized[["parameters"]]}. Omit an entry to
+leave that vector unmapped. See \code{\link[=fit_fims]{fit_fims()}} for mapping rules.
+
 It is important that you only have one FIMS model initialized in your R
 workspace at a time. Thus, after you initialize and fit the model, you should
 run \code{\link[=clear]{clear()}}.

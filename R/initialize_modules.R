@@ -878,14 +878,44 @@ initialize_comp <- function(data,
 #'   modules requires passing the data and information regarding the uncertainty
 #'   of that data, i.e., input sample sizes for the multinomial distribution.
 #' @return
-#' A list is returned with two elements, `parameters` and `model`. The list can
-#' be passed to the `input` argument of [fit_fims()] to fit the model. The first
-#' element of the list can also be passed to the `parameters` argument of
-#' [TMB::MakeADFun()] if you wish to have more control over the model-fitting
-#' process.
-#' The model element of the returned list stores the instantiated C++ model
-#' module, e.g., the results of `methods::new(CatchAtAge)` for a catch-at-age
-#' model.
+#' A named list with exactly two top-level elements:
+#'
+#' * `parameters`: A named list of numeric starting-value vectors for TMB:
+#'   * `p`: Fixed-effect values returned by `get_fixed()`.
+#'   * `re`: Random-effect values returned by `get_random()`. This vector is
+#'     empty if the model has no random effects.
+#'
+#'   These vectors follow the initialized C++ parameter order, not necessarily
+#'   the row order of the input `parameters` tibble. They contain values on the
+#'   model's estimation scale (for example, log scale for log parameters).
+#'   Parameters with `estimation_type = "constant"` are stored in the modules,
+#'   not in these vectors. This nested list is not the input tibble.
+#' * `model`: The instantiated C++ model module. Currently this is the
+#'   catch-at-age model created with `methods::new(CatchAtAge)`.
+#'
+#' The structure is:
+#' ```
+#' list(
+#'   parameters = list(
+#'     p = get_fixed(),
+#'     re = get_random()
+#'   ),
+#'   model = fims_model
+#' )
+#' ```
+#'
+#' If the returned list is assigned to `initialized`, pass the entire list as
+#' `fit_fims(input = initialized)`. For manual fitting, pass only
+#' `initialized[["parameters"]]` to the `parameters` argument of
+#' [TMB::MakeADFun()], with `random = "re"` and `DLL = "FIMS"`.
+#' The top-level name must be `parameters`, not `parameter_list`.
+#'
+#' No `map` element is returned. To map parameters when using [fit_fims()], add
+#' `initialized[["map"]]` as a top-level named list of factors with entries
+#' `p` and/or `re`. Each factor must match the length and order of its
+#' corresponding vector in `initialized[["parameters"]]`. Omit an entry to
+#' leave that vector unmapped. See [fit_fims()] for mapping rules.
+#'
 #' It is important that you only have one FIMS model initialized in your R
 #' workspace at a time. Thus, after you initialize and fit the model, you should
 #' run [clear()].

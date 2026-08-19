@@ -9,7 +9,8 @@ reshape_tmb_estimates(
   sdreport = NULL,
   opt = NULL,
   parameter_names,
-  precomputed_gradient = NULL
+  precomputed_gradient = NULL,
+  mapping = NULL
 )
 }
 \arguments{
@@ -30,6 +31,9 @@ at the MLE, typically from \code{get_gradient(x)}. When provided, this avoids
 a second call to \code{obj[["gr"]]()}, which would crash after \code{\link[=clear]{clear()}} has
 freed the C++ memory. If \code{NULL} (default), the gradient is computed
 directly from \code{obj[["gr"]](opt[["par"]])}.}
+
+\item{mapping}{Full-to-reduced parameter metadata saved during fitting, or
+\code{NULL} for fits created before mapping metadata was available.}
 }
 \value{
 A tibble containing the reshaped estimates (i.e., parameters and
