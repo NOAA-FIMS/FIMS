@@ -255,7 +255,7 @@ FIMS:::setup_default_log_init_naa(
 
 ### Time-varying parameters
 
-Catchability (`log_q`) can vary by year, with 1 value specified for each year instead of using a single value for all years. Give 1 row per year, in year order, because FIMS uses the rows in the order they appear rather than sorting by `timing`. Years without index data for that fleet do not inform `log_q`, so set those rows to `estimation_type = "constant"`. The value does not change the fit, because `log_q` in a year without index data is not included in the likelihood. It only affects the expected index for that year. Estimating them would make the Hessian singular, and then no parameter gets a standard error. In the output from `get_estimates()`, each `log_q` value is labeled with its year. Sharing 1 estimated value across a block of years is not yet available.
+Catchability (`log_q`) can vary by year, with 1 value specified for each year instead of using a single value for all years. Give 1 row per year, in year order, because FIMS uses the rows in the order they appear rather than sorting by `timing`. Years without index data for that fleet do not inform `log_q`, so set those rows to `estimation_type = "constant"`. The value does not change the fit, because `log_q` in a year without index data is not included in the likelihood. It only affects the expected index for that year. Estimating them would make the Hessian singular, and then no parameter gets a standard error. In the output from `get_estimates()`, each `log_q` value is labeled with its year. A TMB parameter map can share 1 estimated value across a block of years, as described below.
 
 ```{r time-varying-log-q}
 # 1 log_q per year for survey1, estimated only in years with index data
@@ -294,6 +294,30 @@ The tibble returned by `setup_default_parameters()` is just a data frame contain
 ### `fit_fims()`
 
 The list returned from `initialize_fims()` can be passed to the parameter of `fit_fims()` called `input` to run a FIMS model. If `optimize = FALSE`, the model will not actually be optimized but instead just checked to ensure it is a viable model. When `optimize = TRUE`, the model will be fit using `stats::nlminb()` and an object of the class `FIMSFit` will be returned.
+
+### Parameter maps
+
+Add a named `map` list to the initialized input to fix or share parameters using TMB's factor maps. The `p` map applies to fixed effects and the `re` map applies to random effects. Each factor must have the same length and order as its corresponding vector in `input[["parameters"]]`. Missing maps leave that vector unchanged. An `NA` entry holds a parameter at its starting value; repeated levels share one estimated value. Shared entries must have identical starting values. Levels are independent between the fixed and random vectors.
+
+For example, share the first two estimated fishing-mortality parameters:
+
+```{r parameter-map, eval=FALSE}
+mapped_input <- initialize_fims(parameters_4_model, data = data_4_model)
+fixed_names <- names(get_parameter_names(
+  as.list(mapped_input[["parameters"]][["p"]])
+))
+shared <- utils::head(which(grepl("log_Fmort", fixed_names)), 2)
+fixed_map <- seq_along(fixed_names)
+fixed_map[shared[2]] <- fixed_map[shared[1]]
+mapped_input[["parameters"]][["p"]][shared[2]] <-
+  mapped_input[["parameters"]][["p"]][shared[1]]
+mapped_input[["map"]] <- list(p = factor(fixed_map))
+mapped_fit <- fit_fims(mapped_input)
+```
+
+Use the same approach with `re` to map random effects. Mapping holds or shares parameters but does not remove their likelihood contributions. For example, fixing every recruitment deviation at zero while estimating its process variance can make the variance estimate degenerate; fix the variance too if it is not informed by other data.
+
+`get_estimates()` retains all original parameter rows and gives shared parameters the same estimate and standard error. Mapped-off parameters have `NA` standard errors. Gradients are reported only on the first parameter in each shared fixed-effect level; parameter counts refer to the reduced vectors optimized by TMB. If all fixed effects are mapped off, TMB evaluates the random-effects model without an outer optimizer. If every fixed and random effect is mapped off, use `optimize = FALSE`.
 
 ### Example
 

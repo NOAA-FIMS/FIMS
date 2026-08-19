@@ -308,7 +308,9 @@ check_sdreport_convergence <- function(
       na_se_labels <- character(0)
       large_se_labels <- character(0)
 
-      fixed_summary <- summary(sdreport, "fixed")
+      fixed_summary <- if (length(opt[["par"]]) > 0) {
+        summary(sdreport, "fixed")
+      }
 
       if (!is.null(fixed_summary) && nrow(fixed_summary) > 0) {
         fixed_labels <- summary_labels(fixed_summary, parameter_names, "p")
